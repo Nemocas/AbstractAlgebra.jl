@@ -230,6 +230,16 @@ end
       @test f*(g + h) == f*g + f*h
       @test f*(g - h) == f*g - f*h
    end
+
+   # Regression test for bug #484
+   R, x = LaurentSeriesRing(QQ, 20,"x")
+   a = sum(n*x^n for n in 1:17)
+   b = 83 + 43*x^10 + O(x^20)
+   c = a + b
+   ccp = deepcopy(c)
+   addeq!(a, b)
+   @test c - a == 0
+   @test c - ccp == 0
 end
 
 @testset "Generic.LaurentSeries.inplace_binary_ops..." begin

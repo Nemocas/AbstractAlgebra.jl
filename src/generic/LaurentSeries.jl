@@ -538,12 +538,12 @@ function +(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
             pb += sb
             k += 1
          else
-            z = setcoeff!(z, i, polcoeff(a, j))
+            z = setcoeff!(z, i, deepcopy(polcoeff(a, j)))
          end
          j += 1
          pa += sa
       elseif pi == pb && pi < minb
-         z = setcoeff!(z, i, polcoeff(b, k))
+         z = setcoeff!(z, i, deepcopy(polcoeff(b, k)))
          k += 1
          pb += sb
       else
@@ -598,7 +598,7 @@ function -(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
             pb += sb
             k += 1
          else
-            z = setcoeff!(z, i, polcoeff(a, j))
+            z = setcoeff!(z, i, deepcopy(polcoeff(a, j)))
          end
          j += 1
          pa += sa

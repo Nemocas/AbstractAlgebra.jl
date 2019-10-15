@@ -345,7 +345,7 @@ function +(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
    set_val!(z, valz)
    if vala >= valb
       for i = 1:min(lenb, vala - valb)
-         z = setcoeff!(z, i - 1, polcoeff(b, i - 1))
+         z = setcoeff!(z, i - 1, deepcopy(polcoeff(b, i - 1)))
       end
       for i = lenb + 1:min(vala - valb, lenz)
          z = setcoeff!(z, i - 1, R())
@@ -354,14 +354,14 @@ function +(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
          z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1) + polcoeff(b, i - 1))
       end
       for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1))
+         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - vala + valb - 1)))
       end
       for i = lena + vala - valb + 1:lenb
-         z = setcoeff!(z, i - 1, polcoeff(b, i - 1))
+         z = setcoeff!(z, i - 1, deepcopy(polcoeff(b, i - 1)))
       end
    else
       for i = 1:min(lena, valb - vala)
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
+         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - 1)))
       end
       for i = lena + 1:min(valb - vala, lenz)
          z = setcoeff!(z, i - 1, R())
@@ -370,10 +370,10 @@ function +(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
          z = setcoeff!(z, i - 1, polcoeff(a, i - 1) + polcoeff(b, i - valb + vala - 1))
       end
       for i = max(lena, valb - vala) + 1:lenb + valb - vala
-         z = setcoeff!(z, i - 1, polcoeff(b, i - valb + vala - 1))
+         z = setcoeff!(z, i - 1, deepcopy(polcoeff(b, i - valb + vala - 1)))
       end
       for i = lenb + valb - vala + 1:lena
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
+         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - 1)))
       end
    end
    set_length!(z, normalise(z, lenz))
@@ -412,14 +412,14 @@ function -(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
          z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1) - polcoeff(b, i - 1))
       end
       for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1))
+         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - vala + valb - 1)))
       end
       for i = lena + vala - valb + 1:lenb
          z = setcoeff!(z, i - 1, -polcoeff(b, i - 1))
       end
    else
       for i = 1:min(lena, valb - vala)
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
+         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - 1)))
       end
       for i = lena + 1:min(valb - vala, lenz)
          z = setcoeff!(z, i - 1, R())
@@ -431,7 +431,7 @@ function -(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
          z = setcoeff!(z, i - 1, -polcoeff(b, i - valb + vala - 1))
       end
       for i = lenb + valb - vala + 1:lena
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
+         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - 1)))
       end
    end
    set_length!(z, normalise(z, lenz))
