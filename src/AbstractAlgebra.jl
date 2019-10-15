@@ -324,14 +324,6 @@ function AllPerms(n::T) where T
   Generic.AllPerms(n)
 end
 
-function Perm(n::T) where T
-  Generic.Perm(n)
-end
-
-function Perm(a::AbstractVector{T}, check::Bool=true) where T
-  Generic.Perm(a, check)
-end
-
 function Partition(part::AbstractVector{T}, check::Bool=true) where T
   Generic.Partition(part, check)
 end
