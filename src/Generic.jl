@@ -7,7 +7,7 @@ import LinearAlgebra: lu, lu!, tr
 
 using Markdown, Random, InteractiveUtils
 
-import Base: Array, abs, asin, asinh, atan, atanh, bin, checkbounds, cmp, conj,
+import Base: Array, abs, asin, asinh, atan, atanh, axes, bin, checkbounds, cmp, conj,
              convert, copy, cos, cosh, dec, deepcopy, deepcopy_internal,
              exponent, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
              invmod, isapprox, isempty, isequal, isfinite, isless, isone, isqrt,

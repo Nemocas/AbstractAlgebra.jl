@@ -181,6 +181,17 @@ end
    @test degree(A) == 3
 
    @test issquare(A)
+   @test size(A) == (3, 3)
+   @test size(A, 1) == 3
+   @test size(A, 2) == 3
+   @test_throws BoundsError size(A, 0)
+   @test_throws BoundsError size(A, -rand(1:99))
+   @test axes(A) == (1:3, 1:3)
+   @test axes(A, 1) == 1:3
+   @test axes(A, 2) == 1:3
+   @test axes(A, rand(3:99)) == 1:1
+   @test_throws BoundsError axes(A, 0)
+   @test_throws BoundsError axes(A, -rand(1:99))
 end
 
 @testset "Generic.MatAlg.unary_ops..." begin

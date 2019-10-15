@@ -399,13 +399,17 @@ end
 
 ################################################################################
 #
-#   Size
+#   Size, axes and issquare
 #
 ################################################################################
 
-size(x::MatElem) = tuple(nrows(x), ncols(x))
+size(x::MatrixElem) = (nrows(x), ncols(x))
 
-size(t::MatElem, d) = d <= 2 ? size(t)[d] : 1
+size(t::MatrixElem, d::Integer) = d <= 2 ? size(t)[d] : 1
+
+axes(t::MatrixElem) = Base.OneTo.(size(t))
+
+axes(t::MatrixElem, d::Integer) = Base.OneTo(size(t, d))
 
 issquare(a::MatElem) = (nrows(a) == ncols(a))
 

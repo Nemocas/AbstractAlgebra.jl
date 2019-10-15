@@ -213,14 +213,40 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
    @test A[1, 1] === a
 end
 
-@testset "Generic.Mat.size..." begin
+@testset "Generic.Mat.size/axes..." begin
    A = matrix(QQ, [1 2 3; 4 5 6; 7 8 9])
    B = matrix(QQ, [1 2 3 4; 5 6 7 8])
 
    @test size(A) == (3,3)
+   @test size(A, 1) == 3
+   @test size(A, 2) == 3
+   @test size(A, rand(3:99)) == 1
+   @test_throws BoundsError size(A, 0)
+   @test_throws BoundsError size(A, -rand(1:99))
+
+   @test axes(A) == (1:3, 1:3)
+   @test axes(A, 1) == 1:3
+   @test axes(A, 2) == 1:3
+   @test axes(A, rand(3:99)) == 1:1
+   @test_throws BoundsError axes(A, 0)
+   @test_throws BoundsError axes(A, -rand(1:99))
+
    @test issquare(A)
 
    @test size(B) == (2,4)
+   @test size(B, 1) == 2
+   @test size(B, 2) == 4
+   @test size(B, rand(3:99)) == 1
+   @test_throws BoundsError size(B, 0)
+   @test_throws BoundsError size(B, -rand(1:99))
+
+   @test axes(B) == (1:2, 1:4)
+   @test axes(B, 1) == 1:2
+   @test axes(B, 2) == 1:4
+   @test axes(B, rand(3:99)) == 1:1
+   @test_throws BoundsError axes(A, 0)
+   @test_throws BoundsError axes(A, -rand(1:99))
+
    @test !issquare(B)
 end
 
