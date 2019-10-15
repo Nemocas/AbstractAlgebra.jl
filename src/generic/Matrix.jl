@@ -101,13 +101,18 @@ function _check_dim(r::Int, c::Int, arr::AbstractArray{T, 1}) where {T}
   return nothing
 end
 
-function _checkbounds(i::Int, j::Int)
-   j >= 1 && j <= i
-end
+_checkbounds(i::Int, j::Int) = 1 <= j <= i
 
 function _checkbounds(A, i::Int, j::Int)
   (_checkbounds(nrows(A), i) && _checkbounds(ncols(A), j)) ||
             Base.throw_boundserror(A, (i, j))
+end
+
+function _checkbounds(A, rows::UnitRange{Int}, cols::UnitRange{Int})
+   isempty(rows) || _checkbounds(nrows(A), first(rows)) && _checkbounds(nrows(A), last(rows)) ||
+      throw(BoundsError(A, rows))
+   isempty(cols) || _checkbounds(ncols(A), first(cols)) && _checkbounds(ncols(A), last(cols)) ||
+      throw(BoundsError(A, cols))
 end
 
 ###############################################################################
@@ -323,8 +328,7 @@ canonical_unit(a::MatrixElem) = canonical_unit(a[1, 1])
 ###############################################################################
 
 function sub(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, cols::UnitRange{Int})
-  Generic._checkbounds(M, rows.start, cols.start)
-  Generic._checkbounds(M, rows.stop, cols.stop)
+  _checkbounds(M, rows, cols)
   z = similar(M, length(rows), length(cols))
   startr = first(rows)
   startc = first(cols)

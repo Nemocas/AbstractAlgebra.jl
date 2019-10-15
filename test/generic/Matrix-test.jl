@@ -372,6 +372,30 @@ end
    @test B == @inferred B[:, :]
    @test C == @inferred C[:, :]
    @test D == @inferred D[:, :]
+
+   # bounds check
+   S = MatrixSpace(ZZ, rand(1:9), 0)
+   A = S()
+   @test isempty(A)
+   rows = UnitRange(extrema(rand(axes(A)[1], 2))...)
+   # A[rows, :] must be a valid indexing
+   @test size(A[rows, :]) == (length(rows), 0)
+   @test_throws BoundsError A[1:10, :]
+
+   S = MatrixSpace(ZZ, 0, rand(1:9))
+   A = S()
+   @test isempty(A)
+   cols = UnitRange(extrema(rand(axes(A)[2], 2))...)
+   # A[:, cols] must be a valid indexing
+   @test size(A[:, cols]) == (0, length(cols))
+   @test_throws BoundsError A[:, 1:10]
+
+   S = MatrixSpace(ZZ, 0, 0)
+   A = S()
+   @test isempty(A)
+   # A[:, :] must be a valid indexing
+   @test size(A[:, :]) == (0, 0)
+   @test_throws BoundsError A[2:3, 1:10]
 end
 
 @testset "Generic.Mat.binary_ops..." begin
