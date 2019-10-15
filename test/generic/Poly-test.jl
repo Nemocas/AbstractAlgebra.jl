@@ -603,6 +603,10 @@ end
       @test f == reverse(frev, len)
    end
 
+   f = rand(R, 0:10, -10:10)
+   @test_throws DomainError reverse(f, -1)
+   @test_throws DomainError reverse(f, -rand(2:100))
+
    # Fake finite field of char 7, degree 2
    S, y = PolynomialRing(GF(7), "y")
    F = ResidueField(S, y^2 + 6y + 3)
@@ -624,6 +628,10 @@ end
       @test length(frev) == len - shift
       @test f == reverse(frev, len)
    end
+
+   f = rand(R, 0:10, 0:1)
+   @test_throws DomainError reverse(f, -1)
+   @test_throws DomainError reverse(f, -rand(2:100))
 
    #  Inexact field
    R, x = PolynomialRing(RealField, "x")
@@ -644,6 +652,10 @@ end
       @test f == reverse(frev, len)
    end
 
+   f = rand(R, 0:10, -1:1)
+   @test_throws DomainError reverse(f, -1)
+   @test_throws DomainError reverse(f, -rand(2:100))
+
    #  Non-integral domain
    T = ResidueRing(ZZ, 6)
    R, x = T["x"]
@@ -663,6 +675,10 @@ end
       @test length(frev) == len - shift
       @test f == reverse(frev, len)
    end
+
+   f = rand(R, 0:10, 0:5)
+   @test_throws DomainError reverse(f, -1)
+   @test_throws DomainError reverse(f, -rand(2:100))
 end
 
 @testset "Generic.Poly.shift..." begin
@@ -677,6 +693,12 @@ end
       @test shift_left(f, s) == x^s*f
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
+
+   f = rand(R, 0:10, -10:10)
+   @test_throws DomainError shift_right(f, -1)
+   @test_throws DomainError shift_right(f, -rand(2:100))
+   @test_throws DomainError shift_left(f, -1)
+   @test_throws DomainError shift_left(f, -rand(2:100))
 
    # Fake finite field of char 7, degree 2
    S, y = PolynomialRing(GF(7), "y")
@@ -693,6 +715,12 @@ end
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
 
+   f = rand(R, 0:10, 0:1)
+   @test_throws DomainError shift_right(f, -1)
+   @test_throws DomainError shift_right(f, -rand(2:100))
+   @test_throws DomainError shift_left(f, -1)
+   @test_throws DomainError shift_left(f, -rand(2:100))
+
    # Inexact field
    R, x = PolynomialRing(RealField, "x")
    for iter = 1:300
@@ -704,6 +732,12 @@ end
       @test shift_left(f, s) == x^s*f
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
+
+   f = rand(R, 0:10, -1:1)
+   @test_throws DomainError shift_right(f, -1)
+   @test_throws DomainError shift_right(f, -rand(2:100))
+   @test_throws DomainError shift_left(f, -1)
+   @test_throws DomainError shift_left(f, -rand(2:100))
 
    # Non-integral domain
    T = ResidueRing(ZZ, 6)
@@ -717,6 +751,12 @@ end
       @test shift_left(f, s) == x^s*f
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
+
+   f = rand(R, 0:10, 0:5)
+   @test_throws DomainError shift_right(f, -1)
+   @test_throws DomainError shift_right(f, -rand(2:100))
+   @test_throws DomainError shift_left(f, -1)
+   @test_throws DomainError shift_left(f, -rand(2:100))
 end
 
 @testset "Generic.Poly.powering..." begin
@@ -736,6 +776,12 @@ end
       end
    end
 
+   f = rand(R, 0:10, -10:10)
+   @test_throws DomainError f^-1
+   @test_throws DomainError f^-rand(2:100)
+   @test_throws DomainError pow_multinomial(f, -1)
+   @test_throws DomainError pow_multinomial(f, -rand(2:100))
+
    # Fake finite field of char 7, degree 2
    S, y = PolynomialRing(GF(7), "y")
    F = ResidueField(S, y^2 + 6y + 3)
@@ -755,6 +801,12 @@ end
       end
    end
 
+   f = rand(R, 0:10, 0:1)
+   @test_throws DomainError f^-1
+   @test_throws DomainError f^-rand(2:100)
+   @test_throws DomainError pow_multinomial(f, -1)
+   @test_throws DomainError pow_multinomial(f, -rand(2:100))
+
    # Inexact field
    R, x = PolynomialRing(RealField, "x")
 
@@ -770,6 +822,12 @@ end
          r2 *= f
       end
    end
+
+   f = rand(R, 0:10, -1:1)
+   @test_throws DomainError f^-1
+   @test_throws DomainError f^-rand(2:100)
+   @test_throws DomainError pow_multinomial(f, -1)
+   @test_throws DomainError pow_multinomial(f, -rand(2:100))
 
    # Non-integral domain
    for iter = 1:10
@@ -789,6 +847,12 @@ end
          r2 *= f
       end
    end
+
+   f = rand(R, 0:10, 0:rand(1:25))
+   @test_throws DomainError f^-1
+   @test_throws DomainError f^-rand(2:100)
+   @test_throws DomainError pow_multinomial(f, -1)
+   @test_throws DomainError pow_multinomial(f, -rand(2:100))
 end
 
 if false

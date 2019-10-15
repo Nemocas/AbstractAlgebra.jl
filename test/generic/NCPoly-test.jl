@@ -307,6 +307,10 @@ end
          r2 *= f
       end
    end
+
+   f = rand(S, 0:10, -10:10)
+   @test_throws DomainError f^identity(-1) # identity to skip calling literal_pow, which relies on inv
+   @test_throws DomainError f^-rand(2:100)
 end
 
 @testset "Generic.NCPoly.exact_division..." begin

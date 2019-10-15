@@ -129,6 +129,13 @@ end
    end
 end
 
+@testset "Julia.Rationals.exp..." begin
+   @test AbstractAlgebra.exp(0//1) == 1
+   @test_throws DomainError AbstractAlgebra.exp(1//1)
+   @test_throws DomainError AbstractAlgebra.exp(rand(2:1000)//rand(1:1000))
+   @test_throws DomainError AbstractAlgebra.exp(-rand(1:1000//rand(1:1000)))
+end
+
 @testset "Julia.Rationals.divrem..." begin
    R = qq
    S = QQ

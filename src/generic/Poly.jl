@@ -631,7 +631,7 @@ end
 ###############################################################################
 
 function pow_multinomial(a::AbstractAlgebra.PolyElem{T}, e::Int) where {T <: RingElement}
-   e < 0 && throw(DomainError())
+   e < 0 && throw(DomainError(e, "exponent must be >= 0"))
    lena = length(a)
    lenz = (lena - 1) * e + 1
    res = Array{T}(undef, lenz)
@@ -661,7 +661,7 @@ end
 > Return $a^b$. We require $b \geq 0$.
 """
 function ^(a::AbstractAlgebra.PolyElem{T}, b::Int) where {T <: RingElement}
-   b < 0 && throw(DomainError())
+   b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    R = parent(a)
    if isgen(a)
@@ -911,7 +911,7 @@ end
 > `DomainError()`.
 """
 function reverse(x::PolynomialElem, len::Int)
-   len < 0 && throw(DomainError())
+   len < 0 && throw(DomainError(len, "len must be >= 0"))
    r = parent(x)()
    fit!(r, len)
    for i = 1:len
@@ -943,7 +943,7 @@ end
 > $x^n$.
 """
 function shift_left(f::PolynomialElem, n::Int)
-   n < 0 && throw(DomainError())
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
    if n == 0
       return f
    end
@@ -965,7 +965,7 @@ end
 > $x^n$.
 """
 function shift_right(f::PolynomialElem, n::Int)
-   n < 0 && throw(DomainError())
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
    flen = length(f)
    if n >= flen
       return zero(parent(f))

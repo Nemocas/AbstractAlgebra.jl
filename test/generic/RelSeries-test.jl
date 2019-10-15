@@ -78,6 +78,8 @@
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
+
+   @test_throws DomainError O(0+O(x^0))
 end
 
 @testset "Generic.RelSeries.rand..." begin
@@ -122,6 +124,9 @@ end
    @test coeff(a, 1) == 2
    @test coeff(b, 7) == 0
 
+   @test_throws DomainError polcoeff(a, -1)
+   @test_throws DomainError polcoeff(a, -rand(2:100))
+   
    T = ResidueRing(ZZ, 7)
    U, y = PowerSeriesRing(T, 10, "y")
 
@@ -462,6 +467,10 @@ end
       end
    end
 
+   f = rand(R, 0:12, -10:10)
+   @test_throws DomainError f^-1
+   @test_throws DomainError f^-rand(2:100)
+
    # Inexact field
    R, x = PowerSeriesRing(RealField, 10, "x")
 
@@ -477,6 +486,10 @@ end
          r2 *= f
       end
    end
+
+   f = rand(R, 0:12, -1:1)
+   @test_throws DomainError f^-1
+   @test_throws DomainError f^-rand(2:100)
 
    # Non-integral domain
    for iter = 1:100
@@ -496,6 +509,10 @@ end
          r2 *= f
       end
    end
+   
+   f = rand(R, 0:12, 0:rand(1:25))
+   @test_throws DomainError f^-1
+   @test_throws DomainError f^-rand(2:100)
 end
 
 @testset "Generic.RelSeries.shift..." begin
@@ -512,6 +529,12 @@ end
       @test isequal(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
+   
+   f = rand(R, 0:12, -10:10)
+   @test_throws DomainError shift_left(f, -1)
+   @test_throws DomainError shift_left(f, -rand(2:100))
+   @test_throws DomainError shift_right(f, -1)
+   @test_throws DomainError shift_right(f, -rand(2:100))
 
    # Inexact field
    R, x = PowerSeriesRing(RealField, 10, "x")
@@ -527,6 +550,12 @@ end
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
 
+   f = rand(R, 0:12, -1:1)
+   @test_throws DomainError shift_left(f, -1)
+   @test_throws DomainError shift_left(f, -rand(2:100))
+   @test_throws DomainError shift_right(f, -1)
+   @test_throws DomainError shift_right(f, -rand(2:100))
+
    # Non-integral domain
    T = ResidueRing(ZZ, 6)
    R, x = PowerSeriesRing(T, 10, "x")
@@ -541,6 +570,12 @@ end
       @test isequal(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
+
+   f = rand(R, 0:12, 0:5)
+   @test_throws DomainError shift_left(f, -1)
+   @test_throws DomainError shift_left(f, -rand(2:100))
+   @test_throws DomainError shift_right(f, -1)
+   @test_throws DomainError shift_right(f, -rand(2:100))
 end
 
 @testset "Generic.RelSeries.truncation..." begin
@@ -555,6 +590,10 @@ end
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
 
+   f = rand(R, 0:12, -10:10)   
+   @test_throws DomainError truncate(f, -1)
+   @test_throws DomainError truncate(f, -rand(2:100))
+
    # Inexact field
    R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:300
@@ -565,6 +604,10 @@ end
       @test isapprox(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
+
+   f = rand(R, 0:12, -1:1)
+   @test_throws DomainError truncate(f, -1)
+   @test_throws DomainError truncate(f, -rand(2:100))
 
    # Non-integral domain
    T = ResidueRing(ZZ, 6)
@@ -577,6 +620,10 @@ end
       @test isequal(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
+
+   f = rand(R, 0:12, 0:5)
+   @test_throws DomainError truncate(f, -1)
+   @test_throws DomainError truncate(f, -rand(2:100))      
 end
 
 @testset "Generic.RelSeries.inversion..." begin

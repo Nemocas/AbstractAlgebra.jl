@@ -2394,7 +2394,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
 end
 
 function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
-   b < 0 && throw(DomainError())
+   b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    if length(a) == 0
       return parent(a)()

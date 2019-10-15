@@ -97,7 +97,7 @@ function div(a::S, b::T) where {S <: Integer, T <: Integer}
 end
 
 function powmod(a::T, b::Int, c::T) where T <: Integer
-   b < 0 && throw(DomainError())
+   b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special cases
    if a == 0
       return T(0)
@@ -182,7 +182,7 @@ end
 > generally of use to the user, but is used internally in AbstractAlgebra.jl.
 """
 function exp(a::T) where T <: Integer
-    a != 0 && throw(DomainError())
+    a != 0 && throw(DomainError(a, "a must be 0"))
     return T(1)
  end
 

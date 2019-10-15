@@ -180,7 +180,7 @@ end
 > Return $1$ if $a = 0$, otherwise throw an exception.
 """
 function exp(a::Rational{T}) where T <: Integer
-   a != 0 && throw(DomainError())
+   a != 0 && throw(DomainError(a, "a must be 0"))
    return Rational{T}(1)
 end
 

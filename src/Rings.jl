@@ -158,7 +158,7 @@ end
 ###############################################################################
 
 function powers(a::T, d::Int) where {T <: RingElement}
-   d <= 0 && throw(DomainError())
+   d <= 0 && throw(DomainError(d, "the second argument must be positive"))
    S = parent(a)
    A = Array{T}(undef, d + 1)
    A[1] = one(S)

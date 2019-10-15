@@ -23,7 +23,6 @@ function O(a::AbstractAlgebra.AbsSeriesElem{T}) where T <: RingElement
       return deepcopy(a)    # 0 + O(x^n)
    end
    prec = length(a) - 1
-   prec < 0 && throw(DomainError())
    return parent(a)(Array{T}(undef, 0), 0, prec)
 end
 
@@ -56,7 +55,7 @@ function normalise(a::AbsSeries, len::Int)
 end
 
 function coeff(a::AbsSeries, n::Int)
-   n < 0  && throw(DomainError())
+   n < 0  && throw(DomainError(n, "n must be >= 0"))
    return n >= length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
 
@@ -377,7 +376,7 @@ end
 > $x^n$.
 """
 function shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
-   n < 0 && throw(DomainError())
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
    xlen = length(x)
    prec = precision(x) + n
    prec = min(prec, max_precision(parent(x)))
@@ -406,7 +405,7 @@ end
 > $x^n$.
 """
 function shift_right(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
-   n < 0 && throw(DomainError())
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
    xlen = length(x)
    if n >= xlen
       z = zero(parent(x))
@@ -433,7 +432,7 @@ end
 > Return $a$ truncated to $n$ terms.
 """
 function truncate(a::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
-   n < 0 && throw(DomainError())
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
    len = length(a)
    if precision(a) <= n
       return a

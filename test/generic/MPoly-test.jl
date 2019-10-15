@@ -486,6 +486,9 @@ end
 
          @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r
       end
+
+      @test_throws DomainError rand(varlist)^-1
+      @test_throws DomainError rand(varlist)^-rand(2:100)
    end
 end
 

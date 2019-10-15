@@ -77,6 +77,9 @@ end
    end
 
    @test powmod(123, 1, 5) == 3
+
+   @test_throws DomainError powmod(123, -1, 5)
+   @test_throws DomainError powmod(123, -rand(2:100), 5)
 end
 
 @testset "Julia.Integers.exact_division..." begin
@@ -145,4 +148,11 @@ end
       @test AbstractAlgebra.sqrt(f)^2 == f
       @test AbstractAlgebra.sqrt(g)^2 == g
    end
+end
+
+@testset "Julia.Integers.exp..." begin
+   @test AbstractAlgebra.exp(0) == 1
+   @test_throws DomainError AbstractAlgebra.exp(1)
+   @test_throws DomainError AbstractAlgebra.exp(rand(2:1000))
+   @test_throws DomainError AbstractAlgebra.exp(-rand(1:1000))
 end
