@@ -37,7 +37,7 @@ end
 ###############################################################################
 
 function coeff(x::SparsePoly, i::Int)
-   i < 0 && throw(DomainError())
+   i < 0 && throw(DomainError(i, "cannot get the i-th coefficient with i < 0"))
    return x.coeffs[i + 1]
 end
 
@@ -784,7 +784,7 @@ function pow_fps(f::SparsePoly{T}, k::Int) where {T <: RingElement}
 end
 
 function ^(a::SparsePoly{T}, b::Int) where {T <: RingElement}
-   b < 0 && throw(DomainError())
+   b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    if length(a) == 0
       return parent(a)()

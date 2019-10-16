@@ -21,7 +21,7 @@ export PowerSeriesRing, O, valuation, precision, max_precision, set_prec!,
 """
 function O(a::AbstractAlgebra.RelSeriesElem{T}) where T <: RingElement
    val = pol_length(a) + valuation(a) - 1
-   val < 0 && throw(DomainError())
+   val < 0 && throw(DomainError(a, "pol_length(a) + valuation(a) must be >= 1"))
    return parent(a)(Array{T}(undef, 0), 0, val, val)
 end
 
@@ -129,7 +129,7 @@ function set_val!(a::AbstractAlgebra.RelSeriesElem, val::Int)
 end
 
 function polcoeff(a::RelSeries, n::Int)
-   n < 0  && throw(DomainError())
+   n < 0  && throw(DomainError(n, "n must be >= 0"))
    return n >= pol_length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
 
@@ -547,7 +547,7 @@ end
 > $x^n$.
 """
 function shift_left(x::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}
-   n < 0 && throw(DomainError())
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
    xlen = pol_length(x)
    if xlen == 0
       z = zero(parent(x))
@@ -571,7 +571,7 @@ end
 > $x^n$.
 """
 function shift_right(x::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}
-   n < 0 && throw(DomainError())
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
    xlen = pol_length(x)
    xval = valuation(x)
    xprec = precision(x)
@@ -603,7 +603,7 @@ end
 > Return $a$ truncated to (absolute) precision $n$.
 """
 function truncate(a::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}
-   n < 0 && throw(DomainError())
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
    alen = pol_length(a)
    aprec = precision(a)
    aval = valuation(a)
@@ -670,7 +670,7 @@ end
 > Return $a^b$. We require $b \geq 0$.
 """
 function ^(a::AbstractAlgebra.RelSeriesElem{T}, b::Int) where {T <: RingElement}
-   b < 0 && throw(DomainError())
+   b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing power series efficiently
    if pol_length(a) == 0
       z = parent(a)()

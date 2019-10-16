@@ -246,7 +246,7 @@ end
 > Return $a^b$. We require $b \geq 0$.
 """
 function ^(a::AbstractAlgebra.NCPolyElem{T}, b::Int) where {T <: NCRingElem}
-   b < 0 && throw(DomainError())
+   b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    R = parent(a)
    if isgen(a)

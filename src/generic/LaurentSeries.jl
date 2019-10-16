@@ -185,7 +185,7 @@ function set_scale!(a::LaurentSeriesElem, scale::Int)
 end
 
 function polcoeff(a::LaurentSeriesElem, n::Int)
-   n < 0  && throw(DomainError())
+   n < 0  && throw(DomainError(n, "n must be >= 0"))
    return n >= pol_length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
 
@@ -231,7 +231,7 @@ end
 > for padding. It is assumed that the scale factor of $a$ is divisible by $n$.
 """
 function downscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
-   n <= 0 && throw(DomainError())
+   n <= 0 && throw(DomainError(n, "n must be > 0"))
    lena = pol_length(a)
    if n == 1 || lena == 0
       return a
@@ -263,7 +263,7 @@ end
 > $a$ is divisible by $n$.
 """
 function upscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
-   n <= 0 && throw(DomainError())
+   n <= 0 && throw(DomainError(n, "n must be > 0"))
    lena = pol_length(a)
    if n == 1 || lena == 0
       return a

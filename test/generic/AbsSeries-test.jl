@@ -111,6 +111,9 @@ end
    @test coeff(a, 1) == 2
    @test coeff(b, 7) == 0
 
+   @test_throws DomainError coeff(a, -1)
+   @test_throws DomainError coeff(a, -rand(2:100))
+   
    T = ResidueRing(ZZ, 7)
    U, y = PowerSeriesRing(T, 10, "y", model=:capped_absolute)
 
@@ -501,6 +504,12 @@ end
       @test isequal(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
+   
+   f = rand(R, 0:12, -10:10)
+   @test_throws DomainError shift_left(f, -1)
+   @test_throws DomainError shift_left(f, -rand(2:100))
+   @test_throws DomainError shift_right(f, -1)
+   @test_throws DomainError shift_right(f, -rand(2:100))
 
    # Inexact field
    R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
@@ -515,6 +524,12 @@ end
       @test isapprox(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
+   
+   f = rand(R, 0:12, -1:1)
+   @test_throws DomainError shift_left(f, -1)
+   @test_throws DomainError shift_left(f, -rand(2:100))
+   @test_throws DomainError shift_right(f, -1)
+   @test_throws DomainError shift_right(f, -rand(2:100))
 
    # Non-integral domain
    T = ResidueRing(ZZ, 6)
@@ -530,6 +545,12 @@ end
       @test isequal(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
+   
+   f = rand(R, 0:12, 0:5)
+   @test_throws DomainError shift_left(f, -1)
+   @test_throws DomainError shift_left(f, -rand(2:100))
+   @test_throws DomainError shift_right(f, -1)
+   @test_throws DomainError shift_right(f, -rand(2:100))
 end
 
 @testset "Generic.AbsSeries.truncation..." begin
@@ -543,6 +564,12 @@ end
       @test isequal(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
+   
+   f = rand(R, 0:12, -10:10)
+   @test_throws DomainError truncate(f, -1)
+   @test_throws DomainError truncate(f, -rand(2:100))
+   @test_throws DomainError truncate(f, -1)
+   @test_throws DomainError truncate(f, -rand(2:100))
 
    # Inexact field
    R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
@@ -554,6 +581,12 @@ end
       @test isapprox(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
+   
+   f = rand(R, 0:12, -1:1)
+   @test_throws DomainError truncate(f, -1)
+   @test_throws DomainError truncate(f, -rand(2:100))
+   @test_throws DomainError truncate(f, -1)
+   @test_throws DomainError truncate(f, -rand(2:100))
 
    # Non-integral domain
    T = ResidueRing(ZZ, 6)
@@ -566,6 +599,12 @@ end
       @test isequal(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
+   
+   f = rand(R, 0:12, 0:5)
+   @test_throws DomainError truncate(f, -1)
+   @test_throws DomainError truncate(f, -rand(2:100))
+   @test_throws DomainError truncate(f, -1)
+   @test_throws DomainError truncate(f, -rand(2:100))   
 end
 
 @testset "Generic.AbsSeries.inversion..." begin

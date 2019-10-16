@@ -147,6 +147,14 @@ end
    @test coeff(a, 1) == 2
    @test coeff(b, 7) == 0
 
+   @test_throws DomainError polcoeff(a, -1)
+   @test_throws DomainError polcoeff(a, -rand(2:100))
+
+   @test_throws DomainError upscale(a, 0)
+   @test_throws DomainError upscale(a, -rand(1:100))
+   @test_throws DomainError downscale(a, 0)
+   @test_throws DomainError downscale(a, -rand(1:100))
+   
    T = ResidueRing(ZZ, 7)
    U, y = LaurentSeriesRing(T, 10, "y")
 
