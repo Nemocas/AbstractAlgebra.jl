@@ -436,7 +436,124 @@ end
    @test A - B == S([t-1 t-3 R(0); t^2 - t R(-1) R(-2); R(-1) (-t^2 + t + 2) (-t^3 + t^2 + t + 1)])
 
    @test A*B == S([t^2 + 2*t + 1 2*t^2 + 4*t + 3 t^3 + t^2 + 3*t + 1; 3*t^2 - t (t^3 + 4*t^2 + t) t^4 + 2*t^2 + 2*t; t-5 t^4 + t^3 + 2*t^2 + 3*t - 4 t^5 + 1*t^4 + t^3 + t^2 + 4*t + 2])
+
+   # Exact ring
+   R = ZZ
+
+   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+             let n = rand(1:9)
+                MatrixSpace(R, n, n)
+             end)
+
+      A = rand(S, -1000:1000)
+      B = rand(S, -1000:1000)
+
+      @test A + B == S(A.entries + B.entries)
+      @test A - B == S(A.entries - B.entries)
+      @test A + B == A - (-B)
+      if issquare(A)
+         @test A * B == S(A.entries * B.entries)
+      end
+   end
+
+   # Exact field
+   R = GF(7)
+
+   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+             let n = rand(1:9)
+                MatrixSpace(R, n, n)
+             end)
+
+      A = rand(S)
+      B = rand(S)
+
+      @test A + B == S(A.entries + B.entries)
+      @test A - B == S(A.entries - B.entries)
+      @test A + B == A - (-B)
+      if issquare(A)
+         @test A * B == S(A.entries * B.entries)
+      end
+   end
+
+   # Inexact ring
+   R = RealField["t"][1]
+
+   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+             let n = rand(1:9)
+                MatrixSpace(R, n, n)
+             end)
+
+      A = rand(S, 0:20, -100:100)
+      B = rand(S, 0:20, -100:100)
+
+      @test A + B == S(A.entries + B.entries)
+      @test A - B == S(A.entries - B.entries)
+      @test A + B == A - (-B)
+      if issquare(A)
+         @test A * B == S(A.entries * B.entries)
+      end
+   end
+
+   # Inexact field
+   R = RealField
+
+   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+             let n = rand(1:9)
+                MatrixSpace(R, n, n)
+             end)
+
+      A = rand(S, -1000:1000)
+      B = rand(S, -1000:1000)
+
+      @test A + B == S(A.entries + B.entries)
+      @test A - B == S(A.entries - B.entries)
+      @test A + B == A - (-B)
+      if issquare(A)
+         @test A * B == S(A.entries * B.entries)
+      end
+   end
+
+   # Non-integral domain
+   R = ResidueRing(ZZ, 6)
+
+   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+             let n = rand(1:9)
+                MatrixSpace(R, n, n)
+             end)
+
+      A = rand(S, 0:5)
+      B = rand(S, 0:5)
+
+      @test A + B == S(A.entries + B.entries)
+      @test A - B == S(A.entries - B.entries)
+      @test A + B == A - (-B)
+      if issquare(A)
+         @test A * B == S(A.entries * B.entries)
+      end
+   end
+
+   # Fraction field
+   R = QQ
+
+   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+             let n = rand(1:9)
+                MatrixSpace(R, n, n)
+             end)
+
+      A = rand(S, -1000:1000)
+      B = rand(S, -1000:1000)
+
+      @test A + B == S(A.entries + B.entries)
+      @test A - B == S(A.entries - B.entries)
+      @test A + B == A - (-B)
+      if issquare(A)
+         @test A * B == S(A.entries * B.entries)
+      end
+   end
 end
+
+# add x to all the elements of the main diagonal of a copy of M
+add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(CartesianIndices(M))]
 
 @testset "Generic.Mat.adhoc_binary..." begin
    R, t = PolynomialRing(QQ, "t")
@@ -456,6 +573,96 @@ end
    @test BigInt(3)*A == A*BigInt(3)
    @test Rational{BigInt}(3)*A == A*Rational{BigInt}(3)
    @test (t - 1)*A == A*(t - 1)
+
+   # Exact ring
+   R = ZZ
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, -1000:1000)
+
+   for t in Any[rand(-1000:1000), big(rand(-1000:1000)), rand(R, -1000:1000)]
+      @test A + t == t + A
+      @test A + t == S(add_diag(A.entries, t))
+      @test A - t == -(t - A)
+      @test A - t == S(add_diag(A.entries, -t))
+      @test A * t == t * A
+      @test A * t == S(A.entries .* t)
+   end
+
+   # Exact field
+   R = GF(7)
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S)
+
+   for t in Any[rand(-1000:1000), big(rand(-1000:1000)), rand(R)]
+      @test A + t == t + A
+      @test A + t == S(add_diag(A.entries, t))
+      @test A - t == -(t - A)
+      @test A - t == S(add_diag(A.entries, -t))
+      @test A * t == t * A
+      @test A * t == S(A.entries .* t)
+   end
+
+   # Inexact ring
+   R = RealField["t"][1]
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, 0:200, -1000:1000)
+
+   for t in Any[rand(-1000:1000), big(rand(-1000:1000)), rand(R, 0:200, -1000:1000)]
+      @test A + t == t + A
+      @test A + t == S(add_diag(A.entries, t))
+      @test A - t == -(t - A)
+      @test A - t == S(add_diag(A.entries, -t))
+      @test A * t == t * A
+      @test A * t == S(A.entries .* t)
+   end
+
+   # Inexact field
+   R = RealField
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, -1000:1000)
+
+   for t in Any[rand(-1000:1000), big(rand(-1000:1000)), rand(R, -1000:1000)]
+      @test A + t == t + A
+      @test A + t == S(add_diag(A.entries, t))
+      @test A - t == -(t - A)
+      @test A - t == S(add_diag(A.entries, -t))
+      @test A * t == t * A
+      @test A * t == S(A.entries .* t)
+   end
+
+   # Non-integral domain
+   R = ResidueRing(ZZ, 6)
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, 0:5)
+
+   for t in Any[rand(-1000:1000), big(rand(-1000:1000)), rand(R, 0:5)]
+      @test A + t == t + A
+      @test A + t == S(add_diag(A.entries, t))
+      @test A - t == -(t - A)
+      @test A - t == S(add_diag(A.entries, -t))
+      @test A * t == t * A
+      @test A * t == S(A.entries .* t)
+   end
+
+   # Fraction field
+   R = QQ
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, -1000:1000)
+
+   for t in Any[rand(-1000:1000), big(rand(-1000:1000)), rand(R, -1000:1000)]
+      @test A + t == t + A
+      @test A + t == S(add_diag(A.entries, t))
+      @test A - t == -(t - A)
+      @test A - t == S(add_diag(A.entries, -t))
+      @test A * t == t * A
+      @test A * t == S(A.entries .* t)
+   end
 end
 
 @testset "Generic.Mat.permutation..." begin
