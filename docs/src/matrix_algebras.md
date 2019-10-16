@@ -107,7 +107,8 @@ zero(::MatAlgebra)
 ```
 
 ```@docs
-identity_matrix(::MatAlgElem{T}) where T <: RingElement                                  ```
+identity_matrix(::MatAlgElem{T}) where T <: RingElement
+```
 
 *Examples*
 
