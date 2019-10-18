@@ -410,7 +410,7 @@ function setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T},
     startc = first(c)
     for i in r
         for j in c
-            a[i, j] = deepcopy(b[i - startr + 1, j - startc + 1])
+            a[i, j] = b[i - startr + 1, j - startc + 1]
         end
     end
 end

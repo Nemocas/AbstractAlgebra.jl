@@ -424,6 +424,20 @@ end
    @test_throws BoundsError A[2:3, 1:10]
 end
 
+@testset "Generic.Mat.block_replacement..." begin
+   S = MatrixSpace(ZZ, 9, 9)
+   (r, c) = (rand(1:9), rand(1:9))
+   T = MatrixSpace(ZZ, r, c)
+   a = rand(S, -100:100)
+   b = rand(T, -100:100)
+   startr = rand(1:(9-r+1))
+   endr = startr + r - 1
+   startc = rand(1:(9-c+1))
+   endc = startc + c - 1
+   a[startr:endr, startc:endc] = b
+   @test a[startr:endr, startc:endc] == b
+end
+
 @testset "Generic.Mat.binary_ops..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
