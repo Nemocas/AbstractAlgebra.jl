@@ -366,6 +366,46 @@ end
    B = S([-t - 1 (-t) -R(1); -t^2 (-t) (-t); -R(-2) (-t - 2) (-t^2 - t - 1)])
 
    @test -A == B
+
+   # Exact ring
+   S = MatrixSpace(ZZ, rand(0:9), rand(0:9))
+   A = rand(S, -1000:1000)
+
+   @test iszero(A + (-A))
+   @test A == -(-A)
+   @test -A == S(-A.entries)
+
+   # Exact field
+   S = MatrixSpace(GF(7), rand(0:9), rand(0:9))
+   A = rand(S)
+
+   @test iszero(A + (-A))
+   @test A == -(-A)
+   @test -A == S(-A.entries)
+
+   # Inexact ring
+   S = MatrixSpace(RealField["t"][1], rand(0:9), rand(0:9))
+   A = rand(S, 0:200, -1000:1000)
+
+   @test iszero(A + (-A))
+   @test A == -(-A)
+   @test -A == S(-A.entries)
+
+   # Inexact field
+   S = MatrixSpace(RealField, rand(0:9), rand(0:9))
+   A = rand(S, -1000:1000)
+
+   @test iszero(A + (-A))
+   @test A == -(-A)
+   @test -A == S(-A.entries)
+
+   # Non-integral domain
+   S = MatrixSpace(ResidueRing(ZZ, 6), rand(0:9), rand(0:9))
+   A = rand(S, 0:5)
+
+   @test iszero(A + (-A))
+   @test A == -(-A)
+   @test -A == S(-A.entries)
 end
 
 @testset "Generic.Mat.sub..." begin
@@ -422,6 +462,96 @@ end
    # A[:, :] must be a valid indexing
    @test size(A[:, :]) == (0, 0)
    @test_throws BoundsError A[2:3, 1:10]
+
+   # Exact ring
+   R = ZZ
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, -1000:1000)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   # Exact field
+   R = GF(7)
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   # Inexact ring
+   R = RealField["t"][1]
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, 0:200, -1000:1000)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   # Inexact field
+   R = RealField
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, -1000:1000)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   # Non-integral domain
+   R = ResidueRing(ZZ, 6)
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, 0:5)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   # Fraction field
+   R = QQ
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, -1000:1000)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
 end
 
 @testset "Generic.Mat.binary_ops..." begin
