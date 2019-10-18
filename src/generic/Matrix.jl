@@ -397,6 +397,38 @@ function Base.view(M::AbstractAlgebra.MatElem{T}, rows::Colon, cols::Colon) wher
    return view(M, 1:nrows(M), 1:ncols(M))
 end
 
+###############################################################################
+#
+#   Block replacement
+#
+###############################################################################
+
+function setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::UnitRange{Int}, c::UnitRange{Int}) where T
+    _checkbounds(a, r, c)
+    size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(nrows(b))x$(ncols(b)) matrix to a $(length(r))x$(length(c)) destination"))
+    startr = first(r)
+    startc = first(c)
+    for i in r
+        for j in c
+            a[i, j] = b[i - startr + 1, j - startc + 1]
+        end
+    end
+end
+
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::UnitRange{Int}, ::Colon) where T = setindex!(a, b, r, 1:ncols(a))
+
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, ::Colon, c::UnitRange{Int}) where T = setindex!(a, b, 1:nrows(a), c)
+
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, ::Colon, ::Colon) where T = setindex!(a, b, 1:nrows(a), 1:ncols(a))
+
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::Int, c::UnitRange{Int}) where T = setindex!(a, b, r:r, c)
+
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::UnitRange{Int}, c::Int) where T = setindex!(a, b, r, c:c)
+
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::Int, ::Colon) where T = setindex!(a, b, r:r, 1:ncols(a))
+
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, ::Colon, c::Int) where T = setindex!(a, b, 1:nrows(a), c:c)
+
 ################################################################################
 #
 #   Size, axes and issquare
