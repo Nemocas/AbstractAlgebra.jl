@@ -703,6 +703,10 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.NCPolyRing, deg_range::UnitRa
    return f
 end
 
+function rand(S::AbstractAlgebra.NCPolyRing, deg_range, v...)
+   rand(Random.GLOBAL_RNG, S, deg_range, v...)
+end
+
 ###############################################################################
 #
 #   Promotion rules

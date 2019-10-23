@@ -4403,6 +4403,10 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
    return f
 end
 
+function rand(S::AbstractAlgebra.MPolyRing, term_range, exp_bound, v...)
+   rand(Random.GLOBAL_RNG, S, term_range, exp_bound, v...)
+end
+
 ###############################################################################
 #
 #   Build context

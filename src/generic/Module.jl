@@ -343,6 +343,8 @@ function rand(rng::AbstractRNG, M::AbstractAlgebra.FPModule{T}, vals...) where T
    return M(v)
 end
 
+rand(M::AbstractAlgebra.FPModule, vals...) = rand(Random.GLOBAL_RNG, M, vals...)
+
 ###############################################################################
 #
 #   Helper functions

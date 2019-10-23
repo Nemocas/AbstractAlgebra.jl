@@ -603,6 +603,10 @@ function rand(rng::AbstractRNG, S::PuiseuxSeriesField, val_range::UnitRange{Int}
    return S(rand(rng, laurent_ring(S), val_range, v...), rand(rng, scale_range))
 end
 
+function rand(S::Union{PuiseuxSeriesRing,PuiseuxSeriesField}, val_range, scale_range, v...)
+   rand(Random.GLOBAL_RNG, S, val_range, scale_range, v...)
+end
+
 ###############################################################################
 #
 #   Unsafe operations

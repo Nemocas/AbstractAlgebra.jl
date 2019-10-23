@@ -2614,6 +2614,8 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.PolyRing, deg_range::UnitRang
    return f
 end
 
+rand(S::AbstractAlgebra.PolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v...)
+
 ###############################################################################
 #
 #   Promotion rules

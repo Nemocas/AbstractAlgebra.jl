@@ -295,6 +295,8 @@ function rand(rng::AbstractRNG, R::Integers, n::UnitRange{Int})
    return R(rand(rng, n))
 end
 
+rand(R::Integers, n) = rand(Random.GLOBAL_RNG, R, n)
+
 ###############################################################################
 #
 #   Parent object call overload

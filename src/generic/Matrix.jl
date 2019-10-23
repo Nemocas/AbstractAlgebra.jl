@@ -5000,6 +5000,8 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, v...)
    return M
 end
 
+rand(S::AbstractAlgebra.MatSpace, v...) = rand(Random.GLOBAL_RNG, S, v...)
+
 function randmat_triu(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, v...)
    M = S()
    R = base_ring(S)
