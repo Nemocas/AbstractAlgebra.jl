@@ -1,3 +1,12 @@
+const RINGS = Dict(
+   "exact ring"          => (ZZ,                 (-1000:1000,)),
+   "exact field"         => (GF(7),              ()),
+   "inexact ring"        => (RealField["t"][1],  (0:200, -1000:1000)),
+   "inexact field"       => (RealField,          (-1000:1000,)),
+   "non-integral domain" => (ResidueRing(ZZ, 6), (0:5,)),
+   "fraction field"      => (QQ,                 (-1000:1000,)),
+)
+
 primes100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227,
@@ -861,6 +870,25 @@ end
    @test A == inv(P)*(P*A)
 end
 
+######### OPTION 1 ############################################
+
+function test_comparison(R, randparams)
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   seed = rand(1:999)
+
+   Random.seed!(seed)
+   A = rand(S, randparams...)
+   Random.seed!(seed)
+   B = rand(S, randparams...)
+
+   @test A == B
+   @test matrix(R, copy(A.entries)) == A
+
+   if !isone(A)
+      @test A != one(S)
+   end
+end
+
 @testset "Generic.Mat.comparison..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -871,7 +899,47 @@ end
    @test A == B
 
    @test A != one(S)
+
+   test_comparison(RINGS["exact ring"]...)
+   test_comparison(RINGS["exact field"]...)
+   test_comparison(RINGS["inexact ring"]...)
+   test_comparison(RINGS["inexact field"]...)
+   test_comparison(RINGS["non-integral domain"]...)
+   test_comparison(RINGS["fraction field"]...)
 end
+
+######### OPTION 2 ############################################
+
+@testset "Generic.Mat.comparison..." begin
+   R, t = PolynomialRing(QQ, "t")
+   S = MatrixSpace(R, 3, 3)
+
+   A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+   B = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+   @test A == B
+
+   @test A != one(S)
+
+   @testset "$name" for (name, (R, randparams)) in RINGS
+      S = MatrixSpace(R, rand(1:9), rand(1:9))
+      seed = rand(1:999)
+
+      Random.seed!(seed)
+      A = rand(S, randparams...)
+      Random.seed!(seed)
+      B = rand(S, randparams...)
+
+      @test A == B
+      @test matrix(R, copy(A.entries)) == A
+
+      if !isone(A)
+         @test A != one(S)
+      end   
+   end
+end
+
+#################################################################
 
 @testset "Generic.Mat.adhoc_comparison..." begin
    R, t = PolynomialRing(QQ, "t")
