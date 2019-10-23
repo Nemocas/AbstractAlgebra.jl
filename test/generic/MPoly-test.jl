@@ -72,6 +72,12 @@
       @test x in keys(Dict(x => 1))
       @test !(y in keys(Dict(x => 1)))
    end
+
+   # test "getindex" syntax
+   S, (y, z) = R["y", "z"]
+   @test S isa Generic.MPolyRing{Generic.Poly{BigInt}}
+   @test y isa Generic.MPoly{Generic.Poly{BigInt}}
+   @test z isa Generic.MPoly{Generic.Poly{BigInt}}
 end
 
 @testset "Generic.MPoly.geobuckets..." begin
