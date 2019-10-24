@@ -288,6 +288,8 @@ function rand(rng::AbstractRNG, R::Rationals{T}, n::UnitRange{Int}) where T <: I
    return R(n, d)
 end
 
+rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
+
 ###############################################################################
 #
 #   Parent object call overload

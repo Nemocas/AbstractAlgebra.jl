@@ -352,6 +352,8 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.MatAlgebra, v...)
    return M
 end
 
+rand(S::AbstractAlgebra.MatAlgebra, v...) = rand(Random.GLOBAL_RNG, S, v...)
+
 function randmat_triu(rng::AbstractRNG, S::AbstractAlgebra.MatAlgebra, v...)
    M = S()
    n = degree(M)

@@ -1504,6 +1504,10 @@ function rand(rng::AbstractRNG, S::LaurentSeriesField, val_range::UnitRange{Int}
    return shift_left(f, rand(rng, val_range))
 end
 
+function rand(S::Union{LaurentSeriesRing,LaurentSeriesField}, val_range, v...)
+   rand(Random.GLOBAL_RNG, S, val_range, v...)
+end
+
 ###############################################################################
 #
 #   Promotion rules

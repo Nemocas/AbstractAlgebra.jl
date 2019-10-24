@@ -954,6 +954,8 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.FracField{T}, v...) where {T 
    return S(n, d)
 end
 
+rand(S::AbstractAlgebra.FracField, v...) = rand(Random.GLOBAL_RNG, S, v...)
+
 ###############################################################################
 #
 #   Promotion rules

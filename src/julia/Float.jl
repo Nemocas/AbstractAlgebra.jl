@@ -191,6 +191,8 @@ function rand(rng::AbstractRNG, R::Floats, n::UnitRange{Int})
    return R(n.start + rand(rng, Float64)*(n.stop - n.start))
 end
 
+rand(R::Floats, n) = rand(Random.GLOBAL_RNG, R, n)
+
 ###############################################################################
 #
 #   Parent object call overload

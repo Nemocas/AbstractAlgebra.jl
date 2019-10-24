@@ -492,6 +492,8 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.ResField{T}, v...) where {T <
    return S(rand(rng, R, v...))
 end
 
+rand(S::AbstractAlgebra.ResField, v...) = rand(Random.GLOBAL_RNG, S, v...)
+
 ###############################################################################
 #
 #   Promotion rules

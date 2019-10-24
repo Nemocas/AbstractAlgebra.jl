@@ -1244,6 +1244,8 @@ function rand(rng::AbstractRNG, S::SeriesRing, val_range::UnitRange{Int}, v...)
    return shift_left(f, rand(rng, val_range))
 end
 
+rand(S::SeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val_range, v...)
+
 ###############################################################################
 #
 #   Promotion rules
