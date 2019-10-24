@@ -2006,6 +2006,7 @@ end
                                   0 1 0;
                                   0 1 2;])
    @test hcat(B, C) == [B C]
+   @test hcat(B, C, C, B) == reduce(hcat, [B, C, C, B])
    let BC = hcat([B, C])
       @test size(BC) == (2, 1)
       @test BC[1] == B
@@ -2020,12 +2021,12 @@ end
                                   0 1;])
 
    @test vcat(A, B) == [A; B]
+   @test vcat(A, B, B, A) == reduce(vcat, [A, B, B, A])
    let AB = vcat([A, B])
       @test size(AB) == (2,)
       @test AB[1] == A
       @test AB[2] == B
    end
-
 
    @test [A D; B B C] == matrix(R, [1 2 1 2 3;
                                     3 4 4 5 6;

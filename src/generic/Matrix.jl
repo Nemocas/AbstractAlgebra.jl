@@ -4797,6 +4797,8 @@ function Base.vcat(A::MatrixElem...)
   return _vcat(A)
 end
 
+Base.reduce(::typeof(vcat), A::AbstractVector{<:MatrixElem}) = _vcat(A)
+
 function _vcat(A)
   if length(A) == 0
     error("Number of matrices to concatenate must be positive")
@@ -4831,6 +4833,8 @@ end
 function Base.hcat(A::MatrixElem...)
   return _hcat(A)
 end
+
+Base.reduce(::typeof(hcat), A::AbstractVector{<:MatrixElem}) = _hcat(A)
 
 function _hcat(A)
   if length(A) == 0
