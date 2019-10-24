@@ -220,6 +220,16 @@ end
 one(a::AbstractAlgebra.MatSpace) = a(1)
 
 @doc Markdown.doc"""
+    one(a::AbstractAlgebra.MatSpace)
+> Construct the identity matrix in the same matrix space as `a`, i.e.
+> with ones down the diagonal and zeroes elsewhere. `a` must be square.
+"""
+function one(a::MatrixElem)
+   issquare(a) || throw(DomainError(a, "matrix must be square"))
+   identity_matrix(a)
+end
+
+@doc Markdown.doc"""
     iszero(a::Generic.MatrixElem)
 > Return `true` if the supplied matrix $a$ is the zero matrix, otherwise
 > return `false`.
