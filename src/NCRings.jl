@@ -98,12 +98,16 @@ end
 #
 ###############################################################################
 
-function powers(a::T, d::Int) where {T <: NCRingElem}
+@doc Markdown.doc"""
+    powers(a::Union{NCRingElement, MatElem}, d::Int)
+> Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$
+"""
+function powers(a::T, d::Int) where {T <: Union{NCRingElement, MatElem}}
    d <= 0 && throw(DomainError(d, "the second argument must be positive"))
-   S = parent(a)
+   a isa MatElem && !issquare(a) && throw(DomainError(a, "matrix must be square"))
    A = Array{T}(undef, d + 1)
-   A[1] = one(S)
-   if d > 1
+   A[1] = one(a)
+   if d > 0
       c = a
       A[2] = a
       for i = 2:d

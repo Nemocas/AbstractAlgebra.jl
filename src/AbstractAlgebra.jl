@@ -211,7 +211,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row, add_ro
                  newton_to_monomial!, ngens, normalise, nrows, nvars, O, one,
                  order, ordering, parent_type, parity, partitionseq, Perm, perm,
                  permtype, @perm_str, polcoeff, pol_length, powmod,
-                 pow_multinomial, popov, popov_with_transform, powers,
+                 pow_multinomial, popov, popov_with_transform, 
                  precision, preimage, preimage_map, primpart, pseudodivrem,
                  pseudo_inv, pseudorem, push_term!, rank, randmat_triu,
                  randmat_with_rank, rand_ordering, rank_profile_popov, remove,

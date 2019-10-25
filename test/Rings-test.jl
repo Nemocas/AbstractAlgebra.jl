@@ -32,10 +32,3 @@ end
    @test_throws MethodError elem_type('c')
    @test_throws MethodError elem_type(Char)
 end
-
-@testset "Generic.Rings.powers..." begin
-    for T in (ZZ, AbstractFloat, Integer, Rational)
-        @test_throws DomainError powers(T(2), 0)
-        @test_throws DomainError powers(T(2), -rand(1:100))
-    end
-end
