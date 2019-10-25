@@ -234,6 +234,11 @@ identity_matrix(::MatElem{T}) where T <: RingElement
 ```
 
 ```@docs
+one(a::AbstractAlgebra.MatSpace)
+one(a::MatElem)
+```
+
+```@docs
 change_base_ring(::AbstractAlgebra.Ring, ::AbstractAlgebra.MatElem)
 ```
 

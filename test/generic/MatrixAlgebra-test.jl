@@ -144,6 +144,9 @@ end
    @test iszero(zero(S))
    @test isone(one(S))
 
+   @test zero(A) == zero(S)
+   @test one(A) == one(S)
+
    U = MatrixAlgebra(QQ, 3)
    C = U([1 2 3; 5 6 7; 9 8 5])
 

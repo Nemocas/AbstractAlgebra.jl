@@ -267,6 +267,9 @@ end
    @test iszero(zero(S))
    @test isone(one(S))
 
+   @test zero(A) == zero(S)
+   @test one(A) == one(S)
+
    B[1, 1] = R(3)
    @test B[1, 1] == R(3)
 
@@ -349,7 +352,10 @@ end
       @test !iszero(m45)
       @test m45 isa Generic.MatSpaceElem
       @test parent(m45) == M45
+      @test_throws DomainError one(m45)
    end
+
+   @test_throws DomainError one(M45)
 
    let m = matrix(ZZ, 2, 3, 1:6)
       @test typeof(m[1, 1]) == BigInt # not in AbstractAlgebra's hierarchy
