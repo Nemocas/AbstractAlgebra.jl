@@ -115,6 +115,18 @@ function _checkbounds(A, rows::UnitRange{Int}, cols::UnitRange{Int})
       throw(BoundsError(A, cols))
 end
 
+function check_square(A::MatrixElem)
+   issquare(A) || throw(DomainError(A, "matrix must be square"))
+   A
+end
+
+function check_square(S::AbstractAlgebra.MatSpace)
+   nrows(S) == ncols(S) || throw(DomainError(S, "matrices must be square"))
+   S
+end
+
+check_square(S::AbstractAlgebra.MatAlgebra) = S
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -215,19 +227,16 @@ end
 @doc Markdown.doc"""
     one(a::AbstractAlgebra.MatSpace)
 > Construct the matrix in the given matrix space with ones down the diagonal
-> and zeroes elsewhere.
+> and zeroes elsewhere. The matrix space must contain square matrices.
 """
-one(a::AbstractAlgebra.MatSpace) = a(1)
+one(a::AbstractAlgebra.MatSpace) = check_square(a)(1)
 
 @doc Markdown.doc"""
     one(a::AbstractAlgebra.MatSpace)
 > Construct the identity matrix in the same matrix space as `a`, i.e.
 > with ones down the diagonal and zeroes elsewhere. `a` must be square.
 """
-function one(a::MatrixElem)
-   issquare(a) || throw(DomainError(a, "matrix must be square"))
-   identity_matrix(a)
-end
+one(a::MatElem) = identity_matrix(check_square(a))
 
 @doc Markdown.doc"""
     iszero(a::Generic.MatrixElem)

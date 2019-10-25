@@ -77,6 +77,9 @@ end
 
    @test degree(f) == 1
 
+   @test one(f) == one(S)
+   @test zero(f) == zero(S)
+
    h = y^2 + 3*y + 3
 
    @test coeff(h, 1) == 3

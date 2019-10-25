@@ -94,6 +94,16 @@ end
 
 ###############################################################################
 #
+#   One and zero
+#
+###############################################################################
+
+one(x::NCRingElem) = one(parent(x))
+
+zero(x::NCRingElem) = zero(parent(x))
+
+###############################################################################
+#
 #   Baby-steps giant-steps powering
 #
 ###############################################################################
@@ -129,21 +139,3 @@ Base.oftype(x::NCRingElem, y::AbstractFloat) = parent(x)(y)
 Base.oftype(x::NCRingElem, y::Integer) = parent(x)(y)
 
 Base.oftype(x::NCRingElem, y::Rational) = parent(x)(y)
-
-###############################################################################
-#
-#   BELOW: Shared functionalities for Rings and NCRings
-#
-################################################################################
-
-const CNCRingElem = Union{RingElem,NCRingElem}
-
-###############################################################################
-#
-#   One and zero
-#
-###############################################################################
-
-one(x::CNCRingElem) = one(parent(x))
-
-zero(x::CNCRingElem) = zero(parent(x))
