@@ -153,28 +153,6 @@ end
 
 ###############################################################################
 #
-#   Baby-steps giant-steps powering
-#
-###############################################################################
-
-function powers(a::T, d::Int) where {T <: RingElement}
-   d <= 0 && throw(DomainError(d, "the second argument must be positive"))
-   S = parent(a)
-   A = Array{T}(undef, d + 1)
-   A[1] = one(S)
-   if d > 0
-      c = a
-      A[2] = a
-      for i = 2:d
-         c *= a
-         A[i + 1] = c
-      end
-   end
-   return A
-end
-
-###############################################################################
-#
 #   Type traits
 #
 ###############################################################################

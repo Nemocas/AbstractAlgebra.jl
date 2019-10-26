@@ -790,26 +790,6 @@ function ^(a::MatrixElem, b::Int)
    end
 end
 
-@doc Markdown.doc"""
-    powers(a::Generic.MatrixElem, d::Int)
-> Return an array of matrices $M$ wher $M[i + 1] = a^i$ for $i = 0..d$
-"""
-function powers(a::MatrixElem, d::Int)
-   !issquare(a) && error("Dimensions do not match in powers")
-   d <= 0 && throw(DomainError(d, "Negative dimension in powers"))
-   A = Array{typeof(a)}(undef, d + 1)
-   A[1] = identity_matrix(a)
-   if d > 1
-      c = a
-      A[2] = a
-      for i = 2:d
-         c *= a
-         A[i + 1] = c
-      end
-   end
-   return A
-end
-
 ###############################################################################
 #
 #   Comparisons

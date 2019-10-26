@@ -92,7 +92,8 @@ end
 #
 ###############################################################################
 
-const RingElement = Union{RingElem, Integer, Rational, AbstractFloat}
+const RingElement   = Union{RingElem,   Integer, Rational, AbstractFloat}
+const NCRingElement = Union{NCRingElem, Integer, Rational, AbstractFloat}
 
 const FieldElement = Union{FieldElem, Rational, AbstractFloat}
 
