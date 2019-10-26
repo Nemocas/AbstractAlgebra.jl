@@ -131,7 +131,7 @@ julia&gt; multiply_column(M, 2, 3)
 julia&gt; multiply_row(M, 2, 3)
 [1   2   3]
 [2   3   4]
-[8  10  10]</code></pre><h3><a class="nav-anchor" id="Powering-1" href="#Powering-1">Powering</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.powers-Tuple{MatElem,Int64}" href="#AbstractAlgebra.Generic.powers-Tuple{MatElem,Int64}"><code>AbstractAlgebra.Generic.powers</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">powers(a::Generic.MatrixElem, d::Int)</code></pre><blockquote><p>Return an array of matrices <span>$M$</span> wher <span>$M[i + 1] = a^i$</span> for <span>$i = 0..d$</span></p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = ZZ[1 2 3; 2 3 4; 4 5 5]
+[8  10  10]</code></pre><h3><a class="nav-anchor" id="Powering-1" href="#Powering-1">Powering</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.powers-Tuple{MatElem,Int64}" href="#AbstractAlgebra.powers-Tuple{MatElem,Int64}"><code>AbstractAlgebra.powers</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">powers(a::Union{NCRingElement, MatElem}, d::Int)</code></pre><blockquote><p>Return an array <span>$M$</span> of &quot;powers&quot; of <code>a</code> where <span>$M[i + 1] = a^i$</span> for <span>$i = 0..d$</span></p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = ZZ[1 2 3; 2 3 4; 4 5 5]
 [1  2  3]
 [2  3  4]
 [4  5  5]
