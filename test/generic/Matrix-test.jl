@@ -952,7 +952,10 @@ end
    Q = inv(P)
 
    PA = P*A
-   @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
+   if VERSION >= v"1.3"
+      @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+   end
    @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
    @test A == Q*(P*A)
 
@@ -966,7 +969,7 @@ end
    Q = inv(P)
 
    PA = P*A
-   @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
    @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
    @test A == Q*(P*A)
 
@@ -980,7 +983,7 @@ end
    Q = inv(P)
 
    PA = P*A
-   @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
    @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
    @test A == Q*(P*A)
 
@@ -994,7 +997,7 @@ end
    Q = inv(P)
 
    PA = P*A
-   @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
    @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
    @test A == Q*(P*A)
 
@@ -1008,7 +1011,7 @@ end
    Q = inv(P)
 
    PA = P*A
-   @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
    @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
    @test A == Q*(P*A)
 
@@ -1022,7 +1025,7 @@ end
    Q = inv(P)
 
    PA = P*A
-   @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
    @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
    @test A == Q*(P*A)
 end
