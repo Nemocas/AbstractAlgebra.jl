@@ -81,8 +81,8 @@ import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, bin,
              parent, parse, precision, rand, Rational, rem, reverse, setindex!,
              show, sincos, similar, sign, sin, sinh, sinpi, size, string, tan,
              tanh, trailing_zeros, transpose, truncate, typed_hvcat,
-             typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^, &, |, <<, >>,
-             ~, <=, >=, <, >, //, /, !=
+             typed_hcat, typed_vcat, vcat, xor, zero, zeros,
+             +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
 
 using Random: Random, AbstractRNG
 
@@ -605,31 +605,9 @@ getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{St
 #
 ################################################################################
 
-function typed_hvcat(R::Ring, dims, d...)
-   T = elem_type(R)
-   r = length(dims)
-   c = dims[1]
-   A = Array{T}(undef, r, c)
-   for i = 1:r
-      dims[i] != c && throw(ArgumentError("row $i has mismatched number of columns (expected $c, got $(dims[i]))"))
-      for j = 1:c
-         A[i, j] = R(d[(i - 1)*c + j])
-      end
-   end
-   S = matrix(R, A)
-   return S
-end
-
-function typed_hcat(R::Ring, d...)
-   T = elem_type(R)
-   r = length(d)
-   A = Array{T}(undef, 1, r)
-   for i = 1:r
-      A[1, i] = R(d[i])
-   end
-   S = matrix(R, A)
-   return S
-end
+typed_hvcat(R::Ring, dims::Dims, d...) = matrix(R, length(dims), dims[1], hvcat(dims, d...))
+typed_hcat(R::Ring, d...) = matrix(R, 1, length(d), hcat(d...))
+typed_vcat(R::Ring, d...) = matrix(R, length(d), 1, vcat(d...))
 
 ###############################################################################
 #

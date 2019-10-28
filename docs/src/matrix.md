@@ -108,9 +108,8 @@ Matrix interface).
 ## Matrix element constructors
 
 In addition to coercing elements into a matrix space as above, we provide the
-following functions for constructing explicit matrices.
-
-Also see the Matrix interface for a list of other ways to create matrices.
+following syntax for constructing literal matrices (similar to how Julia
+arrays can be be constructed).
 
 ```julia
 R[a b c...;...]
@@ -119,29 +118,9 @@ R[a b c...;...]
 Create the matrix over the base ring $R$ consisting of the given rows (separated by
 semicolons). Each entry is coerced into $R$  automatically. Note that parentheses may
 be placed around individual entries if the lists would otherwise be ambiguous, e.g.
-`R[1 2; 2 (-3)]`.
+`R[1 2; 2 (- 3)]`.
 
-Beware that this syntax does not support the creation of column vectors. See
-the notation below for creating those.
-
-```julia
-R[a b c...]
-```
-
-Create the row vector with entries in $R$ consisting of the given entries
-(separated by spaces). Each entry is coerced into $R$ automatically. Note that
-parentheses may be placed around individual entries if the list would otherwise
-be ambiguous, e.g. `R[1 2 (-3)]`.
-
-```julia
-R[a b c...]'
-```
-
-Create the column vector with entries in $R$ consisting of the given entries
-(separated by spaces). Each entry is coerced into $R$ automatically. Observe
-the dash that is used to transpose the row vector notation (for free) to turn
-it into a column vector. Note that parentheses may be placed around individual
-entries if the list would otherwise be ambiguous, e.g. `R[1 2 (-3)]'`.
+Also see the Matrix interface for a list of other ways to create matrices.
 
 **Examples**
 
@@ -156,14 +135,13 @@ julia> M = R[t + 1 1; t^2 0]
 [t+1//1  1//1]
 [   t^2  0//1]
 
-julia> N = R[t + 1 2 t]
+julia> N = R[t + 1 2 t] # create a row vector
 [t+1//1  2//1  t]
 
-julia> P = R[1 2 t]'
+julia> P = R[1; 2; t] # create a column vector
 [1//1]
 [2//1]
 [   t]
-
 ```
 
 ## Submatrices
