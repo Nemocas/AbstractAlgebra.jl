@@ -130,6 +130,34 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
    @test_throws ErrorConstrDimMismatch S([t, t^2])
    @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10])
 
+   # test literal construction
+   for T = (R, ZZ)
+      m = T[1 2]
+      @test m isa MatElem{elem_type(T)}
+      @test size(m) == (1, 2)
+      @test m[1, 1] == T(1)
+      @test m[1, 2] == T(2)
+
+      m = T[1; 2; 3]
+      @test m isa MatElem{elem_type(T)}
+      @test size(m) == (3, 1)
+      @test m[1, 1] == T(1)
+      @test m[2, 1] == T(2)
+      @test m[3, 1] == T(3)
+
+      m = T[1 2; 3 4; 5 6]
+      @test m isa MatElem{elem_type(T)}
+      @test size(m) == (3, 2)
+      @test m[1, 1] == T(1)
+      @test m[1, 2] == T(2)
+      @test m[2, 1] == T(3)
+      @test m[2, 2] == T(4)
+      @test m[3, 1] == T(5)
+      @test m[3, 2] == T(6)
+
+      @test_throws ArgumentError T[1; 2 3]
+   end
+
    arr = [1 2; 3 4]
    arr2 = [1, 2, 3, 4, 5, 6]
 
