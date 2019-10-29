@@ -507,8 +507,10 @@ end
    @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
    @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
    @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
-
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test sub(A, [i:j;], [k:l;]) == A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test sub(A, i:2:j, k:2:l) == A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
+   
    rows, cols = randsubseq.(axes(A), rand(2))
    @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
 
@@ -523,6 +525,8 @@ end
    @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
    @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
    @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+   @test sub(A, [i:j;], [k:l;]) == A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test sub(A, i:2:j, k:2:l) == A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
 
    rows, cols = randsubseq.(axes(A), rand(2))
    @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
@@ -538,6 +542,8 @@ end
    @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
    @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
    @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+   @test sub(A, [i:j;], [k:l;]) == A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test sub(A, i:2:j, k:2:l) == A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
 
    rows, cols = randsubseq.(axes(A), rand(2))
    @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
@@ -553,6 +559,8 @@ end
    @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
    @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
    @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+   @test sub(A, [i:j;], [k:l;]) == A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test sub(A, i:2:j, k:2:l) == A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
 
    rows, cols = randsubseq.(axes(A), rand(2))
    @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
@@ -568,6 +576,8 @@ end
    @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
    @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
    @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+   @test sub(A, [i:j;], [k:l;]) == A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test sub(A, i:2:j, k:2:l) == A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
 
    rows, cols = randsubseq.(axes(A), rand(2))
    @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
@@ -583,6 +593,8 @@ end
    @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
    @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
    @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+   @test sub(A, [i:j;], [k:l;]) == A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test sub(A, i:2:j, k:2:l) == A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
 
    rows, cols = randsubseq.(axes(A), rand(2))
    @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
