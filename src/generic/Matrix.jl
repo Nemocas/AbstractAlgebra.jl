@@ -369,17 +369,17 @@ function sub(M::AbstractAlgebra.MatElem, rows::AbstractVector{Int}, cols::Abstra
    return z
 end
 
-getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
+getindex(x::AbstractAlgebra.MatElem, r::AbstractVector{Int}, c::AbstractVector{Int}) = sub(x, r, c)
 
-getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, ::Colon) = sub(x, r, 1:ncols(x))
+getindex(x::AbstractAlgebra.MatElem, r::AbstractVector{Int}, ::Colon) = sub(x, r, 1:ncols(x))
 
-getindex(x::AbstractAlgebra.MatElem, ::Colon, c::UnitRange{Int}) = sub(x, 1:nrows(x), c)
+getindex(x::AbstractAlgebra.MatElem, ::Colon, c::AbstractVector{Int}) = sub(x, 1:nrows(x), c)
 
 getindex(x::AbstractAlgebra.MatElem, ::Colon, ::Colon) = sub(x, 1:nrows(x), 1:ncols(x))
 
-getindex(x::AbstractAlgebra.MatElem, r::Int, c::UnitRange{Int}) = sub(x, r:r, c)
+getindex(x::AbstractAlgebra.MatElem, r::Int, c::AbstractVector{Int}) = sub(x, r:r, c)
 
-getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, c::Int) = sub(x, r, c:c)
+getindex(x::AbstractAlgebra.MatElem, r::AbstractVector{Int}, c::Int) = sub(x, r, c:c)
 
 getindex(x::AbstractAlgebra.MatElem, r::Int, ::Colon) = sub(x, r:r, 1:ncols(x))
 
