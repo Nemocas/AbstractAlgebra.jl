@@ -28,7 +28,7 @@ end
     parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingElement
 > Return the parent object of the given matrix.
 """
-parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingElement =
+parent(a::MatAlgElem{T}, cached::Bool = true) where T <: RingElement =
     MatAlgebra{T}(a.base_ring, size(a.entries)[1], cached)
 
 function check_parent(a::AbstractAlgebra.MatAlgElem{T}, b::AbstractAlgebra.MatAlgElem{T}, throw::Bool = true) where T <: RingElement

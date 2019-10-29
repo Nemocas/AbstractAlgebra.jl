@@ -70,7 +70,7 @@ base_ring(a::MatrixElem{T}) where {T <: RingElement} = a.base_ring::parent_type(
     parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: RingElement
 > Return the parent object of the given matrix.
 """
-parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: RingElement =
+parent(a::Mat{T}, cached::Bool = true) where T <: RingElement =
     MatSpace{T}(a.base_ring, size(a.entries)..., cached)
 
 dense_matrix_type(::Type{T}) where T <: RingElement = MatSpaceElem{T}
@@ -160,13 +160,13 @@ end
     nrows(a::Generic.MatrixElem)
 > Return the number of rows of the given matrix.
 """
-nrows(a::MatrixElem) = size(a.entries, 1)
+nrows(a::Union{Mat, MatAlgElem}) = size(a.entries, 1)
 
 @doc Markdown.doc"""
     ncols(a::Generic.MatrixElem)
 > Return the number of columns of the given matrix.
 """
-ncols(a::MatrixElem) = size(a.entries, 2)
+ncols(a::Union{Mat, MatAlgElem}) = size(a.entries, 2)
 
 @doc Markdown.doc"""
     length(a::Generic.MatrixElem)
@@ -180,12 +180,10 @@ length(a::MatrixElem) = nrows(a) * ncols(a)
 """
 isempty(a::MatrixElem) = (nrows(a) == 0) | (ncols(a) == 0)
 
-Base.@propagate_inbounds function getindex(a::MatrixElem, r::Int, c::Int)
-   return a.entries[r, c]
-end
+Base.@propagate_inbounds getindex(a::Union{Mat, MatAlgElem}, r::Int, c::Int) = a.entries[r, c]
 
-Base.@propagate_inbounds function setindex!(a::MatrixElem, d::T, r::Int,
-                                            c::Int) where T <: RingElement
+Base.@propagate_inbounds function setindex!(a::Union{Mat, MatAlgElem}, d::RingElement,
+                                            r::Int, c::Int)
     a.entries[r, c] = base_ring(a)(d)
 end
 
