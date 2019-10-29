@@ -32,10 +32,11 @@ end
    g = rand(G, 1:9, 1:9)
 
    @testset "$T" for (x, T) in (x => string(nameof(typeof(x))) for x in (a, b, c, d, e, f, g))
-      @test_throws DomainError powers(x, 0)
       @test_throws DomainError powers(x, -rand(1:100))
-      @test_throws DomainError powers(x, 0)
-      @test_throws DomainError powers(x, -rand(1:100))
+
+      S = powers(x, 0)
+      @test length(S) == 1
+      @test isone(S[1]) 
       
       P = powers(x, 1)
       @test length(P) == 2

@@ -113,19 +113,17 @@ zero(x::NCRingElem) = zero(parent(x))
 > Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$
 """
 function powers(a::T, d::Int) where {T <: Union{NCRingElement, MatElem}}
-   d <= 0 && throw(DomainError(d, "the second argument must be positive"))
+   d < 0 && throw(DomainError(d, "the second argument must be nonnegative"))
    a isa MatElem && !issquare(a) && throw(DomainError(a, "matrix must be square"))
-   A = Array{T}(undef, d + 1)
-   A[1] = one(a)
+   M = Array{T}(undef, d + 1)
+   M[1] = one(a)
    if d > 0
-      c = a
-      A[2] = a
+      M[2] = a
       for i = 2:d
-         c *= a
-         A[i + 1] = c
+         M[i + 1] = M[i] * a
       end
    end
-   return A
+   return M
 end
 
 ###############################################################################
