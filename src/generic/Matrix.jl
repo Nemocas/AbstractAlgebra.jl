@@ -5210,26 +5210,14 @@ end
 
 > Return the $n \times n$ identity matrix over $R$.
 """
-function identity_matrix(R::Ring, n::Int)
-   z = zero_matrix(R, n, n)
-   for i in 1:n
-      z[i, i] = one(R)
-   end
-   return z
-end
+identity_matrix(R::Ring, n::Int) = diagonal_matrix(R, n, one(R))
 
 @doc Markdown.doc"""
     identity_matrix(R::Ring, m::Int, n::Int)
 > Return the $m \times n$ matrix over $R$ with ones down the diagonal and
 > zeroes elsewhere.
 """
-function identity_matrix(R::Ring, m::Int, n::Int)
-   z = zero_matrix(R, m, n)
-   for i in 1:min(m, n)
-      z[i, i] = one(R)
-   end
-   return z
-end
+identity_matrix(R::Ring, m::Int, n::Int) = diagonal_matrix(R, m, n, one(R))
 
 @doc Markdown.doc"""
     identity_matrix(M::MatElem{T}) where T <: RingElement
@@ -5253,6 +5241,41 @@ function identity_matrix(M::MatElem{T}, n::Int) where T <: RingElement
    end
    z
 end
+
+################################################################################
+#
+#   Diagonal matrix
+#
+################################################################################
+
+@doc Markdown.doc"""
+    diagonal_matrix(R::Ring, m::Int, [n::Int], x::RingElement)
+> Return the $m \times n$ matrix over $R$ with `x` along the main diagonal and
+> zeroes elsewhere. If `n` is not specified, it defaults to `m`.
+
+# Examples
+
+```jldoctest
+julia> diagonal_matrix(ZZ, 2, 3, ZZ(2))
+[2  0  0]
+[0  2  0]
+
+julia> diagonal_matrix(QQ, 3, -1)
+[-1//1   0//1   0//1]
+[ 0//1  -1//1   0//1]
+[ 0//1   0//1  -1//1]
+```
+"""
+function diagonal_matrix(R::Ring, m::Int, n::Int, x::RingElement)
+   z = zero_matrix(R, m, n)
+   x = R(x)
+   for i in 1:min(m, n)
+      z[i, i] = deepcopy(x)
+   end
+   return z
+end
+
+diagonal_matrix(R::Ring, m::Int, x::RingElement) = diagonal_matrix(R, m, m, x)
 
 ###############################################################################
 #
