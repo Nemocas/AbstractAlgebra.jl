@@ -92,6 +92,8 @@ end
 
 ==(x::RingElement, y::NCRingElem) = parent(y)(x) == y
 
+Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
+
 ###############################################################################
 #
 #   One and zero

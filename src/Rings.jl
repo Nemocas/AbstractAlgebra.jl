@@ -119,8 +119,6 @@ function addmul!(z::T, x::T, y::T, c::T) where {T <: RingElem}
    return z
 end
 
-Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, T <: RingElem} = x^p
-
 ###############################################################################
 #
 #   Delayed reduction
