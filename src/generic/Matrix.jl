@@ -354,36 +354,46 @@ function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
 end
 
 @doc Markdown.doc"""
-    sub(M::AbstractAlgebra.MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
-> Return a copy of the submatrix $A$ of $M$ defined by A[i,j] = M[rows[i], cols[j]]
-> for i=1,...,length(rows) and j=1,...,length(cols)
+    sub(M::AbstractAlgebra.MatElem, rows, cols)
+> When `rows` and `cols` are specified as an `AbstractVector{Int}`, return a copy of
+> the submatrix $A$ of $M$ defined by `A[i,j] = M[rows[i], cols[j]]`
+> for `i=1,...,length(rows)` and `j=1,...,length(cols)`.
+> Instead of a vector, `rows` and `cols` can also be:
+> * an integer `i`, which is  interpreted as `i:i`, or
+> * `:`, which is interpreted as `1:nrows(M)` or `1:ncols(M)` respectively.
 """
 function sub(M::AbstractAlgebra.MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
    Base.require_one_based_indexing(rows, cols)
-   z = similar(M, length(rows), length(cols))
+   A = similar(M, length(rows), length(cols))
    for i in 1:length(rows)
       for j in 1:length(cols)
-         z[i, j] = deepcopy(M[rows[i], cols[j]])
+         A[i, j] = deepcopy(M[rows[i], cols[j]])
       end
    end
-   return z
+   return A
 end
 
-getindex(x::AbstractAlgebra.MatElem, r::AbstractVector{Int}, c::AbstractVector{Int}) = sub(x, r, c)
+sub(M::AbstractAlgebra.MatElem,
+    rows::Union{Int,Colon,AbstractVector{Int}},
+    cols::Union{Int,Colon,AbstractVector{Int}}) = sub(M, _to_indices(M, rows, cols)...)
 
-getindex(x::AbstractAlgebra.MatElem, r::AbstractVector{Int}, ::Colon) = sub(x, r, 1:ncols(x))
+getindex(M::AbstractAlgebra.MatElem,
+         rows::Union{Int,Colon,AbstractVector{Int}},
+         cols::Union{Int,Colon,AbstractVector{Int}}) = sub(M, _to_indices(M, rows, cols)...)
 
-getindex(x::AbstractAlgebra.MatElem, ::Colon, c::AbstractVector{Int}) = sub(x, 1:nrows(x), c)
-
-getindex(x::AbstractAlgebra.MatElem, ::Colon, ::Colon) = sub(x, 1:nrows(x), 1:ncols(x))
-
-getindex(x::AbstractAlgebra.MatElem, r::Int, c::AbstractVector{Int}) = sub(x, r:r, c)
-
-getindex(x::AbstractAlgebra.MatElem, r::AbstractVector{Int}, c::Int) = sub(x, r, c:c)
-
-getindex(x::AbstractAlgebra.MatElem, r::Int, ::Colon) = sub(x, r:r, 1:ncols(x))
-
-getindex(x::AbstractAlgebra.MatElem, ::Colon, c::Int) = sub(x, 1:nrows(x), c:c)
+function _to_indices(x, rows, cols)
+   if rows isa Integer
+      rows = rows:rows
+   elseif rows isa Colon
+      rows = 1:nrows(x)
+   end
+   if cols isa Integer
+      cols = cols:cols
+   elseif cols isa Colon
+      cols = 1:ncols(x)
+   end
+   (rows, cols)
+end
 
 function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: RingElement
    return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
