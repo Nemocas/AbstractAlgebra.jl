@@ -340,21 +340,12 @@ canonical_unit(a::MatrixElem) = canonical_unit(a[1, 1])
 
 ###############################################################################
 #
-#   Sub
+#   getindex
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
-> Return a copy of the submatrix of $M$ from $(r1, c1)$ to $(r2, c2)$ inclusive. Note
-> that if the copy is modified, the original matrix is not.
-"""
-function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
-  return sub(M, r1:r2, c1:c2)
-end
-
-@doc Markdown.doc"""
-    sub(M::AbstractAlgebra.MatElem, rows, cols)
+    Base.getindex(M::AbstractAlgebra.MatElem, rows, cols)
 > When `rows` and `cols` are specified as an `AbstractVector{Int}`, return a copy of
 > the submatrix $A$ of $M$ defined by `A[i,j] = M[rows[i], cols[j]]`
 > for `i=1,...,length(rows)` and `j=1,...,length(cols)`.
@@ -362,7 +353,7 @@ end
 > * an integer `i`, which is  interpreted as `i:i`, or
 > * `:`, which is interpreted as `1:nrows(M)` or `1:ncols(M)` respectively.
 """
-function sub(M::AbstractAlgebra.MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
+function getindex(M::AbstractAlgebra.MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
    Base.require_one_based_indexing(rows, cols)
    A = similar(M, length(rows), length(cols))
    for i in 1:length(rows)
@@ -373,13 +364,9 @@ function sub(M::AbstractAlgebra.MatElem, rows::AbstractVector{Int}, cols::Abstra
    return A
 end
 
-sub(M::AbstractAlgebra.MatElem,
-    rows::Union{Int,Colon,AbstractVector{Int}},
-    cols::Union{Int,Colon,AbstractVector{Int}}) = sub(M, _to_indices(M, rows, cols)...)
-
 getindex(M::AbstractAlgebra.MatElem,
          rows::Union{Int,Colon,AbstractVector{Int}},
-         cols::Union{Int,Colon,AbstractVector{Int}}) = sub(M, _to_indices(M, rows, cols)...)
+         cols::Union{Int,Colon,AbstractVector{Int}}) = M[_to_indices(M, rows, cols)...]
 
 function _to_indices(x, rows, cols)
    if rows isa Integer
@@ -1798,7 +1785,7 @@ function minors(A::AbstractAlgebra.MatElem, k::Int)
    mins = Array{elem_type(base_ring(A)), 1}(undef, 0)
    for ri in row_indices
       for ci in col_indices
-         push!(mins, det(AbstractAlgebra.Generic.sub(A, ri, ci)))
+         push!(mins, det(A[ri, ci]))
       end
    end
    return(mins)

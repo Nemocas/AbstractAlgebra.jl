@@ -144,28 +144,6 @@ julia> P = R[1; 2; t] # create a column vector
 [   t]
 ```
 
-## Submatrices
-
-In addition to the functionality described in the Matrix interface for taking
-submatrices of a matrix, the following function variant is also available.
-
-```@docs
-sub(::MatElem, ::Int, ::Int, ::Int, ::Int)
-```
-
-**Examples**
-
-```jldoctest
-julia> M = ZZ[1 2 3; 2 3 4]
-[1  2  3]
-[2  3  4]
-
-julia> N = sub(M, 1, 1, 2, 2)
-[1  2]
-[2  3]
-
-```
-
 ## Matrix functionality provided by AbstractAlgebra.jl
 
 Most of the following generic functionality is available for both matrix spaces and
