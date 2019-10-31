@@ -108,7 +108,8 @@ function _checkbounds(A, i::Int, j::Int)
             Base.throw_boundserror(A, (i, j))
 end
 
-function _checkbounds(A, rows::UnitRange{Int}, cols::UnitRange{Int})
+function _checkbounds(A, rows::AbstractArray{Int}, cols::AbstractArray{Int})
+   Base.require_one_based_indexing(rows, cols)
    isempty(rows) || _checkbounds(nrows(A), first(rows)) && _checkbounds(nrows(A), last(rows)) ||
       throw(BoundsError(A, rows))
    isempty(cols) || _checkbounds(ncols(A), first(cols)) && _checkbounds(ncols(A), last(cols)) ||
@@ -354,7 +355,7 @@ canonical_unit(a::MatrixElem) = canonical_unit(a[1, 1])
 > * `:`, which is interpreted as `1:nrows(M)` or `1:ncols(M)` respectively.
 """
 function getindex(M::AbstractAlgebra.MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
-   Base.require_one_based_indexing(rows, cols)
+   _checkbounds(M, rows, cols)
    A = similar(M, length(rows), length(cols))
    for i in 1:length(rows)
       for j in 1:length(cols)
