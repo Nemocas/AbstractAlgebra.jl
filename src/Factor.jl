@@ -12,7 +12,7 @@ export Fac, unit
 #
 ################################################################################
 
-mutable struct Fac{T <: RingElem}
+mutable struct Fac{T <: RingElement}
    unit::T
    fac::Dict{T, Int}
 
@@ -46,21 +46,24 @@ unit(a::Fac) = a.unit
 ################################################################################
 
 @doc Markdown.doc"""
-    in(a::T, b::Fac{T})
+    in(a, b::Fac)
 
 > Test whether `a` is a factor of `b`.
 """
-function Base.in(a::T, b::Fac{T}) where {T}
-   a in keys(b.fac)
+function Base.in(a, b::Fac{T}) where {T}
+   # convert is necessary when T == fmpz, because hash on fmpz
+   # doesn't coincide with hash on Integer
+   convert(T, a) in keys(b.fac)
 end
 
 @doc Markdown.doc"""
-    getindex(a::Fac{T}, b::T) -> Int
+    getindex(a::Fac, b) -> Int
 
 > If `b` is a factor of `a`, the corresponding exponent is returned. Otherwise
 > an error is thrown.
 """
-function getindex(a::Fac{T}, b::T) where {T}
+function getindex(a::Fac{T}, b) where {T}
+  b = convert(T, b)
   if haskey(a.fac, b)
     return a.fac[b]
   else
