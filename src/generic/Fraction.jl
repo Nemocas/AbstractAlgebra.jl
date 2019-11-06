@@ -767,7 +767,8 @@ end
 > Return the tuple $n, x$ such that $z = p^nx$ where $x$ has valuation $0$ at
 > $p$.
 """
-function remove(z::AbstractAlgebra.FracElem{T}, p::T) where {T <: RingElem}
+function remove(z::AbstractAlgebra.FracElem{T}, p) where {T}
+   p = convert(T, p)
    iszero(z) && error("Not yet implemented")
    v, d = remove(denominator(z, false), p)
    w, n = remove(numerator(z, false), p)
@@ -778,7 +779,8 @@ end
     valuation(z::AbstractAlgebra.FracElem{T}, p::T) where {T <: RingElem}
 > Return the valuation of $z$ at $p$.
 """
-function valuation(z::AbstractAlgebra.FracElem{T}, p::T) where {T <: RingElem}
+function valuation(z::AbstractAlgebra.FracElem{T}, p) where {T}
+   p = convert(T, p)
    v, _ = remove(z, p)
    return v
 end
@@ -944,7 +946,7 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.FracField{T}, v...) where {T <: RingElem}
+function rand(rng::AbstractRNG, S::AbstractAlgebra.FracField, v...)
    R = base_ring(S)
    n = rand(rng, R, v...)
    d = R()
