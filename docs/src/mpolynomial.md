@@ -217,9 +217,7 @@ x^2*y^2+x+1//1
 
 ```
 
-Incase a specific parent ring is constructed, it can also be passed to the function.
-
-```
+In case a specific parent ring is constructed, it can also be passed to the function.
 
 **Examples**
 
@@ -235,8 +233,6 @@ x^5+y^3+1
 
 julia> fq = change_base_ring(QQ, fz, S)
 x^5+y^3+1//1
-
-
 ```
 
 ### Multivariate coefficients
