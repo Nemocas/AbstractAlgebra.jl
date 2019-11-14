@@ -68,69 +68,148 @@ x^2*y^2+x+1
 
 julia&gt; fq = change_base_ring(QQ, fz)
 x^2*y^2+x+1//1
-</code></pre><p>Incase a specific parent ring is constructed, it can also be passed to the function.</p><pre><code class="language-none">
-**Examples**
-</code></pre><p>jldoctest julia&gt; R, (x, y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;]) (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])</p><p>julia&gt; S,  = PolynomialRing(QQ, [&quot;x&quot;, &quot;y&quot;]) (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])</p><p>julia&gt; fz = x^5 + y^3 x^5+y^3+1</p><p>julia&gt; fq = change<em>base</em>ring(QQ, fz, S) x^5+y^3+1//1</p><pre><code class="language-none">
-### Multivariate coefficients
+</code></pre><p>In case a specific parent ring is constructed, it can also be passed to the function.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, (x, y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
-In order to return the &quot;coefficient&quot; (as a multivariate polynomial in the same
-ring), of a given monomial (in which some of the variables may not appear and
-others may be required to appear to exponent zero), we can use the following
-function.
-</code></pre><p>@docs coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T &lt;: RingElement coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T &lt;: AbstractAlgebra.MPolyElem</p><pre><code class="language-none">
-**Examples**
-</code></pre><p>jldoctest julia&gt; R, (x, y, z) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;, &quot;z&quot;]) (Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])</p><p>julia&gt; f = x^4<em>y^2</em>z^2 - 2x^4<em>y</em>z^2 + 4x^4<em>z^2 + 2x^2</em>y^2 + x + 1 x^4<em>y^2</em>z^2-2<em>x^4</em>y<em>z^2+4</em>x^4<em>z^2+2</em>x^2*y^2+x+1</p><p>julia&gt; coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2]) true</p><pre><code class="language-none">
-### Inflation/deflation
-</code></pre><p>@docs deflation(f::AbstractAlgebra.MPolyElem{T}) where T &lt;: RingElement</p><pre><code class="language-none"></code></pre><p>@docs deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T &lt;: RingElement</p><pre><code class="language-none"></code></pre><p>@docs inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T &lt;: RingElement</p><pre><code class="language-none">
-**Examples**
-</code></pre><p>jldoctest julia&gt; R, (x, y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;]) (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])</p><p>julia&gt; f = x^7<em>y^8 + 3</em>x^4<em>y^8 - x^4</em>y^2 + 5x<em>y^5 - x</em>y^2 x^7<em>y^8+3</em>x^4<em>y^8-x^4</em>y^2+5<em>x</em>y^5-x*y^2</p><p>julia&gt; def, shift = deflation(f) ([1, 2], [3, 3])</p><p>julia&gt; f1 = deflate(f, def, shift) x^2<em>y^2+3</em>x<em>y^2-x+5</em>y-1</p><p>julia&gt; f2 = inflate(f1, def, shift) x^7<em>y^8+3</em>x^4<em>y^8-x^4</em>y^2+5<em>x</em>y^5-x*y^2</p><p>julia&gt; f2 == f true</p><pre><code class="language-none">
-### Conversions
-</code></pre><p>@docs to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T &lt;: AbstractAlgebra.RingElement</p><pre><code class="language-none">
-**Examples**
-</code></pre><p>jldoctest julia&gt; R, (x, y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;]) (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])</p><p>julia&gt; S, z = PolynomialRing(ZZ, &quot;z&quot;) (Univariate Polynomial Ring in z over Integers, z)</p><p>julia&gt; f = 2x^5 + 3x^4 - 2x^2 - 1 2<em>x^5+3</em>x^4-2*x^2-1</p><p>julia&gt; g = to_univariate(S, f) 2<em>z^5+3</em>z^4-2*z^2-1</p><pre><code class="language-none">
-### Evaluation
+julia&gt; S,  = PolynomialRing(QQ, [&quot;x&quot;, &quot;y&quot;])
+(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
-The following function allows evaluation of a polynomial at all its variables.
-The result is always in the ring that a product of a coefficient and one of the
-values belongs to, i.e. if all the values are in the coefficient ring, the
-result of the evaluation will be too.
-</code></pre><p>@docs evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T &lt;: RingElement, U &lt;: RingElement}</p><pre><code class="language-none">
-The following functions allow evaluation of a polynomial at some of its
-variables. Note that the result will be a product of values and an element
-of the polynomial ring, i.e. even if all the values are in the coefficient
-ring and all variables are given values, the result will be a constant
-polynomial, not a coefficient.
-</code></pre><p>@docs evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}) where {T &lt;: RingElement, U &lt;: RingElement}</p><pre><code class="language-none"></code></pre><p>@docs evaluate(::S, ::Vector{S}, ::Vector{U}) where {S &lt;: AbstractAlgebra.MPolyElem{T}, U &lt;: RingElement} where T &lt;: RingElement</p><pre><code class="language-none">
-The following function allows evaluation of a polynomial at values in a
-not necessarily commutative ring, e.g. elements of a matrix algebra.
-</code></pre><p>@docs evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T &lt;: RingElement, U &lt;: NCRingElem}</p><pre><code class="language-none">
-**Examples**
-</code></pre><p>jldoctest julia&gt; R, (x, y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;]) (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])</p><p>julia&gt; f = 2x^2<em>y^2 + 3x + y + 1 2</em>x^2<em>y^2+3</em>x+y+1</p><p>julia&gt; evaluate(f, BigInt[1, 2]) 14</p><p>julia&gt; evaluate(f, [QQ(1), QQ(2)]) 14//1</p><p>julia&gt; evaluate(f, [1, 2]) 14</p><p>julia&gt; f(1, 2) == 14 true</p><p>julia&gt; evaluate(f, [x + y, 2y - x]) 2<em>x^4-4</em>x^3<em>y-6</em>x^2<em>y^2+8</em>x<em>y^3+2</em>x+8<em>y^4+5</em>y+1</p><p>julia&gt; f(x + y, 2y - x) 2<em>x^4-4</em>x^3<em>y-6</em>x^2<em>y^2+8</em>x<em>y^3+2</em>x+8<em>y^4+5</em>y+1</p><p>julia&gt; R, (x, y, z) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;, &quot;z&quot;]) (Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])</p><p>julia&gt; f = x^2<em>y^2 + 2x</em>z + 3y<em>z + z + 1 x^2</em>y^2+2<em>x</em>z+3<em>y</em>z+z+1</p><p>julia&gt; evaluate(f, [1, 3], [3, 4]) 9<em>y^2+12</em>y+29</p><p>julia&gt; evaluate(f, [x, z], [3, 4]) 9<em>y^2+12</em>y+29</p><p>julia&gt; evaluate(f, [1, 2], [x + z, x - z]) x^4-2<em>x^2</em>z^2+5<em>x</em>z+z^4-z^2+z+1</p><p>julia&gt; evaluate(f, [2, 4, 6], QQ) 167//1</p><p>julia&gt; evaluate(f, [x, z], [2, 4], QQ) 4//1<em>y^2+12//1</em>y+21//1</p><p>julia&gt; S = MatrixAlgebra(ZZ, 2) Matrix Algebra of degree 2 over Integers</p><p>julia&gt; M1 = S([1 2; 3 4]) [1  2] [3  4]</p><p>julia&gt; M2 = S([2 3; 1 -1]) [2   3] [1  -1]</p><p>julia&gt; M3 = S([-1 1; 1 1]) [-1  1] [ 1  1]</p><p>julia&gt; evaluate(f, [M1, M2, M3]) [ 64   83] [124  149]</p><pre><code class="language-none">
-### Leading coefficients, leading monomials and leading terms
+julia&gt; fz = x^5 + y^3
+x^5+y^3+1
 
-The leading coefficient, leading monomial and leading term of a polynomial p are returned by the following functions:
-</code></pre><p>@docs lc(p::AbstractAlgebra.MPolyElem{T}) where T &lt;: RingElement</p><pre><code class="language-none"></code></pre><p>@docs lm(p::AbstractAlgebra.MPolyElem{T}) where T &lt;: RingElement</p><pre><code class="language-none"></code></pre><p>@docs lt(p::AbstractAlgebra.MPolyElem{T}) where T &lt;: RingElement</p><pre><code class="language-none">
-**Examples**
+julia&gt; fq = change_base_ring(QQ, fz, S)
+x^5+y^3+1//1</code></pre><h3><a class="nav-anchor" id="Multivariate-coefficients-1" href="#Multivariate-coefficients-1">Multivariate coefficients</a></h3><p>In order to return the &quot;coefficient&quot; (as a multivariate polynomial in the same ring), of a given monomial (in which some of the variables may not appear and others may be required to appear to exponent zero), we can use the following function.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.coeff-Union{Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{Int64,1}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.coeff-Union{Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{Int64,1}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.coeff</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T &lt;: RingElement</code></pre><blockquote><p>Return the &quot;coefficient&quot; of <span>$a$</span> (as a multivariate polynomial in the same ring) of the monomial consisting of the product of the variables of the given indices raised to the given exponents (note that not all variables need to appear and the exponents can be zero). E.g. <code>coeff(f, [1, 3], [0, 2])</code> returns the coefficient of <span>$x^0*z^2$</span> in the polynomial <span>$f$</span> (assuming variables <span>$x, y, z$</span> in that order).</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.coeff-Union{Tuple{T}, Tuple{T,Array{T,1},Array{Int64,1}}} where T&lt;:MPolyElem" href="#AbstractAlgebra.Generic.coeff-Union{Tuple{T}, Tuple{T,Array{T,1},Array{Int64,1}}} where T&lt;:MPolyElem"><code>AbstractAlgebra.Generic.coeff</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T &lt;: AbstractAlgebra.MPolyElem</code></pre><blockquote><p>Return the &quot;coefficient&quot; of <span>$a$</span> (as a multivariate polynomial in the same ring) of the monomial consisting of the product of the given variables to the given exponents (note that not all variables need to appear and the exponents can be zero). E.g. <code>coeff(f, [x, z], [0, 2])</code> returns the coefficient of <span>$x^0*z^2$</span> in the polynomial <span>$f$</span>.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, (x, y, z) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;, &quot;z&quot;])
+(Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 
-</code></pre><p>julia using AbstractAlgebra R,(x,y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;], ordering=:deglex) p = 2<em>x</em>y + 3*y^3 lt(p) lm(p) lc(p) lt(p) == lc(p) * lm(p)</p><pre><code class="language-none">
-### Least common multiple, greatest common divisor
+julia&gt; f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
+x^4*y^2*z^2-2*x^4*y*z^2+4*x^4*z^2+2*x^2*y^2+x+1
 
-The greated common divisor of two polynomials a and b is returned by
-</code></pre><p>@docs gcd(a::AbstractAlgebra.Generic.MPoly{T}, b::AbstractAlgebra.Generic.MPoly{T}) where {T &lt;: RingElement}</p><pre><code class="language-none">
-Note that this functionality is currently only provided for AbstractAlgebra
-generic polynomials. It is not automatically provided for all multivariate
-rings that implement the multivariate interface.
+julia&gt; coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])
+true
+</code></pre><h3><a class="nav-anchor" id="Inflation/deflation-1" href="#Inflation/deflation-1">Inflation/deflation</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.deflation-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.deflation-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.deflation</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">deflation(f::AbstractAlgebra.MPolyElem{T}) where T &lt;: RingElement</code></pre><blockquote><p>Compute deflation parameters for the exponents of the polynomial <span>$f$</span>. This is a pair of arrays of integers, the first array of which (the shift) gives the minimum exponent for each variable of the polynomial, and the second of which (the deflation) gives the gcds of all the exponents after subtracting the shift, again per variable. This functionality is used by gcd (and can be used by factorisation algorithms).</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.deflate-Union{Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{Int64,1}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.deflate-Union{Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{Int64,1}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.deflate</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">deflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T &lt;: RingElement</code></pre><blockquote><p>Return a polynomial with the same coefficients as <span>$f$</span> but whose exponents have been shifted down by the given shifts (supplied as an array of shifts, one for each variable, then deflated (divided) by the given exponents (again supplied as an array of deflation factors, one for each variable). The algorithm automatically replaces a deflation of <span>$0$</span> by <span>$1$</span>, to avoid division by <span>$0$</span>.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.inflate-Union{Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{Int64,1}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.inflate-Union{Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{Int64,1}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.inflate</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">inflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T &lt;: RingElement</code></pre><blockquote><p>Return a polynomial with the same coefficients as <span>$f$</span> but whose exponents have been inflated (multiplied) by the given deflation exponents (supplied as an array of inflation factors, one for each variable) and then shifted by the given shifts (again supplied as an array of shifts, one for each variable).</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, (x, y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
-However, if such a gcd is provided, the least common multiple of two
-polynomials a and b is returned by
-</code></pre><p>@docs lcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T &lt;: RingElement}</p><pre><code class="language-none">
-**Examples**
-</code></pre><p>jldoctest julia&gt; using AbstractAlgebra</p><p>julia&gt; R,(x,y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;]) (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])</p><p>julia&gt; a = x<em>y + 2</em>y x<em>y+2</em>y</p><p>julia&gt; b = x^3<em>y + y x^3</em>y+y</p><p>julia&gt; gcd(a,b) y</p><p>julia&gt; lcm(a,b) x^4<em>y+2</em>x^3<em>y+x</em>y+2*y</p><p>julia&gt; lcm(a,b) == a * b // gcd(a,b) true</p><pre><code class="language-none">
-### Derivations
-</code></pre><p>@docs derivative(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T &lt;: AbstractAlgebra.RingElement</p><pre><code class="language-none">
-**Examples**
-</code></pre><p>jldoctest julia&gt; R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;]) (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])</p><p>julia&gt; f = x<em>y + x + y + 1 x</em>y+x+y+1</p><p>julia&gt; derivative(f, x) y+1</p><p>julia&gt; derivative(f, y) x+1</p><pre><code class="language-none">
-### Homogeneous polynomials
+julia&gt; f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
+x^7*y^8+3*x^4*y^8-x^4*y^2+5*x*y^5-x*y^2
 
-It is possible to test whether a polynomial is homogeneous with respect to the standard grading using the function
-</code></pre><p>@docs ishomogeneous(x::AbstractAlgebra.MPolyElem{T}) where T &lt;: RingElement ```</p><footer><hr/><a class="previous" href="../mpolynomial_rings/"><span class="direction">Previous</span><span class="title">Multivariate Polynomial Ring Interface</span></a><a class="next" href="../series_rings/"><span class="direction">Next</span><span class="title">Series Ring Interface</span></a></footer></article></body></html>
+julia&gt; def, shift = deflation(f)
+([1, 2], [3, 3])
+
+julia&gt; f1 = deflate(f, def, shift)
+x^2*y^2+3*x*y^2-x+5*y-1
+
+julia&gt; f2 = inflate(f1, def, shift)
+x^7*y^8+3*x^4*y^8-x^4*y^2+5*x*y^5-x*y^2
+
+julia&gt; f2 == f
+true
+</code></pre><h3><a class="nav-anchor" id="Conversions-1" href="#Conversions-1">Conversions</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.to_univariate-Union{Tuple{T}, Tuple{PolyRing{T},MPolyElem{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.to_univariate-Union{Tuple{T}, Tuple{PolyRing{T},MPolyElem{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.to_univariate</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T &lt;: AbstractAlgebra.RingElement</code></pre><blockquote><p>Assuming the polynomial <span>$p$</span> is actually a univariate polynomial, convert the polynomial to a univariate polynomial in the given univariate polynomial ring <span>$R$</span>. An exception is raised if the polynomial <span>$p$</span> involves more than one variable.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, (x, y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia&gt; S, z = PolynomialRing(ZZ, &quot;z&quot;)
+(Univariate Polynomial Ring in z over Integers, z)
+
+julia&gt; f = 2x^5 + 3x^4 - 2x^2 - 1
+2*x^5+3*x^4-2*x^2-1
+
+julia&gt; g = to_univariate(S, f)
+2*z^5+3*z^4-2*z^2-1
+</code></pre><h3><a class="nav-anchor" id="Evaluation-1" href="#Evaluation-1">Evaluation</a></h3><p>The following function allows evaluation of a polynomial at all its variables. The result is always in the ring that a product of a coefficient and one of the values belongs to, i.e. if all the values are in the coefficient ring, the result of the evaluation will be too.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.evaluate-Union{Tuple{U}, Tuple{T}, Tuple{MPolyElem{T},Array{U,1}}} where U&lt;:Union{RingElem, AbstractFloat, Integer, Rational} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.evaluate-Union{Tuple{U}, Tuple{T}, Tuple{MPolyElem{T},Array{U,1}}} where U&lt;:Union{RingElem, AbstractFloat, Integer, Rational} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.evaluate</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T &lt;: RingElement, U &lt;: RingElement}</code></pre><blockquote><p>Evaluate the polynomial by substituting in the array of values for each of the variables. The evaluation will succeed if multiplication is defined between elements of the coefficient ring of <span>$a$</span> and elements of the supplied vector.</p></blockquote></div></section><p>The following functions allow evaluation of a polynomial at some of its variables. Note that the result will be a product of values and an element of the polynomial ring, i.e. even if all the values are in the coefficient ring and all variables are given values, the result will be a constant polynomial, not a coefficient.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.evaluate-Union{Tuple{U}, Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{U,1}}} where U&lt;:Union{RingElem, AbstractFloat, Integer, Rational} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.evaluate-Union{Tuple{U}, Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{U,1}}} where U&lt;:Union{RingElem, AbstractFloat, Integer, Rational} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.evaluate</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T &lt;: RingElement, U &lt;: RingElement}</code></pre><blockquote><p>Evaluate the polynomial by substituting in the supplied values in the array <code>vals</code> for the corresponding variables with indices given by the array <code>vars</code>. The evaluation will succeed if multiplication is defined between elements of the coefficient ring of <span>$a$</span> and elements of <code>vals</code>.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.evaluate-Union{Tuple{U}, Tuple{S}, Tuple{T}, Tuple{S,Array{S,1},Array{U,1}}} where U&lt;:Union{RingElem, AbstractFloat, Integer, Rational} where S&lt;:MPolyElem{T} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.evaluate-Union{Tuple{U}, Tuple{S}, Tuple{T}, Tuple{S,Array{S,1},Array{U,1}}} where U&lt;:Union{RingElem, AbstractFloat, Integer, Rational} where S&lt;:MPolyElem{T} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.evaluate</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S &lt;: AbstractAlgebra.MPolyElem{T}, U &lt;: RingElement} where T &lt;: RingElement</code></pre><blockquote><p>Evaluate the polynomial by substituting in the supplied values in the array <code>vals</code> for the corresponding variables (supplied as polynomials) given by the array <code>vars</code>. The evaluation will succeed if multiplication is defined between elements of the coefficient ring of <span>$a$</span> and elements of <code>vals</code>.</p></blockquote></div></section><p>The following function allows evaluation of a polynomial at values in a not necessarily commutative ring, e.g. elements of a matrix algebra.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.evaluate-Union{Tuple{U}, Tuple{T}, Tuple{MPolyElem{T},Array{U,1}}} where U&lt;:NCRingElem where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.evaluate-Union{Tuple{U}, Tuple{T}, Tuple{MPolyElem{T},Array{U,1}}} where U&lt;:NCRingElem where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.evaluate</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T &lt;: RingElement, U &lt;: NCRingElem}</code></pre><blockquote><p>Evaluate the polynomial at the supplied values, which may be any ring elements, commutative or non-commutative, but in the same ring. Evaluation always proceeds in the order of the variables as supplied when creating the polynomial ring to which <span>$a$</span> belongs. The evaluation will succeed if a product of a coefficient of the polynomial by one of the values is defined.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, (x, y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia&gt; f = 2x^2*y^2 + 3x + y + 1
+2*x^2*y^2+3*x+y+1
+
+julia&gt; evaluate(f, BigInt[1, 2])
+14
+
+julia&gt; evaluate(f, [QQ(1), QQ(2)])
+14//1
+
+julia&gt; evaluate(f, [1, 2])
+14
+
+julia&gt; f(1, 2) == 14
+true
+
+julia&gt; evaluate(f, [x + y, 2y - x])
+2*x^4-4*x^3*y-6*x^2*y^2+8*x*y^3+2*x+8*y^4+5*y+1
+
+julia&gt; f(x + y, 2y - x)
+2*x^4-4*x^3*y-6*x^2*y^2+8*x*y^3+2*x+8*y^4+5*y+1
+
+julia&gt; R, (x, y, z) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;, &quot;z&quot;])
+(Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
+
+julia&gt; f = x^2*y^2 + 2x*z + 3y*z + z + 1
+x^2*y^2+2*x*z+3*y*z+z+1
+
+julia&gt; evaluate(f, [1, 3], [3, 4])
+9*y^2+12*y+29
+
+julia&gt; evaluate(f, [x, z], [3, 4])
+9*y^2+12*y+29
+
+julia&gt; evaluate(f, [1, 2], [x + z, x - z])
+x^4-2*x^2*z^2+5*x*z+z^4-z^2+z+1
+
+julia&gt; evaluate(f, [2, 4, 6], QQ)
+167//1
+
+julia&gt; evaluate(f, [x, z], [2, 4], QQ)
+4//1*y^2+12//1*y+21//1
+
+julia&gt; S = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
+
+julia&gt; M1 = S([1 2; 3 4])
+[1  2]
+[3  4]
+
+julia&gt; M2 = S([2 3; 1 -1])
+[2   3]
+[1  -1]
+
+julia&gt; M3 = S([-1 1; 1 1])
+[-1  1]
+[ 1  1]
+
+julia&gt; evaluate(f, [M1, M2, M3])
+[ 64   83]
+[124  149]</code></pre><h3><a class="nav-anchor" id="Leading-coefficients,-leading-monomials-and-leading-terms-1" href="#Leading-coefficients,-leading-monomials-and-leading-terms-1">Leading coefficients, leading monomials and leading terms</a></h3><p>The leading coefficient, leading monomial and leading term of a polynomial p are returned by the following functions:</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.lc-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.lc-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.lc</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">lc(p::MPolyElem)</code></pre><blockquote><p>Return the leading coefficient of the polynomial p.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.lm-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.lm-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.lm</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">lm(p::MPolyElem)</code></pre><blockquote><p>Return the leading monomial of the polynomial p.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.lt-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.lt-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.lt</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">lt(p::MPolyElem)</code></pre><blockquote><p>Return the leading term of the polynomial p.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia">using AbstractAlgebra
+R,(x,y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;], ordering=:deglex)
+p = 2*x*y + 3*y^3
+lt(p)
+lm(p)
+lc(p)
+lt(p) == lc(p) * lm(p)</code></pre><h3><a class="nav-anchor" id="Least-common-multiple,-greatest-common-divisor-1" href="#Least-common-multiple,-greatest-common-divisor-1">Least common multiple, greatest common divisor</a></h3><p>The greated common divisor of two polynomials a and b is returned by</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.gcd-Union{Tuple{T}, Tuple{MPoly{T},MPoly{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#Base.gcd-Union{Tuple{T}, Tuple{MPoly{T},MPoly{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>Base.gcd</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">gcd(a::AbstractAlgebra.Generic.MPoly{T}, a::AbstractAlgebra.Generic.MPoly{T}) where {T &lt;: RingElement}</code></pre><blockquote><p>Return the greatest common divisor of a and b in parent(a).</p></blockquote></div></section><p>Note that this functionality is currently only provided for AbstractAlgebra generic polynomials. It is not automatically provided for all multivariate rings that implement the multivariate interface.</p><p>However, if such a gcd is provided, the least common multiple of two polynomials a and b is returned by</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.lcm-Union{Tuple{T}, Tuple{MPolyElem{T},MPolyElem{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#Base.lcm-Union{Tuple{T}, Tuple{MPolyElem{T},MPolyElem{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>Base.lcm</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">lcm(a::AbstractAlgebra.MPolyElem{T}, a::AbstractAlgebra.MPolyElem{T}) where {T &lt;: RingElement}</code></pre><blockquote><p>Return the least common multiple of a and b in parent(a).</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; using AbstractAlgebra
+
+julia&gt; R,(x,y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia&gt; a = x*y + 2*y
+x*y+2*y
+
+julia&gt; b = x^3*y + y
+x^3*y+y
+
+julia&gt; gcd(a,b)
+y
+
+julia&gt; lcm(a,b)
+x^4*y+2*x^3*y+x*y+2*y
+
+julia&gt; lcm(a,b) == a * b // gcd(a,b)
+true
+</code></pre><h3><a class="nav-anchor" id="Derivations-1" href="#Derivations-1">Derivations</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.derivative-Union{Tuple{T}, Tuple{MPolyElem{T},MPolyElem{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.derivative-Union{Tuple{T}, Tuple{MPolyElem{T},MPolyElem{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.derivative</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">derivative(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T &lt;: RingElement</code></pre><blockquote><p>Return the partial derivative of <code>f</code> with respect to <code>x</code>. The value <code>x</code> must be a generator of the polynomial ring of <code>f</code>.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia&gt; f = x*y + x + y + 1
+x*y+x+y+1
+
+julia&gt; derivative(f, x)
+y+1
+
+julia&gt; derivative(f, y)
+x+1
+</code></pre><h3><a class="nav-anchor" id="Homogeneous-polynomials-1" href="#Homogeneous-polynomials-1">Homogeneous polynomials</a></h3><p>It is possible to test whether a polynomial is homogeneous with respect to the standard grading using the function</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.ishomogeneous-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.ishomogeneous-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.ishomogeneous</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">ishomogeneous(x::MPoly{T}) where {T &lt;: RingElement}</code></pre><blockquote><p>Return <code>true</code> if the given polynomial is homogeneous with respect to the standard grading and <code>false</code> otherwise.</p></blockquote></div></section><footer><hr/><a class="previous" href="../mpolynomial_rings/"><span class="direction">Previous</span><span class="title">Multivariate Polynomial Ring Interface</span></a><a class="next" href="../series_rings/"><span class="direction">Next</span><span class="title">Series Ring Interface</span></a></footer></article></body></html>
