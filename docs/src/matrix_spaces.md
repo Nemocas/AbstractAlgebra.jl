@@ -325,7 +325,7 @@ performance reasons.
 The following are only available for matrix spaces, not for matrix algebras.
 
 ```julia
-sub(M::MyMat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: AbstractAlgebra.RingElem
+Base.getindex(M::MyMat, rows::AbstractVector{Int}, cols::AbstractVector{Int})
 ```
 
 Return a new matrix with the same entries as the submatrix with the given range of rows

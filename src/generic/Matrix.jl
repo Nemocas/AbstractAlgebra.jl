@@ -108,7 +108,8 @@ function _checkbounds(A, i::Int, j::Int)
             Base.throw_boundserror(A, (i, j))
 end
 
-function _checkbounds(A, rows::UnitRange{Int}, cols::UnitRange{Int})
+function _checkbounds(A, rows::AbstractArray{Int}, cols::AbstractArray{Int})
+   Base.has_offset_axes(rows, cols) && throw(ArgumentError("offset arrays are not supported"))
    isempty(rows) || _checkbounds(nrows(A), first(rows)) && _checkbounds(nrows(A), last(rows)) ||
       throw(BoundsError(A, rows))
    isempty(cols) || _checkbounds(ncols(A), first(cols)) && _checkbounds(ncols(A), last(cols)) ||
@@ -340,63 +341,47 @@ canonical_unit(a::MatrixElem) = canonical_unit(a[1, 1])
 
 ###############################################################################
 #
-#   Sub
+#   getindex
 #
 ###############################################################################
 
-function sub(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, cols::UnitRange{Int})
-  _checkbounds(M, rows, cols)
-  z = similar(M, length(rows), length(cols))
-  startr = first(rows)
-  startc = first(cols)
-  for i in rows
-    for j in cols
-      z[i - startr + 1, j - startc + 1] = deepcopy(M[i, j])
-    end
-  end
-  return z
-end
-
 @doc Markdown.doc"""
-    sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
-> Return a copy of the submatrix of $M$ from $(r1, c1)$ to $(r2, c2)$ inclusive. Note
-> that if the copy is modified, the original matrix is not.
+    Base.getindex(M::AbstractAlgebra.MatElem, rows, cols)
+> When `rows` and `cols` are specified as an `AbstractVector{Int}`, return a copy of
+> the submatrix $A$ of $M$ defined by `A[i,j] = M[rows[i], cols[j]]`
+> for `i=1,...,length(rows)` and `j=1,...,length(cols)`.
+> Instead of a vector, `rows` and `cols` can also be:
+> * an integer `i`, which is  interpreted as `i:i`, or
+> * `:`, which is interpreted as `1:nrows(M)` or `1:ncols(M)` respectively.
 """
-function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
-  return sub(M, r1:r2, c1:c2)
-end
-
-@doc Markdown.doc"""
-    sub(M::AbstractAlgebra.MatElem, rows::Array{Int,1}, cols::Array{Int,1})
-> Return a copy of the submatrix $A$ of $M$ defined by A[i,j] = M[rows[i], cols[j]]
-> for i=1,...,length(rows) and j=1,...,length(cols)
-"""
-function sub(M::AbstractAlgebra.MatElem, rows::Array{Int,1}, cols::Array{Int,1})
-   z = similar(M, length(rows), length(cols))
+function getindex(M::AbstractAlgebra.MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
+   _checkbounds(M, rows, cols)
+   A = similar(M, length(rows), length(cols))
    for i in 1:length(rows)
       for j in 1:length(cols)
-         Generic._checkbounds(M, rows[i], cols[j])
-         z[i, j] = deepcopy(M[rows[i], cols[j]])
+         A[i, j] = deepcopy(M[rows[i], cols[j]])
       end
    end
-   return z
+   return A
 end
 
-getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
+getindex(M::AbstractAlgebra.MatElem,
+         rows::Union{Int,Colon,AbstractVector{Int}},
+         cols::Union{Int,Colon,AbstractVector{Int}}) = M[_to_indices(M, rows, cols)...]
 
-getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, ::Colon) = sub(x, r, 1:ncols(x))
-
-getindex(x::AbstractAlgebra.MatElem, ::Colon, c::UnitRange{Int}) = sub(x, 1:nrows(x), c)
-
-getindex(x::AbstractAlgebra.MatElem, ::Colon, ::Colon) = sub(x, 1:nrows(x), 1:ncols(x))
-
-getindex(x::AbstractAlgebra.MatElem, r::Int, c::UnitRange{Int}) = sub(x, r:r, c)
-
-getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, c::Int) = sub(x, r, c:c)
-
-getindex(x::AbstractAlgebra.MatElem, r::Int, ::Colon) = sub(x, r:r, 1:ncols(x))
-
-getindex(x::AbstractAlgebra.MatElem, ::Colon, c::Int) = sub(x, 1:nrows(x), c:c)
+function _to_indices(x, rows, cols)
+   if rows isa Integer
+      rows = rows:rows
+   elseif rows isa Colon
+      rows = 1:nrows(x)
+   end
+   if cols isa Integer
+      cols = cols:cols
+   elseif cols isa Colon
+      cols = 1:ncols(x)
+   end
+   (rows, cols)
+end
 
 function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: RingElement
    return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
@@ -1801,7 +1786,7 @@ function minors(A::AbstractAlgebra.MatElem, k::Int)
    mins = Array{elem_type(base_ring(A)), 1}(undef, 0)
    for ri in row_indices
       for ci in col_indices
-         push!(mins, det(AbstractAlgebra.Generic.sub(A, ri, ci)))
+         push!(mins, det(A[ri, ci]))
       end
    end
    return(mins)

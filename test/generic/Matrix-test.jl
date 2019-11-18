@@ -442,12 +442,12 @@ end
    @test -A == S(-A.entries)
 end
 
-@testset "Generic.Mat.sub..." begin
+@testset "Generic.Mat.getindex..." begin
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
-   B = @inferred sub(A, 1, 1, 2, 2)
+   B = @inferred A[1:2, 1:2]
 
    @test typeof(B) == typeof(A)
    @test B == MatrixSpace(ZZ, 2, 2)([1 2; 4 5])
@@ -455,7 +455,7 @@ end
    B[1, 1] = 10
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 
-   C = @inferred sub(B, 1:2, 1:2)
+   C = @inferred B[1:2, 1:2]
 
    @test typeof(C) == typeof(A)
    @test C == MatrixSpace(ZZ, 2, 2)([10 2; 4 5])
@@ -504,13 +504,14 @@ end
    A = rand(S, -1000:1000)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
 
-   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
-   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
-   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
-
+   @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
+   @test A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
+   
    rows, cols = randsubseq.(axes(A), rand(2))
-   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+   @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
    # Exact field
    R = GF(7)
@@ -519,13 +520,14 @@ end
    A = rand(S)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
 
-   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
-   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
-   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
-
+   @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
+   @test A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
+   
    rows, cols = randsubseq.(axes(A), rand(2))
-   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+   @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
    # Inexact ring
    R = RealField["t"][1]
@@ -534,13 +536,14 @@ end
    A = rand(S, 0:200, -1000:1000)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
 
-   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
-   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
-   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
-
+   @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
+   @test A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
+   
    rows, cols = randsubseq.(axes(A), rand(2))
-   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+   @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
    # Inexact field
    R = RealField
@@ -549,13 +552,14 @@ end
    A = rand(S, -1000:1000)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
 
-   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
-   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
-   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
-
+   @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
+   @test A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
+   
    rows, cols = randsubseq.(axes(A), rand(2))
-   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+   @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
    # Non-integral domain
    R = ResidueRing(ZZ, 6)
@@ -564,13 +568,14 @@ end
    A = rand(S, 0:5)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
 
-   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
-   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
-   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
-
+   @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
+   @test A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
+   
    rows, cols = randsubseq.(axes(A), rand(2))
-   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+   @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
    # Fraction field
    R = QQ
@@ -579,13 +584,14 @@ end
    A = rand(S, -1000:1000)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
 
-   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
-   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
-   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
-
+   @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
+   @test A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
+   @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
+   
    rows, cols = randsubseq.(axes(A), rand(2))
-   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+   @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 end
 
 @testset "Generic.Mat.block_replacement..." begin
