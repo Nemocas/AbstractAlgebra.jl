@@ -288,6 +288,30 @@ end
    @test typeof(identity_matrix(M9.m))    == typeof(M9.m)
    @test typeof(identity_matrix(M9.m, 3)) == typeof(M9.m)
 
+   D1 = diagonal_matrix(one(R), 2)
+
+   @test size(D1) == (2, 2)
+   @test base_ring(D1) == R
+   @test D1[1, 1] == D1[2, 2] == one(R)
+   @test D1[1, 2] == D1[2, 1] == zero(R)
+   @test D1 isa Generic.MatSpaceElem{elem_type(R)}
+
+   D2 = diagonal_matrix(one(R), 2, 2)
+   @test D2 == D1 && typeof(D2) == typeof(D1)
+
+   let pol = t^2+1
+      D3 = diagonal_matrix(pol, 3, 4)
+      @test D3 isa Generic.MatSpaceElem{elem_type(R)}
+      for i=1:3, j=1:4
+         if i == j
+            @test D3[i, j] == pol
+            @test D3[i, j] !== pol
+         else
+            @test iszero(D3[i, j])
+         end
+      end
+   end
+
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
 

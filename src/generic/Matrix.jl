@@ -5210,14 +5210,14 @@ end
 
 > Return the $n \times n$ identity matrix over $R$.
 """
-identity_matrix(R::Ring, n::Int) = diagonal_matrix(R, n, one(R))
+identity_matrix(R::Ring, n::Int) = diagonal_matrix(one(R), n)
 
 @doc Markdown.doc"""
     identity_matrix(R::Ring, m::Int, n::Int)
 > Return the $m \times n$ matrix over $R$ with ones down the diagonal and
 > zeroes elsewhere.
 """
-identity_matrix(R::Ring, m::Int, n::Int) = diagonal_matrix(R, m, n, one(R))
+identity_matrix(R::Ring, m::Int, n::Int) = diagonal_matrix(one(R), m, n)
 
 @doc Markdown.doc"""
     identity_matrix(M::MatElem{T}) where T <: RingElement
@@ -5249,33 +5249,32 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    diagonal_matrix(R::Ring, m::Int, [n::Int], x::RingElement)
+    diagonal_matrix(x::RingElement, m::Int, [n::Int])
 > Return the $m \times n$ matrix over $R$ with `x` along the main diagonal and
 > zeroes elsewhere. If `n` is not specified, it defaults to `m`.
 
 # Examples
 
 ```jldoctest
-julia> diagonal_matrix(ZZ, 2, 3, ZZ(2))
+julia> diagonal_matrix(ZZ(2), 2, 3)
 [2  0  0]
 [0  2  0]
 
-julia> diagonal_matrix(QQ, 3, -1)
+julia> diagonal_matrix(QQ(-1), 3)
 [-1//1   0//1   0//1]
 [ 0//1  -1//1   0//1]
 [ 0//1   0//1  -1//1]
 ```
 """
-function diagonal_matrix(R::Ring, m::Int, n::Int, x::RingElement)
-   z = zero_matrix(R, m, n)
-   x = R(x)
+function diagonal_matrix(x::RingElement, m::Int, n::Int)
+   z = zero_matrix(parent(x), m, n)
    for i in 1:min(m, n)
       z[i, i] = deepcopy(x)
    end
    return z
 end
 
-diagonal_matrix(R::Ring, m::Int, x::RingElement) = diagonal_matrix(R, m, m, x)
+diagonal_matrix(x::RingElement, m::Int) = diagonal_matrix(x, m, m)
 
 ###############################################################################
 #

@@ -190,6 +190,10 @@ identity_matrix(::MatElem{T}) where T <: RingElement
 ```
 
 ```@docs
+diagonal_matrix(::RingElement, ::Int, ::Int)
+```
+
+```@docs
 one(a::AbstractAlgebra.MatSpace)
 one(a::MatElem)
 ```
