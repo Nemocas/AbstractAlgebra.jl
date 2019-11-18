@@ -109,7 +109,7 @@ function _checkbounds(A, i::Int, j::Int)
 end
 
 function _checkbounds(A, rows::AbstractArray{Int}, cols::AbstractArray{Int})
-   Base.require_one_based_indexing(rows, cols)
+   Base.has_offset_axes(rows, cols) && throw(ArgumentError("offset arrays are not supported"))
    isempty(rows) || _checkbounds(nrows(A), first(rows)) && _checkbounds(nrows(A), last(rows)) ||
       throw(BoundsError(A, rows))
    isempty(cols) || _checkbounds(ncols(A), first(cols)) && _checkbounds(ncols(A), last(cols)) ||
