@@ -309,7 +309,7 @@ end
 ################################################################################
 
 function copy(d::MatSpaceElem{T}) where T <: RingElement
-   z = _similar(d, base_ring(d), nrows(d), ncols(d))
+   z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
          z[i, j] = d[i, j]
@@ -319,7 +319,7 @@ function copy(d::MatSpaceElem{T}) where T <: RingElement
 end
 
 function deepcopy_internal(d::MatSpaceElem{T}, dict::IdDict) where T <: RingElement
-   z = _similar(d, base_ring(d), nrows(d), ncols(d))
+   z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
          z[i, j] = deepcopy(d[i, j])
@@ -4906,13 +4906,18 @@ end
 #
 ###############################################################################
 
+# like change_base_ring, but without initializing the entries
+# this function exists until a better API is implemented
+_change_base_ring(R::Ring, a::MatElem) = zero_matrix(R, nrows(a), ncols(a))
+_change_base_ring(R::Ring, a::MatAlgElem) = MatrixAlgebra(R, nrows(a))()
+
 @doc Markdown.doc"""
     change_base_ring(R::Ring, M::MatrixElem)
 
 > Return the matrix obtained by coercing each entry into `R`.
 """
 function change_base_ring(R::Ring, M::MatrixElem)
-   N = similar(M, R)
+   N = _change_base_ring(R, M)
    for i=1:nrows(M), j=1:ncols(M)
       N[i,j] = R(M[i,j])
    end
@@ -4951,9 +4956,9 @@ Base.map!(f, dst::MatrixElem, src::MatrixElem) = map_entries!(f, dst, src)
 > Transform matrix `a` by applying `f` on each element.
 """
 function map_entries(f, a::MatrixElem)
-   isempty(a) && return similar(a, parent(f(zero(base_ring(a)))))
+   isempty(a) && return _change_base_ring(parent(f(zero(base_ring(a)))), a)
    b11 = f(a[1, 1])
-   b = similar(a, parent(b11))
+   b = _change_base_ring(parent(b11), a)
    b[1, 1] = b11
    for i = 1:nrows(a), j = 1:ncols(a)
       i == j == 1 && continue
