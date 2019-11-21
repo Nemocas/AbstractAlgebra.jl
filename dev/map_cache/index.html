@@ -10,13 +10,11 @@ Codomain:
 ========
 Integers
 
-
-julia&gt; g = cached(f)
+julia&gt; g = cached(f);
 
 julia&gt; f(ZZ(1)) == g(ZZ(1))
-true
-</code></pre><h2><a class="nav-anchor" id="Functionality-for-cached-maps-1" href="#Functionality-for-cached-maps-1">Functionality for cached maps</a></h2><p>The following functions are provided for cached maps.</p><pre><code class="language-julia">enable_cache!(M::MapCache)
-disable_cache!(M::MapCache)</code></pre><p>Temporarily enable or disable the cache for the given map. The values stored in the cache are not lost when it is disabled.</p><pre><code class="language-julia">set_limit!(M::MapCache, limit::Int)</code></pre><p>Set the limit on the number of values that can be cached in the dictionary, to the given value. Setting the value to 0 will effectively disable further caching for this map.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; f = cached(map_from_func(x -&gt; x + 1, ZZ, ZZ))
+true</code></pre><h2><a class="nav-anchor" id="Functionality-for-cached-maps-1" href="#Functionality-for-cached-maps-1">Functionality for cached maps</a></h2><p>The following functions are provided for cached maps.</p><pre><code class="language-julia">enable_cache!(M::MapCache)
+disable_cache!(M::MapCache)</code></pre><p>Temporarily enable or disable the cache for the given map. The values stored in the cache are not lost when it is disabled.</p><pre><code class="language-julia">set_limit!(M::MapCache, limit::Int)</code></pre><p>Set the limit on the number of values that can be cached in the dictionary, to the given value. Setting the value to 0 will effectively disable further caching for this map.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; f = cached(map_from_func(x -&gt; x + 1, ZZ, ZZ));
 
 julia&gt; a = f(ZZ(1))
 2
@@ -35,5 +33,4 @@ julia&gt; set_limit!(f, 200)
 200
 
 julia&gt; d = f(ZZ(1))
-2
-</code></pre><footer><hr/><a class="previous" href="../functional_map/"><span class="direction">Previous</span><span class="title">Functional maps</span></a><a class="next" href="../map_with_inverse/"><span class="direction">Next</span><span class="title">Map with inverse</span></a></footer></article></body></html>
+2</code></pre><footer><hr/><a class="previous" href="../functional_map/"><span class="direction">Previous</span><span class="title">Functional maps</span></a><a class="next" href="../map_with_inverse/"><span class="direction">Next</span><span class="title">Map with inverse</span></a></footer></article></body></html>
