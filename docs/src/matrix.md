@@ -165,11 +165,11 @@ dense_matrix_type(::Ring)
 ```
 
 ```@docs
-nrows(::MatElem)
+nrows(::Generic.MatrixElem)
 ```
 
 ```@docs
-ncols(::MatElem)
+ncols(::Generic.MatrixElem)
 ```
 
 ```@docs
