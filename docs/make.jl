@@ -7,6 +7,7 @@ makedocs(
          clean = true,
          doctest = true,
          strict = false,
+         checkdocs = :none,
          pages    = [
              "index.md",
              "constructors.md",
@@ -54,4 +55,3 @@ deploydocs(
    repo   = "github.com/Nemocas/AbstractAlgebra.jl.git",
    target = "build",
 )
-
