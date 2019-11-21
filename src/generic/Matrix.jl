@@ -161,12 +161,16 @@ end
     nrows(a::Generic.MatrixElem)
 > Return the number of rows of the given matrix.
 """
+nrows(::MatrixElem)
+
 nrows(a::Union{Mat, MatAlgElem}) = size(a.entries, 1)
 
 @doc Markdown.doc"""
     ncols(a::Generic.MatrixElem)
 > Return the number of columns of the given matrix.
 """
+ncols(::MatrixElem)
+
 ncols(a::Union{Mat, MatAlgElem}) = size(a.entries, 2)
 
 @doc Markdown.doc"""

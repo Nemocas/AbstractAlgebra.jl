@@ -228,10 +228,10 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 julia> S,  = PolynomialRing(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
-julia> fz = x^5 + y^3
+julia> fz = x^5 + y^3 + 1
 x^5+y^3+1
 
-julia> fq = change_base_ring(QQ, fz, S)
+julia> fq = change_base_ring(QQ, fz, parent=S)
 x^5+y^3+1//1
 ```
 
@@ -394,12 +394,6 @@ julia> evaluate(f, [x, z], [3, 4])
 
 julia> evaluate(f, [1, 2], [x + z, x - z])
 x^4-2*x^2*z^2+5*x*z+z^4-z^2+z+1
-
-julia> evaluate(f, [2, 4, 6], QQ)
-167//1
-
-julia> evaluate(f, [x, z], [2, 4], QQ)
-4//1*y^2+12//1*y+21//1
 
 julia> S = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
