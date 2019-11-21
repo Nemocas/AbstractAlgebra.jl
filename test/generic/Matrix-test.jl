@@ -870,46 +870,6 @@ end
    @test A == inv(P)*(P*A)
 end
 
-######### OPTION 1 ############################################
-
-function test_comparison(R, randparams)
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
-   seed = rand(1:999)
-
-   Random.seed!(seed)
-   A = rand(S, randparams...)
-   Random.seed!(seed)
-   B = rand(S, randparams...)
-
-   @test A == B
-   @test matrix(R, copy(A.entries)) == A
-
-   if !isone(A)
-      @test A != one(S)
-   end
-end
-
-@testset "Generic.Mat.comparison..." begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
-
-   A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-   B = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-
-   @test A == B
-
-   @test A != one(S)
-
-   test_comparison(RINGS["exact ring"]...)
-   test_comparison(RINGS["exact field"]...)
-   test_comparison(RINGS["inexact ring"]...)
-   test_comparison(RINGS["inexact field"]...)
-   test_comparison(RINGS["non-integral domain"]...)
-   test_comparison(RINGS["fraction field"]...)
-end
-
-######### OPTION 2 ############################################
-
 @testset "Generic.Mat.comparison..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -925,21 +885,32 @@ end
       S = MatrixSpace(R, rand(1:9), rand(1:9))
       seed = rand(1:999)
 
-      Random.seed!(seed)
-      A = rand(S, randparams...)
-      Random.seed!(seed)
-      B = rand(S, randparams...)
+      Random.seed!(rng, seed)
+      A = rand(rng, S, randparams...)
+      Random.seed!(rng, seed)
+      B = rand(rng, S, randparams...)
 
       @test A == B
-      @test matrix(R, copy(A.entries)) == A
+      @test A == A
+      @test A == copy(A)
 
-      if !isone(A)
-         @test A != one(S)
-      end   
+      for _=1:3
+         i, j = rand.(Base.OneTo.(size(A)))
+         x = A[i, j]
+         iszero(x) && continue
+         if x == -x
+            @assert !(R isa AbstractAlgebra.Field) || characteristic(R) == 2  # could happen for GF(2)
+            continue
+         end
+         B[i, j] = -A[i, j]
+         @test B != A
+         B[i, j] = -B[i, j]
+         @test A == A
+      end
+
+      @test matrix(R, copy(A.entries)) == A
    end
 end
-
-#################################################################
 
 @testset "Generic.Mat.adhoc_comparison..." begin
    R, t = PolynomialRing(QQ, "t")
