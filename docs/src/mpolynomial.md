@@ -228,10 +228,10 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 julia> S,  = PolynomialRing(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
-julia> fz = x^5 + y^3
+julia> fz = x^5 + y^3 + 1
 x^5+y^3+1
 
-julia> fq = change_base_ring(QQ, fz, S)
+julia> fq = change_base_ring(QQ, fz, parent=S)
 x^5+y^3+1//1
 ```
 
