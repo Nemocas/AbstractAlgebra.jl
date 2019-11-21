@@ -4918,7 +4918,7 @@ _change_base_ring(R::Ring, a::MatAlgElem) = MatrixAlgebra(R, nrows(a))()
 """
 function change_base_ring(R::Ring, M::MatrixElem)
    N = _change_base_ring(R, M)
-   for i=1:nrows(M), j=1:ncols(M)
+   for i = 1:nrows(M), j = 1:ncols(M)
       N[i,j] = R(M[i,j])
    end
    return N
