@@ -305,7 +305,6 @@ end
       for i=1:3, j=1:4
          if i == j
             @test D3[i, j] == pol
-            @test D3[i, j] !== pol
          else
             @test iszero(D3[i, j])
          end

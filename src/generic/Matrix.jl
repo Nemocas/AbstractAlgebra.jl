@@ -5254,7 +5254,6 @@ end
 > zeroes elsewhere. If `n` is not specified, it defaults to `m`.
 
 # Examples
-
 ```jldoctest
 julia> diagonal_matrix(ZZ(2), 2, 3)
 [2  0  0]
@@ -5269,7 +5268,7 @@ julia> diagonal_matrix(QQ(-1), 3)
 function diagonal_matrix(x::RingElement, m::Int, n::Int)
    z = zero_matrix(parent(x), m, n)
    for i in 1:min(m, n)
-      z[i, i] = deepcopy(x)
+      z[i, i] = x
    end
    return z
 end
