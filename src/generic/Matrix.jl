@@ -3170,33 +3170,33 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
    t1 = base_ring(H)()
    t2 = base_ring(H)()
    for i = 1:l
-      for j = k+1:m
-         if iszero(H[j,i])
+      for j = k + 1:m
+         if iszero(H[j, i])
             continue
          end
-         d, u, v = gcdx(H[k,i], H[j,i])
-         a = divexact(H[k,i], d)
-         b = -divexact(H[j,i], d)
+         d, u, v = gcdx(H[k, i], H[j, i])
+         a = divexact(H[k, i], d)
+         b = -divexact(H[j, i], d)
          for c = i:n
-            t = deepcopy(H[j,c])
+            t = deepcopy(H[j, c])
             t1 = mul_red!(t1, a, H[j, c], false)
             t2 = mul_red!(t2, b, H[k, c], false)
-            H[j, c] = add!(H[j, c], t1, t2)
+            H[j, c] = t1 + t2
             H[j, c] = reduce!(H[j, c])
             t1 = mul_red!(t1, u, H[k, c], false)
             t2 = mul_red!(t2, v, t, false)
-            H[k, c] = add!(H[k, c], t1, t2)
+            H[k, c] = t1 + t2
             H[k, c] = reduce!(H[k, c])
          end
          for c = 1:m
             t = deepcopy(U[j,c])
             t1 = mul_red!(t1, a, U[j, c], false)
             t2 = mul_red!(t2, b, U[k, c], false)
-            U[j, c] = add!(U[j, c], t1, t2)
+            U[j, c] = t1 + t2
             U[j, c] = reduce!(U[j, c])
             t1 = mul_red!(t1, u, U[k, c], false)
             t2 = mul_red!(t2, v, t, false)
-            U[k, c] = add!(U[k, c], t1, t2)
+            U[k, c] = t1 + t2
             U[k, c] = reduce!(U[k, c])
          end
       end
