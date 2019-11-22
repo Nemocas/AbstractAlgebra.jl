@@ -138,9 +138,11 @@ end
 #
 ###############################################################################
 
-divexact(a::T, b::T) where T <: Integer = div(a, b)
-
-divexact(a::BigInt, b::T) where T <: Integer = div(a, b)
+function divexact(a::Integer, b::Integer)
+   q, r = divrem(a, b)
+   iszero(r) || throw(ArgumentError("not an exact division"))
+   q
+end
 
 ###############################################################################
 #
