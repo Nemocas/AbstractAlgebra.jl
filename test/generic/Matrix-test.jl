@@ -1,3 +1,12 @@
+const RINGS = Dict(
+   "exact ring"          => (ZZ,                 (-1000:1000,)),
+   "exact field"         => (GF(7),              ()),
+   "inexact ring"        => (RealField["t"][1],  (0:200, -1000:1000)),
+   "inexact field"       => (RealField,          (-1000:1000,)),
+   "non-integral domain" => (ResidueRing(ZZ, 6), (0:5,)),
+   "fraction field"      => (QQ,                 (-1000:1000,)),
+)
+
 primes100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227,
@@ -871,6 +880,36 @@ end
    @test A == B
 
    @test A != one(S)
+
+   @testset "$name" for (name, (R, randparams)) in RINGS
+      S = MatrixSpace(R, rand(1:9), rand(1:9))
+      seed = rand(1:999)
+
+      Random.seed!(rng, seed)
+      A = rand(rng, S, randparams...)
+      Random.seed!(rng, seed)
+      B = rand(rng, S, randparams...)
+
+      @test A == B
+      @test A == A
+      @test A == copy(A)
+
+      for _=1:3
+         i, j = rand.(Base.OneTo.(size(A)))
+         x = A[i, j]
+         iszero(x) && continue
+         if x == -x
+            @assert !(R isa AbstractAlgebra.Field) || characteristic(R) == 2  # could happen for GF(2)
+            continue
+         end
+         B[i, j] = -A[i, j]
+         @test B != A
+         B[i, j] = -B[i, j]
+         @test A == A
+      end
+
+      @test matrix(R, copy(A.entries)) == A
+   end
 end
 
 @testset "Generic.Mat.adhoc_comparison..." begin
