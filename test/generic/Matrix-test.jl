@@ -96,6 +96,45 @@ Base.getindex(a::MyTestMatrix{T}, r::Int, c::Int) where T = a.d
 
 Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
 
+# Simulate user Field, together with a specialized matrix type
+# (like fmpz / fmpz_mat)
+struct F2 <: AbstractAlgebra.Field end
+
+Base.zero(::F2) = F2Elem(false)
+
+struct F2Elem <: AbstractAlgebra.FieldElem
+   x::Bool
+end
+
+Base.:-(x::F2Elem) = x
+(f2::F2)(x::F2Elem) = x
+AbstractAlgebra.parent(x::F2Elem) = F2()
+
+struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
+   m::Generic.MatSpaceElem{F2Elem}
+end
+
+AbstractAlgebra.nrows(a::F2Matrix) = nrows(a.m)
+AbstractAlgebra.ncols(a::F2Matrix) = ncols(a.m)
+AbstractAlgebra.parent_type(::Type{F2Elem}) = F2
+AbstractAlgebra.elem_type(::Type{F2}) = F2Elem
+AbstractAlgebra.base_ring(::F2Matrix) = F2()
+
+Base.getindex(a::F2Matrix, r::Int64, c::Int64) = a.m[r, c]
+Base.setindex!(a::F2Matrix, x::F2Elem, r::Int64, c::Int64) = a.m[r, c] = x
+Base.similar(x::F2Matrix, R::F2, r::Int, c::Int) = F2Matrix(similar(x.m, r, c))
+
+function AbstractAlgebra.zero_matrix(R::F2, r::Int, c::Int)
+   mat = Array{F2Elem}(undef, r, c)
+   for i=1:r, j=1:c
+      mat[i, j] = zero(R)
+   end
+   z = Generic.MatSpaceElem{F2Elem}(mat)
+   z.base_ring = R
+   return F2Matrix(z)
+end
+
+
 @testset "Generic.Mat.constructors..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -449,6 +488,10 @@ end
    @test iszero(A + (-A))
    @test A == -(-A)
    @test -A == S(-A.entries)
+
+   z = zero_matrix(F2(), 2, 3)
+   @test -z   isa F2Matrix
+   @test -z.m isa Generic.MatSpaceElem{F2Elem}
 end
 
 @testset "Generic.Mat.getindex..." begin
@@ -2451,6 +2494,10 @@ end
          @test MQ * NQ == MNQ
       end
    end
+
+   z = zero_matrix(F2(), 2, 3)
+   @test change_base_ring(F2(), z)   isa F2Matrix
+   @test change_base_ring(F2(), z.m) isa F2Matrix
 end
 
 @testset "Generic.Mat.map..." begin
@@ -2491,6 +2538,10 @@ end
          end
       end
    end
+
+   z = zero_matrix(F2(), 2, 3)
+   @test map(identity, z)   isa F2Matrix
+   @test map(identity, z.m) isa F2Matrix
 end
 
 @testset "Generic.Mat.similar/zero..." begin
@@ -2521,6 +2572,20 @@ end
          end
       end
    end
+
+   z = zero_matrix(F2(), 2, 3)
+   @test z isa F2Matrix
+   @test similar(z)       isa F2Matrix
+   @test similar(z, 2, 3) isa F2Matrix
+   @test zero(z)          isa F2Matrix
+   @test zero(z, 2, 3)    isa F2Matrix
+
+   m = z.m
+   @test m                isa Generic.MatSpaceElem{F2Elem}
+   @test similar(m)       isa Generic.MatSpaceElem{F2Elem}
+   @test similar(m, 2, 3) isa Generic.MatSpaceElem{F2Elem}
+   @test zero(m)          isa Generic.MatSpaceElem{F2Elem}
+   @test zero(m, 2, 3)    isa Generic.MatSpaceElem{F2Elem}
 end
 
 @testset "Generic.Mat.printing..." begin
