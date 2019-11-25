@@ -5248,11 +5248,21 @@ end
 > dimensions with ones down the diagonal and zeroes elsewhere.
 """
 function identity_matrix(M::MatElem{T}) where T <: RingElement
-   return identity_matrix(base_ring(M), nrows(M), ncols(M))
+   z = zero(M)
+   R = base_ring(M)
+   for i = 1:min(size(M)...)
+      z[i, i] = one(R)
+   end
+   z
 end
 
 function identity_matrix(M::MatElem{T}, n::Int) where T <: RingElement
-   return identity_matrix(base_ring(M), n, n)
+   z = zero(M, n, n)
+   R = base_ring(M)
+   for i = 1:n
+      z[i, i] = one(R)
+   end
+   z
 end
 
 ###############################################################################

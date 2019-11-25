@@ -101,17 +101,28 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
 struct F2 <: AbstractAlgebra.Field end
 
 Base.zero(::F2) = F2Elem(false)
+Base.one(::F2) = F2Elem(true)
+(::F2)() = F2Elem(false)
 
 struct F2Elem <: AbstractAlgebra.FieldElem
    x::Bool
 end
 
+(::F2)(x::F2Elem) = x
 Base.:-(x::F2Elem) = x
-(f2::F2)(x::F2Elem) = x
-AbstractAlgebra.parent(x::F2Elem) = F2()
+Base.:+(x::F2Elem, y::F2Elem) = F2Elem(x.x ⊻ y.x)
+Base.inv(x::F2Elem) = x.x ? x : throw(DivideError())
+Base.:*(x::F2Elem, y::F2Elem) = F2Elem(x.x * y.x)
 
 Base.convert(::Type{F2Elem}, x::Integer) = F2Elem(x % Bool)
 Base.:(==)(x::F2Elem, y::F2Elem) = x.x == y.x
+
+AbstractAlgebra.parent_type(::Type{F2Elem}) = F2
+AbstractAlgebra.elem_type(::Type{F2}) = F2Elem
+AbstractAlgebra.parent(x::F2Elem) = F2()
+AbstractAlgebra.mul!(x::F2Elem, y::F2Elem, z::F2Elem) = y * z
+AbstractAlgebra.addeq!(x::F2Elem, y::F2Elem) = x + y
+AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 
 struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
    m::Generic.MatSpaceElem{F2Elem}
@@ -119,8 +130,6 @@ end
 
 AbstractAlgebra.nrows(a::F2Matrix) = nrows(a.m)
 AbstractAlgebra.ncols(a::F2Matrix) = ncols(a.m)
-AbstractAlgebra.parent_type(::Type{F2Elem}) = F2
-AbstractAlgebra.elem_type(::Type{F2}) = F2Elem
 AbstractAlgebra.base_ring(::F2Matrix) = F2()
 
 Base.getindex(a::F2Matrix, r::Int64, c::Int64) = a.m[r, c]
@@ -271,6 +280,13 @@ end
    @test isa(M7, Generic.MatSpaceElem{elem_type(R)})
    @test M7.base_ring == R
    @test M7 == M8
+
+   # identity_matrix should preserve the type of the input
+   M9 = matrix(F2(), F2Elem[1 0; 0 1])
+   @test typeof(identity_matrix(M9))      == typeof(M9)
+   @test typeof(identity_matrix(M9, 3))   == typeof(M9)
+   @test typeof(identity_matrix(M9.m))    == typeof(M9.m)
+   @test typeof(identity_matrix(M9.m, 3)) == typeof(M9.m)
 
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
@@ -572,10 +588,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
@@ -588,10 +604,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
@@ -604,10 +620,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
@@ -620,10 +636,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
@@ -636,10 +652,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
@@ -652,10 +668,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 end
@@ -1765,6 +1781,11 @@ end
 
       @test M*X == d*one(T)
    end
+
+   # inv should preserve the type of the input
+   M = matrix(F2(), F2Elem[1 0; 0 1])
+   @test typeof(inv(M))   == typeof(M)
+   @test typeof(inv(M.m)) == typeof(M.m)
 end
 
 @testset "Generic.Mat.hessenberg..." begin
