@@ -110,6 +110,9 @@ Base.:-(x::F2Elem) = x
 (f2::F2)(x::F2Elem) = x
 AbstractAlgebra.parent(x::F2Elem) = F2()
 
+Base.convert(::Type{F2Elem}, x::Integer) = F2Elem(x % Bool)
+Base.:(==)(x::F2Elem, y::F2Elem) = x.x == y.x
+
 struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
    m::Generic.MatSpaceElem{F2Elem}
 end
@@ -134,6 +137,17 @@ function AbstractAlgebra.zero_matrix(R::F2, r::Int, c::Int)
    return F2Matrix(z)
 end
 
+function AbstractAlgebra.matrix(R::F2, mat::AbstractMatrix{F2Elem})
+   mat = convert(Matrix, mat)
+   z = Generic.MatSpaceElem{F2Elem}(mat)
+   z.base_ring = R
+   return F2Matrix(z)
+end
+
+function AbstractAlgebra.matrix(R::F2, r::Int, c::Int, mat::AbstractMatrix{F2Elem})
+   AbstractAlgebra._check_dim(r, c, mat)
+   matrix(R, mat)
+end
 
 @testset "Generic.Mat.constructors..." begin
    R, t = PolynomialRing(QQ, "t")
@@ -1013,6 +1027,14 @@ end
    A = matrix(R, arr)
    B = matrix(R, permutedims(arr, [2, 1]))
    @test transpose(A) == B
+
+   # transpose input/output types are the same
+   a = matrix(F2(), F2Elem[1 1 0; 0 0 1])
+   # not method (yet) for transpose(a)
+   at = transpose(a.m)
+   @test typeof(at) == typeof(a.m)
+   @test at[1, 1] == at[2, 1] == at[3, 2] == F2Elem(true)
+   @test at[3, 1] == at[1, 2] == at[2, 2] == F2Elem(false)
 end
 
 @testset "Generic.Mat.gram..." begin
