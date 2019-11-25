@@ -3571,12 +3571,12 @@ function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int,
       q = -div(H[p, c], H[r, c])
       for j = c:ncols(H)
          t = mul!(t, q, H[r, j])
-         H[p, j] = addeq!(H[p, j], t)
+         H[p, j] += t
       end
       if with_trafo
          for j = 1:ncols(U)
             t = mul!(t, q, U[r, j])
-            U[p, j] = addeq!(U[p, j], t)
+            U[p, j] += t
          end
       end
    end
@@ -3673,24 +3673,20 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
                t = deepcopy(H[i, c])
                t1 = mul_red!(t1, a, H[i, c], false)
                t2 = mul_red!(t2, b, H[p, c], false)
-               H[i, c] = add!(H[i, c], t1, t2)
-               H[i, c] = reduce!(H[i, c])
+               H[i, c] = reduce!(t1 + t2)
                t1 = mul_red!(t1, u, H[p, c], false)
                t2 = mul_red!(t2, v, t, false)
-               H[p, c] = add!(H[p, c], t1, t2)
-               H[p, c] = reduce!(H[p, c])
+               H[p, c] = reduce!(t1 + t2)
             end
             if with_trafo
                for c = 1:m
                   t = deepcopy(U[i, c])
                   t1 = mul_red!(t1, a, U[i, c], false)
                   t2 = mul_red!(t2, b, U[p, c], false)
-                  U[i, c] = add!(U[i, c], t1, t2)
-                  U[i, c] = reduce!(U[i, c])
+                  U[i, c] = reduce!(t1 + t2)
                   t1 = mul_red!(t1, u, U[p, c], false)
                   t2 = mul_red!(t2, v, t, false)
-                  U[p, c] = add!(U[p, c], t1, t2)
-                  U[p, c] = reduce!(U[p, c])
+                  U[p, c] = reduce!(t1 + t2)
                end
             end
          end

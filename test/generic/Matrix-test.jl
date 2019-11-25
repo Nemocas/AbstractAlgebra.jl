@@ -2277,6 +2277,24 @@ end
    @test ishnf(H)
    @test isunit(det(U))
    @test U*B == H
+
+   # hnf_kb! must not assume it "owns" entries of its input
+   # A and B have de-aliased entries, a and b have aliased entries
+   # the result must be the same
+   A = R[1 1; 1 1]
+   B = R[1 0; 0 1]
+   @assert length(IdDict(x => nothing for x in A.entries)) == 4
+   @assert length(IdDict(x => nothing for x in B.entries)) == 4
+   i = x^0
+   z = 0*x
+   a = R[i i; i i]
+   b = R[i z; z i]
+   @assert a[1, 1] === a[1, 2] === a[2, 1] === a[2, 2]
+   @assert b[1, 1] === b[2, 2] &&  b[1, 2] === b[2, 1]
+   Generic.hnf_kb!(A, B, true);
+   Generic.hnf_kb!(a, b, true);
+   @test A == a
+   @test B == b
 end
 
 @testset "Generic.Mat.hnf_cohen..." begin
