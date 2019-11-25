@@ -112,6 +112,7 @@ AbstractAlgebra.parent(x::F2Elem) = F2()
 
 Base.convert(::Type{F2Elem}, x::Integer) = F2Elem(x % Bool)
 Base.:(==)(x::F2Elem, y::F2Elem) = x.x == y.x
+Base.one(::F2) = F2Elem(true)
 
 struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
    m::Generic.MatSpaceElem{F2Elem}
@@ -271,6 +272,13 @@ end
    @test isa(M7, Generic.MatSpaceElem{elem_type(R)})
    @test M7.base_ring == R
    @test M7 == M8
+
+   # identity_matrix should preserve the type of the input
+   M9 = matrix(F2(), F2Elem[1 0; 0 1])
+   @test typeof(identity_matrix(M9))      == typeof(M9)
+   @test typeof(identity_matrix(M9, 3))   == typeof(M9)
+   @test typeof(identity_matrix(M9.m))    == typeof(M9.m)
+   @test typeof(identity_matrix(M9.m, 3)) == typeof(M9.m)
 
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
