@@ -955,7 +955,9 @@ end
 > Return the transpose of the given matrix.
 """
 function transpose(x::Mat)
-   return matrix(base_ring(x), permutedims(x.entries, [2, 1]))
+   y = MatSpaceElem{eltype(x)}(permutedims(x.entries))
+   y.base_ring = x.base_ring
+   y
 end
 
 ###############################################################################
