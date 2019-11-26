@@ -444,6 +444,28 @@ end
 
 Base.ndims(::MatrixElem) = 2
 
+Base.eachindex(a::MatrixElem) = Base.OneTo(length(a))
+
+# linear indexing
+Base.@propagate_inbounds function Base.getindex(a::MatrixElem, n::Integer)
+   nr, nc = nrows(a), ncols(a)
+   # bounds checking necessary as if n == 0, r and c below might still be computed
+   # to be valid cartesian indices in a
+   @boundscheck 0 < n <= nr * nc || throw(BoundsError(a, n))
+   r = mod1(n, nr)
+   c = (n-1) ÷ nr + 1
+   return a[r, c]
+end
+
+Base.@propagate_inbounds function Base.setindex!(a::MatrixElem, x, n::Integer)
+   nr, nc = nrows(a), ncols(a)
+   @boundscheck 0 < n <= nr * nc || throw(BoundsError(a, n))
+   r = mod1(n, nr)
+   c = (n-1) ÷ nr + 1
+   a[r, c] = x
+   return a # like arrays, but not mandatory
+end
+
 ###############################################################################
 #
 #   Block replacement

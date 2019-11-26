@@ -657,8 +657,23 @@ end
 
 @testset "Generic.Mat.array_interface" begin
    A = matrix(ZZ, [1 2 3; 4 5 6])
+   B = copy(A)
 
    @test ndims(A) == 2
+
+   @test eachindex(A) == 1:6
+
+   for i in eachindex(A)
+      @test A[i] == A.entries[i]
+      B[i] = 2 * B[i]
+      @test B[i] == B.entries[i] == 2 * A[i]
+   end
+
+   @test_throws BoundsError A[0]
+   @test_throws BoundsError A[-1]
+   @test_throws BoundsError A[-rand(2:99)]
+   @test_throws BoundsError A[7]
+   @test_throws BoundsError A[rand(8:99)]
 end
 
 @testset "Generic.Mat.block_replacement..." begin
