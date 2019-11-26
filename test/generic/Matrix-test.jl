@@ -663,6 +663,7 @@ end
 
    @test eachindex(A) == 1:6
 
+   # linear indexing
    for i in eachindex(A)
       @test A[i] == A.entries[i]
       B[i] = 2 * B[i]
@@ -674,6 +675,15 @@ end
    @test_throws BoundsError A[-rand(2:99)]
    @test_throws BoundsError A[7]
    @test_throws BoundsError A[rand(8:99)]
+
+   # iteration
+   for (i, x) in enumerate(A)
+      @test A[i] == x
+   end
+
+   AC = collect(A)
+   @test size(AC) == size(A)
+   @test AC == A.entries
 end
 
 @testset "Generic.Mat.block_replacement..." begin

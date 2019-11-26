@@ -447,6 +447,7 @@ Base.ndims(::MatrixElem) = 2
 Base.eachindex(a::MatrixElem) = Base.OneTo(length(a))
 
 # linear indexing
+
 Base.@propagate_inbounds function Base.getindex(a::MatrixElem, n::Integer)
    nr, nc = nrows(a), ncols(a)
    # bounds checking necessary as if n == 0, r and c below might still be computed
@@ -465,6 +466,13 @@ Base.@propagate_inbounds function Base.setindex!(a::MatrixElem, x, n::Integer)
    a[r, c] = x
    return a # like arrays, but not mandatory
 end
+
+# iteration
+
+Base.iterate(a::MatrixElem, i::Int=1) = i <= length(a) ? (@inbounds a[i], i + 1) : nothing
+
+Base.IteratorSize(::Type{<:MatrixElem}) = Base.HasShape{2}()
+Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default
 
 ###############################################################################
 #
