@@ -942,92 +942,21 @@ end
 
    @test A == inv(P)*(P*A)
 
-   # Exact ring
-   R = ZZ
-   S = MatrixSpace(R, rand(1:9), rand(0:9))
+   @testset "$name" for (name, (R, randparams)) in RINGS
+      S = MatrixSpace(R, rand(1:9), rand(0:9))
+      A = rand(S, randparams...)
+      T = PermutationGroup(nrows(A))
+      P = rand(T)
+      Q = inv(P)
 
-   A = rand(S, -1000:1000)
-   T = PermutationGroup(nrows(A))
-   P = rand(T)
-   Q = inv(P)
-
-   PA = P*A
-   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
-   if VERSION >= v"1.3"
-      @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+      PA = P*A
+      @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
+      if VERSION >= v"1.3"
+         @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+      end
+      @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
+      @test A == Q*(P*A)
    end
-   @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
-   @test A == Q*(P*A)
-
-   # Exact field
-   R = GF(7)
-   S = MatrixSpace(R, rand(1:9), rand(0:9))
-
-   A = rand(S)
-   T = PermutationGroup(nrows(A))
-   P = rand(T)
-   Q = inv(P)
-
-   PA = P*A
-   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
-   @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
-   @test A == Q*(P*A)
-
-   # Inexact ring
-   R = RealField["t"][1]
-   S = MatrixSpace(R, rand(1:9), rand(0:9))
-
-   A = rand(S, 0:200, -1000:1000)
-   T = PermutationGroup(nrows(A))
-   P = rand(T)
-   Q = inv(P)
-
-   PA = P*A
-   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
-   @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
-   @test A == Q*(P*A)
-
-   # Inexact field
-   R = RealField
-   S = MatrixSpace(R, rand(1:9), rand(0:9))
-
-   A = rand(S, -1000:1000)
-   T = PermutationGroup(nrows(A))
-   P = rand(T)
-   Q = inv(P)
-
-   PA = P*A
-   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
-   @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
-   @test A == Q*(P*A)
-
-   # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S = MatrixSpace(R, rand(1:9), rand(0:9))
-
-   A = rand(S, 0:5)
-   T = PermutationGroup(nrows(A))
-   P = rand(T)
-   Q = inv(P)
-
-   PA = P*A
-   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
-   @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
-   @test A == Q*(P*A)
-
-   # Fraction field
-   R = QQ
-   S = MatrixSpace(R, rand(1:9), rand(0:9))
-
-   A = rand(S, -1000:1000)
-   T = PermutationGroup(nrows(A))
-   P = rand(T)
-   Q = inv(P)
-
-   PA = P*A
-   @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
-   @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
-   @test A == Q*(P*A)
 end
 
 @testset "Generic.Mat.comparison..." begin
