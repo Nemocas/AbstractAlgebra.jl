@@ -2283,16 +2283,21 @@ end
    # the result must be the same
    A = R[1 1; 1 1]
    B = R[1 0; 0 1]
+   # if any of the following assertions fail with a change to the code base,
+   # find a new way to construct the matrices such that the assertions remain valid
+   # (similar for snf_kb!)
    @assert length(IdDict(x => nothing for x in A.entries)) == 4
    @assert length(IdDict(x => nothing for x in B.entries)) == 4
-   i = x^0
-   z = 0*x
+   i = i0 = x^0
+   z = z0 = 0*x
    a = R[i i; i i]
    b = R[i z; z i]
    @assert a[1, 1] === a[1, 2] === a[2, 1] === a[2, 2]
    @assert b[1, 1] === b[2, 2] &&  b[1, 2] === b[2, 1]
    Generic.hnf_kb!(A, B, true);
    Generic.hnf_kb!(a, b, true);
+   @test i === i0 == x^0
+   @test z === z0 == 0*x
    @test A == a
    @test B == b
 end
@@ -2402,6 +2407,29 @@ end
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
+
+   # snf_kb! must not assume it "owns" entries of its input
+   # A, B and C have de-aliased entries, a, b and c have aliased entries
+   # the result must be the same
+   A = R[1 1 0; 0 1 1]
+   B = R[1 0; 0 1]
+   C = R[1 0 0; 0 1 0; 0 0 1]
+   @assert length(IdDict(x => nothing for x in A.entries)) == 6
+   @assert length(IdDict(x => nothing for x in B.entries)) == 4
+   i = i0 = x^0
+   z = z0 = 0*x
+   a = R[i i z; z i i]
+   b = R[i z; z i]
+   c = R[i z z; z i z; z z i]
+   @assert a[1, 1] === a[1, 2] === a[2, 2] === a[2, 3]
+   @assert b[1, 1] === b[2, 2] &&  b[1, 2] === b[2, 1]
+   Generic.snf_kb!(A, B, C, true);
+   Generic.snf_kb!(a, b, c, true);
+   @test i === i0 == x^0
+   @test z === z0 == 0*x
+   @test A == a
+   @test B == b
+   @test C == c
 end
 
 @testset "Generic.Mat.snf..." begin
