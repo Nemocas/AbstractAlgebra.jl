@@ -655,6 +655,12 @@ end
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 end
 
+@testset "Generic.Mat.array_interface" begin
+   A = matrix(ZZ, [1 2 3; 4 5 6])
+
+   @test ndims(A) == 2
+end
+
 @testset "Generic.Mat.block_replacement..." begin
    S = MatrixSpace(ZZ, 9, 9)
    (r, c) = (rand(1:9), rand(1:9))
