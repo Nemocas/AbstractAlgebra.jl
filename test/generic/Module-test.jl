@@ -1,18 +1,3 @@
-function rand_homomorphism(M::AbstractAlgebra.FPModule{T}, vals...) where T <: RingElement
-   rk = rand(1:5)
-   m = ngens(M)
-   R = base_ring(M)
-   F = FreeModule(R, rk)
-   S = MatrixSpace(R, rk, m)
-   mat = rand(S, vals...)
-   f = ModuleHomomorphism(F, M, mat)
-   ngens1 = rand(1:3)
-   gens1 = [rand(F, vals...) for j in 1:ngens1]
-   S, g = sub(F, gens1)
-   hom1 = compose(g, f)
-   return S, hom1
-end
-
 @testset "Generic.Module.rand..." begin
    F = FreeModule(ZZ, 3)
    f = rand(F, 1:9)

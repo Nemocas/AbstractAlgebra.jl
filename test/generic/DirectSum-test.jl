@@ -1,5 +1,3 @@
-using Random
-
 @testset "Generic.DirectSum.constructors..." begin
    for R in [ZZ, QQ]
       for iter = 1:100

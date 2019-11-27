@@ -1,14 +1,3 @@
-mutable struct MyMap <: Map{AbstractAlgebra.Integers{BigInt}, AbstractAlgebra.Integers{BigInt}, SetMap, MyMap}
-   a::Int
-end
-
-Generic.domain(f::Map(MyMap)) = AbstractAlgebra.JuliaZZ
-Generic.codomain(f::Map(MyMap)) = AbstractAlgebra.JuliaZZ
-
-a(f::Map(MyMap)) = Generic.get_field(f, :a)
-
-(f::MyMap)(x) =  a(f)*(x + 1)
-
 @testset "Generic.Map.FunctionalMap..." begin
    f = map_from_func(x -> x + 1, ZZ, ZZ)
    g = map_from_func(x -> QQ(x), ZZ, QQ)
