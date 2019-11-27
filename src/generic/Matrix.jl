@@ -5292,3 +5292,45 @@ function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = tru
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end
+
+###############################################################################
+#
+#   Conversion to Array
+#
+###############################################################################
+
+"""
+    Matrix(A::MatrixElem)
+> Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> A = ZZ[1 2 3; 4 5 6]
+[1  2  3]
+[4  5  6]
+
+julia> Matrix(A)
+2×3 Array{BigInt,2}:
+ 1  2  3
+ 4  5  6
+```
+"""
+Matrix(M::MatrixElem) = eltype(M)[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
+
+"""
+    Array(A::MatrixElem)
+> Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, x = ZZ["x"]; A = R[x^0 x^1; x^2 x^3]
+[  1    x]
+[x^2  x^3]
+
+julia> Array(A)
+2×2 Array{AbstractAlgebra.Generic.Poly{BigInt},2}:
+ 1    x
+ x^2  x^3
+```
+"""
+Array(M::MatrixElem) = Matrix(M)

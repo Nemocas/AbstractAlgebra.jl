@@ -144,6 +144,18 @@ julia> P = R[1; 2; t] # create a column vector
 [   t]
 ```
 
+## Conversion to Julia matrices
+
+While `AbstractAlgebra` matrices are not instances of `AbstractArray`,
+they are closely related to Julia matrices. For convenience, a `Matrix`
+and an `Array` constructors taking an `AbstractAlgebra` matrix as input
+are provided:
+
+```@docs
+Matrix(::MatrixElem)
+Array(::MatrixElem)
+```
+
 ## Matrix functionality provided by AbstractAlgebra.jl
 
 Most of the following generic functionality is available for both matrix spaces and
