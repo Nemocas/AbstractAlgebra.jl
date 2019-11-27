@@ -1,3 +1,7 @@
+if !@isdefined SETUP
+   include("../setup.jl")
+end
+
 @testset "Generic.Mat.constructors..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)

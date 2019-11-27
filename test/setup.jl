@@ -11,6 +11,8 @@ end
 
 using Random: Random, MersenneTwister, randsubseq, shuffle
 
+const SETUP = true
+
 const rng = MersenneTwister()
 
 const RINGS = Dict(
