@@ -2643,3 +2643,19 @@ end
    @test string(similar(matrix(ZZ, [3 1 2; 2 0 1]))) ==
       "[#undef  #undef  #undef]\n[#undef  #undef  #undef]"
 end
+
+@testset "Generic.Mat.array_conversion" begin
+   M = ZZ[1 2; 3 4]
+   A = Array(M)
+   @test A  == M.entries
+   @test A !== M.entries
+   @test Matrix(M) == A
+   @test eltype(A) == eltype(M)
+
+   F = matrix(F2(), F2Elem[1 1 1; 0 0 0])
+   B = Array(F)
+   @test B ==  F.m.entries
+   @test B !== F.m.entries
+   @test Matrix(F) == B
+   @test eltype(B) == F2Elem
+end
