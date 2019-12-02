@@ -40,6 +40,8 @@ isunit(a::AbstractFloat) = a != 0
 
 canonical_unit(a::AbstractFloat) = a
 
+characteristic(a::Floats{T}) where T <: AbstractFloat = 0
+
 ###############################################################################
 #
 #   String I/O

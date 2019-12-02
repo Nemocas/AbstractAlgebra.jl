@@ -88,6 +88,10 @@ isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement = isunit(det(a))
 
 isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
 
+function characteristic(a::MatAlgebra{T}) where T <: RingElement
+   return characteristic(base_ring(a))
+end
+
 ###############################################################################
 #
 #   Similar and zero

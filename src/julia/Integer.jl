@@ -44,6 +44,8 @@ isunit(a::Integer) = a == 1 || a == -1
 
 canonical_unit(a::T) where T <: Integer = a < 0 ? T(-1) : T(1)
 
+characteristic(::Integers{T}) where T <: Integer = 0
+
 ###############################################################################
 #
 #   String I/O

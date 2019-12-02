@@ -176,6 +176,10 @@ function check_parent(a::MPoly{T}, b::MPoly{T}, throw::Bool = true) where T <: R
    return !b
 end
 
+function characteristic(a::MPolyRing{T}) where T <: RingElement
+   return characteristic(base_ring(a))
+end
+
 ###############################################################################
 #
 #   Manipulating terms and monomials
@@ -2393,6 +2397,20 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    return parent(f)(Rc, Re)
 end
 
+function pow_rmul(a::MPoly{T}, b::Int) where {T <: RingElement}
+   b < 0 && throw(DomainError(b, "exponent must be >= 0"))
+   if length(a) == 0
+      return parent(a)()
+   elseif b == 0
+      return one(parent(a))
+   end
+   z = deepcopy(a)
+   for i = 2:b
+      z = mul!(z, z, a)
+   end
+   return z
+end
+
 function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
@@ -2409,11 +2427,15 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       end
       return parent(a)([coeff(a, 1)^b], exps)
    elseif b == 0
-      return parent(a)(1)
+      return one(parent(a))
    elseif b == 1
-      return a
+      return deepcopy(a)
    elseif b == 2
       return a*a
+   elseif !hasmethod(characteristic, Tuple{T}) ||
+          characteristic(base_ring(a)) != 0
+      # pow_fps requires char 0 so use pow_rmul if not or unsure
+      return pow_rmul(a, b)
    else
       v, d = max_fields(a)
       d *= b

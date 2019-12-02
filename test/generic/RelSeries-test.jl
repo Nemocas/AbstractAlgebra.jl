@@ -127,6 +127,8 @@ end
    @test_throws DomainError polcoeff(a, -1)
    @test_throws DomainError polcoeff(a, -rand(2:100))
    
+   @test characteristic(S) == 0
+
    T = ResidueRing(ZZ, 7)
    U, y = PowerSeriesRing(T, 10, "y")
 

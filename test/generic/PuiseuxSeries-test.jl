@@ -136,6 +136,8 @@ end
    @test isequal(deepcopy(a), a)
    @test isequal(deepcopy(b), b)
 
+   @test characteristic(S) == 0
+
    T = ResidueRing(ZZ, 7)
    U, y = PuiseuxSeriesRing(T, 10, "y")
 
