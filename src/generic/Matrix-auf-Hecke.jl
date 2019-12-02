@@ -1,3 +1,5 @@
+export scalar_matrix
+
 ################################################################################
 #
 #  Matrix from Hecke
@@ -25,6 +27,11 @@ coefficient_type(::Type{Generic.Mat{T}}) where {T} = T
 #
 ################################################################################
 
+@doc Markdown.doc"""
+    zero_matrix(::Type{MatElem}, R::Ring, n::Int)
+    zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
+Return the zero `n x n` (resp. `n x m`) matrix over the ring `R`.
+"""
 function zero_matrix(::Type{MatElem}, R::Ring, n::Int)
   return zero_matrix(R, n)
 end
@@ -33,13 +40,23 @@ function zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
   return zero_matrix(R, n, m)
 end
 
+@doc Markdown.doc"""
+    matrix(A::Array{T, 2}) where T <: RingElem
+Construct an AbstractAlgebra matrix whose entries are `A`. Note that `A`
+must be non-empty.
+"""
 function matrix(A::Array{T, 2}) where T <: RingElem
   r, c = size(A)
-  (r < 0 || c < 0) && error("Array must be non-empty")
+  (r <= 0 || c <= 0) && throw(DomainError("Array must be non-empty"))
   m = matrix(parent(A[1, 1]), A)
   return m
 end
 
+@doc Markdown.doc"""
+    matrix(A::Array{T, 1}) where T <: RingElem
+Construct an `n x 1` AbstractAlgebra matrix `M` such that `M[j,1] = A[j]`.
+Note that `A` must be non-empty.
+"""
 function matrix(A::Array{T, 1}) where T <: RingElem
   return matrix(reshape(A,length(A),1))
 end
