@@ -499,7 +499,7 @@ function addeq!(A::MatAlgElem{T}, B::MatAlgElem{T}) where T <: RingElement
    n = degree(A)
    for i = 1:n
       for j = 1:n
-         A.entries[i, j] = A.entries[i, j] + B.entries[i, j]
+         A.entries[i, j] += B.entries[i, j]
       end
    end
    return A
