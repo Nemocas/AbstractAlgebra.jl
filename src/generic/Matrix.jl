@@ -221,7 +221,7 @@ zero(x::MatrixElem, r::Int, c::Int) = zero(x, base_ring(x), r, c)
 
 function zero!(x::MatrixElem)
    R = base_ring(x)
-   for i=1:nrows(x), j=1:ncols(x)
+   for i = 1:nrows(x), j = 1:ncols(x)
       x[i, j] = zero(R)
    end
    x
