@@ -473,7 +473,7 @@ function zero!(M::MatAlgElem{T}) where T <: RingElement
    R = base_ring(M)
    for i = 1:n
       for j = 1:n
-         M.entries[i, j] = R()
+         M[i, j] = zero(R)
       end
    end
    return M
@@ -499,7 +499,7 @@ function addeq!(A::MatAlgElem{T}, B::MatAlgElem{T}) where T <: RingElement
    n = degree(A)
    for i = 1:n
       for j = 1:n
-         addeq!(A.entries[i, j], B.entries[i, j])
+         A.entries[i, j] = A.entries[i, j] + B.entries[i, j]
       end
    end
    return A
