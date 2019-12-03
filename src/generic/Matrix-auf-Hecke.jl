@@ -11,6 +11,56 @@ quarantine zone until the AbstractAlgebra package maintainers are happy with
 the state of the code.
 """
 
+# TODO LIST:
+#= Pure abstract algebra.
+
+T = tested.
+
+DONE:
+XX Unsafe functions for generic matrices [basically, cannot implement.]
+T- Zero matrix constructors
+T- iszero_row
+T- diagonal_matrix, isdiagonal, diagonal
+T- concatination [Already there]
+-- array interface [Some already there]
+-- reduce_mod
+-- find_pivot
+-- can_solve and friends... (Big...)
+-- minpoly/charpoly
+-- basic eigenvector
+
+NOT DONE:
+-- Kernel function.
+-- Kernel with base ring
+-- is upper/lower triangular
+-- triangular solving
+
+-- where the hell is the Array/Matrix interface promised in the Documentation?
+
+=#
+
+#= Also involves NEMO
+
+NOT DONE:
+-- Dense matrix types
+-- Saturation
+-- Zero matrix constructors
+-- iszero_row [FLINT call]
+-- hnf
+-- divexact
+-- is_lll_reduced
+-- maximum / minimum
+-- lifting to over-rings.
+-- copy
+-- powering
+-- round_scale
+-- shift
+-- mod, mod_sym
+-- Smith normal form
+
+=#
+
+
 ################################################################################
 #
 #  Dense matrix types
@@ -103,17 +153,24 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
+    diagonal_matrix(R::Ring, x::Vector)
     diagonal_matrix(x::Vector{T}) where T <: NCRingElem -> MatElem{T}
     diagonal_matrix(x::T...) where T <: NCRingElem -> MatElem{T}
-Returns a diagonal matrix whose diagonal entries are the element of `x`.
+Returns a diagonal matrix whose diagonal entries are the element of `x`. In the
+first method, the elements of `x` are assigned via `setindex!`, so conversion is
+automatic.
 """
-function diagonal_matrix(x::Vector{T}) where T <: NCRingElem
-  isempty(x) && throw(DomainError(x, "Array must be non-empty."))
-  M = zero_matrix(parent(x[1]), length(x), length(x))
+function diagonal_matrix(R::Ring, x::Vector)
+  M = zero_matrix(R, length(x), length(x))
   for i = 1:length(x)
     M[i, i] = x[i]
   end
   return M
+end
+
+function diagonal_matrix(x::Vector{T}) where T <: NCRingElem
+    isempty(x) && throw(DomainError(x, "Array must be non-empty."))
+    return diagonal_matrix(parent(x[1]), x)
 end
 
 function diagonal_matrix(x::T...) where T <: NCRingElem
@@ -158,61 +215,103 @@ function isdiagonal(A::MatElem)
     return true
 end
 
+@doc Markdown.doc"""
+    diagonal(A::Mat{T}) -> Vector{T}
+
+Returns the diagonal of `A` is as array.
+"""
+diagonal(A::Generic.Mat{T}) where {T} = T[A[i, i] for i in 1:nrows(A)]
+
 
 ################################################################################
 #
-#  Unsafe arithmetic functions for generic matrices
+#  hvcat
 #
 ################################################################################
 
-#=
-function mul!(c::MatElem, a::MatElem, b::MatElem)
+# Via grep, this method is completely unused in Hecke. We add it here to annoy
+# people until they remove it.
 
-    if any(ncols(a) != nrows(b), nrows(c) != nrows(a), ncols(c) != ncols(b))
-        @info "Matrix dimensions:" size(a) size(b) size(c)
-        throw(DomainError((a,b,c), "Incompatible matrix dimensions"))
-    end
+function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatElem...)
 
-    if c === a || c === b
-        # If the output is either of the inputs, memory must be allocated anyway.
-        d = parent(a)()
-        return mul!(d, a, b)
-    end
-
-    t = base_ring(a)()
-    for i = 1:nrows(a)
-        for j = 1:ncols(b)
-            c[i, j] = zero!(c[i, j])
-            for k = 1:ncols(a)
-                c[i, j] = addmul_delayed_reduction!(c[i, j], a[i, k], b[k, j], t)
-            end
-            c[i, j] = reduce!(c[i, j])
-        end
-    end
-    return c
+    @warn "This function is not actually used for anything." 
+    B = hcat([A[i] for i=1:rows[1]]...)
+  o = rows[1]
+  for j=2:length(rows)
+    C = hcat([A[i+o] for i=1:rows[j]]...)
+    o += rows[j]
+    B = vcat(B, C)
+  end
+  return B
 end
 
-function add!(c::MatElem, a::MatElem, b::MatElem)
-    !(parent(a) == parent(b) == parent(c)) && throw(DomainError(
-        (parent(a), parent(b), parent(c)), "Parents don't match."))
+################################################################################
+#
+#  Array interface (extensions)
+#
+################################################################################
 
-    for i = 1:nrows(c)
-        for j = 1:ncols(c)
-            c[i, j] = add!(c[i, j], a[i, j], b[i, j])
-        end
-    end
-    return c
+function Base.keys(A::MatElem)
+    return keys(A.entries)
 end
 
-function sub!(c::MatElem, a::MatElem, b::MatElem)
-    !(parent(a) == parent(b) == parent(c)) && throw(DomainError(
-        (parent(a), parent(b), parent(c)), "Parents don't match."))
-
-    for i = 1:nrows(c)
-        for j = 1:ncols(c)
-            c[i, j] = sub!(c[i, j], a[i, j], b[i, j])
-        end
-    end
-    return c
+function Base.getindex(A::MatElem, I::CartesianIndex{2})
+    return A[I[1], I[1]]
 end
-=#
+
+function Base.getindex(A::MatElem, n::Int)
+    1 <= n <= length(A) || throw(BoundsError(A,n))
+    return A[1 + ((n-1) % nrows(A)), 1 + div((n-1), nrows(A))]
+end
+
+function setindex!(A::MatElem{T}, n::Int, s::T) where T <: RingElem
+    1 <= n <= length(A) || throw(BoundsError(A,n))
+    A[1 + ((n-1) % nrows(A)), 1 + div((n-1), nrows(A))] = s
+    return s
+end
+
+function Base.stride(A::MatElem, n::Int)
+    n <= 1 && return 1
+    n == 2 && return nrows(A)
+    return length(A)
+end
+
+##
+
+
+function iterate(A::MatElem, state::Int = 0)
+    
+    # Annoy Hecke devs until they change code.
+    if state == 0
+        @warn "`iterate` output shape has changed for matrices. Please adjust accordingly."
+    end
+    
+    if state < length(A)
+        state += 1
+        return A[state], state
+    end
+    return nothing
+end
+
+Base.IteratorSize(M::MatElem) = Base.HasShape{2}()
+Base.IteratorEltype(M::MatElem) = Base.HasEltype()
+Base.eltype(M::MatElem) = elem_type(base_ring(M))
+
+
+################################################################################
+#
+#  Minpoly and Charpoly
+#
+################################################################################
+
+function minpoly(M::MatElem)
+  k = base_ring(M)
+  kx, x = PolynomialRing(k, cached = false)
+  return minpoly(kx, M)
+end
+
+function charpoly(M::MatElem)
+  k = base_ring(M)
+  kx, x = PolynomialRing(k, cached = false)
+  return charpoly(kx, M)
+end

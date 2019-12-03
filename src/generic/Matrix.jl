@@ -4777,7 +4777,7 @@ end
 
 @doc Markdown.doc"""
     vcat(A::MatrixElem...) -> MatrixElem
-> Return the horizontal concatenation of the matrices $A$.
+> Return the vertical concatenation of the matrices $A$.
 > All component matrices need to have the same base ring and number of columns.
 """
 function Base.vcat(A::MatrixElem...)
