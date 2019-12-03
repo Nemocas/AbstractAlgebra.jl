@@ -1,4 +1,4 @@
-export scalar_matrix
+export scalar_matrix, diagonal_matrix, iszero_row
 
 ################################################################################
 #
@@ -47,7 +47,7 @@ must be non-empty.
 """
 function matrix(A::Array{T, 2}) where T <: RingElem
   r, c = size(A)
-  isempty(A) && throw(DomainError("$A. Array must be non-empty"))
+  isempty(A) && throw(DomainError(A, "Array must be non-empty."))
   m = matrix(parent(A[1, 1]), A)
   return m
 end
@@ -98,7 +98,7 @@ end
 
 ################################################################################
 #
-#  Diagonal (block) matrix creation
+#  Diagonal (block) matrix
 #
 ################################################################################
 
@@ -108,7 +108,7 @@ end
 Returns a diagonal matrix whose diagonal entries are the element of `x`.
 """
 function diagonal_matrix(x::Vector{T}) where T <: NCRingElem
-  isempty(x) && throw(DomainError("$x. Array must be non-empty."))
+  isempty(x) && throw(DomainError(x, "Array must be non-empty."))
   M = zero_matrix(parent(x[1]), length(x), length(x))
   for i = 1:length(x)
     M[i, i] = x[i]
@@ -132,8 +132,87 @@ end
 
 function diagonal_matrix(x::T...) where T <: MatElem
     (isempty(x) || all([isempty(M) for M in x])) && (
-        throw(DomainError("$x. Not all matrices can be empty.")))
+        throw(DomainError(x, "Not all matrices can be empty")))
     
     return cat(x..., dims = (1, 2))
 end
 
+
+@doc Markdown.doc"""
+    isdiagonal(A::Mat)
+
+Tests if `A` is diagonal; i.e, if `A[i,j] == 0` for all `i != j`, which is well-defined
+for rectangular matrices. We consider the empty matrix to be diagonal as well.
+"""
+function isdiagonal(A::MatElem)
+    for i = 1:ncols(A)
+        #Pre-diagonal.
+        for j = 1:i-1
+            !iszero(A[j, i]) && return false
+        end
+        #Post-diagonal.
+        for j = i+1:nrows(A)
+            !iszero(A[j, i]) && return false
+        end
+    end
+    return true
+end
+
+
+################################################################################
+#
+#  Unsafe arithmetic functions for generic matrices
+#
+################################################################################
+
+#=
+function mul!(c::MatElem, a::MatElem, b::MatElem)
+
+    if any(ncols(a) != nrows(b), nrows(c) != nrows(a), ncols(c) != ncols(b))
+        @info "Matrix dimensions:" size(a) size(b) size(c)
+        throw(DomainError((a,b,c), "Incompatible matrix dimensions"))
+    end
+
+    if c === a || c === b
+        # If the output is either of the inputs, memory must be allocated anyway.
+        d = parent(a)()
+        return mul!(d, a, b)
+    end
+
+    t = base_ring(a)()
+    for i = 1:nrows(a)
+        for j = 1:ncols(b)
+            c[i, j] = zero!(c[i, j])
+            for k = 1:ncols(a)
+                c[i, j] = addmul_delayed_reduction!(c[i, j], a[i, k], b[k, j], t)
+            end
+            c[i, j] = reduce!(c[i, j])
+        end
+    end
+    return c
+end
+
+function add!(c::MatElem, a::MatElem, b::MatElem)
+    !(parent(a) == parent(b) == parent(c)) && throw(DomainError(
+        (parent(a), parent(b), parent(c)), "Parents don't match."))
+
+    for i = 1:nrows(c)
+        for j = 1:ncols(c)
+            c[i, j] = add!(c[i, j], a[i, j], b[i, j])
+        end
+    end
+    return c
+end
+
+function sub!(c::MatElem, a::MatElem, b::MatElem)
+    !(parent(a) == parent(b) == parent(c)) && throw(DomainError(
+        (parent(a), parent(b), parent(c)), "Parents don't match."))
+
+    for i = 1:nrows(c)
+        for j = 1:ncols(c)
+            c[i, j] = sub!(c[i, j], a[i, j], b[i, j])
+        end
+    end
+    return c
+end
+=#
