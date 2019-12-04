@@ -256,7 +256,7 @@ function Base.keys(A::MatElem)
 end
 
 function Base.getindex(A::MatElem, I::CartesianIndex{2})
-    return A[I[1], I[1]]
+    return A[I[1], I[2]]
 end
 
 function Base.getindex(A::MatElem, n::Int)
@@ -276,8 +276,11 @@ function Base.stride(A::MatElem, n::Int)
     return length(A)
 end
 
-##
+function Base.strides(A::MatElem)
+    return (stride(A,1), stride(A,2))
+end
 
+ndims(::MatElem) = 2
 
 function iterate(A::MatElem, state::Int = 0)
     
@@ -304,14 +307,18 @@ Base.eltype(M::MatElem) = elem_type(base_ring(M))
 #
 ################################################################################
 
+function default_name()
+    return "_x"
+end
+
 function minpoly(M::MatElem)
   k = base_ring(M)
-  kx, x = PolynomialRing(k, cached = false)
+  kx, x = PolynomialRing(k, default_name(), cached = false)
   return minpoly(kx, M)
 end
 
 function charpoly(M::MatElem)
   k = base_ring(M)
-  kx, x = PolynomialRing(k, cached = false)
+  kx, x = PolynomialRing(k, default_name(), cached = false)
   return charpoly(kx, M)
 end
