@@ -193,7 +193,6 @@ isempty(::MatElem)
 ```
 
 ```@docs
-identity_matrix(::Ring, ::Int, ::Int)
 identity_matrix(::Ring, ::Int)
 ```
 
