@@ -267,19 +267,7 @@ end
    @test isa(M4, Generic.MatSpaceElem{elem_type(R)})
    @test M4.base_ring == R
 
-   M5 = identity_matrix(R, 2, 3)
-   M6 = identity_matrix(M5)
-
-   @test isa(M5, Generic.MatSpaceElem{elem_type(R)})
-   @test M5.base_ring == R
-   @test M5 == M6
-
-   M7 = identity_matrix(R, 3, 2)
-   M8 = identity_matrix(M7)
-
-   @test isa(M7, Generic.MatSpaceElem{elem_type(R)})
-   @test M7.base_ring == R
-   @test M7 == M8
+   @test_throws DomainError identity_matrix(M3) # must be square
 
    # identity_matrix should preserve the type of the input
    M9 = matrix(F2(), F2Elem[1 0; 0 1])

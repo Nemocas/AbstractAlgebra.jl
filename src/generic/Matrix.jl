@@ -239,7 +239,7 @@ one(a::AbstractAlgebra.MatSpace) = check_square(a)(1)
 > Construct the identity matrix in the same matrix space as `a`, i.e.
 > with ones down the diagonal and zeroes elsewhere. `a` must be square.
 """
-one(a::MatElem) = identity_matrix(check_square(a))
+one(a::MatElem) = identity_matrix(a)
 
 @doc Markdown.doc"""
     iszero(a::Generic.MatrixElem)
@@ -5213,24 +5213,13 @@ end
 identity_matrix(R::Ring, n::Int) = diagonal_matrix(one(R), n)
 
 @doc Markdown.doc"""
-    identity_matrix(R::Ring, m::Int, n::Int)
-> Return the $m \times n$ matrix over $R$ with ones down the diagonal and
-> zeroes elsewhere.
-"""
-identity_matrix(R::Ring, m::Int, n::Int) = diagonal_matrix(one(R), m, n)
-
-@doc Markdown.doc"""
     identity_matrix(M::MatElem{T}) where T <: RingElement
-> Return the matrix over the same base ring as $M$ and with the same
-> dimensions with ones down the diagonal and zeroes elsewhere.
+> Construct the identity matrix in the same matrix space as `M`, i.e.
+> with ones down the diagonal and zeroes elsewhere. `M` must be square.
+> This is an alias for `one(M)`.
 """
 function identity_matrix(M::MatElem{T}) where T <: RingElement
-   z = zero(M)
-   R = base_ring(M)
-   for i = 1:min(size(M)...)
-      z[i, i] = one(R)
-   end
-   z
+   identity_matrix(check_square(M), nrows(M))
 end
 
 function identity_matrix(M::MatElem{T}, n::Int) where T <: RingElement
