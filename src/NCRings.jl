@@ -100,7 +100,8 @@ Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 #
 ###############################################################################
 
-characteristic(R::NCRing) = missing
+# -1 means the characteristic is not known by default
+characteristic(R::NCRing) = -1
 
 ###############################################################################
 #
