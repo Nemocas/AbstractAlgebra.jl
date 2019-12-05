@@ -280,9 +280,9 @@ function Base.strides(A::MatElem)
     return (stride(A,1), stride(A,2))
 end
 
-ndims(::MatElem) = 2
+Base.ndims(::MatElem) = 2
 
-function iterate(A::MatElem, state::Int = 0)
+function Base.iterate(A::MatElem, state::Int = 0)
     
     # Annoy Hecke devs until they change code.
     if state == 0

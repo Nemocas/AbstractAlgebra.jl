@@ -49,4 +49,6 @@
     end
 end
 
+include("Matrix-further-solve-test.jl")
+
 nothing
