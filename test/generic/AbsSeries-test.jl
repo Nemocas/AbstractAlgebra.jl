@@ -114,6 +114,8 @@ end
    @test_throws DomainError coeff(a, -1)
    @test_throws DomainError coeff(a, -rand(2:100))
    
+   @test characteristic(R) == 0
+
    T = ResidueRing(ZZ, 7)
    U, y = PowerSeriesRing(T, 10, "y", model=:capped_absolute)
 

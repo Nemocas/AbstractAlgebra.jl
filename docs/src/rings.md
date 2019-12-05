@@ -542,6 +542,15 @@ isunit(f::MyElem)
 
 Return `true` if the given element is a unit in the ring it belongs to.
 
+```julia
+characteristic(R::MyParent)
+```
+
+Return the characteristic of the ring. The function should not be defined if
+it is not possible to unconditionally give the characteristic as the function
+is used in some generic code for correctness, but will always take the safe
+path if the function is not defined.
+
 ### Optional binary ad hoc operators
 
 By default, ad hoc operations are handled by AbstractAlgebra.jl if they are not defined

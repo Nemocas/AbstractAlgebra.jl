@@ -58,6 +58,8 @@ function denominator(a::Rational, canonicalise::Bool=true)
    return Base.denominator(a) # all other types ignore canonicalise
 end
 
+characteristic(a::Rational{T}) where T <: Integer = 0
+
 ###############################################################################
 #
 #   String I/O
