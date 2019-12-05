@@ -103,6 +103,7 @@ struct F2 <: AbstractAlgebra.Field end
 Base.zero(::F2) = F2Elem(false)
 Base.one(::F2) = F2Elem(true)
 (::F2)() = F2Elem(false)
+AbstractAlgebra.dense_matrix_type(::F2) = F2Matrix
 
 struct F2Elem <: AbstractAlgebra.FieldElem
    x::Bool
@@ -126,6 +127,8 @@ AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 
 struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
    m::Generic.MatSpaceElem{F2Elem}
+
+   F2Matrix(R::F2, r::Int, c::Int) = new(Generic.MatSpaceElem{F2Elem}(R, r, c))
 end
 
 AbstractAlgebra.nrows(a::F2Matrix) = nrows(a.m)
@@ -134,29 +137,6 @@ AbstractAlgebra.base_ring(::F2Matrix) = F2()
 
 Base.getindex(a::F2Matrix, r::Int64, c::Int64) = a.m[r, c]
 Base.setindex!(a::F2Matrix, x::F2Elem, r::Int64, c::Int64) = a.m[r, c] = x
-Base.similar(x::F2Matrix, R::F2, r::Int, c::Int) = F2Matrix(similar(x.m, r, c))
-
-function AbstractAlgebra.zero_matrix(R::F2, r::Int, c::Int)
-   mat = Array{F2Elem}(undef, r, c)
-   for i=1:r, j=1:c
-      mat[i, j] = zero(R)
-   end
-   z = Generic.MatSpaceElem{F2Elem}(mat)
-   z.base_ring = R
-   return F2Matrix(z)
-end
-
-function AbstractAlgebra.matrix(R::F2, mat::AbstractMatrix{F2Elem})
-   mat = convert(Matrix, mat)
-   z = Generic.MatSpaceElem{F2Elem}(mat)
-   z.base_ring = R
-   return F2Matrix(z)
-end
-
-function AbstractAlgebra.matrix(R::F2, r::Int, c::Int, mat::AbstractMatrix{F2Elem})
-   AbstractAlgebra._check_dim(r, c, mat)
-   matrix(R, mat)
-end
 
 @testset "Generic.Mat.constructors..." begin
    R, t = PolynomialRing(QQ, "t")
@@ -2659,7 +2639,8 @@ end
          @test !test_zero || iszero(n)
          @test parent(n) == MatrixSpace(R, r, c)
          @test size(n) == (r, c)
-         for S = [QQ, ZZ, GF(2), GF(5)]
+         R == GF(11) || continue
+         for S = [GF(2), GF(5)]
             n = sim_zero(m, S)
             @test !test_zero || iszero(n)
             @test parent(n) == MatrixSpace(S, size(n)...)
@@ -2670,6 +2651,7 @@ end
             @test parent(n) == MatrixSpace(S, r, c)
             @test size(n) == (r, c)
          end
+         @test_throws ArgumentError sim_zero(m, QQ)
       end
    end
 

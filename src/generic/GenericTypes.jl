@@ -865,22 +865,12 @@ mutable struct MatSpaceElem{T <: RingElement} <: Mat{T}
    entries::Array{T, 2}
    base_ring::Ring
 
-   function MatSpaceElem{T}(A::Array{T, 2}) where T <: RingElement
-      return new{T}(A)
-    end
-
-   function MatSpaceElem{T}(A::AbstractArray{T, 2}) where T <: RingElement
-      return new{T}(Array(A))
+   function MatSpaceElem{T}(R::Ring, r::Int, c::Int) where T <: RingElement
+      new(Array{T}(undef, r, c), R)
    end
 
-   function MatSpaceElem{T}(r::Int, c::Int, A::Array{T, 1}) where T <: RingElement
-      t = Array{T}(undef, r, c)
-      for i = 1:r
-         for j = 1:c
-            t[i, j] = A[(i - 1) * c + j]
-         end
-      end
-      return new{T}(t)
+   function MatSpaceElem{T}(R::Ring, A::Array{T, 2}) where T <: RingElement
+      return new{T}(A, R)
    end
 end
 
@@ -918,18 +908,14 @@ mutable struct MatAlgElem{T <: RingElement} <: AbstractAlgebra.MatAlgElem{T}
    entries::Array{T, 2}
    base_ring::Ring
 
-   function MatAlgElem{T}(A::Array{T, 2}) where T <: RingElement
-      return new{T}(A)
+   function MatAlgElem{T}(R::Ring, r::Int, c::Int) where T <: RingElement
+      @assert r == c
+      new(Array{T}(undef, r, r), R)
    end
 
-   function MatAlgElem{T}(n::Int, A::Array{T, 1}) where T <: RingElement
-      t = Array{T}(undef, n, n)
-      for i = 1:n
-         for j = 1:n
-            t[i, j] = A[(i - 1) * c + j]
-         end
-      end
-      return new{T}(t)
+   function MatAlgElem{T}(R::Ring, A::Array{T, 2}) where T <: RingElement
+      @assert size(A, 1) == size(A, 2)
+      return new{T}(A, R)
    end
 end
 

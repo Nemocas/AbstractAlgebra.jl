@@ -312,10 +312,9 @@ end
 > Return the transpose of the given matrix.
 """
 function transpose(x::MatAlgElem{T}) where T <: RingElement
-   arr = permutedims(x.entries, [2, 1])
-   z = MatAlgElem{T}(arr)
-   z.base_ring = base_ring(x)
-   return z
+   y = MatAlgElem{eltype(x)}(base_ring(x), ncols(x), nrows(x))
+   permutedims!(y.entries, x.entries, [2, 1])
+   y
 end
 
 @doc Markdown.doc"""
@@ -425,26 +424,20 @@ randmat_with_rank(S::Generic.MatAlgebra{T}, rank::Int, v...) where {T <: Abstrac
 function solve_lu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
-   MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
-   MS.base_ring = R
-   BS = MatSpaceElem{T}(B.entries)
-   BS.base_ring = R
+   MS = MatSpaceElem{T}(R, M.entries) # convert to ordinary matrix
+   BS = MatSpaceElem{T}(R, B.entries)
    S = solve_lu(MS, BS)
-   SA = MatAlgElem{T}(S.entries)
-   SA.base_ring = R
+   SA = MatAlgElem{T}(R, S.entries)
    return SA
 end
 
 function solve_fflu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
-   MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
-   MS.base_ring = R
-   BS = MatSpaceElem{T}(B.entries)
-   BS.base_ring = R
+   MS = MatSpaceElem{T}(R, M.entries) # convert to ordinary matrix
+   BS = MatSpaceElem{T}(R, B.entries)
    S, d = solve_fflu(MS, BS)
-   SA = MatAlgElem{T}(S.entries)
-   SA.base_ring = R
+   SA = MatAlgElem{T}(R, S.entries)
    return SA, d
 end
 
@@ -461,8 +454,7 @@ end
 > of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
-   MS.base_ring = base_ring(M)
+   MS = MatSpaceElem{T}(base_ring(M), M.entries) # convert to ordinary matrix
    return minpoly(S, MS, charpoly_only)
 end
 
@@ -523,8 +515,7 @@ function identity_matrix(M::MatAlgElem{T}, n::Int) where T <: RingElement
          arr[i, j] = i == j ? one(R) : zero(R)
       end
    end
-   z = MatAlgElem{T}(arr)
-   z.base_ring = R
+   z = MatAlgElem{T}(R, arr)
    return z
 end
 
@@ -544,33 +535,22 @@ end
 ###############################################################################
 
 function (a::MatAlgebra{T})() where {T <: RingElement}
-   R = base_ring(a)
-   entries = Array{T}(undef, a.n, a.n)
-   for i = 1:a.n
-      for j = 1:a.n
-         entries[i, j] = zero(R)
-      end
-   end
-   z = MatAlgElem{T}(entries)
-   z.base_ring = R
-   return z
+   zero!(MatAlgElem{T}(base_ring(a), nrows(a), ncols(a)))
 end
 
 function (a::MatAlgebra{T})(b::S) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
-   entries = Array{T}(undef, a.n, a.n)
+   z = MatAlgElem{T}(R, a.n, a.n)
    rb = R(b)
    for i = 1:a.n
       for j = 1:a.n
          if i != j
-            entries[i, j] = zero(R)
+            z[i, j] = zero(R)
          else
-            entries[i, j] = rb
+            z[i, j] = rb
          end
       end
    end
-   z = MatAlgElem{T}(entries)
-   z.base_ring = R
    return z
 end
 
@@ -588,8 +568,7 @@ function (a::MatAlgebra{T})(b::Array{S, 2}) where {S <: RingElement, T <: RingEl
          entries[i, j] = R(b[i, j])
       end
    end
-   z = MatAlgElem{T}(entries)
-   z.base_ring = R
+   z = MatAlgElem{T}(R, entries)
    return z
 end
 

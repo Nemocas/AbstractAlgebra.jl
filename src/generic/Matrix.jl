@@ -30,11 +30,8 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
 ###############################################################################
 
 function _similar(x::MatrixElem{T}, R::Ring, r::Int, c::Int) where T <: RingElement
-   TT = elem_type(R)
-   M = Matrix{TT}(undef, (r, c))
-   z = x isa AbstractAlgebra.MatElem ? MatSpaceElem{TT}(M) : MatAlgElem{TT}(M)
-   z.base_ring = R
-   return z
+   typeof(base_ring(x)) == typeof(R) || throw(ArgumentError("incompatible rings"))
+   parent_matrix_type(x)(R, r, c)
 end
 
 similar(x::AbstractAlgebra.MatElem, R::Ring, r::Int, c::Int) = _similar(x, R, r, c)
@@ -80,6 +77,23 @@ dense_matrix_type(::Type{T}) where T <: RingElement = MatSpaceElem{T}
 > Return the type of matrices over the given ring.
 """
 dense_matrix_type(R::Ring) = dense_matrix_type(elem_type(R))
+
+"""
+    parent_matrix_type(T::Type{<:MatrixElem}
+> If `T` is a view type into matrices of type `S`, return `S`, otherwise
+> return `T`.
+> This function must be specialized for new view types (it returns `T` by default,
+> so it does not have to be specialized for new matrix types).
+"""
+parent_matrix_type(::Type{T}) where {T <: MatrixElem} = T
+parent_matrix_type(::Type{<:MatSpaceView{T}}) where {T <: RingElement} = MatSpaceElem{T}
+
+"""
+    parent_matrix_type(a::MatrixElem)
+> If `a` is a view into a matrix `b`, return the type of `b`.
+> If `a` is not a view, return `typeof(a)`.
+"""
+parent_matrix_type(a::MatrixElem) = parent_matrix_type(typeof(a))
 
 function check_parent(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem, throw::Bool = true)
   fl = (base_ring(a) != base_ring(b) || nrows(a) != nrows(b) || ncols(a) != ncols(b))
@@ -955,8 +969,8 @@ end
 > Return the transpose of the given matrix.
 """
 function transpose(x::Mat)
-   y = MatSpaceElem{eltype(x)}(permutedims(x.entries))
-   y.base_ring = x.base_ring
+   y = MatSpaceElem{eltype(x)}(base_ring(x), ncols(x), nrows(x))
+   permutedims!(y.entries, x.entries, [2, 1])
    y
 end
 
@@ -4903,7 +4917,7 @@ end
 
 # like change_base_ring, but without initializing the entries
 # this function exists until a better API is implemented
-_change_base_ring(R::Ring, a::MatElem) = zero_matrix(R, nrows(a), ncols(a))
+_change_base_ring(R::Ring, a::MatElem) = dense_matrix_type(R)(R, size(a)...)
 _change_base_ring(R::Ring, a::MatAlgElem) = MatrixAlgebra(R, nrows(a))()
 
 @doc Markdown.doc"""
@@ -5068,33 +5082,20 @@ end
 ###############################################################################
 
 function (a::MatSpace{T})() where {T <: RingElement}
-   R = base_ring(a)
-   entries = Array{T}(undef, a.nrows, a.ncols)
-   for i = 1:a.nrows
-      for j = 1:a.ncols
-         entries[i, j] = zero(R)
-      end
-   end
-   z = MatSpaceElem{T}(entries)
-   z.base_ring = R
-   return z
+   zero!(MatSpaceElem{T}(base_ring(a), nrows(a), ncols(a)))
 end
 
 function (a::MatSpace{T})(b::S) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
-   entries = Array{T}(undef, a.nrows, a.ncols)
+   z = MatSpaceElem{T}(R, a.nrows, a.ncols)
    rb = R(b)
-   for i = 1:a.nrows
-      for j = 1:a.ncols
-         if i != j
-            entries[i, j] = zero(R)
-         else
-            entries[i, j] = rb
-         end
+   for i = 1:nrows(z), j = 1:ncols(z)
+      if i != j
+         z[i, j] = zero(R)
+      else
+         z[i, j] = rb
       end
    end
-   z = MatSpaceElem{T}(entries)
-   z.base_ring = R
    return z
 end
 
@@ -5109,22 +5110,18 @@ function (a::MatSpace{T})(b::Array{T, 2}) where T <: RingElement
    if !isempty(b)
       R != parent(b[1, 1]) && error("Unable to coerce matrix")
    end
-   z = MatSpaceElem{T}(b)
-   z.base_ring = R
+   z = MatSpaceElem{T}(R, size(b)...)
+   copy!(z.entries, b)
    return z
 end
 
 function (a::MatSpace{T})(b::AbstractArray{S, 2}) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
-   entries = Array{T}(undef, a.nrows, a.ncols)
-   for i = 1:a.nrows
-      for j = 1:a.ncols
-         entries[i, j] = R(b[i, j])
-      end
+   z = MatSpaceElem{T}(R, size(b)...)
+   for i = 1:nrows(z), j = 1:ncols(z)
+      z[i, j] = R(b[i, j])
    end
-   z = MatSpaceElem{T}(entries)
-   z.base_ring = R
    return z
 end
 
@@ -5147,14 +5144,12 @@ end
 > Constructs the matrix over $R$ with entries as in `arr`.
 """
 function matrix(R::Ring, arr::AbstractArray{T, 2}) where {T}
-   if elem_type(R) === T
-      z = MatSpaceElem{elem_type(R)}(arr)
-      z.base_ring = R
-      return z
-   else
-      arr_coerce = convert(Array{elem_type(R), 2}, map(R, arr))::Array{elem_type(R), 2}
-      return matrix(R, arr_coerce)
+   Base.has_offset_axes(arr) && throw(ArgumentError("offset arrays are not supported"))
+   mat = dense_matrix_type(R)(R, size(arr)...)
+   for i in axes(arr, 1), j in axes(arr, 2)
+      mat[i, j] = arr[i, j]
    end
+   return mat
 end
 
 @doc Markdown.doc"""
@@ -5164,16 +5159,14 @@ end
 > row-wise from `arr`.
 """
 function matrix(R::Ring, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
+   Base.has_offset_axes(arr) && throw(ArgumentError("offset arrays are not supported"))
    _check_dim(r, c, arr)
    ndims(arr) == 2 && return matrix(R, arr)
-   if elem_type(R) === T
-     z = MatSpaceElem{elem_type(R)}(r, c, arr)
-     z.base_ring = R
-     return z
-   else
-     arr_coerce = convert(Array{elem_type(R), 1}, map(R, arr))::Array{elem_type(R), 1}
-     return matrix(R, r, c, arr_coerce)
+   mat = dense_matrix_type(R)(R, r, c)
+   for i = 1:r, j = 1:c
+      mat[i, j] = arr[(i - 1) * c + j]
    end
+   return mat
 end
 
 ################################################################################
@@ -5182,21 +5175,28 @@ end
 #
 ################################################################################
 
+"""
+    is_zero_initialized(T::Type{<:MatrixElem})
+> Specify whether the default-constructed matrices of type `T`,
+> via the `T(R::Ring, r::Int, c::Int)` constructor, are zero-initialized.
+> The default is `false`, and new matrix types should specialize
+> this method appropriately (for optimization only).
+"""
+is_zero_initialized(::Type{<:MatrixElem}) = false
+
 @doc Markdown.doc"""
     zero_matrix(R::Ring, r::Int, c::Int) -> MatElem
 
 > Return the $r \times c$ zero matrix over $R$.
 """
 function zero_matrix(R::Ring, r::Int, c::Int)
-   arr = Array{elem_type(R)}(undef, r, c)
-   for i in 1:r
-      for j in 1:c
-         arr[i, j] = zero(R)
+   mat = dense_matrix_type(R)(R, r, c)
+   if !is_zero_initialized(typeof(mat))
+      for i = 1:r, j = 1:c
+         mat[i, j] = zero(R)
       end
    end
-   z = MatSpaceElem{elem_type(R)}(arr)
-   z.base_ring = R
-   return z
+   mat
 end
 
 ################################################################################
