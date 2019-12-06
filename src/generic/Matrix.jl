@@ -4724,12 +4724,16 @@ end
 > Return the $r \times c$ zero matrix over $R$.
 """
 function zero_matrix(R::Ring, r::Int, c::Int)
-   arr = Array{elem_type(R)}(undef, r, c)
+    #=
+    arr = Array{elem_type(R)}(undef, r, c)
    for i in 1:r
       for j in 1:c
          arr[i, j] = zero(R)
       end
    end
+    =#
+   # Better:
+   arr = fill(zero(R), r, c)
    z = MatSpaceElem{elem_type(R)}(arr)
    z.base_ring = R
    return z
