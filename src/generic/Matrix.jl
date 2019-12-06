@@ -4597,134 +4597,134 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:nrows(a))
+    add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
 > Add $s$ times the $i$-th row to the $j$-th row of $a$.
 >
 > By default, the transformation is applied to all rows of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `rows` argument.
 """
-function add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:nrows(a))
+function add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
    c = base_ring(a)(s)
    nc = ncols(a)
    !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
    !_checkbounds(nc, j) && error("Column index ($j) must be between 1 and $nc")
    temp = base_ring(a)()
-   for r in rng
+   for r in rows
       a[r, j] = addmul!(a[r, j], c, a[r, i], temp)
    end
    return a
 end
 
 @doc Markdown.doc"""
-    add_column(a::MatrixElem, s::RingElement, i::Int, j::Int; rng = 1:nrows(a))
+    add_column(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
 > Create a copy of $a$ and add $s$ times the $i$-th row to the $j$-th row of $a$.
 >
 > By default, the transformation is applied to all rows of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `rows` argument.
 
 """
-function add_column(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:nrows(a))
+function add_column(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
    b = deepcopy(a)
-   return add_column!(b, s, i, j, rng)
+   return add_column!(b, s, i, j, rows)
 end
 
 @doc Markdown.doc"""
-    add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:nrows(a))
+    add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
 > Add $s$ times the $i$-th row to the $j$-th row of $a$.
 >
 > By default, the transformation is applied to all columns of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `cols` argument.
 """
-function add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:ncols(a))
+function add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
    c = base_ring(a)(s)
    nc = nrows(a)
    !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
    !_checkbounds(nc, j) && error("Row index ($j) must be between 1 and $nc")
    temp = base_ring(a)()
-   for r in rng
+   for r in cols
       a[j, r] = addmul!(a[j, r], c, a[i, r], temp)
    end
    return a
 end
 
 @doc Markdown.doc"""
-    add_row(a::MatrixElem, s::RingElement, i::Int, j::Int; rng = 1:nrows(a))
+    add_row(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
 > Create a copy of $a$ and add $s$ times the $i$-th row to the $j$-th row of $a$.
 >
 > By default, the transformation is applied to all columns of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `cols` argument.
 """
-function add_row(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:ncols(a))
+function add_row(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
    b = deepcopy(a)
-   return add_row!(b, s, i, j, rng)
+   return add_row!(b, s, i, j, cols)
 end
 
 # Multiply column
 
 @doc Markdown.doc"""
-    multiply_column!(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+    multiply_column!(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
 
 > Multiply the $i$th column of $a$ with $s$.
 >
 > By default, the transformation is applied to all rows of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `rows` argument.
 """
-function multiply_column!(a::MatrixElem, s::RingElement, i::Int, rng = 1:nrows(a))
+function multiply_column!(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
    c = base_ring(a)(s)
    nc = ncols(a)
    !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
    temp = base_ring(a)()
-   for r in rng
+   for r in rows
       a[r, i] = mul!(a[r, i], c, a[r, i])
    end
    return a
 end
 
 @doc Markdown.doc"""
-    multiply_column(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+    multiply_column(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
 
-> Create a copy of $a$ and multiply  the $i$th column of $a$ with $s$.
+> Create a copy of $a$ and multiply the $i$th column of $a$ with $s$.
 >
 > By default, the transformation is applied to all rows of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `rows` argument.
 """
-function multiply_column(a::MatrixElem, s::RingElement, i::Int, rng = 1:nrows(a))
+function multiply_column(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
    b = deepcopy(a)
-   return multiply_column!(b, s, i, rng)
+   return multiply_column!(b, s, i, rows)
 end
 
 # Multiply row
 
 @doc Markdown.doc"""
-    multiply_row!(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+    multiply_row!(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
 
 > Multiply the $i$th row of $a$ with $s$.
 >
 > By default, the transformation is applied to all columns of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `cols` argument.
 """
-function multiply_row!(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+function multiply_row!(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
    c = base_ring(a)(s)
    nc = nrows(a)
    !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
    temp = base_ring(a)()
-   for r in rng
+   for r in cols
       a[i, r] = mul!(a[i, r], c, a[i, r])
    end
    return a
 end
 
 @doc Markdown.doc"""
-    multiply_row(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+    multiply_row(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
 
 > Create a copy of $a$ and multiply  the $i$th row of $a$ with $s$.
 >
 > By default, the transformation is applied to all columns of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `cols` argument.
 """
-function multiply_row(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+function multiply_row(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
    b = deepcopy(a)
-   return multiply_row!(b, s, i, rng)
+   return multiply_row!(b, s, i, cols)
 end
 
 ###############################################################################
