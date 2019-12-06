@@ -53,52 +53,236 @@ function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) wh
 end
 
 function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
+
+    n = nrows(LU)
+    m = ncols(LU)
     
-   x = p * b
-   n = nrows(x)
-   m = ncols(x)
-   R = base_ring(LU)
+    rk = begin
+        rk=min(n,m)
+        for i = min(n,m):-1:1
+            iszero(LU[i,i]) ? rk -= 1 : break
+        end
+        rk
+    end
 
-   t = base_ring(b)()
-   s = base_ring(b)()
+    ncolsb = ncols(b)
+    R = base_ring(LU)
 
-    # For each column of x.
-   for k in 1:m
-       x[1, k] = deepcopy(x[1, k])
+    #x = p * b # Not correct dimensions for output.
 
-       # The back-substitution, along rows.
-      for i in 2:n
-         for j in 1:(i - 1)
-            # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
-            t = mul_red!(t, -LU[i, j], x[j, k], false)
-            if j == 1
-               x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
-            else
-               x[i, k] = addeq!(x[i, k], t)
+    # TODO: In general, `zero_matrix` will return a type dependent only on the base_ring,
+    # which could in theory be a different concrete type from the input. It will be crucial
+    # to implement a zero-matrix constructor that takes into account the type of `LU`.
+    x  = zero_matrix(R, m, ncolsb)
+    pb = p*b
+    
+    t = base_ring(b)()
+    s = base_ring(b)()
+
+    # For each column of b, solve Ax=b[:,j].
+    for k in 1:ncolsb
+
+        # The back-substitution, along rows.
+        # Note that the lower-triangular part by definition has ones on the
+        # diagonal. Thus, a solve is always possible. Moreover, for "tall"
+        # solve instances (`n>m`), only the first `m` columns of `L` need to
+        # be considered. This follows from the following lemma
+        #=
+            Lemma: Let D be a (not necessarily commutative) division algebra, and
+                  `L,U` be matrices in `GL_n(D)`. Then $A = LU$ is the unique `LU`
+                  decomposition for A.
+
+            Proof: Write A = LU = (L')(U'). Now inv(L')*L == (U')*inv(U). Since
+                   upper (resp. lower) triangular matrices form a subgroup of M_n(D),
+                   which once can check by basic arithmetic, we see that L'==L and U'==U. []
+
+            When `U` is singular, uniqueness fails to hold, but hopefully we can show
+            up to the natural ambiguity that we still only need the first `m` columns of `L`.
+            If you're reading this, I guess you've found a bug!
+        =#
+
+        # Populate the initial values in `x`. There is surely a better way to do this.
+        for i=1:rk
+            x[i, k] = deepcopy(pb[i, k])
+        end
+        
+        for i in 2:rk
+            for j in 1:(i - 1)
+                # NOTE: This is the correct order of multiplication in non-commutative rings.
+                # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
+                t = mul_red!(t, -LU[i, j], x[j, k], false)
+                if j == 1
+                    # This was to allocate memory before. Now we don't have to.
+                    # In fact, it is better to allocate memory in a single request
+                    # rather than in small pieces.
+                    
+                    x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
+                else
+                    # This doesn't do what you think it does guys... There is an implicit
+                    # copy in `setindex!`. At least one allocation is avoided, but not both.
+                    # That said, the assignment is absolutely necessary for immutable input.
+                    x[i, k] = addeq!(x[i, k], t) 
+                end
             end
-         end
-         x[i, k] = reduce!(x[i, k])
-      end
+            x[i, k] = reduce!(x[i, k])
+        end
 
-      # Now every entry of x is a proper copy, so we can change the entries
-      # as much as we want.
+        # TODO: Optimize.
+        for i= n:-1:rk+1
+            # Below the last row where `U` has a pivot, the entries
+            # of `LU` are just the entries of `L`.
+            sm = sum(LU[i,j]*x[j,k] for j=1:nrows(x)) 
 
-      x[n, k] = divexact(x[n, k], LU[n, n])
+            if sm != b[i,k]
+                throw(DomainError((LU,b), "LU-solve instance is inconsistent."))
+            end
+        end
+        
+        # Previous comment; now defunct.
+        # #Now every entry of x is a proper copy, so we can change the entries
+        # #as much as we want.
 
-      for i in (n - 1):-1:1
-         for j in (i + 1):n
-            # x[i, k] = x[i, k] - x[j, k] * LU[i, j]
-            t = mul_red!(t, x[j, k], -LU[i, j], false)
-            x[i, k] = addeq!(x[i, k], t)
-         end
-         x[i, k] = reduce!(x[i, k])
-         x[i, k] = divexact(x[i, k], LU[i, i])
-      end
-   end
-   return x
+        
+        # Additionally, since _ut_pivot_columns only checks entries above the diagonal,
+        # it effectively only reads the `U` part of the `LU` object.
+        pcols  = _ut_pivot_columns(LU)
+
+        #@info "" pcols LU LU[:, pcols]
+
+        # As `x` is freshly allocated space, and the entries are deepcopyed/newly allocated,
+        # the elements of `x` share no references, even in part, aside from parents.
+        # Moreover, trivially, `x===x`. Thus, we have fulfilled the CONTRACT for using
+        # the `!!` method.        
+        x[:,k] = _solve_nonsingular_ut!!(x[:,k], LU[:, pcols], x[:,k], rk, 1)
+
+        #TODO: Replace the implicit `get_index` with a `view`.
+
+    end
+    return x
 end
 
+# NOTE: Very dangerous function, and breaks the mutability edicts set out in
+# https://github.com/Nemocas/Nemo.jl/issues/278
+#
+# CONTRACT:
+# By involking this function, you (the calling method) have intended target of mutation
+# `x` and can certify that either:
+#
+# 1. `A,b` shares no references (even in part, aside from parents)
+#     with `x`, or
+#
+# 2. `x===b`, the mutation on `b` (i.e `x`) is intended, and elements of `x` share no
+#    references between each other, even in part, aside from parents.
+#    
+# Failure to abide by the terms of this contract absolves this function of any liability,
+# and usually will result in misery and suffering.
+#
+# The reason this function exists is that solve methods have the same pattern of
+# back-substitution, but generally only want to allocate the memory for the solution
+# vector once. `x` is assumed to be such an output container, which by definition of
+# the mutability edicts should not share references from `A` or `b` in the caller.
+#
+function _solve_nonsingular_ut!!(x, U, b, rk, k)
 
+    if iszero(rk)
+        return x
+    end
+
+    n  = nrows(U)
+    m  = ncols(U)
+    #rk = min(n,m)::Int
+
+    # Arithmetic container.
+    t = base_ring(b)()
+    ZERO = base_ring(b)()
+    
+    # This is incorrect if `U` is not invertible.
+    # This is also not the correct order of division for non-commutative rings.
+    x[rk, k] = divexact(b[rk, k], U[rk, rk])
+
+    # The upper triangular back-substitution. Along rows.
+    for i in rk-1:-1:1
+        
+        # Theoretically `x[i,k] = add!(x[i,k], b[i,k], ZERO)` should be sufficient,
+        # but I really don't trust that `add!` has uniform behaviour.
+        t = zero!(t)
+        t = addeq!(t, b[i,k])
+        x[i,k] = add!(x[i,k], t, ZERO)
+        
+        for j in (i + 1):rk
+            # x[i, k] = x[i, k] - x[j, k] * U[i, j]
+            t = mul_red!(t, x[j, k], -U[i, j], false)
+            x[i, k] = addeq!(x[i, k], t)
+        end
+        x[i, k] = reduce!(x[i, k])
+        x[i, k] = divexact(x[i, k], U[i, i])
+    end
+
+    return x
+end
+
+#=
+@doc Markdown.doc"""
+    _ut_pivot_columns(A::MatElem{<:RingElem})
+
+Return the pivot columns of an upper triangular matrix, which is assumed to be
+reduced (see docstring for pivot_columns).
+
+Absolutely no check is made, which is surprisingly useful applied to factorizations
+of matrices which are stored in-place.
+"""
+=#
+function _ut_pivot_columns(A::MatElem{T}) where T
+  p = Int[]
+  j = 0
+  for i=1:nrows(A)
+    j += 1
+    if j > ncols(A)
+      return p
+    end
+    while iszero(A[i,j])
+      j += 1
+      if j > ncols(A)
+        return p
+      end
+    end
+    push!(p, j)
+  end
+  return p
+end
+
+# NOTE: This is a UI function. You actually want to call _pivot_columns in
+# library code to skip the check.
+@doc Markdown.doc"""
+    pivot_columns(A::MatElem{<:RingElem})
+
+Return the pivot columns of a matrix in reduced triangular form. A matrix is
+in reduced triangular form if the multiset `{ min{i : A[i,j] != 0} }` has no 
+elements of multiplicity 2 or more. (where the minimum over the empty set is empty).
+i.e, the matrix looks something like this:
+
+[* * * * * *]
+[0 * * * * *]
+[0 0 0 * * *]
+[0 0 0 0 0 *]
+[0 0 0 0 0 0]
+"""
+function pivot_columns(A::MatElem{T}) where T
+    !isreduced_ut(A) && throw(DomainError(A, "Matrix is not in Hermite normal form."))
+    return _pivot_columns(A)
+end
+
+function isreduced_ut(A::MatElem{T}) where T
+    first_nonzeros = Int[findfirst(!iszero, A[j,:]) for j=1:nrows(A)]
+    for i=1:length(first_nonzeros-1)
+        first_nonzeros[i+1] <= first_nonzeros[i] && return false
+    end
+    return true
+end
+
+function solve_consistency_check()
+    error("Not Implemented.")
+end
 
 ###############################################################################
 #
@@ -207,3 +391,86 @@ function can_solve_left_reduced_triu(r::AbstractAlgebra.MatElem{T},
    end
    return true, x
 end
+
+#############################################################################
+#
+#  Kept for reference.
+#
+#############################################################################
+
+
+
+### Code below is not active ###
+if false
+    
+@doc Markdown.doc"""
+    solve_ut(A::MatElem{T}, b::MatElem{T}) -> MatElem{T})
+
+Given an upper triangular $m \times m$ matrix $A$ and a matrix $b$ of size $m
+\times 1$, this function computes $x$ such that $Ax = b$.  It is assumed that
+the pivots of $A$ are invertible.
+"""
+function solve_ut(A::MatElem{T}, b::MatElem{T}) where T
+  m = nrows(A)
+  n = ncols(A)
+  @assert m == nrows(b)
+  @assert m <= n
+  x = zero_matrix(base_ring(A), n, 1)
+  pivot_cols = Vector{Int}()
+  r = 0
+  last_pivot = n + 1
+  for i = m:-1:1
+    for j = 1:last_pivot - 1
+      if iszero(A[i, j])
+        continue
+      end
+      x[j, 1] = b[i, 1]
+      for k = 1:r
+        x[j, 1] -= A[i, pivot_cols[k]]*x[pivot_cols[k], 1]
+      end
+      x[j, 1] *= inv(A[i, j])
+      last_pivot = j
+      r += 1
+      push!(pivot_cols, j)
+      break
+    end
+  end
+  return x
+end
+
+@doc Markdown.doc"""
+    solve_lt(A::MatElem{T}, b::MatElem{T}) -> MatElem{T})
+
+Given a lower triangular $m \times m$ matrix $A$ and a matrix $b$ of size
+$m \times 1$, this function computes $x$ such that $Ax = b$.  It is assumed
+that the pivots of $A$ are invertible.
+"""
+function solve_lt(A::MatElem{T}, b::MatElem{T}) where T
+  m = nrows(A)
+  n = ncols(A)
+  @assert m == nrows(b)
+  @assert m <= n
+  x = zero_matrix(base_ring(A), n, 1)
+  pivot_cols = Vector{Int}()
+  r = 0
+  last_pivot = 0
+  for i = 1:m
+    for j = n:-1:last_pivot + 1
+      if iszero(A[i, j])
+        continue
+      end
+      x[j, 1] = b[i, 1]
+      for k = 1:r
+        x[j, 1] -= A[i, pivot_cols[k]]*x[pivot_cols[k], 1]
+      end
+      x[j, 1] *= inv(A[i, j])
+      last_pivot = j
+      r += 1
+      push!(pivot_cols, j)
+      break
+    end
+  end
+  return x
+end
+    
+end #if-false block.

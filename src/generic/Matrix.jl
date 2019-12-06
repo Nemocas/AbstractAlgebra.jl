@@ -1055,6 +1055,8 @@ end
 #
 ###############################################################################
 
+# NOTE: For "long" matrices, the upper triangular part actually has
+#       pivot columns, instead of just being upper triangular. 
 function lu!(P::Generic.Perm, A::MatrixElem{T}) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)

@@ -4,22 +4,99 @@
     @testset "Generic.Mat.solve_lu..." begin
         S = QQ
 
-        for dim = 0:5
-            R = MatrixSpace(S, dim, dim)
-            U = MatrixSpace(S, dim, rand(1:5))
+        @testset "Consistent square solve tests." begin            
+            for dim = 1:5
+                R = MatrixSpace(S, dim, dim)
+                U = MatrixSpace(S, dim, rand(1:5))
 
-            M = randmat_with_rank(R, dim, -100:100)
-            b = rand(U, -100:100)
+                M = randmat_with_rank(R, dim, -100:100)
+                b = rand(U, -100:100)
 
-            x = Generic.solve_lu(M, b)
+                x = Generic.solve_lu(M, b)
 
-            @test M*x == b
+                @test M*x == b
+            end
         end
 
+        @testset "Consistent rectangular solve tests." begin
+            for rdim = 1:3
+                for cdim = 1:3
+                    R = MatrixSpace(S, rdim, cdim)
+                    U = MatrixSpace(S, cdim, rand(1:5))
+                    
+                    M = randmat_with_rank(R, min(rdim,cdim), -10:10)
+                    x = rand(U, -10:10)
+
+                    b = M*x
+
+                    y = Generic.solve_lu(M, b)
+
+                    @test M*x == b
+                end
+            end
+
+        end
+        
+        @testset "Inconsistent solve error tests." begin
+            for rdim = 1:3
+                for cdim = 1:3
+                    Mn = MatrixSpace(S, rdim, rdim)
+                    Mm = MatrixSpace(S, cdim, cdim)
+
+                    R = MatrixSpace(S, rdim, cdim)
+
+                    t = rand(1:5)
+                    U = MatrixSpace(S, rdim, t)
+                    
+                    # Assgin a random test matrix.
+                    D = R()
+                    for j = 1:min(rdim, cdim)-1
+                        D[j,j] = rand(-100:100)
+                    end
+
+                    # Choose vector space automorphisms.
+                    g = randmat_with_rank(Mn, rdim, -10:10)
+                    h = randmat_with_rank(Mm, cdim, -10:10)
+
+                    # Note no solution to `Dx=b` is possible, as `b` at least one column of
+                    # `b` has a non-constant final coordinate.
+                    bbad = rand(U, -10:10); bbad[rdim,rand(1:t)] = 1
+
+                    #Act!
+                    M = g*D*h
+                    bbad = g*bbad
+
+                    #@test Generic.solve_lu(M,bbad)
+                    @test_throws DomainError Generic.solve_lu(M,bbad)
+                end
+            end
+        end
+        
+        @testset "Solves with zero matrix inputs." begin
+
+            A = matrix(QQ, fill(QQ(0),4,4))
+            b = matrix(QQ, hcat([[rand(-10:10) for j=1:4] for i=1:1]...))
+            b[1,1] = 1
+            
+            @test_throws DomainError Generic.solve_lu(A,b)
+
+            R = MatrixSpace(S, 5, 4)
+            A = rand(R, -10:10)
+            b = matrix(QQ, fill(0,5,4))
+            x = Generic.solve_lu(A,b)
+            @test A*x == b
+
+            A = matrix(QQ, fill(QQ(0),5,4))
+            b = matrix(QQ, fill(0,5,4))
+            x = Generic.solve_lu(A,b)
+            @test A*x == b
+        end
+        
+        #=
         S, y = PolynomialRing(ZZ, "y")
         K = FractionField(S)
 
-        for dim = 0:5
+        for dim = 1:5
             R = MatrixSpace(S, dim, dim)
             U = MatrixSpace(S, dim, rand(1:5))
 
@@ -33,12 +110,14 @@
 
             @test MK*x == bK
         end
+        =#
     end
 
+    #=
     @testset "Generic.Mat.solve_rational..." begin
         S = ResidueRing(ZZ, 20011*10007)
 
-        for dim = 0:5
+        for dim = 1:5
             R = MatrixSpace(S, dim, dim)
             U = MatrixSpace(S, dim, rand(1:5))
 
@@ -62,7 +141,7 @@
 
         S, z = PolynomialRing(ZZ, "z")
 
-        for dim = 0:5
+        for dim = 1:5
             R = MatrixSpace(S, dim, dim)
             U = MatrixSpace(S, dim, rand(1:5))
 
@@ -77,7 +156,7 @@
         R, x = PolynomialRing(QQ, "x")
         K, a = NumberField(x^3 + 3x + 1, "a")
 
-        for dim = 0:5
+        for dim = 1:5
             S = MatrixSpace(K, dim, dim)
             U = MatrixSpace(K, dim, rand(1:5))
 
@@ -92,7 +171,7 @@
         R, x = PolynomialRing(ZZ, "x")
         S, y = PolynomialRing(R, "y")
 
-        for dim = 0:5
+        for dim = 1:5
             T = MatrixSpace(S, dim, dim)
             U = MatrixSpace(S, dim, rand(1:5))
 
@@ -121,7 +200,7 @@
     @testset "Generic.Mat.solve_left..." begin
         for R in [ZZ, QQ]
             for iter = 1:40
-                for dim = 0:5
+                for dim = 1:5
                     r = rand(1:5)
                     n = rand(1:5)
                     c = rand(1:5)
@@ -143,7 +222,7 @@
         R, x = PolynomialRing(QQ, "x")
 
         for iter = 1:4
-            for dim = 0:5
+            for dim = 1:5
                 r = rand(1:5)
                 n = rand(1:5)
                 c = rand(1:5)
@@ -166,7 +245,7 @@
         R, x = PolynomialRing(QQ, "x")
         K, a = NumberField(x^3 + 3x + 1, "a")
 
-        for dim = 0:10
+        for dim = 1:10
             S = MatrixSpace(K, dim, dim)
             U = MatrixSpace(K, dim, rand(1:5))
 
@@ -196,7 +275,8 @@
             @test flag == false || x*M == r
         end
     end
-
+=#
+#=
 @testset "Generic.Mat.rref..." begin
     S = ResidueRing(ZZ, 20011*10007)
     R = MatrixSpace(S, 5, 5)
@@ -262,5 +342,6 @@
         @test isrref(A)
     end
 end
-
+=#
 end
+
