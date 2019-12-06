@@ -137,23 +137,19 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
                 throw(DomainError((LU,b), "LU-solve instance is inconsistent."))
             end
         end
-        
-        # Previous comment; now defunct.
-        # #Now every entry of x is a proper copy, so we can change the entries
-        # #as much as we want.
-
-        
-        # Additionally, since _ut_pivot_columns only checks entries above the diagonal,
+                
+        # Since _ut_pivot_columns only checks entries above the diagonal,
         # it effectively only reads the `U` part of the `LU` object.
         pcols  = _ut_pivot_columns(LU)
 
-        #@info "" pcols LU LU[:, pcols]
-
-        # As `x` is freshly allocated space, and the entries are deepcopyed/newly allocated,
-        # the elements of `x` share no references, even in part, aside from parents.
+        
+        # PROOF OF CORRECT USAGE:
+        # By use of `deepcopy`, we see `x` is freshly allocated space and the entries are
+        # deepcopyed/newly allocated.
+        # Thus, the elements of `x` share no references, even in part, aside from parents.
         # Moreover, trivially, `x===x`. Thus, we have fulfilled the CONTRACT for using
         # the `!!` method.        
-        x[:,k] = _solve_nonsingular_ut!!(x[:,k], LU[:, pcols], x[:,k], rk, 1)
+        x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], LU[:, pcols], x[:,k], rk, 1)
 
         #TODO: Replace the implicit `get_index` with a `view`.
 
@@ -165,6 +161,10 @@ end
 # https://github.com/Nemocas/Nemo.jl/issues/278
 #
 # CONTRACT:
+#   (*) The contract does not cover cases where allocation and assignment functions (ex: deepcopy)
+# have been maliciously or negligently tampered with, in which case the TYPE owner assumes
+# all fault.
+#
 # By involking this function, you (the calling method) have intended target of mutation
 # `x` and can certify that either:
 #
@@ -173,7 +173,18 @@ end
 #
 # 2. `x===b`, the mutation on `b` (i.e `x`) is intended, and elements of `x` share no
 #    references between each other, even in part, aside from parents.
-#    
+#
+# 3. The matrix `A` is in reduced upper-triangular form.
+#
+# 4. A correct proof that conditions 1-3 have been satisfied, given (*), exists at the call site.
+#
+#
+# Under these conditions, I (the function) agree that
+#
+# 1. `A` and constituants are not modified in any way, shape, or form,
+# 2. either `b===x`, or `b` and its constituants are not modified in any, shape, or form.
+# 3. The output `x` will be a solution to `Ax==b`.
+#
 # Failure to abide by the terms of this contract absolves this function of any liability,
 # and usually will result in misery and suffering.
 #
@@ -182,7 +193,7 @@ end
 # vector once. `x` is assumed to be such an output container, which by definition of
 # the mutability edicts should not share references from `A` or `b` in the caller.
 #
-function _solve_nonsingular_ut!!(x, U, b, rk, k)
+function _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x, U, b, rk, k)
 
     if iszero(rk)
         return x
