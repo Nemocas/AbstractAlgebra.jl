@@ -106,6 +106,31 @@ zero(x::NCRingElem) = zero(parent(x))
 
 ###############################################################################
 #
+#   minus!
+#
+###############################################################################
+
+# Requires `mul!` to be implemented, but then automatically extends the
+# interface.
+@doc Markdown.doc"""
+    minus!(a::NCRingElement)
+> Return the negation of `a` inplace.
+
+NOTE: The abstract method cannot actually do this. However, a hook is provided
+in various generic algorithms in (the plethora of) cases where inplace negation
+is faster than multiplication.
+"""
+@inline function minus!(a::NCRingElement)
+    # The method is deliberately stupid as we cannot know the memory structure
+    # of the type in advance. However, it keeps the required interface for
+    # ring types a little smaller. The point is to provide a hook in the case
+    # that inplace negation can be done faster than multiplying by (-1).
+
+    return -a
+end
+
+###############################################################################
+#
 #   Baby-steps giant-steps powering
 #
 ###############################################################################

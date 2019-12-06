@@ -112,7 +112,7 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
                 # NOTE: This is the correct order of multiplication in non-commutative rings.
                 # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
                 t = mul_red!(t, LU[i, j], x[j, k], false)
-                t = mul_red!(t, t, MINUS_ONE, false)
+                t = minus!(t)
                 if j == 1
                     # This was to allocate memory before. Now we don't have to.
                     # In fact, it is better to allocate memory in a single request
@@ -209,9 +209,8 @@ function _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_fun
     t = base_ring(b)()
     ZERO = base_ring(b)()
     
-    # This is incorrect if `U` is not invertible.
-    # This is also not the correct order of division for non-commutative rings.
-    x[rk, k] = divexact(b[rk, k], U[rk, rk])
+    # NOTE: This is the correct order of division for non-commutative rings.
+    x[rk, k] = divexact_left(U[rk, rk], b[rk, k])
 
     # The upper triangular back-substitution. Along rows.
     for i in rk-1:-1:1
@@ -228,7 +227,7 @@ function _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_fun
             x[i, k] = addeq!(x[i, k], t)
         end
         x[i, k] = reduce!(x[i, k])
-        x[i, k] = divexact(x[i, k], U[i, i])
+        x[i, k] = divexact_left(U[i, i], x[i, k])
     end
 
     return x
