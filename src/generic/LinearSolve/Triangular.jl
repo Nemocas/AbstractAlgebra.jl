@@ -52,7 +52,7 @@ function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) wh
    return x
 end
 
-function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
+function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: RingElement}
 
     n = nrows(LU)
     m = ncols(LU)
@@ -78,7 +78,8 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
     
     t = base_ring(b)()
     s = base_ring(b)()
-
+    MINUS_ONE = base_ring(b)(-1)
+    
     # For each column of b, solve Ax=b[:,j].
     for k in 1:ncolsb
 
@@ -110,7 +111,8 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
             for j in 1:(i - 1)
                 # NOTE: This is the correct order of multiplication in non-commutative rings.
                 # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
-                t = mul_red!(t, -LU[i, j], x[j, k], false)
+                t = mul_red!(t, LU[i, j], x[j, k], false)
+                t = mul_red!(t, t, MINUS_ONE, false)
                 if j == 1
                     # This was to allocate memory before. Now we don't have to.
                     # In fact, it is better to allocate memory in a single request
@@ -118,10 +120,10 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
                     
                     x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
                 else
-                    # This doesn't do what you think it does guys... There is an implicit
+                    # This doesn't do what you think it does... There is an implicit
                     # copy in `setindex!`. At least one allocation is avoided, but not both.
                     # That said, the assignment is absolutely necessary for immutable input.
-                    x[i, k] = addeq!(x[i, k], t) 
+                    x[i, k] = addeq!(x[i, k], t)
                 end
             end
             x[i, k] = reduce!(x[i, k])

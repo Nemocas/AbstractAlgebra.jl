@@ -1186,7 +1186,7 @@ end
 @testset "Generic.Mat.solve_lu..." begin
    S = QQ
 
-   for dim = 0:5
+   for dim = 1:5
       R = MatrixSpace(S, dim, dim)
       U = MatrixSpace(S, dim, rand(1:5))
 
@@ -1201,7 +1201,7 @@ end
    S, y = PolynomialRing(ZZ, "y")
    K = FractionField(S)
 
-   for dim = 0:5
+   for dim = 1:5
       R = MatrixSpace(S, dim, dim)
       U = MatrixSpace(S, dim, rand(1:5))
 

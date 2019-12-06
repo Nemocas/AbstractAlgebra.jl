@@ -6,7 +6,8 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    p = PermGroup(nrows(A))()
    r, d = fflu!(p, FFLU)
     #r < nrows(A) && error("Singular matrix in solve_fflu")
-   return solve_fflu_precomp(p, FFLU, b), d
+    #return solve_fflu_precomp(p, FFLU, b), d
+    return solve_fflu_precomp(p, FFLU, b), d
 end
 
 

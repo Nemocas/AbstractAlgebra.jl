@@ -92,7 +92,7 @@
             @test A*x == b
         end
         
-        #=
+        
         S, y = PolynomialRing(ZZ, "y")
         K = FractionField(S)
 
@@ -110,10 +110,10 @@
 
             @test MK*x == bK
         end
-        =#
+        
     end
 
-    #=
+    
     @testset "Generic.Mat.solve_rational..." begin
         S = ResidueRing(ZZ, 20011*10007)
 
@@ -197,9 +197,10 @@
         @test M*x == d*b
     end
 
+
     @testset "Generic.Mat.solve_left..." begin
         for R in [ZZ, QQ]
-            for iter = 1:40
+            for iter = 1:4
                 for dim = 1:5
                     r = rand(1:5)
                     n = rand(1:5)
@@ -219,6 +220,7 @@
             end
         end
 
+        #=
         R, x = PolynomialRing(QQ, "x")
 
         for iter = 1:4
@@ -239,8 +241,9 @@
                 @test X*M == B
             end
         end
+        =#
     end
-
+#=
     @testset "Generic.Mat.solve_triu..." begin
         R, x = PolynomialRing(QQ, "x")
         K, a = NumberField(x^3 + 3x + 1, "a")
