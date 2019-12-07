@@ -23,14 +23,15 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T}; den=Val(true)) where {T <: Rin
     r, d = fflu!(p, FFLU)
     #r < nrows(A) && error("Singular matrix in solve_fflu")
 
+    x = _solve_fflu_postcomp(p, FFLU, b)
+    
     if den == Val(true) || den == Val(:true)
-        return solve_fflu_precomp(p, FFLU, b), d
+        return x, d
 
     elseif den == Val(false) || den == Val(:false)
-        return solve_fflu_precomp(p, FFLU, b)
+        return x
 
     elseif den == Val(:det)
-        x = solve_fflu_precomp(p, FFLU, b)
         if iszero(parity(p))
             return x, d
         else

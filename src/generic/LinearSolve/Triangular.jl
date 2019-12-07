@@ -2,9 +2,9 @@
 
 # These functions are honestly just triangular solving in disguise.
 
-function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
 
-
+    # TODO: Decide with Bill on the correct canonical FFLU form for long matrices.
     @warn "fflu does not work properly for `long` matrices. Caution is advised."
 
     n = nrows(FFLU)
@@ -24,12 +24,10 @@ function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) wh
     pb = p*b
     #x = p * b
 
-   t = base_ring(b)()
-   s = base_ring(b)()
-   ZERO = zero(R)
+    t = base_ring(b)()
+    s = base_ring(b)()
+    ZERO = zero(R)
 
-    # As it turns out, 
-    
     # For each column of x
     for k in 1:ncolsb
 
@@ -62,13 +60,13 @@ function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) wh
                 #if i == 1
                 #  x[j, k] = mul_red!(R(), x[j, k], FFLU[i, i], false)
                 #else
-                x[j, k] = mul_red!(x[j, k], x[j, k], FFLU[i, i], false)
+                x[j, k] = mul_red!(x[j, k], FFLU[i, i], x[j, k], false)
                 #end
                 s = mul_red!(s, FFLU[j, i], t, false)
                 x[j, k] = addeq!(x[j, k], s)
                 x[j, k] = reduce!(x[j, k])
                 if i > 1
-                    x[j, k] = divexact(x[j, k], FFLU[i - 1, i - 1])
+                    x[j, k] = divexact_left(FFLU[i - 1, i - 1], x[j, k])
                 end
             end
         end
@@ -112,6 +110,8 @@ function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) wh
         # Backsolve the upper triangular part. However, things have been rearranged
         # so that a single column of `x` is accessed in the inner (j) loop, rather than a row.
 
+        # The backsolve step is totally redundant. However, there is a mild optimization to
+        # prevent a multiplication and division by the same thing.
         #=
         for i in (n - 1):-1:1
          #if i > 1
@@ -192,18 +192,18 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
                 # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
                 t = mul_red!(t, LU[i, j], x[j, k], false)
                 t = minus!(t)
-                if j == 1
+                #if j == 1
                     # This was to allocate memory before. Now we don't have to.
                     # In fact, it is better to allocate memory in a single request
                     # rather than in small pieces.
                     
-                    x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
-                else
+                #    x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
+                #else
                     # This doesn't do what you think it does... There is an implicit
                     # copy in `setindex!`. At least one allocation is avoided, but not both.
                     # That said, the assignment is absolutely necessary for immutable input.
                     x[i, k] = addeq!(x[i, k], t)
-                end
+                #end
             end
             x[i, k] = reduce!(x[i, k])
         end
@@ -395,10 +395,6 @@ function isreduced_ut(A::MatElem{T}) where T
         first_nonzeros[i+1] <= first_nonzeros[i] && return false
     end
     return true
-end
-
-function solve_consistency_check()
-    error("Not Implemented.")
 end
 
 ###############################################################################

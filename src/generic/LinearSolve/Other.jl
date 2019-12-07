@@ -26,7 +26,6 @@ end
 
 Gives a solution to the linear equation `A*x = b` using `solve_fflu`.
 """
-
 function solve_ff(M::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}    
     x, d = solve_fflu(M, b, den=Val(true))
     for i in 1:nrows(x)
