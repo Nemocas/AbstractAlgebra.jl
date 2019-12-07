@@ -9,6 +9,12 @@ function check_solve_instance_is_well_defined(A::MatElem{T}, b::MatElem{T}) wher
     return true
 end
 
+################################################################################
+#
+#  Solve scaled.
+#
+################################################################################
+
 # Need to think of a better name than `solve_ff`.
 
 @doc Markdown.doc"""
@@ -73,6 +79,11 @@ function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
    return x, d
 end
 
+################################################################################
+#
+#  Solve with interpolation
+#
+################################################################################
 
 function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    m = nrows(M)
@@ -151,16 +162,11 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
    return x, interpolate(R, y, d)
 end
 
-@doc Markdown.doc"""
-    solve(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
-> Given a non-singular $n\times n$ matrix over a field and an $n\times m$
-> matrix over the same field, return $x$ an
-> $n\times m$ matrix $x$ such that $Ax = b$.
-> If $A$ is singular an exception is raised.
-"""
-function solve(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
-    error("Top level calls not implemented.")
-end
+################################################################################
+#
+#  Solve rational.
+#
+################################################################################
 
 @doc Markdown.doc"""
     solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where T <: RingElement
@@ -187,4 +193,46 @@ function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
       end
       return solve_scaled_ff(M, b)
    end
+end
+
+
+################################################################################
+#
+#  The solve UI
+#
+################################################################################
+
+@doc Markdown.doc"""
+    solve(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where T
+> Given a non-singular $n\times n$ matrix over a field and an $n\times m$
+> matrix over the same field, return $x$ an
+> $n\times m$ matrix $x$ such that $Ax = b$.
+> If $A$ is singular an exception is raised.
+"""
+function solve(A::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T};
+               kernel = Val(false),
+               nullspace = Val(false),
+               method = Val(false),
+               side = Val(:right)
+               
+               ) where T
+
+    # Ultimately solve is just a UI function designed to parse the solve instance and dispatch
+    # to the method that will actually do the work.
+
+    # In the event `solve` cannot determine a method to solve `A*x == b`, it will give a reason
+    # and a recommendation/override instructions.
+    
+    # Set up solve instance based on parameters, then call the right method, if possible.
+
+    # kernel -- requires HNF or custom ultra_generic interface.
+
+    # nullspace -- implicitly asks for the version of the problem over the fraction field.
+
+    # 
+    error("Top level calls not implemented.")
+end
+
+function _solve_generic(A::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
+
 end

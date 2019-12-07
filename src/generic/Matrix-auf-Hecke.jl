@@ -112,6 +112,22 @@ function matrix(A::Array{T, 1}) where T <: RingElem
 end
 
 @doc Markdown.doc"""
+    matrix(R::Ring, A::Array{Array{T, 1},1}) where T
+    matrix(A::Array{Array{T, 1},1}) where T <: RingElem
+Construct the matrix whose columns are given by the elements of `A`.
+Note that `A` and its entries must all be non-empty.
+"""
+function matrix(R::Ring, a::Array{Array{T, 1}, 1}) where T
+    return matrix(R, typed_hcat(T, a...))
+end
+
+function matrix(R::Ring, a::Array{Array{T, 1}, 1}) where T <: RingElem
+    R = base_ring(a[1][1])
+    return matrix(R, a)
+end
+
+
+@doc Markdown.doc"""
     scalar_matrix(R::Ring, n::Int, a::RingElement)
 Construct the AbstractAlgebra matrix `a*I`, with `I` the `n x n` identity matrix.
 """
