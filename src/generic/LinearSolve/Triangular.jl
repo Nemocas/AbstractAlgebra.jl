@@ -78,7 +78,6 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
     
     t = base_ring(b)()
     s = base_ring(b)()
-    MINUS_ONE = base_ring(b)(-1)
     
     # For each column of b, solve Ax=b[:,j].
     for k in 1:ncolsb
@@ -129,21 +128,13 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
             x[i, k] = reduce!(x[i, k])
         end
 
-        # TODO: Optimize.
-        for i= n:-1:rk+1
-            # Below the last row where `U` has a pivot, the entries
-            # of `LU` are just the entries of `L`.
-            sm = sum(LU[i,j]*x[j,k] for j=1:nrows(x)) 
-
-            if sm != b[i,k]
-                throw(DomainError((LU,b), "LU-solve instance is inconsistent."))
-            end
-        end
-                
+        # Below the last row where `U` has a pivot, the entries
+        # of `LU` are just the entries of `L`.
+        check_system_is_consistent(LU, view(x, : , k:k), view(b, :, k:k) , rk)
+        
         # Since _ut_pivot_columns only checks entries above the diagonal,
         # it effectively only reads the `U` part of the `LU` object.
         pcols  = _ut_pivot_columns(LU)
-
         
         # PROOF OF CORRECT USAGE:
         # By use of `deepcopy`, we see `x` is freshly allocated space and the entries are
@@ -158,6 +149,37 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
     end
     return x
 end
+
+@doc Markdown.doc"""
+    check_system_is_consistent(A,x,b,rk)
+
+Checks if `A[rk+1:n, :]*x == b`, where `n` is the number of rows of `A`.
+An error is raised otherwise.
+"""
+function check_system_is_consistent(A, x, b, rk = 0::Int)
+
+    n = nrows(A)
+    m = ncols(A)
+    nvecs = max(ncols(x), ncols(b))
+
+    # Containers
+    t = base_ring(b)()
+    sum = base_ring(b)()
+
+    # Check all the dot products.
+    for k = 1:nvecs
+        for i = rk+1:n
+            sum = zero!(sum)
+            for j=1:m 
+                sum = addmul_delayed_reduction!(sum, A[i, j], x[j, k], t)
+            end
+            sum = reduce!(sum)
+            sum != b[i,k] && throw(DomainError((A, x, b), "Solve instance is inconsistent."))
+        end
+    end
+    return true
+end
+
 
 # NOTE: Very dangerous function, and breaks the mutability edicts set out in
 # https://github.com/Nemocas/Nemo.jl/issues/278
@@ -189,6 +211,9 @@ end
 #
 # Failure to abide by the terms of this contract absolves this function of any liability,
 # and usually will result in misery and suffering.
+#
+# Your SIGNATURE of the contract is the `git-blame` info at the call site. MY signature is
+# the `git-blame` info at this contract.
 #
 # The reason this function exists is that solve methods have the same pattern of
 # back-substitution, but generally only want to allocate the memory for the solution

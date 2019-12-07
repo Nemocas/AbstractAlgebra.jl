@@ -280,7 +280,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  map_with_retraction, map_with_retraction_from_func,
                  map_with_section, map_with_section_from_func,
                  mat, matrix, matrix_repr, max_fields,
-                 max_precision, minors, minpoly, mod,
+                 max_precision, minors, minpoly, minus!, mod,
                  modulus, monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx, mul!, mul_classical,
