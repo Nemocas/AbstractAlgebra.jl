@@ -3,53 +3,133 @@
 # These functions are honestly just triangular solving in disguise.
 
 function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   x = p * b
-   n = nrows(x)
-   m = ncols(x)
-   R = base_ring(FFLU)
+
+
+    @warn "fflu does not work properly for `long` matrices. Caution is advised."
+
+    n = nrows(FFLU)
+    m = ncols(FFLU)
+    ncolsb = ncols(b)
+    
+    rk = begin
+        rk=min(n,m)
+        for i = min(n,m):-1:1
+            iszero(FFLU[i,i]) ? rk -= 1 : break
+        end
+        rk
+    end
+
+    R = base_ring(FFLU)
+    x  = zero_matrix(R, m, ncolsb)
+    pb = p*b
+    #x = p * b
 
    t = base_ring(b)()
    s = base_ring(b)()
-   minus_one = R(-1)
+   ZERO = zero(R)
 
+    # As it turns out, 
+    
     # For each column of x
-    for k in 1:m
+    for k in 1:ncolsb
+
+        # Populate the initial values in `x`. There is surely a better way to do this.
+
+        # In the first backsolve step, Only the part `y[1:rk, :]` is needed to
+        # construct the solution to the linear equation `(LD^-1)^(-1) b =: y = Ux`.
+        # or to check that the system is consistent. Essentially, we are restricting
+        # to the principal (rk x rk)-subblock of `U`.
+        for i=1:rk
+            x[i, k] = deepcopy(pb[i, k])
+        end
+
         # Backsolve the lower triangular part. However, things have been rearranged
         # so that a single column is accessed in the inner (j) loop, rather than a row.
-      for i in 1:(n - 1)
-         t = mul!(t, x[i, k], minus_one)
-         for j in (i + 1):n
-            if i == 1
-              x[j, k] = mul_red!(R(), x[j, k], FFLU[i, i], false)
-            else
-              x[j, k] = mul_red!(x[j, k], x[j, k], FFLU[i, i], false)
-            end
-            s = mul_red!(s, FFLU[j, i], t, false)
-            x[j, k] = addeq!(x[j, k], s)
-            x[j, k] = reduce!(x[j, k])
-            if i > 1
-                x[j, k] = divexact(x[j, k], FFLU[i - 1, i - 1])
-            end
-         end
-      end
+        #
+        # The trick here is that the atomic lower triangular operations
+        # almost commute with `D`, and that the partial quotients `D[i,i]/D[i-1,i-1]`
+        # are integral and telescope.
+        #
+        # Writing `L = L_1 L_2 .. L_n` as a product of atomic lower triangular matrices
+        # (See https://en.wikipedia.org/wiki/Triangular_matrix#Atomic_triangular_matrix)
+        # Each loop iteration corresponds to solving ...something... .
+        #
+        for i in 1:(rk - 1)
+            t = add!(t, x[i, k], ZERO)
+            t = minus!(t)
+            for j in (i + 1):rk
 
+                #if i == 1
+                #  x[j, k] = mul_red!(R(), x[j, k], FFLU[i, i], false)
+                #else
+                x[j, k] = mul_red!(x[j, k], x[j, k], FFLU[i, i], false)
+                #end
+                s = mul_red!(s, FFLU[j, i], t, false)
+                x[j, k] = addeq!(x[j, k], s)
+                x[j, k] = reduce!(x[j, k])
+                if i > 1
+                    x[j, k] = divexact(x[j, k], FFLU[i - 1, i - 1])
+                end
+            end
+        end
+
+        # The very last back-solve step is just multiplying `x[rk, k]` by the last pivot
+        # of `LU[rk,rk]`, which
+        # will be canceled out by the first step of the next part.
+        #
+        # TODO: There are some clever trick one can implement to get cancellation to happen
+        # through the function call.
+        x[rk,k] = mul!(x[rk,k], FFLU[rk,rk], x[rk, k])
+        
+        check_system_is_consistent(FFLU, view(x,:, k:k), view(b,:, k:k), rk)
+        
+        # Since _ut_pivot_columns only checks entries above the diagonal,
+        # it effectively only reads the `U` part of the `LU` object.
+        pcols  = _ut_pivot_columns(FFLU)
+
+        for i in (rk - 1):-1:1
+            x[i, k] = mul!(x[i, k], FFLU[rk, rk], x[i, k])
+        end
+
+            
+        # PROOF OF CORRECT USAGE:
+        # By construction of `x` using `zero_matrix`, and assignment using `deepcopy`, we see
+        # `x` is freshly allocated space and the entries are deepcopyed/newly allocated.
+        #
+        # After this, entries of `x` are modified only by `mul_red!`, which under correct
+        # functioning, does not allow `x` to share a reference with `FFLU` or other operands,
+        # aside from itself.
+        #
+        # Thus, the elements of `x` share no references between each other or the entries of
+        # FFLU, even in part, aside from parents.
+        # Moreover, trivially, `x===x`. Thus, we have fulfilled the CONTRACT for using
+        # the `!!` method.        
+        x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], FFLU[:, pcols], x[:,k], rk, 1)
+
+        #TODO: Replace the implicit `get_index` with a `view`.
+
+        
         # Backsolve the upper triangular part. However, things have been rearranged
         # so that a single column of `x` is accessed in the inner (j) loop, rather than a row.
-      for i in (n - 1):-1:1
-         if i > 1
+
+        #=
+        for i in (n - 1):-1:1
+         #if i > 1
             x[i, k] = mul!(x[i, k], x[i, k], FFLU[n, n])
-         else
-            x[i, k] = x[i, k] * FFLU[n, n]
-         end
+         #else
+         #   x[i, k] = x[i, k] * FFLU[n, n]
+         #end
          for j in (i + 1):n
             t = mul!(t, x[j, k], FFLU[i, j])
-            t = mul!(t, t, minus_one)
+            t = minus!(t)
             x[i, k] = addeq!(x[i, k], t)
          end
          x[i, k] = divexact(x[i, k], FFLU[i, i])
-      end
-   end
-   return x
+        end
+        =#
+    
+    end
+    return x
 end
 
 function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: RingElement}
