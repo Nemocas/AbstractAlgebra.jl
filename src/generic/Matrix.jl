@@ -1130,7 +1130,7 @@ function lu(A::MatrixElem{T}, P = PermGroup(nrows(A))) where {T <: FieldElement}
    L = similar(A, m, m)
    rank = lu!(p, U)
    for i = 1:m
-      for j = 1:n
+      for j = 1:max(n,m)
          if i > j
             L[i, j] = U[i, j]
             U[i, j] = R()
@@ -1279,12 +1279,12 @@ function fflu(A::MatrixElem{T}, P = PermGroup(nrows(A))) where {T <: RingElement
    L = similar(A, m, m)
    rank, d = fflu!(p, U)
    for i = 1:m
-      for j = 1:n
+      for j = 1:max(n,m)
          if i > j
             L[i, j] = U[i, j]
             U[i, j] = R()
          elseif i == j
-            L[i, j] = U[i, j]
+            L[i, j] = j > n ? R(1) : U[i, j]
          elseif j <= m
             L[i, j] = R()
          end

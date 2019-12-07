@@ -1,28 +1,43 @@
 
-function solve_ff(M::MatrixElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
-   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   !issquare(M) && error("Non-square matrix in solve")
-   nrows(M) != nrows(b) && error("Dimensions don't match in solve")
-   m = nrows(M)
-   x, d = solve_fflu(M, b)
-   for i in 1:nrows(x)
-      for j in 1:ncols(x)
-         x[i, j] = divexact(x[i, j], d)
-      end
-   end
-   return x
+function check_solve_instance_is_well_defined(A::MatElem{T}, b::MatElem{T}) where T
+    base_ring(A) != base_ring(b) && error("Base rings don't match in solve_lu")
+    nrows(A) != nrows(b) && throw(DimensionMismatch("nrows(A) != nrows(b)"))
+
+    if nrows(A) == 0 || ncols(A) == 0 || ncols(b) == 0
+        throw(DimensionMismatch("Solve Ax=b instance with either A=$A or b=$b empty."))
+    end
+    return true
 end
 
-function solve_ff(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
-   m = nrows(M)
-   n = ncols(M)
-   if m == 0 || n == 0
-      return b, base_ring(M)()
-   end
-   return solve_fflu(M, b)
+# Need to think of a better name than `solve_ff`.
+
+@doc Markdown.doc"""
+    solve_scaled_ff(M::MatElem{T}, b::MatElem{T}; den = Val(true)) where {T <: RingElement}
+
+Alias for solve_scaled_fflu.
+"""
+function solve_scaled_ff(M::MatElem{T}, b::MatElem{T}; den=Val(true)) where {T <: RingElement}
+    return solve_fflu(M, b, den=den)
 end
 
 
+"""
+    solve_ff(M::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
+
+Gives a solution to the linear equation `A*x = b` using `solve_fflu`.
+"""
+
+function solve_ff(M::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}    
+    x, d = solve_fflu(M, b, den=Val(true))
+    for i in 1:nrows(x)
+        for j in 1:ncols(x)
+            x[i, j] = divexact(x[i, j], d)
+        end
+    end
+    return x
+end
+
+#=
 function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    # We cannot use solve_fflu directly, since it forgot about the (parity of
    # the) permutation.
@@ -47,6 +62,11 @@ function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
       d = mul!(d, d, minus_one)
    end
    return x, d
+end
+=#
+
+function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
+    return solve_fflu(M,b; den=Val(:det))
 end
 
 function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
@@ -140,27 +160,21 @@ end
 > If $A$ is singular an exception is raised.
 """
 function solve(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
-    return solve_ringelem(M, b)
+    error("Top level calls not implemented.")
 end
 
 @doc Markdown.doc"""
     solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where T <: RingElement
 > Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
 > matrix over the same ring, return a tuple $x, d$ consisting of an
-> $n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The
+> $n\times m$ matrix $x$ and a denominator $d$ such that $Ax = d*b$. The
 > denominator will be the determinant of $A$ up to sign. If $A$ is singular an
 > exception is raised.
 """
 function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where T <: RingElement
-   return solve_ringelem(M, b)
+   return solve_scaled_ff(M, b, den=Val(true))
 end
 
-function solve_ringelem(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
-   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   nrows(M) != ncols(M) && error("Non-square matrix in solve")
-   nrows(M) != nrows(b) && error("Dimensions don't match in solve")
-   return solve_ff(M, b)
-end
 
 function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
@@ -172,6 +186,6 @@ function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
       if !isa(e, ErrorException)
          rethrow(e)
       end
-      return solve_ff(M, b)
+      return solve_scaled_ff(M, b)
    end
 end
