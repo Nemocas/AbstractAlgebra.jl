@@ -15,7 +15,20 @@ The parameter `den` determines if the denominator `d` is returned, and how it is
 
 Default is Val(true) for legacy reasons, which is inconsistant with normal solve syntax.
 """
-function solve_fflu(A::MatElem{T}, b::MatElem{T}; den=Val(true)) where {T <: RingElement}
+function solve_fflu(A::MatElem{T}, b::MatElem{T};
+                    den=Val(true), side = :right) where {T <: RingElement}
+
+    if side === :left
+        # It might be easier to do things this way, but you could in theory allocate
+        # the solution space as a TransposeIndexDual. Just remember to return the
+        # correct type afterward.
+        Adual = TransposeIndexDual(A)
+        bdual = TransposeIndexDual(b)
+        sol, d = solve_fflu(Adual, bdual, side=:right)
+        actual_sol = transpose(sol)
+        return actual_sol, d
+    end
+
     check_solve_instance_is_well_defined(A,b)
 
     FFLU = deepcopy(A)
@@ -43,6 +56,7 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T}; den=Val(true)) where {T <: Rin
             return x, minus!(d)
         end
     end
+    error("Option for `den` not accepted.")
 end
 
 
