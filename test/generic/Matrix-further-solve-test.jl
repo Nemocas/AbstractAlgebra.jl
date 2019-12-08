@@ -31,7 +31,7 @@
 
                     y = Generic.solve_lu(M, b)
 
-                    @test M*x == b
+                    @test M*y == b
                 end
             end
 
@@ -113,7 +113,81 @@
         
     end
 
-    
+    @testset "Generic.Mat.solve_fflu..." begin
+        S = ZZ
+
+        @testset "Consistent square solve tests." begin            
+            for dim = 1:7
+                R = MatrixSpace(S, dim, dim)
+                U = MatrixSpace(S, dim, rand(1:5))
+
+                M = randmat_with_rank(R, dim, -100:100)
+                b = rand(U, -100:100)
+
+                x,d = Generic.solve_fflu(M, b)
+
+                @test M*x == d*b
+            end
+        end
+
+        
+        @testset "Consistent rectangular solve tests." begin
+            for rdim = 1:3
+                for cdim = 1:3
+                    R = MatrixSpace(S, rdim, cdim)
+                    U = MatrixSpace(S, cdim, rand(1:5))
+                    
+                    M = randmat_with_rank(R, min(rdim,cdim), -10:10)
+                    x = rand(U, -10:10)
+
+                    b = M*x
+
+                    y,d = Generic.solve_fflu(M, b)
+
+                    @test M*y == d*b
+                end
+            end
+
+        end
+
+        
+        @testset "Inconsistent solve error tests." begin
+            for rdim = 1:3
+                for cdim = 1:3
+                    Mn = MatrixSpace(S, rdim, rdim)
+                    Mm = MatrixSpace(S, cdim, cdim)
+
+                    R = MatrixSpace(S, rdim, cdim)
+
+                    t = rand(1:5)
+                    U = MatrixSpace(S, rdim, t)
+                    
+                    # Assgin a random test matrix.
+                    D = R()
+                    for j = 1:min(rdim, cdim)-1
+                        D[j,j] = rand(-100:100)
+                    end
+
+                    # Choose vector space automorphisms.
+                    g = randmat_with_rank(Mn, rdim, -10:10)
+                    h = randmat_with_rank(Mm, cdim, -10:10)
+
+                    # Note no solution to `Dx=b` is possible, as `b` at least one column of
+                    # `b` has a non-constant final coordinate.
+                    bbad = rand(U, -10:10); bbad[rdim,rand(1:t)] = 1
+
+                    #Act!
+                    M = g*D*h
+                    bbad = g*bbad
+
+                    #Generic.solve_fflu(M,bbad)
+                    @test_throws DomainError Generic.solve_fflu(M,bbad)
+                end
+            end
+        end
+    end
+
+
     @testset "Generic.Mat.solve_rational..." begin
         S = ResidueRing(ZZ, 20011*10007)
 
@@ -148,6 +222,7 @@
             M = randmat_with_rank(R, dim, 0:3, -20:20)
             b = rand(U, 0:3, -20:20);
 
+            # Integer division error sometimes, but not always observed.
             x, d = solve_rational(M, b)
 
             @test M*x == d*b

@@ -1,4 +1,15 @@
 
+function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
+    @warn "Function has been depreciated. Use `solve_hnf(a,b,side=:left)` instead."
+    return solve_hnf(a,b,side=:left)
+end
+
+function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: FieldElement
+    @warn "Function has been depreciated. Use `solve_lu(a,b,side=:left)` instead."
+    return solve_lu(a,b,side=:left)
+end
+
+#=
 @doc Markdown.doc"""
     solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
 > Given an $r\times n$ matrix $a$ over a ring and an $m\times n$ matrix $b$
@@ -60,6 +71,8 @@ function solve_left(A::AbstractAlgebra.MatElem{T}, B::AbstractAlgebra.MatElem{T}
   end
   return sol
 end
+
+=#
 
 # Find the pivot columns of an rref matrix
 function find_pivot(A::AbstractAlgebra.MatElem{T}) where T <: RingElement

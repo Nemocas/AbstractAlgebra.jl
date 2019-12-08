@@ -80,8 +80,6 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
         # through the function call.
         x[rk,k] = mul!(x[rk,k], FFLU[rk,rk], x[rk, k])
         
-        check_system_is_consistent(FFLU, view(x,:, k:k), view(b,:, k:k), rk)
-        
         # Since _ut_pivot_columns only checks entries above the diagonal,
         # it effectively only reads the `U` part of the `LU` object.
         pcols  = _ut_pivot_columns(FFLU)
@@ -90,6 +88,7 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
             x[i, k] = mul!(x[i, k], FFLU[rk, rk], x[i, k])
         end
 
+        
         # PROOF OF CORRECT USAGE:
         # By construction of `x` using `zero_matrix`, and assignment using `deepcopy`, we see
         # `x` is freshly allocated space and the entries are deepcopyed/newly allocated.
@@ -105,7 +104,6 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
         x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], FFLU[:, pcols], x[:,k], rk, 1)
 
         #TODO: Replace the implicit `get_index` with a `view`.
-
         
         # Backsolve the upper triangular part. However, things have been rearranged
         # so that a single column of `x` is accessed in the inner (j) loop, rather than a row.

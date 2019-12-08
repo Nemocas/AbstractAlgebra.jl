@@ -40,7 +40,11 @@ function check_system_is_consistent(A, x, b, rk = 0::Int)
                 sum = addmul_delayed_reduction!(sum, A[i, j], x[j, k], t)
             end
             sum = reduce!(sum)
-            sum != b[i,k] && throw(DomainError((A, x, b), "Solve instance is inconsistent."))
+
+            if sum != b[i,k]
+                @info "Residual: " i k (sum - b[i,k]) 
+                throw(DomainError((A, x, b), "Solve instance is inconsistent."))
+            end
         end
     end
     return true

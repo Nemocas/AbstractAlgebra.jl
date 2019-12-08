@@ -36,8 +36,17 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T};
     r, d = fflu!(p, FFLU)
     #r < nrows(A) && error("Singular matrix in solve_fflu")
 
+    if iszero(r)
+        x = zero_matrix(base_ring(A), ncols(A), ncols(b))
+        check_system_is_consistent(A, x, d*b, r)
+        return x, d
+    end
+
     x = _solve_fflu_postcomp(p, FFLU, b)
-    
+
+    # Because of the implicit `D` factor, we have to check consistency at the end.
+    check_system_is_consistent(A, x, d*b, r)
+
     if den == Val(true) || den == Val(:true)
         return x, d
 

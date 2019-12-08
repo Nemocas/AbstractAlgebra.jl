@@ -1281,9 +1281,13 @@ function fflu(A::MatrixElem{T}, P = PermGroup(nrows(A))) where {T <: RingElement
    rank, d = fflu!(p, U)
    for i = 1:m
       for j = 1:max(n,m)
-         if i > j
-            L[i, j] = U[i, j]
-            U[i, j] = R()
+          if i > j
+              if j > n
+                  L[i, j] = R(0)
+              else
+                  L[i, j] = U[i, j]
+                  U[i, j] = R()
+              end
          elseif i == j
             L[i, j] = j > n ? R(1) : U[i, j]
          elseif j <= m
