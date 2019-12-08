@@ -251,7 +251,7 @@ function solve(A::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T};
                nullspace = Val(false),
                method = nothing,
                scaled = Val(false),
-               side = Val(:right)
+               side = :right
                ) where {T}
 
     kwds = Dict(:kernel => kernel,
@@ -272,8 +272,9 @@ function solve(A::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T};
     TRUE_LIST = [Val(true), Val(:true), true]
     FALSE_LIST = [Val(false), Val(:false), false]
 
+    ####
+    # Apply the user suggested method.
     if isa(method, Function)
-        # Apply the user suggested method.
         error("Generic keyword selection not implemented for calling user method.")
         return method(A,b, kwds... )
         
@@ -281,8 +282,19 @@ function solve(A::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T};
         typ = typeof(method)
         error("Provided method is not of type Function. typeof(method) = $typ")
     end
-    
-    
+
+    ####
+    # Check the side parameter for correctness.
+    if side == Val(:right)
+        @warn "`side` parameter is a symbol."
+        side = :right
+    elseif side == Val(:left)
+        @warn "`side` parameter is a symbol."
+        side = :left
+    end
+
+    ####
+    # If unspecified, try to choose the right method.
     if T <: FieldElem
         if kernel in TRUE_LIST || nullspace in TRUE_LIST
             kernel = Val(true)

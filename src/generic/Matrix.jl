@@ -1849,6 +1849,7 @@ include("LinearSolve/LU-variants.jl")
 include("LinearSolve/HNF-variants.jl")
 include("LinearSolve/LeftRight.jl")
 include("LinearSolve/Other.jl")
+include("LinearSolve/AbstractDual.jl")
 
 
 ###############################################################################

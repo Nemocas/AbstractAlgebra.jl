@@ -46,9 +46,20 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T}; den=Val(true)) where {T <: Rin
 end
 
 
-function solve_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
-    check_solve_instance_is_well_defined(A,b)
+function solve_lu(A::MatElem{T}, b::MatElem{T}; side=:right) where {T <: FieldElement}
 
+    if side === :left
+        # It might be easier to do things this way, but you could in theory allocate
+        # the solution space as a TransposeIndexDual. Just remember to return the
+        # correct type afterward.
+        Adual = TransposeIndexDual(A)
+        bdual = TransposeIndexDual(b)
+        actual_sol = transpose(solve_lu(Adual, bdual, side=:right))
+        return actual_sol
+    end
+
+    check_solve_instance_is_well_defined(A,b)
+    
     LU = deepcopy(A)
     p = PermGroup(nrows(A))()
     r = lu!(p, LU)

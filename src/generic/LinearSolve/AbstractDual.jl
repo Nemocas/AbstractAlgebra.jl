@@ -3,17 +3,17 @@
 # It is going to be a royal pain to generalize the functionality to non-commutative
 # rings. In the mean time, we will still support duality for the day that occurs.
 
-abstract type OppositeRingFlag <: NCRing
-abstract type OppositeEltFlag <: NCRingElem
+abstract type OppositeRingFlag <: NCRing end
+abstract type OppositeEltFlag <: NCRingElem end
 
 # NOTE: Mutability is important for the constructors below.
 mutable struct BasicOppositeEltFlag{T} <: NCRingElem
     elt::T
 end
 
-@inline function BasicOppositeEltFlag(a::T) where T 
-    return BasicOppositeEltFlag{T}(a)
-end
+#@inline function BasicOppositeEltFlag(a::T) where T 
+#    return BasicOppositeEltFlag{T}(a)
+#end
 
 
 @inline function element(a::BasicOppositeEltFlag)
@@ -102,6 +102,12 @@ function BasicOppositeEltFlag(a::RingElement)
     return a
 end
 
+###############################################################################
+#
+#   TransposeIndexDual
+#
+###############################################################################
+
 mutable struct TransposeIndexDual{T} <: MatElem{T}
     elt::MatElem{T}
 end
@@ -117,16 +123,16 @@ end
 #
 ###############################################################################
 
-@inline function TransposeIndexDual(elt::MatElem{T}) where T
-    return TransposeIndexDual{T}(elt)
-end
+#@inline function TransposeIndexDual(elt::MatElem{T}) where T
+#    return TransposeIndexDual{T}(elt)
+#end
 
 @inline function element(D::TransposeIndexDual)
     return D.elt
 end
 
 @inline function TransposeIndexDual(D::TransposeIndexDual)
-    return element(elt)
+    return element(D)
 end
 
 function set_element!(D, elt)
@@ -134,11 +140,16 @@ function set_element!(D, elt)
     return D
 end
 
-function getindex(D::TransposeIndexDual, I, J)
+####
+# Implement a light version of the matrix interface.
+
+INDEX_TYPES = Union{Colon, Int64, AbstractArray{Int64,1}}
+
+function getindex(D::TransposeIndexDual, I::Int, J::Int)
     return BasicOppositeEltFlag(getindex(element(D), J, I))
 end
 
-function setindex!(D::TransposeIndexDual, I, J, a::OppositeEltFlag)
+function setindex!(D::TransposeIndexDual, a::OppositeEltFlag, I::INDEX_TYPES, J::INDEX_TYPES)
     elt = element(D)
     elt = setindex!(elt, J, I, typeof(a)(a))
     D = set_element!(D, elt)
@@ -146,10 +157,35 @@ function setindex!(D::TransposeIndexDual, I, J, a::OppositeEltFlag)
 end
 
 # Catch the trivial case with commutative rings.
-function setindex!(D::TransposeIndexDual, I, J, a::RingElement)
+function setindex!(D::TransposeIndexDual, a::RingElement, I::INDEX_TYPES, J::INDEX_TYPES)
     elt = element(D)
-    elt = setindex!(elt, J, I, a)
+    elt = setindex!(elt, a, J, I)
     return 
+end
+
+function ncols(D::TransposeIndexDual)
+    return nrows(element(D))
+end
+
+function nrows(D::TransposeIndexDual)
+    return ncols(element(D))
+end
+
+function size(D::TransposeIndexDual)
+    a,b = size(element(D))
+    return (b,a)
+end
+
+function base_ring(D::TransposeIndexDual)
+    return base_ring(element(D))
+end
+
+
+function view(D::TransposeIndexDual, rows::UnitRange{Int}, cols::UnitRange{Int})
+    elt = element(D)
+    elt_view = view(elt, cols, rows)
+    Dview = TransposeIndexDual(elt_view)
+    return Dview
 end
 
 # Change the memory layout of the element of `D` so that the
@@ -167,6 +203,21 @@ function column_major_access_form(D::TransposeIndexDual{T}) where T <: RingEleme
     return new_elt
 end
 
+###############################################################################
+#
+#   Similar
+#
+###############################################################################
+
+
+function _similar(x::TransposeIndexDual{T}, R::Ring, r::Int, c::Int) where T <: RingElement
+    TT = elem_type(R)
+    M = Matrix{TT}(undef, (c, r))
+    z = x isa AbstractAlgebra.MatElem ? MatSpaceElem{TT}(M) : MatAlgElem{TT}(M)
+    z.base_ring = R
+   return TransposeIndexDual(z)
+end
+
 
 ###############################################################################
 #
@@ -174,19 +225,19 @@ end
 #
 ###############################################################################
 
-@inline function MatrixOfOpposites(elt::MatElem{T}) where T
-    return MatrixOfOpposites{T}(elt)
-end
+#@inline function MatrixOfOpposites(elt::MatElem{T}) where T
+#    return MatrixOfOpposites{T}(elt)
+#end
 
 @inline function element(D::MatrixOfOpposites)
     return D.elt
 end
 
 @inline function MatrixOfOpposites(D::MatrixOfOpposites)
-    return element(elt)
+    return element(D)
 end
 
-function getindex(D::MatrixOfOpposites, I, J)
+function getindex(D::MatrixOfOpposites, I::INDEX_TYPES, J::INDEX_TYPES)
     return BasicOppositeEltFlag(getindex(element(D), J, I))
 end
 
@@ -198,7 +249,7 @@ function setindex!(D::MatrixOfOpposites, I, J, a::OppositeEltFlag)
 end
 
 # Catch the trivial case with commutative rings.
-function setindex!(D::MatrixOfOpposites, I, J, a::RingElement)
+function setindex!(D::MatrixOfOpposites, I::INDEX_TYPES, J::INDEX_TYPES, a::RingElement)
     elt = element(D)
     elt = setindex!(elt, I, J, a)
     return set_element!(D,elt)

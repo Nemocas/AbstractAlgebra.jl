@@ -214,7 +214,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row, add_ro
                  pow_multinomial, popov, popov_with_transform, 
                  precision, preimage, preimage_map, primpart, pseudodivrem,
                  pseudo_inv, pseudorem, push_term!, rank, randmat_triu,
-                 randmat_with_rank, rand_ordering, rank_profile_popov, remove,
+                 randmat_with_rank, rand_ordering, rank_profile_popov, remove, reduce!,
                  renormalize!, rels, rescale!, resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, retraction_map, reverse,

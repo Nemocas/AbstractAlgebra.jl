@@ -6,6 +6,7 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
 
     # TODO: Decide with Bill on the correct canonical FFLU form for long matrices.
     @warn "fflu does not work properly for `long` matrices. Caution is advised."
+    @warn "fflu does not fully reduce matrix in singular case. Some care is required."
 
     n = nrows(FFLU)
     m = ncols(FFLU)
@@ -14,7 +15,7 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
     rk = begin
         rk=min(n,m)
         for i = min(n,m):-1:1
-            iszero(FFLU[i,i]) ? rk -= 1 : break
+            iszero(FFLU[i,i]) ? rk -= 1 : nothing
         end
         rk
     end
@@ -89,7 +90,6 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
             x[i, k] = mul!(x[i, k], FFLU[rk, rk], x[i, k])
         end
 
-            
         # PROOF OF CORRECT USAGE:
         # By construction of `x` using `zero_matrix`, and assignment using `deepcopy`, we see
         # `x` is freshly allocated space and the entries are deepcopyed/newly allocated.
@@ -136,7 +136,9 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
 
     n = nrows(LU)
     m = ncols(LU)
-    
+
+    # TODO: The rank is not revealed by the diagonal elements unless the principal rxr
+    # block contains perfect information.
     rk = begin
         rk=min(n,m)
         for i = min(n,m):-1:1
@@ -226,6 +228,8 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
 
         #TODO: Replace the implicit `get_index` with a `view`.
 
+        #TODO: Fix issue where the wrong columns of `x` are assigned if the principal rxr
+        #      block is not invertable.
     end
     return x
 end
@@ -282,7 +286,7 @@ function _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_fun
     # Arithmetic container.
     t = base_ring(b)()
     ZERO = base_ring(b)()
-    
+
     # NOTE: This is the correct order of division for non-commutative rings.
     x[rk, k] = divexact_left(U[rk, rk], b[rk, k])
 

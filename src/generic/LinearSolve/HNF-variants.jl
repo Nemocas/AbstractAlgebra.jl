@@ -66,8 +66,20 @@ is assumed that it returns a correct Hermite normal form.
 function solve_hnf(A::MatElem{T}, b::MatElem{T};
                                   side = :right) where T <: RingElement
 
+    if side === :left
+        # It might be easier to do things this way, but you could in theory allocate
+        # the solution space as a TransposeIndexDual. Just remember to return the
+        # correct type afterward.
+        Adual = TransposeIndexDual(A)
+        bdual = TransposeIndexDual(b)
+        actual_sol = transpose(solve_hnf(Adual, bdual, side=:right))
+        return actual_sol
+    end
+    
     check_solve_instance_is_well_defined(A,b)
 
+    @warn "Principal `r x r`-block assumed faithful. Please fix!"
+    
     HNF, g = hnf_with_transform(A)
 
     n = nrows(HNF)
@@ -76,19 +88,21 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
     
     R = base_ring(HNF)
 
-    # Also allocates space for `x`.
-    x = view(g, 1:m, :)*b
-
     pcols  = _ut_pivot_columns(HNF)
     rk = length(pcols)
 
+    # Also allocates space for `x`. Since it is unclear to me if `g` has special properties
+    # for tall/long matrices, this is the extent to which I can optimize.
+    y = g*b
+    x = zero_matrix(R, m, nvecs)
+    
     for k=1:nvecs
         # PROOF OF CORRECT USAGE: 
-        # As the elements of `x` are distinct deepcopied elements of `b`, we see they
-        # are distinct and share no references between each other, `A`, or `b` aside from
-        # parents. Trivially `x===x`, so we have fulfilled the CONTRACT for using the `!!`
+        # As the elements of `x` are allocated in `zero_matrix`, we see they
+        # are distinct and share no references between each other, `A`, or `y` aside from
+        # parents. Thus, we have fulfilled the CONTRACT for using the `!!`
         # method.
-        x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], HNF[:, pcols], x[:,k], rk, 1)
+        x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], HNF[:, pcols], y[:,k], rk, 1)
     end
 
     # Because `divexact` **Does not throw and error** if an invalid division is performed,
