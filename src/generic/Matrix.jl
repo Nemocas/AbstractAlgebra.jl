@@ -190,6 +190,7 @@ Base.@propagate_inbounds getindex(a::Union{Mat, MatAlgElem}, r::Int, c::Int) = a
 Base.@propagate_inbounds function setindex!(a::Union{Mat, MatAlgElem}, d::RingElement,
                                             r::Int, c::Int)
     a.entries[r, c] = base_ring(a)(d)
+    return a
 end
 
 Base.eltype(::Type{<:MatrixElem{T}}) where {T} = T
@@ -1845,6 +1846,7 @@ end
 
 include("LinearSolve/Triangular.jl")
 include("LinearSolve/LU-variants.jl")
+include("LinearSolve/HNF-variants.jl")
 include("LinearSolve/LeftRight.jl")
 include("LinearSolve/Other.jl")
 

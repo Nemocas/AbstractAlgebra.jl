@@ -1,10 +1,47 @@
 
+################################################################################
+#
+#  Checks.
+#
+################################################################################
+
+
 function check_solve_instance_is_well_defined(A::MatElem{T}, b::MatElem{T}) where T
     base_ring(A) != base_ring(b) && error("Base rings don't match in solve_lu")
     nrows(A) != nrows(b) && throw(DimensionMismatch("nrows(A) != nrows(b)"))
 
     if nrows(A) == 0 || ncols(A) == 0 || ncols(b) == 0
         throw(DimensionMismatch("Solve Ax=b instance with either A=$A or b=$b empty."))
+    end
+    return true
+end
+
+@doc Markdown.doc"""
+    check_system_is_consistent(A,x,b,rk)
+
+Checks if `A[rk+1:n, :]*x == b`, where `n` is the number of rows of `A`.
+An error is raised otherwise.
+"""
+function check_system_is_consistent(A, x, b, rk = 0::Int)
+
+    n = nrows(A)
+    m = ncols(A)
+    nvecs = max(ncols(x), ncols(b))
+
+    # Containers
+    t = base_ring(b)()
+    sum = base_ring(b)()
+
+    # Check all the dot products.
+    for k = 1:nvecs
+        for i = rk+1:n
+            sum = zero!(sum)
+            for j=1:m 
+                sum = addmul_delayed_reduction!(sum, A[i, j], x[j, k], t)
+            end
+            sum = reduce!(sum)
+            sum != b[i,k] && throw(DomainError((A, x, b), "Solve instance is inconsistent."))
+        end
     end
     return true
 end
@@ -212,27 +249,84 @@ end
 function solve(A::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T};
                kernel = Val(false),
                nullspace = Val(false),
-               method = Val(false),
+               method = nothing,
+               scaled = Val(false),
                side = Val(:right)
-               
-               ) where T
+               ) where {T}
 
-    # Ultimately solve is just a UI function designed to parse the solve instance and dispatch
-    # to the method that will actually do the work.
-
-    # In the event `solve` cannot determine a method to solve `A*x == b`, it will give a reason
-    # and a recommendation/override instructions.
+    kwds = Dict(:kernel => kernel,
+                :nullspace => nullspace,
+                :method => method,
+                :scaled => scaled,
+                :side => side
+                )
     
     # Set up solve instance based on parameters, then call the right method, if possible.
+    #
+    # Ultimately solve is just a UI function designed to parse the solve instance and dispatch
+    # to the method that will actually do the work.
+    #
+    # In the event `solve` cannot determine a method to solve `A*x == b`, it will give a reason
+    # and a recommendation/override instructions.
 
-    # kernel -- requires HNF or custom ultra_generic interface.
+    TRUE_LIST = [Val(true), Val(:true), true]
+    FALSE_LIST = [Val(false), Val(:false), false]
 
-    # nullspace -- implicitly asks for the version of the problem over the fraction field.
+    if isa(method, Function)
+        # Apply the user suggested method.
+        error("Generic keyword selection not implemented for calling user method.")
+        return method(A,b, kwds... )
+        
+    elseif !isa(method, Nothing)
+        typ = typeof(method)
+        error("Provided method is not of type Function. typeof(method) = $typ")
+    end
+    
+    
+    if T <: FieldElem
+        if kernel in TRUE_LIST || nullspace in TRUE_LIST
+            kernel = Val(true)
+        end
+        return solve_lu(A,b, side=side, kernel=kernel)
+        
+    elseif hasmethod(hnf_with_transform, Tuple{typeof(A)})
+        if kernel in TRUE_LIST || nullspace in TRUE_LIST
+            kernel = Val(true)
+        else
+            kernel = Val(false)
+        end
+        # If you want different behaviour for nullspace rather than kernel, change it
+        # here:
+        return solve_hnf(A,b, side=side, kernel=kernel)
 
-    # 
-    error("Top level calls not implemented.")
+    elseif scaled in TRUE_LIST
+        if kernel in TRUE_LIST
+            msg = ("Kernel not supported if no Hermite Normal Form method exists. "*
+                   "Either use `nullspace=Val(true)` to get an integral basis for the "*
+                   "kernel in the fraction field, or implement `hnf_with_transform`.")
+            throw(DomainError(kernel, msg))
+        elseif nullspace in TRUE_LIST
+            nullspace = Val(true)
+        else
+            nullspace = Val(false)
+        end
+        
+        return solve_scaled_ff(A,b, nullspace=nullspace)
+    end
+
+    # Don't know what to do, throw nice error message.
+    return _solve_generic(A,b; kwds...)
 end
 
-function _solve_generic(A::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
-
+function _solve_generic(A::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}; kwds...) where T
+    display("Unfortunately, solve cannot solve your linear system `A*x = b` with:")
+    @info "" typeof(A) typeof(b)
+    display("This is because none of the following conditions held: ")
+    @info "" (typeof(A) <: Field) hasmethod(hnf_with_transform, Tuple{typeof(A)}) kwds[:scaled]==Val(true)
+    display("If it is sufficent to solve `A*x = d*b` for some non-zero `d`, set `scaled=Val(true)`.")
+    display("If you control the type `T` of the base ring elements, and have a method in mind, you can write your own solve method and dispatch will take care of the rest.")
+    display("finally, the list of available solve functions is: ")
+    @info "" solve_lu solve_scaled_ff solve_rational
+    display("Please see the documentation for more information.")
+    error("No method found for solving `A*x = b` as given.")
 end

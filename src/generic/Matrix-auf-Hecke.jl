@@ -22,17 +22,17 @@ T- Zero matrix constructors
 T- iszero_row
 T- diagonal_matrix, isdiagonal, diagonal
 T- concatination [Already there]
+-- is upper/lower triangular
 -- array interface [Some already there]
--- reduce_mod
 -- find_pivot
--- can_solve and friends... (Big...)
 -- minpoly/charpoly
 -- basic eigenvector
 
 NOT DONE:
+-- reduce_mod
+-- can_solve and friends... (Big...)
 -- Kernel function.
 -- Kernel with base ring
--- is upper/lower triangular
 -- triangular solving
 
 -- where the hell is the Array/Matrix interface promised in the Documentation?
@@ -238,6 +238,37 @@ Returns the diagonal of `A` is as array.
 """
 diagonal(A::Generic.Mat{T}) where {T} = T[A[i, i] for i in 1:nrows(A)]
 
+################################################################################
+#
+#  IsUpper\Lower triangular 
+#
+################################################################################
+
+function isupper_triangular(M::MatElem)
+    n = nrows(M)
+    m = ncols(M)
+    for i = 2:n
+        for j = 1:i-1
+            if !iszero(M[i, j])
+                return false
+            end
+        end
+    end
+    return true
+end
+
+function islower_triangular(M::MatElem)
+    n = nrows(M)
+    m = ncols(M)
+    for i = 1:n
+        for j = i+1:m
+            if !iszero(M[i, j])
+                return false
+            end
+        end
+    end
+    return true
+end
 
 ################################################################################
 #

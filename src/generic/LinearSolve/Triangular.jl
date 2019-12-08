@@ -230,37 +230,6 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
     return x
 end
 
-@doc Markdown.doc"""
-    check_system_is_consistent(A,x,b,rk)
-
-Checks if `A[rk+1:n, :]*x == b`, where `n` is the number of rows of `A`.
-An error is raised otherwise.
-"""
-function check_system_is_consistent(A, x, b, rk = 0::Int)
-
-    n = nrows(A)
-    m = ncols(A)
-    nvecs = max(ncols(x), ncols(b))
-
-    # Containers
-    t = base_ring(b)()
-    sum = base_ring(b)()
-
-    # Check all the dot products.
-    for k = 1:nvecs
-        for i = rk+1:n
-            sum = zero!(sum)
-            for j=1:m 
-                sum = addmul_delayed_reduction!(sum, A[i, j], x[j, k], t)
-            end
-            sum = reduce!(sum)
-            sum != b[i,k] && throw(DomainError((A, x, b), "Solve instance is inconsistent."))
-        end
-    end
-    return true
-end
-
-
 # NOTE: Very dangerous function, and breaks the mutability edicts set out in
 # https://github.com/Nemocas/Nemo.jl/issues/278
 #
