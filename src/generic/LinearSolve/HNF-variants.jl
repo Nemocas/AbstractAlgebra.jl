@@ -110,6 +110,27 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
     check_system_is_consistent(A, x, b, 0)
     
     return x
+
+    ####
+    # With kernel
+
+    # Scan backward for the first non-zero row, once found, set the nullspace to
+    # be the bottom rows (for a left-solve)
+    for i = nrows(HNF):-1:1
+        for j = 1:ncols(HNF)
+            if !iszero(HNF[i,j])
+                N = similar(A, ncols(A), nrows(HNF) - i)
+                for k = 1:nrows(N)
+                    for l = 1:ncols(N)
+                        N[k,l] = T[nrows(T) - l + 1, k]
+                    end
+                end
+                return true, transpose(z*T), N
+            end
+        end
+    end
+    N =  similar(A, ncols(A), 0)
+
         
     #=
     if side === :right

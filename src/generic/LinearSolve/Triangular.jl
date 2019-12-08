@@ -273,6 +273,8 @@ end
 #
 function _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x, U, b, rk, k)
 
+    # TODO: clone this method for lower triangular solve.
+    
     if iszero(rk)
         return x
     end
