@@ -100,9 +100,10 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
         # Thus, the elements of `x` share no references between each other or the entries of
         # FFLU, even in part, aside from parents.
         # Moreover, trivially, `x===x`. Thus, we have fulfilled the CONTRACT for using
-        # the `!!` method.        
-        x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], FFLU[:, pcols], x[:,k], rk, 1)
-
+        # the `!!` method.
+        if !iszero(rk)
+            x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], FFLU[:, pcols], x[:,k], rk, 1)
+        end
         #TODO: Replace the implicit `get_index` with a `view`.
         
         # Backsolve the upper triangular part. However, things have been rearranged
@@ -221,9 +222,11 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
         # deepcopyed/newly allocated.
         # Thus, the elements of `x` share no references, even in part, aside from parents.
         # Moreover, trivially, `x===x`. Thus, we have fulfilled the CONTRACT for using
-        # the `!!` method.        
-        x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], LU[:, pcols], x[:,k], rk, 1)
-
+        # the `!!` method.
+        if !iszero(rk)
+            x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], LU[:, pcols], x[:,k], rk, 1)
+        end
+        
         #TODO: Replace the implicit `get_index` with a `view`.
 
         #TODO: Fix issue where the wrong columns of `x` are assigned if the principal rxr
@@ -272,12 +275,6 @@ end
 # the mutability edicts should not share references from `A` or `b` in the caller.
 #
 function _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x, U, b, rk, k)
-
-    # TODO: clone this method for lower triangular solve.
-    
-    if iszero(rk)
-        return x
-    end
 
     n  = nrows(U)
     m  = ncols(U)

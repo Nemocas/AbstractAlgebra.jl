@@ -102,7 +102,9 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
         # are distinct and share no references between each other, `A`, or `y` aside from
         # parents. Thus, we have fulfilled the CONTRACT for using the `!!`
         # method.
-        x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], HNF[:, pcols], y[:,k], rk, 1)
+        if !iszero(rk)
+            x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], HNF[:, pcols], y[:,k], rk, 1)
+        end
     end
 
     # Because `divexact` **Does not throw and error** if an invalid division is performed,
