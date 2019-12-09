@@ -563,7 +563,7 @@ end
 
 @testset "Generic.MatAlg.solve_lu..." begin
    S = QQ
-
+    
    for dim = 0:5
       R = MatrixAlgebra(S, dim)
       U = MatrixAlgebra(S, dim)
@@ -571,15 +571,19 @@ end
       M = randmat_with_rank(R, dim, -100:100)
       b = rand(U, -100:100)
 
-      x = Generic.solve_lu(M, b)
-
-      @test M*x == b
+      if dim != 0
+         x = Generic.solve_lu(M, b)
+         @test M*x == b
+      else
+         @test_throws DimensionMismatch Generic.solve_lu(M, b)
+      end
+       
    end
 
    S, y = PolynomialRing(ZZ, "y")
    K = FractionField(S)
 
-   for dim = 0:5
+   for dim = 1:5
       R = MatrixAlgebra(S, dim)
       U = MatrixAlgebra(S, dim)
       T = MatrixAlgebra(K, dim)

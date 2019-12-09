@@ -181,9 +181,9 @@ function base_ring(D::TransposeIndexDual)
 end
 
 
-function Base.view(D::TransposeIndexDual, rows::UnitRange{Int}, cols::UnitRange{Int})
+function Base.view(D::TransposeIndexDual, I::Vararg{Any, N}) where N
     elt = element(D)
-    elt_view = view(elt, cols, rows)
+    elt_view = view(elt, I...)
     Dview = TransposeIndexDual(elt_view)
     return Dview
 end

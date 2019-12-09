@@ -195,6 +195,9 @@ end
 
 Base.eltype(::Type{<:MatrixElem{T}}) where {T} = T
 
+# Really not sure if this is a good idea for an abstract type, but legacy...
+entries(a::Mat{T}) where T = a.entries
+
 Base.isassigned(a::Union{Mat,MatAlgElem}, i, j) = isassigned(a.entries, i, j)
 
 function Base.isassigned(a::MatrixElem, i, j)
@@ -389,10 +392,23 @@ function _to_indices(x, rows, cols)
    (rows, cols)
 end
 
-function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: RingElement
-   return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
+@doc Markdown.doc"""
+    Base.view(M::Mat{T}, VarArg{Any, N}) where {N}
+
+Forward the `view` call to the underlying (abstract) array given by `entries(M)`.
+Return a MatSpaceView object.
+"""
+function Base.view(M::MatElem{T}, I::Vararg{Any, N}) where {T,N}
+   return MatSpaceView(view(entries(M), I...), base_ring(M))
 end
 
+#function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: RingElement
+#   return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
+#end
+
+# TODO:
+# Completely wrong philosophically, but Nemo matrix types only catch `UnitRange{Int}` arg types,
+# and probably wasn't built to handle general `to_indices` logic. For now, the code must stay.
 function Base.view(M::AbstractAlgebra.MatElem{T}, rows::Colon, cols::UnitRange{Int}) where T <: RingElement
    return view(M, 1:nrows(M), cols)
 end
