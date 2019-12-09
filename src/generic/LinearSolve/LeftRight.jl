@@ -9,14 +9,14 @@ function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
     return solve_lu(a,b,side=:left)
 end
 
-#=
+
 @doc Markdown.doc"""
     solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
 > Given an $r\times n$ matrix $a$ over a ring and an $m\times n$ matrix $b$
 > over the same ring, return an $m\times r$ matrix $x$ such that $xa = b$. If
 > no such matrix exists, an exception is raised.
 """
-function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
+function old_solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
    @assert ncols(a) == ncols(b)
    H, T = hnf_with_transform(a)
    b = deepcopy(b)
@@ -46,6 +46,7 @@ function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
    return z*T
 end
 
+#=
 function solve_left(A::AbstractAlgebra.MatElem{T}, B::AbstractAlgebra.MatElem{T}) where T <: FieldElement
   R = base_ring(A)
   ncols(A) != ncols(B) && error("Incompatible matrices")

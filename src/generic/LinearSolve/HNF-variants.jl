@@ -64,8 +64,10 @@ The method `hnf_with_transform` must be implemented for the type, and it
 is assumed that it returns a correct Hermite normal form. 
 """
 function solve_hnf(A::MatElem{T}, b::MatElem{T};
-                                  side = :right) where T <: RingElement
+                                  side = :right, kernel=Val(false)) where T <: RingElement
 
+    @info "" A
+    
     if side === :left
         # It might be easier to do things this way, but you could in theory allocate
         # the solution space as a TransposeIndexDual. Just remember to return the
@@ -75,25 +77,35 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
         actual_sol = transpose(solve_hnf(Adual, bdual, side=:right))
         return actual_sol
     end
+
+    if kernel != Val(false)
+        error("Kernel not yet supported in `solve_lu`.")
+    end
     
     check_solve_instance_is_well_defined(A,b)
-
-    @warn "Principal `r x r`-block assumed faithful. Please fix!"
+    isempty(b) && return _solve_empty(A,b)
     
-    HNF, g = hnf_with_transform(A)
+    @warn "Principal `r x r`-block assumed faithful. Please fix!"
 
-    n = nrows(HNF)
-    m = ncols(HNF)
+    # Writing `A^T = UH`, we want to solve Ax = (UH)^T*x = b. To optimize the cubic
+    # part of the algorithm, we enforce that access is column-major. Note `H^T` is actually
+    # lower-triangular.
+    HNFt, g = hnf_with_transform(column_major_access_form(TransposeIndexDual(A)))
+    lHNF = TransposeIndexDual(HNFt)
+    
+    @info "" lHNF typeof(g)
+    
+    n = nrows(lHNF)
+    m = ncols(lHNF)
     nvecs = ncols(b)
     
-    R = base_ring(HNF)
+    R = base_ring(lHNF)
 
-    pcols  = _ut_pivot_columns(HNF)
-    rk = length(pcols)
+    prows  = _ut_pivot_columns(HNFt)
+    rk = length(prows)
 
     # Also allocates space for `x`. Since it is unclear to me if `g` has special properties
     # for tall/long matrices, this is the extent to which I can optimize.
-    y = g*b
     x = zero_matrix(R, m, nvecs)
     
     for k=1:nvecs
@@ -103,15 +115,23 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
         # parents. Thus, we have fulfilled the CONTRACT for using the `!!`
         # method.
         if !iszero(rk)
-            x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], HNF[:, pcols], y[:,k], rk, 1)
+            lHNFview = view(lHNF, prows, :)
+            xview = view(x, prows, k:k)
+            bview = view(b, :, k:k)
+
+            # TODO: Fix for immutable types.
+            xview = _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_function(xview, lHNFview, bview, rk, 1)
         end
     end
 
     # Because `divexact` **Does not throw and error** if an invalid division is performed,
     # we need to perform the consistency check on every row.
-    check_system_is_consistent(A, x, b, 0)
+
+    @info "" g x A b 
+    sol = transpose(g)*x
+    check_system_is_consistent(A, sol, b, 0)
     
-    return x
+    return sol
 
     ####
     # With kernel

@@ -187,7 +187,13 @@
         end
     end
 
+    @testset "Difficult HNF..." begin
+        At,xt,bt = ( matrix(ZZ,[-12  19   12  -19   -7;  17   9  -19  -19  -17]),
+		   matrix(ZZ, [96  79   81; 18   4  -11; 0 0 0; 0 0 0; 0 0 0]),
+		   matrix(ZZ, [135 563 99; 471  -630  -514]))
 
+        
+    end
     @testset "Generic.Mat.solve_rational..." begin
         S = ResidueRing(ZZ, 20011*10007)
 

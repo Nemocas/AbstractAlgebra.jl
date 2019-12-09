@@ -180,13 +180,38 @@ function base_ring(D::TransposeIndexDual)
     return base_ring(element(D))
 end
 
+###############################################################################
+#
+#   Views
+#
+###############################################################################
 
-function Base.view(D::TransposeIndexDual, I::Vararg{Any, N}) where N
+function Base.view(D::TransposeIndexDual, I::Vararg{Any, 2})
     elt = element(D)
-    elt_view = view(elt, I...)
+    elt_view = view(elt, I[2], I[1])
     Dview = TransposeIndexDual(elt_view)
     return Dview
 end
+
+# We have to copy this broken logic everywhere we change view because of NEMO.
+
+function Base.view(D::TransposeIndexDual{T}, rows::Colon, cols::UnitRange{Int}) where T <: RingElement
+   return view(D, 1:nrows(D), cols)
+end
+
+function Base.view(D::TransposeIndexDual{T}, rows::UnitRange{Int}, cols::Colon) where T <: RingElement
+   return view(D, rows, 1:ncols(D))
+end
+
+function Base.view(D::TransposeIndexDual{T}, rows::Colon, cols::Colon) where T <: RingElement
+   return view(D, 1:nrows(D), 1:ncols(D))
+end
+
+###############################################################################
+#
+#   Change memory layout
+#
+###############################################################################
 
 # Change the memory layout of the element of `D` so that the
 # get/set index is accessed in column major order. As you can see,
@@ -203,12 +228,15 @@ function column_major_access_form(D::TransposeIndexDual{T}) where T <: RingEleme
     return new_elt
 end
 
+function column_major_access_form(M::MatSpaceElem)
+    return M
+end
+
 ###############################################################################
 #
 #   Similar
 #
 ###############################################################################
-
 
 function _similar(x::TransposeIndexDual{T}, R::Ring, r::Int, c::Int) where T <: RingElement
     TT = elem_type(R)

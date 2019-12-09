@@ -16,7 +16,7 @@ The parameter `den` determines if the denominator `d` is returned, and how it is
 Default is Val(true) for legacy reasons, which is inconsistant with normal solve syntax.
 """
 function solve_fflu(A::MatElem{T}, b::MatElem{T};
-                    den=Val(true), side = :right) where {T <: RingElement}
+                    den=Val(true), side = :right, kernel = Val(false)) where {T <: RingElement}
 
     if side === :left
         # It might be easier to do things this way, but you could in theory allocate
@@ -29,8 +29,13 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T};
         return actual_sol, d
     end
 
+    if kernel != Val(false)
+        error("Kernel not yet supported in `solve_fflu`.")
+    end
+    
     check_solve_instance_is_well_defined(A,b)
-
+    isempty(b) && return _solve_empty(A,b), base_ring(b)(1) # Empty determinant is 1.
+    
     FFLU = deepcopy(A)
     p = PermGroup(nrows(A))()
     r, d = fflu!(p, FFLU)
@@ -69,7 +74,8 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T};
 end
 
 
-function solve_lu(A::MatElem{T}, b::MatElem{T}; side=:right) where {T <: FieldElement}
+function solve_lu(A::MatElem{T}, b::MatElem{T};
+                  side=:right, kernel=Val(false)) where {T <: FieldElement}
 
     if side === :left
         # It might be easier to do things this way, but you could in theory allocate
@@ -77,11 +83,18 @@ function solve_lu(A::MatElem{T}, b::MatElem{T}; side=:right) where {T <: FieldEl
         # correct type afterward.
         Adual = TransposeIndexDual(A)
         bdual = TransposeIndexDual(b)
-        actual_sol = transpose(solve_lu(Adual, bdual, side=:right))
+        actual_sol = transpose(solve_lu(Adual, bdual, side=:right, kernel=kernel))
         return actual_sol
     end
 
+    @info "" A b
+    
+    if kernel != Val(false)
+        error("Kernel not yet supported in `solve_lu`.")
+    end
+        
     check_solve_instance_is_well_defined(A,b)
+    isempty(b) && return _solve_empty(A,b)
     
     LU = deepcopy(A)
     p = PermGroup(nrows(A))()

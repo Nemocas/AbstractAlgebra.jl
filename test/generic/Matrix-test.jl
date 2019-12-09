@@ -1186,7 +1186,7 @@ end
 @testset "Generic.Mat.solve_lu..." begin
    S = QQ
 
-   for dim = 1:5
+   for dim = 0:5
       R = MatrixSpace(S, dim, dim)
       U = MatrixSpace(S, dim, rand(1:5))
 

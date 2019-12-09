@@ -211,7 +211,7 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
 
         # Below the last row where `U` has a pivot, the entries
         # of `LU` are just the entries of `L`.
-        check_system_is_consistent(LU, view(x, : , k:k), view(b, :, k:k) , rk)
+        check_system_is_consistent(LU, view(x, : , k:k), view(pb, :, k:k) , rk)
         
         # Since _ut_pivot_columns only checks entries above the diagonal,
         # it effectively only reads the `U` part of the `LU` object.
@@ -224,7 +224,13 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
         # Moreover, trivially, `x===x`. Thus, we have fulfilled the CONTRACT for using
         # the `!!` method.
         if !iszero(rk)
-            x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], LU[:, pcols], x[:,k], rk, 1)
+            LUview = view(LU, :, pcols)
+            xview = view(x, pcols, k:k)
+            bview = view(b, :, k:k)
+            #xview = _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_function(xview, lHNFview, bview, rk, 1)
+
+            #TODO: Fix for immutable types.
+            xview = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(xview, LUview, xview, rk, 1)
         end
         
         #TODO: Replace the implicit `get_index` with a `view`.
@@ -234,6 +240,87 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
     end
     return x
 end
+
+###############################################################################
+#
+#   Internal Nonsingular triangular solving. (The Danger Zone)
+#
+###############################################################################
+
+
+# NOTE: Very dangerous function, and breaks the mutability edicts set out in
+# https://github.com/Nemocas/Nemo.jl/issues/278
+#
+# CONTRACT:
+#   (*) The contract does not cover cases where allocation and assignment functions (ex: deepcopy)
+# have been maliciously or negligently tampered with, in which case the TYPE owner assumes
+# all fault.
+#
+# By involking this function, you (the calling method) have intended target of mutation
+# `x` and can certify that either:
+#
+# 1. `A,b` shares no references (even in part, aside from parents)
+#     with `x`, or
+#
+# 2. `x===b`, the mutation on `b` (i.e `x`) is intended, and elements of `x` share no
+#    references between each other, even in part, aside from parents.
+#
+# 3. The matrix `A` is in reduced upper-triangular form.
+#
+# 4. A correct proof that conditions 1-3 have been satisfied, given (*), exists at the call site.
+#
+#
+# Under these conditions, I (the function) agree that
+#
+# 1. `A` and constituants are not modified in any way, shape, or form,
+# 2. either `b===x`, or `b` and its constituants are not modified in any, shape, or form.
+# 3. The output `x` will be a solution to `Ax==b`.
+#
+# Failure to abide by the terms of this contract absolves this function of any liability,
+# and usually will result in misery and suffering.
+#
+# Your SIGNATURE of the contract is the `git-blame` info at the call site. MY signature is
+# the `git-blame` info at this contract.
+#
+# The reason this function exists is that solve methods have the same pattern of
+# back-substitution, but generally only want to allocate the memory for the solution
+# vector once. `x` is assumed to be such an output container, which by definition of
+# the mutability edicts should not share references from `A` or `b` in the caller.
+#
+function _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_function(x, L, b, rk, k)
+
+    n  = nrows(L)
+    m  = ncols(L)
+    #rk = min(n,m)::Int
+
+    # Arithmetic container.
+    t = base_ring(b)()
+    ZERO = base_ring(b)()
+
+    # NOTE: This is the correct order of division for non-commutative rings.
+    x[1, k] = divexact_left(L[1, 1], b[1, k])
+
+    # The lower triangular back-substitution. Along rows.
+    for i in 2:rk
+        
+        # Theoretically `x[i,k] = add!(x[i,k], b[i,k], ZERO)` should be sufficient,
+        # but I really don't trust that `add!` has uniform behaviour.
+        t = zero!(t)
+        t = addeq!(t, b[i,k])
+        x[i,k] = add!(x[i,k], t, ZERO)
+        
+        for j in 1:(i - 1)
+            # x[i, k] = x[i, k] - x[j, k] * L[i, j]
+            t = mul_red!(t, x[j, k], -L[i, j], false)
+            x[i, k] = addeq!(x[i, k], t)
+        end
+        x[i, k] = reduce!(x[i, k])
+        x[i, k] = divexact_left(L[i, i], x[i, k])
+    end
+
+    return x
+end
+
 
 # NOTE: Very dangerous function, and breaks the mutability edicts set out in
 # https://github.com/Nemocas/Nemo.jl/issues/278
@@ -307,6 +394,12 @@ function _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_fun
 
     return x
 end
+
+###############################################################################
+#
+#   Pivot column selection.
+#
+###############################################################################
 
 #=
 @doc Markdown.doc"""

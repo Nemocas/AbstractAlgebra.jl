@@ -393,7 +393,7 @@ function _to_indices(x, rows, cols)
 end
 
 @doc Markdown.doc"""
-    Base.view(M::Mat{T}, VarArg{Any, N}) where {N}
+    Base.view(M::MatElem{T}, VarArg{Any, N}) where {N}
 
 Forward the `view` call to the underlying (abstract) array given by `entries(M)`.
 Return a MatSpaceView object.

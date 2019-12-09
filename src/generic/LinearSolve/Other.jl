@@ -10,8 +10,8 @@ function check_solve_instance_is_well_defined(A::MatElem{T}, b::MatElem{T}) wher
     base_ring(A) != base_ring(b) && error("Base rings don't match in solve_lu")
     nrows(A) != nrows(b) && throw(DimensionMismatch("nrows(A) != nrows(b)"))
 
-    if nrows(A) == 0 || ncols(A) == 0 || ncols(b) == 0
-        throw(DimensionMismatch("Solve Ax=b instance with either A=$A or b=$b empty."))
+    if isempty(A) && !isempty(b)
+        throw(DimensionMismatch("Solve Ax=b instance with A=$A empty and b=$b non-empty."))
     end
     return true
 end
@@ -42,12 +42,17 @@ function check_system_is_consistent(A, x, b, rk = 0::Int)
             sum = reduce!(sum)
 
             if sum != b[i,k]
-                @info "Residual: " i k (sum - b[i,k]) 
+                @info "Residual: " i k rk base_ring(b) (sum - b[i,k]) 
                 throw(DomainError((A, x, b), "Solve instance is inconsistent."))
             end
         end
     end
     return true
+end
+
+# Solve the empty instance, assuming it is well-defined.
+function _solve_empty(A,b)
+    return similar(b, ncols(A), ncols(b))
 end
 
 ################################################################################
@@ -176,7 +181,14 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
          V[l], d[l] = solve_with_det(X, Y)
          l = l + 1
       catch e
-         if !(e isa ErrorException)
+          #TODO: One could make an optimization here. If you've found a specialization
+          # that is inconsistent, this corresponds to a pole of the solution. This is quite,
+          # useful information to know about the solution, and can reduce the size of
+          # future solve instances.
+         if e isa DivideError
+             @warn ("Division error in solve_fflu. This occurs because the diagonal entries "*
+                    "of the FFLU form are not sorted in any particular order. Please fix.")
+         elseif !(e isa DomainError)
             rethrow(e)
          end
          i = i + 1
