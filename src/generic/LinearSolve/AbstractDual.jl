@@ -11,11 +11,6 @@ mutable struct BasicOppositeEltFlag{T} <: NCRingElem
     elt::T
 end
 
-#@inline function BasicOppositeEltFlag(a::T) where T 
-#    return BasicOppositeEltFlag{T}(a)
-#end
-
-
 @inline function element(a::BasicOppositeEltFlag)
     return a.elt
 end
@@ -123,10 +118,6 @@ end
 #
 ###############################################################################
 
-#@inline function TransposeIndexDual(elt::MatElem{T}) where T
-#    return TransposeIndexDual{T}(elt)
-#end
-
 @inline function element(D::TransposeIndexDual)
     return D.elt
 end
@@ -193,7 +184,7 @@ function Base.view(D::TransposeIndexDual, I::Vararg{Any, 2})
     return Dview
 end
 
-# We have to copy this broken logic everywhere we change view because of NEMO.
+# We have to copy this broken logic everywhere we change `view` because of NEMO.
 
 function Base.view(D::TransposeIndexDual{T}, rows::Colon, cols::UnitRange{Int}) where T <: RingElement
    return view(D, 1:nrows(D), cols)
@@ -252,10 +243,6 @@ end
 #   More fancy silliness on top of the silliness.
 #
 ###############################################################################
-
-#@inline function MatrixOfOpposites(elt::MatElem{T}) where T
-#    return MatrixOfOpposites{T}(elt)
-#end
 
 @inline function element(D::MatrixOfOpposites)
     return D.elt

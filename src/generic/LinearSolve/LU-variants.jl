@@ -39,7 +39,6 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T};
     FFLU = deepcopy(A)
     p = PermGroup(nrows(A))()
     r, d = fflu!(p, FFLU)
-    #r < nrows(A) && error("Singular matrix in solve_fflu")
 
     if iszero(r)
         x = zero_matrix(base_ring(A), ncols(A), ncols(b))

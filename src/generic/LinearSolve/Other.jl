@@ -106,34 +106,6 @@ function solve_ff(M::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
     return x
 end
 
-#=
-function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
-   # We cannot use solve_fflu directly, since it forgot about the (parity of
-   # the) permutation.
-   nrows(M) != ncols(M) && error("Non-square matrix")
-   R = base_ring(M)
-   FFLU = deepcopy(M)
-   p = PermGroup(nrows(M))()
-   r, d = fflu!(p, FFLU)
-   if r < nrows(M)
-      error("Singular matrix in solve_with_det")
-   end
-   x = solve_fflu_precomp(p, FFLU, b)
-   # Now M*x = d*b, but d is only sign(P) * det(M)
-   if parity(p) != 0
-      minus_one = R(-1)
-      for k in 1:ncols(x)
-         for i in 1:nrows(x)
-            # We are allowed to modify x in-place.
-            x[i, k] = mul!(x[i, k], x[i, k], minus_one)
-         end
-      end
-      d = mul!(d, d, minus_one)
-   end
-   return x, d
-end
-=#
-
 function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
     return solve_fflu(M,b; den=Val(:det))
 end

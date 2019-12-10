@@ -142,7 +142,8 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
 
     ####
     # With kernel
-
+    # TODO: XXX: Implement the logic.
+    
     # Scan backward for the first non-zero row, once found, set the nullspace to
     # be the bottom rows (for a left-solve)
     for i = nrows(HNF):-1:1
@@ -159,24 +160,6 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
         end
     end
     N =  similar(A, ncols(A), 0)
-
-        
-    #=
-    if side === :right
-        @assert nrows(A) == nrows(B)
-        return _can_solve(A, B)
-    elseif side === :left
-        @assert ncols(A) == ncols(B)
-        b, C = _can_solve(transpose(A), transpose(B))
-        if b
-            return true, transpose(C)
-        else
-            return false, C
-        end
-    else
-        error("Unsupported argument :$side for side: Must be :left or :right")
-    end
-    =#
 end
 
 
@@ -314,84 +297,3 @@ function _can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: FieldEl
   end
   return true, sol, n
 end
-
-
-
-################################################################################
-#
-#  "Can solve with kernel (Ring)" (To be demolished.)
-#
-################################################################################
-
-
-#=
-@doc Markdown.doc"""
-    can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: RingElem -> Bool, MatElem, MatElem
-
-Tries to solve $Ax = B$ for $x$ if `side = :right` or $xA = B$ if `side = :left`.
-It returns the solution and the right respectively left kernel of $A$.
-"""
-function can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}; side = :right) where T <: RingElem
-  @assert base_ring(A) == base_ring(B)
-  if side === :right
-    @assert nrows(A) == nrows(B)
-    return _can_solve_with_kernel(A, B)
-  elseif side === :left
-    b, C, K = _can_solve_with_kernel(transpose(A), transpose(B))
-    @assert ncols(A) == ncols(B)
-    if b
-      return b, transpose(C), transpose(K)
-    else
-      return b, C, K
-    end
-  else
-    error("Unsupported argument :$side for side: Must be :left or :right")
-  end
-end
-
-function _can_solve_with_kernel(a::MatElem{S}, b::MatElem{S}) where S <: RingElem
-  H, T = hnf_with_transform(transpose(a))
-  z = similar(a, ncols(b), ncols(a))
-  l = min(nrows(a), ncols(a))
-  b = deepcopy(b)
-  for i=1:ncols(b)
-    for j=1:l
-      k = 1
-      while k <= ncols(H) && iszero(H[j, k])
-        k += 1
-      end
-      if k > ncols(H)
-        continue
-      end
-      q, r = divrem(b[k, i], H[j, k])
-      if !iszero(r)
-        return false, b, b
-      end
-      for h=k:ncols(H)
-        b[h, i] -= q*H[j, h]
-      end
-      z[i, j] = q
-    end
-  end
-  if !iszero(b)
-    return false, b, b
-  end
-
-  for i = nrows(H):-1:1
-    for j = 1:ncols(H)
-      if !iszero(H[i,j])
-        N = similar(a, ncols(a), nrows(H) - i)
-        for k = 1:nrows(N)
-          for l = 1:ncols(N)
-            N[k,l] = T[nrows(T) - l + 1, k]
-          end
-        end
-        return true, transpose(z*T), N
-      end
-    end
-  end
-  N =  similar(a, ncols(a), 0)
-
-  return true, transpose(z*T), N
-end
-=#

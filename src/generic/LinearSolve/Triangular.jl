@@ -4,7 +4,7 @@
 
 function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
 
-    # TODO: Decide with Bill on the correct canonical FFLU form for long matrices.
+    # TODO: Implement the new FFLU code & debug.
     @warn "fflu does not work properly for `long` matrices. Caution is advised." maxlog=1
     @warn "fflu does not fully reduce matrix in singular case. Some care is required." maxlog=1
 
@@ -23,7 +23,6 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
     R = base_ring(FFLU)
     x  = zero_matrix(R, m, ncolsb)
     pb = p*b
-    #x = p * b
 
     t = base_ring(b)()
     s = base_ring(b)()
@@ -31,13 +30,12 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
 
     # For each column of x
     for k in 1:ncolsb
-
-        # Populate the initial values in `x`. There is surely a better way to do this.
-
         # In the first backsolve step, Only the part `y[1:rk, :]` is needed to
         # construct the solution to the linear equation `(LD^-1)^(-1) b =: y = Ux`.
         # or to check that the system is consistent. Essentially, we are restricting
         # to the principal (rk x rk)-subblock of `U`.
+        #
+        # Populate the initial values in `x`. There is surely a better way to do this.
         for i=1:rk
             x[i, k] = deepcopy(pb[i, k])
         end
@@ -57,12 +55,8 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
             t = add!(t, x[i, k], ZERO)
             t = minus!(t)
             for j in (i + 1):rk
-
-                #if i == 1
-                #  x[j, k] = mul_red!(R(), x[j, k], FFLU[i, i], false)
-                #else
                 x[j, k] = mul_red!(x[j, k], FFLU[i, i], x[j, k], false)
-                #end
+
                 s = mul_red!(s, FFLU[j, i], t, false)
                 x[j, k] = addeq!(x[j, k], s)
                 x[j, k] = reduce!(x[j, k])
@@ -105,7 +99,6 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
             x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], FFLU[:, pcols], x[:,k], rk, 1)
         end
         #TODO: Replace the implicit `get_index` with a `view`.
-            
     end
     return x
 end
@@ -117,8 +110,6 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}, rk)
 
     ncolsb = ncols(b)
     R = base_ring(LU)
-
-    #x = p * b # Not correct dimensions for output.
 
     # TODO: In general, `zero_matrix` will return a type dependent only on the base_ring,
     # which could in theory be a different concrete type from the input. It will be crucial
@@ -179,27 +170,25 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}, rk)
         # By use of `deepcopy`, we see `x` is freshly allocated space and the entries are
         # deepcopyed/newly allocated. 
         # Thus, the elements of `x` share no references, even in part, aside from parents.
-        # Additionally, `z` is freshly allocated space, and also shares this property.
+        # Additionally, we have that `xview === xview`. The number of pivot columns is equal to
+        # the rank, so the upper triangular part of LUview is a non-singular square upper
+        # triangular matrix.
         # Thus, we have fulfilled the CONTRACT for using the `!!` method.
         if !iszero(rk)
-            LUview = view(LU, :, pcols)
-            xview = view(x, :, k:k)      # The pivot rows are always the same.
-            bview = view(b, :, k:k)
+            LUview = view(LU, 1:rk, pcols)
+            xview = view(x, 1:rk, k:k)      # The pivot rows are always the same.
 
-            # TODO: This can be optimized to avoid the allocation, but it requires passing
-            # incongruent views to a dangerous function. For now, we keep it simple.
+            xview = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(xview, LUview, xview, rk, 1)
 
-            z = zero_matrix(R, length(pcols), 1)
-            z = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(z, LUview, xview, rk, 1)
-
-            # Since the setindex is not quite as flexible as with AbstractArrays, we do this
-            # manually.
-            for ell = 1:length(pcols)
-                x[pcols[ell], k] = z[ell,1]
+            # The entries of `xview` are only assigned to the first `1:rk` rows of `x`. These
+            # are not actually the correct since we have ignored the intermediate columns of
+            # `LU`. Thus, we need to permute the entries of `x` to the correct positions.
+            #
+            # Note that the pivot columns are given in ascending order. Entries in `x` below
+            # the rank are simply zero by design.
+            for ell = length(pcols):-1:1
+                x[pcols[ell], k], x[ell, k] = xview[ell,1], x[pcols[ell], k]
             end
-
-            # TODO: XXX: Unfortunately, if the pivot columns do not cover the top part
-            # of the vector, there can be 
         end
     end
     return x
@@ -229,7 +218,7 @@ end
 # 2. `x===b`, the mutation on `b` (i.e `x`) is intended, and elements of `x` share no
 #    references between each other, even in part, aside from parents.
 #
-# 3. The matrix `A` is in reduced upper-triangular form.
+# 3. The matrix `A` is square, nonsingular, and in reduced lower-triangular form.
 #
 # 4. A correct proof that conditions 1-3 have been satisfied, given (*), exists at the call site.
 #
@@ -303,7 +292,7 @@ end
 # 2. `x===b`, the mutation on `b` (i.e `x`) is intended, and elements of `x` share no
 #    references between each other, even in part, aside from parents.
 #
-# 3. The matrix `A` is in reduced upper-triangular form.
+# 3. The matrix `A` is square, nonsingular, and in reduced upper-triangular form.
 #
 # 4. A correct proof that conditions 1-3 have been satisfied, given (*), exists at the call site.
 #
@@ -531,86 +520,3 @@ function can_solve_left_reduced_triu(r::AbstractAlgebra.MatElem{T},
    end
    return true, x
 end
-
-#############################################################################
-#
-#  Kept for reference.
-#
-#############################################################################
-
-
-
-### Code below is not active ###
-if false
-    
-@doc Markdown.doc"""
-    solve_ut(A::MatElem{T}, b::MatElem{T}) -> MatElem{T})
-
-Given an upper triangular $m \times m$ matrix $A$ and a matrix $b$ of size $m
-\times 1$, this function computes $x$ such that $Ax = b$.  It is assumed that
-the pivots of $A$ are invertible.
-"""
-function solve_ut(A::MatElem{T}, b::MatElem{T}) where T
-  m = nrows(A)
-  n = ncols(A)
-  @assert m == nrows(b)
-  @assert m <= n
-  x = zero_matrix(base_ring(A), n, 1)
-  pivot_cols = Vector{Int}()
-  r = 0
-  last_pivot = n + 1
-  for i = m:-1:1
-    for j = 1:last_pivot - 1
-      if iszero(A[i, j])
-        continue
-      end
-      x[j, 1] = b[i, 1]
-      for k = 1:r
-        x[j, 1] -= A[i, pivot_cols[k]]*x[pivot_cols[k], 1]
-      end
-      x[j, 1] *= inv(A[i, j])
-      last_pivot = j
-      r += 1
-      push!(pivot_cols, j)
-      break
-    end
-  end
-  return x
-end
-
-@doc Markdown.doc"""
-    solve_lt(A::MatElem{T}, b::MatElem{T}) -> MatElem{T})
-
-Given a lower triangular $m \times m$ matrix $A$ and a matrix $b$ of size
-$m \times 1$, this function computes $x$ such that $Ax = b$.  It is assumed
-that the pivots of $A$ are invertible.
-"""
-function solve_lt(A::MatElem{T}, b::MatElem{T}) where T
-  m = nrows(A)
-  n = ncols(A)
-  @assert m == nrows(b)
-  @assert m <= n
-  x = zero_matrix(base_ring(A), n, 1)
-  pivot_cols = Vector{Int}()
-  r = 0
-  last_pivot = 0
-  for i = 1:m
-    for j = n:-1:last_pivot + 1
-      if iszero(A[i, j])
-        continue
-      end
-      x[j, 1] = b[i, 1]
-      for k = 1:r
-        x[j, 1] -= A[i, pivot_cols[k]]*x[pivot_cols[k], 1]
-      end
-      x[j, 1] *= inv(A[i, j])
-      last_pivot = j
-      r += 1
-      push!(pivot_cols, j)
-      break
-    end
-  end
-  return x
-end
-    
-end #if-false block.

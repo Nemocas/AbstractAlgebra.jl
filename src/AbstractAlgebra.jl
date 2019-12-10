@@ -315,6 +315,8 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
 import .Generic: scalar_matrix, diagonal_matrix, iszero_row, isdiagonal
 export scalar_matrix, diagonal_matrix, iszero_row, isdiagonal
 
+import .Generic: InconsistentLinearSystemError
+export InconsistentLinearSystemError
 
 ################################################################################
 #
