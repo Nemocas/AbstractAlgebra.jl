@@ -105,46 +105,15 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
             x[:,k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(x[:,k], FFLU[:, pcols], x[:,k], rk, 1)
         end
         #TODO: Replace the implicit `get_index` with a `view`.
-        
-        # Backsolve the upper triangular part. However, things have been rearranged
-        # so that a single column of `x` is accessed in the inner (j) loop, rather than a row.
-
-        # The backsolve step is totally redundant. However, there is a mild optimization to
-        # prevent a multiplication and division by the same thing.
-        #=
-        for i in (n - 1):-1:1
-         #if i > 1
-            x[i, k] = mul!(x[i, k], x[i, k], FFLU[n, n])
-         #else
-         #   x[i, k] = x[i, k] * FFLU[n, n]
-         #end
-         for j in (i + 1):n
-            t = mul!(t, x[j, k], FFLU[i, j])
-            t = minus!(t)
-            x[i, k] = addeq!(x[i, k], t)
-         end
-         x[i, k] = divexact(x[i, k], FFLU[i, i])
-        end
-        =#
-    
+            
     end
     return x
 end
 
-function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: RingElement}
+function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}, rk) where {T <: RingElement}
 
     n = nrows(LU)
     m = ncols(LU)
-
-    # TODO: The rank is not revealed by the diagonal elements unless the principal rxr
-    # block contains perfect information.
-    rk = begin
-        rk=min(n,m)
-        for i = min(n,m):-1:1
-            iszero(LU[i,i]) ? rk -= 1 : break
-        end
-        rk
-    end
 
     ncolsb = ncols(b)
     R = base_ring(LU)
@@ -193,18 +162,7 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
                 # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
                 t = mul_red!(t, LU[i, j], x[j, k], false)
                 t = minus!(t)
-                #if j == 1
-                    # This was to allocate memory before. Now we don't have to.
-                    # In fact, it is better to allocate memory in a single request
-                    # rather than in small pieces.
-                    
-                #    x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
-                #else
-                    # This doesn't do what you think it does... There is an implicit
-                    # copy in `setindex!`. At least one allocation is avoided, but not both.
-                    # That said, the assignment is absolutely necessary for immutable input.
-                    x[i, k] = addeq!(x[i, k], t)
-                #end
+                x[i, k] = addeq!(x[i, k], t)
             end
             x[i, k] = reduce!(x[i, k])
         end
@@ -219,24 +177,26 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
         
         # PROOF OF CORRECT USAGE:
         # By use of `deepcopy`, we see `x` is freshly allocated space and the entries are
-        # deepcopyed/newly allocated.
+        # deepcopyed/newly allocated. 
         # Thus, the elements of `x` share no references, even in part, aside from parents.
-        # Moreover, trivially, `x===x`. Thus, we have fulfilled the CONTRACT for using
-        # the `!!` method.
+        # Additionally, `z` is freshly allocated space, and also shares this property.
+        # Thus, we have fulfilled the CONTRACT for using the `!!` method.
         if !iszero(rk)
             LUview = view(LU, :, pcols)
-            xview = view(x, pcols, k:k)
+            xview = view(x, :, k:k)      # The pivot rows are always the same.
             bview = view(b, :, k:k)
-            #xview = _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_function(xview, lHNFview, bview, rk, 1)
 
-            #TODO: Fix for immutable types.
-            xview = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(xview, LUview, xview, rk, 1)
+            # TODO: This can be optimized to avoid the allocation, but it requires passing
+            # incongruent views to a dangerous function. For now, we keep it simple.
+            z = zero_matrix(R, length(pcols), 1)
+            z = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(z, LUview, xview, rk, 1)
+
+            # Since the setindex is not quite as flexible as with AbstractArrays, we do this
+            # manually.
+            for ell = 1:length(pcols)
+                x[pcols[ell], k] = z[ell,1]
+            end
         end
-        
-        #TODO: Replace the implicit `get_index` with a `view`.
-
-        #TODO: Fix issue where the wrong columns of `x` are assigned if the principal rxr
-        #      block is not invertable.
     end
     return x
 end

@@ -87,8 +87,6 @@ function solve_lu(A::MatElem{T}, b::MatElem{T};
         return actual_sol
     end
 
-    @info "" A b
-    
     if kernel != Val(false)
         error("Kernel not yet supported in `solve_lu`.")
     end
@@ -100,6 +98,6 @@ function solve_lu(A::MatElem{T}, b::MatElem{T};
     p = PermGroup(nrows(A))()
     r = lu!(p, LU)
 
-    return solve_lu_precomp(p, LU, b)
+    return solve_lu_precomp(p, LU, b, r)
 end
 
