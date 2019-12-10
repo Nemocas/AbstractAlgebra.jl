@@ -66,8 +66,6 @@ is assumed that it returns a correct Hermite normal form.
 function solve_hnf(A::MatElem{T}, b::MatElem{T};
                                   side = :right, kernel=Val(false)) where T <: RingElement
 
-    @info "" A
-    
     if side === :left
         # It might be easier to do things this way, but you could in theory allocate
         # the solution space as a TransposeIndexDual. Just remember to return the
@@ -85,15 +83,13 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
     check_solve_instance_is_well_defined(A,b)
     isempty(b) && return _solve_empty(A,b)
     
-    @warn "Principal `r x r`-block assumed faithful. Please fix!"
-
     # Writing `A^T = UH`, we want to solve Ax = (UH)^T*x = b. To optimize the cubic
     # part of the algorithm, we enforce that access is column-major. Note `H^T` is actually
     # lower-triangular.
     HNFt, g = hnf_with_transform(column_major_access_form(TransposeIndexDual(A)))
     lHNF = TransposeIndexDual(HNFt)
     
-    @info "" lHNF typeof(g)
+    #@info "" lHNF typeof(g)
     
     n = nrows(lHNF)
     m = ncols(lHNF)
@@ -116,18 +112,29 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
         # method.
         if !iszero(rk)
             lHNFview = view(lHNF, prows, :)
-            xview = view(x, prows, k:k)
-            bview = view(b, :, k:k)
+            xview = view(x, :, k:k)
+            bview = view(b, prows, k:k)
 
-            # TODO: Fix for immutable types.
-            xview = _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_function(xview, lHNFview, bview, rk, 1)
+            #@info "" lHNFview xview bview
+            
+            # TODO: This can be optimized to avoid the allocation, but it requires passing
+            # incongruent views to a dangerous function. For now, we keep it simple.
+
+            z = zero_matrix(R, length(prows), 1)
+            z = _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_function(z, lHNFview, bview, rk, 1)
+
+            # Since the setindex is not quite as flexible as with AbstractArrays, we do this
+            # manually.
+            for ell = 1:length(prows)
+                x[ell, k] = z[ell,1]
+            end
+
         end
     end
 
     # Because `divexact` **Does not throw and error** if an invalid division is performed,
     # we need to perform the consistency check on every row.
 
-    @info "" g x A b 
     sol = transpose(g)*x
     check_system_is_consistent(A, sol, b, 0)
     

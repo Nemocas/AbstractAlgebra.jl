@@ -1,11 +1,11 @@
 
 function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
-    @warn "Function has been depreciated. Use `solve_hnf(a,b,side=:left)` instead."
+    @warn "Function has been depreciated. Use `solve_hnf(a,b,side=:left)` instead." maxlog=1
     return solve_hnf(a,b,side=:left)
 end
 
 function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: FieldElement
-    @warn "Function has been depreciated. Use `solve_lu(a,b,side=:left)` instead."
+    @warn "Function has been depreciated. Use `solve_lu(a,b,side=:left)` instead." maxlog=1
     return solve_lu(a,b,side=:left)
 end
 

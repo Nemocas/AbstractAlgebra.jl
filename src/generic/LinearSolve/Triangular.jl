@@ -5,8 +5,8 @@
 function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
 
     # TODO: Decide with Bill on the correct canonical FFLU form for long matrices.
-    @warn "fflu does not work properly for `long` matrices. Caution is advised."
-    @warn "fflu does not fully reduce matrix in singular case. Some care is required."
+    @warn "fflu does not work properly for `long` matrices. Caution is advised." maxlog=1
+    @warn "fflu does not fully reduce matrix in singular case. Some care is required." maxlog=1
 
     n = nrows(FFLU)
     m = ncols(FFLU)
@@ -188,6 +188,7 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}, rk)
 
             # TODO: This can be optimized to avoid the allocation, but it requires passing
             # incongruent views to a dangerous function. For now, we keep it simple.
+
             z = zero_matrix(R, length(pcols), 1)
             z = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(z, LUview, xview, rk, 1)
 
@@ -196,6 +197,9 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}, rk)
             for ell = 1:length(pcols)
                 x[pcols[ell], k] = z[ell,1]
             end
+
+            # TODO: XXX: Unfortunately, if the pivot columns do not cover the top part
+            # of the vector, there can be 
         end
     end
     return x
