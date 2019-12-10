@@ -175,7 +175,7 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
           # that is inconsistent, this corresponds to a pole of the solution. This is quite,
           # useful information to know about the solution, and can reduce the size of
           # future solve instances.
-         if e isa DivideError
+         if e isa DivideError || e isa ArgumentError
              @warn ("Division error in solve_fflu. This occurs because the diagonal entries "*
                     "of the FFLU form are not sorted in any particular order. Please fix.")
          elseif !(e isa InconsistentLinearSystemError)
