@@ -272,28 +272,6 @@ end
 
 ################################################################################
 #
-#  hvcat
-#
-################################################################################
-
-# Via grep, this method is completely unused in Hecke. We add it here to annoy
-# people until they remove it.
-
-function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatElem...)
-
-    @warn "This function is not actually used for anything." 
-    B = hcat([A[i] for i=1:rows[1]]...)
-  o = rows[1]
-  for j=2:length(rows)
-    C = hcat([A[i+o] for i=1:rows[j]]...)
-    o += rows[j]
-    B = vcat(B, C)
-  end
-  return B
-end
-
-################################################################################
-#
 #  Array interface (extensions)
 #
 ################################################################################

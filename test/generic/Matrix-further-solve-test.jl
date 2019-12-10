@@ -67,7 +67,7 @@
                     bbad = g*bbad
 
                     #@test Generic.solve_lu(M,bbad)
-                    @test_throws DomainError Generic.solve_lu(M,bbad)
+                    @test_throws InconsistentLinearSystemError Generic.solve_lu(M,bbad)
                 end
             end
         end
@@ -78,7 +78,7 @@
             b = matrix(QQ, hcat([[rand(-10:10) for j=1:4] for i=1:1]...))
             b[1,1] = 1
             
-            @test_throws DomainError Generic.solve_lu(A,b)
+            @test_throws InconsistentLinearSystemError Generic.solve_lu(A,b)
 
             R = MatrixSpace(S, 5, 4)
             A = rand(R, -10:10)
@@ -181,7 +181,7 @@
                     bbad = g*bbad
 
                     #Generic.solve_fflu(M,bbad)
-                    @test_throws DomainError Generic.solve_fflu(M,bbad)
+                    @test_throws InconsistentLinearSystemError Generic.solve_fflu(M,bbad)
                 end
             end
         end

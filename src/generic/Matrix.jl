@@ -23,6 +23,8 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        solve_left, add_column, add_column!, add_row, add_row!, multiply_column,
        multiply_column!, multiply_row, multiply_row!, map_entries, map_entries!
 
+export InconsistentLinearSystemError
+    
 ###############################################################################
 #
 #   Similar

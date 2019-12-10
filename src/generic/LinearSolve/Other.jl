@@ -1,10 +1,29 @@
 
 ################################################################################
 #
-#  Checks.
+#  Inconsistent system error.
 #
 ################################################################################
 
+struct InconsistentLinearSystemError <: Exception
+    A::MatElem
+    x::MatElem
+    b::MatElem
+end
+
+function Base.showerror(io::IO, e::InconsistentLinearSystemError)
+    A = e.A
+    x = e.x
+    b = e.b
+    residual = A*x - b
+    @error "Solve instance `Ax = b` is inconsistent. With: " A x b residual
+end
+
+################################################################################
+#
+#  Checks.
+#
+################################################################################
 
 function check_solve_instance_is_well_defined(A::MatElem{T}, b::MatElem{T}) where T
     base_ring(A) != base_ring(b) && error("Base rings don't match in solve_lu")
@@ -42,8 +61,7 @@ function check_system_is_consistent(A, x, b, rk = 0::Int)
             sum = reduce!(sum)
 
             if sum != b[i,k]
-                @info "Residual: " i k rk base_ring(b) (sum - b[i,k]) 
-                throw(DomainError((A, x, b), "Solve instance is inconsistent."))
+                throw(InconsistentLinearSystemError(A[rk+1:n, :], x, b[rk+1:n, :]))
             end
         end
     end
@@ -188,7 +206,7 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
          if e isa DivideError
              @warn ("Division error in solve_fflu. This occurs because the diagonal entries "*
                     "of the FFLU form are not sorted in any particular order. Please fix.")
-         elseif !(e isa DomainError)
+         elseif !(e isa InconsistentLinearSystemError)
             rethrow(e)
          end
          i = i + 1
