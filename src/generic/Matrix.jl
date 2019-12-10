@@ -427,7 +427,7 @@ end
 #
 ###############################################################################
 
-function setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::UnitRange{Int}, c::UnitRange{Int}) where T
+function setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::AbstractVector{Int}, c::AbstractVector{Int}) where T
     _checkbounds(a, r, c)
     size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(nrows(b))x$(ncols(b)) matrix to a $(length(r))x$(length(c)) destination"))
     startr = first(r)
@@ -439,15 +439,15 @@ function setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T},
     end
 end
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::UnitRange{Int}, ::Colon) where T = setindex!(a, b, r, 1:ncols(a))
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::AbstractVector{Int}, ::Colon) where T = setindex!(a, b, r, 1:ncols(a))
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, ::Colon, c::UnitRange{Int}) where T = setindex!(a, b, 1:nrows(a), c)
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, ::Colon, c::AbstractVector{Int}) where T = setindex!(a, b, 1:nrows(a), c)
 
 setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, ::Colon, ::Colon) where T = setindex!(a, b, 1:nrows(a), 1:ncols(a))
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::Int, c::UnitRange{Int}) where T = setindex!(a, b, r:r, c)
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::Int, c::AbstractVector{Int}) where T = setindex!(a, b, r:r, c)
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::UnitRange{Int}, c::Int) where T = setindex!(a, b, r, c:c)
+setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::AbstractVector{Int}, c::Int) where T = setindex!(a, b, r, c:c)
 
 setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::Int, ::Colon) where T = setindex!(a, b, r:r, 1:ncols(a))
 
