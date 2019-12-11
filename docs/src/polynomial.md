@@ -30,14 +30,14 @@ etc. See the file `src/generic/GenericTypes.jl` for details.
 Parent objects of such polynomials have type `Generic.PolyRing{T}`.
 
 The string representation of the variable of the polynomial ring and the
-base/coefficient ring $R$ is stored in the parent object. 
+base/coefficient ring $R$ is stored in the parent object.
 
 The polynomial element types belong to the abstract type `AbstractAlgebra.PolyElem{T}`
 and the polynomial ring types belong to the abstract type `AbstractAlgebra.PolyRing{T}`. This enables one to write generic functions that can accept any AbstractAlgebra
 polynomial type.
 
 Note that both the generic polynomial ring type `Generic.PolyRing{T}` and the abstract
-type it belongs to, `AbstractAlgebra.PolyRing{T}` are both called `PolyRing`. The 
+type it belongs to, `AbstractAlgebra.PolyRing{T}`, are called `PolyRing`. The
 former is a (parameterised) concrete type for a polynomial ring over a given base ring
 whose elements have type `T`. The latter is an abstract type representing all
 polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
@@ -54,7 +54,7 @@ PolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString; cached::Bool = true)
 
 Given a base ring `R` and string `s` specifying how the generator (variable) should be
 printed, return a tuple `S, x` representing the new polynomial ring $S = R[x]$ and the
-generator $x$ of the ring. By default the parent object `S` will depend only on `R` and 
+generator $x$ of the ring. By default the parent object `S` will depend only on `R` and
 `x` and will be cached. Setting the optional argument `cached` to `false` will prevent
 the parent object `S` from being cached.
 
@@ -108,7 +108,7 @@ polynomials in that ring.
 
 The easiest way is simply using the generator returned by the `PolynomialRing`
 constructor and build up the polynomial using basic arithmetic, as described in
-the Ring interface. 
+the Ring interface.
 
 The Julia language also has special syntax for the construction of polynomials in terms
 of a generator, e.g. we can write `2x` instead of `2*x`.
@@ -240,7 +240,7 @@ any polynomial module that implements the full Univariate Polynomial Ring interf
 This includes AbstractAlgebra.jl's own generic polynomial rings.
 
 But if a C library provides all the functionality documented in the Univariate
-Polynomial Ring interface, then all the functions described here will also be 
+Polynomial Ring interface, then all the functions described here will also be
 automatically supplied by AbstractAlgebra.jl for that polynomial type.
 
 Of course, modules are free to provide specific implementations of the functions
@@ -521,7 +521,7 @@ subst{T <: RingElem}(::PolyElem{T}, ::Any)
 ```
 
 We also overload the functional notation so that the polynomial $f$ can be
-evaluated at $a$ by writing $f(a)$. 
+evaluated at $a$ by writing $f(a)$.
 
 **Examples**
 
