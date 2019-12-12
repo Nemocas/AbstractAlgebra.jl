@@ -952,6 +952,22 @@ end
    P = T([2, 3, 1])
 
    @test A == inv(P)*(P*A)
+
+   @testset "$name" for (name, (R, randparams)) in RINGS
+      S = MatrixSpace(R, rand(1:9), rand(0:9))
+      A = rand(S, randparams...)
+      T = PermutationGroup(nrows(A))
+      P = rand(T)
+      Q = inv(P)
+
+      PA = P*A
+      @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
+      if VERSION >= v"1.3"
+         @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+      end
+      @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
+      @test A == Q*(P*A)
+   end
 end
 
 @testset "Generic.Mat.comparison..." begin
