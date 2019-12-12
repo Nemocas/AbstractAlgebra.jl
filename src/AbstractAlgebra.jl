@@ -1,7 +1,7 @@
 @doc Markdown.doc"""
- AbstractAlgebra is a pure Julia package for computational abstract algebra. 
+ AbstractAlgebra is a pure Julia package for computational abstract algebra.
 
- For more information see https://github.com/Nemocas/AbstractAlgebra.jl  
+ For more information see https://github.com/Nemocas/AbstractAlgebra.jl
 """
 module AbstractAlgebra
 
@@ -123,8 +123,8 @@ export crt
 # struct bla..
 # ..
 # end
-# 
-# to 
+#
+# to
 #
 # struct bla ..
 # @declare_other
@@ -265,7 +265,7 @@ end
 # (a::Ring)(b::elem_type(a))
 #   parent(b) == a && return a
 #   return force_coerce(a, b)
-# 
+#
 function force_coerce(a, b; throw_error::Bool = true)
   throw_error && error("coercion not possible")
   return false
@@ -273,7 +273,7 @@ end
 
 #to allow +(a::T, b::T) where a, b have different parents, but
 # a common over structure
-# designed(?) to be minimally invasive in AA and Nemo, but filled with 
+# designed(?) to be minimally invasive in AA and Nemo, but filled with
 # content in Hecke/Oscar
 function force_op(op::Function, a...; throw_error::Bool = true)
   throw_error && error("no common overstructure for the arguments found")
@@ -353,7 +353,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  hnf_kb, hnf_kb_with_transform,
                  hnf_minors, hnf_minors_with_transform,
                  hnf_with_transform, hnf_via_popov,
-                 hnf_via_popov_with_transform, 
+                 hnf_via_popov_with_transform,
                  hooklength, identity_map, identity_matrix, image,
                  image_map, image_fn, inflate, integral, interpolate, inv,
                  inv!, invariant_factors,
@@ -613,6 +613,9 @@ function SparsePolynomialRing(R::Ring, s::Char; cached::Bool = true)
    SparsePolynomialRing(R, string(s); cached=cached)
 end
 
+@doc (@doc Generic.LaurentPolynomialRing)
+LaurentPolynomialRing(R::Ring, s::AbstractString) = Generic.LaurentPolynomialRing(R, s)
+
 function MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
    Generic.MatrixSpace(R, r, c, cached)
 end
@@ -751,8 +754,8 @@ end
 # add empty functions so that Singular, Nemo and Hecke can import and extend.
 function crt end
 
-export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
-       MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
+export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, LaurentPolynomialRing,
+       MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, sub,

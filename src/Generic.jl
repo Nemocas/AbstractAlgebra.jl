@@ -48,6 +48,8 @@ include("generic/MPoly.jl")
 
 include("generic/SparsePoly.jl")
 
+include("generic/LaurentPoly.jl")
+
 include("generic/RelSeries.jl")
 
 include("generic/AbsSeries.jl")
