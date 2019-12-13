@@ -101,6 +101,7 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
 struct F2 <: AbstractAlgebra.Field end
 
 Base.zero(::F2) = F2Elem(false)
+AbstractAlgebra.zero!(a::F2Elem) = zero(parent(a))
 Base.one(::F2) = F2Elem(true)
 (::F2)() = F2Elem(false)
 
@@ -117,10 +118,13 @@ Base.:*(x::F2Elem, y::F2Elem) = F2Elem(x.x * y.x)
 Base.convert(::Type{F2Elem}, x::Integer) = F2Elem(x % Bool)
 Base.:(==)(x::F2Elem, y::F2Elem) = x.x == y.x
 
+
+# Implement *all* the required ring interface.
 AbstractAlgebra.parent_type(::Type{F2Elem}) = F2
 AbstractAlgebra.elem_type(::Type{F2}) = F2Elem
 AbstractAlgebra.parent(x::F2Elem) = F2()
 AbstractAlgebra.mul!(x::F2Elem, y::F2Elem, z::F2Elem) = y * z
+AbstractAlgebra.add!(x::F2Elem, y::F2Elem, z::F2Elem) = y + z
 AbstractAlgebra.addeq!(x::F2Elem, y::F2Elem) = x + y
 AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 
@@ -135,6 +139,23 @@ AbstractAlgebra.base_ring(::F2Matrix) = F2()
 Base.getindex(a::F2Matrix, r::Int64, c::Int64) = a.m[r, c]
 Base.setindex!(a::F2Matrix, x::F2Elem, r::Int64, c::Int64) = a.m[r, c] = x
 Base.similar(x::F2Matrix, R::F2, r::Int, c::Int) = F2Matrix(similar(x.m, r, c))
+
+Base.view(x::F2Matrix, I...) = view(x.m, I...)
+
+####
+# We have to copy this broken logic everywhere we implement `view` because of NEMO.
+function Base.view(D::F2Matrix, rows::Colon, cols::UnitRange{Int})
+   return view(D, 1:nrows(D), cols)
+end
+
+function Base.view(D::F2Matrix, rows::UnitRange{Int}, cols::Colon)
+   return view(D, rows, 1:ncols(D))
+end
+
+function Base.view(D::F2Matrix, rows::Colon, cols::Colon)
+   return view(D, 1:nrows(D), 1:ncols(D))
+end
+####
 
 function AbstractAlgebra.zero_matrix(R::F2, r::Int, c::Int)
    mat = Array{F2Elem}(undef, r, c)
@@ -1810,7 +1831,9 @@ end
    end
 
    # inv should preserve the type of the input
-   M = matrix(F2(), F2Elem[1 0; 0 1])
+    M = matrix(F2(), F2Elem[1 0; 0 1])
+
+   @warn "This test breaks because I used `zero_matrix` to construct a dense matrix in the solve functions. The way to think about this is to implement a construct_dense_matrix_from_type kind of pattern. The trick is to somehow get this to be part of the optional, rather than required, interface."
    @test typeof(inv(M))   == typeof(M)
    @test typeof(inv(M.m)) == typeof(M.m)
 end

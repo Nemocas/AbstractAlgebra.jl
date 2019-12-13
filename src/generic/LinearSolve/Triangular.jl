@@ -21,6 +21,12 @@ function _solve_fflu_postcomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) 
     end
 
     R = base_ring(FFLU)
+
+    # TODO: In general, `zero_matrix` will return a type dependent only on the base_ring,
+    # which could in theory be a different concrete type from the input. It will be crucial
+    # to implement a zero-matrix constructor that takes into account the type of `LU`.
+    #
+    # This breaks at least one test...
     x  = zero_matrix(R, m, ncolsb)
     pb = p*b
 
