@@ -480,6 +480,15 @@ isunit(f::MyElem)
 
 Return `true` if the given element is a unit in the ring it belongs to.
 
+```
+characteristic(R::MyParent)
+```
+
+Return the characteristic of the ring $R$ or $-1$ if this is unknown or cannot
+be computed efficiently. Defining this function may speed up some code paths,
+as more efficient algorithms exist for certain characteristics but are invalid
+for others.
+
 ### Optional binary ad hoc operators
 
 By default, ad hoc operations are handled by AbstractAlgebra.jl if they are not defined

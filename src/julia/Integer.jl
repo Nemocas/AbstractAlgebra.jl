@@ -44,6 +44,8 @@ isunit(a::Integer) = a == 1 || a == -1
 
 canonical_unit(a::T) where T <: Integer = a < 0 ? T(-1) : T(1)
 
+characteristic(::Integers{T}) where T <: Integer = 0
+
 ###############################################################################
 #
 #   String I/O
@@ -138,9 +140,11 @@ end
 #
 ###############################################################################
 
-divexact(a::T, b::T) where T <: Integer = div(a, b)
-
-divexact(a::BigInt, b::T) where T <: Integer = div(a, b)
+function divexact(a::Integer, b::Integer)
+   q, r = divrem(a, b)
+   iszero(r) || throw(ArgumentError("not an exact division"))
+   q
+end
 
 ###############################################################################
 #

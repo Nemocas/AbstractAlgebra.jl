@@ -275,6 +275,10 @@ function deepcopy_internal(a::PuiseuxSeriesElem{T}, dict::IdDict) where {T <: Ri
     return parent(a)(deepcopy(a.data), a.scale)
 end
 
+function characteristic(a::PuiseuxSeriesRing{T}) where T <: RingElement
+   return characteristic(base_ring(a))
+end
+
 ###############################################################################
 #
 #   AbstractString I/O

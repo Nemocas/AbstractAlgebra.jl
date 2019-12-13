@@ -111,6 +111,8 @@ end
 @testset "Generic.MPoly.manipulation..." begin
    R, x = ZZ["y"]
 
+   @test characteristic(R) == 0
+
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -489,6 +491,14 @@ end
 
       @test_throws DomainError rand(varlist)^-1
       @test_throws DomainError rand(varlist)^-rand(2:100)
+   end
+
+   # Over field of nonzero characteristic
+   R, (x, y, z, t) = PolynomialRing(GF(2), ["x", "y", "z", "t"])
+   f = 1 + x + y + z + t
+
+   for i = 1:5
+      @test f^i == f*f^(i - 1)
    end
 end
 

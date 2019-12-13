@@ -1,3 +1,12 @@
+const RINGS = Dict(
+   "exact ring"          => (ZZ,                 (-1000:1000,)),
+   "exact field"         => (GF(7),              ()),
+   "inexact ring"        => (RealField["t"][1],  (0:200, -1000:1000)),
+   "inexact field"       => (RealField,          (-1000:1000,)),
+   "non-integral domain" => (ResidueRing(ZZ, 6), (0:5,)),
+   "fraction field"      => (QQ,                 (-1000:1000,)),
+)
+
 primes100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227,
@@ -86,6 +95,68 @@ end
 Base.getindex(a::MyTestMatrix{T}, r::Int, c::Int) where T = a.d
 
 Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
+
+# Simulate user Field, together with a specialized matrix type
+# (like fmpz / fmpz_mat)
+struct F2 <: AbstractAlgebra.Field end
+
+Base.zero(::F2) = F2Elem(false)
+Base.one(::F2) = F2Elem(true)
+(::F2)() = F2Elem(false)
+
+struct F2Elem <: AbstractAlgebra.FieldElem
+   x::Bool
+end
+
+(::F2)(x::F2Elem) = x
+Base.:-(x::F2Elem) = x
+Base.:+(x::F2Elem, y::F2Elem) = F2Elem(x.x ⊻ y.x)
+Base.inv(x::F2Elem) = x.x ? x : throw(DivideError())
+Base.:*(x::F2Elem, y::F2Elem) = F2Elem(x.x * y.x)
+
+Base.convert(::Type{F2Elem}, x::Integer) = F2Elem(x % Bool)
+Base.:(==)(x::F2Elem, y::F2Elem) = x.x == y.x
+
+AbstractAlgebra.parent_type(::Type{F2Elem}) = F2
+AbstractAlgebra.elem_type(::Type{F2}) = F2Elem
+AbstractAlgebra.parent(x::F2Elem) = F2()
+AbstractAlgebra.mul!(x::F2Elem, y::F2Elem, z::F2Elem) = y * z
+AbstractAlgebra.addeq!(x::F2Elem, y::F2Elem) = x + y
+AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
+
+struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
+   m::Generic.MatSpaceElem{F2Elem}
+end
+
+AbstractAlgebra.nrows(a::F2Matrix) = nrows(a.m)
+AbstractAlgebra.ncols(a::F2Matrix) = ncols(a.m)
+AbstractAlgebra.base_ring(::F2Matrix) = F2()
+
+Base.getindex(a::F2Matrix, r::Int64, c::Int64) = a.m[r, c]
+Base.setindex!(a::F2Matrix, x::F2Elem, r::Int64, c::Int64) = a.m[r, c] = x
+Base.similar(x::F2Matrix, R::F2, r::Int, c::Int) = F2Matrix(similar(x.m, r, c))
+
+function AbstractAlgebra.zero_matrix(R::F2, r::Int, c::Int)
+   mat = Array{F2Elem}(undef, r, c)
+   for i=1:r, j=1:c
+      mat[i, j] = zero(R)
+   end
+   z = Generic.MatSpaceElem{F2Elem}(mat)
+   z.base_ring = R
+   return F2Matrix(z)
+end
+
+function AbstractAlgebra.matrix(R::F2, mat::AbstractMatrix{F2Elem})
+   mat = convert(Matrix, mat)
+   z = Generic.MatSpaceElem{F2Elem}(mat)
+   z.base_ring = R
+   return F2Matrix(z)
+end
+
+function AbstractAlgebra.matrix(R::F2, r::Int, c::Int, mat::AbstractMatrix{F2Elem})
+   AbstractAlgebra._check_dim(r, c, mat)
+   matrix(R, mat)
+end
 
 @testset "Generic.Mat.constructors..." begin
    R, t = PolynomialRing(QQ, "t")
@@ -196,19 +267,37 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
    @test isa(M4, Generic.MatSpaceElem{elem_type(R)})
    @test M4.base_ring == R
 
-   M5 = identity_matrix(R, 2, 3)
-   M6 = identity_matrix(M5)
+   @test_throws DomainError identity_matrix(M3) # must be square
 
-   @test isa(M5, Generic.MatSpaceElem{elem_type(R)})
-   @test M5.base_ring == R
-   @test M5 == M6
+   # identity_matrix should preserve the type of the input
+   M9 = matrix(F2(), F2Elem[1 0; 0 1])
+   @test typeof(identity_matrix(M9))      == typeof(M9)
+   @test typeof(identity_matrix(M9, 3))   == typeof(M9)
+   @test typeof(identity_matrix(M9.m))    == typeof(M9.m)
+   @test typeof(identity_matrix(M9.m, 3)) == typeof(M9.m)
 
-   M7 = identity_matrix(R, 3, 2)
-   M8 = identity_matrix(M7)
+   D1 = diagonal_matrix(one(R), 2)
 
-   @test isa(M7, Generic.MatSpaceElem{elem_type(R)})
-   @test M7.base_ring == R
-   @test M7 == M8
+   @test size(D1) == (2, 2)
+   @test base_ring(D1) == R
+   @test D1[1, 1] == D1[2, 2] == one(R)
+   @test D1[1, 2] == D1[2, 1] == zero(R)
+   @test D1 isa Generic.MatSpaceElem{elem_type(R)}
+
+   D2 = diagonal_matrix(one(R), 2, 2)
+   @test D2 == D1 && typeof(D2) == typeof(D1)
+
+   let pol = t^2+1
+      D3 = diagonal_matrix(pol, 3, 4)
+      @test D3 isa Generic.MatSpaceElem{elem_type(R)}
+      for i=1:3, j=1:4
+         if i == j
+            @test D3[i, j] == pol
+         else
+            @test iszero(D3[i, j])
+         end
+      end
+   end
 
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
@@ -440,6 +529,10 @@ end
    @test iszero(A + (-A))
    @test A == -(-A)
    @test -A == S(-A.entries)
+
+   z = zero_matrix(F2(), 2, 3)
+   @test -z   isa F2Matrix
+   @test -z.m isa Generic.MatSpaceElem{F2Elem}
 end
 
 @testset "Generic.Mat.getindex..." begin
@@ -506,10 +599,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
@@ -522,10 +615,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
@@ -538,10 +631,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
@@ -554,10 +647,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
@@ -570,10 +663,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
@@ -586,10 +679,10 @@ end
 
    @test A[i:j, k:l] == matrix(R, A.entries[i:j, k:l])
    @test A[:, k:l] == matrix(R, A.entries[:, k:l])
-   @test A[i:j, :] == matrix(R, A.entries[i:j, :])   
+   @test A[i:j, :] == matrix(R, A.entries[i:j, :])
    @test A[[i:j;], [k:l;]] == matrix(R, A.entries[[i:j;], [k:l;]])
    @test A[i:2:j, k:2:l] == matrix(R, A.entries[i:2:j, k:2:l])
-   
+
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 end
@@ -859,6 +952,22 @@ end
    P = T([2, 3, 1])
 
    @test A == inv(P)*(P*A)
+
+   @testset "$name" for (name, (R, randparams)) in RINGS
+      S = MatrixSpace(R, rand(1:9), rand(0:9))
+      A = rand(S, randparams...)
+      T = PermutationGroup(nrows(A))
+      P = rand(T)
+      Q = inv(P)
+
+      PA = P*A
+      @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
+      if VERSION >= v"1.3"
+         @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+      end
+      @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
+      @test A == Q*(P*A)
+   end
 end
 
 @testset "Generic.Mat.comparison..." begin
@@ -871,6 +980,36 @@ end
    @test A == B
 
    @test A != one(S)
+
+   @testset "$name" for (name, (R, randparams)) in RINGS
+      S = MatrixSpace(R, rand(1:9), rand(1:9))
+      seed = rand(1:999)
+
+      Random.seed!(rng, seed)
+      A = rand(rng, S, randparams...)
+      Random.seed!(rng, seed)
+      B = rand(rng, S, randparams...)
+
+      @test A == B
+      @test A == A
+      @test A == copy(A)
+
+      for _=1:3
+         i, j = rand.(Base.OneTo.(size(A)))
+         x = A[i, j]
+         iszero(x) && continue
+         if x == -x
+            @assert !(R isa AbstractAlgebra.Field) || characteristic(R) == 2  # could happen for GF(2)
+            continue
+         end
+         B[i, j] = -A[i, j]
+         @test B != A
+         B[i, j] = -B[i, j]
+         @test A == A
+      end
+
+      @test matrix(R, copy(A.entries)) == A
+   end
 end
 
 @testset "Generic.Mat.adhoc_comparison..." begin
@@ -931,6 +1070,14 @@ end
    A = matrix(R, arr)
    B = matrix(R, permutedims(arr, [2, 1]))
    @test transpose(A) == B
+
+   # transpose input/output types are the same
+   a = matrix(F2(), F2Elem[1 1 0; 0 0 1])
+   # not method (yet) for transpose(a)
+   at = transpose(a.m)
+   @test typeof(at) == typeof(a.m)
+   @test at[1, 1] == at[2, 1] == at[3, 2] == F2Elem(true)
+   @test at[3, 1] == at[1, 2] == at[2, 2] == F2Elem(false)
 end
 
 @testset "Generic.Mat.gram..." begin
@@ -1661,6 +1808,11 @@ end
 
       @test M*X == d*one(T)
    end
+
+   # inv should preserve the type of the input
+   M = matrix(F2(), F2Elem[1 0; 0 1])
+   @test typeof(inv(M))   == typeof(M)
+   @test typeof(inv(M.m)) == typeof(M.m)
 end
 
 @testset "Generic.Mat.hessenberg..." begin
@@ -2152,6 +2304,29 @@ end
    @test ishnf(H)
    @test isunit(det(U))
    @test U*B == H
+
+   # hnf_kb! must not assume it "owns" entries of its input
+   # A and B have de-aliased entries, a and b have aliased entries
+   # the result must be the same
+   A = R[1 1; 1 1]
+   B = R[1 0; 0 1]
+   # if any of the following assertions fail with a change to the code base,
+   # find a new way to construct the matrices such that the assertions remain valid
+   # (similar for snf_kb!)
+   @assert length(IdDict(x => nothing for x in A.entries)) == 4
+   @assert length(IdDict(x => nothing for x in B.entries)) == 4
+   i = i0 = x^0
+   z = z0 = 0*x
+   a = R[i i; i i]
+   b = R[i z; z i]
+   @assert a[1, 1] === a[1, 2] === a[2, 1] === a[2, 2]
+   @assert b[1, 1] === b[2, 2] &&  b[1, 2] === b[2, 1]
+   Generic.hnf_kb!(A, B, true);
+   Generic.hnf_kb!(a, b, true);
+   @test i === i0 == x^0
+   @test z === z0 == 0*x
+   @test A == a
+   @test B == b
 end
 
 @testset "Generic.Mat.hnf_cohen..." begin
@@ -2259,6 +2434,29 @@ end
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
+
+   # snf_kb! must not assume it "owns" entries of its input
+   # A, B and C have de-aliased entries, a, b and c have aliased entries
+   # the result must be the same
+   A = R[1 1 0; 0 1 1]
+   B = R[1 0; 0 1]
+   C = R[1 0 0; 0 1 0; 0 0 1]
+   @assert length(IdDict(x => nothing for x in A.entries)) == 6
+   @assert length(IdDict(x => nothing for x in B.entries)) == 4
+   i = i0 = x^0
+   z = z0 = 0*x
+   a = R[i i z; z i i]
+   b = R[i z; z i]
+   c = R[i z z; z i z; z z i]
+   @assert a[1, 1] === a[1, 2] === a[2, 2] === a[2, 3]
+   @assert b[1, 1] === b[2, 2] &&  b[1, 2] === b[2, 1]
+   Generic.snf_kb!(A, B, C, true);
+   Generic.snf_kb!(a, b, c, true);
+   @test i === i0 == x^0
+   @test z === z0 == 0*x
+   @test A == a
+   @test B == b
+   @test C == c
 end
 
 @testset "Generic.Mat.snf..." begin
@@ -2412,6 +2610,10 @@ end
          @test MQ * NQ == MNQ
       end
    end
+
+   z = zero_matrix(F2(), 2, 3)
+   @test change_base_ring(F2(), z)   isa F2Matrix
+   @test change_base_ring(F2(), z.m) isa F2Matrix
 end
 
 @testset "Generic.Mat.map..." begin
@@ -2452,6 +2654,10 @@ end
          end
       end
    end
+
+   z = zero_matrix(F2(), 2, 3)
+   @test map(identity, z)   isa F2Matrix
+   @test map(identity, z.m) isa F2Matrix
 end
 
 @testset "Generic.Mat.similar/zero..." begin
@@ -2482,6 +2688,20 @@ end
          end
       end
    end
+
+   z = zero_matrix(F2(), 2, 3)
+   @test z isa F2Matrix
+   @test similar(z)       isa F2Matrix
+   @test similar(z, 2, 3) isa F2Matrix
+   @test zero(z)          isa F2Matrix
+   @test zero(z, 2, 3)    isa F2Matrix
+
+   m = z.m
+   @test m                isa Generic.MatSpaceElem{F2Elem}
+   @test similar(m)       isa Generic.MatSpaceElem{F2Elem}
+   @test similar(m, 2, 3) isa Generic.MatSpaceElem{F2Elem}
+   @test zero(m)          isa Generic.MatSpaceElem{F2Elem}
+   @test zero(m, 2, 3)    isa Generic.MatSpaceElem{F2Elem}
 end
 
 @testset "Generic.Mat.printing..." begin
@@ -2495,4 +2715,20 @@ end
    @test string(MatrixAlgebra(QQ, 0)()) == "0 by 0 matrix"
    @test string(similar(matrix(ZZ, [3 1 2; 2 0 1]))) ==
       "[#undef  #undef  #undef]\n[#undef  #undef  #undef]"
+end
+
+@testset "Generic.Mat.array_conversion" begin
+   M = ZZ[1 2; 3 4]
+   A = Array(M)
+   @test A  == M.entries
+   @test A !== M.entries
+   @test Matrix(M) == A
+   @test eltype(A) == eltype(M)
+
+   F = matrix(F2(), F2Elem[1 1 1; 0 0 0])
+   B = Array(F)
+   @test B ==  F.m.entries
+   @test B !== F.m.entries
+   @test Matrix(F) == B
+   @test eltype(B) == F2Elem
 end

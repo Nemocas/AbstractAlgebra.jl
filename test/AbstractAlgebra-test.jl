@@ -1,4 +1,4 @@
-using Random: MersenneTwister, randsubseq
+using Random: Random, MersenneTwister, randsubseq
 
 const rng = MersenneTwister()
 

@@ -88,6 +88,10 @@ isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement = isunit(det(a))
 
 isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
 
+function characteristic(a::MatAlgebra{T}) where T <: RingElement
+   return characteristic(base_ring(a))
+end
+
 ###############################################################################
 #
 #   Similar and zero
@@ -138,7 +142,7 @@ zero(x::AbstractAlgebra.MatAlgElem, n::Int) = zero!(similar(x, n))
 ################################################################################
 
 function copy(d::MatAlgElem{T}) where T <: RingElement
-   z = _similar(d, base_ring(d), nrows(d), ncols(d))
+   z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
          z[i, j] = d[i, j]
@@ -148,7 +152,7 @@ function copy(d::MatAlgElem{T}) where T <: RingElement
 end
 
 function deepcopy_internal(d::MatAlgElem{T}, dict::IdDict) where T <: RingElement
-   z = _similar(d, base_ring(d), nrows(d), ncols(d))
+   z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
          z[i, j] = deepcopy(d[i, j])
@@ -473,7 +477,7 @@ function zero!(M::MatAlgElem{T}) where T <: RingElement
    R = base_ring(M)
    for i = 1:n
       for j = 1:n
-         M.entries[i, j] = R()
+         M[i, j] = zero(R)
       end
    end
    return M
@@ -499,7 +503,7 @@ function addeq!(A::MatAlgElem{T}, B::MatAlgElem{T}) where T <: RingElement
    n = degree(A)
    for i = 1:n
       for j = 1:n
-         addeq!(A.entries[i, j], B.entries[i, j])
+         A.entries[i, j] += B.entries[i, j]
       end
    end
    return A

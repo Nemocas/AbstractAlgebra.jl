@@ -126,6 +126,10 @@ end
 deepcopy_internal(a::AbstractAlgebra.ResElem, dict::IdDict) =
    parent(a)(deepcopy(data(a)))
 
+function characteristic(a::ResRing{T}) where T <: Integer
+   return modulus(a)
+end
+
 ###############################################################################
 #
 #   Canonicalisation

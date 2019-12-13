@@ -134,6 +134,10 @@ function Base.hash(a::AbstractAlgebra.AbsSeriesElem, h::UInt)
    return b
 end
 
+function characteristic(a::AbsSeriesRing{T}) where T <: RingElement
+   return characteristic(base_ring(a))
+end
+
 ###############################################################################
 #
 #   AbstractString I/O

@@ -130,6 +130,8 @@ end
    @test ismonomial(x*y^2)
 
    @test !ismonomial(2*x*y^2 + y + 1)
+
+   @test characteristic(R) == 0
 end
 
 @testset "Generic.Poly.binary_ops..." begin

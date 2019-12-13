@@ -221,7 +221,7 @@ zero(x::MatrixElem, r::Int, c::Int) = zero(x, base_ring(x), r, c)
 
 function zero!(x::MatrixElem)
    R = base_ring(x)
-   for i=1:nrows(x), j=1:ncols(x)
+   for i = 1:nrows(x), j = 1:ncols(x)
       x[i, j] = zero(R)
    end
    x
@@ -239,7 +239,7 @@ one(a::AbstractAlgebra.MatSpace) = check_square(a)(1)
 > Construct the identity matrix in the same matrix space as `a`, i.e.
 > with ones down the diagonal and zeroes elsewhere. `a` must be square.
 """
-one(a::MatElem) = identity_matrix(check_square(a))
+one(a::MatElem) = identity_matrix(a)
 
 @doc Markdown.doc"""
     iszero(a::Generic.MatrixElem)
@@ -313,7 +313,7 @@ end
 ################################################################################
 
 function copy(d::MatSpaceElem{T}) where T <: RingElement
-   z = _similar(d, base_ring(d), nrows(d), ncols(d))
+   z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
          z[i, j] = d[i, j]
@@ -323,7 +323,7 @@ function copy(d::MatSpaceElem{T}) where T <: RingElement
 end
 
 function deepcopy_internal(d::MatSpaceElem{T}, dict::IdDict) where T <: RingElement
-   z = _similar(d, base_ring(d), nrows(d), ncols(d))
+   z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
          z[i, j] = deepcopy(d[i, j])
@@ -955,7 +955,9 @@ end
 > Return the transpose of the given matrix.
 """
 function transpose(x::Mat)
-   return matrix(base_ring(x), permutedims(x.entries, [2, 1]))
+   y = MatSpaceElem{eltype(x)}(permutedims(x.entries))
+   y.base_ring = x.base_ring
+   y
 end
 
 ###############################################################################
@@ -3170,33 +3172,33 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
    t1 = base_ring(H)()
    t2 = base_ring(H)()
    for i = 1:l
-      for j = k+1:m
-         if iszero(H[j,i])
+      for j = k + 1:m
+         if iszero(H[j, i])
             continue
          end
-         d, u, v = gcdx(H[k,i], H[j,i])
-         a = divexact(H[k,i], d)
-         b = -divexact(H[j,i], d)
+         d, u, v = gcdx(H[k, i], H[j, i])
+         a = divexact(H[k, i], d)
+         b = -divexact(H[j, i], d)
          for c = i:n
-            t = deepcopy(H[j,c])
+            t = deepcopy(H[j, c])
             t1 = mul_red!(t1, a, H[j, c], false)
             t2 = mul_red!(t2, b, H[k, c], false)
-            H[j, c] = add!(H[j, c], t1, t2)
+            H[j, c] = t1 + t2
             H[j, c] = reduce!(H[j, c])
             t1 = mul_red!(t1, u, H[k, c], false)
             t2 = mul_red!(t2, v, t, false)
-            H[k, c] = add!(H[k, c], t1, t2)
+            H[k, c] = t1 + t2
             H[k, c] = reduce!(H[k, c])
          end
          for c = 1:m
             t = deepcopy(U[j,c])
             t1 = mul_red!(t1, a, U[j, c], false)
             t2 = mul_red!(t2, b, U[k, c], false)
-            U[j, c] = add!(U[j, c], t1, t2)
+            U[j, c] = t1 + t2
             U[j, c] = reduce!(U[j, c])
             t1 = mul_red!(t1, u, U[k, c], false)
             t2 = mul_red!(t2, v, t, false)
-            U[k, c] = add!(U[k, c], t1, t2)
+            U[k, c] = t1 + t2
             U[k, c] = reduce!(U[k, c])
          end
       end
@@ -3569,12 +3571,12 @@ function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int,
       q = -div(H[p, c], H[r, c])
       for j = c:ncols(H)
          t = mul!(t, q, H[r, j])
-         H[p, j] = addeq!(H[p, j], t)
+         H[p, j] += t
       end
       if with_trafo
          for j = 1:ncols(U)
             t = mul!(t, q, U[r, j])
-            U[p, j] = addeq!(U[p, j], t)
+            U[p, j] += t
          end
       end
    end
@@ -3671,24 +3673,20 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
                t = deepcopy(H[i, c])
                t1 = mul_red!(t1, a, H[i, c], false)
                t2 = mul_red!(t2, b, H[p, c], false)
-               H[i, c] = add!(H[i, c], t1, t2)
-               H[i, c] = reduce!(H[i, c])
+               H[i, c] = reduce!(t1 + t2)
                t1 = mul_red!(t1, u, H[p, c], false)
                t2 = mul_red!(t2, v, t, false)
-               H[p, c] = add!(H[p, c], t1, t2)
-               H[p, c] = reduce!(H[p, c])
+               H[p, c] = reduce!(t1 + t2)
             end
             if with_trafo
                for c = 1:m
                   t = deepcopy(U[i, c])
                   t1 = mul_red!(t1, a, U[i, c], false)
                   t2 = mul_red!(t2, b, U[p, c], false)
-                  U[i, c] = add!(U[i, c], t1, t2)
-                  U[i, c] = reduce!(U[i, c])
+                  U[i, c] = reduce!(t1 + t2)
                   t1 = mul_red!(t1, u, U[p, c], false)
                   t2 = mul_red!(t2, v, t, false)
-                  U[p, c] = add!(U[p, c], t1, t2)
-                  U[p, c] = reduce!(U[p, c])
+                  U[p, c] = reduce!(t1 + t2)
                end
             end
          end
@@ -3830,24 +3828,20 @@ function kb_clear_row!(S::MatrixElem{T}, K::MatrixElem{T}, i::Int, with_trafo::B
          t = deepcopy(S[r, j])
          t1 = mul_red!(t1, a, S[r, j], false)
          t2 = mul_red!(t2, b, S[r, i], false)
-         S[r, j] = add!(S[r, j], t1, t2)
-         S[r, j] = reduce!(S[r, j])
+         S[r, j] = reduce!(t1 + t2)
          t1 = mul_red!(t1, u, S[r, i], false)
          t2 = mul_red!(t2, v, t, false)
-         S[r, i] = add!(S[r, i], t1, t2)
-         S[r, i] = reduce!(S[r, i])
+         S[r, i] = reduce!(t1 + t2)
       end
       if with_trafo
          for r = 1:n
             t = deepcopy(K[r,j])
             t1 = mul_red!(t1, a, K[r, j], false)
             t2 = mul_red!(t2, b, K[r, i], false)
-            K[r, j] = add!(K[r, j], t1, t2)
-            K[r, j] = reduce!(K[r, j])
+            K[r, j] = reduce!(t1 + t2)
             t1 = mul_red!(t1, u, K[r, i], false)
             t2 = mul_red!(t2, v, t, false)
-            K[r, i] = add!(K[r, i], t1, t2)
-            K[r, i] = reduce!(K[r, i])
+            K[r, i] = reduce!(t1 + t2)
          end
       end
    end
@@ -3888,12 +3882,11 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
             t1 = mul!(t1, q, v)
             for c = 1:m
                t = deepcopy(U[i,c])
-               U[i, c] = addeq!(U[i, c], U[j,c])
+               U[i, c] += U[j, c]
                t2 = mul_red!(t2, t1, U[j, c], false)
-               U[j, c] = addeq!(U[j, c], t2)
+               U[j, c] += t2
                t2 = mul_red!(t2, t1, t, false)
-               U[j, c] = addeq!(U[j, c], t2)
-               U[j, c] = reduce!(U[j, c])
+               U[j, c] = reduce!(U[j, c] + t2)
             end
             q1 = -divexact(S[j, j], d)
             q2 = divexact(S[i, i], d)
@@ -3901,12 +3894,10 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
                t = deepcopy(K[r, i])
                t1 = mul_red!(t1, K[r, i], u, false)
                t2 = mul_red!(t2, K[r, j], v, false)
-               K[r, i] = add!(K[r, i], t1, t2)
-               K[r, i] = reduce!(K[r, i])
+               K[r, i] = reduce!(t1 + t2)
                t1 = mul_red!(t1, t, q1, false)
                t2 = mul_red!(t2, K[r, j], q2, false)
-               K[r, j] = add!(K[r, j], t1, t2)
-               K[r, j] = reduce!(K[r, j])
+               K[r, j] = reduce!(t1 + t2)
             end
          end
          S[j, j] = divexact(S[i, i]*S[j, j],d)
@@ -4597,134 +4588,134 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:nrows(a))
+    add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
 > Add $s$ times the $i$-th row to the $j$-th row of $a$.
 >
 > By default, the transformation is applied to all rows of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `rows` argument.
 """
-function add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:nrows(a))
+function add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
    c = base_ring(a)(s)
    nc = ncols(a)
    !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
    !_checkbounds(nc, j) && error("Column index ($j) must be between 1 and $nc")
    temp = base_ring(a)()
-   for r in rng
+   for r in rows
       a[r, j] = addmul!(a[r, j], c, a[r, i], temp)
    end
    return a
 end
 
 @doc Markdown.doc"""
-    add_column(a::MatrixElem, s::RingElement, i::Int, j::Int; rng = 1:nrows(a))
+    add_column(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
 > Create a copy of $a$ and add $s$ times the $i$-th row to the $j$-th row of $a$.
 >
 > By default, the transformation is applied to all rows of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `rows` argument.
 
 """
-function add_column(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:nrows(a))
+function add_column(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
    b = deepcopy(a)
-   return add_column!(b, s, i, j, rng)
+   return add_column!(b, s, i, j, rows)
 end
 
 @doc Markdown.doc"""
-    add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:nrows(a))
+    add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
 > Add $s$ times the $i$-th row to the $j$-th row of $a$.
 >
 > By default, the transformation is applied to all columns of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `cols` argument.
 """
-function add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:ncols(a))
+function add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
    c = base_ring(a)(s)
    nc = nrows(a)
    !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
    !_checkbounds(nc, j) && error("Row index ($j) must be between 1 and $nc")
    temp = base_ring(a)()
-   for r in rng
+   for r in cols
       a[j, r] = addmul!(a[j, r], c, a[i, r], temp)
    end
    return a
 end
 
 @doc Markdown.doc"""
-    add_row(a::MatrixElem, s::RingElement, i::Int, j::Int; rng = 1:nrows(a))
+    add_row(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
 > Create a copy of $a$ and add $s$ times the $i$-th row to the $j$-th row of $a$.
 >
 > By default, the transformation is applied to all columns of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `cols` argument.
 """
-function add_row(a::MatrixElem, s::RingElement, i::Int, j::Int, rng = 1:ncols(a))
+function add_row(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
    b = deepcopy(a)
-   return add_row!(b, s, i, j, rng)
+   return add_row!(b, s, i, j, cols)
 end
 
 # Multiply column
 
 @doc Markdown.doc"""
-    multiply_column!(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+    multiply_column!(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
 
 > Multiply the $i$th column of $a$ with $s$.
 >
 > By default, the transformation is applied to all rows of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `rows` argument.
 """
-function multiply_column!(a::MatrixElem, s::RingElement, i::Int, rng = 1:nrows(a))
+function multiply_column!(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
    c = base_ring(a)(s)
    nc = ncols(a)
    !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
    temp = base_ring(a)()
-   for r in rng
+   for r in rows
       a[r, i] = mul!(a[r, i], c, a[r, i])
    end
    return a
 end
 
 @doc Markdown.doc"""
-    multiply_column(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+    multiply_column(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
 
-> Create a copy of $a$ and multiply  the $i$th column of $a$ with $s$.
+> Create a copy of $a$ and multiply the $i$th column of $a$ with $s$.
 >
 > By default, the transformation is applied to all rows of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `rows` argument.
 """
-function multiply_column(a::MatrixElem, s::RingElement, i::Int, rng = 1:nrows(a))
+function multiply_column(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
    b = deepcopy(a)
-   return multiply_column!(b, s, i, rng)
+   return multiply_column!(b, s, i, rows)
 end
 
 # Multiply row
 
 @doc Markdown.doc"""
-    multiply_row!(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+    multiply_row!(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
 
 > Multiply the $i$th row of $a$ with $s$.
 >
 > By default, the transformation is applied to all columns of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `cols` argument.
 """
-function multiply_row!(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+function multiply_row!(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
    c = base_ring(a)(s)
    nc = nrows(a)
    !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
    temp = base_ring(a)()
-   for r in rng
+   for r in cols
       a[i, r] = mul!(a[i, r], c, a[i, r])
    end
    return a
 end
 
 @doc Markdown.doc"""
-    multiply_row(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+    multiply_row(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
 
 > Create a copy of $a$ and multiply  the $i$th row of $a$ with $s$.
 >
 > By default, the transformation is applied to all columns of $a$. This can be
-> changed using the optional `rng` argument.
+> changed using the optional `cols` argument.
 """
-function multiply_row(a::MatrixElem, s::RingElement, i::Int, rng = 1:ncols(a))
+function multiply_row(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
    b = deepcopy(a)
-   return multiply_row!(b, s, i, rng)
+   return multiply_row!(b, s, i, cols)
 end
 
 ###############################################################################
@@ -4910,14 +4901,19 @@ end
 #
 ###############################################################################
 
+# like change_base_ring, but without initializing the entries
+# this function exists until a better API is implemented
+_change_base_ring(R::Ring, a::MatElem) = zero_matrix(R, nrows(a), ncols(a))
+_change_base_ring(R::Ring, a::MatAlgElem) = MatrixAlgebra(R, nrows(a))()
+
 @doc Markdown.doc"""
     change_base_ring(R::Ring, M::MatrixElem)
 
 > Return the matrix obtained by coercing each entry into `R`.
 """
 function change_base_ring(R::Ring, M::MatrixElem)
-   N = similar(M, R)
-   for i=1:nrows(M), j=1:ncols(M)
+   N = _change_base_ring(R, M)
+   for i = 1:nrows(M), j = 1:ncols(M)
       N[i,j] = R(M[i,j])
    end
    return N
@@ -4955,9 +4951,9 @@ Base.map!(f, dst::MatrixElem, src::MatrixElem) = map_entries!(f, dst, src)
 > Transform matrix `a` by applying `f` on each element.
 """
 function map_entries(f, a::MatrixElem)
-   isempty(a) && return similar(a, parent(f(zero(base_ring(a)))))
+   isempty(a) && return _change_base_ring(parent(f(zero(base_ring(a)))), a)
    b11 = f(a[1, 1])
-   b = similar(a, parent(b11))
+   b = _change_base_ring(parent(b11), a)
    b[1, 1] = b11
    for i = 1:nrows(a), j = 1:ncols(a)
       i == j == 1 && continue
@@ -5214,39 +5210,59 @@ end
 
 > Return the $n \times n$ identity matrix over $R$.
 """
-function identity_matrix(R::Ring, n::Int)
-   z = zero_matrix(R, n, n)
-   for i in 1:n
-      z[i, i] = one(R)
-   end
-   return z
-end
-
-@doc Markdown.doc"""
-    identity_matrix(R::Ring, m::Int, n::Int)
-> Return the $m \times n$ matrix over $R$ with ones down the diagonal and
-> zeroes elsewhere.
-"""
-function identity_matrix(R::Ring, m::Int, n::Int)
-   z = zero_matrix(R, m, n)
-   for i in 1:min(m, n)
-      z[i, i] = one(R)
-   end
-   return z
-end
+identity_matrix(R::Ring, n::Int) = diagonal_matrix(one(R), n)
 
 @doc Markdown.doc"""
     identity_matrix(M::MatElem{T}) where T <: RingElement
-> Return the matrix over the same base ring as $M$ and with the same
-> dimensions with ones down the diagonal and zeroes elsewhere.
+> Construct the identity matrix in the same matrix space as `M`, i.e.
+> with ones down the diagonal and zeroes elsewhere. `M` must be square.
+> This is an alias for `one(M)`.
 """
 function identity_matrix(M::MatElem{T}) where T <: RingElement
-   return identity_matrix(base_ring(M), nrows(M), ncols(M))
+   identity_matrix(check_square(M), nrows(M))
 end
 
 function identity_matrix(M::MatElem{T}, n::Int) where T <: RingElement
-   return identity_matrix(base_ring(M), n, n)
+   z = zero(M, n, n)
+   R = base_ring(M)
+   for i = 1:n
+      z[i, i] = one(R)
+   end
+   z
 end
+
+################################################################################
+#
+#   Diagonal matrix
+#
+################################################################################
+
+@doc Markdown.doc"""
+    diagonal_matrix(x::RingElement, m::Int, [n::Int])
+> Return the $m \times n$ matrix over $R$ with `x` along the main diagonal and
+> zeroes elsewhere. If `n` is not specified, it defaults to `m`.
+
+# Examples
+```jldoctest
+julia> diagonal_matrix(ZZ(2), 2, 3)
+[2  0  0]
+[0  2  0]
+
+julia> diagonal_matrix(QQ(-1), 3)
+[-1//1   0//1   0//1]
+[ 0//1  -1//1   0//1]
+[ 0//1   0//1  -1//1]
+```
+"""
+function diagonal_matrix(x::RingElement, m::Int, n::Int)
+   z = zero_matrix(parent(x), m, n)
+   for i in 1:min(m, n)
+      z[i, i] = x
+   end
+   return z
+end
+
+diagonal_matrix(x::RingElement, m::Int) = diagonal_matrix(x, m, m)
 
 ###############################################################################
 #
@@ -5265,3 +5281,45 @@ function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = tru
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end
+
+###############################################################################
+#
+#   Conversion to Array
+#
+###############################################################################
+
+"""
+    Matrix(A::MatrixElem)
+> Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> A = ZZ[1 2 3; 4 5 6]
+[1  2  3]
+[4  5  6]
+
+julia> Matrix(A)
+2×3 Array{BigInt,2}:
+ 1  2  3
+ 4  5  6
+```
+"""
+Matrix(M::MatrixElem) = eltype(M)[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
+
+"""
+    Array(A::MatrixElem)
+> Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, x = ZZ["x"]; A = R[x^0 x^1; x^2 x^3]
+[  1    x]
+[x^2  x^3]
+
+julia> Array(A)
+2×2 Array{AbstractAlgebra.Generic.Poly{BigInt},2}:
+ 1    x
+ x^2  x^3
+```
+"""
+Array(M::MatrixElem) = Matrix(M)

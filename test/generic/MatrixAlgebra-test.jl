@@ -147,6 +147,8 @@ end
    @test zero(A) == zero(S)
    @test one(A) == one(S)
 
+   @test characteristic(S) == 0
+
    U = MatrixAlgebra(QQ, 3)
    C = U([1 2 3; 5 6 7; 9 8 5])
 
