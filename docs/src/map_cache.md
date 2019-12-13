@@ -56,12 +56,10 @@ Codomain:
 ========
 Integers
 
-
-julia> g = cached(f)
+julia> g = cached(f);
 
 julia> f(ZZ(1)) == g(ZZ(1))
 true
-
 ```
 
 ## Functionality for cached maps
@@ -86,7 +84,7 @@ value. Setting the value to 0 will effectively disable further caching for this 
 **Examples**
 
 ```jldoctest
-julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ))
+julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ));
 
 julia> a = f(ZZ(1))
 2
@@ -106,7 +104,4 @@ julia> set_limit!(f, 200)
 
 julia> d = f(ZZ(1))
 2
-
 ```
-
-

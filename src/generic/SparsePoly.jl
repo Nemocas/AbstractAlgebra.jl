@@ -77,6 +77,10 @@ function Base.deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: Ring
    return parent(a)(Rc, Re)
 end
 
+function characteristic(a::SparsePolyRing{T}) where T <: RingElement
+   return characteristic(base_ring(a))
+end
+
 ###############################################################################
 #
 #   String I/O

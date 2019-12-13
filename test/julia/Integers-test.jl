@@ -95,6 +95,10 @@ end
       @test a2 == 0 || divexact(a1*a2, a2) == a1
       @test b2 == 0 || divexact(b1*b2, b2) == b1
 
+      @test_throws ArgumentError divexact(10, 4)
+      @test_throws ArgumentError divexact(big(10), big(4))
+      @test_throws ArgumentError divexact(big(10), 4)
+
       if a1 != 0
          flagR, qR = divides(a1*a2, a1)
 

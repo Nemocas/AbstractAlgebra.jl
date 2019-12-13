@@ -154,7 +154,9 @@ end
    @test_throws DomainError upscale(a, -rand(1:100))
    @test_throws DomainError downscale(a, 0)
    @test_throws DomainError downscale(a, -rand(1:100))
-   
+  
+   @test characteristic(S) == 0
+
    T = ResidueRing(ZZ, 7)
    U, y = LaurentSeriesRing(T, 10, "y")
 

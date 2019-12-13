@@ -75,6 +75,8 @@ end
    @test isunit((x + 1)//(-x^2 + 1))
 
    @test deepcopy((x + 1)//(-x^2 + 1)) == (x + 1)//(-x^2 + 1)
+
+   @test characteristic(R) == 0
 end
 
 @testset "Generic.Frac.unary_ops..." begin

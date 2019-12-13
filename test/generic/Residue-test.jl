@@ -84,6 +84,8 @@ end
    @test canonical_unit(T(x + 1)) == T(x + 1)
 
    @test deepcopy(h) == h
+
+   @test characteristic(R) == 16453889
 end
 
 @testset "Generic.Res.unary_ops..." begin

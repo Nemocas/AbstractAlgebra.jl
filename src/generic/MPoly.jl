@@ -176,6 +176,10 @@ function check_parent(a::MPoly{T}, b::MPoly{T}, throw::Bool = true) where T <: R
    return !b
 end
 
+function characteristic(a::MPolyRing{T}) where T <: RingElement
+   return characteristic(base_ring(a))
+end
+
 ###############################################################################
 #
 #   Manipulating terms and monomials
@@ -1392,7 +1396,7 @@ end
 
 function -(a::MPoly{T}) where {T <: RingElement}
    N = size(a.exps, 1)
-   r = parent(a)()
+   r = zero(a)
    fit!(r, length(a))
    for i = 1:length(a)
       r.coeffs[i] = -a.coeffs[i]
@@ -2052,7 +2056,7 @@ end
 
 function *(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    N = size(a.exps, 1)
-   r = parent(a)()
+   r = zero(a)
    fit!(r, length(a))
    j = 1
    for i = 1:length(a)
@@ -2070,7 +2074,7 @@ end
 
 function *(a::MPoly{T}, n::T) where {T <: RingElem}
    N = size(a.exps, 1)
-   r = parent(a)()
+   r = zero(a)
    fit!(r, length(a))
    j = 1
    for i = 1:length(a)
@@ -2092,7 +2096,7 @@ end
 
 function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    N = size(a.exps, 1)
-   r = parent(a)()
+   r = zero(a)
    fit!(r, length(a))
    j = 1
    for i = 1:length(a)
@@ -2110,7 +2114,7 @@ end
 
 function divexact(a::MPoly{T}, n::T) where {T <: RingElem}
    N = size(a.exps, 1)
-   r = parent(a)()
+   r = zero(a)
    fit!(r, length(a))
    j = 1
    for i = 1:length(a)
@@ -2393,11 +2397,25 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    return parent(f)(Rc, Re)
 end
 
+function pow_rmul(a::MPoly{T}, b::Int) where {T <: RingElement}
+   b < 0 && throw(DomainError(b, "exponent must be >= 0"))
+   if iszero(a)
+      return zero(a)
+   elseif b == 0
+      return one(a)
+   end
+   z = deepcopy(a)
+   for i = 2:b
+      z = mul!(z, z, a)
+   end
+   return z
+end
+
 function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
-   if length(a) == 0
-      return parent(a)()
+   if iszero(a)
+      return zero(a)
    elseif length(a) == 1
       N = size(a.exps, 1)
       exps = zeros(UInt, N, 1)
@@ -2409,11 +2427,14 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       end
       return parent(a)([coeff(a, 1)^b], exps)
    elseif b == 0
-      return parent(a)(1)
+      return one(a)
    elseif b == 1
-      return a
+      return deepcopy(a)
    elseif b == 2
       return a*a
+   elseif characteristic(base_ring(a)) != 0
+      # pow_fps requires char 0 so use pow_rmul if not or unsure
+      return pow_rmul(a, b)
    else
       v, d = max_fields(a)
       d *= b
@@ -2962,7 +2983,7 @@ function Base.div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    end
    N = parent(a).N
    word_bits = sizeof(Int)*8
-   q = parent(a)()
+   q = zero(a)
    eq = zeros(UInt, N, 0)
    flag = false
    while flag == false
@@ -3186,8 +3207,8 @@ function Base.divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    end
    N = parent(a).N
    word_bits = sizeof(Int)*8
-   q = parent(a)()
-   r = parent(a)()
+   q = zero(a)
+   r = zero(a)
    eq = zeros(UInt, N, 0)
    er = zeros(UInt, N, 0)
    flag = false
@@ -3425,9 +3446,9 @@ function Base.divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
-   q = [parent(a)() for i in 1:len]
+   q = [zero(a) for i in 1:len]
    eq = [zeros(UInt, N, 0) for i in 1:len]
-   r = parent(a)()
+   r = zero(a)
    er = zeros(UInt, N, 0)
    flag = false
    while flag == false
@@ -3811,7 +3832,7 @@ end
 > Return the greatest common divisor of a and b in parent(a).
 """
 function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   if length(a) == 0
+   if iszero(a)
       if b.length == 0
          return deepcopy(a)
       end
