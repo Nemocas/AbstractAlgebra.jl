@@ -24,4 +24,10 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
          @test characteristic(L) == characteristic(R)
       end
    end
+
+   @testset "printing" begin
+      L, y = LaurentPolynomialRing(ZZ, "y")
+      @test string(y) == "y"
+      @test string(L) == "Univariate Laurent Polynomial Ring in y over Integers"
+   end
 end

@@ -270,20 +270,42 @@ canonical_unit(x::PolynomialElem) = canonical_unit(lead(x))
 #
 ###############################################################################
 
-function show(io::IO, x::PolynomialElem)
+show(io::IO, x::PolynomialElem) = _show(io, x, 0)
+show(io::IO, x::LaurentPolyWrap) = _show(io, x.poly, x.mindeg)
+
+function _show(io::IO, x::PolynomialElem, mindeg::Int)
    len = length(x)
    S = var(parent(x))
    if len == 0
       print(IOContext(io, :compact => true), base_ring(x)(0))
    else
-      for i = 1:len - 1
+      for i = 1:len
          c = coeff(x, len - i)
          bracket = needs_parentheses(c)
          if !iszero(c)
             if i != 1 && !displayed_with_minus_in_front(c)
                print(io, "+")
             end
-            if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
+            if len - i + mindeg != 0
+               if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
+                  if bracket
+                     print(io, "(")
+                  end
+                  print(IOContext(io, :compact => true), c)
+                  if bracket
+                     print(io, ")")
+                  end
+                  print(io, "*")
+               end
+               if c == -1 && !show_minus_one(typeof(c))
+                  print(io, "-")
+               end
+               print(io, string(S))
+               if len - i != 1
+                  print(io, "^")
+                  print(io, len - i + mindeg)
+               end
+            else # constant term
                if bracket
                   print(io, "(")
                end
@@ -291,30 +313,7 @@ function show(io::IO, x::PolynomialElem)
                if bracket
                   print(io, ")")
                end
-               print(io, "*")
             end
-            if c == -1 && !show_minus_one(typeof(c))
-               print(io, "-")
-            end
-            print(io, string(S))
-            if len - i != 1
-               print(io, "^")
-               print(io, len - i)
-            end
-         end
-      end
-      c = coeff(x, 0)
-      bracket = needs_parentheses(c)
-      if !iszero(c)
-         if len != 1 && !displayed_with_minus_in_front(c)
-            print(io, "+")
-         end
-         if bracket
-            print(io, "(")
-         end
-         print(IOContext(io, :compact => true), c)
-         if bracket
-            print(io, ")")
          end
       end
    end
