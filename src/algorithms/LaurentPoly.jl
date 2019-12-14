@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-base_ring(p::AbstractAlgebra.LaurentPolyElem) = base_ring(parent(p))
+base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 
 
 ###############################################################################

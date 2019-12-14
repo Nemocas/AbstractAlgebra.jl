@@ -321,6 +321,15 @@ include("julia/JuliaTypes.jl")
 
 ###############################################################################
 #
+#   Generic algorithms defined on abstract types
+#
+###############################################################################
+
+include("algorithms/generic_functions.jl")
+include("algorithms/LaurentPoly.jl")
+
+###############################################################################
+#
 #   Generic submodule
 #
 ###############################################################################
@@ -329,7 +338,7 @@ include("Generic.jl")
 
 # Do not import numerator and denominator as we have our own
 import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
-                 add_row!, base_ring, basis, cached, canonical_unit, can_solve_left_reduced_triu,
+                 add_row!, basis, cached, canonical_unit, can_solve_left_reduced_triu,
                  change_base_ring,
                  character, characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,

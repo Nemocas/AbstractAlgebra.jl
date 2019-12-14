@@ -24,7 +24,7 @@ import Base: floor, ceil, hypot, log, log1p, expm1, sin, cos, sinpi, cospi,
 
 import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
                           RingElem, RingElement, Field, FieldElement, Map,
-                          promote_rule
+                          promote_rule, base_ring
 
 import ..AbstractAlgebra: exp, sqrt, div, divrem, numerator, denominator
 
@@ -49,7 +49,6 @@ include("generic/MPoly.jl")
 include("generic/SparsePoly.jl")
 
 include("generic/LaurentPoly.jl")
-include("algorithms/LaurentPoly.jl")
 
 include("generic/RelSeries.jl")
 
