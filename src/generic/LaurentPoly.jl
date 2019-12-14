@@ -18,6 +18,8 @@ elem_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} =
 
 parent(p::LaurentPolyWrap) = LaurentPolyWrapRing(parent(p.poly))
 
+base_ring(R::LaurentPolyWrapRing) = base_ring(R.polyring)
+
 var(R::LaurentPolyWrapRing) = var(R.polyring)
 
 symbols(R::LaurentPolyWrapRing) = symbols(R.polyring)

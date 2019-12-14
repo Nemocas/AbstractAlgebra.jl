@@ -49,6 +49,7 @@ include("generic/MPoly.jl")
 include("generic/SparsePoly.jl")
 
 include("generic/LaurentPoly.jl")
+include("algorithms/LaurentPoly.jl")
 
 include("generic/RelSeries.jl")
 
