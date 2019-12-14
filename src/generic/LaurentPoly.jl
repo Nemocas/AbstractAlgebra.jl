@@ -4,6 +4,8 @@
 #
 ###############################################################################
 
+import AbstractAlgebra: monomials_degrees
+
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -27,6 +29,15 @@ symbols(R::LaurentPolyWrapRing) = symbols(R.polyring)
 nvars(R::LaurentPolyWrapRing) = nvars(R.polyring)
 
 characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
+
+
+###############################################################################
+#
+#   Basic manipulation
+#
+###############################################################################
+
+monomials_degrees(p::LaurentPolyWrap) = p.mindeg .+ (0:degree(p.poly))
 
 
 ###############################################################################

@@ -6,6 +6,20 @@
 
 base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 
+###############################################################################
+#
+#   Basic manipulation
+#
+###############################################################################
+
+# required implementation
+"""
+    monomials_degrees(p::LaurentPolyElem) -> AbstractVector
+
+> Return a vector containing at least all the degrees of the non-null
+> monomials of `p`.
+"""
+function monomials_degrees end
 
 ###############################################################################
 #

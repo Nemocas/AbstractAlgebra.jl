@@ -1,3 +1,5 @@
+using AbstractAlgebra: monomials_degrees
+
 using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
 @testset "Generic.LaurentPoly" begin
@@ -23,6 +25,20 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
          @test characteristic(L) == characteristic(R)
       end
+   end
+
+   @testset "basic manipulation" begin
+      L, y = LaurentPolynomialRing(ZZ, "y")
+
+      @test monomials_degrees(y) == 0:1
+      # @test monomials_degrees(y^3) == 0:3
+
+      x = y.poly
+      f = LaurentPolyWrap(x, -2)
+      @test monomials_degrees(f) == -2:-1
+
+      f = LaurentPolyWrap(1+x^4, -3)
+      @test monomials_degrees(f) == -3:1
    end
 
    @testset "printing" begin
