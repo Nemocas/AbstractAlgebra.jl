@@ -84,6 +84,8 @@ end
 *(p::LaurentPolyWrap, a::RingElement) = LaurentPolyWrap(p.poly * a, p.mindeg)
 *(a::RingElement, p::LaurentPolyWrap) = p * a
 
++(p::LaurentPolyWrap, a::RingElement) = p + LaurentPolyWrap(one(p.poly) * a)
++(a::RingElement, p::LaurentPolyWrap) = p + a
 
 ###############################################################################
 #

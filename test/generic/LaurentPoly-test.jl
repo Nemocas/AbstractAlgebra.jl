@@ -5,8 +5,9 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 @testset "Generic.LaurentPoly" begin
    @testset "constructors" begin
       for R in (ZZ, GF(5))
-         P, x = PolynomialRing(R, "x")
+         P, _ = PolynomialRing(R, "x0")
          L, y = LaurentPolynomialRing(R, "y")
+         x = y.poly
 
          @test L isa LaurentPolyWrapRing{elem_type(R)}
          @test y isa LaurentPolyWrap{elem_type(R)}
@@ -25,9 +26,9 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
          @test characteristic(L) == characteristic(R)
 
-        @test LaurentPolyWrap(x) == y
-#       @test LaurentPolyWrap(2x^2 + 3x + 4) == 2y^2 + 3y + 4
-#       @test LaurentPolyWrap(2x^2 + 3x + 4, -1) * y == 2y^2 + 3y + 4
+         @test LaurentPolyWrap(x) == y
+         @test LaurentPolyWrap(2x^2 + 3x + 4) == 2y^2 + 3y + 4
+         @test LaurentPolyWrap(2x^2 + 3x + 4, -1) * y == 2y^2 + 3y + 4
       end
    end
 
@@ -68,7 +69,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test -(-y) == y
 #     @test iszero(y + (-y))
       @test y + y - y == y
-      @test 2y*y*y + 3y*y - 5y == LaurentPolyWrap(2x^3 + 3x^2 - 5x)
+      @test 2y*y*y + 3y*y - 5y + 8 == LaurentPolyWrap(2x^3 + 3x^2 - 5x + 8)
 
       c = rand(-9:9)
       for i = -9:9
