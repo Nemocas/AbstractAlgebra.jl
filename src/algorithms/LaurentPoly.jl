@@ -21,6 +21,9 @@ base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 """
 function monomials_degrees end
 
+# other required methods without default implementation:
+# coeff
+
 ###############################################################################
 #
 #   String I/O

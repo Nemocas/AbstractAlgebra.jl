@@ -32,13 +32,16 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
       @test monomials_degrees(y) == 0:1
       # @test monomials_degrees(y^3) == 0:3
+      @test [coeff(y, i) for i=-1:2] == [0, 0, 1, 0]
 
       x = y.poly
       f = LaurentPolyWrap(x, -2)
       @test monomials_degrees(f) == -2:-1
+      @test [coeff(f, i) for i = -3:0] == [0, 0, 1, 0]
 
-      f = LaurentPolyWrap(1+x^4, -3)
+      f = LaurentPolyWrap(3 + 2*x^4, -3)
       @test monomials_degrees(f) == -3:1
+      @test [coeff(f, i) for i = -4:2] == [0, 3, 0, 0, 0, 2, 0]
    end
 
    @testset "printing" begin

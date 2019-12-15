@@ -39,6 +39,8 @@ characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
 
 monomials_degrees(p::LaurentPolyWrap) = p.mindeg .+ (0:degree(p.poly))
 
+coeff(p::LaurentPolyWrap, i::Int) =
+   i < p.mindeg ? zero(base_ring(p)) : coeff(p.poly, i - p.mindeg)
 
 ###############################################################################
 #
