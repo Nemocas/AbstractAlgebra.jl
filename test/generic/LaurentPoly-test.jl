@@ -44,6 +44,19 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test [coeff(f, i) for i = -4:2] == [0, 3, 0, 0, 0, 2, 0]
    end
 
+   @testset "comparisons" begin
+      L, y = LaurentPolynomialRing(ZZ, "y")
+      x = y.poly
+
+      @test y == y
+
+      f = LaurentPolyWrap(x^3 + 2x^2 - 1)
+      @test f == f
+      @test f == LaurentPolyWrap(x^3 + 2x^2 - 1)
+      @test f != x
+      @test f != LaurentPolyWrap(x^3 + 2x^2 - 1, -2)
+   end
+
    @testset "printing" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
       @test string(y) == "y"

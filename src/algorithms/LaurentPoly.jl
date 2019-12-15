@@ -21,6 +21,13 @@ base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 """
 function monomials_degrees end
 
+# return a monomials_degrees vector valid for both polys
+function monomials_degrees(p::LaurentPolyElem, q::LaurentPolyElem)
+   minp, maxp = extrema(monomials_degrees(p))
+   minq, maxq = extrema(monomials_degrees(q))
+   min(minp, minq):max(maxp, maxq)
+end
+
 # other required methods without default implementation:
 # coeff
 
