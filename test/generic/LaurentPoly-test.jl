@@ -61,14 +61,20 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test f != LaurentPolyWrap(x^3 + 2x^2 - 1, -2)
    end
 
-   @testset "unary & binary arithmetic operations" begin
+   @testset "unary & binary & adhoc arithmetic operations" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
       x = y.poly
 
       @test -(-y) == y
 #     @test iszero(y + (-y))
       @test y + y - y == y
-      @test y*y*y + y*y - y == LaurentPolyWrap(x^3 + x^2 - x)
+      @test 2y*y*y + 3y*y - 5y == LaurentPolyWrap(2x^3 + 3x^2 - 5x)
+
+      c = rand(-9:9)
+      for i = -9:9
+         @test coeff(c*y, i) == (i == 1 ? c : 0)
+         @test coeff(y*c, i) == (i == 1 ? c : 0)
+      end
 
       f_ = rand(parent(x), 1:9, -9:9)
       f = LaurentPolyWrap(f_)

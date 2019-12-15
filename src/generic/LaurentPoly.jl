@@ -74,6 +74,14 @@ end
 
 *(p::LaurentPolyWrap, q::LaurentPolyWrap) = LaurentPolyWrap(p.poly * q.poly, p.mindeg + q.mindeg)
 
+###############################################################################
+#
+#   Ad hoc binary operators
+#
+###############################################################################
+
+*(p::LaurentPolyWrap, a::RingElement) = LaurentPolyWrap(p.poly * a, p.mindeg)
+*(a::RingElement, p::LaurentPolyWrap) = p * a
 
 ###############################################################################
 #
