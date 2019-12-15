@@ -53,6 +53,30 @@ coeff(p::LaurentPolyWrap, i::Int) =
 
 ###############################################################################
 #
+#   Unary and Binary operations
+#
+###############################################################################
+
+-(p::LaurentPolyWrap) = LaurentPolyWrap(-p.poly, p.mindeg)
+
+function +(p::LaurentPolyWrap, q::LaurentPolyWrap)
+   if p.mindeg > q.mindeg
+      p, q = q, p
+   end
+   p_, q_ = p.poly, q.poly
+   if p.mindeg < q.mindeg
+      q_ = shift_left(q_, q.mindeg - p.mindeg)
+   end
+   LaurentPolyWrap(p_ + q_, p.mindeg)
+end
+
+-(p::LaurentPolyWrap, q::LaurentPolyWrap) = p + (-q) # TODO: optimize
+
+*(p::LaurentPolyWrap, q::LaurentPolyWrap) = LaurentPolyWrap(p.poly * q.poly, p.mindeg + q.mindeg)
+
+
+###############################################################################
+#
 #   LaurentPolynomialRing constructor
 #
 ###############################################################################

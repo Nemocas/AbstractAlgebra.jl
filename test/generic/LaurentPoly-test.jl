@@ -24,6 +24,10 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
          @test nvars(L) == 1
 
          @test characteristic(L) == characteristic(R)
+
+#        @test LaurentPolyWrap(x) == y
+#        @test LaurentPolyWrap(2x^2 + 3x + 4) == 2y^2 + 3x + 4
+#        @test LaurentPolyWrap(2x^2 + 3x + 4, -1) * y == 2y^2 + 3x + 4
       end
    end
 
@@ -55,6 +59,23 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test f == LaurentPolyWrap(x^3 + 2x^2 - 1)
       @test f != x
       @test f != LaurentPolyWrap(x^3 + 2x^2 - 1, -2)
+   end
+
+   @testset "unary & binary arithmetic operations" begin
+      L, y = LaurentPolynomialRing(ZZ, "y")
+      x = y.poly
+
+      @test -(-y) == y
+#     @test iszero(y + (-y))
+      @test y + y - y == y
+      @test y*y*y + y*y - y == LaurentPolyWrap(x^3 + x^2 - x)
+
+      f_ = rand(parent(x), 1:9, -9:9)
+      f = LaurentPolyWrap(f_)
+      @test f*f == LaurentPolyWrap(f_*f_)
+
+      f = LaurentPolyWrap(f_, -3)
+      @test y*y*y*y*y*y*f*f == LaurentPolyWrap(f_*f_)
    end
 
    @testset "printing" begin
