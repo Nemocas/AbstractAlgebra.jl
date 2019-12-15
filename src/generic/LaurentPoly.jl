@@ -52,6 +52,10 @@ function isone(p::LaurentPolyWrap)
    isone(coeff(p, 0))
 end
 
+zero(p::LaurentPolyWrapRing) = LaurentPolyWrap(zero(p.polyring))
+one(p::LaurentPolyWrapRing) = LaurentPolyWrap(one(p.polyring))
+
+
 ###############################################################################
 #
 #   Comparisons

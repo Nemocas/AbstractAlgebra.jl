@@ -39,6 +39,14 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test monomials_degrees(y^3) == 0:3
       @test [coeff(y, i) for i=-1:2] == [0, 0, 1, 0]
 
+      @test iszero(zero(L))
+      @test iszero(zero(y))
+      @test !iszero(one(y))
+
+      @test isone(one(L))
+      @test isone(one(y))
+      @test !isone(zero(y))
+
       x = y.poly
       f = LaurentPolyWrap(x, -2)
       @test monomials_degrees(f) == -2:-1
