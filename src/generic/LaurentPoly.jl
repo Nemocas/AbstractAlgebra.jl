@@ -5,7 +5,7 @@
 ###############################################################################
 
 import AbstractAlgebra: monomials_degrees
-using AbstractAlgebra: monomial_degree
+using AbstractAlgebra: monomial_degree, degrees_range
 
 ###############################################################################
 #
@@ -42,6 +42,15 @@ monomials_degrees(p::LaurentPolyWrap) = p.mindeg .+ (0:degree(p.poly))
 
 coeff(p::LaurentPolyWrap, i::Int) =
    i < p.mindeg ? zero(base_ring(p)) : coeff(p.poly, i - p.mindeg)
+
+iszero(p::LaurentPolyWrap) = iszero(p.poly)
+
+function isone(p::LaurentPolyWrap)
+   dr = degrees_range(p)
+   length(dr) == 1 || return false
+   iszero(dr[]) || return false
+   isone(coeff(p, 0))
+end
 
 ###############################################################################
 #

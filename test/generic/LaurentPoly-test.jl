@@ -44,9 +44,19 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test monomials_degrees(f) == -2:-1
       @test [coeff(f, i) for i = -3:0] == [0, 0, 1, 0]
 
+      @test !isone(f)
+      @test !iszero(f)
+      @test isone(f^0)
+      @test iszero(f-f)
+
       f = LaurentPolyWrap(3 + 2*x^4, -3)
       @test monomials_degrees(f) == -3:1
       @test [coeff(f, i) for i = -4:2] == [0, 3, 0, 0, 0, 2, 0]
+
+      @test !isone(f)
+      @test !iszero(f)
+      @test isone(f^0)
+      @test iszero(f-f)
    end
 
    @testset "comparisons" begin
@@ -67,7 +77,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       x = y.poly
 
       @test -(-y) == y
-#     @test iszero(y + (-y))
+      @test iszero(y + (-y))
       @test y + y - y == y
       @test 2y*y*y + 3y*y - 5y + 8 == LaurentPolyWrap(2x^3 + 3x^2 - 5x + 8)
 
@@ -101,6 +111,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
             @test y^(-i*e) * f(i)^e == fxe
          end
       end
+
+      @test isone(f(rand(-9:9))^0)
 
       @test_throws DomainError (2y)^-1
       @test_throws DomainError (3y^-1)^-2

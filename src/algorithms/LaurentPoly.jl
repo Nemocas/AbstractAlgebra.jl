@@ -14,7 +14,7 @@ base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 
 # required implementation
 """
-    monomials_degrees(p::LaurentPolyElem) -> AbstractVector
+    monomials_degrees(p::LaurentPolyElem) -> AbstractVector{<:Integer}
 
 > Return a vector containing at least all the degrees of the non-null
 > monomials of `p`.
@@ -27,6 +27,23 @@ function monomials_degrees(p::LaurentPolyElem, q::LaurentPolyElem)
    minq, maxq = extrema(monomials_degrees(q))
    min(minp, minq):max(maxp, maxq)
 end
+
+# like monomials_degrees, but return a "strict" range, whose min/max
+# corresponds to non-zero coeffs
+function degrees_range(p::LaurentPolyElem)
+   mds = monomials_degrees(p)
+   T = eltype(mds)
+   minp, maxp = isempty(mds) ? (T(0), T(0)) : extrema(mds)
+   while iszero(coeff(p, minp))
+      minp += 1
+      minp > maxp && return minp:maxp
+   end
+   while iszero(coeff(p, maxp))
+      maxp -= 1
+   end
+   minp:maxp
+end
+
 
 # return the degree of the unique monomial, throw if not a monomial
 function monomial_degree(p::LaurentPolyElem)
