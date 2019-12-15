@@ -25,9 +25,9 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
          @test characteristic(L) == characteristic(R)
 
-#        @test LaurentPolyWrap(x) == y
-#        @test LaurentPolyWrap(2x^2 + 3x + 4) == 2y^2 + 3x + 4
-#        @test LaurentPolyWrap(2x^2 + 3x + 4, -1) * y == 2y^2 + 3x + 4
+        @test LaurentPolyWrap(x) == y
+#       @test LaurentPolyWrap(2x^2 + 3x + 4) == 2y^2 + 3y + 4
+#       @test LaurentPolyWrap(2x^2 + 3x + 4, -1) * y == 2y^2 + 3y + 4
       end
    end
 
@@ -35,7 +35,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       L, y = LaurentPolynomialRing(ZZ, "y")
 
       @test monomials_degrees(y) == 0:1
-      # @test monomials_degrees(y^3) == 0:3
+      @test monomials_degrees(y^3) == 0:3
       @test [coeff(y, i) for i=-1:2] == [0, 0, 1, 0]
 
       x = y.poly
@@ -76,12 +76,42 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
          @test coeff(y*c, i) == (i == 1 ? c : 0)
       end
 
-      f_ = rand(parent(x), 1:9, -9:9)
-      f = LaurentPolyWrap(f_)
-      @test f*f == LaurentPolyWrap(f_*f_)
+      fx = rand(parent(x), 1:9, -9:9)
+      f = LaurentPolyWrap(fx)
+      @test f*f == LaurentPolyWrap(fx*fx)
 
-      f = LaurentPolyWrap(f_, -3)
-      @test y*y*y*y*y*y*f*f == LaurentPolyWrap(f_*f_)
+      f = LaurentPolyWrap(fx, -3)
+      @test y*y*y*y*y*y*f*f == LaurentPolyWrap(fx*fx)
+      @test y*y*y*y*y*y*f*f == y^6 * f^2
+   end
+
+   @testset "powering" begin
+      L, y = LaurentPolynomialRing(ZZ, "y")
+      x = y.poly
+
+      @test 2y^-2 + 3y^-1 + 4y^0 + 5y + 6y^2 == LaurentPolyWrap(2 + 3x + 4x^2 + 5x^3 + 6x^4, -2)
+
+      fx = rand(parent(x), 1:9, -9:9)
+      f = d -> LaurentPolyWrap(fx, d)
+
+      for e in rand(0:9, 2)
+         fxe = LaurentPolyWrap(fx^e)
+         for i = -3:3
+            @test y^(-i*e) * f(i)^e == fxe
+         end
+      end
+
+      @test_throws DomainError (2y)^-1
+      @test_throws DomainError (3y^-1)^-2
+      @test_throws DomainError (y + y^2)^-1
+
+
+      LQ, z = LaurentPolynomialRing(QQ, "z")
+
+      @test (2z)^-1 == 1//2 * z^-1
+      @test (3z^-1)^(-2) == 1//9 * z^2
+
+      @test_throws DomainError (z + z^2)^-1
    end
 
    @testset "printing" begin

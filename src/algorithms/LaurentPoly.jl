@@ -28,6 +28,20 @@ function monomials_degrees(p::LaurentPolyElem, q::LaurentPolyElem)
    min(minp, minq):max(maxp, maxq)
 end
 
+# return the degree of the unique monomial, throw if not a monomial
+function monomial_degree(p::LaurentPolyElem)
+   isnull = true
+   local deg
+   for d in monomials_degrees(p)
+      if !iszero(coeff(p, d))
+         !isnull && throw(DomainError(p, "not a monomial"))
+         deg = d
+         isnull = false
+      end
+   end
+   deg
+end
+
 # other required methods without default implementation:
 # coeff
 

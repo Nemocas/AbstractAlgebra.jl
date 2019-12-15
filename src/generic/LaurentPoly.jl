@@ -5,6 +5,7 @@
 ###############################################################################
 
 import AbstractAlgebra: monomials_degrees
+using AbstractAlgebra: monomial_degree
 
 ###############################################################################
 #
@@ -82,6 +83,26 @@ end
 
 *(p::LaurentPolyWrap, a::RingElement) = LaurentPolyWrap(p.poly * a, p.mindeg)
 *(a::RingElement, p::LaurentPolyWrap) = p * a
+
+
+###############################################################################
+#
+#   Powering
+#
+###############################################################################
+
+function ^(p::LaurentPolyWrap, e::Integer)
+   if e >= 0
+      LaurentPolyWrap(p.poly^e, p.mindeg * e)
+   else
+      # p must be a monomial, whose coeff is invertible
+      deg = monomial_degree(p)
+      c = coeff(p, deg)
+      # the following is to allow x^-3 even if 1^-3 is failing
+      c = isone(c) ? c : c^e
+      LaurentPolyWrap(c * one(p.poly), deg * e)
+   end
+end
 
 ###############################################################################
 #
