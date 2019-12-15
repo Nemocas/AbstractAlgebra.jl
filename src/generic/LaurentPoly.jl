@@ -43,6 +43,23 @@ monomials_degrees(p::LaurentPolyWrap) = p.mindeg .+ (0:degree(p.poly))
 coeff(p::LaurentPolyWrap, i::Int) =
    i < p.mindeg ? zero(base_ring(p)) : coeff(p.poly, i - p.mindeg)
 
+function _enable_deg!(p::LaurentPolyWrap, i::Int)
+   diff = p.mindeg - i
+   p_ = p.poly
+   if diff > 0
+      p.mindeg = i
+      p.poly = shift_left(p_, diff)
+   end
+end
+
+
+
+function setcoeff!(p::LaurentPolyWrap, i::Int, a)
+   _enable_deg!(p, i)
+   setcoeff!(p.poly, i - p.mindeg, a)
+   p
+end
+
 iszero(p::LaurentPolyWrap) = iszero(p.poly)
 
 function isone(p::LaurentPolyWrap)

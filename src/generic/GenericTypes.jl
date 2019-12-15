@@ -529,8 +529,8 @@ struct LaurentPolyWrapRing{T  <: RingElement,
    end
 end
 
-struct LaurentPolyWrap{T  <: RingElement,
-                       PE <: AbstractAlgebra.PolyElem{T}} <: AbstractAlgebra.LaurentPolyElem{T}
+mutable struct LaurentPolyWrap{T  <: RingElement,
+                               PE <: AbstractAlgebra.PolyElem{T}} <: AbstractAlgebra.LaurentPolyElem{T}
    poly::PE
    mindeg::Int
 

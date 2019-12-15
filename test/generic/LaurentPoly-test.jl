@@ -34,6 +34,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
    @testset "basic manipulation" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
+      x = y.poly
 
       @test monomials_degrees(y) == 0:1
       @test monomials_degrees(y^3) == 0:3
@@ -47,7 +48,6 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test isone(one(y))
       @test !isone(zero(y))
 
-      x = y.poly
       f = LaurentPolyWrap(x, -2)
       @test monomials_degrees(f) == -2:-1
       @test [coeff(f, i) for i = -3:0] == [0, 0, 1, 0]
@@ -60,6 +60,20 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       f = LaurentPolyWrap(3 + 2*x^4, -3)
       @test monomials_degrees(f) == -3:1
       @test [coeff(f, i) for i = -4:2] == [0, 3, 0, 0, 0, 2, 0]
+
+      @test f == 3y^-3 + 2y
+
+      setcoeff!(f, -3, big(4))
+      @test f == 4y^-3 + 2y
+
+      setcoeff!(f, -3, big(0))
+      @test f == 2y
+
+      setcoeff!(f, -50, big(-2))
+      @test f == -2y^-50 + 2y
+
+      # TODO: make this work
+      @test_broken iszero(setcoeff!(setcoeff!(f, 1, big(0)), -50, big(0)))
 
       @test !isone(f)
       @test !iszero(f)
