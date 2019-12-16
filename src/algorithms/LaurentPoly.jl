@@ -12,6 +12,19 @@ base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 #
 ###############################################################################
 
+const hashp_seed = UInt === UInt64 ? 0xcdaf0e0b5ade239b : 0x5ade239b
+
+function Base.hash(p::LaurentPolyElem, h::UInt)
+   for i in monomials_degrees(p)
+      c = coeff(p, i)
+      if !iszero(c)
+         h = hash(i, h)
+         h = hash(c, h)
+      end
+   end
+   hash(hashp_seed, h)
+end
+
 # required implementation
 """
     monomials_degrees(p::LaurentPolyElem) -> AbstractVector{<:Integer}

@@ -48,7 +48,10 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test isone(one(y))
       @test !isone(zero(y))
 
-      f = LaurentPolyWrap(x, -2)
+      @test hash(zero(y)) == hash(zero(y))
+      @test hash(one(y)) == hash(one(y))
+
+      f1 = f = LaurentPolyWrap(x, -2)
       @test monomials_degrees(f) == -2:-1
       @test [coeff(f, i) for i = -3:0] == [0, 0, 1, 0]
 
@@ -57,11 +60,14 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test isone(f^0)
       @test iszero(f-f)
 
-      f = LaurentPolyWrap(3 + 2*x^4, -3)
+      f2 = f = LaurentPolyWrap(3 + 2*x^4, -3)
       @test monomials_degrees(f) == -3:1
       @test [coeff(f, i) for i = -4:2] == [0, 3, 0, 0, 0, 2, 0]
 
       @test f == 3y^-3 + 2y
+
+      @test hash(f) != hash(3y^-3 + y)
+      @test hash(f) != hash(3y^-2 + 2y)
 
       setcoeff!(f, -3, big(4))
       @test f == 4y^-3 + 2y
@@ -79,6 +85,15 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test !iszero(f)
       @test isone(f^0)
       @test iszero(f-f)
+
+      for f in (f1, f2, LaurentPolyWrap(rand(parent(x), 0:9, -9:9), rand(-9:9)))
+         @test hash(f) == hash(f)
+         @test hash(f, rand(UInt)) != hash(f) # very unlikely failure
+         @test hash(f-f) == hash(zero(f))
+         @test hash(f^1) == hash(f)
+         @test hash(f^0) == hash(one(f))
+         @test hash(f*f*f) == hash(f^3)
+      end
    end
 
    @testset "comparisons" begin
