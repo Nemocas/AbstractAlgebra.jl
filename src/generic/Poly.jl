@@ -2375,10 +2375,13 @@ function change_base_ring(R::Ring, p::PolyElem{T}; cached::Bool = true, parent::
 end
 
 ################################################################################
-#                                                             
+#
 #  Map
 #
 ################################################################################
+
+_make_parent(g, p::PolyElem, cached::Bool) =
+   _change_poly_ring(AbstractAlgebra.parent(g(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached)
 
 @doc Markdown.doc"""
     map_coeffs(f, p::PolyElem{<: RingElement}; parent::PolyRing)
@@ -2388,9 +2391,13 @@ end
 > element of `parent`. The caching of the parent object can be controlled
 > via the `cached` keyword argument.
 """
-function map_coeffs(g, p::PolyElem{T}; cached::Bool = true, parent::AbstractAlgebra.PolyRing = _change_poly_ring(AbstractAlgebra.parent(g(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached)) where T <: RingElement
-   return _map(g, p, parent)
+function map_coeffs(g, p::PolyElem{<:RingElement};
+                    cached::Bool = true,
+                    parent::AbstractAlgebra.PolyRing = _make_parent(g, p, cached))
+   return _map(_map_zero_to_zero(g), p, parent)
 end
+
+ _map_zero_to_zero(f) = x -> iszero(x) ? zero(x) : f(x)
 
 function _map(g, p::PolyElem, Rx)
    new_coefficients = [g(coeff(p, i)) for i in 0:degree(p)]
