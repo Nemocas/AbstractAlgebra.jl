@@ -124,6 +124,15 @@ function ^(p::LaurentPolyWrap, e::Integer)
    end
 end
 
+
+################################################################################
+#
+#  map_coeffs
+#
+################################################################################
+
+map_coeffs(f, p::LaurentPolyWrap) = LaurentPolyWrap(map_coeffs(f, p.poly), p.mindeg)
+
 ###############################################################################
 #
 #   Parent object call overload

@@ -216,6 +216,21 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test_throws DomainError (z + z^2)^-1
    end
 
+   @testset "change_base_ring & map_coeffs" begin
+      Z, z = LaurentPolynomialRing(ZZ, "z")
+      Q, q = LaurentPolynomialRing(QQ, "q")
+
+      fz = z^2 - z - 2z^-2
+
+      @test change_base_ring(QQ, z) == q
+      @test change_base_ring(QQ, fz) == q^2 - q - 2q^-2
+      @test_broken change_base_ring(ZZ, q) == z
+
+      @test map_coeffs(x -> x^2, fz) == z^2 + z + 4z^-2
+      @test map_coeffs(one, fz) == z^2 + z + 1 + z^-1 + z^-2
+      @test map_coeffs(x -> x^2, q^2 - q - 2q^-2) == q^2 + q + 4q^-2
+   end
+
    @testset "printing" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
       @test string(y) == "y"

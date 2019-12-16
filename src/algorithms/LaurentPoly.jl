@@ -5,7 +5,7 @@
 ###############################################################################
 
 # required methods without default implementation:
-# coeff, setcoeff!, gen
+# coeff, setcoeff!, map_coeffs, gen
 
 base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 
@@ -129,6 +129,15 @@ end
 ==(p::LaurentPolyElem, q::LaurentPolyElem) =
    all(i -> coeff(p, i) == coeff(q, i), monomials_degrees(p, q))
 
+
+
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+change_base_ring(R::Ring, p::LaurentPolyElem) = map_coeffs(R, p)
 
 ###############################################################################
 #
