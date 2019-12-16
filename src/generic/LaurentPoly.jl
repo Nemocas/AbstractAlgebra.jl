@@ -52,8 +52,6 @@ function _enable_deg!(p::LaurentPolyWrap, i::Int)
    end
 end
 
-
-
 function setcoeff!(p::LaurentPolyWrap, i::Int, a)
    _enable_deg!(p, i)
    setcoeff!(p.poly, i - p.mindeg, a)
@@ -69,9 +67,10 @@ function isone(p::LaurentPolyWrap)
    isone(coeff(p, 0))
 end
 
-zero(p::LaurentPolyWrapRing) = LaurentPolyWrap(zero(p.polyring))
-one(p::LaurentPolyWrapRing) = LaurentPolyWrap(one(p.polyring))
+zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(zero(R.polyring))
+one(R::LaurentPolyWrapRing) = LaurentPolyWrap(one(R.polyring))
 
+gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(gen(R.polyring))
 
 ###############################################################################
 #

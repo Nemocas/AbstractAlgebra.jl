@@ -4,6 +4,9 @@
 #
 ###############################################################################
 
+# required methods without default implementation:
+# coeff, setcoeff!, gen
+
 base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 
 ###############################################################################
@@ -98,9 +101,9 @@ function trail(p::LaurentPolyElem)
    isempty(dr) ? zero(base_ring(p)) : coeff(p, first(dr))
 end
 
-# other required methods without default implementation:
-# coeff
+gens(R::LaurentPolynomialRing) = [gen(R)]
 
+isgen(p::LaurentPolyElem) = p == gen(parent(p))
 
 ###############################################################################
 #

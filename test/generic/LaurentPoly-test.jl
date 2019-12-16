@@ -55,10 +55,21 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test iszero(zero(L))
       @test iszero(zero(y))
       @test !iszero(one(y))
+      @test !iszero(y)
 
       @test isone(one(L))
       @test isone(one(y))
       @test !isone(zero(y))
+      @test !isone(y)
+
+      @test isgen(y)
+      @test isgen(gen(L))
+      @test !isgen(one(y))
+      @test !isgen(zero(y))
+      @test y == gen(L)
+
+      @test gens(L)[1] == y
+      @test length(gens(L)) == 1
 
       @test lead(zero(y)) == 0
       @test trail(zero(y)) == 0
