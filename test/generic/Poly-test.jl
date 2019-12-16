@@ -2621,6 +2621,10 @@ end
    for i in [0, 1, 4, 5]
       @test coeff(f2, i) !== coeff(f, i)
    end
+
+   F = GF(11)
+   P, y = PolynomialRing(F, 'x')
+   @test map_coeffs(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 end
 
 @testset "Generic.Poly.printing..." begin

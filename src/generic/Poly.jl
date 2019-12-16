@@ -2351,7 +2351,7 @@ function interpolate(S::AbstractAlgebra.PolyRing, x::Array{T, 1}, y::Array{T, 1}
 end
 
 ################################################################################
-#                                                                                       
+#
 #  Change base ring
 #
 ################################################################################
@@ -2359,8 +2359,8 @@ end
 function _change_poly_ring(R, Rx, cached)
    P, _ = AbstractAlgebra.PolynomialRing(R, string(var(Rx)), cached = cached)
    return P
-end   
-                                                                                   
+end
+
 @doc Markdown.doc"""
     change_base_ring(R::Ring, p::PolyElem{<: RingElement}; parent::PolyRing)
 > Return the polynomial obtained by coercing the non-zero coefficients of `p`
@@ -2381,7 +2381,8 @@ end
 ################################################################################
 
 _make_parent(g, p::PolyElem, cached::Bool) =
-   _change_poly_ring(AbstractAlgebra.parent(g(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached)
+   _change_poly_ring(AbstractAlgebra.parent(g(zero(base_ring(p)))),
+                     AbstractAlgebra.parent(p), cached)
 
 @doc Markdown.doc"""
     map_coeffs(f, p::PolyElem{<: RingElement}; parent::PolyRing)
@@ -2394,13 +2395,14 @@ _make_parent(g, p::PolyElem, cached::Bool) =
 function map_coeffs(g, p::PolyElem{<:RingElement};
                     cached::Bool = true,
                     parent::AbstractAlgebra.PolyRing = _make_parent(g, p, cached))
-   return _map(_map_zero_to_zero(g), p, parent)
+   return _map(g, p, parent)
 end
 
- _map_zero_to_zero(f) = x -> iszero(x) ? zero(x) : f(x)
-
-function _map(g, p::PolyElem, Rx)
-   new_coefficients = [g(coeff(p, i)) for i in 0:degree(p)]
+function _map(g, p::PolyElem, Rx::PolyRing)
+   R = base_ring(Rx)
+   new_coefficients = [let c = coeff(p, i)
+                          iszero(c) ? zero(R) : R(g(c))
+                       end for i in 0:degree(p)]
    return Rx(new_coefficients)
 end
 
