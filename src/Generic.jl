@@ -27,7 +27,7 @@ import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
                           promote_rule
 
 import ..AbstractAlgebra: base_ring, denominator, div, divrem, exp, gen, gens, isgen,
-                          lead, ismonomial, numerator, trail, sqrt
+                          ismonomial, isunit, lead, numerator, trail, sqrt
 
 using ..AbstractAlgebra
 

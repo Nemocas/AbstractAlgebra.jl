@@ -71,6 +71,19 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test gens(L)[1] == y
       @test length(gens(L)) == 1
 
+      @test !isunit(zero(L))
+
+      for e = -5:5
+         @test isunit(y^e)
+      end
+
+      if base_ring(L) isa AbstractAlgebra.Field
+         for e = -5:5
+            @test isunit(2*y^e)
+            @test isunit(3*y^(2e))
+         end
+      end
+
       @test lead(zero(y)) == 0
       @test trail(zero(y)) == 0
       @test lead(one(y)) == 1

@@ -113,6 +113,13 @@ function ismonomial(p::LaurentPolyElem, i::Integer; rec::Bool=true)
    dr[] == i || return false
    isone(coeff(p, i))
 end
+
+function isunit(p::LaurentPolyElem)
+   dr = degrees_range(p)
+   length(dr) == 1 || return false
+   isunit(coeff(p, dr[]))
+end
+
 ###############################################################################
 #
 #   Comparisons
