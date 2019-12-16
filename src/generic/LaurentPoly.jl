@@ -60,17 +60,23 @@ end
 
 iszero(p::LaurentPolyWrap) = iszero(p.poly)
 
-function isone(p::LaurentPolyWrap)
+# whether p is a (monic) monomial of degree i
+function ismonomial(p::LaurentPolyWrap, i::Integer)
    dr = degrees_range(p)
    length(dr) == 1 || return false
-   iszero(dr[]) || return false
-   isone(coeff(p, 0))
+   dr[] == i || return false
+   isone(coeff(p, i))
 end
+
+isone(p::LaurentPolyWrap) = ismonomial(p, 0)
 
 zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(zero(R.polyring))
 one(R::LaurentPolyWrapRing) = LaurentPolyWrap(one(R.polyring))
 
 gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(gen(R.polyring))
+
+isgen(p::LaurentPolyWrap) = ismonomial(p, 1)
+
 
 ###############################################################################
 #
