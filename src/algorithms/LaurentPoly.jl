@@ -36,9 +36,25 @@ function monomials_degrees end
 
 # return a monomials_degrees vector valid for both polys
 function monomials_degrees(p::LaurentPolyElem, q::LaurentPolyElem)
-   minp, maxp = extrema(monomials_degrees(p))
-   minq, maxq = extrema(monomials_degrees(q))
-   min(minp, minq):max(maxp, maxq)
+   mdp = monomials_degrees(p)
+   mdq = monomials_degrees(q)
+   T = promote_type(eltype(mdp), eltype(mdq))
+   @assert T <: Signed # -one(T) must not wrap around
+   if isempty(mdq)
+      mdp, mdq = mdq, mdp
+   end
+   # if only one is empty, it's now mdp
+   if isempty(mdp) # extrema requires non-empty
+      if isempty(mdq)
+         zero(T):-one(T)
+      else
+         UnitRange{T}(extrema(mdq)...)
+      end
+   else # none is empty
+      minp, maxp = extrema(mdp)
+      minq, maxq = extrema(mdq)
+      min(minp, minq):max(maxp, maxq)
+   end
 end
 
 # like monomials_degrees, but return a "strict" range, whose min/max
@@ -84,6 +100,17 @@ end
 
 # other required methods without default implementation:
 # coeff
+
+
+###############################################################################
+#
+#   Comparisons
+#
+###############################################################################
+
+==(p::LaurentPolyElem, q::LaurentPolyElem) =
+   all(i -> coeff(p, i) == coeff(q, i), monomials_degrees(p, q))
+
 
 ###############################################################################
 #

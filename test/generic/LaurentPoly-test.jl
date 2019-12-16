@@ -35,7 +35,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
          @test L(y) === y
          f = y^2 + y
          @test L(f) === f
-         # @test L(0) == zero(L)
+         @test L(0) == zero(L)
          @test L(1) == one(L)
          @test L(2) == 2*one(L)
          @test_throws Exception L('x')
