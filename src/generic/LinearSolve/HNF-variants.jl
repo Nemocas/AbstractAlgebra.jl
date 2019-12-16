@@ -75,15 +75,11 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
         actual_sol = transpose(solve_hnf(Adual, bdual, side=:right))
         return actual_sol
     end
-
-    if kernel != Val(false)
-        error("Kernel not yet supported in `solve_lu`.")
-    end
     
     check_solve_instance_is_well_defined(A,b)
     isempty(b) && return _solve_empty(A,b)
     
-    # Writing `A^T = UH`, we want to solve Ax = (UH)^T*x = b. To optimize the cubic
+    # Writing `UA^T = H`, we want to solve Ax = (H)^T*(U^(-1)^T)x = b. To optimize the cubic
     # part of the algorithm, we enforce that access is column-major. Note `H^T` is actually
     # lower-triangular.
     HNFt, g = hnf_with_transform(column_major_access_form(TransposeIndexDual(A)))
@@ -137,29 +133,33 @@ function solve_hnf(A::MatElem{T}, b::MatElem{T};
 
     sol = transpose(g)*x
     check_system_is_consistent(A, sol, b, 0)
-    
-    return sol
 
-    ####
-    # With kernel
-    # TODO: XXX: Implement the logic.
     
-    # Scan backward for the first non-zero row, once found, set the nullspace to
-    # be the bottom rows (for a left-solve)
-    for i = nrows(HNF):-1:1
-        for j = 1:ncols(HNF)
-            if !iszero(HNF[i,j])
-                N = similar(A, ncols(A), nrows(HNF) - i)
-                for k = 1:nrows(N)
-                    for l = 1:ncols(N)
-                        N[k,l] = T[nrows(T) - l + 1, k]
+    if kernel == Val(false)
+        return sol
+
+    elseif kernel == Val(true)
+        # Scan backward for the first non-zero row, once found, set the nullspace to
+        # be the appropriate columns of the transform matrix.
+        for i = nrows(lHNF):-1:1
+            for j = 1:ncols(lHNF)
+                if !iszero(lHNF[i,j])
+                    N = similar(A, ncols(A), nrows(lHNF) - i)
+                    for k = 1:nrows(N)
+                        for l = 1:ncols(N)
+                            N[k,l] = g[nrows(g) - l + 1, k]
+                        end
                     end
+                    return sol, N
                 end
-                return true, transpose(z*T), N
             end
         end
+
+        # No kernel found.
+        return sol, similar(A, ncols(A), 0)
+    else
+        error("Unsupported option for `kernel`. Only `Val(true), Val(false)` supported.")
     end
-    N =  similar(A, ncols(A), 0)
 end
 
 
