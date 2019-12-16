@@ -227,7 +227,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test_broken change_base_ring(ZZ, q) == z
 
       @test map_coeffs(x -> x^2, fz) == z^2 + z + 4z^-2
-      @test map_coeffs(one, fz) == z^2 + z + 1 + z^-1 + z^-2
+      @test_broken map_coeffs(one, fz) == z^2 + z + z^-2
+      @test_broken map_coeffs(x -> x+2, fz) == 3z^2 + z
       @test map_coeffs(x -> x^2, q^2 - q - 2q^-2) == q^2 + q + 4q^-2
    end
 
