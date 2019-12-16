@@ -72,6 +72,16 @@ function monomial_degree(p::LaurentPolyElem)
    deg
 end
 
+function lead(p::LaurentPolyElem)
+   dr = degrees_range(p)
+   isempty(dr) ? zero(base_ring(p)) : coeff(p, last(dr))
+end
+
+function trail(p::LaurentPolyElem)
+   dr = degrees_range(p)
+   isempty(dr) ? zero(base_ring(p)) : coeff(p, first(dr))
+end
+
 # other required methods without default implementation:
 # coeff
 

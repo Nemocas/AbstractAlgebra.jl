@@ -24,9 +24,10 @@ import Base: floor, ceil, hypot, log, log1p, expm1, sin, cos, sinpi, cospi,
 
 import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
                           RingElem, RingElement, Field, FieldElement, Map,
-                          promote_rule, base_ring
+                          promote_rule
 
-import ..AbstractAlgebra: exp, sqrt, div, divrem, numerator, denominator
+import ..AbstractAlgebra: base_ring, denominator, div, divrem, exp, lead, numerator, trail,
+                          sqrt
 
 using ..AbstractAlgebra
 
