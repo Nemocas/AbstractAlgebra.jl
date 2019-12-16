@@ -138,6 +138,19 @@ end
 
 ###############################################################################
 #
+#   Parent object call overload
+#
+###############################################################################
+
+(R::LaurentPolyWrapRing)(b::RingElement) = LaurentPolyWrap(R.polyring(b))
+
+function (R::LaurentPolyWrapRing)(p::LaurentPolyWrap)
+   parent(p) == R ? p :
+                    LaurentPolyWrap(R.polyring(p.poly), p.mindeg)
+end
+
+###############################################################################
+#
 #   LaurentPolynomialRing constructor
 #
 ###############################################################################

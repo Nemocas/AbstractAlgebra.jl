@@ -4,6 +4,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
 @testset "Generic.LaurentPoly" begin
    @testset "constructors" begin
+      L0, y0 = LaurentPolynomialRing(zz, "y0")
+
       for R in (ZZ, GF(5))
          P, _ = PolynomialRing(R, "x0")
          L, y = LaurentPolynomialRing(R, "y")
@@ -29,6 +31,16 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
          @test LaurentPolyWrap(x) == y
          @test LaurentPolyWrap(2x^2 + 3x + 4) == 2y^2 + 3y + 4
          @test LaurentPolyWrap(2x^2 + 3x + 4, -1) * y == 2y^2 + 3y + 4
+
+         @test L(y) === y
+         f = y^2 + y
+         @test L(f) === f
+         # @test L(0) == zero(L)
+         @test L(1) == one(L)
+         @test L(2) == 2*one(L)
+         @test_throws Exception L('x')
+         @test_throws Exception L("x")
+         @test_throws Exception L(y0)
       end
    end
 
