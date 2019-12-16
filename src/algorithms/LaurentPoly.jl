@@ -105,6 +105,14 @@ gens(R::LaurentPolynomialRing) = [gen(R)]
 
 isgen(p::LaurentPolyElem) = p == gen(parent(p))
 
+# whether p is a (monic) monomial of degree i
+function ismonomial(p::LaurentPolyElem, i::Integer; rec::Bool=true)
+   rec && error("not implemented")
+   dr = degrees_range(p)
+   length(dr) == 1 || return false
+   dr[] == i || return false
+   isone(coeff(p, i))
+end
 ###############################################################################
 #
 #   Comparisons
