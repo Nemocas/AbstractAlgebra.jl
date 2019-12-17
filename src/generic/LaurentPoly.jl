@@ -133,6 +133,21 @@ function ^(p::LaurentPolyWrap, e::Integer)
 end
 
 
+###############################################################################
+#
+#   Random elements
+#
+###############################################################################
+
+function rand(rng::AbstractRNG, S::LaurentPolyWrapRing, degrees_range, v...)
+   m = minimum(degrees_range)
+   degrees_range = degrees_range .- m
+   LaurentPolyWrap(rand(rng, S.polyring, degrees_range, v...), m)
+end
+
+rand(S::LaurentPolyWrapRing, degrees_range, v...) =
+   rand(Random.GLOBAL_RNG, S, degrees_range, v...)
+
 ################################################################################
 #
 #  map_coeffs

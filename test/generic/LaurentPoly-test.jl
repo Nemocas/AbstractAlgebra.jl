@@ -1,4 +1,4 @@
-using AbstractAlgebra: monomials_degrees
+using AbstractAlgebra: monomials_degrees, LaurentPolyElem
 
 using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
@@ -242,6 +242,24 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test (3z^-1)^(-2) == 1//9 * z^2
 
       @test_throws DomainError (z + z^2)^-1
+   end
+
+   @testset "rand" begin
+      L, y = LaurentPolynomialRing(ZZ, "y")
+
+      f = rand(L, -5:5, -10:10)
+      @test f isa LaurentPolyElem{BigInt}
+      @test AbstractAlgebra.degrees_range(f) ⊆ -5:5
+      for i = -5:5
+         @test coeff(f, i) ∈ -10:10
+      end
+
+      f = rand(rng, L, -5:5, -10:10)
+      @test f isa LaurentPolyElem{BigInt}
+      @test AbstractAlgebra.degrees_range(f) ⊆ -5:5
+      for i = -5:5
+         @test coeff(f, i) ∈ -10:10
+      end
    end
 
    @testset "change_base_ring & map_coeffs" begin
