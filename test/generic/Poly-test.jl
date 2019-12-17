@@ -2613,6 +2613,18 @@ end
 
    ps = map_coeffs(z -> z^2, p)
    @test ps == Zx([i^2 for i in 1:10])
+
+   f = x^2 + 3x^3 + 2x^6
+   @test map_coeffs(one, f) == x^2 + x^3 + x^6
+   f2 = map_coeffs(t -> t+2, f)
+   @test f2 == 3x^2 + 5x^3 + 4x^6
+   for i in [0, 1, 4, 5]
+      @test coeff(f2, i) !== coeff(f, i)
+   end
+
+   F = GF(11)
+   P, y = PolynomialRing(F, 'x')
+   @test map_coeffs(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 end
 
 @testset "Generic.Poly.printing..." begin
