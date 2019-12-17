@@ -148,11 +148,12 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}, rk)
             If you're reading this, I guess you've found a bug!
         =#
 
+        
         # Populate the initial values in `x`. There is surely a better way to do this.
         for i=1:rk
             x[i, k] = deepcopy(pb[i, k])
         end
-        
+        #=
         for i in 2:rk
             for j in 1:(i - 1)
                 # NOTE: This is the correct order of multiplication in non-commutative rings.
@@ -162,6 +163,18 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}, rk)
                 x[i, k] = addeq!(x[i, k], t)
             end
             x[i, k] = reduce!(x[i, k])
+        end
+        =#
+
+        if !iszero(rk)
+            LUview = view(LU, 1:rk, 1:rk)
+            xview = view(x, 1:rk, k:k)      # The pivot rows are always the same.
+
+            xview = _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_function(xview, LUview, xview, rk, 1, unit_diagonal=Val(true))
+        end
+
+        for i=1:rk
+            x[i, k] = xview[i, 1]
         end
 
         # Below the last row where `U` has a pivot, the entries
@@ -246,7 +259,7 @@ end
 # vector once. `x` is assumed to be such an output container, which by definition of
 # the mutability edicts should not share references from `A` or `b` in the caller.
 #
-function _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_function(x, L, b, rk, k)
+function _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_function(x, L, b, rk, k; unit_diagonal=Val(false))
 
     n  = nrows(L)
     m  = ncols(L)
@@ -257,7 +270,7 @@ function _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_fun
     ZERO = base_ring(b)()
 
     # NOTE: This is the correct order of division for non-commutative rings.
-    x[1, k] = divexact_left(L[1, 1], b[1, k])
+    x[1, k] = unit_diagonal == Val(true) ? deepcopy(b[1,k]) : divexact_left(L[1, 1], b[1, k])
 
     # The lower triangular back-substitution. Along rows.
     for i in 2:rk
@@ -274,7 +287,10 @@ function _solve_nonsingular_lt!!_I_agree_to_the_terms_and_conditions_of_this_fun
             x[i, k] = addeq!(x[i, k], t)
         end
         x[i, k] = reduce!(x[i, k])
-        x[i, k] = divexact_left(L[i, i], x[i, k])
+
+        if unit_diagonal == Val(false)
+            x[i, k] = divexact_left(L[i, i], x[i, k])
+        end
     end
 
     return x
