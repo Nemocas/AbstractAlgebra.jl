@@ -186,7 +186,7 @@ julia> @time dim(YoungTableau(λ))
   0.000038 seconds (335 allocations: 10.734 KiB)
 9079590132732747656880081324531330222983622187548672000
 
-julia> G = PermutationGroup(sum(λ))
+julia> G = SymmetricGroup(sum(λ))
 Permutation group over 78 elements
 
 julia> @time character(λ, G())

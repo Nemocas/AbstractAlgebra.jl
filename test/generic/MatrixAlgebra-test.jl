@@ -249,7 +249,7 @@ end
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
-   T = PermutationGroup(3)
+   T = SymmetricGroup(3)
    P = T([2, 3, 1])
 
    @test A == inv(P)*(P*A)

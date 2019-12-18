@@ -460,7 +460,7 @@ julia> R, t = PolynomialRing(QQ, "t")
 julia> S = MatrixSpace(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
-julia> G = PermGroup(3)
+julia> G = SymmetricGroup(3)
 Permutation group over 3 elements
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -481,11 +481,11 @@ julia> B = P*A
 ### LU factorisation
 
 ```@docs
-lu{T <: FieldElem}(::MatElem{T}, ::PermGroup)
+lu{T <: FieldElem}(::MatElem{T}, ::SymmetricGroup)
 ```
 
 ```@docs
-fflu{T <: RingElem}(::MatElem{T}, ::PermGroup)
+fflu{T <: RingElem}(::MatElem{T}, ::SymmetricGroup)
 ```
 
 **Examples**

@@ -2,38 +2,40 @@ IntTypes = [Int8, Int16, Int32, Int, UInt8, UInt16, UInt32, UInt, BigInt]
 
 @testset "Perm.abstract_types..." begin
    @test Generic.Perm <: GroupElem
+   @test Generic.Perm <: AbstractAlgebra.AbstractPerm
 
-   @test Generic.PermGroup <: AbstractAlgebra.Group
+   @test Generic.SymmetricGroup <: AbstractAlgebra.Group
+   @test Generic.SymmetricGroup <: AbstractAlgebra.AbstractPermutationGroup
 end
 
 @testset "Perm.constructors ($T)..." for T in IntTypes
-   @test elem_type(Generic.PermGroup{T}) == Generic.Perm{T}
-   @test parent_type(Generic.Perm{T}) == Generic.PermGroup{T}
+   @test elem_type(Generic.SymmetricGroup{T}) == Generic.Perm{T}
+   @test parent_type(Generic.Perm{T}) == Generic.SymmetricGroup{T}
 
-   @test PermutationGroup(T(10)) isa Generic.PermGroup{T}
+   @test SymmetricGroup(T(10)) isa Generic.SymmetricGroup{T}
 
-   @test Generic.PermGroup(T(10)) isa Generic.PermGroup{T}
-   @test Generic.PermGroup{T}(0xa) isa Generic.PermGroup{T}
+   @test Generic.SymmetricGroup(T(10)) isa Generic.SymmetricGroup{T}
+   @test Generic.SymmetricGroup{T}(0xa) isa Generic.SymmetricGroup{T}
 
    if T <: Signed
-      @test_throws DomainError PermutationGroup(-rand(T(1):T(100)))
-      @test_throws DomainError Generic.PermGroup(-rand(T(1):T(100)))
+      @test_throws DomainError SymmetricGroup(-rand(T(1):T(100)))
+      @test_throws DomainError Generic.SymmetricGroup(-rand(T(1):T(100)))
    end
 
-   G0 = PermutationGroup(zero(T))
-   @test G0 isa Generic.PermGroup{T}
+   G0 = SymmetricGroup(zero(T))
+   @test G0 isa Generic.SymmetricGroup{T}
 
    p = Perm(T[])
    @test p == G0()
    @test parent(p) == G0
 
-   G = PermutationGroup(T(10))
+   G = SymmetricGroup(T(10))
    @test elem_type(G) == Generic.Perm{T}
 
    @test G() isa GroupElem
    @test G() isa Generic.Perm{T}
    a = G()
-   @test parent_type(typeof(a)) == Generic.PermGroup{T}
+   @test parent_type(typeof(a)) == Generic.SymmetricGroup{T}
    @test parent(a) == G
 
    z = T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8]
@@ -42,7 +44,7 @@ end
    @test G(z) isa Generic.Perm{T}
    b = G(z)
    @test typeof(b) == Generic.Perm{T}
-   @test parent_type(typeof(b)) == Generic.PermGroup{T}
+   @test parent_type(typeof(b)) == Generic.SymmetricGroup{T}
    @test parent(b) == G
 
    @test rand(G) isa Generic.Perm{T}
@@ -51,12 +53,12 @@ end
    @test rand(rng, G, 2, 3) isa Matrix{Generic.Perm{T}}
    g = rand(G)
    @test parent(g) == G
-   @test parent(g) == PermutationGroup(T(10))
+   @test parent(g) == SymmetricGroup(T(10))
 
    @test convert(Vector{T}, G(z)) == z
 
    if T != Int
-      @test parent(g) != PermutationGroup(10)
+      @test parent(g) != SymmetricGroup(10)
    end
 
    @test similar(g) isa Perm{T}
@@ -91,8 +93,8 @@ end
    @test perm"(1,2,3)(5)(10)" isa GroupElem
    @test perm"(1,2,3)(5)(10)" isa Generic.Perm
    @test perm"(1,2,3)(5)(10)" isa Generic.Perm{Int}
-   @test parent(perm"(1,2,3)(5)(10)") == PermGroup(10)
-   @test parent(perm"(1,2,3)(5)(6)") == PermGroup(6)
+   @test parent(perm"(1,2,3)(5)(10)") == SymmetricGroup(10)
+   @test parent(perm"(1,2,3)(5)(6)") == SymmetricGroup(6)
    @test perm"(1,2,3,4,5)" == Perm([2,3,4,5,1])
    @test perm"(3,2,1)(4,5)" == Perm([3,1,2,5,4])
 
@@ -101,10 +103,10 @@ end
 10,67,87,60,36,12)(2,57,34,88)(3,92,76,17,99,96,30,55,45,41,98)(4,56,59,97,49,
 21,15,9,26,86,83,29,27,66,6,58,28,5,68,40,72,7,84,93,39,79,23,46,63,32,61,100,
 11)(8,80,71,75,35,14,85,25,20,70,65,16,48,47,37,74,33,13,31,69)
-""" == PermGroup(100)(s2)
+""" == SymmetricGroup(100)(s2)
 
    for T in IntTypes
-      G = PermutationGroup(T(5))
+      G = SymmetricGroup(T(5))
       @test G("()") == G()
       @test G("()()") == G()
       @test G("(1)(2,3)") == Perm(T[1,3,2,4,5])
@@ -125,7 +127,7 @@ end
 end
 
 @testset "Perm.printing ($T)..." for T in IntTypes
-   G = PermutationGroup(T(10))
+   G = SymmetricGroup(T(10))
 
    b = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
@@ -142,7 +144,7 @@ end
 end
 
 @testset "Perm.basic_manipulation ($T)..." for T in IntTypes
-   G = PermutationGroup(T(10))
+   G = SymmetricGroup(T(10))
 
    a = G()
    b = deepcopy(a)
@@ -163,7 +165,7 @@ end
 end
 
 @testset "Perm.iteration ($T)..." for T in IntTypes
-   G = PermutationGroup(T(6))
+   G = SymmetricGroup(T(6))
    @test length(AllPerms(T(6))) == 720
    @test length(unique([deepcopy(p) for p in AllPerms(T(6))])) == 720
    @test order(G) isa BigInt
@@ -182,7 +184,7 @@ end
 end
 
 @testset "Perm.binary_ops ($T)..." for T in IntTypes
-   G = PermutationGroup(T(3))
+   G = SymmetricGroup(T(3))
 
    a = Perm(T[2,1,3]) # (1,2)
    b = Perm(T[2,3,1]) # (1,2,3)
@@ -212,7 +214,7 @@ end
    @test a_copy^2 == AbstractAlgebra.mul!(a,a,a)
    @test a_copy == a
 
-   G = PermutationGroup(T(10))
+   G = SymmetricGroup(T(10))
    p = G(T[9,5,4,7,3,8,2,10,1,6]) # (1,9)(2,5,3,4,7)(6,8,10)
    @test p^0 == G()
    @test p^1 == p
@@ -223,9 +225,9 @@ end
 end
 
 @testset "Perm.mixed_binary_ops..." begin
-   G = PermutationGroup(6)
+   G = SymmetricGroup(6)
    for T in IntTypes
-      H = PermutationGroup(T(6))
+      H = SymmetricGroup(T(6))
 
       @test G(H()) == G()
       @test H(G()) == H()
@@ -238,7 +240,7 @@ end
 end
 
 @testset "Perm.inversion ($T)..." for T in IntTypes
-   G = PermutationGroup(T(10))
+   G = SymmetricGroup(T(10))
 
    a = G()
    b = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
@@ -246,14 +248,14 @@ end
    @test a == inv(a)
    @test a == b*inv(b)
 
-   G = PermutationGroup(3)
+   G = SymmetricGroup(3)
    for a in G, b in G
       @test inv(a*b) == inv(b)*inv(a)
    end
 end
 
 @testset "Perm.misc ($T)..." for T in IntTypes
-   G = PermutationGroup(T(10))
+   G = SymmetricGroup(T(10))
    a = G([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
    @test cycles(G()) isa Generic.CycleDec{T}
@@ -304,12 +306,12 @@ end
 @testset "Perm.characters..." begin
    for T in IntTypes
       N = T(7)
-      G = PermutationGroup(N)
+      G = SymmetricGroup(N)
 
       @test all(character(p)(G()) == dim(YoungTableau(p)) for p in AllParts(N))
 
       N = T(3)
-      G = PermutationGroup(N)
+      G = SymmetricGroup(N)
       ps = Partition.([[1,1,1], [2,1], [3]])
       l = Partition(T[1,1,1])
 
@@ -336,7 +338,7 @@ end
    @test character(Partition([2,2,2,2]), Partition([8])) == 0
 
    N = 4
-   G = PermutationGroup(N)
+   G = SymmetricGroup(N)
 
    ps = Partition.([[1,1,1,1], [2,1,1], [2,2], [3,1], [4]])
    @test Set(AllParts(N)) == Set(ps)
@@ -357,7 +359,7 @@ end
    # compatible with GAP numbering of conjugacy classes. This is NOT the order
    # of partitions given by AllParts.
    N = 5
-   G = PermutationGroup(N)
+   G = SymmetricGroup(N)
    ps = Partition.([[1,1,1,1,1], [2,1,1,1], [2,2,1], [3,1,1], [3,2], [4,1], [5]])
    @test Set(AllParts(N)) == Set(ps)
 
@@ -379,6 +381,6 @@ end
    # test for overflow
 
    p = Partition(collect(10:-1:1))
-   @test character(p, PermutationGroup(big(55))()) == 44261486084874072183645699204710400
+   @test character(p, SymmetricGroup(big(55))()) == 44261486084874072183645699204710400
    @test dim(YoungTableau(p)) == 44261486084874072183645699204710400
 end

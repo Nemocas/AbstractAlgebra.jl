@@ -948,7 +948,7 @@ end
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
-   T = PermutationGroup(3)
+   T = SymmetricGroup(3)
    P = T([2, 3, 1])
 
    @test A == inv(P)*(P*A)
@@ -956,7 +956,7 @@ end
    @testset "$name" for (name, (R, randparams)) in RINGS
       S = MatrixSpace(R, rand(1:9), rand(0:9))
       A = rand(S, randparams...)
-      T = PermutationGroup(nrows(A))
+      T = SymmetricGroup(nrows(A))
       P = rand(T)
       Q = inv(P)
 
