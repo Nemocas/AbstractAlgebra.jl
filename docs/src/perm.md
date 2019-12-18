@@ -9,16 +9,11 @@ end
 
 AbstractAlgebra.jl provides rudimentary native support for permutation groups (implemented in `src/generic/PermGroups.jl`). All functionality of permutations is accesible in the `Generic` submodule.
 
-Permutations are represented internally via vector of integers, wrapped in type `Perm{T}`, where `T<:Integer` carries the information on the type of elements of a permutation. Permutation groups are singleton parent objects of type `PermGroup{T}` and are used mostly to store the length of a permutation, since it is not included in the permutation type.
+Permutations are represented internally via vector of integers, wrapped in type `Perm{T}`, where `T<:Integer` carries the information on the type of elements of a permutation. Permutation groups are singleton parent objects of type `SymmetricGroup{T}` and are used mostly to store the length of a permutation, since it is not included in the permutation type.
 
-Permutation groups are created using the `PermGroup` (inner) constructor.
-However, for convenience we define
-```
-PermutationGroup = PermGroup
-```
-so that permutation groups can be created using `PermutationGroup` instead of `PermGroup`.
+Permutation groups are created using the `SymmetricGroup` (inner) constructor.
 
-Both `PermGroup` and `Perm` and can be parametrized by any type `T<:Integer` .
+Both `SymmetricGroup` and `Perm` and can be parametrized by any type `T<:Integer` .
 By default the parameter is the `Int`-type native to the systems architecture.
 However, if you are sure that your permutations are small enough to fit into smaller integer type (such as `Int32`, `UInt16`, or even `Int8`), you may choose to change the parametrizing type accordingly.
 In practice this may result in decreased memory footprint (when storing multiple permutations) and noticable faster performance, if your workload is heavy in operations on permutations, which e.g. does not fit into cache of your cpu.
@@ -42,12 +37,12 @@ Generic.Perm
   Since the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitly constructing the parent object.
 
 * The other way is to first construct the permutation group they belong to.
-  This is accomplished with the inner constructor `PermGroup(n::Integer)` which
+  This is accomplished with the inner constructor `SymmetricGroup(n::Integer)` which
   constructs the permutation group on $n$ symbols and returns the parent object
   representing the group.
 
 ```@docs
-Generic.PermGroup
+Generic.SymmetricGroup
 ```
 
   A vector of integers can be then coerced to a permutation by calling a parent permutation group on it.
@@ -56,13 +51,13 @@ Generic.PermGroup
   **Examples:**
 
 ```jldoctest
-julia> G = PermutationGroup(BigInt(5)); p = G([2,3,1,5,4])
+julia> G = SymmetricGroup(BigInt(5)); p = G([2,3,1,5,4])
 (1,2,3)(4,5)
 
 julia> typeof(p)
 Perm{BigInt}
 
-julia> H = PermutationGroup(UInt16(5)); r = H([2,3,1,5,4])
+julia> H = SymmetricGroup(UInt16(5)); r = H([2,3,1,5,4])
 (1,2,3)(4,5)
 
 julia> typeof(r)
@@ -89,7 +84,7 @@ Any custom permutation group implementation in AbstractAlgebra.jl should provide
 
 ```@docs
 parent(::Perm)
-elem_type(::PermGroup)
+elem_type(::SymmetricGroup)
 parent_type(::Perm)
 ```
 
@@ -154,7 +149,7 @@ parity(::Perm)
 sign(::Perm)
 permtype(::Perm)
 order(::Perm)
-order(::Generic.PermGroup)
+order(::Generic.SymmetricGroup)
 ```
 
 Note that even an `Int64` can be easily overflowed when computing with permutation groups.
@@ -162,10 +157,10 @@ Thus, by default, `order` returns (always correct) `BigInt`s.
 If you are sure that the computation will not overflow, you may use `order(::Type{T}, ...)` to perform computations with machine integers.
 Julia's standard promotion rules apply for the returned value.
 
-Since `PermGroup` implements the iterator protocol, you may iterate over all permutations via a simple loop:
+Since `SymmetricGroup` implements the iterator protocol, you may iterate over all permutations via a simple loop:
 
 ```
-for p in PermutationGroup(n)
+for p in SymmetricGroup(n)
    ...
 end
 ```
@@ -174,10 +169,10 @@ Iteration over all permutations in reasonable time, (i.e. in terms of minutes) i
 You may also use the non-allocating `Generic.elements!` function for $n ≤ 14$ (or even $15$ if you are patient enough), which is an order of magnitude faster.
 
 ```@docs
-Generic.elements!(::Generic.PermGroup)
+Generic.elements!(::Generic.SymmetricGroup)
 ```
 
-However, since all permutations yielded by `elements!` are aliased (modified "in-place"), `collect(Generic.elements!(PermGroup(n)))` returns a vector of identical permutations.
+However, since all permutations yielded by `elements!` are aliased (modified "in-place"), `collect(Generic.elements!(SymmetricGroup(n)))` returns a vector of identical permutations.
 
 !!! note
     If you intend to use or store elements yielded by `elements!` you need to **deepcopy** them explicitly.
@@ -193,8 +188,8 @@ inv(::Perm)
 Permutations parametrized by different types can be multiplied, and follow the standard julia integer promotion rules:
 
 ```jldoctest
-g = rand(PermGroup(Int8(5)));
-h = rand(PermGroup(UInt32(5)));
+g = rand(SymmetricGroup(Int8(5)));
+h = rand(SymmetricGroup(UInt32(5)));
 typeof(g*h)
 
 # output
@@ -203,32 +198,32 @@ Perm{UInt32}
 
 ## Coercion
 
-The following coercions are available for `G::PermGroup` parent objects.
+The following coercions are available for `G::SymmetricGroup` parent objects.
 Each of the methods perform basic sanity checks on the input which can be switched off by the second argument.
 
 **Examples**
 
 ```jldoctest
-julia> PermutationGroup(4)()
+julia> SymmetricGroup(4)()
 ()
 ```
 > Return the identity element of `G`.
 
 
 ```julia
-(G::PermGroup)(::Vector{<:Integer}[, check=true])
+(G::SymmetricGroup)(::AbstractVector{<:Integer}[, check=true])
 ```
 > Turn a vector of integers into a permutation (performing conversion, if necessary).
 
 
 ```julia
-(G::PermGroup)(::Perm[, check=true])
+(G::SymmetricGroup)(::Perm[, check=true])
 ```
 > Coerce a permutation `p` into group `G` (performing the conversion, if necessary).
 > If `p` is already an element of `G` no copy is performed.
 
 ```julia
-(G::PermGroup)(::String[, check=true])
+(G::SymmetricGroup)(::String[, check=true])
 ```
 > Parse the string input e.g. copied from the output of GAP.
 > The method uses the same logic as the `perm"..."` macro.
@@ -236,7 +231,7 @@ julia> PermutationGroup(4)()
 > Both `string(p::Perm)` (if `setpermstyle(:cycles)`) and `string(cycles(p::Perm))` are valid input for this method.
 
 ```julia
-(G::PermGroup{T})(::CycleDec{T}[, check=true]) where T
+(G::SymmetricGroup{T})(::CycleDec{T}[, check=true]) where T
 ```
 > Turn a cycle decomposition object into a permutation.
 
@@ -244,13 +239,13 @@ julia> PermutationGroup(4)()
 
 ```@docs
 ==(::Perm, ::Perm)
-==(::Generic.PermGroup, ::Generic.PermGroup)
+==(::Generic.SymmetricGroup, ::Generic.SymmetricGroup)
 ```
 
 ## Misc
 ```@docs
-rand(::Generic.PermGroup)
+rand(::Generic.SymmetricGroup)
 Generic.matrix_repr(::Perm)
-Generic.emb(::Generic.PermGroup, ::Vector{Int}, ::Bool)
+Generic.emb(::Generic.SymmetricGroup, ::Vector{Int}, ::Bool)
 Generic.emb!(::Perm, ::Perm, V)
 ```

@@ -25,40 +25,40 @@ end
 
 ###############################################################################
 #
-#   PermGroup / Perm
+#   SymmetricGroup / Perm
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    PermGroup{T<:Integer}
-> The permutation group singleton type.
-> `PermGroup(n)` constructs the permutation group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
+    SymmetricGroup{T<:Integer}
+> The full symmetric group singleton type.
+> `SymmetricGroup(n)` constructs the full symmetric group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> G = PermGroup(5)
-Permutation group over 5 elements
+julia> G = SymmetricGroup(5)
+Full symmetric group over 5 elements
 
 julia> elem_type(G)
 Perm{Int64}
 
-julia> H = PermGroup(UInt16(5))
-Permutation group over 5 elements
+julia> H = SymmetricGroup(UInt16(5))
+Full symmetric group over 5 elements
 
 julia> elem_type(H)
 Perm{UInt16}
 ```
 """
-struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
+struct SymmetricGroup{T<:Integer} <: AbstractAlgebra.AbstractPermutationGroup
    n::T
 
-   function PermGroup{T}(n::Integer) where T<:Integer
-      n < 0 && throw(DomainError(n, "PermGroup constructor requires a non-negative integer"))
+   function SymmetricGroup{T}(n::Integer) where T<:Integer
+      n < 0 && throw(DomainError(n, "SymmetricGroup constructor requires a non-negative integer"))
       new{T}(n)
    end
 end
 
-PermGroup(n::Integer) = PermGroup{typeof(n)}(n)
+SymmetricGroup(n::Integer) = SymmetricGroup{typeof(n)}(n)
 
 @doc Markdown.doc"""
     Perm{T<:Integer}
@@ -76,7 +76,7 @@ PermGroup(n::Integer) = PermGroup{typeof(n)}(n)
 > There are two inner constructors of `Perm`:
 >
 > * `Perm(n::T)` constructs the trivial `Perm{T}`-permutation of length $n$.
-> * `Perm(v::Vector{T<:Integer}[,check=true])` constructs a permutation
+> * `Perm(v::AbstractVector{<:Integer} [,check=true])` constructs a permutation
 >   represented by `v`. By default `Perm` constructor checks if the vector
 >   constitutes a valid permutation. To skip the check call `Perm(v, false)`.
 
@@ -92,7 +92,7 @@ julia> typeof(g)
 Perm{Int32}
 ```
 """
-mutable struct Perm{T<:Integer} <: AbstractAlgebra.GroupElem
+mutable struct Perm{T<:Integer} <: AbstractAlgebra.AbstractPerm
    d::Array{T, 1}
    modified::Bool
    cycles::CycleDec{T}

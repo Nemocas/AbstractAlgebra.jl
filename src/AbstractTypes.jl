@@ -11,6 +11,8 @@ abstract type Set end
 
 abstract type Group <: Set end
 
+abstract type AbstractPermutationGroup <: Group end
+
 abstract type NCRing <: Set end
 
 abstract type Ring <: NCRing end
@@ -22,6 +24,8 @@ abstract type Field <: Ring end
 abstract type SetElem end
 
 abstract type GroupElem <: SetElem end
+
+abstract type AbstractPerm <: GroupElem end
 
 abstract type NCRingElem <: SetElem end
 
@@ -148,4 +152,3 @@ abstract type FinFieldElem <: FieldElem end # for fq, fq_nmod, etc
 promote_rule(T, U) = Union{}
 
 promote_rule(a::Type{S}, b::Type{T}) where {S <: Real, T <: Real} = Base.promote_rule(a, b)
-

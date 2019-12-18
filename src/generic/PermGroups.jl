@@ -8,27 +8,27 @@
     parent_type(::Type{<:Perm})
 > Return the type of the parent of a permutation.
 """
-parent_type(::Type{Perm{T}}) where T = PermGroup{T}
+parent_type(::Type{Perm{T}}) where T = SymmetricGroup{T}
 
 @doc Markdown.doc"""
-    elem_type(::Type{<:PermGroup})
+    elem_type(::Type{<:SymmetricGroup})
 > Return the type of elements of a permutation group.
 """
-elem_type(::Type{PermGroup{T}}) where T = Perm{T}
+elem_type(::Type{SymmetricGroup{T}}) where T = Perm{T}
 
 @doc Markdown.doc"""
     parent(g::Perm)
 > Return the parent of the permutation `g`.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> G = PermutationGroup(5); g = Perm([3,4,5,2,1])
+julia> G = SymmetricGroup(5); g = Perm([3,4,5,2,1])
 (1,3,5)(2,4)
 
 julia> parent(g) == G
 true
 ```
 """
-parent(g::Perm{T}) where T = PermGroup(T(length(g.d)))
+parent(g::Perm{T}) where T = SymmetricGroup(T(length(g.d)))
 
 ###############################################################################
 #
@@ -259,7 +259,7 @@ julia> permtype(g)
  2
  1
 
-julia> G = PermGroup(5); e = parent(g)()
+julia> G = SymmetricGroup(5); e = parent(g)()
 ()
 
 julia> permtype(e)
@@ -280,8 +280,8 @@ permtype(g::Perm) = sort(diff(cycles(g).cptrs), rev=true)
 #
 ###############################################################################
 
-function show(io::IO, G::PermGroup)
-   print(io, "Permutation group over $(G.n) elements")
+function show(io::IO, G::SymmetricGroup)
+   print(io, "Full symmetric group over $(G.n) elements")
 end
 
 mutable struct PermDisplayStyle
@@ -367,7 +367,7 @@ true
 ==(g::Perm, h::Perm) = g.d == h.d
 
 @doc Markdown.doc"""
-    ==(G::PermGroup, H::PermGroup)
+    ==(G::SymmetricGroup, H::SymmetricGroup)
 > Return `true` if permutation groups are equal, otherwise return `false`.
 >
 > Permutation groups on the same number of letters, but parametrized
@@ -375,17 +375,17 @@ true
 
 # Examples:
 ```
-julia> G = PermGroup(UInt(5))
+julia> G = SymmetricGroup(UInt(5))
 Permutation group over 5 elements
 
-julia> H = PermGroup(5)
+julia> H = SymmetricGroup(5)
 Permutation group over 5 elements
 
 julia> G == H
 false
 ```
 """
-==(G::PermGroup, H::PermGroup) = typeof(G) == typeof(H) && G.n == H.n
+==(G::SymmetricGroup, H::SymmetricGroup) = typeof(G) == typeof(H) && G.n == H.n
 
 ###############################################################################
 #
@@ -570,7 +570,7 @@ Base.eltype(::Type{AllPerms{T}}) where T<:Integer = Perm{T}
 Base.length(A::AllPerms) = A.all
 
 @doc Markdown.doc"""
-    Generic.elements!(G::PermGroup)
+    Generic.elements!(G::SymmetricGroup)
 > Return an unsafe iterator over all permutations in `G`. Only one permutation
 > is allocated and then modified in-place using the non-recursive
 > [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
@@ -580,13 +580,13 @@ Base.length(A::AllPerms) = A.all
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> elts = Generic.elements!(PermGroup(5));
+julia> elts = Generic.elements!(SymmetricGroup(5));
 
 
 julia> length(elts)
 120
 
-julia> for p in Generic.elements!(PermGroup(3))
+julia> for p in Generic.elements!(SymmetricGroup(3))
          println(p)
        end
 ()
@@ -596,7 +596,7 @@ julia> for p in Generic.elements!(PermGroup(3))
 (1,2,3)
 (1,3)
 
-julia> A = collect(Generic.elements!(PermGroup(3))); A
+julia> A = collect(Generic.elements!(SymmetricGroup(3))); A
 6-element Array{Perm{Int64},1}:
  (1,3)
  (1,3)
@@ -610,15 +610,15 @@ julia> unique(A)
  (1,3)
 ```
 """
-elements!(G::PermGroup)= (p for p in AllPerms(G.n))
+elements!(G::SymmetricGroup)= (p for p in AllPerms(G.n))
 
-function Base.iterate(G::PermGroup)
+function Base.iterate(G::SymmetricGroup)
   A = AllPerms(G.n)
   a, b = iterate(A)
   return deepcopy(A.elts), (A, b)
 end
 
-function Base.iterate(G::PermGroup, S)
+function Base.iterate(G::SymmetricGroup, S)
   A = S[1]
   c = S[2]
 
@@ -631,9 +631,9 @@ function Base.iterate(G::PermGroup, S)
   return deepcopy(s[1]), (A, s[2])
 end
 
-Base.eltype(::Type{PermGroup{T}}) where T = Perm{T}
+Base.eltype(::Type{SymmetricGroup{T}}) where T = Perm{T}
 
-Base.length(G::PermGroup) = order(G)
+Base.length(G::SymmetricGroup) = order(G)
 
 ###############################################################################
 #
@@ -642,11 +642,11 @@ Base.length(G::PermGroup) = order(G)
 ###############################################################################
 
 @doc Markdown.doc"""
-    order(G::PermGroup) -> BigInt
+    order(G::SymmetricGroup) -> BigInt
 > Return the order of the full permutation group as `BigInt`.
 """
-order(G::PermGroup) = order(BigInt, G)
-order(::Type{T}, G::PermGroup) where T = factorial(T(G.n))
+order(G::SymmetricGroup) = order(BigInt, G)
+order(::Type{T}, G::SymmetricGroup) where T = factorial(T(G.n))
 
 @doc Markdown.doc"""
     order(a::Perm) -> BigInt
@@ -709,7 +709,7 @@ function emb!(result::Perm, p::Perm, V)
 end
 
 @doc Markdown.doc"""
-    emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
+    emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
 > Return the natural embedding of a permutation group into `G` as the
 > subgroup permuting points indexed by `V`.
 
@@ -718,14 +718,14 @@ end
 julia> p = Perm([2,3,1])
 (1,2,3)
 
-julia> f = Generic.emb(PermGroup(5), [3,2,5]);
+julia> f = Generic.emb(SymmetricGroup(5), [3,2,5]);
 
 
 julia> f(p)
 (2,5,3)
 ```
 """
-function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
+function emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
    if check
       @assert length(Base.Set(V)) == length(V)
       @assert all(V .<= G.n)
@@ -734,10 +734,11 @@ function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
 end
 
 @doc Markdown.doc"""
-    rand([rng=GLOBAL_RNG,] G::PermGroup)
+    rand([rng=GLOBAL_RNG,] G::SymmetricGroup)
 > Return a random permutation from `G`.
 """
-rand(rng::AbstractRNG, rs::Random.SamplerTrivial{PermGroup{T}}) where {T} = Perm(randperm!(rng, Vector{T}(undef, rs[].n)), false)
+rand(rng::AbstractRNG, rs::Random.SamplerTrivial{SymmetricGroup{T}}) where {T} =
+   Perm(randperm!(rng, Vector{T}(undef, rs[].n)), false)
 
 ###############################################################################
 #
@@ -745,35 +746,29 @@ rand(rng::AbstractRNG, rs::Random.SamplerTrivial{PermGroup{T}}) where {T} = Perm
 #
 ###############################################################################
 
-function perm(a::Vector{<: Integer}, check::Bool = true)
+function perm(a::AbstractVector{<:Integer}, check::Bool = true)
   return Perm(a, check)
 end
 
-(G::PermGroup)() = Perm(G.n)
+(G::SymmetricGroup)() = Perm(G.n)
 
-function (G::PermGroup{T})(a::Vector{T}, check::Bool=true) where T<:Integer
+function (G::SymmetricGroup{T})(a::AbstractVector{S}, check::Bool=true) where {S, T}
    if check
       G.n == length(a) || throw("Cannot coerce to $G: lengths differ")
    end
-   return Perm(a, check)
+   return Perm(convert(Vector{T}, a), check)
 end
 
-function (G::PermGroup{T})(a::Vector{S}, check::Bool=true) where {S<:Integer,T}
-   return G(convert(Vector{T}, a), check)
+function (G::SymmetricGroup{T})(p::Perm{S}, check::Bool=true) where {S, T}
+   parent(p) == G && return p
+   return Perm(convert(Vector{T}, p.d), check)
 end
 
-function (G::PermGroup{T})(p::Perm{S}, check::Bool=true) where {S<:Integer, T}
-   if parent(p) == G
-      return p
-   end
-   return G(convert(Vector{T}, p.d), check)
-end
-
-function (G::PermGroup)(str::String, check::Bool=true)
+function (G::SymmetricGroup)(str::String, check::Bool=true)
    return G(cycledec(parse_cycles(str)..., G.n), check)
 end
 
-function (G::PermGroup{T})(cdec::CycleDec{T}, check::Bool=true) where T
+function (G::SymmetricGroup{T})(cdec::CycleDec{T}, check::Bool=true) where T
    if check
       length(cdec.ccycles) == G.n || throw("Can not coerce to $G: lengths differ")
    end
@@ -858,13 +853,13 @@ julia> p = perm"(1,3)(2,4)"
 julia> typeof(p)
 Perm{Int64}
 
-julia> parent(p) == PermutationGroup(4)
+julia> parent(p) == SymmetricGroup(4)
 true
 
 julia> p = perm"(1,3)(2,4)(10)"
 (1,3)(2,4)
 
-julia> parent(p) == PermutationGroup(10)
+julia> parent(p) == SymmetricGroup(10)
 true
 ```
 """
@@ -876,12 +871,12 @@ macro perm_str(s)
       n = maximum(c)
    end
    cdec = cycledec(c, p, n)
-   return PermGroup(cdec.cptrs[end]-1)(cdec)
+   return SymmetricGroup(cdec.cptrs[end]-1)(cdec)
 end
 
 ###############################################################################
 #
-#   PermGroup constructor
+#   SymmetricGroup constructor
 #
 ###############################################################################
 
@@ -917,7 +912,7 @@ const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> G = PermutationGroup(4)
+julia> G = SymmetricGroup(4)
 Permutation group over 4 elements
 
 julia> chi = character(Partition([3,1])); # character of the regular representation

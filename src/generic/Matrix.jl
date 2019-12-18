@@ -1114,13 +1114,13 @@ function lu!(P::Generic.Perm, A::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc Markdown.doc"""
-    lu(A::Generic.MatrixElem{T}, P = PermGroup(rows(A))) where {T <: FieldElement}
+    lu(A::Generic.MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
 > Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
 > $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
 > triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
 > matrix whose rows are the given permutation $p$ of the rows of $A$.
 """
-function lu(A::MatrixElem{T}, P = PermGroup(nrows(A))) where {T <: FieldElement}
+function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -1258,7 +1258,7 @@ function fflu!(P::Generic.Perm, A::MatrixElem{T}) where {T <: Union{FieldElement
 end
 
 @doc Markdown.doc"""
-    fflu(A::Generic.MatrixElem{T}, P = PermGroup(nrows(A))) where {T <: RingElement}
+    fflu(A::Generic.MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
 > Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
 > denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower
 > triangular matrix $L$ and an upper triangular matrix $U$ such that
@@ -1269,7 +1269,7 @@ end
 > $\pm \mbox{det}(S)$ where $S$ is an appropriate submatrix of $A$ ($S = A$ if
 > $A$ is square) and the sign is decided by the parity of the permutation.
 """
-function fflu(A::MatrixElem{T}, P = PermGroup(nrows(A))) where {T <: RingElement}
+function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -1306,7 +1306,7 @@ function rref!(A::MatrixElem{T}) where {T <: RingElement}
    m = nrows(A)
    n = ncols(A)
    R = base_ring(A)
-   P = PermGroup(m)()
+   P = SymmetricGroup(m)()
    rank, d = fflu!(P, A)
    for i = rank + 1:m
       for j = 1:n
@@ -1375,7 +1375,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    R = base_ring(A)
-   P = PermGroup(m)()
+   P = SymmetricGroup(m)()
    rnk = lu!(P, A)
    if rnk == 0
       return 0
@@ -1668,7 +1668,7 @@ function det_fflu(M::MatrixElem{T}) where {T <: RingElement}
       return base_ring(M)()
    end
    A = deepcopy(M)
-   P = PermGroup(n)()
+   P = SymmetricGroup(n)()
    r, d = fflu!(P, A)
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
@@ -1815,7 +1815,7 @@ function rank(M::MatrixElem{T}) where {T <: RingElement}
       return 0
    end
    A = deepcopy(M)
-   P = PermGroup(n)()
+   P = SymmetricGroup(n)()
    r, d = fflu!(P, A)
    return r
 end
@@ -1830,7 +1830,7 @@ function rank(M::MatrixElem{T}) where {T <: FieldElement}
       return 0
    end
    A = deepcopy(M)
-   P = PermGroup(n)()
+   P = SymmetricGroup(n)()
    return lu!(P, A)
 end
 
@@ -1845,7 +1845,7 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    !issquare(A) && error("Non-square matrix in solve_fflu")
    nrows(A) != nrows(b) && error("Dimensions don't match in solve_fflu")
    FFLU = deepcopy(A)
-   p = PermGroup(nrows(A))()
+   p = SymmetricGroup(nrows(A))()
    r, d = fflu!(p, FFLU)
    r < nrows(A) && error("Singular matrix in solve_fflu")
    return solve_fflu_precomp(p, FFLU, b), d
@@ -1906,7 +1906,7 @@ function solve_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
    end
 
    LU = deepcopy(A)
-   p = PermGroup(nrows(A))()
+   p = SymmetricGroup(nrows(A))()
    r = lu!(p, LU)
    r < nrows(A) && error("Singular matrix in solve_lu")
    return solve_lu_precomp(p, LU, b)
@@ -1974,7 +1974,7 @@ function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
    nrows(M) != ncols(M) && error("Non-square matrix")
    R = base_ring(M)
    FFLU = deepcopy(M)
-   p = PermGroup(nrows(M))()
+   p = SymmetricGroup(nrows(M))()
    r, d = fflu!(p, FFLU)
    if r < nrows(M)
       error("Singular matrix in solve_with_det")

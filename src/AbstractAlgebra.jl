@@ -101,7 +101,7 @@ export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
 
 export ZZ, QQ, zz, qq, RealField, RDF
 
-export PermutationGroup
+export SymmetricGroup
 
 export create_accessors, get_handle, package_handle, zeros,
        Array, sig_exists
@@ -211,7 +211,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row, add_ro
                  newton_to_monomial!, ngens, normalise, nrows, nvars, O, one,
                  order, ordering, parent_type, parity, partitionseq, Perm, perm,
                  permtype, @perm_str, polcoeff, pol_length, powmod,
-                 pow_multinomial, popov, popov_with_transform, 
+                 pow_multinomial, popov, popov_with_transform,
                  precision, preimage, preimage_map, primpart, pseudodivrem,
                  pseudo_inv, pseudorem, push_term!, rank, randmat_triu,
                  randmat_with_rank, rand_ordering, rank_profile_popov, remove,
@@ -316,8 +316,8 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
 #
 ################################################################################
 
-function PermGroup(n::T) where T
-  Generic.PermGroup(n)
+function SymmetricGroup(n::T) where T
+  Generic.SymmetricGroup(n)
 end
 
 function AllPerms(n::T) where T
@@ -579,7 +579,7 @@ end
 function crt end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
-       MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
+       MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, sub,
@@ -699,14 +699,6 @@ function zeros(R::Ring, r::Int...)
    end
    return A
 end
-
-###############################################################################
-#
-#   Set domain for PermutationGroup
-#
-###############################################################################
-
-const PermutationGroup = PermGroup
 
 ###############################################################################
 #
