@@ -206,12 +206,11 @@ function _losen_lu_mit_kernel(A,b)
     # which could in theory be a different concrete type from the input. It will be crucial
     # to implement a zero-matrix constructor that takes into account the type of `UtLt`.
     x  = zero_matrix(R, ncols(UtLt), ncolsb)
-    pb = p*b
 
     # Default rank zero behaviour.
     if iszero(rk)
         error("Not implemented in zero rank case.")
-        check_system_is_consistent(UtLt, x, pb, rk)
+        check_system_is_consistent(UtLt, x, b, rk)
         return x
     end
     
@@ -223,7 +222,7 @@ function _losen_lu_mit_kernel(A,b)
 
         # Populate the initial values in `x`. There is surely a better way to do this.
         for i=1:rk
-            x[i, k] = deepcopy(pb[i, k])
+            x[i, k] = deepcopy(b[i, k])
         end
 
         # _ut_pivot_columns only checks entries above the diagonal.
@@ -249,7 +248,7 @@ function _losen_lu_mit_kernel(A,b)
 
         # Below the last row where `U` has a pivot, the entries
         # of `UtLt` are just the entries of `Ut`.
-        check_system_is_consistent(UtLt, view(x, : , k:k), view(pb, :, k:k) , rk)
+        check_system_is_consistent(UtLt, view(x, : , k:k), view(b, :, k:k) , rk)
 
         # Backsolve step
         UtLtview = view(UtLt, 1:rk, 1:rk)
@@ -262,10 +261,15 @@ function _losen_lu_mit_kernel(A,b)
     end
 
     # Wir machen das kernel hier.
-    N = identity_matrix(R, ncols(UtLt), ncols(UtLt))[:, rk+1:ncols(UtLt)]
+    N = identity_matrix(R, ncols(UtLt))[:, rk+1:ncols(UtLt)]
 
-    # N is freshly allocated space, so the usual argument applies here to show we have satisfied the CONTRACT.
-    N = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(N, UtLtview, N, rk, 1, unit_diagonal=Val(true))
+    @warn "solve_lu with kernel will fail for 'tall' matrices."
     
-    return x, N
+    # N is freshly allocated space, so the usual argument applies here to show we have satisfied the CONTRACT.
+
+    # TODO: special logic is needed here because of the block structure.
+    N = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(N, UtLt, N, rk, 1, unit_diagonal=Val(true))
+
+    # TODO: Not sure if p*x, or inv(p)*x...
+    return p*x, p*N
 end
