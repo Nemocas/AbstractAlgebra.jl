@@ -393,7 +393,7 @@ false
 #
 ###############################################################################
 function mul!(out::Perm, g::Perm, h::Perm)
-   out = (out === g || out === h ? similar(out) : out)
+   out = (out === h ? similar(out) : out)
    @inbounds for i in eachindex(out.d)
       out[i] = h[g[i]]
    end
