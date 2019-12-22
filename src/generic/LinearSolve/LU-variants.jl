@@ -194,7 +194,7 @@ function _losen_lu_mit_kernel(A,b)
     (isempty(A) || isempty(b)) && error("empty solving with kernel not yet supported.")
 
     # LU decomposition step.
-    LU = transpose(A)
+    LU = transpose(deepcopy(A))
     p = PermGroup(nrows(LU))()
     rk = lu!(p, LU)
     UtLt = transpose(LU)
@@ -209,9 +209,8 @@ function _losen_lu_mit_kernel(A,b)
 
     # Default rank zero behaviour.
     if iszero(rk)
-        error("Not implemented in zero rank case.")
-        check_system_is_consistent(UtLt, x, b, rk)
-        return x
+        check_system_is_consistent(A, x, b, rk)
+        return x, identity_matrix(R, ncols(UtLt))
     end
     
     t = base_ring(b)()
@@ -219,11 +218,6 @@ function _losen_lu_mit_kernel(A,b)
     
     # For each column of b, solve Ax=b[:,j].
     for k in 1:ncolsb
-
-        # Populate the initial values in `x`. There is surely a better way to do this.
-        for i=1:rk
-            x[i, k] = deepcopy(b[i, k])
-        end
 
         # _ut_pivot_columns only checks entries above the diagonal.
         prows  = _ut_pivot_columns(LU)
@@ -237,6 +231,11 @@ function _losen_lu_mit_kernel(A,b)
         # triangular matrix.
         # Thus, we have fulfilled the CONTRACT for using the `!!` method.
 
+        # Populate the initial values in `x`. There is surely a better way to do this.
+        for i=1:rk
+            x[i, k] = deepcopy(b[prows[i], k])
+        end
+
         UtLtview = view(UtLt, prows, 1:rk)
         xview = view(x, 1:rk, k:k)      # The pivot rows are always the same.
 
@@ -246,6 +245,8 @@ function _losen_lu_mit_kernel(A,b)
             x[i, k] = xview[i, 1]
         end        
 
+        #@info "" xview UtLtview
+        
         # Below the last row where `U` has a pivot, the entries
         # of `UtLt` are just the entries of `Ut`.
         check_system_is_consistent(UtLt, view(x, : , k:k), view(b, :, k:k) , rk)
@@ -263,13 +264,14 @@ function _losen_lu_mit_kernel(A,b)
     # Wir machen das kernel hier.
     N = identity_matrix(R, ncols(UtLt))[:, rk+1:ncols(UtLt)]
 
-    @warn "solve_lu with kernel will fail for 'tall' matrices."
-    
-    # N is freshly allocated space, so the usual argument applies here to show we have satisfied the CONTRACT.
+    #@info "" UtLt N rk typeof(N)
 
-    # TODO: special logic is needed here because of the block structure.
-    N = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(N, UtLt, N, rk, 1, unit_diagonal=Val(true))
+    for k in 1:ncols(UtLt)-rk
+        # N is freshly allocated space, so the usual argument applies here
+        # to show we have satisfied the CONTRACT.
+        N[1:rk, k] = _solve_nonsingular_ut!!_I_agree_to_the_terms_and_conditions_of_this_function(N[1:rk,k], UtLt, -UtLt[1:rk,k+rk], rk, 1, unit_diagonal=Val(true))
+    end
 
-    # TODO: Not sure if p*x, or inv(p)*x...
-    return p*x, p*N
+    invp = inv(p)
+    return invp*x, invp*N
 end
