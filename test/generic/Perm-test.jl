@@ -265,7 +265,7 @@ end
    @test order(G()) == 1
 
    @test collect(cycles(a)) == [T[1,2,3,5,6,7], T[4], T[8,9,10]]
-   @test Generic.permtype(a) isa Vector{Int}
+   @test Generic.permtype(a) isa Vector{T}
    @test Generic.permtype(a) == [6,3,1]
    @test cycles(a)[1] isa Vector{T}
    @test cycles(a)[1] == T[1,2,3,5,6,7]

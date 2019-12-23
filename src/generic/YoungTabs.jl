@@ -150,8 +150,9 @@ function Base.iterate(A::AllParts, k)
    return nextpart_asc(A.part, k)
 end
 
-Base.eltype(::Type{AllParts}) = Partition
-length(A::AllParts) = _numpart(A.n)
+Base.length(A::AllParts) = _numpart(A.n)
+Base.eltype(::Type{AllParts{T}}) where T = Partition{T}
+Base.size(A::AllParts) = (length(A),)
 
 @inbounds function nextpart_asc(part, k)
    if k == 0
@@ -201,7 +202,7 @@ end
 > Return the conjugated partition of `part` together with permuted vector `v`.
 """
 function Base.conj(part::Partition, v::Vector)
-   w = zeros(Int, size(v))
+   w = zeros(eltype(part), size(v))
 
    acc = Vector{Int}(undef, length(part)+1)
    acc[1] = 0
@@ -257,11 +258,11 @@ partitionseq(v::Vector{T}) where T<:Integer = partitionseq(Partition(v))
 partitionseq(seq::BitVector) = seq[something(findfirst(isequal(true), seq), 0):something(findlast(isequal(false), seq), 0)]
 
 @doc Markdown.doc"""
-    isrimhook(R::BitVector, idx::Int, len::Int)
+    isrimhook(R::BitVector, idx::Integer, len::Integer)
 > `R[idx:idx+len]` forms a rim hook in the Young Diagram of partition
 > corresponding to `R` iff `R[idx] == true` and `R[idx+len] == false`.
 """
-function isrimhook(R::BitVector, idx::Int, len::Int)
+function isrimhook(R::BitVector, idx::Integer, len::Integer)
    return (R[idx+len] == false) && (R[idx] == true)
 end
 
@@ -331,9 +332,9 @@ julia> y = YoungTableau([4,3,1]); size(y)
 """
 size(Y::YoungTableau) = (length(Y.part), Y.part[1])
 
-Base.IndexStyle(::Type{YoungTableau}) = Base.IndexLinear()
+Base.IndexStyle(::Type{<:YoungTableau}) = Base.IndexLinear()
 
-function inyoungtab(t::Tuple{T,T}, Y::YoungTableau) where T<:Integer
+function inyoungtab(t::Tuple{Integer,Integer}, Y::YoungTableau)
    i,j = t
    i > length(Y.part) && return false
    Y.part[i] < j && return false
@@ -389,7 +390,7 @@ function ==(Y1::YoungTableau,Y2::YoungTableau)
    return true
 end
 
-hash(Y::YoungTableau, h::UInt) = hash(Y.part, hash(Y.fill, hash(YoungTableau, h)))
+hash(Y::YoungTableau, h::UInt) = hash(Y.part, hash(Y.fill, hash(typeof(Y), h)))
 
 ##############################################################################
 #
@@ -551,8 +552,8 @@ julia> matrix_repr(y)
   [1, 4]  =  4
 ```
 """
-function matrix_repr(Y::YoungTableau)
-   tab = spzeros(Int, length(Y.part), Y.part[1])
+function matrix_repr(Y::YoungTableau{T}) where T
+   tab = spzeros(T, length(Y.part), Y.part[1])
    k=1
    for (idx, p) in enumerate(Y.part)
       tab[idx, 1:p] = Y.fill[k:k+p-1]
@@ -649,7 +650,7 @@ julia> Generic.rowlength(y, 3,3)
 0
 ```
 """
-rowlength(Y::YoungTableau, i, j) = Y.part[i] < j ? 0 : Y.part[i]-j
+rowlength(Y::YoungTableau, i::Integer, j::Integer) = Y.part[i] < j ? 0 : Y.part[i]-j
 
 @doc Markdown.doc"""
     collength(Y::YoungTableau, i, j)
@@ -677,7 +678,7 @@ julia> Generic.collength(y, 2,4)
 0
 ```
 """
-collength(Y::YoungTableau, i, j) = count(x -> x>=j, view(Y.part, i+1:lastindex(Y.part)))
+collength(Y::YoungTableau, i::Integer, j::Integer) = count(x -> x>=j, view(Y.part, i+1:lastindex(Y.part)))
 
 @doc Markdown.doc"""
     hooklength(Y::YoungTableau, i, j)
@@ -708,7 +709,7 @@ julia> hooklength(y, 2,4)
 0
 ```
 """
-function hooklength(Y::YoungTableau, i, j)
+function hooklength(Y::YoungTableau, i::Integer, j::Integer)
    if inyoungtab((i,j), Y)
       return rowlength(Y, i, j) + collength(Y, i, j) + 1
    else
@@ -748,7 +749,7 @@ end
 #
 ##############################################################################
 
-SkewDiagram(lambda::Vector{Int}, mu::Vector{Int}) = SkewDiagram(Partition(lambda), Partition(mu))
+SkewDiagram(lambda::AbstractVector{<:Integer}, mu::AbstractVector{<:Integer}) = SkewDiagram(Partition(lambda), Partition(mu))
 /(lambda::Partition, mu::Partition) = SkewDiagram(lambda, mu)
 
 @doc Markdown.doc"""
@@ -758,13 +759,13 @@ SkewDiagram(lambda::Vector{Int}, mu::Vector{Int}) = SkewDiagram(Partition(lambda
 """
 Base.size(xi::SkewDiagram) = (length(xi.lam), xi.lam[1])
 
-Base.IndexStyle(::Type{SkewDiagram}) = Base.IndexLinear()
+Base.IndexStyle(::Type{<:SkewDiagram}) = Base.IndexLinear()
 
 @doc Markdown.doc"""
-    in(t::Tuple{T,T}, xi::SkewDiagram) where T<:Integer
+    in(t::Tuple{Integer,Integer}, xi::SkewDiagram)
 > Check if box at position `(i,j)` belongs to the skew diagram `xi`.
 """
-function Base.in(t::Tuple{T, T}, xi::SkewDiagram) where T<:Integer
+function Base.in(t::Tuple{Integer, Integer}, xi::SkewDiagram)
    i,j = t
    if i <= 0 || j <= 0
       return false
@@ -789,7 +790,7 @@ function getindex(xi::SkewDiagram, n::Integer)
 end
 
 ==(xi::SkewDiagram, psi::SkewDiagram) = xi.lam == psi.lam && xi.mu == psi.mu
-hash(xi::SkewDiagram, h::UInt) = hash(xi.lam, hash(xi.mu, hash(SkewDiagram, h)))
+hash(xi::SkewDiagram, h::UInt) = hash(xi.lam, hash(xi.mu, hash(typeof(xi), h)))
 
 ###############################################################################
 #
@@ -819,7 +820,7 @@ end
 > where `A[i,j] == 1` if and only if `(i,j)` is in `xi.lam` but not in `xi.mu`.
 """
 function matrix_repr(xi::SkewDiagram)
-   skdiag = spzeros(Int, size(xi)...)
+   skdiag = spzeros(eltype(xi), size(xi)...)
    for i in 1:length(xi.mu)
       skdiag[i, xi.mu[i]+1:xi.lam[i]] .= 1
    end
@@ -830,10 +831,10 @@ function matrix_repr(xi::SkewDiagram)
 end
 
 @doc Markdown.doc"""
-    has_left_neighbor(xi::SkewDiagram, i::Int, j::Int)
+    has_left_neighbor(xi::SkewDiagram, i::Integer, j::Integer)
 > Check if box at position `(i,j)` has neighbour in `xi` to the left.
 """
-function has_left_neighbor(xi::SkewDiagram, i::Int, j::Int)
+function has_left_neighbor(xi::SkewDiagram, i::Integer, j::Integer)
    if j == 1
       return false
    else
@@ -842,10 +843,10 @@ function has_left_neighbor(xi::SkewDiagram, i::Int, j::Int)
 end
 
 @doc Markdown.doc"""
-    has_bottom_neighbor(xi::SkewDiagram, i::Int, j::Int)
+    has_bottom_neighbor(xi::SkewDiagram, i::Integer, j::Integer)
 > Check if box at position `(i,j)` has neighbour in `xi` below.
 """
-function has_bottom_neighbor(xi::SkewDiagram, i::Int, j::Int)
+function has_bottom_neighbor(xi::SkewDiagram, i::Integer, j::Integer)
    if i == length(xi.lam)
       return false
    else
@@ -858,7 +859,7 @@ end
 > Check if `xi` represents a rim-hook diagram, i.e. its diagram is
 > edge-connected and contains no $2\times 2$ squares.
 """
-function isrimhook(xi::SkewDiagram)
+function isrimhook(xi::SkewDiagram{T}) where T
    i = 1
    j = xi.lam[1]
    while i != length(xi.lam) && j != 1
@@ -872,7 +873,7 @@ function isrimhook(xi::SkewDiagram)
          i += 1
       else
          lam_tail = xi.lam[i+1:end]
-         mu_tail = zeros(Int, length(lam_tail))
+         mu_tail = zeros(T, length(lam_tail))
          mu_tail[1:length(xi.mu)-i] = xi.mu[i+1:end]
 
          if any(lam_tail .- mu_tail .> 0)
