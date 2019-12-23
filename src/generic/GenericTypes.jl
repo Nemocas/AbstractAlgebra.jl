@@ -17,10 +17,10 @@
 > * `cptrs`: an array of pointers to the locations where cycles begin: ```ccycles[cptrs[i], cptrs[i+1]-1]` contains the i-th cycle;
 > * `n`: the number of cycles;
 """
-struct CycleDec{T}
+struct CycleDec{T<:Integer}
    ccycles::Vector{T}
-   cptrs::Vector{Int}
-   n::Int
+   cptrs::Vector{T}
+   n::T
 end
 
 ###############################################################################
@@ -152,9 +152,9 @@ julia> p.n == sum(p.part)
 true
 ```
 """
-mutable struct Partition <: AbstractVector{Int}
+mutable struct Partition{T} <: AbstractVector{T}
    n::Int
-   part::Vector{Int}
+   part::Vector{T}
 
    function Partition(part::AbstractVector{T}, check::Bool=true) where T<:Integer
       if check
@@ -163,7 +163,7 @@ mutable struct Partition <: AbstractVector{Int}
             part[end] >= 1 || throw(ArgumentError("Found non-positive entry in partition!"))
          end
       end
-      return new(sum(part), part)
+      return new{T}(sum(part), part)
    end
 end
 
@@ -194,10 +194,11 @@ julia> collect(ap)
  5₁
 ```
 """
-struct AllParts
+struct AllParts{T<:Integer}
     n::Int
-    part::Vector{Int}
-    AllParts(n::Integer) = new(n, zeros(Int,n))
+    part::Vector{T}
+    AllParts{T}(n::Integer) where T = new{T}(n, zeros(Int,n))
+    AllParts(n::T) where T<:Integer = AllParts{T}(n)
 end
 
 ###############################################################################
@@ -228,17 +229,21 @@ julia> xi = SkewDiagram(l,m)
 
 ```
 """
-struct SkewDiagram <: AbstractArray{Int, 2}
-   lam::Partition
-   mu::Partition
+struct SkewDiagram{T<:Integer} <: AbstractArray{T, 2}
+   lam::Partition{T}
+   mu::Partition{T}
 
-   function SkewDiagram(lambda, mu)
-      lambda.n >= mu.n || throw("Can't create SkewDiagram: $mu is partition of  $(mu.n) > $(lambda.n).")
-      length(lambda) >= length(mu) || throw("Can't create SkewDiagram: $mu is longer than $(lambda)!")
-      for (l, m) in zip(lambda, mu)
-         l >= m || throw("a row of $mu is longer than a row of $lambda")
+   function SkewDiagram(lambda::Partition{T}, mu::Partition{T}) where T
+      @boundscheck let
+         lambda.n >= mu.n ||
+            throw("Can't create SkewDiagram: $mu is partition of  $(mu.n) > $(lambda.n).")
+         length(lambda) >= length(mu) ||
+               throw("Can't create SkewDiagram: $mu is longer than $(lambda)!")
+         for (l, m) in zip(lambda, mu)
+            l >= m || throw("a row of $mu is longer than a row of $lambda")
+         end
       end
-      return new(lambda, mu)
+      return new{T}(lambda, mu)
    end
 end
 
@@ -283,16 +288,15 @@ julia> y.fill
  8
 ```
 """
-struct YoungTableau <: AbstractArray{Int, 2}
-   part::Partition
-   fill::Vector{Int}
+struct YoungTableau{T<:Integer} <: AbstractArray{T, 2}
+   part::Partition{T}
+   fill::Vector{T}
 
-   function YoungTableau(part::Partition, fill::Vector{T}=collect(1:sum(part))) where T<:Integer
-      sum(part) == length(fill) || throw(ArgumentError("Can't fill Young digaram of $part with $fill: different number of elemnets."))
+   function YoungTableau(part::Partition{T},
+      fill::AbstractVector{<:Integer}=collect(T(1):sum(part))) where T
+      @boundscheck sum(part) == length(fill) || throw(ArgumentError("Can't fill Young digaram of $part with $fill: different number of elemnets."))
 
-      # _, fill = conj(part, fill)
-
-      return new(part, fill)
+      return new{T}(part, fill)
    end
 end
 
