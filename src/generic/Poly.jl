@@ -74,9 +74,9 @@ symbols(a::AbstractAlgebra.PolyRing) = [a.S]
 nvars(a::AbstractAlgebra.PolyRing) = 1
 
 function check_parent(a::PolynomialElem, b::PolynomialElem, throw::Bool = true)
-   b = parent(a) != parent(b)
-   b && throw && error("Incompatible polynomial rings in polynomial operation")
-   return !b
+   c = parent(a) != parent(b)
+   c && throw && error("Incompatible polynomial rings in polynomial operation")
+   return !c
 end
 
 characteristic(a::AbstractAlgebra.PolyRing) = characteristic(base_ring(a))
@@ -2398,7 +2398,7 @@ function map_coeffs(g, p::PolyElem{<:RingElement};
    return _map(g, p, parent)
 end
 
-function _map(g, p::PolyElem, Rx::PolyRing)
+function _map(g, p::PolyElem, Rx)
    R = base_ring(Rx)
    new_coefficients = [let c = coeff(p, i)
                           iszero(c) ? zero(R) : R(g(c))
