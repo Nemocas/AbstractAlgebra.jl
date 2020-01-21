@@ -88,7 +88,7 @@ using Random: Random, AbstractRNG
 
 export elem_type, parent_type
 
-export SetElem, GroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElement,
+export SetElem, GroupElem, AdditiveGroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElement,
        FieldElement, Map, AccessorNotSetError
 
 export SetMap, FunctionalMap, IdentityMap

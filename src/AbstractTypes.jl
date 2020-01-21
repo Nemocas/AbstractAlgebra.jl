@@ -9,7 +9,9 @@
 
 abstract type Set end
 
-abstract type Group <: Set end
+abstract type Group <: Set end # with * as operation
+
+abstract type AdditiveGroup <: Set end # with + as operation
 
 abstract type NCRing <: Set end
 
@@ -21,7 +23,9 @@ abstract type Field <: Ring end
 
 abstract type SetElem end
 
-abstract type GroupElem <: SetElem end
+abstract type GroupElem <: SetElem end # with * as operation
+
+abstract type AdditiveGroupElem <: SetElem end # with + as operation
 
 abstract type NCRingElem <: SetElem end
 
@@ -31,7 +35,7 @@ abstract type FieldElem <: RingElem end
 
 # parameterized domains
 
-abstract type Module{T} <: Group end
+abstract type Module{T} <: AdditiveGroup end
 
 abstract type FPModule{T} <: Module{T} end
 
@@ -39,7 +43,7 @@ abstract type Ideal{T} <: Set end
 
 # elements of parameterised domains
 
-abstract type ModuleElem{T} <: GroupElem end
+abstract type ModuleElem{T} <: AdditiveGroupElem end
 
 abstract type FPModuleElem{T} <: ModuleElem{T} end
 
