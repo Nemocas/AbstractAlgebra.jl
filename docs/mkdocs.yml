@@ -16,4 +16,4 @@ markdown_extensions:
 
 docs_dir: 'build'
 
-extra_javascript: ['mathjaxhelper.js', 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML']
+extra_javascript: ['mathjaxhelper.js', 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML']
