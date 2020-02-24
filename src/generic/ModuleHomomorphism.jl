@@ -226,6 +226,12 @@ function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra
    return ModuleHomomorphism{T}(M1, M2, m)
 end
 
+hom(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement = ModuleHomomorphism(M1, M2, m)
+
+function hom(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, v::Vector{<:AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement 
+  return hom(M1, M2, vcat([x.v for x = v]))
+end
+
 @doc Markdown.doc"""
     ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T},
         M2::AbstractAlgebra.FPModule{T}, M::AbstractAlgebra.MatElem{T},
