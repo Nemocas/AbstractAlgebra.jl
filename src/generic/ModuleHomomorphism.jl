@@ -223,7 +223,12 @@ end
 > Create the homomorphism $f : M_1 \to M_2$ represented by the matrix $m$.
 """
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) || error("dimension mismatch")
    return ModuleHomomorphism{T}(M1, M2, m)
+end
+
+function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, v::Array{S, 1}) where {T <: RingElement, S<:AbstractAlgebra.FPModuleElem{T}}
+  return ModuleHomomorphism(M1, M2, vcat([x.v for x = v]...))
 end
 
 @doc Markdown.doc"""

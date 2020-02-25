@@ -156,8 +156,9 @@ include("julia/JuliaTypes.jl")
 include("Generic.jl")
 
 # Do not import numerator and denominator as we have our own
-import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row, add_row!, base_ring, cached,
-                 canonical_unit, can_solve_left_reduced_triu, change_base_ring,
+import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
+                 add_row!, base_ring, basis, cached, canonical_unit, can_solve_left_reduced_triu,
+                 change_base_ring,
                  character, characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_composable, check_parent,
@@ -180,7 +181,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row, add_ro
                  hnf_kb, hnf_kb_with_transform,
                  hnf_minors, hnf_minors_with_transform,
                  hnf_with_transform, hnf_via_popov,
-                 hnf_via_popov_with_transform,
+                 hnf_via_popov_with_transform, 
                  hooklength, identity_map, identity_matrix, image,
                  image_map, image_fn, inflate, integral, interpolate, inv,
                  inv!, invariant_factors,
@@ -559,8 +560,8 @@ function direct_sum(m::Module{T}...) where T <: RingElement
    Generic.DirectSum(m...)
 end
 
-function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
-   Generic.ModuleHomomorphism(M1, M2, m)
+function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, A...)
+   Generic.ModuleHomomorphism(M1, M2, A...)
 end
 
 function module_homomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
@@ -584,7 +585,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, sub,
        quo, DirectSum, ModuleIsomorphism, free_module, vector_space,
-       module_homomorphism, direct_sum, module_isomorphism
+       module_homomorphism, direct_sum, module_isomorphism, basis
 
 export Generic
 

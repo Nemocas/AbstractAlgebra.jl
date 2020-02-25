@@ -48,11 +48,6 @@ function show(io::IO, N::DirectSumModule{T}) where T <: RingElement
    print(IOContext(io, :compact => true), base_ring(N))
 end
 
-function show(io::IO, N::DirectSumModule{T}) where T <: FieldElement
-   print(io, "Subspace over ")
-   print(IOContext(io, :compact => true), base_ring(N))
-end
-
 function show(io::IO, v::DirectSumModuleElem)
    print(io, "(")
    len = ngens(parent(v))
@@ -111,6 +106,21 @@ function (M::DirectSumModule{T})(a::DirectSumModuleElem{T}) where T <: RingEleme
    return a
 end
 
+function (M::DirectSumModule{T})(a::Vector{U}) where U <: AbstractAlgebra.FPModuleElem{T} where T <: RingElement
+   S = summands(M)
+   if length(a) != length(S)
+     error("need one entry per summand")
+   end
+   if any(x->parent(a[x]) != S[x], 1:length(a))
+     error("Incompatible modules")
+   end
+   s = M.inj[1](a[1])
+   for i = 2:length(a)
+     s += M.inj[i](a[i])
+   end
+   return s
+end
+
 # Fallback for all other kinds of modules
 function (M::DirectSumModule{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
    error("Unable to coerce into given module")
@@ -122,39 +132,31 @@ end
 #
 ###############################################################################
 
-function direct_sum_injection(m::AbstractAlgebra.FPModule{T}, D::DirectSumModule{T}, v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+function direct_sum_injection(i::Int, D::DirectSumModule{T}, v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   S = summands(D)
+   m = S[i]
    R = base_ring(m)
    # Find starting point of the given module in the large vectors
-   start = 0
-   S = summands(D)
-   i = 1
-   while i < length(S) && S[i] !== m
-         start += ngens(S[i])
-         i += 1
-   end
+   start = sum(map(x->ngens(x)::Int, S[1:i-1]))
    # create embedded value
-   newv = T[zero(R) for i in 1:ngens(D)]
-   for i = 1:ngens(m)
-      newv[i + start] = v[i]
+   newv = T[zero(R) for j in 1:ngens(D)]
+   for j = 1:ngens(m)
+      newv[j + start] = v[j]
    end
    matv = matrix(R, 1, length(newv), newv)
    return DirectSumModuleElem{T}(D, matv)
 end
 
-function direct_sum_projection(D::DirectSumModule{T}, m::U, v::AbstractAlgebra.FPModuleElem{T}) where {T <: RingElement, U <: AbstractAlgebra.FPModule{T}}
+function direct_sum_projection(D::DirectSumModule{T}, i::Int, v::AbstractAlgebra.FPModuleElem{T}) where {T <: RingElement}
    # Find starting point of the given module in the large vectors
-   R = base_ring(m)
-   start = 0
    S = summands(D)
-   i = 1
-   while i < length(S) && S[i] !== m
-         start += ngens(S[i])
-         i += 1
-   end
+   m = S[i]
+   R = base_ring(m)
+   start = sum(map(x->ngens(x)::Int, S[1:i-1]))
    # create projected value
-   newv = T[v[i + start] for i in 1:ngens(m)]
+   newv = T[v[j + start] for j in 1:ngens(m)]
    matv = matrix(R, 1, length(newv), newv)
-   return elem_type(U)(m, matv)
+   return elem_type(m)(m, matv)
 end
 
 @doc Markdown.doc"""
@@ -204,8 +206,8 @@ function DirectSum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElem
       mat2 = transpose(mat1)
       pro[i] = ModuleHomomorphism(M, m[i], mat2)
       # Override image_fns with fast versions that don't do matrix-vector mul
-      inj[i].image_fn  = x -> direct_sum_injection(m[i], M, x)
-      pro[i].image_fn = x -> direct_sum_projection(M, m[i], x)
+      inj[i].image_fn  = x -> direct_sum_injection(i, M, x)
+      pro[i].image_fn = x -> direct_sum_projection(M, i, x)
       start += ngens(m[i])
    end
    M.inj = inj
@@ -216,3 +218,31 @@ end
 function DirectSum(vals::AbstractAlgebra.FPModule{T}...) where T <: RingElement
    return DirectSum([vals...])
 end
+
+function ModuleHomomorphism(D::DirectSumModule{T}, A::AbstractAlgebra.FPModule{T}, m::Vector{<:ModuleHomomorphism{T}}) where T <: RingElement
+   S = summands(D)
+   length(S) == length(m) || error("map array has wrong length")
+   all(i->domain(m[i]) == S[i] && codomain(m[i]) == A, 1:length(S)) || 
+                            error("modules and maps are not compatible")
+   return ModuleHomomorphism(D, A, vcat([x.matrix for x = m]...))
+end
+
+function ModuleHomomorphism(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Array{<:Any, 2}) where T <: RingElement
+   SD = summands(D)
+   SA = summands(A)
+   size(m) == (length(SD), length(SA)) || error("dimensions do not match")
+   for i = 1:length(SD)
+      for j = 1:length(SA)
+         if m[i, j] == 0
+            m[i, j] = ModuleHomomorphism(SD[i], SA[j], [zero(SA[j]) for x = 1:ngens(SD[i])])
+         else
+            isa(m[i, j], ModuleHomomorphism{T}) || error("matrix must contain only 0 and homs")
+            domain(m[i, j]) === SD[i] && codomain(m[i, j]) === SA[j] || 
+                                    error("modules and maps are not compatible")
+         end
+      end
+   end
+
+   return ModuleHomomorphism(D, A, hvcat(Tuple([length(SD) for i = 1:length(SA)]), map(x->(x.matrix)', m)...)')
+end
+

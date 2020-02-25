@@ -54,6 +54,8 @@ function gen(N::FreeModule{T}, i::Int) where T <: Union{RingElement, NCRingElem}
    return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
 end
 
+basis(N::FreeModule) = gens(N)
+
 ###############################################################################
 #
 #   String I/O

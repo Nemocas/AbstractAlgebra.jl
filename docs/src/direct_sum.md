@@ -176,3 +176,69 @@ julia> summands(D)
  Submodule over Integers with 2 generators and no relations
 ```
 
+
+```
+    (D::DirectSumModule{T}(::Vector{<:AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement
+```   
+
+Given a vector (or $1$-dim array) of module elements, where the $i$-th entry
+has to be an element of the $i$-summand of $D$, create the corresponding
+element in $D$.
+
+**Examples**
+
+```jldoctest
+julia> N = FreeModule(QQ, 2);
+julia> M = FreeModule(QQ, 1);
+julia> D, _ = DirectSum(M, N, M);
+julia> D([gen(M, 1), gen(N, 1), gen(M, 2)])
+(1//1, 1//1, 0//1, 0//1)
+```
+### Special Homomorphisms
+
+Due to the special structure as direct sums, homomorphisms can be created by specifying
+homomorphisms for all summands. In case of the codmain being a direct sum as well, 
+any homomorphism may be thought of as a matrix containing maps from the $i$-th
+source summand to the $j$-th target module:
+
+```
+ModuleHomomorphism(D::DirectSumModule{T}, S::DirectSumModule{T}, m::Array{Any, 2}) where T <: RingElement
+```
+
+Given a matrix $m$ such that the $(i,j)$-th entry is either $0$ (`Int(0)`)
+or a `ModuleHomomorphism` from the $i$-th summand of $D$ to the $j$-th summand of
+$S$, construct the corresponding homomorphism.
+
+```
+ModuleHomomorphism(D::DirectSumModule{T}, S::FPModuleElem{T}, m::Array{ModuleHomomorphism, 1})
+```
+Given an array $a$ of `ModuleHomomorphism` such that $a_i$, the $i$-th entry
+of $a$ is a `ModuleHomomorphism` from the $i$-th summand of `D` into `S`,
+construct the direct sum of the components.
+
+
+Given a matrix $m$ such that the $(i,j)$-th entry is either $0$ (`Int(0)`)
+or a `ModuleHomomorphism` from the $i$-th summand of $D$ to the $j$-th summand of
+$S$, construct the corresponding homomorphism.
+
+
+**Examples**
+
+```jldoctest
+julia> N = FreeModule(QQ, 2);
+julia> D, _ = DirectSum(N, N);
+julia> p = ModuleHomomorphism(N, N, [3,4] .* basis(N));
+julia> q = ModuleHomomorphism(N, N, [5,7] .* basis(N));
+julia> phi = ModuleHomomorphism(D, D, [p 0; 0 q])
+Module homomorphism with
+Domain: DirectSumModule over Rationals
+Codomain: DirectSumModule over Rationals
+
+julia> r = ModuleHomomorphism(N, D, [2,3] .* gens(D)[1:2])
+julia> psi = ModuleHomomorphism(D, D, [r, r])
+Module homomorphism with
+Domain: DirectSumModule over Rationals
+Codomain: DirectSumModule over Rationals
+
+```
+

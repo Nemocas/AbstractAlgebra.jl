@@ -57,6 +57,7 @@ Vector space of dimension 2 over Rationals
 ```julia
 rank(M::Generic.FreeModule{T}) where T <: AbstractAlgebra.RingElem
 dim(V::Generic.FreeModule{T}) where T <: AbstractAlgebra.FieldElem
+basis(V::Generic.FreeModule{T}) where T <: AbstractAlgebra.FieldElem
 ```
 
 **Examples**
@@ -74,6 +75,10 @@ julia> rank(M)
 julia> dim(V)
 2
 
+julia> basis(V)
+2-element Array{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}},1}:
+ (1//1, 0//1)
+ (0//1, 1//1)
 ```
 
 
