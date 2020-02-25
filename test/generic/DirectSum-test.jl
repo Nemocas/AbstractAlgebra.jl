@@ -20,6 +20,12 @@ using Random
    m = D([])
 
    @test isa(m, Generic.DirectSumModuleElem)
+
+   F = FreeModule(QQ,2)
+   D, inj, pro = DirectSum(F, F)
+   f = D([gen(F, 1), gen(F,2)])
+   @test isa(f, Generic.DirectSumModuleElem)
+   @test f == inj[1](gen(F,1)) + inj[2](gen(F, 2))
 end
 
 @testset "Generic.DirectSum.basic_manipulation..." begin
@@ -67,3 +73,18 @@ end
       end
    end
 end
+
+@testset "Generic.DirectSum.more maps..." begin
+   F = FreeModule(QQ, 2)
+   D, _ = DirectSum(F, F)
+   p = ModuleHomomorphism(F, F, [1,2] .* gens(F))
+   q = ModuleHomomorphism(F, F, [3,4] .* gens(F))
+   phi = ModuleHomomorphism(D, D, [p 0; q q])
+
+   @test phi(gen(D, 1)) == D([p(gen(F, 1)), zero(F)])
+   @test phi(gen(D, 2)) == D([p(gen(F, 2)), zero(F)])
+   @test phi(gen(D, 3)) == D([q(gen(F, 1)), q(gen(F, 1))])
+   @test phi(gen(D, 4)) == D([q(gen(F, 2)), q(gen(F, 2))])
+end
+
+

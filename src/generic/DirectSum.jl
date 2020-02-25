@@ -48,11 +48,6 @@ function show(io::IO, N::DirectSumModule{T}) where T <: RingElement
    print(IOContext(io, :compact => true), base_ring(N))
 end
 
-#function show(io::IO, N::DirectSumModule{T}) where T <: FieldElement
-#   print(io, "Subspace over ")
-#   print(IOContext(io, :compact => true), base_ring(N))
-#end
-
 function show(io::IO, v::DirectSumModuleElem)
    print(io, "(")
    len = ngens(parent(v))
@@ -224,22 +219,22 @@ function DirectSum(vals::AbstractAlgebra.FPModule{T}...) where T <: RingElement
    return DirectSum([vals...])
 end
 
-function hom(D::DirectSumModule{T}, A::AbstractAlgebra.FPModule{T}, m::Vector{<:ModuleHomomorphism{T}}) where T <: RingElement
+function ModuleHomomorphism(D::DirectSumModule{T}, A::AbstractAlgebra.FPModule{T}, m::Vector{<:ModuleHomomorphism{T}}) where T <: RingElement
   S = summands(D)
   length(S) == length(m) || error("map array has wrong length")
-  all(x->domain(m[i]) == S[i] && codomain(m[i]) == A, 1:length(S)) || 
+  all(i->domain(m[i]) == S[i] && codomain(m[i]) == A, 1:length(S)) || 
                            error("modules and maps are not compatible")
-  return hom(D, A, vcat([x.matrix for x = m]))
+  return ModuleHomomorphism(D, A, vcat([x.matrix for x = m]...))
 end
 
-function hom(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Array{<:Any, 2}) where T <: RingElement
+function ModuleHomomorphism(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Array{<:Any, 2}) where T <: RingElement
   SD = summands(D)
   SA = summands(A)
   size(m) == (length(SD), length(SA)) || error("dimensions do not match")
-  for i=1:length(SD)
-    for j=1:length(SA)
+  for i = 1:length(SD)
+    for j = 1:length(SA)
       if m[i,j] == 0
-        m[i,j] = hom(SD[i], SA[j], [zero(SA[j]) for x = 1:ngens(SD[i])])
+        m[i,j] = ModuleHomomorphism(SD[i], SA[j], [zero(SA[j]) for x = 1:ngens(SD[i])])
       else
         isa(m[i,j], ModuleHomomorphism{T}) || error("matrix must contain only 0 and homs")
         domain(m[i,j]) === SD[i] && codomain(m[i,j]) === SA[j] || 
@@ -248,6 +243,6 @@ function hom(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Array{<:Any, 2}) w
     end
   end
 
-  return hom(D, A, hvcat(Tuple([length(SD) for i = 1:length(SA)]), map(x->(x.matrix)', m)...)')
+  return ModuleHomomorphism(D, A, hvcat(Tuple([length(SD) for i = 1:length(SA)]), map(x->(x.matrix)', m)...)')
 end
 

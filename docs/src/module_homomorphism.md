@@ -45,6 +45,10 @@ julia> f(m)
 
 ```
 
+They can also be created by giving images (in the codomain) of the generators of the domain:
+```@doc
+Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, v::Vector{<:AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement
+```
 ### Kernels
 
 ```@docs
