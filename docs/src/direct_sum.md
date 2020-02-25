@@ -205,20 +205,20 @@ source summand to the $j$-th target module:
 ModuleHomomorphism(D::DirectSumModule{T}, S::DirectSumModule{T}, m::Array{Any, 2}) where T <: RingElement
 ```
 
-Given a matrix $m$ s.th. the $(i,j)$-th entry is either $0$ (```Int(0)```)
-or a ```ModuleHomomorphism``` from the $i$-th summand of $D$ to the $j$-th summand of
+Given a matrix $m$ such that the $(i,j)$-th entry is either $0$ (`Int(0)`)
+or a `ModuleHomomorphism` from the $i$-th summand of $D$ to the $j$-th summand of
 $S$, construct the corresponding homomorphism.
 
 ```
 ModuleHomomorphism(D::DirectSumModule{T}, S::FPModuleElem{T}, m::Array{ModuleHomomorphism, 1})
 ```
-Given an array $a$ of ```ModuleHomomorphism``` s.th. $a_i$, the $i$-th entry
-of $a$ is a ```ModuleHomomorphism``` from the $i$-th summand of ```D``` into ```S```,
+Given an array $a$ of `ModuleHomomorphism` such that $a_i$, the $i$-th entry
+of $a$ is a `ModuleHomomorphism` from the $i$-th summand of `D` into `S`,
 construct the direct sum of the components.
 
 
-Given a matrix $m$ s.th. the $(i,j)$-th entry is either $0$ (```Int(0)```)
-or a ```ModuleHomomorphism``` from the $i$-th summand of $D$ to the $j$-th summand of
+Given a matrix $m$ such that the $(i,j)$-th entry is either $0$ (`Int(0)`)
+or a `ModuleHomomorphism` from the $i$-th summand of $D$ to the $j$-th summand of
 $S$, construct the corresponding homomorphism.
 
 

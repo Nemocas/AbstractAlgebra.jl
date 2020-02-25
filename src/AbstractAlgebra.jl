@@ -560,7 +560,6 @@ function direct_sum(m::Module{T}...) where T <: RingElement
    Generic.DirectSum(m...)
 end
 
-#why? Why not just export the Generic function?
 function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, A...)
    Generic.ModuleHomomorphism(M1, M2, A...)
 end
