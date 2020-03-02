@@ -110,6 +110,142 @@ export error_dim_negative, ErrorConstrDimMismatch
 
 export crt
 
+###############################################################################
+# Macros for fancy printing and extending objects when desired
+# fancy printing (and extending)
+# change
+#
+# struct bla..
+# ..
+# end
+# 
+# to 
+#
+# struct bla ..
+# @declare_other
+# ...
+# end
+#
+# Then, in the show function, start with
+# @show_name(io, obj)
+# If the user assigned a name to the object (in the REPL mainly) by doing
+# A = bla...
+# then, in the compact printing only the name "A" is printed
+# also adding
+# @show_special(io, obj)
+# allows, if present to call a different printing function for this instance
+# See FreeModule for an example
+#
+###############################################################################
+
+macro declare_other()
+   esc(quote other::Dict{Symbol, Any} end )
+end
+
+function set_name!(G, name::String)
+   set_special(G, :name => name)
+end
+
+function hasspecial(G)
+   if !isdefined(G, :other)
+      return false, nothing
+   else
+     return true, G.other
+   end
+end
+
+function get_special(G, s::Symbol)
+   fl, D = hasspecial(G)
+   fl && return get(D, s, nothing)
+   nothing
+end
+
+function set_name!(G)
+   s = get_special(G, :name)
+   s === nothing || return
+   sy = find_name(G)
+   sy === nothing && return
+   set_name!(G, string(sy))
+end
+
+function set_special(G, data::Pair{Symbol, <:Any}...)
+  if !isdefined(G, :other)
+    D = G.other = Dict{Symbol, Any}()
+  else
+    D = G.other
+  end
+
+  for d in data
+    push!(D, d)
+  end
+end
+
+extra_name(G) = nothing
+
+macro show_name(io, O)
+  return :( begin
+    local i = $(esc(io))
+    local o = $(esc(O))
+    s = get_special(o, :name)
+    if s === nothing
+      sy = find_name(o)
+      if sy === nothing
+        sy = extra_name(o)
+      end
+      if sy !== nothing
+        s = string(sy)
+        set_name!(o, s)
+      end
+    end
+    if get(i, :compact, false) &&
+       s !== nothing
+      print(i, s)
+      return
+    end
+  end )
+end
+
+function find_name(A, M = Main)
+  for a = names(Main)
+    a === :ans && continue
+    d = Meta.parse("$M.$a")
+    try
+      z = eval(d);
+      if z === A
+        return a
+      end
+    catch e
+    end
+  end
+end
+
+macro show_special(io, O)
+  return :( begin
+    local i = $(esc(io))
+    local o = $(esc(O))
+    s = get_special(o, :show)
+    if s !== nothing
+      s(i, o)
+      return
+    end
+  end )
+end
+
+macro show_special_elem(io, e)
+  return :( begin
+    local i = $(esc(io))
+    local a = $(esc(e))
+    local o = parent(a)
+    s = get_special(o, :show_elem)
+    if s !== nothing
+      s(i, a)
+      return
+    end
+  end )
+end
+
+###############################################################################
+
 include("AbstractTypes.jl")
 
 ###############################################################################

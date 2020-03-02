@@ -1070,6 +1070,7 @@ end
 mutable struct FreeModule{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModule{T}
    rank::Int
    base_ring::NCRing
+   AbstractAlgebra.@declare_other
 
    function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: Union{RingElement, NCRingElem}
       if cached && haskey(FreeModuleDict, (R, rank))
