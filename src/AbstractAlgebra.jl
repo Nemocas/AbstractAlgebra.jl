@@ -351,7 +351,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  pow_multinomial, popov, popov_with_transform, 
                  precision, preimage, preimage_map, primpart, pseudodivrem,
                  pseudo_inv, pseudorem, push_term!, rank, randmat_triu,
-                 randmat_with_rank, rand_ordering, rank_profile_popov, remove,
+                 randmat_with_rank, rand_ordering, rank_profile_popov, remove, reduce!,
                  renormalize!, rels, rescale!, resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, retraction_map, reverse,
@@ -417,7 +417,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  map_with_retraction, map_with_retraction_from_func,
                  map_with_section, map_with_section_from_func,
                  mat, matrix, matrix_repr, max_fields,
-                 max_precision, minors, minpoly, mod,
+                 max_precision, minors, minpoly, minus!, mod,
                  modulus, monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx, mul!, mul_classical,
@@ -446,6 +446,14 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  upscale, valuation, var, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem
+
+
+# Export functionality from the Hecke Quarantine.
+import .Generic: scalar_matrix, diagonal_matrix, iszero_row, isdiagonal
+export scalar_matrix, diagonal_matrix, iszero_row, isdiagonal
+
+import .Generic: InconsistentLinearSystemError
+export InconsistentLinearSystemError
 
 ################################################################################
 #

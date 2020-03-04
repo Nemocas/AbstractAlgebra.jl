@@ -565,7 +565,7 @@ end
 
 @testset "Generic.MatAlg.solve_lu..." begin
    S = QQ
-
+    
    for dim = 0:5
       R = MatrixAlgebra(S, dim)
       U = MatrixAlgebra(S, dim)
@@ -574,14 +574,13 @@ end
       b = rand(U, -100:100)
 
       x = Generic.solve_lu(M, b)
-
-      @test M*x == b
+      @test M*x == b       
    end
 
    S, y = PolynomialRing(ZZ, "y")
    K = FractionField(S)
 
-   for dim = 0:5
+   for dim = 1:5
       R = MatrixAlgebra(S, dim)
       U = MatrixAlgebra(S, dim)
       T = MatrixAlgebra(K, dim)

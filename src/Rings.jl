@@ -93,6 +93,10 @@ divexact(x::RingElem, y::RingElement) = divexact(x, parent(x)(y))
 
 divexact(x::RingElement, y::RingElem) = divexact(parent(y)(x), y)
 
+divexact_left(x::S,y::T) where {S <: RingElement, T <: RingElement} = divexact(y,x)
+
+divexact_right(x,y) where {S <: RingElement, T <: RingElement} = divexact(x,y)
+
 function divides(x::T, y::T) where {T <: RingElem}
    if iszero(y)
       return iszero(x), y
