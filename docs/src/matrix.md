@@ -156,6 +156,24 @@ Matrix(::MatrixElem)
 Array(::MatrixElem)
 ```
 
+## Pretty printing
+
+It's possible to have matrices printed using unicode characters by setting
+an `IOContext` attribute:
+```julia # not jldoctest, as the the second command doesn't always work
+julia> println(IOContext(stdout, :ascii=>false), matrix(ZZ, [3 1; 2 2; 0 1]))
+⎛3  1⎞
+⎜2  2⎟
+⎝0  1⎠
+
+julia> Base.active_repl.options.iocontext[:ascii] = false; # requires Julia 1.4
+
+julia> matrix(ZZ, [3 1; 2 2; 0 1])
+⎛3  1⎞
+⎜2  2⎟
+⎝0  1⎠
+```
+
 ## Matrix functionality provided by AbstractAlgebra.jl
 
 Most of the following generic functionality is available for both matrix spaces and

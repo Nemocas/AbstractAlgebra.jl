@@ -2715,6 +2715,8 @@ end
    @test string(MatrixAlgebra(QQ, 0)()) == "0 by 0 matrix"
    @test string(similar(matrix(ZZ, [3 1 2; 2 0 1]))) ==
       "[#undef  #undef  #undef]\n[#undef  #undef  #undef]"
+   @test sprint(show, matrix(ZZ, [3 1; 2 2; 0 1]), context = :ascii=>false) ==
+      "⎛3  1⎞\n⎜2  2⎟\n⎝0  1⎠"
 end
 
 @testset "Generic.Mat.array_conversion" begin

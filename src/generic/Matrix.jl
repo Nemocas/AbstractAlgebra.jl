@@ -474,8 +474,12 @@ function show(io::IO, a::MatrixElem)
                            context = :compact => true) for i=1:r, j=1:c]
    maxs = maximum(length, strings, dims=1)
 
+   ascii = get(io, :ascii, true)
+   lefts  = ascii ? ('[', '[', '[') : ('⎛', '⎜', '⎝')
+   rights = ascii ? (']', ']', ']') : ('⎞', '⎟', '⎠')
+
    for i = 1:r
-      print(io, i == 1 ? '⎛' : i == r ? '⎝' : '⎜')
+      print(io, i == 1 ? lefts[1] : i == r ? lefts[3] : lefts[2])
       for j = 1:c
          s = strings[i, j]
          s = ' '^(maxs[j] - length(s)) * s
@@ -484,7 +488,7 @@ function show(io::IO, a::MatrixElem)
             print(io, "  ")
          end
       end
-      print(io,  i == 1 ? '⎞' : i == r ? '⎠' : '⎟')
+      print(io,  i == 1 ? rights[1] : i == r ? rights[3] : rights[2])
       i != r && println(io)
    end
 end
