@@ -179,7 +179,7 @@ julia> summands(D)
 
 ```
     (D::DirectSumModule{T}(::Vector{<:AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement
-```   
+```
 
 Given a vector (or $1$-dim array) of module elements, where the $i$-th entry
 has to be an element of the $i$-summand of $D$, create the corresponding
@@ -189,15 +189,18 @@ element in $D$.
 
 ```jldoctest
 julia> N = FreeModule(QQ, 2);
+
 julia> M = FreeModule(QQ, 1);
+
 julia> D, _ = DirectSum(M, N, M);
+
 julia> D([gen(M, 1), gen(N, 1), gen(M, 2)])
 (1//1, 1//1, 0//1, 0//1)
 ```
 ### Special Homomorphisms
 
 Due to the special structure as direct sums, homomorphisms can be created by specifying
-homomorphisms for all summands. In case of the codmain being a direct sum as well, 
+homomorphisms for all summands. In case of the codmain being a direct sum as well,
 any homomorphism may be thought of as a matrix containing maps from the $i$-th
 source summand to the $j$-th target module:
 
@@ -226,19 +229,25 @@ $S$, construct the corresponding homomorphism.
 
 ```jldoctest
 julia> N = FreeModule(QQ, 2);
+
 julia> D, _ = DirectSum(N, N);
+
 julia> p = ModuleHomomorphism(N, N, [3,4] .* basis(N));
+
 julia> q = ModuleHomomorphism(N, N, [5,7] .* basis(N));
+
 julia> phi = ModuleHomomorphism(D, D, [p 0; 0 q])
 Module homomorphism with
 Domain: DirectSumModule over Rationals
 Codomain: DirectSumModule over Rationals
 
 julia> r = ModuleHomomorphism(N, D, [2,3] .* gens(D)[1:2])
+Module homomorphism with
+Domain: Vector space of dimension 2 over Rationals
+Codomain: DirectSumModule over Rationals
+
 julia> psi = ModuleHomomorphism(D, D, [r, r])
 Module homomorphism with
 Domain: DirectSumModule over Rationals
 Codomain: DirectSumModule over Rationals
-
 ```
-

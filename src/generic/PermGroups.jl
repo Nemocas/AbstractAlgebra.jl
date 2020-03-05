@@ -913,7 +913,7 @@ const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> G = SymmetricGroup(4)
-Permutation group over 4 elements
+Full symmetric group over 4 elements
 
 julia> chi = character(Partition([3,1])); # character of the regular representation
 

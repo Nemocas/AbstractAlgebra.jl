@@ -187,7 +187,7 @@ julia> @time dim(YoungTableau(λ))
 9079590132732747656880081324531330222983622187548672000
 
 julia> G = SymmetricGroup(sum(λ))
-Permutation group over 78 elements
+Full symmetric group over 78 elements
 
 julia> @time character(λ, G())
  24.154105 seconds (58.13 M allocations: 3.909 GiB, 42.84% gc time)
@@ -225,7 +225,7 @@ Generic.SkewDiagram
 
 ```@docs
 size(xi::Generic.SkewDiagram)
-in(t::Tuple{T,T}, xi::Generic.SkewDiagram) where T<:Integer
+in(t::Tuple{Integer,Integer}, xi::Generic.SkewDiagram)
 getindex(xi::Generic.SkewDiagram, n::Integer)
 ```
 

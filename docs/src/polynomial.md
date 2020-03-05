@@ -431,7 +431,7 @@ julia> h = shift_right(f, 2)
 
 ```@docs
 change_base_ring(::Ring, ::PolyElem{T}) where T <: RingElement
-map_coeffs(::Any, ::PolyElem{T}) where T <: RingElement
+map_coeffs(::Any, ::PolyElem{<:RingElement})
 ```
 
 **Examples**
