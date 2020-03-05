@@ -184,7 +184,7 @@ julia> ap = AllParts(5);
 
 
 julia> collect(ap)
-7-element Array{AbstractAlgebra.Generic.Partition,1}:
+7-element Array{AbstractAlgebra.Generic.Partition{Int64},1}:
  1₅
  2₁1₃
  3₁1₂
@@ -222,7 +222,7 @@ julia> m = Partition([3,1,1])
 3₁1₂
 
 julia> xi = SkewDiagram(l,m)
-3×4 AbstractAlgebra.Generic.SkewDiagram:
+3×4 AbstractAlgebra.Generic.SkewDiagram{Int64}:
  ⋅  ⋅  ⋅  1
  ⋅  1  1
  ⋅  1

@@ -461,7 +461,7 @@ julia> S = MatrixSpace(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia> G = SymmetricGroup(3)
-Permutation group over 3 elements
+Full symmetric group over 3 elements
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t+1//1       t        1//1]
