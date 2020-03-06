@@ -758,8 +758,7 @@ julia> B = T([BigInt(4), 5, 7])
 ### Inverse
 
 ```@docs
-inv{T <: RingElem}(::MatElem{T})
-inv{T <: FieldElem}(::MatElem{T})
+inv(::MatrixElem{<:RingElement})
 ```
 
 **Examples**
