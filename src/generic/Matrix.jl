@@ -2339,12 +2339,6 @@ function pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
    return X, d
 end
 
-@doc Markdown.doc"""
-    inv(M::Generic.MatrixElem{T}) where {T <: FieldElement}
-> Given a non-singular $n\times n$ matrix over a field, return an
-> $n\times n$ matrix $X$ such that $MX = I_n$ where $I_n$ is the $n\times n$
-> identity matrix. If $M$ is singular an exception is raised.
-"""
 function inv(M::MatrixElem{T}) where {T <: FieldElement}
    issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    A = solve_lu(M, identity_matrix(M))
