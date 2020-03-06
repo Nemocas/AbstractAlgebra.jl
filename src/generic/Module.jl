@@ -310,7 +310,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   isisomorphic(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+    isisomorphic(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
 > Return `true` if the modules $M$ and $N$ are isomorphic.
 """
 function isisomorphic(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement

@@ -930,7 +930,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   inv(a::AbstractAlgebra.RelSeriesElem)
+    inv(a::AbstractAlgebra.RelSeriesElem)
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
 function inv(a::AbstractAlgebra.RelSeriesElem)
@@ -963,7 +963,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   sqrt(a::AbstractAlgebra.RelSeriesElem)
+    sqrt(a::AbstractAlgebra.RelSeriesElem)
 > Return the square root of the power series $a$.
 """
 function Base.sqrt(a::AbstractAlgebra.RelSeriesElem)
@@ -1320,7 +1320,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
+    PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
 > Return a tuple $(S, x)$ consisting of the parent object `S` of a power series
 > ring over the given base ring and a generator `x` for the power series ring.
 > The maximum precision of power series in the ring is set to `prec`. If the
