@@ -139,7 +139,7 @@ function vars(p::MPoly{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-   var_index(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+    var_index(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
 > Return the index of the given variable $x$. If $x$ is not a variable
 > in a multivariate polynomial ring, an exception is raised.
 """
@@ -983,7 +983,7 @@ function degree(f::AbstractAlgebra.MPolyElem{T}, i::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-   degree(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+    degree(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 > Return the degree of the polynomial $f$ in terms of the variable $x$.
 """
 function degree(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
@@ -991,7 +991,7 @@ function degree(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}
 end
 
 @doc Markdown.doc"""
-   degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+    degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 > Return an array of the degrees of the polynomial $f$ in terms of each variable.
 """
 function degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement

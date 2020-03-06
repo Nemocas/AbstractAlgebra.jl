@@ -700,7 +700,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   inv(a::AbstractAlgebra.AbsSeriesElem)
+    inv(a::AbstractAlgebra.AbsSeriesElem)
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
 function inv(a::AbstractAlgebra.AbsSeriesElem)
@@ -732,7 +732,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   sqrt(a::AbstractAlgebra.AbsSeriesElem)
+    sqrt(a::AbstractAlgebra.AbsSeriesElem)
 > Return the square root of the power series $a$.
 """
 function Base.sqrt(a::AbstractAlgebra.AbsSeriesElem)

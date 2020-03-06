@@ -37,7 +37,7 @@ zero(::Integers{T}) where T <: Integer = T(0)
 one(::Integers{T}) where T <: Integer = T(1)
 
 @doc Markdown.doc"""
-   isunit(a::Integer)
+    isunit(a::Integer)
 > Return `true` if $a$ is $1$ or $-1$.
 """
 isunit(a::Integer) = a == 1 || a == -1
@@ -202,7 +202,7 @@ function exp(a::T) where T <: Integer
 # This is used in various Euclidean domains for Chinese remaindering.
 
 @doc Markdown.doc"""
-   ppio(a::T, b::T)
+    ppio(a::T, b::T)
 
 > Split $a$ into $c*d$ where $c = gcd(a, b^\infty)$.
 """

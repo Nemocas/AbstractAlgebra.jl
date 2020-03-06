@@ -758,7 +758,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true)
+    PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true)
 > Return a tuple $(S, x)$ consisting of the parent object `S` of a Puiseux series
 > ring over the given base ring and a generator `x` for the Puiseux series ring.
 > The maximum precision of the series in the ring is set to `prec`. This is taken as a

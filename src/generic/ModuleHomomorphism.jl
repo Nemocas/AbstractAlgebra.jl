@@ -68,7 +68,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   inv(f::Map(ModuleIsomorphism))
+    inv(f::Map(ModuleIsomorphism))
 > Return the inverse map of the given module isomorphism. This is computed
 > cheaply.
 """

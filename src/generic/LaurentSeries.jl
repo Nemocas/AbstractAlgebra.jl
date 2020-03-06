@@ -140,7 +140,7 @@ max_precision(R::LaurentSeriesRing) = R.prec_max
 max_precision(R::LaurentSeriesField) = R.prec_max
 
 @doc Markdown.doc"""
-   exp_gcd(a::Generic.LaurentSeriesElem)
+    exp_gcd(a::Generic.LaurentSeriesElem)
 > Return the GCD of the exponents of the polynomial underlying the given Laurent series.
 """
 function exp_gcd(a::LaurentSeriesElem)
@@ -1170,7 +1170,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   inv(a::Generic.LaurentSeriesElem)
+    inv(a::Generic.LaurentSeriesElem)
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
 function inv(a::LaurentSeriesElem)
@@ -1207,7 +1207,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   sqrt(a::Generic.LaurentSeriesElem)
+    sqrt(a::Generic.LaurentSeriesElem)
 > Return the square root of the power series $a$.
 """
 function Base.sqrt(a::LaurentSeriesElem)
@@ -1639,7 +1639,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   LaurentSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true)
+    LaurentSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true)
 > Return a tuple $(S, x)$ consisting of the parent object `S` of a Laurent series
 > ring over the given base ring and a generator `x` for the Laurent series ring.
 > The maximum precision of the series in the ring is set to `prec`. This is taken as a
