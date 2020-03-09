@@ -3,18 +3,19 @@
 ## Constructing objects in Julia
 
 In Julia, one constructs objects of a given type by calling a type constructor. This is
-simply a function with the same name as the type itself. For example, to construct a 
-`BigInt` object in Julia, we simply call the `BigInt` constructor:
+simply a function with the same name as the type itself. For example, to construct a
+`BigInt` object from an `Int` in Julia, we simply call the `BigInt` constructor:
 
 ```julia
-n = BigInt("1234567898765434567898765434567876543456787654567890")
+n = BigInt(123)
 ```
 
-Julia also uses constructors to convert between types. For example, to convert an `Int`
-to a `BigInt`:
+Note that a number literal too big to fit in an `Int` or `Int128` automatically creates
+a `BigInt`:
 
 ```julia
-m = BigInt(123)
+julia> typeof(12345678765456787654567890987654567898765678909876567890)
+BigInt
 ```
 
 ## How we construct objects in AbstractAlgebra.jl
@@ -26,7 +27,7 @@ special objects that we refer to as parent objects. They behave a lot like Julia
 Consider the following simple example, to create a multiprecision integer:
 
 ```julia
-n = ZZ("12345678765456787654567890987654567898765678909876567890")
+n = ZZ(12345678765456787654567890987654567898765678909876567890)
 ```
 
 Here `ZZ` is not a Julia type, but a callable object. However, for most purposes
@@ -71,4 +72,3 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 | $S = R/(f)$ (with $(f)$ maximal) | `S = ResidueField(R, f)`                     |
 | $S = \mbox{Mat}_{m\times n}(R)$  | `S = MatrixSpace(R, m, n)`                  |
 | $S = \mathbb{Q}[x]/(f)$          | `S, a = NumberField(f, "a")`                |
-
