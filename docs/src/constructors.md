@@ -10,7 +10,7 @@ simply a function with the same name as the type itself. For example, to constru
 n = BigInt(123)
 ```
 
-Note that a number litteral too big to fit in an `Int` or `Int128` automatically creates
+Note that a number literal too big to fit in an `Int` or `Int128` automatically creates
 a `BigInt`:
 
 ```julia
@@ -72,4 +72,3 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 | $S = R/(f)$ (with $(f)$ maximal) | `S = ResidueField(R, f)`                     |
 | $S = \mbox{Mat}_{m\times n}(R)$  | `S = MatrixSpace(R, m, n)`                  |
 | $S = \mathbb{Q}[x]/(f)$          | `S, a = NumberField(f, "a")`                |
-
