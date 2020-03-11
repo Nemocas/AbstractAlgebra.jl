@@ -71,6 +71,13 @@ cached. Setting the optional argument `cached` to `false` will prevent the paren
 The optional named argument `ordering` can be used to specify an ordering. The currently
 supported options are `:lex`, `:deglex` and `:degrevlex`.
 
+Like for univariate polynomials, a shorthand version of this function is provided when the number of
+generators is greater than `1`: given a base ring `R`, we abbreviate the constructor as follows:
+
+```julia
+R["x", "y", ...]
+```
+
 Here are some examples of creating multivariate polynomial rings and making use of the
 resulting parent objects to coerce various elements into the polynomial ring.
 
@@ -79,6 +86,9 @@ resulting parent objects to coerce various elements into the polynomial ring.
 ```jldoctest
 julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:deglex)
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> T, (z, t) = QQ["z", "t"]
+(Multivariate Polynomial Ring in z, t over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[z, t])
 
 julia> f = R()
 0

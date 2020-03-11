@@ -732,6 +732,8 @@ export Generic
 ###############################################################################
 
 getindex(R::NCRing, s::Union{String, Char}) = PolynomialRing(R, s)
+getindex(R::NCRing, s::Union{String, Char}, ss::Union{String, Char}...) =
+   PolynomialRing(R, [s, ss...])
 
 # syntax x = R["x"]["y"]
 getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{String, Char}) = PolynomialRing(R[1], s)
