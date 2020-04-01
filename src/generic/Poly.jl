@@ -2400,7 +2400,7 @@ end
 
 function _map(g, p::PolyElem, Rx)
    R = base_ring(Rx)
-   new_coefficients = [let c = coeff(p, i)
+   new_coefficients = elem_type(R)[let c = coeff(p, i)
                           iszero(c) ? zero(R) : R(g(c))
                        end for i in 0:degree(p)]
    return Rx(new_coefficients)
