@@ -250,6 +250,15 @@ macro show_special_elem(io, e)
 end
 
 ###############################################################################
+# generic fall back if no ceorcion is possible
+# can/ should be called for more generic general coercion mechanisms
+
+function force_coerce(a, b; show_error::Bool = true)
+  show_error && error("coercion not possible")
+  return false
+end
+
+###############################################################################
 
 include("AbstractTypes.jl")
 
