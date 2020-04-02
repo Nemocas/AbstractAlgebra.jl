@@ -253,6 +253,11 @@ function force_coerce(a, b; show_error::Bool = true)
   return false
 end
 
+function force_op(op::Function, a...; show_error::Bool = true)
+  show_error && error("coercion not possible")
+  return false
+end
+
 ###############################################################################
 
 include("AbstractTypes.jl")
