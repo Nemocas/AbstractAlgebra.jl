@@ -250,6 +250,37 @@ macro show_special_elem(io, e)
 end
 
 ###############################################################################
+# generic fall back if no imediate coercion is possible
+# can/ should be called for more generic general coercion mechanisms
+
+#tries to turn b into an element of a
+# applications (in outside AbstractAlgebra so far)
+#  - number fields (different cyclotomics, ie. coerce zeta_n into
+#    cyclo(m*n)
+#  - finite fields (although they roll their own)
+#  - unram. local fields
+#  - modules, abelian groups
+#
+# intended usage
+# (a::Ring)(b::elem_type(a))
+#   parent(b) == a && return a
+#   return force_coerce(a, b)
+# 
+function force_coerce(a, b; show_error::Bool = true)
+  show_error && error("coercion not possible")
+  return false
+end
+
+#to allow +(a::T, b::T) where a, b have different parents, but
+# a common over structure
+# designed(?) to be minimally invasive in AA and Nemo, but filled with 
+# content in Hecke/Oscar
+function force_op(op::Function, a...; show_error::Bool = true)
+  show_error && error("no common overstructure for the arguments found")
+  return false
+end
+
+###############################################################################
 
 include("AbstractTypes.jl")
 
