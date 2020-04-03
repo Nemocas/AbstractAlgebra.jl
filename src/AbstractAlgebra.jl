@@ -266,8 +266,8 @@ end
 #   parent(b) == a && return a
 #   return force_coerce(a, b)
 # 
-function force_coerce(a, b; show_error::Bool = true)
-  show_error && error("coercion not possible")
+function force_coerce(a, b; throw_error::Bool = true)
+  throw_error && error("coercion not possible")
   return false
 end
 
@@ -275,8 +275,8 @@ end
 # a common over structure
 # designed(?) to be minimally invasive in AA and Nemo, but filled with 
 # content in Hecke/Oscar
-function force_op(op::Function, a...; show_error::Bool = true)
-  show_error && error("no common overstructure for the arguments found")
+function force_op(op::Function, a...; throw_error::Bool = true)
+  throw_error && error("no common overstructure for the arguments found")
   return false
 end
 
