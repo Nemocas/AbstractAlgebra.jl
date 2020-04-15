@@ -444,32 +444,31 @@ end
 
 Base.ndims(::MatrixElem) = 2
 
-Base.eachindex(a::MatrixElem) = Base.OneTo(length(a))
+# Cartesian indexing
 
-# linear indexing
+Base.eachindex(a::MatrixElem) = CartesianIndices((nrows(a), ncols(a)))
 
-Base.@propagate_inbounds function Base.getindex(a::MatrixElem, n::Integer)
-   nr, nc = nrows(a), ncols(a)
-   # bounds checking necessary as if n == 0, r and c below might still be computed
-   # to be valid cartesian indices in a
-   @boundscheck 0 < n <= nr * nc || throw(BoundsError(a, n))
-   r = mod1(n, nr)
-   c = (n-1) ÷ nr + 1
-   return a[r, c]
-end
+Base.@propagate_inbounds Base.getindex(a::MatrixElem, I::CartesianIndex) =
+   a[I[1], I[2]]
 
-Base.@propagate_inbounds function Base.setindex!(a::MatrixElem, x, n::Integer)
-   nr, nc = nrows(a), ncols(a)
-   @boundscheck 0 < n <= nr * nc || throw(BoundsError(a, n))
-   r = mod1(n, nr)
-   c = (n-1) ÷ nr + 1
-   a[r, c] = x
-   return a # like arrays, but not mandatory
+Base.@propagate_inbounds function Base.setindex!(a::MatrixElem, x, I::CartesianIndex)
+   a[I[1], I[2]] = x
+   a
 end
 
 # iteration
 
-Base.iterate(a::MatrixElem, i::Int=1) = i <= length(a) ? (@inbounds a[i], i + 1) : nothing
+function Base.iterate(a::MatrixElem, ij=(0, 1))
+   i, j = ij
+   i += 1
+   if i > nrows(a)
+      iszero(nrows(a)) && return nothing
+      i = 1
+      j += 1
+   end
+   j > ncols(a) && return nothing
+   a[i, j], (i, j)
+end
 
 Base.IteratorSize(::Type{<:MatrixElem}) = Base.HasShape{2}()
 Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default

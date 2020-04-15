@@ -661,29 +661,38 @@ end
 
    @test ndims(A) == 2
 
-   @test eachindex(A) == 1:6
+   @test size(A) == (2, 3)
+   @test eachindex(A) == CartesianIndices((2, 3))
 
-   # linear indexing
+   # cartesian indexing
    for i in eachindex(A)
       @test A[i] == A.entries[i]
       B[i] = 2 * B[i]
       @test B[i] == B.entries[i] == 2 * A[i]
    end
 
-   @test_throws BoundsError A[0]
-   @test_throws BoundsError A[-1]
-   @test_throws BoundsError A[-rand(2:99)]
-   @test_throws BoundsError A[7]
-   @test_throws BoundsError A[rand(8:99)]
+   @test_throws BoundsError A[CartesianIndex(0, 1)]
+   @test_throws BoundsError A[CartesianIndex(1, -1)]
+   @test_throws BoundsError A[CartesianIndex(-rand(2:99), 1)]
+   @test_throws BoundsError A[CartesianIndex(1, 4)]
+   @test_throws BoundsError A[CartesianIndex(rand(3:99), 1)]
 
    # iteration
    for (i, x) in enumerate(A)
-      @test A[i] == x
+      @test A[Tuple(CartesianIndices(size(A))[i])...] == x
    end
 
    AC = collect(A)
    @test size(AC) == size(A)
    @test AC == A.entries
+
+   # check iteration for empty matrices
+   for sz in [(2, 0), (0, 2), (0, 0)]
+      A = matrix(ZZ, sz..., BigInt[])
+      AC = collect(A)
+      @test AC isa Matrix{BigInt}
+      @test size(AC) == sz
+   end
 end
 
 @testset "Generic.Mat.block_replacement..." begin
