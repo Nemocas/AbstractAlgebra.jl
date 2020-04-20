@@ -338,7 +338,7 @@ include("Generic.jl")
 
 # Do not import numerator and denominator as we have our own
 import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
-                 add_row!, basis, cached, canonical_unit, can_solve_left_reduced_triu,
+                 add_row!, basis, cached, can_solve_left_reduced_triu,
                  character, characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_composable, check_parent,

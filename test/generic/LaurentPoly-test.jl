@@ -118,6 +118,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test lead(f) == 2
       @test trail(f) == 3
 
+      @test canonical_unit(f) == 1
+
       @test hash(f) != hash(3y^-3 + y)
       @test hash(f) != hash(3y^-2 + 2y)
 
