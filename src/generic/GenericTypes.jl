@@ -519,10 +519,10 @@ end
 abstract type LaurentPolynomialRing{T} <: AbstractAlgebra.LaurentPolynomialRing{T} end
 
 struct LaurentPolyWrapRing{T  <: RingElement,
-                           PR <: AbstractAlgebra.PolyRing{T}} <: LaurentPolynomialRing{T}
+                           PR <: AbstractAlgebra.PolyRing{T}
+                          } <: LaurentPolynomialRing{T}
    polyring::PR
 
-   # TODO: simplify this constructor with a generic function can extract T out of PR
    function LaurentPolyWrapRing(pr::PR) where {T <: RingElement,
                                                PR <: AbstractAlgebra.PolyRing{T}}
       new{T, PR}(pr)
@@ -530,11 +530,11 @@ struct LaurentPolyWrapRing{T  <: RingElement,
 end
 
 mutable struct LaurentPolyWrap{T  <: RingElement,
-                               PE <: AbstractAlgebra.PolyElem{T}} <: AbstractAlgebra.LaurentPolyElem{T}
+                               PE <: AbstractAlgebra.PolyElem{T}
+                              } <: AbstractAlgebra.LaurentPolyElem{T}
    poly::PE
    mindeg::Int
 
-   # TODO: simplify this constructor with a generic function can extract T out of PR
    function LaurentPolyWrap(poly::PE, mindeg::Int=0) where {T  <: RingElement,
                                                             PE <: AbstractAlgebra.PolyElem{T}}
       new{T, PE}(poly, mindeg)

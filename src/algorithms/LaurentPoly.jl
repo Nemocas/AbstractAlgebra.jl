@@ -51,7 +51,7 @@ function monomials_degrees(p::LaurentPolyElem, q::LaurentPolyElem)
       if isempty(mdq)
          zero(T):-one(T)
       else
-         UnitRange{T}(extrema(mdq)...)
+         UnitRange{T}(extrema(mdq)...) # mdq not returned for type-stability
       end
    else # none is empty
       minp, maxp = extrema(mdp)
@@ -61,7 +61,7 @@ function monomials_degrees(p::LaurentPolyElem, q::LaurentPolyElem)
 end
 
 # like monomials_degrees, but return a "strict" range, whose min/max
-# corresponds to non-zero coeffs
+# corresponds to non-zero coeffs, or an empty range for p == 0
 function degrees_range(p::LaurentPolyElem)
    mds = monomials_degrees(p)
    T = eltype(mds)
@@ -81,7 +81,9 @@ end
 function monomial_degree(p::LaurentPolyElem)
    isnull = true
    local deg
-   for d in monomials_degrees(p)
+   mds = monomials_degrees(p)
+   isempty(mds) && throw(DomainError(p, "not a monomial"))
+   for d in mds
       if !iszero(coeff(p, d))
          !isnull && throw(DomainError(p, "not a monomial"))
          deg = d
