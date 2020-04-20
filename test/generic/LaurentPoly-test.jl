@@ -38,6 +38,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
          @test L(0) == zero(L)
          @test L(1) == one(L)
          @test L(2) == 2*one(L)
+         @test L()  == zero(L)
          @test_throws Exception L('x')
          @test_throws Exception L("x")
          @test_throws Exception L(y0)

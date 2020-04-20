@@ -142,6 +142,8 @@ map_coeffs(f, p::LaurentPolyWrap) = LaurentPolyWrap(map_coeffs(f, p.poly), p.min
 
 (R::LaurentPolyWrapRing)(b::RingElement) = LaurentPolyWrap(R.polyring(b))
 
+(R::LaurentPolyWrapRing)() = LaurentPolyWrap(R.polyring())
+
 function (R::LaurentPolyWrapRing)(p::LaurentPolyWrap)
    parent(p) == R ? p :
                     LaurentPolyWrap(R.polyring(p.poly), p.mindeg)
