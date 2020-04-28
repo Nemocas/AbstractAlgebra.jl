@@ -231,3 +231,10 @@ if @isdefined fmpq
         @test valuation(a, BigInt(3)) == -1
     end
 end
+
+@testset "Generic.Frac.promotion..." begin
+   S, x = PolynomialRing(QQ, "x")
+   F = FractionField(S)
+   T = elem_type(F)
+   @test AbstractAlgebra.promote_rule(T, T) == T
+end
