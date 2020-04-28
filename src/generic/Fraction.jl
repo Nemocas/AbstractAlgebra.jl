@@ -965,6 +965,7 @@ rand(S::AbstractAlgebra.FracField, v...) = rand(Random.GLOBAL_RNG, S, v...)
 ###############################################################################
 
 promote_rule(::Type{Frac{T}}, ::Type{Frac{T}}) where T <: RingElement = Frac{T}
+promote_rule(::Type{Frac{T}}, ::Type{Frac{T}}) where T <: RingElem = Frac{T}
 
 function promote_rule(::Type{Frac{T}}, ::Type{U}) where {T <: RingElem, U <: RingElem}
    promote_rule(T, U) == T ? Frac{T} : Union{}
