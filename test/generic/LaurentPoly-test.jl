@@ -253,5 +253,9 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       L, y = LaurentPolynomialRing(ZZ, "y")
       @test string(y) == "y"
       @test string(L) == "Univariate Laurent Polynomial Ring in y over Integers"
+      R, z = PolynomialRing(L, "z")
+      @test string((y^2)*z) == "(y^2)*z"
+      @test string(3*(y^0)*z) == "3*z"
+      @test needs_parentheses(zero(L)) == false
    end
 end

@@ -161,3 +161,8 @@ function show(io::IO, p::LaurentPolynomialRing)
    print(io, " over ")
    print(IOContext(io, :compact => true), base_ring(p))
 end
+
+function needs_parentheses(p::LaurentPolyElem)
+   dr = degrees_range(p)
+   !(isempty(dr) || dr == 0:0)
+end
