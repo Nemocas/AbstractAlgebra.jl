@@ -7,7 +7,16 @@
 # required methods without default implementation:
 # coeff, setcoeff!, map_coeffs, gen
 
+###############################################################################
+#
+#   Data type and parent object methods
+#
+###############################################################################
+
 base_ring(p::LaurentPolyElem) = base_ring(parent(p))
+
+isdomain_type(::Type{<:LaurentPolyElem{T}}) where {T} = isdomain_type(T)
+
 
 ###############################################################################
 #
@@ -130,7 +139,6 @@ end
 
 ==(p::LaurentPolyElem, q::LaurentPolyElem) =
    all(i -> coeff(p, i) == coeff(q, i), monomials_degrees(p, q))
-
 
 
 ################################################################################

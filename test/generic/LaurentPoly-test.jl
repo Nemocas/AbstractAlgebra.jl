@@ -44,6 +44,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
          @test_throws Exception L('x')
          @test_throws Exception L("x")
          @test_throws Exception L(y0)
+
+         @test isdomain_type(typeof(y))
       end
    end
 
