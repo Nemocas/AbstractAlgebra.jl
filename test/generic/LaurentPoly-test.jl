@@ -188,6 +188,18 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       f = LaurentPolyWrap(fx, -3)
       @test y*y*y*y*y*y*f*f == LaurentPolyWrap(fx*fx)
       @test y*y*y*y*y*y*f*f == y^6 * f^2
+
+      # with polynomials as base ring
+      P, x = PolynomialRing(ZZ, "x")
+      L, y = LaurentPolynomialRing(P, "y")
+      @test parent(x*y) == L
+      @test parent(y*x) == L
+
+      # as base ring of polynomials
+      L, y = LaurentPolynomialRing(ZZ, "y")
+      P, x = PolynomialRing(L, "x")
+      @test parent(x*y) == P
+      @test parent(y*x) == P
    end
 
    @testset "powering" begin
