@@ -194,6 +194,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       L, y = LaurentPolynomialRing(P, "y")
       @test parent(x*y) == L
       @test parent(y*x) == L
+      @test 3*y == y*3 == LaurentPolyWrap(3*x, 0)
 
       # as base ring of polynomials
       L, y = LaurentPolynomialRing(ZZ, "y")
