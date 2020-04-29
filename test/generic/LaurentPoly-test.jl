@@ -157,6 +157,10 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
          @test lead(f) == lead(f.poly)
          @test trail(f) == trail(f.poly)
       end
+
+      ff = deepcopy(f)
+      @test parent(f) === parent(ff)
+      @test f == ff && f !== ff
    end
 
    @testset "comparisons" begin

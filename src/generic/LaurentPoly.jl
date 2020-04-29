@@ -70,6 +70,10 @@ gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(gen(R.polyring))
 
 isgen(p::LaurentPolyWrap) = ismonomial(p, 1, rec=false)
 
+# only an optimization over the default Base implementation (maybe 1.4 speed-up)
+deepcopy_internal(p::LaurentPolyWrap, dict::IdDict) =
+   LaurentPolyWrap(deepcopy_internal(p.poly, dict), p.mindeg)
+
 
 ###############################################################################
 #
