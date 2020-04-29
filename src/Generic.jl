@@ -24,7 +24,8 @@ import Base: floor, ceil, hypot, log, log1p, expm1, sin, cos, sinpi, cospi,
 
 import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
                           RingElem, RingElement, Field, FieldElement,
-                          isdomain_type, Map, needs_parentheses, promote_rule
+                          isexact_type, isdomain_type, Map, needs_parentheses,
+                          promote_rule
 
 import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring,
                           denominator, div, divrem, exp, gen, gens, isgen,

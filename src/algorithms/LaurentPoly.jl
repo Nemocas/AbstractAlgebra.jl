@@ -17,6 +17,8 @@ base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 
 isdomain_type(::Type{<:LaurentPolyElem{T}}) where {T} = isdomain_type(T)
 
+isexact_type(::Type{<:LaurentPolyElem{T}}) where {T} = isexact_type(T)
+
 
 ###############################################################################
 #
