@@ -169,6 +169,15 @@ function addeq!(c::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}) where T
    c
 end
 
+function add!(c::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
+   # TODO: optimize
+   d = a + b
+   c.poly = d.poly
+   c.mindeg = d.mindeg
+   c
+end
+
+
 ###############################################################################
 #
 #   Random elements
