@@ -244,6 +244,21 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test_throws DomainError (z + z^2)^-1
    end
 
+   @testset "unsafe functions" begin
+      L, y = LaurentPolynomialRing(ZZ, "y")
+
+      # zero!
+      p = y^-2 + 3y + y^3
+      q = zero!(p)
+      @test q === p
+      @test iszero(p)
+      p = rand(L, -10:10, -10:10)
+      q = zero!(p)
+      @test q === p
+      @test iszero(p)
+      # TODO: add a test for when p.poly is immutable
+   end
+
    @testset "rand" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
 
