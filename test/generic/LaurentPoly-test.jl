@@ -270,6 +270,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       mul!(s, p, q)
       @test t == s
       # TODO: add a test for when s.poly is immutable
+
+      p = rand(L, -10:10, -10:10)
+      q = rand(L, -10:10, -10:10)
+      t = p + q
+      s = addeq!(p, q)
+      @test s === p == t
+      # TODO: add a test for when p.poly is immutable
    end
 
    @testset "rand" begin
