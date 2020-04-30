@@ -176,3 +176,9 @@ function needs_parentheses(p::LaurentPolyElem)
    dr = degrees_range(p)
    !(isempty(dr) || dr == 0:0)
 end
+
+# follows implementation of Poly
+function displayed_with_minus_in_front(p::LaurentPolyElem)
+   dr = degrees_range(p)
+   !(isempty(dr) || dr == 0:0) && displayed_with_minus_in_front(coeff(p, 0))
+end
