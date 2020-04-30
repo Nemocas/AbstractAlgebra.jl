@@ -149,6 +149,19 @@ function zero!(p::LaurentPolyWrap)
    end
 end
 
+function mul!(c::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
+   am = a.mindeg
+   bm = b.mindeg
+   d = mul!(c.poly, a.poly, b.poly)
+   if d === c.poly
+      c.mindeg = am + bm
+      c
+   else
+      LaurentPolyWrap(d, am + bm)
+   end
+end
+
+
 ###############################################################################
 #
 #   Random elements

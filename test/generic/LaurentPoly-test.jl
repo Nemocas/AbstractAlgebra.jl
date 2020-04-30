@@ -257,6 +257,19 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test q === p
       @test iszero(p)
       # TODO: add a test for when p.poly is immutable
+
+      # mul!
+      p = y+1
+      q = y-1
+      s = y^0
+      t = mul!(s, p, q)
+      @test t === s == y^2-1
+      p = rand(L, -10:10, -10:10)
+      q = rand(L, -10:10, -10:10)
+      t = p*q
+      mul!(s, p, q)
+      @test t == s
+      # TODO: add a test for when s.poly is immutable
    end
 
    @testset "rand" begin
