@@ -19,6 +19,12 @@ isdomain_type(::Type{<:LaurentPolyElem{T}}) where {T} = isdomain_type(T)
 
 isexact_type(::Type{<:LaurentPolyElem{T}}) where {T} = isexact_type(T)
 
+function check_parent(a::LaurentPolyElem, b::LaurentPolyElem, throw::Bool = true)
+   c = parent(a) == parent(b)
+   c || !throw || error("incompatible Laurent polynomial rings")
+   return c
+end
+
 
 ###############################################################################
 #
@@ -141,6 +147,26 @@ end
 
 ==(p::LaurentPolyElem, q::LaurentPolyElem) =
    all(i -> coeff(p, i) == coeff(q, i), monomials_degrees(p, q))
+
+
+###############################################################################
+#
+#   Approximation
+#
+###############################################################################
+
+function Base.isapprox(p::LaurentPolyElem, q::LaurentPolyElem; atol::Real=sqrt(eps()))
+   check_parent(p, q)
+   all(monomials_degrees(p, q)) do d
+      isapprox(coeff(p, d), coeff(q, d); atol=atol)
+   end
+end
+
+Base.isapprox(p::LaurentPolyElem{T}, q::T; atol::Real=sqrt(eps())) where {T} =
+   isapprox(p, parent(p)(q); atol=atol)
+
+Base.isapprox(q::T, p::LaurentPolyElem{T}; atol::Real=sqrt(eps())) where {T} =
+   isapprox(p, q; atol=atol)
 
 
 ################################################################################

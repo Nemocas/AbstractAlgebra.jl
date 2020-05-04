@@ -28,7 +28,7 @@ import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
                           isdomain_type, Map, needs_parentheses,
                           promote_rule, show_minus_one
 
-import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring,
+import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring, check_parent,
                           denominator, div, divrem, exp, gen, gens, isgen,
                           ismonomial, isunit, lead, numerator, trail, sqrt
 

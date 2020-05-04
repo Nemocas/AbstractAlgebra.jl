@@ -211,6 +211,32 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       P, x = PolynomialRing(L, "x")
       @test parent(x*y) == P
       @test parent(y*x) == P
+
+      # Inexact field
+      R, x = LaurentPolynomialRing(RealField, "x")
+      for iter = 1:100
+         f = rand(R, 0:10, -1:1)
+         g = rand(R, 0:10, -1:1)
+         h = rand(R, 0:10, -1:1)
+         @test isapprox(f + (g + h), (f + g) + h)
+         @test isapprox(f*g, g*f)
+         @test isapprox(f*(g + h), f*g + f*h)
+         @test isapprox((f - h) + (g + h), f + g)
+         @test isapprox((f + g)*(f - g), f*f - g*g)
+         @test isapprox(f - g, -(g - f))
+      end
+      p = 1.2*x
+      q = nextfloat(1.2)*x
+      @test p != q
+      @test isapprox(p, q)
+      @test !isapprox(p, q + 1.2x^2)
+      @test !isapprox(p, 1.1*x)
+
+      t = 1.2 * x^0
+      r = RealField(1.2)
+      @test isapprox(r, t) && isapprox(t, r)
+      r = RealField(nextfloat(1.2))
+      @test isapprox(r, t) && isapprox(t, r)
    end
 
    @testset "powering" begin
