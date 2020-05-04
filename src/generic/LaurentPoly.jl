@@ -193,6 +193,23 @@ end
 rand(S::LaurentPolyWrapRing, degrees_range, v...) =
    rand(Random.GLOBAL_RNG, S, degrees_range, v...)
 
+
+###############################################################################
+#
+#   Promotion rules
+#
+###############################################################################
+
+# TODO: add tests
+
+promote_rule(::Type{L}, ::Type{L}) where {L <: LaurentPolyWrap} = L
+
+function promote_rule(::Type{L}, ::Type{U}) where
+       {T<:RingElement, L <: LaurentPolyWrap{T}, U <: RingElement}
+   promote_rule(T, U) == T ? L : Union{}
+end
+
+
 ################################################################################
 #
 #  map_coeffs
