@@ -270,6 +270,21 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test_throws DomainError (z + z^2)^-1
    end
 
+   @testset "evaluate" begin
+      L, y = LaurentPolynomialRing(ZZ, "y")
+      p = 2y+3y^4
+      @assert p.mindeg == 0
+      for a = Any[-3:3; -10.0:3.3:10;]
+         @test evaluate(p, a) == evaluate(p.poly, a)
+      end
+      q = p - y^-2
+      x = y.poly
+      t = -x^0 + 2x^3 + 3x^6
+      for a = -10.0:3.3:10
+         @test evaluate(q, a) == evaluate(t, a) * a^-2
+      end
+   end
+
    @testset "unsafe functions" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
 
