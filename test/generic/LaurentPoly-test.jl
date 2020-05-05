@@ -353,6 +353,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       L, y = LaurentPolynomialRing(ZZ, "y")
       @test string(y) == "y"
       @test string(L) == "Univariate Laurent Polynomial Ring in y over Integers"
+      p = y^1; p.mindeg = -3
+      @test string(p) == "y^-2"
       R, z = PolynomialRing(L, "z")
       @test string((y^2)*z) == "(y^2)*z"
       @test string(3*(y^0)*z) == "3*z"

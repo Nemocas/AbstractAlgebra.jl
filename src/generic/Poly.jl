@@ -301,7 +301,7 @@ function _show(io::IO, x::PolynomialElem, mindeg::Int)
                   print(io, "-")
                end
                print(io, string(S))
-               if len - i != 1
+               if len - i + mindeg != 1
                   print(io, "^")
                   print(io, len - i + mindeg)
                end
