@@ -37,7 +37,9 @@ parent(g::Perm{T}) where T = SymmetricGroup(T(length(g.d)))
 ###############################################################################
 
 # hash(Perm) = 0x0d9939c64ab650ca
-Base.hash(g::Perm, h::UInt) = xor(hash(g.d, h), 0x0d9939c64ab650ca)
+# note: we don't use hash(g.d, h), as it's unnecessarily slow for this use-case
+Base.hash(g::Perm, h::UInt) = foldl((h, x) -> hash(x, h), g.d,
+                                    init = hash(0x0d9939c64ab650ca, h))
 
 function getindex(g::Perm, n::Integer)
    return g.d[n]
