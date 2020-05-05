@@ -2193,7 +2193,7 @@ function gcdinv(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) 
    end
    if length(b) == 0
       d = lead(a)
-      return divexact(a, d), inv(d)
+      return divexact(a, d), parent(a)(inv(d))
    end
    if length(a) < length(b)
       a, b = b, a
