@@ -4756,7 +4756,8 @@ macro PolynomialRing(R, args...)
     end
     ring1 = gensym()
     ring2 = gensym()
-    push!(exprs, :($(Expr(:tuple, esc(ring1), esc(ring2))) = PolynomialRing($(esc(R)), $(esc(all_names)))))
+    push!(exprs, :($(Expr(:tuple, esc(ring1), esc(ring2))) =
+                   AbstractAlgebra.PolynomialRing($(esc(R)), $(esc(all_names)))))
     vars = Symbol[]
     k = gensym()
     push!(exprs, :($(esc(k)) = 0))
