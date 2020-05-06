@@ -1279,7 +1279,7 @@ function _show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
           if c == 1
              print(io, c)
           elseif c == -1 && !show_minus_one(typeof(c))
-             print(io, 1)
+             print(io, -c)
           end
         end
         fst = true
