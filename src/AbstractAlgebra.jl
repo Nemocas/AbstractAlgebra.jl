@@ -266,18 +266,27 @@ end
 #   parent(b) == a && return a
 #   return force_coerce(a, b)
 # 
-function force_coerce(a, b; throw_error::Bool = true)
-  throw_error && error("coercion not possible")
-  return false
+function force_coerce(a, b, throw_error::Type{Val{T}} = Val{true}) where {T}
+  if throw_error === Val{true}
+    throw(error("coercion not possible"))
+  else
+    return nothing
+  end
 end
 
 #to allow +(a::T, b::T) where a, b have different parents, but
 # a common over structure
 # designed(?) to be minimally invasive in AA and Nemo, but filled with 
 # content in Hecke/Oscar
-function force_op(op::Function, a...; throw_error::Bool = true)
-  throw_error && error("no common overstructure for the arguments found")
+function force_op(op::Function, throw_error::Type{Val{T}}, a...) where {T}
+  if throw_error === Val{true}
+    throw(error("no common overstructure for the arguments found"))
+  end
   return false
+end
+
+function force_op(op::Function, a...)
+  return force_op(op, Val{true}, a...)
 end
 
 ###############################################################################
