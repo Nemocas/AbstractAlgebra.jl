@@ -503,6 +503,8 @@ end
    R, (x, y, z, t) = PolynomialRing(GF(2), ["x", "y", "z", "t"])
    f = 1 + x + y + z + t
 
+   @test zero(R)^0 == one(R)
+
    for i = 1:5
       @test f^i == f*f^(i - 1)
    end
@@ -916,6 +918,8 @@ end
    R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
    f = 2x^2*y^2 + 3x + y + 1
+
+   @test evaluate(f, [0*x, 0*y]) == 1
 
    @test evaluate(f, BigInt[1, 2]) == ZZ(14)
    @test evaluate(f, [QQ(1), QQ(2)]) == 14//1

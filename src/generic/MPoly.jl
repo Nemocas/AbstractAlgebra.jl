@@ -2415,7 +2415,11 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    if iszero(a)
-      return zero(a)
+      if iszero(b)
+         return one(a)
+      else
+         return zero(a)
+      end
    elseif length(a) == 1
       N = size(a.exps, 1)
       exps = zeros(UInt, N, 1)
@@ -3606,9 +3610,12 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    r = zero(S)
    cvzip = zip(coeffs(a), exponent_vectors(a))
    for (c, v) in cvzip
-      t = one(R)
+      t = one(S)
       for j = 1:length(vals)
          exp = v[j]
+         if iszero(exp)
+           continue
+         end
          if !haskey(powers[j], exp)
             powers[j][exp] = vals[j]^exp
          end
@@ -3699,10 +3706,14 @@ function __evaluate(a, vars, vals, powers)
      r = geobucket(S)
      cvzip = zip(coeffs(a), exponent_vectors(a))
      for (c, v) in cvzip
-        t = one(R)
+        t = one(S)
         for j = 1:length(vars)
            varnum = vars[j]
            exp = v[varnum]
+           if iszero(exp)
+             v[varnum] = 0
+             continue
+           end
            if !haskey(powers[j], exp)
               powers[j][exp] = vals[j]^exp
            end
@@ -3719,10 +3730,14 @@ function __evaluate(a, vars, vals, powers)
      r = zero(K)
      cvzip = zip(coeffs(a), exponent_vectors(a))
      for (c, v) in cvzip
-        t = one(R)
+        t = one(K)
         for j = 1:length(vars)
            varnum = vars[j]
            exp = v[varnum]
+           if iszero(exp)
+             v[varnum] = 0
+             continue
+           end
            if !haskey(powers[j], exp)
               powers[j][exp] = vals[j]^exp
            end
