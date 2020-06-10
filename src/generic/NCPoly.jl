@@ -149,7 +149,7 @@ function +(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) w
       z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
-   set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, normalise(z, i - 1))
    return z
 end
 
@@ -177,7 +177,7 @@ function -(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) w
       z = setcoeff!(z, i - 1, -coeff(b, i - 1))
       i += 1
    end
-   set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, normalise(z, i - 1))
    return z
 end
 
@@ -203,7 +203,7 @@ function *(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) w
       end
    end
    z = parent(a)(d)
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -220,7 +220,7 @@ function *(a::T, b::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -231,7 +231,7 @@ function *(a::AbstractAlgebra.NCPolyElem{T}, b::T) where {T <: NCRingElem}
    for i = 1:len
       z = setcoeff!(z, i - 1, coeff(a, i - 1)*b)
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -256,7 +256,7 @@ function ^(a::AbstractAlgebra.NCPolyElem{T}, b::Int) where {T <: NCRingElem}
       for i = 1:b
          z = setcoeff!(z, i - 1, deepcopy(coeff(a, 0)))
       end
-      set_length!(z, b + 1)
+      z = set_length!(z, b + 1)
       return z
    elseif length(a) == 0
       return zero(R)
@@ -398,7 +398,7 @@ function mullow(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{
       end
    end
    z = parent(a)(d)
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -430,11 +430,11 @@ function divexact_right(f::AbstractAlgebra.NCPolyElem{T}, g::AbstractAlgebra.NCP
       q1 = d[lenf - leng + 1] = divexact_right(coeff(f, lenf - 1), coeff(g, leng - 1))
       f = f - shift_left(q1*g, lenf - leng)
       if length(f) == lenf # inexact case
-         set_length!(f, normalise(f, lenf - 1))
+         f = set_length!(f, normalise(f, lenf - 1))
       end
    end
    q = parent(f)(d)
-   set_length!(q, lenq)
+   q = set_length!(q, lenq)
    return q
 end
 
@@ -460,11 +460,11 @@ function divexact_left(f::AbstractAlgebra.NCPolyElem{T}, g::AbstractAlgebra.NCPo
       q1 = d[lenf - leng + 1] = divexact_left(coeff(f, lenf - 1), coeff(g, leng - 1))
       f = f - shift_left(g*q1, lenf - leng)
       if length(f) == lenf # inexact case
-         set_length!(f, normalise(f, lenf - 1))
+         f = set_length!(f, normalise(f, lenf - 1))
       end
    end
    q = parent(f)(d)
-   set_length!(q, lenq)
+   q = set_length!(q, lenq)
    return q
 end
 
@@ -485,7 +485,7 @@ function divexact_right(a::AbstractAlgebra.NCPolyElem{T}, b::T) where {T <: NCRi
    for i = 1:length(a)
       z = setcoeff!(z, i - 1, divexact_right(coeff(a, i - 1), b))
    end
-   set_length!(z, length(a))
+   z = set_length!(z, length(a))
    return z
 end
 
@@ -500,7 +500,7 @@ function divexact_left(a::AbstractAlgebra.NCPolyElem{T}, b::T) where {T <: NCRin
    for i = 1:length(a)
       z = setcoeff!(z, i - 1, divexact_left(coeff(a, i - 1), b))
    end
-   set_length!(z, length(a))
+   z = set_length!(z, length(a))
    return z
 end
 
@@ -515,7 +515,7 @@ function divexact_right(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rationa
    for i = 1:length(a)
       z = setcoeff!(z, i - 1, divexact_right(coeff(a, i - 1), b))
    end
-   set_length!(z, length(a))
+   z = set_length!(z, length(a))
    return z
 end
 
@@ -585,6 +585,7 @@ function set_length!(c::NCPoly{T}, n::Int) where T <: NCRingElem
       end
    end
    c.length = n
+   return c
 end
 
 function fit!(c::NCPoly{T}, n::Int) where {T <: NCRingElem}
@@ -602,7 +603,7 @@ function fit!(c::NCPoly{T}, n::Int) where {T <: NCRingElem}
 end
 
 function zero!(c::NCPoly{T}) where {T <: NCRingElem}
-   set_length!(c, 0)
+   c = set_length!(c, 0)
    return c
 end
 
@@ -611,7 +612,7 @@ function mul!(c::AbstractAlgebra.NCPolyElem{T}, a::AbstractAlgebra.NCPolyElem{T}
    lenb = length(b)
 
    if lena == 0 || lenb == 0
-      set_length!(c, 0)
+      c = set_length!(c, 0)
    else
       if a === c
          a = deepcopy(a)
@@ -640,7 +641,7 @@ function mul!(c::AbstractAlgebra.NCPolyElem{T}, a::AbstractAlgebra.NCPolyElem{T}
          end
       end
 
-      set_length!(c, normalise(c, lenc))
+      c = set_length!(c, normalise(c, lenc))
    end
    return c
 end
@@ -653,7 +654,7 @@ function addeq!(c::AbstractAlgebra.NCPolyElem{T}, a::AbstractAlgebra.NCPolyElem{
    for i = 1:lena
       c.coeffs[i] = addeq!(c.coeffs[i], coeff(a, i - 1))
    end
-   set_length!(c, normalise(c, len))
+   c = set_length!(c, normalise(c, len))
    return c
 end
 
@@ -677,7 +678,7 @@ function add!(c::AbstractAlgebra.NCPolyElem{T}, a::AbstractAlgebra.NCPolyElem{T}
       c = setcoeff!(c, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
-   set_length!(c, normalise(c, len))
+   c = set_length!(c, normalise(c, len))
    return c
 end
 

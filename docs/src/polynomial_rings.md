@@ -178,8 +178,7 @@ the length of the polynomial to $n$. This function does not need to normalise th
 polynomial and is not useful to the user, but is used extensively by the AbstractAlgebra
 generic functionality.
 
-This function mutates the existing polynomial in-place, but does not return the
-polynomial.
+This function returns the resulting polynomial.
 
 ```julia
 coeff(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
@@ -241,8 +240,8 @@ julia> n = length(f)
 julia> c = coeff(f, 1)
 3
 
-julia> set_length!(g, normalise(g, 7))
-4
+julia> g = set_length!(g, normalise(g, 7))
+x^3+2*x+1
 
 julia> g = setcoeff!(g, 2, BigInt(11))
 x^3+11*x^2+2*x+1

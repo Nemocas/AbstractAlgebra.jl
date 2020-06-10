@@ -236,7 +236,7 @@ function +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
       z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
-   set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, normalise(z, i - 1))
    return z
 end
 
@@ -268,7 +268,7 @@ function -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
       z = setcoeff!(z, i - 1, -coeff(b, i - 1))
       i += 1
    end
-   set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, normalise(z, i - 1))
    return z
 end
 
@@ -314,7 +314,7 @@ function *(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
       end
    end
    z = parent(a)(d, lenz, prec)
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -336,7 +336,7 @@ function *(a::T, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem}
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -352,7 +352,7 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.AbsSer
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -399,7 +399,7 @@ function shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: Rin
    for i = 1:xlen
       z = setcoeff!(z, i + n - 1, coeff(x, i - 1))
    end
-   set_length!(z, normalise(z, zlen))
+   z = set_length!(z, normalise(z, zlen))
    return z
 end
 
@@ -450,7 +450,7 @@ function truncate(a::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingE
    for i = len + 1:n
       z = setcoeff!(z, i - 1, zero(base_ring(a)))
    end
-   set_length!(z, normalise(z, n))
+   z = set_length!(z, normalise(z, n))
    return z
 end
 
@@ -651,7 +651,7 @@ function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSer
          x = setcoeff!(x, i + j, coeff(x, i + j) - coeff(y, j)*q)
       end
    end
-   set_length!(res, normalise(res, length(res)))
+   res = set_length!(res, normalise(res, length(res)))
    return res
 end
 
@@ -721,7 +721,7 @@ function inv(a::AbstractAlgebra.AbsSeriesElem)
       end
       ainv = setcoeff!(ainv, n - 1, divexact(s, a1))
    end
-   set_length!(ainv, normalise(ainv, precision(a)))
+   ainv = set_length!(ainv, normalise(ainv, precision(a)))
    return ainv
 end
 
@@ -779,7 +779,7 @@ function Base.sqrt(a::AbstractAlgebra.AbsSeriesElem)
       c = divexact(c, g2)
       asqrt = setcoeff!(asqrt, aval2 + n, c)
    end
-   set_length!(asqrt, normalise(asqrt, prec))
+   asqrt = set_length!(asqrt, normalise(asqrt, prec))
    return asqrt
 end
 
@@ -812,7 +812,7 @@ function Base.exp(a::AbstractAlgebra.AbsSeriesElem)
       !isunit(base_ring(a)(k)) && error("Unable to divide in exp")
       z = setcoeff!(z, k, divexact(s, k))
    end
-   set_length!(z, normalise(z, precision(a)))
+   z = set_length!(z, normalise(z, precision(a)))
    return z
 end
 
