@@ -195,7 +195,7 @@ set_prec!(f::MySeries{T}, prec::Int)
 
 Set the absolute precision of the given series to the given value.
 
-This function mutates the series in-place but does not return the mutated series.
+This return the updated series.
 
 ```julia
 valuation(f::MySeries{T})
@@ -210,7 +210,7 @@ set_val!(f::MySeries{T}, val::Int)
 For relative series and Laurent series only, this function alters the valuation of the
 given series to the given value.
 
-The series is mutated in-place but does not return the mutated series.
+This function returns the updated series.
 
 ```julia
 polcoeff(f::MySeries{T}, n::Int)
