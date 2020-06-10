@@ -255,16 +255,16 @@ function rescale!(a::PuiseuxSeriesElem)
    if !iszero(a)
       d = gcd(a.scale, gcd(scale(a.data), gcd(valuation(a.data), precision(a.data))))
       if d != 1
-         set_scale!(a.data, div(scale(a.data), d))
-         set_prec!(a.data, AbstractAlgebra.div(precision(a.data), d))
-         set_val!(a.data, AbstractAlgebra.div(valuation(a.data), d))
+         a.data = set_scale!(a.data, div(scale(a.data), d))
+         a.data = set_prec!(a.data, AbstractAlgebra.div(precision(a.data), d))
+         a.data = set_val!(a.data, AbstractAlgebra.div(valuation(a.data), d))
          a.scale = div(a.scale, d)
       end
    else
       d = gcd(precision(a.data), a.scale)
       if d != 1
-         set_prec!(a.data, AbstractAlgebra.div(precision(a.data), d))
-         set_val!(a.data, AbstractAlgebra.div(valuation(a.data), d))
+         a.data = set_prec!(a.data, AbstractAlgebra.div(precision(a.data), d))
+         a.data = set_val!(a.data, AbstractAlgebra.div(valuation(a.data), d))
          a.scale = div(a.scale, d)
       end
    end
@@ -619,7 +619,7 @@ end
 
 function zero!(a::PuiseuxSeriesElem{T}) where T <: RingElement
    zero!(a.data)
-   set_scale(a, 1)
+   a = set_scale(a, 1)
    return a
 end
 
