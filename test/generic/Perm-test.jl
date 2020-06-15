@@ -214,6 +214,11 @@ end
    @test a_copy^2 == AbstractAlgebra.mul!(a,a,a)
    @test a_copy == a
 
+   G2 = SymmetricGroup(T(2))
+   c = Perm(T[2, 1])
+   @test_throws ArgumentError a*c
+   @test_throws ArgumentError c*a
+
    G = SymmetricGroup(T(10))
    p = G(T[9,5,4,7,3,8,2,10,1,6]) # (1,9)(2,5,3,4,7)(6,8,10)
    @test p^0 == G()
