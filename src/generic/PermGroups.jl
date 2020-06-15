@@ -30,6 +30,10 @@ true
 """
 parent(g::Perm{T}) where T = SymmetricGroup(T(length(g.d)))
 
+check_parent(g::Perm, h::Perm) = length(g.d) == length(h.d) ||
+   throw(ArgumentError("incompatible permutation groups"))
+
+
 ###############################################################################
 #
 #   Low-level manipulation
@@ -396,6 +400,8 @@ false
 ###############################################################################
 function mul!(out::Perm, g::Perm, h::Perm)
    out = (out === h ? similar(out) : out)
+   check_parent(out, g)
+   check_parent(g, h)
    @inbounds for i in eachindex(out.d)
       out[i] = h[g[i]]
    end
