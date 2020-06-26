@@ -3608,8 +3608,8 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    # must be done in a certain order.
    # But addition is associative.
    S = parent(one(R)*one(parent(vals[1])))
-   r = [zero(S)]
-   i = UInt(0)
+   r = elem_type(S)[zero(S)]
+   i = UInt(1)
    cvzip = zip(coeffs(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = one(S)
