@@ -113,7 +113,7 @@ export create_accessors, get_handle, package_handle, zeros,
 
 export error_dim_negative, ErrorConstrDimMismatch
 
-export crt
+export crt, factor
 
 ###############################################################################
 # Macros for fancy printing and extending objects when desired
@@ -759,6 +759,8 @@ end
 
 # add empty functions so that Singular, Nemo and Hecke can import and extend.
 function crt end
+
+function factor end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,

@@ -212,6 +212,28 @@ function ppio(a::E, b::E) where E <: RingElem
    return c, n
 end
 
+################################################################################
+#
+#   Squares
+#
+################################################################################
+
+@doc Markdown.doc"""
+    sqrt(a::FieldElem)
+> Return the square root of the element `a`.
+"""
+function Base.sqrt(a::FieldElem)
+  R = parent(a)
+  R, t = PolynomialRing(R, "t", cached = false)
+  f = factor(t^2 - a)
+  for (p, e) in f
+    if degree(p) == 1
+      return -divexact(coeff(p, 0), coeff(p, 1))
+    end
+  end
+  throw(error("Element $a does not have a square root"))
+end
+
 ###############################################################################
 #
 #   Generic and specific rings and fields
