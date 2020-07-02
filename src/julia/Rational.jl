@@ -66,6 +66,16 @@ characteristic(a::Rational{T}) where T <: Integer = 0
 #
 ###############################################################################
 
+function expressify(a::Rational; context = nothing)
+    n = numerator(a)
+    d = denominator(a)
+    if isone(d)
+        return n
+    else
+        return Expr(:call, ://, n, d)
+    end
+end
+
 function show(io::IO, R::Rationals)
    print(io, "Rationals")
 end

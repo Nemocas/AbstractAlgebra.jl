@@ -162,8 +162,16 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::AbstractAlgebra.ResElem)
-   print(IOContext(io, :compact => true), data(x))
+function AbstractAlgebra.expressify(a::AbstractAlgebra.ResElem; context = nothing)
+   return expressify(data(a), context = context)
+end
+
+function show(io::IO, ::MIME"text/plain", a::AbstractAlgebra.ResElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function show(io::IO, a::AbstractAlgebra.ResElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, a::AbstractAlgebra.ResRing)

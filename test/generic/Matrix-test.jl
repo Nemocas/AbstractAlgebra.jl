@@ -2705,16 +2705,19 @@ end
 end
 
 @testset "Generic.Mat.printing..." begin
-   @test string(matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
-   @test string(matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
-   @test string(matrix(ZZ, 2, 0, [])) == "2 by 0 matrix"
-   @test string(matrix(ZZ, 0, 3, [])) == "0 by 3 matrix"
+   # this is the REPL printing
+   @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
+   @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
+   @test sprint(show, "text/plain", matrix(ZZ, 2, 0, [])) == "2 by 0 empty matrix"
+   @test sprint(show, "text/plain", matrix(ZZ, 0, 3, [])) == "0 by 3 empty matrix"
    S = MatrixAlgebra(QQ, 3)
-   @test string(S([1 2 3; 4 5 6; 7 8 9])) ==
+   @test sprint(show, "text/plain", S([1 2 3; 4 5 6; 7 8 9])) ==
       "[1//1  2//1  3//1]\n[4//1  5//1  6//1]\n[7//1  8//1  9//1]"
-   @test string(MatrixAlgebra(QQ, 0)()) == "0 by 0 matrix"
-   @test string(similar(matrix(ZZ, [3 1 2; 2 0 1]))) ==
+   @test sprint(show, "text/plain", MatrixAlgebra(QQ, 0)()) == "0 by 0 empty matrix"
+   @test sprint(show, "text/plain", similar(matrix(ZZ, [3 1 2; 2 0 1]))) ==
       "[#undef  #undef  #undef]\n[#undef  #undef  #undef]"
+
+   @test sprint(print, matrix(ZZ, [3 1 2; 2 0 1])) == "[3 1 2; 2 0 1]"
 end
 
 @testset "Generic.Mat.array_conversion" begin

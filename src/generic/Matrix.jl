@@ -458,16 +458,37 @@ issquare(a::MatElem) = (nrows(a) == ncols(a))
 #
 ###############################################################################
 
-function show(io::IO, a::AbstractAlgebra.MatSpace)
-   print(io, "Matrix Space of ")
-   print(io, a.nrows, " rows and ", a.ncols, " columns over ")
-   print(IOContext(io, :compact => true), base_ring(a))
-end
-
-function show(io::IO, a::MatrixElem)
+function expressify(a::MatrixElem; context = nothing)
    r = nrows(a)
    c = ncols(a)
-   isempty(a) && return print(io, "$r by $c matrix")
+   isempty(a) && return "$r by $c empty matrix"
+   mat = Expr(:vcat)
+   for i in 1:r
+      row = Expr(:row)
+      for j in 1:c
+         if isassigned(a, i, j)
+            push!(row.args, expressify(a[i, j], context = context))
+         else
+            push!(row.args,Base.undef_ref_str)
+         end
+      end
+      push!(mat.args, row)
+   end
+   return mat
+end
+
+function Base.show(io::IO, a::MatrixElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem)
+   r = nrows(a)
+   c = ncols(a)
+
+   if isempty(a)
+      print(io, "$r by $c empty matrix")
+      return
+   end
 
    # preprint each element to know the widths so as to align the columns
    strings = String[sprint(print, isassigned(a, i, j) ? a[i, j] : Base.undef_ref_str,
@@ -489,6 +510,12 @@ function show(io::IO, a::MatrixElem)
          println(io, "")
       end
    end
+end
+
+function show(io::IO, a::AbstractAlgebra.MatSpace)
+   print(io, "Matrix Space of ")
+   print(io, a.nrows, " rows and ", a.ncols, " columns over ")
+   print(IOContext(io, :compact => true), base_ring(a))
 end
 
 ###############################################################################

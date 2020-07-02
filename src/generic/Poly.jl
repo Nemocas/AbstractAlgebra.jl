@@ -270,54 +270,29 @@ canonical_unit(x::PolynomialElem) = canonical_unit(lead(x))
 #
 ###############################################################################
 
-function show(io::IO, x::PolynomialElem)
-   len = length(x)
-   S = var(parent(x))
-   if len == 0
-      print(IOContext(io, :compact => true), base_ring(x)(0))
-   else
-      for i = 1:len - 1
-         c = coeff(x, len - i)
-         bracket = needs_parentheses(c)
-         if !iszero(c)
-            if i != 1 && !displayed_with_minus_in_front(c)
-               print(io, "+")
+function AbstractAlgebra.expressify(@nospecialize(a::Union{PolynomialElem, NCPolyElem}),
+                                    x = var(parent(a)); context = nothing)
+    sum = Expr(:call, :+)
+    for k in degree(a):-1:0
+        c = coeff(a, k)
+        if !iszero(c)
+            xk = k < 1 ? 1 : k == 1 ? x : Expr(:call, :^, x, k)
+            if isone(c)
+                push!(sum.args, Expr(:call, :*, xk))
+            else
+                push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
             end
-            if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
-               if bracket
-                  print(io, "(")
-               end
-               print(IOContext(io, :compact => true), c)
-               if bracket
-                  print(io, ")")
-               end
-               print(io, "*")
-            end
-            if c == -1 && !show_minus_one(typeof(c))
-               print(io, "-")
-            end
-            print(io, string(S))
-            if len - i != 1
-               print(io, "^")
-               print(io, len - i)
-            end
-         end
-      end
-      c = coeff(x, 0)
-      bracket = needs_parentheses(c)
-      if !iszero(c)
-         if len != 1 && !displayed_with_minus_in_front(c)
-            print(io, "+")
-         end
-         if bracket
-            print(io, "(")
-         end
-         print(IOContext(io, :compact => true), c)
-         if bracket
-            print(io, ")")
-         end
-      end
-   end
+        end
+    end
+    return sum
+end
+
+function Base.show(io::IO, ::MIME"text/plain", a::Union{PolynomialElem, NCPolyElem})
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, a::Union{PolynomialElem, NCPolyElem})
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, p::AbstractAlgebra.PolyRing)
