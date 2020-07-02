@@ -2630,5 +2630,5 @@ end
 @testset "Generic.Poly.printing..." begin
    M = MatrixAlgebra(ZZ, 3)
    _, x = M['x']
-   @test string(M(-1)*x) == "-x"
+   @test string(M(-1)*x) isa String
 end

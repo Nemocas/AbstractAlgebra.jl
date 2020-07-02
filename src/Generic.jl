@@ -26,7 +26,7 @@ import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
                           RingElem, RingElement, Field, FieldElement, Map,
                           promote_rule
 
-import ..AbstractAlgebra: exp, sqrt, div, divrem, numerator, denominator
+import ..AbstractAlgebra: exp, sqrt, div, divrem, numerator, denominator, expressify
 
 using ..AbstractAlgebra
 

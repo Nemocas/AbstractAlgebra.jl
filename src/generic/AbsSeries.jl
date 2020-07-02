@@ -144,41 +144,31 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::AbstractAlgebra.AbsSeriesElem)
-   len = length(x)
+function AbstractAlgebra.expressify(a::AbstractAlgebra.AbsSeriesElem,
+                                    x = var(parent(a)); context = nothing)
+    sum = Expr(:call, :+)
+    v = valuation(a)
+    len = length(a)
 
-   if len == 0
-      print(io, zero(base_ring(x)))
-   else
-      coeff_printed = false
-      for i = 0:len - 1
-         c = coeff(x, i)
-         if !iszero(c)
-            if coeff_printed
-               print(io, "+")
-            end
-            if i != 0
-               if !isone(c)
-                  print(io, "(")
-                  print(IOContext(io, :compact => true), c)
-                  print(io, ")")
-                  if i != 0
-                     print(io, "*")
-                  end
-               end
-               print(io, string(var(parent(x))))
-               if i != 1
-                  print(io, "^")
-                  print(io, i)
-               end
+    for k in 0:len - 1
+        c = coeff(a, k)
+        if !iszero(c)
+            if k == 0
+                xk = 1
+            elseif k == 1
+                xk = x
             else
-               print(IOContext(io, :compact => true), c)
+                xk = Expr(:call, :^, x, k)
             end
-            coeff_printed = true
-         end
-      end
-   end
-   print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
+            if isone(c)
+                push!(sum.args, Expr(:call, :*, xk))
+            else
+                push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
+            end
+        end
+    end
+    push!(sum.args, Expr(:call, :O, Expr(:call, :^, x, precision(a))))
+    return sum
 end
 
 ###############################################################################

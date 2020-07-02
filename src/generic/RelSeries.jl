@@ -244,48 +244,38 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::AbstractAlgebra.RelSeriesElem)
-   len = pol_length(x)
-   if len == 0
-      print(IOContext(io, :compact => true), zero(base_ring(x)))
-   else
-      coeff_printed = false
-      for i = 0:len - 1
-         c = polcoeff(x, i)
-         bracket = needs_parentheses(c)
-         if !iszero(c)
-            if coeff_printed && !displayed_with_minus_in_front(c)
-               print(io, "+")
-            end
-            if i + valuation(x) != 0
-               if !isone(c) && (c != -1 || show_minus_one(elem_type(base_ring(x))))
-                  if bracket
-                     print(io, "(")
-                  end
-                  print(IOContext(io, :compact => true), c)
-                  if bracket
-                     print(io, ")")
-                  end
-                  if i + valuation(x) != 0
-                     print(io, "*")
-                  end
-               end
-               if c == -1 && !show_minus_one(elem_type(base_ring(x)))
-                  print(io, "-")
-               end
-               print(io, string(var(parent(x))))
-               if i + valuation(x) != 1
-                  print(io, "^")
-                  print(io, valuation(x) + i)
-               end
+function AbstractAlgebra.expressify(a::AbstractAlgebra.RelSeriesElem,
+                                    x = var(parent(a)); context = nothing)
+    sum = Expr(:call, :+)
+    v = valuation(a)
+    for i in 0:pol_length(a) - 1
+        k = i + v
+        c = polcoeff(a, i)
+        if !iszero(c)
+            if k == 0
+                xk = 1
+            elseif k == 1
+                xk = x
             else
-               print(IOContext(io, :compact => true), c)
+                xk = Expr(:call, :^, x, k)
             end
-            coeff_printed = true
-         end
-      end
-   end
-   print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
+            if isone(c)
+                push!(sum.args, Expr(:call, :*, xk))
+            else
+                push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
+            end
+        end
+    end
+    push!(sum.args, Expr(:call, :O, Expr(:call, :^, x, precision(a))))
+    return sum
+end
+
+function Base.show(io::IO, a::AbstractAlgebra.SeriesElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, ::MIME"text/plain", a::AbstractAlgebra.SeriesElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, a::SeriesRing)

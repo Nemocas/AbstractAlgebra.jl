@@ -1240,71 +1240,29 @@ end
 #
 ###############################################################################
 
-function _show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
-    len = length(x)
-    if len == 0
-      print(io, base_ring(x)(0))
-    else
-      N = parent(x).N
-      ord = parent(x).ord
-      for i = 1:len
-        c = coeff(x, i)
-        bracket = needs_parentheses(c)
-        if i != 1 && !displayed_with_minus_in_front(c)
-          print(io, "+")
-        end
-        X = zeros(UInt, N, 1)
-        if ord == :degrevlex
-           monomial_reverse!(X, 1, x.exps, i, N)
-        else
-           monomial_set!(X, 1, x.exps, i, N)
-        end
-        if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
-          if bracket
-            print(io, "(")
-          end
-          print(io, c)
-          if bracket
-            print(io, ")")
-          end
-          if c != 1 && !(c == -1 && !show_minus_one(typeof(c))) && !monomial_iszero(X, 1, N)
-             print(io, "*")
-          end
-        end
-        if c == -1 && !show_minus_one(typeof(c))
-          print(io, "-")
-        end
-        num_vars = nvars(parent(x))
-        if monomial_iszero(X, 1, N)
-          if c == 1
-             print(io, c)
-          elseif c == -1 && !show_minus_one(typeof(c))
-             print(io, -c)
-          end
-        end
-        fst = true
-        for j = 1:nvars(parent(x))
-          n = reinterpret(Int, X[num_vars - j + 1, 1])
-          if n != 0
-            if fst
-               print(io, U[j])
-               fst = false
-            else
-               print(io, "*", U[j])
-            end
-            if n != 1
-              print(io, "^", n)
-            end
-          end
-        end
-    end
-  end
+function expressify(a::MPolyElem, x = symbols(parent(a)); context = nothing)
+   sum = Expr(:call, :+)
+   n = nvars(parent(a))
+   for (c, v) in zip(coeffs(a), exponent_vectors(a))
+      prod = Expr(:call, :*, expressify(c, context = context))
+      for i in 1:n
+         if v[i] > 1
+            push!(prod.args, Expr(:call, :^, x[i], v[i]))
+         elseif v[i] == 1
+            push!(prod.args, x[i])
+         end
+      end
+      push!(sum.args, prod)
+   end
+   return sum
 end
 
-function show(io::IO, x::MPoly)
-   len = length(x)
-   U = [string(x) for x in symbols(parent(x))]
-   _show(IOContext(io, :compact => true), x, U)
+function Base.show(io::IO, ::MIME"text/plain", a::MPolyElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, a::MPolyElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, p::MPolyRing)

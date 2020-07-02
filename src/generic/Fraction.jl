@@ -172,23 +172,22 @@ canonical_unit(a::AbstractAlgebra.FracElem) = a
 #
 ###############################################################################
 
-function show(io::IO, x::AbstractAlgebra.FracElem)
-   # Canonicalise for display
-   n = numerator(x, true)
-   d = denominator(x, true)
-   if !isone(d) && needs_parentheses(n)
-      print(io, "(")
-   end
-   print(IOContext(io, :compact => true), n)
-   if !isone(d)
-      if needs_parentheses(n)
-         print(io, ")")
-      end
-      print(io, "//")
-      print(io, "(") # always print parentheses for denoninators e.g. x//(x*y*z)
-      print(IOContext(io, :compact => true), d)
-      print(io, ")")
-   end
+function AbstractAlgebra.expressify(a::FracElem; context = nothing)
+    n = numerator(a, true)
+    d = denominator(a, true)
+    if isone(d)
+        return expressify(n)
+    else
+        return Expr(:call, ://, expressify(n), expressify(d))
+    end
+end
+
+function show(io::IO, ::MIME"text/plain", a::FracElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function show(io::IO, a::FracElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, a::AbstractAlgebra.FracField)

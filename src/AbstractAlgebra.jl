@@ -115,6 +115,9 @@ export error_dim_negative, ErrorConstrDimMismatch
 
 export crt
 
+function expressify
+end
+
 ###############################################################################
 # Macros for fancy printing and extending objects when desired
 # fancy printing (and extending)
@@ -808,6 +811,15 @@ include("error.jl")
 ###############################################################################
 
 include("Groups.jl")
+
+################################################################################
+#
+#   Printing
+#
+################################################################################
+
+include("PrettyPrinting.jl")
+
 
 ###############################################################################
 #
