@@ -3606,8 +3606,10 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    # to optimise computing new powers in any way.
    # Note that this function accepts values in a non-commutative ring, so operations
    # must be done in a certain order.
+   # But addition is associative.
    S = parent(one(R)*one(parent(vals[1])))
-   r = zero(S)
+   r = elem_type(S)[zero(S)]
+   i = UInt(1)
    cvzip = zip(coeffs(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = one(S)
@@ -3621,9 +3623,19 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
          end
          t = t*powers[j][exp]
       end
-      r = addeq!(r, c*t)
+      push!(r, c*t)
+      j = i = i + 1
+      while iseven(j) && length(r) > 1
+          top = pop!(r)
+          r[end] = addeq!(r[end], top)
+          j >>>= 1
+      end
    end
-   return r
+   while length(r) > 1
+      top = pop!(r)
+      r[end] = addeq!(r[end], top)
+   end
+   return r[1]
 end
 
 @doc Markdown.doc"""
