@@ -77,13 +77,13 @@ julia> R, x = PolynomialRing(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> f = (x^2 + x + 1)//(x^3 + 3x + 1)
-(x^2+x+1)//(x^3+3*x+1)
+(x^2 + x + 1)//(x^3 + 3*x + 1)
 
 julia> g = f//x
-(x^2+x+1)//(x^4+3*x^2+x)
+(x^2 + x + 1)//(x^4 + 3*x^2 + x)
 
 julia> h = x//f
-(x^4+3*x^2+x)//(x^2+x+1)
+(x^4 + 3*x^2 + x)//(x^2 + x + 1)
 
 ```
 
@@ -110,13 +110,13 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> f = (x^2 + x + 1)//(x^3 + 3x + 1)
-(x^2+x+1//1)//(x^3+3//1*x+1//1)
+(x^2 + x + 1)//(x^3 + 3*x + 1)
 
 julia> n = numerator(f)
-x^2+x+1//1
+x^2 + x + 1
 
 julia> d = denominator(f)
-x^3+3//1*x+1//1
+x^3 + 3*x + 1
 
 ```
 

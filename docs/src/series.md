@@ -96,28 +96,28 @@ various elements into those rings.
 
 ```jldoctest
 julia> R, x = PowerSeriesRing(ZZ, 10, "x")
-(Univariate power series ring in x over Integers, x+O(x^11))
+(Univariate power series ring in x over Integers, x + O(x^11))
 
 julia> S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
-(Univariate power series ring in y over Integers, y+O(y^10))
+(Univariate power series ring in y over Integers, y + O(y^10))
 
 julia> T, z = LaurentSeriesRing(ZZ, 10, "z")
-(Laurent series ring in z over Integers, z+O(z^11))
+(Laurent series ring in z over Integers, z + O(z^11))
 
 julia> U, w = LaurentSeriesField(QQ, 10, "w")
-(Laurent series field in w over Rationals, w+O(w^11))
+(Laurent series field in w over Rationals, w + O(w^11))
 
 julia> f = R()
-0+O(x^10)
+O(x^10)
 
 julia> g = S(123)
-123+O(y^10)
+123 + O(y^10)
 
 julia> h = U(BigInt(1234))
-1234//1+O(w^10)
+1234 + O(w^10)
 
 julia> k = T(z + 1)
-1+z+O(z^10)
+1 + z + O(z^10)
 
 ```
 
@@ -134,16 +134,16 @@ O(x::SeriesElem)
 
 ```jldoctest
 julia> R, x = PowerSeriesRing(ZZ, 10, "x")
-(Univariate power series ring in x over Integers, x+O(x^11))
+(Univariate power series ring in x over Integers, x + O(x^11))
 
 julia> S, y = LaurentSeriesRing(ZZ, 10, "y")
-(Laurent series ring in y over Integers, y+O(y^11))
+(Laurent series ring in y over Integers, y + O(y^11))
 
 julia> f = 1 + 2x + O(x^5)
-1+2*x+O(x^5)
+1 + 2*x + O(x^5)
 
 julia> g = 2y + 7y^2 + O(y^7)
-2*y+7*y^2+O(y^7)
+2*y + 7*y^2 + O(y^7)
 
 ```
 
@@ -249,19 +249,19 @@ interfaces.
 
 ```jldoctest
 julia> S, x = PowerSeriesRing(ZZ, 10, "x")
-(Univariate power series ring in x over Integers, x+O(x^11))
+(Univariate power series ring in x over Integers, x + O(x^11))
 
 julia> f = 1 + 3x + x^3 + O(x^10)
-1+3*x+x^3+O(x^10)
+1 + 3*x + x^3 + O(x^10)
 
 julia> g = 1 + 2x + x^2 + O(x^10)
-1+2*x+x^2+O(x^10)
+1 + 2*x + x^2 + O(x^10)
 
 julia> h = zero(S)
-0+O(x^10)
+O(x^10)
 
 julia> k = one(S)
-1+O(x^10)
+1 + O(x^10)
 
 julia> isone(k)
 true
@@ -288,7 +288,7 @@ julia> g == deepcopy(g)
 true
 
 julia> t = divexact(2g, 2)
-1+2*x+x^2+O(x^10)
+1 + 2*x + x^2 + O(x^10)
 
 julia> p = precision(f)
 10
@@ -339,16 +339,16 @@ isunit(::RelSeriesElem)
 
 ```jldoctest
 julia> R, t = PowerSeriesRing(QQ, 10, "t")
-(Univariate power series ring in t over Rationals, t+O(t^11))
+(Univariate power series ring in t over Rationals, t + O(t^11))
 
 julia> S, x = PowerSeriesRing(R, 30, "x")
-(Univariate power series ring in x over Univariate power series ring in t over Rationals, x+O(x^31))
+(Univariate power series ring in x over Univariate power series ring in t over Rationals, x + O(x^31))
 
 julia> a = O(x^4)
-0//1+O(t^10)+O(x^4)
+O(x^4)
 
 julia> b = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)
-(3//1+t+O(t^10))*x+(1//1+t^2+O(t^10))*x^2+O(x^4)
+(3 + t + O(t^10))*x + (1 + t^2 + O(t^10))*x^2 + O(x^4)
 
 julia> k = isgen(gen(R))
 true
@@ -363,7 +363,7 @@ julia> p = valuation(b)
 1
 
 julia> c = coeff(b, 2)
-1//1+t^2+O(t^10)
+1 + t^2 + O(t^10)
 
 ```
 
@@ -384,31 +384,31 @@ julia> R, t = PolynomialRing(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S, x = PowerSeriesRing(R, 30, "x")
-(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x+O(x^31))
+(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x + O(x^31))
 
 julia> a = 2x + x^3
-2//1*x+x^3+O(x^31)
+2*x + x^3 + O(x^31)
 
 julia> b = O(x^4)
-0//1+O(x^4)
+O(x^4)
 
 julia> c = 1 + x + 2x^2 + O(x^5)
-1//1+x+2//1*x^2+O(x^5)
+1 + x + 2*x^2 + O(x^5)
 
 julia> d = 2x + x^3 + O(x^4)
-2//1*x+x^3+O(x^4)
+2*x + x^3 + O(x^4)
 
 julia> f = shift_left(a, 2)
-2//1*x^3+x^5+O(x^33)
+2*x^3 + x^5 + O(x^33)
 
 julia> g = shift_left(b, 2)
-0//1+O(x^6)
+O(x^6)
 
 julia> h = shift_right(c, 1)
-1//1+2//1*x+O(x^4)
+1 + 2*x + O(x^4)
 
 julia> k = shift_right(d, 3)
-1//1+O(x^1)
+1 + O(x^1)
 
 ```
 
@@ -425,31 +425,31 @@ julia> R, t = PolynomialRing(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S, x = PowerSeriesRing(R, 30, "x")
-(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x+O(x^31))
+(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x + O(x^31))
 
 julia> a = 2x + x^3
-2//1*x+x^3+O(x^31)
+2*x + x^3 + O(x^31)
 
 julia> b = O(x^4)
-0//1+O(x^4)
+O(x^4)
 
 julia> c = 1 + x + 2x^2 + O(x^5)
-1//1+x+2//1*x^2+O(x^5)
+1 + x + 2*x^2 + O(x^5)
 
 julia> d = 2x + x^3 + O(x^4)
-2//1*x+x^3+O(x^4)
+2*x + x^3 + O(x^4)
 
 julia> f = truncate(a, 3)
-2//1*x+O(x^3)
+2*x + O(x^3)
 
 julia> g = truncate(b, 2)
-0//1+O(x^2)
+O(x^2)
 
 julia> h = truncate(c, 7)
-1//1+x+2//1*x^2+O(x^5)
+1 + x + 2*x^2 + O(x^5)
 
 julia> k = truncate(d, 5)
-2//1*x+x^3+O(x^4)
+2*x + x^3 + O(x^4)
 
 ```
 
@@ -466,19 +466,19 @@ julia> R, t = PolynomialRing(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S, x = PowerSeriesRing(R, 30, "x")
-(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x+O(x^31))
+(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x + O(x^31))
 
 julia> a = 1 + x + 2x^2 + O(x^5)
-1//1+x+2//1*x^2+O(x^5)
+1 + x + 2*x^2 + O(x^5)
 
 julia> b = S(-1)
--1//1+O(x^30)
+-1 + O(x^30)
 
 julia> c = inv(a)
-1//1-x-x^2+3//1*x^3-x^4+O(x^5)
+1 - x - x^2 + 3*x^3 - x^4 + O(x^5)
 
 julia> d = inv(b)
--1//1+O(x^30)
+-1 + O(x^30)
 
 ```
 
@@ -500,27 +500,27 @@ julia> R, t = PolynomialRing(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S, x = PowerSeriesRing(R, 30, "x")
-(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x+O(x^31))
+(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x + O(x^31))
 
 julia> T, z = PowerSeriesRing(QQ, 30, "z")
-(Univariate power series ring in z over Rationals, z+O(z^31))
+(Univariate power series ring in z over Rationals, z + O(z^31))
 
 julia> a = 1 + z + 3z^2 + O(z^5)
-1//1+z+3//1*z^2+O(z^5)
+1 + z + 3*z^2 + O(z^5)
 
 julia> b = z + 2z^2 + 5z^3 + O(z^5)
-z+2//1*z^2+5//1*z^3+O(z^5)
+z + 2*z^2 + 5*z^3 + O(z^5)
 
 julia> c = exp(x + O(x^40))
-1//1+x+1//2*x^2+1//6*x^3+1//24*x^4+1//120*x^5+1//720*x^6+1//5040*x^7+1//40320*x^8+1//362880*x^9+1//3628800*x^10+1//39916800*x^11+1//479001600*x^12+1//6227020800*x^13+1//87178291200*x^14+1//1307674368000*x^15+1//20922789888000*x^16+1//355687428096000*x^17+1//6402373705728000*x^18+1//121645100408832000*x^19+1//2432902008176640000*x^20+1//51090942171709440000*x^21+1//1124000727777607680000*x^22+1//25852016738884976640000*x^23+1//620448401733239439360000*x^24+1//15511210043330985984000000*x^25+1//403291461126605635584000000*x^26+1//10888869450418352160768000000*x^27+1//304888344611713860501504000000*x^28+1//8841761993739701954543616000000*x^29+1//265252859812191058636308480000000*x^30+O(x^31)
+1 + x + 1//2*x^2 + 1//6*x^3 + 1//24*x^4 + 1//120*x^5 + 1//720*x^6 + 1//5040*x^7 + 1//40320*x^8 + 1//362880*x^9 + 1//3628800*x^10 + 1//39916800*x^11 + 1//479001600*x^12 + 1//6227020800*x^13 + 1//87178291200*x^14 + 1//1307674368000*x^15 + 1//20922789888000*x^16 + 1//355687428096000*x^17 + 1//6402373705728000*x^18 + 1//121645100408832000*x^19 + 1//2432902008176640000*x^20 + 1//51090942171709440000*x^21 + 1//1124000727777607680000*x^22 + 1//25852016738884976640000*x^23 + 1//620448401733239439360000*x^24 + 1//15511210043330985984000000*x^25 + 1//403291461126605635584000000*x^26 + 1//10888869450418352160768000000*x^27 + 1//304888344611713860501504000000*x^28 + 1//8841761993739701954543616000000*x^29 + 1//265252859812191058636308480000000*x^30 + O(x^31)
 
 julia> d = divexact(x, exp(x + O(x^40)) - 1)
-1//1-1//2*x+1//12*x^2-1//720*x^4+1//30240*x^6-1//1209600*x^8+1//47900160*x^10-691//1307674368000*x^12+1//74724249600*x^14-3617//10670622842880000*x^16+43867//5109094217170944000*x^18-174611//802857662698291200000*x^20+77683//14101100039391805440000*x^22-236364091//1693824136731743669452800000*x^24+657931//186134520519971831808000000*x^26-3392780147//37893265687455865519472640000000*x^28+O(x^29)
+1 - 1//2*x + 1//12*x^2 - 1//720*x^4 + 1//30240*x^6 - 1//1209600*x^8 + 1//47900160*x^10 - 691//1307674368000*x^12 + 1//74724249600*x^14 - 3617//10670622842880000*x^16 + 43867//5109094217170944000*x^18 - 174611//802857662698291200000*x^20 + 77683//14101100039391805440000*x^22 - 236364091//1693824136731743669452800000*x^24 + 657931//186134520519971831808000000*x^26 - 3392780147//37893265687455865519472640000000*x^28 + O(x^29)
 
 julia> f = exp(b)
-1//1+z+5//2*z^2+43//6*z^3+193//24*z^4+O(z^5)
+1 + z + 5//2*z^2 + 43//6*z^3 + 193//24*z^4 + O(z^5)
 
 julia> h = sqrt(a)
-1//1+1//2*z+11//8*z^2-11//16*z^3-77//128*z^4+O(z^5)
+1 + 1//2*z + 11//8*z^2 - 11//16*z^3 - 77//128*z^4 + O(z^5)
 
 ```

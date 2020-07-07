@@ -90,10 +90,10 @@ julia> h = S(BigInt(1234))
 1234
 
 julia> k = S(x + 1)
-(x+1)
+x + 1
 
 julia> m = T(z + 1)
-z+1//1
+z + 1
 
 ```
 
@@ -128,10 +128,10 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = x^3 + 3x + 21
-x^3+3*x+21
+x^3 + 3*x + 21
 
 julia> g = (x + 1)*y^2 + 2x + 1
-(x+1)*y^2+(2*x+1)
+(x + 1)*y^2 + 2*x + 1
 
 julia> h = zero(S)
 0
@@ -164,7 +164,7 @@ julia> g == deepcopy(g)
 true
 
 julia> t = divexact(2g, 2)
-(x+1)*y^2+(2*x+1)
+(x + 1)*y^2 + 2*x + 1
 
 ```
 
@@ -177,55 +177,55 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> T, y = PolynomialRing(S, "y")
-(Univariate Polynomial Ring in y over Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, y)
+(Univariate Polynomial Ring in y over Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, y)
 
 julia> f = (3*x^2 + x + 2)*y + x^2 + 1
-(3//1*x^2+x+2//1)*y+(x^2+1//1)
+(3*x^2 + x + 2)*y + x^2 + 1
 
 julia> g = (5*x^2 + 2*x + 1)*y^2 + 2x*y + x + 1
-(5//1*x^2+2//1*x+1//1)*y^2+(2//1*x)*y+(x+1//1)
+(5*x^2 + 2*x + 1)*y^2 + 2*x*y + x + 1
 
 julia> h = (3*x^3 + 2*x^2 + x + 7)*y^5 + 2x*y + 1
-(2//1*x^2-8//1*x+4//1)*y^5+(2//1*x)*y+1//1
+(2*x^2 - 8*x + 4)*y^5 + 2*x*y + 1
 
 julia> invmod(f, g)
-(707//3530*x^2+2151//1765*x+123//3530)*y+(-178//1765*x^2-551//3530*x+698//1765)
+(707//3530*x^2 + 2151//1765*x + 123//3530)*y - 178//1765*x^2 - 551//3530*x + 698//1765
 
 julia> mulmod(f, g, h)
-(-30//1*x^2-43//1*x-9//1)*y^3+(-7//1*x^2-23//1*x-7//1)*y^2+(4//1*x^2-10//1*x-3//1)*y+(x^2-2//1*x)
+(-30*x^2 - 43*x - 9)*y^3 + (-7*x^2 - 23*x - 7)*y^2 + (4*x^2 - 10*x - 3)*y + x^2 - 2*x
 
 julia> powmod(f, 3, h)
-(69//1*x^2+243//1*x+79//1)*y^3+(78//1*x^2+180//1*x+63//1)*y^2+(27//1*x^2+42//1*x+18//1)*y+(3//1*x^2+3//1*x+2//1)
+(69*x^2 + 243*x + 79)*y^3 + (78*x^2 + 180*x + 63)*y^2 + (27*x^2 + 42*x + 18)*y + 3*x^2 + 3*x + 2
 
 julia> h = mod(f, g)
-(3//1*x^2+x+2//1)*y+(x^2+1//1)
+(3*x^2 + x + 2)*y + x^2 + 1
 
 julia> q, r = divrem(f, g)
-(0//1, (3//1*x^2+x+2//1)*y+(x^2+1//1))
+(0, (3*x^2 + x + 2)*y + x^2 + 1)
 
 julia> d = gcd(f*h, g*h)
-y+(1//11*x^2+6//11)
+y + 1//11*x^2 + 6//11
 
 julia> k = gcdinv(f, h)
-(y+(1//11*x^2+6//11), 0//1)
+(y + 1//11*x^2 + 6//11, 0)
 
 julia> m = lcm(f, h)
-(-14//1*x^2-23//1*x-2//1)*y+(-4//1*x^2-5//1*x+1//1)
+(-14*x^2 - 23*x - 2)*y - 4*x^2 - 5*x + 1
 
 julia> flag, q = divides(g^2, g)
-(true, (5//1*x^2+2//1*x+1//1)*y^2+(2//1*x)*y+(x+1//1))
+(true, (5*x^2 + 2*x + 1)*y^2 + 2*x*y + x + 1)
 
 julia> valuation(3g^3, g) == 3
 true
 
 julia> val, q = remove(5g^3, g)
-(3, 5//1)
+(3, 5)
 
 julia> r, s, t = gcdx(g, h)
-(1//1, (311//3530*x^2-2419//3530*x+947//1765), (707//3530*x^2+2151//1765*x+123//3530)*y+(-178//1765*x^2-551//3530*x+698//1765))
+(1, 311//3530*x^2 - 2419//3530*x + 947//1765, (707//3530*x^2 + 2151//1765*x + 123//3530)*y - 178//1765*x^2 - 551//3530*x + 698//1765)
 
 ```
 
@@ -306,10 +306,10 @@ julia> b = one(S)
 1
 
 julia> c = BigInt(1)//2*z^2 + BigInt(1)//3
-1//2*z^2+1//3
+1//2*z^2 + 1//3
 
 julia> d = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+1)*y+3
+x*y^2 + (x + 1)*y + 3
 
 julia> f = lead(d)
 x
@@ -357,16 +357,16 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+1)*y+3
+x*y^2 + (x + 1)*y + 3
 
 julia> g = (x + 1)*y + (x^3 + 2x + 2)
-(x+1)*y+(x^3+2*x+2)
+(x + 1)*y + x^3 + 2*x + 2
 
 julia> h = truncate(f, 1)
 3
 
 julia> k = mullow(f, g, 4)
-(x^2+x)*y^3+(x^4+3*x^2+4*x+1)*y^2+(x^4+x^3+2*x^2+7*x+5)*y+(3*x^3+6*x+6)
+(x^2 + x)*y^3 + (x^4 + 3*x^2 + 4*x + 1)*y^2 + (x^4 + x^3 + 2*x^2 + 7*x + 5)*y + 3*x^3 + 6*x + 6
 
 ```
 
@@ -387,13 +387,13 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+1)*y+3
+x*y^2 + (x + 1)*y + 3
 
 julia> g = reverse(f, 7)
-3*y^6+(x+1)*y^5+(x)*y^4
+3*y^6 + (x + 1)*y^5 + x*y^4
 
 julia> h = reverse(f)
-3*y^2+(x+1)*y+(x)
+3*y^2 + (x + 1)*y + x
 
 ```
 
@@ -417,13 +417,13 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+1)*y+3
+x*y^2 + (x + 1)*y + 3
 
 julia> g = shift_left(f, 7)
-(x)*y^9+(x+1)*y^8+3*y^7
+x*y^9 + (x + 1)*y^8 + 3*y^7
 
 julia> h = shift_right(f, 2)
-(x)
+x
 
 ```
 
@@ -470,16 +470,16 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+1)*y+3
+x*y^2 + (x + 1)*y + 3
 
 julia> g = (x + 1)*y + (x^3 + 2x + 2)
-(x+1)*y+(x^3+2*x+2)
+(x + 1)*y + x^3 + 2*x + 2
 
 julia> h = pseudorem(f, g)
-(x^7+3*x^5+2*x^4+x^3+5*x^2+4*x+1)
+x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1
 
 julia> q, r = pseudodivrem(f, g)
-((x^2+x)*y+(-x^4-x^2+1), (x^7+3*x^5+2*x^4+x^3+5*x^2+4*x+1))
+((x^2 + x)*y - x^4 - x^2 + 1, x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1)
 
 ```
 
@@ -534,34 +534,34 @@ julia> S, y = PolynomialRing(R, "y")
 
 
 julia> f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+1)*y+3
+x*y^2 + (x + 1)*y + 3
 
 julia> g = (x + 1)*y + (x^3 + 2x + 2)
-(x+1)*y+(x^3+2*x+2)
+(x + 1)*y + x^3 + 2*x + 2
 
 julia> M = R[x + 1 2x; x - 3 2x - 1]
-[x+1    2*x]
-[x-3  2*x-1]
+[x + 1      2*x]
+[x - 3  2*x - 1]
 
 julia> k = evaluate(f, 3)
-12*x+6
+12*x + 6
 
 julia> m = evaluate(f, x^2 + 2x + 1)
-x^5+4*x^4+7*x^3+7*x^2+4*x+4
+x^5 + 4*x^4 + 7*x^3 + 7*x^2 + 4*x + 4
 
 julia> n = compose(f, g)
-(x^3+2*x^2+x)*y^2+(2*x^5+2*x^4+4*x^3+9*x^2+6*x+1)*y+(x^7+4*x^5+5*x^4+5*x^3+10*x^2+8*x+5)
+(x^3 + 2*x^2 + x)*y^2 + (2*x^5 + 2*x^4 + 4*x^3 + 9*x^2 + 6*x + 1)*y + x^7 + 4*x^5 + 5*x^4 + 5*x^3 + 10*x^2 + 8*x + 5
 
 julia> p = subst(f, M)
-[3*x^3-3*x^2+3*x+4    6*x^3+2*x^2+2*x]
-[3*x^3-8*x^2-2*x-3  6*x^3-8*x^2+2*x+2]
+[3*x^3 - 3*x^2 + 3*x + 4      6*x^3 + 2*x^2 + 2*x]
+[3*x^3 - 8*x^2 - 2*x - 3  6*x^3 - 8*x^2 + 2*x + 2]
 
 julia> q = f(M)
-[3*x^3-3*x^2+3*x+4    6*x^3+2*x^2+2*x]
-[3*x^3-8*x^2-2*x-3  6*x^3-8*x^2+2*x+2]
+[3*x^3 - 3*x^2 + 3*x + 4      6*x^3 + 2*x^2 + 2*x]
+[3*x^3 - 8*x^2 - 2*x - 3  6*x^3 - 8*x^2 + 2*x + 2]
 
 julia> r = f(23)
-552*x+26
+552*x + 26
 
 ```
 
@@ -588,22 +588,22 @@ julia> T, z = PolynomialRing(QQ, "z")
 (Univariate Polynomial Ring in z over Rationals, z)
 
 julia> U = ResidueRing(T, z^3 + 3z + 1)
-Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3+3//1*z+1//1
+Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3 + 3*z + 1
 
 julia> V, w = PolynomialRing(U, "w")
-(Univariate Polynomial Ring in w over Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3+3//1*z+1//1, w)
+(Univariate Polynomial Ring in w over Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3 + 3*z + 1, w)
 
 julia> f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+1)*y+3
+x*y^2 + (x + 1)*y + 3
 
 julia> g = (z^2 + 2z + 1)*w^2 + (z + 1)*w - 2z + 4
-(z^2+2//1*z+1//1)*w^2+(z+1//1)*w+(-2//1*z+4//1)
+(z^2 + 2*z + 1)*w^2 + (z + 1)*w - 2*z + 4
 
 julia> h = derivative(f)
-(2*x)*y+(x+1)
+2*x*y + x + 1
 
 julia> k = integral(g)
-(1//3*z^2+2//3*z+1//3)*w^3+(1//2*z+1//2)*w^2+(-2//1*z+4//1)*w
+(1//3*z^2 + 2//3*z + 1//3)*w^3 + (1//2*z + 1//2)*w^2 + (-2*z + 4)*w
 
 ```
 
@@ -635,21 +635,21 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = 3x*y^2 + (x + 1)*y + 3
-(3*x)*y^2+(x+1)*y+3
+3*x*y^2 + (x + 1)*y + 3
 
 julia> g = 6(x + 1)*y + (x^3 + 2x + 2)
-(6*x+6)*y+(x^3+2*x+2)
+(6*x + 6)*y + x^3 + 2*x + 2
 
 julia> S = sylvester_matrix(f, g)
-[  3*x        x+1          3]
-[6*x+6  x^3+2*x+2          0]
-[    0      6*x+6  x^3+2*x+2]
+[    3*x          x + 1              3]
+[6*x + 6  x^3 + 2*x + 2              0]
+[      0        6*x + 6  x^3 + 2*x + 2]
 
 julia> h = resultant(f, g)
-3*x^7+6*x^5-6*x^3+96*x^2+192*x+96
+3*x^7 + 6*x^5 - 6*x^3 + 96*x^2 + 192*x + 96
 
 julia> k = discriminant(f)
-x^2-34*x+1
+x^2 - 34*x + 1
 
 ```
 
@@ -673,10 +673,10 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = 3x*y^2 + (x + 1)*y + 3
-(3*x)*y^2+(x+1)*y+3
+3*x*y^2 + (x + 1)*y + 3
 
 julia> g = deepcopy(f)
-(3*x)*y^2+(x+1)*y+3
+3*x*y^2 + (x + 1)*y + 3
 
 julia> roots = [R(1), R(2), R(3)]
 3-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
@@ -748,9 +748,9 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = chebyshev_t(20, y)
-524288*y^20-2621440*y^18+5570560*y^16-6553600*y^14+4659200*y^12-2050048*y^10+549120*y^8-84480*y^6+6600*y^4-200*y^2+1
+524288*y^20 - 2621440*y^18 + 5570560*y^16 - 6553600*y^14 + 4659200*y^12 - 2050048*y^10 + 549120*y^8 - 84480*y^6 + 6600*y^4 - 200*y^2 + 1
 
 julia> g = chebyshev_u(15, y)
-32768*y^15-114688*y^13+159744*y^11-112640*y^9+42240*y^7-8064*y^5+672*y^3-16*y
+32768*y^15 - 114688*y^13 + 159744*y^11 - 112640*y^9 + 42240*y^7 - 8064*y^5 + 672*y^3 - 16*y
 
 ```

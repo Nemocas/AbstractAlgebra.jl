@@ -116,13 +116,13 @@ julia> S, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> f = S(Rational{BigInt}[2, 3, 1])
-x^2+3//1*x+2//1
+x^2 + 3*x + 2
 
 julia> g = S(BigInt[1, 0, 4])
-4//1*x^2+1//1
+4*x^2 + 1
 
 julia> h = S([4, 7, 2, 9])
-9//1*x^3+2//1*x^2+7//1*x+4//1
+9*x^3 + 2*x^2 + 7*x + 4
 
 ```
 
@@ -231,7 +231,7 @@ julia> S, x = PolynomialRing(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> f = x^3 + 3x + 1
-x^3+3*x+1
+x^3 + 3*x + 1
 
 julia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0]);
 
@@ -245,12 +245,12 @@ julia> set_length!(g, normalise(g, 7))
 4
 
 julia> g = setcoeff!(g, 2, BigInt(11))
-x^3+11*x^2+2*x+1
+x^3 + 11*x^2 + 2*x + 1
 
 julia> fit!(g, 8)
 
 julia> g = setcoeff!(g, 7, BigInt(4))
-4*x^7+x^3+11*x^2+2*x+1
+4*x^7 + x^3 + 11*x^2 + 2*x + 1
 ```
 
 ## Optional functionality for polynomial rings
