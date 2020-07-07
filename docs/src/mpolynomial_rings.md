@@ -132,10 +132,10 @@ julia> finish(C)
 3*x*y^2
 
 julia> push_term!(C, ZZ(2), [1, 1]); finish(C)
-3*x*y^2+2*x*y
+3*x*y^2 + 2*x*y
 
 julia> push_term!(C, ZZ(4), [0, 0]); finish(C)
-3*x*y^2+2*x*y+4
+3*x*y^2 + 2*x*y + 4
 ```
 
 ### Data type and parent object methods
@@ -272,7 +272,7 @@ julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^3*y + 3x*y^2 + 1
-x^3*y+3*x*y^2+1
+x^3*y + 3*x*y^2 + 1
 
 julia> n = length(f)
 3
@@ -349,19 +349,19 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = 2x^2*y + 2x + y + 1
-2*x^2*y+2*x+y+1
+2*x^2*y + 2*x + y + 1
 
 julia> g = x^2*y^2 + 1
-x^2*y^2+1
+x^2*y^2 + 1
 
 julia> flag, q = divides(f*g, f)
-(true, x^2*y^2+1)
+(true, x^2*y^2 + 1)
 
 julia> d = divexact(f*g, f)
-x^2*y^2+1
+x^2*y^2 + 1
 
 julia> v, q = remove(f*g^3, g)
-(3, 2*x^2*y+2*x+y+1)
+(3, 2*x^2*y + 2*x + y + 1)
 
 julia> n = valuation(f*g^3, g)
 3
@@ -387,13 +387,13 @@ julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> f = 3x^2*y^2 + 2x + 1
-3//1*x^2*y^2+2//1*x+1//1
+3*x^2*y^2 + 2*x + 1
 
 julia> f1 = divexact(f, 5)
-3//5*x^2*y^2+2//5*x+1//5
+3//5*x^2*y^2 + 2//5*x + 1//5
 
 julia> f2 = divexact(f, QQ(2, 3))
-9//2*x^2*y^2+3//1*x+3//2
+9//2*x^2*y^2 + 3*x + 3//2
 
 ```
 
@@ -429,16 +429,16 @@ julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> f = 2x^2*y + 2x + y + 1
-2//1*x^2*y+2//1*x+y+1//1
+2*x^2*y + 2*x + y + 1
 
 julia> g = x + y
-x+y
+x + y
 
 julia> q = div(f, g)
-2//1*x*y-2//1*y^2+2//1
+2*x*y - 2*y^2 + 2
 
 julia> q, r = divrem(f, g)
-(2//1*x*y-2//1*y^2+2//1, 2//1*y^3-y+1//1)
+(2*x*y - 2*y^2 + 2, 2*y^3 - y + 1)
 
 ```
 
@@ -460,13 +460,13 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = 2x^2*y + 2x + y + 1
-2*x^2*y+2*x+y+1
+2*x^2*y + 2*x + y + 1
 
 julia> g = x^2*y^2 + 1
-x^2*y^2+1
+x^2*y^2 + 1
 
 julia> d = gcd(f*g^2, f^2*g)
-2*x^4*y^3+2*x^3*y^2+x^2*y^3+x^2*y^2+2*x^2*y+2*x+y+1
+2*x^4*y^3 + 2*x^3*y^2 + x^2*y^3 + x^2*y^2 + 2*x^2*y + 2*x + y + 1
 
 ```
 
@@ -508,7 +508,7 @@ julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
-2//1*x^3*y^2+3//1*x+y
+2*x^3*y^2 + 3*x + y
 
 ```
 
@@ -581,7 +581,7 @@ julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^3*y + 3x*y^2 + 1
-x^3*y+3*x*y^2+1
+x^3*y + 3*x*y^2 + 1
 
 julia> c1 = coeff(f, 1)
 1
@@ -604,7 +604,7 @@ julia> t1 = term(f, 1)
 x^3*y
 
 julia> setcoeff!(f, [3, 1], 12)
-12*x^3*y+3*x*y^2+1
+12*x^3*y + 3*x*y^2 + 1
 
 ```
 
@@ -695,16 +695,16 @@ julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> f = 2x^2*y + 2x + y + 1
-2//1*x^2*y+2//1*x+y+1//1
+2*x^2*y + 2*x + y + 1
 
 julia> g = x + y
-x+y
+x + y
 
 julia> h = y + 1
-y+1//1
+y + 1
 
 julia> Q, r = divrem(f, [g, h])
-(AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[2//1*x*y-2//1*y^2+2//1, 2//1*y^2-2//1*y+1//1], 0//1)
+(AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[2*x*y - 2*y^2 + 2, 2*y^2 - 2*y + 1], 0)
 
 ```
 
@@ -756,7 +756,7 @@ julia> S = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
 julia> f = x*y + x + y + 1
-x*y+x+y+1
+x*y + x + y + 1
 
 julia> evaluate(f, [ZZ(1), ZZ(2)])
 6
@@ -771,7 +771,7 @@ julia> f(ZZ(1), ZZ(2))
 6
 
 julia> f(x - y, x + y)
-x^2+2*x-y^2+1
+x^2 + 2*x - y^2 + 1
 
 julia> M1 = S([1 2; 3 4])
 [1  2]
@@ -814,12 +814,12 @@ julia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x*y + x + y + 1
-x*y+x+y+1
+x*y + x + y + 1
 
 julia> derivative(f, 1)
-y+1
+y + 1
 
 julia> derivative(f, 2)
-x+1
+x + 1
 
 ```

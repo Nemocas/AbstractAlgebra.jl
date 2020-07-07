@@ -297,19 +297,19 @@ julia> S = MatrixSpace(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-[t+1//1       t        1//1]
-[   t^2       t           t]
-[ -2//1  t+2//1  t^2+t+1//1]
+[t + 1      t            1]
+[  t^2      t            t]
+[   -2  t + 2  t^2 + t + 1]
 
 julia> B = transpose(A)
-[t+1//1  t^2       -2//1]
-[     t    t      t+2//1]
-[  1//1    t  t^2+t+1//1]
+[t + 1  t^2           -2]
+[    t    t        t + 2]
+[    1    t  t^2 + t + 1]
 
 julia> C = A'
-[t+1//1  t^2       -2//1]
-[     t    t      t+2//1]
-[  1//1    t  t^2+t+1//1]
+[t + 1  t^2           -2]
+[    t    t        t + 2]
+[    1    t  t^2 + t + 1]
 
 ```
 

@@ -73,7 +73,7 @@ julia> h = S(BigInt(1234))
 1234
 
 julia> k = S(x + 1)
-x+1
+x + 1
 
 ```
 
@@ -98,16 +98,16 @@ julia> S = FractionField(R)
 Fraction field of Univariate Polynomial Ring in x over Rationals
 
 julia> f = S(x + 1)
-x+1//1
+x + 1
 
 julia> g = (x^2 + x + 1)//(x^3 + 3x + 1)
-(x^2+x+1//1)//(x^3+3//1*x+1//1)
+(x^2 + x + 1)//(x^3 + 3*x + 1)
 
 julia> h = zero(S)
-0//1
+0
 
 julia> k = one(S)
-1//1
+1
 
 julia> isone(k)
 true
@@ -128,13 +128,13 @@ julia> T = parent(f)
 Fraction field of Univariate Polynomial Ring in x over Rationals
 
 julia> r = deepcopy(f)
-x+1//1
+x + 1
 
 julia> n = numerator(g)
-x^2+x+1//1
+x^2 + x + 1
 
 julia> d = denominator(g)
-x^3+3//1*x+1//1
+x^3 + 3*x + 1
 
 ```
 
@@ -164,13 +164,13 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> f = (x + 1)//(x^3 + 3x + 1)
-(x+1//1)//(x^3+3//1*x+1//1)
+(x + 1)//(x^3 + 3*x + 1)
 
 julia> g = (x^2 + 2x + 1)//(x^2 + x + 1)
-(x^2+2//1*x+1//1)//(x^2+x+1//1)
+(x^2 + 2*x + 1)//(x^2 + x + 1)
 
 julia> h = gcd(f, g)
-(x+1//1)//(x^5+x^4+4//1*x^3+4//1*x^2+4//1*x+1//1)
+(x + 1)//(x^5 + x^4 + 4*x^3 + 4*x^2 + 4*x + 1)
 
 ```
 
@@ -194,13 +194,13 @@ julia> R, x = PolynomialRing(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> f = (x + 1)//(x^3 + 3x + 1)
-(x+1)//(x^3+3*x+1)
+(x + 1)//(x^3 + 3*x + 1)
 
 julia> g = (x^2 + 1)//(x^2 + x + 1)
-(x^2+1)//(x^2+x+1)
+(x^2 + 1)//(x^2 + x + 1)
 
 julia> v, q = remove(f^3*g, x + 1)
-(3, (x^2+1)//(x^11+x^10+10*x^9+12*x^8+39*x^7+48*x^6+75*x^5+75*x^4+66*x^3+37*x^2+10*x+1))
+(3, (x^2 + 1)//(x^11 + x^10 + 10*x^9 + 12*x^8 + 39*x^7 + 48*x^6 + 75*x^5 + 75*x^4 + 66*x^3 + 37*x^2 + 10*x + 1))
 
 julia> v = valuation(f^3*g, x + 1)
 3
