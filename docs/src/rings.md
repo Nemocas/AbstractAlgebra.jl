@@ -334,6 +334,32 @@ If `show_minus_one` returns true, polynomial printing functions will not print $
 terms of degree $1$ with coefficient $-1$, but will use the printing function of the
 given type to print the coefficient in that case.
 
+### Expressions
+
+Alternatively, one can implement a method
+
+```julia
+expressify(f::MyElem; context = nothing)
+```
+
+which must be either `Expr`, `Symbol`, `Integer` or `String`. For example, if
+an element of type `MyElem` has two components `f.a` and `f.b` of integer type,
+which should be printed as `a^b`, this can be implemented as
+
+```julia
+expressify(f::MyElem; context = nothing) = Expr(:call, :^, f.a, f.b)
+```
+
+If `f.a` and `f.b` themselves are objects that can be expressified, this can
+be implemented as
+
+```julia
+function expressify(f::MyElem; context = nothing)
+  return Expr(:call, :^, expressify(f.a, context = context),
+                         expressify(f.b, context = context))
+end
+```
+
 ### Unary operations
 
 ```julia
