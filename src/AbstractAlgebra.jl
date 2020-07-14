@@ -1,7 +1,7 @@
 @doc Markdown.doc"""
- AbstractAlgebra is a pure Julia package for computational abstract algebra. 
+ AbstractAlgebra is a pure Julia package for computational abstract algebra.
 
- For more information see https://github.com/Nemocas/AbstractAlgebra.jl  
+ For more information see https://github.com/Nemocas/AbstractAlgebra.jl
 """
 module AbstractAlgebra
 
@@ -17,7 +17,7 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
                   :promote_rule,
                   :Set, :Module, :Ring, :Group, :Field]
 
-import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg
+import LinearAlgebra: det, issymmetric, norm, nullspace, rank, transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
 
@@ -126,8 +126,8 @@ end
 # struct bla..
 # ..
 # end
-# 
-# to 
+#
+# to
 #
 # struct bla ..
 # @declare_other
@@ -268,7 +268,7 @@ end
 # (a::Ring)(b::elem_type(a))
 #   parent(b) == a && return a
 #   return force_coerce(a, b)
-# 
+#
 function force_coerce(a, b, throw_error::Type{Val{T}} = Val{true}) where {T}
   if throw_error === Val{true}
     throw(error("coercion not possible"))
@@ -279,7 +279,7 @@ end
 
 #to allow +(a::T, b::T) where a, b have different parents, but
 # a common over structure
-# designed(?) to be minimally invasive in AA and Nemo, but filled with 
+# designed(?) to be minimally invasive in AA and Nemo, but filled with
 # content in Hecke/Oscar
 function force_op(op::Function, throw_error::Type{Val{T}}, a...) where {T}
   if throw_error === Val{true}
@@ -365,7 +365,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  hnf_kb, hnf_kb_with_transform,
                  hnf_minors, hnf_minors_with_transform,
                  hnf_with_transform, hnf_via_popov,
-                 hnf_via_popov_with_transform, 
+                 hnf_via_popov_with_transform,
                  hooklength, identity_map, identity_matrix, image,
                  image_map, image_fn, inflate, integral, interpolate, inv,
                  inv!, invariant_factors,
@@ -377,7 +377,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  isdomain_type, isexact_type, isgen, ishessenberg,
                  ishnf, ishomogeneous, isisomorphic, ismonomial,
                  isone, isreverse, isrimhook,
-                 isrref, issquare, issubmodule, isterm,
+                 isrref, issquare, issubmodule, issymmetric, isterm,
                  isunit, iszero_row, iszero_column,
                  kernel, kronecker_product,
                  laurent_ring, lc, lcm, lead, left_kernel, length,
@@ -454,7 +454,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  isdomain_type, isexact_type, isgen, ishessenberg,
                  ishnf, ishomogeneous, isisomorphic, ismonomial,
                  isnegative, isone, isreverse,
-                 isrimhook, isrref, issquare, issubmodule,
+                 isrimhook, isrref, issquare, issubmodule, issymmetric,
                  isterm, isunit, iszero,
                  iszero_row, iszero_column, kernel,
                  kronecker_product, laurent_ring,
