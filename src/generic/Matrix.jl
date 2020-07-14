@@ -954,7 +954,7 @@ end
 #
 ###############################################################################
 
-function issymmetric(a::MatElem)
+function issymmetric(a::MatrixElem)
     if !issquare(a)
         return false
     end

@@ -1064,6 +1064,9 @@ end
    @test !issymmetric(matrix(R, [t + 1 t R(1); t^2 t t]))
    @test issymmetric(matrix(R, [t + 1 t R(1); t t^2 t; R(1) t R(5)]))
    @test !issymmetric(matrix(R, [t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
+   S = MatrixAlgebra(R, 3)
+   @test issymmetric(S([t + 1 t R(1); t t^2 t; R(1) t R(5)]))
+   @test !issymmetric(S([t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
 end
 
 @testset "Generic.Mat.transpose..." begin
