@@ -506,3 +506,31 @@ julia> D = zero(M, QQ, 2, 2)
 julia> base_ring(D)
 Rationals
 ```
+### Optional symmetry test
+
+```julia
+LinearAlgebra.issymmetric(a::MatrixElem)
+```
+
+Return `true` if the given matrix is symmetric with respect to its main diagonal,
+otherwise return false.
+
+**Examples**
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
+[1  2  3]
+[2  4  5]
+[3  5  6]
+
+julia> issymmetric(M)
+true
+
+julia> N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
+[1  2  3]
+[4  5  6]
+[7  8  9]
+
+julia> issymmetric(N)
+false
+```
