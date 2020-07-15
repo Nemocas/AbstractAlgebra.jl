@@ -955,11 +955,10 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   issymmetric(a::MatrixElem)
+    issymmetric(a::MatrixElem)
 > Return `true` if the given matrix is symmetric with respect to its main
 > diagonal, otherwise return `false`.
 """
-
 function issymmetric(a::MatrixElem)
     if !issquare(a)
         return false

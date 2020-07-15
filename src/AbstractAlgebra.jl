@@ -17,11 +17,13 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
                   :promote_rule,
                   :Set, :Module, :Ring, :Group, :Field]
 
+# If you want to add methods to functions in LinearAlgebra they should be
+# imported here and in Generic.jl, and exported below.
+# They should not be imported/exported anywhere else.
+
 import LinearAlgebra: det, issymmetric, norm, nullspace, rank, transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
-
-export nullspace
 
 ################################################################################
 #
@@ -76,6 +78,10 @@ end
 function denominator(a::T, canonicalise::Bool=true) where T
   return Base.denominator(a, canonicalise)
 end
+
+# If you want to add methods to functions in Base they should be imported here
+# and in Generic.jl, and exported below.
+# They should not be imported/exported anywhere else.
 
 import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, bin,
              ceil, checkbounds, conj, convert, cmp, cos, cosh, cospi, cot,
@@ -253,7 +259,7 @@ macro show_special_elem(io, e)
 end
 
 ###############################################################################
-# generic fall back if no imediate coercion is possible
+# generic fall back if no immediate coercion is possible
 # can/ should be called for more generic general coercion mechanisms
 
 #tries to turn b into an element of a
@@ -349,7 +355,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  codomain, coeff, coeffs, ncols,
                  combine_like_terms!, compose, content, cycles,
                  data, deflate, deflation, degree, degrees,
-                 dense_matrix_type, derivative, det, det_clow,
+                 dense_matrix_type, derivative, det_clow,
                  det_df, det_fflu, det_popov, diagonal_matrix, dim, disable_cache!,
                  discriminant, displayed_with_minus_in_front,
                  divexact, divexact_left, divexact_right, divides,
@@ -377,7 +383,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  isdomain_type, isexact_type, isgen, ishessenberg,
                  ishnf, ishomogeneous, isisomorphic, ismonomial,
                  isone, isreverse, isrimhook,
-                 isrref, issquare, issubmodule, issymmetric, isterm,
+                 isrref, issquare, issubmodule, isterm,
                  isunit, iszero_row, iszero_column,
                  kernel, kronecker_product,
                  laurent_ring, lc, lcm, lead, left_kernel, length,
@@ -398,7 +404,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  permtype, @perm_str, polcoeff, pol_length, powmod,
                  pow_multinomial, popov, popov_with_transform,
                  precision, preimage, preimage_map, primpart, pseudodivrem,
-                 pseudo_inv, pseudorem, push_term!, rank, randmat_triu,
+                 pseudo_inv, pseudorem, push_term!, randmat_triu,
                  randmat_with_rank, rand_ordering, rank_profile_popov, remove,
                  renormalize!, rels, rescale!, resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
@@ -472,10 +478,10 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  mul_karatsuba, mul_ks, mul_red!, mullow, mulmod,
                  multiply_column, multiply_column!, multiply_row,
                  multiply_row!, needs_parentheses, newton_to_monomial!, ngens,
-                 normalise, nrows, nvars, O, one, order, ordering, parent_type,
-                 parity, partitionseq, Perm, perm, permtype, @perm_str, polcoeff,
-                 pol_length, powmod, pow_multinomial, popov,
-                 popov_with_transform, powers, ppio, precision, preimage,
+                 normalise, nrows, nullspace, nvars, O, one, order, ordering,
+                 parent_type, parity, partitionseq, Perm, perm, permtype,
+                 @perm_str, polcoeff, pol_length, powmod, pow_multinomial,
+                 popov, popov_with_transform, powers, ppio, precision, preimage,
                  preimage_map, primpart, pseudo_inv, pseudodivrem, pseudorem,
                  push_term!, rank, randmat_triu, randmat_with_rank,
                  rand_ordering, rank_profile_popov, reduce!, remove,
