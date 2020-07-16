@@ -11,6 +11,12 @@ function expr_to_string(@nospecialize(obj))::String
     return getstring(S)
 end
 
+function expr_to_latex_string(@nospecialize(obj))::String
+    S = printer([])
+    printLatexExpr(S, obj, prec_lowest, prec_lowest)
+    return getstring(S)
+end
+
 # Main function for Expr -> 2D String conversion
 # currently pagewidth is unused because a proper implemention is too much work
 function expr_to_2dstring(@nospecialize(obj), pagewidth::Int)::Vector{String}
@@ -26,6 +32,15 @@ end
 # Shortcut for Obj -> 1D String conversion
 function obj_to_string(@nospecialize(x); context = nothing)
   return expr_to_string(canonicalize(expressify(x, context = context)))
+end
+
+function obj_to_latex_string(@nospecialize(x); context = nothing)
+  return expr_to_latex_string(canonicalize(expressify(x, context = context)))
+end
+
+function Base.show(io::IO, ::MIME"text/latex", x::RingElement)
+  S = obj_to_latex_string(x)
+  print(io, S)
 end
 
 ################################################################################
@@ -622,6 +637,333 @@ function printExpr(S::printer, obj, left::Int, right::Int)
     end
 end
 
+################################################################################
+#
+#  Latex printing
+#
+################################################################################
+
+function printLatexGenericPrefix(S::printer, obj::Expr, left::Int, right::Int, op::String, prec::Int)
+    n = length(obj.args)
+    @assert n == 2
+    needp = prec <= right
+    if needp
+        left = right = prec_lowest
+        push(S, "\\left(")
+    end
+    push(S, op)
+    printLatexExpr(S, obj.args[2], prec, right)
+    if needp
+        push(S, "\\right)")
+    end
+end
+
+# infix operator: plus +, times *, ...
+function printLatexGenericInfix(S::printer, obj::Expr, left::Int, right::Int, op::String, prec::Int)
+    n = length(obj.args)
+    @assert n > 2
+    # actual condition is prec < left || prec < right, but because we flatten
+    # + and *, we should see in the output if they are not flattened.
+    needp = prec <= left || prec <= right
+    if needp
+        left = right = prec_lowest
+        push(S, "\\left(")
+    end
+    printLatexExpr(S, obj.args[2], left, prec)
+    for i in 3 : n - 1
+        push(S, op)
+        printLatexExpr(S, obj.args[i], prec, prec)
+    end
+    push(S, op)
+    printLatexExpr(S, obj.args[n], prec, right)
+    if needp
+        push(S, "\\right)")
+    end
+end
+
+# left associative infix operator: ?
+function printLatexGenericInfixLeft(S::printer, obj::Expr, left::Int, right::Int, op::String, prec::Int)
+    n = length(obj.args)
+    @assert n === 3
+    needp = prec <= left || prec <= right
+    if needp
+        left = right = prec_lowest
+        push(S, "\\left(")
+    end
+    printLatexExpr(S, obj.args[2], left, prec - 1)
+    push(S, op)
+    printLatexExpr(S, obj.args[3], prec, right)
+    if needp
+        push(S, "\\right)")
+    end
+end
+
+# right associative infix operator: power ^, ...
+function printLatexGenericInfixRight(S::printer, obj::Expr, left::Int, right::Int, op::String, prec::Int)
+    n = length(obj.args)
+    @assert n === 3
+    needp = prec <= left || prec <= right
+    if needp
+        left = right = prec_lowest
+        push(S, "\\left(")
+    end
+    printLatexExpr(S, obj.args[2], left, prec)
+    push(S, op)
+    printLatexExpr(S, obj.args[3], prec - 1, right)
+    if needp
+        push(S, "\\right)")
+    end    
+end
+
+# non associative infix operator minus -, divides /
+function printLatexGenericInfixNone(S::printer, obj::Expr, left::Int, right::Int, op::String, prec::Int)
+    n = length(obj.args)
+    @assert n > 2
+    needp = prec <= left || prec <= right
+    if needp
+        left = right = prec_lowest
+        push(S, "\\left(")
+    end
+    printLatexExpr(S, obj.args[2], left, prec - 1)
+    for i in 3 : n - 1
+        push(S, op)
+        printLatexExpr(S, obj.args[i], prec - 1, prec)
+    end
+    push(S, op)
+    printLatexExpr(S, obj.args[n], prec - 1, right)
+    if needp
+        push(S, "\\right)")
+    end
+end
+
+# postfix operator: factorial !, ...
+function printLatexGenericPostfix(S::printer, obj::Expr, left::Int, right::Int, op::String, prec::Int)
+    n = length(obj.args)
+    @assert n == 2
+    needp = prec <= left
+    if needp
+        left = right = prec_lowest
+        push(S, "\\right(")
+    end
+    printLatexExpr(S, obj.args[2], prec, right)
+    push(S, op)
+    if needp
+        push(S, "\\left)")
+    end
+end
+
+function printLatexPlus(S::printer, obj::Expr, left::Int, right::Int)
+    n = length(obj.args)
+    @assert n > 0 && obj.head === :call && obj.args[1] === :(+)
+    if n < 2
+        push(S, "??? plus with zero arguments ???")
+        return
+    end
+    prec = prec_inf_Plus
+    needp = prec <= left || prec <= right
+    if needp
+        left = right = prec_lowest
+        push(S, "\\left(")
+    end
+    printLatexExpr(S, obj.args[2], left, prec)
+    for i in 3 : n
+        sgn, abs = get_syntactic_sign_abs(obj.args[i])
+        push(S, sgn > 0 ? " + " : " - ")
+        printLatexExpr(S, abs, prec, i < n ? prec : right)
+    end
+    if needp
+        push(S, "\\right)")
+    end
+end
+
+function printLatexMinus(S::printer, obj::Expr, left::Int, right::Int)
+    n = length(obj.args)
+    @assert n > 0 && obj.head === :call && obj.args[1] === :(-)
+    if n < 2
+        printLatexcall(S, obj, left, right)
+        return
+    elseif n == 2
+        printLatexGenericPrefix(S, obj, left, right, "-", prec_pre_Minus)
+        return
+    end
+    prec = prec_inf_Minus
+    needp = prec <= left || prec <= right
+    if needp
+        left = right = prec_lowest
+        push(S, "\\left(")
+    end
+    printLatexExpr(S, obj.args[2], left, prec)
+    for i in 3 : n
+        sgn, abs = get_syntactic_sign_abs(obj.args[i])
+        push(S, sgn > 0 ? " - " : " + ")
+        printLatexExpr(S, abs, prec, i < n ? prec : right)
+    end
+    if needp
+        push(S, "\\right)")
+    end
+end
+
+
+
+function printLatexTimes(S::printer, obj::Expr, left::Int, right::Int)
+    n = length(obj.args)
+    @assert n > 0 && obj.head === :call && obj.args[1] === :(*)
+    if n < 2
+        printLatexcall(S, obj, left, right)
+    elseif n == 2
+        printLatexExpr(S, obj.args[2], left, right)
+    else
+        printLatexGenericInfix(S, obj, left, right, "", prec_inf_Times)
+    end
+end
+
+
+function printLatexDivides(S::printer, obj::Expr, left::Int, right::Int)
+    n = length(obj.args)
+    @assert n > 0 && obj.head === :call && (obj.args[1] === :/ || obj.args[1] === ://)
+    op_str = (obj.args[1] === :/) ? "/" : "//"
+    if n < 2
+        printLatexcall(S, obj, left, right)
+    elseif n == 2
+        printLatexGenericPrefix(S, obj, left, right, op_str, prec_pre_Divide)
+    elseif n == 3
+      prec = prec_inf_Divide
+      needp = prec <= left || prec <= right
+      if needp
+          left = right = prec_lowest
+          push(S, "\\left(")
+      end
+      push(S, "\\frac{")
+      printLatexExpr(S, obj.args[2], prec_lowest, prec_lowest)
+      push(S, "}{")
+      printLatexExpr(S, obj.args[3], prec_lowest, prec_lowest)
+      push(S, "}")
+      if needp
+          push(S, "\\right)")
+      end
+    else
+        printLatexGenericInfixNone(S, obj, left, right, op_str, prec_inf_Divide)
+    end
+end
+
+function printLatexPower(S::printer, obj::Expr, left::Int, right::Int)
+    n = length(obj.args)
+    @assert n > 0 && obj.head === :call && obj.args[1] === :(^)
+    if n < 3
+        printLatexcall(S, obj, left, right)
+    elseif n == 3
+        prec = prec_inf_Power
+        needp = prec <= left || prec <= right
+        if needp
+            left = right = prec_lowest
+            push(S, "\\left(")
+        end
+        printLatexExpr(S, obj.args[2], left, prec)
+        push(S, "^{")
+        printLatexExpr(S, obj.args[3], left, prec)
+        push(S, "}")
+        if needp
+            push(S, "\\right)")
+        end
+    else
+        printLatexGenericInfixNone(S, obj, left, right, "^", prec_inf_Power)
+    end
+end
+
+function printLatexcall(S::printer, obj::Expr, left::Int, right::Int)
+    n = length(obj.args)
+    @assert n > 0 && obj.head === :call
+    prec = prec_post_call
+    needp = prec <= left
+    if needp
+        left = prec_lowest
+        push(S, "(")
+    end
+    printLatexExpr(S, obj.args[1], left, prec)
+    push(S, "(")
+    for i in 2:n
+        printLatexExpr(S, obj.args[i], prec_lowest, prec_lowest)
+        if i < n
+            push(S, ", ")
+        end
+    end
+    push(S, ")")
+    if needp
+        push(S, ")")
+    end
+end
+
+const _latex_to_string = Dict{String, String}(
+  "Α" => "\\alpha", "α" => "\\alpha", "Β" => "\\Beta", "β" => "\\beta", "Γ" =>
+  "\\Gamma", "γ" => "\\gamma", "Δ" => "\\Delta", "δ" => "\\delta", "Ε" =>
+  "\\Epsilon", "ε" => "\\epsilon", "Ζ" => "\\Zeta", "ζ" => "\\zeta", "Η" =>
+  "\\Eta", "η" => "\\eta", "Θ" => "\\Theta", "θ" => "\\theta", "Ι" => "\\Iota",
+  "ι" => "\\iota", "Κ" => "\\Kappa", "κ" => "\\kappa", "Λ" => "\\Lambda", "λ"
+  => "\\lambda", "Μ" => "\\Mu", "μ" => "\\mu", "Ν" => "\\Nu", "ν" => "\\nu",
+  "Ξ" => "\\Xi", "ξ" => "\\xi", "Ο" => "\\Omicron", "ο" => "\\omicron", "Π" =>
+  "\\Pie", "π" => "\\pie", "Ρ" => "\\Rho", "ρ" => "\\rho", "Σ" => "\\Sigma",
+  "σ" => "\\sigma", "Τ" => "\\Tau", "τ" => "\\tau", "Υ" => "\\Upsilon", "υ" =>
+  "\\upsilon", "Φ" => "\\Phi", "φ" => "\\phi", "Χ" => "\\Chi", "χ" => "\\chi",
+  "Ψ" => "\\Psi", "ψ" => "\\psi", "Ω" => "\\Omega", "omega" => "\\omega")
+
+function deunicodify(x::String)
+  z = ""
+  for c in x
+    y = get(_latex_to_string, string(c), string(c)) 
+    z = z * "{" * y * "}"
+  end
+  return z
+end
+
+function printLatexExpr(S::printer, obj, left::Int, right::Int)
+    if isa(obj, String)
+        push(S, deunicodify(obj))
+    elseif isa(obj, Symbol)
+        push(S, deunicodify(string(obj)))
+    elseif isa(obj, Integer)
+        if obj < 0
+            printLatexGenericPrefix(S, Expr(:call, :-, string(-obj)), left, right, "-", prec_pre_Minus)
+        else
+            push(S, string(obj))
+        end
+    elseif isa(obj, Expr)
+        if obj.head === :call && !isempty(obj.args)
+            if obj.args[1] === :+
+                printLatexPlus(S, obj, left, right)
+            elseif obj.args[1] === :-
+                printLatexMinus(S, obj, left, right)
+            elseif obj.args[1] === :*
+                printLatexTimes(S, obj, left, right)
+            elseif obj.args[1] === :/ || obj.args[1] === ://
+                printLatexDivides(S, obj, left, right)
+            elseif obj.args[1] === :^
+                printLatexPower(S, obj, left, right)
+            else
+                printLatexcall(S, obj, left, right)
+            end
+        elseif obj.head == :vcat
+            push(S, "[")
+            for i in 1:length(obj.args)
+                if i > 1
+                    push(S, "; ")
+                end
+                printLatexExpr(S, obj.args[i], 0, 0)
+            end
+            push(S, "]")
+        elseif obj.head == :hcat || obj.head == :row
+            for i in 1:length(obj.args)
+                if i > 1
+                    push(S, " ")
+                end
+                printLatexExpr(S, obj.args[i], 0, 0)
+            end
+        else
+            push(S, "??? unknown Expr ???")
+        end
+    else
+        push(S, "??? unknown ???")
+    end
+end
 
 ################################################################################
 #
