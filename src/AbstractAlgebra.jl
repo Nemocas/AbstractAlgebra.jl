@@ -80,7 +80,7 @@ function denominator(a::T, canonicalise::Bool=true) where T
 end
 
 # If you want to add methods to functions in Base they should be imported here
-# and in Generic.jl, and exported below.
+# and in Generic.jl.
 # They should not be imported/exported anywhere else.
 
 import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, bin,
