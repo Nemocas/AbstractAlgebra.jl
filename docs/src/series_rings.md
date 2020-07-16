@@ -190,7 +190,7 @@ precision(f::MySeries{T})
 Return the absolute precision of $f$.
 
 ```julia
-set_prec!(f::MySeries{T}, prec::Int)
+set_precision!(f::MySeries{T}, prec::Int)
 ```
 
 Set the absolute precision of the given series to the given value.

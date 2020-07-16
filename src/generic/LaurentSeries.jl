@@ -169,7 +169,7 @@ function set_length!(a::LaurentSeriesElem, len::Int)
    return a
 end
 
-function set_prec!(a::LaurentSeriesElem, prec::Int)
+function set_precision!(a::LaurentSeriesElem, prec::Int)
    a.prec = prec
    return a
 end
@@ -389,7 +389,7 @@ function renormalize!(z::LaurentSeriesElem)
    while i < zlen && iszero(polcoeff(z, i))
       i += 1
    end
-   z = set_prec!(z, zprec)
+   z = set_precision!(z, zprec)
    if i == zlen
       z = set_length!(z, 0)
       z = set_val!(z, zprec)
@@ -480,7 +480,7 @@ show_minus_one(::Type{LaurentSeriesElem{T}}) where {T <: RingElement} = show_min
 function -(a::LaurentSeriesElem)
    len = pol_length(a)
    z = parent(a)()
-   z = set_prec!(z, precision(a))
+   z = set_precision!(z, precision(a))
    z = set_val!(z, valuation(a))
    z = set_scale!(z, scale(a))
    fit!(z, len)
@@ -523,7 +523,7 @@ function +(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    R = base_ring(a)
    z = parent(a)()
    fit!(z, lenz)
-   z = set_prec!(z, prec)
+   z = set_precision!(z, prec)
    z = set_val!(z, valz)
    z = set_scale!(z, sz)
    pa = vala
@@ -583,7 +583,7 @@ function -(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    R = base_ring(a)
    z = parent(a)()
    fit!(z, lenz)
-   z = set_prec!(z, prec)
+   z = set_precision!(z, prec)
    z = set_val!(z, valz)
    z = set_scale!(z, sz)
    pa = vala
@@ -693,7 +693,7 @@ function *(a::T, b::LaurentSeriesElem{T}) where {T <: RingElem}
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
-   z = set_prec!(z, precision(b))
+   z = set_precision!(z, precision(b))
    z = set_val!(z, valuation(b))
    z = set_scale!(z, scale(b))
    for i = 1:len
@@ -713,7 +713,7 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::LaurentSeriesElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
-   z = set_prec!(z, precision(b))
+   z = set_precision!(z, precision(b))
    z = set_val!(z, valuation(b))
    z = set_scale!(z, scale(b))
    for i = 1:len
@@ -750,7 +750,7 @@ end
 """
 function shift_left(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    z = deepcopy(x)
-   z = set_prec!(z, precision(x) + n)
+   z = set_precision!(z, precision(x) + n)
    z = set_val!(z, valuation(x) + n)
    return z
 end
@@ -762,7 +762,7 @@ end
 """
 function shift_right(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    z = deepcopy(x)
-   z = set_prec!(z, precision(x) - n)
+   z = set_precision!(z, precision(x) - n)
    z = set_val!(z, valuation(x) - n)
    return z
 end
@@ -785,7 +785,7 @@ function truncate(a::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
       return a
    end
    z = parent(a)()
-   z = set_prec!(z, n)
+   z = set_precision!(z, n)
    if n <= aval
       z = set_length!(z, 0)
       z = set_val!(z, n)
@@ -815,7 +815,7 @@ function mullow(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}, n::Int) where 
       z = zero(parent(a))
       zprec = valuation(a) + valuation(b)
       z = set_val!(z, zprec)
-      z = set_prec!(z, zprec)
+      z = set_precision!(z, zprec)
       z = set_scale!(z, scale(a))
       return z
    end
@@ -873,7 +873,7 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
    # special case powers of x for constructing power series efficiently
    if pol_length(a) == 0
       z = parent(a)()
-      z = set_prec!(z, b*valuation(a))
+      z = set_precision!(z, b*valuation(a))
       z = set_val!(z, b*valuation(a))
       z = set_scale!(z, 1)
       return z
@@ -884,7 +884,7 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
    elseif isgen(a)
       z = parent(a)()
       fit!(z, 1)
-      z = set_prec!(z, b + precision(a) - 1)
+      z = set_precision!(z, b + precision(a) - 1)
       z = set_val!(z, b)
       z = setcoeff!(z, 0, deepcopy(polcoeff(a, 0)))
       z = set_scale!(z, 1)
@@ -892,7 +892,7 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
       return z
    elseif pol_length(a) == 1
       z = parent(a)(polcoeff(a, 0)^b)
-      z = set_prec!(z, (b - 1)*valuation(a) + precision(a))
+      z = set_precision!(z, (b - 1)*valuation(a) + precision(a))
       z = set_val!(z, b*valuation(a))
       z = set_scale!(z, 1)
       return z
@@ -924,7 +924,7 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
       bit >>= 1
    end
    z = set_val!(z, b*val)
-   z = set_prec!(z, b*val + prec)
+   z = set_precision!(z, b*val + prec)
    if pol_length(z) <= 1
       z = set_scale!(z, 1)
    end
@@ -1091,7 +1091,7 @@ function divexact(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: 
    end
    res = parent(x)()
    y = truncate(y, precision(x) - valuation(x))
-   res = set_prec!(res, min(precision(x), valuation(x) + precision(y)))
+   res = set_precision!(res, min(precision(x), valuation(x) + precision(y)))
    res = set_val!(res, valuation(x))
    sx = scale(x)
    sy = scale(y)
@@ -1132,7 +1132,7 @@ function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloa
    lenx = pol_length(x)
    z = parent(x)()
    fit!(z, lenx)
-   z = set_prec!(z, precision(x))
+   z = set_precision!(z, precision(x))
    z = set_val!(z, valuation(x))
    z = set_scale!(z, scale(x))
    for i = 1:lenx
@@ -1150,7 +1150,7 @@ function divexact(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem}
    lenx = pol_length(x)
    z = parent(x)()
    fit!(z, lenx)
-   z = set_prec!(z, precision(x))
+   z = set_precision!(z, precision(x))
    z = set_val!(z, valuation(x))
    z = set_scale!(z, scale(x))
    for i = 1:lenx
@@ -1176,7 +1176,7 @@ function inv(a::LaurentSeriesElem)
    sa = scale(a)
    lenz = div(precision(a) - valuation(a) + sa - 1, sa)
    fit!(ainv, lenz)
-   ainv = set_prec!(ainv, precision(a) - 2*valuation(a))
+   ainv = set_precision!(ainv, precision(a) - 2*valuation(a))
    ainv = set_val!(ainv, -valuation(a))
    ainv = set_scale!(ainv, sa)
    !isunit(a1) && error("Unable to invert power series")
@@ -1215,7 +1215,7 @@ function Base.sqrt(a::LaurentSeriesElem)
    prec = precision(a) - aval
    if prec == 0
       asqrt = parent(a)()
-      asqrt = set_prec!(asqrt, aval2)
+      asqrt = set_precision!(asqrt, aval2)
       asqrt = set_val!(asqrt, aval2)
       asqrt = set_scale!(asqrt, 1)
       return asqrt
@@ -1224,7 +1224,7 @@ function Base.sqrt(a::LaurentSeriesElem)
    s = scale(a)
    zlen = div(prec + s - 1, s)
    fit!(asqrt, prec)
-   asqrt = set_prec!(asqrt, prec + aval2)
+   asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_val!(asqrt, aval2)
    if prec > 0
       g = sqrt(polcoeff(a, 0))
@@ -1268,7 +1268,7 @@ end
 function Base.exp(a::LaurentSeriesElem{T}) where {T <: RingElement}
    if iszero(a)
       z = one(parent(a))
-      z = set_prec!(z, precision(a))
+      z = set_precision!(z, precision(a))
       return z
    end
    vala = valuation(a)
@@ -1288,7 +1288,7 @@ function Base.exp(a::LaurentSeriesElem{T}) where {T <: RingElement}
    z = parent(a)()
    R = base_ring(a)
    fit!(z, preca)
-   z = set_prec!(z, preca)
+   z = set_precision!(z, preca)
    z = set_val!(z, 0)
    c = vala == 0 ? polcoeff(a, 0) : R()
    z = setcoeff!(z, 0, exp(c))
