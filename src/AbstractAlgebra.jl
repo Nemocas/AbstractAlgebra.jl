@@ -411,7 +411,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  resultant_sylvester, resx, retraction_map, reverse,
                  right_kernel, rref, rref!, section_map, setcoeff!,
                  set_exponent_vector!, set_field!, set_length!, set_limit!,
-                 setpermstyle, set_prec!, set_val!, size, shift_left,
+                 setpermstyle, set_precision!, set_val!, size, shift_left,
                  shift_right, show_minus_one, similarity!, snf, snf_kb,
                  snf_kb_with_transform, snf_with_transform, solve, solve_left,
                  solve_rational, solve_triu, sort_terms!, sub, subst, summands,
@@ -490,7 +490,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  resultant_sylvester, resx, retraction_map, reverse,
                  right_kernel, rref, rref!, section_map, setcoeff!,
                  set_exponent_vector!, set_field!, set_length!, set_limit!,
-                 setpermstyle, set_prec!, set_val!, shift_left, shift_right,
+                 setpermstyle, set_precision!, set_val!, shift_left, shift_right,
                  show_minus_one, similarity!, size, snf, snf_kb,
                  snf_kb_with_transform, snf_with_transform, solve, solve_left,
                  solve_rational, solve_triu, sort_terms!, sub, subst, summands,
@@ -828,6 +828,13 @@ include("Groups.jl")
 
 include("PrettyPrinting.jl")
 
+################################################################################
+#
+#   Deprecations
+#
+################################################################################
+
+include("Deprecations.jl")
 
 ###############################################################################
 #
