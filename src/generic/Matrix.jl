@@ -950,6 +950,31 @@ end
 
 ###############################################################################
 #
+#   Symmetry
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    issymmetric(a::MatrixElem)
+> Return `true` if the given matrix is symmetric with respect to its main
+> diagonal, otherwise return `false`.
+"""
+function issymmetric(a::MatrixElem)
+    if !issquare(a)
+        return false
+    end
+    for row in 2:nrows(a)
+        for col in 1:(row - 1)
+            if a[row, col] != a[col, row]
+                return false
+            end
+        end
+    end
+    return true
+end
+
+###############################################################################
+#
 #   Kronecker product
 #
 ###############################################################################

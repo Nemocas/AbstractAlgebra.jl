@@ -1,6 +1,6 @@
 module Generic
 
-import LinearAlgebra: det, norm,
+import LinearAlgebra: det, issymmetric, norm,
                       nullspace, rank, transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
