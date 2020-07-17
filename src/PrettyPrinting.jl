@@ -860,7 +860,7 @@ function printLatexPower(S::printer, obj::Expr, left::Int, right::Int)
         end
         printLatexExpr(S, obj.args[2], left, prec)
         push(S, "^{")
-        printLatexExpr(S, obj.args[3], left, prec)
+        printLatexExpr(S, obj.args[3], prec_lowest, prec_lowest)
         push(S, "}")
         if needp
             push(S, "\\right)")
@@ -908,9 +908,13 @@ const _latex_to_string = Dict{String, String}(
 
 function deunicodify(x::String)
   z = ""
-  for c in x
+  for i in eachindex(x)
+    c = x[i]
     y = get(_latex_to_string, string(c), string(c)) 
-    z = z * "{" * y * "}"
+    z = z * y
+    if i < lastindex(x)
+      z = z * " "
+    end
   end
   return z
 end
