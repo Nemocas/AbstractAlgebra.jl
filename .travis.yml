@@ -15,9 +15,6 @@ branches:
     - master
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # release tags
 
-matrix:
-  allow_failures:
-    - julia: nightly
 env:
    global:
       - DOCUMENTER_DEBUG=true
