@@ -129,4 +129,32 @@ julia&gt; summands(D)
 
  Submodule over Integers with 2 generators and no relations
 
- Submodule over Integers with 2 generators and no relations</code></pre><footer><hr/><a class="previous" href="../quotient_module/"><span class="direction">Previous</span><span class="title">Quotient modules</span></a><a class="next" href="../module_homomorphism/"><span class="direction">Next</span><span class="title">Module Homomorphisms</span></a></footer></article></body></html>
+ Submodule over Integers with 2 generators and no relations</code></pre><pre><code class="language-none">    (D::DirectSumModule{T}(::Vector{&lt;:AbstractAlgebra.FPModuleElem{T}}) where T &lt;: RingElement</code></pre><p>Given a vector (or <span>$1$</span>-dim array) of module elements, where the <span>$i$</span>-th entry has to be an element of the <span>$i$</span>-summand of <span>$D$</span>, create the corresponding element in <span>$D$</span>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; N = FreeModule(QQ, 2);
+
+julia&gt; M = FreeModule(QQ, 1);
+
+julia&gt; D, _ = DirectSum(M, N, M);
+
+julia&gt; D([gen(M, 1), gen(N, 1), gen(M, 2)])
+(1//1, 1//1, 0//1, 0//1)</code></pre><h3><a class="nav-anchor" id="Special-Homomorphisms-1" href="#Special-Homomorphisms-1">Special Homomorphisms</a></h3><p>Due to the special structure as direct sums, homomorphisms can be created by specifying homomorphisms for all summands. In case of the codmain being a direct sum as well, any homomorphism may be thought of as a matrix containing maps from the <span>$i$</span>-th source summand to the <span>$j$</span>-th target module:</p><pre><code class="language-none">ModuleHomomorphism(D::DirectSumModule{T}, S::DirectSumModule{T}, m::Array{Any, 2}) where T &lt;: RingElement</code></pre><p>Given a matrix <span>$m$</span> such that the <span>$(i,j)$</span>-th entry is either <span>$0$</span> (<code>Int(0)</code>) or a <code>ModuleHomomorphism</code> from the <span>$i$</span>-th summand of <span>$D$</span> to the <span>$j$</span>-th summand of <span>$S$</span>, construct the corresponding homomorphism.</p><pre><code class="language-none">ModuleHomomorphism(D::DirectSumModule{T}, S::FPModuleElem{T}, m::Array{ModuleHomomorphism, 1})</code></pre><p>Given an array <span>$a$</span> of <code>ModuleHomomorphism</code> such that <span>$a_i$</span>, the <span>$i$</span>-th entry of <span>$a$</span> is a <code>ModuleHomomorphism</code> from the <span>$i$</span>-th summand of <code>D</code> into <code>S</code>, construct the direct sum of the components.</p><p>Given a matrix <span>$m$</span> such that the <span>$(i,j)$</span>-th entry is either <span>$0$</span> (<code>Int(0)</code>) or a <code>ModuleHomomorphism</code> from the <span>$i$</span>-th summand of <span>$D$</span> to the <span>$j$</span>-th summand of <span>$S$</span>, construct the corresponding homomorphism.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; N = FreeModule(QQ, 2);
+
+julia&gt; D, _ = DirectSum(N, N);
+
+julia&gt; p = ModuleHomomorphism(N, N, [3,4] .* basis(N));
+
+julia&gt; q = ModuleHomomorphism(N, N, [5,7] .* basis(N));
+
+julia&gt; phi = ModuleHomomorphism(D, D, [p 0; 0 q])
+Module homomorphism with
+Domain: DirectSumModule over Rationals
+Codomain: DirectSumModule over Rationals
+
+julia&gt; r = ModuleHomomorphism(N, D, [2,3] .* gens(D)[1:2])
+Module homomorphism with
+Domain: Vector space of dimension 2 over Rationals
+Codomain: DirectSumModule over Rationals
+
+julia&gt; psi = ModuleHomomorphism(D, D, [r, r])
+Module homomorphism with
+Domain: DirectSumModule over Rationals
+Codomain: DirectSumModule over Rationals</code></pre><footer><hr/><a class="previous" href="../quotient_module/"><span class="direction">Previous</span><span class="title">Quotient modules</span></a><a class="next" href="../module_homomorphism/"><span class="direction">Next</span><span class="title">Module Homomorphisms</span></a></footer></article></body></html>

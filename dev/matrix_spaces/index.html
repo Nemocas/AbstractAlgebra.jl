@@ -77,19 +77,19 @@ julia&gt; S = MatrixSpace(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia&gt; A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-[t+1//1       t        1//1]
-[   t^2       t           t]
-[ -2//1  t+2//1  t^2+t+1//1]
+[t + 1      t            1]
+[  t^2      t            t]
+[   -2  t + 2  t^2 + t + 1]
 
 julia&gt; B = transpose(A)
-[t+1//1  t^2       -2//1]
-[     t    t      t+2//1]
-[  1//1    t  t^2+t+1//1]
+[t + 1  t^2           -2]
+[    t    t        t + 2]
+[    1    t  t^2 + t + 1]
 
 julia&gt; C = A&#39;
-[t+1//1  t^2       -2//1]
-[     t    t      t+2//1]
-[  1//1    t  t^2+t+1//1]
+[t + 1  t^2           -2]
+[    t    t        t + 2]
+[    1    t  t^2 + t + 1]
 </code></pre><h2><a class="nav-anchor" id="Optional-functionality-for-matrices-1" href="#Optional-functionality-for-matrices-1">Optional functionality for matrices</a></h2><p>Especially when wrapping C libraries, some functions are best implemented directly, rather than relying on the generic functionality. The following are all provided by the AbstractAlgebra.jl generic code, but can optionally be implemented directly for performance reasons.</p><h3><a class="nav-anchor" id="Optional-submatrices-1" href="#Optional-submatrices-1">Optional submatrices</a></h3><p>The following are only available for matrix spaces, not for matrix algebras.</p><pre><code class="language-julia">Base.getindex(M::MyMat, rows::AbstractVector{Int}, cols::AbstractVector{Int})</code></pre><p>Return a new matrix with the same entries as the submatrix with the given range of rows and columns.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
 [1  2  3]
 [2  3  4]
@@ -177,4 +177,18 @@ julia&gt; D = zero(M, QQ, 2, 2)
 [0//1  0//1]
 
 julia&gt; base_ring(D)
-Rationals</code></pre><footer><hr/><a class="previous" href="../module_homomorphism/"><span class="direction">Previous</span><span class="title">Module Homomorphisms</span></a><a class="next" href="../matrix/"><span class="direction">Next</span><span class="title">Generic matrices</span></a></footer></article></body></html>
+Rationals</code></pre><h3><a class="nav-anchor" id="Optional-symmetry-test-1" href="#Optional-symmetry-test-1">Optional symmetry test</a></h3><pre><code class="language-julia">LinearAlgebra.issymmetric(a::MatrixElem)</code></pre><p>Return <code>true</code> if the given matrix is symmetric with respect to its main diagonal, otherwise return <code>false</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
+[1  2  3]
+[2  4  5]
+[3  5  6]
+
+julia&gt; issymmetric(M)
+true
+
+julia&gt; N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
+[1  2  3]
+[4  5  6]
+[7  8  9]
+
+julia&gt; issymmetric(N)
+false</code></pre><footer><hr/><a class="previous" href="../module_homomorphism/"><span class="direction">Previous</span><span class="title">Module Homomorphisms</span></a><a class="next" href="../matrix/"><span class="direction">Next</span><span class="title">Generic matrices</span></a></footer></article></body></html>

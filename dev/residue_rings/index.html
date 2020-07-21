@@ -3,19 +3,19 @@
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia&gt; S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia&gt; m = modulus(S)
-x^3+3//1*x+1//1
+x^3 + 3*x + 1
 </code></pre><h3><a class="nav-anchor" id="Basic-manipulation-of-rings-and-elements-1" href="#Basic-manipulation-of-rings-and-elements-1">Basic manipulation of rings and elements</a></h3><pre><code class="language-julia">data(f::MyRes{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Given a residue <span>$r \pmod{m}$</span>, represented as such, return <span>$r$</span>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(QQ, &quot;x&quot;)
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia&gt; S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia&gt; f = S(x^2 + 2)
-x^2+2//1
+x^2 + 2
 
 julia&gt; d = data(f)
-x^2+2//1
+x^2 + 2
 </code></pre><footer><hr/><a class="previous" href="../puiseux/"><span class="direction">Previous</span><span class="title">Generic Puiseux series</span></a><a class="next" href="../residue/"><span class="direction">Next</span><span class="title">Generic residue rings</span></a></footer></article></body></html>

@@ -3,22 +3,22 @@
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia&gt; f = (x^2 + x + 1)//(x^3 + 3x + 1)
-(x^2+x+1)//(x^3+3*x+1)
+(x^2 + x + 1)//(x^3 + 3*x + 1)
 
 julia&gt; g = f//x
-(x^2+x+1)//(x^4+3*x^2+x)
+(x^2 + x + 1)//(x^4 + 3*x^2 + x)
 
 julia&gt; h = x//f
-(x^4+3*x^2+x)//(x^2+x+1)
+(x^4 + 3*x^2 + x)//(x^2 + x + 1)
 </code></pre><h3><a class="nav-anchor" id="Basic-manipulation-of-fields-and-elements-1" href="#Basic-manipulation-of-fields-and-elements-1">Basic manipulation of fields and elements</a></h3><pre><code class="language-julia">numerator(d::MyFrac{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Given a fraction <span>$d = a/b$</span> return <span>$a$</span>, where <span>$a/b$</span> is in lowest terms with respect to the <code>canonical_unit</code> and <code>gcd</code> functions on the base ring.</p><pre><code class="language-julia">denominator(d::MyFrac{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Given a fraction <span>$d = a/b$</span> return <span>$b$</span>, where <span>$a/b$</span> is in lowest terms with respect to the <code>canonical_unit</code> and <code>gcd</code> functions on the base ring.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(QQ, &quot;x&quot;)
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia&gt; f = (x^2 + x + 1)//(x^3 + 3x + 1)
-(x^2+x+1//1)//(x^3+3//1*x+1//1)
+(x^2 + x + 1)//(x^3 + 3*x + 1)
 
 julia&gt; n = numerator(f)
-x^2+x+1//1
+x^2 + x + 1
 
 julia&gt; d = denominator(f)
-x^3+3//1*x+1//1
+x^3 + 3*x + 1
 </code></pre><footer><hr/><a class="previous" href="../fields/"><span class="direction">Previous</span><span class="title">Field Interface</span></a><a class="next" href="../fraction/"><span class="direction">Next</span><span class="title">Generic fraction fields</span></a></footer></article></body></html>

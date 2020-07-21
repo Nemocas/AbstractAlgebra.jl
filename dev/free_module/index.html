@@ -5,7 +5,8 @@ Free module of rank 3 over Integers
 julia&gt; V = VectorSpace(QQ, 2)
 Vector space of dimension 2 over Rationals
 </code></pre><h3><a class="nav-anchor" id="Basic-manipulation-1" href="#Basic-manipulation-1">Basic manipulation</a></h3><pre><code class="language-julia">rank(M::Generic.FreeModule{T}) where T &lt;: AbstractAlgebra.RingElem
-dim(V::Generic.FreeModule{T}) where T &lt;: AbstractAlgebra.FieldElem</code></pre><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = FreeModule(ZZ, 3)
+dim(V::Generic.FreeModule{T}) where T &lt;: AbstractAlgebra.FieldElem
+basis(V::Generic.FreeModule{T}) where T &lt;: AbstractAlgebra.FieldElem</code></pre><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = FreeModule(ZZ, 3)
 Free module of rank 3 over Integers
 
 julia&gt; V = VectorSpace(QQ, 2)
@@ -16,4 +17,8 @@ julia&gt; rank(M)
 
 julia&gt; dim(V)
 2
-</code></pre><footer><hr/><a class="previous" href="../module/"><span class="direction">Previous</span><span class="title">Module Interface</span></a><a class="next" href="../submodule/"><span class="direction">Next</span><span class="title">Submodules</span></a></footer></article></body></html>
+
+julia&gt; basis(V)
+2-element Array{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}},1}:
+ (1//1, 0//1)
+ (0//1, 1//1)</code></pre><footer><hr/><a class="previous" href="../module/"><span class="direction">Previous</span><span class="title">Module Interface</span></a><a class="next" href="../submodule/"><span class="direction">Next</span><span class="title">Submodules</span></a></footer></article></body></html>

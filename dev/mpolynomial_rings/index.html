@@ -12,10 +12,10 @@ julia&gt; finish(C)
 3*x*y^2
 
 julia&gt; push_term!(C, ZZ(2), [1, 1]); finish(C)
-3*x*y^2+2*x*y
+3*x*y^2 + 2*x*y
 
 julia&gt; push_term!(C, ZZ(4), [0, 0]); finish(C)
-3*x*y^2+2*x*y+4</code></pre><h3><a class="nav-anchor" id="Data-type-and-parent-object-methods-1" href="#Data-type-and-parent-object-methods-1">Data type and parent object methods</a></h3><pre><code class="language-julia">symbols(S::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return an array of <code>Symbol</code>s representing the variables (generators) of the polynomial ring. Note that these are <code>Symbol</code>s not <code>String</code>s, though their string values will usually be used when printing polynomials.</p><pre><code class="language-julia">nvars(f::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the number of variables of the polynomial ring.</p><pre><code class="language-julia">gens(S::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return an array of all the generators (variables) of the given polynomial ring (as polynomials).</p><p>The first entry in the array will be the variable with most significance with respect to the ordering.</p><pre><code class="language-julia">gen(S::MyMPolyRing{T}, i::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the <span>$i$</span>-th generator (variable) of the given polynomial ring (as a polynomial).</p><pre><code class="language-julia">ordering(S::MyMPolyRing{T})</code></pre><p>Return the ordering of the given polynomial ring as a symbol. Supported values currently include <code>:lex</code>, <code>:deglex</code> and <code>:degrevlex</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; S, (x, y) = PolynomialRing(QQ, [&quot;x&quot;, &quot;y&quot;]; ordering=:deglex)
+3*x*y^2 + 2*x*y + 4</code></pre><h3><a class="nav-anchor" id="Data-type-and-parent-object-methods-1" href="#Data-type-and-parent-object-methods-1">Data type and parent object methods</a></h3><pre><code class="language-julia">symbols(S::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return an array of <code>Symbol</code>s representing the variables (generators) of the polynomial ring. Note that these are <code>Symbol</code>s not <code>String</code>s, though their string values will usually be used when printing polynomials.</p><pre><code class="language-julia">nvars(f::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the number of variables of the polynomial ring.</p><pre><code class="language-julia">gens(S::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return an array of all the generators (variables) of the given polynomial ring (as polynomials).</p><p>The first entry in the array will be the variable with most significance with respect to the ordering.</p><pre><code class="language-julia">gen(S::MyMPolyRing{T}, i::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the <span>$i$</span>-th generator (variable) of the given polynomial ring (as a polynomial).</p><pre><code class="language-julia">ordering(S::MyMPolyRing{T})</code></pre><p>Return the ordering of the given polynomial ring as a symbol. Supported values currently include <code>:lex</code>, <code>:deglex</code> and <code>:degrevlex</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; S, (x, y) = PolynomialRing(QQ, [&quot;x&quot;, &quot;y&quot;]; ordering=:deglex)
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia&gt; V = symbols(S)
@@ -34,7 +34,7 @@ julia&gt; ord = ordering(S)
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia&gt; f = x^3*y + 3x*y^2 + 1
-x^3*y+3*x*y^2+1
+x^3*y + 3*x*y^2 + 1
 
 julia&gt; n = length(f)
 3
@@ -75,19 +75,19 @@ julia&gt; d = total_degree(f)
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia&gt; f = 2x^2*y + 2x + y + 1
-2*x^2*y+2*x+y+1
+2*x^2*y + 2*x + y + 1
 
 julia&gt; g = x^2*y^2 + 1
-x^2*y^2+1
+x^2*y^2 + 1
 
 julia&gt; flag, q = divides(f*g, f)
-(true, x^2*y^2+1)
+(true, x^2*y^2 + 1)
 
 julia&gt; d = divexact(f*g, f)
-x^2*y^2+1
+x^2*y^2 + 1
 
 julia&gt; v, q = remove(f*g^3, g)
-(3, 2*x^2*y+2*x+y+1)
+(3, 2*x^2*y + 2*x + y + 1)
 
 julia&gt; n = valuation(f*g^3, g)
 3
@@ -97,49 +97,49 @@ divexact(f::MyMPoly{T}, c::T) where T &lt;: AbstractAlgebra.RingElem</code></pre
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia&gt; f = 3x^2*y^2 + 2x + 1
-3//1*x^2*y^2+2//1*x+1//1
+3*x^2*y^2 + 2*x + 1
 
 julia&gt; f1 = divexact(f, 5)
-3//5*x^2*y^2+2//5*x+1//5
+3//5*x^2*y^2 + 2//5*x + 1//5
 
 julia&gt; f2 = divexact(f, QQ(2, 3))
-9//2*x^2*y^2+3//1*x+3//2
+9//2*x^2*y^2 + 3*x + 3//2
 </code></pre><h3><a class="nav-anchor" id="Euclidean-division-1" href="#Euclidean-division-1">Euclidean division</a></h3><p>Although multivariate polynomial rings are not in general Euclidean, it is possible to define a quotient with remainder function that depends on the polynomial ordering in the case that the quotient ring is a field or a Euclidean domain. In the case that a polynomial <span>$g$</span> divides a polynomial <span>$f$</span>, the result no longer depends on the ordering and the remainder is zero, with the quotient agreeing with the exact quotient.</p><pre><code class="language-julia">divrem(f::MyMPoly{T}, g::MyMPoly{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return a tuple <span>$(q, r)$</span> such that <span>$f = qg + r$</span>, where the coefficients of terms of <span>$r$</span> whose monomials are divisible by the leading monomial of <span>$g$</span> are reduced modulo the leading coefficient of <span>$g$</span> (according to the Euclidean function on the coefficients).</p><p>Note that the result of this function depends on the ordering of the polynomial ring.</p><pre><code class="language-julia">div(f::MyMPoly{T}, g::MyMPoly{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>As per the <code>divrem</code> function, but returning the quotient only. Especially when the quotient happens to be exact, this function can be exceedingly fast.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, (x, y) = PolynomialRing(QQ, [&quot;x&quot;, &quot;y&quot;])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia&gt; f = 2x^2*y + 2x + y + 1
-2//1*x^2*y+2//1*x+y+1//1
+2*x^2*y + 2*x + y + 1
 
 julia&gt; g = x + y
-x+y
+x + y
 
 julia&gt; q = div(f, g)
-2//1*x*y-2//1*y^2+2//1
+2*x*y - 2*y^2 + 2
 
 julia&gt; q, r = divrem(f, g)
-(2//1*x*y-2//1*y^2+2//1, 2//1*y^3-y+1//1)
+(2*x*y - 2*y^2 + 2, 2*y^3 - y + 1)
 </code></pre><h3><a class="nav-anchor" id="GCD-1" href="#GCD-1">GCD</a></h3><p>In cases where there is a meaningful Euclidean structure on the coefficient ring, it is possible to compute the GCD of multivariate polynomials.</p><pre><code class="language-julia">gcd(f::MyMPoly{T}, g::MyMPoly{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return a greatest common divisor of <span>$f$</span> and <span>$g$</span>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, (x, y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia&gt; f = 2x^2*y + 2x + y + 1
-2*x^2*y+2*x+y+1
+2*x^2*y + 2*x + y + 1
 
 julia&gt; g = x^2*y^2 + 1
-x^2*y^2+1
+x^2*y^2 + 1
 
 julia&gt; d = gcd(f*g^2, f^2*g)
-2*x^4*y^3+2*x^3*y^2+x^2*y^3+x^2*y^2+2*x^2*y+2*x+y+1
+2*x^4*y^3 + 2*x^3*y^2 + x^2*y^3 + x^2*y^2 + 2*x^2*y + 2*x + y + 1
 </code></pre><h2><a class="nav-anchor" id="Interface-for-sparse-distributed,-random-access-multivariates-1" href="#Interface-for-sparse-distributed,-random-access-multivariates-1">Interface for sparse distributed, random access multivariates</a></h2><p>The following additional functions should be implemented by libraries that provide a sparse distributed polynomial format, stored in a representation for which terms can be accessed in constant time (e.g. where arrays are used to store coefficients and exponent vectors).</p><h3><a class="nav-anchor" id="Sparse-distributed,-random-access-constructors-1" href="#Sparse-distributed,-random-access-constructors-1">Sparse distributed, random access constructors</a></h3><p>In addition to the standard constructors, the following constructor, taking arrays of coefficients and exponent vectors, should be provided.</p><pre><code class="language-julia">(S::MyMPolyRing{T})(A::Vector{T}, m::Vector{Vector{Int}}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Create the polynomial in the given ring with nonzero coefficients specified by the elements of <span>$A$</span> and corresponding exponent vectors given by the elements of <span>$m$</span>.</p><p>There is no assumption about coefficients being nonzero or terms being in order or unique. Zero terms are removed by the function, duplicate terms are combined (added) and the terms are sorted so that they are in the correct order.</p><p>Each exponent vector uses a separate integer for each exponent field, the first of which should be the exponent for the most significant variable with respect to the ordering. All exponents must be non-negative.</p><p>A library may also optionally provide an interface that makes use of <code>BigInt</code> (or any other big integer type) for exponents instead of <code>Int</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; S, (x, y) = PolynomialRing(QQ, [&quot;x&quot;, &quot;y&quot;])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia&gt; f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
-2//1*x^3*y^2+3//1*x+y
+2*x^3*y^2 + 3*x + y
 </code></pre><h3><a class="nav-anchor" id="Sparse-distributed,-random-access-basic-manipulation-1" href="#Sparse-distributed,-random-access-basic-manipulation-1">Sparse distributed, random access basic manipulation</a></h3><pre><code class="language-julia">coeff(f::MyMPoly{T}, n::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the coefficient of the <span>$n$</span>-th term of <span>$f$</span>. The first term should be the most significant term with respect to the ordering.</p><pre><code class="language-julia">coeff(a::MyMPoly{T}, exps::Vector{Int}) where T &lt;: RingElement</code></pre><p>Return the coefficient of the term with the given exponent vector, or zero if there is no such term.</p><pre><code class="language-julia">monomial(f::MyMPoly{T}, n::Int) where T &lt;: AbstractAlgebra.RingElem
 monomial!(m::MyMPoly{T}, f::MyMPoly{T}, n::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the <span>$n$</span>-th monomial of <span>$f$</span> or set <span>$m$</span> to the <span>$n$</span>-th monomial of <span>$f$</span>, respectively. The first monomial should be the most significant term with respect to the ordering. Monomials have coefficient <span>$1$</span> in AbstractAlgebra. See the function <code>term</code> if you also require the coefficient, however, note that only monomials can be compared.</p><pre><code class="language-julia">term(f::MyMPoly{T}, n::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the <span>$n$</span>-th term of <span>$f$</span>. The first term should be the one whose monomial is most significant with respect to the ordering.</p><pre><code class="language-julia">exponent(f::MyMPoly{T}, i::Int, j::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the exponent of the <span>$j$</span>-th variable in the <span>$n$</span>-th term of the polynomial <span>$f$</span>. The first term is the one with whose monomial is most significant with respect to the ordering.</p><pre><code class="language-julia">exponent_vector(a::MyMPoly{T}, i::Int) where T &lt;: RingElement</code></pre><p>Return a vector of exponents, corresponding to the exponent vector of the i-th term of the polynomial. Term numbering begins at <span>$1$</span> and the exponents are given in the order of the variables for the ring, as supplied when the ring was created.</p><pre><code class="language-julia">setcoeff!(a::MyMPoly, exps::Vector{Int}, c::S) where S &lt;: RingElement</code></pre><p>Set the coefficient of the term with the given exponent vector to the given value <span>$c$</span>. If no such term exists (and <span>$c \neq 0$</span>), one will be inserted. This function takes <span>$O(\log n)$</span> operations if a term with the given exponent already exists and <span>$c \neq 0$</span>, or if the term is inserted at the end of the polynomial. Otherwise it can take <span>$O(n)$</span> operations in the worst case. This function must return the modified polynomial.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; S, (x, y) = PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia&gt; f = x^3*y + 3x*y^2 + 1
-x^3*y+3*x*y^2+1
+x^3*y + 3*x*y^2 + 1
 
 julia&gt; c1 = coeff(f, 1)
 1
@@ -162,22 +162,22 @@ julia&gt; t1 = term(f, 1)
 x^3*y
 
 julia&gt; setcoeff!(f, [3, 1], 12)
-12*x^3*y+3*x*y^2+1
+12*x^3*y + 3*x*y^2 + 1
 </code></pre><h3><a class="nav-anchor" id="Unsafe-functions-1" href="#Unsafe-functions-1">Unsafe functions</a></h3><p>The following functions must be provided, but are considered unsafe, as they may leave the polynomials in an inconsistent state and they mutate their inputs. As usual, such functions should only be applied on polynomials that have no references elsewhere in the system and are mainly intended to be used in carefully written library code, rather than by users.</p><p>Users should instead build polynomials using the constructors described above.</p><pre><code class="language-julia">fit!(f::MyMPoly{T}, n::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Ensure that the polynomial <span>$f$</span> internally has space for <span>$n$</span> nonzero terms. This function must mutate the function in-place if it is mutable. It does not return the mutated polynomial. Immutable types can still be supported by defining this function to do nothing.</p><pre><code class="language-julia">setcoeff!(a::MyMPoly{T}, i::Int, c::T) where T &lt;: RingElement
 setcoeff!(a::MyMPoly{T}, i::Int, c::U) where {T &lt;: RingElement, U &lt;: Integer}</code></pre><p>Set the <span>$i$</span>-th coefficient of the polynomial <span>$a$</span> to <span>$c$</span>. No check is performed on the index <span>$i$</span> or for <span>$c = 0$</span>. It may be necessary to call <code>combine_like_terms</code> after calls to this function, to remove zero terms. The function must return the modified polynomial.</p><pre><code class="language-julia">combine_like_terms!(a::MyMPoly{T}) where T &lt;: RingElement</code></pre><p>Remove zero terms and combine any adjacent terms with the same exponent vector (by adding them). It is assumed that all the exponent vectors are already in the correct order with respect to the ordering. The function must return the resulting polynomial.</p><pre><code class="language-julia">set_exponent_vector!(a::MyMPoly{T}, i::Int, exps::Vector{Int}) where T &lt;: RingElement</code></pre><p>Set the <span>$i$</span>-th exponent vector to the given exponent vector. No check is performed on the index <span>$i$</span>, which is assumed to be valid (or that the polynomial has enough space allocated). No sorting of exponents is performed by this function. To sort the terms after setting any number of exponents with this function, run the <code>sort_terms!</code> function. The function must return the modified polynomial.</p><pre><code class="language-julia">sort_terms!(a::MyMPoly{T}) where {T &lt;: RingElement}</code></pre><p>Sort the terms of the given polynomial according to the polynomial ring ordering. Zero terms and duplicate exponents are ignored. To deal with those call <code>combine_like_terms</code>. The sorted polynomial must be returned by the function.</p><h2><a class="nav-anchor" id="Optional-functionality-for-multivariate-polynomials-1" href="#Optional-functionality-for-multivariate-polynomials-1">Optional functionality for multivariate polynomials</a></h2><p>The following functions can optionally be implemented for multivariate polynomial types.</p><h3><a class="nav-anchor" id="Reduction-by-an-ideal-1" href="#Reduction-by-an-ideal-1">Reduction by an ideal</a></h3><pre><code class="language-julia">divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>As per the <code>divrem</code> function above, except that each term of <span>$r$</span> starting with the most significant term, is reduced modulo the leading terms of each of the polynomials in the array <span>$G$</span> for which the leading monomial is a divisor.</p><p>A tuple <span>$(Q, r)$</span> is returned from the function, where <span>$Q$</span> is an array of polynomials of the same length as <span>$G$</span>, and such that <span>$f = r + \sum Q[i]G[i]$</span>.</p><p>The result is again dependent on the ordering in general, but if the polynomials in <span>$G$</span> are over a field and the reduced generators of a Groebner basis, then the result is unique.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, (x, y) = PolynomialRing(QQ, [&quot;x&quot;, &quot;y&quot;])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia&gt; f = 2x^2*y + 2x + y + 1
-2//1*x^2*y+2//1*x+y+1//1
+2*x^2*y + 2*x + y + 1
 
 julia&gt; g = x + y
-x+y
+x + y
 
 julia&gt; h = y + 1
-y+1//1
+y + 1
 
 julia&gt; Q, r = divrem(f, [g, h])
-(AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[2//1*x*y-2//1*y^2+2//1, 2//1*y^2-2//1*y+1//1], 0//1)
+(AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[2*x*y - 2*y^2 + 2, 2*y^2 - 2*y + 1], 0)
 </code></pre><h3><a class="nav-anchor" id="Evaluation-1" href="#Evaluation-1">Evaluation</a></h3><pre><code class="language-julia">evaluate(a::MyMPoly{T}, A::Vector{T}) where T &lt;: RingElem</code></pre><p>Evaluate the polynomial at the given values in the coefficient ring of the polynomial. The result should be an element of the coefficient ring.</p><pre><code class="language-julia">evaluate(f::MyMPoly{T}, A::Vector{U}) where {T &lt;: AbstractAlgebra.RingElem, U &lt;: Intege
 r}</code></pre><p>Evaluate the polynomial <span>$f$</span> at the values specified by the entries of the array <span>$A$</span>.</p><pre><code class="language-julia">(a::MyMPoly{T})(vals::Union{NCRingElem, RingElement}...) where T &lt;: RingElement</code></pre><p>Evaluate the polynomial at the given arguments. This provides functional notation for polynomial evaluation, i.e. <span>$f(a, b, c)$</span>. It must be defined for each supported polynomial type (Julia does not allow functional notation to be defined for an abstract type).</p><p>The code for this function in MPoly.jl can be used when implementing this as it provides the most general possible evaluation, which is much more general than the case of evaluation at elements of the same ring.</p><p>The evaluation should succeed for any set of values for which a multiplication is defined with the product of a coefficient and all the values before it.</p><p>Note that the values may be in non-commutative rings. Products are performed in the order of the variables in the polynomial ring that the polynomial belongs to, preceded by a multiplication by the coefficient on the left.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
@@ -186,7 +186,7 @@ julia&gt; S = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
 julia&gt; f = x*y + x + y + 1
-x*y+x+y+1
+x*y + x + y + 1
 
 julia&gt; evaluate(f, [ZZ(1), ZZ(2)])
 6
@@ -201,7 +201,7 @@ julia&gt; f(ZZ(1), ZZ(2))
 6
 
 julia&gt; f(x - y, x + y)
-x^2+2*x-y^2+1
+x^2 + 2*x - y^2 + 1
 
 julia&gt; M1 = S([1 2; 3 4])
 [1  2]
@@ -226,11 +226,11 @@ julia&gt; f(M1, ZZ(2))
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia&gt; f = x*y + x + y + 1
-x*y+x+y+1
+x*y + x + y + 1
 
 julia&gt; derivative(f, 1)
-y+1
+y + 1
 
 julia&gt; derivative(f, 2)
-x+1
+x + 1
 </code></pre><footer><hr/><a class="previous" href="../ncpolynomial/"><span class="direction">Previous</span><span class="title">Generic univariate polynomials over a noncommutative ring</span></a><a class="next" href="../mpolynomial/"><span class="direction">Next</span><span class="title">Generic sparse distributed multivariate polynomials</span></a></footer></article></body></html>

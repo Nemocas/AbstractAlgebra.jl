@@ -3,33 +3,33 @@
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia&gt; S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia&gt; f = S()
-0//1
+0
 
 julia&gt; g = S(123)
-123//1
+123
 
 julia&gt; h = S(BigInt(1234))
-1234//1
+1234
 
 julia&gt; k = S(x + 1)
-x+1//1
+x + 1
 </code></pre><p>All of the examples here are generic residue rings, but specialised implementations of residue rings provided by external modules will also usually provide a <code>ResidueRing</code> constructor to allow creation of their residue rings.</p><h2><a class="nav-anchor" id="Basic-ring-functionality-1" href="#Basic-ring-functionality-1">Basic ring functionality</a></h2><p>Residue rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Residue Ring interface is also implemented.</p><p>We give some examples of such functionality.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(QQ, &quot;x&quot;)
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia&gt; S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia&gt; f = S(x + 1)
-x+1//1
+x + 1
 
 julia&gt; h = zero(S)
-0//1
+0
 
 julia&gt; k = one(S)
-1//1
+1
 
 julia&gt; isone(k)
 true
@@ -38,7 +38,7 @@ julia&gt; iszero(f)
 false
 
 julia&gt; m = modulus(S)
-x^3+3//1*x+1//1
+x^3 + 3*x + 1
 
 julia&gt; U = base_ring(S)
 Univariate Polynomial Ring in x over Rationals
@@ -47,7 +47,7 @@ julia&gt; V = base_ring(f)
 Univariate Polynomial Ring in x over Rationals
 
 julia&gt; T = parent(f)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia&gt; f == deepcopy(f)
 true
@@ -55,13 +55,13 @@ true
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia&gt; S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia&gt; r = S(x + 1)
-x+1//1
+x + 1
 
 julia&gt; a = modulus(S)
-x^3+3//1*x+1//1
+x^3 + 3*x + 1
 
 julia&gt; isunit(r)
 true
@@ -69,25 +69,25 @@ true
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia&gt; S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia&gt; f = S(x + 1)
-x+1//1
+x + 1
 
 julia&gt; g = inv(f)
-1//3*x^2-1//3*x+4//3
+1//3*x^2 - 1//3*x + 4//3
 </code></pre><h3><a class="nav-anchor" id="Greatest-common-divisor-1" href="#Greatest-common-divisor-1">Greatest common divisor</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.gcd-Union{Tuple{T}, Tuple{ResElem{T},ResElem{T}}} where T&lt;:RingElem" href="#Base.gcd-Union{Tuple{T}, Tuple{ResElem{T},ResElem{T}}} where T&lt;:RingElem"><code>Base.gcd</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">gcd(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T &lt;: RingElement}</code></pre><blockquote><p>Return a greatest common divisor of <span>$a$</span> and <span>$b$</span> if one exists. This is done by taking the greatest common divisor of the data associated with the supplied residues and taking its greatest common divisor with the modulus.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(QQ, &quot;x&quot;)
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia&gt; S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia&gt; f = S(x + 1)
-x+1//1
+x + 1
 
 julia&gt; g = S(x^2 + 2x + 1)
-x^2+2//1*x+1//1
+x^2 + 2*x + 1
 
 julia&gt; h = gcd(f, g)
-1//1
+1
 </code></pre><footer><hr/><a class="previous" href="../residue_rings/"><span class="direction">Previous</span><span class="title">Residue Ring Interface</span></a><a class="next" href="../fields/"><span class="direction">Next</span><span class="title">Field Interface</span></a></footer></article></body></html>

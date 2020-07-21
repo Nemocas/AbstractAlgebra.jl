@@ -12,24 +12,19 @@ julia&gt; U, z = R[&quot;z&quot;]
 (Univariate Polynomial Ring in z over Matrix Algebra of degree 2 over Integers, z)
 
 julia&gt; f = S()
-[0  0]
-[0  0]
+0
 
 julia&gt; g = S(123)
-([123    0]
-[  0  123])
+[123 0; 0 123]
 
 julia&gt; h = T(BigInt(1234))
-([1234     0]
-[   0  1234])
+[1234 0; 0 1234]
 
 julia&gt; k = T(x + 1)
-(x+([1  0]
-[0  1]))
+x + 1
 
 julia&gt; m = U(z + 1)
-z+([1  0]
-[0  1])
+z + 1
 </code></pre><p>All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a <code>PolynomialRing</code> constructor to allow creation of their polynomial rings.</p><h2><a class="nav-anchor" id="Basic-ring-functionality-1" href="#Basic-ring-functionality-1">Basic ring functionality</a></h2><p>Once a polynomial ring is constructed, there are various ways to construct polynomials in that ring.</p><p>The easiest way is simply using the generator returned by the <code>PolynomialRing</code> constructor and build up the polynomial using basic arithmetic, as described in the Ring interface. </p><p>The Julia language also has special syntax for the construction of polynomials in terms of a generator, e.g. we can write <code>2x</code> instead of <code>2*x</code>.</p><p>The polynomial rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Univariate Polynomial Ring interface is also implemented.</p><p>We give some examples of such functionality.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
@@ -40,23 +35,16 @@ julia&gt; T, y = PolynomialRing(S, &quot;y&quot;)
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia&gt; f = x^3 + 3x + 21
-x^3+([3  0]
-[0  3])*x+([21   0]
-[ 0  21])
+x^3 + [3 0; 0 3]*x + [21 0; 0 21]
 
 julia&gt; g = (x + 1)*y^2 + 2x + 1
-(x+([1  0]
-[0  1]))*y^2+(([2  0]
-[0  2])*x+([1  0]
-[0  1]))
+(x + 1)*y^2 + [2 0; 0 2]*x + 1
 
 julia&gt; h = zero(T)
-[0  0]
-[0  0]
+0
 
 julia&gt; k = one(S)
-([1  0]
-[0  1])
+1
 
 julia&gt; isone(k)
 true
@@ -90,21 +78,16 @@ julia&gt; T, y = PolynomialRing(S, &quot;y&quot;)
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia&gt; a = zero(T)
-[0  0]
-[0  0]
+0
 
 julia&gt; b = one(T)
-([1  0]
-[0  1])
+1
 
 julia&gt; c = BigInt(1)*y^2 + BigInt(1)
-y^2+([1  0]
-[0  1])
+y^2 + 1
 
 julia&gt; d = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+([1  0]
-[0  1]))*y+([3  0]
-[0  3])
+x*y^2 + (x + 1)*y + [3 0; 0 3]
 
 julia&gt; f = lead(d)
 x
@@ -136,31 +119,16 @@ julia&gt; T, y = PolynomialRing(S, &quot;y&quot;)
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia&gt; f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+([1  0]
-[0  1]))*y+([3  0]
-[0  3])
+x*y^2 + (x + 1)*y + [3 0; 0 3]
 
 julia&gt; g = (x + 1)*y + (x^3 + 2x + 2)
-(x+([1  0]
-[0  1]))*y+(x^3+([2  0]
-[0  2])*x+([2  0]
-[0  2]))
+(x + 1)*y + x^3 + [2 0; 0 2]*x + [2 0; 0 2]
 
 julia&gt; h = truncate(f, 1)
-([3  0]
-[0  3])
+[3 0; 0 3]
 
 julia&gt; k = mullow(f, g, 4)
-(x^2+x)*y^3+(x^4+([3  0]
-[0  3])*x^2+([4  0]
-[0  4])*x+([1  0]
-[0  1]))*y^2+(x^4+x^3+([2  0]
-[0  2])*x^2+([7  0]
-[0  7])*x+([5  0]
-[0  5]))*y+(([3  0]
-[0  3])*x^3+([6  0]
-[0  6])*x+([6  0]
-[0  6]))
+(x^2 + x)*y^3 + (x^4 + [3 0; 0 3]*x^2 + [4 0; 0 4]*x + 1)*y^2 + (x^4 + x^3 + [2 0; 0 2]*x^2 + [7 0; 0 7]*x + [5 0; 0 5])*y + [3 0; 0 3]*x^3 + [6 0; 0 6]*x + [6 0; 0 6]
 </code></pre><h3><a class="nav-anchor" id="Reversal-1" href="#Reversal-1">Reversal</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.reverse-Tuple{NCPolyElem,Int64}" href="#Base.reverse-Tuple{NCPolyElem,Int64}"><code>Base.reverse</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">reverse(x::Generic.PolynomialElem, len::Int)</code></pre><blockquote><p>Return the reverse of the polynomial <span>$x$</span>, thought of as a polynomial of the given length (the polynomial will be notionally truncated or padded with zeroes before the leading term if necessary to match the specified length). The resulting polynomial is normalised. If <code>len</code> is negative we throw a <code>DomainError()</code>.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.reverse-Tuple{NCPolyElem}" href="#Base.reverse-Tuple{NCPolyElem}"><code>Base.reverse</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">reverse(x::Generic.PolynomialElem)</code></pre><blockquote><p>Return the reverse of the polynomial <span>$x$</span>, i.e. the leading coefficient of <span>$x$</span> becomes the constant coefficient of the result, etc. The resulting polynomial is normalised.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
@@ -171,19 +139,13 @@ julia&gt; T, y = PolynomialRing(S, &quot;y&quot;)
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia&gt; f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+([1  0]
-[0  1]))*y+([3  0]
-[0  3])
+x*y^2 + (x + 1)*y + [3 0; 0 3]
 
 julia&gt; g = reverse(f, 7)
-([3  0]
-[0  3])*y^6+(x+([1  0]
-[0  1]))*y^5+(x)*y^4
+[3 0; 0 3]*y^6 + (x + 1)*y^5 + x*y^4
 
 julia&gt; h = reverse(f)
-([3  0]
-[0  3])*y^2+(x+([1  0]
-[0  1]))*y+(x)
+[3 0; 0 3]*y^2 + (x + 1)*y + x
 </code></pre><h3><a class="nav-anchor" id="Shifting-1" href="#Shifting-1">Shifting</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.shift_left-Tuple{NCPolyElem,Int64}" href="#AbstractAlgebra.Generic.shift_left-Tuple{NCPolyElem,Int64}"><code>AbstractAlgebra.Generic.shift_left</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">shift_left(f::Generic.PolynomialElem, n::Int)</code></pre><blockquote><p>Return the polynomial <span>$f$</span> shifted left by <span>$n$</span> terms, i.e. multiplied by <span>$x^n$</span>.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.shift_right-Tuple{NCPolyElem,Int64}" href="#AbstractAlgebra.Generic.shift_right-Tuple{NCPolyElem,Int64}"><code>AbstractAlgebra.Generic.shift_right</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">shift_right(f::Generic.PolynomialElem, n::Int)</code></pre><blockquote><p>Return the polynomial <span>$f$</span> shifted right by <span>$n$</span> terms, i.e. divided by <span>$x^n$</span>.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
@@ -194,17 +156,13 @@ julia&gt; T, y = PolynomialRing(S, &quot;y&quot;)
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia&gt; f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+([1  0]
-[0  1]))*y+([3  0]
-[0  3])
+x*y^2 + (x + 1)*y + [3 0; 0 3]
 
 julia&gt; g = shift_left(f, 7)
-(x)*y^9+(x+([1  0]
-[0  1]))*y^8+([3  0]
-[0  3])*y^7
+x*y^9 + (x + 1)*y^8 + [3 0; 0 3]*y^7
 
 julia&gt; h = shift_right(f, 2)
-(x)
+x
 </code></pre><h3><a class="nav-anchor" id="Evaluation-1" href="#Evaluation-1">Evaluation</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.evaluate-Union{Tuple{T}, Tuple{NCPolyElem{T},T}} where T&lt;:NCRingElem" href="#AbstractAlgebra.Generic.evaluate-Union{Tuple{T}, Tuple{NCPolyElem{T},T}} where T&lt;:NCRingElem"><code>AbstractAlgebra.Generic.evaluate</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">evaluate(a::AbstractAlgebra.NCPolyElem, b::T) where {T &lt;: NCRingElem}</code></pre><blockquote><p>Evaluate the polynomial <span>$a$</span> at the value <span>$b$</span> and return the result.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.evaluate-Tuple{NCPolyElem,Integer}" href="#AbstractAlgebra.Generic.evaluate-Tuple{NCPolyElem,Integer}"><code>AbstractAlgebra.Generic.evaluate</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">evaluate(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, AbstractFloat})</code></pre><blockquote><p>Evaluate the polynomial <span>$a$</span> at the value <span>$b$</span> and return the result.</p></blockquote></div></section><p>We also overload the functional notation so that the polynomial <span>$f$</span> can be evaluated at <span>$a$</span> by writing <span>$f(a)$</span>. </p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
@@ -216,27 +174,16 @@ julia&gt; T, y = PolynomialRing(S, &quot;y&quot;)
 
 
 julia&gt; f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+([1  0]
-[0  1]))*y+([3  0]
-[0  3])
+x*y^2 + (x + 1)*y + [3 0; 0 3]
 
 julia&gt; k = evaluate(f, 3)
-([12   0]
-[ 0  12])*x+([6  0]
-[0  6])
+[12 0; 0 12]*x + [6 0; 0 6]
 
 julia&gt; m = evaluate(f, x^2 + 2x + 1)
-x^5+([4  0]
-[0  4])*x^4+([7  0]
-[0  7])*x^3+([7  0]
-[0  7])*x^2+([4  0]
-[0  4])*x+([4  0]
-[0  4])
+x^5 + [4 0; 0 4]*x^4 + [7 0; 0 7]*x^3 + [7 0; 0 7]*x^2 + [4 0; 0 4]*x + [4 0; 0 4]
 
 julia&gt; r = f(23)
-([552    0]
-[  0  552])*x+([26   0]
-[ 0  26])
+[552 0; 0 552]*x + [26 0; 0 26]
 </code></pre><h3><a class="nav-anchor" id="Derivative-1" href="#Derivative-1">Derivative</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.derivative-Tuple{NCPolyElem}" href="#AbstractAlgebra.Generic.derivative-Tuple{NCPolyElem}"><code>AbstractAlgebra.Generic.derivative</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">derivative(a::Generic.PolynomialElem)</code></pre><blockquote><p>Return the derivative of the polynomial <span>$a$</span>.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
@@ -247,12 +194,8 @@ julia&gt; T, y = PolynomialRing(S, &quot;y&quot;)
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia&gt; f = x*y^2 + (x + 1)*y + 3
-(x)*y^2+(x+([1  0]
-[0  1]))*y+([3  0]
-[0  3])
+x*y^2 + (x + 1)*y + [3 0; 0 3]
 
 julia&gt; h = derivative(f)
-(([2  0]
-[0  2])*x)*y+(x+([1  0]
-[0  1]))
+[2 0; 0 2]*x*y + x + 1
 </code></pre><footer><hr/><a class="previous" href="../polynomial/"><span class="direction">Previous</span><span class="title">Generic univariate polynomials</span></a><a class="next" href="../mpolynomial_rings/"><span class="direction">Next</span><span class="title">Multivariate Polynomial Ring Interface</span></a></footer></article></body></html>
