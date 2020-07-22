@@ -535,6 +535,12 @@ mutable struct LaurentPolyWrap{T  <: RingElement,
    poly::PE
    mindeg::Int
 
+   # A LaurentPolyWrap object is specified by a backing polynomial `poly` and
+   # an integer `mindeg`, and represents `poly * x^mindeg`, where `x` is a generator
+   # of the parent ring; no "normalization" is done, i.e.
+   # `LaurentPolyWrap(poly*x^i, mindeg-i)` is another valid representation for the same
+   # Laurent polynomial, where i is an integer.
+
    function LaurentPolyWrap(poly::PE, mindeg::Int=0) where {T  <: RingElement,
                                                             PE <: AbstractAlgebra.PolyElem{T}}
       new{T, PE}(poly, mindeg)

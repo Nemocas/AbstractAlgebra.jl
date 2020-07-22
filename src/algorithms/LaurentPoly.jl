@@ -124,7 +124,13 @@ gens(R::LaurentPolynomialRing) = [gen(R)]
 
 isgen(p::LaurentPolyElem) = p == gen(parent(p))
 
-# whether p is a (monic) monomial of degree i
+# whether p is a (monic) monomial of degree i;
+# * if `rec==false`, return true iff `p` has only one non-null coefficient
+#   (of degree i) at the outer layer, and this coefficient (element of the
+#   base ring) is one.
+# * if `rec==true` (currently unimplemented), return true if `p` is a
+#   monomial of degree i at any layer (i.e. the non-null coefficient at the
+#   outer layer must be itself a monomial (in the recursive meaning)
 function ismonomial(p::LaurentPolyElem, i::Integer; rec::Bool=true)
    rec && error("not implemented")
    dr = degrees_range(p)
