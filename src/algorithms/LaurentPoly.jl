@@ -35,7 +35,7 @@ end
 const hashp_seed = UInt === UInt64 ? 0xcdaf0e0b5ade239b : 0x5ade239b
 
 function Base.hash(p::LaurentPolyElem, h::UInt)
-   for i in monomials_degrees(p)
+   for i in terms_degrees(p)
       c = coeff(p, i)
       if !iszero(c)
          h = hash(i, h)
@@ -47,17 +47,17 @@ end
 
 # required implementation
 """
-    monomials_degrees(p::LaurentPolyElem) -> AbstractVector{<:Integer}
+    terms_degrees(p::LaurentPolyElem) -> AbstractVector{<:Integer}
 
 > Return a vector containing at least all the degrees of the non-null
-> monomials of `p`.
+> terms of `p`.
 """
-function monomials_degrees end
+function terms_degrees end
 
-# return a monomials_degrees vector valid for both polys
-function monomials_degrees(p::LaurentPolyElem, q::LaurentPolyElem)
-   mdp = monomials_degrees(p)
-   mdq = monomials_degrees(q)
+# return a terms_degrees vector valid for both polys
+function terms_degrees(p::LaurentPolyElem, q::LaurentPolyElem)
+   mdp = terms_degrees(p)
+   mdq = terms_degrees(q)
    T = promote_type(eltype(mdp), eltype(mdq))
    @assert T <: Signed # -one(T) must not wrap around
    if isempty(mdq)
@@ -77,10 +77,10 @@ function monomials_degrees(p::LaurentPolyElem, q::LaurentPolyElem)
    end
 end
 
-# like monomials_degrees, but return a "strict" range, whose min/max
+# like terms_degrees, but return a "strict" range, whose min/max
 # corresponds to non-zero coeffs, or an empty range for p == 0
 function degrees_range(p::LaurentPolyElem)
-   mds = monomials_degrees(p)
+   mds = terms_degrees(p)
    T = eltype(mds)
    minp, maxp = isempty(mds) ? (T(0), T(0)) : extrema(mds)
    while iszero(coeff(p, minp))
@@ -94,15 +94,15 @@ function degrees_range(p::LaurentPolyElem)
 end
 
 
-# return the degree of the unique monomial, throw if not a monomial
-function monomial_degree(p::LaurentPolyElem)
+# return the degree of the unique term, throw if not a term
+function term_degree(p::LaurentPolyElem)
    isnull = true
    local deg
-   mds = monomials_degrees(p)
-   isempty(mds) && throw(DomainError(p, "not a monomial"))
+   mds = terms_degrees(p)
+   isempty(mds) && throw(DomainError(p, "not a term"))
    for d in mds
       if !iszero(coeff(p, d))
-         !isnull && throw(DomainError(p, "not a monomial"))
+         !isnull && throw(DomainError(p, "not a term"))
          deg = d
          isnull = false
       end
@@ -154,7 +154,7 @@ end
 ###############################################################################
 
 ==(p::LaurentPolyElem, q::LaurentPolyElem) =
-   all(i -> coeff(p, i) == coeff(q, i), monomials_degrees(p, q))
+   all(i -> coeff(p, i) == coeff(q, i), terms_degrees(p, q))
 
 
 ###############################################################################
@@ -165,7 +165,7 @@ end
 
 function Base.isapprox(p::LaurentPolyElem, q::LaurentPolyElem; atol::Real=sqrt(eps()))
    check_parent(p, q)
-   all(monomials_degrees(p, q)) do d
+   all(terms_degrees(p, q)) do d
       isapprox(coeff(p, d), coeff(q, d); atol=atol)
    end
 end

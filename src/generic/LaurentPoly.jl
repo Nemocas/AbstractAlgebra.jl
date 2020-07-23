@@ -4,8 +4,8 @@
 #
 ###############################################################################
 
-import AbstractAlgebra: monomials_degrees
-using AbstractAlgebra: monomial_degree, degrees_range, ismonomial_nonrec
+import AbstractAlgebra: terms_degrees
+using AbstractAlgebra: term_degree, degrees_range, ismonomial_nonrec
 
 ###############################################################################
 #
@@ -38,7 +38,7 @@ characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
 #
 ###############################################################################
 
-monomials_degrees(p::LaurentPolyWrap) = p.mindeg .+ (0:degree(p.poly))
+terms_degrees(p::LaurentPolyWrap) = p.mindeg .+ (0:degree(p.poly))
 
 coeff(p::LaurentPolyWrap, i::Int) =
    i < p.mindeg ? zero(base_ring(p)) : coeff(p.poly, i - p.mindeg)
@@ -123,8 +123,8 @@ function ^(p::LaurentPolyWrap, e::Integer)
    if e >= 0
       LaurentPolyWrap(p.poly^e, p.mindeg * e)
    else
-      # p must be a monomial, whose coeff is invertible
-      deg = monomial_degree(p)
+      # p must be a term, whose coeff is invertible
+      deg = term_degree(p)
       c = coeff(p, deg)
       # the following is to allow x^-3 even if 1^-3 is failing
       c = isone(c) ? c : c^e
