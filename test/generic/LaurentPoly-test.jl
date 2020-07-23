@@ -56,6 +56,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
    @testset "basic manipulation" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
       x = y.poly
+      Z, z = LaurentPolynomialRing(L, "z")
+      T, t = LaurentPolynomialRing(L.polyring, "t")
 
       @test monomials_degrees(y) == 0:1
       @test monomials_degrees(y^3) == 0:3
@@ -79,6 +81,17 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
       @test gens(L)[1] == y
       @test length(gens(L)) == 1
+
+      @test ismonomial(y)
+      @test ismonomial(y^-3)
+      @test !ismonomial(2y)
+      @test !ismonomial(y^-1 + y)
+      @test ismonomial(z^2)
+      # TODO: remove Z constructor below, when ambiguities are fixed
+      @test ismonomial(Z(y^-3)*z^4)
+      @test !ismonomial(Z(y+y^2)*z)
+      @test ismonomial(x^2*t^-3)
+      @test !ismonomial((x+x^2)*t)
 
       @test !isunit(zero(L))
 

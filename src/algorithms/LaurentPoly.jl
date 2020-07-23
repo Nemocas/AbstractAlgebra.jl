@@ -135,6 +135,12 @@ function ismonomial_nonrec(p::LaurentPolyElem, i::Integer)
    isone(coeff(p, i))
 end
 
+function ismonomial(p::LaurentPolyElem)
+   dr = degrees_range(p)
+   length(dr) == 1 || return false
+   ismonomial(coeff(p, dr[]))
+end
+
 function isunit(p::LaurentPolyElem)
    dr = degrees_range(p)
    length(dr) == 1 || return false
