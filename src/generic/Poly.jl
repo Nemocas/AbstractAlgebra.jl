@@ -4,18 +4,18 @@
 #
 ###############################################################################
 
-export PolynomialRing, hash, coeff, isgen, lead,
-       var, truncate, mullow, reverse, shift_left, shift_right, divexact,
-       pseudorem, pseudodivrem, gcd, degree, content, primpart, evaluate,
-       compose, derivative, integral, resultant, discriminant, gcdx, zero, one,
-       gen, length, iszero, normalise, isone, isunit, addeq!, mul!, fit!,
-       setcoeff!, mulmod, powmod, invmod, lcm, divrem, mod, gcdinv, resx,
-       canonical_unit, var, chebyshev_t, chebyshev_u, set_length!,
-       mul_classical, mul_ks, subst, mul_karatsuba, trail,
-       pow_multinomial, monomial_to_newton!, newton_to_monomial!, ismonomial,
-       base_ring, parent_type, elem_type, check_parent, promote_rule,
-       needs_parentheses, displayed_with_minus_in_front, show_minus_one,
-       remove, zero!, add!, interpolate, sylvester_matrix
+export PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
+       reverse, shift_left, shift_right, divexact, pseudorem, pseudodivrem,
+       gcd, degree, content, primpart, evaluate, compose, derivative, integral,
+       resultant, discriminant, gcdx, zero, one, gen, length, iszero,
+       normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod,
+       invmod, lcm, divrem, mod, gcdinv, resx, canonical_unit, var,
+       chebyshev_t, chebyshev_u, set_length!, mul_classical, mul_ks, subst,
+       mul_karatsuba, trail, pow_multinomial, monomial_to_newton!,
+       newton_to_monomial!, isterm, isterm_recursive, ismonomial,
+       ismonomial_recursive, base_ring, parent_type, elem_type, check_parent,
+       promote_rule, needs_parentheses, displayed_with_minus_in_front,
+       show_minus_one, remove, zero!, add!, interpolate, sylvester_matrix
 
 ###############################################################################
 #
@@ -211,15 +211,37 @@ end
 """
 isunit(a::PolynomialElem) = length(a) == 1 && isunit(coeff(a, 0))
 
-isterm(a::T) where {T <: RingElement} = true
+###############################################################################
+#
+#  Monomial and term
+#
+###############################################################################
 
 @doc Markdown.doc"""
-    isterm(a::Generic.PolynomialElem)
+    isterm(a::PolynomialElem)
+> Return `true` if the given polynomial has one term.
+"""
+function isterm(a::PolynomialElem)
+   if iszero(a)
+      return false
+   end
+   for i = 1:length(a) - 1
+      if !iszero(coeff(a, i - 1))
+         return false
+      end
+   end
+   return true
+end
+
+isterm_recursive(a::T) where {T <: RingElement} = true
+
+@doc Markdown.doc"""
+    isterm_recursive(a::PolynomialElem)
 > Return `true` if the given polynomial has one term. This function is
 > recursive, with all scalar types returning true.
 """
-function isterm(a::PolynomialElem)
-   if !isterm(lead(a))
+function isterm_recursive(a::PolynomialElem)
+   if !isterm_recursive(lead(a))
       return false
    end
    for i = 1:length(a) - 1
@@ -230,14 +252,12 @@ function isterm(a::PolynomialElem)
    return true
 end
 
-ismonomial(a::T) where {T <: RingElement} = isone(a)
-
 @doc Markdown.doc"""
-    ismonomial(a::Generic.PolynomialElem)
+    ismonomial_recursive(a::PolynomialElem)
 > Return `true` if the given polynomial is a monomial.
 """
 function ismonomial(a::PolynomialElem)
-   if !ismonomial(lead(a))
+   if !isone(lead(a))
       return false
    end
    for i = 1:length(a) - 1
@@ -247,6 +267,31 @@ function ismonomial(a::PolynomialElem)
    end
    return true
 end
+
+ismonomial_recursive(a::T) where {T <: RingElement} = isone(a)
+
+@doc Markdown.doc"""
+    ismonomial_recursive(a::PolynomialElem)
+> Return `true` if the given polynomial is a monomial. This function is
+> recursive, with all scalar types returning true.
+"""
+function ismonomial_recursive(a::PolynomialElem)
+   if !ismonomial_recursive(lead(a))
+      return false
+   end
+   for i = 1:length(a) - 1
+      if !iszero(coeff(a, i - 1))
+         return false
+      end
+   end
+   return true
+end
+
+###############################################################################
+#
+#   Deepcopy
+#
+################################################################################
 
 function deepcopy_internal(a::Poly{T}, dict::IdDict) where {T <: RingElement}
    coeffs = Array{T}(undef, length(a))
@@ -1437,8 +1482,8 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ign
       b = divexact(b, c2)
       c = gcd(c1, c2)
    end
-   lead_monomial = isterm(lead(a)) || isterm(lead(b))
-   trail_monomial = isterm(trail(a)) || isterm(trail(b))
+   lead_monomial = isterm_recursive(lead(a)) || isterm_recursive(lead(b))
+   trail_monomial = isterm_recursive(trail(a)) || isterm_recursive(trail(b))
    lead_a = lead(a)
    lead_b = lead(b)
    g = one(parent(a))
@@ -1462,7 +1507,7 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ign
       end
    end
    if !ignore_content
-      if !isterm(lead(b)) && !isterm(trail(b))
+      if !isterm_recursive(lead(b)) && !isterm_recursive(trail(b))
          if lead_monomial # lead term monomial, so content contains rest
             d = divexact(lead(b), term_content(lead(b)))
             b = divexact(b, d)
@@ -1471,7 +1516,7 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ign
             b = divexact(b, d)
          else
             glead = gcd(lead_a, lead_b)
-            if isterm(glead)
+            if isterm_recursive(glead)
                d = divexact(lead(b), term_content(lead(b)))
                b = divexact(b, d)
             else # last ditched attempt to find easy content

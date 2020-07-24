@@ -123,13 +123,18 @@ end
 
    @test deepcopy(h) == h
 
+   @test isterm_recursive(2*x*y^2)
+   @test !isterm_recursive(2*(x + 1)*y^2)
+
+   @test !isterm(2*x*y^2 + 1)
    @test isterm(2*x*y^2)
 
-   @test !ismonomial(2*x*y^2)
+   @test !ismonomial_recursive(2*x*y^2)
 
-   @test ismonomial(x*y^2)
+   @test ismonomial(y^2)
 
-   @test !ismonomial(2*x*y^2 + y + 1)
+   @test !ismonomial_recursive(2*x*y^2 + y + 1)
+   @test !ismonomial(2*y^2)
 
    @test characteristic(R) == 0
 end

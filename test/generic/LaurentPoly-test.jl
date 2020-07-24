@@ -92,9 +92,11 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test ismonomial(z^2)
       # TODO: remove Z constructor below, when ambiguities are fixed
       @test ismonomial(Z(y^-3)*z^4)
-      @test !ismonomial(Z(y+y^2)*z)
-      @test ismonomial(x^2*t^-3)
-      @test !ismonomial((x+x^2)*t)
+      @test ismonomial_recursive(Z(y^-3)*z^4)
+      @test !ismonomial_recursive(Z(y+y^2)*z)
+      @test ismonomial_recursive(x^2*t^-3)
+      @test !ismonomial(x^2*t^-3)
+      @test !ismonomial_recursive((x+x^2)*t)
 
       @test !isunit(zero(L))
 

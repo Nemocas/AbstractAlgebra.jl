@@ -278,7 +278,15 @@ ismonomial(::PolyElem)
 ```
 
 ```@docs
+ismonomial_recursive(::PolyElem)
+```
+
+```@docs
 isterm(::PolyElem)
+```
+
+```@docs
+isterm_recursive(::PolyElem)
 ```
 
 **Examples**
@@ -334,6 +342,12 @@ true
 
 julia> ismonomial(y^2)
 true
+
+julia> ismonomial_recursive(x*y^2)
+true
+
+julia> ismonomial(x*y^2)
+false
 
 ```
 

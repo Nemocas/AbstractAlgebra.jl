@@ -30,7 +30,7 @@ import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
 
 import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring, check_parent,
                           denominator, div, divrem, exp, gen, gens, isgen,
-                          ismonomial, isunit, lead, numerator, trail, sqrt, expressify
+                          ismonomial, ismonomial_recursive, isunit, lead, numerator, trail, sqrt, expressify
 
 using ..AbstractAlgebra
 

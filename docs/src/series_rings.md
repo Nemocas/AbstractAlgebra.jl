@@ -292,7 +292,7 @@ julia> c = polcoeff(f, 1)
 3
 
 julia> set_length!(g, 3)
-3
+x^3 + 2*x^4 + O(x^10)
 
 julia> g = setcoeff!(g, 2, BigInt(11))
 x^3 + 2*x^4 + 11*x^5 + O(x^10)
