@@ -379,15 +379,14 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
    @testset "printing" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
-      @test string(y) == "y"
-      @test string(L) == "Univariate Laurent Polynomial Ring in y over Integers"
+      @test sprint(show, "text/plain", y) == "y"
+      @test sprint(show, "text/plain", L) == "Univariate Laurent Polynomial Ring in y over Integers"
       p = y^1; p.mindeg = -3
-      @test string(p) == "y^-2"
+      @test sprint(show, "text/plain", p) == "y^-2"
       R, z = PolynomialRing(L, "z")
-      @test string((y^2)*z) == "(y^2)*z"
-      @test string(3*(y^0)*z) == "3*z"
-      @test needs_parentheses(zero(L)) == false
-      @test string(-y*z + (-y*z^2)) == "(-y)*z^2 + (-y)*z" # uses displayed_with_minus_in_front
-      @test_broken string(-y^0*z) == "-z" # uses show_minus_one
+      @test sprint(show, "text/plain", (y^2)*z) == "y^2*z"
+      @test sprint(show, "text/plain", 3*(y^0)*z) == "3*z"
+      @test sprint(show, "text/plain", -y*z + (-y*z^2)) == "-y*z^2 - y*z"
+      @test sprint(show, "text/plain", -y^0*z) == "-z"
    end
 end

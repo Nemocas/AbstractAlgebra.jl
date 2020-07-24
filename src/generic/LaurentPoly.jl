@@ -270,50 +270,37 @@ end
 #
 ###############################################################################
 
-function show(io::IO, y::LaurentPolyWrap)
+function AbstractAlgebra.expressify(y::LaurentPolyWrap, S = var(parent(y));
+                                                        context = nothing)
    x = y.poly
    mindeg = y.mindeg
    len = length(x)
-   S = var(parent(x))
-   if len == 0
-      print(IOContext(io, :compact => true), base_ring(x)(0))
-   else
-      for i = 1:len
-         c = coeff(x, len - i)
-         bracket = needs_parentheses(c)
-         if !iszero(c)
-            if i != 1 && !displayed_with_minus_in_front(c)
-               print(io, "+")
-            end
-            if len - i + mindeg != 0
-               if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
-                  if bracket
-                     print(io, "(")
-                  end
-                  print(IOContext(io, :compact => true), c)
-                  if bracket
-                     print(io, ")")
-                  end
-                  print(io, "*")
-               end
-               if c == -1 && !show_minus_one(typeof(c))
-                  print(io, "-")
-               end
-               print(io, string(S))
-               if len - i + mindeg != 1
-                  print(io, "^")
-                  print(io, len - i + mindeg)
-               end
-            else # constant term
-               if bracket
-                  print(io, "(")
-               end
-               print(IOContext(io, :compact => true), c)
-               if bracket
-                  print(io, ")")
-               end
-            end
+   sum = Expr(:call, :+)
+   for i in 1:len
+      c = coeff(x, len - i)
+      k = len - i + mindeg
+      if !iszero(c)
+         if k == 0
+            xk = 1
+         elseif k == 1
+            xk = S
+         else
+            xk = Expr(:call, :^, S, k)
+         end
+         if isone(c)
+            push!(sum.args, Expr(:call, :*, xk))
+         else
+            push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
          end
       end
    end
+   return sum
+end
+
+function Base.show(io::IO, ::MIME"text/plain", a::LaurentPolyWrap)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, a::LaurentPolyWrap)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
