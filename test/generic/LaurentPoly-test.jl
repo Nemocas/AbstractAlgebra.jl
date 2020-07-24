@@ -350,6 +350,19 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       # TODO: add a test for when p.poly is immutable
    end
 
+   @testset "shifting" begin
+      L, y = LaurentPolynomialRing(ZZ, "y")
+
+      p = 2y - 3y^-2
+      @test shift_left(p, 0) == p
+      @test shift_left(p, 3) == 2y^4 - 3y
+      @test_throws DomainError shift_left(p, -rand(1:99))
+
+      @test shift_right(p, 0) == p
+      @test shift_right(p, 3) == 2y^-2 - 3y^-5
+      @test_throws DomainError shift_right(p, -rand(1:99))
+   end
+
    @testset "rand" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
 

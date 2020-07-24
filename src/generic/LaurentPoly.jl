@@ -209,6 +209,31 @@ function add!(c::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T
    c
 end
 
+###############################################################################
+#
+#   Shifting
+#
+###############################################################################
+
+# return a copy of `f` whose underlying poly has a constant term
+# (this maximizes the .mindeg field)
+function canonicalize(f::LaurentPolyWrap)
+   td = trail_degree(f)
+   tdp = td - f.mindeg # trail degree for f.poly
+   LaurentPolyWrap(shift_right(f.poly, tdp), td)
+end
+
+function shift_left(f::LaurentPolyWrap, n::Integer)
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
+   f = canonicalize(f) # this ensures the underlying polynomial is copied
+   LaurentPolyWrap(f.poly, f.mindeg + n)
+end
+
+function shift_right(f::LaurentPolyWrap, n::Integer)
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
+   f = canonicalize(f) # this ensures the underlying polynomial is copied
+   LaurentPolyWrap(f.poly, f.mindeg - n)
+end
 
 ###############################################################################
 #
