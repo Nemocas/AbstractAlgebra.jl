@@ -52,6 +52,10 @@ characteristic(::Integers{T}) where T <: Integer = 0
 #
 ###############################################################################
 
+function expressify(a::Integer; context = nothing)
+    return a
+end
+
 function show(io::IO, R::Integers)
    print(io, "Integers")
 end

@@ -17,11 +17,13 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
                   :promote_rule,
                   :Set, :Module, :Ring, :Group, :Field]
 
-import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg
+# If you want to add methods to functions in LinearAlgebra they should be
+# imported here and in Generic.jl, and exported below.
+# They should not be imported/exported anywhere else.
+
+import LinearAlgebra: det, issymmetric, norm, nullspace, rank, transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
-
-export nullspace
 
 ################################################################################
 #
@@ -77,6 +79,10 @@ function denominator(a::T, canonicalise::Bool=true) where T
   return Base.denominator(a, canonicalise)
 end
 
+# If you want to add methods to functions in Base they should be imported here
+# and in Generic.jl.
+# They should not be imported/exported anywhere else.
+
 import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, bin,
              ceil, checkbounds, conj, convert, cmp, cos, cosh, cospi, cot,
              coth, dec, deepcopy, deepcopy_internal, expm1, exponent, fill,
@@ -113,7 +119,10 @@ export create_accessors, get_handle, package_handle, zeros,
 
 export error_dim_negative, ErrorConstrDimMismatch
 
-export crt
+export crt, factor
+
+function expressify
+end
 
 ###############################################################################
 # Macros for fancy printing and extending objects when desired
@@ -250,7 +259,7 @@ macro show_special_elem(io, e)
 end
 
 ###############################################################################
-# generic fall back if no imediate coercion is possible
+# generic fall back if no immediate coercion is possible
 # can/ should be called for more generic general coercion mechanisms
 
 #tries to turn b into an element of a
@@ -266,18 +275,27 @@ end
 #   parent(b) == a && return a
 #   return force_coerce(a, b)
 #
-function force_coerce(a, b; throw_error::Bool = true)
-  throw_error && error("coercion not possible")
-  return false
+function force_coerce(a, b, throw_error::Type{Val{T}} = Val{true}) where {T}
+  if throw_error === Val{true}
+    throw(error("coercion not possible"))
+  else
+    return nothing
+  end
 end
 
 #to allow +(a::T, b::T) where a, b have different parents, but
 # a common over structure
 # designed(?) to be minimally invasive in AA and Nemo, but filled with
 # content in Hecke/Oscar
-function force_op(op::Function, a...; throw_error::Bool = true)
-  throw_error && error("no common overstructure for the arguments found")
+function force_op(op::Function, throw_error::Type{Val{T}}, a...) where {T}
+  if throw_error === Val{true}
+    throw(error("no common overstructure for the arguments found"))
+  end
   return false
+end
+
+function force_op(op::Function, a...)
+  return force_op(op, Val{true}, a...)
 end
 
 ###############################################################################
@@ -345,7 +363,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  codomain, coeff, coeffs, ncols,
                  combine_like_terms!, compose, content, cycles,
                  data, deflate, deflation, degree, degrees,
-                 dense_matrix_type, derivative, det, det_clow,
+                 dense_matrix_type, derivative, det_clow,
                  det_df, det_fflu, det_popov, diagonal_matrix, dim, disable_cache!,
                  discriminant,
                  divexact, divexact_left, divexact_right, divides,
@@ -393,14 +411,14 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  permtype, @perm_str, polcoeff, pol_length, powmod,
                  pow_multinomial, popov, popov_with_transform,
                  precision, preimage, preimage_map, primpart, pseudodivrem,
-                 pseudo_inv, pseudorem, push_term!, rank, randmat_triu,
+                 pseudo_inv, pseudorem, push_term!, randmat_triu,
                  randmat_with_rank, rand_ordering, rank_profile_popov, remove,
                  renormalize!, rels, rescale!, resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, retraction_map, reverse,
                  right_kernel, rref, rref!, section_map, setcoeff!,
                  set_exponent_vector!, set_field!, set_length!, set_limit!,
-                 setpermstyle, set_prec!, set_val!, size, shift_left,
+                 setpermstyle, set_precision!, set_val!, size, shift_left,
                  shift_right, similarity!, snf, snf_kb,
                  snf_kb_with_transform, snf_with_transform, solve, solve_left,
                  solve_rational, solve_triu, sort_terms!, sub, subst, summands,
@@ -449,7 +467,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  isdomain_type, isexact_type, isgen, ishessenberg,
                  ishnf, ishomogeneous, isisomorphic, ismonomial,
                  isnegative, isone, isreverse,
-                 isrimhook, isrref, issquare, issubmodule,
+                 isrimhook, isrref, issquare, issubmodule, issymmetric,
                  isterm, isunit, iszero,
                  iszero_row, iszero_column, kernel,
                  kronecker_product, laurent_ring,
@@ -467,10 +485,10 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  mul_karatsuba, mul_ks, mul_red!, mullow, mulmod,
                  multiply_column, multiply_column!, multiply_row,
                  multiply_row!, needs_parentheses, newton_to_monomial!, ngens,
-                 normalise, nrows, nvars, O, one, order, ordering, parent_type,
-                 parity, partitionseq, Perm, perm, permtype, @perm_str, polcoeff,
-                 pol_length, powmod, pow_multinomial, popov,
-                 popov_with_transform, powers, ppio, precision, preimage,
+                 normalise, nrows, nullspace, nvars, O, one, order, ordering,
+                 parent_type, parity, partitionseq, Perm, perm, permtype,
+                 @perm_str, polcoeff, pol_length, powmod, pow_multinomial,
+                 popov, popov_with_transform, powers, ppio, precision, preimage,
                  preimage_map, primpart, pseudo_inv, pseudodivrem, pseudorem,
                  push_term!, rank, randmat_triu, randmat_with_rank,
                  rand_ordering, rank_profile_popov, reduce!, remove,
@@ -479,7 +497,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  resultant_sylvester, resx, retraction_map, reverse,
                  right_kernel, rref, rref!, section_map, setcoeff!,
                  set_exponent_vector!, set_field!, set_length!, set_limit!,
-                 setpermstyle, set_prec!, set_val!, shift_left, shift_right,
+                 setpermstyle, set_precision!, set_val!, shift_left, shift_right,
                  show_minus_one, similarity!, size, snf, snf_kb,
                  snf_kb_with_transform, snf_with_transform, solve, solve_left,
                  solve_rational, solve_triu, sort_terms!, sub, subst, summands,
@@ -668,11 +686,11 @@ end
 > Return the vector space over the field $R$ with the given dimension.
 """
 function VectorSpace(R::Field, dim::Int; cached::Bool = true)
-   Generic.FreeModule(R, dim)
+   Generic.FreeModule(R, dim; cached=cached)
 end
 
 function vector_space(R::Field, dim::Int; cached::Bool = true)
-   Generic.FreeModule(R, dim)
+   Generic.FreeModule(R, dim; cached=cached)
 end
 
 @doc Markdown.doc"""
@@ -761,6 +779,8 @@ end
 # add empty functions so that Singular, Nemo and Hecke can import and extend.
 function crt end
 
+function factor end
+
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, LaurentPolynomialRing,
        MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
@@ -809,6 +829,22 @@ include("error.jl")
 ###############################################################################
 
 include("Groups.jl")
+
+################################################################################
+#
+#   Printing
+#
+################################################################################
+
+include("PrettyPrinting.jl")
+
+################################################################################
+#
+#   Deprecations
+#
+################################################################################
+
+include("Deprecations.jl")
 
 ###############################################################################
 #

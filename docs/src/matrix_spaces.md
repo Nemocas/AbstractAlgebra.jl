@@ -297,19 +297,19 @@ julia> S = MatrixSpace(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-[t+1//1       t        1//1]
-[   t^2       t           t]
-[ -2//1  t+2//1  t^2+t+1//1]
+[t + 1      t            1]
+[  t^2      t            t]
+[   -2  t + 2  t^2 + t + 1]
 
 julia> B = transpose(A)
-[t+1//1  t^2       -2//1]
-[     t    t      t+2//1]
-[  1//1    t  t^2+t+1//1]
+[t + 1  t^2           -2]
+[    t    t        t + 2]
+[    1    t  t^2 + t + 1]
 
 julia> C = A'
-[t+1//1  t^2       -2//1]
-[     t    t      t+2//1]
-[  1//1    t  t^2+t+1//1]
+[t + 1  t^2           -2]
+[    t    t        t + 2]
+[    1    t  t^2 + t + 1]
 
 ```
 
@@ -505,4 +505,32 @@ julia> D = zero(M, QQ, 2, 2)
 
 julia> base_ring(D)
 Rationals
+```
+### Optional symmetry test
+
+```julia
+LinearAlgebra.issymmetric(a::MatrixElem)
+```
+
+Return `true` if the given matrix is symmetric with respect to its main diagonal,
+otherwise return `false`.
+
+**Examples**
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
+[1  2  3]
+[2  4  5]
+[3  5  6]
+
+julia> issymmetric(M)
+true
+
+julia> N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
+[1  2  3]
+[4  5  6]
+[7  8  9]
+
+julia> issymmetric(N)
+false
 ```

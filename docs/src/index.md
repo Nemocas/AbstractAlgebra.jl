@@ -7,7 +7,6 @@ maintained by William Hart, Tommy Hofmann, Claus Fieker and Fredrik Johansson an
 other interested contributors.
 
 - [Source code](https://github.com/Nemocas/AbstractAlgebra.jl)
-- [Online documentation](http://nemocas.github.io/AbstractAlgebra.jl/latest)
 
 AbstractAlgebra.jl grew out of the Nemo project after a number of requests from the
 community for the pure Julia part of Nemo to be split off into a separate project. See

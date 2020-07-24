@@ -500,7 +500,7 @@ end
       s = rand(0:12)
       g = rand(R, 0:0, -10:10) + O(x^s)
 
-      set_prec!(g, max(precision(g), precision(f) + s))
+      g = set_precision!(g, max(precision(g), precision(f) + s))
 
       @test shift_right(shift_left(f, s) + g, s) == f
       @test isequal(shift_left(f, s), x^s*f)
@@ -520,7 +520,7 @@ end
       s = rand(0:12)
       g = rand(R, 0:0, -1:1) + O(x^s)
 
-      set_prec!(g, max(precision(g), precision(f) + s))
+      g = set_precision!(g, max(precision(g), precision(f) + s))
 
       @test isapprox(shift_right(shift_left(f, s) + g, s), f)
       @test isapprox(shift_left(f, s), x^s*f)
@@ -541,7 +541,7 @@ end
       s = rand(0:12)
       g = rand(R, 0:0, 0:5) + O(x^s)
 
-      set_prec!(g, max(precision(g), precision(f) + s))
+      g = set_precision!(g, max(precision(g), precision(f) + s))
 
       @test shift_right(shift_left(f, s) + g, s) == f
       @test isequal(shift_left(f, s), x^s*f)

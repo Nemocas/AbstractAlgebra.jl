@@ -270,53 +270,29 @@ canonical_unit(x::PolynomialElem) = canonical_unit(lead(x))
 #
 ###############################################################################
 
-show(io::IO, x::PolynomialElem) = _show(io, x, 0)
-show(io::IO, x::LaurentPolyWrap) = _show(io, x.poly, x.mindeg)
+function AbstractAlgebra.expressify(@nospecialize(a::Union{PolynomialElem, NCPolyElem}),
+                                    x = var(parent(a)); context = nothing)
+    sum = Expr(:call, :+)
+    for k in degree(a):-1:0
+        c = coeff(a, k)
+        if !iszero(c)
+            xk = k < 1 ? 1 : k == 1 ? x : Expr(:call, :^, x, k)
+            if isone(c)
+                push!(sum.args, Expr(:call, :*, xk))
+            else
+                push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
+            end
+        end
+    end
+    return sum
+end
 
-function _show(io::IO, x::PolynomialElem, mindeg::Int)
-   len = length(x)
-   S = var(parent(x))
-   if len == 0
-      print(IOContext(io, :compact => true), base_ring(x)(0))
-   else
-      for i = 1:len
-         c = coeff(x, len - i)
-         bracket = needs_parentheses(c)
-         if !iszero(c)
-            if i != 1 && !displayed_with_minus_in_front(c)
-               print(io, "+")
-            end
-            if len - i + mindeg != 0
-               if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
-                  if bracket
-                     print(io, "(")
-                  end
-                  print(IOContext(io, :compact => true), c)
-                  if bracket
-                     print(io, ")")
-                  end
-                  print(io, "*")
-               end
-               if c == -1 && !show_minus_one(typeof(c))
-                  print(io, "-")
-               end
-               print(io, string(S))
-               if len - i + mindeg != 1
-                  print(io, "^")
-                  print(io, len - i + mindeg)
-               end
-            else # constant term
-               if bracket
-                  print(io, "(")
-               end
-               print(IOContext(io, :compact => true), c)
-               if bracket
-                  print(io, ")")
-               end
-            end
-         end
-      end
-   end
+function Base.show(io::IO, ::MIME"text/plain", a::Union{PolynomialElem, NCPolyElem})
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, a::Union{PolynomialElem, NCPolyElem})
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, p::AbstractAlgebra.PolyRing)
@@ -349,7 +325,7 @@ function -(a::PolynomialElem)
    for i = 1:len
       z = setcoeff!(z, i - 1, -coeff(a, i - 1))
    end
-   set_length!(z, len)
+   z = set_length!(z, len)
    return z
 end
 
@@ -383,7 +359,7 @@ function +(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where
       z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
-   set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, normalise(z, i - 1))
    return z
 end
 
@@ -411,7 +387,7 @@ function -(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where
       z = setcoeff!(z, i - 1, -coeff(b, i - 1))
       i += 1
    end
-   set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, normalise(z, i - 1))
    return z
 end
 
@@ -532,7 +508,7 @@ function mul_ks(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) 
       end
       setcoeff!(r, i - 1, u)
    end
-   set_length!(r, normalise(r, lenr))
+   r = set_length!(r, normalise(r, lenr))
    return r
 end
 
@@ -562,7 +538,7 @@ function mul_classical(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyEl
       d[i] = reduce!(d[i])
    end
    z = parent(a)(d)
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -592,7 +568,7 @@ function *(a::T, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElem}
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -607,7 +583,7 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -651,7 +627,7 @@ function pow_multinomial(a::AbstractAlgebra.PolyElem{T}, e::Int) where {T <: Rin
       res[k + 1] = divexact(res[k + 1], d)
    end
    z = parent(a)(res)
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -670,7 +646,7 @@ function ^(a::AbstractAlgebra.PolyElem{T}, b::Int) where {T <: RingElement}
       for i = 1:b
          z = setcoeff!(z, i - 1, deepcopy(coeff(a, 0)))
       end
-      set_length!(z, b + 1)
+      z = set_length!(z, b + 1)
       return z
    elseif b == 0
       return one(R)
@@ -849,7 +825,7 @@ function truncate(a::PolynomialElem, n::Int)
    for i = 1:lenz
       z = setcoeff!(z, i - 1, coeff(a, i - 1))
    end
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -891,7 +867,7 @@ function mullow(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, 
       d[i] = reduce!(d[i])
    end
    z = parent(a)(d)
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -916,7 +892,7 @@ function reverse(x::PolynomialElem, len::Int)
    for i = 1:len
       z = setcoeff!(r, i - 1, coeff(x, len - i))
    end
-   set_length!(r, normalise(r, len))
+   r = set_length!(r, normalise(r, len))
    return r
 end
 
@@ -1074,11 +1050,11 @@ function divexact(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}
       q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1))
       f = f - shift_left(q1*g, lenf - leng)
       if length(f) == lenf # inexact case
-         set_length!(f, normalise(f, lenf - 1))
+         f = set_length!(f, normalise(f, lenf - 1))
       end
    end
    q = parent(f)(d)
-   set_length!(q, lenq)
+   q = set_length!(q, lenq)
    return q
 end
 
@@ -1099,7 +1075,7 @@ function divexact(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem}
    for i = 1:length(a)
       z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
    end
-   set_length!(z, length(a))
+   z = set_length!(z, length(a))
    return z
 end
 
@@ -1114,7 +1090,7 @@ function divexact(a::AbstractAlgebra.PolyElem, b::Union{Integer, Rational, Abstr
    for i = 1:length(a)
       z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
    end
-   set_length!(z, length(a))
+   z = set_length!(z, length(a))
    return z
 end
 
@@ -1146,7 +1122,7 @@ function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) whe
             u = addeq!(u, c)
             f = setcoeff!(f, i + length(f) - length(g) - 1, u)
          end
-         set_length!(f, normalise(f, length(f) - 1))
+         f = set_length!(f, normalise(f, length(f) - 1))
       end
    end
    return f
@@ -1186,7 +1162,7 @@ function Base.divrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem
          u = addeq!(u, c)
          f = setcoeff!(f, i + length(f) - length(g) - 1, u)
       end
-      set_length!(f, normalise(f, length(f) - 1))
+      f = set_length!(f, normalise(f, length(f) - 1))
    end
    return q, f
 end
@@ -1255,7 +1231,7 @@ function pseudodivrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyEle
    while lenq > 0 && iszero(coeff(q, lenq - 1))
       lenq -= 1
    end
-   set_length!(q, lenq)
+   q = set_length!(q, lenq)
    s = b^k
    return q*s, f*s
 end
@@ -1368,7 +1344,7 @@ function divides(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
          u = addeq!(u, c)
          f = setcoeff!(f, i + length(f) - length(g) - 1, u)
       end
-      set_length!(f, normalise(f, length(f)))
+      f = set_length!(f, normalise(f, length(f)))
    end
    return iszero(f), q
 end
@@ -1391,7 +1367,7 @@ function divides(z::AbstractAlgebra.PolyElem{T}, x::T) where {T <: RingElement}
       end
       q = setcoeff!(q, i - 1, c)
    end
-   set_length!(q, flag ? length(z) : 0)
+   q = set_length!(q, flag ? length(z) : 0)
    return flag, q
 end
 
@@ -1643,7 +1619,7 @@ function derivative(a::PolynomialElem)
    for i = 1:len - 1
       z = setcoeff!(z, i - 1, i*coeff(a, i))
    end
-   set_length!(z, normalise(z, len - 1))
+   z = set_length!(z, normalise(z, len - 1))
    return z
 end
 
@@ -1669,7 +1645,7 @@ function integral(x::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlge
    while len > 0 && iszero(coeff(p, len - 1)) # FIXME: cannot use normalise here
       len -= 1
    end
-   set_length!(p, len)
+   p = set_length!(p, len)
    return p
 end
 
@@ -1715,7 +1691,7 @@ function subresultant_ducos(A::AbstractAlgebra.PolyElem{T}, Sd1::AbstractAlgebra
    for j = 0:e1 - 2
       setcoeff!(D, j, se*coeff(A, j))
    end
-   set_length!(D, normalise(D, e1 - 1))
+   D = set_length!(D, normalise(D, e1 - 1))
    Hj = parent(A)()
    fit!(Hj, e1)
    setcoeff!(Hj, e1 - 1, se)
@@ -2192,7 +2168,7 @@ function gcdinv(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) 
    end
    if length(b) == 0
       d = lead(a)
-      return divexact(a, d), inv(d)
+      return divexact(a, d), parent(a)(inv(d))
    end
    if length(a) < length(b)
       a, b = b, a
@@ -2316,7 +2292,7 @@ function interpolate(S::AbstractAlgebra.PolyRing, x::Array{T, 1}, y::Array{T, 1}
    end
    newton_to_monomial!(P, x)
    r = S(P)
-   set_length!(r, normalise(r, n))
+   r = set_length!(r, normalise(r, n))
    return r
 end
 
@@ -2345,7 +2321,7 @@ function interpolate(S::AbstractAlgebra.PolyRing, x::Array{T, 1}, y::Array{T, 1}
    end
    newton_to_monomial!(P, x)
    r = S(P)
-   set_length!(r, normalise(r, n))
+   r = set_length!(r, normalise(r, n))
    return r
 end
 
@@ -2504,6 +2480,7 @@ function set_length!(c::Poly{T}, n::Int) where T <: RingElement
       end
    end
    c.length = n
+   return c
 end
 
 function fit!(c::Poly{T}, n::Int) where {T <: RingElement}
@@ -2521,7 +2498,7 @@ function fit!(c::Poly{T}, n::Int) where {T <: RingElement}
 end
 
 function zero!(c::Poly{T}) where {T <: RingElement}
-   set_length!(c, 0)
+   c = set_length!(c, 0)
    return c
 end
 
@@ -2530,7 +2507,7 @@ function mul!(c::AbstractAlgebra.PolyElem{T}, a::AbstractAlgebra.PolyElem{T}, b:
    lenb = length(b)
 
    if lena == 0 || lenb == 0
-      set_length!(c, 0)
+      c = set_length!(c, 0)
    else
       if a === c
          a = deepcopy(a)
@@ -2559,7 +2536,7 @@ function mul!(c::AbstractAlgebra.PolyElem{T}, a::AbstractAlgebra.PolyElem{T}, b:
          end
       end
 
-      set_length!(c, normalise(c, lenc))
+      c = set_length!(c, normalise(c, lenc))
    end
    return c
 end
@@ -2572,7 +2549,7 @@ function addeq!(c::AbstractAlgebra.PolyElem{T}, a::AbstractAlgebra.PolyElem{T}) 
    for i = 1:lena
       c.coeffs[i] = addeq!(c.coeffs[i], coeff(a, i - 1))
    end
-   set_length!(c, normalise(c, len))
+   c = set_length!(c, normalise(c, len))
    return c
 end
 
@@ -2596,7 +2573,7 @@ function add!(c::AbstractAlgebra.PolyElem{T}, a::AbstractAlgebra.PolyElem{T}, b:
       c = setcoeff!(c, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
-   set_length!(c, normalise(c, len))
+   c = set_length!(c, normalise(c, len))
    return c
 end
 

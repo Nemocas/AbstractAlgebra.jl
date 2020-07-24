@@ -1,6 +1,6 @@
 module Generic
 
-import LinearAlgebra: det, norm,
+import LinearAlgebra: det, issymmetric, norm,
                       nullspace, rank, transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
@@ -30,7 +30,7 @@ import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
 
 import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring, check_parent,
                           denominator, div, divrem, exp, gen, gens, isgen,
-                          ismonomial, isunit, lead, numerator, trail, sqrt
+                          ismonomial, isunit, lead, numerator, trail, sqrt, expressify
 
 using ..AbstractAlgebra
 

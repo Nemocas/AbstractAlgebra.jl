@@ -387,7 +387,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test string((y^2)*z) == "(y^2)*z"
       @test string(3*(y^0)*z) == "3*z"
       @test needs_parentheses(zero(L)) == false
-      @test string(-y*z + (-y*z^2)) == "(-y)*z^2+(-y)*z" # uses displayed_with_minus_in_front
-      @test string(-y^0*z) == "-z" # uses show_minus_one
+      @test string(-y*z + (-y*z^2)) == "(-y)*z^2 + (-y)*z" # uses displayed_with_minus_in_front
+      @test_broken string(-y^0*z) == "-z" # uses show_minus_one
    end
 end

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export PowerSeriesRing, O, valuation, precision, max_precision, set_prec!,
+export PowerSeriesRing, O, valuation, precision, max_precision, set_precision!,
        polcoeff, set_val!, pol_length, renormalize!
 
 ###############################################################################
@@ -118,14 +118,17 @@ end
 
 function set_length!(a::AbstractAlgebra.SeriesElem, len::Int)
    a.length = len
+   return a
 end
 
-function set_prec!(a::AbstractAlgebra.SeriesElem, prec::Int)
+function set_precision!(a::AbstractAlgebra.SeriesElem, prec::Int)
    a.prec = prec
+   return a
 end
 
 function set_val!(a::AbstractAlgebra.RelSeriesElem, val::Int)
    a.val = val
+   return a
 end
 
 function polcoeff(a::RelSeries, n::Int)
@@ -220,16 +223,16 @@ function renormalize!(z::AbstractAlgebra.RelSeriesElem)
    while i < zlen && iszero(polcoeff(z, i))
       i += 1
    end
-   set_prec!(z, zprec)
+   z = set_precision!(z, zprec)
    if i == zlen
-      set_length!(z, 0)
-      set_val!(z, zprec)
+      z = set_length!(z, 0)
+      z = set_val!(z, zprec)
    else
-      set_val!(z, zval + i)
+      z = set_val!(z, zval + i)
       for j = 1:zlen - i
          z = setcoeff!(z, j - 1, polcoeff(z, j + i - 1))
       end
-      set_length!(z, zlen - i)
+      z = set_length!(z, zlen - i)
    end
    return nothing
 end
@@ -244,48 +247,38 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::AbstractAlgebra.RelSeriesElem)
-   len = pol_length(x)
-   if len == 0
-      print(IOContext(io, :compact => true), zero(base_ring(x)))
-   else
-      coeff_printed = false
-      for i = 0:len - 1
-         c = polcoeff(x, i)
-         bracket = needs_parentheses(c)
-         if !iszero(c)
-            if coeff_printed && !displayed_with_minus_in_front(c)
-               print(io, "+")
-            end
-            if i + valuation(x) != 0
-               if !isone(c) && (c != -1 || show_minus_one(elem_type(base_ring(x))))
-                  if bracket
-                     print(io, "(")
-                  end
-                  print(IOContext(io, :compact => true), c)
-                  if bracket
-                     print(io, ")")
-                  end
-                  if i + valuation(x) != 0
-                     print(io, "*")
-                  end
-               end
-               if c == -1 && !show_minus_one(elem_type(base_ring(x)))
-                  print(io, "-")
-               end
-               print(io, string(var(parent(x))))
-               if i + valuation(x) != 1
-                  print(io, "^")
-                  print(io, valuation(x) + i)
-               end
+function AbstractAlgebra.expressify(a::AbstractAlgebra.RelSeriesElem,
+                                    x = var(parent(a)); context = nothing)
+    sum = Expr(:call, :+)
+    v = valuation(a)
+    for i in 0:pol_length(a) - 1
+        k = i + v
+        c = polcoeff(a, i)
+        if !iszero(c)
+            if k == 0
+                xk = 1
+            elseif k == 1
+                xk = x
             else
-               print(IOContext(io, :compact => true), c)
+                xk = Expr(:call, :^, x, k)
             end
-            coeff_printed = true
-         end
-      end
-   end
-   print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
+            if isone(c)
+                push!(sum.args, Expr(:call, :*, xk))
+            else
+                push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
+            end
+        end
+    end
+    push!(sum.args, Expr(:call, :O, Expr(:call, :^, x, precision(a))))
+    return sum
+end
+
+function Base.show(io::IO, a::AbstractAlgebra.SeriesElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, ::MIME"text/plain", a::AbstractAlgebra.SeriesElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, a::SeriesRing)
@@ -312,8 +305,8 @@ show_minus_one(::Type{<:AbstractAlgebra.SeriesElem{T}}) where {T <: RingElement}
 function -(a::AbstractAlgebra.RelSeriesElem)
    len = pol_length(a)
    z = parent(a)()
-   set_prec!(z, precision(a))
-   set_val!(z, valuation(a))
+   z = set_precision!(z, precision(a))
+   z = set_val!(z, valuation(a))
    fit!(z, len)
    for i = 1:len
       z = setcoeff!(z, i - 1, -polcoeff(a, i - 1))
@@ -345,8 +338,8 @@ function +(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
    R = base_ring(a)
    z = parent(a)()
    fit!(z, lenz)
-   set_prec!(z, prec)
-   set_val!(z, valz)
+   z = set_precision!(z, prec)
+   z = set_val!(z, valz)
    if vala >= valb
       for i = 1:min(lenb, vala - valb)
          z = setcoeff!(z, i - 1, deepcopy(polcoeff(b, i - 1)))
@@ -380,7 +373,7 @@ function +(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
          z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - 1)))
       end
    end
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    renormalize!(z)
    return z
 end
@@ -403,8 +396,8 @@ function -(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
    R = base_ring(a)
    z = parent(a)()
    fit!(z, lenz)
-   set_prec!(z, prec)
-   set_val!(z, valz)
+   z = set_precision!(z, prec)
+   z = set_val!(z, valz)
    if vala >= valb
       for i = 1:min(lenb, vala - valb)
          z = setcoeff!(z, i - 1, -polcoeff(b, i - 1))
@@ -438,7 +431,7 @@ function -(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
          z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - 1)))
       end
    end
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    renormalize!(z)
    return z
 end
@@ -480,7 +473,7 @@ function *(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
       end
    end
    z = parent(a)(d, lenz, prec + zval, zval)
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    renormalize!(z)
    return z
 end
@@ -499,12 +492,12 @@ function *(a::T, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElem}
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
-   set_prec!(z, precision(b))
-   set_val!(z, valuation(b))
+   z = set_precision!(z, precision(b))
+   z = set_val!(z, valuation(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    renormalize!(z)
    return z
 end
@@ -517,12 +510,12 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.RelSer
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
-   set_prec!(z, precision(b))
-   set_val!(z, valuation(b))
+   z = set_precision!(z, precision(b))
+   z = set_val!(z, valuation(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    renormalize!(z)
    return z
 end
@@ -555,14 +548,14 @@ function shift_left(x::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: Rin
    xlen = pol_length(x)
    if xlen == 0
       z = zero(parent(x))
-      set_prec!(z, precision(x) + n)
-      set_val!(z, valuation(x) + n)
+      z = set_precision!(z, precision(x) + n)
+      z = set_val!(z, valuation(x) + n)
       return z
    end
    z = parent(x)()
    fit!(z, xlen)
-   set_prec!(z, precision(x) + n)
-   set_val!(z, valuation(x) + n)
+   z = set_precision!(z, precision(x) + n)
+   z = set_val!(z, valuation(x) + n)
    for i = 1:xlen
       z = setcoeff!(z, i - 1, polcoeff(x, i - 1))
    end
@@ -581,13 +574,13 @@ function shift_right(x::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: Ri
    xprec = precision(x)
    z = parent(x)()
    if n >= xlen + xval
-      set_prec!(z, max(0, xprec - n))
-      set_val!(z, max(0, xprec - n))
+      z = set_precision!(z, max(0, xprec - n))
+      z = set_val!(z, max(0, xprec - n))
    else
       zlen = min(xlen + xval - n, xlen)
       fit!(z, zlen)
-      set_prec!(z, max(0, xprec - n))
-      set_val!(z, max(0, xval - n))
+      z = set_precision!(z, max(0, xprec - n))
+      z = set_val!(z, max(0, xval - n))
       for i = 1:zlen
          z = setcoeff!(z, i - 1, polcoeff(x, i + xlen  - zlen - 1))
       end
@@ -615,17 +608,17 @@ function truncate(a::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingE
       return a
    end
    z = parent(a)()
-   set_prec!(z, n)
+   z = set_precision!(z, n)
    if n <= aval
-      set_length!(z, 0)
-      set_val!(z, n)
+      z = set_length!(z, 0)
+      z = set_val!(z, n)
    else
       fit!(z, n - aval)
-      set_val!(z, aval)
+      z = set_val!(z, aval)
       for i = 1:min(n - aval, alen)
          z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
       end
-      set_length!(z, normalise(z, n - aval))
+      z = set_length!(z, normalise(z, n - aval))
    end
    return z
 end
@@ -659,7 +652,7 @@ function mullow(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSerie
       end
    end
    z = parent(a)(d, lenz, prec, 0)
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -678,8 +671,8 @@ function ^(a::AbstractAlgebra.RelSeriesElem{T}, b::Int) where {T <: RingElement}
    # special case powers of x for constructing power series efficiently
    if pol_length(a) == 0
       z = parent(a)()
-      set_prec!(z, b*valuation(a))
-      set_val!(z, b*valuation(a))
+      z = set_precision!(z, b*valuation(a))
+      z = set_val!(z, b*valuation(a))
       return z
    elseif b == 0
       # in fact, the result would be exact 1 if we had exact series
@@ -688,15 +681,15 @@ function ^(a::AbstractAlgebra.RelSeriesElem{T}, b::Int) where {T <: RingElement}
    elseif isgen(a)
       z = parent(a)()
       fit!(z, 1)
-      set_prec!(z, b + precision(a) - 1)
-      set_val!(z, b)
+      z = set_precision!(z, b + precision(a) - 1)
+      z = set_val!(z, b)
       z = setcoeff!(z, 0, deepcopy(polcoeff(a, 0)))
-      set_length!(z, 1)
+      z = set_length!(z, 1)
       return z
    elseif pol_length(a) == 1
       z = parent(a)(polcoeff(a, 0)^b)
-      set_prec!(z, (b - 1)*valuation(a) + precision(a))
-      set_val!(z, b*valuation(a))
+      z = set_precision!(z, (b - 1)*valuation(a) + precision(a))
+      z = set_val!(z, b*valuation(a))
       return z
    elseif b == 1
       return deepcopy(a)
@@ -717,8 +710,8 @@ function ^(a::AbstractAlgebra.RelSeriesElem{T}, b::Int) where {T <: RingElement}
          end
          bit >>= 1
       end
-      set_val!(z, b*val)
-      set_prec!(z, b*val + prec)
+      z = set_val!(z, b*val)
+      z = set_precision!(z, b*val + prec)
       renormalize!(z)
       return z
    end
@@ -866,8 +859,8 @@ function divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSer
    end
    y = truncate(y, precision(x))
    res = parent(x)()
-   set_prec!(res, min(precision(x), valuation(x) + precision(y)))
-   set_val!(res, valuation(x))
+   res = set_precision!(res, min(precision(x), valuation(x) + precision(y)))
+   res = set_val!(res, valuation(x))
    lc = coeff(y, 0)
    lc == 0 && error("Not an exact division")
    lenr = precision(x) - valuation(x)
@@ -879,7 +872,7 @@ function divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSer
          x = setcoeff!(x, i + j, polcoeff(x, i + j) - polcoeff(y, j)*q)
       end
    end
-   set_length!(res, normalise(res, pol_length(res)))
+   res = set_length!(res, normalise(res, pol_length(res)))
    return res
 end
 
@@ -898,8 +891,8 @@ function divexact(x::AbstractAlgebra.RelSeriesElem, y::Union{Integer, Rational, 
    lenx = pol_length(x)
    z = parent(x)()
    fit!(z, lenx)
-   set_prec!(z, precision(x))
-   set_val!(z, valuation(x))
+   z = set_precision!(z, precision(x))
+   z = set_val!(z, valuation(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
    end
@@ -915,8 +908,8 @@ function divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::T) where {T <: RingEle
    lenx = pol_length(x)
    z = parent(x)()
    fit!(z, lenx)
-   set_prec!(z, precision(x))
-   set_val!(z, valuation(x))
+   z = set_precision!(z, precision(x))
+   z = set_val!(z, valuation(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
    end
@@ -939,8 +932,8 @@ function inv(a::AbstractAlgebra.RelSeriesElem)
    a1 = polcoeff(a, 0)
    ainv = parent(a)()
    fit!(ainv, precision(a))
-   set_prec!(ainv, precision(a))
-   set_val!(ainv, 0)
+   ainv = set_precision!(ainv, precision(a))
+   ainv = set_val!(ainv, 0)
    if precision(a) != 0
       ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
    end
@@ -952,7 +945,7 @@ function inv(a::AbstractAlgebra.RelSeriesElem)
       end
       ainv = setcoeff!(ainv, n - 1, divexact(s, a1))
    end
-   set_length!(ainv, normalise(ainv, precision(a)))
+   ainv = set_length!(ainv, normalise(ainv, precision(a)))
    return ainv
 end
 
@@ -975,14 +968,14 @@ function Base.sqrt(a::AbstractAlgebra.RelSeriesElem)
    prec = precision(a) - aval
    if prec == 0
       asqrt = parent(a)()
-      set_prec!(asqrt, aval2)
-      set_val!(asqrt, aval2)
+      asqrt = set_precision!(asqrt, aval2)
+      asqrt = set_val!(asqrt, aval2)
       return asqrt
    end
    asqrt = parent(a)()
    fit!(asqrt, prec)
-   set_prec!(asqrt, prec + aval2)
-   set_val!(asqrt, aval2)
+   asqrt = set_precision!(asqrt, prec + aval2)
+   asqrt = set_val!(asqrt, aval2)
    if prec > 0
       g = sqrt(polcoeff(a, 0))
       asqrt = setcoeff!(asqrt, 0, g)
@@ -1006,7 +999,7 @@ function Base.sqrt(a::AbstractAlgebra.RelSeriesElem)
       c = divexact(c, g2)
       asqrt = setcoeff!(asqrt, n, c)
    end
-   set_length!(asqrt, normalise(asqrt, prec))
+   asqrt = set_length!(asqrt, normalise(asqrt, prec))
    return asqrt
 end
 
@@ -1023,7 +1016,7 @@ end
 function Base.exp(a::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    if iszero(a)
       z = one(parent(a))
-      set_prec!(z, precision(a))
+      z = set_precision!(z, precision(a))
       return z
    end
    vala = valuation(a)
@@ -1031,8 +1024,8 @@ function Base.exp(a::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    z = parent(a)()
    R = base_ring(a)
    fit!(z, preca)
-   set_prec!(z, preca)
-   set_val!(z, 0)
+   z = set_precision!(z, preca)
+   z = set_val!(z, 0)
    c = vala == 0 ? polcoeff(a, 0) : R()
    z = setcoeff!(z, 0, exp(c))
    len = pol_length(a) + vala
@@ -1045,7 +1038,7 @@ function Base.exp(a::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
       !isunit(R(k)) && error("Unable to divide in exp")
       z = setcoeff!(z, k, divexact(s, k))
    end
-   set_length!(z, normalise(z, preca))
+   z = set_length!(z, normalise(z, preca))
    return z
 end
 
@@ -1227,7 +1220,7 @@ function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where {T <: Rin
          c.coeffs[i] = deepcopy(a.coeffs[i])
       end
    end
-   set_length!(c, normalise(c, lenr))
+   c = set_length!(c, normalise(c, lenr))
    renormalize!(c)
    return c
 end

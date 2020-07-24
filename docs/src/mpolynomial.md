@@ -100,10 +100,10 @@ julia> h = R(BigInt(1234))
 1234
 
 julia> k = R(x + 1)
-x+1
+x + 1
 
 julia> m = R(x + y + 1)
-x+y+1
+x + y + 1
 
 julia> derivative(k, 1)
 1
@@ -164,7 +164,7 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^2 + 2x + 1
-x^2+2*x+1
+x^2 + 2*x + 1
 
 julia> V = vars(f)
 1-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
@@ -220,10 +220,10 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> fz = x^2*y^2 + x + 1
-x^2*y^2+x+1
+x^2*y^2 + x + 1
 
 julia> fq = change_base_ring(QQ, fz)
-x^2*y^2+x+1//1
+x^2*y^2 + x + 1
 
 ```
 
@@ -239,10 +239,10 @@ julia> S,  = PolynomialRing(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> fz = x^5 + y^3 + 1
-x^5+y^3+1
+x^5 + y^3 + 1
 
 julia> fq = change_base_ring(QQ, fz, parent=S)
-x^5+y^3+1//1
+x^5 + y^3 + 1
 ```
 
 ### Multivariate coefficients
@@ -264,7 +264,7 @@ julia> R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
 (Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 
 julia> f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
-x^4*y^2*z^2-2*x^4*y*z^2+4*x^4*z^2+2*x^2*y^2+x+1
+x^4*y^2*z^2 - 2*x^4*y*z^2 + 4*x^4*z^2 + 2*x^2*y^2 + x + 1
 
 julia> coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])
 true
@@ -292,16 +292,16 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
-x^7*y^8+3*x^4*y^8-x^4*y^2+5*x*y^5-x*y^2
+x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5*x*y^5 - x*y^2
 
 julia> def, shift = deflation(f)
 ([1, 2], [3, 3])
 
 julia> f1 = deflate(f, def, shift)
-x^2*y^2+3*x*y^2-x+5*y-1
+x^2*y^2 + 3*x*y^2 - x + 5*y - 1
 
 julia> f2 = inflate(f1, def, shift)
-x^7*y^8+3*x^4*y^8-x^4*y^2+5*x*y^5-x*y^2
+x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5*x*y^5 - x*y^2
 
 julia> f2 == f
 true
@@ -324,10 +324,10 @@ julia> S, z = PolynomialRing(ZZ, "z")
 (Univariate Polynomial Ring in z over Integers, z)
 
 julia> f = 2x^5 + 3x^4 - 2x^2 - 1
-2*x^5+3*x^4-2*x^2-1
+2*x^5 + 3*x^4 - 2*x^2 - 1
 
 julia> g = to_univariate(S, f)
-2*z^5+3*z^4-2*z^2-1
+2*z^5 + 3*z^4 - 2*z^2 - 1
 
 ```
 
@@ -370,7 +370,7 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = 2x^2*y^2 + 3x + y + 1
-2*x^2*y^2+3*x+y+1
+2*x^2*y^2 + 3*x + y + 1
 
 julia> evaluate(f, BigInt[1, 2])
 14
@@ -385,25 +385,25 @@ julia> f(1, 2) == 14
 true
 
 julia> evaluate(f, [x + y, 2y - x])
-2*x^4-4*x^3*y-6*x^2*y^2+8*x*y^3+2*x+8*y^4+5*y+1
+2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
 
 julia> f(x + y, 2y - x)
-2*x^4-4*x^3*y-6*x^2*y^2+8*x*y^3+2*x+8*y^4+5*y+1
+2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
 
 julia> R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
 (Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 
 julia> f = x^2*y^2 + 2x*z + 3y*z + z + 1
-x^2*y^2+2*x*z+3*y*z+z+1
+x^2*y^2 + 2*x*z + 3*y*z + z + 1
 
 julia> evaluate(f, [1, 3], [3, 4])
-9*y^2+12*y+29
+9*y^2 + 12*y + 29
 
 julia> evaluate(f, [x, z], [3, 4])
-9*y^2+12*y+29
+9*y^2 + 12*y + 29
 
 julia> evaluate(f, [1, 2], [x + z, x - z])
-x^4-2*x^2*z^2+5*x*z+z^4-z^2+z+1
+x^4 - 2*x^2*z^2 + 5*x*z + z^4 - z^2 + z + 1
 
 julia> S = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
@@ -480,16 +480,16 @@ julia> R,(x,y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> a = x*y + 2*y
-x*y+2*y
+x*y + 2*y
 
 julia> b = x^3*y + y
-x^3*y+y
+x^3*y + y
 
 julia> gcd(a,b)
 y
 
 julia> lcm(a,b)
-x^4*y+2*x^3*y+x*y+2*y
+x^4*y + 2*x^3*y + x*y + 2*y
 
 julia> lcm(a,b) == a * b // gcd(a,b)
 true
@@ -509,13 +509,13 @@ julia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x*y + x + y + 1
-x*y+x+y+1
+x*y + x + y + 1
 
 julia> derivative(f, x)
-y+1
+y + 1
 
 julia> derivative(f, y)
-x+1
+x + 1
 
 ```
 

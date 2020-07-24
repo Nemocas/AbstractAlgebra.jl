@@ -76,19 +76,19 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> f = S()
-0//1
+0
 
 julia> g = S(123)
-123//1
+123
 
 julia> h = S(BigInt(1234))
-1234//1
+1234
 
 julia> k = S(x + 1)
-x+1//1
+x + 1
 
 ```
 
@@ -110,16 +110,16 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
-x+1//1
+x + 1
 
 julia> h = zero(S)
-0//1
+0
 
 julia> k = one(S)
-1//1
+1
 
 julia> isone(k)
 true
@@ -128,7 +128,7 @@ julia> iszero(f)
 false
 
 julia> m = modulus(S)
-x^3+3//1*x+1//1
+x^3 + 3*x + 1
 
 julia> U = base_ring(S)
 Univariate Polynomial Ring in x over Rationals
@@ -137,7 +137,7 @@ julia> V = base_ring(f)
 Univariate Polynomial Ring in x over Rationals
 
 julia> T = parent(f)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> f == deepcopy(f)
 true
@@ -174,13 +174,13 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> r = S(x + 1)
-x+1//1
+x + 1
 
 julia> a = modulus(S)
-x^3+3//1*x+1//1
+x^3 + 3*x + 1
 
 julia> isunit(r)
 true
@@ -200,13 +200,13 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
-x+1//1
+x + 1
 
 julia> g = inv(f)
-1//3*x^2-1//3*x+4//3
+1//3*x^2 - 1//3*x + 4//3
 
 ```
 
@@ -223,16 +223,16 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
-x+1//1
+x + 1
 
 julia> g = S(x^2 + 2x + 1)
-x^2+2//1*x+1//1
+x^2 + 2*x + 1
 
 julia> h = gcd(f, g)
-1//1
+1
 
 ```
 

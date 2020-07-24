@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export O, valuation, precision, max_precision, set_prec!
+export O, valuation, precision, max_precision, set_precision!
 
 ###############################################################################
 #
@@ -144,41 +144,31 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::AbstractAlgebra.AbsSeriesElem)
-   len = length(x)
+function AbstractAlgebra.expressify(a::AbstractAlgebra.AbsSeriesElem,
+                                    x = var(parent(a)); context = nothing)
+    sum = Expr(:call, :+)
+    v = valuation(a)
+    len = length(a)
 
-   if len == 0
-      print(io, zero(base_ring(x)))
-   else
-      coeff_printed = false
-      for i = 0:len - 1
-         c = coeff(x, i)
-         if !iszero(c)
-            if coeff_printed
-               print(io, "+")
-            end
-            if i != 0
-               if !isone(c)
-                  print(io, "(")
-                  print(IOContext(io, :compact => true), c)
-                  print(io, ")")
-                  if i != 0
-                     print(io, "*")
-                  end
-               end
-               print(io, string(var(parent(x))))
-               if i != 1
-                  print(io, "^")
-                  print(io, i)
-               end
+    for k in 0:len - 1
+        c = coeff(a, k)
+        if !iszero(c)
+            if k == 0
+                xk = 1
+            elseif k == 1
+                xk = x
             else
-               print(IOContext(io, :compact => true), c)
+                xk = Expr(:call, :^, x, k)
             end
-            coeff_printed = true
-         end
-      end
-   end
-   print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
+            if isone(c)
+                push!(sum.args, Expr(:call, :*, xk))
+            else
+                push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
+            end
+        end
+    end
+    push!(sum.args, Expr(:call, :O, Expr(:call, :^, x, precision(a))))
+    return sum
 end
 
 ###############################################################################
@@ -194,7 +184,7 @@ end
 function -(a::AbstractAlgebra.AbsSeriesElem)
    len = length(a)
    z = parent(a)()
-   set_prec!(z, precision(a))
+   z = set_precision!(z, precision(a))
    fit!(z, len)
    for i = 1:len
       z = setcoeff!(z, i - 1, -coeff(a, i - 1))
@@ -222,7 +212,7 @@ function +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
    lenz = max(lena, lenb)
    z = parent(a)()
    fit!(z, lenz)
-   set_prec!(z, prec)
+   z = set_precision!(z, prec)
    i = 1
    while i <= min(lena, lenb)
       z = setcoeff!(z, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
@@ -236,7 +226,7 @@ function +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
       z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
-   set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, normalise(z, i - 1))
    return z
 end
 
@@ -254,7 +244,7 @@ function -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
    lenz = max(lena, lenb)
    z = parent(a)()
    fit!(z, lenz)
-   set_prec!(z, prec)
+   z = set_precision!(z, prec)
    i = 1
    while i <= min(lena, lenb)
       z = setcoeff!(z, i - 1, coeff(a, i - 1) - coeff(b, i - 1))
@@ -268,7 +258,7 @@ function -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
       z = setcoeff!(z, i - 1, -coeff(b, i - 1))
       i += 1
    end
-   set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, normalise(z, i - 1))
    return z
 end
 
@@ -314,7 +304,7 @@ function *(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
       end
    end
    z = parent(a)(d, lenz, prec)
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -332,11 +322,11 @@ function *(a::T, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem}
    len = length(b)
    z = parent(b)()
    fit!(z, len)
-   set_prec!(z, precision(b))
+   z = set_precision!(z, precision(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -348,11 +338,11 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.AbsSer
    len = length(b)
    z = parent(b)()
    fit!(z, len)
-   set_prec!(z, precision(b))
+   z = set_precision!(z, precision(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -386,20 +376,20 @@ function shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: Rin
    prec = min(prec, max_precision(parent(x)))
    if xlen == 0
       z = zero(parent(x))
-      set_prec!(z, prec)
+      z = set_precision!(z, prec)
       return z
    end
    zlen = min(prec, xlen + n)
    z = parent(x)()
    fit!(z, zlen)
-   set_prec!(z, prec)
+   z = set_precision!(z, prec)
    for i = 1:n
       z = setcoeff!(z, i - 1, zero(base_ring(x)))
    end
    for i = 1:xlen
       z = setcoeff!(z, i + n - 1, coeff(x, i - 1))
    end
-   set_length!(z, normalise(z, zlen))
+   z = set_length!(z, normalise(z, zlen))
    return z
 end
 
@@ -413,12 +403,12 @@ function shift_right(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: Ri
    xlen = length(x)
    if n >= xlen
       z = zero(parent(x))
-      set_prec!(z, max(0, precision(x) - n))
+      z = set_precision!(z, max(0, precision(x) - n))
       return z
    end
    z = parent(x)()
    fit!(z, xlen - n)
-   set_prec!(z, precision(x) - n)
+   z = set_precision!(z, precision(x) - n)
    for i = 1:xlen - n
       z = setcoeff!(z, i - 1, coeff(x, i + n - 1))
    end
@@ -443,14 +433,14 @@ function truncate(a::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingE
    end
    z = parent(a)()
    fit!(z, n)
-   set_prec!(z, n)
+   z = set_precision!(z, n)
    for i = 1:min(n, len)
       z = setcoeff!(z, i - 1, coeff(a, i - 1))
    end
    for i = len + 1:n
       z = setcoeff!(z, i - 1, zero(base_ring(a)))
    end
-   set_length!(z, normalise(z, n))
+   z = set_length!(z, normalise(z, n))
    return z
 end
 
@@ -469,14 +459,14 @@ function ^(a::AbstractAlgebra.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
    # special case powers of x for constructing power series efficiently
    if b == 0
       z = one(parent(a))
-      set_prec!(z, precision(a))
+      z = set_precision!(z, precision(a))
       return z
    elseif precision(a) > 0 && isgen(a) && b > 0
       # arithmetic operators must not introduce new aliasing
       return deepcopy(shift_left(a, b - 1))
    elseif length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
-      set_prec!(z, precision(a))
+      z = set_precision!(z, precision(a))
       return z
    elseif b == 1
       return deepcopy(a)
@@ -639,7 +629,7 @@ function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSer
    end
    y = truncate(y, precision(x))
    res = parent(x)()
-   set_prec!(res, min(precision(x), precision(y) + valuation(x)))
+   res = set_precision!(res, min(precision(x), precision(y) + valuation(x)))
    lc = coeff(y, 0)
    lc == 0 && error("Not an exact division")
    lenr = precision(x)
@@ -651,7 +641,7 @@ function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSer
          x = setcoeff!(x, i + j, coeff(x, i + j) - coeff(y, j)*q)
       end
    end
-   set_length!(res, normalise(res, length(res)))
+   res = set_length!(res, normalise(res, length(res)))
    return res
 end
 
@@ -670,7 +660,7 @@ function divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, 
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
-   set_prec!(z, precision(x))
+   z = set_precision!(z, precision(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
    end
@@ -686,7 +676,7 @@ function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingEle
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
-   set_prec!(z, precision(x))
+   z = set_precision!(z, precision(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
    end
@@ -709,7 +699,7 @@ function inv(a::AbstractAlgebra.AbsSeriesElem)
    a1 = coeff(a, 0)
    ainv = parent(a)()
    fit!(ainv, precision(a))
-   set_prec!(ainv, precision(a))
+   ainv = set_precision!(ainv, precision(a))
    if precision(a) != 0
       ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
    end
@@ -721,7 +711,7 @@ function inv(a::AbstractAlgebra.AbsSeriesElem)
       end
       ainv = setcoeff!(ainv, n - 1, divexact(s, a1))
    end
-   set_length!(ainv, normalise(ainv, precision(a)))
+   ainv = set_length!(ainv, normalise(ainv, precision(a)))
    return ainv
 end
 
@@ -752,7 +742,7 @@ function Base.sqrt(a::AbstractAlgebra.AbsSeriesElem)
    prec = precision(a) - aval2
    asqrt = parent(a)()
    fit!(asqrt, prec)
-   set_prec!(asqrt, prec)
+   asqrt = set_precision!(asqrt, prec)
    for n = 1:aval2
       asqrt = setcoeff!(asqrt, n - 1, R())
    end
@@ -779,7 +769,7 @@ function Base.sqrt(a::AbstractAlgebra.AbsSeriesElem)
       c = divexact(c, g2)
       asqrt = setcoeff!(asqrt, aval2 + n, c)
    end
-   set_length!(asqrt, normalise(asqrt, prec))
+   asqrt = set_length!(asqrt, normalise(asqrt, prec))
    return asqrt
 end
 
@@ -796,12 +786,12 @@ end
 function Base.exp(a::AbstractAlgebra.AbsSeriesElem)
    if iszero(a)
       z = one(parent(a))
-      set_prec!(z, precision(a))
+      z = set_precision!(z, precision(a))
       return z
    end
    z = parent(a)()
    fit!(z, precision(a))
-   set_prec!(z, precision(a))
+   z = set_precision!(z, precision(a))
    z = setcoeff!(z, 0, exp(coeff(a, 0)))
    len = length(a)
    for k = 1 : precision(a) - 1
@@ -812,7 +802,7 @@ function Base.exp(a::AbstractAlgebra.AbsSeriesElem)
       !isunit(base_ring(a)(k)) && error("Unable to divide in exp")
       z = setcoeff!(z, k, divexact(s, k))
    end
-   set_length!(z, normalise(z, precision(a)))
+   z = set_length!(z, normalise(z, precision(a)))
    return z
 end
 

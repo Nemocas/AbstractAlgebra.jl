@@ -1240,71 +1240,29 @@ end
 #
 ###############################################################################
 
-function _show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
-    len = length(x)
-    if len == 0
-      print(io, base_ring(x)(0))
-    else
-      N = parent(x).N
-      ord = parent(x).ord
-      for i = 1:len
-        c = coeff(x, i)
-        bracket = needs_parentheses(c)
-        if i != 1 && !displayed_with_minus_in_front(c)
-          print(io, "+")
-        end
-        X = zeros(UInt, N, 1)
-        if ord == :degrevlex
-           monomial_reverse!(X, 1, x.exps, i, N)
-        else
-           monomial_set!(X, 1, x.exps, i, N)
-        end
-        if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
-          if bracket
-            print(io, "(")
-          end
-          print(io, c)
-          if bracket
-            print(io, ")")
-          end
-          if c != 1 && !(c == -1 && !show_minus_one(typeof(c))) && !monomial_iszero(X, 1, N)
-             print(io, "*")
-          end
-        end
-        if c == -1 && !show_minus_one(typeof(c))
-          print(io, "-")
-        end
-        num_vars = nvars(parent(x))
-        if monomial_iszero(X, 1, N)
-          if c == 1
-             print(io, c)
-          elseif c == -1 && !show_minus_one(typeof(c))
-             print(io, 1)
-          end
-        end
-        fst = true
-        for j = 1:nvars(parent(x))
-          n = reinterpret(Int, X[num_vars - j + 1, 1])
-          if n != 0
-            if fst
-               print(io, U[j])
-               fst = false
-            else
-               print(io, "*", U[j])
-            end
-            if n != 1
-              print(io, "^", n)
-            end
-          end
-        end
-    end
-  end
+function expressify(a::MPolyElem, x = symbols(parent(a)); context = nothing)
+   sum = Expr(:call, :+)
+   n = nvars(parent(a))
+   for (c, v) in zip(coeffs(a), exponent_vectors(a))
+      prod = Expr(:call, :*, expressify(c, context = context))
+      for i in 1:n
+         if v[i] > 1
+            push!(prod.args, Expr(:call, :^, x[i], v[i]))
+         elseif v[i] == 1
+            push!(prod.args, x[i])
+         end
+      end
+      push!(sum.args, prod)
+   end
+   return sum
 end
 
-function show(io::IO, x::MPoly)
-   len = length(x)
-   U = [string(x) for x in symbols(parent(x))]
-   _show(IOContext(io, :compact => true), x, U)
+function Base.show(io::IO, ::MIME"text/plain", a::MPolyElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, a::MPolyElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, p::MPolyRing)
@@ -2415,7 +2373,11 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    if iszero(a)
-      return zero(a)
+      if iszero(b)
+         return one(a)
+      else
+         return zero(a)
+      end
    elseif length(a) == 1
       N = size(a.exps, 1)
       exps = zeros(UInt, N, 1)
@@ -3602,21 +3564,36 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    # to optimise computing new powers in any way.
    # Note that this function accepts values in a non-commutative ring, so operations
    # must be done in a certain order.
+   # But addition is associative.
    S = parent(one(R)*one(parent(vals[1])))
-   r = zero(S)
+   r = elem_type(S)[zero(S)]
+   i = UInt(1)
    cvzip = zip(coeffs(a), exponent_vectors(a))
    for (c, v) in cvzip
-      t = one(R)
+      t = one(S)
       for j = 1:length(vals)
          exp = v[j]
+         if iszero(exp)
+           continue
+         end
          if !haskey(powers[j], exp)
             powers[j][exp] = vals[j]^exp
          end
          t = t*powers[j][exp]
       end
-      r = addeq!(r, c*t)
+      push!(r, c*t)
+      j = i = i + 1
+      while iseven(j) && length(r) > 1
+          top = pop!(r)
+          r[end] = addeq!(r[end], top)
+          j >>>= 1
+      end
    end
-   return r
+   while length(r) > 1
+      top = pop!(r)
+      r[end] = addeq!(r[end], top)
+   end
+   return r[1]
 end
 
 @doc Markdown.doc"""
@@ -3699,10 +3676,14 @@ function __evaluate(a, vars, vals, powers)
      r = geobucket(S)
      cvzip = zip(coeffs(a), exponent_vectors(a))
      for (c, v) in cvzip
-        t = one(R)
+        t = one(S)
         for j = 1:length(vars)
            varnum = vars[j]
            exp = v[varnum]
+           if iszero(exp)
+             v[varnum] = 0
+             continue
+           end
            if !haskey(powers[j], exp)
               powers[j][exp] = vals[j]^exp
            end
@@ -3719,10 +3700,14 @@ function __evaluate(a, vars, vals, powers)
      r = zero(K)
      cvzip = zip(coeffs(a), exponent_vectors(a))
      for (c, v) in cvzip
-        t = one(R)
+        t = one(K)
         for j = 1:length(vars)
            varnum = vars[j]
            exp = v[varnum]
+           if iszero(exp)
+             v[varnum] = 0
+             continue
+           end
            if !haskey(powers[j], exp)
               powers[j][exp] = vals[j]^exp
            end
@@ -4756,7 +4741,8 @@ macro PolynomialRing(R, args...)
     end
     ring1 = gensym()
     ring2 = gensym()
-    push!(exprs, :($(Expr(:tuple, esc(ring1), esc(ring2))) = PolynomialRing($(esc(R)), $(esc(all_names)))))
+    push!(exprs, :($(Expr(:tuple, esc(ring1), esc(ring2))) =
+                   AbstractAlgebra.PolynomialRing($(esc(R)), $(esc(all_names)))))
     vars = Symbol[]
     k = gensym()
     push!(exprs, :($(esc(k)) = 0))

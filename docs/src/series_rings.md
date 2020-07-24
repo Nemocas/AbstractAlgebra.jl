@@ -87,13 +87,13 @@ precision minus the valuation is bigger than the length of the array.
 
 ```jldoctest
 julia> S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_relative)
-(Univariate power series ring in x over Rationals, x+O(x^11))
+(Univariate power series ring in x over Rationals, x + O(x^11))
 
 julia> T, y = LaurentSeriesRing(ZZ, 10, "y")
-(Laurent series ring in y over Integers, y+O(y^11))
+(Laurent series ring in y over Integers, y + O(y^11))
 
 julia> U, z = LaurentSeriesField(QQ, 10, "z")
-(Laurent series field in z over Rationals, z+O(z^11))
+(Laurent series field in z over Rationals, z + O(z^11))
 ```
 
 For absolute power series we have:
@@ -117,10 +117,10 @@ precision is bigger than the length of the array.
 
 ```jldoctest
 julia> S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
-(Univariate power series ring in x over Rationals, x+O(x^10))
+(Univariate power series ring in x over Rationals, x + O(x^10))
 
 julia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
-(2//1)*x+(3//1)*x^2+x^3+O(x^6)
+2*x + 3*x^2 + x^3 + O(x^6)
 
 ```
 
@@ -150,7 +150,7 @@ are stored on a per element basis in the actual series elements.
 
 ```jldoctest
 julia> S, x = PowerSeriesRing(QQ, 10, "x")
-(Univariate power series ring in x over Rationals, x+O(x^11))
+(Univariate power series ring in x over Rationals, x + O(x^11))
 
 julia> vsym = var(S)
 :x
@@ -190,12 +190,12 @@ precision(f::MySeries{T})
 Return the absolute precision of $f$.
 
 ```julia
-set_prec!(f::MySeries{T}, prec::Int)
+set_precision!(f::MySeries{T}, prec::Int)
 ```
 
 Set the absolute precision of the given series to the given value.
 
-This function mutates the series in-place but does not return the mutated series.
+This return the updated series.
 
 ```julia
 valuation(f::MySeries{T})
@@ -210,7 +210,7 @@ set_val!(f::MySeries{T}, val::Int)
 For relative series and Laurent series only, this function alters the valuation of the
 given series to the given value.
 
-The series is mutated in-place but does not return the mutated series.
+This function returns the updated series.
 
 ```julia
 polcoeff(f::MySeries{T}, n::Int)
@@ -278,10 +278,10 @@ Return the generator `x` of the series ring.
 
 ```jldoctest
 julia> S, x = PowerSeriesRing(ZZ, 10, "x")
-(Univariate power series ring in x over Integers, x+O(x^11))
+(Univariate power series ring in x over Integers, x + O(x^11))
 
 julia> f = 1 + 3x + x^3 + O(x^5)
-1+3*x+x^3+O(x^5)
+1 + 3*x + x^3 + O(x^5)
 
 julia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0], 4, 10, 3);
 
@@ -295,15 +295,15 @@ julia> set_length!(g, 3)
 3
 
 julia> g = setcoeff!(g, 2, BigInt(11))
-x^3+2*x^4+11*x^5+O(x^10)
+x^3 + 2*x^4 + 11*x^5 + O(x^10)
 
 julia> fit!(g, 8)
 
 julia> g = setcoeff!(g, 7, BigInt(4))
-x^3+2*x^4+11*x^5+O(x^10)
+x^3 + 2*x^4 + 11*x^5 + O(x^10)
 
 julia> w = gen(S)
-x+O(x^11)
+x + O(x^11)
 
 julia> isgen(w)
 true

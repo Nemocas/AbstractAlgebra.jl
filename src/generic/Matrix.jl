@@ -458,16 +458,37 @@ issquare(a::MatElem) = (nrows(a) == ncols(a))
 #
 ###############################################################################
 
-function show(io::IO, a::AbstractAlgebra.MatSpace)
-   print(io, "Matrix Space of ")
-   print(io, a.nrows, " rows and ", a.ncols, " columns over ")
-   print(IOContext(io, :compact => true), base_ring(a))
-end
-
-function show(io::IO, a::MatrixElem)
+function expressify(a::MatrixElem; context = nothing)
    r = nrows(a)
    c = ncols(a)
-   isempty(a) && return print(io, "$r by $c matrix")
+   isempty(a) && return "$r by $c empty matrix"
+   mat = Expr(:vcat)
+   for i in 1:r
+      row = Expr(:row)
+      for j in 1:c
+         if isassigned(a, i, j)
+            push!(row.args, expressify(a[i, j], context = context))
+         else
+            push!(row.args,Base.undef_ref_str)
+         end
+      end
+      push!(mat.args, row)
+   end
+   return mat
+end
+
+function Base.show(io::IO, a::MatrixElem)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem)
+   r = nrows(a)
+   c = ncols(a)
+
+   if isempty(a)
+      print(io, "$r by $c empty matrix")
+      return
+   end
 
    # preprint each element to know the widths so as to align the columns
    strings = String[sprint(print, isassigned(a, i, j) ? a[i, j] : Base.undef_ref_str,
@@ -489,6 +510,12 @@ function show(io::IO, a::MatrixElem)
          println(io, "")
       end
    end
+end
+
+function show(io::IO, a::AbstractAlgebra.MatSpace)
+   print(io, "Matrix Space of ")
+   print(io, a.nrows, " rows and ", a.ncols, " columns over ")
+   print(IOContext(io, :compact => true), base_ring(a))
 end
 
 ###############################################################################
@@ -919,6 +946,31 @@ function divexact(x::MatrixElem{T}, y::T) where {T <: RingElem}
       end
    end
    return z
+end
+
+###############################################################################
+#
+#   Symmetry
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    issymmetric(a::MatrixElem)
+> Return `true` if the given matrix is symmetric with respect to its main
+> diagonal, otherwise return `false`.
+"""
+function issymmetric(a::MatrixElem)
+    if !issquare(a)
+        return false
+    end
+    for row in 2:nrows(a)
+        for col in 1:(row - 1)
+            if a[row, col] != a[col, row]
+                return false
+            end
+        end
+    end
+    return true
 end
 
 ###############################################################################
@@ -2954,15 +3006,15 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
    p = S(1)
    A = similar(M, n + 1, 2n + 1)
    B = similar(M, n, n)
-   L1 = [n + i for i in 1:n + 1]
-   L2 = [n for i in 1:n]
+   L1 = Int[n + i for i in 1:n + 1]
+   L2 = Int[n for i in 1:n]
    P2 = zeros(Int, n)
    P2[1] = 1
    c2 = 1
    r2 = 1
    first_poly = true
    while r2 <= n
-      P1 = [0 for i in 1:2n + 1]
+      P1 = Int[0 for i in 1:2n + 1]
       v = zero(M, n, 1)
       for j = 1:n
          B[r2, j] = v[j, 1]

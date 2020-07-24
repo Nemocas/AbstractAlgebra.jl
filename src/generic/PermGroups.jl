@@ -30,6 +30,10 @@ true
 """
 parent(g::Perm{T}) where T = SymmetricGroup(T(length(g.d)))
 
+check_parent(g::Perm, h::Perm) = length(g.d) == length(h.d) ||
+   throw(ArgumentError("incompatible permutation groups"))
+
+
 ###############################################################################
 #
 #   Low-level manipulation
@@ -37,7 +41,9 @@ parent(g::Perm{T}) where T = SymmetricGroup(T(length(g.d)))
 ###############################################################################
 
 # hash(Perm) = 0x0d9939c64ab650ca
-Base.hash(g::Perm, h::UInt) = xor(hash(g.d, h), 0x0d9939c64ab650ca)
+# note: we don't use hash(g.d, h), as it's unnecessarily slow for this use-case
+Base.hash(g::Perm, h::UInt) = foldl((h, x) -> hash(x, h), g.d,
+                                    init = hash(0x0d9939c64ab650ca, h))
 
 function getindex(g::Perm, n::Integer)
    return g.d[n]
@@ -394,6 +400,8 @@ false
 ###############################################################################
 function mul!(out::Perm, g::Perm, h::Perm)
    out = (out === h ? similar(out) : out)
+   check_parent(out, g)
+   check_parent(g, h)
    @inbounds for i in eachindex(out.d)
       out[i] = h[g[i]]
    end
