@@ -94,7 +94,7 @@ gen(R::AbstractAlgebra.NCPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
 isterm(a::T) where {T <: NCRingElem} = true
 
-ismonomial(a::T) where {T <: NCRingElem} = isone(a)
+ismonomial_monomial(a::T) where {T <: NCRingElem} = isone(a)
 
 function deepcopy_internal(a::NCPoly{T}, dict::IdDict) where {T <: NCRingElem}
    coeffs = Array{T}(undef, length(a))

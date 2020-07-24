@@ -5,7 +5,7 @@
 ###############################################################################
 
 import AbstractAlgebra: terms_degrees
-using AbstractAlgebra: term_degree, degrees_range, ismonomial_nonrec
+using AbstractAlgebra: term_degree, degrees_range
 
 ###############################################################################
 #
@@ -80,14 +80,14 @@ end
 
 iszero(p::LaurentPolyWrap) = iszero(p.poly)
 
-isone(p::LaurentPolyWrap) = ismonomial_nonrec(p, 0)
+isone(p::LaurentPolyWrap) = ismonomial(p, 0)
 
 zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(zero(R.polyring))
 one(R::LaurentPolyWrapRing) = LaurentPolyWrap(one(R.polyring))
 
 gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(gen(R.polyring))
 
-isgen(p::LaurentPolyWrap) = ismonomial_nonrec(p, 1)
+isgen(p::LaurentPolyWrap) = ismonomial(p, 1)
 
 # only an optimization over the default Base implementation (maybe 1.4 speed-up)
 deepcopy_internal(p::LaurentPolyWrap, dict::IdDict) =

@@ -241,7 +241,7 @@ julia> c = coeff(f, 1)
 3
 
 julia> g = set_length!(g, normalise(g, 7))
-x^3+2*x+1
+x^3 + 2*x + 1
 
 julia> g = setcoeff!(g, 2, BigInt(11))
 x^3 + 11*x^2 + 2*x + 1

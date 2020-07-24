@@ -128,7 +128,7 @@ isgen(p::LaurentPolyElem) = p == gen(parent(p))
 # return true iff `p` has only one non-null coefficient
 # (of degree i) at the outer layer, and this coefficient is one
 # (as an element of the base ring)
-function ismonomial_nonrec(p::LaurentPolyElem, i::Integer)
+function ismonomial(p::LaurentPolyElem, i::Integer)
    dr = degrees_range(p)
    length(dr) == 1 || return false
    dr[] == i || return false
@@ -138,7 +138,13 @@ end
 function ismonomial(p::LaurentPolyElem)
    dr = degrees_range(p)
    length(dr) == 1 || return false
-   ismonomial(coeff(p, dr[]))
+   isone(coeff(p, dr[]))
+end
+
+function ismonomial_recursive(p::LaurentPolyElem)
+   dr = degrees_range(p)
+   length(dr) == 1 || return false
+   ismonomial_recursive(coeff(p, dr[]))
 end
 
 function isunit(p::LaurentPolyElem)
