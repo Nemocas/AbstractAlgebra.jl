@@ -1,6 +1,7 @@
 using AbstractAlgebra: terms_degrees, LaurentPolyElem
 
-using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
+using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
+                               trail_degree, lead_degree
 
 @testset "Generic.LaurentPoly" begin
    @testset "constructors" begin
@@ -62,6 +63,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
       @test terms_degrees(y) == 0:1
       @test terms_degrees(y^3) == 0:3
       @test [coeff(y, i) for i=-1:2] == [0, 0, 1, 0]
+      @test trail_degree(y^2) == 2
+      @test lead_degree(y^2) == 2
 
       @test iszero(zero(L))
       @test iszero(zero(y))
@@ -118,6 +121,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
       f1 = f = LaurentPolyWrap(x, -2)
       @test terms_degrees(f) == -2:-1
+      @test trail_degree(f) == -1
+      @test lead_degree(f) == -1
       @test [coeff(f, i) for i = -3:0] == [0, 0, 1, 0]
 
       @test !isone(f)
@@ -130,6 +135,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap
 
       f2 = f = LaurentPolyWrap(3 + 2*x^4, -3)
       @test terms_degrees(f) == -3:1
+      @test trail_degree(f) == -3
+      @test lead_degree(f) == 1
       @test [coeff(f, i) for i = -4:2] == [0, 3, 0, 0, 0, 2, 0]
 
       @test f == 3y^-3 + 2y
