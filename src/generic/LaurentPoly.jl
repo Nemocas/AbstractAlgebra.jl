@@ -115,7 +115,7 @@ end
 
 -(p::LaurentPolyWrap, q::LaurentPolyWrap) = p + (-q) # TODO: optimize
 
-*(p::LaurentPolyWrap, q::LaurentPolyWrap) = LaurentPolyWrap(p.poly * q.poly, p.mindeg + q.mindeg)
+*(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where {T} = LaurentPolyWrap(p.poly * q.poly, p.mindeg + q.mindeg)
 
 ###############################################################################
 #

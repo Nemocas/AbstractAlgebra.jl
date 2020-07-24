@@ -226,6 +226,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test parent(y*x) == L
       @test 3*y == y*3 == LaurentPolyWrap(3*x, 0)
 
+      # with Laurent polynomials as base ring
+      P, x = LaurentPolynomialRing(ZZ, "x")
+      L, y = LaurentPolynomialRing(P, "y")
+      @test parent(x*y) == L
+      @test parent(y*x) == L
+      @test 3*y == y*3 == LaurentPolyWrap((3*x).poly, 0)
+
       # as base ring of polynomials
       L, y = LaurentPolynomialRing(ZZ, "y")
       P, x = PolynomialRing(L, "x")
