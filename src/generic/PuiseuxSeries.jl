@@ -257,14 +257,14 @@ function rescale!(a::PuiseuxSeriesElem)
       if d != 1
          a.data = set_scale!(a.data, div(scale(a.data), d))
          a.data = set_precision!(a.data, AbstractAlgebra.div(precision(a.data), d))
-         a.data = set_val!(a.data, AbstractAlgebra.div(valuation(a.data), d))
+         a.data = set_valuation!(a.data, AbstractAlgebra.div(valuation(a.data), d))
          a.scale = div(a.scale, d)
       end
    else
       d = gcd(precision(a.data), a.scale)
       if d != 1
          a.data = set_precision!(a.data, AbstractAlgebra.div(precision(a.data), d))
-         a.data = set_val!(a.data, AbstractAlgebra.div(valuation(a.data), d))
+         a.data = set_valuation!(a.data, AbstractAlgebra.div(valuation(a.data), d))
          a.scale = div(a.scale, d)
       end
    end

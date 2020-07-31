@@ -204,7 +204,7 @@ valuation(f::MySeries{T})
 Return the valuation of the given series.
 
 ```julia
-set_val!(f::MySeries{T}, val::Int)
+set_valuation!(f::MySeries{T}, val::Int)
 ```
 
 For relative series and Laurent series only, this function alters the valuation of the
