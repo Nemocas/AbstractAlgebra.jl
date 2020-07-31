@@ -509,6 +509,44 @@ mutable struct SparsePoly{T <: RingElement} <: AbstractAlgebra.RingElem
                                                new{T}([a], [UInt(0)], 1)
 end
 
+
+###############################################################################
+#
+#   LaurentPolyRing / LaurentPoly
+#
+###############################################################################
+
+abstract type LaurentPolynomialRing{T} <: AbstractAlgebra.LaurentPolynomialRing{T} end
+
+struct LaurentPolyWrapRing{T  <: RingElement,
+                           PR <: AbstractAlgebra.PolyRing{T}
+                          } <: LaurentPolynomialRing{T}
+   polyring::PR
+
+   function LaurentPolyWrapRing(pr::PR) where {T <: RingElement,
+                                               PR <: AbstractAlgebra.PolyRing{T}}
+      new{T, PR}(pr)
+   end
+end
+
+mutable struct LaurentPolyWrap{T  <: RingElement,
+                               PE <: AbstractAlgebra.PolyElem{T}
+                              } <: AbstractAlgebra.LaurentPolyElem{T}
+   poly::PE
+   mindeg::Int
+
+   # A LaurentPolyWrap object is specified by a backing polynomial `poly` and
+   # an integer `mindeg`, and represents `poly * x^mindeg`, where `x` is a generator
+   # of the parent ring; no "normalization" is done, i.e.
+   # `LaurentPolyWrap(poly*x^i, mindeg-i)` is another valid representation for the same
+   # Laurent polynomial, where i is an integer.
+
+   function LaurentPolyWrap(poly::PE, mindeg::Int=0) where {T  <: RingElement,
+                                                            PE <: AbstractAlgebra.PolyElem{T}}
+      new{T, PE}(poly, mindeg)
+   end
+end
+
 ###############################################################################
 #
 #   ResRing / Res

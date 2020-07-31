@@ -1,6 +1,7 @@
 include("julia/Integers-test.jl")
 
 include("generic/Poly-test.jl")
+include("generic/LaurentPoly-test.jl")
 include("generic/Residue-test.jl")
 include("generic/ResidueField-test.jl")
 include("generic/RelSeries-test.jl")

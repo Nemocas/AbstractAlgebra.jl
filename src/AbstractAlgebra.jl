@@ -339,6 +339,15 @@ include("julia/JuliaTypes.jl")
 
 ###############################################################################
 #
+#   Generic algorithms defined on abstract types
+#
+###############################################################################
+
+include("algorithms/generic_functions.jl")
+include("algorithms/LaurentPoly.jl")
+
+###############################################################################
+#
 #   Generic submodule
 #
 ###############################################################################
@@ -347,25 +356,24 @@ include("Generic.jl")
 
 # Do not import numerator and denominator as we have our own
 import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
-                 add_row!, base_ring, basis, cached, canonical_unit, can_solve_left_reduced_triu,
-                 change_base_ring,
+                 add_row!, basis, cached, can_solve_left_reduced_triu,
                  character, characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
-                 chebyshev_u, _check_dim, check_composable, check_parent,
+                 chebyshev_u, _check_dim, check_composable,
                  codomain, coeff, coeffs, ncols,
                  combine_like_terms!, compose, content, cycles,
                  data, deflate, deflation, degree, degrees,
                  dense_matrix_type, derivative, det_clow,
                  det_df, det_fflu, det_popov, diagonal_matrix, dim, disable_cache!,
-                 discriminant, displayed_with_minus_in_front,
+                 discriminant,
                  divexact, divexact_left, divexact_right, divides,
                  domain, downscale,
                  elem_type, enable_cache!, evaluate, exp_gcd,
                  exponent, exponent_vector, exponent_vectors,
                  extended_weak_popov, extended_weak_popov_with_transform,
                  finish, fflu!,
-                 fflu, find_pivot_popov, fit!, gcd, gen,
-                 gens, get_field, gcdinv, gcdx,
+                 fflu, find_pivot_popov, fit!, gcd,
+                 get_field, gcdinv, gcdx,
                  gram, has_left_neighbor, has_bottom_neighbor, hash,
                  hessenberg!, hnf, hnf_cohen, hnf_cohen_with_transform,
                  hnf_kb, hnf_kb_with_transform,
@@ -379,14 +387,13 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  inverse_mat, reverse_rows, reverse_rows!,
                  reverse_cols, reverse_cols!,
                  invmod, involves_at_most_one_variable,
-                 iscompatible, isconstant, isdegree,
-                 isdomain_type, isexact_type, isgen, ishessenberg,
-                 ishnf, ishomogeneous, isisomorphic, ismonomial,
+                 iscompatible, isconstant, isdegree, ishessenberg,
+                 ishnf, ishomogeneous, isisomorphic,
                  isone, isreverse, isrimhook,
                  isrref, issquare, issubmodule, isterm,
                  isunit, iszero_row, iszero_column,
                  kernel, kronecker_product,
-                 laurent_ring, lc, lcm, lead, left_kernel, length,
+                 laurent_ring, lc, lcm, left_kernel, length,
                  leglength, lm, lt, main_variable,
                  main_variable_extract, main_variable_insert,
                  map1, map2, map_from_func, map_coeffs, map_entries, map_entries!,
@@ -398,7 +405,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx, mul!, mul_classical, mul_karatsuba, mul_ks,
                  mullow, mulmod, multiply_column, multiply_column!,
-                 multiply_row, multiply_row!, needs_parentheses,
+                 multiply_row, multiply_row!,
                  newton_to_monomial!, ngens, normalise, nrows, nvars, O, one,
                  order, ordering, parent_type, parity, partitionseq, Perm, perm,
                  permtype, @perm_str, polcoeff, pol_length, powmod,
@@ -417,7 +424,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  solve_rational, solve_triu, sort_terms!, sub, subst, summands,
                  supermodule, swap_cols, swap_cols!, swap_rows, swap_rows!,
                  sylvester_matrix, symbols, term, terms, total_degree,
-                 to_univariate, trail, truncate, typed_hcat, typed_hvcat,
+                 to_univariate, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem
@@ -631,6 +638,9 @@ function SparsePolynomialRing(R::Ring, s::Char; cached::Bool = true)
    SparsePolynomialRing(R, string(s); cached=cached)
 end
 
+@doc (@doc Generic.LaurentPolynomialRing)
+LaurentPolynomialRing(R::Ring, s::AbstractString) = Generic.LaurentPolynomialRing(R, s)
+
 function MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
    Generic.MatrixSpace(R, r, c, cached)
 end
@@ -771,8 +781,8 @@ function crt end
 
 function factor end
 
-export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
-       MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
+export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, LaurentPolynomialRing,
+       MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, sub,
