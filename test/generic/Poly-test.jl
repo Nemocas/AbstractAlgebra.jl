@@ -2417,6 +2417,11 @@ end
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
+   @test_throws ErrorException remove(R(1), R(0))
+   @test_throws ErrorException remove(R(1), R(-1))
+   @test_throws ErrorException remove(R(0), R(1))
+   @test_throws ErrorException remove(R(0), R(2))
+
    for iter = 1:10
       d = true
       f = R()
@@ -2424,8 +2429,10 @@ end
       while d
          f = R()
          g = R()
-         f = rand(R, 0:10, -10:10)
-         g = rand(R, 0:10, -10:10)
+         while iszero(f) || iszero(g) || isunit(g)
+           f = rand(R, 0:10, -10:10)
+           g = rand(R, 0:10, -10:10)
+         end
 
          d, q = divides(f, g)
          if d
@@ -2434,10 +2441,6 @@ end
       end
 
       s = rand(0:10)
-
-      while iszero(g)
-        g = rand(R, 0:10, -10:10)
-      end
 
       v, q = remove(f*g^s, g)
 
@@ -2460,6 +2463,11 @@ end
    # Exact field
    R, x = PolynomialRing(QQ, "x")
 
+   @test_throws ErrorException remove(R(1), R(0))
+   @test_throws ErrorException remove(R(1), R(1))
+   @test_throws ErrorException remove(R(0), R(x))
+   @test_throws ErrorException remove(R(1), R(2))
+
    for iter = 1:10
       d = true
       f = R()
@@ -2467,7 +2475,7 @@ end
       while d
          f = R()
          g = R()
-         while f == 0 || g == 0
+         while f == 0 || g == 0 || isunit(g)
             f = rand(R, 0:10, -10:10)
             g = rand(R, 0:10, -10:10)
          end
@@ -2506,7 +2514,7 @@ end
       while d
          f = R()
          g = R()
-         while f == 0 || g == 0
+         while f == 0 || g == 0 || isunit(g)
             f = rand(R, 0:10, 0:22)
             g = rand(R, 0:10, 0:22)
          end
@@ -2544,7 +2552,7 @@ end
       while d
          f = R()
          g = R()
-         while f == 0 || g == 0
+         while f == 0 || g == 0 || isunit(g)
             f = rand(R, 0:10)
             g = rand(R, 0:10)
          end

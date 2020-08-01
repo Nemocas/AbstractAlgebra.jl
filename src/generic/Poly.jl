@@ -1255,6 +1255,7 @@ function remove(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) 
   check_parent(z, p)
   !isexact_type(T) && error("remove requires an exact ring")
   iszero(z) && error("Not yet implemented")
+  (isunit(p) || iszero(p)) && throw(error("Second argument must be a non-zero non-unit"))
   flag, q = divides(z, p)
   if !flag
     return 0, z
@@ -1280,6 +1281,7 @@ function remove(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) 
   check_parent(z, p)
   !isexact_type(T) && error("remove requires an exact ring")
   iszero(z) && error("Not yet implemented")
+  (isunit(p) || iszero(p)) && throw(error("Second argument must be a non-zero non-unit"))
   q, r = divrem(z, p)
   if !iszero(r)
     return 0, z
