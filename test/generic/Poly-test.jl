@@ -2420,6 +2420,7 @@ end
    @test_throws ErrorException remove(R(1), R(0))
    @test_throws ErrorException remove(R(1), R(-1))
    @test_throws ErrorException remove(R(0), R(1))
+   @test_throws ErrorException remove(R(0), R(2))
 
    for iter = 1:10
       d = true
