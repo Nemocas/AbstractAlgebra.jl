@@ -2424,7 +2424,7 @@ end
 > i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
 > $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
 > the vector space kernel over the fraction field of the base ring if the
-> latter is not a field. In AbstractAlgebra we use the name ``kernel'' for a
+> latter is not a field. In AbstractAlgebra we use the name `kernel` for a
 > function to compute an integral kernel.
 """
 function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
