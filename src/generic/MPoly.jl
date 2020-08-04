@@ -2082,16 +2082,20 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
    mb = -2*Qc[1]
    # while the heap is not empty
    @inbounds while !isempty(H)
+      # get next exponent from heap
       exp = H[1].exp
+      # make space for additional result term
       k += 1
       if k > q_alloc
          q_alloc *= 2
          resize!(Qc, q_alloc)
          Qe = resize_exps!(Qe, q_alloc)
       end
+      # check if next heap exponent is divisible by leading term
       d1 = monomial_divides!(Qe, k, Exps, exp, Qe, 1, mask, N)
       # deal with each heap chain matching exp
       @inbounds while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
+         # get first node from heap chain
          x = H[1]
          viewc += 1
          Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
@@ -2110,11 +2114,12 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
          # deal with other nodes in current chain
          while (xn = v.next) != 0
             v = I[xn]
-            if v.i == 0
+            if v.i == 0 # term from original poly
                qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
-            else
+            else # term from cross multiplication
                qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
             end
+            # decide whether node needs processing or reusing
             if v.i != 0 || v.j < m
                push!(Q, xn)
             else
@@ -2122,9 +2127,11 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
             end
          end
       end
+      # reduction was delayed, do it now
       qc = reduce!(qc)
-      # put next items into heap
+      # put next items into heap by processing Q
       @inbounds while !isempty(Q)
+         # get iterm from Q
          xn = pop!(Q)
          v = I[xn]
          if v.i == 0 # term from original poly
@@ -2148,31 +2155,33 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
             push!(reuse, xn)
          end
       end
+      # if terms from heap combine to zero, remove new result term
       if qc == 0
          k -= 1
       else
+         # if not, check the accumulation is divisible by leading coeff
          d2, Qc[k] = divides(qc, mb)
-         if !d1 || !d2
+         if !d1 || !d2 # if accumulation term is not divisible, return false
             return false, par()
          end
-         if !isempty(reuse)
+         if !isempty(reuse) # if we have nodes in cache that we can reuse
             xn = pop!(reuse)
-            I[xn] = heap_t(k, 2, 0)
+            I[xn] = heap_t(k, 2, 0) # put (k, 2) on heap
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
             if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                viewc -= 1
             end
-         else
-            push!(I, heap_t(k, 2, 0))
+         else # create new node
+            push!(I, heap_t(k, 2, 0)) # put (k, 2) on heap
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
             if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
                viewc -= 1
            end
          end
-         for i = 2:s
-            if !isempty(reuse)
+         for i = 2:s # put (i, k) on heap for i = 2:s
+            if !isempty(reuse) # if we have nodes in cache that we can reuse
                xn = pop!(reuse)
                I[xn] = heap_t(i, k, 0)
                vw = Viewn[viewc]
@@ -2180,7 +2189,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
                if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                   viewc -= 1
                end
-            else
+            else # create new node
                push!(I, heap_t(i, k, 0))
                vw = Viewn[viewc]
                monomial_add!(Exps, vw, Qe, i, Qe, k, N)
@@ -2189,13 +2198,13 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
                end
             end
          end
-         s = 1
+         s = 1 # reset s
       end
-      qc = zero!(qc)
+      qc = zero!(qc) # clear qc
    end
-   resize!(Qc, k)
+   resize!(Qc, k) # don't waste so much memory with result
    Qe = resize_exps!(Qe, k)
-   return true, parent(a)(Qc, Qe);
+   return true, parent(a)(Qc, Qe) # return result
 end
 
 function sqrt_heap(a::MPoly{T}) where {T <: RingElement}
