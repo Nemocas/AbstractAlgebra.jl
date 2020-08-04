@@ -544,6 +544,33 @@ end
    end
 end
 
+@testset "Generic.MPoly.sqrt..." begin
+   for R in [ZZ, QQ]
+      for num_vars = 1:10
+         var_names = ["x$j" for j in 1:num_vars]
+         ord = rand_ordering()
+
+         S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+
+         for iter = 1:10
+            f = rand(S, 0:5, 0:100, -100:100)
+
+            p = f^2
+
+            @test issquare(p)
+         
+            q = sqrt(f^2)
+
+            @test q^2 == f^2
+
+            if f != 0
+               @test_throws ErrorException sqrt(f^2*varlist[rand(1:num_vars)])
+            end
+         end
+      end
+   end
+end
+
 @testset "Generic.MPoly.euclidean_division..." begin
    R, x = QQ["y"]
 

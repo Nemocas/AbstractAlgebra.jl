@@ -181,6 +181,14 @@ function sqrt(a::Rational{T}) where T <: Integer
    return sqrt(numerator(a))//sqrt(denominator(a))
 end
 
+@doc Markdown.doc"""
+    issquare(a::Rational{T}) where T <: Integer
+> Return true if $a$ is the square of a rational..
+"""
+function issquare(a::Rational{T}) where T <: Integer
+   return issquare(numerator(a)) && issquare(denominator(a))
+end
+
 ###############################################################################
 #
 #   Exponential

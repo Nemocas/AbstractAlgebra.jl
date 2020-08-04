@@ -148,6 +148,10 @@ AbstractAlgebra.sqrt(a::Rational{BigInt})
 ```
 
 ```@docs
+issquare(a::Rational{BigInt})
+```
+
+```@docs
 AbstractAlgebra.exp(a::Rational{BigInt})
 ```
 
@@ -157,9 +161,11 @@ AbstractAlgebra.exp(a::Rational{BigInt})
 julia> d = AbstractAlgebra.sqrt(ZZ(36)//ZZ(25))
 6//5
 
+julia> issquare(ZZ(9)//ZZ(16))
+true
+
 julia> m = AbstractAlgebra.exp(ZZ(0)//ZZ(1))
 1//1
-
 ```
 
 

@@ -470,6 +470,40 @@ julia> d = gcd(f*g^2, f^2*g)
 
 ```
 
+### Square root
+
+Over rings for which an exact square root is available, it is possible to take
+the square root of a polynomial or test whether it is a square.
+
+```julia
+sqrt(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return the square root of the polynomial $f$ and raise an exception if it is
+not a square.
+
+```julia
+issquare(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return `true` if $f$ is a square.
+
+**Examples**
+
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = -4*x^5*y^4 + 5*x^5*y^3 + 4*x^4 - x^3*y^4
+-4*x^5*y^4 + 5*x^5*y^3 + 4*x^4 - x^3*y^4
+
+julia> sqrt(f^2)
+4*x^5*y^4 - 5*x^5*y^3 - 4*x^4 + x^3*y^4
+
+julia> issquare(f)
+false
+```
+
 ## Interface for sparse distributed, random access multivariates
 
 The following additional functions should be implemented by libraries that provide a

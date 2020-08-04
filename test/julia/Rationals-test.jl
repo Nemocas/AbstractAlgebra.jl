@@ -126,6 +126,8 @@ end
 
       @test AbstractAlgebra.sqrt(f)^2 == f
       @test AbstractAlgebra.sqrt(g)^2 == g
+      @test issquare(f)
+      @test issquare(g)
    end
 end
 

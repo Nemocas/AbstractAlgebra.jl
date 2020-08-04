@@ -178,6 +178,18 @@ function sqrt(a::T) where T <: Integer
    return s
 end
 
+@doc Markdown.doc"""
+    issquare(a::T) where T <: Integer
+> Return true if $a$ is a square..
+"""
+function issquare(a::T) where T <: Integer
+   if a < 0
+      return false
+   end
+   s = isqrt(a)
+   return a == s*s
+end
+
 ###############################################################################
 #
 #   Exponential
