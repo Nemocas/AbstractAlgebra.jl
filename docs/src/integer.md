@@ -148,6 +148,10 @@ AbstractAlgebra.sqrt(a::BigInt)
 ```
 
 ```@docs
+issquare(a::BigInt)
+```
+
+```@docs
 AbstractAlgebra.exp(a::BigInt)
 ```
 
@@ -157,9 +161,11 @@ AbstractAlgebra.exp(a::BigInt)
 julia> d = AbstractAlgebra.sqrt(ZZ(36))
 6
 
+julia> issquare(ZZ(9))
+true
+
 julia> m = AbstractAlgebra.exp(ZZ(0))
 1
-
 ```
 ### Coprime bases
 

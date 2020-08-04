@@ -645,6 +645,24 @@ function monomial_divides!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j1::Int
    return flag
 end
 
+# Return true is the j-th exponent vector of the array B can be halved
+# If so the i-th exponent i-th exponent vector of A is set to the half
+function monomial_halves!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, mask::UInt, N::Int)
+   flag = true
+   for k = 1:N
+      b = reinterpret(Int, B[k, j])
+      if isodd(b)
+         flag = false
+      else
+         A[k, i] = reinterpret(UInt, div(b, 2))
+      end
+      if A[k, i] & mask != 0
+         flag = false
+      end
+   end
+   return flag
+end
+
 # Return true if the i-th exponent vector of the array A is in an overflow
 # condition. Note that a mask must be supplied which has 1's in all bit
 # positions that correspond to an overflow of the corresponding exponent field.
@@ -2004,6 +2022,222 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       er = r1.exps
    end
    return parent(a)(r1.coeffs, er)
+end
+
+function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
+   par = parent(a)
+   R = base_ring(par)
+   m = length(a)
+   if m == 0
+      return true, par()
+   end 
+   # ordering mask
+   drmask = monomial_drmask(par, bits)
+   # mask for checking for overflows in halves!
+   mask1 = UInt(1) << (bits - 1)
+   mask = UInt(0)
+   for i = 1:div(sizeof(UInt)*8, bits)
+      mask = (mask << bits) + mask1
+   end
+   # number of words in (possibly packed) exponent
+   N = size(a.exps, 1)
+   # Initialise heap
+   H = Array{heap_s}(undef, 0)
+   I = Array{heap_t}(undef, 0)
+   viewc = m + 1
+   Viewn = [i for i in 1:viewc]
+   Exps = zeros(UInt, N, viewc)
+   # set up heap
+   if m > 1
+      vw = Viewn[viewc]
+      viewc -= 1
+      monomial_set!(Exps, vw, a.exps, 2, N)
+      push!(H, heap_s(vw, 1))
+      push!(I, heap_t(0, 2, 0))
+   end
+   # number of result terms
+   k = 1
+   # alloc arrays for result coeffs/exps
+   q_alloc = Int(floor(Base.sqrt(m)) + 1)
+   Qc = Array{T}(undef, q_alloc)
+   Qe = zeros(UInt, N, q_alloc)
+   # temporary for addmul
+   c = R()
+   # for accumulation of cross multiplications
+   qc = R()
+   # for multiplication by -1 in addmul
+   m1 = -R(1)
+   # Queue for processing next nodes into heap
+   Q = zeros(Int, 0)
+   reuse = zeros(Int, 0)
+   # products (i, k) for k = 2:s to be put in heap
+   s = 1
+   # get leading coeff of sqrt
+   d1 = monomial_halves!(Qe, 1, a.exps, 1, mask, N)
+   d2 = issquare(a.coeffs[1])
+   if !d1 || !d2
+      return false, par()
+   end
+   Qc[1] = sqrt(a.coeffs[1])
+   mb = -2*Qc[1]
+   # while the heap is not empty
+   @inbounds while !isempty(H)
+      exp = H[1].exp
+      k += 1
+      if k > q_alloc
+         q_alloc *= 2
+         resize!(Qc, q_alloc)
+         Qe = resize_exps!(Qe, q_alloc)
+      end
+      d1 = monomial_divides!(Qe, k, Exps, exp, Qe, 1, mask, N)
+      # deal with each heap chain matching exp
+      @inbounds while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
+         x = H[1]
+         viewc += 1
+         Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
+         v = I[x.n]
+         if v.i == 0 # term from original poly
+            qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
+         else # term from cross multiplication
+            qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
+         end
+         # decide whether node needs processing or reusing
+         if v.i != 0 || v.j < m
+            push!(Q, x.n)
+         else
+            push!(reuse, x.n)
+         end
+         # deal with other nodes in current chain
+         while (xn = v.next) != 0
+            v = I[xn]
+            if v.i == 0
+               qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
+            else
+               qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
+            end
+            if v.i != 0 || v.j < m
+               push!(Q, xn)
+            else
+               push!(reuse, xn)
+            end
+         end
+      end
+      qc = reduce!(qc)
+      # put next items into heap
+      @inbounds while !isempty(Q)
+         xn = pop!(Q)
+         v = I[xn]
+         if v.i == 0 # term from original poly
+            # put next poly term in heap
+            I[xn] = heap_t(0, v.j + 1, 0)
+            vw = Viewn[viewc]
+            monomial_set!(Exps, vw, a.exps, v.j + 1, N)
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
+               viewc -= 1
+            end
+         elseif v.j < k - 1 # term from cross mult
+            # i, j -> i, j + 1 and put on heap
+            I[xn] = heap_t(v.i, v.j + 1, 0)
+            vw = Viewn[viewc]
+            monomial_add!(Exps, vw, Qe, v.i, Qe, v.j + 1, N)
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
+               viewc -= 1
+            end
+         elseif v.j == k - 1 # no new term to add
+            s += 1
+            push!(reuse, xn)
+         end
+      end
+      if qc == 0
+         k -= 1
+      else
+         d2, Qc[k] = divides(qc, mb)
+         if !d1 || !d2
+            return false, par()
+         end
+         if !isempty(reuse)
+            xn = pop!(reuse)
+            I[xn] = heap_t(k, 2, 0)
+            vw = Viewn[viewc]
+            monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
+               viewc -= 1
+            end
+         else
+            push!(I, heap_t(k, 2, 0))
+            vw = Viewn[viewc]
+            monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
+            if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
+               viewc -= 1
+           end
+         end
+         for i = 2:s
+            if !isempty(reuse)
+               xn = pop!(reuse)
+               I[xn] = heap_t(i, k, 0)
+               vw = Viewn[viewc]
+               monomial_add!(Exps, vw, Qe, i, Qe, k, N)
+               if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
+                  viewc -= 1
+               end
+            else
+               push!(I, heap_t(i, k, 0))
+               vw = Viewn[viewc]
+               monomial_add!(Exps, vw, Qe, i, Qe, k, N)
+               if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
+                  viewc -= 1
+               end
+            end
+         end
+         s = 1
+      end
+      qc = zero!(qc)
+   end
+   resize!(Qc, k)
+   Qe = resize_exps!(Qe, k)
+   return true, parent(a)(Qc, Qe);
+end
+
+function sqrt_heap(a::MPoly{T}) where {T <: RingElement}
+   v, d = max_fields(a)
+   exp_bits = 8
+   max_e = 2^(exp_bits - 1)
+   while d >= max_e
+      exp_bits *= 2
+      if exp_bits == sizeof(Int)*8
+         break
+      end
+      max_e = 2^(exp_bits - 1)
+   end
+   word_bits = sizeof(Int)*8
+   k = div(word_bits, exp_bits)
+   N = parent(a).N
+   if k != 1
+      M = div(N + k - 1, k)
+      e1 = zeros(UInt, M, length(a))
+      pack_monomials(e1, a.exps, k, exp_bits, length(a))
+      par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
+      a1 = par(a.coeffs, e1)
+      a1.length = a.length
+      flag, q = sqrt_heap(a1, exp_bits)
+      eq = zeros(UInt, N, length(q))
+      unpack_monomials(eq, q.exps, k, exp_bits, length(q))
+   else
+      flag, q = sqrt_heap(a, exp_bits)
+      eq = q.exps
+   end
+   return flag, parent(a)(q.coeffs, eq)
+end
+
+function Base.sqrt(a::MPoly{T}) where {T <: RingElement}
+   flag, q = sqrt_heap(a)
+   !flag && error("Not a square in square root")
+   return q
+end
+
+function issquare(a::MPoly{T}) where {T <: RingElement}
+   flag, q = sqrt_heap(a)
+   return flag
 end
 
 ###############################################################################
