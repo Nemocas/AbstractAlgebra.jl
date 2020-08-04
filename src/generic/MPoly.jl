@@ -2070,8 +2070,6 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
    # Queue for processing next nodes into heap
    Q = zeros(Int, 0)
    reuse = zeros(Int, 0)
-   # products (i, k) for k = 2:s to be put in heap
-   s = 1
    # get leading coeff of sqrt
    d1 = monomial_halves!(Qe, 1, a.exps, 1, mask, N)
    d2 = issquare(a.coeffs[1])
@@ -2102,8 +2100,12 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
          v = I[x.n]
          if v.i == 0 # term from original poly
             qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
-         else # term from cross multiplication
+         elseif v.i == v.j # term from cross multiplication
             qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
+         else
+            c = mul_red!(c, Qc[v.i], Qc[v.j], false) # qc += 2*Q[i]*Q[j]
+            qc = addeq!(qc, c)
+            qc = addeq!(qc, c)
          end
          # decide whether node needs processing or reusing
          if v.i != 0 || v.j < m
@@ -2116,8 +2118,12 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
             v = I[xn]
             if v.i == 0 # term from original poly
                qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
-            else # term from cross multiplication
+            elseif v.i == v.j # term from cross multiplication
                qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
+            else
+               c = mul_red!(c, Qc[v.i], Qc[v.j], false) # qc += 2*Q[i]*Q[j]
+               qc = addeq!(qc, c)
+               qc = addeq!(qc, c)
             end
             # decide whether node needs processing or reusing
             if v.i != 0 || v.j < m
@@ -2142,7 +2148,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
             if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                viewc -= 1
             end
-         elseif v.j < k - 1 # term from cross mult
+         elseif v.j < k - 1 && v.j < v.i # term from cross mult
             # i, j -> i, j + 1 and put on heap
             I[xn] = heap_t(v.i, v.j + 1, 0)
             vw = Viewn[viewc]
@@ -2150,8 +2156,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
             if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                viewc -= 1
             end
-         elseif v.j == k - 1 # no new term to add
-            s += 1
+         elseif v.j == k - 1 || v.j >= v.i # no new term to add
             push!(reuse, xn)
          end
       end
@@ -2180,25 +2185,6 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
                viewc -= 1
            end
          end
-         for i = 2:s # put (i, k) on heap for i = 2:s
-            if !isempty(reuse) # if we have nodes in cache that we can reuse
-               xn = pop!(reuse)
-               I[xn] = heap_t(i, k, 0)
-               vw = Viewn[viewc]
-               monomial_add!(Exps, vw, Qe, i, Qe, k, N)
-               if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
-                  viewc -= 1
-               end
-            else # create new node
-               push!(I, heap_t(i, k, 0))
-               vw = Viewn[viewc]
-               monomial_add!(Exps, vw, Qe, i, Qe, k, N)
-               if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
-                  viewc -= 1
-               end
-            end
-         end
-         s = 1 # reset s
       end
       qc = zero!(qc) # clear qc
    end
