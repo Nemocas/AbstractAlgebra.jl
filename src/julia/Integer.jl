@@ -180,7 +180,7 @@ end
 
 @doc Markdown.doc"""
     issquare(a::T) where T <: Integer
-> Return true if $a$ is a square..
+> Return true if $a$ is a square.
 """
 function issquare(a::T) where T <: Integer
    if a < 0

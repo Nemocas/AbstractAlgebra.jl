@@ -2586,6 +2586,27 @@ end
    end
 end
 
+@testset "Generic.Poly.sqrt..." begin
+   for R in [ZZ, QQ]
+      S, x = PolynomialRing(R, "x")
+      for iter = 1:10
+         f = rand(S, 0:20, -20:20)
+
+         p = f^2
+
+         @test issquare(p)
+
+         q = sqrt(f^2)
+
+         @test q^2 == f^2
+
+         if f != 0
+            @test_throws ErrorException sqrt(f^2*x)
+         end
+      end
+   end
+end
+
 @testset "Generic.Poly.generic_eval..." begin
    R, x = PolynomialRing(ZZ, "x")
 
