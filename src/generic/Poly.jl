@@ -1280,7 +1280,7 @@ function pseudodivrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyEle
    s = b^k
    return q*s, f*s
 end
-
+   
 ################################################################################
 #
 #   Remove and valuation
@@ -1416,6 +1416,69 @@ function divides(z::AbstractAlgebra.PolyElem{T}, x::T) where {T <: RingElement}
    end
    q = set_length!(q, flag ? length(z) : 0)
    return flag, q
+end
+
+################################################################################
+#
+#   Square root
+#
+################################################################################
+
+function sqrt_classical(f::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
+   S = parent(f)
+   R = base_ring(f)
+   if iszero(f)
+      return true, S()
+   end
+   m = length(f)
+   if iseven(m) # square polys have even degree
+      return false, S()
+   end
+   if !issquare(coeff(f, m - 1))
+      return false, S()
+   end
+   lenq = div(m + 1, 2)
+   d = Array{T}(undef, lenq)
+   d[lenq] = sqrt(coeff(f, m - 1))
+   b = -2*d[lenq]
+   k = 1
+   c = R()
+   for i = m - 2:-1:0
+      qc = -coeff(f, i)
+      for j = lenq - k + 1:lenq
+         if i - j + 2 >= j && j > 0
+            c = mul_red!(c, d[j], d[i - j + 2], false)
+            qc = addeq!(qc, c)
+            if (j != i - j + 2)
+               qc = addeq!(qc, c)
+            end
+         end
+      end
+      qc = reduce!(qc)
+      if i >= lenq - 1
+         flag, d[lenq - k] = divides(qc, b)
+         if !flag
+            return false, S()
+         end
+      elseif !iszero(qc)
+         return false, S()
+      end
+      k += 1
+   end
+   q = S(d)
+   q = set_length!(q, lenq)
+   return true, q
+end
+
+function Base.sqrt(f::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
+   flag, q = sqrt_classical(f)
+   !flag && error("Not a square in sqrt")
+   return q
+end
+
+function issquare(f::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
+   flag, q = sqrt_classical(f)
+   return flag
 end
 
 ###############################################################################

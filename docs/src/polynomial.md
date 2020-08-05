@@ -270,6 +270,10 @@ isunit(::PolyElem)
 ```
 
 ```@docs
+issquare(::PolyElem)
+```
+
+```@docs
 degree(::Generic.PolynomialElem)
 ```
 
@@ -439,6 +443,20 @@ x*y^9 + (x + 1)*y^8 + 3*y^7
 julia> h = shift_right(f, 2)
 x
 
+```
+
+### Square root
+
+```@docs
+Base.sqrt(::PolyElem{T}) where T <: RingElement
+```
+
+**Examples**
+
+```julia
+R, x = PolynomialRing(ZZ, "x")
+g = x^2+6*x+1
+sqrt(g^2)
 ```
 
 ### Change of base ring
