@@ -2586,7 +2586,7 @@ end
    end
 end
 
-@testset "Generic.Poly.sqrt..." begin
+@testset "Generic.Poly.square_root..." begin
    for R in [ZZ, QQ]
       S, x = PolynomialRing(R, "x")
       for iter = 1:10

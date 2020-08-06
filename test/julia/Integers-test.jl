@@ -70,6 +70,8 @@ end
       for n = 0:20
          @test r == 0 || a == powmod(r, n, modR)
          @test s == 0 || b == powmod(s, n, modS)
+         @test powmod(r, n, modR) == powmod(r, BigInt(n), modR)
+         @test powmod(s, n, modS) == powmod(s, BigInt(n), modS)
 
          a = mod(a*r, modR)
          b = mod(b*s, modS)

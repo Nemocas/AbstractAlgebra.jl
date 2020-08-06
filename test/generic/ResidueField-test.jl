@@ -254,3 +254,45 @@ end
 
    @test divexact(f, g) == T(7*x^2+25*x+26)
 end
+
+@testset "Generic.ResF.square_root..." begin
+   for p in [3, 47, 733, 13913, 168937, 3980299, 57586577]
+       R = Generic.ResidueField(ZZ, p)
+
+       for i = 1:10
+          a = rand(R, 0:p - 1)^2
+          b = sqrt(a)
+          @test b^2 == a
+
+          if !iszero(a)
+             z = rand(R, 1:p - 1)
+             while issquare(z)
+                z = rand(R, 1:p - 1)
+             end
+
+             @test !issquare(z*a)
+             @test_throws ErrorException sqrt(z*a)
+         end
+      end
+   end
+
+   for p in [ZZ(3), ZZ(53), ZZ(727), ZZ(8893), ZZ(191339), ZZ(2369093), ZZ(52694921)]
+       R = Generic.ResidueField(ZZ, p)                                                                                  
+       
+       for i = 1:10
+          a = rand(R, 0:Int(p - 1))^2
+          b = sqrt(a)
+          @test b^2 == a
+
+          if !iszero(a)
+             z = rand(R, 1:Int(p - 1))
+             while issquare(z)
+                z = rand(R, 1:Int(p - 1))
+             end
+
+             @test !issquare(z*a)
+             @test_throws ErrorException sqrt(z*a)
+         end
+      end
+   end
+end

@@ -236,3 +236,29 @@ julia> h = gcd(f, g)
 
 ```
 
+### Square Root
+
+```@docs
+issquare{T <: Integer}(::ResElem{T})
+```
+
+```@docs
+sqrt{T <: Integer}(::ResElem{T})
+```
+
+**Examples**
+
+```jldoctest
+julia> R = ResidueField(ZZ, 733)
+Residue field of Integers modulo 733
+
+julia> a = R(86)
+86
+
+julia> issquare(a)
+true
+
+julia> sqrt(a)
+532
+```
+

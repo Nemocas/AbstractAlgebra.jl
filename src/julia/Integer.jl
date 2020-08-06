@@ -127,6 +127,29 @@ function powmod(a::T, b::Int, c::T) where T <: Integer
    end
 end
 
+function powmod(a::T, b::BigInt, c::T) where T <: Integer
+   b < 0 && throw(DomainError(b, "exponent must be >= 0"))
+   # special cases
+   if a == 0
+      return T(0)
+   elseif b == 0
+      return T(1)
+   else
+      n = ndigits(b; base = 2)
+      bit = BigInt(1) << (n - 1)
+      z = mod(a, c)
+      bit >>= 1
+      while bit != 0
+         z = mod(z*z, c)
+         if (bit & b) != 0
+            z = mod(z*a, c)
+         end
+         bit >>= 1
+      end
+      return z
+   end
+end
+
 ###############################################################################
 #
 #   Divides
