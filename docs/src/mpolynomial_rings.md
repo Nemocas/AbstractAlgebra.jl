@@ -476,14 +476,16 @@ Over rings for which an exact square root is available, it is possible to take
 the square root of a polynomial or test whether it is a square.
 
 ```julia
-sqrt(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+sqrt(f::MyMPoly{T}, check::bool=true) where T <: AbstractAlgebra.RingElem
 ```
 
 Return the square root of the polynomial $f$ and raise an exception if it is
-not a square.
+not a square. If `check` is set to `false`, the input is assumed to be a
+perfect square and this assumption is not fully checked. This can be
+significantly faster.
 
 ```julia
-issquare(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+issquare(::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 Return `true` if $f$ is a square.
