@@ -569,6 +569,33 @@ end
          end
       end
    end
+
+   # Field of characteristic p
+   for p in [2, 7, 13, 65537, ZZ(2), ZZ(7), ZZ(37), ZZ(65537)]
+      R = ResidueField(ZZ, p)
+      for num_vars = 1:10
+         var_names = ["x$j" for j in 1:num_vars]
+         ord = rand_ordering()
+
+         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+         for iter = 1:10
+            f = rand(S, 0:5, 0:100, 0:Int(p))
+
+            s = f^2
+
+            @test issquare(s)
+
+            q = sqrt(f^2)
+
+            @test q^2 == f^2
+
+            if f != 0
+               @test_throws ErrorException sqrt(f^2*varlist[rand(1:num_vars)])
+            end
+         end
+      end
+   end
 end
 
 @testset "Generic.MPoly.euclidean_division..." begin

@@ -2024,6 +2024,38 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return parent(a)(r1.coeffs, er)
 end
 
+###############################################################################
+#
+#   Square root
+#
+###############################################################################
+
+function sqrt_classical_char2(a::MPoly{T}) where {T <: RingElement}
+   par = parent(a)
+   m = length(a)
+   if m == 0
+      return true, par()
+   end
+   # number of words in (possibly packed) exponent
+   N = size(a.exps, 1)
+   # compute mask
+   bits = sizeof(Int)*8
+   mask = UInt(1) << (bits - 1)
+   # alloc arrays for result coeffs/exps
+   Qc = Array{T}(undef, m)
+   Qe = zeros(UInt, N, m)
+   # compute square root
+   for i = 1:m
+      d1 = monomial_halves!(Qe, i, a.exps, i, mask, N)
+      d2 = issquare(a.coeffs[i])
+      if !d1 || !d2
+         return false, par()
+      end
+      Qc[i] = sqrt(a.coeffs[i])
+   end
+   return true, par(Qc, Qe) # return result
+end
+
 function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
@@ -2194,6 +2226,9 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
 end
 
 function sqrt_heap(a::MPoly{T}) where {T <: RingElement}
+   if characteristic(base_ring(a)) == 2
+      return sqrt_classical_char2(a)
+   end
    v, d = max_fields(a)
    exp_bits = 8
    max_e = 2^(exp_bits - 1)
