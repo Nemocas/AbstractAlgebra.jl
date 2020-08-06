@@ -1424,9 +1424,41 @@ end
 #
 ################################################################################
 
+function sqrt_classical_char2(f::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
+   S = parent(f)
+   R = base_ring(f)
+   if iszero(f)
+      return true, S()
+   end
+   m = length(f)
+   if iseven(m) # square polys have even degree
+      return false, S()
+   end
+   for i = 1:2:m # polynomial must have even exponents
+      if !iszero(coeff(f, i))
+         return false, S()
+      end
+   end
+   lenq = div(m + 1, 2)
+   d = Array{T}(undef, lenq)
+   for i = 1:lenq
+      c = coeff(f, 2*i - 2)
+      if !issquare(c)
+         return false, S()
+      end
+      d[i] = sqrt(c)
+   end
+   q = S(d)
+   q = set_length!(q, lenq)
+   return true, q
+end
+
 function sqrt_classical(f::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    S = parent(f)
    R = base_ring(f)
+   if characteristic(R) == 2
+      return sqrt_classical_char2(f)
+   end
    if iszero(f)
       return true, S()
    end

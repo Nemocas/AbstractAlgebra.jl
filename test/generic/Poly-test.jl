@@ -2587,14 +2587,54 @@ end
 end
 
 @testset "Generic.Poly.square_root..." begin
-   for R in [ZZ, QQ]
+   # Exact ring
+   S, x = PolynomialRing(ZZ, "x")
+   for iter = 1:10
+      f = rand(S, 0:20, -20:20)
+
+      p = f^2
+
+      @test issquare(p)
+
+      q = sqrt(f^2)
+
+      @test q^2 == f^2
+
+      if f != 0
+         @test_throws ErrorException sqrt(f^2*x)
+      end
+   end
+
+   # Exact field
+   S, x = PolynomialRing(QQ, "x")
+   for iter = 1:10
+      f = rand(S, 0:20, -20:20)
+
+      p = f^2
+
+      @test issquare(p)
+
+      q = sqrt(f^2)
+
+      @test q^2 == f^2
+
+      if f != 0
+         @test_throws ErrorException sqrt(f^2*x)
+      end
+   end
+
+   # Characteristic p field
+   for p in [2, 7, 19, 65537, ZZ(2), ZZ(7), ZZ(19), ZZ(65537)]
+      R = ResidueField(ZZ, p)
+
       S, x = PolynomialRing(R, "x")
+      
       for iter = 1:10
-         f = rand(S, 0:20, -20:20)
-
-         p = f^2
-
-         @test issquare(p)
+         f = rand(S, 0:20, 0:Int(p))
+         
+         s = f^2
+         
+         @test issquare(s)
 
          q = sqrt(f^2)
 
