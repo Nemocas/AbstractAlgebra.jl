@@ -2600,6 +2600,10 @@ end
 
       @test q^2 == f^2
 
+      q = sqrt(f^2, false)
+
+      @test q^2 == f^2
+
       if f != 0
          @test_throws ErrorException sqrt(f^2*x)
       end
@@ -2615,6 +2619,10 @@ end
       @test issquare(p)
 
       q = sqrt(f^2)
+
+      @test q^2 == f^2
+
+      q = sqrt(f^2, false)
 
       @test q^2 == f^2
 
@@ -2637,6 +2645,10 @@ end
          @test issquare(s)
 
          q = sqrt(f^2)
+
+         @test q^2 == f^2
+
+         q = sqrt(f^2, false)
 
          @test q^2 == f^2
 
