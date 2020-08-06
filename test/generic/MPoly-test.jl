@@ -563,6 +563,10 @@ end
 
             @test q^2 == f^2
 
+            q = sqrt(f^2, false)
+
+            @test q^2 == f^2
+
             if f != 0
                @test_throws ErrorException sqrt(f^2*varlist[rand(1:num_vars)])
             end
@@ -585,6 +589,10 @@ end
             s = f^2
 
             @test issquare(s)
+
+            q = sqrt(f^2)
+
+            @test q^2 == f^2
 
             q = sqrt(f^2)
 

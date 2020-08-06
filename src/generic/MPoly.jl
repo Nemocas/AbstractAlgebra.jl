@@ -2056,7 +2056,7 @@ function sqrt_classical_char2(a::MPoly{T}) where {T <: RingElement}
    return true, par(Qc, Qe) # return result
 end
 
-function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
+function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -2110,6 +2110,12 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
    end
    Qc[1] = sqrt(a.coeffs[1])
    mb = -2*Qc[1]
+   # if exact sqrt is not checked, compute last exponent that needs dealing with
+   if !check
+      Fe = zeros(UInt, N, 1)
+      monomial_halves!(Fe, 1, a.exps, m, mask, N)
+      monomial_add!(Fe, 1, Fe, 1, Qe, 1, N)
+   end
    # while the heap is not empty
    @inbounds while !isempty(H)
       # get next exponent from heap
@@ -2123,6 +2129,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
       end
       # check if next heap exponent is divisible by leading term
       d1 = monomial_divides!(Qe, k, Exps, exp, Qe, 1, mask, N)
+      do_coeffs = check || d1
       # deal with each heap chain matching exp
       @inbounds while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
          # get first node from heap chain
@@ -2130,14 +2137,16 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
          viewc += 1
          Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
          v = I[x.n]
-         if v.i == 0 # term from original poly
-            qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
-         elseif v.i == v.j # term from cross multiplication
-            qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
-         else
-            c = mul_red!(c, Qc[v.i], Qc[v.j], false) # qc += 2*Q[i]*Q[j]
-            qc = addeq!(qc, c)
-            qc = addeq!(qc, c)
+         if do_coeffs
+            if v.i == 0 # term from original poly
+               qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
+            elseif v.i == v.j # term from cross multiplication
+               qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
+            else
+               c = mul_red!(c, Qc[v.i], Qc[v.j], false) # qc += 2*Q[i]*Q[j]
+               qc = addeq!(qc, c)
+               qc = addeq!(qc, c)
+            end
          end
          # decide whether node needs processing or reusing
          if v.i != 0 || v.j < m
@@ -2148,14 +2157,16 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
          # deal with other nodes in current chain
          while (xn = v.next) != 0
             v = I[xn]
-            if v.i == 0 # term from original poly
-               qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
-            elseif v.i == v.j # term from cross multiplication
-               qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
-            else
-               c = mul_red!(c, Qc[v.i], Qc[v.j], false) # qc += 2*Q[i]*Q[j]
-               qc = addeq!(qc, c)
-               qc = addeq!(qc, c)
+            if do_coeffs
+               if v.i == 0 # term from original poly
+                  qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
+               elseif v.i == v.j # term from cross multiplication
+                  qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
+               else
+                  c = mul_red!(c, Qc[v.i], Qc[v.j], false) # qc += 2*Q[i]*Q[j]
+                  qc = addeq!(qc, c)
+                  qc = addeq!(qc, c)
+               end
             end
             # decide whether node needs processing or reusing
             if v.i != 0 || v.j < m
@@ -2166,7 +2177,9 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
          end
       end
       # reduction was delayed, do it now
-      qc = reduce!(qc)
+      if do_coeffs
+         qc = reduce!(qc)
+      end
       # put next items into heap by processing Q
       @inbounds while !isempty(Q)
          # get iterm from Q
@@ -2177,16 +2190,20 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
             I[xn] = heap_t(0, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_set!(Exps, vw, a.exps, v.j + 1, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
-               viewc -= 1
+            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+               if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
+                  viewc -= 1
+               end
             end
          elseif v.j < k - 1 && v.j < v.i # term from cross mult
             # i, j -> i, j + 1 and put on heap
             I[xn] = heap_t(v.i, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, v.i, Qe, v.j + 1, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
-               viewc -= 1
+            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+               if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
+                  viewc -= 1
+               end
             end
          elseif v.j == k - 1 || v.j >= v.i # no new term to add
             push!(reuse, xn)
@@ -2206,16 +2223,20 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
             I[xn] = heap_t(k, 2, 0) # put (k, 2) on heap
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
-               viewc -= 1
+            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+               if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
+                  viewc -= 1
+               end
             end
          else # create new node
             push!(I, heap_t(k, 2, 0)) # put (k, 2) on heap
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
-            if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
-               viewc -= 1
-           end
+            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+               if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
+                  viewc -= 1
+              end
+            end
          end
       end
       qc = zero!(qc) # clear qc
@@ -2225,7 +2246,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int) where {T <: RingElement}
    return true, parent(a)(Qc, Qe) # return result
 end
 
-function sqrt_heap(a::MPoly{T}) where {T <: RingElement}
+function sqrt_heap(a::MPoly{T}, check::Bool=true) where {T <: RingElement}
    if characteristic(base_ring(a)) == 2
       return sqrt_classical_char2(a)
    end
@@ -2249,18 +2270,18 @@ function sqrt_heap(a::MPoly{T}) where {T <: RingElement}
       par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
       a1 = par(a.coeffs, e1)
       a1.length = a.length
-      flag, q = sqrt_heap(a1, exp_bits)
+      flag, q = sqrt_heap(a1, exp_bits, check)
       eq = zeros(UInt, N, length(q))
       unpack_monomials(eq, q.exps, k, exp_bits, length(q))
    else
-      flag, q = sqrt_heap(a, exp_bits)
+      flag, q = sqrt_heap(a, exp_bits, check)
       eq = q.exps
    end
    return flag, parent(a)(q.coeffs, eq)
 end
 
-function Base.sqrt(a::MPoly{T}) where {T <: RingElement}
-   flag, q = sqrt_heap(a)
+function Base.sqrt(a::MPoly{T}, check::Bool=true) where {T <: RingElement}
+   flag, q = sqrt_heap(a, check)
    !flag && error("Not a square in square root")
    return q
 end
