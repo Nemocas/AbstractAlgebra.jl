@@ -544,7 +544,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.sqrt..." begin
+@testset "Generic.MPoly.square_root..." begin
    for R in [ZZ, QQ]
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]

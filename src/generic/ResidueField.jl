@@ -318,7 +318,7 @@ end
     ^(a::AbstractAlgebra.ResFieldElem, b::Int)
 > Return $a^b$.
 """
-function ^(a::AbstractAlgebra.ResFieldElem, b::Int)
+function ^(a::AbstractAlgebra.ResFieldElem, b::Integer)
    parent(a)(powmod(data(a), b, modulus(a)))
 end
 
@@ -453,6 +453,79 @@ end
 function gcd(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(gcd(gcd(data(a), modulus(a)), data(b)))
+end
+
+###############################################################################
+#
+#   Square root
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    issquare(a::AbstractAlgebra.ResFieldElem{T}) where T <: Integer
+> Return `true` if $a$ is a square.
+"""
+function issquare(a::AbstractAlgebra.ResFieldElem{T}) where T <: Integer
+   if iszero(a)
+      return true
+   end
+   p = modulus(a)
+   pm1div2 = div(p - 1, 2)
+   return isone(a^pm1div2)
+end
+
+@doc Markdown.doc"""
+    sqrt(a::AbstractAlgebra.ResFieldElem{T}) where T <: Integer
+> Return the square root of $a$ if it is a square, otherwise an exception is
+> raised.
+"""
+function Base.sqrt(a::AbstractAlgebra.ResFieldElem{T}) where T <: Integer
+   U = parent(a)
+   p = modulus(a)
+   # Compute Q, S such that p - 1 = Q*2^S
+   Q = p - 1
+   S = 0 # power of 2 dividing p - 1
+   while iseven(Q)
+      Q >>= 1
+      S += 1
+   end
+   # find a quadratic nonresidue z mod p
+   z = U(rand(1:p - 1))
+   while issquare(z)
+      z = U(rand(1:p - 1))
+   end
+   # set up
+   M = S
+   c = z^Q
+   t = a^Q
+   R = a^div(Q + 1, 2)
+   # main loop
+   while true
+      if iszero(t)
+         return zero(U)
+      end
+      if isone(t)
+         return R
+      end
+      u = t
+      i = 0
+      while i < M
+         if isone(u)
+            break
+         end
+         u = u^2
+         i += 1
+      end
+      i == M && error("Not a square in sqrt")
+      b = c
+      for j = 1:M - i - 1
+         b = b^2
+      end
+      M = i
+      c = b^2
+      t *= c
+      R *= b
+   end
 end
 
 ###############################################################################
