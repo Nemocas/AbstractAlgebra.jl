@@ -482,6 +482,9 @@ end
 function Base.sqrt(a::AbstractAlgebra.ResFieldElem{T}) where T <: Integer
    U = parent(a)
    p = modulus(a)
+   if p == 2 # special case, cannot find a quadratic nonresidue mod 2
+      return deepcopy(a)
+   end
    # Compute Q, S such that p - 1 = Q*2^S
    Q = p - 1
    S = 0 # power of 2 dividing p - 1
