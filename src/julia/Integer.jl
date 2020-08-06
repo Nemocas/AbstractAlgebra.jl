@@ -193,11 +193,12 @@ end
 @doc Markdown.doc"""
     sqrt(a::T) where T <: Integer
 > Return the integer square root of $a$. If $a$ is not a perfect square an
-> error is thrown.
+> exception is thrown. If `check` is set to `false` this check is not
+> performed.
 """
-function sqrt(a::T) where T <: Integer
+function sqrt(a::T, check::Bool=true) where T <: Integer
    s = isqrt(a)
-   s*s != a && error("Not a square in sqrt")
+   (check && s*s != a) && error("Not a square in sqrt")
    return s
 end
 

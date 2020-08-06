@@ -177,8 +177,8 @@ end
 > Return the square root of $a$ if it is the square of a rational, otherwise
 > throw an error.
 """
-function sqrt(a::Rational{T}) where T <: Integer
-   return sqrt(numerator(a))//sqrt(denominator(a))
+function sqrt(a::Rational{T}, check::Bool=true) where T <: Integer
+   return sqrt(numerator(a, check))//sqrt(denominator(a, check))
 end
 
 @doc Markdown.doc"""

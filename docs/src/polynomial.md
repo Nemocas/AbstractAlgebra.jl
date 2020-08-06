@@ -448,7 +448,7 @@ x
 ### Square root
 
 ```@docs
-Base.sqrt(::PolyElem{T}) where T <: RingElement
+Base.sqrt(::PolyElem{T}, ::Bool) where T <: RingElement
 ```
 
 **Examples**
