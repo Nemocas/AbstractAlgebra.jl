@@ -174,6 +174,35 @@ julia> h = gcd(f, g)
 
 ```
 
+### Square root
+
+```@docs
+issquare{T <: RingElem}(::FracElem{T})
+```
+
+```@docs
+sqrt{T <: RingElem}(::FracElem{T})
+```
+
+**Examples**
+
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia> S = FractionField(R)
+Fraction field of Univariate Polynomial Ring in x over Rationals
+
+julia> a = (21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
+(21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
+
+julia> sqrt(a^2)
+(21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
+
+julia> issquare(a^2)
+true
+```
+
 ### Remove and valuation
 
 When working over a Euclidean domain, it is convenient to extend valuations to the

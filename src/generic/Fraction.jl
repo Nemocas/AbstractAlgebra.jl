@@ -734,6 +734,29 @@ end
 
 ###############################################################################
 #
+#   Square root
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    issquare(a::AbstractAlgebra.FracElem{T}) where T <: RingElem
+> Return `true` if $a$ is a square.
+"""
+function issquare(a::AbstractAlgebra.FracElem{T}) where T <: RingElem
+   return issquare(numerator(a)) && issquare(denominator(a))
+end
+
+@doc Markdown.doc"""
+    Base.sqrt(a::AbstractAlgebra.FracElem{T}) where T <: RingElem
+> Return the square root of $a$ if it is a square, otherwise raise an
+> exception.
+"""
+function Base.sqrt(a::AbstractAlgebra.FracElem{T}) where T <: RingElem
+   return parent(a)(sqrt(numerator(a)), sqrt(denominator(a)))
+end
+
+###############################################################################
+#
 #   GCD
 #
 ###############################################################################

@@ -198,7 +198,8 @@ end
 end
 
 @testset "Generic.Frac.divides..." begin
-   S, x = PolynomialRing(ZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
+   S = FractionField(R)
 
    for i in 1:10000
      a = rand(S, 1:5, -10:10)
@@ -209,6 +210,19 @@ end
      if d
        @test b * q == a
      end
+   end
+end
+
+@testset "Generic.Frac.square_root..." begin
+   R, x = PolynomialRing(QQ, "x")
+   S = FractionField(R)
+
+   for i = 1:100
+      a = rand(S, 1:5, -10:10)
+
+      @test issquare(a^2)
+
+      @test sqrt(a^2)^2 == a^2
    end
 end
 
