@@ -90,4 +90,14 @@ x^2 + 2*x + 1
 
 julia&gt; h = gcd(f, g)
 1
-</code></pre><footer><hr/><a class="previous" href="../residue_rings/"><span class="direction">Previous</span><span class="title">Residue Ring Interface</span></a><a class="next" href="../fields/"><span class="direction">Next</span><span class="title">Field Interface</span></a></footer></article></body></html>
+</code></pre><h3><a class="nav-anchor" id="Square-Root-1" href="#Square-Root-1">Square Root</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.issquare-Union{Tuple{ResFieldElem{T}}, Tuple{T}} where T&lt;:Integer" href="#AbstractAlgebra.Generic.issquare-Union{Tuple{ResFieldElem{T}}, Tuple{T}} where T&lt;:Integer"><code>AbstractAlgebra.Generic.issquare</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">issquare(a::AbstractAlgebra.ResFieldElem{T}) where T &lt;: Integer</code></pre><blockquote><p>Return <code>true</code> if <span>$a$</span> is a square.</p></blockquote></div></section><div class="admonition warning"><div class="admonition-title">Missing docstring.</div><div class="admonition-text"><p>Missing docstring for <code>sqrt{T &lt;: Integer}(::ResFieldElem{T})</code>. Check Documenter&#39;s build log for details.</p></div></div><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R = ResidueField(ZZ, 733)
+Residue field of Integers modulo 733
+
+julia&gt; a = R(86)
+86
+
+julia&gt; issquare(a)
+true
+
+julia&gt; sqrt(a)
+532</code></pre><footer><hr/><a class="previous" href="../residue_rings/"><span class="direction">Previous</span><span class="title">Residue Ring Interface</span></a><a class="next" href="../fields/"><span class="direction">Next</span><span class="title">Field Interface</span></a></footer></article></body></html>
