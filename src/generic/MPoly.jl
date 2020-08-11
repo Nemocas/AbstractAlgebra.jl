@@ -2195,7 +2195,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
                   viewc -= 1
                end
             end
-         elseif v.j < k - 1 && v.j < v.i # term from cross mult
+         elseif v.j < v.i # term from cross mult
             # i, j -> i, j + 1 and put on heap
             I[xn] = heap_t(v.i, v.j + 1, 0)
             vw = Viewn[viewc]
