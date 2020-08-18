@@ -568,7 +568,8 @@ end
             @test q^2 == f^2
 
             if f != 0
-               @test_throws ErrorException sqrt(f^2*varlist[rand(1:num_vars)])
+               x = varlist[rand(1:num_vars)]
+               @test_throws ErrorException sqrt(f^2*(x^2 - x))
             end
          end
       end
@@ -599,7 +600,8 @@ end
             @test q^2 == f^2
 
             if f != 0
-               @test_throws ErrorException sqrt(f^2*varlist[rand(1:num_vars)])
+               x = varlist[rand(1:num_vars)]
+               @test_throws ErrorException sqrt(f^2*(x^2 - x))
             end
          end
       end

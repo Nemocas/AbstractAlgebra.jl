@@ -2076,13 +2076,14 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
    # Initialise heap
    H = Array{heap_s}(undef, 0)
    I = Array{heap_t}(undef, 0)
-   viewc = m + 1
-   Viewn = [i for i in 1:viewc]
-   Exps = zeros(UInt, N, viewc)
+   viewc = 1
+   Viewn = [1, 2]
+   viewalloc = 2
+   Exps = zeros(UInt, N, 2)
    # set up heap
    if m > 1
       vw = Viewn[viewc]
-      viewc -= 1
+      viewc += 1
       monomial_set!(Exps, vw, a.exps, 2, N)
       push!(H, heap_s(vw, 1))
       push!(I, heap_t(0, 2, 0))
@@ -2134,7 +2135,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
       @inbounds while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
          # get first node from heap chain
          x = H[1]
-         viewc += 1
+         viewc -= 1
          Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
          v = I[x.n]
          if do_coeffs
@@ -2192,7 +2193,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
             monomial_set!(Exps, vw, a.exps, v.j + 1, N)
             if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
-                  viewc -= 1
+                  viewc += 1
                end
             end
          elseif v.j < v.i # term from cross mult
@@ -2202,7 +2203,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
             monomial_add!(Exps, vw, Qe, v.i, Qe, v.j + 1, N)
             if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
-                  viewc -= 1
+                  viewc += 1
                end
             end
          elseif v.j == k - 1 || v.j >= v.i # no new term to add
@@ -2218,6 +2219,9 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
          if !d1 || !d2 # if accumulation term is not divisible, return false
             return false, par()
          end
+         viewalloc += 1
+         push!(Viewn, viewalloc)
+         Exps = resize_exps!(Exps, viewalloc)
          if !isempty(reuse) # if we have nodes in cache that we can reuse
             xn = pop!(reuse)
             I[xn] = heap_t(k, 2, 0) # put (k, 2) on heap
@@ -2225,7 +2229,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
             monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
             if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
-                  viewc -= 1
+                  viewc += 1
                end
             end
          else # create new node
@@ -2234,7 +2238,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
             monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
             if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
-                  viewc -= 1
+                  viewc += 1
               end
             end
          end
