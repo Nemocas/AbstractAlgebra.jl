@@ -179,7 +179,15 @@ end
 #
 ###############################################################################
 
-inv(a::Integer) = divexact(1, a)
+function inv(a::T) where T <: Integer
+   if a == 1
+      return one(T)
+   elseif a == -1
+      return -one(T)
+   end
+   iszero(a) && throw(DivideError())
+   throw(ArgumentError("not a unit"))
+end
 
 ###############################################################################
 #
