@@ -1056,6 +1056,8 @@ end
       @test divexact(f*g, g) == f
    end
 
+   @test_throws ArgumentError divexact(x^2, x - 1)
+
    # Fake finite field of char 7, degree 2
    S, y = PolynomialRing(GF(7), "y")
    F = ResidueField(S, y^2 + 6y + 3)

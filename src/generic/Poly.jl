@@ -1098,6 +1098,7 @@ function divexact(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}
          f = set_length!(f, normalise(f, lenf - 1))
       end
    end
+   length(f) != 0 && throw(ArgumentError("not an exact division"))
    q = parent(f)(d)
    q = set_length!(q, lenq)
    return q
