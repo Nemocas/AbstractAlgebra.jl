@@ -383,7 +383,7 @@ julia&gt; A = S([BigInt(2) 3 5; 1 4 7; 9 2 2])
 julia&gt; B = T([BigInt(4), 5, 7])
 [4]
 [5]
-[7]</code></pre><h3><a class="nav-anchor" id="Inverse-1" href="#Inverse-1">Inverse</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.inv-Tuple{Union{MatAlgElem{#s4}, MatElem{#s4}} where #s4&lt;:Union{RingElem, AbstractFloat, Integer, Rational}}" href="#Base.inv-Tuple{Union{MatAlgElem{#s4}, MatElem{#s4}} where #s4&lt;:Union{RingElem, AbstractFloat, Integer, Rational}}"><code>Base.inv</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">inv(M::Generic.MatrixElem{T}) where {T &lt;: RingElement}</code></pre><blockquote><p>Given a non-singular <span>$n\times n$</span> matrix over a ring, return an <span>$n\times n$</span> matrix <span>$X$</span> such that <span>$MX = I_n$</span>, where <span>$I_n$</span> is the <span>$n\times n$</span> identity matrix. If <span>$M$</span> is not invertible over the base ring an exception is raised.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(QQ, &quot;x&quot;)
+[7]</code></pre><h3><a class="nav-anchor" id="Inverse-1" href="#Inverse-1">Inverse</a></h3><div class="admonition warning"><div class="admonition-title">Missing docstring.</div><div class="admonition-text"><p>Missing docstring for <code>inv(::MatrixElem{&lt;:RingElement})</code>. Check Documenter&#39;s build log for details.</p></div></div><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(QQ, &quot;x&quot;)
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia&gt; K, a = NumberField(x^3 + 3x + 1, &quot;a&quot;)

@@ -65,7 +65,7 @@ x^3 + 3*x + 1
 
 julia&gt; isunit(r)
 true
-</code></pre><h3><a class="nav-anchor" id="Inversion-1" href="#Inversion-1">Inversion</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.inv-Tuple{ResElem}" href="#Base.inv-Tuple{ResElem}"><code>Base.inv</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">inv(a::AbstractAlgebra.ResElem)</code></pre><blockquote><p>Return the inverse of the element <span>$a$</span> in the residue ring. If an impossible inverse is encountered, an exception is raised.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(QQ, &quot;x&quot;)
+</code></pre><h3><a class="nav-anchor" id="Inversion-1" href="#Inversion-1">Inversion</a></h3><div class="admonition warning"><div class="admonition-title">Missing docstring.</div><div class="admonition-text"><p>Missing docstring for <code>inv(::AbstractAlgebra.ResElem)</code>. Check Documenter&#39;s build log for details.</p></div></div><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(QQ, &quot;x&quot;)
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia&gt; S = ResidueRing(R, x^3 + 3x + 1)

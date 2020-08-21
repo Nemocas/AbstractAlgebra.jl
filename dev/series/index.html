@@ -161,7 +161,7 @@ julia&gt; h = truncate(c, 7)
 
 julia&gt; k = truncate(d, 5)
 2*x + x^3 + O(x^4)
-</code></pre><h3><a class="nav-anchor" id="Division-1" href="#Division-1">Division</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.inv-Tuple{RelSeriesElem}" href="#Base.inv-Tuple{RelSeriesElem}"><code>Base.inv</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">inv(a::AbstractAlgebra.RelSeriesElem)</code></pre><blockquote><p>Return the inverse of the power series <span>$a$</span>, i.e. <span>$1/a$</span>.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, t = PolynomialRing(QQ, &quot;t&quot;)
+</code></pre><h3><a class="nav-anchor" id="Division-1" href="#Division-1">Division</a></h3><div class="admonition warning"><div class="admonition-title">Missing docstring.</div><div class="admonition-text"><p>Missing docstring for <code>inv(::RelSeriesElem)</code>. Check Documenter&#39;s build log for details.</p></div></div><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, t = PolynomialRing(QQ, &quot;t&quot;)
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia&gt; S, x = PowerSeriesRing(R, 30, &quot;x&quot;)

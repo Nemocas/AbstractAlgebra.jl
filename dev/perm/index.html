@@ -139,7 +139,7 @@ julia&gt; g^3
 (1,4,2,5,3)
 
 julia&gt; g^5
-()</code></pre></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.inv-Tuple{Perm}" href="#Base.inv-Tuple{Perm}"><code>Base.inv</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">inv(g::Perm)</code></pre><blockquote><p>Return the inverse of the given permutation, i.e. the permuation <span>$g^{-1}$</span> such that <span>$g ∘ g^{-1} = g^{-1} ∘ g$</span> is the identity permutation.</p></blockquote></div></section><p>Permutations parametrized by different types can be multiplied, and follow the standard julia integer promotion rules:</p><pre><code class="language-julia">g = rand(SymmetricGroup(Int8(5)));
+()</code></pre></div></section><div class="admonition warning"><div class="admonition-title">Missing docstring.</div><div class="admonition-text"><p>Missing docstring for <code>inv(::Perm)</code>. Check Documenter&#39;s build log for details.</p></div></div><p>Permutations parametrized by different types can be multiplied, and follow the standard julia integer promotion rules:</p><pre><code class="language-julia">g = rand(SymmetricGroup(Int8(5)));
 h = rand(SymmetricGroup(UInt32(5)));
 typeof(g*h)
 
