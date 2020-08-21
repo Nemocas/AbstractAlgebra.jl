@@ -69,7 +69,7 @@ function compose(f::MapWithSection{U, C}, g::MapWithSection{D, U}) where {D, U, 
    end
 end
 
-function inv(f::MapWithSection)
+function Base.inv(f::MapWithSection)
    return MapWithRetraction(f.section, f.map)
 end
  
@@ -124,7 +124,7 @@ function compose(f::MapWithRetraction{U, C}, g::MapWithRetraction{D, U}) where {
    end
 end
 
-function inv(f::MapWithRetraction)
+function Base.inv(f::MapWithRetraction)
    return MapWithSection(f.retraction, f.map)
 end
 

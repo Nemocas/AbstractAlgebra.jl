@@ -585,10 +585,10 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    inv(a::AbstractAlgebra.FracElem)
+    Base.inv(a::AbstractAlgebra.FracElem)
 > Return the inverse of the fraction $a$.
 """
-function inv(a::AbstractAlgebra.FracElem)
+function Base.inv(a::AbstractAlgebra.FracElem)
    iszero(numerator(a, false)) && throw(DivideError())
    return parent(a)(deepcopy(denominator(a, false)),
                     deepcopy(numerator(a, false)))

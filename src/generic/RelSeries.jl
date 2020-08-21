@@ -923,10 +923,10 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    inv(a::AbstractAlgebra.RelSeriesElem)
+    Base.inv(a::AbstractAlgebra.RelSeriesElem)
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
-function inv(a::AbstractAlgebra.RelSeriesElem)
+function Base.inv(a::AbstractAlgebra.RelSeriesElem)
    iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    a1 = polcoeff(a, 0)

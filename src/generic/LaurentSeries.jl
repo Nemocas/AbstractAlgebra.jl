@@ -1166,10 +1166,10 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    inv(a::Generic.LaurentSeriesElem)
+    Base.inv(a::Generic.LaurentSeriesElem)
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
-function inv(a::LaurentSeriesElem)
+function Base.inv(a::LaurentSeriesElem)
    iszero(a) && throw(DivideError())
    a1 = polcoeff(a, 0)
    ainv = parent(a)()

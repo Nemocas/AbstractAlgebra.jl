@@ -405,7 +405,7 @@ end
 > Return the inverse of the element $a$ in the residue ring. If an impossible
 > inverse is encountered, an exception is raised.
 """
-function inv(a::AbstractAlgebra.ResFieldElem)
+function Base.inv(a::AbstractAlgebra.ResFieldElem)
    g, ainv = gcdinv(data(a), modulus(a))
    if g != 1
       error("Impossible inverse in inv")

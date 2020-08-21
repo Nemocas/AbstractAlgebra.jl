@@ -403,11 +403,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    inv(a::AbstractAlgebra.ResElem)
+    Base.inv(a::AbstractAlgebra.ResElem)
 > Return the inverse of the element $a$ in the residue ring. If an impossible
 > inverse is encountered, an exception is raised.
 """
-function inv(a::AbstractAlgebra.ResElem)
+function Base.inv(a::AbstractAlgebra.ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
    if g != 1
       error("Impossible inverse in inv")

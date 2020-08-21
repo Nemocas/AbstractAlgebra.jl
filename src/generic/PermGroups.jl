@@ -514,11 +514,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    inv(g::Perm)
+    Base.inv(g::Perm)
 > Return the inverse of the given permutation, i.e. the permuation $g^{-1}$
 > such that $g ∘ g^{-1} = g^{-1} ∘ g$ is the identity permutation.
 """
-function inv(g::Perm)
+function Base.inv(g::Perm)
    res = similar(g)
    @inbounds for i in 1:length(res.d)
       res[g[i]] = i

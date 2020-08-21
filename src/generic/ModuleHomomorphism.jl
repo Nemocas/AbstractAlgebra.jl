@@ -68,11 +68,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    inv(f::Map(ModuleIsomorphism))
+    Base.inv(f::Map(ModuleIsomorphism))
 > Return the inverse map of the given module isomorphism. This is computed
 > cheaply.
 """
-function inv(f::Map(ModuleIsomorphism))
+function Base.inv(f::Map(ModuleIsomorphism))
    T = elem_type(base_ring(domain(f)))
    return ModuleIsomorphism{T}(codomain(f), domain(f), inverse_mat(f), mat(f))
 end
