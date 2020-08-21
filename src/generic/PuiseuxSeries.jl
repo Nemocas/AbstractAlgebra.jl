@@ -476,11 +476,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   inv(a::PuiseuxSeriesElem{T}) where T <: RingElement
+   Base.inv(a::PuiseuxSeriesElem{T}) where T <: RingElement
 > Return the inverse of the power series $a$, i.e. $1/a$, if it exists.
 > Otherwise an exception is raised.
 """
-function inv(a::PuiseuxSeriesElem{T}) where T <: RingElement
+function Base.inv(a::PuiseuxSeriesElem{T}) where T <: RingElement
    z = parent(a)(inv(a.data), a.scale)
    z = rescale!(z)
    return z

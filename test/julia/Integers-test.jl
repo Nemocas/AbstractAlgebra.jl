@@ -117,6 +117,16 @@ end
    end
 end
 
+@testset "Julia.Integers.inv..." begin
+   @test AbstractAlgebra.inv(ZZ(1)) == 1
+   @test AbstractAlgebra.inv(-ZZ(1)) == -1
+   @test AbstractAlgebra.inv(zz(1)) == 1
+   @test AbstractAlgebra.inv(-zz(1)) == -1
+
+   @test_throws ArgumentError AbstractAlgebra.inv(ZZ(2))
+   @test_throws DivideError AbstractAlgebra.inv(ZZ(0))
+end
+
 @testset "Julia.Integers.gcd..." begin
    R = zz
    S = ZZ

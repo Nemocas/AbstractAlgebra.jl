@@ -85,11 +85,4 @@ isunit(f::MyElem)
 
 Return `true` if the given element is invertible, i.e. nonzero in the field.
 
-### Inversion
-
-```julia
-inv(f::MyElem)
-```
-
-Return the inverse of the given element in the field. If $f = 0$, an error is thrown.
 

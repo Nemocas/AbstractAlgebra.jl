@@ -1840,6 +1840,11 @@ end
          @test ishessenberg(A)
       end
    end
+
+   M = matrix(ZZ, 3, 3, [10 -4 8; -1 -5 -3; 3 8 -10])
+   H = hessenberg(M)
+
+   @test H == matrix(ZZ, 3, 3, [10 -28 8; -1 4 -3; 0 50 -19])
 end
 
 @testset "Generic.Mat.kronecker_product..." begin

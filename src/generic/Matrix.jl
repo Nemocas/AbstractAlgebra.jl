@@ -2391,7 +2391,7 @@ function pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
    return X, d
 end
 
-function inv(M::MatrixElem{T}) where {T <: FieldElement}
+function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
    issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    A = solve_lu(M, identity_matrix(M))
    return A
@@ -2404,7 +2404,7 @@ end
 > identity matrix. If $M$ is not invertible over the base ring an exception is
 > raised.
 """
-function inv(M::MatrixElem{T}) where {T <: RingElement}
+function Base.inv(M::MatrixElem{T}) where {T <: RingElement}
    issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    X, d = pseudo_inv(M)
    isunit(d) || throw(DomainError(M, "Matrix is not invertible."))
@@ -3254,10 +3254,10 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
       cu = canonical_unit(H[k, i])
       if cu != 1
          for c = i:n
-            H[k, c] = divexact(H[k, c],cu)
+            H[k, c] = divexact(H[k, c], cu)
         end
          for c = 1:m
-            U[k, c] = divexact(U[k, c],cu)
+            U[k, c] = divexact(U[k, c], cu)
          end
       end
       for j = 1:k-1
@@ -3897,19 +3897,19 @@ end
 function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_trafo::Bool = false) where {T <: RingElement}
    m = nrows(S)
    n = ncols(S)
-   l = min(m,n)
+   l = min(m, n)
    i = 1
    t = base_ring(S)()
    t1 = base_ring(S)()
    t2 = base_ring(S)()
-   while i<=l
+   while i <= l
       kb_clear_row!(S, K, i, with_trafo)
       hnf_kb!(S, U, with_trafo, i)
-      c = i+1
+      c = i + 1
       while c <= n && iszero(S[i, c])
-         c+=1
+         c += 1
       end
-      if c != n+1
+      if c != n + 1
          continue
       end
       i+=1
@@ -3927,7 +3927,7 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
             q = -divexact(S[j, j], d)
             t1 = mul!(t1, q, v)
             for c = 1:m
-               t = deepcopy(U[i,c])
+               t = deepcopy(U[i, c])
                U[i, c] += U[j, c]
                t2 = mul_red!(t2, t1, U[j, c], false)
                U[j, c] += t2
@@ -3946,7 +3946,7 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
                K[r, j] = reduce!(t1 + t2)
             end
          end
-         S[j, j] = divexact(S[i, i]*S[j, j],d)
+         S[j, j] = divexact(S[i, i]*S[j, j], d)
          S[i, i] = d
       end
    end
@@ -4311,20 +4311,20 @@ function popov!(P::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T <: Poly
          continue
       end
       pivot = pivots[i][1]
-      d = degree(P[pivot,i])
-      for r = 1:pivot-1
-         if degree(P[r,i]) < d
+      d = degree(P[pivot, i])
+      for r = 1:pivot - 1
+         if degree(P[r, i]) < d
             continue
          end
-         q = -div(P[r,i],P[pivot,i])
+         q = -div(P[r, i],P[pivot, i])
          for c = 1:n
-            t = mul!(t, q, P[pivot,c])
-            P[r, c] = addeq!(P[r,c], t)
+            t = mul!(t, q, P[pivot, c])
+            P[r, c] = addeq!(P[r, c], t)
          end
          if with_trafo
             for c = 1:ncols(U)
-               t = mul!(t, q, U[pivot,c])
-               U[r, c] = addeq!(U[r,c], t)
+               t = mul!(t, q, U[pivot, c])
+               U[r, c] = addeq!(U[r, c], t)
             end
          end
       end
@@ -4334,14 +4334,14 @@ function popov!(P::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T <: Poly
          continue
       end
       r = pivots[i][1]
-      cu = canonical_unit(P[r,i])
+      cu = canonical_unit(P[r, i])
       if cu != 1
          for j = 1:n
-            P[r,j] = divexact(P[r,j],cu)
+            P[r, j] = divexact(P[r, j], cu)
          end
          if with_trafo
             for j = 1:ncols(U)
-               U[r,j] = divexact(U[r,j],cu)
+               U[r, j] = divexact(U[r, j], cu)
             end
          end
       end

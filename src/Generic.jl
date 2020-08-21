@@ -9,7 +9,7 @@ using Markdown, Random, InteractiveUtils
 
 import Base: Array, abs, asin, asinh, atan, atanh, axes, bin, checkbounds, cmp, conj,
              convert, copy, cos, cosh, dec, deepcopy, deepcopy_internal,
-             exponent, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
+             exponent, gcd, gcdx, getindex, hash, hcat, hex, intersect,
              invmod, isapprox, isempty, isequal, isfinite, isless, isone, isqrt,
              isreal, iszero, lcm, ldexp, length, log, Matrix, mod, ndigits, oct, one,
              parent, parse, precision, rand, Rational, rem, reverse, setindex!,
@@ -29,7 +29,7 @@ import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
                           promote_rule, show_minus_one
 
 import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring, check_parent,
-                          denominator, div, divrem, exp, gen, gens, isgen,
+                          denominator, div, divrem, exp, gen, gens, inv, isgen,
                           ismonomial, ismonomial_recursive, isunit, lead, numerator, trail, sqrt, expressify
 
 using ..AbstractAlgebra

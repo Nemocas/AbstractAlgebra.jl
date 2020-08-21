@@ -71,6 +71,10 @@ function div(a::T, b::T) where T
   return Base.div(a, b)
 end
 
+function inv(a::T) where T
+  return Base.inv(a)
+end
+
 function numerator(a::T, canonicalise::Bool=true) where T
   return Base.numerator(a, canonicalise)
 end
@@ -87,7 +91,7 @@ import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, bin,
              ceil, checkbounds, conj, convert, cmp, cos, cosh, cospi, cot,
              coth, dec, deepcopy, deepcopy_internal, expm1, exponent, fill,
              floor, gcd, gcdx, getindex, hash, hcat, hex, hypot, intersect,
-             inv, invmod, isequal, isfinite, isless, isone, isqrt, isreal,
+             invmod, isequal, isfinite, isless, isone, isqrt, isreal,
              iszero, lcm, ldexp, length, log, log1p, mod, ndigits, oct, one,
              parent, parse, precision, rand, Rational, rem, reverse, setindex!,
              show, sincos, similar, sign, sin, sinh, sinpi, size, string, tan,
@@ -354,7 +358,8 @@ include("algorithms/LaurentPoly.jl")
 
 include("Generic.jl")
 
-# Do not import numerator and denominator as we have our own
+# Do not import div, divrem, exp, inv, sqrt, numerator and denominator
+# as we have our own
 import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  add_row!, basis, cached, can_solve_left_reduced_triu,
                  character, characteristic, charpoly, charpoly_danilevsky!,
@@ -381,11 +386,10 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  hnf_with_transform, hnf_via_popov,
                  hnf_via_popov_with_transform,
                  hooklength, identity_map, identity_matrix, image,
-                 image_map, image_fn, inflate, integral, interpolate, inv,
+                 image_map, image_fn, inflate, integral, interpolate,
                  inv!, invariant_factors,
                  inverse_fn, inverse_image_fn,
                  inverse_mat, reverse_rows, reverse_rows!,
-                 reverse_cols, reverse_cols!,
                  invmod, involves_at_most_one_variable,
                  iscompatible, isconstant, isdegree, ishessenberg,
                  ishnf, ishomogeneous, isisomorphic,
@@ -416,6 +420,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  renormalize!, rels, rescale!, resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, retraction_map, reverse,
+                 reverse_cols, reverse_cols!,
                  right_kernel, rref, rref!, section_map, setcoeff!,
                  set_exponent_vector!, set_field!, set_length!, set_limit!,
                  setpermstyle, set_precision!, set_valuation!, size, shift_left,
@@ -429,7 +434,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem
 
-# Do not export divrem, exp, sqrt, numerator and denominator as we define our own
+# Do not export inv, div, divrem, exp, sqrt, numerator and denominator as we define our own
 export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, add_column!, add_row, add_row!, base_ring, cached,
                  canonical_unit, can_solve_left_reduced_triu,
                  change_base_ring, character,
@@ -458,11 +463,10 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  hnf_with_transform, hnf_via_popov,
                  hnf_via_popov_with_transform,
                  hooklength, identity_map, identity_matrix, image,
-                 image_map, image_fn, inflate, integral, interpolate, inv,
+                 image_map, image_fn, inflate, integral, interpolate,
                  inv!, invariant_factors,
                  inverse_fn, inverse_image_fn,
                  inverse_mat, invmod, reverse_rows,
-                 reverse_rows!, reverse_cols, reverse_cols!,
                  iscompatible, isconstant, isdegree,
                  isdomain_type, isexact_type, isgen, ishessenberg,
                  ishnf, ishomogeneous, isisomorphic, ismonomial, ismonomial_recursive,
@@ -495,6 +499,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  renormalize!, rels, resultant, resultant_ducos, rescale!,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, retraction_map, reverse,
+                 reverse_rows!, reverse_cols, reverse_cols!,
                  right_kernel, rref, rref!, section_map, setcoeff!,
                  set_exponent_vector!, set_field!, set_length!, set_limit!,
                  setpermstyle, set_precision!, set_valuation!, shift_left, shift_right,

@@ -416,6 +416,18 @@ mean exact division in the ring, i.e. return $q$ such that $f = gq$. A `DivideEr
 should be thrown if $g$ is zero. If no exact quotient exists or an impossible inverse
 is unavoidably encountered, an error should be thrown.
 
+### Inverse
+
+```julia
+inv(f::MyElem)
+```
+
+Return the inverse of $f$, i.e. $1/f$, though note that Julia uses `/` for floating
+point division. Here we mean exact division in the ring.
+
+A fallback for this function is provided in terms of `divexact` so an implementation
+can be omitted if preferred.
+
 ### Unsafe operators
 
 To speed up polynomial and matrix arithmetic, it sometimes makes sense to mutate values
