@@ -2591,6 +2591,7 @@ function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
    n = nrows(A)
    u = R()
    t = R()
+   oneR = one(R)
    for m = 2:n - 1
       i = m + 1
       while i <= n && iszero(A[i, m - 1])
@@ -2600,7 +2601,7 @@ function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
          if !iszero(A[m, m - 1])
             i = m
          end
-         h = -inv(A[i, m - 1])
+         h = -divexact(oneR, A[i, m - 1])
          if i > m
             for j = m - 1:n
                A[i, j], A[m, j] = A[m, j], A[i, j]
@@ -2710,6 +2711,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
    W = Array{T}(undef, n)
    pol = S(1)
    i = 1
+   oneR = one(R)
    while i < n
       h = A[n - i + 1, n - i]
       while iszero(h)
@@ -2797,7 +2799,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
       for kk = 1:n
          A[n - i, kk] = mul!(A[n - i, kk], A[n - i, kk], d)
       end
-      d = inv(h)
+      d = divexact(oneR, h)
       parent(d) # To work around a bug in julia
       i += 1
    end
@@ -2827,6 +2829,7 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
    W = Array{T}(undef, n)
    pol = S(1)
    i = 1
+   oneR = one(R)
    while i < n
       h = A[n - i + 1, n - i]
       while iszero(h)
@@ -2858,7 +2861,7 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
          end
          h = A[n - i + 1, n - i]
       end
-      h = -inv(h)
+      h = -divexact(oneR, h)
       for j = 1:n
          V[j] = A[n - i + 1, j]*h
          W[j] = deepcopy(A[n - i + 1, j])
@@ -3254,10 +3257,10 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
       cu = canonical_unit(H[k, i])
       if cu != 1
          for c = i:n
-            H[k, c] = divexact(H[k, c],cu)
+            H[k, c] = divexact(H[k, c], cu)
         end
          for c = 1:m
-            U[k, c] = divexact(U[k, c],cu)
+            U[k, c] = divexact(U[k, c], cu)
          end
       end
       for j = 1:k-1
@@ -3328,7 +3331,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
          end
       end
    end
-
+   oneR = one(R)
    t = zero(R)
    b = zero(R)
    t2 = zero(R)
@@ -3424,7 +3427,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
 
       u = canonical_unit(H[k, k])
       if !isone(u)
-         u = R(inv(u))
+         u = divexact(oneR, u)
          for j in k:n
             H[k, j] = mul!(H[k, j], H[k, j], u)
          end
@@ -4311,20 +4314,20 @@ function popov!(P::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T <: Poly
          continue
       end
       pivot = pivots[i][1]
-      d = degree(P[pivot,i])
-      for r = 1:pivot-1
-         if degree(P[r,i]) < d
+      d = degree(P[pivot, i])
+      for r = 1:pivot - 1
+         if degree(P[r, i]) < d
             continue
          end
-         q = -div(P[r,i],P[pivot,i])
+         q = -div(P[r, i], P[pivot, i])
          for c = 1:n
-            t = mul!(t, q, P[pivot,c])
-            P[r, c] = addeq!(P[r,c], t)
+            t = mul!(t, q, P[pivot, c])
+            P[r, c] = addeq!(P[r, c], t)
          end
          if with_trafo
             for c = 1:ncols(U)
-               t = mul!(t, q, U[pivot,c])
-               U[r, c] = addeq!(U[r,c], t)
+               t = mul!(t, q, U[pivot, c])
+               U[r, c] = addeq!(U[r, c], t)
             end
          end
       end
@@ -4334,14 +4337,14 @@ function popov!(P::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T <: Poly
          continue
       end
       r = pivots[i][1]
-      cu = canonical_unit(P[r,i])
+      cu = canonical_unit(P[r, i])
       if cu != 1
          for j = 1:n
-            P[r,j] = divexact(P[r,j],cu)
+            P[r,j] = divexact(P[r, j], cu)
          end
          if with_trafo
             for j = 1:ncols(U)
-               U[r,j] = divexact(U[r,j],cu)
+               U[r,j] = divexact(U[r, j], cu)
             end
          end
       end
