@@ -383,6 +383,7 @@ end
 
    @test iszero(zero(S))
    @test isone(one(S))
+   @test isunit(one(S))
 
    @test zero(A) == zero(S)
    @test one(A) == one(S)
@@ -427,12 +428,14 @@ end
       @test eltype(typeof(n)) == ET
       @test eltype(n) == ET
       @test elem_type(base_ring(n)) == ET
+      @test !isunit(n)
    end
 
    for n = (matrix(R, zeros(Int, 2, 0)),
             matrix(R, zeros(Int, 0, 2)))
       @test length(n) == 0
       @test isempty(n)
+      @test !isunit(n)
    end
 
    M3 = MatrixAlgebra(R, 3)
@@ -453,6 +456,10 @@ end
       @test parent(m3) == M3
    end
 
+   let m = M3([0, 1, 0, 1, 0, 0, 0, 0, 1])
+      @test isunit(m)
+   end
+
    M0 = MatrixAlgebra(R, 0)
    m0 = rand(M0, 0:9, -9, 9)
    @test length(m0) == 0
@@ -467,6 +474,7 @@ end
                randmat_with_rank(rng, M45, 3, 0:9, -9:9)]
       @test length(m45) == 20
       @test !iszero(m45)
+      @test !isunit(m45)
       @test m45 isa Generic.MatSpaceElem
       @test parent(m45) == M45
       @test_throws DomainError one(m45)
@@ -478,6 +486,15 @@ end
       @test typeof(m[1, 1]) == BigInt # not in AbstractAlgebra's hierarchy
       @test eltype(m) == BigInt
       @test eltype(typeof(m)) == BigInt
+      @test !isunit(m)
+   end
+
+   let m = matrix(ZZ, 2, 2, 1:4)
+      @test !isunit(m)
+   end
+
+   let m = matrix(QQ, 2, 2, 1:4)
+      @test isunit(m)
    end
 end
 

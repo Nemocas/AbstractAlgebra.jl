@@ -19,6 +19,10 @@ inverse_mat(f::Map(ModuleIsomorphism)) = f.inverse_matrix
 
 inverse_image_fn(f::Map(ModuleIsomorphism)) = f.inverse_image_fn
 
+isunit(f::Map(ModuleHomomorphism)) = isunit(mat(f))
+
+isunit(f::Map(ModuleIsomorphism)) = true
+
 ###############################################################################
 #
 #   String I/O

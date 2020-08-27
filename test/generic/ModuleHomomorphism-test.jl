@@ -9,6 +9,8 @@
 
    @test f(m) == M([ZZ(7), ZZ(10)])
 
+   @test !isunit(f)
+
    N, nmap = sub(M, [m])
 
    g = ModuleHomomorphism(N, N, matrix(ZZ, 1, 1, [3]))
@@ -16,6 +18,12 @@
    m2 = N([ZZ(4)])
 
    @test g(m2) == N([ZZ(12)])
+
+   @test !isunit(g)
+
+   h = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [0, 1, 1, 0]))
+
+  @test isunit(h)
 end
 
 @testset "Generic.ModuleHomomorphism.kernel..." begin

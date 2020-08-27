@@ -306,6 +306,10 @@ function iszero_column(M::MatrixElem{T}, i::Int) where T <: RingElement
   return true
 end
 
+isunit(M::MatrixElem{T}) where T <: RingElement = issquare(M) && isunit(det(M))
+
+isunit(M::MatrixElem{T}) where T <: FieldElement = nrows(M) == ncols(M) == rank(M)
+
 ################################################################################
 #
 #  Copy and deepcopy
