@@ -981,6 +981,35 @@ julia> U*A
 [0  0  281]
 ```
 
+### Smith normal form
+
+```@docs
+snf{T <: RingElem}(::MatElem{T})
+snf_with_transform{T <: RingElem}(::MatElem{T})
+```
+
+**Examples**
+
+```jldoctest
+julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
+[ 2  3  -1]
+[ 3  5   7]
+[11  1  12]
+
+julia> S = snf(A)
+[1  0    0]
+[0  1    0]
+[0  0  281]
+
+julia> S, T, U = snf_with_transform(A)
+([1 0 0; 0 1 0; 0 0 281], [1 0 0; 7 1 0; 229 31 1], [0 -3 26; 0 2 -17; -1 0 1])
+
+julia> T*A*U
+[1  0    0]
+[0  1    0]
+[0  0  281]
+```
+
 ### (Weak) Popov form
 
 AbstractAlgebra.jl provides algorithms for computing the (weak) Popov of a matrix with
