@@ -556,17 +556,6 @@ julia> isrref(A)
 true
 ```
 
-### Hermite normal form
-
-```@docs
-hnf{T <: RingElem}(::MatElem{T})
-hnf_with_transform{T <: RingElem}(::MatElem{T})
-```
-
-```@docs
-ishnf{T <: RingElem}(::MatElem{T})
-```
-
 ### Determinant
 
 ```@docs
@@ -954,6 +943,42 @@ julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
 
 julia> similarity!(M, 1, R(3))
 
+```
+
+### Hermite normal form
+
+```@docs
+hnf{T <: RingElem}(::MatElem{T})
+hnf_with_transform{T <: RingElem}(::MatElem{T})
+```
+
+```@docs
+ishnf{T <: RingElem}(::MatElem{T})
+```
+
+**Examples**
+
+```jldoctest
+julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
+[ 2  3  -1]
+[ 3  5   7]
+[11  1  12]
+
+julia> H = hnf(A)
+[1  0  255]
+[0  1   17]
+[0  0  281]                                                                                                             
+
+julia> ishnf(H)
+true
+
+julia> H, U = hnf_with_transform(A)
+([1 0 255; 0 1 17; 0 0 281], [-47 28 1; -3 2 0; -52 31 1])
+
+julia> U*A
+[1  0  255]
+[0  1   17]
+[0  0  281]
 ```
 
 ### (Weak) Popov form
