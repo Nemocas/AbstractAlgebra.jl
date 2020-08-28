@@ -3,7 +3,7 @@
 
    R = Generic.ResidueRing(B, 16453889)
 
-   @test_throws ErrorException Generic.ResidueRing(B, 0)
+   @test_throws DomainError Generic.ResidueRing(B, 0)
 
    @test elem_type(R) == Generic.Res{elem_type(B)}
    @test elem_type(Generic.ResRing{elem_type(B)}) == Generic.Res{elem_type(B)}
