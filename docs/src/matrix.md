@@ -967,3 +967,27 @@ weak_popov_with_transform{T <: PolyElem}(::Generic.Mat{T})
 popov{T <: PolyElem}(::Generic.Mat{T})
 popov_with_transform{T <: PolyElem}(::Generic.Mat{T})
 ```
+
+**Examples**
+
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x");
+
+julia> A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+[1        2          3              x]
+[x      2*x        3*x            x^2]
+[x  x^2 + 1  x^3 + x^2  x^4 + x^2 + 1]
+
+julia> P = weak_popov(A)
+[   1                       2                   3  x]
+[   0                       0                   0  0]
+[-x^3  -2*x^3 + x^2 - 2*x + 1  -2*x^3 + x^2 - 3*x  1]
+
+julia> P, U = weak_popov_with_transform(A)
+([1 2 3 x; 0 0 0 0; -x^3 -2*x^3 + x^2 - 2*x + 1 -2*x^3 + x^2 - 3*x 1], [1 0 0; -x 1 0; -x^3 - x 0 1])
+
+julia> U*A
+[   1                       2                   3  x]
+[   0                       0                   0  0]
+[-x^3  -2*x^3 + x^2 - 2*x + 1  -2*x^3 + x^2 - 3*x  1]
+```
