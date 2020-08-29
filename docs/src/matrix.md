@@ -734,7 +734,7 @@ julia> B = T([BigInt(4), 5, 7])
 ### Inverse
 
 ```@docs
-inv(::MatrixElem{<:RingElement})
+Base.inv{T <: RingElement}(::MatrixElem{T})
 ```
 
 **Examples**
@@ -778,7 +778,6 @@ julia> X, d = pseudo_inv(A)
 ### Nullspace
 
 ```@docs
-nullspace{T <: RingElem}(::MatElem{T})
 nullspace{T <: FieldElem}(::MatElem{T})
 ```
 
