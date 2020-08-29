@@ -3953,10 +3953,19 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
    return nothing
 end
 
+@doc Markdown.doc"""
+    snf(A::Generic.MatrixElem{T}) where {T <: RingElement}
+> Return the Smith normal form of $A$.
+"""
 function snf(a::MatrixElem{T}) where {T <: RingElement}
   return snf_kb(a)
 end
 
+@doc Markdown.doc"""
+    snf_with_transform(A)
+> Return the tuple $S, T, U$ consisting of the Smith normal form $S$ of $A$
+> together with invertible matrices $T$ and $U$ such that $TAU = S$.
+"""
 function snf_with_transform(a::MatrixElem{T}) where {T <: RingElement}
   return snf_kb_with_transform(a)
 end
