@@ -11,7 +11,8 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        powers, randmat_triu, randmat_with_rank, similarity!, solve,
        solve_rational, hnf, hnf_with_transform,
        issquare, snf, snf_with_transform, weak_popov,
-       weak_popov_with_transform, can_solve_left_reduced_triu, can_solve_with_solution,
+       weak_popov_with_transform, can_solve_left_reduced_triu,
+       can_solve, can_solve_with_solution,
        extended_weak_popov, extended_weak_popov_with_transform, rank,
        rank_profile_popov, hnf_via_popov, hnf_via_popov_with_transform, popov,
        popov_with_transform, det_popov, _check_dim, nrows, ncols, gram, rref,
@@ -2420,6 +2421,19 @@ function can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgeb
    else
       @error("Unsupported argument :$side for side: Must be :left or :right.")
    end
+end
+
+@doc Markdown.doc"""
+    can_solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side = :right) where S <: RingElement
+> Given two matrices $a$ and $b$ over the same ring, checks the solubility
+> of $ax = b$ if `side` is `:right` or $xa = b$ if `side` is `:left`.
+> Returns true if a solution exists, false otherwise. If the dimensions
+> of $a$ and $b$ are incompatible, an exception is raised. If a solution
+> should be computed as well, use `can_solve_with_solution` instead.
+"""
+function can_solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S};
+                                                                  side = :right) where S <: RingElement
+   return can_solve_with_solution(a, b; side=side)[1]
 end
 
 ###############################################################################

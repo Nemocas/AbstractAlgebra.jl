@@ -1572,6 +1572,7 @@ end
                B = M*X1
                (flag, X) = can_solve_with_solution(M, M*X1)
 
+               @test can_solve(M, B)
                @test flag && M*X == B
             end
 
@@ -1585,6 +1586,7 @@ end
                B = X1*M
                (flag, X) = can_solve_with_solution(M, X1*M; side = :left)
 
+               @test can_solve(M, B; side = :left)
                @test flag && X*M == B
             end
          end
@@ -1609,6 +1611,7 @@ end
             B = M*X1
             (flag, X) = can_solve_with_solution(M, M*X1)
 
+            @test can_solve(M, B)
             @test flag && M*X == B
          end
 
@@ -1622,6 +1625,7 @@ end
             B = X1*M
             (flag, X) = can_solve_with_solution(M, X1*M; side = :left)
 
+            @test can_solve(M, B; side = :left)
             @test flag && X*M == B
          end
       end
@@ -1631,9 +1635,11 @@ end
       M = matrix(R, 1, 1, [x])
       X = matrix(R, 1, 1, [1])
 
+      @assert !can_solve(M, X)
       (flag, _) = can_solve_with_solution(M, X)
       @assert !flag
 
+      @assert !can_solve(M, X; side = :left)
       (flag, _) = can_solve_with_solution(M, X; side = :left)
       @assert !flag
    end
@@ -1642,9 +1648,11 @@ end
       M = matrix(ZZ, 2, 2, [1, 1, 1, 1])
       X = matrix(ZZ, 2, 1, [1, 0])
 
+      @assert !can_solve(M, X)
       (flag, _) = can_solve_with_solution(M, X)
       @assert !flag
 
+      @assert !can_solve(M, X'; side = :left)
       (flag, _) = can_solve_with_solution(M, X'; side = :left)
       @assert !flag
    end
@@ -1653,10 +1661,12 @@ end
       M = matrix(ZZ, 3, 3, [2, 0, 0, 0, 1, 0, 0, 0, 1])
 
       X1 = matrix(ZZ, 3, 1, [1, 0, 0])
+      @assert !can_solve(M, X1)
       (flag, X) = can_solve_with_solution(M, X1)
       @assert !flag
 
       X2 = matrix(ZZ, 2, 3, [1, 0, 0, 0, 1, 0])
+      @assert !can_solve(M, X2; side = :left)
       (flag, _) = can_solve_with_solution(M, X2; side = :left)
       @assert !flag
    end

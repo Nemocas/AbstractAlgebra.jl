@@ -361,7 +361,8 @@ include("Generic.jl")
 # Do not import div, divrem, exp, inv, sqrt, numerator and denominator
 # as we have our own
 import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
-                 add_row!, basis, cached, can_solve_left_reduced_triu, can_solve_with_solution,
+                 add_row!, basis, cached, can_solve_left_reduced_triu,
+                 can_solve, can_solve_with_solution,
                  character, characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_composable,
@@ -436,7 +437,8 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
 
 # Do not export inv, div, divrem, exp, sqrt, numerator and denominator as we define our own
 export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, add_column!, add_row, add_row!, base_ring, cached,
-                 canonical_unit, can_solve_left_reduced_triu, can_solve_with_solution,
+                 canonical_unit, can_solve_left_reduced_triu,
+                 can_solve, can_solve_with_solution,
                  change_base_ring, character,
                  characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
