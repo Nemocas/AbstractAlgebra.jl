@@ -2189,33 +2189,9 @@ end
 > no such matrix exists, an exception is raised.
 """
 function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
-   @assert ncols(a) == ncols(b)
-   H, T = hnf_with_transform(a)
-   b = deepcopy(b)
-   z = zero(a, nrows(b), nrows(a))
-   l = min(ncols(a), nrows(a))
-   t = base_ring(a)()
-   for i = 1:nrows(b)
-      for j = 1:l
-         k = 1
-         while k <= ncols(H) && iszero(H[j, k])
-            k += 1
-         end
-         if k > ncols(H)
-            continue
-         end
-         q, r = divrem(b[i, k], H[j, k])
-         r != 0 && error("Unable to solve linear system")
-         z[i, j] = q
-         q = -q
-         for h = k:ncols(H)
-            t = mul!(t, q, H[j, h])
-            b[i, h] = addeq!(b[i, h], t)
-         end
-      end
-   end
-   b != 0 && error("Unable to solve linear system")
-   return z*T
+   (flag, x) = can_solve_with_solution(a, b; side = :left)
+   flag || error("Unable to solve linear system")
+   return x
 end
 
 # Find the pivot columns of an rref matrix
