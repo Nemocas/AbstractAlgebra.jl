@@ -1554,6 +1554,114 @@ end
    end
 end
 
+@testset "Generic.Mat.can_solve..." begin
+   for R in [ZZ, QQ]
+      for iter = 1:40
+         for dim = 0:5
+            r = rand(1:5)
+            n = rand(1:5)
+            c = rand(1:5)
+
+            let
+               S = MatrixSpace(R, n, r)
+               U = MatrixSpace(R, c, n)
+
+               X1 = rand(S, -20:20)
+               M = rand(U, -20:20)
+
+               B = M*X1
+               (flag, X) = can_solve_with_solution(M, M*X1)
+
+               @test flag && M*X == B
+            end
+
+            let
+               S = MatrixSpace(R, r, n)
+               U = MatrixSpace(R, n, c)
+
+               X1 = rand(S, -20:20)
+               M = rand(U, -20:20)
+
+               B = X1*M
+               (flag, X) = can_solve_with_solution(M, X1*M; side = :left)
+
+               @test flag && X*M == B
+            end
+         end
+      end
+   end
+
+   R, x = PolynomialRing(QQ, "x")
+
+   for iter = 1:4
+      for dim = 0:5
+         r = rand(1:5)
+         n = rand(1:5)
+         c = rand(1:5)
+
+         let
+            S = MatrixSpace(R, n, r)
+            U = MatrixSpace(R, c, n)
+
+            X1 = rand(S, 1:2, -10:10)
+            M = rand(U, 1:2, -10:10)
+
+            B = M*X1
+            (flag, X) = can_solve_with_solution(M, M*X1)
+
+            @test flag && M*X == B
+         end
+
+         let
+            S = MatrixSpace(R, r, n)
+            U = MatrixSpace(R, n, c)
+
+            X1 = rand(S, 1:2, -10:10)
+            M = rand(U, 1:2, -10:10)
+
+            B = X1*M
+            (flag, X) = can_solve_with_solution(M, X1*M; side = :left)
+
+            @test flag && X*M == B
+         end
+      end
+   end
+
+   let
+      M = matrix(R, 1, 1, [x])
+      X = matrix(R, 1, 1, [1])
+
+      (flag, _) = can_solve_with_solution(M, X)
+      @assert !flag
+
+      (flag, _) = can_solve_with_solution(M, X; side = :left)
+      @assert !flag
+   end
+
+   let
+      M = matrix(ZZ, 2, 2, [1, 1, 1, 1])
+      X = matrix(ZZ, 2, 1, [1, 0])
+
+      (flag, _) = can_solve_with_solution(M, X)
+      @assert !flag
+
+      (flag, _) = can_solve_with_solution(M, X'; side = :left)
+      @assert !flag
+   end
+
+   let
+      M = matrix(ZZ, 3, 3, [2, 0, 0, 0, 1, 0, 0, 0, 1])
+
+      X1 = matrix(ZZ, 3, 1, [1, 0, 0])
+      (flag, X) = can_solve_with_solution(M, X1)
+      @assert !flag
+
+      X2 = matrix(ZZ, 2, 3, [1, 0, 0, 0, 1, 0])
+      (flag, _) = can_solve_with_solution(M, X2; side = :left)
+      @assert !flag
+   end
+end
+
 @testset "Generic.Mat.solve_triu..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
