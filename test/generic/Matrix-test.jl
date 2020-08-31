@@ -65,7 +65,7 @@ function is_snf(A::Generic.Mat)
    return true
 end
 
-function is_weak_popov(P::Generic.Mat, rank::Int)
+function is_weak_popov(P::Generic.Mat{T}, rank::Int) where { T <: Generic.Poly }
    zero_rows = 0
    pivots = zeros(ncols(P))
    for r = 1:nrows(P)
@@ -74,6 +74,7 @@ function is_weak_popov(P::Generic.Mat, rank::Int)
          zero_rows += 1
          continue
       end
+      # There is already a pivot in this column
       if pivots[p] != 0
          return false
       end
@@ -81,6 +82,58 @@ function is_weak_popov(P::Generic.Mat, rank::Int)
    end
    if zero_rows != nrows(P)-rank
       return false
+   end
+   return true
+end
+
+function is_popov(P::Generic.Mat{T}, rank::Int) where { T <: Generic.Poly }
+   zero_rows = 0
+   for r = 1:nrows(P)
+      p = AbstractAlgebra.find_pivot_popov(P, r)
+      if P[r, p] != 0
+         break
+      end
+      zero_rows += 1
+   end
+   # The zero rows must all be on top.
+   if zero_rows != nrows(P) - rank
+      return false
+   end
+   pivotscr = zeros(Int, ncols(P)) # pivotscr[i] == j means the pivot of column i is in row j
+   pivots = zeros(Int, nrows(P)) # the other way round
+   for r = zero_rows + 1:nrows(P)
+      p = AbstractAlgebra.find_pivot_popov(P, r)
+      if P[r, p] == 0
+         return false
+      end
+      if pivotscr[p] != 0
+         # There is already a pivot in this column
+         return false
+      end
+      pivotscr[p] = r
+      pivots[r] = p
+   end
+   for r = zero_rows + 1:nrows(P)
+      p = pivots[r]
+      f = P[r, p]
+      if !isone(lead(f))
+         return false
+      end
+      for i = 1:nrows(P)
+         i == r ? continue : nothing
+         if degree(P[i, p]) >= degree(f)
+            return false
+         end
+      end
+      if r == nrows(P)
+         break
+      end
+      g = P[r + 1, pivots[r + 1]]
+      if degree(f) >= degree(g)
+         if pivots[r] >= pivots[r + 1]
+            return false
+         end
+      end
    end
    return true
 end
@@ -2515,7 +2568,7 @@ end
    R, x = PolynomialRing(QQ, "x")
 
    A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
-   r = rank(A)
+   r = 2 # == rank(A)
 
    P = weak_popov(A)
    @test is_weak_popov(P, r)
@@ -2530,7 +2583,7 @@ end
    S, y = PolynomialRing(F, "y")
 
    B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
-   s = rank(B)
+   s = 2 # == rank(B)
 
    P = weak_popov(B)
    @test is_weak_popov(P, s)
@@ -2583,6 +2636,83 @@ end
 
       P, U = weak_popov_with_transform(A)
       @test is_weak_popov(P, r)
+      @test U*A == P
+      @test isunit(det(U))
+   end
+end
+
+@testset "Generic.Mat.popov..." begin
+   R, x = PolynomialRing(QQ, "x")
+
+   A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+   r = 2 # == rank(A)
+
+   P = popov(A)
+   @test is_popov(P, r)
+
+   P, U = popov_with_transform(A)
+   @test is_popov(P, r)
+   @test U*A == P
+   @test isunit(det(U))
+
+   F = GF(7)
+
+   S, y = PolynomialRing(F, "y")
+
+   B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
+   s = 2 # == rank(B)
+
+   P = popov(B)
+   @test is_popov(P, s)
+
+   P, U = popov_with_transform(B)
+   @test is_popov(P, s)
+   @test U*B == P
+   @test isunit(det(U))
+
+   # some random tests
+
+   for i in 1:3
+      M = MatrixSpace(PolynomialRing(QQ, "x")[1], rand(1:5), rand(1:5))
+      A = rand(M, 0:5, -5:5)
+      r = rank(A)
+      P = popov(A)
+      @test is_popov(P, r)
+
+      P, U = popov_with_transform(A)
+      @test is_popov(P, r)
+      @test U*A == P
+      @test isunit(det(U))
+   end
+
+   R = GF(randprime(100))
+
+   M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
+
+   for i in 1:2
+      A = rand(M, 1:5)
+      r = rank(A)
+      P = popov(A)
+      @test is_popov(P, r)
+
+      P, U = popov_with_transform(A)
+      @test is_popov(P, r)
+      @test U*A == P
+      @test isunit(det(U))
+   end
+
+   R = ResidueField(ZZ, randprime(100))
+
+   M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
+
+   for i in 1:2
+      A = rand(M, 1:5, 0:100)
+      r = rank(A)
+      P = popov(A)
+      @test is_popov(P, r)
+
+      P, U = popov_with_transform(A)
+      @test is_popov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
