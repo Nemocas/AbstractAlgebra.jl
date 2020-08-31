@@ -4300,7 +4300,7 @@ function asc_order_popov!(P::Mat{T}, U::Mat{T}, pivots::Array{Array{Int,1}}, wit
       end
       swap_rows!(P, r, r2)
       with_trafo ? swap_rows!(U, r, r2) : nothing
-      j = findfirst(row_nums, r)
+      j = findfirst(isequal(r), row_nums)
       row_nums[i] = r
       row_nums[j] = r2
    end
@@ -4321,7 +4321,10 @@ function popov!(P::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T <: Poly
       end
       pivot = pivots[i][1]
       d = degree(P[pivot, i])
-      for r = 1:pivot - 1
+      for r = 1:m
+         if r == pivot
+            continue
+         end
          if degree(P[r, i]) < d
             continue
          end
