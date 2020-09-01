@@ -2655,6 +2655,16 @@ end
    @test U*A == P
    @test isunit(det(U))
 
+   A = matrix(R, 3, 3, [ x^4, 0, 0, x^3, x^4, x^3, x^3, x^5, x^5 ])
+   r = 3 # == rank(A)
+   P = popov(A)
+   @test is_popov(P, r)
+
+   P, U = popov_with_transform(A)
+   @test is_popov(P, r)
+   @test U*A == P
+   @test isunit(det(U))
+
    F = GF(7)
 
    S, y = PolynomialRing(F, "y")
