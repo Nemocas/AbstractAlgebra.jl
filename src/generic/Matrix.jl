@@ -4307,6 +4307,7 @@ function asc_order_popov!(P::Mat{T}, U::Mat{T}, pivots::Array{Array{Int,1}}, wit
    return nothing
 end
 
+# Mulders, Storjohann: "On lattice reduction for polynomial matrices", Section 7
 function popov!(P::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T <: PolyElem}
    m = nrows(P)
    n = ncols(P)
@@ -4314,33 +4315,56 @@ function popov!(P::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T <: Poly
    pivots = init_pivots_popov(P)
    weak_popov_with_pivots!(P, W, U, pivots, false, with_trafo)
    asc_order_popov!(P, U, pivots, with_trafo)
-   t = base_ring(P)()
-   for i = 1:n
-      if length(pivots[i]) == 0
+   pivotColumns = zeros(Int, m)
+   for c = 1:n
+      if length(pivots[c]) == 0
          continue
       end
-      pivot = pivots[i][1]
-      d = degree(P[pivot, i])
-      for r = 1:m
-         if r == pivot
-            continue
+      # P is in weak Popov form, so any non-zero row contains exactly one pivot
+      pivotColumns[pivots[c][1]] = c
+   end
+
+   t = base_ring(P)()
+   for r = 1:m
+      # Reduce row r assuming that rows 1, ..., r - 1 are reduced
+      if iszero(pivotColumns[r])
+         continue
+      end
+      r2 = 1
+      while !iszero(r2)
+         r2 = 0
+         maxDegreeDiff = -1
+         # Find the column c2 for which the difference
+         # degree(P[r, c2]) - degree(P[r2, c2]) is maximal, where r2 is the row
+         # in which the pivot is in column c2.
+         for i = 1:r - 1
+            ci = pivotColumns[i]
+            if iszero(ci)
+               continue
+            end
+            d = degree(P[r, ci]) - degree(P[i, ci])
+            if d <= maxDegreeDiff
+               continue
+            end
+            maxDegreeDiff = d
+            r2 = i
          end
-         if degree(P[r, i]) < d
-            continue
-         end
-         q = -div(P[r, i],P[pivot, i])
+         iszero(r2) ? break : nothing
+         c2 = pivotColumns[r2]
+         q = -div(P[r, c2], P[r2, c2])
          for c = 1:n
-            t = mul!(t, q, P[pivot, c])
+            t = mul!(t, q, P[r2, c])
             P[r, c] = addeq!(P[r, c], t)
          end
          if with_trafo
             for c = 1:ncols(U)
-               t = mul!(t, q, U[pivot, c])
+               t = mul!(t, q, U[r2, c])
                U[r, c] = addeq!(U[r, c], t)
             end
          end
       end
    end
+   # Make the pivots monic
    for i = 1:n
       if length(pivots[i]) == 0
          continue
