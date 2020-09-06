@@ -2214,32 +2214,6 @@ function find_pivot(A::AbstractAlgebra.MatElem{T}) where T <: RingElement
   return p
 end
 
-function solve_left(A::AbstractAlgebra.MatElem{T}, B::AbstractAlgebra.MatElem{T}) where T <: FieldElement
-  R = base_ring(A)
-  ncols(A) != ncols(B) && error("Incompatible matrices")
-  mu = zero_matrix(R, ncols(A), nrows(A) + nrows(B))
-  for i = 1:ncols(A)
-     for j = 1:nrows(A)
-        mu[i, j] = A[j, i]
-     end
-     for j = 1:nrows(B)
-        mu[i, nrows(A) + j] = B[j, i]
-     end
-  end
-  rk, mu = rref(mu)
-  p = find_pivot(mu)
-  if any(i -> i > nrows(A), p)
-    error("Unable to solve linear system")
-  end
-  sol = zero_matrix(R, nrows(B), nrows(A))
-  for i = 1:length(p)
-    for j = 1:nrows(B)
-      sol[j, p[i]] = mu[i, nrows(A) + j]
-    end
-  end
-  return sol
-end
-
 ###############################################################################
 #
 #   Upper triangular solving
@@ -2396,6 +2370,40 @@ function can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgeb
       return (true, z*T)
    else
       @error("Unsupported argument :$side for side: Must be :left or :right.")
+   end
+end
+
+function can_solve_with_solution(A::AbstractAlgebra.MatElem{T}, B::AbstractAlgebra.MatElem{T};
+                                                                                side = :right) where T <: FieldElement
+   if side == :right
+      (f, x) = can_solve_with_solution(A', B', side = :left)
+      return (f, x')
+   elseif side == :left
+      R = base_ring(A)
+      ncols(A) != ncols(B) && error("Incompatible matrices")
+      mu = zero_matrix(R, ncols(A), nrows(A) + nrows(B))
+      for i = 1:ncols(A)
+         for j = 1:nrows(A)
+            mu[i, j] = A[j, i]
+         end
+         for j = 1:nrows(B)
+            mu[i, nrows(A) + j] = B[j, i]
+         end
+      end
+      rk, mu = rref(mu)
+      p = find_pivot(mu)
+      if any(i -> i > nrows(A), p)
+         return (false, zero(A, 0, 0))
+      end
+      sol = zero_matrix(R, nrows(B), nrows(A))
+      for i = 1:length(p)
+         for j = 1:nrows(B)
+            sol[j, p[i]] = mu[i, nrows(A) + j]
+         end
+      end
+      return (true, sol)
+   else
+      error("Unsupported argument :$side for side: Must be :left or :right.")
    end
 end
 
