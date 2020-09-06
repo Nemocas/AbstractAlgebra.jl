@@ -12,7 +12,8 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        solve_rational, hnf, hnf_with_transform,
        issquare, snf, snf_with_transform, weak_popov,
        weak_popov_with_transform, can_solve_left_reduced_triu,
-       can_solve, can_solve_with_solution,
+       can_solve, can_solve_with_solution, isinvertible,
+       isinvertible_with_inverse,
        extended_weak_popov, extended_weak_popov_with_transform, rank,
        rank_profile_popov, hnf_via_popov, hnf_via_popov_with_transform, popov,
        popov_with_transform, det_popov, _check_dim, nrows, ncols, gram, rref,
@@ -2459,6 +2460,41 @@ function Base.inv(M::MatrixElem{T}) where {T <: RingElement}
    isunit(d) || throw(DomainError(M, "Matrix is not invertible."))
    return divexact(X, d)
 end
+
+###############################################################################
+#
+#   Is invertible
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    isinvertible_with_inverse(A::Generic.MatrixElem{T}; side = :left) where {T <: RingElement}
+> Given an $n\times m$ matrix $A$ over a ring, returns a tuple `(flag, B)`.
+> If `side` is `:right` and `flag` is true, $B$ is the right inverse of $A$
+> i.e. $AB$ is the $m\times m$ unit matrix. If `side` is `:left` and `flag` is
+> true, $B$ is the left inverse of $A$ i.e. $BA$ is the $\times $ unit matrix.
+> If `flag` is false, no right or left inverse does not exist.
+"""
+function isinvertible_with_inverse(A::Generic.MatrixElem{T};
+                                              side = :left) where {T <: RingElement}
+   if (side == :left && nrows(A) < ncols(A)) || (side == :right && ncols(A) < nrows(A))
+      return (false, zero(A, 0, 0))
+   end
+   I = (side == :left) ? zero(A, ncols(A), ncols(A)) : zero(A, nrows(A), nrows(A))
+   for i = 1:ncols(I)
+      I[i, i] = one(base_ring(I))
+   end
+   return can_solve_with_solution(A, I; side = side)
+end
+
+@doc Markdown.doc"""
+    isinvertible(A::Generic.MatrixElem{T}) where {T <: RingElement}
+> Returns true if a given square matrix is invertible, false otherwise. If
+> the inverse should also be computed, use `isinvertible_with_inverse`.
+"""
+isinvertible(A::Generic.MatrixElem{T}) where {T <: RingElement} = issquare(A) && isunit(det(A))
+
+isinvertible(A::Generic.MatrixElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) == rank(A)
 
 ###############################################################################
 #

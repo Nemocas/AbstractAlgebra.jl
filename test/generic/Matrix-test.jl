@@ -1773,6 +1773,90 @@ end
    end
 end
 
+@testset "Generic.Mat.isinvertible..." begin
+   R, x = PolynomialRing(QQ, "x")
+
+   let
+      M = matrix(R, 1, 1, [R(1)])
+
+      @test isinvertible(M)
+      (flag, _) = isinvertible_with_inverse(M)
+      @test flag
+      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      @test flag
+   end
+
+   let
+      M = matrix(R, 1, 1, [x])
+
+      @test !isinvertible(M)
+      (flag, _) = isinvertible_with_inverse(M)
+      @test !flag
+      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      @test !flag
+   end
+
+   let
+      M = matrix(ZZ, 2, 2, [1, 1, 1, 1])
+
+      @test !isinvertible(M)
+      (flag, _) = isinvertible_with_inverse(M)
+      @test !flag
+      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      @test !flag
+   end
+
+   let
+      M = matrix(QQ, 4, 4, [1, 1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1, -1, -1, 1])
+
+      @test isinvertible(M)
+      (flag, _) = isinvertible_with_inverse(M)
+      @test flag
+      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      @test flag
+   end
+
+   let
+      M = matrix(QQ, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 0])
+
+      @test isinvertible(M)
+      (flag, _) = isinvertible_with_inverse(M)
+      @test flag
+      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      @test flag
+   end
+
+   for _ in 1:100
+      m = rand(1:10)
+      n = rand(m:10)
+      M1 = MatrixSpace(QQ, n, m)
+      M2 = MatrixSpace(QQ, m, n)
+
+      L_l = randmat_with_rank(M1, m, -10:10)
+      L_r = randmat_with_rank(M2, m, -10:10)
+
+      I_m = matrix(QQ, m, m, [i == j ? 1 : 0 for i in 1:m, j in 1:m])
+
+      (flag_l, x_l) = isinvertible_with_inverse(L_l; side = :left)
+      @test flag_l && x_l * L_l == I_m
+      (flag_r, x_r) = isinvertible_with_inverse(L_r; side = :right)
+      @test flag_r && L_r * x_r == I_m
+   end
+
+   for _ in 1:100
+      n = rand(1:10)
+      M = MatrixSpace(QQ, n, n)
+
+      L = randmat_with_rank(M, rand(0:n-1), -10:10)
+
+      @test !isinvertible(L)
+      (flag, _) = isinvertible_with_inverse(L; side = :left)
+      @test !flag
+      (flag, _) = isinvertible_with_inverse(L; side = :right)
+      @test !flag
+   end
+end
+
 @testset "Generic.Mat.nullspace..." begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixSpace(S, 5, 5)
