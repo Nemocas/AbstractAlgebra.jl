@@ -6,6 +6,7 @@ import LinearAlgebra: det, issymmetric, norm,
 import LinearAlgebra: lu, lu!, tr
 
 using Markdown, Random, InteractiveUtils
+using RandomExtensions: RandomExtensions, make
 
 import Base: Array, abs, asin, asinh, atan, atanh, axes, bin, checkbounds, cmp, conj,
              convert, copy, cos, cosh, dec, deepcopy, deepcopy_internal,
