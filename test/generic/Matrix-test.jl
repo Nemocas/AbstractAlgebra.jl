@@ -403,6 +403,12 @@ end
 
    @test issquare(A)
 
+   @test A[1:end, 1:end] == A
+   @test firstindex(A, 1) == 1
+   @test lastindex(A, 1) == nrows(A)
+   @test lastindex(A, 2) == ncols(A)
+   @test_throws ErrorException lastindex(A, 3)
+
    @test size(B) == (2,4)
    @test size(B, 1) == 2
    @test size(B, 2) == 4
@@ -416,6 +422,12 @@ end
    @test axes(B, rand(3:99)) == 1:1
    @test_throws BoundsError axes(A, 0)
    @test_throws BoundsError axes(A, -rand(1:99))
+
+   @test B[1:end, 1:end] == B
+   @test firstindex(B, 1) == 1
+   @test lastindex(B, 1) == nrows(B)
+   @test lastindex(B, 2) == ncols(B)
+   @test_throws ErrorException lastindex(B, 3)
 
    @test !issquare(B)
 end

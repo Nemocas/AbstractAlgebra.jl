@@ -110,6 +110,24 @@ function (M::FreeModule{T})(a::Vector{T}) where T <: Union{RingElement, NCRingEl
    return z
 end
 
+#function (M::FreeModule{T})(a::Vector{<: Integer}) where T <: Union{RingElement, NCRingElem}
+#   length(a) != rank(M) && error("Number of elements does not equal rank")
+#   R = base_ring(M)
+#   v = matrix(R, 1, length(a), a)
+#   z = FreeModuleElem{T}(M, v)
+#   z.parent = M
+#   return z
+#end
+
+function (M::FreeModule{T})(a::Vector{S}) where {T <: Union{RingElement, NCRingElem}, S <: RingElement}
+   length(a) != rank(M) && error("Number of elements does not equal rank")
+   R = base_ring(M)
+   v = matrix(R, 1, length(a), a)
+   z = FreeModuleElem{T}(M, v)
+   z.parent = M
+   return z
+end
+
 function (M::FreeModule{T})(a::Vector{Any}) where T <: Union{RingElement, NCRingElem}
    length(a) != 0 && error("Incompatible element")
    return M(T[])
