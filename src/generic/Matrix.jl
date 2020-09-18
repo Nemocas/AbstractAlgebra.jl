@@ -404,6 +404,18 @@ function Base.view(M::AbstractAlgebra.MatElem{T}, rows::Colon, cols::Colon) wher
    return view(M, 1:nrows(M), 1:ncols(M))
 end
 
+Base.firstindex(M::MatrixElem, i::Int) = 1
+
+function Base.lastindex(M::MatrixElem, i::Int)
+   if i == 1
+      return nrows(M)
+   elseif i == 2
+      return ncols(M)
+   else
+      error("Dimension in lastindex must be 1 or 2 (got $i)")
+   end
+end
+
 ###############################################################################
 #
 #   Block replacement
