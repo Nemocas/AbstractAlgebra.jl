@@ -55,6 +55,12 @@ end
    @test f isa Generic.ResF
    f = rand(rng, R, 1:9)
    @test f isa Generic.ResF
+
+   m = make(R, 1:9)
+   for f in (rand(m), rand(rng, m))
+      @test f isa Generic.ResF
+      @test 1 <= f.data <= 9
+   end
 end
 
 @testset "Generic.ResF.manipulation..." begin

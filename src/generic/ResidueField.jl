@@ -563,10 +563,27 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.ResField{T}, v...) where {T <: RingElement}
-   R = base_ring(S)
-   return S(rand(rng, R, v...))
+RandomExtensions.maketype(R::AbstractAlgebra.ResField, _) = elem_type(R)
+
+function rand(rng::AbstractRNG,
+              sp::Random.SamplerTrivial{
+                 <:RandomExtensions.Make2{<:AbstractAlgebra.ResFieldElem{T},
+                                          <:AbstractAlgebra.ResField{T}}}
+              ) where {T}
+   S, v = sp[][1:end]
+   S(rand(rng, v))
 end
+
+function RandomExtensions.make(S::AbstractAlgebra.ResField, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      RandomExtensions.Make(S, vs[1])
+   else
+      make(S, make(base_ring(S), vs...))
+   end
+end
+
+rand(rng::AbstractRNG, S::AbstractAlgebra.ResField, v...) = rand(rng, make(S, v...))
 
 rand(S::AbstractAlgebra.ResField, v...) = rand(Random.GLOBAL_RNG, S, v...)
 
