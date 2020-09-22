@@ -46,6 +46,15 @@ end
    @test f isa elem_type(R)
    f = rand(rng, R, UnitRange(big(1.0), big(9.0)))
    @test f isa elem_type(R)
+
+   # make
+   for r in (1:9, UnitRange(1.0, 9.0), UnitRange(big(1.0), big(9.0)))
+      m = make(R, r)
+      @test rand(m) isa elem_type(R)
+      @test 1.0 <= rand(m) <= 9.0
+      @test rand(rng, m) isa elem_type(R)
+      @test rand(m, 2, 3) isa Matrix{elem_type(R)}
+   end
 end
 
 @testset "Julia.Floats.manipulation..." begin

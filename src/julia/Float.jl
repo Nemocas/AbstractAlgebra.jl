@@ -185,13 +185,17 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, R::Floats, n::UnitRange{<:AbstractFloat})
-   return R(n.start + rand(rng, Float64)*(n.stop - n.start))
+RandomExtensions.maketype(R::Floats{T}, _) where {T} = T
+
+function rand(rng::AbstractRNG,
+              sp::Random.SamplerTrivial{<:RandomExtensions.Make2{
+                 T, Floats{T}, <:UnitRange{<:Union{AbstractFloat, Int}}}}) where {T}
+   R, n = sp[][1:end]
+   R(n.start + rand(rng, Float64)*(n.stop - n.start))
 end
 
-function rand(rng::AbstractRNG, R::Floats, n::UnitRange{Int})
-   return R(n.start + rand(rng, Float64)*(n.stop - n.start))
-end
+
+rand(rng::AbstractRNG, R::Floats, n::UnitRange) = rand(rng, make(R, n))
 
 rand(R::Floats, n) = rand(Random.GLOBAL_RNG, R, n)
 
