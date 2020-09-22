@@ -41,6 +41,14 @@ end
    @test f isa elem_type(R)
    f = rand(rng, R, 1:9)
    @test f isa elem_type(R)
+
+   # make
+   m = make(R, 1:9)
+   for f = (rand(m), rand(rng, m))
+      @test f isa elem_type(R)
+      @test 1 <= numerator(f) <= 9
+      @test 1 <= denominator(f) <= 9
+   end
 end
 
 @testset "Julia.Rationals.manipulation..." begin
