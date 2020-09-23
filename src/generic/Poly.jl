@@ -2745,6 +2745,15 @@ end
 
 RandomExtensions.maketype(S::AbstractAlgebra.PolyRing, dr::UnitRange{Int}, _) = elem_type(S)
 
+function RandomExtensions.make(S::AbstractAlgebra.PolyRing, deg_range::UnitRange{Int}, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      RandomExtensions.Make(S, deg_range, vs[1]) # forward to default Make constructor
+   else
+      make(S, deg_range, make(R, vs...))
+   end
+end
+
 # define rand for make(S, deg_range, v)
 function rand(rng::AbstractRNG, sp::Random.SamplerTrivial{<:RandomExtensions.Make3{<:RingElement,<:AbstractAlgebra.PolyRing,UnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
@@ -2755,15 +2764,6 @@ function rand(rng::AbstractRNG, sp::Random.SamplerTrivial{<:RandomExtensions.Mak
       f += rand(rng, v)*x^i
    end
    return f
-end
-
-function RandomExtensions.make(S::AbstractAlgebra.PolyRing, deg_range::UnitRange{Int}, vs...)
-   R = base_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      RandomExtensions.Make(S, deg_range, vs[1]) # forward to default Make constructor
-   else
-      make(S, deg_range, make(R, vs...))
-   end
 end
 
 rand(rng::AbstractRNG, S::AbstractAlgebra.PolyRing, deg_range::UnitRange{Int}, v...) =
