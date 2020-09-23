@@ -4682,8 +4682,21 @@ function rand_ordering(rng::AbstractRNG=Random.GLOBAL_RNG)
    end
 end
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
-              term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
+RandomExtensions.maketype(S::AbstractAlgebra.MPolyRing, _, _, _) = elem_type(S)
+
+function RandomExtensions.make(S::AbstractAlgebra.MPolyRing, term_range::UnitRange{Int},
+                               exp_bound::UnitRange{Int}, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      RandomExtensions.Make(S, term_range, exp_bound, vs[1])
+   else
+      make(S, term_range, exp_bound, make(R, vs...))
+   end
+end
+
+function rand(rng::AbstractRNG, sp::Random.SamplerTrivial{<:RandomExtensions.Make4{
+                 <:RingElement,<:AbstractAlgebra.MPolyRing,UnitRange{Int},UnitRange{Int}}})
+   S, term_range, exp_bound, v = sp[][1:end]
    f = S()
    g = gens(S)
    R = base_ring(S)
@@ -4692,10 +4705,15 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
       for j = 1:length(g)
          term *= g[j]^rand(rng, exp_bound)
       end
-      term *= rand(rng, R, v...)
+      term *= rand(rng, v)
       f += term
    end
    return f
+end
+
+function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
+              term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
+   rand(rng, make(S, term_range, exp_bound, v...))
 end
 
 function rand(S::AbstractAlgebra.MPolyRing, term_range, exp_bound, v...)
