@@ -1250,3 +1250,19 @@ end
       end
    end
 end
+
+@testset "Generic.MatAlg.rand" begin
+   M = MatrixAlgebra(ZZ, 3)
+   m = make(M, 1:9)
+   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
+                rand(M, 1:9), rand(rng, M, 1:9)]
+      @test A isa elem_type(M)
+   end
+
+   M = MatrixAlgebra(GF(7), 2)
+   m = make(M)
+   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
+                rand(M), rand(rng, M)]
+      @test A isa elem_type(M)
+   end
+end

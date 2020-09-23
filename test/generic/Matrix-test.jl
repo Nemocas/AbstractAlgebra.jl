@@ -519,7 +519,7 @@ end
    end
 
    M0 = MatrixAlgebra(R, 0)
-   m0 = rand(M0, 0:9, -9, 9)
+   m0 = rand(M0, 0:9, -9:9)
    @test length(m0) == 0
    @test isempty(m0)
 
