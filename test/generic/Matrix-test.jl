@@ -2902,3 +2902,19 @@ end
    @test Matrix(F) == B
    @test eltype(B) == F2Elem
 end
+
+@testset "Generic.Mat.rand" begin
+   M = MatrixSpace(ZZ, 2, 3)
+   m = make(M, 1:9)
+   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
+                rand(M, 1:9), rand(rng, M, 1:9)]
+      @test A isa elem_type(M)
+   end
+
+   M = MatrixSpace(GF(7), 3, 2)
+   m = make(M)
+   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
+                rand(M), rand(rng, M)]
+      @test A isa elem_type(M)
+   end
+end
