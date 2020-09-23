@@ -337,10 +337,26 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, M::AbstractAlgebra.FPModule{T}, vals...) where T <: RingElement
+RandomExtensions.maketype(M::AbstractAlgebra.FPModule, _) = elem_type(M)
+
+function RandomExtensions.make(M::AbstractAlgebra.FPModule, vs...)
    R = base_ring(M)
-   v = [rand(rng, R, vals...) for i in 1:ngens(M)]
-   return M(v)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      RandomExtensions.Make(M, vs[1]) # forward to default Make constructor
+   else
+      make(M, make(R, vs...))
+   end
+end
+
+function rand(rng::AbstractRNG,
+              sp::Random.SamplerTrivial{<:RandomExtensions.Make2{
+                 <:AbstractAlgebra.FPModuleElem, <:AbstractAlgebra.FPModule}})
+   M, vals = sp[][1:end]
+   M(rand(rng, vals, ngens(M)))
+end
+
+function rand(rng::AbstractRNG, M::AbstractAlgebra.FPModule{T}, vals...) where T <: RingElement
+   rand(rng, make(M, vals...))
 end
 
 rand(M::AbstractAlgebra.FPModule, vals...) = rand(Random.GLOBAL_RNG, M, vals...)
