@@ -85,48 +85,54 @@ end
 end
 
 @testset "Julia.GFElem.unary_ops..." begin
-   R = GF(13)
-   S = GF(BigInt(13))
+   for (T, p) in [(Int8, 127),
+                  (UInt8, 251),
+                  (Int16, 32749),
+                  (UInt16, 65521),
+                  (Int32, 2147483647),
+                  (UInt32, 4294967291),
+                  (Int64, 9223372036854775783),
+                  (UInt64, 18446744073709551557),
+                  (Int128, 170141183460469231731687303715884105727),
+                  (UInt128, 340282366920938463463374607431768211297),
+                  (BigInt, 13)]
+      R = GF(T(p))
 
-   for iter = 1:1000
-      a = rand(R)
-      b = rand(S)
-
-      @test a == -(-a)
-      @test b == -(-b)
+      for iter = 1:1000
+         a = rand(R)
+         @test a == -(-a)
+      end
    end
 end
 
 @testset "Julia.GFElem.binary_ops..." begin
-   R = GF(13)
-   S = GF(BigInt(13))
+   for (T, p) in [(Int8, 127),
+                  (UInt8, 251),
+                  (Int16, 32749),
+                  (UInt16, 65521),
+                  (Int32, 2147483647),
+                  (UInt32, 4294967291),
+                  (Int64, 9223372036854775783),
+                  (UInt64, 18446744073709551557),
+                  (Int128, 170141183460469231731687303715884105727),
+                  (UInt128, 340282366920938463463374607431768211297),
+                  (BigInt, 13)]
+      R = GF(T(p))
 
-   for iter = 1:1000
-      a1 = rand(R)
-      a2 = rand(R)
-      a3 = rand(R)
+      for iter = 1:1000
+         a1 = rand(R)
+         a2 = rand(R)
+         a3 = rand(R)
 
-      @test a1 + a2 == a2 + a1
-      @test a1 - a2 == -(a2 - a1)
-      @test a1 + R() == a1
-      @test a1 + (a2 + a3) == (a1 + a2) + a3
-      @test a1*(a2 + a3) == a1*a2 + a1*a3
-      @test a1*a2 == a2*a1
-      @test a1*R(1) == a1
-      @test R(1)*a1 == a1
-
-      b1 = rand(S)
-      b2 = rand(S)
-      b3 = rand(S)
-
-      @test b1 + b2 == b2 + b1
-      @test b1 - b2 == -(b2 - b1)
-      @test b1 + S() == b1
-      @test b1 + (b2 + b3) == (b1 + b2) + b3
-      @test b1*(b2 + b3) == b1*b2 + b1*b3
-      @test b1*b2 == b2*b1
-      @test b1*S(1) == b1
-      @test S(1)*b1 == b1
+         @test a1 + a2 == a2 + a1
+         @test a1 - a2 == -(a2 - a1)
+         @test a1 + R() == a1
+         @test a1 + (a2 + a3) == (a1 + a2) + a3
+         @test a1*(a2 + a3) == a1*a2 + a1*a3
+         @test a1*a2 == a2*a1
+         @test a1*R(1) == a1
+         @test R(1)*a1 == a1
+      end
    end
 
    if Int == Int32
@@ -143,36 +149,35 @@ end
 end
 
 @testset "Julia.GFElem.adhoc_binary..." begin
-   R = GF(13)
-   S = GF(BigInt(13))
+   for (T, p) in [(Int8, 127),
+                  (UInt8, 251),
+                  (Int16, 32749),
+                  (UInt16, 65521),
+                  (Int32, 2147483647),
+                  (UInt32, 4294967291),
+                  (Int64, 9223372036854775783),
+                  (UInt64, 18446744073709551557),
+                  (Int128, 170141183460469231731687303715884105727),
+                  (UInt128, 340282366920938463463374607431768211297),
+                  (BigInt, 13)]
+      R = GF(T(p))
+      for iter = 1:1000
+         a = rand(R)
 
-   for iter = 1:1000
-      a = rand(R)
+         c1 = rand(0:100)
+         c2 = rand(0:100)
+         d1 = rand(BigInt(0):BigInt(100))
+         d2 = rand(BigInt(0):BigInt(100))
 
-      c1 = rand(0:100)
-      c2 = rand(0:100)
-      d1 = rand(BigInt(0):BigInt(100))
-      d2 = rand(BigInt(0):BigInt(100))
-
-      @test a + c1 == c1 + a
-      @test a + d1 == d1 + a
-      @test a - c1 == -(c1 - a)
-      @test a - d1 == -(d1 - a)
-      @test a*c1 == c1*a
-      @test a*d1 == d1*a
-      @test a*c1 + a*c2 == a*(c1 + c2)
-      @test a*d1 + a*d2 == a*(d1 + d2)
-
-      b = rand(S)
-
-      @test b + c1 == c1 + b
-      @test b + d1 == d1 + b
-      @test b - c1 == -(c1 - b)
-      @test b - d1 == -(d1 - b)
-      @test b*c1 == c1*b
-      @test b*d1 == d1*b
-      @test b*c1 + b*c2 == b*(c1 + c2)
-      @test b*d1 + b*d2 == b*(d1 + d2)
+         @test a + c1 == c1 + a
+         @test a + d1 == d1 + a
+         @test a - c1 == -(c1 - a)
+         @test a - d1 == -(d1 - a)
+         @test a*c1 == c1*a
+         @test a*d1 == d1*a
+         @test a*c1 + a*c2 == a*(c1 + c2)
+         @test a*d1 + a*d2 == a*(d1 + d2)
+      end
    end
 end
 
