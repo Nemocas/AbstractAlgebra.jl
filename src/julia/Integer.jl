@@ -364,6 +364,12 @@ rand(rng::AbstractRNG, R::Integers, n) = R(rand(rng, n))
 
 rand(R::Integers, n) = rand(Random.GLOBAL_RNG, R, n)
 
+## testing
+
+# we re-use the test(T) method implemented in RandomTest,
+# and scale it down as an example here, to get smaller numbers
+RandomTest.test(::Integers{T}) where {T} = RandomTest.scale(0.4, test(T))
+
 ###############################################################################
 #
 #   Parent object call overload

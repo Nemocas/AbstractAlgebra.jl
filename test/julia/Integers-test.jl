@@ -92,7 +92,8 @@ end
    S = ZZ
 
    for iter = 1:1000
-      a1 = rand(R, -100:100)
+      a1 = rand(R, Small(Int)) # Small(Int) generates most numer in [-100, 100], with
+                               # mean of their absolute value approx. 33
       a2 = rand(R, -100:100)
       b1 = rand(S, -100:100)
       b2 = rand(S, -100:100)
@@ -158,8 +159,8 @@ end
    S = ZZ
 
    for iter = 1:1000
-      r = rand(R, 0:1000)
-      s = rand(S, 0:1000)
+      r = rand(test(R))
+      s = randt(S) # equivalent to rand(test(S))
 
       f = r^2
       g = s^2

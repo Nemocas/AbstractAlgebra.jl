@@ -2771,6 +2771,27 @@ rand(rng::AbstractRNG, S::AbstractAlgebra.PolyRing, deg_range::UnitRange{Int}, v
 
 rand(S::AbstractAlgebra.PolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v...)
 
+# this defines, via `Sized`, a distribution in two stages:
+# 1) generate a "size" parameter `sz`, which is drawn from `Nat()` here
+#    (Nat() roughly generates numbers in 1:100, non-uniformly
+# 2) given sz, compute an on-the-fly distribution via make
+# The advantage of using `Sized` is that the resulting distribution knows about
+# its size, and can be automatically "scaled", which can be useful (cf. QuickCheck)
+RandomTest.test(S::AbstractAlgebra.PolyRing) =
+   Sized(Nat()) do sz
+      make(S, 1:1+sz, test(base_ring(S)))
+   end
+
+#= or more refined: adjust the size of the coeffs to depend on the lenght of the Poly
+
+RandomTest.test(S::AbstractAlgebra.PolyRing) =
+   Sized(Nat()) do sz
+       make(S, 1:sz+1,
+            RandomTest.scale(0.1 * RandomTest.ratio(sz, Nat()),
+                             test(base_ring(S))))
+   end
+=#
+
 ###############################################################################
 #
 #   Promotion rules
