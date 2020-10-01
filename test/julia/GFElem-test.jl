@@ -128,6 +128,18 @@ end
       @test b1*S(1) == b1
       @test S(1)*b1 == b1
    end
+
+   if Int == Int32
+      F = GF(2147483659)
+      a = F(2147483659 - 1)
+      @test addeq!(a, a) == F(2147483657)
+      @test add!(a, a, a) == F(2147483657)
+   else
+      F = GF(4611686018427388039)
+      a = F(4611686018427388039 - 1)
+      @test addeq!(a, a) == F(4611686018427388037)
+      @test add!(a, a, a) == F(4611686018427388037)
+   end
 end
 
 @testset "Julia.GFElem.adhoc_binary..." begin
