@@ -178,24 +178,17 @@ function +(x::GFElem{T}, y::GFElem{T}) where T <: Integer
    check_parent(x, y)
    R = parent(x)
    p = characteristic(R)::T
-   d = x.d + y.d - p
-   if d < 0
-      return GFElem{T}(d + p, R)
-   else
-      return GFElem{T}(d, R)
-   end
+   pmy = p - y.d
+   z = x.d < pmy ? x.d + y.d : x.d - pmy
+   return GFElem{T}(z, R)
 end
 
 function -(x::GFElem{T}, y::GFElem{T}) where T <: Integer
    check_parent(x, y)
    R = parent(x)
    p = characteristic(R)::T
-   d = x.d - y.d
-   if d < 0
-      return GFElem{T}(d + p, R)
-   else
-      return GFElem{T}(d, R)
-   end
+   z = x.d < y.d ? x.d + (p - y.d) : x.d - y.d
+   return GFElem{T}(z, R)
 end
 
 function *(x::GFElem{T}, y::GFElem{T}) where T <: Integer
