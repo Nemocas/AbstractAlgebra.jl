@@ -2,7 +2,7 @@
 
 Maps in Nemo model maps on sets $f : D \to C$ for some domain $D$ and codomain $C$, which
 have no real limitations except that elements of the codomain and domain be represented
-by element objects in the system..
+by element objects in the system.
 
 Maps $f : D \to C$ in AbstractAlgebra are modeled by Julia objects that are able to be
 called on a single element $d \in D$ of the domain to yield an element $f(d) \in C$ of the
@@ -13,7 +13,7 @@ kind of data, e.g. a matrix, or built up from other maps.
 
 In the following, we will always use the word "function" to mean a Julia function, and
 reserve the word "map" for a map on sets, whether mathematically, or as an object in the
-system..
+system.
 
 Maps in AbstractAlgebra have a domain and codomain, can be applied, composed and composed
 with the identity map (assuming its domain is compatible). Various special kinds of map
@@ -207,7 +207,7 @@ To construct an identity map for a given domain, specified by a parent object `R
 we have the following function.
 
 ```julia
-identity_map(R::D) where D <: Set
+identity_map(R::Set)
 ```
 
 Return an identity map on the domain $R$.
@@ -222,7 +222,7 @@ identity map. In such a case, the class of such an identity map type must belong
 Any two compatible maps in AbstractAlgebra can be composed and any composition can be
 applied.
 
-In order to facilitate this, the Generic module provides a type `CompositionMap{D, C}`,
+In order to facilitate this, the Generic module provides a type `CompositeMap{D, C}`,
 which contains two maps `map1` and `map2`, corresponding to the two maps to be applied
 in a composition, in the order they should be applied.
 
