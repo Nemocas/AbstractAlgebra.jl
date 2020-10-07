@@ -5070,16 +5070,33 @@ Base.map(f, a::MatrixElem) = map_entries(f, a)
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, v...)
+RandomExtensions.maketype(S::AbstractAlgebra.MatSpace, _) = elem_type(S)
+
+function RandomExtensions.make(S::AbstractAlgebra.MatSpace, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      RandomExtensions.Make(S, vs[1]) # forward to default Make constructor
+   else
+      make(S, make(R, vs...))
+   end
+end
+
+
+function rand(rng::AbstractRNG,
+              sp::Random.SamplerTrivial{<:RandomExtensions.Make2{<:MatSpaceElem,
+                                                                 <:AbstractAlgebra.MatSpace}})
+   S, v = sp[][1:end]
    M = S()
    R = base_ring(S)
    for i = 1:nrows(M)
       for j = 1:ncols(M)
-         M[i, j] = rand(rng, R, v...)
+         M[i, j] = rand(rng, v)
       end
    end
    return M
 end
+
+rand(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, v...) = rand(rng, make(S, v...))
 
 rand(S::AbstractAlgebra.MatSpace, v...) = rand(Random.GLOBAL_RNG, S, v...)
 

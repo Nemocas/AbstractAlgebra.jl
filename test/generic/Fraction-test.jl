@@ -52,10 +52,12 @@ end
 @testset "Generic.Frac.rand..." begin
    S, x = PolynomialRing(ZZ, "x")
    K = FractionField(S)
-   f = rand(K, 0:3, -3:3)
-   @test f isa Generic.Frac
-   f = rand(rng, K, 0:3, -3:3)
-   @test f isa Generic.Frac
+   m = make(K, 0:3, -3:3)
+   for f in Any[rand(m), rand(rng, m), rand(m, 3)...,
+                rand(K, 0:3, -3:3),
+                rand(rng, K, 0:3, -3:3)]
+      @test f isa Generic.Frac
+   end
 end
 
 @testset "Generic.Frac.manipulation..." begin

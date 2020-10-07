@@ -299,7 +299,13 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, R::Rationals{T}, n::UnitRange{Int}) where T <: Integer
+RandomExtensions.maketype(R::Rationals{T}, _) where {T} = Rational{T}
+
+function rand(rng::AbstractRNG,
+              sp::Random.SamplerTrivial{
+                 <:RandomExtensions.Make2{Rational{T}, Rationals{T}, UnitRange{Int}}}
+              ) where {T}
+   R, n = sp[][1:end]
    d = T(0)
    while d == 0
       d = T(rand(rng, n))
@@ -307,6 +313,9 @@ function rand(rng::AbstractRNG, R::Rationals{T}, n::UnitRange{Int}) where T <: I
    n = T(rand(rng, n))
    return R(n, d)
 end
+
+
+rand(rng::AbstractRNG, R::Rationals, n) = rand(rng, make(R, n))
 
 rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
 

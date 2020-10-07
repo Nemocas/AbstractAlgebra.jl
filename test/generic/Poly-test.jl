@@ -86,11 +86,41 @@
 end
 
 @testset "Generic.Poly.rand..." begin
+   # TODO: test more than just the result type
    R, x = PolynomialRing(ZZ, "x")
    f = rand(R, 0:10, -10:10)
    @test f isa Generic.Poly
    f = rand(rng, R, 0:10, -10:10)
    @test f isa Generic.Poly
+
+   # make API
+   for m in (make(R, 0:10, make(ZZ, -10:10)),
+             make(R, 0:10, -10:10)) # convenience only
+      for f in (rand(m), rand(rng, m))
+         @test f isa Generic.Poly
+      end
+      @test rand(m, 3) isa Vector{Generic.Poly{BigInt}}
+      @test size(rand(rng, m, 2, 3)) == (2, 3)
+   end
+
+   S, y = PolynomialRing(R, "y")
+   for m in (make(S, 0:5, make(R, 0:10, make(ZZ, -10:10))),
+             make(S, 0:5, make(R, 0:10, -10:10)),
+             make(S, 0:5, 0:10, -10:10))
+
+      for f in (rand(m), rand(rng, m))
+         @test f isa Generic.Poly{Generic.Poly{BigInt}}
+      end
+      a = rand(m, 3)
+      @test length(a) == 3
+      @test a isa Vector{Generic.Poly{Generic.Poly{BigInt}}}
+   end
+
+   T, z = PolynomialRing(GF(7), "z")
+   m = make(T, 0:4)
+   for f in (rand(m), rand(rng, m))
+      @test f isa Generic.Poly{AbstractAlgebra.GFElem{Int64}}
+   end
 end
 
 @testset "Generic.Poly.manipulation..." begin
@@ -320,11 +350,13 @@ end
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:500
-      f = rand(R, 0:10, -10:10)
+      # f = rand(R, 0:10, -10:10) # Here, 0:10 and -10:10 are not really meaningful
+                                  # and were specified only because rand required it
+      f = randt(R)
       g = deepcopy(f)
       h = R()
       while iszero(h)
-         h = rand(R, 0:10, -10:10)
+         h = randt(R)
       end
 
       @test f == g
@@ -402,6 +434,23 @@ end
       @test c1 != R(c1) + f
       @test R(d1) != d1 + f
       @test d1 != R(d1) + f
+   end
+   # possible alternative with quickcheck-like testing:
+   # @quickcheck runs the specified "function" a certain number of times (100 by default),
+   # with random inputs;
+   # the function syntax is modified such that the "types" are replaced with
+   # "distributions" to pick from (`test` is applied to get a distribution if not already
+   # a distribution, like ZZ)
+   @quickcheck function (f::NonZero(test(R)), c1::ZZ, d1::ZZ)
+      @test R(c1) == c1
+      @test c1 == R(c1)
+      # etc...
+   end
+   # or non-macro:
+   quickcheck(NonZero(test(R)), ZZ, ZZ) do (f, c1, d1)
+      @test R(c1) == c1
+      @test c1 == R(c1)
+      # etc...
    end
 
    # Fake finite field of char 7, degree 2

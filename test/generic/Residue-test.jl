@@ -57,6 +57,17 @@ end
    @test f isa Generic.Res
    f = rand(rng, R, 1:9)
    @test f isa Generic.Res
+   m = make(R, 1:9)
+   for f = (rand(m), rand(rng, m))
+      @test f isa Generic.Res
+      @test 1 <= f.data <= 9
+   end
+
+   # make with 3 arguments
+   P, x = PolynomialRing(RealField, "x")
+   R = Generic.ResidueRing(P, x^3)
+   m = make(R, 1:9, -3:3)
+   @test rand(m) isa Generic.Res{AbstractAlgebra.Generic.Poly{BigFloat}}
 end
 
 @testset "Generic.Res.manipulation..." begin

@@ -1231,15 +1231,33 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, S::SeriesRing, val_range::UnitRange{Int}, v...)
+RandomExtensions.maketype(S::SeriesRing, ::UnitRange{Int}, _) = elem_type(S)
+
+function RandomExtensions.make(S::SeriesRing, val_range::UnitRange{Int}, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      RandomExtensions.Make(S, val_range, vs[1]) # forward to default Make constructor
+   else
+      make(S, val_range, make(R, vs...))
+   end
+end
+
+function rand(rng::AbstractRNG,
+              sp::Random.SamplerTrivial{<:RandomExtensions.Make3{<:RingElement,
+                                                                 <:SeriesRing,
+                                                                 UnitRange{Int}}})
+   S, val_range, v = sp[][1:end]
    R = base_ring(S)
    f = S()
    x = gen(S)
    for i = 0:S.prec_max - 1
-      f += rand(rng, R, v...)*x^i
+      f += rand(rng, v)*x^i
    end
    return shift_left(f, rand(rng, val_range))
 end
+
+rand(rng::AbstractRNG, S::SeriesRing, val_range::UnitRange{Int}, v...) =
+   rand(rng, make(S, val_range, v...))
 
 rand(S::SeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val_range, v...)
 

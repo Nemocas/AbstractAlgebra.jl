@@ -103,10 +103,12 @@ end
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
 
-   f = rand(S, 0:10, -10:10)
-   @test f isa Generic.NCPoly
-   f = rand(rng, S, 0:10, -10:10)
-   @test f isa Generic.NCPoly
+   m = make(S, 0:10, -10:10)
+   for f in (rand(m), rand(rng, m),
+             rand(S, 0:10, -10:10),
+             rand(rng, S, 0:10, -10:10))
+      @test f isa Generic.NCPoly
+   end
 end
 
 @testset "Generic.NCPoly.binary_ops..." begin

@@ -504,10 +504,28 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.ResRing{T}, v...) where {T <: RingElement}
-   R = base_ring(S)
-   return S(rand(rng, R, v...))
+RandomExtensions.maketype(R::AbstractAlgebra.ResRing, _) = elem_type(R)
+
+# define rand(make(S, v))
+function rand(rng::AbstractRNG,
+              sp::Random.SamplerTrivial{
+                 <:RandomExtensions.Make2{<:AbstractAlgebra.ResElem{T},
+                                          <:AbstractAlgebra.ResRing{T}}}
+              ) where {T}
+   S, v = sp[][1:end]
+   S(rand(rng, v))
 end
+
+function RandomExtensions.make(S::AbstractAlgebra.ResRing, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      RandomExtensions.Make(S, vs[1])
+   else
+      make(S, make(base_ring(S), vs...))
+   end
+end
+
+rand(rng::AbstractRNG, S::AbstractAlgebra.ResRing, v...) = rand(rng, make(S, v...))
 
 rand(S::AbstractAlgebra.ResRing, v...) = rand(Random.GLOBAL_RNG, S, v...)
 

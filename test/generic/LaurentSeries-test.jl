@@ -106,11 +106,25 @@ end
    f = rand(rng, R, -12:12, -10:10)
    @test f isa Generic.LaurentSeriesRingElem
 
+   for m in (make(R, -12:12, -10:10),
+            make(R, -12:12, make(ZZ, -10:10)))
+      for f in (rand(m), rand(rng, m))
+         @test f isa Generic.LaurentSeriesRingElem{BigInt}
+      end
+   end
+
    R, x = LaurentSeriesField(RealField, 10, "x")
    f = rand(R, -12:12, -1:1)
    @test f isa Generic.LaurentSeriesFieldElem
    f = rand(rng, R, -12:12, -1:1)
    @test f isa Generic.LaurentSeriesFieldElem
+
+   for m in (make(R, -12:12, -1:1),
+             make(R, -12:12, make(RealField, -1:1)))
+      for f in (rand(m), rand(rng, m))
+         @test f isa Generic.LaurentSeriesFieldElem{BigFloat}
+      end
+   end
 end
 
 @testset "Generic.LaurentSeries.manipulation..." begin

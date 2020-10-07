@@ -1281,7 +1281,7 @@ function pseudodivrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyEle
    s = b^k
    return q*s, f*s
 end
-   
+
 ################################################################################
 #
 #   Remove and valuation
@@ -2743,17 +2743,54 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.PolyRing, deg_range::UnitRange{Int}, v...)
+RandomExtensions.maketype(S::AbstractAlgebra.PolyRing, dr::UnitRange{Int}, _) = elem_type(S)
+
+function RandomExtensions.make(S::AbstractAlgebra.PolyRing, deg_range::UnitRange{Int}, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      RandomExtensions.Make(S, deg_range, vs[1]) # forward to default Make constructor
+   else
+      make(S, deg_range, make(R, vs...))
+   end
+end
+
+# define rand for make(S, deg_range, v)
+function rand(rng::AbstractRNG, sp::Random.SamplerTrivial{<:RandomExtensions.Make3{<:RingElement,<:AbstractAlgebra.PolyRing,UnitRange{Int}}})
+   S, deg_range, v = sp[][1:end]
    R = base_ring(S)
    f = S()
    x = gen(S)
    for i = 0:rand(rng, deg_range)
-      f += rand(rng, R, v...)*x^i
+      f += rand(rng, v)*x^i
    end
    return f
 end
 
+rand(rng::AbstractRNG, S::AbstractAlgebra.PolyRing, deg_range::UnitRange{Int}, v...) =
+   rand(rng, make(S, deg_range, v...))
+
 rand(S::AbstractAlgebra.PolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v...)
+
+# this defines, via `Sized`, a distribution in two stages:
+# 1) generate a "size" parameter `sz`, which is drawn from `Nat()` here
+#    (Nat() roughly generates numbers in 1:100, non-uniformly
+# 2) given sz, compute an on-the-fly distribution via make
+# The advantage of using `Sized` is that the resulting distribution knows about
+# its size, and can be automatically "scaled", which can be useful (cf. QuickCheck)
+RandomTest.test(S::AbstractAlgebra.PolyRing) =
+   Sized(Nat()) do sz
+      make(S, 1:1+sz, test(base_ring(S)))
+   end
+
+#= or more refined: adjust the size of the coeffs to depend on the lenght of the Poly
+
+RandomTest.test(S::AbstractAlgebra.PolyRing) =
+   Sized(Nat()) do sz
+       make(S, 1:sz+1,
+            RandomTest.scale(0.1 * RandomTest.ratio(sz, Nat()),
+                             test(base_ring(S))))
+   end
+=#
 
 ###############################################################################
 #

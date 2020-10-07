@@ -15,10 +15,11 @@ end
 
 @testset "Generic.Module.rand..." begin
    F = FreeModule(ZZ, 3)
-   f = rand(F, 1:9)
-   @test f isa Generic.FreeModuleElem
-   f = rand(rng, F, 1:9)
-   @test f isa Generic.FreeModuleElem
+   m = make(F, 1:9)
+   for f in Any[rand(m), rand(rng, m), rand(m, 3)...,
+                rand(F, 1:9), rand(rng, F, 1:9)]
+      @test f isa Generic.FreeModuleElem
+   end
 end
 
 @testset "Generic.Module.manipulation..." begin

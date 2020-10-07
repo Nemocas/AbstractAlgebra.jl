@@ -100,6 +100,8 @@ import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, bin,
              +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
 
 using Random: Random, AbstractRNG
+using RandomExtensions: RandomExtensions, make
+using RandomTest
 
 export elem_type, parent_type
 
