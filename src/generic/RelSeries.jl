@@ -1236,16 +1236,14 @@ RandomExtensions.maketype(S::SeriesRing, ::UnitRange{Int}, _) = elem_type(S)
 function RandomExtensions.make(S::SeriesRing, val_range::UnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      RandomExtensions.Make(S, val_range, vs[1]) # forward to default Make constructor
+      Make(S, val_range, vs[1]) # forward to default Make constructor
    else
       make(S, val_range, make(R, vs...))
    end
 end
 
 function rand(rng::AbstractRNG,
-              sp::Random.SamplerTrivial{<:RandomExtensions.Make3{<:RingElement,
-                                                                 <:SeriesRing,
-                                                                 UnitRange{Int}}})
+              sp::SamplerTrivial{<:Make3{<:RingElement, <:SeriesRing, UnitRange{Int}}})
    S, val_range, v = sp[][1:end]
    R = base_ring(S)
    f = S()

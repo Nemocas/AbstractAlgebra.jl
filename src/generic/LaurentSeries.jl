@@ -1491,16 +1491,16 @@ RandomExtensions.maketype(S::LaurentSeriesRingOrField, ::UnitRange{Int}, _) = el
 function RandomExtensions.make(S::LaurentSeriesRingOrField, val_range::UnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      RandomExtensions.Make(S, val_range, vs[1]) # forward to default Make constructor
+     Make(S, val_range, vs[1]) # forward to default Make constructor
    else
       make(S, val_range, make(R, vs...))
    end
 end
 
 function rand(rng::AbstractRNG,
-              sp::Random.SamplerTrivial{<:RandomExtensions.Make3{<:RingElement,
-                                                                 <:LaurentSeriesRingOrField,
-                                                                 UnitRange{Int}}})
+              sp::SamplerTrivial{<:Make3{<:RingElement,
+                                         <:LaurentSeriesRingOrField,
+                                         UnitRange{Int}}})
    S, val_range, v = sp[][1:end]
    R = base_ring(S)
    f = S()
@@ -1515,7 +1515,7 @@ rand(rng::AbstractRNG, S::LaurentSeriesRingOrField, val_range::UnitRange{Int}, v
    rand(rng, make(S, val_range, v...))
 
 rand(S::LaurentSeriesRingOrField, val_range, v...) =
-   rand(Random.GLOBAL_RNG, S, val_range, v...)
+   rand(GLOBAL_RNG, S, val_range, v...)
 
 
 ###############################################################################

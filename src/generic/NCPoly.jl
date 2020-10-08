@@ -699,16 +699,16 @@ RandomExtensions.maketype(S::AbstractAlgebra.NCPolyRing, dr::UnitRange{Int}, _) 
 function RandomExtensions.make(S::AbstractAlgebra.NCPolyRing, deg_range::UnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      RandomExtensions.Make(S, deg_range, vs[1]) # forward to default Make constructor
+      Make(S, deg_range, vs[1]) # forward to default Make constructor
    else
       make(S, deg_range, make(R, vs...))
    end
 end
 
 function rand(rng::AbstractRNG,
-              sp::Random.SamplerTrivial{<:RandomExtensions.Make3{<:AbstractAlgebra.NCPolyElem,
-                                                                 <:AbstractAlgebra.NCPolyRing,
-                                                                 UnitRange{Int}}})
+              sp::SamplerTrivial{<:Make3{<:AbstractAlgebra.NCPolyElem,
+                                         <:AbstractAlgebra.NCPolyRing,
+                                         UnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
    R = base_ring(S)
    f = S()

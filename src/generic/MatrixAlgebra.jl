@@ -350,15 +350,15 @@ RandomExtensions.maketype(S::AbstractAlgebra.MatAlgebra, _) = elem_type(S)
 function RandomExtensions.make(S::AbstractAlgebra.MatAlgebra, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      RandomExtensions.Make(S, vs[1]) # forward to default Make constructor
+      Make(S, vs[1]) # forward to default Make constructor
    else
       make(S, make(R, vs...))
    end
 end
 
 function rand(rng::AbstractRNG,
-              sp::Random.SamplerTrivial{<:RandomExtensions.Make2{<:AbstractAlgebra.MatAlgElem,
-                                                                 <:AbstractAlgebra.MatAlgebra}})
+              sp::SamplerTrivial{<:Make2{<:AbstractAlgebra.MatAlgElem,
+                                         <:AbstractAlgebra.MatAlgebra}})
    S, v = sp[][1:end]
    M = S()
    n = degree(M)

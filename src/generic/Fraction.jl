@@ -980,8 +980,7 @@ function RandomExtensions.make(S::AbstractAlgebra.FracField, vs...)
 end
 
 function rand(rng::AbstractRNG,
-              sp::Random.SamplerTrivial{
-                 <:RandomExtensions.Make2{<:RingElement, <:AbstractAlgebra.FracField}})
+              sp::SamplerTrivial{<:Make2{<:RingElement, <:AbstractAlgebra.FracField}})
    S, v = sp[][1:end]
    R = base_ring(S)
    n = rand(rng, v)
@@ -995,7 +994,7 @@ end
 rand(rng::AbstractRNG, S::AbstractAlgebra.FracField, v...) =
    rand(rng, make(S, v...))
 
-rand(S::AbstractAlgebra.FracField, v...) = rand(Random.GLOBAL_RNG, S, v...)
+rand(S::AbstractAlgebra.FracField, v...) = rand(GLOBAL_RNG, S, v...)
 
 ###############################################################################
 #

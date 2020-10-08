@@ -188,8 +188,9 @@ end
 RandomExtensions.maketype(R::Floats{T}, _) where {T} = T
 
 function rand(rng::AbstractRNG,
-              sp::Random.SamplerTrivial{<:RandomExtensions.Make2{
-                 T, Floats{T}, <:UnitRange{<:Union{AbstractFloat, Int}}}}) where {T}
+              sp::SamplerTrivial{<:Make2{T, Floats{T},
+                                         <:UnitRange{<:Union{AbstractFloat, Int}}}}
+              ) where {T}
    R, n = sp[][1:end]
    R(n.start + rand(rng, Float64)*(n.stop - n.start))
 end

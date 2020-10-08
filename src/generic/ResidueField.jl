@@ -566,9 +566,8 @@ end
 RandomExtensions.maketype(R::AbstractAlgebra.ResField, _) = elem_type(R)
 
 function rand(rng::AbstractRNG,
-              sp::Random.SamplerTrivial{
-                 <:RandomExtensions.Make2{<:AbstractAlgebra.ResFieldElem{T},
-                                          <:AbstractAlgebra.ResField{T}}}
+              sp::SamplerTrivial{<:Make2{<:AbstractAlgebra.ResFieldElem{T},
+                                         <:AbstractAlgebra.ResField{T}}}
               ) where {T}
    S, v = sp[][1:end]
    S(rand(rng, v))
@@ -577,7 +576,7 @@ end
 function RandomExtensions.make(S::AbstractAlgebra.ResField, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      RandomExtensions.Make(S, vs[1])
+      Make(S, vs[1])
    else
       make(S, make(base_ring(S), vs...))
    end

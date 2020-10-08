@@ -246,7 +246,7 @@ RandomExtensions.maketype(S::LaurentPolyWrapRing, _, _) = elem_type(S)
 function RandomExtensions.make(S::LaurentPolyWrapRing, v1, vs...)
    R = S.polyring
    if length(vs) == 1 && vs[1] isa Integer && elem_type(R) == Random.gentype(v1)
-      RandomExtensions.Make(S, v1, vs[1]) # forward to default Make constructor
+     Make(S, v1, vs[1]) # forward to default Make constructor
    else
       degrees_range = v1
       m = minimum(degrees_range)
@@ -256,8 +256,7 @@ function RandomExtensions.make(S::LaurentPolyWrapRing, v1, vs...)
 end
 
 function rand(rng::AbstractRNG,
-              sp::Random.SamplerTrivial{<:RandomExtensions.Make3{<:LaurentPolyWrap,
-                                                                 <:LaurentPolyWrapRing}})
+              sp::SamplerTrivial{<:Make3{<:LaurentPolyWrap, <:LaurentPolyWrapRing}})
    v, m = sp[][2:end]
    LaurentPolyWrap(rand(rng, v), m)
 end
@@ -266,7 +265,7 @@ rand(rng::AbstractRNG, S::LaurentPolyWrapRing, degrees_range, v...) =
    rand(rng, make(S, degrees_range, v...))
 
 rand(S::LaurentPolyWrapRing, degrees_range, v...) =
-   rand(Random.GLOBAL_RNG, S, degrees_range, v...)
+   rand(GLOBAL_RNG, S, degrees_range, v...)
 
 
 ###############################################################################

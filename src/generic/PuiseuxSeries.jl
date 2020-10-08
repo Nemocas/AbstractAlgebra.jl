@@ -609,9 +609,9 @@ RandomExtensions.make(S::PuiseuxSeriesRingOrField, val_range::UnitRange{Int},
      make(S, scale_range, make(laurent_ring(S), val_range, vs...))
 
 function rand(rng::AbstractRNG,
-              sp::Random.SamplerTrivial{<:RandomExtensions.Make3{<:RingElement,
-                                                                 <:PuiseuxSeriesRingOrField,
-                                                                 UnitRange{Int}}})
+              sp::SamplerTrivial{<:Make3{<:RingElement,
+                                         <:PuiseuxSeriesRingOrField,
+                                         UnitRange{Int}}})
    S, scale_range, v = sp[][1:end]
    (first(scale_range) <= 0 || last(scale_range) <= 0) && error("Scale must be positive")
    return S(rand(rng, v), rand(rng, scale_range))

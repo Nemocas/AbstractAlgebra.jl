@@ -342,14 +342,14 @@ RandomExtensions.maketype(M::AbstractAlgebra.FPModule, _) = elem_type(M)
 function RandomExtensions.make(M::AbstractAlgebra.FPModule, vs...)
    R = base_ring(M)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      RandomExtensions.Make(M, vs[1]) # forward to default Make constructor
+      Make(M, vs[1]) # forward to default Make constructor
    else
       make(M, make(R, vs...))
    end
 end
 
 function rand(rng::AbstractRNG,
-              sp::Random.SamplerTrivial{<:RandomExtensions.Make2{
+              sp::SamplerTrivial{<:Make2{
                  <:AbstractAlgebra.FPModuleElem, <:AbstractAlgebra.FPModule}})
    M, vals = sp[][1:end]
    M(rand(rng, vals, ngens(M)))

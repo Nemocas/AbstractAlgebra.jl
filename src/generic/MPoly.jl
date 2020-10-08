@@ -4688,13 +4688,13 @@ function RandomExtensions.make(S::AbstractAlgebra.MPolyRing, term_range::UnitRan
                                exp_bound::UnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      RandomExtensions.Make(S, term_range, exp_bound, vs[1])
+      Make(S, term_range, exp_bound, vs[1])
    else
       make(S, term_range, exp_bound, make(R, vs...))
    end
 end
 
-function rand(rng::AbstractRNG, sp::Random.SamplerTrivial{<:RandomExtensions.Make4{
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
                  <:RingElement,<:AbstractAlgebra.MPolyRing,UnitRange{Int},UnitRange{Int}}})
    S, term_range, exp_bound, v = sp[][1:end]
    f = S()
@@ -4717,7 +4717,7 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
 end
 
 function rand(S::AbstractAlgebra.MPolyRing, term_range, exp_bound, v...)
-   rand(Random.GLOBAL_RNG, S, term_range, exp_bound, v...)
+   rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
 end
 
 ###############################################################################
