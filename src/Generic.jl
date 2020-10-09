@@ -64,6 +64,8 @@ include("generic/PuiseuxSeries.jl")
 
 include("generic/Matrix.jl")
 
+include("generic/Matrix-auf-Hecke.jl")
+
 include("generic/MatrixAlgebra.jl")
 
 include("generic/Fraction.jl")

@@ -513,6 +513,12 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem
 
+
+# Export functionality from the Hecke Quarantine.
+import .Generic: scalar_matrix, diagonal_matrix, iszero_row, isdiagonal
+export scalar_matrix, diagonal_matrix, iszero_row, isdiagonal
+
+
 ################################################################################
 #
 #   Parent constructors
