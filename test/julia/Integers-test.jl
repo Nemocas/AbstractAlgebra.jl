@@ -52,6 +52,9 @@ end
    @test f isa elem_type(R)
    f = rand(rng, R, 0:22)
    @test f isa elem_type(R)
+   f = rand(make(R, 0:22))
+   @test f isa elem_type(R)
+   @test f in 0:22
 end
 
 @testset "Julia.Integers.modular_arithmetic..." begin

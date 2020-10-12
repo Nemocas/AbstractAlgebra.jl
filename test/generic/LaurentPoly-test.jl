@@ -375,18 +375,16 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
    @testset "rand" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
 
-      f = rand(L, -5:5, -10:10)
-      @test f isa LaurentPolyElem{BigInt}
-      @test AbstractAlgebra.degrees_range(f) ⊆ -5:5
-      for i = -5:5
-         @test coeff(f, i) ∈ -10:10
-      end
+      m = make(L, -5:5, -10:10)
+      for f in (rand(m), rand(rng, m),
+                rand(L, -5:5, -10:10),
+                rand(rng, L, -5:5, -10:10))
 
-      f = rand(rng, L, -5:5, -10:10)
-      @test f isa LaurentPolyElem{BigInt}
-      @test AbstractAlgebra.degrees_range(f) ⊆ -5:5
-      for i = -5:5
-         @test coeff(f, i) ∈ -10:10
+         @test f isa LaurentPolyElem{BigInt}
+         @test AbstractAlgebra.degrees_range(f) ⊆ -5:5
+         for i = -5:5
+            @test coeff(f, i) ∈ -10:10
+         end
       end
    end
 

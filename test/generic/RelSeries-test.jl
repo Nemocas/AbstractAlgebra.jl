@@ -84,10 +84,12 @@ end
 
 @testset "Generic.RelSeries.rand..." begin
    R, x = PowerSeriesRing(ZZ, 10, "x")
-   f = rand(R, 0:12, -10:10)
-   @test f isa Generic.RelSeries
-   f = rand(rng, R, 0:12, -10:10)
-   @test f isa Generic.RelSeries
+   m = make(R, 0:12, -10:10)
+   for f in Any[rand(m), rand(rng, m), rand(m, 3)...,
+                rand(R, 0:12, -10:10),
+                rand(rng, R, 0:12, -10:10)]
+      @test f isa Generic.RelSeries
+   end
 end
 
 @testset "Generic.RelSeries.manipulation..." begin

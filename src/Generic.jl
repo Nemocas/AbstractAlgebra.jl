@@ -7,6 +7,9 @@ import LinearAlgebra: lu, lu!, tr
 
 using Markdown, Random, InteractiveUtils
 
+using Random: SamplerTrivial, GLOBAL_RNG
+using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
+
 import Base: Array, abs, asin, asinh, atan, atanh, axes, bin, checkbounds, cmp, conj,
              convert, copy, cos, cosh, dec, deepcopy, deepcopy_internal,
              exponent, gcd, gcdx, getindex, hash, hcat, hex, intersect,

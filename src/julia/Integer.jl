@@ -351,9 +351,16 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, R::Integers, n::UnitRange{Int})
-   return R(rand(rng, n))
-end
+RandomExtensions.maketype(R::AbstractAlgebra.Integers{T}, _) where {T} = T
+
+# define rand(make(ZZ, n:m))
+rand(rng::AbstractRNG,
+     sp::SamplerTrivial{<:Make2{T, Integers{T}, UnitRange{Int}}}
+     ) where {T} =
+        sp[][1](rand(rng, sp[][2]))
+
+
+rand(rng::AbstractRNG, R::Integers, n) = R(rand(rng, n))
 
 rand(R::Integers, n) = rand(Random.GLOBAL_RNG, R, n)
 

@@ -99,7 +99,8 @@ import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, bin,
              typed_hcat, typed_vcat, vcat, xor, zero, zeros,
              +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
 
-using Random: Random, AbstractRNG
+using Random: Random, AbstractRNG, SamplerTrivial
+using RandomExtensions: RandomExtensions, make, Make2
 
 export elem_type, parent_type
 

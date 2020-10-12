@@ -968,17 +968,33 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.FracField, v...)
+RandomExtensions.maketype(R::AbstractAlgebra.FracField, _) = elem_type(R)
+
+function RandomExtensions.make(S::AbstractAlgebra.FracField, vs...)
    R = base_ring(S)
-   n = rand(rng, R, v...)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      RandomExtensions.Make(S, vs[1]) # forward to default Make constructor
+   else
+      make(S, make(R, vs...))
+   end
+end
+
+function rand(rng::AbstractRNG,
+              sp::SamplerTrivial{<:Make2{<:RingElement, <:AbstractAlgebra.FracField}})
+   S, v = sp[][1:end]
+   R = base_ring(S)
+   n = rand(rng, v)
    d = R()
    while iszero(d)
-      d = rand(rng, R, v...)
+      d = rand(rng, v)
    end
    return S(n, d)
 end
 
-rand(S::AbstractAlgebra.FracField, v...) = rand(Random.GLOBAL_RNG, S, v...)
+rand(rng::AbstractRNG, S::AbstractAlgebra.FracField, v...) =
+   rand(rng, make(S, v...))
+
+rand(S::AbstractAlgebra.FracField, v...) = rand(GLOBAL_RNG, S, v...)
 
 ###############################################################################
 #
