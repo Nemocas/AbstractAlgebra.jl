@@ -29,6 +29,33 @@ notion of a coefficient domain, in which case it may make sense to parameterise 
 types by the type of elements of this coefficient domain. But note that this may have
 implications for the ad hoc operators one might like to explicitly implement.
 
+## FieldElement type union
+
+Because of its lack of multiple inheritance, Julia does not allow Julia Base
+types to belong to `AbstractAlgebra.FieldElem`. To allow us to work equally with
+AbstractAlgebra and Julia types that represent elements of fields we define a
+union type `AbstractAlgebra.FieldElement` in `src/julia/JuliaTypes`.
+
+So far, in addition to `AbstractAlgebra.FieldElem` the  union type
+`AbstractAlgebra.FieldElement` includes the Julia types `Rational`
+and `AbstractFloat`.
+                                                                                                   
+Most of the generic code in AbstractAlgebra makes use of the union type
+`AbstractAlgebra.FieldElement` instead of `AbstractAlgebra.FieldElem` so that the
+generic functions also accept the Julia Base field types.
+                                                                
+One must be careful when defining ad hoc binary operations for field element
+types. It is often necessary to define separate versions of the functions for
+`AbstractAlgebra.FieldElem` then for each of the Julia types separately in
+order to avoid ambiguity warnings.
+
+Note that even though `AbstractAlgebra.FieldElement` is a union type we still
+have the following inclusion
+
+```julia
+AbstractAlgebra.FieldElement <: AbstractAlgebra.RingElement
+```
+
 ## Parent object caches
 
 In many cases, it is desirable to have only one object in the system to represent each
