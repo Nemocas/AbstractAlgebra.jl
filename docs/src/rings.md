@@ -56,7 +56,8 @@ types. It is often necessary to define separate versions of the functions for
 `AbstractAlgebra.RingElem` then for each of the Julia types separately in
 order to avoid ambiguity warnings.
 
-Note that even though `AbstractAlgebra.RingElement` is a union type we still                                           have the following inclusion
+Note that even though `AbstractAlgebra.RingElement` is a union type we still
+have the following inclusion
 
 ```julia
 AbstractAlgebra.RingElement <: AbstractAlgebra.NCRingElement
