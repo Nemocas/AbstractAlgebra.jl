@@ -2324,16 +2324,15 @@ function can_solve_left_reduced_triu(r::AbstractAlgebra.MatElem{T},
 end
 
 @doc Markdown.doc"""
-    can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side = :right) where S <: RingElement
-> Given two matrices $a$ and $b$ over the same ring, tries to solve $ax = b$
+    can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: RingElement
+> Given two matrices $a$ and $b$ over the same ring, try to solve $ax = b$
 > if `side` is `:right` or $xa = b$ if `side` is `:left`. In either case,
-> returns a tuple `(flag, x)`. If a solution exists, `flag` is set to true and
+> return a tuple `(flag, x)`. If a solution exists, `flag` is set to true and
 > `x` is a solution. If no solution exists, `flag` is set to false and `x`
 > is arbitrary. If the dimensions of $a$ and $b$ are incompatible, an exception
 > is raised.
 """
-function can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S};
-                                                                                side = :right) where S <: RingElement
+function can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: RingElement
    if side == :right
       (f, x) = can_solve_with_solution(a', b'; side=:left)
       return (f, x')
@@ -2370,12 +2369,11 @@ function can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgeb
       end
       return (true, z*T)
    else
-      @error("Unsupported argument :$side for side: Must be :left or :right.")
+      error("Unsupported argument :$side for side: Must be :left or :right.")
    end
 end
 
-function can_solve_with_solution(A::AbstractAlgebra.MatElem{T}, B::AbstractAlgebra.MatElem{T};
-                                                                                side = :right) where T <: FieldElement
+function can_solve_with_solution(A::AbstractAlgebra.MatElem{T}, B::AbstractAlgebra.MatElem{T}; side::Symbol = :right) where T <: FieldElement
    if side == :right
       (f, x) = can_solve_with_solution(A', B', side = :left)
       return (f, x')
@@ -2409,15 +2407,14 @@ function can_solve_with_solution(A::AbstractAlgebra.MatElem{T}, B::AbstractAlgeb
 end
 
 @doc Markdown.doc"""
-    can_solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side = :right) where S <: RingElement
-> Given two matrices $a$ and $b$ over the same ring, checks the solubility
+    can_solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: RingElement
+> Given two matrices $a$ and $b$ over the same ring, check the solubility
 > of $ax = b$ if `side` is `:right` or $xa = b$ if `side` is `:left`.
-> Returns true if a solution exists, false otherwise. If the dimensions
+> Return true if a solution exists, false otherwise. If the dimensions
 > of $a$ and $b$ are incompatible, an exception is raised. If a solution
 > should be computed as well, use `can_solve_with_solution` instead.
 """
-function can_solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S};
-                                                                  side = :right) where S <: RingElement
+function can_solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: RingElement
    return can_solve_with_solution(a, b; side=side)[1]
 end
 
@@ -2468,15 +2465,14 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    isinvertible_with_inverse(A::Generic.MatrixElem{T}; side = :left) where {T <: RingElement}
-> Given an $n\times m$ matrix $A$ over a ring, returns a tuple `(flag, B)`.
+    isinvertible_with_inverse(A::Generic.MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+> Given an $n\times m$ matrix $A$ over a ring, return a tuple `(flag, B)`.
 > If `side` is `:right` and `flag` is true, $B$ is the right inverse of $A$
 > i.e. $AB$ is the $m\times m$ unit matrix. If `side` is `:left` and `flag` is
 > true, $B$ is the left inverse of $A$ i.e. $BA$ is the $\times $ unit matrix.
-> If `flag` is false, no right or left inverse does not exist.
+> If `flag` is false, no right or left inverse exists.
 """
-function isinvertible_with_inverse(A::Generic.MatrixElem{T};
-                                              side = :left) where {T <: RingElement}
+function isinvertible_with_inverse(A::Generic.MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
    if (side == :left && nrows(A) < ncols(A)) || (side == :right && ncols(A) < nrows(A))
       return (false, zero(A, 0, 0))
    end
@@ -2489,7 +2485,7 @@ end
 
 @doc Markdown.doc"""
     isinvertible(A::Generic.MatrixElem{T}) where {T <: RingElement}
-> Returns true if a given square matrix is invertible, false otherwise. If
+> Return true if a given square matrix is invertible, false otherwise. If
 > the inverse should also be computed, use `isinvertible_with_inverse`.
 """
 isinvertible(A::Generic.MatrixElem{T}) where {T <: RingElement} = issquare(A) && isunit(det(A))
@@ -2660,7 +2656,7 @@ function kernel(A::AbstractAlgebra.MatElem{T}; side::Symbol = :right) where T <:
    elseif side == :left
       return left_kernel(A)
    else
-      error("Unsupported argument: :$side for side: Must be :left or :right")
+      error("Unsupported argument: :$side for side: must be :left or :right")
    end
 end
 

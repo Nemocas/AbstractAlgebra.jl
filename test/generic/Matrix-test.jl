@@ -1613,6 +1613,11 @@ end
 
             @test can_solve(M, B)
             @test flag && M*X == B
+
+            (flag, X) = can_solve_with_solution(M, M*X1; side = :right)
+
+            @test can_solve(M, B; side = :right)
+            @test flag && M*X == B
          end
 
          let
@@ -1670,6 +1675,9 @@ end
       (flag, _) = can_solve_with_solution(M, X2; side = :left)
       @assert !flag
    end
+
+   @test_throws Exception can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = :aaa)
+   @test_throws TypeError can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = "right")
 end
 
 @testset "Generic.Mat.solve_triu..." begin
