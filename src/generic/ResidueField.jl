@@ -668,3 +668,14 @@ end
 function  gen(R::AbstractAlgebra.Generic.ResField{AbstractAlgebra.Generic.Poly{Rational{BigInt}}})
    return R(gen(base_ring(R)))
 end
+
+function RandomExtensions.make(S::AbstractAlgebra.ResField{AbstractAlgebra.Generic.Poly{Rational{BigInt}}}, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      Make(S, vs[1])
+   else
+      n = degree(S.modulus)
+      make(S, make(base_ring(S), n - 1:n - 1, vs...))
+   end
+end
+
