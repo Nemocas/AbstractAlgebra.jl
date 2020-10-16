@@ -625,6 +625,14 @@ solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})
 ```
 
 ```@docs
+can_solve_with_solution{T <: RingElement}(::MatElem{T}, ::MatElem{T})
+```
+
+```@docs
+can_solve{T <: RingElement}(::MatElem{T}, ::MatElem{T})
+```
+
+```@docs
 solve_left{T <: RingElem}(::MatElem{T}, ::MatElem{T})
 ```
 
@@ -665,6 +673,27 @@ julia> x = solve(A, b)
 [  1984//7817*x^2 + 1573//7817*x - 937//7817]
 [ -2085//7817*x^2 + 1692//7817*x + 965//7817]
 [-3198//7817*x^2 + 3540//7817*x - 3525//7817]
+
+julia> A = matrix(ZZ, 2, 2, [1, 2, 0, 2])
+[1  2]
+[0  2]
+
+julia> b = matrix(ZZ, 2, 1, [2, 1])
+[2]
+[1]
+
+julia> can_solve(A, b, side = :right)
+false
+
+julia> A = matrix(QQ, 2, 2, [3, 4, 5, 6])
+[3//1  4//1]
+[5//1  6//1]
+
+julia> b = matrix(QQ, 1, 2, [2, 1])
+[2//1  1//1]
+
+julia> can_solve_with_solution(A, b; side = :left)
+(true, [(-7)//2 5//2])
 
 julia> A = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])
 [x + 1  2*x + 3  x^2 + 1]
@@ -726,6 +755,14 @@ julia> B = T([BigInt(4), 5, 7])
 Base.inv{T <: RingElement}(::MatrixElem{T})
 ```
 
+```@docs
+isinvertible_with_inverse{T <: RingElement}(::MatrixElem{T})
+```
+
+```@docs
+isinvertible{T <: RingElement}(::MatrixElem{T})
+```
+
 **Examples**
 
 ```jldoctest
@@ -747,6 +784,12 @@ julia> X = inv(A)
 [-343//7817*x^2 + 717//7817*x - 2072//7817  -4964//23451*x^2 + 2195//23451*x - 11162//23451   -232//23451*x^2 - 4187//23451*x - 1561//23451]
 [ 128//7817*x^2 - 655//7817*x + 2209//7817     599//23451*x^2 - 2027//23451*x - 1327//23451  -1805//23451*x^2 + 2702//23451*x - 7394//23451]
 [ 545//7817*x^2 + 570//7817*x + 2016//7817    -1297//23451*x^2 - 5516//23451*x - 337//23451  8254//23451*x^2 - 2053//23451*x + 16519//23451]
+
+julia> isinvertible(A)
+true
+
+julia> isinvertible_with_inverse(A)
+(true, [(-343//7817*x^2 + 717//7817*x - 2072//7817) (-4964//23451*x^2 + 2195//23451*x - 11162//23451) (-232//23451*x^2 - 4187//23451*x - 1561//23451); (128//7817*x^2 - 655//7817*x + 2209//7817) (599//23451*x^2 - 2027//23451*x - 1327//23451) (-1805//23451*x^2 + 2702//23451*x - 7394//23451); (545//7817*x^2 + 570//7817*x + 2016//7817) (-1297//23451*x^2 - 5516//23451*x - 337//23451) (8254//23451*x^2 - 2053//23451*x + 16519//23451)])
 
 julia> R, x = PolynomialRing(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
