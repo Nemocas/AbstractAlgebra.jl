@@ -1145,6 +1145,8 @@ end
       end
 
       @test divexact(f*g, g) == f
+      @test divexact_left(f*g, g) == f
+      @test divexact_right(f*g, g) == f
 
       h = 0
       while h == 0
