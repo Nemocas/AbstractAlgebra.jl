@@ -22,7 +22,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        snf_kb_with_transform, find_pivot_popov, inv!, zero_matrix,
        kronecker_product, minors, tr, lu, lu!, pseudo_inv, dense_matrix_type,
        kernel, iszero_row, iszero_column, left_kernel, right_kernel, ishnf,
-       solve_left, add_column, add_column!, add_row, add_row!, multiply_column,
+       solve_left, solve_right, add_column, add_column!, add_row, add_row!, multiply_column,
        multiply_column!, multiply_row, multiply_row!, map_entries, map_entries!
 
 ###############################################################################
@@ -2196,12 +2196,26 @@ function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
 end
 
 @doc Markdown.doc"""
+    solve_right(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where {S <: RingElement}
+> Given an $m\times r$ matrix $a$ over a ring and an $m\times n$ matrix $b$
+> over the same ring, return an $r\times n$ matrix $x$ such that $ax = b$. If
+> no such matrix exists, an exception is raised.
+"""
+function solve_right(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
+                     ) where S <: RingElement
+   can, X = can_solve_with_solution(a, b, side = :right)
+   can || throw(ArgumentError("Unable to solve linear system"))
+   return X
+end
+
+@doc Markdown.doc"""
     solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
 > Given an $r\times n$ matrix $a$ over a ring and an $m\times n$ matrix $b$
 > over the same ring, return an $m\times r$ matrix $x$ such that $xa = b$. If
 > no such matrix exists, an exception is raised.
 """
-function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
+function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
+                    ) where S <: RingElement
    (flag, x) = can_solve_with_solution(a, b; side = :left)
    flag || error("Unable to solve linear system")
    return x

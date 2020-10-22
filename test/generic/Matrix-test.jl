@@ -1522,6 +1522,49 @@ end
    @test M*x == d*b
 end
 
+@testset "Generic.Mat.solve_right..." begin
+   for R in [ZZ, QQ]
+      for iter = 1:40
+         for dim = 0:5
+            r = rand(1:5)
+            n = rand(1:5)
+            c = rand(1:5)
+
+            S = MatrixSpace(R, r, n)
+            U = MatrixSpace(R, n, c)
+
+            X1 = rand(U, -20:20)
+            M = rand(S, -20:20)
+
+            B = M*X1
+            X = solve_right(M, B)
+
+            @test M*X == B
+         end
+      end
+   end
+   R, x = PolynomialRing(QQ, "x")
+
+   for iter = 1:4
+      for dim = 0:5
+         r = rand(1:5)
+         n = rand(1:5)
+         c = rand(1:5)
+
+         S = MatrixSpace(R, r, n)
+         U = MatrixSpace(R, n, c)
+
+         X1 = rand(U, 1:2, -10:10)
+         M = rand(S, 1:2, -10:10)
+
+         B = M*X1
+         X = solve_right(M, B)
+
+         @test M*X == B
+      end
+   end
+end
+
 @testset "Generic.Mat.solve_left..." begin
    for R in [ZZ, QQ]
       for iter = 1:40
