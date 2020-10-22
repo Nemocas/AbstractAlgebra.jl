@@ -1566,6 +1566,132 @@ end
    end
 end
 
+@testset "Generic.Mat.can_solve..." begin
+   for R in [ZZ, QQ]
+      for iter = 1:40
+         for dim = 0:5
+            r = rand(1:5)
+            n = rand(1:5)
+            c = rand(1:5)
+
+            let
+               S = MatrixSpace(R, n, r)
+               U = MatrixSpace(R, c, n)
+
+               X1 = rand(S, -20:20)
+               M = rand(U, -20:20)
+
+               B = M*X1
+               (flag, X) = can_solve_with_solution(M, M*X1)
+
+               @test can_solve(M, B)
+               @test flag && M*X == B
+            end
+
+            let
+               S = MatrixSpace(R, r, n)
+               U = MatrixSpace(R, n, c)
+
+               X1 = rand(S, -20:20)
+               M = rand(U, -20:20)
+
+               B = X1*M
+               (flag, X) = can_solve_with_solution(M, X1*M; side = :left)
+
+               @test can_solve(M, B; side = :left)
+               @test flag && X*M == B
+            end
+         end
+      end
+   end
+
+   R, x = PolynomialRing(QQ, "x")
+
+   for iter = 1:4
+      for dim = 0:5
+         r = rand(1:5)
+         n = rand(1:5)
+         c = rand(1:5)
+
+         let
+            S = MatrixSpace(R, n, r)
+            U = MatrixSpace(R, c, n)
+
+            X1 = rand(S, 1:2, -10:10)
+            M = rand(U, 1:2, -10:10)
+
+            B = M*X1
+            (flag, X) = can_solve_with_solution(M, M*X1)
+
+            @test can_solve(M, B)
+            @test flag && M*X == B
+
+            (flag, X) = can_solve_with_solution(M, M*X1; side = :right)
+
+            @test can_solve(M, B; side = :right)
+            @test flag && M*X == B
+         end
+
+         let
+            S = MatrixSpace(R, r, n)
+            U = MatrixSpace(R, n, c)
+
+            X1 = rand(S, 1:2, -10:10)
+            M = rand(U, 1:2, -10:10)
+
+            B = X1*M
+            (flag, X) = can_solve_with_solution(M, X1*M; side = :left)
+
+            @test can_solve(M, B; side = :left)
+            @test flag && X*M == B
+         end
+      end
+   end
+
+   let
+      M = matrix(R, 1, 1, [x])
+      X = matrix(R, 1, 1, [1])
+
+      @assert !can_solve(M, X)
+      (flag, _) = can_solve_with_solution(M, X)
+      @assert !flag
+
+      @assert !can_solve(M, X; side = :left)
+      (flag, _) = can_solve_with_solution(M, X; side = :left)
+      @assert !flag
+   end
+
+   let
+      M = matrix(ZZ, 2, 2, [1, 1, 1, 1])
+      X = matrix(ZZ, 2, 1, [1, 0])
+
+      @assert !can_solve(M, X)
+      (flag, _) = can_solve_with_solution(M, X)
+      @assert !flag
+
+      @assert !can_solve(M, X'; side = :left)
+      (flag, _) = can_solve_with_solution(M, X'; side = :left)
+      @assert !flag
+   end
+
+   let
+      M = matrix(ZZ, 3, 3, [2, 0, 0, 0, 1, 0, 0, 0, 1])
+
+      X1 = matrix(ZZ, 3, 1, [1, 0, 0])
+      @assert !can_solve(M, X1)
+      (flag, X) = can_solve_with_solution(M, X1)
+      @assert !flag
+
+      X2 = matrix(ZZ, 2, 3, [1, 0, 0, 0, 1, 0])
+      @assert !can_solve(M, X2; side = :left)
+      (flag, _) = can_solve_with_solution(M, X2; side = :left)
+      @assert !flag
+   end
+
+   @test_throws Exception can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = :aaa)
+   @test_throws TypeError can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = "right")
+end
+
 @testset "Generic.Mat.solve_triu..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
@@ -1664,6 +1790,90 @@ end
 
       @test r == i
       @test isrref(A)
+   end
+end
+
+@testset "Generic.Mat.isinvertible..." begin
+   R, x = PolynomialRing(QQ, "x")
+
+   let
+      M = matrix(R, 1, 1, [R(1)])
+
+      @test isinvertible(M)
+      (flag, _) = isinvertible_with_inverse(M)
+      @test flag
+      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      @test flag
+   end
+
+   let
+      M = matrix(R, 1, 1, [x])
+
+      @test !isinvertible(M)
+      (flag, _) = isinvertible_with_inverse(M)
+      @test !flag
+      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      @test !flag
+   end
+
+   let
+      M = matrix(ZZ, 2, 2, [1, 1, 1, 1])
+
+      @test !isinvertible(M)
+      (flag, _) = isinvertible_with_inverse(M)
+      @test !flag
+      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      @test !flag
+   end
+
+   let
+      M = matrix(QQ, 4, 4, [1, 1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1, -1, -1, 1])
+
+      @test isinvertible(M)
+      (flag, _) = isinvertible_with_inverse(M)
+      @test flag
+      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      @test flag
+   end
+
+   let
+      M = matrix(QQ, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 0])
+
+      @test isinvertible(M)
+      (flag, _) = isinvertible_with_inverse(M)
+      @test flag
+      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      @test flag
+   end
+
+   for _ in 1:100
+      m = rand(1:10)
+      n = rand(m:10)
+      M1 = MatrixSpace(QQ, n, m)
+      M2 = MatrixSpace(QQ, m, n)
+
+      L_l = randmat_with_rank(M1, m, -10:10)
+      L_r = randmat_with_rank(M2, m, -10:10)
+
+      I_m = matrix(QQ, m, m, [i == j ? 1 : 0 for i in 1:m, j in 1:m])
+
+      (flag_l, x_l) = isinvertible_with_inverse(L_l; side = :left)
+      @test flag_l && x_l * L_l == I_m
+      (flag_r, x_r) = isinvertible_with_inverse(L_r; side = :right)
+      @test flag_r && L_r * x_r == I_m
+   end
+
+   for _ in 1:100
+      n = rand(1:10)
+      M = MatrixSpace(QQ, n, n)
+
+      L = randmat_with_rank(M, rand(0:n-1), -10:10)
+
+      @test !isinvertible(L)
+      (flag, _) = isinvertible_with_inverse(L; side = :left)
+      @test !flag
+      (flag, _) = isinvertible_with_inverse(L; side = :right)
+      @test !flag
    end
 end
 

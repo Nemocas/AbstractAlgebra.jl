@@ -12,6 +12,8 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        solve_rational, hnf, hnf_with_transform,
        issquare, snf, snf_with_transform, weak_popov,
        weak_popov_with_transform, can_solve_left_reduced_triu,
+       can_solve, can_solve_with_solution, isinvertible,
+       isinvertible_with_inverse,
        extended_weak_popov, extended_weak_popov_with_transform, rank,
        rank_profile_popov, hnf_via_popov, hnf_via_popov_with_transform, popov,
        popov_with_transform, det_popov, _check_dim, nrows, ncols, gram, rref,
@@ -2200,33 +2202,9 @@ end
 > no such matrix exists, an exception is raised.
 """
 function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
-   @assert ncols(a) == ncols(b)
-   H, T = hnf_with_transform(a)
-   b = deepcopy(b)
-   z = zero(a, nrows(b), nrows(a))
-   l = min(ncols(a), nrows(a))
-   t = base_ring(a)()
-   for i = 1:nrows(b)
-      for j = 1:l
-         k = 1
-         while k <= ncols(H) && iszero(H[j, k])
-            k += 1
-         end
-         if k > ncols(H)
-            continue
-         end
-         q, r = divrem(b[i, k], H[j, k])
-         r != 0 && error("Unable to solve linear system")
-         z[i, j] = q
-         q = -q
-         for h = k:ncols(H)
-            t = mul!(t, q, H[j, h])
-            b[i, h] = addeq!(b[i, h], t)
-         end
-      end
-   end
-   b != 0 && error("Unable to solve linear system")
-   return z*T
+   (flag, x) = can_solve_with_solution(a, b; side = :left)
+   flag || error("Unable to solve linear system")
+   return x
 end
 
 # Find the pivot columns of an rref matrix
@@ -2247,32 +2225,6 @@ function find_pivot(A::AbstractAlgebra.MatElem{T}) where T <: RingElement
     push!(p, j)
   end
   return p
-end
-
-function solve_left(A::AbstractAlgebra.MatElem{T}, B::AbstractAlgebra.MatElem{T}) where T <: FieldElement
-  R = base_ring(A)
-  ncols(A) != ncols(B) && error("Incompatible matrices")
-  mu = zero_matrix(R, ncols(A), nrows(A) + nrows(B))
-  for i = 1:ncols(A)
-     for j = 1:nrows(A)
-        mu[i, j] = A[j, i]
-     end
-     for j = 1:nrows(B)
-        mu[i, nrows(A) + j] = B[j, i]
-     end
-  end
-  rk, mu = rref(mu)
-  p = find_pivot(mu)
-  if any(i -> i > nrows(A), p)
-    error("Unable to solve linear system")
-  end
-  sol = zero_matrix(R, nrows(B), nrows(A))
-  for i = 1:length(p)
-    for j = 1:nrows(B)
-      sol[j, p[i]] = mu[i, nrows(A) + j]
-    end
-  end
-  return sol
 end
 
 ###############################################################################
@@ -2383,6 +2335,101 @@ function can_solve_left_reduced_triu(r::AbstractAlgebra.MatElem{T},
    return true, x
 end
 
+@doc Markdown.doc"""
+    can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: RingElement
+> Given two matrices $a$ and $b$ over the same ring, try to solve $ax = b$
+> if `side` is `:right` or $xa = b$ if `side` is `:left`. In either case,
+> return a tuple `(flag, x)`. If a solution exists, `flag` is set to true and
+> `x` is a solution. If no solution exists, `flag` is set to false and `x`
+> is arbitrary. If the dimensions of $a$ and $b$ are incompatible, an exception
+> is raised.
+"""
+function can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: RingElement
+   if side == :right
+      (f, x) = can_solve_with_solution(a', b'; side=:left)
+      return (f, x')
+   elseif side == :left
+      @assert ncols(a) == ncols(b)
+      H, T = hnf_with_transform(a)
+      b = deepcopy(b)
+      z = zero(a, nrows(b), nrows(a))
+      l = min(ncols(a), nrows(a))
+      t = base_ring(a)()
+      for i = 1:nrows(b)
+         for j = 1:l
+            k = 1
+            while k <= ncols(H) && iszero(H[j, k])
+               k += 1
+            end
+            if k > ncols(H)
+               continue
+            end
+            q, r = divrem(b[i, k], H[j, k])
+            if r != 0
+               return (false, zero(a, 0, 0))
+            end
+            z[i, j] = q
+            q = -q
+            for h = k:ncols(H)
+               t = mul!(t, q, H[j, h])
+               b[i, h] = addeq!(b[i, h], t)
+            end
+         end
+      end
+      if b != 0
+         return (false, zero(a, 0, 0))
+      end
+      return (true, z*T)
+   else
+      error("Unsupported argument :$side for side: Must be :left or :right.")
+   end
+end
+
+function can_solve_with_solution(A::AbstractAlgebra.MatElem{T}, B::AbstractAlgebra.MatElem{T}; side::Symbol = :right) where T <: FieldElement
+   if side == :right
+      (f, x) = can_solve_with_solution(A', B', side = :left)
+      return (f, x')
+   elseif side == :left
+      R = base_ring(A)
+      ncols(A) != ncols(B) && error("Incompatible matrices")
+      mu = zero_matrix(R, ncols(A), nrows(A) + nrows(B))
+      for i = 1:ncols(A)
+         for j = 1:nrows(A)
+            mu[i, j] = A[j, i]
+         end
+         for j = 1:nrows(B)
+            mu[i, nrows(A) + j] = B[j, i]
+         end
+      end
+      rk, mu = rref(mu)
+      p = find_pivot(mu)
+      if any(i -> i > nrows(A), p)
+         return (false, zero(A, 0, 0))
+      end
+      sol = zero_matrix(R, nrows(B), nrows(A))
+      for i = 1:length(p)
+         for j = 1:nrows(B)
+            sol[j, p[i]] = mu[i, nrows(A) + j]
+         end
+      end
+      return (true, sol)
+   else
+      error("Unsupported argument :$side for side: Must be :left or :right.")
+   end
+end
+
+@doc Markdown.doc"""
+    can_solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: RingElement
+> Given two matrices $a$ and $b$ over the same ring, check the solubility
+> of $ax = b$ if `side` is `:right` or $xa = b$ if `side` is `:left`.
+> Return true if a solution exists, false otherwise. If the dimensions
+> of $a$ and $b$ are incompatible, an exception is raised. If a solution
+> should be computed as well, use `can_solve_with_solution` instead.
+"""
+function can_solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: RingElement
+   return can_solve_with_solution(a, b; side=side)[1]
+end
+
 ###############################################################################
 #
 #   Inverse
@@ -2422,6 +2469,40 @@ function Base.inv(M::MatrixElem{T}) where {T <: RingElement}
    isunit(d) || throw(DomainError(M, "Matrix is not invertible."))
    return divexact(X, d)
 end
+
+###############################################################################
+#
+#   Is invertible
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    isinvertible_with_inverse(A::Generic.MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+> Given an $n\times m$ matrix $A$ over a ring, return a tuple `(flag, B)`.
+> If `side` is `:right` and `flag` is true, $B$ is the right inverse of $A$
+> i.e. $AB$ is the $m\times m$ unit matrix. If `side` is `:left` and `flag` is
+> true, $B$ is the left inverse of $A$ i.e. $BA$ is the $\times $ unit matrix.
+> If `flag` is false, no right or left inverse exists.
+"""
+function isinvertible_with_inverse(A::Generic.MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+   if (side == :left && nrows(A) < ncols(A)) || (side == :right && ncols(A) < nrows(A))
+      return (false, zero(A, 0, 0))
+   end
+   I = (side == :left) ? zero(A, ncols(A), ncols(A)) : zero(A, nrows(A), nrows(A))
+   for i = 1:ncols(I)
+      I[i, i] = one(base_ring(I))
+   end
+   return can_solve_with_solution(A, I; side = side)
+end
+
+@doc Markdown.doc"""
+    isinvertible(A::Generic.MatrixElem{T}) where {T <: RingElement}
+> Return true if a given square matrix is invertible, false otherwise. If
+> the inverse should also be computed, use `isinvertible_with_inverse`.
+"""
+isinvertible(A::Generic.MatrixElem{T}) where {T <: RingElement} = issquare(A) && isunit(det(A))
+
+isinvertible(A::Generic.MatrixElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) == rank(A)
 
 ###############################################################################
 #
@@ -2587,7 +2668,7 @@ function kernel(A::AbstractAlgebra.MatElem{T}; side::Symbol = :right) where T <:
    elseif side == :left
       return left_kernel(A)
    else
-      error("Unsupported argument: :$side for side: Must be :left or :right")
+      error("Unsupported argument: :$side for side: must be :left or :right")
    end
 end
 
