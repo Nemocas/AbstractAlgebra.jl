@@ -14,6 +14,7 @@ export iscompatible, issubmodule, isisomorphic, rels
 
 @doc Markdown.doc"""
     zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
 > Return the zero element of the module $M$.
 """
 function zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
@@ -23,6 +24,7 @@ end
 
 @doc Markdown.doc"""
     iszero(v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+
 > Return true if $v$ is the zero element of the module $M$.
 """
 function iszero(v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
@@ -31,6 +33,7 @@ end
 
 @doc Markdown.doc"""
     rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
 > Return a vector of all the relations between generators of the given
 > module, where each relation is given as row matrix. The relation matrix
 > whose rows are the returned relations will be in reduced form (hnf/rref).
@@ -39,6 +42,7 @@ rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels::Vector{den
 
 @doc Markdown.doc"""
     iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
 > Return `true, P` if the given modules are compatible, i.e. that they are
 > (transitively) submodules of the same module, P. Otherwise return `false, M`.
 """
@@ -67,6 +71,7 @@ end
 
 @doc Markdown.doc"""
     issubmodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
 > Return `true` if $N$ was constructed as a submodule of $M$. The relation
 > is taken transitively (i.e. subsubmodules are submodules for the purposes
 > of this relation, etc). The module $M$ is also considered a submodule of
@@ -170,6 +175,7 @@ end
 
 @doc Markdown.doc"""
     Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
 > Return the intersection of the modules $M$ as a submodule of $M$. Note that
 > $M$ and $N$ must be (constructed as) submodules (transitively) of some common
 > module $P$.
@@ -236,6 +242,7 @@ end
 
 @doc Markdown.doc"""
     ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
 > Return `true` if the modules are (constructed to be) the same module
 > elementwise. This is not object equality and it is not isomorphism. In fact,
 > each method of constructing modules (submodules, quotient modules, products,
@@ -311,6 +318,7 @@ end
 
 @doc Markdown.doc"""
     isisomorphic(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
 > Return `true` if the modules $M$ and $N$ are isomorphic.
 """
 function isisomorphic(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
@@ -325,6 +333,7 @@ end
 
 @doc Markdown.doc"""
     getindex(v::AbstractAlgebra.FPModuleElem{T}, i::Int) where T <: RingElement
+
 > Return the $i$-th coefficient of the module element $v$.
 """
 function getindex(v::AbstractAlgebra.FPModuleElem{T}, i::Int) where T <: RingElement

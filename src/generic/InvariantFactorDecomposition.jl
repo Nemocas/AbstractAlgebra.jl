@@ -143,6 +143,7 @@ end
 
 @doc Markdown.doc"""
     snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
 > Return a pair `M, f` consisting of the invariant factor decomposition $M$ of
 > the module `m` and a module homomorphism (isomorphisms) $f : M \to m$. The
 > module `M` is itself a module which can be manipulated as any other module
@@ -201,6 +202,7 @@ end
 
 @doc Markdown.doc"""
     invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
 > Return a vector of the invariant factors of the module $M$.
 """
 function invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElement

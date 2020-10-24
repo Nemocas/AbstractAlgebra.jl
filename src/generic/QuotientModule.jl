@@ -35,12 +35,14 @@ end
 
 @doc Markdown.doc"""
     dim(N::AbstractAlgebra.Generic.QuotientModule{T}) where T <: FieldElement
+
 > Return the dimension of the given vector quotient space.
 """
 dim(N::AbstractAlgebra.Generic.QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
 
 @doc Markdown.doc"""
     supermodule(M::QuotientModule{T}) where T <: RingElement
+
 > Return the module that this module is a quotient of.
 """
 supermodule(M::QuotientModule{T}) where T <: RingElement = M.m
@@ -255,6 +257,7 @@ end
 
 @doc Markdown.doc"""
     quo(m::AbstractAlgebra.FPModule{T}, subm::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
 > Return the quotient `M` of the module `m` by the module `subm` (which must
 > have been (transitively) constructed as a submodule of `m` or be `m` itself)
 > along with the canonical quotient map from `m` to `M`.

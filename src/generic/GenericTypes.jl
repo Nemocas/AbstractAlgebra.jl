@@ -12,6 +12,7 @@
 
 @doc Markdown.doc"""
     CycleDec{T}(ccycles, cptrs, n) where T
+
 > Cycle decomposition of a permutation.
 > * `ccycles`: an array of consecutive entries of cycles;
 > * `cptrs`: an array of pointers to the locations where cycles begin: ```ccycles[cptrs[i], cptrs[i+1]-1]` contains the i-th cycle;
@@ -31,6 +32,7 @@ end
 
 @doc Markdown.doc"""
     SymmetricGroup{T<:Integer}
+
 > The full symmetric group singleton type.
 > `SymmetricGroup(n)` constructs the full symmetric group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
 
@@ -62,6 +64,7 @@ SymmetricGroup(n::Integer) = SymmetricGroup{typeof(n)}(n)
 
 @doc Markdown.doc"""
     Perm{T<:Integer}
+
 > The type of permutations.
 > Fieldnames:
 > * `d::Vector{T}` - vector representing the permutation
@@ -112,6 +115,7 @@ end
 
 @doc Markdown.doc"""
     AllPerms(n::T) where T
+
 > Return an iterator over arrays representing all permutations of `1:n`.
 > Similar to `Combinatorics.permutations(1:n)`
 """
@@ -133,6 +137,7 @@ end
 
 @doc Markdown.doc"""
     Partition(part::Vector{<:Integer}[, check::Bool=true]) <: AbstractVector{Int}
+
 > Represent integer partition in the non-increasing order.
 >
 > `part` will be sorted, if necessary. Checks for validity of input can be skipped by calling the (inner) constructor with `false` as the second argument.
@@ -169,6 +174,7 @@ end
 
 @doc Markdown.doc"""
     AllParts(n::Integer)
+
 > Return an iterator over all integer `Partition`s of `n`.
 > Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
 >
@@ -209,6 +215,7 @@ end
 
 @doc Markdown.doc"""
     SkewDiagram(lambda::Partition, mu::Partition) <: AbstractArray{Int, 2}
+
 > Implements a skew diagram, i.e. a difference of two Young diagrams
 > represented by partitions `lambda` and `mu`.
 > (below dots symbolise the removed entries)
@@ -255,6 +262,7 @@ end
 
 @doc Markdown.doc"""
     YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}
+
 > Return the Young tableaux of partition `part`, filled linearly
 > by `fill` vector. Note that `fill` vector is in **row-major** format.
 >

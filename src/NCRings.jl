@@ -121,6 +121,7 @@ zero(x::NCRingElem) = zero(parent(x))
 
 @doc Markdown.doc"""
     powers(a::Union{NCRingElement, MatElem}, d::Int)
+
 > Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$
 """
 function powers(a::T, d::Int) where {T <: Union{NCRingElement, MatElem}}

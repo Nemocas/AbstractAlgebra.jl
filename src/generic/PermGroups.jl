@@ -6,18 +6,21 @@
 
 @doc Markdown.doc"""
     parent_type(::Type{<:Perm})
+
 > Return the type of the parent of a permutation.
 """
 parent_type(::Type{Perm{T}}) where T = SymmetricGroup{T}
 
 @doc Markdown.doc"""
     elem_type(::Type{<:SymmetricGroup})
+
 > Return the type of elements of a permutation group.
 """
 elem_type(::Type{SymmetricGroup{T}}) where T = Perm{T}
 
 @doc Markdown.doc"""
     parent(g::Perm)
+
 > Return the parent of the permutation `g`.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -76,6 +79,7 @@ end
 
 @doc Markdown.doc"""
     parity(g::Perm)
+
 > Return the parity of the given permutation, i.e. the parity of the number of
 > transpositions in any decomposition of `g` into transpositions.
 >
@@ -121,6 +125,7 @@ end
 
 @doc Markdown.doc"""
     sign(g::Perm)
+
 > Return the sign of a permutation.
 >
 > `sign` returns $1$ if `g` is even and $-1$ if `g` is odd. `sign` represents
@@ -186,6 +191,7 @@ end
 
 @doc Markdown.doc"""
     cycles(g::Perm)
+
 > Decompose permutation `g` into disjoint cycles.
 >
 > Return a `CycleDec` object which iterates over disjoint cycles of `g`. The
@@ -248,6 +254,7 @@ end
 
 @doc Markdown.doc"""
     permtype(g::Perm)
+
 > Return the type of permutation `g`, i.e. lengths of disjoint cycles in cycle
 > decomposition of `g`.
 >
@@ -298,6 +305,7 @@ const _permdisplaystyle = PermDisplayStyle(:cycles)
 
 @doc Markdown.doc"""
     setpermstyle(format::Symbol)
+
 > Select the style in which permutations are displayed (in the REPL or in general
 > as strings). This can be either
 > * `:array` - as vector of integers whose $n$-th position represents the
@@ -353,6 +361,7 @@ end
 
 @doc Markdown.doc"""
     ==(g::Perm, h::Perm)
+
 > Return `true` if permutations are equal, otherwise return `false`.
 >
 > Permutations parametrized by different integer types are considered equal if
@@ -374,6 +383,7 @@ true
 
 @doc Markdown.doc"""
     ==(G::SymmetricGroup, H::SymmetricGroup)
+
 > Return `true` if permutation groups are equal, otherwise return `false`.
 >
 > Permutation groups on the same number of letters, but parametrized
@@ -410,6 +420,7 @@ end
 
 @doc Markdown.doc"""
     *(g::Perm, h::Perm)
+
 > Return the composition ``h ∘ g`` of two permutations.
 >
 > This corresponds to the action of permutation group on the set `[1..n]`
@@ -429,6 +440,7 @@ julia> Perm([2,3,1,4])*Perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 
 @doc Markdown.doc"""
     ^(g::Perm, n::Integer)
+
 > Return the $n$-th power of a permutation `g`.
 >
 > By default `g^n` is computed by cycle decomposition of `g` if `n > 3`.
@@ -515,6 +527,7 @@ end
 
 @doc Markdown.doc"""
     Base.inv(g::Perm)
+
 > Return the inverse of the given permutation, i.e. the permuation $g^{-1}$
 > such that $g ∘ g^{-1} = g^{-1} ∘ g$ is the identity permutation.
 """
@@ -579,6 +592,7 @@ Base.length(A::AllPerms) = A.all
 
 @doc Markdown.doc"""
     Generic.elements!(G::SymmetricGroup)
+
 > Return an unsafe iterator over all permutations in `G`. Only one permutation
 > is allocated and then modified in-place using the non-recursive
 > [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
@@ -651,6 +665,7 @@ Base.length(G::SymmetricGroup) = order(G)
 
 @doc Markdown.doc"""
     order(G::SymmetricGroup) -> BigInt
+
 > Return the order of the full permutation group as `BigInt`.
 """
 order(G::SymmetricGroup) = order(BigInt, G)
@@ -658,6 +673,7 @@ order(::Type{T}, G::SymmetricGroup) where T = factorial(T(G.n))
 
 @doc Markdown.doc"""
     order(a::Perm) -> BigInt
+
 > Return the order of permutation `a` as `BigInt`.
 >
 > If you are sure that computation over `T` (or its `Int` promotion) will not
@@ -672,6 +688,7 @@ end
 
 @doc Markdown.doc"""
     matrix_repr(a::Perm)
+
 > Return the permutation matrix as a sparse matrix representing `a` via natural
 > embedding of the permutation group into the general linear group over $\mathbb{Z}$.
 
@@ -697,6 +714,7 @@ matrix_repr(a::Perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,
 
 @doc Markdown.doc"""
     emb!(result::Perm, p::Perm, V)
+
 > Embed permutation `p` into permutation `result` on the indices given by `V`.
 >
 > This corresponds to the natural embedding of $S_k$ into $S_n$ as the
@@ -718,6 +736,7 @@ end
 
 @doc Markdown.doc"""
     emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
+
 > Return the natural embedding of a permutation group into `G` as the
 > subgroup permuting points indexed by `V`.
 
@@ -743,6 +762,7 @@ end
 
 @doc Markdown.doc"""
     rand([rng=GLOBAL_RNG,] G::SymmetricGroup)
+
 > Return a random permutation from `G`.
 """
 rand(rng::AbstractRNG, rs::Random.SamplerTrivial{SymmetricGroup{T}}) where {T} =
@@ -846,6 +866,7 @@ end
 
 @doc Markdown.doc"""
     perm"..."
+
 > String macro to parse disjoint cycles into `Perm{Int}`.
 >
 > Strings for the output of GAP could be copied directly into `perm"..."`.
@@ -901,6 +922,7 @@ const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 
 @doc Markdown.doc"""
     character(lambda::Partition)
+
 > Return the $\lambda$-th irreducible character of permutation group on
 > `sum(lambda)` symbols. The returned character function is of the following signature:
 > > `chi(p::Perm[, check::Bool=true]) -> BigInt`
@@ -948,6 +970,7 @@ end
 
 @doc Markdown.doc"""
     character(lambda::Partition, p::Perm, check::Bool=true) -> BigInt
+
 > Return the value of `lambda`-th irreducible character of the permutation
 > group on permutation `p`.
 """
@@ -964,6 +987,7 @@ end
 
 @doc Markdown.doc"""
     character(lambda::Partition, mu::Partition, check::Bool=true) -> BigInt
+
 > Return the value of `lambda-th` irreducible character on the conjugacy class
 > represented by partition `mu`.
 """

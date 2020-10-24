@@ -38,6 +38,7 @@ one(::Integers{T}) where T <: Integer = T(1)
 
 @doc Markdown.doc"""
     isunit(a::Integer)
+
 > Return `true` if $a$ is $1$ or $-1$.
 """
 isunit(a::Integer) = a == 1 || a == -1
@@ -208,6 +209,7 @@ end
 
 @doc Markdown.doc"""
     sqrt(a::T) where T <: Integer
+
 > Return the integer square root of $a$. If $a$ is not a perfect square an
 > exception is thrown. If `check` is set to `false` this check is not
 > performed.
@@ -220,6 +222,7 @@ end
 
 @doc Markdown.doc"""
     issquare(a::T) where T <: Integer
+
 > Return true if $a$ is a square.
 """
 function issquare(a::T) where T <: Integer
@@ -238,6 +241,7 @@ end
 
 @doc Markdown.doc"""
     exp(a::T) where T <: Integer
+
 > Return $1$ if $a = 0$, otherwise throw an exception. This function is not
 > generally of use to the user, but is used internally in AbstractAlgebra.jl.
 """

@@ -18,6 +18,7 @@ elem_type(::Type{MatAlgebra{T}}) where {T <: RingElement} = MatAlgElem{T}
 
 @doc Markdown.doc"""
     base_ring(a::AbstractAlgebra.MatAlgebra{T}) where {T <: RingElement}
+
 > Return the base ring $R$ of the given matrix algebra.
 """
 function base_ring(a::AbstractAlgebra.MatAlgebra{T}) where {T <: RingElement}
@@ -26,6 +27,7 @@ end
 
 @doc Markdown.doc"""
     parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingElement
+
 > Return the parent object of the given matrix.
 """
 parent(a::MatAlgElem{T}, cached::Bool = true) where T <: RingElement =
@@ -61,24 +63,28 @@ ncols(a::AbstractAlgebra.MatAlgebra) = nrows(a)
 
 @doc Markdown.doc"""
     degree(a::Generic.MatAlgElem)
+
 > Return the degree $n$ of the $n\times n$ matrix $a$..
 """
 degree(a::MatAlgElem) = nrows(a)
 
 @doc Markdown.doc"""
     degree(a::AbstractAlgebra.MatAlgebra)
+
 > Return the degree $n$ of the given matrix algebra.
 """
 degree(a::AbstractAlgebra.MatAlgebra) = nrows(a)
 
 @doc Markdown.doc"""
     zero(a::AbstractAlgebra.MatAlgebra)
+
 > Construct the zero matrix in the given matrix algebra.
 """
 zero(a::AbstractAlgebra.MatAlgebra) = a()
 
 @doc Markdown.doc"""
     one(a::AbstractAlgebra.MatAlgebra)
+
 > Construct the matrix in the given matrix algebra with ones down the diagonal
 > and zeroes elsewhere.
 """
@@ -309,6 +315,7 @@ end
 
 @doc Markdown.doc"""
     transpose(x::MatAlgElem{T}) where T <: RingElement
+
 > Return the transpose of the given matrix.
 """
 function transpose(x::MatAlgElem{T}) where T <: RingElement
@@ -320,6 +327,7 @@ end
 
 @doc Markdown.doc"""
     gram(x::AbstractAlgebra.MatAlgElem)
+
 > Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
 > the $r\times r$ matrix whose entries $i, j$ are the dot products of the
 > $i$-th and $j$-th rows, respectively.
@@ -474,6 +482,7 @@ end
 
 @doc Markdown.doc"""
     minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+
 > Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 > of the resulting polynomial must be supplied and the matrix must be square.
 """
@@ -547,6 +556,7 @@ end
 
 @doc Markdown.doc"""
     identity_matrix(M::MatAlgElem{T}) where T <: RingElement
+
 > Return the identity matrix over the same base ring as $M$ and with the
 > same dimensions.
 """
@@ -625,6 +635,7 @@ end
 
 @doc Markdown.doc"""
     MatrixAlgebra(R::AbstractAlgebra.Ring, n::Int, cached::Bool = true)
+
 > Return parent object corresponding to the ring of $n\times n$ matrices over
 > the ring $R$. If `cached == true` (the default), the returned parent object
 > is cached so that it can returned by future calls to the constructor with the

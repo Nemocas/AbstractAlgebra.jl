@@ -69,6 +69,7 @@ end
 
 @doc Markdown.doc"""
     Base.inv(f::Map(ModuleIsomorphism))
+
 > Return the inverse map of the given module isomorphism. This is computed
 > cheaply.
 """
@@ -85,6 +86,7 @@ end
 
 @doc Markdown.doc"""
     kernel(f::ModuleHomomorphism{T}) where T <: RingElement
+
 > Return a pair `K, g` consisting of the kernel object $K$ of the given module
 > homomorphism $f$ (as a submodule of its domain) and the canonical injection
 > from the kernel into the domain of $f$
@@ -129,6 +131,7 @@ end
 
 @doc Markdown.doc"""
     image(f::Map(AbstractAlgebra.FPModuleHomomorphism))
+
 > Return a pair `I, g` consisting of the image object $I$ of the given module
 > homomorphism $f$ (as a submodule of its codomain) and the canonical injection
 > from the image into the codomain of $f$

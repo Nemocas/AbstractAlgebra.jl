@@ -174,6 +174,7 @@ end
 
 @doc Markdown.doc"""
     sqrt(a::Rational{T}) where T <: Integer
+
 > Return the square root of $a$ if it is the square of a rational, otherwise
 > throw an error.
 """
@@ -183,6 +184,7 @@ end
 
 @doc Markdown.doc"""
     issquare(a::Rational{T}) where T <: Integer
+
 > Return true if $a$ is the square of a rational.
 """
 function issquare(a::Rational{T}) where T <: Integer
@@ -197,6 +199,7 @@ end
 
 @doc Markdown.doc"""
     exp(a::Rational{T}) where T <: Integer
+
 > Return $1$ if $a = 0$, otherwise throw an exception.
 """
 function exp(a::Rational{T}) where T <: Integer

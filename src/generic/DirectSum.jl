@@ -33,6 +33,7 @@ end
 
 @doc Markdown.doc"""
     summands(M::DirectSumModule{T}) where T <: RingElement
+
 > Return the modules that this module is a direct sum of.
 """
 summands(M::DirectSumModule{T}) where T <: RingElement = M.m
@@ -161,6 +162,7 @@ end
 
 @doc Markdown.doc"""
     DirectSum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
+
 > Return a tuple $M, f, g$ consisting of $M$ the direct sum of the modules `m`
 > (supplied as a vector of modules), a vector $f$ of the injections
 > of the $m[i]$ into $M$ and a vector $g$ of the projections from
