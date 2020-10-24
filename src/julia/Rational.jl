@@ -175,8 +175,8 @@ end
 @doc Markdown.doc"""
     sqrt(a::Rational{T}) where T <: Integer
 
-> Return the square root of $a$ if it is the square of a rational, otherwise
-> throw an error.
+Return the square root of $a$ if it is the square of a rational, otherwise
+throw an error.
 """
 function sqrt(a::Rational{T}, check::Bool=true) where T <: Integer
    return sqrt(numerator(a, check))//sqrt(denominator(a, check))
@@ -185,7 +185,7 @@ end
 @doc Markdown.doc"""
     issquare(a::Rational{T}) where T <: Integer
 
-> Return true if $a$ is the square of a rational.
+Return true if $a$ is the square of a rational.
 """
 function issquare(a::Rational{T}) where T <: Integer
    return issquare(numerator(a)) && issquare(denominator(a))
@@ -200,7 +200,7 @@ end
 @doc Markdown.doc"""
     exp(a::Rational{T}) where T <: Integer
 
-> Return $1$ if $a = 0$, otherwise throw an exception.
+Return $1$ if $a = 0$, otherwise throw an exception.
 """
 function exp(a::Rational{T}) where T <: Integer
    a != 0 && throw(DomainError(a, "a must be 0"))

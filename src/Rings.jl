@@ -227,7 +227,7 @@ end
 @doc Markdown.doc"""
     sqrt(a::FieldElem)
 
-> Return the square root of the element `a`.
+Return the square root of the element `a`.
 """
 function Base.sqrt(a::FieldElem)
   R = parent(a)

@@ -7,21 +7,21 @@
 @doc Markdown.doc"""
     parent_type(::Type{<:Perm})
 
-> Return the type of the parent of a permutation.
+Return the type of the parent of a permutation.
 """
 parent_type(::Type{Perm{T}}) where T = SymmetricGroup{T}
 
 @doc Markdown.doc"""
     elem_type(::Type{<:SymmetricGroup})
 
-> Return the type of elements of a permutation group.
+Return the type of elements of a permutation group.
 """
 elem_type(::Type{SymmetricGroup{T}}) where T = Perm{T}
 
 @doc Markdown.doc"""
     parent(g::Perm)
 
-> Return the parent of the permutation `g`.
+Return the parent of the permutation `g`.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> G = SymmetricGroup(5); g = Perm([3,4,5,2,1])
@@ -80,13 +80,13 @@ end
 @doc Markdown.doc"""
     parity(g::Perm)
 
-> Return the parity of the given permutation, i.e. the parity of the number of
-> transpositions in any decomposition of `g` into transpositions.
->
-> `parity` returns $1$ if the number is odd and $0$ otherwise. `parity` uses
-> cycle decomposition of `g` if already available, but will not compute
-> it on demand. Since cycle structure is cached in `g` you may call
-> `cycles(g)` before calling `parity`.
+Return the parity of the given permutation, i.e. the parity of the number of
+transpositions in any decomposition of `g` into transpositions.
+
+`parity` returns $1$ if the number is odd and $0$ otherwise. `parity` uses
+cycle decomposition of `g` if already available, but will not compute
+it on demand. Since cycle structure is cached in `g` you may call
+`cycles(g)` before calling `parity`.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -126,11 +126,11 @@ end
 @doc Markdown.doc"""
     sign(g::Perm)
 
-> Return the sign of a permutation.
->
-> `sign` returns $1$ if `g` is even and $-1$ if `g` is odd. `sign` represents
-> the homomorphism from the permutation group to the unit group of $\mathbb{Z}$
-> whose kernel is the alternating group.
+Return the sign of a permutation.
+
+`sign` returns $1$ if `g` is even and $-1$ if `g` is odd. `sign` represents
+the homomorphism from the permutation group to the unit group of $\mathbb{Z}$
+whose kernel is the alternating group.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -192,13 +192,13 @@ end
 @doc Markdown.doc"""
     cycles(g::Perm)
 
-> Decompose permutation `g` into disjoint cycles.
->
-> Return a `CycleDec` object which iterates over disjoint cycles of `g`. The
-> ordering of cycles is not guaranteed, and the order within each cycle is
-> computed up to a cyclic permutation.
-> The cycle decomposition is cached in `g` and used in future computation of
-> `permtype`, `parity`, `sign`, `order` and `^` (powering).
+Decompose permutation `g` into disjoint cycles.
+
+Return a `CycleDec` object which iterates over disjoint cycles of `g`. The
+ordering of cycles is not guaranteed, and the order within each cycle is
+computed up to a cyclic permutation.
+The cycle decomposition is cached in `g` and used in future computation of
+`permtype`, `parity`, `sign`, `order` and `^` (powering).
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -255,11 +255,11 @@ end
 @doc Markdown.doc"""
     permtype(g::Perm)
 
-> Return the type of permutation `g`, i.e. lengths of disjoint cycles in cycle
-> decomposition of `g`.
->
-> The lengths are sorted in decreasing order by default. `permtype(g)` fully
-> determines the conjugacy class of `g`.
+Return the type of permutation `g`, i.e. lengths of disjoint cycles in cycle
+decomposition of `g`.
+
+The lengths are sorted in decreasing order by default. `permtype(g)` fully
+determines the conjugacy class of `g`.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -306,15 +306,15 @@ const _permdisplaystyle = PermDisplayStyle(:cycles)
 @doc Markdown.doc"""
     setpermstyle(format::Symbol)
 
-> Select the style in which permutations are displayed (in the REPL or in general
-> as strings). This can be either
-> * `:array` - as vector of integers whose $n$-th position represents the
->   value at $n$), or
-> * `:cycles` - as, more familiar for mathematicians, decomposition into
->   disjoint cycles, where the value at $n$ is represented by the entry
->   immediately following $n$ in a cycle (the default).
->
-> The difference is purely esthetical.
+Select the style in which permutations are displayed (in the REPL or in general
+as strings). This can be either
+* `:array` - as vector of integers whose $n$-th position represents the
+  value at $n$), or
+* `:cycles` - as, more familiar for mathematicians, decomposition into
+  disjoint cycles, where the value at $n$ is represented by the entry
+  immediately following $n$ in a cycle (the default).
+
+The difference is purely esthetical.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -362,10 +362,10 @@ end
 @doc Markdown.doc"""
     ==(g::Perm, h::Perm)
 
-> Return `true` if permutations are equal, otherwise return `false`.
->
-> Permutations parametrized by different integer types are considered equal if
-> they define the same permutation in the abstract permutation group.
+Return `true` if permutations are equal, otherwise return `false`.
+
+Permutations parametrized by different integer types are considered equal if
+they define the same permutation in the abstract permutation group.
 
 # Examples:
 ```
@@ -384,10 +384,10 @@ true
 @doc Markdown.doc"""
     ==(G::SymmetricGroup, H::SymmetricGroup)
 
-> Return `true` if permutation groups are equal, otherwise return `false`.
->
-> Permutation groups on the same number of letters, but parametrized
-> by different integer types are considered different.
+Return `true` if permutation groups are equal, otherwise return `false`.
+
+Permutation groups on the same number of letters, but parametrized
+by different integer types are considered different.
 
 # Examples:
 ```
@@ -421,13 +421,13 @@ end
 @doc Markdown.doc"""
     *(g::Perm, h::Perm)
 
-> Return the composition ``h ∘ g`` of two permutations.
->
-> This corresponds to the action of permutation group on the set `[1..n]`
-> **on the right** and follows the convention of GAP.
->
-> If `g` and `h` are parametrized by different types, the result is promoted
-> accordingly.
+Return the composition ``h ∘ g`` of two permutations.
+
+This corresponds to the action of permutation group on the set `[1..n]`
+**on the right** and follows the convention of GAP.
+
+If `g` and `h` are parametrized by different types, the result is promoted
+accordingly.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -441,13 +441,13 @@ julia> Perm([2,3,1,4])*Perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 @doc Markdown.doc"""
     ^(g::Perm, n::Integer)
 
-> Return the $n$-th power of a permutation `g`.
->
-> By default `g^n` is computed by cycle decomposition of `g` if `n > 3`.
-> `Generic.power_by_squaring` provides a different method for powering which
-> may or may not be faster, depending on the particular case. Due to caching of
-> the cycle structure, repeated powering of `g` will be faster with the default
-> method.
+Return the $n$-th power of a permutation `g`.
+
+By default `g^n` is computed by cycle decomposition of `g` if `n > 3`.
+`Generic.power_by_squaring` provides a different method for powering which
+may or may not be faster, depending on the particular case. Due to caching of
+the cycle structure, repeated powering of `g` will be faster with the default
+method.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -528,8 +528,8 @@ end
 @doc Markdown.doc"""
     Base.inv(g::Perm)
 
-> Return the inverse of the given permutation, i.e. the permuation $g^{-1}$
-> such that $g ∘ g^{-1} = g^{-1} ∘ g$ is the identity permutation.
+Return the inverse of the given permutation, i.e. the permuation $g^{-1}$
+such that $g ∘ g^{-1} = g^{-1} ∘ g$ is the identity permutation.
 """
 function Base.inv(g::Perm)
    res = similar(g)
@@ -593,12 +593,12 @@ Base.length(A::AllPerms) = A.all
 @doc Markdown.doc"""
     Generic.elements!(G::SymmetricGroup)
 
-> Return an unsafe iterator over all permutations in `G`. Only one permutation
-> is allocated and then modified in-place using the non-recursive
-> [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
->
-> Note: you need to explicitely copy permutations intended to be stored or
-> modified.
+Return an unsafe iterator over all permutations in `G`. Only one permutation
+is allocated and then modified in-place using the non-recursive
+[Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
+
+Note: you need to explicitely copy permutations intended to be stored or
+modified.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -666,7 +666,7 @@ Base.length(G::SymmetricGroup) = order(G)
 @doc Markdown.doc"""
     order(G::SymmetricGroup) -> BigInt
 
-> Return the order of the full permutation group as `BigInt`.
+Return the order of the full permutation group as `BigInt`.
 """
 order(G::SymmetricGroup) = order(BigInt, G)
 order(::Type{T}, G::SymmetricGroup) where T = factorial(T(G.n))
@@ -674,11 +674,11 @@ order(::Type{T}, G::SymmetricGroup) where T = factorial(T(G.n))
 @doc Markdown.doc"""
     order(a::Perm) -> BigInt
 
-> Return the order of permutation `a` as `BigInt`.
->
-> If you are sure that computation over `T` (or its `Int` promotion) will not
-> overflow you may use the method `order(T::Type, a::Perm)` which bypasses
-> computation with `BigInt`s and returns `promote(T, Int)`.
+Return the order of permutation `a` as `BigInt`.
+
+If you are sure that computation over `T` (or its `Int` promotion) will not
+overflow you may use the method `order(T::Type, a::Perm)` which bypasses
+computation with `BigInt`s and returns `promote(T, Int)`.
 """
 order(a::Perm) = order(BigInt, a)
 function order(::Type{T}, a::Perm) where T
@@ -689,8 +689,8 @@ end
 @doc Markdown.doc"""
     matrix_repr(a::Perm)
 
-> Return the permutation matrix as a sparse matrix representing `a` via natural
-> embedding of the permutation group into the general linear group over $\mathbb{Z}$.
+Return the permutation matrix as a sparse matrix representing `a` via natural
+embedding of the permutation group into the general linear group over $\mathbb{Z}$.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -715,10 +715,10 @@ matrix_repr(a::Perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,
 @doc Markdown.doc"""
     emb!(result::Perm, p::Perm, V)
 
-> Embed permutation `p` into permutation `result` on the indices given by `V`.
->
-> This corresponds to the natural embedding of $S_k$ into $S_n$ as the
-> subgroup permuting points indexed by `V`.
+Embed permutation `p` into permutation `result` on the indices given by `V`.
+
+This corresponds to the natural embedding of $S_k$ into $S_n$ as the
+subgroup permuting points indexed by `V`.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -737,8 +737,8 @@ end
 @doc Markdown.doc"""
     emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
 
-> Return the natural embedding of a permutation group into `G` as the
-> subgroup permuting points indexed by `V`.
+Return the natural embedding of a permutation group into `G` as the
+subgroup permuting points indexed by `V`.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -763,7 +763,7 @@ end
 @doc Markdown.doc"""
     rand([rng=GLOBAL_RNG,] G::SymmetricGroup)
 
-> Return a random permutation from `G`.
+Return a random permutation from `G`.
 """
 rand(rng::AbstractRNG, rs::Random.SamplerTrivial{SymmetricGroup{T}}) where {T} =
    Perm(randperm!(rng, Vector{T}(undef, rs[].n)), false)
@@ -867,12 +867,12 @@ end
 @doc Markdown.doc"""
     perm"..."
 
-> String macro to parse disjoint cycles into `Perm{Int}`.
->
-> Strings for the output of GAP could be copied directly into `perm"..."`.
-> Cycles of length $1$ are not necessary, but can be included. A permutation
-> of the minimal support is constructed, i.e. the maximal $n$ in the
-> decomposition determines the parent group $S_n$.
+String macro to parse disjoint cycles into `Perm{Int}`.
+
+Strings for the output of GAP could be copied directly into `perm"..."`.
+Cycles of length $1$ are not necessary, but can be included. A permutation
+of the minimal support is constructed, i.e. the maximal $n$ in the
+decomposition determines the parent group $S_n$.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -923,22 +923,22 @@ const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 @doc Markdown.doc"""
     character(lambda::Partition)
 
-> Return the $\lambda$-th irreducible character of permutation group on
-> `sum(lambda)` symbols. The returned character function is of the following signature:
-> > `chi(p::Perm[, check::Bool=true]) -> BigInt`
-> The function checks (if `p` belongs to the appropriate group) can be switched
-> off by calling `chi(p, false)`. The values computed by $\chi$ are cached in
-> look-up table.
->
-> The computation follows the Murnaghan-Nakayama formula:
-> $$\chi_\lambda(\sigma) = \sum_{\text{rimhook }\xi\subset \lambda}(-1)^{ll(\lambda\backslash\xi)} \chi_{\lambda \backslash\xi}(\tilde\sigma)$$
-> where $\lambda\backslash\xi$ denotes the skew diagram of $\lambda$ with $\xi$
-> removed, $ll$ denotes the leg-length (i.e. number of rows - 1) and
-> $\tilde\sigma$ is permutation obtained from $\sigma$ by the removal of the
-> longest cycle.
->
-> For more details see e.g. Chapter 2.8 of *Group Theory and Physics* by
-> S.Sternberg.
+Return the $\lambda$-th irreducible character of permutation group on
+`sum(lambda)` symbols. The returned character function is of the following signature:
+> `chi(p::Perm[, check::Bool=true]) -> BigInt`
+The function checks (if `p` belongs to the appropriate group) can be switched
+off by calling `chi(p, false)`. The values computed by $\chi$ are cached in
+look-up table.
+
+The computation follows the Murnaghan-Nakayama formula:
+$$\chi_\lambda(\sigma) = \sum_{\text{rimhook }\xi\subset \lambda}(-1)^{ll(\lambda\backslash\xi)} \chi_{\lambda \backslash\xi}(\tilde\sigma)$$
+where $\lambda\backslash\xi$ denotes the skew diagram of $\lambda$ with $\xi$
+removed, $ll$ denotes the leg-length (i.e. number of rows - 1) and
+$\tilde\sigma$ is permutation obtained from $\sigma$ by the removal of the
+longest cycle.
+
+For more details see e.g. Chapter 2.8 of *Group Theory and Physics* by
+S.Sternberg.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -971,8 +971,8 @@ end
 @doc Markdown.doc"""
     character(lambda::Partition, p::Perm, check::Bool=true) -> BigInt
 
-> Return the value of `lambda`-th irreducible character of the permutation
-> group on permutation `p`.
+Return the value of `lambda`-th irreducible character of the permutation
+group on permutation `p`.
 """
 function character(lambda::Partition, p::Perm, check::Bool=true)
    if check
@@ -988,8 +988,8 @@ end
 @doc Markdown.doc"""
     character(lambda::Partition, mu::Partition, check::Bool=true) -> BigInt
 
-> Return the value of `lambda-th` irreducible character on the conjugacy class
-> represented by partition `mu`.
+Return the value of `lambda-th` irreducible character on the conjugacy class
+represented by partition `mu`.
 """
 function character(lambda::Partition, mu::Partition, check::Bool=true)
    if check

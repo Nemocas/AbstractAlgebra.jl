@@ -33,7 +33,7 @@ end
 @doc Markdown.doc"""
     unit(a::Fac{T}) -> T
 
-> Return the unit of the factorization.
+Return the unit of the factorization.
 """
 unit(a::Fac) = a.unit
 
@@ -48,7 +48,7 @@ unit(a::Fac) = a.unit
 @doc Markdown.doc"""
     in(a, b::Fac)
 
-> Test whether `a` is a factor of `b`.
+Test whether `a` is a factor of `b`.
 """
 function Base.in(a, b::Fac{T}) where {T}
    # convert is necessary when T == fmpz, because hash on fmpz
@@ -59,8 +59,8 @@ end
 @doc Markdown.doc"""
     getindex(a::Fac, b) -> Int
 
-> If `b` is a factor of `a`, the corresponding exponent is returned. Otherwise
-> an error is thrown.
+If `b` is a factor of `a`, the corresponding exponent is returned. Otherwise
+an error is thrown.
 """
 function getindex(a::Fac{T}, b) where {T}
   b = convert(T, b)
@@ -74,7 +74,7 @@ end
 @doc Markdown.doc"""
     setindex!(a::Fac{T}, c::Int, b::T)
 
-> If `b` is a factor of `a`, the corresponding entry is set to c.
+If `b` is a factor of `a`, the corresponding entry is set to c.
 """
 function setindex!(a::Fac{T}, c::Int, b::T) where {T}
   if haskey(a.fac, b)
@@ -120,6 +120,6 @@ Base.eltype(::Type{Fac{T}}) where {T} = Base.eltype(Dict{T, Int})
 @doc Markdown.doc"""
     length(a::Fac) -> Int
 
-> Return the number of factors of `a`, not including the unit.
+Return the number of factors of `a`, not including the unit.
 """
 Base.length(a::Fac) = Base.length(a.fac)

@@ -34,14 +34,14 @@ end
 @doc Markdown.doc"""
     rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
 
-> Return the rank of the given free module.
+Return the rank of the given free module.
 """
 rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
 
 @doc Markdown.doc"""
     dim(M::FreeModule{T}) where T <: FieldElement
 
-> Return the dimension of the given vector space.
+Return the dimension of the given vector space.
 """
 dim(M::FreeModule{T}) where T <: FieldElement = M.rank
 

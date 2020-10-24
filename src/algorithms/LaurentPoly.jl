@@ -49,8 +49,8 @@ end
 """
     terms_degrees(p::LaurentPolyElem) -> AbstractVector{<:Integer}
 
-> Return a vector containing at least all the degrees of the non-null
-> terms of `p`.
+Return a vector containing at least all the degrees of the non-null
+terms of `p`.
 """
 function terms_degrees end
 
