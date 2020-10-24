@@ -1522,7 +1522,7 @@ end
    @test M*x == d*b
 end
 
-@testset "Generic.Mat.solve_right..." begin
+@testset "Generic.Mat.solve..." begin
    for R in [ZZ, QQ]
       for iter = 1:40
          for dim = 0:5
@@ -1537,7 +1537,7 @@ end
             M = rand(S, -20:20)
 
             B = M*X1
-            X = solve_right(M, B)
+            X = solve(M, B)
 
             @test M*X == B
          end
@@ -1558,7 +1558,7 @@ end
          M = rand(S, 1:2, -10:10)
 
          B = M*X1
-         X = solve_right(M, B)
+         X = solve(M, B)
 
          @test M*X == B
       end

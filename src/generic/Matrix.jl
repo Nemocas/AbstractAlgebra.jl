@@ -22,7 +22,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        snf_kb_with_transform, find_pivot_popov, inv!, zero_matrix,
        kronecker_product, minors, tr, lu, lu!, pseudo_inv, dense_matrix_type,
        kernel, iszero_row, iszero_column, left_kernel, right_kernel, ishnf,
-       solve_left, solve_right, add_column, add_column!, add_row, add_row!, multiply_column,
+       solve_left, add_column, add_column!, add_row, add_row!, multiply_column,
        multiply_column!, multiply_row, multiply_row!, map_entries, map_entries!
 
 ###############################################################################
@@ -2152,17 +2152,6 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
 end
 
 @doc Markdown.doc"""
-    solve(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
-> Given a non-singular $n\times n$ matrix over a field and an $n\times m$
-> matrix over the same field, return $x$ an
-> $n\times m$ matrix $x$ such that $Ax = b$.
-> If $A$ is singular an exception is raised.
-"""
-function solve(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
-    return solve_ringelem(M, b)
-end
-
-@doc Markdown.doc"""
     solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where T <: RingElement
 > Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
 > matrix over the same ring, return a tuple $x, d$ consisting of an
@@ -2196,13 +2185,14 @@ function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
 end
 
 @doc Markdown.doc"""
-    solve_right(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where {S <: RingElement}
+    solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where {S <: RingElement}
 > Given an $m\times r$ matrix $a$ over a ring and an $m\times n$ matrix $b$
 > over the same ring, return an $r\times n$ matrix $x$ such that $ax = b$. If
 > no such matrix exists, an exception is raised.
+> See also [`solve_left`](@ref).
 """
-function solve_right(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
-                     ) where S <: RingElement
+function solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
+               ) where S <: RingElement
    can, X = can_solve_with_solution(a, b, side = :right)
    can || throw(ArgumentError("Unable to solve linear system"))
    return X
@@ -2213,6 +2203,7 @@ end
 > Given an $r\times n$ matrix $a$ over a ring and an $m\times n$ matrix $b$
 > over the same ring, return an $m\times r$ matrix $x$ such that $xa = b$. If
 > no such matrix exists, an exception is raised.
+> See also [`solve`](@ref).
 """
 function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
                     ) where S <: RingElement
