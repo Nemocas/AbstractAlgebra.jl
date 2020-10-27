@@ -23,121 +23,6 @@ function randprime(n::Int)
    return primes100[rand(1:n)]
 end
 
-function istriu(A::Generic.Mat)
-   m = nrows(A)
-   n = ncols(A)
-   d = 0
-   for c = 1:n
-      for r = m:-1:1
-         if !iszero(A[r,c])
-            if r < d
-               return false
-            end
-            d = r
-            break
-         end
-      end
-   end
-   return true
-end
-
-function is_snf(A::Generic.Mat)
-   m = nrows(A)
-   n = ncols(A)
-   a = A[1,1]
-   for i = 2:min(m,n)
-      q, r = divrem(A[i,i], a)
-      if !iszero(r)
-         return false
-      end
-      a = A[i,i]
-   end
-   for i = 1:n
-      for j = 1:m
-         if i == j
-            continue
-         end
-         if !iszero(A[j,i])
-            return false
-         end
-      end
-   end
-   return true
-end
-
-function is_weak_popov(P::Generic.Mat{T}, rank::Int) where { T <: Generic.Poly }
-   zero_rows = 0
-   pivots = zeros(ncols(P))
-   for r = 1:nrows(P)
-      p = AbstractAlgebra.find_pivot_popov(P, r)
-      if P[r,p] == 0
-         zero_rows += 1
-         continue
-      end
-      # There is already a pivot in this column
-      if pivots[p] != 0
-         return false
-      end
-      pivots[p] = r
-   end
-   if zero_rows != nrows(P)-rank
-      return false
-   end
-   return true
-end
-
-function is_popov(P::Generic.Mat{T}, rank::Int) where { T <: Generic.Poly }
-   zero_rows = 0
-   for r = 1:nrows(P)
-      p = AbstractAlgebra.find_pivot_popov(P, r)
-      if P[r, p] != 0
-         break
-      end
-      zero_rows += 1
-   end
-   # The zero rows must all be on top.
-   if zero_rows != nrows(P) - rank
-      return false
-   end
-   pivotscr = zeros(Int, ncols(P)) # pivotscr[i] == j means the pivot of column i is in row j
-   pivots = zeros(Int, nrows(P)) # the other way round
-   for r = zero_rows + 1:nrows(P)
-      p = AbstractAlgebra.find_pivot_popov(P, r)
-      if P[r, p] == 0
-         return false
-      end
-      if pivotscr[p] != 0
-         # There is already a pivot in this column
-         return false
-      end
-      pivotscr[p] = r
-      pivots[r] = p
-   end
-   for r = zero_rows + 1:nrows(P)
-      p = pivots[r]
-      f = P[r, p]
-      if !isone(lead(f))
-         return false
-      end
-      for i = 1:nrows(P)
-         i == r ? continue : nothing
-         if degree(P[i, p]) >= degree(f)
-            return false
-         end
-      end
-      if r == nrows(P)
-         break
-      end
-      g = P[r + 1, pivots[r + 1]]
-      if degree(f) >= degree(g)
-         if pivots[r] >= pivots[r + 1]
-            return false
-         end
-      end
-   end
-   return true
-end
-
 # Simulate user matrix type belonging to AbstractArray
 # with getindex but no setindex!
 struct MyTestMatrix{T} <: AbstractArray{T, 2}
@@ -2697,10 +2582,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    T = AbstractAlgebra.snf_kb(A)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(A)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*A*K == T
@@ -2717,10 +2602,10 @@ end
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    T = AbstractAlgebra.snf_kb(B)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(B)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
@@ -2757,10 +2642,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    T = snf(A)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = snf_with_transform(A)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*A*K == T
@@ -2777,10 +2662,10 @@ end
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    T = snf(B)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = snf_with_transform(B)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
@@ -2793,10 +2678,10 @@ end
    r = 2 # == rank(A)
 
    P = weak_popov(A)
-   @test is_weak_popov(P, r)
+   @test isweak_popov(P, r)
 
    P, U = weak_popov_with_transform(A)
-   @test is_weak_popov(P, r)
+   @test isweak_popov(P, r)
    @test U*A == P
    @test isunit(det(U))
 
@@ -2808,10 +2693,10 @@ end
    s = 2 # == rank(B)
 
    P = weak_popov(B)
-   @test is_weak_popov(P, s)
+   @test isweak_popov(P, s)
 
    P, U = weak_popov_with_transform(B)
-   @test is_weak_popov(P, s)
+   @test isweak_popov(P, s)
    @test U*B == P
    @test isunit(det(U))
 
@@ -2822,10 +2707,10 @@ end
       A = rand(M, 0:5, -5:5)
       r = rank(A)
       P = weak_popov(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
 
       P, U = weak_popov_with_transform(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -2838,10 +2723,10 @@ end
       A = rand(M, 1:5)
       r = rank(A)
       P = weak_popov(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
 
       P, U = weak_popov_with_transform(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -2854,10 +2739,10 @@ end
       A = rand(M, 1:5, 0:100)
       r = rank(A)
       P = weak_popov(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
 
       P, U = weak_popov_with_transform(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -2870,20 +2755,20 @@ end
    r = 2 # == rank(A)
 
    P = popov(A)
-   @test is_popov(P, r)
+   @test ispopov(P, r)
 
    P, U = popov_with_transform(A)
-   @test is_popov(P, r)
+   @test ispopov(P, r)
    @test U*A == P
    @test isunit(det(U))
 
    A = matrix(R, 3, 3, [ x^4, 0, 0, x^3, x^4, x^3, x^3, x^5, x^5 ])
    r = 3 # == rank(A)
    P = popov(A)
-   @test is_popov(P, r)
+   @test ispopov(P, r)
 
    P, U = popov_with_transform(A)
-   @test is_popov(P, r)
+   @test ispopov(P, r)
    @test U*A == P
    @test isunit(det(U))
 
@@ -2895,10 +2780,10 @@ end
    s = 2 # == rank(B)
 
    P = popov(B)
-   @test is_popov(P, s)
+   @test ispopov(P, s)
 
    P, U = popov_with_transform(B)
-   @test is_popov(P, s)
+   @test ispopov(P, s)
    @test U*B == P
    @test isunit(det(U))
 
@@ -2909,10 +2794,10 @@ end
       A = rand(M, 0:5, -5:5)
       r = rank(A)
       P = popov(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
 
       P, U = popov_with_transform(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -2925,10 +2810,10 @@ end
       A = rand(M, 1:5)
       r = rank(A)
       P = popov(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
 
       P, U = popov_with_transform(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -2941,10 +2826,10 @@ end
       A = rand(M, 1:5, 0:100)
       r = rank(A)
       P = popov(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
 
       P, U = popov_with_transform(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end

@@ -3,7 +3,7 @@ module Generic
 import LinearAlgebra: det, issymmetric, norm,
                       nullspace, rank, transpose!, hessenberg
 
-import LinearAlgebra: lu, lu!, tr
+import LinearAlgebra: istriu, lu, lu!, tr
 
 using Markdown, Random, InteractiveUtils
 

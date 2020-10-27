@@ -14,68 +14,6 @@ function randprime(n::Int)
    return primes100[rand(1:n)]
 end
 
-function istriu(A::Generic.MatAlgElem)
-   m = nrows(A)
-   n = ncols(A)
-   d = 0
-   for c = 1:n
-      for r = m:-1:1
-         if !iszero(A[r,c])
-            if r < d
-               return false
-            end
-            d = r
-            break
-         end
-      end
-   end
-   return true
-end
-
-function is_snf(A::Generic.MatAlgElem)
-   m = nrows(A)
-   n = ncols(A)
-   a = A[1,1]
-   for i = 2:min(m,n)
-      q, r = divrem(A[i,i], a)
-      if !iszero(r)
-         return false
-      end
-      a = A[i,i]
-   end
-   for i = 1:n
-      for j = 1:m
-         if i == j
-            continue
-         end
-         if !iszero(A[j,i])
-            return false
-         end
-      end
-   end
-   return true
-end
-
-function is_weak_popov(P::Generic.MatAlgElem, rank::Int)
-   zero_rows = 0
-   pivots = zeros(ncols(P))
-   for r = 1:nrows(P)
-      p = AbstractAlgebra.find_pivot_popov(P, r)
-      if P[r,p] == 0
-         zero_rows += 1
-         continue
-      end
-      if pivots[p] != 0
-         return false
-      end
-      pivots[p] = r
-   end
-   if zero_rows != nrows(P)-rank
-      return false
-   end
-   return true
-end
-
 @testset "Generic.MatAlg.constructors..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
@@ -1137,10 +1075,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    T = AbstractAlgebra.snf_kb(A)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(A)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*A*K == T
@@ -1157,10 +1095,10 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    T = AbstractAlgebra.snf_kb(B)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(B)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
@@ -1174,10 +1112,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    T = snf(A)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = snf_with_transform(A)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*A*K == T
@@ -1194,10 +1132,10 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    T = snf(B)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = snf_with_transform(B)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
