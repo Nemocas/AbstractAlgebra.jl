@@ -1183,6 +1183,38 @@ end
 end
 
 @testset "Generic.Mat.lu..." begin
+   # Exact field
+   R = GF(7)
+   
+   for iters = 1:50
+      m = rand(0:100)
+      n = rand(0:100)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      A = randmat_with_rank(S, rank)
+
+      r, P, L, U = lu(A)
+      @test P*A == L*U
+      @test r == rank
+   end
+
+   # Fraction field
+   R = QQ
+
+   for iters = 1:20
+      m = rand(0:30)
+      n = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      A = randmat_with_rank(S, rank, -10:10)
+
+      r, P, L, U = lu(A)
+      @test P*A == L*U
+      @test r == rank
+   end
+
+   # Extra tests
+
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 3, 3)

@@ -1207,6 +1207,11 @@ function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldEle
          end
       end
    end
+   for i = 1:m
+      for j = n + 1:m
+         L[i, j] = R()
+      end
+   end
    return rank, p, L, U
 end
 
