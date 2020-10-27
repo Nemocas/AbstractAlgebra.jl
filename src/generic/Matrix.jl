@@ -2550,8 +2550,8 @@ end
 
 Given an $n\times m$ matrix $A$ over a ring, return a tuple `(flag, B)`.
 If `side` is `:right` and `flag` is true, $B$ is the right inverse of $A$
-i.e. $AB$ is the $m\times m$ unit matrix. If `side` is `:left` and `flag` is
-true, $B$ is the left inverse of $A$ i.e. $BA$ is the $\times $ unit matrix.
+i.e. $AB$ is the $n\times n$ unit matrix. If `side` is `:left` and `flag` is
+true, $B$ is the left inverse of $A$ i.e. $BA$ is the $m\times m$ unit matrix.
 If `flag` is false, no right or left inverse exists.
 """
 function isinvertible_with_inverse(A::Generic.MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
