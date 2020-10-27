@@ -2234,6 +2234,30 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
+    function istriu(A::MatrixElem{T}) where T <: RingElement
+
+Return `true` if $A$ is an upper triangular matrix.
+"""
+function istriu(A::MatrixElem{T}) where T <: RingElement
+   m = nrows(A)
+   n = ncols(A)
+   d = 0
+   for c = 1:n
+      for r = m:-1:1
+         if !iszero(A[r, c])
+            if r < d
+               return false
+            end
+            d = r
+            break
+         end
+      end
+   end
+   return true
+end
+
+
+@doc Markdown.doc"""
     solve_triu(U::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, unit::Bool = false) where {T <: FieldElement}
 > Given a non-singular $n\times n$ matrix over a field which is upper
 > triangular, and an $n\times m$ matrix over the same field, return an
@@ -3925,6 +3949,35 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    issnf(A::MatrixElem{T}) where T <: RingElement
+
+Return `true` if $A$ is in Smith Normal Form.
+"""
+function issnf(A::MatrixElem{T}) where T <: RingElement
+   m = nrows(A)
+   n = ncols(A)
+   a = A[1, 1]
+   for i = 2:min(m, n)
+      q, r = divrem(A[i, i], a)
+      if !iszero(r)
+         return false
+      end
+      a = A[i,i]
+   end
+   for i = 1:n
+      for j = 1:m
+         if i == j
+            continue
+         end
+         if !iszero(A[j, i])
+            return false
+         end
+      end
+   end
+   return true
+end
+
 function snf_kb(A::MatrixElem{T}) where {T <: RingElement}
    return _snf_kb(A, Val{false})
 end
@@ -4068,6 +4121,89 @@ end
 #   Popov Form
 #
 ################################################################################
+
+@doc Markdown.doc"""
+    isweak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
+
+Return `true` if $P$ is a matrix in weak Popov form of the given rank.
+"""
+function isweak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+   zero_rows = 0
+   pivots = zeros(ncols(P))
+   for r = 1:nrows(P)
+      p = AbstractAlgebra.find_pivot_popov(P, r)
+      if P[r, p] == 0
+         zero_rows += 1
+         continue
+      end
+      # There is already a pivot in this column
+      if pivots[p] != 0
+         return false
+      end
+      pivots[p] = r
+   end
+   if zero_rows != nrows(P) - rank
+      return false
+   end
+   return true
+end
+
+@doc Markdown.doc"""
+    ispopov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+
+Return `true` if $P$ is a matrix in Popov form with the given rank.
+"""
+function ispopov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
+   zero_rows = 0
+   for r = 1:nrows(P)
+      p = AbstractAlgebra.find_pivot_popov(P, r)
+      if P[r, p] != 0
+         break
+      end
+      zero_rows += 1
+   end
+   # The zero rows must all be on top.
+   if zero_rows != nrows(P) - rank
+      return false
+   end
+   pivotscr = zeros(Int, ncols(P)) # pivotscr[i] == j means the pivot of column i is in row j
+   pivots = zeros(Int, nrows(P)) # the other way round
+   for r = zero_rows + 1:nrows(P)
+      p = AbstractAlgebra.find_pivot_popov(P, r)
+      if P[r, p] == 0
+         return false
+      end
+      if pivotscr[p] != 0
+         # There is already a pivot in this column
+         return false
+      end
+      pivotscr[p] = r
+      pivots[r] = p
+   end
+   for r = zero_rows + 1:nrows(P)
+      p = pivots[r]
+      f = P[r, p]
+      if !isone(lead(f))
+         return false
+      end
+      for i = 1:nrows(P)
+         i == r ? continue : nothing
+         if degree(P[i, p]) >= degree(f)
+            return false
+         end
+      end
+      if r == nrows(P)
+         break
+      end
+      g = P[r + 1, pivots[r + 1]]
+      if degree(f) >= degree(g)
+         if pivots[r] >= pivots[r + 1]
+            return false
+         end
+      end
+   end
+   return true
+end
 
 @doc Markdown.doc"""
     weak_popov(A::Mat{T}) where {T <: PolyElem}

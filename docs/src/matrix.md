@@ -205,8 +205,12 @@ diagonal_matrix(::RingElement, ::Int, ::Int)
 ```
 
 ```@docs
-one(a::AbstractAlgebra.MatSpace)
-one(a::MatElem)
+one(::AbstractAlgebra.MatSpace)
+one(::MatElem)
+```
+
+```@docs
+istriu(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -1026,6 +1030,10 @@ julia> U*A
 ### Smith normal form
 
 ```@docs
+issnf(::MatrixElem{T}) where T <: RingElement
+```
+
+```@docs
 snf{T <: RingElem}(::MatElem{T})
 snf_with_transform{T <: RingElem}(::MatElem{T})
 ```
@@ -1056,6 +1064,11 @@ julia> T*A*U
 
 AbstractAlgebra.jl provides algorithms for computing the (weak) Popov of a matrix with
 entries in a univariate polynomial ring over a field.
+
+```@docs
+isweak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
+isweak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
+```
 
 ```@docs
 weak_popov{T <: PolyElem}(::Generic.Mat{T})
