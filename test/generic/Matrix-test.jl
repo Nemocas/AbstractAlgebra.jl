@@ -1137,6 +1137,42 @@ end
 end
 
 @testset "Generic.Mat.fflu..." begin
+   # Exact ring
+   R = ZZ
+
+   for iters = 1:50
+      m = rand(0:20)
+      n = rand(0:20)
+
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      A = S()
+      for i = 1:m
+         for j = 1:n
+            A[i, j] = rand(-10:10)
+         end
+      end
+                                       
+      r, d, P, L, U = fflu(A)
+
+      R2 = parent(1//one(R))
+      V = MatrixSpace(R2, m, m)
+      D = V()
+      if m >= 1
+          D[1, 1] = 1//L[1, 1]
+      end
+      if m >= 2
+         for j = 1:m - 1
+            D[j + 1, j + 1] = (1//L[j, j])*(1//L[j + 1, j + 1])
+         end
+      end
+      L2 = change_base_ring(R2, L)                                   
+      U2 = change_base_ring(R2, U)                                   
+      @test change_base_ring(R2, P*A) == L2*D*U2
+   end
+
+ # Other tests
+
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 3, 3)
@@ -1146,9 +1182,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 3
    @test P*A == L*D*U
@@ -1158,9 +1194,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 3
    @test P*A == L*D*U
@@ -1170,9 +1206,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 2
    @test P*A == L*D*U
@@ -1182,9 +1218,9 @@ end
    r, d, P, L, U, = fflu(A)
 
    D = zero_matrix(QQ, 3, 3)
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
    @test r == 3
    @test P*A == L*D*U
 end
