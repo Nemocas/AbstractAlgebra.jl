@@ -5419,7 +5419,7 @@ end
 
 
 function rand(rng::AbstractRNG,
-              sp::SamplerTrivial{<:Make2{<:MatSpaceElem,
+              sp::SamplerTrivial{<:Make2{<:AbstractAlgebra.MatElem,
                                          <:AbstractAlgebra.MatSpace}})
    S, v = sp[][1:end]
    M = S()
