@@ -330,9 +330,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 3
    @test P*A == L*D*U
@@ -342,9 +342,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 3
    @test P*A == L*D*U
@@ -354,9 +354,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 2
    @test P*A == L*D*U
@@ -367,9 +367,9 @@ end
    r, d, P, L, U, = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
    @test r == 3
    @test P*A == L*D*U
 end
