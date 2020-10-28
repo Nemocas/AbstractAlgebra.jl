@@ -69,8 +69,9 @@ end
 
 @doc Markdown.doc"""
     Base.inv(f::Map(ModuleIsomorphism))
-> Return the inverse map of the given module isomorphism. This is computed
-> cheaply.
+
+Return the inverse map of the given module isomorphism. This is computed
+cheaply.
 """
 function Base.inv(f::Map(ModuleIsomorphism))
    T = elem_type(base_ring(domain(f)))
@@ -85,9 +86,10 @@ end
 
 @doc Markdown.doc"""
     kernel(f::ModuleHomomorphism{T}) where T <: RingElement
-> Return a pair `K, g` consisting of the kernel object $K$ of the given module
-> homomorphism $f$ (as a submodule of its domain) and the canonical injection
-> from the kernel into the domain of $f$
+
+Return a pair `K, g` consisting of the kernel object $K$ of the given module
+homomorphism $f$ (as a submodule of its domain) and the canonical injection
+from the kernel into the domain of $f$
 """
 function kernel(f::Map(AbstractAlgebra.FPModuleHomomorphism))
    D = domain(f)
@@ -129,9 +131,10 @@ end
 
 @doc Markdown.doc"""
     image(f::Map(AbstractAlgebra.FPModuleHomomorphism))
-> Return a pair `I, g` consisting of the image object $I$ of the given module
-> homomorphism $f$ (as a submodule of its codomain) and the canonical injection
-> from the image into the codomain of $f$
+
+Return a pair `I, g` consisting of the image object $I$ of the given module
+homomorphism $f$ (as a submodule of its codomain) and the canonical injection
+from the image into the codomain of $f$
 """
 function image(f::Map(AbstractAlgebra.FPModuleHomomorphism))
    D = domain(f)
@@ -151,12 +154,12 @@ end
 @doc Markdown.doc"""
     preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism),
 	      v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
-> Return a preimage of $v$ under the homomorphism $f$, i.e. an element of the
-> domain of $f$ that maps to $v$ under $f$. Note that this has no special
-> mathematical properties. It is an element of the set theoretical preimage of
-> the map $f$ as a map of sets, if one exists. The preimage is neither
-> unique nor chosen in a canonical way in general. When no such element exists,
-> an exception is raised.
+Return a preimage of $v$ under the homomorphism $f$, i.e. an element of the
+domain of $f$ that maps to $v$ under $f$. Note that this has no special
+mathematical properties. It is an element of the set theoretical preimage of
+the map $f$ as a map of sets, if one exists. The preimage is neither
+unique nor chosen in a canonical way in general. When no such element exists,
+an exception is raised.
 """
 function preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
    D = domain(f)
@@ -220,7 +223,7 @@ end
     ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
 	 M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T})
             where T <: RingElement
-> Create the homomorphism $f : M_1 \to M_2$ represented by the matrix $m$.
+Create the homomorphism $f : M_1 \to M_2$ represented by the matrix $m$.
 """
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
    (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) || error("dimension mismatch")
@@ -235,8 +238,8 @@ end
     ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T},
         M2::AbstractAlgebra.FPModule{T}, M::AbstractAlgebra.MatElem{T},
 	   minv::AbstractAlgebra.MatElem{T}) where T <: RingElement
-> Create the isomorphism $f : M_1 \to M_2$ represented by the matrix $M$. The
-> inverse morphism is automatically computed.
+Create the isomorphism $f : M_1 \to M_2$ represented by the matrix $M$. The
+inverse morphism is automatically computed.
 """
 function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    # Put rows of m and target relations into a matrix

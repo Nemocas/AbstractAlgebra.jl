@@ -18,20 +18,23 @@ elem_type(::Type{FracField{T}}) where {T <: RingElem} = Frac{T}
 
 @doc Markdown.doc"""
     base_ring(a::AbstractAlgebra.FracField{T}) where T <: RingElem
-> Return the base ring $R$ of the given fraction field.
+
+Return the base ring $R$ of the given fraction field.
 """
 base_ring(a::AbstractAlgebra.FracField{T}) where T <: RingElem = a.base_ring::parent_type(T)
 
 @doc Markdown.doc"""
     base_ring(a::AbstractAlgebra.FracElem)
-> Return the base ring $R$ of the fraction field that the supplied
-> element $a$ belongs to.
+
+Return the base ring $R$ of the fraction field that the supplied
+element $a$ belongs to.
 """
 base_ring(a::AbstractAlgebra.FracElem) = base_ring(parent(a))
 
 @doc Markdown.doc"""
     parent(a::AbstractAlgebra.FracElem)
-> Return the parent object of the given fraction element.
+
+Return the parent object of the given fraction element.
 """
 parent(a::AbstractAlgebra.FracElem) = a.parent
 
@@ -45,7 +48,8 @@ end
 
 @doc Markdown.doc"""
     characteristic(R::AbstractAlgebra.FracField{T}) where T <: RingElem
-> Return the characteristic of the given field.
+
+Return the characteristic of the given field.
 """
 function characteristic(R::AbstractAlgebra.FracField{T}) where T <: RingElem
    return characteristic(base_ring(R))
@@ -121,34 +125,39 @@ end
 
 @doc Markdown.doc"""
     zero(R::AbstractAlgebra.FracField)
-> Return $0/1$ in the given fraction field.
+
+Return $0/1$ in the given fraction field.
 """
 zero(R::AbstractAlgebra.FracField) = R(0)
 
 @doc Markdown.doc"""
     one(R::AbstractAlgebra.FracField)
-> Return $1/1$ in the given fraction field.
+
+Return $1/1$ in the given fraction field.
 """
 one(R::AbstractAlgebra.FracField) = R(1)
 
 @doc Markdown.doc"""
     iszero(a::AbstractAlgebra.FracElem)
-> Return `true` if the supplied element $a$ is zero in the fraction field it
-> belongs to, otherwise return `false`.
+
+Return `true` if the supplied element $a$ is zero in the fraction field it
+belongs to, otherwise return `false`.
 """
 iszero(a::AbstractAlgebra.FracElem) = iszero(numerator(a, false))
 
 @doc Markdown.doc"""
     isone(a::AbstractAlgebra.FracElem)
-> Return `true` if the supplied element $a$ is one in the fraction field it
-> belongs to, otherwise return `false`.
+
+Return `true` if the supplied element $a$ is one in the fraction field it
+belongs to, otherwise return `false`.
 """
 isone(a::AbstractAlgebra.FracElem) = numerator(a, false) == denominator(a, false)
 
 @doc Markdown.doc"""
     isunit(a::AbstractAlgebra.FracElem)
-> Return `true` if the supplied element $a$ is invertible in the fraction field
-> it belongs to, i.e. the numerator is nonzero, otherwise return `false`.
+
+Return `true` if the supplied element $a$ is invertible in the fraction field
+it belongs to, i.e. the numerator is nonzero, otherwise return `false`.
 """
 isunit(a::AbstractAlgebra.FracElem) = !iszero(numerator(a, false))
 
@@ -215,7 +224,8 @@ end
 
 @doc Markdown.doc"""
     -(a::AbstractAlgebra.FracElem)
-> Return $-a$.
+
+Return $-a$.
 """
 function -(a::AbstractAlgebra.FracElem)
    return parent(a)(-numerator(a, false), deepcopy(denominator(a, false)))
@@ -229,7 +239,8 @@ end
 
 @doc Markdown.doc"""
     +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return $a + b$.
+
+Return $a + b$.
 """
 function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
@@ -280,7 +291,8 @@ end
 
 @doc Markdown.doc"""
     -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return $a - b$.
+
+Return $a - b$.
 """
 function -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
@@ -331,7 +343,8 @@ end
 
 @doc Markdown.doc"""
     *(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return $a\times b$.
+
+Return $a\times b$.
 """
 function *(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
@@ -385,7 +398,8 @@ end
 
 @doc Markdown.doc"""
     *(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
-> Return $a\times b$.
+
+Return $a\times b$.
 """
 function *(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    c = base_ring(a)(b)
@@ -397,7 +411,8 @@ end
 
 @doc Markdown.doc"""
     *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
-> Return $a\times b$.
+
+Return $a\times b$.
 """
 function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    c = base_ring(b)(a)
@@ -409,7 +424,8 @@ end
 
 @doc Markdown.doc"""
     *(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-> Return $a\times b$.
+
+Return $a\times b$.
 """
 function *(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    g = gcd(denominator(a, false), b)
@@ -420,7 +436,8 @@ end
 
 @doc Markdown.doc"""
     *(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return $a\times b$.
+
+Return $a\times b$.
 """
 function *(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    g = gcd(denominator(b, false), a)
@@ -431,7 +448,8 @@ end
 
 @doc Markdown.doc"""
     +(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
-> Return $a + b$.
+
+Return $a + b$.
 """
 function +(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    n = numerator(a, false) + denominator(a, false)*b
@@ -441,7 +459,8 @@ end
 
 @doc Markdown.doc"""
     -(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
-> Return $a - b$.
+
+Return $a - b$.
 """
 function -(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    n = numerator(a, false) - denominator(a, false)*b
@@ -451,13 +470,15 @@ end
 
 @doc Markdown.doc"""
     +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
-> Return $a + b$.
+
+Return $a + b$.
 """
 +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem) = b + a
 
 @doc Markdown.doc"""
     -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
-> Return $a - b$.
+
+Return $a - b$.
 """
 function -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    n = a*denominator(b, false) - numerator(b, false)
@@ -467,7 +488,8 @@ end
 
 @doc Markdown.doc"""
     +(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-> Return $a + b$.
+
+Return $a + b$.
 """
 function +(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) + denominator(a, false)*b
@@ -477,7 +499,8 @@ end
 
 @doc Markdown.doc"""
     -(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-> Return $a - b$.
+
+Return $a - b$.
 """
 function -(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) - denominator(a, false)*b
@@ -487,13 +510,15 @@ end
 
 @doc Markdown.doc"""
     +(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return $a + b$.
+
+Return $a + b$.
 """
 +(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem} = b + a
 
 @doc Markdown.doc"""
     -(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return $a - b$.
+
+Return $a - b$.
 """
 function -(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    n = a*denominator(b, false) - numerator(b, false)
@@ -509,9 +534,10 @@ end
 
 @doc Markdown.doc"""
     ==(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
-> that power series to different precisions may still be arithmetically
-> equal to the minimum of the two precisions.
+
+Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
+that power series to different precisions may still be arithmetically
+equal to the minimum of the two precisions.
 """
 function ==(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    b  = check_parent(x, y, false)
@@ -527,10 +553,11 @@ end
 
 @doc Markdown.doc"""
     isequal(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return `true` if $x == y$ exactly, otherwise return `false`. This function is
-> useful in cases where the numerators and denominators of the fractions are
-> inexact, e.g. power series. Only if the power series are precisely the same,
-> to the same precision, are they declared equal by this function.
+
+Return `true` if $x == y$ exactly, otherwise return `false`. This function is
+useful in cases where the numerators and denominators of the fractions are
+inexact, e.g. power series. Only if the power series are precisely the same,
+to the same precision, are they declared equal by this function.
 """
 function isequal(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    if parent(x) != parent(y)
@@ -548,7 +575,8 @@ end
 
 @doc Markdown.doc"""
     ==(x::AbstractAlgebra.FracElem, y::Union{Integer, Rational, AbstractFloat})
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+
+Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(x::AbstractAlgebra.FracElem, y::Union{Integer, Rational, AbstractFloat})
    return (isone(denominator(x, false)) && numerator(x, false) == y) ||
@@ -558,13 +586,15 @@ end
 
 @doc Markdown.doc"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.FracElem)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+
+Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.FracElem) = y == x
 
 @doc Markdown.doc"""
     ==(x::AbstractAlgebra.FracElem{T}, y::T) where {T <: RingElem}
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+
+Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(x::AbstractAlgebra.FracElem{T}, y::T) where {T <: RingElem}
    return (isone(denominator(x, false)) && numerator(x, false) == y) ||
@@ -574,7 +604,8 @@ end
 
 @doc Markdown.doc"""
     ==(x::T, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+
+Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::T, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem} = y == x
 
@@ -586,7 +617,8 @@ end
 
 @doc Markdown.doc"""
     Base.inv(a::AbstractAlgebra.FracElem)
-> Return the inverse of the fraction $a$.
+
+Return the inverse of the fraction $a$.
 """
 function Base.inv(a::AbstractAlgebra.FracElem)
    iszero(numerator(a, false)) && throw(DivideError())
@@ -602,7 +634,8 @@ end
 
 @doc Markdown.doc"""
     divexact(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return $a/b$.
+
+Return $a/b$.
 """
 function divexact(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
@@ -656,7 +689,8 @@ end
 
 @doc Markdown.doc"""
     divexact(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
-> Return $a/b$.
+
+Return $a/b$.
 """
 function divexact(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    b == 0 && throw(DivideError())
@@ -669,7 +703,8 @@ end
 
 @doc Markdown.doc"""
     divexact(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
-> Return $a/b$.
+
+Return $a/b$.
 """
 function divexact(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    iszero(b) && throw(DivideError())
@@ -682,7 +717,8 @@ end
 
 @doc Markdown.doc"""
     divexact(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-> Return $a/b$.
+
+Return $a/b$.
 """
 function divexact(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    iszero(b) && throw(DivideError())
@@ -694,7 +730,8 @@ end
 
 @doc Markdown.doc"""
     divexact(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return $a/b$.
+
+Return $a/b$.
 """
 function divexact(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    iszero(b) && throw(DivideError())
@@ -722,7 +759,8 @@ end
 
 @doc Markdown.doc"""
     ^(a::AbstractAlgebra.FracElem, b::Int)
-> Return $a^b$.
+
+Return $a^b$.
 """
 function ^(a::AbstractAlgebra.FracElem{T}, b::Int) where {T <: RingElem}
    if b < 0
@@ -740,7 +778,8 @@ end
 
 @doc Markdown.doc"""
     issquare(a::AbstractAlgebra.FracElem{T}) where T <: RingElem
-> Return `true` if $a$ is a square.
+
+Return `true` if $a$ is a square.
 """
 function issquare(a::AbstractAlgebra.FracElem{T}) where T <: RingElem
    return issquare(numerator(a)) && issquare(denominator(a))
@@ -748,8 +787,9 @@ end
 
 @doc Markdown.doc"""
     Base.sqrt(a::AbstractAlgebra.FracElem{T}) where T <: RingElem
-> Return the square root of $a$ if it is a square, otherwise raise an
-> exception.
+
+Return the square root of $a$ if it is a square, otherwise raise an
+exception.
 """
 function Base.sqrt(a::AbstractAlgebra.FracElem{T}) where T <: RingElem
    return parent(a)(sqrt(numerator(a)), sqrt(denominator(a)))
@@ -763,10 +803,11 @@ end
 
 @doc Markdown.doc"""
     gcd(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-> Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
-> the GCD of $a/b$ and $c/d$ to be gcd$(ad, bc)/bd$, reduced to lowest terms.
-> This requires the existence of a greatest common divisor function for the
-> base ring.
+
+Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
+the GCD of $a/b$ and $c/d$ to be gcd$(ad, bc)/bd$, reduced to lowest terms.
+This requires the existence of a greatest common divisor function for the
+base ring.
 """
 function gcd(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
@@ -786,8 +827,9 @@ end
 
 @doc Markdown.doc"""
     remove(z::AbstractAlgebra.FracElem{T}, p::T) where {T <: RingElem}
-> Return the tuple $n, x$ such that $z = p^nx$ where $x$ has valuation $0$ at
-> $p$.
+
+Return the tuple $n, x$ such that $z = p^nx$ where $x$ has valuation $0$ at
+$p$.
 """
 function remove(z::AbstractAlgebra.FracElem{T}, p) where {T}
    p = convert(T, p)
@@ -799,7 +841,8 @@ end
 
 @doc Markdown.doc"""
     valuation(z::AbstractAlgebra.FracElem{T}, p::T) where {T <: RingElem}
-> Return the valuation of $z$ at $p$.
+
+Return the valuation of $z$ at $p$.
 """
 function valuation(z::AbstractAlgebra.FracElem{T}, p) where {T}
    p = convert(T, p)
@@ -1079,10 +1122,11 @@ end
 
 @doc Markdown.doc"""
     FractionField(R::AbstractAlgebra.Ring; cached=true)
-> Return the parent object of the fraction field over the given base ring $R$.
-> If `cached == true` (the default), the returned parent object is cached so
-> that it will always be returned by a call to the constructor when the same
-> base ring $R$ is supplied.
+
+Return the parent object of the fraction field over the given base ring $R$.
+If `cached == true` (the default), the returned parent object is cached so
+that it will always be returned by a call to the constructor when the same
+base ring $R$ is supplied.
 """
 function FractionField(R::AbstractAlgebra.Ring; cached=true)
    R2 = R
