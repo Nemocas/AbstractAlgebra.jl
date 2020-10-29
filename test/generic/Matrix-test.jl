@@ -62,9 +62,27 @@ AbstractAlgebra.mul!(x::F2Elem, y::F2Elem, z::F2Elem) = y * z
 AbstractAlgebra.addeq!(x::F2Elem, y::F2Elem) = x + y
 AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 
+Random.rand(rng::AbstractRNG, sp::Random.SamplerTrivial{F2}) = F2Elem(rand(rng, Bool))
+Random.gentype(::Type{F2}) = F2Elem
+
+struct F2MatSpace <: AbstractAlgebra.MatSpace{F2Elem}
+   nrows::Int
+   ncols::Int
+end
+
+(S::F2MatSpace)() = zero_matrix(F2(), S.nrows, S.ncols)
+
 struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
    m::Generic.MatSpaceElem{F2Elem}
 end
+
+AbstractAlgebra.elem_type(::Type{F2MatSpace}) = F2Matrix
+AbstractAlgebra.parent_type(::Type{F2Matrix}) = F2MatSpace
+
+AbstractAlgebra.base_ring(::F2MatSpace) = F2()
+AbstractAlgebra.dense_matrix_type(::Type{F2}) = F2Matrix
+AbstractAlgebra.parent(a::F2Matrix) = F2MatSpace(nrows(a), ncols(a))
+AbstractAlgebra.MatrixSpace(::F2, r::Int, c::Int) = F2MatSpace(r, c)
 
 AbstractAlgebra.nrows(a::F2Matrix) = nrows(a.m)
 AbstractAlgebra.ncols(a::F2Matrix) = ncols(a.m)
@@ -3038,10 +3056,12 @@ end
       @test A isa elem_type(M)
    end
 
-   M = MatrixSpace(GF(7), 3, 2)
-   m = make(M)
-   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                rand(M), rand(rng, M)]
-      @test A isa elem_type(M)
+   for M = (MatrixSpace(GF(7), 3, 2),
+            MatrixSpace(F2(), 2, 3))
+      m = make(M)
+      for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
+                   rand(M), rand(rng, M)]
+         @test A isa elem_type(M)
+      end
    end
 end
