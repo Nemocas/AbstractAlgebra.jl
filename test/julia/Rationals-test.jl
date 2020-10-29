@@ -49,6 +49,8 @@ end
       @test 1 <= numerator(f) <= 9
       @test 1 <= denominator(f) <= 9
    end
+   @test reproducible(m)
+   @test reproducible(R, 1:9)
 end
 
 @testset "Julia.Rationals.manipulation..." begin

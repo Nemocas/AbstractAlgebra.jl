@@ -114,6 +114,8 @@ end
              rand(rng, S, 0:5, 0:100, 0:0, -100:100))
       @test f isa Generic.MPoly
    end
+   @test reproducible(m)
+   @test reproducible(S, 0:5, 0:100, 0:0, -100:100)
 end
 
 @testset "Generic.MPoly.manipulation..." begin
@@ -560,7 +562,7 @@ end
             p = f^2
 
             @test issquare(p)
-         
+
             q = sqrt(f^2)
 
             @test q^2 == f^2
@@ -1413,4 +1415,3 @@ end
       end
    end
 end
-

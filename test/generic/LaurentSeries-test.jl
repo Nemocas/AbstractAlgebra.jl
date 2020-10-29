@@ -111,7 +111,9 @@ end
       for f in (rand(m), rand(rng, m))
          @test f isa Generic.LaurentSeriesRingElem{BigInt}
       end
+      @test reproducible(m)
    end
+   @test reproducible(R, -12:12, -10:10)
 
    R, x = LaurentSeriesField(RealField, 10, "x")
    f = rand(R, -12:12, -1:1)
@@ -124,7 +126,9 @@ end
       for f in (rand(m), rand(rng, m))
          @test f isa Generic.LaurentSeriesFieldElem{BigFloat}
       end
+      @test reproducible(m)
    end
+   @test reproducible(R, -12:12, -1:1)
 end
 
 @testset "Generic.LaurentSeries.manipulation..." begin
@@ -168,7 +172,7 @@ end
    @test_throws DomainError upscale(a, -rand(1:100))
    @test_throws DomainError downscale(a, 0)
    @test_throws DomainError downscale(a, -rand(1:100))
-  
+
    @test characteristic(S) == 0
 
    T = ResidueRing(ZZ, 7)

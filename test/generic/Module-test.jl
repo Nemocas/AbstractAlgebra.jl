@@ -20,6 +20,8 @@ end
                 rand(F, 1:9), rand(rng, F, 1:9)]
       @test f isa Generic.FreeModuleElem
    end
+   @test reproducible(m)
+   @test reproducible(F, 1:9)
 end
 
 @testset "Generic.Module.manipulation..." begin
