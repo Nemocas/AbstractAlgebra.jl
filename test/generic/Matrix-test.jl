@@ -1699,6 +1699,8 @@ end
 end
 
 @testset "Generic.Mat.rref..." begin
+   # Non-integral domain
+
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixSpace(S, 5, 5)
 
@@ -1725,6 +1727,28 @@ end
       end
    end
 
+   # Exact ring
+
+   R = ZZ
+
+   for iters = 1:50
+      m = rand(0:50)
+      n = rand(0:50)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      M = randmat_with_rank(S, rank, -10:10)
+      r, d, N = rref(M)
+
+      @test r == rank
+      @test isrref(N)
+
+      N2 = change_base_ring(QQ, N)
+      N2 = divexact(N2, d)
+
+      @test isrref(N2)
+   end
+
+
    S, z = PolynomialRing(ZZ, "z")
    R = MatrixSpace(S, 5, 5)
 
@@ -1736,6 +1760,8 @@ end
       @test r == i
       @test isrref(A)
    end
+
+   # Exact field
 
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
@@ -1749,6 +1775,22 @@ end
       @test r == i
       @test isrref(A)
    end
+
+   R = GF(7)
+
+   for iters = 1:50
+      m = rand(0:50)
+      n = rand(0:50)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      M = randmat_with_rank(S, rank)
+      r, N = rref(M)
+
+      @test r == rank
+      @test isrref(N)
+   end
+
+   # Multiple level exact ring
 
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
