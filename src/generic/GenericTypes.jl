@@ -483,6 +483,8 @@ end
 #
 ###############################################################################
 
+# Q: Why is SparsePolyRing not a subtype of AbstractAlgebra.PolyRing{T} ?
+
 mutable struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring
    S::Symbol
