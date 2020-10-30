@@ -1186,6 +1186,8 @@ end
                 rand(M, 1:9), rand(rng, M, 1:9)]
       @test A isa elem_type(M)
    end
+   @test reproducible(m)
+   @test reproducible(M, 1:9)
 
    M = MatrixAlgebra(GF(7), 2)
    m = make(M)
@@ -1193,4 +1195,6 @@ end
                 rand(M), rand(rng, M)]
       @test A isa elem_type(M)
    end
+   @test reproducible(m)
+   @test reproducible(M)
 end

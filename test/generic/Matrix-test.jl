@@ -1088,7 +1088,7 @@ end
 @testset "Generic.Mat.lu..." begin
    # Exact field
    R = GF(7)
-   
+
    for iters = 1:50
       m = rand(0:100)
       n = rand(0:100)
@@ -1170,7 +1170,7 @@ end
             A[i, j] = rand(-10:10)
          end
       end
-                                       
+
       r, d, P, L, U = fflu(A)
 
       R2 = parent(1//one(R))
@@ -1184,8 +1184,8 @@ end
             D[j + 1, j + 1] = (1//L[j, j])*(1//L[j + 1, j + 1])
          end
       end
-      L2 = change_base_ring(R2, L)                                   
-      U2 = change_base_ring(R2, U)                                   
+      L2 = change_base_ring(R2, L)
+      U2 = change_base_ring(R2, U)
       @test change_base_ring(R2, P*A) == L2*D*U2
    end
 
@@ -3091,6 +3091,8 @@ end
                 rand(M, 1:9), rand(rng, M, 1:9)]
       @test A isa elem_type(M)
    end
+   @test reproducible(m)
+   @test reproducible(M, 1:9)
 
    for M = (MatrixSpace(GF(7), 3, 2),
             MatrixSpace(F2(), 2, 3))
@@ -3099,5 +3101,6 @@ end
                    rand(M), rand(rng, M)]
          @test A isa elem_type(M)
       end
+      @test reproducible(m)
    end
 end

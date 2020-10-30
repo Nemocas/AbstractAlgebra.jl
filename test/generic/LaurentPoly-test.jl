@@ -386,6 +386,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
             @test coeff(f, i) ∈ -10:10
          end
       end
+      @test reproducible(m)
+      @test reproducible(L, -5:5, -10:10)
    end
 
    @testset "change_base_ring & map_coeffs" begin

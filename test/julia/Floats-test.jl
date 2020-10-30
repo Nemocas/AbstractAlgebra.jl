@@ -36,8 +36,10 @@ end
    R = RealField
    f = rand(R, 1:9)
    @test f isa elem_type(R)
+   @test reproducible(R, 1:9)
    f = rand(R, UnitRange(1.0, 9.0))
    @test f isa elem_type(R)
+   @test reproducible(R, UnitRange(1.0, 9.0))
    f = rand(R, UnitRange(big(1.0), big(9.0)))
    @test f isa elem_type(R)
    f = rand(rng, R, 1:9)
@@ -54,6 +56,7 @@ end
       @test 1.0 <= rand(m) <= 9.0
       @test rand(rng, m) isa elem_type(R)
       @test rand(m, 2, 3) isa Matrix{elem_type(R)}
+      @test reproducible(m)
    end
 end
 

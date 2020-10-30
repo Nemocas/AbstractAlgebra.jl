@@ -103,7 +103,9 @@ end
       for f in (rand(m), rand(rng, m))
          @test f isa Generic.PuiseuxSeriesRingElem{BigInt}
       end
+      @test reproducible(m)
    end
+   @test reproducible(R, -2:12, 1:6, -10:10)
 
    R, x = PuiseuxSeriesField(RealField, 10, "x")
    f = rand(R, -12:12, 1:6, -1:1)
@@ -116,6 +118,7 @@ end
       for f in (rand(m), rand(rng, m))
          @test f isa Generic.PuiseuxSeriesFieldElem{BigFloat}
       end
+      @test reproducible(m)
    end
 end
 

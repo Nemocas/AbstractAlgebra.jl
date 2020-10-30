@@ -62,12 +62,16 @@ end
       @test f isa Generic.Res
       @test 1 <= f.data <= 9
    end
+   @test reproducible(m)
+   @test reproducible(R, 1:9)
 
    # make with 3 arguments
    P, x = PolynomialRing(RealField, "x")
    R = Generic.ResidueRing(P, x^3)
    m = make(R, 1:9, -3:3)
    @test rand(m) isa Generic.Res{AbstractAlgebra.Generic.Poly{BigFloat}}
+   @test reproducible(m)
+   @test reproducible(R, 1:9, -3:3)
 end
 
 @testset "Generic.Res.manipulation..." begin

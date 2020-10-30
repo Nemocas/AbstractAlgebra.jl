@@ -101,7 +101,9 @@ end
       end
       @test rand(m, 3) isa Vector{Generic.Poly{BigInt}}
       @test size(rand(rng, m, 2, 3)) == (2, 3)
+      @test reproducible(m)
    end
+   @test reproducible(R, 0:10, -10:10)
 
    S, y = PolynomialRing(R, "y")
    for m in (make(S, 0:5, make(R, 0:10, make(ZZ, -10:10))),
@@ -114,6 +116,7 @@ end
       a = rand(m, 3)
       @test length(a) == 3
       @test a isa Vector{Generic.Poly{Generic.Poly{BigInt}}}
+      @test reproducible(m)
    end
 
    T, z = PolynomialRing(GF(7), "z")
@@ -121,6 +124,8 @@ end
    for f in (rand(m), rand(rng, m))
       @test f isa Generic.Poly{AbstractAlgebra.GFElem{Int64}}
    end
+   @test reproducible(m)
+   @test reproducible(T, 0:4)
 end
 
 @testset "Generic.Poly.manipulation..." begin
@@ -2670,12 +2675,12 @@ end
       R = ResidueField(ZZ, p)
 
       S, x = PolynomialRing(R, "x")
-      
+
       for iter = 1:10
          f = rand(S, 0:20, 0:Int(p))
-         
+
          s = f^2
-         
+
          @test issquare(s)
 
          q = sqrt(f^2)

@@ -61,6 +61,9 @@ end
       @test f isa Generic.ResF
       @test 1 <= f.data <= 9
    end
+
+   @test reproducible(m)
+   @test reproducible(R, 1:9)
 end
 
 @testset "Generic.ResF.manipulation..." begin
@@ -283,8 +286,8 @@ end
    end
 
    for p in [ZZ(3), ZZ(53), ZZ(727), ZZ(8893), ZZ(191339), ZZ(2369093), ZZ(52694921)]
-       R = Generic.ResidueField(ZZ, p)                                                                                  
-       
+       R = Generic.ResidueField(ZZ, p)
+
        for i = 1:10
           a = rand(R, 0:Int(p - 1))^2
           b = sqrt(a)

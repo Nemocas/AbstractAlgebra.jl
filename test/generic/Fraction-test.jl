@@ -58,6 +58,8 @@ end
                 rand(rng, K, 0:3, -3:3)]
       @test f isa Generic.Frac
    end
+   @test reproducible(m)
+   @test reproducible(K, 0:3, -3:3)
 end
 
 @testset "Generic.Frac.manipulation..." begin

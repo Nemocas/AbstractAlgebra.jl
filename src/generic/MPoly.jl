@@ -2102,7 +2102,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
    m = length(a)
    if m == 0
       return true, par()
-   end 
+   end
    # ordering mask
    drmask = monomial_drmask(par, bits)
    # mask for checking for overflows in halves!
@@ -4698,7 +4698,7 @@ end
 
 ################################################################################
 #
-#  Map                                                                      
+#  Map
 #
 ################################################################################
 
@@ -4760,7 +4760,7 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
    f = S()
    g = gens(S)
    R = base_ring(S)
-   for i = 1:rand(term_range)
+   for i = 1:rand(rng, term_range)
       term = S(1)
       for j = 1:length(g)
          term *= g[j]^rand(rng, exp_bound)
