@@ -1,6 +1,6 @@
 # AbstractAlgebra
 
-[![Build Status](https://travis-ci.org/Nemocas/AbstractAlgebra.jl.svg?branch=master)](https://travis-ci.org/Nemocas/AbstractAlgebra.jl) [![Build status](https://ci.appveyor.com/api/projects/status/1w9ninmoidxkxshp/branch/master?svg=true)](https://ci.appveyor.com/project/thofma/abstractalgebra-jl/branch/master)
+[![Build Status](https://travis-ci.com/Nemocas/AbstractAlgebra.jl.svg?branch=master)](https://travis-ci.com/Nemocas/AbstractAlgebra.jl) [![Build status](https://ci.appveyor.com/api/projects/status/1w9ninmoidxkxshp/branch/master?svg=true)](https://ci.appveyor.com/project/thofma/abstractalgebra-jl/branch/master)
 
 AbstractAlgebra is a pure Julia package for computational abstract algebra. It grew out of the Nemo project and provides all of the abstract types and generic implementations that Nemo relies on.
 
