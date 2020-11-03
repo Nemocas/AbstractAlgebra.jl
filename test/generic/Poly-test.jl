@@ -86,46 +86,21 @@
 end
 
 @testset "Generic.Poly.rand..." begin
-   # TODO: test more than just the result type
    R, x = PolynomialRing(ZZ, "x")
-   f = rand(R, 0:10, -10:10)
-   @test f isa Generic.Poly
-   f = rand(rng, R, 0:10, -10:10)
-   @test f isa Generic.Poly
 
-   # make API
-   for m in (make(R, 0:10, make(ZZ, -10:10)),
-             make(R, 0:10, -10:10)) # convenience only
-      for f in (rand(m), rand(rng, m))
-         @test f isa Generic.Poly
-      end
-      @test rand(m, 3) isa Vector{Generic.Poly{BigInt}}
-      @test size(rand(rng, m, 2, 3)) == (2, 3)
-      @test reproducible(m)
-   end
-   @test reproducible(R, 0:10, -10:10)
+   # TODO: test more than just the result type
+   test_rand(R, 0:10, -10:10)
+   test_rand(R, 0:10, make(ZZ, -10:10))
 
    S, y = PolynomialRing(R, "y")
-   for m in (make(S, 0:5, make(R, 0:10, make(ZZ, -10:10))),
-             make(S, 0:5, make(R, 0:10, -10:10)),
-             make(S, 0:5, 0:10, -10:10))
 
-      for f in (rand(m), rand(rng, m))
-         @test f isa Generic.Poly{Generic.Poly{BigInt}}
-      end
-      a = rand(m, 3)
-      @test length(a) == 3
-      @test a isa Vector{Generic.Poly{Generic.Poly{BigInt}}}
-      @test reproducible(m)
-   end
+   test_rand(S, 0:5, make(R, 0:10, make(ZZ, -10:10)))
+   test_rand(S, 0:5, make(R, 0:10, -10:10))
+   test_rand(S, 0:5, 0:10, -10:10)
 
    T, z = PolynomialRing(GF(7), "z")
-   m = make(T, 0:4)
-   for f in (rand(m), rand(rng, m))
-      @test f isa Generic.Poly{AbstractAlgebra.GFElem{Int64}}
-   end
-   @test reproducible(m)
-   @test reproducible(T, 0:4)
+
+   test_rand(T, 0:4)
 end
 
 @testset "Generic.Poly.manipulation..." begin

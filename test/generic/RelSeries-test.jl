@@ -84,14 +84,8 @@ end
 
 @testset "Generic.RelSeries.rand..." begin
    R, x = PowerSeriesRing(ZZ, 10, "x")
-   m = make(R, 0:12, -10:10)
-   for f in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                rand(R, 0:12, -10:10),
-                rand(rng, R, 0:12, -10:10)]
-      @test f isa Generic.RelSeries
-   end
-   @test reproducible(m)
-   @test reproducible(R, 0:12, -10:10)
+
+   test_rand(R, 0:12, -10:10)
 end
 
 @testset "Generic.RelSeries.manipulation..." begin

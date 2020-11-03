@@ -77,12 +77,7 @@ end
 end
 
 @testset "Julia.GFElem.rand..." begin
-   R = GF(13)
-   @test rand(R) isa AbstractAlgebra.GFElem
-   @test rand(rng, R) isa AbstractAlgebra.GFElem
-   @test rand(R, 2, 3) isa Matrix{<:AbstractAlgebra.GFElem}
-   @test rand(rng, R, 2, 3) isa Matrix{<:AbstractAlgebra.GFElem}
-   @test reproducible(R)
+   test_rand(GF(13))
 end
 
 @testset "Julia.GFElem.unary_ops..." begin

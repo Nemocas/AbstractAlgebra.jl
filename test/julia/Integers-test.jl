@@ -47,16 +47,9 @@ end
 end
 
 @testset "Julia.Integers.rand..." begin
-   R = ZZ
-   f = rand(R, 0:22)
-   @test f isa elem_type(R)
-   f = rand(rng, R, 0:22)
-   @test f isa elem_type(R)
-   @test reproducible(R, 0:22)
-   f = rand(make(R, 0:22))
-   @test f isa elem_type(R)
-   @test f in 0:22
-   @test reproducible(make(R, 0:22))
+   test_rand(ZZ, 0:22) do f
+      f in 0:22
+   end
 end
 
 @testset "Julia.Integers.modular_arithmetic..." begin

@@ -36,21 +36,10 @@
 end
 
 @testset "Julia.Rationals.rand..." begin
-   R = QQ
-   f = rand(R, 1:9)
-   @test f isa elem_type(R)
-   f = rand(rng, R, 1:9)
-   @test f isa elem_type(R)
-
-   # make
-   m = make(R, 1:9)
-   for f = (rand(m), rand(rng, m))
-      @test f isa elem_type(R)
+   test_rand(QQ, 1:9) do f
       @test 1 <= numerator(f) <= 9
       @test 1 <= denominator(f) <= 9
    end
-   @test reproducible(m)
-   @test reproducible(R, 1:9)
 end
 
 @testset "Julia.Rationals.manipulation..." begin
