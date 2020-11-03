@@ -1376,6 +1376,44 @@ end
    end
 end
 
+@testset "Generic.Mat.can_solve_with_solution_fflu..." begin
+   R = ZZ
+  
+   # Test random soluble systems 
+   for i = 1:100
+      m = rand(0:30)
+      n = rand(0:30)
+      k = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank, -20:20)
+      X2 = rand(U, -20:20)
+      B = A*X2
+      flag, X, d = Generic.can_solve_with_solution_fflu(A, B)
+      @test flag && A*X == B*d
+   end
+
+   # Test random systems (most will be insoluble)
+   for i = 1:100
+      m = rand(0:30)
+      n = rand(0:30)
+      k = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank, -20:20)
+      B = rand(T, -20:20)
+      flag1, X, d = Generic.can_solve_with_solution_fflu(A, B)
+      A2 = change_base_ring(QQ, A)
+      B2 = change_base_ring(QQ, B)
+      flag2, X2 = can_solve_with_solution(A2, B2)
+      @test flag1 == flag2
+   end
+end
+
 @testset "Generic.Mat.solve_lu..." begin
    S = QQ
 
