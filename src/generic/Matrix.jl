@@ -1988,6 +1988,11 @@ end
 #
 ###############################################################################
 
+# Return flag, y, d where flag is set to `true` if `Ay = bd` has a solution in
+# the base ring. If not, it returns false. The matrix A can be non-square and
+# singular. If a solution exists, `y` is set to one such solution. The value
+# `d` is set to an appropriate denominator so that `Ay = bd` is a solution
+# over the ring.
 function can_solve_with_solution_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    base_ring(A) != base_ring(b) && error("Base rings don't match in can_solve_with_solution_fflu")
    nrows(A) != nrows(b) && error("Dimensions don't match in can_solve_with_solution_fflu")
@@ -2005,6 +2010,12 @@ function can_solve_with_solution_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: 
    return flag, y, d
 end
 
+# Given a fraction free LU decomposition `LdU` of `p(A)` over an integral
+# domain with `L` invertible over fraction field, this function will return a
+# pair `flag, y` such that `Ay = bd` and `flag` is set to `true if a solution
+# exists. If not, `flag` may be set to false, however it is not required to be.
+# If `r` is the rank of `A` then the first `r` rows of `p(A)y = p(b)d` will
+# hold iff `flag` is `true`. The remaining rows must be checked by the user.
 function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    x = p * b
    n = nrows(x)
