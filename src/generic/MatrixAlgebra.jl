@@ -460,17 +460,17 @@ function solve_lu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
    return SA
 end
 
-function solve_fflu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
+function can_solve_with_solution_fflu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
    MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
    MS.base_ring = R
    BS = MatSpaceElem{T}(B.entries)
    BS.base_ring = R
-   S, d = solve_fflu(MS, BS)
+   flag, S, d = can_solve_with_solution_fflu(MS, BS)
    SA = MatAlgElem{T}(S.entries)
    SA.base_ring = R
-   return SA, d
+   return flag, SA, d
 end
 
 ###############################################################################

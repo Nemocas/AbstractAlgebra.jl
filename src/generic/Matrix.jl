@@ -1988,60 +1988,113 @@ end
 #
 ###############################################################################
 
-function solve_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   base_ring(A) != base_ring(b) && error("Base rings don't match in solve_fflu")
-   !issquare(A) && error("Non-square matrix in solve_fflu")
-   nrows(A) != nrows(b) && error("Dimensions don't match in solve_fflu")
+# Return `flag, y, d` where flag is set to `true` if `Ay = bd` has a solution
+# in the base ring. If not, it returns false. The matrix A can be non-square
+# and singular. If a solution exists, `y` is set to one such solution. The
+# value `d` is set to an appropriate denominator so that `Ay = bd` is a
+# solution over the ring.
+function can_solve_with_solution_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+   base_ring(A) != base_ring(b) && error("Base rings don't match in can_solve_with_solution_fflu")
+   nrows(A) != nrows(b) && error("Dimensions don't match in can_solve_with_solution_fflu")
    FFLU = deepcopy(A)
    p = SymmetricGroup(nrows(A))()
-   r, d = fflu!(p, FFLU)
-   r < nrows(A) && error("Singular matrix in solve_fflu")
-   return solve_fflu_precomp(p, FFLU, b), d
+   rank, d = fflu!(p, FFLU)
+   flag, y = solve_fflu_precomp(p, rank, FFLU, b)
+   n = nrows(A)
+   if flag && rank < n
+      b2 = p*b
+      A2 = p*A
+      A3 = A2[rank + 1:n, :]
+      flag = A3*y == b2[rank + 1:n, :]*d
+   end
+   return flag, y, d
 end
 
-function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+# Given a fraction free LU decomposition `LdU` of `p(A)` over an integral
+# domain with `L` invertible over fraction field, this function will return a
+# pair `flag, y` such that `Ay = bd` and `flag` is set to `true` if a solution
+# exists. If not, `flag` may be set to `false`, however it is not required to
+# be. If `r` is the rank of `A` then the first `r` rows of `p(A)y = p(b)d` will
+# hold iff `flag` is `true`. The remaining rows must be checked by the user.
+function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    x = p * b
    n = nrows(x)
    m = ncols(x)
    R = base_ring(FFLU)
-
+   c = ncols(FFLU)
    t = base_ring(b)()
    s = base_ring(b)()
    minus_one = R(-1)
+   y = similar(x, c, m)
 
    for k in 1:m
       for i in 1:(n - 1)
          t = mul!(t, x[i, k], minus_one)
          for j in (i + 1):n
-            if i == 1
-              x[j, k] = mul_red!(R(), x[j, k], FFLU[i, i], false)
+            if i <= c && !iszero(FFLU[i, i])
+               if i == 1
+                  x[j, k] = mul_red!(R(), x[j, k], FFLU[i, i], false)
+               else
+                  x[j, k] = mul_red!(x[j, k], x[j, k], FFLU[i, i], false)
+               end
             else
-              x[j, k] = mul_red!(x[j, k], x[j, k], FFLU[i, i], false)
+               x[j, k] = deepcopy(x[j, k])
             end
-            s = mul_red!(s, FFLU[j, i], t, false)
-            x[j, k] = addeq!(x[j, k], s)
+            if i <= c
+               s = mul_red!(s, FFLU[j, i], t, false)
+               x[j, k] = addeq!(x[j, k], s)
+            end
             x[j, k] = reduce!(x[j, k])
             if i > 1
-                x[j, k] = divexact(x[j, k], FFLU[i - 1, i - 1])
+               if i <= c && !iszero(FFLU[i - 1, i - 1])
+                  flag, x[j, k] = divides(x[j, k], FFLU[i - 1, i - 1])
+                  if !flag
+                     return false, x
+                  end
+               end
             end
          end
       end
 
       for i in (n - 1):-1:1
-         if i > 1
-            x[i, k] = mul!(x[i, k], x[i, k], FFLU[n, n])
-         else
-            x[i, k] = x[i, k] * FFLU[n, n]
+         if rank != 0 && !iszero(FFLU[rank, rank])
+            if i > 1
+               x[i, k] = mul!(x[i, k], x[i, k], FFLU[rank, rank])
+            else
+               x[i, k] = x[i, k] * FFLU[rank, rank]
+            end
          end
-         for j in (i + 1):n
+         for j in (i + 1):min(n, c)
             t = mul!(t, x[j, k], FFLU[i, j])
             t = mul!(t, t, minus_one)
             x[i, k] = addeq!(x[i, k], t)
          end
-         x[i, k] = divexact(x[i, k], FFLU[i, i])
+         if i <= c && !iszero(FFLU[i, i])
+            flag, x[i, k] = divides(x[i, k], FFLU[i, i])
+            if !flag
+               return false, x
+            end
+         end
       end
    end
-   return x
+
+   for i = 1:min(c, n)
+      for j = 1:m
+         y[i, j] = x[i, j]
+      end
+   end
+
+   for i = min(c, n) + 1:c
+      for j = 1:m
+         y[i, j] = R()
+      end
+   end
+
+   if rank < n
+      
+   end
+
+   return true, y
 end
 
 function solve_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
@@ -2107,7 +2160,10 @@ function solve_ff(M::MatrixElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
    !issquare(M) && error("Non-square matrix in solve")
    nrows(M) != nrows(b) && error("Dimensions don't match in solve")
    m = nrows(M)
-   x, d = solve_fflu(M, b)
+   flag, x, d = can_solve_with_solution_fflu(M, b)
+   if !flag
+      error("System not solvable in solve_ff")
+   end
    for i in 1:nrows(x)
       for j in 1:ncols(x)
          x[i, j] = divexact(x[i, j], d)
@@ -2127,7 +2183,10 @@ function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
    if r < nrows(M)
       error("Singular matrix in solve_with_det")
    end
-   x = solve_fflu_precomp(p, FFLU, b)
+   flag, x = solve_fflu_precomp(p, r, FFLU, b)
+   if !flag
+      error("System not solvable in solve_with_det")
+   end
    # Now M*x = d*b, but d is only sign(P) * det(M)
    if parity(p) != 0
       minus_one = R(-1)
@@ -2153,7 +2212,9 @@ function solve_ff(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) 
    if m == 0 || n == 0
       return b, base_ring(M)()
    end
-   return solve_fflu(M, b)
+   flag, S, d = can_solve_with_solution_fflu(M, b)
+   !flag && error("System not soluble in solve_ff")
+   return S, d
 end
 
 function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
@@ -2559,7 +2620,8 @@ is raised.
 """
 function pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
    issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
-   X, d = solve_fflu(M, identity_matrix(M))
+   flag, X, d = can_solve_with_solution_fflu(M, identity_matrix(M))
+   !flag && error("Singular matrix in pseudo_inv")
    return X, d
 end
 
