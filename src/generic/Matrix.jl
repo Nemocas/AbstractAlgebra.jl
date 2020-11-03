@@ -2111,9 +2111,9 @@ function can_solve_with_solution_lu(A::MatElem{T}, b::MatElem{T}) where {T <: Fi
    LU = deepcopy(A)
    p = SymmetricGroup(nrows(A))()
    rank = lu!(p, LU)
-   
+
    y = solve_lu_precomp(p, LU, b)
-   
+
    n = nrows(A)
    flag = true
    if rank < n
@@ -2128,7 +2128,7 @@ end
 
 # Given an LU decomposition `LU` of `p(A)` over a field with `L` invertible,
 # this function will return `y` such that the first `r` rows of `p(A)y = p(b)`
-# hold, where `r` is the rank of `A`. The remaining rows must be checked by 
+# hold, where `r` is the rank of `A`. The remaining rows must be checked by
 # the caller.
 function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
    x = p * b
@@ -2139,7 +2139,7 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
    t = base_ring(b)()
    s = base_ring(b)()
    y = similar(x, c, m)
-   
+
    for k in 1:m
       x[1, k] = deepcopy(x[1, k])
       for i in 2:n
@@ -2192,7 +2192,7 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
          y[i, j] = R()
       end
    end
-    
+
    return y
 end
 
@@ -5553,6 +5553,12 @@ end
 rand(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, v...) = rand(rng, make(S, v...))
 
 rand(S::AbstractAlgebra.MatSpace, v...) = rand(Random.GLOBAL_RNG, S, v...)
+
+# resolve ambiguities
+rand(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, dims::Integer...) =
+   rand(rng, make(S), dims...)
+
+rand(S::AbstractAlgebra.MatSpace, dims::Integer...) = rand(Random.GLOBAL_RNG, S, dims...)
 
 function randmat_triu(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, v...)
    M = S()

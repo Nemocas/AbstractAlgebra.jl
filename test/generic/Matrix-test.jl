@@ -1378,8 +1378,8 @@ end
 
 @testset "Generic.Mat.can_solve_with_solution_fflu..." begin
    R = ZZ
-  
-   # Test random soluble systems 
+
+   # Test random soluble systems
    for i = 1:100
       m = rand(0:30)
       n = rand(0:30)
@@ -3275,7 +3275,7 @@ end
             MatrixSpace(F2(), 2, 3))
       m = make(M)
       for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                   rand(M), rand(rng, M)]
+                   rand(M), rand(rng, M), rand(M, 3)...]
          @test A isa elem_type(M)
       end
       @test reproducible(m)
