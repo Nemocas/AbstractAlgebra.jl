@@ -25,6 +25,10 @@ import LinearAlgebra: det, issymmetric, norm, nullspace, rank, transpose!, hesse
 
 import LinearAlgebra: lu, lu!, tr
 
+if VERSION > v"1.5.3"
+  error("asdsd")
+end
+
 ################################################################################
 #
 #  Import/export philosophy
