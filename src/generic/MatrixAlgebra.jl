@@ -447,17 +447,17 @@ randmat_with_rank(S::Generic.MatAlgebra{T}, rank::Int, v...) where {T <: Abstrac
 #
 ###############################################################################
 
-function solve_lu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
+function can_solve_with_solution_lu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
    MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
    MS.base_ring = R
    BS = MatSpaceElem{T}(B.entries)
    BS.base_ring = R
-   S = solve_lu(MS, BS)
+   flag, S = can_solve_with_solution_lu(MS, BS)
    SA = MatAlgElem{T}(S.entries)
    SA.base_ring = R
-   return SA
+   return flag, SA
 end
 
 function can_solve_with_solution_fflu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}

@@ -2015,7 +2015,7 @@ end
 # pair `flag, y` such that `Ay = bd` and `flag` is set to `true` if a solution
 # exists. If not, `flag` may be set to `false`, however it is not required to
 # be. If `r` is the rank of `A` then the first `r` rows of `p(A)y = p(b)d` will
-# hold iff `flag` is `true`. The remaining rows must be checked by the user.
+# hold iff `flag` is `true`. The remaining rows must be checked by the caller.
 function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    x = p * b
    n = nrows(x)
@@ -2090,48 +2090,70 @@ function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::Mat
       end
    end
 
-   if rank < n
-      
-   end
-
    return true, y
 end
 
-function solve_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
+# Return `flag, y` where flag is set to `true` if `Ay = b` has a solution
+# in the base field. If not, it returns false. The matrix A can be non-square
+# and singular. If a solution exists, `y` is set to one such solution.
+function can_solve_with_solution_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
    base_ring(A) != base_ring(b) && error("Base rings don't match in solve_lu")
-   !issquare(A) && error("Non-square matrix in solve_lu")
    nrows(A) != nrows(b) && error("Dimensions don't match in solve_lu")
 
-   if nrows(A) == 0 || ncols(A) == 0
-      return b
+   if nrows(A) == 0
+      return true, zero_matrix(base_ring(A), ncols(A), ncols(b))
+   end
+
+   if ncols(A) == 0
+      return iszero(b), zero_matrix(base_ring(A), ncols(A), ncols(b))
    end
 
    LU = deepcopy(A)
    p = SymmetricGroup(nrows(A))()
-   r = lu!(p, LU)
-   r < nrows(A) && error("Singular matrix in solve_lu")
-   return solve_lu_precomp(p, LU, b)
+   rank = lu!(p, LU)
+   
+   y = solve_lu_precomp(p, LU, b)
+   
+   n = nrows(A)
+   flag = true
+   if rank < n
+      b2 = p*b
+      A2 = p*A
+      A3 = A2[rank + 1:n, :]
+      flag = A3*y == b2[rank + 1:n, :]
+   end
+
+   return flag, y
 end
 
+# Given an LU decomposition `LU` of `p(A)` over a field with `L` invertible,
+# this function will return `y` such that the first `r` rows of `p(A)y = p(b)`
+# hold, where `r` is the rank of `A`. The remaining rows must be checked by 
+# the caller.
 function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
    x = p * b
    n = nrows(x)
    m = ncols(x)
    R = base_ring(LU)
-
+   c = ncols(LU)
    t = base_ring(b)()
    s = base_ring(b)()
-
+   y = similar(x, c, m)
+   
    for k in 1:m
       x[1, k] = deepcopy(x[1, k])
       for i in 2:n
          for j in 1:(i - 1)
             # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
-            t = mul_red!(t, -LU[i, j], x[j, k], false)
-            if j == 1
-               x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
+            if j <= c
+               t = mul_red!(t, -LU[i, j], x[j, k], false)
+               if j == 1
+                  x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
+               else
+                  x[i, k] = addeq!(x[i, k], t)
+               end
             else
-               x[i, k] = addeq!(x[i, k], t)
+               x[i, k] = deepcopy(x[i, k])
             end
          end
          x[i, k] = reduce!(x[i, k])
@@ -2140,19 +2162,38 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
       # Now every entry of x is a proper copy, so we can change the entries
       # as much as we want.
 
-      x[n, k] = divexact(x[n, k], LU[n, n])
+      if n <= c && !iszero(LU[n, n])
+         x[n, k] = divexact(x[n, k], LU[n, n])
+      end
 
       for i in (n - 1):-1:1
-         for j in (i + 1):n
+         for j in (i + 1):min(n, c)
             # x[i, k] = x[i, k] - x[j, k] * LU[i, j]
             t = mul_red!(t, x[j, k], -LU[i, j], false)
             x[i, k] = addeq!(x[i, k], t)
          end
-         x[i, k] = reduce!(x[i, k])
-         x[i, k] = divexact(x[i, k], LU[i, i])
+         if i <= c
+            x[i, k] = reduce!(x[i, k])
+            if !iszero(LU[i, i])
+               x[i, k] = divexact(x[i, k], LU[i, i])
+            end
+         end
       end
    end
-   return x
+
+   for i = 1:min(c, n)
+      for j = 1:m
+         y[i, j] = x[i, j]
+      end
+   end
+
+   for i = min(c, n) + 1:c
+      for j = 1:m
+         y[i, j] = R()
+      end
+   end
+    
+   return y
 end
 
 function solve_ff(M::MatrixElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
@@ -2161,9 +2202,7 @@ function solve_ff(M::MatrixElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
    nrows(M) != nrows(b) && error("Dimensions don't match in solve")
    m = nrows(M)
    flag, x, d = can_solve_with_solution_fflu(M, b)
-   if !flag
-      error("System not solvable in solve_ff")
-   end
+   !flag && error("System not solvable in solve_ff")
    for i in 1:nrows(x)
       for j in 1:ncols(x)
          x[i, j] = divexact(x[i, j], d)
@@ -2184,9 +2223,7 @@ function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
       error("Singular matrix in solve_with_det")
    end
    flag, x = solve_fflu_precomp(p, r, FFLU, b)
-   if !flag
-      error("System not solvable in solve_with_det")
-   end
+   !flag && error("System not solvable in solve_with_det")
    # Now M*x = d*b, but d is only sign(P) * det(M)
    if parity(p) != 0
       minus_one = R(-1)
@@ -2627,7 +2664,8 @@ end
 
 function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
    issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
-   A = solve_lu(M, identity_matrix(M))
+   flag, A = can_solve_with_solution_lu(M, identity_matrix(M))
+   !flag && error("Singular matrix in inv")
    return A
 end
 
