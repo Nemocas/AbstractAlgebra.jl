@@ -2098,7 +2098,7 @@ end
 # and singular. If a solution exists, `y` is set to one such solution.
 function can_solve_with_solution_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
    base_ring(A) != base_ring(b) && error("Base rings don't match in can_solve_with_solution_lu")
-   nrows(A) != nrows(b) && error("Dimensions don't match in solve_lu")
+   nrows(A) != nrows(b) && error("Dimensions don't match in can_solve_with_solution_lu")
 
    if nrows(A) == 0
       return true, zero_matrix(base_ring(A), ncols(A), ncols(b))
