@@ -2097,7 +2097,7 @@ end
 # in the base field. If not, it returns false. The matrix A can be non-square
 # and singular. If a solution exists, `y` is set to one such solution.
 function can_solve_with_solution_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
-   base_ring(A) != base_ring(b) && error("Base rings don't match in solve_lu")
+   base_ring(A) != base_ring(b) && error("Base rings don't match in can_solve_with_solution_lu")
    nrows(A) != nrows(b) && error("Dimensions don't match in solve_lu")
 
    if nrows(A) == 0
