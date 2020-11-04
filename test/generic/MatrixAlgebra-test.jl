@@ -1192,7 +1192,7 @@ end
    M = MatrixAlgebra(GF(7), 2)
    m = make(M)
    for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                rand(M), rand(rng, M)]
+                rand(M), rand(rng, M), rand(M, 3)...]
       @test A isa elem_type(M)
    end
    @test reproducible(m)

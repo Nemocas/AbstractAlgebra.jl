@@ -383,6 +383,12 @@ rand(rng::AbstractRNG, S::AbstractAlgebra.MatAlgebra, v...) = rand(rng, make(S, 
 
 rand(S::AbstractAlgebra.MatAlgebra, v...) = rand(Random.GLOBAL_RNG, S, v...)
 
+# resolve ambiguities
+rand(rng::AbstractRNG, S::AbstractAlgebra.MatAlgebra, dims::Integer...) =
+   rand(rng, make(S), dims...)
+
+rand(S::AbstractAlgebra.MatAlgebra, dims::Integer...) = rand(Random.GLOBAL_RNG, S, dims...)
+
 function randmat_triu(rng::AbstractRNG, S::AbstractAlgebra.MatAlgebra, v...)
    M = S()
    n = degree(M)
