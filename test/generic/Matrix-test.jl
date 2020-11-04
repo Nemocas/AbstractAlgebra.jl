@@ -1414,7 +1414,7 @@ end
    end
 end
 
-@testset "Generic.Mat.solve_lu..." begin
+@testset "Generic.Mat.can_solve_with_solution_lu..." begin
    R = GF(17)
 
    for i = 1:100
@@ -1484,6 +1484,7 @@ end
 end
 
 @testset "Generic.Mat.solve_ff..." begin
+   # Exact field
    R = QQ
 
    for i = 1:50
@@ -1505,6 +1506,25 @@ end
       @test A*divexact(X2, d) == B
       X = Generic.solve_ff(A, B)
       @test A*X == B
+   end
+
+   # Exact ring
+   R = ZZ
+
+   # Test random soluble systems
+   for i = 1:100
+      m = rand(0:30)
+      n = rand(0:30)
+      k = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank, -20:20)
+      X2 = rand(U, -20:20)
+      B = A*X2
+      X, d = Generic.solve_ff(A, B)
+      @test A*X == B*d
    end
 end
 
