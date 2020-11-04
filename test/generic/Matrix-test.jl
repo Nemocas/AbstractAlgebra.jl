@@ -1415,18 +1415,53 @@ end
 end
 
 @testset "Generic.Mat.solve_lu..." begin
-   S = QQ
+   R = GF(17)
+
+   for i = 1:100
+      m = rand(0:30)
+      n = rand(0:30)
+      k = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank)
+      X2 = rand(U)
+      B = A*X2
+      flag, X = Generic.can_solve_with_solution_lu(A, B)
+      @test flag && A*X == B
+      B = rand(T)
+      flag, X = Generic.can_solve_with_solution_lu(A, B)
+      @test (flag && A*X == B) || !flag
+   end
+
+   R = QQ
+
+   for i = 1:50
+       m = rand(0:30)
+       n = rand(0:30)
+       k = rand(0:30)
+       rank = rand(0:min(m, n))
+       S = MatrixSpace(R, m, n)
+       T = MatrixSpace(R, m, k)
+       U = MatrixSpace(R, n, k)
+       A = randmat_with_rank(S, rank, -20:20)
+       X2 = rand(U, -20:20)
+       B = A*X2
+       flag, X = Generic.can_solve_with_solution_lu(A, B)
+       @test flag && A*X == B
+    end
 
    for dim = 0:5
-      R = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, rand(1:5))
+      S = MatrixSpace(R, dim, dim)
+      U = MatrixSpace(R, dim, rand(1:5))
 
-      M = randmat_with_rank(R, dim, -100:100)
+      M = randmat_with_rank(S, dim, -100:100)
       b = rand(U, -100:100)
 
-      x = Generic.solve_lu(M, b)
+      flag, x = Generic.can_solve_with_solution_lu(M, b)
 
-      @test M*x == b
+      @test flag && M*x == b
    end
 
    S, y = PolynomialRing(ZZ, "y")
@@ -1442,9 +1477,9 @@ end
       MK = matrix(K, elem_type(K)[ K(M[i, j]) for i in 1:nrows(M), j in 1:ncols(M) ])
       bK = matrix(K, elem_type(K)[ K(b[i, j]) for i in 1:nrows(b), j in 1:ncols(b) ])
 
-      x = Generic.solve_lu(MK, bK)
+      flag, x = Generic.can_solve_with_solution_lu(MK, bK)
 
-      @test MK*x == bK
+      @test flag && MK*x == bK
    end
 end
 
