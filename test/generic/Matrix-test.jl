@@ -1848,7 +1848,7 @@ end
       A = M
 
       try
-          r, d, A = rref(M)
+          r, A, d = rref(M)
           do_test = true
       catch e
          if !(e isa ErrorException)
@@ -1872,7 +1872,7 @@ end
       rank = rand(0:min(m, n))
       S = MatrixSpace(R, m, n)
       M = randmat_with_rank(S, rank, -10:10)
-      r, d, N = rref(M)
+      r, N, d = rref(M)
 
       @test r == rank
       @test isrref(N)
@@ -1890,7 +1890,7 @@ end
    for i = 0:5
       M = randmat_with_rank(R, i, 0:3, -20:20)
 
-      r, d, A = rref(M)
+      r, A, d = rref(M)
 
       @test r == i
       @test isrref(A)
@@ -1934,7 +1934,7 @@ end
    for i = 0:5
       M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
 
-      r, d, A = rref(M)
+      r, A, d = rref(M)
 
       @test r == i
       @test isrref(A)

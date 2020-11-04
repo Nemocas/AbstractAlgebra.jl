@@ -1499,7 +1499,7 @@ end
 @doc Markdown.doc"""
     rref(M::Generic.MatrixElem{T}) where {T <: RingElement}
 
-Return a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a
+Return a tuple $(r, A, d)$ consisting of the rank $r$ of $M$ and a
 denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is
 the reduced row echelon form of $M$. Note that the denominator is not usually
 minimal.
@@ -1507,7 +1507,7 @@ minimal.
 function rref(M::MatrixElem{T}) where {T <: RingElement}
    A = deepcopy(M)
    r, d = rref!(A)
-   return r, d, A
+   return r, A, d
 end
 
 function rref!(A::MatrixElem{T}) where {T <: FieldElement}
@@ -2741,7 +2741,7 @@ function to compute an integral kernel.
 """
 function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    n = ncols(M)
-   rank, d, A = rref(M)
+   rank, A, d = rref(M)
    nullity = n - rank
    R = base_ring(M)
    U = zero(M, n, nullity)
