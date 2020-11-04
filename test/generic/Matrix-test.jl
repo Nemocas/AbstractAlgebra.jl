@@ -1529,6 +1529,23 @@ end
 end
 
 @testset "Generic.Mat.solve_rational..." begin
+   R = ZZ
+
+   for i = 1:100
+      m = rand(0:30)
+      n = rand(0:30)
+      k = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank, -20:20)
+      X2 = rand(U, -20:20)
+      B = A*X2
+      X, d = solve_rational(A, B)
+      @test A*X == B*d
+   end
+
    S = ResidueRing(ZZ, 20011*10007)
 
    for dim = 0:5
