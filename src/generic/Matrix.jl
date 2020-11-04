@@ -2245,8 +2245,12 @@ end
 function solve_ff(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    m = nrows(M)
    n = ncols(M)
-   if m == 0 || n == 0
-      return b, base_ring(M)()
+   if m == 0
+      return zero_matrix(base_ring(M), ncols(M), ncols(b)), base_ring(M)()
+   end
+   if n == 0
+      b != 0 && error("System not soluble in solve_ff")
+      return zero_matrix(base_ring(M), ncols(M), ncols(b)), base_ring(M)()
    end
    flag, S, d = can_solve_with_solution_fflu(M, b)
    !flag && error("System not soluble in solve_ff")
