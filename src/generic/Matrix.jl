@@ -2361,7 +2361,6 @@ end
 
 function solve_ringelem(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   nrows(M) != ncols(M) && error("Non-square matrix in solve")
    nrows(M) != nrows(b) && error("Dimensions don't match in solve")
    return solve_ff(M, b)
 end
