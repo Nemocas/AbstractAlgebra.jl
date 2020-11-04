@@ -2198,7 +2198,6 @@ end
 
 function solve_ff(M::MatrixElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   !issquare(M) && error("Non-square matrix in solve")
    nrows(M) != nrows(b) && error("Dimensions don't match in solve")
    m = nrows(M)
    flag, x, d = can_solve_with_solution_fflu(M, b)

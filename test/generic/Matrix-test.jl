@@ -1483,6 +1483,31 @@ end
    end
 end
 
+@testset "Generic.Mat.solve_ff..." begin
+   R = QQ
+
+   for i = 1:50
+      m = rand(0:20)
+      n = rand(0:20)
+      k = rand(0:20)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank, -10:10)
+      X2 = rand(U, -10:10)
+      B = A*X2
+      d = R()
+      while iszero(d)
+         d = rand(R, -10:10)
+      end
+      B = divexact(B, d)
+      @test A*divexact(X2, d) == B
+      X = Generic.solve_ff(A, B)
+      @test A*X == B
+   end
+end
+
 @testset "Generic.Mat.solve_rational..." begin
    S = ResidueRing(ZZ, 20011*10007)
 
