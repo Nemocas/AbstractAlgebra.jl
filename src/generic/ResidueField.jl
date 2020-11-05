@@ -147,6 +147,10 @@ function isunit(a::AbstractAlgebra.ResFieldElem)
    return isone(g)
 end
 
+function  gen(R::AbstractAlgebra.Generic.ResField{AbstractAlgebra.Generic.Poly{Rational{BigInt}}})
+   return R(gen(base_ring(R)))
+end
+
 deepcopy_internal(a::AbstractAlgebra.ResFieldElem, dict::IdDict) =
    parent(a)(deepcopy(data(a)))
 
@@ -582,6 +586,16 @@ function RandomExtensions.make(S::AbstractAlgebra.ResField, vs...)
    end
 end
 
+function RandomExtensions.make(S::AbstractAlgebra.ResField{AbstractAlgebra.Generic.Poly{Rational{BigInt}}}, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      Make(S, vs[1])
+   else
+      n = degree(S.modulus)
+      make(S, make(base_ring(S), 0:n - 1, vs...))
+   end
+end
+
 rand(rng::AbstractRNG, S::AbstractAlgebra.ResField, v...) = rand(rng, make(S, v...))
 
 rand(S::AbstractAlgebra.ResField, v...) = rand(Random.GLOBAL_RNG, S, v...)
@@ -663,19 +677,5 @@ function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Abstr
    R = ResidueField(S, a, cached=cached)
    x = gen(S)
    return R, R(x)
-end
-
-function  gen(R::AbstractAlgebra.Generic.ResField{AbstractAlgebra.Generic.Poly{Rational{BigInt}}})
-   return R(gen(base_ring(R)))
-end
-
-function RandomExtensions.make(S::AbstractAlgebra.ResField{AbstractAlgebra.Generic.Poly{Rational{BigInt}}}, vs...)
-   R = base_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, vs[1])
-   else
-      n = degree(S.modulus)
-      make(S, make(base_ring(S), 0:n - 1, vs...))
-   end
 end
 
