@@ -1270,7 +1270,7 @@ end
    for dim = 0:7
       S = MatrixSpace(K, dim, dim)
 
-      M = rand(S, 0:2, -100:100)
+      M = rand(S, -100:100)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
@@ -1352,7 +1352,7 @@ end
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i,-100:100)
 
       @test rank(M) == i
    end
@@ -1591,8 +1591,8 @@ end
       S = MatrixSpace(K, dim, dim)
       U = MatrixSpace(K, dim, rand(1:5))
 
-      M = randmat_with_rank(S, dim, 0:2, -100:100)
-      b = rand(U, 0:2, -100:100)
+      M = randmat_with_rank(S, dim, -100:100)
+      b = rand(U, -100:100)
 
       x = solve(M, b)
 
@@ -1806,8 +1806,8 @@ end
       S = MatrixSpace(K, dim, dim)
       U = MatrixSpace(K, dim, rand(1:5))
 
-      M = randmat_triu(S, 0:2, -100:100)
-      b = rand(U, 0:2, -100:100)
+      M = randmat_triu(S, -100:100)
+      b = rand(U, -100:100)
 
       x = solve_triu(M, b, false)
 
@@ -1903,7 +1903,7 @@ end
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       r, A = rref(M)
 
@@ -2072,7 +2072,7 @@ end
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       n, N = nullspace(M)
 
@@ -2120,7 +2120,7 @@ end
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       n, N = kernel(M)
 
@@ -2222,7 +2222,7 @@ end
    for dim = 1:5
       S = MatrixSpace(K, dim, dim)
 
-      M = randmat_with_rank(S, dim, 0:2, -100:100)
+      M = randmat_with_rank(S, dim, -100:100)
 
       X, d = pseudo_inv(M)
 

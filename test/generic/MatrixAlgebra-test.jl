@@ -401,7 +401,7 @@ end
    for dim = 0:7
       S = MatrixAlgebra(K, dim)
 
-      M = rand(S, 0:2, -100:100)
+      M = rand(S, -100:100)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
@@ -467,7 +467,7 @@ end
    S = MatrixAlgebra(K, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       @test rank(M) == i
    end
@@ -568,7 +568,7 @@ end
    S = MatrixAlgebra(K, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       r, A = rref(M)
 
@@ -685,7 +685,7 @@ end
    for dim = 1:5
       R = MatrixAlgebra(S, dim)
 
-      M = randmat_with_rank(R, dim, 0:2, -100:100)
+      M = randmat_with_rank(R, dim, -100:100)
 
       X = inv(M)
 
