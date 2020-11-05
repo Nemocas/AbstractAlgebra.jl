@@ -592,7 +592,7 @@ function RandomExtensions.make(S::AbstractAlgebra.ResField{AbstractAlgebra.Gener
       Make(S, vs[1])
    else
       n = degree(S.modulus)
-      make(S, make(base_ring(S), 0:n - 1, vs...))
+      make(S, make(base_ring(S), n - 1:n - 1, vs...))
    end
 end
 
@@ -678,4 +678,3 @@ function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Abstr
    x = gen(S)
    return R, R(x)
 end
-
