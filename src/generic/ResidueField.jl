@@ -675,7 +675,7 @@ function RandomExtensions.make(S::AbstractAlgebra.ResField{AbstractAlgebra.Gener
       Make(S, vs[1])
    else
       n = degree(S.modulus)
-      make(S, make(base_ring(S), n - 1:n - 1, vs...))
+      make(S, make(base_ring(S), 0:n - 1, vs...))
    end
 end
 
