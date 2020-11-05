@@ -108,14 +108,8 @@ end
    @test ord in [:lex, :deglex, :degrevlex]
 
    S, varlist = PolynomialRing(R, var_names, ordering = ord)
-   m = make(S, 0:5, 0:100, 0:0, -100:100)
-   for f in (rand(m), rand(rng, m),
-             rand(S, 0:5, 0:100, 0:0, -100:100),
-             rand(rng, S, 0:5, 0:100, 0:0, -100:100))
-      @test f isa Generic.MPoly
-   end
-   @test reproducible(m)
-   @test reproducible(S, 0:5, 0:100, 0:0, -100:100)
+
+   test_rand(S, 0:5, 0:100, 0:0, -100:100)
 end
 
 @testset "Generic.MPoly.manipulation..." begin

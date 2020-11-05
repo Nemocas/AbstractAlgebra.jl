@@ -1181,20 +1181,10 @@ end
 
 @testset "Generic.MatAlg.rand" begin
    M = MatrixAlgebra(ZZ, 3)
-   m = make(M, 1:9)
-   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                rand(M, 1:9), rand(rng, M, 1:9)]
-      @test A isa elem_type(M)
-   end
-   @test reproducible(m)
-   @test reproducible(M, 1:9)
+
+   test_rand(M, 1:9)
 
    M = MatrixAlgebra(GF(7), 2)
-   m = make(M)
-   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                rand(M), rand(rng, M), rand(M, 3)...]
-      @test A isa elem_type(M)
-   end
-   @test reproducible(m)
-   @test reproducible(M)
+
+   test_rand(M)
 end
