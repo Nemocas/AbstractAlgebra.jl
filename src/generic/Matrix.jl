@@ -2364,9 +2364,8 @@ function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlg
          i = i + 1
       end
 
-      # We tested bound evaluation points and either an impossible
-      # inverse was encountered, or the matrix was singular for all
-      # the values.
+      # We tested bound evaluation points and an impossible inverse was
+      # encountered for all the values.
 
       if i > bound && l == 1
          error("Impossible inverse in solve_interpolation")
