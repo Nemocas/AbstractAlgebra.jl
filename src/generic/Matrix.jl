@@ -2213,13 +2213,21 @@ end
 function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    # We cannot use solve_fflu directly, since it forgot about the (parity of
    # the) permutation.
-   nrows(M) != ncols(M) && error("Non-square matrix")
    R = base_ring(M)
    FFLU = deepcopy(M)
    p = SymmetricGroup(nrows(M))()
    r, d = fflu!(p, FFLU)
-   if r < nrows(M)
-      error("Singular matrix in solve_with_det")
+   pivots = zeros(Int, nrows(M))
+   c = 1
+   for r = 1:nrows(M)
+      while c <= ncols(M)
+         if !iszero(FFLU[r, c])
+            pivots[r] = c
+            c += 1
+            break
+         end
+         c += 1
+      end
    end
    flag, x = solve_fflu_precomp(p, r, FFLU, b)
    !flag && error("System not solvable in solve_with_det")
@@ -2234,12 +2242,12 @@ function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
       end
       d = mul!(d, d, minus_one)
    end
-   return x, d
+   return r, p, pivots, x, d
 end
 
 function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
-   x, d = solve_interpolation(M, b)
-   return x, d
+   r, p, pivots, x, d = solve_interpolation_inner(M, b)
+   return r, p, pivots, x, d
 end
 
 function solve_ff(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
@@ -2257,20 +2265,27 @@ function solve_ff(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) 
    return S, d
 end
 
-function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
+function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    m = nrows(M)
    h = ncols(b)
+   c = ncols(M)
+   R = base_ring(M)
+   prm = SymmetricGroup(nrows(M))()
+   pivots = zeros(Int, nrows(M))
    if m == 0
-      return b, base_ring(M)()
+      return 0, prm, pivots, zero_matrix(R, c, h), one(R)
    end
    R = base_ring(M)
    maxlen = 0
    for i = 1:m
-      for j = 1:m
+      for j = 1:c
          maxlen = max(maxlen, length(M[i, j]))
       end
    end
-   maxlen == 0 && error("Matrix is singular in solve")
+   if maxlen == 0
+      !iszero(b) && error("System not soluble in solve_interpolation")
+      return 0, prm, pivots, zero_matrix(R, c, h), one(R)
+   end
    maxlenb = 0
    for i = 1:m
       for j = 1:h
@@ -2278,25 +2293,27 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
       end
    end
    # bound from xd = (M*)b where d is the det
-   bound = (maxlen - 1)*(m - 1) + max(maxlenb, maxlen)
+   bound = (maxlen - 1)*(max(m, c) - 1) + max(maxlenb, maxlen)
    tmat = matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
    V = Array{typeof(tmat)}(undef, bound)
    d = Array{elem_type(base_ring(R))}(undef, bound)
    y = Array{elem_type(base_ring(R))}(undef, bound)
    bj = Array{elem_type(base_ring(R))}(undef, bound)
-   X = similar(tmat, m, m)
+   X = similar(tmat, m, c)
    Y = similar(tmat, m, h)
-   x = similar(b)
+   x = similar(b, c, h)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
    l = 1
    i = 1
    pt = 1
+   rnk = -1
+   firstprm = true
    while l <= bound
       y[l] = base_ring(R)(pt - b2)
       (y[l] == pt1 && pt != 1) && error("Not enough interpolation points in ring")
       for j = 1:m
-         for k = 1:m
+         for k = 1:c
             X[j, k] = evaluate(M[j, k], y[l])
          end
          for k = 1:h
@@ -2304,8 +2321,42 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
          end
       end
       try
-         V[l], d[l] = solve_with_det(X, Y)
-         l = l + 1
+         r, p, pv, Vl, dl = solve_with_det(X, Y)
+         if r != rnk || p != prm || pv != pivots
+            if r < rnk
+               pt += 1
+               continue
+            elseif r > rnk
+               l = 1
+               rnk = r
+               prm = p
+               pivots = pv
+               firstprm = false
+            elseif p != prm || pv != pivots
+               reset_prm = false
+               for j = 1:length(p.d)
+                  if firstprm || (p[j] < prm[j] && pv[j] <= pivots[j]) ||
+                                 (p[j] == prm[j] && pv[j] < pivots[j] && pv[j] != 0)
+                     prm = p
+                     pivots = pv
+                     l = 1
+                     firstprm = false
+                     break
+                  elseif p[j] > prm[j] || pv[j] > pivots[j]
+                     reset_prm = true
+                     break
+                  end
+               end
+               if reset_prm
+                  pt += 1
+                  continue
+               end
+            end
+         end
+         V[l] = Vl
+         d[l] = dl
+         y[l] = base_ring(R)(pt - b2)
+         l += 1
       catch e
          if !(e isa ErrorException)
             rethrow(e)
@@ -2318,20 +2369,25 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
       # the values.
 
       if i > bound && l == 1
-         error("Impossible inverse or too many singular matrices in solve_interpolation")
+         error("Impossible inverse in solve_interpolation")
       end
 
       pt = pt + 1
    end
    for k = 1:h
-      for i = 1:m
+      for i = 1:c
          for j = 1:bound
             bj[j] = V[j][i, k]
          end
          x[i, k] = interpolate(R, y, bj)
       end
    end
-   return x, interpolate(R, y, d)
+   return rnk, prm, pivots, x, interpolate(R, y, d)
+end
+
+function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
+   r, p, pv, x, d = solve_interpolation_inner(M, b)
+   return x, d
 end
 
 @doc Markdown.doc"""
