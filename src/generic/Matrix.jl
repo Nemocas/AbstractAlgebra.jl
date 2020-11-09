@@ -2322,19 +2322,21 @@ function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlg
       end
       try
          r, p, pv, Vl, dl = solve_with_det(X, Y)
+         # Check that new solution has the same pivots as previous ones
          if r != rnk || p != prm || pv != pivots
-            if r < rnk
+            if r < rnk # rank is too low: reject
                pt += 1
                continue
-            elseif r > rnk
+            elseif r > rnk # rank has increased: restart
                l = 1
                rnk = r
                prm = p
                pivots = pv
                firstprm = false
-            elseif p != prm || pv != pivots
+            elseif p != prm || pv != pivots # pivot structure different
                reset_prm = false
                for j = 1:length(p.d)
+                  # If earlier pivots or row swaps are encountered, restart
                   if firstprm || (p[j] < prm[j] && pv[j] <= pivots[j]) ||
                                  (p[j] == prm[j] && pv[j] < pivots[j] && pv[j] != 0)
                      prm = p
@@ -2342,7 +2344,7 @@ function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlg
                      l = 1
                      firstprm = false
                      break
-                  elseif p[j] > prm[j] || pv[j] > pivots[j]
+                  elseif p[j] > prm[j] || pv[j] > pivots[j] # worse pivots/row swaps: reject
                      reset_prm = true
                      break
                   end
@@ -2373,6 +2375,7 @@ function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlg
 
       pt = pt + 1
    end
+   # Interpolate
    for k = 1:h
       for i = 1:c
          for j = 1:bound
