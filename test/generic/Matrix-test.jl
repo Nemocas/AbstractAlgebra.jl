@@ -1798,6 +1798,40 @@ end
    @test_throws TypeError can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = "right")
 end
 
+@testset "Generic.Mat.solve_interpolation..." begin
+   R1 = ResidueRing(ZZ, 65537)
+   R, x = PolynomialRing(R1, "x")
+   RZ, x = PolynomialRing(ZZ, "x")
+
+   for iters = 1:50
+      m = rand(0:10)
+      n = rand(0:10)
+      k = rand(0:10)
+      rnk = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, n, k)
+      U = MatrixSpace(R, m, k)
+
+      S1 = MatrixSpace(RZ, m, n)
+      MZ = randmat_with_rank(S1, rnk, 0:2, -20:20)
+
+      M = matrix(R, m, n, [change_base_ring(R1, MZ[i, j]) for i in 1:m for j in 1:n])
+      K = FractionField(R)
+      MK = change_base_ring(K, M)
+      X2 = rand(T, 0:2, 0:65536)
+      B = M*X2
+      d2 = R()
+      while iszero(d2)
+         d2 = rand(R, 0:2, 0:65536);
+      end
+      M = M*d2
+
+      X, d = Generic.solve_interpolation(M, B)
+
+      @test M*X == B*d
+   end
+end
+
 @testset "Generic.Mat.solve_triu..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
