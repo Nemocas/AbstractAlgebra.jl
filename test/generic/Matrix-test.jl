@@ -1391,6 +1391,11 @@ end
       A = randmat_with_rank(S, rank, -20:20)
       X2 = rand(U, -20:20)
       B = A*X2
+      d2 = R()
+      while iszero(d2)
+         d2 = rand(R, -20:20)
+      end
+      A *= d2
       flag, X, d = Generic.can_solve_with_solution_fflu(A, B)
       @test flag && A*X == B*d
    end
@@ -1572,18 +1577,23 @@ end
 
    S, z = PolynomialRing(ZZ, "z")
 
-   for dim = 0:5
-      R = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, rand(1:5))
-
-      M = randmat_with_rank(R, dim, 0:3, -20:20)
-      b = rand(U, 0:3, -20:20);
-
+   for iters = 1:100
+      m = rand(0:5)
+      n = rand(0:5)
+      k = rand(0:5)
+      R = MatrixSpace(S, m, n)
+      U = MatrixSpace(S, n, k)
+      rnk = rand(0:min(m, n))
+      M = randmat_with_rank(R, rnk, 0:3, -20:20)
+      x2 = rand(U, 0:3, -20:20)
+      d2 = rand(S, 0:3, -20:20)
+      M *= d2
+      b = M*x2
       x, d = solve_rational(M, b)
 
       @test M*x == d*b
    end
-
+ 
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -1602,18 +1612,23 @@ end
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   for dim = 0:5
-      T = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, rand(1:5))
-
-      M = randmat_with_rank(T, dim, 0:2, 0:2, -20:20)
-      b = rand(U, 0:2, 0:2, -20:20)
-
+   for iters = 1:30
+      m = rand(0:5)
+      n = rand(0:5)
+      k = rand(0:5)
+      R = MatrixSpace(S, m, n)
+      U = MatrixSpace(S, n, k)
+      rnk = rand(0:min(m, n))
+      M = randmat_with_rank(R, rnk, 0:2, 0:2, -20:20)
+      x2 = rand(U, 0:2, 0:2, -20:20)
+      d2 = rand(S, 0:2, 0:2, -20:20)
+      M *= d2
+      b = M*x2
       x, d = solve_rational(M, b)
 
       @test M*x == d*b
    end
-
+ 
    R, t = PolynomialRing(AbstractAlgebra.JuliaQQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
    S, y = PolynomialRing(K, "y")
@@ -1798,7 +1813,7 @@ end
    @test_throws TypeError can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = "right")
 end
 
-@testset "Generic.Mat.solve_interpolation..." begin
+@testset "Generic.Mat.can_solve_with_solution_interpolation..." begin
    R1 = ResidueRing(ZZ, 65537)
    R, x = PolynomialRing(R1, "x")
    RZ, x = PolynomialRing(ZZ, "x")
@@ -1826,9 +1841,9 @@ end
       end
       M = M*d2
 
-      X, d = Generic.solve_interpolation(M, B)
+      flag, X, d = Generic.can_solve_with_solution_interpolation(M, B)
 
-      @test M*X == B*d
+      @test flag && M*X == B*d
    end
 end
 

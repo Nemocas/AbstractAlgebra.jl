@@ -2026,28 +2026,42 @@ function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::Mat
    s = base_ring(b)()
    minus_one = R(-1)
    y = similar(x, c, m)
+   diag = Array{elem_type(R), 1}(undef, n)
+   piv = Array{Int, 1}(undef, n)
+
+   l = 0
+   for i = 1:n
+      l += 1
+      while l <= c && iszero(FFLU[i, l])
+         l += 1
+      end
+      piv[i] = l
+      if l <= c
+         diag[i] = FFLU[i, l]
+      end
+   end
 
    for k in 1:m
       for i in 1:(n - 1)
          t = mul!(t, x[i, k], minus_one)
          for j in (i + 1):n
-            if i <= c && !iszero(FFLU[i, i])
+            if i <= c && piv[i] <= c
                if i == 1
-                  x[j, k] = mul_red!(R(), x[j, k], FFLU[i, i], false)
+                  x[j, k] = mul_red!(R(), x[j, k], diag[i], false)
                else
-                  x[j, k] = mul_red!(x[j, k], x[j, k], FFLU[i, i], false)
+                  x[j, k] = mul_red!(x[j, k], x[j, k], diag[i], false)
                end
             else
                x[j, k] = deepcopy(x[j, k])
             end
-            if i <= c
-               s = mul_red!(s, FFLU[j, i], t, false)
+            if piv[i] <= c
+               s = mul_red!(s, FFLU[j, piv[i]], t, false)
                x[j, k] = addeq!(x[j, k], s)
             end
             x[j, k] = reduce!(x[j, k])
             if i > 1
-               if i <= c && !iszero(FFLU[i - 1, i - 1])
-                  flag, x[j, k] = divides(x[j, k], FFLU[i - 1, i - 1])
+               if i <= c && piv[i - 1] <= c
+                  flag, x[j, k] = divides(x[j, k], diag[i - 1])
                   if !flag
                      return false, x
                   end
@@ -2056,24 +2070,32 @@ function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::Mat
          end
       end
 
-      for i in (n - 1):-1:1
-         if rank != 0 && !iszero(FFLU[rank, rank])
-            if i > 1
-               x[i, k] = mul!(x[i, k], x[i, k], FFLU[rank, rank])
+      l = rank
+      for i in n:-1:1
+         if l > 0 && i == piv[l]
+            if rank != 0
+               if i > 1
+                  x[i, k] = mul!(x[i, k], x[l, k], diag[rank])
+               else
+                  x[i, k] = x[l, k] * diag[rank]
+               end
             else
-               x[i, k] = x[i, k] * FFLU[rank, rank]
+               x[i, k] = deepcopy(x[l, k])
             end
-         end
-         for j in (i + 1):min(n, c)
-            t = mul!(t, x[j, k], FFLU[i, j])
-            t = mul!(t, t, minus_one)
-            x[i, k] = addeq!(x[i, k], t)
-         end
-         if i <= c && !iszero(FFLU[i, i])
-            flag, x[i, k] = divides(x[i, k], FFLU[i, i])
+            for j in (piv[l] + 1):min(n, c)
+               t = mul!(t, x[j, k], FFLU[l, j])
+               t = mul!(t, t, minus_one)
+               x[i, k] = addeq!(x[i, k], t)
+            end
+            
+            flag, x[i, k] = divides(x[i, k], diag[l])
             if !flag
                return false, x
             end
+            
+            l -= 1
+         else
+            x[i, k] = R()
          end
       end
    end
@@ -2210,13 +2232,13 @@ function solve_ff(M::MatrixElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
    return x
 end
 
-function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
+function can_solve_with_solution_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    # We cannot use solve_fflu directly, since it forgot about the (parity of
    # the) permutation.
    R = base_ring(M)
    FFLU = deepcopy(M)
    p = SymmetricGroup(nrows(M))()
-   r, d = fflu!(p, FFLU)
+   rank, d = fflu!(p, FFLU)
    pivots = zeros(Int, nrows(M))
    c = 1
    for r = 1:nrows(M)
@@ -2229,8 +2251,17 @@ function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
          c += 1
       end
    end
-   flag, x = solve_fflu_precomp(p, r, FFLU, b)
-   !flag && error("System not solvable in solve_with_det")
+   flag, x = solve_fflu_precomp(p, rank, FFLU, b)
+   n = nrows(M)
+   if flag && rank < n
+      b2 = p*b
+      A2 = p*M
+      A3 = A2[rank + 1:n, :]
+      flag = A3*x == b2[rank + 1:n, :]*d
+   end
+   if !flag
+      return false, rank, p, pivots, x, d
+   end
    # Now M*x = d*b, but d is only sign(P) * det(M)
    if parity(p) != 0
       minus_one = R(-1)
@@ -2242,12 +2273,12 @@ function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
       end
       d = mul!(d, d, minus_one)
    end
-   return r, p, pivots, x, d
+   return true, rank, p, pivots, x, d
 end
 
-function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
-   r, p, pivots, x, d = solve_interpolation_inner(M, b)
-   return r, p, pivots, x, d
+function can_solve_with_solution_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
+   flag, r, p, pivots, x, d = can_solve_with_solution_interpolation_inner(M, b)
+   return flag, r, p, pivots, x, d
 end
 
 function solve_ff(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
@@ -2265,7 +2296,7 @@ function solve_ff(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) 
    return S, d
 end
 
-function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
+function can_solve_with_solution_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    m = nrows(M)
    h = ncols(b)
    c = ncols(M)
@@ -2273,7 +2304,7 @@ function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlg
    prm = SymmetricGroup(nrows(M))()
    pivots = zeros(Int, nrows(M))
    if m == 0
-      return 0, prm, pivots, zero_matrix(R, c, h), one(R)
+      return true, 0, prm, pivots, zero_matrix(R, c, h), one(R)
    end
    R = base_ring(M)
    maxlen = 0
@@ -2283,8 +2314,7 @@ function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlg
       end
    end
    if maxlen == 0
-      !iszero(b) && error("System not soluble in solve_interpolation")
-      return 0, prm, pivots, zero_matrix(R, c, h), one(R)
+      return iszero(b), 0, prm, pivots, zero_matrix(R, c, h), one(R)
    end
    maxlenb = 0
    for i = 1:m
@@ -2309,8 +2339,10 @@ function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlg
    pt = 1
    rnk = -1
    firstprm = true
+   
    while l <= bound
       y[l] = base_ring(R)(pt - b2)
+      # Running out of interpolation points doesn't imply there is no solution
       (y[l] == pt1 && pt != 1) && error("Not enough interpolation points in ring")
       for j = 1:m
          for k = 1:c
@@ -2321,7 +2353,10 @@ function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlg
          end
       end
       try
-         r, p, pv, Vl, dl = solve_with_det(X, Y)
+         flag, r, p, pv, Vl, dl = can_solve_with_solution_with_det(X, Y)
+         if !flag
+            return false, rnk, prm, pivots, x, one(R)
+         end
          # Check that new solution has the same pivots as previous ones
          if r != rnk || p != prm || pv != pivots
             if r < rnk # rank is too low: reject
@@ -2370,7 +2405,8 @@ function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlg
       # encountered for all the values.
 
       if i > bound && l == 1
-         error("Impossible inverse in solve_interpolation")
+         # impossible inverse doesn't imply no solution
+         error("Impossible inverse in can_solve_with_solution_interpolation")
       end
 
       pt = pt + 1
@@ -2381,15 +2417,22 @@ function solve_interpolation_inner(M::AbstractAlgebra.MatElem{T}, b::AbstractAlg
          for j = 1:bound
             bj[j] = V[j][i, k]
          end
-         x[i, k] = interpolate(R, y, bj)
+         try
+            x[i, k] = interpolate(R, y, bj)
+         catch e
+            if !(e isa ErrorException)
+               rethrow(e)
+            end
+            return false, rnk, prm, pivots, x, interpolate(R, y, d) 
+         end
       end
    end
-   return rnk, prm, pivots, x, interpolate(R, y, d)
+   return true, rnk, prm, pivots, x, interpolate(R, y, d)
 end
 
-function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
-   r, p, pv, x, d = solve_interpolation_inner(M, b)
-   return x, d
+function can_solve_with_solution_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
+   flag, r, p, pv, x, d = can_solve_with_solution_interpolation_inner(M, b)
+   return flag, x, d
 end
 
 @doc Markdown.doc"""
@@ -2425,14 +2468,17 @@ end
 
 function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   nrows(M) != ncols(M) && error("Non-square matrix in solve")
    nrows(M) != nrows(b) && error("Dimensions don't match in solve")
+   flag = true
    try
-      return solve_interpolation(M, b)
+      flag, x, d = can_solve_with_solution_interpolation(M, b)
+      !flag && error("No solution in solve_rational")
+      return x, d
    catch e
       if !isa(e, ErrorException)
          rethrow(e)
       end
+      !flag && error("No solution in solve_rational") 
       return solve_ff(M, b)
    end
 end
