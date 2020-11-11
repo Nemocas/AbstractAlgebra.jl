@@ -1586,7 +1586,10 @@ end
       rnk = rand(0:min(m, n))
       M = randmat_with_rank(R, rnk, 0:3, -20:20)
       x2 = rand(U, 0:3, -20:20)
-      d2 = rand(S, 0:3, -20:20)
+      d2 = S()
+      while iszero(d2)
+         rand(S, 0:3, -20:20)
+      end
       M *= d2
       b = M*x2
       x, d = solve_rational(M, b)
