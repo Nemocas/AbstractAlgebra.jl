@@ -1431,6 +1431,13 @@ end
       T = MatrixSpace(R, m, k)
       U = MatrixSpace(R, n, k)
       A = randmat_with_rank(S, rank)
+      # randomly zero a column
+      if n > 0 && rand(0:1) == 0
+         col = rand(1:n)
+         for i = 1:m
+            A[i, col] = 0
+         end
+      end
       X2 = rand(U)
       B = A*X2
       flag, X = Generic.can_solve_with_solution_lu(A, B)
