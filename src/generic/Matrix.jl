@@ -2160,14 +2160,31 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
    c = ncols(LU)
    t = base_ring(b)()
    s = base_ring(b)()
-   y = similar(x, c, m)
+   y = zero_matrix(R, c, m)
+
+   diag = Array{elem_type(R), 1}(undef, n)
+   piv = Array{Int, 1}(undef, n)
+
+   l = 0
+   rnk = 0
+   for i = 1:n
+      l += 1
+      while l <= c && iszero(LU[i, l])
+         l += 1
+      end
+      piv[i] = l
+      if l <= c
+         diag[i] = LU[i, l]
+         rnk += 1
+      end
+   end
 
    for k in 1:m
       x[1, k] = deepcopy(x[1, k])
       for i in 2:n
          for j in 1:(i - 1)
             # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
-            if j <= c
+            if j <= c && piv[j] <= c
                t = mul_red!(t, -LU[i, j], x[j, k], false)
                if j == 1
                   x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
@@ -2184,34 +2201,24 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
       # Now every entry of x is a proper copy, so we can change the entries
       # as much as we want.
 
-      if n <= c && !iszero(LU[n, n])
-         x[n, k] = divexact(x[n, k], LU[n, n])
-      end
+      l = rnk
+      for i in c:-1:1
+         if l > 0 && i == piv[l]
+            y[i, k] = x[l, k]
 
-      for i in (n - 1):-1:1
-         for j in (i + 1):min(n, c)
-            # x[i, k] = x[i, k] - x[j, k] * LU[i, j]
-            t = mul_red!(t, x[j, k], -LU[i, j], false)
-            x[i, k] = addeq!(x[i, k], t)
-         end
-         if i <= c
-            x[i, k] = reduce!(x[i, k])
-            if !iszero(LU[i, i])
-               x[i, k] = divexact(x[i, k], LU[i, i])
+            for j in (piv[l] + 1):c
+               # x[i, k] = x[i, k] - x[j, k] * LU[l, j]
+               t = mul_red!(t, y[j, k], -LU[l, j], false)
+               y[i, k] = addeq!(y[i, k], t)
             end
+               
+            y[i, k] = reduce!(y[i, k])
+            y[i, k] = divexact(y[i, k], diag[l])
+
+            l -= 1
+         else
+            y[i, k] = R()
          end
-      end
-   end
-
-   for i = 1:min(c, n)
-      for j = 1:m
-         y[i, j] = x[i, j]
-      end
-   end
-
-   for i = min(c, n) + 1:c
-      for j = 1:m
-         y[i, j] = R()
       end
    end
 
