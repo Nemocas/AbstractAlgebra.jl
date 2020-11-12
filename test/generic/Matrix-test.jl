@@ -1389,6 +1389,12 @@ end
       T = MatrixSpace(R, m, k)
       U = MatrixSpace(R, n, k)
       A = randmat_with_rank(S, rank, -20:20)
+      if n > 0 && rand(0:1) == 0
+         col = rand(1:n)
+         for i = 1:m
+            A[i, col] = 0
+         end
+      end
       X2 = rand(U, -20:20)
       B = A*X2
       d2 = R()
@@ -1398,6 +1404,9 @@ end
       A *= d2
       flag, X, d = Generic.can_solve_with_solution_fflu(A, B)
       @test flag && A*X == B*d
+      B = rand(T, -10:10)
+      flag, X, d = Generic.can_solve_with_solution_fflu(A, B)
+      @test (flag && A*X == B*d) || !flag
    end
 
    # Test random systems (most will be insoluble)
