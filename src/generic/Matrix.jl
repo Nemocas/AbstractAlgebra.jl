@@ -1999,7 +1999,7 @@ function can_solve_with_solution_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: 
    FFLU = deepcopy(A)
    p = SymmetricGroup(nrows(A))()
    rank, d = fflu!(p, FFLU)
-   flag, y = solve_fflu_precomp(p, rank, FFLU, b)
+   flag, y = solve_fflu_precomp(p, FFLU, b)
    n = nrows(A)
    if flag && rank < n
       b2 = p*b
@@ -2016,7 +2016,7 @@ end
 # exists. If not, `flag` may be set to `false`, however it is not required to
 # be. If `r` is the rank of `A` then the first `r` rows of `p(A)y = p(b)d` will
 # hold iff `flag` is `true`. The remaining rows must be checked by the caller.
-function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    x = p * b
    n = nrows(x)
    m = ncols(x)
@@ -2029,6 +2029,7 @@ function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::Mat
    diag = Array{elem_type(R), 1}(undef, n)
    piv = Array{Int, 1}(undef, n)
 
+   rnk = 0
    l = 0
    for i = 1:n
       l += 1
@@ -2038,6 +2039,7 @@ function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::Mat
       piv[i] = l
       if l <= c
          diag[i] = FFLU[i, l]
+         rnk += 1
       end
    end
 
@@ -2054,7 +2056,7 @@ function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::Mat
             else
                x[j, k] = deepcopy(x[j, k])
             end
-            if piv[i] <= c
+            if i <= c && piv[i] <= c
                s = mul_red!(s, FFLU[j, piv[i]], t, false)
                x[j, k] = addeq!(x[j, k], s)
             end
@@ -2070,45 +2072,29 @@ function solve_fflu_precomp(p::Generic.Perm, rank::Int, FFLU::MatElem{T}, b::Mat
          end
       end
 
-      l = rank
-      for i in n:-1:1
+      l = rnk
+      for i in c:-1:1
          if l > 0 && i == piv[l]
-            if rank != 0
-               if i > 1
-                  x[i, k] = mul!(x[i, k], x[l, k], diag[rank])
-               else
-                  x[i, k] = x[l, k] * diag[rank]
-               end
+            if rnk != 0
+               y[i, k] = x[l, k]*diag[rnk]
             else
-               x[i, k] = deepcopy(x[l, k])
+               y[i, k] = deepcopy(x[l, k])
             end
-            for j in (piv[l] + 1):min(n, c)
-               t = mul!(t, x[j, k], FFLU[l, j])
+            for j in (piv[l] + 1):c
+               t = mul!(t, y[j, k], FFLU[l, j])
                t = mul!(t, t, minus_one)
-               x[i, k] = addeq!(x[i, k], t)
+               y[i, k] = addeq!(y[i, k], t)
             end
             
-            flag, x[i, k] = divides(x[i, k], diag[l])
+            flag, y[i, k] = divides(y[i, k], diag[l])
             if !flag
                return false, x
             end
             
             l -= 1
          else
-            x[i, k] = R()
+            y[i, k] = R()
          end
-      end
-   end
-
-   for i = 1:min(c, n)
-      for j = 1:m
-         y[i, j] = x[i, j]
-      end
-   end
-
-   for i = min(c, n) + 1:c
-      for j = 1:m
-         y[i, j] = R()
       end
    end
 
@@ -2160,7 +2146,7 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
    c = ncols(LU)
    t = base_ring(b)()
    s = base_ring(b)()
-   y = zero_matrix(R, c, m)
+   y = similar(x, c, m)
 
    diag = Array{elem_type(R), 1}(undef, n)
    piv = Array{Int, 1}(undef, n)
@@ -2184,7 +2170,7 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
       for i in 2:n
          for j in 1:(i - 1)
             # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
-            if j <= c && piv[j] <= c
+            if j <= c
                t = mul_red!(t, -LU[i, j], x[j, k], false)
                if j == 1
                   x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
@@ -2258,7 +2244,7 @@ function can_solve_with_solution_with_det(M::AbstractAlgebra.MatElem{T}, b::Abst
          c += 1
       end
    end
-   flag, x = solve_fflu_precomp(p, rank, FFLU, b)
+   flag, x = solve_fflu_precomp(p, FFLU, b)
    n = nrows(M)
    if flag && rank < n
       b2 = p*b
