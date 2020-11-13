@@ -2274,6 +2274,14 @@ function can_solve_with_solution_with_det(M::AbstractAlgebra.MatElem{T}, b::Abst
    return flag, r, p, pivots, x, d
 end
 
+# This can be removed once Nemo implements can_solve_with_solution_with_det
+# It's here now only because Nemo overloads it
+function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
+   flag, r, p, piv, x, d = can_solve_with_solution_with_det(M, b)
+   !flag && error("System not solvable in solve_with_det")
+   return x, d
+end
+
 function solve_ff(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    m = nrows(M)
    n = ncols(M)
