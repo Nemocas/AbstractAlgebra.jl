@@ -2642,6 +2642,34 @@ function can_solve_left_reduced_triu(r::AbstractAlgebra.MatElem{T},
    return true, x
 end
 
+# The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
+function can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: Union{FracElem, Rational{BigInt}}
+   if side == :left
+      (f, x) = can_solve_with_solution(a', b'; side=:right)
+      return (f, x')
+   elseif side == :right
+      d = numerator(one(base_ring(a)))
+      for i = 1:nrows(a)
+         for j = 1:ncols(a)
+            d = lcm(d, denominator(a[i, j]))
+         end
+      end
+      for i = 1:nrows(b)
+         for j = 1:ncols(b)
+            d = lcm(d, denominator(b[i, j]))
+         end
+      end
+      A = matrix(parent(d), nrows(a), ncols(a), [numerator(a[i, j]*d) for i in 1:nrows(a) for j in 1:ncols(a)])
+      B = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
+      flag, x, den = can_solve_with_solution_fflu(A, B)
+      X = change_base_ring(base_ring(a), x)
+      X = divexact(X, base_ring(a)(den))
+      return flag, X
+   else
+      error("Unsupported argument :$side for side: Must be :left or :right.")
+   end
+end
+
 @doc Markdown.doc"""
     can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: RingElement
 

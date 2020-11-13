@@ -1710,6 +1710,30 @@ end
 end
 
 @testset "Generic.Mat.can_solve..." begin
+   R, x = PolynomialRing(QQ, "x")
+   S = FractionField(R)
+
+   for iter = 1:8
+      m = rand(0:7)
+
+      T = MatrixSpace(R, m, m)
+      U = MatrixSpace(R, m, m)
+
+      M = rand(T, 0:2, -10:10)
+      X2 = rand(U, 0:2, -10:10)
+      b = M*X2
+
+      flag, X = Generic.can_solve_with_solution(M, b)
+
+      @test flag && M*X == b
+
+      b = X2*M
+
+      flag, X = Generic.can_solve_with_solution(M, b; side=:left)
+
+      @test flag && X*M == b
+   end
+ 
    for R in [ZZ, QQ]
       for iter = 1:40
          for dim = 0:5
