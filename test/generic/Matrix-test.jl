@@ -1733,7 +1733,38 @@ end
 
       @test flag && X*M == b
    end
- 
+
+   R, x = PolynomialRing(GF(65537), "x")
+   S = FractionField(R)
+
+   for iters = 1:10
+      m = rand(1:15)
+      T = MatrixSpace(R, m, m)
+      U = MatrixSpace(R, m, m)
+
+      M = rand(T, 0:2)
+      X2 = rand(U, 0:2)
+      b = M*X2
+
+      M = change_base_ring(S, M)
+      b = change_base_ring(S, b)
+
+      flag, X = can_solve_with_solution(M, b)
+
+      @test flag && M*X == b
+
+      M = rand(T, 0:2)
+      X2 = rand(U, 0:2)
+      b = X2*M
+
+      M = change_base_ring(S, M)
+      b = change_base_ring(S, b)
+
+      flag, X = can_solve_with_solution(M, b; side=:left)
+
+      @test flag && X*M == b
+   end
+
    for R in [ZZ, QQ]
       for iter = 1:40
          for dim = 0:5

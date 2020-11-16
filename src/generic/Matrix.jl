@@ -2340,23 +2340,41 @@ function can_solve_with_solution_interpolation_inner(M::AbstractAlgebra.MatElem{
    pt = 1
    rnk = -1
    firstprm = true
-   
+   failues = 0
    while l <= bound
       y[l] = base_ring(R)(pt - b2)
       # Running out of interpolation points doesn't imply there is no solution
       (y[l] == pt1 && pt != 1) && error("Not enough interpolation points in ring")
+      bad_evaluation = false
       for j = 1:m
          for k = 1:c
             X[j, k] = evaluate(M[j, k], y[l])
+            if iszero(X[j, k]) && !iszero(M[j, k])
+               bad_evaluation = true
+               break
+            end
+         end
+         if bad_evaluation
+            break
          end
          for k = 1:h
             Y[j, k] = evaluate(b[j, k], y[l])
+            if iszero(Y[j, k]) && !iszero(b[j, k])
+               bad_evaluation = true
+               break
+            end
+         end
+         if bad_evaluation
+            break
          end
       end
       try
+         if bad_evaluation
+            error("Bad evaluation point")
+         end
          flag, r, p, pv, Vl, dl = can_solve_with_solution_with_det(X, Y)
          if !flag
-            return false, rnk, prm, pivots, x, one(R)
+            return flag, r, p, pv, zero(x), zero(R)
          end
          # Check that new solution has the same pivots as previous ones
          if r != rnk || p != prm || pv != pivots
@@ -2407,7 +2425,7 @@ function can_solve_with_solution_interpolation_inner(M::AbstractAlgebra.MatElem{
 
       if i > bound && l == 1
          # impossible inverse doesn't imply no solution
-         error("Impossible inverse in can_solve_with_solution_interpolation")
+         error("Impossible inverse or too many failures in can_solve_with_solution_interpolation")
       end
 
       pt = pt + 1
@@ -2424,7 +2442,7 @@ function can_solve_with_solution_interpolation_inner(M::AbstractAlgebra.MatElem{
             if !(e isa ErrorException)
                rethrow(e)
             end
-            return false, rnk, prm, pivots, x, interpolate(R, y, d) 
+            return false, rnk, prm, pivots, zero(x), zero(R) 
          end
       end
    end
@@ -2648,6 +2666,40 @@ function can_solve_left_reduced_triu(r::AbstractAlgebra.MatElem{T},
       end
    end
    return true, x
+end
+
+function can_solve_with_solution(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}; side::Symbol = :right) where S <: FracElem{T} where T <: PolyElem
+   if side == :left
+      (f, x) = can_solve_with_solution(a', b'; side=:right)
+      return (f, x')
+   elseif side == :right
+      d = numerator(one(base_ring(a)))
+      for i = 1:nrows(a)
+         for j = 1:ncols(a)
+            d = lcm(d, denominator(a[i, j]))
+         end
+      end
+      for i = 1:nrows(b)
+         for j = 1:ncols(b)
+            d = lcm(d, denominator(b[i, j]))
+         end
+      end
+      A = matrix(parent(d), nrows(a), ncols(a), [numerator(a[i, j]*d) for i in 1:nrows(a) for j in 1:ncols(a)])
+      B = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
+      flag = false
+      x = similar(A, ncols(A), nrows(B))
+      den = one(base_ring(a))
+      try
+         flag, x, den = can_solve_with_solution_interpolation(A, B)
+      catch
+         flag, x, den = can_solve_with_solution_fflu(A, B)
+      end
+      X = change_base_ring(base_ring(a), x)
+      X = divexact(X, base_ring(a)(den))
+      return flag, X
+   else
+      error("Unsupported argument :$side for side: Must be :left or :right.")
+   end
 end
 
 # The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
