@@ -1992,7 +1992,12 @@ end
 # in the base ring. If not, it returns false. The matrix A can be non-square
 # and singular. If a solution exists, `y` is set to one such solution. The
 # value `d` is set to an appropriate denominator so that `Ay = bd` is a
-# solution over the ring.
+# solution over the ring. This implements the fraction free decomposition of
+# David J. Jeffrey, see "LU Factoring of non-invertible matrices" in ACM
+# Communications in Computer Algebra, July 2010. Note that we handle column
+# permutations implicitly and add units along the diagonal of the lower
+# triangular matrix L instead of removing rows (and corresponding columns of
+# the upper triangular matrix U).
 function can_solve_with_solution_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    base_ring(A) != base_ring(b) && error("Base rings don't match in can_solve_with_solution_fflu")
    nrows(A) != nrows(b) && error("Dimensions don't match in can_solve_with_solution_fflu")
@@ -2104,6 +2109,8 @@ end
 # Return `flag, y` where flag is set to `true` if `Ay = b` has a solution
 # in the base field. If not, it returns false. The matrix A can be non-square
 # and singular. If a solution exists, `y` is set to one such solution.
+# This implements the LU decomposition, for non-invertible matrices, of
+# David J. Jeffrey, see "LU Factoring of non-invertible matrices" in ACM                                                # Communications in Computer Algebra, July 2010. Note that we handle column                                             # permutations implicitly and add units along the diagonal of the lower                                                 # triangular matrix L instead of removing rows (and corresponding columns of                                            # the upper triangular matrix U).
 function can_solve_with_solution_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
    base_ring(A) != base_ring(b) && error("Base rings don't match in can_solve_with_solution_lu")
    nrows(A) != nrows(b) && error("Dimensions don't match in can_solve_with_solution_lu")
