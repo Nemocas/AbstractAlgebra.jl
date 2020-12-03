@@ -598,7 +598,7 @@ function (a::MatAlgebra{T})(b::S) where {S <: RingElement, T <: RingElement}
          if i != j
             entries[i, j] = zero(R)
          else
-            entries[i, j] = rb
+            entries[i, j] = i == 1 ? rb : deepcopy(rb)
          end
       end
    end

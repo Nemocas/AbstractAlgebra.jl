@@ -27,6 +27,7 @@ end
    f = S(t^2 + 1)
 
    @test isa(f, MatAlgElem)
+   @test !(f[1,1] === f[2,2])
 
    g = S(2)
 
