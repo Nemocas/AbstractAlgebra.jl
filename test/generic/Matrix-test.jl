@@ -1612,7 +1612,7 @@ end
 
       @test M*x == d*b
    end
- 
+
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -1650,7 +1650,7 @@ end
 
       @test M*x == d*b
    end
- 
+
    R, t = PolynomialRing(AbstractAlgebra.JuliaQQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
    S, y = PolynomialRing(K, "y")
@@ -3393,6 +3393,12 @@ end
 
    M = MatrixSpace(GF(7), 3, 2)
    test_rand(M)
+
+   sp = Random.Sampler(MersenneTwister, M)
+   @test parent(rand(sp)) == M
+   v = rand(sp, 3)
+   @test v isa Vector{elem_type(M)}
+   @test all(x -> parent(x) == M, v)
 
    M = MatrixSpace(F2(), 2, 3)
    test_rand(M)

@@ -364,6 +364,10 @@ function RandomExtensions.make(S::AbstractAlgebra.MatAlgebra, vs...)
    end
 end
 
+Random.Sampler(::Type{RNG}, S::AbstractAlgebra.MatAlgebra, n::Random.Repetition
+               ) where {RNG<:AbstractRNG} =
+   Random.Sampler(RNG, make(S), n)
+
 function rand(rng::AbstractRNG,
               sp::SamplerTrivial{<:Make2{<:AbstractAlgebra.MatAlgElem,
                                          <:AbstractAlgebra.MatAlgebra}})
