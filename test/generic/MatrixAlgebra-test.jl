@@ -1187,4 +1187,10 @@ end
    M = MatrixAlgebra(GF(7), 2)
 
    test_rand(M)
+
+   sp = Random.Sampler(MersenneTwister, M)
+   @test parent(rand(sp)) == M
+   v = rand(sp, 3)
+   @test v isa Vector{elem_type(M)}
+   @test all(x -> parent(x) == M, v)
 end

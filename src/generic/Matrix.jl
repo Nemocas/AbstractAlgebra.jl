@@ -2090,12 +2090,12 @@ function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) wh
                t = mul!(t, t, minus_one)
                y[i, k] = addeq!(y[i, k], t)
             end
-            
+
             flag, y[i, k] = divides(y[i, k], diag[l])
             if !flag
                return false, x
             end
-            
+
             l -= 1
          else
             y[i, k] = R()
@@ -2208,7 +2208,7 @@ function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) whe
                t = mul_red!(t, y[j, k], -LU[l, j], false)
                y[i, k] = addeq!(y[i, k], t)
             end
-               
+
             y[i, k] = reduce!(y[i, k])
             y[i, k] = divexact(y[i, k], diag[l])
 
@@ -2453,7 +2453,7 @@ function can_solve_with_solution_interpolation_inner(M::AbstractAlgebra.MatElem{
             if !(e isa ErrorException)
                rethrow(e)
             end
-            return false, rnk, prm, pivots, zero(x), zero(R) 
+            return false, rnk, prm, pivots, zero(x), zero(R)
          end
       end
    end
@@ -2508,7 +2508,7 @@ function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
       if !isa(e, ErrorException)
          rethrow(e)
       end
-      !flag && error("No solution in solve_rational") 
+      !flag && error("No solution in solve_rational")
       return solve_ff(M, b)
    end
 end
@@ -5731,6 +5731,12 @@ function RandomExtensions.make(S::AbstractAlgebra.MatSpace, vs...)
    end
 end
 
+# Sampler for a MatSpace not needing arguments (passed via make)
+# this allows to obtain the Sampler in simple cases without having to know about make
+# (when one can do `rand(M)`, one can expect to be able to do `rand(Sampler(rng, M))`)
+Random.Sampler(::Type{RNG}, S::AbstractAlgebra.MatSpace, n::Random.Repetition
+               ) where {RNG<:AbstractRNG} =
+   Random.Sampler(RNG, make(S), n)
 
 function rand(rng::AbstractRNG,
               sp::SamplerTrivial{<:Make2{<:AbstractAlgebra.MatElem,
