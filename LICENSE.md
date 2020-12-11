@@ -1,6 +1,6 @@
 As AbstractAlgebra links dynamically at runtime with various libraries included with Julia, all of whose licenses are compatible with GPL v3+, you may safely distribute AbstractAlgebra *as a whole* under the terms of that license. See for example the MPFR or GMP licenses in the Julia distribution, or refer to the GPL online here: 
 
-http://www.gnu.org/copyleft/gpl.txt
+https://www.gnu.org/copyleft/gpl.txt
 
 Individual parts of AbstractAlgebra may be distributed according to more permissive terms as laid out below:
 

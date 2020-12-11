@@ -40,7 +40,7 @@ Generic.AllParts
 ```
 
 The number of all partitions can be computed by the hidden function `_numpart`.
-Much faster implementation is available in [Nemo.jl](http://nemocas.github.io/Nemo.jl/latest/arb.html#Nemo.numpart-Tuple{Int64,ArbField}).
+Much faster implementation is available in [Nemo.jl](https://nemocas.github.io/Nemo.jl/latest/arb.html#Nemo.numpart-Tuple{Int64,ArbField}).
 
 ```@docs
 Generic._numpart
