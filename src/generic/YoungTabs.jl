@@ -91,7 +91,7 @@ const _numPartsTableBig = Dict{Int, BigInt}()
 
 Return the number of all distinct integer partitions of `n`. The function
 uses Euler pentagonal number theorem for recursive formula. For more details
-see OEIS sequence [A000041](http://oeis.org/A000041). Note that
+see OEIS sequence [A000041](https://oeis.org/A000041). Note that
 `_numpart(0) = 1` by convention.
 """
 function _numpart(n::Integer)
