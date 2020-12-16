@@ -18,7 +18,7 @@ struct FinFieldIterator{F}
 
    function FinFieldIterator(f)
       deg = degree(f)
-      characteristic(f)^deg == order(f) ||
+      BigInt(characteristic(f))^deg == order(f) ||
          throw(ArgumentError("iteration only supported for extension fields over a prime field"))
       basis = [one(f)]
       if deg > 1
