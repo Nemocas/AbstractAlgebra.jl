@@ -172,7 +172,7 @@ function preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgeb
    q = length(trels)
    m = nrows(M)
    n = ncols(M)
-   ncols(v.v) != n && error("Incompatible element")
+   ncols(_matrix(v)) != n && error("Incompatible element")
    if m == 0 || n == 0
        return D(zero_matrix(R, 1, m))
    else
@@ -189,7 +189,7 @@ function preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgeb
          end
       end
       # Find left inverse of mat
-      x = solve_left(matr, v.v)
+      x = solve_left(matr, _matrix(v))
       if q != 0
          x = matrix(R, 1, m, T[x[1, i] for i in 1:m])
       end
@@ -231,7 +231,7 @@ function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra
 end
 
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, v::Array{S, 1}) where {T <: RingElement, S<:AbstractAlgebra.FPModuleElem{T}}
-  return ModuleHomomorphism(M1, M2, vcat([x.v for x = v]...))
+   return ModuleHomomorphism(M1, M2, vcat([_matrix(x) for x = v]...))
 end
 
 @doc Markdown.doc"""

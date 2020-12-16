@@ -70,11 +70,11 @@ function show(io::IO, v::SubmoduleElem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
-      print(IOContext(io, :compact => true), v.v[1, i])
+      print(IOContext(io, :compact => true), _matrix(v)[1, i])
       print(io, ", ")
    end
    if len > 0
-      print(IOContext(io, :compact => true), v.v[1, len])
+      print(IOContext(io, :compact => true), _matrix(v)[1, len])
    end
    print(io, ")")
 end
@@ -145,7 +145,7 @@ given as elements of `m`.
 function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingElement, S <: AbstractAlgebra.FPModuleElem{T}}
    R = base_ring(m)
    r = length(gens)
-   while r > 0 && iszero_row(gens[r].v, 1) # check that not all gens are zero
+   while r > 0 && iszero_row(_matrix(gens[r]), 1) # check that not all gens are zero
       r -= 1
    end
    if r == 0
@@ -158,11 +158,12 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
    end
    # Make generators rows of a matrix
    s = ngens(m)
+   local mat::dense_matrix_type(T)
    mat = zero_matrix(base_ring(m), r, s)
    for i = 1:r
       parent(gens[i]) !== m && error("Incompatible module elements")
       for j = 1:s
-         mat[i, j] = gens[i].v[1, j]
+         mat[i, j] = _matrix(gens[i])[1, j]
       end
    end
    # Reduce matrix (hnf/rref), ensuring we remain reduced mod old relations
@@ -215,22 +216,21 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
       end
    end
    # Compute reduced form of new rels
-   new_rels = reduced_form(new_rels)
+   new_rels = reduced_form(new_rels)::dense_matrix_type(T)
    # remove rows and columns corresponding to unit pivots
    gen_cols, culled, pivots = cull_matrix(new_rels)
    # put all the culled relations into new relations
-   T1 = typeof(new_rels)
-   srels = Vector{T1}(undef, length(culled))
+   srels = Vector{dense_matrix_type(T)}(undef, length(culled))
    for i = 1:length(culled)
       srels[i] = matrix(R, 1, length(gen_cols),
-                    [new_rels[culled[i], gen_cols[j]]
+                    T[new_rels[culled[i], gen_cols[j]]
                        for j in 1:length(gen_cols)])
    end
    # Make submodule whose generators are the nonzero rows of mat
-   nonzero_gens = [m([mat[i, j] for j = 1:s]) for i = 1:num]
+   nonzero_gens = elem_type(m)[m(T[mat[i, j] for j = 1:s]) for i = 1:num]
    M = Submodule{T}(m, nonzero_gens, srels, gen_cols, pivots)
    # Compute map from elements of submodule into original module
-   hmat = [nonzero_gens[gen_cols[i]].v[1, j] for i in 1:ngens(M) for j in 1:ngens(m)]
+   hmat = T[_matrix(nonzero_gens[gen_cols[i]])[1, j] for i in 1:ngens(M) for j in 1:ngens(m)]
    f = ModuleHomomorphism(M, m, matrix(R, ngens(M), ngens(m), hmat))
    M.map = f
    return M, f

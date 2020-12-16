@@ -12,6 +12,12 @@ export iscompatible, issubmodule, isisomorphic, rels
 #
 ###############################################################################
 
+# The .v field in FPModuleElem has an abstract type. We introduce an internal
+# type stable accessor function to make the compiler happy.
+@inline function _matrix(v::AbstractAlgebra.FPModuleElem{T}) where T
+  return (v.v)::dense_matrix_type(T)
+end
+
 @doc Markdown.doc"""
     zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
@@ -28,7 +34,7 @@ end
 Return true if $v$ is the zero element of the module $M$.
 """
 function iszero(v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
-   return iszero(v.v)
+   return iszero(_matrix(v))
 end
 
 @doc Markdown.doc"""
@@ -107,7 +113,7 @@ end
 
 function -(v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
    N = parent(v)
-   return N(-v.v)
+   return N(-_matrix(v))
 end
 
 ###############################################################################
@@ -119,13 +125,13 @@ end
 function +(v1::AbstractAlgebra.FPModuleElem{T}, v2::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
    check_parent(v1, v2)
    N = parent(v1)
-   return N(v1.v + v2.v)
+   return N(_matrix(v1) + _matrix(v2))
 end
 
 function -(v1::AbstractAlgebra.FPModuleElem{T}, v2::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
    check_parent(v1, v2)
    N = parent(v1)
-   return N(v1.v - v2.v)
+   return N(_matrix(v1) - _matrix(v2))
 end
 
 ###############################################################################
@@ -137,23 +143,23 @@ end
 function *(v::AbstractAlgebra.FPModuleElem{T}, c::T) where T <: RingElem
    base_ring(v) != parent(c) && error("Incompatible rings")
    N = parent(v)
-   return N(v.v*c)
+   return N(_matrix(v) * c)
 end
 
 function *(v::AbstractAlgebra.FPModuleElem{T}, c::U) where {T <: RingElement, U <: Union{Rational, Integer}}
    N = parent(v)
-   return N(v.v*c)
+   return N(_matrix(v) * c)
 end
 
 function *(c::T, v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElem
    base_ring(v) != parent(c) && error("Incompatible rings")
    N = parent(v)
-   return N(c*v.v)
+   return N(c * _matrix(v))
 end
 
 function *(c::U, v::AbstractAlgebra.FPModuleElem{T}) where {T <: RingElement, U <: Union{Rational, Integer}}
    N = parent(v)
-   return N(c*v.v)
+   return N(c * _matrix(v))
 end
 
 ###############################################################################
@@ -164,7 +170,7 @@ end
 
 function ==(m::AbstractAlgebra.FPModuleElem{T}, n::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
    check_parent(m, n)
-   return m.v == n.v
+   return _matrix(m) == _matrix(n)
 end
 
 ###############################################################################
@@ -211,12 +217,12 @@ function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPMod
    rn = r1 + r2 + r3
    for i = 1:r1
       for j = 1:c
-         mat[rn - i + 1, j] = G1[i].v[1, j]
+         mat[rn - i + 1, j] = _matrix(G1[i])[1, j]
       end
    end
    for i = 1:r2
       for j = 1:c
-         mat[rn - i - r1 + 1, j] = G2[i].v[1, j]
+         mat[rn - i - r1 + 1, j] = _matrix(G2[i])[1, j]
       end
    end
    for i = 1:r3
@@ -275,13 +281,13 @@ function ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) wher
    mat1 = zero_matrix(base_ring(M), r1 + length(prels), c)
    for i = 1:r1
       for j = 1:c
-         mat1[i, j] = G1[i].v[1, j]
+         mat1[i, j] = _matrix(G1[i])[1, j]
       end
    end
    mat2 = zero_matrix(base_ring(M), r2 + length(prels), c)
    for i = 1:r2
       for j = 1:c
-         mat2[i, j] = G2[i].v[1, j]
+         mat2[i, j] = _matrix(G2[i])[1, j]
       end
    end
    for i = 1:length(prels)
@@ -295,14 +301,14 @@ function ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) wher
    mat2 = reduced_form(mat2)
    # Check containment of rewritten gens of M in row space of mat2
    for v in G1
-      flag, r = can_solve_left_reduced_triu(v.v, mat2)
+      flag, r = can_solve_left_reduced_triu(_matrix(v), mat2)
       if !flag
          return false
       end
    end
    # Check containment of rewritten gens of N in row space of mat1
    for v in G2
-      flag, r = can_solve_left_reduced_triu(v.v, mat1)
+      flag, r = can_solve_left_reduced_triu(_matrix(v), mat1)
       if !flag
          return false
       end
@@ -337,7 +343,7 @@ end
 Return the $i$-th coefficient of the module element $v$.
 """
 function getindex(v::AbstractAlgebra.FPModuleElem{T}, i::Int) where T <: RingElement
-   return v.v[1, i]
+   return _matrix(v)[1, i]
 end
 
 ###############################################################################

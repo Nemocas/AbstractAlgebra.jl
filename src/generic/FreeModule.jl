@@ -88,11 +88,11 @@ function show(io::IO, a::FreeModuleElem)
    print(io, "(")
    M = parent(a)
    for i = 1:rank(M) - 1
-      print(IOContext(io, :compact => true), a.v[1, i])
+      print(IOContext(io, :compact => true), _matrix(a)[1, i])
       print(io, ", ")
    end
    if rank(M) > 0
-      print(IOContext(io, :compact => true), a.v[1, rank(M)])
+      print(IOContext(io, :compact => true), _matrix(a)[1, rank(M)])
    end
    print(io, ")")
 end
