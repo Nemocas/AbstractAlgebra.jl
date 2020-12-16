@@ -10,6 +10,7 @@ include("generic/LaurentSeries-test.jl")
 include("generic/PuiseuxSeries-test.jl")
 include("generic/Matrix-test.jl")
 include("generic/MPoly-test.jl")
+include("generic/MPolyFactor-test.jl")
 
 @testset "Generic.Rings.broadcast..." begin
    F = GF(3)

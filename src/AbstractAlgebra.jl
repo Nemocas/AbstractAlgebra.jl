@@ -124,7 +124,7 @@ export create_accessors, get_handle, package_handle, zeros,
 
 export error_dim_negative, ErrorConstrDimMismatch
 
-export crt, factor
+export crt, factor, factor_squarefree
 
 function expressify
 end
@@ -798,6 +798,8 @@ function crt end
 
 function factor end
 
+function factor_squarefree end
+
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, LaurentPolynomialRing,
        MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
@@ -954,6 +956,14 @@ const QQ = JuliaQQ
 ###############################################################################
 
 const RealField = JuliaRealField
+
+###############################################################################
+#
+#   Generic algorithms defined on generic types
+#
+###############################################################################
+
+include("algorithms/MPolyFactor.jl")
 
 ###############################################################################
 #
