@@ -510,7 +510,7 @@ julia> r, d, P, L, U = fflu(A)
 ### Reduced row-echelon form
 
 ```@docs
-rref{T <: RingElem}(::MatElem{T})
+rref_rational{T <: RingElem}(::MatElem{T})
 rref{T <: FieldElem}(::MatElem{T})
 ```
 
@@ -553,7 +553,7 @@ julia> M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
 [      x^2 - 2    x - 1      2*x]
 [x^2 + 3*x + 1      2*x        1]
 
-julia> r, A, d = rref(M)
+julia> r, A, d = rref_rational(M)
 (3, -x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7, [-x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7 0 0; 0 -x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7 0; 0 0 -x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7])
 
 julia> isrref(A)

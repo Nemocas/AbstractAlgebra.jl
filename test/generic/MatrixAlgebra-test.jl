@@ -537,7 +537,7 @@ end
       r = 0
       A = M
       try
-         r, A, d = rref(M)
+         r, A, d = rref_rational(M)
          do_test = true
       catch e
          if !(e isa ErrorException)
@@ -557,7 +557,7 @@ end
    for i = 0:5
       M = randmat_with_rank(R, i, 0:3, -20:20)
 
-      r, A, d = rref(M)
+      r, A, d = rref_rational(M)
 
       @test r == i
       @test isrref(A)
@@ -583,7 +583,7 @@ end
    for i = 0:5
       M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
 
-      r, A, d = rref(M)
+      r, A, d = rref_rational(M)
 
       @test r == i
       @test isrref(A)

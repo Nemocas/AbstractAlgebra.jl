@@ -17,7 +17,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        extended_weak_popov, extended_weak_popov_with_transform, rank,
        rank_profile_popov, hnf_via_popov, hnf_via_popov_with_transform, popov,
        popov_with_transform, det_popov, _check_dim, nrows, ncols, gram, rref,
-       rref!, swap_cols, swap_cols!, swap_rows, swap_rows!, hnf_kb,
+       rref!, rref_rational, rref_rational!, swap_cols, swap_cols!, swap_rows, swap_rows!, hnf_kb,
        hnf_kb_with_transform, hnf_cohen, hnf_cohen_with_transform, snf_kb,
        snf_kb_with_transform, find_pivot_popov, inv!, zero_matrix,
        kronecker_product, minors, tr, lu, lu!, pseudo_inv, dense_matrix_type,
@@ -1440,7 +1440,7 @@ end
 #
 ###############################################################################
 
-function rref!(A::MatrixElem{T}) where {T <: RingElement}
+function rref_rational!(A::MatrixElem{T}) where {T <: RingElement}
    m = nrows(A)
    n = ncols(A)
    R = base_ring(A)
@@ -1497,16 +1497,16 @@ function rref!(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    rref(M::Generic.MatrixElem{T}) where {T <: RingElement}
+    rref_rational(M::Generic.MatrixElem{T}) where {T <: RingElement}
 
 Return a tuple $(r, A, d)$ consisting of the rank $r$ of $M$ and a
 denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is
 the reduced row echelon form of $M$. Note that the denominator is not usually
 minimal.
 """
-function rref(M::MatrixElem{T}) where {T <: RingElement}
+function rref_rational(M::MatrixElem{T}) where {T <: RingElement}
    A = deepcopy(M)
-   r, d = rref!(A)
+   r, d = rref_rational!(A)
    return r, A, d
 end
 
