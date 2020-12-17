@@ -1100,6 +1100,7 @@ function lcc_kaltofen(
     ok, cont, bfac = hlift_bivar_combine(beval, mainvar, minorvars[vi],
                                                              alphas[vi], ufacs)
     if !ok
+      # this means there are extraneous factors and so hlift will fail
       return false, divs
     end
     if !isconstant(cont)
@@ -1123,10 +1124,28 @@ function lcc_kaltofen(
   end
 
   return isempty(lcAf.fac), divs
-
 end
 
-# factor a truely multivariate A in at least three variables
+
+# factor out the random choice so that it can be overridden
+# size increases every time this is called
+function mfactor_choose_eval_points!(
+  alphas::Vector,
+  A::E,
+  mainvar::Int,
+  minorvars::Vector{Int},
+  size::Int) where E
+
+  n = length(minorvars)
+  R = parent(A)
+  K = base_ring(R)
+
+  for i in 1:n
+    alphas[i] = K(rand(Int) % size)
+  end
+end
+
+# factor a truly multivariate A in at least three variables
 function mfactor_irred_mvar_char_zero(
   A::E,             # squarefree, primitve wrt mainvar, monic
   mainvar::Int,
@@ -1148,9 +1167,7 @@ function mfactor_irred_mvar_char_zero(
 @label next_alpha
 
   alpha_modulus += 1
-  for i in 1:n
-    alphas[i] = K(rand(Int) % alpha_modulus)
-  end
+  mfactor_choose_eval_points!(alphas, A, mainvar, minorvars, alpha_modulus)
 
   evals[n + 1] = A
   for i in n:-1:1
@@ -1161,19 +1178,18 @@ function mfactor_irred_mvar_char_zero(
   end
 
   # make sure univar is squarefree. TODO also zassenhaus pruning here
-  ok, fac = mfactor_irred_univar(evals[1], mainvar)
+  ok, ufac = mfactor_irred_univar(evals[1], mainvar)
   if !ok
     @goto next_alpha    
   end
 
-  r = length(fac)
-  if r < 2
+  if length(ufac) < 2
     return [A]
   end
 
   lcAf = mfactor_squarefree_char_zero(get_lc(A, mainvar))
 
-  ok, divs = lcc_kaltofen(lcAf, A, mainvar, maindeg, minorvars, alphas, fac)
+  ok, divs = lcc_kaltofen(lcAf, A, mainvar, maindeg, minorvars, alphas, ufac)
   if !ok
     lcc_fails_remaining -= 1
     if lcc_fails_remaining >= 0
@@ -1181,7 +1197,7 @@ function mfactor_irred_mvar_char_zero(
     end
   end
 
-  ok, fac = hlift_with_lcc(A, fac, divs, mainvar, minorvars, alphas)
+  ok, fac = hlift_with_lcc(A, ufac, divs, mainvar, minorvars, alphas)
   if !ok
     @goto next_alpha
   end
