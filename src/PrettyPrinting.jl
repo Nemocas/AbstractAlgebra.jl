@@ -38,7 +38,7 @@ function obj_to_latex_string(@nospecialize(x); context = nothing)
   return expr_to_latex_string(canonicalize(expressify(x, context = context)))
 end
 
-function Base.show(io::IO, ::MIME"text/latex", x::RingElement)
+function Base.show(io::IO, ::MIME"text/latex", x::RingElem)
   S = obj_to_latex_string(x)
   print(io, S)
 end

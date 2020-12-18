@@ -101,30 +101,14 @@ end
 
 @testset "Generic.LaurentSeries.rand..." begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
-   f = rand(R, -12:12, -10:10)
-   @test f isa Generic.LaurentSeriesRingElem
-   f = rand(rng, R, -12:12, -10:10)
-   @test f isa Generic.LaurentSeriesRingElem
 
-   for m in (make(R, -12:12, -10:10),
-            make(R, -12:12, make(ZZ, -10:10)))
-      for f in (rand(m), rand(rng, m))
-         @test f isa Generic.LaurentSeriesRingElem{BigInt}
-      end
-   end
+   test_rand(R, -12:12, -10:10)
+   test_rand(R, -12:12, make(ZZ, -10:10))
 
    R, x = LaurentSeriesField(RealField, 10, "x")
-   f = rand(R, -12:12, -1:1)
-   @test f isa Generic.LaurentSeriesFieldElem
-   f = rand(rng, R, -12:12, -1:1)
-   @test f isa Generic.LaurentSeriesFieldElem
 
-   for m in (make(R, -12:12, -1:1),
-             make(R, -12:12, make(RealField, -1:1)))
-      for f in (rand(m), rand(rng, m))
-         @test f isa Generic.LaurentSeriesFieldElem{BigFloat}
-      end
-   end
+   test_rand(R, -12:12, -1:1)
+   test_rand(R, -12:12, make(RealField, -1:1))
 end
 
 @testset "Generic.LaurentSeries.manipulation..." begin
@@ -168,7 +152,7 @@ end
    @test_throws DomainError upscale(a, -rand(1:100))
    @test_throws DomainError downscale(a, 0)
    @test_throws DomainError downscale(a, -rand(1:100))
-  
+
    @test characteristic(S) == 0
 
    T = ResidueRing(ZZ, 7)

@@ -12,10 +12,11 @@
 
 @doc Markdown.doc"""
     CycleDec{T}(ccycles, cptrs, n) where T
-> Cycle decomposition of a permutation.
-> * `ccycles`: an array of consecutive entries of cycles;
-> * `cptrs`: an array of pointers to the locations where cycles begin: ```ccycles[cptrs[i], cptrs[i+1]-1]` contains the i-th cycle;
-> * `n`: the number of cycles;
+
+Cycle decomposition of a permutation.
+* `ccycles`: an array of consecutive entries of cycles;
+* `cptrs`: an array of pointers to the locations where cycles begin: ```ccycles[cptrs[i], cptrs[i+1]-1]` contains the i-th cycle;
+* `n`: the number of cycles;
 """
 struct CycleDec{T<:Integer}
    ccycles::Vector{T}
@@ -31,8 +32,9 @@ end
 
 @doc Markdown.doc"""
     SymmetricGroup{T<:Integer}
-> The full symmetric group singleton type.
-> `SymmetricGroup(n)` constructs the full symmetric group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
+
+The full symmetric group singleton type.
+`SymmetricGroup(n)` constructs the full symmetric group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -62,23 +64,24 @@ SymmetricGroup(n::Integer) = SymmetricGroup{typeof(n)}(n)
 
 @doc Markdown.doc"""
     Perm{T<:Integer}
-> The type of permutations.
-> Fieldnames:
-> * `d::Vector{T}` - vector representing the permutation
-> * `modified::Bool` - bit to check the validity of cycle decomposition
-> * `cycles::CycleDec{T}` - (cached) cycle decomposition
->
-> A permutation $p$ consists of a vector (`p.d`) of $n$ integers from $1$ to $n$.
-> If the $i$-th entry of the vector is $j$, this corresponds to $p$ sending $i \to j$.
-> The cycle decomposition (`p.cycles`) is computed on demand and should never be
-> accessed directly. Use [`cycles(p)`](@ref) instead.
->
-> There are two inner constructors of `Perm`:
->
-> * `Perm(n::T)` constructs the trivial `Perm{T}`-permutation of length $n$.
-> * `Perm(v::AbstractVector{<:Integer} [,check=true])` constructs a permutation
->   represented by `v`. By default `Perm` constructor checks if the vector
->   constitutes a valid permutation. To skip the check call `Perm(v, false)`.
+
+The type of permutations.
+Fieldnames:
+* `d::Vector{T}` - vector representing the permutation
+* `modified::Bool` - bit to check the validity of cycle decomposition
+* `cycles::CycleDec{T}` - (cached) cycle decomposition
+
+A permutation $p$ consists of a vector (`p.d`) of $n$ integers from $1$ to $n$.
+If the $i$-th entry of the vector is $j$, this corresponds to $p$ sending $i \to j$.
+The cycle decomposition (`p.cycles`) is computed on demand and should never be
+accessed directly. Use [`cycles(p)`](@ref) instead.
+
+There are two inner constructors of `Perm`:
+
+* `Perm(n::T)` constructs the trivial `Perm{T}`-permutation of length $n$.
+* `Perm(v::AbstractVector{<:Integer} [,check=true])` constructs a permutation
+  represented by `v`. By default `Perm` constructor checks if the vector
+  constitutes a valid permutation. To skip the check call `Perm(v, false)`.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -112,8 +115,9 @@ end
 
 @doc Markdown.doc"""
     AllPerms(n::T) where T
-> Return an iterator over arrays representing all permutations of `1:n`.
-> Similar to `Combinatorics.permutations(1:n)`
+
+Return an iterator over arrays representing all permutations of `1:n`.
+Similar to `Combinatorics.permutations(1:n)`
 """
 struct AllPerms{T<:Integer}
    all::Int
@@ -133,15 +137,16 @@ end
 
 @doc Markdown.doc"""
     Partition(part::Vector{<:Integer}[, check::Bool=true]) <: AbstractVector{Int}
-> Represent integer partition in the non-increasing order.
->
-> `part` will be sorted, if necessary. Checks for validity of input can be skipped by calling the (inner) constructor with `false` as the second argument.
->
-> Functionally `Partition` is a thin wrapper over `Vector{Int}`.
 
-> Fieldnames:
->  * `n::Int` - the partitioned number
->  * `part::Vector{Int}` - a non-increasing sequence of summands of `n`.
+Represent integer partition in the non-increasing order.
+
+`part` will be sorted, if necessary. Checks for validity of input can be skipped by calling the (inner) constructor with `false` as the second argument.
+
+Functionally `Partition` is a thin wrapper over `Vector{Int}`.
+
+Fieldnames:
+ * `n::Int` - the partitioned number
+ * `part::Vector{Int}` - a non-increasing sequence of summands of `n`.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -169,14 +174,15 @@ end
 
 @doc Markdown.doc"""
     AllParts(n::Integer)
-> Return an iterator over all integer `Partition`s of `n`.
-> Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
->
-> > Jerome Kelleher and Barry O’Sullivan,
-> > *Generating All Partitions: A Comparison Of Two Encodings*
-> > ArXiv:0909.2331
->
-> See also `Combinatorics.partitions(1:n)`.
+
+Return an iterator over all integer `Partition`s of `n`.
+Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
+
+> Jerome Kelleher and Barry O’Sullivan,
+> *Generating All Partitions: A Comparison Of Two Encodings*
+> ArXiv:0909.2331
+
+See also `Combinatorics.partitions(1:n)`.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -209,9 +215,10 @@ end
 
 @doc Markdown.doc"""
     SkewDiagram(lambda::Partition, mu::Partition) <: AbstractArray{Int, 2}
-> Implements a skew diagram, i.e. a difference of two Young diagrams
-> represented by partitions `lambda` and `mu`.
-> (below dots symbolise the removed entries)
+
+Implements a skew diagram, i.e. a difference of two Young diagrams
+represented by partitions `lambda` and `mu`.
+(below dots symbolise the removed entries)
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -255,12 +262,13 @@ end
 
 @doc Markdown.doc"""
     YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}
-> Return the Young tableaux of partition `part`, filled linearly
-> by `fill` vector. Note that `fill` vector is in **row-major** format.
->
-> Fields:
-> * `part` - the partition defining Young diagram
-> * `fill` - the row-major fill vector: the entries of the diagram.
+
+Return the Young tableaux of partition `part`, filled linearly
+by `fill` vector. Note that `fill` vector is in **row-major** format.
+
+Fields:
+* `part` - the partition defining Young diagram
+* `fill` - the row-major fill vector: the entries of the diagram.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -474,6 +482,8 @@ end
 #   SparsePolyRing / SparsePoly
 #
 ###############################################################################
+
+# Q: Why is SparsePolyRing not a subtype of AbstractAlgebra.PolyRing{T} ?
 
 mutable struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring

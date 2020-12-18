@@ -51,14 +51,8 @@ end
 
 @testset "Generic.ResF.rand..." begin
    R = Generic.ResidueField(ZZ, 16453889)
-   f = rand(R, 1:9)
-   @test f isa Generic.ResF
-   f = rand(rng, R, 1:9)
-   @test f isa Generic.ResF
 
-   m = make(R, 1:9)
-   for f in (rand(m), rand(rng, m))
-      @test f isa Generic.ResF
+   test_rand(R, 1:9) do f
       @test 1 <= f.data <= 9
    end
 end
@@ -283,8 +277,8 @@ end
    end
 
    for p in [ZZ(3), ZZ(53), ZZ(727), ZZ(8893), ZZ(191339), ZZ(2369093), ZZ(52694921)]
-       R = Generic.ResidueField(ZZ, p)                                                                                  
-       
+       R = Generic.ResidueField(ZZ, p)
+
        for i = 1:10
           a = rand(R, 0:Int(p - 1))^2
           b = sqrt(a)

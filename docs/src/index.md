@@ -12,7 +12,7 @@ AbstractAlgebra.jl grew out of the Nemo project after a number of requests from 
 community for the pure Julia part of Nemo to be split off into a separate project. See
 the Nemo website for more details about Nemo.
 
-- [Nemo website](http://nemocas.org)
+- [Nemo website](https://nemocas.org)
 
 ## Features
 
@@ -39,7 +39,7 @@ AbstractAlgebra.jl type hierarchy.
 ## Installation
 
 To use AbstractAlgebra we require Julia 1.0 or higher. Please see
-[http://julialang.org/downloads](http://julialang.org/downloads/) for instructions on
+<https://julialang.org/downloads/> for instructions on
 how to obtain Julia for your system.
 
 At the Julia prompt simply type

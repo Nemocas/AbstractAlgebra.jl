@@ -14,68 +14,6 @@ function randprime(n::Int)
    return primes100[rand(1:n)]
 end
 
-function istriu(A::Generic.MatAlgElem)
-   m = nrows(A)
-   n = ncols(A)
-   d = 0
-   for c = 1:n
-      for r = m:-1:1
-         if !iszero(A[r,c])
-            if r < d
-               return false
-            end
-            d = r
-            break
-         end
-      end
-   end
-   return true
-end
-
-function is_snf(A::Generic.MatAlgElem)
-   m = nrows(A)
-   n = ncols(A)
-   a = A[1,1]
-   for i = 2:min(m,n)
-      q, r = divrem(A[i,i], a)
-      if !iszero(r)
-         return false
-      end
-      a = A[i,i]
-   end
-   for i = 1:n
-      for j = 1:m
-         if i == j
-            continue
-         end
-         if !iszero(A[j,i])
-            return false
-         end
-      end
-   end
-   return true
-end
-
-function is_weak_popov(P::Generic.MatAlgElem, rank::Int)
-   zero_rows = 0
-   pivots = zeros(ncols(P))
-   for r = 1:nrows(P)
-      p = AbstractAlgebra.find_pivot_popov(P, r)
-      if P[r,p] == 0
-         zero_rows += 1
-         continue
-      end
-      if pivots[p] != 0
-         return false
-      end
-      pivots[p] = r
-   end
-   if zero_rows != nrows(P)-rank
-      return false
-   end
-   return true
-end
-
 @testset "Generic.MatAlg.constructors..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
@@ -392,9 +330,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 3
    @test P*A == L*D*U
@@ -404,9 +342,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 3
    @test P*A == L*D*U
@@ -416,9 +354,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 2
    @test P*A == L*D*U
@@ -429,9 +367,9 @@ end
    r, d, P, L, U, = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
    @test r == 3
    @test P*A == L*D*U
 end
@@ -463,7 +401,7 @@ end
    for dim = 0:7
       S = MatrixAlgebra(K, dim)
 
-      M = rand(S, 0:2, -100:100)
+      M = rand(S, -100:100)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
@@ -529,7 +467,7 @@ end
    S = MatrixAlgebra(K, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       @test rank(M) == i
    end
@@ -563,9 +501,9 @@ end
       M = randmat_with_rank(R, dim, -100:100)
       b = rand(U, -100:100)
 
-      x = Generic.solve_lu(M, b)
+      flag, x = Generic.can_solve_with_solution_lu(M, b)
 
-      @test M*x == b
+      @test flag && M*x == b
    end
 
    S, y = PolynomialRing(ZZ, "y")
@@ -582,9 +520,9 @@ end
       MK = T(elem_type(K)[ K(M[i, j]) for i in 1:nrows(M), j in 1:ncols(M) ])
       bK = T(elem_type(K)[ K(b[i, j]) for i in 1:nrows(b), j in 1:ncols(b) ])
 
-      x = Generic.solve_lu(MK, bK)
+      flag, x = Generic.can_solve_with_solution_lu(MK, bK)
 
-      @test MK*x == bK
+      @test flag && MK*x == bK
    end
 end
 
@@ -599,7 +537,7 @@ end
       r = 0
       A = M
       try
-         r, d, A = rref(M)
+         r, A, d = rref_rational(M)
          do_test = true
       catch e
          if !(e isa ErrorException)
@@ -619,7 +557,7 @@ end
    for i = 0:5
       M = randmat_with_rank(R, i, 0:3, -20:20)
 
-      r, d, A = rref(M)
+      r, A, d = rref_rational(M)
 
       @test r == i
       @test isrref(A)
@@ -630,7 +568,7 @@ end
    S = MatrixAlgebra(K, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       r, A = rref(M)
 
@@ -645,7 +583,7 @@ end
    for i = 0:5
       M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
 
-      r, d, A = rref(M)
+      r, A, d = rref_rational(M)
 
       @test r == i
       @test isrref(A)
@@ -747,7 +685,7 @@ end
    for dim = 1:5
       R = MatrixAlgebra(S, dim)
 
-      M = randmat_with_rank(R, dim, 0:2, -100:100)
+      M = randmat_with_rank(R, dim, -100:100)
 
       X = inv(M)
 
@@ -1137,10 +1075,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    T = AbstractAlgebra.snf_kb(A)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(A)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*A*K == T
@@ -1157,10 +1095,10 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    T = AbstractAlgebra.snf_kb(B)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(B)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
@@ -1174,10 +1112,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    T = snf(A)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = snf_with_transform(A)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*A*K == T
@@ -1194,10 +1132,10 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    T = snf(B)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = snf_with_transform(B)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
@@ -1243,16 +1181,16 @@ end
 
 @testset "Generic.MatAlg.rand" begin
    M = MatrixAlgebra(ZZ, 3)
-   m = make(M, 1:9)
-   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                rand(M, 1:9), rand(rng, M, 1:9)]
-      @test A isa elem_type(M)
-   end
+
+   test_rand(M, 1:9)
 
    M = MatrixAlgebra(GF(7), 2)
-   m = make(M)
-   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                rand(M), rand(rng, M)]
-      @test A isa elem_type(M)
-   end
+
+   test_rand(M)
+
+   sp = Random.Sampler(MersenneTwister, M)
+   @test parent(rand(sp)) == M
+   v = rand(sp, 3)
+   @test v isa Vector{elem_type(M)}
+   @test all(x -> parent(x) == M, v)
 end

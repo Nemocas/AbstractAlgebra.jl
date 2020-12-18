@@ -84,12 +84,8 @@ end
 
 @testset "Generic.RelSeries.rand..." begin
    R, x = PowerSeriesRing(ZZ, 10, "x")
-   m = make(R, 0:12, -10:10)
-   for f in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                rand(R, 0:12, -10:10),
-                rand(rng, R, 0:12, -10:10)]
-      @test f isa Generic.RelSeries
-   end
+
+   test_rand(R, 0:12, -10:10)
 end
 
 @testset "Generic.RelSeries.manipulation..." begin
@@ -128,7 +124,7 @@ end
 
    @test_throws DomainError polcoeff(a, -1)
    @test_throws DomainError polcoeff(a, -rand(2:100))
-   
+
    @test characteristic(S) == 0
 
    T = ResidueRing(ZZ, 7)
@@ -513,7 +509,7 @@ end
          r2 *= f
       end
    end
-   
+
    f = rand(R, 0:12, 0:rand(1:25))
    @test_throws DomainError f^-1
    @test_throws DomainError f^-rand(2:100)
@@ -533,7 +529,7 @@ end
       @test isequal(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
-   
+
    f = rand(R, 0:12, -10:10)
    @test_throws DomainError shift_left(f, -1)
    @test_throws DomainError shift_left(f, -rand(2:100))
@@ -594,7 +590,7 @@ end
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
 
-   f = rand(R, 0:12, -10:10)   
+   f = rand(R, 0:12, -10:10)
    @test_throws DomainError truncate(f, -1)
    @test_throws DomainError truncate(f, -rand(2:100))
 
@@ -627,7 +623,7 @@ end
 
    f = rand(R, 0:12, 0:5)
    @test_throws DomainError truncate(f, -1)
-   @test_throws DomainError truncate(f, -rand(2:100))      
+   @test_throws DomainError truncate(f, -rand(2:100))
 end
 
 @testset "Generic.RelSeries.inversion..." begin

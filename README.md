@@ -1,6 +1,9 @@
 # AbstractAlgebra
 
-[![Build Status](https://travis-ci.org/Nemocas/AbstractAlgebra.jl.svg?branch=master)](https://travis-ci.org/Nemocas/AbstractAlgebra.jl) [![Build status](https://ci.appveyor.com/api/projects/status/1w9ninmoidxkxshp/branch/master?svg=true)](https://ci.appveyor.com/project/thofma/abstractalgebra-jl/branch/master)
+[![Docs](https://img.shields.io/badge/docs-latest-blue.svg)](https://nemocas.github.io/AbstractAlgebra.jl/latest)
+[![Build status](https://ci.appveyor.com/api/projects/status/1w9ninmoidxkxshp/branch/master?svg=true)](https://ci.appveyor.com/project/thofma/abstractalgebra-jl/branch/master)
+[![Build Status](https://github.com/Nemocas/AbstractAlgebra.jl/workflows/Run%20tests/badge.svg)](https://github.com/Nemocas/AbstractAlgebra.jl/actions?query=workflow%3A%22Run%20tests%22+branch%3Amaster)
+[![Codecov](https://codecov.io/github/Nemocas/AbstractAlgebra.jl/coverage.svg?branch=master&token=)](https://codecov.io/gh/Nemocas/AbstractAlgebra.jl)
 
 AbstractAlgebra is a pure Julia package for computational abstract algebra. It grew out of the Nemo project and provides all of the abstract types and generic implementations that Nemo relies on.
 
@@ -14,11 +17,11 @@ AbstractAlgebra currently provides:
 
 Documentation can be found at the following link:
 
-* [https://nemocas.github.io/AbstractAlgebra.jl/latest/index.html](https://nemocas.github.io/AbstractAlgebra.jl/latest/index.html)
+* <https://nemocas.github.io/AbstractAlgebra.jl/latest/index.html>
 
 Projects that depend on AbstractAlgebra include:
 
-* Nemo.jl [http://nemocas.org](http://nemocas.org/) (optimised implementations of specific rings provided by the Flint, Arb and Antic C libraries)
-* Hecke.jl [https://github.com/thofma/Hecke.jl](https://github.com/thofma/Hecke.jl) (algebraic number theory)
-* Singular.jl [https://github.com/oscar-system/Singular.jl](https://github.com/oscar-system/Singular.jl) (polynomial rings and ideals, Groebner bases and computer algebra provided by the Singular C++ library)
+* Nemo.jl <https://nemocas.org/> (optimised implementations of specific rings provided by the Flint, Arb and Antic C libraries)
+* Hecke.jl <https://github.com/thofma/Hecke.jl> (algebraic number theory)
+* Singular.jl <https://github.com/oscar-system/Singular.jl> (polynomial rings and ideals, Groebner bases and computer algebra provided by the Singular C++ library)
 

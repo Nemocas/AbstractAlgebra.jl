@@ -43,8 +43,8 @@ terms_degrees(p::LaurentPolyWrap) = p.mindeg .+ (0:degree(p.poly))
 """
     trail_degree(p::LaurentPolyElem)
 
-> Return the degree of the term with lowest degree in `p`.
-> The result is undefined when `p` is null.
+Return the degree of the term with lowest degree in `p`.
+The result is undefined when `p` is null.
 """
 function trail_degree(p::LaurentPolyWrap)
    # TODO: implement in terms of trail_degree for polynomials
@@ -54,8 +54,8 @@ end
 """
     lead_degree(p::LaurentPolyElem)
 
-> Return the degree of the term with highest degree in `p`.
-> The result is undefined when `p` is null.
+Return the degree of the term with highest degree in `p`.
+The result is undefined when `p` is null.
 """
 lead_degree(p::LaurentPolyWrap) = p.mindeg + degree(p.poly)
 
@@ -315,10 +315,11 @@ end
 
 @doc doc"""
     LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString)
-> Given a base ring `R` and string `s` specifying how the generator (variable)
-> should be printed, return a tuple `S, x` representing the new Laurent polynomial
-> ring $S = R[x, 1/x]$ and the generator $x$ of the ring. The parent
-> object `S` will depend only on `R` and `x`.
+
+Given a base ring `R` and string `s` specifying how the generator (variable)
+should be printed, return a tuple `S, x` representing the new Laurent polynomial
+ring $S = R[x, 1/x]$ and the generator $x$ of the ring. The parent
+object `S` will depend only on `R` and `x`.
 """
 function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString)
    P, x = AbstractAlgebra.PolynomialRing(R, s)

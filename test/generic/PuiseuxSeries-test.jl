@@ -93,30 +93,14 @@ end
 
 @testset "Generic.PuiseuxSeries.rand..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
-   f = rand(R, -12:12, 1:6, -10:10)
-   @test f isa Generic.PuiseuxSeriesRingElem
-   f = rand(rng, R, -12:12, 1:6, -10:10)
-   @test f isa Generic.PuiseuxSeriesRingElem
 
-   for m in (make(R, -12:12, 1:6, -10:10),
-             make(R, -12:12, 1:6, make(ZZ, -10:10)))
-      for f in (rand(m), rand(rng, m))
-         @test f isa Generic.PuiseuxSeriesRingElem{BigInt}
-      end
-   end
+   test_rand(R, -12:12, 1:6, -10:10)
+   test_rand(R, -12:12, 1:6, make(ZZ, -10:10))
 
    R, x = PuiseuxSeriesField(RealField, 10, "x")
-   f = rand(R, -12:12, 1:6, -1:1)
-   @test f isa Generic.PuiseuxSeriesFieldElem
-   f = rand(rng, R, -12:12, 1:6, -1:1)
-   @test f isa Generic.PuiseuxSeriesFieldElem
 
-   for m in (make(R, -12:12, 1:6, -1:1),
-             make(R, -12:12, 1:6, make(RealField, -1:1)))
-      for f in (rand(m), rand(rng, m))
-         @test f isa Generic.PuiseuxSeriesFieldElem{BigFloat}
-      end
-   end
+   test_rand(R, -12:12, 1:6, -1:1)
+   test_rand(R, -12:12, 1:6, make(RealField, -1:1))
 end
 
 @testset "Generic.PuiseuxSeries.manipulation..." begin

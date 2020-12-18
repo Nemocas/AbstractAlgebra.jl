@@ -7,3 +7,9 @@
 @deprecate set_val!(a::AbstractAlgebra.Generic.LaurentSeriesElem, val::Int) set_valuation!(a, val)
 
 @deprecate set_val!(a::AbstractAlgebra.RelSeriesElem, val::Int) set_valuation!(a, val)
+
+# Deprecated in 0.11.*
+
+@deprecate rref(a::MatrixElem{<:RingElement}) rref_rational(a)
+
+@deprecate rref!(a::MatrixElem{<:RingElement}) rref_rational!(a)

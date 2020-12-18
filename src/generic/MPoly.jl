@@ -41,14 +41,16 @@ end
 
 @doc Markdown.doc"""
     symbols(a::MPolyRing)
-> Return an array of symbols representing the variable names for the given
-> polynomial ring.
+
+Return an array of symbols representing the variable names for the given
+polynomial ring.
 """
 symbols(a::MPolyRing) = a.S
 
 @doc Markdown.doc"""
     nvars(x::MPolyRing)
-> Return the number of variables of the polynomial ring.
+
+Return the number of variables of the polynomial ring.
 """
 nvars(a::MPolyRing) = a.num_vars
 
@@ -72,8 +74,9 @@ end
 
 @doc Markdown.doc"""
     gens(a::MPolyRing{T}) where {T <: RingElement}
-> Return an array of all the generators (variables) of the given polynomial
-> ring.
+
+Return an array of all the generators (variables) of the given polynomial
+ring.
 """
 function gens(a::MPolyRing{T}) where {T <: RingElement}
    n = a.num_vars
@@ -82,8 +85,9 @@ end
 
 @doc Markdown.doc"""
     gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
-> Return the $i$-th generator (variable) of the given polynomial
-> ring.
+
+Return the $i$-th generator (variable) of the given polynomial
+ring.
 """
 function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
    return gen(a, i, Val{a.ord})
@@ -91,7 +95,8 @@ end
 
 @doc Markdown.doc"""
     vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
-> Return the variables actually occuring in $p$.
+
+Return the variables actually occuring in $p$.
 """
 function vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
    U = typeof(p)
@@ -140,8 +145,9 @@ end
 
 @doc Markdown.doc"""
     var_index(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
-> Return the index of the given variable $x$. If $x$ is not a variable
-> in a multivariate polynomial ring, an exception is raised.
+
+Return the index of the given variable $x$. If $x$ is not a variable
+in a multivariate polynomial ring, an exception is raised.
 """
 function var_index(x::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
    !ismonomial(x) && error("Not a variable in var_index")
@@ -163,8 +169,9 @@ end
 
 @doc Markdown.doc"""
     ordering(a::MPolyRing{T}) where {T <: RingElement}
-> Return the ordering of the given polynomial ring as a symbol. The options are
-> `:lex`, `:deglex` and `:degrevlex`.
+
+Return the ordering of the given polynomial ring as a symbol. The options are
+`:lex`, `:deglex` and `:degrevlex`.
 """
 function ordering(a::MPolyRing{T}) where {T <: RingElement}
    return a.ord
@@ -218,10 +225,11 @@ end
 
 @doc Markdown.doc"""
     exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
-> Return a vector of exponents, corresponding to the exponent vector of the
-> i-th term of the polynomial. Term numbering begins at $1$ and the exponents
-> are given in the order of the variables for the ring, as supplied when the
-> ring was created.
+
+Return a vector of exponents, corresponding to the exponent vector of the
+i-th term of the polynomial. Term numbering begins at $1$ and the exponents
+are given in the order of the variables for the ring, as supplied when the
+ring was created.
 """
 function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
    return exponent_vector(a, i, Val{parent(a).ord})
@@ -229,9 +237,10 @@ end
 
 @doc Markdown.doc"""
     exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
-> Return coefficient of the j-th variables in the i-th term of the polynomial.
-> Term and variable numbering begins at $1$ and variables are ordered as
-> during the creation of the ring.
+
+Return coefficient of the j-th variables in the i-th term of the polynomial.
+Term and variable numbering begins at $1$ and variables are ordered as
+during the creation of the ring.
 """
 function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
    return exponent(a, i, j, Val{parent(a).ord})
@@ -271,9 +280,10 @@ end
 
 @doc Markdown.doc"""
     set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
-> Set the i-th exponent vector to the supplied vector, where the entries
-> correspond to the exponents of the variables in the order supplied when
-> the ring was created. The modified polynomial is returned.
+
+Set the i-th exponent vector to the supplied vector, where the entries
+correspond to the exponents of the variables in the order supplied when
+the ring was created. The modified polynomial is returned.
 """
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
    return set_exponent_vector!(a, i, exps, Val{parent(a).ord})
@@ -281,8 +291,9 @@ end
 
 @doc Markdown.doc"""
     coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
-> Return the coefficient of the term with the given exponent vector, or zero
-> if there is no such term.
+
+Return the coefficient of the term with the given exponent vector, or zero
+if there is no such term.
 """
 function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
    A = a.exps
@@ -318,10 +329,11 @@ end
 
 @doc Markdown.doc"""
     setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
-> Set the coefficient of the term with the given exponent vector to the given
-> value $c$. This function takes $O(\log n)$ operations if a term with the given
-> exponent already exists, or if the term is inserted at the end of the
-> polynomial. Otherwise it can take $O(n)$ operations in the worst case.
+
+Set the coefficient of the term with the given exponent vector to the given
+value $c$. This function takes $O(\log n)$ operations if a term with the given
+exponent already exists, or if the term is inserted at the end of the
+polynomial. Otherwise it can take $O(n)$ operations in the worst case.
 """
 function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
    c = base_ring(a)(c)
@@ -383,9 +395,10 @@ end
 
 @doc Markdown.doc"""
     sort_terms!(a::MPoly{T}) where {T <: RingElement}
-> Sort the terms of the given polynomial according to the polynomial ring
-> ordering. Zero terms and duplicate exponents are ignored. To deal with those
-> call `combine_like_terms`. The sorted polynomial is returned.
+
+Sort the terms of the given polynomial according to the polynomial ring
+ordering. Zero terms and duplicate exponents are ignored. To deal with those
+call `combine_like_terms`. The sorted polynomial is returned.
 """
 function sort_terms!(a::MPoly{T}) where {T <: RingElement}
    N = parent(a).N
@@ -417,12 +430,13 @@ end
 
 @doc Markdown.doc"""
     coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
-> Return the "coefficient" of $a$ (as a multivariate polynomial in the same
-> ring) of the monomial consisting of the product of the variables of the given
-> indices raised to the given exponents (note that not all variables need to
-> appear and the exponents can be zero). E.g. `coeff(f, [1, 3], [0, 2])` returns
-> the coefficient of $x^0*z^2$ in the polynomial $f$ (assuming variables
-> $x, y, z$ in that order).
+
+Return the "coefficient" of $a$ (as a multivariate polynomial in the same
+ring) of the monomial consisting of the product of the variables of the given
+indices raised to the given exponents (note that not all variables need to
+appear and the exponents can be zero). E.g. `coeff(f, [1, 3], [0, 2])` returns
+the coefficient of $x^0*z^2$ in the polynomial $f$ (assuming variables
+$x, y, z$ in that order).
 """
 function coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
    unique(vars) != vars && error("Variables not unique")
@@ -458,11 +472,12 @@ end
 
 @doc Markdown.doc"""
     coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
-> Return the "coefficient" of $a$ (as a multivariate polynomial in the same
-> ring) of the monomial consisting of the product of the given variables
-> to the given exponents (note that not all variables need to appear and the
-> exponents can be zero). E.g. `coeff(f, [x, z], [0, 2])` returns the
-> coefficient of $x^0*z^2$ in the polynomial $f$.
+
+Return the "coefficient" of $a$ (as a multivariate polynomial in the same
+ring) of the monomial consisting of the product of the given variables
+to the given exponents (note that not all variables need to appear and the
+exponents can be zero). E.g. `coeff(f, [x, z], [0, 2])` returns the
+coefficient of $x^0*z^2$ in the polynomial $f$.
 """
 function coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
    varidx = [var_index(x) for x in vars]
@@ -722,14 +737,16 @@ end
 
 @doc Markdown.doc"""
     isdegree(s::Symbol)
-> Return `true` if the given symbol represents a degree ordering (deglex or
-> degrevlex).
+
+Return `true` if the given symbol represents a degree ordering (deglex or
+degrevlex).
 """
 isdegree(s::Symbol) = s == :deglex || s == :degrevlex
 
 @doc Markdown.doc"""
     isreverse(s::Symbol)
-> Return `true` if the given symbol represents a reverse ordering (degrevlex).
+
+Return `true` if the given symbol represents a reverse ordering (degrevlex).
 """
 isreverse(s::Symbol) = s == :degrevlex
 
@@ -765,8 +782,9 @@ end
 
 @doc Markdown.doc"""
     isgen(x::MPoly{T}) where {T <: RingElement}
-> Return `true` if the given polynomial is a generator (variable) of the
-> polynomial ring it belongs to.
+
+Return `true` if the given polynomial is a generator (variable) of the
+polynomial ring it belongs to.
 """
 function isgen(x::MPoly{T}) where {T <: RingElement}
    if length(x) != 1
@@ -780,7 +798,8 @@ end
 
 @doc Markdown.doc"""
     ishomogeneous(x::MPoly{T}) where {T <: RingElement}
-> Return `true` if the given polynomial is homogeneous with respect to the standard grading and `false` otherwise.
+
+Return `true` if the given polynomial is homogeneous with respect to the standard grading and `false` otherwise.
 """
 function ishomogeneous(x::MPoly{T}) where {T <: RingElement}
    last_deg = 0
@@ -804,7 +823,8 @@ end
 
 @doc Markdown.doc"""
     coeff(x::MPoly, i::Int)
-> Return the coefficient of the $i$-th term of the polynomial.
+
+Return the coefficient of the $i$-th term of the polynomial.
 """
 function coeff(x::MPoly, i::Int)
    return x.coeffs[i]
@@ -812,8 +832,9 @@ end
 
 @doc Markdown.doc"""
     coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Return the coefficient of the monomial $m$ of the polynomial $f$. If there
-> is no such monomial, zero is returned.
+
+Return the coefficient of the monomial $m$ of the polynomial $f$. If there
+is no such monomial, zero is returned.
 """
 function coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
     !ismonomial(m) && error("Not a monomial in coeff")
@@ -829,7 +850,8 @@ end
 
 @doc Markdown.doc"""
     lc(p::MPolyElem)
-> Return the leading coefficient of the polynomial p.
+
+Return the leading coefficient of the polynomial p.
 """
 function lc(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
@@ -841,8 +863,9 @@ end
 
 @doc Markdown.doc"""
     monomial(x::MPoly, i::Int)
-> Return the monomial of the $i$-th term of the polynomial (as a polynomial
-> of length $1$ with coefficient $1$.
+
+Return the monomial of the $i$-th term of the polynomial (as a polynomial
+of length $1$ with coefficient $1$.
 """
 function monomial(x::MPoly, i::Int)
    R = base_ring(x)
@@ -854,7 +877,8 @@ end
 
 @doc Markdown.doc"""
     lm(p::MPolyElem)
-> Return the leading monomial of the polynomial p.
+
+Return the leading monomial of the polynomial p.
 """
 function lm(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
@@ -866,7 +890,8 @@ end
 
 @doc Markdown.doc"""
     lt(p::MPolyElem)
-> Return the leading term of the polynomial p.
+
+Return the leading term of the polynomial p.
 """
 function lt(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
@@ -878,8 +903,9 @@ end
 
 @doc Markdown.doc"""
     monomial!(m::Mpoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
-> Set $m$ to the monomial of the $i$-th term of the polynomial (as a
-> polynomial of length $1$ with coefficient $1$.
+
+Set $m$ to the monomial of the $i$-th term of the polynomial (as a
+polynomial of length $1$ with coefficient $1$.
 """
 function monomial!(m::MPoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
    N = size(x.exps, 1)
@@ -892,7 +918,8 @@ end
 
 @doc Markdown.doc"""
     term(x::MPoly, i::Int)
-> Return the $i$-th nonzero term of the polynomial $x$ (as a polynomial).
+
+Return the $i$-th nonzero term of the polynomial $x$ (as a polynomial).
 """
 function term(x::MPoly, i::Int)
    R = base_ring(x)
@@ -904,13 +931,14 @@ end
 
 @doc Markdown.doc"""
     max_fields(f::MPoly{T}) where {T <: RingElement}
-> Return a tuple `(degs, biggest)` consisting of an array `degs` of the maximum
-> exponent for each field in the exponent vectors of `f` and an integer which
-> is the largest of the entries in `degs`. The array `degs` will have `n + 1`
-> entries in the case of a degree ordering, or `n` otherwise, where `n` is the
-> number of variables of the polynomial ring `f` belongs to. The fields are
-> returned in the order they exist in the internal representation (which is not
-> intended to be specified, and not needed for current applications).
+
+Return a tuple `(degs, biggest)` consisting of an array `degs` of the maximum
+exponent for each field in the exponent vectors of `f` and an integer which
+is the largest of the entries in `degs`. The array `degs` will have `n + 1`
+entries in the case of a degree ordering, or `n` otherwise, where `n` is the
+number of variables of the polynomial ring `f` belongs to. The fields are
+returned in the order they exist in the internal representation (which is not
+intended to be specified, and not needed for current applications).
 """
 function max_fields(f::MPoly{T}) where {T <: RingElement}
    A = f.exps
@@ -981,7 +1009,8 @@ end
 
 @doc Markdown.doc"""
     degree(f::AbstractAlgebra.MPolyElem{T}, i::Int) where T <: RingElement
-> Return the degree of the polynomial $f$ in terms of the i-th variable.
+
+Return the degree of the polynomial $f$ in terms of the i-th variable.
 """
 function degree(f::AbstractAlgebra.MPolyElem{T}, i::Int) where T <: RingElement
    biggest = -1
@@ -1002,7 +1031,8 @@ end
 
 @doc Markdown.doc"""
     degree(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Return the degree of the polynomial $f$ in terms of the variable $x$.
+
+Return the degree of the polynomial $f$ in terms of the variable $x$.
 """
 function degree(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return degree(f, var_index(x))
@@ -1010,7 +1040,8 @@ end
 
 @doc Markdown.doc"""
     degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Return an array of the degrees of the polynomial $f$ in terms of each variable.
+
+Return an array of the degrees of the polynomial $f$ in terms of each variable.
 """
 function degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    R = parent(f)
@@ -1031,7 +1062,8 @@ end
 
 @doc Markdown.doc"""
     total_degree(f::MPoly{T}) where {T <: RingElement}
-> Return the total degree of `f`.
+
+Return the total degree of `f`.
 """
 function total_degree(f::MPoly{T}) where {T <: RingElement}
    A = f.exps
@@ -1062,7 +1094,8 @@ end
 
 @doc Markdown.doc"""
     length(x::MPoly)
-> Return the number of terms of the polynomial.
+
+Return the number of terms of the polynomial.
 """
 length(x::MPoly) = x.length
 
@@ -1090,8 +1123,9 @@ isconstant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps
 
 @doc Markdown.doc"""
     isconstant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Return `true` if `x` is a degree zero polynomial or the zero polynomial, i.e.
-> a constant polynomial.
+
+Return `true` if `x` is a degree zero polynomial or the zero polynomial, i.e.
+a constant polynomial.
 """
 function isconstant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
     return length(x) == 0 || (length(x) == 1 &&
@@ -1100,13 +1134,15 @@ end
 
 @doc Markdown.doc"""
     isterm(x::MPoly)
-> Return `true` if the given polynomial has precisely one term.
+
+Return `true` if the given polynomial has precisely one term.
 """
 isterm(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement = length(x) == 1
 
 @doc Markdown.doc"""
     ismonomial(x::AbstractAlgebra.MPolyElem)
-> Return `true` if the given polynomial has precisely one term whose coefficient is one.
+
+Return `true` if the given polynomial has precisely one term whose coefficient is one.
 """
 function ismonomial(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return length(x) == 1 && isone(first(coeffs(x)))
@@ -1217,8 +1253,9 @@ end
 
 @doc Markdown.doc"""
     coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Return an iterator for the coefficients of the given polynomial. To retrieve
-> an array of the coefficients, use `collect(coeffs(a))`.
+
+Return an iterator for the coefficients of the given polynomial. To retrieve
+an array of the coefficients, use `collect(coeffs(a))`.
 """
 function coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return MPolyCoeffs(a)
@@ -1226,9 +1263,10 @@ end
 
 @doc Markdown.doc"""
     exponent_vectors(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Return an iterator for the exponent vectors of the given polynomial. To
-> retrieve an array of the exponent vectors, use
-> `collect(exponent_vectors(a))`.
+
+Return an iterator for the exponent vectors of the given polynomial. To
+retrieve an array of the exponent vectors, use
+`collect(exponent_vectors(a))`.
 """
 function exponent_vectors(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return MPolyExponentVectors(a)
@@ -1236,8 +1274,9 @@ end
 
 @doc Markdown.doc"""
     monomials(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Return an iterator for the monomials of the given polynomial. To retrieve
-> an array of the monomials, use `collect(monomials(a))`.
+
+Return an iterator for the monomials of the given polynomial. To retrieve
+an array of the monomials, use `collect(monomials(a))`.
 """
 function monomials(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return MPolyMonomials(a)
@@ -1245,8 +1284,9 @@ end
 
 @doc Markdown.doc"""
     terms(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Return an iterator for the terms of the given polynomial. To retrieve
-> an array of the terms, use `collect(terms(a))`.
+
+Return an iterator for the terms of the given polynomial. To retrieve
+an array of the terms, use `collect(terms(a))`.
 """
 function terms(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return MPolyTerms(a)
@@ -2062,7 +2102,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
    m = length(a)
    if m == 0
       return true, par()
-   end 
+   end
    # ordering mask
    drmask = monomial_drmask(par, bits)
    # mask for checking for overflows in halves!
@@ -2405,8 +2445,9 @@ end
 
 @doc Markdown.doc"""
     isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-> Return `true` if the monomial $a$ is less than the monomial $b$ with respect
-> to the monomial ordering of the parent ring.
+
+Return `true` if the monomial $a$ is less than the monomial $b$ with respect
+to the monomial ordering of the parent ring.
 """
 function Base.isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    check_parent(a, b)
@@ -2730,12 +2771,13 @@ end
 
 @doc Markdown.doc"""
     deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Compute deflation parameters for the exponents of the polynomial $f$. This
-> is a pair of arrays of integers, the first array of which (the shift) gives
-> the minimum exponent for each variable of the polynomial, and the second of
-> which (the deflation) gives the gcds of all the exponents after subtracting
-> the shift, again per variable. This functionality is used by gcd (and can be
-> used by factorisation algorithms).
+
+Compute deflation parameters for the exponents of the polynomial $f$. This
+is a pair of arrays of integers, the first array of which (the shift) gives
+the minimum exponent for each variable of the polynomial, and the second of
+which (the deflation) gives the gcds of all the exponents after subtracting
+the shift, again per variable. This functionality is used by gcd (and can be
+used by factorisation algorithms).
 """
 function deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    N = nvars(parent(f))
@@ -2760,12 +2802,13 @@ end
 
 @doc Markdown.doc"""
     deflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement
-> Return a polynomial with the same coefficients as $f$ but whose exponents
-> have been shifted down by the given shifts (supplied as an array of shifts,
-> one for each variable, then deflated (divided) by the given exponents
-> (again supplied as an array of deflation factors, one for each variable).
-> The algorithm automatically replaces a deflation of $0$ by $1$, to avoid
-> division by $0$.
+
+Return a polynomial with the same coefficients as $f$ but whose exponents
+have been shifted down by the given shifts (supplied as an array of shifts,
+one for each variable, then deflated (divided) by the given exponents
+(again supplied as an array of deflation factors, one for each variable).
+The algorithm automatically replaces a deflation of $0$ by $1$, to avoid
+division by $0$.
 """
 function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    S = parent(f)
@@ -2817,11 +2860,12 @@ end
 
 @doc Markdown.doc"""
     inflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement
-> Return a polynomial with the same coefficients as $f$ but whose exponents
-> have been inflated (multiplied) by the given deflation exponents (supplied
-> as an array of inflation factors, one for each variable) and then shifted
-> by the given shifts (again supplied as an array of shifts, one for each
-> variable).
+
+Return a polynomial with the same coefficients as $f$ but whose exponents
+have been inflated (multiplied) by the given deflation exponents (supplied
+as an array of inflation factors, one for each variable) and then shifted
+by the given shifts (again supplied as an array of shifts, one for each
+variable).
 """
 function inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    S = parent(f)
@@ -3673,8 +3717,9 @@ end
 
 @doc Markdown.doc"""
     divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
-> Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
-> each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i] + r`.
+
+Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
+each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i] + r`.
 """
 function Base.divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    v1, d = max_fields(a)
@@ -3748,11 +3793,12 @@ end
 
 @doc Markdown.doc"""
     remove(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
-> Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
-> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as the second return.
-> value.
->
-> See also `valuation`, which only returns the valuation.
+
+Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
+$p^k$ divides $z$. Additionally, $z/p^k$ is returned as the second return.
+value.
+
+See also `valuation`, which only returns the valuation.
 """
 function remove(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
    check_parent(z, p)
@@ -3773,10 +3819,11 @@ end
 
 @doc Markdown.doc"""
     valuation(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
-> Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
-> $p^k$ divides $z$.
->
-> See also `remove`, which also returns $z/p^k$.
+
+Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
+$p^k$ divides $z$.
+
+See also `remove`, which also returns $z/p^k$.
 """
 function valuation(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
   v, _ = remove(z, p)
@@ -3791,8 +3838,9 @@ end
 
 @doc Markdown.doc"""
     evaluate(a::MPoly{T}, A::Vector{T}) where {T <: RingElement}
-> Evaluate the polynomial by substituting in the array of values for each of
-> the variables.
+
+Evaluate the polynomial by substituting in the array of values for each of
+the variables.
 """
 function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
    if iszero(a)
@@ -3827,9 +3875,10 @@ end
 
 @doc Markdown.doc"""
     evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-> Evaluate the polynomial by substituting in the array of values for each of
-> the variables. The evaluation will succeed if multiplication is defined between elements
-> of the coefficient ring of $a$ and elements of the supplied vector.
+
+Evaluate the polynomial by substituting in the array of values for each of
+the variables. The evaluation will succeed if multiplication is defined between elements
+of the coefficient ring of $a$ and elements of the supplied vector.
 """
 function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    length(vals) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
@@ -3887,10 +3936,11 @@ end
 
 @doc Markdown.doc"""
     evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-> Evaluate the polynomial by substituting in the supplied values in the array `vals` for
-> the corresponding variables with indices given by the array `vars`. The evaluation will
-> succeed if multiplication is defined between elements of the coefficient ring of $a$ and
-> elements of `vals`.
+
+Evaluate the polynomial by substituting in the supplied values in the array `vals` for
+the corresponding variables with indices given by the array `vars`. The evaluation will
+succeed if multiplication is defined between elements of the coefficient ring of $a$ and
+elements of `vals`.
 """
 function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    unique(vars) != vars && error("Variables not unique")
@@ -4013,10 +4063,11 @@ end
 
 @doc Markdown.doc"""
     evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
-> Evaluate the polynomial by substituting in the supplied values in the array `vals` for
-> the corresponding variables (supplied as polynomials) given by the array `vars`. The
-> evaluation will succeed if multiplication is defined between elements of the coefficient
-> ring of $a$ and elements of `vals`.
+
+Evaluate the polynomial by substituting in the supplied values in the array `vals` for
+the corresponding variables (supplied as polynomials) given by the array `vars`. The
+evaluation will succeed if multiplication is defined between elements of the coefficient
+ring of $a$ and elements of `vals`.
 """
 function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
    varidx = Int[var_index(x) for x in vars]
@@ -4035,13 +4086,14 @@ end
 
 @doc Markdown.doc"""
     (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
-> Evaluate the polynomial at the supplied values, which may be any ring elements,
-> commutative or non-commutative. Evaluation always proceeds in the order of the
-> variables as supplied when creating the polynomial ring to which $a$ belongs. The
-> evaluation will succeed if a product of a coefficient of the polynomial by all
-> of the supplied values in order is defined. Note that this evaluation is more
-> general than those provided by the evaluate function. The values do not need to
-> be in the same ring, just in compatible rings.
+
+Evaluate the polynomial at the supplied values, which may be any ring elements,
+commutative or non-commutative. Evaluation always proceeds in the order of the
+variables as supplied when creating the polynomial ring to which $a$ belongs. The
+evaluation will succeed if a product of a coefficient of the polynomial by all
+of the supplied values in order is defined. Note that this evaluation is more
+general than those provided by the evaluate function. The values do not need to
+be in the same ring, just in compatible rings.
 """
 function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
@@ -4085,11 +4137,12 @@ end
 
 @doc Markdown.doc"""
     evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
-> Evaluate the polynomial at the supplied values, which may be any ring elements,
-> commutative or non-commutative, but in the same ring. Evaluation always proceeds
-> in the order of the variables as supplied when creating the polynomial ring to
-> which $a$ belongs. The evaluation will succeed if a product of a coefficient of
-> the polynomial by one of the values is defined.
+
+Evaluate the polynomial at the supplied values, which may be any ring elements,
+commutative or non-commutative, but in the same ring. Evaluation always proceeds
+in the order of the variables as supplied when creating the polynomial ring to
+which $a$ belongs. The evaluation will succeed if a product of a coefficient of
+the polynomial by one of the values is defined.
 """
 function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
    return a(vals...)
@@ -4103,7 +4156,8 @@ end
 
 @doc Markdown.doc"""
     gcd(a::AbstractAlgebra.Generic.MPoly{T}, a::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
-> Return the greatest common divisor of a and b in parent(a).
+
+Return the greatest common divisor of a and b in parent(a).
 """
 function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    if iszero(a)
@@ -4212,7 +4266,8 @@ end
 
 @doc Markdown.doc"""
     lcm(a::AbstractAlgebra.MPolyElem{T}, a::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
-> Return the least common multiple of a and b in parent(a).
+
+Return the least common multiple of a and b in parent(a).
 """
 function lcm(a::MPolyElem{T}, b::MPolyElem{T}) where {T <: RingElement}
    if iszero(a) && iszero(b)
@@ -4291,8 +4346,9 @@ end
 
 @doc Markdown.doc"""
     derivative(f::AbstractAlgebra.MPolyElem{T}, x::Int) where {T <: RingElement}
-> Return the partial derivative of `f` with respect to $j$-th variable
-> of the polynomial ring.
+
+Return the partial derivative of `f` with respect to $j$-th variable
+of the polynomial ring.
 """
 function derivative(f::AbstractAlgebra.MPolyElem{T}, j::Int) where T <: RingElement
    R = parent(f)
@@ -4311,8 +4367,9 @@ end
 
 @doc Markdown.doc"""
     derivative(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Return the partial derivative of `f` with respect to `x`. The value `x` must
-> be a generator of the polynomial ring of `f`.
+
+Return the partial derivative of `f` with respect to `x`. The value `x` must
+be a generator of the polynomial ring of `f`.
 """
 function derivative(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return derivative(f, var_index(x))
@@ -4326,10 +4383,11 @@ end
 
 @doc Markdown.doc"""
     to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
-> Assuming the polynomial $p$ is actually a univariate polynomial, convert the
-> polynomial to a univariate polynomial in the given univariate polynomial ring
-> $R$. An exception is raised if the polynomial $p$ involves more than one
-> variable.
+
+Assuming the polynomial $p$ is actually a univariate polynomial, convert the
+polynomial to a univariate polynomial in the given univariate polynomial ring
+$R$. An exception is raised if the polynomial $p$ involves more than one
+variable.
 """
 function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
    vars_p = vars(p)
@@ -4347,7 +4405,8 @@ end
 
 @doc Markdown.doc"""
     involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
-> Return true if $p$ contains at most 1 variable and false otherwise.
+
+Return true if $p$ contains at most 1 variable and false otherwise.
 """
 function involves_at_most_one_variable(p::AbstractAlgebra.MPolyElem)
    return length(vars(p)) <= 1
@@ -4355,7 +4414,8 @@ end
 
 @doc Markdown.doc"""
     coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly)
-> Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
+
+Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
 """
 function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univariate::Bool=true)
    if check_univariate
@@ -4624,12 +4684,12 @@ end
 @doc Markdown.doc"""
     change_base_ring(R::Ring, p::MPolyElem{<: RingElement}; parent::MPolyRing, cached::Bool)
 
-> Return the polynomial obtained by coercing the non-zero coefficients of `p`
-> into `R`.
->
-> If the optional `parent` keyword is provided, the polynomial will be an
-> element of `parent`. The caching of the parent object can be controlled
-> via the `cached` keyword argument.
+Return the polynomial obtained by coercing the non-zero coefficients of `p`
+into `R`.
+
+If the optional `parent` keyword is provided, the polynomial will be an
+element of `parent`. The caching of the parent object can be controlled
+via the `cached` keyword argument.
 """
 function change_base_ring(R::Ring, p::MPolyElem{T}; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
    base_ring(parent) != R && error("Base rings do not match.")
@@ -4638,18 +4698,18 @@ end
 
 ################################################################################
 #
-#  Map                                                                      
+#  Map
 #
 ################################################################################
 
 @doc Markdown.doc"""
     map_coeffs(f, p::MPolyElem{<: RingElement}; parent::MPolyRing)
 
-> Transform the polynomial `p` by applying `f` on each non-zero coefficient.
->
-> If the optional `parent` keyword is provided, the polynomial will be an
-> element of `parent`. The caching of the parent object can be controlled
-> via the `cached` keyword argument.
+Transform the polynomial `p` by applying `f` on each non-zero coefficient.
+
+If the optional `parent` keyword is provided, the polynomial will be an
+element of `parent`. The caching of the parent object can be controlled
+via the `cached` keyword argument.
 """
 function map_coeffs(f, p::MPolyElem; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
    return _map(f, p, parent)
@@ -4700,7 +4760,7 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
    f = S()
    g = gens(S)
    R = base_ring(S)
-   for i = 1:rand(term_range)
+   for i = 1:rand(rng, term_range)
       term = S(1)
       for j = 1:length(g)
          term *= g[j]^rand(rng, exp_bound)
@@ -4815,7 +4875,8 @@ end
 
 @doc Markdown.doc"""
     setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
-> Set the coefficient of the i-th term of the polynomial to $c$.
+
+Set the coefficient of the i-th term of the polynomial to $c$.
 """
 setcoeff!(a::MPoly{<: RingElement}, i::Int, c::RingElement)
 
@@ -4834,7 +4895,8 @@ end
 
 @doc Markdown.doc"""
     setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
-> Set the coefficient of the i-th term of the polynomial to the integer $c$.
+
+Set the coefficient of the i-th term of the polynomial to the integer $c$.
 """
 function setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
     return setcoeff!(a, i, base_ring(a)(c))
@@ -4842,8 +4904,9 @@ end
 
 @doc Markdown.doc"""
     combine_like_terms!(a::MPoly{T}) where T <: RingElement
-> Remove zero terms and combine adjacent terms if they have the same
-> exponent vector. The modified polynomial is returned.
+
+Remove zero terms and combine adjacent terms if they have the same
+exponent vector. The modified polynomial is returned.
 """
 function combine_like_terms!(a::MPoly{T}) where T <: RingElement
    A = a.exps
@@ -4984,14 +5047,15 @@ end
 
 @doc Markdown.doc"""
     PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
-> Given a base ring `R` and an array of strings `s` specifying how the
-> generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
-> representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
-> $x1, x2, ...$ of the polynomial ring. By default the parent object `T` will
-> depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional
-> argument `cached` to `false` will prevent the parent object `T` from being
-> cached. `S` is a symbol corresponding to the ordering of the polynomial and
-> can be one of `:lex`, `:deglex` or `:degrevlex`.
+
+Given a base ring `R` and an array of strings `s` specifying how the
+generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
+representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
+$x1, x2, ...$ of the polynomial ring. By default the parent object `T` will
+depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional
+argument `cached` to `false` will prevent the parent object `T` from being
+cached. `S` is a symbol corresponding to the ordering of the polynomial and
+can be one of `:lex`, `:deglex` or `:degrevlex`.
 """
 function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    U = [Symbol(x) for x in s]

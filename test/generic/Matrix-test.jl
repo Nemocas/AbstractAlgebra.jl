@@ -23,121 +23,6 @@ function randprime(n::Int)
    return primes100[rand(1:n)]
 end
 
-function istriu(A::Generic.Mat)
-   m = nrows(A)
-   n = ncols(A)
-   d = 0
-   for c = 1:n
-      for r = m:-1:1
-         if !iszero(A[r,c])
-            if r < d
-               return false
-            end
-            d = r
-            break
-         end
-      end
-   end
-   return true
-end
-
-function is_snf(A::Generic.Mat)
-   m = nrows(A)
-   n = ncols(A)
-   a = A[1,1]
-   for i = 2:min(m,n)
-      q, r = divrem(A[i,i], a)
-      if !iszero(r)
-         return false
-      end
-      a = A[i,i]
-   end
-   for i = 1:n
-      for j = 1:m
-         if i == j
-            continue
-         end
-         if !iszero(A[j,i])
-            return false
-         end
-      end
-   end
-   return true
-end
-
-function is_weak_popov(P::Generic.Mat{T}, rank::Int) where { T <: Generic.Poly }
-   zero_rows = 0
-   pivots = zeros(ncols(P))
-   for r = 1:nrows(P)
-      p = AbstractAlgebra.find_pivot_popov(P, r)
-      if P[r,p] == 0
-         zero_rows += 1
-         continue
-      end
-      # There is already a pivot in this column
-      if pivots[p] != 0
-         return false
-      end
-      pivots[p] = r
-   end
-   if zero_rows != nrows(P)-rank
-      return false
-   end
-   return true
-end
-
-function is_popov(P::Generic.Mat{T}, rank::Int) where { T <: Generic.Poly }
-   zero_rows = 0
-   for r = 1:nrows(P)
-      p = AbstractAlgebra.find_pivot_popov(P, r)
-      if P[r, p] != 0
-         break
-      end
-      zero_rows += 1
-   end
-   # The zero rows must all be on top.
-   if zero_rows != nrows(P) - rank
-      return false
-   end
-   pivotscr = zeros(Int, ncols(P)) # pivotscr[i] == j means the pivot of column i is in row j
-   pivots = zeros(Int, nrows(P)) # the other way round
-   for r = zero_rows + 1:nrows(P)
-      p = AbstractAlgebra.find_pivot_popov(P, r)
-      if P[r, p] == 0
-         return false
-      end
-      if pivotscr[p] != 0
-         # There is already a pivot in this column
-         return false
-      end
-      pivotscr[p] = r
-      pivots[r] = p
-   end
-   for r = zero_rows + 1:nrows(P)
-      p = pivots[r]
-      f = P[r, p]
-      if !isone(lead(f))
-         return false
-      end
-      for i = 1:nrows(P)
-         i == r ? continue : nothing
-         if degree(P[i, p]) >= degree(f)
-            return false
-         end
-      end
-      if r == nrows(P)
-         break
-      end
-      g = P[r + 1, pivots[r + 1]]
-      if degree(f) >= degree(g)
-         if pivots[r] >= pivots[r + 1]
-            return false
-         end
-      end
-   end
-   return true
-end
-
 # Simulate user matrix type belonging to AbstractArray
 # with getindex but no setindex!
 struct MyTestMatrix{T} <: AbstractArray{T, 2}
@@ -177,9 +62,27 @@ AbstractAlgebra.mul!(x::F2Elem, y::F2Elem, z::F2Elem) = y * z
 AbstractAlgebra.addeq!(x::F2Elem, y::F2Elem) = x + y
 AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 
+Random.rand(rng::AbstractRNG, sp::Random.SamplerTrivial{F2}) = F2Elem(rand(rng, Bool))
+Random.gentype(::Type{F2}) = F2Elem
+
+struct F2MatSpace <: AbstractAlgebra.MatSpace{F2Elem}
+   nrows::Int
+   ncols::Int
+end
+
+(S::F2MatSpace)() = zero_matrix(F2(), S.nrows, S.ncols)
+
 struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
    m::Generic.MatSpaceElem{F2Elem}
 end
+
+AbstractAlgebra.elem_type(::Type{F2MatSpace}) = F2Matrix
+AbstractAlgebra.parent_type(::Type{F2Matrix}) = F2MatSpace
+
+AbstractAlgebra.base_ring(::F2MatSpace) = F2()
+AbstractAlgebra.dense_matrix_type(::Type{F2}) = F2Matrix
+AbstractAlgebra.parent(a::F2Matrix) = F2MatSpace(nrows(a), ncols(a))
+AbstractAlgebra.MatrixSpace(::F2, r::Int, c::Int) = F2MatSpace(r, c)
 
 AbstractAlgebra.nrows(a::F2Matrix) = nrows(a.m)
 AbstractAlgebra.ncols(a::F2Matrix) = ncols(a.m)
@@ -1183,6 +1086,38 @@ end
 end
 
 @testset "Generic.Mat.lu..." begin
+   # Exact field
+   R = GF(7)
+
+   for iters = 1:50
+      m = rand(0:100)
+      n = rand(0:100)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      A = randmat_with_rank(S, rank)
+
+      r, P, L, U = lu(A)
+      @test P*A == L*U
+      @test r == rank
+   end
+
+   # Fraction field
+   R = QQ
+
+   for iters = 1:20
+      m = rand(0:30)
+      n = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      A = randmat_with_rank(S, rank, -10:10)
+
+      r, P, L, U = lu(A)
+      @test P*A == L*U
+      @test r == rank
+   end
+
+   # Extra tests
+
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 3, 3)
@@ -1220,6 +1155,42 @@ end
 end
 
 @testset "Generic.Mat.fflu..." begin
+   # Exact ring
+   R = ZZ
+
+   for iters = 1:50
+      m = rand(0:20)
+      n = rand(0:20)
+
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      A = S()
+      for i = 1:m
+         for j = 1:n
+            A[i, j] = rand(-10:10)
+         end
+      end
+
+      r, d, P, L, U = fflu(A)
+
+      R2 = parent(1//one(R))
+      V = MatrixSpace(R2, m, m)
+      D = V()
+      if m >= 1
+          D[1, 1] = 1//L[1, 1]
+      end
+      if m >= 2
+         for j = 1:m - 1
+            D[j + 1, j + 1] = (1//L[j, j])*(1//L[j + 1, j + 1])
+         end
+      end
+      L2 = change_base_ring(R2, L)
+      U2 = change_base_ring(R2, U)
+      @test change_base_ring(R2, P*A) == L2*D*U2
+   end
+
+ # Other tests
+
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 3, 3)
@@ -1229,9 +1200,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 3
    @test P*A == L*D*U
@@ -1241,9 +1212,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 3
    @test P*A == L*D*U
@@ -1253,9 +1224,9 @@ end
    r, d, P, L, U = fflu(A)
 
    D = S()
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
 
    @test r == 2
    @test P*A == L*D*U
@@ -1265,9 +1236,9 @@ end
    r, d, P, L, U, = fflu(A)
 
    D = zero_matrix(QQ, 3, 3)
-   D[1, 1] = inv(U[1, 1])
-   D[2, 2] = inv(U[1, 1]*U[2, 2])
-   D[3, 3] = inv(U[2, 2])
+   D[1, 1] = inv(L[1, 1])
+   D[2, 2] = inv(L[1, 1]*L[2, 2])
+   D[3, 3] = inv(L[2, 2]*L[3, 3])
    @test r == 3
    @test P*A == L*D*U
 end
@@ -1299,7 +1270,7 @@ end
    for dim = 0:7
       S = MatrixSpace(K, dim, dim)
 
-      M = rand(S, 0:2, -100:100)
+      M = rand(S, -100:100)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
@@ -1381,7 +1352,7 @@ end
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i,-100:100)
 
       @test rank(M) == i
    end
@@ -1405,19 +1376,113 @@ end
    end
 end
 
-@testset "Generic.Mat.solve_lu..." begin
-   S = QQ
+@testset "Generic.Mat.can_solve_with_solution_fflu..." begin
+   R = ZZ
+
+   # Test random soluble systems
+   for i = 1:100
+      m = rand(0:30)
+      n = rand(0:30)
+      k = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank, -20:20)
+      if n > 0 && rand(0:1) == 0
+         col = rand(1:n)
+         for i = 1:m
+            A[i, col] = 0
+         end
+      end
+      X2 = rand(U, -20:20)
+      B = A*X2
+      d2 = R()
+      while iszero(d2)
+         d2 = rand(R, -20:20)
+      end
+      A *= d2
+      flag, X, d = Generic.can_solve_with_solution_fflu(A, B)
+      @test flag && A*X == B*d
+      B = rand(T, -10:10)
+      flag, X, d = Generic.can_solve_with_solution_fflu(A, B)
+      @test (flag && A*X == B*d) || !flag
+   end
+
+   # Test random systems (most will be insoluble)
+   for i = 1:100
+      m = rand(0:30)
+      n = rand(0:30)
+      k = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank, -20:20)
+      B = rand(T, -20:20)
+      flag1, X, d = Generic.can_solve_with_solution_fflu(A, B)
+      A2 = change_base_ring(QQ, A)
+      B2 = change_base_ring(QQ, B)
+      flag2, X2 = can_solve_with_solution(A2, B2)
+      @test flag1 == flag2
+   end
+end
+
+@testset "Generic.Mat.can_solve_with_solution_lu..." begin
+   R = GF(17)
+
+   for i = 1:100
+      m = rand(0:30)
+      n = rand(0:30)
+      k = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank)
+      # randomly zero a column
+      if n > 0 && rand(0:1) == 0
+         col = rand(1:n)
+         for i = 1:m
+            A[i, col] = 0
+         end
+      end
+      X2 = rand(U)
+      B = A*X2
+      flag, X = Generic.can_solve_with_solution_lu(A, B)
+      @test flag && A*X == B
+      B = rand(T)
+      flag, X = Generic.can_solve_with_solution_lu(A, B)
+      @test (flag && A*X == B) || !flag
+   end
+
+   R = QQ
+
+   for i = 1:50
+       m = rand(0:30)
+       n = rand(0:30)
+       k = rand(0:30)
+       rank = rand(0:min(m, n))
+       S = MatrixSpace(R, m, n)
+       T = MatrixSpace(R, m, k)
+       U = MatrixSpace(R, n, k)
+       A = randmat_with_rank(S, rank, -20:20)
+       X2 = rand(U, -20:20)
+       B = A*X2
+       flag, X = Generic.can_solve_with_solution_lu(A, B)
+       @test flag && A*X == B
+    end
 
    for dim = 0:5
-      R = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, rand(1:5))
+      S = MatrixSpace(R, dim, dim)
+      U = MatrixSpace(R, dim, rand(1:5))
 
-      M = randmat_with_rank(R, dim, -100:100)
+      M = randmat_with_rank(S, dim, -100:100)
       b = rand(U, -100:100)
 
-      x = Generic.solve_lu(M, b)
+      flag, x = Generic.can_solve_with_solution_lu(M, b)
 
-      @test M*x == b
+      @test flag && M*x == b
    end
 
    S, y = PolynomialRing(ZZ, "y")
@@ -1433,13 +1498,75 @@ end
       MK = matrix(K, elem_type(K)[ K(M[i, j]) for i in 1:nrows(M), j in 1:ncols(M) ])
       bK = matrix(K, elem_type(K)[ K(b[i, j]) for i in 1:nrows(b), j in 1:ncols(b) ])
 
-      x = Generic.solve_lu(MK, bK)
+      flag, x = Generic.can_solve_with_solution_lu(MK, bK)
 
-      @test MK*x == bK
+      @test flag && MK*x == bK
+   end
+end
+
+@testset "Generic.Mat.solve_ff..." begin
+   # Exact field
+   R = QQ
+
+   for i = 1:50
+      m = rand(0:20)
+      n = rand(0:20)
+      k = rand(0:20)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank, -10:10)
+      X2 = rand(U, -10:10)
+      B = A*X2
+      d = R()
+      while iszero(d)
+         d = rand(R, -10:10)
+      end
+      B = divexact(B, d)
+      @test A*divexact(X2, d) == B
+      X = Generic.solve_ff(A, B)
+      @test A*X == B
+   end
+
+   # Exact ring
+   R = ZZ
+
+   # Test random soluble systems
+   for i = 1:100
+      m = rand(0:30)
+      n = rand(0:30)
+      k = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank, -20:20)
+      X2 = rand(U, -20:20)
+      B = A*X2
+      X, d = Generic.solve_ff(A, B)
+      @test A*X == B*d
    end
 end
 
 @testset "Generic.Mat.solve_rational..." begin
+   R = ZZ
+
+   for i = 1:100
+      m = rand(0:30)
+      n = rand(0:30)
+      k = rand(0:30)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, m, k)
+      U = MatrixSpace(R, n, k)
+      A = randmat_with_rank(S, rank, -20:20)
+      X2 = rand(U, -20:20)
+      B = A*X2
+      X, d = solve_rational(A, B)
+      @test A*X == B*d
+   end
+
    S = ResidueRing(ZZ, 20011*10007)
 
    for dim = 0:5
@@ -1466,13 +1593,21 @@ end
 
    S, z = PolynomialRing(ZZ, "z")
 
-   for dim = 0:5
-      R = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, rand(1:5))
-
-      M = randmat_with_rank(R, dim, 0:3, -20:20)
-      b = rand(U, 0:3, -20:20);
-
+   for iters = 1:100
+      m = rand(0:5)
+      n = rand(0:5)
+      k = rand(0:5)
+      R = MatrixSpace(S, m, n)
+      U = MatrixSpace(S, n, k)
+      rnk = rand(0:min(m, n))
+      M = randmat_with_rank(R, rnk, 0:3, -20:20)
+      x2 = rand(U, 0:3, -20:20)
+      d2 = S()
+      while iszero(d2)
+         d2 = rand(S, 0:3, -20:20)
+      end
+      M *= d2
+      b = M*x2
       x, d = solve_rational(M, b)
 
       @test M*x == d*b
@@ -1485,8 +1620,8 @@ end
       S = MatrixSpace(K, dim, dim)
       U = MatrixSpace(K, dim, rand(1:5))
 
-      M = randmat_with_rank(S, dim, 0:2, -100:100)
-      b = rand(U, 0:2, -100:100)
+      M = randmat_with_rank(S, dim, -100:100)
+      b = rand(U, -100:100)
 
       x = solve(M, b)
 
@@ -1496,13 +1631,21 @@ end
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   for dim = 0:5
-      T = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, rand(1:5))
-
-      M = randmat_with_rank(T, dim, 0:2, 0:2, -20:20)
-      b = rand(U, 0:2, 0:2, -20:20)
-
+   for iters = 1:30
+      m = rand(0:5)
+      n = rand(0:5)
+      k = rand(0:5)
+      R = MatrixSpace(S, m, n)
+      U = MatrixSpace(S, n, k)
+      rnk = rand(0:min(m, n))
+      M = randmat_with_rank(R, rnk, 0:2, 0:2, -20:20)
+      x2 = rand(U, 0:2, 0:2, -20:20)
+      d2 = zero(S)
+      while iszero(d2)
+         d2 = rand(S, 0:2, 0:2, -20:20)
+      end
+      M *= d2
+      b = M*x2
       x, d = solve_rational(M, b)
 
       @test M*x == d*b
@@ -1610,6 +1753,61 @@ end
 end
 
 @testset "Generic.Mat.can_solve..." begin
+   R, x = PolynomialRing(QQ, "x")
+   S = FractionField(R)
+
+   for iter = 1:8
+      m = rand(0:7)
+
+      T = MatrixSpace(R, m, m)
+      U = MatrixSpace(R, m, m)
+
+      M = rand(T, 0:2, -10:10)
+      X2 = rand(U, 0:2, -10:10)
+      b = M*X2
+
+      flag, X = Generic.can_solve_with_solution(M, b)
+
+      @test flag && M*X == b
+
+      b = X2*M
+
+      flag, X = Generic.can_solve_with_solution(M, b; side=:left)
+
+      @test flag && X*M == b
+   end
+
+   R, x = PolynomialRing(GF(65537), "x")
+   S = FractionField(R)
+
+   for iters = 1:10
+      m = rand(1:15)
+      T = MatrixSpace(R, m, m)
+      U = MatrixSpace(R, m, m)
+
+      M = rand(T, 0:2)
+      X2 = rand(U, 0:2)
+      b = M*X2
+
+      M = change_base_ring(S, M)
+      b = change_base_ring(S, b)
+
+      flag, X = can_solve_with_solution(M, b)
+
+      @test flag && M*X == b
+
+      M = rand(T, 0:2)
+      X2 = rand(U, 0:2)
+      b = X2*M
+
+      M = change_base_ring(S, M)
+      b = change_base_ring(S, b)
+
+      flag, X = can_solve_with_solution(M, b; side=:left)
+
+      @test flag && X*M == b
+   end
+
    for R in [ZZ, QQ]
       for iter = 1:40
          for dim = 0:5
@@ -1735,6 +1933,40 @@ end
    @test_throws TypeError can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = "right")
 end
 
+@testset "Generic.Mat.can_solve_with_solution_interpolation..." begin
+   R1 = ResidueRing(ZZ, 65537)
+   R, x = PolynomialRing(R1, "x")
+   RZ, x = PolynomialRing(ZZ, "x")
+
+   for iters = 1:50
+      m = rand(0:10)
+      n = rand(0:10)
+      k = rand(0:10)
+      rnk = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      T = MatrixSpace(R, n, k)
+      U = MatrixSpace(R, m, k)
+
+      S1 = MatrixSpace(RZ, m, n)
+      MZ = randmat_with_rank(S1, rnk, 0:2, -20:20)
+
+      M = matrix(R, m, n, [change_base_ring(R1, MZ[i, j]) for i in 1:m for j in 1:n])
+      K = FractionField(R)
+      MK = change_base_ring(K, M)
+      X2 = rand(T, 0:2, 0:65536)
+      B = M*X2
+      d2 = R()
+      while iszero(d2)
+         d2 = rand(R, 0:2, 0:65536);
+      end
+      M = M*d2
+
+      flag, X, d = Generic.can_solve_with_solution_interpolation(M, B)
+
+      @test flag && M*X == B*d
+   end
+end
+
 @testset "Generic.Mat.solve_triu..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
@@ -1743,8 +1975,8 @@ end
       S = MatrixSpace(K, dim, dim)
       U = MatrixSpace(K, dim, rand(1:5))
 
-      M = randmat_triu(S, 0:2, -100:100)
-      b = rand(U, 0:2, -100:100)
+      M = randmat_triu(S, -100:100)
+      b = rand(U, -100:100)
 
       x = solve_triu(M, b, false)
 
@@ -1771,6 +2003,8 @@ end
 end
 
 @testset "Generic.Mat.rref..." begin
+   # Non-integral domain
+
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixSpace(S, 5, 5)
 
@@ -1783,7 +2017,7 @@ end
       A = M
 
       try
-          r, d, A = rref(M)
+          r, A, d = rref_rational(M)
           do_test = true
       catch e
          if !(e isa ErrorException)
@@ -1797,30 +2031,70 @@ end
       end
    end
 
+   # Exact ring
+
+   R = ZZ
+
+   for iters = 1:50
+      m = rand(0:50)
+      n = rand(0:50)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      M = randmat_with_rank(S, rank, -10:10)
+      r, N, d = rref_rational(M)
+
+      @test r == rank
+      @test isrref(N)
+
+      N2 = change_base_ring(QQ, N)
+      N2 = divexact(N2, d)
+
+      @test isrref(N2)
+   end
+
+
    S, z = PolynomialRing(ZZ, "z")
    R = MatrixSpace(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(R, i, 0:3, -20:20)
 
-      r, d, A = rref(M)
+      r, A, d = rref(M)
 
       @test r == i
       @test isrref(A)
    end
+
+   # Exact field
 
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       r, A = rref(M)
 
       @test r == i
       @test isrref(A)
    end
+
+   R = GF(7)
+
+   for iters = 1:50
+      m = rand(0:50)
+      n = rand(0:50)
+      rank = rand(0:min(m, n))
+      S = MatrixSpace(R, m, n)
+      M = randmat_with_rank(S, rank)
+      r, N = rref(M)
+
+      @test r == rank
+      @test isrref(N)
+   end
+
+   # Multiple level exact ring
 
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -1829,7 +2103,7 @@ end
    for i = 0:5
       M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
 
-      r, d, A = rref(M)
+      r, A, d = rref_rational(M)
 
       @test r == i
       @test isrref(A)
@@ -1967,7 +2241,7 @@ end
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       n, N = nullspace(M)
 
@@ -2015,7 +2289,7 @@ end
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i, 0:2, -100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       n, N = kernel(M)
 
@@ -2117,7 +2391,7 @@ end
    for dim = 1:5
       S = MatrixSpace(K, dim, dim)
 
-      M = randmat_with_rank(S, dim, 0:2, -100:100)
+      M = randmat_with_rank(S, dim, -100:100)
 
       X, d = pseudo_inv(M)
 
@@ -2740,10 +3014,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    T = AbstractAlgebra.snf_kb(A)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(A)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*A*K == T
@@ -2760,10 +3034,10 @@ end
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    T = AbstractAlgebra.snf_kb(B)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(B)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
@@ -2800,10 +3074,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    T = snf(A)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = snf_with_transform(A)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*A*K == T
@@ -2820,10 +3094,10 @@ end
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    T = snf(B)
-   @test is_snf(T)
+   @test issnf(T)
 
    T, U, K = snf_with_transform(B)
-   @test is_snf(T)
+   @test issnf(T)
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
@@ -2836,10 +3110,10 @@ end
    r = 2 # == rank(A)
 
    P = weak_popov(A)
-   @test is_weak_popov(P, r)
+   @test isweak_popov(P, r)
 
    P, U = weak_popov_with_transform(A)
-   @test is_weak_popov(P, r)
+   @test isweak_popov(P, r)
    @test U*A == P
    @test isunit(det(U))
 
@@ -2851,10 +3125,10 @@ end
    s = 2 # == rank(B)
 
    P = weak_popov(B)
-   @test is_weak_popov(P, s)
+   @test isweak_popov(P, s)
 
    P, U = weak_popov_with_transform(B)
-   @test is_weak_popov(P, s)
+   @test isweak_popov(P, s)
    @test U*B == P
    @test isunit(det(U))
 
@@ -2865,10 +3139,10 @@ end
       A = rand(M, 0:5, -5:5)
       r = rank(A)
       P = weak_popov(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
 
       P, U = weak_popov_with_transform(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -2881,10 +3155,10 @@ end
       A = rand(M, 1:5)
       r = rank(A)
       P = weak_popov(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
 
       P, U = weak_popov_with_transform(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -2897,10 +3171,10 @@ end
       A = rand(M, 1:5, 0:100)
       r = rank(A)
       P = weak_popov(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
 
       P, U = weak_popov_with_transform(A)
-      @test is_weak_popov(P, r)
+      @test isweak_popov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -2913,20 +3187,20 @@ end
    r = 2 # == rank(A)
 
    P = popov(A)
-   @test is_popov(P, r)
+   @test ispopov(P, r)
 
    P, U = popov_with_transform(A)
-   @test is_popov(P, r)
+   @test ispopov(P, r)
    @test U*A == P
    @test isunit(det(U))
 
    A = matrix(R, 3, 3, [ x^4, 0, 0, x^3, x^4, x^3, x^3, x^5, x^5 ])
    r = 3 # == rank(A)
    P = popov(A)
-   @test is_popov(P, r)
+   @test ispopov(P, r)
 
    P, U = popov_with_transform(A)
-   @test is_popov(P, r)
+   @test ispopov(P, r)
    @test U*A == P
    @test isunit(det(U))
 
@@ -2938,10 +3212,10 @@ end
    s = 2 # == rank(B)
 
    P = popov(B)
-   @test is_popov(P, s)
+   @test ispopov(P, s)
 
    P, U = popov_with_transform(B)
-   @test is_popov(P, s)
+   @test ispopov(P, s)
    @test U*B == P
    @test isunit(det(U))
 
@@ -2952,10 +3226,10 @@ end
       A = rand(M, 0:5, -5:5)
       r = rank(A)
       P = popov(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
 
       P, U = popov_with_transform(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -2968,10 +3242,10 @@ end
       A = rand(M, 1:5)
       r = rank(A)
       P = popov(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
 
       P, U = popov_with_transform(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -2984,10 +3258,10 @@ end
       A = rand(M, 1:5, 0:100)
       r = rank(A)
       P = popov(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
 
       P, U = popov_with_transform(A)
-      @test is_popov(P, r)
+      @test ispopov(P, r)
       @test U*A == P
       @test isunit(det(U))
    end
@@ -3158,16 +3432,17 @@ end
 
 @testset "Generic.Mat.rand" begin
    M = MatrixSpace(ZZ, 2, 3)
-   m = make(M, 1:9)
-   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                rand(M, 1:9), rand(rng, M, 1:9)]
-      @test A isa elem_type(M)
-   end
+   test_rand(M, 1:9)
 
    M = MatrixSpace(GF(7), 3, 2)
-   m = make(M)
-   for A in Any[rand(m), rand(rng, m), rand(m, 3)...,
-                rand(M), rand(rng, M)]
-      @test A isa elem_type(M)
-   end
+   test_rand(M)
+
+   sp = Random.Sampler(MersenneTwister, M)
+   @test parent(rand(sp)) == M
+   v = rand(sp, 3)
+   @test v isa Vector{elem_type(M)}
+   @test all(x -> parent(x) == M, v)
+
+   M = MatrixSpace(F2(), 2, 3)
+   test_rand(M)
 end

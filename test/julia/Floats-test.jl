@@ -34,27 +34,11 @@ end
 
 @testset "Julia.Floats.rand..." begin
    R = RealField
-   f = rand(R, 1:9)
-   @test f isa elem_type(R)
-   f = rand(R, UnitRange(1.0, 9.0))
-   @test f isa elem_type(R)
-   f = rand(R, UnitRange(big(1.0), big(9.0)))
-   @test f isa elem_type(R)
-   f = rand(rng, R, 1:9)
-   @test f isa elem_type(R)
-   f = rand(rng, R, UnitRange(1.0, 9.0))
-   @test f isa elem_type(R)
-   f = rand(rng, R, UnitRange(big(1.0), big(9.0)))
-   @test f isa elem_type(R)
 
-   # make
-   for r in (1:9, UnitRange(1.0, 9.0), UnitRange(big(1.0), big(9.0)))
-      m = make(R, r)
-      @test rand(m) isa elem_type(R)
-      @test 1.0 <= rand(m) <= 9.0
-      @test rand(rng, m) isa elem_type(R)
-      @test rand(m, 2, 3) isa Matrix{elem_type(R)}
-   end
+   test(x) = @test 1.0 <= x <= 9.0
+   test_rand(test, R, 1:9)
+   test_rand(test, R, UnitRange(1.0, 9.0))
+   test_rand(test, R, UnitRange(big(1.0), big(9.0)))
 end
 
 @testset "Julia.Floats.manipulation..." begin

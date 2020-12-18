@@ -24,7 +24,7 @@ base_ring(v::QuotientModuleElem{T}) where T <: RingElement = base_ring(v.parent)
 
 ngens(N::QuotientModule{T}) where T <: RingElement = length(N.gen_cols)
 
-gens(N::QuotientModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
+gens(N::QuotientModule{T}) where T <: RingElement = elem_type(N)[gen(N, i) for i = 1:ngens(N)]
 
 function gen(N::QuotientModule{T}, i::Int) where T <: RingElement
    R = base_ring(N)
@@ -35,13 +35,15 @@ end
 
 @doc Markdown.doc"""
     dim(N::AbstractAlgebra.Generic.QuotientModule{T}) where T <: FieldElement
-> Return the dimension of the given vector quotient space.
+
+Return the dimension of the given vector quotient space.
 """
 dim(N::AbstractAlgebra.Generic.QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
 
 @doc Markdown.doc"""
     supermodule(M::QuotientModule{T}) where T <: RingElement
-> Return the module that this module is a quotient of.
+
+Return the module that this module is a quotient of.
 """
 supermodule(M::QuotientModule{T}) where T <: RingElement = M.m
 
@@ -83,11 +85,11 @@ function show(io::IO, v::QuotientModuleElem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
-      print(IOContext(io, :compact => true), v.v[1, i])
+      print(IOContext(io, :compact => true), _matrix(v)[1, i])
       print(io, ", ")
    end
    if len > 0
-      print(IOContext(io, :compact => true), v.v[1, len])
+      print(IOContext(io, :compact => true), _matrix(v)[1, len])
    end
    print(io, ")")
 end
@@ -222,11 +224,11 @@ function quo(m::AbstractAlgebra.FPModule{T}, subm::Submodule{T}) where T <: Ring
    !issubmodule(m, subm) && error("Not a submodule in QuotientModule constructor")
    R = base_ring(m)
    if subm === m # quotient of submodule by itself
-      srels = [v.v for v in gens(subm)]
+      srels = dense_matrix_type(T)[_matrix(v) for v in gens(subm)]
       combined_rels = compute_combined_rels(m, srels)
       M = QuotientModule{T}(m, combined_rels)
       f = ModuleHomomorphism(m, M,
-          matrix(R, ngens(m), 0, []))
+          matrix(R, ngens(m), 0, T[]))
    else
       G = generators(subm)
       S = subm
@@ -241,12 +243,12 @@ function quo(m::AbstractAlgebra.FPModule{T}, subm::Submodule{T}) where T <: Ring
       nrels = ngens(subm)
       srels = Vector{dense_matrix_type(T)}(undef, nrels)
       for i = 1:nrels
-         srels[i] = G[i].v
+         srels[i] = _matrix(G[i])
       end
       combined_rels = compute_combined_rels(m, srels)
       M = QuotientModule{T}(m, combined_rels)
-      hvecs = [projection(x.v, combined_rels, M) for x in gens(m)]
-      hmat = [hvecs[i][1, j] for i in 1:ngens(m) for j in 1:ngens(M)]
+      hvecs = dense_matrix_type(T)[projection(_matrix(x), combined_rels, M) for x in gens(m)]
+      hmat = T[hvecs[i][1, j] for i in 1:ngens(m) for j in 1:ngens(M)]
       f = ModuleHomomorphism(m, M, matrix(R, ngens(m), ngens(M), hmat))
    end
    M.map = f
@@ -255,15 +257,16 @@ end
 
 @doc Markdown.doc"""
     quo(m::AbstractAlgebra.FPModule{T}, subm::AbstractAlgebra.FPModule{T}) where T <: RingElement
-> Return the quotient `M` of the module `m` by the module `subm` (which must
-> have been (transitively) constructed as a submodule of `m` or be `m` itself)
-> along with the canonical quotient map from `m` to `M`.
+
+Return the quotient `M` of the module `m` by the module `subm` (which must
+have been (transitively) constructed as a submodule of `m` or be `m` itself)
+along with the canonical quotient map from `m` to `M`.
 """
 function quo(m::AbstractAlgebra.FPModule{T}, subm::AbstractAlgebra.FPModule{T}) where T <: RingElement
    # The only case we need to deal with here is where `m == subm`. In all other
    # cases, subm will be of type Submodule.
    m !== subm && error("Not a submodule in QuotientModule constructor")
-   srels = [v.v for v in gens(subm)]
+   srels = dense_matrix_type(T)[_matrix(v) for v in gens(subm)]
    combined_rels = compute_combined_rels(m, srels)
    M = QuotientModule{T}(m, combined_rels)
    f = ModuleHomomorphism(m, M, matrix(R, ngens(m), 0, []))

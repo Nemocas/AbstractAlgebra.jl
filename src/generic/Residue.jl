@@ -18,20 +18,23 @@ elem_type(::Type{ResRing{T}}) where {T <: RingElement} = Res{T}
 
 @doc Markdown.doc"""
     base_ring(S::AbstractAlgebra.ResRing{T}) where {T <: RingElement}
-> Return the base ring $R$ of the given residue ring $S = R/(a)$.
+
+Return the base ring $R$ of the given residue ring $S = R/(a)$.
 """
 base_ring(S::AbstractAlgebra.ResRing{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
 @doc Markdown.doc"""
     base_ring(r::AbstractAlgebra.ResElem)
-> Return the base ring $R$ of the residue ring $R/(a)$ that the supplied
-> element $r$ belongs to.
+
+Return the base ring $R$ of the residue ring $R/(a)$ that the supplied
+element $r$ belongs to.
 """
 base_ring(r::AbstractAlgebra.ResElem) = base_ring(parent(r))
 
 @doc Markdown.doc"""
     parent(a::AbstractAlgebra.ResElem)
-> Return the parent object of the given residue element.
+
+Return the parent object of the given residue element.
 """
 parent(a::AbstractAlgebra.ResElem) = a.parent
 
@@ -69,7 +72,8 @@ end
 
 @doc Markdown.doc"""
     modulus(R::AbstractAlgebra.ResRing)
-> Return the modulus $a$ of the given residue ring $S = R/(a)$.
+
+Return the modulus $a$ of the given residue ring $S = R/(a)$.
 """
 function modulus(S::AbstractAlgebra.ResRing)
    return S.modulus
@@ -77,8 +81,9 @@ end
 
 @doc Markdown.doc"""
     modulus(R::AbstractAlgebra.ResElem)
-> Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
-> residue $r$ belongs to.
+
+Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
+residue $r$ belongs to.
 """
 function modulus(r::AbstractAlgebra.ResElem)
    return modulus(parent(r))
@@ -88,35 +93,40 @@ data(a::AbstractAlgebra.ResElem) = a.data
 
 @doc Markdown.doc"""
     zero(R::AbstractAlgebra.ResRing)
-> Return the zero element of the given residue ring, i.e. $0 \pmod{a}$ where
-> $a$ is the modulus of the residue ring.
+
+Return the zero element of the given residue ring, i.e. $0 \pmod{a}$ where
+$a$ is the modulus of the residue ring.
 """
 zero(R::AbstractAlgebra.ResRing) = R(0)
 
 @doc Markdown.doc"""
     one(R::AbstractAlgebra.ResRing)
-> Return $1 \pmod{a}$ where $a$ is the modulus of the residue ring.
+
+Return $1 \pmod{a}$ where $a$ is the modulus of the residue ring.
 """
 one(R::AbstractAlgebra.ResRing) = R(1)
 
 @doc Markdown.doc"""
     iszero(a::AbstractAlgebra.ResElem)
-> Return `true` if the supplied element $a$ is zero in the residue ring it
-> belongs to, otherwise return `false`.
+
+Return `true` if the supplied element $a$ is zero in the residue ring it
+belongs to, otherwise return `false`.
 """
 iszero(a::AbstractAlgebra.ResElem) = iszero(data(a))
 
 @doc Markdown.doc"""
     isone(a::AbstractAlgebra.ResElem)
-> Return `true` if the supplied element $a$ is one in the residue ring it
-> belongs to, otherwise return `false`.
+
+Return `true` if the supplied element $a$ is one in the residue ring it
+belongs to, otherwise return `false`.
 """
 isone(a::AbstractAlgebra.ResElem) = isone(data(a))
 
 @doc Markdown.doc"""
     isunit(a::AbstractAlgebra.ResElem)
-> Return `true` if the supplied element $a$ is invertible in the residue ring
-> it belongs to, otherwise return `false`.
+
+Return `true` if the supplied element $a$ is invertible in the residue ring
+it belongs to, otherwise return `false`.
 """
 function isunit(a::AbstractAlgebra.ResElem)
    g = gcd(data(a), modulus(a))
@@ -192,7 +202,8 @@ show_minus_one(::Type{Res{T}}) where {T <: RingElement} = true
 
 @doc Markdown.doc"""
     -(a::AbstractAlgebra.ResElem)
-> Return $-a$.
+
+Return $-a$.
 """
 function -(a::AbstractAlgebra.ResElem)
    parent(a)(-data(a))
@@ -206,7 +217,8 @@ end
 
 @doc Markdown.doc"""
     +(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-> Return $a + b$.
+
+Return $a + b$.
 """
 function +(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
@@ -215,7 +227,8 @@ end
 
 @doc Markdown.doc"""
     -(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-> Return $a - b$.
+
+Return $a - b$.
 """
 function -(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
@@ -224,7 +237,8 @@ end
 
 @doc Markdown.doc"""
     *(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-> Return $a\times b$.
+
+Return $a\times b$.
 """
 function *(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
@@ -239,73 +253,85 @@ end
 
 @doc Markdown.doc"""
     *(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
-> Return $a\times b$.
+
+Return $a\times b$.
 """
 *(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
 
 @doc Markdown.doc"""
     *(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem}
-> Return $a\times b$.
+
+Return $a\times b$.
 """
 *(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
 @doc Markdown.doc"""
     *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
-> Return $a\times b$.
+
+Return $a\times b$.
 """
 *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem) = parent(b)(a * data(b))
 
 @doc Markdown.doc"""
     *(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem}
-> Return $a\times b$.
+
+Return $a\times b$.
 """
 *(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
 @doc Markdown.doc"""
     +(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
-> Return $a + b$.
+
+Return $a + b$.
 """
 +(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
 
 @doc Markdown.doc"""
     +(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem}
-> Return $a + b$.
+
+Return $a + b$.
 """
 +(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
 @doc Markdown.doc"""
     +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
-> Return $a + b$.
+
+Return $a + b$.
 """
 +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem) = parent(b)(a + data(b))
 
 @doc Markdown.doc"""
     +(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem}
-> Return $a + b$.
+
+Return $a + b$.
 """
 +(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
 @doc Markdown.doc"""
     -(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
-> Return $a - b$.
+
+Return $a - b$.
 """
 -(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
 
 @doc Markdown.doc"""
     -(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem}
-> Return $a - b$.
+
+Return $a - b$.
 """
 -(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
 @doc Markdown.doc"""
     -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
-> Return $a - b$.
+
+Return $a - b$.
 """
 -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem) = parent(b)(a - data(b))
 
 @doc Markdown.doc"""
     -(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem}
-> Return $a - b$.
+
+Return $a - b$.
 """
 -(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
 
@@ -317,7 +343,8 @@ end
 
 @doc Markdown.doc"""
     ^(a::AbstractAlgebra.ResElem, b::Int)
-> Return $a^b$.
+
+Return $a^b$.
 """
 function ^(a::AbstractAlgebra.ResElem, b::Int)
    parent(a)(powmod(data(a), b, modulus(a)))
@@ -331,9 +358,10 @@ end
 
 @doc Markdown.doc"""
     ==(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-> Return `true` if $a == b$ arithmetically, otherwise return `false`. Recall
-> that power series to different precisions may still be arithmetically
-> equal to the minimum of the two precisions.
+
+Return `true` if $a == b$ arithmetically, otherwise return `false`. Recall
+that power series to different precisions may still be arithmetically
+equal to the minimum of the two precisions.
 """
 function ==(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    fl = check_parent(a, b, false)
@@ -343,10 +371,11 @@ end
 
 @doc Markdown.doc"""
     isequal(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-> Return `true` if $a == b$ exactly, otherwise return `false`. This function is
-> useful in cases where the data of the residues are inexact, e.g. power series
-> Only if the power series are precisely the same, to the same precision, are
-> they declared equal by this function.
+
+Return `true` if $a == b$ exactly, otherwise return `false`. This function is
+useful in cases where the data of the residues are inexact, e.g. power series
+Only if the power series are precisely the same, to the same precision, are
+they declared equal by this function.
 """
 function isequal(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    fl = check_parent(a, b, false)
@@ -362,7 +391,8 @@ end
 
 @doc Markdown.doc"""
     ==(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
-> Return `true` if $a == b$ arithmetically, otherwise return `false`.
+
+Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
    z = base_ring(a)(b)
@@ -371,7 +401,8 @@ end
 
 @doc Markdown.doc"""
     ==(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
-> Return `true` if $a == b$ arithmetically, otherwise return `false`.
+
+Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
    z = base_ring(b)(a)
@@ -380,7 +411,8 @@ end
 
 @doc Markdown.doc"""
     ==(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem}
-> Return `true` if $a == b$ arithmetically, otherwise return `false`.
+
+Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem}
    z = base_ring(a)(b)
@@ -389,7 +421,8 @@ end
 
 @doc Markdown.doc"""
     ==(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem}
-> Return `true` if $a == b$ arithmetically, otherwise return `false`.
+
+Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem}
    z = base_ring(b)(a)
@@ -404,8 +437,9 @@ end
 
 @doc Markdown.doc"""
     Base.inv(a::AbstractAlgebra.ResElem)
-> Return the inverse of the element $a$ in the residue ring. If an impossible
-> inverse is encountered, an exception is raised.
+
+Return the inverse of the element $a$ in the residue ring. If an impossible
+inverse is encountered, an exception is raised.
 """
 function Base.inv(a::AbstractAlgebra.ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
@@ -423,7 +457,8 @@ end
 
 @doc Markdown.doc"""
     divexact(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-> Return $a/b$ where the quotient is expected to be exact.
+
+Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
@@ -463,9 +498,10 @@ end
 
 @doc Markdown.doc"""
     gcd(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-> Return a greatest common divisor of $a$ and $b$ if one exists. This is done
-> by taking the greatest common divisor of the data associated with the
-> supplied residues and taking its greatest common divisor with the modulus.
+
+Return a greatest common divisor of $a$ and $b$ if one exists. This is done
+by taking the greatest common divisor of the data associated with the
+supplied residues and taking its greatest common divisor with the modulus.
 """
 function gcd(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
@@ -582,11 +618,12 @@ end
 
 @doc Markdown.doc"""
     ResidueRing(R::AbstractAlgebra.Ring, a::RingElement; cached::Bool=true){T <: RingElement}
-> Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
-> require $a \neq 0$. If `cached == true` (the default) then the resulting
-> residue ring parent object is cached and returned for any subsequent calls
-> to the constructor with the same base ring $R$ and element $a$. A modulus
-> of zero is not supported and throws an exception.
+
+Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
+require $a \neq 0$. If `cached == true` (the default) then the resulting
+residue ring parent object is cached and returned for any subsequent calls
+to the constructor with the same base ring $R$ and element $a$. A modulus
+of zero is not supported and throws an exception.
 """
 function ResidueRing(R::AbstractAlgebra.Ring, a::RingElement; cached::Bool = true)
    # Modulus of zero cannot be supported. E.g. A C library could not be expected to

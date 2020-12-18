@@ -205,8 +205,12 @@ diagonal_matrix(::RingElement, ::Int, ::Int)
 ```
 
 ```@docs
-one(a::AbstractAlgebra.MatSpace)
-one(a::MatElem)
+one(::AbstractAlgebra.MatSpace)
+one(::MatElem)
+```
+
+```@docs
+istriu(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -506,7 +510,7 @@ julia> r, d, P, L, U = fflu(A)
 ### Reduced row-echelon form
 
 ```@docs
-rref{T <: RingElem}(::MatElem{T})
+rref_rational{T <: RingElem}(::MatElem{T})
 rref{T <: FieldElem}(::MatElem{T})
 ```
 
@@ -549,7 +553,7 @@ julia> M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
 [      x^2 - 2    x - 1      2*x]
 [x^2 + 3*x + 1      2*x        1]
 
-julia> r, d, A = rref(M)
+julia> r, A, d = rref_rational(M)
 (3, -x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7, [-x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7 0 0; 0 -x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7 0; 0 0 -x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7])
 
 julia> isrref(A)
@@ -1026,6 +1030,10 @@ julia> U*A
 ### Smith normal form
 
 ```@docs
+issnf(::MatrixElem{T}) where T <: RingElement
+```
+
+```@docs
 snf{T <: RingElem}(::MatElem{T})
 snf_with_transform{T <: RingElem}(::MatElem{T})
 ```
@@ -1056,6 +1064,11 @@ julia> T*A*U
 
 AbstractAlgebra.jl provides algorithms for computing the (weak) Popov of a matrix with
 entries in a univariate polynomial ring over a field.
+
+```@docs
+isweak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
+isweak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
+```
 
 ```@docs
 weak_popov{T <: PolyElem}(::Generic.Mat{T})

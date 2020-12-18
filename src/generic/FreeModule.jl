@@ -33,13 +33,15 @@ end
 
 @doc Markdown.doc"""
     rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
-> Return the rank of the given free module.
+
+Return the rank of the given free module.
 """
 rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
 
 @doc Markdown.doc"""
     dim(M::FreeModule{T}) where T <: FieldElement
-> Return the dimension of the given vector space.
+
+Return the dimension of the given vector space.
 """
 dim(M::FreeModule{T}) where T <: FieldElement = M.rank
 
@@ -86,11 +88,11 @@ function show(io::IO, a::FreeModuleElem)
    print(io, "(")
    M = parent(a)
    for i = 1:rank(M) - 1
-      print(IOContext(io, :compact => true), a.v[1, i])
+      print(IOContext(io, :compact => true), _matrix(a)[1, i])
       print(io, ", ")
    end
    if rank(M) > 0
-      print(IOContext(io, :compact => true), a.v[1, rank(M)])
+      print(IOContext(io, :compact => true), _matrix(a)[1, rank(M)])
    end
    print(io, ")")
 end
