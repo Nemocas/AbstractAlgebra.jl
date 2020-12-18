@@ -9,6 +9,8 @@ using Markdown
 
 using InteractiveUtils
 
+using Test # for "interface-conformance" functions
+
 # A list of all symbols external packages should not import from AbstractAlgebra
 import_exclude = [:import_exclude, :QQ, :ZZ,
                   :RealField, :NumberField,
@@ -350,6 +352,7 @@ include("julia/JuliaTypes.jl")
 
 include("algorithms/generic_functions.jl")
 include("algorithms/LaurentPoly.jl")
+include("algorithms/FinField.jl")
 
 ###############################################################################
 #
