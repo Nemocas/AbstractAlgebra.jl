@@ -107,7 +107,7 @@ julia> G = gens(M)
  (0//1, 1//1)
 
 julia> R = rels(M)
-0-element Array{AbstractAlgebra.Generic.MatSpaceElem{Rational{BigInt}},1}
+AbstractAlgebra.Generic.MatSpaceElem{Rational{BigInt}}[]
 
 julia> g1 = gen(M, 1)
 (1//1, 0//1)
