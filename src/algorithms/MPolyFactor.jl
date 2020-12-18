@@ -4,6 +4,9 @@
 #
 ###############################################################################
 
+# experimental module whose parts can be overridden for specific types
+# main functions are mfactor_squarefree_char_zero and mfactor_char_zero
+
 module MPolyFactor
 
 using AbstractAlgebra
