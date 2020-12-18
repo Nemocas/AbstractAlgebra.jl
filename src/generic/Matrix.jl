@@ -2503,10 +2503,11 @@ end
 
 @doc Markdown.doc"""
     solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where {S <: RingElement}
-> Given an $m\times r$ matrix $a$ over a ring and an $m\times n$ matrix $b$
-> over the same ring, return an $r\times n$ matrix $x$ such that $ax = b$. If
-> no such matrix exists, an exception is raised.
-> See also [`solve_left`](@ref).
+
+Given an $m\times r$ matrix $a$ over a ring and an $m\times n$ matrix $b$
+over the same ring, return an $r\times n$ matrix $x$ such that $ax = b$. If
+no such matrix exists, an exception is raised.
+See also [`solve_left`](@ref).
 """
 function solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
                ) where S <: RingElement
@@ -2518,10 +2519,10 @@ end
 @doc Markdown.doc"""
     solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
 
-> Given an $r\times n$ matrix $a$ over a ring and an $m\times n$ matrix $b$
-> over the same ring, return an $m\times r$ matrix $x$ such that $xa = b$. If
-> no such matrix exists, an exception is raised.
-> See also [`solve`](@ref).
+Given an $r\times n$ matrix $a$ over a ring and an $m\times n$ matrix $b$
+over the same ring, return an $m\times r$ matrix $x$ such that $xa = b$. If
+no such matrix exists, an exception is raised.
+See also [`solve`](@ref).
 """
 function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
                     ) where S <: RingElement
