@@ -1974,7 +1974,7 @@ end
       A = M
 
       try
-          r, A, d = rref(M)
+          r, A, d = rref_rational(M)
           do_test = true
       catch e
          if !(e isa ErrorException)
@@ -1998,7 +1998,7 @@ end
       rank = rand(0:min(m, n))
       S = MatrixSpace(R, m, n)
       M = randmat_with_rank(S, rank, -10:10)
-      r, N, d = rref(M)
+      r, N, d = rref_rational(M)
 
       @test r == rank
       @test isrref(N)
@@ -2060,7 +2060,7 @@ end
    for i = 0:5
       M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
 
-      r, A, d = rref(M)
+      r, A, d = rref_rational(M)
 
       @test r == i
       @test isrref(A)
