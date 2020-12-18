@@ -2466,18 +2466,6 @@ function can_solve_with_solution_interpolation(M::AbstractAlgebra.MatElem{T}, b:
 end
 
 @doc Markdown.doc"""
-    solve(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
-
-Given a non-singular $n\times n$ matrix over a field and an $n\times m$
-matrix over the same field, return $x$ an
-$n\times m$ matrix $x$ such that $Ax = b$.
-If $A$ is singular an exception is raised.
-"""
-function solve(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
-    return solve_ringelem(M, b)
-end
-
-@doc Markdown.doc"""
     solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where T <: RingElement
 
 Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
@@ -2514,13 +2502,30 @@ function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatEle
 end
 
 @doc Markdown.doc"""
+    solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where {S <: RingElement}
+
+Given an $m\times r$ matrix $a$ over a ring and an $m\times n$ matrix $b$
+over the same ring, return an $r\times n$ matrix $x$ such that $ax = b$. If
+no such matrix exists, an exception is raised.
+See also [`solve_left`](@ref).
+"""
+function solve(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
+               ) where S <: RingElement
+   can, X = can_solve_with_solution(a, b, side = :right)
+   can || throw(ArgumentError("Unable to solve linear system"))
+   return X
+end
+
+@doc Markdown.doc"""
     solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
 
 Given an $r\times n$ matrix $a$ over a ring and an $m\times n$ matrix $b$
 over the same ring, return an $m\times r$ matrix $x$ such that $xa = b$. If
 no such matrix exists, an exception is raised.
+See also [`solve`](@ref).
 """
-function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
+function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}
+                    ) where S <: RingElement
    (flag, x) = can_solve_with_solution(a, b; side = :left)
    flag || error("Unable to solve linear system")
    return x
