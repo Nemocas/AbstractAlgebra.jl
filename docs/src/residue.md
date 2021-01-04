@@ -38,10 +38,10 @@ ring types belong to the abstract type `AbstractAlgebra.ResRing{T}` or
 that can accept any AbstractAlgebra residue type.
 
 Note that both the generic residue ring type `Generic.ResRing{T}` and the abstract
-type it belongs to, `AbstractAlgebra.ResRing{T}` are both called `ResRing`, and 
+type it belongs to, `AbstractAlgebra.ResRing{T}` are both called `ResRing`, and
 similarly for the residue field types. In each case, the  former is a (parameterised)
 concrete type for a residue ring over a given base ring whose elements have type `T`.
-The latter is an abstract type representing all residue ring types in 
+The latter is an abstract type representing all residue ring types in
 AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C library).
 
 ## Residue ring constructors
@@ -190,7 +190,7 @@ true
 ### Inversion
 
 ```@docs
-inv(::AbstractAlgebra.ResElem)
+Base.inv(::AbstractAlgebra.ResElem)
 ```
 
 **Examples**
@@ -243,7 +243,7 @@ issquare{T <: Integer}(::ResFieldElem{T})
 ```
 
 ```@docs
-sqrt{T <: Integer}(::ResFieldElem{T})
+Base.sqrt{T <: Integer}(::ResFieldElem{T})
 ```
 
 **Examples**
@@ -261,4 +261,3 @@ true
 julia> sqrt(a)
 201
 ```
-

@@ -36,12 +36,12 @@ Puiseux series elements belong directly to either `AbstractAlgebra.RingElem` or
 `AbstractAlgebra.FieldElem` since it is more useful to be able to distinguish whether
 they belong to a ring or field than it is to distinguish that they are Puiseux series.
 
-The parent types for Puiseux series, `Generic.PuiseuxSeriesRing{T}` 
+The parent types for Puiseux series, `Generic.PuiseuxSeriesRing{T}`
 and `Generic.PuiseuxSeriesField{T}` respectively, belong to `AbstractAlgebra.Ring`
 and `AbstractAlgebra.Field` respectively.
 
 The default precision, string representation of the variable and base ring $R$ of a
-generic Puiseux series are stored in its parent object. 
+generic Puiseux series are stored in its parent object.
 
 ## Puisuex series ring constructors
 
@@ -116,7 +116,7 @@ julia> g = 2x^(1//3) + 7x^(2//3) + O(x^(7//3))
 ```
 
 What is happening here in practice is that `O(x^n)` is creating the series `0 + O(x^n)`
-and the rules for addition of series dictate that if this is added to a series of 
+and the rules for addition of series dictate that if this is added to a series of
 greater precision, then the lower of the two precisions must be used.
 
 Of course it may be that the precision of the series that `O(x^n)` is added to is
@@ -275,7 +275,7 @@ julia> c = coeff(b, 2)
 ### Division
 
 ```@docs
-inv(::Generic.PuiseuxSeriesElem)
+Base.inv(::Generic.PuiseuxSeriesElem)
 ```
 
 **Examples**

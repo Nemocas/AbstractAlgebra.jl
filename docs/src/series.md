@@ -7,7 +7,7 @@ end
 
 # Generic power series
 
-AbstractAlgebra.jl allows the creation of capped relative and absolute power series over 
+AbstractAlgebra.jl allows the creation of capped relative and absolute power series over
 any computable commutative ring $R$.
 
 Capped relative power series are power series of the form
@@ -51,15 +51,15 @@ they belong to a ring or field than it is to distinguish that they are relative 
 
 Absolute power series elements belong to `AbstractAlgebra.AbsSeriesElem`.
 
-The parent types for relative and absolute power series, `Generic.RelSeriesRing{T}` 
+The parent types for relative and absolute power series, `Generic.RelSeriesRing{T}`
 and `Generic.AbsSeriesRing{T}` respectively, belong to `AbstractAlgebra.SeriesRing{T}`.
 
 The parent types for Laurent series rings and fields, `Generic.LaurentSeriesRing{T}`
-and `Generic.LaurentSeriesField{T}` respectively, belong directly to 
+and `Generic.LaurentSeriesField{T}` respectively, belong directly to
 `AbstractAlgebra.Ring` and `AbstractAlgebra.Field` respectively.
 
 The default precision, string representation of the variable and base ring $R$ of a
-generic power series are stored in its parent object. 
+generic power series are stored in its parent object.
 
 ## Series ring constructors
 
@@ -148,7 +148,7 @@ julia> g = 2y + 7y^2 + O(y^7)
 ```
 
 What is happening here in practice is that `O(x^n)` is creating the series `0 + O(x^n)`
-and the rules for addition of series dictate that if this is added to a series of 
+and the rules for addition of series dictate that if this is added to a series of
 greater precision, then the lower of the two precisions must be used.
 
 Of course it may be that the precision of the series that `O(x^n)` is added to is
@@ -234,7 +234,7 @@ Simply increasing the precision will not necessarily give a "more correct"
 answer and some computations may not even terminate due to the presence of
 arithmetic zeroes!
 
-An absolute power series ring over a ring $R$ with precision $p$ behaves 
+An absolute power series ring over a ring $R$ with precision $p$ behaves
 very much like the quotient $R[x]/(x^p)$ of the polynomial ring over $R$. Therefore
 one can often treat absolute power series rings as though they were rings. However,
 this depends on all series being given a precision equal to the specified maximum
@@ -456,7 +456,7 @@ julia> k = truncate(d, 5)
 ### Division
 
 ```@docs
-inv(::RelSeriesElem)
+Base.inv(::RelSeriesElem)
 ```
 
 **Examples**

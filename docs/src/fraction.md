@@ -32,7 +32,7 @@ This enables one to write generic functions that can accept any AbstractAlgebra
 fraction type.
 
 Note that both the generic fraction field type `Generic.FracField{T}` and the abstract
-type it belongs to, `AbstractAlgebra.FracField{T}` are both called `FracField`. The 
+type it belongs to, `AbstractAlgebra.FracField{T}` are both called `FracField`. The
 former is a (parameterised) concrete type for a fraction field over a given base ring
 whose elements have type `T`. The latter is an abstract type representing all
 fraction field types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
@@ -181,7 +181,7 @@ issquare{T <: RingElem}(::FracElem{T})
 ```
 
 ```@docs
-sqrt{T <: RingElem}(::FracElem{T})
+Base.sqrt(::FracElem{T}) where {T <: RingElem}
 ```
 
 **Examples**
@@ -235,4 +235,3 @@ julia> v = valuation(f^3*g, x + 1)
 3
 
 ```
-
