@@ -651,7 +651,7 @@ the ring $R$. If `cached == true` (the default), the returned parent object
 is cached so that it can returned by future calls to the constructor with the
 same degree and base ring.
 """
-function MatrixAlgebra(R::AbstractAlgebra.Ring, n::Int, cached::Bool = true)
+function MatrixAlgebra(R::AbstractAlgebra.Ring, n::Int; cached::Bool = true)
    T = elem_type(R)
    return MatAlgebra{T}(R, n, cached)
 end

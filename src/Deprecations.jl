@@ -13,3 +13,9 @@
 @deprecate rref(a::MatrixElem{<:RingElement}) rref_rational(a)
 
 @deprecate rref!(a::MatrixElem{<:RingElement}) rref_rational!(a)
+
+# Deprecated in 0.12.*
+
+@deprecate MatrixSpace(R::Ring, n::Int, m::Int, cached::Bool) MatrixSpace(R, n, m, cached = cached)
+
+@deprecate MatrixAlgebra(R::Ring, n::Int, cached::Bool) MatrixAlgebra(R, n, cached = cached)
