@@ -49,6 +49,20 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
+@testset "Generic.ResF.printing..." begin
+   R = Generic.ResidueField(ZZ, 16453889)
+
+   @test string(zero(R)) == "0"
+   @test string(one(R)) == "1"
+
+   S, x = PolynomialRing(R, "x")
+
+   @test string(zero(S)) == "0"
+   @test string(one(S)) == "1"
+   @test string(x) == "x"
+   @test string(5*x^5+3*x^3+2*x^2+x+1) == "5*x^5 + 3*x^3 + 2*x^2 + x + 1"
+end
+
 @testset "Generic.ResF.rand..." begin
    R = Generic.ResidueField(ZZ, 16453889)
 

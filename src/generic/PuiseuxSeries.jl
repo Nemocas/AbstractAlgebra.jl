@@ -325,18 +325,13 @@ function AbstractAlgebra.expressify(a::PuiseuxSeriesElem,
     for i in 0:len - 1
         c = polcoeff(b, i)
         expo = (i * sc + v)//den
-        if isone(denominator(expo)) 
-          expo_expr = expressify(numerator(expo))
-        else
-          expo_expr = expressify(expo)
-        end
         if !iszero(c)
-            if expo == 0
+            if iszero(expo)
                 xk = 1
-            elseif expo == 1
+            elseif isone(expo)
                 xk = x
             else
-                xk = Expr(:call, :^, x, expo_expr)
+                xk = Expr(:call, :^, x, expressify(expo, context = context))
             end
             if isone(c)
                 push!(sum.args, Expr(:call, :*, xk))
@@ -345,9 +340,8 @@ function AbstractAlgebra.expressify(a::PuiseuxSeriesElem,
             end
         end
     end
-    q = precision(b)//a.scale
-    qexp = isone(denominator(q)) ? expressify(numerator(q)) : expressify(q)
-    push!(sum.args, Expr(:call, :O, Expr(:call, :^, x, qexp)))
+    expo = precision(b)//den
+    push!(sum.args, Expr(:call, :O, Expr(:call, :^, x, expressify(expo))))
     return sum
 end
 
@@ -368,12 +362,6 @@ function show(io::IO, a::PuiseuxSeriesField)
    print(io, "Puiseux series field in ", var(laurent_ring(a)), " over ")
    print(IOContext(io, :compact => true), base_ring(a))
 end
-
-needs_parentheses(x::PuiseuxSeriesElem) = pol_length(x.data) > 1
-
-displayed_with_minus_in_front(x::PuiseuxSeriesElem) = pol_length(x.data) <= 1 && displayed_with_minus_in_front(polcoeff(x.data, 0))
-
-show_minus_one(::Type{PuiseuxSeriesElem{T}}) where {T <: RingElement} = show_minus_one(T)
 
 ###############################################################################
 #

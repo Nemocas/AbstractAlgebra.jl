@@ -185,6 +185,10 @@ end
 #
 ###############################################################################
 
+function expressify(@nospecialize(a::AbstractAlgebra.ResFieldElem); context = nothing)
+   return expressify(data(a), context = context)
+end
+
 function show(io::IO, x::AbstractAlgebra.ResFieldElem)
    print(IOContext(io, :compact => true), data(x))
 end
@@ -192,12 +196,6 @@ end
 function show(io::IO, a::AbstractAlgebra.ResField)
    print(IOContext(io, :compact => true), "Residue field of ", base_ring(a), " modulo ", modulus(a))
 end
-
-needs_parentheses(x::AbstractAlgebra.ResFieldElem) = needs_parentheses(data(x))
-
-displayed_with_minus_in_front(x::AbstractAlgebra.ResFieldElem) = displayed_with_minus_in_front(data(x))
-
-show_minus_one(::Type{ResF{T}}) where {T <: RingElement} = true
 
 ###############################################################################
 #

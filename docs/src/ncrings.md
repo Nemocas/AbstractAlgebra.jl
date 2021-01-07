@@ -259,37 +259,6 @@ Should returns `true` if parentheses are needed around this object when printed,
 a coefficient of a polynomial. As an example, non-constant polynomials would need such
 parentheses if used as coefficients of another polynomial.
 
-```julia
-displayed_with_minus_in_front(f::MyElem)
-```
-
-When printing polynomials, a `+` sign is usually inserted automatically between terms of
-the polynomial. However, this is not desirable if the coefficient is negative and that
-negative sign is already printed when the coefficient is printed.
-
-This function must return `true` if $f$ is printed starting with a negative sign.
-This suppresses the automatic printing of a `+` sign by polynomial printing
-functions that are printing $f$ as a coefficient of a term.
-
-Note that if `needs_parentheses` returns `true` for $f$, then `displayed_with_minus_in_front` should always
-return `false` for that $f$, since an automatic `+` will need to be printed in front of
-a coefficient that is printed with parentheses.
-
-```julia
-show_minus_one(::Type{MyElem})
-```
-
-When printing polynomials, we prefer to print $x$ rather than $1*x$ if the degree $1$
-term has coefficient $1$. This can be taken care of without any special support.
-
-However, we also prefer to print $-x$ rather than $-1*x$. This requires special support,
-since $-1$ in some rings is not printed as $-1$ (e.g. $-1$ in $\mathbb{Z}/3\mathbb{Z}$
-might be printed as $2$). In such rings, `show_minus_one` should return `true`.
-
-If `show_minus_one` returns true, polynomial printing functions will not print $-x$ for
-terms of degree $1$ with coefficient $-1$, but will use the printing function of the
-given type to print the coefficient in that case.
-
 ### Unary operations
 
 ```julia

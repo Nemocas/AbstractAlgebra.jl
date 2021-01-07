@@ -188,12 +188,6 @@ function show(io::IO, a::AbstractAlgebra.ResRing)
    print(IOContext(io, :compact => true), "Residue ring of ", base_ring(a), " modulo ", modulus(a))
 end
 
-needs_parentheses(x::AbstractAlgebra.ResElem) = needs_parentheses(data(x))
-
-displayed_with_minus_in_front(x::AbstractAlgebra.ResElem) = displayed_with_minus_in_front(data(x))
-
-show_minus_one(::Type{Res{T}}) where {T <: RingElement} = true
-
 ###############################################################################
 #
 #   Unary operations

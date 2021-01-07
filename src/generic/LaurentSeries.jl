@@ -490,12 +490,6 @@ function show(io::IO, a::LaurentSeriesField)
    print(IOContext(io, :compact => true), base_ring(a))
 end
 
-needs_parentheses(x::LaurentSeriesElem) = pol_length(x) > 1
-
-displayed_with_minus_in_front(x::LaurentSeriesElem) = pol_length(x) <= 1 && displayed_with_minus_in_front(polcoeff(x, 0))
-
-show_minus_one(::Type{LaurentSeriesElem{T}}) where {T <: RingElement} = show_minus_one(T)
-
 ###############################################################################
 #
 #   Unary operators

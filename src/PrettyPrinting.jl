@@ -49,11 +49,7 @@ end
 #
 ################################################################################
 
-# The user should define expressify for all of their types.
-# The conversion to expressions is generally clean and does not require
-#   displayed_with_minus_in_front, needs_parentheses, ...
-
-# Legacy API for no expressions
+# generic fallback in case expressify is not defined
 function expressify(@nospecialize(a); context = nothing)::String
     s = sprint(print, a; context = context)::String
     if needs_parentheses(a)::Bool

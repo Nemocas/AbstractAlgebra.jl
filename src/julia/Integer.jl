@@ -61,12 +61,6 @@ function show(io::IO, R::Integers)
    print(io, "Integers")
 end
 
-needs_parentheses(::Integer) = false
-
-displayed_with_minus_in_front(a::Integer) = a < 0
-
-show_minus_one(::Type{T}) where T <: Integer = false
-
 ###############################################################################
 #
 #   Modular arithmetic

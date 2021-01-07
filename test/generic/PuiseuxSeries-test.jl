@@ -91,6 +91,12 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
+@testset "Generic.PuiseuxSeries.printing..." begin
+   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+
+   @test occursin("O", string(x^(-1//2) + 1 - x + x^2 + x^5))
+end
+
 @testset "Generic.PuiseuxSeries.rand..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
 

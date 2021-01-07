@@ -123,8 +123,6 @@ function show(io::IO, p::AbstractAlgebra.NCPolyRing)
    print(IOContext(io, :compact => true), base_ring(p))
 end
 
-show_minus_one(::Type{NCPoly{T}}) where {T <: NCRingElem} = show_minus_one(T)
-
 ###############################################################################
 #
 #   Binary operations
