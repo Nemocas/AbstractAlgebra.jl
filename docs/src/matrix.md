@@ -1013,7 +1013,7 @@ julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
 julia> H = hnf(A)
 [1  0  255]
 [0  1   17]
-[0  0  281]                                                                                                             
+[0  0  281]
 
 julia> ishnf(H)
 true
@@ -1066,7 +1066,6 @@ AbstractAlgebra.jl provides algorithms for computing the (weak) Popov of a matri
 entries in a univariate polynomial ring over a field.
 
 ```@docs
-isweak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
 isweak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
 ```
 

@@ -131,7 +131,7 @@ p = preimage(g, n)
 Module isomorphisms can be cheaply inverted.
 
 ```@docs
-inv(::Map(Generic.ModuleIsomorphism))
+Base.inv(::Map(Generic.ModuleIsomorphism))
 ```
 
 ```julia

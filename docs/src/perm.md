@@ -182,7 +182,7 @@ However, since all permutations yielded by `elements!` are aliased (modified "in
 ```@docs
 *(::Perm{T}, ::Perm{T}) where T
 ^(::Perm, n::Integer)
-inv(::Perm)
+Base.inv(::Perm)
 ```
 
 Permutations parametrized by different types can be multiplied, and follow the standard julia integer promotion rules:
