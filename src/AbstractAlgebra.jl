@@ -975,6 +975,8 @@ include("algorithms/MPolyFactor.jl")
 
 needs_parentheses(x) = false
 
+function isnegative end
+
 ###############################################################################
 #
 #   Test code
