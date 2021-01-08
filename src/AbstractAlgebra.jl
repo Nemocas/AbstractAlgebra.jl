@@ -520,6 +520,9 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem
 
+# TODO remove these two once removed from dependent packages (Hecke)
+export displayed_with_minus_in_front, show_minus_one
+
 ################################################################################
 #
 #   Parent constructors
@@ -976,6 +979,11 @@ include("algorithms/MPolyFactor.jl")
 needs_parentheses(x) = false
 
 function isnegative end
+
+# TODO remove these two once removed from dependent packages (Hecke)
+function displayed_with_minus_in_front end
+
+function show_minus_one end
 
 ###############################################################################
 #
