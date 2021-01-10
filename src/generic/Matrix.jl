@@ -2942,7 +2942,7 @@ function to compute an integral kernel.
 """
 function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    n = ncols(M)
-   rank, A, d = rref(M)
+   rank, A, d = rref_rational(M)
    nullity = n - rank
    R = base_ring(M)
    U = zero(M, n, nullity)

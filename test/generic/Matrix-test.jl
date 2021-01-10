@@ -2059,7 +2059,7 @@ end
    for i = 0:5
       M = randmat_with_rank(R, i, 0:3, -20:20)
 
-      r, A, d = rref(M)
+      r, A, d = rref_rational(M)
 
       @test r == i
       @test isrref(A)
