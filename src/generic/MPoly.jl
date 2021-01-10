@@ -3853,16 +3853,17 @@ function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
    else
       start_var = N - 1
    end
+   R = SparsePolyRing{typeof(a)}(parent(a), :$, false)
    if ord == :degrevlex
       while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
          k = main_variable(a, start_var)
-         p = main_variable_extract(a, k)
+         p = main_variable_extract(R, a, k)
          a = evaluate(p, A[k])
       end
   else
       while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
          k = main_variable(a, start_var)
-         p = main_variable_extract(a, k)
+         p = main_variable_extract(R, a, k)
          a = evaluate(p, A[start_var - k + 1])
       end
    end
@@ -4556,8 +4557,14 @@ function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:degr
    return main_variable_coefficient_deglex(a, k, n)
 end
 
-# Turn an MPoly into a SparsePoly in the main variable k
 function main_variable_extract(a::MPoly{T}, k::Int) where {T <: RingElement}
+   sym = parent(a).S[nvars(parent(a)) - k + 1]
+   R = SparsePolyRing{MPoly{T}}(parent(a), sym, false)
+   return main_variable_extract(R, a, k)
+end
+
+# Turn an MPoly into a SparsePoly in the main variable k
+function main_variable_extract(R::SparsePolyRing, a::MPoly{T}, k::Int) where {T <: RingElement}
    V = [(a.exps[k, i], i) for i in 1:length(a)]
    sort!(V)
    N = size(a.exps, 1)
@@ -4577,8 +4584,6 @@ function main_variable_extract(a::MPoly{T}, k::Int) where {T <: RingElement}
       Pe[i] = a2.exps[k, A[i]]
       Pc[i] = main_variable_coefficient(a2, k, A[i], Val{ord})
    end
-   sym = parent(a).S[nvars(parent(a)) - k + 1]
-   R = SparsePolyRing{MPoly{T}}(parent(a), sym, true)
    return R(Pc, Pe)
 end
 
