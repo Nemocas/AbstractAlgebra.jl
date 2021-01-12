@@ -151,6 +151,10 @@ canonical_unit(x::GFElem) = x
 #
 ###############################################################################
 
+function expressify(x::GFElem; context = nothing)
+   return expressify(x.d, context = context)
+end
+
 function show(io::IO, x::GFElem)
    print(io, x.d)
 end
@@ -158,12 +162,6 @@ end
 function show(io::IO, R::GFField)
    print(io, "Finite field F_", R.p)
 end
-
-needs_parentheses(x::GFElem) = false
-
-displayed_with_minus_in_front(x::GFElem) = false
-
-show_minus_one(::Type{GFElem{T}}) where T <: Integer = true
 
 ###############################################################################
 #

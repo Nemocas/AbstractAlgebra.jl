@@ -40,6 +40,11 @@ end
    @test string(R()) == "0"
    @test string(S(3)) == "3"
    @test string(S()) == "0"
+
+   R, x = PolynomialRing(GF(13), "x")
+
+   @test string(x) == "x"
+   @test !occursin("1", string(x^2+2*x))
 end
 
 @testset "Julia.GFElem.manipulation..." begin

@@ -87,50 +87,27 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::SparsePoly)
-    len = length(x)
-    U = string(var(parent(x)))
-    if len == 0
-      print(io, base_ring(x)(0))
-    else
-      for i = 1:len
-        c = coeff(x, len - i)
-        bracket = needs_parentheses(c)
-        if i != 1 && !displayed_with_minus_in_front(c)
-           print(io, "+")
-        end
-        X = x.exps[len - i + 1]
-        if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
-          if bracket
-            print(io, "(")
-          end
-          print(io, c)
-          if bracket
-            print(io, ")")
-          end
-          if c != 1 && !(c == -1 && !show_minus_one(typeof(c))) && X != UInt(0)
-             print(io, "*")
-          end
-        end
-        if c == -1 && !show_minus_one(typeof(c))
-          print(io, "-")
-        end
-        if X == UInt(0)
-          if c == 1
-             print(io, c)
-          elseif c == -1 && !show_minus_one(typeof(c))
-             print(io, 1)
-          end
-        end
-        n = reinterpret(Int, X)
-        if n != 0
-           print(io, U)
-        end
-        if n > 1
-           print(io, "^", n)
-        end
+function expressify(a::SparsePoly, x = var(parent(a)); context = nothing)
+   sum = Expr(:call, :+)
+   for i in length(a):-1:1 # the polynomials are stored backwards
+      c = coeff(a, i-1)    # ???
+      e = a.exps[i]
+      xe = iszero(e) ? 1 : isone(e) ? x : Expr(:call, :^, x, e)
+      if isone(c)
+          push!(sum.args, Expr(:call, :*, xe))
+      else
+          push!(sum.args, Expr(:call, :*, expressify(c, context = context), xe))
       end
-    end
+   end
+   return sum
+end
+
+function Base.show(io::IO, ::MIME"text/plain", a::SparsePoly)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, a::SparsePoly)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, p::SparsePolyRing)
@@ -139,12 +116,6 @@ function show(io::IO, p::SparsePolyRing)
    print(io, " over ")
    print(IOContext(io, :compact => true), base_ring(p))
 end
-
-show_minus_one(::Type{SparsePoly{T}}) where {T <: RingElement} = show_minus_one(T)
-
-needs_parentheses(a::SparsePoly{T}) where {T <: RingElement} = length(a) > 1
-
-displayed_with_minus_in_front(x::SparsePoly) = length(x) <= 1 && displayed_with_minus_in_front(coeff(x, 0))
 
 ###############################################################################
 #

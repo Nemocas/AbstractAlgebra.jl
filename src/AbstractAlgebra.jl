@@ -430,7 +430,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  right_kernel, rref, rref!, rref_rational, rref_rational!, section_map, setcoeff!,
                  set_exponent_vector!, set_field!, set_length!, set_limit!,
                  setpermstyle, set_precision!, set_valuation!, size, shift_left,
-                 shift_right, show_minus_one, similarity!, snf, snf_kb,
+                 shift_right, similarity!, snf, snf_kb,
                  snf_kb_with_transform, snf_with_transform, solve, solve_left,
                  solve_rational, solve_triu, sort_terms!, sub, subst, summands,
                  supermodule, swap_cols, swap_cols!, swap_rows, swap_rows!,
@@ -453,8 +453,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  data, deflate, deflation, degree, degrees,
                  dense_matrix_type, derivative, det, det_clow,
                  det_df, det_fflu, det_popov, diagonal_matrix, dim, disable_cache!,
-                 discriminant, displayed_with_minus_in_front,
-                 divexact, divexact_left, divexact_right, divides,
+                 discriminant, divexact, divexact_left, divexact_right, divides,
                  domain, downscale,
                  elem_type, enable_cache!, evaluate, exp_gcd,
                  exponent, exponent_vector, exponent_vectors,
@@ -511,7 +510,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  right_kernel, rref, rref!, rref_rational, rref_rational!, section_map, setcoeff!,
                  set_exponent_vector!, set_field!, set_length!, set_limit!,
                  setpermstyle, set_precision!, set_valuation!, shift_left, shift_right,
-                 show_minus_one, similarity!, size, snf, snf_kb,
+                 similarity!, size, snf, snf_kb,
                  snf_kb_with_transform, snf_with_transform, solve, solve_left,
                  solve_rational, solve_triu, sort_terms!, sub, subst, summands,
                  supermodule, swap_rows, swap_rows!, swap_cols, swap_cols!,
@@ -520,6 +519,9 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  upscale, valuation, var, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem
+
+# TODO remove these two once removed from dependent packages (Hecke)
+export displayed_with_minus_in_front, show_minus_one
 
 ################################################################################
 #
@@ -974,9 +976,22 @@ include("algorithms/MPolyFactor.jl")
 #
 ###############################################################################
 
-displayed_with_minus_in_front(x) = isnegative(x)
+needs_parentheses(x) = false
 
-isnegative(x) = displayed_with_minus_in_front(x)
+function isnegative end
+
+# TODO remove these two once removed from dependent packages (Hecke)
+@noinline function displayed_with_minus_in_front(x)
+  Base.depwarn("This function is deprecated",
+               :displayed_with_minus_in_front)
+  return string(x)[1] == "-"
+end
+
+@noinline function show_minus_one(x)
+  Base.depwarn("This function is deprecated",
+               :displayed_with_minus_in_front)
+  return true
+end
 
 ###############################################################################
 #

@@ -14,8 +14,7 @@ export PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
        mul_karatsuba, trail, pow_multinomial, monomial_to_newton!,
        newton_to_monomial!, isterm, isterm_recursive, ismonomial,
        ismonomial_recursive, base_ring, parent_type, elem_type, check_parent,
-       promote_rule, needs_parentheses, displayed_with_minus_in_front,
-       show_minus_one, remove, zero!, add!, interpolate, sylvester_matrix
+       promote_rule, remove, zero!, add!, interpolate, sylvester_matrix
 
 ###############################################################################
 #
@@ -368,12 +367,6 @@ function show(io::IO, p::AbstractAlgebra.PolyRing)
    print(io, " over ")
    print(IOContext(io, :compact => true), base_ring(p))
 end
-
-needs_parentheses(x::PolynomialElem) = length(x) > 1
-
-displayed_with_minus_in_front(x::PolynomialElem) = length(x) <= 1 && displayed_with_minus_in_front(coeff(x, 0))
-
-show_minus_one(::Type{Poly{T}}) where {T <: RingElement} = show_minus_one(T)
 
 ###############################################################################
 #

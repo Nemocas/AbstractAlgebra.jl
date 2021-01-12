@@ -1302,7 +1302,10 @@ function expressify(a::MPolyElem, x = symbols(parent(a)); context = nothing)
    sum = Expr(:call, :+)
    n = nvars(parent(a))
    for (c, v) in zip(coeffs(a), exponent_vectors(a))
-      prod = Expr(:call, :*, expressify(c, context = context))
+      prod = Expr(:call, :*)
+      if !isone(c)
+         push!(prod.args, expressify(c, context = context))
+      end
       for i in 1:n
          if v[i] > 1
             push!(prod.args, Expr(:call, :^, x[i], v[i]))
@@ -1341,12 +1344,6 @@ function show(io::IO, p::MPolyRing)
    print(io, " over ")
    print(IOContext(io, :compact => true), base_ring(p))
 end
-
-show_minus_one(::Type{U}) where U <: AbstractAlgebra.MPolyElem{T} where T <: RingElement = show_minus_one(T)
-
-needs_parentheses(x::AbstractAlgebra.MPolyElem) = length(x) > 1
-
-displayed_with_minus_in_front(x::AbstractAlgebra.MPolyElem) = length(x) == 1 && displayed_with_minus_in_front(coeff(x, 1))
 
 function canonical_unit(x::AbstractAlgebra.MPolyElem)
    if length(x) == 0

@@ -52,11 +52,13 @@ function show(io::IO, R::Floats)
    print(io, "Floats")
 end
 
-needs_parentheses(::AbstractFloat) = false
-
-displayed_with_minus_in_front(a::AbstractFloat) = a < 0
-
-show_minus_one(::Type{T}) where T <: AbstractFloat = false
+function expressify(a::AbstractFloat; context = nothing)
+   if a < 0
+      return Expr(:call, :-, string(-a))
+   else
+      return string(a)
+   end
+end
 
 ###############################################################################
 #

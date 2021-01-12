@@ -80,12 +80,6 @@ function show(io::IO, R::Rationals)
    print(io, "Rationals")
 end
 
-needs_parentheses(::Rational) = false
-
-displayed_with_minus_in_front(a::Rational) = a < 0
-
-show_minus_one(::Type{Rational{T}}) where T <: Integer = false
-
 ###############################################################################
 #
 #   Divides

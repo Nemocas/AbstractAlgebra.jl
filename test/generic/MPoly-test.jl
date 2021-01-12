@@ -80,6 +80,21 @@
    @test z isa Generic.MPoly{Generic.Poly{BigInt}}
 end
 
+@testset "Generic.MPoly.printing..." begin
+   S, (x, y) = ZZ["x", "y"]
+
+   @test string(zero(S)) == "0"
+   @test string(one(S)) == "1"
+   @test string(x) == "x"
+   @test string(y) == "y"
+   @test string(x^2 - y) == "x^2 - y"
+
+   S, (x, y) = RealField["x", "y"]
+
+   @test string(x) == "x"
+   @test string(y) == "y"
+end
+
 @testset "Generic.MPoly.geobuckets..." begin
    R, x = ZZ["y"]
    for num_vars = 1:10

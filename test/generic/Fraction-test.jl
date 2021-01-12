@@ -49,6 +49,14 @@
    @test !(b in keys(Dict(a => 1)))
 end
 
+@testset "Generic.Frac.printing..." begin
+   S, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+
+   @test string((x+y)//z) == "(x + y)//z"
+   @test string(x//y//z) == "x//(y*z)"
+end
+
+
 @testset "Generic.Frac.rand..." begin
    S, x = PolynomialRing(ZZ, "x")
    K = FractionField(S)

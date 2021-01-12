@@ -187,12 +187,6 @@ function show(io::IO, a::AbstractAlgebra.MatAlgebra)
    print(IOContext(io, :compact => true), base_ring(a))
 end
 
-show_minus_one(::Type{<:AbstractAlgebra.MatAlgElem{T}}) where T <: RingElement = false
-
-needs_parentheses(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement = true
-
-displayed_with_minus_in_front(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement = false
-
 ###############################################################################
 #
 #   Binary operations

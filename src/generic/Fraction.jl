@@ -203,19 +203,6 @@ function show(io::IO, a::AbstractAlgebra.FracField)
    print(IOContext(io, :compact => true), "Fraction field of ", base_ring(a))
 end
 
-# Parentheses are only needed for fractions if we didn't print them already
-needs_parentheses(x::AbstractAlgebra.FracElem) = isone(denominator(x, true)) &&
-                                     needs_parentheses(numerator(x, true))
-
-function displayed_with_minus_in_front(x::AbstractAlgebra.FracElem)
-   n = numerator(x, true)
-   return !needs_parentheses(n) && displayed_with_minus_in_front(n)
-end
-
-function show_minus_one(::Type{AbstractAlgebra.FracElem{T}}) where {T <: RingElem}
-   return show_minus_one(T)
-end
-
 ###############################################################################
 #
 #   Unary operators

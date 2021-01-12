@@ -91,18 +91,30 @@ end
 #
 ################################################################################
 
+function expressify(@nospecialize(a::Fac); context = nothing)
+   prod = Expr(:call, :*)
+   if isdefined(a, :unit)
+      push!(prod.args, expressify(a.unit, context = context))
+   else
+      push!(prod.args, Expr(:call, :*, "[unit not set]"))
+   end
+   for (p, i) in a.fac
+      ep = expressify(p, context = context)
+      if isone(i)
+         push!(prod.args, ep)
+      else
+         push!(prod.args, Expr(:call, :^, ep, i))
+      end
+   end
+   return prod
+end
+
+function Base.show(io::IO, ::MIME"text/plain", a::Fac)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
 function Base.show(io::IO, a::Fac)
-  if isdefined(a, :unit)
-    print(io, "$(a.unit)")
-  else
-    print(io, "unit not set")
-  end
-  for (p, e) in a.fac
-    bracket = needs_parentheses(p)
-    print(io, " * ")
-    bracket ? print(io, "($p)") : print(io, "$p")
-    a[p] == 1 ? nothing : print(io, "^$e")
-  end
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 ################################################################################
