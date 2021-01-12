@@ -455,11 +455,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-
-Return $a/b$ where the quotient is expected to be exact.
-"""
 function divexact(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    fl, q = divides(a, b)

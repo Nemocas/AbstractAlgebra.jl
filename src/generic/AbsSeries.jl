@@ -634,11 +634,6 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
-
-Return $x/y$.
-"""
 function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
    iszero(y) && throw(DivideError())
@@ -678,11 +673,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return $x/y$ where the quotient is expected to be exact.
-"""
 function divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
    lenx = length(x)
@@ -695,11 +685,6 @@ function divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, 
    return z
 end
 
-@doc Markdown.doc"""
-    divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem}
-
-Return $x/y$ where the quotient is expected to be exact.
-"""
 function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = length(x)

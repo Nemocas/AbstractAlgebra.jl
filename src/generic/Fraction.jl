@@ -632,11 +632,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-
-Return $a/b$.
-"""
 function divexact(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
    n1 = numerator(a, false)
@@ -687,11 +682,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a/b$.
-"""
 function divexact(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    b == 0 && throw(DivideError())
    c = base_ring(a)(b)
@@ -701,11 +691,6 @@ function divexact(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, Abstr
    return parent(a)(n, d)
 end
 
-@doc Markdown.doc"""
-    divexact(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
-
-Return $a/b$.
-"""
 function divexact(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    iszero(b) && throw(DivideError())
    c = base_ring(b)(a)
@@ -715,11 +700,6 @@ function divexact(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra
    return parent(b)(n, d)
 end
 
-@doc Markdown.doc"""
-    divexact(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-
-Return $a/b$.
-"""
 function divexact(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    iszero(b) && throw(DivideError())
    g = gcd(numerator(a, false), b)
@@ -728,11 +708,6 @@ function divexact(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    return parent(a)(n, d)
 end
 
-@doc Markdown.doc"""
-    divexact(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-
-Return $a/b$.
-"""
 function divexact(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    iszero(b) && throw(DivideError())
    g = gcd(numerator(b, false), a)

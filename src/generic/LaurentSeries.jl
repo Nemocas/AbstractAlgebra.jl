@@ -1122,11 +1122,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(x::Generic.LaurentSeriesElem{T}, y::Generic.LaurentSeriesElem{T}) where {T <: RingElement}
-
-Return $x/y$.
-"""
 function divexact(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
    iszero(y) && throw(DivideError())
@@ -1171,11 +1166,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(x::Generic.LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return $x/y$ where the quotient is expected to be exact.
-"""
 function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
@@ -1190,11 +1180,6 @@ function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloa
    return z
 end
 
-@doc Markdown.doc"""
-    divexact(x::Generic.LaurentSeriesElem{T}, y::T) where {T <: RingElem}
-
-Return $x/y$ where the quotient is expected to be exact.
-"""
 function divexact(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)

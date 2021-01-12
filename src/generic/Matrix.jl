@@ -973,12 +973,6 @@ otherwise return `false`.
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(x::Generic.MatrixElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return $x/y$, i.e. the matrix where each of the entries has been divided by
-$y$. Each division is expected to be exact.
-"""
 function divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
    z = similar(x)
    for i = 1:nrows(x)
@@ -989,12 +983,6 @@ function divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
    return z
 end
 
-@doc Markdown.doc"""
-    divexact(x::Generic.MatrixElem{T}, y::T) where {T <: RingElem}
-
-Return $x/y$, i.e. the matrix where each of the entries has been divided by
-$y$. Each division is expected to be exact.
-"""
 function divexact(x::MatrixElem{T}, y::T) where {T <: RingElem}
    z = similar(x)
    for i = 1:nrows(x)
