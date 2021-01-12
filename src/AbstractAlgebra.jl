@@ -981,9 +981,17 @@ needs_parentheses(x) = false
 function isnegative end
 
 # TODO remove these two once removed from dependent packages (Hecke)
-function displayed_with_minus_in_front end
+@noinline function displayed_with_minus_in_front(x)
+  Base.depwarn("This function is deprecated",
+               :displayed_with_minus_in_front)
+  return string(x)[1] == "-"
+end
 
-function show_minus_one end
+@noinline function show_minus_one(x)
+  Base.depwarn("This function is deprecated",
+               :displayed_with_minus_in_front)
+  return true
+end
 
 ###############################################################################
 #
