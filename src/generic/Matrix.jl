@@ -369,6 +369,17 @@ canonical_unit(a::MatrixElem) = canonical_unit(a[1, 1])
 #
 ###############################################################################
 
+# linear indexing for row- or column- vectors
+Base.@propagate_inbounds function getindex(M::MatElem, x::Integer)
+   if nrows(M) == 1
+      M[1, x]
+   elseif ncols(M) == 1
+      M[x, 1]
+   else
+      throw(ArgumentError("linear indexing not supported for non-vector matrices"))
+   end
+end
+
 @doc Markdown.doc"""
     Base.getindex(M::AbstractAlgebra.MatElem, rows, cols)
 

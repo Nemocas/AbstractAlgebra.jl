@@ -558,6 +558,29 @@ end
    @test size(A[:, :]) == (0, 0)
    @test_throws BoundsError A[2:3, 1:10]
 
+   function test_linear_indexing(A)
+      nr, nc = size(A)
+      if nr == 1
+         c = rand(1:nc)
+         @test A[c] == A[1, c]
+      elseif nc == 1
+         r = rand(1:nr)
+         @test A[r] == A[r, 1]
+      elseif length(A) >= 1
+         @test_throws ArgumentError A[1]
+      end
+   end
+
+   for (_, (R, rand_params)) in RINGS
+      len = rand(1:9)
+      A = matrix(R, 1, len, rand(make(R, rand_params...), len))
+      test_linear_indexing(A)
+      A = matrix(R, len, 1, rand(make(R, rand_params...), len))
+      test_linear_indexing(A)
+      A = matrix(R, 2, len, rand(make(R, rand_params...), 2*len))
+      test_linear_indexing(A)
+   end
+
    # Exact ring
    R = ZZ
    S = MatrixSpace(R, rand(1:9), rand(1:9))
@@ -573,6 +596,8 @@ end
 
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
+
+   test_linear_indexing(A)
 
    # Exact field
    R = GF(7)
@@ -590,6 +615,8 @@ end
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
+   test_linear_indexing(A)
+
    # Inexact ring
    R = RealField["t"][1]
    S = MatrixSpace(R, rand(1:9), rand(1:9))
@@ -605,6 +632,8 @@ end
 
    rows, cols = randsubseq.(axes(A), rand(2))
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
+
+   test_linear_indexing(A)
 
    # Inexact field
    R = RealField
