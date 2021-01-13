@@ -318,6 +318,11 @@ This should print a human readable, textual representation of the object (to the
 IO object). It can recursively call the corresponding `show` functions for any of its
 components.
 
+!!! note
+
+    The functionality of the function `needs_parentheses` has been replaced by
+    `expressify` and `needs_parentheses` will be removed in future versions.
+
 It may be necessary in some cases to print parentheses around components of $f$ or to
 print signs of components. For these, the following functions will exist for each
 component or component type.
@@ -335,15 +340,25 @@ expression method below is preferred.
 
 ### Expressions
 
-Alternatively, one can implement a method
+To obtain best results when printing composed types derived from other types, e.g., polynomials,
+the following method should be implemented.
 
 ```julia
 expressify(f::MyElem; context = nothing)
 ```
 
-which must be either `Expr`, `Symbol`, `Integer` or `String`. For example, if
-an element of type `MyElem` has two components `f.a` and `f.b` of integer type,
-which should be printed as `a^b`, this can be implemented as
+which must return either `Expr`, `Symbol`, `Integer` or `String`. In case one
+implements `expressify`, one can define the show method for `MyType` as follows:
+
+```julia
+function Base.show(io::IO, a::MyType)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+```
+
+As an example, assume that an object `f` of type `MyElem` has two components
+`f.a` and `f.b` of integer type, which should be printed as `a^b`, this can be
+implemented as
 
 ```julia
 expressify(f::MyElem; context = nothing) = Expr(:call, :^, f.a, f.b)
