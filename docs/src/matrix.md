@@ -144,7 +144,7 @@ julia> P = R[1; 2; t] # create a column vector
 [t]
 ```
 
-## Conversion to Julia matrices
+## Conversion to Julia matrices and iteration
 
 While `AbstractAlgebra` matrices are not instances of `AbstractArray`,
 they are closely related to Julia matrices. For convenience, a `Matrix`
@@ -154,6 +154,29 @@ are provided:
 ```@docs
 Matrix(::MatrixElem)
 Array(::MatrixElem)
+```
+
+Matrices also support iteration, and therefore functions accepting an iterator
+can be called on them, e.g.:
+
+```jldoctest
+julia> M = MatrixSpace(ZZ, 2, 3); x = M(1:6)
+[1  2  3]
+[4  5  6]
+
+julia> collect(x)
+2×3 Matrix{BigInt}:
+ 1  2  3
+ 4  5  6
+
+julia> Set(x)
+Set{BigInt} with 6 elements:
+  5
+  4
+  6
+  2
+  3
+  1
 ```
 
 ## Matrix functionality provided by AbstractAlgebra.jl

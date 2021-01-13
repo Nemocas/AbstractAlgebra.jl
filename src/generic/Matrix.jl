@@ -438,6 +438,43 @@ end
 
 ###############################################################################
 #
+#   Array interface
+#
+###############################################################################
+
+Base.ndims(::MatrixElem) = 2
+
+# Cartesian indexing
+
+Base.eachindex(a::MatrixElem) = CartesianIndices((nrows(a), ncols(a)))
+
+Base.@propagate_inbounds Base.getindex(a::MatrixElem, I::CartesianIndex) =
+   a[I[1], I[2]]
+
+Base.@propagate_inbounds function Base.setindex!(a::MatrixElem, x, I::CartesianIndex)
+   a[I[1], I[2]] = x
+   a
+end
+
+# iteration
+
+function Base.iterate(a::MatrixElem, ij=(0, 1))
+   i, j = ij
+   i += 1
+   if i > nrows(a)
+      iszero(nrows(a)) && return nothing
+      i = 1
+      j += 1
+   end
+   j > ncols(a) && return nothing
+   a[i, j], (i, j)
+end
+
+Base.IteratorSize(::Type{<:MatrixElem}) = Base.HasShape{2}()
+Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default
+
+###############################################################################
+#
 #   Block replacement
 #
 ###############################################################################
