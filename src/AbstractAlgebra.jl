@@ -989,7 +989,7 @@ end
 
 @noinline function show_minus_one(x)
   Base.depwarn("This function is deprecated",
-               :displayed_with_minus_in_front)
+               :show_minus_one)
   return true
 end
 
