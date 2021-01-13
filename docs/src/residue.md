@@ -248,7 +248,7 @@ Base.sqrt{T <: Integer}(::ResFieldElem{T})
 
 **Examples**
 
-```jldoctest
+```julia
 julia> R = ResidueField(ZZ, 733)
 Residue field of Integers modulo 733
 
