@@ -141,14 +141,14 @@ check_square(S::AbstractAlgebra.MatAlgebra) = S
 ###############################################################################
 
 @doc Markdown.doc"""
-    nrows(a::Generic.MatrixSpace)
+    nrows(a::MatSpace)
 
 Return the number of rows of the given matrix space.
 """
 nrows(a::MatSpace) = a.nrows
 
 @doc Markdown.doc"""
-    ncols(a::Generic.MatrixSpace)
+    ncols(a::MatSpace)
 
 Return the number of columns of the given matrix space.
 """
