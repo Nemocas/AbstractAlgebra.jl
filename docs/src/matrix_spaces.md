@@ -14,7 +14,7 @@ As the space of $m\times n$ matrices over a commutative ring is not itself a com
 ring, not all of the Ring interface needs to be implemented for such matrices in.
 
 In particular, the following functions do not need to be implemented: `isdomain_type`,
-`needs_parentheses`, and `divexact`.
+and `divexact`.
 The `canonical_unit` function should be implemented, but simply needs to return the
 corresponding value for entry $[1, 1]$ (the function is never called on empty matrices).
 
