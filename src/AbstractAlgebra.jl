@@ -838,6 +838,16 @@ typed_hvcat(R::Ring, dims::Dims, d...) = matrix(R, length(dims), dims[1], hvcat(
 typed_hcat(R::Ring, d...) = matrix(R, 1, length(d), hcat(d...))
 typed_vcat(R::Ring, d...) = matrix(R, length(d), 1, vcat(d...))
 
+
+
+###############################################################################
+#
+#   misc
+#
+###############################################################################
+
+include("misc/ProductIterator.jl")
+
 ###############################################################################
 #
 #   Load error objects
