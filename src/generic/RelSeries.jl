@@ -867,11 +867,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
-
-Return $x/y$.
-"""
 function divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
    iszero(y) && throw(DivideError())
@@ -912,11 +907,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(x::AbstractAlgebra.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return $x/y$ where the quotient is expected to be exact.
-"""
 function divexact(x::AbstractAlgebra.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
@@ -930,11 +920,6 @@ function divexact(x::AbstractAlgebra.RelSeriesElem, y::Union{Integer, Rational, 
    return z
 end
 
-@doc Markdown.doc"""
-    divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::T) where {T <: RingElem}
-
-Return $x/y$ where the quotient is expected to be exact.
-"""
 function divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)

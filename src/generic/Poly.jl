@@ -1112,11 +1112,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-
-Return $f/g$ where the quotient is expected to be exact.
-"""
 function divexact(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
    iszero(g) && throw(DivideError())
@@ -1150,11 +1145,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem}
-
-Return $a/b$ where the quotient is expected to be exact.
-"""
 function divexact(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem}
    iszero(b) && throw(DivideError())
    z = parent(a)()
@@ -1166,11 +1156,6 @@ function divexact(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem}
    return z
 end
 
-@doc Markdown.doc"""
-    divexact(a::AbstractAlgebra.PolyElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a/b$ where the quotient is expected to be exact.
-"""
 function divexact(a::AbstractAlgebra.PolyElem, b::Union{Integer, Rational, AbstractFloat})
    iszero(b) && throw(DivideError())
    z = parent(a)()

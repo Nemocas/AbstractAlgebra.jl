@@ -468,20 +468,10 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(x::Generic.PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return $a/b$ where the quotient is expected to be exact.
-"""
 function divexact(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    return parent(x)(divexact(x.data, y), x.scale)
 end
 
-@doc Markdown.doc"""
-    divexact(x::Generic.PuiseuxSeriesElem{T}, y::T) where {T <: RingElem}
-
-Return $a/b$ where the quotient is expected to be exact.
-"""
 function divexact(x::PuiseuxSeriesElem{T}, y::T) where {T <: RingElem}
    return parent(x)(divexact(x.data, y), x.scale)
 end

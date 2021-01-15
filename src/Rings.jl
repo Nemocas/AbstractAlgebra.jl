@@ -81,6 +81,17 @@ end
 
 *(x::RingElement, y::RingElem) = parent(y)(x)*y
 
+
+"""
+    divexact(x, y)
+
+Return an exact quotient of `x` by `y`, i.e. an element
+`z` such that `x == yz`; when `x` and `y` do not belong to the same ring,
+they are first coerced into a common ring.
+If no exact division is possible, an exception is raised.
+"""
+function divexact end
+
 function divexact(x::S, y::T) where {S <: RingElem, T <: RingElem}
    if S == promote_rule(S, T)
       divexact(x, parent(x)(y))
