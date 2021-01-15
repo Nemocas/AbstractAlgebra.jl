@@ -534,6 +534,28 @@ issquare(a::MatElem) = (nrows(a) == ncols(a))
 
 ###############################################################################
 #
+#   Matrix spaces iteration
+#
+###############################################################################
+
+function Base.iterate(M::AbstractAlgebra.MatSpace)
+   R = base_ring(M)
+   p = AbstractAlgebra.ProductIterator(fill(R, nrows(M) * ncols(M)); inplace=true)
+   a, st = iterate(p) # R is presumably not empty
+   M(a), (p, st)
+end
+
+function Base.iterate(M::AbstractAlgebra.MatSpace, (p, st))
+   a_st = iterate(p, st)
+   a_st === nothing && return nothing
+   M(first(a_st)), (p, last(a_st))
+end
+
+Base.eltype(::Type{M}) where {M<:AbstractAlgebra.MatSpace} = elem_type(M)
+Base.length(M::AbstractAlgebra.MatSpace) = BigInt(length(base_ring(M)))^(nrows(M)*ncols(M))
+
+###############################################################################
+#
 #   String I/O
 #
 ###############################################################################
