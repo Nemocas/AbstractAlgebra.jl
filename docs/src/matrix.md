@@ -216,6 +216,10 @@ isempty(::MatElem)
 ```
 
 ```@docs
+zero_matrix(::MatElem{T}) where T <: RingElement
+```
+
+```@docs
 identity_matrix(::Ring, ::Int)
 ```
 
