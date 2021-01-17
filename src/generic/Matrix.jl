@@ -6035,6 +6035,28 @@ function zero_matrix(R::Ring, r::Int, c::Int)
    return z
 end
 
+@doc Markdown.doc"""
+    zero_matrix(M::MatElem{T}, [m::Int], [n::Int]) where T <: RingElement
+
+Construct the zero matrix, i.e. a matrix only zeroes, over the same ring as `M`.
+If only `M` is specified, then it returns a zero matrix in the same matrix space
+as `M`; this is alias for `zero(M)`. If `m` also is specified, the ouput is an
+$m \times m$ zero matrix over the same ring as `M`. If both `m` and `n` are
+specified, then it returns an $m \times n$ zero matrix; this is an alias for
+`zero(M, m, n)`.
+"""
+function zero_matrix(M::MatElem{T}) where T <: RingElement
+   zero(M)
+end
+
+function zero_matrix(M::MatElem{T}, n::Int) where T <: RingElement
+   zero(M, n, n)
+end
+
+function zero_matrix(M::MatElem{T}, m::Int, n::Int) where T <: RingElement
+   zero(M, m, n)
+end
+
 ################################################################################
 #
 #   Identity matrix
