@@ -58,7 +58,7 @@ end
 #   a*(b*c) => a*b*c    products are flattened
 #   a*-b*c  => -a*b*c   unary minus can move freely through products
 #   (-a)/b  => -(a/b)   unary minus can move through the numerator of a quotient
-#   a-b     => a + -b   subtract is turned into addition with unary minus
+#   a-b     => a + -b   subtraction is turned into addition with unary minus
 #   --a     => a        
 #   0*a     => 0
 #   0+a     => a
@@ -237,7 +237,7 @@ function canonicalizePlus(obj::Expr)
    return canonicalizePlusFinal!(newobj)
 end
 
-function canonicalizeMinus(@nospecialize(obj))
+function canonicalizeMinus(obj::Expr)
    @assert obj.head == :call && obj.args[1] == :-
    if length(obj.args) < 2
       return 0
@@ -254,15 +254,19 @@ function canonicalizeMinus(@nospecialize(obj))
    return canonicalizePlusFinal!(newobj)
 end
 
-function canonicalizeTimes(@nospecialize(obj))
-   @assert obj.head == :call && obj.args[1] == :*
+function canonicalizeTimes(obj::Expr)
+   op = obj.args[1]
+   @assert obj.head == :call && (op == :* || op == :cdot)
    if length(obj.args) < 2
       return 1
    elseif length(obj.args) == 2
       return canonicalize(obj.args[2])
    end
-   obj = flatten_op(obj, :*)
-   newobj = Expr(:call, :*)
+   if op == :cdot
+      return canonicalizeOperation(obj)
+   end
+   obj = flatten_op(obj, op)
+   newobj = Expr(:call, op)
    newsign = 1
    for i in 2:length(obj.args)
       t = canonicalize(obj.args[i])
@@ -281,7 +285,7 @@ function canonicalizeTimes(@nospecialize(obj))
    elseif length(newobj.args) == 2
       newobj = newobj.args[2]
    else
-      newobj = flatten_op(newobj, :*)
+      newobj = flatten_op(newobj, op)
    end
    if newsign < 0
       newobj = syntactic_neg!(newobj)
@@ -289,19 +293,9 @@ function canonicalizeTimes(@nospecialize(obj))
    return newobj
 end
 
-function canonicalizeDivides(@nospecialize(obj))
-   @assert obj.head == :call && (obj.args[1] == :/ || obj.args[1] == ://)
+function canonicalizeOperation(obj::Expr)
+   @assert obj.head == :call
    newobj = Expr(:call, obj.args[1])
-   # lets not do anything fancy with division
-   for i in 2:length(obj.args)
-      push!(newobj.args, canonicalize(obj.args[i]))
-   end
-   return newobj
-end
-
-function canonicalizePower(@nospecialize(obj))
-   @assert obj.head == :call && obj.args[1] == :^
-   newobj = Expr(:call, :^)
    for i in 2:length(obj.args)
       push!(newobj.args, canonicalize(obj.args[i]))
    end
@@ -314,12 +308,10 @@ function canonicalize(obj::Expr)
          return canonicalizePlus(obj)
       elseif obj.args[1] == :-
          return canonicalizeMinus(obj)
-      elseif obj.args[1] == :*
+      elseif obj.args[1] == :* || obj.args[1] == :cdot
          return canonicalizeTimes(obj)
-      elseif obj.args[1] == :/ || obj.args[1] == ://
-         return canonicalizeDivides(obj)
-      elseif obj.args[1] == :^
-         return canonicalizePower(obj)
+      elseif obj.args[1] == :/ || obj.args[1] == :// || obj.args[1] == :^
+         return canonicalizeOperation(obj)
       else
          return obj
       end
@@ -350,6 +342,7 @@ prec_inf_Plus    = 1    # infix a+b+c
 prec_inf_Minus   = 1    # infix a-b-c
 prec_inf_Times   = 3    # infix a*b*c
 prec_inf_Divide  = 3    # infix a/b/c
+prec_inf_CenterDot = 4  # non associative * with spaces, \cdot in latex
 prec_pre_Plus    = 5    # prefix +a not used
 prec_pre_Minus   = 6    # prefix -a
 prec_pre_Times   = 7    # prefix *a not used
@@ -517,6 +510,8 @@ function printExpr(S::printer, obj::Expr, left::Int, right::Int)
          printGenericInfix(S, obj, left, right, "/", prec_inf_Divide, +1)
       elseif obj.args[1] === ://
          printGenericInfix(S, obj, left, right, "//", prec_inf_Divide, +1)
+      elseif obj.args[1] === :cdot
+         printGenericInfix(S, obj, left, right, " * ", prec_inf_CenterDot, 0)
       elseif obj.args[1] === :^
          printGenericInfix(S, obj, left, right, "^", prec_inf_Power, -1)
       else
@@ -767,6 +762,8 @@ function printLatexExpr(S::printer, obj::Expr, left::Int, right::Int)
          printLatexMinus(S, obj, left, right)
       elseif obj.args[1] === :*
          printLatexGenericInfix(S, obj, left, right, " ", prec_inf_Times, +1)
+      elseif obj.args[1] === :cdot
+         printLatexGenericInfix(S, obj, left, right, " \\cdot ", prec_inf_CenterDot, 0)
       elseif obj.args[1] === :/ || obj.args[1] === ://
          printLatexDivides(S, obj, left, right)
       elseif obj.args[1] === :^
