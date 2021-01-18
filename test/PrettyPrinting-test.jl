@@ -115,6 +115,14 @@
 
    @test latex_string(:(x^((-1)//2))) == "x^{-\\frac{1}{2}}"
 
+   # / has same precedence as * in julia
+   @test latex_string(:(x^(-a*b/c))) == "x^{-\\frac{a b}{c}}"
+   # // has higher precedence in julia
+   @test latex_string(:(x^(-a*b//c))) == "x^{-a \\frac{b}{c}}"
+
+   @test latex_string(:((-a*b/c)^x)) == "\\left(-\\frac{a b}{c}\\right)^{x}"
+   @test latex_string(:((a*b/c)^x)) == "\\left(\\frac{a b}{c}\\right)^{x}"
+
    @test latex_string(:(cdot(cdot(-a,b),cdot(c,d)))) ==
              "\\left(-a \\cdot b\\right) \\cdot \\left(c \\cdot d\\right)"
 
