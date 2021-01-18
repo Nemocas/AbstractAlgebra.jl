@@ -92,7 +92,7 @@ end
 ################################################################################
 
 function expressify(@nospecialize(a::Fac); context = nothing)
-   prod = Expr(:call, :*)
+   prod = Expr(:call, :cdot)
    if isdefined(a, :unit)
       push!(prod.args, expressify(a.unit, context = context))
    else
