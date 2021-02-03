@@ -89,4 +89,16 @@ include("generic/MapWithInverse.jl")
 
 include("generic/MapCache.jl")
 
+###############################################################################
+#
+#   Temporary miscellaneous files being moved from Hecke.jl
+#
+###############################################################################
+
+include("Misc/Frac.jl")
+include("Misc/Poly.jl")
+include("Misc/Rings.jl")
+include("Misc/Series.jl")
+include("Misc/Localization.jl")
+
 end # generic
