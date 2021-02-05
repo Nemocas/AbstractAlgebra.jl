@@ -420,7 +420,8 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  order, ordering, parent_type, parity, partitionseq, Perm, perm,
                  permtype, @perm_str, polcoeff, pol_length, powmod,
                  pow_multinomial, popov, popov_with_transform,
-                 precision, preimage, preimage_map, primpart, pseudodivrem,
+                 precision, preimage, preimage_map,
+		 prime, primpart, pseudodivrem,
                  pseudo_inv, pseudorem, push_term!, randmat_triu,
                  randmat_with_rank, rand_ordering, rank_profile_popov, remove,
                  renormalize!, rels, rescale!, resultant, resultant_ducos,
@@ -438,7 +439,12 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  to_univariate, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
-                 @PolynomialRing, MatrixElem
+                 @PolynomialRing, MatrixElem,
+       # Moved from Hecke into Misc
+                 coefficients, divexact_low, divhigh,
+		 ismonic, Loc, Localization, LocElem, mulhigh_n,
+		 polynomial_to_power_sums, PolyCoeffs,
+		 power_sums_to_polynomial, roots, sturm_sequence
 
 # Do not export inv, div, divrem, exp, sqrt, numerator and denominator as we define our own
 export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, add_column!, add_row, add_row!, base_ring, cached,
@@ -500,7 +506,8 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  parent_type, parity, partitionseq, Perm, perm, permtype,
                  @perm_str, polcoeff, pol_length, powmod, pow_multinomial,
                  popov, popov_with_transform, powers, ppio, precision, preimage,
-                 preimage_map, primpart, pseudo_inv, pseudodivrem, pseudorem,
+                 preimage_map, prime, primpart,
+		 pseudo_inv, pseudodivrem, pseudorem,
                  push_term!, rank, randmat_triu, randmat_with_rank,
                  rand_ordering, rank_profile_popov, reduce!, remove,
                  renormalize!, rels, resultant, resultant_ducos, rescale!,
@@ -518,7 +525,12 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  total_degree, tr, trail, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
-                 @PolynomialRing, MatrixElem
+                 @PolynomialRing, MatrixElem,
+       # Moved from Hecke into Misc
+                 coefficients, divexact_low, divhigh,
+		 ismonic, Loc, Localization, LocElem, mulhigh_n,
+		 polynomial_to_power_sums, PolyCoeffs,
+		 power_sums_to_polynomial, roots, sturm_sequence
 
 # TODO remove these two once removed from dependent packages (Hecke)
 export displayed_with_minus_in_front, show_minus_one
