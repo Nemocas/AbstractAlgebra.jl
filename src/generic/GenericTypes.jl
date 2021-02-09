@@ -952,7 +952,7 @@ mutable struct MatAlgebra{T <: RingElement} <: AbstractAlgebra.MatAlgebra{T}
    base_ring::Ring
 
    function MatAlgebra{T}(R::Ring, n::Int, cached::Bool = true) where T <: RingElement
-      if haskey(MatAlgDict, (R, n))
+      if cached && haskey(MatAlgDict, (R, n))
          return MatAlgDict[R, n]::MatAlgebra{T}
       else
          z = new{T}(n, R)

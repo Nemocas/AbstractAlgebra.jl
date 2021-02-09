@@ -6109,14 +6109,14 @@ diagonal_matrix(x::RingElement, m::Int) = diagonal_matrix(x, m, m)
 ###############################################################################
 
 @doc Markdown.doc"""
-    MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = true)
+    MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int; cached::Bool = true)
 
 Return parent object corresponding to the space of $r\times c$ matrices over
 the ring $R$. If `cached == true` (the default), the returned parent object
 is cached so that it can returned by future calls to the constructor with the
 same dimensions and base ring.
 """
-function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = true)
+function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int; cached::Bool = true)
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end

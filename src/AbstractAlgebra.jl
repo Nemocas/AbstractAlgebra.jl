@@ -668,12 +668,12 @@ end
 @doc (@doc Generic.LaurentPolynomialRing)
 LaurentPolynomialRing(R::Ring, s::AbstractString) = Generic.LaurentPolynomialRing(R, s)
 
-function MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
-   Generic.MatrixSpace(R, r, c, cached)
+function MatrixSpace(R::Ring, r::Int, c::Int; cached::Bool = true)
+   Generic.MatrixSpace(R, r, c; cached = cached)
 end
 
-function MatrixAlgebra(R::Ring, n::Int, cached::Bool = true)
-   Generic.MatrixAlgebra(R, n, cached)
+function MatrixAlgebra(R::Ring, n::Int; cached::Bool = true)
+   Generic.MatrixAlgebra(R, n, cached = cached)
 end
 
 function FractionField(R::Ring; cached=true)

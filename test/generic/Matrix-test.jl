@@ -116,7 +116,11 @@ end
 
 @testset "Generic.Mat.constructors..." begin
    R, t = PolynomialRing(QQ, "t")
+
    S = MatrixSpace(R, 3, 3)
+
+   @test MatrixSpace(R, 3, 3, cached = false) !== MatrixSpace(R, 3, 3, cached = false)
+   @test MatrixSpace(R, 3, 3, cached = true) === MatrixSpace(R, 3, 3, cached = true)
 
    @test elem_type(S) == Generic.MatSpaceElem{elem_type(R)}
    @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
