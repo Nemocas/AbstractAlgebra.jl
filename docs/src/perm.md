@@ -5,13 +5,13 @@ DocTestSetup = quote
 end
 ```
 
-# Permutations and Permutation groups
+# Permutations and Symmetric groups
 
 AbstractAlgebra.jl provides rudimentary native support for permutation groups (implemented in `src/generic/PermGroups.jl`). All functionality of permutations is accesible in the `Generic` submodule.
 
-Permutations are represented internally via vector of integers, wrapped in type `Perm{T}`, where `T<:Integer` carries the information on the type of elements of a permutation. Permutation groups are singleton parent objects of type `SymmetricGroup{T}` and are used mostly to store the length of a permutation, since it is not included in the permutation type.
+Permutations are represented internally via vector of integers, wrapped in type `Perm{T}`, where `T<:Integer` carries the information on the type of elements of a permutation. Symmetric groups are singleton parent objects of type `SymmetricGroup{T}` and are used mostly to store the length of a permutation, since it is not included in the permutation type.
 
-Permutation groups are created using the `SymmetricGroup` (inner) constructor.
+Symmetric groups are created using the `SymmetricGroup` (inner) constructor.
 
 Both `SymmetricGroup` and `Perm` and can be parametrized by any type `T<:Integer` .
 By default the parameter is the `Int`-type native to the systems architecture.
@@ -63,7 +63,7 @@ julia> H = SymmetricGroup(UInt16(5)); r = H([2,3,1,5,4])
 julia> typeof(r)
 Perm{UInt16}
 
-julia> H()
+julia> one(H)
 ()
 ```
 
@@ -115,7 +115,7 @@ Given the parent object `G` for a permutation group, the following coercion func
 Developers provide these by overloading the permutation group parent objects.
 
 ```julia
-G()
+one(G)
 ```
 
 Return the identity permutation.
@@ -202,13 +202,6 @@ The following coercions are available for `G::SymmetricGroup` parent objects.
 Each of the methods perform basic sanity checks on the input which can be switched off by the second argument.
 
 **Examples**
-
-```jldoctest
-julia> SymmetricGroup(4)()
-()
-```
-> Return the identity element of `G`.
-
 
 ```julia
 (G::SymmetricGroup)(::AbstractVector{<:Integer}[, check=true])

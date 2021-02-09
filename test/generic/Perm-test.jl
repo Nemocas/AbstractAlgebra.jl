@@ -26,15 +26,15 @@ end
    @test G0 isa Generic.SymmetricGroup{T}
 
    p = Perm(T[])
-   @test p == G0()
+   @test p == one(G0)
    @test parent(p) == G0
 
    G = SymmetricGroup(T(10))
    @test elem_type(G) == Generic.Perm{T}
 
-   @test G() isa GroupElem
-   @test G() isa Generic.Perm{T}
-   a = G()
+   @test one(G) isa GroupElem
+   @test one(G) isa Generic.Perm{T}
+   a = one(G)
    @test parent_type(typeof(a)) == Generic.SymmetricGroup{T}
    @test parent(a) == G
 
@@ -107,8 +107,8 @@ end
 
    for T in IntTypes
       G = SymmetricGroup(T(5))
-      @test G("()") == G()
-      @test G("()()") == G()
+      @test G("()") == one(G)
+      @test G("()()") == one(G)
       @test G("(1)(2,3)") == Perm(T[1,3,2,4,5])
       @test G("(2,3)") == G("(1)(2,3)")
       @test G("(3,2)") == G("(2,3)")
@@ -146,7 +146,7 @@ end
 @testset "Perm.basic_manipulation ($T)..." for T in IntTypes
    G = SymmetricGroup(T(10))
 
-   a = G()
+   a = one(G)
    b = deepcopy(a)
    c = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
@@ -176,7 +176,7 @@ end
 
    elts = collect(G)
 
-   @test elts[1] == G()
+   @test elts[1] == one(G)
    @test length(elts) == 720
    @test length(unique(elts)) == 720
    @test length(G) == 720
@@ -191,19 +191,19 @@ end
 
    @test a*b == G(T[3,2,1]) # (1,2)*(1,2,3) == (1,3)
    @test b*a == G(T[1,3,2]) # (1,2,3)*(1,2) == (2,3)
-   @test a*a == G()
-   @test b*b*b == G()
+   @test a*a == one(G)
+   @test b*b*b == one(G)
 
    # (1,2,3)*(2,3,4) == (1,3)(2,4)
    @test Perm(T[2,3,1,4])*Perm(T[1,3,4,2]) == Perm(T[3,4,1,2])
 
-   @test parity(G()) == 0
+   @test parity(one(G)) == 0
    p = parity(a)
    @test p == 1
    cycles(a)
    @test parity(a) == p
 
-   z = G()
+   z = one(G)
 
    for a in G, b in G
       @test parity(a*b) == (parity(b)+parity(a)) % 2
@@ -221,12 +221,12 @@ end
 
    G = SymmetricGroup(T(10))
    p = G(T[9,5,4,7,3,8,2,10,1,6]) # (1,9)(2,5,3,4,7)(6,8,10)
-   @test p^0 == G()
+   @test p^0 == one(G)
    @test p^1 == p
    @test p^-1 == inv(p)
    @test p^5 == p*p*p*p*p
    @test p^-4 == inv(p)*inv(p)*inv(p)*inv(p)
-   @test p^2 * p^-2 == G()
+   @test p^2 * p^-2 == one(G)
 end
 
 @testset "Perm.mixed_binary_ops..." begin
@@ -234,9 +234,9 @@ end
    for T in IntTypes
       H = SymmetricGroup(T(6))
 
-      @test G(H()) == G()
-      @test H(G()) == H()
-      @test G() == H()
+      @test G(one(H)) == one(G)
+      @test H(one(G)) == one(H)
+      @test one(G) == one(H)
       @test rand(G)*rand(H) isa Perm{promote_type(Int, T)}
       @test rand(H)*rand(G) isa Perm{promote_type(Int, T)}
       @test G(rand(H)) isa Perm{Int}
@@ -247,7 +247,7 @@ end
 @testset "Perm.inversion ($T)..." for T in IntTypes
    G = SymmetricGroup(T(10))
 
-   a = G()
+   a = one(G)
    b = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
    @test a == inv(a)
@@ -263,11 +263,11 @@ end
    G = SymmetricGroup(T(10))
    a = G([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
-   @test cycles(G()) isa Generic.CycleDec{T}
-   @test collect(cycles(G())) == [T[i] for i in 1:10]
-   @test order(G()) isa BigInt
-   @test order(T, G()) isa promote_type(Int, T)
-   @test order(G()) == 1
+   @test cycles(one(G)) isa Generic.CycleDec{T}
+   @test collect(cycles(one(G))) == [T[i] for i in 1:10]
+   @test order(one(G)) isa BigInt
+   @test order(T, one(G)) isa promote_type(Int, T)
+   @test order(one(G)) == 1
 
    @test collect(cycles(a)) == [T[1,2,3,5,6,7], T[4], T[8,9,10]]
    @test Generic.permtype(a) isa Vector{T}
@@ -281,7 +281,7 @@ end
    @test order(a) isa BigInt
    @test order(T, a) isa promote_type(Int, T)
    @test order(a) == 6
-   @test a^6 == G()
+   @test a^6 == one(G)
 
    p = G([9,5,4,7,3,8,2,10,1,6])
 
@@ -313,7 +313,7 @@ end
       N = T(7)
       G = SymmetricGroup(N)
 
-      @test all(character(p)(G()) == dim(YoungTableau(p)) for p in AllParts(N))
+      @test all(character(p)(one(G)) == dim(YoungTableau(p)) for p in AllParts(N))
 
       N = T(3)
       G = SymmetricGroup(N)
@@ -386,6 +386,6 @@ end
    # test for overflow
 
    p = Partition(collect(10:-1:1))
-   @test character(p, SymmetricGroup(big(55))()) == 44261486084874072183645699204710400
+   @test character(p, one(SymmetricGroup(big(55)))) == 44261486084874072183645699204710400
    @test dim(YoungTableau(p)) == 44261486084874072183645699204710400
 end
