@@ -353,21 +353,19 @@ function _print_perm(io::IO, p::Perm, width::Integer=last(displaysize(io)))
    if isone(p)
       return print(io, "()")
    else
-      res = String[]
       cum_length = 0
       for c in cycles(p)
          length(c) == 1 && continue
-         push!(res, join(c, ","))
-         cum_length += 2length(c)+1
-         if cum_length > width
+         cyc = join(c, ",")
+
+         if width - cum_length >= length(cyc)+2
+            print(io, "(", cyc, ")")
+            cum_length += length(cyc)+2
+         else
+            available = width - cum_length - 3
+            print(io, "(", SubString(cyc, 1, available), " …")
             break
          end
-      end
-      out = "("*join(res, ")(")*")"
-      if length(out) > width
-         print(io, out[1:width-3]*" … ")
-      else
-         print(io, out)
       end
    end
 end
