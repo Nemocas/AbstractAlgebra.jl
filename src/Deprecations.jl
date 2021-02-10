@@ -19,3 +19,8 @@
 @deprecate MatrixSpace(R::Ring, n::Int, m::Int, cached::Bool) MatrixSpace(R, n, m, cached = cached)
 
 @deprecate MatrixAlgebra(R::Ring, n::Int, cached::Bool) MatrixAlgebra(R, n, cached = cached)
+
+function (G::Generic.SymmetricGroup)()
+    Base.depwarn("(::SymmetricGroup)() to get the group identity is deprecated, use one(::SymmetricGroup) instead", :one)
+    return one(G)
+end
