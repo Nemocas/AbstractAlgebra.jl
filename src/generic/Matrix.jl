@@ -1298,7 +1298,7 @@ function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldEle
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
-   p = P()
+   p = one(P)
    R = base_ring(A)
    U = deepcopy(A)
    L = similar(A, m, m)
@@ -1454,7 +1454,7 @@ function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingEl
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
-   p = P()
+   p = one(P)
    R = base_ring(A)
    U = deepcopy(A)
    L = similar(A, m, m)
@@ -1502,7 +1502,7 @@ function rref_rational!(A::MatrixElem{T}) where {T <: RingElement}
    m = nrows(A)
    n = ncols(A)
    R = base_ring(A)
-   P = SymmetricGroup(m)()
+   P = one(SymmetricGroup(m))
    rank, d = fflu!(P, A)
    for i = rank + 1:m
       for j = 1:n
@@ -1572,7 +1572,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    R = base_ring(A)
-   P = SymmetricGroup(m)()
+   P = one(SymmetricGroup(m))
    rnk = lu!(P, A)
    if rnk == 0
       return 0
@@ -1868,7 +1868,7 @@ function det_fflu(M::MatrixElem{T}) where {T <: RingElement}
       return base_ring(M)()
    end
    A = deepcopy(M)
-   P = SymmetricGroup(n)()
+   P = one(SymmetricGroup(n))
    r, d = fflu!(P, A)
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
@@ -2020,7 +2020,7 @@ function rank(M::MatrixElem{T}) where {T <: RingElement}
       return 0
    end
    A = deepcopy(M)
-   P = SymmetricGroup(n)()
+   P = one(SymmetricGroup(n))
    r, d = fflu!(P, A)
    return r
 end
@@ -2036,7 +2036,7 @@ function rank(M::MatrixElem{T}) where {T <: FieldElement}
       return 0
    end
    A = deepcopy(M)
-   P = SymmetricGroup(n)()
+   P = one(SymmetricGroup(n))
    return lu!(P, A)
 end
 
@@ -2060,7 +2060,7 @@ function can_solve_with_solution_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: 
    base_ring(A) != base_ring(b) && error("Base rings don't match in can_solve_with_solution_fflu")
    nrows(A) != nrows(b) && error("Dimensions don't match in can_solve_with_solution_fflu")
    FFLU = deepcopy(A)
-   p = SymmetricGroup(nrows(A))()
+   p = one(SymmetricGroup(nrows(A)))
    rank, d = fflu!(p, FFLU)
    flag, y = solve_fflu_precomp(p, FFLU, b)
    n = nrows(A)
@@ -2186,7 +2186,7 @@ function can_solve_with_solution_lu(A::MatElem{T}, b::MatElem{T}) where {T <: Fi
    end
 
    LU = deepcopy(A)
-   p = SymmetricGroup(nrows(A))()
+   p = one(SymmetricGroup(nrows(A)))
    rank = lu!(p, LU)
 
    y = solve_lu_precomp(p, LU, b)
@@ -2299,7 +2299,7 @@ function can_solve_with_solution_with_det(M::AbstractAlgebra.MatElem{T}, b::Abst
    # the) permutation.
    R = base_ring(M)
    FFLU = deepcopy(M)
-   p = SymmetricGroup(nrows(M))()
+   p = one(SymmetricGroup(nrows(M)))
    rank, d = fflu!(p, FFLU)
    pivots = zeros(Int, nrows(M))
    c = 1
@@ -2371,7 +2371,7 @@ function can_solve_with_solution_interpolation_inner(M::AbstractAlgebra.MatElem{
    h = ncols(b)
    c = ncols(M)
    R = base_ring(M)
-   prm = SymmetricGroup(nrows(M))()
+   prm = one(SymmetricGroup(nrows(M)))
    pivots = zeros(Int, nrows(M))
    if m == 0
       return true, 0, prm, pivots, zero_matrix(R, c, h), one(R)

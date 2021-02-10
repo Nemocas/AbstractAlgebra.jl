@@ -272,7 +272,7 @@ julia> permtype(g)
  2
  1
 
-julia> G = SymmetricGroup(5); e = parent(g)()
+julia> e = one(g)
 ()
 
 julia> permtype(e)
@@ -285,7 +285,7 @@ julia> permtype(e)
  1
 ```
 """
-permtype(g::Perm) = sort(diff(cycles(g).cptrs), rev=true)
+permtype(g::Perm) = sort!(diff(cycles(g).cptrs), rev=true)
 
 ###############################################################################
 #
@@ -340,15 +340,32 @@ function setpermstyle(format::Symbol)
    return format
 end
 
-function show(io::IO, g::Perm)
+function Base.show(io::IO, g::Perm)
    if _permdisplaystyle.format == :array
       print(io, "[" * join(g.d, ", ") * "]")
    elseif _permdisplaystyle.format == :cycles
-      cd = cycles(g)
-      if g == parent(g)()
-         print(io, "()")
-      else
-         print(io, join(["("*join(c, ",")*")" for c in cd if length(c)>1],""))
+      _print_perm(io, g)
+   end
+end
+
+function _print_perm(io::IO, p::Perm, width::Integer=last(displaysize(io)))
+   @assert width > 3
+   if isone(p)
+      return print(io, "()")
+   else
+      cum_length = 0
+      for c in cycles(p)
+         length(c) == 1 && continue
+         cyc = join(c, ",")
+
+         if width - cum_length >= length(cyc)+2
+            print(io, "(", cyc, ")")
+            cum_length += length(cyc)+2
+         else
+            available = width - cum_length - 3
+            print(io, "(", SubString(cyc, 1, available), " …")
+            break
+         end
       end
    end
 end
@@ -757,7 +774,7 @@ function emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
       @assert length(Base.Set(V)) == length(V)
       @assert all(V .<= G.n)
    end
-   return p -> Generic.emb!(G(), p, V)
+   return p -> Generic.emb!(one(G), p, V)
 end
 
 @doc Markdown.doc"""
@@ -778,7 +795,8 @@ function perm(a::AbstractVector{<:Integer}, check::Bool = true)
   return Perm(a, check)
 end
 
-(G::SymmetricGroup)() = Perm(G.n)
+one(G::SymmetricGroup) = Perm(G.n)
+one(g::Perm) = one(parent(g))
 
 function (G::SymmetricGroup{T})(a::AbstractVector{S}, check::Bool=true) where {S, T}
    if check
@@ -948,7 +966,7 @@ Full symmetric group over 4 elements
 julia> chi = character(Partition([3,1])); # character of the regular representation
 
 
-julia> chi(G())
+julia> chi(one(G))
 3
 
 julia> chi(perm"(1,3)(2,4)")
