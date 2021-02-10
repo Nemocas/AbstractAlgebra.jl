@@ -344,19 +344,19 @@ function Base.show(io::IO, g::Perm)
    if _permdisplaystyle.format == :array
       print(io, "[" * join(g.d, ", ") * "]")
    elseif _permdisplaystyle.format == :cycles
-      print(io, _permstring(g, last(displaysize(io))))
+      _print_perm(io, g)
    end
 end
 
-function _permstring(p::Perm, width::Integer)
+function _print_perm(io::IO, p::Perm, width::Integer=last(displaysize(io)))
    @assert width > 3
    if isone(p)
-      return "()"
+      return print(io, "()")
    else
       res = String[]
       cum_length = 0
       for c in cycles(p)
-         length(c) == 1 && continue            
+         length(c) == 1 && continue
          push!(res, join(c, ","))
          cum_length += 2length(c)+1
          if cum_length > width
@@ -365,9 +365,9 @@ function _permstring(p::Perm, width::Integer)
       end
       out = "("*join(res, ")(")*")"
       if length(out) > width
-         return out[1:width-3]*" … "
+         print(io, out[1:width-3]*" … ")
       else
-         return out
+         print(io, out)
       end
    end
 end
