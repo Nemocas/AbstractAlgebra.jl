@@ -4,19 +4,8 @@
 #
 ###############################################################################
 
-mutable struct Integers{T <: Integer} <: Ring
-   function Integers{T}() where T <: Integer
-      if haskey(IntegersID, T)
-         z = IntegersID[T]::Integers{T}
-      else 
-         z = new{T}()
-         IntegersID[T] = z
-      end
-      return z
-   end
+struct Integers{T <: Integer} <: Ring
 end
-
-const IntegersID = Dict{DataType, Ring}()
 
 ###############################################################################
 #
@@ -24,19 +13,8 @@ const IntegersID = Dict{DataType, Ring}()
 #
 ###############################################################################
 
-mutable struct Rationals{T <: Integer} <: Field
-   function Rationals{T}() where T <: Integer
-      if haskey(RationalsID, T)
-         z = RationalsID[T]::Rationals{T}
-      else 
-         z = new{T}()
-         RationalsID[T] = z
-      end
-      return z
-   end
+struct Rationals{T <: Integer} <: Field
 end
-
-const RationalsID = Dict{DataType, Ring}()
 
 ###############################################################################
 #
@@ -44,20 +22,8 @@ const RationalsID = Dict{DataType, Ring}()
 #
 ###############################################################################
 
-mutable struct Floats{T <: AbstractFloat} <: Field
-   function Floats{T}() where T <: AbstractFloat
-      if haskey(FloatsID, T)
-         z = FloatsID[T]::Floats{T}
-      else 
-         z = new{T}()
-         FloatsID[T] = z
-      end
-      return z
-   end
+struct Floats{T <: AbstractFloat} <: Field
 end
-
-const FloatsID = Dict{DataType, Field}()
-
 
 ###############################################################################
 #
@@ -96,4 +62,3 @@ const RingElement   = Union{RingElem,   Integer, Rational, AbstractFloat}
 const NCRingElement = Union{NCRingElem, Integer, Rational, AbstractFloat}
 
 const FieldElement = Union{FieldElem, Rational, AbstractFloat}
-
