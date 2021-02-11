@@ -729,6 +729,16 @@ end
 end
 
 @testset "Generic.Mat.block_replacement..." begin
+   _test_block_replacement = function(a, b, r, c)
+      rr = r isa Colon ? (1:nrows(a)) : r
+      cc = c isa Colon ? (1:ncols(a)) : c
+      if (b isa Vector)
+         all([a[i1, j1] == b[i + j - 1] for (i, i1) in enumerate(rr) for (j, j1) in enumerate(cc)])
+      else
+         all([a[i1, j1] == b[i, j] for (i, i1) in enumerate(rr) for (j, j1) in enumerate(cc)])
+      end
+   end
+
    S = MatrixSpace(ZZ, 9, 9)
    (r, c) = (rand(1:9), rand(1:9))
    T = MatrixSpace(ZZ, r, c)
@@ -740,6 +750,91 @@ end
    endc = startc + c - 1
    a[startr:endr, startc:endc] = b
    @test a[startr:endr, startc:endc] == b
+
+   for i in 1:10
+      n = rand(1:9)
+      m = rand(1:9)
+      S = MatrixSpace(ZZ, n, m)
+      a = rand(S, -100:100)
+      (r, c) = (rand(1:n), rand(1:m))
+      T = MatrixSpace(zz, r, c)
+      b = rand(T, -2:2)
+      startr = rand(1:(n-r+1))
+      endr = startr + r - 1
+      startc = rand(1:(m-c+1))
+      endc = startc + c - 1
+
+      rrs = Int[]
+      for j in 1:rand(1:n)
+         rr = rand(1:n)
+         while (rr in rrs)
+            rr = rand(1:n)
+         end
+         push!(rrs, rr)
+      end
+
+      ccs = Int[]
+      for j in 1:rand(1:m)
+         cc = rand(1:m)
+         while (cc in ccs)
+            cc = rand(1:m)
+         end
+         push!(ccs, cc)
+      end
+
+      for r in [rand(1:n), Colon(), rrs, startr:endr]
+         for c in [rand(1:m), Colon(), ccs, startc:endc]
+            if c isa Int && r isa Int
+               continue
+            end
+            for R in [zz, ZZ]
+               lr = r isa Colon ? nrows(a) : length(r)
+               lc = c isa Colon ? ncols(a) : length(c)
+               T = MatrixSpace(zz, lr, lc)
+               b = rand(T, -2:2)
+               aa = deepcopy(a)
+               a[r, c] = b
+               @test _test_block_replacement(a, b, r, c)
+               bb = Matrix(b)
+               aa[r, c] = bb
+               @test _test_block_replacement(aa, bb, r, c)
+            end
+         end
+      end
+      for r in [rand(1:n)]
+         for c in [rand(1:m), Colon(), ccs, startc:endc]
+            if c isa Int && r isa Int
+               continue
+            end
+            for R in [zz, ZZ]
+               lr = r isa Colon ? nrows(a) : length(r)
+               lc = c isa Colon ? ncols(a) : length(c)
+               T = MatrixSpace(zz, lr, lc)
+               _b = rand(T, -2:2)
+               b = vec(Matrix(_b))
+               a[r, c] = b
+               @test _test_block_replacement(a, b, r, c)
+            end
+         end
+      end
+      for r in [rand(1:n), Colon(), rrs, startr:endr]
+         for c in [rand(1:m)]
+            if c isa Int && r isa Int
+               continue
+            end
+            for R in [zz, ZZ]
+               lr = r isa Colon ? nrows(a) : length(r)
+               lc = c isa Colon ? ncols(a) : length(c)
+               T = MatrixSpace(zz, lr, lc)
+               _b = rand(T, -2:2)
+               b = vec(Matrix(_b))
+               a[r, c] = b
+               @test _test_block_replacement(a, b, r, c)
+            end
+         end
+      end
+
+   end
 end
 
 @testset "Generic.Mat.binary_ops..." begin

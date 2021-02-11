@@ -490,9 +490,9 @@ Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default
 #
 ###############################################################################
 
-function setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::UnitRange{Int}, c::UnitRange{Int}) where T
+function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::UnitRange{Int}, c::UnitRange{Int}) where T
     _checkbounds(a, r, c)
-    size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(nrows(b))x$(ncols(b)) matrix to a $(length(r))x$(length(c)) destination"))
+    size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
     startr = first(r)
     startc = first(c)
     for i in r
@@ -502,19 +502,77 @@ function setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T},
     end
 end
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::UnitRange{Int}, ::Colon) where T = setindex!(a, b, r, 1:ncols(a))
+function setindex!(a::MatrixElem{T}, b::Vector, r::UnitRange{Int}, c::UnitRange{Int}) where T
+    _checkbounds(a, r, c)
+    if !((length(r) == 1 && length(c) == length(b)) || length(c) == 1 && length(r) == length(b))
+      throw(DimensionMismatch("tried to assign vector of length $(length(b)) to a $(length(r))x$(length(c)) destination"))
+    end
+    startr = first(r)
+    startc = first(c)
+    for i in r
+        for j in c
+            a[i, j] = b[i - startr + 1 + j - startc]
+        end
+    end
+end
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, ::Colon, c::UnitRange{Int}) where T = setindex!(a, b, 1:nrows(a), c)
+# UnitRange{Int}, Colon
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, ::Colon) where T = setindex!(a, b, r, 1:ncols(a))
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, ::Colon, ::Colon) where T = setindex!(a, b, 1:nrows(a), 1:ncols(a))
+# Colon, UnitRange{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::UnitRange{Int}) where T = setindex!(a, b, 1:nrows(a), c)
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::Int, c::UnitRange{Int}) where T = setindex!(a, b, r:r, c)
+# Colon, Colon
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, ::Colon) where T = setindex!(a, b, 1:nrows(a), 1:ncols(a))
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::UnitRange{Int}, c::Int) where T = setindex!(a, b, r, c:c)
+# Int, UnitRange{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, c::UnitRange{Int}) where T = setindex!(a, b, r:r, c)
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, r::Int, ::Colon) where T = setindex!(a, b, r:r, 1:ncols(a))
+# UnitRange{Int}, Int
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, c::Int) where T = setindex!(a, b, r, c:c)
 
-setindex!(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, ::Colon, c::Int) where T = setindex!(a, b, 1:nrows(a), c:c)
+# Int, Colon
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, ::Colon) where T = setindex!(a, b, r:r, 1:ncols(a))
+
+# Colon, Int
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::Int) where T = setindex!(a, b, 1:nrows(a), c:c)
+
+function _setindex!(a::MatrixElem{T}, b, r, c) where T
+   for (i, i2) in enumerate(r)
+      for (j, j2) in enumerate(c)
+         a[i2, j2] = b[i, j]
+      end
+   end
+end
+
+function _setindex!(a::MatrixElem{T}, b::Vector, r, c) where T
+   for (i, i2) in enumerate(r)
+      for (j, j2) in enumerate(c)
+         a[i2, j2] = b[i + j - 1]
+      end
+   end
+end
+
+# Vector{Int}, Vector{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::Vector{Int}) where T = _setindex!(a, b, r, c)
+
+# Vector{Int}, UnitRange{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::UnitRange{Int}) where T = _setindex!(a, b, r, c)
+
+# UnitRange{Int}, Vector{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, c::Vector{Int}) where T = _setindex!(a, b, r, c)
+
+# Vector{Int}, Colon
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, ::Colon) where T = _setindex!(a, b, r, 1:ncols(a))
+
+# Colon, Vector{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::Vector{Int}) where T = _setindex!(a, b, 1:nrows(a), c)
+
+# Int, Vector{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, c::Vector{Int}) where T = setindex!(a, b, r:r, c)
+
+# Vector{Int}, Int
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::Int) where T = setindex!(a, b, r, c:c)
 
 ################################################################################
 #
