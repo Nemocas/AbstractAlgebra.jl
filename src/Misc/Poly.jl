@@ -214,7 +214,7 @@ power sums from the coefficients of $f$.
 function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: FieldElem
     d = degree(f)
     R = base_ring(f)
-    S = PowerSeriesRing(R, n + 1, "gen(S)", cached = false, model =:capped_absolute)[1]
+    S = AbstractAlgebra.PowerSeriesRing(R, n + 1, "gen(S)", cached = false, model =:capped_absolute)[1]
     # Beware: converting to power series and derivative do not commute
     A = S()
     B = S()
@@ -261,7 +261,7 @@ coefficients (the elementary symmetric functions) from the power sums.
 function power_sums_to_polynomial(P::Array{T, 1}) where T <: FieldElem
     d = length(P)
     R = parent(P[1])
-    S = PowerSeriesRing(R, d, "gen(S)")[1] # capped_absolute
+    S = AbstractAlgebra.PowerSeriesRing(R, d, "gen(S)")[1] # capped_absolute
     s = S(P, length(P), d, 0)
     r = -integral(s)
     r1 = exp(r)
