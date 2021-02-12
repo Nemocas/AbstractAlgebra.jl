@@ -36,6 +36,13 @@
    @test just_string(:(a^-(b*c^d))) == "a^-(b*c^d)"
    @test just_string(:((a^-b)*(c^d))) == "a^-b*c^d"
 
+   # // has a higher precedence than /
+   @test just_string(:(a*b//c)) == "a*b//c"
+   @test just_string(:(a*(b//c))) == "a*b//c"
+   @test just_string(:((a*b)//c)) == "(a*b)//c"
+   @test just_string(:(-a*b//c*d^e)) == "-a*b//c*d^e"
+   @test just_string(:((-a)*(b//c)*d^e)) == "-a*b//c*d^e"
+
    @test just_string(:([a b; c d])) == "[a b; c d]"
    @test just_string(:(if a; b; end;)) isa String
    @test just_string(1.2) isa String
