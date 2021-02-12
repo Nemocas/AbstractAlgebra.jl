@@ -337,21 +337,23 @@ end
 ################################################################################
 
 # printing is done with respect to the following precedences
+# There is no point in using the julia values because we add our own ops
 prec_lowest      = 0
-prec_inf_Plus    = 1    # infix a+b+c
-prec_inf_Minus   = 1    # infix a-b-c
-prec_inf_Times   = 3    # infix a*b*c
-prec_inf_Divide  = 3    # infix a/b/c
-prec_inf_CenterDot = 4  # non associative * with spaces, \cdot in latex
-prec_pre_Plus    = 5    # prefix +a not used
-prec_pre_Minus   = 6    # prefix -a
-prec_pre_Times   = 7    # prefix *a not used
-prec_pre_Divide  = 8    # prefix /b not used
-prec_inf_Power   = 9    # infix a^b
+prec_inf_Plus    = 11    # infix a+b+c
+prec_inf_Minus   = 11    # infix a-b-c
+prec_inf_Times   = 13    # infix a*b*c
+prec_inf_Divide  = 13    # infix a/b/c
+prec_inf_DoubleDivide  = 14    # infix a//b//c
+prec_inf_CenterDot = 15  # non associative * with spaces, \cdot in latex
+prec_pre_Plus    = 20    # prefix +a not used
+prec_pre_Minus   = 21    # prefix -a
+prec_pre_Times   = 22    # prefix *a not used
+prec_pre_Divide  = 23    # prefix /b not used
+prec_inf_Power   = 30    # infix a^b
 prec_post_call   = 99   # a(b) i.e. whether a+b(c) is (a+b)(c) vs a+(b(c))
 
-prec_post_FractionBox    = 10    # precedence for a/b in 2d form
-prec_post_SuperscriptBox = 11    # precedence for a^b in 2d form
+prec_post_FractionBox    = 50    # precedence for a/b in 2d form
+prec_post_SuperscriptBox = 51    # precedence for a^b in 2d form
 
 mutable struct printer
    array::Vector{String}
@@ -509,7 +511,7 @@ function printExpr(S::printer, obj::Expr, left::Int, right::Int)
       elseif obj.args[1] === :/
          printGenericInfix(S, obj, left, right, "/", prec_inf_Divide, +1)
       elseif obj.args[1] === ://
-         printGenericInfix(S, obj, left, right, "//", prec_inf_Divide, +1)
+         printGenericInfix(S, obj, left, right, "//", prec_inf_DoubleDivide, +1)
       elseif obj.args[1] === :cdot
          printGenericInfix(S, obj, left, right, " * ", prec_inf_CenterDot, 0)
       elseif obj.args[1] === :^
@@ -657,7 +659,7 @@ function printLatexFraction(S::printer, @nospecialize(num),
    end
 end
 
-
+# What to about / and //? Just print them both as /.
 function printLatexDivides(S::printer, obj::Expr, left::Int, right::Int)
    n = length(obj.args)
    @assert n > 0 && obj.head === :call && (obj.args[1] === :/ || obj.args[1] === ://)
