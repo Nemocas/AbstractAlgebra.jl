@@ -264,7 +264,7 @@ function power_sums_to_polynomial(P::Array{T, 1}) where T <: FieldElem
     S = AbstractAlgebra.PowerSeriesRing(R, d, "gen(S)")[1] # capped_absolute
     s = S(P, length(P), d, 0)
     r = -integral(s)
-    r1 = Base.exp(r)
+    r1 = exp(r)
     @assert iszero(valuation(r1))
     Rx, x = AbstractAlgebra.PolynomialRing(R, "x", cached = false)
     return Rx([polcoeff(r1, d - i) for i = 0:d])
