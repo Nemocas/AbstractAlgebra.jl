@@ -96,10 +96,10 @@ include("generic/MapCache.jl")
 #
 ###############################################################################
 
-include("Misc/Frac.jl")
-include("Misc/Poly.jl")
-include("Misc/Rings.jl")
-include("Misc/Series.jl")
-include("Misc/Localization.jl")
+include("generic/Misc/Frac.jl")
+include("generic/Misc/Poly.jl")
+include("generic/Misc/Rings.jl")
+include("generic/Misc/Series.jl")
+include("generic/Misc/Localization.jl")
 
 end # generic
