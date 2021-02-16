@@ -39,15 +39,20 @@ end
 #
 ###############################################################################
 
-function log(a::RelSeriesElem{T}) where T <: FieldElement
+function Base.log(a::RelSeriesElem{T}) where T <: FieldElement
     @assert valuation(a) == 0 
     return integral(derivative(a)*inv(a))
 end
 
-function exp(a::RelSeriesElem{T}) where T <: FieldElement
+function Base.exp(a::RelSeriesElem{T}) where T <: FieldElement
+    if iszero(a)
+      b = parent(a)(1)
+      set_precision!(b, precision(a))
+      return b
+    end
     @assert valuation(a) > 0
     R = base_ring(parent(a))
-    x = parent(a)([R(1)], 1, 2, 0)
+    x = parent(a)([R(1)], 1, min(2, precision(a)), 0)
     p = precision(a)
     la = [p]
     while la[end] > 1
