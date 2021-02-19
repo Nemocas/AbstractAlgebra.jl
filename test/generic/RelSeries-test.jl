@@ -772,6 +772,21 @@ end
    end
 end
 
+@testset "Generic.RelSeries.unsafe_operators..." begin
+   Qx, x = PowerSeriesRing(GF(13), 10, "x")
+   a = 1 + O(x^3)
+   c = x^4 + O(x^7)
+   c = addeq!(c, a)
+
+   @test isequal(c, 1 + O(x^3))
+
+   a = 1 + x + x^2 + x^3 + x^4 + x^5 + x^6 + x^7 + O(x^9)
+   c = x^4 + O(x^7)
+   c = addeq!(c, a)
+
+   @test isequal(c, 1 + x + x^2 + x^3 + 2*x^4 + x^5 + x^6 + O(x^7))
+end
+
 @testset "Generic.RelSeries.special_functions..." begin
    # Exact field
    S, x = PowerSeriesRing(QQ, 10, "x")

@@ -1151,31 +1151,31 @@ function addeq!(c::RelSeries{T}, a::RelSeries{T}) where {T <: RingElement}
    R = base_ring(c)
    fit!(c, lenr)
    if valc >= vala
-      for i = lenc + valc - vala:-1:max(lena, valc - vala) + 1
+      for i = min(lenr, lenc + valc - vala):-1:max(lena, valc - vala) + 1
          t = c.coeffs[i]
          c.coeffs[i] = c.coeffs[i - valc + vala]
          c.coeffs[i - valc + vala] = t
       end
-      for i = lena:-1:valc - vala + 1
+      for i = min(lenr, lena):-1:valc - vala + 1
          c.coeffs[i] = add!(c.coeffs[i], c.coeffs[i - valc + vala], a.coeffs[i])
       end
-      for i = 1:min(lena, valc - vala)
+      for i = 1:min(lenr, lena, valc - vala)
          c.coeffs[i] = deepcopy(a.coeffs[i])
       end
       for i = lena + 1:min(valc - vala, lenr)
          c.coeffs[i] = R()
       end
-      for i = lenc + valc - vala + 1:lena
+      for i = lenc + valc - vala + 1:min(lenr, lena)
          c.coeffs[i] = deepcopy(a.coeffs[i])
       end
    else
       for i = lenc + 1:min(vala - valc, lenr)
          c.coeffs[i] = R()
       end
-      for i = vala - valc + 1:lenc
+      for i = vala - valc + 1:min(lenc, lenr)
          c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i - vala + valc])
       end
-      for i = max(lenc, vala - valc) + 1:lena + vala - valc
+      for i = max(lenc, vala - valc) + 1:min(lena + vala - valc, lenr)
          c.coeffs[i] = deepcopy(a.coeffs[i - vala + valc])
       end
    end
