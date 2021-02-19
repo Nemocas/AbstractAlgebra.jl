@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-function inv(a::RelSeriesElem{T}) where T <: FieldElement
+function Base.inv(a::RelSeriesElem{T}) where T <: FieldElement
     @assert valuation(a) == 0
     # x -> x*(2-xa) is the lifting recursion
     x = parent(a)(inv(coeff(a, 0)))
