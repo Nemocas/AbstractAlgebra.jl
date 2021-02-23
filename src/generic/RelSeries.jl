@@ -225,6 +225,7 @@ Return the modulus of the coefficients of the given power series.
 modulus(a::AbstractAlgebra.SeriesElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
 function deepcopy_internal(a::RelSeries{T}, dict::IdDict) where {T <: RingElement}
+   return parent(a)(deepcopy(a.coeffs), pol_length(a), precision(a), valuation(a))
    coeffs = Array{T}(undef, pol_length(a))
    for i = 1:pol_length(a)
       coeffs[i] = deepcopy(polcoeff(a, i - 1))
@@ -1081,10 +1082,11 @@ function fit!(c::RelSeries{T}, n::Int) where {T <: RingElement}
       for i = 1:c.length
          c.coeffs[i] = t[i]
       end
-      for i = pol_length(c) + 1:n
-         c.coeffs[i] = zero(base_ring(c))
-      end
-   end
+    end
+    for i = pol_length(c) + 1:n
+       @assert !isdefined(c.coeffs, i)
+       c.coeffs[i] = zero(base_ring(c))
+    end
    return nothing
 end
 
