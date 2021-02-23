@@ -926,7 +926,7 @@ if false
          p = mod(S(1), g)
 
          for expn = 0:5
-            r = powmod(f, expn, g)
+            r = powermod(f, expn, g)
 
             @test (f == 0 && expn == 0 && r == 0) || r == p
 
@@ -972,7 +972,7 @@ if false
          p = mod(S(1), g)
 
          for expn = 0:5
-            r = powmod(f, expn, g)
+            r = powermod(f, expn, g)
 
             @test (f == 0 && expn == 0 && r == 0) || r == p
 
@@ -1015,7 +1015,7 @@ if false
          p = mod(S(1), g)
 
          for expn = 0:5
-            r = powmod(f, expn, g)
+            r = powermod(f, expn, g)
 
             @test (f == 0 && expn == 0 && r == 0) || isapprox(r, p)
 
@@ -1058,7 +1058,7 @@ if false
          p = mod(R(1), g)
 
          for expn = 0:5
-            r = powmod(f, expn, g)
+            r = powermod(f, expn, g)
 
             @test (f == 0 && expn == 0 && r == 0) || r == p
 

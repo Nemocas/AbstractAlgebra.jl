@@ -34,7 +34,7 @@ mulmod(f::MyElem, g::MyElem, m::MyElem)
 Return $fg \pmod{m}$.
 
 ```julia
-powmod(f::MyElem, e::Int, m::MyElem)
+powermod(f::MyElem, e::Int, m::MyElem)
 ```
 
 Return $f^e \pmod{m}$.

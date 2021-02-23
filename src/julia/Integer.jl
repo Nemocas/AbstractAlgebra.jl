@@ -97,6 +97,7 @@ function div(a::S, b::T) where {S <: Integer, T <: Integer}
    return q
 end
 
+#=
 function powmod(a::T, b::Int, c::T) where T <: Integer
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special cases
@@ -144,6 +145,7 @@ function powmod(a::T, b::BigInt, c::T) where T <: Integer
       return z
    end
 end
+=#
 
 ###############################################################################
 #

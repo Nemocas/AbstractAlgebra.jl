@@ -197,7 +197,7 @@ julia> invmod(f, g)
 julia> mulmod(f, g, h)
 (-30*x^2 - 43*x - 9)*y^3 + (-7*x^2 - 23*x - 7)*y^2 + (4*x^2 - 10*x - 3)*y + (x^2 - 2*x)
 
-julia> powmod(f, 3, h)
+julia> powermod(f, 3, h)
 (69*x^2 + 243*x + 79)*y^3 + (78*x^2 + 180*x + 63)*y^2 + (27*x^2 + 42*x + 18)*y + 3*x^2 + 3*x + 2
 
 julia> h = mod(f, g)

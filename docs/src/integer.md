@@ -112,7 +112,7 @@ true
 julia> g = f + 12
 24
 
-julia> h = powmod(f, 12, ZZ(17))
+julia> h = powermod(f, 12, ZZ(17))
 4
 
 julia> flag, q = divides(f, ZZ(3))
