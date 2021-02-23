@@ -611,11 +611,7 @@ end
 
 function fit!(c::NCPoly{T}, n::Int) where {T <: NCRingElem}
    if length(c.coeffs) < n
-      t = c.coeffs
-      c.coeffs = Array{T}(undef, n)
-      for i = 1:length(c)
-         c.coeffs[i] = t[i]
-      end
+      resize!(c.coeffs, n)
       for i = length(c) + 1:n
          c.coeffs[i] = zero(base_ring(c))
       end
