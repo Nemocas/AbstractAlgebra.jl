@@ -1083,7 +1083,6 @@ function fit!(c::RelSeries{T}, n::Int) where {T <: RingElement}
       end
    end
    for i = pol_length(c) + 1:n
-      @assert !isdefined(c.coeffs, i)
       c.coeffs[i] = zero(base_ring(c))
    end
    return nothing
