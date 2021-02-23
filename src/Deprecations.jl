@@ -24,3 +24,8 @@ function (G::Generic.SymmetricGroup)()
     Base.depwarn("(::SymmetricGroup)() to get the group identity is deprecated, use one(::SymmetricGroup) instead", :one)
     return one(G)
 end
+
+# Deprecated in 0.13.5
+
+@deprecate powmod(x, y, z) powermod(x, y, z)
+
