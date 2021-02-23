@@ -837,11 +837,7 @@ end
 
 function fit!(c::AbsSeries{T}, n::Int) where {T <: RingElement}
    if length(c.coeffs) < n
-      t = c.coeffs
-      c.coeffs = Array{T}(undef, n)
-      for i = 1:c.length
-         c.coeffs[i] = t[i]
-      end
+      resize!(c.coeffs, n)
       for i = length(c) + 1:n
          c.coeffs[i] = zero(base_ring(c))
       end
