@@ -785,6 +785,16 @@ end
    c = addeq!(c, a)
 
    @test isequal(c, 1 + x + x^2 + x^3 + 2*x^4 + x^5 + x^6 + O(x^7))
+
+   B, x = PolynomialRing(QQ, "x")
+   S, s = PowerSeriesRing(B, 4, "s")
+   a = S([3*x, 2*x, 4*x], 3, 4, 1)
+   b = S([-3*x], 1, 4, 1)
+   addeq!(a, b)
+   b = S([-3*x, 4*x, 5*x], 3, 4, 1)
+   addeq!(a, b)
+   
+   @test isequal(a, -3*x*s + 6*x*s^2 + 9*x*s^3 + O(s^4))
 end
 
 @testset "Generic.RelSeries.special_functions..." begin
