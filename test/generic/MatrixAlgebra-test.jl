@@ -14,7 +14,7 @@ function randprime(n::Int)
    return primes100[rand(1:n)]
 end
 
-@testset "Generic.MatAlg.constructors..." begin
+@testset "Generic.MatAlg.constructors" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -63,7 +63,7 @@ end
    @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10])
 end
 
-@testset "Generic.MatAlg.manipulation..." begin
+@testset "Generic.MatAlg.manipulation" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -130,7 +130,7 @@ end
    @test_throws BoundsError axes(A, -rand(1:99))
 end
 
-@testset "Generic.MatAlg.unary_ops..." begin
+@testset "Generic.MatAlg.unary_ops" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -140,7 +140,7 @@ end
    @test -A == B
 end
 
-@testset "Generic.MatAlg.binary_ops..." begin
+@testset "Generic.MatAlg.binary_ops" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -154,7 +154,7 @@ end
    @test A*B == S([t^2 + 2*t + 1 2*t^2 + 4*t + 3 t^3 + t^2 + 3*t + 1; 3*t^2 - t (t^3 + 4*t^2 + t) t^4 + 2*t^2 + 2*t; t-5 t^4 + t^3 + 2*t^2 + 3*t - 4 t^5 + 1*t^4 + t^3 + t^2 + 4*t + 2])
 end
 
-@testset "Generic.MatAlg.adhoc_binary..." begin
+@testset "Generic.MatAlg.adhoc_binary" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -174,7 +174,7 @@ end
    @test (t - 1)*A == A*(t - 1)
 end
 
-@testset "Generic.MatAlg.permutation..." begin
+@testset "Generic.MatAlg.permutation" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -186,7 +186,7 @@ end
    @test A == inv(P)*(P*A)
 end
 
-@testset "Generic.MatAlg.comparison..." begin
+@testset "Generic.MatAlg.comparison" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -198,7 +198,7 @@ end
    @test A != one(S)
 end
 
-@testset "Generic.MatAlg.adhoc_comparison..." begin
+@testset "Generic.MatAlg.adhoc_comparison" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -216,7 +216,7 @@ end
    @test one(S) == one(S)
 end
 
-@testset "Generic.MatAlg.powering..." begin
+@testset "Generic.MatAlg.powering" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -227,7 +227,7 @@ end
    @test A^0 == one(S)
 end
 
-@testset "Generic.MatAlg.exact_division..." begin
+@testset "Generic.MatAlg.exact_division" begin
    S = MatrixAlgebra(QQ, 3)
 
    M = rand(S, -20:20)
@@ -237,7 +237,7 @@ end
    @test divexact_left(N*M, N) == M
 end
 
-@testset "Generic.MatAlg.adhoc_exact_division..." begin
+@testset "Generic.MatAlg.adhoc_exact_division" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -249,7 +249,7 @@ end
    @test divexact((1 + t)*A, 1 + t) == A
 end
 
-@testset "Generic.MatAlg.transpose..." begin
+@testset "Generic.MatAlg.transpose" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
    arr = [t + 1 t R(1); t^2 t t; t+1 t^2 R(-1)]
@@ -258,7 +258,7 @@ end
    @test transpose(A) == B
 end
 
-@testset "Generic.MatAlg.gram..." begin
+@testset "Generic.MatAlg.gram" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -267,7 +267,7 @@ end
    @test gram(A) == S([2*t^2 + 2*t + 2 t^3 + 2*t^2 + t 2*t^2 + t - 1; t^3 + 2*t^2 + t t^4 + 2*t^2 t^3 + 3*t; 2*t^2 + t - 1 t^3 + 3*t t^4 + 2*t^3 + 4*t^2 + 6*t + 9])
 end
 
-@testset "Generic.MatAlg.tr..." begin
+@testset "Generic.MatAlg.tr" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -276,7 +276,7 @@ end
    @test tr(A) == t^2 + 3t + 2
 end
 
-@testset "Generic.MatAlg.content..." begin
+@testset "Generic.MatAlg.content" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -285,7 +285,7 @@ end
    @test content((1 + t)*A) == 1 + t
 end
 
-@testset "Generic.MatAlg.lu..." begin
+@testset "Generic.MatAlg.lu" begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixAlgebra(K, 3)
@@ -323,7 +323,7 @@ end
    @test P*A == L*U
 end
 
-@testset "Generic.MatAlg.fflu..." begin
+@testset "Generic.MatAlg.fflu" begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixAlgebra(K, 3)
@@ -377,7 +377,7 @@ end
    @test P*A == L*D*U
 end
 
-@testset "Generic.MatAlg.det..." begin
+@testset "Generic.MatAlg.det" begin
    S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
 
    for dim = 0:5
@@ -420,7 +420,7 @@ end
    end
 end
 
-@testset "Generic.MatAlg.block_replacement..." begin
+@testset "Generic.MatAlg.block_replacement" begin
    _test_block_replacement = function(a, b, r, c)
       rr = r isa Colon ? (1:nrows(a)) : r
       cc = c isa Colon ? (1:ncols(a)) : c
@@ -529,7 +529,7 @@ end
    end
 end
 
-@testset "Generic.MatAlg.rank..." begin
+@testset "Generic.MatAlg.rank" begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixAlgebra(S, 5)
 
@@ -603,7 +603,7 @@ end
    end
 end
 
-@testset "Generic.MatAlg.solve_lu..." begin
+@testset "Generic.MatAlg.solve_lu" begin
    S = QQ
 
    for dim = 0:5
@@ -638,7 +638,7 @@ end
    end
 end
 
-@testset "Generic.MatAlg.rref..." begin
+@testset "Generic.MatAlg.rref" begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixAlgebra(S, 5)
 
@@ -702,7 +702,7 @@ end
    end
 end
 
-@testset "Generic.MatAlg.inversion..." begin
+@testset "Generic.MatAlg.inversion" begin
    indexing(n) = [(i,j) for i in 1:n for j in 1:n if i !=j ]
    E(R,i,j, val=1) = (M=one(R); M[i,j] = val; return M)
    E(R::MatAlgebra; vals=[1,-1]) = [E(R, i,j,val) for (i,j) in indexing(R.n) for val in vals]
@@ -837,9 +837,9 @@ end
       @test all(isone(m*inv(m)) for m in random_matrices)
    end
    end
-end # of @testset "Generic.MatAlg.inversion..."
+end # of @testset "Generic.MatAlg.inversion"
 
-@testset "Generic.MatAlg.hessenberg..." begin
+@testset "Generic.MatAlg.hessenberg" begin
    R = ResidueRing(ZZ, 18446744073709551629)
 
    for dim = 0:5
@@ -856,7 +856,7 @@ end # of @testset "Generic.MatAlg.inversion..."
    end
 end
 
-@testset "Generic.MatAlg.charpoly..." begin
+@testset "Generic.MatAlg.charpoly" begin
    R = ResidueRing(ZZ, 18446744073709551629)
 
    for dim = 0:5
@@ -914,7 +914,7 @@ end
    @test p1 == p2
 end
 
-@testset "Generic.MatAlg.minpoly..." begin
+@testset "Generic.MatAlg.minpoly" begin
    R = GF(103)
    T, y = PolynomialRing(R, "y")
    S = MatrixAlgebra(R, 3)
@@ -1024,7 +1024,7 @@ end
    @test p1 == p2
 end
 
-@testset "Generic.MatAlg.row_swapping..." begin
+@testset "Generic.MatAlg.row_swapping" begin
    R, x = PolynomialRing(ZZ, "x")
    M = MatrixAlgebra(R, 3)
 
@@ -1038,7 +1038,7 @@ end
 end
 
 if false # see bug 160
-    @testset "Generic.MatAlg.hnf_minors..." begin
+    @testset "Generic.MatAlg.hnf_minors" begin
         R, x = PolynomialRing(QQ, "x")
 
         M = MatrixAlgebra(R, 3)
@@ -1074,7 +1074,7 @@ if false # see bug 160
     end
 end
 
-@testset "Generic.MatAlg.hnf_kb..." begin
+@testset "Generic.MatAlg.hnf_kb" begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
@@ -1109,7 +1109,7 @@ end
    @test U*B == H
 end
 
-@testset "Generic.MatAlg.hnf_cohen..." begin
+@testset "Generic.MatAlg.hnf_cohen" begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
@@ -1144,7 +1144,7 @@ end
    @test U*B == H
 end
 
-@testset "Generic.MatAlg.hnf..." begin
+@testset "Generic.MatAlg.hnf" begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
@@ -1179,7 +1179,7 @@ end
    @test U*B == H
 end
 
-@testset "Generic.MatAlg.snf_kb..." begin
+@testset "Generic.MatAlg.snf_kb" begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
@@ -1216,7 +1216,7 @@ end
    @test U*B*K == T
 end
 
-@testset "Generic.MatAlg.snf..." begin
+@testset "Generic.MatAlg.snf" begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
@@ -1253,7 +1253,7 @@ end
    @test U*B*K == T
 end
 
-@testset "Generic.MatAlg.$sim_zero..." for sim_zero in (similar, zero)
+@testset "Generic.MatAlg.$sim_zero" for sim_zero in (similar, zero)
    test_zero = sim_zero === zero
    for R = (ZZ, GF(11))
       M = MatrixAlgebra(R, rand(0:9))

@@ -16,7 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-@testset "Generic.LaurentSeries.constructors..." begin
+@testset "Generic.LaurentSeries.constructors" begin
    R, x = LaurentSeriesRing(ZZ, 30, "x")
 
    S, t = PolynomialRing(QQ, "t")
@@ -99,7 +99,7 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.LaurentSeries.rand..." begin
+@testset "Generic.LaurentSeries.rand" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
 
    test_rand(R, -12:12, -10:10)
@@ -111,7 +111,7 @@ end
    test_rand(R, -12:12, make(RealField, -1:1))
 end
 
-@testset "Generic.LaurentSeries.manipulation..." begin
+@testset "Generic.LaurentSeries.manipulation" begin
    R, t = PolynomialRing(QQ, "t")
    S, x = LaurentSeriesRing(R, 30, "x")
 
@@ -161,7 +161,7 @@ end
    @test modulus(T) == 7
 end
 
-@testset "Generic.LaurentSeries.unary_ops..." begin
+@testset "Generic.LaurentSeries.unary_ops" begin
    #  Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -191,7 +191,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.binary_ops..." begin
+@testset "Generic.LaurentSeries.binary_ops" begin
    #  Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:100
@@ -250,7 +250,7 @@ end
    @test c - ccp == 0
 end
 
-@testset "Generic.LaurentSeries.inplace_binary_ops..." begin
+@testset "Generic.LaurentSeries.inplace_binary_ops" begin
    #  Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:100
@@ -292,7 +292,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.adhoc_binary_ops..." begin
+@testset "Generic.LaurentSeries.adhoc_binary_ops" begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -382,7 +382,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.comparison..." begin
+@testset "Generic.LaurentSeries.comparison" begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -433,7 +433,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.adhoc_comparison..." begin
+@testset "Generic.LaurentSeries.adhoc_comparison" begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -530,7 +530,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.powering..." begin
+@testset "Generic.LaurentSeries.powering" begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
 
@@ -583,7 +583,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.shift..." begin
+@testset "Generic.LaurentSeries.shift" begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -619,7 +619,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.truncation..." begin
+@testset "Generic.LaurentSeries.truncation" begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -655,7 +655,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.inversion..." begin
+@testset "Generic.LaurentSeries.inversion" begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -691,7 +691,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.square_root..." begin
+@testset "Generic.LaurentSeries.square_root" begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -711,7 +711,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.exact_division..." begin
+@testset "Generic.LaurentSeries.exact_division" begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -751,7 +751,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.adhoc_exact_division..." begin
+@testset "Generic.LaurentSeries.adhoc_exact_division" begin
    # Exact field
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -790,7 +790,7 @@ end
    end
 end
 
-@testset "Generic.LaurentSeries.special_functions..." begin
+@testset "Generic.LaurentSeries.special_functions" begin
    # Exact field
    S, x = LaurentSeriesRing(QQ, 10, "x")
 

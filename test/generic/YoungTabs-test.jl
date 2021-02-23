@@ -1,4 +1,4 @@
-@testset "youngtabs.partition_type..." begin
+@testset "youngtabs.partition_type" begin
    @test Partition([4,3,1]) isa Generic.Partition
    @test Partition([4,3,1]) isa AbstractVector{Int}
    @test Partition([3,4,1]) isa Generic.Partition
@@ -31,7 +31,7 @@
    @test p != r
 end
 
-@testset "youngtabs.partition_iter..." begin
+@testset "youngtabs.partition_iter" begin
    @test [Generic._numpart(i) for i in 0:10] == [1,1,2,3,5,7,11,15,22,30,42]
    @test Generic._numpart(100) == 190_569_292
    @test Generic._numpart(1000) == 24_061_467_864_032_622_473_692_149_727_991
@@ -43,7 +43,7 @@ end
    @test collect(AllParts(0)) == [Partition(Int[])]
 end
 
-@testset "youngtabs.youngtableau_type..." begin
+@testset "youngtabs.youngtableau_type" begin
    lambda = [4,3,1]
    @test YoungTableau(Partition(lambda)) isa Generic.YoungTableau
    @test YoungTableau(Partition(lambda)) isa AbstractArray{Int, 2}
@@ -80,7 +80,7 @@ end
    end
 end
 
-@testset "youngtabs.conjugation..." begin
+@testset "youngtabs.conjugation" begin
    @test conj(Partition([1,1,1,1])) == Partition([4])
    @test conj(Partition([2,1,1])) == Partition([3,1])
 
@@ -105,7 +105,7 @@ end
 end
 
 
-@testset "youngtabs.dim..." begin
+@testset "youngtabs.dim" begin
    y = YoungTableau([5,4,3,3,1,1])
    # ┌───┬───┬───┬───┬───┐
    # │ 1 │ 2 │ 3 │ 4 │ 5 │
@@ -172,7 +172,7 @@ end
    @test dim(YoungTableau(collect(10:-1:1))) == 44261486084874072183645699204710400
 end
 
-@testset "youngtabs.skewdiags..." begin
+@testset "youngtabs.skewdiags" begin
    l = Partition([5,3,2,2,2,1,1])
    m = Partition([2,2,1])
    xi = l/m
@@ -226,7 +226,7 @@ end
    @test has_bottom_neighbor(xi, 7, 1) == false
 end
 
-@testset "youngtabs.rimhooks..." begin
+@testset "youngtabs.rimhooks" begin
    xi = Partition([2,1])/Partition(Int[], false)
    @test isrimhook(xi) == true
 
@@ -275,7 +275,7 @@ end
    @test isrimhook(lambda/mu) == false # is disconnected
 end
 
-@testset "youngtabs.partitionseqs..." begin
+@testset "youngtabs.partitionseqs" begin
    @test partitionseq(Partition([1])) == BitVector([true, false])
    @test partitionseq([1]) == BitVector([true, false])
    @test partitionseq(Partition([1,1])) == BitVector([true, false, false])

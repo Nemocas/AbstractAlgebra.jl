@@ -1,4 +1,4 @@
-@testset "Julia.Integers.constructors..." begin
+@testset "Julia.Integers.constructors" begin
    R = zz
    S = ZZ
 
@@ -26,7 +26,7 @@
    @test isa(S(b), BigInt)
 end
 
-@testset "Julia.Integers.manipulation..." begin
+@testset "Julia.Integers.manipulation" begin
    R = zz
    S = ZZ
 
@@ -46,13 +46,13 @@ end
    @test isunit(S(-1))
 end
 
-@testset "Julia.Integers.rand..." begin
+@testset "Julia.Integers.rand" begin
    test_rand(ZZ, 0:22) do f
       f in 0:22
    end
 end
 
-@testset "Julia.Integers.modular_arithmetic..." begin
+@testset "Julia.Integers.modular_arithmetic" begin
    R = zz
    S = ZZ
 
@@ -82,7 +82,7 @@ end
    @test_throws DomainError powmod(123, -rand(2:100), 5)
 end
 
-@testset "Julia.Integers.exact_division..." begin
+@testset "Julia.Integers.exact_division" begin
    R = zz
    S = ZZ
 
@@ -115,7 +115,7 @@ end
    end
 end
 
-@testset "Julia.Integers.inv..." begin
+@testset "Julia.Integers.inv" begin
    @test AbstractAlgebra.inv(ZZ(1)) == 1
    @test AbstractAlgebra.inv(-ZZ(1)) == -1
    @test AbstractAlgebra.inv(zz(1)) == 1
@@ -125,7 +125,7 @@ end
    @test_throws DivideError AbstractAlgebra.inv(ZZ(0))
 end
 
-@testset "Julia.Integers.gcd..." begin
+@testset "Julia.Integers.gcd" begin
    R = zz
    S = ZZ
 
@@ -148,7 +148,7 @@ end
    end
 end
 
-@testset "Julia.Integers.square_root..." begin
+@testset "Julia.Integers.square_root" begin
    R = zz
    S = ZZ
 
@@ -166,7 +166,7 @@ end
    end
 end
 
-@testset "Julia.Integers.exp..." begin
+@testset "Julia.Integers.exp" begin
    @test AbstractAlgebra.exp(0) == 1
    @test_throws DomainError AbstractAlgebra.exp(1)
    @test_throws DomainError AbstractAlgebra.exp(rand(2:1000))

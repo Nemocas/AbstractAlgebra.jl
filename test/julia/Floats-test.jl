@@ -1,4 +1,4 @@
-@testset "Julia.Floats.constructors..." begin
+@testset "Julia.Floats.constructors" begin
    R = RDF
    S = RealField
 
@@ -32,13 +32,13 @@
    @test isa(S(b), BigFloat)
 end
 
-@testset "Julia.Floats.printing...." begin
+@testset "Julia.Floats.printing." begin
    R, x = PolynomialRing(RealField, "x")
 
    @test !occursin("+", string(2*x^2-3*x))
 end
 
-@testset "Julia.Floats.rand..." begin
+@testset "Julia.Floats.rand" begin
    R = RealField
 
    test(x) = @test 1.0 <= x <= 9.0
@@ -47,7 +47,7 @@ end
    test_rand(test, R, UnitRange(big(1.0), big(9.0)))
 end
 
-@testset "Julia.Floats.manipulation..." begin
+@testset "Julia.Floats.manipulation" begin
    R = RDF
    S = RealField
 
@@ -63,7 +63,7 @@ end
    @test isunit(S(3))
 end
 
-@testset "Julia.Floats.exact_division..." begin
+@testset "Julia.Floats.exact_division" begin
    R = RDF
    S = RealField
 
@@ -86,7 +86,7 @@ end
    end
 end
 
-@testset "Julia.Floats.divrem..." begin
+@testset "Julia.Floats.divrem" begin
    R = RealField
 
    for iter = 1:1000
@@ -100,7 +100,7 @@ end
    end
 end
 
-@testset "Julia.Floats.gcd..." begin
+@testset "Julia.Floats.gcd" begin
    R = RDF
    S = RealField
 

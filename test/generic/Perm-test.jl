@@ -1,6 +1,6 @@
 IntTypes = [Int8, Int16, Int32, Int, UInt8, UInt16, UInt32, UInt, BigInt]
 
-@testset "Perm.abstract_types..." begin
+@testset "Perm.abstract_types" begin
    @test Generic.Perm <: GroupElem
    @test Generic.Perm <: AbstractAlgebra.AbstractPerm
 
@@ -8,7 +8,7 @@ IntTypes = [Int8, Int16, Int32, Int, UInt8, UInt16, UInt32, UInt, BigInt]
    @test Generic.SymmetricGroup <: AbstractAlgebra.AbstractPermutationGroup
 end
 
-@testset "Perm.constructors ($T)..." for T in IntTypes
+@testset "Perm.constructors ($T)" for T in IntTypes
    @test elem_type(Generic.SymmetricGroup{T}) == Generic.Perm{T}
    @test parent_type(Generic.Perm{T}) == Generic.SymmetricGroup{T}
 
@@ -68,7 +68,7 @@ end
    @test_throws MethodError Perm(Any[])
 end
 
-@testset "Perm.parsingGAP..." begin
+@testset "Perm.parsingGAP" begin
    @test Generic.parse_cycles("()") == (Int[], [1])
    @test Generic.parse_cycles("(1)(2)(3)") == ([1,2,3], [1,2,3,4])
    @test Generic.parse_cycles("Cycle Decomposition: (1)(2,3)") == ([1,2,3], [1,2,4])
@@ -126,7 +126,7 @@ end
    end
 end
 
-@testset "Perm.printing ($T)..." for T in IntTypes
+@testset "Perm.printing ($T)" for T in IntTypes
    G = SymmetricGroup(T(10))
 
    b = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
@@ -143,7 +143,7 @@ end
    @test string(Perm(Int[])) == "()"
 end
 
-@testset "Perm.basic_manipulation ($T)..." for T in IntTypes
+@testset "Perm.basic_manipulation ($T)" for T in IntTypes
    G = SymmetricGroup(T(10))
 
    a = one(G)
@@ -164,7 +164,7 @@ end
    @test a[1] == T(5)
 end
 
-@testset "Perm.iteration ($T)..." for T in IntTypes
+@testset "Perm.iteration ($T)" for T in IntTypes
    G = SymmetricGroup(T(6))
    @test length(AllPerms(T(6))) == 720
    @test length(unique([deepcopy(p) for p in AllPerms(T(6))])) == 720
@@ -183,7 +183,7 @@ end
    @test length(unique(collect(G))) == 720
 end
 
-@testset "Perm.binary_ops ($T)..." for T in IntTypes
+@testset "Perm.binary_ops ($T)" for T in IntTypes
    G = SymmetricGroup(T(3))
 
    a = Perm(T[2,1,3]) # (1,2)
@@ -229,7 +229,7 @@ end
    @test p^2 * p^-2 == one(G)
 end
 
-@testset "Perm.mixed_binary_ops..." begin
+@testset "Perm.mixed_binary_ops" begin
    G = SymmetricGroup(6)
    for T in IntTypes
       H = SymmetricGroup(T(6))
@@ -244,7 +244,7 @@ end
    end
 end
 
-@testset "Perm.inversion ($T)..." for T in IntTypes
+@testset "Perm.inversion ($T)" for T in IntTypes
    G = SymmetricGroup(T(10))
 
    a = one(G)
@@ -259,7 +259,7 @@ end
    end
 end
 
-@testset "Perm.misc ($T)..." for T in IntTypes
+@testset "Perm.misc ($T)" for T in IntTypes
    G = SymmetricGroup(T(10))
    a = G([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
@@ -308,7 +308,7 @@ end
    end
 end
 
-@testset "Perm.characters..." begin
+@testset "Perm.characters" begin
    for T in IntTypes
       N = T(7)
       G = SymmetricGroup(N)

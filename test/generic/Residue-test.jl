@@ -1,4 +1,4 @@
-@testset "Generic.Res.constructors..." begin
+@testset "Generic.Res.constructors" begin
    B = ZZ
 
    R = Generic.ResidueRing(B, 16453889)
@@ -51,7 +51,7 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.Res.rand..." begin
+@testset "Generic.Res.rand" begin
    R = Generic.ResidueRing(ZZ, 49)
 
    test_rand(R, 1:9) do f
@@ -65,7 +65,7 @@ end
    test_rand(R, 1:9, -3:3)
 end
 
-@testset "Generic.Res.manipulation..." begin
+@testset "Generic.Res.manipulation" begin
    R = Generic.ResidueRing(ZZ, 16453889)
 
    @test modulus(R) == 16453889
@@ -96,7 +96,7 @@ end
    @test characteristic(R) == 16453889
 end
 
-@testset "Generic.Res.unary_ops..." begin
+@testset "Generic.Res.unary_ops" begin
    R = Generic.ResidueRing(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
@@ -107,7 +107,7 @@ end
    @test -T(x^5 + 1) == T(x^2+16453880*x+16453885)
 end
 
-@testset "Generic.Res.binary_ops..." begin
+@testset "Generic.Res.binary_ops" begin
    R = Generic.ResidueRing(ZZ, 12)
 
    f = R(4)
@@ -133,7 +133,7 @@ end
    @test n*p == T(3x^2 + 4x + 4)
 end
 
-@testset "Generic.Res.gcd..." begin
+@testset "Generic.Res.gcd" begin
    R = Generic.ResidueRing(ZZ, 12)
 
    f = R(4)
@@ -151,7 +151,7 @@ end
    @test gcd(n, p) == 1
 end
 
-@testset "Generic.Res.adhoc_binary..." begin
+@testset "Generic.Res.adhoc_binary" begin
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -174,7 +174,7 @@ end
    @test f*5 == T(2*x^2+3*x+6)
 end
 
-@testset "Generic.Res.comparison..." begin
+@testset "Generic.Res.comparison" begin
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -200,7 +200,7 @@ end
    @test isequal(f, g)
 end
 
-@testset "Generic.Res.adhoc_comparison..." begin
+@testset "Generic.Res.adhoc_comparison" begin
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -216,7 +216,7 @@ end
    @test f != 5
 end
 
-@testset "Generic.Res.powering..." begin
+@testset "Generic.Res.powering" begin
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -231,7 +231,7 @@ end
    @test f^100 == T(x^2 + 2x + 1)
 end
 
-@testset "Generic.Res.inversion..." begin
+@testset "Generic.Res.inversion" begin
    R = Generic.ResidueRing(ZZ, 49)
 
    a = R(5)
@@ -247,7 +247,7 @@ end
    @test inv(f) == T(26*x^2+31*x+10)
 end
 
-@testset "Generic.Res.exact_division..." begin
+@testset "Generic.Res.exact_division" begin
    R = Generic.ResidueRing(ZZ, 49)
 
    a = R(5)

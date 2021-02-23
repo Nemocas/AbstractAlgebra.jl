@@ -1,4 +1,4 @@
-@testset "Generic.MPoly.constructors..." begin
+@testset "Generic.MPoly.constructors" begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -80,7 +80,7 @@
    @test z isa Generic.MPoly{Generic.Poly{BigInt}}
 end
 
-@testset "Generic.MPoly.printing..." begin
+@testset "Generic.MPoly.printing" begin
    S, (x, y) = ZZ["x", "y"]
 
    @test string(zero(S)) == "0"
@@ -95,7 +95,7 @@ end
    @test string(y) == "y"
 end
 
-@testset "Generic.MPoly.geobuckets..." begin
+@testset "Generic.MPoly.geobuckets" begin
    R, x = ZZ["y"]
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -112,7 +112,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.rand..." begin
+@testset "Generic.MPoly.rand" begin
    R, x = ZZ["y"]
    num_vars = 5
    var_names = ["x$j" for j in 1:num_vars]
@@ -127,7 +127,7 @@ end
    test_rand(S, 0:5, 0:100, 0:0, -100:100)
 end
 
-@testset "Generic.MPoly.manipulation..." begin
+@testset "Generic.MPoly.manipulation" begin
    R, x = ZZ["y"]
 
    @test characteristic(R) == 0
@@ -269,7 +269,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.multivariate_coeff..." begin
+@testset "Generic.MPoly.multivariate_coeff" begin
    R = ZZ
 
    for iter = 1:5
@@ -359,7 +359,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.total_degree..." begin
+@testset "Generic.MPoly.total_degree" begin
    max = 50
    for nvars = 1:10
       var_names = ["x$j" for j in 1:nvars]
@@ -380,7 +380,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.unary_ops..." begin
+@testset "Generic.MPoly.unary_ops" begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -397,7 +397,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.binary_ops..." begin
+@testset "Generic.MPoly.binary_ops" begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -422,7 +422,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.adhoc_binary..." begin
+@testset "Generic.MPoly.adhoc_binary" begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -463,7 +463,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.adhoc_comparison..." begin
+@testset "Generic.MPoly.adhoc_comparison" begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -486,7 +486,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.powering..." begin
+@testset "Generic.MPoly.powering" begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -523,7 +523,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.divides..." begin
+@testset "Generic.MPoly.divides" begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -557,7 +557,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.square_root..." begin
+@testset "Generic.MPoly.square_root" begin
    for R in [ZZ, QQ]
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -621,7 +621,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.euclidean_division..." begin
+@testset "Generic.MPoly.euclidean_division" begin
    R, x = QQ["y"]
 
    for num_vars = 1:10
@@ -662,7 +662,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.ideal_reduction..." begin
+@testset "Generic.MPoly.ideal_reduction" begin
    R, x = QQ["y"]
 
    for num_vars = 1:10
@@ -711,7 +711,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.deflation..." begin
+@testset "Generic.MPoly.deflation" begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -732,7 +732,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.gcd..." begin
+@testset "Generic.MPoly.gcd" begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -751,7 +751,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.lcm..." begin
+@testset "Generic.MPoly.lcm" begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -775,7 +775,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.evaluation..." begin
+@testset "Generic.MPoly.evaluation" begin
    R, x = ZZ["x"]
 
    for num_vars = 1:10
@@ -1057,7 +1057,7 @@ end
    @test evaluate(x + y, [K(1), K(1)]) isa BigFloat
 end
 
-@testset "Generic.MPoly.valuation..." begin
+@testset "Generic.MPoly.valuation" begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -1095,7 +1095,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.derivative..." begin
+@testset "Generic.MPoly.derivative" begin
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -1120,7 +1120,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.change_base_ring..." begin
+@testset "Generic.MPoly.change_base_ring" begin
    F2 = ResidueRing(ZZ, 2)
    R, varsR = PolynomialRing(F2, ["x"])
    S, varsS = PolynomialRing(R, ["y"])
@@ -1154,7 +1154,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.vars..." begin
+@testset "Generic.MPoly.vars" begin
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -1168,7 +1168,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.combine_like_terms..." begin
+@testset "Generic.MPoly.combine_like_terms" begin
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -1202,7 +1202,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.exponents..." begin
+@testset "Generic.MPoly.exponents" begin
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -1273,7 +1273,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.to_univariate..." begin
+@testset "Generic.MPoly.to_univariate" begin
    for num_vars=1:10
       ord = rand_ordering()
 
@@ -1300,7 +1300,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.coefficients_of_univariate..." begin
+@testset "Generic.MPoly.coefficients_of_univariate" begin
    for num_vars=1:10
       ord = rand_ordering()
       var_names = ["x$j" for j in 1:num_vars]
@@ -1329,7 +1329,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.ordering..." begin
+@testset "Generic.MPoly.ordering" begin
    n_mpolys = 100
    maxval = 10
    maxdeg = 20

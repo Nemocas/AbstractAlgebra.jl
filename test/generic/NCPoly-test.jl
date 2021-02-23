@@ -1,4 +1,4 @@
-@testset "Generic.NCPoly.constructors..." begin
+@testset "Generic.NCPoly.constructors" begin
    R = MatrixAlgebra(ZZ, 2)
    S1 = PolynomialRing(R, "y")
    S2 = R["y"]
@@ -57,7 +57,7 @@
    @test isa(n, NCPolyElem)
 end
 
-@testset "Generic.NCPoly.manipulation..." begin
+@testset "Generic.NCPoly.manipulation" begin
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
 
@@ -99,14 +99,14 @@ end
    @test !ismonomial(y^2 + y + 1)
 end
 
-@testset "Generic.NCPoly.rand..." begin
+@testset "Generic.NCPoly.rand" begin
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
 
    test_rand(S, 0:10, -10:10)
 end
 
-@testset "Generic.NCPoly.binary_ops..." begin
+@testset "Generic.NCPoly.binary_ops" begin
    #  Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -124,7 +124,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.adhoc_binary..." begin
+@testset "Generic.NCPoly.adhoc_binary" begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -163,7 +163,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.comparison..." begin
+@testset "Generic.NCPoly.comparison" begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -181,7 +181,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.adhoc_comparison..." begin
+@testset "Generic.NCPoly.adhoc_comparison" begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -228,7 +228,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.unary_ops..." begin
+@testset "Generic.NCPoly.unary_ops" begin
    #  Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -240,7 +240,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.truncation..." begin
+@testset "Generic.NCPoly.truncation" begin
    #  Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -253,7 +253,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.reverse..." begin
+@testset "Generic.NCPoly.reverse" begin
    #  Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -275,7 +275,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.shift..." begin
+@testset "Generic.NCPoly.shift" begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -290,7 +290,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.powering..." begin
+@testset "Generic.NCPoly.powering" begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -315,7 +315,7 @@ end
    @test_throws DomainError f^-rand(2:100)
 end
 
-@testset "Generic.NCPoly.exact_division..." begin
+@testset "Generic.NCPoly.exact_division" begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -332,7 +332,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.adhoc_exact_division..." begin
+@testset "Generic.NCPoly.adhoc_exact_division" begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -381,7 +381,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.evaluation..." begin
+@testset "Generic.NCPoly.evaluation" begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -404,7 +404,7 @@ end
    end
 end
 
-@testset "Generic.NCPoly.derivative..." begin
+@testset "Generic.NCPoly.derivative" begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")

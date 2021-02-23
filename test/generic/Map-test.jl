@@ -9,7 +9,7 @@ a(f::Map(MyMap)) = Generic.get_field(f, :a)
 
 (f::MyMap)(x) =  a(f)*(x + 1)
 
-@testset "Generic.Map.FunctionalMap..." begin
+@testset "Generic.Map.FunctionalMap" begin
    f = map_from_func(x -> x + 1, ZZ, ZZ)
    g = map_from_func(x -> QQ(x), ZZ, QQ)
 
@@ -25,7 +25,7 @@ a(f::Map(MyMap)) = Generic.get_field(f, :a)
    @test image_fn(g)(ZZ(2)) == QQ(2)
 end
 
-@testset "Generic.Map.FunctionalCompositeMap..." begin
+@testset "Generic.Map.FunctionalCompositeMap" begin
    f = map_from_func(x -> x + 1, ZZ, ZZ)
    g = map_from_func(x -> QQ(x), ZZ, QQ)
 
@@ -49,7 +49,7 @@ end
    @test map2(h) === g
 end
 
-@testset "Generic.Map.CompositeMap..." begin
+@testset "Generic.Map.CompositeMap" begin
    f = map_from_func(x -> x + 1, ZZ, ZZ)
 
    s = MyMap(2)
@@ -69,7 +69,7 @@ end
    @test map2(t) === s
 end
 
-@testset "Generic.Map.IdentityMap..." begin
+@testset "Generic.Map.IdentityMap" begin
    f = map_from_func(x -> QQ(x + 1), ZZ, QQ)
    g = identity_map(ZZ)
    h = identity_map(QQ)

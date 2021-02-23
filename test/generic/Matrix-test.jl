@@ -114,7 +114,7 @@ function AbstractAlgebra.matrix(R::F2, r::Int, c::Int, mat::AbstractMatrix{F2Ele
    matrix(R, mat)
 end
 
-@testset "Generic.Mat.constructors..." begin
+@testset "Generic.Mat.constructors" begin
    R, t = PolynomialRing(QQ, "t")
 
    S = MatrixSpace(R, 3, 3)
@@ -290,7 +290,7 @@ end
    @test A[1, 1] === a
 end
 
-@testset "Generic.Mat.size/axes..." begin
+@testset "Generic.Mat.size/axes" begin
    A = matrix(QQ, [1 2 3; 4 5 6; 7 8 9])
    B = matrix(QQ, [1 2 3 4; 5 6 7 8])
 
@@ -339,7 +339,7 @@ end
    @test !issquare(B)
 end
 
-@testset "Generic.Mat.manipulation..." begin
+@testset "Generic.Mat.manipulation" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -453,7 +453,7 @@ end
    end
 end
 
-@testset "Generic.Mat.unary_ops..." begin
+@testset "Generic.Mat.unary_ops" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -507,7 +507,7 @@ end
    @test -z.m isa Generic.MatSpaceElem{F2Elem}
 end
 
-@testset "Generic.Mat.getindex..." begin
+@testset "Generic.Mat.getindex" begin
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
@@ -728,7 +728,7 @@ end
    end
 end
 
-@testset "Generic.Mat.block_replacement..." begin
+@testset "Generic.Mat.block_replacement" begin
    _test_block_replacement = function(a, b, r, c)
       rr = r isa Colon ? (1:nrows(a)) : r
       cc = c isa Colon ? (1:ncols(a)) : c
@@ -837,7 +837,7 @@ end
    end
 end
 
-@testset "Generic.Mat.binary_ops..." begin
+@testset "Generic.Mat.binary_ops" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -968,7 +968,7 @@ end
 # add x to all the elements of the main diagonal of a copy of M
 add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(CartesianIndices(M))]
 
-@testset "Generic.Mat.adhoc_binary..." begin
+@testset "Generic.Mat.adhoc_binary" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -1078,7 +1078,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    end
 end
 
-@testset "Generic.Mat.permutation..." begin
+@testset "Generic.Mat.permutation" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -1106,7 +1106,7 @@ end
    end
 end
 
-@testset "Generic.Mat.comparison..." begin
+@testset "Generic.Mat.comparison" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -1148,7 +1148,7 @@ end
    end
 end
 
-@testset "Generic.Mat.adhoc_comparison..." begin
+@testset "Generic.Mat.adhoc_comparison" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -1166,7 +1166,7 @@ end
    @test one(S) == one(S)
 end
 
-@testset "Generic.Mat.powering..." begin
+@testset "Generic.Mat.powering" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -1183,7 +1183,7 @@ end
    @test A^-1 == inv(A)
 end
 
-@testset "Generic.Mat.adhoc_exact_division..." begin
+@testset "Generic.Mat.adhoc_exact_division" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -1195,7 +1195,7 @@ end
    @test divexact((1 + t)*A, 1 + t) == A
 end
 
-@testset "Generic.Mat.issymmetric..." begin
+@testset "Generic.Mat.issymmetric" begin
    R, t = PolynomialRing(QQ, "t")
    @test !issymmetric(matrix(R, [t + 1 t R(1); t^2 t t]))
    @test issymmetric(matrix(R, [t + 1 t R(1); t t^2 t; R(1) t R(5)]))
@@ -1205,7 +1205,7 @@ end
    @test !issymmetric(S([t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
 end
 
-@testset "Generic.Mat.transpose..." begin
+@testset "Generic.Mat.transpose" begin
    R, t = PolynomialRing(QQ, "t")
    arr = [t + 1 t R(1); t^2 t t]
    A = matrix(R, arr)
@@ -1226,7 +1226,7 @@ end
    @test at[3, 1] == at[1, 2] == at[2, 2] == F2Elem(false)
 end
 
-@testset "Generic.Mat.gram..." begin
+@testset "Generic.Mat.gram" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -1235,7 +1235,7 @@ end
    @test gram(A) == S([2*t^2 + 2*t + 2 t^3 + 2*t^2 + t 2*t^2 + t - 1; t^3 + 2*t^2 + t t^4 + 2*t^2 t^3 + 3*t; 2*t^2 + t - 1 t^3 + 3*t t^4 + 2*t^3 + 4*t^2 + 6*t + 9])
 end
 
-@testset "Generic.Mat.tr..." begin
+@testset "Generic.Mat.tr" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -1244,7 +1244,7 @@ end
    @test tr(A) == t^2 + 3t + 2
 end
 
-@testset "Generic.Mat.content..." begin
+@testset "Generic.Mat.content" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -1253,7 +1253,7 @@ end
    @test content((1 + t)*A) == 1 + t
 end
 
-@testset "Generic.Mat.lu..." begin
+@testset "Generic.Mat.lu" begin
    # Exact field
    R = GF(7)
 
@@ -1322,7 +1322,7 @@ end
    @test P*A == L*U
 end
 
-@testset "Generic.Mat.fflu..." begin
+@testset "Generic.Mat.fflu" begin
    # Exact ring
    R = ZZ
 
@@ -1411,7 +1411,7 @@ end
    @test P*A == L*D*U
 end
 
-@testset "Generic.Mat.det..." begin
+@testset "Generic.Mat.det" begin
    S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
 
    for dim = 0:5
@@ -1454,7 +1454,7 @@ end
    end
 end
 
-@testset "Generic.Mat.minors..." begin
+@testset "Generic.Mat.minors" begin
    S, z = PolynomialRing(ZZ,"z")
    n = 5
    R = MatrixSpace(S,n,n)
@@ -1471,7 +1471,7 @@ end
    end
 end
 
-@testset "Generic.Mat.rank..." begin
+@testset "Generic.Mat.rank" begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixSpace(S, 5, 5)
 
@@ -1544,7 +1544,7 @@ end
    end
 end
 
-@testset "Generic.Mat.can_solve_with_solution_fflu..." begin
+@testset "Generic.Mat.can_solve_with_solution_fflu" begin
    R = ZZ
 
    # Test random soluble systems
@@ -1596,7 +1596,7 @@ end
    end
 end
 
-@testset "Generic.Mat.can_solve_with_solution_lu..." begin
+@testset "Generic.Mat.can_solve_with_solution_lu" begin
    R = GF(17)
 
    for i = 1:100
@@ -1672,7 +1672,7 @@ end
    end
 end
 
-@testset "Generic.Mat.solve_ff..." begin
+@testset "Generic.Mat.solve_ff" begin
    # Exact field
    R = QQ
 
@@ -1717,7 +1717,7 @@ end
    end
 end
 
-@testset "Generic.Mat.solve_rational..." begin
+@testset "Generic.Mat.solve_rational" begin
    R = ZZ
 
    for i = 1:100
@@ -1833,7 +1833,7 @@ end
    @test M*x == d*b
 end
 
-@testset "Generic.Mat.solve..." begin
+@testset "Generic.Mat.solve" begin
    for R in [ZZ, QQ]
       for iter = 1:40
          for dim = 0:5
@@ -1876,7 +1876,7 @@ end
    end
 end
 
-@testset "Generic.Mat.solve_left..." begin
+@testset "Generic.Mat.solve_left" begin
    for R in [ZZ, QQ]
       for iter = 1:40
          for dim = 0:5
@@ -1920,7 +1920,7 @@ end
    end
 end
 
-@testset "Generic.Mat.can_solve..." begin
+@testset "Generic.Mat.can_solve" begin
    R, x = PolynomialRing(QQ, "x")
    S = FractionField(R)
 
@@ -2101,7 +2101,7 @@ end
    @test_throws TypeError can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = "right")
 end
 
-@testset "Generic.Mat.can_solve_with_solution_interpolation..." begin
+@testset "Generic.Mat.can_solve_with_solution_interpolation" begin
    R1 = ResidueRing(ZZ, 65537)
    R, x = PolynomialRing(R1, "x")
    RZ, x = PolynomialRing(ZZ, "x")
@@ -2135,7 +2135,7 @@ end
    end
 end
 
-@testset "Generic.Mat.solve_triu..." begin
+@testset "Generic.Mat.solve_triu" begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -2152,7 +2152,7 @@ end
    end
 end
 
-@testset "Generic.Mat.solve_left_reduced_triu..." begin
+@testset "Generic.Mat.solve_left_reduced_triu" begin
    for iter = 1:40
       n = rand(1:6)
       m = rand(1:n)
@@ -2170,7 +2170,7 @@ end
    end
 end
 
-@testset "Generic.Mat.rref..." begin
+@testset "Generic.Mat.rref" begin
    # Non-integral domain
 
    S = ResidueRing(ZZ, 20011*10007)
@@ -2278,7 +2278,7 @@ end
    end
 end
 
-@testset "Generic.Mat.isinvertible..." begin
+@testset "Generic.Mat.isinvertible" begin
    R, x = PolynomialRing(QQ, "x")
 
    let
@@ -2362,7 +2362,7 @@ end
    end
 end
 
-@testset "Generic.Mat.nullspace..." begin
+@testset "Generic.Mat.nullspace" begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixSpace(S, 5, 5)
 
@@ -2433,7 +2433,7 @@ end
    end
 end
 
-@testset "Generic.Mat.kernel..." begin
+@testset "Generic.Mat.kernel" begin
    R = MatrixSpace(ZZ, 5, 5)
 
    for i = 0:5
@@ -2492,7 +2492,7 @@ end
    end
 end
 
-@testset "Generic.Mat.inversion..." begin
+@testset "Generic.Mat.inversion" begin
    for dim = 2:5
       R = MatrixSpace(ZZ, dim, dim)
       M = R(1)
@@ -2585,7 +2585,7 @@ end
    @test typeof(inv(M.m)) == typeof(M.m)
 end
 
-@testset "Generic.Mat.hessenberg..." begin
+@testset "Generic.Mat.hessenberg" begin
    R = ResidueRing(ZZ, 18446744073709551629)
 
    for dim = 0:5
@@ -2607,7 +2607,7 @@ end
    @test H == matrix(ZZ, 3, 3, [10 -28 8; -1 4 -3; 0 50 -19])
 end
 
-@testset "Generic.Mat.kronecker_product..." begin
+@testset "Generic.Mat.kronecker_product" begin
    R = ResidueRing(ZZ, 18446744073709551629)
    S = MatrixSpace(R, 2, 3)
    S2 = MatrixSpace(R, 2, 2)
@@ -2621,7 +2621,7 @@ end
    @test kronecker_product(B*A,A*C) == kronecker_product(B,A) * kronecker_product(A,C)
 end
 
-@testset "Generic.Mat.charpoly..." begin
+@testset "Generic.Mat.charpoly" begin
    R = ResidueRing(ZZ, 18446744073709551629)
 
    for dim = 0:5
@@ -2679,7 +2679,7 @@ end
    @test p1 == p2
 end
 
-@testset "Generic.Mat.minpoly..." begin
+@testset "Generic.Mat.minpoly" begin
    R = GF(103)
    T, y = PolynomialRing(R, "y")
 
@@ -2783,7 +2783,7 @@ end
    @test p1 == p2
 end
 
-@testset "Generic.Mat.row_col_swapping..." begin
+@testset "Generic.Mat.row_col_swapping" begin
    R, x = PolynomialRing(ZZ, "x")
    M = MatrixSpace(R, 3, 2)
 
@@ -2823,7 +2823,7 @@ end
    @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
 end
 
-@testset "Generic.Mat.gen_mat_elem_op..." begin
+@testset "Generic.Mat.gen_mat_elem_op" begin
    R, x = PolynomialRing(ZZ, "x")
    for i in 1:10
       r = rand(1:50)
@@ -2946,7 +2946,7 @@ end
    end
 end
 
-@testset "Generic.Mat.concat..." begin
+@testset "Generic.Mat.concat" begin
    R, x = PolynomialRing(ZZ, "x")
 
    for i = 1:10
@@ -3003,7 +3003,7 @@ end
                                     0 1 0 1 2;])
 end
 
-@testset "Generic.Mat.hnf_minors..." begin
+@testset "Generic.Mat.hnf_minors" begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -3038,7 +3038,7 @@ end
    @test U*B == H
 end
 
-@testset "Generic.Mat.hnf_kb..." begin
+@testset "Generic.Mat.hnf_kb" begin
    M = matrix(ZZ, BigInt[4 6 2; 0 0 10; 0 5 3])
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(M)
@@ -3104,7 +3104,7 @@ end
    @test B == b
 end
 
-@testset "Generic.Mat.hnf_cohen..." begin
+@testset "Generic.Mat.hnf_cohen" begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -3139,7 +3139,7 @@ end
    @test U*B == H
 end
 
-@testset "Generic.Mat.hnf..." begin
+@testset "Generic.Mat.hnf" begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -3174,7 +3174,7 @@ end
    @test U*B == H
 end
 
-@testset "Generic.Mat.snf_kb..." begin
+@testset "Generic.Mat.snf_kb" begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -3234,7 +3234,7 @@ end
    @test C == c
 end
 
-@testset "Generic.Mat.snf..." begin
+@testset "Generic.Mat.snf" begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -3271,7 +3271,7 @@ end
    @test U*B*K == T
 end
 
-@testset "Generic.Mat.weak_popov..." begin
+@testset "Generic.Mat.weak_popov" begin
    R, x = PolynomialRing(QQ, "x")
 
    A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
@@ -3348,7 +3348,7 @@ end
    end
 end
 
-@testset "Generic.Mat.popov..." begin
+@testset "Generic.Mat.popov" begin
    R, x = PolynomialRing(QQ, "x")
 
    A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
@@ -3435,7 +3435,7 @@ end
    end
 end
 
-@testset "Generic.Mat.views..." begin
+@testset "Generic.Mat.views" begin
    M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
    M2 = deepcopy(M)
 
@@ -3454,7 +3454,7 @@ end
    @test M2 == M
 end
 
-@testset "Generic.Mat.change_base_ring..." begin
+@testset "Generic.Mat.change_base_ring" begin
    for (P, Q, T) in ((MatrixSpace(ZZ, 2, 3), MatrixSpace(ZZ, 3, 2), MatElem),
                      (MatrixAlgebra(ZZ, 3), MatrixAlgebra(ZZ, 3), MatAlgElem))
       M = rand(P, -10:10)
@@ -3478,7 +3478,7 @@ end
    @test change_base_ring(F2(), z.m) isa F2Matrix
 end
 
-@testset "Generic.Mat.map..." begin
+@testset "Generic.Mat.map" begin
    u, v = rand(0:9, 2)
    for (mat, algebra) = ((rand(1:9, u, v), false),
                          (rand(1:9, u, u), true))
@@ -3522,7 +3522,7 @@ end
    @test map(identity, z.m) isa F2Matrix
 end
 
-@testset "Generic.Mat.similar/zero..." begin
+@testset "Generic.Mat.similar/zero" begin
    for sim_zero in (similar, zero)
       test_zero = sim_zero === zero
       for R = (ZZ, GF(11))
@@ -3566,7 +3566,7 @@ end
    @test zero(m, 2, 3)    isa Generic.MatSpaceElem{F2Elem}
 end
 
-@testset "Generic.Mat.printing..." begin
+@testset "Generic.Mat.printing" begin
    # this is the REPL printing
    @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
    @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"

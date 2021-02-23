@@ -13,13 +13,13 @@ function rand_homomorphism(M::AbstractAlgebra.FPModule{T}, vals...) where T <: R
    return S, hom1
 end
 
-@testset "Generic.Module.rand..." begin
+@testset "Generic.Module.rand" begin
    F = FreeModule(ZZ, 3)
 
    test_rand(F, 1:9)
 end
 
-@testset "Generic.Module.manipulation..." begin
+@testset "Generic.Module.manipulation" begin
    for R in [ZZ, QQ]
       for iter = 1:100
          F = FreeModule(R, 3)
@@ -99,7 +99,7 @@ end
    U, k = quo(Q, T)
 end
 
-@testset "Generic.Module.elem_getindex..." begin
+@testset "Generic.Module.elem_getindex" begin
 
    for R in [ZZ, QQ]
       for iter = 1:100
@@ -119,7 +119,7 @@ end
    end
 end
 
-@testset "Generic.Module.intersection..." begin
+@testset "Generic.Module.intersection" begin
    for R in [ZZ, QQ]
       for iter = 1:100
          M = rand_module(R, -10:10)
@@ -161,7 +161,7 @@ end
    end
 end
 
-@testset "Generic.Module.is_isomorphic..." begin
+@testset "Generic.Module.is_isomorphic" begin
    # Test the first isomorphism theorem
    for R in [ZZ, QQ]
       for iter = 1:100
@@ -193,7 +193,7 @@ end
    end
 end
 
-@testset "Generic.Module.coercions..." begin
+@testset "Generic.Module.coercions" begin
    # Test the first isomorphism theorem
    for R in [ZZ, QQ]
       for iter = 1:20

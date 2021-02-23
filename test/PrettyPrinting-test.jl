@@ -1,4 +1,4 @@
-@testset "PrettyPrinting..." begin
+@testset "PrettyPrinting" begin
 
    function just_string(x)
       return AbstractAlgebra.expr_to_string(x)

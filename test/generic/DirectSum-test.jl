@@ -1,6 +1,6 @@
 using Random
 
-@testset "Generic.DirectSum.constructors..." begin
+@testset "Generic.DirectSum.constructors" begin
    for R in [ZZ, QQ]
       for iter = 1:100
          num = rand(1:5)
@@ -28,7 +28,7 @@ using Random
    @test f == inj[1](gen(F,1)) + inj[2](gen(F, 2))
 end
 
-@testset "Generic.DirectSum.basic_manipulation..." begin
+@testset "Generic.DirectSum.basic_manipulation" begin
 
    for R in [ZZ, QQ]
       for iter = 1:100
@@ -42,7 +42,7 @@ end
    end
 end
 
-@testset "Generic.DirectSum.maps..." begin
+@testset "Generic.DirectSum.maps" begin
    for R in [ZZ, QQ]
       for iter = 1:100
          num = rand(1:5)
@@ -71,7 +71,7 @@ end
 
 end
 
-@testset "Generic.DirectSum.isomorphism..." begin
+@testset "Generic.DirectSum.isomorphism" begin
    for R in [ZZ, QQ]
       for iter = 1:100
          num = rand(1:5)

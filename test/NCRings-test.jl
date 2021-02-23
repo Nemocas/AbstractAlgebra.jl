@@ -1,7 +1,7 @@
 include("generic/MatrixAlgebra-test.jl")
 include("generic/NCPoly-test.jl")
 
-@testset "NCRings.oftype..." begin
+@testset "NCRings.oftype" begin
    F = GF(3)
    Fx, x = PolynomialRing(F, "x")
    z = oftype(x, 3)
@@ -9,7 +9,7 @@ include("generic/NCPoly-test.jl")
    @test parent(z) === Fx
 end
 
-@testset "NCRings.powers..." begin
+@testset "NCRings.powers" begin
    
    # non-commutative rings
    A = MatrixAlgebra(ZZ, rand(1:9))

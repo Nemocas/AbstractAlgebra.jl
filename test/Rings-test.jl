@@ -13,7 +13,7 @@ include("generic/Matrix-test.jl")
 include("generic/MPoly-test.jl")
 include("generic/MPolyFactor-test.jl")
 
-@testset "Generic.Rings.broadcast..." begin
+@testset "Generic.Rings.broadcast" begin
    F = GF(3)
    @test F(2) .* [F(1), F(2)] == [F(2), F(1)]
 end

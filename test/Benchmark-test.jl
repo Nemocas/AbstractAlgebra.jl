@@ -1,4 +1,4 @@
-@testset "Benchmark.fateman..." begin
+@testset "Benchmark.fateman" begin
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
@@ -11,7 +11,7 @@
    @test length(q) == 21
 end
 
-@testset "Benchmark.pearce..." begin
+@testset "Benchmark.pearce" begin
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")

@@ -16,7 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-@testset "Generic.AbsSeries.constructors..." begin
+@testset "Generic.AbsSeries.constructors" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    S, t = PolynomialRing(QQ, "t")
@@ -80,7 +80,7 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.AbsSeries.manipulation..." begin
+@testset "Generic.AbsSeries.manipulation" begin
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
@@ -122,7 +122,7 @@ end
    @test modulus(T) == 7
 end
 
-@testset "Generic.AbsSeries.unary_ops..." begin
+@testset "Generic.AbsSeries.unary_ops" begin
    #  Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
@@ -152,7 +152,7 @@ end
    end
 end
 
-@testset "Generic.AbsSeries.binary_ops..." begin
+@testset "Generic.AbsSeries.binary_ops" begin
    #  Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:100
@@ -201,7 +201,7 @@ end
    end
 end
 
-@testset "Generic.AbsSeries.adhoc_binary_ops..." begin
+@testset "Generic.AbsSeries.adhoc_binary_ops" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:500
@@ -291,7 +291,7 @@ end
    end
 end
 
-@testset "Generic.AbsSeries.comparison..." begin
+@testset "Generic.AbsSeries.comparison" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:500
@@ -342,7 +342,7 @@ end
    end
 end
 
-@testset "Generic.AbsSeries.adhoc_comparison..." begin
+@testset "Generic.AbsSeries.adhoc_comparison" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:500
@@ -439,7 +439,7 @@ end
    end
 end
 
-@testset "Generic.AbsSeries.powering..." begin
+@testset "Generic.AbsSeries.powering" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
 
@@ -492,7 +492,7 @@ end
    end
 end
 
-@testset "Generic.AbsSeries.shift..." begin
+@testset "Generic.AbsSeries.shift" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
@@ -555,7 +555,7 @@ end
    @test_throws DomainError shift_right(f, -rand(2:100))
 end
 
-@testset "Generic.AbsSeries.truncation..." begin
+@testset "Generic.AbsSeries.truncation" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
@@ -609,7 +609,7 @@ end
    @test_throws DomainError truncate(f, -rand(2:100))   
 end
 
-@testset "Generic.AbsSeries.inversion..." begin
+@testset "Generic.AbsSeries.inversion" begin
 
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
@@ -646,7 +646,7 @@ end
     end
  end
 
-@testset "Generic.AbsSeries.square_root..." begin
+@testset "Generic.AbsSeries.square_root" begin
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
     for iter = 1:300
@@ -666,7 +666,7 @@ end
     end
 end
 
-@testset "Generic.AbsSeries.exact_division..." begin
+@testset "Generic.AbsSeries.exact_division" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
@@ -717,7 +717,7 @@ end
    end
 end
 
-@testset "Generic.AbsSeries.adhoc_exact_division..." begin
+@testset "Generic.AbsSeries.adhoc_exact_division" begin
    # Exact field
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
@@ -756,7 +756,7 @@ end
    end
 end
 
-@testset "Generic.AbsSeries.special_functions..." begin
+@testset "Generic.AbsSeries.special_functions" begin
    # Exact field
    S, x = PowerSeriesRing(QQ, 10, "x", model=:capped_absolute)
 
