@@ -16,7 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-@testset "Generic.RelSeries.constructors..." begin
+@testset "Generic.RelSeries.constructors" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    S, t = PolynomialRing(QQ, "t")
@@ -82,13 +82,13 @@
    @test_throws DomainError O(0+O(x^0))
 end
 
-@testset "Generic.RelSeries.rand..." begin
+@testset "Generic.RelSeries.rand" begin
    R, x = PowerSeriesRing(ZZ, 10, "x")
 
    test_rand(R, 0:12, -10:10)
 end
 
-@testset "Generic.RelSeries.manipulation..." begin
+@testset "Generic.RelSeries.manipulation" begin
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -133,7 +133,7 @@ end
    @test modulus(T) == 7
 end
 
-@testset "Generic.RelSeries.unary_ops..." begin
+@testset "Generic.RelSeries.unary_ops" begin
    #  Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -163,7 +163,7 @@ end
    end
 end
 
-@testset "Generic.RelSeries.binary_ops..." begin
+@testset "Generic.RelSeries.binary_ops" begin
    #  Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:100
@@ -212,7 +212,7 @@ end
    end
 end
 
-@testset "Generic.RelSeries.adhoc_binary_ops..." begin
+@testset "Generic.RelSeries.adhoc_binary_ops" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -302,7 +302,7 @@ end
    end
 end
 
-@testset "Generic.RelSeries.comparison..." begin
+@testset "Generic.RelSeries.comparison" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -353,7 +353,7 @@ end
    end
 end
 
-@testset "Generic.RelSeries.adhoc_comparison..." begin
+@testset "Generic.RelSeries.adhoc_comparison" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -450,7 +450,7 @@ end
    end
 end
 
-@testset "Generic.RelSeries.powering..." begin
+@testset "Generic.RelSeries.powering" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
 
@@ -515,7 +515,7 @@ end
    @test_throws DomainError f^-rand(2:100)
 end
 
-@testset "Generic.RelSeries.shift..." begin
+@testset "Generic.RelSeries.shift" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -578,7 +578,7 @@ end
    @test_throws DomainError shift_right(f, -rand(2:100))
 end
 
-@testset "Generic.RelSeries.truncation..." begin
+@testset "Generic.RelSeries.truncation" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -626,7 +626,7 @@ end
    @test_throws DomainError truncate(f, -rand(2:100))
 end
 
-@testset "Generic.RelSeries.inversion..." begin
+@testset "Generic.RelSeries.inversion" begin
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x")
     for iter = 1:300
@@ -662,7 +662,7 @@ end
     end
 end
 
-@testset "Generic.RelSeries.square_root..." begin
+@testset "Generic.RelSeries.square_root" begin
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x")
     for iter = 1:300
@@ -682,7 +682,7 @@ end
     end
 end
 
-@testset "Generic.RelSeries.exact_division..." begin
+@testset "Generic.RelSeries.exact_division" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -733,7 +733,7 @@ end
    end
 end
 
-@testset "Generic.RelSeries.adhoc_exact_division..." begin
+@testset "Generic.RelSeries.adhoc_exact_division" begin
    # Exact field
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -772,7 +772,7 @@ end
    end
 end
 
-@testset "Generic.RelSeries.unsafe_operators..." begin
+@testset "Generic.RelSeries.unsafe_operators" begin
    Qx, x = PowerSeriesRing(GF(13), 10, "x")
    a = 1 + O(x^3)
    c = x^4 + O(x^7)
@@ -797,7 +797,7 @@ end
    @test isequal(a, -3*x*s + 6*x*s^2 + 9*x*s^3 + O(s^4))
 end
 
-@testset "Generic.RelSeries.special_functions..." begin
+@testset "Generic.RelSeries.special_functions" begin
    # Exact field
    S, x = PowerSeriesRing(QQ, 10, "x")
 

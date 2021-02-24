@@ -1,4 +1,4 @@
-@testset "Generic.ModuleHomomorphism.constructors..." begin
+@testset "Generic.ModuleHomomorphism.constructors" begin
    M = FreeModule(ZZ, 2)
 
    f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
@@ -18,7 +18,7 @@
    @test g(m2) == N([ZZ(12)])
 end
 
-@testset "Generic.ModuleHomomorphism.kernel..." begin
+@testset "Generic.ModuleHomomorphism.kernel" begin
    for R in [ZZ, QQ]
       for iter = 1:100
          # test kernels of canonical injection and projection
@@ -65,7 +65,7 @@ end
    end
 end
 
-@testset "Generic.ModuleHomomorphism.image..." begin
+@testset "Generic.ModuleHomomorphism.image" begin
    # To make it work on julia nightlies
 
    R = AbstractAlgebra.JuliaZZ
@@ -107,7 +107,7 @@ end
    end
 end
 
-@testset "Generic.ModuleIsomorphism..." begin
+@testset "Generic.ModuleIsomorphism" begin
    R = AbstractAlgebra.JuliaQQ
    for iter = 1:100
       # test image of composition of canonical injection and projection

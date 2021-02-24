@@ -1,4 +1,4 @@
-@testset "Generic.MapWithInverse.constructors..." begin
+@testset "Generic.MapWithInverse.constructors" begin
    f = map_from_func(x -> x + 1, ZZ, ZZ)
    g = map_from_func(x -> x - 1, ZZ, ZZ)
 
@@ -37,7 +37,7 @@
    @test u(ZZ(1)) == 2
 end
 
-@testset "Generic.MapWithInverse.composition..." begin
+@testset "Generic.MapWithInverse.composition" begin
    f = map_from_func(x -> x + 1, ZZ, ZZ)
    g = map_from_func(x -> x - 1, ZZ, ZZ)
    h = map_from_func(x -> x + 2, ZZ, ZZ)
@@ -58,7 +58,7 @@ end
    @test u(ZZ(1)) == 4
 end
 
-@testset "Generic.MapWithInverse.inv..." begin
+@testset "Generic.MapWithInverse.inv" begin
    f = map_from_func(x -> x + 1, ZZ, ZZ)
    g = map_from_func(x -> x - 1, ZZ, ZZ)
    h = map_from_func(x -> x + 2, ZZ, ZZ)

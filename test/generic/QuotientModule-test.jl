@@ -1,4 +1,4 @@
-@testset "Generic.QuotientModule.constructors..." begin
+@testset "Generic.QuotientModule.constructors" begin
    R = ZZ
    M = FreeModule(R, 2)
 
@@ -63,7 +63,7 @@
    @test isa(m, Generic.QuotientModuleElem)
 end
 
-@testset "Generic.QuotientModule.manipulation..." begin
+@testset "Generic.QuotientModule.manipulation" begin
    R = ZZ
    M = FreeModule(R, 2)
 
@@ -91,7 +91,7 @@ end
    end
 end
 
-@testset "Generic.QuotientModule.unary_ops..." begin
+@testset "Generic.QuotientModule.unary_ops" begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -107,7 +107,7 @@ end
    end
 end
 
-@testset "Generic.QuotientModule.binary_ops..." begin
+@testset "Generic.QuotientModule.binary_ops" begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -125,7 +125,7 @@ end
    end
 end
 
-@testset "Generic.QuotientModule.adhoc_binary..." begin
+@testset "Generic.QuotientModule.adhoc_binary" begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -146,7 +146,7 @@ end
    end
 end
 
-@testset "Generic.QuotientModule.canonical_projection..." begin
+@testset "Generic.QuotientModule.canonical_projection" begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)

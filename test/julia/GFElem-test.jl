@@ -1,4 +1,4 @@
-@testset "Julia.GFElem.constructors..." begin
+@testset "Julia.GFElem.constructors" begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -32,7 +32,7 @@
    @test F isa AbstractAlgebra.GFField{Int64}
 end
 
-@testset "Julia.GFElem.printing..." begin
+@testset "Julia.GFElem.printing" begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -47,7 +47,7 @@ end
    @test !occursin("1", string(x^2+2*x))
 end
 
-@testset "Julia.GFElem.manipulation..." begin
+@testset "Julia.GFElem.manipulation" begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -81,11 +81,11 @@ end
    @test S === S1
 end
 
-@testset "Julia.GFElem.rand..." begin
+@testset "Julia.GFElem.rand" begin
    test_rand(GF(13))
 end
 
-@testset "Julia.GFElem.unary_ops..." begin
+@testset "Julia.GFElem.unary_ops" begin
    for (T, p) in [(Int8, 127),
                   (UInt8, 251),
                   (Int16, 32749),
@@ -106,7 +106,7 @@ end
    end
 end
 
-@testset "Julia.GFElem.binary_ops..." begin
+@testset "Julia.GFElem.binary_ops" begin
    for (T, p) in [(Int8, 127),
                   (UInt8, 251),
                   (Int16, 32749),
@@ -149,7 +149,7 @@ end
    end
 end
 
-@testset "Julia.GFElem.adhoc_binary..." begin
+@testset "Julia.GFElem.adhoc_binary" begin
    for (T, p) in [(Int8, 127),
                   (UInt8, 251),
                   (Int16, 32749),
@@ -182,7 +182,7 @@ end
    end
 end
 
-@testset "Julia.GFElem.powering..." begin
+@testset "Julia.GFElem.powering" begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -222,7 +222,7 @@ end
    end
 end
 
-@testset "Julia.GFElem.comparison..." begin
+@testset "Julia.GFElem.comparison" begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -243,7 +243,7 @@ end
    end
 end
 
-@testset "Julia.GFElem.adhoc_comparison..." begin
+@testset "Julia.GFElem.adhoc_comparison" begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -263,7 +263,7 @@ end
    end
 end
 
-@testset "Julia.GFElem.inversion..." begin
+@testset "Julia.GFElem.inversion" begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -279,7 +279,7 @@ end
    end
 end
 
-@testset "Julia.GFElem.exact_division..." begin
+@testset "Julia.GFElem.exact_division" begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -294,7 +294,7 @@ end
    end
 end
 
-@testset "Julia.GFElem.iteration..." begin
+@testset "Julia.GFElem.iteration" begin
    for n = [2, 3, 5, 13, 31]
       R = GF(n)
       elts = AbstractAlgebra.test_iterate(R)

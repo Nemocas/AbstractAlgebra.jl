@@ -16,7 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-@testset "Generic.Poly.constructors..." begin
+@testset "Generic.Poly.constructors" begin
    R, x = ZZ["x"]
    S1 = R["y"]
    S2 = ZZ["x"]["y"]
@@ -85,7 +85,7 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.Poly.printing..." begin
+@testset "Generic.Poly.printing" begin
    R, x = PolynomialRing(ZZ, "x")
 
    @test string(zero(R)) == "0"
@@ -101,7 +101,7 @@ end
    @test string(x+y+1) == "y + x + 1"
 end
 
-@testset "Generic.Poly.rand..." begin
+@testset "Generic.Poly.rand" begin
    R, x = PolynomialRing(ZZ, "x")
 
    # TODO: test more than just the result type
@@ -119,7 +119,7 @@ end
    test_rand(T, 0:4)
 end
 
-@testset "Generic.Poly.manipulation..." begin
+@testset "Generic.Poly.manipulation" begin
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
@@ -165,7 +165,7 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "Generic.Poly.binary_ops..." begin
+@testset "Generic.Poly.binary_ops" begin
    #  Exact ring
    R, x = PolynomialRing(ZZ, "x")
    for iter = 1:100
@@ -229,7 +229,7 @@ end
    end
 end
 
-@testset "Generic.Poly.adhoc_binary..." begin
+@testset "Generic.Poly.adhoc_binary" begin
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:500
@@ -342,7 +342,7 @@ end
    end
 end
 
-@testset "Generic.Poly.comparison..." begin
+@testset "Generic.Poly.comparison" begin
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:500
@@ -408,7 +408,7 @@ end
    end
 end
 
-@testset "Generic.Poly.adhoc_comparison..." begin
+@testset "Generic.Poly.adhoc_comparison" begin
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:500
@@ -525,7 +525,7 @@ end
    end
 end
 
-@testset "Generic.Poly.unary_ops..." begin
+@testset "Generic.Poly.unary_ops" begin
    #  Exact ring
    R, x = PolynomialRing(ZZ, "x")
    for iter = 1:300
@@ -567,7 +567,7 @@ end
    end
 end
 
-@testset "Generic.Poly.truncation..." begin
+@testset "Generic.Poly.truncation" begin
    #  Exact ring
    R, x = PolynomialRing(ZZ, "x")
    for iter = 1:300
@@ -616,7 +616,7 @@ end
    end
 end
 
-@testset "Generic.Poly.reverse..." begin
+@testset "Generic.Poly.reverse" begin
    #  Exact ring
    R, x = ZZ["x"]
    for iter = 1:300
@@ -714,7 +714,7 @@ end
    @test_throws DomainError reverse(f, -rand(2:100))
 end
 
-@testset "Generic.Poly.shift..." begin
+@testset "Generic.Poly.shift" begin
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:300
@@ -792,7 +792,7 @@ end
    @test_throws DomainError shift_left(f, -rand(2:100))
 end
 
-@testset "Generic.Poly.powering..." begin
+@testset "Generic.Poly.powering" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -889,7 +889,7 @@ end
 end
 
 if false
-   @testset "Generic.Poly.modular_arithmetic..." begin
+   @testset "Generic.Poly.modular_arithmetic" begin
       # Exact ring
       R = ResidueRing(ZZ, 23)
       S, x = PolynomialRing(R, "x")
@@ -1068,7 +1068,7 @@ if false
    end
 end
 
-@testset "Generic.Poly.exact_division..." begin
+@testset "Generic.Poly.exact_division" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1129,7 +1129,7 @@ end
    end
 end
 
-@testset "Generic.Poly.adhoc_exact_division..." begin
+@testset "Generic.Poly.adhoc_exact_division" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1236,7 +1236,7 @@ end
    end
 end
 
-@testset "Generic.Poly.euclidean_division..." begin
+@testset "Generic.Poly.euclidean_division" begin
    # Exact ring
    R = ResidueRing(ZZ, 23)
    S, x = PolynomialRing(R, "x")
@@ -1350,7 +1350,7 @@ end
    end
 end
 
-@testset "Generic.Poly.pseudodivision..." begin
+@testset "Generic.Poly.pseudodivision" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1395,7 +1395,7 @@ end
    end
 end
 
-@testset "Generic.Poly.content_primpart_gcd..." begin
+@testset "Generic.Poly.content_primpart_gcd" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1527,7 +1527,7 @@ end
    end
 end
 
-@testset "Generic.Poly.evaluation..." begin
+@testset "Generic.Poly.evaluation" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1593,7 +1593,7 @@ end
    end
 end
 
-@testset "Generic.Poly.composition..." begin
+@testset "Generic.Poly.composition" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1629,7 +1629,7 @@ end
    end
 end
 
-@testset "Generic.Poly.derivative..." begin
+@testset "Generic.Poly.derivative" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1668,7 +1668,7 @@ end
    end
 end
 
-@testset "Generic.Poly.integral..." begin
+@testset "Generic.Poly.integral" begin
    # Exact field
    R, x = PolynomialRing(QQ, "x")
 
@@ -1713,7 +1713,7 @@ end
    end
 end
 
-@testset "Generic.Poly.sylvester_matrix..." begin
+@testset "Generic.Poly.sylvester_matrix" begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
@@ -1741,7 +1741,7 @@ end
    end
 end
 
-@testset "Generic.Poly.resultant..." begin
+@testset "Generic.Poly.resultant" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1832,7 +1832,7 @@ end
    end
 end
 
-@testset "Generic.Poly.discriminant..." begin
+@testset "Generic.Poly.discriminant" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1884,7 +1884,7 @@ end
 #   end
 end
 
-@testset "Generic.Poly.resx..." begin
+@testset "Generic.Poly.resx" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -2018,7 +2018,7 @@ end
 #   end
 end
 
-@testset "Generic.Poly.gcdx..." begin
+@testset "Generic.Poly.gcdx" begin
    # Exact field
    R, x = PolynomialRing(QQ, "x")
 
@@ -2109,7 +2109,7 @@ end
    end
 end
 
-@testset "Generic.Poly.newton_representation..." begin
+@testset "Generic.Poly.newton_representation" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -2198,7 +2198,7 @@ end
    end
 end
 
-@testset "Generic.Poly.interpolation..." begin
+@testset "Generic.Poly.interpolation" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -2306,7 +2306,7 @@ end
 #   end
 end
 
-@testset "Generic.Poly.special..." begin
+@testset "Generic.Poly.special" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -2424,7 +2424,7 @@ end
    end
 end
 
-@testset "Generic.Poly.mul_karatsuba..." begin
+@testset "Generic.Poly.mul_karatsuba" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -2436,7 +2436,7 @@ end
    @test mul_karatsuba(f^10, f^30) == mul_classical(f^10, f^30)
 end
 
-@testset "Generic.Poly.mul_ks..." begin
+@testset "Generic.Poly.mul_ks" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -2448,7 +2448,7 @@ end
    @test mul_ks(f^10, f^30) == mul_classical(f^10, f^30)
 end
 
-@testset "Generic.Poly.remove_valuation..." begin
+@testset "Generic.Poly.remove_valuation" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -2616,7 +2616,7 @@ end
    end
 end
 
-@testset "Generic.Poly.square_root..." begin
+@testset "Generic.Poly.square_root" begin
    # Exact ring
    S, x = PolynomialRing(ZZ, "x")
    for iter = 1:10
@@ -2689,7 +2689,7 @@ end
    end
 end
 
-@testset "Generic.Poly.generic_eval..." begin
+@testset "Generic.Poly.generic_eval" begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
@@ -2713,7 +2713,7 @@ end
    end
 end
 
-@testset "Generic.Poly.change_base_ring..." begin
+@testset "Generic.Poly.change_base_ring" begin
    Zx, x = PolynomialRing(ZZ,'x')
    @test 1 == map_coeffs(sqrt, x^0)
    p = Zx([i for i in 1:10])
@@ -2743,7 +2743,7 @@ end
    @test map_coeffs(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 end
 
-@testset "Generic.Poly.printing..." begin
+@testset "Generic.Poly.printing" begin
    M = MatrixAlgebra(ZZ, 3)
    _, x = M['x']
    @test string(M(-1)*x) isa String

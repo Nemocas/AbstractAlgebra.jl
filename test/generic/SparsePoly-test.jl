@@ -1,4 +1,4 @@
-@testset "Generic.SparsePoly.constructors..." begin
+@testset "Generic.SparsePoly.constructors" begin
    R, x = SparsePolynomialRing(ZZ, "x")
    S, y = SparsePolynomialRing(R, "y")
 
@@ -9,7 +9,7 @@
    @test typeof(T) <: Generic.SparsePolyRing
 end
 
-@testset "Generic.SparsePoly.printing..." begin
+@testset "Generic.SparsePoly.printing" begin
    R, x = SparsePolynomialRing(ZZ, "x")
 
    @test string(zero(R)) == "0"

@@ -16,7 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-@testset "Generic.PuiseuxSeries.constructors..." begin
+@testset "Generic.PuiseuxSeries.constructors" begin
    R, x = PuiseuxSeriesRing(ZZ, 30, "x")
 
    S, t = PolynomialRing(QQ, "t")
@@ -91,13 +91,13 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.PuiseuxSeries.printing..." begin
+@testset "Generic.PuiseuxSeries.printing" begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
 
    @test occursin("O", string(x^(-1//2) + 1 - x + x^2 + x^5))
 end
 
-@testset "Generic.PuiseuxSeries.rand..." begin
+@testset "Generic.PuiseuxSeries.rand" begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
 
    test_rand(R, -12:12, 1:6, -10:10)
@@ -109,7 +109,7 @@ end
    test_rand(R, -12:12, 1:6, make(RealField, -1:1))
 end
 
-@testset "Generic.PuiseuxSeries.manipulation..." begin
+@testset "Generic.PuiseuxSeries.manipulation" begin
    R, t = PolynomialRing(QQ, "t")
    S, x = PuiseuxSeriesRing(R, 30, "x")
 
@@ -148,7 +148,7 @@ end
    @test modulus(T) == 7
 end
 
-@testset "Generic.PuiseuxSeries.unary_ops..." begin
+@testset "Generic.PuiseuxSeries.unary_ops" begin
    #  Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -178,7 +178,7 @@ end
    end
 end
 
-@testset "Generic.PuiseuxSeries.binary_ops..." begin
+@testset "Generic.PuiseuxSeries.binary_ops" begin
    #  Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:100
@@ -238,7 +238,7 @@ end
    @test isequal(g, f)
 end
 
-@testset "Generic.PuiseuxSeries.adhoc_binary_ops..." begin
+@testset "Generic.PuiseuxSeries.adhoc_binary_ops" begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -328,7 +328,7 @@ end
    end
 end
 
-@testset "Generic.PuiseuxSeries.comparison..." begin
+@testset "Generic.PuiseuxSeries.comparison" begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -379,7 +379,7 @@ end
    end
 end
 
-@testset "Generic.PuiseuxSeries.adhoc_comparison..." begin
+@testset "Generic.PuiseuxSeries.adhoc_comparison" begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -476,7 +476,7 @@ end
    end
 end
 
-@testset "Generic.PuiseuxSeries.powering..." begin
+@testset "Generic.PuiseuxSeries.powering" begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
 
@@ -529,7 +529,7 @@ end
    end
 end
 
-@testset "Generic.PuiseuxSeries.inversion..." begin
+@testset "Generic.PuiseuxSeries.inversion" begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -565,7 +565,7 @@ end
    end
 end
 
-@testset "Generic.PuiseuxSeries.square_root..." begin
+@testset "Generic.PuiseuxSeries.square_root" begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -585,7 +585,7 @@ end
    end
 end
 
-@testset "Generic.PuiseuxSeries.exact_division..." begin
+@testset "Generic.PuiseuxSeries.exact_division" begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -626,7 +626,7 @@ end
    end
 end
 
-@testset "Generic.PuiseuxSeries.adhoc_exact_division..." begin
+@testset "Generic.PuiseuxSeries.adhoc_exact_division" begin
    # Exact field
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -665,7 +665,7 @@ end
    end
 end
 
-@testset "Generic.PuiseuxSeries.special_functions..." begin
+@testset "Generic.PuiseuxSeries.special_functions" begin
    # Exact field
    S, x = PuiseuxSeriesRing(QQ, 10, "x")
 

@@ -1,4 +1,4 @@
-@testset "Generic.FreeModule.constructors..." begin
+@testset "Generic.FreeModule.constructors" begin
    R, x = PolynomialRing(ZZ, "x")
    M = FreeModule(R, 5)
 
@@ -17,14 +17,14 @@
    @test isa(F([]), Generic.FreeModuleElem)
 end
 
-@testset "Generic.FreeModule.manipulation..." begin
+@testset "Generic.FreeModule.manipulation" begin
    R, x = PolynomialRing(ZZ, "x")
    M = FreeModule(R, 5)
 
    @test rank(M) == 5
 end
 
-@testset "Generic.FreeModule.unary_ops..." begin
+@testset "Generic.FreeModule.unary_ops" begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:10
@@ -48,7 +48,7 @@ end
    end
 end
 
-@testset "Generic.FreeModule.binary_ops..." begin
+@testset "Generic.FreeModule.binary_ops" begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:10
@@ -72,7 +72,7 @@ end
    end
 end
 
-@testset "Generic.FreeModule.adhoc_binary..." begin
+@testset "Generic.FreeModule.adhoc_binary" begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:10

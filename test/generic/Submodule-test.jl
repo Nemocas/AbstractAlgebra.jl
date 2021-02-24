@@ -1,4 +1,4 @@
-@testset "Generic.Submodule.constructors..." begin
+@testset "Generic.Submodule.constructors" begin
    R = ZZ
    M = FreeModule(R, 2)
    m = M([R(1), R(3)])
@@ -53,7 +53,7 @@
    @test isa(m, Generic.SubmoduleElem)
 end
 
-@testset "Generic.Submodule.manipulation..." begin
+@testset "Generic.Submodule.manipulation" begin
    R = ZZ
    M = FreeModule(R, 2)
    m = M([R(1), R(3)])
@@ -78,7 +78,7 @@ end
    end
 end
 
-@testset "Generic.Submodule.unary_ops..." begin
+@testset "Generic.Submodule.unary_ops" begin
    for R in [ZZ, QQ]
       for iter = 1:20
          M = rand_module(R, -10:10)
@@ -93,7 +93,7 @@ end
    end
 end
 
-@testset "Generic.Submodule.binary_ops..." begin
+@testset "Generic.Submodule.binary_ops" begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -110,7 +110,7 @@ end
    end
 end
 
-@testset "Generic.Submodule.adhoc_binary..." begin
+@testset "Generic.Submodule.adhoc_binary" begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -130,7 +130,7 @@ end
    end
 end
 
-@testset "Generic.Submodule.canonical_injection..." begin
+@testset "Generic.Submodule.canonical_injection" begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)

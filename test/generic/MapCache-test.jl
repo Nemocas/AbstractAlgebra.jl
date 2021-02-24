@@ -1,4 +1,4 @@
-@testset "Generic.MapCache.constructors..." begin
+@testset "Generic.MapCache.constructors" begin
    f = cached(map_from_func(x -> x + 1, ZZ, ZZ))
    g = cached(map_from_func(x -> QQ(x), ZZ, QQ), limit=2)
    h = cached(map_from_func(x -> x + 2, ZZ, ZZ), enabled=false)
@@ -22,7 +22,7 @@
    @test image_fn(f)(ZZ(1)) == 2
 end
 
-@testset "Generic.MapCache.enable_disable..." begin
+@testset "Generic.MapCache.enable_disable" begin
    f = cached(map_from_func(x -> x + 1, ZZ, ZZ))
 
    @test f(ZZ(1)) == 2
@@ -52,7 +52,7 @@ end
    @test g(ZZ(3)) == 4
 end
 
-@testset "Generic.MapCache.limit..." begin
+@testset "Generic.MapCache.limit" begin
    g = cached(map_from_func(x -> QQ(x), ZZ, QQ), limit=2)
 
    set_limit!(g, 3)

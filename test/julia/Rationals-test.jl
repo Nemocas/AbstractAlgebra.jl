@@ -1,4 +1,4 @@
-@testset "Julia.Rationals.constructors..." begin
+@testset "Julia.Rationals.constructors" begin
    R = qq
    S = QQ
 
@@ -35,14 +35,14 @@
    @test isa(S(b), Rational{BigInt})
 end
 
-@testset "Julia.Rationals.rand..." begin
+@testset "Julia.Rationals.rand" begin
    test_rand(QQ, 1:9) do f
       @test 1 <= numerator(f) <= 9
       @test 1 <= denominator(f) <= 9
    end
 end
 
-@testset "Julia.Rationals.manipulation..." begin
+@testset "Julia.Rationals.manipulation" begin
    R = qq
    S = QQ
 
@@ -58,7 +58,7 @@ end
    @test isunit(S(3))
 end
 
-@testset "Julia.Rationals.exact_division..." begin
+@testset "Julia.Rationals.exact_division" begin
    R = qq
    S = QQ
 
@@ -95,7 +95,7 @@ end
    end
 end
 
-@testset "Julia.Rationals.gcd..." begin
+@testset "Julia.Rationals.gcd" begin
    R = qq
    S = QQ
 
@@ -112,7 +112,7 @@ end
    end
 end
 
-@testset "Julia.Rationals.square_root..." begin
+@testset "Julia.Rationals.square_root" begin
    R = qq
    S = QQ
 
@@ -130,14 +130,14 @@ end
    end
 end
 
-@testset "Julia.Rationals.exp..." begin
+@testset "Julia.Rationals.exp" begin
    @test AbstractAlgebra.exp(0//1) == 1
    @test_throws DomainError AbstractAlgebra.exp(1//1)
    @test_throws DomainError AbstractAlgebra.exp(rand(2:1000)//rand(1:1000))
    @test_throws DomainError AbstractAlgebra.exp(-rand(1:1000//rand(1:1000)))
 end
 
-@testset "Julia.Rationals.divrem..." begin
+@testset "Julia.Rationals.divrem" begin
    R = qq
    S = QQ
 

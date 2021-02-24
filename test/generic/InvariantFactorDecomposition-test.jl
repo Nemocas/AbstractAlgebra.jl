@@ -1,4 +1,4 @@
-@testset "Generic.InvariantFactorDecomposition.constructors..." begin
+@testset "Generic.InvariantFactorDecomposition.constructors" begin
    for R in [ZZ, QQ]
       for iter = 1:100
          M = rand_module(R, -10:10)
@@ -16,7 +16,7 @@
    @test isa(m, Generic.SNFModuleElem)
 end
 
-@testset "Generic.InvariantFactorDecomposition.invariant_factors..." begin
+@testset "Generic.InvariantFactorDecomposition.invariant_factors" begin
    for R in [ZZ, QQ]
       for iter = 1:100
          M = rand_module(R, -10:10)
@@ -29,7 +29,7 @@ end
    end
 end
 
-@testset "Generic.InvariantFactorDecomposition.isomorphism..." begin
+@testset "Generic.InvariantFactorDecomposition.isomorphism" begin
    for R in [ZZ, QQ]
       for iter = 1:100
          M = rand_module(R, -10:10)
