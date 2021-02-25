@@ -114,7 +114,8 @@
    @test latex_string(:(-(a/b))) == "-\\frac{a}{b}"
    @test latex_string(:(-(a/-b))) == "-\\frac{a}{-b}"
    @test latex_string(:((-a)^b)) == "\\left(-a\\right)^{b}"
-   @test latex_string(:(ff(-a)*-b)) == "-f f(-a) b"
+   @test latex_string(:(a+sqrt(b*c))) == "a + \\sqrt{b c}"
+   @test latex_string(:(ff(-a)*-b)) == "-f f\\left(-a\\right) b"
    @test latex_string(:(a^(-b/c) - ((-a)*b)*c - ((a*b)*(-c*d)))) ==
                                          "a^{-\\frac{b}{c}} + a b c + a b c d"                             
    @test latex_string(:((-a/b)*c+d*(e/f)*g^h + (-i)*j/k^l)) ==
@@ -135,7 +136,9 @@
 
    @test latex_string(:(2*α^2-1*α+1)) == "2 \\alpha^{2} - \\alpha + 1"
 
-   @test latex_string(:([a b; c d])) == "[a b; c d]"
+   @test latex_string(:([a b; c d])) ==
+                        "\\begin{array}{cc}\na & b \\\\\nc & d\n\\end{array}\n"
+
    @test latex_string(:(if a; b; end;)) isa String
    @test latex_string(1.2) isa String
 
