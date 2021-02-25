@@ -3580,6 +3580,13 @@ end
       "[#undef  #undef  #undef]\n[#undef  #undef  #undef]"
 
    @test sprint(print, matrix(ZZ, [3 1 2; 2 0 1])) == "[3 1 2; 2 0 1]"
+
+   R, x = PolynomialRing(ZZ, "x")
+
+   @test sprint(show, matrix(R, [-x-1 -x; 2*x+1 -1])) == "[-x-1 -x; 2*x+1 -1]"
+
+   @test sprint(show, "text/plain", matrix(R, [-x-1 -x; x+1 -1])) ==
+                                                       "[-x-1  -x]\n[ x+1  -1]"
 end
 
 @testset "Generic.Mat.array_conversion" begin

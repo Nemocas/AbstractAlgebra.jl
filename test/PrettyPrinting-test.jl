@@ -85,6 +85,8 @@
 
 
    @test canonical_string(:([a b; c d])) == "[a b; c d]"
+   @test canonical_string(:([-a-b -c+d; -a -b-c+d])) == "[-a-b -c+d; -a -b-c+d]"
+
    @test canonical_string(:(if a; b; end;)) isa String
    @test canonical_string(1.2) isa String
 
