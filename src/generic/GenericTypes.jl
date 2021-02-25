@@ -190,7 +190,7 @@ julia> ap = AllParts(5);
 
 
 julia> collect(ap)
-7-element Array{AbstractAlgebra.Generic.Partition{Int64},1}:
+7-element Vector{AbstractAlgebra.Generic.Partition{Int64}}:
  1₅
  2₁1₃
  3₁1₂
@@ -285,7 +285,7 @@ julia> y.part
 4₁3₁1₁
 
 julia> y.fill
-8-element Array{Int64,1}:
+8-element Vector{Int64}:
  1
  2
  3

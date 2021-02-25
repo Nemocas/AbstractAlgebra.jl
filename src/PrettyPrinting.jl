@@ -20,7 +20,7 @@ function obj_to_latex_string(@nospecialize(obj); context = nothing)
    return sprint(show_via_expressify, MIME("text/latex"), obj, context = context)
 end
 
-function Base.show(io::IO, mi::MIME, x::RingElem)
+function Base.show(io::IO, mi::MIME"text/latex", x::RingElem)
    show_via_expressify(io, mi, x)
 end
 

@@ -6197,7 +6197,7 @@ julia> A = ZZ[1 2 3; 4 5 6]
 [4  5  6]
 
 julia> Matrix(A)
-2×3 Array{BigInt,2}:
+2×3 Matrix{BigInt}:
  1  2  3
  4  5  6
 ```
@@ -6216,7 +6216,7 @@ julia> R, x = ZZ["x"]; A = R[x^0 x^1; x^2 x^3]
 [x^2  x^3]
 
 julia> Array(A)
-2×2 Array{AbstractAlgebra.Generic.Poly{BigInt},2}:
+2×2 Matrix{AbstractAlgebra.Generic.Poly{BigInt}}:
  1    x
  x^2  x^3
 ```

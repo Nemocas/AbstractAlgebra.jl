@@ -177,10 +177,10 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3*x+1
 
 julia> T, y = PolynomialRing(S, "y")
-(Univariate Polynomial Ring in y over Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, y)
+(Univariate Polynomial Ring in y over Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3*x+1, y)
 
 julia> f = (3*x^2 + x + 2)*y + x^2 + 1
 (3*x^2 + x + 2)*y + x^2 + 1
@@ -572,8 +572,8 @@ julia> g = (x + 1)*y + (x^3 + 2x + 2)
 (x + 1)*y + x^3 + 2*x + 2
 
 julia> M = R[x + 1 2x; x - 3 2x - 1]
-[x + 1      2*x]
-[x - 3  2*x - 1]
+[x+1    2*x]
+[x-3  2*x-1]
 
 julia> k = evaluate(f, 3)
 12*x + 6
@@ -585,12 +585,12 @@ julia> n = compose(f, g)
 (x^3 + 2*x^2 + x)*y^2 + (2*x^5 + 2*x^4 + 4*x^3 + 9*x^2 + 6*x + 1)*y + x^7 + 4*x^5 + 5*x^4 + 5*x^3 + 10*x^2 + 8*x + 5
 
 julia> p = subst(f, M)
-[3*x^3 - 3*x^2 + 3*x + 4      6*x^3 + 2*x^2 + 2*x]
-[3*x^3 - 8*x^2 - 2*x - 3  6*x^3 - 8*x^2 + 2*x + 2]
+[3*x^3-3*x^2+3*x+4    6*x^3+2*x^2+2*x]
+[3*x^3-8*x^2-2*x-3  6*x^3-8*x^2+2*x+2]
 
 julia> q = f(M)
-[3*x^3 - 3*x^2 + 3*x + 4      6*x^3 + 2*x^2 + 2*x]
-[3*x^3 - 8*x^2 - 2*x - 3  6*x^3 - 8*x^2 + 2*x + 2]
+[3*x^3-3*x^2+3*x+4    6*x^3+2*x^2+2*x]
+[3*x^3-8*x^2-2*x-3  6*x^3-8*x^2+2*x+2]
 
 julia> r = f(23)
 552*x + 26
@@ -620,10 +620,10 @@ julia> T, z = PolynomialRing(QQ, "z")
 (Univariate Polynomial Ring in z over Rationals, z)
 
 julia> U = ResidueRing(T, z^3 + 3z + 1)
-Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3 + 3*z + 1
+Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3+3*z+1
 
 julia> V, w = PolynomialRing(U, "w")
-(Univariate Polynomial Ring in w over Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3 + 3*z + 1, w)
+(Univariate Polynomial Ring in w over Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3+3*z+1, w)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + 3
@@ -673,9 +673,9 @@ julia> g = 6(x + 1)*y + (x^3 + 2x + 2)
 (6*x + 6)*y + x^3 + 2*x + 2
 
 julia> S = sylvester_matrix(f, g)
-[    3*x          x + 1              3]
-[6*x + 6  x^3 + 2*x + 2              0]
-[      0        6*x + 6  x^3 + 2*x + 2]
+[  3*x        x+1          3]
+[6*x+6  x^3+2*x+2          0]
+[    0      6*x+6  x^3+2*x+2]
 
 julia> h = resultant(f, g)
 3*x^7 + 6*x^5 - 6*x^3 + 96*x^2 + 192*x + 96
@@ -711,7 +711,7 @@ julia> g = deepcopy(f)
 3*x*y^2 + (x + 1)*y + 3
 
 julia> roots = [R(1), R(2), R(3)]
-3-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
  1
  2
  3
@@ -738,14 +738,14 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> xs = [R(1), R(2), R(3), R(4)]
-4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
  1
  2
  3
  4
 
 julia> ys = [R(1), R(4), R(9), R(16)]
-4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
  1
  4
  9

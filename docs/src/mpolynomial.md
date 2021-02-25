@@ -167,7 +167,7 @@ julia> f = x^2 + 2x + 1
 x^2 + 2*x + 1
 
 julia> V = vars(f)
-1-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
+1-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
  x
 
 julia> var_index(y) == 2
@@ -180,7 +180,7 @@ julia> degree(f, 2) == 0
 true
 
 julia> d = degrees(f)
-2-element Array{Int64,1}:
+2-element Vector{Int64}:
  2
  0
 
