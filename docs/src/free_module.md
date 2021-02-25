@@ -76,7 +76,7 @@ julia> dim(V)
 2
 
 julia> basis(V)
-2-element Vector{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}}}:
+2-element Array{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}},1}:
  (1//1, 0//1)
  (0//1, 1//1)
 ```

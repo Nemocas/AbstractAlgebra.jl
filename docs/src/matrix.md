@@ -165,17 +165,17 @@ julia> M = MatrixSpace(ZZ, 2, 3); x = M(1:6)
 [4  5  6]
 
 julia> collect(x)
-2×3 Matrix{BigInt}:
+2×3 Array{BigInt,2}:
  1  2  3
  4  5  6
 
 julia> Set(x)
 Set{BigInt} with 6 elements:
-  5
   4
-  6
   2
   3
+  5
+  6
   1
 ```
 
@@ -376,7 +376,7 @@ julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
 [4  5  5]
 
 julia> A = powers(M, 4)
-5-element Vector{AbstractAlgebra.Generic.MatSpaceElem{BigInt}}:
+5-element Array{AbstractAlgebra.Generic.MatSpaceElem{BigInt},1}:
  [1 0 0; 0 1 0; 0 0 1]
  [1 2 3; 2 3 4; 4 5 5]
  [17 23 26; 24 33 38; 34 48 57]

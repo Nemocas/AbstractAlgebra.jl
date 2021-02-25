@@ -711,7 +711,7 @@ julia> g = deepcopy(f)
 3*x*y^2 + (x + 1)*y + 3
 
 julia> roots = [R(1), R(2), R(3)]
-3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+3-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
  1
  2
  3
@@ -738,14 +738,14 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> xs = [R(1), R(2), R(3), R(4)]
-4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
  1
  2
  3
  4
 
 julia> ys = [R(1), R(4), R(9), R(16)]
-4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
  1
  4
  9

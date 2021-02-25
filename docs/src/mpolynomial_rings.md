@@ -185,12 +185,12 @@ julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> V = symbols(S)
-2-element Vector{Symbol}:
+2-element Array{Symbol,1}:
  :x
  :y
 
 julia> X = gens(S)
-2-element Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}:
+2-element Array{AbstractAlgebra.Generic.MPoly{Rational{BigInt}},1}:
  x
  y
 
@@ -284,25 +284,25 @@ julia> nvars(S) == 2
 true
 
 julia> C = collect(coeffs(f))
-3-element Vector{BigInt}:
+3-element Array{BigInt,1}:
  1
  3
  1
 
 julia> M = collect(monomials(f))
-3-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
+3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
  x^3*y
  x*y^2
  1
 
 julia> T = collect(terms(f))
-3-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
+3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
  x^3*y
  3*x*y^2
  1
 
 julia> V = collect(exponent_vectors(f))
-3-element Vector{Vector{Int64}}:
+3-element Array{Array{Int64,1},1}:
  [3, 1]
  [1, 2]
  [0, 0]
@@ -632,7 +632,7 @@ julia> e1 = exponent(f, 1, 1)
 3
 
 julia> v1 = exponent_vector(f, 1)
-2-element Vector{Int64}:
+2-element Array{Int64,1}:
  3
  1
 

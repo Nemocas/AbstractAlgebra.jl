@@ -206,7 +206,7 @@ julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
 
 julia> collect(cycles(g))
-3-element Vector{Vector{Int64}}:
+3-element Array{Array{Int64,1},1}:
  [1, 3, 5]
  [2, 4]
  [6]
@@ -267,7 +267,7 @@ julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
 
 julia> permtype(g)
-3-element Vector{Int64}:
+3-element Array{Int64,1}:
  3
  2
  1
@@ -276,7 +276,7 @@ julia> e = one(g)
 ()
 
 julia> permtype(e)
-6-element Vector{Int64}:
+6-element Array{Int64,1}:
  1
  1
  1
@@ -636,7 +636,7 @@ julia> for p in Generic.elements!(SymmetricGroup(3))
 (1,3)
 
 julia> A = collect(Generic.elements!(SymmetricGroup(3))); A
-6-element Vector{Perm{Int64}}:
+6-element Array{Perm{Int64},1}:
  (1,3)
  (1,3)
  (1,3)
@@ -645,7 +645,7 @@ julia> A = collect(Generic.elements!(SymmetricGroup(3))); A
  (1,3)
 
 julia> unique(A)
-1-element Vector{Perm{Int64}}:
+1-element Array{Perm{Int64},1}:
  (1,3)
 ```
 """
@@ -715,13 +715,13 @@ julia> p = Perm([2,3,1])
 (1,2,3)
 
 julia> matrix_repr(p)
-3×3 SparseArrays.SparseMatrixCSC{Int64, Int64} with 3 stored entries:
- ⋅  1  ⋅
- ⋅  ⋅  1
- 1  ⋅  ⋅
+3×3 SparseArrays.SparseMatrixCSC{Int64,Int64} with 3 stored entries:
+  [3, 1]  =  1
+  [1, 2]  =  1
+  [2, 3]  =  1
 
 julia> Array(ans)
-3×3 Matrix{Int64}:
+3×3 Array{Int64,2}:
  0  1  0
  0  0  1
  1  0  0

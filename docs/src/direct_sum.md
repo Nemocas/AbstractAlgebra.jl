@@ -168,7 +168,7 @@ Codomain: Submodule over Integers with 2 generators and no relations
 ])
 
 julia> summands(D)
-3-element Vector{AbstractAlgebra.Generic.Submodule{BigInt}}:
+3-element Array{AbstractAlgebra.Generic.Submodule{BigInt},1}:
  Submodule over Integers with 2 generators and no relations
 
  Submodule over Integers with 2 generators and no relations

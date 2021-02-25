@@ -190,7 +190,7 @@ julia> G = SymmetricGroup(sum(λ))
 Full symmetric group over 78 elements
 
 julia> @time character(λ, one(G))
- 24.154105 seconds (58.13 M allocations: 3.909 GiB, 42.84% gc time)
+  0.000046 seconds (115 allocations: 16.391 KiB)
 9079590132732747656880081324531330222983622187548672000
 
 julia> @time character(λ, one(G))

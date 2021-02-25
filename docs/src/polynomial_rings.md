@@ -154,7 +154,7 @@ julia> vsym = var(S)
 :x
 
 julia> V = symbols(S)
-1-element Vector{Symbol}:
+1-element Array{Symbol,1}:
  :x
 
 ```
