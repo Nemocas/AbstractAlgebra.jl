@@ -638,7 +638,11 @@ function expressify(a::MatrixElem; context = nothing)
 end
 
 function Base.show(io::IO, a::MatrixElem)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+   show_via_expressify(io, a)
+end
+
+function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem)
+   show_via_expressify(io, mi, a)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem)

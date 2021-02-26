@@ -131,6 +131,9 @@ export crt, factor, factor_squarefree
 function expressify
 end
 
+function show_via_expressify
+end
+
 ###############################################################################
 # Macros for fancy printing and extending objects when desired
 # fancy printing (and extending)

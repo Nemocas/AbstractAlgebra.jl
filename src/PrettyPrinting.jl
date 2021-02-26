@@ -24,6 +24,10 @@ function Base.show(io::IO, mi::MIME"text/latex", x::RingElem)
    show_via_expressify(io, mi, x)
 end
 
+function Base.show(io::IO, mi::MIME"text/html", x::RingElem)
+   show_via_expressify(io, mi, x)
+end
+
 function show_via_expressify(io::IO, @nospecialize(obj); context = nothing)
    show_via_expressify(io::IO, MIME("text/plain"), obj, context = context)
 end
@@ -37,6 +41,12 @@ function show_obj(io::IO, mi::MIME, obj)
    S = printer(io)
    print_obj(S, mi, obj, prec_lowest, prec_lowest)
    finish(S)
+end
+
+function show_obj(io::IO, mi::MIME"text/html", obj)
+   print(io, "\$")
+   show_obj(io, MIME("text/latex"), obj)
+   print(io, "\$")
 end
 
 ################################################################################
