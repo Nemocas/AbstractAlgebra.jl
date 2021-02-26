@@ -139,7 +139,7 @@
    @test latex_string(:(2*α^2-1*α+1)) == "2 \\alpha^{2} - \\alpha + 1"
 
    @test latex_string(:([a b; c d])) ==
-                        "\\begin{array}{cc}\na & b \\\\\nc & d\n\\end{array}\n"
+         "\\left(\\begin{array}{cc}\na & b \\\\\nc & d\n\\end{array}\\right)\n"
 
    @test latex_string(:(if a; b; end;)) isa String
    @test latex_string(1.2) isa String
