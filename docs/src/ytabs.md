@@ -174,7 +174,7 @@ dim(::Generic.YoungTableau)
 
 The character associated with `Y.part` can also be used to compute the dimension, but as it is expected the Murnaghan-Nakayama is much slower even though (due to caching) consecutive calls are fast:
 
-```jldoctest
+```julia
 julia> λ = Partition(collect(12:-1:1))
 12₁11₁10₁9₁8₁7₁6₁5₁4₁3₁2₁1₁
 
