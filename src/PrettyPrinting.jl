@@ -20,11 +20,11 @@ function obj_to_latex_string(@nospecialize(obj); context = nothing)
    return sprint(show_via_expressify, MIME("text/latex"), obj, context = context)
 end
 
-function Base.show(io::IO, mi::MIME"text/latex", x::RingElem)
+function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem})
    show_via_expressify(io, mi, x)
 end
 
-function Base.show(io::IO, mi::MIME"text/html", x::RingElem)
+function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem})
    show_via_expressify(io, mi, x)
 end
 
@@ -751,7 +751,7 @@ function print_obj(S::printer, mi::MIME"text/latex", obj::Expr,
          printCall(S, mi, obj, left, right)
       end
    elseif obj.head == :vcat
-      push(S, "\\begin{array}")
+      push(S, "\\left(\\begin{array}")
       ncols = 1
       for i in 1:length(obj.args)
          if isa(obj.args[i], Expr) && (obj.args[i].head == :hcat ||
@@ -766,7 +766,7 @@ function print_obj(S::printer, mi::MIME"text/latex", obj::Expr,
          end
          print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
       end
-      push(S, "\n\\end{array}\n")
+      push(S, "\n\\end{array}\\right)\n")
    elseif obj.head == :hcat || obj.head == :row
       for i in 1:length(obj.args)
          if i > 1
