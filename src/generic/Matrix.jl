@@ -249,7 +249,7 @@ and zeroes elsewhere. The matrix space must contain square matrices.
 one(a::AbstractAlgebra.MatSpace) = check_square(a)(1)
 
 @doc Markdown.doc"""
-    one(a::AbstractAlgebra.MatSpace)
+    one(a::MatElem)
 
 Construct the identity matrix in the same matrix space as `a`, i.e.
 with ones down the diagonal and zeroes elsewhere. `a` must be square.
