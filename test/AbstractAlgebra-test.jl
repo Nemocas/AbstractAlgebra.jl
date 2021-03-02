@@ -1,3 +1,4 @@
+include("WeakValueDict-test.jl")
 include("Groups-test.jl")
 include("NCRings-test.jl")
 include("Rings-test.jl")

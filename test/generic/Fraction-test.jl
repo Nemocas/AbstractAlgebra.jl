@@ -2,6 +2,9 @@
    S, x = PolynomialRing(ZZ, "x")
    T = FractionField(S)
 
+   @test FractionField(S, cached = true) === FractionField(S, cached = true)
+   @test FractionField(S, cached = false) !== FractionField(S, cached = true)
+
    @test elem_type(T) == Generic.Frac{elem_type(S)}
    @test elem_type(Generic.FracField{elem_type(S)}) == Generic.Frac{elem_type(S)}
    @test parent_type(Generic.Frac{elem_type(S)}) == Generic.FracField{elem_type(S)}

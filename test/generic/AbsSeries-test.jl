@@ -78,6 +78,12 @@
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
+
+   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   S, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   @test R === S
+   S, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute, cached = false)
+   @test R !== S
 end
 
 @testset "Generic.AbsSeries.manipulation" begin

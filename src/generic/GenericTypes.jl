@@ -319,19 +319,13 @@ mutable struct PolyRing{T <: RingElement} <: AbstractAlgebra.PolyRing{T}
    S::Symbol
 
    function PolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
-      if cached && haskey(PolyID, (R, s))
-         return PolyID[R, s]::PolyRing{T}
-      else
-         z = new{T}(R, s)
-         if cached
-           PolyID[R, s] = z
-         end
-         return z
-      end
+      return get_cached!(PolyID, (R, s), cached) do
+         new{T}(R, s)
+      end::PolyRing{T}
    end
 end
 
-const PolyID = Dict{Tuple{Ring, Symbol}, Ring}()
+const PolyID = CacheDictType{Tuple{Ring, Symbol}, Ring}()
 
 mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyElem{T}
    coeffs::Array{T, 1}
@@ -360,19 +354,13 @@ mutable struct NCPolyRing{T <: NCRingElem} <: AbstractAlgebra.NCPolyRing{T}
    S::Symbol
 
    function NCPolyRing{T}(R::NCRing, s::Symbol, cached::Bool = true) where T <: NCRingElem
-      if cached && haskey(NCPolyID, (R, s))
-         return NCPolyID[R, s]::NCPolyRing{T}
-      else
-         z = new{T}(R, s)
-         if cached
-           NCPolyID[R, s] = z
-         end
-         return z
-      end
+      return get_cached!(NCPolyID, (R, s), cached) do
+         new{T}(R, s)
+      end::NCPolyRing{T}
    end
 end
 
-const NCPolyID = Dict{Tuple{NCRing, Symbol}, NCRing}()
+const NCPolyID = CacheDictType{Tuple{NCRing, Symbol}, NCRing}()
 
 mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyElem{T}
    coeffs::Array{T, 1}
@@ -416,19 +404,13 @@ mutable struct MPolyRing{T <: RingElement} <: AbstractAlgebra.MPolyRing{T}
 
    function MPolyRing{T}(R::Ring, s::Array{Symbol, 1}, ord::Symbol, N::Int,
                          cached::Bool = true) where T <: RingElement
-      if cached && haskey(MPolyID, (R, s, ord, N))
-         return MPolyID[R, s, ord, N]::MPolyRing{T}
-      else
-         z = new{T}(R, s, ord, length(s), N)
-         if cached
-           MPolyID[R, s, ord, N] = z
-         end
-         return z
-      end
+      return get_cached!(MPolyID, (R, s, ord, N), cached) do
+         new{T}(R, s, ord, length(s), N)
+      end::MPolyRing{T}
    end
 end
 
-const MPolyID = Dict{Tuple{Ring, Array{Symbol, 1}, Symbol, Int}, Ring}()
+const MPolyID = CacheDictType{Tuple{Ring, Array{Symbol, 1}, Symbol, Int}, Ring}()
 
 mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyElem{T}
    coeffs::Array{T, 1}
@@ -491,19 +473,13 @@ mutable struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
    num_vars::Int
 
    function SparsePolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
-      if cached && haskey(SparsePolyID, (R, s))
-         return SparsePolyID[R, s]::SparsePolyRing{T}
-      else
-         z = new{T}(R, s)
-         if cached
-           SparsePolyID[R, s] = z
-         end
-         return z
-      end
+      return get_cached!(SparsePolyID, (R, s), cached) do
+         new{T}(R, s)
+      end::SparsePolyRing{T}
    end
 end
 
-const SparsePolyID = Dict{Tuple{Ring, Symbol}, SparsePolyRing}()
+const SparsePolyID = CacheDictType{Tuple{Ring, Symbol}, SparsePolyRing}()
 
 mutable struct SparsePoly{T <: RingElement} <: AbstractAlgebra.RingElem
    coeffs::Array{T, 1}
@@ -572,19 +548,15 @@ mutable struct ResRing{T <: RingElement} <: AbstractAlgebra.ResRing{T}
       if !isone(c)
         modulus = divexact(modulus, c)
       end
-      if cached && haskey(ModulusDict, (parent(modulus), modulus))
-         return ModulusDict[parent(modulus), modulus]::ResRing{T}
-      else
-         z = new{T}(parent(modulus), modulus)
-         if cached
-            ModulusDict[parent(modulus), modulus] = z
-         end
-         return z
-      end
+      R = parent(modulus)
+
+      return get_cached!(ModulusDict, (R, modulus), cached) do
+         new{T}(R, modulus)
+      end::ResRing{T}
    end
 end
 
-const ModulusDict = Dict{Tuple{Ring, RingElement}, Ring}()
+const ModulusDict = CacheDictType{Tuple{Ring, RingElement}, Ring}()
 
 mutable struct Res{T <: RingElement} <: AbstractAlgebra.ResElem{T}
    data::T
@@ -608,19 +580,14 @@ mutable struct ResField{T <: RingElement} <: AbstractAlgebra.ResField{T}
       if !isone(c)
         modulus = divexact(modulus, c)
       end
-      if cached && haskey(ModulusFieldDict, (parent(modulus), modulus))
-         return ModulusFieldDict[parent(modulus), modulus]::ResField{T}
-      else
-         z = new{T}(parent(modulus), modulus)
-         if cached
-            ModulusFieldDict[parent(modulus), modulus] = z
-         end
-         return z
-      end
+      R = parent(modulus)
+      return get_cached!(ModulusFieldDict, (R, modulus), cached) do
+         new{T}(R, modulus)
+      end::ResField{T}
    end
 end
 
-const ModulusFieldDict = Dict{Tuple{Ring, RingElement}, Field}()
+const ModulusFieldDict = CacheDictType{Tuple{Ring, RingElement}, Field}()
 
 mutable struct ResF{T <: RingElement} <: AbstractAlgebra.ResFieldElem{T}
    data::T
@@ -641,19 +608,13 @@ mutable struct RelSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    S::Symbol
 
    function RelSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
-      if cached && haskey(RelSeriesID, (R, prec, s))
-         return RelSeriesID[R, prec, s]::RelSeriesRing{T}
-      else
-         z = new{T}(R, prec, s)
-         if cached
-            RelSeriesID[R, prec, s] = z
-         end
-         return z
-      end
+      return get_cached!(RelSeriesID, (R, prec, s), cached) do
+         new{T}(R, prec, s)
+      end::RelSeriesRing{T}
    end
 end
 
-const RelSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
+const RelSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
 mutable struct RelSeries{T <: RingElement} <: AbstractAlgebra.RelSeriesElem{T}
    coeffs::Array{T, 1}
@@ -681,19 +642,13 @@ mutable struct AbsSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    S::Symbol
 
    function AbsSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
-      if cached && haskey(AbsSeriesID, (R, prec, s))
-         return AbsSeriesID[R, prec, s]::AbsSeriesRing{T}
-      else
-         z = new{T}(R, prec, s)
-         if cached
-            AbsSeriesID[R, prec, s] = z
-         end
-         return z
-      end
+      return get_cached!(AbsSeriesID, (R, prec, s), cached) do
+         new{T}(R, prec, s)
+      end::AbsSeriesRing{T}
    end
 end
 
-const AbsSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
+const AbsSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
 mutable struct AbsSeries{T <: RingElement} <: AbstractAlgebra.AbsSeriesElem{T}
    coeffs::Array{T, 1}
@@ -717,19 +672,13 @@ mutable struct LaurentSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    S::Symbol
 
    function LaurentSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
-      if cached && haskey(LaurentSeriesID, (R, prec, s))
-         return LaurentSeriesID[R, prec, s]::LaurentSeriesRing{T}
-      else
-         z = new{T}(R, prec, s)
-         if cached
-            LaurentSeriesID[R, prec, s] = z
-         end
-         return z
-      end
+      return get_cached!(LaurentSeriesID, (R, prec, s), cached) do
+         new{T}(R, prec, s)
+      end::LaurentSeriesRing{T}
    end
 end
 
-const LaurentSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
+const LaurentSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
 mutable struct LaurentSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingElem
    coeffs::Array{T, 1}
@@ -756,15 +705,9 @@ mutable struct LaurentSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    S::Symbol
 
    function LaurentSeriesField{T}(R::Field, prec::Int, s::Symbol, cached::Bool = true) where T <: FieldElement
-      if cached && haskey(LaurentSeriesID, (R, prec, s))
-         return LaurentSeriesID[R, prec, s]::LaurentSeriesField{T}
-      else
-         z = new{T}(R, prec, s)
-         if cached
-            LaurentSeriesID[R, prec, s] = z
-         end
-         return z
-      end
+      return get_cached!(LaurentSeriesID, (R, prec, s), cached) do
+         new{T}(R, prec, s)
+      end::LaurentSeriesField{T}
    end
 end
 
@@ -793,19 +736,13 @@ mutable struct PuiseuxSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    laurent_ring::Ring
 
    function PuiseuxSeriesRing{T}(R::LaurentSeriesRing{T}, cached::Bool = true) where T <: RingElement
-      if cached && haskey(PuiseuxSeriesID, R)
-         return PuiseuxSeriesID[R]::PuiseuxSeriesRing{T}
-      else
-         z = new{T}(R)
-         if cached
-            PuiseuxSeriesID[R] = z
-         end
-         return z
-      end
+      return get_cached!(PuiseuxSeriesID, R, cached) do
+         new{T}(R)
+      end::PuiseuxSeriesRing{T}
    end
 end
 
-const PuiseuxSeriesID = Dict{Ring, Ring}()
+const PuiseuxSeriesID = CacheDictType{Ring, Ring}()
 
 mutable struct PuiseuxSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingElem
    data::LaurentSeriesRingElem{T}
@@ -827,17 +764,13 @@ mutable struct PuiseuxSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    laurent_ring::Field
 
    function PuiseuxSeriesField{T}(R::LaurentSeriesField{T}, cached::Bool = true) where T <: FieldElement
-      if cached && haskey(PuiseuxSeriesID, R)
-         return PuiseuxSeriesID[R]::PuiseuxSeriesField{T}
-      else
-         z = new{T}(R)
-         if cached
-            PuiseuxSeriesID[R] = z
-         end
-         return z
-      end
+      return get_cached!(PuiseuxSeriesFieldID, R, cached) do
+         new{T}(R)
+      end::PuiseuxSeriesField{T}
    end
 end
+
+const PuiseuxSeriesFieldID = CacheDictType{Ring, Field}()
 
 mutable struct PuiseuxSeriesFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
    data::LaurentSeriesFieldElem{T}
@@ -861,19 +794,13 @@ mutable struct FracField{T <: RingElem} <: AbstractAlgebra.FracField{T}
    base_ring::Ring
 
    function FracField{T}(R::Ring, cached::Bool = true) where T <: RingElem
-      if cached && haskey(FracDict, R)
-         return FracDict[R]::FracField{T}
-      else
-         z = new{T}(R)
-         if cached
-            FracDict[R] = z
-         end
-         return z
-      end
+      return get_cached!(FracDict, R, cached) do
+         new{T}(R)
+      end::FracField{T}
    end
 end
 
-const FracDict = Dict{Ring, Ring}()
+const FracDict = CacheDictType{Ring, Ring}()
 
 mutable struct Frac{T <: RingElem} <: AbstractAlgebra.FracElem{T}
    num::T
@@ -899,19 +826,13 @@ mutable struct MatSpace{T <: RingElement} <: AbstractAlgebra.MatSpace{T}
    base_ring::Ring
 
    function MatSpace{T}(R::Ring, r::Int, c::Int, cached::Bool = true) where T <: RingElement
-      if cached && haskey(MatDict, (R, r, c))
-         return MatDict[R, r, c]::MatSpace{T}
-      else
-         z = new{T}(r, c, R)
-         if cached
-            MatDict[R, r, c] = z
-         end
-         return z
-      end
+      return get_cached!(MatDict, (R, r, c), cached) do
+         new{T}(r, c, R)
+      end::MatSpace{T}
    end
 end
 
-const MatDict = Dict{Tuple{Ring, Int, Int}, MatSpace}()
+const MatDict = CacheDictType{Tuple{Ring, Int, Int}, MatSpace}()
 
 mutable struct MatSpaceElem{T <: RingElement} <: Mat{T}
    entries::Array{T, 2}
@@ -952,19 +873,13 @@ mutable struct MatAlgebra{T <: RingElement} <: AbstractAlgebra.MatAlgebra{T}
    base_ring::Ring
 
    function MatAlgebra{T}(R::Ring, n::Int, cached::Bool = true) where T <: RingElement
-      if cached && haskey(MatAlgDict, (R, n))
-         return MatAlgDict[R, n]::MatAlgebra{T}
-      else
-         z = new{T}(n, R)
-         if cached
-            MatAlgDict[R, n] = z
-         end
-         return z
-      end
+      return get_cached!(MatAlgDict, (R, n), cached) do
+         new{T}(n, R)
+      end::MatAlgebra{T}
    end
 end
 
-const MatAlgDict = Dict{Tuple{Ring, Int}, NCRing}()
+const MatAlgDict = CacheDictType{Tuple{Ring, Int}, NCRing}()
 
 mutable struct MatAlgElem{T <: RingElement} <: AbstractAlgebra.MatAlgElem{T}
    entries::Array{T, 2}
@@ -1125,19 +1040,13 @@ mutable struct FreeModule{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebr
    AbstractAlgebra.@declare_other
 
    function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: Union{RingElement, NCRingElem}
-      if cached && haskey(FreeModuleDict, (R, rank))
-         return FreeModuleDict[R, rank]::FreeModule{T}
-      else
-         z = new{T}(rank, R)
-         if cached
-            FreeModuleDict[R, rank] = z
-         end
-         return z
-      end
+      return get_cached!(FreeModuleDict, (R, rank), cached) do
+         new{T}(rank, R)
+      end::FreeModule{T}
    end
 end
 
-const FreeModuleDict = Dict{Tuple{NCRing, Int}, FreeModule}()
+const FreeModuleDict = CacheDictType{Tuple{NCRing, Int}, FreeModule}()
 
 mutable struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
     v::AbstractAlgebra.MatElem{T}

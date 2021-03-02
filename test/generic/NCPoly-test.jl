@@ -3,6 +3,9 @@
    S1 = PolynomialRing(R, "y")
    S2 = R["y"]
 
+   @test PolynomialRing(R, "y", cached = true)[1] === PolynomialRing(R, "y", cached = true)[1]
+   @test PolynomialRing(R, "y", cached = true)[1] !== PolynomialRing(R, "y", cached = false)[1]
+
    for (S, y) in (S1, S2)
       @test elem_type(S) == Generic.NCPoly{elem_type(R)}
       @test elem_type(Generic.NCPolyRing{elem_type(R)}) == Generic.NCPoly{elem_type(R)}

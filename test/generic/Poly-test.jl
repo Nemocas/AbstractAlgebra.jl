@@ -21,6 +21,9 @@
    S1 = R["y"]
    S2 = ZZ["x"]["y"]
 
+   @test PolynomialRing(R, "y", cached = true)[1] === PolynomialRing(R, "y", cached = true)[1]
+   @test PolynomialRing(R, "y", cached = true)[1] !== PolynomialRing(R, "y", cached = false)[1]
+
    for (S, y) in (S1, S2)
       @test elem_type(S) == Generic.Poly{elem_type(R)}
       @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}

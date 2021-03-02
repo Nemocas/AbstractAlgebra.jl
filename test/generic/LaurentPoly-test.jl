@@ -10,6 +10,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       for R in (ZZ, GF(5))
          P, _ = PolynomialRing(R, "x0")
          L, y = LaurentPolynomialRing(R, "y")
+
          x = y.poly
 
          @test L isa LaurentPolyWrapRing{elem_type(R)}

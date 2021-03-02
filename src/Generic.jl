@@ -25,6 +25,9 @@ import Base: floor, ceil, hypot, log, log1p, expm1, sin, cos, sinpi, cospi,
              tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
              acosh, sinpi, cospi
 
+# The type and helper function for the dictionaries for hashing
+import ..AbstractAlgebra: CacheDictType, get_cached!
+
 import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
                           RingElem, RingElement, Field, FieldElement,
                           isexact_type, isdomain_type, Map, promote_rule

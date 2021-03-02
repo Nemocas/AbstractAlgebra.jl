@@ -306,6 +306,34 @@ function force_op(op::Function, a...)
 end
 
 ###############################################################################
+#
+#  Weak value dictionaries
+#
+###############################################################################
+
+include("WeakValueDict.jl")
+
+###############################################################################
+#
+#  Type for the Hash dictionary
+#
+###############################################################################
+
+@static if VERSION >= v"1.6"
+  const CacheDictType = WeakValueDict
+else
+  const CacheDictType = Dict
+end
+
+function get_cached!(default::Base.Callable, dict::CacheDictType, key, use_cache::Bool)
+   return use_cache ? Base.get!(default, dict, key) : default()
+end
+
+###############################################################################
+#
+#  Types
+#
+################################################################################
 
 include("AbstractTypes.jl")
 
@@ -666,7 +694,7 @@ function SparsePolynomialRing(R::Ring, s::Char; cached::Bool = true)
 end
 
 @doc (@doc Generic.LaurentPolynomialRing)
-LaurentPolynomialRing(R::Ring, s::AbstractString) = Generic.LaurentPolynomialRing(R, s)
+LaurentPolynomialRing(R::Ring, s::AbstractString; cached::Bool = true) = Generic.LaurentPolynomialRing(R, s)
 
 function MatrixSpace(R::Ring, r::Int, c::Int; cached::Bool = true)
    Generic.MatrixSpace(R, r, c; cached = cached)
