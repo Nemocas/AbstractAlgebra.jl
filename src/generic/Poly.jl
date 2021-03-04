@@ -463,6 +463,19 @@ function -(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where
    return z
 end
 
+function mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where T
+   alen = length(a)
+   blen = length(b)
+   (alen < 1 || blen < 1) && return zero(parent(a))
+   zlen = alen + blen - 1
+   zcoeffs = Array{T}(undef, zlen)
+   AbstractAlgebra.DensePoly.mullow_fast!(zcoeffs, zlen,
+                          a.coeffs, alen, b.coeffs, blen, base_ring(a), cutoff)
+   z = parent(a)(zcoeffs)
+   z = set_length!(z, normalise(z, zlen))
+   return z
+end
+
 function mul_karatsuba(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    # we assume len(a) != 0 != lenb and parent(a) == parent(b)
    lena = length(a)

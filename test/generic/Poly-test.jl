@@ -2564,6 +2564,10 @@ end
 
    @test mul_karatsuba(f^10, f^10) == mul_classical(f^10, f^10)
    @test mul_karatsuba(f^10, f^30) == mul_classical(f^10, f^30)
+
+   @test mul_karatsuba(f^10, f^30, 5) == mul_classical(f^10, f^30)
+   @test mul_karatsuba(f^10, f^30, 10) == mul_classical(f^10, f^30)
+
 end
 
 @testset "Generic.Poly.mul_ks" begin
