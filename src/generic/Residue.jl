@@ -341,7 +341,7 @@ Return $a - b$.
 Return $a^b$.
 """
 function ^(a::AbstractAlgebra.ResElem, b::Int)
-   parent(a)(powmod(data(a), b, modulus(a)))
+   parent(a)(powermod(data(a), b, modulus(a)))
 end
 
 ###############################################################################

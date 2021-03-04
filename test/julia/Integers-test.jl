@@ -66,20 +66,23 @@ end
       s = rand(S, 0:22)
 
       for n = 0:20
-         @test r == 0 || a == powmod(r, n, modR)
-         @test s == 0 || b == powmod(s, n, modS)
-         @test powmod(r, n, modR) == powmod(r, BigInt(n), modR)
-         @test powmod(s, n, modS) == powmod(s, BigInt(n), modS)
+         @test r == 0 || a == powermod(r, n, modR)
+         @test s == 0 || b == powermod(s, n, modS)
+         @test powermod(r, n, modR) == powermod(r, BigInt(n), modR)
+         @test powermod(s, n, modS) == powermod(s, BigInt(n), modS)
 
          a = mod(a*r, modR)
          b = mod(b*s, modS)
       end
    end
 
-   @test powmod(123, 1, 5) == 3
+   @test powermod(123, 1, 5) == 3
 
-   @test_throws DomainError powmod(123, -1, 5)
-   @test_throws DomainError powmod(123, -rand(2:100), 5)
+   @test powermod(123, -1, 5) == 2
+   
+   n = -rand(2:100)
+   
+   @test powermod(123, n, 5) == invmod(powermod(123, -n, 5), 5)
 end
 
 @testset "Julia.Integers.exact_division" begin

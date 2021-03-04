@@ -8,7 +8,7 @@ export PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
        reverse, shift_left, shift_right, divexact, pseudorem, pseudodivrem,
        gcd, degree, content, primpart, evaluate, compose, derivative, integral,
        resultant, discriminant, gcdx, zero, one, gen, length, iszero,
-       normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod,
+       normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod,
        invmod, lcm, divrem, mod, gcdinv, resx, canonical_unit, var,
        chebyshev_t, chebyshev_u, set_length!, mul_classical, mul_ks, subst,
        mul_karatsuba, trail, pow_multinomial, monomial_to_newton!,
@@ -1055,11 +1055,11 @@ function mulmod(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, 
 end
 
 @doc Markdown.doc"""
-    powmod(a::AbstractAlgebra.PolyElem{T}, b::Int, d::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+    powermod(a::AbstractAlgebra.PolyElem{T}, b::Int, d::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 
 Return $a^b \pmod{d}$. There are no restrictions on $b$.
 """
-function powmod(a::AbstractAlgebra.PolyElem{T}, b::Int, d::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+function powermod(a::AbstractAlgebra.PolyElem{T}, b::Int, d::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
    check_parent(a, d)
    if length(a) == 0
       z = zero(parent(a))
