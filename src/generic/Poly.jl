@@ -374,11 +374,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    -(a::Generic.PolynomialElem)
-
-Return $-a$.
-"""
 function -(a::PolynomialElem)
    len = length(a)
    z = parent(a)()
@@ -396,11 +391,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    +(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-
-Return $a + b$.
-"""
 function +(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
@@ -425,11 +415,6 @@ function +(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where
    return z
 end
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-
-Return $a - b$.
-"""
 function -(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
@@ -605,11 +590,6 @@ function mul_classical(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyEl
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-
-Return $a\times b$.
-"""
 function *(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return mul_classical(a, b)
@@ -621,11 +601,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(a::T, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 function *(a::T, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElem}
    len = length(b)
    z = parent(b)()
@@ -637,11 +612,6 @@ function *(a::T, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElem}
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::Generic.PolynomialElem)
-
-Return $a\times b$.
-"""
 function *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
    len = length(b)
    z = parent(b)()
@@ -653,18 +623,8 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 *(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem} = b*a
 
-@doc Markdown.doc"""
-    *(a::Generic.PolynomialElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a\times b$.
-"""
 *(a::PolynomialElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################

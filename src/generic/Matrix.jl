@@ -684,11 +684,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    -(x::Generic.MatrixElem)
-
-Return $-x$.
-"""
 function -(x::MatrixElem)
    z = similar(x)
    for i in 1:nrows(x)
@@ -705,11 +700,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    +(x::Generic.MatrixElem{T}, y::Generic.MatrixElem{T}) where {T <: RingElement}
-
-Return $x + y$.
-"""
 function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    check_parent(x, y)
    r = similar(x)
@@ -721,11 +711,6 @@ function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    return r
 end
 
-@doc Markdown.doc"""
-    -(x::Generic.MatrixElem{T}, y::Generic.MatrixElem{T}) where {T <: RingElement}
-
-Return $x - y$.
-"""
 function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    check_parent(x, y)
    r = similar(x)
@@ -737,11 +722,6 @@ function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    return r
 end
 
-@doc Markdown.doc"""
-    *(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
-
-Return $x\times y$.
-"""
 function *(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
    A = similar(x, nrows(x), ncols(y))
@@ -764,11 +744,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(x::Union{Integer, Rational, AbstractFloat}, y::Generic.MatrixElem)
-
-Return $x\times y$.
-"""
 function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
    z = similar(y)
    for i = 1:nrows(y)
@@ -779,11 +754,6 @@ function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
    return z
 end
 
-@doc Markdown.doc"""
-    *(x::T, y::Generic.MatrixElem{T}) where {T <: RingElem}
-
-Return $x\times y$.
-"""
 function *(x::T, y::MatrixElem{T}) where {T <: RingElem}
    z = similar(y)
    for i = 1:nrows(y)
@@ -794,18 +764,8 @@ function *(x::T, y::MatrixElem{T}) where {T <: RingElem}
    return z
 end
 
-@doc Markdown.doc"""
-    *(x::Generic.MatrixElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return $x\times y$.
-"""
 *(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}) = y*x
 
-@doc Markdown.doc"""
-    *(x::Generic.MatrixElem{T}, y::T) where {T <: RingElem}
-
-Return $x\times y$.
-"""
 *(x::MatrixElem{T}, y::T) where {T <: RingElem} = y*x
 
 @doc Markdown.doc"""

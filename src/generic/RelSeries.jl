@@ -309,11 +309,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.RelSeriesElem)
-
-Return $-a$.
-"""
 function -(a::AbstractAlgebra.RelSeriesElem)
    len = pol_length(a)
    z = parent(a)()
@@ -332,11 +327,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    +(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
-
-Return $a + b$.
-"""
 function +(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = pol_length(a)
@@ -391,11 +381,6 @@ function +(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
    return z
 end
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
-
-Return $a - b$.
-"""
 function -(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = pol_length(a)
@@ -450,11 +435,6 @@ function -(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
-
-Return $a\times b$.
-"""
 function *(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = pol_length(a)
@@ -499,11 +479,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(a::T, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 function *(a::T, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElem}
    len = pol_length(b)
    z = parent(b)()
@@ -518,11 +493,6 @@ function *(a::T, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElem}
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.RelSeriesElem)
-
-Return $a\times b$.
-"""
 function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.RelSeriesElem)
    len = pol_length(b)
    z = parent(b)()
@@ -537,18 +507,8 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.RelSer
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.RelSeriesElem{T}, b::T) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 *(a::AbstractAlgebra.RelSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.RelSeriesElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a\times b$.
-"""
 *(a::AbstractAlgebra.RelSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################
