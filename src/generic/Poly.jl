@@ -11,7 +11,7 @@ export PolynomialRing, hash, coeff, isgen, leading_coefficient, var, truncate,
        length, iszero, normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!,
        mulmod, invmod, lcm, divrem, mod, gcdinv, resx, canonical_unit, var,
        chebyshev_t, chebyshev_u, set_length!, mul_classical, mul_ks, subst,
-       mul_karatsuba, trailing_coefficient, pow_multinomial,
+       mul_karatsuba, mullow_karatsuba, trailing_coefficient, pow_multinomial,
        monomial_to_newton!, newton_to_monomial!, isterm, isterm_recursive,
        ismonomial, ismonomial_recursive, base_ring, parent_type, elem_type,
        check_parent, promote_rule, remove, zero!, add!, interpolate,
@@ -463,7 +463,13 @@ function -(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where
    return z
 end
 
-function mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where T
+@doc Markdown.doc"""
+    mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where {T <: RingElement}
+
+Return $a \times b$ using the Karatsuba algorithm recursively for problems of
+size roughly greater than `cutoff`.
+"""
+function mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where {T <: RingElement}
    alen = length(a)
    blen = length(b)
    (alen < 1 || blen < 1) && return zero(parent(a))
@@ -476,6 +482,11 @@ function mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where T
    return z
 end
 
+@doc Markdown.doc"""
+    mul_karatsuba(a::Poly{T}, b::Poly{T}) where {T <: RingElement}
+
+Return $a \times b$ using one non-recursive application the Karatsuba algorithm.
+"""
 function mul_karatsuba(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    # we assume len(a) != 0 != lenb and parent(a) == parent(b)
    lena = length(a)
@@ -899,6 +910,25 @@ function truncate(a::PolynomialElem, n::Int)
       z = setcoeff!(z, i - 1, coeff(a, i - 1))
    end
    z = set_length!(z, normalise(z, lenz))
+   return z
+end
+
+@doc Markdown.doc"""
+    mullow_karatsuba(a::Poly{T}, b::Poly{T}, n::Int, cutoff::Int) where {T <: RingElement}
+
+Return $a \times b$ truncated to $n$ terms using the Karatsuba algorithm
+recursively for problems of size roughly greater than `cutoff`.
+"""
+function mullow_karatsuba(a::Poly{T}, b::Poly{T}, n::Int, cutoff::Int) where {T <: RingElement}
+   alen = length(a)
+   blen = length(b)
+   (n < 1 || alen < 1 || blen < 1) && return zero(parent(a))
+   zlen = min(alen + blen - 1, n)
+   zcoeffs = Array{T}(undef, zlen)
+   AbstractAlgebra.DensePoly.mullow_fast!(zcoeffs, zlen,
+                          a.coeffs, alen, b.coeffs, blen, base_ring(a), cutoff)
+   z = parent(a)(zcoeffs)
+   z = set_length!(z, normalise(z, zlen))
    return z
 end
 

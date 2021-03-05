@@ -611,6 +611,7 @@ end
       n = rand(0:20)
 
       @test truncate(f*g, n) == mullow(f, g, n)
+      @test truncate(f*g, n) == mullow_karatsuba(f, g, n, rand(1:5))
    end
 
    for iter = 1:100
@@ -675,6 +676,7 @@ end
       n = rand(0:20)
 
       @test truncate(f*g, n) == mullow(f, g, n)
+      @test truncate(f*g, n) == mullow_karatsuba(f, g, n, rand(1:5))
    end
 
    #  Inexact field
@@ -698,6 +700,7 @@ end
       r = mullow(f, g, n)
 
       @test truncate(f*g, n) == r
+      @test truncate(f*g, n) == mullow_karatsuba(f, g, n, rand(1:10))
       @test r == 0 || !iszero(leading_coefficient(r))
    end
 end
