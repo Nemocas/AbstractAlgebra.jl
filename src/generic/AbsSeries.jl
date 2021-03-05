@@ -185,11 +185,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.AbsSeriesElem)
-
-Return $-a$.
-"""
 function -(a::AbstractAlgebra.AbsSeriesElem)
    len = length(a)
    z = parent(a)()
@@ -207,11 +202,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
-
-Return $a + b$.
-"""
 function +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
@@ -240,11 +230,6 @@ function +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
    return z
 end
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
-
-Return $a - b$.
-"""
 function -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
@@ -273,11 +258,6 @@ function -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
-
-Return $a\times b$.
-"""
 function *(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
 
@@ -326,11 +306,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(a::T, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 function *(a::T, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem}
    len = length(b)
    z = parent(b)()
@@ -343,11 +318,6 @@ function *(a::T, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem}
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.AbsSeriesElem)
-
-Return $a\times b$.
-"""
 function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.AbsSeriesElem)
    len = length(b)
    z = parent(b)()
@@ -360,18 +330,8 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.AbsSer
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.AbsSeriesElem{T}, b::T) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 *(a::AbstractAlgebra.AbsSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a\times b$.
-"""
 *(a::AbstractAlgebra.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################

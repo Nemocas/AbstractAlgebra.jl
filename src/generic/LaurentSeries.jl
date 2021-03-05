@@ -496,11 +496,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    -(a::Generic.LaurentSeriesElem)
-
-Return $-a$.
-"""
 function -(a::LaurentSeriesElem)
    len = pol_length(a)
    z = parent(a)()
@@ -520,11 +515,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    +(a::Generic.LaurentSeriesElem{T}, b::Generic.LaurentSeriesElem{T}) where {T <: RingElement}
-
-Return $a + b$.
-"""
 function +(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = pol_length(a)
@@ -581,11 +571,6 @@ function +(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    return z
 end
 
-@doc Markdown.doc"""
-    -(a::Generic.LaurentSeriesElem{T}, b::Generic.LaurentSeriesElem{T}) where {T <: RingElement}
-
-Return $a - b$.
-"""
 function -(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = pol_length(a)
@@ -642,11 +627,6 @@ function -(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::Generic.LaurentSeriesElem{T}, b::Generic.LaurentSeriesElem{T}) where {T <: RingElement}
-
-Return $a\times b$.
-"""
 function *(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = pol_length(a)
@@ -712,11 +692,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(a::T, b::Generic.LaurentSeriesElem{T}) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 function *(a::T, b::LaurentSeriesElem{T}) where {T <: RingElem}
    len = pol_length(b)
    z = parent(b)()
@@ -733,11 +708,6 @@ function *(a::T, b::LaurentSeriesElem{T}) where {T <: RingElem}
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::Generic.LaurentSeriesElem)
-
-Return $a\times b$.
-"""
 function *(a::Union{Integer, Rational, AbstractFloat}, b::LaurentSeriesElem)
    len = pol_length(b)
    z = parent(b)()
@@ -754,18 +724,8 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::LaurentSeriesElem)
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::Generic.LaurentSeriesElem{T}, b::T) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 *(a::LaurentSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
-@doc Markdown.doc"""
-    *(a::Generic.LaurentSeriesElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a\times b$.
-"""
 *(a::LaurentSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################

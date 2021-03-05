@@ -209,11 +209,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.FracElem)
-
-Return $-a$.
-"""
 function -(a::AbstractAlgebra.FracElem)
    return parent(a)(-numerator(a, false), deepcopy(denominator(a, false)))
 end
@@ -224,11 +219,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-
-Return $a + b$.
-"""
 function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
    d1 = denominator(a, false)
@@ -276,11 +266,6 @@ function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
    return parent(a)(rnum, rden)
 end
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-
-Return $a - b$.
-"""
 function -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
    d1 = denominator(a, false)
@@ -328,11 +313,6 @@ function -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
    return parent(a)(rnum, rden)
 end
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 function *(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
    n1 = numerator(a, false)
@@ -383,11 +363,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a\times b$.
-"""
 function *(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    c = base_ring(a)(b)
    g = gcd(denominator(a, false), c)
@@ -396,11 +371,6 @@ function *(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloa
    return parent(a)(n, d)
 end
 
-@doc Markdown.doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
-
-Return $a\times b$.
-"""
 function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    c = base_ring(b)(a)
    g = gcd(denominator(b, false), c)
@@ -409,11 +379,6 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracEl
    return parent(b)(n, d)
 end
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 function *(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    g = gcd(denominator(a, false), b)
    n = numerator(a, false)*divexact(b, g)
@@ -421,11 +386,6 @@ function *(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    return parent(a)(n, d)
 end
 
-@doc Markdown.doc"""
-    *(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 function *(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    g = gcd(denominator(b, false), a)
    n = numerator(b, false)*divexact(a, g)
@@ -433,80 +393,40 @@ function *(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    return parent(b)(n, d)
 end
 
-@doc Markdown.doc"""
-    +(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a + b$.
-"""
 function +(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    n = numerator(a, false) + denominator(a, false)*b
    d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a - b$.
-"""
 function -(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    n = numerator(a, false) - denominator(a, false)*b
    d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
-@doc Markdown.doc"""
-    +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
-
-Return $a + b$.
-"""
 +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem) = b + a
 
-@doc Markdown.doc"""
-    -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
-
-Return $a - b$.
-"""
 function -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    n = a*denominator(b, false) - numerator(b, false)
    d = denominator(b, false)
    return parent(b)(n, deepcopy(d))
 end
 
-@doc Markdown.doc"""
-    +(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-
-Return $a + b$.
-"""
 function +(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) + denominator(a, false)*b
    d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-
-Return $a - b$.
-"""
 function -(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) - denominator(a, false)*b
    d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
-@doc Markdown.doc"""
-    +(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-
-Return $a + b$.
-"""
 +(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem} = b + a
 
-@doc Markdown.doc"""
-    -(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-
-Return $a - b$.
-"""
 function -(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    n = a*denominator(b, false) - numerator(b, false)
    d = denominator(b, false)
@@ -719,11 +639,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    ^(a::AbstractAlgebra.FracElem, b::Int)
-
-Return $a^b$.
-"""
 function ^(a::AbstractAlgebra.FracElem{T}, b::Int) where {T <: RingElem}
    if b < 0
       a = inv(a)

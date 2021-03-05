@@ -194,11 +194,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.ResElem)
-
-Return $-a$.
-"""
 function -(a::AbstractAlgebra.ResElem)
    parent(a)(-data(a))
 end
@@ -209,31 +204,16 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    +(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-
-Return $a + b$.
-"""
 function +(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) + data(b))
 end
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-
-Return $a - b$.
-"""
 function -(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) - data(b))
 end
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-
-Return $a\times b$.
-"""
 function *(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) * data(b))
@@ -245,88 +225,28 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a\times b$.
-"""
 *(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
 
-@doc Markdown.doc"""
-    *(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 *(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
-@doc Markdown.doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
-
-Return $a\times b$.
-"""
 *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem) = parent(b)(a * data(b))
 
-@doc Markdown.doc"""
-    *(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem}
-
-Return $a\times b$.
-"""
 *(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
-@doc Markdown.doc"""
-    +(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a + b$.
-"""
 +(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
 
-@doc Markdown.doc"""
-    +(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem}
-
-Return $a + b$.
-"""
 +(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
-@doc Markdown.doc"""
-    +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
-
-Return $a + b$.
-"""
 +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem) = parent(b)(a + data(b))
 
-@doc Markdown.doc"""
-    +(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem}
-
-Return $a + b$.
-"""
 +(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return $a - b$.
-"""
 -(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
 
-@doc Markdown.doc"""
-    -(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem}
-
-Return $a - b$.
-"""
 -(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
-@doc Markdown.doc"""
-    -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
-
-Return $a - b$.
-"""
 -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem) = parent(b)(a - data(b))
 
-@doc Markdown.doc"""
-    -(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem}
-
-Return $a - b$.
-"""
 -(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
 
 ###############################################################################
@@ -335,11 +255,6 @@ Return $a - b$.
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    ^(a::AbstractAlgebra.ResElem, b::Int)
-
-Return $a^b$.
-"""
 function ^(a::AbstractAlgebra.ResElem, b::Int)
    parent(a)(powermod(data(a), b, modulus(a)))
 end
