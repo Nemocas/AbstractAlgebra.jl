@@ -8,7 +8,7 @@ import Base: isempty, setindex!, getkey, length, iterate, empty, delete!, pop!, 
 
 `WeakValueDict()` constructs a hash table where the values are weak
 references to objects which may be garbage collected even when
-used as keys in a hash table.
+used as values in a hash table.
 """
 mutable struct WeakValueDict{K,V} <: AbstractDict{K,V}
     ht::Dict{K,WeakRef}
@@ -18,7 +18,7 @@ mutable struct WeakValueDict{K,V} <: AbstractDict{K,V}
 
     # Constructors mirror Dict's
     function WeakValueDict{K,V}() where V where K
-        t = new(Dict{K,Any}(), ReentrantLock(), identity, 0)
+        t = new(Dict{K,Any}(), ReentrantLock(), identity, false)
         t.finalizer = v -> t.dirty = true
         return t
     end
@@ -128,9 +128,8 @@ end
 
 function Base.getkey(wkh::WeakValueDict{K}, kk, default) where K
     k = lock(wkh) do
-        k = getkey(wkh.ht, kk, nothing)
-        k === nothing && return nothing
-        return k
+        _cleanup_locked(wkh)
+        getkey(wkh.ht, kk, nothing)
     end
     return k === nothing ? default : k::K
 end
