@@ -33,27 +33,6 @@ getindex(p::Partition, i::Integer) = p.part[i]
 
 Base.sum(p::Partition) = p.n
 
-@doc Markdown.doc"""
-    setindex!(p::Partition, v::Integer, i::Integer)
-
-Set the `i`-th part of partition `p` to `v`.
-`setindex!` will throw an error if the operation violates the non-increasing assumption.
-"""
-function setindex!(p::Partition, v::Integer, i::Integer)
-   prev = sum(p)
-   nex = 1
-   if i != 1
-      prev = p[i-1]
-   end
-   if i != length(p)
-      nex = p[i+1]
-   end
-   nex <= v <= prev || throw(ArgumentError("Partition must be positive and non-increasing"))
-   p.n += v - p.part[i]
-   p.part[i] = v
-   return p
-end
-
 ==(p::Partition, m::Partition) = sum(p) == sum(m) && p.part == m.part
 hash(p::Partition, h::UInt) = hash(p.part, hash(Partition, h))
 

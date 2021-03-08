@@ -157,18 +157,22 @@ julia> p.n == sum(p.part)
 true
 ```
 """
-mutable struct Partition{T} <: AbstractVector{T}
+struct Partition{T} <: AbstractVector{T}
    n::Int
    part::Vector{T}
 
-   function Partition(part::AbstractVector{T}, check::Bool=true) where T<:Integer
+   Partition(part::AbstractVector{<:Integer}, check::Bool=true) =
+      Partition(sum(part), part, check)
+
+   function Partition(n::Integer, part::AbstractVector{T}, check::Bool=true) where T
       if check
-         all(diff(part) .<= 0) || sort!(part, rev=true)
+         all(i-> part[i] >= part[i-1], 2:length(part)) || sort!(part, rev=true)
          if length(part) > 0
-            part[end] >= 1 || throw(ArgumentError("Found non-positive entry in partition!"))
+            part[end] >= 1 || throw(ArgumentError("Found non-positive entry in partition: $(part[end])"))
          end
+         @assert n == sum(part)
       end
-      return new{T}(sum(part), part)
+      return new{T}(n, part)
    end
 end
 
@@ -201,10 +205,13 @@ julia> collect(ap)
 ```
 """
 struct AllParts{T<:Integer}
-    n::Int
-    part::Vector{T}
-    AllParts{T}(n::Integer) where T = new{T}(n, zeros(Int,n))
-    AllParts(n::T) where T<:Integer = AllParts{T}(n)
+   n::T
+   tmp::Vector{T}
+   part::Vector{T}
+
+   AllParts{T}(n::Integer) where T =
+      new{T}(n, ones(T, n), ones(T, n))
+   AllParts(n::T; copy=true) where T<:Integer = AllParts{T}(n)
 end
 
 ###############################################################################

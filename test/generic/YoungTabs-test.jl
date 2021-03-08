@@ -14,21 +14,6 @@
    @test p[2] == 3
    @test p[3] == 1
    @test_throws BoundsError p[4]
-
-   @test_throws ArgumentError p[1] = 2
-   @test_throws ArgumentError p[2] = 5
-   @test_throws ArgumentError p[2] = 0
-
-   r = deepcopy(p)
-
-   p[3] = 2
-   @test p[3] == 2
-
-   @test sum(p) == 9
-   @test sum(r) == 8
-
-   @test p == Partition([4,3,2])
-   @test p != r
 end
 
 @testset "youngtabs.partition_iter" begin
@@ -55,7 +40,7 @@ end
    @test length(Y) == 12
    @test size(Y) == (3,4)
 
-   Y.part[2] = 2
+   Y = YoungTableau([4,2,1])
    @test Y != Z
 
    @test YoungTableau([1,3,4,1]) == YoungTableau([4,3,1,1])
