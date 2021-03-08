@@ -26,6 +26,11 @@ end
    @test Generic.partitions(2) == [Partition([1,1]), Partition([2])]
    @test Generic.partitions(1) == [Partition([1])]
    @test Generic.partitions(0) == [Partition(Int[])]
+
+   # we actually iterate over all of them:
+   @test sum(first, Generic.partitions!(10)) == 192
+   # but they share memory:
+   @test length(unique(collect(Generic.partitions!(10)))) == 1
 end
 
 @testset "youngtabs.youngtableau_type" begin
