@@ -156,7 +156,9 @@ end
    @test isone(a) && isone(b)
    @test !isone(c)
 
-   @test @allocated(isone(a)) == 0
+   if isbitstype(T)
+      @test @allocated(isone(a)) == 0
+   end
 
    @test parity(a) == 0
    @test parity(c) == 1
