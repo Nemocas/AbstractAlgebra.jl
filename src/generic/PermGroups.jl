@@ -4,18 +4,8 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    parent_type(::Type{<:Perm})
-
-Return the type of the parent of a permutation.
-"""
 parent_type(::Type{Perm{T}}) where T = SymmetricGroup{T}
 
-@doc Markdown.doc"""
-    elem_type(::Type{<:SymmetricGroup})
-
-Return the type of elements of a permutation group.
-"""
 elem_type(::Type{SymmetricGroup{T}}) where T = Perm{T}
 
 @doc Markdown.doc"""
