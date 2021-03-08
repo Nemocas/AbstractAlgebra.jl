@@ -219,6 +219,28 @@ end
    end
 end
 
+@testset "Generic.Frac.derivative" begin
+   R, x = PolynomialRing(QQ, "x")
+
+   f = (x^2 + 1)//2x
+
+   @test derivative(f) == (x^2 - 1)//2x^2
+
+   R, (x, ) = PolynomialRing(QQ, ["x"])
+
+   f = (x^2 + 1)//2x
+
+   @test derivative(f, x) == (x^2 - 1)//2x^2
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   f = (x^2 + x*y + y^2)//(x + y)
+
+   @test derivative(f, x) == (x^2 + 2x*y)//(x^2 + 2x*y + y^2)
+
+   @test derivative(f, 2) == (2x*y + y^2)//(x^2 + 2x*y + y^2)
+end
+
 @testset "Generic.Frac.square_root" begin
    R, x = PolynomialRing(QQ, "x")
    S = FractionField(R)

@@ -647,6 +647,30 @@ function ^(a::AbstractAlgebra.FracElem{T}, b::Int) where {T <: RingElem}
    return parent(a)(numerator(a)^b, denominator(a)^b)
 end
 
+##############################################################################
+#
+#  Derivative
+#
+##############################################################################
+
+# Return the derivative with respect to `x`.
+function derivative(f::Generic.Frac{T}, x::T) where {T <: MPolyElem}
+    return derivative(f, var_index(x))
+end
+  
+# Return the derivative with respect to the `i`-th variable.
+function derivative(f::Generic.Frac{T}, i::Int) where {T <: MPolyElem}
+    n = numerator(f)
+    d = denominator(f)
+    return (derivative(n, i)*d - n*derivative(d, i))//d^2
+end
+
+function derivative(f::Generic.Frac{T}) where {T <: PolyElem}
+    n = numerator(f)
+    d = denominator(f)
+    return (derivative(n)*d - n*derivative(d))//d^2
+end
+
 ###############################################################################
 #
 #   Square root
