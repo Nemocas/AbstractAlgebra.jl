@@ -21,6 +21,8 @@ end
    @test Generic._numpart(100) == 190_569_292
    @test Generic._numpart(1000) == 24_061_467_864_032_622_473_692_149_727_991
 
+   @test eltype(Generic.AllParts(Int8(5))) == Vector{Int8}
+
    @test Generic.partitions(5) isa Vector{Generic.Partition{Int}}
    @test Generic.partitions(Int8(5)) isa Vector{Generic.Partition{Int8}}
    @test Generic.partitions(2) == [Partition([1,1]), Partition([2])]
