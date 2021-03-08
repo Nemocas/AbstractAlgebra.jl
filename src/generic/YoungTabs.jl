@@ -136,6 +136,11 @@ Base.eltype(::Type{AllParts{T}}) where T = Vector{T}
    return k
 end
 
+@doc Markdown.doc"""
+    partitions(n::Integer)
+Return the vector of all permutations of `n`. For an unsafe generator version
+see `partitions!`.
+"""
 partitions(n::Integer) = [Partition(n, copy(p), false) for p in AllParts(n)]
 partitions!(n::Integer) = (Partition(n, p, false) for p in AllParts(n))
 

@@ -23,21 +23,21 @@ Generic.Partition
 
 ### Array interface
 
-`Partition` is a concrete subtype of `AbstractVector{Int}` and implements the following standard Array interface:
+`Partition` is a concrete (immutable) subtype of `AbstractVector{Integer}` and implements the standard Array interface.
 
 ```@docs
 size(::Generic.Partition)
 getindex(::Generic.Partition, i::Integer)
-setindex!(::Generic.Partition, v::Integer, i::Integer)
 ```
 These functions work on the level of `p.part` vector.
-Additionally `setindex!` will try to prevent uses which result in non-valid (i.e. non-decreasing) partition vectors.
 
-One can easily iterate over all partitions of $n$ using the `AllParts` type:
+One can easily iterate over all partitions of $n$ using the `Generic.partitions` function.
 
 ```@docs
-Generic.AllParts
+Generic.partitions
 ```
+
+You may also have a look at [JuLie.jl](https://github.com/ulthiel/JuLie.jl) package for more utilities related to partitions.
 
 The number of all partitions can be computed by the hidden function `_numpart`.
 Much faster implementation is available in [Nemo.jl](https://nemocas.github.io/Nemo.jl/latest/arb.html#Nemo.numpart-Tuple{Int64,ArbField}).
