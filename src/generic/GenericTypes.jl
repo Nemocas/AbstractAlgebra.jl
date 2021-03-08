@@ -179,8 +179,9 @@ end
 @doc Markdown.doc"""
     AllParts(n::Integer)
 
-Return an iterator over all integer `Partition`s of `n`.
-Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
+Return an iterator over all integer Partitions of `n`.
+
+Partitions are produced as `Vector{typeof(n)}` in ascending order according to RuleAsc (Algorithm 3.1) from
 
 > Jerome Kelleher and Barry O’Sullivan,
 > *Generating All Partitions: A Comparison Of Two Encodings*
@@ -188,20 +189,26 @@ Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) 
 
 See also `Combinatorics.partitions(1:n)`.
 
+Note: All returned partitions share memory, so advancing to the next one will change the previous. For persistent storage one should `copy` the result
+
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> ap = AllParts(5);
 
+julia> for p in ap; println(p) end
+[1, 1, 1, 1, 1]
+[2, 1, 1, 1]
+[3, 1, 1]
+[2, 2, 1]
+[4, 1]
+[3, 2]
+[5]
 
-julia> collect(ap)
-7-element Array{AbstractAlgebra.Generic.Partition{Int64},1}:
- 1₅
- 2₁1₃
- 3₁1₂
- 2₂1₁
- 4₁1₁
- 3₁2₁
- 5₁
+julia> unique(collect(ap))
+1-element Array{Array{Int64,1},1}:
+ [5]
+
+
 ```
 """
 struct AllParts{T<:Integer}

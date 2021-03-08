@@ -101,14 +101,17 @@ end
 #    "Generating All Partitions: A Comparison Of Two Encodings"
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
 
-@inline Base.iterate(A::AllParts) = A.part, max(A.n, one(A.n))
+@inline function Base.iterate(A::AllParts)
+   resize!(A.part, A.n)
+   resize!(A.tmp, A.n)
+   A.tmp .= 1
+   A.part .= 1
+
+   return A.part, max(A.n, one(A.n))
+end
 
 @inline function Base.iterate(A::AllParts, k)
-   if isone(k)
-      A.tmp .= 1
-      A.part .= 1
-      return nothing
-   end
+   isone(k) && return nothing
    k = @inbounds nextpart_asc!(A.tmp, k)
 
    resize!(A.part, k)
@@ -140,6 +143,19 @@ end
     partitions(n::Integer)
 Return the vector of all permutations of `n`. For an unsafe generator version
 see `partitions!`.
+
+# Examples:
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> Generic.partitions(5)
+7-element Array{AbstractAlgebra.Generic.Partition{Int64},1}:
+ 1₅
+ 2₁1₃
+ 3₁1₂
+ 2₂1₁
+ 4₁1₁
+ 3₁2₁
+ 5₁
+
 """
 partitions(n::Integer) = [Partition(n, copy(p), false) for p in AllParts(n)]
 partitions!(n::Integer) = (Partition(n, p, false) for p in AllParts(n))
