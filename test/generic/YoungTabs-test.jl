@@ -21,11 +21,11 @@ end
    @test Generic._numpart(100) == 190_569_292
    @test Generic._numpart(1000) == 24_061_467_864_032_622_473_692_149_727_991
 
-   @test collect(AllParts(5)) isa Vector{Generic.Partition{Int}}
-   @test collect(AllParts(Int8(5))) isa Vector{Generic.Partition{Int8}}
-   @test collect(AllParts(2)) == [Partition([1,1]), Partition([2])]
-   @test collect(AllParts(1)) == [Partition([1])]
-   @test collect(AllParts(0)) == [Partition(Int[])]
+   @test Generic.partitions(5) isa Vector{Generic.Partition{Int}}
+   @test Generic.partitions(Int8(5)) isa Vector{Generic.Partition{Int8}}
+   @test Generic.partitions(2) == [Partition([1,1]), Partition([2])]
+   @test Generic.partitions(1) == [Partition([1])]
+   @test Generic.partitions(0) == [Partition(Int[])]
 end
 
 @testset "youngtabs.youngtableau_type" begin

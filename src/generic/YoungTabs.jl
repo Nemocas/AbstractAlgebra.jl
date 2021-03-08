@@ -22,12 +22,10 @@ julia> p = Partition([4,3,1]); size(p)
 """
 size(p::Partition) = size(p.part)
 
-Base.IndexStyle(::Type{Partition}) = Base.IndexLinear()
-
 @doc Markdown.doc"""
     getindex(p::Partition, i::Integer)
 
-Return the `i`-th part (in decreasing order) of the partition.
+Return the `i`-th part (in non-increasing order) of the partition.
 """
 getindex(p::Partition, i::Integer) = p.part[i]
 
@@ -103,55 +101,43 @@ end
 #    "Generating All Partitions: A Comparison Of Two Encodings"
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
 
-function Base.iterate(A::AllParts)
-   if A.n < 1
-      return Partition(A.part, false), 1
-   elseif A.n == 1
-      A.part[1] = 1
-      return Partition(A.part, false), 1
-   else
-      A.part .= 0
-      A.part[2] = A.n
-      k = 2
-      y = A.part[k] - 1
-      k -= 1
-      x = A.part[k] + 1
-      while x <= y
-         A.part[k] = x
-         y -= x
-         k += 1
-      end
-      A.part[k] = x + y
-      return Partition(reverse!(A.part[1:k]), false), k
-   end
-end
+@inline Base.iterate(A::AllParts) = A.part, max(A.n, one(A.n))
 
-function Base.iterate(A::AllParts, k)
-   if k == 1
+@inline function Base.iterate(A::AllParts, k)
+   if isone(k)
+      A.tmp .= 1
+      A.part .= 1
       return nothing
    end
-   return nextpart_asc(A.part, k)
+   k = @inbounds nextpart_asc!(A.tmp, k)
+
+   resize!(A.part, k)
+   for i in 1:k
+      A.part[i] = A.tmp[k-i+1]
+   end
+
+   return A.part, k
 end
 
 Base.length(A::AllParts) = _numpart(A.n)
-Base.eltype(::Type{AllParts{T}}) where T = Partition{T}
-Base.size(A::AllParts) = (length(A),)
+Base.eltype(::Type{AllParts{T}}) where T = Vector{T}
 
-@inbounds function nextpart_asc(part, k)
-   if k == 0
-      return Partition(part, false), 1
-   end
-   y = part[k] - 1
-   k -= 1
-   x = part[k] + 1
+@inline function nextpart_asc!(part, k)
+   iszero(k) && return one(k)
+   y = part[k] - one(k)
+   k -= one(k)
+   x = part[k] + one(k)
    while x <= y
       part[k] = x
       y -= x
-      k += 1
+      k += one(k)
    end
    part[k] = x + y
-   return Partition(reverse!(part[1:k]), false), k
+   return k
 end
+
+partitions(n::Integer) = [Partition(n, copy(p), false) for p in AllParts(n)]
+partitions!(n::Integer) = (Partition(n, p, false) for p in AllParts(n))
 
 @doc Markdown.doc"""
     conj(part::Partition)
