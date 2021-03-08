@@ -631,6 +631,10 @@ function PowerSeriesRing(R::Ring, prec::Int, s::Char; cached=true, model=:capped
    PowerSeriesRing(R, prec, string(s); cached=cached, model=model)
 end
 
+function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int}, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
+   Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
+end
+
 function LaurentSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
    Generic.LaurentSeriesRing(R, prec, s; cached=cached)
 end

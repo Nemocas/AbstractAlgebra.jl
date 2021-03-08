@@ -79,6 +79,8 @@ abstract type LaurentPolynomialRing{T} <: Ring end
 
 abstract type SeriesRing{T} <: Ring end
 
+abstract type MSeriesRing{T} <: Ring end
+
 abstract type ResRing{T} <: Ring end
 
 abstract type ResField{T} <: Field end
@@ -118,9 +120,13 @@ abstract type FracElem{T} <: FieldElem end
 
 abstract type SeriesElem{T} <: RingElem end
 
+abstract type MSeriesElem{T} <: RingElem end
+
 abstract type RelSeriesElem{T} <: SeriesElem{T} end
 
 abstract type AbsSeriesElem{T} <: SeriesElem{T} end
+
+abstract type AbsMSeriesElem{T} <: MSeriesElem{T} end
 
 abstract type MatElem{T} <: ModuleElem{T} end
 
