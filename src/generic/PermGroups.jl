@@ -788,6 +788,8 @@ end
 one(G::SymmetricGroup) = Perm(G.n)
 one(g::Perm) = one(parent(g))
 
+Base.isone(g::Perm) = all(i == g[i] for i in eachindex(g.d))
+
 function (G::SymmetricGroup{T})(a::AbstractVector{S}, check::Bool=true) where {S, T}
    if check
       G.n == length(a) || throw("Cannot coerce to $G: lengths differ")

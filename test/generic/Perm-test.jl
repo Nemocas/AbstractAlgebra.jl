@@ -1,4 +1,4 @@
-IntTypes = [Int8, Int16, Int32, Int, UInt8, UInt16, UInt32, UInt, BigInt]
+IntTypes = [Int16, UInt32, Int, BigInt]
 
 @testset "Perm.abstract_types" begin
    @test Generic.Perm <: GroupElem
@@ -151,6 +151,12 @@ end
    c = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
    @test a == b
+   @test a !== b
+
+   @test isone(a) && isone(b)
+   @test !isone(c)
+
+   @test @allocated(isone(a)) == 0
 
    @test parity(a) == 0
    @test parity(c) == 1
