@@ -212,7 +212,7 @@ function cycles(g::Perm{T}) where T<:Integer
 end
 
 function cycledec(v::Vector{T}) where T<:Integer
-  to_visit = trues(size(v))
+   to_visit = trues(size(v))
    ccycles = similar(v) # consecutive cycles entries
    cptrs = [1] # pointers to where cycles start
    # ccycles[cptrs[i], cptrs[i+1]-1] contains i-th cycle
@@ -564,18 +564,10 @@ end
 #
 ###############################################################################
 
-@inline function Base.iterate(A::AllPerms{<: Integer})
-   return A.elts, 1
-end
+@inline Base.iterate(A::AllPerms) = (A.c .= 1; (A.elts, 1))
 
 @inline function Base.iterate(A::AllPerms{<: Integer}, count)
-   if count >= A.all
-     # Reset the iterator to make it iterable again
-     for i in 1:length(A.c)
-       A.c[i] = 1
-     end
-     return nothing
-   end
+   count >= A.all && return nothing
 
    k = 0
    n = 1
@@ -641,23 +633,18 @@ julia> unique(A)
 """
 elements!(G::SymmetricGroup)= (p for p in AllPerms(G.n))
 
-function Base.iterate(G::SymmetricGroup)
-  A = AllPerms(G.n)
-  a, b = iterate(A)
-  return deepcopy(A.elts), (A, b)
+@inline function Base.iterate(G::SymmetricGroup)
+   A = AllPerms(G.n)
+   a, b = iterate(A)
+   return Perm(copy(A.elts.d), false), (A, b)
 end
 
-function Base.iterate(G::SymmetricGroup, S)
-  A = S[1]
-  c = S[2]
+@inline function Base.iterate(G::SymmetricGroup, S)
+   A, c = S
+   s = iterate(A, c)
+   s === nothing && return nothing
 
-  s = iterate(A, c)
-
-  if s === nothing
-    return nothing
-  end
-
-  return deepcopy(s[1]), (A, s[2])
+   return Perm(copy(A.elts.d), false), (A, last(s))
 end
 
 Base.eltype(::Type{SymmetricGroup{T}}) where T = Perm{T}
