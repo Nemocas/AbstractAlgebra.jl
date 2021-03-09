@@ -52,12 +52,55 @@ end
 
 function gen(R::AbsMSeriesRing, i::Int)
     S = R.poly_ring
-    prec = [i == ind ? 1 : R.prec_max[i] for ind in 1:nvars(R)]
-    x = gen(S, i)
+    prec = [R.prec_max[ind] for ind in 1:nvars(R)]
+    x = R.prec_max[i] > 1 ? gen(S, i) : S()
     return R(x, prec)
 end
 
 gens(R::AbsMSeriesRing) = [gen(R, i) for i in 1:nvars(R)]
+
+vars(R::AbstractAlgebra.MSeriesRing) = R.sym
+
+parent(a::AbstractAlgebra.MSeriesElem) = a.parent
+
+function base_ring(R::AbstractAlgebra.MSeriesRing{T}) where T <: RingElement
+    return R.base_ring::parent_type(T)
+end
+
+base_ring(a::AbstractAlgebra.MSeriesElem) = base_ring(parent(a))
+
+###############################################################################
+#
+#   AbstractString I/O
+#
+###############################################################################
+
+function AbstractAlgebra.expressify(a::AbstractAlgebra.AbsMSeriesElem,
+                                        x = vars(parent(a)); context = nothing)
+    sum = Expr(:call, :+)
+
+    push!(sum.args, expressify(a.poly, context = context))
+
+    for i in 1:nvars(parent(a))
+        push!(sum.args, Expr(:call, :O, Expr(:call, :^, x[i], a.prec[i])))
+    end
+
+    return sum
+end
+
+function Base.show(io::IO, a::AbstractAlgebra.MSeriesElem)
+    print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+  
+function Base.show(io::IO, ::MIME"text/plain", a::AbstractAlgebra.MSeriesElem)
+    print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+  
+function show(io::IO, a::AbstractAlgebra.MSeriesRing)
+    v = join([String(s) for s in vars(a)], ", ")
+    print(io, "Multivariate power series ring in ", v, " over ")
+    print(IOContext(io, :compact => true), base_ring(a))
+end
 
 ###############################################################################
 #
@@ -68,6 +111,7 @@ gens(R::AbsMSeriesRing) = [gen(R, i) for i in 1:nvars(R)]
 function (R::AbsMSeriesRing{T})(x::MPoly{T}, prec::Vector{Int}) where T <: RingElement
     s = AbsMSeries{T}(x, prec)
     s.parent = R
+    return s
 end
 
 ###############################################################################
