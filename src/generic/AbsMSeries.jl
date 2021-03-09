@@ -13,17 +13,17 @@
 
 function O(a::AbstractAlgebra.AbsMSeriesElem{T}) where T <: RingElement
     if iszero(a)
-       return deepcopy(a)    # 0 + O(x^n)
+       return deepcopy(a)
     end
     R = parent(a)
     p = poly(a)
     v = vars(p)
-    exps = first(exponent_vector(p, 1))
     (length(v) != 1 || length(p) != 1 || !isone(lc(p))) &&
                                                error("Not a pure power in O()")
     ind = var_index(v[1])
+    exps = first(exponent_vectors(p))
     prec = [i == ind ? exps[i] : R.prec_max[i] for i in 1:length(exps)]
-    return R(poly(a), prec)
+    return R(parent(p)(), prec)
 end
 
 parent_type(::Type{AbsMSeries{T}}) where {T <: RingElement} = AbsMSeriesRing{T}
@@ -224,6 +224,30 @@ function *(a::AbsMSeries, b::AbsMSeries)
     z = truncate_poly(poly(a)*poly(b), prec)
     return R(z, prec)
 end    
+
+###############################################################################
+#
+#   Powering
+#
+###############################################################################
+
+function ^(a::AbsMSeries, b::Int) where T <: RingElement
+    b < 0 && throw(DomainError(b, "Can't take negative power"))
+    bit = ~((~UInt(0)) >> 1)
+    while (UInt(bit) & b) == 0
+        bit >>= 1
+    end
+    z = a
+    bit >>= 1
+    while bit !=0
+        z = z*z
+        if (UInt(bit) & b) != 0
+            z *= a
+        end
+        bit >>= 1
+    end
+    return z
+end
 
 ###############################################################################
 #
