@@ -69,9 +69,15 @@ function coeff(a::AbsMSeries, n::Int)
     return coeff(poly(a), n)
 end
 
-function iszero(a::AbsMSeries)
-    return length(poly(a)) == 0
+iszero(a::AbsMSeries) = length(poly(a)) == 0
+
+function isone(a::AbsMSeries)
+    return isone(poly(a)) || iszero(precision(a))
 end
+
+zero(R::AbsMSeriesRing) = R(0)
+
+one(R::AbsMSeriesRing) = R(1)
 
 function gen(R::AbsMSeriesRing, i::Int)
     S = R.poly_ring
@@ -82,6 +88,14 @@ end
 
 gens(R::AbsMSeriesRing) = [gen(R, i) for i in 1:nvars(R)]
 
+function isgen(a::AbsMSeries)
+    R = parent(a)
+    p = poly(a)
+    v = vars(p)
+    return length(v) == 1 && length(p) == 1 &&
+                          isone(lc(p)) && sum(first(exponent_vectors(p))) == 1
+end
+
 vars(R::AbstractAlgebra.MSeriesRing) = R.sym
 
 parent(a::AbstractAlgebra.MSeriesElem) = a.parent
@@ -91,6 +105,13 @@ function base_ring(R::AbstractAlgebra.MSeriesRing{T}) where T <: RingElement
 end
 
 base_ring(a::AbstractAlgebra.MSeriesElem) = base_ring(parent(a))
+
+deepcopy(a::AbsMSeries) = parent(a)(deepcopy(poly(a)), precision(a))
+
+function Base.hash(a::AbsMSeries, h::UInt)
+    b = 0xf7f073b6c9e1d560
+    return xor(b, hash(poly(a), h))
+end
 
 ###############################################################################
 #
@@ -233,6 +254,17 @@ end
 
 function ^(a::AbsMSeries, b::Int) where T <: RingElement
     b < 0 && throw(DomainError(b, "Can't take negative power"))
+    R = parent(a)
+    prec = precision(a)
+    if b == 0
+        p = one(R.poly_ring)
+        p = truncate_poly(p, prec)
+        return R(p, prec)
+    elseif isconstant(poly(a))
+        return R(poly(a)^b, precision(a))
+    elseif b == 1
+        return deepcopy(a)
+    end
     bit = ~((~UInt(0)) >> 1)
     while (UInt(bit) & b) == 0
         bit >>= 1
@@ -262,6 +294,14 @@ function (R::AbsMSeriesRing{T})(x::MPoly{T}, prec::Vector{Int}) where T <: RingE
     s = AbsMSeries{T}(x, prec)
     s.parent = R
     return s
+end
+
+function (R::AbsMSeriesRing)()
+    return R(R.poly_ring(), max_precision(R))
+end
+
+function (R::AbsMSeriesRing)(b::Union{Integer, Rational, AbstractFloat})
+    return R(R.poly_ring(b), max_precision(R))
 end
 
 ###############################################################################
