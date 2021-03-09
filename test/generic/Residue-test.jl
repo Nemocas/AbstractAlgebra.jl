@@ -3,6 +3,9 @@
 
    R = Generic.ResidueRing(B, 16453889)
 
+   @test Generic.ResidueRing(B, 16453889, cached = true) === Generic.ResidueRing(B, 16453889, cached = true)
+   @test Generic.ResidueRing(B, 16453889, cached = false) !== Generic.ResidueRing(B, 16453889, cached = true)
+
    @test_throws DomainError Generic.ResidueRing(B, 0)
 
    @test elem_type(R) == Generic.Res{elem_type(B)}

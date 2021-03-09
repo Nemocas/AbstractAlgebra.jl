@@ -2,6 +2,9 @@
    R, x = SparsePolynomialRing(ZZ, "x")
    S, y = SparsePolynomialRing(R, "y")
 
+   @test SparsePolynomialRing(R, "y", cached = true)[1] === SparsePolynomialRing(R, "y", cached = true)[1]
+   @test SparsePolynomialRing(R, "y", cached = true)[1] !== SparsePolynomialRing(R, "y", cached = false)[1]
+
    @test typeof(S) <: Generic.SparsePolyRing
 
    T, z = SparsePolynomialRing(S, "z")

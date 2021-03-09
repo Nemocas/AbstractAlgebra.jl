@@ -307,6 +307,36 @@ function force_op(op::Function, a...)
 end
 
 ###############################################################################
+#
+#  Weak value dictionaries
+#
+###############################################################################
+
+include("WeakValueDict.jl")
+
+###############################################################################
+#
+#  Type for the Hash dictionary
+#
+###############################################################################
+
+@static if VERSION >= v"1.6"
+  const CacheDictType = WeakValueDict
+else
+  const CacheDictType = Dict
+end
+
+function get_cached!(default::Base.Callable, dict::AbstractDict,
+                                             key,
+                                             use_cache::Bool)
+   return use_cache ? Base.get!(default, dict, key) : default()
+end
+
+###############################################################################
+#
+#  Types
+#
+################################################################################
 
 include("AbstractTypes.jl")
 

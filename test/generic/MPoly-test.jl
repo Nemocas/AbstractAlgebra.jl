@@ -7,6 +7,9 @@
 
       S, varlist = PolynomialRing(R, var_names, ordering = ord)
 
+      @test PolynomialRing(R, var_names, ordering = ord, cached = true)[1] === PolynomialRing(R, var_names, ordering = ord, cached = true)[1]
+      @test PolynomialRing(R, var_names, ordering = ord, cached = false)[1] !== PolynomialRing(R, var_names, ordering = ord, cached = true)[1]
+
       @test elem_type(S) == Generic.MPoly{elem_type(R)}
       @test elem_type(Generic.MPolyRing{elem_type(R)}) == Generic.MPoly{elem_type(R)}
       @test parent_type(Generic.MPoly{elem_type(R)}) == Generic.MPolyRing{elem_type(R)}

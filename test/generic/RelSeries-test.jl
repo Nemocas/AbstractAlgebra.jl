@@ -22,6 +22,9 @@
    S, t = PolynomialRing(QQ, "t")
    T, y = PowerSeriesRing(S, 30, "y")
 
+   @test PowerSeriesRing(S, 30, "y", cached = true)[1] === PowerSeriesRing(S, 30, "y", cached = true)[1]
+   @test PowerSeriesRing(S, 30, "y", cached = false)[1] !== PowerSeriesRing(S, 30, "y", cached = true)[1]
+
    @test elem_type(R) == Generic.RelSeries{BigInt}
    @test elem_type(Generic.RelSeriesRing{BigInt}) == Generic.RelSeries{BigInt}
    @test parent_type(Generic.RelSeries{BigInt}) == Generic.RelSeriesRing{BigInt}

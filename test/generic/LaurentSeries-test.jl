@@ -19,6 +19,9 @@
 @testset "Generic.LaurentSeries.constructors" begin
    R, x = LaurentSeriesRing(ZZ, 30, "x")
 
+   @test LaurentSeriesRing(ZZ, 30, "x", cached = true)[1] === LaurentSeriesRing(ZZ, 30, "x", cached = true)[1]
+   @test LaurentSeriesRing(ZZ, 30, "x", cached = false)[1] !== LaurentSeriesRing(ZZ, 30, "x", cached = true)[1]
+
    S, t = PolynomialRing(QQ, "t")
    T, y = LaurentSeriesRing(S, 30, "y")
 
@@ -97,6 +100,12 @@
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
+   
+   R, x = LaurentSeriesRing(ZZ, 30, "x")
+   RR, x = LaurentSeriesRing(ZZ, 30, "x")
+   @test R === RR
+   RR, x = LaurentSeriesRing(ZZ, 30, "x", cached = false)
+   @test R !== RR
 end
 
 @testset "Generic.LaurentSeries.rand" begin

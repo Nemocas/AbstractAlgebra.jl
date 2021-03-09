@@ -2,6 +2,9 @@
    R, x = PolynomialRing(ZZ, "x")
    M = FreeModule(R, 5)
 
+   @test FreeModule(R, 5, cached = true) === FreeModule(R, 5, cached = true)
+   @test FreeModule(R, 5, cached = true) !== FreeModule(R, 5, cached = false)
+
    @test isa(M, Generic.FreeModule)
 
    @test elem_type(M) == Generic.FreeModuleElem{elem_type(R)}

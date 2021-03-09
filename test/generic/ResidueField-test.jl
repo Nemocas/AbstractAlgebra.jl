@@ -3,6 +3,9 @@
 
    R = Generic.ResidueField(B, 16453889)
 
+   @test Generic.ResidueField(B, 16453889, cached = true) === Generic.ResidueField(B, 16453889, cached = true)
+   @test Generic.ResidueField(B, 16453889, cached = true) !== Generic.ResidueField(B, 16453889, cached = false)
+
    @test elem_type(R) == Generic.ResF{elem_type(B)}
    @test elem_type(Generic.ResField{elem_type(B)}) == Generic.ResF{elem_type(B)}
    @test parent_type(Generic.ResF{elem_type(B)}) == Generic.ResField{elem_type(B)}
