@@ -69,6 +69,10 @@ function coeff(a::AbsMSeries, n::Int)
     return coeff(poly(a), n)
 end
 
+function iszero(a::AbsMSeries)
+    return length(poly(a)) == 0
+end
+
 function gen(R::AbsMSeriesRing, i::Int)
     S = R.poly_ring
     prec = [R.prec_max[ind] for ind in 1:nvars(R)]
@@ -212,6 +216,14 @@ function -(a::AbsMSeries, b::AbsMSeries)
     z = truncate_poly(poly(a) - poly(b), prec)
     return R(z, prec)
 end
+
+function *(a::AbsMSeries, b::AbsMSeries)
+    R = parent(a)
+    prec = min.(precision(a) .+ valuation(b), precision(b) .+ valuation(a))
+    prec = min.(prec, max_precision(R))
+    z = truncate_poly(poly(a)*poly(b), prec)
+    return R(z, prec)
+end    
 
 ###############################################################################
 #
