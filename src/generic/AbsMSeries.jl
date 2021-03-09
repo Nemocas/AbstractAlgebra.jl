@@ -46,6 +46,25 @@ precision(a::AbsMSeries) = a.prec
 
 max_precision(R::AbsMSeriesRing) = R.prec_max
 
+@doc Markdown.doc"""
+    valuation(a::AbsMSeries)
+
+Return the valuation of $a$ as a vector of integers.
+"""
+function valuation(a::AbsMSeries)
+    p = poly(a)
+    prec = precision(a)
+    val = prec
+    for v in exponent_vectors(p)
+        if iszero(v)
+            return v
+        end
+        v = exponents_clamp_zero_to_prec(v, prec)
+        val = min.(v, val)
+    end
+    return val
+end
+
 function coeff(a::AbsMSeries, n::Int)
     return coeff(poly(a), n)
 end
@@ -104,9 +123,13 @@ end
 
 ###############################################################################
 #
-#   Truncation
+#   Exponent helper functions (not exported)
 #
 ###############################################################################
+
+function exponents_clamp_zero_to_prec(a::Vector{Int}, prec::Vector{Int})
+    return [a[i] == 0 ? prec[i] : a[i] for i in 1:length(a)]
+end
 
 function exponents_lt(v::Vector{Int}, p::Vector{Int})
     for i = 1:length(v)
@@ -116,6 +139,12 @@ function exponents_lt(v::Vector{Int}, p::Vector{Int})
     end
     return true
 end
+
+###############################################################################
+#
+#   Truncation
+#
+###############################################################################
 
 function truncate_poly(a::MPolyElem, prec::Vector{Int})
     R = parent(a)
