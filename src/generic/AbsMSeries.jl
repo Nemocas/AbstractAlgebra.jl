@@ -106,7 +106,9 @@ end
 
 base_ring(a::AbstractAlgebra.MSeriesElem) = base_ring(parent(a))
 
-deepcopy(a::AbsMSeries) = parent(a)(deepcopy(poly(a)), precision(a))
+function deepcopy_internal(a::AbsMSeries, dict::IdDict)
+    return parent(a)(deepcopy(poly(a)), precision(a))
+end
 
 function Base.hash(a::AbsMSeries, h::UInt)
     b = 0xf7f073b6c9e1d560
