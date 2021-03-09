@@ -219,6 +219,23 @@ end
    end
 end
 
+@testset "Generic.Frac.evaluate" begin
+   R = ResidueRing(ZZ, 5)
+   S, x = PolynomialRing(R, "x")
+
+   f = (x^2 + 2)//(x + 1)
+
+   @test evaluate(f, 1) == R(4)
+   @test evaluate(f, R(1)) == R(4)
+
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+   f = (x^2 + y)//(y + 2)
+
+   @test evaluate(f, [1, 2]) == ZZ(3)//ZZ(4)
+   @test evaluate(f, [ZZ(1), ZZ(2)]) == ZZ(3)//ZZ(4)
+end
+
 @testset "Generic.Frac.derivative" begin
    R, x = PolynomialRing(QQ, "x")
 
