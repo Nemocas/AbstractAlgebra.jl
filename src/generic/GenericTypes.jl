@@ -157,26 +157,31 @@ julia> p.n == sum(p.part)
 true
 ```
 """
-mutable struct Partition{T} <: AbstractVector{T}
+struct Partition{T} <: AbstractVector{T}
    n::Int
    part::Vector{T}
 
-   function Partition(part::AbstractVector{T}, check::Bool=true) where T<:Integer
+   Partition(part::AbstractVector{<:Integer}, check::Bool=true) =
+      Partition(sum(part), part, check)
+
+   function Partition(n::Integer, part::AbstractVector{T}, check::Bool=true) where T
       if check
-         all(diff(part) .<= 0) || sort!(part, rev=true)
+         all(i-> part[i] >= part[i-1], 2:length(part)) || sort!(part, rev=true)
          if length(part) > 0
-            part[end] >= 1 || throw(ArgumentError("Found non-positive entry in partition!"))
+            part[end] >= 1 || throw(ArgumentError("Found non-positive entry in partition: $(part[end])"))
          end
+         @assert n == sum(part)
       end
-      return new{T}(sum(part), part)
+      return new{T}(n, part)
    end
 end
 
 @doc Markdown.doc"""
     AllParts(n::Integer)
 
-Return an iterator over all integer `Partition`s of `n`.
-Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
+Return an iterator over all integer Partitions of `n`.
+
+Partitions are produced as `Vector{typeof(n)}` in ascending order according to RuleAsc (Algorithm 3.1) from
 
 > Jerome Kelleher and Barry O’Sullivan,
 > *Generating All Partitions: A Comparison Of Two Encodings*
@@ -184,27 +189,36 @@ Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) 
 
 See also `Combinatorics.partitions(1:n)`.
 
+Note: All returned partitions share memory, so advancing to the next one will change the previous. For persistent storage one should `copy` the result
+
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> ap = AllParts(5);
 
+julia> for p in ap; println(p) end
+[1, 1, 1, 1, 1]
+[2, 1, 1, 1]
+[3, 1, 1]
+[2, 2, 1]
+[4, 1]
+[3, 2]
+[5]
 
-julia> collect(ap)
-7-element Array{AbstractAlgebra.Generic.Partition{Int64},1}:
- 1₅
- 2₁1₃
- 3₁1₂
- 2₂1₁
- 4₁1₁
- 3₁2₁
- 5₁
+julia> unique(collect(ap))
+1-element Array{Array{Int64,1},1}:
+ [5]
+
+
 ```
 """
 struct AllParts{T<:Integer}
-    n::Int
-    part::Vector{T}
-    AllParts{T}(n::Integer) where T = new{T}(n, zeros(Int,n))
-    AllParts(n::T) where T<:Integer = AllParts{T}(n)
+   n::T
+   tmp::Vector{T}
+   part::Vector{T}
+
+   AllParts{T}(n::Integer) where T =
+      new{T}(n, ones(T, n), ones(T, n))
+   AllParts(n::T; copy=true) where T<:Integer = AllParts{T}(n)
 end
 
 ###############################################################################

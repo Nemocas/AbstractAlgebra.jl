@@ -14,21 +14,6 @@
    @test p[2] == 3
    @test p[3] == 1
    @test_throws BoundsError p[4]
-
-   @test_throws ArgumentError p[1] = 2
-   @test_throws ArgumentError p[2] = 5
-   @test_throws ArgumentError p[2] = 0
-
-   r = deepcopy(p)
-
-   p[3] = 2
-   @test p[3] == 2
-
-   @test sum(p) == 9
-   @test sum(r) == 8
-
-   @test p == Partition([4,3,2])
-   @test p != r
 end
 
 @testset "youngtabs.partition_iter" begin
@@ -36,11 +21,18 @@ end
    @test Generic._numpart(100) == 190_569_292
    @test Generic._numpart(1000) == 24_061_467_864_032_622_473_692_149_727_991
 
-   @test collect(AllParts(5)) isa Vector{Generic.Partition{Int}}
-   @test collect(AllParts(Int8(5))) isa Vector{Generic.Partition{Int8}}
-   @test collect(AllParts(2)) == [Partition([1,1]), Partition([2])]
-   @test collect(AllParts(1)) == [Partition([1])]
-   @test collect(AllParts(0)) == [Partition(Int[])]
+   @test eltype(Generic.AllParts(Int8(5))) == Vector{Int8}
+
+   @test Generic.partitions(5) isa Vector{Generic.Partition{Int}}
+   @test Generic.partitions(Int8(5)) isa Vector{Generic.Partition{Int8}}
+   @test Generic.partitions(2) == [Partition([1,1]), Partition([2])]
+   @test Generic.partitions(1) == [Partition([1])]
+   @test Generic.partitions(0) == [Partition(Int[])]
+
+   # we actually iterate over all of them:
+   @test sum(first, Generic.partitions!(10)) == 192
+   # but they share memory:
+   @test length(unique(collect(Generic.partitions!(10)))) == 1
 end
 
 @testset "youngtabs.youngtableau_type" begin
@@ -55,7 +47,7 @@ end
    @test length(Y) == 12
    @test size(Y) == (3,4)
 
-   Y.part[2] = 2
+   Y = YoungTableau([4,2,1])
    @test Y != Z
 
    @test YoungTableau([1,3,4,1]) == YoungTableau([4,3,1,1])

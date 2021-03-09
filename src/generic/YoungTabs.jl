@@ -22,37 +22,14 @@ julia> p = Partition([4,3,1]); size(p)
 """
 size(p::Partition) = size(p.part)
 
-Base.IndexStyle(::Type{Partition}) = Base.IndexLinear()
-
 @doc Markdown.doc"""
     getindex(p::Partition, i::Integer)
 
-Return the `i`-th part (in decreasing order) of the partition.
+Return the `i`-th part (in non-increasing order) of the partition.
 """
 getindex(p::Partition, i::Integer) = p.part[i]
 
 Base.sum(p::Partition) = p.n
-
-@doc Markdown.doc"""
-    setindex!(p::Partition, v::Integer, i::Integer)
-
-Set the `i`-th part of partition `p` to `v`.
-`setindex!` will throw an error if the operation violates the non-increasing assumption.
-"""
-function setindex!(p::Partition, v::Integer, i::Integer)
-   prev = sum(p)
-   nex = 1
-   if i != 1
-      prev = p[i-1]
-   end
-   if i != length(p)
-      nex = p[i+1]
-   end
-   nex <= v <= prev || throw(ArgumentError("Partition must be positive and non-increasing"))
-   p.n += v - p.part[i]
-   p.part[i] = v
-   return p
-end
 
 ==(p::Partition, m::Partition) = sum(p) == sum(m) && p.part == m.part
 hash(p::Partition, h::UInt) = hash(p.part, hash(Partition, h))
@@ -124,55 +101,64 @@ end
 #    "Generating All Partitions: A Comparison Of Two Encodings"
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
 
-function Base.iterate(A::AllParts)
-   if A.n < 1
-      return Partition(A.part, false), 1
-   elseif A.n == 1
-      A.part[1] = 1
-      return Partition(A.part, false), 1
-   else
-      A.part .= 0
-      A.part[2] = A.n
-      k = 2
-      y = A.part[k] - 1
-      k -= 1
-      x = A.part[k] + 1
-      while x <= y
-         A.part[k] = x
-         y -= x
-         k += 1
-      end
-      A.part[k] = x + y
-      return Partition(reverse!(A.part[1:k]), false), k
-   end
+@inline function Base.iterate(A::AllParts)
+   resize!(A.part, A.n)
+   resize!(A.tmp, A.n)
+   A.tmp .= 1
+   A.part .= 1
+
+   return A.part, max(A.n, one(A.n))
 end
 
-function Base.iterate(A::AllParts, k)
-   if k == 1
-      return nothing
+@inline function Base.iterate(A::AllParts, k)
+   isone(k) && return nothing
+   k = @inbounds nextpart_asc!(A.tmp, k)
+
+   resize!(A.part, k)
+   for i in 1:k
+      A.part[i] = A.tmp[k-i+1]
    end
-   return nextpart_asc(A.part, k)
+
+   return A.part, k
 end
 
 Base.length(A::AllParts) = _numpart(A.n)
-Base.eltype(::Type{AllParts{T}}) where T = Partition{T}
-Base.size(A::AllParts) = (length(A),)
+Base.eltype(::Type{AllParts{T}}) where T = Vector{T}
 
-@inbounds function nextpart_asc(part, k)
-   if k == 0
-      return Partition(part, false), 1
-   end
-   y = part[k] - 1
-   k -= 1
-   x = part[k] + 1
+@inline function nextpart_asc!(part, k)
+   iszero(k) && return one(k)
+   y = part[k] - one(k)
+   k -= one(k)
+   x = part[k] + one(k)
    while x <= y
       part[k] = x
       y -= x
-      k += 1
+      k += one(k)
    end
    part[k] = x + y
-   return Partition(reverse!(part[1:k]), false), k
+   return k
 end
+
+@doc Markdown.doc"""
+    partitions(n::Integer)
+Return the vector of all permutations of `n`. For an unsafe generator version
+see `partitions!`.
+
+# Examples:
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> Generic.partitions(5)
+7-element Array{AbstractAlgebra.Generic.Partition{Int64},1}:
+ 1₅
+ 2₁1₃
+ 3₁1₂
+ 2₂1₁
+ 4₁1₁
+ 3₁2₁
+ 5₁
+
+"""
+partitions(n::Integer) = [Partition(n, copy(p), false) for p in AllParts(n)]
+partitions!(n::Integer) = (Partition(n, p, false) for p in AllParts(n))
 
 @doc Markdown.doc"""
     conj(part::Partition)

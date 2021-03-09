@@ -1,4 +1,4 @@
-IntTypes = [Int8, Int16, Int32, Int, UInt8, UInt16, UInt32, UInt, BigInt]
+IntTypes = [Int16, UInt32, Int, BigInt]
 
 @testset "Perm.abstract_types" begin
    @test Generic.Perm <: GroupElem
@@ -151,6 +151,14 @@ end
    c = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
    @test a == b
+   @test a !== b
+
+   @test isone(a) && isone(b)
+   @test !isone(c)
+
+   if isbitstype(T)
+      @test @allocated(isone(a)) == 0
+   end
 
    @test parity(a) == 0
    @test parity(c) == 1
@@ -313,7 +321,7 @@ end
       N = T(7)
       G = SymmetricGroup(N)
 
-      @test all(character(p)(one(G)) == dim(YoungTableau(p)) for p in AllParts(N))
+      @test all(character(p)(one(G)) == dim(YoungTableau(p)) for p in Generic.partitions(N))
 
       N = T(3)
       G = SymmetricGroup(N)
@@ -346,7 +354,7 @@ end
    G = SymmetricGroup(N)
 
    ps = Partition.([[1,1,1,1], [2,1,1], [2,2], [3,1], [4]])
-   @test Set(AllParts(N)) == Set(ps)
+   @test Set(Generic.partitions(N)) == Set(ps)
 
    l = Partition([1,1,1,1])
 
@@ -366,7 +374,7 @@ end
    N = 5
    G = SymmetricGroup(N)
    ps = Partition.([[1,1,1,1,1], [2,1,1,1], [2,2,1], [3,1,1], [3,2], [4,1], [5]])
-   @test Set(AllParts(N)) == Set(ps)
+   @test Set(Generic.partitions(N)) == Set(ps)
 
    l = Partition([1,1,1,1,1])
    @test [character(l, m) for m in ps] == [   1,  -1,   1,   1,  -1,  -1,   1 ]
