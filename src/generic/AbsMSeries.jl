@@ -246,7 +246,27 @@ function *(a::AbsMSeries, b::AbsMSeries)
     prec = min.(prec, max_precision(R))
     z = truncate_poly(poly(a)*poly(b), prec)
     return R(z, prec)
-end    
+end
+
+###############################################################################
+#
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function *(a::T, b::AbsMSeries{T}) where {T <: RingElem}
+    R = parent(b)
+    return R(a*poly(b), precision(b)) 
+end
+
+function *(a::Union{Integer, Rational, AbstractFloat}, b::AbsMSeries)
+    R = parent(b)
+    return R(a*poly(b), precision(b)) 
+end
+
+*(a::AbsMSeries{T}, b::T) where T <: RingElem = b*a
+ 
+*(a::AbsMSeries, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################
 #
