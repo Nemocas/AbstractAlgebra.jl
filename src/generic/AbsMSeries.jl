@@ -104,11 +104,60 @@ end
 
 ###############################################################################
 #
+#   Truncation
+#
+###############################################################################
+
+function exponents_lt(v::Vector{Int}, p::Vector{Int})
+    for i = 1:length(v)
+        if v[i] >= p[i]
+            return false
+        end
+    end
+    return true
+end
+
+@doc Markdown.doc"""
+    truncate(a::AbstractAlgebra.AbsMSeries, prec::Vector{Int})
+
+Return $a$ truncated to (absolute) precisions given by the vector `prec`.
+"""
+function truncate(a::AbsMSeries, prec::Vector{Int})
+    R = parent(a)
+    length(prec) != nvars(R) &&
+             error("Array length not equal to number of variables in truncate")
+    trunc_needed = false
+    p = precision(a)
+    for i = 1:nvars(R)
+        if prec[i] < p[i]
+            trunc_needed = true
+            break
+        end
+    end
+    if !trunc_needed
+        return a
+    end
+    prec = min.(prec, p)
+    ctx = MPolyBuildCtx(R.poly_ring)
+    q = poly(a)
+    for (c, v) in zip(coeffs(q), exponent_vectors(q))
+        if exponents_lt(v, prec)
+            push_term!(ctx, c, v)
+        end
+    end
+    return R(finish(ctx), prec)
+end
+
+###############################################################################
+#
 #   Parent object call overload
 #
 ###############################################################################
 
 function (R::AbsMSeriesRing{T})(x::MPoly{T}, prec::Vector{Int}) where T <: RingElement
+    for v in prec
+        v < 0 && error("Precision must be non-negative")
+    end
     s = AbsMSeries{T}(x, prec)
     s.parent = R
     return s
