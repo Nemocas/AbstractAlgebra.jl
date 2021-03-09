@@ -117,6 +117,17 @@ function exponents_lt(v::Vector{Int}, p::Vector{Int})
     return true
 end
 
+function truncate_poly(a::MPolyElem, prec::Vector{Int})
+    R = parent(a)
+    ctx = MPolyBuildCtx(R)
+    for (c, v) in zip(coeffs(a), exponent_vectors(a))
+        if exponents_lt(v, prec)
+            push_term!(ctx, c, v)
+        end
+    end
+    return finish(ctx)
+end
+
 @doc Markdown.doc"""
     truncate(a::AbstractAlgebra.AbsMSeries, prec::Vector{Int})
 
@@ -138,14 +149,8 @@ function truncate(a::AbsMSeries, prec::Vector{Int})
         return a
     end
     prec = min.(prec, p)
-    ctx = MPolyBuildCtx(R.poly_ring)
-    q = poly(a)
-    for (c, v) in zip(coeffs(q), exponent_vectors(q))
-        if exponents_lt(v, prec)
-            push_term!(ctx, c, v)
-        end
-    end
-    return R(finish(ctx), prec)
+    q = truncate_poly(poly(a), prec)
+    return R(q, prec)
 end
 
 ###############################################################################
@@ -157,6 +162,26 @@ end
 function -(a::AbsMSeries)
     R = parent(a)
     return R(-poly(a), precision(a))
+end
+
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
+
+function +(a::AbsMSeries, b::AbsMSeries)
+    R = parent(a)
+    prec = min.(precision(a), precision(b))
+    z = truncate_poly(poly(a) + poly(b), prec)
+    return R(z, prec)
+end
+
+function -(a::AbsMSeries, b::AbsMSeries)
+    R = parent(a)
+    prec = min.(precision(a), precision(b))
+    z = truncate_poly(poly(a) - poly(b), prec)
+    return R(z, prec)
 end
 
 ###############################################################################
