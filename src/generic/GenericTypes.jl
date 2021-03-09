@@ -812,7 +812,7 @@ mutable struct AbsMSeriesRing{T <: RingElement} <: AbstractAlgebra.MSeriesRing{T
 
    function AbsMSeriesRing{T}(R::Ring, poly_ring::MPolyRing{T}, prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where T <: RingElement
       if cached && haskey(AbsMSeriesID, (R, prec, s))
-         return AbsMSeriesID[R, prec, s]::AbsSeriesRing{T}
+         return AbsMSeriesID[R, prec, s]::AbsMSeriesRing{T}
       else
          z = new{T}(R, poly_ring, prec, s)
          if cached
