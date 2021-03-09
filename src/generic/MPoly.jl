@@ -3836,8 +3836,8 @@ end
 @doc Markdown.doc"""
     evaluate(a::MPoly{T}, A::Vector{T}) where {T <: RingElement}
 
-Evaluate the polynomial by substituting in the array of values for each of
-the variables.
+Evaluate the polynomial expression by substituting in the array of values for
+each of the variables.
 """
 function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
    if iszero(a)
@@ -3874,9 +3874,10 @@ end
 @doc Markdown.doc"""
     evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
 
-Evaluate the polynomial by substituting in the array of values for each of
-the variables. The evaluation will succeed if multiplication is defined between elements
-of the coefficient ring of $a$ and elements of the supplied vector.
+Evaluate the polynomial expression by substituting in the array of values for
+each of the variables. The evaluation will succeed if multiplication is
+defined between elements of the coefficient ring of $a$ and elements of the
+supplied vector.
 """
 function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    length(vals) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
@@ -3935,10 +3936,10 @@ end
 @doc Markdown.doc"""
     evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
 
-Evaluate the polynomial by substituting in the supplied values in the array `vals` for
-the corresponding variables with indices given by the array `vars`. The evaluation will
-succeed if multiplication is defined between elements of the coefficient ring of $a$ and
-elements of `vals`.
+Evaluate the polynomial expression by substituting in the supplied values in
+the array `vals` for the corresponding variables with indices given by the
+array `vars`. The evaluation will succeed if multiplication is defined between
+elements of the coefficient ring of $a$ and elements of `vals`.
 """
 function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    unique(vars) != vars && error("Variables not unique")
@@ -4062,10 +4063,10 @@ end
 @doc Markdown.doc"""
     evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
 
-Evaluate the polynomial by substituting in the supplied values in the array `vals` for
-the corresponding variables (supplied as polynomials) given by the array `vars`. The
-evaluation will succeed if multiplication is defined between elements of the coefficient
-ring of $a$ and elements of `vals`.
+Evaluate the polynomial expression by substituting in the supplied values in
+the array `vals` for the corresponding variables (supplied as polynomials)
+given by the array `vars`. The evaluation will succeed if multiplication is
+defined between elements of the coefficient ring of $a$ and elements of `vals`.
 """
 function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
    varidx = Int[var_index(x) for x in vars]
@@ -4087,11 +4088,11 @@ end
 
 Evaluate the polynomial at the supplied values, which may be any ring elements,
 commutative or non-commutative. Evaluation always proceeds in the order of the
-variables as supplied when creating the polynomial ring to which $a$ belongs. The
-evaluation will succeed if a product of a coefficient of the polynomial by all
-of the supplied values in order is defined. Note that this evaluation is more
-general than those provided by the evaluate function. The values do not need to
-be in the same ring, just in compatible rings.
+variables as supplied when creating the polynomial ring to which $a$ belongs.
+The evaluation will succeed if a product of a coefficient of the polynomial by
+all of the supplied values in order is defined. Note that this evaluation is
+more general than those provided by the evaluate function. The values do not
+need to be in the same ring, just in compatible rings.
 """
 function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
@@ -4136,11 +4137,11 @@ end
 @doc Markdown.doc"""
     evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
 
-Evaluate the polynomial at the supplied values, which may be any ring elements,
-commutative or non-commutative, but in the same ring. Evaluation always proceeds
-in the order of the variables as supplied when creating the polynomial ring to
-which $a$ belongs. The evaluation will succeed if a product of a coefficient of
-the polynomial by one of the values is defined.
+Evaluate the polynomial expression at the supplied values, which may be any
+ring elements, commutative or non-commutative, but in the same ring. Evaluation
+always proceeds in the order of the variables as supplied when creating the
+polynomial ring to which $a$ belongs. The evaluation will succeed if a product
+of a coefficient of the polynomial by one of the values is defined.
 """
 function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
    return a(vals...)

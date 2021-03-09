@@ -1713,7 +1713,7 @@ end
 @doc Markdown.doc"""
     evaluate(a::AbstractAlgebra.PolyElem, b::T) where {T <: RingElement}
 
-Evaluate the polynomial $a$ at the value $b$ and return the result.
+Evaluate the polynomial expression $a$ at the value $b$ and return the result.
 """
 function evaluate(a::AbstractAlgebra.PolyElem, b::T) where {T <: RingElement}
    i = length(a)

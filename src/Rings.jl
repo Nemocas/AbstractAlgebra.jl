@@ -151,6 +151,20 @@ end
 
 ###############################################################################
 #
+#   Evaluation
+#
+###############################################################################
+
+function evaluate(x::AbstractAlgebra.PolyElem{T}, y::Integer) where T <: RingElem
+   return evaluate(x, base_ring(x)(y))
+end
+
+function evaluate(x::AbstractAlgebra.MPolyElem{T}, y::Integer) where T <: RingElem
+   return evaluate(x, base_ring(x)(y))
+end
+
+###############################################################################
+#
 #   Delayed reduction
 #
 ###############################################################################

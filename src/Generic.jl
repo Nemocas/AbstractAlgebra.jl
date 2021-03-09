@@ -100,7 +100,6 @@ include("generic/MapCache.jl")
 #
 ###############################################################################
 
-include("generic/Misc/Frac.jl")
 include("generic/Misc/Poly.jl")
 include("generic/Misc/Rings.jl")
 include("generic/Misc/Series.jl")

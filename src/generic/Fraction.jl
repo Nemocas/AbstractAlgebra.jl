@@ -633,6 +633,24 @@ function divides(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T})
    return true, divexact(a, b)
 end
 
+##############################################################################
+#
+#  Evaluation
+#
+##############################################################################
+
+function evaluate(f::FracElem{T}, V::Vector{U}) where {T <: RingElement, U <: RingElement}
+    return evaluate(numerator(f), V)//evaluate(denominator(f), V)
+end
+  
+function evaluate(f::FracElem{T}, v::U) where {T <: RingElement, U <: RingElement}
+    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
+end
+
+function evaluate(f::FracElem{T}, v::U) where {T <: PolyElem, U <: Integer}
+    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
+end
+ 
 ###############################################################################
 #
 #   Powering
