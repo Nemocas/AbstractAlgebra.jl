@@ -117,6 +117,10 @@ function Base.hash(a::AbsMSeries, h::UInt)
     return xor(b, hash(poly(a), h))
 end
 
+function characteristic(a::AbstractAlgebra.MSeriesRing)
+    return characteristic(base_ring(a))
+ end
+
 ###############################################################################
 #
 #   AbstractString I/O
