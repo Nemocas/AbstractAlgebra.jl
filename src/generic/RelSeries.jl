@@ -28,11 +28,6 @@ end
 
 parent_type(::Type{RelSeries{T}}) where T <: RingElement = RelSeriesRing{T}
 
-@doc Markdown.doc"""
-    parent(a::AbstractAlgebra.SeriesElem)
-
-Return the parent of the given power series.
-"""
 parent(a::AbstractAlgebra.SeriesElem) = a.parent
 
 elem_type(::Type{RelSeriesRing{T}}) where T <: RingElement = RelSeries{T}

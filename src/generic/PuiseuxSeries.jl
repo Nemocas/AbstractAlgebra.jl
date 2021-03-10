@@ -45,11 +45,6 @@ parent_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesRingElem{S}} =
 
 parent_type(::Type{T}) where {S <: FieldElement, T <: PuiseuxSeriesFieldElem{S}} = PuiseuxSeriesField{S}
 
-@doc Markdown.doc"""
-    parent(a::Generic.PuiseuxSeriesElem)
-
-Return the parent of the given Puiseux series.
-"""
 parent(a::PuiseuxSeriesElem) = a.parent
 
 elem_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesRing{S}} = PuiseuxSeriesRingElem{S}

@@ -40,11 +40,6 @@ Return the base ring of the polynomial ring of the given polynomial.
 """
 base_ring(a::PolynomialElem) = base_ring(parent(a))
 
-@doc Markdown.doc"""
-    parent(a::Generic.PolynomialElem)
-
-Return the parent of the given polynomial.
-"""
 parent(a::PolynomialElem) = a.parent
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.PolyElem{S}}

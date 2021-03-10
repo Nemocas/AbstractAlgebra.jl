@@ -29,11 +29,6 @@ parent_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRingElem{S}} =
 
 parent_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesFieldElem{S}} = LaurentSeriesField{S}
 
-@doc Markdown.doc"""
-    parent(a::Generic.LaurentSeriesElem)
-
-Return the parent of the given power series.
-"""
 parent(a::LaurentSeriesElem) = a.parent
 
 elem_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRing{S}} = LaurentSeriesRingElem{S}

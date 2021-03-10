@@ -31,11 +31,6 @@ element $a$ belongs to.
 """
 base_ring(a::AbstractAlgebra.FracElem) = base_ring(parent(a))
 
-@doc Markdown.doc"""
-    parent(a::AbstractAlgebra.FracElem)
-
-Return the parent object of the given fraction element.
-"""
 parent(a::AbstractAlgebra.FracElem) = a.parent
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.FracElem{S}}

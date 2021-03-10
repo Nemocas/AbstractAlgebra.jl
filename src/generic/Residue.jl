@@ -31,11 +31,6 @@ element $r$ belongs to.
 """
 base_ring(r::AbstractAlgebra.ResElem) = base_ring(parent(r))
 
-@doc Markdown.doc"""
-    parent(a::AbstractAlgebra.ResElem)
-
-Return the parent object of the given residue element.
-"""
 parent(a::AbstractAlgebra.ResElem) = a.parent
 
 isdomain_type(a::Type{T}) where T <: AbstractAlgebra.ResElem = false

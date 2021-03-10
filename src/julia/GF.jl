@@ -30,11 +30,6 @@ Return `Union{}` as this field is not dependent on another field.
 """
 base_ring(a::GFElem) = Union{}
 
-@doc Markdown.doc"""
-    parent(a::GFElem)
-
-Return the parent of the given finite field element.
-"""
 parent(a::GFElem) = a.parent
 
 isexact_type(::Type{GFElem{T}}) where T <: Integer = true
