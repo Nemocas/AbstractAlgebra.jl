@@ -3568,25 +3568,25 @@ end
 
 @testset "Generic.Mat.printing" begin
    # this is the REPL printing
-   @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
-   @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
+   @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3   1   2]\n[2   0   1]"
+   @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3   1   2]\n[2   0   1]"
    @test sprint(show, "text/plain", matrix(ZZ, 2, 0, [])) == "2 by 0 empty matrix"
    @test sprint(show, "text/plain", matrix(ZZ, 0, 3, [])) == "0 by 3 empty matrix"
    S = MatrixAlgebra(QQ, 3)
    @test sprint(show, "text/plain", S([1 2 3; 4 5 6; 7 8 9])) ==
-      "[1//1  2//1  3//1]\n[4//1  5//1  6//1]\n[7//1  8//1  9//1]"
+      "[1//1   2//1   3//1]\n[4//1   5//1   6//1]\n[7//1   8//1   9//1]"
    @test sprint(show, "text/plain", MatrixAlgebra(QQ, 0)()) == "0 by 0 empty matrix"
    @test sprint(show, "text/plain", similar(matrix(ZZ, [3 1 2; 2 0 1]))) ==
-      "[#undef  #undef  #undef]\n[#undef  #undef  #undef]"
+      "[#undef   #undef   #undef]\n[#undef   #undef   #undef]"
 
-   @test sprint(print, matrix(ZZ, [3 1 2; 2 0 1])) == "[3 1 2; 2 0 1]"
+   @test sprint(show, matrix(ZZ, [3 1 2; 2 0 1])) == "[3 1 2; 2 0 1]"
 
    R, x = PolynomialRing(ZZ, "x")
 
-   @test sprint(show, matrix(R, [-x-1 -x; 2*x+1 -1])) == "[-x-1 -x; 2*x+1 -1]"
+   @test sprint(show, matrix(R, [-x-1 -x; 2*x+1 -1])) == "[-x - 1 -x; 2*x + 1 -1]"
 
    @test sprint(show, "text/plain", matrix(R, [-x-1 -x; x+1 -1])) ==
-                                                       "[-x-1  -x]\n[ x+1  -1]"
+                                                       "[-x - 1   -x]\n[ x + 1   -1]"
 end
 
 @testset "Generic.Mat.array_conversion" begin
