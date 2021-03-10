@@ -32,7 +32,7 @@
    @test isa(S(b), BigFloat)
 end
 
-@testset "Julia.Floats.printing." begin
+@testset "Julia.Floats.printing" begin
    R, x = PolynomialRing(RealField, "x")
 
    @test !occursin("+", string(2*x^2-3*x))
