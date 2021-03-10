@@ -348,11 +348,23 @@ expressify(f::MyElem; context = nothing)
 ```
 
 which must return either `Expr`, `Symbol`, `Integer` or `String`. In case one
-implements `expressify`, one can define the show method for `MyType` as follows:
+implements `expressify`, one can define the following show methods for `MyElem`:
 
 ```julia
-function Base.show(io::IO, a::MyType)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+function Base.show(io::IO, a::MyElem)
+  show_via_expressify(io, a)
+end
+
+function Base.show(io::IO, mi::MIME"text/plain", a::MyElem)
+  show_via_expressify(io, mi, a)
+end
+
+function Base.show(io::IO, mi::MIME"text/latex", a::MyElem)
+  show_via_expressify(io, mi, a)
+end
+
+function Base.show(io::IO, mi::MIME"text/html", a::MyElem)
+  show_via_expressify(io, mi, a)
 end
 ```
 

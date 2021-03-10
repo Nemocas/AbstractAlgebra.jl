@@ -376,23 +376,23 @@ prec_post_SuperscriptBox = 51    # precedence for a^b in 2d form
 mutable struct printer
    io::IO
    array::Vector{String}
-   compact_level::Int
+   terse_level::Int
 end
 
 function printer(io::IO)
    return printer(io, String[], 0)
 end
 
-function ensure_compact(S::printer)
-   S.compact_level = max(1, S.compact_level + 1)
+function ensure_terse(S::printer)
+   S.terse_level = max(1, S.terse_level + 1)
 end
 
-function restore_compact(S::printer)
-   S.compact_level = S.compact_level - 1
+function restore_terse(S::printer)
+   S.terse_level = S.terse_level - 1
 end
 
-function iscompact(S::printer)
-   return S.compact_level > 0 || get(S.io, :compact, false)
+function isterse(S::printer)
+   return S.terse_level > 0 || get(S.io, :terse, false)
 end
 
 function push(S::printer, s::String)
@@ -491,13 +491,11 @@ function printPlus(S::printer, mi::MIME, obj::Expr,
    for i in 3:n
       arg = obj.args[i]
       if isaExprOp(arg, :-, 1)
-         #push(S, iscompact(S) ? "-" : " - ")
-         push(S, " - ")
+         push(S, isterse(S) ? "-" : " - ")
          arg = arg.args[2]
          left_prec = prec_inf_Minus
       else
-         #push(S, iscompact(S) ? "+" : " + ")
-         push(S, " + ")
+         push(S, isterse(S) ? "+" : " + ")
          left_prec = prec_inf_Plus
       end
       right_prec = i + 1 > n ? right :
@@ -520,8 +518,7 @@ function printMinus(S::printer, mi::MIME, obj::Expr,
    elseif n == 2
       printGenericPrefix(S, mi, obj, left, right, "-", prec_pre_Minus)
    else
-      #op = iscompact(S) ? "-" : " - "
-      op = " - "
+      op = isterse(S) ? "-" : " - "
       printGenericInfix(S, mi, obj, left, right, op, prec_inf_Minus, 1)
    end
 end
@@ -541,8 +538,7 @@ function printCall(S::printer, mi::MIME, obj::Expr,
    for i in 2:n
       print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
       if i < n
-         #push(S, iscompact(S) ? "," : ", ")
-         push(S, ", ")
+         push(S, isterse(S) ? "," : ", ")
       end
    end
    push_right_parenthesis(S, mi)
@@ -709,24 +705,24 @@ function print_obj(S::printer, mi::MIME, obj::Expr,
       end
    elseif obj.head == :vcat
       push(S, "[")
-      ensure_compact(S)
+      ensure_terse(S)
       for i in 1:length(obj.args)
          if i > 1
             push(S, "; ")
          end
          print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
       end
-      restore_compact(S)
+      restore_terse(S)
       push(S, "]")
    elseif obj.head == :hcat || obj.head == :row
-      ensure_compact(S)
+      ensure_terse(S)
       for i in 1:length(obj.args)
          if i > 1
             push(S, " ")
          end
          print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
       end
-      restore_compact(S)
+      restore_terse(S)
    else
       push(S, "[??? unknown Expr ???]")
    end

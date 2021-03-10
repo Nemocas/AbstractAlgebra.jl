@@ -3583,7 +3583,7 @@ end
 
    R, x = PolynomialRing(ZZ, "x")
 
-   @test sprint(show, matrix(R, [-x-1 -x; 2*x+1 -1])) == "[-x - 1 -x; 2*x + 1 -1]"
+   @test sprint(show, matrix(R, [-x-1 -x; 2*x+1 -1])) == "[-x-1 -x; 2*x+1 -1]"
 
    @test sprint(show, "text/plain", matrix(R, [-x-1 -x; x+1 -1])) ==
                                                        "[-x - 1   -x]\n[ x + 1   -1]"

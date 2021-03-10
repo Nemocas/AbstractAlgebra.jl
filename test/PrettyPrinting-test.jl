@@ -85,7 +85,7 @@
 
 
    @test canonical_string(:([a b; c d])) == "[a b; c d]"
-   @test canonical_string(:([-a-b -c+d; -a -b-c+d])) == "[-a - b -c + d; -a -b - c + d]"
+   @test canonical_string(:([-a-b -c+d; -a -b-c+d])) == "[-a-b -c+d; -a -b-c+d]"
 
    @test canonical_string(:(if a; b; end;)) isa String
    @test canonical_string(1.2) isa String
@@ -144,5 +144,11 @@
    @test latex_string(:(if a; b; end;)) isa String
    @test latex_string(1.2) isa String
 
+
+   R, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"])
+   p = a + b^2 + c^3
+   @test sprint(show, p) == "a + b^2 + c^3"
+   @test sprint(show, p, context = :compact => true) == "a + b^2 + c^3"
+   @test sprint(show, p, context = :terse => true) == "a+b^2+c^3"
 end
 
