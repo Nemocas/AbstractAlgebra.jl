@@ -79,6 +79,8 @@ zero(R::AbsMSeriesRing) = R(0)
 
 one(R::AbsMSeriesRing) = R(1)
 
+isunit(a::AbsMSeries) = isunit(constant_coefficient(poly(a)))
+
 function gen(R::AbsMSeriesRing, i::Int)
     S = R.poly_ring
     prec = [R.prec_max[ind] for ind in 1:nvars(R)]
@@ -319,7 +321,6 @@ end
 function isequal(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     return precision(x) == precision(y) && poly(x) == poly(y)
 end
-
 
 ###############################################################################
 #

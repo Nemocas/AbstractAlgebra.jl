@@ -362,6 +362,13 @@ end
          @test parent(leading_monomial(f)) == parent(f)
       end
    end
+
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+   @test constant_coefficient(R()) == 0
+   @test constant_coefficient(2x + 1) == 1
+   @test constant_coefficient(2x) == 0
+   @test constant_coefficient(2x^2 + 3y^3 + 4) == 4
 end
 
 @testset "Generic.MPoly.total_degree" begin

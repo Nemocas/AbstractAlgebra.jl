@@ -425,9 +425,10 @@ julia> evaluate(f, [M1, M2, M3])
 [124   149]
 ```
 
-### Leading coefficients, leading monomials and leading terms
+### Leading and constant coefficients, leading monomials and leading terms
 
-The leading coefficient, leading monomial and leading term of a polynomial p are returned by the following functions:
+The leading coefficient, constant coefficient, leading monomial and leading
+term of a polynomial p are returned by the following functions:
 
 ```@docs
 leading_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
@@ -437,6 +438,10 @@ leading_monomial(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 ```@docs
 leading_term(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
+constant_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -450,6 +455,7 @@ leading_term(p)
 leading_monomial(p)
 leading_coefficient(p)
 leading_term(p) == leading_coefficient(p) * leading_monomial(p)
+constant_coefficient(p)
 ```
 
 ### Least common multiple, greatest common divisor

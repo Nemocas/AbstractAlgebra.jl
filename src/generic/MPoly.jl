@@ -852,7 +852,7 @@ end
 @doc Markdown.doc"""
     leading_coefficient(p::MPolyElem)
 
-Return the leading coefficient of the polynomial p.
+Return the leading coefficient of the polynomial $p$.
 """
 function leading_coefficient(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
@@ -863,10 +863,35 @@ function leading_coefficient(p::MPolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
+    constant_coefficient(p::MPolyElem)
+
+Return the constant coefficient of the polynomial $p$ or zero if it doesn't
+have one.
+"""
+function constant_coefficient(p::MPolyElem)
+   if !iszero(p)
+      for (c, v) in zip(coeffs(p), exponent_vectors(p))
+         if iszero(v)
+            return c
+         end
+      end
+   end
+   return zero(base_ring(p))
+end
+
+function constant_coefficient(p::MPoly)
+   len = length(p)
+   if !iszero(p) && iszero(exponent_vector(p, len))
+      return coeff(p, len)
+   end
+   return zero(base_ring(p))
+end
+
+@doc Markdown.doc"""
     monomial(x::MPoly, i::Int)
 
 Return the monomial of the $i$-th term of the polynomial (as a polynomial
-of length $1$ with coefficient $1$.
+of length $1$ with coefficient $1$).
 """
 function monomial(x::MPoly, i::Int)
    R = base_ring(x)
