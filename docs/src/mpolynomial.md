@@ -409,20 +409,20 @@ julia> S = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
 julia> M1 = S([1 2; 3 4])
-[1  2]
-[3  4]
+[1   2]
+[3   4]
 
 julia> M2 = S([2 3; 1 -1])
-[2   3]
-[1  -1]
+[2    3]
+[1   -1]
 
 julia> M3 = S([-1 1; 1 1])
-[-1  1]
-[ 1  1]
+[-1   1]
+[ 1   1]
 
 julia> evaluate(f, [M1, M2, M3])
-[ 64   83]
-[124  149]
+[ 64    83]
+[124   149]
 ```
 
 ### Leading coefficients, leading monomials and leading terms

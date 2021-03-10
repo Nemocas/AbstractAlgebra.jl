@@ -174,7 +174,7 @@ dim(::Generic.YoungTableau)
 
 The character associated with `Y.part` can also be used to compute the dimension, but as it is expected the Murnaghan-Nakayama is much slower even though (due to caching) consecutive calls are fast:
 
-```jldoctest
+```julia
 julia> λ = Partition(collect(12:-1:1))
 12₁11₁10₁9₁8₁7₁6₁5₁4₁3₁2₁1₁
 
@@ -190,7 +190,7 @@ julia> G = SymmetricGroup(sum(λ))
 Full symmetric group over 78 elements
 
 julia> @time character(λ, one(G))
- 24.154105 seconds (58.13 M allocations: 3.909 GiB, 42.84% gc time)
+  0.000046 seconds (115 allocations: 16.391 KiB)
 9079590132732747656880081324531330222983622187548672000
 
 julia> @time character(λ, one(G))

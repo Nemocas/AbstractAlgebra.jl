@@ -638,7 +638,11 @@ function expressify(a::MatrixElem; context = nothing)
 end
 
 function Base.show(io::IO, a::MatrixElem)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+   show_via_expressify(io, a)
+end
+
+function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem)
+   show_via_expressify(io, mi, a)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem)
@@ -662,7 +666,7 @@ function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem)
          s = ' '^(maxs[j] - length(s)) * s
          print(io, s)
          if j != c
-            print(io, "  ")
+            print(io, "   ")
          end
       end
       print(io, "]")
@@ -6101,13 +6105,13 @@ zeroes elsewhere. If `n` is not specified, it defaults to `m`.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> diagonal_matrix(ZZ(2), 2, 3)
-[2  0  0]
-[0  2  0]
+[2   0   0]
+[0   2   0]
 
 julia> diagonal_matrix(QQ(-1), 3)
-[-1//1   0//1   0//1]
-[ 0//1  -1//1   0//1]
-[ 0//1   0//1  -1//1]
+[-1//1    0//1    0//1]
+[ 0//1   -1//1    0//1]
+[ 0//1    0//1   -1//1]
 ```
 """
 function diagonal_matrix(x::RingElement, m::Int, n::Int)
@@ -6153,8 +6157,8 @@ Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> A = ZZ[1 2 3; 4 5 6]
-[1  2  3]
-[4  5  6]
+[1   2   3]
+[4   5   6]
 
 julia> Matrix(A)
 2×3 Array{BigInt,2}:
@@ -6172,8 +6176,8 @@ Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = ZZ["x"]; A = R[x^0 x^1; x^2 x^3]
-[  1    x]
-[x^2  x^3]
+[  1     x]
+[x^2   x^3]
 
 julia> Array(A)
 2×2 Array{AbstractAlgebra.Generic.Poly{BigInt},2}:

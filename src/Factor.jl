@@ -109,12 +109,16 @@ function expressify(@nospecialize(a::Fac); context = nothing)
    return prod
 end
 
-function Base.show(io::IO, ::MIME"text/plain", a::Fac)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+function Base.show(io::IO, mi::MIME"text/plain", a::Fac)
+   show_via_expressify(io, mi, a)
+end
+
+function Base.show(io::IO, mi::MIME"text/html", a::Fac)
+   show_via_expressify(io, mi, a)
 end
 
 function Base.show(io::IO, a::Fac)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+   show_via_expressify(io, a)
 end
 
 ################################################################################

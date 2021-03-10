@@ -81,19 +81,19 @@ julia> S = MatrixAlgebra(R, 3)
 Matrix Algebra of degree 3 over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S()
-[0  0  0]
-[0  0  0]
-[0  0  0]
+[0   0   0]
+[0   0   0]
+[0   0   0]
 
 julia> B = S(12)
-[12   0   0]
-[ 0  12   0]
-[ 0   0  12]
+[12    0    0]
+[ 0   12    0]
+[ 0    0   12]
 
 julia> C = S(R(11))
-[11   0   0]
-[ 0  11   0]
-[ 0   0  11]
+[11    0    0]
+[ 0   11    0]
+[ 0    0   11]
 
 ```
 
@@ -152,9 +152,9 @@ julia> S = MatrixAlgebra(R, 3)
 Matrix Algebra of degree 3 over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-[t + 1      t            1]
-[  t^2      t            t]
-[   -2  t + 2  t^2 + t + 1]
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
 
 julia> n = degree(A)
 3
