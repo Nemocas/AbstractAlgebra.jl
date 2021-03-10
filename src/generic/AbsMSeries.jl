@@ -305,6 +305,24 @@ end
 
 ###############################################################################
 #
+#   Comparison
+#
+###############################################################################
+
+function ==(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
+    prec = min.(precision(x), precision(y))
+    p1 = truncate_poly(poly(x), prec)
+    p2 = truncate_poly(poly(y), prec)
+    return p1 == p2
+end
+
+function isequal(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
+    return precision(x) == precision(y) && poly(x) == poly(y)
+end
+
+
+###############################################################################
+#
 #   Parent object call overload
 #
 ###############################################################################
