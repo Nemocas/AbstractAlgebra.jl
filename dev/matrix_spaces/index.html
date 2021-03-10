@@ -9,55 +9,55 @@ julia&gt; T = MatrixAlgebra(QQ, 2)
 Matrix Algebra of degree 2 over Rationals
 
 julia&gt; M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
-[2//1  3//1  1//1]
-[1//1  0//1  4//1]
+[2//1   3//1   1//1]
+[1//1   0//1   4//1]
 
 julia&gt; M2 = S(BigInt[2 3 1; 1 0 4])
-[2//1  3//1  1//1]
-[1//1  0//1  4//1]
+[2//1   3//1   1//1]
+[1//1   0//1   4//1]
 
 julia&gt; M3 = S(BigInt[2, 3, 1, 1, 0, 4])
-[2//1  3//1  1//1]
-[1//1  0//1  4//1]
+[2//1   3//1   1//1]
+[1//1   0//1   4//1]
 
 julia&gt; N1 = T(Rational{BigInt}[2 3; 1 0])
-[2//1  3//1]
-[1//1  0//1]
+[2//1   3//1]
+[1//1   0//1]
 
 julia&gt; N2 = T(BigInt[2 3; 1 0])
-[2//1  3//1]
-[1//1  0//1]
+[2//1   3//1]
+[1//1   0//1]
 
 julia&gt; N3 = T(BigInt[2, 3, 1, 1])
-[2//1  3//1]
-[1//1  1//1]
+[2//1   3//1]
+[1//1   1//1]
 </code></pre><p>It is also possible to create matrices (in a matrix space only) directly, without first creating the corresponding matrix space (the inner constructor being called directly). Note that to support this, matrix space parent objects don&#39;t contain a reference to their parent. Instead, parents are constructed on-the-fly if requested. (The same strategy is used for matrix algebras.)</p><pre><code class="language-julia">matrix(R::Ring, arr::Array{T, 2}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Given an <span>$m\times n$</span> Julia matrix of entries, construct the corresponding AbstractAlgebra.jl matrix over the given ring <code>R</code>, assuming all the entries can be coerced into <code>R</code>.</p><pre><code class="language-julia">matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Construct the given <span>$r\times c$</span> AbstractAlgebra.jl matrix over the ring <code>R</code> whose <span>$(i, j)$</span> entry is given by <code>A[c*(i - 1) + j]</code>, assuming that all the entries can be coerced into <code>R</code>.</p><pre><code class="language-julia">zero_matrix(R::Ring, r::Int, c::Int)</code></pre><p>Construct the <span>$r\times c$</span> AbstractAlgebra.jl zero matrix over the ring <code>R</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
-[3  1  2]
-[2  0  1]
+[3   1   2]
+[2   0   1]
 
 julia&gt; N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
-[3  1]
-[2  2]
-[0  1]
+[3   1]
+[2   2]
+[0   1]
 
 julia&gt; P = zero_matrix(ZZ, 3, 2)
-[0  0]
-[0  0]
-[0  0]
+[0   0]
+[0   0]
+[0   0]
 
 julia&gt; R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
 julia&gt; M = R()
-[0  0]
-[0  0]</code></pre><h3 id="Views"><a class="docs-heading-anchor" href="#Views">Views</a><a id="Views-1"></a><a class="docs-heading-anchor-permalink" href="#Views" title="Permalink"></a></h3><p>Just as Julia supports views of matrices, AbstractAlgebra requires all matrix types to support views. These allow one to work with a submatrix of a given matrix. Modifying the submatrix also modifies the original matrix.</p><p>Note that <code>deepcopy</code> of a view type must return the same type, but it should return a view into a <code>deepcopy</code> of the original matrix. Julia enforces this for consistency.</p><p>To support views, generic matrices in AbstractAlgebra of type <code>Generic.MatSpaceElem</code> have an associated <code>Generic.MatSpaceView</code> type. Both belong to the <code>Generic.Mat</code> abstract type, so that one can work with that in functions that can accept both views and actual matrices.</p><p>The syntax for views is as for Julia&#39;s own views.</p><p>Note that the <code>parent_type</code> function returns the same type for a view as for the original matrix type. This could potentially cause a problem if the <code>elem_type</code> function is applied to the return value of <code>parent_type</code> and then used in a type assertion. For this reason, there may be some limitations on the use of views.</p><p>The <code>similar</code> function also returns a matrix of type <code>MatSpaceElem</code> when applied to a view, rather than another view.</p><pre><code class="language-julia">M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
+[0   0]
+[0   0]</code></pre><h3 id="Views"><a class="docs-heading-anchor" href="#Views">Views</a><a id="Views-1"></a><a class="docs-heading-anchor-permalink" href="#Views" title="Permalink"></a></h3><p>Just as Julia supports views of matrices, AbstractAlgebra requires all matrix types to support views. These allow one to work with a submatrix of a given matrix. Modifying the submatrix also modifies the original matrix.</p><p>Note that <code>deepcopy</code> of a view type must return the same type, but it should return a view into a <code>deepcopy</code> of the original matrix. Julia enforces this for consistency.</p><p>To support views, generic matrices in AbstractAlgebra of type <code>Generic.MatSpaceElem</code> have an associated <code>Generic.MatSpaceView</code> type. Both belong to the <code>Generic.Mat</code> abstract type, so that one can work with that in functions that can accept both views and actual matrices.</p><p>The syntax for views is as for Julia&#39;s own views.</p><p>Note that the <code>parent_type</code> function returns the same type for a view as for the original matrix type. This could potentially cause a problem if the <code>elem_type</code> function is applied to the return value of <code>parent_type</code> and then used in a type assertion. For this reason, there may be some limitations on the use of views.</p><p>The <code>similar</code> function also returns a matrix of type <code>MatSpaceElem</code> when applied to a view, rather than another view.</p><pre><code class="language-julia">M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
 
 N1 = @view M[1:2, :]
 N2 = @view M[:, 1:2]
 
 R = N1*N2</code></pre><h3 id="Basic-manipulation-of-matrices"><a class="docs-heading-anchor" href="#Basic-manipulation-of-matrices">Basic manipulation of matrices</a><a id="Basic-manipulation-of-matrices-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-manipulation-of-matrices" title="Permalink"></a></h3><pre><code class="language-julia">dense_matrix_type(::Type{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the type of dense matrices whose entries have the given type. E.g. in Nemo, which depends on AbstractAlgebra, we define <code>dense_matrix_type(::Type{fmpz}) = fmpz_mat</code>.</p><pre><code class="language-julia">nrows(f::MyMat{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the number of rows of the given matrix.</p><pre><code class="language-julia">ncols(f::MyMat{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the number of columns of the given matrix.</p><pre><code class="language-julia">getindex(M::MyMat{T}, r::Int, c::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the <span>$(i, j)$</span>-th entry of the matrix <span>$M$</span>.</p><pre><code class="language-julia">setindex!(M::MyMat{T}, d::T, r::Int, c::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Set the <span>$(i, j)$</span>-th entry of the matrix <span>$M$</span> to <span>$d$</span>, which is assumed to be in the base ring of the matrix. The matrix must have such an entry and the matrix is mutated in place and not returned from the function.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
-[2  3  0]
-[1  1  1]
+[2   3   0]
+[1   1   1]
 
 julia&gt; m = nrows(M)
 2
@@ -77,74 +77,74 @@ julia&gt; S = MatrixSpace(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia&gt; A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-[t + 1      t            1]
-[  t^2      t            t]
-[   -2  t + 2  t^2 + t + 1]
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
 
 julia&gt; B = transpose(A)
-[t + 1  t^2           -2]
-[    t    t        t + 2]
-[    1    t  t^2 + t + 1]
+[t + 1   t^2            -2]
+[    t     t         t + 2]
+[    1     t   t^2 + t + 1]
 
 julia&gt; C = A&#39;
-[t + 1  t^2           -2]
-[    t    t        t + 2]
-[    1    t  t^2 + t + 1]
+[t + 1   t^2            -2]
+[    t     t         t + 2]
+[    1     t   t^2 + t + 1]
 </code></pre><h2 id="Optional-functionality-for-matrices"><a class="docs-heading-anchor" href="#Optional-functionality-for-matrices">Optional functionality for matrices</a><a id="Optional-functionality-for-matrices-1"></a><a class="docs-heading-anchor-permalink" href="#Optional-functionality-for-matrices" title="Permalink"></a></h2><p>Especially when wrapping C libraries, some functions are best implemented directly, rather than relying on the generic functionality. The following are all provided by the AbstractAlgebra.jl generic code, but can optionally be implemented directly for performance reasons.</p><h3 id="Optional-submatrices"><a class="docs-heading-anchor" href="#Optional-submatrices">Optional submatrices</a><a id="Optional-submatrices-1"></a><a class="docs-heading-anchor-permalink" href="#Optional-submatrices" title="Permalink"></a></h3><p>The following are only available for matrix spaces, not for matrix algebras.</p><pre><code class="language-julia">Base.getindex(M::MyMat, rows::AbstractVector{Int}, cols::AbstractVector{Int})</code></pre><p>Return a new matrix with the same entries as the submatrix with the given range of rows and columns.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
-[1  2  3]
-[2  3  4]
-[3  4  5]
+[1   2   3]
+[2   3   4]
+[3   4   5]
 
 julia&gt; N1 = M[1:2, :]
-[1  2  3]
-[2  3  4]
+[1   2   3]
+[2   3   4]
 
 julia&gt; N2 = M[:, :]
-[1  2  3]
-[2  3  4]
-[3  4  5]
+[1   2   3]
+[2   3   4]
+[3   4   5]
 
 julia&gt; N3 = M[2:3, 2:3]
-[3  4]
-[4  5]
+[3   4]
+[4   5]
 </code></pre><h3 id="Optional-row-swapping"><a class="docs-heading-anchor" href="#Optional-row-swapping">Optional row swapping</a><a id="Optional-row-swapping-1"></a><a class="docs-heading-anchor-permalink" href="#Optional-row-swapping" title="Permalink"></a></h3><pre><code class="language-julia">swap_rows!(M::MyMat{T}, i::Int, j::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Swap the rows of <code>M</code> in place. The function returns the mutated matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = identity_matrix(ZZ, 3)
-[1  0  0]
-[0  1  0]
-[0  0  1]
+[1   0   0]
+[0   1   0]
+[0   0   1]
 
 julia&gt; swap_rows!(M, 1, 2)
-[0  1  0]
-[1  0  0]
-[0  0  1]
+[0   1   0]
+[1   0   0]
+[0   0   1]
 </code></pre><h3 id="Optional-concatenation"><a class="docs-heading-anchor" href="#Optional-concatenation">Optional concatenation</a><a id="Optional-concatenation-1"></a><a class="docs-heading-anchor-permalink" href="#Optional-concatenation" title="Permalink"></a></h3><p>The following are only available for matrix spaces, not for matrix algebras.</p><pre><code class="language-julia">hcat(M::MyMat{T}, N::MyMat{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the horizontal concatenation of <span>$M$</span> and <span>$N$</span>. It is assumed that the number of rows of <span>$M$</span> and <span>$N$</span> are the same.</p><pre><code class="language-julia">vcat(M::MyMat{T}, N::MyMat{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the vertical concatenation of <span>$M$</span> and <span>$N$</span>. It is assumed that the number of columns of <span>$M$</span> and <span>$N$</span> are the same.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
-[1  2  3]
-[2  3  4]
-[3  4  5]
+[1   2   3]
+[2   3   4]
+[3   4   5]
 
 julia&gt; N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
-[1  0  1]
-[0  1  0]
-[1  0  1]
+[1   0   1]
+[0   1   0]
+[1   0   1]
 
 julia&gt; P = hcat(M, N)
-[1  2  3  1  0  1]
-[2  3  4  0  1  0]
-[3  4  5  1  0  1]
+[1   2   3   1   0   1]
+[2   3   4   0   1   0]
+[3   4   5   1   0   1]
 
 julia&gt; Q = vcat(M, N)
-[1  2  3]
-[2  3  4]
-[3  4  5]
-[1  0  1]
-[0  1  0]
-[1  0  1]
+[1   2   3]
+[2   3   4]
+[3   4   5]
+[1   0   1]
+[0   1   0]
+[1   0   1]
 </code></pre><h3 id="Optional-similar-and-zero"><a class="docs-heading-anchor" href="#Optional-similar-and-zero">Optional similar and zero</a><a id="Optional-similar-and-zero-1"></a><a class="docs-heading-anchor-permalink" href="#Optional-similar-and-zero" title="Permalink"></a></h3><p>The following functions are available for matrices in both matrix algebras and matrix spaces. Both <code>similar</code> and <code>zero</code> construct new matrices, with the same methods, but the entries are either undefined with <code>similar</code> or zero-initialized with <code>zero</code>.</p><pre><code class="language-julia">similar(x::MyMat{T}, R::Ring=base_ring(x)) where T &lt;: AbstractAlgebra.RingElem
 zero(x::MyMat{T}, R::Ring=base_ring(x)) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Construct the matrix with the same dimensions as the given matrix, and the same base ring unless explicitly specified.</p><pre><code class="language-julia">similar(x::MyMat{T}, R::Ring, r::Int, c::Int) where T &lt;: AbstractAlgebra.RingElem
 similar(x::MyMat{T}, r::Int, c::Int) where T &lt;: AbstractAlgebra.RingElem
 zero(x::MyMat{T}, R::Ring, r::Int, c::Int) where T &lt;: AbstractAlgebra.RingElem
 zero(x::MyMat{T}, r::Int, c::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Construct the <span>$r\times c$</span> matrix with <code>R</code> as base ring (which defaults to the base ring of the the given matrix). If <span>$x$</span> belongs to a matrix algebra and <span>$r \neq c$</span>, an exception is raised, and it&#39;s also possible to specify only one <code>Int</code> as the order (e.g. <code>similar(x, n)</code>).</p><p>Custom matrices and rings may choose which specific matrix type is best-suited to return for the given ring and dimensionality. If they do not specialize these functions, the default is a <code>Generic.MatSpaceElem</code> matrix, or <code>Generic.MatAlgElem</code> for matrix algebras. The default implementation of <code>zero</code> calls out to <code>similar</code>, so it&#39;s generally sufficient to specialize only <code>similar</code>. For both <code>similar</code> and <code>zero</code>, only the most general method has to be implemented (e.g. <code>similar(x::MyMat, R::Ring, r::Int, c::Int)</code>, as all other methods (which have defaults) call out to this more general method.</p><pre><code class="language-julia">Base.isassigned(M::MyMat, i, j)</code></pre><p>Test whether the given matrix has a value associated with indices <code>i</code> and <code>j</code>. It is recommended to overload this method for custom matrices.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
-[3  1  2]
-[2  0  1]
+[3   1   2]
+[2   0   1]
 
 julia&gt; isassigned(M, 1, 2)
 true
@@ -153,42 +153,42 @@ julia&gt; isassigned(M, 4, 4)
 false
 
 julia&gt; A = similar(M)
-[#undef  #undef  #undef]
-[#undef  #undef  #undef]
+[#undef   #undef   #undef]
+[#undef   #undef   #undef]
 
 julia&gt; isassigned(A, 1, 2)
 false
 
 julia&gt; B = zero(M)
-[0  0  0]
-[0  0  0]
+[0   0   0]
+[0   0   0]
 
 julia&gt; C = similar(M, 4, 5)
-[#undef  #undef  #undef  #undef  #undef]
-[#undef  #undef  #undef  #undef  #undef]
-[#undef  #undef  #undef  #undef  #undef]
-[#undef  #undef  #undef  #undef  #undef]
+[#undef   #undef   #undef   #undef   #undef]
+[#undef   #undef   #undef   #undef   #undef]
+[#undef   #undef   #undef   #undef   #undef]
+[#undef   #undef   #undef   #undef   #undef]
 
 julia&gt; base_ring(B)
 Integers
 
 julia&gt; D = zero(M, QQ, 2, 2)
-[0//1  0//1]
-[0//1  0//1]
+[0//1   0//1]
+[0//1   0//1]
 
 julia&gt; base_ring(D)
 Rationals</code></pre><h3 id="Optional-symmetry-test"><a class="docs-heading-anchor" href="#Optional-symmetry-test">Optional symmetry test</a><a id="Optional-symmetry-test-1"></a><a class="docs-heading-anchor-permalink" href="#Optional-symmetry-test" title="Permalink"></a></h3><pre><code class="language-julia">LinearAlgebra.issymmetric(a::MatrixElem)</code></pre><p>Return <code>true</code> if the given matrix is symmetric with respect to its main diagonal, otherwise return <code>false</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
-[1  2  3]
-[2  4  5]
-[3  5  6]
+[1   2   3]
+[2   4   5]
+[3   5   6]
 
 julia&gt; issymmetric(M)
 true
 
 julia&gt; N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
-[1  2  3]
-[4  5  6]
-[7  8  9]
+[1   2   3]
+[4   5   6]
+[7   8   9]
 
 julia&gt; issymmetric(N)
-false</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../module_homomorphism/">« Module Homomorphisms</a><a class="docs-footer-nextpage" href="../matrix/">Generic matrices »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 10 March 2021 15:12">Wednesday 10 March 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+false</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../module_homomorphism/">« Module Homomorphisms</a><a class="docs-footer-nextpage" href="../matrix/">Generic matrices »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 10 March 2021 16:39">Wednesday 10 March 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
