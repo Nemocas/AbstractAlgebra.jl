@@ -76,7 +76,7 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3*x+1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> f = S()
 0
@@ -110,7 +110,7 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3*x+1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
 x + 1
@@ -137,7 +137,7 @@ julia> V = base_ring(f)
 Univariate Polynomial Ring in x over Rationals
 
 julia> T = parent(f)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3*x+1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> f == deepcopy(f)
 true
@@ -174,7 +174,7 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3*x+1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> r = S(x + 1)
 x + 1
@@ -200,7 +200,7 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3*x+1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
 x + 1
@@ -223,7 +223,7 @@ julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3*x+1
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
 x + 1

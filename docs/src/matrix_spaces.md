@@ -107,28 +107,28 @@ julia> T = MatrixAlgebra(QQ, 2)
 Matrix Algebra of degree 2 over Rationals
 
 julia> M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
-[2//1  3//1  1//1]
-[1//1  0//1  4//1]
+[2//1   3//1   1//1]
+[1//1   0//1   4//1]
 
 julia> M2 = S(BigInt[2 3 1; 1 0 4])
-[2//1  3//1  1//1]
-[1//1  0//1  4//1]
+[2//1   3//1   1//1]
+[1//1   0//1   4//1]
 
 julia> M3 = S(BigInt[2, 3, 1, 1, 0, 4])
-[2//1  3//1  1//1]
-[1//1  0//1  4//1]
+[2//1   3//1   1//1]
+[1//1   0//1   4//1]
 
 julia> N1 = T(Rational{BigInt}[2 3; 1 0])
-[2//1  3//1]
-[1//1  0//1]
+[2//1   3//1]
+[1//1   0//1]
 
 julia> N2 = T(BigInt[2 3; 1 0])
-[2//1  3//1]
-[1//1  0//1]
+[2//1   3//1]
+[1//1   0//1]
 
 julia> N3 = T(BigInt[2, 3, 1, 1])
-[2//1  3//1]
-[1//1  1//1]
+[2//1   3//1]
+[1//1   1//1]
 
 ```
 
@@ -165,25 +165,25 @@ Construct the $r\times c$ AbstractAlgebra.jl zero matrix over the ring `R`.
 
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
-[3  1  2]
-[2  0  1]
+[3   1   2]
+[2   0   1]
 
 julia> N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
-[3  1]
-[2  2]
-[0  1]
+[3   1]
+[2   2]
+[0   1]
 
 julia> P = zero_matrix(ZZ, 3, 2)
-[0  0]
-[0  0]
-[0  0]
+[0   0]
+[0   0]
+[0   0]
 
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
 julia> M = R()
-[0  0]
-[0  0]
+[0   0]
+[0   0]
 ```
 
 ### Views
@@ -261,8 +261,8 @@ in place and not returned from the function.
 
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
-[2  3  0]
-[1  1  1]
+[2   3   0]
+[1   1   1]
 
 julia> m = nrows(M)
 2
@@ -297,19 +297,19 @@ julia> S = MatrixSpace(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-[t+1    t        1]
-[t^2    t        t]
-[ -2  t+2  t^2+t+1]
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
 
 julia> B = transpose(A)
-[t+1  t^2       -2]
-[  t    t      t+2]
-[  1    t  t^2+t+1]
+[t + 1   t^2            -2]
+[    t     t         t + 2]
+[    1     t   t^2 + t + 1]
 
 julia> C = A'
-[t+1  t^2       -2]
-[  t    t      t+2]
-[  1    t  t^2+t+1]
+[t + 1   t^2            -2]
+[    t     t         t + 2]
+[    1     t   t^2 + t + 1]
 
 ```
 
@@ -335,22 +335,22 @@ and columns.
 
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
-[1  2  3]
-[2  3  4]
-[3  4  5]
+[1   2   3]
+[2   3   4]
+[3   4   5]
 
 julia> N1 = M[1:2, :]
-[1  2  3]
-[2  3  4]
+[1   2   3]
+[2   3   4]
 
 julia> N2 = M[:, :]
-[1  2  3]
-[2  3  4]
-[3  4  5]
+[1   2   3]
+[2   3   4]
+[3   4   5]
 
 julia> N3 = M[2:3, 2:3]
-[3  4]
-[4  5]
+[3   4]
+[4   5]
 
 ```
 
@@ -367,14 +367,14 @@ matrices are assumed to be mutable in AbstractAlgebra.jl).
 
 ```jldoctest
 julia> M = identity_matrix(ZZ, 3)
-[1  0  0]
-[0  1  0]
-[0  0  1]
+[1   0   0]
+[0   1   0]
+[0   0   1]
 
 julia> swap_rows!(M, 1, 2)
-[0  1  0]
-[1  0  0]
-[0  0  1]
+[0   1   0]
+[1   0   0]
+[0   0   1]
 
 ```
 
@@ -400,27 +400,27 @@ columns of $M$ and $N$ are the same.
 
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
-[1  2  3]
-[2  3  4]
-[3  4  5]
+[1   2   3]
+[2   3   4]
+[3   4   5]
 
 julia> N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
-[1  0  1]
-[0  1  0]
-[1  0  1]
+[1   0   1]
+[0   1   0]
+[1   0   1]
 
 julia> P = hcat(M, N)
-[1  2  3  1  0  1]
-[2  3  4  0  1  0]
-[3  4  5  1  0  1]
+[1   2   3   1   0   1]
+[2   3   4   0   1   0]
+[3   4   5   1   0   1]
 
 julia> Q = vcat(M, N)
-[1  2  3]
-[2  3  4]
-[3  4  5]
-[1  0  1]
-[0  1  0]
-[1  0  1]
+[1   2   3]
+[2   3   4]
+[3   4   5]
+[1   0   1]
+[0   1   0]
+[1   0   1]
 
 ```
 
@@ -470,8 +470,8 @@ It is recommended to overload this method for custom matrices.
 
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
-[3  1  2]
-[2  0  1]
+[3   1   2]
+[2   0   1]
 
 julia> isassigned(M, 1, 2)
 true
@@ -480,28 +480,28 @@ julia> isassigned(M, 4, 4)
 false
 
 julia> A = similar(M)
-[#undef  #undef  #undef]
-[#undef  #undef  #undef]
+[#undef   #undef   #undef]
+[#undef   #undef   #undef]
 
 julia> isassigned(A, 1, 2)
 false
 
 julia> B = zero(M)
-[0  0  0]
-[0  0  0]
+[0   0   0]
+[0   0   0]
 
 julia> C = similar(M, 4, 5)
-[#undef  #undef  #undef  #undef  #undef]
-[#undef  #undef  #undef  #undef  #undef]
-[#undef  #undef  #undef  #undef  #undef]
-[#undef  #undef  #undef  #undef  #undef]
+[#undef   #undef   #undef   #undef   #undef]
+[#undef   #undef   #undef   #undef   #undef]
+[#undef   #undef   #undef   #undef   #undef]
+[#undef   #undef   #undef   #undef   #undef]
 
 julia> base_ring(B)
 Integers
 
 julia> D = zero(M, QQ, 2, 2)
-[0//1  0//1]
-[0//1  0//1]
+[0//1   0//1]
+[0//1   0//1]
 
 julia> base_ring(D)
 Rationals
@@ -519,17 +519,17 @@ otherwise return `false`.
 
 ```jldoctest
 julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
-[1  2  3]
-[2  4  5]
-[3  5  6]
+[1   2   3]
+[2   4   5]
+[3   5   6]
 
 julia> issymmetric(M)
 true
 
 julia> N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
-[1  2  3]
-[4  5  6]
-[7  8  9]
+[1   2   3]
+[4   5   6]
+[7   8   9]
 
 julia> issymmetric(N)
 false
