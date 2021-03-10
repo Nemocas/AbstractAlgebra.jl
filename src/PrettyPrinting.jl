@@ -491,11 +491,13 @@ function printPlus(S::printer, mi::MIME, obj::Expr,
    for i in 3:n
       arg = obj.args[i]
       if isaExprOp(arg, :-, 1)
-         push(S, iscompact(S) ? "-" : " - ")
+         #push(S, iscompact(S) ? "-" : " - ")
+         push(S, " - ")
          arg = arg.args[2]
          left_prec = prec_inf_Minus
       else
-         push(S, iscompact(S) ? "+" : " + ")
+         #push(S, iscompact(S) ? "+" : " + ")
+         push(S, " + ")
          left_prec = prec_inf_Plus
       end
       right_prec = i + 1 > n ? right :
@@ -518,7 +520,8 @@ function printMinus(S::printer, mi::MIME, obj::Expr,
    elseif n == 2
       printGenericPrefix(S, mi, obj, left, right, "-", prec_pre_Minus)
    else
-      op = iscompact(S) ? "-" : " - "
+      #op = iscompact(S) ? "-" : " - "
+      op = " - "
       printGenericInfix(S, mi, obj, left, right, op, prec_inf_Minus, 1)
    end
 end
@@ -538,7 +541,8 @@ function printCall(S::printer, mi::MIME, obj::Expr,
    for i in 2:n
       print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
       if i < n
-         push(S, iscompact(S) ? "," : ", ")
+         #push(S, iscompact(S) ? "," : ", ")
+         push(S, ", ")
       end
    end
    push_right_parenthesis(S, mi)

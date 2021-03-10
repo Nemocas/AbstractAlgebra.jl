@@ -666,7 +666,7 @@ function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem)
          s = ' '^(maxs[j] - length(s)) * s
          print(io, s)
          if j != c
-            print(io, "  ")
+            print(io, "   ")
          end
       end
       print(io, "]")
