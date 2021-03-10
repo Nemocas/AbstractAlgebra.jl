@@ -690,6 +690,34 @@ function Base.inv(a::AbstractAlgebra.AbsSeriesElem)
    return ainv
 end
 
+function Base.inv(a::AbsSeriesElem{T}) where T <: FieldElement
+    prec = precision(a)
+    @assert valuation(a) == 0
+    @assert prec != 0
+    R = parent(a)
+    x = R(inv(coeff(a, 0)))
+    set_precision!(x, 1)
+    la = [prec]
+    while la[end] > 1
+        push!(la, div(la[end] + 1, 2))
+    end 
+    two = R(2)
+    two = set_precision!(two, prec)
+    n = length(la) - 1
+    y = R()
+    minus_a = -a
+    while n > 0
+        # x -> x*(2 - xa) is the lifting recursion
+        x = set_precision!(x, la[n])
+        y = set_precision!(y, la[n])
+        y = mul!(y, minus_a, x)
+        y = addeq!(y, two)
+        x = mul!(x, x, y)
+        n -= 1 
+    end
+    return x
+end
+
 ###############################################################################
 #
 #   Square root

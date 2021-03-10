@@ -641,6 +641,19 @@ end
        @test f*inv(f) == 1
     end
 
+    # Exact field
+    for prec = 1:10
+       R, x = PowerSeriesRing(QQ, prec, "x")
+       for iter = 1:30
+          f = R()
+          while valuation(f) != 0
+             f = rand(R, 0:0, -10:10)
+          end
+
+          @test f*inv(f) == 1
+       end
+    end
+
     # Inexact field
     R, x = PowerSeriesRing(RealField, 10, "x")
     for iter = 1:300
