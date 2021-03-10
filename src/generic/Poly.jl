@@ -220,6 +220,17 @@ function isgen(a::PolynomialElem)
     return length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 end
 
+
+@doc Markdown.doc"""
+    ismonic(a::Generic.PolyElem)
+
+Return `true` if the given polynomial is monic, i.e. has leading coefficient
+equal to one, otherwise return `false`.
+"""
+function ismonic(a::PolyElem)
+    return isone(lead(a))
+end
+
 @doc Markdown.doc"""
     isunit(a::Generic.PolynomialElem)
 

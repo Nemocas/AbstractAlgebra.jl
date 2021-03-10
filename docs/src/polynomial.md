@@ -266,6 +266,10 @@ isgen(::PolyElem)
 ```
 
 ```@docs
+ismonic(::PolyElem)
+```
+
+```@docs
 isunit(::PolyElem)
 ```
 
