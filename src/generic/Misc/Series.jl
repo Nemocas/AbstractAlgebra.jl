@@ -1,40 +1,5 @@
 ###############################################################################
 #
-#  Inversion
-#
-###############################################################################
-
-function Base.inv(a::RelSeriesElem{T}) where T <: FieldElement
-    @assert valuation(a) == 0
-    # x -> x*(2-xa) is the lifting recursion
-    x = parent(a)(inv(coeff(a, 0)))
-    set_precision!(x, 1)
-    p = precision(a)
-    la = [p]
-    while la[end] > 1
-        push!(la, div(la[end] + 1, 2))
-    end
-  
-    two = parent(a)(base_ring(a)(2))
-    set_precision!(two, p)
-  
-    n = length(la) - 1
-    y = parent(a)()
-    while n > 0
-        set_precision!(x, la[n])
-        set_precision!(y, la[n])
-        #    y = mul!(y, a, x)
-        #    y = two-y #sub! is missing...
-        #    x = mul!(x, x, y)
-        #    then why not negate a before the loop?
-        x = x*(two - x*a)
-        n -= 1 
-    end
-    return x
-end
-
-###############################################################################
-#
 #  Transcendental functions
 #
 ###############################################################################
