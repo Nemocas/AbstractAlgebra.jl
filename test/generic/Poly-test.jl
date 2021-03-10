@@ -134,6 +134,14 @@ end
 
    @test isunit(one(S))
 
+   @test ismonic(R(1))
+   @test ismonic(x^2 + 3)
+   @test ismonic(y^2 + x*y + 1)
+   @test !ismonic(x^2*y + 3x + 1)
+   @test !ismonic(x^2*y + 3x + 2y + 1)
+   @test !ismonic(-R(1))
+   @test !ismonic(-2x^2*y + 3x + 2y + 1)
+
    f = 2x*y + x^2 + 1
 
    @test lead(f) == 2x

@@ -4,10 +4,6 @@
 #
 ##############################################################################
 
-function ismonic(a::PolyElem)
-    return isone(lead(a))
-end
-
 function ispower(a::PolyElem, n::Int)
     # not the best algorithm... but it works generically
     # probably a equal-degree-factorisation would be good + some more gcd's
