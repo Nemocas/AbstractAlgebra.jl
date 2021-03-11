@@ -199,7 +199,7 @@ Return true if $a$ is zero, else return false.
 julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
 (Puiseux series field in x over Rationals, x + O(x^11))
 
-julia> T(0)
+julia> a = T(0)
 O(x^10)
 
 julia> iszero(a)
