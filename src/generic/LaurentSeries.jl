@@ -310,12 +310,6 @@ its current precision, otherwise return `false`.
 """
 iszero(a::LaurentSeriesElem) = pol_length(a) == 0
 
-@doc Markdown.doc"""
-    isone(a::Generic.LaurentSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to one to
-its current precision, otherwise return `false`.
-"""
 function isone(a::LaurentSeriesElem)
    return valuation(a) == 0 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end

@@ -158,6 +158,39 @@ function zero end
 
 ###############################################################################
 #
+#   Special elements
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    isone(a::T)
+
+Return true if $a$ is an identity, else return false.
+
+# Example
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S = MatrixSpace(ZZ, 2, 2); T = MatrixSpace(ZZ, 2, 3); U = MatrixSpace(ZZ, 3, 2);
+
+julia> isone(S([1 0; 0 1]))
+true
+
+julia> isone(T([1 0 0; 0 1 0]))
+false
+
+julia> isone(U([1 0; 0 1; 0 0]))
+false
+
+julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
+(Puiseux series field in x over Rationals, x + O(x^11))
+
+julia> isone(x), isone(1 + 0 * x)
+(false, true)
+```
+"""
+function isone end
+
+###############################################################################
+#
 #   More generic functions
 #
 ###############################################################################

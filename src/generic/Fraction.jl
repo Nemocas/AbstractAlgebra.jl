@@ -119,12 +119,6 @@ belongs to, otherwise return `false`.
 """
 iszero(a::AbstractAlgebra.FracElem) = iszero(numerator(a, false))
 
-@doc Markdown.doc"""
-    isone(a::AbstractAlgebra.FracElem)
-
-Return `true` if the supplied element $a$ is one in the fraction field it
-belongs to, otherwise return `false`.
-"""
 isone(a::AbstractAlgebra.FracElem) = numerator(a, false) == denominator(a, false)
 
 @doc Markdown.doc"""

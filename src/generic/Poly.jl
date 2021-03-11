@@ -167,12 +167,6 @@ Return `true` if the given polynomial is zero, otherwise return `false`.
 """
 iszero(a::PolynomialElem) = length(a) == 0
 
-@doc Markdown.doc"""
-    isone(a::Generic.PolynomialElem)
-
-Return `true` if the given polynomial is the constant polynomial $1$,
-otherwise return `false`.
-"""
 isone(a::PolynomialElem) = length(a) == 1 && isone(coeff(a, 0))
 
 @doc Markdown.doc"""

@@ -113,12 +113,6 @@ belongs to, otherwise return `false`.
 """
 iszero(a::AbstractAlgebra.ResFieldElem) = iszero(data(a))
 
-@doc Markdown.doc"""
-    isone(a::AbstractAlgebra.ResFieldElem)
-
-Return `true` if the supplied element $a$ is one in the residue ring it
-belongs to, otherwise return `false`.
-"""
 isone(a::AbstractAlgebra.ResFieldElem) = isone(data(a))
 
 @doc Markdown.doc"""

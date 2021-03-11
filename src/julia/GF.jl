@@ -60,11 +60,6 @@ Return true if the given element of the finite field is zero.
 """
 iszero(a::GFElem{T}) where T <: Integer = a.d == 0
 
-@doc Markdown.doc"""
-    isone(a::GFElem{T}) where T <: Integer
-
-Return true if the given element of the finite field is one.
-"""
 isone(a::GFElem{T}) where T <: Integer = a.d == 1
 
 @doc Markdown.doc"""

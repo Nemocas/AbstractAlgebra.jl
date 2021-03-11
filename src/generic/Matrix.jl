@@ -245,12 +245,6 @@ function iszero(a::MatrixElem)
   return true
 end
 
-@doc Markdown.doc"""
-    isone(a::Generic.MatrixElem)
-
-Return `true` if `a` is an identity matrix, i.e. if $a$ is a diagonal square matrix
-with ones along the diagonal and zeros elsewhere.
-"""
 function isone(a::MatrixElem)
    issquare(a) || return false
    for i = 1:nrows(a)

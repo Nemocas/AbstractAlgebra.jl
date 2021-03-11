@@ -155,12 +155,6 @@ its current precision, otherwise return `false`.
 """
 iszero(a::AbstractAlgebra.RelSeriesElem) = pol_length(a) == 0
 
-@doc Markdown.doc"""
-    isone(a::AbstractAlgebra.RelSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to one to
-its current precision, otherwise return `false`.
-"""
 function isone(a::AbstractAlgebra.RelSeriesElem)
    return valuation(a) == 0 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end

@@ -87,12 +87,6 @@ belongs to, otherwise return `false`.
 """
 iszero(a::AbstractAlgebra.ResElem) = iszero(data(a))
 
-@doc Markdown.doc"""
-    isone(a::AbstractAlgebra.ResElem)
-
-Return `true` if the supplied element $a$ is one in the residue ring it
-belongs to, otherwise return `false`.
-"""
 isone(a::AbstractAlgebra.ResElem) = isone(data(a))
 
 @doc Markdown.doc"""

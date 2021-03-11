@@ -74,12 +74,6 @@ its current precision, otherwise return `false`.
 """
 iszero(a::SeriesElem) = length(a) == 0
 
-@doc Markdown.doc"""
-    isone(a::AbsSeries)
-
-Return `true` if the given power series is arithmetically equal to one to
-its current precision, otherwise return `false`.
-"""
 function isone(a::AbsSeries)
    return (length(a) == 1 && isone(coeff(a, 0))) || precision(a) == 0
 end
