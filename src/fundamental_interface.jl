@@ -107,9 +107,7 @@ function base_ring end
 @doc Markdown.doc"""
     gen(a::T)
 
-Return element(s) generating parent $a$. If multiple generators are possible,
-it returns an array. If always possible to write as a single generator, it
-returns a single element.
+Return element generating parent $a$.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -121,6 +119,17 @@ x
 ```
 """
 function gen end
+
+@doc Markdown.doc"""
+    gens(a::T)
+
+Return elements generating parent $a$ in an array.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+```
+"""
+function gens end
 
 # TODO: Move from CRT from Hecke to AbstractAlgebra?
 # Currently no implementation, only example on how the arbitrary inputs `crt`
