@@ -813,6 +813,32 @@ end
    @test isequal(a, -3*x*s + 6*x*s^2 + 9*x*s^3 + O(s^4))
 end
 
+@testset "Generic.RelSeries.derivative_integral" begin
+   # Exact field
+   S, x = PowerSeriesRing(QQ, 10, "x")
+
+   for iter = 1:100
+      f = rand(S, 0:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      set_precision!(const_coeff, precision(f))
+
+      @test isequal(integral(derivative(f)) + const_coeff, f)
+   end
+
+   # Inexact field
+   S, x = PowerSeriesRing(RealField, 10, "x")
+
+   for iter = 1:100
+      f = rand(S, 0:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      set_precision!(const_coeff, precision(f))
+
+      @test isapprox(integral(derivative(f)) + const_coeff, f)
+   end
+end
+
 @testset "Generic.RelSeries.special_functions" begin
    # Exact field
    S, x = PowerSeriesRing(QQ, 10, "x")
@@ -832,6 +858,8 @@ end
       g *= x
 
       @test isequal(exp(f)*exp(g), exp(f + g))
+
+      @test isequal(log(exp(f)), f)
    end
 
    # Inexact field

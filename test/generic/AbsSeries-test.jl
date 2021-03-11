@@ -775,6 +775,32 @@ end
    end
 end
 
+@testset "Generic.AbsSeries.derivative_integral" begin
+   # Exact field
+   S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
+
+   for iter = 1:100
+      f = rand(S, 0:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      set_precision!(const_coeff, precision(f))
+
+      @test isequal(integral(derivative(f)) + const_coeff, f)
+   end
+
+   # Inexact field
+   S, x = PowerSeriesRing(RealField, 10, "x"; model=:capped_absolute)
+
+   for iter = 1:100
+      f = rand(S, 0:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      set_precision!(const_coeff, precision(f))
+
+      @test isapprox(integral(derivative(f)) + const_coeff, f)
+   end
+end
+
 @testset "Generic.AbsSeries.special_functions" begin
    # Exact field
    S, x = PowerSeriesRing(QQ, 10, "x", model=:capped_absolute)
@@ -794,6 +820,7 @@ end
       g *= x
 
       @test isequal(exp(f)*exp(g), exp(f + g))
+      @test isequal(log(exp(f)), f)
    end
 
    # Inexact field

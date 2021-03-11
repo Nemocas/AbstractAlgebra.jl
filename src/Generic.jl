@@ -103,7 +103,6 @@ include("generic/MapCache.jl")
 
 include("generic/Misc/Poly.jl")
 include("generic/Misc/Rings.jl")
-include("generic/Misc/Series.jl")
 include("generic/Misc/Localization.jl")
 
 end # generic

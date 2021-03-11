@@ -482,7 +482,37 @@ julia> d = inv(b)
 
 ```
 
+### Derivative and integral
+
+```@docs
+derivative(a::RelSeriesElem)
+```
+
+```@docs
+integral(a::RelSeriesElem)
+```
+
+**Examples**
+
+```jldoctest
+julia> R, x = PowerSeriesRing(QQ, 10, "x")
+(Univariate Polynomial Ring in x over Rationals, x + O(x^11))
+
+julia> f = 2 + x + 3x^3
+2 + x + 3*x^3 + O(x^10)
+
+julia> derivative(f)
+1 + 9*x^2 + O(x^9)
+
+julia> integral(f)
+2*x + 1//2*x^2 + 3//4*x^4 + O(x^11)
+```
+
 ### Special functions
+
+```@docs
+Base.log(a::SeriesElem)
+```
 
 ```@docs
 Base.exp(a::RelSeriesElem)
@@ -519,6 +549,9 @@ julia> d = divexact(x, exp(x + O(x^40)) - 1)
 
 julia> f = exp(b)
 1 + z + 5//2*z^2 + 43//6*z^3 + 193//24*z^4 + O(z^5)
+
+julia> log(exp(b)) == b
+true
 
 julia> h = sqrt(a)
 1 + 1//2*z + 11//8*z^2 - 11//16*z^3 - 77//128*z^4 + O(z^5)
