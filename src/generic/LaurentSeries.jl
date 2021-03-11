@@ -316,23 +316,11 @@ ring $R$.
 """
 one(R::LaurentSeriesRing) = R(1)
 
-@doc Markdown.doc"""
-    gen(R::LaurentSeriesRing)
-
-Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
-$n$ is the maximum precision of the power series ring $R$.
-"""
 function gen(R::LaurentSeriesRing)
    S = base_ring(R)
    return R([S(1)], 1, max_precision(R) + 1, 1, 1)
 end
 
-@doc Markdown.doc"""
-    gen(R::LaurentSeriesField)
-
-Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
-$n$ is the maximum precision of the power series ring $R$.
-"""
 function gen(R::LaurentSeriesField)
    S = base_ring(R)
    return R([S(1)], 1, max_precision(R) + 1, 1, 1)

@@ -61,12 +61,6 @@ function coeff(a::AbsSeries, n::Int)
    return n >= length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
 
-@doc Markdown.doc"""
-    gen(R::AbsSeriesRing{T}) where T <: RingElement
-
-Return the generator of the power series ring, i.e. $x + O(x^n)$ where
-$n$ is the precision of the power series ring $R$.
-"""
 function gen(R::AbsSeriesRing{T}) where T <: RingElement
    S = base_ring(R)
    return R([S(0), S(1)], 2, max_precision(R))
