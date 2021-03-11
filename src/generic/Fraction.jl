@@ -115,12 +115,6 @@ iszero(a::AbstractAlgebra.FracElem) = iszero(numerator(a, false))
 
 isone(a::AbstractAlgebra.FracElem) = numerator(a, false) == denominator(a, false)
 
-@doc Markdown.doc"""
-    isunit(a::AbstractAlgebra.FracElem)
-
-Return `true` if the supplied element $a$ is invertible in the fraction field
-it belongs to, i.e. the numerator is nonzero, otherwise return `false`.
-"""
 isunit(a::AbstractAlgebra.FracElem) = !iszero(numerator(a, false))
 
 function deepcopy_internal(a::Frac{T}, dict::IdDict) where {T <: RingElem}

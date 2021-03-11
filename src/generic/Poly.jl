@@ -185,12 +185,6 @@ function ismonic(a::PolyElem)
     return isone(lead(a))
 end
 
-@doc Markdown.doc"""
-    isunit(a::Generic.PolynomialElem)
-
-Return `true` if the given polynomial is a unit in its polynomial ring,
-otherwise return `false`.
-"""
 isunit(a::PolynomialElem) = length(a) == 1 && isunit(coeff(a, 0))
 
 ###############################################################################

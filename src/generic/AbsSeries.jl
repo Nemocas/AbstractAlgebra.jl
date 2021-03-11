@@ -84,12 +84,6 @@ function isgen(a::AbsSeries)
            precision(a) == 0
 end
 
-@doc Markdown.doc"""
-    isunit(a::AbstractAlgebra.AbsSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to a unit,
-i.e. is invertible, otherwise return `false`.
-"""
 isunit(a::AbstractAlgebra.AbsSeriesElem) = valuation(a) == 0 && isunit(coeff(a, 0))
 
 @doc Markdown.doc"""

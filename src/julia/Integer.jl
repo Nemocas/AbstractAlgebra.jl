@@ -36,11 +36,6 @@ zero(::Integers{T}) where T <: Integer = T(0)
 
 one(::Integers{T}) where T <: Integer = T(1)
 
-@doc Markdown.doc"""
-    isunit(a::Integer)
-
-Return `true` if $a$ is $1$ or $-1$.
-"""
 isunit(a::Integer) = a == 1 || a == -1
 
 canonical_unit(a::T) where T <: Integer = a < 0 ? T(-1) : T(1)

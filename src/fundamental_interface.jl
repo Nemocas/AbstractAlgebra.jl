@@ -183,7 +183,7 @@ false
 julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
 (Puiseux series field in x over Rationals, x + O(x^11))
 
-julia> isone(x), isone(1 + 0 * x)
+julia> isone(x), isone(T(1))
 (false, true)
 ```
 """
@@ -199,14 +199,33 @@ Return true if $a$ is zero, else return false.
 julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
 (Puiseux series field in x over Rationals, x + O(x^11))
 
-julia> a = x * 0
-O(x^11)
+julia> T(0)
+O(x^10)
 
 julia> iszero(a)
 true
 ```
 """
 function iszero end
+
+@doc Markdown.doc"""
+    isunit(a::T)
+
+Return true if $a$ is invertable, else return false.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia> isunit(x), isunit(S(1)), isunit(S(4))
+(false, true, true)
+
+julia> isunit(ZZ(-1)), isunit(ZZ(4))
+(true, false)
+```
+"""
+function isunit end
 
 ###############################################################################
 #

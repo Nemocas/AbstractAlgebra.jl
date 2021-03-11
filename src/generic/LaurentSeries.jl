@@ -319,12 +319,6 @@ function isgen(a::LaurentSeriesElem)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-@doc Markdown.doc"""
-    isunit(a::Generic.LaurentSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to a unit,
-i.e. is invertible, otherwise return `false`.
-"""
 isunit(a::LaurentSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a, 0))
 
 @doc Markdown.doc"""

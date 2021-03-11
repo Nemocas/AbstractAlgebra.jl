@@ -109,12 +109,6 @@ iszero(a::AbstractAlgebra.ResFieldElem) = iszero(data(a))
 
 isone(a::AbstractAlgebra.ResFieldElem) = isone(data(a))
 
-@doc Markdown.doc"""
-    isunit(a::AbstractAlgebra.ResFieldElem)
-
-Return `true` if the supplied element $a$ is invertible in the residue ring
-it belongs to, otherwise return `false`.
-"""
 function isunit(a::AbstractAlgebra.ResFieldElem)
    g = gcd(data(a), modulus(a))
    return isone(g)

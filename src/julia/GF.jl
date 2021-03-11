@@ -57,12 +57,6 @@ iszero(a::GFElem{T}) where T <: Integer = a.d == 0
 
 isone(a::GFElem{T}) where T <: Integer = a.d == 1
 
-@doc Markdown.doc"""
-    isunit(a::GFElem)
-
-Return `true` if the given finite field element is invertible, i.e. nonzero,
-otherwise return `false`.
-"""
 isunit(a::GFElem) = a.d != 0
 
 @doc Markdown.doc"""

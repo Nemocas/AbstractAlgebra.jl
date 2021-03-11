@@ -187,12 +187,6 @@ function isgen(a::PuiseuxSeriesElem)
    return valuation(a) == 1 && pol_length(a.data) == 1 && isone(polcoeff(a.data, 0))
 end
 
-@doc Markdown.doc"""
-    isunit(a::Generic.PuiseuxSeriesElem)
-
-Return `true` if the given Puiseux series is arithmetically equal to a unit,
-i.e. is invertible, otherwise return `false`.
-"""
 isunit(a::PuiseuxSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a.data, 0))
 
 @doc Markdown.doc"""
