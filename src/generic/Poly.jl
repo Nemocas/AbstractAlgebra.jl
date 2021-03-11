@@ -152,11 +152,6 @@ function trail(a::PolynomialElem)
    end
 end
 
-@doc Markdown.doc"""
-    zero(R::AbstractAlgebra.PolyRing)
-
-Return the zero polynomial in the given polynomial ring.
-"""
 zero(R::AbstractAlgebra.PolyRing) = R(0)
 
 one(R::AbstractAlgebra.PolyRing) = R(1)

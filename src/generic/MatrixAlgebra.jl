@@ -70,11 +70,6 @@ Return the degree $n$ of the given matrix algebra.
 """
 degree(a::AbstractAlgebra.MatAlgebra) = nrows(a)
 
-@doc Markdown.doc"""
-    zero(a::AbstractAlgebra.MatAlgebra)
-
-Construct the zero matrix in the given matrix algebra.
-"""
 zero(a::AbstractAlgebra.MatAlgebra) = a()
 
 one(a::AbstractAlgebra.MatAlgebra) = a(1)

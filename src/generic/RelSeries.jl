@@ -138,12 +138,6 @@ function coeff(a::AbstractAlgebra.RelSeriesElem, n::Int)
    end
 end
 
-@doc Markdown.doc"""
-    zero(R::SeriesRing)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 zero(R::SeriesRing) = R(0)
 
 one(R::SeriesRing) = R(1)

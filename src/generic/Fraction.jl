@@ -107,11 +107,6 @@ function Base.denominator(a::AbstractAlgebra.FracElem, canonicalise::Bool=true)
    return Base.denominator(a) # all other types ignore canonicalise
 end
 
-@doc Markdown.doc"""
-    zero(R::AbstractAlgebra.FracField)
-
-Return $0/1$ in the given fraction field.
-"""
 zero(R::AbstractAlgebra.FracField) = R(0)
 
 one(R::AbstractAlgebra.FracField) = R(1)

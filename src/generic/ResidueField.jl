@@ -101,12 +101,6 @@ end
 
 data(a::AbstractAlgebra.ResFieldElem) = a.data
 
-@doc Markdown.doc"""
-    zero(R::AbstractAlgebra.ResField)
-
-Return the zero element of the given residue ring, i.e. $0 \pmod{a}$ where
-$a$ is the modulus of the residue ring.
-"""
 zero(R::AbstractAlgebra.ResField) = R(0)
 
 one(R::AbstractAlgebra.ResField) = R(1)

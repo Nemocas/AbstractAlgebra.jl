@@ -210,11 +210,6 @@ function Base.isassigned(a::MatrixElem, i, j)
     end
 end
 
-@doc Markdown.doc"""
-    zero(a::AbstractAlgebra.MatSpace)
-
-Construct the zero matrix in the given matrix space.
-"""
 zero(a::AbstractAlgebra.MatSpace) = a()
 
 zero(x::MatrixElem, R::Ring, r::Int, c::Int) = zero!(similar(x, R, r, c))

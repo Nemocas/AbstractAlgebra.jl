@@ -18,11 +18,6 @@ export iscompatible, issubmodule, isisomorphic, rels
   return (v.v)::dense_matrix_type(T)
 end
 
-@doc Markdown.doc"""
-    zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
-
-Return the zero element of the module $M$.
-"""
 function zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
    R = base_ring(M)
    return M(T[zero(R) for i in 1:ngens(M)])

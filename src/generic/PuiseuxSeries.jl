@@ -152,20 +152,8 @@ function coeff(a::PuiseuxSeriesElem, r::Rational{Int})
    return coeff(a.data, n*div(s, d))
 end
 
-@doc Markdown.doc"""
-    zero(R::PuiseuxSeriesRing)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the Puiseux series
-ring $R$.
-"""
 zero(R::PuiseuxSeriesRing) = R(0)
 
-@doc Markdown.doc"""
-    zero(R::PuiseuxSeriesField)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the Puiseux series
-ring $R$.
-"""
 zero(R::PuiseuxSeriesField) = R(0)
 
 one(R::PuiseuxSeriesField) = R(1)

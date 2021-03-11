@@ -72,11 +72,6 @@ end
 
 coeff(a::NCPoly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
-@doc Markdown.doc"""
-    zero(R::AbstractAlgebra.NCPolyRing)
-
-Return the zero polynomial in the given polynomial ring.
-"""
 zero(R::AbstractAlgebra.NCPolyRing) = R(0)
 
 one(R::AbstractAlgebra.NCPolyRing) = R(1)

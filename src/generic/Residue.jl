@@ -75,12 +75,6 @@ end
 
 data(a::AbstractAlgebra.ResElem) = a.data
 
-@doc Markdown.doc"""
-    zero(R::AbstractAlgebra.ResRing)
-
-Return the zero element of the given residue ring, i.e. $0 \pmod{a}$ where
-$a$ is the modulus of the residue ring.
-"""
 zero(R::AbstractAlgebra.ResRing) = R(0)
 
 one(R::AbstractAlgebra.ResRing) = R(1)

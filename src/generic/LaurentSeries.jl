@@ -284,20 +284,8 @@ function upscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
    return z
 end
 
-@doc Markdown.doc"""
-    zero(R::LaurentSeriesRing)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 zero(R::LaurentSeriesRing) = R(0)
 
-@doc Markdown.doc"""
-    zero(R::LaurentSeriesField)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 zero(R::LaurentSeriesField) = R(0)
 
 one(R::LaurentSeriesField) = R(1)

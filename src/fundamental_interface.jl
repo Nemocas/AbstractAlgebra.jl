@@ -133,6 +133,29 @@ julia> one(G)
 """
 function one end
 
+@doc Markdown.doc"""
+    zero(a::T)
+
+Return the zero or additive identity in the family of $a$.
+
+# Example
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S = MatrixAlgebra(QQ, 2)
+Matrix Algebra of degree 2 over Rationals
+
+julia> zero(S)
+[0//1   0//1]
+[0//1   0//1]
+
+julia> R, x = PolynomialRing(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> zero(x^3 + 2)
+0
+```
+"""
+function zero end
+
 ###############################################################################
 #
 #   More generic functions

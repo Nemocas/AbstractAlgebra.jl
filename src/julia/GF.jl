@@ -41,11 +41,6 @@ function Base.hash(a::GFElem, h::UInt)
    return xor(xor(hash(a.d), h), b)
 end
 
-@doc Markdown.doc"""
-    zero(R::GFField{T}) where T <: Integer
-
-Return the additive identity, zero, in the given finite field.
-"""
 function zero(R::GFField{T}) where T <: Integer
    return GFElem{T}(T(0), R)
 end
