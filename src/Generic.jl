@@ -34,10 +34,10 @@ import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
                           isexact_type, isdomain_type, Map, promote_rule
 
 import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring, check_parent,
-                          denominator, div, divrem, exp, gen, gens, inv, isgen,
-                          ismonomial, ismonomial_recursive, isunit, lead,
-                          show_via_expressify,
-                          numerator, trail, sqrt, expressify, factor
+                          denominator, div, divrem, elem_type, exp, expressify,
+                          factor, gen, gens, inv, isgen, ismonomial,
+                          ismonomial_recursive, isunit, lead, numerator,
+                          parent_type, show_via_expressify, sqrt, trail
 
 using ..AbstractAlgebra
 

@@ -28,4 +28,3 @@ end
 # Deprecated in 0.13.5
 
 @deprecate powmod(x, y, z) powermod(x, y, z)
-
