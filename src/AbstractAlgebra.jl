@@ -393,6 +393,7 @@ include("fundamental_interface.jl")
 
 include("algorithms/LaurentPoly.jl")
 include("algorithms/FinField.jl")
+include("algorithms/GenericFunctions.jl")
 
 ###############################################################################
 #
