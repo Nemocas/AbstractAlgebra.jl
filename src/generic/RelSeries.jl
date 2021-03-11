@@ -147,12 +147,6 @@ function gen(R::RelSeriesRing)
    return R([S(1)], 1, max_precision(R) + 1, 1)
 end
 
-@doc Markdown.doc"""
-    iszero(a::AbstractAlgebra.RelSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to zero to
-its current precision, otherwise return `false`.
-"""
 iszero(a::AbstractAlgebra.RelSeriesElem) = pol_length(a) == 0
 
 function isone(a::AbstractAlgebra.RelSeriesElem)

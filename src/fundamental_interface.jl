@@ -81,7 +81,7 @@ parent_type(T::DataType) = throw(MethodError(parent_type, (T,)))
 
 Return base ring $R$ of given element or parent $a$.
 
-# Example
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
@@ -109,7 +109,7 @@ function base_ring end
 
 Return the (multiplicative) identity in the family of $a$.
 
-# Example
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S = MatrixSpace(ZZ, 2, 2)
 Matrix Space of 2 rows and 2 columns over Integers
@@ -138,7 +138,7 @@ function one end
 
 Return the zero or additive identity in the family of $a$.
 
-# Example
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S = MatrixAlgebra(QQ, 2)
 Matrix Algebra of degree 2 over Rationals
@@ -158,7 +158,7 @@ function zero end
 
 ###############################################################################
 #
-#   Special elements
+#   Basic manipulation
 #
 ###############################################################################
 
@@ -167,7 +167,7 @@ function zero end
 
 Return true if $a$ is an identity, else return false.
 
-# Example
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S = MatrixSpace(ZZ, 2, 2); T = MatrixSpace(ZZ, 2, 3); U = MatrixSpace(ZZ, 3, 2);
 
@@ -188,6 +188,25 @@ julia> isone(x), isone(1 + 0 * x)
 ```
 """
 function isone end
+
+@doc Markdown.doc"""
+    iszero(a::T)
+
+Return true if $a$ is zero, else return false.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
+(Puiseux series field in x over Rationals, x + O(x^11))
+
+julia> a = x * 0
+O(x^11)
+
+julia> iszero(a)
+true
+```
+"""
+function iszero end
 
 ###############################################################################
 #

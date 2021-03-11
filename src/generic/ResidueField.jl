@@ -105,12 +105,6 @@ zero(R::AbstractAlgebra.ResField) = R(0)
 
 one(R::AbstractAlgebra.ResField) = R(1)
 
-@doc Markdown.doc"""
-    iszero(a::AbstractAlgebra.ResFieldElem)
-
-Return `true` if the supplied element $a$ is zero in the residue ring it
-belongs to, otherwise return `false`.
-"""
 iszero(a::AbstractAlgebra.ResFieldElem) = iszero(data(a))
 
 isone(a::AbstractAlgebra.ResFieldElem) = isone(data(a))

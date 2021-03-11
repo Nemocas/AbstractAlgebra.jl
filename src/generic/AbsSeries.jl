@@ -66,12 +66,6 @@ function gen(R::AbsSeriesRing{T}) where T <: RingElement
    return R([S(0), S(1)], 2, max_precision(R))
 end
 
-@doc Markdown.doc"""
-    iszero(a::SeriesElem)
-
-Return `true` if the given power series is arithmetically equal to zero to
-its current precision, otherwise return `false`.
-"""
 iszero(a::SeriesElem) = length(a) == 0
 
 function isone(a::AbsSeries)

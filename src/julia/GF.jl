@@ -53,11 +53,6 @@ function gen(R::GFField{T}) where T <: Integer
       return GFElem{T}(T(1), R)
 end
 
-@doc Markdown.doc"""
-    iszero(a::GFElem{T}) where T <: Integer
-
-Return true if the given element of the finite field is zero.
-"""
 iszero(a::GFElem{T}) where T <: Integer = a.d == 0
 
 isone(a::GFElem{T}) where T <: Integer = a.d == 1

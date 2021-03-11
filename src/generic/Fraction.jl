@@ -111,12 +111,6 @@ zero(R::AbstractAlgebra.FracField) = R(0)
 
 one(R::AbstractAlgebra.FracField) = R(1)
 
-@doc Markdown.doc"""
-    iszero(a::AbstractAlgebra.FracElem)
-
-Return `true` if the supplied element $a$ is zero in the fraction field it
-belongs to, otherwise return `false`.
-"""
 iszero(a::AbstractAlgebra.FracElem) = iszero(numerator(a, false))
 
 isone(a::AbstractAlgebra.FracElem) = numerator(a, false) == denominator(a, false)

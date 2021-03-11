@@ -23,11 +23,6 @@ function zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
    return M(T[zero(R) for i in 1:ngens(M)])
 end
 
-@doc Markdown.doc"""
-    iszero(v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
-
-Return true if $v$ is the zero element of the module $M$.
-"""
 function iszero(v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
    return iszero(_matrix(v))
 end

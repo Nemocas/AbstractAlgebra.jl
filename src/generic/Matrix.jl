@@ -228,12 +228,6 @@ one(a::AbstractAlgebra.MatSpace) = check_square(a)(1)
 
 one(a::MatElem) = identity_matrix(a)
 
-@doc Markdown.doc"""
-    iszero(a::Generic.MatrixElem)
-
-Return `true` if the supplied matrix $a$ is the zero matrix, otherwise
-return `false`.
-"""
 function iszero(a::MatrixElem)
    for i = 1:nrows(a)
       for j = 1:ncols(a)

@@ -170,12 +170,6 @@ function gen(R::PuiseuxSeriesField)
    return R(gen(S), 1)
 end
 
-@doc Markdown.doc"""
-    iszero(a::Generic.PuiseuxSeriesElem)
-
-Return `true` if the given Puiseux series is arithmetically equal to zero to
-its current precision, otherwise return `false`.
-"""
 iszero(a::PuiseuxSeriesElem) = iszero(a.data)
 
 function isone(a::PuiseuxSeriesElem)

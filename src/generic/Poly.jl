@@ -160,11 +160,6 @@ gen(R::AbstractAlgebra.PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
 gens(R::AbstractAlgebra.PolyRing) = [gen(R)]
 
-@doc Markdown.doc"""
-    iszero(a::Generic.PolynomialElem)
-
-Return `true` if the given polynomial is zero, otherwise return `false`.
-"""
 iszero(a::PolynomialElem) = length(a) == 0
 
 isone(a::PolynomialElem) = length(a) == 1 && isone(coeff(a, 0))

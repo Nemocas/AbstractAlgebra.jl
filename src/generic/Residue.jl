@@ -79,12 +79,6 @@ zero(R::AbstractAlgebra.ResRing) = R(0)
 
 one(R::AbstractAlgebra.ResRing) = R(1)
 
-@doc Markdown.doc"""
-    iszero(a::AbstractAlgebra.ResElem)
-
-Return `true` if the supplied element $a$ is zero in the residue ring it
-belongs to, otherwise return `false`.
-"""
 iszero(a::AbstractAlgebra.ResElem) = iszero(data(a))
 
 isone(a::AbstractAlgebra.ResElem) = isone(data(a))
