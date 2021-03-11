@@ -23,6 +23,10 @@
          @test isa(gens(S)[j], MPolyElem)
       end
 
+      f = rand(S, 0:5, [rand(0:100) for k in 1:num_vars])
+
+      @test isa(f, MPolyElem)
+
       f =  rand(S, 0:5, 0:100, 0:0, -100:100)
 
       @test isa(f, MPolyElem)
