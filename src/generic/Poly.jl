@@ -173,11 +173,6 @@ Return the generator of the given polynomial ring.
 """
 gen(R::AbstractAlgebra.PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
-@doc Markdown.doc"""
-    gens(R::AbstractAlgebra.PolyRing)
-
-Return an array containing the generator of the given polynomial ring.
-"""
 gens(R::AbstractAlgebra.PolyRing) = [gen(R)]
 
 @doc Markdown.doc"""
