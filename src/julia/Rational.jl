@@ -201,6 +201,15 @@ function exp(a::Rational{T}) where T <: Integer
    return Rational{T}(1)
 end
 
+@doc Markdown.doc"""
+    log(a::Rational{T}) where T <: Integer
+
+Return $0$ if $a = 1$, otherwise throw an exception.
+"""
+function log(a::Rational{T}) where T <: Integer
+   a != 1 && throw(DomainError(a, "a must be 1"))
+end
+
 ###############################################################################
 #
 #   Unsafe functions

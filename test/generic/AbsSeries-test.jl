@@ -820,7 +820,14 @@ end
       g *= x
 
       @test isequal(exp(f)*exp(g), exp(f + g))
+      
       @test isequal(log(exp(f)), f)
+      
+      while !isone(coeff(f, 0))
+         f = rand(S, 0:0, -10:10)
+      end
+
+      @test isequal(exp(log(f)), f)
    end
 
    # Inexact field
@@ -841,6 +848,15 @@ end
       g *= x
 
       @test isapprox(exp(f)*exp(g), exp(f + g))
+
+      @test isapprox(log(exp(f)), f)
+
+      while coeff(f, 0) <= 0
+	 f = rand(S, 0:0, -10:10)
+      end
+
+      @test isapprox(exp(log(f)), f)
+
    end
 
    # Non-integral domain

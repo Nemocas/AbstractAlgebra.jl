@@ -194,7 +194,18 @@ generally of use to the user, but is used internally in AbstractAlgebra.jl.
 function exp(a::T) where T <: Integer
     a != 0 && throw(DomainError(a, "a must be 0"))
     return T(1)
- end
+end
+
+@doc Markdown.doc"""
+    log(a::T) where T <: Integer
+
+Return $0$ if $a = 1$, otherwise throw an exception. This function is not
+generally of use to the user, but is used internally in AbstractAlgebra.jl.
+"""
+function log(a::T) where T <: Integer
+    a != 1 && throw(DomainError(a, "a must be 1"))
+    return T(0)
+end
 
 ###############################################################################
 #

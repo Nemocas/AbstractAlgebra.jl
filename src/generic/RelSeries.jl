@@ -1077,7 +1077,15 @@ Return the logarithm of the power series $a$.
 """
 function Base.log(a::AbstractAlgebra.SeriesElem{T}) where T <: FieldElement
    @assert valuation(a) == 0 
-   return integral(derivative(a)*inv(a))
+   if isone(coeff(a, 0))
+      return integral(derivative(a)*inv(a))
+   else
+      # Definition only works if series is monic, so divide through by constant
+      c = coeff(a, 0)
+      clog = log(c)
+      adivc = divexact(a, c)
+      return integral(derivative(adivc)*inv(adivc)) + clog
+   end
 end
 
 @doc Markdown.doc"""
@@ -1120,25 +1128,33 @@ function Base.exp(a::RelSeriesElem{T}) where T <: FieldElement
       set_precision!(b, precision(a))
       return b
    end
-   @assert valuation(a) > 0
    R = base_ring(a)
+   c = one(R)
+   if valuation(a) == 0
+      a = deepcopy(a)
+      c = exp(coeff(a, 0))
+      a = setcoeff!(a, 0, R())
+   end
    x = parent(a)([R(1)], 1, min(2, precision(a)), 0)
    prec = precision(a)
    la = [prec]
    while la[end] > 1
       push!(la, div(la[end] + 1, 2))
    end
-   one = parent(a)([R(1)], 1, 2, 0)
+   one1 = parent(a)([R(1)], 1, 2, 0)
    n = length(la) - 1
    # x -> x*(1 - log(a) + a) is the recursion
    while n > 0
       set_precision!(x, la[n])
-      set_precision!(one, la[n])
+      set_precision!(one1, la[n])
       t = -log(x)
-      t = addeq!(t, one)
+      t = addeq!(t, one1)
       t = addeq!(t, a)
       x = mul!(x, x, t)
       n -= 1 
+   end
+   if !isone(c)
+      x *= c
    end
    return x
 end
