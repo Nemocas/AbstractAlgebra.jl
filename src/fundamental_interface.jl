@@ -100,6 +100,41 @@ function base_ring end
 
 ###############################################################################
 #
+#   Special elements
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    one(a::T)
+
+Return the (multiplicative) identity in the family of $a$.
+
+# Example
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S = MatrixSpace(ZZ, 2, 2)
+Matrix Space of 2 rows and 2 columns over Integers
+
+julia> one(S)
+[1   0]
+[0   1]
+
+julia> R, x = PuiseuxSeriesField(QQ, 4, "x")
+(Puiseux series field in x over Rationals, x + O(x^5))
+
+julia> one(x)
+1 + O(x^4)
+
+julia> G = GF(5)
+Finite field F_5
+
+julia> one(G)
+1
+```
+"""
+function one end
+
+###############################################################################
+#
 #   More generic functions
 #
 ###############################################################################

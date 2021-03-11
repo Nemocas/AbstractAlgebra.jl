@@ -146,12 +146,6 @@ ring $R$.
 """
 zero(R::SeriesRing) = R(0)
 
-@doc Markdown.doc"""
-    one(R::SeriesRing)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 one(R::SeriesRing) = R(1)
 
 function gen(R::RelSeriesRing)

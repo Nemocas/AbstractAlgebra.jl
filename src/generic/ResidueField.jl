@@ -109,11 +109,6 @@ $a$ is the modulus of the residue ring.
 """
 zero(R::AbstractAlgebra.ResField) = R(0)
 
-@doc Markdown.doc"""
-    one(R::AbstractAlgebra.ResField)
-
-Return $1 \pmod{a}$ where $a$ is the modulus of the residue ring.
-"""
 one(R::AbstractAlgebra.ResField) = R(1)
 
 @doc Markdown.doc"""

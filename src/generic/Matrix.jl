@@ -229,20 +229,8 @@ function zero!(x::MatrixElem)
    x
 end
 
-@doc Markdown.doc"""
-    one(a::AbstractAlgebra.MatSpace)
-
-Construct the matrix in the given matrix space with ones down the diagonal
-and zeroes elsewhere. The matrix space must contain square matrices.
-"""
 one(a::AbstractAlgebra.MatSpace) = check_square(a)(1)
 
-@doc Markdown.doc"""
-    one(a::MatElem)
-
-Construct the identity matrix in the same matrix space as `a`, i.e.
-with ones down the diagonal and zeroes elsewhere. `a` must be square.
-"""
 one(a::MatElem) = identity_matrix(a)
 
 @doc Markdown.doc"""

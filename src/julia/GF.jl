@@ -50,11 +50,6 @@ function zero(R::GFField{T}) where T <: Integer
    return GFElem{T}(T(0), R)
 end
 
-@doc Markdown.doc"""
-    one(R::GFField{T}) where T <: Integer
-
-Return the additive identity, zero, in the given finite field.
-"""
 function one(R::GFField{T}) where T <: Integer
       return GFElem{T}(T(1), R)
 end

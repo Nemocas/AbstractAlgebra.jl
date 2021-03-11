@@ -77,12 +77,6 @@ Construct the zero matrix in the given matrix algebra.
 """
 zero(a::AbstractAlgebra.MatAlgebra) = a()
 
-@doc Markdown.doc"""
-    one(a::AbstractAlgebra.MatAlgebra)
-
-Construct the matrix in the given matrix algebra with ones down the diagonal
-and zeroes elsewhere.
-"""
 one(a::AbstractAlgebra.MatAlgebra) = a(1)
 
 isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement = isunit(det(a))

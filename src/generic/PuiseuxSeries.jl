@@ -168,20 +168,8 @@ ring $R$.
 """
 zero(R::PuiseuxSeriesField) = R(0)
 
-@doc Markdown.doc"""
-    one(R::PuiseuxSeriesField)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the Puiseux series
-ring $R$.
-"""
 one(R::PuiseuxSeriesField) = R(1)
 
-@doc Markdown.doc"""
-    one(R::PuiseuxSeriesRing)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the Puiseux series
-ring $R$.
-"""
 one(R::PuiseuxSeriesRing) = R(1)
 
 function gen(R::PuiseuxSeriesRing)

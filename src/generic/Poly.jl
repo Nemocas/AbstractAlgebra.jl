@@ -159,11 +159,6 @@ Return the zero polynomial in the given polynomial ring.
 """
 zero(R::AbstractAlgebra.PolyRing) = R(0)
 
-@doc Markdown.doc"""
-    one(R::AbstractAlgebra.PolyRing)
-
-Return the constant polynomial $1$ in the given polynomial ring.
-"""
 one(R::AbstractAlgebra.PolyRing) = R(1)
 
 gen(R::AbstractAlgebra.PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])

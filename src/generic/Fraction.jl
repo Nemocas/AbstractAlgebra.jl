@@ -114,11 +114,6 @@ Return $0/1$ in the given fraction field.
 """
 zero(R::AbstractAlgebra.FracField) = R(0)
 
-@doc Markdown.doc"""
-    one(R::AbstractAlgebra.FracField)
-
-Return $1/1$ in the given fraction field.
-"""
 one(R::AbstractAlgebra.FracField) = R(1)
 
 @doc Markdown.doc"""

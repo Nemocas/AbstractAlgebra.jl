@@ -83,11 +83,6 @@ $a$ is the modulus of the residue ring.
 """
 zero(R::AbstractAlgebra.ResRing) = R(0)
 
-@doc Markdown.doc"""
-    one(R::AbstractAlgebra.ResRing)
-
-Return $1 \pmod{a}$ where $a$ is the modulus of the residue ring.
-"""
 one(R::AbstractAlgebra.ResRing) = R(1)
 
 @doc Markdown.doc"""

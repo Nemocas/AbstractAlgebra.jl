@@ -300,20 +300,8 @@ ring $R$.
 """
 zero(R::LaurentSeriesField) = R(0)
 
-@doc Markdown.doc"""
-    one(R::LaurentSeriesField)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 one(R::LaurentSeriesField) = R(1)
 
-@doc Markdown.doc"""
-    one(R::LaurentSeriesRing)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 one(R::LaurentSeriesRing) = R(1)
 
 function gen(R::LaurentSeriesRing)
