@@ -377,6 +377,13 @@ end
 
 include("julia/JuliaTypes.jl")
 
+###############################################################################
+#
+#   Fundamental interface for AbstractAlgebra
+#
+###############################################################################
+
+include("fundamental_interface.jl")
 
 ###############################################################################
 #
@@ -384,7 +391,6 @@ include("julia/JuliaTypes.jl")
 #
 ###############################################################################
 
-include("algorithms/generic_functions.jl")
 include("algorithms/LaurentPoly.jl")
 include("algorithms/FinField.jl")
 
