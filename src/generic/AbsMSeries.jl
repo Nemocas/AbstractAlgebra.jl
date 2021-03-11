@@ -129,11 +129,34 @@ function characteristic(a::AbstractAlgebra.MSeriesRing)
 
 function AbstractAlgebra.expressify(a::AbstractAlgebra.AbsMSeriesElem,
                                         x = vars(parent(a)); context = nothing)
+    apoly = poly(a)
+
+    poly_sum = Expr(:call, :+)
+    n = nvars(parent(apoly))
+    
+    iter = zip(coeffs(apoly), exponent_vectors(apoly))
+    cv = reverse(collect(iter))
+    
+    for (c, v) in cv
+        prod = Expr(:call, :*)
+        if !isone(c)
+            push!(prod.args, expressify(c, context = context))
+        end
+        for i in n:-1:1
+            if v[i] > 1
+                push!(prod.args, Expr(:call, :^, x[i], v[i]))
+            elseif v[i] == 1
+                push!(prod.args, x[i])
+            end
+        end
+        push!(poly_sum.args, prod)
+    end
+    
     sum = Expr(:call, :+)
 
-    push!(sum.args, expressify(a.poly, context = context))
+    push!(sum.args, poly_sum)
 
-    for i in 1:nvars(parent(a))
+    for i in nvars(parent(a)):-1:1
         push!(sum.args, Expr(:call, :O, Expr(:call, :^, x[i], a.prec[i])))
     end
 
