@@ -331,10 +331,6 @@ modulus{T <: ResElem}(::SeriesElem{T})
 isgen(::RelSeriesElem)
 ```
 
-```@docs
-isunit(::RelSeriesElem)
-```
-
 **Examples**
 
 ```jldoctest

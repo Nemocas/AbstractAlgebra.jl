@@ -192,15 +192,7 @@ trail(::NCPolyElem)
 ```
 
 ```@docs
-gen(::NCPolyRing)
-```
-
-```@docs
 isgen(::NCPolyElem)
-```
-
-```@docs
-isunit(::NCPolyElem)
 ```
 
 ```@docs

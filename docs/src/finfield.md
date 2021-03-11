@@ -92,10 +92,6 @@ julia> m = inv(k)
 ## Basic manipulation of fields and elements
 
 ```@docs
-gen{T <: Integer}(F::GFField{T})
-```
-
-```@docs
 order(F::GFField)
 ```
 

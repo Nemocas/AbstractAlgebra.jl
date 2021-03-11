@@ -163,10 +163,6 @@ described here, that override the generic implementation.
 modulus(::AbstractAlgebra.ResElem)
 ```
 
-```@docs
-isunit(::AbstractAlgebra.ResElem)
-```
-
 **Examples**
 
 ```jldoctest

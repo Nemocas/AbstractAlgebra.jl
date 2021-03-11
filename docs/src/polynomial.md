@@ -270,10 +270,6 @@ ismonic(::PolyElem)
 ```
 
 ```@docs
-isunit(::PolyElem)
-```
-
-```@docs
 issquare(::PolyElem)
 ```
 

@@ -236,10 +236,6 @@ modulus{T <: ResElem}(::Generic.PuiseuxSeriesElem{T})
 isgen(::Generic.PuiseuxSeriesElem)
 ```
 
-```@docs
-isunit(::Generic.PuiseuxSeriesElem)
-```
-
 **Examples**
 
 ```jldoctest
