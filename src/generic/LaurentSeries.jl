@@ -35,25 +35,10 @@ elem_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRing{S}} = Laure
 
 elem_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesField{S}} = LaurentSeriesFieldElem{S}
 
-@doc Markdown.doc"""
-    base_ring(R::LaurentSeriesRing{T}) where T <: RingElement
-
-Return the base ring of the given power series ring.
-"""
 base_ring(R::LaurentSeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(R::LaurentSeriesField{T}) where T <: FieldElement
-
-Return the base ring of the given power series ring.
-"""
 base_ring(R::LaurentSeriesField{T}) where T <: FieldElement = R.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::Generic.LaurentSeriesElem)
-
-Return the base ring of the power series ring of the given power series.
-"""
 base_ring(a::LaurentSeriesElem) = base_ring(parent(a))
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesElem{S}}

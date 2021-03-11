@@ -16,19 +16,8 @@ parent_type(::Type{Res{T}}) where T <: RingElement = ResRing{T}
 
 elem_type(::Type{ResRing{T}}) where {T <: RingElement} = Res{T}
 
-@doc Markdown.doc"""
-    base_ring(S::AbstractAlgebra.ResRing{T}) where {T <: RingElement}
-
-Return the base ring $R$ of the given residue ring $S = R/(a)$.
-"""
 base_ring(S::AbstractAlgebra.ResRing{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(r::AbstractAlgebra.ResElem)
-
-Return the base ring $R$ of the residue ring $R/(a)$ that the supplied
-element $r$ belongs to.
-"""
 base_ring(r::AbstractAlgebra.ResElem) = base_ring(parent(r))
 
 parent(a::AbstractAlgebra.ResElem) = a.parent

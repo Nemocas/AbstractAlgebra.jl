@@ -16,19 +16,8 @@ parent_type(::Type{ResF{T}}) where T <: RingElement = ResField{T}
 
 elem_type(::Type{ResField{T}}) where {T <: RingElement} = ResF{T}
 
-@doc Markdown.doc"""
-    base_ring(S::AbstractAlgebra.ResField{T}) where {T <: RingElement}
-
-Return the base ring $R$ of the given residue ring $S = R/(a)$.
-"""
 base_ring(S::AbstractAlgebra.ResField{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(r::AbstractAlgebra.ResFieldElem)
-
-Return the base ring $R$ of the residue ring $R/(a)$ that the supplied
-element $r$ belongs to.
-"""
 base_ring(r::AbstractAlgebra.ResFieldElem) = base_ring(parent(r))
 
 parent(a::AbstractAlgebra.ResFieldElem) = a.parent

@@ -94,6 +94,12 @@ julia> S, x = PolynomialRing(QQ, "x")
 
 julia> base_ring(S) == QQ
 true
+
+julia> R = GF(7)
+Finite field F_7
+
+julia> base_ring(R)
+Union{}
 ```
 """
 function base_ring end

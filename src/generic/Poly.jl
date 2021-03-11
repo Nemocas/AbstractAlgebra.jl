@@ -26,18 +26,8 @@ parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 
 elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
-@doc Markdown.doc"""
-    base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement
-
-Return the base ring of the given polynomial ring.
-"""
 base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::Generic.PolynomialElem)
-
-Return the base ring of the polynomial ring of the given polynomial.
-"""
 base_ring(a::PolynomialElem) = base_ring(parent(a))
 
 parent(a::PolynomialElem) = a.parent

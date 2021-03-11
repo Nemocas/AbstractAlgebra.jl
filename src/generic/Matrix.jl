@@ -55,19 +55,8 @@ parent_type(::Type{S}) where {T <: RingElement, S <: Mat{T}} = MatSpace{T}
 
 elem_type(::Type{MatSpace{T}}) where {T <: RingElement} = MatSpaceElem{T}
 
-@doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.MatSpace{T}) where {T <: RingElement}
-
-Return the base ring $R$ of the given matrix space.
-"""
 base_ring(a::AbstractAlgebra.MatSpace{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::Generic.MatrixElem{T}) where {T <: RingElement}
-
-Return the base ring $R$ of the matrix space that the supplied matrix $r$
-belongs to.
-"""
 base_ring(a::MatrixElem{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
 @doc Markdown.doc"""

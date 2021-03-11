@@ -16,19 +16,8 @@ parent_type(::Type{Frac{T}}) where T <: RingElem = FracField{T}
 
 elem_type(::Type{FracField{T}}) where {T <: RingElem} = Frac{T}
 
-@doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.FracField{T}) where T <: RingElem
-
-Return the base ring $R$ of the given fraction field.
-"""
 base_ring(a::AbstractAlgebra.FracField{T}) where T <: RingElem = a.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.FracElem)
-
-Return the base ring $R$ of the fraction field that the supplied
-element $a$ belongs to.
-"""
 base_ring(a::AbstractAlgebra.FracElem) = base_ring(parent(a))
 
 parent(a::AbstractAlgebra.FracElem) = a.parent

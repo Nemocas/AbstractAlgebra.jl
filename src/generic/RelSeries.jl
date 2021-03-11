@@ -32,18 +32,8 @@ parent(a::AbstractAlgebra.SeriesElem) = a.parent
 
 elem_type(::Type{RelSeriesRing{T}}) where T <: RingElement = RelSeries{T}
 
-@doc Markdown.doc"""
-    base_ring(R::SeriesRing{T}) where T <: RingElement
-
-Return the base ring of the given power series ring.
-"""
 base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.SeriesElem)
-
-Return the base ring of the power series ring of the given power series.
-"""
 base_ring(a::AbstractAlgebra.SeriesElem) = base_ring(parent(a))
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.SeriesElem{S}}

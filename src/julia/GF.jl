@@ -16,18 +16,8 @@ parent_type(::Type{GFElem{T}}) where T <: Integer = GFField{T}
 
 elem_type(::Type{GFField{T}}) where T <: Integer = GFElem{T}
 
-@doc Markdown.doc"""
-    base_ring(a::GFField)
-
-Return `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::GFField) = Union{}
 
-@doc Markdown.doc"""
-    base_ring(a::GFElem)
-
-Return `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::GFElem) = Union{}
 
 parent(a::GFElem) = a.parent

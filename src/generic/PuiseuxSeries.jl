@@ -51,26 +51,10 @@ elem_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesRing{S}} = Puise
 
 elem_type(::Type{T}) where {S <: FieldElement, T <: PuiseuxSeriesField{S}} = PuiseuxSeriesFieldElem{S}
 
-@doc Markdown.doc"""
-    base_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement
-
-Return the base (coefficient) ring of the given Puiseux series ring.
-"""
 base_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = base_ring(laurent_ring(R))
 
-@doc Markdown.doc"""
-    base_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement
-
-Return the base (coefficient) ring of the given Puiseux series field.
-"""
 base_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = base_ring(laurent_ring(R))
 
-@doc Markdown.doc"""
-    base_ring(a::Generic.PuiseuxSeriesElem)
-
-Return the base (coefficient) ring of the Puiseux series ring of the given Puiseux
-series.
-"""
 base_ring(a::PuiseuxSeriesElem) = base_ring(parent(a))
 
 @doc Markdown.doc"""
