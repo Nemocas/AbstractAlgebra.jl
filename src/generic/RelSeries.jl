@@ -1021,6 +1021,7 @@ end
 
 Return the derivative of the power series $f$.
 
+```jldoctes
 julia> R, x = PowerSeriesRing(QQ, 10, "x")
 (Univariate power series ring in x over Rationals, x + O(x^11))
 
@@ -1029,6 +1030,7 @@ julia> f = 2 + x + 3x^3
 
 julia> derivative(f)
 1 + 9*x^2 + O(x^9)
+```
 """
 function derivative(f::RelSeriesElem{T}) where T <: RingElement
    g = parent(f)()
