@@ -77,7 +77,7 @@ parent_type(x) = parent_type(typeof(x))
 parent_type(T::DataType) = throw(MethodError(parent_type, (T,)))
 
 @doc Markdown.doc"""
-    base_ring(a::T)
+    base_ring(a)
 
 Return base ring $R$ of given element or parent $a$.
 
