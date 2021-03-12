@@ -8,7 +8,7 @@
 # Currently no implementation, only example on how the arbitrary inputs `crt`
 # should look like.
 @doc Markdown.doc"""
-    crt(r::Array{T, 1}, m::Array{T, 1}) where T
+    crt(r::AbstractVector{T}, m::AbstractVector{T}) where T
     crt(r::T, m::T...) where T
 
 Return $x$ in the Euclidean domain $T$ such that $x \equiv r_i \mod m_i$
