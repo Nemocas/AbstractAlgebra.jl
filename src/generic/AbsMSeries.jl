@@ -44,6 +44,16 @@ nvars(R::AbsMSeriesRing) = nvars(R.poly_ring)
 
 precision(a::AbsMSeries) = a.prec
 
+function set_precision!(a::AbsMSeries, prec::Vector{Int})
+    length(prec) != length(precision(a)) &&
+                         error("Array length not equal to number of variables")
+    if !exponents_lt(precision(a), prec)
+        a.poly = truncate_poly(a.poly, prec)
+    end
+    a.prec = prec
+    return a
+end
+
 max_precision(R::AbsMSeriesRing) = R.prec_max
 
 @doc Markdown.doc"""
