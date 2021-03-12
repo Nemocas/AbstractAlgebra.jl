@@ -1021,7 +1021,7 @@ end
 
 Return the derivative of the power series $f$.
 
-```jldoctest
+```
 julia> R, x = PowerSeriesRing(QQ, 10, "x")
 (Univariate power series ring in x over Rationals, x + O(x^11))
 
@@ -1058,7 +1058,7 @@ end
 
 Return the integral of the power series $f$.
 
-```jldoctest
+```
 julia> R, x = PowerSeriesRing(QQ, 10, "x")
 (Univariate power series ring in x over Rationals, x + O(x^11))
 
