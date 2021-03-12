@@ -165,7 +165,7 @@ function zero end
 @doc Markdown.doc"""
     isone(a::T)
 
-Return true if $a$ is an identity, else return false.
+Return true if $a$ is an (multiplicative) identity, else return false.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
