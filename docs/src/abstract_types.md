@@ -4,9 +4,13 @@ AbstractAlgebra.jl implements a couple of abstract types which can be extended.
 
 ## Parents
 
+The following diagram shows a complete list of all abstract types in
+AbstractAlgebra.jl.
+
 ```@setup parents
 using Kroki
 
+# This is an example with a WBS-diagram. Not as good.
 parents_bad = plantuml"""
 @startwbs
 skinparam monochrome true
@@ -75,17 +79,17 @@ skinparam RoundCorner 15
 "NCRing" -down-> "Ring"
 
 ' Rings
+"Ring" -down---> "Field"
 "Ring" -down-> "PolyRing{T}"
 "PolyRing{T}" -down-> "LaurentPolynomialRing{T}"
 "PolyRing{T}" -down-> "SeriesRing{T}"
 "Ring" -down-> "ResRing{T}"
-"Ring" -down---> "Field"
 
 ' Fields
 "Field" -down-> "ResField{T}"
+"NumField{T}" -down-> "SimpleNumField{T}"
 "Field" -down-> "FracField{T}"
 "Field" -down-> "NumField{T}"
-"NumField{T}" -down-> "SimpleNumField{T}"
 "Field" -down-> "FinField"
 
 hide members
@@ -99,6 +103,9 @@ parents #hide
 ```
 
 ## Elements
+
+Similarly the following diagram shows a complete list of all abstract types in
+AbstractAlgebra.jl.
 
 ```@setup elements
 using Kroki
@@ -142,17 +149,17 @@ skinparam RoundCorner 15
 
 ' Rings
 "RingElem" -down-> "PolyElem{T}"
-"PolyElem{T}" -down-> "LaurentPolyElem{T}"
 "PolyElem{T}" -down-> "SeriesElem{T}"
+"PolyElem{T}" -down-> "LaurentPolyElem{T}"
 "RingElem" -down-> "ResElem{T}"
 "RingElem" -down---> "FieldElem"
 
 ' Fields
+"FieldElem" -down-> "FinFieldElem"
 "FieldElem" -down-> "ResFieldElem{T}"
-"FieldElem" -down-> "FracElem{T}"
 "FieldElem" -down-> "NumFieldElem{T}"
 "NumFieldElem{T}" -down-> "SimpleNumFieldElem{T}"
-"FieldElem" -down-> "FinFieldElem"
+"FieldElem" -down-> "FracElem{T}"
 
 hide members
 hide circle
