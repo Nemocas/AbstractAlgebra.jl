@@ -105,9 +105,9 @@ function base_ring end
 ###############################################################################
 
 @doc Markdown.doc"""
-    one(a::T)
+    one(a)
 
-Return the (multiplicative) identity in the family of $a$.
+Return the multiplicative identity in the family of $a$.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -134,9 +134,9 @@ julia> one(G)
 function one end
 
 @doc Markdown.doc"""
-    zero(a::T)
+    zero(a)
 
-Return the zero or additive identity in the family of $a$.
+Return the additive identity in the family of $a$.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -215,7 +215,7 @@ function iszero end
 ###############################################################################
 
 @doc Markdown.doc"""
-    gen(a::T)
+    gen(a)
 
 Return element generating parent $a$.
 
@@ -237,7 +237,7 @@ julia> gen(G)
 function gen end
 
 @doc Markdown.doc"""
-    gens(a::T)
+    gens(a)
 
 Return elements generating parent $a$ in an array.
 
