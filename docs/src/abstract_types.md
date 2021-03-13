@@ -111,8 +111,17 @@ skinparam defaultFontSize 16
 skinparam objectArrowColor DarkGray
 skinparam RoundCorner 15
 
+
 ' Ideals
-"SetElem" -down-> "Ideal{T}"
+"SetElem" -down-> "IdealElem{T}"
+
+' Maps
+' NOTE: Identity is 
+"SetElem" -down----> "Map{D, C, S, T}"
+"Map{D, C, S, T}" .right. "SetMap"
+"SetMap" -down-> "IdentityMap"
+"SetMap" -down-> "FunctionalMap"
+"FunctionalMap" -down-> "FPModuleHomomorphism"
 
 ' Groups
 ' NOTE: Shouldn't AbstractPerm have the suffix -Elem?
