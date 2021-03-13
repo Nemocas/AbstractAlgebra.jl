@@ -10,47 +10,6 @@ AbstractAlgebra.jl.
 ```@setup parents
 using Kroki
 
-# This is an example with a WBS-diagram. Not as good.
-parents_bad = plantuml"""
-@startwbs
-skinparam monochrome true
-skinparam arrowThickness 3
-skinparam WbsType tree
-<style>
-wbsDiagram {
-  FontName Monospaced
-  FontSize 16
-  RoundCorner 10
-  Padding 5
-  Margin 15
-}
-</style>
-
-+ Set
-++ Ideal{T}
-++ Group
---- AbstractPermutationGroup
-++ AdditiveGroup
---- Module{T}
-++++ MatSpace{T}
----- FPModule{T}
-++ NCRing
-+++ NCPolyRing{T}
---- MatAlgebra{T}
---- Ring
-++++ PolyRing{T}
-++++ LaurentPolynomialRing{T}
-++++ SeriesRing{T}
-++++ ResRing{T}
-++++ Field
-+++++ ResField{T}
-+++++ FracField{T}
-+++++ NumField{T}
-++++++ SimpleNumField{T}
-+++++ FinField
-@endwbs
-"""
-
 parents = plantuml"""
 @startuml
 skinparam monochrome true
