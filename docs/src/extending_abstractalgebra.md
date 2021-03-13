@@ -14,6 +14,8 @@ elem_type
 parent_type
 ```
 
+### Aquiring associated elements and parents
+
 Further, if one has a base ring, like polynomials over the integers
 $\mathbb{Z}[x]$, then one should implement
 
@@ -35,11 +37,18 @@ depends on if the group is additative (commutative) or not.
 
 ## Basic manipulation
 
+If one would like to implement a ring, this is the basic manipulation methods
+that all rings should extend:
+
 ```@docs
 isone
 iszero
 isunit
 ```
+
+With the same logic as earlier, groups only need to extend one of the methods
+`isone` and `iszero`. By definition, group elements are always invertable,
+therefore there is no need to define `isunit` for them.
 
 ## Generic functions
 
