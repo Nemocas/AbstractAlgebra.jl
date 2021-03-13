@@ -1,6 +1,4 @@
-# Generic interface
-
-## Parents, elements and data type methods
+# Elements and parents
 
 Any implementation with elements and parents should implement the following
 interface:
@@ -16,26 +14,4 @@ $\mathbb{Z}[x]$, then one should implement
 
 ```@docs
 base_ring
-```
-
-## Special elements
-
-```@docs
-one
-zero
-```
-
-## Basic manipulation
-
-```@docs
-isone
-iszero
-isunit
-```
-
-## Generic functions
-
-```@docs
-gen
-gens
 ```

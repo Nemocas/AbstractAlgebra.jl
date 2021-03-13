@@ -1,7 +1,7 @@
-using Documenter, AbstractAlgebra
+using Documenter, AbstractAlgebra, Kroki
 
 makedocs(
-         format   = Documenter.HTML(),
+         format = Documenter.HTML(),
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
          clean = true,
@@ -10,6 +10,13 @@ makedocs(
          checkdocs = :none,
          pages    = [
              "index.md",
+             "Fundamental interface of AbstractAlgebra.jl" => [
+                 "elements_parents.md",
+                 "abstract_types.md",
+                 "special_elements.md",
+                 "basic_manipulation.md",
+                 "generic_functions.md"
+                ],
              "constructors.md",
              "Rings" => [ "rings.md",
                           "ncrings.md",
