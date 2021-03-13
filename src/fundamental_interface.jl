@@ -163,7 +163,7 @@ function zero end
 ###############################################################################
 
 @doc Markdown.doc"""
-    isone(a::T)
+    isone(a)
 
 Return true if $a$ is the multiplicative identity, else return false.
 
@@ -190,7 +190,7 @@ julia> isone(x), isone(T(1))
 function isone end
 
 @doc Markdown.doc"""
-    iszero(a::T)
+    iszero(a)
 
 Return true if $a$ is the additative identity, else return false.
 
