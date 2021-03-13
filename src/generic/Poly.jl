@@ -1171,6 +1171,16 @@ function Base.div(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}
    return q
 end
 
+##############################################################################
+#
+#  Ad hoc Euclidean division
+#
+##############################################################################
+
+function Base.div(f::PolyElem{T}, g::T) where T <: Union{FieldElem, ResElem, AbstractFloat, Rational}
+    return div(f, parent(f)(g))
+end
+
 ###############################################################################
 #
 #   Pseudodivision

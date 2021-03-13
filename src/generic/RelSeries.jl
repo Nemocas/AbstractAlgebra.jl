@@ -961,9 +961,103 @@ end
 
 ###############################################################################
 #
+#  Derivative and Integral
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    derivative(f::RelSeriesElem{T}) -> RelSeriesElem
+
+Return the derivative of the power series $f$.
+
+```
+julia> R, x = PowerSeriesRing(QQ, 10, "x")
+(Univariate power series ring in x over Rationals, x + O(x^11))
+
+julia> f = 2 + x + 3x^3
+2 + x + 3*x^3 + O(x^10)
+
+julia> derivative(f)
+1 + 9*x^2 + O(x^9)
+```
+"""
+function derivative(f::RelSeriesElem{T}) where T <: RingElement
+   g = parent(f)()
+   set_precision!(g, precision(f) - 1)
+   fit!(g, pol_length(f))
+   v = valuation(f)
+   set_valuation!(g, 0)
+   if v == 0
+      for i = 1:pol_length(f)
+         setcoeff!(g, i - 1, i*polcoeff(f, i))
+      end
+   else
+      for i = 0:pol_length(f)
+         setcoeff!(g, i, (i + v)*polcoeff(f, i))
+      end
+      set_valuation!(g, v - 1)
+   end  
+   g = set_length!(g, normalise(g, pol_length(f)))
+   renormalize!(g)
+   return g
+end
+
+@doc Markdown.doc"""
+    integral(f::RelSeriesElem{T}) -> RelSeriesElem
+
+Return the integral of the power series $f$.
+
+```
+julia> R, x = PowerSeriesRing(QQ, 10, "x")
+(Univariate power series ring in x over Rationals, x + O(x^11))
+
+julia> f = 2 + x + 3x^3
+2 + x + 3*x^3 + O(x^10)
+
+julia> integral(f)
+2*x + 1//2*x^2 + 3//4*x^4 + O(x^11)
+```
+"""
+function integral(f::RelSeriesElem{T}) where T <: RingElement
+   g = parent(f)()
+   fit!(g, pol_length(f))
+   set_precision!(g, precision(f) + 1)
+   v = valuation(f)
+   set_valuation!(g, v + 1)
+   for i = 1:pol_length(f)
+      c = polcoeff(f, i - 1)
+      if !iszero(c)
+         setcoeff!(g, i - 1, divexact(c, i + v))
+      end
+   end
+   g = set_length!(g, normalise(g, pol_length(f)))
+   renormalize!(g)
+   return g
+end
+
+###############################################################################
+#
 #   Special functions
 #
 ###############################################################################
+
+@doc Markdown.doc"""
+    log(a::AbstractAlgebra.SeriesElem{T}) where T <: FieldElement
+
+Return the logarithm of the power series $a$.
+"""
+function Base.log(a::AbstractAlgebra.SeriesElem{T}) where T <: FieldElement
+   @assert valuation(a) == 0 
+   if isone(coeff(a, 0))
+      return integral(derivative(a)*inv(a))
+   else
+      # Definition only works if series is monic, so divide through by constant
+      c = coeff(a, 0)
+      clog = log(c)
+      adivc = divexact(a, c)
+      return integral(derivative(adivc)*inv(adivc)) + clog
+   end
+end
 
 @doc Markdown.doc"""
     exp(a::AbstractAlgebra.RelSeriesElem)
@@ -997,6 +1091,43 @@ function Base.exp(a::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    end
    z = set_length!(z, normalise(z, preca))
    return z
+end
+
+function Base.exp(a::RelSeriesElem{T}) where T <: FieldElement
+   if iszero(a)
+      b = parent(a)(1)
+      set_precision!(b, precision(a))
+      return b
+   end
+   R = base_ring(a)
+   c = one(R)
+   if valuation(a) == 0
+      a = deepcopy(a)
+      c = exp(coeff(a, 0))
+      a = setcoeff!(a, 0, R())
+   end
+   x = parent(a)([R(1)], 1, min(2, precision(a)), 0)
+   prec = precision(a)
+   la = [prec]
+   while la[end] > 1
+      push!(la, div(la[end] + 1, 2))
+   end
+   one1 = parent(a)([R(1)], 1, 2, 0)
+   n = length(la) - 1
+   # x -> x*(1 - log(a) + a) is the recursion
+   while n > 0
+      set_precision!(x, la[n])
+      set_precision!(one1, la[n])
+      t = -log(x)
+      t = addeq!(t, one1)
+      t = addeq!(t, a)
+      x = mul!(x, x, t)
+      n -= 1 
+   end
+   if !isone(c)
+      x *= c
+   end
+   return x
 end
 
 ###############################################################################
@@ -1105,7 +1236,7 @@ function addeq!(c::RelSeries{T}, a::RelSeries{T}) where {T <: RingElement}
       for i = lenc + 1:min(vala - valc, lenr)
          c.coeffs[i] = R()
       end
-      for i = vala - valc + 1:min(lenc, lenr)
+      for i = vala - valc + 1:min(lenc, lenr, lena + vala - valc)
          c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i - vala + valc])
       end
       for i = max(lenc, vala - valc) + 1:min(lena + vala - valc, lenr)

@@ -49,7 +49,8 @@ import LinearAlgebra: lu, lu!, tr
 ################################################################################
 
 # This is the list of functions for which we locally have a different behavior.
-const Base_import_exclude = [:exp, :sqrt, :div, :divrem, :numerator, :denominator]
+const Base_import_exclude = [:exp, :log, :sqrt, :div, :divrem, :numerator,
+		             :denominator]
 
 ################################################################################
 #
@@ -59,6 +60,10 @@ const Base_import_exclude = [:exp, :sqrt, :div, :divrem, :numerator, :denominato
 
 function exp(a::T) where T
    return Base.exp(a)
+end
+
+function log(a::T) where T
+   return Base.log(a)
 end
 
 function sqrt(a::T) where T
@@ -94,7 +99,7 @@ import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, bin,
              coth, dec, deepcopy, deepcopy_internal, expm1, exponent, fill,
              floor, gcd, gcdx, getindex, hash, hcat, hex, hypot, intersect,
              invmod, isequal, isfinite, isless, isone, isqrt, isreal,
-             iszero, lcm, ldexp, length, log, log1p, mod, ndigits, oct, one,
+             iszero, lcm, ldexp, length, log1p, mod, ndigits, oct, one,
              parent, parse, powermod,
              precision, rand, Rational, rem, reverse, setindex!,
              show, sincos, similar, sign, sin, sinh, sinpi, size, string, tan,
@@ -323,7 +328,7 @@ include("WeakValueDict.jl")
 #
 ###############################################################################
 
-@static if VERSION >= v"1.6"
+@static if false #VERSION >= v"1.6"
   const CacheDictType = WeakValueDict
 else
   const CacheDictType = Dict
@@ -403,7 +408,7 @@ include("algorithms/GenericFunctions.jl")
 
 include("Generic.jl")
 
-# Do not import div, divrem, exp, inv, sqrt, numerator and denominator
+# Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
 # as we have our own
 import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  add_row!, basis, cached, can_solve_left_reduced_triu,
@@ -487,7 +492,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
 		 polynomial_to_power_sums, PolyCoeffs,
 		 power_sums_to_polynomial, roots, sturm_sequence
 
-# Do not export inv, div, divrem, exp, sqrt, numerator and denominator as we define our own
+# Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, add_column!, add_row, add_row!, base_ring, cached,
                  canonical_unit, can_solve_left_reduced_triu,
                  can_solve, can_solve_with_solution,

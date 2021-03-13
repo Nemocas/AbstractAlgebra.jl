@@ -1361,6 +1361,48 @@ end
    end
 end
 
+@testset "Generic.Poly.ad_hoc_euclidean_division" begin
+   # Exact field
+   R, x = PolynomialRing(QQ, "x")
+
+   for iter = 1:100
+      f = rand(R, 0:5, -10:10)
+      c = QQ()
+      while iszero(c)
+         c = rand(QQ, -10:10)
+      end
+
+      @test div(f, c)*c == f
+   end
+
+   # Inexact field
+   R, x = PolynomialRing(RealField, "x")
+
+   for iter = 1:100
+      f = rand(R, 0:5, -1:1)
+      c = RealField()
+      while isapprox(c, RealField())
+         c = rand(RealField, -1:1)
+      end
+
+      @test isapprox(div(f, c)*c, f)
+   end
+
+   # Residue ring
+   S = ResidueRing(ZZ, 23)
+   R, x = PolynomialRing(S, "x")
+
+   for iter = 1:100
+      f = rand(R, 0:5, 0:22)
+      c = R()
+      while iszero(c)
+         c = rand(S, 0:22)
+      end
+
+      @test div(f, c)*c == f
+   end
+end
+
 @testset "Generic.Poly.pseudodivision" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")

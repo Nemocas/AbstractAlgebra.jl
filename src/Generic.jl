@@ -14,7 +14,7 @@ import Base: Array, abs, asin, asinh, atan, atanh, axes, bin, checkbounds, cmp, 
              convert, copy, cos, cosh, dec, deepcopy, deepcopy_internal,
              exponent, gcd, gcdx, getindex, hash, hcat, hex, intersect,
              invmod, isapprox, isempty, isequal, isfinite, isless, isone, isqrt,
-             isreal, iszero, lcm, ldexp, length, log, Matrix, mod, ndigits, oct, one,
+             isreal, iszero, lcm, ldexp, length, Matrix, mod, ndigits, oct, one,
              parent, parse, powermod,
              precision, rand, Rational, rem, reverse, setindex!,
              show, similar, sign, sin, sinh, size, string, tan, tanh,
@@ -22,7 +22,7 @@ import Base: Array, abs, asin, asinh, atan, atanh, axes, bin, checkbounds, cmp, 
              vcat, xor, zero, zeros, +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=,
              <, >, //, /, !=
 
-import Base: floor, ceil, hypot, log, log1p, expm1, sin, cos, sinpi, cospi,
+import Base: floor, ceil, hypot, log1p, expm1, sin, cos, sinpi, cospi,
              tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
              acosh, sinpi, cospi
 
@@ -36,7 +36,7 @@ import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
 import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring, check_parent,
                           denominator, div, divrem, elem_type, exp, expressify,
                           factor, gen, gens, inv, isgen, ismonomial,
-                          ismonomial_recursive, isunit, lead, numerator,
+                          ismonomial_recursive, isunit, lead, log, numerator,
                           parent_type, show_via_expressify, sqrt, trail
 
 using ..AbstractAlgebra
@@ -103,7 +103,6 @@ include("generic/MapCache.jl")
 
 include("generic/Misc/Poly.jl")
 include("generic/Misc/Rings.jl")
-include("generic/Misc/Series.jl")
 include("generic/Misc/Localization.jl")
 
 end # generic

@@ -1578,7 +1578,7 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    N = parent(a).N
    Ae = zeros(UInt, N, a_alloc)
    Be = zeros(UInt, N, b_alloc)
-   Am = zeros(Int, 64) # 64 is upper bound on max(log m, log n)
+   Am = zeros(Int, 64) # 64 is upper bound on max(Base.log m, Base.log n)
    Bm = zeros(Int, 64) # ... num polys merged (power of 2)
    Ai = zeros(Int, 64) # index of polys in A minus 1
    Bi = zeros(Int, 64) # index of polys in B minus 1
@@ -4232,13 +4232,13 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    for i = end_var:-1:1
       if v1[i] != 0
          if v1[i] >= v2[i]
-            c = max(log(lead2[i])*v1[i]*v2[i], log(2)*v2[i])
+            c = max(Base.log(lead2[i])*v1[i]*v2[i], Base.log(2)*v2[i])
             if c < m
                m = c
                k = i
             end
          else
-            c = max(log(lead1[i])*v2[i]*v1[i], log(2)*v1[i])
+            c = max(Base.log(lead1[i])*v2[i]*v1[i], Base.log(2)*v1[i])
             if c < m
                m = c
                k = i

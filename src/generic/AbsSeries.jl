@@ -755,6 +755,49 @@ end
 
 ###############################################################################
 #
+#  Derivative and Integral
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    derivative(f::AbsSeriesElem{T}) -> AbsSeriesElem
+
+Return the derivative of the power series $f$.
+"""
+function derivative(f::AbsSeriesElem{T}) where T <: RingElement
+   g = parent(f)()
+   set_precision!(g, precision(f) - 1)
+   len = length(f) - 1
+   fit!(g, len)
+   for i = 1:len
+      g = setcoeff!(g, i - 1, i*coeff(f, i))
+   end
+   g = set_length!(g, normalise(g, len))
+   return g
+end
+
+@doc Markdown.doc"""
+    integral(f::AbsSeriesElem{T}) -> AbsSeriesElem
+
+Return the integral of the power series $f$.
+"""
+function integral(f::AbsSeriesElem{T}) where T <: RingElement
+   g = parent(f)()
+   len = length(f) + 1
+   fit!(g, len)
+   set_precision!(g, precision(f) + 1)
+   for i = 1:len - 1
+      c = coeff(f, i - 1)
+      if !iszero(c)
+         g = setcoeff!(g, i, divexact(c, i))
+      end
+   end
+   g = set_length!(g, normalise(g, len))
+   return g
+end
+
+###############################################################################
+#
 #   Special functions
 #
 ###############################################################################
@@ -764,7 +807,7 @@ end
 
 Return the exponential of the power series $a$.
 """
-function Base.exp(a::AbstractAlgebra.AbsSeriesElem)
+function Base.exp(a::AbstractAlgebra.AbsSeriesElem{T}) where T <: RingElement
    if iszero(a)
       z = one(parent(a))
       z = set_precision!(z, precision(a))
@@ -786,6 +829,45 @@ function Base.exp(a::AbstractAlgebra.AbsSeriesElem)
    z = set_length!(z, normalise(z, precision(a)))
    return z
 end
+
+function Base.exp(a::AbsSeriesElem{T}) where T <: FieldElement
+   if iszero(a)
+      b = parent(a)(1)
+      set_precision!(b, precision(a))
+      return b
+   end
+   R = base_ring(a)
+   c = one(R)
+   if valuation(a) == 0
+      a = deepcopy(a)
+      c = exp(coeff(a, 0))
+      a = setcoeff!(a, 0, R())
+   end
+   x = parent(a)([R(1)], 1, min(2, precision(a)))
+   prec = precision(a)
+   la = [prec]
+   while la[end] > 1
+      push!(la, div(la[end] + 1, 2))
+   end
+   one1 = parent(a)([R(1)], 1, 2)
+   n = length(la) - 1
+   # x -> x*(1 - log(a) + a) is the recursion
+   while n > 0
+      set_precision!(x, la[n])
+      set_precision!(one1, la[n])
+      t = -log(x)
+      t = addeq!(t, one1)
+      t = addeq!(t, a)
+      x = mul!(x, x, t)
+      n -= 1 
+   end
+   if !isone(c)
+      x *= c
+   end
+   return x
+end
+
+
 
 ###############################################################################
 #
