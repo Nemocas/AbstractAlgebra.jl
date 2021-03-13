@@ -1,8 +1,8 @@
-# Abstract types
+# Visualiation of the types of AbstractAlgebra.jl
 
 AbstractAlgebra.jl implements a couple of abstract types which can be extended.
 
-## Parents
+## Abstract parents
 
 The following diagram shows a complete list of all abstract types in
 AbstractAlgebra.jl.
@@ -61,7 +61,7 @@ hide circle
 parents #hide
 ```
 
-## Elements
+## Abstract elements
 
 Similarly the following diagram shows a complete list of all abstract types in
 AbstractAlgebra.jl.
@@ -90,7 +90,6 @@ skinparam RoundCorner 15
 "FunctionalMap" -down-> "FPModuleHomomorphism"
 
 ' Groups
-' NOTE: Shouldn't AbstractPerm have the suffix -Elem?
 "SetElem" -down-> "GroupElem"
 "GroupElem" -down-> "AbstractPerm"
 
@@ -129,3 +128,33 @@ hide circle
 ```@example elements
 elements #hide
 ```
+
+## Concrete types in AbstractAlgebra.jl
+
+Until now we have discussed the abstract types of AbstractAlgebra.jl. Under this
+subsection we will instead give some examples of concrete types in
+AbstractAlgebra.jl.
+
+In parentheses we put the types of the corresponding parent objects.
+
+  - `Perm{<:Integer}` (`SymmetricGroup{<:Integer}`)
+  - `GFElem{<:Integer}` (`GFField{<:Integer}`)
+
+We also think of various Julia types as though they were AbstractAlgebra.jl types:
+
+  - `BigInt` (`Integers{BigInt}`)
+  - `Rational{BigInt}` (`Rationals{BigInt}`)
+
+Then there are various types for generic constructions over a base ring. They are all
+parameterised by a type `T` which is the type of the *elements* of the base ring they
+are defined over.
+
+  - `Generic.Poly{T}` (`Generic.PolyRing{T}`)
+  - `Generic.MPoly{T}` (`Generic.MPolyRing{T}`)
+  - `Generic.RelSeries{T}` (`Generic.RelSeriesRing{T}`)
+  - `Generic.AbsSeries{T}` (`Generic.AbsSeriesRing{T}`)
+  - `Generic.LaurentSeriesRingElem{T}` (`Generic.LaurentSeriesRing{T}`)
+  - `Generic.LaurentSeriesFieldElem{T}` (`Generic.LaurentSeriesField{T}`)
+  - `Generic.Res{T}` (`Generic.ResRing{T}`)
+  - `Generic.Frac{T}` (`Generic.FracField{T}`)
+  - `Generic.Mat{T}` (`Generic.MatSpace{T}`)
