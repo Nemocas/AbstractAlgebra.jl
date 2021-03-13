@@ -208,25 +208,6 @@ true
 """
 function iszero end
 
-@doc Markdown.doc"""
-    isunit(a::T)
-
-Return true if $a$ is invertable, else return false.
-
-# Examples
-```jldoctest; setup = :(using AbstractAlgebra)
-julia> S, x = PolynomialRing(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
-
-julia> isunit(x), isunit(S(1)), isunit(S(4))
-(false, true, true)
-
-julia> isunit(ZZ(-1)), isunit(ZZ(4))
-(true, false)
-```
-"""
-function isunit end
-
 ###############################################################################
 #
 #   More generic functions
