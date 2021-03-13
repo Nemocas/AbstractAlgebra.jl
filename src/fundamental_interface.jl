@@ -165,7 +165,7 @@ function zero end
 @doc Markdown.doc"""
     isone(a::T)
 
-Return true if $a$ is an (multiplicative) identity, else return false.
+Return true if $a$ is the multiplicative identity, else return false.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -192,7 +192,7 @@ function isone end
 @doc Markdown.doc"""
     iszero(a::T)
 
-Return true if $a$ is zero, else return false.
+Return true if $a$ is the additative identity, else return false.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
