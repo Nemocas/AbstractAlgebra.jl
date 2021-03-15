@@ -127,3 +127,15 @@ end
       @test precision(g) == min.(prec, prec2)
    end
 end
+
+@testset "Generic.AbsMSeries.unary_ops" begin
+   for nvars in 1:5
+      prec = [rand(0:10) for i in 1:nvars]
+      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+
+      f = rand(R, 0:10, -10:10)
+
+      @test isequal(f, -(-f))
+      @test iszero(f + (-f))
+   end
+end
