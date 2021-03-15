@@ -165,3 +165,45 @@ end
       end
    end
 end
+
+@testset "Generic.AbsMSeries.adhoc_binary_ops" begin
+   S, x = PolynomialRing(ZZ, "x")
+
+   for nvars in 1:5
+      prec = [rand(0:10) for i in 1:nvars]
+      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+
+      for iters = 1:100
+         f = rand(R, 0:12, -10:10)
+         c1 = rand(ZZ, -10:10)
+         c2 = rand(ZZ, -10:10)
+         d1 = rand(zz, -10:10)
+         d2 = rand(zz, -10:10)
+
+         @test isequal(c1*f - c2*f, (c1 - c2)*f)
+         @test isequal(c1*f + c2*f, (c1 + c2)*f)
+         @test isequal(d1*f - d2*f, (d1 - d2)*f)
+         @test isequal(d1*f + d2*f, (d1 + d2)*f)
+
+         @test isequal(f*c1 - f*c2, f*(c1 - c2))
+         @test isequal(f*c1 + f*c2, f*(c1 + c2))
+         @test isequal(f*d1 - f*d2, f*(d1 - d2))
+         @test isequal(f*d1 + f*d2, f*(d1 + d2))
+      end
+   
+      prec = [rand(0:10) for i in 1:nvars]
+      R, gens = PowerSeriesRing(S, prec, ["x$(i)" for i in 1:nvars])
+
+      for iters = 1:100
+         f = rand(R, 0:2, 0:12, -10:10)
+         c1 = rand(S, 0:2, -10:10)
+         c2 = rand(S, 0:2, -10:10)
+
+         @test isequal(c1*f - c2*f, (c1 - c2)*f)
+         @test isequal(c1*f + c2*f, (c1 + c2)*f)
+
+         @test isequal(f*c1 - f*c2, f*(c1 - c2))
+         @test isequal(f*c1 + f*c2, f*(c1 + c2))
+      end
+   end
+end
