@@ -118,13 +118,15 @@ end
       prec = [rand(0:10) for i in 1:nvars]
       R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
 
-      f = rand(R, 0:10, -10:10)
+      for iters = 1:100
+         f = rand(R, 0:10, -10:10)
 
-      prec2 = [rand(0:10) for i in 1:nvars]
+         prec2 = [rand(0:10) for i in 1:nvars]
 
-      g = truncate(f, prec2)
+         g = truncate(f, prec2)
 
-      @test precision(g) == min.(prec, prec2)
+         @test precision(g) == min.(prec, prec2)
+      end
    end
 end
 
@@ -133,9 +135,33 @@ end
       prec = [rand(0:10) for i in 1:nvars]
       R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
 
-      f = rand(R, 0:10, -10:10)
+      for iters = 1:100
+         f = rand(R, 0:10, -10:10)
 
-      @test isequal(f, -(-f))
-      @test iszero(f + (-f))
+         @test isequal(f, -(-f))
+         @test iszero(f + (-f))
+      end
+   end
+end
+
+@testset "Generic.AbsMSeries.binary_ops" begin
+   for nvars in 1:5
+      prec = [rand(0:10) for i in 1:nvars]
+      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+
+      for iters = 1:100
+         f = rand(R, 0:12, -10:10)
+         g = rand(R, 0:12, -10:10)
+         h = rand(R, 0:12, -10:10)
+      
+         @test isequal(f + g, g + f)
+         @test isequal(f + (g + h), (f + g) + h)
+         @test isequal(f*g, g*f)
+         @test isequal(f*(g*h), (f*g)*h)
+         @test isequal(f - g, -(g - f))
+         @test isequal((f - h) + h, f)
+         @test isequal(f*(g + h), f*g + f*h)
+         @test isequal(f*(g - h), f*g - f*h)
+      end
    end
 end
