@@ -333,6 +333,45 @@ function deepcopy_internal(a::Poly{T}, dict::IdDict) where {T <: RingElement}
    return parent(a)(coeffs)
 end
 
+################################################################################
+#
+#  Iterators
+#
+################################################################################
+
+struct PolyCoeffs{T <: RingElement}
+    f::T
+end
+  
+function coefficients(f::PolyElem)
+    return PolyCoeffs(f)
+end
+  
+function Base.iterate(PC::PolyCoeffs{<:PolyElem}, st::Int = -1)
+    st += 1
+    if st > degree(PC.f)
+        return nothing
+    else
+        return coeff(PC.f, st), st
+    end
+end
+  
+Base.IteratorEltype(M::PolyElem) = Base.HasEltype()
+
+Base.eltype(M::PolyElem{T}) where {T} = T
+  
+Base.IteratorSize(M::PolyCoeffs{<:PolyElem}) = Base.HasLength()
+
+Base.length(M::PolyCoeffs{<:PolyElem}) = length(M.f)
+  
+function Base.lastindex(a::PolyCoeffs{<:PolyElem})
+    return degree(a.f)
+end
+  
+function Base.getindex(a::PolyCoeffs{<:PolyElem}, i::Int)
+    return coeff(a.f, i)
+end
+
 ###############################################################################
 #
 #   Canonicalisation

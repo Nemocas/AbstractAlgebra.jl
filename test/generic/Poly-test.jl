@@ -88,6 +88,26 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
+@testset "Generic.Poly.iterators" begin
+   R, x = PolynomialRing(ZZ, "x")
+
+   C = collect(coefficients(R()))
+
+   @test C == []
+
+   C = collect(coefficients(R(1)))
+
+   @test C == [R(1)]
+
+   C = collect(coefficients(x + 2))
+
+   @test C == [R(2), R(1)]
+
+   C = collect(coefficients(x^2 + 2))
+
+   @test C == [R(2), R(), R(1)]
+end
+
 @testset "Generic.Poly.printing" begin
    R, x = PolynomialRing(ZZ, "x")
 

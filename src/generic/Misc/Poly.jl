@@ -31,45 +31,6 @@ function valence(f::PolyElem)
     return c
 end
 
-################################################################################
-#
-#  Iterators
-#
-################################################################################
-
-struct PolyCoeffs{T <: RingElem}
-    f::T
-end
-  
-function coefficients(f::PolyElem)
-    return PolyCoeffs(f)
-end
-  
-function Base.iterate(PC::PolyCoeffs{<:PolyElem}, st::Int = -1)
-    st += 1
-    if st > degree(PC.f)
-        return nothing
-    else
-        return coeff(PC.f, st), st
-    end
-end
-  
-Base.IteratorEltype(M::PolyElem) = Base.HasEltype()
-
-Base.eltype(M::PolyElem{T}) where {T} = T
-  
-Base.IteratorSize(M::PolyCoeffs{<:PolyElem}) = Base.HasLength()
-
-Base.length(M::PolyCoeffs{<:PolyElem}) = degree(M.f) + 1
-  
-function Base.lastindex(a::PolyCoeffs{<:PolyElem})
-    return degree(a.f)
-end
-  
-function Base.getindex(a::PolyCoeffs{<:PolyElem}, i::Int)
-    return coeff(a.f, i)
-end
-
 ##############################################################################
 #
 #  Binary arithmetic
