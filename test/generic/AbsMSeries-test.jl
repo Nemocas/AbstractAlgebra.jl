@@ -228,3 +228,43 @@ end
    end
 end
 
+@testset "Generic.AbsMSeries.comparison" begin
+   for nvars in 1:5
+      prec = [rand(0:10) for i in 1:nvars]
+      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+
+      for iter = 1:100
+         f = rand(R, 0:12, -10:10)
+
+         @test f == deepcopy(f)
+         @test isequal(f, deepcopy(f))
+
+         prec2 = [rand(0:10) for i in 1:nvars]
+
+         g = truncate(f, prec2)
+
+         @test f == g
+      end
+   end
+end
+
+@testset "Generic.AbsMSeries.adhoc_comparison" begin
+   for nvars in 1:5
+      prec = [rand(1:10) for i in 1:nvars]
+      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+
+      for iter = 1:100
+         c = rand(ZZ, -10:10)
+
+         @test c == R(c)
+         @test R(c) == c
+
+         c = rand(zz, -10:10)
+
+         @test c == R(c)
+         @test R(c) == c
+      end
+   end
+end
+
+
