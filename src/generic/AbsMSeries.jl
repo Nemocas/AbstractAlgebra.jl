@@ -76,7 +76,7 @@ function valuation(a::AbsMSeries)
 end
 
 function coeff(a::AbsMSeries, n::Int)
-    return coeff(poly(a), n)
+    return coeff(poly(a), length(a) - n + 1)
 end
 
 iszero(a::AbsMSeries) = length(poly(a)) == 0
@@ -357,6 +357,48 @@ end
 
 function isequal(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     return precision(x) == precision(y) && poly(x) == poly(y)
+end
+
+###############################################################################
+#
+#   Inverse
+#
+###############################################################################
+
+function Base.inv(x::AbsMSeries)
+    !isunit(x) && error("Not a unit")
+    R = parent(x)
+    prec = [1 for n in 1:nvars(R)]
+    cinv = inv(coeff(x, 1))
+    xinv = R(R.poly_ring(cinv), prec)
+    two = R(R.poly_ring(2), prec)
+    # lift each variable in turn
+    for var = nvars(R):-1:1
+        nvar = precision(x)[var]
+        var_prec = [nvar]
+        while nvar != 1
+            nvar = div(nvar + 1, 2)
+            push!(var_prec, nvar)
+        end
+        # list var quadratically
+        for i = length(var_prec) - 1:-1:1
+            prec[var] = var_prec[i]
+            two = set_precision!(two, prec)
+            xinv = set_precision!(xinv, prec)
+            xinv = (two - x*xinv)*xinv
+        end
+    end
+    return xinv
+end
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+function divexact(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
+    return x*inv(y)
 end
 
 ###############################################################################
