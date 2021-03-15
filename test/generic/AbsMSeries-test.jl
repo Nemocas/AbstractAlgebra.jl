@@ -11,6 +11,8 @@
 
       @test f isa Generic.AbsMSeries
 
+      @test O(gens[rand(1:nvars)]^rand(1:10)) isa Generic.AbsMSeries
+
       @test R() isa Generic.AbsMSeries
 
       @test R(rand(-10:10)) isa Generic.AbsMSeries
@@ -28,4 +30,14 @@
 
       @test R(x) isa Generic.AbsMSeries
    end
+end
+
+@testset "Generic.MPoly.printing" begin
+   R, (x, y) = PowerSeriesRing(ZZ, [5, 3], ["x", "y"])
+
+   @test string(zero(R)) == "O(y^3) + O(x^5)"
+   @test string(one(R)) == "1 + O(y^3) + O(x^5)"
+   @test string(x) == "x + O(y^3) + O(x^5)"
+   @test string(y) == "y + O(y^3) + O(x^5)"
+   @test string(x^2 - y) == "-y + x^2 + O(y^3) + O(x^5)"
 end
