@@ -267,4 +267,35 @@ end
    end
 end
 
+@testset "Generic.AbsMSeries.inversion" begin
+   for nvars in 1:4
+      prec = [rand(1:8) for i in 1:nvars]
+      R, gens = PowerSeriesRing(QQ, prec, ["x$(i)" for i in 1:nvars])
 
+      for iter = 1:30
+         f = rand(R, 0:8, -10:10)
+         while !isunit(f)
+            f = rand(R, 0:8, -10:10)
+         end
+
+         @test isequal(f*inv(f), one(R))
+      end
+   end
+end
+
+@testset "Generic.AbsMSeries.exact_division" begin
+   for nvars in 1:4
+      prec = [rand(1:8) for i in 1:nvars]
+      R, gens = PowerSeriesRing(QQ, prec, ["x$(i)" for i in 1:nvars])
+
+      for iter = 1:30
+         f = rand(R, 0:8, -10:10)
+         g = rand(R, 0:8, -10:10)
+         while !isunit(g)
+            g = rand(R, 0:8, -10:10)
+         end
+
+         @test isequal(divexact(f, g)*g, f)
+      end
+   end
+end
