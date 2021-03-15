@@ -448,6 +448,18 @@ end
 
 ###############################################################################
 #
+#   Promotion rules
+#
+###############################################################################
+
+promote_rule(::Type{AbsMSeries{T}}, ::Type{AbsMSeries{T}}) where T <: RingElement = AbsMSeries{T}
+
+function promote_rule(::Type{AbsMSeries{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? AbsMSeries{T} : Union{}
+end
+
+###############################################################################
+#
 #   Parent object call overload
 #
 ###############################################################################
@@ -463,6 +475,10 @@ end
 
 function (R::AbsMSeriesRing)()
     return R(R.poly_ring(), max_precision(R))
+end
+
+function (R::AbsMSeriesRing{T})(x::T) where T <: RingElem
+    return R(R.poly_ring(x), max_precision(R))
 end
 
 function (R::AbsMSeriesRing)(b::Union{Integer, Rational, AbstractFloat})
