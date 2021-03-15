@@ -207,3 +207,24 @@ end
       end
    end
 end
+
+@testset "Generic.AbsMSeries.powering" begin
+   for nvars in 1:5
+      prec = [rand(0:10) for i in 1:nvars]
+      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+      
+      for iter = 1:100
+         f = rand(R, 0:12, -10:10)
+         r2 = R(1)
+
+         for expn = 0:10
+            r1 = f^expn
+
+            @test (f == 0 && expn == 0 && r1 == 0) || isequal(r1, r2)
+
+            r2 *= f
+         end
+      end
+   end
+end
+
