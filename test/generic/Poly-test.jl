@@ -609,6 +609,57 @@ end
       @test truncate(f*g, n) == mullow(f, g, n)
    end
 
+   for iter = 1:100
+      lena = rand(0:10)
+      lenb = rand(0:10)
+      a = rand(R, lena:lena, -10:10)
+      b = rand(R, lenb:lenb, -10:10)
+      c = a*b
+      for i = 0:length(c) - 1
+         d = mulhigh_n(a, b, i)
+         f = c - d
+         @test length(f) < length(c) - i
+         for j = length(c):length(c) - i
+            @test coeff(d, j) == coeff(c, j)
+         end
+      end
+   end
+
+   for iter = 1:100
+      lena = rand(0:10)
+      lenb = rand(1:10)
+      a = rand(R, lena:lena, -10:10)
+      b = R()
+      while iszero(b)
+         b = rand(R, lenb:lenb, -10:10)
+      end
+      c = a*b
+      for i = 0:length(b)
+         d = divhigh(c, b, i)
+         f = a - d
+         @test degree(f) < i
+         for j = 0:i - 1
+            @test coeff(f, j) == coeff(a, j)
+         end
+      end
+   end
+
+   for iter = 1:100
+      lena = rand(0:10)
+      lenb = rand(1:10)
+      a = rand(R, lena:lena, -10:10)
+      b = R()
+      while iszero(b)
+         b = rand(R, lenb:lenb, -10:10)
+      end
+      c = a*b
+      for i = 0:length(a)
+         d = divexact_low(c, b, i)
+         f = truncate(a, i)
+         @test f == d
+      end
+   end
+
    # Fake finite field of char 7, degree 2
    S, y = PolynomialRing(GF(7), "y")
    F = ResidueField(S, y^2 + 6y + 3)

@@ -151,7 +151,7 @@ lead(a::PolynomialElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) 
 
 Return the trailing coefficient of the given polynomial. This will be the
 nonzero coefficient of the term with lowest degree unless the polynomial
-in the zero polynomial, in which case a zero coefficient is returned.
+is the zero polynomial, in which case a zero coefficient is returned.
 """
 function trail(a::PolynomialElem)
    if iszero(a)
@@ -956,6 +956,89 @@ function mullow(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, 
    z = parent(a)(d)
    z = set_length!(z, normalise(z, lenz))
    return z
+end
+
+# computes the terms of the product from degree deg(a) + deg(b) down to
+# deg(a) + deg(b) - n inclusive, setting the remaining terms to zero
+function mulhigh_n(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingElement
+    # if a = sum a_i t^i and b = sum b_j t^j
+    # want (i, j) such that i + j >= deg a + deg b - n
+    r = parent(a)()
+    for i = max(degree(a) - n, 0):degree(a)
+        for j = max(degree(a) + degree(b) - n - i, 0):degree(b)
+            r = setcoeff!(r, i + j, coeff(r, i + j) + coeff(a, i)*coeff(b, j))
+        end
+    end
+    return r
+end
+
+# assuming b divides a (behaviour is undefined otherwise), computes the last n
+# terms of the quotient, i.e. computes divexact(a, b) mod x^n
+function divexact_low(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingElement
+    r = parent(a)()
+    if iszero(b)
+       return r
+    end
+    shift = 0
+    for i = 0:degree(b)
+       if !iszero(coeff(b, i))
+          break
+       end
+       shift += 1
+    end
+    if shift != 0
+        a = shift_right(a, shift)
+        b = shift_right(b, shift)
+    end
+    a = truncate(a, n)
+    b = truncate(b, n)
+    for i = 0:n - 1
+        flag, q = divides(coeff(a, 0), coeff(b, 0))
+        !flag && error("Not an exact division")
+        r = setcoeff!(r, i, q)
+        a = shift_right(a - q*b, 1)
+        b = truncate(b, n - i - 1)
+        # truncate both a and b to n - i - 1
+    end
+    return r
+end
+
+# computes the top terms of the quotient of a by b starting with the term of
+# degree n0
+# if the division is not exact until at least the term of degree n0, an
+# exception may be raised
+function divhigh(a::PolyElem{T}, b::PolyElem{T}, n0::Int) where T <: RingElement
+    r = parent(a)()
+    n = degree(a) - degree(b) - n0
+    fit!(r, degree(a) - degree(b) + 1)
+    a = deepcopy(a)
+    da = degree(a)
+    R = base_ring(a)
+    t = R()
+    for i = 0:n
+        if da < degree(b)
+            break
+        end
+        # negate quotient so we can use addeq! below
+        q = -divexact(coeff(a, da), lead(b))
+        r = setcoeff!(r, da - degree(b), q)
+        da -= 1
+        if i != n
+            c = coeff(a, da)
+            for j = 0:min(degree(b) - 1, i)
+                t = mul!(t, coeff(r, da - degree(b) + j + 1),
+			                          coeff(b, degree(b) - j - 1))
+                c = addeq!(c, t)
+            end
+            a = setcoeff!(a, da, c)
+        end
+    end
+    if iszero(r)
+        return r
+    end
+    r = set_length!(r, normalise(r, length(r)))
+    # negate r to compensate for negation above
+    return -r
 end
 
 ###############################################################################
