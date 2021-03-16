@@ -30,6 +30,12 @@ parent_type(::Type{AbsMSeries{T}}) where {T <: RingElement} = AbsMSeriesRing{T}
 
 elem_type(::Type{AbsMSeriesRing{T}}) where {T <: RingElement} = AbsMSeries{T}
 
+function check_parent(a::AbsMSeries, b::AbsMSeries, throw::Bool = true)
+    c = parent(a) != parent(b)
+    c && throw && error("Incompatible multivariate series rings in series operation")
+    return !c
+ end
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -266,6 +272,7 @@ end
 ###############################################################################
 
 function +(a::AbsMSeries, b::AbsMSeries)
+    check_parent(a, b)
     R = parent(a)
     prec = min.(precision(a), precision(b))
     z = truncate_poly(poly(a) + poly(b), prec)
@@ -273,6 +280,7 @@ function +(a::AbsMSeries, b::AbsMSeries)
 end
 
 function -(a::AbsMSeries, b::AbsMSeries)
+    check_parent(a, b)
     R = parent(a)
     prec = min.(precision(a), precision(b))
     z = truncate_poly(poly(a) - poly(b), prec)
@@ -280,6 +288,7 @@ function -(a::AbsMSeries, b::AbsMSeries)
 end
 
 function *(a::AbsMSeries, b::AbsMSeries)
+    check_parent(a, b)
     R = parent(a)
     prec = min.(precision(a) .+ valuation(b), precision(b) .+ valuation(a))
     prec = min.(prec, max_precision(R))
@@ -349,6 +358,7 @@ end
 ###############################################################################
 
 function ==(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
+    check_parent(x, y)
     prec = min.(precision(x), precision(y))
     p1 = truncate_poly(poly(x), prec)
     p2 = truncate_poly(poly(y), prec)
@@ -356,6 +366,7 @@ function ==(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
 end
 
 function isequal(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
+    check_parent(x, y)
     return precision(x) == precision(y) && poly(x) == poly(y)
 end
 
@@ -398,6 +409,7 @@ end
 ###############################################################################
 
 function divexact(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
+    check_parent(x, y)
     return x*inv(y)
 end
 
@@ -479,6 +491,11 @@ end
 
 function (R::AbsMSeriesRing{T})(x::T) where T <: RingElem
     return R(R.poly_ring(x), max_precision(R))
+end
+
+function (R::AbsMSeriesRing{T})(x::AbsMSeries{T}) where T <: RingElem
+    parent(x) != R && error("Unable to coerce")
+    return x
 end
 
 function (R::AbsMSeriesRing)(b::Union{Integer, Rational, AbstractFloat})

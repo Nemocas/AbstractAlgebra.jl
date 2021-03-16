@@ -23,6 +23,7 @@ makedocs(
                           "series_rings.md",
                           "series.md",
                           "puiseux.md",
+			  "mseries.md",
                           "residue_rings.md",
                           "residue.md"],
              "Fields" => [ "fields.md",
