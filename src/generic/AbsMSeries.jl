@@ -44,12 +44,34 @@ function check_parent(a::AbsMSeries, b::AbsMSeries, throw::Bool = true)
 
 poly(a::AbsMSeries) = a.poly
 
+@doc Markdown.doc"""
+    length(a::AbsMSeries)
+
+Return the number of nonzero terms in the series $a$.
+"""
 length(a::AbsMSeries) = length(poly(a))
 
+@doc Markdown.doc"""
+    nvars(R::AbsMSeriesRing)
+
+Return the number of variables in the series ring.
+"""
 nvars(R::AbsMSeriesRing) = nvars(R.poly_ring)
 
+@doc Markdown.doc"""
+    precision(a::AbsMSeries)
+
+Return a vector of precisions, one for each variable in the series ring.
+"""
 precision(a::AbsMSeries) = a.prec
 
+@doc Markdown.doc"""
+    set_precision!(a::AbsMSeries, prec::Vector{Int})
+
+Set the precisions of the variables in the given series to the values in the
+vector `prec`. The precisions must be non-negative. The series will be
+truncated to the new precisions. The mutated series is returned.
+"""
 function set_precision!(a::AbsMSeries, prec::Vector{Int})
     length(prec) != length(precision(a)) &&
                          error("Array length not equal to number of variables")
@@ -60,12 +82,19 @@ function set_precision!(a::AbsMSeries, prec::Vector{Int})
     return a
 end
 
+@doc Markdown.doc"""
+    max_precision(R::AbsMSeriesRing)
+
+Return a vector of precision caps, one for each variable in the ring.
+Arithmetic operations will be performed to precisions not exceeding these
+values.
+"""
 max_precision(R::AbsMSeriesRing) = R.prec_max
 
 @doc Markdown.doc"""
     valuation(a::AbsMSeries)
 
-Return the valuation of $a$ as a vector of integers.
+Return the valuation of $a$ as a vector of integers, one for each variable.
 """
 function valuation(a::AbsMSeries)
     p = poly(a)
@@ -81,6 +110,13 @@ function valuation(a::AbsMSeries)
     return val
 end
 
+@doc Markdown.doc"""
+    coeff(a::AbsMSeries, n::Int)
+
+Return the coefficient of the $n$-th nonzero term of the series (or zero if
+there are fewer than $n$ nonzero terms). Terms are numbered from the least
+significant term, i.e. the first term displayed when the series is printed.
+"""
 function coeff(a::AbsMSeries, n::Int)
     return coeff(poly(a), length(a) - n + 1)
 end
@@ -95,8 +131,20 @@ zero(R::AbsMSeriesRing) = R(0)
 
 one(R::AbsMSeriesRing) = R(1)
 
+@doc Markdown.doc"""
+    isunit(a::AbsMSeries)
+
+Return `true` if the series is a unit in its series ring, i.e. if its constant
+term is a unit in the base ring.
+"""
 isunit(a::AbsMSeries) = isunit(constant_coefficient(poly(a)))
 
+@doc Markdown.doc"""
+    gen(R::AbsMSeriesRing, i::Int)
+
+Return the $i$-th generator (variable) of the series ring $R$. Numbering starts
+from $1$ for the most significant variable.
+"""
 function gen(R::AbsMSeriesRing, i::Int)
     S = R.poly_ring
     prec = [R.prec_max[ind] for ind in 1:nvars(R)]
@@ -104,8 +152,20 @@ function gen(R::AbsMSeriesRing, i::Int)
     return R(x, prec)
 end
 
+@doc Markdown.doc"""
+    gens(R::AbsMSeriesRing)
+
+Return a vector of the generators (variables) of the series ring $R$, starting
+with the most significant.
+"""
 gens(R::AbsMSeriesRing) = [gen(R, i) for i in 1:nvars(R)]
 
+
+@doc Markdown.doc"""
+    isgen(a::AbsMSeries)
+
+Return true if the series $a$ is a generator of its parent series ring.
+"""
 function isgen(a::AbsMSeries)
     R = parent(a)
     p = poly(a)
@@ -114,6 +174,12 @@ function isgen(a::AbsMSeries)
                           isone(lc(p)) && sum(first(exponent_vectors(p))) == 1
 end
 
+@doc Markdown.doc"""
+    vars(R::AbstractAlgebra.MSeriesRing)
+
+Return a vector of symbols, one for each of the variables of the series ring
+$R$.
+"""
 vars(R::AbstractAlgebra.MSeriesRing) = R.sym
 
 parent(a::AbstractAlgebra.MSeriesElem) = a.parent
@@ -133,9 +199,14 @@ function Base.hash(a::AbsMSeries, h::UInt)
     return xor(b, hash(poly(a), h))
 end
 
+@doc Markdown.doc"""
+    characteristic(a::AbstractAlgebra.MSeriesRing)
+
+Return the characteristic of the base ring of the series `a`.
+"""
 function characteristic(a::AbstractAlgebra.MSeriesRing)
     return characteristic(base_ring(a))
- end
+end
 
 ###############################################################################
 #
@@ -376,6 +447,12 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    Base.inv(x::AbsMSeries)
+
+Return the inverse of the series $x$. An exception is raised if the series is
+not a unit.
+"""
 function Base.inv(x::AbsMSeries)
     !isunit(x) && error("Not a unit")
     R = parent(x)
@@ -408,6 +485,12 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    divexact(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
+
+Return the exact quotient of the series $x$ by the series $y$. This function
+currently assumes $y$ is an invertible series.
+"""
 function divexact(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     check_parent(x, y)
     return x*inv(y)
@@ -454,6 +537,15 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.MSeriesRing,
    rand(rng, make(S, term_range, v...))
 end
 
+@doc Markdown.doc"""
+    rand(S::AbstractAlgebra.MSeriesRing, term_range, v...)
+
+Return a random element of the series ring $S$ with number of terms in the
+range given by `term_range` and where coefficients of the series are randomly
+generated in the base ring using the data given by `v`. The exponents of the
+variable in the terms will be less than the precision caps for the Ring $S$
+when it was created.
+"""
 function rand(S::AbstractAlgebra.MSeriesRing, term_range, v...)
    rand(GLOBAL_RNG, S, term_range, v...)
 end
@@ -493,7 +585,7 @@ function (R::AbsMSeriesRing{T})(x::T) where T <: RingElem
     return R(R.poly_ring(x), max_precision(R))
 end
 
-function (R::AbsMSeriesRing{T})(x::AbsMSeries{T}) where T <: RingElem
+function (R::AbsMSeriesRing{T})(x::AbsMSeries{T}) where T <: RingElement
     parent(x) != R && error("Unable to coerce")
     return x
 end

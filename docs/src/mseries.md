@@ -161,59 +161,69 @@ for absolute series over any commutative ring.
 ### Basic functionality
 
 ```@docs
-nvars(::AbsMSeriesRing)
+nvars(::Generic.AbsMSeriesRing)
 ```
 
 ```@docs
-precision(::AbsMSeries)
+vars(::AbstractAlgebra.MSeriesRing)
 ```
 
 ```@docs
-max_precision(::AbsMSeriesRing)
+precision(::Generic.AbsMSeries)
 ```
 
 ```@docs
-valuation(::AbsMSeries)
+max_precision(::Generic.AbsMSeriesRing)
 ```
 
 ```@docs
-coeff(::AbsMSeries, ::Int)
+valuation(::Generic.AbsMSeries)
 ```
 
 ```@docs
-characteristic(::AbsMSeries)
+coeff(::Generic.AbsMSeries, ::Int)
 ```
 
 ```@docs
-gen(::AbsMSeries, i::Int)
+characteristic(::Generic.AbsMSeries)
 ```
 
 ```@docs
-gens(::AbsMSeries)
+gen(::Generic.AbsMSeriesRing, ::Int)
 ```
 
 ```@docs
-isgen(::AbsMSeries)
+gens(::Generic.AbsMSeriesRing)
 ```
 
 ```@docs
-isunit(::AbsMSeries)
+isgen(::Generic.AbsMSeries)
 ```
 
 ```@docs
-length(::AbsMSeries)
+isunit(::Generic.AbsMSeries)
+```
+
+```@docs
+length(::Generic.AbsMSeries)
 ```
 
 ### Truncation
 
 ```@docs
-truncate(::AbsMSeries, ::Vector{Int})
+truncate(::Generic.AbsMSeries, ::Vector{Int})
+```
+
+### Inversion
+
+```@docs
+Base.inv(::Generic.AbsMSeries)
 ```
 
 ### Exact division
 
 ```@docs
-divexact(::AbsMSeries{T}, ::AbsMSeries{T}) where T <: RingElem
+divexact(::Generic.AbsMSeries{T}, ::Generic.AbsMSeries{T}) where T <: RingElem
 ```
 
 ### Random generation
