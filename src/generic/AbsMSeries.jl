@@ -568,7 +568,7 @@ end
 #
 ###############################################################################
 
-function (R::AbsMSeriesRing{T})(x::MPoly{T}, prec::Vector{Int}) where T <: RingElement
+function (R::AbsMSeriesRing{T})(x::MPolyElem{T}, prec::Vector{Int}) where T <: RingElement
     for v in prec
         v < 0 && error("Precision must be non-negative")
     end

@@ -806,11 +806,11 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
 
 mutable struct AbsMSeriesRing{T <: RingElement} <: AbstractAlgebra.MSeriesRing{T}
    base_ring::Ring
-   poly_ring::MPolyRing{T}
+   poly_ring::AbstractAlgebra.MPolyRing{T}
    prec_max::Vector{Int}
    sym::Vector{Symbol}
 
-   function AbsMSeriesRing{T}(R::Ring, poly_ring::MPolyRing{T}, prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where T <: RingElement
+   function AbsMSeriesRing{T}(R::Ring, poly_ring::AbstractAlgebra.MPolyRing{T}, prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where T <: RingElement
       if cached && haskey(AbsMSeriesID, (R, prec, s))
          return AbsMSeriesID[R, prec, s]::AbsMSeriesRing{T}
       else
@@ -826,12 +826,11 @@ end
 const AbsMSeriesID = Dict{Tuple{Ring, Vector{Int}, Vector{Symbol}}, Ring}()
 
 mutable struct AbsMSeries{T <: RingElement} <: AbstractAlgebra.AbsMSeriesElem{T}
-   poly::MPoly{T}
+   poly::AbstractAlgebra.MPolyElem{T}
    prec::Vector{Int}
    parent::AbsMSeriesRing{T}
 
-   AbsMSeries{T}(p::MPoly{T}, prec::Vector{Int}) where T <: RingElement = new{T}(p, prec)
-   AbsMSeries{T}(a::AbsMSeries{T}) where T <: RingElement = a
+   AbsMSeries{T}(p::AbstractAlgebra.MPolyElem{T}, prec::Vector{Int}) where T <: RingElement = new{T}(p, prec)
 end
 
 ###############################################################################
