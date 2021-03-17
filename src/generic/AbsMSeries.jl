@@ -210,6 +210,62 @@ end
 
 ###############################################################################
 #
+#   Iterators
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    coeffs(a::AbsMSeries)
+
+Return an array of the nonzero coefficients of the series, in the order they
+would be displayed, i.e. least significant term first.
+"""
+function coeffs(a::AbsMSeries)
+    return reverse(collect(coeffs(poly(a))))
+end
+
+@doc Markdown.doc"""
+    exponent_vectors(a::AbsMSeries)
+
+Return an array of the exponent vectors of the nonzero terms of the series, in the
+order they would be displayed, i.e. least significant term first.
+"""
+function exponent_vectors(a::AbsMSeries)
+    return reverse(collect(exponent_vectors(poly(a))))
+end
+
+###############################################################################
+#
+#   Coefficients, terms and exponent vectors
+#
+###############################################################################
+
+# set the exponent vector of the underlying polynomial (used internally)
+function set_exponent_vector!(a::AbsMSeries, i::Int64, v::Vector{Int64})
+    a.poly = set_exponent_vector!(poly(a), i, v)
+    return a
+end
+
+# set the coefficient of the underlying polynomial (used internally)
+function setcoeff!(a::AbsMSeries{T}, i::Int64, c::T) where T <: RingElement
+    a.poly = setcoeff!(poly(a), i, c)
+    return a
+end
+
+# used by MPolyBuildCtx by evaluation
+function sort_terms!(a::AbsMSeries)
+    a.poly = sort_terms!(poly(a))
+    return a
+end
+
+# used by MPolyBuildCtx by evaluation
+function combine_like_terms!(a::AbsMSeries)
+    a.poly = combine_like_terms!(poly(a))
+    return a
+end
+
+###############################################################################
+#
 #   AbstractString I/O
 #
 ###############################################################################
@@ -494,6 +550,89 @@ currently assumes $y$ is an invertible series.
 function divexact(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     check_parent(x, y)
     return x*inv(y)
+end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    evaluate(a::U, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
+
+Evaluate the series expression by substituting in the supplied values in
+the array `vals` for the corresponding variables with indices given by the
+array `vars`. The values must be in the same ring as $a$.
+"""
+function evaluate(a::U, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
+    R = parent(a)
+    unique(vars) != vars && error("Variables not unique")
+    length(vars) != length(vals) &&
+        error("Number of variables does not match number of values")
+    for i = 1:length(vars)
+        if vars[i] < 1 || vars[i] > nvars(parent(a))
+            error("Variable index not in range")
+        end
+        parent(vals[i]) !== R && error("Element not in series ring")
+    end
+ 
+    if length(vars) == 0
+        return a
+    end
+ 
+    S = parent(a)
+    R = base_ring(a)
+    return _evaluate(a, S, R, vars, vals)
+end
+
+@doc Markdown.doc"""
+    evaluate(a::U, vars::Vector{U}, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
+
+Evaluate the series expression by substituting in the supplied values in
+the array `vals` for the corresponding variables given by the array `vars`.
+The values must be in the same ring as $a$.
+"""
+function evaluate(a::U, vars::Vector{U}, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
+    varidx = Int[var_index(poly(x)) for x in vars]
+    return evaluate(a, varidx, vals)
+end
+
+@doc Markdown.doc"""
+    evaluate(a::U, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
+
+Evaluate the series expression by substituting in the supplied values in
+the array `vals` for the variables the series ring to which $a$ belongs. The
+values must be in the same ring as $a$.
+"""
+function evaluate(a::U, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
+    R = parent(a)
+    return evaluate(a, [i for i in 1:nvars(R)], vals)
+end
+
+###############################################################################
+#
+#   Unsafe operators
+#
+###############################################################################
+
+function addeq!(a::AbsMSeries{T}, b::AbsMSeries{T}) where T <: RingElement
+    R = parent(a)
+    prec = min.(precision(a), precision(b))
+    a.poly = addeq!(a.poly, b.poly)
+    a.poly = truncate_poly(a.poly, prec)
+    a.prec = prec
+    return a
+end
+
+function mul!(c::AbsMSeries{T}, a::AbsMSeries{T}, b::AbsMSeries{T}) where T <: RingElement
+    R = parent(a)
+    prec = min.(precision(a) .+ valuation(b), precision(b) .+ valuation(a))
+    prec = min.(prec, max_precision(R))
+    c.poly = mul!(c.poly, a.poly, b.poly)
+    c.poly = truncate_poly(c.poly, prec)
+    c.prec = prec
+    return c
 end
 
 ###############################################################################

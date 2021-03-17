@@ -208,6 +208,16 @@ isunit(::Generic.AbsMSeries)
 length(::Generic.AbsMSeries)
 ```
 
+### Iteration
+
+```@docs
+coeffs(::Generic.AbsMSeries)
+```
+
+```@docs
+exponent_vectors(::Generic.AbsMSeries)
+```
+
 ### Truncation
 
 ```@docs
@@ -224,6 +234,21 @@ Base.inv(::Generic.AbsMSeries)
 
 ```@docs
 divexact(::Generic.AbsMSeries{T}, ::Generic.AbsMSeries{T}) where T <: RingElem
+```
+
+### Evaluation
+
+
+```@docs
+evaluate(::U, ::Vector{Int}, ::Vector{U}) where {T <: RingElement, U <: Generic.AbsMSeries{T}}
+```
+
+```@docs
+evaluate(::U, ::Vector{U}, ::Vector{U}) where {T <: RingElement, U <: Generic.AbsMSeries{T}}
+```
+
+```@docs
+evaluate(::U, ::Vector{U}) where {T <: RingElement, U <: Generic.AbsMSeries{T}}
 ```
 
 ### Random generation

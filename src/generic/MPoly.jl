@@ -1385,7 +1385,7 @@ end
 #
 ###############################################################################
 
-mutable struct geobucket{T <: AbstractAlgebra.MPolyElem}
+mutable struct geobucket{T}
    len::Int
    buckets::Vector{T}
 
@@ -1394,7 +1394,7 @@ mutable struct geobucket{T <: AbstractAlgebra.MPolyElem}
    end
 end
 
-function Base.push!(G::geobucket{T}, p::T) where {T <: AbstractAlgebra.MPolyElem}
+function Base.push!(G::geobucket{T}, p::T) where T
    R = parent(p)
    i = max(1, ndigits(length(p), base=4))
    l = length(G.buckets)
@@ -1419,7 +1419,7 @@ function Base.push!(G::geobucket{T}, p::T) where {T <: AbstractAlgebra.MPolyElem
    end
 end
 
-function finish(G::geobucket{T})  where {T <: AbstractAlgebra.MPolyElem}
+function finish(G::geobucket{T}) where T
    p = G.buckets[1]
    for i = 2:length(G.buckets)
       p = addeq!(p, G.buckets[i])
@@ -4815,7 +4815,9 @@ end
 #
 ###############################################################################
 
-function MPolyBuildCtx(R::AbstractAlgebra.MPolyRing)
+# We use Ring instead of MPolyRing to support other multivariate objects
+# e.g. Series, non-commutative rings in Singular, etc.
+function MPolyBuildCtx(R::AbstractAlgebra.Ring)
    return MPolyBuildCtx(R, Nothing)
 end
 
@@ -4824,17 +4826,17 @@ function show(io::IO, M::MPolyBuildCtx)
    print(iocomp, "Builder for a polynomial in ", parent(M.poly))
 end
 
-function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
-  if iszero(c)
-    return M
-  end
-  len = length(M.poly) + 1
-  set_exponent_vector!(M.poly, len, expv)
-  setcoeff!(M.poly, len, c)
-  return M
+function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
+   if iszero(c)
+      return M
+   end
+   len = length(M.poly) + 1
+   set_exponent_vector!(M.poly, len, expv)
+   setcoeff!(M.poly, len, c)
+   return M
 end
 
-function finish(M::MPolyBuildCtx{T}) where T <: AbstractAlgebra.MPolyElem
+function finish(M::MPolyBuildCtx{T}) where T
   M.poly = sort_terms!(M.poly)
   M.poly = combine_like_terms!(M.poly)
   return M.poly

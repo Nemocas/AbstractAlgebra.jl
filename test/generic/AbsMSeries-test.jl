@@ -299,3 +299,25 @@ end
       end
    end
 end
+
+@testset "Generic.AbsMSeries.evaluation" begin
+   R, (x, y) = PowerSeriesRing(ZZ, [10, 10], ["x", "y"])
+
+   f = x^2 + y
+
+   @test evaluate(f, [x^3 + 1, y^2]) == 1 + y^2 + 2*x^3 + x^6 + O(y^10) + O(x^10)
+
+   for iters = 1:30
+      f = rand(R, 10:10, -10:10)
+      g = rand(R, 10:10, -10:10)
+      h = rand(R, 10:10, -10:10)
+      k = rand(R, 10:10, -10:10)
+
+      @test evaluate(f + k, [g, h]) == evaluate(f, [g, h]) + evaluate(k, [g, h])
+
+      @test evaluate(f, [1], [g]) == evaluate(f, [g, y])
+      @test evaluate(f, [2], [h]) == evaluate(f, [x, h])
+      @test evaluate(f, [x], [g]) == evaluate(f, [g, y])
+      @test evaluate(f, [y], [h]) == evaluate(f, [x, h])
+   end
+end

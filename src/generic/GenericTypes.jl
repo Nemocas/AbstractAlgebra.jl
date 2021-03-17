@@ -448,27 +448,27 @@ end
 
 # Iterators
 
-struct MPolyCoeffs{T <: AbstractAlgebra.MPolyElem}
+struct MPolyCoeffs{T <: AbstractAlgebra.RingElem}
    poly::T
 end
 
-struct MPolyExponentVectors{T <: AbstractAlgebra.MPolyElem}
+struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem}
    poly::T
 end
 
-struct MPolyTerms{T <: AbstractAlgebra.MPolyElem}
+struct MPolyTerms{T <: AbstractAlgebra.RingElem}
    poly::T
 end
 
-struct MPolyMonomials{T <: AbstractAlgebra.MPolyElem}
+struct MPolyMonomials{T <: AbstractAlgebra.RingElem}
    poly::T
 end
 
-mutable struct MPolyBuildCtx{T <: AbstractAlgebra.MPolyElem, S}
+mutable struct MPolyBuildCtx{T, S}
   poly::T
   state::S
 
-  function MPolyBuildCtx(R::T, s::S) where {S, T <: AbstractAlgebra.MPolyRing}
+  function MPolyBuildCtx(R::T, s::S) where {S, T}
     return new{elem_type(T), S}(R())
   end
 end
