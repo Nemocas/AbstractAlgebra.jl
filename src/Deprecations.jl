@@ -29,3 +29,19 @@ end
 
 @deprecate powmod(x, y, z) powermod(x, y, z)
 
+# Deprecated in 0.14.1
+
+@deprecate trail(f) trailing_coefficient(f)
+
+@deprecate lead(f) leading_coefficient(f)
+
+@deprecate lc(f) leading_coefficient(f)
+
+@deprecate lm(f) leading_monomial(f)
+
+@deprecate lt(f) leading_term(f)
+
+@deprecate valence(f::Generic.PolyElem) trailing_coefficient(f)
+
+@deprecate coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement coefficients(a)
+

@@ -164,9 +164,9 @@ end
 
    f = 2x*y + x^2 + 1
 
-   @test lead(f) == 2x
+   @test leading_coefficient(f) == 2x
 
-   @test trail(2x*y + x^2) == x^2
+   @test trailing_coefficient(2x*y + x^2) == x^2
 
    @test degree(f) == 1
 
@@ -694,7 +694,7 @@ end
       r = mullow(f, g, n)
 
       @test truncate(f*g, n) == r
-      @test r == 0 || !iszero(lead(r))
+      @test r == 0 || !iszero(leading_coefficient(r))
    end
 end
 
@@ -1490,7 +1490,7 @@ end
       if length(f) < length(g)
          @test f == r && q == 0
       else
-         @test q*g + r == f*lead(g)^(length(f) - length(g) + 1)
+         @test q*g + r == f*leading_coefficient(g)^(length(f) - length(g) + 1)
       end
 
       @test pseudorem(f, g) == r
@@ -1512,7 +1512,7 @@ end
       if length(f) < length(g)
          @test f == r && q == 0
       else
-         @test q*g + r == f*lead(g)^(length(f) - length(g) + 1)
+         @test q*g + r == f*leading_coefficient(g)^(length(f) - length(g) + 1)
       end
 
       @test pseudorem(f, g) == r
@@ -1544,7 +1544,7 @@ end
          h = rand(R, 0:10, -10:10)
       end
 
-      @test gcd(f*h, g*h) == divexact(h, canonical_unit(lead(h)))*gcd(f, g)
+      @test gcd(f*h, g*h) == divexact(h, canonical_unit(leading_coefficient(h)))*gcd(f, g)
 
       @test lcm(f, h) == divexact(f*h, gcd(f, h))
    end
@@ -1573,7 +1573,7 @@ end
          h = rand(R, 0:5, -10:10)
       end
 
-      @test gcd(f*h, g*h) == inv(lead(h))*h*gcd(f, g)
+      @test gcd(f*h, g*h) == inv(leading_coefficient(h))*h*gcd(f, g)
    end
 
    for iter = 1:10
@@ -1951,8 +1951,10 @@ end
       g = rand(R, 0:5, 0:5)
       h = rand(R, 0:5, 0:5)
 
-      @test lead(f)*lead(g) == 0 || resultant(f*g, h) == resultant(f, h)*resultant(g, h)
-      @test lead(g)*lead(h) == 0 || resultant(f, g*h) == resultant(f, g)*resultant(f, h)
+      @test leading_coefficient(f)*leading_coefficient(g) == 0 ||
+            resultant(f*g, h) == resultant(f, h)*resultant(g, h)
+      @test leading_coefficient(g)*leading_coefficient(h) == 0 ||
+            resultant(f, g*h) == resultant(f, g)*resultant(f, h)
    end
 end
 

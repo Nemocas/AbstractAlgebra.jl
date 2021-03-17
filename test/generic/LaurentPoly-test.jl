@@ -112,12 +112,12 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
          end
       end
 
-      @test lead(zero(y)) == 0
-      @test trail(zero(y)) == 0
-      @test lead(one(y)) == 1
-      @test trail(one(y)) == 1
-      @test lead(y) == 1
-      @test trail(y) == 1
+      @test leading_coefficient(zero(y)) == 0
+      @test trailing_coefficient(zero(y)) == 0
+      @test leading_coefficient(one(y)) == 1
+      @test trailing_coefficient(one(y)) == 1
+      @test leading_coefficient(y) == 1
+      @test trailing_coefficient(y) == 1
 
       @test hash(zero(y)) == hash(zero(y))
       @test hash(one(y)) == hash(one(y))
@@ -133,8 +133,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test isone(f^0)
       @test iszero(f-f)
 
-      @test lead(f) == 1
-      @test trail(f) == 1
+      @test leading_coefficient(f) == 1
+      @test trailing_coefficient(f) == 1
 
       f2 = f = LaurentPolyWrap(3 + 2*x^4, -3)
       @test terms_degrees(f) == -3:1
@@ -144,8 +144,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
       @test f == 3y^-3 + 2y
 
-      @test lead(f) == 2
-      @test trail(f) == 3
+      @test leading_coefficient(f) == 2
+      @test trailing_coefficient(f) == 3
 
       @test canonical_unit(f) == 1
 
@@ -177,8 +177,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
          @test hash(f^0) == hash(one(f))
          @test hash(f*f*f) == hash(f^3)
 
-         @test lead(f) == lead(f.poly)
-         @test trail(f) == trail(f.poly)
+         @test leading_coefficient(f) == leading_coefficient(f.poly)
+         @test trailing_coefficient(f) == trailing_coefficient(f.poly)
       end
 
       ff = deepcopy(f)

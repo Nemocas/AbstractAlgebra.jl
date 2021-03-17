@@ -74,9 +74,9 @@ end
 
    f = 2*y + 1
 
-   @test lead(f) == 2
+   @test leading_coefficient(f) == 2
 
-   @test trail(2y^2 + 3y) == 3
+   @test trailing_coefficient(2y^2 + 3y) == 3
 
    @test degree(f) == 1
 
@@ -326,7 +326,7 @@ end
    for iter = 1:100
       f = rand(S, 0:10, -100:100)
       g = S()
-      while rank(lead(g)) != 2
+      while rank(leading_coefficient(g)) != 2
          g = rand(S, 0:10, -100:100)
       end
 
@@ -367,7 +367,7 @@ end
    for iter = 1:100
       f = rand(T, 0:10, 0:10, -100:100)
       g = S()
-      while rank(lead(g)) != 2
+      while rank(leading_coefficient(g)) != 2
          g = rand(S, 0:10, -100:100)
       end
 
