@@ -811,19 +811,13 @@ mutable struct AbsMSeriesRing{T <: RingElement} <: AbstractAlgebra.MSeriesRing{T
    sym::Vector{Symbol}
 
    function AbsMSeriesRing{T}(R::Ring, poly_ring::AbstractAlgebra.MPolyRing{T}, prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where T <: RingElement
-      if cached && haskey(AbsMSeriesID, (R, prec, s))
-         return AbsMSeriesID[R, prec, s]::AbsMSeriesRing{T}
-      else
-         z = new{T}(R, poly_ring, prec, s)
-         if cached
-            AbsMSeriesID[R, prec, s] = z
-         end
-         return z
-      end
+      return get_cached!(AbsMSeriesID, (R, prec, s), cached) do
+         new{T}(R, poly_ring, prec, s)
+      end::AbsMSeriesRing{T}
    end
 end
 
-const AbsMSeriesID = Dict{Tuple{Ring, Vector{Int}, Vector{Symbol}}, Ring}()
+const AbsMSeriesID = CacheDictType{Tuple{Ring, Vector{Int}, Vector{Symbol}}, Ring}()
 
 mutable struct AbsMSeries{T <: RingElement} <: AbstractAlgebra.AbsMSeriesElem{T}
    poly::AbstractAlgebra.MPolyElem{T}
