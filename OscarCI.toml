@@ -1,0 +1,25 @@
+title = "metadata for oscar CI run"
+
+# keep it small to prevent job-explosion
+[env]
+os = [ "ubuntu-latest" ]
+julia-version = [ "~1.6.0-0" ]
+
+# packages not listed here will use the latest release
+[pkgs]
+  [pkgs.Oscar]
+  branches = [ "master", "release" ]
+  test = true
+
+  [pkgs.Nemo]
+  branches = [ "master", "release" ]
+  test = true
+
+  [pkgs.Singular]
+  branches = [ "master", "release" ]
+  test = true
+
+  [pkgs.Hecke]
+  branches = [ "master", "release" ]
+  test = true
+  testoptions = [ "short" ]
