@@ -804,36 +804,37 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
 #
 ###############################################################################
 
-mutable struct AbsMSeriesRing{T <: RingElement} <:
+mutable struct AbsMSeriesRing{T <: RingElement, S} <:
                                                  AbstractAlgebra.MSeriesRing{T}
    base_ring::Ring
    poly_ring::AbstractAlgebra.MPolyRing{T}
    prec_max::Vector{Int}
    sym::Vector{Symbol}
 
-   function AbsMSeriesRing{T}(R::Ring,
+   function AbsMSeriesRing{T, S}(R::Ring,
          poly_ring::AbstractAlgebra.MPolyRing{T}, prec::Vector{Int},
                             s::Vector{Symbol}, cached::Bool = true) where
-                                                               T <: RingElement
+                          {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
+      U = elem_type(poly_ring)
       return get_cached!(AbsMSeriesID, (R, prec, s), cached) do
-         new{T}(R, poly_ring, prec, s)
-      end::AbsMSeriesRing{T}
+         new{T, U}(R, poly_ring, prec, s)
+      end::AbsMSeriesRing{T, S}
    end
 end
 
 const AbsMSeriesID = CacheDictType{Tuple{Ring,
                                           Vector{Int}, Vector{Symbol}}, Ring}()
 
-mutable struct AbsMSeries{T <: RingElement} <:
+mutable struct AbsMSeries{T <: RingElement, S} <:
                                               AbstractAlgebra.AbsMSeriesElem{T}
-   poly::AbstractAlgebra.MPolyElem{T}
+   poly::S
    prec::Vector{Int}
-   parent::AbsMSeriesRing{T}
+   parent::AbsMSeriesRing{T, S}
 
-   function AbsMSeries{T}(R::AbsMSeriesRing{T},
-               p::AbstractAlgebra.MPolyElem{T}, prec::Vector{Int}) where
-                                                               T <: RingElement
-      return new{T}(p, prec, R)
+   function AbsMSeries{T, S}(R::AbsMSeriesRing{T},
+                      pol::S, prec::Vector{Int}) where
+                          {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
+      return new{T, S}(pol, prec, R)
    end
 end
 

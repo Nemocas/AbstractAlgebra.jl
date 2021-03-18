@@ -26,12 +26,12 @@ function O(a::AbstractAlgebra.AbsMSeriesElem{T}) where T <: RingElement
     return R(parent(p)(), prec)
 end
 
-function parent_type(::Type{AbsMSeries{T}}) where T <: RingElement
-    return AbsMSeriesRing{T}
+function parent_type(::Type{AbsMSeries{T, S}}) where {T <: RingElement, S}
+    return AbsMSeriesRing{T, S}
 end
 
-function elem_type(::Type{AbsMSeriesRing{T}}) where T <: RingElement
-    return AbsMSeries{T}
+function elem_type(::Type{AbsMSeriesRing{T, S}}) where {T <: RingElement, S}
+    return AbsMSeries{T, S}
 end
 
 function check_parent(a::AbsMSeries, b::AbsMSeries, throw::Bool = true)
@@ -47,7 +47,11 @@ function check_parent(a::AbsMSeries, b::AbsMSeries, throw::Bool = true)
 #
 ###############################################################################
 
-poly(a::AbsMSeries) = a.poly
+poly(a::AbsMSeries{T, S}) where {T <: RingElement, S} = a.poly::S
+
+function poly_ring(R::AbsMSeriesRing{T, S}) where {T <: RingElement, S}
+   return R.poly_ring::parent_type(S) 
+end
 
 @doc Markdown.doc"""
     length(a::AbsMSeries)
@@ -61,7 +65,7 @@ length(a::AbsMSeries) = length(poly(a))
 
 Return the number of variables in the series ring.
 """
-nvars(R::AbsMSeriesRing) = nvars(R.poly_ring)
+nvars(R::AbsMSeriesRing) = nvars(poly_ring(R))
 
 @doc Markdown.doc"""
     precision(a::AbsMSeries)
@@ -151,7 +155,7 @@ Return the $i$-th generator (variable) of the series ring $R$. Numbering starts
 from $1$ for the most significant variable.
 """
 function gen(R::AbsMSeriesRing, i::Int)
-    S = R.poly_ring
+    S = poly_ring(R)
     prec = [R.prec_max[ind] for ind in 1:nvars(R)]
     x = R.prec_max[i] > 1 ? gen(S, i) : S()
     return R(x, prec)
@@ -459,7 +463,7 @@ function ^(a::AbsMSeries, b::Int) where T <: RingElement
     R = parent(a)
     prec = precision(a)
     if b == 0
-        p = one(R.poly_ring)
+        p = one(poly_ring(R))
         p = truncate_poly(p, prec)
         return R(p, prec)
     elseif isconstant(poly(a))
@@ -519,8 +523,8 @@ function Base.inv(x::AbsMSeries)
     R = parent(x)
     prec = [1 for n in 1:nvars(R)]
     cinv = inv(coeff(x, 1))
-    xinv = R(R.poly_ring(cinv), prec)
-    two = R(R.poly_ring(2), prec)
+    xinv = R(poly_ring(R)(cinv), prec)
+    two = R(poly_ring(R)(2), prec)
     # lift each variable in turn
     for var = nvars(R):-1:1
         nvar = precision(x)[var]
@@ -718,22 +722,22 @@ end
 #
 ###############################################################################
 
-function (R::AbsMSeriesRing{T})(x::AbstractAlgebra.MPolyElem{T},
-                                      prec::Vector{Int}) where T <: RingElement
+function (R::AbsMSeriesRing{T, S})(x::S, prec::Vector{Int}) where
+                          {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
     for v in prec
         v < 0 && error("Precision must be non-negative")
     end
-    s = AbsMSeries{T}(R, x, prec)
+    s = AbsMSeries{T, S}(R, x, prec)
     s.parent = R
     return s
 end
 
 function (R::AbsMSeriesRing)()
-    return R(R.poly_ring(), max_precision(R))
+    return R(poly_ring(R)(), max_precision(R))
 end
 
 function (R::AbsMSeriesRing{T})(x::T) where T <: RingElem
-    return R(R.poly_ring(x), max_precision(R))
+    return R(poly_ring(R)(x), max_precision(R))
 end
 
 function (R::AbsMSeriesRing{T})(x::AbsMSeries{T}) where T <: RingElement
@@ -742,7 +746,7 @@ function (R::AbsMSeriesRing{T})(x::AbsMSeries{T}) where T <: RingElement
 end
 
 function (R::AbsMSeriesRing)(b::Union{Integer, Rational, AbstractFloat})
-    return R(R.poly_ring(b), max_precision(R))
+    return R(poly_ring(R)(b), max_precision(R))
 end
 
 ###############################################################################
@@ -758,9 +762,10 @@ function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int},
     U = elem_type(R)
  
     S, _ = AbstractAlgebra.PolynomialRing(R, s)
+    V = elem_type(S)
 
     if model == :capped_absolute
-       parent_obj = AbsMSeriesRing{U}(R, S, prec, sym, cached)
+       parent_obj = AbsMSeriesRing{U, V}(R, S, prec, sym, cached)
     else
        error("Unknown model")
     end
