@@ -26,16 +26,12 @@ function O(a::AbstractAlgebra.AbsMSeriesElem{T}) where T <: RingElement
     return R(parent(p)(), prec)
 end
 
-function parent_type(::Type{AbsMSeries{T, U}}) where
-                         {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
-    V = parent_type(U)
-    return AbsMSeriesRing{T, V}
+function parent_type(::Type{AbsMSeries{T}}) where T <: RingElement
+    return AbsMSeriesRing{T}
 end
 
-function elem_type(::Type{AbsMSeriesRing{T, U}}) where
-                         {T <: RingElement, U <: AbstractAlgebra.MPolyRing{T}}
-    V = elem_type(U)
-    return AbsMSeries{T, V}
+function elem_type(::Type{AbsMSeriesRing{T}}) where T <: RingElement
+    return AbsMSeries{T}
 end
 
 function check_parent(a::AbsMSeries, b::AbsMSeries, throw::Bool = true)
@@ -722,12 +718,12 @@ end
 #
 ###############################################################################
 
-function (R::AbsMSeriesRing{T})(x::S, prec::Vector{Int}) where
-                                          {T <: RingElement, S <: MPolyElem{T}}
+function (R::AbsMSeriesRing{T})(x::AbstractAlgebra.MPolyElem{T},
+                                      prec::Vector{Int}) where T <: RingElement
     for v in prec
         v < 0 && error("Precision must be non-negative")
     end
-    s = AbsMSeries{T, S}(x, prec)
+    s = AbsMSeries{T}(R, x, prec)
     s.parent = R
     return s
 end
@@ -763,9 +759,8 @@ function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int},
  
     S, _ = AbstractAlgebra.PolynomialRing(R, s)
 
-    V = typeof(S)
     if model == :capped_absolute
-       parent_obj = AbsMSeriesRing{U, V}(R, S, prec, sym, cached)
+       parent_obj = AbsMSeriesRing{U}(R, S, prec, sym, cached)
     else
        error("Unknown model")
     end

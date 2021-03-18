@@ -804,18 +804,19 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
 #
 ###############################################################################
 
-mutable struct AbsMSeriesRing{T <: RingElement,
-           S <: AbstractAlgebra.MPolyRing{T}} <: AbstractAlgebra.MSeriesRing{T}
+mutable struct AbsMSeriesRing{T <: RingElement} <:
+                                                 AbstractAlgebra.MSeriesRing{T}
    base_ring::Ring
-   poly_ring::S
+   poly_ring::AbstractAlgebra.MPolyRing{T}
    prec_max::Vector{Int}
    sym::Vector{Symbol}
 
-   function AbsMSeriesRing{T, S}(R::Ring, poly_ring::S, prec::Vector{Int},
+   function AbsMSeriesRing{T}(R::Ring,
+         poly_ring::AbstractAlgebra.MPolyRing{T}, prec::Vector{Int},
                             s::Vector{Symbol}, cached::Bool = true) where
-                          {T <: RingElement, S <: AbstractAlgebra.MPolyRing{T}}
+                                                               T <: RingElement
       return get_cached!(AbsMSeriesID, (R, prec, s), cached) do
-         new{T, S}(R, poly_ring, prec, s)
+         new{T}(R, poly_ring, prec, s)
       end::AbsMSeriesRing{T}
    end
 end
@@ -823,16 +824,16 @@ end
 const AbsMSeriesID = CacheDictType{Tuple{Ring,
                                           Vector{Int}, Vector{Symbol}}, Ring}()
 
-mutable struct AbsMSeries{T <: RingElement,
-        S <: AbstractAlgebra.MPolyElem{T}} <: AbstractAlgebra.AbsMSeriesElem{T}
-   poly::S
+mutable struct AbsMSeries{T <: RingElement} <:
+                                              AbstractAlgebra.AbsMSeriesElem{T}
+   poly::AbstractAlgebra.MPolyElem{T}
    prec::Vector{Int}
    parent::AbsMSeriesRing{T}
 
-   function AbsMSeries{T, S}(p::AbstractAlgebra.MPolyElem{T},
-                             prec::Vector{Int}) where
-                          {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
-      return new{T, S}(p, prec)
+   function AbsMSeries{T}(R::AbsMSeriesRing{T},
+               p::AbstractAlgebra.MPolyElem{T}, prec::Vector{Int}) where
+                                                               T <: RingElement
+      return new{T}(p, prec, R)
    end
 end
 
