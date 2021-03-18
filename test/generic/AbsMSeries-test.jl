@@ -7,9 +7,9 @@
    
       f = rand(R, 0:10, -10:10)
 
-      @test parent_type(f) == Generic.AbsMSeriesRing{Rational{BigInt}}
+      @test parent_type(f) == Generic.AbsMSeriesRing{Rational{BigInt}, Generic.MPolyRing{Rational{BigInt}}}
 
-      @test elem_type(R) == Generic.AbsMSeries{Rational{BigInt}}
+      @test elem_type(R) == Generic.AbsMSeries{Rational{BigInt}, Generic.MPoly{Rational{BigInt}}}
 
       @test R isa Generic.AbsMSeriesRing
 

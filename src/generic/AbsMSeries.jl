@@ -26,13 +26,22 @@ function O(a::AbstractAlgebra.AbsMSeriesElem{T}) where T <: RingElement
     return R(parent(p)(), prec)
 end
 
-parent_type(::Type{AbsMSeries{T}}) where {T <: RingElement} = AbsMSeriesRing{T}
+function parent_type(::Type{AbsMSeries{T, U}}) where
+                         {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+    V = parent_type(U)
+    return AbsMSeriesRing{T, V}
+end
 
-elem_type(::Type{AbsMSeriesRing{T}}) where {T <: RingElement} = AbsMSeries{T}
+function elem_type(::Type{AbsMSeriesRing{T, U}}) where
+                         {T <: RingElement, U <: AbstractAlgebra.MPolyRing{T}}
+    V = elem_type(U)
+    return AbsMSeries{T, V}
+end
 
 function check_parent(a::AbsMSeries, b::AbsMSeries, throw::Bool = true)
     c = parent(a) != parent(b)
-    c && throw && error("Incompatible multivariate series rings in series operation")
+    c && throw &&
+            error("Incompatible multivariate series rings in series operation")
     return !c
  end
 
@@ -227,8 +236,8 @@ end
 @doc Markdown.doc"""
     exponent_vectors(a::AbsMSeries)
 
-Return an array of the exponent vectors of the nonzero terms of the series, in the
-order they would be displayed, i.e. least significant term first.
+Return an array of the exponent vectors of the nonzero terms of the series, in
+the order they would be displayed, i.e. least significant term first.
 """
 function exponent_vectors(a::AbsMSeries)
     return reverse(collect(exponent_vectors(poly(a))))
@@ -565,7 +574,8 @@ Evaluate the series expression by substituting in the supplied values in
 the array `vals` for the corresponding variables with indices given by the
 array `vars`. The values must be in the same ring as $a$.
 """
-function evaluate(a::U, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
+function evaluate(a::U, vars::Vector{Int}, vals::Vector{U}) where
+                                         {T <: RingElement, U <: AbsMSeries{T}}
     R = parent(a)
     unique(vars) != vars && error("Variables not unique")
     length(vars) != length(vals) &&
@@ -593,7 +603,8 @@ Evaluate the series expression by substituting in the supplied values in
 the array `vals` for the corresponding variables given by the array `vars`.
 The values must be in the same ring as $a$.
 """
-function evaluate(a::U, vars::Vector{U}, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
+function evaluate(a::U, vars::Vector{U}, vals::Vector{U}) where
+                                        {T <: RingElement, U <: AbsMSeries{T}}
     varidx = Int[var_index(poly(x)) for x in vars]
     return evaluate(a, varidx, vals)
 end
@@ -605,7 +616,8 @@ Evaluate the series expression by substituting in the supplied values in
 the array `vals` for the variables the series ring to which $a$ belongs. The
 values must be in the same ring as $a$.
 """
-function evaluate(a::U, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
+function evaluate(a::U, vals::Vector{U}) where
+                                         {T <: RingElement, U <: AbsMSeries{T}}
     R = parent(a)
     return evaluate(a, [i for i in 1:nvars(R)], vals)
 end
@@ -625,7 +637,8 @@ function addeq!(a::AbsMSeries{T}, b::AbsMSeries{T}) where T <: RingElement
     return a
 end
 
-function mul!(c::AbsMSeries{T}, a::AbsMSeries{T}, b::AbsMSeries{T}) where T <: RingElement
+function mul!(c::AbsMSeries{T}, a::AbsMSeries{T}, b::AbsMSeries{T}) where
+                                                            T <: RingElement
     R = parent(a)
     prec = min.(precision(a) .+ valuation(b), precision(b) .+ valuation(a))
     prec = min.(prec, max_precision(R))
@@ -654,7 +667,7 @@ function RandomExtensions.make(S::AbstractAlgebra.MSeriesRing,
 end
 
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{
-                 <:RingElement,<:AbstractAlgebra.MSeriesRing,UnitRange{Int}}})
+                  <:RingElement,<:AbstractAlgebra.MSeriesRing,UnitRange{Int}}})
    S, term_range, v = sp[][1:end]
    f = S()
    g = gens(S)
@@ -695,9 +708,11 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{AbsMSeries{T}}, ::Type{AbsMSeries{T}}) where T <: RingElement = AbsMSeries{T}
+promote_rule(::Type{AbsMSeries{T}}, ::Type{AbsMSeries{T}}) where
+                                               T <: RingElement = AbsMSeries{T}
 
-function promote_rule(::Type{AbsMSeries{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+function promote_rule(::Type{AbsMSeries{T}}, ::Type{U}) where
+                                           {T <: RingElement, U <: RingElement}
    promote_rule(T, U) == T ? AbsMSeries{T} : Union{}
 end
 
@@ -707,11 +722,12 @@ end
 #
 ###############################################################################
 
-function (R::AbsMSeriesRing{T})(x::MPolyElem{T}, prec::Vector{Int}) where T <: RingElement
+function (R::AbsMSeriesRing{T})(x::S, prec::Vector{Int}) where
+                                          {T <: RingElement, S <: MPolyElem{T}}
     for v in prec
         v < 0 && error("Precision must be non-negative")
     end
-    s = AbsMSeries{T}(x, prec)
+    s = AbsMSeries{T, S}(x, prec)
     s.parent = R
     return s
 end
@@ -739,14 +755,17 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int}, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
+function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int},
+                  s::Vector{T}; cached=true, model=:capped_absolute) where
+                                                            T <: AbstractString
     sym = [Symbol(a) for a in s]
     U = elem_type(R)
  
     S, _ = AbstractAlgebra.PolynomialRing(R, s)
 
+    V = typeof(S)
     if model == :capped_absolute
-       parent_obj = AbsMSeriesRing{U}(R, S, prec, sym, cached)
+       parent_obj = AbsMSeriesRing{U, V}(R, S, prec, sym, cached)
     else
        error("Unknown model")
     end
