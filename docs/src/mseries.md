@@ -165,7 +165,7 @@ nvars(::Generic.AbsMSeriesRing)
 ```
 
 ```@docs
-vars(::AbstractAlgebra.MSeriesRing)
+symbols(::AbstractAlgebra.MSeriesRing)
 ```
 
 ```@docs

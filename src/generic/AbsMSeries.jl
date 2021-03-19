@@ -17,7 +17,7 @@ function O(a::AbstractAlgebra.AbsMSeriesElem{T}) where T <: RingElement
     end
     R = parent(a)
     p = poly(a)
-    v = vars(p)
+    v = symbols(p)
     (length(v) != 1 || length(p) != 1 || !isone(leading_coefficient(p))) &&
                                                error("Not a pure power in O()")
     ind = var_index(v[1])
@@ -178,18 +178,18 @@ Return true if the series $a$ is a generator of its parent series ring.
 function isgen(a::AbsMSeries)
     R = parent(a)
     p = poly(a)
-    v = vars(p)
+    v = symbols(p)
     return length(v) == 1 && length(p) == 1 &&
           isone(leading_coefficient(p)) && sum(first(exponent_vectors(p))) == 1
 end
 
 @doc Markdown.doc"""
-    vars(R::AbstractAlgebra.MSeriesRing)
+    symbols(R::AbstractAlgebra.MSeriesRing)
 
 Return a vector of symbols, one for each of the variables of the series ring
 $R$.
 """
-vars(R::AbstractAlgebra.MSeriesRing) = R.sym
+symbols(R::AbstractAlgebra.MSeriesRing) = R.sym
 
 parent(a::AbstractAlgebra.MSeriesElem) = a.parent
 
@@ -280,7 +280,7 @@ end
 ###############################################################################
 
 function AbstractAlgebra.expressify(a::AbstractAlgebra.AbsMSeriesElem,
-                                        x = vars(parent(a)); context = nothing)
+                                     x = symbols(parent(a)); context = nothing)
     apoly = poly(a)
 
     poly_sum = Expr(:call, :+)
@@ -324,7 +324,7 @@ function Base.show(io::IO, ::MIME"text/plain", a::AbstractAlgebra.MSeriesElem)
 end
   
 function show(io::IO, a::AbstractAlgebra.MSeriesRing)
-    v = join([String(s) for s in vars(a)], ", ")
+    v = join([String(s) for s in symbols(a)], ", ")
     print(io, "Multivariate power series ring in ", v, " over ")
     print(IOContext(io, :compact => true), base_ring(a))
 end
