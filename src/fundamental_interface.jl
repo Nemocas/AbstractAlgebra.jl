@@ -107,7 +107,7 @@ function base_ring end
 @doc Markdown.doc"""
     one(a)
 
-Return the multiplicative identity in the family of $a$.
+Return the multiplicative identity in the algebraic structure of $a$.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -136,7 +136,7 @@ function one end
 @doc Markdown.doc"""
     zero(a)
 
-Return the additive identity in the family of $a$.
+Return the additive identity in the algebraic structure of $a$.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
