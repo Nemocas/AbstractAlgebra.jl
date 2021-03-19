@@ -340,12 +340,7 @@ function exponents_clamp_zero_to_prec(a::Vector{Int}, prec::Vector{Int})
 end
 
 function exponents_lt(v::Vector{Int}, p::Vector{Int})
-    for i = 1:length(v)
-        if v[i] >= p[i]
-            return false
-        end
-    end
-    return true
+    return all(((x, y),) -> x < y, zip(v, p))
 end
 
 ###############################################################################
