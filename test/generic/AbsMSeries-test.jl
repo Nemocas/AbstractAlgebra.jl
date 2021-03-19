@@ -106,7 +106,7 @@ end
 
    @test parent(x) == R
 
-   @test vars(R) == [:x, :y]
+   @test symbols(R) == [:x, :y]
 
    @test base_ring(x) == ZZ
    @test base_ring(R) == ZZ
