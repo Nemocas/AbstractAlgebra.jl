@@ -79,6 +79,9 @@ wishes to set the precision of a variable to precision `0`, one must use the
 If one wants a series with the same precision in all variables, one can use
 `O(R, n)` where `R` is the series ring and `n` is the desired precision.
 
+If all the precisions are to be the same, the vector of integers for the
+precisions can be replaced by a single integer.
+
 **Examples**
 
 ```jldoctest
@@ -99,6 +102,9 @@ julia> k = R(x + 1)
 
 julia> m = x + y + O(y^2)
 y + x + O(y^2) + O(x^2)
+
+julia> R, (x, y) = PowerSeriesRing(ZZ, 3, ["x", "y"])
+(Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt}[x + O(y^3) + O(x^3), y + O(y^3) + O(x^3)])
 
 julia> n = x + y + O(R, 2)
 y + x + O(y^2) + O(x^2)

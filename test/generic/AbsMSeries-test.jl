@@ -39,6 +39,11 @@
 
       @test R(x) isa Generic.AbsMSeries
    end
+
+   R1, (x1, y1) = PowerSeriesRing(ZZ, [3, 3], ["x", "y"])
+   R2, (x2, y2) = PowerSeriesRing(ZZ, 3, ["x", "y"])
+
+   @test R1 === R2
 end
 
 @testset "Generic.AbsMSeries.printing" begin

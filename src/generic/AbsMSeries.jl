@@ -770,4 +770,11 @@ function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int},
     end
  
     return tuple(parent_obj, gens(parent_obj))
- end
+end
+
+function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int,
+                  s::Vector{T}; cached=true, model=:capped_absolute) where
+                                                            T <: AbstractString
+    prec_vec = [prec for v in s]
+    return PowerSeriesRing(R, prec_vec, s; cached=cached, model=model)
+end
