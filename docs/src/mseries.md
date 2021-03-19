@@ -211,7 +211,7 @@ length(::Generic.AbsMSeries)
 ### Iteration
 
 ```@docs
-coeffs(::Generic.AbsMSeries)
+coefficients(::Generic.AbsMSeries)
 ```
 
 ```@docs

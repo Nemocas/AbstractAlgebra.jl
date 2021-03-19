@@ -18,7 +18,7 @@ function O(a::AbstractAlgebra.AbsMSeriesElem{T}) where T <: RingElement
     R = parent(a)
     p = poly(a)
     v = vars(p)
-    (length(v) != 1 || length(p) != 1 || !isone(lc(p))) &&
+    (length(v) != 1 || length(p) != 1 || !isone(leading_coefficient(p))) &&
                                                error("Not a pure power in O()")
     ind = var_index(v[1])
     exps = first(exponent_vectors(p))
@@ -180,7 +180,7 @@ function isgen(a::AbsMSeries)
     p = poly(a)
     v = vars(p)
     return length(v) == 1 && length(p) == 1 &&
-                          isone(lc(p)) && sum(first(exponent_vectors(p))) == 1
+          isone(leading_coefficient(p)) && sum(first(exponent_vectors(p))) == 1
 end
 
 @doc Markdown.doc"""
@@ -224,13 +224,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    coeffs(a::AbsMSeries)
+    coefficients(a::AbsMSeries)
 
 Return an array of the nonzero coefficients of the series, in the order they
 would be displayed, i.e. least significant term first.
 """
-function coeffs(a::AbsMSeries)
-    return reverse(collect(coeffs(poly(a))))
+function coefficients(a::AbsMSeries)
+    return reverse(collect(coefficients(poly(a))))
 end
 
 @doc Markdown.doc"""
@@ -286,7 +286,7 @@ function AbstractAlgebra.expressify(a::AbstractAlgebra.AbsMSeriesElem,
     poly_sum = Expr(:call, :+)
     n = nvars(parent(apoly))
     
-    iter = zip(coeffs(apoly), exponent_vectors(apoly))
+    iter = zip(coefficients(apoly), exponent_vectors(apoly))
     cv = reverse(collect(iter))
     
     for (c, v) in cv
@@ -357,7 +357,7 @@ end
 function truncate_poly(a::MPolyElem, prec::Vector{Int})
     R = parent(a)
     ctx = MPolyBuildCtx(R)
-    for (c, v) in zip(coeffs(a), exponent_vectors(a))
+    for (c, v) in zip(coefficients(a), exponent_vectors(a))
         if exponents_lt(v, prec)
             push_term!(ctx, c, v)
         end
