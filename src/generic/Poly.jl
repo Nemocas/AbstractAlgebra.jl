@@ -1023,7 +1023,7 @@ function divhigh(a::PolyElem{T}, b::PolyElem{T}, n0::Int) where T <: RingElement
             break
         end
         # negate quotient so we can use addeq! below
-        q = -divexact(coeff(a, da), lead(b))
+        q = -divexact(coeff(a, da), leading_coefficient(b))
         r = setcoeff!(r, da - degree(b), q)
         da -= 1
         if i != n
