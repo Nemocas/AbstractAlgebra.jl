@@ -806,18 +806,16 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
 
 mutable struct AbsMSeriesRing{T <: RingElement, S} <:
                                                  AbstractAlgebra.MSeriesRing{T}
-   base_ring::Ring
    poly_ring::AbstractAlgebra.MPolyRing{T}
    prec_max::Vector{Int}
    sym::Vector{Symbol}
 
-   function AbsMSeriesRing{T, S}(R::Ring,
-         poly_ring::AbstractAlgebra.MPolyRing{T}, prec::Vector{Int},
-                            s::Vector{Symbol}, cached::Bool = true) where
+   function AbsMSeriesRing{T, S}(poly_ring::AbstractAlgebra.MPolyRing{T},
+            prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where
                           {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
       U = elem_type(poly_ring)
-      return get_cached!(AbsMSeriesID, (R, prec, s), cached) do
-         new{T, U}(R, poly_ring, prec, s)
+      return get_cached!(AbsMSeriesID, (poly_ring, prec, s), cached) do
+         new{T, U}(poly_ring, prec, s)
       end::AbsMSeriesRing{T, S}
    end
 end

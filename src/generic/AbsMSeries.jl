@@ -194,7 +194,7 @@ symbols(R::AbstractAlgebra.MSeriesRing) = R.sym
 parent(a::AbstractAlgebra.MSeriesElem) = a.parent
 
 function base_ring(R::AbstractAlgebra.MSeriesRing{T}) where T <: RingElement
-    return R.base_ring::parent_type(T)
+    return base_ring(poly_ring(R))::parent_type(T)
 end
 
 base_ring(a::AbstractAlgebra.MSeriesElem) = base_ring(parent(a))
@@ -723,7 +723,6 @@ function (R::AbsMSeriesRing{T, S})(x::S, prec::Vector{Int}) where
         v < 0 && error("Precision must be non-negative")
     end
     s = AbsMSeries{T, S}(R, x, prec)
-    s.parent = R
     return s
 end
 
@@ -760,7 +759,7 @@ function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int},
     V = elem_type(S)
 
     if model == :capped_absolute
-       parent_obj = AbsMSeriesRing{U, V}(R, S, prec, sym, cached)
+       parent_obj = AbsMSeriesRing{U, V}(S, prec, sym, cached)
     else
        error("Unknown model")
     end
