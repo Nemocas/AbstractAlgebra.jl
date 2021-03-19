@@ -33,11 +33,12 @@ import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
                           RingElem, RingElement, Field, FieldElement,
                           isexact_type, isdomain_type, Map, promote_rule
 
-import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring, check_parent,
-                          denominator, div, divrem, elem_type, exp, expressify,
-                          factor, gen, gens, inv, isgen, ismonomial,
-                          ismonomial_recursive, isunit, lead, log, numerator,
-                          parent_type, show_via_expressify, sqrt, trail
+import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring,
+                          check_parent, denominator, div, divrem, elem_type,
+                          exp, expressify, factor, gen, gens, inv, isgen,
+                          ismonomial, ismonomial_recursive, isunit,
+                          leading_coefficient, log, numerator, parent_type,
+                          show_via_expressify, sqrt, trailing_coefficient
 
 using ..AbstractAlgebra
 

@@ -253,8 +253,12 @@ modulus{T <: ResElem}(::PolyElem{T})
 ```
 
 ```@docs
-lead(::PolyElem)
-trail(::PolyElem)
+leading_coefficient(::PolyElem)
+trailing_coefficient(::PolyElem)
+```
+
+```@docs
+constant_coefficient(::Generic.PolynomialElem)
 ```
 
 ```@docs
@@ -323,7 +327,7 @@ julia> c = BigInt(1)//2*z^2 + BigInt(1)//3
 julia> d = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + 3
 
-julia> f = lead(d)
+julia> f = leading_coefficient(d)
 x
 
 julia> y = gen(S)
@@ -353,6 +357,37 @@ true
 julia> ismonomial(x*y^2)
 false
 
+```
+
+### Iterators
+
+An iterator is provided to return the coefficients of a univariate polynomial.
+The iterator is called `coefficients` and allows iteration over the
+coefficients, starting with the term of degree zero (if there is one). Note
+that coefficients of each degree are given, even if they are zero. This is best
+illustrated by example.
+
+**Examples**
+
+```jldoctest
+julia> R, x = PolynomialRing(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> f = x^2 + 2
+x^2 + 2
+
+julia> C = collect(coefficients(f))
+3-element Array{Any,1}:
+ 2
+ 0
+ 1
+
+julia> for c in coefficients(f)
+          println(c)
+       end
+2
+0
+1
 ```
 
 ### Truncation

@@ -4637,7 +4637,7 @@ function ispopov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
    for r = zero_rows + 1:nrows(P)
       p = pivots[r]
       f = P[r, p]
-      if !isone(lead(f))
+      if !isone(leading_coefficient(f))
          return false
       end
       for i = 1:nrows(P)

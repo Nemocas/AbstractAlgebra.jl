@@ -99,6 +99,9 @@ end
 ###############################################################################
 
 function divides(a::T, b::T) where T <: Integer
+   if b == 0
+      return a == 0, b
+   end
    q, r = divrem(a, b)
    return r == 0, q
 end

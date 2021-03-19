@@ -110,12 +110,12 @@ function term_degree(p::LaurentPolyElem)
    deg
 end
 
-function lead(p::LaurentPolyElem)
+function leading_coefficient(p::LaurentPolyElem)
    dr = degrees_range(p)
    isempty(dr) ? zero(base_ring(p)) : coeff(p, last(dr))
 end
 
-function trail(p::LaurentPolyElem)
+function trailing_coefficient(p::LaurentPolyElem)
    dr = degrees_range(p)
    isempty(dr) ? zero(base_ring(p)) : coeff(p, first(dr))
 end
@@ -197,7 +197,7 @@ change_base_ring(R::Ring, p::LaurentPolyElem) = map_coeffs(R, p)
 #
 ###############################################################################
 
-canonical_unit(x::LaurentPolyElem) = canonical_unit(lead(x))
+canonical_unit(x::LaurentPolyElem) = canonical_unit(leading_coefficient(x))
 
 ###############################################################################
 #

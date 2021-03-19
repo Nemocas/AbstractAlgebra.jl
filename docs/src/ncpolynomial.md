@@ -187,8 +187,8 @@ described here, that override the generic implementation.
 ### Basic functionality
 
 ```@docs
-lead(::NCPolyElem)
-trail(::NCPolyElem)
+leading_coefficient(::NCPolyElem)
+trailing_coefficient(::NCPolyElem)
 ```
 
 ```@docs
@@ -227,7 +227,7 @@ y^2 + 1
 julia> d = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
 
-julia> f = lead(d)
+julia> f = leading_coefficient(d)
 x
 
 julia> y = gen(T)

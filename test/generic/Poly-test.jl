@@ -88,6 +88,26 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
+@testset "Generic.Poly.iterators" begin
+   R, x = PolynomialRing(ZZ, "x")
+
+   C = collect(coefficients(R()))
+
+   @test C == []
+
+   C = collect(coefficients(R(1)))
+
+   @test C == [R(1)]
+
+   C = collect(coefficients(x + 2))
+
+   @test C == [R(2), R(1)]
+
+   C = collect(coefficients(x^2 + 2))
+
+   @test C == [R(2), R(), R(1)]
+end
+
 @testset "Generic.Poly.printing" begin
    R, x = PolynomialRing(ZZ, "x")
 
@@ -144,9 +164,13 @@ end
 
    f = 2x*y + x^2 + 1
 
-   @test lead(f) == 2x
+   @test leading_coefficient(f) == 2x
 
-   @test trail(2x*y + x^2) == x^2
+   @test trailing_coefficient(2x*y + x^2) == x^2
+
+   @test constant_coefficient(y^2 + 2x) == 2x
+
+   @test iszero(constant_coefficient(R()))
 
    @test degree(f) == 1
 
@@ -589,6 +613,57 @@ end
       @test truncate(f*g, n) == mullow(f, g, n)
    end
 
+   for iter = 1:100
+      lena = rand(0:10)
+      lenb = rand(0:10)
+      a = rand(R, lena:lena, -10:10)
+      b = rand(R, lenb:lenb, -10:10)
+      c = a*b
+      for i = 0:length(c) - 1
+         d = mulhigh_n(a, b, i)
+         f = c - d
+         @test length(f) < length(c) - i
+         for j = length(c):length(c) - i
+            @test coeff(d, j) == coeff(c, j)
+         end
+      end
+   end
+
+   for iter = 1:100
+      lena = rand(0:10)
+      lenb = rand(1:10)
+      a = rand(R, lena:lena, -10:10)
+      b = R()
+      while iszero(b)
+         b = rand(R, lenb:lenb, -10:10)
+      end
+      c = a*b
+      for i = 0:length(b)
+         d = divhigh(c, b, i)
+         f = a - d
+         @test degree(f) < i
+         for j = 0:i - 1
+            @test coeff(f, j) == coeff(a, j)
+         end
+      end
+   end
+
+   for iter = 1:100
+      lena = rand(0:10)
+      lenb = rand(1:10)
+      a = rand(R, lena:lena, -10:10)
+      b = R()
+      while iszero(b)
+         b = rand(R, lenb:lenb, -10:10)
+      end
+      c = a*b
+      for i = 0:length(a)
+         d = divexact_low(c, b, i)
+         f = truncate(a, i)
+         @test f == d
+      end
+   end
+
    # Fake finite field of char 7, degree 2
    S, y = PolynomialRing(GF(7), "y")
    F = ResidueField(S, y^2 + 6y + 3)
@@ -623,7 +698,7 @@ end
       r = mullow(f, g, n)
 
       @test truncate(f*g, n) == r
-      @test r == 0 || !iszero(lead(r))
+      @test r == 0 || !iszero(leading_coefficient(r))
    end
 end
 
@@ -1419,7 +1494,7 @@ end
       if length(f) < length(g)
          @test f == r && q == 0
       else
-         @test q*g + r == f*lead(g)^(length(f) - length(g) + 1)
+         @test q*g + r == f*leading_coefficient(g)^(length(f) - length(g) + 1)
       end
 
       @test pseudorem(f, g) == r
@@ -1441,7 +1516,7 @@ end
       if length(f) < length(g)
          @test f == r && q == 0
       else
-         @test q*g + r == f*lead(g)^(length(f) - length(g) + 1)
+         @test q*g + r == f*leading_coefficient(g)^(length(f) - length(g) + 1)
       end
 
       @test pseudorem(f, g) == r
@@ -1473,7 +1548,7 @@ end
          h = rand(R, 0:10, -10:10)
       end
 
-      @test gcd(f*h, g*h) == divexact(h, canonical_unit(lead(h)))*gcd(f, g)
+      @test gcd(f*h, g*h) == divexact(h, canonical_unit(leading_coefficient(h)))*gcd(f, g)
 
       @test lcm(f, h) == divexact(f*h, gcd(f, h))
    end
@@ -1502,7 +1577,7 @@ end
          h = rand(R, 0:5, -10:10)
       end
 
-      @test gcd(f*h, g*h) == inv(lead(h))*h*gcd(f, g)
+      @test gcd(f*h, g*h) == inv(leading_coefficient(h))*h*gcd(f, g)
    end
 
    for iter = 1:10
@@ -1880,8 +1955,10 @@ end
       g = rand(R, 0:5, 0:5)
       h = rand(R, 0:5, 0:5)
 
-      @test lead(f)*lead(g) == 0 || resultant(f*g, h) == resultant(f, h)*resultant(g, h)
-      @test lead(g)*lead(h) == 0 || resultant(f, g*h) == resultant(f, g)*resultant(f, h)
+      @test leading_coefficient(f)*leading_coefficient(g) == 0 ||
+            resultant(f*g, h) == resultant(f, h)*resultant(g, h)
+      @test leading_coefficient(g)*leading_coefficient(h) == 0 ||
+            resultant(f, g*h) == resultant(f, g)*resultant(f, h)
    end
 end
 

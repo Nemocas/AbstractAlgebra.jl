@@ -224,7 +224,7 @@ isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 Return `true` if $x$ is a generator of the polynomial ring.
 
 ```julia
-coeffs(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+coefficients(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 Return an iterator for the coefficients of the polynomial $p$, starting
@@ -283,7 +283,7 @@ true
 julia> nvars(S) == 2
 true
 
-julia> C = collect(coeffs(f))
+julia> C = collect(coefficients(f))
 3-element Array{BigInt,1}:
  1
  3

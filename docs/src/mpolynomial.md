@@ -430,13 +430,13 @@ julia> evaluate(f, [M1, M2, M3])
 The leading coefficient, leading monomial and leading term of a polynomial p are returned by the following functions:
 
 ```@docs
-lc(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+leading_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 ```@docs
-lm(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+leading_monomial(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 ```@docs
-lt(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+leading_term(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -446,10 +446,10 @@ lt(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 using AbstractAlgebra
 R,(x,y) = PolynomialRing(ZZ, ["x", "y"], ordering=:deglex)
 p = 2*x*y + 3*y^3
-lt(p)
-lm(p)
-lc(p)
-lt(p) == lc(p) * lm(p)
+leading_term(p)
+leading_monomial(p)
+leading_coefficient(p)
+leading_term(p) == leading_coefficient(p) * leading_monomial(p)
 ```
 
 ### Least common multiple, greatest common divisor

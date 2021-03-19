@@ -94,7 +94,7 @@ end
 
 function to_univar(a, var::Int, Kx)
   r = zero(Kx)
-  for (c, ev) in zip(coeffs(a), exponent_vectors(a))
+  for (c, ev) in zip(coefficients(a), exponent_vectors(a))
     setcoeff!(r, ev[var], c)
   end
   return r
@@ -165,7 +165,7 @@ function make_monic(a::E) where E
   if length(a) < 1
     return a
   end
-  lc = lead(a)
+  lc = leading_coefficient(a)
   if isone(lc)
     return a
   else

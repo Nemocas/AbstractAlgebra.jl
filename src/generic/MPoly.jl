@@ -12,7 +12,8 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        derivative, change_base_ring,  to_univariate, degrees, deflation,
        combine_like_terms!, exponent, exponent_vector, exponent_vectors,
        set_exponent_vector!, sort_terms!, coeffs, monomial, monomial!,
-       monomials, term, terms, var_index, @PolynomialRing, lc, lm, lt, lcm,
+       monomials, term, terms, var_index, @PolynomialRing, leading_coefficient,
+       leading_monomial, leading_term, lcm,
        MPolyBuildCtx, ishomogeneous, map_coeffs
 
 ###############################################################################
@@ -446,7 +447,7 @@ function coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{
    end
    S = parent(a)
    M = MPolyBuildCtx(S)
-   cvzip = zip(coeffs(a), exponent_vectors(a))
+   cvzip = zip(coefficients(a), exponent_vectors(a))
    for (c, v) in cvzip
       flag = true
       for j = 1:length(vars)
@@ -721,7 +722,7 @@ end
 # iterators
 function Base.hash(x::MPolyElem{T}, h::UInt) where {T <: RingElement}
    b = 0x53dd43cd511044d1%UInt
-   for (e, c) in zip(exponent_vectors(x), coeffs(x))
+   for (e, c) in zip(exponent_vectors(x), coefficients(x))
       b = xor(b, hash(c, h), h)
       b = xor(b, hash(e, h), h)
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
@@ -833,7 +834,7 @@ is no such monomial, zero is returned.
 function coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
     !ismonomial(m) && error("Not a monomial in coeff")
     v1 = first(exponent_vectors(m))
-    cvzip = zip(coeffs(f), exponent_vectors(f))
+    cvzip = zip(coefficients(f), exponent_vectors(f))
     for (c, v) in cvzip
         if v == v1
             return c
@@ -843,15 +844,15 @@ function coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T})
 end
 
 @doc Markdown.doc"""
-    lc(p::MPolyElem)
+    leading_coefficient(p::MPolyElem)
 
 Return the leading coefficient of the polynomial p.
 """
-function lc(p::MPolyElem{T}) where T <: RingElement
+function leading_coefficient(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return zero(base_ring(p))
    else
-      return first(coeffs(p))
+      return first(coefficients(p))
    end
 end
 
@@ -870,11 +871,11 @@ function monomial(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
-    lm(p::MPolyElem)
+    leading_monomial(p::MPolyElem)
 
 Return the leading monomial of the polynomial p.
 """
-function lm(p::MPolyElem{T}) where T <: RingElement
+function leading_monomial(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return p
    else
@@ -883,11 +884,11 @@ function lm(p::MPolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    lt(p::MPolyElem)
+    leading_term(p::MPolyElem)
 
 Return the leading term of the polynomial p.
 """
-function lt(p::MPolyElem{T}) where T <: RingElement
+function leading_term(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return p
    else
@@ -1101,7 +1102,7 @@ isone(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) &
 
 function isone(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return length(x) == 1 && iszero(first(exponent_vectors(x))) &&
-          first(coeffs(x)) == 1
+          first(coefficients(x)) == 1
 end
 
 iszero(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement = length(x) == 0
@@ -1110,7 +1111,7 @@ isunit(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) 
 
 function isunit(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return length(x) == 1 && iszero(first(exponent_vectors(x))) &&
-          isunit(first(coeffs(x)))
+          isunit(first(coefficients(x)))
 end
 
 isconstant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
@@ -1139,7 +1140,7 @@ isterm(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement = length(x) == 1
 Return `true` if the given polynomial has precisely one term whose coefficient is one.
 """
 function ismonomial(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-   return length(x) == 1 && isone(first(coeffs(x)))
+   return length(x) == 1 && isone(first(coefficients(x)))
 end
 
 function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
@@ -1246,12 +1247,12 @@ function Base.eltype(x::MPolyTerms{T}) where T <: AbstractAlgebra.MPolyElem{S} w
 end
 
 @doc Markdown.doc"""
-    coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+    coefficients(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 
 Return an iterator for the coefficients of the given polynomial. To retrieve
-an array of the coefficients, use `collect(coeffs(a))`.
+an array of the coefficients, use `collect(coefficients(a))`.
 """
-function coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+function coefficients(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return MPolyCoeffs(a)
 end
 
@@ -1295,7 +1296,7 @@ end
 function expressify(a::MPolyElem, x = symbols(parent(a)); context = nothing)
    sum = Expr(:call, :+)
    n = nvars(parent(a))
-   for (c, v) in zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in zip(coefficients(a), exponent_vectors(a))
       prod = Expr(:call, :*)
       if !isone(c)
          push!(prod.args, expressify(c, context = context))
@@ -2810,7 +2811,7 @@ function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vect
       end
    end
    M = MPolyBuildCtx(S)
-   cvzip = zip(coeffs(f), exponent_vectors(f))
+   cvzip = zip(coeficients(f), exponent_vectors(f))
    for (c, v) in cvzip
       for j = 1:N
          v[j] = div(v[j] - shift[j], defl[j])
@@ -2862,7 +2863,7 @@ function inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vect
    S = parent(f)
    N = nvars(S)
    M = MPolyBuildCtx(S)
-   cvzip = zip(coeffs(f), exponent_vectors(f))
+   cvzip = zip(coefficients(f), exponent_vectors(f))
    for (c, v) in cvzip
       for j = 1:N
          v[j] = v[j]*defl[j] + shift[j]
@@ -3899,7 +3900,7 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    S = parent(one(R)*one(parent(vals[1])))
    r = elem_type(S)[zero(S)]
    i = UInt(1)
-   cvzip = zip(coeffs(a), exponent_vectors(a))
+   cvzip = zip(coefficients(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = one(S)
       for j = 1:length(vals)
@@ -4006,7 +4007,7 @@ function __evaluate(a, vars, vals, powers)
    # We use a geobucket if the result will be an element in the same ring as a
    if parent(vals[1] * one(S)) == S
      r = geobucket(S)
-     cvzip = zip(coeffs(a), exponent_vectors(a))
+     cvzip = zip(coefficients(a), exponent_vectors(a))
      for (c, v) in cvzip
         t = one(S)
         for j = 1:length(vars)
@@ -4030,7 +4031,7 @@ function __evaluate(a, vars, vals, powers)
    else
      K = parent(one(S) * vals[1])
      r = zero(K)
-     cvzip = zip(coeffs(a), exponent_vectors(a))
+     cvzip = zip(coefficients(a), exponent_vectors(a))
      for (c, v) in cvzip
         t = one(K)
         for j = 1:length(vars)
@@ -4113,7 +4114,7 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
          c = c*zero(parent(vals[j]))
       end
    end
-   cvzip = zip(coeffs(a), exponent_vectors(a))
+   cvzip = zip(coefficients(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = c
       for j = 1:length(vals)
@@ -4345,7 +4346,7 @@ of the polynomial ring.
 """
 function derivative(f::AbstractAlgebra.MPolyElem{T}, j::Int) where T <: RingElement
    R = parent(f)
-   iterz = zip(coeffs(f), exponent_vectors(f))
+   iterz = zip(coefficients(f), exponent_vectors(f))
    Ctx = MPolyBuildCtx(R)
    for (c, v) in iterz
       prod = c*v[j]
@@ -4713,7 +4714,7 @@ function map_coeffs(f, p::MPolyElem; cached = true, parent::AbstractAlgebra.MPol
 end
 
 function _map(g, p::MPolyElem, Rx)
-   cvzip = zip(coeffs(p), exponent_vectors(p))
+   cvzip = zip(coefficients(p), exponent_vectors(p))
    M = MPolyBuildCtx(Rx)
    for (c, v) in cvzip
       push_term!(M, g(c), v)
