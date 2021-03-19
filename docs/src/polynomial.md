@@ -258,6 +258,10 @@ trailing_coefficient(::PolyElem)
 ```
 
 ```@docs
+constant_coefficient(::Generic.PolynomialElem)
+```
+
+```@docs
 gen(::PolyElem)
 ```
 

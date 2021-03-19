@@ -168,6 +168,10 @@ end
 
    @test trailing_coefficient(2x*y + x^2) == x^2
 
+   @test constant_coefficient(y^2 + 2x) == 2x
+
+   @test iszero(constant_coefficient(R()))
+
    @test degree(f) == 1
 
    h = x*y^2 + (x + 1)*y + 3

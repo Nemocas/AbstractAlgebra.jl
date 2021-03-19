@@ -171,6 +171,19 @@ function trailing_coefficient(a::PolynomialElem)
 end
 
 @doc Markdown.doc"""
+    constant_coefficient(a::Generic.PolynomialElem)
+
+Return the constant coefficient of the given polynomial. If the polynomial is
+the zero polynomial, the function will return zero.
+"""
+function constant_coefficient(a::PolynomialElem)
+   if iszero(a)
+      return zero(base_ring(a))
+   end
+   return coeff(a, 0)
+end
+
+@doc Markdown.doc"""
     zero(R::AbstractAlgebra.PolyRing)
 
 Return the zero polynomial in the given polynomial ring.
