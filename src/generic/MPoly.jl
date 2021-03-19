@@ -868,7 +868,7 @@ end
 Return the constant coefficient of the polynomial $p$ or zero if it doesn't
 have one.
 """
-function constant_coefficient(p::MPolyElem)
+function constant_coefficient(p::MPolyElem{T}) where T <: RingElement
    if !iszero(p)
       for (c, v) in zip(coeffs(p), exponent_vectors(p))
          if iszero(v)
