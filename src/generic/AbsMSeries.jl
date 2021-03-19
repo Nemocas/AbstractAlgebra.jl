@@ -28,7 +28,7 @@ end
 
 function O(R::AbsMSeriesRing{T}, prec::Int)
     prec <= && error("Precision must be nonnegative")
-    return R(poly_ring(R)(), [prec for i in 1:nvars(R)])
+    return R(poly_ring(R)(), fill(prec, nvars(R)))
 end
 
 function parent_type(::Type{AbsMSeries{T, S}}) where {T <: RingElement, S}
