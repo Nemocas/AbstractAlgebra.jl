@@ -76,6 +76,9 @@ distinction between `x^0` and `y^0` as far as the system is concerned. If one
 wishes to set the precision of a variable to precision `0`, one must use the
 `set_precision!` function described below.
 
+If one wants a series with the same precision in all variables, one can use
+`O(R, n)` where `R` is the series ring and `n` is the desired precision.
+
 **Examples**
 
 ```jldoctest
@@ -95,6 +98,9 @@ julia> k = R(x + 1)
 1 + x + O(y^3) + O(x^2)
 
 julia> m = x + y + O(y^2)
+y + x + O(y^2) + O(x^2)
+
+julia> n = x + y + O(R, 2)
 y + x + O(y^2) + O(x^2)
 ```
 

@@ -19,6 +19,9 @@
 
       @test O(gens[rand(1:nvars)]^rand(1:10)) isa Generic.AbsMSeries
 
+      @test O(R, 3) isa Generic.AbsMSeries
+      @test O(R, 0) isa Generic.AbsMSeries
+
       @test R() isa Generic.AbsMSeries
 
       @test R(rand(-10:10)) isa Generic.AbsMSeries
