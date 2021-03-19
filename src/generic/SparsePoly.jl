@@ -51,9 +51,9 @@ isone(x::SparsePoly) = x == 1
 
 length(x::SparsePoly) = x.length
 
-lead(x::SparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[x.length]
+leading_coefficient(x::SparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[x.length]
 
-trail(x::SparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[1]
+trailing_coefficient(x::SparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[1]
 
 function normalise(a::SparsePoly, n::Int)
    while n > 0 && iszero(a.coeffs[n])
@@ -1000,7 +1000,7 @@ function pseudodivrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElemen
    Re = Array{UInt}(undef, r_alloc)
    Pc = Array{T}(undef, p_alloc)
    Pc[1] = b.coeffs[n]
-   p = -1 # current power of lead(b)
+   p = -1 # current power of leading_coefficient(b)
    p_max = 1
    k = 0
    l = 0
@@ -1176,7 +1176,7 @@ function pseudorem_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <
    Re = Array{UInt}(undef, r_alloc)
    Pc = Array{T}(undef, p_alloc)
    Pc[1] = b.coeffs[n]
-   p = -1 # current power of lead(b)
+   p = -1 # current power of leading_coefficient(b)
    p_max = 1
    k = 0
    l = 0
@@ -1326,9 +1326,9 @@ function pseudorem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
       return deepcopy(a)
    end
    k = reinterpret(Int, a.exps[a.length] - b.exps[b.length]) + 1
-   l = lead(b)
+   l = leading_coefficient(b)
    while a.length > 0 && a.exps[a.length] >= b.exps[b.length]
-      s = lead(a)*b
+      s = leading_coefficient(a)*b
       s = shift_left!(s, a.exps[a.length] - b.exps[b.length])
       a = a*l - s
       k -= 1
@@ -1466,10 +1466,12 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    # compute likely degree of gcd
    deg = 0
    # is the lead/trail term a monomial
-   lead_monomial = lead(a).length == 1 || lead(b).length == 1
-   trail_monomial = trail(a).length == 1 || trail(b).length == 1
-   lead_a = lead(a)
-   lead_b = lead(b)
+   lead_monomial = leading_coefficient(a).length == 1 ||
+                   leading_coefficient(b).length == 1
+   trail_monomial = trailing_coefficient(a).length == 1 ||
+                    trailing_coefficient(b).length == 1
+   lead_a = leading_coefficient(a)
+   lead_b = leading_coefficient(b)
    # psr algorithm
    g = one(base_ring(a))
    h = one(base_ring(a))
@@ -1496,7 +1498,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
          break
       end
       (a, b) = (b, divexact(r, g*h^d))
-      g = lead(a)
+      g = leading_coefficient(a)
       if d > 1
          h = divexact(g^d, h^(d - 1))
       else
@@ -1506,20 +1508,24 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    # sometimes don't care about content, e.g. when computing likely gcd degree
    if !ignore_content
       # remove content from b as cheaply as possible, as per Bernard Parisse
-      if lead(b).length != 1 && trail(b).length != 1
+      if leading_coefficient(b).length != 1 &&
+         trailing_coefficient(b).length != 1
          if lead_monomial # lead term monomial, so content contains rest
-            d = divexact(lead(b), term_content(lead(b)))
+            d = divexact(leading_coefficient(b),
+			  term_content(leading_coefficient(b)))
             b = divexact(b, d)
          elseif trail_monomial # trail term is monomial, so ditto
-            d = divexact(trail(b), term_content(trail(b)))
+            d = divexact(trailing_coefficient(b),
+	          term_content(trailing_coefficient(b)))
             b = divexact(b, d)
          else
             glead = gcd(lead_a, lead_b)
             if glead.length == 1 # gcd of lead coeffs monomial
-               d = divexact(lead(b), term_content(lead(b)))
+               d = divexact(leading_coefficient(b),
+			     term_content(leading_coefficient(b)))
                b = divexact(b, d)
             else # last ditched attempt to find easy content
-               h = gcd(lead(b), glead)
+               h = gcd(leading_coefficient(b), glead)
                h = divexact(h, term_content(h))
                flag, q = divides(b, h)
                if flag

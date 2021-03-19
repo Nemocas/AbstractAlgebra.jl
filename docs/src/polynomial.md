@@ -253,8 +253,8 @@ modulus{T <: ResElem}(::PolyElem{T})
 ```
 
 ```@docs
-lead(::PolyElem)
-trail(::PolyElem)
+leading_coefficient(::PolyElem)
+trailing_coefficient(::PolyElem)
 ```
 
 ```@docs
@@ -327,7 +327,7 @@ julia> c = BigInt(1)//2*z^2 + BigInt(1)//3
 julia> d = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + 3
 
-julia> f = lead(d)
+julia> f = leading_coefficient(d)
 x
 
 julia> y = gen(S)

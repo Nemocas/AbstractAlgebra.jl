@@ -9,26 +9,11 @@ function ispower(a::PolyElem, n::Int)
     # probably a equal-degree-factorisation would be good + some more gcd's
     # implement some Newton-type algo?
     degree(a) % n == 0 || return false, a
-    fl, x = ispower(lead(a), n)
+    fl, x = ispower(leading_coefficient(a), n)
     fl || return false, a
     f = factor(a)
     all(i -> i % n == 0, values(f.fac)) || return false, a
     return true, x*prod(p^div(k, n) for (p, k) = f.fac)
-end
-
-@doc Markdown.doc"""
-    valence(f::PolyElem) -> RingElem
-
- The last non-zero coefficient of $f$.
-"""
-function valence(f::PolyElem)
-    for i = 0:degree(f)
-        c = coeff(f, i)
-        if !iszero(c)
-            return c
-        end
-    end
-    return c
 end
 
 ################################################################################
@@ -213,7 +198,7 @@ function roots(f::PolyElem)
     rts = Vector{elem_type(base_ring(f))}()
     for (p, e) in lf
         if degree(p) == 1
-            push!(rts, -divexact(trail(p), lead(p)))
+            push!(rts, -divexact(trail(p), leading_coefficient(p)))
         end
     end
     return rts

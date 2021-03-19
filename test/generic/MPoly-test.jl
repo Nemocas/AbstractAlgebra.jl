@@ -179,7 +179,7 @@ end
          @test isa(coeff(f, rand(1:length(f))), elem_type(R))
       end
 
-      @test length(f) == length(coeffs(f))
+      @test length(f) == length(coefficients(f))
       @test length(f) == length(monomials(f))
       @test length(f) == length(terms(f))
 
@@ -303,15 +303,15 @@ end
       f = rand(R, 5:10, 1:10, -100:100)
       g = rand(R, 5:10, 1:10, -100:100)
 
-      @test lt(f*g) == lt(f)*lt(g)
-      @test lt(one(R)) == one(R)
-      @test lt(zero(R)) == zero(R)
+      @test leading_term(f*g) == leading_term(f)*leading_term(g)
+      @test leading_term(one(R)) == one(R)
+      @test leading_term(zero(R)) == zero(R)
 
       for v in vars_R
-         @test lt(v) == v
+         @test leading_term(v) == v
       end
 
-      @test parent(lt(f)) == parent(f)
+      @test parent(leading_term(f)) == parent(f)
    end
 
    for num_vars = 1:4
@@ -323,14 +323,15 @@ end
          f = rand(S, 0:4, 0:5, -10:10)
          g = rand(S, 0:4, 0:5, -10:10)
 
-         @test lc(f*g) == lc(f)*lc(g)
-         @test lc(one(S)) == one(base_ring(S))
+         @test leading_coefficient(f*g) ==
+	       leading_coefficient(f)*leading_coefficient(g)
+         @test leading_coefficient(one(S)) == one(base_ring(S))
 
          for v in varlist
-            @test lc(v) == one(base_ring(S))
+            @test leading_coefficient(v) == one(base_ring(S))
          end
 
-         @test parent(lc(f)) == base_ring(f)
+         @test parent(leading_coefficient(f)) == base_ring(f)
       end
    end
 
@@ -349,15 +350,16 @@ end
             g = rand(S, 0:4, 0:5, -10:10)
          end
 
-         @test lm(f*g) == lm(f)*lm(g)
-         @test lm(one(S)) == one(S)
-         @test lm(zero(S)) == zero(S)
+         @test leading_monomial(f*g) ==
+	       leading_monomial(f)*leading_monomial(g)
+         @test leading_monomial(one(S)) == one(S)
+         @test leading_monomial(zero(S)) == zero(S)
 
          for v in varlist
-            @test lm(v) == v
+            @test leading_monomial(v) == v
          end
 
-         @test parent(lm(f)) == parent(f)
+         @test parent(leading_monomial(f)) == parent(f)
       end
    end
 end

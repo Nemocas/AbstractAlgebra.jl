@@ -4,17 +4,18 @@
 #
 ###############################################################################
 
-export PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
-       reverse, shift_left, shift_right, divexact, pseudorem, pseudodivrem,
-       gcd, degree, content, primpart, evaluate, compose, derivative, integral,
-       resultant, discriminant, gcdx, zero, one, gen, length, iszero,
-       normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod,
-       invmod, lcm, divrem, mod, gcdinv, resx, canonical_unit, var,
+export PolynomialRing, hash, coeff, isgen, leading_coefficient, var, truncate,
+       mullow, reverse, shift_left, shift_right, divexact, pseudorem,
+       pseudodivrem, gcd, degree, content, primpart, evaluate, compose,
+       derivative, integral, resultant, discriminant, gcdx, zero, one, gen,
+       length, iszero, normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!,
+       mulmod, invmod, lcm, divrem, mod, gcdinv, resx, canonical_unit, var,
        chebyshev_t, chebyshev_u, set_length!, mul_classical, mul_ks, subst,
-       mul_karatsuba, trail, pow_multinomial, monomial_to_newton!,
-       newton_to_monomial!, isterm, isterm_recursive, ismonomial,
-       ismonomial_recursive, base_ring, parent_type, elem_type, check_parent,
-       promote_rule, remove, zero!, add!, interpolate, sylvester_matrix
+       mul_karatsuba, trailing_coefficient, pow_multinomial,
+       monomial_to_newton!, newton_to_monomial!, isterm, isterm_recursive,
+       ismonomial, ismonomial_recursive, base_ring, parent_type, elem_type,
+       check_parent, promote_rule, remove, zero!, add!, interpolate,
+       sylvester_matrix
 
 ###############################################################################
 #
@@ -138,22 +139,24 @@ modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem} = modulus(base_ring
 coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 @doc Markdown.doc"""
-    lead(a::Generic.PolynomialElem)
+    leading_coefficient(a::Generic.PolynomialElem)
 
 Return the leading coefficient of the given polynomial. This will be the
 nonzero coefficient of the term with highest degree unless the polynomial
 in the zero polynomial, in which case a zero coefficient is returned.
 """
-lead(a::PolynomialElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
+function leading_coefficient(a::PolynomialElem)
+   return length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
+end
 
 @doc Markdown.doc"""
-    trail(a::Generic.PolynomialElem)
+    trailing_coefficient(a::Generic.PolynomialElem)
 
 Return the trailing coefficient of the given polynomial. This will be the
 nonzero coefficient of the term with lowest degree unless the polynomial
 is the zero polynomial, in which case a zero coefficient is returned.
 """
-function trail(a::PolynomialElem)
+function trailing_coefficient(a::PolynomialElem)
    if iszero(a)
       return base_ring(a)(0)
    else
@@ -228,7 +231,7 @@ Return `true` if the given polynomial is monic, i.e. has leading coefficient
 equal to one, otherwise return `false`.
 """
 function ismonic(a::PolyElem)
-    return isone(lead(a))
+    return isone(leading_coefficient(a))
 end
 
 @doc Markdown.doc"""
@@ -271,7 +274,7 @@ Return `true` if the given polynomial has one term. This function is
 recursive, with all scalar types returning true.
 """
 function isterm_recursive(a::PolynomialElem)
-   if !isterm_recursive(lead(a))
+   if !isterm_recursive(leading_coefficient(a))
       return false
    end
    for i = 1:length(a) - 1
@@ -288,7 +291,7 @@ end
 Return `true` if the given polynomial is a monomial.
 """
 function ismonomial(a::PolynomialElem)
-   if !isone(lead(a))
+   if !isone(leading_coefficient(a))
       return false
    end
    for i = 1:length(a) - 1
@@ -308,7 +311,7 @@ Return `true` if the given polynomial is a monomial. This function is
 recursive, with all scalar types returning true.
 """
 function ismonomial_recursive(a::PolynomialElem)
-   if !ismonomial_recursive(lead(a))
+   if !ismonomial_recursive(leading_coefficient(a))
       return false
    end
    for i = 1:length(a) - 1
@@ -378,7 +381,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(x::PolynomialElem) = canonical_unit(lead(x))
+canonical_unit(x::PolynomialElem) = canonical_unit(leading_coefficient(x))
 
 ###############################################################################
 #
@@ -1020,7 +1023,7 @@ function divhigh(a::PolyElem{T}, b::PolyElem{T}, n0::Int) where T <: RingElement
             break
         end
         # negate quotient so we can use addeq! below
-        q = -divexact(coeff(a, da), lead(b))
+        q = -divexact(coeff(a, da), leading_coefficient(b))
         r = setcoeff!(r, da - degree(b), q)
         da -= 1
         if i != n
@@ -1278,11 +1281,11 @@ function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) whe
    end
    if length(f) >= length(g)
       f = deepcopy(f)
-      b = lead(g)
+      b = leading_coefficient(g)
       g = inv(b)*g
       c = base_ring(f)()
       while length(f) >= length(g)
-         l = -lead(f)
+         l = -leading_coefficient(f)
          for i = 1:length(g) - 1
             c = mul!(c, coeff(g, i - 1), l)
             u = coeff(f, i + length(f) - length(g) - 1)
@@ -1314,14 +1317,14 @@ function Base.divrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem
       return zero(parent(f)), f
    end
    f = deepcopy(f)
-   binv = inv(lead(g))
-   g = divexact(g, lead(g))
+   binv = inv(leading_coefficient(g))
+   g = divexact(g, leading_coefficient(g))
    qlen = length(f) - length(g) + 1
    q = parent(f)()
    fit!(q, qlen)
    c = base_ring(f)()
    while length(f) >= length(g)
-      q1 = lead(f)
+      q1 = leading_coefficient(f)
       l = -q1
       q = setcoeff!(q, length(f) - length(g), q1*binv)
       for i = 1:length(g) - 1
@@ -1512,13 +1515,13 @@ function divides(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
       return false, parent(f)()
    end
    f = deepcopy(f)
-   g_lead = lead(g)
+   g_lead = leading_coefficient(g)
    qlen = length(f) - length(g) + 1
    q = parent(f)()
    fit!(q, qlen)
    c = base_ring(f)()
    while length(f) >= length(g)
-      q1 = lead(f)
+      q1 = leading_coefficient(f)
       flag, d = divides(q1, g_lead)
       if !flag
          return false, parent(f)()
@@ -1719,7 +1722,7 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ign
       if iszero(a)
          return a
       else
-         return divexact(a, canonical_unit(lead(a)))
+         return divexact(a, canonical_unit(leading_coefficient(a)))
       end
    end
    if isone(b)
@@ -1732,10 +1735,12 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ign
       b = divexact(b, c2)
       c = gcd(c1, c2)
    end
-   lead_monomial = isterm_recursive(lead(a)) || isterm_recursive(lead(b))
-   trail_monomial = isterm_recursive(trail(a)) || isterm_recursive(trail(b))
-   lead_a = lead(a)
-   lead_b = lead(b)
+   lead_monomial = isterm_recursive(leading_coefficient(a)) ||
+                   isterm_recursive(leading_coefficient(b))
+   trail_monomial = isterm_recursive(trailing_coefficient(a)) ||
+                    isterm_recursive(trailing_coefficient(b))
+   lead_a = leading_coefficient(a)
+   lead_b = leading_coefficient(b)
    g = one(parent(a))
    h = one(parent(a))
    while true
@@ -1749,7 +1754,7 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ign
          break
       end
       (a, b) = (b, divexact(r, g*h^d))
-      g = lead(a)
+      g = leading_coefficient(a)
       if d > 1
          h = divexact(g^d, h^(d - 1))
       else
@@ -1757,20 +1762,24 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ign
       end
    end
    if !ignore_content
-      if !isterm_recursive(lead(b)) && !isterm_recursive(trail(b))
+      if !isterm_recursive(leading_coefficient(b)) &&
+         !isterm_recursive(trailing_coefficient(b))
          if lead_monomial # lead term monomial, so content contains rest
-            d = divexact(lead(b), term_content(lead(b)))
+            d = divexact(leading_coefficient(b),
+	                 term_content(leading_coefficient(b)))
             b = divexact(b, d)
          elseif trail_monomial # trail term is monomial, so ditto
-            d = divexact(trail(b), term_content(trail(b)))
+            d = divexact(trailing_coefficient(b),
+			 term_content(trailing_coefficient(b)))
             b = divexact(b, d)
          else
             glead = gcd(lead_a, lead_b)
             if isterm_recursive(glead)
-               d = divexact(lead(b), term_content(lead(b)))
+               d = divexact(leading_coefficient(b),
+			     term_content(leading_coefficient(b)))
                b = divexact(b, d)
             else # last ditched attempt to find easy content
-               h = gcd(lead(b), glead)
+               h = gcd(leading_coefficient(b), glead)
                h = divexact(h, term_content(h))
                flag, q = divides(b, h)
                if flag
@@ -1782,7 +1791,7 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ign
       b = divexact(b, content(b))
    end
    b = c*b
-   return divexact(b, canonical_unit(lead(b)))
+   return divexact(b, canonical_unit(leading_coefficient(b)))
 end
 
 function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
@@ -1794,7 +1803,7 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) whe
       if iszero(a)
          return(a)
       else
-         d = lead(a)
+         d = leading_coefficient(a)
          return divexact(a, d)
       end
    end
@@ -1805,7 +1814,7 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) whe
       (a, b) = (mod(b, a), a)
    end
    b = g*b
-   d = lead(b)
+   d = leading_coefficient(b)
    return divexact(b, d)
 end
 
@@ -1967,8 +1976,8 @@ function subresultant_lazard(Sd0::AbstractAlgebra.PolyElem{T}, Sd1::AbstractAlge
    if n == 0
       return Sd1
    end
-   x = lead(Sd1)
-   y = lead(Sd0)
+   x = leading_coefficient(Sd1)
+   y = leading_coefficient(Sd0)
    a = 1 << (ndigits(n, base = 2) - 1) # floor(log_2(a))
    c = x
    n = n - a
@@ -1988,8 +1997,8 @@ end
 function subresultant_ducos(A::AbstractAlgebra.PolyElem{T}, Sd1::AbstractAlgebra.PolyElem{T}, Se0::AbstractAlgebra.PolyElem{T}, sd::T) where T <: RingElement
    d1 = length(A)
    e1 = length(Sd1)
-   cd1 = lead(Sd1)
-   se = lead(Se0)
+   cd1 = leading_coefficient(Sd1)
+   se = leading_coefficient(Se0)
    D = parent(A)()
    fit!(D, d1 - 1)
    for j = 0:e1 - 2
@@ -2006,7 +2015,7 @@ function subresultant_ducos(A::AbstractAlgebra.PolyElem{T}, Sd1::AbstractAlgebra
       Hj -= divexact(coeff(Hj, e1 - 1)*Sd1, cd1)
       D += coeff(A, j)*Hj
    end
-   D = divexact(D, lead(A))
+   D = divexact(D, leading_coefficient(A))
    Hj = shift_left(Hj, 1)
    r = divexact((Hj + D)*cd1 - coeff(Hj, e1 - 1)*Sd1, sd)
    return iseven(d1 - e1) ? -r : r
@@ -2040,7 +2049,7 @@ function resultant_ducos(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.Poly
    c2 = content(q)
    p = divexact(p, c1)
    q = divexact(q, c2)
-   sd = lead(q)^(lp - lq)
+   sd = leading_coefficient(q)^(lp - lq)
    Sd0 = parent(p)()
    A = q
    B = pseudorem(p, -A)
@@ -2054,7 +2063,7 @@ function resultant_ducos(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.Poly
       delta = d1 - e1
       if delta > 1
          if length(Sd0) == 0
-            C = divexact(lead(B)^(delta - 1)*B, sd^(delta - 1))
+            C = divexact(leading_coefficient(B)^(delta - 1)*B, sd^(delta - 1))
          else
             C = subresultant_lazard(Sd0, Sd1)
          end
@@ -2068,7 +2077,7 @@ function resultant_ducos(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.Poly
       Sd0 = C
       Sd1 = B
       A = C
-      sd = lead(A)
+      sd = leading_coefficient(A)
    end
 end
 
@@ -2092,7 +2101,7 @@ function resultant_subresultant(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgeb
    if lq == 1
       return coeff(q, 0)^(lp - 1)
    end
-   s = lead(q)^(lp - lq)
+   s = leading_coefficient(q)^(lp - lq)
    S = parent(p)()
    A = q
    B = pseudorem(p, -q)
@@ -2105,7 +2114,7 @@ function resultant_subresultant(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgeb
       S = B
       delta = d1 - e1
       if delta > 1
-         C = divexact(lead(B)^(delta - 1)*B, s^(delta - 1))
+         C = divexact(leading_coefficient(B)^(delta - 1)*B, s^(delta - 1))
          S = C
       else
          C = B
@@ -2113,9 +2122,9 @@ function resultant_subresultant(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgeb
       if e1 == 1
          return coeff(S, 0)*sgn
       end
-      B = divexact(pseudorem(A, -B), s^delta*lead(A))
+      B = divexact(pseudorem(A, -B), s^delta*leading_coefficient(A))
       A = C
-      s = lead(A)
+      s = leading_coefficient(A)
    end
 end
 
@@ -2161,7 +2170,7 @@ function resultant_lehmer(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.Pol
             (q, b), a = divrem(a, b), b
             u1, u2 = u2, u1 - q*u2
             v1, v2 = v2, v1 - q*v2
-            s *= lead(a)^(lena - length(b))
+            s *= leading_coefficient(a)^(lena - length(b))
             lena = lenb
             lenb = length(b)
          end
@@ -2171,7 +2180,7 @@ function resultant_lehmer(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.Pol
                sgn = -sgn
          end
          B, A = mod(A, B), B
-         s *= lead(A)^(lenA - length(B))
+         s *= leading_coefficient(A)^(lenA - length(B))
       end
       lenA = length(A)
       lenB = length(B)
@@ -2184,14 +2193,14 @@ function resultant_lehmer(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.Pol
          sgn = -sgn
       end
       B, A = mod(A, B), B
-      s *= lead(A)^(lenA - length(B))
+      s *= leading_coefficient(A)^(lenA - length(B))
       lenA = lenB
       lenB = length(B)
       if lenB == 0
          return zero(base_ring(A))
       end
    end
-   s *= lead(B)^(lenA - 1)
+   s *= leading_coefficient(B)^(lenA - 1)
    return c1^(lB - 1)*c2^(lA - 1)*s*sgn
 end
 
@@ -2277,7 +2286,7 @@ function resultant_euclidean(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.
          sgn = -sgn
       end
       B, A = mod(A, B), B
-      s *= lead(A)^(lena - length(B))
+      s *= leading_coefficient(A)^(lena - length(B))
       parent(s) # julia bug
       lena = lenb
       lenb = length(B)
@@ -2285,7 +2294,7 @@ function resultant_euclidean(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.
          return zero(base_ring(a))
       end
    end
-   s *= lead(B)^(lena - 1)
+   s *= leading_coefficient(B)^(lena - 1)
    return c1^(lb - 1)*c2^(la - 1)*s*sgn
 end
 
@@ -2312,9 +2321,9 @@ function discriminant(a::AbstractAlgebra.PolyElem)
    d = derivative(a)
    z = resultant(a, d)
    if length(a) - length(d) == 1
-      z = divexact(z, lead(a))
+      z = divexact(z, leading_coefficient(a))
    else
-      z = z*lead(a)^(length(a) - length(d) - 2)
+      z = z*leading_coefficient(a)^(length(a) - length(d) - 2)
    end
    mod4 = (length(a) + 3) % 4 # degree mod 4
    return mod4 == 2 || mod4 == 3 ? -z : z
@@ -2370,13 +2379,13 @@ function resx(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) wh
       end
       s = h^d
       B = divexact(B, g*s)
-      t = lead(A)^(d + 1)
+      t = leading_coefficient(A)^(d + 1)
       u2, u1 = divexact(u1*t - Q*u2, g*s), u2
       v2, v1 = divexact(v1*t - Q*v2, g*s), v2
-      g = lead(A)
+      g = leading_coefficient(A)
       h = divexact(h*g^d, s)
    end
-   s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
+   s = divexact(h*leading_coefficient(B)^(lena - 1), h^(lena - 1))
    res = c1^(length(b) - 1)*c2^(length(a) - 1)*s*sgn
    if length(b) > 1
       u2 *= c1^(length(b) - 2)*c2^(length(a) - 1)*sgn
@@ -2392,13 +2401,13 @@ function resx(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) wh
    end
    if lena != 2
       if lena > 1
-         d1 = lead(B)^(lena - 2)
+         d1 = leading_coefficient(B)^(lena - 2)
          d2 = h^(lena - 2)
          u2 = divexact(u2*d1, d2)
          v2 = divexact(v2*d1, d2)
       else
-         u2 = divexact(u2*h, lead(B))
-         v2 = divexact(v2*h, lead(B))
+         u2 = divexact(u2*h, leading_coefficient(B))
+         v2 = divexact(v2*h, leading_coefficient(B))
       end
    end
    if swap
@@ -2426,12 +2435,12 @@ function gcdx(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) wh
       if length(b) == 0
          return zero(parent(a)), zero(parent(a)), zero(parent(a))
       else
-         d = lead(b)
+         d = leading_coefficient(b)
          return divexact(b, d), zero(parent(a)), divexact(one(parent(a)), d)
       end
    end
    if length(b) == 0
-      d = lead(a)
+      d = leading_coefficient(a)
       return divexact(a, d), divexact(one(parent(a)), d), zero(parent(a))
    end
    swap = false
@@ -2455,7 +2464,7 @@ function gcdx(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) wh
    end
    d = gcd(c1, c2)
    A, u1, v1 = d*A, d*u1, d*v1
-   d = lead(A)
+   d = leading_coefficient(A)
    return divexact(A, d), divexact(u1, d), divexact(v1, d)
 end
 
@@ -2473,12 +2482,12 @@ function gcdinv(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) 
       if length(b) == 0
          return zero(parent(a)), zero(parent(a))
       else
-         d = lead(b)
+         d = leading_coefficient(b)
          return divexact(b, d), zero(parent(a))
       end
    end
    if length(b) == 0
-      d = lead(a)
+      d = leading_coefficient(a)
       return divexact(a, d), parent(a)(inv(d))
    end
    if length(a) < length(b)
@@ -2504,7 +2513,7 @@ function gcdinv(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) 
    end
    d = gcd(c1, c2)
    A, u1 = d*A, d*u1
-   d = lead(A)
+   d = leading_coefficient(A)
    return divexact(A, d), divexact(u1, d)
 end
 
