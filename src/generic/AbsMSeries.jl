@@ -230,7 +230,7 @@ Return an array of the nonzero coefficients of the series, in the order they
 would be displayed, i.e. least significant term first.
 """
 function coefficients(a::AbsMSeries)
-    return reverse(collect(coefficients(poly(a))))
+    return reverse!(collect(coefficients(poly(a))))
 end
 
 @doc Markdown.doc"""
@@ -240,7 +240,7 @@ Return an array of the exponent vectors of the nonzero terms of the series, in
 the order they would be displayed, i.e. least significant term first.
 """
 function exponent_vectors(a::AbsMSeries)
-    return reverse(collect(exponent_vectors(poly(a))))
+    return reverse!(collect(exponent_vectors(poly(a))))
 end
 
 ###############################################################################
@@ -287,7 +287,7 @@ function AbstractAlgebra.expressify(a::AbstractAlgebra.AbsMSeriesElem,
     n = nvars(parent(apoly))
     
     iter = zip(coefficients(apoly), exponent_vectors(apoly))
-    cv = reverse(collect(iter))
+    cv = reverse!(collect(iter))
     
     for (c, v) in cv
         prod = Expr(:call, :*)
