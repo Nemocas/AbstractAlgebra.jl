@@ -183,7 +183,7 @@ Return true if the series $a$ is a generator of its parent series ring.
 function isgen(a::AbsMSeries)
     R = parent(a)
     p = poly(a)
-    v = symbols(p)
+    v = vars(p)
     return length(v) == 1 && length(p) == 1 &&
           isone(leading_coefficient(p)) && sum(first(exponent_vectors(p))) == 1
 end
