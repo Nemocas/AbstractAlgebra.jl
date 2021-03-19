@@ -17,7 +17,7 @@ function O(a::AbstractAlgebra.AbsMSeriesElem{T}) where T <: RingElement
     end
     R = parent(a)
     p = poly(a)
-    v = symbols(p)
+    v = vars(p)
     (length(v) != 1 || length(p) != 1 || !isone(leading_coefficient(p))) &&
                                                error("Not a pure power in O()")
     ind = var_index(v[1])
