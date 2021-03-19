@@ -27,7 +27,7 @@ function O(a::AbstractAlgebra.AbsMSeriesElem{T}) where T <: RingElement
 end
 
 function O(R::AbsMSeriesRing{T}, prec::Int)
-    prec <= && error("Precision must be nonnegative")
+    prec <= 0 && error("Precision must be nonnegative")
     return R(poly_ring(R)(), fill(prec, nvars(R)))
 end
 
