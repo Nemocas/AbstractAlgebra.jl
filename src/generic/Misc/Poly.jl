@@ -16,68 +16,6 @@ function ispower(a::PolyElem, n::Int)
     return true, x*prod(p^div(k, n) for (p, k) = f.fac)
 end
 
-##############################################################################
-#
-#  Binary arithmetic
-#
-##############################################################################
-
-# computes the top n coeffs of the product only
-function mulhigh_n(a::PolyElem{T}, b::PolyElem{T}, n::Int) where {T}
-    # sum a_i t^i and sum b_j t^j
-    # want (i, j) s.th. i + j >= deg a + deg b - n
-    r = parent(a)()
-    for i=max(degree(a)-n, 0):degree(a)
-        for j = max(degree(a) + degree(b) - n - i, 0):degree(b)
-            setcoeff!(r, i+j, coeff(r, i+j) + coeff(a, i)*coeff(b, j))
-        end
-    end
-    return r
-end
-
-# assuming b divides a, compute the last n coeffs of the quotient
-# will produce garbage otherwise
-# div(a, b) mod x^n
-function divexact_low(a::PolyElem{T}, b::PolyElem{T}, n::Int) where {T}
-    r = parent(a)()
-    a = truncate(a, n)
-    b = truncate(b, n)
-    for i = 0:n - 1
-        q = divexact(trail(a), trail(b))
-        setcoeff!(r, i, q)
-        a = shift_right(a - q*b, 1)
-        b = truncate(b, n - i - 1)
-        # truncate both a and b to n - i - 1 (for generic polys one could just change the length)
-    end
-    return r
-end
-
-#computes the top coeffs starting with x^n
-function divhigh(a::PolyElem{T}, b::PolyElem{T}, n0::Int) where {T}
-    r = parent(a)()
-    n = degree(a) - degree(b) - n0
-    fit!(r, degree(a) - degree(b))
-    a = deepcopy(a)
-    k = degree(a) - n0
-    da = degree(a)
-    for i=0:n
-        if degree(a) < degree(b)
-            break
-        end
-        q = divexact(coeff(a, da), lead(b))
-        setcoeff!(r, da - degree(b), q)
-        for j=da:-1:max(k, da - degree(b))
-            setcoeff!(a, j, coeff(a, j)-q*coeff(b, j-da+degree(b)))
-        end
-        da -= 1
-    end
-    if iszero(r)
-        return r
-    end
-    set_length!(r, normalise(r, length(r) - 1))
-    return r
-end
-
 ################################################################################
 #
 #  Deflate and inflate
