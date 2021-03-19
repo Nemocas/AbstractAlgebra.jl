@@ -26,7 +26,7 @@ function names.
 
 ## Types and parent objects
 
-The types of generic polynomials implemented by AbstractAlgebra.jl are
+The types of generic Puiseux series implemented by AbstractAlgebra.jl are
 `Generic.PuiseuxSeriesRingElem{T}` and `Generic.PuiseuxSeriesFieldElem{T}`.
 
 Both series element types belong to the union type
@@ -43,7 +43,7 @@ and `AbstractAlgebra.Field` respectively.
 The default precision, string representation of the variable and base ring $R$ of a
 generic Puiseux series are stored in its parent object.
 
-## Puisuex series ring constructors
+## Puiseux series ring constructors
 
 In order to construct Puiseux series in AbstractAlgebra.jl, one must first construct the
 ring itself. This is accomplished with any of the following constructors.
