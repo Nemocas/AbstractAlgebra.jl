@@ -216,29 +216,29 @@ function iszero end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    gen(a)
+# @doc Markdown.doc"""
+#     gen(a)
 
-Return element generating parent $a$.
+# Return element generating parent $a$.
 
-# Examples
-```jldoctest; setup = :(using AbstractAlgebra)
-julia> S, x = LaurentPolynomialRing(QQ, "x")
-(Univariate Laurent Polynomial Ring in x over Rationals, x)
+# # Examples
+# ```jldoctest; setup = :(using AbstractAlgebra)
+# julia> S, x = LaurentPolynomialRing(QQ, "x")
+# (Univariate Laurent Polynomial Ring in x over Rationals, x)
 
-julia> gen(S)
-x
-```
-"""
+# julia> gen(S)
+# x
+# ```
+# """
 function gen end
 
-@doc Markdown.doc"""
-    gens(a)
+# @doc Markdown.doc"""
+#     gens(a)
 
-Return elements generating parent $a$ in an array.
+# Return elements generating parent $a$ in an array.
 
-# Examples
-```jldoctest; setup = :(using AbstractAlgebra)
-```
-"""
+# # Examples
+# ```jldoctest; setup = :(using AbstractAlgebra)
+# ```
+# """
 function gens end
