@@ -8,7 +8,7 @@ end
 # Generic Laurent polynomials
 
 Laurent polynomials are similar to polynomials but can have terms of negative degrees,
-and form a ring denoted by $R[x, x^{-1}]$ where `R`is the coefficient ring.
+and form a ring denoted by $R[x, x^{-1}]$ where `R` is the coefficient ring.
 AbstractAlgebra.jl provides a generic implementation of Laurent polynomials,
 built in terms of regular polynomials.
 
