@@ -20,6 +20,7 @@ makedocs(
                           "ncpolynomial.md",
                           "mpolynomial_rings.md",
                           "mpolynomial.md",
+                          "laurent_polynomial.md",
                           "series_rings.md",
                           "series.md",
                           "puiseux.md",
