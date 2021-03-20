@@ -192,6 +192,10 @@ trailing_coefficient(::NCPolyElem)
 ```
 
 ```@docs
+gen(::NCPolyRing)
+```
+
+```@docs
 isgen(::NCPolyElem)
 ```
 

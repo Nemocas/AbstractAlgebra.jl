@@ -48,10 +48,3 @@ isunit
 
 With the same logic as earlier, groups only need to extend one of the methods
 `isone` and `iszero`.
-
-## Generic functions
-
-```@docs
-gen
-gens
-```
