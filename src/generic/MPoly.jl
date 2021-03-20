@@ -2842,7 +2842,7 @@ function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vect
       end
    end
    M = MPolyBuildCtx(S)
-   cvzip = zip(coeficients(f), exponent_vectors(f))
+   cvzip = zip(coefficients(f), exponent_vectors(f))
    for (c, v) in cvzip
       for j = 1:N
          v[j] = div(v[j] - shift[j], defl[j])
