@@ -448,27 +448,27 @@ end
 
 # Iterators
 
-struct MPolyCoeffs{T <: AbstractAlgebra.MPolyElem}
+struct MPolyCoeffs{T <: AbstractAlgebra.RingElem}
    poly::T
 end
 
-struct MPolyExponentVectors{T <: AbstractAlgebra.MPolyElem}
+struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem}
    poly::T
 end
 
-struct MPolyTerms{T <: AbstractAlgebra.MPolyElem}
+struct MPolyTerms{T <: AbstractAlgebra.RingElem}
    poly::T
 end
 
-struct MPolyMonomials{T <: AbstractAlgebra.MPolyElem}
+struct MPolyMonomials{T <: AbstractAlgebra.RingElem}
    poly::T
 end
 
-mutable struct MPolyBuildCtx{T <: AbstractAlgebra.MPolyElem, S}
+mutable struct MPolyBuildCtx{T, S}
   poly::T
   state::S
 
-  function MPolyBuildCtx(R::T, s::S) where {S, T <: AbstractAlgebra.MPolyRing}
+  function MPolyBuildCtx(R::T, s::S) where {S, T}
     return new{elem_type(T), S}(R())
   end
 end
@@ -797,6 +797,44 @@ mutable struct PuiseuxSeriesFieldElem{T <: FieldElement} <: AbstractAlgebra.Fiel
 end
 
 const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldElem{T}} where T <: RingElement
+
+###############################################################################
+#
+#   AbsMSeriesRing / AbsMSeries
+#
+###############################################################################
+
+mutable struct AbsMSeriesRing{T <: RingElement, S} <:
+                                                 AbstractAlgebra.MSeriesRing{T}
+   poly_ring::AbstractAlgebra.MPolyRing{T}
+   prec_max::Vector{Int}
+   sym::Vector{Symbol}
+
+   function AbsMSeriesRing{T, S}(poly_ring::AbstractAlgebra.MPolyRing{T},
+            prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where
+                          {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
+      U = elem_type(poly_ring)
+      return get_cached!(AbsMSeriesID, (poly_ring, prec, s), cached) do
+         new{T, U}(poly_ring, prec, s)
+      end::AbsMSeriesRing{T, S}
+   end
+end
+
+const AbsMSeriesID = CacheDictType{Tuple{Ring,
+                                          Vector{Int}, Vector{Symbol}}, Ring}()
+
+mutable struct AbsMSeries{T <: RingElement, S} <:
+                                              AbstractAlgebra.AbsMSeriesElem{T}
+   poly::S
+   prec::Vector{Int}
+   parent::AbsMSeriesRing{T, S}
+
+   function AbsMSeries{T, S}(R::AbsMSeriesRing{T},
+                      pol::S, prec::Vector{Int}) where
+                          {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
+      return new{T, S}(pol, prec, R)
+   end
+end
 
 ###############################################################################
 #
