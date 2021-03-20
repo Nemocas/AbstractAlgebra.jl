@@ -49,6 +49,11 @@ function one(R::GFField{T}) where T <: Integer
       return GFElem{T}(T(1), R)
 end
 
+@doc Markdown.doc"""
+    gen(R::GFField{T}) where T <: Integer
+
+Return a generator of the field. Currently this returns 1.
+"""
 function gen(R::GFField{T}) where T <: Integer
       return GFElem{T}(T(1), R)
 end

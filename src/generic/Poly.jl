@@ -172,6 +172,11 @@ zero(R::AbstractAlgebra.PolyRing) = R(0)
 
 one(R::AbstractAlgebra.PolyRing) = R(1)
 
+@doc Markdown.doc"""
+    gen(R::AbstractAlgebra.PolyRing)
+
+Return the generator of the given polynomial ring.
+"""
 gen(R::AbstractAlgebra.PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
 gens(R::AbstractAlgebra.PolyRing) = [gen(R)]

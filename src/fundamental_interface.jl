@@ -228,12 +228,6 @@ julia> S, x = LaurentPolynomialRing(QQ, "x")
 
 julia> gen(S)
 x
-
-julia> G = GF(7)
-Finite field F_7
-
-julia> gen(G)
-1
 ```
 """
 function gen end

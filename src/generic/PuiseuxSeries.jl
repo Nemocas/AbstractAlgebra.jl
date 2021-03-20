@@ -160,11 +160,23 @@ one(R::PuiseuxSeriesField) = R(1)
 
 one(R::PuiseuxSeriesRing) = R(1)
 
+@doc Markdown.doc"""
+    gen(R::PuiseuxSeriesRing)
+
+Return the generator of the Puiseux series ring, i.e. $x + O(x^{n + 1})$ where
+$n$ is the maximum precision of the Puiseux series ring $R$.
+"""
 function gen(R::PuiseuxSeriesRing)
    S = laurent_ring(R)
    return R(gen(S), 1)
 end
 
+@doc Markdown.doc"""
+    gen(R::PuiseuxSeriesField)
+
+Return the generator of the Puiseux series ring, i.e. $x + O(x^{n + 1})$ where
+$n$ is the maximum precision of the Puiseux series ring $R$.
+"""
 function gen(R::PuiseuxSeriesField)
    S = laurent_ring(R)
    return R(gen(S), 1)

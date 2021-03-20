@@ -142,6 +142,12 @@ zero(R::SeriesRing) = R(0)
 
 one(R::SeriesRing) = R(1)
 
+@doc Markdown.doc"""
+    gen(R::RelSeriesRing)
+
+Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
+$n$ is the maximum precision of the power series ring $R$.
+"""
 function gen(R::RelSeriesRing)
    S = base_ring(R)
    return R([S(1)], 1, max_precision(R) + 1, 1)
