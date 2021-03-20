@@ -73,6 +73,12 @@ function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:degrevlex}}) where {T <: RingE
             for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
+@doc Markdown.doc"""
+    gens(a::MPolyRing{T}) where {T <: RingElement}
+
+Return an array of all the generators (variables) of the given polynomial
+ring.
+"""
 function gens(a::MPolyRing{T}) where {T <: RingElement}
    n = a.num_vars
    return [gen(a, i, Val{a.ord}) for i in 1:n]

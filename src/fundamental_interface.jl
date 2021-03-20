@@ -239,14 +239,6 @@ Return elements generating parent $a$ in an array.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
-(Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
-
-julia> gens(S)
-3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
- x
- y
- z
 ```
 """
 function gens end
