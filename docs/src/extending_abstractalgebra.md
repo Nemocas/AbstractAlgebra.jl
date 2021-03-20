@@ -33,11 +33,11 @@ zero
 ```
 
 Groups should only extend at least one of these. The one that is required
-depends on if the group is additative (commutative) or not.
+depends on if the group is additive (commutative) or multiplicative.
 
 ## Basic manipulation
 
-If one would like to implement a ring, this is the basic manipulation methods
+If one would like to implement a ring, these are the basic manipulation methods
 that all rings should extend:
 
 ```@docs
