@@ -25,11 +25,11 @@ function (G::Generic.SymmetricGroup)()
     return one(G)
 end
 
-# Deprecated in 0.13.5
+# Deprecated in 0.14.*
 
 @deprecate powmod(x, y, z) powermod(x, y, z)
 
-# Deprecated in 0.14.1
+# Deprecated in 0.15.*
 
 @deprecate trail(f) trailing_coefficient(f)
 
