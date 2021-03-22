@@ -1137,7 +1137,7 @@ end
    R, varsR = PolynomialRing(F2, ["x"])
    S, varsS = PolynomialRing(R, ["y"])
    f = x -> x^2
-   map_coeffs(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
+   map_coefficients(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
 
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -1160,7 +1160,7 @@ end
          @test base_ring(g) === F2
          @test parent(g) === F2x
 
-         g = map_coeffs(z -> z + 1, f, parent = R)
+         g = map_coefficients(z -> z + 1, f, parent = R)
          @test parent(g) === R
       end
    end

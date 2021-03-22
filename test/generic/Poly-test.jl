@@ -2845,7 +2845,7 @@ end
 
 @testset "Generic.Poly.change_base_ring" begin
    Zx, x = PolynomialRing(ZZ,'x')
-   @test 1 == map_coeffs(sqrt, x^0)
+   @test 1 == map_coefficients(sqrt, x^0)
    p = Zx([i for i in 1:10])
    q = Zx([i for i in 10:-1:1])
    pq = p * q
@@ -2857,12 +2857,12 @@ end
       @test pR * qR == pqR
    end
 
-   ps = map_coeffs(z -> z^2, p)
+   ps = map_coefficients(z -> z^2, p)
    @test ps == Zx([i^2 for i in 1:10])
 
    f = x^2 + 3x^3 + 2x^6
-   @test map_coeffs(one, f) == x^2 + x^3 + x^6
-   f2 = map_coeffs(t -> t+2, f)
+   @test map_coefficients(one, f) == x^2 + x^3 + x^6
+   f2 = map_coefficients(t -> t+2, f)
    @test f2 == 3x^2 + 5x^3 + 4x^6
    for i in [0, 1, 4, 5]
       @test coeff(f2, i) !== coeff(f, i)
@@ -2870,7 +2870,7 @@ end
 
    F = GF(11)
    P, y = PolynomialRing(F, 'x')
-   @test map_coeffs(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
+   @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 end
 
 @testset "Generic.Poly.printing" begin

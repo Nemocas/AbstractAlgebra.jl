@@ -71,7 +71,7 @@ false
 julia> shift_left(f,2)
 5*x^5 + 2*x^3 + 1
 
-julia> map_coeffs(x->2x, f)
+julia> map_coefficients(x->2x, f)
 10*x^3 + 4*x + 2*x^-2
 
 julia> change_base_ring(RealField, f)
