@@ -1287,7 +1287,7 @@ end
 
 Return $f \pmod{g}$.
 """
-function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement, SeriesElem}}
    check_parent(f, g)
    if length(g) == 0
       throw(DivideError())
