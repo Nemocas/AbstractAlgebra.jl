@@ -484,7 +484,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem,
        # Moved from Hecke into Misc
-                 coefficients, divexact_low, divhigh,
+                 divexact_low, divhigh,
 		 ismonic, Loc, Localization, LocElem, mulhigh_n,
 		 polynomial_to_power_sums, PolyCoeffs,
 		 power_sums_to_polynomial, roots, sturm_sequence
@@ -574,7 +574,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem,
        # Moved from Hecke into Misc
-                 coefficients, divexact_low, divhigh,
+                 divexact_low, divhigh,
 		 ismonic, Loc, Localization, LocElem, mulhigh_n,
 		 polynomial_to_power_sums, PolyCoeffs,
 		 power_sums_to_polynomial, roots, sturm_sequence
