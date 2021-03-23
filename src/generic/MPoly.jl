@@ -870,7 +870,7 @@ have one.
 """
 function constant_coefficient(p::MPolyElem{T}) where T <: RingElement
    if !iszero(p)
-      for (c, v) in zip(coeffs(p), exponent_vectors(p))
+      for (c, v) in zip(coefficients(p), exponent_vectors(p))
          if iszero(v)
             return c
          end
