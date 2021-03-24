@@ -842,11 +842,14 @@ function Base.exp(a::AbstractAlgebra.AbsSeriesElem{T}) where T <: RingElement
    z = set_precision!(z, precision(a))
    z = setcoeff!(z, 0, exp(coeff(a, 0)))
    len = length(a)
+   C = base_ring(a)()
+   d = derivative(a)
    for k = 1 : precision(a) - 1
       s = zero(base_ring(a))
       for j = 1 : min(k + 1, len) - 1
-         s += j * coeff(a, j) * coeff(z, k - j)
+         s = addmul_delayed_reduction!(s, coeff(d, j - 1), coeff(z, k - j), C)
       end
+      s = reduce!(s)
       !isunit(base_ring(a)(k)) && error("Unable to divide in exp")
       z = setcoeff!(z, k, divexact(s, k))
    end
