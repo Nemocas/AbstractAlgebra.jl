@@ -431,17 +431,12 @@ The leading and trailing coefficient, constant coefficient, leading monomial
 and leading term of a polynomial p are returned by the following functions:
 
 ```@docs
-leading_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+leading_coefficient(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 trailing_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-constant_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-```
-
-```
-```@docs
-leading_monomial(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-```
-```@docs
-leading_term(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+leading_monomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+leading_term(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+constant_coefficient(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+tail(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -450,12 +445,13 @@ leading_term(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```julia
 using AbstractAlgebra
 R,(x,y) = PolynomialRing(ZZ, ["x", "y"], ordering=:deglex)
-p = 2*x*y + 3*y^3
+p = 2*x*y + 3*y^3 + 1
 leading_term(p)
 leading_monomial(p)
 leading_coefficient(p)
 leading_term(p) == leading_coefficient(p) * leading_monomial(p)
 constant_coefficient(p)
+tail(p)
 ```
 
 ### Least common multiple, greatest common divisor
