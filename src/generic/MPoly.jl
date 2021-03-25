@@ -898,7 +898,7 @@ function tail(p::MPolyElem{T}) where T <: RingElement
    ctx = MPolyBuildCtx(S)
    tail_cv = Iterators.drop(zip(coefficients(p), exponent_vectors(p)), 1)
    for (c, v) in tail_cv
-      ctx = push_term!(ctx, c, v)
+      push_term!(ctx, c, v)
    end
    return finish(ctx)
 end
