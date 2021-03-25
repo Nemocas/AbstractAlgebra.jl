@@ -495,7 +495,7 @@ integral(a::RelSeriesElem)
 ### Special functions
 
 ```@docs
-Base.log(a::SeriesElem)
+Base.log(a::AbstractAlgebra.SeriesElem{T}) where T <: AbstractAlgebra.FieldElem
 ```
 
 ```@docs

@@ -229,7 +229,7 @@ diagonal_matrix(::RingElement, ::Int, ::Int)
 
 ```@docs
 zero(::AbstractAlgebra.MatSpace)
-zero(::Generic.MatrixElem)
+zero(::MatrixElem, ::Ring)
 ```
 
 ```@docs
