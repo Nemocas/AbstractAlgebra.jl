@@ -2467,7 +2467,8 @@ function can_solve_with_solution_interpolation_inner(M::AbstractAlgebra.MatElem{
          if !flag
             return flag, r, p, pv, zero(x), zero(R)
          end
-         # Check that new solution has the same pivots as previous ones
+         p = inv!(p)
+	 # Check that new solution has the same pivots as previous ones
          if r != rnk || p != prm || pv != pivots
             if r < rnk # rank is too low: reject
                pt += 1
