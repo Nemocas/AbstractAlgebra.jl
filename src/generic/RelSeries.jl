@@ -1137,7 +1137,7 @@ function Base.exp(a::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    for k = 1 : preca - 1
       s = R()
       for j = 1 : min(k + 1, len) - 1
-         c = j >= vala ? polcoeff(d, j - vald) : R()
+         c = j > vald ? polcoeff(d, j - vald - 1) : R()
          s = addmul_delayed_reduction!(s, c, polcoeff(z, k - j), C)
       end
       s = reduce!(s)
