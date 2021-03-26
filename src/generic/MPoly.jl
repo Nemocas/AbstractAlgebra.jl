@@ -863,6 +863,28 @@ function leading_coefficient(p::MPolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
+    trailing_coefficient(p::MPolyElem)
+
+Return the trailing coefficient of the polynomial $p$, i.e. the coefficient of
+the last nonzero term, or zero if the polynomial is zero.
+"""
+function trailing_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   coeff = zero(base_ring(p))
+   for c in coefficients(p)
+      coeff = c
+   end
+   return coeff
+end
+
+function trailing_coefficient(p::MPoly{T}) where T <: RingElement
+   if iszero(p)
+      return zero(base_ring(p))
+   else
+      return coeff(p, length(p))
+   end
+end
+
+@doc Markdown.doc"""
     constant_coefficient(p::MPolyElem)
 
 Return the constant coefficient of the polynomial $p$ or zero if it doesn't

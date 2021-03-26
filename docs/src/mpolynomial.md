@@ -427,21 +427,21 @@ julia> evaluate(f, [M1, M2, M3])
 
 ### Leading and constant coefficients, leading monomials and leading terms
 
-The leading coefficient, constant coefficient, leading monomial and leading
-term of a polynomial p are returned by the following functions:
+The leading and trailing coefficient, constant coefficient, leading monomial
+and leading term of a polynomial p are returned by the following functions:
 
 ```@docs
 leading_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+trailing_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+constant_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
 ```
 ```@docs
 leading_monomial(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 ```@docs
 leading_term(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-```
-
-```@docs
-constant_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
