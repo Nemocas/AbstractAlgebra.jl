@@ -852,7 +852,7 @@ end
 @doc Markdown.doc"""
     leading_coefficient(p::MPolyElem)
 
-Return the leading coefficient of the polynomial p.
+Return the leading coefficient of the polynomial $p$.
 """
 function leading_coefficient(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
@@ -863,10 +863,57 @@ function leading_coefficient(p::MPolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
+    trailing_coefficient(p::MPolyElem)
+
+Return the trailing coefficient of the polynomial $p$, i.e. the coefficient of
+the last nonzero term, or zero if the polynomial is zero.
+"""
+function trailing_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   coeff = zero(base_ring(p))
+   for c in coefficients(p)
+      coeff = c
+   end
+   return coeff
+end
+
+function trailing_coefficient(p::MPoly{T}) where T <: RingElement
+   if iszero(p)
+      return zero(base_ring(p))
+   else
+      return coeff(p, length(p))
+   end
+end
+
+@doc Markdown.doc"""
+    constant_coefficient(p::MPolyElem)
+
+Return the constant coefficient of the polynomial $p$ or zero if it doesn't
+have one.
+"""
+function constant_coefficient(p::MPolyElem{T}) where T <: RingElement
+   if !iszero(p)
+      for (c, v) in zip(coefficients(p), exponent_vectors(p))
+         if iszero(v)
+            return c
+         end
+      end
+   end
+   return zero(base_ring(p))
+end
+
+function constant_coefficient(p::MPoly)
+   len = length(p)
+   if !iszero(p) && iszero(exponent_vector(p, len))
+      return coeff(p, len)
+   end
+   return zero(base_ring(p))
+end
+
+@doc Markdown.doc"""
     monomial(x::MPoly, i::Int)
 
 Return the monomial of the $i$-th term of the polynomial (as a polynomial
-of length $1$ with coefficient $1$.
+of length $1$ with coefficient $1$).
 """
 function monomial(x::MPoly, i::Int)
    R = base_ring(x)
@@ -1360,7 +1407,7 @@ end
 #
 ###############################################################################
 
-mutable struct geobucket{T <: AbstractAlgebra.MPolyElem}
+mutable struct geobucket{T}
    len::Int
    buckets::Vector{T}
 
@@ -1369,7 +1416,7 @@ mutable struct geobucket{T <: AbstractAlgebra.MPolyElem}
    end
 end
 
-function Base.push!(G::geobucket{T}, p::T) where {T <: AbstractAlgebra.MPolyElem}
+function Base.push!(G::geobucket{T}, p::T) where T
    R = parent(p)
    i = max(1, ndigits(length(p), base=4))
    l = length(G.buckets)
@@ -1394,7 +1441,7 @@ function Base.push!(G::geobucket{T}, p::T) where {T <: AbstractAlgebra.MPolyElem
    end
 end
 
-function finish(G::geobucket{T})  where {T <: AbstractAlgebra.MPolyElem}
+function finish(G::geobucket{T}) where T
    p = G.buckets[1]
    for i = 2:length(G.buckets)
       p = addeq!(p, G.buckets[i])
@@ -2817,7 +2864,7 @@ function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vect
       end
    end
    M = MPolyBuildCtx(S)
-   cvzip = zip(coeficients(f), exponent_vectors(f))
+   cvzip = zip(coefficients(f), exponent_vectors(f))
    for (c, v) in cvzip
       for j = 1:N
          v[j] = div(v[j] - shift[j], defl[j])
@@ -4790,7 +4837,9 @@ end
 #
 ###############################################################################
 
-function MPolyBuildCtx(R::AbstractAlgebra.MPolyRing)
+# We use Ring instead of MPolyRing to support other multivariate objects
+# e.g. Series, non-commutative rings in Singular, etc.
+function MPolyBuildCtx(R::AbstractAlgebra.Ring)
    return MPolyBuildCtx(R, Nothing)
 end
 
@@ -4799,17 +4848,17 @@ function show(io::IO, M::MPolyBuildCtx)
    print(iocomp, "Builder for a polynomial in ", parent(M.poly))
 end
 
-function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
-  if iszero(c)
-    return M
-  end
-  len = length(M.poly) + 1
-  set_exponent_vector!(M.poly, len, expv)
-  setcoeff!(M.poly, len, c)
-  return M
+function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
+   if iszero(c)
+      return M
+   end
+   len = length(M.poly) + 1
+   set_exponent_vector!(M.poly, len, expv)
+   setcoeff!(M.poly, len, c)
+   return M
 end
 
-function finish(M::MPolyBuildCtx{T}) where T <: AbstractAlgebra.MPolyElem
+function finish(M::MPolyBuildCtx{T}) where T
   M.poly = sort_terms!(M.poly)
   M.poly = combine_like_terms!(M.poly)
   return M.poly

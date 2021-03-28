@@ -228,6 +228,16 @@ diagonal_matrix(::RingElement, ::Int, ::Int)
 ```
 
 ```@docs
+zero(::AbstractAlgebra.Matspace)
+zero(::MatrixElem, ::Ring)
+```
+
+```@docs
+one(::AbstractAlgebra.Matspace)
+one(::MatElem)
+```
+
+```@docs
 istriu(::MatrixElem{T}) where T <: RingElement
 ```
 

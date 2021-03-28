@@ -416,7 +416,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  character, characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_composable,
-                 codomain, coeff, coefficients, ncols,
+                 codomain, coeff, coefficients,
                  combine_like_terms!, compose, constant_coefficient,
 		 content, cycles,
                  data, deflate, deflation, degree, degrees,
@@ -463,7 +463,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx, mul!, mul_classical, mul_karatsuba, mul_ks,
                  mullow, mulmod, multiply_column, multiply_column!,
-                 multiply_row, multiply_row!,
+                 multiply_row, multiply_row!, ncols,
                  newton_to_monomial!, ngens, normalise, nrows, nvars, O, one,
                  order, ordering, parity, partitionseq, Perm, perm,
                  permtype, @perm_str, polcoeff, pol_length,
@@ -491,7 +491,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem,
        # Moved from Hecke into Misc
-                 coefficients, divexact_low, divhigh,
+                 divexact_low, divhigh,
 		 ismonic, Loc, Localization, LocElem, mulhigh_n,
 		 polynomial_to_power_sums, PolyCoeffs,
 		 power_sums_to_polynomial, roots, sturm_sequence
@@ -504,8 +504,8 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_composable, check_parent,
-                 codomain, coeff, coefficients, ncols,
-                 combine_like_terms!, compose, constant_coefficient,
+                 codomain, coeff, coefficients,
+		 combine_like_terms!, compose, constant_coefficient,
 		 content, cycles,
                  data, deflate, deflation, degree, degrees,
                  dense_matrix_type, derivative, det, det_clow,
@@ -553,7 +553,8 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  MPolyBuildCtx, mul!, mul_classical,
                  mul_karatsuba, mul_ks, mul_red!, mullow, mulmod,
                  multiply_column, multiply_column!, multiply_row,
-                 multiply_row!, needs_parentheses, newton_to_monomial!, ngens,
+                 multiply_row!, ncols, needs_parentheses,
+		 newton_to_monomial!, ngens,
                  normalise, nrows, nullspace, nvars, O, one, order, ordering,
                  parent_type, parity, partitionseq, Perm, perm, permtype,
                  @perm_str, polcoeff, pol_length, pow_multinomial,
@@ -580,7 +581,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem,
        # Moved from Hecke into Misc
-                 coefficients, divexact_low, divhigh,
+                 divexact_low, divhigh,
 		 ismonic, Loc, Localization, LocElem, mulhigh_n,
 		 polynomial_to_power_sums, PolyCoeffs,
 		 power_sums_to_polynomial, roots, sturm_sequence
@@ -636,6 +637,14 @@ end
 
 function PowerSeriesRing(R::Ring, prec::Int, s::Char; cached=true, model=:capped_relative)
    PowerSeriesRing(R, prec, string(s); cached=cached, model=model)
+end
+
+function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int}, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
+   Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
+end
+
+function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
+   Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
 end
 
 function LaurentSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)

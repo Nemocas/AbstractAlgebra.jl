@@ -22,13 +22,13 @@ jobs:
       if: github.repository == 'oscar-system/OscarDevTools.jl'
       run: |
         julia --project=oscar-dev -e "using Pkg;
-                                      Pkg.add(path=\".\");
+                                      Pkg.develop(PackageSpec(path=\".\"));
                                       Pkg.instantiate();"
     - name: fetch OscarDevTools
       if: github.repository != 'oscar-system/OscarDevTools.jl'
       run: |
         julia --project=oscar-dev -e "using Pkg;
-                                      Pkg.add(\"OscarDevTools\");
+                                      Pkg.add(PackageSpec(name=\"OscarDevTools\",version=\"0.2\"));
                                       Pkg.instantiate();"
     - id: set-matrix
       run: |
@@ -61,13 +61,13 @@ jobs:
         if: github.repository == 'oscar-system/OscarDevTools.jl'
         run: |
           julia --project=oscar-dev -e "using Pkg;
-                                        Pkg.add(path=\".\");
+                                        Pkg.develop(PackageSpec(path=\".\"));
                                         Pkg.instantiate();"
       - name: fetch OscarDevTools
         if: github.repository != 'oscar-system/OscarDevTools.jl'
         run: |
           julia --project=oscar-dev -e "using Pkg;
-                                        Pkg.add(url=\"https://github.com/oscar-system/OscarDevTools.jl\");
+                                        Pkg.add(PackageSpec(name=\"OscarDevTools\",version=\"0.2\"));
                                         Pkg.instantiate();"
       - name: "Set up Oscar-dev configuration"
         env:

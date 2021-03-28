@@ -210,10 +210,23 @@ function Base.isassigned(a::MatrixElem, i, j)
     end
 end
 
+@doc Markdown.doc"""
+    zero(a::AbstractAlgebra.MatSpace)
+
+Return the zero matrix in the given matrix space.
+"""
 zero(a::AbstractAlgebra.MatSpace) = a()
 
-zero(x::MatrixElem, R::Ring, r::Int, c::Int) = zero!(similar(x, R, r, c))
+@doc Markdown.doc"""
+    zero(x::MatrixElem, R::Ring, r::Int, c::Int)
+    zero(x::MatrixElem, R::Ring=base_ring(x))
+    zero(x::MatrixElem, r::Int, c::Int)
+
+Return a zero matrix similar to the given matrix, with optionally different
+base ring or dimensions.
+"""
 zero(x::MatrixElem, R::Ring=base_ring(x)) = zero(x, R, nrows(x), ncols(x))
+zero(x::MatrixElem, R::Ring, r::Int, c::Int) = zero!(similar(x, R, r, c))
 zero(x::MatrixElem, r::Int, c::Int) = zero(x, base_ring(x), r, c)
 
 function zero!(x::MatrixElem)
@@ -224,8 +237,20 @@ function zero!(x::MatrixElem)
    x
 end
 
+@doc Markdown.doc"""
+    one(a::AbstractAlgebra.MatSpace)
+
+Return the identity matrix of given matrix space. The matrix space must contain
+square matrices or else an error is thrown.
+"""
 one(a::AbstractAlgebra.MatSpace) = check_square(a)(1)
 
+@doc Markdown.doc"""
+    one(a::MatElem)
+
+Return the identity matrix in the same matrix space as $a$. If the space does
+not contain square matrices, an error is thrown.
+"""
 one(a::MatElem) = identity_matrix(a)
 
 function iszero(a::MatrixElem)

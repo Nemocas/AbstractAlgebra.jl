@@ -66,6 +66,8 @@ include("generic/RelSeries.jl")
 
 include("generic/AbsSeries.jl")
 
+include("generic/AbsMSeries.jl")
+
 include("generic/LaurentSeries.jl")
 
 include("generic/PuiseuxSeries.jl")
