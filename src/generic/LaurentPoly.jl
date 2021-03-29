@@ -286,11 +286,13 @@ end
 
 ################################################################################
 #
-#  map_coeffs
+#  map_coefficients
 #
 ################################################################################
 
-map_coeffs(f, p::LaurentPolyWrap) = LaurentPolyWrap(map_coeffs(f, p.poly), p.mindeg)
+function map_coefficients(f, p::LaurentPolyWrap)
+    return LaurentPolyWrap(map_coefficients(f, p.poly), p.mindeg)
+end
 
 ###############################################################################
 #

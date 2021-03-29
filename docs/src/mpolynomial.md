@@ -210,7 +210,7 @@ structure homomorphism of the $T$-algebra $S$.
 
 ```@docs
 change_base_ring(::Ring, p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
-map_coeffs(::Any, p::AbstractAlgebra.MPolyElem)
+map_coefficients(::Any, p::AbstractAlgebra.MPolyElem)
 ```
 
 **Examples**

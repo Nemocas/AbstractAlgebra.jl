@@ -5,7 +5,7 @@
 ###############################################################################
 
 # required methods without default implementation:
-# coeff, setcoeff!, map_coeffs, gen
+# coeff, setcoeff!, map_coefficients, gen
 
 ###############################################################################
 #
@@ -189,7 +189,7 @@ Base.isapprox(q::T, p::LaurentPolyElem{T}; atol::Real=sqrt(eps())) where {T} =
 #
 ################################################################################
 
-change_base_ring(R::Ring, p::LaurentPolyElem) = map_coeffs(R, p)
+change_base_ring(R::Ring, p::LaurentPolyElem) = map_coefficients(R, p)
 
 ###############################################################################
 #

@@ -2697,7 +2697,7 @@ _make_parent(g, p::PolyElem, cached::Bool) =
                      AbstractAlgebra.parent(p), cached)
 
 @doc Markdown.doc"""
-    map_coeffs(f, p::PolyElem{<: RingElement}; parent::PolyRing)
+    map_coefficients(f, p::PolyElem{<: RingElement}; parent::PolyRing)
 
 Transform the polynomial `p` by applying `f` on each non-zero coefficient.
 
@@ -2705,7 +2705,7 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function map_coeffs(g, p::PolyElem{<:RingElement};
+function map_coefficients(g, p::PolyElem{<:RingElement};
                     cached::Bool = true,
                     parent::AbstractAlgebra.PolyRing = _make_parent(g, p, cached))
    return _map(g, p, parent)
