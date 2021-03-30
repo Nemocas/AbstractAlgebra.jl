@@ -484,6 +484,23 @@ x
 
 ```
 
+### Inflation and deflation
+
+```@docs
+deflation(::PolyElem)
+```
+
+```@docs
+inflate(::PolyElem, ::Int, ::Int)
+inflate(::PolyElem, ::Int)
+```
+
+```@docs
+deflate(::PolyElem, ::Int, ::Int)
+deflate(::PolyElem, ::Int)
+deflate(::PolyElem)
+```
+
 ### Square root
 
 ```@docs
