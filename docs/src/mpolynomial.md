@@ -280,7 +280,7 @@ deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```@docs
 deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
 deflate(f::AbstractAlgebra.MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
-deflate(f::AbstractAlgebra.MPolyElem{T})
+deflate(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
