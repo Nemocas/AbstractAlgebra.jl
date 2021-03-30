@@ -47,7 +47,5 @@ end
 
 # Deprecated in 0.16.*
 
-@deprecate map_coeffs(f, g::AbstractAlgebra.PolyElem; parent=parent(g)) map_coefficients(f, g; parent=parent)
-
-@deprecate map_coeffs(f, g::AbstractAlgebra.MPolyElem; cached=true, parent=parent(g)) map_coefficients(f, g; cached=cached, parent=parent)
+@deprecate map_coeffs(f, g; cached=true, parent=parent(g)) map_coefficients(f, g; cached=cached, parent=parent)
 
