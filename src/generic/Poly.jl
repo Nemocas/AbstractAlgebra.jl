@@ -1231,18 +1231,19 @@ deflate(f::PolyElem, n::Int64) = deflate(f, 0, n)
 
 Deflate the polynomial $f$ maximally, i.e. find the largest $n$ s.th.
 $f$ can be deflated by $n$, i.e. $f$ is actually a polynomial in $x^n$.
+Return $g, n$ where $g$ is the deflation of $f$.
 """
 function deflate(f::PolyElem)
-   g = 0
+   n = 0
    for i = 0:degree(f)
       if coeff(f, i) != 0
-         g = gcd(g, i)
-         if g == 1
+         n = gcd(n, i)
+         if n == 1
             return f, 1
          end
       end
    end
-   return deflate(f, g), g
+   return deflate(f, n), n
 end
 
 ###############################################################################

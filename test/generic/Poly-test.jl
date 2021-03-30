@@ -200,7 +200,7 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "Generic.Poly.inflation_deflation" begin
+@testset "Generic.Poly.deflation" begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:1000
