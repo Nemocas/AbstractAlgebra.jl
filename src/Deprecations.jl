@@ -49,3 +49,5 @@ end
 
 @deprecate map_coeffs(f, g; parent=parent(g)) map_coefficients(f, g; parent=parent)
 
+@deprecated map_coeffs(f, g; cached=true, parent=parent(g)) map_coefficients(f, g; cached=cached, parent=parent)
+
