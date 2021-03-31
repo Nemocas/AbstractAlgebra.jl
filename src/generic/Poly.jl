@@ -187,7 +187,7 @@ end
     tail(a::Generic.PolynomialElem)
 
 Return the tail of the given polynomial, i.e. the polynomial without its
-leading term (if any)
+leading term (if any).
 """
 function tail(a::PolynomialElem)
    return iszero(a) ? zero(parent(a)) : truncate(a, length(a) - 1)
