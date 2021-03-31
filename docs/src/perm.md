@@ -79,14 +79,9 @@ julia> one(H)
 
 The following basic functionality is provided by the default permutation group
 implementation in AbstractAlgebra.jl, to support construction of other generic
-constructions over permutation groups.
-Any custom permutation group implementation in AbstractAlgebra.jl should provide these functions along with the usual group element arithmetic and comparison.
-
-```@docs
-parent(::Perm)
-elem_type(::SymmetricGroup)
-parent_type(::Perm)
-```
+constructions over permutation groups. Any custom permutation group
+implementation in AbstractAlgebra.jl should provide the group element
+arithmetic and comparison.
 
 A custom implementation also needs to implement `hash(::Perm, ::UInt)` and (possibly) `deepcopy_internal(::Perm, ::ObjectIdDict)`.
 

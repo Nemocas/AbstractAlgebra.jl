@@ -126,10 +126,6 @@ The functionality below supplements that provided by Julia itself for its `BigIn
 
 ### Basic functionality
 
-```@docs
-isunit(::Integer)
-```
-
 **Examples**
 
 ```jldoctest

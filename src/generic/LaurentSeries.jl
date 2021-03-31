@@ -29,36 +29,16 @@ parent_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRingElem{S}} =
 
 parent_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesFieldElem{S}} = LaurentSeriesField{S}
 
-@doc Markdown.doc"""
-    parent(a::Generic.LaurentSeriesElem)
-
-Return the parent of the given power series.
-"""
 parent(a::LaurentSeriesElem) = a.parent
 
 elem_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRing{S}} = LaurentSeriesRingElem{S}
 
 elem_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesField{S}} = LaurentSeriesFieldElem{S}
 
-@doc Markdown.doc"""
-    base_ring(R::LaurentSeriesRing{T}) where T <: RingElement
-
-Return the base ring of the given power series ring.
-"""
 base_ring(R::LaurentSeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(R::LaurentSeriesField{T}) where T <: FieldElement
-
-Return the base ring of the given power series ring.
-"""
 base_ring(R::LaurentSeriesField{T}) where T <: FieldElement = R.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::Generic.LaurentSeriesElem)
-
-Return the base ring of the power series ring of the given power series.
-"""
 base_ring(a::LaurentSeriesElem) = base_ring(parent(a))
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesElem{S}}
@@ -304,36 +284,12 @@ function upscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
    return z
 end
 
-@doc Markdown.doc"""
-    zero(R::LaurentSeriesRing)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 zero(R::LaurentSeriesRing) = R(0)
 
-@doc Markdown.doc"""
-    zero(R::LaurentSeriesField)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 zero(R::LaurentSeriesField) = R(0)
 
-@doc Markdown.doc"""
-    one(R::LaurentSeriesField)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 one(R::LaurentSeriesField) = R(1)
 
-@doc Markdown.doc"""
-    one(R::LaurentSeriesRing)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 one(R::LaurentSeriesRing) = R(1)
 
 @doc Markdown.doc"""
@@ -358,20 +314,8 @@ function gen(R::LaurentSeriesField)
    return R([S(1)], 1, max_precision(R) + 1, 1, 1)
 end
 
-@doc Markdown.doc"""
-    iszero(a::Generic.LaurentSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to zero to
-its current precision, otherwise return `false`.
-"""
 iszero(a::LaurentSeriesElem) = pol_length(a) == 0
 
-@doc Markdown.doc"""
-    isone(a::Generic.LaurentSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to one to
-its current precision, otherwise return `false`.
-"""
 function isone(a::LaurentSeriesElem)
    return valuation(a) == 0 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
@@ -387,12 +331,6 @@ function isgen(a::LaurentSeriesElem)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-@doc Markdown.doc"""
-    isunit(a::Generic.LaurentSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to a unit,
-i.e. is invertible, otherwise return `false`.
-"""
 isunit(a::LaurentSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a, 0))
 
 @doc Markdown.doc"""

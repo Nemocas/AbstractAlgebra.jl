@@ -16,11 +16,6 @@ parent_type(::Type{MatAlgElem{T}}) where T <: RingElement = MatAlgebra{T}
 
 elem_type(::Type{MatAlgebra{T}}) where {T <: RingElement} = MatAlgElem{T}
 
-@doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.MatAlgebra{T}) where {T <: RingElement}
-
-Return the base ring $R$ of the given matrix algebra.
-"""
 function base_ring(a::AbstractAlgebra.MatAlgebra{T}) where {T <: RingElement}
    a.base_ring::parent_type(T)
 end
@@ -75,19 +70,8 @@ Return the degree $n$ of the given matrix algebra.
 """
 degree(a::AbstractAlgebra.MatAlgebra) = nrows(a)
 
-@doc Markdown.doc"""
-    zero(a::AbstractAlgebra.MatAlgebra)
-
-Construct the zero matrix in the given matrix algebra.
-"""
 zero(a::AbstractAlgebra.MatAlgebra) = a()
 
-@doc Markdown.doc"""
-    one(a::AbstractAlgebra.MatAlgebra)
-
-Construct the matrix in the given matrix algebra with ones down the diagonal
-and zeroes elsewhere.
-"""
 one(a::AbstractAlgebra.MatAlgebra) = a(1)
 
 isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement = isunit(det(a))

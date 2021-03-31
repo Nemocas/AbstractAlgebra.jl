@@ -8,28 +8,6 @@ function isequal(a::RingElem, b::RingElem)
    return parent(a) == parent(b) && a == b
 end
 
-###############################################################################
-#
-#  Element/Parent types for instances
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    elem_type(parent)
-    elem_type(parent_type)
-Given a parent object (or its type), return the type of its elements.
-"""
-elem_type(x)  = elem_type(typeof(x))
-elem_type(T::DataType) = throw(MethodError(elem_type, (T,)))
-
-@doc Markdown.doc"""
-    parent_type(element)
-    parent_type(element_type)
-Given an element (or its type), return the type of its parent object.
-"""
-parent_type(x) = parent_type(typeof(x))
-parent_type(T::DataType) = throw(MethodError(parent_type, (T,)))
-
 ################################################################################
 #
 #   Promotion system

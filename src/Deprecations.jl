@@ -48,4 +48,3 @@ end
 # Deprecated in 0.16.*
 
 @deprecate map_coeffs(f) map_coefficients(f)
-

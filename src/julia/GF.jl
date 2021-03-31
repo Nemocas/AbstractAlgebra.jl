@@ -16,25 +16,10 @@ parent_type(::Type{GFElem{T}}) where T <: Integer = GFField{T}
 
 elem_type(::Type{GFField{T}}) where T <: Integer = GFElem{T}
 
-@doc Markdown.doc"""
-    base_ring(a::GFField)
-
-Return `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::GFField) = Union{}
 
-@doc Markdown.doc"""
-    base_ring(a::GFElem)
-
-Return `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::GFElem) = Union{}
 
-@doc Markdown.doc"""
-    parent(a::GFElem)
-
-Return the parent of the given finite field element.
-"""
 parent(a::GFElem) = a.parent
 
 isexact_type(::Type{GFElem{T}}) where T <: Integer = true
@@ -56,20 +41,10 @@ function Base.hash(a::GFElem, h::UInt)
    return xor(xor(hash(a.d), h), b)
 end
 
-@doc Markdown.doc"""
-    zero(R::GFField{T}) where T <: Integer
-
-Return the additive identity, zero, in the given finite field.
-"""
 function zero(R::GFField{T}) where T <: Integer
    return GFElem{T}(T(0), R)
 end
 
-@doc Markdown.doc"""
-    one(R::GFField{T}) where T <: Integer
-
-Return the additive identity, zero, in the given finite field.
-"""
 function one(R::GFField{T}) where T <: Integer
       return GFElem{T}(T(1), R)
 end
@@ -83,26 +58,10 @@ function gen(R::GFField{T}) where T <: Integer
       return GFElem{T}(T(1), R)
 end
 
-@doc Markdown.doc"""
-    iszero(a::GFElem{T}) where T <: Integer
-
-Return true if the given element of the finite field is zero.
-"""
 iszero(a::GFElem{T}) where T <: Integer = a.d == 0
 
-@doc Markdown.doc"""
-    isone(a::GFElem{T}) where T <: Integer
-
-Return true if the given element of the finite field is one.
-"""
 isone(a::GFElem{T}) where T <: Integer = a.d == 1
 
-@doc Markdown.doc"""
-    isunit(a::GFElem)
-
-Return `true` if the given finite field element is invertible, i.e. nonzero,
-otherwise return `false`.
-"""
 isunit(a::GFElem) = a.d != 0
 
 @doc Markdown.doc"""

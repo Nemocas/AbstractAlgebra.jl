@@ -55,19 +55,8 @@ parent_type(::Type{S}) where {T <: RingElement, S <: Mat{T}} = MatSpace{T}
 
 elem_type(::Type{MatSpace{T}}) where {T <: RingElement} = MatSpaceElem{T}
 
-@doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.MatSpace{T}) where {T <: RingElement}
-
-Return the base ring $R$ of the given matrix space.
-"""
 base_ring(a::AbstractAlgebra.MatSpace{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::Generic.MatrixElem{T}) where {T <: RingElement}
-
-Return the base ring $R$ of the matrix space that the supplied matrix $r$
-belongs to.
-"""
 base_ring(a::MatrixElem{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
 @doc Markdown.doc"""
@@ -224,7 +213,7 @@ end
 @doc Markdown.doc"""
     zero(a::AbstractAlgebra.MatSpace)
 
-Construct the zero matrix in the given matrix space.
+Return the zero matrix in the given matrix space.
 """
 zero(a::AbstractAlgebra.MatSpace) = a()
 
@@ -251,25 +240,19 @@ end
 @doc Markdown.doc"""
     one(a::AbstractAlgebra.MatSpace)
 
-Construct the matrix in the given matrix space with ones down the diagonal
-and zeroes elsewhere. The matrix space must contain square matrices.
+Return the identity matrix of given matrix space. The matrix space must contain
+square matrices or else an error is thrown.
 """
 one(a::AbstractAlgebra.MatSpace) = check_square(a)(1)
 
 @doc Markdown.doc"""
     one(a::MatElem)
 
-Construct the identity matrix in the same matrix space as `a`, i.e.
-with ones down the diagonal and zeroes elsewhere. `a` must be square.
+Return the identity matrix in the same matrix space as $a$. If the space does
+not contain square matrices, an error is thrown.
 """
 one(a::MatElem) = identity_matrix(a)
 
-@doc Markdown.doc"""
-    iszero(a::Generic.MatrixElem)
-
-Return `true` if the supplied matrix $a$ is the zero matrix, otherwise
-return `false`.
-"""
 function iszero(a::MatrixElem)
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -281,12 +264,6 @@ function iszero(a::MatrixElem)
   return true
 end
 
-@doc Markdown.doc"""
-    isone(a::Generic.MatrixElem)
-
-Return `true` if `a` is an identity matrix, i.e. if $a$ is a diagonal square matrix
-with ones along the diagonal and zeros elsewhere.
-"""
 function isone(a::MatrixElem)
    issquare(a) || return false
    for i = 1:nrows(a)

@@ -169,10 +169,6 @@ be provided by special implementations if desired.
 
 ### Basic manipulation
 
-```@docs
-zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
-```
-
 **Examples**
 
 ```jldoctest

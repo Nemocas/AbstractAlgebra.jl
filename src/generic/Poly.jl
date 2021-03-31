@@ -27,25 +27,10 @@ parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 
 elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
-@doc Markdown.doc"""
-    base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement
-
-Return the base ring of the given polynomial ring.
-"""
 base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::Generic.PolynomialElem)
-
-Return the base ring of the polynomial ring of the given polynomial.
-"""
 base_ring(a::PolynomialElem) = base_ring(parent(a))
 
-@doc Markdown.doc"""
-    parent(a::Generic.PolynomialElem)
-
-Return the parent of the given polynomial.
-"""
 parent(a::PolynomialElem) = a.parent
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.PolyElem{S}}
@@ -183,18 +168,8 @@ function constant_coefficient(a::PolynomialElem)
    return coeff(a, 0)
 end
 
-@doc Markdown.doc"""
-    zero(R::AbstractAlgebra.PolyRing)
-
-Return the zero polynomial in the given polynomial ring.
-"""
 zero(R::AbstractAlgebra.PolyRing) = R(0)
 
-@doc Markdown.doc"""
-    one(R::AbstractAlgebra.PolyRing)
-
-Return the constant polynomial $1$ in the given polynomial ring.
-"""
 one(R::AbstractAlgebra.PolyRing) = R(1)
 
 @doc Markdown.doc"""
@@ -211,19 +186,8 @@ Return an array containing the generator of the given polynomial ring.
 """
 gens(R::AbstractAlgebra.PolyRing) = [gen(R)]
 
-@doc Markdown.doc"""
-    iszero(a::Generic.PolynomialElem)
-
-Return `true` if the given polynomial is zero, otherwise return `false`.
-"""
 iszero(a::PolynomialElem) = length(a) == 0
 
-@doc Markdown.doc"""
-    isone(a::Generic.PolynomialElem)
-
-Return `true` if the given polynomial is the constant polynomial $1$,
-otherwise return `false`.
-"""
 isone(a::PolynomialElem) = length(a) == 1 && isone(coeff(a, 0))
 
 @doc Markdown.doc"""
@@ -247,12 +211,6 @@ function ismonic(a::PolyElem)
     return isone(leading_coefficient(a))
 end
 
-@doc Markdown.doc"""
-    isunit(a::Generic.PolynomialElem)
-
-Return `true` if the given polynomial is a unit in its polynomial ring,
-otherwise return `false`.
-"""
 isunit(a::PolynomialElem) = length(a) == 1 && isunit(coeff(a, 0))
 
 ###############################################################################
