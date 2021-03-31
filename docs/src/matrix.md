@@ -228,12 +228,12 @@ diagonal_matrix(::RingElement, ::Int, ::Int)
 ```
 
 ```@docs
-zero(::AbstractAlgebra.Matspace)
+zero(::AbstractAlgebra.MatSpace)
 zero(::MatrixElem, ::Ring)
 ```
 
 ```@docs
-one(::AbstractAlgebra.Matspace)
+one(::AbstractAlgebra.MatSpace)
 one(::MatElem)
 ```
 
