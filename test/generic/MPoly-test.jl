@@ -9,6 +9,8 @@
 
       @test PolynomialRing(R, var_names, ordering = ord, cached = true)[1] === PolynomialRing(R, var_names, ordering = ord, cached = true)[1]
       @test PolynomialRing(R, var_names, ordering = ord, cached = false)[1] !== PolynomialRing(R, var_names, ordering = ord, cached = true)[1]
+      @test PolynomialRing(R, num_vars, "x", ordering = ord, cached = true)[1] === PolynomialRing(R, var_names, ordering = ord, cached = true)[1]
+      @test PolynomialRing(R, num_vars, ordering = ord, cached = true)[1] === PolynomialRing(R, var_names, ordering = ord, cached = true)[1]
 
       @test elem_type(S) == Generic.MPoly{elem_type(R)}
       @test elem_type(Generic.MPolyRing{elem_type(R)}) == Generic.MPoly{elem_type(R)}

@@ -5119,6 +5119,12 @@ function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bo
    return tuple(parent_obj, gens(parent_obj))
 end
 
+function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::String="x";
+                                  cached::Bool = false, ordering::Symbol = :lex)
+   return PolynomialRing(R, ["$s$i" for i=1:n], cached = cached,
+				                            ordering = ordering)
+end
+
 ################################################################################
 #
 #  Fancy macro
