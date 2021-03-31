@@ -384,7 +384,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       end
    end
 
-   @testset "change_base_ring & map_coeffs" begin
+   @testset "change_base_ring & map_coefficients" begin
       Z, z = LaurentPolynomialRing(ZZ, "z")
       Q, q = LaurentPolynomialRing(QQ, "q")
 
@@ -394,10 +394,10 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test change_base_ring(QQ, fz) == q^2 - q - 2q^-2
       @test_broken change_base_ring(ZZ, q) == z
 
-      @test map_coeffs(x -> x^2, fz) == z^2 + z + 4z^-2
-      @test map_coeffs(one, fz) == z^2 + z + z^-2
-      @test map_coeffs(x -> x+2, fz) == 3z^2 + z
-      @test map_coeffs(x -> x^2, q^2 - q - 2q^-2) == q^2 + q + 4q^-2
+      @test map_coefficients(x -> x^2, fz) == z^2 + z + 4z^-2
+      @test map_coefficients(one, fz) == z^2 + z + z^-2
+      @test map_coefficients(x -> x+2, fz) == 3z^2 + z
+      @test map_coefficients(x -> x^2, q^2 - q - 2q^-2) == q^2 + q + 4q^-2
    end
 
    @testset "printing" begin

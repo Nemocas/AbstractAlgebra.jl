@@ -14,7 +14,7 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        set_exponent_vector!, sort_terms!, coeffs, monomial, monomial!,
        monomials, term, terms, var_index, @PolynomialRing, leading_coefficient,
        leading_monomial, leading_term, lcm,
-       MPolyBuildCtx, ishomogeneous, map_coeffs
+       MPolyBuildCtx, ishomogeneous, map_coefficients
 
 ###############################################################################
 #
@@ -4754,7 +4754,7 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    map_coeffs(f, p::MPolyElem{<: RingElement}; parent::MPolyRing)
+    map_coefficients(f, p::MPolyElem{<: RingElement}; parent::MPolyRing)
 
 Transform the polynomial `p` by applying `f` on each non-zero coefficient.
 
@@ -4762,7 +4762,7 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function map_coeffs(f, p::MPolyElem; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
+function map_coefficients(f, p::MPolyElem; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
    return _map(f, p, parent)
 end
 

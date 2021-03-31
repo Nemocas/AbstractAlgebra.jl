@@ -44,3 +44,7 @@ end
 @deprecate valence(f::Generic.PolyElem) trailing_coefficient(f)
 
 @deprecate coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement coefficients(a)
+
+# Deprecated in 0.16.*
+
+@deprecate map_coeffs(f) map_coefficients(f)

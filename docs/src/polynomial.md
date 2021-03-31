@@ -498,7 +498,7 @@ sqrt(g^2)
 
 ```@docs
 change_base_ring(::Ring, ::PolyElem{T}) where T <: RingElement
-map_coeffs(::Any, ::PolyElem{<:RingElement})
+map_coefficients(::Any, ::PolyElem{<:RingElement})
 ```
 
 **Examples**
