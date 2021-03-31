@@ -862,20 +862,24 @@ Return the inverse of the power series $a$, i.e. $1/a$.
 function Base.inv(a::AbstractAlgebra.RelSeriesElem)
    iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
+   R = base_ring(a)
    a1 = polcoeff(a, 0)
    ainv = parent(a)()
    fit!(ainv, precision(a))
    ainv = set_precision!(ainv, precision(a))
    ainv = set_valuation!(ainv, 0)
    if precision(a) != 0
-      ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
+      ainv = setcoeff!(ainv, 0, divexact(one(R), a1))
    end
    a1 = -a1
+   s = R()
+   t = R()
    for n = 2:precision(a)
-      s = polcoeff(a, 1)*polcoeff(ainv, n - 2)
+      s = mul_red!(s, polcoeff(a, 1), polcoeff(ainv, n - 2), false)
       for i = 2:min(n, pol_length(a)) - 1
-         s += polcoeff(a, i)*polcoeff(ainv, n - i - 1)
+         s = addmul_delayed_reduction!(s, polcoeff(a, i), polcoeff(ainv, n - i - 1), t)
       end
+      s = reduce!(s)
       ainv = setcoeff!(ainv, n - 1, divexact(s, a1))
    end
    ainv = set_length!(ainv, normalise(ainv, precision(a)))

@@ -2655,7 +2655,7 @@ _make_parent(g, p::PolyElem, cached::Bool) =
                      AbstractAlgebra.parent(p), cached)
 
 @doc Markdown.doc"""
-    map_coefficients(f, p::PolyElem{<: RingElement}; parent::PolyRing)
+    map_coefficients(f, p::PolyElem{<: RingElement}; cached::Bool=true, parent::PolyRing)
 
 Transform the polynomial `p` by applying `f` on each non-zero coefficient.
 

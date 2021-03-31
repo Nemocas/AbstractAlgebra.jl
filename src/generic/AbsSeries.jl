@@ -653,19 +653,23 @@ Return the inverse of the power series $a$, i.e. $1/a$.
 function Base.inv(a::AbstractAlgebra.AbsSeriesElem)
    iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
+   R = base_ring(a)
    a1 = coeff(a, 0)
    ainv = parent(a)()
    fit!(ainv, precision(a))
    ainv = set_precision!(ainv, precision(a))
    if precision(a) != 0
-      ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
+      ainv = setcoeff!(ainv, 0, divexact(one(R), a1))
    end
    a1 = -a1
+   s = R()
+   t = R()
    for n = 2:precision(a)
-      s = coeff(a, 1)*coeff(ainv, n - 2)
+      s = mul!(s, coeff(a, 1), coeff(ainv, n - 2))
       for i = 2:min(n, length(a)) - 1
-         s += coeff(a, i)*coeff(ainv, n - i - 1)
+         s = addmul_delayed_reduction!(s, coeff(a, i), coeff(ainv, n - i - 1), t)
       end
+      s = reduce!(s)
       ainv = setcoeff!(ainv, n - 1, divexact(s, a1))
    end
    ainv = set_length!(ainv, normalise(ainv, precision(a)))
