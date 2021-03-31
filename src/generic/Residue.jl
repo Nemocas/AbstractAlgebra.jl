@@ -16,26 +16,10 @@ parent_type(::Type{Res{T}}) where T <: RingElement = ResRing{T}
 
 elem_type(::Type{ResRing{T}}) where {T <: RingElement} = Res{T}
 
-@doc Markdown.doc"""
-    base_ring(S::AbstractAlgebra.ResRing{T}) where {T <: RingElement}
-
-Return the base ring $R$ of the given residue ring $S = R/(a)$.
-"""
 base_ring(S::AbstractAlgebra.ResRing{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(r::AbstractAlgebra.ResElem)
-
-Return the base ring $R$ of the residue ring $R/(a)$ that the supplied
-element $r$ belongs to.
-"""
 base_ring(r::AbstractAlgebra.ResElem) = base_ring(parent(r))
 
-@doc Markdown.doc"""
-    parent(a::AbstractAlgebra.ResElem)
-
-Return the parent object of the given residue element.
-"""
 parent(a::AbstractAlgebra.ResElem) = a.parent
 
 isdomain_type(a::Type{T}) where T <: AbstractAlgebra.ResElem = false
@@ -91,43 +75,14 @@ end
 
 data(a::AbstractAlgebra.ResElem) = a.data
 
-@doc Markdown.doc"""
-    zero(R::AbstractAlgebra.ResRing)
-
-Return the zero element of the given residue ring, i.e. $0 \pmod{a}$ where
-$a$ is the modulus of the residue ring.
-"""
 zero(R::AbstractAlgebra.ResRing) = R(0)
 
-@doc Markdown.doc"""
-    one(R::AbstractAlgebra.ResRing)
-
-Return $1 \pmod{a}$ where $a$ is the modulus of the residue ring.
-"""
 one(R::AbstractAlgebra.ResRing) = R(1)
 
-@doc Markdown.doc"""
-    iszero(a::AbstractAlgebra.ResElem)
-
-Return `true` if the supplied element $a$ is zero in the residue ring it
-belongs to, otherwise return `false`.
-"""
 iszero(a::AbstractAlgebra.ResElem) = iszero(data(a))
 
-@doc Markdown.doc"""
-    isone(a::AbstractAlgebra.ResElem)
-
-Return `true` if the supplied element $a$ is one in the residue ring it
-belongs to, otherwise return `false`.
-"""
 isone(a::AbstractAlgebra.ResElem) = isone(data(a))
 
-@doc Markdown.doc"""
-    isunit(a::AbstractAlgebra.ResElem)
-
-Return `true` if the supplied element $a$ is invertible in the residue ring
-it belongs to, otherwise return `false`.
-"""
 function isunit(a::AbstractAlgebra.ResElem)
    g = gcd(data(a), modulus(a))
    return isone(g)

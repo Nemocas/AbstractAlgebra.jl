@@ -103,10 +103,6 @@ The following additional constructors are provided for constructing various
 kinds of matrices in a matrix algebra.
 
 ```@docs
-zero(::MatAlgebra)
-```
-
-```@docs
 identity_matrix(::Generic.MatAlgElem{T}) where T <: RingElement
 ```
 

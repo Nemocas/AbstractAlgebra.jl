@@ -8,19 +8,6 @@ parent_type(::Type{Perm{T}}) where T = SymmetricGroup{T}
 
 elem_type(::Type{SymmetricGroup{T}}) where T = Perm{T}
 
-@doc Markdown.doc"""
-    parent(g::Perm)
-
-Return the parent of the permutation `g`.
-
-```jldoctest; setup = :(using AbstractAlgebra)
-julia> G = SymmetricGroup(5); g = Perm([3,4,5,2,1])
-(1,3,5)(2,4)
-
-julia> parent(g) == G
-true
-```
-"""
 parent(g::Perm{T}) where T = SymmetricGroup(T(length(g.d)))
 
 check_parent(g::Perm, h::Perm) = length(g.d) == length(h.d) ||

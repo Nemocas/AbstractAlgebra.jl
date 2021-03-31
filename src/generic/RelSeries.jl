@@ -28,27 +28,12 @@ end
 
 parent_type(::Type{RelSeries{T}}) where T <: RingElement = RelSeriesRing{T}
 
-@doc Markdown.doc"""
-    parent(a::AbstractAlgebra.SeriesElem)
-
-Return the parent of the given power series.
-"""
 parent(a::AbstractAlgebra.SeriesElem) = a.parent
 
 elem_type(::Type{RelSeriesRing{T}}) where T <: RingElement = RelSeries{T}
 
-@doc Markdown.doc"""
-    base_ring(R::SeriesRing{T}) where T <: RingElement
-
-Return the base ring of the given power series ring.
-"""
 base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.SeriesElem)
-
-Return the base ring of the power series ring of the given power series.
-"""
 base_ring(a::AbstractAlgebra.SeriesElem) = base_ring(parent(a))
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.SeriesElem{S}}
@@ -153,20 +138,8 @@ function coeff(a::AbstractAlgebra.RelSeriesElem, n::Int)
    end
 end
 
-@doc Markdown.doc"""
-    zero(R::SeriesRing)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 zero(R::SeriesRing) = R(0)
 
-@doc Markdown.doc"""
-    one(R::SeriesRing)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 one(R::SeriesRing) = R(1)
 
 @doc Markdown.doc"""
@@ -180,20 +153,8 @@ function gen(R::RelSeriesRing)
    return R([S(1)], 1, max_precision(R) + 1, 1)
 end
 
-@doc Markdown.doc"""
-    iszero(a::AbstractAlgebra.RelSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to zero to
-its current precision, otherwise return `false`.
-"""
 iszero(a::AbstractAlgebra.RelSeriesElem) = pol_length(a) == 0
 
-@doc Markdown.doc"""
-    isone(a::AbstractAlgebra.RelSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to one to
-its current precision, otherwise return `false`.
-"""
 function isone(a::AbstractAlgebra.RelSeriesElem)
    return valuation(a) == 0 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
@@ -209,12 +170,6 @@ function isgen(a::AbstractAlgebra.RelSeriesElem)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-@doc Markdown.doc"""
-    isunit(a::AbstractAlgebra.RelSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to a unit,
-i.e. is invertible, otherwise return `false`.
-"""
 isunit(a::AbstractAlgebra.RelSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a, 0))
 
 @doc Markdown.doc"""

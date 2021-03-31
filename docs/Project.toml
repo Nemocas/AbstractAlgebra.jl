@@ -1,6 +1,8 @@
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Kroki = "b3565e16-c1f2-4fe9-b4ab-221c88942068"
 
 [compat]
 Documenter = "^0.26.0"
+Kroki = "^0.1.0"

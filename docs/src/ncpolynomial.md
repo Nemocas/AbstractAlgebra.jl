@@ -200,10 +200,6 @@ isgen(::NCPolyElem)
 ```
 
 ```@docs
-isunit(::NCPolyElem)
-```
-
-```@docs
 ismonomial(::NCPolyElem)
 ```
 

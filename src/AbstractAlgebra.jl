@@ -382,6 +382,13 @@ end
 
 include("julia/JuliaTypes.jl")
 
+###############################################################################
+#
+#   Fundamental interface for AbstractAlgebra
+#
+###############################################################################
+
+include("fundamental_interface.jl")
 
 ###############################################################################
 #
@@ -389,9 +396,9 @@ include("julia/JuliaTypes.jl")
 #
 ###############################################################################
 
-include("algorithms/generic_functions.jl")
 include("algorithms/LaurentPoly.jl")
 include("algorithms/FinField.jl")
+include("algorithms/GenericFunctions.jl")
 
 ###############################################################################
 #
@@ -418,7 +425,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  discriminant,
                  divexact, divexact_left, divexact_right, divides,
                  domain, downscale,
-                 elem_type, enable_cache!, evaluate, exp_gcd,
+                 enable_cache!, evaluate, exp_gcd,
                  exponent, exponent_vector, exponent_vectors,
                  extended_weak_popov, extended_weak_popov_with_transform,
                  finish, fflu!,
@@ -459,7 +466,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  mullow, mulmod, multiply_column, multiply_column!,
                  multiply_row, multiply_row!, ncols,
                  newton_to_monomial!, ngens, normalise, nrows, nvars, O, one,
-                 order, ordering, parent_type, parity, partitionseq, Perm, perm,
+                 order, ordering, parity, partitionseq, Perm, perm,
                  permtype, @perm_str, polcoeff, pol_length,
                  pow_multinomial, popov, popov_with_transform,
                  precision, preimage, preimage_map,

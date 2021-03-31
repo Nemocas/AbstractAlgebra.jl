@@ -16,26 +16,10 @@ parent_type(::Type{ResF{T}}) where T <: RingElement = ResField{T}
 
 elem_type(::Type{ResField{T}}) where {T <: RingElement} = ResF{T}
 
-@doc Markdown.doc"""
-    base_ring(S::AbstractAlgebra.ResField{T}) where {T <: RingElement}
-
-Return the base ring $R$ of the given residue ring $S = R/(a)$.
-"""
 base_ring(S::AbstractAlgebra.ResField{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(r::AbstractAlgebra.ResFieldElem)
-
-Return the base ring $R$ of the residue ring $R/(a)$ that the supplied
-element $r$ belongs to.
-"""
 base_ring(r::AbstractAlgebra.ResFieldElem) = base_ring(parent(r))
 
-@doc Markdown.doc"""
-    parent(a::AbstractAlgebra.ResFieldElem)
-
-Return the parent object of the given residue element.
-"""
 parent(a::AbstractAlgebra.ResFieldElem) = a.parent
 
 isdomain_type(a::Type{T}) where T <: AbstractAlgebra.ResFieldElem = true
@@ -117,43 +101,14 @@ end
 
 data(a::AbstractAlgebra.ResFieldElem) = a.data
 
-@doc Markdown.doc"""
-    zero(R::AbstractAlgebra.ResField)
-
-Return the zero element of the given residue ring, i.e. $0 \pmod{a}$ where
-$a$ is the modulus of the residue ring.
-"""
 zero(R::AbstractAlgebra.ResField) = R(0)
 
-@doc Markdown.doc"""
-    one(R::AbstractAlgebra.ResField)
-
-Return $1 \pmod{a}$ where $a$ is the modulus of the residue ring.
-"""
 one(R::AbstractAlgebra.ResField) = R(1)
 
-@doc Markdown.doc"""
-    iszero(a::AbstractAlgebra.ResFieldElem)
-
-Return `true` if the supplied element $a$ is zero in the residue ring it
-belongs to, otherwise return `false`.
-"""
 iszero(a::AbstractAlgebra.ResFieldElem) = iszero(data(a))
 
-@doc Markdown.doc"""
-    isone(a::AbstractAlgebra.ResFieldElem)
-
-Return `true` if the supplied element $a$ is one in the residue ring it
-belongs to, otherwise return `false`.
-"""
 isone(a::AbstractAlgebra.ResFieldElem) = isone(data(a))
 
-@doc Markdown.doc"""
-    isunit(a::AbstractAlgebra.ResFieldElem)
-
-Return `true` if the supplied element $a$ is invertible in the residue ring
-it belongs to, otherwise return `false`.
-"""
 function isunit(a::AbstractAlgebra.ResFieldElem)
    g = gcd(data(a), modulus(a))
    return isone(g)
