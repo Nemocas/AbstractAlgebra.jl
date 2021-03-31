@@ -28,27 +28,12 @@ end
 
 parent_type(::Type{RelSeries{T}}) where T <: RingElement = RelSeriesRing{T}
 
-@doc Markdown.doc"""
-    parent(a::AbstractAlgebra.SeriesElem)
-
-Return the parent of the given power series.
-"""
 parent(a::AbstractAlgebra.SeriesElem) = a.parent
 
 elem_type(::Type{RelSeriesRing{T}}) where T <: RingElement = RelSeries{T}
 
-@doc Markdown.doc"""
-    base_ring(R::SeriesRing{T}) where T <: RingElement
-
-Return the base ring of the given power series ring.
-"""
 base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.SeriesElem)
-
-Return the base ring of the power series ring of the given power series.
-"""
 base_ring(a::AbstractAlgebra.SeriesElem) = base_ring(parent(a))
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.SeriesElem{S}}
@@ -153,20 +138,8 @@ function coeff(a::AbstractAlgebra.RelSeriesElem, n::Int)
    end
 end
 
-@doc Markdown.doc"""
-    zero(R::SeriesRing)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 zero(R::SeriesRing) = R(0)
 
-@doc Markdown.doc"""
-    one(R::SeriesRing)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
-ring $R$.
-"""
 one(R::SeriesRing) = R(1)
 
 @doc Markdown.doc"""
@@ -180,20 +153,8 @@ function gen(R::RelSeriesRing)
    return R([S(1)], 1, max_precision(R) + 1, 1)
 end
 
-@doc Markdown.doc"""
-    iszero(a::AbstractAlgebra.RelSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to zero to
-its current precision, otherwise return `false`.
-"""
 iszero(a::AbstractAlgebra.RelSeriesElem) = pol_length(a) == 0
 
-@doc Markdown.doc"""
-    isone(a::AbstractAlgebra.RelSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to one to
-its current precision, otherwise return `false`.
-"""
 function isone(a::AbstractAlgebra.RelSeriesElem)
    return valuation(a) == 0 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
@@ -209,12 +170,6 @@ function isgen(a::AbstractAlgebra.RelSeriesElem)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-@doc Markdown.doc"""
-    isunit(a::AbstractAlgebra.RelSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to a unit,
-i.e. is invertible, otherwise return `false`.
-"""
 isunit(a::AbstractAlgebra.RelSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a, 0))
 
 @doc Markdown.doc"""
@@ -907,20 +862,24 @@ Return the inverse of the power series $a$, i.e. $1/a$.
 function Base.inv(a::AbstractAlgebra.RelSeriesElem)
    iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
+   R = base_ring(a)
    a1 = polcoeff(a, 0)
    ainv = parent(a)()
    fit!(ainv, precision(a))
    ainv = set_precision!(ainv, precision(a))
    ainv = set_valuation!(ainv, 0)
    if precision(a) != 0
-      ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
+      ainv = setcoeff!(ainv, 0, divexact(one(R), a1))
    end
    a1 = -a1
+   s = R()
+   t = R()
    for n = 2:precision(a)
-      s = polcoeff(a, 1)*polcoeff(ainv, n - 2)
+      s = mul_red!(s, polcoeff(a, 1), polcoeff(ainv, n - 2), false)
       for i = 2:min(n, pol_length(a)) - 1
-         s += polcoeff(a, i)*polcoeff(ainv, n - i - 1)
+         s = addmul_delayed_reduction!(s, polcoeff(a, i), polcoeff(ainv, n - i - 1), t)
       end
+      s = reduce!(s)
       ainv = setcoeff!(ainv, n - 1, divexact(s, a1))
    end
    ainv = set_length!(ainv, normalise(ainv, precision(a)))

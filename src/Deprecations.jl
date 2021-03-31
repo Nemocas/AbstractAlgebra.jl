@@ -47,5 +47,6 @@ end
 
 # Deprecated in 0.16.*
 
-@deprecate map_coeffs(f) map_coefficients(f)
+@deprecate map_coeffs(g, p::PolyElem; cached=true, parent=Generic._make_parent(g, p, cached)) map_coefficients(g, p; cached=cached, parent=parent)
 
+@deprecate map_coeffs(f, p::MPolyElem; cached = true, parent = Generic._change_mpoly_ring(parent(f(zero(base_ring(p)))), parent(p), cached)) map_coefficients(f, p; cached = cached, parent = parent)

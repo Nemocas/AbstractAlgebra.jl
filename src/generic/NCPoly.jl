@@ -16,11 +16,6 @@ parent_type(::Type{NCPoly{T}}) where T <: NCRingElem = NCPolyRing{T}
 
 elem_type(::Type{NCPolyRing{T}}) where T <: NCRingElem = NCPoly{T}
 
-@doc Markdown.doc"""
-    base_ring(R::AbstractAlgebra.NCPolyRing{T}) where T <: NCRingElem
-
-Return the base ring of the given polynomial ring.
-"""
 base_ring(R::AbstractAlgebra.NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)
 
 function isexact_type(a::Type{T}) where {S <: NCRingElem, T <: AbstractAlgebra.NCPolyElem{S}}
@@ -77,18 +72,8 @@ end
 
 coeff(a::NCPoly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
-@doc Markdown.doc"""
-    zero(R::AbstractAlgebra.NCPolyRing)
-
-Return the zero polynomial in the given polynomial ring.
-"""
 zero(R::AbstractAlgebra.NCPolyRing) = R(0)
 
-@doc Markdown.doc"""
-    one(R::AbstractAlgebra.NCPolyRing)
-
-Return the constant polynomial $1$ in the given polynomial ring.
-"""
 one(R::AbstractAlgebra.NCPolyRing) = R(1)
 
 @doc Markdown.doc"""

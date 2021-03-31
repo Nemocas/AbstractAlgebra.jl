@@ -43,4 +43,3 @@ function Base.showerror(io::IO, e::ErrorConstrDimMismatch)
 end
 
 const error_dim_negative = ErrorException("Dimensions must be non-negative")
-

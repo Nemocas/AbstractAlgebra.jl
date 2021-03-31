@@ -72,20 +72,8 @@ function gen(R::AbsSeriesRing{T}) where T <: RingElement
    return R([S(0), S(1)], 2, max_precision(R))
 end
 
-@doc Markdown.doc"""
-    iszero(a::SeriesElem)
-
-Return `true` if the given power series is arithmetically equal to zero to
-its current precision, otherwise return `false`.
-"""
 iszero(a::SeriesElem) = length(a) == 0
 
-@doc Markdown.doc"""
-    isone(a::AbsSeries)
-
-Return `true` if the given power series is arithmetically equal to one to
-its current precision, otherwise return `false`.
-"""
 function isone(a::AbsSeries)
    return (length(a) == 1 && isone(coeff(a, 0))) || precision(a) == 0
 end
@@ -102,12 +90,6 @@ function isgen(a::AbsSeries)
            precision(a) == 0
 end
 
-@doc Markdown.doc"""
-    isunit(a::AbstractAlgebra.AbsSeriesElem)
-
-Return `true` if the given power series is arithmetically equal to a unit,
-i.e. is invertible, otherwise return `false`.
-"""
 isunit(a::AbstractAlgebra.AbsSeriesElem) = valuation(a) == 0 && isunit(coeff(a, 0))
 
 @doc Markdown.doc"""
@@ -671,19 +653,23 @@ Return the inverse of the power series $a$, i.e. $1/a$.
 function Base.inv(a::AbstractAlgebra.AbsSeriesElem)
    iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
+   R = base_ring(a)
    a1 = coeff(a, 0)
    ainv = parent(a)()
    fit!(ainv, precision(a))
    ainv = set_precision!(ainv, precision(a))
    if precision(a) != 0
-      ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
+      ainv = setcoeff!(ainv, 0, divexact(one(R), a1))
    end
    a1 = -a1
+   s = R()
+   t = R()
    for n = 2:precision(a)
-      s = coeff(a, 1)*coeff(ainv, n - 2)
+      s = mul!(s, coeff(a, 1), coeff(ainv, n - 2))
       for i = 2:min(n, length(a)) - 1
-         s += coeff(a, i)*coeff(ainv, n - i - 1)
+         s = addmul_delayed_reduction!(s, coeff(a, i), coeff(ainv, n - i - 1), t)
       end
+      s = reduce!(s)
       ainv = setcoeff!(ainv, n - 1, divexact(s, a1))
    end
    ainv = set_length!(ainv, normalise(ainv, precision(a)))

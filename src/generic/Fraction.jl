@@ -16,26 +16,10 @@ parent_type(::Type{Frac{T}}) where T <: RingElem = FracField{T}
 
 elem_type(::Type{FracField{T}}) where {T <: RingElem} = Frac{T}
 
-@doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.FracField{T}) where T <: RingElem
-
-Return the base ring $R$ of the given fraction field.
-"""
 base_ring(a::AbstractAlgebra.FracField{T}) where T <: RingElem = a.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.FracElem)
-
-Return the base ring $R$ of the fraction field that the supplied
-element $a$ belongs to.
-"""
 base_ring(a::AbstractAlgebra.FracElem) = base_ring(parent(a))
 
-@doc Markdown.doc"""
-    parent(a::AbstractAlgebra.FracElem)
-
-Return the parent object of the given fraction element.
-"""
 parent(a::AbstractAlgebra.FracElem) = a.parent
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.FracElem{S}}
@@ -123,42 +107,14 @@ function Base.denominator(a::AbstractAlgebra.FracElem, canonicalise::Bool=true)
    return Base.denominator(a) # all other types ignore canonicalise
 end
 
-@doc Markdown.doc"""
-    zero(R::AbstractAlgebra.FracField)
-
-Return $0/1$ in the given fraction field.
-"""
 zero(R::AbstractAlgebra.FracField) = R(0)
 
-@doc Markdown.doc"""
-    one(R::AbstractAlgebra.FracField)
-
-Return $1/1$ in the given fraction field.
-"""
 one(R::AbstractAlgebra.FracField) = R(1)
 
-@doc Markdown.doc"""
-    iszero(a::AbstractAlgebra.FracElem)
-
-Return `true` if the supplied element $a$ is zero in the fraction field it
-belongs to, otherwise return `false`.
-"""
 iszero(a::AbstractAlgebra.FracElem) = iszero(numerator(a, false))
 
-@doc Markdown.doc"""
-    isone(a::AbstractAlgebra.FracElem)
-
-Return `true` if the supplied element $a$ is one in the fraction field it
-belongs to, otherwise return `false`.
-"""
 isone(a::AbstractAlgebra.FracElem) = numerator(a, false) == denominator(a, false)
 
-@doc Markdown.doc"""
-    isunit(a::AbstractAlgebra.FracElem)
-
-Return `true` if the supplied element $a$ is invertible in the fraction field
-it belongs to, i.e. the numerator is nonzero, otherwise return `false`.
-"""
 isunit(a::AbstractAlgebra.FracElem) = !iszero(numerator(a, false))
 
 function deepcopy_internal(a::Frac{T}, dict::IdDict) where {T <: RingElem}

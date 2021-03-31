@@ -37,5 +37,3 @@ function gcdx(x::T, y::T) where {T <: FieldElem}
 end
 
 characteristic(R::Field) = 0
-
-
