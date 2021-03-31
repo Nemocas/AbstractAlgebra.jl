@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Visualiation of the types of AbstractAlgebra.jl · AbstractAlgebra.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">AbstractAlgebra.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">AbstractAlgebra.jl</a></li><li><span class="tocitem">Fundamental interface of AbstractAlgebra.jl</span><ul><li><a class="tocitem" href="../types/">Type interface of AbstractAlgebra.jl</a></li><li class="is-active"><a class="tocitem" href>Visualiation of the types of AbstractAlgebra.jl</a><ul class="internal"><li><a class="tocitem" href="#Abstract-parents"><span>Abstract parents</span></a></li><li><a class="tocitem" href="#Abstract-elements"><span>Abstract elements</span></a></li><li><a class="tocitem" href="#Concrete-types-in-AbstractAlgebra.jl"><span>Concrete types in AbstractAlgebra.jl</span></a></li></ul></li><li><a class="tocitem" href="../extending_abstractalgebra/">Extending the interface of AbstractAlgebra.jl</a></li></ul></li><li><a class="tocitem" href="../constructors/">Constructing mathematical objects in AbstractAlgebra.jl</a></li><li><span class="tocitem">Rings</span><ul><li><a class="tocitem" href="../rings/">Ring Interface</a></li><li><a class="tocitem" href="../ncrings/">Noncommutative ring Interface</a></li><li><a class="tocitem" href="../euclidean/">Euclidean Ring Interface</a></li><li><a class="tocitem" href="../integer/">Integer ring</a></li><li><a class="tocitem" href="../polynomial_rings/">Univariate Polynomial Ring Interface</a></li><li><a class="tocitem" href="../polynomial/">Generic univariate polynomials</a></li><li><a class="tocitem" href="../ncpolynomial/">Generic univariate polynomials over a noncommutative ring</a></li><li><a class="tocitem" href="../mpolynomial_rings/">Multivariate Polynomial Ring Interface</a></li><li><a class="tocitem" href="../mpolynomial/">Generic sparse distributed multivariate polynomials</a></li><li><a class="tocitem" href="../laurent_polynomial/">Generic Laurent polynomials</a></li><li><a class="tocitem" href="../series_rings/">Series Ring Interface</a></li><li><a class="tocitem" href="../series/">Generic power series</a></li><li><a class="tocitem" href="../puiseux/">Generic Puiseux series</a></li><li><a class="tocitem" href="../mseries/">Generic multivariate series</a></li><li><a class="tocitem" href="../residue_rings/">Residue Ring Interface</a></li><li><a class="tocitem" href="../residue/">Generic residue rings</a></li></ul></li><li><span class="tocitem">Fields</span><ul><li><a class="tocitem" href="../fields/">Field Interface</a></li><li><a class="tocitem" href="../fraction_fields/">Fraction Field Interface</a></li><li><a class="tocitem" href="../fraction/">Generic fraction fields</a></li><li><a class="tocitem" href="../rational/">Rational field</a></li><li><a class="tocitem" href="../finfield/">Finite fields</a></li><li><a class="tocitem" href="../real/">Real field</a></li><li><a class="tocitem" href="../numberfield/">Number fields</a></li></ul></li><li><span class="tocitem">Groups</span><ul><li><a class="tocitem" href="../perm/">Permutations and Symmetric groups</a></li><li><a class="tocitem" href="../ytabs/">Partitions and Young tableaux</a></li></ul></li><li><span class="tocitem">Modules</span><ul><li><a class="tocitem" href="../module/">Module Interface</a></li><li><a class="tocitem" href="../free_module/">Free Modules and Vector Spaces</a></li><li><a class="tocitem" href="../submodule/">Submodules</a></li><li><a class="tocitem" href="../quotient_module/">Quotient modules</a></li><li><a class="tocitem" href="../direct_sum/">Direct Sums</a></li><li><a class="tocitem" href="../module_homomorphism/">Module Homomorphisms</a></li></ul></li><li><span class="tocitem">Matrices</span><ul><li><a class="tocitem" href="../matrix_spaces/">Matrix Interface</a></li><li><a class="tocitem" href="../matrix/">Generic matrices</a></li><li><a class="tocitem" href="../matrix_algebras/">Generic matrix algebras</a></li></ul></li><li><span class="tocitem">Maps</span><ul><li><a class="tocitem" href="../map/">Map interface</a></li><li><a class="tocitem" href="../functional_map/">Functional maps</a></li><li><a class="tocitem" href="../map_cache/">Cached maps</a></li><li><a class="tocitem" href="../map_with_inverse/">Map with inverse</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Fundamental interface of AbstractAlgebra.jl</a></li><li class="is-active"><a href>Visualiation of the types of AbstractAlgebra.jl</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Visualiation of the types of AbstractAlgebra.jl</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/master/docs/src/visualizing_types.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Visualiation-of-the-types-of-AbstractAlgebra.jl"><a class="docs-heading-anchor" href="#Visualiation-of-the-types-of-AbstractAlgebra.jl">Visualiation of the types of AbstractAlgebra.jl</a><a id="Visualiation-of-the-types-of-AbstractAlgebra.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Visualiation-of-the-types-of-AbstractAlgebra.jl" title="Permalink"></a></h1><p>AbstractAlgebra.jl implements a couple of abstract types which can be extended.</p><h2 id="Abstract-parents"><a class="docs-heading-anchor" href="#Abstract-parents">Abstract parents</a><a id="Abstract-parents-1"></a><a class="docs-heading-anchor-permalink" href="#Abstract-parents" title="Permalink"></a></h2><p>The following diagram shows a complete list of all abstract types in AbstractAlgebra.jl.</p><?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="696px" preserveAspectRatio="none" style="width:1079px;height:696px;" version="1.1" viewBox="0 0 1079 696" width="1079px" zoomAndPan="magnify"><defs><filter height="300%" id="fryxebi1j7yfh" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[73145e46247802284b2f7aaef1fa1797]
+class Set--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="Set" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="30" x="207" y="7"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="24" x="210" y="28.8438">Set</text><!--MD5=[a50ece271047a50033a5c7ed145d7ea6]
+class Ideal{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="Ideal{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="70" x="38" y="99"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="64" x="41" y="120.8438">Ideal{T}</text><!--MD5=[41314a0efc36828092cff9ebad2fcafd]
+class Group--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="Group" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="46" x="143" y="99"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="40" x="146" y="120.8438">Group</text><!--MD5=[b2f8fc17ae331ed04f25127908157045]
+class AbstractPermutationGroup--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="AbstractPermutationGroup" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="198" x="7" y="191"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="192" x="10" y="212.8438">AbstractPermutationGroup</text><!--MD5=[5bddd8b46c26e165d26b282d465b95a8]
+class AdditiveGroup--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="AdditiveGroup" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="110" x="224" y="99"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="104" x="227" y="120.8438">AdditiveGroup</text><!--MD5=[e3f487cfc7ed304a72cda62453eb4068]
+class Module{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="Module{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="78" x="240" y="191"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="72" x="243" y="212.8438">Module{T}</text><!--MD5=[e557bcd0cc90c946a0c53be0234dcb5c]
+class FPModule{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="FPModule{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="94" x="103" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="88" x="106" y="304.8438">FPModule{T}</text><!--MD5=[7e83e4cda25fdf8cd023ad6aa25bce7b]
+class MatSpace{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="MatSpace{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="94" x="232" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="88" x="235" y="304.8438">MatSpace{T}</text><!--MD5=[bbf50daa07d2d91e59f473396f280904]
+class NCRing--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="NCRing" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="54" x="462" y="99"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="48" x="465" y="120.8438">NCRing</text><!--MD5=[92046d790d6705f3ef44c0fa084e960c]
+class MatAlgebra{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="MatAlgebra{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="110" x="361" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="104" x="364" y="304.8438">MatAlgebra{T}</text><!--MD5=[642539ca4e684886b806882765df101e]
+class NCPolyRing{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="NCPolyRing{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="110" x="506" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="104" x="509" y="304.8438">NCPolyRing{T}</text><!--MD5=[3fdda2b21354ce4f4119709bccb2aac0]
+class Ring--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="Ring" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="38" x="700" y="191"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="32" x="703" y="212.8438">Ring</text><!--MD5=[d9427b671d7d049aff2d6f2fe36a13b3]
+class Field--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="Field" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="46" x="646" y="467"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="40" x="649" y="488.8438">Field</text><!--MD5=[d82769b5523c4ca2f36a57dfee73417a]
+class PolyRing{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="PolyRing{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="94" x="748" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="88" x="751" y="304.8438">PolyRing{T}</text><!--MD5=[2d8accf6691e94c23cd5e6e74288677b]
+class LaurentPolynomialRing{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="LaurentPolynomialRing{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="198" x="722" y="375"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="192" x="725" y="396.8438">LaurentPolynomialRing{T}</text><!--MD5=[b9d795d569a206fe0b5fabc1e98b0007]
+class SeriesRing{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="SeriesRing{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="110" x="955" y="375"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="104" x="958" y="396.8438">SeriesRing{T}</text><!--MD5=[899b8bcbf1260018a5955ea06bbcb504]
+class ResRing{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="ResRing{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="86" x="877" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="80" x="880" y="304.8438">ResRing{T}</text><!--MD5=[7fb534e95feb034fb595bde41408e682]
+class ResField{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="ResField{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="94" x="427" y="559"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="88" x="430" y="580.8438">ResField{T}</text><!--MD5=[528eccac96f8f000fa47cb7e4ce5b262]
+class NumField{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="NumField{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="94" x="556" y="559"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="88" x="559" y="580.8438">NumField{T}</text><!--MD5=[7ef7fc126e4330489ddcfed3d0616cdd]
+class SimpleNumField{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="SimpleNumField{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="142" x="532" y="651"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="136" x="535" y="672.8438">SimpleNumField{T}</text><!--MD5=[9eef3a6268ea392df4f0c2b788eed959]
+class FracField{T}--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="FracField{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="102" x="685" y="559"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="96" x="688" y="580.8438">FracField{T}</text><!--MD5=[5b1faddfaf731239732441a3bb5e723b]
+class FinField--><rect fill="#F8F8F8" filter="url(#fryxebi1j7yfh)" height="31.5938" id="FinField" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="70" x="822" y="559"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="64" x="825" y="580.8438">FinField</text><!--MD5=[b3ce388b75fffad23f925fa79fabb0da]
+link Set to Ideal{T}--><path codeLine="8" d="M206.89,33.12 C182.49,47.86 133.98,77.17 102.53,96.16 " fill="none" id="Set-to-Ideal{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="98.02,98.88,107.7925,97.6556,102.3012,96.297,103.6597,90.8057,98.02,98.88" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[6e6f37fbd02e7314eafd606d2a987209]
+link Set to Group--><path codeLine="11" d="M212.5,39.27 C203.03,54.49 188.45,77.92 178.14,94.48 " fill="none" id="Set-to-Group" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="175.36,98.96,183.5136,93.4357,178.0036,94.716,176.7232,89.2059,175.36,98.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[7227fc0a7c2ddf53f3122c02023fff0c]
+link Group to AbstractPermutationGroup--><path codeLine="12" d="M155.82,131.27 C145.68,146.49 130.05,169.92 119.01,186.48 " fill="none" id="Group-to-AbstractPermutationGroup" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="116.03,190.96,124.3505,185.6903,118.8035,186.7997,117.6941,181.2527,116.03,190.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[4f3dcf8caf588563ea752af81c451db4]
+link Set to AdditiveGroup--><path codeLine="15" d="M231.67,39.27 C241.31,54.49 256.15,77.92 266.64,94.48 " fill="none" id="Set-to-AdditiveGroup" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="269.47,98.96,268.0448,89.2148,266.7995,94.7329,261.2814,93.4876,269.47,98.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[1cf965f19d4f06bb407a33178dae682c]
+link AdditiveGroup to Module{T}--><path codeLine="16" d="M279,131.27 C279,146.23 279,169.12 279,185.63 " fill="none" id="AdditiveGroup-to-Module{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="279,190.96,283,181.96,279,185.96,275,181.96,279,190.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[a109efbecb13a28d09bffe640b8fef06]
+link Module{T} to FPModule{T}--><path codeLine="17" d="M257.41,223.06 C234.99,238.7 199.92,263.17 175.99,279.86 " fill="none" id="Module{T}-to-FPModule{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="171.66,282.89,181.3309,281.0261,175.7622,280.0313,176.757,274.4626,171.66,282.89" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[c55068334bce1cae8ceb3b3c0fba92d8]
+link Module{T} to MatSpace{T}--><path codeLine="18" d="M279,223.27 C279,238.23 279,261.12 279,277.63 " fill="none" id="Module{T}-to-MatSpace{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="279,282.96,283,273.96,279,277.96,275,273.96,279,282.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[03a2332ed46cb324cfd14661f7210fef]
+link Set to NCRing--><path codeLine="21" d="M237.12,29.1 C279.31,43.32 399.02,83.67 456.89,103.18 " fill="none" id="Set-to-NCRing" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="461.96,104.88,454.7108,98.213,457.2223,103.2817,452.1536,105.7933,461.96,104.88" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[8d8b8eee8a7bddd341ee3ec176550552]
+link NCRing to MatAlgebra{T}--><path codeLine="22" d="M482.9,131.2 C469.72,164.07 438.57,241.72 423.9,278.3 " fill="none" id="NCRing-to-MatAlgebra{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="422.03,282.97,429.1046,276.118,423.8992,278.3326,421.6847,273.1272,422.03,282.97" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[b8f1c4adcedaa0e58fa2bb368fdc45f5]
+link NCRing to NCPolyRing{T}--><path codeLine="23" d="M495.01,131.2 C508.02,164.07 538.74,241.72 553.21,278.3 " fill="none" id="NCRing-to-NCPolyRing{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="555.05,282.97,555.4475,273.1292,553.2054,278.3227,548.0118,276.0806,555.05,282.97" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[ad8fe4b0420a9c7b2b8d8f36b85b30ff]
+link NCRing to Ring--><path codeLine="24" d="M516.29,126.68 C561.66,144.43 651.88,179.74 694.99,196.6 " fill="none" id="NCRing-to-Ring" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="699.76,198.47,692.8445,191.4574,695.1059,196.6426,689.9207,198.904,699.76,198.47" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[3f7eb00af51d06dd0583618c117d905b]
+link Ring to Field--><path codeLine="27" d="M716.24,223.12 C707.79,269.44 682.25,409.36 672.68,461.84 " fill="none" id="Ring-to-Field" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="671.75,466.93,677.3059,458.7978,672.6507,462.0118,669.4367,457.3567,671.75,466.93" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[6aafd22ffa1a38dbb34cc29fc1522473]
+link Ring to PolyRing{T}--><path codeLine="28" d="M731.89,223.27 C744.85,238.62 764.87,262.32 778.87,278.9 " fill="none" id="Ring-to-PolyRing{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="782.3,282.96,779.5385,273.5062,779.0696,279.1436,773.4323,278.6748,782.3,282.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[28664e9ea50f340fa152bbea15189065]
+link PolyRing{T} to LaurentPolynomialRing{T}--><path codeLine="29" d="M799.41,315.27 C803.77,330.36 810.46,353.52 815.24,370.06 " fill="none" id="PolyRing{T}-to-LaurentPolynomialRing{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="816.65,374.96,817.9968,365.2037,815.2632,370.1562,810.3107,367.4226,816.65,374.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[dda6b58948578ade6de5a9381f775318]
+link PolyRing{T} to SeriesRing{T}--><path codeLine="30" d="M830.99,315.06 C869.12,331.03 929.24,356.19 969.13,372.89 " fill="none" id="PolyRing{T}-to-SeriesRing{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="973.9,374.89,967.1386,367.7287,969.2867,372.9619,964.0536,375.11,973.9,374.89" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[a75ca58436e9d315295ed38a4e0c65e4]
+link Ring to ResRing{T}--><path codeLine="31" d="M738.27,216.63 C771.17,231.36 838.75,261.62 881.59,280.8 " fill="none" id="Ring-to-ResRing{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="886.17,282.85,879.5936,275.5185,881.6075,280.8047,876.3212,282.8185,886.17,282.85" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[374a9b435c03f0301c5287d6c3b28b7f]
+link Field to ResField{T}--><path codeLine="34" d="M645.87,494.68 C612.61,510.02 550.95,538.48 511.23,556.81 " fill="none" id="Field-to-ResField{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="506.5,559,516.3478,558.8544,511.0385,556.902,512.991,551.5928,506.5,559" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[2cb8c24e136ce8a144127e401e20e3a6]
+link NumField{T} to SimpleNumField{T}--><path codeLine="35" d="M603,591.27 C603,606.23 603,629.12 603,645.63 " fill="none" id="NumField{T}-to-SimpleNumField{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="603,650.96,607,641.96,603,645.96,599,641.96,603,650.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[1b133fa95a1a85426612400a06e58390]
+link Field to FracField{T}--><path codeLine="36" d="M680.37,499.27 C691.79,514.62 709.44,538.32 721.78,554.9 " fill="none" id="Field-to-FracField{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="724.8,558.96,722.6384,549.3513,721.816,554.948,716.2193,554.1257,724.8,558.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[f71a4e1bf021d777069f4efb019da335]
+link Field to NumField{T}--><path codeLine="37" d="M657.8,499.27 C646.55,514.62 629.17,538.32 617,554.9 " fill="none" id="Field-to-NumField{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="614.03,558.96,622.5801,554.0718,616.9887,554.9293,616.1311,549.3379,614.03,558.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[12f5773736cab8a240391e96d5926a00]
+link Field to FinField--><path codeLine="38" d="M692.05,495.04 C724.28,510.46 783.09,538.62 821.09,556.81 " fill="none" id="Field-to-FinField" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="825.61,558.97,819.2233,551.4726,821.1013,556.8087,815.7652,558.6866,825.61,558.97" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[49f233fedbcf4f6023785ed82ef5b1ab]
+@startuml
+skinparam monochrome true
+skinparam defaultFontName Monospaced
+skinparam defaultFontSize 16
+skinparam objectArrowColor DarkGray
+skinparam RoundCorner 15
+
+' Ideals
+"Set" -down-> "Ideal{T}"
+
+' Groups
+"Set" -down-> "Group"
+"Group" -down-> "AbstractPermutationGroup"
+
+' Additive groups
+"Set" -down-> "AdditiveGroup"
+"AdditiveGroup" -down-> "Module{T}"
+"Module{T}" -down-> "FPModule{T}"
+"Module{T}" -down-> "MatSpace{T}"
+
+' Non-commutative rings
+"Set" -down-> "NCRing"
+"NCRing" -down- -> "MatAlgebra{T}"
+"NCRing" -down- -> "NCPolyRing{T}"
+"NCRing" -down-> "Ring"
+
+' Rings
+"Ring" -down- - -> "Field"
+"Ring" -down-> "PolyRing{T}"
+"PolyRing{T}" -down-> "LaurentPolynomialRing{T}"
+"PolyRing{T}" -down-> "SeriesRing{T}"
+"Ring" -down-> "ResRing{T}"
+
+' Fields
+"Field" -down-> "ResField{T}"
+"NumField{T}" -down-> "SimpleNumField{T}"
+"Field" -down-> "FracField{T}"
+"Field" -down-> "NumField{T}"
+"Field" -down-> "FinField"
+
+hide members
+hide circle
+
+@enduml
+
+@startuml
+skinparam monochrome true
+skinparam defaultFontName Monospaced
+skinparam defaultFontSize 16
+skinparam objectArrowColor DarkGray
+skinparam RoundCorner 15
+
+"Set" -down-> "Ideal{T}"
+
+"Set" -down-> "Group"
+"Group" -down-> "AbstractPermutationGroup"
+
+"Set" -down-> "AdditiveGroup"
+"AdditiveGroup" -down-> "Module{T}"
+"Module{T}" -down-> "FPModule{T}"
+"Module{T}" -down-> "MatSpace{T}"
+
+"Set" -down-> "NCRing"
+"NCRing" -down- -> "MatAlgebra{T}"
+"NCRing" -down- -> "NCPolyRing{T}"
+"NCRing" -down-> "Ring"
+
+"Ring" -down- - -> "Field"
+"Ring" -down-> "PolyRing{T}"
+"PolyRing{T}" -down-> "LaurentPolynomialRing{T}"
+"PolyRing{T}" -down-> "SeriesRing{T}"
+"Ring" -down-> "ResRing{T}"
+
+"Field" -down-> "ResField{T}"
+"NumField{T}" -down-> "SimpleNumField{T}"
+"Field" -down-> "FracField{T}"
+"Field" -down-> "NumField{T}"
+"Field" -down-> "FinField"
+
+hide members
+hide circle
+
+@enduml
+
+PlantUML version 1.2021.01(Tue Feb 02 07:55:08 GMT 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg><h2 id="Abstract-elements"><a class="docs-heading-anchor" href="#Abstract-elements">Abstract elements</a><a id="Abstract-elements-1"></a><a class="docs-heading-anchor-permalink" href="#Abstract-elements" title="Permalink"></a></h2><p>Similarly the following diagram shows a complete list of all abstract types in AbstractAlgebra.jl.</p><?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="696px" preserveAspectRatio="none" style="width:1190px;height:696px;" version="1.1" viewBox="0 0 1190 696" width="1190px" zoomAndPan="magnify"><defs><filter height="300%" id="fh3s9elwmawy0" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[702da4f58e651341533dbb23931f864c]
+class SetElem--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="SetElem" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="62" x="268" y="7"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="56" x="271" y="28.8438">SetElem</text><!--MD5=[9898cf39a911bc52212bb427773e046f]
+class IdealElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="IdealElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="102" x="123" y="99"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="96" x="126" y="120.8438">IdealElem{T}</text><!--MD5=[655a3f32e34e37c53bdac68be86c7802]
+class Map{D, C, S, T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="Map{D, C, S, T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="126" x="7" y="375"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="120" x="10" y="396.8438">Map{D, C, S, T}</text><!--MD5=[ad1e4349a00c5c3b6acfc920773b5b9e]
+class SetMap--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="SetMap" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="54" x="168" y="375"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="48" x="171" y="396.8438">SetMap</text><!--MD5=[58a9343794522a44016b408a7cda00b1]
+class IdentityMap--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="IdentityMap" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="94" x="79" y="467"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="88" x="82" y="488.8438">IdentityMap</text><!--MD5=[974e67f5dbec4638154070298884a7b2]
+class FunctionalMap--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="FunctionalMap" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="110" x="208" y="467"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="104" x="211" y="488.8438">FunctionalMap</text><!--MD5=[df0891dcb9ef0f0cbf3ac6fe1ac587ac]
+class FPModuleHomomorphism--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="FPModuleHomomorphism" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="166" x="180" y="559"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="160" x="183" y="580.8438">FPModuleHomomorphism</text><!--MD5=[a8527c3e711444010714df42bf5efa28]
+class GroupElem--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="GroupElem" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="78" x="260" y="99"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="72" x="263" y="120.8438">GroupElem</text><!--MD5=[f2d786ad92a6c4864ad66c433c5bde6e]
+class AbstractPerm--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="AbstractPerm" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="102" x="248" y="191"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="96" x="251" y="212.8438">AbstractPerm</text><!--MD5=[8f35231af4a9078eebddca51887f6413]
+class AdditiveGroupElem--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="AdditiveGroupElem" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="142" x="373" y="99"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="136" x="376" y="120.8438">AdditiveGroupElem</text><!--MD5=[500d8bd8fc31a930a7942e0e27753eea]
+class ModuleElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="ModuleElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="110" x="387" y="191"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="104" x="390" y="212.8438">ModuleElem{T}</text><!--MD5=[93785fa03d3dc2b4672963f3b73e55c9]
+class FPModuleElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="FPModuleElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="126" x="238" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="120" x="241" y="304.8438">FPModuleElem{T}</text><!--MD5=[90cc10176a8b434ce3ff4ca3ea09aa5c]
+class MatElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="MatElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="86" x="399" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="80" x="402" y="304.8438">MatElem{T}</text><!--MD5=[c83e51695945a4a24d7eea26eff66f96]
+class NCRingElem--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="NCRingElem" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="86" x="614" y="99"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="80" x="617" y="120.8438">NCRingElem</text><!--MD5=[20677bfcf96c43e8272146aa4b7b91d2]
+class MatAlgElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="MatAlgElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="110" x="520" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="104" x="523" y="304.8438">MatAlgElem{T}</text><!--MD5=[6472abbb30c4a0b8507e69e97f268900]
+class NCPolyElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="NCPolyElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="110" x="665" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="104" x="668" y="304.8438">NCPolyElem{T}</text><!--MD5=[344ba750aff02ce8d82ebd3626142b70]
+class RingElem--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="RingElem" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="70" x="857" y="191"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="64" x="860" y="212.8438">RingElem</text><!--MD5=[7757f1648dd37c32a2ec1748f0256268]
+class PolyElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="PolyElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="94" x="895" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="88" x="898" y="304.8438">PolyElem{T}</text><!--MD5=[93b3a323c853cf347945f67000f27ec4]
+class SeriesElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="SeriesElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="110" x="1066" y="375"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="104" x="1069" y="396.8438">SeriesElem{T}</text><!--MD5=[83c25d99da7f928acc9c1895d88bf156]
+class LaurentPolyElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="LaurentPolyElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="150" x="881" y="375"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="144" x="884" y="396.8438">LaurentPolyElem{T}</text><!--MD5=[c810f8cfe49a199ec2afe0c06c6092dd]
+class ResElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="ResElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="86" x="1024" y="283"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="80" x="1027" y="304.8438">ResElem{T}</text><!--MD5=[e7a07049ddfc41b048d3da9843fb0769]
+class FieldElem--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="FieldElem" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="78" x="789" y="467"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="72" x="792" y="488.8438">FieldElem</text><!--MD5=[1304bd6d4b56b5947bb1eb23f673a35f]
+class FinFieldElem--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="FinFieldElem" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="102" x="983" y="559"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="96" x="986" y="580.8438">FinFieldElem</text><!--MD5=[b8286995903153867844a6c27f7b66a0]
+class ResFieldElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="ResFieldElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="126" x="532" y="559"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="120" x="535" y="580.8438">ResFieldElem{T}</text><!--MD5=[193d2c78b2bdd397a03d760f94a49b5d]
+class NumFieldElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="NumFieldElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="126" x="693" y="559"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="120" x="696" y="580.8438">NumFieldElem{T}</text><!--MD5=[cd84ef9c9d383cfe5e5f1a6d04c4c600]
+class SimpleNumFieldElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="SimpleNumFieldElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="174" x="669" y="651"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="168" x="672" y="672.8438">SimpleNumFieldElem{T}</text><!--MD5=[b5df2d5b722f63a3731972c103ad4819]
+class FracElem{T}--><rect fill="#F8F8F8" filter="url(#fh3s9elwmawy0)" height="31.5938" id="FracElem{T}" rx="7.5" ry="7.5" style="stroke:#383838;stroke-width:1.5;" width="94" x="854" y="559"/><text fill="#000000" font-family="monospace" font-size="16" lengthAdjust="spacing" textLength="88" x="857" y="580.8438">FracElem{T}</text><!--MD5=[60b066335d5bfb0ed53201a2a3a318f3]
+link SetElem to IdealElem{T}--><path codeLine="9" d="M278.08,39.06 C256.36,54.7 222.37,79.17 199.19,95.86 " fill="none" id="SetElem-to-IdealElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="194.99,98.89,204.6333,96.8881,199.0509,95.973,199.9661,90.3907,194.99,98.89" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[32cbe58fb02122746b7329321f9f05b6]
+link SetElem to Map{D, C, S, T}--><path codeLine="13" d="M267.67,26.42 C223.71,31.63 144.67,47.97 105,99 C40.99,181.34 57.04,318.37 65.99,369.73 " fill="none" id="SetElem-to-Map{D, C, S, T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="66.88,374.71,69.225,365.1444,65.9956,369.7888,61.3512,366.5594,66.88,374.71" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[21e2cd7938d11696a417a3ed9dee9970]
+link Map{D, C, S, T} to SetMap--><path codeLine="14" d="M133.48,391 C144.85,391 156.23,391 167.6,391 " fill="none" id="Map{D, C, S, T}-SetMap" style="stroke:#A9A9A9;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><!--MD5=[bde1131222bd2d19bc9c74df6d83c1d0]
+link SetMap to IdentityMap--><path codeLine="15" d="M183.3,407.27 C171.53,422.62 153.35,446.32 140.64,462.9 " fill="none" id="SetMap-to-IdentityMap" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="137.53,466.96,146.1764,462.2441,140.5688,462.9894,139.8235,457.3819,137.53,466.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[094a1bc6ebe67292f272be397db07a85]
+link SetMap to FunctionalMap--><path codeLine="16" d="M206.54,407.27 C218.13,422.62 236.04,446.32 248.57,462.9 " fill="none" id="SetMap-to-FunctionalMap" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="251.64,466.96,249.4181,457.365,248.6309,462.9669,243.0291,462.1796,251.64,466.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[d54f03e8b6d2df544bf0e837a309333c]
+link FunctionalMap to FPModuleHomomorphism--><path codeLine="17" d="M263,499.27 C263,514.23 263,537.12 263,553.63 " fill="none" id="FunctionalMap-to-FPModuleHomomorphism" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="263,558.96,267,549.96,263,553.96,259,549.96,263,558.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[827b9fe8c7cdf68220d2cd3d135331e2]
+link SetElem to GroupElem--><path codeLine="20" d="M299,39.27 C299,54.23 299,77.12 299,93.63 " fill="none" id="SetElem-to-GroupElem" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="299,98.96,303,89.96,299,93.96,295,89.96,299,98.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[2fae048a88ba0028e6baebf25444afef]
+link GroupElem to AbstractPerm--><path codeLine="21" d="M299,131.27 C299,146.23 299,169.12 299,185.63 " fill="none" id="GroupElem-to-AbstractPerm" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="299,190.96,303,181.96,299,185.96,295,181.96,299,190.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[82044e7ca09251f0190cd699de5a6383]
+link SetElem to AdditiveGroupElem--><path codeLine="24" d="M323.27,39.06 C348.57,54.77 388.22,79.38 415.12,96.07 " fill="none" id="SetElem-to-AdditiveGroupElem" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="419.65,98.89,414.1134,90.7447,415.402,96.2528,409.8939,97.5415,419.65,98.89" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[7561ddc5a4b27b1d8dfef66bb1ec78a4]
+link AdditiveGroupElem to ModuleElem{T}--><path codeLine="25" d="M443.66,131.27 C443.33,146.23 442.82,169.12 442.45,185.63 " fill="none" id="AdditiveGroupElem-to-ModuleElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="442.33,190.96,446.5346,182.0538,442.4443,185.9613,438.5367,181.8709,442.33,190.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[94a3213c5536b93ebb18543b3c24b37e]
+link ModuleElem{T} to FPModuleElem{T}--><path codeLine="26" d="M418.4,223.06 C393.8,238.77 355.24,263.38 329.09,280.07 " fill="none" id="ModuleElem{T}-to-FPModuleElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="324.68,282.89,334.4195,281.4264,328.8965,280.2028,330.1201,274.6799,324.68,282.89" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[a8b0988c52e6622229d1fafa9da45ba2]
+link ModuleElem{T} to MatElem{T}--><path codeLine="27" d="M442,223.27 C442,238.23 442,261.12 442,277.63 " fill="none" id="ModuleElem{T}-to-MatElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="442,282.96,446,273.96,442,277.96,438,273.96,442,282.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[7257f7ad5a5507e43bd2832b643dacaa]
+link SetElem to NCRingElem--><path codeLine="30" d="M330.14,31.83 C392.69,47.55 533.96,83.07 608.64,101.84 " fill="none" id="SetElem-to-NCRingElem" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="613.9,103.16,606.1431,97.0912,609.0501,101.944,604.1974,104.851,613.9,103.16" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[e34cdcdd9847f81251e3cd0855731ec8]
+link NCRingElem to MatAlgElem{T}--><path codeLine="31" d="M650.15,131.2 C635.34,164.07 600.36,241.72 583.88,278.3 " fill="none" id="NCRingElem-to-MatAlgElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="581.77,282.97,589.1187,276.4128,583.8272,278.4128,581.8271,273.1213,581.77,282.97" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[adc693c774601589ec0c33d87c9740b5]
+link NCRingElem to NCPolyElem{T}--><path codeLine="32" d="M662.26,131.2 C673.59,163.94 700.3,241.09 713.02,277.85 " fill="none" id="NCRingElem-to-NCPolyElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="714.8,282.97,715.6421,273.1572,713.1674,278.244,708.0806,275.7694,714.8,282.97" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[d271a3b885bd44ccdf340d57dd6fb9eb]
+link NCRingElem to RingElem--><path codeLine="33" d="M696.33,131.06 C739.49,147.59 808.39,173.98 851.86,190.63 " fill="none" id="NCRingElem-to-RingElem" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="856.77,192.51,849.7915,185.5601,852.0996,190.7247,846.935,193.0327,856.77,192.51" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[d1ac0d1c94b63bbe3ba4e6221e460eba]
+link RingElem to PolyElem{T}--><path codeLine="36" d="M900.48,223.27 C908.94,238.49 921.95,261.92 931.16,278.48 " fill="none" id="RingElem-to-PolyElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="933.64,282.96,932.7522,273.1512,931.2057,278.5926,925.7644,277.0461,933.64,282.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[5b31a14d50adb6663d9f589217fe6a4c]
+link PolyElem{T} to SeriesElem{T}--><path codeLine="37" d="M971.96,315.06 C1003.45,330.9 1052.95,355.78 1086.16,372.48 " fill="none" id="PolyElem{T}-to-SeriesElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="1090.94,374.89,1084.6985,367.2714,1086.4736,372.6425,1081.1025,374.4176,1090.94,374.89" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[4b9debd476bfd2633ee2931a75cc11c6]
+link PolyElem{T} to LaurentPolyElem{T}--><path codeLine="38" d="M944.37,315.27 C946.7,330.23 950.26,353.12 952.83,369.63 " fill="none" id="PolyElem{T}-to-LaurentPolyElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="953.66,374.96,956.2243,365.4508,952.889,370.0198,948.32,366.6845,953.66,374.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[5cf0f45058ab73fda13da718c67c5b6e]
+link RingElem to ResElem{T}--><path codeLine="39" d="M921.29,223.06 C952.08,238.9 1000.47,263.78 1032.94,280.48 " fill="none" id="RingElem-to-ResElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="1037.61,282.89,1031.4269,275.2239,1033.1609,280.6084,1027.7764,282.3424,1037.61,282.89" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[ef46e00573a0b52bc9ecf440eee44058]
+link RingElem to FieldElem--><path codeLine="40" d="M888.47,223.12 C877.65,269.44 844.97,409.36 832.71,461.84 " fill="none" id="RingElem-to-FieldElem" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="831.52,466.93,837.448,459.065,832.6485,462.059,829.6545,457.2594,831.52,466.93" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[459746cc5c82c82c972ae1be79dc1ca1]
+link FieldElem to FinFieldElem--><path codeLine="43" d="M862.48,499.06 C898.87,514.96 956.15,539.99 994.38,556.69 " fill="none" id="FieldElem-to-FinFieldElem" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="999.41,558.89,992.7595,551.6256,994.8269,556.8912,989.5614,558.9585,999.41,558.89" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[220f1a3cc0db3220fd05aeb827ab9288]
+link FieldElem to ResFieldElem{T}--><path codeLine="44" d="M789,499.06 C747.59,515.06 682.26,540.3 639.02,557 " fill="none" id="FieldElem-to-ResFieldElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="634.13,558.89,643.9663,559.3865,638.7956,557.0922,641.0899,551.9215,634.13,558.89" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[80b5879b152b965c1f1b3aa4f7397b84]
+link FieldElem to NumFieldElem{T}--><path codeLine="45" d="M815.79,499.27 C803.51,514.62 784.54,538.32 771.28,554.9 " fill="none" id="FieldElem-to-NumFieldElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="768.03,558.96,776.7818,554.4427,771.1587,555.0598,770.5415,549.4368,768.03,558.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[d1aa8e314edff6c74603d9e1aa1ab147]
+link NumFieldElem{T} to SimpleNumFieldElem{T}--><path codeLine="46" d="M756,591.27 C756,606.23 756,629.12 756,645.63 " fill="none" id="NumFieldElem{T}-to-SimpleNumFieldElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="756,650.96,760,641.96,756,645.96,752,641.96,756,650.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[195ee6b9705a9032db2f5d4086f73958]
+link FieldElem to FracElem{T}--><path codeLine="47" d="M840.38,499.27 C852.83,514.62 872.06,538.32 885.51,554.9 " fill="none" id="FieldElem-to-FracElem{T}" style="stroke:#A9A9A9;stroke-width:1.0;"/><polygon fill="#A9A9A9" points="888.8,558.96,886.2291,549.4526,885.647,555.0794,880.0202,554.4973,888.8,558.96" style="stroke:#A9A9A9;stroke-width:1.0;"/><!--MD5=[d353879992cdedeba4a36f1b28553307]
+@startuml
+skinparam monochrome true
+skinparam defaultFontName Monospaced
+skinparam defaultFontSize 16
+skinparam objectArrowColor DarkGray
+skinparam RoundCorner 15
+
+
+' Ideals
+"SetElem" -down-> "IdealElem{T}"
+
+' Maps
+' NOTE: Identity is 
+"SetElem" -down- - - -> "Map{D, C, S, T}"
+"Map{D, C, S, T}" .right. "SetMap"
+"SetMap" -down-> "IdentityMap"
+"SetMap" -down-> "FunctionalMap"
+"FunctionalMap" -down-> "FPModuleHomomorphism"
+
+' Groups
+"SetElem" -down-> "GroupElem"
+"GroupElem" -down-> "AbstractPerm"
+
+' Additive groups
+"SetElem" -down-> "AdditiveGroupElem"
+"AdditiveGroupElem" -down-> "ModuleElem{T}"
+"ModuleElem{T}" -down-> "FPModuleElem{T}"
+"ModuleElem{T}" -down-> "MatElem{T}"
+
+' Non-commutative rings
+"SetElem" -down-> "NCRingElem"
+"NCRingElem" -down- -> "MatAlgElem{T}"
+"NCRingElem" -down- -> "NCPolyElem{T}"
+"NCRingElem" -down-> "RingElem"
+
+' Rings
+"RingElem" -down-> "PolyElem{T}"
+"PolyElem{T}" -down-> "SeriesElem{T}"
+"PolyElem{T}" -down-> "LaurentPolyElem{T}"
+"RingElem" -down-> "ResElem{T}"
+"RingElem" -down- - -> "FieldElem"
+
+' Fields
+"FieldElem" -down-> "FinFieldElem"
+"FieldElem" -down-> "ResFieldElem{T}"
+"FieldElem" -down-> "NumFieldElem{T}"
+"NumFieldElem{T}" -down-> "SimpleNumFieldElem{T}"
+"FieldElem" -down-> "FracElem{T}"
+
+hide members
+hide circle
+
+@enduml
+
+@startuml
+skinparam monochrome true
+skinparam defaultFontName Monospaced
+skinparam defaultFontSize 16
+skinparam objectArrowColor DarkGray
+skinparam RoundCorner 15
+
+
+"SetElem" -down-> "IdealElem{T}"
+
+"SetElem" -down- - - -> "Map{D, C, S, T}"
+"Map{D, C, S, T}" .right. "SetMap"
+"SetMap" -down-> "IdentityMap"
+"SetMap" -down-> "FunctionalMap"
+"FunctionalMap" -down-> "FPModuleHomomorphism"
+
+"SetElem" -down-> "GroupElem"
+"GroupElem" -down-> "AbstractPerm"
+
+"SetElem" -down-> "AdditiveGroupElem"
+"AdditiveGroupElem" -down-> "ModuleElem{T}"
+"ModuleElem{T}" -down-> "FPModuleElem{T}"
+"ModuleElem{T}" -down-> "MatElem{T}"
+
+"SetElem" -down-> "NCRingElem"
+"NCRingElem" -down- -> "MatAlgElem{T}"
+"NCRingElem" -down- -> "NCPolyElem{T}"
+"NCRingElem" -down-> "RingElem"
+
+"RingElem" -down-> "PolyElem{T}"
+"PolyElem{T}" -down-> "SeriesElem{T}"
+"PolyElem{T}" -down-> "LaurentPolyElem{T}"
+"RingElem" -down-> "ResElem{T}"
+"RingElem" -down- - -> "FieldElem"
+
+"FieldElem" -down-> "FinFieldElem"
+"FieldElem" -down-> "ResFieldElem{T}"
+"FieldElem" -down-> "NumFieldElem{T}"
+"NumFieldElem{T}" -down-> "SimpleNumFieldElem{T}"
+"FieldElem" -down-> "FracElem{T}"
+
+hide members
+hide circle
+
+@enduml
+
+PlantUML version 1.2021.01(Tue Feb 02 07:55:08 GMT 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg><h2 id="Concrete-types-in-AbstractAlgebra.jl"><a class="docs-heading-anchor" href="#Concrete-types-in-AbstractAlgebra.jl">Concrete types in AbstractAlgebra.jl</a><a id="Concrete-types-in-AbstractAlgebra.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Concrete-types-in-AbstractAlgebra.jl" title="Permalink"></a></h2><p>Until now we have discussed the abstract types of AbstractAlgebra.jl. Under this subsection we will instead give some examples of concrete types in AbstractAlgebra.jl.</p><p>In parentheses we put the types of the corresponding parent objects.</p><ul><li><code>Perm{&lt;:Integer}</code> (<code>SymmetricGroup{&lt;:Integer}</code>)</li><li><code>GFElem{&lt;:Integer}</code> (<code>GFField{&lt;:Integer}</code>)</li></ul><p>We also think of various Julia types as though they were AbstractAlgebra.jl types:</p><ul><li><code>BigInt</code> (<code>Integers{BigInt}</code>)</li><li><code>Rational{BigInt}</code> (<code>Rationals{BigInt}</code>)</li></ul><p>Then there are various types for generic constructions over a base ring. They are all parameterised by a type <code>T</code> which is the type of the <em>elements</em> of the base ring they are defined over.</p><ul><li><code>Generic.Poly{T}</code> (<code>Generic.PolyRing{T}</code>)</li><li><code>Generic.MPoly{T}</code> (<code>Generic.MPolyRing{T}</code>)</li><li><code>Generic.RelSeries{T}</code> (<code>Generic.RelSeriesRing{T}</code>)</li><li><code>Generic.AbsSeries{T}</code> (<code>Generic.AbsSeriesRing{T}</code>)</li><li><code>Generic.LaurentSeriesRingElem{T}</code> (<code>Generic.LaurentSeriesRing{T}</code>)</li><li><code>Generic.LaurentSeriesFieldElem{T}</code> (<code>Generic.LaurentSeriesField{T}</code>)</li><li><code>Generic.Res{T}</code> (<code>Generic.ResRing{T}</code>)</li><li><code>Generic.Frac{T}</code> (<code>Generic.FracField{T}</code>)</li><li><code>Generic.Mat{T}</code> (<code>Generic.MatSpace{T}</code>)</li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../types/">« Type interface of AbstractAlgebra.jl</a><a class="docs-footer-nextpage" href="../extending_abstractalgebra/">Extending the interface of AbstractAlgebra.jl »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 31 March 2021 14:06">Wednesday 31 March 2021</span>. Using Julia version 1.5.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
