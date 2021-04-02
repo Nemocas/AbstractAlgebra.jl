@@ -54,32 +54,42 @@ specialised (e.g. supplied by a C library).
 ## Polynomial ring constructors
 
 In order to construct multivariate polynomials in AbstractAlgebra.jl, one must first
-construct the polynomial ring itself. This is accomplished with the following
-constructor.
+construct the polynomial ring itself. This is accomplished with one of the following
+constructors.
 
 ```julia
 PolynomialRing(R::AbstractAlgebra.Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)
+PolynomialRing(R::Nemo.Ring, n::Int, s::String="x"; cached::Bool = false, ordering::Symbol = :lex)
 ```
 
-Given a base ring `R` and and array `S` of strings specifying how the generators
-(variables) should be printed, return a tuple `S, (x, ...)` representing the new
-polynomial ring $S = R[x, \ldots]$ and a tuple of the generators $(x, ...)$ of the ring.
-By default the parent object `S` will depend only on `R` and  `(x, ...)` and will be
-cached. Setting the optional argument `cached` to `false` will prevent the parent object
-`S` from being cached.
+The first constructor, given a base ring `R` and an array `S` of strings
+specifying how the generators (variables) should be printed, will return a
+tuple `S, (x, ...)` representing the new polynomial ring $S = R[x, \ldots]$ and
+a tuple of the generators $(x, ...)$ of the ring.
 
-The optional named argument `ordering` can be used to specify an ordering. The currently
-supported options are `:lex`, `:deglex` and `:degrevlex`.
+The second constructor given a string `s` and a number of variables `n` will
+do the same as the first constructor except that the variables will be
+automatically numbered. For example if `s` is the string `x` and `n = 3` then
+the variables will print as `x1`, `x2`, `x3`.
 
-Like for univariate polynomials, a shorthand version of this function is provided when the number of
-generators is greater than `1`: given a base ring `R`, we abbreviate the constructor as follows:
+By default the parent object `S` will depend only on `R` and  `(x, ...)` and
+will be cached. Setting the optional argument `cached` to `false` will prevent
+the parent object `S` from being cached.
+
+The optional named argument `ordering` can be used to specify an ordering. The
+currently supported options are `:lex`, `:deglex` and `:degrevlex`.
+
+Like for univariate polynomials, a shorthand version of this function is
+provided when the number of generators is greater than `1`: given a base ring
+`R`, we abbreviate the constructor as follows:
 
 ```julia
 R["x", "y", ...]
 ```
 
-Here are some examples of creating multivariate polynomial rings and making use of the
-resulting parent objects to coerce various elements into the polynomial ring.
+Here are some examples of creating multivariate polynomial rings and making use
+of the resulting parent objects to coerce various elements into the polynomial
+ring.
 
 **Examples**
 

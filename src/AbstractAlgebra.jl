@@ -720,6 +720,16 @@ function PolynomialRing(R::Ring, s::Array{Char, 1}; cached::Bool = true, orderin
    PolynomialRing(R, string.(s); cached=cached, ordering=ordering)
 end
 
+function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::String="x";
+                                 cached::Bool = false, ordering::Symbol = :lex)
+   PolynomialRing(R, ["$s$i" for i=1:n]; cached = cached, ordering = ordering)
+end
+
+function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::Char;
+                                 cached::Bool = false, ordering::Symbol = :lex)
+   PolynomialRing(R, n, string(s); cached = cached, ordering = ordering)
+end
+
 function SparsePolynomialRing(R::Ring, s::String; cached::Bool = true)
    Generic.SparsePolynomialRing(R, s; cached=cached)
 end
