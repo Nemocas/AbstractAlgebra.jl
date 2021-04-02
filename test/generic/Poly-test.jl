@@ -200,6 +200,28 @@ end
    @test characteristic(R) == 0
 end
 
+@testset "Generic.Poly.deflation" begin
+   R, x = PolynomialRing(ZZ, "x")
+
+   for iter = 1:1000
+      f = rand(R, 0:20, -5:5)
+
+      shift, defl = deflation(f)
+
+      @test inflate(deflate(f, shift, defl), shift, defl) == f
+
+      shift = rand(0:10)
+      defl = rand(1:10)
+
+      g = inflate(f, shift, defl)
+      @test f == deflate(g, shift, defl)
+
+      @test deflate(f, 1) == deflate(f, 0, 1)
+      n = rand(1:10)
+      @test inflate(f, n) == inflate(f, 0, n)
+   end
+end
+
 @testset "Generic.Poly.binary_ops" begin
    #  Exact ring
    R, x = PolynomialRing(ZZ, "x")

@@ -745,6 +745,12 @@ end
          h = inflate(g, s, d)
 
          @test h == f
+
+	 @test deflate(inflate(f, d), d) == f
+
+	 g = inflate(f, defl)
+	 h, defl = deflate(g)
+	 @test g == inflate(h, defl)
       end
    end
 end

@@ -2846,11 +2846,11 @@ function deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    deflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement
+    deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
 
 Return a polynomial with the same coefficients as $f$ but whose exponents
-have been shifted down by the given shifts (supplied as an array of shifts,
-one for each variable, then deflated (divided) by the given exponents
+have been reduced by the given shifts (supplied as an array of shifts,
+one for each variable), then deflated (divided) by the given exponents
 (again supplied as an array of deflation factors, one for each variable).
 The algorithm automatically replaces a deflation of $0$ by $1$, to avoid
 division by $0$.
@@ -2904,11 +2904,38 @@ function deflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: 
 end
 
 @doc Markdown.doc"""
-    inflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement
+    deflate(f::AbstractAlgebra.MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
+
+Return a polynomial with the same coefficients as $f$ but whose exponents have
+been deflated (divided) by the given exponents (supplied as an array of
+deflation factors, one for each variable).
+
+The algorithm automatically replaces a deflation of $0$ by $1$, to avoid
+division by $0$.
+"""
+function deflate(f::AbstractAlgebra.MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
+   return deflate(f, [0 for i in 1:nvars(parent(f))], defl)
+end
+
+@doc Markdown.doc"""
+    deflate(f::AbstractAlgebra.MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
+
+Return a polynomial with the same coefficients as $f$ but whose exponents have
+been deflated maximally, i.e. with each exponent divide by the largest integer
+which divides the degrees of all exponents of that variable in $f$.
+"""
+function deflate(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   shift, defl = deflation(f)
+   defl = gcd.(shift, defl)
+   return deflate(f, defl), defl
+end
+
+@doc Markdown.doc"""
+    inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
 
 Return a polynomial with the same coefficients as $f$ but whose exponents
 have been inflated (multiplied) by the given deflation exponents (supplied
-as an array of inflation factors, one for each variable) and then shifted
+as an array of inflation factors, one for each variable) and then increased
 by the given shifts (again supplied as an array of shifts, one for each
 variable).
 """
@@ -2948,6 +2975,18 @@ function inflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: 
       return r
    end
 end
+
+@doc Markdown.doc"""
+    inflate(f::AbstractAlgebra.MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
+
+Return a polynomial with the same coefficients as $f$ but whose exponents
+have been inflated (multiplied) by the given deflation exponents (supplied
+as an array of inflation factors, one for each variable).
+"""
+function inflate(f::AbstractAlgebra.MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
+   return inflate(f, [0 for i in 1:nvars(parent(f))], defl)
+end
+
 ###############################################################################
 #
 #   Exact division

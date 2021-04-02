@@ -1106,6 +1106,106 @@ end
 
 ###############################################################################
 #
+#   Inflation/deflation
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    function deflation(p::PolyElem)
+
+Return a tuple `(shift, defl)` where `shift` is the exponent of the trailing
+term of $p$ and `defl` is the gcd of the distance between the exponents of the
+nonzero terms of $p$. If $p = 0$, both `shift` and `defl` will be zero.
+"""
+function deflation(p::PolyElem)
+   if iszero(p)
+      return 0, 1
+   end
+   shift = 0
+   while iszero(coeff(p, shift))
+      shift += 1
+   end
+   defl = 0
+   if shift == degree(p)
+      return shift, 1
+   end
+   for exj in shift + 1:degree(p)
+      if !iszero(coeff(p, exj))
+         defl = gcd(defl, exj - shift)
+         if defl == 1
+	    break
+	 end
+      end
+   end
+   return shift, defl
+end
+
+@doc Markdown.doc"""
+    inflate(f::PolyElem, shift::Int64, n::Int64) -> PolyElem
+
+Given a polynomial $f$ in $x$, return $f(x^n)*x^j$, i.e. multiply
+all exponents by $n$ and shift $f$ left by $j$.
+"""
+function inflate(f::PolyElem, j::Int64, n::Int64)
+    y = parent(f)()
+    for i = 0:degree(f)
+        y = setcoeff!(y, n*i + j, coeff(f, i))
+    end
+    return y
+end
+
+@doc Markdown.doc"""
+    inflate(f::PolyElem, n::Int64) -> PolyElem
+
+Given a polynomial $f$ in $x$, return $f(x^n)$, i.e. multiply
+all exponents by $n$.
+"""
+inflate(f::PolyElem, n::Int64) = inflate(f, 0, n)
+
+@doc Markdown.doc"""
+    deflate(f::PolyElem, shift::Int64, n::Int64) -> PolyElem
+
+Given a polynomial $g$ in $x^n$ such that `f = g(x)*x^{shift}`, write $f$ as
+a polynomial in $x$, i.e. divide all exponents of $g$ by $n$.
+"""
+function deflate(f::PolyElem, j::Int64, n::Int64)
+    y = parent(f)()
+    for i = 0:div(degree(f) - j, n)
+        y = setcoeff!(y, i, coeff(f, n*i + j))
+    end
+    return y
+end
+
+@doc Markdown.doc"""
+    deflate(f::PolyElem, n::Int64) -> PolyElem
+
+Given a polynomial $f$ in $x^n$, write it as a polynomial in $x$, i.e. divide
+all exponents by $n$.
+"""
+deflate(f::PolyElem, n::Int64) = deflate(f, 0, n)
+
+@doc Markdown.doc"""
+    deflate(x::PolyElem) -> PolyElem, Int
+
+Deflate the polynomial $f$ maximally, i.e. find the largest $n$ s.th.
+$f$ can be deflated by $n$, i.e. $f$ is actually a polynomial in $x^n$.
+Return $g, n$ where $g$ is the deflation of $f$.
+"""
+function deflate(f::PolyElem)
+   n = 0
+   for i = 0:degree(f)
+      if coeff(f, i) != 0
+         n = gcd(n, i)
+         if n == 1
+            return f, 1
+         end
+      end
+   end
+   return deflate(f, n), n
+end
+
+###############################################################################
+#
 #   Modular arithmetic
 #
 ###############################################################################
