@@ -130,6 +130,9 @@ end
    # TODO: test more than just the result type
    test_rand(R, 0:10, -10:10)
    test_rand(R, 0:10, make(ZZ, -10:10))
+   for deg in 1:10
+      test_rand(R, deg, -10:10)
+   end
 
    S, y = PolynomialRing(R, "y")
 

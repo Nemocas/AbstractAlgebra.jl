@@ -172,23 +172,4 @@ function sturm_sequence(f::PolyElem{<:FieldElem})
     end
     return seq
 end
-  
-################################################################################
-#
-#  Random polynomial
-#
-################################################################################
-
-@doc Markdown.doc"""
-    Base.rand(Rt::PolyRing{T}, n::Int) where T <: ResElem{S} where S <: Integer -> PolyElem{T}
-
-Find a random polynomial of degree=$n$.
-"""
-function Base.rand(Rt::PolyRing{T}, n::Int) where T <: ResElem{S} where S <: Integer
-    f = Rt()
-    R = base_ring(Rt)
-    for i = 0:n
-        setcoeff!(f, i, rand(R))
-    end
-    return f
-end
+ 
