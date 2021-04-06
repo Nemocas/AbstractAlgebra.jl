@@ -1090,12 +1090,16 @@ function Base.exp(a::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    c = vala == 0 ? polcoeff(a, 0) : R()
    z = setcoeff!(z, 0, exp(c))
    len = pol_length(a) + vala
+   C = R()
+   d = derivative(a)
+   vald = valuation(d)
    for k = 1 : preca - 1
       s = R()
       for j = 1 : min(k + 1, len) - 1
-         c = j >= vala ? polcoeff(a, j - vala) : R()
-         s += j * c * polcoeff(z, k - j)
+         c = j > vald ? polcoeff(d, j - vald - 1) : R()
+         s = addmul_delayed_reduction!(s, c, polcoeff(z, k - j), C)
       end
+      s = reduce!(s)
       !isunit(R(k)) && error("Unable to divide in exp")
       z = setcoeff!(z, k, divexact(s, k))
    end

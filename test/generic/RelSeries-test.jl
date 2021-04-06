@@ -868,6 +868,16 @@ end
       @test isequal(exp(log(f)), f)
    end
 
+   # Exact Ring
+
+   R, t = PolynomialRing(QQ, "t")
+   S, x = PowerSeriesRing(R, 10, "x")
+
+   c = exp(x + O(x^10))
+
+   @test isequal(c, 1 + x + 1//2*x^2 + 1//6*x^3 + 1//24*x^4 + 1//120*x^5 +
+             1//720*x^6 + 1//5040*x^7 + 1//40320*x^8 + 1//362880*x^9 + O(x^10))
+
    # Inexact field
    S, x = PowerSeriesRing(RealField, 10, "x")
 
