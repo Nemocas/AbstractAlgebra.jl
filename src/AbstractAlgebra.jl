@@ -463,8 +463,9 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row,
                  modulus, monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx, mul!, mul_classical, mul_karatsuba, mul_ks,
-                 mullow, mulmod, multiply_column, multiply_column!,
-                 multiply_row, multiply_row!, ncols,
+                 mullow, mullow_karatsuba, mulmod,
+                 multiply_column, multiply_column!, multiply_row, multiply_row!,
+                 ncols,
                  newton_to_monomial!, ngens, normalise, nrows, nvars, O, one,
                  order, ordering, parity, partitionseq, Perm, perm,
                  permtype, @perm_str, polcoeff, pol_length,
@@ -552,7 +553,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  modulus, monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx, mul!, mul_classical,
-                 mul_karatsuba, mul_ks, mul_red!, mullow, mulmod,
+                 mul_karatsuba, mul_ks, mul_red!, mullow, mullow_karatsuba, mulmod,
                  multiply_column, multiply_column!, multiply_row,
                  multiply_row!, ncols, needs_parentheses,
 		 newton_to_monomial!, ngens,
@@ -1057,6 +1058,7 @@ const RealField = JuliaRealField
 ###############################################################################
 
 include("algorithms/MPolyFactor.jl")
+include("algorithms/DensePoly.jl")
 
 ###############################################################################
 #

@@ -641,6 +641,7 @@ end
       n = rand(0:20)
 
       @test truncate(f*g, n) == mullow(f, g, n)
+      @test truncate(f*g, n) == mullow_karatsuba(f, g, n, rand(1:5))
    end
 
    for iter = 1:100
@@ -705,6 +706,7 @@ end
       n = rand(0:20)
 
       @test truncate(f*g, n) == mullow(f, g, n)
+      @test truncate(f*g, n) == mullow_karatsuba(f, g, n, rand(1:5))
    end
 
    #  Inexact field
@@ -728,6 +730,7 @@ end
       r = mullow(f, g, n)
 
       @test truncate(f*g, n) == r
+      @test truncate(f*g, n) == mullow_karatsuba(f, g, n, rand(1:10))
       @test r == 0 || !iszero(leading_coefficient(r))
    end
 end
@@ -2594,6 +2597,10 @@ end
 
    @test mul_karatsuba(f^10, f^10) == mul_classical(f^10, f^10)
    @test mul_karatsuba(f^10, f^30) == mul_classical(f^10, f^30)
+
+   @test mul_karatsuba(f^10, f^30, 5) == mul_classical(f^10, f^30)
+   @test mul_karatsuba(f^10, f^30, 10) == mul_classical(f^10, f^30)
+
 end
 
 @testset "Generic.Poly.mul_ks" begin
