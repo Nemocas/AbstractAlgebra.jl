@@ -4502,7 +4502,7 @@ function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyE
    end
 
    if length(vars_p) == 0
-      return length(p) == 0 ? R(0) : R(p.coeffs[1])
+      return leading_coefficient(p)
    end
 
    return R(coefficients_of_univariate(p))
