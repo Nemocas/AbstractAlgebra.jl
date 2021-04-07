@@ -13,7 +13,7 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        combine_like_terms!, exponent, exponent_vector, exponent_vectors,
        set_exponent_vector!, sort_terms!, coeffs, monomial, monomial!,
        monomials, term, terms, var_index, @PolynomialRing, leading_coefficient,
-       leading_monomial, leading_term, lcm,
+       leading_monomial, leading_term, tail, lcm,
        MPolyBuildCtx, ishomogeneous, map_coefficients
 
 ###############################################################################
@@ -882,6 +882,25 @@ function trailing_coefficient(p::MPoly{T}) where T <: RingElement
    else
       return coeff(p, length(p))
    end
+end
+
+@doc Markdown.doc"""
+    tail(p::MPolyElem)
+
+Return the tail of the polynomial $p$, i.e. the polynomial without its leading
+term (if any).
+"""
+function tail(p::MPolyElem{T}) where T <: RingElement
+   S = parent(p)
+   if iszero(p)
+      return S()
+   end
+   ctx = MPolyBuildCtx(S)
+   tail_cv = Iterators.drop(zip(coefficients(p), exponent_vectors(p)), 1)
+   for (c, v) in tail_cv
+      push_term!(ctx, c, v)
+   end
+   return finish(ctx)
 end
 
 @doc Markdown.doc"""
@@ -4010,7 +4029,7 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
       while iseven(j) && length(r) > 1
           top = pop!(r)
           r[end] = addeq!(r[end], top)
-          j >>>= 1
+          j >>= 1
       end
    end
    while length(r) > 1

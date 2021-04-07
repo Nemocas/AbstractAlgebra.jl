@@ -170,6 +170,11 @@ end
 
    @test constant_coefficient(y^2 + 2x) == 2x
 
+   @test tail(2x*y + 2x + y + 1) == 2x + 1
+   @test tail(R(3)) == 0
+   @test tail(3x*y) == 0
+   @test tail(R()) == 0
+
    @test iszero(constant_coefficient(R()))
 
    @test degree(f) == 1

@@ -168,6 +168,21 @@ function constant_coefficient(a::PolynomialElem)
    return coeff(a, 0)
 end
 
+@doc Markdown.doc"""
+    tail(a::Generic.PolynomialElem)
+
+Return the tail of the given polynomial, i.e. the polynomial without its
+leading term (if any).
+"""
+function tail(a::PolynomialElem)
+   return iszero(a) ? zero(parent(a)) : truncate(a, length(a) - 1)
+end
+
+@doc Markdown.doc"""
+    zero(R::AbstractAlgebra.PolyRing)
+
+Return the zero polynomial in the given polynomial ring.
+"""
 zero(R::AbstractAlgebra.PolyRing) = R(0)
 
 one(R::AbstractAlgebra.PolyRing) = R(1)

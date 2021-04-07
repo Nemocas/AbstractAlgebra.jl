@@ -255,10 +255,11 @@ modulus{T <: ResElem}(::PolyElem{T})
 ```@docs
 leading_coefficient(::PolyElem)
 trailing_coefficient(::PolyElem)
+constant_coefficient(::Generic.PolynomialElem)
 ```
 
 ```@docs
-constant_coefficient(::Generic.PolynomialElem)
+tail(::Generic.PolynomialElem)
 ```
 
 ```@docs

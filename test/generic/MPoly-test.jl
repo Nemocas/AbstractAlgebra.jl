@@ -376,6 +376,10 @@ end
    @test trailing_coefficient(x^2*y + 7x*y + 3x + 2y) == 2
    @test trailing_coefficient(R(2)) == 2
    @test trailing_coefficient(R()) == 0
+
+   @test tail(2x^2 + 2x*y + 3) == 2x*y + 3
+   @test tail(R(1)) == 0
+   @test tail(R()) == 0
 end
 
 @testset "Generic.MPoly.total_degree" begin
