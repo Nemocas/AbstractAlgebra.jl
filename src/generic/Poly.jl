@@ -637,11 +637,11 @@ function mul_classical(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyEl
       d[i] = mul_red!(R(), coeff(a, i - 1), coeff(b, 0), false)
    end
    for i = 2:lenb
-      d[lena + i - 1] = mul_red!(R(), a.coeffs[lena], coeff(b, i - 1), false)
+      d[lena + i - 1] = mul_red!(R(), coeff(a, lena - 1), coeff(b, i - 1), false)
    end
    for i = 1:lena - 1
       for j = 2:lenb
-         t = mul_red!(t, coeff(a, i - 1), b.coeffs[j], false)
+         t = mul_red!(t, coeff(a, i - 1), coeff(b, j - 1), false)
          d[i + j - 1] = addeq!(d[i + j - 1], t)
       end
    end
@@ -2954,7 +2954,7 @@ function zero!(c::Poly{T}) where {T <: RingElement}
    return c
 end
 
-function mul!(c::AbstractAlgebra.PolyElem{T}, a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
+function mul!(c::Poly{T}, a::Poly{T}, b::Poly{T}) where {T <: RingElement}
    lena = length(a)
    lenb = length(b)
 
@@ -2993,7 +2993,7 @@ function mul!(c::AbstractAlgebra.PolyElem{T}, a::AbstractAlgebra.PolyElem{T}, b:
    return c
 end
 
-function addeq!(c::AbstractAlgebra.PolyElem{T}, a::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
+function addeq!(c::Poly{T}, a::Poly{T}) where {T <: RingElement}
    lenc = length(c)
    lena = length(a)
    len = max(lenc, lena)
@@ -3005,7 +3005,7 @@ function addeq!(c::AbstractAlgebra.PolyElem{T}, a::AbstractAlgebra.PolyElem{T}) 
    return c
 end
 
-function add!(c::AbstractAlgebra.PolyElem{T}, a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
+function add!(c::Poly{T}, a::Poly{T}, b::Poly{T}) where {T <: RingElement}
    lena = length(a)
    lenb = length(b)
    len = max(lena, lenb)
