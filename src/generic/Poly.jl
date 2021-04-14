@@ -3069,9 +3069,20 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{<:RingElement,<:Abstr
    R = base_ring(S)
    f = S()
    x = gen(S)
-   for i = 0:rand(rng, deg_range)
+   # degree -1 is zero polynomial
+   deg = rand(rng, deg_range)
+   if deg == -1
+      return f
+   end
+   for i = 0:deg - 1
       f += rand(rng, v)*x^i
    end
+   # ensure leading coefficient is nonzero
+   c = R()
+   while iszero(c)
+      c = rand(rng, v)
+   end
+   f += c*x^deg
    return f
 end
 
@@ -3081,9 +3092,19 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{<:RingElement,<:Abstr
    R = base_ring(S)
    f = S()
    x = gen(S)
-   for i = 0:deg
+   # degree -1 is zero polynomial
+   if deg == -1
+      return f
+   end
+   for i = 0:deg - 1
       f += rand(rng, v)*x^i
    end
+   # ensure leading coefficient is nonzero
+   c = R()
+   while iszero(c)
+      c = rand(rng, v)
+   end
+   f += c*x^deg
    return f
 end
 
