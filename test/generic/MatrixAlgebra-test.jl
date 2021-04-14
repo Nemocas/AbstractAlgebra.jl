@@ -383,7 +383,7 @@ end
    for dim = 0:5
       R = MatrixAlgebra(S, dim)
 
-      M = rand(R, 0:5, -100:100)
+      M = rand(R, -1:5, -100:100)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
@@ -393,7 +393,7 @@ end
    for dim = 0:5
       R = MatrixAlgebra(S, dim)
 
-      M = rand(R, 0:3, -20:20)
+      M = rand(R, -1:3, -20:20)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
@@ -414,7 +414,7 @@ end
 
    for dim = 0:5
       T = MatrixAlgebra(S, dim)
-      M = rand(T, 0:2, 0:2, -10:10)
+      M = rand(T, -1:2, -1:2, -10:10)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
@@ -844,7 +844,6 @@ end # of @testset "Generic.MatAlg.inversion"
 
    for dim = 0:5
       S = MatrixAlgebra(R, dim)
-      U, x = PolynomialRing(R, "x")
 
       for i = 1:10
          M = rand(S, -5:5)
@@ -898,7 +897,7 @@ end
    M = T()
    for i = 1:3
       for j = 1:3
-         M[i, j] = rand(R, 0:2, -10:10)
+         M[i, j] = rand(R, -1:2, -10:10)
          M[i + 3, j + 3] = deepcopy(M[i, j])
       end
    end
@@ -992,7 +991,7 @@ end
    M = T()
    for i = 1:3
       for j = 1:3
-         M[i, j] = rand(S, 0:3, 0:3, -10:10)
+         M[i, j] = rand(S, -1:3, -1:3, -10:10)
          M[i + 3, j + 3] = deepcopy(M[i, j])
       end
    end
@@ -1008,7 +1007,7 @@ end
    M = T()
    for i = 1:3
       for j = 1:3
-         M[i, j] = rand(R, 0:2, -10:10)
+         M[i, j] = rand(R, -1:2, -10:10)
          M[i + 3, j + 3] = deepcopy(M[i, j])
       end
    end
@@ -1016,7 +1015,7 @@ end
    p1 = minpoly(U, M)
 
    for i = 1:10
-      similarity!(M, rand(1:6), R(rand(R, 0:2, -3:3)))
+      similarity!(M, rand(1:6), R(rand(R, -1:2, -3:3)))
    end
 
    p2 = minpoly(U, M)

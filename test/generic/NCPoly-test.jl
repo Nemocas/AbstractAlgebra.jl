@@ -106,7 +106,7 @@ end
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
 
-   test_rand(S, 0:10, -10:10)
+   test_rand(S, -1:10, -10:10)
 end
 
 @testset "Generic.NCPoly.binary_ops" begin
@@ -115,9 +115,9 @@ end
    S, y = PolynomialRing(R, "y")
 
    for iter = 1:100
-      f = rand(S, 0:10, -10:10)
-      g = rand(S, 0:10, -10:10)
-      h = rand(S, 0:10, -10:10)
+      f = rand(S, -1:10, -10:10)
+      g = rand(S, -1:10, -10:10)
+      h = rand(S, -1:10, -10:10)
       @test f + g == g + f
       @test f + (g + h) == (f + g) + h
       @test f*(g + h) == f*g + f*h
@@ -132,7 +132,7 @@ end
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
    for iter = 1:500
-      f = rand(S, 0:10, -10:10)
+      f = rand(S, -1:10, -10:10)
       c1 = rand(R, -10:10)
       c2 = rand(R, -10:10)
 
@@ -148,11 +148,11 @@ end
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
    for iter = 1:100
-      f = rand(T, 0:5, 0:5, -10:10)
+      f = rand(T, -1:5, 0:5, -10:10)
       c1 = rand(R, -10:10)
       c2 = rand(R, -10:10)
-      d1 = rand(S, 0:5, -10:10)
-      d2 = rand(S, 0:5, -10:10)
+      d1 = rand(S, -1:5, -10:10)
+      d2 = rand(S, -1:5, -10:10)
 
       @test c1*f - c2*f == (c1 - c2)*f
       @test c1*f + c2*f == (c1 + c2)*f
@@ -171,12 +171,9 @@ end
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
    for iter = 1:500
-      f = rand(S, 0:10, -10:10)
+      f = rand(S, -1:10, -10:10)
       g = deepcopy(f)
-      h = S()
-      while iszero(h)
-         h = rand(S, 0:10, -10:10)
-      end
+      h = rand(S, 0:10, -10:10)
 
       @test f == g
       @test isequal(f, g)
@@ -189,10 +186,7 @@ end
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
    for iter = 1:500
-      f = S()
-      while iszero(f)
-         f = rand(S, 0:10, -10:10)
-      end
+      f = rand(S, 0:10, -10:10)
       c1 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
 
@@ -212,12 +206,9 @@ end
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
    for iter = 1:100
-      f = T()
-      while iszero(f)
-         f = rand(T, 0:10, 0:5, -10:10)
-      end
+      f = rand(T, 0:10, 0:5, -10:10)
       c1 = rand(ZZ, -10:10)
-      d1 = rand(S, 0:5, -10:10)
+      d1 = rand(S, -1:5, -10:10)
 
       @test S(c1) == c1
       @test c1 == S(c1)
@@ -236,7 +227,7 @@ end
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
    for iter = 1:300
-      f = rand(S, 0:10, -10:10)
+      f = rand(S, -1:10, -10:10)
 
       @test -(-f) == f
       @test iszero(f + (-f))
@@ -248,8 +239,8 @@ end
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
    for iter = 1:300
-      f = rand(S, 0:10, -10:10)
-      g = rand(S, 0:10, -10:10)
+      f = rand(S, -1:10, -10:10)
+      g = rand(S, -1:10, -10:10)
       n = rand(0:20)
 
       @test truncate(f*g, n) == mullow(f, g, n)
@@ -261,7 +252,7 @@ end
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
    for iter = 1:300
-      f = rand(S, 0:10, -10:10)
+      f = rand(S, -1:10, -10:10)
       len = rand(length(f):12)
       frev = reverse(f, len)
 
@@ -283,7 +274,7 @@ end
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
    for iter = 1:300
-      f = rand(S, 0:10, -10:10)
+      f = rand(S, -1:10, -10:10)
       s = rand(0:10)
       g = s == 0 ? S() : rand(S, 0:s - 1, -10:10)
 
@@ -299,7 +290,7 @@ end
    S, y = PolynomialRing(R, "y")
 
    for iter = 1:10
-      f = rand(S, 0:10, -10:10)
+      f = rand(S, -1:10, -10:10)
       r2 = R(1)
 
       for expn = 0:10
@@ -324,7 +315,7 @@ end
    S, y = PolynomialRing(R, "y")
 
    for iter = 1:100
-      f = rand(S, 0:10, -100:100)
+      f = rand(S, -1:10, -100:100)
       g = S()
       while rank(leading_coefficient(g)) != 2
          g = rand(S, 0:10, -100:100)
@@ -341,7 +332,7 @@ end
    S, y = PolynomialRing(R, "y")
 
    for iter = 1:100
-      f = rand(S, 0:10, -100:100)
+      f = rand(S, -1:10, -100:100)
       g = ZZ()
       while g == 0
          g = rand(ZZ, -10:10)
@@ -365,7 +356,7 @@ end
    T, z = PolynomialRing(S, "z")
 
    for iter = 1:100
-      f = rand(T, 0:10, 0:10, -100:100)
+      f = rand(T, -1:10, 0:10, -100:100)
       g = S()
       while rank(leading_coefficient(g)) != 2
          g = rand(S, 0:10, -100:100)
@@ -390,8 +381,8 @@ end
    S, y = PolynomialRing(R, "y")
 
    for iter in 1:10
-      f = rand(S, 0:4, -10:10)
-      g = rand(S, 0:4, -10:10)
+      f = rand(S, -1:4, -10:10)
+      g = rand(S, -1:4, -10:10)
 
       d = rand(ZZ, -10:10)
 
@@ -399,7 +390,7 @@ end
    end
 
    for iter in 1:10
-      f = rand(S, 0:4, -10:10)
+      f = rand(S, -1:4, -10:10)
 
       d = rand(ZZ, -10:10)
 
@@ -413,8 +404,8 @@ end
    S, y = PolynomialRing(R, "y")
 
    for iter in 1:10
-      f = rand(S, 0:4, -100:100)
-      g = rand(S, 0:4, -100:100)
+      f = rand(S, -1:4, -100:100)
+      g = rand(S, -1:4, -100:100)
 
       @test derivative(f + g) == derivative(g) + derivative(f)
 
