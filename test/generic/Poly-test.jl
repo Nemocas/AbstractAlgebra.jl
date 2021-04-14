@@ -128,21 +128,21 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    # TODO: test more than just the result type
-   test_rand(R, 0:10, -10:10)
-   test_rand(R, 0:10, make(ZZ, -10:10))
+   test_rand(R, -1:10, -10:10)
+   test_rand(R, -1:10, make(ZZ, -10:10))
    for deg in 1:10
       test_rand(R, deg, -10:10)
    end
 
    S, y = PolynomialRing(R, "y")
 
-   test_rand(S, 0:5, make(R, 0:10, make(ZZ, -10:10)))
-   test_rand(S, 0:5, make(R, 0:10, -10:10))
-   test_rand(S, 0:5, 0:10, -10:10)
+   test_rand(S, -1:5, make(R, -1:10, make(ZZ, -10:10)))
+   test_rand(S, -1:5, make(R, -1:10, -10:10))
+   test_rand(S, -1:5, -1:10, -10:10)
 
    T, z = PolynomialRing(GF(7), "z")
 
-   test_rand(T, 0:4)
+   test_rand(T, -1:4)
 end
 
 @testset "Generic.Poly.manipulation" begin
@@ -212,7 +212,7 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:1000
-      f = rand(R, 0:20, -5:5)
+      f = rand(R, -1:20, -5:5)
 
       shift, defl = deflation(f)
 
@@ -234,9 +234,9 @@ end
    #  Exact ring
    R, x = PolynomialRing(ZZ, "x")
    for iter = 1:100
-      f = rand(R, 0:10, -10:10)
-      g = rand(R, 0:10, -10:10)
-      h = rand(R, 0:10, -10:10)
+      f = rand(R, -1:10, -10:10)
+      g = rand(R, -1:10, -10:10)
+      h = rand(R, -1:10, -10:10)
       @test f + g == g + f
       @test f + (g + h) == (f + g) + h
       @test f*g == g*f
@@ -252,9 +252,9 @@ end
    a = F(y)
    R, x = PolynomialRing(F, "x")
    for iter = 1:100
-      f = rand(R, 0:10, 0:1)
-      g = rand(R, 0:10, 0:1)
-      h = rand(R, 0:10, 0:1)
+      f = rand(R, -1:10, 0:1)
+      g = rand(R, -1:10, 0:1)
+      h = rand(R, -1:10, 0:1)
       @test f + g == g + f
       @test f + (g + h) == (f + g) + h
       @test f*g == g*f
@@ -267,9 +267,9 @@ end
    #  Inexact field
    R, x = PolynomialRing(RealField, "x")
    for iter = 1:100
-      f = rand(R, 0:10, -1:1)
-      g = rand(R, 0:10, -1:1)
-      h = rand(R, 0:10, -1:1)
+      f = rand(R, -1:10, -1:1)
+      g = rand(R, -1:10, -1:1)
+      h = rand(R, -1:10, -1:1)
       @test isapprox(f + (g + h), (f + g) + h)
       @test isapprox(f*g, g*f)
       @test isapprox(f*(g + h), f*g + f*h)
@@ -282,9 +282,9 @@ end
    T = ResidueRing(ZZ, 6)
    R, x = T["x"]
    for iter = 1:100
-      f = rand(R, 0:10, 0:5)
-      g = rand(R, 0:10, 0:5)
-      h = rand(R, 0:10, 0:5)
+      f = rand(R, -1:10, 0:5)
+      g = rand(R, -1:10, 0:5)
+      h = rand(R, -1:10, 0:5)
       @test f + (g + h) == (f + g) + h
       @test f*g == g*f
       @test f*(g + h) == f*g + f*h
@@ -298,7 +298,7 @@ end
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:500
-      f = rand(R, 0:10, -10:10)
+      f = rand(R, -1:10, -10:10)
       c1 = rand(ZZ, -10:10)
       c2 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
@@ -321,7 +321,7 @@ end
    a = F(y)
    R, x = PolynomialRing(F, "x")
    for iter = 1:500
-      f = rand(R, 0:10, 0:1)
+      f = rand(R, -1:10, 0:1)
       c1 = rand(ZZ, -10:10)
       c2 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
@@ -341,7 +341,7 @@ end
    # Inexact field
    R, x = RealField["x"]
    for iter = 1:500
-      f = rand(R, 0:10, -1:1)
+      f = rand(R, -1:10, -1:1)
       c1 = rand(ZZ, -10:10)
       c2 = rand(ZZ, -10:10)
       d1 = rand(RealField, -1:1)
@@ -362,7 +362,7 @@ end
    R = ResidueRing(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
-      f = rand(S, 0:10, 0:5)
+      f = rand(S, -1:10, 0:5)
       c1 = rand(ZZ, -10:10)
       c2 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
@@ -389,11 +389,11 @@ end
    R, x = ZZ["x"]
    S, y = R["y"]
    for iter = 1:100
-      f = rand(S, 0:10, 0:5, -10:10)
+      f = rand(S, -1:10, 0:5, -10:10)
       c1 = rand(ZZ, -10:10)
       c2 = rand(ZZ, -10:10)
-      d1 = rand(R, 0:5, -10:10)
-      d2 = rand(R, 0:5, -10:10)
+      d1 = rand(R, -1:5, -10:10)
+      d2 = rand(R, -1:5, -10:10)
 
       @test c1*f - c2*f == (c1 - c2)*f
       @test c1*f + c2*f == (c1 + c2)*f
@@ -411,12 +411,9 @@ end
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:500
-      f = rand(R, 0:10, -10:10)
+      f = rand(R, -1:10, -10:10)
       g = deepcopy(f)
-      h = R()
-      while iszero(h)
-         h = rand(R, 0:10, -10:10)
-      end
+      h = rand(R, 0:10, -10:10)
 
       @test f == g
       @test isequal(f, g)
@@ -429,12 +426,9 @@ end
    a = F(y)
    R, x = PolynomialRing(F, "x")
    for iter = 1:500
-      f = rand(R, 0:10, 0:1)
+      f = rand(R, -1:10, 0:1)
       g = deepcopy(f)
-      h = R()
-      while iszero(h)
-         h = rand(R, 0:10, 0:1)
-      end
+      h = rand(R, 0:10, 0:1)
 
       @test f == g
       @test isequal(f, g)
@@ -446,10 +440,7 @@ end
    for iter = 1:500
       f = rand(R, 0:10, -1:1)
       g = deepcopy(f)
-      h = R()
-      while iszero(h)
-         h = rand(R, 0:10, -1:1)
-      end
+      h = rand(R, 0:10, -1:1)
 
       @test f == g
       @test isequal(f, g)
@@ -460,12 +451,9 @@ end
    R = ResidueRing(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
-      f = rand(S, 0:10, 0:5)
+      f = rand(S, -1:10, 0:5)
       g = deepcopy(f)
-      h = R()
-      while iszero(h)
-         h = rand(S, 0:10, 0:5)
-      end
+      h = rand(S, 0:10, 0:5)
 
       @test f == g
       @test isequal(f, g)
@@ -477,10 +465,7 @@ end
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:500
-      f = R()
-      while iszero(f)
-         f = rand(R, 0:10, -10:10)
-      end
+      f = rand(R, 0:10, -10:10)
       c1 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
 
@@ -501,10 +486,7 @@ end
    a = F(y)
    R, x = PolynomialRing(F, "x")
    for iter = 1:500
-      f = R()
-      while iszero(f)
-         f = rand(R, 0:10, 0:1)
-      end
+      f = rand(R, 0:10, 0:1)
       c1 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
 
@@ -522,10 +504,7 @@ end
    # Inexact field
    R, x = RealField["x"]
    for iter = 1:500
-      f = R()
-      while iszero(f)
-         f = rand(R, 0:10, -1:1)
-      end
+      f = rand(R, 0:10, -1:1)
       c1 = rand(ZZ, -10:10)
       d1 = rand(RealField, -1:1)
 
@@ -544,10 +523,7 @@ end
    R = ResidueRing(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
-      f = S()
-      while iszero(f)
-         f = rand(S, 0:10, 0:5)
-      end
+      f = rand(S, 0:10, 0:5)
       c1 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
       a1 = rand(R, 0:5)
@@ -571,12 +547,9 @@ end
    R, x = ZZ["x"]
    S, y = R["y"]
    for iter = 1:100
-      f = S()
-      while iszero(f)
-         f = rand(S, 0:10, 0:5, -10:10)
-      end
+      f = rand(S, 0:10, 0:5, -10:10)
       c1 = rand(ZZ, -10:10)
-      d1 = rand(R, 0:5, -10:10)
+      d1 = rand(R, -1:5, -10:10)
 
       @test S(c1) == c1
       @test c1 == S(c1)
@@ -594,7 +567,7 @@ end
    #  Exact ring
    R, x = PolynomialRing(ZZ, "x")
    for iter = 1:300
-      f = rand(R, 0:10, -10:10)
+      f = rand(R, -1:10, -10:10)
 
       @test -(-f) == f
       @test iszero(f + (-f))
@@ -606,7 +579,7 @@ end
    a = F(y)
    R, x = PolynomialRing(F, "x")
    for iter = 1:300
-      f = rand(R, 0:10, 0:1)
+      f = rand(R, -1:10, 0:1)
 
       @test -(-f) == f
       @test iszero(f + (-f))
@@ -615,7 +588,7 @@ end
    #  Inexact field
    R, x = PolynomialRing(RealField, "x")
    for iter = 1:300
-      f = rand(R, 0:10, -1:1)
+      f = rand(R, -1:10, -1:1)
 
       @test -(-f) == f
       @test iszero(f + (-f))
@@ -625,7 +598,7 @@ end
    T = ResidueRing(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
-      f = rand(R, 0:10, 0:5)
+      f = rand(R, -1:10, 0:5)
 
       @test -(-f) == f
       @test iszero(f + (-f))
@@ -636,8 +609,8 @@ end
    #  Exact ring
    R, x = PolynomialRing(ZZ, "x")
    for iter = 1:300
-      f = rand(R, 0:10, -10:10)
-      g = rand(R, 0:10, -10:10)
+      f = rand(R, -1:10, -10:10)
+      g = rand(R, -1:10, -10:10)
       n = rand(0:20)
 
       @test truncate(f*g, n) == mullow(f, g, n)
@@ -661,7 +634,7 @@ end
    end
 
    for iter = 1:100
-      lena = rand(0:10)
+      lena = rand(-1:10)
       lenb = rand(1:10)
       a = rand(R, lena:lena, -10:10)
       b = R()
@@ -680,7 +653,7 @@ end
    end
 
    for iter = 1:100
-      lena = rand(0:10)
+      lena = rand(-1:10)
       lenb = rand(1:10)
       a = rand(R, lena:lena, -10:10)
       b = R()
@@ -701,8 +674,8 @@ end
    a = F(y)
    R, x = PolynomialRing(F, "x")
    for iter = 1:300
-      f = rand(R, 0:10, 0:1)
-      g = rand(R, 0:10, 0:1)
+      f = rand(R, -1:10, 0:1)
+      g = rand(R, -1:10, 0:1)
       n = rand(0:20)
 
       @test truncate(f*g, n) == mullow(f, g, n)
@@ -712,8 +685,8 @@ end
    #  Inexact field
    R, x = PolynomialRing(RealField, "x")
    for iter = 1:300
-      f = rand(R, 0:10, -1:1)
-      g = rand(R, 0:10, -1:1)
+      f = rand(R, -1:10, -1:1)
+      g = rand(R, -1:10, -1:1)
       n = rand(0:20)
 
       @test isapprox(truncate(f*g, n), mullow(f, g, n))
@@ -723,8 +696,8 @@ end
    T = ResidueRing(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
-      f = rand(R, 0:10, 0:5)
-      g = rand(R, 0:10, 0:5)
+      f = rand(R, -1:10, 0:5)
+      g = rand(R, -1:10, 0:5)
       n = rand(0:20)
 
       r = mullow(f, g, n)
@@ -739,7 +712,7 @@ end
    #  Exact ring
    R, x = ZZ["x"]
    for iter = 1:300
-      f = rand(R, 0:10, -10:10)
+      f = rand(R, -1:10, -10:10)
       len = rand(length(f):12)
       frev = reverse(f, len)
 
@@ -755,7 +728,7 @@ end
       @test f == reverse(frev, len)
    end
 
-   f = rand(R, 0:10, -10:10)
+   f = rand(R, -1:10, -10:10)
    @test_throws DomainError reverse(f, -1)
    @test_throws DomainError reverse(f, -rand(2:100))
 
@@ -765,7 +738,7 @@ end
    a = F(y)
    R, x = PolynomialRing(F, "x")
    for iter = 1:300
-      f = rand(R, 0:10, 0:1)
+      f = rand(R, -1:10, 0:1)
       len = rand(length(f):12)
       frev = reverse(f, len)
 
@@ -781,14 +754,14 @@ end
       @test f == reverse(frev, len)
    end
 
-   f = rand(R, 0:10, 0:1)
+   f = rand(R, -1:10, 0:1)
    @test_throws DomainError reverse(f, -1)
    @test_throws DomainError reverse(f, -rand(2:100))
 
    #  Inexact field
    R, x = PolynomialRing(RealField, "x")
    for iter = 1:300
-      f = rand(R, 0:10, -1:1)
+      f = rand(R, -1:10, -1:1)
       len = rand(length(f):12)
       frev = reverse(f, len)
 
@@ -804,7 +777,7 @@ end
       @test f == reverse(frev, len)
    end
 
-   f = rand(R, 0:10, -1:1)
+   f = rand(R, -1:10, -1:1)
    @test_throws DomainError reverse(f, -1)
    @test_throws DomainError reverse(f, -rand(2:100))
 
@@ -812,7 +785,7 @@ end
    T = ResidueRing(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
-      f = rand(R, 0:10, 0:5)
+      f = rand(R, -1:10, 0:5)
       len = rand(length(f):12)
       frev = reverse(f, len)
 
@@ -828,7 +801,7 @@ end
       @test f == reverse(frev, len)
    end
 
-   f = rand(R, 0:10, 0:5)
+   f = rand(R, -1:10, 0:5)
    @test_throws DomainError reverse(f, -1)
    @test_throws DomainError reverse(f, -rand(2:100))
 end
@@ -837,7 +810,7 @@ end
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:300
-      f = rand(R, 0:10, -10:10)
+      f = rand(R, -1:10, -10:10)
       s = rand(0:10)
       g = s == 0 ? R() : rand(R, 0:s - 1, -10:10)
 
@@ -846,7 +819,7 @@ end
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
 
-   f = rand(R, 0:10, -10:10)
+   f = rand(R, -1:10, -10:10)
    @test_throws DomainError shift_right(f, -1)
    @test_throws DomainError shift_right(f, -rand(2:100))
    @test_throws DomainError shift_left(f, -1)
@@ -858,7 +831,7 @@ end
    a = F(y)
    R, x = PolynomialRing(F, "x")
    for iter = 1:300
-      f = rand(R, 0:10, 0:1)
+      f = rand(R, -1:10, 0:1)
       s = rand(0:10)
       g = s == 0 ? R() : rand(R, 0:s - 1, 0:1)
 
@@ -867,7 +840,7 @@ end
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
 
-   f = rand(R, 0:10, 0:1)
+   f = rand(R, -1:10, 0:1)
    @test_throws DomainError shift_right(f, -1)
    @test_throws DomainError shift_right(f, -rand(2:100))
    @test_throws DomainError shift_left(f, -1)
@@ -876,7 +849,7 @@ end
    # Inexact field
    R, x = PolynomialRing(RealField, "x")
    for iter = 1:300
-      f = rand(R, 0:10, -1:1)
+      f = rand(R, -1:10, -1:1)
       s = rand(0:10)
       g = s == 0 ? R() : rand(R, 0:s - 1, -1:1)
 
@@ -885,7 +858,7 @@ end
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
 
-   f = rand(R, 0:10, -1:1)
+   f = rand(R, -1:10, -1:1)
    @test_throws DomainError shift_right(f, -1)
    @test_throws DomainError shift_right(f, -rand(2:100))
    @test_throws DomainError shift_left(f, -1)
@@ -895,7 +868,7 @@ end
    T = ResidueRing(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
-      f = rand(R, 0:10, 0:5)
+      f = rand(R, -1:10, 0:5)
       s = rand(0:10)
       g = s == 0 ? R() : rand(R, 0:s - 1, 0:5)
 
@@ -904,7 +877,7 @@ end
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
 
-   f = rand(R, 0:10, 0:5)
+   f = rand(R, -1:10, 0:5)
    @test_throws DomainError shift_right(f, -1)
    @test_throws DomainError shift_right(f, -rand(2:100))
    @test_throws DomainError shift_left(f, -1)
@@ -916,8 +889,8 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:10
-      f = rand(R, 0:10, -10:10)
-      r2 = R(1)
+      f = rand(R, -1:10, -10:10)
+      r2 = one(R)
 
       for expn = 0:10
          r1 = f^expn
@@ -928,7 +901,7 @@ end
       end
    end
 
-   f = rand(R, 0:10, -10:10)
+   f = rand(R, -1:10, -10:10)
    @test_throws DomainError f^-1
    @test_throws DomainError f^-rand(2:100)
    @test_throws DomainError pow_multinomial(f, -1)
@@ -941,8 +914,8 @@ end
    R, x = PolynomialRing(F, "x")
 
    for iter = 1:10
-      f = rand(R, 0:10, 0:1)
-      r2 = R(1)
+      f = rand(R, -1:10, 0:1)
+      r2 = one(R)
 
       for expn = 0:10
          r1 = f^expn
@@ -953,7 +926,7 @@ end
       end
    end
 
-   f = rand(R, 0:10, 0:1)
+   f = rand(R, -1:10, 0:1)
    @test_throws DomainError f^-1
    @test_throws DomainError f^-rand(2:100)
    @test_throws DomainError pow_multinomial(f, -1)
@@ -963,8 +936,8 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:10
-      f = rand(R, 0:10, -1:1)
-      r2 = R(1)
+      f = rand(R, -1:10, -1:1)
+      r2 = one(R)
 
       for expn = 0:4 # cannot set high power here
          r1 = f^expn
@@ -975,7 +948,7 @@ end
       end
    end
 
-   f = rand(R, 0:10, -1:1)
+   f = rand(R, -1:10, -1:1)
    @test_throws DomainError f^-1
    @test_throws DomainError f^-rand(2:100)
    @test_throws DomainError pow_multinomial(f, -1)
@@ -988,8 +961,8 @@ end
       Zn = ResidueRing(ZZ, n)
       R, x = PolynomialRing(Zn, "x")
 
-      f = rand(R, 0:10, 0:n - 1)
-      r2 = R(1)
+      f = rand(R, -1:10, 0:n - 1)
+      r2 = one(R)
 
       for expn = 0:10
          r1 = f^expn
@@ -1000,7 +973,7 @@ end
       end
    end
 
-   f = rand(R, 0:10, 0:rand(1:25))
+   f = rand(R, -1:10, 0:rand(1:25))
    @test_throws DomainError f^-1
    @test_throws DomainError f^-rand(2:100)
    @test_throws DomainError pow_multinomial(f, -1)
@@ -1014,21 +987,18 @@ if false
       S, x = PolynomialRing(R, "x")
 
       for iter = 1:100
-         f = rand(S, 0:5, 0:22)
-         g = rand(S, 0:5, 0:22)
-         h = rand(S, 0:5, 0:22)
-         k = S()
-         while k == 0
-            k = rand(S, 0:5, 0:22)
-         end
+         f = rand(S, -1:5, 0:22)
+         g = rand(S, -1:5, 0:22)
+         h = rand(S, -1:5, 0:22)
+         k = rand(S, 0:5, 0:22)
 
          @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
       end
 
       for iter = 1:100
-         f = S()
-         g = S()
-         while f == 0 || g == 0 || gcd(f, g) != 1
+         f = rand(S, 0:5, 0:22)
+         g = rand(S, 0:5, 0:22)
+         while gcd(f, g) != 1
             f = rand(S, 0:5, 0:22)
             g = rand(S, 0:5, 0:22)
          end
@@ -1037,12 +1007,9 @@ if false
       end
 
       for iter = 1:100
-         f = rand(S, 0:5, 0:22)
-         g = S()
-         while g == 0
-            g = rand(S, 0:5, 0:22)
-         end
-         p = mod(S(1), g)
+         f = rand(S, -1:5, 0:22)
+         g = rand(S, 0:5, 0:22)
+         p = mod(one(S), g)
 
          for expn = 0:5
             r = powermod(f, expn, g)
@@ -1060,21 +1027,18 @@ if false
       S, x = PolynomialRing(F, "x")
 
       for iter = 1:100
-         f = rand(S, 0:5, 0:1)
-         g = rand(S, 0:5, 0:1)
-         h = rand(S, 0:5, 0:1)
-         k = S()
-         while k == 0
-            k = rand(S, 0:5, 0:1)
-         end
+         f = rand(S, -1:5, 0:1)
+         g = rand(S, -1:5, 0:1)
+         h = rand(S, -1:5, 0:1)
+         k = rand(S, 0:5, 0:1)
 
          @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
       end
 
       for iter = 1:100
-         f = S()
-         g = S()
-         while f == 0 || g == 0 || gcd(f, g) != 1
+         f = rand(S, 0:5, 0:1)
+         g = rand(S, 0:5, 0:1)
+         while gcd(f, g) != 1
             f = rand(S, 0:5, 0:1)
             g = rand(S, 0:5, 0:1)
          end
@@ -1083,12 +1047,9 @@ if false
       end
 
       for iter = 1:100
-         f = rand(S, 0:5, 0:1)
-         g = S()
-         while g == 0
-            g = rand(S, 0:5, 0:1)
-         end
-         p = mod(S(1), g)
+         f = rand(S, -1:5, 0:1)
+         g = rand(S, 0:5, 0:1)
+         p = mod(one(S), g)
 
          for expn = 0:5
             r = powermod(f, expn, g)
@@ -1103,21 +1064,18 @@ if false
       S, x = PolynomialRing(RealField, "x")
 
       for iter = 1:100
-         f = rand(S, 0:5, -1:1)
-         g = rand(S, 0:5, -1:1)
-         h = rand(S, 0:5, -1:1)
-         k = R()
-         while k == 0
-            k = rand(S, 0:5, -1:1)
-         end
+         f = rand(S, -1:5, -1:1)
+         g = rand(S, -1:5, -1:1)
+         h = rand(S, -1:5, -1:1)
+         k = rand(S, 0:5, -1:1)
 
          @test isapprox(mulmod(mulmod(f, g, k), h, k), mulmod(f, mulmod(g, h, k), k))
       end
 
       for iter = 1:100
-         f = S()
-         g = S()
-         while f == 0 || g == 0 || gcd(f, g) != 1
+         f = rand(S, 0:5, -1:1)
+         g = rand(S, 0:5, -1:1)
+         while gcd(f, g) != 1
             f = rand(S, 0:5, -1:1)
             g = rand(S, 0:5, -1:1)
          end
@@ -1126,12 +1084,9 @@ if false
       end
 
       for iter = 1:100
-         f = rand(S, 0:5, -1:1)
-         g = S()
-         while g == 0
-            g = rand(S, 0:5, -1:1)
-         end
-         p = mod(S(1), g)
+         f = rand(S, -1:5, -1:1)
+         g = rand(S, 0:5, -1:1)
+         p = mod(one(S), g)
 
          for expn = 0:5
             r = powermod(f, expn, g)
@@ -1146,21 +1101,19 @@ if false
       R, x = PolynomialRing(QQ, "y")
 
       for iter = 1:10
-         f = rand(R, 0:5, -10:10)
-         g = rand(R, 0:5, -10:10)
-         h = rand(R, 0:5, -10:10)
-         k = R()
-         while k == 0
-            k = rand(R, 0:5, -10:10)
-         end
+         f = rand(R, -1:5, -10:10)
+         g = rand(R, -1:5, -10:10)
+         h = rand(R, -1:5, -10:10)
+         k = rand(R, 0:5, -10:10)
 
          @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
       end
 
       for iter = 1:10
-         f = R()
-         g = R()
-         while f == 0 || g == 0 || gcd(f, g) != 1
+         f = rand(R, 0:5, -10:10)
+         g = rand(R, 0:5, -10:10)
+
+         while gcd(f, g) != 1
             f = rand(R, 0:5, -10:10)
             g = rand(R, 0:5, -10:10)
          end
@@ -1169,12 +1122,9 @@ if false
       end
 
       for iter = 1:10
-         f = rand(R, 0:5, -10:10)
-         g = R()
-         while g == 0
-            g = rand(R, 0:5, -10:10)
-         end
-         p = mod(R(1), g)
+         f = rand(R, -1:5, -10:10)
+         g = rand(R, 0:5, -10:10)
+         p = mod(one(R), g)
 
          for expn = 0:5
             r = powermod(f, expn, g)
@@ -1192,11 +1142,8 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:100
-      f = rand(R, 0:10, -100:100)
-      g = R()
-      while g == 0
-         g = rand(R, 0:10, -100:100)
-      end
+      f = rand(R, -1:10, -100:100)
+      g = rand(R, 0:10, -100:100)
 
       @test divexact(f*g, g) == f
    end
@@ -1210,11 +1157,8 @@ end
    R, x = PolynomialRing(F, "x")
 
    for iter = 1:100
-      f = rand(R, 0:10, 0:1)
-      g = R()
-      while g == 0
-         g = rand(R, 0:10, 0:1)
-      end
+      f = rand(R, -1:10, 0:1)
+      g = rand(R, 0:10, 0:1)
 
       @test divexact(f*g, g) == f
    end
@@ -1223,11 +1167,8 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:100
-      f = rand(R, 0:10, -1:1)
-      g = R()
-      while g == 0
-         g = rand(R, 0:10, -1:1)
-      end
+      f = rand(R, -1:10, -1:1)
+      g = rand(R, 0:10, -1:1)
 
       @test isapprox(divexact(f*g, g), f)
    end
@@ -1238,11 +1179,8 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter = 1:100
-      f = rand(R, 0:10, 0:n - 1)
-      g = R()
-      while g == 0
-         g = rand(R, 0:10, 0:n - 1)
-      end
+      f = rand(R, -1:10, 0:n - 1)
+      g = rand(R, 0:10, 0:n - 1)
 
       @test divexact(f*g, g) == f
    end
@@ -1253,7 +1191,7 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:100
-      f = rand(R, 0:10, -100:100)
+      f = rand(R, -1:10, -100:100)
       g = ZZ()
       while g == 0
          g = rand(ZZ, -10:10)
@@ -1278,7 +1216,7 @@ end
    R, x = PolynomialRing(F, "x")
 
    for iter = 1:100
-      f = rand(R, 0:10, 0:1)
+      f = rand(R, -1:10, 0:1)
       g = ZZ()
       while g == 0
          g = rand(ZZ, 1:6)
@@ -1298,7 +1236,7 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:100
-      f = rand(R, 0:10, -1:1)
+      f = rand(R, -1:10, -1:1)
       g = ZZ()
       while g == 0
          g = rand(RealField, -1:1)
@@ -1320,7 +1258,7 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter = 1:100
-      f = rand(R, 0:10, 0:22)
+      f = rand(R, -1:10, 0:22)
       g = rand(Zn, 1:22)
 
       @test divexact(f*g, g) == f
@@ -1338,11 +1276,8 @@ end
    S, y = PolynomialRing(R, "y")
 
    for iter = 1:100
-      f = rand(S, 0:10, 0:10, -100:100)
-      g = R()
-      while g == 0
-         g = rand(R, 0:10, -100:100)
-      end
+      f = rand(S, -1:10, 0:10, -100:100)
+      g = rand(R, 0:10, -100:100)
 
       @test divexact(f*g, g) == f
 
@@ -1361,22 +1296,16 @@ end
    S, x = PolynomialRing(R, "x")
 
    for iter = 1:100
-      f = rand(S, 0:5, 0:22)
-      g = rand(S, 0:5, 0:22)
-      h = S()
-      while h == 0
-         h = rand(S, 0:5, 0:22)
-      end
+      f = rand(S, -1:5, 0:22)
+      g = rand(S, -1:5, 0:22)
+      h = rand(S, 0:5, 0:22)
 
       @test mod(f + g, h) == mod(f, h) + mod(g, h)
    end
 
    for iter = 1:10
-      f = rand(S, 0:5, 0:22)
-      g = S()
-      while g == 0
-         g = rand(S, 0:5, 0:22)
-      end
+      f = rand(S, -1:5, 0:22)
+      g = rand(S, 0:5, 0:22)
 
       q, r = divrem(f, g)
       @test q*g + r == f
@@ -1391,22 +1320,16 @@ end
    S, x = PolynomialRing(F, "x")
 
    for iter = 1:100
-      f = rand(S, 0:5, 0:1)
-      g = rand(S, 0:5, 0:1)
-      h = S()
-      while h == 0
-         h = rand(S, 0:5, 0:1)
-      end
+      f = rand(S, -1:5, 0:1)
+      g = rand(S, -1:5, 0:1)
+      h = rand(S, 0:5, 0:1)
 
       @test mod(f + g, h) == mod(f, h) + mod(g, h)
    end
 
    for iter = 1:10
-      f = rand(S, 0:5, 0:1)
-      g = S()
-      while g == 0
-         g = rand(S, 0:5, 0:1)
-      end
+      f = rand(S, -1:5, 0:1)
+      g = rand(S, 0:5, 0:1)
 
       q, r = divrem(f, g)
       @test q*g + r == f
@@ -1418,22 +1341,16 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:100
-      f = rand(R, 0:5, -1:1)
-      g = rand(R, 0:5, -1:1)
-      h = R()
-      while h == 0
-         h = rand(R, 0:5, -1:1)
-      end
+      f = rand(R, -1:5, -1:1)
+      g = rand(R, -1:5, -1:1)
+      h = rand(R, 0:5, -1:1)
 
       @test isapprox(mod(f + g, h), mod(f, h) + mod(g, h))
    end
 
    for iter = 1:10
-      f = rand(R, 0:5, -1:1)
-      g = R()
-      while g == 0
-         g = rand(R, 0:5, -1:1)
-      end
+      f = rand(R, -1:5, -1:1)
+      g = rand(R, 0:5, -1:1)
 
       q, r = divrem(f, g)
       @test isapprox(q*g + r, f)
@@ -1445,22 +1362,16 @@ end
    R, x = PolynomialRing(QQ, "x")
 
    for iter = 1:100
-      f = rand(R, 0:5, -10:10)
-      g = rand(R, 0:5, -10:10)
-      h = R()
-      while h == 0
-         h = rand(R, 0:5, -10:10)
-      end
+      f = rand(R, -1:5, -10:10)
+      g = rand(R, -1:5, -10:10)
+      h = rand(R, 0:5, -10:10)
 
       @test mod(f + g, h) == mod(f, h) + mod(g, h)
    end
 
    for iter = 1:10
-      f = rand(R, 0:5, -10:10)
-      g = R()
-      while g == 0
-         g = rand(R, 0:5, -10:10)
-      end
+      f = rand(R, -1:5, -10:10)
+      g = rand(R, 0:5, -10:10)
 
       q, r = divrem(f, g)
       @test q*g + r == f
@@ -1474,7 +1385,7 @@ end
    R, x = PolynomialRing(QQ, "x")
 
    for iter = 1:100
-      f = rand(R, 0:5, -10:10)
+      f = rand(R, -1:5, -10:10)
       c = QQ()
       while iszero(c)
          c = rand(QQ, -10:10)
@@ -1487,7 +1398,7 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:100
-      f = rand(R, 0:5, -1:1)
+      f = rand(R, -1:5, -1:1)
       c = RealField()
       while isapprox(c, RealField())
          c = rand(RealField, -1:1)
@@ -1501,7 +1412,7 @@ end
    R, x = PolynomialRing(S, "x")
 
    for iter = 1:100
-      f = rand(R, 0:5, 0:22)
+      f = rand(R, -1:5, 0:22)
       c = R()
       while iszero(c)
          c = rand(S, 0:22)
@@ -1516,11 +1427,8 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:100
-      f = rand(R, 0:5, -10:10)
-      g = R()
-      while g == 0
-         g = rand(R, 0:5, -10:10)
-      end
+      f = rand(R, -1:5, -10:10)
+      g = rand(R, 0:5, -10:10)
 
       q, r = pseudodivrem(f, g)
 
@@ -1538,11 +1446,8 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter = 1:100
-      f = rand(R, 0:5, 0:22)
-      g = R()
-      while g == 0
-         g = rand(R, 0:5, 0:22)
-      end
+      f = rand(R, -1:5, 0:22)
+      g = rand(R, 0:5, 0:22)
 
       q, r = pseudodivrem(f, g)
 
@@ -1561,7 +1466,7 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:100
-      f = rand(R, 0:10, -10:10)
+      f = rand(R, -1:10, -10:10)
 
       g = R()
       while g == 0
@@ -1574,12 +1479,9 @@ end
    end
 
    for iter = 1:20
-      f = rand(R, 0:10, -10:10)
-      g = rand(R, 0:10, -10:10)
-      h = R()
-      while h == 0
-         h = rand(R, 0:10, -10:10)
-      end
+      f = rand(R, -1:10, -10:10)
+      g = rand(R, -1:10, -10:10)
+      h = rand(R, 0:10, -10:10)
 
       @test gcd(f*h, g*h) == divexact(h, canonical_unit(leading_coefficient(h)))*gcd(f, g)
 
@@ -1590,7 +1492,7 @@ end
    R, x = PolynomialRing(QQ, "x")
 
    for iter = 1:100
-      f = rand(R, 0:5, -10:10)
+      f = rand(R, -1:5, -10:10)
 
       g = QQ()
       while g == 0
@@ -1603,20 +1505,17 @@ end
    end
 
    for iter = 1:20
-      f = rand(R, 0:5, -10:10)
-      g = rand(R, 0:5, -10:10)
-      h = R()
-      while h == 0
-         h = rand(R, 0:5, -10:10)
-      end
+      f = rand(R, -1:5, -10:10)
+      g = rand(R, -1:5, -10:10)
+      h = rand(R, 0:5, -10:10)
 
       @test gcd(f*h, g*h) == inv(leading_coefficient(h))*h*gcd(f, g)
    end
 
    for iter = 1:10
-      f = R()
-      g = R()
-      while f == 0 || g == 0 || gcd(f, g) != 1
+      f = rand(R, 0:5, -10:10)
+      g = rand(R, 0:5, -10:10)
+      while gcd(f, g) != 1
          f = rand(R, 0:5, -10:10)
          g = rand(R, 0:5, -10:10)
       end
@@ -1633,7 +1532,7 @@ end
    S, x = PolynomialRing(R, "x")
 
    for iter = 1:100
-      f = rand(S, 0:10, 0:22)
+      f = rand(S, -1:10, 0:22)
       g = rand(R, 1:22)
 
       @test content(f*g) == divexact(g, canonical_unit(g))*content(f)
@@ -1642,9 +1541,9 @@ end
    end
 
    for iter = 1:100
-      f = S()
-      g = S()
-      while f == 0 || g == 0 || gcd(f, g) != 1
+      f = rand(S, 0:5, 0:22)
+      g = rand(S, 0:5, 0:22)
+      while gcd(f, g) != 1
          f = rand(S, 0:5, 0:22)
          g = rand(S, 0:5, 0:22)
       end
@@ -1661,7 +1560,7 @@ end
    S, x = PolynomialRing(R, "x")
 
    for iter = 1:100
-      f = rand(S, 0:10)
+      f = rand(S, -1:10)
       g = R()
       while g == 0
          g = rand(R)
@@ -1673,9 +1572,9 @@ end
    end
 
    for iter = 1:100
-      f = S()
-      g = S()
-      while f == 0 || g == 0 || gcd(f, g) != 1
+      f = rand(S, 0:5)
+      g = rand(S, 0:5)
+      while gcd(f, g) != 1
          f = rand(S, 0:5)
          g = rand(S, 0:5)
       end
@@ -1693,8 +1592,8 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
-      f = rand(R, 0:4, -10:10)
-      g = rand(R, 0:4, -10:10)
+      f = rand(R, -1:4, -10:10)
+      g = rand(R, -1:4, -10:10)
 
       d = rand(ZZ, -10:10)
 
@@ -1702,8 +1601,8 @@ end
    end
 
    for iter in 1:10
-      f = rand(R, 0:4, -10:10)
-      g = rand(R, 0:4, -10:10)
+      f = rand(R, -1:4, -10:10)
+      g = rand(R, -1:4, -10:10)
 
       d = rand(-10:10)
 
@@ -1714,8 +1613,8 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
-      f = rand(R, 0:4, 0:1)
-      g = rand(R, 0:4, 0:1)
+      f = rand(R, -1:4, 0:1)
+      g = rand(R, -1:4, 0:1)
 
       d = rand(RealField, 0:1)
 
@@ -1723,8 +1622,8 @@ end
    end
 
    for iter in 1:10
-      f = rand(R, 0:4, 0:1)
-      g = rand(R, 0:4, 0:1)
+      f = rand(R, -1:4, 0:1)
+      g = rand(R, -1:4, 0:1)
 
       d = rand(-10:10)
 
@@ -1736,8 +1635,8 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
-      f = rand(R, 0:4, 0:22)
-      g = rand(R, 0:4, 0:22)
+      f = rand(R, -1:4, 0:22)
+      g = rand(R, -1:4, 0:22)
 
       d = rand(Zn, 0:22)
 
@@ -1745,8 +1644,8 @@ end
    end
 
    for iter in 1:10
-      f = rand(R, 0:4, 0:22)
-      g = rand(R, 0:4, 0:22)
+      f = rand(R, -1:4, 0:22)
+      g = rand(R, -1:4, 0:22)
 
       d = rand(-100:100)
 
@@ -1759,9 +1658,9 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
-      f = rand(R, 0:5, -10:10)
-      g = rand(R, 0:5, -10:10)
-      h = rand(R, 0:5, -10:10)
+      f = rand(R, -1:5, -10:10)
+      g = rand(R, -1:5, -10:10)
+      h = rand(R, -1:5, -10:10)
 
       @test compose(f, compose(g, h)) == compose(compose(f, g), h)
    end
@@ -1770,9 +1669,9 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
-      f = rand(R, 0:5, 0:1)
-      g = rand(R, 0:5, 0:1)
-      h = rand(R, 0:5, 0:1)
+      f = rand(R, -1:5, 0:1)
+      g = rand(R, -1:5, 0:1)
+      h = rand(R, -1:5, 0:1)
 
       @test isapprox(compose(f, compose(g, h)), compose(compose(f, g), h))
    end
@@ -1782,9 +1681,9 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
-      f = rand(R, 0:5, 0:5)
-      g = rand(R, 0:5, 0:5)
-      h = rand(R, 0:5, 0:5)
+      f = rand(R, -1:5, 0:5)
+      g = rand(R, -1:5, 0:5)
+      h = rand(R, -1:5, 0:5)
 
       @test compose(f, compose(g, h)) == compose(compose(f, g), h)
    end
@@ -1795,8 +1694,8 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
-      f = rand(R, 0:4, -100:100)
-      g = rand(R, 0:4, -100:100)
+      f = rand(R, -1:4, -100:100)
+      g = rand(R, -1:4, -100:100)
 
       @test derivative(f + g) == derivative(g) + derivative(f)
 
@@ -1807,8 +1706,8 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
-      f = rand(R, 0:4, 0:1)
-      g = rand(R, 0:4, 0:1)
+      f = rand(R, -1:4, 0:1)
+      g = rand(R, -1:4, 0:1)
 
       @test isapprox(derivative(f + g), derivative(g) + derivative(f))
 
@@ -1820,8 +1719,8 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
-      f = rand(R, 0:4, 0:5)
-      g = rand(R, 0:4, 0:5)
+      f = rand(R, -1:4, 0:5)
+      g = rand(R, -1:4, 0:5)
 
       @test derivative(f + g) == derivative(g) + derivative(f)
 
@@ -1834,11 +1733,11 @@ end
    R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:10
-      f = rand(R, 0:10, -100:100)
+      f = rand(R, -1:10, -100:100)
 
       @test derivative(integral(f)) == f
 
-      g = rand(R, 0:2, -100:100)
+      g = rand(R, -1:2, -100:100)
 
       @test integral(f + g) == integral(g) + integral(f)
       @test integral(f)*integral(g) == integral(integral(f)*g + integral(g)*f)
@@ -1849,11 +1748,11 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
-      f = rand(R, 0:10, 0:22)
+      f = rand(R, -1:10, 0:22)
 
       @test derivative(integral(f)) == f
 
-      g = rand(R, 0:10, 0:22)
+      g = rand(R, -1:10, 0:22)
 
       @test integral(f + g) == integral(g) + integral(f)
       @test integral(f)*integral(g) == integral(integral(f)*g + integral(g)*f)
@@ -1863,11 +1762,11 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
-      f = rand(R, 0:10, 0:1)
+      f = rand(R, -1:10, 0:1)
 
       @test isapprox(derivative(integral(f)), f)
 
-      g = rand(R, 0:10, 0:1)
+      g = rand(R, -1:10, 0:1)
 
       @test isapprox(integral(f + g), integral(g) + integral(f))
       @test isapprox(integral(f)*integral(g), integral(integral(f)*g + integral(g)*f))
@@ -1880,10 +1779,6 @@ end
    for iter in 1:10
       f = rand(R, 1:5, -10:10)
       g = rand(R, 1:5, -10:10)
-      while degree(f) <= 0 || degree(g) <= 0
-         f = rand(R, 1:5, -10:10)
-         g = rand(R, 1:5, -10:10)
-      end
 
       d1 = degree(f)
       d2 = degree(g)
@@ -1907,9 +1802,9 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
-      f = rand(R, 0:5, -10:10)
-      g = rand(R, 0:5, -10:10)
-      h = rand(R, 0:5, -10:10)
+      f = rand(R, -1:5, -10:10)
+      g = rand(R, -1:5, -10:10)
+      h = rand(R, -1:5, -10:10)
 
       @test resultant(f*g, h) == resultant(f, h) * resultant(g, h)
       @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
@@ -1922,9 +1817,9 @@ end
    R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:10
-      f = rand(R, 0:5, -10:10)
-      g = rand(R, 0:5, -10:10)
-      h = rand(R, 0:5, -10:10)
+      f = rand(R, -1:5, -10:10)
+      g = rand(R, -1:5, -10:10)
+      h = rand(R, -1:5, -10:10)
 
       @test resultant(f*g, h) == resultant(f, h) * resultant(g, h)
       @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
@@ -1939,9 +1834,9 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
-      f = rand(R, 0:5, 0:22)
-      g = rand(R, 0:5, 0:22)
-      h = rand(R, 0:5, 0:22)
+      f = rand(R, -1:5, 0:22)
+      g = rand(R, -1:5, 0:22)
+      h = rand(R, -1:5, 0:22)
 
       @test resultant(f*g, h) == resultant(f, h)*resultant(g, h)
       @test resultant(f, g*h) == resultant(f, g)*resultant(f, h)
@@ -1954,9 +1849,9 @@ end
    R, x = PolynomialRing(GF(23), "x")
 
    for iter in 1:10
-      f = rand(R, 0:5)
-      g = rand(R, 0:5)
-      h = rand(R, 0:5)
+      f = rand(R, -1:5)
+      g = rand(R, -1:5)
+      h = rand(R, -1:5)
 
       @test resultant(f*g, h) == resultant(f, h)*resultant(g, h)
       @test resultant(f, g*h) == resultant(f, g)*resultant(f, h)
@@ -1969,9 +1864,9 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
-      f = rand(R, 0:5, 0:1)
-      g = rand(R, 0:5, 0:1)
-      h = rand(R, 0:5, 0:1)
+      f = rand(R, -1:5, 0:1)
+      g = rand(R, -1:5, 0:1)
+      h = rand(R, -1:5, 0:1)
 
       @test isapprox(resultant(f*g, h), resultant(f, h)*resultant(g, h))
       @test isapprox(resultant(f, g*h), resultant(f, g)*resultant(f, h))
@@ -1984,9 +1879,9 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
-      f = rand(R, 0:5, 0:5)
-      g = rand(R, 0:5, 0:5)
-      h = rand(R, 0:5, 0:5)
+      f = rand(R, -1:5, 0:5)
+      g = rand(R, -1:5, 0:5)
+      h = rand(R, -1:5, 0:5)
 
       @test leading_coefficient(f)*leading_coefficient(g) == 0 ||
             resultant(f*g, h) == resultant(f, h)*resultant(g, h)
@@ -2000,12 +1895,8 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:100
-      f = R()
-      g = R()
-      while length(f) < 2 || length(g) < 2
-         f = rand(R, 1:5, -10:10)
-         g = rand(R, 1:5, -10:10)
-      end
+      f = rand(R, 1:5, -10:10)
+      g = rand(R, 1:5, -10:10)
 
       # See http://www2.math.uu.se/~svante/papers/sjN5.pdf 3.10
       # The identity on Wikipedia is incorrect as of 07.10.2017
@@ -2016,12 +1907,8 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:100
-      f = R()
-      g = R()
-      while length(f) < 2 || length(g) < 2
-         f = rand(R, 0:10, 0:1)
-         g = rand(R, 0:10, 0:1)
-      end
+      f = rand(R, 1:10, 0:1)
+      g = rand(R, 1:10, 0:1)
 
       # See http://www2.math.uu.se/~svante/papers/sjN5.pdf 3.10
       # The identity on Wikipedia is incorrect as of 07.10.2017
@@ -2052,18 +1939,14 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:100
-      f = R()
-      g = R()
-      while length(f) <= 1 && length(g) <= 1
-         f = rand(R, 0:5, -10:10)
-         g = rand(R, 0:5, -10:10)
-      end
+      f = rand(R, 1:5, -10:10)
+      g = rand(R, 1:5, -10:10)
       r, u, v = resx(f, g)
 
       @test u*f + v*g == r
       @test r == resultant(f, g)
 
-      h = rand(R, 0:5, -10:10)
+      h = rand(R, -1:5, -10:10)
       r, u, v = resx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
@@ -2073,18 +1956,14 @@ end
    R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:100
-      f = R()
-      g = R()
-      while length(f) <= 1 && length(g) <= 1
-         f = rand(R, 0:5, -10:10)
-         g = rand(R, 0:5, -10:10)
-      end
+      f = rand(R, 1:5, -10:10)
+      g = rand(R, 1:5, -10:10)
       r, u, v = resx(f, g)
 
       @test u*f + v*g == r
       @test r == resultant(f, g)
 
-      h = rand(R, 0:5, -10:10)
+      h = rand(R, -1:5, -10:10)
       r, u, v = resx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
@@ -2094,18 +1973,14 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:100
-      f = R()
-      g = R()
-      while length(f) <= 1 && length(g) <= 1
-         f = rand(R, 0:5, 0:1)
-         g = rand(R, 0:5, 0:1)
-      end
+      f = rand(R, 1:5, 0:1)
+      g = rand(R, 1:5, 0:1)
       r, u, v = resx(f, g)
 
       @test isapprox(u*f + v*g, r)
       @test isapprox(r, resultant(f, g))
 
-      h = rand(R, 0:5, 0:1)
+      h = rand(R, -1:5, 0:1)
       r, u, v = resx(f*h, g*h)
 
       @test isapprox((u*f + v*g)*h, r)
@@ -2116,12 +1991,8 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:100
-      f = R()
-      g = R()
-      while length(f) <= 1 && length(g) <= 1
-         f = rand(R, 0:5, 0:22)
-         g = rand(R, 0:5, 0:22)
-      end
+      f = rand(R, 1:5, 0:22)
+      g = rand(R, 1:5, 0:22)
       r, u, v = resx(f, g)
 
       @test u*f + v*g == r
@@ -2137,18 +2008,14 @@ end
    R, x = PolynomialRing(GF(23), "x")
 
    for iter in 1:100
-      f = R()
-      g = R()
-      while length(f) <= 1 && length(g) <= 1
-         f = rand(R, 0:5)
-         g = rand(R, 0:5)
-      end
+      f = rand(R, 1:5)
+      g = rand(R, 1:5)
       r, u, v = resx(f, g)
 
       @test u*f + v*g == r
       @test r == resultant(f, g)
 
-      h = rand(R, 0:5)
+      h = rand(R, -1:5)
       r, u, v = resx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
@@ -2186,19 +2053,15 @@ end
    R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:100
-      f = R()
-      g = R()
-      while length(f) <= 1 && length(g) <= 1
-         f = rand(R, 0:5, -10:10)
-         g = rand(R, 0:5, -10:10)
-      end
+      f = rand(R, 1:5, -10:10)
+      g = rand(R, 1:5, -10:10)
       r, u, v = gcdx(f, g)
 
       @test u*f + v*g == r
       @test r == gcd(f, g)
 
       h = R()
-      h = rand(R, 0:5, -10:10)
+      h = rand(R, -1:5, -10:10)
       r, u, v = gcdx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
@@ -2209,18 +2072,14 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:100
-      f = R()
-      g = R()
-      while length(f) <= 1 && length(g) <= 1
-         f = rand(R, 0:5, 0:22)
-         g = rand(R, 0:5, 0:22)
-      end
+      f = rand(R, 1:5, 0:22)
+      g = rand(R, 1:5, 0:22)
       r, u, v = gcdx(f, g)
 
       @test u*f + v*g == r
       @test r == gcd(f, g)
 
-      h = rand(R, 0:5, 0:22)
+      h = rand(R, -1:5, 0:22)
       r, u, v = gcdx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
@@ -2230,18 +2089,14 @@ end
    R, x = PolynomialRing(GF(23), "x")
 
    for iter in 1:100
-      f = R()
-      g = R()
-      while length(f) <= 1 && length(g) <= 1
-         f = rand(R, 0:5)
-         g = rand(R, 0:5)
-      end
+      f = rand(R, 1:5)
+      g = rand(R, 1:5)
       r, u, v = gcdx(f, g)
 
       @test u*f + v*g == r
       @test r == gcd(f, g)
 
-      h = rand(R, 0:5)
+      h = rand(R, -1:5)
       r, u, v = gcdx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
@@ -2254,18 +2109,14 @@ end
    R, x = PolynomialRing(F, "x")
 
    for iter in 1:100
-      f = R()
-      g = R()
-      while length(f) <= 1 && length(g) <= 1
-         f = rand(R, 0:5, 0:1)
-         g = rand(R, 0:5, 0:1)
-      end
+      f = rand(R, 1:5, 0:1)
+      g = rand(R, 1:5, 0:1)
       r, u, v = gcdx(f, g)
 
       @test u*f + v*g == r
       @test r == gcd(f, g)
 
-      h = rand(R, 0:5, 0:1)
+      h = rand(R, -1:5, 0:1)
       r, u, v = gcdx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
@@ -2277,7 +2128,7 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
-      f = rand(R, 0:10, -100:100)
+      f = rand(R, -1:10, -100:100)
 
       g = deepcopy(f)
       roots = BigInt[rand(ZZ, -10:10) for i in 1:length(f)]
@@ -2291,7 +2142,7 @@ end
    R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:10
-      f = rand(R, 0:10, -100:100)
+      f = rand(R, -1:10, -100:100)
 
       g = deepcopy(f)
       roots = Rational{BigInt}[rand(QQ, -10:10) for i in 1:length(f)]
@@ -2305,7 +2156,7 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
-      f = rand(R, 0:10, 0:1)
+      f = rand(R, -1:10, 0:1)
 
       g = deepcopy(f)
       roots = BigFloat[rand(RealField, 0:1) for i in 1:length(f)]
@@ -2320,7 +2171,7 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
-      f = rand(R, 0:10, 0:22)
+      f = rand(R, -1:10, 0:22)
 
       g = deepcopy(f)
       roots = elem_type(Zn)[rand(Zn, 0:22) for i in 1:length(f)]
@@ -2335,7 +2186,7 @@ end
    R, x = PolynomialRing(K, "x")
 
    for iter in 1:10
-      f = rand(R, 0:10)
+      f = rand(R, -1:10)
 
       g = deepcopy(f)
       roots = elem_type(K)[rand(K) for i in 1:length(f)]
@@ -2350,7 +2201,7 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
-      f = rand(R, 0:10, 0:5)
+      f = rand(R, -1:10, 0:5)
 
       g = deepcopy(f)
       roots = elem_type(Zn)[rand(Zn, 0:5) for i in 1:length(f)]
@@ -2366,10 +2217,7 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
-      p = R()
-      while p == 0
-         p = rand(R, 0:10, -10:10)
-      end
+      p = rand(R, 0:10, -10:10)
 
       xs = BigInt[i for i in 1:length(p)]
       ys = [p(i) for i in 1:length(p)]
@@ -2383,10 +2231,7 @@ end
    R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:10
-      p = R()
-      while p == 0
-         p = rand(R, 0:10, -10:10)
-      end
+      p = rand(R, 0:10, -10:10)
 
       xs = Rational{BigInt}[i for i in 1:length(p)]
       ys = [p(i) for i in 1:length(p)]
@@ -2400,10 +2245,7 @@ end
    R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
-      p = R()
-      while p == 0
-         p = rand(R, 0:10, 0:1)
-      end
+      p = rand(R, 0:10, 0:1)
 
       xs = BigFloat[i for i in 1:length(p)]
       ys = [p(i) for i in 1:length(p)]
@@ -2418,10 +2260,7 @@ end
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
-      p = R()
-      while p == 0
-         p = rand(R, 0:10, 0:22)
-      end
+      p = rand(R, 0:10, 0:22)
 
       xs = elem_type(Zn)[Zn(i) for i in 1:length(p)]
       ys = [p(i) for i in 1:length(p)]
@@ -2436,10 +2275,7 @@ end
    R, x = PolynomialRing(K, "x")
 
    for iter in 1:10
-      p = R()
-      while p == 0
-         p = rand(R, 0:10)
-      end
+      p = rand(R, 0:10)
 
       xs = elem_type(K)[K(i) for i in 1:length(p)]
       ys = [p(i) for i in 1:length(p)]
@@ -2629,10 +2465,9 @@ end
       f = R()
       g = R()
       while d
-         f = R()
-         g = R()
-         while iszero(f) || iszero(g) || isunit(g)
-           f = rand(R, 0:10, -10:10)
+         f = rand(R, 0:10, -10:10)
+         g = rand(R, 0:10, -10:10)
+         while isunit(g)
            g = rand(R, 0:10, -10:10)
          end
 
@@ -2675,10 +2510,9 @@ end
       f = R()
       g = R()
       while d
-         f = R()
-         g = R()
-         while f == 0 || g == 0 || isunit(g)
-            f = rand(R, 0:10, -10:10)
+         f = rand(R, 0:10, -10:10)
+         g = rand(R, 0:10, -10:10)
+         while isunit(g)
             g = rand(R, 0:10, -10:10)
          end
 
@@ -2714,9 +2548,9 @@ end
       f = R()
       g = R()
       while d
-         f = R()
-         g = R()
-         while f == 0 || g == 0 || isunit(g)
+         f = rand(R, 0:10, 0:22)
+         g = rand(R, 0:10, 0:22)
+         while isunit(g)
             f = rand(R, 0:10, 0:22)
             g = rand(R, 0:10, 0:22)
          end
@@ -2752,10 +2586,9 @@ end
       f = R()
       g = R()
       while d
-         f = R()
-         g = R()
-         while f == 0 || g == 0 || isunit(g)
-            f = rand(R, 0:10)
+         f = rand(R, 0:10)
+         g = rand(R, 0:10)
+         while isunit(g)
             g = rand(R, 0:10)
          end
 
@@ -2787,7 +2620,7 @@ end
    # Exact ring
    S, x = PolynomialRing(ZZ, "x")
    for iter = 1:10
-      f = rand(S, 0:20, -20:20)
+      f = rand(S, -1:20, -20:20)
 
       p = f^2
 
@@ -2809,7 +2642,7 @@ end
    # Exact field
    S, x = PolynomialRing(QQ, "x")
    for iter = 1:10
-      f = rand(S, 0:20, -20:20)
+      f = rand(S, -1:20, -20:20)
 
       p = f^2
 
@@ -2835,7 +2668,7 @@ end
       S, x = PolynomialRing(R, "x")
 
       for iter = 1:10
-         f = rand(S, 0:20, 0:Int(p))
+         f = rand(S, -1:20, 0:Int(p))
 
          s = f^2
 
@@ -2860,9 +2693,9 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
-      f = rand(R, 0:2, -100:100)
-      g = rand(R, 0:2, -100:100)
-      h = rand(R, 0:2, -100:100)
+      f = rand(R, -1:2, -100:100)
+      g = rand(R, -1:2, -100:100)
+      h = rand(R, -1:2, -100:100)
 
       @test f(g(h)) == f(g)(h)
    end
@@ -2872,7 +2705,7 @@ end
    f = x
    b = a = QQ(13)
    for i in 1:5
-      g = x^2 + rand(R, 0:1, -1:1)
+      g = x^2 + rand(R, -1:1, -1:1)
       f = g(f)
       b = g(b)
 
