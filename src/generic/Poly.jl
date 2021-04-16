@@ -332,7 +332,8 @@ function _similar(x::PolyElem{T}, R::Ring, len::Int, var::Symbol; cached::Bool) 
    TT = elem_type(R)
    V = Vector{TT}(undef, len)
    p = Poly{TT}(V)
-   p.parent = AbstractAlgebra.PolynomialRing(R, string(var); cached=cached)[1]
+   p.parent = base_ring(x) == R && parent(x).S == var ? parent(x) :
+              AbstractAlgebra.PolynomialRing(R, string(var); cached=cached)[1]
    p = set_length!(p, 0)
    return p
 end
@@ -365,7 +366,7 @@ function polynomial(R::Ring, arr::Vector{T}, var::AbstractString="x"; cached::Bo
    return S(coeffs)
 end
 
-function _zero(p::PolyElem, R::Ring, len::Int, var::AbstractString="x"; cached::Bool=true) where T <: RingElement
+function _zero(p::PolyElem, R::Ring, len::Int, var::AbstractString="x"; cached::Bool) where T <: RingElement
    p = similar(p, R, len, Symbol(var); cached=cached)
    for i = 1:len
       p = setcoeff!(p, i - 1, R())
