@@ -98,7 +98,7 @@ function setcoeff!(c::Poly{T}, n::Int, a::T) where {T <: RingElement}
 end
 
 function normalise(a::Poly, n::Int)
-   while n > 0 && iszero(a.coeffs[n])
+   while n > 0 && (!isassigned(a.coeffs, n) || iszero(a.coeffs[n]))
       n -= 1
    end
    return n
@@ -312,7 +312,7 @@ end
 #
 #   Deepcopy
 #
-################################################################################
+###############################################################################
 
 function deepcopy_internal(a::Poly{T}, dict::IdDict) where {T <: RingElement}
    coeffs = Array{T}(undef, length(a))
@@ -322,11 +322,74 @@ function deepcopy_internal(a::Poly{T}, dict::IdDict) where {T <: RingElement}
    return parent(a)(coeffs)
 end
 
-################################################################################
+###############################################################################
+#
+#   Similar
+#
+###############################################################################
+
+function _similar(x::PolyElem{T}, R::Ring, len::Int, var::Symbol; cached::Bool) where T <: RingElement
+   TT = elem_type(R)
+   V = Vector{TT}(undef, len)
+   p = Poly{TT}(V)
+   p.parent = AbstractAlgebra.PolynomialRing(R, string(var); cached=cached)[1]
+   p = set_length!(p, 0)
+   return p
+end
+
+function similar(x::PolyElem, R::Ring, len::Int, var::Symbol=parent(x).S; cached::Bool=true)
+   return _similar(x, R, len, var; cached=cached)
+end
+
+function similar(x::PolyElem, R::Ring, var::Symbol=parent(x).S; cached::Bool=true)
+   return _similar(x, R, length(x), var; cached=cached)
+end
+
+function similar(x::PolyElem, len::Int, var::Symbol=parent(x).S; cached::Bool=true)
+   return _similar(x, base_ring(x), len, var; cached=cached)
+end
+
+function similar(x::PolyElem, var::Symbol=parent(x).S; cached::Bool=true)
+   return _similar(x, base_ring(x), length(x), var; cached=cached)
+end
+
+###############################################################################
+#
+#   polynomial and zero constructors
+#
+###############################################################################
+
+function polynomial(R::Ring, arr::Vector{T}, var::AbstractString="x"; cached::Bool=true) where T
+   coeffs = map(R, arr)
+   S, _ = PolynomialRing(R, var; cached=cached)
+   return S(coeffs)
+end
+
+function _zero(p::PolyElem, R::Ring, len::Int, var::AbstractString="x"; cached::Bool=true) where T <: RingElement
+   p = similar(p, R, len, Symbol(var); cached=cached)
+   for i = 1:len
+      p = setcoeff!(p, i - 1, R())
+   end
+   return p   
+end
+
+zero(p::PolyElem, R::Ring, len::Int, var::AbstractString="x"; cached::Bool=true) = 
+   _zero(p, R, len, var; cached=cached)
+
+zero(p::PolyElem, R::Ring, var::AbstractString="x"; cached::Bool=true) =
+   _zero(p, R, length(p), var; cached=cached)
+
+zero(p::PolyElem, len::Int, var::AbstractString="x"; cached::Bool=true) =
+   _zero(p, base_ring(p), len, var; cached=cached)
+
+zero(p::PolyElem, var::AbstractString="x"; cached::Bool=true) =
+   _zero(p, base_ring(p), length(p), var; cached=cached)
+
+###############################################################################
 #
 #  Iterators
 #
-################################################################################
+###############################################################################
 
 struct PolyCoeffs{T <: RingElement}
     f::T
@@ -3034,7 +3097,7 @@ function addmul!(z::AbstractAlgebra.PolyElem{T}, x::AbstractAlgebra.PolyElem{T},
    z = addeq!(z, c)
    return z
 end
-
+ 
 ###############################################################################
 #
 #   Random elements
