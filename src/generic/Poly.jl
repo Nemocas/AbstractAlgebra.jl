@@ -332,8 +332,8 @@ function similar(x::PolyElem, R::Ring, var::Symbol=var(parent(x)); cached::Bool=
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Poly{TT}(V)
-   p.parent = base_ring(x) == R && parent(x).S == var ? parent(x) :
-              AbstractAlgebra.PolynomialRing(R, string(var); cached=cached)[1]
+   # Default similar is supposed to return a Generic polynomial
+   p.parent = PolynomialRing(R, string(var); cached=cached)[1]
    p = set_length!(p, 0)
    return p
 end
