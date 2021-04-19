@@ -333,7 +333,7 @@ function similar(x::PolyElem, R::Ring, var::Symbol=var(parent(x)); cached::Bool=
    V = Vector{TT}(undef, 0)
    p = Poly{TT}(V)
    # Default similar is supposed to return a Generic polynomial
-   p.parent = PolynomialRing(R, string(var); cached=cached)[1]
+   p.parent = PolyRing{TT}(R, var, cached)
    p = set_length!(p, 0)
    return p
 end
@@ -370,7 +370,7 @@ zero(p::PolyElem, var::String; cached::Bool=true) =
 
 function polynomial(R::Ring, arr::Vector{T}, var::AbstractString="x"; cached::Bool=true) where T
    coeffs = length(arr) == 0 ? elem_type(R)[] : map(R, arr)
-   S, _ = PolynomialRing(R, var; cached=cached)
+   S, _ = AbstractAlgebra.PolynomialRing(R, var; cached=cached)
    return S(coeffs)
 end
 
@@ -3313,9 +3313,12 @@ optional argument `cached` to `false` will prevent the parent object `S` from
 being cached.
 """
 function PolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString; cached::Bool = true)
-   S = Symbol(s)
+   return PolynomialRing(R, Symbol(s); cached=cached)
+end
+
+function PolynomialRing(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
    T = elem_type(R)
-   parent_obj = PolyRing{T}(R, S, cached)
+   parent_obj = PolyRing{T}(R, s, cached)
 
    return parent_obj, parent_obj([R(0), R(1)])
 end
