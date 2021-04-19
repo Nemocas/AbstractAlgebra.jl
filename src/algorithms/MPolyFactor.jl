@@ -900,6 +900,9 @@ function hlift_bivar_combine(
   monica = divrem(lcinv*a, yalphapow)[2]
   @assert isone(coeff(monica, Int[xvar], Int[xdeg]))
 
+  # input factors might not be monic
+  ufacs = map(make_monic, ufacs)
+
   ok, bfacs = hliftstep(ufacs, xvar, [yvar], [ydeg], [alpha], monica, false)
   if !ok
     return false, a, tfac
