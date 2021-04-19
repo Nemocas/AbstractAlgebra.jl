@@ -361,7 +361,7 @@ end
 ###############################################################################
 
 function polynomial(R::Ring, arr::Vector{T}, var::AbstractString="x"; cached::Bool=true) where T
-   coeffs = map(R, arr)
+   coeffs = length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    S, _ = PolynomialRing(R, var; cached=cached)
    return S(coeffs)
 end
