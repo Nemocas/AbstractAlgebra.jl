@@ -146,10 +146,10 @@ of calling this function repeatedly with `cached=false`.
 
 ```jldoctest
 julia> f = polynomial(ZZ, [1, 2, 3])
-3x^2 + 2*x + 1
+3*x^2 + 2*x + 1
 
 julia> f = polynomial(ZZ, [1, 2, 3], "y")
-3y^2 + 2*y + 1
+3*y^2 + 2*y + 1
 ```
 
 ### Data type and parent object methods

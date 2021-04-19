@@ -370,7 +370,7 @@ zero(p::PolyElem, var::String; cached::Bool=true) =
 
 function polynomial(R::Ring, arr::Vector{T}, var::AbstractString="x"; cached::Bool=true) where T
    TT = elem_type(R)
-   coeffs = length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Poly{TT}(coeffs)
    # Default is supposed to return a Generic polynomial
    p.parent = PolyRing{TT}(R, Symbol(var), cached)
