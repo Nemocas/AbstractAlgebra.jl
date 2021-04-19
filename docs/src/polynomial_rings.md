@@ -277,3 +277,36 @@ functionality provided by AbstractAlgebra.jl, using the same interface.
 Obviously additional functionality can also be added to that provided by
 AbstractAlgebra.jl on an ad hoc basis.
 
+### Similar and zero
+
+The following functions are available for all univariate polynomial types. The
+functions `similar` and `zero` do the same thing, but they are both provided
+for uniformity with other parts of the interface.
+
+```julia
+similar(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
+zero(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
+```
+
+Construct the zero polynomial with the same variable as the given polynomial
+with coefficients in the given ring.
+
+```julia
+similar(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
+similar(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
+zero(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
+zero(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
+```
+
+Construct the zero polynomial with the given variable and coefficients in the
+given ring, if specified, and in the coefficient ring of the given polynomial
+otherwise.
+
+Custom polynomial rings may choose which polynomial type is best-suited to
+return for the given ring and variable. If they don't specialise these
+function the default is a `Generic.Poly`. The default implementation of `zero`
+calls out to `similar`, so it's generally sufficient to specialise only
+`similar`. For both `similar` and `zero` only the most general method has to
+be implemented (e.g. `similar(x::MyPoly, R::Ring, var::String)` as all other
+methods call out to this more general method.
+

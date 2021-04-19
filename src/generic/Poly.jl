@@ -98,7 +98,7 @@ function setcoeff!(c::Poly{T}, n::Int, a::T) where {T <: RingElement}
 end
 
 function normalise(a::Poly, n::Int)
-   while n > 0 && (!isassigned(a.coeffs, n) || iszero(a.coeffs[n]))
+   while n > 0 && iszero(a.coeffs[n])
       n -= 1
    end
    return n
@@ -324,13 +324,13 @@ end
 
 ###############################################################################
 #
-#   Similar
+#   Similar and zero
 #
 ###############################################################################
 
-function _similar(x::PolyElem{T}, R::Ring, len::Int, var::Symbol; cached::Bool) where T <: RingElement
+function similar(x::PolyElem, R::Ring, var::Symbol=var(parent(x)); cached::Bool=true)
    TT = elem_type(R)
-   V = Vector{TT}(undef, len)
+   V = Vector{TT}(undef, 0)
    p = Poly{TT}(V)
    p.parent = base_ring(x) == R && parent(x).S == var ? parent(x) :
               AbstractAlgebra.PolynomialRing(R, string(var); cached=cached)[1]
@@ -338,25 +338,33 @@ function _similar(x::PolyElem{T}, R::Ring, len::Int, var::Symbol; cached::Bool) 
    return p
 end
 
-function similar(x::PolyElem, R::Ring, len::Int, var::Symbol=parent(x).S; cached::Bool=true)
-   return _similar(x, R, len, var; cached=cached)
+function similar(x::PolyElem, var::Symbol=var(parent(x)); cached::Bool=true)
+   return similar(x, base_ring(x), var; cached=cached)
 end
 
-function similar(x::PolyElem, R::Ring, var::Symbol=parent(x).S; cached::Bool=true)
-   return _similar(x, R, length(x), var; cached=cached)
+function similar(x::PolyElem, R::Ring, var::String; cached::Bool=true)
+   return similar(x, R, Symbol(var); cached=cached)
 end
 
-function similar(x::PolyElem, len::Int, var::Symbol=parent(x).S; cached::Bool=true)
-   return _similar(x, base_ring(x), len, var; cached=cached)
+function similar(x::PolyElem, var::String; cached::Bool=true)
+   return similar(x, base_ring(x), Symbol(var); cached=cached)
 end
 
-function similar(x::PolyElem, var::Symbol=parent(x).S; cached::Bool=true)
-   return _similar(x, base_ring(x), length(x), var; cached=cached)
-end
+zero(p::PolyElem, R::Ring, var::Symbol=var(parent(p)); cached::Bool=true) =
+   similar(p, R, var; cached=cached)
+
+zero(p::PolyElem, var::Symbol=var(parent(p)); cached::Bool=true) =
+   similar(p, base_ring(p), var; cached=cached)
+
+zero(p::PolyElem, R::Ring, var::String; cached::Bool=true) =
+   zero(p, R, Symbol(var); cached=cached)
+
+zero(p::PolyElem, var::String; cached::Bool=true) =
+   zero(p, base_ring(p), Symbol(var); cached=cached)
 
 ###############################################################################
 #
-#   polynomial and zero constructors
+#   polynomial constructor
 #
 ###############################################################################
 
@@ -365,26 +373,6 @@ function polynomial(R::Ring, arr::Vector{T}, var::AbstractString="x"; cached::Bo
    S, _ = PolynomialRing(R, var; cached=cached)
    return S(coeffs)
 end
-
-function _zero(p::PolyElem, R::Ring, len::Int, var::AbstractString="x"; cached::Bool) where T <: RingElement
-   p = similar(p, R, len, Symbol(var); cached=cached)
-   for i = 1:len
-      p = setcoeff!(p, i - 1, R())
-   end
-   return p   
-end
-
-zero(p::PolyElem, R::Ring, len::Int, var::AbstractString="x"; cached::Bool=true) = 
-   _zero(p, R, len, var; cached=cached)
-
-zero(p::PolyElem, R::Ring, var::AbstractString="x"; cached::Bool=true) =
-   _zero(p, R, length(p), var; cached=cached)
-
-zero(p::PolyElem, len::Int, var::AbstractString="x"; cached::Bool=true) =
-   _zero(p, base_ring(p), len, var; cached=cached)
-
-zero(p::PolyElem, var::AbstractString="x"; cached::Bool=true) =
-   _zero(p, base_ring(p), length(p), var; cached=cached)
 
 ###############################################################################
 #
