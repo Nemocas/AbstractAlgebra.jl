@@ -145,6 +145,56 @@ end
    test_rand(T, 0:4)
 end
 
+@testset "Generic.Poly.similar" begin
+   R, x = PolynomialRing(ZZ, "x")
+
+   for iters = 1:10
+      f = rand(R, 0:10, -10:10)
+
+      g = similar(f, QQ, rand(0:15), :y)
+      h = similar(f, rand(0:15), :y)
+      k = similar(f, QQ, :y)
+      l = similar(f, QQ, rand(0:15))
+      m = similar(f, rand(0:15))
+
+      @test isa(g, PolyElem)
+      @test isa(h, PolyElem)
+      @test isa(k, PolyElem)
+      @test isa(l, PolyElem)
+      @test isa(m, PolyElem)
+
+      @test base_ring(g) == QQ
+      @test base_ring(k) == QQ
+      @test base_ring(l) == QQ
+
+      @test parent(g).S == :y
+      @test parent(h).S == :y
+      @test parent(k).S == :y
+
+      @test length(g) == 0
+      @test length(h) == 0
+      @test length(k) == 0
+      @test length(l) == 0
+      @test length(m) == 0
+
+      @test parent(g) != parent(f)
+      @test parent(h) != parent(f)
+      @test parent(k) != parent(f)
+      @test parent(l) != parent(f)
+      @test parent(m) == parent(f)
+
+      p = similar(f, rand(0:15), cached=false)
+      q = similar(f, rand(0:15), :z, cached=false)
+      r = similar(f, rand(0:15), :z, cached=false)
+      s = similar(f, rand(0:15))
+      t = similar(f, rand(0:15))
+
+      @test parent(p) == parent(f)
+      @test parent(q) != parent(r)
+      @test parent(s) == parent(t)
+   end
+end
+
 @testset "Generic.Poly.manipulation" begin
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
