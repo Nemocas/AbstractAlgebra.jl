@@ -136,6 +136,12 @@ polynomial(R::Ring, arr::Vector{T}, var::String="x"; cached::Bool=true)
 Given an array of coefficients construct the polynomial with those coefficients
 over the given ring and with the given variable.
 
+Note that if `cached` is set to `false` then the parent ring of the created
+polynomial is not cached. However, this means that subsequent polynomials
+created in the same way will not be compatible. Instead, one should use the
+parent object of the first polynomial to create subsequent polynomials instead
+of calling this function repeatedly with `cached=false`.
+
 **Examples**
 
 ```jldoctest
