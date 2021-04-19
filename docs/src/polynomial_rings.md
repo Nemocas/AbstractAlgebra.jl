@@ -126,6 +126,26 @@ julia> h = S([4, 7, 2, 9])
 
 ```
 
+It is also possible to create polynomials directly without first creating the
+corresponding polynomial ring.
+
+```julia
+polynomial(R::Ring, arr::Vector{T}, var::String="x"; cached::Bool=true)
+```
+
+Given an array of coefficients construct the polynomial with those coefficients
+over the given ring and with the given variable.
+
+**Examples**
+
+```jldoctest
+julia> f = polynomial(ZZ, [1, 2, 3])
+3x^2 + 2*x + 1
+
+julia> f = polynomial(ZZ, [1, 2, 3], "y")
+3y^2 + 2*y + 1
+```
+
 ### Data type and parent object methods
 
 ```julia
