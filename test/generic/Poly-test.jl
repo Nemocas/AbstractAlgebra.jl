@@ -16,6 +16,11 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
+@testset "Generic.Poly.types" begin
+   @test dense_poly_type(BigInt) = Generic.Poly{BigInt}
+   @test dense_poly_type(Rational{BigInt}) = Generic.Poly{Rational{BigInt}}
+end
+
 @testset "Generic.Poly.constructors" begin
    R, x = ZZ["x"]
    S1 = R["y"]
