@@ -21,7 +21,7 @@
       p = y*(y*x+1)*((y+1)*x+y)*((y+2)*x+y)
 
       ok, content, fac = AbstractAlgebra.MPolyFactor.hlift_bivar_combine(p,
-                                            1, 2, QQ(1), [x+1, x+1//2, x+1//3])
+                                            1, 2, QQ(1), [x+1, 2*x+1, 3*x+1])
       @test ok
       @test degrees(content) == [0, 1]
       @test p == content*prod(fac)
