@@ -12,7 +12,7 @@ include("generic/PuiseuxSeries-test.jl")
 include("generic/AbsMSeries-test.jl")
 include("generic/Matrix-test.jl")
 include("generic/MPoly-test.jl")
-include("generic/MPolyFactor-test.jl")
+include("algorithms/MPolyFactor-test.jl")
 include("algorithms/DensePoly-test.jl")
 
 @testset "Generic.Rings.broadcast" begin
