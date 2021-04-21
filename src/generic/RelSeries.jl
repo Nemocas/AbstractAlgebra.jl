@@ -177,7 +177,7 @@ isunit(a::AbstractAlgebra.RelSeriesElem) = valuation(a) == 0 && isunit(polcoeff(
 
 Return the modulus of the coefficients of the given power series.
 """
-modulus(a::AbstractAlgebra.SeriesElem{T}) where {T <: ResElem} = modulus(base_ring(a))
+modulus(a::AbstractAlgebra.SeriesElem{T}) where {T <: Union{ResElem, FinFieldElem}} = modulus(base_ring(a))
 
 function deepcopy_internal(a::RelSeries{T}, dict::IdDict) where {T <: RingElement}
    coeffs = Array{T}(undef, pol_length(a))
