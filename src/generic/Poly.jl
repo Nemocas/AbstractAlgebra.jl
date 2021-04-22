@@ -348,6 +348,8 @@ end
 Base.IteratorEltype(M::PolyElem) = Base.HasEltype()
 
 Base.eltype(M::PolyElem{T}) where {T} = T
+
+Base.eltype(M::PolyCoeffs) = Base.eltype(M.f)
   
 Base.IteratorSize(M::PolyCoeffs{<:PolyElem}) = Base.HasLength()
 

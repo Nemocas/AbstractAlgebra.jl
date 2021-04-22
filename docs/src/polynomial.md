@@ -378,7 +378,7 @@ julia> f = x^2 + 2
 x^2 + 2
 
 julia> C = collect(coefficients(f))
-3-element Array{Any,1}:
+3-element Array{BigInt,1}:
  2
  0
  1
