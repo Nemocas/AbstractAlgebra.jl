@@ -825,6 +825,10 @@ function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Char,
    NumberField(a, string(s), t; cached=cached)
 end
 
+function RationalFunctionField(k::Field, s::AbstractString; cached = true)
+   Generic.RationalFunctionField(k, s; cached=cached)
+end
+
 @doc Markdown.doc"""
     FreeModule(R::NCRing, rank::Int; cached::Bool = true)
 
@@ -942,7 +946,8 @@ end
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, LaurentPolynomialRing,
        MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
-       LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
+       LaurentSeriesField, ResidueField, NumberField, RationalFunctionField,
+       FunctionField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, sub,
        quo, DirectSum, ModuleIsomorphism, free_module, vector_space,
        module_homomorphism, direct_sum, module_isomorphism, basis

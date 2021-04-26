@@ -864,6 +864,54 @@ end
 
 ###############################################################################
 #
+#   RationalFunctionField / rational_function
+#
+###############################################################################
+
+struct RationalFunctionField{T <: FieldElement} <: AbstractAlgebra.Field
+   S::Symbol
+   fraction_field::FracField{<:PolyElem{T}}
+   base_ring::Field
+
+   function RationalFunctionField{T}(k::Field, frac_field::FracField{<:PolyElem{T}}, sym::Symbol, cached::Bool = true) where T <: FieldElement
+      return get_cached!(RationalFunctionFieldDict, (k, sym), cached) do
+         U = elem_type(k)
+         new{U}(sym, frac_field, k)
+      end::RationalFunctionField{T}
+   end
+end
+
+const RationalFunctionFieldDict = CacheDictType{Tuple{Field, Symbol}, Field}()
+
+mutable struct Rat{T <: FieldElement} <: AbstractAlgebra.FieldElem
+   d::Frac{<:PolyElem{T}}
+   parent::RationalFunctionField{T}
+
+   Rat{T}(f::Frac{<:PolyElem{T}}) where T <: FieldElement = new{T}(f)
+end
+
+###############################################################################
+#
+#   FunctionField / function_field_elem
+#
+###############################################################################
+
+
+mutable struct FunctionField{T <: FieldElem} <: AbstractAlgebra.Field
+   p::PolyElem{T}
+   S::Symbol
+
+   function FunctionField{T}(p::PolyElem{T}, s::Symbol, cached::Bool = true) where T <: FieldElem
+      return get_cached!(FunctionFieldDict, (p, s), cached) do
+         new{T}(p, s)
+      end::FunctionField{T}
+   end
+end
+
+const FunctionFieldDict = CacheDictType{Tuple{PolyElem, Symbol}, Field}()
+
+###############################################################################
+#
 #   MatSpace / Mat
 #
 ###############################################################################
