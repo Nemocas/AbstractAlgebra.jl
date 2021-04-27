@@ -384,10 +384,21 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    issquare(a::Rat)
+
+Return `true` if $a$ is a square.
+"""
 function issquare(a::Rat)
    return issquare(data(a))
 end
 
+@doc Markdown.doc"""
+    Base.sqrt(a::Rat)
+
+Return the square root of $a$ if it is a square, otherwise raise an
+exception.
+"""
 function Base.sqrt(a::Rat)
    R = parent(a)
    return R(sqrt(data(a)))
@@ -399,6 +410,12 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    gcd(a::Rat{T}, b::Rat{T}) where {T <: RingElem}
+
+Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
+the GCD of $a/b$ and $c/d$ to be gcd$(ad, bc)/bd$, reduced to lowest terms.
+"""
 function gcd(a::Rat{T}, b::Rat{T}) where T <: FieldElement
    check_parent(a, b)
    R = parent(a)
