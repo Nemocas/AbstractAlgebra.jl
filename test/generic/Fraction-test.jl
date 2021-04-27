@@ -210,7 +210,7 @@ end
    R, x = PolynomialRing(ZZ, "x")
    S = FractionField(R)
 
-   for i in 1:10000
+   for i in 1:1000
      a = rand(S, -1:5, -10:10)
      b = rand(S, 0:5, -10:10)
 

@@ -211,7 +211,7 @@ end
 
 function +(a::Union{Integer, Rational, AbstractFloat}, b::Rat)
    R = parent(b)
-   return R(a*data(b))
+   return R(a + data(b))
 end
 
 function +(a::Rat{T}, b::T) where T <: FieldElem
@@ -310,7 +310,10 @@ function divexact(a::Rat{T}, b::Rat{T}) where T <: FieldElement
 end
 
 function divides(a::Rat{T}, b::Rat{T}) where T <: FieldElement
-   return divides(data(a), data(b))
+   check_parent(a, b)
+   R = parent(a)
+   d, q = divides(data(a), data(b))
+   return d, R(q)
 end
 
 ###############################################################################
@@ -493,7 +496,7 @@ function (a::RationalFunctionField{T})(b::Frac{<:PolyElem{T}}) where T <: FieldE
    parent(b) != K && error("Unable to coerce rational function")
    z = Rat{T}(b)
    z.parent = a
-   return z
+   return z::Rat{T}
 end
 
 function (a::RationalFunctionField{T})(b::Rat{T}) where T <: FieldElement
