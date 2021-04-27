@@ -799,6 +799,32 @@ end
    end
 end
 
+@testset "Generic.LaurentSeries.derivative_integral" begin
+   # Exact field
+   S, x = LaurentSeriesRing(QQ, 10, "x")
+
+   for iter = 1:100
+      f = rand(S, -10:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      const_coeff = set_precision!(const_coeff, precision(f))
+
+      @test isequal(integral(derivative(f)) + const_coeff, f)
+   end
+
+   # Inexact field
+   S, x = LaurentSeriesRing(RealField, 10, "x")
+
+   for iter = 1:100
+      f = rand(S, -10:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      set_precision!(const_coeff, precision(f))
+
+      @test isapprox(integral(derivative(f)) + const_coeff, f)
+   end
+end
+
 @testset "Generic.LaurentSeries.special_functions" begin
    # Exact field
    S, x = LaurentSeriesRing(QQ, 10, "x")
@@ -818,6 +844,14 @@ end
       g *= x
 
       @test isequal(exp(f)*exp(g), exp(f + g))
+
+      @test isequal(log(exp(f)), f)
+
+      while !isone(coeff(f, 0))
+         f = rand(S, 0:0, -10:10)
+      end
+
+      @test isequal(exp(log(f)), f)
    end
 
    # Inexact field
@@ -837,7 +871,19 @@ end
       f *= x
       g *= x
 
+      while coeff(f, 0) <= 0
+         f = rand(S, 0:0, -1:1)
+      end
+
       @test isapprox(exp(f)*exp(g), exp(f + g))
+
+      @test isapprox(log(exp(f)), f)
+
+      while coeff(f, 0) <= 0
+         f = rand(S, 0:0, -10:10)
+      end
+
+      @test isapprox(exp(log(f)), f)
    end
 
    # Non-integral domain

@@ -312,7 +312,7 @@ do not belong to this abstract type.
 
 ### Basic functionality
 
-```
+```julia
 coeff(a::AbstractAlgebra.SeriesElem, n::Int)
 ```
 

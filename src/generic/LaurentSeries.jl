@@ -1186,16 +1186,79 @@ end
 
 ###############################################################################
 #
+#   Derivative and integral
+#
+###############################################################################
+
+function derivative(f::LaurentSeriesElem{T}) where T <: RingElement
+   g = parent(f)()
+   g = set_precision!(g, precision(f) - 1)
+   sf = scale(f)
+   g = set_scale!(g, sf)
+   fit!(g, pol_length(f))
+   v = valuation(f)
+   if v == 0
+      g = set_valuation!(g, sf - 1)
+      for i = 1:pol_length(f) - 1
+         g = setcoeff!(g, i - 1, sf*i*polcoeff(f, i))
+      end
+   else
+      g = set_valuation!(g, v - 1)
+      for i = 0:pol_length(f) - 1
+         g = setcoeff!(g, i, (sf*i + v)*polcoeff(f, i))
+      end
+   end
+   g = set_length!(g, normalise(g, pol_length(f)))
+   renormalize!(g)
+   g = rescale!(g)
+   return g
+end
+
+function integral(f::LaurentSeriesElem{T}) where T <: RingElement
+   g = parent(f)()
+   fit!(g, pol_length(f))
+   g = set_precision!(g, precision(f) + 1)
+   v = valuation(f)
+   g = set_valuation!(g, v + 1)
+   sf = scale(f)
+   g = set_scale!(g, sf)
+   for i = 1:pol_length(f)
+      c = polcoeff(f, i - 1)
+      if !iszero(c)
+         g = setcoeff!(g, i - 1, divexact(c, (i - 1)*sf + 1 + v))
+      end
+   end
+   g = set_length!(g, normalise(g, pol_length(f)))
+   renormalize!(g)
+   g = rescale!(g)
+   return g
+end
+
+###############################################################################
+#
 #   Special functions
 #
 ###############################################################################
+
+function Base.log(a::LaurentSeriesElem{T}) where T <: FieldElement
+   @assert valuation(a) == 0
+   if isone(coeff(a, 0))
+      return integral(derivative(a)*inv(a))
+   else
+      # Definition only works if series is monic, so divide through by constant
+      c = coeff(a, 0)
+      clog = log(c)
+      adivc = divexact(a, c)
+      return integral(derivative(adivc)*inv(adivc)) + clog
+   end
+end
 
 @doc Markdown.doc"""
     exp(a::Generic.LaurentSeriesElem)
 
 Return the exponential of the power series $a$.
 """
-function Base.exp(a::LaurentSeriesElem{T}) where {T <: RingElement}
+function Base.exp(a::LaurentSeriesElem{T}) where T <: RingElement
    if iszero(a)
       z = one(parent(a))
       z = set_precision!(z, precision(a))
@@ -1235,6 +1298,47 @@ function Base.exp(a::LaurentSeriesElem{T}) where {T <: RingElement}
    end
    z = set_length!(z, normalise(z, preca))
    z = inflate(z, sc)
+   z = rescale!(z)
+   return z
+end
+
+function Base.exp(a::LaurentSeriesElem{T}) where T <: FieldElement
+   if iszero(a)
+      z = one(parent(a))
+      z = set_precision!(z, precision(a))
+      return z
+   end
+   vala = valuation(a)
+   preca = precision(a)
+   vala < 0 && error("Valuation must be non-negative in exp")
+   R = base_ring(a)
+   c = one(R)
+   if valuation(a) == 0
+      a = deepcopy(a)
+      c = exp(coeff(a, 0))
+      a = setcoeff!(a, 0, R())
+   end
+   z = parent(a)([R(1)], 1, min(2, preca), 0, 1, false)
+   la = [preca]
+   while la[end] > 1
+      push!(la, div(la[end] + 1, 2))
+   end
+   one1 = parent(a)([R(1)], 1, 2, 0, 1, false)
+   n = length(la) - 1
+   # z -> z*(1 - log(a) + a) is the recursion
+   while n > 0
+      z = set_precision!(z, la[n])
+      one1 = set_precision!(one1, la[n])
+      t = -log(z)
+      t = addeq!(t, one1)
+      t = addeq!(t, a)
+      z = mul!(z, z, t)
+      n -= 1
+   end
+   if !isone(c)
+      z *= c
+   end
+   renormalize!(z)
    z = rescale!(z)
    return z
 end
@@ -1303,8 +1407,10 @@ function mul!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
    t = base_ring(a)()
    da = div(sa, sz)
    db = div(sb, sz)
-   a = downscale(a, da)
-   b = downscale(b, db)
+   a2 = downscale(a, da)
+   b2 = downscale(b, db)
+   a = a === c && a2 === a ? deepcopy(a2) : a2
+   b = b === c && b2 === b ? deepcopy(b2) : b2
    lena = pol_length(a)
    lenb = pol_length(b)
    lenc = min(lena + lenb - 1, div(prec + sz - 1, sz))
