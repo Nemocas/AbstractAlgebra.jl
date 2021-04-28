@@ -150,5 +150,14 @@
    @test sprint(show, p) == "a + b^2 + c^3"
    @test sprint(show, p, context = :compact => true) == "a + b^2 + c^3"
    @test sprint(show, p, context = :terse => true) == "a+b^2+c^3"
+
+   Qx, x = QQ["x"]
+   AbstractAlgebra.set_html_as_latex(true)
+   @test AbstractAlgebra.get_html_as_latex() == true
+   @test sprint(show, "text/html", x^12) == "\$x^{12}\$"
+   fl = AbstractAlgebra.set_html_as_latex(false)
+   @assert fl == true
+   @test AbstractAlgebra.get_html_as_latex() == false
+   @test sprint(show, "text/html", x^12) == "x^12"
 end
 

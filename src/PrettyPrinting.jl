@@ -43,10 +43,35 @@ function show_obj(io::IO, mi::MIME, obj)
    finish(S)
 end
 
+global _html_as_latex = Ref(false)
+
+@doc doc"""
+    get_html_as_latex()
+
+Returns whether MIME type `text/html` is printed as `text/latex`.
+"""
+get_html_as_latex() = _html_as_latex[]
+
+@doc doc"""
+    set_html_as_latex(fl::Bool)
+
+Toggles whether MIME type `text/html` should be printed as `text/latex`. Note
+that this is a global option. The return value is the old value.
+"""
+function set_html_as_latex(fl::Bool)
+  old = get_html_as_latex()
+  _html_as_latex[] = fl
+  return old
+end
+
 function show_obj(io::IO, mi::MIME"text/html", obj)
-   print(io, "\$")
-   show_obj(io, MIME("text/latex"), obj)
-   print(io, "\$")
+   if _html_as_latex[]
+      print(io, "\$")
+      show_obj(io, MIME("text/latex"), obj)
+      print(io, "\$")
+   else
+      show_obj(io, MIME("text/plain"), obj)
+   end
 end
 
 ################################################################################
