@@ -998,11 +998,11 @@ function derivative(f::RelSeriesElem{T}) where T <: RingElement
    v = valuation(f)
    set_valuation!(g, 0)
    if v == 0
-      for i = 1:pol_length(f)
+      for i = 1:pol_length(f) - 1
          setcoeff!(g, i - 1, i*polcoeff(f, i))
       end
    else
-      for i = 0:pol_length(f)
+      for i = 0:pol_length(f) - 1
          setcoeff!(g, i, (i + v)*polcoeff(f, i))
       end
       set_valuation!(g, v - 1)
