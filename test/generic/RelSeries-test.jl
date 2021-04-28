@@ -788,31 +788,6 @@ end
    end
 end
 
-@testset "Generic.RelSeries.unsafe_operators" begin
-   Qx, x = PowerSeriesRing(GF(13), 10, "x")
-   a = 1 + O(x^3)
-   c = x^4 + O(x^7)
-   c = addeq!(c, a)
-
-   @test isequal(c, 1 + O(x^3))
-
-   a = 1 + x + x^2 + x^3 + x^4 + x^5 + x^6 + x^7 + O(x^9)
-   c = x^4 + O(x^7)
-   c = addeq!(c, a)
-
-   @test isequal(c, 1 + x + x^2 + x^3 + 2*x^4 + x^5 + x^6 + O(x^7))
-
-   B, x = PolynomialRing(QQ, "x")
-   S, s = PowerSeriesRing(B, 4, "s")
-   a = S([3*x, 2*x, 4*x], 3, 4, 1)
-   b = S([-3*x], 1, 4, 1)
-   addeq!(a, b)
-   b = S([-3*x, 4*x, 5*x], 3, 4, 1)
-   addeq!(a, b)
-   
-   @test isequal(a, -3*x*s + 6*x*s^2 + 9*x*s^3 + O(s^4))
-end
-
 @testset "Generic.RelSeries.derivative_integral" begin
    # Exact field
    S, x = PowerSeriesRing(QQ, 10, "x")
@@ -932,7 +907,7 @@ end
    end
 end
 
-@testset "Generic.RelSeries.unsafe_functions" begin
+@testset "Generic.RelSeries.unsafe_operators" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    

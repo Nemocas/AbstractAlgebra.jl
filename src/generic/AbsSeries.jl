@@ -933,10 +933,7 @@ function mul!(c::AbsSeries{T}, a::AbsSeries{T}, b::AbsSeries{T}) where {T <: Rin
       lenc = min(lena + lenb - 1, prec)
 
       if c === a || c === b
-         d = Array{T}(undef, lenc)
-	 for i = 1:lenc
-	    d[i] = base_ring(c)()
-	 end
+         d = T[base_ring(c)() for i in 1:lenc]
       else
          fit!(c, lenc)
          d = c.coeffs

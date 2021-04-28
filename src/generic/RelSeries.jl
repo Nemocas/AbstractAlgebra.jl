@@ -1153,6 +1153,7 @@ end
 function zero!(a::RelSeries)
    a.length = 0
    a.prec = parent(a).prec_max
+   a.val = a.prec
    return a
 end
 
@@ -1187,25 +1188,31 @@ function mul!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where {T <: Rin
    if lena <= 0 || lenb <= 0
       c.length = 0
    else
-      t = base_ring(a)()
       lenc = min(lena + lenb - 1, prec)
-      fit!(c, lenc)
+      if c === a || c === b
+         d = T[base_ring(c)() for i in 1:lenc]
+      else
+         fit!(c, lenc)
+	 d = c.coeffs
+      end
+      t = base_ring(a)()
       for i = 1:min(lena, lenc)
-         c.coeffs[i] = mul!(c.coeffs[i], polcoeff(a, i - 1), polcoeff(b, 0))
+         d[i] = mul!(d[i], polcoeff(a, i - 1), polcoeff(b, 0))
       end
       if lenc > lena
          for i = 2:min(lenb, lenc - lena + 1)
-            c.coeffs[lena + i - 1] = mul!(c.coeffs[lena + i - 1], polcoeff(a, lena - 1), polcoeff(b, i - 1))
+            d[lena + i - 1] = mul!(d[lena + i - 1], polcoeff(a, lena - 1), polcoeff(b, i - 1))
          end
       end
       for i = 1:lena - 1
          if lenc > i
             for j = 2:min(lenb, lenc - i + 1)
                t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
-               c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
+               d[i + j - 1] = addeq!(d[i + j - 1], t)
             end
          end
       end
+      c.coeffs = d
       c.length = normalise(c, lenc)
    end
    c.val = a.val + b.val

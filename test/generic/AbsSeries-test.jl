@@ -881,7 +881,7 @@ end
    end
 end
 
-@testset "Generic.AbsSeries.unsafe_functions" begin
+@testset "Generic.AbsSeries.unsafe_operators" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    
