@@ -896,19 +896,30 @@ end
 #
 ###############################################################################
 
-
-mutable struct FunctionField{T <: FieldElem} <: AbstractAlgebra.Field
-   p::PolyElem{T}
+mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
+   num::PolyElem{<:PolyElem{T}}
+   den::PolyElem{T}
    S::Symbol
+   powers::Vector{Poly{<:PolyElem{T}}}
+   powers_den::Vector{<:PolyElem{T}}
+   base_ring::RationalFunctionField{T}
 
-   function FunctionField{T}(p::PolyElem{T}, s::Symbol, cached::Bool = true) where T <: FieldElem
-      return get_cached!(FunctionFieldDict, (p, s), cached) do
-         new{T}(p, s)
+   function FunctionField{T}(num::Poly{<:PolyElem{T}},
+             den::PolyElem{T}, s::Symbol, cached::Bool = true) where
+                                                          T <: FieldElement
+      return get_cached!(FunctionFieldDict, (num, den, s), cached) do
+         new{T}(num, den, s)
       end::FunctionField{T}
    end
 end
 
-const FunctionFieldDict = CacheDictType{Tuple{PolyElem, Symbol}, Field}()
+const FunctionFieldDict = CacheDictType{Tuple{Poly, PolyElem, Symbol}, Field}()
+
+mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.Field
+   num::Poly{<:PolyElem{T}}
+   den::PolyElem{T}
+   monic::Bool
+end
 
 ###############################################################################
 #
