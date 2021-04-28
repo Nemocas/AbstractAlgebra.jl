@@ -1286,35 +1286,35 @@ function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where {T <: Rin
    c.prec = prec
    c.val = valr
    if vala > valb
-      for i = 1:min(lenb, vala - valb)
+      for i = 1:min(lenr, min(lenb, vala - valb))
          c.coeffs[i] = deepcopy(b.coeffs[i])
       end
-      for i = lenb + 1:vala - valb
+      for i = lenb + 1:min(lenr, vala - valb)
          c.coeffs[i] = R()
       end
-      for i = vala - valb + 1:lenb
-         c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i - vala + valb], b.coeffs[i])
+      for i = vala - valb + 1:min(lenr, lenb)
+         c.coeffs[i] = add!(c.coeffs[i], polcoeff(a, i - vala + valb - 1), b.coeffs[i])
       end
-      for i = max(lenb, vala - valb) + 1:lena + vala - valb
+      for i = max(lenb, vala - valb) + 1:min(lenr, lena + vala - valb)
          c.coeffs[i] = deepcopy(a.coeffs[i - vala + valb])
       end
-      for i = lena + vala - valb + 1:lenb
+      for i = lena + vala - valb + 1:min(lenr, lenb)
          c.coeffs[i] = deepcopy(b.coeffs[i])
       end
    else
-      for i = 1:min(lena, valb - vala)
+      for i = 1:min(lenr, min(lena, valb - vala))
          c.coeffs[i] = deepcopy(a.coeffs[i])
       end
-      for i = lena + 1:valb - vala
+      for i = lena + 1:min(lenr, valb - vala)
          c.coeffs[i] = R()
       end
-      for i = valb - vala + 1:lena
-         c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i], b.coeffs[i - valb + vala])
+      for i = valb - vala + 1:min(lenr, lena)
+         c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i], polcoeff(b, i - valb + vala - 1))
       end
-      for i = max(lena, valb - vala) + 1:lenb + valb - vala
+      for i = max(lena, valb - vala) + 1:min(lenr, lenb + valb - vala)
          c.coeffs[i] = deepcopy(b.coeffs[i - valb + vala])
       end
-      for i = lenb + valb - vala + 1:lena
+      for i = lenb + valb - vala + 1:min(lenr, lena)
          c.coeffs[i] = deepcopy(a.coeffs[i])
       end
    end
