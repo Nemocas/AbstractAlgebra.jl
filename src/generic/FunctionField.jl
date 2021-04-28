@@ -363,3 +363,42 @@ function _rat_poly_rem(poly1::Poly{S}, den1::S,
 
    return _rat_poly_canonicalise(rpoly, rden)
 end
+
+# convert a polynomial over a rational function field to
+# a numerator and denominator
+function _rat_poly(p::Poly{Rat{T}}; cached::Bool=true) where T <: FieldElement
+   K = base_ring(p)
+   R = base_ring(fraction_field(K))
+   S = elem_type(R)
+
+   par = PolyRing{S}(R, K.S, cached)
+
+   len = length(p)
+
+   if len == 0
+      rpol = Poly{S}(R())
+      rpol.parent = par
+      return rpol, R()
+   end
+
+   d = one(R)
+   for i = 1:len
+      d = lcm(d, denominator(coeff(p, i - 1)))
+   end
+
+   V = Vector{S}(undef, len)
+   for i = 1:len
+      c = coeff(p, i - 1)
+      den_i = denominator(c)
+      if den_i == d
+         V[i] = deepcopy(numerator(c))
+      else
+         V[i] = divexact(d, den_i)*numerator(c)
+      end
+   end
+
+   rpol = Poly{S}(V)
+   rpol.parent = par
+
+   return rpol, d
+end
