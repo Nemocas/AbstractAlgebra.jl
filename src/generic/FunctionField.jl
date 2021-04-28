@@ -298,3 +298,68 @@ function _rat_poly_mul(poly1::Poly{S}, den1::S,
    end
    return rpoly, rden
 end
+
+function _rat_poly_canonicalise(poly::Poly{S}, den::S) where
+                       {T <: FieldElement, S <: PolyElem{T}}
+   R = base_ring(poly)
+
+   if isone(den)
+      return poly, den
+   end
+
+   if isone(-den)
+      return -poly, one(R)
+   end
+
+   if length(poly) == 0
+      return poly, one(R)
+   end
+
+   g = content(poly)
+   g = gcd(g, den)
+
+   if !isone(g)
+      poly = divexact(poly, g)
+      den = divexact(den, g)
+   end
+
+   return poly, den
+end
+
+function _rat_poly_rem(poly1::Poly{S}, den1::S,
+                       poly2::Poly{S}, den2::S) where
+                       {T <: FieldElement, S <: PolyElem{T}}
+   R = base_ring(poly1)
+
+   len1 = length(poly1)
+   len2 = length(poly2)
+
+   if len1 < len2
+      rpoly = deepcopy(poly1)
+      rden = deepcopy(den1)
+      return rpoly, rden
+   end
+   
+   if len2 == 1
+      rpoly = zero(parent(poly1))
+      rden = one(R)
+      return rpoly, rden
+   end
+
+   lenq = len1 - len2 + 1
+
+   rpoly = pseudorem(poly1, poly2)
+
+   lead = leading_coefficient(poly2)
+
+   if isone(lead)
+      rden = deepcopy(den1)
+   elseif isone(-lead)
+      rden = -den1
+      rpoly = -rpoly
+   else
+      rden = den1*lead^lenq
+   end
+
+   return _rat_poly_canonicalise(rpoly, rden)
+end
