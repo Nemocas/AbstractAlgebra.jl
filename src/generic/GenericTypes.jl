@@ -902,6 +902,7 @@ mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
    S::Symbol
    powers::Vector{Poly{<:PolyElem{T}}}
    powers_den::Vector{<:PolyElem{T}}
+   monic::Bool
    base_ring::RationalFunctionField{T}
 
    function FunctionField{T}(num::Poly{<:PolyElem{T}},
@@ -918,7 +919,11 @@ const FunctionFieldDict = CacheDictType{Tuple{Poly, PolyElem, Symbol}, Field}()
 mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.Field
    num::Poly{<:PolyElem{T}}
    den::PolyElem{T}
-   monic::Bool
+   parent::FunctionField{T}
+
+   function FunctionFieldElem{T}(R::FunctionField{T}, num::Poly{S}, den::S) where {T <: FieldElement, S <: PolyElem{T}}
+      return new{T}(num, den, R)
+   end
 end
 
 ###############################################################################

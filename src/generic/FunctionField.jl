@@ -5,7 +5,7 @@
 #
 ###############################################################################
 
-export FunctionField
+export FunctionField, Frac
 
 ###############################################################################
 #
@@ -366,12 +366,12 @@ end
 
 # convert a polynomial over a rational function field to
 # a numerator and denominator
-function _rat_poly(p::Poly{Rat{T}}; cached::Bool=true) where T <: FieldElement
+function _rat_poly(p::Poly{Rat{T}}, var=parent(p).S; cached::Bool=true) where T <: FieldElement
    K = base_ring(p)
    R = base_ring(fraction_field(K))
    S = elem_type(R)
 
-   par = PolyRing{S}(R, parent(p).S, cached)
+   par = PolyRing{S}(R, var, cached)
 
    len = length(p)
 
@@ -405,12 +405,82 @@ end
 
 ###############################################################################
 #
+#   Data type and parent object methods
+#
+###############################################################################
+
+parent_type(::Type{FunctionFieldElem{T}}) where T <: FieldElement = FunctionField{T}
+
+elem_type(::Type{FunctionField{T}}) where T <: FieldElement = FunctionFieldElem{T}
+
+function base_ring(a::FunctionField{T}) where T <: FieldElement
+   return a.base_ring::RationalFunctionField{T}
+end
+
+base_ring(a::FunctionFieldElem) = base_ring(parent(a))
+
+parent(a::FunctionFieldElem) = a.parent
+
+###############################################################################
+#
+#   Basic manipulation
+#
+###############################################################################
+
+function Base.numerator(a::FunctionFieldElem, canonicalise::Bool=true)
+   if canonicalise
+      u = canonical_unit(a.den)
+      return divexact(a.num, u)
+   else
+      return a.num
+   end
+end
+
+function Base.denominator(a::FunctionFieldElem, canonicalise::Bool=true)
+   if canonicalise
+      u = canonical_unit(a.den)
+      return divexact(a.den, u)
+   else
+      return a.den
+   end
+end
+
+###############################################################################
+#
+#   AbstractString I/O
+#
+###############################################################################
+
+function AbstractAlgebra.expressify(a::FunctionFieldElem; context = nothing)
+   n = numerator(a, true)
+   d = denominator(a, true)
+   if isone(d)
+       return expressify(n)
+   else
+       return Expr(:call, ://, expressify(n), expressify(d))
+   end
+end
+
+function show(io::IO, ::MIME"text/plain", a::FunctionFieldElem)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
+ end
+ 
+ function show(io::IO, a::FunctionFieldElem)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
+ end
+
+function show(io::IO, a::FunctionField)
+   print(IOContext(io, :compact => true), "Function Field over ",
+         base_ring(base_ring(a)), " with defining polynomial ", a.num)
+end
+
+###############################################################################
+#
 #   FunctionField constructor
 #
 ###############################################################################
 
-function powers_precompute(p::Poly{Rat{T}}) where T <: FieldElement
-   pol, d = _rat_poly(p)
+function powers_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: PolyElem{T}}
    len = length(pol)
    R = parent(d)
    S = parent(pol)
@@ -447,4 +517,17 @@ function powers_precompute(p::Poly{Rat{T}}) where T <: FieldElement
       end
    end
    return monic, P, D
+end
+
+function FunctionField(p::Poly{Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
+   sym = Symbol(s)
+   pol, den = _rat_poly(p, sym)
+   
+   par = FunctionField{T}(pol, den, sym, cached)
+   par.monic, par.powers, par.powers_den = powers_precompute(pol, den)
+   par.base_ring = base_ring(p)
+
+   gen = FunctionFieldElem{T}(par, par.powers[2], par.powers_den[2])
+
+   return par, gen
 end

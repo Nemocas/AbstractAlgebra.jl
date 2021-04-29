@@ -829,6 +829,10 @@ function RationalFunctionField(k::Field, s::AbstractString; cached = true)
    Generic.RationalFunctionField(k, s; cached=cached)
 end
 
+function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
+   Generic.FunctionField(p, s; cached=cached)
+end
+
 @doc Markdown.doc"""
     FreeModule(R::NCRing, rank::Int; cached::Bool = true)
 
