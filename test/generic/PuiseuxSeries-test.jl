@@ -676,7 +676,8 @@ end
       f = rand(S, -10:10, 1:10, -10:10)
 
       const_coeff = S(coeff(f, 0))
-      const_coeff.data = set_precision!(const_coeff.data, Int(precision(f)*Generic.scale(f)))
+      const_coeff = set_precision!(const_coeff, precision(f))
+
       @test isequal(integral(derivative(f)) + const_coeff, f)
    end
  
@@ -687,7 +688,8 @@ end
       f = rand(S, -10:10, 1:10, -10:10)
 
       const_coeff = S(coeff(f, 0))
-      const_coeff.data = set_precision!(const_coeff.data, Int(precision(f)*Generic.scale(f)))
+      const_coeff = set_precision!(const_coeff, precision(f))
+
       @test isapprox(integral(derivative(f)) + const_coeff, f)
    end
 
@@ -699,7 +701,8 @@ end
       f = rand(S, -5:5, 1:10, -10:10)
 
       const_coeff = S(coeff(f, 0))
-      const_coeff.data = set_precision!(const_coeff.data, Int(precision(f)*Generic.scale(f)))
+      const_coeff = set_precision!(const_coeff, precision(f))
+
       @test isequal(integral(derivative(f)) + const_coeff, f)
    end
 end

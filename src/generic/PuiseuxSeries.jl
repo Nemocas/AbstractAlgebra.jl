@@ -127,6 +127,32 @@ valuation(a::PuiseuxSeriesElem) = valuation(a.data)//a.scale
 
 scale(a::PuiseuxSeriesElem) = a.scale
 
+function set_precision!(a::PuiseuxSeriesElem, prec::Rational{Int})
+   s = scale(a)
+   n = numerator(prec)
+   d = denominator(prec)
+   sa = lcm(s, d)
+   a.data = inflate(a.data, div(sa, s))
+   a.data = set_precision!(a.data, n*div(sa, d))
+   a.scale = sa
+   return a
+end
+
+set_precision!(a::PuiseuxSeriesElem, prec::Int) = set_precision!(a, prec//1)
+
+function set_valuation!(a::PuiseuxSeriesElem, val::Rational{Int})
+   s = scale(a)
+   n = numerator(val)
+   d = denominator(val)
+   sa = lcm(s, d)
+   a.data = inflate(a.data, div(sa, s))
+   a.data = set_valuation!(a.data, n*div(sa, d))
+   a.scale = sa
+   return a
+end
+
+set_valuation!(a::PuiseuxSeriesElem, val::Int) = set_valuation!(a, val//1)
+
 @doc Markdown.doc"""
     coeff(a::Generic.PuiseuxSeriesElem, n::Int)
 
