@@ -930,18 +930,23 @@ function mul!(c::AbsSeries{T}, a::AbsSeries{T}, b::AbsSeries{T}) where {T <: Rin
    if lena == 0 || lenb == 0
       c.length = 0
    else
+      lenc = min(lena + lenb - 1, prec)
+
+      if c === a || c === b
+         d = T[base_ring(c)() for i in 1:lenc]
+      else
+         fit!(c, lenc)
+         d = c.coeffs
+      end
       t = base_ring(a)()
 
-      lenc = min(lena + lenb - 1, prec)
-      fit!(c, lenc)
-
       for i = 1:min(lena, lenc)
-         c.coeffs[i] = mul!(c.coeffs[i], coeff(a, i - 1), coeff(b, 0))
+         d[i] = mul!(d[i], coeff(a, i - 1), coeff(b, 0))
       end
 
       if lenc > lena
          for i = 2:min(lenb, lenc - lena + 1)
-            c.coeffs[lena + i - 1] = mul!(c.coeffs[lena + i - 1], coeff(a, lena - 1), coeff(b, i - 1))
+            d[lena + i - 1] = mul!(d[lena + i - 1], coeff(a, lena - 1), coeff(b, i - 1))
          end
       end
 
@@ -949,18 +954,19 @@ function mul!(c::AbsSeries{T}, a::AbsSeries{T}, b::AbsSeries{T}) where {T <: Rin
          if lenc > i
             for j = 2:min(lenb, lenc - i + 1)
                t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
-               c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
+               d[i + j - 1] = addeq!(d[i + j - 1], t)
             end
          end
       end
 
+      c.coeffs = d
       c.length = normalise(c, lenc)
    end
    c.prec = prec
    return c
 end
 
-function addeq!(c::AbsSeries{T}, a::AbsSeries{T}) where {T <: RingElement}
+function addeq!(c::AbsSeries{T}, a::AbsSeries{T}) where T <: RingElement
    lenc = length(c)
    lena = length(a)
 
@@ -975,6 +981,37 @@ function addeq!(c::AbsSeries{T}, a::AbsSeries{T}) where {T <: RingElement}
       c.coeffs[i] = addeq!(c.coeffs[i], coeff(a, i - 1))
    end
    c.length = normalise(c, len)
+   c.prec = prec
+   return c
+end
+
+function add!(c::AbsSeries{T}, a::AbsSeries{T}, b::AbsSeries{T}) where T <: RingElement
+   if c === a
+      return addeq!(c, b)
+   elseif c === b
+      return addeq!(c, a)
+   end
+   lena = length(a)
+   lenb = length(b)
+   prec = min(precision(a), precision(b))
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   lenc = max(lena, lenb)
+   fit!(c, lenc)
+   i = 1
+   while i <= min(lena, lenb)
+      c.coeffs[i] = coeff(a, i - 1) + coeff(b, i - 1)
+      i += 1
+   end
+   while i <= lena
+      c.coeffs[i] = deepcopy(coeff(a, i - 1))
+      i += 1
+   end
+   while i <= lenb
+      c.coeffs[i] = deepcopy(coeff(b, i - 1))
+      i += 1
+   end
+   c.length = normalise(c, i - 1)
    c.prec = prec
    return c
 end
