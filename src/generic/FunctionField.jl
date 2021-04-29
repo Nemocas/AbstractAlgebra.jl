@@ -451,6 +451,15 @@ function Base.denominator(a::FunctionFieldElem, canonicalise::Bool=true)
    end
 end
 
+zero(R::FunctionField) = R()
+
+one(R::FunctionField) = R(1)
+
+iszero(a::FunctionFieldElem) = iszero(a.num)
+
+isone(a::FunctionFieldElem) = length(a.num) == 1 &&
+                              isone(coeff(a.num, 0)) && isone(a.den)
+
 function _rat_poly(a::FunctionFieldElem)
    return numerator(a), denominator(a)
 end
@@ -524,6 +533,42 @@ function *(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where T <: FieldEle
    n2, d2 = _rat_poly(b)
    z = R(_rat_poly_mul(n1, d1, n2, d2)...)
    return reduce!(z)
+end
+
+###############################################################################
+#
+#   Powering
+#
+###############################################################################
+
+function ^(a::FunctionFieldElem{T}, b::Int) where T <: FieldElement
+   b < 0 && error("Not implemented")
+   R = parent(a)
+   # TODO: special case powers of generator
+   if b == 0
+      return one(R)
+   elseif iszero(a)
+      return zero(R)
+   elseif length(a.num) == 1
+      return R(coeff(a, 0)^b)
+   elseif b == 1
+      return deepcopy(a)
+   else
+      bit = ~((~UInt(0)) >> 1)
+      while (UInt(bit) & b) == 0
+         bit >>= 1
+      end
+      z = a
+      bit >>= 1
+      while bit != 0
+         z = z*z
+         if (UInt(bit) & b) != 0
+            z *= a
+         end
+         bit >>= 1
+      end
+      return z
+   end
 end
 
 ###############################################################################
