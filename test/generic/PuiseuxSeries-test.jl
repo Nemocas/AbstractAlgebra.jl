@@ -668,6 +668,42 @@ end
    end
 end
 
+@testset "Generic.PuiseuxSeries.derivative_integral" begin
+   # Exact field
+   S, x = PuiseuxSeriesRing(QQ, 10, "x")
+
+   for iter = 1:100
+      f = rand(S, -10:10, 1:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      const_coeff.data = set_precision!(const_coeff.data, Int(precision(f)*Generic.scale(f)))
+      @test isequal(integral(derivative(f)) + const_coeff, f)
+   end
+ 
+   # Inexact field
+   S, x = PuiseuxSeriesField(RealField, 10, "x")
+
+   for iter = 1:100
+      f = rand(S, -10:10, 1:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      const_coeff.data = set_precision!(const_coeff.data, Int(precision(f)*Generic.scale(f)))
+      @test isapprox(integral(derivative(f)) + const_coeff, f)
+   end
+
+   # Non-integral domain
+   R = ResidueRing(ZZ, 143)
+   S, x = PuiseuxSeriesRing(R, 5, "x")
+
+   for iter = 1:100
+      f = rand(S, -5:5, 1:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      const_coeff.data = set_precision!(const_coeff.data, Int(precision(f)*Generic.scale(f)))
+      @test isequal(integral(derivative(f)) + const_coeff, f)
+   end
+end
+
 @testset "Generic.PuiseuxSeries.special_functions" begin
    # Exact field
    S, x = PuiseuxSeriesRing(QQ, 10, "x")

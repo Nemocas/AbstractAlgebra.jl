@@ -526,6 +526,32 @@ end
 
 ###############################################################################
 #
+#   Derivative and integral
+#
+###############################################################################
+
+function derivative(a::PuiseuxSeriesElem{T}) where T <: RingElement
+   S = parent(a)
+   s = scale(a)
+   z = derivative(a.data)
+   z = set_valuation!(z, valuation(z) - s + 1)
+   z = set_precision!(z, precision(z) - s + 1)
+   r = divexact(S(z, s), s)
+   return rescale!(r)
+end
+
+function integral(a::PuiseuxSeriesElem{T}) where T <: RingElement
+   S = parent(a)
+   s = scale(a)
+   z = s*a.data
+   z = set_valuation!(z, valuation(z) + s - 1)
+   z = set_precision!(z, precision(z) + s - 1)
+   r = S(integral(z), s)
+   return rescale!(r)
+end
+
+###############################################################################
+#
 #   Exponential
 #
 ###############################################################################
