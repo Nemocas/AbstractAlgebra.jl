@@ -457,6 +457,35 @@ end
 
 ###############################################################################
 #
+#   AbstractString I/O
+#
+###############################################################################
+
+function AbstractAlgebra.expressify(a::FunctionFieldElem; context = nothing)
+   n = numerator(a, true)
+   d = denominator(a, true)
+   if isone(d)
+       return expressify(n)
+   else
+       return Expr(:call, ://, expressify(n), expressify(d))
+   end
+end
+
+function show(io::IO, ::MIME"text/plain", a::FunctionFieldElem)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
+ end
+ 
+ function show(io::IO, a::FunctionFieldElem)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
+ end
+
+function show(io::IO, a::FunctionField)
+   print(IOContext(io, :compact => true), "Function Field over ",
+         base_ring(base_ring(a)), " with defining polynomial ", a.num)
+end
+
+###############################################################################
+#
 #   Unary operators
 #
 ###############################################################################
@@ -488,33 +517,34 @@ function -(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where T <: FieldEle
    return R(_rat_poly_sub(n1, d1, n2, d2)...)
 end
 
-###############################################################################
-#
-#   AbstractString I/O
-#
-###############################################################################
-
-function AbstractAlgebra.expressify(a::FunctionFieldElem; context = nothing)
-   n = numerator(a, true)
-   d = denominator(a, true)
-   if isone(d)
-       return expressify(n)
-   else
-       return Expr(:call, ://, expressify(n), expressify(d))
-   end
+function *(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where T <: FieldElement
+   check_parent(a, b)
+   R = parent(a)
+   n1, d1 = _rat_poly(a)
+   n2, d2 = _rat_poly(b)
+   z = R(_rat_poly_mul(n1, d1, n2, d2)...)
+   return reduce!(z)
 end
 
-function show(io::IO, ::MIME"text/plain", a::FunctionFieldElem)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
- end
- 
- function show(io::IO, a::FunctionFieldElem)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
- end
+###############################################################################
+#
+#   Unsafe operators
+#
+###############################################################################
 
-function show(io::IO, a::FunctionField)
-   print(IOContext(io, :compact => true), "Function Field over ",
-         base_ring(base_ring(a)), " with defining polynomial ", a.num)
+function reduce!(a::FunctionFieldElem)
+   R = parent(a)
+   len = length(R.num)
+   num = numerator(a)
+   den = denominator(a)
+   z = truncate(num, len - 1)
+   zden = den
+   for i = len:length(numerator(a))
+      c = coeff(num, i - 1)
+      z, zden = _rat_poly_add(z, zden, c*R.powers[i], R.powers_den[i])
+   end
+   a.num, a.den = _rat_poly_canonicalise(z, zden)
+   return a
 end
 
 ###############################################################################
@@ -574,7 +604,7 @@ function powers_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
    D = Vector{V}(undef, 2*len - 1)
    if monic
       pow = one(S)
-      for i = 1:2*len - 1
+      for i = 1:2*len - 3
          D[i] = one(R)
          if length(pow) == len
             pow -= pol*coeff(pow, len - 1)
@@ -586,7 +616,7 @@ function powers_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
    else
       pow = one(S)
       den = one(R)
-      for i = 1:2*len - 1
+      for i = 1:2*len - 3
          if length(pow) == len
             tden = den*coeff(pol, len - 1)
             t = pol*coeff(pow, len - 1)
