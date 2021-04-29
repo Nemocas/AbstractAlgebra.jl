@@ -371,7 +371,7 @@ function _rat_poly(p::Poly{Rat{T}}; cached::Bool=true) where T <: FieldElement
    R = base_ring(fraction_field(K))
    S = elem_type(R)
 
-   par = PolyRing{S}(R, K.S, cached)
+   par = PolyRing{S}(R, parent(p).S, cached)
 
    len = length(p)
 
@@ -401,4 +401,50 @@ function _rat_poly(p::Poly{Rat{T}}; cached::Bool=true) where T <: FieldElement
    rpol.parent = par
 
    return rpol, d
+end
+
+###############################################################################
+#
+#   FunctionField constructor
+#
+###############################################################################
+
+function powers_precompute(p::Poly{Rat{T}}) where T <: FieldElement
+   pol, d = _rat_poly(p)
+   len = length(pol)
+   R = parent(d)
+   S = parent(pol)
+   U = typeof(pol)
+   V = typeof(d)
+   P = Vector{U}(undef, 2*len - 1)
+   monic = isone(coeff(pol, len - 1))
+   D = Vector{V}(undef, 2*len - 1)
+   if monic
+      pow = one(S)
+      for i = 1:2*len - 1
+         D[i] = one(R)
+         if length(pow) == len
+            pow -= pol*coeff(pow, len - 1)
+            pow = truncate(pow, len - 1)
+         end
+         P[i] = pow
+         pow = shift_left(pow, 1)
+      end
+   else
+      pow = one(S)
+      den = one(R)
+      for i = 1:2*len - 1
+         if length(pow) == len
+            tden = den*coeff(pol, len - 1)
+            t = pol*coeff(pow, len - 1)
+            t = truncate(t, len - 1)
+            t, tden = _rat_poly_canonicalise(t, tden)
+            pow, den = _rat_poly_sub(pow, den, t, tden)
+         end
+         P[i] = pow
+         D[i] = den
+         pow = shift_left(pow, 1)
+      end
+   end
+   return monic, P, D
 end
