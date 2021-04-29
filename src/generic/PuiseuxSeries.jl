@@ -567,6 +567,17 @@ function Base.exp(a::PuiseuxSeriesElem{T}) where T <: RingElement
    return z
 end
 
+@doc Markdown.doc"""
+    log(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
+
+Return the logarithm of the given Puiseux series $a$.
+"""
+function Base.log(a::PuiseuxSeriesElem{T}) where T <: RingElement
+   z = parent(a)(log(a.data), a.scale)
+   z = rescale!(z)
+   return z
+end
+
 ###############################################################################
 #
 #   Random elements
