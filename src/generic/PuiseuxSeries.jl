@@ -556,6 +556,11 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    derivative(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
+
+Return the derivative of the given Puiseux series $a$.
+"""
 function derivative(a::PuiseuxSeriesElem{T}) where T <: RingElement
    S = parent(a)
    s = scale(a)
@@ -566,6 +571,11 @@ function derivative(a::PuiseuxSeriesElem{T}) where T <: RingElement
    return rescale!(r)
 end
 
+@doc Markdown.doc"""
+    integral(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
+
+Return the integral of the given Puiseux series $a$.
+"""
 function integral(a::PuiseuxSeriesElem{T}) where T <: RingElement
    S = parent(a)
    s = scale(a)

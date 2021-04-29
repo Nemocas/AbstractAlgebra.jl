@@ -299,9 +299,34 @@ julia> d = inv(b)
 
 ```
 
+## Derivative and integral
+
+```@docs
+derivative(a::Generic.PuiseuxSeriesElem)
+integral(a::Generic.PuiseuxSeriesElem)
+```
+
+**Examples**
+
+
+```jldoctest
+julia> R, x = PuiseuxSeriesRing(QQ, 10, "x")
+(Puiseux series field in x over Rationals, x + O(x^11))
+
+julia> f = x^(5//3) + x^(7//3) + x^(11//3)
+x^(5//3) + x^(7//3) + x^(11//3) + O(x^5)
+
+julia> derivative(f)
+5//3*x^(2//3) + 7//3*x^(4//3) + 11//3*x^(8//3) + O(x^4)
+
+julia> derivative(integral(f)) == f
+true
+```
+
 ### Special functions
 
 ```@docs
+Base.log(a::Generic.PuiseuxSeriesElem)
 Base.exp(a::Generic.PuiseuxSeriesElem)
 ```
 
