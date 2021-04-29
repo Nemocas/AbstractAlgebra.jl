@@ -544,7 +544,7 @@ end
 function RationalFunctionField(k::Field, s::AbstractString; cached=true)
    T = elem_type(k)
 
-   R, x = PolynomialRing(k, s, cached=cached)
+   R, x = AbstractAlgebra.PolynomialRing(k, s, cached=cached)
    g = x//1
    t = Rat{T}(g)
 

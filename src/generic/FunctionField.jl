@@ -421,6 +421,12 @@ base_ring(a::FunctionFieldElem) = base_ring(parent(a))
 
 parent(a::FunctionFieldElem) = a.parent
 
+function check_parent(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}, throw::Bool = true) where T <: FieldElement
+   fl = parent(a) != parent(b)
+   fl && throw && error("Incompatible function fields in function field operation")
+   return !fl
+end
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -443,6 +449,43 @@ function Base.denominator(a::FunctionFieldElem, canonicalise::Bool=true)
    else
       return a.den
    end
+end
+
+function _rat_poly(a::FunctionFieldElem)
+   return numerator(a), denominator(a)
+end
+
+###############################################################################
+#
+#   Unary operators
+#
+###############################################################################
+
+function -(a::FunctionFieldElem)
+   R = parent(a)
+   return R(-numerator(a), denominator(a))
+end
+
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
+
+function +(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where T <: FieldElement
+   check_parent(a, b)
+   R = parent(a)
+   n1, d1 = _rat_poly(a)
+   n2, d2 = _rat_poly(b)
+   return R(_rat_poly_add(n1, d1, n2, d2)...)
+end
+
+function -(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where T <: FieldElement
+   check_parent(a, b)
+   R = parent(a)
+   n1, d1 = _rat_poly(a)
+   n2, d2 = _rat_poly(b)
+   return R(_rat_poly_sub(n1, d1, n2, d2)...)
 end
 
 ###############################################################################
@@ -472,6 +515,46 @@ function show(io::IO, ::MIME"text/plain", a::FunctionFieldElem)
 function show(io::IO, a::FunctionField)
    print(IOContext(io, :compact => true), "Function Field over ",
          base_ring(base_ring(a)), " with defining polynomial ", a.num)
+end
+
+###############################################################################
+#
+#   Parent object call overloading
+#
+###############################################################################
+
+function (R::FunctionField{T})(p::Poly{S}, den::S) where
+                                          {T <: FieldElement, S <: PolyElem{T}}
+   z = FunctionFieldElem{T}(R, p, den)
+   return z
+end
+
+function (R::FunctionField{T})() where T <: FieldElement
+   p = zero(parent(R.powers[1]))
+   den = one(parent(R.powers_den[1]))
+   z = FunctionFieldElem{T}(R, p, den)
+   return z
+end
+
+function (R::FunctionField{T})(a::Union{Rational, Integer}) where T <: FieldElement
+   p = parent(R.powers[1])(a)
+   den = one(parent(R.powers_den[1]))
+   z = FunctionFieldElem{T}(R, p, den)
+   return z
+end
+
+function (R::FunctionField{T})(a::T) where T <: FieldElement
+   p = parent(R.powers[1])(a)
+   den = one(parent(R.powers_den[1]))
+   z = FunctionFieldElem{T}(R, p, den)
+   return z
+end
+
+function (R::FunctionField{T})(a::Rat{T}) where T <: FieldElement
+   p = parent(R.powers[1])([numerator(a)])
+   den = parent(R.powers_den[1])(denominator(a))
+   z = FunctionFieldElem{T}(R, p, den)
+   return z
 end
 
 ###############################################################################
