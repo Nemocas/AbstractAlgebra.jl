@@ -900,6 +900,16 @@ end
       @test isequal(g, g0)
 
       f1 = deepcopy(f)
+      f1 = add!(f1, f1, g)
+      @test isequal(f1, k)
+      @test isequal(g, g0)
+
+      g1 = deepcopy(g)
+      g1 = add!(g1, f, g1)
+      @test isequal(g1, k)
+      @test isequal(f, f0)
+
+      f1 = deepcopy(f)
       f1 = addeq!(f1, g)
       @test isequal(h, k)
       @test isequal(g, g0)
