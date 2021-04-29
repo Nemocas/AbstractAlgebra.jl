@@ -135,7 +135,7 @@ function set_precision!(a::PuiseuxSeriesElem, prec::Rational{Int})
    a.data = inflate(a.data, div(sa, s))
    a.data = set_precision!(a.data, n*div(sa, d))
    a.scale = sa
-   return a
+   return rescale!(a)
 end
 
 set_precision!(a::PuiseuxSeriesElem, prec::Int) = set_precision!(a, prec//1)
@@ -148,7 +148,7 @@ function set_valuation!(a::PuiseuxSeriesElem, val::Rational{Int})
    a.data = inflate(a.data, div(sa, s))
    a.data = set_valuation!(a.data, n*div(sa, d))
    a.scale = sa
-   return a
+   return rescale!(a)
 end
 
 set_valuation!(a::PuiseuxSeriesElem, val::Int) = set_valuation!(a, val//1)
