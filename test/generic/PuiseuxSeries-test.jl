@@ -149,6 +149,28 @@ end
    U, y = PuiseuxSeriesRing(T, 10, "y")
 
    @test modulus(T) == 7
+
+   R, x = PuiseuxSeriesRing(QQ, 10, "x")
+
+   for iter = 1:100
+      f = rand(R, -10:10, 1:6, -10:10)
+
+      prec = rand(0:10)//rand(1:10) + 10
+
+      f = set_precision!(f, prec)
+
+      @test precision(f) == prec
+   end
+
+   for iter = 1:100
+      f = rand(R, -10:10, 1:6, -10:10)
+
+      val = rand(-10:10)//rand(1:10)
+
+      f = set_valuation!(f, val)
+
+      @test valuation(f) == val
+   end
 end
 
 @testset "Generic.PuiseuxSeries.unary_ops" begin
