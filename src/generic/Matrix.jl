@@ -5403,13 +5403,14 @@ By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
 """
 function add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
-   c = base_ring(a)(s)
+   v = base_ring(a)(s)
    nc = ncols(a)
    !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
    !_checkbounds(nc, j) && error("Column index ($j) must be between 1 and $nc")
    temp = base_ring(a)()
    for r in rows
-      a[r, j] = addmul!(a[r, j], c, a[r, i], temp)
+      temp = mul!(temp, v, a[r, i])
+      a[r, j] += temp # cannot mutate matrix entries
    end
    return a
 end
@@ -5437,13 +5438,14 @@ By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
 """
 function add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
-   c = base_ring(a)(s)
-   nc = nrows(a)
-   !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
-   !_checkbounds(nc, j) && error("Row index ($j) must be between 1 and $nc")
+   v = base_ring(a)(s)
+   nr = nrows(a)
+   !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
+   !_checkbounds(nr, j) && error("Row index ($j) must be between 1 and $nr")
    temp = base_ring(a)()
-   for r in cols
-      a[j, r] = addmul!(a[j, r], c, a[i, r], temp)
+   for c in cols
+      temp = mul!(temp, v, a[i, c])
+      a[j, c] += temp # cannot mutate matrix entries
    end
    return a
 end
@@ -5477,7 +5479,7 @@ function multiply_column!(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(
    !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
    temp = base_ring(a)()
    for r in rows
-      a[r, i] = mul!(a[r, i], c, a[r, i])
+      a[r, i] = c*a[r, i] # cannot mutate matrix entries
    end
    return a
 end
@@ -5507,11 +5509,11 @@ changed using the optional `cols` argument.
 """
 function multiply_row!(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
    c = base_ring(a)(s)
-   nc = nrows(a)
-   !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
+   nr = nrows(a)
+   !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
    temp = base_ring(a)()
    for r in cols
-      a[i, r] = mul!(a[i, r], c, a[i, r])
+      a[i, r] = c*a[i, r] # cannot mutate matrix entries
    end
    return a
 end
