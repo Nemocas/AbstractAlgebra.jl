@@ -461,6 +461,17 @@ isone(a::FunctionFieldElem) = isone(a.num) && isone(a.den)
 
 isgen(a::FunctionFieldElem) = isgen(a.num) && isone(a.den)
 
+function deepcopy_internal(a::FunctionFieldElem, dict::IdDict)
+   R = parent(a)
+   return R(deepcopy_internal(a.num, dict), deepcopy_internal(a.den, dict))
+end
+
+function Base.hash(a::FunctionFieldElem, h::UInt)
+   b = 0x52fd76bf2694aa02%UInt
+   b = xor(hash(a.den, h), xor(hash(a.num, h), b))
+   return b
+end
+
 function _rat_poly(a::FunctionFieldElem)
    return numerator(a), denominator(a)
 end
