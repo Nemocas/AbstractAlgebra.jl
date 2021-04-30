@@ -421,6 +421,10 @@ base_ring(a::FunctionFieldElem) = base_ring(parent(a))
 
 parent(a::FunctionFieldElem) = a.parent
 
+function isexact_type(a::Type{T}) where {S <: FieldElement, T <: FunctionFieldElem{S}}
+   return isexact_type(S)
+end
+
 function check_parent(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}, throw::Bool = true) where T <: FieldElement
    fl = parent(a) != parent(b)
    fl && throw && error("Incompatible function fields in function field operation")
