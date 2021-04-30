@@ -457,8 +457,9 @@ one(R::FunctionField) = R(1)
 
 iszero(a::FunctionFieldElem) = iszero(a.num)
 
-isone(a::FunctionFieldElem) = length(a.num) == 1 &&
-                              isone(coeff(a.num, 0)) && isone(a.den)
+isone(a::FunctionFieldElem) = isone(a.num) && isone(a.den)
+
+isgen(a::FunctionFieldElem) = isgen(a.num) && isone(a.den)
 
 function _rat_poly(a::FunctionFieldElem)
    return numerator(a), denominator(a)
@@ -544,8 +545,9 @@ end
 function ^(a::FunctionFieldElem{T}, b::Int) where T <: FieldElement
    b < 0 && error("Not implemented")
    R = parent(a)
-   # TODO: special case powers of generator
-   if b == 0
+   if isgen(a) && b < 2*length(R.num) - 3 # special case powers of generator
+      return R(deepcopy(R.powers[b + 1]), deepcopy(R.powers_den[b + 1]))
+   elseif b == 0
       return one(R)
    elseif iszero(a)
       return zero(R)
