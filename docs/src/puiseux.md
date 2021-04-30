@@ -161,6 +161,8 @@ issues.
 
 All Puiseux series provide the functionality described in the Ring and Series Ring
 interfaces with the exception of the `pol_length` and `polcoeff` functions.
+Naturally the `set_precision!`, `set_valuation!` and `coeff` functions can take a
+rational exponent.
 
 **Examples**
 
@@ -185,6 +187,9 @@ true
 
 julia> iszero(f)
 false
+
+julia> coeff(g, 1//3)
+2
 
 julia> U = base_ring(S)
 Integers
@@ -294,9 +299,34 @@ julia> d = inv(b)
 
 ```
 
+## Derivative and integral
+
+```@docs
+derivative(a::Generic.PuiseuxSeriesElem)
+integral(a::Generic.PuiseuxSeriesElem)
+```
+
+**Examples**
+
+
+```jldoctest
+julia> R, x = PuiseuxSeriesRing(QQ, 10, "x")
+(Puiseux series field in x over Rationals, x + O(x^11))
+
+julia> f = x^(5//3) + x^(7//3) + x^(11//3)
+x^(5//3) + x^(7//3) + x^(11//3) + O(x^5)
+
+julia> derivative(f)
+5//3*x^(2//3) + 7//3*x^(4//3) + 11//3*x^(8//3) + O(x^4)
+
+julia> derivative(integral(f)) == f
+true
+```
+
 ### Special functions
 
 ```@docs
+Base.log(a::Generic.PuiseuxSeriesElem)
 Base.exp(a::Generic.PuiseuxSeriesElem)
 ```
 

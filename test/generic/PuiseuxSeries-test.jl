@@ -149,6 +149,28 @@ end
    U, y = PuiseuxSeriesRing(T, 10, "y")
 
    @test modulus(T) == 7
+
+   R, x = PuiseuxSeriesRing(QQ, 10, "x")
+
+   for iter = 1:100
+      f = rand(R, -10:10, 1:6, -10:10)
+
+      prec = rand(0:10)//rand(1:10) + 10
+
+      f = set_precision!(f, prec)
+
+      @test precision(f) == prec
+   end
+
+   for iter = 1:100
+      f = rand(R, -10:10, 1:6, -10:10)
+
+      val = rand(-10:10)//rand(1:10)
+
+      f = set_valuation!(f, val)
+
+      @test valuation(f) == val
+   end
 end
 
 @testset "Generic.PuiseuxSeries.unary_ops" begin
@@ -668,6 +690,45 @@ end
    end
 end
 
+@testset "Generic.PuiseuxSeries.derivative_integral" begin
+   # Exact field
+   S, x = PuiseuxSeriesRing(QQ, 10, "x")
+
+   for iter = 1:100
+      f = rand(S, -10:10, 1:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      const_coeff = set_precision!(const_coeff, precision(f))
+
+      @test isequal(integral(derivative(f)) + const_coeff, f)
+   end
+ 
+   # Inexact field
+   S, x = PuiseuxSeriesField(RealField, 10, "x")
+
+   for iter = 1:100
+      f = rand(S, -10:10, 1:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      const_coeff = set_precision!(const_coeff, precision(f))
+
+      @test isapprox(integral(derivative(f)) + const_coeff, f)
+   end
+
+   # Non-integral domain
+   R = ResidueRing(ZZ, 143)
+   S, x = PuiseuxSeriesRing(R, 5, "x")
+
+   for iter = 1:100
+      f = rand(S, -5:5, 1:10, -10:10)
+
+      const_coeff = S(coeff(f, 0))
+      const_coeff = set_precision!(const_coeff, precision(f))
+
+      @test isequal(integral(derivative(f)) + const_coeff, f)
+   end
+end
+
 @testset "Generic.PuiseuxSeries.special_functions" begin
    # Exact field
    S, x = PuiseuxSeriesRing(QQ, 10, "x")
@@ -687,6 +748,14 @@ end
       g *= x
 
       @test isequal(exp(f)*exp(g), exp(f + g))
+
+      @test isequal(log(exp(f)), f)
+
+      while !isone(coeff(f, 0))
+         f = rand(S, 0:0, 1:6, -10:10)
+      end
+
+      @test isequal(exp(log(f)), f)
    end
 
    # Inexact field
@@ -707,6 +776,14 @@ end
       g *= x
 
       @test isapprox(exp(f)*exp(g), exp(f + g))
+
+      @test isapprox(log(exp(f)), f)
+
+      while coeff(f, 0) <= 0
+         f = rand(S, 0:0, 1:6, -10:10)
+      end
+
+      @test isapprox(exp(log(f)), f)
    end
 
    # Non-integral domain

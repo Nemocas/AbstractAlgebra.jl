@@ -127,6 +127,32 @@ valuation(a::PuiseuxSeriesElem) = valuation(a.data)//a.scale
 
 scale(a::PuiseuxSeriesElem) = a.scale
 
+function set_precision!(a::PuiseuxSeriesElem, prec::Rational{Int})
+   s = scale(a)
+   n = numerator(prec)
+   d = denominator(prec)
+   sa = lcm(s, d)
+   a.data = inflate(a.data, div(sa, s))
+   a.data = set_precision!(a.data, n*div(sa, d))
+   a.scale = sa
+   return rescale!(a)
+end
+
+set_precision!(a::PuiseuxSeriesElem, prec::Int) = set_precision!(a, prec//1)
+
+function set_valuation!(a::PuiseuxSeriesElem, val::Rational{Int})
+   s = scale(a)
+   n = numerator(val)
+   d = denominator(val)
+   sa = lcm(s, d)
+   a.data = inflate(a.data, div(sa, s))
+   a.data = set_valuation!(a.data, n*div(sa, d))
+   a.scale = sa
+   return rescale!(a)
+end
+
+set_valuation!(a::PuiseuxSeriesElem, val::Int) = set_valuation!(a, val//1)
+
 @doc Markdown.doc"""
     coeff(a::Generic.PuiseuxSeriesElem, n::Int)
 
@@ -526,6 +552,42 @@ end
 
 ###############################################################################
 #
+#   Derivative and integral
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    derivative(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
+
+Return the derivative of the given Puiseux series $a$.
+"""
+function derivative(a::PuiseuxSeriesElem{T}) where T <: RingElement
+   S = parent(a)
+   s = scale(a)
+   z = derivative(a.data)
+   z = set_valuation!(z, valuation(z) - s + 1)
+   z = set_precision!(z, precision(z) - s + 1)
+   r = divexact(S(z, s), s)
+   return rescale!(r)
+end
+
+@doc Markdown.doc"""
+    integral(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
+
+Return the integral of the given Puiseux series $a$.
+"""
+function integral(a::PuiseuxSeriesElem{T}) where T <: RingElement
+   S = parent(a)
+   s = scale(a)
+   z = s*a.data
+   z = set_valuation!(z, valuation(z) + s - 1)
+   z = set_precision!(z, precision(z) + s - 1)
+   r = S(integral(z), s)
+   return rescale!(r)
+end
+
+###############################################################################
+#
 #   Exponential
 #
 ###############################################################################
@@ -537,6 +599,17 @@ Return the exponential of the given Puiseux series $a$.
 """
 function Base.exp(a::PuiseuxSeriesElem{T}) where T <: RingElement
    z = parent(a)(exp(a.data), a.scale)
+   z = rescale!(z)
+   return z
+end
+
+@doc Markdown.doc"""
+    log(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
+
+Return the logarithm of the given Puiseux series $a$.
+"""
+function Base.log(a::PuiseuxSeriesElem{T}) where T <: RingElement
+   z = parent(a)(log(a.data), a.scale)
    z = rescale!(z)
    return z
 end
