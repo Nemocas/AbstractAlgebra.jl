@@ -485,6 +485,10 @@ function coeff(a::FunctionFieldElem, n::Int)
    return R(n//d)
 end
 
+function num_coeff(a::FunctionFieldElem, n::Int)
+   return coeff(a.num, n)
+end
+
 function deepcopy_internal(a::FunctionFieldElem, dict::IdDict)
    R = parent(a)
    return R(deepcopy_internal(a.num, dict), deepcopy_internal(a.den, dict))
@@ -622,8 +626,8 @@ function zero!(a::FunctionFieldElem)
 end
 
 function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::Rat{T}) where T <: FieldElement
-   n < 0 || n > degree(parent(a)) && error("Degree not in range")
    base_ring(a) != parent(c) && error("Unable to coerce element")
+   n < 0 || n > degree(parent(a)) && error("Degree not in range")
    cnum = numerator(c.d, false)
    cden = denominator(c.d, false)
    anum = a.num
@@ -632,8 +636,6 @@ function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::Rat{T}) where T <: FieldE
    if g != aden
       u = divexact(aden, g)
       cnum *= u
-   else
-      cnum = deepcopy(cnum)
    end
    if g != cden
       u = divexact(cden, g)
@@ -642,6 +644,17 @@ function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::Rat{T}) where T <: FieldE
    end
    anum = setcoeff!(anum, n, cnum)
    a.num, a.den = _rat_poly_canonicalise(anum, aden)
+   return a
+end
+
+function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::PolyElem{T}) where T <: FieldElement
+   parent(c) != parent(a.den) && error("Unable to coerce element")
+   n < 0 || n > degree(parent(a)) && error("Degree not in range")
+   if !isone(a.den)
+      c *= a.den
+   end
+   anum = setcoeff!(a.num, n, c)
+   a.num, a.den = _rat_poly_canonicalise(anum, a.den)
    return a
 end
 
