@@ -459,6 +459,8 @@ function Base.denominator(a::FunctionFieldElem, canonicalise::Bool=true)
    end
 end
 
+degree(R::FunctionField) = degree(R.num)
+
 zero(R::FunctionField) = R()
 
 one(R::FunctionField) = R(1)
@@ -474,30 +476,6 @@ function coeff(a::FunctionFieldElem, n::Int)
    n = coeff(a.num, n)
    d = a.den
    return R(n//d)
-end
-
-function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::Rat{T}) where T <: FieldElement
-   n < 0 || n >= length(a.num) && error("Degree not in range")
-   base_ring(a) != parent(c) && error("Unable to coerce element")
-   cnum = numerator(c.d, false)
-   cden = denominator(c.d, false)
-   anum = a.num
-   aden = a.den
-   g = gcd(cden, aden)
-   if g != aden
-      u = divexact(aden, g)
-      cnum *= u
-   else
-      cnum = deepcopy(cnum)
-   end
-   if g != cden
-      u = divexact(cden, g)
-      anum *= u
-      aden *= u
-   end
-   anum = setcoeff!(anum, n, cnum)
-   a.num, a.den = _rat_poly_canonicalise(anum, aden)
-   return a
 end
 
 function deepcopy_internal(a::FunctionFieldElem, dict::IdDict)
@@ -628,6 +606,41 @@ end
 #   Unsafe operators
 #
 ###############################################################################
+
+function zero!(a::FunctionFieldElem)
+   a.num = zero!(a.num)
+   R = parent(a.den)
+   a.den = one(R)
+   return a
+end
+
+function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::Rat{T}) where T <: FieldElement
+   n < 0 || n > degree(parent(a)) && error("Degree not in range")
+   base_ring(a) != parent(c) && error("Unable to coerce element")
+   cnum = numerator(c.d, false)
+   cden = denominator(c.d, false)
+   anum = a.num
+   aden = a.den
+   g = gcd(cden, aden)
+   if g != aden
+      u = divexact(aden, g)
+      cnum *= u
+   else
+      cnum = deepcopy(cnum)
+   end
+   if g != cden
+      u = divexact(cden, g)
+      anum *= u
+      aden *= u
+   end
+   anum = setcoeff!(anum, n, cnum)
+   a.num, a.den = _rat_poly_canonicalise(anum, aden)
+   return a
+end
+
+function setcoeff!(a::FunctionFieldElem, n::Int, c::RingElement)
+   return setcoeff!(a, n, base_ring(a)(c))
+end
 
 function reduce!(a::FunctionFieldElem)
    R = parent(a)
