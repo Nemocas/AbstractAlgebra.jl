@@ -474,6 +474,8 @@ iszero(a::FunctionFieldElem) = iszero(a.num)
 
 isone(a::FunctionFieldElem) = isone(a.num) && isone(a.den)
 
+isunit(a::FunctionFieldElem) = !iszero(a)
+
 isgen(a::FunctionFieldElem) = isgen(a.num) && isone(a.den)
 
 function coeff(a::FunctionFieldElem, n::Int)
