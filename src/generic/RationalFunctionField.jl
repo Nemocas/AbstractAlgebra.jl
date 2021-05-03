@@ -528,11 +528,15 @@ function (a::RationalFunctionField{T})(b::Integer) where T <: FieldElement
    return z
 end
 
-function (a::RationalFunctionField{T})(b::Rational{Integer}) where T <: FieldElement
+function (a::RationalFunctionField{T})(b::Rational{<:Integer}) where T <: FieldElement
    K = fraction_field(a)
    z = Rat{T}(K(b))
    z.parent = a
    return z
+end
+
+function (a::RationalFunctionField)(b::RingElem)
+   return a(fraction_field(a)(b))
 end
 
 ###############################################################################

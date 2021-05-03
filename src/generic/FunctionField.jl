@@ -577,6 +577,75 @@ end
 
 ###############################################################################
 #
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function *(a::FunctionFieldElem, b::Union{Integer, Rational})
+   R = parent(a)
+   num = a.num*b
+   return R(_rat_poly_canonicalise(num, a.den)...)
+end
+
+*(a::Union{Integer, Rational}, b::FunctionFieldElem) = b*a
+
+function *(a::FunctionFieldElem{T}, b::T) where T <: FieldElem
+   R = parent(a)
+   num = a.num*b
+   return R(_rat_poly_canonicalise(num, a.den)...)
+end
+
+*(a::T, b::FunctionFieldElem{T}) where T <: FieldElem = b*a
+
+function *(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
+   parent(b) != base_ring(a) && error("Could not coerce element")
+   R = parent(a)
+   num = a.num*numerator(b, false)
+   den = a.den*denominator(b, false)
+   return R(_rat_poly_canonicalise(num, den)...)
+end
+
+*(a::Rat{T}, b::FunctionFieldElem{T}) where T <: FieldElement = b*a
+
+*(a::FunctionFieldElem, b::RingElem) = a*base_ring(a)(b)
+
+*(a::RingElem, b::FunctionFieldElem) = b*a
+
+function +(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
+   parent(b) != base_ring(a) && error("Unable to coerce element")
+   return a + parent(a)(b)
+end
+
++(a::Rat{T}, b::FunctionFieldElem{T}) where T <: FieldElement = b + a
+
++(a::FunctionFieldElem, b::Union{Integer, Rational}) = a + base_ring(a)(b)
+
++(a::Union{Integer, Rational}, b::FunctionFieldElem) = b + a
+
++(a::FunctionFieldElem, b::RingElem) = a + base_ring(a)(b)
+
++(a::RingElem, b::FunctionFieldElem) = b + a
+
+function -(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
+   parent(b) != base_ring(a) && error("Unable to coerce element")
+   return a - parent(a)(b)
+end
+
+function -(a::Rat{T}, b::FunctionFieldElem{T}) where T <: FieldElement
+   parent(a) != base_ring(b) && error("Unable to coerce element")
+   return parent(b)(a) - b
+end
+
+-(a::FunctionFieldElem, b::Union{Integer, Rational}) = a - base_ring(a)(b)
+
+-(a::Union{Integer, Rational}, b::FunctionFieldElem) = base_ring(b)(a) - b
+
+-(a::FunctionFieldElem, b::RingElem) = a - base_ring(a)(b)
+
+-(a::RingElem, b::FunctionFieldElem) = base_ring(b)(a) - b
+
+###############################################################################
+#
 #   Powering
 #
 ###############################################################################
@@ -716,6 +785,8 @@ function (R::FunctionField{T})(a::Rat{T}) where T <: FieldElement
    z = FunctionFieldElem{T}(R, p, den)
    return z
 end
+
+(R::FunctionField)(b::RingElem) = R(base_ring(R)(b))
 
 ###############################################################################
 #
