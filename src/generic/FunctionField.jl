@@ -465,6 +465,11 @@ zero(R::FunctionField) = R()
 
 one(R::FunctionField) = R(1)
 
+function gen(R::FunctionField{T}) where T <: FieldElement
+   return FunctionFieldElem{T}(R,
+                              deepcopy(R.powers[2]), deepcopy(R.powers_den[2]))
+end
+
 iszero(a::FunctionFieldElem) = iszero(a.num)
 
 isone(a::FunctionFieldElem) = isone(a.num) && isone(a.den)
@@ -750,7 +755,5 @@ function FunctionField(p::Poly{Rat{T}}, s::AbstractString; cached::Bool=true) wh
    par.monic, par.powers, par.powers_den = powers_precompute(pol, den)
    par.base_ring = base_ring(p)
 
-   gen = FunctionFieldElem{T}(par, par.powers[2], par.powers_den[2])
-
-   return par, gen
+   return par, gen(par)
 end
