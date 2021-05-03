@@ -425,11 +425,15 @@ function isexact_type(a::Type{T}) where {S <: FieldElement, T <: FunctionFieldEl
    return isexact_type(S)
 end
 
+var(a::FunctionField) = a.S
+
 function check_parent(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}, throw::Bool = true) where T <: FieldElement
    fl = parent(a) != parent(b)
    fl && throw && error("Incompatible function fields in function field operation")
    return !fl
 end
+
+characteristic(a::FunctionField) = characteristic(base_ring(a))
 
 ###############################################################################
 #
