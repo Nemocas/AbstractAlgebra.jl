@@ -772,7 +772,7 @@ function (R::FunctionField{T})(a::Union{Rational, Integer}) where T <: FieldElem
    return z
 end
 
-function (R::FunctionField{T})(a::T) where T <: FieldElement
+function (R::FunctionField{T})(a::T) where T <: FieldElem
    p = parent(R.powers[1])(a)
    den = one(parent(R.powers_den[1]))
    z = FunctionFieldElem{T}(R, p, den)
