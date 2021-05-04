@@ -3252,16 +3252,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    PolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString; cached::Bool = true)
-
-Given a base ring `R` and string `s` specifying how the generator (variable)
-should be printed, return a tuple `S, x` representing the new polynomial
-ring $S = R[x]$ and the generator $x$ of the ring. By default the parent
-object `S` will depend only on `R` and `x` and will be cached. Setting the
-optional argument `cached` to `false` will prevent the parent object `S` from
-being cached.
-"""
 function PolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString; cached::Bool = true)
    S = Symbol(s)
    T = elem_type(R)

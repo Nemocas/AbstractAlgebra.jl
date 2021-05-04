@@ -697,6 +697,18 @@ function PuiseuxSeriesField(R::Field, prec::Int, s::Char; cached=true)
    PuiseuxSeriesField(R, prec, string(s); cached=cached)
 end
 
+@doc Markdown.doc"""
+    PolynomialRing(R::AbstractAlgebra.Ring, s::Union{String, Char}; cached::Bool = true)
+
+Given a base ring `R` and string `s` specifying how the generator (variable)
+should be printed, return a tuple `S, x` representing the new polynomial
+ring $S = R[x]$ and the generator $x$ of the ring. By default the parent
+object `S` will depend only on `R` and `x` and will be cached. Setting the
+optional argument `cached` to `false` will prevent the parent object `S` from
+being cached.
+"""
+PolynomialRing(R::Ring, s::Union{AbstractString, Char}; cached::Bool = true)
+
 function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
    Generic.PolynomialRing(R, s; cached=cached)
 end
@@ -712,6 +724,20 @@ end
 function PolynomialRing(R::NCRing, s::Char; cached::Bool = true)
    PolynomialRing(R, string(s); cached=cached)
 end
+
+@doc Markdown.doc"""
+    PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{T}; cached::Bool = true, ordering::Symbol = :lex) where T <: Union{String, Char}
+
+Given a base ring `R` and an array of strings `s` specifying how the
+generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
+representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
+$x1, x2, ...$ of the polynomial ring. By default the parent object `T` will
+depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional
+argument `cached` to `false` will prevent the parent object `T` from being
+cached. `S` is a symbol corresponding to the ordering of the polynomial and
+can be one of `:lex`, `:deglex` or `:degrevlex`.
+"""
+PolynomialRing(R::Ring, s::Union{Vector{String}, Vector{Char}}; cached::Bool = true, ordering::Symbol = :lex)
 
 function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    Generic.PolynomialRing(R, s; cached=cached, ordering=ordering)
