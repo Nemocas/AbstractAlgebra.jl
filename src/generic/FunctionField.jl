@@ -364,6 +364,49 @@ function _rat_poly_rem(poly1::Poly{S}, den1::S,
    return _rat_poly_canonicalise(rpoly, rden)
 end
 
+function _rat_poly_xgcd(a::Poly{S}, den_a::S,
+                         b::Poly{S}, den_b::S) where
+                         {T <: FieldElement, S <: PolyElem{T}}
+   R = parent(a)
+   
+   if length(a) == 0 && length(b) == 0
+      return zero(R), zero(R), zero(R)
+   end
+   
+   # TODO: special case length 0 and length 1
+   
+   ca = content(a)
+   cb = content(b)
+
+   if !isone(ca)
+      a = divexact(a, ca)
+   end
+   if !isone(cb)
+      b = divexact(b, cb)
+   end
+
+   g = gcd(a, b)
+   if length(g) > 1
+      a = divexact(a, g)
+      b = divexact(b, g)
+   end
+
+   den_g, s, t = xgcd(a, b)
+
+   den_g *= leading_coefficient(g)
+
+   s *= den_a
+   den_s = ca*den_g
+
+   t *= den_b
+   den_t = cb*den_g
+
+   s, den_s = _rat_poly_canonicalise(s, den_s)
+   t, den_t = _rat_poly_canonicalise(t, den_t)
+
+   return g, leading_coefficient(g), s, den_s, t, den_t   
+end
+
 # convert a polynomial over a rational function field to
 # a numerator and denominator
 function _rat_poly(p::Poly{Rat{T}}, var=parent(p).S; cached::Bool=true) where T <: FieldElement
