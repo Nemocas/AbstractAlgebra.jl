@@ -892,7 +892,7 @@ function Base.inv(a::RelSeriesElem{T}) where T <: FieldElement
     @assert prec != 0
     R = parent(a)
     x = R(inv(coeff(a, 0)))
-    set_precision!(x, 1)
+    x = set_precision!(x, 1)
     la = [prec]
     while la[end] > 1
         push!(la, div(la[end] + 1, 2))
@@ -993,19 +993,19 @@ julia> derivative(f)
 """
 function derivative(f::RelSeriesElem{T}) where T <: RingElement
    g = parent(f)()
-   set_precision!(g, precision(f) - 1)
+   g = set_precision!(g, precision(f) - 1)
    fit!(g, pol_length(f))
    v = valuation(f)
-   set_valuation!(g, 0)
+   g = set_valuation!(g, 0)
    if v == 0
       for i = 1:pol_length(f) - 1
-         setcoeff!(g, i - 1, i*polcoeff(f, i))
+         g = setcoeff!(g, i - 1, i*polcoeff(f, i))
       end
    else
       for i = 0:pol_length(f) - 1
-         setcoeff!(g, i, (i + v)*polcoeff(f, i))
+         g = setcoeff!(g, i, (i + v)*polcoeff(f, i))
       end
-      set_valuation!(g, v - 1)
+      g = set_valuation!(g, v - 1)
    end  
    g = set_length!(g, normalise(g, pol_length(f)))
    renormalize!(g)
@@ -1031,13 +1031,13 @@ julia> integral(f)
 function integral(f::RelSeriesElem{T}) where T <: RingElement
    g = parent(f)()
    fit!(g, pol_length(f))
-   set_precision!(g, precision(f) + 1)
+   g = set_precision!(g, precision(f) + 1)
    v = valuation(f)
-   set_valuation!(g, v + 1)
+   g = set_valuation!(g, v + 1)
    for i = 1:pol_length(f)
       c = polcoeff(f, i - 1)
       if !iszero(c)
-         setcoeff!(g, i - 1, divexact(c, i + v))
+         g = setcoeff!(g, i - 1, divexact(c, i + v))
       end
    end
    g = set_length!(g, normalise(g, pol_length(f)))
@@ -1110,7 +1110,7 @@ end
 function Base.exp(a::RelSeriesElem{T}) where T <: FieldElement
    if iszero(a)
       b = parent(a)(1)
-      set_precision!(b, precision(a))
+      b = set_precision!(b, precision(a))
       return b
    end
    R = base_ring(a)
@@ -1130,8 +1130,8 @@ function Base.exp(a::RelSeriesElem{T}) where T <: FieldElement
    n = length(la) - 1
    # x -> x*(1 - log(a) + a) is the recursion
    while n > 0
-      set_precision!(x, la[n])
-      set_precision!(one1, la[n])
+      x = set_precision!(x, la[n])
+      one1 = set_precision!(one1, la[n])
       t = -log(x)
       t = addeq!(t, one1)
       t = addeq!(t, a)

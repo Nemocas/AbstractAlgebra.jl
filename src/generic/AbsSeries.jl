@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export O, valuation, precision, max_precision, set_precision!
+export O, valuation, precision, max_precision
 
 ###############################################################################
 #
@@ -682,7 +682,7 @@ function Base.inv(a::AbsSeriesElem{T}) where T <: FieldElement
     @assert prec != 0
     R = parent(a)
     x = R(inv(coeff(a, 0)))
-    set_precision!(x, 1)
+    x = set_precision!(x, 1)
     la = [prec]
     while la[end] > 1
         push!(la, div(la[end] + 1, 2))
@@ -738,7 +738,7 @@ function Base.sqrt(a::AbstractAlgebra.AbsSeriesElem)
    end
    if prec > aval2
       g = sqrt(coeff(a, aval))
-      setcoeff!(asqrt, aval2, g)
+      asqrt = setcoeff!(asqrt, aval2, g)
       g2 = g + g
    end
    p = R()
@@ -776,7 +776,7 @@ Return the derivative of the power series $f$.
 """
 function derivative(f::AbsSeriesElem{T}) where T <: RingElement
    g = parent(f)()
-   set_precision!(g, precision(f) - 1)
+   g = set_precision!(g, precision(f) - 1)
    len = length(f) - 1
    fit!(g, len)
    for i = 1:len
@@ -795,7 +795,7 @@ function integral(f::AbsSeriesElem{T}) where T <: RingElement
    g = parent(f)()
    len = length(f) + 1
    fit!(g, len)
-   set_precision!(g, precision(f) + 1)
+   g = set_precision!(g, precision(f) + 1)
    for i = 1:len - 1
       c = coeff(f, i - 1)
       if !iszero(c)
@@ -846,7 +846,7 @@ end
 function Base.exp(a::AbsSeriesElem{T}) where T <: FieldElement
    if iszero(a)
       b = parent(a)(1)
-      set_precision!(b, precision(a))
+      b = set_precision!(b, precision(a))
       return b
    end
    R = base_ring(a)
@@ -866,8 +866,8 @@ function Base.exp(a::AbsSeriesElem{T}) where T <: FieldElement
    n = length(la) - 1
    # x -> x*(1 - log(a) + a) is the recursion
    while n > 0
-      set_precision!(x, la[n])
-      set_precision!(one1, la[n])
+      x = set_precision!(x, la[n])
+      one1 = set_precision!(one1, la[n])
       t = -log(x)
       t = addeq!(t, one1)
       t = addeq!(t, a)
