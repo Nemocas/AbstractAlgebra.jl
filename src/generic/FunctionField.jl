@@ -683,6 +683,41 @@ end
 
 ###############################################################################
 #
+#   Comparison
+#
+###############################################################################
+
+function ==(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where T <: FieldElement
+   check_parent(a, b)
+   return denominator(a) == denominator(b) && numerator(a) == numerator(b)
+end
+
+###############################################################################
+#
+#   Ad hoc comparison
+#
+###############################################################################
+
+function ==(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
+   parent(b) != base_ring(a) && error("Unable to coerce element")
+   if length(numerator(a)) != 1
+      return false
+   end
+   return a == parent(a)(b)
+end
+
+==(a::Rat{T}, b::FunctionFieldElem{T}) where T <: FieldElement = b == a
+
+==(a::FunctionFieldElem, b::Union{Integer, Rational}) = a == base_ring(a)(b)
+
+==(a::Union{Integer, Rational}, b::FunctionFieldElem) = b == a
+
+==(a::FunctionFieldElem, b::RingElem) = a == base_ring(a)(b)
+
+==(a::RingElem, b::FunctionFieldElem) = b == a
+
+###############################################################################
+#
 #   Unsafe operators
 #
 ###############################################################################
