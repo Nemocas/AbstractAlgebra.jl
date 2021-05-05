@@ -126,6 +126,32 @@ julia> h = S([4, 7, 2, 9])
 
 ```
 
+It is also possible to create polynomials directly without first creating the
+corresponding polynomial ring.
+
+```julia
+polynomial(R::Ring, arr::Vector{T}, var::String="x"; cached::Bool=true)
+```
+
+Given an array of coefficients construct the polynomial with those coefficients
+over the given ring and with the given variable.
+
+Note that if `cached` is set to `false` then the parent ring of the created
+polynomial is not cached. However, this means that subsequent polynomials
+created in the same way will not be compatible. Instead, one should use the
+parent object of the first polynomial to create subsequent polynomials instead
+of calling this function repeatedly with `cached=false`.
+
+**Examples**
+
+```jldoctest
+julia> f = polynomial(ZZ, [1, 2, 3])
+3*x^2 + 2*x + 1
+
+julia> f = polynomial(ZZ, [1, 2, 3], "y")
+3*y^2 + 2*y + 1
+```
+
 ### Data type and parent object methods
 
 ```julia
@@ -276,4 +302,37 @@ functionality provided by AbstractAlgebra.jl, using the same interface.
 
 Obviously additional functionality can also be added to that provided by
 AbstractAlgebra.jl on an ad hoc basis.
+
+### Similar and zero
+
+The following functions are available for all univariate polynomial types. The
+functions `similar` and `zero` do the same thing, but they are both provided
+for uniformity with other parts of the interface.
+
+```julia
+similar(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
+zero(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
+```
+
+Construct the zero polynomial with the same variable as the given polynomial
+with coefficients in the given ring.
+
+```julia
+similar(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
+similar(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
+zero(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
+zero(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
+```
+
+Construct the zero polynomial with the given variable and coefficients in the
+given ring, if specified, and in the coefficient ring of the given polynomial
+otherwise.
+
+Custom polynomial rings may choose which polynomial type is best-suited to
+return for the given ring and variable. If they don't specialise these
+function the default is a `Generic.Poly`. The default implementation of `zero`
+calls out to `similar`, so it's generally sufficient to specialise only
+`similar`. For both `similar` and `zero` only the most general method has to
+be implemented (e.g. `similar(x::MyPoly, R::Ring, var::String)` as all other
+methods call out to this more general method.
 

@@ -312,7 +312,7 @@ end
 #
 #   Deepcopy
 #
-################################################################################
+###############################################################################
 
 function deepcopy_internal(a::Poly{T}, dict::IdDict) where {T <: RingElement}
    coeffs = Array{T}(undef, length(a))
@@ -322,11 +322,66 @@ function deepcopy_internal(a::Poly{T}, dict::IdDict) where {T <: RingElement}
    return parent(a)(coeffs)
 end
 
-################################################################################
+###############################################################################
+#
+#   Similar and zero
+#
+###############################################################################
+
+function similar(x::PolyElem, R::Ring, var::Symbol=var(parent(x)); cached::Bool=true)
+   TT = elem_type(R)
+   V = Vector{TT}(undef, 0)
+   p = Poly{TT}(V)
+   # Default similar is supposed to return a Generic polynomial
+   p.parent = PolyRing{TT}(R, var, cached)
+   p = set_length!(p, 0)
+   return p
+end
+
+function similar(x::PolyElem, var::Symbol=var(parent(x)); cached::Bool=true)
+   return similar(x, base_ring(x), var; cached=cached)
+end
+
+function similar(x::PolyElem, R::Ring, var::String; cached::Bool=true)
+   return similar(x, R, Symbol(var); cached=cached)
+end
+
+function similar(x::PolyElem, var::String; cached::Bool=true)
+   return similar(x, base_ring(x), Symbol(var); cached=cached)
+end
+
+zero(p::PolyElem, R::Ring, var::Symbol=var(parent(p)); cached::Bool=true) =
+   similar(p, R, var; cached=cached)
+
+zero(p::PolyElem, var::Symbol=var(parent(p)); cached::Bool=true) =
+   similar(p, base_ring(p), var; cached=cached)
+
+zero(p::PolyElem, R::Ring, var::String; cached::Bool=true) =
+   zero(p, R, Symbol(var); cached=cached)
+
+zero(p::PolyElem, var::String; cached::Bool=true) =
+   zero(p, base_ring(p), Symbol(var); cached=cached)
+
+###############################################################################
+#
+#   polynomial constructor
+#
+###############################################################################
+
+function polynomial(R::Ring, arr::Vector{T}, var::AbstractString="x"; cached::Bool=true) where T
+   TT = elem_type(R)
+   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   p = Poly{TT}(coeffs)
+   # Default is supposed to return a Generic polynomial
+   p.parent = PolyRing{TT}(R, Symbol(var), cached)
+   return p
+end
+
+###############################################################################
 #
 #  Iterators
 #
-################################################################################
+###############################################################################
 
 struct PolyCoeffs{T <: RingElement}
     f::T
@@ -3036,7 +3091,7 @@ function addmul!(z::AbstractAlgebra.PolyElem{T}, x::AbstractAlgebra.PolyElem{T},
    z = addeq!(z, c)
    return z
 end
-
+ 
 ###############################################################################
 #
 #   Random elements
@@ -3274,9 +3329,12 @@ end
 ###############################################################################
 
 function PolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString; cached::Bool = true)
-   S = Symbol(s)
+   return PolynomialRing(R, Symbol(s); cached=cached)
+end
+
+function PolynomialRing(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
    T = elem_type(R)
-   parent_obj = PolyRing{T}(R, S, cached)
+   parent_obj = PolyRing{T}(R, s, cached)
 
    return parent_obj, parent_obj([R(0), R(1)])
 end
