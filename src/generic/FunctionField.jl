@@ -364,17 +364,45 @@ function _rat_poly_rem(poly1::Poly{S}, den1::S,
    return _rat_poly_canonicalise(rpoly, rden)
 end
 
-function _rat_poly_xgcd(a::Poly{S}, den_a::S,
-                         b::Poly{S}, den_b::S) where
-                         {T <: FieldElement, S <: PolyElem{T}}
-   R = parent(a)
-   
-   if length(a) == 0 && length(b) == 0
-      return zero(R), zero(R), zero(R)
+function _rat_poly_xgcd(a::Poly{U}, den_a::U,
+                         b::Poly{U}, den_b::U) where
+                         {T <: FieldElement, U <: PolyElem{T}}
+   S = parent(a)
+   R = parent(den_a)
+
+   lena = length(a)
+   lenb = length(b)
+
+   if lena == 0 && lenb == 0
+      return zero(S), one(R), zero(S), one(R), zero(S), one(R)
    end
-   
-   # TODO: special case length 0 and length 1
-   
+
+   if lena == 0
+      c = leading_coefficient(b)
+      g, den_g = _rat_poly_canonicalise(b, c)
+      t, den_t = _rat_poly_canonicalise(S(den_b), c)
+      return g, den_g, zero(S), one(R), t, den_t
+   end
+
+   if lenb == 0
+      c = leading_coefficient(a)
+      g, den_g = _rat_poly_canonicalise(a, c)
+      s, den_s = _rat_poly_canonicalise(S(den_a), c)
+      return g, den_g, s, den_s, zero(S), one(R)
+   end
+
+   if lena == 1
+      c = leading_coefficient(a)
+      s, den_s = _rat_poly_canonicalise(S(den_a), c)
+      return one(S), one(R), s, den_s, zero(S), one(R)
+   end
+
+   if lenb == 1
+      c = leading_coefficient(b)
+      t, den_t = _rat_poly_canonicalise(S(den_b), c)
+      return one(S), one(R), zero(S), one(R), t, den_t
+   end
+
    ca = content(a)
    cb = content(b)
 
@@ -461,6 +489,9 @@ function base_ring(a::FunctionField{T}) where T <: FieldElement
 end
 
 base_ring(a::FunctionFieldElem) = base_ring(parent(a))
+
+# For consistency with number fields in Hecke.jl
+base_field(a::FunctionField) = base_ring(a::FunctionField)
 
 parent(a::FunctionFieldElem) = a.parent
 
