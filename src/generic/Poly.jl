@@ -27,6 +27,13 @@ parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 
 elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
+@doc Markdown.doc"""
+    dense_poly_type(::Type{T}) where T <: RingElement
+
+Return the type of a polynomial whose coefficients have the given type.
+"""
+dense_poly_type(::Type{T}) where T <: RingElement = Generic.Poly{T}
+
 base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 base_ring(a::PolynomialElem) = base_ring(parent(a))
