@@ -885,6 +885,50 @@ end
 
 ###############################################################################
 #
+#   Ad hoc exact division
+#
+###############################################################################
+
+function divexact(a::FunctionFieldElem, b::Union{Rational, Integer})
+   S = parent(a)
+   anum = numerator(a, false)
+   aden = denominator(a, false)
+   R = parent(aden)
+   rnum, rden = _rat_poly_canonicalise(anum, R(b))
+   return S(rnum, rden*aden)
+end
+
+function divexact(a::FunctionFieldElem{T}, b::T) where T <: FieldElem
+   S = parent(a)
+   anum = numerator(a, false)
+   aden = denominator(a, false)
+   R = parent(aden)
+   rnum, rden = _rat_poly_canonicalise(anum, R(b))
+   return S(rnum, rden*aden)
+end
+
+function divexact(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
+   S = parent(a)
+   base_ring(a) != parent(b) && error("Incompatible fields")
+   bnum = numerator(b, false)
+   bden = denominator(b, false)
+   anum = numerator(a, false)
+   aden = denominator(a, false)
+   return S(_rat_poly_canonicalise(anum*bden, aden*bnum)...)
+end
+
+divexact(a::FunctionFieldElem, b::RingElem) = divexact(a, base_ring(a)(b))
+
+divexact(a::Union{Rational, Integer}, b::FunctionFieldElem) = a*inv(b)
+
+divexact(a::T, b::FunctionFieldElem{T}) where T <: FieldElement = a*inv(b)
+
+divexact(a::Rat{T}, b::FunctionFieldElem{T}) where T <: FieldElement = a*inv(b)
+
+divexact(a::RingElem, b::FunctionFieldElem) = a*inv(b)
+
+###############################################################################
+#
 #   Parent object call overloading
 #
 ###############################################################################
