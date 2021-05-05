@@ -929,6 +929,49 @@ divexact(a::RingElem, b::FunctionFieldElem) = a*inv(b)
 
 ###############################################################################
 #
+#   Random generation
+#
+###############################################################################
+
+RandomExtensions.maketype(K::FunctionField, _) = elem_type(K)
+
+function RandomExtensions.make(S::FunctionField, vs...)
+   R = parent(S.num)
+   n = degree(S.num)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      Make(S, vs[1]) # forward to default Make constructor
+   else
+      make(S, make(R, (n-1):(n-1), vs...))
+   end
+end
+
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{<:FunctionFieldElem,
+                                                                <:FunctionField}})
+   K, v = sp[][1:end]
+   r = v[3]
+   S = parent(K.num)
+   R = parent(K.den)
+   return K(_rat_poly_canonicalise(rand(rng, v), rand(rng, r))...)
+end
+
+rand(rng::AbstractRNG, K::FunctionField, v...) = rand(rng, make(K, v...))
+
+rand(K::FunctionField, v...) = rand(Random.GLOBAL_RNG, K, v...)
+
+###############################################################################
+#
+#   Promotion rules
+#
+###############################################################################
+
+promote_rule(::Type{FunctionFieldElem{T}}, ::Type{FunctionFieldElem{T}}) where T <: FieldElement = FunctionFieldElem{T}
+
+function promote_rule(::Type{FunctionFieldElem{T}}, ::Type{U}) where {T <: FieldElem, U <: RingElem}
+   promote_rule(T, U) == T ? FunctionFieldElem{T} : Union{}
+end
+
+###############################################################################
+#
 #   Parent object call overloading
 #
 ###############################################################################
