@@ -2837,6 +2837,11 @@ end
 
       # add column
 
+      # issue #755
+      A = identity_matrix(ZZ, 2)
+      A = add_column!(A, 2, 2, 1)
+      @test isone(A[2, 2])
+
       N = add_column(M, s, c1, c2, r1:r2)
       for ci in 1:c
          if ci == c2
@@ -2864,6 +2869,11 @@ end
 
       # multiply column
 
+      # issue #755
+      A = identity_matrix(ZZ, 2)
+      A = multiply_column!(A, 2, 1)
+      @test isone(A[2, 2])
+
       N = multiply_column(M, s, c1, r1:r2)
       for ci in 1:c
          if ci == c1
@@ -2888,6 +2898,11 @@ end
       @test multiply_column(multiply_column(M, -one(R), c1), -one(R), c1) == M
 
       # add row
+
+      # issue #755
+      A = identity_matrix(ZZ, 2)
+      A = add_row!(A, 2, 2, 1)
+      @test isone(A[2, 2])
 
       r1, r2 = rand(1:r), rand(1:r)
       s = rand(-100:100)
@@ -2920,6 +2935,11 @@ end
       end
 
       # multiply row
+
+      # issue #755
+      A = identity_matrix(ZZ, 2)
+      A = multiply_row!(A, 2, 1)
+      @test isone(A[2, 2])
 
       N = multiply_row(M, s, r1, c1:c2)
       for ci in 1:r
