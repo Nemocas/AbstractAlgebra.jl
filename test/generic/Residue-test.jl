@@ -65,7 +65,7 @@ end
    P, x = PolynomialRing(RealField, "x")
    R = Generic.ResidueRing(P, x^3)
 
-   test_rand(R, 1:9, -3:3)
+   test_rand(R, -1:9, -3:3)
 end
 
 @testset "Generic.Res.manipulation" begin

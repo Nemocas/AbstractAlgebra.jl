@@ -33,7 +33,7 @@ end
    for iter = 1:10
       M = FreeModule(R, 3)
 
-      v = [rand(R, 0:2, -10:10) for i in 1:3]
+      v = [rand(R, -1:2, -10:10) for i in 1:3]
       w = [-c for c in v]
 
       @test -M(v) == M(w)
@@ -57,8 +57,8 @@ end
    for iter = 1:10
       M = FreeModule(R, 3)
 
-      m = rand(M, 0:2, -10:10)
-      n = rand(M, 0:2, -10:10)
+      m = rand(M, -1:2, -10:10)
+      n = rand(M, -1:2, -10:10)
 
       @test m + n - n == m
    end
@@ -82,9 +82,9 @@ end
       M = FreeModule(R, 3)
       c = rand(1:10)
 
-      m = rand(M, 0:2, -10:10)
+      m = rand(M, -1:2, -10:10)
 
-      v = [rand(R, 0:2, -10:10) for i in 1:3]
+      v = [rand(R, -1:2, -10:10) for i in 1:3]
       w = [x*c for c in v]
 
       @test 2*m == m + m

@@ -64,7 +64,7 @@ end
    S, x = PolynomialRing(ZZ, "x")
    K = FractionField(S)
 
-   test_rand(K, 0:3, -3:3)
+   test_rand(K, -1:3, -3:3)
 end
 
 @testset "Generic.Frac.manipulation" begin
@@ -99,9 +99,9 @@ end
    K = FractionField(S)
 
    for iter = 1:100
-      a = rand(K, 0:3, -3:3)
-      b = rand(K, 0:3, -3:3)
-      c = rand(K, 0:3, -3:3)
+      a = rand(K, -1:3, -3:3)
+      b = rand(K, -1:3, -3:3)
+      c = rand(K, -1:3, -3:3)
 
       @test a + b - b == a
       @test c*(a + b) == c*a + c*b
@@ -177,13 +177,13 @@ end
       a = K(); b = K(); c = K()
 
       while a == 0
-         a = rand(K, 0:3, -3:3)
+         a = rand(K, -1:3, -3:3)
       end
       while b == 0
-         b = rand(K, 0:3, -3:3)
+         b = rand(K, -1:3, -3:3)
       end
       while c == 0
-         c = rand(K, 0:3, -3:3)
+         c = rand(K, -1:3, -3:3)
       end
 
       @test divexact(a*b, b) == a
@@ -211,8 +211,8 @@ end
    S = FractionField(R)
 
    for i in 1:10000
-     a = rand(S, 1:5, -10:10)
-     b = rand(S, 1:5, -10:10)
+     a = rand(S, -1:5, -10:10)
+     b = rand(S, 0:5, -10:10)
 
      d, q = divides(a, b)
 
@@ -266,7 +266,7 @@ end
    S = FractionField(R)
 
    for i = 1:100
-      a = rand(S, 1:5, -10:10)
+      a = rand(S, -1:5, -10:10)
 
       @test issquare(a^2)
 

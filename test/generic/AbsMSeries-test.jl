@@ -205,9 +205,9 @@ end
       R, gens = PowerSeriesRing(S, prec, ["x$(i)" for i in 1:nvars])
 
       for iters = 1:100
-         f = rand(R, 0:2, 0:12, -10:10)
-         c1 = rand(S, 0:2, -10:10)
-         c2 = rand(S, 0:2, -10:10)
+         f = rand(R, 0:12, -1:2, -10:10)
+         c1 = rand(S, -1:2, -10:10)
+         c2 = rand(S, -1:2, -10:10)
 
          @test isequal(c1*f - c2*f, (c1 - c2)*f)
          @test isequal(c1*f + c2*f, (c1 + c2)*f)

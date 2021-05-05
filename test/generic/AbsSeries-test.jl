@@ -279,11 +279,11 @@ end
    R, x = ZZ["x"]
    S, y = PowerSeriesRing(R, 10, "y", model=:capped_absolute)
    for iter = 1:100
-      f = rand(S, 0:12, 0:5, -10:10)
+      f = rand(S, 0:12, -1:5, -10:10)
       c1 = rand(ZZ, -10:10)
       c2 = rand(ZZ, -10:10)
-      d1 = rand(R, 0:5, -10:10)
-      d2 = rand(R, 0:5, -10:10)
+      d1 = rand(R, -1:5, -10:10)
+      d2 = rand(R, -1:5, -10:10)
 
       @test isequal(c1*f - c2*f, (c1 - c2)*f)
       @test isequal(c1*f + c2*f, (c1 + c2)*f)
@@ -429,9 +429,9 @@ end
       while f == 0
          f = rand(S, 0:0, 0:5, -10:10)
       end
-      f += rand(S, 1:12, 0:5, -10:10)
+      f += rand(S, 1:12, -1:5, -10:10)
       c1 = rand(ZZ, -10:10)
-      d1 = rand(R, 0:5, -10:10)
+      d1 = rand(R, -1:5, -10:10)
 
       @test S(c1) == c1
       @test c1 == S(c1)

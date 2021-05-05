@@ -408,12 +408,12 @@ end
    end
 
    M3 = MatrixAlgebra(R, 3)
-   for m3 in [rand(M3, 0:9, -9:9),
-              rand(rng, M3, 0:9, -9:9),
-              randmat_triu(M3, 0:9, -9:9),
-              randmat_triu(rng, M3, 0:9, -9:9),
-              randmat_with_rank(M3, 2, 0:9, -9:9),
-              randmat_with_rank(rng, M3, 2, 0:9, -9:9)]
+   for m3 in [rand(M3, -1:9, -9:9),
+              rand(rng, M3, -1:9, -9:9),
+              randmat_triu(M3, -1:9, -9:9),
+              randmat_triu(rng, M3, -1:9, -9:9),
+              randmat_with_rank(M3, 2, -1:9, -9:9),
+              randmat_with_rank(rng, M3, 2, -1:9, -9:9)]
       @test length(m3) == 9
       ET = AbstractAlgebra.Generic.Poly{Rational{BigInt}}
       @test eltype(typeof(m3)) == ET
@@ -426,17 +426,17 @@ end
    end
 
    M0 = MatrixAlgebra(R, 0)
-   m0 = rand(M0, 0:9, -9:9)
+   m0 = rand(M0, -1:9, -9:9)
    @test length(m0) == 0
    @test isempty(m0)
 
    M45 = MatrixSpace(R, 4, 5)
-   for m45 in [rand(M45, 0:9, -9:9),
-               rand(rng, M45, 0:9, -9:9),
-               randmat_triu(M45, 0:9, -9:9),
-               randmat_triu(rng, M45, 0:9, -9:9),
-               randmat_with_rank(M45, 3, 0:9, -9:9),
-               randmat_with_rank(rng, M45, 3, 0:9, -9:9)]
+   for m45 in [rand(M45, -1:9, -9:9),
+               rand(rng, M45, -1:9, -9:9),
+               randmat_triu(M45, -1:9, -9:9),
+               randmat_triu(rng, M45, -1:9, -9:9),
+               randmat_with_rank(M45, 3, -1:9, -9:9),
+               randmat_with_rank(rng, M45, 3, -1:9, -9:9)]
       @test length(m45) == 20
       @test !iszero(m45)
       @test m45 isa Generic.MatSpaceElem
@@ -896,8 +896,8 @@ end
                 MatrixSpace(R, n, n)
              end)
 
-      A = rand(S, 0:20, -100:100)
-      B = rand(S, 0:20, -100:100)
+      A = rand(S, -1:20, -100:100)
+      B = rand(S, -1:20, -100:100)
 
       @test A + B == S(A.entries + B.entries)
       @test A - B == S(A.entries - B.entries)
@@ -1021,7 +1021,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    R = RealField["t"][1]
    S = MatrixSpace(R, rand(1:9), rand(1:9))
 
-   A = rand(S, 0:200, -1000:1000)
+   A = rand(S, -1:200, -1000:1000)
 
    for t in Any[rand(-1000:1000), big(rand(-1000:1000)), rand(R, 0:200, -1000:1000)]
       @test A + t == t + A
@@ -1417,7 +1417,7 @@ end
    for dim = 0:5
       R = MatrixSpace(S, dim, dim)
 
-      M = rand(R, 0:5, -100:100)
+      M = rand(R, -1:5, -100:100)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
@@ -1427,7 +1427,7 @@ end
    for dim = 0:5
       R = MatrixSpace(S, dim, dim)
 
-      M = rand(R, 0:3, -20:20)
+      M = rand(R, -1:3, -20:20)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
@@ -1448,7 +1448,7 @@ end
 
    for dim = 0:5
       T = MatrixSpace(S, dim, dim)
-      M = rand(T, 0:2, 0:2, -10:10)
+      M = rand(T, 0:2, -1:2, -10:10)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
@@ -1457,7 +1457,7 @@ end
 @testset "Generic.Mat.minors" begin
    S, z = PolynomialRing(ZZ,"z")
    n = 5
-   R = MatrixSpace(S,n,n)
+   R = MatrixSpace(S, n, n)
    for r = 0:n
       M = randmat_with_rank(R, r, 0:3, 0:3)
       @test [1] == minors(M, 0)
@@ -1504,7 +1504,7 @@ end
    R = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(R, i, 0:3, -20:20)
+      M = randmat_with_rank(R, i, -1:3, -20:20)
 
       @test rank(M) == i
    end
@@ -1520,7 +1520,7 @@ end
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, i,-100:100)
+      M = randmat_with_rank(S, i, -100:100)
 
       @test rank(M) == i
    end
@@ -1538,7 +1538,7 @@ end
    T = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
+      M = randmat_with_rank(T, i, 0:2, -1:2, -20:20)
 
       @test rank(M) == i
    end
@@ -1660,7 +1660,7 @@ end
       R = MatrixSpace(S, dim, dim)
       U = MatrixSpace(S, dim, rand(1:5))
 
-      M = randmat_with_rank(R, dim, 0:5, -100:100)
+      M = randmat_with_rank(R, dim, -1:5, -100:100)
       b = rand(U, 0:5, -100:100);
 
       MK = matrix(K, elem_type(K)[ K(M[i, j]) for i in 1:nrows(M), j in 1:ncols(M) ])
@@ -1768,7 +1768,7 @@ end
       R = MatrixSpace(S, m, n)
       U = MatrixSpace(S, n, k)
       rnk = rand(0:min(m, n))
-      M = randmat_with_rank(R, rnk, 0:3, -20:20)
+      M = randmat_with_rank(R, rnk, -1:3, -20:20)
       x2 = rand(U, 0:3, -20:20)
       d2 = S()
       while iszero(d2)
@@ -1806,11 +1806,11 @@ end
       R = MatrixSpace(S, m, n)
       U = MatrixSpace(S, n, k)
       rnk = rand(0:min(m, n))
-      M = randmat_with_rank(R, rnk, 0:2, 0:2, -20:20)
-      x2 = rand(U, 0:2, 0:2, -20:20)
+      M = randmat_with_rank(R, rnk, 0:2, -1:2, -20:20)
+      x2 = rand(U, 0:2, -1:2, -20:20)
       d2 = zero(S)
       while iszero(d2)
-         d2 = rand(S, 0:2, 0:2, -20:20)
+         d2 = rand(S, 0:2, -1:2, -20:20)
       end
       M *= d2
       b = M*x2
@@ -1865,8 +1865,8 @@ end
          S = MatrixSpace(R, r, n)
          U = MatrixSpace(R, n, c)
 
-         X1 = rand(U, 1:2, -10:10)
-         M = rand(S, 1:2, -10:10)
+         X1 = rand(U, -1:2, -10:10)
+         M = rand(S, -1:2, -10:10)
 
          B = M*X1
          X = solve(M, B)
@@ -1909,8 +1909,8 @@ end
          S = MatrixSpace(R, r, n)
          U = MatrixSpace(R, n, c)
 
-         X1 = rand(S, 1:2, -10:10)
-         M = rand(U, 1:2, -10:10)
+         X1 = rand(S, -1:2, -10:10)
+         M = rand(U, -1:2, -10:10)
 
          B = X1*M
          X = solve_left(M, X1*M)
@@ -1930,8 +1930,8 @@ end
       T = MatrixSpace(R, m, m)
       U = MatrixSpace(R, m, m)
 
-      M = rand(T, 0:2, -10:10)
-      X2 = rand(U, 0:2, -10:10)
+      M = rand(T, -1:2, -10:10)
+      X2 = rand(U, -1:2, -10:10)
       b = M*X2
 
       flag, X = Generic.can_solve_with_solution(M, b)
@@ -2026,8 +2026,8 @@ end
             S = MatrixSpace(R, n, r)
             U = MatrixSpace(R, c, n)
 
-            X1 = rand(S, 1:2, -10:10)
-            M = rand(U, 1:2, -10:10)
+            X1 = rand(S, -1:2, -10:10)
+            M = rand(U, -1:2, -10:10)
 
             B = M*X1
             (flag, X) = can_solve_with_solution(M, M*X1)
@@ -2045,8 +2045,8 @@ end
             S = MatrixSpace(R, r, n)
             U = MatrixSpace(R, n, c)
 
-            X1 = rand(S, 1:2, -10:10)
-            M = rand(U, 1:2, -10:10)
+            X1 = rand(S, -1:2, -10:10)
+            M = rand(U, -1:2, -10:10)
 
             B = X1*M
             (flag, X) = can_solve_with_solution(M, X1*M; side = :left)
@@ -2121,11 +2121,11 @@ end
       M = matrix(R, m, n, [change_base_ring(R1, MZ[i, j]) for i in 1:m for j in 1:n])
       K = FractionField(R)
       MK = change_base_ring(K, M)
-      X2 = rand(T, 0:2, 0:65536)
+      X2 = rand(T, -1:2, 0:65536)
       B = M*X2
       d2 = R()
       while iszero(d2)
-         d2 = rand(R, 0:2, 0:65536);
+         d2 = rand(R, -1:2, 0:65536);
       end
       M = M*d2
 
@@ -2225,7 +2225,7 @@ end
    R = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(R, i, 0:3, -20:20)
+      M = randmat_with_rank(R, i, -1:3, -20:20)
 
       r, A, d = rref_rational(M)
 
@@ -2269,7 +2269,7 @@ end
    T = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
+      M = randmat_with_rank(T, i, 0:2, -1:2, -20:20)
 
       r, A, d = rref_rational(M)
 
@@ -2395,7 +2395,7 @@ end
    R = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(R, i, 0:3, -20:20)
+      M = randmat_with_rank(R, i, -1:3, -20:20)
 
       n, N = nullspace(M)
 
@@ -2423,7 +2423,7 @@ end
    T = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
+      M = randmat_with_rank(T, i, 0:2, -1:2, -20:20)
 
       n, N = nullspace(M)
 
@@ -2476,7 +2476,7 @@ end
    T = MatrixSpace(R, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(T, i, 0:2, -20:20)
+      M = randmat_with_rank(T, i, -1:2, -20:20)
 
       n, N = kernel(M)
 
@@ -2546,7 +2546,7 @@ end
    for dim = 1:5
       R = MatrixSpace(S, dim, dim)
 
-      M = randmat_with_rank(R, dim, 0:3, -20:20)
+      M = randmat_with_rank(R, dim, -1:3, -20:20)
 
       X, d = pseudo_inv(M)
 
@@ -2572,7 +2572,7 @@ end
    for dim = 1:5
       T = MatrixSpace(S, dim, dim)
 
-      M = randmat_with_rank(T, dim, 0:2, 0:2, -20:20)
+      M = randmat_with_rank(T, dim, 0:2, -1:2, -20:20)
 
       X, d = pseudo_inv(M)
 
@@ -2663,7 +2663,7 @@ end
    M = T()
    for i = 1:3
       for j = 1:3
-         M[i, j] = rand(R, 0:2, -10:10)
+         M[i, j] = rand(R, -1:2, -10:10)
          M[i + 3, j + 3] = deepcopy(M[i, j])
       end
    end
@@ -2671,7 +2671,7 @@ end
    p1 = charpoly(U, M)
 
    for i = 1:10
-      similarity!(M, rand(1:6), R(rand(R, 0:2, -3:3)))
+      similarity!(M, rand(1:6), R(rand(R, -1:2, -3:3)))
    end
 
    p2 = charpoly(U, M)
@@ -2751,7 +2751,7 @@ end
    M = T()
    for i = 1:3
       for j = 1:3
-         M[i, j] = rand(S, 0:3, 0:3, -10:10)
+         M[i, j] = rand(S, 0:3, -1:3, -10:10)
          M[i + 3, j + 3] = deepcopy(M[i, j])
       end
    end
@@ -2767,7 +2767,7 @@ end
    M = T()
    for i = 1:3
       for j = 1:3
-         M[i, j] = rand(R, 0:2, -10:10)
+         M[i, j] = rand(R, -1:2, -10:10)
          M[i + 3, j + 3] = deepcopy(M[i, j])
       end
    end
@@ -2775,7 +2775,7 @@ end
    p1 = minpoly(U, M)
 
    for i = 1:10
-      similarity!(M, rand(1:6), R(rand(R, 0:2, -3:3)))
+      similarity!(M, rand(1:6), R(rand(R, -1:2, -3:3)))
    end
 
    p2 = minpoly(U, M)
@@ -2829,7 +2829,7 @@ end
       r = rand(1:50)
       c = rand(1:50)
       S = MatrixSpace(R, r, c)
-      M = rand(S, 0:3, -100:100)
+      M = rand(S, -1:3, -100:100)
       c1, c2 = rand(1:c), rand(1:c)
       s = rand(-100:100)
       r1 = rand(1:r)
@@ -2977,8 +2977,8 @@ end
       S1 = MatrixSpace(R, r, c1)
       S2 = MatrixSpace(R, r, c2)
 
-      M1 = rand(S1, 0:3, -100:100)
-      M2 = rand(S2, 0:3, -100:100)
+      M1 = rand(S1, -1:3, -100:100)
+      M2 = rand(S2, -1:3, -100:100)
 
       @test vcat(transpose(M1), transpose(M2)) == transpose(hcat(M1, M2))
    end
@@ -3324,7 +3324,7 @@ end
 
    for i in 1:3
       M = MatrixSpace(PolynomialRing(QQ, "x")[1], rand(1:5), rand(1:5))
-      A = rand(M, 0:5, -5:5)
+      A = rand(M, -1:5, -5:5)
       r = rank(A)
       P = weak_popov(A)
       @test isweak_popov(P, r)
@@ -3356,7 +3356,7 @@ end
    M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
 
    for i in 1:2
-      A = rand(M, 1:5, 0:100)
+      A = rand(M, -1:5, 0:100)
       r = rank(A)
       P = weak_popov(A)
       @test isweak_popov(P, r)
@@ -3411,7 +3411,7 @@ end
 
    for i in 1:3
       M = MatrixSpace(PolynomialRing(QQ, "x")[1], rand(1:5), rand(1:5))
-      A = rand(M, 0:5, -5:5)
+      A = rand(M, -1:5, -5:5)
       r = rank(A)
       P = popov(A)
       @test ispopov(P, r)
@@ -3443,7 +3443,7 @@ end
    M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
 
    for i in 1:2
-      A = rand(M, 1:5, 0:100)
+      A = rand(M, -1:5, 0:100)
       r = rank(A)
       P = popov(A)
       @test ispopov(P, r)
