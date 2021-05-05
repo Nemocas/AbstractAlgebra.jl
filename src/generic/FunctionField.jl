@@ -364,7 +364,7 @@ function _rat_poly_rem(poly1::Poly{S}, den1::S,
    return _rat_poly_canonicalise(rpoly, rden)
 end
 
-function _rat_poly_xgcd(a::Poly{U}, den_a::U,
+function _rat_poly_gcdx(a::Poly{U}, den_a::U,
                          b::Poly{U}, den_b::U) where
                          {T <: FieldElement, U <: PolyElem{T}}
    S = parent(a)
@@ -419,7 +419,7 @@ function _rat_poly_xgcd(a::Poly{U}, den_a::U,
       b = divexact(b, g)
    end
 
-   den_g, s, t = xgcd(a, b)
+   den_g, s, t = resx(a, b)
 
    den_g *= leading_coefficient(g)
 
@@ -847,12 +847,29 @@ function reduce!(a::FunctionFieldElem)
    den = denominator(a)
    z = truncate(num, len - 1)
    zden = den
-   for i = len:length(numerator(a))
+   z, zden = _rat_poly_canonicalise(z, zden)
+   for i = len:length(num)
       c = coeff(num, i - 1)
-      z, zden = _rat_poly_add(z, zden, c*R.powers[i], R.powers_den[i])
+      t, tden = _rat_poly_canonicalise(R.powers[i]*c, R.powers_den[i]*zden)
+      z, zden = _rat_poly_add(z, zden, t, tden)
    end
-   a.num, a.den = _rat_poly_canonicalise(z, zden)
+   a.num, a.den = z, zden
    return a
+end
+
+###############################################################################
+#
+#   Inversion
+#
+###############################################################################
+
+function Base.inv(a::FunctionFieldElem)
+   R = parent(a)   
+   anum = numerator(a, false)
+   aden = denominator(a, false)
+
+   G, G_den, S, S_den, T, T_den = _rat_poly_gcdx(anum, aden, R.num, R.den)
+   return R(S, S_den)
 end
 
 ###############################################################################
