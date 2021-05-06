@@ -22,7 +22,11 @@ base_ring(a::Rat) = base_ring(parent(a))
 
 parent(a::Rat) = a.parent
 
-fraction_field(a::RationalFunctionField{T}) where T <: FieldElement = a.fraction_field
+data(x::Rat{T}) where T <: FieldElement = x.d::Frac{dense_poly_type(T)}
+
+function fraction_field(a::RationalFunctionField{T}) where T <: FieldElement
+   return a.fraction_field::FracField{dense_poly_type(T)}
+end
 
 function isdomain_type(::Type{T}) where {S <: FieldElement, T <: Rat{S}}
    return true
@@ -81,8 +85,6 @@ end
 #   Basic manipulation
 #
 ###############################################################################
-
-data(x::Rat) = x.d
 
 function Base.hash(a::Rat, h::UInt)
    b = 0x2d122a968560a3c0%UInt

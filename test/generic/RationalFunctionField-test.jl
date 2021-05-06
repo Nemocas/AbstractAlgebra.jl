@@ -48,8 +48,7 @@ end
 @testset "Generic.RationalFunctionField.rand" begin
    K, x = RationalFunctionField(QQ, "x")
 
-   # Currently won't pass due to missing dense_poly_type
-#   test_rand(K, 0:3, -3:3)
+   test_rand(K, 0:3, -3:3)
 end
 
 @testset "Generic.RationalFunctionField.manipulation" begin
