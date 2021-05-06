@@ -857,6 +857,30 @@ function reduce!(a::FunctionFieldElem)
    return a
 end
 
+function add!(c::FunctionFieldElem{T},
+      a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where T <: FieldElement
+   n1, d1 = _rat_poly(a)
+   n2, d2 = _rat_poly(b)
+   c.num, c.den = _rat_poly_add(n1, d1, n2, d2)
+   return c
+end
+
+function addeq!(c::FunctionFieldElem{T}, a::FunctionFieldElem{T}) where
+                                                              T <: FieldElement
+   n1, d1 = _rat_poly(c)
+   n2, d2 = _rat_poly(a)
+   c.num, c.den = _rat_poly_add(n1, d1, n2, d2)
+   return c
+end
+
+function mul!(c::FunctionFieldElem{T},
+      a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where T <: FieldElement
+   n1, d1 = _rat_poly(a)
+   n2, d2 = _rat_poly(b)
+   c.num, c.den = _rat_poly_mul(n1, d1, n2, d2)
+   return reduce!(c)
+end
+
 ###############################################################################
 #
 #   Inversion
