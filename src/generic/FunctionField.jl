@@ -515,6 +515,10 @@ characteristic(a::FunctionField) = characteristic(base_ring(a))
 #
 ###############################################################################
 
+defining_polynomial(R::FunctionField) = R.pol
+
+modulus(R::FunctionField) = defining_polynomial(R)
+
 function Base.numerator(a::FunctionFieldElem, canonicalise::Bool=true)
    if canonicalise
       u = canonical_unit(a.den)
@@ -1088,6 +1092,7 @@ function FunctionField(p::Poly{Rat{T}}, s::AbstractString; cached::Bool=true) wh
    par = FunctionField{T}(pol, den, sym, cached)
    par.monic, par.powers, par.powers_den = powers_precompute(pol, den)
    par.base_ring = base_ring(p)
+   par.pol = p
 
    return par, gen(par)
 end

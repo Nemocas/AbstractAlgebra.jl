@@ -903,6 +903,7 @@ mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
    powers::Vector{Poly{<:PolyElem{T}}}
    powers_den::Vector{<:PolyElem{T}}
    monic::Bool
+   pol::Poly{Rat{T}}
    base_ring::RationalFunctionField{T}
 
    function FunctionField{T}(num::Poly{<:PolyElem{T}},
