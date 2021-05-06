@@ -897,7 +897,7 @@ end
 ###############################################################################
 
 mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
-   num::PolyElem{<:PolyElem{T}}
+   num::Poly{<:PolyElem{T}}
    den::PolyElem{T}
    S::Symbol
    powers::Vector{Poly{<:PolyElem{T}}}

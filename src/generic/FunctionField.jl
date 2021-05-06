@@ -454,17 +454,17 @@ function _rat_poly(p::Poly{Rat{T}}, var=parent(p).S; cached::Bool=true) where T 
 
    d = one(R)
    for i = 1:len
-      d = lcm(d, denominator(coeff(p, i - 1)))
+      d = lcm(d, denominator(coeff(p, i - 1), false))
    end
 
    V = Vector{S}(undef, len)
    for i = 1:len
       c = coeff(p, i - 1)
-      den_i = denominator(c)
+      den_i = denominator(c, false)
       if den_i == d
-         V[i] = deepcopy(numerator(c))
+         V[i] = deepcopy(numerator(c, false))
       else
-         V[i] = divexact(d, den_i)*numerator(c)
+         V[i] = divexact(d, den_i)*numerator(c, false)
       end
    end
 
@@ -519,25 +519,50 @@ defining_polynomial(R::FunctionField) = R.pol
 
 modulus(R::FunctionField) = defining_polynomial(R)
 
-function Base.numerator(a::FunctionFieldElem, canonicalise::Bool=true)
+function power_precomp(R::FunctionField{T}, n::Int) where T <: FieldElement
+   return R.powers[n + 1]::Poly{dense_poly_type(T)}
+end
+
+function power_precomp_den(R::FunctionField{T}, n::Int) where T <: FieldElement
+   return R.powers_den[n + 1]::dense_poly_type(T)
+end
+
+function Base.numerator(R::FunctionField{T},
+                               canonicalise::Bool=true) where T <: FieldElement
+   # only used for type assert, so no need to canonicalise
+   return R.num::Poly{dense_poly_type(T)}
+end                 
+
+function Base.denominator(R::FunctionField{T},
+                               canonicalise::Bool=true) where T <: FieldElement
+   # only used for type assert, so no need to canonicalise
+   return R.den::dense_poly_type(T)
+end                 
+
+function Base.numerator(a::FunctionFieldElem{T},
+                               canonicalise::Bool=true) where T <: FieldElement
+   anum = a.num::Poly{dense_poly_type(T)}
+   aden = a.den::dense_poly_type(T)
    if canonicalise
-      u = canonical_unit(a.den)
-      return divexact(a.num, u)
+      u = canonical_unit(aden)
+      return divexact(anum, u)
    else
-      return a.num
+      return anum
    end
 end
 
-function Base.denominator(a::FunctionFieldElem, canonicalise::Bool=true)
+function Base.denominator(a::FunctionFieldElem{T},
+                               canonicalise::Bool=true) where T <: FieldElement
+   aden = a.den::dense_poly_type(T)
    if canonicalise
-      u = canonical_unit(a.den)
-      return divexact(a.den, u)
+      u = canonical_unit(aden)
+      return divexact(aden, u)
    else
-      return a.den
+      return aden
    end
 end
 
-degree(R::FunctionField) = degree(R.num)
+degree(R::FunctionField) = degree(numerator(R))
 
 zero(R::FunctionField) = R()
 
@@ -545,41 +570,46 @@ one(R::FunctionField) = R(1)
 
 function gen(R::FunctionField{T}) where T <: FieldElement
    return FunctionFieldElem{T}(R,
-                              deepcopy(R.powers[2]), deepcopy(R.powers_den[2]))
+                  deepcopy(power_precomp(R, 1)),
+                  deepcopy(power_precomp_den(R, 1)))
 end
 
-iszero(a::FunctionFieldElem) = iszero(a.num)
+iszero(a::FunctionFieldElem) = iszero(numerator(a, false))
 
-isone(a::FunctionFieldElem) = isone(a.num) && isone(a.den)
+isone(a::FunctionFieldElem) = isone(numerator(a, false)) &&
+                                                   isone(denominator(a, false))
 
 isunit(a::FunctionFieldElem) = !iszero(a)
 
-isgen(a::FunctionFieldElem) = isgen(a.num) && isone(a.den)
+isgen(a::FunctionFieldElem) = isgen(numerator(a, false)) &&
+                                                   isone(denominator(a, false))
 
 function coeff(a::FunctionFieldElem, n::Int)
    R = base_ring(a)
-   n = coeff(a.num, n)
-   d = a.den
+   n = coeff(numerator(a, false), n)
+   d = denominator(a, false)
    return R(n//d)
 end
 
 function num_coeff(a::FunctionFieldElem, n::Int)
-   return coeff(a.num, n)
+   return coeff(numerator(a, false), n)
 end
 
 function deepcopy_internal(a::FunctionFieldElem, dict::IdDict)
    R = parent(a)
-   return R(deepcopy_internal(a.num, dict), deepcopy_internal(a.den, dict))
+   return R(deepcopy_internal(numerator(a, false), dict),
+            deepcopy_internal(denominator(a, false), dict))
 end
 
 function Base.hash(a::FunctionFieldElem, h::UInt)
    b = 0x52fd76bf2694aa02%UInt
-   b = xor(hash(a.den, h), xor(hash(a.num, h), b))
+   b = xor(hash(denominator(a, false), h),
+                                          xor(hash(numerator(a, false), h), b))
    return b
 end
 
 function _rat_poly(a::FunctionFieldElem)
-   return numerator(a), denominator(a)
+   return numerator(a, false), denominator(a, false)
 end
 
 ###############################################################################
@@ -606,9 +636,10 @@ function show(io::IO, ::MIME"text/plain", a::FunctionFieldElem)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
  end
 
-function show(io::IO, a::FunctionField)
+function show(io::IO, R::FunctionField)
    print(IOContext(io, :compact => true), "Function Field over ",
-         base_ring(base_ring(a)), " with defining polynomial ", a.num)
+         base_ring(base_ring(R)), " with defining polynomial ",
+         numerator(R))
 end
 
 ###############################################################################
@@ -619,7 +650,7 @@ end
 
 function -(a::FunctionFieldElem)
    R = parent(a)
-   return R(-numerator(a), denominator(a))
+   return R(-numerator(a, false), denominator(a, false))
 end
 
 ###############################################################################
@@ -661,16 +692,16 @@ end
 
 function *(a::FunctionFieldElem, b::Union{Integer, Rational})
    R = parent(a)
-   num = a.num*b
-   return R(_rat_poly_canonicalise(num, a.den)...)
+   num = numerator(a, false)*b
+   return R(_rat_poly_canonicalise(num, denominator(a, false))...)
 end
 
 *(a::Union{Integer, Rational}, b::FunctionFieldElem) = b*a
 
 function *(a::FunctionFieldElem{T}, b::T) where T <: FieldElem
    R = parent(a)
-   num = a.num*b
-   return R(_rat_poly_canonicalise(num, a.den)...)
+   num = numerator(a, false)*b
+   return R(_rat_poly_canonicalise(num, denominator(a, false))...)
 end
 
 *(a::T, b::FunctionFieldElem{T}) where T <: FieldElem = b*a
@@ -678,8 +709,8 @@ end
 function *(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
    parent(b) != base_ring(a) && error("Could not coerce element")
    R = parent(a)
-   num = a.num*numerator(b, false)
-   den = a.den*denominator(b, false)
+   num = numerator(a, false)*numerator(b, false)
+   den = denominator(a, false)*denominator(b, false)
    return R(_rat_poly_canonicalise(num, den)...)
 end
 
@@ -731,13 +762,14 @@ end
 function ^(a::FunctionFieldElem{T}, b::Int) where T <: FieldElement
    b < 0 && error("Not implemented")
    R = parent(a)
-   if isgen(a) && b < 2*length(R.num) - 3 # special case powers of generator
-      return R(deepcopy(R.powers[b + 1]), deepcopy(R.powers_den[b + 1]))
+   if isgen(a) && b < 2*length(numerator(R)) - 3 # special case powers of generator
+      return R(deepcopy(power_precomp(R, b)),
+               deepcopy(power_precomp_den(R, b)))
    elseif b == 0
       return one(R)
    elseif iszero(a)
       return zero(R)
-   elseif length(a.num) == 1
+   elseif length(numerator(a, false)) == 1
       return R(coeff(a, 0)^b)
    elseif b == 1
       return deepcopy(a)
@@ -767,7 +799,14 @@ end
 
 function ==(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where T <: FieldElement
    check_parent(a, b)
-   return denominator(a) == denominator(b) && numerator(a) == numerator(b)
+   aden = denominator(a, true)
+   bden = denominator(b, true)
+   if aden != bden
+      return false
+   end
+   anum = numerator(a, true)
+   bnum = numerator(a, true)
+   return anum == bnum
 end
 
 ###############################################################################
@@ -778,7 +817,7 @@ end
 
 function ==(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
    parent(b) != base_ring(a) && error("Unable to coerce element")
-   if length(numerator(a)) != 1
+   if length(numerator(a, false)) != 1
       return false
    end
    return a == parent(a)(b)
@@ -801,8 +840,8 @@ end
 ###############################################################################
 
 function zero!(a::FunctionFieldElem)
-   a.num = zero!(a.num)
-   R = parent(a.den)
+   a.num = zero!(numerator(a, false))
+   R = parent(denominator(a, false))
    a.den = one(R)
    return a
 end
@@ -812,8 +851,8 @@ function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::Rat{T}) where T <: FieldE
    n < 0 || n > degree(parent(a)) && error("Degree not in range")
    cnum = numerator(c.d, false)
    cden = denominator(c.d, false)
-   anum = a.num
-   aden = a.den
+   anum = numerator(a, false)
+   aden = denominator(a, false)
    g = gcd(cden, aden)
    if g != aden
       u = divexact(aden, g)
@@ -830,13 +869,14 @@ function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::Rat{T}) where T <: FieldE
 end
 
 function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::PolyElem{T}) where T <: FieldElement
-   parent(c) != parent(a.den) && error("Unable to coerce element")
+   parent(c) != parent(denominator(a, false)) && error("Unable to coerce element")
    n < 0 || n > degree(parent(a)) && error("Degree not in range")
-   if !isone(a.den)
-      c *= a.den
+   aden = denominator(a, false)
+   if !isone(aden)
+      c *= aden
    end
-   anum = setcoeff!(a.num, n, c)
-   a.num, a.den = _rat_poly_canonicalise(anum, a.den)
+   anum = setcoeff!(numerator(a, false), n, c)
+   a.num, a.den = _rat_poly_canonicalise(anum, aden)
    return a
 end
 
@@ -844,17 +884,18 @@ function setcoeff!(a::FunctionFieldElem, n::Int, c::RingElement)
    return setcoeff!(a, n, base_ring(a)(c))
 end
 
-function reduce!(a::FunctionFieldElem)
+function reduce!(a::FunctionFieldElem{T}) where T <: FieldElement
    R = parent(a)
-   len = length(R.num)
-   num = numerator(a)
-   den = denominator(a)
+   len = length(numerator(R))
+   num = numerator(a, false)
+   den = denominator(a, false)
    z = truncate(num, len - 1)
    zden = den
    z, zden = _rat_poly_canonicalise(z, zden)
    for i = len:length(num)
       c = coeff(num, i - 1)
-      t, tden = _rat_poly_canonicalise(R.powers[i]*c, R.powers_den[i]*zden)
+      t, tden = _rat_poly_canonicalise(power_precomp(R, i - 1)*c,
+                                       power_precomp_den(R, i - 1)*zden)
       z, zden = _rat_poly_add(z, zden, t, tden)
    end
    a.num, a.den = z, zden
@@ -896,7 +937,8 @@ function Base.inv(a::FunctionFieldElem)
    anum = numerator(a, false)
    aden = denominator(a, false)
 
-   G, G_den, S, S_den, T, T_den = _rat_poly_gcdx(anum, aden, R.num, R.den)
+   G, G_den, S, S_den, T, T_den =
+                   _rat_poly_gcdx(anum, aden, numerator(R), denominator(R))
    return R(S, S_den)
 end
 
@@ -964,8 +1006,8 @@ divexact(a::RingElem, b::FunctionFieldElem) = a*inv(b)
 RandomExtensions.maketype(K::FunctionField, _) = elem_type(K)
 
 function RandomExtensions.make(S::FunctionField, vs...)
-   R = parent(S.num)
-   n = degree(S.num)
+   R = parent(numerator(S))
+   n = degree(numerator(S))
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, vs[1]) # forward to default Make constructor
    else
@@ -977,8 +1019,8 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{<:FunctionFieldElem,
                                                                 <:FunctionField}})
    K, v = sp[][1:end]
    r = v[3]
-   S = parent(K.num)
-   R = parent(K.den)
+   S = parent(numerator(K))
+   R = parent(denominator(K))
    return K(_rat_poly_canonicalise(rand(rng, v), rand(rng, r))...)
 end
 
@@ -1011,29 +1053,29 @@ function (R::FunctionField{T})(p::Poly{S}, den::S) where
 end
 
 function (R::FunctionField{T})() where T <: FieldElement
-   p = zero(parent(R.powers[1]))
-   den = one(parent(R.powers_den[1]))
+   p = zero(parent(power_precomp(R, 0)))
+   den = one(parent(power_precomp_den(R, 0)))
    z = FunctionFieldElem{T}(R, p, den)
    return z
 end
 
 function (R::FunctionField{T})(a::Union{Rational, Integer}) where T <: FieldElement
-   p = parent(R.powers[1])(a)
-   den = one(parent(R.powers_den[1]))
+   p = parent(power_precomp(R, 0))(a)
+   den = one(parent(power_precomp_den(R, 0)))
    z = FunctionFieldElem{T}(R, p, den)
    return z
 end
 
 function (R::FunctionField{T})(a::T) where T <: FieldElem
-   p = parent(R.powers[1])(a)
-   den = one(parent(R.powers_den[1]))
+   p = parent(power_precomp(R, 0))(a)
+   den = one(parent(power_precomp_den(R, 0)))
    z = FunctionFieldElem{T}(R, p, den)
    return z
 end
 
 function (R::FunctionField{T})(a::Rat{T}) where T <: FieldElement
-   p = parent(R.powers[1])([numerator(a)])
-   den = parent(R.powers_den[1])(denominator(a))
+   p = parent(power_precomp(R, 0))([numerator(a, false)])
+   den = parent(power_precomp_den(R, 0))(denominator(a, false))
    z = FunctionFieldElem{T}(R, p, den)
    return z
 end
