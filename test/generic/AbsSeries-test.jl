@@ -128,6 +128,54 @@ end
    @test modulus(T) == 7
 end
 
+@testset "Generic.AbsSeries.similar" begin
+   R, x = PowerSeriesRing(ZZ, 10, "x"; model=:capped_absolute)
+
+   for iters = 1:10
+      f = rand(R, 0:10, -10:10)
+
+      g = similar(f, QQ, "y")
+      h = similar(f, "y")
+      k = similar(f)
+      m = similar(f, QQ, 5)
+      n = similar(f, 5)
+
+      @test isa(g, AbsSeriesElem)
+      @test isa(h, AbsSeriesElem)
+      @test isa(k, AbsSeriesElem)
+      @test isa(m, AbsSeriesElem)
+      @test isa(n, AbsSeriesElem)
+
+      @test base_ring(g) == QQ
+      @test base_ring(m) == QQ
+
+      @test parent(g).S == :y
+      @test parent(h).S == :y
+
+      @test iszero(g)
+      @test iszero(h)
+      @test iszero(k)
+      @test iszero(m)
+      @test iszero(n)
+
+      @test parent(g) != parent(f)
+      @test parent(h) != parent(f)
+      @test parent(k) == parent(f)
+      @test parent(m) != parent(f)
+      @test parent(n) != parent(f)
+
+      p = similar(f, cached=false)
+      q = similar(f, "z", cached=false)
+      r = similar(f, "z", cached=false)
+      s = similar(f)
+      t = similar(f)
+
+      @test parent(p) != parent(f)
+      @test parent(q) != parent(r)
+      @test parent(s) == parent(t)
+   end
+end
+
 @testset "Generic.AbsSeries.unary_ops" begin
    #  Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
