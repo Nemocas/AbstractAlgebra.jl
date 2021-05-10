@@ -130,6 +130,89 @@ end
 
 ###############################################################################
 #
+#   Similar and zero
+#
+###############################################################################
+
+function similar(x::AbsSeriesElem, R::Ring, max_prec::Int,
+                                 var::Symbol=var(parent(x)); cached::Bool=true)
+   TT = elem_type(R)
+   V = Vector{TT}(undef, 0)
+   p = AbsSeries{TT}(V, 0, max_prec)
+   # Default similar is supposed to return a Generic series
+   p.parent = AbsSeriesRing{TT}(R, max_prec, var, cached)
+   return p
+end
+
+function similar(x::AbsSeriesElem, R::Ring,
+                                 var::Symbol=var(parent(x)); cached::Bool=true)
+   return similar(x, R, max_precision(parent(x)), var; cached = cached)
+end
+
+function similar(x::AbsSeriesElem, max_prec::Int,
+                                 var::Symbol=var(parent(x)); cached::Bool=true)
+   return similar(x, base_ring(x), max_prec, var; cached=cached)
+end
+
+function similar(x::AbsSeriesElem,
+                                 var::Symbol=var(parent(x)); cached::Bool=true)
+   return similar(x, base_ring(x),
+                  max_precision(parent(x)), var; cached=cached)
+end
+
+function similar(x::AbsSeriesElem, R::Ring, max_prec::Int,
+                                                var::String; cached::Bool=true)
+   return similar(x, R, max_prec, Symbol(var); cached=cached)
+end
+
+function similar(x::AbsSeriesElem, R::Ring, var::String; cached::Bool=true)
+   return similar(x, R, max_precision(parent(x)), Symbol(var); cached=cached)
+end
+
+function similar(x::AbsSeriesElem, max_prec::Int,
+                                                var::String; cached::Bool=true)
+   return similar(x, base_ring(x), max_prec, Symbol(var); cached=cached)
+end
+
+function similar(x::AbsSeriesElem, var::String; cached::Bool=true)
+   return similar(x, base_ring(x),
+                  max_precision(parent(x)), Symbol(var); cached=cached)
+end
+
+function zero(a::AbsSeriesElem, R::Ring, max_prec::Int,
+                                 var::Symbol=var(parent(a)); cached::Bool=true)
+   return similar(a, R, max_prec, var; cached=cached)
+end
+
+function zero(a::AbsSeriesElem, R::Ring,
+                                 var::Symbol=var(parent(a)); cached::Bool=true)
+   return similar(a, R, max_precision(parent(x)), var; cached=cached)
+end
+
+function zero(a::AbsSeriesElem, max_prec::Int,
+                                 var::Symbol=var(parent(a)); cached::Bool=true)
+   return similar(a, base_ring(a), max_prec, var; cached=cached)
+end
+
+zero(a::AbsSeriesElem, var::Symbol=var(parent(a)); cached::Bool=true) =
+   similar(a, base_ring(a), max_precision(parent(x)), var; cached=cached)
+
+function zero(a::AbsSeriesElem, R::Ring, max_prec::Int,
+                                                var::String; cached::Bool=true)
+   return zero(a, R, max_prec, Symbol(var); cached=cached)
+end
+
+zero(a::AbsSeriesElem, R::Ring, var::String; cached::Bool=true) =
+   zero(a, R, max_precision(parent(x)), Symbol(var); cached=cached)
+
+zero(a::AbsSeriesElem, max_prec::Int, var::String; cached::Bool=true) =
+   zero(a, base_ring(p), max_prec, Symbol(var); cached=cached)
+
+zero(a::AbsSeriesElem, var::String; cached::Bool=true) =
+   zero(a, base_ring(p), max_precision(parent(x)), Symbol(var); cached=cached)
+
+###############################################################################
+#
 #   AbstractString I/O
 #
 ###############################################################################

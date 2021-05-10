@@ -309,3 +309,53 @@ julia> isgen(w)
 true
 
 ```
+
+## Optional functionality for series
+
+### Similar and zero
+
+The following functions are available for all absolute and relative series
+types. The functions `similar` and `zero` do the same thing, but are provided
+for uniformity with other parts of the interface.
+
+```julia
+similar(x::MySeries, R::Ring, max_prec::Int, var::Symbol=var(parent(x)); cached::Bool=true)
+zero(a::MySeries, R::Ring, max_prec::Int, var::Symbol=var(parent(a)); cached::Bool=true)
+```
+
+Construct the zero series with the given variable (if specified), coefficients
+in the specified coefficient ring and with relative/absolute precision cap on
+its parent ring as given by `max_prec`.
+
+```julia
+similar(x::MySeries, R::Ring, var::Symbol=var(parent(x)); cached::Bool=true)
+similar(x::MySeries, max_prec::Int, var::Symbol=var(parent(x)); cached::Bool=true)
+similar(x::MySeries, var::Symbol=var(parent(x)); cached::Bool=true)
+similar(x::MySeries, R::Ring, max_prec::Int, var::String; cached::Bool=true)
+similar(x::MySeries, R::Ring, var::String; cached::Bool=true)
+similar(x::MySeries, max_prec::Int, var::String; cached::Bool=true)
+similar(x::MySeries, var::String; cached::Bool=true)
+zero(x::MySeries, R::Ring, var::Symbol=var(parent(x)); cached::Bool=true)
+zero(x::MySeries, max_prec::Int, var::Symbol=var(parent(x)); cached::Bool=true)
+zero(x::MySeries, var::Symbol=var(parent(x)); cached::Bool=true)
+zero(x::MySeries, R::Ring, max_prec::Int, var::String; cached::Bool=true)
+zero(x::MySeries, R::Ring, var::String; cached::Bool=true)
+zero(x::MySeries, max_prec::Int, var::String; cached::Bool=true)
+zero(x::MySeries, var::String; cached::Bool=true)
+```
+
+As above, but use the precision cap of the parent ring of `x` and the
+`base_ring` of `x` if these are not specified.
+
+Custom series rings may choose which series type is best-suited to return for
+the given coefficient ring, precision cap and variable, however they should
+return a series with the same model as `x`, i.e. relative or series.
+
+If custom implementations don't specialise these function the default return
+type is a `Generic.AbsSeries` or `Generic.RelSeries`.
+
+The default implementation of zero calls out to similar, so it's generally
+sufficient to specialise only similar. For both similar and zero only the most
+general method has to be implemented as all other methods call out to this more
+general method.
+
