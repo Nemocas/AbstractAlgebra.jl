@@ -92,3 +92,18 @@ end
    @test string(x2 + y + 1) == "y + x2 + 1"
 end
 
+@testset "Generic.FunctionField.rand" begin
+   for f in P1
+      S, y = FunctionField(f, "y")
+
+      # TODO: test more than just the result type
+      test_rand(S, 1:10, -10:10)
+   end
+   
+   for f in P2
+      S, y = FunctionField(f, "y")
+
+      # TODO: test more than just the result type
+      test_rand(S, 1:10)
+   end
+end
