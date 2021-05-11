@@ -168,6 +168,25 @@ end
 
       @test S(numerator(h), denominator(h)) == h
    end
+end
 
+@testset "Generic.FunctionField.unary_ops" begin
+   for i = 1:length(P1)
+      # characteristic 0
+      S, y = FunctionField(P1[i], "y")
+
+      f = rand(S, 1:10, -10:10)
+
+      @test -(-f) == f
+      @test iszero(f + (-f))
+
+      # characteristic p
+      S, y = FunctionField(P2[i], "y")
+
+      f = rand(S, 1:10)
+
+      @test -(-f) == f
+      @test iszero(f + (-f))
+   end
 end
 
