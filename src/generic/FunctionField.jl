@@ -814,7 +814,7 @@ function ==(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where T <: FieldEl
       return false
    end
    anum = numerator(a, true)
-   bnum = numerator(a, true)
+   bnum = numerator(b, true)
    return anum == bnum
 end
 
@@ -906,7 +906,7 @@ function reduce!(a::FunctionFieldElem{T}) where T <: FieldElement
    for i = len:length(num)
       c = coeff(num, i - 1)
       t, tden = _rat_poly_canonicalise(power_precomp(R, i - 1)*c,
-                                       power_precomp_den(R, i - 1)*zden)
+                                       power_precomp_den(R, i - 1)*den)
       z, zden = _rat_poly_add(z, zden, t, tden)
    end
    a.num, a.den = z, zden
@@ -1110,9 +1110,9 @@ function powers_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
    S = parent(pol)
    U = typeof(pol)
    V = typeof(d)
-   P = Vector{U}(undef, 2*len - 1)
+   P = Vector{U}(undef, 2*len - 3)
    monic = isone(coeff(pol, len - 1))
-   D = Vector{V}(undef, 2*len - 1)
+   D = Vector{V}(undef, 2*len - 3)
    if monic
       pow = one(S)
       for i = 1:2*len - 3
@@ -1133,6 +1133,7 @@ function powers_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
             t = pol*coeff(pow, len - 1)
             t = truncate(t, len - 1)
             t, tden = _rat_poly_canonicalise(t, tden)
+            pow = truncate(pow, len - 1)
             pow, den = _rat_poly_sub(pow, den, t, tden)
          end
          P[i] = pow

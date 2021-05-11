@@ -438,3 +438,38 @@ end
    end
 end
 
+@testset "Generic.FunctionField.powering" begin
+   for i = 1:length(P1)
+      # characteristic 0
+      S, y = FunctionField(P1[i], "y")
+
+      for iters = 1:2
+         f = rand(S, 1:2, -1:1)
+         r2 = one(S)
+
+         for expn = 0:2
+            r1 = f^expn
+
+            @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
+
+            r2 *= f
+         end
+      end
+
+      # characteristic p
+      S, y = FunctionField(P2[i], "y")
+      for iters = 1:10
+         f = rand(S, 1:5)
+         r2 = one(S)
+
+         for expn = 0:5
+            r1 = f^expn
+
+            @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
+
+            r2 *= f
+         end
+      end
+   end
+end
+
