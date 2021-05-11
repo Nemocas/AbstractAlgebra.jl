@@ -826,7 +826,9 @@ end
 
 function ==(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
    parent(b) != base_ring(a) && error("Unable to coerce element")
-   if length(numerator(a, false)) != 1
+   if iszero(a) && iszero(b)
+      return true
+   elseif length(numerator(a, false)) != 1
       return false
    end
    return a == parent(a)(b)

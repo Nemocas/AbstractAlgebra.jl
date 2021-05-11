@@ -365,3 +365,76 @@ end
    end
 end
 
+@testset "Generic.FunctionField.adhoc_comparison" begin
+   for i = 1:length(P1)
+      # characteristic 0
+      S, y = FunctionField(P1[i], "y")
+
+      for iters = 1:10
+         f = S()
+         while iszero(f)
+            f = rand(S, 1:5, -10:10)
+         end
+
+         c1 = rand(ZZ, -10:10)
+ 
+         @test S(c1) == c1
+         @test c1 == S(c1)
+
+         @test S(c1) != c1 + f
+         @test c1 != S(c1) + f
+
+         c1 = rand(QQ, -10:10)
+
+         @test S(c1) == c1
+         @test c1 == S(c1)
+
+         @test S(c1) != c1 + f
+         @test c1 != S(c1) + f
+
+         c1 = rand(R1, 1:5, -10:10)
+
+         @test S(c1) == c1
+         @test c1 == S(c1)
+
+         @test S(c1) != c1 + f
+         @test c1 != S(c1) + f
+      end
+
+      # characteristic p
+      S, y = FunctionField(P2[i], "y")
+
+      for iters = 1:10
+         f = S()
+         while iszero(f)
+            f = rand(S, 1:5)
+         end
+
+         c1 = rand(ZZ, -10:10)
+ 
+         @test S(c1) == c1
+         @test c1 == S(c1)
+
+         @test S(c1) != c1 + f
+         @test c1 != S(c1) + f
+
+         k = base_ring(base_ring(S))
+         c1 = rand(k)
+
+         @test S(c1) == c1
+         @test c1 == S(c1)
+
+         @test S(c1) != c1 + f
+         @test c1 != S(c1) + f
+
+         c1 = rand(R2, 1:5)
+
+         @test S(c1) == c1
+         @test c1 == S(c1)
+
+         @test S(c1) != c1 + f
+         @test c1 != S(c1) + f
+      end
+   end
+end
+
