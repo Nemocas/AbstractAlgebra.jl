@@ -190,3 +190,37 @@ end
    end
 end
 
+@testset "Generic.FunctionField.binary_ops" begin
+   for i = 1:length(P1)
+      # characteristic 0
+      S, y = FunctionField(P1[i], "y")
+
+      f = rand(S, 1:5, -10:10)
+      g = rand(S, 1:5, -10:10)
+      h = rand(S, 1:5, -10:10)
+
+      @test f + g == g + f
+      @test f + (g + h) == (f + g) + h
+      @test f*g == g*f
+      @test f*(g + h) == f*g + f*h
+      @test (f - h) + (g + h) == f + g
+      @test (f + g)*(f - g) == f*f - g*g
+      @test f - g == -(g - f)
+
+      # characteristic p
+      S, y = FunctionField(P2[i], "y")
+
+      f = rand(S, 1:5)
+      g = rand(S, 1:5)
+      h = rand(S, 1:5)
+
+      @test f + g == g + f
+      @test f + (g + h) == (f + g) + h
+      @test f*g == g*f
+      @test f*(g + h) == f*g + f*h
+      @test (f - h) + (g + h) == f + g
+      @test (f + g)*(f - g) == f*f - g*g
+      @test f - g == -(g - f)
+   end
+end
+
