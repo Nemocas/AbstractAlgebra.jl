@@ -133,6 +133,8 @@ end
    @test one(R) == 1
 
    @test 1 == one(R)
+
+   R(x + 1) == x + 1
 end
 
 @testset "Generic.RationalFunctionField.powering" begin

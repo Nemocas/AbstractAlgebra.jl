@@ -288,6 +288,14 @@ function ==(a::T, b::Rat{T}) where T <: FieldElem
    return a == data(b)
 end
 
+function ==(a::Rat{T}, b::Poly{T}) where T <: FieldElement
+   return a == parent(a)(b)
+end
+
+function ==(a::Poly{T}, b::Rat{T}) where T <: FieldElement
+   return parent(b)(a) == b
+end
+
 ###############################################################################
 #
 #   Inversion

@@ -107,3 +107,67 @@ end
       test_rand(S, 1:10)
    end
 end
+
+@testset "Generic.FunctionField.manipulation" begin
+   for f in union(P1, P2)
+      S, y = FunctionField(f, "y")
+
+      @test iszero(zero(S))
+
+      @test isone(one(S))
+
+      @test isgen(gen(S))
+
+      @test isunit(one(S))
+      @test !isunit(zero(S))
+      @test isunit(gen(S))
+
+      @test degree(S) == length(modulus(S)) - 1
+
+      @test defining_polynomial(S) == modulus(S)
+
+      @test isa(numerator(S), PolyElem)
+      @test isa(denominator(S), PolyElem)
+
+      T = elem_type(base_ring(base_ring(S)))
+
+      @test isa(numerator(y), Generic.Poly{<:PolyElem{T}})
+      @test isa(denominator(y), PolyElem{T})
+   end
+
+   # characteristic 0
+   S, y = FunctionField(P1[4], "y")
+
+   h = x1*y^2 + (x1 + 1)//(x1 + 2)*y + 3
+
+   @test coeff(h, 2) == x1
+   @test coeff(h, 1) == (x1 + 1)//(x1 + 2)
+   @test num_coeff(h, 1) == x1 + 1
+
+   for i = 1:10
+      h = rand(S, 1:10, -10:10)
+
+      @test deepcopy(h) == h
+
+      @test S(numerator(h), denominator(h)) == h
+   end
+
+   # characteristic p
+   S, y = FunctionField(P2[4], "y")
+
+   h = x2*y^2 + (x2 + 1)//(x2 + 2)*y + 3
+
+   @test coeff(h, 2) == x2
+   @test coeff(h, 1) == (x2 + 1)//(x2 + 2)
+   @test num_coeff(h, 1) == x2 + 1
+
+   for i = 1:10
+      h = rand(S, 1:10)
+
+      @test deepcopy(h) == h
+
+      @test S(numerator(h), denominator(h)) == h
+   end
+
+end
+

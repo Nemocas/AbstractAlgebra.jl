@@ -562,17 +562,19 @@ function Base.denominator(a::FunctionFieldElem{T},
    end
 end
 
-degree(R::FunctionField) = degree(numerator(R))
+degree(S::FunctionField) = degree(numerator(S))
 
-zero(R::FunctionField) = R()
+zero(S::FunctionField) = S()
 
-one(R::FunctionField) = R(1)
+one(S::FunctionField) = S(1)
 
-function gen(R::FunctionField{T}) where T <: FieldElement
-   return degree(R) == 1 ? -coeff(modulus(R), 0)//coeff(modulus(R), 1) :
-          FunctionFieldElem{T}(R,
-                  deepcopy(power_precomp(R, 1)),
-                  deepcopy(power_precomp_den(R, 1)))
+function gen(S::FunctionField{T}) where T <: FieldElement
+   if degree(S) == 1
+      return S(-coeff(modulus(S), 0)//coeff(modulus(S), 1))
+   else
+      return FunctionFieldElem{T}(S, deepcopy(power_precomp(S, 1)),
+                                     deepcopy(power_precomp_den(S, 1)))
+   end
 end
 
 iszero(a::FunctionFieldElem) = iszero(numerator(a, false))
@@ -582,8 +584,14 @@ isone(a::FunctionFieldElem) = isone(numerator(a, false)) &&
 
 isunit(a::FunctionFieldElem) = !iszero(a)
 
-isgen(a::FunctionFieldElem) = isgen(numerator(a, false)) &&
-                                                   isone(denominator(a, false))
+function isgen(a::FunctionFieldElem)
+   S = parent(a)
+   if degree(S) == 1
+      return a == S(-coeff(modulus(S), 0)//coeff(modulus(S), 1))
+   else
+      return isgen(numerator(a, false)) && isone(denominator(a, false))
+   end
+end
 
 function coeff(a::FunctionFieldElem, n::Int)
    R = base_ring(a)
@@ -597,8 +605,8 @@ function num_coeff(a::FunctionFieldElem, n::Int)
 end
 
 function deepcopy_internal(a::FunctionFieldElem, dict::IdDict)
-   R = parent(a)
-   return R(deepcopy_internal(numerator(a, false), dict),
+   S = parent(a)
+   return S(deepcopy_internal(numerator(a, false), dict),
             deepcopy_internal(denominator(a, false), dict))
 end
 
@@ -1134,6 +1142,7 @@ function powers_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
 end
 
 function FunctionField(p::Poly{Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
+   length(p) < 2 && error("Polynomial must have degree at least 1")
    sym = Symbol(s)
    pol, den = _rat_poly(p, sym)
    
