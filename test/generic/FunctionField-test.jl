@@ -329,3 +329,39 @@ end
    end
 end
 
+@testset "Generic.FunctionField.comparison" begin
+   for i = 1:length(P1)
+      # characteristic 0
+      S, y = FunctionField(P1[i], "y")
+
+      for iters = 1:10
+         f = rand(S, 1:5, -10:10)
+         g = deepcopy(f)
+         h = S()
+         while iszero(h)
+            h = rand(S, 1:5, -10:10)
+         end
+
+         @test f == g
+         @test isequal(f, g)
+         @test f != g + h
+      end
+
+      # characteristic p
+      S, y = FunctionField(P2[i], "y")
+
+      for iters = 1:10
+         f = rand(S, 1:5)
+         g = deepcopy(f)
+         h = S()
+         while iszero(h)
+            h = rand(S, 1:4)
+         end
+
+         @test f == g
+         @test isequal(f, g)
+         @test f != g + h
+      end
+   end
+end
+
