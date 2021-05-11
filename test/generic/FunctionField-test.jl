@@ -175,18 +175,22 @@ end
       # characteristic 0
       S, y = FunctionField(P1[i], "y")
 
-      f = rand(S, 1:10, -10:10)
+      for iters = 1:10
+         f = rand(S, 1:5, -10:10)
 
-      @test -(-f) == f
-      @test iszero(f + (-f))
+         @test -(-f) == f
+         @test iszero(f + (-f))
+      end
 
       # characteristic p
       S, y = FunctionField(P2[i], "y")
 
-      f = rand(S, 1:10)
+      for iters = 1:10
+         f = rand(S, 1:5)
 
-      @test -(-f) == f
-      @test iszero(f + (-f))
+         @test -(-f) == f
+         @test iszero(f + (-f))
+      end
    end
 end
 
@@ -195,32 +199,133 @@ end
       # characteristic 0
       S, y = FunctionField(P1[i], "y")
 
-      f = rand(S, 1:5, -10:10)
-      g = rand(S, 1:5, -10:10)
-      h = rand(S, 1:5, -10:10)
+      for iters = 1:10
+         f = rand(S, 1:5, -10:10)
+         g = rand(S, 1:5, -10:10)
+         h = rand(S, 1:5, -10:10)
 
-      @test f + g == g + f
-      @test f + (g + h) == (f + g) + h
-      @test f*g == g*f
-      @test f*(g + h) == f*g + f*h
-      @test (f - h) + (g + h) == f + g
-      @test (f + g)*(f - g) == f*f - g*g
-      @test f - g == -(g - f)
+         @test f + g == g + f
+         @test f + (g + h) == (f + g) + h
+         @test f*g == g*f
+         @test f*(g + h) == f*g + f*h
+         @test (f - h) + (g + h) == f + g
+         @test (f + g)*(f - g) == f*f - g*g
+         @test f - g == -(g - f)
+      end
 
       # characteristic p
       S, y = FunctionField(P2[i], "y")
 
-      f = rand(S, 1:5)
-      g = rand(S, 1:5)
-      h = rand(S, 1:5)
+      for iters = 1:10
+         f = rand(S, 1:5)
+         g = rand(S, 1:5)
+         h = rand(S, 1:5)
 
-      @test f + g == g + f
-      @test f + (g + h) == (f + g) + h
-      @test f*g == g*f
-      @test f*(g + h) == f*g + f*h
-      @test (f - h) + (g + h) == f + g
-      @test (f + g)*(f - g) == f*f - g*g
-      @test f - g == -(g - f)
+         @test f + g == g + f
+         @test f + (g + h) == (f + g) + h
+         @test f*g == g*f
+         @test f*(g + h) == f*g + f*h
+         @test (f - h) + (g + h) == f + g
+         @test (f + g)*(f - g) == f*f - g*g
+         @test f - g == -(g - f)
+      end
+   end
+end
+
+@testset "Generic.FunctionField.adhoc_binary" begin
+   for i = 1:length(P1)
+      # characteristic 0
+      S, y = FunctionField(P1[i], "y")
+
+      for iters = 1:10
+         f = rand(S, 1:5, -10:10)
+
+         c1 = rand(ZZ, -10:10)
+         c2 = rand(ZZ, -10:10)
+
+         @test c1*f - c2*f == (c1 - c2)*f
+         @test c1*f + c2*f == (c1 + c2)*f
+
+         @test f*c1 - f*c2 == f*(c1 - c2)
+         @test f*c1 + f*c2 == f*(c1 + c2)
+
+         @test f - c1 == f + (-c1)
+         @test f + c1 == f - (-c1)
+         @test c1 + f == c1 + f
+
+         c1 = rand(QQ, -10:10)
+         c2 = rand(QQ, -10:10)
+
+         @test c1*f - c2*f == (c1 - c2)*f
+         @test c1*f + c2*f == (c1 + c2)*f
+
+         @test f*c1 - f*c2 == f*(c1 - c2)
+         @test f*c1 + f*c2 == f*(c1 + c2)
+
+         @test f - c1 == f + (-c1)
+         @test f + c1 == f - (-c1)
+         @test c1 + f == c1 + f
+
+         c1 = rand(R1, 1:5, -10:10)
+         c2 = rand(R1, 1:5, -10:10)
+
+         @test c1*f - c2*f == (c1 - c2)*f
+         @test c1*f + c2*f == (c1 + c2)*f
+
+         @test f*c1 - f*c2 == f*(c1 - c2)
+         @test f*c1 + f*c2 == f*(c1 + c2)
+
+         @test f - c1 == f + (-c1)
+         @test f + c1 == f - (-c1)
+         @test c1 + f == c1 + f
+      end
+
+      # characteristic p
+      S, y = FunctionField(P2[i], "y")
+
+      for iters = 1:10
+         f = rand(S, 1:5)
+
+         c1 = rand(ZZ, -10:10)
+         c2 = rand(ZZ, -10:10)
+
+         @test c1*f - c2*f == (c1 - c2)*f
+         @test c1*f + c2*f == (c1 + c2)*f
+
+         @test f*c1 - f*c2 == f*(c1 - c2)
+         @test f*c1 + f*c2 == f*(c1 + c2)
+
+         @test f - c1 == f + (-c1)
+         @test f + c1 == f - (-c1)
+         @test c1 + f == c1 + f
+
+         k = base_ring(base_ring(S))
+         c1 = rand(k)
+         c2 = rand(k)
+
+         @test c1*f - c2*f == (c1 - c2)*f
+         @test c1*f + c2*f == (c1 + c2)*f
+
+         @test f*c1 - f*c2 == f*(c1 - c2)
+         @test f*c1 + f*c2 == f*(c1 + c2)
+
+         @test f - c1 == f + (-c1)
+         @test f + c1 == f - (-c1)
+         @test c1 + f == c1 + f
+
+         c1 = rand(R2, 1:5)
+         c2 = rand(R2, 1:5)
+
+         @test c1*f - c2*f == (c1 - c2)*f
+         @test c1*f + c2*f == (c1 + c2)*f
+
+         @test f*c1 - f*c2 == f*(c1 - c2)
+         @test f*c1 + f*c2 == f*(c1 + c2)
+
+         @test f - c1 == f + (-c1)
+         @test f + c1 == f - (-c1)
+         @test c1 + f == c1 + f
+      end
    end
 end
 
