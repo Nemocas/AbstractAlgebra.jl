@@ -2,14 +2,14 @@ R1, x1 = RationalFunctionField(QQ, "x1")
 U1, z1 = R1["z1"]
 
 P1 = [(x1 + 1)*z1 + (x1 + 2), z1 + (x1 + 1)//(x1 + 2), z1^2 + 3z1 + 1,
-     (x1^2 + 1)//(x1 + 1)*z1^5 + 4z1^4 + (x1 + 2)*z1^3 + x1//(x1 + 1)*z1 + 1//(z1 + 1)]
+     (x1^2 + 1)//(x1 + 1)*z1^5 + 4z1^4 + (x1 + 2)*z1^3 + x1//(x1 + 1)*z1 + 1//(x1 + 1)]
 
 R2, x2 = RationalFunctionField(GF(23), "x2")
 
 U2, z2 = R2["z2"]
 
 P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
-     (x2^2 + 1)//(x2 + 1)*z2^5 + 4z2^4 + (x2 + 2)*z2^3 + x2//(x2 + 1)*z2 + 1//(z2 + 1)]
+     (x2^2 + 1)//(x2 + 1)*z2^5 + 4z2^4 + (x2 + 2)*z2^3 + x2//(x2 + 1)*z2 + 1//(x2 + 1)]
 
 @testset "Generic.FunctionField.constructors" begin 
    @test FunctionField(P1[1], "y")[1] === FunctionField(P1[1], "y", cached=true)[1]
@@ -72,5 +72,23 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
 
    @test y1 in keys(Dict(y1 => 1))
    @test !(y2 in keys(Dict(y1 => 1)))
+end
+
+@testset "Generic.FunctionField.printing" begin
+   S, y = FunctionField(P1[4], "y")
+
+   @test string(zero(S)) == "0"
+   @test string(one(S)) == "1"
+   @test string(y) == "y"
+   @test string(2*y^2 - y + 1) == "2*y^2 - y + 1"
+   @test string((x1 + 1)//(x1 + 2)*y^2 - 1//(x1 + 2)*y + 3) ==
+                           "((x1 + 1)*y^2 - y + 3*x1 + 6)//(x1 + 2)"
+
+   S, y = FunctionField(P2[4], "y")
+
+   @test string(zero(S)) == "0"
+   @test string(one(S)) == "1"
+   @test string(y) == "y"
+   @test string(x2 + y + 1) == "y + x2 + 1"
 end
 
