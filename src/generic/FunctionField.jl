@@ -5,7 +5,7 @@
 #
 ###############################################################################
 
-export FunctionField, Frac
+export FunctionField, Frac, base_field
 
 ###############################################################################
 #
@@ -569,7 +569,8 @@ zero(R::FunctionField) = R()
 one(R::FunctionField) = R(1)
 
 function gen(R::FunctionField{T}) where T <: FieldElement
-   return FunctionFieldElem{T}(R,
+   return degree(R) == 1 ? -coeff(modulus(R), 0)//coeff(modulus(R), 1) :
+          FunctionFieldElem{T}(R,
                   deepcopy(power_precomp(R, 1)),
                   deepcopy(power_precomp_den(R, 1)))
 end
@@ -1078,6 +1079,11 @@ function (R::FunctionField{T})(a::Rat{T}) where T <: FieldElement
    den = parent(power_precomp_den(R, 0))(denominator(a, false))
    z = FunctionFieldElem{T}(R, p, den)
    return z
+end
+
+function (R::FunctionField{T})(a::FunctionFieldElem) where T <: FieldElement
+   parent(a) !== R && error("Unable to coerce element")
+   return a
 end
 
 (R::FunctionField)(b::RingElem) = R(base_ring(R)(b))
