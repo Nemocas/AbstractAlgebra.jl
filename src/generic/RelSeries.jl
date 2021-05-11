@@ -5,7 +5,7 @@
 ###############################################################################
 
 export PowerSeriesRing, O, valuation, precision, max_precision, set_precision!,
-       polcoeff, set_valuation!, pol_length, renormalize!
+       polcoeff, set_valuation!, pol_length, renormalize!, rel_series
 
 ###############################################################################
 #
@@ -295,6 +295,22 @@ zero(a::RelSeriesElem, max_prec::Int, var::String; cached::Bool=true) =
 
 zero(a::RelSeriesElem, var::String; cached::Bool=true) =
    zero(a, base_ring(p), max_precision(parent(x)), Symbol(var); cached=cached)
+
+###############################################################################
+#
+#   rel_series constructor
+#
+###############################################################################
+
+function rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+   prec < len + val && error("Precision too small for given data")
+   TT = elem_type(R)
+   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   p = RelSeries{TT}(coeffs, len, prec, val)
+   # Default is supposed to return a Generic polynomial
+   p.parent = RelSeriesRing{TT}(R, max_precision, Symbol(var), cached)
+   return p
+end
 
 ###############################################################################
 #

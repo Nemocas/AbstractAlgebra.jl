@@ -176,6 +176,48 @@ end
    end
 end
 
+@testset "Generic.AbsSeries.abs_series" begin
+   f = abs_series(ZZ, [1, 2, 3], 3, 5, "y")
+
+   @test isa(f, AbsSeriesElem)
+   @test base_ring(f) == ZZ
+   @test coeff(f, 0) == 1
+   @test coeff(f, 2) == 3
+   @test parent(f).S == :y
+
+   g = abs_series(ZZ, [1, 2, 3], 3, 5)
+
+   @test isa(g, AbsSeriesElem)
+   @test base_ring(g) == ZZ
+   @test coeff(g, 0) == 1
+   @test coeff(g, 2) == 3
+   @test parent(g).S == :x
+
+   h = abs_series(ZZ, [1, 2, 3], 2, 5)
+   k = abs_series(ZZ, [1, 2, 3], 1, 6, cached=false)
+   m = abs_series(ZZ, [1, 2, 3], 3, 9, cached=false)
+
+   @test parent(h) == parent(g)
+   @test parent(k) != parent(m)
+
+   p = abs_series(ZZ, BigInt[], 0, 4)
+   q = abs_series(ZZ, [], 0, 6)
+
+   @test isa(p, AbsSeriesElem)
+   @test isa(q, AbsSeriesElem)
+
+   @test length(p) == 0
+   @test length(q) == 0
+
+   r = abs_series(QQ, BigInt[1, 2, 3], 3, 5)
+
+   @test isa(r, AbsSeriesElem)
+
+   s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
+   
+   @test max_precision(parent(s)) == 10
+end
+
 @testset "Generic.AbsSeries.unary_ops" begin
    #  Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
