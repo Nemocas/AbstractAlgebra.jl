@@ -124,6 +124,58 @@ julia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
 
 ```
 
+It is also possible to create series directly without having to create the
+corresponding series ring.
+
+```julia
+abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+```
+
+Create the power series over the given base ring `R` with coefficients
+specified by `arr` with the given absolute precision `prec` and in the case
+of relative series with the given valuation `val`.
+
+Note that more coefficients may be specified than are actually used. Only
+the first `len` coefficients are made part of the series, the remainder being
+stored internally but ignored.
+
+In the case of absolute series one must have `prec >= len` and in the case of
+relative series one must have `prec >= len + val`.
+
+By default the series are created in a ring with variable `x` and
+`max_precision` equal to `prec`, however one may specify these directly to
+override the defaults. Note that series are only compatible if they have the
+same coefficient ring `R`, `max_precision` and variable string `var`.
+
+Also by default any parent ring created is cached. If this behaviour is not
+desired, set `cached=false`. However, this means that subsequent series created
+in the same way will not be compatible. Instead, one should use the parent
+object of the first series to create subsequent series instead of calling this
+function repeatedly with cached=false.
+
+**Examples**
+
+```jldoctest
+julia> f = abs_series(ZZ, [1, 2, 3], 3, 5, "y")
+1 + 2*y + 3*y^2 + O(y^5)
+
+julia> g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
+x^4 + 2*x^5 + 3*x^6 + O(x^7)
+
+julia> k = abs_series(ZZ, [1, 2, 3], 1, 6, cached=false)
+1 + O(x^6)
+
+julia> p = rel_series(ZZ, BigInt[], 0, 3, 1)
+O(x^3)
+
+julia> q = abs_series(ZZ, [], 0, 6)
+O(x^6)
+
+julia> s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
+1 + 2*x + 3*x^2 + O(x^5)
+```
+
 ### Data type and parent object methods
 
 ```julia

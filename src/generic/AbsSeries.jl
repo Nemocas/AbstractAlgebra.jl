@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export O, valuation, precision, max_precision
+export O, valuation, precision, max_precision, abs_series
 
 ###############################################################################
 #
@@ -210,6 +210,22 @@ zero(a::AbsSeriesElem, max_prec::Int, var::String; cached::Bool=true) =
 
 zero(a::AbsSeriesElem, var::String; cached::Bool=true) =
    zero(a, base_ring(p), max_precision(parent(x)), Symbol(var); cached=cached)
+
+###############################################################################
+#
+#   abs_series constructor
+#
+###############################################################################
+
+function abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+   prec < len && error("Precision too small for given data")
+   TT = elem_type(R)
+   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   p = AbsSeries{TT}(coeffs, len, prec)
+   # Default is supposed to return a Generic polynomial
+   p.parent = AbsSeriesRing{TT}(R, max_precision, Symbol(var), cached)
+   return p
+end
 
 ###############################################################################
 #
