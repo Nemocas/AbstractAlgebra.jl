@@ -16,6 +16,11 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
+@testset "Generic.RelSeries.types" begin
+   @test rel_series_type(BigInt) == Generic.RelSeries{BigInt}
+   @test rel_series_type(Rational{BigInt}) == Generic.RelSeries{Rational{BigInt}}
+end
+
 @testset "Generic.RelSeries.constructors" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 

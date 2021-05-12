@@ -5,7 +5,8 @@
 ###############################################################################
 
 export PowerSeriesRing, O, valuation, precision, max_precision, set_precision!,
-       polcoeff, set_valuation!, pol_length, renormalize!, rel_series
+       polcoeff, set_valuation!, pol_length, renormalize!, rel_series,
+       rel_series_type
 
 ###############################################################################
 #
@@ -31,6 +32,13 @@ parent_type(::Type{RelSeries{T}}) where T <: RingElement = RelSeriesRing{T}
 parent(a::AbstractAlgebra.SeriesElem) = a.parent
 
 elem_type(::Type{RelSeriesRing{T}}) where T <: RingElement = RelSeries{T}
+
+@doc Markdown.doc"""
+    rel_series_type(::Type{T}) where T <: RingElement
+
+Return the type of a relative series whose coefficients have the given type.
+"""
+rel_series_type(::Type{T}) where T <: RingElement = Generic.RelSeries{T}
 
 base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 

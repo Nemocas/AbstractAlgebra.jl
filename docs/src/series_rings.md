@@ -186,6 +186,19 @@ Return a `Symbol` representing the variable (generator) of the series ring. Note
 that this is a `Symbol` not a `String`, though its string value will usually be used
 when printing series.
 
+Custom series types over a given ring should define one of the following functions
+which return the type of an absolute or relative series object over that ring.
+
+```julia
+abs_series_type(::Type{T}) where T <: RingElement
+rel_series_type(::Type{T}) where T <: RingElement
+```
+
+Return the type of a series whose coefficients have the given type.
+
+This function is defined for generic series and only needs to be defined for
+custom series rings, e.g. ones defined by a C implementation.
+
 ```julia
 max_precision(S::MySeriesRing{T}) where T <: AbstractAlgebra.RingElem
 ```

@@ -410,7 +410,7 @@ include("Generic.jl")
 
 # Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
 # as we have our own
-import .Generic: abs_series, add!, addeq!, addmul!, 
+import .Generic: abs_series, abs_series_type, add!, addeq!, addmul!, 
                  add_column, add_column!, add_row,
                  add_row!, basis, cached, can_solve_left_reduced_triu,
                  can_solve, can_solve_with_solution,
@@ -475,7 +475,7 @@ import .Generic: abs_series, add!, addeq!, addmul!,
 		 prime, primpart, pseudodivrem,
                  pseudo_inv, pseudorem, push_term!, randmat_triu,
                  randmat_with_rank, rand_ordering, rank_profile_popov, remove,
-                 renormalize!, rel_series, rels,
+                 renormalize!, rel_series, rel_series_type, rels,
 		 rescale!, resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, retraction_map, reverse,
@@ -501,7 +501,7 @@ import .Generic: abs_series, add!, addeq!, addmul!,
 		 power_sums_to_polynomial, roots, sturm_sequence
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
-export abs_series, add!, addeq!, addmul!,
+export abs_series, abs_series_type, add!, addeq!, addmul!,
                  addmul_delayed_reduction!, addmul!,
                  add_column, add_column!, add_row, add_row!, base_ring, cached,
                  canonical_unit, can_solve_left_reduced_triu,
@@ -569,7 +569,7 @@ export abs_series, add!, addeq!, addmul!,
 		 pseudo_inv, pseudodivrem, pseudorem,
                  push_term!, rank, randmat_triu, randmat_with_rank,
                  rand_ordering, rank_profile_popov, reduce!, remove,
-                 renormalize!, rel_series, rels,
+                 renormalize!, rel_series, rel_series_type, rels,
 		 resultant, resultant_ducos, rescale!,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, retraction_map, reverse,

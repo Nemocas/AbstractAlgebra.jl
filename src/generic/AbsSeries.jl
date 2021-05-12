@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export O, valuation, precision, max_precision, abs_series
+export O, valuation, precision, max_precision, abs_series, abs_series_type
 
 ###############################################################################
 #
@@ -30,6 +30,13 @@ end
 parent_type(::Type{AbsSeries{T}}) where {T <: RingElement} = AbsSeriesRing{T}
 
 elem_type(::Type{AbsSeriesRing{T}}) where {T <: RingElement} = AbsSeries{T}
+
+@doc Markdown.doc"""
+    abs_series_type(::Type{T}) where T <: RingElement
+
+Return the type of an absolute series whose coefficients have the given type.
+"""
+abs_series_type(::Type{T}) where T <: RingElement = Generic.AbsSeries{T}
 
 ###############################################################################
 #

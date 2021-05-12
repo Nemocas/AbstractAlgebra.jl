@@ -16,6 +16,11 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
+@testset "Generic.AbsSeries.types" begin
+   @test abs_series_type(BigInt) == Generic.AbsSeries{BigInt}
+   @test abs_series_type(Rational{BigInt}) == Generic.AbsSeries{Rational{BigInt}}
+end
+
 @testset "Generic.AbsSeries.constructors" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
