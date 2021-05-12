@@ -177,3 +177,127 @@ julia> sqrt(a^2)
 julia> issquare(a^2)
 true
 ```
+
+# Univariate function fields
+
+Univariate function fields in AbstractAlgebra are algebraic extensions $K/k(x)$
+of a rational function field $k(x)$ over a field $k$.
+
+These are implemented in a module implemented in
+`src/generic/FunctionField.jl`.
+
+Function field functionality exists in the `Generic` namespace, which is
+exported by default so that the functions can be accessed unqualified.
+
+
+## Types and parent objects
+
+Function field objects $K/k(x)$ in AbstractAlgebra have type
+`Generic.FunctionField{T}` where `T` is the type of elements of the field `k`.
+
+Corresponding function field elements have type
+`Generic.FunctionFieldElement{T}`. See the file `src/generic/GenericTypes.jl`
+for details.
+
+Function field types belong to the abstract type `AbstractAlgebra.Field`
+and their elements to the abstract type `AbstractAlgebra.FieldElem`.
+
+## Function field constructors
+
+In order to construct function fields in AbstractAlgebra.jl, one first
+constructs the rational function field they are an extension of, then supplies
+a polynomial over this field to the following constructor:
+
+```julia
+FunctionField(p::Poly{Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
+```
+
+Given an irreducible polynomial `p` over a rational function field return a
+tuple `(S, z)` consisting of the parent object of the function field defined by
+that polynomial over $k(x)$ and the generator `z`. By default the parent object
+`S` will depend only on `p` and `s` and will be cached. Setting the optional
+argument `cached` to `false` will prevent the parent object `S` from being
+cached.
+
+Here are some examples of creating function fields and making use of the
+resulting parent objects to coerce various elements into the function field.
+
+**Examples**
+
+```jldoctest
+julia> R1, x1 = RationalFunctionField(QQ, "x1") # characteristic 0
+(Rational function field over Rationals, x1)
+
+julia> U1, z1 = R1["z1"]
+(Univariate Polynomial Ring in z1 over Rational function field over Rationals, z1)
+
+julia> f = (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
+(x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
+
+julia> S1, y1 = FunctionField(f, "y1")
+(Function Field over Rationals with defining polynomial (x1^2 + 1)*y1^3 + (4*x1 + 4)*y1 + 1, y1)
+
+julia> a = S1()
+0
+
+julia> b = S1((x1 + 1)//(x1 + 2))
+(x1 + 1)//(x1 + 2)
+
+julia> c = S1(1//3)
+1//3
+
+julia> R2, x2 = RationalFunctionField(GF(23), "x1") # characteristic p
+(Rational function field over Finite field F_23, x1)
+
+julia> U2, z2 = R2["z2"]
+(Univariate Polynomial Ring in z2 over Rational function field over Finite field F_23, z2)
+
+julia> g = z2^2 + 3z2 + 1
+z2^2 + 3*z2 + 1
+
+julia> S2, y2 = FunctionField(g, "y2")
+(Function Field over Finite field F_23 with defining polynomial y2^2 + 3*y2 + 1, y2)
+
+julia> d = S2(R2(5))
+5
+
+julia> e = S2(y2)
+y2
+```
+
+## Basic function field functionality
+
+Function fields implement the full Ring and Field interfaces. We give some
+examples of such functionality.
+
+
+**Examples**
+
+```jldoctest
+julia> R, x = RationalFunctionField(GF(23), "x") # characteristic p
+(Rational function field over Finite field F_23, x)
+
+julia> U, z = R["z"]
+(Univariate Polynomial Ring in z over Rational function field over Finite field F_23, z)
+
+julia> g = z^2 + 3z + 1
+z^2 + 3*z + 1
+
+julia> S, y = FunctionField(g, "y")
+(Function Field over Finite field F_23 with defining polynomial y^2 + 3*y + 1, y)
+
+julia> f = (x + 1)*y + 1
+(x + 1)*y + 1
+
+julia> base_ring(f)
+Rational function field over Finite field F_23
+
+julia> f^2
+(20*x^2 + 19*x + 22)*y + 22*x^2 + 21*x
+
+julia> f*inv(f)
+1
+```
+
+
+
