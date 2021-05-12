@@ -240,6 +240,32 @@ end
       for iters = 1:10
          f = rand(S, 1:5, -10:10)
 
+         c1 = rand(-10:10)
+         c2 = rand(-10:10)
+
+         @test c1*f - c2*f == (c1 - c2)*f
+         @test c1*f + c2*f == (c1 + c2)*f
+
+         @test f*c1 - f*c2 == f*(c1 - c2)
+         @test f*c1 + f*c2 == f*(c1 + c2)
+
+         @test f - c1 == f + (-c1)
+         @test f + c1 == f - (-c1)
+         @test c1 + f == c1 + f
+
+         c1 = rand(-10:10)//rand(1:10)
+         c2 = rand(-10:10)//rand(1:10)
+
+         @test c1*f - c2*f == (c1 - c2)*f
+         @test c1*f + c2*f == (c1 + c2)*f
+
+         @test f*c1 - f*c2 == f*(c1 - c2)
+         @test f*c1 + f*c2 == f*(c1 + c2)
+
+         @test f - c1 == f + (-c1)
+         @test f + c1 == f - (-c1)
+         @test c1 + f == c1 + f
+
          c1 = rand(ZZ, -10:10)
          c2 = rand(ZZ, -10:10)
 
@@ -285,6 +311,19 @@ end
 
       for iters = 1:10
          f = rand(S, 1:5)
+
+         c1 = rand(-10:10)
+         c2 = rand(-10:10)
+
+         @test c1*f - c2*f == (c1 - c2)*f
+         @test c1*f + c2*f == (c1 + c2)*f
+
+         @test f*c1 - f*c2 == f*(c1 - c2)
+         @test f*c1 + f*c2 == f*(c1 + c2)
+
+         @test f - c1 == f + (-c1)
+         @test f + c1 == f - (-c1)
+         @test c1 + f == c1 + f
 
          c1 = rand(ZZ, -10:10)
          c2 = rand(ZZ, -10:10)
