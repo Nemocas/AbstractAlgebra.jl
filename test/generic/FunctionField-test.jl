@@ -531,3 +531,92 @@ end
    end
 end
 
+@testset "Generic.FunctionField.adhoc_exact_division" begin
+   for i = 1:length(P1)
+      # characteristic 0
+      S, y = FunctionField(P1[i], "y")
+
+      for iters = 1:10
+         f = 0 # Int
+         while iszero(f)
+            f = rand(-10:10)
+         end
+         g = rand(S, 1:5, -10:10)
+
+         @test divexact(f*g, f) == g
+      end
+
+      for iters = 1:10
+         f = 0//1
+         while iszero(f)
+            f = rand(-10:10)//rand(1:10) # Rational{Int}
+         end
+         g = rand(S, 1:5, -10:10)
+
+         @test divexact(f*g, f) == g
+      end
+
+      for iters = 1:10 # BigInt
+         f = ZZ()
+         while iszero(f)
+            f = rand(ZZ, -10:10)
+         end
+         g = rand(S, 1:5, -1:10)
+
+         @test divexact(f*g, f) == g
+      end
+
+      for iters = 1:10 # BigInt
+         f = QQ()
+         while iszero(f)
+            f = rand(QQ, -10:10) # Rational BigInt
+         end
+         g = rand(S, 1:5, -10:10)
+
+         @test divexact(f*g, f) == g
+      end
+
+      for iters = 1:10 # Rat
+         f = R1()
+         while iszero(f)
+            f = rand(R1, 1:5, -10:10) # Rational BigInt
+         end
+         g = rand(S, 1:5, -10:10)
+
+         @test divexact(f*g, f) == g
+      end
+
+      # characteristic p
+      S, y = FunctionField(P2[i], "y")
+
+      for iters = 1:10
+         f = 0 # Int
+         while iszero(f)
+            f = rand(-10:10)
+         end
+         g = rand(S, 1:5)
+
+         @test divexact(f*g, f) == g
+      end
+
+      for iters = 1:10 # BigInt
+         f = ZZ()
+         while iszero(f)
+            f = rand(ZZ, -10:10)
+         end
+         g = rand(S, 1:5)
+
+         @test divexact(f*g, f) == g
+      end
+
+      for iters = 1:10 # Rat
+         f = R1()
+         while iszero(f)
+            f = rand(R2, 1:5) # Rational BigInt
+         end
+         g = rand(S, 1:5)
+
+         @test divexact(f*g, f) == g
+      end
+   end
+end
