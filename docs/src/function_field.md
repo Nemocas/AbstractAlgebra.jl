@@ -346,3 +346,61 @@ coeff(::Generic.FunctionFieldElem, ::Int)
 num_coeff(::Generic.FunctionFieldElem, ::Int)
 ```
 
+**Examples**
+
+```jldoctest
+julia> R, x = RationalFunctionField(QQ, "x")
+(Rational function field over Rationals, x)
+
+julia> U, z = R["z"]
+(Univariate Polynomial Ring in z over Rational function field over Rationals, z)
+
+julia> g = z^2 + 3*(x + 1)//(x + 2)*z + 1
+z^2 + (3*x + 3)//(x + 2)*z + 1
+
+julia> S, y = FunctionField(g, "y")
+(Function Field over Rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
+
+julia> base_field(S)
+Rational function field over Rationals
+
+julia> var(S)
+:y
+
+julia> characteristic(S)
+0
+
+julia> defining_polynomial(S)
+z^2 + (3*x + 3)//(x + 2)*z + 1
+
+julia> numerator(S)
+(x + 2)*y^2 + (3*x + 3)*y + x + 2
+
+julia> denominator(S)
+x + 2
+
+julia> a = (x + 1)//(x^2 + 1)*y + 3x + 2
+((x + 1)*y + 3*x^3 + 2*x^2 + 3*x + 2)//(x^2 + 1)
+
+julia> numerator(a, false)
+(x + 1)*y + 3*x^3 + 2*x^2 + 3*x + 2
+
+julia> denominator(a, false)
+x^2 + 1
+
+julia> degree(S)
+2
+
+julia> gen(S)
+y
+
+julia> isgen(y)
+true
+
+julia> coeff(a, 1)
+(x + 1)//(x^2 + 1)
+
+julia> num_coeff(a, 1)
+x + 1
+```
+
