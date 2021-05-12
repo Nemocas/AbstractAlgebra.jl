@@ -473,3 +473,31 @@ end
    end
 end
 
+@testset "Generic.FunctionField.inverse" begin
+   for i = 1:length(P1)
+      # characteristic 0
+      S, y = FunctionField(P1[i], "y")
+
+      for iters = 1:5
+         f = S()
+         while iszero(f)
+            f = rand(S, 1:3, -10:10)
+         end
+
+         @test isone(f*inv(f))
+      end
+
+      # characteristic p
+      S, y = FunctionField(P2[i], "y")
+
+      for iters = 1:5
+         f = S()
+         while iszero(f)
+            f = rand(S, 1:3, -10:10)
+         end
+
+         @test isone(f*inv(f))
+      end
+   end
+end
+

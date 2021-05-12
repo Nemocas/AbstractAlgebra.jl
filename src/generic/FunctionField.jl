@@ -323,6 +323,12 @@ function _rat_poly_canonicalise(poly::Poly{S}, den::S) where
       den = divexact(den, g)
    end
 
+   u = canonical_unit(den)
+   if !isone(u)
+      poly = divexact(poly, u)
+      den = divexact(den, u)
+   end
+
    return poly, den
 end
 
@@ -980,7 +986,7 @@ function reduce!(a::FunctionFieldElem{T}) where T <: FieldElement
                                        power_precomp_den(R, i - 1)*den)
       z, zden = _rat_poly_add(z, zden, t, tden)
    end
-   a.num, a.den = z, zden
+   a.num, a.den = _rat_poly_canonicalise(z, zden)
    return a
 end
 
