@@ -299,5 +299,50 @@ julia> f*inv(f)
 1
 ```
 
+## Function field functionality provided by AbstractAlgebra.jl
 
+The following functionality is provided for function fields.
+
+### Basic manipulation
+
+```@docs
+base_field(::Generic.FunctionField)
+```
+
+```@docs
+var(::Generic.FunctionField)
+```
+
+```@docs
+characteristic(S::Generic.FunctionField)
+```
+
+```@docs
+defining_polynomial(R::Generic.FunctionField)
+```
+
+```@docs
+Base.numerator(::Generic.FunctionField{T}, ::Bool=true) where T <: FieldElement
+```
+
+```@docs
+Base.numerator(::Generic.FunctionFieldElem{T}, ::Bool=true) where T <: FieldElement
+```
+
+```@docs
+degree(::Generic.FunctionField)
+```
+
+```@docs
+gen(::Generic.FunctionField{T}) where T <: FieldElement
+```
+
+```@docs
+isgen(a::Generic.FunctionFieldElem)
+```
+
+```@docs
+coeff(::Generic.FunctionFieldElem, ::Int)
+num_coeff(::Generic.FunctionFieldElem, ::Int)
+```
 

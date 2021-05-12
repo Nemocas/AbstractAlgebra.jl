@@ -490,14 +490,20 @@ parent_type(::Type{FunctionFieldElem{T}}) where T <: FieldElement = FunctionFiel
 
 elem_type(::Type{FunctionField{T}}) where T <: FieldElement = FunctionFieldElem{T}
 
-function base_ring(a::FunctionField{T}) where T <: FieldElement
-   return a.base_ring::RationalFunctionField{T}
+function base_ring(R::FunctionField{T}) where T <: FieldElement
+   return R.base_ring::RationalFunctionField{T}
 end
 
-base_ring(a::FunctionFieldElem) = base_ring(parent(a))
+base_ring(R::FunctionFieldElem) = base_ring(parent(R))
 
 # For consistency with number fields in Hecke.jl
-base_field(a::FunctionField) = base_ring(a::FunctionField)
+@doc Markdown.doc"""
+    base_field(R::FunctionField)
+
+Return the rational function field that the field `R` is an extension of.
+Synonymous with `base_ring`.
+"""
+base_field(R::FunctionField) = base_ring(R)
 
 parent(a::FunctionFieldElem) = a.parent
 
@@ -505,7 +511,13 @@ function isexact_type(a::Type{T}) where {S <: FieldElement, T <: FunctionFieldEl
    return isexact_type(S)
 end
 
-var(a::FunctionField) = a.S
+@doc Markdown.doc"""
+    var(R::FunctionField)
+
+Return the variable name of the generator of the function field `R` as a
+symbol.
+"""
+var(R::FunctionField) = R.S
 
 function check_parent(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}, throw::Bool = true) where T <: FieldElement
    fl = parent(a) != parent(b)
@@ -513,7 +525,12 @@ function check_parent(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}, throw::B
    return !fl
 end
 
-characteristic(a::FunctionField) = characteristic(base_ring(a))
+@doc Markdown.doc"""
+    characteristic(R::FunctionField)
+
+Return the characteristic of the underlying rational function field.
+"""
+characteristic(R::FunctionField) = characteristic(base_ring(R))
 
 ###############################################################################
 #
@@ -521,6 +538,12 @@ characteristic(a::FunctionField) = characteristic(base_ring(a))
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    defining_polynomial(R::FunctionField)
+    modulus(R::FunctionField)
+
+Return the original polynomial that was used to define the function field `R`.
+"""
 defining_polynomial(R::FunctionField) = R.pol
 
 modulus(R::FunctionField) = defining_polynomial(R)
@@ -533,6 +556,17 @@ function power_precomp_den(R::FunctionField{T}, n::Int) where T <: FieldElement
    return R.powers_den[n + 1]::dense_poly_type(T)
 end
 
+@doc Markdown.doc"""
+    Base.numerator(R::FunctionField{T}, canonicalise::Bool=true) where T <: FieldElement
+    Base.denominator(R::FunctionField{T}, canonicalise::Bool=true) where T <: FieldElement
+
+Thinking of elements of the rational function field as fractions, put the
+defining polynomial of the function field over a common denominator
+and return the numerator/denominator respectively. Note that the resulting
+polynomials belong to a different ring than the original defining polynomial.
+The `canonicalise` is ignored, but exists for compatibility with the Generic
+interface.
+"""
 function Base.numerator(R::FunctionField{T},
                                canonicalise::Bool=true) where T <: FieldElement
    # only used for type assert, so no need to canonicalise
@@ -545,6 +579,15 @@ function Base.denominator(R::FunctionField{T},
    return R.den::dense_poly_type(T)
 end                 
 
+@doc Markdown.doc"""
+    Base.numerator(a::FunctionFieldElem{T}, canonicalise::Bool=true) where T <: FieldElement
+    Base.denominator(a::FunctionFieldElem{T}, canonicalise::Bool=true) where T <: FieldElement
+
+Return the numerator and denominator of the function field element `a`.
+Note that elements are stored in fraction free form so that the denominator
+is a common denominator for the coefficients of the element `a`.
+If `canonicalise` is set to `true` the fraction is first canonicalised.
+"""
 function Base.numerator(a::FunctionFieldElem{T},
                                canonicalise::Bool=true) where T <: FieldElement
    anum = a.num::Poly{dense_poly_type(T)}
@@ -568,12 +611,25 @@ function Base.denominator(a::FunctionFieldElem{T},
    end
 end
 
+@doc Markdown.doc"""
+    degree(S::FunctionField)
+
+Return the degree of the defining polynomial of the function field, i.e. the
+degree of the extension that the function field makes of the underlying
+rational function field.
+"""
 degree(S::FunctionField) = degree(numerator(S))
 
 zero(S::FunctionField) = S()
 
 one(S::FunctionField) = S(1)
 
+@doc Markdown.doc"""
+    gen(S::FunctionField{T}) where T <: FieldElement
+
+Return the generator of the function field returned by the function field
+constructor.
+"""
 function gen(S::FunctionField{T}) where T <: FieldElement
    if degree(S) == 1
       return S(-coeff(modulus(S), 0)//coeff(modulus(S), 1))
@@ -590,6 +646,12 @@ isone(a::FunctionFieldElem) = isone(numerator(a, false)) &&
 
 isunit(a::FunctionFieldElem) = !iszero(a)
 
+@doc Markdown.doc"""
+    isgen(a::FunctionFieldElem)
+
+Return `true` if `a` is the generator of the function field returned by the
+function field constructor.
+"""
 function isgen(a::FunctionFieldElem)
    S = parent(a)
    if degree(S) == 1
@@ -599,6 +661,14 @@ function isgen(a::FunctionFieldElem)
    end
 end
 
+@doc Markdown.doc"""
+    coeff(a::FunctionFieldElem, n::Int)
+
+Return the degree `n` coefficient of the element `a` in its polynomial
+representation in terms of the generator of the function field. The
+coefficient is returned as an element of the underlying rational function
+field.
+"""
 function coeff(a::FunctionFieldElem, n::Int)
    R = base_ring(a)
    n = coeff(numerator(a, false), n)
@@ -606,6 +676,15 @@ function coeff(a::FunctionFieldElem, n::Int)
    return R(n//d)
 end
 
+@doc Markdown.doc"""
+    num_coeff(a::FunctionFieldElem, n::Int)
+
+Return the degree `n` coefficient of the numerator of the element `a` (in its
+polynomial representation in terms of the generator of the function field,
+rationalised as per `numerator/denominator` described above). The coefficient
+will be an polynomial over the `base_ring` of the underlying rational function
+field.
+"""
 function num_coeff(a::FunctionFieldElem, n::Int)
    return coeff(numerator(a, false), n)
 end
