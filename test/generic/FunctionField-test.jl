@@ -493,10 +493,40 @@ end
       for iters = 1:5
          f = S()
          while iszero(f)
-            f = rand(S, 1:3, -10:10)
+            f = rand(S, 1:3)
          end
 
          @test isone(f*inv(f))
+      end
+   end
+end
+
+@testset "Generic.FunctionField.exact_division" begin
+   for i = 1:length(P1)
+      # characteristic 0
+      S, y = FunctionField(P1[i], "y")
+
+      for iters = 1:5
+         f = S()
+         while iszero(f)
+            f = rand(S, 1:2, -1:1)
+         end
+         g = rand(S, 1:2, -1:1)
+
+         @test divexact(f*g, f) == g
+      end
+
+      # characteristic p
+      S, y = FunctionField(P2[i], "y")
+
+      for iters = 1:10
+         f = S()
+         while iszero(f)
+            f = rand(S, 1:5)
+         end
+         g = rand(S, 1:5)
+
+         @test divexact(f*g, f) == g
       end
    end
 end
