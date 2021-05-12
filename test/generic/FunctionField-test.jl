@@ -415,6 +415,22 @@ end
             f = rand(S, 1:5, -10:10)
          end
 
+         c1 = rand(-10:10)
+ 
+         @test S(c1) == c1
+         @test c1 == S(c1)
+
+         @test S(c1) != c1 + f
+         @test c1 != S(c1) + f
+
+         c1 = rand(-10:10)//rand(1:10)
+ 
+         @test S(c1) == c1
+         @test c1 == S(c1)
+
+         @test S(c1) != c1 + f
+         @test c1 != S(c1) + f
+
          c1 = rand(ZZ, -10:10)
  
          @test S(c1) == c1
@@ -448,6 +464,14 @@ end
          while iszero(f)
             f = rand(S, 1:5)
          end
+
+         c1 = rand(-10:10)
+ 
+         @test S(c1) == c1
+         @test c1 == S(c1)
+
+         @test S(c1) != c1 + f
+         @test c1 != S(c1) + f
 
          c1 = rand(ZZ, -10:10)
  
