@@ -633,6 +633,9 @@ function YoungTableau(p::Vector{Int})
    Generic.YoungTableau(p)
 end
 
+@doc (@doc Generic.PowerSeriesRing)
+PowerSeriesRing(R::Ring, prec::Int, s::Union{Char, AbstractString}; cached=true, model=:capped_relative)
+
 function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
    Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
 end
@@ -648,6 +651,9 @@ end
 function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
    Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
 end
+
+@doc (@doc Generic.LaurentSeriesRing)
+LaurentSeriesRing(R::Ring, prec::Int, s::Union{Char, AbstractString}; cached=true)
 
 function LaurentSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
    Generic.LaurentSeriesRing(R, prec, s; cached=cached)
@@ -757,6 +763,9 @@ function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::Char;
    PolynomialRing(R, n, string(s); cached = cached, ordering = ordering)
 end
 
+@doc (@doc Generic.SparsePolynomialRing)
+SparsePolynomialRing(R::Ring, s::Union{Char, String}; cached::Bool = true)
+
 function SparsePolynomialRing(R::Ring, s::String; cached::Bool = true)
    Generic.SparsePolynomialRing(R, s; cached=cached)
 end
@@ -768,21 +777,36 @@ end
 @doc (@doc Generic.LaurentPolynomialRing)
 LaurentPolynomialRing(R::Ring, s::AbstractString) = Generic.LaurentPolynomialRing(R, s)
 
+@doc (@doc Generic.MatrixSpace)
+MatrixSpace(R::Ring, r::Int, c::Int; cached::Bool = true)
+
 function MatrixSpace(R::Ring, r::Int, c::Int; cached::Bool = true)
    Generic.MatrixSpace(R, r, c; cached = cached)
 end
+
+@doc (@doc Generic.MatrixAlgebra)
+MatrixAlgebra(R::Ring, n::Int; cached::Bool = true)
 
 function MatrixAlgebra(R::Ring, n::Int; cached::Bool = true)
    Generic.MatrixAlgebra(R, n, cached = cached)
 end
 
+@doc (@doc Generic.FractionField)
+FractionField(R::Ring; cached=true)
+
 function FractionField(R::Ring; cached=true)
    Generic.FractionField(R; cached=cached)
 end
 
+@doc (@doc Generic.ResidueRing)
+ResidueRing(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
+
 function ResidueRing(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
    Generic.ResidueRing(R, a; cached=cached)
 end
+
+@doc (@doc Generic.ResidueField)
+ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
 
 function ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
    Generic.ResidueField(R, a; cached=cached)
