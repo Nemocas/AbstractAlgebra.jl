@@ -46,6 +46,8 @@ abs_series_type(::Type{T}) where T <: RingElement = Generic.AbsSeries{T}
 
 length(x::AbstractAlgebra.AbsSeriesElem) = x.length
 
+pol_length(x::AbstractAlgebra.AbsSeriesElem) = length(x)
+
 precision(x::AbstractAlgebra.AbsSeriesElem) = x.prec
 
 @doc Markdown.doc"""
@@ -67,6 +69,8 @@ function coeff(a::AbsSeries, n::Int)
    n < 0  && throw(DomainError(n, "n must be >= 0"))
    return n >= length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
+
+polcoeff(a::AbsSeries, n::Int) = coeff(a, n)
 
 @doc Markdown.doc"""
     gen(R::AbsSeriesRing{T}) where T <: RingElement
