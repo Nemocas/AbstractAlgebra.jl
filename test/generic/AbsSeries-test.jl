@@ -120,10 +120,14 @@ end
    @test normalise(a, 4) == 4
 
    @test coeff(a, 1) == 2
+   @test polcoeff(a, 1) == 2
    @test coeff(b, 7) == 0
+   @test polcoeff(b, 7) == 0
 
    @test_throws DomainError coeff(a, -1)
+   @test_throws DomainError polcoeff(a, -1)
    @test_throws DomainError coeff(a, -rand(2:100))
+   @test_throws DomainError polcoeff(a, -rand(2:100))
    
    @test characteristic(R) == 0
 
@@ -212,7 +216,9 @@ end
    @test isa(q, AbsSeriesElem)
 
    @test length(p) == 0
+   @test pol_length(p) == 0
    @test length(q) == 0
+   @test pol_length(q) == 0
 
    r = abs_series(QQ, BigInt[1, 2, 3], 3, 5)
 
