@@ -65,6 +65,8 @@ julia> h = S(BigInt(1234))
 julia> k = S(x + 1)
 x + 1
 
+julia> m = S(numerator(x + 1, false), numerator(x + 2, false))
+(x + 1)//(x + 2)
 ```
 
 ## Basic rational function field functionality
@@ -402,5 +404,31 @@ julia> coeff(a, 1)
 
 julia> num_coeff(a, 1)
 x + 1
+```
+
+### Trace and norm
+
+```@docs
+norm(::Generic.FunctionFieldElem)
+```
+
+```jldoctest
+julia> R, x = RationalFunctionField(QQ, "x")
+(Rational function field over Rationals, x)
+
+julia> U, z = R["z"]
+(Univariate Polynomial Ring in z over Rational function field over Rationals, z)
+
+julia> g = z^2 + 3*(x + 1)//(x + 2)*z + 1
+z^2 + (3*x + 3)//(x + 2)*z + 1
+
+julia> S, y = FunctionField(g, "y")
+(Function Field over Rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
+
+julia> f = (-3*x - 5//3)//(x - 2)*y + (x^3 + 1//9*x^2 + 5)//(x - 2)
+((-3*x - 5//3)*y + x^3 + 1//9*x^2 + 5)//(x - 2)
+
+julia> norm(f)
+(x^7 + 20//9*x^6 + 766//81*x^5 + 2027//81*x^4 + 110//3*x^3 + 682//9*x^2 + 1060//9*x + 725//9)//(x^3 - 2*x^2 - 4*x + 8)
 ```
 

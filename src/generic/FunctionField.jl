@@ -139,6 +139,21 @@ function _rat_mul(n1::PolyElem{T}, d1::PolyElem{T},
    return n, d
 end
 
+function _rat_canonicalise(n::PolyElem{T}, d::PolyElem{T}) where
+                                                              T <: FieldElement
+   g = gcd(n, d)
+   if !isone(g)
+      n = divexact(n, g)
+      d = divexact(d, g)
+   end
+   u = canonical_unit(d)
+   if !isone(u)
+      n = divexact(n, u)
+      d = divexact(d, u)
+   end
+   return n, d
+end
+
 ###############################################################################
 #
 #   Rational polynomial arithmetic : equivalent of _fmpq_poly in Flint for k(x)
@@ -439,6 +454,34 @@ function _rat_poly_gcdx(a::Poly{U}, den_a::U,
    t, den_t = _rat_poly_canonicalise(t, den_t)
 
    return g, leading_coefficient(g), s, den_s, t, den_t   
+end
+
+function _rat_poly_resultant(a::Poly{U}, den_a::U,
+                                    b::Poly{U}, den_b::U) where
+                                          {T <: FieldElement, U <: PolyElem{T}}
+   lena = length(a)
+   lenb = length(b)
+   R = parent(den_a)
+   if lena == 0 || lenb == 0
+      return zero(R), one(R)
+   end
+   ca = content(a)
+   cb = content(b)
+   a = divexact(a, ca)
+   b = divexact(b, cb)
+   g = gcd(a, b)
+   if length(g) > 1 # not coprime, resultant is zero
+      return zero(R), one(R)
+   end
+   rnum = resultant(a, b)
+   if !isone(ca)
+      rnum *= ca^(lenb - 1)
+   end
+   if !isone(cb)
+      rnum *= cb^(lena - 1)
+   end
+   rden = den_a^(lenb - 1)*den_b^(lena - 1)
+   return _rat_canonicalise(rnum, rden) 
 end
 
 # convert a polynomial over a rational function field to
@@ -999,6 +1042,36 @@ divexact(a::T, b::FunctionFieldElem{T}) where T <: FieldElement = a*inv(b)
 divexact(a::Rat{T}, b::FunctionFieldElem{T}) where T <: FieldElement = a*inv(b)
 
 divexact(a::RingElem, b::FunctionFieldElem) = a*inv(b)
+
+###############################################################################
+#
+#   Norm
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    norm(a::FunctionFieldElem)
+
+Return the absolute norm of `a` as an element of the underlying rational
+function field.
+"""
+function norm(a::FunctionFieldElem)
+   R = base_ring(a)
+   S = parent(a)
+   if iszero(a)
+      return zero(R)
+   end
+   anum = numerator(a, false)
+   aden = denominator(a, false)
+   alen = length(anum)
+   pol = numerator(S, false)
+   rnum, rden = _rat_poly_resultant(pol, one(base_ring(pol)), anum, aden)
+   if !S.monic && length(anum) > 1
+      pow = leading_coefficient(pol)^(alen - 1)
+      rnum, rden = _rat_canonicalise(rnum, rden*pow)
+   end
+   return R(rnum, rden, false)
+end
 
 ###############################################################################
 #

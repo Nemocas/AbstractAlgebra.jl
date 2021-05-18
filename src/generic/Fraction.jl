@@ -52,13 +52,14 @@ end
 ###############################################################################
 
 function //(x::T, y::T) where {T <: RingElem}
+   R = parent(x)
    iszero(y) && throw(DivideError())
    g = gcd(x, y)
    z = Frac{T}(divexact(x, g), divexact(y, g))
    try
       z.parent = FracDict[R]
    catch
-      z.parent = FractionField(parent(x))
+      z.parent = FractionField(R)
    end
    return z
 end

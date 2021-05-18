@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export RationalFunctionField
+export RationalFunctionField, norm
 
 ###############################################################################
 #
@@ -524,6 +524,28 @@ function (a::RationalFunctionField{T})(b::Frac{<:PolyElem{T}}) where T <: FieldE
    z = Rat{T}(b)
    z.parent = a
    return z::Rat{T}
+end
+
+function (a::RationalFunctionField{T})(n::S, d::S,
+           canonicalise::Bool=true) where {T <: FieldElement, S <: PolyElem{T}}
+   R = parent(n)
+   g = gcd(n, d)
+   if !isone(g)
+      n = divexact(n, g)
+      d = divexact(d, g)
+   end
+   u = canonical_unit(d)
+   if !isone(u)
+      n = divexact(n, u)
+      d = divexact(d, u)
+   end
+   r = Frac{S}(n, d)
+   try
+      r.parent = FracDict[R]
+   catch
+      r.parent = FractionField(R)
+   end
+   return a(r)
 end
 
 function (a::RationalFunctionField{T})(b::Rat{T}) where T <: FieldElement
