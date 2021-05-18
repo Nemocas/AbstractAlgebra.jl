@@ -684,6 +684,30 @@ end
    end
 end
 
+@testset "Generic.FunctionField.norm" begin
+   for i = 1:length(P1)
+      # characteristic 0
+      S, y = FunctionField(P1[i], "y")
+
+      for iters = 1:3
+         f = rand(S, 1:3, -2:2)
+         g = rand(S, 1:3, -2:2)
+
+         @test norm(f)*norm(g) == norm(f*g)
+      end
+
+      # characteristic p
+      S, y = FunctionField(P2[i], "y")
+
+      for iters = 1:5
+         f = rand(S, 1:3)
+         g = rand(S, 1:3)
+
+         @test norm(f)*norm(g) == norm(f*g)
+      end
+   end
+end
+
 @testset "Generic.FunctionField.unsafe_operators" begin
    for i = 1:length(P1)
       # characteristic 0

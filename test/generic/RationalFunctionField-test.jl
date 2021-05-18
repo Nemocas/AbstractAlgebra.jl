@@ -16,7 +16,7 @@
 
    @test isa(T(x + 2), Generic.Rat)
 
-   @test isa(T(x^2 + 2x + 1, x + 1), Generic.Rat)
+   @test isa(T(numerator(x^2 + 2x + 1, false), numerator(x + 1, false)), Generic.Rat)
 
    @test isa(T(), Generic.Rat)
 
