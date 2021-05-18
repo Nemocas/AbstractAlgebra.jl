@@ -5854,7 +5854,7 @@ end
 
 randmat_triu(S::AbstractAlgebra.MatSpace, v...) = randmat_triu(Random.GLOBAL_RNG, S, v...)
 
-function randmat_with_rank(rng::AbstractRNG, S::Generic.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
+function randmat_with_rank(rng::AbstractRNG, S::AbstractAlgebra.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
    if !isdomain_type(T) && !(T <: ResElem)
       error("Not implemented")
    end
@@ -5892,7 +5892,7 @@ function randmat_with_rank(rng::AbstractRNG, S::Generic.MatSpace{T}, rank::Int, 
    return M
 end
 
-randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement} =
+randmat_with_rank(S::AbstractAlgebra.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement} =
    randmat_with_rank(Random.GLOBAL_RNG, S, rank, v...)
 
 ###############################################################################
