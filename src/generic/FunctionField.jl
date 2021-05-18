@@ -599,6 +599,14 @@ function power_precomp_den(R::FunctionField{T}, n::Int) where T <: FieldElement
    return R.powers_den[n + 1]::dense_poly_type(T)
 end
 
+function trace_precomp(R::FunctionField{T}, n::Int) where T <: FieldElement
+   return R.traces[n + 1]::dense_poly_type(T)
+end
+
+function trace_precomp_den(R::FunctionField{T}) where T <: FieldElement
+   return R.traces_den::dense_poly_type(T)
+end
+
 @doc Markdown.doc"""
     Base.numerator(R::FunctionField{T}, canonicalise::Bool=true) where T <: FieldElement
     Base.denominator(R::FunctionField{T}, canonicalise::Bool=true) where T <: FieldElement
@@ -1075,6 +1083,35 @@ end
 
 ###############################################################################
 #
+#   Trace
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    tr(a::FunctionFieldElem)
+
+Return the absolute trace of `a` as an element of the underlying rational
+function field.
+"""
+function tr(a::FunctionFieldElem)
+   R = base_ring(a)
+   S = parent(a)
+   if iszero(a)
+      return zero(R)
+   end
+   anum = numerator(a, false)
+   aden = denominator(a, false)
+   alen = length(anum)
+   rnum = coeff(anum, 0)*trace_precomp(S, 0)
+   for i = 1:alen - 1
+      rnum += coeff(anum, i)*trace_precomp(S, i)
+   end
+   rden = aden*trace_precomp_den(S)
+   return R(rnum, rden)
+end
+
+###############################################################################
+#
 #   Unsafe operators
 #
 ###############################################################################
@@ -1302,6 +1339,31 @@ function powers_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
    return monic, P, D
 end
 
+function traces_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: PolyElem{T}}
+   len = length(pol)
+   R = parent(d)
+   S = parent(pol)
+   U = typeof(pol)
+   V = typeof(d)
+   P = Vector{V}(undef, len - 1)
+   Pden = one(R)
+   lc = leading_coefficient(pol)
+   for i = 1:len - 2
+      P[i + 1] = coeff(pol, len - i - 1)*i
+      for j = i - 1:-1:1
+         P[i + 1] *= lc
+         P[i + 1] += coeff(pol, len - j - 1)*P[i - j + 1]
+      end
+      P[i + 1] = -P[i + 1]
+   end
+   for i = 1:len - 2
+      P[len - i] *= Pden
+      Pden *= lc
+   end
+   P[1] = Pden*(len - 1)
+   return P, Pden
+end
+
 function FunctionField(p::Poly{Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
    length(p) < 2 && error("Polynomial must have degree at least 1")
    sym = Symbol(s)
@@ -1309,6 +1371,7 @@ function FunctionField(p::Poly{Rat{T}}, s::AbstractString; cached::Bool=true) wh
    
    par = FunctionField{T}(pol, den, sym, cached)
    par.monic, par.powers, par.powers_den = powers_precompute(pol, den)
+   par.traces, par.traces_den = traces_precompute(pol, den)
    par.base_ring = base_ring(p)
    par.pol = p
 
