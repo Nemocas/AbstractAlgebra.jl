@@ -234,6 +234,43 @@ function abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::AbstractS
    return p
 end
 
+################################################################################
+#
+#  Map
+#
+################################################################################
+
+function _make_parent(g, p::AbsSeriesElem, cached::Bool)
+   R = parent(g(zero(base_ring(p))))
+   S = parent(p)
+   sym = String(var(S))
+   max_prec = max_precision(S)
+   return AbstractAlgebra.PowerSeriesRing(R, max_prec, sym; model=:capped_absolute, cached=cached)[1]
+end
+
+@doc Markdown.doc"""
+    map_coefficients(f, p::SeriesElem{<: RingElement}; cached::Bool=true, parent::PolyRing)
+
+Transform the series `p` by applying `f` on each non-zero coefficient.
+
+If the optional `parent` keyword is provided, the polynomial will be an
+element of `parent`. The caching of the parent object can be controlled
+via the `cached` keyword argument.
+"""
+function map_coefficients(g, p::AbsSeriesElem{<:RingElement};
+                    cached::Bool = true,
+                    parent::Ring = _make_parent(g, p, cached))
+   return _map(g, p, parent)
+end
+
+function _map(g, p::AbsSeriesElem, Rx)
+   R = base_ring(Rx)
+   new_coefficients = elem_type(R)[let c = coeff(p, i)
+                                     iszero(c) ? zero(R) : R(g(c))
+                                   end for i in 0:length(p) - 1]
+   return Rx(new_coefficients, length(p), precision(p))
+end
+
 ###############################################################################
 #
 #   AbstractString I/O
