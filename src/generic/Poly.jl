@@ -1337,7 +1337,7 @@ end
 
 Return $a\times b \pmod{d}$.
 """
-function mulmod(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, d::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+function mulmod(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, d::AbstractAlgebra.PolyElem{T}) where T <: RingElement
    check_parent(a, b)
    check_parent(a, d)
    return mod(a*b, d)
@@ -1348,7 +1348,7 @@ end
 
 Return $a^b \pmod{d}$. There are no restrictions on $b$.
 """
-function powermod(a::AbstractAlgebra.PolyElem{T}, b::Int, d::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+function powermod(a::AbstractAlgebra.PolyElem{T}, b::Int, d::AbstractAlgebra.PolyElem{T}) where T <: RingElement
    check_parent(a, d)
    if length(a) == 0
       z = zero(parent(a))
@@ -1467,7 +1467,7 @@ end
 
 Return $f \pmod{g}$.
 """
-function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
    if length(g) == 0
       throw(DivideError())
@@ -1491,7 +1491,7 @@ function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) whe
    return f
 end
 
-function rem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+function rem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where T <: RingElement
   return mod(f, g)
 end
 
@@ -1501,7 +1501,7 @@ end
 Return a tuple $(q, r)$ such that $f = qg + r$ where $q$ is the euclidean
 quotient of $f$ by $g$.
 """
-function Base.divrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+function Base.divrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where T <: RingElement
    check_parent(f, g)
    if length(g) == 0
       throw(DivideError())
@@ -1536,7 +1536,7 @@ end
 
 Return the euclidean quotient of $f$ by $g$.
 """
-function Base.div(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+function Base.div(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where T <: RingElement
    q, r = divrem(f, g)
    return q
 end
