@@ -492,3 +492,11 @@ function ResidueRing(R::AbstractAlgebra.Ring, a::RingElement; cached::Bool = tru
 
    return ResRing{T}(R(a), cached)
 end
+
+function ResidueRing(R::AbstractAlgebra.PolyRing, a::RingElement; cached::Bool = true)
+   iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
+   !isunit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
+   T = elem_type(R)
+
+   return ResRing{T}(R(a), cached)
+end

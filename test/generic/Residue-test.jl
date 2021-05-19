@@ -43,6 +43,28 @@
 
    @test isa(g, Generic.Res)
 
+   # Poly modulus, invertible lc 
+   S, x = PolynomialRing(ZZ, "x")
+   T = ResidueRing(S, x^2 + 1)
+
+   @test isa(T, Generic.ResRing)
+
+   f = T(x^4)
+
+   @test isa(f, Generic.Res)
+
+   g = T(f)
+
+   @test isa(g, Generic.Res)
+
+   h = T()
+
+   @test isa(h, Generic.Res)
+
+   k = T(1)
+
+   @test isa(k, Generic.Res)
+
    S = Generic.ResidueRing(B, 164538890)
    x = R(1)
    y = S(1)
@@ -97,6 +119,16 @@ end
    @test deepcopy(h) == h
 
    @test characteristic(R) == 16453889
+
+   # Poly modulus, invertible lc
+   S, x = PolynomialRing(ZZ, "x")
+   T = ResidueRing(S, x^2 + 1)
+
+   @test isone(one(T))
+   @test iszero(zero(T))
+   @test isunit(T(x))
+   @test canonical_unit(T(x)) == T(x)
+   @test modulus(T) == x^2 + 1
 end
 
 @testset "Generic.Res.unary_ops" begin
@@ -108,6 +140,12 @@ end
    T = ResidueRing(S, x^3 + 3x + 1)
 
    @test -T(x^5 + 1) == T(x^2+16453880*x+16453885)
+
+   # Poly modulus, invertible lc
+   S, x = PolynomialRing(ZZ, "x")
+   T = ResidueRing(S, x^2 + 1)
+
+   @test -T(x + 1) == T(-x - 1)
 end
 
 @testset "Generic.Res.binary_ops" begin
@@ -134,6 +172,19 @@ end
    @test n - p == T(5x^2 + 3)
 
    @test n*p == T(3x^2 + 4x + 4)
+
+   # Poly modulus, invertible lc
+   S, x = PolynomialRing(ZZ, "x")
+   T = ResidueRing(S, x^2 + 1)
+
+   n = T(x^5 + 1)
+   p = T(x^2 + 2x + 1)
+
+   @test n + p == T(3x + 1)
+
+   @test n - p == T(-x + 1)
+
+   @test n*p == T(2x - 2)
 end
 
 @testset "Generic.Res.gcd" begin
@@ -152,6 +203,16 @@ end
    p = T(x^2 + 2x + 1)
 
    @test gcd(n, p) == 1
+
+   # Poly modulus, invertible lc
+   S, x = PolynomialRing(ZZ, "x")
+   T = ResidueRing(S, x^2 + 2x + 1)
+   
+   @test gcd(T(x + 1), T(x + 1)) == T(x + 1)
+
+   T = ResidueRing(S, x^2 + 1)
+
+   @test gcd(T(x + 1), T(x + 1)) == T(1)
 end
 
 @testset "Generic.Res.adhoc_binary" begin
@@ -175,6 +236,18 @@ end
    @test 4 - f == T(x^2+5*x)
 
    @test f*5 == T(2*x^2+3*x+6)
+
+   # Poly modulus, invertible lc
+   S, x = PolynomialRing(ZZ, "x")
+   T = ResidueRing(S, x^2 + 2x + 1)
+
+   f = T(x + 1)
+
+   @test f + 4 == T(x + 5)
+
+   @test 4 - f == T(-x + 3)
+
+   @test f*5 == T(5x + 5)
 end
 
 @testset "Generic.Res.comparison" begin
@@ -201,6 +274,13 @@ end
    @test h != g
 
    @test isequal(f, g)
+
+   # Poly modulus, invertible lc
+   S, x = PolynomialRing(ZZ, "x")
+   T = ResidueRing(S, x^2 + 1)
+
+   @test T(x + 1) == T(x + 1)
+   @test isequal(T(x + 2), T(x + 2))
 end
 
 @testset "Generic.Res.adhoc_comparison" begin
@@ -217,6 +297,13 @@ end
    f = T(x^5 + 1)
 
    @test f != 5
+
+   # Poly modulus, invertible lc
+   S, x = PolynomialRing(ZZ, "x")
+   T = ResidueRing(S, x^2 + 1)
+
+   @test T(2) == 2
+   @test T(x) != 2
 end
 
 @testset "Generic.Res.powering" begin
@@ -232,6 +319,15 @@ end
    f = T(x^5 + 1)
 
    @test f^100 == T(x^2 + 2x + 1)
+
+   # Poly modulus, invertible lc
+   S, x = PolynomialRing(ZZ, "x")
+   T = ResidueRing(S, x^2 + 1)
+
+   @test T(x + 1)^0 == T(1)
+   @test T(x + 1)^1 == T(x + 1)
+   @test T(x + 1)^2 == T(2x)
+   @test T(x + 1)^3 == T(2x - 2)
 end
 
 @testset "Generic.Res.inversion" begin

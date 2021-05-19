@@ -7,9 +7,13 @@ end
 
 # Residue Ring Interface
 
-Residue rings (currently a quotient ring modulo a principal ideal) are supported in
-AbstractAlgebra.jl, at least for Euclidean base rings. In addition to the standard Ring
-interface, some additional functions are required to be present for residue rings.
+Residue rings (currently a quotient ring modulo a principal ideal) are
+supported in AbstractAlgebra.jl, at least for Euclidean base rings. There is
+also partial support for residue rings of polynomial rings where the modulus
+has invertible leading coefficient.
+
+In addition to the standard Ring interface, some additional functions are
+required to be present for residue rings.
 
 ## Types and parents
 
