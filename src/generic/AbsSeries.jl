@@ -1024,7 +1024,8 @@ function _map(g, p::AbsSeriesElem, Rx)
    new_coefficients = elem_type(R)[let c = coeff(p, i)
                                      iszero(c) ? zero(R) : R(g(c))
                                    end for i in 0:length(p) - 1]
-   return Rx(new_coefficients, length(p), precision(p))
+   res = Rx(new_coefficients, length(p), precision(p))
+   return set_length!(res, normalise(res, length(res)))
 end
 
 ################################################################################
@@ -1248,6 +1249,18 @@ function (a::AbsSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int) where {T <: 
       parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
    end
    z = AbsSeries{T}(b, len, prec)
+   z.parent = a
+   return z
+end
+
+function (a::AbsSeriesRing{T})(b::Array{S, 1}, len::Int, prec::Int) where {S <: RingElement, T <: RingElement}
+   R = base_ring(a)
+   lenb = length(b)
+   entries = Array{T}(undef, lenb)
+   for i = 1:lenb
+      entries[i] = R(b[i])
+   end
+   z = AbsSeries{T}(entries, len, prec)
    z.parent = a
    return z
 end

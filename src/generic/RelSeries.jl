@@ -1276,7 +1276,10 @@ function _map(g, p::RelSeriesElem, Rx)
    new_coefficients = elem_type(R)[let c = polcoeff(p, i)
                                      iszero(c) ? zero(R) : R(g(c))
                                    end for i in 0:pol_length(p) - 1]
-   return Rx(new_coefficients, pol_length(p), precision(p), valuation(p))
+   res = Rx(new_coefficients, pol_length(p), precision(p), valuation(p))
+   res = set_length!(res, normalise(res, pol_length(res)))
+   renormalize!(res)
+   return res
 end
 
 ################################################################################
@@ -1576,6 +1579,18 @@ function (R::RelSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) wh
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
    z = RelSeries{T}(b, len, prec, val)
+   z.parent = R
+   return z
+end
+
+function (R::RelSeriesRing{T})(b::Array{S, 1}, len::Int, prec::Int, val::Int) where {S <: RingElement, T <: RingElement}
+   R0 = base_ring(R)
+   lenb = length(b)
+   entries = Array{T}(undef, lenb)
+   for i = 1:lenb
+      entries[i] = R0(b[i])
+   end
+   z = RelSeries{T}(entries, len, prec, val)
    z.parent = R
    return z
 end
