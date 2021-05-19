@@ -366,7 +366,7 @@ julia> c = coeff(b, 2)
 ### Change base ring
 
 ```@docs
-map_coefficients(::Any, ::AbsSeriesElem)
+map_coefficients(::Any, ::AbsSeriesElem{<:RingElem})
 ```
 
 **Examples**
