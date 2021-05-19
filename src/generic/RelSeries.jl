@@ -320,34 +320,6 @@ function rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var:
    return p
 end
 
-################################################################################
-#
-#  Map
-#
-################################################################################
-
-function _make_parent(g, p::RelSeriesElem, cached::Bool)
-   R = parent(g(zero(base_ring(p))))
-   S = parent(p)
-   sym = String(var(S))
-   max_prec = max_precision(S)
-   return AbstractAlgebra.PowerSeriesRing(R, max_prec, sym; cached=cached)[1]
-end
-
-function map_coefficients(g, p::RelSeriesElem{<:RingElement};
-                    cached::Bool = true,
-                    parent::Ring = _make_parent(g, p, cached))
-   return _map(g, p, parent)
-end
-
-function _map(g, p::RelSeriesElem, Rx)
-   R = base_ring(Rx)
-   new_coefficients = elem_type(R)[let c = polcoeff(p, i)
-                                     iszero(c) ? zero(R) : R(g(c))
-                                   end for i in 0:pol_length(p) - 1]
-   return Rx(new_coefficients, pol_length(p), precision(p), valuation(p))
-end
-
 ###############################################################################
 #
 #   AbstractString I/O
@@ -1277,6 +1249,52 @@ function Base.exp(a::RelSeriesElem{T}) where T <: FieldElement
       x *= c
    end
    return x
+end
+
+################################################################################
+#
+#  Map
+#
+################################################################################
+
+function _make_parent(g, p::RelSeriesElem, cached::Bool)
+   R = parent(g(zero(base_ring(p))))
+   S = parent(p)
+   sym = String(var(S))
+   max_prec = max_precision(S)
+   return AbstractAlgebra.PowerSeriesRing(R, max_prec, sym; cached=cached)[1]
+end
+
+function map_coefficients(g, p::RelSeriesElem{<:RingElement};
+                    cached::Bool = true,
+                    parent::Ring = _make_parent(g, p, cached))
+   return _map(g, p, parent)
+end
+
+function _map(g, p::RelSeriesElem, Rx)
+   R = base_ring(Rx)
+   new_coefficients = elem_type(R)[let c = polcoeff(p, i)
+                                     iszero(c) ? zero(R) : R(g(c))
+                                   end for i in 0:pol_length(p) - 1]
+   return Rx(new_coefficients, pol_length(p), precision(p), valuation(p))
+end
+
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function _change_rel_series_ring(R, Rx, cached)
+   P, _ = AbstractAlgebra.PowerSeriesRing(R, max_precision(Rx),
+                                               string(var(Rx)), cached = cached)
+   return P
+end
+
+function change_base_ring(R::Ring, p::RelSeriesElem{T};
+                    cached::Bool = true, parent::AbstractAlgebra.Ring =
+          _change_rel_series_ring(R, parent(p), cached)) where T <: RingElement
+   return _map(R, p, parent)
 end
 
 ###############################################################################

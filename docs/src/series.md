@@ -367,6 +367,7 @@ julia> c = coeff(b, 2)
 
 ```@docs
 map_coefficients(::Any, ::AbsSeriesElem{<:RingElem})
+change_base_ring(::Ring, ::AbsSeriesElem{<:RingElem})
 ```
 
 **Examples**
@@ -375,11 +376,14 @@ map_coefficients(::Any, ::AbsSeriesElem{<:RingElem})
 julia> R, x = PowerSeriesRing(ZZ, 10, "x")
 (Univariate power series ring in x over Integers, x + O(x^11))
 
-julia> f = 4*x^6 - 2*x^7 - x^8 - 10*x^9 + 10*x^10 + O(x^11)
-4*x^6 - 2*x^7 - x^8 - 10*x^9 + 10*x^10 + O(x^11)
+julia> f = 4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
 
-julia> map_coefficients(QQ, f)
-4*x^6 - 2*x^7 - x^8 - 10*x^9 + 10*x^10 + O(x^11)
+julia> map_coefficients(AbstractAlgebra.sqrt, f)
+2*x^6 + x^7 + 3*x^8 + 4*x^9 + 5*x^10 + O(x^11)
+
+julia> change_base_ring(QQ, f)
+4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
 ```
 
 ### Shifting
