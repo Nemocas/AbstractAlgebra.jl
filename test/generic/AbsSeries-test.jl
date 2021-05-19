@@ -53,9 +53,11 @@ end
 
    c1 = R(BigInt[1, 3, 5], 3, 5)
    c2 = T([t + 1, t, S(1)], 3, 5)
+   c3 = R([1, 3, 5], 3, 5)
 
    @test isa(c1, Generic.AbsSeries)
    @test isa(c2, Generic.AbsSeries)
+   @test isa(c3, Generic.AbsSeries)
 
    g1 = R(1)
    h1 = R(ZZ(2))
