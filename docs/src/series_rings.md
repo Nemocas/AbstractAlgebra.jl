@@ -83,6 +83,23 @@ ignored. The value `len` cannot exceed the length of the supplied array.
 It is permitted to have trailing zeros in the array, but it is not needed, even if the
 precision minus the valuation is bigger than the length of the array.
 
+```julia
+(S::MySeriesRing{T})(A::Array{U, 1}, len::Int, prec::Int, val::Int) where {T <: AbstractAlgebra.RingElem, U <: AbstractAlgebra.RingElem}
+```
+
+As above, but where the array is an array of coefficient that can be coerced into the
+base ring of the series ring.
+
+```julia
+(S::MySeriesRing{T})(A::Array{U, 1}, len::Int, prec::Int, val::Int) where {T <: AbstractAlgebra.RingElem, U <: Integer}
+```
+
+As above, but where the array is an array of integers that can be coerced into the
+base ring of the series ring.
+
+It may be desirable to implement an addition version which accepts an array of Julia
+`Int` values if this can be done more efficiently.
+
 **Examples**
 
 ```jldoctest
