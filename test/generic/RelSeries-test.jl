@@ -56,9 +56,11 @@ end
 
    c1 = R(BigInt[1, 3, 5], 3, 5, 0)
    c2 = T([t + 1, t, S(1)], 3, 5, 0)
+   c3 = R([1, 3, 5], 3, 5, 0)
 
    @test isa(c1, Generic.RelSeries)
    @test isa(c2, Generic.RelSeries)
+   @test isa(c3, Generic.RelSeries)
 
    g1 = R(1)
    h1 = R(ZZ(2))
