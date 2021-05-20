@@ -520,23 +520,45 @@ which is being produced.
 
 ### Promotion rules
 
-In order for AbstractAlgebra to be able to automatically coerce up towers of rings,
-certain promotion rules must be defined. For every ring, one wants to be able to coerce
-integers into the ring. And for any ring constructed over a base ring, one would like to
-be able to coerce from the base ring into the ring.
+AbstractAlgebra currently has a very simple coercion model. With few exceptions
+only simple coercions are supported. For example if $x \in \mathbb{Z}$ and
+$y \in \mathbb{Z}[x]$ then $x + y$ can be computed by coercing $x$ into
+the same ring as $y$ and then adding in that ring.
 
-The promotion rules look a bit different depending on whether the element type is
-parameterised or not and whether it is built on a base ring.
+Complex coercions such as adding elements of $\mathbb{Q}$ and $\mathbb{Z}[x]$
+are not supported, as this would require finding and creating a common
+overring in which the elements could be added.
 
-For ring element types `MyElem` that are neither parameterised nor built over a base
-ring, the promotion rules can be defined as follows:
+AbstractAlgebra supports simple coercions by overloading parent object call
+syntax `R(x)` to coerce the object `x` into the ring `R`. However, to coerce
+elements up a tower of rings, one needs to also have a promotion system
+similar to Julia's type promotion system.
+
+As for Julia, AbstractAlgebra's promotion system only specifies what happens
+to types. It is the coercions themselves that must deal with the mathematical
+situation at the level of rings, including checking that the object can even
+be coerced into the given ring.
+
+We now describe the required AbstractAlgebra type promotion rules.
+
+For every ring, one wants to be able to coerce integers into the ring. And for
+any ring constructed over a base ring, one would like to be able to coerce from
+the base ring into the ring.
+
+The required promotion rules to support this look a bit different depending on
+whether the element type is parameterised or not and whether it is built on a
+base ring.
+
+For ring element types `MyElem` that are neither parameterised nor built over a
+base ring, the promotion rules can be defined as follows:
 
 ```julia
 promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElem
 ```
 
-For ring element types `MyElem` that aren't parameterised, but which have a base ring
-with concrete element type `T` the promotion rules can be defined as follows:
+For ring element types `MyElem` that aren't parameterised, but which have a
+base ring with concrete element type `T` the promotion rules can be defined as
+follows:
 
 ```julia
 promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElem
@@ -546,8 +568,8 @@ promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElem
 promote_rule(::Type{MyElem}, ::Type{T}) = MyElem
 ```
 
-For ring element types `MyElem{T}` that are parameterised by the type of elements of
-the base ring, the promotion rules can be defined as follows:
+For ring element types `MyElem{T}` that are parameterised by the type of
+elements of the base ring, the promotion rules can be defined as follows:
 
 ```julia
 promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}
