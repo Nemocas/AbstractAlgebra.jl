@@ -59,7 +59,7 @@ types in Julia can belong to one another in a hierarchy.
 
 For example, the `AbstractAlgebra.Field` abstract type belongs to the
 `AbstractAlgebra.Ring` abstract type. The full hierarchy can be seen in diagrams
-under the section [on visualisation of the abstract types](#abstract-types).
+under the section [on visualisation of the abstract types](visualizing_types.md).
 
 In practice this is practical since it means that any generic function designed
 to work with ring objects will also work with field objects.
