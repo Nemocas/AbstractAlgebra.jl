@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Generic univariate polynomials · AbstractAlgebra.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">AbstractAlgebra.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">AbstractAlgebra.jl</a></li><li><span class="tocitem">Fundamental interface of AbstractAlgebra.jl</span><ul><li><a class="tocitem" href="../types/">Type interface of AbstractAlgebra.jl</a></li><li><a class="tocitem" href="../visualizing_types/">Visualiation of the types of AbstractAlgebra.jl</a></li><li><a class="tocitem" href="../extending_abstractalgebra/">Extending the interface of AbstractAlgebra.jl</a></li></ul></li><li><a class="tocitem" href="../constructors/">Constructing mathematical objects in AbstractAlgebra.jl</a></li><li><span class="tocitem">Rings</span><ul><li><a class="tocitem" href="../rings/">Ring Interface</a></li><li><a class="tocitem" href="../ncrings/">Noncommutative ring Interface</a></li><li><a class="tocitem" href="../euclidean/">Euclidean Ring Interface</a></li><li><a class="tocitem" href="../integer/">Integer ring</a></li><li><a class="tocitem" href="../polynomial_rings/">Univariate Polynomial Ring Interface</a></li><li class="is-active"><a class="tocitem" href>Generic univariate polynomials</a><ul class="internal"><li><a class="tocitem" href="#Types-and-parent-objects"><span>Types and parent objects</span></a></li><li><a class="tocitem" href="#Polynomial-ring-constructors"><span>Polynomial ring constructors</span></a></li><li><a class="tocitem" href="#Basic-ring-functionality"><span>Basic ring functionality</span></a></li><li><a class="tocitem" href="#Polynomial-functionality-provided-by-AbstractAlgebra.jl"><span>Polynomial functionality provided by AbstractAlgebra.jl</span></a></li></ul></li><li><a class="tocitem" href="../ncpolynomial/">Generic univariate polynomials over a noncommutative ring</a></li><li><a class="tocitem" href="../mpolynomial_rings/">Multivariate Polynomial Ring Interface</a></li><li><a class="tocitem" href="../mpolynomial/">Generic sparse distributed multivariate polynomials</a></li><li><a class="tocitem" href="../laurent_polynomial/">Generic Laurent polynomials</a></li><li><a class="tocitem" href="../series_rings/">Series Ring Interface</a></li><li><a class="tocitem" href="../series/">Generic power series</a></li><li><a class="tocitem" href="../puiseux/">Generic Puiseux series</a></li><li><a class="tocitem" href="../mseries/">Generic multivariate series</a></li><li><a class="tocitem" href="../residue_rings/">Residue Ring Interface</a></li><li><a class="tocitem" href="../residue/">Generic residue rings</a></li></ul></li><li><span class="tocitem">Fields</span><ul><li><a class="tocitem" href="../fields/">Field Interface</a></li><li><a class="tocitem" href="../fraction_fields/">Fraction Field Interface</a></li><li><a class="tocitem" href="../fraction/">Generic fraction fields</a></li><li><a class="tocitem" href="../rational/">Rational field</a></li><li><a class="tocitem" href="../function_field/">Rational function fields</a></li><li><a class="tocitem" href="../finfield/">Finite fields</a></li><li><a class="tocitem" href="../real/">Real field</a></li><li><a class="tocitem" href="../numberfield/">Number fields</a></li></ul></li><li><span class="tocitem">Groups</span><ul><li><a class="tocitem" href="../perm/">Permutations and Symmetric groups</a></li><li><a class="tocitem" href="../ytabs/">Partitions and Young tableaux</a></li></ul></li><li><span class="tocitem">Modules</span><ul><li><a class="tocitem" href="../module/">Module Interface</a></li><li><a class="tocitem" href="../free_module/">Free Modules and Vector Spaces</a></li><li><a class="tocitem" href="../submodule/">Submodules</a></li><li><a class="tocitem" href="../quotient_module/">Quotient modules</a></li><li><a class="tocitem" href="../direct_sum/">Direct Sums</a></li><li><a class="tocitem" href="../module_homomorphism/">Module Homomorphisms</a></li></ul></li><li><span class="tocitem">Matrices</span><ul><li><a class="tocitem" href="../matrix_spaces/">Matrix Interface</a></li><li><a class="tocitem" href="../matrix/">Generic matrices</a></li><li><a class="tocitem" href="../matrix_algebras/">Generic matrix algebras</a></li></ul></li><li><span class="tocitem">Maps</span><ul><li><a class="tocitem" href="../map/">Map interface</a></li><li><a class="tocitem" href="../functional_map/">Functional maps</a></li><li><a class="tocitem" href="../map_cache/">Cached maps</a></li><li><a class="tocitem" href="../map_with_inverse/">Map with inverse</a></li></ul></li><li><span class="tocitem">Miscellaneous</span><ul><li><a class="tocitem" href="../misc/">Miscellaneous</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Rings</a></li><li class="is-active"><a href>Generic univariate polynomials</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Generic univariate polynomials</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/master/docs/src/polynomial.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Generic-univariate-polynomials"><a class="docs-heading-anchor" href="#Generic-univariate-polynomials">Generic univariate polynomials</a><a id="Generic-univariate-polynomials-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-univariate-polynomials" title="Permalink"></a></h1><p>AbstractAlgebra.jl provides a module, implemented in <code>src/generic/Poly.jl</code> for generic polynomials over any commutative ring belonging to the AbstractAlgebra abstract type hierarchy.</p><p>As well as implementing the Univariate Polynomial interface, and relevant parts of the Euclidean Ring interface for polynomials over a field, there are many additional generic algorithms implemented for such polynomial rings. We describe this generic functionality below.</p><p>All of the generic functionality is part of a submodule of AbstractAlgebra called <code>Generic</code>. This is exported by default so that it is not necessary to qualify the function names with the submodule name.</p><h2 id="Types-and-parent-objects"><a class="docs-heading-anchor" href="#Types-and-parent-objects">Types and parent objects</a><a id="Types-and-parent-objects-1"></a><a class="docs-heading-anchor-permalink" href="#Types-and-parent-objects" title="Permalink"></a></h2><p>Polynomials implemented using the AbstractAlgebra generics have type <code>Generic.Poly{T}</code> where <code>T</code> is the type of elements of the coefficient ring. Internally they consist of a Julia array of coefficients and some additional fields for length and a parent object, etc. See the file <code>src/generic/GenericTypes.jl</code> for details.</p><p>Parent objects of such polynomials have type <code>Generic.PolyRing{T}</code>.</p><p>The string representation of the variable of the polynomial ring and the base/coefficient ring <span>$R$</span> is stored in the parent object.</p><p>The polynomial element types belong to the abstract type <code>AbstractAlgebra.PolyElem{T}</code> and the polynomial ring types belong to the abstract type <code>AbstractAlgebra.PolyRing{T}</code>. This enables one to write generic functions that can accept any AbstractAlgebra polynomial type.</p><p>Note that both the generic polynomial ring type <code>Generic.PolyRing{T}</code> and the abstract type it belongs to, <code>AbstractAlgebra.PolyRing{T}</code>, are called <code>PolyRing</code>. The former is a (parameterised) concrete type for a polynomial ring over a given base ring whose elements have type <code>T</code>. The latter is an abstract type representing all polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C library).</p><h2 id="Polynomial-ring-constructors"><a class="docs-heading-anchor" href="#Polynomial-ring-constructors">Polynomial ring constructors</a><a id="Polynomial-ring-constructors-1"></a><a class="docs-heading-anchor-permalink" href="#Polynomial-ring-constructors" title="Permalink"></a></h2><p>In order to construct polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.</p><pre><code class="language-julia">PolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString; cached::Bool = true)</code></pre><p>Given a base ring <code>R</code> and string <code>s</code> specifying how the generator (variable) should be printed, return a tuple <code>S, x</code> representing the new polynomial ring <span>$S = R[x]$</span> and the generator <span>$x$</span> of the ring. By default the parent object <code>S</code> will depend only on <code>R</code> and <code>x</code> and will be cached. Setting the optional argument <code>cached</code> to <code>false</code> will prevent the parent object <code>S</code> from being cached.</p><p>A shorthand version of this function is provided: given a base ring <code>R</code>, we abbreviate the constructor as follows.</p><pre><code class="language-julia">R[&quot;x&quot;]</code></pre><p>Here are some examples of creating polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; T, z = QQ[&quot;z&quot;]
+(Univariate Polynomial Ring in z over Rationals, z)
+
+julia&gt; f = R()
+0
+
+julia&gt; g = R(123)
+123
+
+julia&gt; h = S(BigInt(1234))
+1234
+
+julia&gt; k = S(x + 1)
+x + 1
+
+julia&gt; m = T(z + 1)
+z + 1
+</code></pre><p>All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a <code>PolynomialRing</code> constructor to allow creation of their polynomial rings.</p><h2 id="Basic-ring-functionality"><a class="docs-heading-anchor" href="#Basic-ring-functionality">Basic ring functionality</a><a id="Basic-ring-functionality-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-ring-functionality" title="Permalink"></a></h2><p>Once a polynomial ring is constructed, there are various ways to construct polynomials in that ring.</p><p>The easiest way is simply using the generator returned by the <code>PolynomialRing</code> constructor and build up the polynomial using basic arithmetic, as described in the Ring interface.</p><p>The Julia language also has special syntax for the construction of polynomials in terms of a generator, e.g. we can write <code>2x</code> instead of <code>2*x</code>.</p><p>The polynomial rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Univariate Polynomial Ring interface is also implemented.</p><p>We give some examples of such functionality.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; f = x^3 + 3x + 21
+x^3 + 3*x + 21
+
+julia&gt; g = (x + 1)*y^2 + 2x + 1
+(x + 1)*y^2 + 2*x + 1
+
+julia&gt; h = zero(S)
+0
+
+julia&gt; k = one(R)
+1
+
+julia&gt; isone(k)
+true
+
+julia&gt; iszero(f)
+false
+
+julia&gt; n = length(g)
+3
+
+julia&gt; U = base_ring(S)
+Univariate Polynomial Ring in x over Integers
+
+julia&gt; V = base_ring(y + 1)
+Univariate Polynomial Ring in x over Integers
+
+julia&gt; v = var(S)
+:y
+
+julia&gt; T = parent(y + 1)
+Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers
+
+julia&gt; g == deepcopy(g)
+true
+
+julia&gt; t = divexact(2g, 2)
+(x + 1)*y^2 + 2*x + 1
+</code></pre><p>For polynomials over a field, the Euclidean Ring interface is implemented.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(QQ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia&gt; S = ResidueRing(R, x^3 + 3x + 1)
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+
+julia&gt; T, y = PolynomialRing(S, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, y)
+
+julia&gt; f = (3*x^2 + x + 2)*y + x^2 + 1
+(3*x^2 + x + 2)*y + x^2 + 1
+
+julia&gt; g = (5*x^2 + 2*x + 1)*y^2 + 2x*y + x + 1
+(5*x^2 + 2*x + 1)*y^2 + 2*x*y + x + 1
+
+julia&gt; h = (3*x^3 + 2*x^2 + x + 7)*y^5 + 2x*y + 1
+(2*x^2 - 8*x + 4)*y^5 + 2*x*y + 1
+
+julia&gt; invmod(f, g)
+(707//3530*x^2 + 2151//1765*x + 123//3530)*y - 178//1765*x^2 - 551//3530*x + 698//1765
+
+julia&gt; mulmod(f, g, h)
+(-30*x^2 - 43*x - 9)*y^3 + (-7*x^2 - 23*x - 7)*y^2 + (4*x^2 - 10*x - 3)*y + (x^2 - 2*x)
+
+julia&gt; powermod(f, 3, h)
+(69*x^2 + 243*x + 79)*y^3 + (78*x^2 + 180*x + 63)*y^2 + (27*x^2 + 42*x + 18)*y + 3*x^2 + 3*x + 2
+
+julia&gt; h = mod(f, g)
+(3*x^2 + x + 2)*y + x^2 + 1
+
+julia&gt; q, r = divrem(f, g)
+(0, (3*x^2 + x + 2)*y + x^2 + 1)
+
+julia&gt; d = gcd(f*h, g*h)
+y + 1//11*x^2 + 6//11
+
+julia&gt; k = gcdinv(f, h)
+(y + 1//11*x^2 + 6//11, 0)
+
+julia&gt; m = lcm(f, h)
+(-14*x^2 - 23*x - 2)*y - 4*x^2 - 5*x + 1
+
+julia&gt; flag, q = divides(g^2, g)
+(true, (5*x^2 + 2*x + 1)*y^2 + 2*x*y + x + 1)
+
+julia&gt; valuation(3g^3, g) == 3
+true
+
+julia&gt; val, q = remove(5g^3, g)
+(3, 5)
+
+julia&gt; r, s, t = gcdx(g, h)
+(1, 311//3530*x^2 - 2419//3530*x + 947//1765, (707//3530*x^2 + 2151//1765*x + 123//3530)*y - 178//1765*x^2 - 551//3530*x + 698//1765)
+</code></pre><p>Functions in the Euclidean Ring interface are supported over residue rings that are not fields, except that if an impossible inverse is encountered during the computation an error is thrown.</p><h2 id="Polynomial-functionality-provided-by-AbstractAlgebra.jl"><a class="docs-heading-anchor" href="#Polynomial-functionality-provided-by-AbstractAlgebra.jl">Polynomial functionality provided by AbstractAlgebra.jl</a><a id="Polynomial-functionality-provided-by-AbstractAlgebra.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Polynomial-functionality-provided-by-AbstractAlgebra.jl" title="Permalink"></a></h2><p>The functionality listed below is automatically provided by AbstractAlgebra.jl for any polynomial module that implements the full Univariate Polynomial Ring interface. This includes AbstractAlgebra.jl&#39;s own generic polynomial rings.</p><p>But if a C library provides all the functionality documented in the Univariate Polynomial Ring interface, then all the functions described here will also be automatically supplied by AbstractAlgebra.jl for that polynomial type.</p><p>Of course, modules are free to provide specific implementations of the functions described here, that override the generic implementation.</p><h3 id="Basic-functionality"><a class="docs-heading-anchor" href="#Basic-functionality">Basic functionality</a><a id="Basic-functionality-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-functionality" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.modulus-Union{Tuple{PolyElem{T}}, Tuple{T}} where T&lt;:ResElem" href="#AbstractAlgebra.Generic.modulus-Union{Tuple{PolyElem{T}}, Tuple{T}} where T&lt;:ResElem"><code>AbstractAlgebra.Generic.modulus</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">modulus(a::AbstractAlgebra.PolyElem{T}) where {T &lt;: ResElem}</code></pre><p>Return the modulus of the coefficients of the given polynomial.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L124">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.leading_coefficient-Tuple{PolyElem}" href="#AbstractAlgebra.leading_coefficient-Tuple{PolyElem}"><code>AbstractAlgebra.leading_coefficient</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">leading_coefficient(a::Generic.PolynomialElem)</code></pre><p>Return the leading coefficient of the given polynomial. This will be the nonzero coefficient of the term with highest degree unless the polynomial in the zero polynomial, in which case a zero coefficient is returned.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L133">source</a></section><section><div><pre><code class="language-julia">leading_coefficient(p::MPolyElem)</code></pre><p>Return the leading coefficient of the polynomial <span>$p$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/MPoly.jl#L852">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.trailing_coefficient-Tuple{PolyElem}" href="#AbstractAlgebra.trailing_coefficient-Tuple{PolyElem}"><code>AbstractAlgebra.trailing_coefficient</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">trailing_coefficient(a::Generic.PolynomialElem)</code></pre><p>Return the trailing coefficient of the given polynomial. This will be the nonzero coefficient of the term with lowest degree unless the polynomial is the zero polynomial, in which case a zero coefficient is returned.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L144">source</a></section><section><div><pre><code class="language-julia">trailing_coefficient(p::MPolyElem)</code></pre><p>Return the trailing coefficient of the polynomial <span>$p$</span>, i.e. the coefficient of the last nonzero term, or zero if the polynomial is zero.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/MPoly.jl#L865">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.constant_coefficient-Tuple{Union{NCPolyElem{T}, PolyElem{T}} where T}" href="#AbstractAlgebra.Generic.constant_coefficient-Tuple{Union{NCPolyElem{T}, PolyElem{T}} where T}"><code>AbstractAlgebra.Generic.constant_coefficient</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">constant_coefficient(a::Generic.PolynomialElem)</code></pre><p>Return the constant coefficient of the given polynomial. If the polynomial is the zero polynomial, the function will return zero.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L165">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.tail-Tuple{Union{NCPolyElem{T}, PolyElem{T}} where T}" href="#AbstractAlgebra.Generic.tail-Tuple{Union{NCPolyElem{T}, PolyElem{T}} where T}"><code>AbstractAlgebra.Generic.tail</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">tail(a::Generic.PolynomialElem)</code></pre><p>Return the tail of the given polynomial, i.e. the polynomial without its leading term (if any).</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L178">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.gen-Tuple{PolyElem}" href="#AbstractAlgebra.gen-Tuple{PolyElem}"><code>AbstractAlgebra.gen</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">gen(a::MPolyRing{T}, i::Int) where {T &lt;: RingElement}</code></pre><p>Return the <span>$i$</span>-th generator (variable) of the given polynomial ring.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/MPoly.jl#L87">source</a></section><section><div><pre><code class="language-none">gen(R::AbsSeriesRing{T}) where T &lt;: RingElement</code></pre><p>Return the generator of the power series ring, i.e. <span>$x + O(x^n)$</span> where <span>$n$</span> is the precision of the power series ring <span>$R$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/AbsSeries.jl#L75">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.isgen-Tuple{PolyElem}" href="#AbstractAlgebra.isgen-Tuple{PolyElem}"><code>AbstractAlgebra.isgen</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">isgen(a::Generic.PolynomialElem)</code></pre><p>Return <code>true</code> if the given polynomial is the constant generator of its polynomial ring, otherwise return <code>false</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L215">source</a></section><section><div><pre><code class="language-none">isgen(x::MPoly{T}) where {T &lt;: RingElement}</code></pre><p>Return <code>true</code> if the given polynomial is a generator (variable) of the polynomial ring it belongs to.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/MPoly.jl#L784">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.ismonic-Tuple{PolyElem}" href="#AbstractAlgebra.Generic.ismonic-Tuple{PolyElem}"><code>AbstractAlgebra.Generic.ismonic</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">ismonic(a::Generic.PolyElem)</code></pre><p>Return <code>true</code> if the given polynomial is monic, i.e. has leading coefficient equal to one, otherwise return <code>false</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L226">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.issquare-Tuple{PolyElem}" href="#AbstractAlgebra.Generic.issquare-Tuple{PolyElem}"><code>AbstractAlgebra.Generic.issquare</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">issquare(f::AbstractAlgebra.PolyElem{T}) where T &lt;: RingElement</code></pre><p>Return <code>true</code> if <span>$f$</span> is a perfect square.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1856">source</a></section><section><div><pre><code class="language-julia">issquare(a::AbstractAlgebra.FracElem{T}) where T &lt;: RingElem</code></pre><p>Return <code>true</code> if <span>$a$</span> is a square.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Fraction.jl#L655">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.degree-Tuple{Union{NCPolyElem{T}, PolyElem{T}} where T}" href="#AbstractAlgebra.Generic.degree-Tuple{Union{NCPolyElem{T}, PolyElem{T}} where T}"><code>AbstractAlgebra.Generic.degree</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">degree(a::Generic.PolynomialElem)</code></pre><p>Return the degree of the given polynomial. This is defined to be one less than the length, even for constant polynomials.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L116">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.ismonomial-Tuple{PolyElem}" href="#AbstractAlgebra.ismonomial-Tuple{PolyElem}"><code>AbstractAlgebra.ismonomial</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">ismonomial_recursive(a::PolynomialElem)</code></pre><p>Return <code>true</code> if the given polynomial is a monomial.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L281">source</a></section><section><div><pre><code class="language-julia">ismonomial(x::AbstractAlgebra.MPolyElem)</code></pre><p>Return <code>true</code> if the given polynomial has precisely one term whose coefficient is one.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/MPoly.jl#L1209">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.ismonomial_recursive-Tuple{PolyElem}" href="#AbstractAlgebra.ismonomial_recursive-Tuple{PolyElem}"><code>AbstractAlgebra.ismonomial_recursive</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">ismonomial_recursive(a::PolynomialElem)</code></pre><p>Return <code>true</code> if the given polynomial is a monomial. This function is recursive, with all scalar types returning true.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L300">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.isterm-Tuple{PolyElem}" href="#AbstractAlgebra.Generic.isterm-Tuple{PolyElem}"><code>AbstractAlgebra.Generic.isterm</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">isterm(a::PolynomialElem)</code></pre><p>Return <code>true</code> if the given polynomial has one term.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L244">source</a></section><section><div><pre><code class="language-julia">isterm(x::MPoly)</code></pre><p>Return <code>true</code> if the given polynomial has precisely one term.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/MPoly.jl#L1202">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.isterm_recursive-Tuple{PolyElem}" href="#AbstractAlgebra.Generic.isterm_recursive-Tuple{PolyElem}"><code>AbstractAlgebra.Generic.isterm_recursive</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">isterm_recursive(a::PolynomialElem)</code></pre><p>Return <code>true</code> if the given polynomial has one term. This function is recursive, with all scalar types returning true.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L263">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; T, z = PolynomialRing(QQ, &quot;z&quot;)
+(Univariate Polynomial Ring in z over Rationals, z)
+
+julia&gt; U = ResidueRing(ZZ, 17)
+Residue ring of Integers modulo 17
+
+julia&gt; V, w = PolynomialRing(U, &quot;w&quot;)
+(Univariate Polynomial Ring in w over Residue ring of Integers modulo 17, w)
+
+julia&gt; a = zero(S)
+0
+
+julia&gt; b = one(S)
+1
+
+julia&gt; c = BigInt(1)//2*z^2 + BigInt(1)//3
+1//2*z^2 + 1//3
+
+julia&gt; d = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia&gt; f = leading_coefficient(d)
+x
+
+julia&gt; y = gen(S)
+y
+
+julia&gt; g = isgen(w)
+true
+
+julia&gt; m = isunit(b)
+true
+
+julia&gt; n = degree(d)
+2
+
+julia&gt; r = modulus(w)
+17
+
+julia&gt; isterm(2y^2)
+true
+
+julia&gt; ismonomial(y^2)
+true
+
+julia&gt; ismonomial_recursive(x*y^2)
+true
+
+julia&gt; ismonomial(x*y^2)
+false
+</code></pre><h3 id="Iterators"><a class="docs-heading-anchor" href="#Iterators">Iterators</a><a id="Iterators-1"></a><a class="docs-heading-anchor-permalink" href="#Iterators" title="Permalink"></a></h3><p>An iterator is provided to return the coefficients of a univariate polynomial. The iterator is called <code>coefficients</code> and allows iteration over the coefficients, starting with the term of degree zero (if there is one). Note that coefficients of each degree are given, even if they are zero. This is best illustrated by example.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; f = x^2 + 2
+x^2 + 2
+
+julia&gt; C = collect(coefficients(f))
+3-element Array{BigInt,1}:
+ 2
+ 0
+ 1
+
+julia&gt; for c in coefficients(f)
+          println(c)
+       end
+2
+0
+1</code></pre><h3 id="Truncation"><a class="docs-heading-anchor" href="#Truncation">Truncation</a><a id="Truncation-1"></a><a class="docs-heading-anchor-permalink" href="#Truncation" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="Base.truncate-Tuple{PolyElem,Int64}" href="#Base.truncate-Tuple{PolyElem,Int64}"><code>Base.truncate</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">truncate(a::Generic.PolynomialElem, n::Int)</code></pre><p>Return <span>$a$</span> truncated to <span>$n$</span> terms.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L975">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.mullow-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T},Int64}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.mullow-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T},Int64}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.mullow</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">mullow(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, n::Int) where {T &lt;: RingElement}</code></pre><p>Return <span>$a\times b$</span> truncated to <span>$n$</span> terms.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1014">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia&gt; g = (x + 1)*y + (x^3 + 2x + 2)
+(x + 1)*y + x^3 + 2*x + 2
+
+julia&gt; h = truncate(f, 1)
+3
+
+julia&gt; k = mullow(f, g, 4)
+(x^2 + x)*y^3 + (x^4 + 3*x^2 + 4*x + 1)*y^2 + (x^4 + x^3 + 2*x^2 + 7*x + 5)*y + 3*x^3 + 6*x + 6
+</code></pre><h3 id="Reversal"><a class="docs-heading-anchor" href="#Reversal">Reversal</a><a id="Reversal-1"></a><a class="docs-heading-anchor-permalink" href="#Reversal" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="Base.reverse-Tuple{PolyElem,Int64}" href="#Base.reverse-Tuple{PolyElem,Int64}"><code>Base.reverse</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">reverse(x::Generic.PolynomialElem, len::Int)</code></pre><p>Return the reverse of the polynomial <span>$x$</span>, thought of as a polynomial of the given length (the polynomial will be notionally truncated or padded with zeroes before the leading term if necessary to match the specified length). The resulting polynomial is normalised. If <code>len</code> is negative we throw a <code>DomainError()</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1146">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Base.reverse-Tuple{PolyElem}" href="#Base.reverse-Tuple{PolyElem}"><code>Base.reverse</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">reverse(x::Generic.PolynomialElem)</code></pre><p>Return the reverse of the polynomial <span>$x$</span>, i.e. the leading coefficient of <span>$x$</span> becomes the constant coefficient of the result, etc. The resulting polynomial is normalised.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1166">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia&gt; g = reverse(f, 7)
+3*y^6 + (x + 1)*y^5 + x*y^4
+
+julia&gt; h = reverse(f)
+3*y^2 + (x + 1)*y + x
+</code></pre><h3 id="Shifting"><a class="docs-heading-anchor" href="#Shifting">Shifting</a><a id="Shifting-1"></a><a class="docs-heading-anchor-permalink" href="#Shifting" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.shift_left-Tuple{PolyElem,Int64}" href="#AbstractAlgebra.Generic.shift_left-Tuple{PolyElem,Int64}"><code>AbstractAlgebra.Generic.shift_left</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">shift_left(f::Generic.PolynomialElem, n::Int)</code></pre><p>Return the polynomial <span>$f$</span> shifted left by <span>$n$</span> terms, i.e. multiplied by <span>$x^n$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1183">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.shift_right-Tuple{PolyElem,Int64}" href="#AbstractAlgebra.Generic.shift_right-Tuple{PolyElem,Int64}"><code>AbstractAlgebra.Generic.shift_right</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">shift_right(f::Generic.PolynomialElem, n::Int)</code></pre><p>Return the polynomial <span>$f$</span> shifted right by <span>$n$</span> terms, i.e. divided by <span>$x^n$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1206">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia&gt; g = shift_left(f, 7)
+x*y^9 + (x + 1)*y^8 + 3*y^7
+
+julia&gt; h = shift_right(f, 2)
+x
+</code></pre><h3 id="Inflation-and-deflation"><a class="docs-heading-anchor" href="#Inflation-and-deflation">Inflation and deflation</a><a id="Inflation-and-deflation-1"></a><a class="docs-heading-anchor-permalink" href="#Inflation-and-deflation" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.deflation-Tuple{PolyElem}" href="#AbstractAlgebra.Generic.deflation-Tuple{PolyElem}"><code>AbstractAlgebra.Generic.deflation</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">function deflation(p::PolyElem)</code></pre><p>Return a tuple <code>(shift, defl)</code> where <code>shift</code> is the exponent of the trailing term of <span>$p$</span> and <code>defl</code> is the gcd of the distance between the exponents of the nonzero terms of <span>$p$</span>. If <span>$p = 0$</span>, both <code>shift</code> and <code>defl</code> will be zero.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1235">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.inflate-Tuple{PolyElem,Int64,Int64}" href="#AbstractAlgebra.Generic.inflate-Tuple{PolyElem,Int64,Int64}"><code>AbstractAlgebra.Generic.inflate</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">inflate(f::PolyElem, shift::Int64, n::Int64) -&gt; PolyElem</code></pre><p>Given a polynomial <span>$f$</span> in <span>$x$</span>, return <span>$f(x^n)*x^j$</span>, i.e. multiply all exponents by <span>$n$</span> and shift <span>$f$</span> left by <span>$j$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1265">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.inflate-Tuple{PolyElem,Int64}" href="#AbstractAlgebra.Generic.inflate-Tuple{PolyElem,Int64}"><code>AbstractAlgebra.Generic.inflate</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">inflate(f::PolyElem, n::Int64) -&gt; PolyElem</code></pre><p>Given a polynomial <span>$f$</span> in <span>$x$</span>, return <span>$f(x^n)$</span>, i.e. multiply all exponents by <span>$n$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1279">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.deflate-Tuple{PolyElem,Int64,Int64}" href="#AbstractAlgebra.Generic.deflate-Tuple{PolyElem,Int64,Int64}"><code>AbstractAlgebra.Generic.deflate</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">deflate(f::PolyElem, shift::Int64, n::Int64) -&gt; PolyElem</code></pre><p>Given a polynomial <span>$g$</span> in <span>$x^n$</span> such that <code>f = g(x)*x^{shift}</code>, write <span>$f$</span> as a polynomial in <span>$x$</span>, i.e. divide all exponents of <span>$g$</span> by <span>$n$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1287">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.deflate-Tuple{PolyElem,Int64}" href="#AbstractAlgebra.Generic.deflate-Tuple{PolyElem,Int64}"><code>AbstractAlgebra.Generic.deflate</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">deflate(f::PolyElem, n::Int64) -&gt; PolyElem</code></pre><p>Given a polynomial <span>$f$</span> in <span>$x^n$</span>, write it as a polynomial in <span>$x$</span>, i.e. divide all exponents by <span>$n$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1301">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.deflate-Tuple{PolyElem}" href="#AbstractAlgebra.Generic.deflate-Tuple{PolyElem}"><code>AbstractAlgebra.Generic.deflate</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">deflate(x::PolyElem) -&gt; PolyElem, Int</code></pre><p>Deflate the polynomial <span>$f$</span> maximally, i.e. find the largest <span>$n$</span> s.th. <span>$f$</span> can be deflated by <span>$n$</span>, i.e. <span>$f$</span> is actually a polynomial in <span>$x^n$</span>. Return <span>$g, n$</span> where <span>$g$</span> is the deflation of <span>$f$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1309">source</a></section></article><h3 id="Square-root"><a class="docs-heading-anchor" href="#Square-root">Square root</a><a id="Square-root-1"></a><a class="docs-heading-anchor-permalink" href="#Square-root" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="Base.sqrt-Union{Tuple{T}, Tuple{PolyElem{T},Bool}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#Base.sqrt-Union{Tuple{T}, Tuple{PolyElem{T},Bool}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>Base.sqrt</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">Base.sqrt(f::AbstractAlgebra.PolyElem{T}, check::Bool=true) where T &lt;: RingElement</code></pre><p>Return the square root of <span>$f$</span> if it is a perfect square, otherwise an exception is raised. If <code>check</code> is set to <code>false</code> the function assumes the input is square and may not fully check this.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1843">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia">R, x = PolynomialRing(ZZ, &quot;x&quot;)
+g = x^2+6*x+1
+sqrt(g^2)</code></pre><h3 id="Change-of-base-ring"><a class="docs-heading-anchor" href="#Change-of-base-ring">Change of base ring</a><a id="Change-of-base-ring-1"></a><a class="docs-heading-anchor-permalink" href="#Change-of-base-ring" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.change_base_ring-Union{Tuple{T}, Tuple{AbstractAlgebra.Ring,PolyElem{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.change_base_ring-Union{Tuple{T}, Tuple{AbstractAlgebra.Ring,PolyElem{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.change_base_ring</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">change_base_ring(R::Ring, p::PolyElem{&lt;: RingElement}; parent::PolyRing)</code></pre><p>Return the polynomial obtained by coercing the non-zero coefficients of <code>p</code> into <code>R</code>.</p><p>If the optional <code>parent</code> keyword is provided, the polynomial will be an element of <code>parent</code>. The caching of the parent object can be controlled via the <code>cached</code> keyword argument.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2855">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.map_coefficients-Tuple{Any,PolyElem{var&quot;#s5&quot;} where var&quot;#s5&quot;&lt;:Union{RingElem, AbstractFloat, Integer, Rational}}" href="#AbstractAlgebra.Generic.map_coefficients-Tuple{Any,PolyElem{var&quot;#s5&quot;} where var&quot;#s5&quot;&lt;:Union{RingElem, AbstractFloat, Integer, Rational}}"><code>AbstractAlgebra.Generic.map_coefficients</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">map_coefficients(f, p::PolyElem{&lt;: RingElement}; cached::Bool=true, parent::PolyRing)</code></pre><p>Transform the polynomial <code>p</code> by applying <code>f</code> on each non-zero coefficient.</p><p>If the optional <code>parent</code> keyword is provided, the polynomial will be an element of <code>parent</code>. The caching of the parent object can be controlled via the <code>cached</code> keyword argument.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2879">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia">R, x = PolynomialRing(ZZ, &quot;x&quot;)
+g = x^3+6*x + 1
+change_base_ring(GF(2), g)</code></pre><h3 id="Pseudodivision"><a class="docs-heading-anchor" href="#Pseudodivision">Pseudodivision</a><a id="Pseudodivision-1"></a><a class="docs-heading-anchor-permalink" href="#Pseudodivision" title="Permalink"></a></h3><p>Given two polynomials <span>$a, b$</span>, pseudodivision computes polynomials <span>$q$</span> and <span>$r$</span> with length<span>$(r) &lt;$</span> length<span>$(b)$</span> such that <span>$L^d a = bq + r,$</span> where <span>$d =$</span> length<span>$(a) -$</span> length<span>$(b) + 1$</span> and <span>$L$</span> is the leading coefficient of <span>$b$</span>.</p><p>We call <span>$q$</span> the pseudoquotient and <span>$r$</span> the pseudoremainder.</p><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.pseudorem-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.pseudorem-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.pseudorem</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">pseudorem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T &lt;: RingElement}</code></pre><p>Return the pseudoremainder of <span>$f$</span> divided by <span>$g$</span>. If <span>$g = 0$</span> we throw a <code>DivideError()</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1560">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.pseudodivrem-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.pseudodivrem-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.pseudodivrem</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">pseudodivrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T &lt;: RingElement}</code></pre><p>Return a tuple <span>$(q, r)$</span> consisting of the pseudoquotient and pseudoremainder of <span>$f$</span> divided by <span>$g$</span>. If <span>$g = 0$</span> we throw a <code>DivideError()</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L1582">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia&gt; g = (x + 1)*y + (x^3 + 2x + 2)
+(x + 1)*y + x^3 + 2*x + 2
+
+julia&gt; h = pseudorem(f, g)
+x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1
+
+julia&gt; q, r = pseudodivrem(f, g)
+((x^2 + x)*y - x^4 - x^2 + 1, x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1)
+</code></pre><h3 id="Content-and-primitive-part"><a class="docs-heading-anchor" href="#Content-and-primitive-part">Content and primitive part</a><a id="Content-and-primitive-part-1"></a><a class="docs-heading-anchor-permalink" href="#Content-and-primitive-part" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.content-Tuple{PolyElem}" href="#AbstractAlgebra.Generic.content-Tuple{PolyElem}"><code>AbstractAlgebra.Generic.content</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">content(a::AbstractAlgebra.PolyElem)</code></pre><p>Return the content of <span>$a$</span>, i.e. the greatest common divisor of its coefficients.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2024">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.primpart-Tuple{PolyElem}" href="#AbstractAlgebra.Generic.primpart-Tuple{PolyElem}"><code>AbstractAlgebra.Generic.primpart</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">primpart(a::AbstractAlgebra.PolyElem)</code></pre><p>Return the primitive part of <span>$a$</span>, i.e. the polynomial divided by its content.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2038">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-none">R, x = PolynomialRing(ZZ, &quot;x&quot;)
+S, y = PolynomialRing(R, &quot;y&quot;)
+
+k = x*y^2 + (x + 1)*y + 3
+
+n = content(k)
+p = primpart(k*(x^2 + 1))</code></pre><h3 id="Evaluation,-composition-and-substitution"><a class="docs-heading-anchor" href="#Evaluation,-composition-and-substitution">Evaluation, composition and substitution</a><a id="Evaluation,-composition-and-substitution-1"></a><a class="docs-heading-anchor-permalink" href="#Evaluation,-composition-and-substitution" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.evaluate-Union{Tuple{T}, Tuple{PolyElem{T},T}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.evaluate-Union{Tuple{T}, Tuple{PolyElem{T},T}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.evaluate</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">evaluate(a::AbstractAlgebra.PolyElem, b::T) where {T &lt;: RingElement}</code></pre><p>Evaluate the polynomial expression <span>$a$</span> at the value <span>$b$</span> and return the result.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2058">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.evaluate-Tuple{PolyElem,Integer}" href="#AbstractAlgebra.Generic.evaluate-Tuple{PolyElem,Integer}"><code>AbstractAlgebra.Generic.evaluate</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">evaluate(a::AbstractAlgebra.PolyElem, b::T) where {T &lt;: RingElement}</code></pre><p>Evaluate the polynomial expression <span>$a$</span> at the value <span>$b$</span> and return the result.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2058">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.compose-Tuple{PolyElem,PolyElem}" href="#AbstractAlgebra.Generic.compose-Tuple{PolyElem,PolyElem}"><code>AbstractAlgebra.Generic.compose</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">compose(a::AbstractAlgebra.PolyElem, b::AbstractAlgebra.PolyElem)</code></pre><p>Compose the polynomial <span>$a$</span> with the polynomial <span>$b$</span> and return the result, i.e. return <span>$a\circ b$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2082">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.subst-Union{Tuple{T}, Tuple{PolyElem{T},Any}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.subst-Union{Tuple{T}, Tuple{PolyElem{T},Any}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.subst</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">subst(f::AbstractAlgebra.PolyElem{T}, a::Any) where {T &lt;: RingElement}</code></pre><p>Evaluate the polynomial <span>$f$</span> at <span>$a$</span>. Note that <span>$a$</span> can be anything, whether a ring element or not.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L3201">source</a></section></article><p>We also overload the functional notation so that the polynomial <span>$f$</span> can be evaluated at <span>$a$</span> by writing <span>$f(a)$</span>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+
+julia&gt; f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia&gt; g = (x + 1)*y + (x^3 + 2x + 2)
+(x + 1)*y + x^3 + 2*x + 2
+
+julia&gt; M = R[x + 1 2x; x - 3 2x - 1]
+[x + 1       2*x]
+[x - 3   2*x - 1]
+
+julia&gt; k = evaluate(f, 3)
+12*x + 6
+
+julia&gt; m = evaluate(f, x^2 + 2x + 1)
+x^5 + 4*x^4 + 7*x^3 + 7*x^2 + 4*x + 4
+
+julia&gt; n = compose(f, g)
+(x^3 + 2*x^2 + x)*y^2 + (2*x^5 + 2*x^4 + 4*x^3 + 9*x^2 + 6*x + 1)*y + x^7 + 4*x^5 + 5*x^4 + 5*x^3 + 10*x^2 + 8*x + 5
+
+julia&gt; p = subst(f, M)
+[3*x^3 - 3*x^2 + 3*x + 4       6*x^3 + 2*x^2 + 2*x]
+[3*x^3 - 8*x^2 - 2*x - 3   6*x^3 - 8*x^2 + 2*x + 2]
+
+julia&gt; q = f(M)
+[3*x^3 - 3*x^2 + 3*x + 4       6*x^3 + 2*x^2 + 2*x]
+[3*x^3 - 8*x^2 - 2*x - 3   6*x^3 - 8*x^2 + 2*x + 2]
+
+julia&gt; r = f(23)
+552*x + 26
+</code></pre><h3 id="Derivative-and-integral"><a class="docs-heading-anchor" href="#Derivative-and-integral">Derivative and integral</a><a id="Derivative-and-integral-1"></a><a class="docs-heading-anchor-permalink" href="#Derivative-and-integral" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.derivative-Tuple{PolyElem}" href="#AbstractAlgebra.Generic.derivative-Tuple{PolyElem}"><code>AbstractAlgebra.Generic.derivative</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">derivative(a::Generic.PolynomialElem)</code></pre><p>Return the derivative of the polynomial <span>$a$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2112">source</a></section><section><div><pre><code class="language-julia">derivative(f::AbstractAlgebra.MPolyElem{T}, x::Int) where {T &lt;: RingElement}</code></pre><p>Return the partial derivative of <code>f</code> with respect to <span>$j$</span>-th variable of the polynomial ring.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/MPoly.jl#L4452">source</a></section><section><div><pre><code class="language-julia">derivative(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T &lt;: RingElement</code></pre><p>Return the partial derivative of <code>f</code> with respect to <code>x</code>. The value <code>x</code> must be a generator of the polynomial ring of <code>f</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/MPoly.jl#L4473">source</a></section><section><div><pre><code class="language-none">derivative(f::RelSeriesElem{T}) -&gt; RelSeriesElem</code></pre><p>Return the derivative of the power series <span>$f$</span>.</p><pre><code class="language-none">julia&gt; R, x = PowerSeriesRing(QQ, 10, &quot;x&quot;)
+(Univariate power series ring in x over Rationals, x + O(x^11))
+
+julia&gt; f = 2 + x + 3x^3
+2 + x + 3*x^3 + O(x^10)
+
+julia&gt; derivative(f)
+1 + 9*x^2 + O(x^9)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/RelSeries.jl#L1085">source</a></section><section><div><pre><code class="language-none">derivative(f::AbsSeriesElem{T}) -&gt; AbsSeriesElem</code></pre><p>Return the derivative of the power series <span>$f$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/AbsSeries.jl#L882">source</a></section><section><div><pre><code class="language-none">derivative(a::Generic.PuiseuxSeriesElem{T}) where T &lt;: RingElement</code></pre><p>Return the derivative of the given Puiseux series <span>$a$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/PuiseuxSeries.jl#L559">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.integral-Union{Tuple{PolyElem{T}}, Tuple{T}} where T&lt;:Union{FieldElem, ResElem}" href="#AbstractAlgebra.Generic.integral-Union{Tuple{PolyElem{T}}, Tuple{T}} where T&lt;:Union{FieldElem, ResElem}"><code>AbstractAlgebra.Generic.integral</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">integral(x::AbstractAlgebra.PolyElem{T}) where {T &lt;: Union{AbstractAlgebra.ResElem, FieldElement}}</code></pre><p>Return the integral of the polynomial <span>$x$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2137">source</a></section><section><div><pre><code class="language-julia">integral(f::RelSeriesElem{T}) -&gt; RelSeriesElem</code></pre><p>Return the integral of the power series <span>$f$</span>.</p><pre><code class="language-none">julia&gt; R, x = PowerSeriesRing(QQ, 10, &quot;x&quot;)
+(Univariate power series ring in x over Rationals, x + O(x^11))
+
+julia&gt; f = 2 + x + 3x^3
+2 + x + 3*x^3 + O(x^10)
+
+julia&gt; integral(f)
+2*x + 1//2*x^2 + 3//4*x^4 + O(x^11)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/RelSeries.jl#L1122">source</a></section><section><div><pre><code class="language-none">integral(f::AbsSeriesElem{T}) -&gt; AbsSeriesElem</code></pre><p>Return the integral of the power series <span>$f$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/AbsSeries.jl#L899">source</a></section><section><div><pre><code class="language-none">integral(a::Generic.PuiseuxSeriesElem{T}) where T &lt;: RingElement</code></pre><p>Return the integral of the given Puiseux series <span>$a$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/PuiseuxSeries.jl#L574">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; T, z = PolynomialRing(QQ, &quot;z&quot;)
+(Univariate Polynomial Ring in z over Rationals, z)
+
+julia&gt; U = ResidueRing(T, z^3 + 3z + 1)
+Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3 + 3*z + 1
+
+julia&gt; V, w = PolynomialRing(U, &quot;w&quot;)
+(Univariate Polynomial Ring in w over Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3 + 3*z + 1, w)
+
+julia&gt; f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia&gt; g = (z^2 + 2z + 1)*w^2 + (z + 1)*w - 2z + 4
+(z^2 + 2*z + 1)*w^2 + (z + 1)*w - 2*z + 4
+
+julia&gt; h = derivative(f)
+2*x*y + x + 1
+
+julia&gt; k = integral(g)
+(1//3*z^2 + 2//3*z + 1//3)*w^3 + (1//2*z + 1//2)*w^2 + (-2*z + 4)*w
+</code></pre><h3 id="Resultant-and-discriminant"><a class="docs-heading-anchor" href="#Resultant-and-discriminant">Resultant and discriminant</a><a id="Resultant-and-discriminant-1"></a><a class="docs-heading-anchor-permalink" href="#Resultant-and-discriminant" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.sylvester_matrix-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.sylvester_matrix-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.sylvester_matrix</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">sylvester_matrix(p::PolyElem, q::PolyElem)</code></pre><p>Return the sylvester matrix of the given polynomials.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2400">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.resultant-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.resultant-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.resultant</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">resultant(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.PolyElem{T}) where {T &lt;: RingElement}</code></pre><p>Return the resultant of the given polynomials.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2436">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.resx-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.resx-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.resx</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">resx(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T &lt;: RingElement}</code></pre><p>Return a tuple <span>$(r, s, t)$</span> such that <span>$r$</span> is the resultant of <span>$a$</span> and <span>$b$</span> and such that <span>$r = a\times s + b\times t$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2531">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.discriminant-Tuple{PolyElem}" href="#AbstractAlgebra.Generic.discriminant-Tuple{PolyElem}"><code>AbstractAlgebra.Generic.discriminant</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">discriminant(a::AbstractAlgebra.PolyElem)</code></pre><p>Return the discriminant of the given polynomial.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2508">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; f = 3x*y^2 + (x + 1)*y + 3
+3*x*y^2 + (x + 1)*y + 3
+
+julia&gt; g = 6(x + 1)*y + (x^3 + 2x + 2)
+(6*x + 6)*y + x^3 + 2*x + 2
+
+julia&gt; S = sylvester_matrix(f, g)
+[    3*x           x + 1               3]
+[6*x + 6   x^3 + 2*x + 2               0]
+[      0         6*x + 6   x^3 + 2*x + 2]
+
+julia&gt; h = resultant(f, g)
+3*x^7 + 6*x^5 - 6*x^3 + 96*x^2 + 192*x + 96
+
+julia&gt; k = discriminant(f)
+x^2 - 34*x + 1
+</code></pre><h3 id="Newton-representation"><a class="docs-heading-anchor" href="#Newton-representation">Newton representation</a><a id="Newton-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Newton-representation" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.monomial_to_newton!-Union{Tuple{T}, Tuple{Array{T,1},Array{T,1}}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.monomial_to_newton!-Union{Tuple{T}, Tuple{Array{T,1},Array{T,1}}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.monomial_to_newton!</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where {T &lt;: RingElement}</code></pre><p>Converts a polynomial <span>$p$</span>, given as an array of coefficients, in-place from its coefficients given in the standard monomial basis to the Newton basis for the roots <span>$r_0, r_1, \ldots, r_{n-2}$</span>. In other words, this determines output coefficients <span>$c_i$</span> such that <span>$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots + c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$</span> is equal to the input polynomial.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2719">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.newton_to_monomial!-Union{Tuple{T}, Tuple{Array{T,1},Array{T,1}}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.newton_to_monomial!-Union{Tuple{T}, Tuple{Array{T,1},Array{T,1}}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.newton_to_monomial!</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">newton_to_monomial!(P::Array{T, 1}, roots::Array{T, 1}) where {T &lt;: RingElement}</code></pre><p>Converts a polynomial <span>$p$</span>, given as an array of coefficients, in-place from its coefficients given in the Newton basis for the roots <span>$r_0, r_1, \ldots, r_{n-2}$</span> to the standard monomial basis. In other words, this evaluates <span>$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots + c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$</span> where <span>$c_i$</span> are the input coefficients given by <span>$p$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2744">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; f = 3x*y^2 + (x + 1)*y + 3
+3*x*y^2 + (x + 1)*y + 3
+
+julia&gt; g = deepcopy(f)
+3*x*y^2 + (x + 1)*y + 3
+
+julia&gt; roots = [R(1), R(2), R(3)]
+3-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+ 1
+ 2
+ 3
+
+julia&gt; monomial_to_newton!(g.coeffs, roots)
+
+julia&gt; newton_to_monomial!(g.coeffs, roots)
+</code></pre><h3 id="Interpolation"><a class="docs-heading-anchor" href="#Interpolation">Interpolation</a><a id="Interpolation-1"></a><a class="docs-heading-anchor-permalink" href="#Interpolation" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.interpolate-Union{Tuple{T}, Tuple{PolyRing,Array{T,1},Array{T,1}}} where T&lt;:RingElem" href="#AbstractAlgebra.Generic.interpolate-Union{Tuple{T}, Tuple{PolyRing,Array{T,1},Array{T,1}}} where T&lt;:RingElem"><code>AbstractAlgebra.Generic.interpolate</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">interpolate(S::AbstractAlgebra.PolyRing, x::Array{T, 1}, y::Array{T, 1}) where {T &lt;: RingElement}</code></pre><p>Given two arrays of values <span>$xs$</span> and <span>$ys$</span> of the same length <span>$n$</span>, find the polynomial <span>$f$</span> in the polynomial ring <span>$R$</span> of length at most <span>$n$</span> such that <span>$f$</span> has the value <span>$ys$</span> at the points <span>$xs$</span>. The values in the arrays <span>$xs$</span> and <span>$ys$</span> must belong to the base ring of the polynomial ring <span>$R$</span>. If no such polynomial exists, an exception is raised.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2776">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; xs = [R(1), R(2), R(3), R(4)]
+4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+ 1
+ 2
+ 3
+ 4
+
+julia&gt; ys = [R(1), R(4), R(9), R(16)]
+4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+ 1
+ 4
+ 9
+ 16
+
+julia&gt; f = interpolate(S, xs, ys)
+y^2
+</code></pre><h3 id="Special-functions"><a class="docs-heading-anchor" href="#Special-functions">Special functions</a><a id="Special-functions-1"></a><a class="docs-heading-anchor-permalink" href="#Special-functions" title="Permalink"></a></h3><p>The following special functions can be computed for any polynomial ring. Typically one uses the generator <span>$x$</span> of a polynomial ring to get the respective special polynomials expressed in terms of that generator.</p><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.chebyshev_t-Tuple{Int64,PolyElem}" href="#AbstractAlgebra.Generic.chebyshev_t-Tuple{Int64,PolyElem}"><code>AbstractAlgebra.Generic.chebyshev_t</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">chebyshev_t(n::Int, x::AbstractAlgebra.PolyElem)</code></pre><p>Return the Chebyshev polynomial of the first kind <span>$T_n(x)$</span>, defined by <span>$T_n(x) = \cos(n \cos^{-1}(x))$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2925">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="AbstractAlgebra.Generic.chebyshev_u-Tuple{Int64,PolyElem}" href="#AbstractAlgebra.Generic.chebyshev_u-Tuple{Int64,PolyElem}"><code>AbstractAlgebra.Generic.chebyshev_u</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">chebyshev_u(n::Int, x::AbstractAlgebra.PolyElem)</code></pre><p>Return the Chebyshev polynomial of the first kind <span>$U_n(x)$</span>, defined by <span>$(n+1) U_n(x) = T&#39;_{n+1}(x)$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9fd86a5772d506d07d00f1c19966f152edf12e04/src/generic/Poly.jl#L2966">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+
+julia&gt; f = chebyshev_t(20, y)
+524288*y^20 - 2621440*y^18 + 5570560*y^16 - 6553600*y^14 + 4659200*y^12 - 2050048*y^10 + 549120*y^8 - 84480*y^6 + 6600*y^4 - 200*y^2 + 1
+
+julia&gt; g = chebyshev_u(15, y)
+32768*y^15 - 114688*y^13 + 159744*y^11 - 112640*y^9 + 42240*y^7 - 8064*y^5 + 672*y^3 - 16*y
+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../polynomial_rings/">« Univariate Polynomial Ring Interface</a><a class="docs-footer-nextpage" href="../ncpolynomial/">Generic univariate polynomials over a noncommutative ring »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 21 May 2021 19:29">Friday 21 May 2021</span>. Using Julia version 1.5.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
