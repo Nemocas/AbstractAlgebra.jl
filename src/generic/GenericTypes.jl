@@ -864,6 +864,73 @@ end
 
 ###############################################################################
 #
+#   RationalFunctionField / rational_function
+#
+###############################################################################
+
+struct RationalFunctionField{T <: FieldElement} <: AbstractAlgebra.Field
+   S::Symbol
+   fraction_field::FracField{<:PolyElem{T}}
+   base_ring::Field
+
+   function RationalFunctionField{T}(k::Field, frac_field::FracField{<:PolyElem{T}}, sym::Symbol, cached::Bool = true) where T <: FieldElement
+      return get_cached!(RationalFunctionFieldDict, (k, sym), cached) do
+         U = elem_type(k)
+         new{U}(sym, frac_field, k)
+      end::RationalFunctionField{T}
+   end
+end
+
+const RationalFunctionFieldDict = CacheDictType{Tuple{Field, Symbol}, Field}()
+
+mutable struct Rat{T <: FieldElement} <: AbstractAlgebra.FieldElem
+   d::Frac{<:PolyElem{T}}
+   parent::RationalFunctionField{T}
+
+   Rat{T}(f::Frac{<:PolyElem{T}}) where T <: FieldElement = new{T}(f)
+end
+
+###############################################################################
+#
+#   FunctionField / function_field_elem
+#
+###############################################################################
+
+mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
+   num::Poly{<:PolyElem{T}}
+   den::PolyElem{T}
+   S::Symbol
+   powers::Vector{Poly{<:PolyElem{T}}}
+   powers_den::Vector{<:PolyElem{T}}
+   traces::Vector{<:PolyElem{T}}
+   traces_den::PolyElem{T}
+   monic::Bool
+   pol::Poly{Rat{T}}
+   base_ring::RationalFunctionField{T}
+
+   function FunctionField{T}(num::Poly{<:PolyElem{T}},
+             den::PolyElem{T}, s::Symbol, cached::Bool = true) where
+                                                          T <: FieldElement
+      return get_cached!(FunctionFieldDict, (num, den, s), cached) do
+         new{T}(num, den, s)
+      end::FunctionField{T}
+   end
+end
+
+const FunctionFieldDict = CacheDictType{Tuple{Poly, PolyElem, Symbol}, Field}()
+
+mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.Field
+   num::Poly{<:PolyElem{T}}
+   den::PolyElem{T}
+   parent::FunctionField{T}
+
+   function FunctionFieldElem{T}(R::FunctionField{T}, num::Poly{S}, den::S) where {T <: FieldElement, S <: PolyElem{T}}
+      return new{T}(num, den, R)
+   end
+end
+
+###############################################################################
+#
 #   MatSpace / Mat
 #
 ###############################################################################

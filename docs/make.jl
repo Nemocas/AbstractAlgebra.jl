@@ -36,6 +36,7 @@ makedocs(
                            "fraction_fields.md",
                            "fraction.md",
                            "rational.md",
+			   "function_field.md",
                            "finfield.md",
                            "real.md",
                            "numberfield.md"],

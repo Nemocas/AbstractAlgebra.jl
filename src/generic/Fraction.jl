@@ -52,13 +52,14 @@ end
 ###############################################################################
 
 function //(x::T, y::T) where {T <: RingElem}
+   R = parent(x)
    iszero(y) && throw(DivideError())
    g = gcd(x, y)
    z = Frac{T}(divexact(x, g), divexact(y, g))
    try
       z.parent = FracDict[R]
    catch
-      z.parent = FractionField(parent(x))
+      z.parent = FractionField(R)
    end
    return z
 end
@@ -539,6 +540,16 @@ function divexact(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}
    return parent(a)(n, d)
 end
 
+function divides(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
+   if iszero(a)
+     return true, parent(a)()
+   end
+   if iszero(b)
+     return false, parent(a)()
+   end
+   return true, divexact(a, b)
+end
+
 ###############################################################################
 #
 #   Ad hoc exact division
@@ -577,16 +588,6 @@ function divexact(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    n = denominator(b, false)*divexact(a, g)
    d = divexact(numerator(b, false), g)
    return parent(b)(n, d)
-end
-
-function divides(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   if iszero(a)
-     return true, parent(a)()
-   end
-   if iszero(b)
-     return false, parent(a)()
-   end
-   return true, divexact(a, b)
 end
 
 ##############################################################################

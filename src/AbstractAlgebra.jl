@@ -412,7 +412,8 @@ include("Generic.jl")
 # as we have our own
 import .Generic: abs_series, abs_series_type, add!, addeq!, addmul!, 
                  add_column, add_column!, add_row,
-                 add_row!, basis, cached, can_solve_left_reduced_triu,
+                 add_row!, base_field, basis,
+		 cached, can_solve_left_reduced_triu,
                  can_solve, can_solve_with_solution,
                  character, characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
@@ -420,7 +421,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!, addmul!,
                  codomain, coeff, coefficients,
                  combine_like_terms!, compose, constant_coefficient,
 		 content, cycles,
-                 data, deflate, deflation, degree, degrees,
+                 data, defining_polynomial, deflate, deflation, degree, degrees,
                  dense_matrix_type, dense_poly_type, derivative, det_clow,
                  det_df, det_fflu, det_popov, diagonal_matrix, dim, disable_cache!,
                  discriminant,
@@ -467,15 +468,17 @@ import .Generic: abs_series, abs_series_type, add!, addeq!, addmul!,
                  mullow, mullow_karatsuba, mulmod,
                  multiply_column, multiply_column!, multiply_row, multiply_row!,
                  ncols,
-                 newton_to_monomial!, ngens, normalise, nrows, nvars, O, one,
+                 newton_to_monomial!, ngens, norm, normalise, nrows,
+		 num_coeff, nvars, O, one,
                  order, ordering, parity, partitionseq, Perm, perm,
                  permtype, @perm_str, polcoeff, pol_length, polynomial,
                  pow_multinomial, popov, popov_with_transform,
                  precision, preimage, preimage_map,
 		 prime, primpart, pseudodivrem,
                  pseudo_inv, pseudorem, push_term!, randmat_triu,
-                 randmat_with_rank, rand_ordering, rank_profile_popov, remove,
-                 renormalize!, rel_series, rel_series_type, rels,
+                 randmat_with_rank, rand_ordering, rank_profile_popov,
+		 reduce!, remove,
+                 renormalize!, rels, rel_series, rel_series_type,
 		 rescale!, resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, retraction_map, reverse,
@@ -503,7 +506,8 @@ import .Generic: abs_series, abs_series_type, add!, addeq!, addmul!,
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export abs_series, abs_series_type, add!, addeq!, addmul!,
                  addmul_delayed_reduction!, addmul!,
-                 add_column, add_column!, add_row, add_row!, base_ring, cached,
+                 add_column, add_column!, add_row, add_row!,
+		 base_field, base_ring, cached,
                  canonical_unit, can_solve_left_reduced_triu,
                  can_solve, can_solve_with_solution,
                  change_base_ring, character,
@@ -513,7 +517,7 @@ export abs_series, abs_series_type, add!, addeq!, addmul!,
                  codomain, coeff, coefficients,
 		 combine_like_terms!, compose, constant_coefficient,
 		 content, cycles,
-                 data, deflate, deflation, degree, degrees,
+                 data, defining_polynomial, deflate, deflation, degree, degrees,
                  dense_matrix_type, dense_poly_type, derivative, det, det_clow,
                  det_df, det_fflu, det_popov, diagonal_matrix, dim, disable_cache!,
                  discriminant, divexact, divexact_left, divexact_right, divides,
@@ -560,8 +564,9 @@ export abs_series, abs_series_type, add!, addeq!, addmul!,
                  mul_karatsuba, mul_ks, mul_red!, mullow, mullow_karatsuba, mulmod,
                  multiply_column, multiply_column!, multiply_row,
                  multiply_row!, ncols, needs_parentheses,
-		 newton_to_monomial!, ngens,
-                 normalise, nrows, nullspace, nvars, O, one, order, ordering,
+		 newton_to_monomial!, ngens, norm,
+                 normalise, nrows, nullspace, num_coeff,
+		 nvars, O, one, order, ordering,
                  parent_type, parity, partitionseq, Perm, perm, permtype,
                  @perm_str, polcoeff, pol_length, polynomial, pow_multinomial,
                  popov, popov_with_transform, powers, ppio, precision, preimage,
@@ -825,6 +830,14 @@ function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Char,
    NumberField(a, string(s), t; cached=cached)
 end
 
+function RationalFunctionField(k::Field, s::AbstractString; cached = true)
+   Generic.RationalFunctionField(k, s; cached=cached)
+end
+
+function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
+   Generic.FunctionField(p, s; cached=cached)
+end
+
 @doc Markdown.doc"""
     FreeModule(R::NCRing, rank::Int; cached::Bool = true)
 
@@ -942,7 +955,8 @@ end
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, LaurentPolynomialRing,
        MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
-       LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
+       LaurentSeriesField, ResidueField, NumberField, RationalFunctionField,
+       FunctionField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, sub,
        quo, DirectSum, ModuleIsomorphism, free_module, vector_space,
        module_homomorphism, direct_sum, module_isomorphism, basis

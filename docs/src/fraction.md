@@ -27,7 +27,7 @@ where `T` is the type of elements of the base ring. See the file
 Parent objects of such fraction elements have type `Generic.FracField{T}`.
 
 The fraction element types belong to the abstract type `AbstractAlgebra.FracElem{T}`
-and the fraction field types belong to the abstract type `AbstractAlgebra.FracRing{T}`.
+and the fraction field types belong to the abstract type `AbstractAlgebra.FracField{T}`.
 This enables one to write generic functions that can accept any AbstractAlgebra
 fraction type.
 
