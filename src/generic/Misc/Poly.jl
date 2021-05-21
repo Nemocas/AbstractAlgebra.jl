@@ -145,7 +145,7 @@ function roots(f::PolyElem)
     rts = Vector{elem_type(base_ring(f))}()
     for (p, e) in lf
         if degree(p) == 1
-            push!(rts, -divexact(trail(p), leading_coefficient(p)))
+            push!(rts, -divexact(constant_coefficient(p), leading_coefficient(p)))
         end
     end
     return rts
