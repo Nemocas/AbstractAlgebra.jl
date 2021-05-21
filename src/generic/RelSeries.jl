@@ -279,7 +279,7 @@ end
 
 function zero(a::RelSeriesElem, R::Ring,
                                  var::Symbol=var(parent(a)); cached::Bool=true)
-   return similar(a, R, max_precision(parent(x)), var; cached=cached)
+   return similar(a, R, max_precision(parent(a)), var; cached=cached)
 end
 
 function zero(a::RelSeriesElem, max_prec::Int,
@@ -288,7 +288,7 @@ function zero(a::RelSeriesElem, max_prec::Int,
 end
 
 zero(a::RelSeriesElem, var::Symbol=var(parent(a)); cached::Bool=true) =
-   similar(a, base_ring(a), max_precision(parent(x)), var; cached=cached)
+   similar(a, base_ring(a), max_precision(parent(a)), var; cached=cached)
 
 function zero(a::RelSeriesElem, R::Ring, max_prec::Int,
                                                 var::String; cached::Bool=true)
@@ -296,13 +296,13 @@ function zero(a::RelSeriesElem, R::Ring, max_prec::Int,
 end
 
 zero(a::RelSeriesElem, R::Ring, var::String; cached::Bool=true) =
-   zero(a, R, max_precision(parent(x)), Symbol(var); cached=cached)
+   zero(a, R, max_precision(parent(a)), Symbol(var); cached=cached)
 
 zero(a::RelSeriesElem, max_prec::Int, var::String; cached::Bool=true) =
    zero(a, base_ring(p), max_prec, Symbol(var); cached=cached)
 
 zero(a::RelSeriesElem, var::String; cached::Bool=true) =
-   zero(a, base_ring(p), max_precision(parent(x)), Symbol(var); cached=cached)
+   zero(a, base_ring(p), max_precision(parent(a)), Symbol(var); cached=cached)
 
 ###############################################################################
 #
