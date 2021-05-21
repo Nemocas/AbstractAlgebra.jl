@@ -208,6 +208,10 @@ length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 Return the number of nonzero terms of the given polynomial. The length of the zero
 polynomial is defined to be $0$. The return value should be of type `Int`.
 
+```julia
+degrees(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+```
+
 Return an array of the degrees of the polynomial $f$ in each of the variables.
 
 ```julia
