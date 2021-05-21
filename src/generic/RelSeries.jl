@@ -299,10 +299,10 @@ zero(a::RelSeriesElem, R::Ring, var::String; cached::Bool=true) =
    zero(a, R, max_precision(parent(a)), Symbol(var); cached=cached)
 
 zero(a::RelSeriesElem, max_prec::Int, var::String; cached::Bool=true) =
-   zero(a, base_ring(p), max_prec, Symbol(var); cached=cached)
+   zero(a, base_ring(a), max_prec, Symbol(var); cached=cached)
 
 zero(a::RelSeriesElem, var::String; cached::Bool=true) =
-   zero(a, base_ring(p), max_precision(parent(a)), Symbol(var); cached=cached)
+   zero(a, base_ring(a), max_precision(parent(a)), Symbol(var); cached=cached)
 
 ###############################################################################
 #
