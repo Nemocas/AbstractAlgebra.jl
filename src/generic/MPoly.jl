@@ -5,7 +5,7 @@
 ###############################################################################
 
 export max_fields, total_degree, gens, divides, isconstant, isdegree,
-       ismonomial, isreverse, isterm, involves_at_most_one_variable,
+       ismonomial, isreverse, isterm,
        main_variable, main_variable_extract, main_variable_insert, nvars, vars,
        ordering, rand_ordering, symbols, monomial_set!, monomial_iszero,
        derivative, rand_ordering, symbols, monomial_set!, monomial_iszero,
@@ -4495,26 +4495,51 @@ $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
 """
 function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
-   vars_p = vars(p)
-
-   if length(vars_p) > 1
+   if !isunivariate(p)
       error("Can only convert univariate polynomials of type MPoly.")
    end
-
-   if length(vars_p) == 0
+   if isconstant(p)
       return leading_coefficient(p)
    end
-
    return R(coefficients_of_univariate(p))
 end
 
 @doc Markdown.doc"""
-    involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
+    isunivariate(p::AbstractAlgebra.MPolyElem)
 
-Return true if $p$ contains at most 1 variable and false otherwise.
+Returns `true` if $p$ is a univariate polynomial, i.e. involves at most one
+variable (thus constant polynomials are considered univariate), and `false`
+otherwise. The result depends on the terms of the polynomial, not simply on
+the number of variables in the polynomial ring.
 """
-function involves_at_most_one_variable(p::AbstractAlgebra.MPolyElem)
-   return length(vars(p)) <= 1
+function isunivariate(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   if isconstant(p)
+      return true
+   end
+   var = -1
+   for v in exponent_vectors(p)
+      n = count(x -> x != 0, v)
+      if n > 1
+         return false
+      elseif n == 1
+         if var == -1
+	    var = findfirst(x -> x != 0, v)
+	 elseif v[var] == 0
+	    return false
+	 end
+      end
+   end
+   return true
+end
+
+@doc Markdown.doc"""
+    isunivariate(R::AbstractAlgebra.MPolyRing)
+
+Returns `true` if $R$ is a univariate polynomial ring, i.e. has exactly one
+variable, and `false` otherwise.
+"""
+function isunivariate(R::AbstractAlgebra.MPolyRing{T}) where T <: RingElement
+   return nvars(R) == 1
 end
 
 @doc Markdown.doc"""

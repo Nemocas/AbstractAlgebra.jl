@@ -272,6 +272,29 @@ end
          end
       end
    end
+
+   R, (x, ) = PolynomialRing(ZZ, ["x"])
+
+   @test isunivariate(R)
+   @test isunivariate(x)
+   @test isunivariate(R())
+   @test isunivariate(R(1))
+   @test isunivariate(x^3 + 3x)
+
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+   @test !isunivariate(R)
+   @test isunivariate(x)
+   @test isunivariate(y)
+   @test isunivariate(R())
+   @test isunivariate(R(1))
+   @test isunivariate(x^3 + 3*x)
+   @test isunivariate(2*y^4 + 3*y + 5)
+   @test !isunivariate(x + y)
+   @test !isunivariate(x*y)
+   @test !isunivariate(x^3 + 3x + y + 1)
+   @test !isunivariate(x^3 + 3x + y)
+   @test !isunivariate(y^4 + 3x + 1)
 end
 
 @testset "Generic.MPoly.multivariate_coeff" begin
