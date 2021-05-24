@@ -772,7 +772,13 @@ julia> roots = [R(1), R(2), R(3)]
 julia> monomial_to_newton!(g.coeffs, roots)
 
 julia> newton_to_monomial!(g.coeffs, roots)
+```
 
+### Roots
+
+```@docs
+roots(f::PolyElem)
+roots(f::PolyElem, R::Field)
 ```
 
 ### Interpolation
