@@ -1069,8 +1069,12 @@ function norm(a::FunctionFieldElem)
    pol = numerator(S, false)
    rnum, rden = _rat_poly_resultant(pol, one(base_ring(pol)), anum, aden)
    if !S.monic && length(anum) > 1
-      pow = leading_coefficient(pol)^(alen - 1)
-      rnum, rden = _rat_canonicalise(rnum, rden*pow)
+      lc = leading_coefficient(pol)
+      pow = lc^(alen - 1)
+      rden *= pow
+      if alen == 2 || (alen > 2 && !isone(gcd(lc, rnum))) # must rationalise
+         rnum, rden = _rat_canonicalise(rnum, rden)
+      end
    end
    return R(rnum, rden)
 end
