@@ -338,12 +338,6 @@ function _rat_poly_canonicalise(poly::Poly{S}, den::S) where
       den = divexact(den, g)
    end
 
-   u = canonical_unit(den)
-   if !isone(u)
-      poly = divexact(poly, u)
-      den = divexact(den, u)
-   end
-
    return poly, den
 end
 
@@ -692,8 +686,7 @@ end
 
 iszero(a::FunctionFieldElem) = iszero(numerator(a, false))
 
-isone(a::FunctionFieldElem) = isone(numerator(a, false)) &&
-                                                   isone(denominator(a, false))
+isone(a::FunctionFieldElem) = numerator(a, false) == denominator(a, false)
 
 isunit(a::FunctionFieldElem) = !iszero(a)
 
@@ -708,7 +701,8 @@ function isgen(a::FunctionFieldElem)
    if degree(S) == 1
       return a == S(-coeff(modulus(S), 0)//coeff(modulus(S), 1))
    else
-      return isgen(numerator(a, false)) && isone(denominator(a, false))
+      return isgen(numerator(a, false)) && isone(denominator(a, false)) ||
+             isgen(numerator(a, true)) && isone(denominator(a, true))
    end
 end
 
@@ -1075,10 +1069,14 @@ function norm(a::FunctionFieldElem)
    pol = numerator(S, false)
    rnum, rden = _rat_poly_resultant(pol, one(base_ring(pol)), anum, aden)
    if !S.monic && length(anum) > 1
-      pow = leading_coefficient(pol)^(alen - 1)
-      rnum, rden = _rat_canonicalise(rnum, rden*pow)
+      lc = leading_coefficient(pol)
+      pow = lc^(alen - 1)
+      rden *= pow
+      if alen == 2 || (alen > 2 && !isone(gcd(lc, rnum))) # must rationalise
+         rnum, rden = _rat_canonicalise(rnum, rden)
+      end
    end
-   return R(rnum, rden, false)
+   return R(rnum, rden)
 end
 
 ###############################################################################
@@ -1327,7 +1325,6 @@ function powers_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
             tden = den*coeff(pol, len - 1)
             t = pol*coeff(pow, len - 1)
             t = truncate(t, len - 1)
-            t, tden = _rat_poly_canonicalise(t, tden)
             pow = truncate(pow, len - 1)
             pow, den = _rat_poly_sub(pow, den, t, tden)
          end

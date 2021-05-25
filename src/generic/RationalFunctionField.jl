@@ -526,18 +526,12 @@ function (a::RationalFunctionField{T})(b::Frac{<:PolyElem{T}}) where T <: FieldE
    return z::Rat{T}
 end
 
-function (a::RationalFunctionField{T})(n::S, d::S,
-           canonicalise::Bool=true) where {T <: FieldElement, S <: PolyElem{T}}
+function (a::RationalFunctionField{T})(n::S, d::S) where {T <: FieldElement, S <: PolyElem{T}}
    R = parent(n)
    g = gcd(n, d)
    if !isone(g)
       n = divexact(n, g)
       d = divexact(d, g)
-   end
-   u = canonical_unit(d)
-   if !isone(u)
-      n = divexact(n, u)
-      d = divexact(d, u)
    end
    r = Frac{S}(n, d)
    try
