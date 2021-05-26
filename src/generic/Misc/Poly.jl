@@ -33,7 +33,7 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: F
     dfc = first(reverse!(collect(coefficients(derivative(f)))), n + 1)
     A = abs_series(R, dfc, length(dfc), n + 1; cached=false)
     S = parent(A)
-    fc = first(reverse!(collect(coefficients(f))), n + 1)
+    fc = collect(Base.Iterators.take(reverse!(collect(coefficients(f))), n + 1))
     B = S(fc, length(fc), n + 1)
     L = A*inv(B)
     s = T[coeff(L, i) for i = 1:n]
