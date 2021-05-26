@@ -22,15 +22,11 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) -> Array{T, 1}
-
-Uses Newton (or Newton-Girard) formulas to compute the first $n$
-power sums from the coefficients of $f$.
-"""
 function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: FieldElement
+    degree(f) < 1 && error("Polynomial has no roots")
     !ismonic(f) && error("Requires monic polynomial")
     iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
+    n < 0 && throw(DomainError(n, "number of terms must be nonnegative"))
     d = degree(f)
     R = base_ring(f)
     # Beware: converting to power series and derivative do not commute
@@ -44,15 +40,31 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: F
     return s
 end
 
-# plain vanilla recursion
+@doc Markdown.doc"""
+    polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement -> Array{T, 1}
+
+Uses Newton (or Newton-Girard) formulas to compute the first $n$
+sums of powers of the roots of $f$ from the coefficients of $f$, starting
+with the sum of (first powers of) the roots. The input polynomial must be
+monic, at least degree $1$ and have nonzero constant coefficient.
+"""
 function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement
+    # plain vanilla recursion
+    degree(f) < 1 && error("Polynomial has no roots")
     !ismonic(f) && error("Requires monic polynomial")
     iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
+    n < 0 && throw(DomainError(n, "number of terms must be nonnegative"))
     d = degree(f)
     R = base_ring(f)
+    if n == 0
+       return elem_type(R)[]
+    end
+    if n == 1
+       return [-coeff(f, d - 1)]
+    end
     E = T[(-1)^i*coeff(f, d - i) for i = 0:min(d, n)] # elementary symm. polys
     while length(E) <= n
-        push!(E, R(0))
+        push!(E, R())
     end
     P = T[]
     push!(P, E[1 + 1])
@@ -64,14 +76,18 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: R
 end
 
 @doc Markdown.doc"""
-    power_sums_to_polynomial(P::Array{T, 1}) -> PolyElem{T}
+    power_sums_to_polynomial(P::Array{T, 1};
+      parent::AbstractAlgebra.PolyRing{T}=PolynomialRing(parent(P[1]), "x",
+                       cached=false)[1]) where T <: RingElement -> PolyElem{T}
 
 Uses the Newton (or Newton-Girard) identities to obtain the polynomial
-coefficients (the elementary symmetric functions) from the power sums.
+with given sums of powers of roots. The list must be nonempty and contain
+`degree(f)` entries where $f$ is the polynomial to be recovered. The list
+must start with the sum of first powers of the roots.
 """
-function power_sums_to_polynomial(P::Array{T, 1}; cached::Bool=true,
+function power_sums_to_polynomial(P::Array{T, 1};
             parent::AbstractAlgebra.PolyRing{T}=PolynomialRing(parent(P[1]), "x",
-                                           cached=cached)[1]) where T <: RingElement
+                                           cached=false)[1]) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
 

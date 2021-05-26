@@ -809,6 +809,36 @@ y^2
 
 ```
 
+### Power sums
+
+```@docs
+polynomial_to_power_sums(::PolyElem{T}) where T <: RingElem
+```
+
+```@docs
+power_sums_to_polynomial(::Array{T, 1}) where T <: RingElem
+```
+
+**Examples**
+
+```@jldoctest
+julia> R, x = PolynomialRing(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> f = x^4 - 2*x^3 + 10*x^2 + 7*x - 5
+x^4 - 2*x^3 + 10*x^2 + 7*x - 5
+
+julia> V = polynomial_to_power_sums(f)
+4-element Vector{BigInt}:
+   2
+ -16
+ -73
+  20
+
+julia> power_sums_to_polynomial(V)
+x^4 - 2*x^3 + 10*x^2 + 7*x - 5
+```
+
 ### Special functions
 
 The following special functions can be computed for any polynomial ring.
