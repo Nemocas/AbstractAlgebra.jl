@@ -140,6 +140,11 @@ end
 #
 ################################################################################
 
+@doc doc"""
+    roots(f::PolyElem)
+
+Returns the roots of the polynomial `f` in the base ring of `f` as an array.
+"""
 function roots(f::PolyElem)
     lf = factor(f)
     rts = Vector{elem_type(base_ring(f))}()
@@ -151,6 +156,11 @@ function roots(f::PolyElem)
     return rts
 end
 
+@doc doc"""
+    roots(f::PolyElem, R::Field)
+
+Returns the roots of the polynomial `f` in the field `R` as an array.
+"""
 function roots(f::PolyElem, R::Field)
     Rt = AbstractAlgebra.PolynomialRing(R, "t", cached = false)[1]
     f1 = change_base_ring(R, f, parent = Rt)
