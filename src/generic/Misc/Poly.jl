@@ -29,6 +29,8 @@ Uses Newton (or Newton-Girard) formulas to compute the first $n$
 power sums from the coefficients of $f$.
 """
 function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: FieldElement
+    !ismonic(f) && error("Requires monic polynomial")
+    iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
     d = degree(f)
     R = base_ring(f)
     # Beware: converting to power series and derivative do not commute
@@ -44,9 +46,8 @@ end
 
 # plain vanilla recursion
 function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement
-    if n == 0
-        return elem_type(base_ring(f))[]
-    end
+    !ismonic(f) && error("Requires monic polynomial")
+    iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
     d = degree(f)
     R = base_ring(f)
     E = T[(-1)^i*coeff(f, d - i) for i = 0:min(d, n)] # elementary symm. polys
