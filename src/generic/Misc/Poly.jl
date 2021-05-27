@@ -30,7 +30,7 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: F
     d = degree(f)
     R = base_ring(f)
     # Beware: converting to power series and derivative do not commute
-    dfc = first(reverse!(collect(coefficients(derivative(f)))), n + 1)
+    dfc = collect(Base.Iterators.take(reverse!(collect(coefficients(derivative(f)))), n + 1))
     A = abs_series(R, dfc, length(dfc), n + 1; cached=false)
     S = parent(A)
     fc = collect(Base.Iterators.take(reverse!(collect(coefficients(f))), n + 1))
