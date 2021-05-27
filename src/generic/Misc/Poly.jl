@@ -86,7 +86,7 @@ with given sums of powers of roots. The list must be nonempty and contain
 must start with the sum of first powers of the roots.
 """
 function power_sums_to_polynomial(P::Array{T, 1};
-            parent::AbstractAlgebra.PolyRing{T}=PolynomialRing(parent(P[1]), "x",
+            parent::AbstractAlgebra.PolyRing{T}=AbstractAlgebra.PolynomialRing(parent(P[1]), "x",
                                            cached=false)[1]) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
