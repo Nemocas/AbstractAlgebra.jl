@@ -2882,7 +2882,7 @@ end
       num = rand(0:2*degree(f))
       W = polynomial_to_power_sums(f, num)
       d = min(num, degree(f))
-      @test first(V, d) == first(W, d)
+      @test collect(Base.Iterators.take(V, d)) == collect(Base.Iterators.take(W, d))
    end
 
    R, x = PolynomialRing(ZZ, "x")
@@ -2902,6 +2902,6 @@ end
       num = rand(0:2*degree(f))
       W = polynomial_to_power_sums(f, num)
       d = min(num, degree(f))
-      @test first(V, d) == first(W, d)
+      @test collect(Base.Iterators.take(V, d)) == collect(Base.Iterators.take(W, d))
    end
 end 
