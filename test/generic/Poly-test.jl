@@ -2863,3 +2863,45 @@ end
    _, x = M['x']
    @test string(M(-1)*x) isa String
 end
+
+@testset "Generic.Poly.polynomial_to_power_sums" begin
+   R, x = PolynomialRing(QQ, "x")
+
+   for iters = 1:100
+      f = rand(R, 0:10, -10:10)
+      f += x^length(f) # make monic
+      while iszero(constant_coefficient(f))
+         f += rand(-10:10)
+      end
+
+      V = polynomial_to_power_sums(f)
+
+      @test power_sums_to_polynomial(V, R) == f
+      @test isa(power_sums_to_polynomial(V), PolyElem)
+
+      num = rand(0:2*degree(f))
+      W = polynomial_to_power_sums(f, num)
+      d = min(num, degree(f))
+      @test collect(Base.Iterators.take(V, d)) == collect(Base.Iterators.take(W, d))
+   end
+
+   R, x = PolynomialRing(ZZ, "x")
+
+   for iters = 1:100
+      f = rand(R, 0:10, -10:10)
+      f += x^length(f) # make monic
+      while iszero(constant_coefficient(f))
+         f += rand(-10:10)
+      end
+
+      V = polynomial_to_power_sums(f)
+
+      @test power_sums_to_polynomial(V, R) == f
+      @test isa(power_sums_to_polynomial(V), PolyElem)
+
+      num = rand(0:2*degree(f))
+      W = polynomial_to_power_sums(f, num)
+      d = min(num, degree(f))
+      @test collect(Base.Iterators.take(V, d)) == collect(Base.Iterators.take(W, d))
+   end
+end 

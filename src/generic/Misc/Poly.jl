@@ -22,90 +22,104 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) -> Array{T, 1}
-
-Uses Newton (or Newton-Girard) formulas to compute the first $n$
-power sums from the coefficients of $f$.
-"""
-function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: FieldElem
+function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: FieldElement
+    degree(f) < 1 && error("Polynomial has no roots")
+    !ismonic(f) && error("Requires monic polynomial")
+    iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
+    n < 0 && throw(DomainError(n, "number of terms must be nonnegative"))
     d = degree(f)
     R = base_ring(f)
-    S = AbstractAlgebra.PowerSeriesRing(R, n + 1, "gen(S)", cached = false, model =:capped_absolute)[1]
     # Beware: converting to power series and derivative do not commute
-    A = S()
-    B = S()
-    fit!(A, d)
-    fit!(B, d + 1)
-    for i=1:d
-        c = coeff(f, i)
-        setcoeff!(A, d - i, i*c)
-        setcoeff!(B, d - i, c)
-    end
-    setcoeff!(B, d, coeff(f, 0))
-    A.prec = n + 1
-    B.prec = n + 1
+    dfc = collect(Base.Iterators.take(reverse!(collect(coefficients(derivative(f)))), n + 1))
+    A = abs_series(R, dfc, length(dfc), n + 1; cached=false)
+    S = parent(A)
+    fc = collect(Base.Iterators.take(reverse!(collect(coefficients(f))), n + 1))
+    B = S(fc, length(fc), n + 1)
     L = A*inv(B)
     s = T[coeff(L, i) for i = 1:n]
     return s
 end
 
-# plain vanilla recursion
-function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T
-    if n == 0
-        return elem_type(base_ring(f))[]
-    end
+@doc Markdown.doc"""
+    polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement -> Array{T, 1}
+
+Uses Newton (or Newton-Girard) formulas to compute the first $n$
+sums of powers of the roots of $f$ from the coefficients of $f$, starting
+with the sum of (first powers of) the roots. The input polynomial must be
+monic, at least degree $1$ and have nonzero constant coefficient.
+"""
+function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement
+    # plain vanilla recursion
+    degree(f) < 1 && error("Polynomial has no roots")
+    !ismonic(f) && error("Requires monic polynomial")
+    iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
+    n < 0 && throw(DomainError(n, "number of terms must be nonnegative"))
     d = degree(f)
     R = base_ring(f)
-    E = T[(-1)^i*coeff(f, d-i) for i=0:min(d, n)] #should be the elementary symm.
+    if n == 0
+       return elem_type(R)[]
+    end
+    if n == 1
+       return [-coeff(f, d - 1)]
+    end
+    E = T[(-1)^i*coeff(f, d - i) for i = 0:min(d, n)] # elementary symm. polys
     while length(E) <= n
-        push!(E, R(0))
+        push!(E, R())
     end
     P = T[]
-    push!(P, E[1+1])
+    push!(P, E[1 + 1])
     for k = 2:n
-        push!(P, (-1)^(k-1)*k*E[k+1] + sum((-1)^(k-1+i)*E[k-i+1]*P[i] for i=1:k-1))
+        push!(P, (-1)^(k - 1)*k*E[k + 1] +
+		 sum((-1)^(k - 1 + i)*E[k - i + 1]*P[i] for i = 1:k - 1))
     end
     return P
 end
 
 @doc Markdown.doc"""
-    power_sums_to_polynomial(P::Array{T, 1}) -> PolyElem{T}
+    power_sums_to_polynomial(P::Array{T, 1};
+      parent::AbstractAlgebra.PolyRing{T}=PolynomialRing(parent(P[1]), "x",
+                       cached=false)[1]) where T <: RingElement -> PolyElem{T}
 
 Uses the Newton (or Newton-Girard) identities to obtain the polynomial
-coefficients (the elementary symmetric functions) from the power sums.
+with given sums of powers of roots. The list must be nonempty and contain
+`degree(f)` entries where $f$ is the polynomial to be recovered. The list
+must start with the sum of first powers of the roots.
 """
-function power_sums_to_polynomial(P::Array{T, 1}) where T <: FieldElem
+function power_sums_to_polynomial(P::Array{T, 1};
+            parent::AbstractAlgebra.PolyRing{T}=AbstractAlgebra.PolynomialRing(parent(P[1]), "x",
+                                           cached=false)[1]) where T <: RingElement
+   return power_sums_to_polynomial(P, parent)
+end
+
+function power_sums_to_polynomial(P::Array{T, 1}, Rx::AbstractAlgebra.PolyRing{T}) where T <: FieldElement
     d = length(P)
-    R = parent(P[1])
-    S = AbstractAlgebra.PowerSeriesRing(R, d, "gen(S)")[1] # capped_absolute
-    s = S(P, length(P), d, 0)
+    R = base_ring(Rx)
+    s = rel_series(R, P, d, d, 0)
     r = -integral(s)
     r1 = exp(r)
     @assert iszero(valuation(r1))
-    Rx, x = AbstractAlgebra.PolynomialRing(R, "x", cached = false)
     return Rx([polcoeff(r1, d - i) for i = 0:d])
 end
 
-function power_sums_to_polynomial(P::Array{T, 1}) where T
+function power_sums_to_polynomial(P::Array{T, 1}, Rx::AbstractAlgebra.PolyRing{T}) where T <: RingElement
     E = T[one(parent(P[1]))]
     R = parent(P[1])
     last_non_zero = 0
     for k = 1:length(P)
-        push!(E, divexact(sum((-1)^(i-1)*E[k-i+1]*P[i] for i=1:k), R(k)))
+        push!(E, divexact(sum((-1)^(i - 1)*E[k - i + 1]*P[i] for i = 1:k), R(k)))
         if E[end] != 0
             last_non_zero = k
         end
     end
-    E = E[1:last_non_zero+1]
-    d = length(E) # the length of the resulting poly...
+    E = E[1:last_non_zero + 1]
+    d = length(E) # the length of the resulting polynomial
     for i = 1:div(d, 2)
         E[i], E[d - i + 1] = (-1)^(d - i)*E[d - i + 1], (-1)^(i - 1)*E[i]
     end
     if isodd(d)
         E[div(d + 1, 2)] *= (-1)^div(d, 2)
     end
-    return AbstractAlgebra.PolynomialRing(R, "x", cached = false)[1](E)
+    return Rx(E)
 end
 
 ################################################################################
