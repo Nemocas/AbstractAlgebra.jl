@@ -5,37 +5,34 @@ DocTestSetup = quote
 end
 ```
 
-# Generic univariate polynomials
+# Univariate polynomial functionality
 
-AbstractAlgebra.jl provides a module, implemented in `src/generic/Poly.jl` for generic
+AbstractAlgebra.jl provides a module, implemented in `src/Poly.jl` for
 polynomials over any commutative ring belonging to the AbstractAlgebra abstract type
-hierarchy.
+hierarchy. This functionality will work for any univariate polynomial type which
+follows the Univariate Polynomial Ring interface.
 
-As well as implementing the Univariate Polynomial interface, and relevant parts of the
-Euclidean Ring interface for polynomials over a field, there are many additional
-generic algorithms implemented for such polynomial rings. We describe this generic
-functionality below.
+## Generic univariate polynomial types
 
-All of the generic functionality is part of a submodule of AbstractAlgebra called
-`Generic`. This is exported by default so that it is not necessary to qualify the
-function names with the submodule name.
+AbstractAlgebra.jl provides a generic polynomial type based on Julia arrays which
+is implemented in `src/generic/Poly.jl`.
 
-## Types and parent objects
-
-Polynomials implemented using the AbstractAlgebra generics have type `Generic.Poly{T}`
-where `T` is the type of elements of the coefficient ring. Internally they consist of
-a Julia array of coefficients and some additional fields for length and a parent object,
-etc. See the file `src/generic/GenericTypes.jl` for details.
+These generic polynomials have type `Generic.Poly{T}` where `T` is the type of
+elements of the coefficient ring. Internally they consist of a Julia array of
+coefficients and some additional fields for length and a parent object, etc. See
+the file `src/generic/GenericTypes.jl` for details.
 
 Parent objects of such polynomials have type `Generic.PolyRing{T}`.
 
 The string representation of the variable of the polynomial ring and the
 base/coefficient ring $R$ is stored in the parent object.
 
-The polynomial element types belong to the abstract type `AbstractAlgebra.PolyElem{T}`
-and the polynomial ring types belong to the abstract type `AbstractAlgebra.PolyRing{T}`.
-This enables one to write generic functions that can accept any AbstractAlgebra
-polynomial type.
+## Abstract types
+
+All univariate polynomial element types belong to the abstract type
+`AbstractAlgebra.PolyElem{T}` and the polynomial ring types belong to the abstract
+type `AbstractAlgebra.PolyRing{T}`. This enables one to write generic functions that
+can accept any AbstractAlgebra polynomial type.
 
 Note that both the generic polynomial ring type `Generic.PolyRing{T}` and the abstract
 type it belongs to, `AbstractAlgebra.PolyRing{T}`, are called `PolyRing`. The
