@@ -5,6 +5,8 @@
 """
 module AbstractAlgebra
 
+using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
+
 using Markdown
 
 using InteractiveUtils
@@ -348,6 +350,8 @@ end
 
 include("AbstractTypes.jl")
 
+const PolynomialElem{T} = Union{PolyElem{T}, NCPolyElem{T}}
+
 ###############################################################################
 #
 #  Version information
@@ -400,6 +404,8 @@ include("algorithms/LaurentPoly.jl")
 include("algorithms/FinField.jl")
 include("algorithms/GenericFunctions.jl")
 
+include("Poly.jl")
+
 ###############################################################################
 #
 #   Generic submodule
@@ -410,29 +416,26 @@ include("Generic.jl")
 
 # Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
 # as we have our own
-import .Generic: abs_series, abs_series_type, add!, addeq!, addmul!, 
+import .Generic: abs_series, abs_series_type, add!, addeq!, 
                  add_column, add_column!, add_row,
                  add_row!, base_field, basis,
 		 cached, can_solve_left_reduced_triu,
                  can_solve, can_solve_with_solution,
-                 character, characteristic, charpoly, charpoly_danilevsky!,
-                 charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
-                 chebyshev_u, _check_dim, check_composable,
-                 codomain, coeff, coefficients,
-                 combine_like_terms!, compose, constant_coefficient,
-		 content, cycles,
-                 data, defining_polynomial, deflate, deflation, degree, degrees,
-                 dense_matrix_type, dense_poly_type, derivative, det_clow,
+                 character, charpoly, charpoly_danilevsky!,
+                 charpoly_danilevsky_ff!, charpoly_hessenberg!,
+                 _check_dim, check_composable,
+                 codomain, coeff, combine_like_terms!, cycles,
+                 data, defining_polynomial, degrees,
+                 dense_matrix_type, dense_poly_type, det_clow,
                  det_df, det_fflu, det_popov, diagonal_matrix, dim, disable_cache!,
-                 discriminant,
-                 divexact, divexact_left, divexact_right, divides,
+                 divexact_left, divexact_right,
                  domain, downscale,
-                 enable_cache!, evaluate, exp_gcd,
+                 enable_cache!, exp_gcd,
                  exponent, exponent_vector, exponent_vectors,
                  extended_weak_popov, extended_weak_popov_with_transform,
                  finish, fflu!,
                  fflu, find_pivot_popov, fit!, gcd,
-                 get_field, gcdinv, gcdx,
+                 get_field, gcdx,
                  gram, has_left_neighbor, has_bottom_neighbor, hash,
                  hessenberg!, hnf, hnf_cohen, hnf_cohen_with_transform,
                  hnf_kb, hnf_kb_with_transform,
@@ -440,7 +443,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!, addmul!,
                  hnf_with_transform, hnf_via_popov,
                  hnf_via_popov_with_transform,
                  hooklength, identity_map, identity_matrix, image,
-                 image_map, image_fn, inflate, integral, interpolate,
+                 image_map, image_fn,
                  inv!, invariant_factors,
                  inverse_fn, inverse_image_fn,
                  inverse_mat, invmod,
@@ -448,80 +451,72 @@ import .Generic: abs_series, abs_series_type, add!, addeq!, addmul!,
                  ishnf, ishomogeneous, isinvertible, isinvertible_with_inverse,
                  isisomorphic,
                  isone, ispopov, isreverse, isrimhook,
-                 isrref, issquare, issubmodule, isterm, isterm_recursive,
+                 isrref, issubmodule,
                  issnf, istriu, isunit, isunivariate, isweak_popov, iszero_row,
                  iszero_column, kernel, kronecker_product,
                  laurent_ring, lcm, leading_coefficient, leading_monomial,
 		 leading_term, left_kernel, length,
                  leglength, main_variable,
                  main_variable_extract, main_variable_insert,
-                 map1, map2, map_from_func, map_coefficients,
+                 map1, map2, map_from_func,
 		 map_entries, map_entries!,
                  map_with_preimage_from_func, map_with_retraction,
                  map_with_retraction_from_func,
                  map_with_section, map_with_section_from_func, mat, matrix,
                  matrix_repr, max_fields, max_precision, minors, minpoly, mod,
-                 modulus, monomial, monomial!, monomials,
-                 monomial_iszero, monomial_set!, monomial_to_newton!,
-                 MPolyBuildCtx, mul!, mul_classical, mul_karatsuba, mul_ks,
-                 mullow, mullow_karatsuba, mulmod,
+                 monomial, monomial!, monomials,
+                 monomial_iszero, monomial_set!,
+                 MPolyBuildCtx, mul!, mullow_karatsuba,
                  multiply_column, multiply_column!, multiply_row, multiply_row!,
-                 ncols,
-                 newton_to_monomial!, ngens, norm, normalise, nrows,
-		 num_coeff, nvars, O, one,
+                 ncols, ngens, norm, normalise, nrows,
+		 num_coeff, O, one,
                  order, ordering, parity, partitionseq, Perm, perm,
-                 permtype, @perm_str, polcoeff, pol_length, polynomial,
-                 pow_multinomial, popov, popov_with_transform,
+                 permtype, @perm_str, polcoeff, pol_length,
+                 popov, popov_with_transform,
                  precision, preimage, preimage_map,
-		 prime, primpart, pseudodivrem,
-                 pseudo_inv, pseudorem, push_term!, randmat_triu,
+		 prime, pseudo_inv, push_term!, randmat_triu,
                  randmat_with_rank, rand_ordering, rank_profile_popov,
-		 reduce!, remove,
+		 reduce!,
                  renormalize!, rels, rel_series, rel_series_type,
-		 rescale!, resultant, resultant_ducos,
-                 resultant_euclidean, resultant_subresultant,
-                 resultant_sylvester, resx, retraction_map, reverse,
+		 rescale!, retraction_map, reverse,
                  reverse_cols, reverse_cols!, reverse_rows, reverse_rows!,
                  right_kernel, rref, rref!, rref_rational, rref_rational!,
 		 section_map, setcoeff!,
                  set_exponent_vector!, set_field!, set_length!, set_limit!,
-                 setpermstyle, set_precision!, set_valuation!, size, shift_left,
-                 shift_right, similarity!, snf, snf_kb,
+                 setpermstyle, set_precision!, set_valuation!, size,
+                 similarity!, snf, snf_kb,
                  snf_kb_with_transform, snf_with_transform, solve, solve_left,
-                 solve_rational, solve_triu, sort_terms!, sub, subst, summands,
+                 solve_rational, solve_triu, sort_terms!, sub, summands,
                  supermodule, swap_cols, swap_cols!, swap_rows, swap_rows!,
-                 sylvester_matrix, symbols, tail, term, terms, total_degree,
+                 term, terms, total_degree,
                  to_univariate, trailing_coefficient,
 		 truncate, typed_hcat, typed_hvcat,
-                 upscale, valuation, var, var_index, vars, weak_popov,
+                 upscale, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem,
        # Moved from Hecke into Misc
-                 divexact_low, divhigh,
-		 ismonic, Loc, Localization, LocElem, mulhigh_n,
-		 polynomial_to_power_sums, PolyCoeffs,
+		 Loc, Localization, LocElem,
+		 polynomial_to_power_sums,
 		 power_sums_to_polynomial, roots, sturm_sequence
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
-export abs_series, abs_series_type, add!, addeq!, addmul!,
+export abs_series, abs_series_type, add!, addeq!,
                  addmul_delayed_reduction!, addmul!,
                  add_column, add_column!, add_row, add_row!,
 		 base_field, base_ring, cached,
                  canonical_unit, can_solve_left_reduced_triu,
                  can_solve, can_solve_with_solution,
                  change_base_ring, character,
-                 characteristic, charpoly, charpoly_danilevsky!,
+                 charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_composable, check_parent,
-                 codomain, coeff, coefficients,
-		 combine_like_terms!, compose, constant_coefficient,
-		 content, cycles,
-                 data, defining_polynomial, deflate, deflation, degree, degrees,
-                 dense_matrix_type, dense_poly_type, derivative, det, det_clow,
+                 codomain, coeff, combine_like_terms!, cycles,
+                 data, defining_polynomial, degrees,
+                 dense_matrix_type, dense_poly_type, det, det_clow,
                  det_df, det_fflu, det_popov, diagonal_matrix, dim, disable_cache!,
-                 discriminant, divexact, divexact_left, divexact_right, divides,
+                 discriminant, divexact_left, divexact_right,
                  domain, downscale,
-                 elem_type, enable_cache!, evaluate, exp_gcd,
+                 elem_type, enable_cache!, exp_gcd,
                  exponent, exponent_vector, exponent_vectors,
                  extended_weak_popov,
                  extended_weak_popov_with_transform, fflu!,
@@ -535,7 +530,7 @@ export abs_series, abs_series_type, add!, addeq!, addmul!,
                  hnf_with_transform, hnf_via_popov,
                  hnf_via_popov_with_transform,
                  hooklength, identity_map, identity_matrix, image,
-                 image_map, image_fn, inflate, integral, interpolate,
+                 image_map, image_fn, interpolate,
                  inv!, invariant_factors,
                  inverse_fn, inverse_image_fn,
                  inverse_mat, invmod,
@@ -544,36 +539,34 @@ export abs_series, abs_series_type, add!, addeq!, addmul!,
                  ishnf, ishomogeneous, isinvertible, isinvertible_with_inverse,
                  isisomorphic, ismonomial, ismonomial_recursive,
                  isnegative, isone, ispopov, isreverse,
-                 isrimhook, isrref, issnf, issquare, issubmodule, issymmetric,
-                 isterm, isterm_recursive, istriu,
-		 isunit, isunivariate, isweak_popov,
+                 isrimhook, isrref, issnf, issubmodule, issymmetric,
+                 isterm_recursive, istriu, isunit, isunivariate, isweak_popov,
                  iszero, iszero_row, iszero_column, kernel,
                  kronecker_product, laurent_ring,
                  lcm, leading_coefficient, leading_monomial, leading_term,
 		 left_kernel, leglength, length, lu, lu!,
                  main_variable, main_variable_extract, main_variable_insert,
-                 map1, map2, map_from_func, map_coefficients, map_entries,
+                 map1, map2, map_from_func, map_entries,
 		 map_entries!, map_with_preimage_from_func,
                  map_with_retraction, map_with_retraction_from_func,
                  map_with_section, map_with_section_from_func,
                  mat, matrix, matrix_repr, max_fields,
                  max_precision, minors, minpoly, mod,
-                 modulus, monomial, monomial!, monomials,
+                 monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
-                 MPolyBuildCtx, mul!, mul_classical,
-                 mul_karatsuba, mul_ks, mul_red!, mullow, mullow_karatsuba, mulmod,
+                 MPolyBuildCtx, mul!,
+                 mul_ks, mul_red!, mullow_karatsuba, mulmod,
                  multiply_column, multiply_column!, multiply_row,
                  multiply_row!, ncols, needs_parentheses,
 		 newton_to_monomial!, ngens, norm,
                  normalise, nrows, nullspace, num_coeff,
-		 nvars, O, one, order, ordering,
+		 O, one, order, ordering,
                  parent_type, parity, partitionseq, Perm, perm, permtype,
                  @perm_str, polcoeff, pol_length, polynomial, pow_multinomial,
                  popov, popov_with_transform, powers, ppio, precision, preimage,
-                 preimage_map, prime, primpart,
-		 pseudo_inv, pseudodivrem, pseudorem,
-                 push_term!, rank, randmat_triu, randmat_with_rank,
-                 rand_ordering, rank_profile_popov, reduce!, remove,
+                 preimage_map, prime,
+		 pseudo_inv, push_term!, rank, randmat_triu, randmat_with_rank,
+                 rand_ordering, rank_profile_popov, reduce!,
                  renormalize!, rel_series, rel_series_type, rels,
 		 resultant, resultant_ducos, rescale!,
                  resultant_euclidean, resultant_subresultant,
@@ -581,15 +574,15 @@ export abs_series, abs_series_type, add!, addeq!, addmul!,
                  reverse_rows, reverse_rows!, reverse_cols, reverse_cols!,
                  right_kernel, rref, rref!, rref_rational, rref_rational!, section_map, setcoeff!,
                  set_exponent_vector!, set_field!, set_length!, set_limit!,
-                 setpermstyle, set_precision!, set_valuation!, shift_left, shift_right,
+                 setpermstyle, set_precision!, set_valuation!,
                  similarity!, size, snf, snf_kb,
                  snf_kb_with_transform, snf_with_transform, solve, solve_left,
                  solve_rational, solve_triu, sort_terms!, sub, subst, summands,
                  supermodule, swap_rows, swap_rows!, swap_cols, swap_cols!,
-                 sylvester_matrix, symbols, tail, term, terms, to_univariate,
+                 sylvester_matrix, term, terms, to_univariate,
                  total_degree, tr, trailing_coefficient,
 		 truncate, typed_hcat, typed_hvcat,
-                 upscale, valuation, var, var_index, vars, weak_popov,
+                 upscale, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
                  @PolynomialRing, MatrixElem,
        # Moved from Hecke into Misc
@@ -711,26 +704,6 @@ end
 
 function PuiseuxSeriesField(R::Field, prec::Int, s::Char; cached=true)
    PuiseuxSeriesField(R, prec, string(s); cached=cached)
-end
-
-@doc Markdown.doc"""
-    PolynomialRing(R::AbstractAlgebra.Ring, s::Union{String, Char}; cached::Bool = true)
-
-Given a base ring `R` and string `s` specifying how the generator (variable)
-should be printed, return a tuple `S, x` representing the new polynomial
-ring $S = R[x]$ and the generator $x$ of the ring. By default the parent
-object `S` will depend only on `R` and `x` and will be cached. Setting the
-optional argument `cached` to `false` will prevent the parent object `S` from
-being cached.
-"""
-PolynomialRing(R::Ring, s::Union{AbstractString, Char}; cached::Bool = true)
-
-function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
-   Generic.PolynomialRing(R, s; cached=cached)
-end
-
-function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
-   PolynomialRing(R, string(s); cached=cached)
 end
 
 function PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)

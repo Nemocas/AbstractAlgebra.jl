@@ -1862,7 +1862,7 @@ end
 
 function det_df(M::MatrixElem{T}) where {T <: RingElement}
    R = base_ring(M)
-   S, z = PolynomialRing(R, "z")
+   S, z = AbstractAlgebra.PolynomialRing(R, "z")
    n = nrows(M)
    p = charpoly(S, M)
    d = coeff(p, 0)

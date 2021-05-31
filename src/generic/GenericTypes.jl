@@ -392,8 +392,6 @@ mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyElem{T}
    NCPoly{T}(a::T) where T <: NCRingElem = iszero(a) ? new{T}(Array{T}(undef, 0), 0) : new{T}([a], 1)
 end
 
-const PolynomialElem{T} = Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.NCPolyElem{T}}
-
 ###############################################################################
 #
 #   MPolyRing / MPoly

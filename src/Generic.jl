@@ -40,6 +40,17 @@ import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring,
                           leading_coefficient, log, numerator, parent_type,
                           show_via_expressify, sqrt, trailing_coefficient
 
+import ..AbstractAlgebra: addmul!, characteristic, coefficients, compose,
+                          constant_coefficient, content, deflate, deflation,
+                          degree, derivative, divexact, divides, evaluate,
+                          inflate, integral, issquare, isterm,
+                          map_coefficients, modulus, mul_classical,
+                          mul_karatsuba, mullow, nvars, primpart,
+                          pseudodivrem, pseudorem, remove, shift_left,
+                          shift_right, symbols, tail, valuation, var
+
+import ..AbstractAlgebra: PolynomialElem
+
 using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")

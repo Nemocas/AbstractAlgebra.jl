@@ -1432,7 +1432,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    # if we are in univariate case, convert to dense, take gcd, convert back
    if constant_coeffs
       # convert polys to univariate dense
-      R, x = PolynomialRing(base_ring(base_ring(a)), "\$")
+      R, x = AbstractAlgebra.PolynomialRing(base_ring(base_ring(a)), "\$")
       f = R()
       g = R()
       fit!(f, reinterpret(Int, a.exps[a.length] + 1))

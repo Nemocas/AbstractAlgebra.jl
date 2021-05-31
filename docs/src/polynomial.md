@@ -33,7 +33,8 @@ The string representation of the variable of the polynomial ring and the
 base/coefficient ring $R$ is stored in the parent object.
 
 The polynomial element types belong to the abstract type `AbstractAlgebra.PolyElem{T}`
-and the polynomial ring types belong to the abstract type `AbstractAlgebra.PolyRing{T}`. This enables one to write generic functions that can accept any AbstractAlgebra
+and the polynomial ring types belong to the abstract type `AbstractAlgebra.PolyRing{T}`.
+This enables one to write generic functions that can accept any AbstractAlgebra
 polynomial type.
 
 Note that both the generic polynomial ring type `Generic.PolyRing{T}` and the abstract
@@ -49,7 +50,7 @@ In order to construct polynomials in AbstractAlgebra.jl, one must first construc
 polynomial ring itself. This is accomplished with the following constructor.
 
 ```julia
-PolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString; cached::Bool = true)
+PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
 ```
 
 Given a base ring `R` and string `s` specifying how the generator (variable) should be
@@ -255,11 +256,11 @@ modulus{T <: ResElem}(::PolyElem{T})
 ```@docs
 leading_coefficient(::PolyElem)
 trailing_coefficient(::PolyElem)
-constant_coefficient(::Generic.PolynomialElem)
+constant_coefficient(::PolynomialElem)
 ```
 
 ```@docs
-tail(::Generic.PolynomialElem)
+tail(::PolynomialElem)
 ```
 
 ```@docs
@@ -279,7 +280,7 @@ issquare(::PolyElem)
 ```
 
 ```@docs
-degree(::Generic.PolynomialElem)
+degree(::PolynomialElem)
 ```
 
 ```@docs
