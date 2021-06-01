@@ -65,6 +65,8 @@ import ..AbstractAlgebra: coeff, max_precision, renormalize!, set_length!,
 
 import ..AbstractAlgebra: term_degree, terms_degrees, degrees_range
 
+import ..AbstractAlgebra: reduced_form, isreduced_form
+
 using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")
