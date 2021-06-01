@@ -417,6 +417,7 @@ include("LaurentPoly.jl")
 include("FreeModule.jl")
 include("Submodule.jl")
 include("QuotientModule.jl")
+include("InvariantFactorDecomposition.jl")
 
 ###############################################################################
 #
@@ -444,7 +445,6 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
                  has_left_neighbor, has_bottom_neighbor, hash,
                  hooklength, identity_map, image,
                  image_map, image_fn,
-                 invariant_factors,
                  inverse_fn, inverse_image_fn,
                  inverse_mat, reverse_rows, reverse_rows!,
                  inv!, invmod,
@@ -507,8 +507,7 @@ export abs_series, abs_series_type, add!, addeq!,
                  has_left_neighbor, has_bottom_neighbor, hash,
                  hooklength, identity_map, image,
                  image_map, image_fn, interpolate,
-                 inv!, invariant_factors,
-                 inverse_fn, inverse_image_fn,
+                 inv!, inverse_fn, inverse_image_fn,
                  inverse_mat, invmod,
                  iscompatible, isconstant, isdegree,
                  isdomain_type, isexact_type, isgen,
