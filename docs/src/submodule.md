@@ -17,8 +17,8 @@ of the same module $M$ and their generators generate the same set of elements.
 ## Generic submodule type
 
 AbstractAlgebra implements a generic submodule type `Generic.Submodule{T}`
-where `T` is the element type of the base ring. See `src/generic/GenericTypes.jl`
-for more details.
+where `T` is the element type of the base ring in `src/generic/Submodule.jl`.
+See `src/generic/GenericTypes.jl` for more details of the type definition.
 
 Elements of a generic submodule have type `Generic.SubmoduleElem{T}`.
 

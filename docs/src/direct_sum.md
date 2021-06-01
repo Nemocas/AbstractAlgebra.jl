@@ -10,11 +10,21 @@ end
 AbstractAlgebra allows the construction of the external direct sum of any
 nonempty vector of finitely presented modules.
 
-As well as implementing the entire Module interface, AbstractAlgebra
-direct sums also provide the following interface.
-
 Note that external direct sums are considered equal iff they are the same
 object.
+
+## Generic direct sum type
+
+AbstractAlgebra provides a generic direct sum type
+`Generic.DirectSumModule{T}` where `T` is the element type of the base ring.
+The implementation is in `src/generic/DirectSum.jl`
+
+Elements of direct sum modules have type `Generic.DirectSumModuleElem{T}`.
+
+## Abstract types
+
+Direct sum module types belong to the abstract type `FPModule{T}` and their
+elements to `FPModuleElem{T}`.
 
 ## Constructors
 

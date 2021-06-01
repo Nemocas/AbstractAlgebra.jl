@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   SNFModule.jl : Invariant factor decomposition of modules
+#   SNFModule.jl : Generic invariant factor decomposition of modules
 #
 ###############################################################################
 

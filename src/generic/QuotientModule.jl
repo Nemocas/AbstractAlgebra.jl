@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   QuotientModule.jl : Quotients of modules by submodules
+#   QuotientModule.jl : Generic quotients of modules by submodules
 #
 ###############################################################################
 

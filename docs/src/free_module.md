@@ -20,6 +20,9 @@ is the type of the elements of the ring $R$ over which the module is built.
 
 Vector spaces are simply free modules over a field.
 
+The implementation of generic free modules can be found in
+`src/generic/FreeModule.jl`.
+
 The free module of a given rank over a given ring is made unique on the
 system by caching them (unless an optional `cache` parameter is set to
 `false`).

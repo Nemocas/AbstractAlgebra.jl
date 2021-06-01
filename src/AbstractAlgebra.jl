@@ -418,6 +418,7 @@ include("FreeModule.jl")
 include("Submodule.jl")
 include("QuotientModule.jl")
 include("InvariantFactorDecomposition.jl")
+include("DirectSum.jl")
 
 ###############################################################################
 #
@@ -752,37 +753,6 @@ end
 # Handles empty vector of submodules
 function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: RingElement, U <: Any}
    Generic.sub(m, subs)
-end
-
-@doc Markdown.doc"""
-    DirectSum(m::Vector{<:Module{T}}) where T <: RingElement
-
-Return a tuple $M, f, g$ consisting of $M$ the direct sum of the modules `m`
-(supplied as a vector of modules), a vector $f$ of the canonical injections
-of the $m[i]$ into $M$ and a vector $g$ of the canonical projections from
-$M$ onto the $m[i]$.
-"""
-function DirectSum(m::Vector{<:Module{T}}) where T <: RingElement
-   Generic.DirectSum(m)
-end
-
-function direct_sum(m::Vector{<:Module{T}}) where T <: RingElement
-   Generic.DirectSum(m)
-end
-
-@doc Markdown.doc"""
-    DirectSum(m::Module{T}...) where T <: RingElement
-
-Return a tuple $M, f, g$ consisting of $M$ the direct sum of the given
-modules, a vector $f$ of the canonical injections of the $m[i]$ into $M$
-and a vector $g$ of the canonical projections from $M$ onto the $m[i]$.
-"""
-function DirectSum(m::Module{T}...) where T <: RingElement
-   Generic.DirectSum(m...)
-end
-
-function direct_sum(m::Module{T}...) where T <: RingElement
-   Generic.DirectSum(m...)
 end
 
 function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, A...)

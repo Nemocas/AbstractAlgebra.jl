@@ -17,7 +17,8 @@ same module $M$ by two equal submodules.
 ## Generic quotient module type
 
 AbstractAlgebra implements the generic quotient module type
-`Generic.QuotientModule{T}` where `T` is the element type of the base ring.
+`Generic.QuotientModule{T}` where `T` is the element type of the base ring,
+in `src/generic/QuotientModule.jl`.
 
 Elements of generic quotient modules have type `Generic.QuotientModuleElem{T}`.
 
