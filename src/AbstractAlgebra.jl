@@ -416,6 +416,7 @@ include("RelSeries.jl")
 include("LaurentPoly.jl")
 include("FreeModule.jl")
 include("Submodule.jl")
+include("QuotientModule.jl")
 
 ###############################################################################
 #
@@ -752,16 +753,6 @@ end
 # Handles empty vector of submodules
 function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: RingElement, U <: Any}
    Generic.sub(m, subs)
-end
-
-@doc Markdown.doc"""
-    quo(m::Module{T}, N::Module{T}) where T <: RingElement
-
-Return the quotient `Q` of the module `m` by the submodule `N` of `m`, and a
-map which is a lift of elements of `Q` to `m`.
-"""
-function quo(m::Module{T}, N::Module{T}) where T <: RingElement
-   Generic.quo(m, N)
 end
 
 @doc Markdown.doc"""
