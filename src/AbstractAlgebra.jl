@@ -412,6 +412,7 @@ include("NCPoly.jl")
 include("Matrix.jl")
 include("MatrixAlgebra.jl")
 include("AbsSeries.jl")
+include("RelSeries.jl")
 
 ###############################################################################
 #
@@ -427,7 +428,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
                  base_field, basis, cached,
                  character,
                  check_composable,
-                 codomain, coeff, combine_like_terms!, cycles,
+                 codomain, combine_like_terms!, cycles,
                  data, defining_polynomial, degrees,
                  dense_matrix_type, dense_poly_type,
                  dim, disable_cache!,
@@ -455,7 +456,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
                  map_with_preimage_from_func, map_with_retraction,
                  map_with_retraction_from_func,
                  map_with_section, map_with_section_from_func, mat,
-                 matrix_repr, max_fields, max_precision, mod,
+                 matrix_repr, max_fields, mod,
                  monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!,
                  MPolyBuildCtx, mul!, mullow_karatsuba,
@@ -466,11 +467,11 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
                  precision, preimage, preimage_map,
 		 prime, push_term!,
                  rand_ordering, reduce!,
-                 renormalize!, rels, rel_series, rel_series_type,
+                 rels, rel_series, rel_series_type,
 		 rescale!, retraction_map, reverse,
                  right_kernel, section_map, setcoeff!,
-                 set_exponent_vector!, set_field!, set_length!, set_limit!,
-                 setpermstyle, set_precision!, set_valuation!, size,
+                 set_exponent_vector!, set_field!, set_limit!,
+                 setpermstyle, size,
                  sort_terms!, sub, summands,
                  supermodule, term, terms, total_degree,
                  to_univariate, trailing_coefficient,
@@ -490,7 +491,7 @@ export abs_series, abs_series_type, add!, addeq!,
                  change_base_ring, character,
                  chebyshev_t,
                  chebyshev_u, check_composable, check_parent,
-                 codomain, coeff, combine_like_terms!, cycles,
+                 codomain, combine_like_terms!, cycles,
                  data, defining_polynomial, degrees,
                  dense_matrix_type, dense_poly_type, det,
                  dim, disable_cache!,
@@ -519,8 +520,7 @@ export abs_series, abs_series_type, add!, addeq!,
 		 map_with_preimage_from_func,
                  map_with_retraction, map_with_retraction_from_func,
                  map_with_section, map_with_section_from_func,
-                 mat, matrix_repr, max_fields,
-                 max_precision, mod,
+                 mat, matrix_repr, max_fields, mod,
                  monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx, mul!,
@@ -539,8 +539,8 @@ export abs_series, abs_series_type, add!, addeq!,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, retraction_map, reverse,
                  section_map, setcoeff!,
-                 set_exponent_vector!, set_field!, set_length!, set_limit!,
-                 setpermstyle, set_precision!, set_valuation!,
+                 set_exponent_vector!, set_field!, set_limit!,
+                 setpermstyle,
                  size, sort_terms!, sub, subst, summands, supermodule,
                  sylvester_matrix, term, terms, to_univariate,
                  total_degree, trailing_coefficient, truncate,
@@ -595,17 +595,6 @@ end
 
 function YoungTableau(p::Vector{Int})
    Generic.YoungTableau(p)
-end
-
-@doc (@doc Generic.PowerSeriesRing)
-PowerSeriesRing(R::Ring, prec::Int, s::Union{Char, AbstractString}; cached=true, model=:capped_relative)
-
-function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
-   Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
-end
-
-function PowerSeriesRing(R::Ring, prec::Int, s::Char; cached=true, model=:capped_relative)
-   PowerSeriesRing(R, prec, string(s); cached=cached, model=model)
 end
 
 function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int}, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString

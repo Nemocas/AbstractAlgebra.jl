@@ -60,6 +60,8 @@ import ..AbstractAlgebra: CycleDec, Perm, PolynomialElem, MatrixElem
 
 import ..AbstractAlgebra: O, pol_length
 
+import ..AbstractAlgebra: coeff, max_precision, renormalize!, set_length!,
+                          set_precision!, set_valuation!
 using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")
