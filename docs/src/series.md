@@ -43,20 +43,20 @@ The types of generic series implemented by AbstractAlgebra.jl are
 `Generic.LaurentSeriesFieldElem{T}`.
 
 Relative power series elements belong to the abstract type
-`AbstractAlgebra.RelSeriesElem`.
+`RelSeriesElem`.
 
-Laurent series elements belong directly to either `AbstractAlgebra.RingElem` or
-`AbstractAlgebra.FieldElem` since it is more useful to be able to distinguish whether
+Laurent series elements belong directly to either `RingElem` or
+`FieldElem` since it is more useful to be able to distinguish whether
 they belong to a ring or field than it is to distinguish that they are relative series.
 
-Absolute power series elements belong to `AbstractAlgebra.AbsSeriesElem`.
+Absolute power series elements belong to `AbsSeriesElem`.
 
 The parent types for relative and absolute power series, `Generic.RelSeriesRing{T}`
-and `Generic.AbsSeriesRing{T}` respectively, belong to `AbstractAlgebra.SeriesRing{T}`.
+and `Generic.AbsSeriesRing{T}` respectively, belong to `SeriesRing{T}`.
 
 The parent types for Laurent series rings and fields, `Generic.LaurentSeriesRing{T}`
 and `Generic.LaurentSeriesField{T}` respectively, belong directly to
-`AbstractAlgebra.Ring` and `AbstractAlgebra.Field` respectively.
+`Ring` and `Field` respectively.
 
 The default precision, string representation of the variable and base ring $R$ of a
 generic power series are stored in its parent object.
@@ -67,15 +67,15 @@ In order to construct series in AbstractAlgebra.jl, one must first construct the
 itself. This is accomplished with any of the following constructors.
 
 ```julia
-PowerSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true, model=:capped_relative)
+PowerSeriesRing(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true, model=:capped_relative)
 ```
 
 ```julia
-LaurentSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
+LaurentSeriesRing(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
 ```
 
 ```julia
-LaurentSeriesRing(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)
+LaurentSeriesRing(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
 ```
 
 Given a base ring `R`, a maximum precision (relative or absolute, depending on the
@@ -307,13 +307,13 @@ described here, that override the generic implementation.
 
 Unless otherwise noted, the functions are available for all series models, including
 Laurent series. We denote this by using the abstract type
-`AbstractAlgebra.RelSeriesElem`, even though absolute series and Laurent series types
+`RelSeriesElem`, even though absolute series and Laurent series types
 do not belong to this abstract type.
 
 ### Basic functionality
 
 ```julia
-coeff(a::AbstractAlgebra.SeriesElem, n::Int)
+coeff(a::SeriesElem, n::Int)
 ```
 
 Return the degree $n$ coefficient of the given power series. Note coefficients
@@ -514,7 +514,7 @@ integral(a::RelSeriesElem)
 ### Special functions
 
 ```@docs
-Base.log(a::AbstractAlgebra.SeriesElem{T}) where T <: AbstractAlgebra.FieldElem
+Base.log(a::SeriesElem{T}) where T <: FieldElem
 ```
 
 ```@docs

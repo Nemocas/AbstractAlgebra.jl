@@ -58,6 +58,8 @@ import ..AbstractAlgebra: can_solve_with_solution_lu,
 
 import ..AbstractAlgebra: CycleDec, Perm, PolynomialElem, MatrixElem
 
+import ..AbstractAlgebra: O, pol_length
+
 using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")

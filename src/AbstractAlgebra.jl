@@ -411,6 +411,7 @@ include("Poly.jl")
 include("NCPoly.jl")
 include("Matrix.jl")
 include("MatrixAlgebra.jl")
+include("AbsSeries.jl")
 
 ###############################################################################
 #
@@ -459,9 +460,9 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
                  monomial_iszero, monomial_set!,
                  MPolyBuildCtx, mul!, mullow_karatsuba,
                  ngens, norm, normalise,
-		 num_coeff, O, one,
+		 num_coeff, one,
                  order, ordering, parity, partitionseq, Perm, perm,
-                 permtype, @perm_str, polcoeff, pol_length,
+                 permtype, @perm_str, polcoeff,
                  precision, preimage, preimage_map,
 		 prime, push_term!,
                  rand_ordering, reduce!,
@@ -526,9 +527,9 @@ export abs_series, abs_series_type, add!, addeq!,
                  mul_ks, mul_red!, mullow_karatsuba, mulmod,
                  needs_parentheses, newton_to_monomial!, ngens, norm,
                  normalise, nullspace, num_coeff,
-		 O, one, order, ordering,
+		 one, order, ordering,
                  parent_type, parity, partitionseq, Perm, perm, permtype,
-                 @perm_str, polcoeff, pol_length, polynomial, pow_multinomial,
+                 @perm_str, polcoeff, polynomial, pow_multinomial,
                  ppio, precision, preimage,
                  preimage_map, prime,
 		 push_term!, rank,
