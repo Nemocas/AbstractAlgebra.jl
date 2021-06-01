@@ -132,6 +132,10 @@ of polynomial rings provided by external modules will also usually provide a
 ### Basic manipulation
 
 ```@docs
+isunivariate(::AbstractAlgebra.MPolyRing{T}) where T <: RingElement
+```
+
+```@docs
 vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
@@ -161,6 +165,10 @@ isterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 
 ```@docs
 ismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
+isunivariate(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
