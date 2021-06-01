@@ -62,6 +62,9 @@ import ..AbstractAlgebra: O, pol_length
 
 import ..AbstractAlgebra: coeff, max_precision, renormalize!, set_length!,
                           set_precision!, set_valuation!
+
+import ..AbstractAlgebra: term_degree, terms_degrees, degrees_range
+
 using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")

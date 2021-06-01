@@ -413,6 +413,7 @@ include("Matrix.jl")
 include("MatrixAlgebra.jl")
 include("AbsSeries.jl")
 include("RelSeries.jl")
+include("LaurentPoly.jl")
 
 ###############################################################################
 #
@@ -698,9 +699,6 @@ end
 function SparsePolynomialRing(R::Ring, s::Char; cached::Bool = true)
    SparsePolynomialRing(R, string(s); cached=cached)
 end
-
-@doc (@doc Generic.LaurentPolynomialRing)
-LaurentPolynomialRing(R::Ring, s::AbstractString) = Generic.LaurentPolynomialRing(R, s)
 
 @doc (@doc Generic.FractionField)
 FractionField(R::Ring; cached=true)
