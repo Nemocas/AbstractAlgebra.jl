@@ -4,8 +4,8 @@
 #
 ###############################################################################
 
-export PowerSeriesRing, set_precision!, polcoeff, set_valuation!, renormalize!,
-       rel_series, rel_series_type, coeff
+export PowerSeriesRing, coeff, polcoeff, rel_series, rel_series_type,
+       renormalize!, set_length!, set_precision!, set_valuation!
 
 ###############################################################################
 #

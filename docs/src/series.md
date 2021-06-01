@@ -5,7 +5,7 @@ DocTestSetup = quote
 end
 ```
 
-# Generic power series
+# Power series
 
 AbstractAlgebra.jl allows the creation of capped relative and absolute power series over
 any computable commutative ring $R$.
@@ -20,46 +20,47 @@ $a_jx^j + a_{j+1}x^{j+1} + \cdots + a_{n-1}x^{n-1} + O(x^n)$
 where $j \geq 0$, $a_j \in R$ and the precision $n$ is fixed.
 
 There are two implementations of relative series: relative power series, implemented in
-`src/generic/RelSeries.jl` for which $j > 0$ in the above description, and Laurent
-series where $j$ can be negative, implemented in `src/generic/Laurent.jl`.
+`src/RelSeries.jl` for which $j > 0$ in the above description, and Laurent
+series where $j$ can be negative, implemented in `src/Laurent.jl`.
 Note that there are two implementations for Laurent series, one over rings and one
 over fields, though in practice most of the implementation uses the same code in both
 cases.
 
 There is a single implementation of absolute series: absolute power series, implemented
-in `src/generic/AbsSeries.jl`.
+in `src/AbsSeries.jl`.
 
-As well as implementing the Series Ring interface, the series modules in
-AbstractAlgebra.jl implement the generic algorithms described below.
+## Generic power series types
 
-All of the generic functionality is part of the `Generic` submodule of
-AbstractAlgebra.jl. This is exported by default so that it is not necessary to qualify
-function names.
+AbstractAlgebra.jl provides generic series types implemented in
+`src/generic/AbsSeries.jl`, `src/generic/RelSeries.jl` and
+`src/generic/LaurentSeries.jl` which implement the Series interface.
 
-## Types and parent objects
+These generic series have types `Generic.RelSeries{T}`, `Generic.AbsSeries{T}`,
+`Generic.LaurentSeriesRingElem{T}` and `Generic.LaurentSeriesFieldElem{T}`. See
+the file `src/generic/GenericTypes.jl` for details.
 
-The types of generic series implemented by AbstractAlgebra.jl are
-`Generic.RelSeries{T}`, `Generic.AbsSeries{T}`, `Generic.LaurentSeriesRingElem{T}` and
-`Generic.LaurentSeriesFieldElem{T}`.
+The parent objects have types `Generic.AbsSeriesRing{T}`
+and `Generic.RelSeriesRing{T}` and `Generic.LaurentSeriesRing{T}` respectively.
 
-Relative power series elements belong to the abstract type
-`RelSeriesElem`.
+The default precision, string representation of the variable and base ring $R$
+of a generic power series are stored in its parent object.
+
+## Abstract types
+Relative power series elements belong to the abstract type `RelSeriesElem`.
 
 Laurent series elements belong directly to either `RingElem` or
 `FieldElem` since it is more useful to be able to distinguish whether
-they belong to a ring or field than it is to distinguish that they are relative series.
+they belong to a ring or field than it is to distinguish that they are relative
+series.
 
 Absolute power series elements belong to `AbsSeriesElem`.
 
-The parent types for relative and absolute power series, `Generic.RelSeriesRing{T}`
-and `Generic.AbsSeriesRing{T}` respectively, belong to `SeriesRing{T}`.
+The parent types for relative and absolute power series,
+`Generic.RelSeriesRing{T}` and `Generic.AbsSeriesRing{T}` respectively,
+belong to `SeriesRing{T}`.
 
-The parent types for Laurent series rings and fields, `Generic.LaurentSeriesRing{T}`
-and `Generic.LaurentSeriesField{T}` respectively, belong directly to
-`Ring` and `Field` respectively.
-
-The default precision, string representation of the variable and base ring $R$ of a
-generic power series are stored in its parent object.
+The parent types of Laurent series belong directly to `Ring` and `Field`
+respectively.
 
 ## Series ring constructors
 
