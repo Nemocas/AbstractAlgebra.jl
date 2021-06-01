@@ -408,6 +408,7 @@ include("algorithms/GenericFunctions.jl")
 
 include("CommonTypes.jl") # types needed by AbstractAlgebra and Generic
 include("Poly.jl")
+include("NCPoly.jl")
 include("Matrix.jl")
 include("MatrixAlgebra.jl")
 
@@ -663,14 +664,6 @@ end
 
 function PuiseuxSeriesField(R::Field, prec::Int, s::Char; cached=true)
    PuiseuxSeriesField(R, prec, string(s); cached=cached)
-end
-
-function PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
-   Generic.PolynomialRing(R, s; cached=cached)
-end
-
-function PolynomialRing(R::NCRing, s::Char; cached::Bool = true)
-   PolynomialRing(R, string(s); cached=cached)
 end
 
 @doc Markdown.doc"""
