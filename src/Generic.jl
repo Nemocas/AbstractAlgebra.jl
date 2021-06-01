@@ -49,7 +49,14 @@ import ..AbstractAlgebra: addmul!, characteristic, coefficients, compose,
                           pseudodivrem, pseudorem, remove, shift_left,
                           shift_right, symbols, tail, valuation, var
 
-import ..AbstractAlgebra: PolynomialElem
+import ..AbstractAlgebra: gram, identity_matrix, kernel, minpoly,
+                          randmat_triu, randmat_with_rank, snf, zero!
+
+import ..AbstractAlgebra: can_solve_with_solution_lu,
+                          can_solve_with_solution_fflu,
+                          divexact_left, divexact_right, ncols, nrows
+
+import ..AbstractAlgebra: CycleDec, Perm, PolynomialElem, MatrixElem
 
 using ..AbstractAlgebra
 

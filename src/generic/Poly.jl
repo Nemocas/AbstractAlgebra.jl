@@ -19,7 +19,7 @@ elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
 Return the type of a polynomial whose coefficients have the given type.
 """
-dense_poly_type(::Type{T}) where T <: RingElement = Generic.Poly{T}
+dense_poly_type(::Type{T}) where T <: RingElement = Poly{T}
 
 ###############################################################################
 #
