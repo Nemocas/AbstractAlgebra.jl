@@ -69,6 +69,8 @@ import ..AbstractAlgebra: reduced_form, isreduced_form
 
 import ..AbstractAlgebra: domain, codomain, get_field, set_field!
 
+import ..AbstractAlgebra: cached
+
 using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")

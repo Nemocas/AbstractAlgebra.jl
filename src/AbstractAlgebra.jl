@@ -420,6 +420,7 @@ include("QuotientModule.jl")
 include("InvariantFactorDecomposition.jl")
 include("DirectSum.jl")
 include("Map.jl")
+include("MapCache.jl")
 
 ###############################################################################
 #
@@ -432,7 +433,7 @@ include("Generic.jl")
 # Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
 # as we have our own
 import .Generic: abs_series, abs_series_type, add!, addeq!, 
-                 base_field, basis, cached,
+                 base_field, basis,
                  character,
                  check_composable,
                  combine_like_terms!, cycles,
@@ -491,7 +492,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export abs_series, abs_series_type, add!, addeq!,
                  addmul_delayed_reduction!, addmul!,
-		 base_field, base_ring, cached,
+		 base_field, base_ring,
                  canonical_unit, can_solve_left_reduced_triu,
                  change_base_ring, character,
                  chebyshev_t,
