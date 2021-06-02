@@ -426,6 +426,7 @@ include("YoungTabs.jl")
 include("PermGroups.jl")
 include("LaurentSeries.jl")
 include("PuiseuxSeries.jl")
+include("SparsePoly.jl")
 
 ###############################################################################
 #
@@ -615,17 +616,6 @@ function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::Char;
    PolynomialRing(R, n, string(s); cached = cached, ordering = ordering)
 end
 
-@doc (@doc Generic.SparsePolynomialRing)
-SparsePolynomialRing(R::Ring, s::Union{Char, String}; cached::Bool = true)
-
-function SparsePolynomialRing(R::Ring, s::String; cached::Bool = true)
-   Generic.SparsePolynomialRing(R, s; cached=cached)
-end
-
-function SparsePolynomialRing(R::Ring, s::Char; cached::Bool = true)
-   SparsePolynomialRing(R, string(s); cached=cached)
-end
-
 @doc (@doc Generic.FractionField)
 FractionField(R::Ring; cached=true)
 
@@ -678,12 +668,9 @@ function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: Rin
    Generic.sub(m, subs)
 end
 
-export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, LaurentPolynomialRing,
-       MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, SymmetricGroup,
-       YoungTableau, AllPerms, Perm, LaurentSeriesRing,
-       LaurentSeriesField, ResidueField, NumberField, RationalFunctionField,
-       FunctionField, PuiseuxSeriesRing,
-       PuiseuxSeriesField
+export FractionField, ResidueRing,
+       ResidueField, NumberField, RationalFunctionField,
+       FunctionField
 
 export Generic
 

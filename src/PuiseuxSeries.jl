@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export laurent_ring, rescale!
+export PuiseuxSeriesField, PuiseuxSeriesRing, laurent_ring, rescale!
 
 ###############################################################################
 #
