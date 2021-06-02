@@ -9,6 +9,17 @@ end
 
 Abstract Algebra provides homomorphisms of finitely presented modules.
 
+## Generic module homomorphism types
+
+AbstractAlgebra defines two module homomorphism types, namely
+`Generic.ModuleHomomorphism` and `Generic.ModuleIsomorphism`. Functionality
+for these is implemented in `src/generic/ModuleHomomorphism.jl`.
+
+## Abstract types
+
+The `Generic.ModuleHomomorphism` and `Generic.ModuleIsomorphism` types inherit
+from `Map(FPModuleHomomorphism)`.
+
 ## Generic functionality
 
 The following generic functionality is provided for module homomorphisms.

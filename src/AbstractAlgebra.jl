@@ -422,6 +422,7 @@ include("DirectSum.jl")
 include("Map.jl")
 include("MapCache.jl")
 include("MapWithInverse.jl")
+include("ModuleHomomorphism.jl")
 
 ###############################################################################
 #
