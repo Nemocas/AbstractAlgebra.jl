@@ -424,6 +424,7 @@ include("Map.jl")
 include("MapCache.jl")
 include("MapWithInverse.jl")
 include("ModuleHomomorphism.jl")
+include("YoungTabs.jl")
 
 ###############################################################################
 #
@@ -502,14 +503,13 @@ export abs_series, abs_series_type, add!, addeq!,
                  chebyshev_u, check_composable, check_parent,
                  combine_like_terms!, cycles,
                  data, defining_polynomial, degrees,
-                 dense_matrix_type, dense_poly_type, det, dim,
+                 dense_matrix_type, dense_poly_type, det,
                  discriminant, downscale,
                  elem_type, exp_gcd,
                  exponent, exponent_vector, exponent_vectors,
                  finish, fit!, gcd, gen,
                  gens, gcdinv, gcdx,
                  has_left_neighbor, has_bottom_neighbor, hash,
-                 hooklength,
                  interpolate,
                  inv!, inverse_image_fn,
                  inverse_mat, invmod,
@@ -518,10 +518,10 @@ export abs_series, abs_series_type, add!, addeq!,
                  ishomogeneous,
                  isisomorphic, ismonomial, ismonomial_recursive,
                  isnegative, isone, isreverse,
-                 isrimhook, issubmodule, issymmetric,
+                 issubmodule, issymmetric,
                  isterm_recursive, isunit, isunivariate, iszero, laurent_ring,
                  lcm, leading_coefficient, leading_monomial, leading_term,
-		 leglength, length,
+		 length,
                  main_variable, main_variable_extract, main_variable_insert,
                  mat, matrix_repr, max_fields, mod,
                  monomial, monomial!, monomials,
@@ -570,19 +570,7 @@ function AllPerms(n::T) where T
   Generic.AllPerms(n)
 end
 
-function Partition(part::AbstractVector{T}, check::Bool=true) where T
-  Generic.Partition(part, check)
-end
-
-function AllParts(n::T) where T
-  Generic.AllParts(n)
-end
-
 function SkewDiagram(lambda::Generic.Partition, mu::Generic.Partition)
-  Generic.SkewDiagram(lambda, mu)
-end
-
-function SkewDiagram(lambda::Vector{T}, mu::Vector{T}) where T
   Generic.SkewDiagram(lambda, mu)
 end
 
@@ -592,10 +580,6 @@ end
 
 function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.n))
    Generic.YoungTableau(part, fill)
-end
-
-function YoungTableau(p::Vector{Int})
-   Generic.YoungTableau(p)
 end
 
 function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int}, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
@@ -753,8 +737,8 @@ function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: Rin
 end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, LaurentPolynomialRing,
-       MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
-       YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
+       MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, SymmetricGroup,
+       YoungTableau, AllPerms, Perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, RationalFunctionField,
        FunctionField, PuiseuxSeriesRing,
        PuiseuxSeriesField
