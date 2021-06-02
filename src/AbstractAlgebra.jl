@@ -425,6 +425,7 @@ include("ModuleHomomorphism.jl")
 include("YoungTabs.jl")
 include("PermGroups.jl")
 include("LaurentSeries.jl")
+include("PuiseuxSeries.jl")
 
 ###############################################################################
 #
@@ -519,7 +520,7 @@ export abs_series, abs_series_type, add!, addeq!,
                  isisomorphic, ismonomial, ismonomial_recursive,
                  isnegative, isone, isreverse,
                  issubmodule, issymmetric,
-                 isterm_recursive, isunit, isunivariate, iszero, laurent_ring,
+                 isterm_recursive, isunit, isunivariate, iszero,
                  lcm, leading_coefficient, leading_monomial, leading_term,
 		 length,
                  main_variable, main_variable_extract, main_variable_insert,
@@ -537,7 +538,7 @@ export abs_series, abs_series_type, add!, addeq!,
 		 push_term!, rank,
                  rand_ordering, reduce!,
                  renormalize!, rel_series, rel_series_type, rels,
-		 resultant, resultant_ducos, rescale!,
+		 resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, reverse, setcoeff!,
                  set_exponent_vector!,
@@ -580,30 +581,6 @@ end
 
 function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
    Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
-end
-
-function PuiseuxSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
-   Generic.PuiseuxSeriesRing(R, prec, s; cached=cached)
-end
-
-function PuiseuxSeriesRing(R::Ring, prec::Int, s::Char; cached=true)
-   PuiseuxSeriesRing(R, prec, string(s); cached=cached)
-end
-
-function PuiseuxSeriesRing(R::Field, prec::Int, s::AbstractString; cached=true)
-   Generic.PuiseuxSeriesField(R, prec, s; cached=cached)
-end
-
-function PuiseuxSeriesRing(R::Field, prec::Int, s::Char; cached=true)
-   PuiseuxSeriesField(R, prec, string(s); cached=cached)
-end
-
-function PuiseuxSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
-   Generic.PuiseuxSeriesField(R, prec, s; cached=cached)
-end
-
-function PuiseuxSeriesField(R::Field, prec::Int, s::Char; cached=true)
-   PuiseuxSeriesField(R, prec, string(s); cached=cached)
 end
 
 @doc Markdown.doc"""

@@ -26,16 +26,20 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-function LaurentSeriesRing(R::Ring, prec::Int, s::Symbol; cached=true)
-   return Generic.LaurentSeriesRing(R, prec, s; cached=cached)
-end
-
 function LaurentSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
    return Generic.LaurentSeriesRing(R, prec, Symbol(s); cached=cached)
 end
 
+function LaurentSeriesRing(R::Ring, prec::Int, s::Symbol; cached=true)
+   return Generic.LaurentSeriesRing(R, prec, s; cached=cached)
+end
+
 function LaurentSeriesRing(R::Ring, prec::Int, s::Char; cached=true)
    return Generic.LaurentSeriesRing(R, prec, Symbol(s); cached=cached)
+end
+
+function LaurentSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
+   return Generic.LaurentSeriesField(R, prec, Symbol(s); cached=cached)
 end
 
 function LaurentSeriesField(R::Field, prec::Int, s::Symbol; cached=true)
@@ -46,6 +50,3 @@ function LaurentSeriesField(R::Field, prec::Int, s::Char; cached=true)
    return Generic.LaurentSeriesField(R, prec, Symbol(s); cached=cached)
 end
 
-function LaurentSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
-   return Generic.LaurentSeriesField(R, prec, Symbol(s); cached=cached)
-end
