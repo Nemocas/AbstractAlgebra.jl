@@ -23,7 +23,7 @@ interface.
 Free modules can be built over both commutative and noncommutative rings. Other
 types of module are restricted to fields and euclidean rings.
 
-## Types and parents
+## Abstract types
 
 AbstractAlgebra provides two abstract types for finitely presented modules and
 their elements:
