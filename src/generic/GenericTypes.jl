@@ -952,9 +952,6 @@ end
 #
 ###############################################################################
 
-Map(::Type{T}) where T <: AbstractAlgebra.Map = supertype(T)
-Map(::Type{S}) where S <: AbstractAlgebra.SetMap = Map{D, C, <:S, T} where {D, C, T}
-
 mutable struct CompositeMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.SetMap, CompositeMap}
    domain::D
    codomain::C

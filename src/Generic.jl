@@ -67,6 +67,8 @@ import ..AbstractAlgebra: term_degree, terms_degrees, degrees_range
 
 import ..AbstractAlgebra: reduced_form, isreduced_form
 
+import ..AbstractAlgebra: domain, codomain, get_field, set_field!
+
 using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")
