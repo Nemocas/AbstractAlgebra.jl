@@ -128,8 +128,6 @@ export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
 
 export ZZ, QQ, zz, qq, RealField, RDF
 
-export SymmetricGroup
-
 export create_accessors, get_handle, package_handle, zeros,
        Array, sig_exists
 
@@ -425,6 +423,7 @@ include("MapCache.jl")
 include("MapWithInverse.jl")
 include("ModuleHomomorphism.jl")
 include("YoungTabs.jl")
+include("PermGroups.jl")
 
 ###############################################################################
 #
@@ -561,14 +560,6 @@ export displayed_with_minus_in_front, show_minus_one
 #   Parent constructors
 #
 ################################################################################
-
-function SymmetricGroup(n::T) where T
-  Generic.SymmetricGroup(n)
-end
-
-function AllPerms(n::T) where T
-  Generic.AllPerms(n)
-end
 
 function SkewDiagram(lambda::Generic.Partition, mu::Generic.Partition)
   Generic.SkewDiagram(lambda, mu)
