@@ -424,6 +424,7 @@ include("MapWithInverse.jl")
 include("ModuleHomomorphism.jl")
 include("YoungTabs.jl")
 include("PermGroups.jl")
+include("LaurentSeries.jl")
 
 ###############################################################################
 #
@@ -503,8 +504,8 @@ export abs_series, abs_series_type, add!, addeq!,
                  combine_like_terms!, cycles,
                  data, defining_polynomial, degrees,
                  dense_matrix_type, dense_poly_type, det,
-                 discriminant, downscale,
-                 elem_type, exp_gcd,
+                 discriminant,
+                 elem_type,
                  exponent, exponent_vector, exponent_vectors,
                  finish, fit!, gcd, gen,
                  gens, gcdinv, gcdx,
@@ -544,7 +545,7 @@ export abs_series, abs_series_type, add!, addeq!,
                  size, sort_terms!, subst, summands, supermodule,
                  sylvester_matrix, term, terms, to_univariate,
                  total_degree, trailing_coefficient, truncate,
-                 upscale, var_index, vars, zero,
+                 var_index, vars, zero,
                  @PolynomialRing, MatrixElem,
        # Moved from Hecke into Misc
                  divexact_low, divhigh,
@@ -579,33 +580,6 @@ end
 
 function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
    Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
-end
-
-@doc (@doc Generic.LaurentSeriesRing)
-LaurentSeriesRing(R::Ring, prec::Int, s::Union{Char, AbstractString}; cached=true)
-
-function LaurentSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
-   Generic.LaurentSeriesRing(R, prec, s; cached=cached)
-end
-
-function LaurentSeriesRing(R::Ring, prec::Int, s::Char; cached=true)
-   LaurentSeriesRing(R, prec, string(s); cached=cached)
-end
-
-function LaurentSeriesRing(R::Field, prec::Int, s::AbstractString; cached=true)
-   Generic.LaurentSeriesField(R, prec, s; cached=cached)
-end
-
-function LaurentSeriesRing(R::Field, prec::Int, s::Char; cached=true)
-   LaurentSeriesField(R, prec, string(s); cached=cached)
-end
-
-function LaurentSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
-   Generic.LaurentSeriesField(R, prec, s; cached=cached)
-end
-
-function LaurentSeriesField(R::Field, prec::Int, s::Char; cached=true)
-   LaurentSeriesField(R, prec, string(s); cached=cached)
 end
 
 function PuiseuxSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)

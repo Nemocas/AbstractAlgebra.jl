@@ -805,7 +805,7 @@ precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
 function PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true)
-   S, x = LaurentSeriesRing(R, prec, s; cached=cached)
+   S, x = AbstractAlgebra.LaurentSeriesRing(R, prec, s; cached=cached)
    T = elem_type(R)
 
    parent_obj = PuiseuxSeriesRing{T}(S, cached)
@@ -814,7 +814,7 @@ function PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString
 end
 
 function PuiseuxSeriesRing(R::AbstractAlgebra.Field, prec::Int, s::AbstractString; cached= true)
-   S, x = LaurentSeriesField(R, prec, s; cached=cached)
+   S, x = AbstractAlgebra.LaurentSeriesField(R, prec, s; cached=cached)
    T = elem_type(R)
 
    parent_obj = PuiseuxSeriesField{T}(S, cached)
@@ -823,7 +823,7 @@ function PuiseuxSeriesRing(R::AbstractAlgebra.Field, prec::Int, s::AbstractStrin
 end
 
 function PuiseuxSeriesField(R::AbstractAlgebra.Field, prec::Int, s::AbstractString; cached = true)
-   S, x = LaurentSeriesField(R, prec, s; cached=cached)
+   S, x = AbstractAlgebra.LaurentSeriesField(R, prec, s; cached=cached)
    T = elem_type(R)
 
    parent_obj = PuiseuxSeriesField{T}(S, cached)
