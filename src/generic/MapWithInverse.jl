@@ -1,20 +1,15 @@
 ################################################################################
 #
-#  MapWithInverse.jl : Map with section, retraction, two-sided inverse, etc.
+#  MapWithInverse.jl : Generic Map with section, retraction,
+#                      two-sided inverse, etc.
 #
 ################################################################################
-
-export map_with_preimage_from_func, map_with_section_from_func, 
-       map_with_retraction_from_func, image_map, preimage_map, section_map,
-       retraction_map, map_with_retraction, map_with_section, inverse_fn
 
 ################################################################################
 #
 #  MapWithSection
 #
 ################################################################################
-
-map_with_section(f::Map{D, C}, g::Map{C, D}) where {D, C} = MapWithSection(f, g)
 
 domain(f::MapWithSection{D, C}) where {D, C} = domain(f.map)::D
 codomain(f::MapWithSection{D, C}) where {D, C} = codomain(f.map)::C
@@ -25,26 +20,6 @@ preimage_map(f::MapWithSection) = f.section # for convenience only
 section_map(f::MapWithSection) = f.section
 
 (f::MapWithSection{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
-
-# These two functions are provided for convenience only. Strictly speaking
-# preimage is not the correct name for this type of construction.
-function map_with_preimage_from_func(image_fn::Function, inverse_fn::Function, domain, codomain)
-   return MapWithSection(FunctionalMap(domain, codomain, image_fn),
-                          FunctionalMap(codomain, domain, inverse_fn))
-end
-
-function map_with_preimage_from_func(image_fn::Function, domain, codomain)
-   return MapWithSection(FunctionalMap(domain, codomain, image_fn))
-end
-
-function map_with_section_from_func(image_fn::Function, inverse_fn::Function, domain, codomain)
-   return MapWithSection(FunctionalMap(domain, codomain, image_fn),
-                          FunctionalMap(codomain, domain, inverse_fn))
-end
-
-function map_with_section_from_func(image_fn::Function, domain, codomain)
-   return MapWithSection(FunctionalMap(domain, codomain, image_fn))
-end
 
 function show(io::IO, M::MapWithSection)
    println(io, "Map with section with the following data")
@@ -72,14 +47,12 @@ end
 function Base.inv(f::MapWithSection)
    return MapWithRetraction(f.section, f.map)
 end
- 
+
 ################################################################################
 #
 #  MapWithRetraction
 #
 ################################################################################
-
-map_with_retraction(f::Map{D, C}, g::Map{C, D}) where {D, C} = MapWithRetraction(f, g)
 
 domain(f::MapWithRetraction{D, C}) where {D, C} = domain(f.map)::D
 codomain(f::MapWithRetraction{D, C}) where {D, C} = codomain(f.map)::C
@@ -91,15 +64,6 @@ retraction_map(f::MapWithRetraction) = f.retraction
 retraction_map(f::MapCache) = retraction_map(f.map)
 
 (f::MapWithRetraction{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
-
-function map_with_retraction_from_func(image_fn::Function, inverse_fn::Function, domain, codomain)
-   return MapWithRetraction(FunctionalMap(domain, codomain, image_fn),
-                          FunctionalMap(codomain, domain, inverse_fn))
-end
-
-function map_with_retraction_from_func(image_fn::Function, domain, codomain)
-   return MapWithRetraction(FunctionalMap(domain, codomain, image_fn))
-end
 
 function show(io::IO, M::MapWithRetraction)
    println(io, "Map with retraction with the following data")
@@ -127,4 +91,3 @@ end
 function Base.inv(f::MapWithRetraction)
    return MapWithSection(f.retraction, f.map)
 end
-
