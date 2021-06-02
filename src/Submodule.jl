@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export Submodule, SubmoduleElem, gens, ngens,sub, supermodule
+export Submodule, SubmoduleElem, gens, ngens, sub, supermodule
 
 ###############################################################################
 #

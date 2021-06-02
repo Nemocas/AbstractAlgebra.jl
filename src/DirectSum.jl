@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export DirectSumModule, DirectSumModuleElem, summands
+export DirectSum, DirectSumModule, DirectSumModuleElem, direct_sum, summands
 
 ###############################################################################
 #
@@ -14,7 +14,8 @@ export DirectSumModule, DirectSumModuleElem, summands
 
 @doc Markdown.doc"""
     DirectSum(m::Vector{<:FPModule{T}}) where T <: RingElement
-
+    DirectSum(vals::FPModule{T}...) where T <: RingElement
+    
 Return a tuple $M, f, g$ consisting of $M$ the direct sum of the modules `m`
 (supplied as a vector of modules), a vector $f$ of the injections
 of the $m[i]$ into $M$ and a vector $g$ of the projections from

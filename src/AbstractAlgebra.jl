@@ -448,7 +448,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
                  exponent, exponent_vector, exponent_vectors,
                  finish, fit!, gcd, gcdx,
                  has_left_neighbor, has_bottom_neighbor, hash,
-                 hooklength, identity_map, image,
+                 hooklength, identity_map,
                  image_map, image_fn,
                  inverse_fn, inverse_image_fn,
                  inverse_mat, reverse_rows, reverse_rows!,
@@ -495,7 +495,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export abs_series, abs_series_type, add!, addeq!,
                  addmul_delayed_reduction!, addmul!,
-		 base_field, base_ring,
+		 base_field, base_ring, basis,
                  canonical_unit, can_solve_left_reduced_triu,
                  change_base_ring, character,
                  chebyshev_t,
@@ -509,7 +509,7 @@ export abs_series, abs_series_type, add!, addeq!,
                  finish, fit!, gcd, gen,
                  gens, gcdinv, gcdx,
                  has_left_neighbor, has_bottom_neighbor, hash,
-                 hooklength, image,
+                 hooklength,
                  interpolate,
                  inv!, inverse_image_fn,
                  inverse_mat, invmod,
@@ -752,30 +752,12 @@ function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: Rin
    Generic.sub(m, subs)
 end
 
-function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, A...)
-   Generic.ModuleHomomorphism(M1, M2, A...)
-end
-
-function module_homomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
-   Generic.ModuleHomomorphism(M1, M2, m)
-end
-
-function ModuleIsomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
-   Generic.ModuleIsomorphism(M1, M2, m)
-end
-
-function module_isomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
-   Generic.ModuleIsomorphism(M1, M2, m)
-end
-
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, LaurentPolynomialRing,
        MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, RationalFunctionField,
        FunctionField, PuiseuxSeriesRing,
-       PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, sub,
-       quo, DirectSum, ModuleIsomorphism, free_module, vector_space,
-       module_homomorphism, direct_sum, module_isomorphism, basis
+       PuiseuxSeriesField
 
 export Generic
 

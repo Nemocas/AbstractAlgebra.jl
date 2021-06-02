@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export FreeModule, FreeModuleElem
+export FreeModule, FreeModuleElem, VectorSpace, free_module, vector_space
 
 ###############################################################################
 #

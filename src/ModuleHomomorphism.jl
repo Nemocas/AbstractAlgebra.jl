@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export ModuleHomomorphism, image, inverse_image_fn, inverse_mat, mat,
+export ModuleHomomorphism, ModuleIsomorphism, image, inverse_image_fn,
+       inverse_mat, mat, module_homomorphism, module_isomorphism,
        preimage
 
 ###############################################################################
@@ -183,6 +184,14 @@ function ModuleHomomorphism(M1::FPModule{T},
    return Generic.ModuleHomomorphism(M1, M2, v)
 end
 
+function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, A...)
+   Generic.ModuleHomomorphism(M1, M2, A...)
+end
+
+function module_homomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
+   Generic.ModuleHomomorphism(M1, M2, m)
+end
+
 @doc Markdown.doc"""
     ModuleIsomorphism(M1::FPModule{T}, M2::FPModule{T}, M::MatElem{T},
 	                                     minv::MatElem{T}) where T <: RingElement
@@ -192,4 +201,12 @@ inverse morphism is automatically computed.
 function ModuleIsomorphism(M1::FPModule{T},
                           M2::FPModule{T}, M::MatElem{T}) where T <: RingElement
    return Generic.ModuleIsomorphism(M1, M2, M)
+end
+
+function ModuleIsomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
+   Generic.ModuleIsomorphism(M1, M2, m)
+end
+
+function module_isomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
+   Generic.ModuleIsomorphism(M1, M2, m)
 end

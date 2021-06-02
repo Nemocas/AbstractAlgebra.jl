@@ -30,7 +30,6 @@ elements to `FPModuleElem{T}`.
 
 ```@docs
 DirectSum(::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
-DirectSum(::AbstractAlgebra.FPModule{T}...) where T <: RingElement
 ```
 
 **Examples**
