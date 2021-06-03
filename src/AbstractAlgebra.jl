@@ -5,6 +5,7 @@
 """
 module AbstractAlgebra
 
+using Random: SamplerTrivial, GLOBAL_RNG
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 
 using Markdown
@@ -427,6 +428,7 @@ include("PermGroups.jl")
 include("LaurentSeries.jl")
 include("PuiseuxSeries.jl")
 include("SparsePoly.jl")
+include("AbsMSeries.jl")
 
 ###############################################################################
 #
@@ -475,7 +477,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
                  ngens, norm, normalise,
 		 num_coeff, one,
                  order, ordering, parity, partitionseq, Perm, perm,
-                 permtype, @perm_str, polcoeff,
+                 permtype, @perm_str, polcoeff, poly, poly_ring,
                  precision, preimage, preimage_map,
 		 prime, push_term!,
                  rand_ordering, reduce!,
@@ -534,7 +536,8 @@ export abs_series, abs_series_type, add!, addeq!,
                  normalise, nullspace, num_coeff,
 		 one, order, ordering,
                  parent_type, parity, partitionseq, Perm, perm, permtype,
-                 @perm_str, polcoeff, polynomial, pow_multinomial,
+                 @perm_str, polcoeff, polynomial, poly,
+		 poly_ring, pow_multinomial,
                  ppio, precision, preimage, prime,
 		 push_term!, rank,
                  rand_ordering, reduce!,
@@ -574,14 +577,6 @@ end
 
 function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.n))
    Generic.YoungTableau(part, fill)
-end
-
-function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int}, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
-   Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
-end
-
-function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
-   Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
 end
 
 @doc Markdown.doc"""
