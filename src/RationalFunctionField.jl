@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   RationalFunctionField.jl : Generic rational function fields
+#   RationalFunctionField.jl : Rational function fields
 #
 ###############################################################################
 

@@ -430,6 +430,7 @@ include("PuiseuxSeries.jl")
 include("SparsePoly.jl")
 include("AbsMSeries.jl")
 include("RationalFunctionField.jl")
+include("FunctionField.jl")
 
 ###############################################################################
 #
@@ -501,7 +502,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export abs_series, abs_series_type, add!, addeq!,
                  addmul_delayed_reduction!, addmul!,
-		 base_field, base_ring, basis,
+                 base_field, base_ring, basis,
                  canonical_unit, can_solve_left_reduced_triu,
                  change_base_ring, character,
                  chebyshev_t,
@@ -633,16 +634,24 @@ function ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = tr
    Generic.ResidueField(R, a; cached=cached)
 end
 
+function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Symbol; cached::Bool=true) where T <: FieldElement
+   return Generic.FunctionField(p, s; cached=cached)
+end
+
+function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
+   return Generic.FunctionField(p, Symbol(s); cached=cached)
+end
+
+function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Char; cached::Bool=true) where T <: FieldElement
+   return Generic.FunctionField(p, Symbol(s); cached=cached)
+end
+
 function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
    Generic.NumberField(a, s, t; cached=cached)
 end
 
 function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Char, t = "\$"; cached = true)
    NumberField(a, string(s), t; cached=cached)
-end
-
-function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
-   Generic.FunctionField(p, s; cached=cached)
 end
 
 @doc Markdown.doc"""
@@ -661,8 +670,7 @@ function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: Rin
 end
 
 export FractionField, ResidueRing,
-       ResidueField, NumberField,
-       FunctionField
+       ResidueField, NumberField
 
 export Generic
 
