@@ -429,6 +429,7 @@ include("LaurentSeries.jl")
 include("PuiseuxSeries.jl")
 include("SparsePoly.jl")
 include("AbsMSeries.jl")
+include("RationalFunctionField.jl")
 
 ###############################################################################
 #
@@ -532,7 +533,7 @@ export abs_series, abs_series_type, add!, addeq!,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx, mul!,
                  mul_ks, mul_red!, mullow_karatsuba, mulmod,
-                 needs_parentheses, newton_to_monomial!, ngens, norm,
+                 needs_parentheses, newton_to_monomial!, ngens,
                  normalise, nullspace, num_coeff,
 		 one, order, ordering,
                  parent_type, parity, partitionseq, Perm, perm, permtype,
@@ -640,10 +641,6 @@ function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Char,
    NumberField(a, string(s), t; cached=cached)
 end
 
-function RationalFunctionField(k::Field, s::AbstractString; cached = true)
-   Generic.RationalFunctionField(k, s; cached=cached)
-end
-
 function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
    Generic.FunctionField(p, s; cached=cached)
 end
@@ -664,7 +661,7 @@ function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: Rin
 end
 
 export FractionField, ResidueRing,
-       ResidueField, NumberField, RationalFunctionField,
+       ResidueField, NumberField,
        FunctionField
 
 export Generic
