@@ -1473,8 +1473,8 @@ end
 
 @testset "Generic.Mat.pfaffian" begin
    n = 5
-   R, x = PolynomialRing(QQ, ["x$i" for i in 1:binomial(n,2)])
-   pf = [R(1), R(), x[1], R(), x[1]*x[6]-x[2]*x[5]+x[3]*x[4], R()]
+   R, x = PolynomialRing(QQ, ["x$i" for i in 1:binomial(n, 2)])
+   pf = [R(1), R(), x[1], R(), x[1]*x[6] - x[2]*x[5] + x[3]*x[4], R()]
    for dim in 0:5
       idx = 0
       M = matrix(R, [j <= i ? R() : (idx += 1; x[idx]) for j in 1:dim, i in 1:dim])
@@ -1486,7 +1486,7 @@ end
       @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian_bfl(M)
    end
    
-   S, z = PolynomialRing(ZZ,"z")
+   S, z = PolynomialRing(ZZ, "z")
    n = 5
    for dim = 0:n
       R = MatrixSpace(S, dim, dim)

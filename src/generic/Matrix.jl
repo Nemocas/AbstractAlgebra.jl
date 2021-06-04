@@ -2020,9 +2020,9 @@ function isskew_symmetric(M::MatElem)
    n = nrows(M)
    n == ncols(M) || return false
    for i in 1:n
-      M[i,i] == 0 || return false
-      for j in i+1:n
-         M[i,j] == -M[j,i] || return false
+      M[i, i] == 0 || return false
+      for j in i + 1:n
+         M[i, j] == -M[j, i] || return false
       end
    end
    return true
@@ -2066,16 +2066,16 @@ function _pfaffian(M::MatElem, idx::Vector{Int}, k::Int)
    k == 2 && return M[idx[1], idx[2]]
    ans = R()
    sig = false
-   for i in k-1:-1:1
-      idx[i], idx[k-1] = idx[k-1], idx[i]
+   for i in k - 1:-1:1
+      idx[i], idx[k - 1] = idx[k - 1], idx[i]
       sig = !sig
-      g = M[idx[k-1], idx[k]]
+      g = M[idx[k - 1], idx[k]]
       if g != 0
-         ans = (sig ? (+) : (-))(ans, g * _pfaffian(M, idx, k-2))
+         ans = (sig ? (+) : (-))(ans, g * _pfaffian(M, idx, k - 2))
       end
    end
-   x = idx[k-1]
-   deleteat!(idx, k-1)
+   x = idx[k - 1]
+   deleteat!(idx, k - 1)
    pushfirst!(idx, x) # restore idx
    return ans
 end
@@ -2099,11 +2099,11 @@ function pfaffian_bfl(M::MatElem)
    N = deepcopy(M)
    for i in 1:2:n
       for j in 1:n
-         N[j, i], N[j, i+1] = N[j, i+1], -N[j, i]
+         N[j, i], N[j, i + 1] = N[j, i + 1], -N[j, i]
       end
    end
    P = deepcopy(N)
-   for i in 1:k-1
+   for i in 1:k - 1
       P -= (1//2i) * tr(P)
       P *= N
    end
