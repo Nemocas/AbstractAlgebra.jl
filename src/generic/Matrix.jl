@@ -2012,6 +2012,104 @@ end
 
 ###############################################################################
 #
+#   Pfaffian
+#
+###############################################################################
+
+function isskew_symmetric(M::MatElem)
+   n = nrows(M)
+   n == ncols(M) || return false
+   for i in 1:n
+      M[i,i] == 0 || return false
+      for j in i+1:n
+         M[i,j] == -M[j,i] || return false
+      end
+   end
+   return true
+end
+
+function check_skew_symmetric(M::MatElem)
+   isskew_symmetric(M) || throw(DomainError(M, "matrix must be skew-symmetric"))
+   M
+end
+
+@doc Markdown.doc"""
+    pfaffian(M::AbstractAlgebra.MatElem)
+
+Return the Pfaffian of a skew-symmetric matrix M.
+"""
+function pfaffian(M::MatElem)
+   check_skew_symmetric(M)
+   _pfaffian(M, collect(1:ncols(M)), ncols(M))
+end
+
+@doc Markdown.doc"""
+    pfaffians(M::AbstractAlgebra.MatElem, k::Int)
+
+Return an array consisting of the k-Pfaffians of a skew-symmetric matrix M.
+"""
+function pfaffians(M::MatElem, k::Int)
+   check_skew_symmetric(M)
+   indices = combinations(ncols(M), k)
+   pfs = elem_type(base_ring(M))[]
+   for i in indices
+      push!(pfs, _pfaffian(M, i, k))
+   end
+   return pfs
+end
+
+# actual computation using recursion
+function _pfaffian(M::MatElem, idx::Vector{Int}, k::Int)
+   R = base_ring(M)
+   k == 0 && return R(1)
+   isodd(k) && return R()
+   k == 2 && return M[idx[1], idx[2]]
+   ans = R()
+   sig = false
+   for i in k-1:-1:1
+      idx[i], idx[k-1] = idx[k-1], idx[i]
+      sig = !sig
+      g = M[idx[k-1], idx[k]]
+      if g != 0
+         ans = (sig ? (+) : (-))(ans, g * _pfaffian(M, idx, k-2))
+      end
+   end
+   pushfirst!(idx, popat!(idx, k-1)) # restore idx
+   return ans
+end
+
+@doc Markdown.doc"""
+    pfaffian_bfl(M::AbstractAlgebra.MatElem)
+
+Return the Pfaffian of a skew-symmetric matrix M, using the algorithm of
+Baer-Faddeev-LeVerrier. The base ring of M should be a QQ-algebra to allow
+integer divisions.
+"""
+function pfaffian_bfl(M::MatElem)
+   check_skew_symmetric(M)
+   R = base_ring(M)
+   characteristic(R) == 0 || throw(DomainError(M, "base ring must be of characteristic 0"))
+   n = ncols(M)
+   n == 0 && return R(1)
+   isodd(n) && return R()
+   n == 2 && return M[1, 2]
+   k = div(n, 2)
+   N = deepcopy(M)
+   for i in 1:2:n
+      for j in 1:n
+         N[j, i], N[j, i+1] = N[j, i+1], -N[j, i]
+      end
+   end
+   P = deepcopy(N)
+   for i in 1:k-1
+      P -= (1//2i) * tr(P)
+      P *= N
+   end
+   return (-1)^k * (-1//2k) * tr(P)
+end
+
+###############################################################################
+#
 #   Rank
 #
 ###############################################################################

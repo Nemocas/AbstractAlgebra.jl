@@ -1471,6 +1471,39 @@ end
    end
 end
 
+@testset "Generic.Mat.pfaffian" begin
+   n = 5
+   R, x = PolynomialRing(QQ, ["x$i" for i in 1:binomial(n,2)])
+   pf = [R(1), R(), x[1], R(), x[1]*x[6]-x[2]*x[5]+x[3]*x[4], R()]
+   for dim in 0:5
+      idx = 0
+      M = matrix(R, [j <= i ? R() : (idx += 1; x[idx]) for j in 1:dim, i in 1:dim])
+      if dim >= 2 # the matrix is indeed skew-symmetric when dim <= 1
+         @test_throws DomainError AbstractAlgebra.Generic.pfaffian(M)
+      end
+      M = transpose(M) - M
+      @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian(M)
+      @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian_bfl(M)
+   end
+   
+   S, z = PolynomialRing(ZZ,"z")
+   n = 5
+   for dim = 0:n
+      R = MatrixSpace(S, dim, dim)
+      M = rand(R, -1:5, -5:5)
+      M = transpose(M) - M
+      @test [1] == AbstractAlgebra.Generic.pfaffians(M, 0)
+      for i = 1:2:dim
+         for m in AbstractAlgebra.Generic.pfaffians(M, i)
+            @test m == 0
+         end
+      end
+      @test det(M) == AbstractAlgebra.Generic.pfaffian(M)^2
+      @test det(M) == AbstractAlgebra.Generic.pfaffians(M, dim)[1]^2
+      @test [] == AbstractAlgebra.Generic.pfaffians(M, dim + 1)
+   end
+end
+
 @testset "Generic.Mat.rank" begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixSpace(S, 5, 5)
