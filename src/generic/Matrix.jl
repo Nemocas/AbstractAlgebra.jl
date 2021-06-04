@@ -2074,7 +2074,9 @@ function _pfaffian(M::MatElem, idx::Vector{Int}, k::Int)
          ans = (sig ? (+) : (-))(ans, g * _pfaffian(M, idx, k-2))
       end
    end
-   pushfirst!(idx, popat!(idx, k-1)) # restore idx
+   x = idx[k-1]
+   deleteat!(idx, k-1)
+   pushfirst!(idx, x) # restore idx
    return ans
 end
 
