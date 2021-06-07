@@ -11,8 +11,8 @@ AbstractAlgebra.jl provides a very naive implementation of number fields. This a
 arithmetic in algebraic number fields, which are currently modeled as $\mathbb{Q}[x]$
 modulo an irreducible polynomial, i.e. as a residue field.
 
-In fact, the definition of the number field constructor is currently given in
-`src/generic/ResidueField.jl` and no type is defined for a number field. The definition
+The definition of the number field constructor is given in
+`src/generic/NumberField.jl` but no type is defined for a number field. The definition
 mainly exists for testing purposes. It may later be replaced by a more standard
 implementation. For a more fully fleshed out number field implementation (based on a
 very high performance C library), see Nemo.jl.
@@ -23,7 +23,7 @@ In order to construct number fields in AbstractAlgebra.jl, one must first constr
 field itself. This is accomplished with the following constructor.
 
 ```julia
-NumberField(f::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+NumberField(f::Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
 ```
 
 Given an irreducible defining polynomial $f$ in $\mathbb{Q}[x]$, return a tuple $(K, x)$

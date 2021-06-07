@@ -7,42 +7,40 @@ end
 
 # Generic residue rings
 
-AbstractAlgebra.jl provides a module, implemented in `src/generic/Residue.jl` for
-generic residue rings over any Euclidean domain (in practice most of the functionality
-is provided for GCD domains that provide a meaningful GCD function) belonging to the
+AbstractAlgebra.jl provides modules, implemented in `src/Residue.jl` and
+`src/ResidueField` for residue rings and fields, respectively, over any
+Euclidean domain (in practice most of the functionality is provided for GCD
+domains that provide a meaningful GCD function) belonging to the
 AbstractAlgebra.jl abstract type hierarchy.
 
-As well as implementing the Residue Ring interface a number of generic algorithms are
-implemented for residue rings. We describe this generic functionality below.
+## Generic residue types
 
-All of the generic functionality is part of a submodule of AbstractAlgebra called
-`Generic`. This is exported by default so that it is not necessary to qualify the
-function names with the submodule name.
+AbstractAlgebra.jl implements generic residue rings with type `Generic.Res{T}`
+or in the case of residue rings that are known to be fields, `Generic.ResF{T}`,
+where `T` is the type of elements of the base ring. See the file
+`src/generic/GenericTypes.jl` for details.
 
-## Types and parent objects
-
-Residues implemented using the AbstractAlgebra generics have type `Generic.Res{T}`
-or in the case of residue rings that are known to be fields, `Generic.ResF{T}`, where
-`T` is the type of elements of the base ring. See the file `src/generic/GenericTypes.jl`
-for details.
-
-Parent objects of residue ring elements have type `Generic.ResRing{T}` and those of
-residue fields have type `GenericResField{T}`.
+Parent objects of generic residue ring elements have type `Generic.ResRing{T}`
+and those of residue fields have type `GenericResField{T}`.
 
 The defining modulus of the residue ring is stored in the parent object.
 
-The residue element types belong to the abstract type `AbstractAlgebra.ResElem{T}`
-or `AbstractAlgebra.ResFieldElem{T}` in the case of residue fields, and the residue
-ring types belong to the abstract type `AbstractAlgebra.ResRing{T}` or
-`AbstractAlgebra.ResField{T}` respectively. This enables one to write generic functions
-that can accept any AbstractAlgebra residue type.
+## Abstract types
 
-Note that both the generic residue ring type `Generic.ResRing{T}` and the abstract
-type it belongs to, `AbstractAlgebra.ResRing{T}` are both called `ResRing`, and
-similarly for the residue field types. In each case, the  former is a (parameterised)
-concrete type for a residue ring over a given base ring whose elements have type `T`.
-The latter is an abstract type representing all residue ring types in
-AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C library).
+All residue element types belong to the abstract type `ResElem{T}`
+or `AbstractAlgebra.ResFieldElem{T}` in the case of residue fields, and the
+residue ring types belong to the abstract type `ResRing{T}` or `ResField{T}`
+respectively. This enables one to write generic functions that can accept any
+AbstractAlgebra residue type.
+
+
+Note that both the generic residue ring type `Generic.ResRing{T}` and the
+abstract type it belongs to, `ResRing{T}` are both called `ResRing`, and
+similarly for the residue field types. In each case, the  former is a
+(parameterised) concrete type for a residue ring over a given base ring whose
+elements have type `T`. The latter is an abstract type representing all
+residue ring types in AbstractAlgebra.jl, whether generic or very specialised
+(e.g. supplied by a C library).
 
 ## Residue ring constructors
 
