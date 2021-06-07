@@ -2110,6 +2110,64 @@ function pfaffian_bfl(M::MatElem)
    return (-1)^k * (-1//2k) * tr(P)
 end
 
+function trace_of_prod(M::MatElem, N::MatElem)
+   issquare(M) && issquare(N) || error("Not a square matrix in trace")
+   d = zero(base_ring(M))
+   for i = 1:nrows(M)
+      d += (M[i, :] * N[:, i])[1, 1]
+   end
+   return d
+end
+
+# use baby-step giant-step
+function pfaffian_bfl_bsgs(M::MatElem)
+   check_skew_symmetric(M)
+   R = base_ring(M)
+   characteristic(R) == 0 || throw(DomainError(M, "base ring must be of characteristic 0"))
+   n = ncols(M)
+   n == 0 && return R(1)
+   isodd(n) && return R()
+   n == 2 && return M[1, 2]
+   k = div(n, 2)
+   N = deepcopy(M)
+   for i in 1:2:n
+      for j in 1:n
+         N[j, i], N[j, i + 1] = N[j, i + 1], -N[j, i]
+      end
+   end
+
+   # precompute the powers of N and their traces
+   m = isqrt(n)
+   Ni = [N]
+   for i in 1:m - 1
+      push!(Ni, Ni[end] * N)
+   end
+   t = tr.(Ni)
+
+   P = identity_matrix(R, n)
+   c = Vector{elem_type(R)}(undef, m)
+   i = 1
+   while i <= k - 1
+      m = min(m, k - i)
+      # compute the coefficient c[m - j] before each N^j
+      for j in 1:m
+         c[j] = trace_of_prod(Ni[j], P)
+         for k in 1:j - 1
+            c[j] += t[k] * c[j - k]
+         end
+         c[j] *= -1//2(i + j - 1)
+      end
+      P *= Ni[m]
+      for j in 1:m - 1
+         P += c[m - j] * Ni[j]
+      end
+      P += c[m]
+      i += m
+   end
+
+   return (-1)^k * (-1//2k) * trace_of_prod(N, P)
+end
+
 ###############################################################################
 #
 #   Rank

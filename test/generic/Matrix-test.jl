@@ -1484,6 +1484,7 @@ end
       M = transpose(M) - M
       @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian(M)
       @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian_bfl(M)
+      @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian_bfl_bsgs(M)
    end
    
    S, z = PolynomialRing(ZZ, "z")
