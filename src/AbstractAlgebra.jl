@@ -432,6 +432,8 @@ include("AbsMSeries.jl")
 include("RationalFunctionField.jl")
 include("FunctionField.jl")
 include("Residue.jl")
+include("ResidueField.jl")
+include("NumberField.jl")
 
 ###############################################################################
 #
@@ -614,18 +616,23 @@ function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::Char;
    PolynomialRing(R, n, string(s); cached = cached, ordering = ordering)
 end
 
+function NumberField(a::Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+   return Generic.NumberField(a, Symbol(s), t; cached=cached)
+end
+
+function NumberField(a::Generic.Poly{Rational{BigInt}}, s::Char, t = "\$"; cached = true)
+   return Generic.NumberField(a, Symbol(s), t; cached=cached)
+end
+
+function NumberField(a::Generic.Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cached = true)
+   return Generic.NumberField(a, s, t; cached=cached)
+end
+
 @doc (@doc Generic.FractionField)
 FractionField(R::Ring; cached=true)
 
 function FractionField(R::Ring; cached=true)
    Generic.FractionField(R; cached=cached)
-end
-
-@doc (@doc Generic.ResidueField)
-ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
-
-function ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
-   Generic.ResidueField(R, a; cached=cached)
 end
 
 function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Symbol; cached::Bool=true) where T <: FieldElement
@@ -638,14 +645,6 @@ end
 
 function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Char; cached::Bool=true) where T <: FieldElement
    return Generic.FunctionField(p, Symbol(s); cached=cached)
-end
-
-function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
-   Generic.NumberField(a, s, t; cached=cached)
-end
-
-function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Char, t = "\$"; cached = true)
-   NumberField(a, string(s), t; cached=cached)
 end
 
 @doc Markdown.doc"""
@@ -664,7 +663,7 @@ function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: Rin
 end
 
 export FractionField,
-       ResidueField, NumberField
+       ResidueField
 
 export Generic
 
