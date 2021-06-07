@@ -431,6 +431,7 @@ include("SparsePoly.jl")
 include("AbsMSeries.jl")
 include("RationalFunctionField.jl")
 include("FunctionField.jl")
+include("Residue.jl")
 
 ###############################################################################
 #
@@ -442,12 +443,12 @@ include("Generic.jl")
 
 # Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
 # as we have our own
-import .Generic: abs_series, abs_series_type, add!, addeq!, 
+import .Generic: abs_series, abs_series_type, 
                  base_field, basis,
                  character,
                  check_composable,
                  combine_like_terms!, cycles,
-                 data, defining_polynomial, degrees,
+                 defining_polynomial, degrees,
                  dense_matrix_type, dense_poly_type,
                  dim, disable_cache!,
                  downscale,
@@ -475,7 +476,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
                  matrix_repr, max_fields, mod,
                  monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!,
-                 MPolyBuildCtx, mul!, mullow_karatsuba,
+                 MPolyBuildCtx, mullow_karatsuba,
                  ngens, norm, normalise,
 		 num_coeff, one,
                  order, ordering, parity, partitionseq, Perm, perm,
@@ -500,7 +501,7 @@ import .Generic: abs_series, abs_series_type, add!, addeq!,
 		 power_sums_to_polynomial, roots, sturm_sequence
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
-export abs_series, abs_series_type, add!, addeq!,
+export abs_series, abs_series_type,
                  addmul_delayed_reduction!, addmul!,
                  base_field, base_ring, basis,
                  canonical_unit, can_solve_left_reduced_triu,
@@ -508,7 +509,7 @@ export abs_series, abs_series_type, add!, addeq!,
                  chebyshev_t,
                  chebyshev_u, check_composable, check_parent,
                  combine_like_terms!, cycles,
-                 data, defining_polynomial, degrees,
+                 defining_polynomial, degrees,
                  dense_matrix_type, dense_poly_type, det,
                  discriminant,
                  elem_type,
@@ -532,7 +533,7 @@ export abs_series, abs_series_type, add!, addeq!,
                  mat, matrix_repr, max_fields, mod,
                  monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
-                 MPolyBuildCtx, mul!,
+                 MPolyBuildCtx,
                  mul_ks, mul_red!, mullow_karatsuba, mulmod,
                  needs_parentheses, newton_to_monomial!, ngens,
                  normalise, nullspace, num_coeff,
@@ -620,13 +621,6 @@ function FractionField(R::Ring; cached=true)
    Generic.FractionField(R; cached=cached)
 end
 
-@doc (@doc Generic.ResidueRing)
-ResidueRing(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
-
-function ResidueRing(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
-   Generic.ResidueRing(R, a; cached=cached)
-end
-
 @doc (@doc Generic.ResidueField)
 ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
 
@@ -669,7 +663,7 @@ function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: Rin
    Generic.sub(m, subs)
 end
 
-export FractionField, ResidueRing,
+export FractionField,
        ResidueField, NumberField
 
 export Generic

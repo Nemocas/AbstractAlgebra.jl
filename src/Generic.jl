@@ -71,6 +71,8 @@ import ..AbstractAlgebra: domain, codomain, get_field, set_field!
 
 import ..AbstractAlgebra: cached
 
+import ..AbstractAlgebra: add!, addeq!, data, mul!
+
 using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")
