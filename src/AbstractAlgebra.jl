@@ -434,6 +434,7 @@ include("FunctionField.jl")
 include("Residue.jl")
 include("ResidueField.jl")
 include("NumberField.jl")
+include("Fraction.jl")
 
 ###############################################################################
 #
@@ -628,13 +629,6 @@ function NumberField(a::Generic.Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cac
    return Generic.NumberField(a, s, t; cached=cached)
 end
 
-@doc (@doc Generic.FractionField)
-FractionField(R::Ring; cached=true)
-
-function FractionField(R::Ring; cached=true)
-   Generic.FractionField(R; cached=cached)
-end
-
 function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Symbol; cached::Bool=true) where T <: FieldElement
    return Generic.FunctionField(p, s; cached=cached)
 end
@@ -661,9 +655,6 @@ end
 function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: RingElement, U <: Any}
    Generic.sub(m, subs)
 end
-
-export FractionField,
-       ResidueField
 
 export Generic
 
