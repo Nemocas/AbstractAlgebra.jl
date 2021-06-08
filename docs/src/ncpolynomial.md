@@ -28,13 +28,13 @@ base/coefficient ring $R$ is stored in the parent object.
 
 ## Abstract types
 
-The polynomial element types belong to the abstract type `AbstractAlgebra.NCPolyElem{T}`
+The polynomial element types belong to the abstract type `NCPolyElem{T}`
 and the polynomial ring types belong to the abstract type
-`AbstractAlgebra.NCPolyRing{T}`. This enables one to write generic functions that can
+`NCPolyRing{T}`. This enables one to write generic functions that can
 accept any AbstractAlgebra polynomial type.
 
 Note that both the generic polynomial ring type `Generic.NCPolyRing{T}` and the abstract
-type it belongs to, `AbstractAlgebra.NCPolyRing{T}` are both called `NCPolyRing`. The 
+type it belongs to, `NCPolyRing{T}` are both called `NCPolyRing`. The 
 former is a (parameterised) concrete type for a polynomial ring over a given base ring
 whose elements have type `T`. The latter is an abstract type representing all
 polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
@@ -46,7 +46,7 @@ In order to construct polynomials in AbstractAlgebra.jl, one must first construc
 polynomial ring itself. This is accomplished with the following constructor.
 
 ```julia
-PolynomialRing(R::AbstractAlgebra.NCRing, s::AbstractString; cached::Bool = true)
+PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
 ```
 
 Given a base ring `R` and string `s` specifying how the generator (variable) should be

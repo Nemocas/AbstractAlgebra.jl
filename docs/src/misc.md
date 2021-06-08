@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Miscellaneous
 
 ## Printing options
@@ -7,6 +14,6 @@ enable LaTeX rendering in Jupyter notebooks and query for the current state,
 use the following functions:
 
 ```@docs
-AbstractAlgebra.set_html_as_latex
-AbstractAlgebra.get_html_as_latex
+set_html_as_latex
+get_html_as_latex
 ```

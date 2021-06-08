@@ -17,8 +17,8 @@ types in `generic/GenericTypes.jl`:
   - `Generic.FracField{T}` for the parent objects
   - `Generic.Frac{T}` for the actual fractions
 
-The parent type must belong to `AbstractAlgebra.Field` and the element type must belong
-to `AbstractAlgebra.FieldElem`. Of course, the types may belong to these abstract types
+The parent type must belong to `Field` and the element type must belong
+to `FieldElem`. Of course, the types may belong to these abstract types
 transitively.
 
 For parameterised fields, we advise that the types of both the parent objects and
@@ -32,28 +32,28 @@ implications for the ad hoc operators one might like to explicitly implement.
 ## FieldElement type union
 
 Because of its lack of multiple inheritance, Julia does not allow Julia Base
-types to belong to `AbstractAlgebra.FieldElem`. To allow us to work equally with
+types to belong to `FieldElem`. To allow us to work equally with
 AbstractAlgebra and Julia types that represent elements of fields we define a
-union type `AbstractAlgebra.FieldElement` in `src/julia/JuliaTypes`.
+union type `FieldElement` in `src/julia/JuliaTypes`.
 
-So far, in addition to `AbstractAlgebra.FieldElem` the  union type
-`AbstractAlgebra.FieldElement` includes the Julia types `Rational`
+So far, in addition to `FieldElem` the  union type
+`FieldElement` includes the Julia types `Rational`
 and `AbstractFloat`.
                                                                                                    
 Most of the generic code in AbstractAlgebra makes use of the union type
-`AbstractAlgebra.FieldElement` instead of `AbstractAlgebra.FieldElem` so that the
+`FieldElement` instead of `FieldElem` so that the
 generic functions also accept the Julia Base field types.
                                                                 
 One must be careful when defining ad hoc binary operations for field element
 types. It is often necessary to define separate versions of the functions for
-`AbstractAlgebra.FieldElem` then for each of the Julia types separately in
+`FieldElem` then for each of the Julia types separately in
 order to avoid ambiguity warnings.
 
-Note that even though `AbstractAlgebra.FieldElement` is a union type we still
+Note that even though `FieldElement` is a union type we still
 have the following inclusion
 
 ```julia
-AbstractAlgebra.FieldElement <: AbstractAlgebra.RingElement
+FieldElement <: RingElement
 ```
 
 ## Parent object caches

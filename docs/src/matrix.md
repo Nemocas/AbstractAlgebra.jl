@@ -47,10 +47,10 @@ demand.
 ## Abstract types
 
 The generic matrix types (matrix spaces) belong to the abstract type
-`AbstractAlgebra.MatElem{T}` and the matrix space parent types belong to
-`AbstractAlgebra.MatSpace{T}`. Similarly the generic matrix algebra matrix types belong
-to the abstract type `AbstractAlgebra.MatAlgElem{T}` and the parent types belong to
- `AbstractAlgebra.MatAlgebra{T}` Note that both
+`MatElem{T}` and the matrix space parent types belong to
+`MatSpace{T}`. Similarly the generic matrix algebra matrix types belong
+to the abstract type `MatAlgElem{T}` and the parent types belong to
+ `MatAlgebra{T}` Note that both
 the concrete type of a matrix space parent object and the abstract class it belongs to
 have the name `MatElem`, therefore disambiguation is required to specify which is
 intended. The same is true for the abstract types for matrix spaces and their elements.

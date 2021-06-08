@@ -18,8 +18,8 @@ AbstractAlgebra provides two abstract types for fraction fields and their elemen
   * `FracField{T}` is the abstract type for fraction field parent types
   * `FracElem{T}` is the abstract type for types of fractions
 
-We have that `FracField{T} <: AbstractAlgebra.Field` and 
-`FracElem{T} <: AbstractAlgebra.FieldElem`.
+We have that `FracField{T} <: Field` and 
+`FracElem{T} <: FieldElem`.
 
 Note that both abstract types are parameterised. The type `T` should usually be the type
 of elements of the base ring of the fraction field.
@@ -53,19 +53,19 @@ element type doesn't contain a reference to the parent object, but merely contai
 reference to the base ring. The parent object can then be constructed on demand.
 
 ```julia
-//(x::T, y::T) where T <: AbstractAlgebra.RingElem
+//(x::T, y::T) where T <: RingElem
 ```
 
 Return the fraction $x/y$.
 
 ```julia
-//(x::T, y::AbstractAlgebra.FracElem{T}) where T <: AbstractAlgebra.RingElem
+//(x::T, y::FracElem{T}) where T <: RingElem
 ```
 
 Return $x/y$ where $x$ is in the base ring of $y$.
 
 ```julia
-//(x::AbstractAlgebra.FracElem{T}, y::T) where T <: AbstractAlgebra.RingElem
+//(x::FracElem{T}, y::T) where T <: RingElem
 ```
 
 Return $x/y$ where $y$ is in the base ring of $x$.
@@ -90,14 +90,14 @@ julia> h = x//f
 ### Basic manipulation of fields and elements
 
 ```julia
-numerator(d::MyFrac{T}) where T <: AbstractAlgebra.RingElem
+numerator(d::MyFrac{T}) where T <: RingElem
 ```
 
 Given a fraction $d = a/b$ return $a$, where $a/b$ is in lowest terms with respect to
 the `canonical_unit` and `gcd` functions on the base ring.
 
 ```julia
-denominator(d::MyFrac{T}) where T <: AbstractAlgebra.RingElem
+denominator(d::MyFrac{T}) where T <: RingElem
 ```
 
 Given a fraction $d = a/b$ return $b$, where $a/b$ is in lowest terms with respect to

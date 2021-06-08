@@ -215,7 +215,7 @@ Return an identity map on the domain $R$.
 Of course there is nothing stopping a map type or class from implementing its own
 identity map type, and defining composition of maps of the same kind with such an
 identity map. In such a case, the class of such an identity map type must belong to
-`AbstractAlgebra.IdentityMap` so that composition with other map types still works.
+`IdentityMap` so that composition with other map types still works.
 
 ### Composition of maps
 

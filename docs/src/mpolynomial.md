@@ -41,11 +41,11 @@ Parent objects of such polynomials have type `Generic.MPolyRing{T}`.
 The string representation of the variables of the polynomial ring and the
 base/coefficient ring $R$ and the ordering are stored in the parent object.
 
-The polynomial element types belong to the abstract type `AbstractAlgebra.MPolyElem{T}`
-and the polynomial ring types belong to the abstract type `AbstractAlgebra.MPolyRing{T}`.
+The polynomial element types belong to the abstract type `MPolyElem{T}`
+and the polynomial ring types belong to the abstract type `MPolyRing{T}`.
 
 Note that both the generic polynomial ring type `Generic.MPolyRing{T}` and the abstract
-type it belongs to, `AbstractAlgebra.MPolyRing{T}` are both called `MPolyRing`. The
+type it belongs to, `MPolyRing{T}` are both called `MPolyRing`. The
 former is a (parameterised) concrete type for a polynomial ring over a given base ring
 whose elements have type `T`. The latter is an abstract type representing all
 multivariate polynomial ring types in AbstractAlgebra.jl, whether generic or very
@@ -58,8 +58,8 @@ construct the polynomial ring itself. This is accomplished with one of the follo
 constructors.
 
 ```julia
-PolynomialRing(R::AbstractAlgebra.Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)
-PolynomialRing(R::Nemo.Ring, n::Int, s::String="x"; cached::Bool = false, ordering::Symbol = :lex)
+PolynomialRing(R::Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)
+PolynomialRing(R::Ring, n::Int, s::String="x"; cached::Bool = false, ordering::Symbol = :lex)
 ```
 
 The first constructor, given a base ring `R` and an array `S` of strings
@@ -132,47 +132,47 @@ of polynomial rings provided by external modules will also usually provide a
 ### Basic manipulation
 
 ```@docs
-isunivariate(::AbstractAlgebra.MPolyRing{T}) where T <: RingElement
+isunivariate(::MPolyRing{T}) where T <: RingElement
 ```
 
 ```@docs
-vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+vars(p::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-var_index(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+var_index(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-degree(::AbstractAlgebra.MPolyElem{T}, ::Int) where T <: RingElement
+degree(::MPolyElem{T}, ::Int) where T <: RingElement
 ```
 
 ```@docs
-degree(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+degree(::MPolyElem{T}, ::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-degrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+degrees(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isconstant(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+isconstant(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+isterm(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-ismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+ismonomial(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isunivariate(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+isunivariate(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-coeff(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+coeff(::MPolyElem{T}, ::MPolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -227,8 +227,8 @@ using the following function, where $g$ is a function representing the
 structure homomorphism of the $T$-algebra $S$.
 
 ```@docs
-change_base_ring(::Ring, p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
-map_coefficients(::Any, p::AbstractAlgebra.MPolyElem)
+change_base_ring(::Ring, p::MPolyElem{T}) where {T <: RingElement}
+map_coefficients(::Any, p::MPolyElem)
 ```
 
 **Examples**
@@ -271,8 +271,8 @@ others may be required to appear to exponent zero), we can use the following
 function.
 
 ```@docs
-coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
-coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+coeff(a::MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
+coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: MPolyElem
 ```
 
 **Examples**
@@ -292,18 +292,18 @@ true
 ### Inflation/deflation
 
 ```@docs
-deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+deflation(f::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
-deflate(f::AbstractAlgebra.MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
-deflate(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+deflate(f::MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+deflate(f::MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
+deflate(f::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
-inflate(f::AbstractAlgebra.MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
+inflate(f::MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+inflate(f::MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
 ```
 
 **Examples**
@@ -332,7 +332,7 @@ true
 ### Conversions
 
 ```@docs
-to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+to_univariate(R::PolyRing{T}, p::MPolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -360,7 +360,7 @@ values belongs to, i.e. if all the values are in the coefficient ring, the
 result of the evaluation will be too.
 
 ```@docs
-evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
+evaluate(::MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
 ```
 
 The following functions allow evaluation of a polynomial at some of its
@@ -370,18 +370,18 @@ ring and all variables are given values, the result will be a constant
 polynomial, not a coefficient.
 
 ```@docs
-evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
+evaluate(::MPolyElem{T}, ::Vector{Int}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
 ```
 
 ```@docs
-evaluate(::S, ::Vector{S}, ::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
+evaluate(::S, ::Vector{S}, ::Vector{U}) where {S <: MPolyElem{T}, U <: RingElement} where T <: RingElement
 ```
 
 The following function allows evaluation of a polynomial at values in a
 not necessarily commutative ring, e.g. elements of a matrix algebra.
 
 ```@docs
-evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+evaluate(::MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: NCRingElem}
 ```
 
 **Examples**
@@ -452,12 +452,12 @@ The leading and trailing coefficient, constant coefficient, leading monomial
 and leading term of a polynomial p are returned by the following functions:
 
 ```@docs
-leading_coefficient(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-trailing_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-leading_monomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-leading_term(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-constant_coefficient(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-tail(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+leading_coefficient(::MPolyElem{T}) where T <: RingElement
+trailing_coefficient(p::MPolyElem{T}) where T <: RingElement
+leading_monomial(::MPolyElem{T}) where T <: RingElement
+leading_term(::MPolyElem{T}) where T <: RingElement
+constant_coefficient(::MPolyElem{T}) where T <: RingElement
+tail(::MPolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -480,7 +480,7 @@ tail(p)
 The greated common divisor of two polynomials a and b is returned by
 
 ```@docs
-gcd(a::AbstractAlgebra.Generic.MPoly{T}, b::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+gcd(a::Generic.MPoly{T}, b::Generic.MPoly{T}) where {T <: RingElement}
 ```
 
 Note that this functionality is currently only provided for AbstractAlgebra
@@ -491,7 +491,7 @@ However, if such a gcd is provided, the least common multiple of two
 polynomials a and b is returned by
 
 ```@docs
-lcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+lcm(a::MPolyElem{T}, b::MPolyElem{T}) where {T <: RingElement}
 ```
 
 **Examples**
@@ -522,7 +522,7 @@ true
 ### Derivations
 
 ```@docs
-derivative(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+derivative(::MPolyElem{T}, ::MPolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -547,5 +547,5 @@ x + 1
 It is possible to test whether a polynomial is homogeneous with respect to the standard grading using the function
 
 ```@docs
-ishomogeneous(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+ishomogeneous(x::MPolyElem{T}) where T <: RingElement
 ```

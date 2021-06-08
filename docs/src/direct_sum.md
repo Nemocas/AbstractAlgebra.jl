@@ -107,7 +107,7 @@ following functionality.
 ### Basic manipulation
 
 ```@docs
-summands(::AbstractAlgebra.Generic.DirectSumModule{T}) where T <: RingElement
+summands(::Generic.DirectSumModule{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -187,7 +187,7 @@ julia> summands(D)
 
 
 ```
-    (D::DirectSumModule{T}(::Vector{<:AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement
+    (D::DirectSumModule{T}(::Vector{<:FPModuleElem{T}}) where T <: RingElement
 ```
 
 Given a vector (or $1$-dim array) of module elements, where the $i$-th entry

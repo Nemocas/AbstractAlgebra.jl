@@ -30,12 +30,12 @@ base/coefficient ring $R$ is stored in the parent object.
 ## Abstract types
 
 All univariate polynomial element types belong to the abstract type
-`AbstractAlgebra.PolyElem{T}` and the polynomial ring types belong to the abstract
-type `AbstractAlgebra.PolyRing{T}`. This enables one to write generic functions that
+`PolyElem{T}` and the polynomial ring types belong to the abstract
+type `PolyRing{T}`. This enables one to write generic functions that
 can accept any AbstractAlgebra polynomial type.
 
 Note that both the generic polynomial ring type `Generic.PolyRing{T}` and the abstract
-type it belongs to, `AbstractAlgebra.PolyRing{T}`, are called `PolyRing`. The
+type it belongs to, `PolyRing{T}`, are called `PolyRing`. The
 former is a (parameterised) concrete type for a polynomial ring over a given base ring
 whose elements have type `T`. The latter is an abstract type representing all
 polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.

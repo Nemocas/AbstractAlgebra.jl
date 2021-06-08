@@ -42,8 +42,8 @@ their elements:
   * `MPolyRing{T}` is the abstract type for multivariate polynomial ring parent types
   * `MPolyElem{T}` is the abstract type for multivariate polynomial types
 
-We have that `MPolyRing{T} <: AbstractAlgebra.Ring` and
-`MPolyElem{T} <: AbstractAlgebra.RingElem`.
+We have that `MPolyRing{T} <: Ring` and
+`MPolyElem{T} <: RingElem`.
 
 Note that both abstract types are parameterised. The type `T` should usually be the type
 of elements of the coefficient ring of the polynomial ring. For example, in the case of
@@ -141,7 +141,7 @@ julia> push_term!(C, ZZ(4), [0, 0]); finish(C)
 ### Data type and parent object methods
 
 ```julia
-symbols(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
+symbols(S::MyMPolyRing{T}) where T <: RingElem
 ```
 
 Return an array of `Symbol`s representing the variables (generators) of the polynomial
@@ -149,13 +149,13 @@ ring. Note that these are `Symbol`s not `String`s, though their string values wi
 usually be used when printing polynomials.
 
 ```julia
-nvars(f::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
+nvars(f::MyMPolyRing{T}) where T <: RingElem
 ```
 
 Return the number of variables of the polynomial ring.
 
 ```julia
-gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
+gens(S::MyMPolyRing{T}) where T <: RingElem
 ```
 
 Return an array of all the generators (variables) of the given polynomial ring
@@ -165,7 +165,7 @@ The first entry in the array will be the variable with most significance with
 respect to the ordering.
 
 ```julia
-gen(S::MyMPolyRing{T}, i::Int) where T <: AbstractAlgebra.RingElem
+gen(S::MyMPolyRing{T}, i::Int) where T <: RingElem
 ```
 
 Return the $i$-th generator (variable) of the given polynomial ring (as a
@@ -202,33 +202,33 @@ julia> ord = ordering(S)
 ### Basic manipulation of rings and elements
 
 ```julia
-length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+length(f::MyMPoly{T}) where T <: RingElem
 ```
 
 Return the number of nonzero terms of the given polynomial. The length of the zero
 polynomial is defined to be $0$. The return value should be of type `Int`.
 
 ```julia
-degrees(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+degrees(f::MyMPoly{T}) where T <: RingElem
 ```
 
 Return an array of the degrees of the polynomial $f$ in each of the variables.
 
 ```julia
-total_degree(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+total_degree(f::MyMPoly{T}) where T <: RingElem
 ```
 
 Return the total degree of the polynomial $f$, i.e. the highest sum of
 exponents occuring in any term of $f$.
 
 ```julia
-isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+isgen(x::MyMPoly{T}) where T <: RingElem
 ```
 
 Return `true` if $x$ is a generator of the polynomial ring.
 
 ```julia
-coefficients(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+coefficients(p::MyMPoly{T}) where T <: RingElem
 ```
 
 Return an iterator for the coefficients of the polynomial $p$, starting
@@ -237,7 +237,7 @@ ordering. Generic code will provide this function automatically for
 random access polynomials that implement the `coeff` function.
 
 ```julia
-monomials(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+monomials(p::MyMPoly{T}) where T <: RingElem
 ```
 
 Return an iterator for the monomials of the polynomial $p$, starting with
@@ -249,7 +249,7 @@ automatically for random access polynomials that implement the `monomial`
 function.
 
 ```julia
-terms(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+terms(p::MyMPoly{T}) where T <: RingElem
 ```
 
 Return an iterator for the terms of the polynomial $p$, starting with
@@ -321,27 +321,27 @@ julia> d = total_degree(f)
 For any ring that implements exact division, the following can be implemented.
 
 ```julia
-divexact(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+divexact(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 ```
 
 Return the exact quotient of $f$ by $g$ if it exists, otherwise throw an error.
 
 ```julia
-divides(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+divides(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 ```
 
 Return a tuple `(flag, q)` where `flag` is `true` if $g$ divides $f$, in which case
 $q$ will be the exact quotient, or `flag` is false and $q$ is set to zero.
 
 ```julia
-remove(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+remove(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 ```
 
 Return a tuple $(v, q)$ such that the highest power of $g$ that divides $f$ is $g^v$
 and the cofactor is $q$.
 
 ```julia
-valuation(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+valuation(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 ```
 
 Return $v$ such that the highest power of $g$ that divides $f$ is $g^v$.
@@ -377,9 +377,9 @@ julia> n = valuation(f*g^3, g)
 For any ring that implements exact division, the following can be implemented.
 
 ```julia
-divexact(f::MyMPoly{T}, c::Integer) where T <: AbstractAlgebra.RingElem
-divexact(f::MyMPoly{T}, c::Rational) where T <: AbstractAlgebra.RingElem
-divexact(f::MyMPoly{T}, c::T) where T <: AbstractAlgebra.RingElem
+divexact(f::MyMPoly{T}, c::Integer) where T <: RingElem
+divexact(f::MyMPoly{T}, c::Rational) where T <: RingElem
+divexact(f::MyMPoly{T}, c::T) where T <: RingElem
 ```
 
 Divide the polynomial exactly by the constant $c$.
@@ -410,7 +410,7 @@ a polynomial $g$ divides a polynomial $f$, the result no longer depends on the o
 and the remainder is zero, with the quotient agreeing with the exact quotient.
 
 ```julia
-divrem(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+divrem(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 ```
 
 Return a tuple $(q, r)$ such that $f = qg + r$, where the coefficients of terms of
@@ -420,7 +420,7 @@ leading coefficient of $g$ (according to the Euclidean function on the coefficie
 Note that the result of this function depends on the ordering of the polynomial ring.
 
 ```julia
-div(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+div(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 ```
 
 As per the `divrem` function, but returning the quotient only. Especially when the
@@ -452,7 +452,7 @@ In cases where there is a meaningful Euclidean structure on the coefficient ring
 possible to compute the GCD of multivariate polynomials.
 
 ```julia
-gcd(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+gcd(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 ```
 
 Return a greatest common divisor of $f$ and $g$.
@@ -480,7 +480,7 @@ Over rings for which an exact square root is available, it is possible to take
 the square root of a polynomial or test whether it is a square.
 
 ```julia
-sqrt(f::MyMPoly{T}, check::bool=true) where T <: AbstractAlgebra.RingElem
+sqrt(f::MyMPoly{T}, check::bool=true) where T <: RingElem
 ```
 
 Return the square root of the polynomial $f$ and raise an exception if it is
@@ -489,7 +489,7 @@ perfect square and this assumption is not fully checked. This can be
 significantly faster.
 
 ```julia
-issquare(::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+issquare(::MyMPoly{T}) where T <: RingElem
 ```
 
 Return `true` if $f$ is a square.
@@ -523,7 +523,7 @@ In addition to the standard constructors, the following constructor, taking arra
 coefficients and exponent vectors, should be provided.
 
 ```julia
-(S::MyMPolyRing{T})(A::Vector{T}, m::Vector{Vector{Int}}) where T <: AbstractAlgebra.RingElem
+(S::MyMPolyRing{T})(A::Vector{T}, m::Vector{Vector{Int}}) where T <: RingElem
 ```
 
 Create the polynomial in the given ring with nonzero coefficients specified by
@@ -555,7 +555,7 @@ julia> f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
 ### Sparse distributed, random access basic manipulation
 
 ```julia
-coeff(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+coeff(f::MyMPoly{T}, n::Int) where T <: RingElem
 ```
 
 Return the coefficient of the $n$-th term of $f$. The first term should be the most
@@ -569,8 +569,8 @@ Return the coefficient of the term with the given exponent vector, or zero
 if there is no such term.
 
 ```julia
-monomial(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
-monomial!(m::MyMPoly{T}, f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+monomial(f::MyMPoly{T}, n::Int) where T <: RingElem
+monomial!(m::MyMPoly{T}, f::MyMPoly{T}, n::Int) where T <: RingElem
 ```
 
 Return the $n$-th monomial of $f$ or set $m$ to the $n$-th monomial of $f$,
@@ -580,14 +580,14 @@ See the function `term` if you also require the coefficient, however, note
 that only monomials can be compared.
 
 ```julia
-term(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+term(f::MyMPoly{T}, n::Int) where T <: RingElem
 ```
 
 Return the $n$-th term of $f$. The first term should be the one whose
 monomial is most significant with respect to the ordering.
 
 ```julia
-exponent(f::MyMPoly{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
+exponent(f::MyMPoly{T}, i::Int, j::Int) where T <: RingElem
 ```
 
 Return the exponent of the $j$-th variable in the $n$-th term of the polynomial
@@ -659,7 +659,7 @@ in carefully written library code, rather than by users.
 Users should instead build polynomials using the constructors described above.
 
 ```julia
-fit!(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+fit!(f::MyMPoly{T}, n::Int) where T <: RingElem
 ```
 
 Ensure that the polynomial $f$ internally has space for $n$ nonzero terms. This
@@ -714,7 +714,7 @@ polynomial types.
 ### Reduction by an ideal
 
 ```julia
-divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T <: AbstractAlgebra.RingElem
+divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T <: RingElem
 ```
 
 As per the `divrem` function above, except that each term of $r$ starting with the
@@ -758,7 +758,7 @@ Evaluate the polynomial at the given values in the coefficient ring of the
 polynomial. The result should be an element of the coefficient ring.
 
 ```julia
-evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: AbstractAlgebra.RingElem, U <: Intege
+evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: RingElem, U <: Intege
 r}
 ```
 
@@ -841,7 +841,7 @@ The following function allows to compute derivations of multivariate
 polynomials of type MPoly.
 
 ```julia
-derivative(f::MyMPoly{T}, j::Int) where T <: AbstractAlgebra.RingElem
+derivative(f::MyMPoly{T}, j::Int) where T <: RingElem
 ```
 
 Compute the derivative of $f$ with respect to the $j$-th variable of the

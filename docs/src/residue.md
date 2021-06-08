@@ -28,7 +28,7 @@ The defining modulus of the residue ring is stored in the parent object.
 ## Abstract types
 
 All residue element types belong to the abstract type `ResElem{T}`
-or `AbstractAlgebra.ResFieldElem{T}` in the case of residue fields, and the
+or `ResFieldElem{T}` in the case of residue fields, and the
 residue ring types belong to the abstract type `ResRing{T}` or `ResField{T}`
 respectively. This enables one to write generic functions that can accept any
 AbstractAlgebra residue type.
@@ -48,10 +48,10 @@ In order to construct residues in AbstractAlgebra.jl, one must first construct t
 residue ring itself. This is accomplished with one of the following constructors.
 
 ```julia
-ResidueRing(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)
+ResidueRing(R::Ring, m::RingElem; cached::Bool = true)
 ```
 ```julia
-ResidueField(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)
+ResidueField(R::Ring, m::RingElem; cached::Bool = true)
 ```
 
 Given a base ring `R` and residue $m$ contained in this ring, return the parent object
@@ -158,7 +158,7 @@ described here, that override the generic implementation.
 ### Basic functionality
 
 ```@docs
-modulus(::AbstractAlgebra.ResElem)
+modulus(::ResElem)
 ```
 
 **Examples**
@@ -184,7 +184,7 @@ true
 ### Inversion
 
 ```@docs
-Base.inv(::AbstractAlgebra.ResElem)
+Base.inv(::ResElem)
 ```
 
 **Examples**

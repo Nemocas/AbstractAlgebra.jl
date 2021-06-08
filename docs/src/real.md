@@ -16,13 +16,13 @@ implement any additional functionality required by AbstractAlgebra.jl.
 Because `BigFloat` cannot be directly included in the AbstractAlgebra.jl
 abstract type hierarchy, we achieve integration of Julia `BigFloat`s by
 introducing a type union, called `FieldElement`, which is a union of
-`AbstractAlgebra.FieldElem` and a number of Julia types, including `BigFloat`.
+`FieldElem` and a number of Julia types, including `BigFloat`.
 Everywhere that `FieldElem` is notionally used in AbstractAlgebra.jl, we are in fact
 using `FieldElement`, with additional care being taken to avoid ambiguities.
 
 The details of how this is done are technical, and we refer the reader to the
 implementation for details. For most intents and purposes, one can think of the Julia
-`BigFloat` type as belonging to `AbstractAlgebra.FieldElem`.
+`BigFloat` type as belonging to `FieldElem`.
 
 ## Types and parent objects
 
