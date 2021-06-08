@@ -24,8 +24,8 @@ export MatrixSpace, add_column, add_column!, add_row, add_row!, can_solve,
        reverse_cols!, reverse_rows, reverse_rows!, right_kernel, rref, rref!,
        rref_rational, rref_rational!, similarity!, snf, snf_with_transform,
        snf_kb, snf_kb!, snf_kb_with_transform, solve, solve_ff, solve_left,
-       solve_rational, solve_triu, swap_cols, swap_cols!, swap_rows,
-       swap_rows!, tr, typed_hvcat, typed_hcat, weak_popov,
+       solve_rational, solve_triu, solve_with_det, swap_cols, swap_cols!,
+       swap_rows, swap_rows!, tr, typed_hvcat, typed_hcat, weak_popov,
        weak_popov_with_transform, zero!, zero_matrix
 
 ###############################################################################
