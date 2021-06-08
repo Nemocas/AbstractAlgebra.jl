@@ -1387,7 +1387,7 @@ end
    maxdeg = 20
 
    # :deglex ordering
-   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:lex)
+   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, [:x, :y, :z], ordering=:lex)
    # Monomials of degree 2
    @test isless(z^2, y*z) == true
    @test isless(y*z, y^2) == true
@@ -1397,7 +1397,7 @@ end
 
    for n_vars = 1:maxdeg
       A = unique(sortslices(reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars)), dims=1),dims=1)
-      var_names = ["x$j" for j in 1:n_vars]
+      var_names = [Symbol("x$j") for j in 1:n_vars]
       R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:lex)
       for i in 1:size(A)[1]-1
          f = R([base_ring(R)(1)], [A[i,:]])
@@ -1407,7 +1407,7 @@ end
    end
 
    # :deglex ordering
-   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:deglex)
+   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, [:x, :y, :z], ordering=:deglex)
 
    @test isless(z^2, y*z) == true
    @test isless(y*z, x*z) == true
@@ -1417,7 +1417,7 @@ end
 
    for n_vars=1:maxdeg
       A = reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars))
-      var_names = ["x$j" for j in 1:n_vars]
+      var_names = [Symbol("x$j") for j in 1:n_vars]
       R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:deglex)
 
       for i in 1:size(A)[1]-1
@@ -1442,7 +1442,7 @@ end
    end
 
    # :degrevlex ordering
-   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:degrevlex)
+   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, [:x, :y, :z], ordering=:degrevlex)
    # Monomials of degree 2
    @test isless(z^2, y*z) == true
    @test isless(y*z, x*z) == true
@@ -1451,7 +1451,7 @@ end
    @test isless(x*y, x^2) == true
    for n_vars = 1:maxdeg
       A = reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars))
-      var_names = ["x$j" for j in 1:n_vars]
+      var_names = [Symbol("x$j") for j in 1:n_vars]
       R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:degrevlex)
       for i in 1:size(A)[1]-1
          f = R([base_ring(R)(1)], [A[i,:]])

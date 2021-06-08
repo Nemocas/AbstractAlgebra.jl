@@ -26,7 +26,7 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
 # imported here and in Generic.jl, and exported below.
 # They should not be imported/exported anywhere else.
 
-import LinearAlgebra: det, issymmetric, istriu, norm, nullspace, rank, snf,
+import LinearAlgebra: det, issymmetric, istriu, norm, nullspace, rank,
                       transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
@@ -435,6 +435,7 @@ include("Residue.jl")
 include("ResidueField.jl")
 include("NumberField.jl")
 include("Fraction.jl")
+include("MPoly.jl")
 
 ###############################################################################
 #
@@ -456,7 +457,7 @@ import .Generic: abs_series, abs_series_type,
                  dim, disable_cache!,
                  downscale,
                  enable_cache!, exp_gcd,
-                 exponent, exponent_vector, exponent_vectors,
+                 exponent, exponent_vector,
                  finish, fit!, gcd, gcdx,
                  has_left_neighbor, has_bottom_neighbor, hash,
                  hooklength, identity_map,
@@ -464,10 +465,10 @@ import .Generic: abs_series, abs_series_type,
                  inverse_fn, inverse_image_fn,
                  inverse_mat, reverse_rows, reverse_rows!,
                  inv!, invmod,
-                 iscompatible, isconstant, isdegree,
+                 iscompatible, isdegree,
                  ishomogeneous, isisomorphic,
                  isone, isreverse, isrimhook, issubmodule,
-                 isunit, isunivariate,
+                 isunit,
                  laurent_ring, lcm, leading_coefficient, leading_monomial,
 		 leading_term, length,
                  leglength, main_variable,
@@ -495,9 +496,9 @@ import .Generic: abs_series, abs_series_type,
                  sort_terms!, summands,
                  supermodule, term, terms, total_degree,
                  to_univariate, trailing_coefficient,
-		 truncate, upscale, var_index, vars,
+		 truncate, upscale, var_index,
                  zero,
-                 @PolynomialRing, MatrixElem,
+                 MatrixElem,
        # Moved from Hecke into Misc
 		 Loc, Localization, LocElem,
 		 polynomial_to_power_sums,
@@ -516,20 +517,20 @@ export abs_series, abs_series_type,
                  dense_matrix_type, dense_poly_type, det,
                  discriminant,
                  elem_type,
-                 exponent, exponent_vector, exponent_vectors,
+                 exponent, exponent_vector,
                  finish, fit!, gcd, gen,
                  gens, gcdinv, gcdx,
                  has_left_neighbor, has_bottom_neighbor, hash,
                  interpolate,
                  inv!, inverse_image_fn,
                  inverse_mat, invmod,
-                 iscompatible, isconstant, isdegree,
+                 iscompatible, isdegree,
                  isdomain_type, isexact_type, isgen,
                  ishomogeneous,
                  isisomorphic, ismonomial, ismonomial_recursive,
                  isnegative, isone, isreverse,
                  issubmodule, issymmetric,
-                 isterm_recursive, isunit, isunivariate, iszero,
+                 isterm_recursive, isunit, iszero,
                  lcm, leading_coefficient, leading_monomial, leading_term,
 		 length,
                  main_variable, main_variable_extract, main_variable_insert,
@@ -556,8 +557,8 @@ export abs_series, abs_series_type,
                  size, sort_terms!, subst, summands, supermodule,
                  sylvester_matrix, term, terms, to_univariate,
                  total_degree, trailing_coefficient, truncate,
-                 var_index, vars, zero,
-                 @PolynomialRing, MatrixElem,
+                 var_index, zero,
+                 MatrixElem,
        # Moved from Hecke into Misc
                  divexact_low, divhigh,
 		 ismonic, Loc, Localization, LocElem, mulhigh_n,
@@ -583,38 +584,6 @@ end
 
 function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.n))
    Generic.YoungTableau(part, fill)
-end
-
-@doc Markdown.doc"""
-    PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{T}; cached::Bool = true, ordering::Symbol = :lex) where T <: Union{String, Char}
-
-Given a base ring `R` and an array of strings `s` specifying how the
-generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
-representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
-$x1, x2, ...$ of the polynomial ring. By default the parent object `T` will
-depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional
-argument `cached` to `false` will prevent the parent object `T` from being
-cached. `S` is a symbol corresponding to the ordering of the polynomial and
-can be one of `:lex`, `:deglex` or `:degrevlex`.
-"""
-PolynomialRing(R::Ring, s::Union{Vector{String}, Vector{Char}}; cached::Bool = true, ordering::Symbol = :lex)
-
-function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
-   Generic.PolynomialRing(R, s; cached=cached, ordering=ordering)
-end
-
-function PolynomialRing(R::Ring, s::Array{Char, 1}; cached::Bool = true, ordering::Symbol = :lex)
-   PolynomialRing(R, string.(s); cached=cached, ordering=ordering)
-end
-
-function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::String="x";
-                                 cached::Bool = false, ordering::Symbol = :lex)
-   PolynomialRing(R, ["$s$i" for i=1:n]; cached = cached, ordering = ordering)
-end
-
-function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::Char;
-                                 cached::Bool = false, ordering::Symbol = :lex)
-   PolynomialRing(R, n, string(s); cached = cached, ordering = ordering)
 end
 
 function NumberField(a::Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
@@ -664,12 +633,12 @@ export Generic
 #
 ###############################################################################
 
-getindex(R::NCRing, s::Union{String, Char}) = PolynomialRing(R, s)
-getindex(R::NCRing, s::Union{String, Char}, ss::Union{String, Char}...) =
+getindex(R::NCRing, s::Union{String, Char, Symbol}) = PolynomialRing(R, s)
+getindex(R::NCRing, s::Union{String, Char, Symbol}, ss::Union{String, Char}...) =
    PolynomialRing(R, [s, ss...])
 
 # syntax x = R["x"]["y"]
-getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{String, Char}) = PolynomialRing(R[1], s)
+getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{String, Char, Symbol}) = PolynomialRing(R[1], s)
 
 ###############################################################################
 #
@@ -680,8 +649,6 @@ getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{St
 typed_hvcat(R::Ring, dims::Dims, d...) = matrix(R, length(dims), dims[1], hvcat(dims, d...))
 typed_hcat(R::Ring, d...) = matrix(R, 1, length(d), hcat(d...))
 typed_vcat(R::Ring, d...) = matrix(R, length(d), 1, vcat(d...))
-
-
 
 ###############################################################################
 #

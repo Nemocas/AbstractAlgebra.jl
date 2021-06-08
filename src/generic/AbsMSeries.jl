@@ -497,7 +497,7 @@ function evaluate(a::U, vars::Vector{Int}, vals::Vector{U}) where
  
     S = parent(a)
     R = base_ring(a)
-    return _evaluate(a, S, R, vars, vals)
+    return AbstractAlgebra._evaluate(a, S, R, vars, vals)
 end
 
 @doc Markdown.doc"""

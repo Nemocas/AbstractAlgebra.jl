@@ -73,6 +73,9 @@ import ..AbstractAlgebra: cached
 
 import ..AbstractAlgebra: add!, addeq!, data, mul!
 
+import ..AbstractAlgebra: isreverse, isdegree, exponent_vectors, isconstant,
+                          vars
+
 using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")

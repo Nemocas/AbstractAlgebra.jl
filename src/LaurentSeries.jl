@@ -5,7 +5,8 @@
 #
 ###############################################################################
 
-export LaurentSeriesField, LaurentSeriesRing, deflate, downscale, exp_gcd, inflate, upscale
+export LaurentSeriesField, LaurentSeriesRing, deflate, downscale, exp_gcd,
+       inflate, upscale
 
 ###############################################################################
 #
