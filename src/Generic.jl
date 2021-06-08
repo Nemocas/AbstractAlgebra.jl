@@ -29,52 +29,32 @@ import Base: floor, ceil, hypot, log1p, expm1, sin, cos, sinpi, cospi,
 # The type and helper function for the dictionaries for hashing
 import ..AbstractAlgebra: CacheDictType, get_cached!
 
-import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
-                          RingElem, RingElement, Field, FieldElement,
-                          isexact_type, isdomain_type, Map, promote_rule
+import ..AbstractAlgebra: CycleDec, Field, FieldElement, Integers, Map,
+                          NCRing, NCRingElem, Perm, Rationals, Ring, RingElem,
+                          RingElement
 
-import ..AbstractAlgebra: base_ring, canonical_unit, change_base_ring,
-                          check_parent, denominator, div, divrem, elem_type,
-                          exp, expressify, factor, gen, gens, inv, isgen,
-                          ismonomial, ismonomial_recursive, isunit,
-                          leading_coefficient, log, numerator, parent_type,
-                          show_via_expressify, sqrt, trailing_coefficient
-
-import ..AbstractAlgebra: addmul!, characteristic, coefficients, compose,
-                          constant_coefficient, content, deflate, deflation,
-                          degree, derivative, divexact, divides, evaluate,
-                          inflate, integral, issquare, isterm,
-                          map_coefficients, modulus, mul_classical,
-                          mul_karatsuba, mullow, nvars, primpart,
-                          pseudodivrem, pseudorem, remove, shift_left,
-                          shift_right, symbols, tail, valuation, var
-
-import ..AbstractAlgebra: gram, identity_matrix, kernel, minpoly,
-                          randmat_triu, randmat_with_rank, snf, zero!
-
-import ..AbstractAlgebra: can_solve_with_solution_lu,
-                          can_solve_with_solution_fflu,
-                          divexact_left, divexact_right, ncols, nrows
-
-import ..AbstractAlgebra: CycleDec, Perm, PolynomialElem, MatrixElem
-
-import ..AbstractAlgebra: O, pol_length
-
-import ..AbstractAlgebra: coeff, max_precision, renormalize!, set_length!,
-                          set_precision!, set_valuation!
-
-import ..AbstractAlgebra: term_degree, terms_degrees, degrees_range
-
-import ..AbstractAlgebra: reduced_form, isreduced_form
-
-import ..AbstractAlgebra: domain, codomain, get_field, set_field!
-
-import ..AbstractAlgebra: cached
-
-import ..AbstractAlgebra: add!, addeq!, data, mul!
-
-import ..AbstractAlgebra: isreverse, isdegree, exponent_vectors, isconstant,
-                          vars
+import ..AbstractAlgebra: add!, addeq!, addmul!, base_ring, canonical_unit,
+                          can_solve_with_solution_lu,
+                          can_solve_with_solution_fflu, change_base_ring,
+                          characteristic, check_parent, codomain, coeff,
+                          coefficients, compose, constant_coefficient,
+                          content, data, deflate, deflation, degree,
+                          degrees_range, denominator, derivative, div,
+                          divexact, divides, divrem, domain, elem_type,
+                          evaluate, exp, exponent_vectors, expressify, factor,
+                          gen, gens, get_field, identity_matrix, inflate,
+                          integral, inv, isconstant, isdomain_type,
+                          isexact_type, isgen, ismonomial, isreduced_form,
+                          issquare, isunit, leading_coefficient, log,
+                          map_coefficients, max_precision, minpoly, modulus,
+                          mul!, mul_classical, mul_karatsuba, mullow,
+                          numerator, ncols, nrows, nvars, O, parent_type,
+                          pol_length, primpart, promote_rule, pseudodivrem,
+                          pseudorem, reduced_form, renormalize!, set_field!,
+                          set_length!, set_precision!, set_valuation!,
+                          shift_left, shift_right, snf, sqrt, symbols,
+                          term_degree, terms_degrees, trailing_coefficient,
+                          valuation, var, vars, zero!
 
 using ..AbstractAlgebra
 
