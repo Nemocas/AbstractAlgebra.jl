@@ -5,27 +5,15 @@ DocTestSetup = quote
 end
 ```
 
-# Generic sparse distributed multivariate polynomials
+# Sparse distributed multivariate polynomials
 
-AbstractAlgebra.jl provides a module, implemented in `src/generic/MPoly.jl` for generic
+AbstractAlgebra.jl provides a module, implemented in `src/MPoly.jl` for
 sparse distributed multivariate polynomials over any commutative ring belonging to the
 AbstractAlgebra abstract type hierarchy.
 
-This modules implements the Multivariate Polynomial interface, including the sparse
-distributed, random access part of the interface.
+## Generic sparse distributed multivariable polynomial types
 
-All of the generic functionality is part of a submodule of AbstractAlgebra called
-`Generic`. This is exported by default so that it is not necessary to qualify the
-function names with the submodule name.
-
-Multivariates are implemented in this module using a Julia array of coefficients and
-a 2-dimensional Julia array of `UInt`s for the exponent vectors. Note that exponent $n$
-is represented by the $n$-th column of the exponent array, not the $n$-th row. This is
-because Julia uses a column major representation.
-
-## Types and parent objects
-
-Multivariate polynomials implemented in AbstractAlgebra.jl have type `Generic.MPoly{T}`
+AbstractAlgebra provides a generic multivariate polynomial type `Generic.MPoly{T}`
 where `T` is the type of elements of the coefficient ring.
 
 The polynomials are implemented using a Julia array of coefficients and a 2-dimensional
@@ -40,6 +28,8 @@ Parent objects of such polynomials have type `Generic.MPolyRing{T}`.
 
 The string representation of the variables of the polynomial ring and the
 base/coefficient ring $R$ and the ordering are stored in the parent object.
+
+## Abstract types
 
 The polynomial element types belong to the abstract type `MPolyElem{T}`
 and the polynomial ring types belong to the abstract type `MPolyRing{T}`.
