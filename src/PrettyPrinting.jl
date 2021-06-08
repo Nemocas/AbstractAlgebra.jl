@@ -977,7 +977,7 @@ function print_vcat(S::printer, mi::MIME"text/latex", obj::Expr,
 
    nrows = length(obj.args)
    if nrows < 1
-      push(S, "\\left(\\text{empty}\\right)")
+      push(S, "\\text{empty}")
       return
    end
 
@@ -1025,7 +1025,7 @@ function print_vcat(S::printer, mi::MIME"text/latex", obj::Expr,
       display_ncols = ncols
       use_col_elision = false
    end
-   push(S, "\\left(\\begin{array}")
+   push(S, "\\begin{array}")
    push(S, "{" * "c"^display_ncols * "}\n")
 
    set_size_limit(S, entry_limit)
@@ -1064,7 +1064,7 @@ function print_vcat(S::printer, mi::MIME"text/latex", obj::Expr,
    end
    restore_size_limit(S)
 
-   push(S, "\n\\end{array}\\right)\n")
+   push(S, "\n\\end{array}")
 end
 
 # special case so that we don't have to negate integers
@@ -1121,11 +1121,8 @@ function underscorify(x::String)
    while n > 1 && tryparse(Int, y[n]) != nothing
       n -= 1
    end
-   if n == 1 && length(y[1]) == 1
-      z = y[1]
-   else
-      z = "\\operatorname{" * join(y[1:n], "\\_") * "}"
-   end
+   # at this point we need operatorname and escaped underscores
+   z = "\\operatorname{" * join(y[1:n], "\\_") * "}"
    if n < length(y)
       z = z * "_{" * join(y[n+1:end], ",") * "}"
    end
@@ -1228,7 +1225,9 @@ function print_obj(S::printer, mi::MIME"text/latex", obj::Expr,
    elseif obj.head === :latex_form && n >= 2
       print_obj(S, mi, obj.args[2], left, right)
    elseif obj.head === :matrix && n == 1
+      push_left_parenthesis(S, mi)
       print_obj(S, mi, obj.args[1], left, right)
+      push_right_parenthesis(S, mi)
    else
       push(S, "[??? unknown Expr ???]")
    end

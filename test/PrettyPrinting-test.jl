@@ -137,6 +137,7 @@
    @test latex_string(:((-a)^b)) == "\\left(-a\\right)^{b}"
    @test latex_string(:(a+sqrt(b*c))) == "a + \\sqrt{b c}"
    @test latex_string(:(sqrt(a)^b)) == "\\left(\\sqrt{a}\\right)^{b}"
+   @test latex_string(:((a//b)^c)) == "\\left(\\frac{a}{b}\\right)^{c}"
    @test latex_string(:(ff(-a)*-b)) == "-\\operatorname{ff}\\left(-a\\right) b"
    @test latex_string(:(a^(-b//c) - ((-a)*b)*c - ((a*b)*(-c*d)))) ==
                                          "a^{-\\frac{b}{c}} + a b c + a b c d"                             
@@ -160,8 +161,8 @@
 
    @test latex_string(:(2*α^2-1*α+1)) == "2 {\\alpha}^{2} - {\\alpha} + 1"
 
-   @test latex_string(:([a b; c d])) ==
-         "\\left(\\begin{array}{cc}\na & b \\\\\nc & d\n\\end{array}\\right)\n"
+   @test latex_string(Expr(:matrix, :([a b; c d]))) ==
+           "\\left(\\begin{array}{cc}\na & b \\\\\nc & d\n\\end{array}\\right)"
 
    @test latex_string(:(if a; b; end;)) isa String
    @test latex_string(1.2) isa String
@@ -174,17 +175,47 @@
       return String(take!(b))
    end
 
+   function limited_string(x)
+      x = AbstractAlgebra.canonicalize(x)
+      b = IOBuffer()
+      c = IOContext(b, :size_limit => 30)
+      AbstractAlgebra.show_obj(c, MIME("text/plain"), x)
+      return String(take!(b))
+   end
+
    e = Expr(:call, :+, [:(x^$i) for i in 1:200]...)
    @test length(limited_latex_string(e)) < 200
+   @test length(limited_string(e)) < 200
 
    e = Expr(:call, :*, [:(x^$i) for i in 1:200]...)
    @test length(limited_latex_string(e)) < 200
+   @test length(limited_string(e)) < 200
 
    e = Expr(:call, :f, [:(x^$i) for i in 1:200]...)
    @test length(limited_latex_string(e)) < 200
+   @test length(limited_string(e)) < 200
 
    e = Expr(:ref, [:(x^$i) for i in 1:200]...)
    @test length(limited_latex_string(e)) < 200
+   @test length(limited_string(e)) < 200
+
+   e = Expr(:list, [:(x^$i) for i in 1:200]...)
+   @test length(limited_latex_string(e)) < 200
+   @test length(limited_string(e)) < 200
+
+   e = Expr(:latex_form, "ZZ", "\\mathbb{Z}")
+   @test canonical_string(e) == "ZZ"
+   @test latex_string(e) == "\\mathbb{Z}"
+
+   e = :([a b;c;d e])
+   @test canonical_string(e) == "[a b; c; d e]"
+   @test latex_string(e) ==
+                  "\\begin{array}{cc}\na & b \\\\\nc \\\\\nd & e\n\\end{array}"
+
+   e = Expr(:matrix, e)
+   @test canonical_string(e) == "[a b; c; d e]"
+   @test latex_string(e) ==
+   "\\left(\\begin{array}{cc}\na & b \\\\\nc \\\\\nd & e\n\\end{array}\\right)"
 
 
    R, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"])
@@ -203,9 +234,16 @@
    @test sprint(show, "text/html", x^12) == "x^12"
 
    R,(x,y) = ZZ["x","y"]
+
+   @test latex_string(Expr(:vcat)) == "\\text{empty}"
+
    m = matrix(R, [x^i*y^j for i in 0:20, j in 0:20])
-   x = AbstractAlgebra.expressify(m)
-   @test length(latex_string(x)) > 100 + length(limited_latex_string(x))
+   e = AbstractAlgebra.expressify(m)
+   @test length(latex_string(e)) > 100 + length(limited_latex_string(e))
+
+   m = matrix(R, [x^i*y^j for i in 0:20, j in 0:1])
+   e = AbstractAlgebra.expressify(m)
+   @test length(latex_string(e)) > 100 + length(limited_latex_string(e))
 
 end
 
