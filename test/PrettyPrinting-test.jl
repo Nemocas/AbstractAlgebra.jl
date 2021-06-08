@@ -203,9 +203,14 @@
    @test length(limited_latex_string(e)) < 200
    @test length(limited_string(e)) < 200
 
-   e = Expr(:latex_form, "ZZ", "\\mathbb{Z}")
-   @test canonical_string(e) == "ZZ"
-   @test latex_string(e) == "\\mathbb{Z}"
+   e = Expr(:sequence, Expr(:text, "Polynomial ring in "),
+                       :x,
+                       Expr(:text, " over "),
+                       Expr(:latex_form, "ZZ", "\\mathbb{Z}"))
+   e = Expr(:call, :/, e, :(x^2+1))
+   @test canonical_string(e) == "(Polynomial ring in x over ZZ)/(x^2 + 1)"
+   @test latex_string(e) == "\\left(\\text{Polynomial ring in }x\\"*
+                     "text{ over }\\mathbb{Z}\\right)/\\left(x^{2} + 1\\right)"
 
    e = :([a b;c;d e])
    @test canonical_string(e) == "[a b; c; d e]"

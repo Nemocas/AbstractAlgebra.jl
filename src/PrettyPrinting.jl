@@ -1176,6 +1176,8 @@ function print_obj(S::printer, mi::MIME, obj::Expr,
       print_tuple_ect(S, mi, obj, left, right)
    elseif obj.head === :ref && n > 0
       print_call_or_ref(S, mi, obj, left, right)
+   elseif obj.head === :text && n == 1
+      print_obj(S, mi, obj.args[1], left, right)
    elseif obj.head === :latex_form && length(obj.args) >= 1
       print_obj(S, mi, obj.args[1], left, right)
    elseif obj.head === :matrix && n == 1
@@ -1222,6 +1224,10 @@ function print_obj(S::printer, mi::MIME"text/latex", obj::Expr,
       print_tuple_ect(S, mi, obj, left, right)
    elseif obj.head === :ref && n > 0
       print_call_or_ref(S, mi, obj, left, right)
+   elseif obj.head === :text && n == 1
+      push(S, "\\text{")
+      print_obj(S, mi, obj.args[1], left, right)
+      push(S, "}")
    elseif obj.head === :latex_form && n >= 2
       print_obj(S, mi, obj.args[2], left, right)
    elseif obj.head === :matrix && n == 1
