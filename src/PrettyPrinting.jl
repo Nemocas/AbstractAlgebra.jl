@@ -987,6 +987,8 @@ function print_vcat(S::printer, mi::MIME"text/latex", obj::Expr,
       return
    end
 
+   # print row i iff i <= b || i > nrows - b
+   # print col j iff j <= a || j > ncols - a
    if l < 0
       # no limit on printing
       ncols = 1
@@ -994,31 +996,25 @@ function print_vcat(S::printer, mi::MIME"text/latex", obj::Expr,
          ei = obj.args[i]
          if isa(ei, Expr) && (ei.head == :hcat || ei.head == :row)
             ncols = max(ncols, length(ei.args))
-         else
-            nentries += 1
          end
       end
       b = nrows
-      a = max(1, ncols)
+      a = ncols
       entry_limit = l
    else
       ncols = 1
-      nentries = 0
       nleaves = 1
       for i in 1:nrows
          ei = obj.args[i]
          if isa(ei, Expr) && (ei.head == :hcat || ei.head == :row)
-            nentries += length(ei.args)
             ncols = max(ncols, length(ei.args))
-         else
-            nentries += 1
          end
          nleaves += leaf_count(S, ei)
       end
       s = sqrt((l + 1)/(nleaves + 1))
       a = max(1, round(Int, 0.5*s*ncols))
       b = max(1, round(Int, 0.5*s*nrows))
-      entry_limit = cld(cld(l, 4*a), b)
+      entry_limit = cld(cld(l, min(2*a, ncols)), min(2*b, nrows))
    end
 
    # figure how many columns are actually going to be displayed
