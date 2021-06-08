@@ -26,7 +26,7 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
 # imported here and in Generic.jl, and exported below.
 # They should not be imported/exported anywhere else.
 
-import LinearAlgebra: det, issymmetric, istriu, norm, nullspace, rank,
+import LinearAlgebra: det, issymmetric, istriu, norm, nullspace, rank, snf,
                       transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
