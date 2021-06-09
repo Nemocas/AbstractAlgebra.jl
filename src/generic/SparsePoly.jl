@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-export SparsePolynomialRing
-
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -1432,7 +1430,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    # if we are in univariate case, convert to dense, take gcd, convert back
    if constant_coeffs
       # convert polys to univariate dense
-      R, x = PolynomialRing(base_ring(base_ring(a)), "\$")
+      R, x = AbstractAlgebra.PolynomialRing(base_ring(base_ring(a)), "\$")
       f = R()
       g = R()
       fit!(f, reinterpret(Int, a.exps[a.length] + 1))
@@ -1695,21 +1693,10 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    SparsePolynomialRing(R::AbstractAlgebra.Ring, s::String; cached::Bool = true)
-
-Given a base ring `R` and a string `s` specifying how the generator
-(variable) should be printed, return a tuple `S, x` representing the new
-polynomial ring $T = R[x1, x2, ...]$ and the generator $x$ of the polynomial
-ring. By default the parent object `T` will depend only on `R` and `x` and
-will be cached. Setting the optional argument `cached` to `false` will
-prevent the parent object `T` from being cached.
-"""
-function SparsePolynomialRing(R::AbstractAlgebra.Ring, s::String; cached::Bool = true)
-   U = Symbol(s)
+function SparsePolynomialRing(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
    T = elem_type(R)
 
-   par = SparsePolyRing{T}(R, U, cached)
+   par = SparsePolyRing{T}(R, s, cached)
 
    return par, gen(par)
 end

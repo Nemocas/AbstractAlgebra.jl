@@ -18,9 +18,9 @@ time, the map first looks up the dictionary of previous known values of the map.
 To facilitate caching of maps, the Generic module provides a type `Generic.MapCache`,
 which can be used to wrap any existing map object with a dictionary.
 
-Importantly, the supertype of the resulting `MapCache` object is identical to that of
-the map being cached. This means that any functions that would accept the original
-map will also accept the cached version.
+Importantly, the supertype of the resulting `Generic.MapCache` object is identical to
+that of the map being cached. This means that any functions that would accept the
+original map will also accept the cached version.
 
 Note that caching of maps only works for maps that correctly abstract access to their
 fields using accessor functions, as described in the map interface.

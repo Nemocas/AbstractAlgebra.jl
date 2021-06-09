@@ -11,11 +11,7 @@ AbstractAlgebra.jl provides a module, implemented in
 `src/generic/RationalFunctionField.jl` for rational function fields $k(x)$ over
 a field $k$.
 
-All of this functionality is part of a submodule of AbstractAlgebra called
-`Generic`. This is exported by default so that it is not necessary to qualify the
-function names with the submodule name.
-
-## Types and parent objects
+## Generic rational function field type
 
 Rational functions in $k(x)$ have type `Generic.Rat{T}` where `T` is the type of
 elements of the coefficient field $k$. See the file
@@ -24,9 +20,11 @@ elements of the coefficient field $k$. See the file
 Parent objects corresponding to the rational function field $k$ have type
 `Generic.RationalFunctionField{T}`.
 
-The rational function types belong to the abstract type `AbstractAlgebra.Field`
+## Abstract types
+
+The rational function types belong to the abstract type `Field`
 and the rational function field types belong to the abstract type
-`AbstractAlgebra.FieldElem`.
+`FieldElem`.
 
 ## Rational function field constructors
 
@@ -35,7 +33,7 @@ construct the function field itself. This is accomplished with the following
 constructor.
 
 ```julia
-RationalFunctionField(k::AbstractAlgebra.Field, s::AbstractString; cached::Bool = true)
+RationalFunctionField(k::Field, s::AbstractString; cached::Bool = true)
 ```
 
 Given a coefficient field `k` return a tuple `(S, x)` consisting of the parent
@@ -188,11 +186,7 @@ of a rational function field $k(x)$ over a field $k$.
 These are implemented in a module implemented in
 `src/generic/FunctionField.jl`.
 
-Function field functionality exists in the `Generic` namespace, which is
-exported by default so that the functions can be accessed unqualified.
-
-
-## Types and parent objects
+## Generic function field types
 
 Function field objects $K/k(x)$ in AbstractAlgebra have type
 `Generic.FunctionField{T}` where `T` is the type of elements of the field `k`.
@@ -201,8 +195,10 @@ Corresponding function field elements have type
 `Generic.FunctionFieldElement{T}`. See the file `src/generic/GenericTypes.jl`
 for details.
 
-Function field types belong to the abstract type `AbstractAlgebra.Field`
-and their elements to the abstract type `AbstractAlgebra.FieldElem`.
+## Abstract types
+
+Function field types belong to the abstract type `Field`
+and their elements to the abstract type `FieldElem`.
 
 ## Function field constructors
 

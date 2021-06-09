@@ -23,7 +23,7 @@ interface.
 Free modules can be built over both commutative and noncommutative rings. Other
 types of module are restricted to fields and euclidean rings.
 
-## Types and parents
+## Abstract types
 
 AbstractAlgebra provides two abstract types for finitely presented modules and
 their elements:
@@ -123,7 +123,7 @@ We can construct elements of a module $M$ by specifying linear combinations
 of the generators of $M$. This is done by passing a vector of ring elements.
 
 ```julia
-(M::AbstractAlgebra.Module{T})(v::Vector{T}) where T <: RingElement
+(M::Module{T})(v::Vector{T}) where T <: RingElement
 ```
 
 Construct the element of the module $M$ corrsponding to $\sum_i g[i]v[i]$
@@ -182,7 +182,7 @@ julia> z = zero(M)
 ### Element indexing
 
 ```@docs
-Base.getindex(m::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+Base.getindex(m::FPModuleElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -201,7 +201,7 @@ julia> m[1]
 ### Comparison
 
 ```@docs
-==(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElement
+==(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -218,7 +218,7 @@ true
 ### Isomorphism
 
 ```@docs
-isisomorphic(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElement
+isisomorphic(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 ```
 
 Note that this function relies on the Smith normal form over the base ring of
@@ -265,8 +265,8 @@ are unique up to multiplication by a unit, and even unique if a
 `canonical_unit` is available for the ring that canonicalises elements.
 
 ```@docs
-snf(::AbstractAlgebra.FPModule{T}) where T <: RingElement
-invariant_factors(::AbstractAlgebra.FPModule{T}) where T <: RingElement
+snf(::FPModule{T}) where T <: RingElement
+invariant_factors(::FPModule{T}) where T <: RingElement
 ```
 
 **Examples**

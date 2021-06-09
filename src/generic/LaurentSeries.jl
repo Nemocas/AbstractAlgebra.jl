@@ -1,11 +1,9 @@
 ###############################################################################
 #
-#   LaurentSeries.jl : Laurent series over rings and fields,
+#   LaurentSeries.jl : Generic Laurent series over rings and fields,
 #                      capped relative precision
 #
 ###############################################################################
-
-export exp_gcd, inflate, deflate, downscale, upscale
 
 ###############################################################################
 #
@@ -1676,41 +1674,26 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    LaurentSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true)
-
-Return a tuple $(S, x)$ consisting of the parent object `S` of a Laurent series
-ring over the given base ring and a generator `x` for the Laurent series ring.
-The maximum precision of the series in the ring is set to `prec`. This is taken as a
-maximum relative precision. The supplied string `s` specifies the way the
-generator of the Laurent series ring will be printed. By default, the parent
-object `S` will be cached so that supplying the same base ring, string and
-precision in future will return the same parent object and generator. If
-caching of the parent object is not required, `cached` can be set to `false`.
-"""
-function LaurentSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true)
-   S = Symbol(s)
+function LaurentSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached=true)
    T = elem_type(R)
 
-   parent_obj = LaurentSeriesRing{T}(R, prec, S, cached)
+   parent_obj = LaurentSeriesRing{T}(R, prec, s, cached)
 
    return parent_obj, gen(parent_obj)
 end
 
-function LaurentSeriesRing(R::AbstractAlgebra.Field, prec::Int, s::AbstractString; cached=true)
-   S = Symbol(s)
+function LaurentSeriesRing(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached=true)
    T = elem_type(R)
 
-   parent_obj = LaurentSeriesField{T}(R, prec, S, cached)
+   parent_obj = LaurentSeriesField{T}(R, prec, s, cached)
 
    return parent_obj, gen(parent_obj)
 end
 
-function LaurentSeriesField(R::AbstractAlgebra.Field, prec::Int, s::AbstractString; cached=true)
-   S = Symbol(s)
+function LaurentSeriesField(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached=true)
    T = elem_type(R)
 
-   parent_obj = LaurentSeriesField{T}(R, prec, S, cached)
+   parent_obj = LaurentSeriesField{T}(R, prec, s, cached)
 
    return parent_obj, gen(parent_obj)
 end

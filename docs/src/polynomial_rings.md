@@ -36,10 +36,10 @@ over a noncommutative ring:
   * `NCPolyRing{T}` is the abstract type for univariate polynomial ring parent types
   * `NCPolyElem{T}` is the abstract type for univariate polynomial types
 
-We have that `PolyRing{T} <: AbstractAlgebra.Ring` and
-`PolyElem{T} <: AbstractAlgebra.RingElem`. Similarly we have that
-`NCPolyRing{T} <: AbstractAlgebra.NCRing` and 
-`NCPolyElem{T} <: AbstractAlgebra.NCRingElem`.
+We have that `PolyRing{T} <: Ring` and
+`PolyElem{T} <: RingElem`. Similarly we have that
+`NCPolyRing{T} <: NCRing` and 
+`NCPolyElem{T} <: NCRingElem`.
 
 Note that the abstract types are parameterised. The type `T` should usually be the type
 of elements of the coefficient ring of the polynomial ring. For example, in the case of
@@ -88,20 +88,20 @@ In addition to the standard constructors, the following constructors, taking an 
 coefficients, must be available.
 
 ```julia
-(S::MyPolyRing{T})(A::Array{T, 1}) where T <: AbstractAlgebra.RingElem
+(S::MyPolyRing{T})(A::Array{T, 1}) where T <: RingElem
 ```
 
 Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[i]`.
 
 ```julia
-(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: AbstractAlgebra.RingElem
+(S::MyPolyRing{T})(A::Array{U, 1}) where T <: RingElem, U <: RingElem
 ```
 
 Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[i]`.
 The elements of the array are assumed to be able to be coerced into the base ring `R`.
 
 ```julia
-(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: Integer
+(S::MyPolyRing{T})(A::Array{U, 1}) where T <: RingElem, U <: Integer
 ```
 
 Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[i]`.
@@ -155,7 +155,7 @@ julia> f = polynomial(ZZ, [1, 2, 3], "y")
 ### Data type and parent object methods
 
 ```julia
-var(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElem
+var(S::MyPolyRing{T}) where T <: RingElem
 ```
 
 Return a `Symbol` representing the variable (generator) of the polynomial ring. Note
@@ -163,7 +163,7 @@ that this is a `Symbol` not a `String`, though its string value will usually be 
 when printing polynomials.
 
 ```julia
-symbols(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElem
+symbols(S::MyPolyRing{T}) where T <: RingElem
 ```
 
 Return the array `[s]` where `s` is a `Symbol` representing the variable of the given
@@ -200,7 +200,7 @@ julia> V = symbols(S)
 ### Basic manipulation of rings and elements
 
 ```julia
-length(f::MyPoly{T}) where T <: AbstractAlgebra.RingElem
+length(f::MyPoly{T}) where T <: RingElem
 ```
 
 Return the length of the given polynomial. The length of the zero polynomial is defined
@@ -208,7 +208,7 @@ to be $0$, otherwise the length is the degree plus $1$. The return value should 
 type `Int`.
 
 ```julia
-set_length!(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+set_length!(f::MyPoly{T}, n::Int) where T <: RingElem
 ```
 
 This function must zero any coefficients beyond the requested length $n$ and then set
@@ -219,14 +219,14 @@ generic functionality.
 This function returns the resulting polynomial.
 
 ```julia
-coeff(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+coeff(f::MyPoly{T}, n::Int) where T <: RingElem
 ```
 
 Return the coefficient of the polynomial `f` of degree `n`. If `n` is larger than the
 degree of the polynomial, it should return zero in the coefficient ring. 
 
 ```julia
-setcoeff!(f::MyPoly{T}, n::Int, a::T) where T <: AbstractAlgebra.RingElem
+setcoeff!(f::MyPoly{T}, n::Int, a::T) where T <: RingElem
 ```
 
 Set the degree $n$ coefficient of $f$ to $a$. This mutates the polynomial in-place
@@ -239,7 +239,7 @@ necessarily useful to the user, but is used extensively by the generic functiona
 AbstractAlgebra.jl. It is for setting raw coefficients in the representation.
 
 ```julia
-normalise(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+normalise(f::MyPoly{T}, n::Int) where T <: RingElem
 ```
 
 Given a polynomial whose length is currently $n$, including any leading zero
@@ -248,7 +248,7 @@ of the polynomial with nonzero leading coefficient). Note that the function does
 actually perform the normalisation.
 
 ```julia
-fit!(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+fit!(f::MyPoly{T}, n::Int) where T <: RingElem
 ```
 
 Ensure that the polynomial $f$ internally has space for $n$ coefficients. This function
@@ -322,18 +322,18 @@ functions `similar` and `zero` do the same thing, but they are both provided
 for uniformity with other parts of the interface.
 
 ```julia
-similar(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
-zero(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
+similar(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
+zero(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
 ```
 
 Construct the zero polynomial with the same variable as the given polynomial
 with coefficients in the given ring.
 
 ```julia
-similar(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
-similar(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
-zero(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
-zero(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: AbstractAlgebra.RingElem
+similar(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: RingElem
+similar(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: RingElem
+zero(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: RingElem
+zero(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: RingElem
 ```
 
 Construct the zero polynomial with the given variable and coefficients in the

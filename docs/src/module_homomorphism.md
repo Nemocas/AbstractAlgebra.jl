@@ -9,6 +9,17 @@ end
 
 Abstract Algebra provides homomorphisms of finitely presented modules.
 
+## Generic module homomorphism types
+
+AbstractAlgebra defines two module homomorphism types, namely
+`Generic.ModuleHomomorphism` and `Generic.ModuleIsomorphism`. Functionality
+for these is implemented in `src/generic/ModuleHomomorphism.jl`.
+
+## Abstract types
+
+The `Generic.ModuleHomomorphism` and `Generic.ModuleIsomorphism` types inherit
+from `Map(FPModuleHomomorphism)`.
+
 ## Generic functionality
 
 The following generic functionality is provided for module homomorphisms.
@@ -19,11 +30,11 @@ Homomorphisms of AbstractAlgebra modules, $f : R^s \to R^t$, can be represented 
 $s\times t$ matrices over $R$.
 
 ```@docs
-Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
+ModuleHomomorphism(M1::FPModule{T}, M2::FPModule{T}, m::MatElem{T}) where T <: RingElement
 ```
 
 ```@docs
-Generic.ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
+ModuleIsomorphism(M1::FPModule{T}, M2::FPModule{T}, m::MatElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -47,13 +58,13 @@ julia> f(m)
 
 They can also be created by giving images (in the codomain) of the generators of the domain:
 ```@doc
-Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, v::Vector{<:AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement
+ModuleHomomorphism(M1::FPModule{T}, M2::FPModule{T}, v::Vector{<:FPModuleElem{T}}) where T <: RingElement
 ```
 
 ### Kernels
 
 ```@docs
-kernel(f::Map(AbstractAlgebra.FPModuleHomomorphism))
+kernel(f::Map(FPModuleHomomorphism))
 ```
 
 **Examples**
@@ -91,7 +102,7 @@ Codomain: Free module of rank 3 over Integers)
 ### Images
 
 ```@docs
-image(::Map(AbstractAlgebra.FPModuleHomomorphism))
+image(::Map(FPModuleHomomorphism))
 ```
 
 ```julia
@@ -109,7 +120,7 @@ image(compose(k, g))
 ### Preimages
 
 ```@docs
-preimage(::Map(AbstractAlgebra.FPModuleHomomorphism), ::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+preimage(::Map(FPModuleHomomorphism), ::FPModuleElem{T}) where T <: RingElement
 ```
 
 ```julia

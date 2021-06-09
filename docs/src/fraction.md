@@ -7,32 +7,27 @@ end
 
 # Generic fraction fields
 
-AbstractAlgebra.jl provides a module, implemented in `src/generic/Fraction.jl` for
-generic fraction fields over any gcd domain belonging to the AbstractAlgebra.jl
+AbstractAlgebra.jl provides a module, implemented in `src/Fraction.jl` for
+fraction fields over any gcd domain belonging to the AbstractAlgebra.jl
 abstract type hierarchy.
 
-As well as implementing the Fraction Field interface a number of generic algorithms are
-implemented for fraction fields. We describe this generic functionality below.
+## Generic fraction types
 
-All of the generic functionality is part of a submodule of AbstractAlgebra called
-`Generic`. This is exported by default so that it is not necessary to qualify the
-function names with the submodule name.
-
-## Types and parent objects
-
-Fractions implemented using the AbstractAlgebra generics have type `Generic.Frac{T}`
+AbstractAlgebra.jl implements a generic fraction type `Generic.Frac{T}`
 where `T` is the type of elements of the base ring. See the file
 `src/generic/GenericTypes.jl` for details.
 
 Parent objects of such fraction elements have type `Generic.FracField{T}`.
 
-The fraction element types belong to the abstract type `AbstractAlgebra.FracElem{T}`
-and the fraction field types belong to the abstract type `AbstractAlgebra.FracField{T}`.
+## Abstract types
+
+All fraction element types belong to the abstract type `FracElem{T}`
+and the fraction field types belong to the abstract type `FracField{T}`.
 This enables one to write generic functions that can accept any AbstractAlgebra
 fraction type.
 
 Note that both the generic fraction field type `Generic.FracField{T}` and the abstract
-type it belongs to, `AbstractAlgebra.FracField{T}` are both called `FracField`. The
+type it belongs to, `FracField{T}` are both called `FracField`. The
 former is a (parameterised) concrete type for a fraction field over a given base ring
 whose elements have type `T`. The latter is an abstract type representing all
 fraction field types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
@@ -44,7 +39,7 @@ In order to construct fractions in AbstractAlgebra.jl, one can first construct t
 fraction field itself. This is accomplished with the following constructor.
 
 ```julia
-FractionField(R::AbstractAlgebra.Ring; cached::Bool = true)
+FractionField(R::Ring; cached::Bool = true)
 ```
 
 Given a base ring `R` return the parent object of the fraction field of $R$. By default

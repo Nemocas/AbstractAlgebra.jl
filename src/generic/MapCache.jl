@@ -4,14 +4,8 @@
 #
 ################################################################################
 
-export cached, disable_cache!, enable_cache!, set_limit!
-
 get_field(M::MapCache, f) = getfield(M.map, f) # pass accessors through
 set_field!(M::MapCache, f) = setfield(M.map, f) # pass accessors through
-
-function cached(M::AbstractAlgebra.Map; limit::Int = 100, enabled::Bool = true)
-   return MapCache(M, limit, enabled)
-end
 
 domain(M::MapCache{D, C}) where {D, C} = domain(M.map)::D
 codomain(M::MapCache{D, C}) where {D, C} = codomain(M.map)::C

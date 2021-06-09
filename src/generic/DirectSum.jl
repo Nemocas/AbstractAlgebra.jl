@@ -1,10 +1,8 @@
 ###############################################################################
 #
-#   DirectSumModule.jl : Direct sums of modules
+#   DirectSumModule.jl : Generic direct sums of modules
 #
 ###############################################################################
-
-export DirectSumModule, DirectSumModuleElem, summands
 
 ###############################################################################
 #
@@ -160,14 +158,6 @@ function direct_sum_projection(D::DirectSumModule{T}, i::Int, v::AbstractAlgebra
    return elem_type(m)(m, matv)
 end
 
-@doc Markdown.doc"""
-    DirectSum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
-
-Return a tuple $M, f, g$ consisting of $M$ the direct sum of the modules `m`
-(supplied as a vector of modules), a vector $f$ of the injections
-of the $m[i]$ into $M$ and a vector $g$ of the projections from
-$M$ onto the $m[i]$.
-"""
 function DirectSum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
    length(m) == 0 && error("Cannot take a direct sum of an empty vector of modules")
    # Check base rings are the same
@@ -217,10 +207,6 @@ function DirectSum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElem
    return M, inj, pro
 end
 
-function DirectSum(vals::AbstractAlgebra.FPModule{T}...) where T <: RingElement
-   return DirectSum([vals...])
-end
-
 function ModuleHomomorphism(D::DirectSumModule{T}, A::AbstractAlgebra.FPModule{T}, m::Vector{<:ModuleHomomorphism{T}}) where T <: RingElement
    S = summands(D)
    length(S) == length(m) || error("map array has wrong length")
@@ -247,4 +233,3 @@ function ModuleHomomorphism(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Arr
 
    return ModuleHomomorphism(D, A, hvcat(Tuple([length(SD) for i = 1:length(SA)]), map(x->(x.matrix)', m)...)')
 end
-

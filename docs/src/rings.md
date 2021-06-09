@@ -22,10 +22,10 @@ types in generic/GenericTypes.jl:
   - `Generic.PolyRing{T}` for the parent objects
   - `Generic.Poly{T}` for the actual polynomials
 
-The parent type must belong to `AbstractAlgebra.Ring` and the element type must belong
-to `AbstractAlgebra.RingElem`. Of course, the types may belong to these abstract types
-transitively, e.g. `Poly{T}` actually belongs to `AbstractAlgebra.PolyElem{T}` which in
-turn belongs to `AbstractAlgebra.RingElem`.
+The parent type must belong to `Ring` and the element type must belong
+to `RingElem`. Of course, the types may belong to these abstract types
+transitively, e.g. `Poly{T}` actually belongs to `PolyElem{T}` which in
+turn belongs to `RingElem`.
 
 For parameterised rings, we advise that the types of both the parent objects and
 element objects to be parameterised by the types of the elements of the base ring
@@ -39,28 +39,28 @@ implications for the ad hoc operators one might like to explicitly implement.
 ## RingElement type union
 
 Because of its lack of multiple inheritance, Julia does not allow Julia Base
-types to belong to `AbstractAlgebra.RingElem`. To allow us to work equally with
+types to belong to `RingElem`. To allow us to work equally with
 AbstractAlgebra and Julia types that represent elements of rings we define a
-union type `AbstractAlgebra.RingElement` in `src/julia/JuliaTypes`.
+union type `RingElement` in `src/julia/JuliaTypes`.
 
-So far, in addition to `AbstractAlgebra.RingElem` the  union type
-`AbstractAlgebra.RingElement` includes the Julia types `Integer`, `Rational`
+So far, in addition to `RingElem` the  union type
+`RingElement` includes the Julia types `Integer`, `Rational`
 and `AbstractFloat`.
 
 Most of the generic code in AbstractAlgebra makes use of the union type
-`AbstractAlgebra.RingElement` instead of `AbstractAlgebra.RingElem` so that the
+`RingElement` instead of `RingElem` so that the
 generic functions also accept the Julia Base ring types.
 
 One must be careful when defining ad hoc binary operations for ring element
 types. It is often necessary to define separate versions of the functions for
-`AbstractAlgebra.RingElem` then for each of the Julia types separately in
+`RingElem` then for each of the Julia types separately in
 order to avoid ambiguity warnings.
 
-Note that even though `AbstractAlgebra.RingElement` is a union type we still
+Note that even though `RingElement` is a union type we still
 have the following inclusion
 
 ```julia
-AbstractAlgebra.RingElement <: AbstractAlgebra.NCRingElement
+RingElement <: NCRingElement
 ```
 
 ## Parent object caches
@@ -245,7 +245,7 @@ For parameterised rings we also require a function to coerce from the base ring 
 the parent ring.
 
 ```julia
-(R::MyParent{T})(a::T) where T <: AbstractAlgebra.RingElem
+(R::MyParent{T})(a::T) where T <: RingElem
 ```
 
 Coerce $a$ into the ring $R$ if $a$ belongs to the base ring of $R$.
@@ -598,11 +598,11 @@ For parameterised rings over an inexact ring, we also require the following ad h
 approximation functionality.
 
 ```julia
-isapprox(f::MyElem{T}, g::T; atol::Real=sqrt(eps())) where T <: AbstractAlgebra.RingElem
+isapprox(f::MyElem{T}, g::T; atol::Real=sqrt(eps())) where T <: RingElem
 ```
 
 ```julia
-isapprox(f::T, g::MyElem{T}; atol::Real=sqrt(eps())) where T <: AbstractAlgebra.RingElem
+isapprox(f::T, g::MyElem{T}; atol::Real=sqrt(eps())) where T <: RingElem
 ```
 
 These notionally coerce the element of the base ring into the parameterised ring and do
@@ -665,15 +665,15 @@ For parameterised types, it is also sometimes more performant to provide explici
 hoc operators with elements of the base ring.
 
 ```julia
-+(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem
--(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem
-*(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem
++(f::MyElem{T}, c::T) where T <: RingElem
+-(f::MyElem{T}, c::T) where T <: RingElem
+*(f::MyElem{T}, c::T) where T <: RingElem
 ```
 
 ```julia
-+(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem
--(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem
-*(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem
++(c::T, f::MyElem{T}) where T <: RingElem
+-(c::T, f::MyElem{T}) where T <: RingElem
+*(c::T, f::MyElem{T}) where T <: RingElem
 ```
 
 ### Optional ad hoc comparisons
@@ -687,17 +687,17 @@ hoc operators with elements of the base ring.
 ```
 
 ```julia
-==(f::MyElem{T}, c:T) where T <: AbstractAlgebra.RingElem
+==(f::MyElem{T}, c:T) where T <: RingElem
 ```
 
 ```julia
-==(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem
+==(c::T, f::MyElem{T}) where T <: RingElem
 ```
 
 ### Optional ad hoc exact division functions
 
 ```julia
-divexact(a::MyElem{T}, b::T) where T <: AbstractAlgebra.RingElem
+divexact(a::MyElem{T}, b::T) where T <: RingElem
 ```
 
 ```julia

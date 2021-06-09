@@ -5,21 +5,25 @@ DocTestSetup = quote
 end
 ```
 
-# Generic multivariate series
+# Multivariate series
 
-AbstractAlgebra.jl provides generic multivariate series over a commutative
-ring, implemented in `src/generic/AbsMSeries.jl`.
+AbstractAlgebra.jl provide multivariate series over a commutative ring.
 
 Currently only series with capped absolute precision are provided. The
 precision in each variable can be set, but is capped at some maximum
 precision which is set when defining the ring.
 
-As well as implementing the Ring interface, there are numerous additional
-generic algorithms provided. We describe this generic functionality below.
+## Generic multivariate series
 
-All of the generic functionality is part of a submodule of AbstractAlgebra
-called `Generic`. This is exported by default so that it is not necessary to
-qualify the function names with the submodule name.
+Generic multivariate series over a commutative ring,
+`AbsMSeries{T}` is implemented in `src/generic/AbsMSeries.jl`.
+
+Such series are capped absolute series and have type `Generic.AbsMSeries{T}`
+where `T` is the type of elements of the coefficient ring.
+
+Internally they consist of a multivariate polynomial and a vector of
+precisions, one for each variable. See the file
+`src/generic/GenericTypes.jl` for details of the type.
 
 The series are implemented in terms of multivariate polynomials which are
 used internally to keep track of the coefficients of the series.
@@ -28,24 +32,18 @@ Only lex ordering is provided at present, though series print in reverse
 order to what multivariate polynomials would print, i.e. least significant
 term first, as would be expected for series.
 
-## Types and parent objects
-
-Capped absolute generic series implemented using the AbstractAlgebra generics
-have type `Generic.AbsMSeries{T}` where `T` is the type of elements of the
-coefficient ring. Internally they consist of a multivariate polynomial and a
-vector of precisions, one for each variable. See the file
-`src/generic/GenericTypes.jl` for details.
-
 Parent objects of such series have type `Generic.AbsMSeriesRing{T}`.
 
 The symbol representation of the variables and the multivariate polynomial
 ring is stored in the parent object.
 
-The series element types belong to the abstract type
-`AbstractAlgebra.MSeriesElem{T}` and the series ring types belong to the
-abstract type `AbstractAlgebra.MSeriesRing{T}`. This enables one to write
-generic functions that can accept any AbstractAlgebra multivariate series
-type.
+## Abstract types
+
+Multivariate series element types belong to the abstract type
+`MSeriesElem{T}` and the multivariate series ring types
+belong to the abstract type `MSeriesRing{T}`. This enables
+one to write generic functions that can accept any AbstractAlgebra
+multivariate series type.
 
 ## Multivariate series ring constructors
 
@@ -54,7 +52,7 @@ construct the series ring itself. This is accomplished with the following
 constructor.
 
 ```julia
-PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int}, s::Vector{U}; cached::Bool = true) where U <: AbstractString
+PowerSeriesRing(R::Ring, prec::Vector{Int}, s::Vector{U}; cached::Bool = true) where U <: AbstractString
 ```
 
 Given a base ring `R` and vector of strings `s` specifying how the generators
@@ -177,7 +175,7 @@ nvars(::Generic.AbsMSeriesRing)
 ```
 
 ```@docs
-symbols(::AbstractAlgebra.MSeriesRing)
+symbols(::MSeriesRing)
 ```
 
 ```@docs
@@ -266,7 +264,7 @@ evaluate(::U, ::Vector{U}) where {T <: RingElement, U <: Generic.AbsMSeries{T}}
 ### Random generation
 
 ```@docs
-rand(::AbstractAlgebra.MSeriesRing, term_range, v...)
+rand(::MSeriesRing, term_range, v...)
 ```
 
 

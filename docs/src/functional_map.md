@@ -11,13 +11,13 @@ A functional map in AbstractAlgebra is a map which can be applied by evaluating 
 function or closure. It is represented by a map object that contains such a
 function/closure, usually in a field called `image_fn`.
 
-All functional maps belong to the map class `AbstractAlgebra.FunctionalMap`.
+All functional maps belong to the map class `FunctionalMap`.
 
 A generic concrete type `Generic.FunctionalMap` is provided by the Generic module to
 implement a generic functional map type. This allows for functional maps that contain no
 extra data, other than a Julia function/closure.
 
-Custom map types can also be defined which have map class `AbstractAlgebra.FunctionalMap`.
+Custom map types can also be defined which have map class `FunctionalMap`.
 
 ## Functional map interface
 

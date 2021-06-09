@@ -1387,7 +1387,7 @@ end
    maxdeg = 20
 
    # :deglex ordering
-   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:lex)
+   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x", "y", "z"], ordering=:lex)
    # Monomials of degree 2
    @test isless(z^2, y*z) == true
    @test isless(y*z, y^2) == true
@@ -1407,7 +1407,7 @@ end
    end
 
    # :deglex ordering
-   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:deglex)
+   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x", "y", "z"], ordering=:deglex)
 
    @test isless(z^2, y*z) == true
    @test isless(y*z, x*z) == true
@@ -1442,7 +1442,7 @@ end
    end
 
    # :degrevlex ordering
-   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:degrevlex)
+   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x", "y", "z"], ordering=:degrevlex)
    # Monomials of degree 2
    @test isless(z^2, y*z) == true
    @test isless(y*z, x*z) == true
