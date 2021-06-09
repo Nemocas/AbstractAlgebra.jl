@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export DirectSum, DirectSumModule, DirectSumModuleElem, direct_sum, summands
+export DirectSum, direct_sum, summands
 
 ###############################################################################
 #
