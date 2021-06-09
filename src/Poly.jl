@@ -3079,9 +3079,9 @@ function PolynomialRing(R::Ring, s::Symbol; cached::Bool = true)
 end
 
 function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
-   return Generic.PolynomialRing(R, Symbol(s); cached=cached)
+   return PolynomialRing(R, Symbol(s); cached=cached)
 end
 
 function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
-   return Generic.PolynomialRing(R, Symbol(s); cached=cached)
+   return PolynomialRing(R, Symbol(s); cached=cached)
 end

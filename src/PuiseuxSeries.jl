@@ -27,7 +27,7 @@ precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
 function PuiseuxSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
-   return Generic.PuiseuxSeriesRing(R, prec, Symbol(s); cached=cached)
+   return PuiseuxSeriesRing(R, prec, Symbol(s); cached=cached)
 end
 
 function PuiseuxSeriesRing(R::Ring, prec::Int, s::Symbol; cached=true)
@@ -35,11 +35,11 @@ function PuiseuxSeriesRing(R::Ring, prec::Int, s::Symbol; cached=true)
 end
 
 function PuiseuxSeriesRing(R::Ring, prec::Int, s::Char; cached=true)
-   return Generic.PuiseuxSeriesRing(R, prec, Symbol(s); cached=cached)
+   return PuiseuxSeriesRing(R, prec, Symbol(s); cached=cached)
 end
 
 function PuiseuxSeriesField(R::Field, prec::Int, s::AbstractString; cached = true)
-   return Generic.PuiseuxSeriesField(R, prec, Symbol(s); cached=cached)
+   return PuiseuxSeriesField(R, prec, Symbol(s); cached=cached)
 end
 
 function PuiseuxSeriesField(R::Field, prec::Int, s::Symbol; cached = true)
@@ -47,5 +47,5 @@ function PuiseuxSeriesField(R::Field, prec::Int, s::Symbol; cached = true)
 end
 
 function PuiseuxSeriesField(R::Field, prec::Int, s::Char; cached = true)
-   return Generic.PuiseuxSeriesField(R, prec, Symbol(s); cached=cached)
+   return PuiseuxSeriesField(R, prec, Symbol(s); cached=cached)
 end

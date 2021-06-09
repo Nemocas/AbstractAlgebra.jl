@@ -38,10 +38,10 @@ function LaurentPolynomialRing(R::Ring, s::Symbol)
 end
 
 function LaurentPolynomialRing(R::Ring, s::Char)
-   return Generic.LaurentPolynomialRing(R, Symbol(s))
+   return LaurentPolynomialRing(R, Symbol(s))
 end
 
 function LaurentPolynomialRing(R::Ring, s::AbstractString)
-   return Generic.LaurentPolynomialRing(R, Symbol(s))
+   return LaurentPolynomialRing(R, Symbol(s))
 end
 

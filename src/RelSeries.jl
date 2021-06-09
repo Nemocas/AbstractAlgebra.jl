@@ -1314,9 +1314,9 @@ function PowerSeriesRing(R::Ring, prec::Int, s::Symbol; cached=true, model=:capp
 end
 
 function PowerSeriesRing(R::Ring, prec::Int, s::Char; cached=true, model=:capped_relative)
-   return Generic.PowerSeriesRing(R, prec, Symbol(s); cached=cached, model=model)
+   return PowerSeriesRing(R, prec, Symbol(s); cached=cached, model=model)
 end
 
 function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
-   return Generic.PowerSeriesRing(R, prec, Symbol(s); cached=cached, model=model)
+   return PowerSeriesRing(R, prec, Symbol(s); cached=cached, model=model)
 end
