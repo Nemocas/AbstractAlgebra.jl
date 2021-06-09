@@ -4092,3 +4092,8 @@ function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{Symbol, 1}; cached::Bo
 
    return tuple(parent_obj, gens(parent_obj))
 end
+
+function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
+   return PolynomialRing(R, [Symbol(v) for v in s]; cached=cached, ordering=ordering)
+end
+
