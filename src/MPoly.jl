@@ -1182,7 +1182,7 @@ end
 
 function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::Symbol=:x;
                                   cached::Bool = false, ordering::Symbol = :lex)
-   return Generic.PolynomialRing(R, [Symbol(s, i) for i=1:n], cached = cached,
+   return PolynomialRing(R, [Symbol(s, i) for i=1:n], cached = cached,
          ordering = ordering)
 end
 
