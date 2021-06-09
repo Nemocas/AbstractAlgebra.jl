@@ -2040,7 +2040,15 @@ Return the Pfaffian of a skew-symmetric matrix M.
 """
 function pfaffian(M::MatElem)
    check_skew_symmetric(M)
-   _pfaffian(M, collect(1:ncols(M)), ncols(M))
+   # when the matrix is big, try use the BFL algorithm
+   if ncols(M) > 10
+      try
+	 return pfaffian_bfl_bsgs(M)
+      catch
+      end
+   end
+   # fallback to using recursion
+   return pfaffian_r(M)
 end
 
 @doc Markdown.doc"""
@@ -2053,12 +2061,13 @@ function pfaffians(M::MatElem, k::Int)
    indices = combinations(ncols(M), k)
    pfs = elem_type(base_ring(M))[]
    for i in indices
-      push!(pfs, _pfaffian(M, i, k))
+      push!(pfs, pfaffian(M[i, i]))
    end
    return pfs
 end
 
-# actual computation using recursion
+# using recursion
+pfaffian_r(M::MatElem) = _pfaffian(M, collect(1:ncols(M)), ncols(M))
 function _pfaffian(M::MatElem, idx::Vector{Int}, k::Int)
    R = base_ring(M)
    k == 0 && return R(1)
@@ -2080,22 +2089,16 @@ function _pfaffian(M::MatElem, idx::Vector{Int}, k::Int)
    return ans
 end
 
-@doc Markdown.doc"""
-    pfaffian_bfl(M::AbstractAlgebra.MatElem)
-
-Return the Pfaffian of a skew-symmetric matrix M, using the algorithm of
-Baer-Faddeev-LeVerrier. The base ring of M should be a QQ-algebra to allow
-integer divisions.
-"""
+# using the algorithm of Baer-Faddeev-LeVerrier
+# the base ring of M should allow divisions of small integers
+# (specifically, 2,4,6,...,n).
 function pfaffian_bfl(M::MatElem)
-   check_skew_symmetric(M)
    R = base_ring(M)
-   characteristic(R) == 0 || throw(DomainError(M, "base ring must be of characteristic 0"))
    n = ncols(M)
+   characteristic(R) == 0 || characteristic(R) > n || throw(DomainError(M, "base ring must allow divisions of small integers"))
    n == 0 && return R(1)
    isodd(n) && return R()
    n == 2 && return M[1, 2]
-   k = div(n, 2)
    N = deepcopy(M)
    for i in 1:2:n
       for j in 1:n
@@ -2103,11 +2106,12 @@ function pfaffian_bfl(M::MatElem)
       end
    end
    P = deepcopy(N)
-   for i in 1:k - 1
-      P -= (1//2i) * tr(P)
+   half_n = div(n, 2)
+   for i in 1:half_n - 1
+      P -= inv(R(2i)) * tr(P)
       P *= N
    end
-   return (-1)^k * (-1//2k) * tr(P)
+   return (-1)^(half_n + 1) * inv(R(n)) * tr(P)
 end
 
 function trace_of_prod(M::MatElem, N::MatElem)
@@ -2120,15 +2124,14 @@ function trace_of_prod(M::MatElem, N::MatElem)
 end
 
 # use baby-step giant-step
+# see https://arxiv.org/abs/2011.12573
 function pfaffian_bfl_bsgs(M::MatElem)
-   check_skew_symmetric(M)
    R = base_ring(M)
-   characteristic(R) == 0 || throw(DomainError(M, "base ring must be of characteristic 0"))
    n = ncols(M)
+   characteristic(R) == 0 || characteristic(R) > n || throw(DomainError(M, "base ring must allow divisions of small integers"))
    n == 0 && return R(1)
    isodd(n) && return R()
    n == 2 && return M[1, 2]
-   k = div(n, 2)
    N = deepcopy(M)
    for i in 1:2:n
       for j in 1:n
@@ -2138,34 +2141,36 @@ function pfaffian_bfl_bsgs(M::MatElem)
 
    # precompute the powers of N and their traces
    m = isqrt(n)
-   Ni = [N]
+   N_power = [N]
    for i in 1:m - 1
-      push!(Ni, Ni[end] * N)
+      push!(N_power, N_power[end] * N)
    end
-   t = tr.(Ni)
+   t = tr.(N_power)
 
    P = identity_matrix(R, n)
    c = Vector{elem_type(R)}(undef, m)
    i = 1
-   while i <= k - 1
-      m = min(m, k - i)
+   half_n = div(n, 2)
+   while i <= half_n - 1
+      m = min(m, half_n - i)
       # compute the coefficient c[m - j] before each N^j
       for j in 1:m
-         c[j] = trace_of_prod(Ni[j], P)
+         # when i = 1, P = Id, so tr(N^j) is already known
+         c[j] = (i == 1) ? t[j] : trace_of_prod(N_power[j], P)
          for k in 1:j - 1
             c[j] += t[k] * c[j - k]
          end
-         c[j] *= -1//2(i + j - 1)
+         c[j] *= -inv(R(2(i + j - 1)))
       end
-      P *= Ni[m]
+      P *= N_power[m]
       for j in 1:m - 1
-         P += c[m - j] * Ni[j]
+         P += c[m - j] * N_power[j]
       end
       P += c[m]
       i += m
    end
 
-   return (-1)^k * (-1//2k) * trace_of_prod(N, P)
+   return (-1)^(half_n + 1) * inv(R(n)) * trace_of_prod(N, P)
 end
 
 ###############################################################################

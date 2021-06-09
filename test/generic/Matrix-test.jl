@@ -1482,7 +1482,7 @@ end
          @test_throws DomainError AbstractAlgebra.Generic.pfaffian(M)
       end
       M = transpose(M) - M
-      @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian(M)
+      @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian_r(M)
       @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian_bfl(M)
       @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian_bfl_bsgs(M)
    end
