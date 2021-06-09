@@ -170,7 +170,7 @@
    function limited_latex_string(x)
       x = AbstractAlgebra.canonicalize(x)
       b = IOBuffer()
-      c = IOContext(b, :size_limit => 30)
+      c = IOContext(b, :size_limit => 20)
       AbstractAlgebra.show_obj(c, MIME("text/latex"), x)
       return String(take!(b))
    end
@@ -178,30 +178,36 @@
    function limited_string(x)
       x = AbstractAlgebra.canonicalize(x)
       b = IOBuffer()
-      c = IOContext(b, :size_limit => 30)
+      c = IOContext(b, :size_limit => 20)
       AbstractAlgebra.show_obj(c, MIME("text/plain"), x)
       return String(take!(b))
    end
 
    e = Expr(:call, :+, [:(x^$i) for i in 1:200]...)
-   @test length(limited_latex_string(e)) < 200
-   @test length(limited_string(e)) < 200
+   @test limited_latex_string(e) == "x^{1} + x^{2} + x^{3} + x^{4} +"*
+                                    " {\\ldots} + x^{198} + x^{199} + x^{200}"
+   @test limited_string(e) == "x^1 + x^2 + x^3 + x^4 +"*
+                              " ... + x^198 + x^199 + x^200"
 
    e = Expr(:call, :*, [:(x^$i) for i in 1:200]...)
-   @test length(limited_latex_string(e)) < 200
-   @test length(limited_string(e)) < 200
+   @test limited_latex_string(e) == "x^{1} x^{2} x^{3} x^{4} "*
+                                    "{\\ldots} x^{198} x^{199} x^{200}"
+   @test limited_string(e) == "x^1*x^2*x^3*x^4*...*x^198*x^199*x^200"
 
-   e = Expr(:call, :f, [:(x^$i) for i in 1:200]...)
-   @test length(limited_latex_string(e)) < 200
-   @test length(limited_string(e)) < 200
+   e = Expr(:call, [:(x^$i) for i in 1:200]...)
+   @test limited_latex_string(e) == "\\left(x^{1}\\right)\\left(x^{2}, x^{3},"*
+                         " x^{4}, {\\ldots}, x^{198}, x^{199}, x^{200}\\right)"
+   @test limited_string(e) == "(x^1)(x^2, x^3, x^4, ..., x^198, x^199, x^200)"
 
    e = Expr(:ref, [:(x^$i) for i in 1:200]...)
-   @test length(limited_latex_string(e)) < 200
-   @test length(limited_string(e)) < 200
+   @test limited_latex_string(e) == "\\left(x^{1}\\right)\\left[x^{2}, "*
+                   "x^{3}, x^{4}, {\\ldots}, x^{198}, x^{199}, x^{200}\\right]"
+   @test limited_string(e) == "(x^1)[x^2, x^3, x^4, ..., x^198, x^199, x^200]"
 
    e = Expr(:list, [:(x^$i) for i in 1:200]...)
-   @test length(limited_latex_string(e)) < 200
-   @test length(limited_string(e)) < 200
+   @test limited_latex_string(e) == "\\left{x^{1}, x^{2}, x^{3}, x^{4}, "*
+                                 "{\\ldots}, x^{198}, x^{199}, x^{200}\\right}"
+   @test limited_string(e) == "{x^1, x^2, x^3, x^4, ..., x^198, x^199, x^200}"
 
    e = Expr(:sequence, Expr(:text, "Polynomial ring in "),
                        :x,
@@ -244,11 +250,26 @@
 
    m = matrix(R, [x^i*y^j for i in 0:20, j in 0:20])
    e = AbstractAlgebra.expressify(m)
-   @test length(latex_string(e)) > 100 + length(limited_latex_string(e))
+   @test length(latex_string(e)) > 21*21
+   @test limited_latex_string(e) == "\\begin{array}{ccc}\n"*
+                                    "1 & \\cdots  & y^{20} \\\\\n"*
+                                    "\\vdots  & \\ddots  & \\vdots  \\\\\n"*
+                                    "x^{20} & \\cdots  & x^{20} y^{20}\n"*
+                                    "\\end{array}"
 
    m = matrix(R, [x^i*y^j for i in 0:20, j in 0:1])
    e = AbstractAlgebra.expressify(m)
-   @test length(latex_string(e)) > 100 + length(limited_latex_string(e))
-
+   @test length(latex_string(e)) > 21*2
+   @test limited_latex_string(e) == "\\begin{array}{cc}\n"*
+                                    "1 & y \\\\\n"*
+                                    "x & x y \\\\\n"*
+                                    "x^{2} & x^{2} y \\\\\n"*
+                                    "x^{3} & x^{3} y \\\\\n"*
+                                    "\\vdots  & \\vdots  \\\\\n"*
+                                    "x^{17} & x^{17} y \\\\\n"*
+                                    "x^{18} & x^{18} y \\\\\n"*
+                                    "x^{19} & x^{19} y \\\\\n"*
+                                    "x^{20} & x^{20} y\n"*
+                                    "\\end{array}"
 end
 

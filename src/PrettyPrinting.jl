@@ -1024,7 +1024,9 @@ function print_vcat(S::printer, mi::MIME"text/latex", obj::Expr,
    else
       display_ncols = ncols
       use_col_elision = false
+      a = ncols   # just take a to the max
    end
+
    push(S, "\\begin{array}")
    push(S, "{" * "c"^display_ncols * "}\n")
 
