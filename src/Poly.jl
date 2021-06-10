@@ -3085,3 +3085,8 @@ end
 function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
+
+function PolynomialRing(R::Ring)
+   T = elem_type(R)
+   return Generic.PolyRing{T}(R, :x, false)
+end

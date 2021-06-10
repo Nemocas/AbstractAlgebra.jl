@@ -1320,3 +1320,14 @@ end
 function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
    return PowerSeriesRing(R, prec, Symbol(s); cached=cached, model=model)
 end
+
+function AbsSeriesRing(R::Ring, prec::Int)
+   T = elem_type(R)
+   return Generic.AbsSeriesRing{T}(R, prec, :x, false)
+end
+
+function RelSeriesRing(R::Ring, prec::Int)
+   T = elem_type(R)
+   return Generic.RelSeriesRing{T}(R, prec, :x, false)
+end
+
