@@ -288,11 +288,6 @@ function canonicalizePlusFinal!(obj::Expr)
          obj.args[i] = abs
       end
    end
-   # julia supports only binary subtraction
-   if length(obj.args) == 3 && isaExprOp(obj.args[3], :-, 1)
-      obj.args[3] = obj.args[3].args[2]
-      obj.args[1] = :-
-   end
    return obj
 end
 
