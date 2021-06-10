@@ -12,8 +12,9 @@ function ispower(a::RingElem, n::Int)
         return true, a
     end
     R = parent(a)
-    Rt, t = PolynomialRing(R, "t", cached = false)
-    r = roots(t^n-a)
+    Rt = PolyRing(R)
+    x = gen(Rt)
+    r = roots(x^n - a)
     if length(r) == 0
         return false, a
     else
@@ -26,3 +27,4 @@ function root(a::RingElem, n::Int)
     fl || error("element does not have a $n-th root")
     return b
 end
+

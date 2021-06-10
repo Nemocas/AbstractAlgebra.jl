@@ -22,6 +22,12 @@
 end
 
 @testset "Generic.AbsSeries.constructors" begin
+   S1 = AbsSeriesRing(ZZ, 10)
+   S2 = AbsSeriesRing(ZZ, 10)
+
+   @test S1 !== S2
+   @test isa(S1, Generic.AbsSeriesRing)
+
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    S, t = PolynomialRing(QQ, "t")

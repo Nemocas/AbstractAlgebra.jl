@@ -22,6 +22,12 @@
 end
 
 @testset "Generic.RelSeries.constructors" begin
+   S1 = RelSeriesRing(ZZ, 10)
+   S2 = RelSeriesRing(ZZ, 10)
+
+   @test S1 !== S2
+   @test isa(S1, Generic.RelSeriesRing)
+
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    S, t = PolynomialRing(QQ, "t")

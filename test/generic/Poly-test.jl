@@ -22,6 +22,12 @@
 end
 
 @testset "Generic.Poly.constructors" begin
+   S1 = PolyRing(ZZ)
+   S2 = PolyRing(ZZ)
+
+   @test S1 !== S2
+   @test isa(S1, Generic.PolyRing)
+
    R, x = ZZ["x"]
    S1 = R["y"]
    S2 = ZZ["x"]["y"]
