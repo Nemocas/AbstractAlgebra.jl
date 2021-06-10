@@ -85,10 +85,14 @@ x^3 + 3*x + 1
 ### Basic manipulation of rings and elements
 
 ```julia
-data(f::MyRes{T}) where T <: AbstractAlgebra.RingElem
+data(f::MyRes{T}) where T <: RingElem
+lift(f::MyRes{T}) where T <: RingElem
 ```
 
-Given a residue $r \pmod{m}$, represented as such, return $r$.
+Given a residue $r \pmod{m}$, represented as such, return $r$. In the special
+case where machine integers are used to represent the residue, `data` will
+return the machine integer, whereas `lift` will return a multiprecision
+integer. Otherwise `lift` falls back to `data` by default.
 
 **Examples**
 
