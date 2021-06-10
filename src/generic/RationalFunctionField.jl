@@ -571,14 +571,14 @@ end
 #
 ###############################################################################
 
-function RationalFunctionField(k::Field, s::AbstractString; cached=true)
+function RationalFunctionField(k::Field, s::Symbol; cached=true)
    T = elem_type(k)
 
    R, x = AbstractAlgebra.PolynomialRing(k, s, cached=cached)
    g = x//1
    t = Rat{T}(g)
 
-   par_object = RationalFunctionField{T}(k, parent(g), Symbol(s), cached)
+   par_object = RationalFunctionField{T}(k, parent(g), s, cached)
 
    t.parent = par_object
 

@@ -78,8 +78,8 @@ julia> a = f(ZZ(1))
 The following functionality is provided for maps with inverses.
 
 ```julia
-inv(M::MapWithRetraction)
-inv(M::MapWithSection)
+inv(M::Generic.MapWithRetraction)
+inv(M::Generic.MapWithSection)
 ```
 
 Return the map with the two maps contained in $M$ swapped. In the first case, a
@@ -88,10 +88,10 @@ Return the map with the two maps contained in $M$ swapped. In the first case, a
 To access the two maps stored in a map with retraction/section, we have the following:
 
 ```julia
-image_map(M::MapWithRetraction)
-image_map(M::MapWithSection)
-retraction_map(M::MapWithRetraction)
-section_map(M::MapWithSection)
+image_map(M::Generic.MapWithRetraction)
+image_map(M::Generic.MapWithSection)
+retraction_map(M::Generic.MapWithRetraction)
+section_map(M::Generic.MapWithSection)
 ```
 
 The first two of these functions return the first map in a map with retraction/section,

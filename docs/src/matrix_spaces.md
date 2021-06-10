@@ -74,23 +74,23 @@ In addition to the standard constructors, the following constructors, taking an 
 elements, must be available.
 
 ```julia
-(S::MyMatSpace{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElem
-(S::MyMatAlgebra{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElem
+(S::MyMatSpace{T})(A::Array{T, 2}) where T <: RingElem
+(S::MyMatAlgebra{T})(A::Array{T, 2}) where T <: RingElem
 ```
 
 Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`.
 
 ```julia
-(S::MyMatSpace{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}
-(S::MyMatAlgebra{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}
+(S::MyMatSpace{T})(A::Array{S, 2}) where {S <: RingElem, T <: RingElem}
+(S::MyMatAlgebra{T})(A::Array{S, 2}) where {S <: RingElem, T <: RingElem}
 ```
 
 Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`,
 where `S` is the type of elements that can be coerced into the base ring of the matrix.
 
 ```julia
-(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}
-(S::MyMatAlgebra{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}
+(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: RingElem, T <: RingElem}
+(S::MyMatAlgebra{T})(A::Array{S, 1}) where {S <: RingElem, T <: RingElem}
 ```
 
 Create the matrix in the given space/algebra of matrices (with dimensions $m\times n$
@@ -139,7 +139,7 @@ their parent. Instead, parents are constructed on-the-fly if requested. (The sam
 strategy is used for matrix algebras.)
 
 ```julia
-matrix(R::Ring, arr::Array{T, 2}) where T <: AbstractAlgebra.RingElem
+matrix(R::Ring, arr::Array{T, 2}) where T <: RingElem
 ```
 
 Given an $m\times n$ Julia matrix of entries, construct the corresponding
@@ -148,7 +148,7 @@ coerced into `R`.
 
 
 ```julia
-matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: AbstractAlgebra.RingElem
+matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: RingElem
 ```
 
 Construct the given $r\times c$ AbstractAlgebra.jl matrix over the ring `R` whose
@@ -224,7 +224,7 @@ R = N1*N2
 ### Basic manipulation of matrices
 
 ```julia
-dense_matrix_type(::Type{T}) where T <: AbstractAlgebra.RingElem
+dense_matrix_type(::Type{T}) where T <: RingElem
 ```
 
 Return the type of dense matrices whose entries have the given type. E.g.
@@ -232,25 +232,25 @@ in Nemo, which depends on AbstractAlgebra, we define
 `dense_matrix_type(::Type{fmpz}) = fmpz_mat`.
 
 ```julia
-nrows(f::MyMat{T}) where T <: AbstractAlgebra.RingElem
+nrows(f::MyMat{T}) where T <: RingElem
 ```
 
 Return the number of rows of the given matrix.
 
 ```julia
-ncols(f::MyMat{T}) where T <: AbstractAlgebra.RingElem
+ncols(f::MyMat{T}) where T <: RingElem
 ```
 
 Return the number of columns of the given matrix.
 
 ```julia
-getindex(M::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
+getindex(M::MyMat{T}, r::Int, c::Int) where T <: RingElem
 ```
 
 Return the $(i, j)$-th entry of the matrix $M$.
 
 ```julia
-setindex!(M::MyMat{T}, d::T, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
+setindex!(M::MyMat{T}, d::T, r::Int, c::Int) where T <: RingElem
 ```
 
 Set the $(i, j)$-th entry of the matrix $M$ to $d$, which is assumed to be in the
@@ -280,7 +280,7 @@ julia> c = M[1, 1]
 ### Transpose
 
 ```julia
-transpose(::MyMat{T}) where T <: AbstractAlgebra.RingElem
+transpose(::MyMat{T}) where T <: RingElem
 ```
 
 Return the transpose of the given matrix.
@@ -357,7 +357,7 @@ julia> N3 = M[2:3, 2:3]
 ### Optional row swapping
 
 ```julia
-swap_rows!(M::MyMat{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
+swap_rows!(M::MyMat{T}, i::Int, j::Int) where T <: RingElem
 ```
 
 Swap the rows of `M` in place. The function returns the mutated matrix (since
@@ -383,14 +383,14 @@ julia> swap_rows!(M, 1, 2)
 The following are only available for matrix spaces, not for matrix algebras.
 
 ```julia
-hcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElem
+hcat(M::MyMat{T}, N::MyMat{T}) where T <: RingElem
 ```
 
 Return the horizontal concatenation of $M$ and $N$. It is assumed that the number of
 rows of $M$ and $N$ are the same.
 
 ```julia
-vcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElem
+vcat(M::MyMat{T}, N::MyMat{T}) where T <: RingElem
 ```
 
 Return the vertical concatenation of $M$ and $N$. It is assumed that the number of
@@ -431,18 +431,18 @@ spaces. Both `similar` and `zero` construct new matrices, with the same methods,
 the entries are either undefined with `similar` or zero-initialized with `zero`.
 
 ```julia
-similar(x::MyMat{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
-zero(x::MyMat{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
+similar(x::MyMat{T}, R::Ring=base_ring(x)) where T <: RingElem
+zero(x::MyMat{T}, R::Ring=base_ring(x)) where T <: RingElem
 ```
 
 Construct the matrix with the same dimensions as the given matrix, and the
 same base ring unless explicitly specified.
 
 ```julia
-similar(x::MyMat{T}, R::Ring, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
-similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
-zero(x::MyMat{T}, R::Ring, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
-zero(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
+similar(x::MyMat{T}, R::Ring, r::Int, c::Int) where T <: RingElem
+similar(x::MyMat{T}, r::Int, c::Int) where T <: RingElem
+zero(x::MyMat{T}, R::Ring, r::Int, c::Int) where T <: RingElem
+zero(x::MyMat{T}, r::Int, c::Int) where T <: RingElem
 ```
 
 Construct the $r\times c$ matrix with `R` as base ring (which defaults to the

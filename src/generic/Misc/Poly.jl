@@ -77,17 +77,17 @@ end
 
 @doc Markdown.doc"""
     power_sums_to_polynomial(P::Array{T, 1};
-      parent::AbstractAlgebra.PolyRing{T}=PolynomialRing(parent(P[1]), "x",
-                       cached=false)[1]) where T <: RingElement -> PolyElem{T}
+                     parent::AbstractAlgebra.PolyRing{T}=
+   AbstractAlgebra.PolyRing(parent(P[1])) where T <: RingElement -> PolyElem{T}
 
 Uses the Newton (or Newton-Girard) identities to obtain the polynomial
 with given sums of powers of roots. The list must be nonempty and contain
 `degree(f)` entries where $f$ is the polynomial to be recovered. The list
 must start with the sum of first powers of the roots.
 """
-function power_sums_to_polynomial(P::Array{T, 1};
-            parent::AbstractAlgebra.PolyRing{T}=AbstractAlgebra.PolynomialRing(parent(P[1]), "x",
-                                           cached=false)[1]) where T <: RingElement
+function power_sums_to_polynomial(P::Array{T, 1}; 
+                           parent::AbstractAlgebra.PolyRing{T}=
+	         AbstractAlgebra.PolyRing(parent(P[1]))) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
 
@@ -129,7 +129,7 @@ end
 ################################################################################
 
 function factor(f::PolyElem, R::Field)
-    Rt = AbstractAlgebra.PolynomialRing(R, "t", cached = false)[1]
+    Rt = AbstractAlgebra.PolyRing(R)
     f1 = change_base_ring(R, f, parent = Rt)
     return factor(f1)
 end
@@ -176,7 +176,7 @@ end
 Returns the roots of the polynomial `f` in the field `R` as an array.
 """
 function roots(f::PolyElem, R::Field)
-    Rt = AbstractAlgebra.PolynomialRing(R, "t", cached = false)[1]
+    Rt = AbstractAlgebra.PolyRing(R)
     f1 = change_base_ring(R, f, parent = Rt)
     return roots(f1)
 end

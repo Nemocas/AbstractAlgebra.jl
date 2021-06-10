@@ -1479,13 +1479,19 @@ end
       idx = 0
       M = matrix(R, [j <= i ? R() : (idx += 1; x[idx]) for j in 1:dim, i in 1:dim])
       if dim >= 2 # the matrix is indeed skew-symmetric when dim <= 1
-         @test_throws DomainError AbstractAlgebra.Generic.pfaffian(M)
+         @test_throws DomainError pfaffian(M)
       end
       M = transpose(M) - M
-      @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian_r(M)
-      @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian_bfl(M)
-      @test pf[dim + 1] == AbstractAlgebra.Generic.pfaffian_bfl_bsgs(M)
+      @test pf[dim + 1] == AbstractAlgebra.pfaffian_r(M)
+      @test pf[dim + 1] == AbstractAlgebra.pfaffian_bfl(M)
+      @test pf[dim + 1] == AbstractAlgebra.pfaffian_bfl_bsgs(M)
    end
+
+   # do a big matrix which uses BFL
+   R = MatrixSpace(QQ, 12, 12)
+   M = rand(R, -5:5)
+   M = transpose(M) - M
+   @test det(M) == pfaffian(M)^2
    
    S, z = PolynomialRing(ZZ, "z")
    n = 5
@@ -1493,15 +1499,15 @@ end
       R = MatrixSpace(S, dim, dim)
       M = rand(R, -1:5, -5:5)
       M = transpose(M) - M
-      @test [1] == AbstractAlgebra.Generic.pfaffians(M, 0)
+      @test [1] == pfaffians(M, 0)
       for i = 1:2:dim
-         for m in AbstractAlgebra.Generic.pfaffians(M, i)
+         for m in pfaffians(M, i)
             @test m == 0
          end
       end
-      @test det(M) == AbstractAlgebra.Generic.pfaffian(M)^2
-      @test det(M) == AbstractAlgebra.Generic.pfaffians(M, dim)[1]^2
-      @test [] == AbstractAlgebra.Generic.pfaffians(M, dim + 1)
+      @test det(M) == pfaffian(M)^2
+      @test det(M) == pfaffians(M, dim)[1]^2
+      @test [] == pfaffians(M, dim + 1)
    end
 end
 

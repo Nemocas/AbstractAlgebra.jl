@@ -57,8 +57,8 @@ In AbstractAlgebra.jl, we use the abstract type hierarchy in order to give
 structure when programming the mathematical structures. For example, abstract
 types in Julia can belong to one another in a hierarchy.
 
-For example, the `AbstractAlgebra.Field` abstract type belongs to the
-`AbstractAlgebra.Ring` abstract type. The full hierarchy can be seen in diagrams
+For example, the `Field` abstract type belongs to the
+`Ring` abstract type. The full hierarchy can be seen in diagrams
 under the section [on visualisation of the abstract types](visualizing_types.md).
 
 In practice this is practical since it means that any generic function designed

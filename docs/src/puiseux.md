@@ -32,13 +32,13 @@ The types of generic Puiseux series implemented by AbstractAlgebra.jl are
 Both series element types belong to the union type
 `Generic.PuiseuxSeriesElem`.
 
-Puiseux series elements belong directly to either `AbstractAlgebra.RingElem` or
-`AbstractAlgebra.FieldElem` since it is more useful to be able to distinguish whether
+Puiseux series elements belong directly to either `RingElem` or
+`FieldElem` since it is more useful to be able to distinguish whether
 they belong to a ring or field than it is to distinguish that they are Puiseux series.
 
 The parent types for Puiseux series, `Generic.PuiseuxSeriesRing{T}`
-and `Generic.PuiseuxSeriesField{T}` respectively, belong to `AbstractAlgebra.Ring`
-and `AbstractAlgebra.Field` respectively.
+and `Generic.PuiseuxSeriesField{T}` respectively, belong to `Ring`
+and `Field` respectively.
 
 The default precision, string representation of the variable and base ring $R$ of a
 generic Puiseux series are stored in its parent object.
@@ -49,15 +49,15 @@ In order to construct Puiseux series in AbstractAlgebra.jl, one must first const
 ring itself. This is accomplished with any of the following constructors.
 
 ```julia
-PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
+PuiseuxSeriesRing(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
 ```
 
 ```julia
-PuiseuxSeriesRing(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)
+PuiseuxSeriesRing(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
 ```
 
 ```julia
-PuiseuxSeriesField(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)
+PuiseuxSeriesField(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
 ```
 
 Given a base ring `R`, a maximum relative precision and a string `s` specifying how the

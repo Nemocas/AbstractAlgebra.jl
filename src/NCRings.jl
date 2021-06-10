@@ -94,6 +94,12 @@ end
 
 Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 
+function check_parent(a::NCRingElement, b::NCRingElement, throw::Bool=true)
+   c = parent(a) !== parent(b)
+   c && throw && error("Incompatible polynomial rings in polynomial operation")
+   return !c
+end
+
 ###############################################################################
 #
 #   Basic manipulation

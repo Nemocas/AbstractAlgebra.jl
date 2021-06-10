@@ -2,7 +2,8 @@
 #
 # This file is a modification of base/weakkeydict.jl from the Julia project.
 
-import Base: isempty, setindex!, getkey, length, iterate, empty, delete!, pop!, get, sizehint!, copy
+import Base: isempty, setindex!, getkey, length, iterate, empty, delete!, pop!,
+       get, sizehint!, copy
 """
     WeakValueDict([itr])
 

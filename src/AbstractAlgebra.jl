@@ -5,6 +5,9 @@
 """
 module AbstractAlgebra
 
+using Random: SamplerTrivial, GLOBAL_RNG
+using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
+
 using Markdown
 
 using InteractiveUtils
@@ -23,7 +26,8 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
 # imported here and in Generic.jl, and exported below.
 # They should not be imported/exported anywhere else.
 
-import LinearAlgebra: det, issymmetric, norm, nullspace, rank, transpose!, hessenberg
+import LinearAlgebra: det, issymmetric, istriu, norm, nullspace, rank,
+                      transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
 
@@ -94,8 +98,8 @@ end
 # and in Generic.jl.
 # They should not be imported/exported anywhere else.
 
-import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, bin,
-             ceil, checkbounds, conj, convert, cmp, cos, cosh, cospi, cot,
+import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, axes,
+             bin, ceil, checkbounds, conj, convert, cmp, cos, cosh, cospi, cot,
              coth, dec, deepcopy, deepcopy_internal, expm1, exponent, fill,
              floor, gcd, gcdx, getindex, hash, hcat, hex, hypot, intersect,
              invmod, isequal, isfinite, isless, isone, isqrt, isreal,
@@ -124,8 +128,6 @@ export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
        FinField, MPolyRing, NumField, SimpleNumField
 
 export ZZ, QQ, zz, qq, RealField, RDF
-
-export SymmetricGroup
 
 export create_accessors, get_handle, package_handle, zeros,
        Array, sig_exists
@@ -348,6 +350,9 @@ end
 
 include("AbstractTypes.jl")
 
+const PolynomialElem{T} = Union{PolyElem{T}, NCPolyElem{T}}
+const MatrixElem{T} = Union{MatElem{T}, MatAlgElem{T}}
+
 ###############################################################################
 #
 #  Version information
@@ -400,6 +405,38 @@ include("algorithms/LaurentPoly.jl")
 include("algorithms/FinField.jl")
 include("algorithms/GenericFunctions.jl")
 
+include("CommonTypes.jl") # types needed by AbstractAlgebra and Generic
+include("Poly.jl")
+include("NCPoly.jl")
+include("Matrix.jl")
+include("MatrixAlgebra.jl")
+include("AbsSeries.jl")
+include("RelSeries.jl")
+include("LaurentPoly.jl")
+include("FreeModule.jl")
+include("Submodule.jl")
+include("QuotientModule.jl")
+include("Module.jl")
+include("InvariantFactorDecomposition.jl")
+include("DirectSum.jl")
+include("Map.jl")
+include("MapCache.jl")
+include("MapWithInverse.jl")
+include("ModuleHomomorphism.jl")
+include("YoungTabs.jl")
+include("PermGroups.jl")
+include("LaurentSeries.jl")
+include("PuiseuxSeries.jl")
+include("SparsePoly.jl")
+include("AbsMSeries.jl")
+include("RationalFunctionField.jl")
+include("FunctionField.jl")
+include("Residue.jl")
+include("ResidueField.jl")
+include("NumberField.jl")
+include("Fraction.jl")
+include("MPoly.jl")
+
 ###############################################################################
 #
 #   Generic submodule
@@ -410,188 +447,117 @@ include("Generic.jl")
 
 # Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
 # as we have our own
-import .Generic: abs_series, abs_series_type, add!, addeq!, addmul!, 
-                 add_column, add_column!, add_row,
-                 add_row!, base_field, basis,
-		 cached, can_solve_left_reduced_triu,
-                 can_solve, can_solve_with_solution,
-                 character, characteristic, charpoly, charpoly_danilevsky!,
-                 charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
-                 chebyshev_u, _check_dim, check_composable,
-                 codomain, coeff, coefficients,
-                 combine_like_terms!, compose, constant_coefficient,
-		 content, cycles,
-                 data, defining_polynomial, deflate, deflation, degree, degrees,
-                 dense_matrix_type, dense_poly_type, derivative, det_clow,
-                 det_df, det_fflu, det_popov, diagonal_matrix, dim, disable_cache!,
-                 discriminant,
-                 divexact, divexact_left, divexact_right, divides,
-                 domain, downscale,
-                 enable_cache!, evaluate, exp_gcd,
-                 exponent, exponent_vector, exponent_vectors,
-                 extended_weak_popov, extended_weak_popov_with_transform,
-                 finish, fflu!,
-                 fflu, find_pivot_popov, fit!, gcd,
-                 get_field, gcdinv, gcdx,
-                 gram, has_left_neighbor, has_bottom_neighbor, hash,
-                 hessenberg!, hnf, hnf_cohen, hnf_cohen_with_transform,
-                 hnf_kb, hnf_kb_with_transform,
-                 hnf_minors, hnf_minors_with_transform,
-                 hnf_with_transform, hnf_via_popov,
-                 hnf_via_popov_with_transform,
-                 hooklength, identity_map, identity_matrix, image,
-                 image_map, image_fn, inflate, integral, interpolate,
-                 inv!, invariant_factors,
+import .Generic: abs_series, abs_series_type, 
+                 base_field, basis,
+                 character,
+                 check_composable, collength,
+                 combine_like_terms!, cycles,
+                 defining_polynomial, degrees,
+                 dense_matrix_type, dense_poly_type,
+                 dim, disable_cache!,
+                 downscale,
+                 enable_cache!, exp_gcd,
+                 exponent, exponent_vector,
+                 finish, fit!, gcd, gcdx,
+                 has_left_neighbor, has_bottom_neighbor, hash,
+                 hooklength, identity_map,
+                 image_map, image_fn,
                  inverse_fn, inverse_image_fn,
-                 inverse_mat, invmod,
-                 iscompatible, isconstant, isdegree, ishessenberg,
-                 ishnf, ishomogeneous, isinvertible, isinvertible_with_inverse,
-                 isisomorphic,
-                 isone, ispopov, isreverse, isrimhook,
-                 isrref, issquare, issubmodule, isterm, isterm_recursive,
-                 issnf, istriu, isunit, isunivariate, isweak_popov, iszero_row,
-                 iszero_column, kernel, kronecker_product,
+                 inverse_mat, reverse_rows, reverse_rows!,
+                 inv!, invmod,
+                 iscompatible, isdegree,
+                 ishomogeneous, isisomorphic,
+                 isone, isreverse, isrimhook, issubmodule,
+                 isunit,
                  laurent_ring, lcm, leading_coefficient, leading_monomial,
-		 leading_term, left_kernel, length,
+		 leading_term, length,
                  leglength, main_variable,
                  main_variable_extract, main_variable_insert,
-                 map1, map2, map_from_func, map_coefficients,
-		 map_entries, map_entries!,
+                 map1, map2, map_from_func,
                  map_with_preimage_from_func, map_with_retraction,
                  map_with_retraction_from_func,
-                 map_with_section, map_with_section_from_func, mat, matrix,
-                 matrix_repr, max_fields, max_precision, minors, minpoly, mod,
-                 modulus, monomial, monomial!, monomials,
-                 monomial_iszero, monomial_set!, monomial_to_newton!,
-                 MPolyBuildCtx, mul!, mul_classical, mul_karatsuba, mul_ks,
-                 mullow, mullow_karatsuba, mulmod,
-                 multiply_column, multiply_column!, multiply_row, multiply_row!,
-                 ncols,
-                 newton_to_monomial!, ngens, norm, normalise, nrows,
-		 num_coeff, nvars, O, one,
+                 map_with_section, map_with_section_from_func, mat,
+                 matrix_repr, max_fields, mod,
+                 monomial, monomial!, monomials,
+                 monomial_iszero, monomial_set!,
+                 MPolyBuildCtx, mullow_karatsuba,
+                 ngens, norm, normalise,
+		 num_coeff, one,
                  order, ordering, parity, partitionseq, Perm, perm,
-                 permtype, @perm_str, polcoeff, pol_length, polynomial,
-                 pow_multinomial, popov, popov_with_transform,
+                 permtype, @perm_str, polcoeff, poly, poly_ring,
                  precision, preimage, preimage_map,
-		 prime, primpart, pseudodivrem,
-                 pseudo_inv, pseudorem, push_term!, randmat_triu,
-                 randmat_with_rank, rand_ordering, rank_profile_popov,
-		 reduce!, remove,
-                 renormalize!, rels, rel_series, rel_series_type,
-		 rescale!, resultant, resultant_ducos,
-                 resultant_euclidean, resultant_subresultant,
-                 resultant_sylvester, resx, retraction_map, reverse,
-                 reverse_cols, reverse_cols!, reverse_rows, reverse_rows!,
-                 right_kernel, rref, rref!, rref_rational, rref_rational!,
-		 section_map, setcoeff!,
-                 set_exponent_vector!, set_field!, set_length!, set_limit!,
-                 setpermstyle, set_precision!, set_valuation!, size, shift_left,
-                 shift_right, similarity!, snf, snf_kb,
-                 snf_kb_with_transform, snf_with_transform, solve, solve_left,
-                 solve_rational, solve_triu, sort_terms!, sub, subst, summands,
-                 supermodule, swap_cols, swap_cols!, swap_rows, swap_rows!,
-                 sylvester_matrix, symbols, tail, term, terms, total_degree,
+		 prime, push_term!,
+                 rand_ordering, reduce!,
+                 rels, rel_series, rel_series_type,
+		 rescale!, retraction_map, reverse,
+                 right_kernel, rowlength, section_map, setcoeff!,
+                 set_exponent_vector!, set_limit!,
+                 setpermstyle, size,
+                 sort_terms!, summands,
+                 supermodule, term, terms, total_degree,
                  to_univariate, trailing_coefficient,
-		 truncate, typed_hcat, typed_hvcat,
-                 upscale, valuation, var, var_index, vars, weak_popov,
-                 weak_popov_with_transform, zero, zero!, zero_matrix,
-                 @PolynomialRing, MatrixElem,
+		 truncate, upscale, var_index,
+                 zero,
        # Moved from Hecke into Misc
-                 divexact_low, divhigh,
-		 ismonic, Loc, Localization, LocElem, mulhigh_n,
-		 polynomial_to_power_sums, PolyCoeffs,
+		 Loc, Localization, LocElem,
+		 polynomial_to_power_sums,
 		 power_sums_to_polynomial, roots, sturm_sequence
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
-export abs_series, abs_series_type, add!, addeq!, addmul!,
+export abs_series, abs_series_type,
                  addmul_delayed_reduction!, addmul!,
-                 add_column, add_column!, add_row, add_row!,
-		 base_field, base_ring, cached,
+                 base_field, base_ring, basis,
                  canonical_unit, can_solve_left_reduced_triu,
-                 can_solve, can_solve_with_solution,
                  change_base_ring, character,
-                 characteristic, charpoly, charpoly_danilevsky!,
-                 charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
-                 chebyshev_u, _check_dim, check_composable, check_parent,
-                 codomain, coeff, coefficients,
-		 combine_like_terms!, compose, constant_coefficient,
-		 content, cycles,
-                 data, defining_polynomial, deflate, deflation, degree, degrees,
-                 dense_matrix_type, dense_poly_type, derivative, det, det_clow,
-                 det_df, det_fflu, det_popov, diagonal_matrix, dim, disable_cache!,
-                 discriminant, divexact, divexact_left, divexact_right, divides,
-                 domain, downscale,
-                 elem_type, enable_cache!, evaluate, exp_gcd,
-                 exponent, exponent_vector, exponent_vectors,
-                 extended_weak_popov,
-                 extended_weak_popov_with_transform, fflu!,
-                 fflu, find_pivot_popov, finish, fit!, gcd, gen,
-                 gens, get_field, gcdinv, gcdx,
-                 gram, has_left_neighbor, has_bottom_neighbor, hash,
-                 hessenberg!, hessenberg, hnf,
-                 hnf_cohen, hnf_cohen_with_transform,
-                 hnf_kb, hnf_kb_with_transform,
-                 hnf_minors, hnf_minors_with_transform,
-                 hnf_with_transform, hnf_via_popov,
-                 hnf_via_popov_with_transform,
-                 hooklength, identity_map, identity_matrix, image,
-                 image_map, image_fn, inflate, integral, interpolate,
-                 inv!, invariant_factors,
-                 inverse_fn, inverse_image_fn,
+                 chebyshev_t,
+                 chebyshev_u, check_composable, check_parent,
+                 collength, combine_like_terms!, cycles,
+                 defining_polynomial, degrees,
+                 dense_matrix_type, dense_poly_type, det,
+                 discriminant,
+                 elem_type,
+                 exponent, exponent_vector,
+                 finish, fit!, gcd, gen,
+                 gens, gcdinv, gcdx,
+                 has_left_neighbor, has_bottom_neighbor, hash,
+                 interpolate,
+                 inv!, inverse_image_fn,
                  inverse_mat, invmod,
-                 iscompatible, isconstant, isdegree,
-                 isdomain_type, isexact_type, isgen, ishessenberg,
-                 ishnf, ishomogeneous, isinvertible, isinvertible_with_inverse,
+                 iscompatible, isdegree,
+                 isdomain_type, isexact_type, isgen,
+                 ishomogeneous,
                  isisomorphic, ismonomial, ismonomial_recursive,
-                 isnegative, isone, ispopov, isreverse,
-                 isrimhook, isrref, issnf, issquare, issubmodule, issymmetric,
-                 isterm, isterm_recursive, istriu,
-		 isunit, isunivariate, isweak_popov,
-                 iszero, iszero_row, iszero_column, kernel,
-                 kronecker_product, laurent_ring,
+                 isnegative, isone, isreverse,
+                 issubmodule, issymmetric,
+                 isterm_recursive, isunit, iszero,
                  lcm, leading_coefficient, leading_monomial, leading_term,
-		 left_kernel, leglength, length, lu, lu!,
+		 length,
                  main_variable, main_variable_extract, main_variable_insert,
-                 map1, map2, map_from_func, map_coefficients, map_entries,
-		 map_entries!, map_with_preimage_from_func,
-                 map_with_retraction, map_with_retraction_from_func,
-                 map_with_section, map_with_section_from_func,
-                 mat, matrix, matrix_repr, max_fields,
-                 max_precision, minors, minpoly, mod,
-                 modulus, monomial, monomial!, monomials,
+                 mat, matrix_repr, max_fields, mod,
+                 monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
-                 MPolyBuildCtx, mul!, mul_classical,
-                 mul_karatsuba, mul_ks, mul_red!, mullow, mullow_karatsuba, mulmod,
-                 multiply_column, multiply_column!, multiply_row,
-                 multiply_row!, ncols, needs_parentheses,
-		 newton_to_monomial!, ngens, norm,
-                 normalise, nrows, nullspace, num_coeff,
-		 nvars, O, one, order, ordering,
+                 MPolyBuildCtx,
+                 mul_ks, mul_red!, mullow_karatsuba, mulmod,
+                 needs_parentheses, newton_to_monomial!, ngens,
+                 normalise, nullspace, num_coeff,
+		 one, order, ordering,
                  parent_type, parity, partitionseq, Perm, perm, permtype,
-                 @perm_str, polcoeff, pol_length, polynomial, pow_multinomial,
-                 popov, popov_with_transform, powers, ppio, precision, preimage,
-                 preimage_map, prime, primpart,
-		 pseudo_inv, pseudodivrem, pseudorem,
-                 push_term!, rank, randmat_triu, randmat_with_rank,
-                 rand_ordering, rank_profile_popov, reduce!, remove,
+                 @perm_str, polcoeff, polynomial, poly,
+		 poly_ring, pow_multinomial,
+                 ppio, precision, preimage, prime,
+		 push_term!, rank,
+                 rand_ordering, reduce!,
                  renormalize!, rel_series, rel_series_type, rels,
-		 resultant, resultant_ducos, rescale!,
+		 resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
-                 resultant_sylvester, resx, retraction_map, reverse,
-                 reverse_rows, reverse_rows!, reverse_cols, reverse_cols!,
-                 right_kernel, rref, rref!, rref_rational, rref_rational!, section_map, setcoeff!,
-                 set_exponent_vector!, set_field!, set_length!, set_limit!,
-                 setpermstyle, set_precision!, set_valuation!, shift_left, shift_right,
-                 similarity!, size, snf, snf_kb,
-                 snf_kb_with_transform, snf_with_transform, solve, solve_left,
-                 solve_rational, solve_triu, sort_terms!, sub, subst, summands,
-                 supermodule, swap_rows, swap_rows!, swap_cols, swap_cols!,
-                 sylvester_matrix, symbols, tail, term, terms, to_univariate,
-                 total_degree, tr, trailing_coefficient,
-		 truncate, typed_hcat, typed_hvcat,
-                 upscale, valuation, var, var_index, vars, weak_popov,
-                 weak_popov_with_transform, zero, zero!, zero_matrix,
-                 @PolynomialRing, MatrixElem,
+                 resultant_sylvester, resx, reverse, rowlength,
+		 setcoeff!, set_exponent_vector!,
+                 setpermstyle,
+                 size, sort_terms!, subst, summands, supermodule,
+                 sylvester_matrix, term, terms, to_univariate,
+                 total_degree, trailing_coefficient, truncate,
+                 var_index, zero,
+                 MatrixElem, PolynomialElem,
        # Moved from Hecke into Misc
                  divexact_low, divhigh,
 		 ismonic, Loc, Localization, LocElem, mulhigh_n,
@@ -607,27 +573,7 @@ export displayed_with_minus_in_front, show_minus_one
 #
 ################################################################################
 
-function SymmetricGroup(n::T) where T
-  Generic.SymmetricGroup(n)
-end
-
-function AllPerms(n::T) where T
-  Generic.AllPerms(n)
-end
-
-function Partition(part::AbstractVector{T}, check::Bool=true) where T
-  Generic.Partition(part, check)
-end
-
-function AllParts(n::T) where T
-  Generic.AllParts(n)
-end
-
 function SkewDiagram(lambda::Generic.Partition, mu::Generic.Partition)
-  Generic.SkewDiagram(lambda, mu)
-end
-
-function SkewDiagram(lambda::Vector{T}, mu::Vector{T}) where T
   Generic.SkewDiagram(lambda, mu)
 end
 
@@ -639,245 +585,28 @@ function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.
    Generic.YoungTableau(part, fill)
 end
 
-function YoungTableau(p::Vector{Int})
-   Generic.YoungTableau(p)
+function NumberField(a::Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+   return Generic.NumberField(a, Symbol(s), t; cached=cached)
 end
 
-@doc (@doc Generic.PowerSeriesRing)
-PowerSeriesRing(R::Ring, prec::Int, s::Union{Char, AbstractString}; cached=true, model=:capped_relative)
-
-function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
-   Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
+function NumberField(a::Generic.Poly{Rational{BigInt}}, s::Char, t = "\$"; cached = true)
+   return Generic.NumberField(a, Symbol(s), t; cached=cached)
 end
 
-function PowerSeriesRing(R::Ring, prec::Int, s::Char; cached=true, model=:capped_relative)
-   PowerSeriesRing(R, prec, string(s); cached=cached, model=model)
+function NumberField(a::Generic.Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cached = true)
+   return Generic.NumberField(a, s, t; cached=cached)
 end
 
-function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int}, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
-   Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
-end
-
-function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Vector{T}; cached=true, model=:capped_absolute) where T <: AbstractString
-   Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
-end
-
-@doc (@doc Generic.LaurentSeriesRing)
-LaurentSeriesRing(R::Ring, prec::Int, s::Union{Char, AbstractString}; cached=true)
-
-function LaurentSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
-   Generic.LaurentSeriesRing(R, prec, s; cached=cached)
-end
-
-function LaurentSeriesRing(R::Ring, prec::Int, s::Char; cached=true)
-   LaurentSeriesRing(R, prec, string(s); cached=cached)
-end
-
-function LaurentSeriesRing(R::Field, prec::Int, s::AbstractString; cached=true)
-   Generic.LaurentSeriesField(R, prec, s; cached=cached)
-end
-
-function LaurentSeriesRing(R::Field, prec::Int, s::Char; cached=true)
-   LaurentSeriesField(R, prec, string(s); cached=cached)
-end
-
-function LaurentSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
-   Generic.LaurentSeriesField(R, prec, s; cached=cached)
-end
-
-function LaurentSeriesField(R::Field, prec::Int, s::Char; cached=true)
-   LaurentSeriesField(R, prec, string(s); cached=cached)
-end
-
-function PuiseuxSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
-   Generic.PuiseuxSeriesRing(R, prec, s; cached=cached)
-end
-
-function PuiseuxSeriesRing(R::Ring, prec::Int, s::Char; cached=true)
-   PuiseuxSeriesRing(R, prec, string(s); cached=cached)
-end
-
-function PuiseuxSeriesRing(R::Field, prec::Int, s::AbstractString; cached=true)
-   Generic.PuiseuxSeriesField(R, prec, s; cached=cached)
-end
-
-function PuiseuxSeriesRing(R::Field, prec::Int, s::Char; cached=true)
-   PuiseuxSeriesField(R, prec, string(s); cached=cached)
-end
-
-function PuiseuxSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
-   Generic.PuiseuxSeriesField(R, prec, s; cached=cached)
-end
-
-function PuiseuxSeriesField(R::Field, prec::Int, s::Char; cached=true)
-   PuiseuxSeriesField(R, prec, string(s); cached=cached)
-end
-
-@doc Markdown.doc"""
-    PolynomialRing(R::AbstractAlgebra.Ring, s::Union{String, Char}; cached::Bool = true)
-
-Given a base ring `R` and string `s` specifying how the generator (variable)
-should be printed, return a tuple `S, x` representing the new polynomial
-ring $S = R[x]$ and the generator $x$ of the ring. By default the parent
-object `S` will depend only on `R` and `x` and will be cached. Setting the
-optional argument `cached` to `false` will prevent the parent object `S` from
-being cached.
-"""
-PolynomialRing(R::Ring, s::Union{AbstractString, Char}; cached::Bool = true)
-
-function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
-   Generic.PolynomialRing(R, s; cached=cached)
-end
-
-function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
-   PolynomialRing(R, string(s); cached=cached)
-end
-
-function PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
-   Generic.PolynomialRing(R, s; cached=cached)
-end
-
-function PolynomialRing(R::NCRing, s::Char; cached::Bool = true)
-   PolynomialRing(R, string(s); cached=cached)
-end
-
-@doc Markdown.doc"""
-    PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{T}; cached::Bool = true, ordering::Symbol = :lex) where T <: Union{String, Char}
-
-Given a base ring `R` and an array of strings `s` specifying how the
-generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
-representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
-$x1, x2, ...$ of the polynomial ring. By default the parent object `T` will
-depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional
-argument `cached` to `false` will prevent the parent object `T` from being
-cached. `S` is a symbol corresponding to the ordering of the polynomial and
-can be one of `:lex`, `:deglex` or `:degrevlex`.
-"""
-PolynomialRing(R::Ring, s::Union{Vector{String}, Vector{Char}}; cached::Bool = true, ordering::Symbol = :lex)
-
-function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
-   Generic.PolynomialRing(R, s; cached=cached, ordering=ordering)
-end
-
-function PolynomialRing(R::Ring, s::Array{Char, 1}; cached::Bool = true, ordering::Symbol = :lex)
-   PolynomialRing(R, string.(s); cached=cached, ordering=ordering)
-end
-
-function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::String="x";
-                                 cached::Bool = false, ordering::Symbol = :lex)
-   PolynomialRing(R, ["$s$i" for i=1:n]; cached = cached, ordering = ordering)
-end
-
-function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::Char;
-                                 cached::Bool = false, ordering::Symbol = :lex)
-   PolynomialRing(R, n, string(s); cached = cached, ordering = ordering)
-end
-
-@doc (@doc Generic.SparsePolynomialRing)
-SparsePolynomialRing(R::Ring, s::Union{Char, String}; cached::Bool = true)
-
-function SparsePolynomialRing(R::Ring, s::String; cached::Bool = true)
-   Generic.SparsePolynomialRing(R, s; cached=cached)
-end
-
-function SparsePolynomialRing(R::Ring, s::Char; cached::Bool = true)
-   SparsePolynomialRing(R, string(s); cached=cached)
-end
-
-@doc (@doc Generic.LaurentPolynomialRing)
-LaurentPolynomialRing(R::Ring, s::AbstractString) = Generic.LaurentPolynomialRing(R, s)
-
-@doc (@doc Generic.MatrixSpace)
-MatrixSpace(R::Ring, r::Int, c::Int; cached::Bool = true)
-
-function MatrixSpace(R::Ring, r::Int, c::Int; cached::Bool = true)
-   Generic.MatrixSpace(R, r, c; cached = cached)
-end
-
-@doc (@doc Generic.MatrixAlgebra)
-MatrixAlgebra(R::Ring, n::Int; cached::Bool = true)
-
-function MatrixAlgebra(R::Ring, n::Int; cached::Bool = true)
-   Generic.MatrixAlgebra(R, n, cached = cached)
-end
-
-@doc (@doc Generic.FractionField)
-FractionField(R::Ring; cached=true)
-
-function FractionField(R::Ring; cached=true)
-   Generic.FractionField(R; cached=cached)
-end
-
-@doc (@doc Generic.ResidueRing)
-ResidueRing(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
-
-function ResidueRing(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
-   Generic.ResidueRing(R, a; cached=cached)
-end
-
-@doc (@doc Generic.ResidueField)
-ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
-
-function ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
-   Generic.ResidueField(R, a; cached=cached)
-end
-
-function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
-   Generic.NumberField(a, s, t; cached=cached)
-end
-
-function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Char, t = "\$"; cached = true)
-   NumberField(a, string(s), t; cached=cached)
-end
-
-function RationalFunctionField(k::Field, s::AbstractString; cached = true)
-   Generic.RationalFunctionField(k, s; cached=cached)
+function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Symbol; cached::Bool=true) where T <: FieldElement
+   return Generic.FunctionField(p, s; cached=cached)
 end
 
 function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
-   Generic.FunctionField(p, s; cached=cached)
+   return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
-@doc Markdown.doc"""
-    FreeModule(R::NCRing, rank::Int; cached::Bool = true)
-
-Return the free module over the ring $R$ with the given rank.
-"""
-function FreeModule(R::NCRing, rank::Int; cached::Bool = true)
-   Generic.FreeModule(R, rank; cached=cached)
-end
-
-function free_module(R::NCRing, rank::Int; cached::Bool = true)
-   Generic.FreeModule(R, rank; cached=cached)
-end
-
-@doc Markdown.doc"""
-    VectorSpace(R::Field, dim::Int; cached::Bool = true)
-
-Return the vector space over the field $R$ with the given dimension.
-"""
-function VectorSpace(R::Field, dim::Int; cached::Bool = true)
-   Generic.FreeModule(R, dim; cached=cached)
-end
-
-function vector_space(R::Field, dim::Int; cached::Bool = true)
-   Generic.FreeModule(R, dim; cached=cached)
-end
-
-@doc Markdown.doc"""
-    sub(m::Module{T}, gens::Vector{<:ModuleElem{T}}) where T <: RingElement
-
-Return the submodule `S` of the module `m` generated by the given generators,
-given as elements of `m`, and a map which is the canonical injection from `S`
-to `m`.
-"""
-function sub(m::Module{T}, gens::Vector{<:ModuleElem{T}}) where T <: RingElement
-   Generic.sub(m, gens)
-end
-
-# Handles empty vector of elements
-function sub(m::Module{T}, gens::Vector{Any}) where T <: RingElement
-   Generic.sub(m, gens)
+function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Char; cached::Bool=true) where T <: FieldElement
+   return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
 @doc Markdown.doc"""
@@ -895,72 +624,6 @@ function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: Rin
    Generic.sub(m, subs)
 end
 
-@doc Markdown.doc"""
-    quo(m::Module{T}, N::Module{T}) where T <: RingElement
-
-Return the quotient `Q` of the module `m` by the submodule `N` of `m`, and a
-map which is a lift of elements of `Q` to `m`.
-"""
-function quo(m::Module{T}, N::Module{T}) where T <: RingElement
-   Generic.quo(m, N)
-end
-
-@doc Markdown.doc"""
-    DirectSum(m::Vector{<:Module{T}}) where T <: RingElement
-
-Return a tuple $M, f, g$ consisting of $M$ the direct sum of the modules `m`
-(supplied as a vector of modules), a vector $f$ of the canonical injections
-of the $m[i]$ into $M$ and a vector $g$ of the canonical projections from
-$M$ onto the $m[i]$.
-"""
-function DirectSum(m::Vector{<:Module{T}}) where T <: RingElement
-   Generic.DirectSum(m)
-end
-
-function direct_sum(m::Vector{<:Module{T}}) where T <: RingElement
-   Generic.DirectSum(m)
-end
-
-@doc Markdown.doc"""
-    DirectSum(m::Module{T}...) where T <: RingElement
-
-Return a tuple $M, f, g$ consisting of $M$ the direct sum of the given
-modules, a vector $f$ of the canonical injections of the $m[i]$ into $M$
-and a vector $g$ of the canonical projections from $M$ onto the $m[i]$.
-"""
-function DirectSum(m::Module{T}...) where T <: RingElement
-   Generic.DirectSum(m...)
-end
-
-function direct_sum(m::Module{T}...) where T <: RingElement
-   Generic.DirectSum(m...)
-end
-
-function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, A...)
-   Generic.ModuleHomomorphism(M1, M2, A...)
-end
-
-function module_homomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
-   Generic.ModuleHomomorphism(M1, M2, m)
-end
-
-function ModuleIsomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
-   Generic.ModuleIsomorphism(M1, M2, m)
-end
-
-function module_isomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
-   Generic.ModuleIsomorphism(M1, M2, m)
-end
-
-export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, LaurentPolynomialRing,
-       MatrixSpace, MatrixAlgebra, FractionField, ResidueRing, Partition, SymmetricGroup,
-       YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
-       LaurentSeriesField, ResidueField, NumberField, RationalFunctionField,
-       FunctionField, PuiseuxSeriesRing,
-       PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, sub,
-       quo, DirectSum, ModuleIsomorphism, free_module, vector_space,
-       module_homomorphism, direct_sum, module_isomorphism, basis
-
 export Generic
 
 ###############################################################################
@@ -969,12 +632,12 @@ export Generic
 #
 ###############################################################################
 
-getindex(R::NCRing, s::Union{String, Char}) = PolynomialRing(R, s)
-getindex(R::NCRing, s::Union{String, Char}, ss::Union{String, Char}...) =
+getindex(R::NCRing, s::Union{String, Char, Symbol}) = PolynomialRing(R, s)
+getindex(R::NCRing, s::Union{String, Char, Symbol}, ss::Union{String, Char}...) =
    PolynomialRing(R, [s, ss...])
 
 # syntax x = R["x"]["y"]
-getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{String, Char}) = PolynomialRing(R[1], s)
+getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{String, Char, Symbol}) = PolynomialRing(R[1], s)
 
 ###############################################################################
 #
@@ -985,8 +648,6 @@ getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{St
 typed_hvcat(R::Ring, dims::Dims, d...) = matrix(R, length(dims), dims[1], hvcat(dims, d...))
 typed_hcat(R::Ring, d...) = matrix(R, 1, length(d), hcat(d...))
 typed_vcat(R::Ring, d...) = matrix(R, length(d), 1, vcat(d...))
-
-
 
 ###############################################################################
 #

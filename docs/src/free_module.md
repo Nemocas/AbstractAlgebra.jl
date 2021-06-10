@@ -7,18 +7,21 @@ end
 
 # Free Modules and Vector Spaces
 
-AbstractAlgebra allows the construction of the free module of any rank over any
+AbstractAlgebra allows the construction of free modules of any rank over any
 Euclidean ring and the vector space of any dimension over a field. By default
 the system considers the free module of a given rank over a given ring or
 vector space of given dimension over a field to be unique.
 
-## Types and parents
+## Generic free module and vector space types
 
-AbstractAlgebra provides the type `FreeModule{T}` for free modules, where `T`
+AbstractAlgebra provides generic types for free modules and vector spaces,
+via the type `FreeModule{T}` for free modules, where `T`
 is the type of the elements of the ring $R$ over which the module is built.
-The type `FreeModule{T}` belongs to `AbstractAlgebra.FPModule{T}`.
 
 Vector spaces are simply free modules over a field.
+
+The implementation of generic free modules can be found in
+`src/generic/FreeModule.jl`.
 
 The free module of a given rank over a given ring is made unique on the
 system by caching them (unless an optional `cache` parameter is set to
@@ -26,6 +29,10 @@ system by caching them (unless an optional `cache` parameter is set to
 
 See `src/generic/GenericTypes.jl` for an example of how to implement such a
 cache (which usually makes use of a dictionary).
+
+## Abstract types
+
+The type `FreeModule{T}` belongs to `FPModule{T}`.
 
 ## Functionality for free modules
 
@@ -35,8 +42,8 @@ following functionality.
 ### Constructors
 
 ```@docs
-FreeModule(R::AbstractAlgebra.Ring, rank::Int)
-VectorSpace(F::AbstractAlgebra.Field, dim::Int)
+FreeModule(R::Ring, rank::Int)
+VectorSpace(F::Field, dim::Int)
 ```
 
 Construct the free module/vector space of given rank/dimension.
@@ -55,9 +62,9 @@ Vector space of dimension 2 over Rationals
 ### Basic manipulation
 
 ```julia
-rank(M::Generic.FreeModule{T}) where T <: AbstractAlgebra.RingElem
-dim(V::Generic.FreeModule{T}) where T <: AbstractAlgebra.FieldElem
-basis(V::Generic.FreeModule{T}) where T <: AbstractAlgebra.FieldElem
+rank(M::Generic.FreeModule{T}) where T <: RingElem
+dim(V::Generic.FreeModule{T}) where T <: FieldElem
+basis(V::Generic.FreeModule{T}) where T <: FieldElem
 ```
 
 **Examples**

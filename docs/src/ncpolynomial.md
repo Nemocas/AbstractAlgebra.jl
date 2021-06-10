@@ -5,39 +5,36 @@ DocTestSetup = quote
 end
 ```
 
-# Generic univariate polynomials over a noncommutative ring
+# Univariate polynomials over a noncommutative ring
 
-AbstractAlgebra.jl provides a module, implemented in `src/generic/NCPoly.jl` for generic
-polynomials over any noncommutative ring belonging to the AbstractAlgebra abstract type
-hierarchy.
+AbstractAlgebra.jl provides a module, implemented in `src/NCPoly.jl` for
+univariate polynomials over any noncommutative ring in the AbstractAlgebra
+type hierarchy.
 
-As well as implementing the Univariate Polynomial interface, there are many additional
-generic algorithms implemented for such polynomial rings. We describe this generic
-functionality below.
+## Generic type for univariate polynomials over a noncommutative ring
 
-All of the generic functionality is part of a submodule of AbstractAlgebra called
-`Generic`. This is exported by default so that it is not necessary to qualify the
-function names with the submodule name.
+AbstractAlgebra.jl implements a generic univariate polynomial type over
+noncommutative rings in `src/generic/NCPoly.jl`.
 
-## Types and parent objects
-
-Polynomials implemented using the AbstractAlgebra generics have type `Generic.NCPoly{T}`
-where `T` is the type of elements of the coefficient ring. Internally they consist of
-a Julia array of coefficients and some additional fields for length and a parent object,
+These generic polynomials have type `Generic.NCPoly{T}` where `T` is the type
+of elements of the coefficient ring. Internally they consist of a Julia array
+of coefficients and some additional fields for length and a parent object,
 etc. See the file `src/generic/GenericTypes.jl` for details.
 
 Parent objects of such polynomials have type `Generic.NCPolyRing{T}`.
 
 The string representation of the variable of the polynomial ring and the
-base/coefficient ring $R$ is stored in the parent object. 
+base/coefficient ring $R$ is stored in the parent object.
 
-The polynomial element types belong to the abstract type `AbstractAlgebra.NCPolyElem{T}`
+## Abstract types
+
+The polynomial element types belong to the abstract type `NCPolyElem{T}`
 and the polynomial ring types belong to the abstract type
-`AbstractAlgebra.NCPolyRing{T}`. This enables one to write generic functions that can
+`NCPolyRing{T}`. This enables one to write generic functions that can
 accept any AbstractAlgebra polynomial type.
 
 Note that both the generic polynomial ring type `Generic.NCPolyRing{T}` and the abstract
-type it belongs to, `AbstractAlgebra.NCPolyRing{T}` are both called `NCPolyRing`. The 
+type it belongs to, `NCPolyRing{T}` are both called `NCPolyRing`. The 
 former is a (parameterised) concrete type for a polynomial ring over a given base ring
 whose elements have type `T`. The latter is an abstract type representing all
 polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
@@ -49,7 +46,7 @@ In order to construct polynomials in AbstractAlgebra.jl, one must first construc
 polynomial ring itself. This is accomplished with the following constructor.
 
 ```julia
-PolynomialRing(R::AbstractAlgebra.NCRing, s::AbstractString; cached::Bool = true)
+PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
 ```
 
 Given a base ring `R` and string `s` specifying how the generator (variable) should be

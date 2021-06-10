@@ -4,9 +4,6 @@
 #
 ###############################################################################
 
-import AbstractAlgebra: terms_degrees
-using AbstractAlgebra: term_degree, degrees_range
-
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -93,14 +90,60 @@ isgen(p::LaurentPolyWrap) = ismonomial(p, 1)
 deepcopy_internal(p::LaurentPolyWrap, dict::IdDict) =
    LaurentPolyWrap(deepcopy_internal(p.poly, dict), p.mindeg)
 
+###############################################################################
+#
+#   String I/O
+#
+###############################################################################
+
+function AbstractAlgebra.expressify(y::LaurentPolyWrap, S = var(parent(y));
+   context = nothing)
+   x = y.poly
+   mindeg = y.mindeg
+   len = length(x)
+   sum = Expr(:call, :+)
+   for i in 1:len
+      c = coeff(x, len - i)
+      k = len - i + mindeg
+      if !iszero(c)
+         if k == 0
+            xk = 1
+         elseif k == 1
+            xk = S
+         else
+            xk = Expr(:call, :^, S, k)
+         end
+         if isone(c)
+            push!(sum.args, Expr(:call, :*, xk))
+         else
+            push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
+         end
+      end
+   end
+   return sum
+end
+
+function Base.show(io::IO, ::MIME"text/plain", a::LaurentPolyWrap)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function Base.show(io::IO, a::LaurentPolyWrap)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
 
 ###############################################################################
 #
-#   Unary and Binary operations
+#   Unary operations
 #
 ###############################################################################
 
 -(p::LaurentPolyWrap) = LaurentPolyWrap(-p.poly, p.mindeg)
+
+###############################################################################
+#
+#   Binary operations
+#
+###############################################################################
 
 function +(p::LaurentPolyWrap, q::LaurentPolyWrap)
    if p.mindeg > q.mindeg
@@ -315,67 +358,8 @@ end
 #
 ###############################################################################
 
-@doc doc"""
-    LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString)
-
-Given a base ring `R` and string `s` specifying how the generator (variable)
-should be printed, return a tuple `S, x` representing the new Laurent polynomial
-ring $S = R[x, 1/x]$ and the generator $x$ of the ring.
-
-## Examples
-```julia
-julia> R, x = LaurentPolynomialRing(ZZ, "x")
-(Univariate Laurent Polynomial Ring in x over Integers, x)
-
-julia> 2x^-3 + x^2
-x^2 + 2*x^-3
-
-julia> rand(R, -3:3 ,-9:9)
--3*x^2 - 8*x + 4 + 3*x^-1 - 6*x^-2 + 9*x^-3
-```
-"""
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString)
+function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Symbol)
    P, x = AbstractAlgebra.PolynomialRing(R, s)
    LaurentPolyWrapRing(P), LaurentPolyWrap(x)
 end
 
-###############################################################################
-#
-#   String I/O
-#
-###############################################################################
-
-function AbstractAlgebra.expressify(y::LaurentPolyWrap, S = var(parent(y));
-                                                        context = nothing)
-   x = y.poly
-   mindeg = y.mindeg
-   len = length(x)
-   sum = Expr(:call, :+)
-   for i in 1:len
-      c = coeff(x, len - i)
-      k = len - i + mindeg
-      if !iszero(c)
-         if k == 0
-            xk = 1
-         elseif k == 1
-            xk = S
-         else
-            xk = Expr(:call, :^, S, k)
-         end
-         if isone(c)
-            push!(sum.args, Expr(:call, :*, xk))
-         else
-            push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
-         end
-      end
-   end
-   return sum
-end
-
-function Base.show(io::IO, ::MIME"text/plain", a::LaurentPolyWrap)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
-
-function Base.show(io::IO, a::LaurentPolyWrap)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end

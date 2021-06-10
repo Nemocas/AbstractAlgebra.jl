@@ -15,14 +15,14 @@ any additional functionality required by AbstractAlgebra.jl.
 
 Because `BigInt` cannot be directly included in the AbstractAlgebra.jl abstract type
 hierarchy, we achieve integration of Julia `BigInt`s by introducing a type union, called
-`RingElement`, which is a union of `AbstractAlgebra.RingElem` and a number of Julia
+`RingElement`, which is a union of `RingElem` and a number of Julia
 types, including `BigInt`. Everywhere that `RingElem` is notionally used in
 AbstractAlgebra.jl, we are in fact using `RingElement`, with additional care being taken
 to avoid ambiguities.
 
 The details of how this is done are technical, and we refer the reader to the
 implementation for details. For most intents and purposes, one can think of the Julia
-`BigInt` type as belonging to `AbstractAlgebra.RingElem`.
+`BigInt` type as belonging to `RingElem`.
 
 One other technicality is that Julia defines certain functions for `BigInt`, such as
 `sqrt` and `exp` differently to what AbstractAlgebra.jl requires. To get around this,

@@ -5,25 +5,24 @@ DocTestSetup = quote
 end
 ```
 
-# Generic matrices
+# Matrix functionality
+
+AbstractAlgebra.jl provides a module, implemented in `src/Matrix.jl` for
+matrices over any commutative ring belonging to the AbstractAlgebra abstract type
+hierarchy. This functionality will work for any matrix type which
+follows the Matrix interface.
+
+Similarly, AbstractAlgebra.jl provides a module in `src/MatrixAlgebra.jl` for
+matrix algebras over a commutative ring.
+
+## Generic matrix types
 
 AbstractAlgebra.jl allows the creation of dense matrices over any computable commutative
 ring $R$. Generic matrices over a commutative ring are implemented in
-`src/generic/Matrix.jl`. Much of the functionality there covers both matrix spaces and
-matrix algebras.
+`src/generic/Matrix.jl`.
 
-Functions specific to generic matrix algebras of $m\times m$ matrices are implemented in
+Generic matrix algebras of $m\times m$ matrices are implemented in
 `src/generic/MatrixAlgebra.jl`.
-
-As well as implementing the entire Matrix interface, including the optional
-functionality, there are many additional generic algorithms implemented for matrix
-spaces. We describe this functionality below.
-
-All of this generic functionality is part of the Generic submodule of
-AbstractAlgebra.jl. This is exported by default, so it is not necessary to qualify names
-of functions.
-
-## Types and parent objects
 
 Generic matrices in AbstractAlgebra.jl have type `Generic.MatSpaceElem{T}` for matrices
 in a matrix space, or `Generic.MatAlgElem{T}` for matrices in a matrix algebra, where
@@ -38,21 +37,23 @@ thereof.
 Parents of generic matrices (matrix spaces) have type `Generic.MatSpace{T}`. Parents of
 matrices in a matrix algebra have type `Generic.MatAlgebra{T}`.
 
-The generic matrix types (matrix spaces) belong to the abstract type
-`AbstractAlgebra.MatElem{T}` and the matrix space parent types belong to
-`AbstractAlgebra.MatSpace{T}`. Similarly the generic matrix algebra matrix types belong
-to the abstract type `AbstractAlgebra.MatAlgElem{T}` and the parent types belong to
- `AbstractAlgebra.MatAlgebra{T}` Note that both
-the concrete type of a matrix space parent object and the abstract class it belongs to
-have the name `MatElem`, therefore disambiguation is required to specify which is
-intended. The same is true for the abstract types for matrix spaces and their elements.
-
 The dimensions and base ring $R$ of a generic matrix are stored in its parent object,
 however to allow creation of matrices without first creating the matrix space parent,
 generic matrices in Julia do not contain a reference to their parent. They contain the
 row and column numbers (or degree, in the case of matrix algebras) and the base ring
 on a per matrix basis. The parent object can then be reconstructed from this data on
 demand.
+
+## Abstract types
+
+The generic matrix types (matrix spaces) belong to the abstract type
+`MatElem{T}` and the matrix space parent types belong to
+`MatSpace{T}`. Similarly the generic matrix algebra matrix types belong
+to the abstract type `MatAlgElem{T}` and the parent types belong to
+ `MatAlgebra{T}` Note that both
+the concrete type of a matrix space parent object and the abstract class it belongs to
+have the name `MatElem`, therefore disambiguation is required to specify which is
+intended. The same is true for the abstract types for matrix spaces and their elements.
 
 ## Matrix space constructors
 
@@ -200,11 +201,11 @@ dense_matrix_type(::Ring)
 ```
 
 ```@docs
-nrows(::Generic.MatrixElem)
+nrows(::MatrixElem)
 ```
 
 ```@docs
-ncols(::Generic.MatrixElem)
+ncols(::MatrixElem)
 ```
 
 ```@docs
@@ -228,12 +229,12 @@ diagonal_matrix(::RingElement, ::Int, ::Int)
 ```
 
 ```@docs
-zero(::AbstractAlgebra.MatSpace)
+zero(::MatSpace)
 zero(::MatrixElem, ::Ring)
 ```
 
 ```@docs
-one(::AbstractAlgebra.MatSpace)
+one(::MatSpace)
 one(::MatElem)
 ```
 
@@ -242,15 +243,15 @@ istriu(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
-change_base_ring(::AbstractAlgebra.Ring, ::AbstractAlgebra.MatElem)
+change_base_ring(::Ring, ::MatElem)
 ```
 
 ```@docs
-Base.map(f, ::Generic.MatrixElem)
+Base.map(f, ::MatrixElem)
 ```
 
 ```@docs
-Base.map!(f, ::Generic.MatrixElem, ::Generic.MatrixElem)
+Base.map!(f, ::MatrixElem, ::MatrixElem)
 ```
 
 **Examples**
@@ -644,6 +645,60 @@ julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 julia> d = rank(A)
 3
 
+```
+
+### Minors
+
+```@docs
+minors(::MatElem, ::Int)
+```
+
+**Examples**
+
+```jldoctest
+julia> A = ZZ[1 2 3; 4 5 6]
+[1   2   3]
+[4   5   6]
+
+julia> minors(A, 2)
+3-element Vector{BigInt}:
+ -3
+ -6
+ -3
+
+```
+
+### Pfaffian
+
+```@docs
+pfaffian(::MatElem)
+pfaffians(::MatElem, ::Int)
+```
+
+**Examples**
+
+```jldoctest
+julia> R, x = PolynomialRing(QQ, ["x$i" for i in 1:6])
+(Multivariate Polynomial Ring in 6 variables x1, x2, x3, x4, ..., x6 over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x1, x2, x3, x4, x5, x6])
+
+julia> M = R[0 x[1] x[2] x[3]; -x[1] 0 x[4] x[5]; -x[2] -x[4] 0 x[6]; -x[3] -x[5] -x[6] 0]
+[  0    x1    x2   x3]
+[-x1     0    x4   x5]
+[-x2   -x4     0   x6]
+[-x3   -x5   -x6    0]
+
+julia> pfaffian(M)
+x1*x6 - x2*x5 + x3*x4
+
+julia> pfaffians(M, 2)
+6-element Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}:
+ x1
+ x2
+ x4
+ x3
+ x5
+ x6
+ 
 ```
 
 ### Linear solving
@@ -1098,10 +1153,10 @@ isweak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
 ```
 
 ```@docs
-weak_popov{T <: PolyElem}(::Generic.Mat{T})
-weak_popov_with_transform{T <: PolyElem}(::Generic.Mat{T})
-popov{T <: PolyElem}(::Generic.Mat{T})
-popov_with_transform{T <: PolyElem}(::Generic.Mat{T})
+weak_popov{T <: PolyElem}(::MatElem{T})
+weak_popov_with_transform{T <: PolyElem}(::MatElem{T})
+popov{T <: PolyElem}(::MatElem{T})
+popov_with_transform{T <: PolyElem}(::MatElem{T})
 ```
 
 **Examples**

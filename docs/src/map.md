@@ -215,16 +215,17 @@ Return an identity map on the domain $R$.
 Of course there is nothing stopping a map type or class from implementing its own
 identity map type, and defining composition of maps of the same kind with such an
 identity map. In such a case, the class of such an identity map type must belong to
-`AbstractAlgebra.IdentityMap` so that composition with other map types still works.
+`IdentityMap` so that composition with other map types still works.
 
 ### Composition of maps
 
 Any two compatible maps in AbstractAlgebra can be composed and any composition can be
 applied.
 
-In order to facilitate this, the Generic module provides a type `CompositeMap{D, C}`,
-which contains two maps `map1` and `map2`, corresponding to the two maps to be applied
-in a composition, in the order they should be applied.
+In order to facilitate this, the Generic module provides a type
+`Generic.CompositeMap{D, C}`, which contains two maps `map1` and `map2`,
+corresponding to the two maps to be applied in a composition, in the order they
+should be applied.
 
 To construct a composition map from two existing maps, we have the following function:
 

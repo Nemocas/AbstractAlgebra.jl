@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   SNFModule.jl : Invariant factor decomposition of modules
+#   SNFModule.jl : Generic invariant factor decomposition of modules
 #
 ###############################################################################
 
@@ -142,7 +142,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
+    snf(m::FPModule{T}) where T <: RingElement
 
 Return a pair `M, f` consisting of the invariant factor decomposition $M$ of
 the module `m` and a module homomorphism (isomorphisms) $f : M \to m$. The
@@ -200,11 +200,6 @@ function snf(m::SNFModule{T}) where T <: RingElement
    return m
 end
 
-@doc Markdown.doc"""
-    invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
-
-Return a vector of the invariant factors of the module $M$.
-"""
 function invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
    R = base_ring(m)
    old_rels = rels(m)

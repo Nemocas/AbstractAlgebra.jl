@@ -16,13 +16,13 @@ implement any additional functionality required by AbstractAlgebra.jl.
 Because `Rational{BigInt}` cannot be directly included in the AbstractAlgebra.jl
 abstract type hierarchy, we achieve integration of Julia `Rational{BigInt}`s by
 introducing a type union, called `FieldElement`, which is a union of
-`AbstractAlgebra.FieldElem` and a number of Julia types, including `Rational{BigInt}`.
+`FieldElem` and a number of Julia types, including `Rational{BigInt}`.
 Everywhere that `FieldElem` is notionally used in AbstractAlgebra.jl, we are in fact
 using `FieldElement`, with additional care being taken to avoid ambiguities.
 
 The details of how this is done are technical, and we refer the reader to the
 implementation for details. For most intents and purposes, one can think of the Julia
-`Rational{BigInt}` type as belonging to `AbstractAlgebra.FieldElem`.
+`Rational{BigInt}` type as belonging to `FieldElem`.
 
 One other technicality is that Julia defines certain functions for `Rational{BigInt}`,
 such as `sqrt` and `exp` differently to what AbstractAlgebra.jl requires. To get around

@@ -44,6 +44,8 @@ end
    @test isunit(S(1))
    @test isunit(R(-1))
    @test isunit(S(-1))
+
+   @test check_parent(S(1), S(1))
 end
 
 @testset "Julia.Integers.rand" begin

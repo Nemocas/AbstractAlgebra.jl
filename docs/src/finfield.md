@@ -92,6 +92,11 @@ julia> m = inv(k)
 ## Basic manipulation of fields and elements
 
 ```@docs
+data(::GFField)
+lift(::GFField)
+```
+
+```@docs
 gen{T <: Integer}(F::GFField{T})
 ```
 

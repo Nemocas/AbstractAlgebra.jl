@@ -111,6 +111,7 @@ end
    @test isone(h)
 
    @test data(h) == 1
+   @test lift(h) == 1
 
    @test canonical_unit(R(11)) == R(11)
 
@@ -129,6 +130,11 @@ end
    @test isunit(T(x))
    @test canonical_unit(T(x)) == T(x)
    @test modulus(T) == x^2 + 1
+
+   S = ResidueRing(zz, 23)
+
+   @test lift(S(1)) == 1
+   @test isa(lift(S(1)), BigInt)
 end
 
 @testset "Generic.Res.unary_ops" begin

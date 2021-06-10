@@ -5,7 +5,7 @@
 #
 ###############################################################################
 
-export FunctionField, Frac, base_field
+export FunctionField, base_field
 
 ###############################################################################
 #
@@ -1361,12 +1361,11 @@ function traces_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
    return P, Pden
 end
 
-function FunctionField(p::Poly{Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
+function FunctionField(p::Poly{Rat{T}}, s::Symbol; cached::Bool=true) where T <: FieldElement
    length(p) < 2 && error("Polynomial must have degree at least 1")
-   sym = Symbol(s)
-   pol, den = _rat_poly(p, sym)
+   pol, den = _rat_poly(p, s)
    
-   par = FunctionField{T}(pol, den, sym, cached)
+   par = FunctionField{T}(pol, den, s, cached)
    par.monic, par.powers, par.powers_den = powers_precompute(pol, den)
    par.traces, par.traces_den = traces_precompute(pol, den)
    par.base_ring = base_ring(p)

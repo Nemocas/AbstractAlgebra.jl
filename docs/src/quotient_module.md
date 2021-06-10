@@ -14,13 +14,23 @@ quotient of a module by a submodule of that module.
 We define two quotient modules to be equal if they are quotients of the
 same module $M$ by two equal submodules.
 
-As well as implementing the entire Module interface, AbstractAlgebra
-submodules also provide the following interface.
+## Generic quotient module type
+
+AbstractAlgebra implements the generic quotient module type
+`Generic.QuotientModule{T}` where `T` is the element type of the base ring,
+in `src/generic/QuotientModule.jl`.
+
+Elements of generic quotient modules have type `Generic.QuotientModuleElem{T}`.
+
+## Abstract types
+
+Quotient module types belong to the `FPModule{T}` abstract type and their
+elements to `FPModuleElem{T}`.
 
 ## Constructors
 
 ```@docs
-quo(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: RingElement
+quo(M::FPModule{T}, v::Generic.Submodule{T}) where T <: RingElement
 ```
 
 Note that a preimage of the canonical projection can be obtained using the
@@ -89,9 +99,9 @@ following functionality.
 ### Basic manipulation
 
 ```@docs
-supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElement
+supermodule(M::Generic.QuotientModule{T}) where T <: RingElement
 
-dim(N::AbstractAlgebra.Generic.QuotientModule{T}) where T <: FieldElement
+dim(N::Generic.QuotientModule{T}) where T <: FieldElement
 ```
 
 **Examples**

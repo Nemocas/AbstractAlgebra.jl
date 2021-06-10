@@ -41,8 +41,8 @@ and `NCRingElem`. They cannot be used in constructions which require a commutati
 ring (`Ring` and `RingElem` respectively).
 
 The generic matrix algebra matrix types belong to the abstract type
-`AbstractAlgebra.MatAlgElem{T}` and the parent types belong to
- `AbstractAlgebra.MatAlgebra{T}` Note that both of these require disambiguation from
+`MatAlgElem{T}` and the parent types belong to
+ `MatAlgebra{T}` Note that both of these require disambiguation from
 the concrete types in `Generic` of the same name.
 
 The degree and base ring $R$ of a generic matrix are stored in its parent object,

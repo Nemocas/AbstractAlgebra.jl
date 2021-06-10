@@ -20,8 +20,8 @@ AbstractAlgebra provides two abstract types for power series rings and their ele
   * `SeriesRing{T}` is the abstract type for all power series ring parent types
   * `SeriesElem{T}` is the abstract type for all power series types
 
-We have that `SeriesRing{T} <: AbstractAlgebra.Ring` and
-`SeriesElem{T} <: AbstractAlgebra.RingElem`.
+We have that `SeriesRing{T} <: Ring` and
+`SeriesElem{T} <: RingElem`.
 
 Note that both abstract types are parameterised. The type `T` should usually be the type
 of elements of the coefficient ring of the power series ring. For example, in the case
@@ -72,7 +72,7 @@ coefficients, must be available.
 For relative power series and Laurent series we have:
 
 ```julia
-(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int, val::Int) where T <: AbstractAlgebra.RingElem
+(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int, val::Int) where T <: RingElem
 ```
 
 Create the series in the given ring whose valuation is `val`, whose absolute precision
@@ -84,14 +84,14 @@ It is permitted to have trailing zeros in the array, but it is not needed, even 
 precision minus the valuation is bigger than the length of the array.
 
 ```julia
-(S::MySeriesRing{T})(A::Array{U, 1}, len::Int, prec::Int, val::Int) where {T <: AbstractAlgebra.RingElem, U <: AbstractAlgebra.RingElem}
+(S::MySeriesRing{T})(A::Array{U, 1}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: RingElem}
 ```
 
 As above, but where the array is an array of coefficient that can be coerced into the
 base ring of the series ring.
 
 ```julia
-(S::MySeriesRing{T})(A::Array{U, 1}, len::Int, prec::Int, val::Int) where {T <: AbstractAlgebra.RingElem, U <: Integer}
+(S::MySeriesRing{T})(A::Array{U, 1}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: Integer}
 ```
 
 As above, but where the array is an array of integers that can be coerced into the
@@ -116,7 +116,7 @@ julia> U, z = LaurentSeriesField(QQ, 10, "z")
 For absolute power series we have:
 
 ```julia
-(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int) where T <: AbstractAlgebra.RingElem
+(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int) where T <: RingElem
 ```
 
 Create the series in the given ring whose absolute precision is given by `prec` and the
@@ -196,7 +196,7 @@ julia> s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
 ### Data type and parent object methods
 
 ```julia
-var(S::MySeriesRing{T}) where T <: AbstractAlgebra.RingElem
+var(S::MySeriesRing{T}) where T <: RingElem
 ```
 
 Return a `Symbol` representing the variable (generator) of the series ring. Note
@@ -217,7 +217,7 @@ This function is defined for generic series and only needs to be defined for
 custom series rings, e.g. ones defined by a C implementation.
 
 ```julia
-max_precision(S::MySeriesRing{T}) where T <: AbstractAlgebra.RingElem
+max_precision(S::MySeriesRing{T}) where T <: RingElem
 ```
 
 Return the (default) maximum precision of the power series ring. This is the precision
@@ -245,14 +245,14 @@ true
 ### Basic manipulation of rings and elements
 
 ```julia
-pol_length(f::MySeries{T}) where T <: AbstractAlgebra.RingElem
+pol_length(f::MySeries{T}) where T <: RingElem
 ```
 
 Return the length of the polynomial underlying the given power series. This is not
 generally useful to the user, but is used internally.
 
 ```julia
-set_length!(f::MySeries{T}, n::Int) where T <: AbstractAlgebra.RingElem
+set_length!(f::MySeries{T}, n::Int) where T <: RingElem
 ```
 
 This function sets the effective length of the polynomial underlying the given series.
@@ -304,7 +304,7 @@ generally of use to the user but is used internally.
 
 
 ```julia
-setcoeff!(f::MySeries{T}, n::Int, a::T) where T <: AbstractAlgebra.RingElem
+setcoeff!(f::MySeries{T}, n::Int, a::T) where T <: RingElem
 ```
 
 Set the degree $n$ coefficient of the polynomial underlying $f$ to $a$. This mutates
@@ -327,7 +327,7 @@ function does not actually normalise the polynomial and is not particularly usef
 the user. It is used internally.
 
 ```julia
-renormalize!(f::MySeries{T}) where T <: AbstractAlgebra.RingElem
+renormalize!(f::MySeries{T}) where T <: RingElem
 ```
 
 Given a relative series or Laurent series whose underlying polynomial has zero constant
@@ -337,7 +337,7 @@ adjusted to compensate. This function is not intended to be useful to the user, 
 used internally.
 
 ```julia
-fit!(f::MySeries{T}, n::Int) where T <: AbstractAlgebra.RingElem
+fit!(f::MySeries{T}, n::Int) where T <: RingElem
 ```
 
 Ensure that the polynomial underlying $f$ internally has space for $n$ coefficients.
@@ -351,7 +351,7 @@ the generic code in AbstractAlgebra.jl is not required. In such cases, this func
 can also be defined to do nothing.
 
 ```julia
-gen(R::MySeriesRing{T}) where T <: AbstractAlgebra.RingElem
+gen(R::MySeriesRing{T}) where T <: RingElem
 ```
 
 Return the generator `x` of the series ring.

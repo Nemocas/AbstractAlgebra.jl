@@ -5,7 +5,7 @@ DocTestSetup = quote
 end
 ```
 
-# Generic power series
+# Power series
 
 AbstractAlgebra.jl allows the creation of capped relative and absolute power series over
 any computable commutative ring $R$.
@@ -20,46 +20,47 @@ $a_jx^j + a_{j+1}x^{j+1} + \cdots + a_{n-1}x^{n-1} + O(x^n)$
 where $j \geq 0$, $a_j \in R$ and the precision $n$ is fixed.
 
 There are two implementations of relative series: relative power series, implemented in
-`src/generic/RelSeries.jl` for which $j > 0$ in the above description, and Laurent
-series where $j$ can be negative, implemented in `src/generic/Laurent.jl`.
+`src/RelSeries.jl` for which $j > 0$ in the above description, and Laurent
+series where $j$ can be negative, implemented in `src/Laurent.jl`.
 Note that there are two implementations for Laurent series, one over rings and one
 over fields, though in practice most of the implementation uses the same code in both
 cases.
 
 There is a single implementation of absolute series: absolute power series, implemented
-in `src/generic/AbsSeries.jl`.
+in `src/AbsSeries.jl`.
 
-As well as implementing the Series Ring interface, the series modules in
-AbstractAlgebra.jl implement the generic algorithms described below.
+## Generic power series types
 
-All of the generic functionality is part of the `Generic` submodule of
-AbstractAlgebra.jl. This is exported by default so that it is not necessary to qualify
-function names.
+AbstractAlgebra.jl provides generic series types implemented in
+`src/generic/AbsSeries.jl`, `src/generic/RelSeries.jl` and
+`src/generic/LaurentSeries.jl` which implement the Series interface.
 
-## Types and parent objects
+These generic series have types `Generic.RelSeries{T}`, `Generic.AbsSeries{T}`,
+`Generic.LaurentSeriesRingElem{T}` and `Generic.LaurentSeriesFieldElem{T}`. See
+the file `src/generic/GenericTypes.jl` for details.
 
-The types of generic series implemented by AbstractAlgebra.jl are
-`Generic.RelSeries{T}`, `Generic.AbsSeries{T}`, `Generic.LaurentSeriesRingElem{T}` and
-`Generic.LaurentSeriesFieldElem{T}`.
+The parent objects have types `Generic.AbsSeriesRing{T}`
+and `Generic.RelSeriesRing{T}` and `Generic.LaurentSeriesRing{T}` respectively.
 
-Relative power series elements belong to the abstract type
-`AbstractAlgebra.RelSeriesElem`.
+The default precision, string representation of the variable and base ring $R$
+of a generic power series are stored in its parent object.
 
-Laurent series elements belong directly to either `AbstractAlgebra.RingElem` or
-`AbstractAlgebra.FieldElem` since it is more useful to be able to distinguish whether
-they belong to a ring or field than it is to distinguish that they are relative series.
+## Abstract types
+Relative power series elements belong to the abstract type `RelSeriesElem`.
 
-Absolute power series elements belong to `AbstractAlgebra.AbsSeriesElem`.
+Laurent series elements belong directly to either `RingElem` or
+`FieldElem` since it is more useful to be able to distinguish whether
+they belong to a ring or field than it is to distinguish that they are relative
+series.
 
-The parent types for relative and absolute power series, `Generic.RelSeriesRing{T}`
-and `Generic.AbsSeriesRing{T}` respectively, belong to `AbstractAlgebra.SeriesRing{T}`.
+Absolute power series elements belong to `AbsSeriesElem`.
 
-The parent types for Laurent series rings and fields, `Generic.LaurentSeriesRing{T}`
-and `Generic.LaurentSeriesField{T}` respectively, belong directly to
-`AbstractAlgebra.Ring` and `AbstractAlgebra.Field` respectively.
+The parent types for relative and absolute power series,
+`Generic.RelSeriesRing{T}` and `Generic.AbsSeriesRing{T}` respectively,
+belong to `SeriesRing{T}`.
 
-The default precision, string representation of the variable and base ring $R$ of a
-generic power series are stored in its parent object.
+The parent types of Laurent series belong directly to `Ring` and `Field`
+respectively.
 
 ## Series ring constructors
 
@@ -67,15 +68,15 @@ In order to construct series in AbstractAlgebra.jl, one must first construct the
 itself. This is accomplished with any of the following constructors.
 
 ```julia
-PowerSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true, model=:capped_relative)
+PowerSeriesRing(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true, model=:capped_relative)
 ```
 
 ```julia
-LaurentSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
+LaurentSeriesRing(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
 ```
 
 ```julia
-LaurentSeriesRing(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)
+LaurentSeriesRing(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
 ```
 
 Given a base ring `R`, a maximum precision (relative or absolute, depending on the
@@ -88,6 +89,20 @@ cached. Setting the optional argument `cached` to `false` will prevent this.
 In the case of power series, the optional argument `model` can be set to either
 `:capped_absolute` or `capped_relative`, depending on which power series model is
 required.
+
+It is also possible to construct absolute and relative power series with a
+default variable. These are lightweight constructors and should be used in
+generic algorithms wherever possible when creating series rings where the
+symbol does not matter.
+
+```julia
+AbsSeriesRing(R::Ring, prec::Int)
+RelSeriesRing(R::Ring, prec::Int)
+```
+
+Return the absolute or relative power series ring over the given base ring $R$
+and with precision cap given by `prec`. Note that a tuple is not returned, only
+the power series ring itself, not a generator.
 
 Here are some examples of constructing various kinds of series rings and coercing
 various elements into those rings.
@@ -119,6 +134,8 @@ julia> h = U(BigInt(1234))
 julia> k = T(z + 1)
 1 + z + O(z^10)
 
+julia> V = AbsSeriesRing(ZZ, 10)
+Univariate power series ring in x over Integers
 ```
 
 ## Big-oh notation
@@ -307,13 +324,13 @@ described here, that override the generic implementation.
 
 Unless otherwise noted, the functions are available for all series models, including
 Laurent series. We denote this by using the abstract type
-`AbstractAlgebra.RelSeriesElem`, even though absolute series and Laurent series types
+`RelSeriesElem`, even though absolute series and Laurent series types
 do not belong to this abstract type.
 
 ### Basic functionality
 
 ```julia
-coeff(a::AbstractAlgebra.SeriesElem, n::Int)
+coeff(a::SeriesElem, n::Int)
 ```
 
 Return the degree $n$ coefficient of the given power series. Note coefficients
@@ -514,7 +531,7 @@ integral(a::RelSeriesElem)
 ### Special functions
 
 ```@docs
-Base.log(a::AbstractAlgebra.SeriesElem{T}) where T <: AbstractAlgebra.FieldElem
+Base.log(a::SeriesElem{T}) where T <: FieldElem
 ```
 
 ```@docs
