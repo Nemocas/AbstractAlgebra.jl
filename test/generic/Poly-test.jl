@@ -170,7 +170,7 @@ end
       @test isa(h, PolyElem)
       @test isa(k, PolyElem)
 
-      @test base_ring(g) == QQ
+      @test coefficient_ring(g) == QQ
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -199,7 +199,7 @@ end
    f = polynomial(ZZ, [1, 2, 3], "y")
 
    @test isa(f, PolyElem)
-   @test base_ring(f) == ZZ
+   @test coefficient_ring(f) == ZZ
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
    @test parent(f).S == :y
@@ -207,7 +207,7 @@ end
    g = polynomial(ZZ, [1, 2, 3])
 
    @test isa(g, PolyElem)
-   @test base_ring(g) == ZZ
+   @test coefficient_ring(g) == ZZ
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
    @test parent(g).S == :x
@@ -246,7 +246,7 @@ end
    @test length(h) == 0
    @test length(k) == 0
 
-   @test base_ring(g) == QQ
+   @test coefficient_ring(g) == QQ
 
    @test parent(g).S == :y
    @test parent(h).S == :y
@@ -2834,17 +2834,17 @@ end
    end
 end
 
-@testset "Generic.Poly.change_base_ring" begin
+@testset "Generic.Poly.change_coefficient_ring" begin
    Zx, x = PolynomialRing(ZZ,'x')
    @test 1 == map_coefficients(sqrt, x^0)
    p = Zx([i for i in 1:10])
    q = Zx([i for i in 10:-1:1])
    pq = p * q
    for R in [QQ,GF(2),GF(13),ZZ]
-      pR = change_base_ring(R, p)
-      qR = change_base_ring(R, q, parent = parent(pR))
+      pR = change_coefficient_ring(R, p)
+      qR = change_coefficient_ring(R, q, parent = parent(pR))
       @test parent(qR) === parent(pR)
-      pqR = change_base_ring(R, pq, parent = parent(pR))
+      pqR = change_coefficient_ring(R, pq, parent = parent(pR))
       @test pR * qR == pqR
    end
 

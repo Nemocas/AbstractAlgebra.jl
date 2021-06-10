@@ -76,13 +76,7 @@ residue $r$ belongs to.
 """
 function characteristic(r::ResField)
    R = base_ring(r)
-   while R != Union{}
-      if typeof(R) <: Field
-         return characteristic(R)
-      end
-      R = base_ring(R)
-   end
-   return characteristic(base_ring(R))
+   return characteristic(R)
 end
 
 @doc Markdown.doc"""

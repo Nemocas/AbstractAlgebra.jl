@@ -21,7 +21,7 @@ export MPolyBuildCtx, @PolynomialRing, change_base_ring,
 #
 ###############################################################################
 
-base_ring(a::MPolyElem{T}) where T <: RingElement = base_ring(parent(a))
+coefficient_ring(a::MPolyElem{T}) where T <: RingElement = coefficient_ring(parent(a))
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyElem{S}}
    return isdomain_type(S)
@@ -82,7 +82,7 @@ function var_index(x::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
 end
 
 function characteristic(a::MPolyRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
+   return characteristic(coefficient_ring(a))
 end
 
 ###############################################################################
@@ -195,7 +195,7 @@ function coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T})
             return c
         end
     end
-    return zero(base_ring(f))
+    return zero(coefficient_ring(f))
 end
 
 @doc Markdown.doc"""
@@ -205,7 +205,7 @@ Return the leading coefficient of the polynomial $p$.
 """
 function leading_coefficient(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
-      return zero(base_ring(p))
+      return zero(coefficient_ring(p))
    else
       return first(coefficients(p))
    end
@@ -218,7 +218,7 @@ Return the trailing coefficient of the polynomial $p$, i.e. the coefficient of
 the last nonzero term, or zero if the polynomial is zero.
 """
 function trailing_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-   coeff = zero(base_ring(p))
+   coeff = zero(coefficient_ring(p))
    for c in coefficients(p)
       coeff = c
    end
@@ -258,7 +258,7 @@ function constant_coefficient(p::MPolyElem{T}) where T <: RingElement
          end
       end
    end
-   return zero(base_ring(p))
+   return zero(coefficient_ring(p))
 end
 
 function constant_coefficient(p::MPolyElem)
@@ -266,7 +266,7 @@ function constant_coefficient(p::MPolyElem)
    if !iszero(p) && iszero(exponent_vector(p, len))
       return coeff(p, len)
    end
-   return zero(base_ring(p))
+   return zero(coefficient_ring(p))
 end
 
 @doc Markdown.doc"""
@@ -488,12 +488,12 @@ function show(io::IO, p::MPolyRing)
    end
    print(io, string(p.S[n]))
    print(io, " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+   print(IOContext(io, :compact => true), coefficient_ring(p))
 end
 
 function canonical_unit(x::AbstractAlgebra.MPolyElem)
    if length(x) == 0
-      return base_ring(x)()
+      return coefficient_ring(x)()
    else
       return canonical_unit(coeff(x, 1))
    end
@@ -687,7 +687,7 @@ supplied vector.
 """
 function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    length(vals) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
-   R = base_ring(a)
+   R = coefficient_ring(a)
    if (U <: Integer && U != BigInt) ||
       (U <: Rational && U != Rational{BigInt})
       c = zero(R)*zero(U)
@@ -762,7 +762,7 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
    end
 
    S = parent(a)
-   R = base_ring(a)
+   R = coefficient_ring(a)
    return _evaluate(a, S, R, vars, vals)
 end
 
@@ -808,7 +808,7 @@ function _evaluate(a, S, R, vars, vals::Vector{Rational{BigInt}})
 end
 
 function __evaluate(a, vars, vals, powers)
-   R = base_ring(a)
+   R = parent(a) isa MSeriesRing ? base_ring(a) : coefficient_ring(a)
    S = parent(a)
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
@@ -1008,7 +1008,7 @@ function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univaria
    end
 
    if length(p) == 0
-      return Array{elem_type(base_ring(parent(p)))}(undef, 0)
+      return Array{elem_type(coefficient_ring(parent(p)))}(undef, 0)
    end
 
    var_index = findfirst(!iszero, exponent_vector(p, 1))
@@ -1017,7 +1017,7 @@ function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univaria
       return([coeff(p, 1)])
    end
 
-   coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
+   coeffs = [zero(coefficient_ring(p)) for i = 0:total_degree(p)]
    for i = 1:p.length
       coeffs[exponent(p, i, var_index) + 1] = coeff(p, i)
    end
@@ -1037,7 +1037,7 @@ function _change_mpoly_ring(R, Rx, cached)
 end
 
 @doc Markdown.doc"""
-    change_base_ring(R::Ring, p::MPolyElem{<: RingElement}; parent::MPolyRing, cached::Bool)
+    change_coefficient_ring(R::Ring, p::MPolyElem{<: RingElement}; parent::MPolyRing, cached::Bool)
 
 Return the polynomial obtained by coercing the non-zero coefficients of `p`
 into `R`.
@@ -1046,8 +1046,8 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function change_base_ring(R::Ring, p::MPolyElem{T}; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
-   base_ring(parent) != R && error("Base rings do not match.")
+function change_coefficient_ring(R::Ring, p::MPolyElem{T}; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
+   coefficient_ring(parent) != R && error("Base rings do not match.")
    return _map(R, p, parent)
 end
 
@@ -1066,7 +1066,7 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function map_coefficients(f, p::MPolyElem; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
+function map_coefficients(f, p::MPolyElem; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(coefficient_ring(p)))), AbstractAlgebra.parent(p), cached))
    return _map(f, p, parent)
 end
 
@@ -1101,7 +1101,7 @@ RandomExtensions.maketype(S::AbstractAlgebra.MPolyRing, _, _, _) = elem_type(S)
 
 function RandomExtensions.make(S::AbstractAlgebra.MPolyRing, term_range::UnitRange{Int},
                                exp_bound::UnitRange{Int}, vs...)
-   R = base_ring(S)
+   R = coefficient_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, term_range, exp_bound, vs[1])
    else
@@ -1114,7 +1114,7 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
    S, term_range, exp_bound, v = sp[][1:end]
    f = S()
    g = gens(S)
-   R = base_ring(S)
+   R = coefficient_ring(S)
    for i = 1:rand(rng, term_range)
       term = S(1)
       for j = 1:length(g)

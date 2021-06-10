@@ -18,7 +18,9 @@ elem_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} =
 
 parent(p::LaurentPolyWrap) = LaurentPolyWrapRing(parent(p.poly))
 
-base_ring(R::LaurentPolyWrapRing) = base_ring(R.polyring)
+coefficient_ring(R::LaurentPolyWrapRing) = coefficient_ring(R.polyring)
+
+coefficient_ring(p::LaurentPolyWrap) = coefficient_ring(parent(p))
 
 var(R::LaurentPolyWrapRing) = var(R.polyring)
 
@@ -27,7 +29,6 @@ symbols(R::LaurentPolyWrapRing) = symbols(R.polyring)
 nvars(R::LaurentPolyWrapRing) = nvars(R.polyring)
 
 characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
-
 
 ###############################################################################
 #
@@ -57,7 +58,7 @@ The result is undefined when `p` is null.
 lead_degree(p::LaurentPolyWrap) = p.mindeg + degree(p.poly)
 
 coeff(p::LaurentPolyWrap, i::Int) =
-   i < p.mindeg ? zero(base_ring(p)) : coeff(p.poly, i - p.mindeg)
+   i < p.mindeg ? zero(coefficient_ring(p)) : coeff(p.poly, i - p.mindeg)
 
 function _enable_deg!(p::LaurentPolyWrap, i::Int)
    diff = p.mindeg - i

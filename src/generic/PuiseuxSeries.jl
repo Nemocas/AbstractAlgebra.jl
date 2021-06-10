@@ -49,11 +49,11 @@ elem_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesRing{S}} = Puise
 
 elem_type(::Type{T}) where {S <: FieldElement, T <: PuiseuxSeriesField{S}} = PuiseuxSeriesFieldElem{S}
 
-base_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = base_ring(laurent_ring(R))
+coefficient_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = coefficient_ring(laurent_ring(R))
 
-base_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = base_ring(laurent_ring(R))
+coefficient_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = coefficient_ring(laurent_ring(R))
 
-base_ring(a::PuiseuxSeriesElem) = base_ring(parent(a))
+coefficient_ring(a::PuiseuxSeriesElem) = coefficient_ring(parent(a))
 
 @doc Markdown.doc"""
     max_precision(R::PuiseuxSeriesRing{T}) where T <: RingElement
@@ -171,7 +171,7 @@ function coeff(a::PuiseuxSeriesElem, r::Rational{Int})
    n = numerator(r)
    d = denominator(r)
    if mod(s, d) != 0
-      return base_ring(a)()
+      return coefficient_ring(a)()
    end
    return coeff(a.data, n*div(s, d))
 end
@@ -230,7 +230,7 @@ isunit(a::PuiseuxSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a.data, 0))
 
 Return the modulus of the coefficients of the given Puiseux series.
 """
-modulus(a::PuiseuxSeriesElem{T}) where {T <: ResElem} = modulus(base_ring(a))
+modulus(a::PuiseuxSeriesElem{T}) where {T <: ResElem} = modulus(coefficient_ring(a))
 
 @doc Markdown.doc"""
     rescale!(a::Generic.PuiseuxSeriesElem)
@@ -264,7 +264,7 @@ function deepcopy_internal(a::PuiseuxSeriesElem{T}, dict::IdDict) where {T <: Ri
 end
 
 function characteristic(a::PuiseuxSeriesRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
+   return characteristic(coefficient_ring(a))
 end
 
 ###############################################################################
@@ -316,12 +316,12 @@ end
 
 function show(io::IO, a::PuiseuxSeriesRing)
    print(io, "Puiseux series ring in ", var(laurent_ring(a)), " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+   print(IOContext(io, :compact => true), coefficient_ring(a))
 end
 
 function show(io::IO, a::PuiseuxSeriesField)
    print(io, "Puiseux series field in ", var(laurent_ring(a)), " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+   print(IOContext(io, :compact => true), coefficient_ring(a))
 end
 
 ###############################################################################
@@ -714,11 +714,11 @@ end
 ###############################################################################
 
 function (R::PuiseuxSeriesRing{T})(b::RingElement) where {T <: RingElement}
-   return R(base_ring(R)(b))
+   return R(coefficient_ring(R)(b))
 end
 
 function (R::PuiseuxSeriesField{T})(b::RingElement) where {T <: FieldElement}
-   return R(base_ring(R)(b))
+   return R(coefficient_ring(R)(b))
 end
 
 function (R::PuiseuxSeriesRing{T})() where {T <: RingElement}
@@ -760,14 +760,14 @@ function (R::PuiseuxSeriesField{T})(b::Union{Rational, AbstractFloat}) where T <
 end
 
 function (R::PuiseuxSeriesRing{T})(b::T) where T <: RingElem
-   parent(b) != base_ring(R) && error("Unable to coerce to Puiseux series")
+   parent(b) != coefficient_ring(R) && error("Unable to coerce to Puiseux series")
    z = PuiseuxSeriesRingElem{T}(laurent_ring(R)(b), 1)
    z.parent = R
    return z
 end
 
 function (R::PuiseuxSeriesField{T})(b::T) where T <: FieldElem
-   parent(b) != base_ring(R) && error("Unable to coerce to Puiseux series")
+   parent(b) != coefficient_ring(R) && error("Unable to coerce to Puiseux series")
    z = PuiseuxSeriesFieldElem{T}(laurent_ring(R)(b), 1)
    z.parent = R
    return z

@@ -350,13 +350,13 @@ end
 
          @test leading_coefficient(f*g) ==
 	       leading_coefficient(f)*leading_coefficient(g)
-         @test leading_coefficient(one(S)) == one(base_ring(S))
+         @test leading_coefficient(one(S)) == one(coefficient_ring(S))
 
          for v in varlist
-            @test leading_coefficient(v) == one(base_ring(S))
+            @test leading_coefficient(v) == one(coefficient_ring(S))
          end
 
-         @test parent(leading_coefficient(f)) == base_ring(f)
+         @test parent(leading_coefficient(f)) == coefficient_ring(f)
       end
    end
 
@@ -1088,7 +1088,7 @@ end
    @test evaluate(f, [y, z], [t + 1, t - 1]) ==
                  (x^2 + 3)*t^2 + (2*x^2 + 2*x + 1)*t + (x^2 - 2*x - 3)
 
-   @test evaluate(change_base_ring(QQ, f1), [2, 4, 6]) == 167//1
+   @test evaluate(change_coefficient_ring(QQ, f1), [2, 4, 6]) == 167//1
    @test evaluate(f1, [1, 3], [2, 4]) == 4*y1^2 + 12*y1 + 21
    @test evaluate(f1, [x1, z1], [2, 4]) == 4*y1^2 + 12*y1 + 21
 
@@ -1172,7 +1172,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.change_base_ring" begin
+@testset "Generic.MPoly.change_coefficient_ring" begin
    F2 = ResidueRing(ZZ, 2)
    R, varsR = PolynomialRing(F2, ["x"])
    S, varsS = PolynomialRing(R, ["y"])
@@ -1187,17 +1187,17 @@ end
 
       F2x, varss = PolynomialRing(F2, var_names; ordering = ord)
 
-      @test typeof(AbstractAlgebra.Generic.change_base_ring(ZZ, R(1))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(1))}
-      @test typeof(AbstractAlgebra.Generic.change_base_ring(ZZ, R(0))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(0))}
+      @test typeof(AbstractAlgebra.Generic.change_coefficient_ring(ZZ, R(1))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(1))}
+      @test typeof(AbstractAlgebra.Generic.change_coefficient_ring(ZZ, R(0))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(0))}
 
       for iter in 1:10
          f = rand(R, 5:10, 1:10, -100:100)
-         @test evaluate(change_base_ring(R, f), [one(R) for i=1:num_vars]) == sum(f.coeffs[i] for i=1:f.length)
-         @test evaluate(change_base_ring(R, f), vars) == f
-         @test ordering(parent(change_base_ring(R, f))) == ordering(parent(f))
+         @test evaluate(change_coefficient_ring(R, f), [one(R) for i=1:num_vars]) == sum(f.coeffs[i] for i=1:f.length)
+         @test evaluate(change_coefficient_ring(R, f), vars) == f
+         @test ordering(parent(change_coefficient_ring(R, f))) == ordering(parent(f))
 
-         g = change_base_ring(F2, f, parent = F2x)
-         @test base_ring(g) === F2
+         g = change_coefficient_ring(F2, f, parent = F2x)
+         @test coefficient_ring(g) === F2
          @test parent(g) === F2x
 
          g = map_coefficients(z -> z + 1, f, parent = R)
@@ -1361,12 +1361,12 @@ end
 
       @test length(AbstractAlgebra.Generic.coefficients_of_univariate(zero(R), true)) == 0
       @test length(AbstractAlgebra.Generic.coefficients_of_univariate(zero(R), false)) == 0
-      @test AbstractAlgebra.Generic.coefficients_of_univariate(one(R), true) == [ one(base_ring(R)) ]
+      @test AbstractAlgebra.Generic.coefficients_of_univariate(one(R), true) == [ one(coefficient_ring(R)) ]
       x = rand(vars_R)
-      @test AbstractAlgebra.Generic.coefficients_of_univariate(one(R), false) == [ one(base_ring(R)) ]
-      @test AbstractAlgebra.Generic.coefficients_of_univariate(x, true) == [ zero(base_ring(R)), one(base_ring(R)) ]
+      @test AbstractAlgebra.Generic.coefficients_of_univariate(one(R), false) == [ one(coefficient_ring(R)) ]
+      @test AbstractAlgebra.Generic.coefficients_of_univariate(x, true) == [ zero(coefficient_ring(R)), one(coefficient_ring(R)) ]
       x = rand(vars_R)
-      @test AbstractAlgebra.Generic.coefficients_of_univariate(x, false) == [ zero(base_ring(R)), one(base_ring(R)) ]
+      @test AbstractAlgebra.Generic.coefficients_of_univariate(x, false) == [ zero(coefficient_ring(R)), one(coefficient_ring(R)) ]
 
       for iter in 1:10
          f = zero(R)
@@ -1400,8 +1400,8 @@ end
       var_names = ["x$j" for j in 1:n_vars]
       R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:lex)
       for i in 1:size(A)[1]-1
-         f = R([base_ring(R)(1)], [A[i,:]])
-         g = R([base_ring(R)(1)], [A[i+1,:]])
+         f = R([coefficient_ring(R)(1)], [A[i,:]])
+         g = R([coefficient_ring(R)(1)], [A[i+1,:]])
          @test isless(f,g)
       end
    end
@@ -1421,8 +1421,8 @@ end
       R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:deglex)
 
       for i in 1:size(A)[1]-1
-         f = R([base_ring(R)(1)], [A[i,:]])
-         g = R([base_ring(R)(1)], [A[i+1,:]])
+         f = R([coefficient_ring(R)(1)], [A[i,:]])
+         g = R([coefficient_ring(R)(1)], [A[i+1,:]])
          if total_degree(f) < total_degree(g)
             @test isless(f,g)
          elseif total_degree(g) < total_degree(f)
@@ -1454,8 +1454,8 @@ end
       var_names = ["x$j" for j in 1:n_vars]
       R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:degrevlex)
       for i in 1:size(A)[1]-1
-         f = R([base_ring(R)(1)], [A[i,:]])
-         g = R([base_ring(R)(1)], [A[i+1,:]])
+         f = R([coefficient_ring(R)(1)], [A[i,:]])
+         g = R([coefficient_ring(R)(1)], [A[i+1,:]])
          if total_degree(f) < total_degree(g)
             @test isless(f,g)
          elseif total_degree(g) < total_degree(f)

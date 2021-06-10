@@ -24,7 +24,7 @@ etc. See the file `src/generic/GenericTypes.jl` for details.
 Parent objects of such polynomials have type `Generic.NCPolyRing{T}`.
 
 The string representation of the variable of the polynomial ring and the
-base/coefficient ring $R$ is stored in the parent object.
+coefficient ring $R$ is stored in the parent object.
 
 ## Abstract types
 
@@ -35,7 +35,7 @@ accept any AbstractAlgebra polynomial type.
 
 Note that both the generic polynomial ring type `Generic.NCPolyRing{T}` and the abstract
 type it belongs to, `NCPolyRing{T}` are both called `NCPolyRing`. The 
-former is a (parameterised) concrete type for a polynomial ring over a given base ring
+former is a (parameterised) concrete type for a polynomial ring over a given coefficient ring
 whose elements have type `T`. The latter is an abstract type representing all
 polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
 supplied by a C library).
@@ -49,13 +49,13 @@ polynomial ring itself. This is accomplished with the following constructor.
 PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
 ```
 
-Given a base ring `R` and string `s` specifying how the generator (variable) should be
+Given a coefficient ring `R` and string `s` specifying how the generator (variable) should be
 printed, return a tuple `S, x` representing the new polynomial ring $S = R[x]$ and the
 generator $x$ of the ring. By default the parent object `S` will depend only on `R` and 
 `x` and will be cached. Setting the optional argument `cached` to `false` will prevent
 the parent object `S` from being cached.
 
-A shorthand version of this function is provided: given a base ring `R`, we abbreviate
+A shorthand version of this function is provided: given a coefficient ring `R`, we abbreviate
 the constructor as follows.
 
 ```julia
@@ -151,10 +151,10 @@ false
 julia> n = length(g)
 3
 
-julia> U = base_ring(T)
+julia> U = coefficient_ring(T)
 Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers
 
-julia> V = base_ring(y + 1)
+julia> V = coefficient_ring(y + 1)
 Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers
 
 julia> v = var(T)

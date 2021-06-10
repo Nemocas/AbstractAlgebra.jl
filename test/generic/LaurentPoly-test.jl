@@ -21,8 +21,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
          @test parent(y) == L
 
-         @test base_ring(L) == R
-         @test base_ring(L) == base_ring(P)
+         @test coefficient_ring(L) == R
+         @test coefficient_ring(L) == coefficient_ring(P)
 
          @test var(L) == :y
          @test symbols(L) == [:y]
@@ -105,7 +105,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
          @test isunit(y^e)
       end
 
-      if base_ring(L) isa AbstractAlgebra.Field
+      if coefficient_ring(L) isa AbstractAlgebra.Field
          for e = -5:5
             @test isunit(2*y^e)
             @test isunit(3*y^(2e))
@@ -384,15 +384,15 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       end
    end
 
-   @testset "change_base_ring & map_coefficients" begin
+   @testset "change_coefficient_ring & map_coefficients" begin
       Z, z = LaurentPolynomialRing(ZZ, "z")
       Q, q = LaurentPolynomialRing(QQ, "q")
 
       fz = z^2 - z - 2z^-2
 
-      @test change_base_ring(QQ, z) == q
-      @test change_base_ring(QQ, fz) == q^2 - q - 2q^-2
-      @test_broken change_base_ring(ZZ, q) == z
+      @test change_coefficient_ring(QQ, z) == q
+      @test change_coefficient_ring(QQ, fz) == q^2 - q - 2q^-2
+      @test_broken change_coefficient_ring(ZZ, q) == z
 
       @test map_coefficients(x -> x^2, fz) == z^2 + z + 4z^-2
       @test map_coefficients(one, fz) == z^2 + z + z^-2

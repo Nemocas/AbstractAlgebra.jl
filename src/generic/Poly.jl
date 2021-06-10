@@ -44,7 +44,7 @@ function normalise(a::Poly, n::Int)
    return n
 end
 
-coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
+coeff(a::Poly, n::Int) = n >= length(a) ? coefficient_ring(a)(0) : a.coeffs[n + 1]
 
 function deepcopy_internal(a::Poly{T}, dict::IdDict) where T <: RingElement
    coeffs = Array{T}(undef, length(a))
@@ -73,7 +73,7 @@ function mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where T <: RingEleme
    zlen = alen + blen - 1
    zcoeffs = Vector{T}(undef, zlen)
    AbstractAlgebra.DensePoly.mullow_fast!(zcoeffs, zlen,
-                          a.coeffs, alen, b.coeffs, blen, base_ring(a), cutoff)
+                          a.coeffs, alen, b.coeffs, blen, coefficient_ring(a), cutoff)
    z = parent(a)(zcoeffs)
    z = set_length!(z, normalise(z, zlen))
    return z
@@ -92,7 +92,7 @@ function mullow_karatsuba(a::Poly{T}, b::Poly{T}, n::Int, cutoff::Int) where T <
    zlen = min(alen + blen - 1, n)
    zcoeffs = Vector{T}(undef, zlen)
    AbstractAlgebra.DensePoly.mullow_fast!(zcoeffs, zlen,
-                          a.coeffs, alen, b.coeffs, blen, base_ring(a), cutoff)
+                          a.coeffs, alen, b.coeffs, blen, coefficient_ring(a), cutoff)
    z = parent(a)(zcoeffs)
    z = set_length!(z, normalise(z, zlen))
    return z
@@ -118,7 +118,7 @@ function fit!(c::Poly{T}, n::Int) where T <: RingElement
    if length(c.coeffs) < n
       resize!(c.coeffs, n)
       for i = length(c) + 1:n
-         c.coeffs[i] = zero(base_ring(c))
+         c.coeffs[i] = zero(coefficient_ring(c))
       end
    end
    return nothing
@@ -143,7 +143,7 @@ function mul!(c::Poly{T}, a::Poly{T}, b::Poly{T}) where T <: RingElement
          b = deepcopy(b)
       end
 
-      t = base_ring(a)()
+      t = coefficient_ring(a)()
 
       lenc = lena + lenb - 1
       fit!(c, lenc)
@@ -226,7 +226,7 @@ end
 ###############################################################################
 
 function (a::PolyRing{T})(b::RingElement) where T <: RingElement
-   return a(base_ring(a)(b))
+   return a(coefficient_ring(a)(b))
 end
 
 function (a::PolyRing{T})() where T <: RingElement
@@ -236,13 +236,13 @@ function (a::PolyRing{T})() where T <: RingElement
 end
 
 function (a::PolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
-   z = Poly{T}(base_ring(a)(b))
+   z = Poly{T}(coefficient_ring(a)(b))
    z.parent = a
    return z
 end
 
 function (a::PolyRing{T})(b::T) where T <: RingElement
-   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   parent(b) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    z = Poly{T}(b)
    z.parent = a
    return z
@@ -254,7 +254,7 @@ function (a::PolyRing{T})(b::AbstractAlgebra.PolyElem{T}) where T <: RingElement
 end
 
 function (a::PolyRing{T})(b::Array{T, 1}) where T <: RingElement
-   R = base_ring(a)
+   R = coefficient_ring(a)
    for i = 1:length(b)
       b[i] = R(b[i])
    end
@@ -264,7 +264,7 @@ function (a::PolyRing{T})(b::Array{T, 1}) where T <: RingElement
 end
 
 function (a::PolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: RingElement}
-   R = base_ring(a)
+   R = coefficient_ring(a)
    len = length(b)
    entries = Array{T}(undef, len)
    for i = 1:length(b)
@@ -277,21 +277,21 @@ end
 
 # Functions to remove ambiguities on julia 0.7
 function (a::PolyRing{T})(b::T) where {T <: Rational}
-   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   parent(b) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    z = Poly{T}(b)
    z.parent = a
    return z
 end
 
 function (a::PolyRing{T})(b::T) where {T <: AbstractFloat}
-   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   parent(b) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    z = Poly{T}(b)
    z.parent = a
    return z
 end
 
 function (a::PolyRing{T})(b::T) where {T <: Integer}
-   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   parent(b) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    z = Poly{T}(b)
    z.parent = a
    return z

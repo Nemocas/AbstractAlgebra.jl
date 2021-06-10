@@ -28,7 +28,7 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: F
     iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
     n < 0 && throw(DomainError(n, "number of terms must be nonnegative"))
     d = degree(f)
-    R = base_ring(f)
+    R = coefficient_ring(f)
     # Beware: converting to power series and derivative do not commute
     dfc = collect(Base.Iterators.take(reverse!(collect(coefficients(derivative(f)))), n + 1))
     A = abs_series(R, dfc, length(dfc), n + 1; cached=false)
@@ -55,7 +55,7 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: R
     iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
     n < 0 && throw(DomainError(n, "number of terms must be nonnegative"))
     d = degree(f)
-    R = base_ring(f)
+    R = coefficient_ring(f)
     if n == 0
        return elem_type(R)[]
     end
@@ -93,7 +93,7 @@ end
 
 function power_sums_to_polynomial(P::Array{T, 1}, Rx::AbstractAlgebra.PolyRing{T}) where T <: FieldElement
     d = length(P)
-    R = base_ring(Rx)
+    R = coefficient_ring(Rx)
     s = rel_series(R, P, d, d, 0)
     r = -integral(s)
     r1 = exp(r)
@@ -130,7 +130,7 @@ end
 
 function factor(f::PolyElem, R::Field)
     Rt = AbstractAlgebra.PolyRing(R)
-    f1 = change_base_ring(R, f, parent = Rt)
+    f1 = change_coefficient_ring(R, f, parent = Rt)
     return factor(f1)
 end
 
@@ -161,7 +161,7 @@ Returns the roots of the polynomial `f` in the base ring of `f` as an array.
 """
 function roots(f::PolyElem)
     lf = factor(f)
-    rts = Vector{elem_type(base_ring(f))}()
+    rts = Vector{elem_type(coefficient_ring(f))}()
     for (p, e) in lf
         if degree(p) == 1
             push!(rts, -divexact(constant_coefficient(p), leading_coefficient(p)))
@@ -177,7 +177,7 @@ Returns the roots of the polynomial `f` in the field `R` as an array.
 """
 function roots(f::PolyElem, R::Field)
     Rt = AbstractAlgebra.PolyRing(R)
-    f1 = change_base_ring(R, f, parent = Rt)
+    f1 = change_coefficient_ring(R, f, parent = Rt)
     return roots(f1)
 end
 

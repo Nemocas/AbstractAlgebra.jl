@@ -43,7 +43,7 @@ symbols(R::MSeriesRing) = R.sym
 parent(a::MSeriesElem) = a.parent
 
 function base_ring(R::MSeriesRing{T}) where T <: RingElement
-    return base_ring(poly_ring(R))::parent_type(T)
+    return coefficient_ring(poly_ring(R))::parent_type(T)
 end
 
 base_ring(a::MSeriesElem) = base_ring(parent(a))

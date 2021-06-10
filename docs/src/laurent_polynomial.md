@@ -77,7 +77,7 @@ julia> shift_left(f,2)
 julia> map_coefficients(x->2x, f)
 10*x^3 + 4*x + 2*x^-2
 
-julia> change_base_ring(RealField, f)
+julia> change_coefficient_ring(RealField, f)
 5.0*x^3 + 2.0*x + x^-2
 
 julia> lead(f), trail(f)

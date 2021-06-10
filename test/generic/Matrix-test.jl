@@ -2118,7 +2118,7 @@ end
       S1 = MatrixSpace(RZ, m, n)
       MZ = randmat_with_rank(S1, rnk, 0:2, -20:20)
 
-      M = matrix(R, m, n, [change_base_ring(R1, MZ[i, j]) for i in 1:m for j in 1:n])
+      M = matrix(R, m, n, [change_coefficient_ring(R1, MZ[i, j]) for i in 1:m for j in 1:n])
       K = FractionField(R)
       MK = change_base_ring(K, M)
       X2 = rand(T, -1:2, 0:65536)

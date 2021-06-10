@@ -25,7 +25,7 @@ end
 var(a::SparsePolyRing) = a.S
 
 function gen(a::SparsePolyRing)
-   return a([one(base_ring(a))], [UInt(1)])
+   return a([one(coefficient_ring(a))], [UInt(1)])
 end
 
 ###############################################################################
@@ -49,9 +49,9 @@ isone(x::SparsePoly) = x == 1
 
 length(x::SparsePoly) = x.length
 
-leading_coefficient(x::SparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[x.length]
+leading_coefficient(x::SparsePoly) = x.length == 0 ? coefficient_ring(x)() : x.coeffs[x.length]
 
-trailing_coefficient(x::SparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[1]
+trailing_coefficient(x::SparsePoly) = x.length == 0 ? coefficient_ring(x)() : x.coeffs[1]
 
 function normalise(a::SparsePoly, n::Int)
    while n > 0 && iszero(a.coeffs[n])
@@ -60,9 +60,9 @@ function normalise(a::SparsePoly, n::Int)
    return n
 end
 
-base_ring(a::SparsePoly) = base_ring(parent(a))
+coefficient_ring(a::SparsePoly) = coefficient_ring(parent(a))
 
-base_ring(R::SparsePolyRing{T}) where {T <: RingElement} = R.base_ring::parent_type(T)
+coefficient_ring(R::SparsePolyRing{T}) where {T <: RingElement} = R.base_ring::parent_type(T)
 
 parent(a::SparsePoly) = a.parent
 
@@ -76,7 +76,7 @@ function Base.deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: Ring
 end
 
 function characteristic(a::SparsePolyRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
+   return characteristic(coefficient_ring(a))
 end
 
 ###############################################################################
@@ -112,7 +112,7 @@ function show(io::IO, p::SparsePolyRing)
    print(io, "Sparse Univariate Polynomial Ring in ")
    print(io, string(p.S))
    print(io, " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+   print(IOContext(io, :compact => true), coefficient_ring(p))
 end
 
 ###############################################################################
@@ -289,7 +289,7 @@ end
 
 function mul_johnson(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    if m == 0 || n == 0
@@ -385,7 +385,7 @@ end
 
 function divrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    maxn = a.exps[m]
@@ -619,7 +619,7 @@ end
 
 function pow_fps(f::SparsePoly{T}, k::Int) where {T <: RingElement}
    par = parent(f)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(f)
    H = Array{heap_sr}(undef, 0) # heap
    I = Array{heap_t}(undef, 0) # auxilliary data for heap nodes
@@ -786,7 +786,7 @@ end
 
 function divides_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    n == 0 && error("Division by zero in divides_monagan_pearce")
@@ -975,7 +975,7 @@ end
 
 function pseudodivrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    maxn = a.exps[m]
@@ -1151,7 +1151,7 @@ end
 
 function pseudorem_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    maxn = a.exps[m]
@@ -1316,7 +1316,7 @@ end
 
 function pseudorem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    n == 0 && throw(DivideError())
@@ -1342,7 +1342,7 @@ end
 
 function evaluate(a::SparsePoly{T}, b::S) where {S <: RingElement, T <: RingElement}
    if a.length == 0
-      return base_ring(a)()
+      return coefficient_ring(a)()
    end
    r = a.coeffs[a.length]
    for i = 1:a.length - 1
@@ -1357,7 +1357,7 @@ end
 
 function evaluate(a::SparsePoly{T}, b::Rational{S}) where {S <: Integer, T <: RingElement}
    if a.length == 0
-      return base_ring(a)()
+      return coefficient_ring(a)()
    end
    r = a.coeffs[a.length]
    for i = 1:a.length - 1
@@ -1372,9 +1372,9 @@ end
 
 function evaluate(a::SparsePoly{T}, b::Integer) where {T <: RingElement}
    if a.length == 0
-      return base_ring(a)()
+      return coefficient_ring(a)()
    end
-   R = base_ring(a)
+   R = coefficient_ring(a)
    r = a.coeffs[a.length]
    for i = 1:a.length - 1
       r *= R(b)^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i]))
@@ -1430,7 +1430,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    # if we are in univariate case, convert to dense, take gcd, convert back
    if constant_coeffs
       # convert polys to univariate dense
-      R = AbstractAlgebra.PolyRing(base_ring(base_ring(a)))
+      R = AbstractAlgebra.PolyRing(coefficient_ring(coefficient_ring(a)))
       f = R()
       g = R()
       fit!(f, reinterpret(Int, a.exps[a.length] + 1))
@@ -1450,7 +1450,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       for i = 1:length(h)
          ci = coeff(h, i - 1)
          if ci != 0
-            push!(Ac, base_ring(a)(ci))
+            push!(Ac, coefficient_ring(a)(ci))
             push!(Ae, UInt(i - 1))
          end
       end
@@ -1471,8 +1471,8 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    lead_a = leading_coefficient(a)
    lead_b = leading_coefficient(b)
    # psr algorithm
-   g = one(base_ring(a))
-   h = one(base_ring(a))
+   g = one(coefficient_ring(a))
+   h = one(coefficient_ring(a))
    while true
       adeg = reinterpret(Int,  a.exps[a.length])
       bdeg = reinterpret(Int,  b.exps[b.length])
@@ -1561,7 +1561,7 @@ function content(a::SparsePoly{T}) where {T <: RingElement}
          return z
       end
    end
-   z = base_ring(a)()
+   z = coefficient_ring(a)()
    for i = 1:length(a)
       z = gcd(coeff(a, i - 1), z)
    end
@@ -1651,7 +1651,7 @@ end
 ###############################################################################
 
 function (a::SparsePolyRing{T} where {T <: RingElement})(b::RingElement)
-   return a([base_ring(a)(b)], [UInt(0)])
+   return a([coefficient_ring(a)(b)], [UInt(0)])
 end
 
 function (a::SparsePolyRing{T})() where {T <: RingElement}
@@ -1661,13 +1661,13 @@ function (a::SparsePolyRing{T})() where {T <: RingElement}
 end
 
 function (a::SparsePolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
-   z = SparsePoly{T}(base_ring(a)(b))
+   z = SparsePoly{T}(coefficient_ring(a)(b))
    z.parent = a
    return z
 end
 
 function (a::SparsePolyRing{T})(b::T) where {T <: RingElement}
-   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   parent(b) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    z = SparsePoly{T}(b)
    z.parent = a
    return z
@@ -1680,7 +1680,7 @@ end
 
 function (a::SparsePolyRing{T})(b::Array{T, 1}, m::Array{UInt, 1}) where {T <: RingElement}
    if length(b) > 0
-      parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
+      parent(b[1]) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    end
    z = SparsePoly{T}(b, m)
    z.parent = a

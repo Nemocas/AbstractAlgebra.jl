@@ -53,7 +53,7 @@ type `MyZXPoly` then one would have:
 
 Polynomial rings should be made unique on the system by caching parent objects (unless
 an optional `cache` parameter is set to `false`). Polynomial rings should at least be
-distinguished based on their base (coefficient) ring. But if they have the same base
+distinguished based on their coefficient ring. But if they have the same coefficient 
 ring and symbol (for their variable/generator), they should certainly have the same
 parent object.
 
@@ -66,10 +66,10 @@ In addition to the required functionality for the Ring/NCRing interface (and in 
 of polynomials over a field, the Euclidean Ring interface), the Polynomial Ring interface
 has the following required functions.
 
-We suppose that `R` is a fictitious base ring (coefficient ring) and that `S` is a
+We suppose that `R` is a fictitious coefficient ring and that `S` is a
 univariate polynomial ring over `R` (i.e. $S = R[x]$) with parent object `S` of type
 `MyPolyRing{T}`. We also assume the polynomials in the ring have type `MyPoly{T}`, where
-`T` is the type of elements of the base (coefficient) ring.
+`T` is the type of elements of the coefficient ring.
 
 Of course, in practice these types may not be parameterised, but we use parameterised
 types here to make the interface clearer.
@@ -98,7 +98,7 @@ Create the polynomial in the given ring whose degree $i$ coefficient is given by
 ```
 
 Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[i]`.
-The elements of the array are assumed to be able to be coerced into the base ring `R`.
+The elements of the array are assumed to be able to be coerced into the coefficient ring `R`.
 
 ```julia
 (S::MyPolyRing{T})(A::Array{U, 1}) where T <: RingElem, U <: Integer
@@ -322,8 +322,8 @@ functions `similar` and `zero` do the same thing, but they are both provided
 for uniformity with other parts of the interface.
 
 ```julia
-similar(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
-zero(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
+similar(x::MyPoly{T}, R::Ring=coefficient_ring(x)) where T <: RingElem
+zero(x::MyPoly{T}, R::Ring=coefficient_ring(x)) where T <: RingElem
 ```
 
 Construct the zero polynomial with the same variable as the given polynomial

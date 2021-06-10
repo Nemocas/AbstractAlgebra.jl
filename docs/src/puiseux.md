@@ -191,7 +191,7 @@ false
 julia> coeff(g, 1//3)
 2
 
-julia> U = base_ring(S)
+julia> U = coefficient_ring(S)
 Integers
 
 julia> v = var(S)

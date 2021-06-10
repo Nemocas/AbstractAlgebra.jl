@@ -163,7 +163,7 @@ end
 function _rat_poly_add(poly1::Poly{S}, den1::S,
                         poly2::Poly{S}, den2::S) where
                         {T <: FieldElement, S <: PolyElem{T}}
-   R = base_ring(poly1)
+   R = coefficient_ring(poly1)
    
    if den1 == den2
       rpoly = poly1 + poly2
@@ -227,7 +227,7 @@ end
 function _rat_poly_sub(poly1::Poly{S}, den1::S,
                         poly2::Poly{S}, den2::S) where
                         {T <: FieldElement, S <: PolyElem{T}}
-   R = base_ring(poly1)
+   R = coefficient_ring(poly1)
    
    if den1 == den2
       rpoly = poly1 - poly2
@@ -287,7 +287,7 @@ end
 function _rat_poly_mul(poly1::Poly{S}, den1::S,
                        poly2::Poly{S}, den2::S) where
                        {T <: FieldElement, S <: PolyElem{T}}
-   R = base_ring(poly1)
+   R = coefficient_ring(poly1)
 
    if !isone(den2)
       gcd1 = content(poly1)
@@ -316,7 +316,7 @@ end
 
 function _rat_poly_canonicalise(poly::Poly{S}, den::S) where
                        {T <: FieldElement, S <: PolyElem{T}}
-   R = base_ring(poly)
+   R = coefficient_ring(poly)
 
    if isone(den)
       return poly, den
@@ -344,7 +344,7 @@ end
 function _rat_poly_rem(poly1::Poly{S}, den1::S,
                        poly2::Poly{S}, den2::S) where
                        {T <: FieldElement, S <: PolyElem{T}}
-   R = base_ring(poly1)
+   R = coefficient_ring(poly1)
 
    len1 = length(poly1)
    len2 = length(poly2)
@@ -481,7 +481,7 @@ end
 # convert a polynomial over a rational function field to
 # a numerator and denominator
 function _rat_poly(p::Poly{Rat{T}}, var=parent(p).S; cached::Bool=true) where T <: FieldElement
-   K = base_ring(p)
+   K = coefficient_ring(p)
    R = base_ring(fraction_field(K))
    S = elem_type(R)
 
@@ -1067,7 +1067,7 @@ function norm(a::FunctionFieldElem)
    aden = denominator(a, false)
    alen = length(anum)
    pol = numerator(S, false)
-   rnum, rden = _rat_poly_resultant(pol, one(base_ring(pol)), anum, aden)
+   rnum, rden = _rat_poly_resultant(pol, one(coefficient_ring(pol)), anum, aden)
    if !S.monic && length(anum) > 1
       lc = leading_coefficient(pol)
       pow = lc^(alen - 1)
@@ -1368,7 +1368,7 @@ function FunctionField(p::Poly{Rat{T}}, s::Symbol; cached::Bool=true) where T <:
    par = FunctionField{T}(pol, den, s, cached)
    par.monic, par.powers, par.powers_den = powers_precompute(pol, den)
    par.traces, par.traces_den = traces_precompute(pol, den)
-   par.base_ring = base_ring(p)
+   par.base_ring = coefficient_ring(p)
    par.pol = p
 
    return par, gen(par)

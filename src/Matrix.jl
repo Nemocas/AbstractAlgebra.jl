@@ -1803,7 +1803,7 @@ end
 
 function det_interpolation(M::MatrixElem{T}) where {T <: PolyElem}
    n = nrows(M)
-   !isdomain_type(elem_type(typeof(base_ring(base_ring(M))))) &&
+   !isdomain_type(elem_type(typeof(coefficient_ring(base_ring(M))))) &&
           error("Generic interpolation requires a domain type")
    R = base_ring(M)
    if n == 0
@@ -1819,13 +1819,14 @@ function det_interpolation(M::MatrixElem{T}) where {T <: PolyElem}
       return R()
    end
    bound = n*(maxlen - 1) + 1
-   x = Array{elem_type(base_ring(R))}(undef, bound)
-   d = Array{elem_type(base_ring(R))}(undef, bound)
-   X = zero_matrix(base_ring(R), n, n)
+   RR = coefficient_ring(R)
+   x = Array{elem_type(RR)}(undef, bound)
+   d = Array{elem_type(RR)}(undef, bound)
+   X = zero_matrix(RR, n, n)
    b2 = div(bound, 2)
-   pt1 = base_ring(R)(1 - b2)
+   pt1 = RR(1 - b2)
    for i = 1:bound
-      x[i] = base_ring(R)(i - b2)
+      x[i] = RR(i - b2)
       (x[i] == pt1 && i != 1) && error("Not enough interpolation points in ring")
       for j = 1:n
          for k = 1:n
@@ -2292,16 +2293,17 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
    end
    # bound from xd = (M*)b where d is the det
    bound = (maxlen - 1)*(max(m, c) - 1) + max(maxlenb, maxlen)
-   tmat = matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
+   RR = coefficient_ring(R)
+   tmat = matrix(RR, 0, 0, elem_type(RR)[])
    V = Array{typeof(tmat)}(undef, bound)
-   d = Array{elem_type(base_ring(R))}(undef, bound)
-   y = Array{elem_type(base_ring(R))}(undef, bound)
-   bj = Array{elem_type(base_ring(R))}(undef, bound)
+   d = Array{elem_type(RR)}(undef, bound)
+   y = Array{elem_type(RR)}(undef, bound)
+   bj = Array{elem_type(RR)}(undef, bound)
    X = similar(tmat, m, c)
    Y = similar(tmat, m, h)
    x = similar(b, c, h)
    b2 = div(bound, 2)
-   pt1 = base_ring(R)(1 - b2)
+   pt1 = RR(1 - b2)
    l = 1
    i = 1
    pt = 1
@@ -2309,7 +2311,7 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
    firstprm = true
    failues = 0
    while l <= bound
-      y[l] = base_ring(R)(pt - b2)
+      y[l] = RR(pt - b2)
       # Running out of interpolation points doesn't imply there is no solution
       (y[l] == pt1 && pt != 1) && error("Not enough interpolation points in ring")
       bad_evaluation = false
@@ -2379,7 +2381,7 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
          end
          V[l] = Vl
          d[l] = dl
-         y[l] = base_ring(R)(pt - b2)
+         y[l] = RR(pt - b2)
          l += 1
       catch e
          if !(e isa ErrorException)
@@ -3146,7 +3148,7 @@ end
 function charpoly_hessenberg!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
    !issquare(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
-   base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
+   coefficient_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
    if n == 0
       return S(1)
@@ -3172,7 +3174,7 @@ end
 function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
    !issquare(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
-   base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
+   coefficient_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
    if n == 0
       return S(1)
@@ -3290,7 +3292,7 @@ end
 function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
    !issquare(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
-   base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
+   coefficient_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
    if n == 0
       return S(1)
@@ -3395,7 +3397,7 @@ and the matrix is assumed to be square.
 function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
    !issquare(Y) && error("Dimensions don't match in charpoly")
    R = base_ring(Y)
-   base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
+   coefficient_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
    n = nrows(Y)
    if n == 0
       return V(1)
@@ -3475,7 +3477,7 @@ of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
    !issquare(M) && error("Not a square matrix in minpoly")
-   base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
+   coefficient_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
    if n == 0
       return S(1)
@@ -3571,7 +3573,7 @@ of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
    !issquare(M) && error("Not a square matrix in minpoly")
-   base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
+   coefficient_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
    if n == 0
       return S(1)

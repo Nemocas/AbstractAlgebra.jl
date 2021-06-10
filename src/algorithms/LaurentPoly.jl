@@ -13,7 +13,7 @@
 #
 ###############################################################################
 
-base_ring(p::LaurentPolyElem) = base_ring(parent(p))
+_ring(p::LaurentPolyElem) = coefficient_ring(parent(p))
 
 isdomain_type(::Type{<:LaurentPolyElem{T}}) where {T} = isdomain_type(T)
 
@@ -24,7 +24,6 @@ function check_parent(a::LaurentPolyElem, b::LaurentPolyElem, throw::Bool = true
    c || !throw || error("incompatible Laurent polynomial rings")
    return c
 end
-
 
 ###############################################################################
 #
@@ -112,12 +111,12 @@ end
 
 function leading_coefficient(p::LaurentPolyElem)
    dr = degrees_range(p)
-   isempty(dr) ? zero(base_ring(p)) : coeff(p, last(dr))
+   isempty(dr) ? zero(coefficient_ring(p)) : coeff(p, last(dr))
 end
 
 function trailing_coefficient(p::LaurentPolyElem)
    dr = degrees_range(p)
-   isempty(dr) ? zero(base_ring(p)) : coeff(p, first(dr))
+   isempty(dr) ? zero(coefficient_ring(p)) : coeff(p, first(dr))
 end
 
 gens(R::LaurentPolynomialRing) = [gen(R)]
@@ -189,7 +188,7 @@ Base.isapprox(q::T, p::LaurentPolyElem{T}; atol::Real=sqrt(eps())) where {T} =
 #
 ################################################################################
 
-change_base_ring(R::Ring, p::LaurentPolyElem) = map_coefficients(R, p)
+change_coefficient_ring(R::Ring, p::LaurentPolyElem) = map_coefficients(R, p)
 
 ###############################################################################
 #
@@ -209,6 +208,6 @@ function show(io::IO, p::LaurentPolynomialRing)
    print(io, "Univariate Laurent Polynomial Ring in ")
    print(io, string(var(p)))
    print(io, " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+   print(IOContext(io, :compact => true), coefficient_ring(p))
 end
 

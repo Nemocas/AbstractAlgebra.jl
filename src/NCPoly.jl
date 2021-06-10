@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-base_ring(R::NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)
+coefficient_ring(R::NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)
 
 function isexact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyElem{S}}
    return isexact_type(S)
@@ -56,7 +56,7 @@ one(R::NCPolyRing) = R(1)
 
 Return the generator of the given polynomial ring.
 """
-gen(R::NCPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
+gen(R::NCPolyRing) = R([zero(coefficient_ring(R)), one(coefficient_ring(R))])
 
 isterm(a::T) where T <: NCRingElem = true
 
@@ -72,7 +72,7 @@ function show(io::IO, p::NCPolyRing)
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(var(p)))
    print(io, " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+   print(IOContext(io, :compact => true), coefficient_ring(p))
 end
 
 ###############################################################################
@@ -135,7 +135,7 @@ function *(a::NCPolyElem{T}, b::NCPolyElem{T}) where T <: NCRingElem
    if lena == 0 || lenb == 0
       return parent(a)()
    end
-   t = base_ring(a)()
+   t = coefficient_ring(a)()
    lenz = lena + lenb - 1
    d = Array{T}(undef, lenz)
    for i = 1:lena
@@ -333,7 +333,7 @@ function mullow(a::NCPolyElem{T}, b::NCPolyElem{T}, n::Int) where T <: NCRingEle
    if n < 0
       n = 0
    end
-   t = base_ring(a)()
+   t = coefficient_ring(a)()
    lenz = min(lena + lenb - 1, n)
    d = Array{T}(undef, lenz)
    for i = 1:min(lena, lenz)
@@ -377,7 +377,7 @@ function divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}) where T <: NCRingEle
    lenq = length(f) - length(g) + 1
    d = Array{T}(undef, lenq)
    for i = 1:lenq
-      d[i] = zero(base_ring(f))
+      d[i] = zero(coefficient_ring(f))
    end
    x = gen(parent(f))
    leng = length(g)
@@ -408,7 +408,7 @@ function divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}) where T <: NCRingElem
    lenq = length(f) - length(g) + 1
    d = Array{T}(undef, lenq)
    for i = 1:lenq
-      d[i] = zero(base_ring(f))
+      d[i] = zero(coefficient_ring(f))
    end
    x = gen(parent(f))
    leng = length(g)
@@ -499,7 +499,7 @@ Evaluate the polynomial $a$ at the value $b$ and return the result.
 """
 function evaluate(a::NCPolyElem, b::T) where T <: NCRingElem
    i = length(a)
-   R = base_ring(a)
+   R = coefficient_ring(a)
    if i == 0
        return zero(R)
    end
@@ -519,7 +519,7 @@ Evaluate the polynomial $a$ at the value $b$ and return the result.
 """
 function evaluate(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
    i = length(a)
-   R = base_ring(a)
+   R = coefficient_ring(a)
    if i == 0
        return zero(R)
    end
@@ -556,7 +556,7 @@ end
 RandomExtensions.maketype(S::NCPolyRing, dr::UnitRange{Int}, _) = elem_type(S)
 
 function RandomExtensions.make(S::NCPolyRing, deg_range::UnitRange{Int}, vs...)
-   R = base_ring(S)
+   R = coefficient_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, deg_range, vs[1]) # forward to default Make constructor
    else
@@ -569,7 +569,7 @@ function rand(rng::AbstractRNG,
                                          <:NCPolyRing,
                                          UnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
-   R = base_ring(S)
+   R = coefficient_ring(S)
    f = S()
    x = gen(S)
    for i = 0:rand(rng, deg_range)

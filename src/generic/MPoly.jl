@@ -16,7 +16,7 @@ parent_type(::Type{MPoly{T}}) where T <: RingElement = MPolyRing{T}
 
 elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
-base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
+coefficient_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 @doc Markdown.doc"""
     symbols(a::MPolyRing)
@@ -35,19 +35,19 @@ nvars(a::MPolyRing) = a.num_vars
 
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:lex}}) where {T <: RingElement}
     n = a.num_vars
-    return a([base_ring(a)(1)], reshape([UInt(j == n - i + 1)
+    return a([coefficient_ring(a)(1)], reshape([UInt(j == n - i + 1)
             for j = 1:n], n, 1))
 end
 
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:deglex}}) where {T <: RingElement}
     n = a.num_vars
-    return a([base_ring(a)(1)], reshape([[UInt(j == n - i + 1)
+    return a([coefficient_ring(a)(1)], reshape([[UInt(j == n - i + 1)
             for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:degrevlex}}) where {T <: RingElement}
     n = a.num_vars
-    return a([base_ring(a)(1)], reshape([[UInt(j == i)
+    return a([coefficient_ring(a)(1)], reshape([[UInt(j == i)
             for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
@@ -249,7 +249,7 @@ function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
       end
       n = div(hi - lo + 1, 2)
    end
-   return base_ring(a)()
+   return coefficient_ring(a)()
 end
 
 @doc Markdown.doc"""
@@ -261,7 +261,7 @@ exponent already exists, or if the term is inserted at the end of the
 polynomial. Otherwise it can take $O(n)$ operations in the worst case.
 """
 function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
-   c = base_ring(a)(c)
+   c = coefficient_ring(a)(c)
    A = a.exps
    N = size(A, 1)
    exp2 = Array{UInt, 1}(undef, N)
@@ -670,7 +670,7 @@ end
 
 function trailing_coefficient(p::MPoly{T}) where T <: RingElement
    if iszero(p)
-      return zero(base_ring(p))
+      return zero(coefficient_ring(p))
    else
       return coeff(p, length(p))
    end
@@ -683,7 +683,7 @@ Return the monomial of the $i$-th term of the polynomial (as a polynomial
 of length $1$ with coefficient $1$).
 """
 function monomial(x::MPoly, i::Int)
-   R = base_ring(x)
+   R = coefficient_ring(x)
    N = size(x.exps, 1)
    exps = Array{UInt, 2}(undef, N, 1)
    monomial_set!(exps, 1, x.exps, i, N)
@@ -700,7 +700,7 @@ function monomial!(m::MPoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
    N = size(x.exps, 1)
    fit!(m, 1)
    monomial_set!(m.exps, 1, x.exps, i, N)
-   m.coeffs[1] = one(base_ring(x))
+   m.coeffs[1] = one(coefficient_ring(x))
    m.length = 1
    return m
 end
@@ -711,7 +711,7 @@ end
 Return the $i$-th nonzero term of the polynomial $x$ (as a polynomial).
 """
 function term(x::MPoly, i::Int)
-   R = base_ring(x)
+   R = coefficient_ring(x)
    N = size(x.exps, 1)
    exps = Array{UInt, 2}(undef, N, 1)
    monomial_set!(exps, 1, x.exps, i, N)
@@ -1160,7 +1160,7 @@ end
 
 function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    if m == 0 || n == 0
@@ -1468,7 +1468,7 @@ end
 
 function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    if m == 0 || n == 0
@@ -1631,7 +1631,7 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       e2 = zeros(UInt, M, length(b))
       pack_monomials(e1, a.exps, k, exp_bits, length(a))
       pack_monomials(e2, b.exps, k, exp_bits, length(b))
-      par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
+      par = MPolyRing{T}(coefficient_ring(a), parent(a).S, parent(a).ord, M, false)
       a1 = par(a.coeffs, e1)
       b1 = par(b.coeffs, e2)
       a1.length = a.length
@@ -1684,7 +1684,7 @@ end
 
 function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    if m == 0
       return true, par()
@@ -1877,7 +1877,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
 end
 
 function sqrt_heap(a::MPoly{T}, check::Bool=true) where {T <: RingElement}
-   if characteristic(base_ring(a)) == 2
+   if characteristic(coefficient_ring(a)) == 2
       return sqrt_classical_char2(a)
    end
    v, d = max_fields(a)
@@ -1897,7 +1897,7 @@ function sqrt_heap(a::MPoly{T}, check::Bool=true) where {T <: RingElement}
       M = div(N + k - 1, k)
       e1 = zeros(UInt, M, length(a))
       pack_monomials(e1, a.exps, k, exp_bits, length(a))
-      par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
+      par = MPolyRing{T}(coefficient_ring(a), parent(a).S, parent(a).ord, M, false)
       a1 = par(a.coeffs, e1)
       a1.length = a.length
       flag, q = sqrt_heap(a1, exp_bits, check)
@@ -2104,7 +2104,7 @@ end
 
 function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    par = parent(f)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(f)
    N = parent(f).N
    drmask = monomial_drmask(par, bits)
@@ -2310,7 +2310,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       return deepcopy(a)
    elseif b == 2
       return a*a
-   elseif characteristic(base_ring(a)) != 0
+   elseif characteristic(coefficient_ring(a)) != 0
       # pow_fps requires char 0 so use pow_rmul if not or unsure
       return pow_rmul(a, b)
    else
@@ -2335,7 +2335,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
          M = div(N + k - 1, k)
          e1 = zeros(UInt, M, length(a))
          pack_monomials(e1, a.exps, k, exp_bits, length(a))
-         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
+         par = MPolyRing{T}(coefficient_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
          r1 = pow_fps(a1, b, exp_bits)
@@ -2415,7 +2415,7 @@ end
 
 function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    if m == 0
@@ -2575,7 +2575,7 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       e2 = zeros(UInt, M, length(b))
       pack_monomials(e1, a.exps, k, exp_bits, length(a))
       pack_monomials(e2, b.exps, k, exp_bits, length(b))
-      par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
+      par = MPolyRing{T}(coefficient_ring(a), parent(a).S, parent(a).ord, M, false)
       a1 = par(a.coeffs, e1)
       b1 = par(b.coeffs, e2)
       a1.length = a.length
@@ -2604,7 +2604,7 @@ end
 
 function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    n == 0 && error("Division by zero in div_monagan_pearce")
@@ -2793,7 +2793,7 @@ function Base.div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          e2 = zeros(UInt, M, length(b))
          pack_monomials(e1, a.exps, k, exp_bits, length(a))
          pack_monomials(e2, b.exps, k, exp_bits, length(b))
-         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
+         par = MPolyRing{T}(coefficient_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          b1 = par(b.coeffs, e2)
          a1.length = a.length
@@ -2816,7 +2816,7 @@ end
 
 function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    m = length(a)
    n = length(b)
    n == 0 && error("Division by zero in divrem_monagan_pearce")
@@ -3019,7 +3019,7 @@ function Base.divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          e2 = zeros(UInt, M, length(b))
          pack_monomials(e1, a.exps, k, exp_bits, length(a))
          pack_monomials(e2, b.exps, k, exp_bits, length(b))
-         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
+         par = MPolyRing{T}(coefficient_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          b1 = par(b.coeffs, e2)
          a1.length = a.length
@@ -3045,7 +3045,7 @@ end
 
 function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) where {T <: RingElement}
    par = parent(a)
-   R = base_ring(par)
+   R = coefficient_ring(par)
    len = length(b)
    m = length(a)
    n = [length(b[i]) for i in 1:len]
@@ -3261,7 +3261,7 @@ function Base.divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement
          for i = 1:len
             pack_monomials(e2[i], b[i].exps, k, exp_bits, length(b[i]))
          end
-         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
+         par = MPolyRing{T}(coefficient_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
          b1 = [par(b[i].coeffs, e2[i]) for i in 1:len]
@@ -3303,7 +3303,7 @@ each of the variables.
 """
 function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
    if iszero(a)
-      return base_ring(a)()
+      return coefficient_ring(a)()
    end
    N = size(a.exps, 1)
    ord = parent(a).ord
@@ -3327,7 +3327,7 @@ function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
       end
    end
    if a.length == 0
-      return base_ring(a)()
+      return coefficient_ring(a)()
    else
       return a.coeffs[1]
    end
@@ -3356,7 +3356,7 @@ need to be in the same ring, just in compatible rings.
 """
 function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-   R = base_ring(a)
+   R = coefficient_ring(a)
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
@@ -3548,7 +3548,7 @@ function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
 end
 
 function content(a::MPoly{T}) where {T <: RingElement}
-   z = base_ring(a)()
+   z = coefficient_ring(a)()
    for i = 1:length(a)
       z = gcd(z, coeff(a, i))
    end
@@ -3577,7 +3577,7 @@ function term_content(a::MPoly{T}) where {T <: RingElement}
          break
       end
    end
-   Cc[1] = base_ring(a)()
+   Cc[1] = coefficient_ring(a)()
    for i = 1:a.length
       Cc[1] = gcd(Cc[1], a.coeffs[i])
    end
@@ -3739,7 +3739,7 @@ end
 
 # Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_lex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
-   N = base_ring(a).N
+   N = coefficient_ring(a).N
    V = [(ntuple(i -> i == k ? a.exps[r] : a.coeffs[r].exps[i, s], Val(N)), r, s) for
        r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V, lt = is_less_lex)
@@ -3750,12 +3750,12 @@ function main_variable_insert_lex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: R
          Re[j, length(V) - i + 1] = V[i][1][j]
       end
    end
-   return base_ring(a)(Rc, Re)
+   return coefficient_ring(a)(Rc, Re)
 end
 
 # Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_deglex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
-   N = base_ring(a).N
+   N = coefficient_ring(a).N
    V = [(ntuple(i -> i == N ? a.exps[r] + a.coeffs[r].exps[N, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val(N)), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V, lt = is_less_lex)
@@ -3766,7 +3766,7 @@ function main_variable_insert_deglex(a::SparsePoly{MPoly{T}}, k::Int) where {T <
          Re[j, length(V) - i + 1] = V[i][1][j]
       end
    end
-   return base_ring(a)(Rc, Re)
+   return coefficient_ring(a)(Rc, Re)
 end
 
 function is_less_degrevlex(a::Tuple, b::Tuple)
@@ -3788,7 +3788,7 @@ end
 
 # Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_degrevlex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
-   N = base_ring(a).N
+   N = coefficient_ring(a).N
    V = [(ntuple(i -> i == N ? a.exps[r] + a.coeffs[r].exps[N, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val(N)), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V, lt = is_less_degrevlex)
@@ -3799,11 +3799,11 @@ function main_variable_insert_degrevlex(a::SparsePoly{MPoly{T}}, k::Int) where {
          Re[j, length(V) - i + 1] = V[i][1][j]
       end
    end
-   return base_ring(a)(Rc, Re)
+   return coefficient_ring(a)(Rc, Re)
 end
 
 function main_variable_insert(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
-   ord = base_ring(a).ord
+   ord = coefficient_ring(a).ord
    if ord == :lex
       return main_variable_insert_lex(a, k)
    elseif ord == :deglex
@@ -3939,7 +3939,7 @@ end
 Set the coefficient of the i-th term of the polynomial to the integer $c$.
 """
 function setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
-    return setcoeff!(a, i, base_ring(a)(c))
+    return setcoeff!(a, i, coefficient_ring(a)(c))
 end
 
 @doc Markdown.doc"""
@@ -3998,7 +3998,7 @@ end
 ###############################################################################
 
 function (a::MPolyRing{T})(b::RingElement) where {T <: RingElement}
-   return a(base_ring(a)(b))
+   return a(coefficient_ring(a)(b))
 end
 
 function (a::MPolyRing{T})() where {T <: RingElement}
@@ -4007,7 +4007,7 @@ function (a::MPolyRing{T})() where {T <: RingElement}
 end
 
 function (a::MPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
-   z = MPoly{T}(a, base_ring(a)(b))
+   z = MPoly{T}(a, coefficient_ring(a)(b))
    return z
 end
 
@@ -4017,7 +4017,7 @@ function (a::MPolyRing{T})(b::T) where {T <: Union{Integer, Rational, AbstractFl
 end
 
 function (a::MPolyRing{T})(b::T) where {T <: RingElement}
-   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   parent(b) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    z = MPoly{T}(a, b)
    return z
 end
@@ -4029,7 +4029,7 @@ end
 
 function (a::MPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingElement}
    if length(b) > 0 && isassigned(b, 1)
-      parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
+      parent(b[1]) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    end
    z = MPoly{T}(a, b, m)
    return z
@@ -4040,7 +4040,7 @@ end
 # like terms and removal of zero terms is performed.
 function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: RingElement}
    if length(b) > 0 && isassigned(b, 1)
-       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
+       parent(b[1]) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    end
 
    for i in 1:length(m)

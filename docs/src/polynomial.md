@@ -14,7 +14,7 @@ follows the Univariate Polynomial Ring interface.
 
 ## Generic univariate polynomial types
 
-AbstractAlgebra.jl provides a generic polynomial type based on Julia arrays which
+AbstractAlgebra.jl provides a generic polynomial type coefficientd on Julia arrays which
 is implemented in `src/generic/Poly.jl`.
 
 These generic polynomials have type `Generic.Poly{T}` where `T` is the type of
@@ -25,7 +25,7 @@ the file `src/generic/GenericTypes.jl` for details.
 Parent objects of such polynomials have type `Generic.PolyRing{T}`.
 
 The string representation of the variable of the polynomial ring and the
-base/coefficient ring $R$ is stored in the parent object.
+coefficient/coefficient ring $R$ is stored in the parent object.
 
 ## Abstract types
 
@@ -36,7 +36,7 @@ can accept any AbstractAlgebra polynomial type.
 
 Note that both the generic polynomial ring type `Generic.PolyRing{T}` and the abstract
 type it belongs to, `PolyRing{T}`, are called `PolyRing`. The
-former is a (parameterised) concrete type for a polynomial ring over a given base ring
+former is a (parameterised) concrete type for a polynomial ring over a given coefficient ring
 whose elements have type `T`. The latter is an abstract type representing all
 polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
 supplied by a C library).
@@ -50,13 +50,13 @@ polynomial ring itself. This is accomplished with the following constructor.
 PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
 ```
 
-Given a base ring `R` and string `s` specifying how the generator (variable) should be
+Given a coefficient ring `R` and string `s` specifying how the generator (variable) should be
 printed, return a tuple `S, x` representing the new polynomial ring $S = R[x]$ and the
 generator $x$ of the ring. By default the parent object `S` will depend only on `R` and
 `x` and will be cached. Setting the optional argument `cached` to `false` will prevent
 the parent object `S` from being cached.
 
-A shorthand version of this function is provided: given a base ring `R`, we abbreviate
+A shorthand version of this function is provided: given a coefficient ring `R`, we abbreviate
 the constructor as follows.
 
 ```julia
@@ -72,7 +72,7 @@ matter.
 PolyRing(R::Ring)
 ```
 
-Given a base ring `R` return the polynomial ring $S = R[x]$. Note that unlike
+Given a coefficient ring `R` return the polynomial ring $S = R[x]$. Note that unlike
 the constructors above, the return type is not a tuple. Only the ring is
 returned and not the generator. The polynomial ring is not cached.
 
@@ -161,10 +161,10 @@ false
 julia> n = length(g)
 3
 
-julia> U = base_ring(S)
+julia> U = coefficient_ring(S)
 Univariate Polynomial Ring in x over Integers
 
-julia> V = base_ring(y + 1)
+julia> V = coefficient_ring(y + 1)
 Univariate Polynomial Ring in x over Integers
 
 julia> v = var(S)
@@ -525,10 +525,10 @@ g = x^2+6*x+1
 sqrt(g^2)
 ```
 
-### Change of base ring
+### Change of coefficient ring
 
 ```@docs
-change_base_ring(::Ring, ::PolyElem{T}) where T <: RingElement
+change_coefficient_ring(::Ring, ::PolyElem{T}) where T <: RingElement
 map_coefficients(::Any, ::PolyElem{<:RingElement})
 ```
 
@@ -537,7 +537,7 @@ map_coefficients(::Any, ::PolyElem{<:RingElement})
 ```julia
 R, x = PolynomialRing(ZZ, "x")
 g = x^3+6*x + 1
-change_base_ring(GF(2), g)
+change_coefficient_ring(GF(2), g)
 ```
 
 ### Pseudodivision

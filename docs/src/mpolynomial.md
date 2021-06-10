@@ -27,7 +27,7 @@ The top bit of each `UInt` is reserved for overflow detection.
 Parent objects of such polynomials have type `Generic.MPolyRing{T}`.
 
 The string representation of the variables of the polynomial ring and the
-base/coefficient ring $R$ and the ordering are stored in the parent object.
+coefficient ring $R$ and the ordering are stored in the parent object.
 
 ## Abstract types
 
@@ -36,7 +36,7 @@ and the polynomial ring types belong to the abstract type `MPolyRing{T}`.
 
 Note that both the generic polynomial ring type `Generic.MPolyRing{T}` and the abstract
 type it belongs to, `MPolyRing{T}` are both called `MPolyRing`. The
-former is a (parameterised) concrete type for a polynomial ring over a given base ring
+former is a (parameterised) concrete type for a polynomial ring over a given coefficient ring
 whose elements have type `T`. The latter is an abstract type representing all
 multivariate polynomial ring types in AbstractAlgebra.jl, whether generic or very
 specialised (e.g. supplied by a C library).
@@ -52,7 +52,7 @@ PolynomialRing(R::Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symb
 PolynomialRing(R::Ring, n::Int, s::String="x"; cached::Bool = false, ordering::Symbol = :lex)
 ```
 
-The first constructor, given a base ring `R` and an array `S` of strings
+The first constructor, given a coefficient ring `R` and an array `S` of strings
 specifying how the generators (variables) should be printed, will return a
 tuple `S, (x, ...)` representing the new polynomial ring $S = R[x, \ldots]$ and
 a tuple of the generators $(x, ...)$ of the ring.
@@ -70,7 +70,7 @@ The optional named argument `ordering` can be used to specify an ordering. The
 currently supported options are `:lex`, `:deglex` and `:degrevlex`.
 
 Like for univariate polynomials, a shorthand version of this function is
-provided when the number of generators is greater than `1`: given a base ring
+provided when the number of generators is greater than `1`: given a coefficient ring
 `R`, we abbreviate the constructor as follows:
 
 ```julia
@@ -209,15 +209,15 @@ julia> c = coeff(f, x^2)
 
 ```
 
-### Changing base (coefficient) rings
+### Changing coefficient rings
 
 In order to substitute the variables of a polynomial $f$ over a ring $T$ by
-elements in a $T$-algebra $S$, you first have to change the base ring of $f$
+elements in a $T$-algebra $S$, you first have to change the coefficient ring of $f$
 using the following function, where $g$ is a function representing the
 structure homomorphism of the $T$-algebra $S$.
 
 ```@docs
-change_base_ring(::Ring, p::MPolyElem{T}) where {T <: RingElement}
+change_coefficient_ring(::Ring, p::MPolyElem{T}) where {T <: RingElement}
 map_coefficients(::Any, p::MPolyElem)
 ```
 
@@ -230,7 +230,7 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 julia> fz = x^2*y^2 + x + 1
 x^2*y^2 + x + 1
 
-julia> fq = change_base_ring(QQ, fz)
+julia> fq = change_coefficient_ring(QQ, fz)
 x^2*y^2 + x + 1
 
 ```
@@ -249,7 +249,7 @@ julia> S,  = PolynomialRing(QQ, ["x", "y"])
 julia> fz = x^5 + y^3 + 1
 x^5 + y^3 + 1
 
-julia> fq = change_base_ring(QQ, fz, parent=S)
+julia> fq = change_coefficient_ring(QQ, fz, parent=S)
 x^5 + y^3 + 1
 ```
 

@@ -219,7 +219,7 @@ function pfracinit(
   @assert length(alphas) >= l
 
   R = parent(B[1])
-  K = base_ring(R)
+  K = coefficient_ring(R)
 
   # betas is a 1+l by r matrix with the original B[i] in the last row
   # and successive evaluations in the previous rows
@@ -433,7 +433,7 @@ function hlift_with_lcc(
 ) where E
 
   R = parent(A)
-  K = base_ring(R)
+  K = coefficient_ring(R)
   n = length(minorvars)
   r = length(Auf)
   @assert n > 0
@@ -477,7 +477,7 @@ function hlift_have_lcs(
 ) where E
 
   R = parent(A)
-  K = base_ring(R)
+  K = coefficient_ring(R)
   n = length(minorvars)
   r = length(Auf)
   @assert n > 0
@@ -803,7 +803,7 @@ end
 =#
 function mfactor_irred_univar(a::E, var::Int) where E
   R = parent(a)
-  K = base_ring(R)
+  K = coefficient_ring(R)
   Kx, _ = PolynomialRing(K, "x")
   F = factor(to_univar(a, var, Kx))
   res = E[]
@@ -874,7 +874,7 @@ function hlift_bivar_combine(
 ) where E
 
   R = parent(a)
-  K = base_ring(R)
+  K = coefficient_ring(R)
   r = length(ufacs)
   tfac = E[zero(R) for i in 1:r]
 
@@ -999,7 +999,7 @@ function lcc_kaltofen_step!(
   R = parent(Af.unit)
   r = length(Au)
   @assert r == length(divs)
-  Kx, _ = PolynomialRing(base_ring(R), string(gen(R,v)))
+  Kx, _ = PolynomialRing(coefficient_ring(R), string(gen(R,v)), cached = false)
 
   Auf = [collect(factor_squarefree(to_univar(Au[i], v, Kx)).fac) for i in 1:r]
 
@@ -1144,7 +1144,7 @@ function mfactor_choose_eval_points!(
 
   n = length(minorvars)
   R = parent(A)
-  K = base_ring(R)
+  K = coefficient_ring(R)
 
   for i in 1:n
     alphas[i] = K(rand(Int) % size)
@@ -1160,7 +1160,7 @@ function mfactor_irred_mvar_char_zero(
 
   n = length(minorvars)
   R = parent(A)
-  K = base_ring(R)
+  K = coefficient_ring(R)
   @assert length(A) > 0
 
   evals = zeros(R, n + 1)
@@ -1260,7 +1260,7 @@ end
 # return irreducible factors
 function mfactor_irred_char_zero(a::E) where E
   R = parent(a)
-  K = base_ring(R)
+  K = coefficient_ring(R)
   @assert length(a) > 0
 
   res = Fac{E}()
@@ -1313,7 +1313,7 @@ end
 
 function mfactor_squarefree_char_zero(a::E) where E
   R = parent(a)
-  K = base_ring(R)
+  K = coefficient_ring(R)
 
   res = Fac{E}()
   tres = Fac{E}()

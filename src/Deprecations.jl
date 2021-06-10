@@ -55,3 +55,9 @@ end
 
 @deprecate involves_at_most_one_variable(p::AbstractAlgebra.MPolyElem) isunivariate(p)
 
+# Deprecated in 0.18.*
+
+@deprecate  base_ring(R::PolyRing{T}) where T <: RingElement coefficient_ring(R)
+
+@deprecate  change_base_ring(R::Ring, p::PolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement change_coefficient_ring(R, p, cached = cached, parent = parent)
+

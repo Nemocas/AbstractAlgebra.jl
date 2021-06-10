@@ -37,7 +37,7 @@ function normalise(a::NCPoly, n::Int)
    return n
 end
 
-coeff(a::NCPoly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
+coeff(a::NCPoly, n::Int) = n >= length(a) ? coefficient_ring(a)(0) : a.coeffs[n + 1]
 
 function deepcopy_internal(a::NCPoly{T}, dict::IdDict) where T <: NCRingElem
    coeffs = Array{T}(undef, length(a))
@@ -67,7 +67,7 @@ function fit!(c::NCPoly{T}, n::Int) where T <: NCRingElem
    if length(c.coeffs) < n
       resize!(c.coeffs, n)
       for i = length(c) + 1:n
-         c.coeffs[i] = zero(base_ring(c))
+         c.coeffs[i] = zero(coefficient_ring(c))
       end
    end
    return nothing
@@ -92,7 +92,7 @@ function mul!(c::NCPoly{T}, a::NCPoly{T}, b::NCPoly{T}) where T <: NCRingElem
          b = deepcopy(b)
       end
 
-      t = base_ring(a)()
+      t = coefficient_ring(a)()
 
       lenc = lena + lenb - 1
       fit!(c, lenc)
@@ -172,7 +172,7 @@ end
 ###############################################################################
 
 function (a::NCPolyRing{T})(b::NCRingElem) where T <: NCRingElem
-   return a(base_ring(a)(b))
+   return a(coefficient_ring(a)(b))
 end
 
 function (a::NCPolyRing{T})() where T <: NCRingElem
@@ -182,13 +182,13 @@ function (a::NCPolyRing{T})() where T <: NCRingElem
 end
 
 function (a::NCPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElem
-   z = NCPoly{T}(base_ring(a)(b))
+   z = NCPoly{T}(coefficient_ring(a)(b))
    z.parent = a
    return z
 end
 
 function (a::NCPolyRing{T})(b::T) where T <: NCRingElem
-   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   parent(b) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    z = NCPoly{T}(b)
    z.parent = a
    return z
@@ -200,7 +200,7 @@ function (a::NCPolyRing{T})(b::NCPolyElem{T}) where T <: NCRingElem
 end
 
 function (a::NCPolyRing{T})(b::Array{T, 1}) where T <: NCRingElem
-   R = base_ring(a)
+   R = coefficient_ring(a)
    for i = 1:length(b)
       b[i] = R(b[i])
    end
@@ -210,7 +210,7 @@ function (a::NCPolyRing{T})(b::Array{T, 1}) where T <: NCRingElem
 end
 
 function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: NCRingElem}
-   R = base_ring(a)
+   R = coefficient_ring(a)
    len = length(b)
    entries = Array{T}(undef, len)
    for i = 1:length(b)
@@ -222,7 +222,7 @@ function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: NCRing
 end
 
 function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: NCRingElem, T <: NCRingElem}
-   R = base_ring(a)
+   R = coefficient_ring(a)
    len = length(b)
    entries = Array{T}(undef, len)
    for i = 1:length(b)
@@ -235,21 +235,21 @@ end
 
 # Functions to remove ambiguities on julia 0.7
 function (a::NCPolyRing{T})(b::T) where {T <: Rational}
-   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   parent(b) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    z = NCPoly{T}(b)
    z.parent = a
    return z
 end
 
 function (a::NCPolyRing{T})(b::T) where {T <: AbstractFloat}
-   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   parent(b) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    z = NCPoly{T}(b)
    z.parent = a
    return z
 end
 
 function (a::NCPolyRing{T})(b::T) where {T <: Integer}
-   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   parent(b) != coefficient_ring(a) && error("Unable to coerce to polynomial")
    z = NCPoly{T}(b)
    z.parent = a
    return z
