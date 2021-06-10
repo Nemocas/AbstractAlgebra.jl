@@ -64,11 +64,12 @@ R["x"]
 ```
 
 It is also possible to create a polynomial ring with default symbol as follows.
-This is a lightweight constructor and should be used in generic code wherever
-possible when creating polynomial rings where the symbol does not matter.
+This is a lightweight constructor and should be used in generic algorithms
+wherever possible when creating polynomial rings where the symbol does not
+matter.
 
 ```julia
-UPolyRing(R::AbstractAlgebra.Ring)
+PolyRing(R::Ring)
 ```
 
 Given a base ring `R` return the polynomial ring $S = R[x]$. Note that unlike
@@ -105,7 +106,7 @@ x + 1
 julia> m = T(z + 1)
 z + 1
 
-julia> U = PolynomialRing(ZZ)
+julia> U = PolyRing(ZZ)
 Univariate Polynomial Ring in x over Integers
 ```
 

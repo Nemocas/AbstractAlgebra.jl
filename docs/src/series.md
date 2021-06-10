@@ -90,6 +90,20 @@ In the case of power series, the optional argument `model` can be set to either
 `:capped_absolute` or `capped_relative`, depending on which power series model is
 required.
 
+It is also possible to construct absolute and relative power series with a
+default variable. These are lightweight constructors and should be used in
+generic algorithms wherever possible when creating series rings where the
+symbol does not matter.
+
+```julia
+AbsSeriesRing(R::Ring, prec::Int)
+RelSeriesRing(R::Ring, prec::Int)
+```
+
+Return the absolute or relative power series ring over the given base ring $R$
+and with precision cap given by `prec`. Note that a tuple is not returned, only
+the power series ring itself, not a generator.
+
 Here are some examples of constructing various kinds of series rings and coercing
 various elements into those rings.
 
@@ -120,6 +134,8 @@ julia> h = U(BigInt(1234))
 julia> k = T(z + 1)
 1 + z + O(z^10)
 
+julia> V = AbsSeriesRing(ZZ, 10)
+Univariate power series ring in x over Integers
 ```
 
 ## Big-oh notation

@@ -4,9 +4,9 @@
 #
 ###############################################################################
 
-export PolyCoeffs, PolynomialRing, addmul!, characteristic, chebyshev_t,
-       chebyshev_u, coefficients, compose, constant_coefficient, content,
-       deflate, deflation, degree, derivative, discriminant,  divexact,
+export PolyCoeffs, PolynomialRing, PolyRing, addmul!, characteristic,
+       chebyshev_t, chebyshev_u, coefficients, compose, constant_coefficient,
+       content, deflate, deflation, degree, derivative, discriminant, divexact,
        divexact_low, divhigh, divides, evaluate, gcdinv, inflate, integral,
        interpolate, ismonic, issquare, isterm, isterm_recursive,
        map_coefficients, modulus,  monomial_to_newton!, mul_classical,
@@ -3086,7 +3086,7 @@ function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
 
-function PolynomialRing(R::Ring)
+function PolyRing(R::Ring)
    T = elem_type(R)
    return Generic.PolyRing{T}(R, :x, false)
 end
