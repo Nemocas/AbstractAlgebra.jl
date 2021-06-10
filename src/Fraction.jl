@@ -662,7 +662,10 @@ function gcd(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
    gbd = gcd(denominator(a, false), denominator(b, false))
    n = gcd(numerator(a, false), numerator(b, false))
    d = divexact(denominator(a, false), gbd)*denominator(b, false)
-   n = divexact(n, canonical_unit(n))
+   u = canonical_unit(n)
+   if !iszero(u)
+      n = divexact(n, u)
+   end
    d = divexact(d, canonical_unit(d))
    return parent(a)(n, d)
 end
