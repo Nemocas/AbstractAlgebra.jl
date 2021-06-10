@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ResidueRing, add!, addeq!, data, modulus, mul! 
+export ResidueRing, add!, addeq!, data, modulus, mul!, lift 
 
 ###############################################################################
 #
@@ -70,6 +70,10 @@ function modulus(r::ResElem)
 end
 
 data(a::ResElem) = a.data
+
+lift(a::ResElem) = data(a)
+
+lift(a::ResElem{Int}) = BigInt(data(a))
 
 zero(R::ResRing) = R(0)
 

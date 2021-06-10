@@ -79,6 +79,13 @@ end
 
    @test R === R1
    @test S === S1
+
+   @test data(R(3)) == 3
+   @test data(S(3)) == 3
+   @test lift(R(3)) == 3
+   @test lift(S(3)) == 3
+   @test isa(lift(R(3)), BigInt)
+   @test isa(lift(S(3)), BigInt)
 end
 
 @testset "Julia.GFElem.rand" begin

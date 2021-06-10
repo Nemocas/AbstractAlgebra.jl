@@ -41,6 +41,23 @@ function Base.hash(a::GFElem, h::UInt)
    return xor(xor(hash(a.d), h), b)
 end
 
+@doc Markdown.doc"""
+    data(R::GFElem)
+
+Return the internal data used to represent the finite field element. This
+coincides with `lift` except where the internal data ids a machine integer.
+"""
+data(a::GFElem) = a.d
+
+@doc Markdown.doc"""
+    data(R::GFElem)
+
+Lift the finite field element to the integers. The result will be a
+multiprecision integer regardless of how the field element is represented
+internally.
+"""
+lift(a::GFElem) = BigInt(data(a))
+
 function zero(R::GFField{T}) where T <: Integer
    return GFElem{T}(T(0), R)
 end
