@@ -361,6 +361,16 @@ function Base.iterate(PC::PolyCoeffs{<:PolyElem}, st::Int = -1)
        return coeff(PC.f, st), st
    end
 end
+
+function Base.iterate(PCR::Iterators.Reverse{<:PolyCoeffs{<:PolyElem}},
+                                                   st::Int = degree(PCR.itr.f) + 1)
+   st -= 1
+   if st < 0
+      return nothing
+   else
+      return coeff(PCR.itr.f, st), st
+   end
+end
  
 Base.IteratorEltype(M::PolyElem) = Base.HasEltype()
 
@@ -368,6 +378,12 @@ Base.eltype(M::PolyElem{T}) where {T} = T
 
 Base.eltype(M::PolyCoeffs) = Base.eltype(M.f)
  
+Base.eltype(M::Iterators.Reverse{<:PolyCoeffs}) = Base.eltype(M.itr.f)
+
+Base.eltype(M::Iterators.Take{<:PolyCoeffs}) = Base.eltype(M.xs.f)
+
+Base.eltype(M::Iterators.Take{<:Iterators.Reverse{<:PolyCoeffs}}) = Base.eltype(M.xs.itr.f)
+
 Base.IteratorSize(M::PolyCoeffs{<:PolyElem}) = Base.HasLength()
 
 Base.length(M::PolyCoeffs{<:PolyElem}) = length(M.f)
@@ -378,6 +394,10 @@ end
  
 function Base.getindex(a::PolyCoeffs{<:PolyElem}, i::Int)
    return coeff(a.f, i)
+end
+
+function Base.getindex(a::Iterators.Reverse{<:PolyCoeffs{<:PolyElem}}, i::Int)
+   return coeff(a.itr.f, degree(a.itr.f) - i)
 end
 
 ###############################################################################
