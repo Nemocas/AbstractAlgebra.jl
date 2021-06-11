@@ -647,6 +647,60 @@ julia> d = rank(A)
 
 ```
 
+### Minors
+
+```@docs
+minors(::MatElem, ::Int)
+```
+
+**Examples**
+
+```jldoctest
+julia> A = ZZ[1 2 3; 4 5 6]
+[1   2   3]
+[4   5   6]
+
+julia> minors(A, 2)
+3-element Vector{BigInt}:
+ -3
+ -6
+ -3
+
+```
+
+### Pfaffian
+
+```@docs
+pfaffian(::MatElem)
+pfaffians(::MatElem, ::Int)
+```
+
+**Examples**
+
+```jldoctest
+julia> R, x = PolynomialRing(QQ, ["x$i" for i in 1:6])
+(Multivariate Polynomial Ring in 6 variables x1, x2, x3, x4, ..., x6 over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x1, x2, x3, x4, x5, x6])
+
+julia> M = R[0 x[1] x[2] x[3]; -x[1] 0 x[4] x[5]; -x[2] -x[4] 0 x[6]; -x[3] -x[5] -x[6] 0]
+[  0    x1    x2   x3]
+[-x1     0    x4   x5]
+[-x2   -x4     0   x6]
+[-x3   -x5   -x6    0]
+
+julia> pfaffian(M)
+x1*x6 - x2*x5 + x3*x4
+
+julia> pfaffians(M, 2)
+6-element Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}:
+ x1
+ x2
+ x4
+ x3
+ x5
+ x6
+ 
+```
+
 ### Linear solving
 
 ```@docs

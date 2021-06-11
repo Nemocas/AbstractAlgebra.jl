@@ -18,9 +18,9 @@ export MatrixSpace, add_column, add_column!, add_row, add_row!, can_solve,
        isrref, issnf, issquare, istriu, isweak_popov, iszero_column,
        iszero_row, kernel, kronecker_product, left_kernel, lu, lu!,
        map_entries, map_entries!, matrix, minpoly, minors, multiply_column,
-       multiply_column!, multiply_row, multiply_row!, nrows, ncols, popov,
-       popov_with_transform, powers, pseudo_inv, randmat_triu,
-       randmat_with_rank, rank, rank_profile_popov, reverse_cols,
+       multiply_column!, multiply_row, multiply_row!, nrows, ncols, pfaffian,
+       pfaffians, popov, popov_with_transform, powers, pseudo_inv,
+       randmat_triu, randmat_with_rank, rank, rank_profile_popov, reverse_cols,
        reverse_cols!, reverse_rows, reverse_rows!, right_kernel, rref, rref!,
        rref_rational, rref_rational!, similarity!, snf, snf_with_transform,
        snf_kb, snf_kb!, snf_kb_with_transform, solve, solve_ff, solve_left,
@@ -1899,6 +1899,169 @@ function minors(A::MatElem, k::Int)
       end
    end
    return(mins)
+end
+
+###############################################################################
+#
+#   Pfaffian
+#
+###############################################################################
+
+function isskew_symmetric(M::MatElem)
+   n = nrows(M)
+   n == ncols(M) || return false
+   for i in 1:n
+      M[i, i] == 0 || return false
+      for j in i + 1:n
+         M[i, j] == -M[j, i] || return false
+      end
+   end
+   return true
+end
+
+function check_skew_symmetric(M::MatElem)
+   isskew_symmetric(M) || throw(DomainError(M, "matrix must be skew-symmetric"))
+   M
+end
+
+@doc Markdown.doc"""
+    pfaffian(M::MatElem)
+
+Return the Pfaffian of a skew-symmetric matrix M.
+"""
+function pfaffian(M::MatElem)
+   check_skew_symmetric(M)
+   # when the matrix is big, try use the BFL algorithm
+   if ncols(M) > 10
+      try
+         return pfaffian_bfl_bsgs(M)
+      catch
+      end
+   end
+   # fallback to using recursion
+   return pfaffian_r(M)
+end
+
+@doc Markdown.doc"""
+    pfaffians(M::MatElem, k::Int)
+
+Return an array consisting of the k-Pfaffians of a skew-symmetric matrix M.
+"""
+function pfaffians(M::MatElem, k::Int)
+   check_skew_symmetric(M)
+   indices = combinations(ncols(M), k)
+   pfs = elem_type(base_ring(M))[]
+   for i in indices
+      push!(pfs, pfaffian(M[i, i]))
+   end
+   return pfs
+end
+
+# using recursion
+pfaffian_r(M::MatElem) = _pfaffian(M, collect(1:ncols(M)), ncols(M))
+function _pfaffian(M::MatElem, idx::Vector{Int}, k::Int)
+   R = base_ring(M)
+   k == 0 && return R(1)
+   isodd(k) && return R()
+   k == 2 && return M[idx[1], idx[2]]
+   ans = R()
+   sig = false
+   for i in k - 1:-1:1
+      idx[i], idx[k - 1] = idx[k - 1], idx[i]
+      sig = !sig
+      g = M[idx[k - 1], idx[k]]
+      if g != 0
+         ans = (sig ? (+) : (-))(ans, g * _pfaffian(M, idx, k - 2))
+      end
+   end
+   x = idx[k - 1]
+   deleteat!(idx, k - 1)
+   pushfirst!(idx, x) # restore idx
+   return ans
+end
+
+# using the algorithm of Baer-Faddeev-LeVerrier
+# the base ring of M should allow divisions of small integers
+# (specifically, 2,4,6,...,n).
+function pfaffian_bfl(M::MatElem)
+   R = base_ring(M)
+   n = ncols(M)
+   characteristic(R) == 0 || characteristic(R) > n || throw(DomainError(M, "base ring must allow divisions of small integers"))
+   n == 0 && return R(1)
+   isodd(n) && return R()
+   n == 2 && return M[1, 2]
+   N = deepcopy(M)
+   for i in 1:2:n
+      for j in 1:n
+         N[j, i], N[j, i + 1] = N[j, i + 1], -N[j, i]
+      end
+   end
+   P = deepcopy(N)
+   half_n = div(n, 2)
+   for i in 1:half_n - 1
+      P -= inv(R(2i)) * tr(P)
+      P *= N
+   end
+   return (-1)^(half_n + 1) * inv(R(n)) * tr(P)
+end
+
+function trace_of_prod(M::MatElem, N::MatElem)
+   issquare(M) && issquare(N) || error("Not a square matrix in trace")
+   d = zero(base_ring(M))
+   for i = 1:nrows(M)
+      d += (M[i, :] * N[:, i])[1, 1]
+   end
+   return d
+end
+
+# use baby-step giant-step
+# see https://arxiv.org/abs/2011.12573
+function pfaffian_bfl_bsgs(M::MatElem)
+   R = base_ring(M)
+   n = ncols(M)
+   characteristic(R) == 0 || characteristic(R) > n || throw(DomainError(M, "base ring must allow divisions of small integers"))
+   n == 0 && return R(1)
+   isodd(n) && return R()
+   n == 2 && return M[1, 2]
+   N = deepcopy(M)
+   for i in 1:2:n
+      for j in 1:n
+         N[j, i], N[j, i + 1] = N[j, i + 1], -N[j, i]
+      end
+   end
+
+   # precompute the powers of N and their traces
+   m = isqrt(n)
+   N_power = [N]
+   for i in 1:m - 1
+      push!(N_power, N_power[end] * N)
+   end
+   t = tr.(N_power)
+
+   P = identity_matrix(R, n)
+   c = Vector{elem_type(R)}(undef, m)
+   i = 1
+   half_n = div(n, 2)
+   while i <= half_n - 1
+      m = min(m, half_n - i)
+      # compute the coefficient c[m - j] before each N^j
+      for j in 1:m
+         # when i = 1, P = Id, so tr(N^j) is already known
+         c[j] = (i == 1) ? t[j] : trace_of_prod(N_power[j], P)
+         for k in 1:j - 1
+            c[j] += t[k] * c[j - k]
+         end
+         c[j] *= -inv(R(2(i + j - 1)))
+      end
+      P *= N_power[m]
+      for j in 1:m - 1
+         P += c[m - j] * N_power[j]
+      end
+      P += c[m]
+      i += m
+   end
+
+   return (-1)^(half_n + 1) * inv(R(n)) * trace_of_prod(N, P)
 end
 
 ###############################################################################
