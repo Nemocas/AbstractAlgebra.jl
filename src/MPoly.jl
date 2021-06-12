@@ -23,6 +23,10 @@ export MPolyBuildCtx, @PolynomialRing, change_base_ring,
 
 base_ring(a::MPolyElem{T}) where T <: RingElement = base_ring(parent(a))
 
+coefficient_ring(a::MPolyElem) = base_ring(a)
+
+coefficient_ring(R::MPolyRing) = base_ring(R)
+
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyElem{S}}
    return isdomain_type(S)
 end
@@ -1049,6 +1053,20 @@ via the `cached` keyword argument.
 function change_base_ring(R::Ring, p::MPolyElem{T}; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
    base_ring(parent) != R && error("Base rings do not match.")
    return _map(R, p, parent)
+end
+
+@doc Markdown.doc"""
+    change_coefficient_ring(R::Ring, p::MPolyElem{<: RingElement}; parent::MPolyRing, cached::Bool)
+
+Return the polynomial obtained by coercing the non-zero coefficients of `p`
+into `R`.
+
+If the optional `parent` keyword is provided, the polynomial will be an
+element of `parent`. The caching of the parent object can be controlled
+via the `cached` keyword argument.
+"""
+function change_coefficient_ring(R::Ring, p::MPolyElem{T}; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
+  return change_base_ring(R, p, cached = cached, parent = parent)
 end
 
 ################################################################################
