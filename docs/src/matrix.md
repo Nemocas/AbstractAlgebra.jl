@@ -661,7 +661,7 @@ julia> A = ZZ[1 2 3; 4 5 6]
 [4   5   6]
 
 julia> minors(A, 2)
-3-element Vector{BigInt}:
+3-element Array{BigInt,1}:
  -3
  -6
  -3
@@ -691,7 +691,7 @@ julia> pfaffian(M)
 x1*x6 - x2*x5 + x3*x4
 
 julia> pfaffians(M, 2)
-6-element Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}:
+6-element Array{AbstractAlgebra.Generic.MPoly{Rational{BigInt}},1}:
  x1
  x2
  x4

@@ -92,8 +92,8 @@ julia> m = inv(k)
 ## Basic manipulation of fields and elements
 
 ```@docs
-data(::GFField)
-lift(::GFField)
+data(::GFElem)
+lift(::GFElem)
 ```
 
 ```@docs
