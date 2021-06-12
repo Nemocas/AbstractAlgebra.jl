@@ -6,7 +6,7 @@ makedocs(
          modules = [AbstractAlgebra],
          clean = true,
          doctest = true,
-         strict = false,
+         strict = true,
          checkdocs = :none,
          pages    = [
              "index.md",
