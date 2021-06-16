@@ -218,6 +218,7 @@ structure homomorphism of the $T$-algebra $S$.
 
 ```@docs
 change_base_ring(::Ring, p::MPolyElem{T}) where {T <: RingElement}
+change_coefficient_ring(::Ring, p::MPolyElem{T}) where {T <: RingElement}
 map_coefficients(::Any, p::MPolyElem)
 ```
 
@@ -231,6 +232,9 @@ julia> fz = x^2*y^2 + x + 1
 x^2*y^2 + x + 1
 
 julia> fq = change_base_ring(QQ, fz)
+x^2*y^2 + x + 1
+
+julia> fq = change_coefficient_ring(QQ, fz)
 x^2*y^2 + x + 1
 
 ```

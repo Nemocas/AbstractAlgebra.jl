@@ -36,6 +36,9 @@ end
    @test PolynomialRing(R, "y", cached = true)[1] !== PolynomialRing(R, "y", cached = false)[1]
 
    for (S, y) in (S1, S2)
+      @test base_ring(S) === R
+      @test coefficient_ring(S) === R
+
       @test elem_type(S) == Generic.Poly{elem_type(R)}
       @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
       @test parent_type(Generic.Poly{elem_type(R)}) == Generic.PolyRing{elem_type(R)}

@@ -12,6 +12,8 @@
 
 base_ring(R::NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)
 
+coefficient_ring(R::NCPolyRing) = base_ring(R)
+
 function isexact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyElem{S}}
    return isexact_type(S)
 end

@@ -5,17 +5,17 @@
 ###############################################################################
 
 export PolyCoeffs, PolynomialRing, PolyRing, addmul!, characteristic,
-       chebyshev_t, chebyshev_u, coefficients, compose, constant_coefficient,
-       content, deflate, deflation, degree, derivative, discriminant, divexact,
-       divexact_low, divhigh, divides, evaluate, gcdinv, inflate, integral,
-       interpolate, ismonic, issquare, isterm, isterm_recursive,
-       map_coefficients, modulus,  monomial_to_newton!, mul_classical,
-       mulhigh_n, mul_karatsuba, mul_ks, mullow, mulmod, newton_to_monomial!,
-       nvars, polynomial, pow_multinomial, primpart, pseudodivrem, pseudorem,
-       remove, resultant, resultant_ducos, resultant_euclidean,
-       resultant_lehmer, resultant_subresultant, resultant_sylvester, resx,
-       shift_left, shift_right, subst, sylvester_matrix, symbols, tail,
-       valuation, var
+       chebyshev_t, chebyshev_u, coefficient_ring, coefficients, compose,
+       constant_coefficient, content, deflate, deflation, degree, derivative,
+       discriminant, divexact, divexact_low, divhigh, divides, evaluate,
+       gcdinv, inflate, integral, interpolate, ismonic, issquare, isterm,
+       isterm_recursive, map_coefficients, modulus,  monomial_to_newton!,
+       mul_classical, mulhigh_n, mul_karatsuba, mul_ks, mullow, mulmod,
+       newton_to_monomial!, nvars, polynomial, pow_multinomial, primpart,
+       pseudodivrem, pseudorem, remove, resultant, resultant_ducos,
+       resultant_euclidean, resultant_lehmer, resultant_subresultant,
+       resultant_sylvester, resx, shift_left, shift_right, subst,
+       sylvester_matrix, symbols, tail, valuation, var
 
 ###############################################################################
 #
@@ -26,6 +26,10 @@ export PolyCoeffs, PolynomialRing, PolyRing, addmul!, characteristic,
 base_ring(R::PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 base_ring(a::PolynomialElem) = base_ring(parent(a))
+
+coefficient_ring(R::PolyRing) = base_ring(R)
+
+coefficient_ring(a::PolynomialElem) = base_ring(a)
 
 parent(a::PolynomialElem) = a.parent
 
@@ -2801,6 +2805,20 @@ via the `cached` keyword argument.
 """
 function change_base_ring(R::Ring, p::PolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement
    return _map(R, p, parent)
+end
+
+@doc Markdown.doc"""
+    change_coefficient_ring(R::Ring, p::PolyElem{<: RingElement}; parent::PolyRing)
+
+Return the polynomial obtained by coercing the non-zero coefficients of `p`
+into `R`.
+
+If the optional `parent` keyword is provided, the polynomial will be an
+element of `parent`. The caching of the parent object can be controlled
+via the `cached` keyword argument.
+"""
+function change_coefficient_ring(R::Ring, p::PolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement
+  return change_base_ring(R, p; cached = cached, parent = parent)
 end
 
 ################################################################################

@@ -529,6 +529,7 @@ sqrt(g^2)
 
 ```@docs
 change_base_ring(::Ring, ::PolyElem{T}) where T <: RingElement
+change_coefficient_ring(::Ring, ::PolyElem{T}) where T <: RingElement
 map_coefficients(::Any, ::PolyElem{<:RingElement})
 ```
 
@@ -538,6 +539,7 @@ map_coefficients(::Any, ::PolyElem{<:RingElement})
 R, x = PolynomialRing(ZZ, "x")
 g = x^3+6*x + 1
 change_base_ring(GF(2), g)
+change_coefficient_ring(GF(2), g)
 ```
 
 ### Pseudodivision

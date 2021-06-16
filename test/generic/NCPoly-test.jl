@@ -7,6 +7,8 @@
    @test PolynomialRing(R, "y", cached = true)[1] !== PolynomialRing(R, "y", cached = false)[1]
 
    for (S, y) in (S1, S2)
+      @test base_ring(S) === R
+      @test coefficient_ring(S) === R
       @test elem_type(S) == Generic.NCPoly{elem_type(R)}
       @test elem_type(Generic.NCPolyRing{elem_type(R)}) == Generic.NCPoly{elem_type(R)}
       @test parent_type(Generic.NCPoly{elem_type(R)}) == Generic.NCPolyRing{elem_type(R)}

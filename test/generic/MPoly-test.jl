@@ -15,6 +15,8 @@
       @test elem_type(S) == Generic.MPoly{elem_type(R)}
       @test elem_type(Generic.MPolyRing{elem_type(R)}) == Generic.MPoly{elem_type(R)}
       @test parent_type(Generic.MPoly{elem_type(R)}) == Generic.MPolyRing{elem_type(R)}
+      @test base_ring(S) === R
+      @test coefficient_ring(S) === R
 
       @test typeof(S) <: Generic.MPolyRing
 
