@@ -913,13 +913,12 @@ function derivative(f::AbstractAlgebra.MPolyElem{T}, j::Int) where T <: RingElem
    iterz = zip(coefficients(f), exponent_vectors(f))
    Ctx = Generic.MPolyBuildCtx(R)
    for (c, v) in iterz
-      prod = c*v[j]
       if v[j] >= 1
+         prod = c*v[j]
          v[j] -= 1
+         push_term!(Ctx, prod, v)
       end
-      push_term!(Ctx, prod, v)
    end
-
    return finish(Ctx)
 end
 
@@ -977,10 +976,10 @@ function isunivariate(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
          return false
       elseif n == 1
          if var == -1
-	    var = findfirst(x -> x != 0, v)
-	 elseif v[var] == 0
-	    return false
-	 end
+            var = findfirst(x -> x != 0, v)
+         elseif v[var] == 0
+            return false
+         end
       end
    end
    return true
@@ -999,34 +998,42 @@ end
 @doc Markdown.doc"""
     coefficients_of_univariate(p::MPolyElem)
 
-Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
+Return the coefficients of p, which is assumed to be univariate,
+as an array in ascending order.
 """
-function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univariate::Bool=true)
-   if check_univariate
-      vars_p = vars(p)
+function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem,
+                                    check_univariate::Bool=true)
 
-      if length(vars_p) > 1
-         error("Polynomial is not univariate.")
+   coeffs = Array{elem_type(coefficient_ring(p))}(undef, 0)
+   var_index = -1
+   for (c, v) in zip(coefficients(p), exponent_vectors(p))
+      e = 0
+      if var_index < 0
+         for i in 1:length(v)
+            if v[i] != 0
+               e = v[i]
+               var_index = i
+               break
+            end
+         end
+      else
+         e = v[var_index]
       end
 
+      while length(coeffs) <= e
+         push!(coeffs, zero(coefficient_ring(p)))
+      end
+      coeffs[1 + e] = c
+
+      if check_univariate
+         for i in 1:length(v)
+            if i != var_index && v[i] != 0
+               error("Polynomial is not univariate.")
+            end
+         end
+      end
    end
-
-   if length(p) == 0
-      return Array{elem_type(base_ring(parent(p)))}(undef, 0)
-   end
-
-   var_index = findfirst(!iszero, exponent_vector(p, 1))
-
-   if var_index == nothing
-      return([coeff(p, 1)])
-   end
-
-   coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
-   for i = 1:p.length
-      coeffs[exponent(p, i, var_index) + 1] = coeff(p, i)
-   end
-
-   return(coeffs)
+   return coeffs
 end
 
 ################################################################################
