@@ -913,13 +913,12 @@ function derivative(f::AbstractAlgebra.MPolyElem{T}, j::Int) where T <: RingElem
    iterz = zip(coefficients(f), exponent_vectors(f))
    Ctx = Generic.MPolyBuildCtx(R)
    for (c, v) in iterz
-      prod = c*v[j]
       if v[j] >= 1
+         prod = c*v[j]
          v[j] -= 1
+         push_term!(Ctx, prod, v)
       end
-      push_term!(Ctx, prod, v)
    end
-
    return finish(Ctx)
 end
 
