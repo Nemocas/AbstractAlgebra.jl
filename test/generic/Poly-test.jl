@@ -192,7 +192,7 @@ end
       s = similar(f)
       t = similar(f)
 
-      @test parent(p) != parent(f)
+      @test parent(p) == parent(f)
       @test parent(q) != parent(r)
       @test parent(s) == parent(t)
    end
@@ -264,7 +264,7 @@ end
    s = zero(f)
    t = zero(f)
 
-   @test parent(p) != parent(f)
+   @test parent(p) == parent(f)
    @test parent(q) != parent(r)
    @test parent(s) == parent(t)
 end
