@@ -112,7 +112,7 @@ nonzero coefficient of the term with highest degree unless the polynomial
 in the zero polynomial, in which case a zero coefficient is returned.
 """
 function leading_coefficient(a::PolynomialElem)
-   return length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
+   return length(a) == 0 ? zero(base_ring(a)) : coeff(a, length(a) - 1)
 end
 
 @doc Markdown.doc"""
@@ -124,7 +124,7 @@ is the zero polynomial, in which case a zero coefficient is returned.
 """
 function trailing_coefficient(a::PolynomialElem)
    if iszero(a)
-      return base_ring(a)(0)
+      return zero(base_ring(a))
    else
       for i = 1:length(a)
          c = coeff(a, i - 1)
@@ -2285,13 +2285,13 @@ function resultant_lehmer(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResE
    c2 = content(b)
    A = divexact(a, c1)
    B = divexact(b, c2)
-   s = R(1)
+   s = one(R)
    while lenB > crossover/2 + 1
       shift = max(lenA - crossover, 0)
       a = shift_right(A, shift)
       b = shift_right(B, shift)
-      u1, v1 = R(1), R(0)
-      u2, v2 = R(0), R(1)
+      u1, v1 = one(R), zero(R)
+      u2, v2 = zero(R), one(R)
       lena = lenA - shift
       lenb = lenB - shift
       if lenb > crossover/2 + 1
@@ -2319,7 +2319,7 @@ function resultant_lehmer(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResE
       lenA = length(A)
       lenB = length(B)
       if lenB == 0
-         return zero(base_ring(a)), parent(A)(1), parent(A)(1)
+         return zero(base_ring(a)), one(parent(A)), one(parent(A))
       end
    end
    while lenB > 1
@@ -2369,7 +2369,7 @@ function resultant_sylvester(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElem
    check_parent(p, q)
    R = base_ring(p)
    if length(p) == 0 || length(q) == 0
-      return R(0)
+      return zero(R)
    end
    return det_df(sylvester_matrix(p, q))
 end
@@ -2412,7 +2412,7 @@ function resultant_euclidean(a::PolyElem{T}, b::PolyElem{T}) where T <: Union{Re
    c2 = content(b)
    A = divexact(a, c1)
    B = divexact(b, c2)
-   s = base_ring(A)(1)
+   s = one(base_ring(A))
    la = lena = length(A)
    lb = lenb = length(B)
    while lenb > 1
@@ -3054,9 +3054,9 @@ function subst(f::PolyElem{T}, a::U) where {T <: RingElement, U}
    if n < 0
       return zero(S) + zero(R)
    elseif n == 0
-      return coeff(f, 0)*S(1)
+      return coeff(f, 0)*one(S)
    elseif n == 1
-      return coeff(f, 0)*S(1) + coeff(f, 1)*a
+      return coeff(f, 0)*one(S) + coeff(f, 1)*a
    end
    d1 = isqrt(n)
    d = div(n, d1)

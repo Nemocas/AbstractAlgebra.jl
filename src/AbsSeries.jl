@@ -650,7 +650,7 @@ function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingEleme
    res = parent(x)()
    res = set_precision!(res, min(precision(x), precision(y) + valuation(x)))
    lc = coeff(y, 0)
-   lc == 0 && error("Not an exact division")
+   iszero(lc) && error("Not an exact division")
    lenr = precision(x)
    for i = valuation(x):lenr - 1
       flag, q = divides(coeff(x, i), lc)
@@ -671,7 +671,7 @@ end
 ###############################################################################
 
 function divexact(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)

@@ -298,7 +298,7 @@ $n$ is the maximum precision of the power series ring $R$.
 """
 function gen(R::LaurentSeriesRing)
    S = base_ring(R)
-   return R([S(1)], 1, max_precision(R) + 1, 1, 1)
+   return R([one(S)], 1, max_precision(R) + 1, 1, 1)
 end
 
 @doc Markdown.doc"""
@@ -309,7 +309,7 @@ $n$ is the maximum precision of the power series ring $R$.
 """
 function gen(R::LaurentSeriesField)
    S = base_ring(R)
-   return R([S(1)], 1, max_precision(R) + 1, 1, 1)
+   return R([one(S)], 1, max_precision(R) + 1, 1, 1)
 end
 
 iszero(a::LaurentSeriesElem) = pol_length(a) == 0
@@ -1316,12 +1316,12 @@ function Base.exp(a::LaurentSeriesElem{T}) where T <: FieldElement
       c = exp(coeff(a, 0))
       a = setcoeff!(a, 0, R())
    end
-   z = parent(a)([R(1)], 1, min(2, preca), 0, 1, false)
+   z = parent(a)([one(R)], 1, min(2, preca), 0, 1, false)
    la = [preca]
    while la[end] > 1
       push!(la, div(la[end] + 1, 2))
    end
-   one1 = parent(a)([R(1)], 1, 2, 0, 1, false)
+   one1 = parent(a)([one(R)], 1, 2, 0, 1, false)
    n = length(la) - 1
    # z -> z*(1 - log(a) + a) is the recursion
    while n > 0

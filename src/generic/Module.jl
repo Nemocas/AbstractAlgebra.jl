@@ -100,7 +100,7 @@ function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    col = 1
    new_col = 1
    for i in 1:nrels
-      while M[i, col] == 0
+      while iszero(M[i, col])
          push!(gen_cols, col)
          col += 1
          new_col += 1
