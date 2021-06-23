@@ -1207,7 +1207,7 @@ function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldEle
             L[i, j] = U[i, j]
             U[i, j] = R()
          elseif i == j
-            L[i, j] = R(1)
+            L[i, j] = one(R)
          elseif j <= m
             L[i, j] = R()
          end
@@ -1231,8 +1231,8 @@ function fflu!(P::Perm, A::MatrixElem{T}) where {T <: RingElement}
    r = 1
    c = 1
    R = base_ring(A)
-   d = R(1)
-   d2 = R(1)
+   d = one(R)
+   d2 = one(R)
    if m == 0 || n == 0
       return 0, d
    end
@@ -1286,8 +1286,8 @@ function fflu!(P::Perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResEle
    r = 1
    c = 1
    R = base_ring(A)
-   d = R(1)
-   d2 = R(1)
+   d = one(R)
+   d2 = one(R)
    if m == 0 || n == 0
       return 0, d
    end
@@ -1515,7 +1515,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
    V = solve_triu(U, V, false)
    for i = 1:rnk
       for j = 1:i
-         A[j, pivots[i]] = i == j ? R(1) : R()
+         A[j, pivots[i]] = i == j ? one(R) : R()
       end
    end
    for i = 1:n - rnk
@@ -1636,7 +1636,7 @@ function reduce_row!(A::MatrixElem{T}, P::Array{Int}, L::Array{Int}, m::Int) whe
                A[m, j] = reduce!(A[m, j])
             end
             h = inv(A[m, i])
-            A[m, i] = R(1)
+            A[m, i] = one(R)
             for j = i + 1:L[m]
                A[m, j] = mul!(A[m, j], A[m, j], h)
             end
@@ -1652,7 +1652,7 @@ function reduce_row!(A::MatrixElem{T}, P::Array{Int}, L::Array{Int}, m::Int) whe
    R = base_ring(A)
    n = ncols(A)
    t = R()
-   c = R(1)
+   c = one(R)
    c1 = 0
    for i = 1:n
       if !iszero(A[m, i])
@@ -1710,7 +1710,7 @@ function det_clow(M::MatrixElem{T}) where {T <: RingElement}
    C = R()
    for i = 1:n
       for j = 1:n
-         A[i, j] = i == j ? R(1) : R(0)
+         A[i, j] = i == j ? one(R) : zero(R)
          B[i, j] = R()
       end
    end
@@ -1911,7 +1911,7 @@ function isskew_symmetric(M::MatElem)
    n = nrows(M)
    n == ncols(M) || return false
    for i in 1:n
-      M[i, i] == 0 || return false
+      iszero(M[i, i]) || return false
       for j in i + 1:n
          M[i, j] == -M[j, i] || return false
       end
@@ -1921,7 +1921,7 @@ end
 
 function check_skew_symmetric(M::MatElem)
    isskew_symmetric(M) || throw(DomainError(M, "matrix must be skew-symmetric"))
-   M
+   return M
 end
 
 @doc Markdown.doc"""
@@ -1959,9 +1959,10 @@ end
 
 # using recursion
 pfaffian_r(M::MatElem) = _pfaffian(M, collect(1:ncols(M)), ncols(M))
+
 function _pfaffian(M::MatElem, idx::Vector{Int}, k::Int)
    R = base_ring(M)
-   k == 0 && return R(1)
+   k == 0 && return one(R)
    isodd(k) && return R()
    k == 2 && return M[idx[1], idx[2]]
    ans = R()
@@ -1970,7 +1971,7 @@ function _pfaffian(M::MatElem, idx::Vector{Int}, k::Int)
       idx[i], idx[k - 1] = idx[k - 1], idx[i]
       sig = !sig
       g = M[idx[k - 1], idx[k]]
-      if g != 0
+      if !iszero(g)
          ans = (sig ? (+) : (-))(ans, g * _pfaffian(M, idx, k - 2))
       end
    end
@@ -1987,7 +1988,7 @@ function pfaffian_bfl(M::MatElem)
    R = base_ring(M)
    n = ncols(M)
    characteristic(R) == 0 || characteristic(R) > n || throw(DomainError(M, "base ring must allow divisions of small integers"))
-   n == 0 && return R(1)
+   n == 0 && return one(R)
    isodd(n) && return R()
    n == 2 && return M[1, 2]
    N = deepcopy(M)
@@ -2020,8 +2021,8 @@ function pfaffian_bfl_bsgs(M::MatElem)
    R = base_ring(M)
    n = ncols(M)
    characteristic(R) == 0 || characteristic(R) > n || throw(DomainError(M, "base ring must allow divisions of small integers"))
-   n == 0 && return R(1)
-   isodd(n) && return R()
+   n == 0 && return one(R)
+   isodd(n) && return zero(R)
    n == 2 && return M[1, 2]
    N = deepcopy(M)
    for i in 1:2:n
@@ -3068,7 +3069,7 @@ function nullspace(M::MatElem{T}) where {T <: RingElement}
    U = zero(M, n, nullity)
    if rank == 0
       for i = 1:nullity
-         U[i, i] = R(1)
+         U[i, i] = one(R)
       end
    elseif nullity != 0
       pivots = zeros(Int, rank)
@@ -3116,7 +3117,7 @@ function nullspace(M::MatElem{T}) where {T <: FieldElement}
    X = zero(M, n, nullity)
    if rank == 0
       for i = 1:nullity
-         X[i, i] = R(1)
+         X[i, i] = one(R)
       end
    elseif nullity != 0
       pivots = zeros(Int, max(m, n))
@@ -3140,7 +3141,7 @@ function nullspace(M::MatElem{T}) where {T <: FieldElement}
          for j = 1:rank
             X[pivots[j], i] = -A[j, pivots[np + i]]
          end
-         X[pivots[np + i], i] = R(1)
+         X[pivots[np + i], i] = one(R)
       end
    end
    return nullity, X
@@ -3312,18 +3313,18 @@ function charpoly_hessenberg!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
    if n == 0
-      return S(1)
+      return one(S)
    end
    if n == 1
       return gen(S) - A[1, 1]
    end
    hessenberg!(A)
    P = Array{elem_type(S)}(undef, n + 1)
-   P[1] = S(1)
+   P[1] = one(S)
    x = gen(S)
    for m = 1:n
       P[m + 1] = (x - A[m, m])*P[m]
-      t = R(1)
+      t = one(R)
       for i = 1:m - 1
          t = mul!(t, t, A[m - i + 1, m - i])
          P[m + 1] -= t*A[m - i, m]*P[m - i]
@@ -3338,16 +3339,16 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
    if n == 0
-      return S(1)
+      return one(S)
    end
    if n == 1
       return gen(S) - A[1, 1]
    end
-   d = R(1)
+   d = one(R)
    t = R()
    V = Array{T}(undef, n)
    W = Array{T}(undef, n)
-   pol = S(1)
+   pol = one(S)
    i = 1
    while i < n
       h = A[n - i + 1, n - i]
@@ -3359,7 +3360,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
          if k == n - i
             b = S()
             fit!(b, i + 1)
-            b = setcoeff!(b, i, R(1))
+            b = setcoeff!(b, i, one(R))
             for kk = 1:i
                b = setcoeff!(b, kk - 1, -A[n - i + 1, n - kk + 1]*d)
             end
@@ -3442,7 +3443,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
    end
    b = S()
    fit!(b, n + 1)
-   b = setcoeff!(b, n, R(1))
+   b = setcoeff!(b, n, one(R))
    for i = 1:n
       c = -A[1, n - i + 1]*d
       b = setcoeff!(b, i - 1, c)
@@ -3456,7 +3457,7 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
    if n == 0
-      return S(1)
+      return one(S)
    end
    if n == 1
       return gen(S) - A[1, 1]
@@ -3464,7 +3465,7 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
    t = R()
    V = Array{T}(undef, n)
    W = Array{T}(undef, n)
-   pol = S(1)
+   pol = one(S)
    i = 1
    while i < n
       h = A[n - i + 1, n - i]
@@ -3476,7 +3477,7 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
          if k == n - i
             b = S()
             fit!(b, i + 1)
-            b = setcoeff!(b, i, R(1))
+            b = setcoeff!(b, i, one(R))
             for kk = 1:i
                b = setcoeff!(b, kk - 1, -A[n - i + 1, n - kk + 1])
             end
@@ -3541,7 +3542,7 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
    end
    b = S()
    fit!(b, n + 1)
-   b = setcoeff!(b, n, R(1))
+   b = setcoeff!(b, n, one(R))
    for i = 1:n
       b = setcoeff!(b, i - 1, -A[1, n - i + 1])
    end
@@ -3561,7 +3562,7 @@ function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
    base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
    n = nrows(Y)
    if n == 0
-      return V(1)
+      return one(V)
    end
    F = Array{elem_type(R)}(undef, n)
    A = Array{elem_type(R)}(undef, n)
@@ -3641,10 +3642,10 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
    if n == 0
-      return S(1)
+      return one(S)
    end
    R = base_ring(M)
-   p = S(1)
+   p = one(S)
    A = similar(M, n + 1, 2n + 1)
    B = similar(M, n, n)
    L1 = Int[n + i for i in 1:n + 1]
@@ -3663,10 +3664,10 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
       end
       P1[c2] = 1
       P2[c2] = r2
-      v[c2, 1] = R(1)
+      v[c2, 1] = one(R)
       B[r2, c2] = v[c2, 1]
-      A[1, c2] = R(1)
-      A[1, n + 1] = R(1)
+      A[1, c2] = one(R)
+      A[1, n + 1] = one(R)
       indep = true
       r1 = 1
       c1 = 0
@@ -3678,9 +3679,9 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
             A[r1, j] = deepcopy(v[j, 1])
          end
          for j = n + 1:n + r1 - 1
-            A[r1, j] = R(0)
+            A[r1, j] = zero(R)
          end
-         A[r1, n + r1] = R(1)
+         A[r1, n + r1] = one(R)
          c1 = reduce_row!(A, P1, L1, r1)
          if indep && r2 <= n && !first_poly
             for j = 1:n
@@ -3737,10 +3738,10 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
    if n == 0
-      return S(1)
+      return one(S)
    end
    R = base_ring(M)
-   p = S(1)
+   p = one(S)
    A = similar(M, n + 1, 2n + 1)
    B = similar(M, n, n)
    L1 = zeros(Int, n + 1)
@@ -3762,15 +3763,15 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
       end
       P1[c2] = 1
       P2[c2] = r2
-      v[c2, 1] = R(1)
+      v[c2, 1] = one(R)
       B[r2, c2] = v[c2, 1]
       for s = 1:c2 - 1
          if P2[s] != 0
             B[r2, c2] *= B[P2[s], s]
          end
       end
-      A[1, c2] = R(1)
-      A[1, n + 1] = R(1)
+      A[1, c2] = one(R)
+      A[1, n + 1] = one(R)
       indep = true
       r1 = 1
       c1 = 0
@@ -3782,9 +3783,9 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
             A[r1, j] = deepcopy(v[j, 1])
          end
          for j = n + 1:n + r1 - 1
-            A[r1, j] = R(0)
+            A[r1, j] = zero(R)
          end
-         A[r1, n + r1] = R(1)
+         A[r1, n + r1] = one(R)
          c1 = reduce_row!(A, P1, L1, r1)
          if indep && r2 <= n && !first_poly
             for j = 1:n
@@ -4963,7 +4964,7 @@ function det_popov(A::MatElem{T}) where {T <: PolyElem}
          pivots[i] = pivots1[i][1]
       else
          # If there is no pivot in the ith column, A has not full rank.
-         return R(0)
+         return zero(R)
       end
    end
    for i = n-1:-1:1
@@ -4986,7 +4987,7 @@ function det_popov(A::MatElem{T}) where {T <: PolyElem}
          c = find_pivot_popov(B, r1, i)
       end
       if iszero(B[r1, i+1])
-         return R(0)
+         return zero(R)
       end
       diag_elems[i+1] = r1
       det = mul!(det, det, B[r1,i+1])

@@ -1170,7 +1170,7 @@ end
 
 function Base.exp(a::RelSeriesElem{T}) where T <: FieldElement
    if iszero(a)
-      b = parent(a)(1)
+      b = one(parent(a))
       b = set_precision!(b, precision(a))
       return b
    end
@@ -1181,13 +1181,13 @@ function Base.exp(a::RelSeriesElem{T}) where T <: FieldElement
       c = exp(coeff(a, 0))
       a = setcoeff!(a, 0, R())
    end
-   x = parent(a)([R(1)], 1, min(2, precision(a)), 0)
+   x = parent(a)([one(R)], 1, min(2, precision(a)), 0)
    prec = precision(a)
    la = [prec]
    while la[end] > 1
       push!(la, div(la[end] + 1, 2))
    end
-   one1 = parent(a)([R(1)], 1, 2, 0)
+   one1 = parent(a)([one(R)], 1, 2, 0)
    n = length(la) - 1
    # x -> x*(1 - log(a) + a) is the recursion
    while n > 0

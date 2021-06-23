@@ -409,7 +409,7 @@ function divrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    s = n
    c = R()
    qc = R()
-   m1 = -R(1)
+   m1 = -one(R)
    mb = -b.coeffs[n]
    Q = Array{Int}(undef, 0)
    reuse = Array{Int}(undef, 0)
@@ -764,7 +764,7 @@ function ^(a::SparsePoly{T}, b::Int) where {T <: RingElement}
    elseif length(a) == 1
       return parent(a)([coeff(a, 0)^b], [a.exps[1]*b])
    elseif b == 0
-      return parent(a)(1)
+      return one(parent(a))
    elseif b == 1
       return a
    elseif b == 2
@@ -805,7 +805,7 @@ function divides_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: 
    s = n
    c = R()
    qc = R()
-   m1 = -R(1)
+   m1 = -one(R)
    mb = -b.coeffs[1]
    Q = Array{Int}(undef, 0)
    reuse = Array{Int}(undef, 0)
@@ -1004,7 +1004,7 @@ function pseudodivrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElemen
    l = 0
    s = n
    c = R()
-   m1 = -R(1)
+   m1 = -one(R)
    mb = -b.coeffs[n]
    Q = Array{Int}(undef, 0)
    reuse = Array{Int}(undef, 0)
@@ -1180,7 +1180,7 @@ function pseudorem_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <
    l = 0
    s = n
    c = R()
-   m1 = -R(1)
+   m1 = -one(R)
    mb = -b.coeffs[n]
    Q = Array{Int}(undef, 0)
    reuse = Array{Int}(undef, 0)

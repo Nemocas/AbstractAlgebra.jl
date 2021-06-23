@@ -35,19 +35,19 @@ nvars(a::MPolyRing) = a.num_vars
 
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:lex}}) where {T <: RingElement}
     n = a.num_vars
-    return a([base_ring(a)(1)], reshape([UInt(j == n - i + 1)
+    return a([one(base_ring(a))], reshape([UInt(j == n - i + 1)
             for j = 1:n], n, 1))
 end
 
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:deglex}}) where {T <: RingElement}
     n = a.num_vars
-    return a([base_ring(a)(1)], reshape([[UInt(j == n - i + 1)
+    return a([one(base_ring(a))], reshape([[UInt(j == n - i + 1)
             for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:degrevlex}}) where {T <: RingElement}
     n = a.num_vars
-    return a([base_ring(a)(1)], reshape([[UInt(j == i)
+    return a([one(base_ring(a))], reshape([[UInt(j == i)
             for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
@@ -1725,7 +1725,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
    # for accumulation of cross multiplications
    qc = R()
    # for multiplication by -1 in addmul
-   m1 = -R(1)
+   m1 = -one(R)
    # Queue for processing next nodes into heap
    Q = zeros(Int, 0)
    reuse = zeros(Int, 0)
@@ -2449,7 +2449,7 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
    s = n
    c = R()
    qc = R()
-   m1 = -R(1)
+   m1 = -one(R)
    mb = -b.coeffs[1]
    Q = zeros(Int, 0)
    reuse = zeros(Int, 0)
@@ -2637,7 +2637,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
    s = n
    c = R()
    qc = R()
-   m1 = -R(1)
+   m1 = -one(R)
    mb = -b.coeffs[1]
    Q = zeros(Int, 0)
    reuse = zeros(Int, 0)
@@ -2853,7 +2853,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
    s = n
    c = R()
    qc = R()
-   m1 = -R(1)
+   m1 = -one(R)
    mb = -b.coeffs[1]
    Q = zeros(Int, 0)
    reuse = zeros(Int , 0)
@@ -3089,7 +3089,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
    s = [n[i] for i in 1:len]
    c = R()
    qc = R()
-   m1 = -R(1)
+   m1 = -one(R)
    mb = [-b[i].coeffs[1] for i in 1:len]
    Q = zeros(Int, 0)
    reuse = zeros(Int, 0)
@@ -3414,10 +3414,10 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    elseif length(b) == 0
       return divexact(a, canonical_unit(coeff(a, 1)))
    end
-   if a == 1
+   if isone(a)
       return deepcopy(a)
    end
-   if b == 1
+   if isone(b)
       return deepcopy(b)
    end
    # compute deflation and deflate
