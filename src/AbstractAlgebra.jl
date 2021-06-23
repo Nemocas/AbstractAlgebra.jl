@@ -500,8 +500,7 @@ import .Generic: abs_series, abs_series_type,
                  zero,
        # Moved from Hecke into Misc
 		 Loc, Localization, LocElem,
-		 polynomial_to_power_sums,
-		 power_sums_to_polynomial, roots, sturm_sequence
+		 roots, sturm_sequence
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export abs_series, abs_series_type,
@@ -561,8 +560,7 @@ export abs_series, abs_series_type,
        # Moved from Hecke into Misc
                  divexact_low, divhigh,
 		 ismonic, Loc, Localization, LocElem, mulhigh_n,
-		 polynomial_to_power_sums, PolyCoeffs,
-		 power_sums_to_polynomial, roots, sturm_sequence
+		 PolyCoeffs, roots, sturm_sequence
 
 # TODO remove these two once removed from dependent packages (Hecke)
 export displayed_with_minus_in_front, show_minus_one
