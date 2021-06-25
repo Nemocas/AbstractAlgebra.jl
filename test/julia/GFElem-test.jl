@@ -308,3 +308,15 @@ end
       @test elts == R.(0:n-1)
    end
 end
+
+@testset "Julia.GFElem.unsafe_operators" begin
+   n = rand(ZZ(2)^9:ZZ(2)^10-1)
+   while !AbstractAlgebra.isprobable_prime(n)
+      n = rand(ZZ(2)^9:ZZ(2)^10-1)
+   end
+   R, x = PolynomialRing(GF(n), "x")
+   f = rand(R, 10:10)
+   g = rand(R, 10:10)
+   @test f*g == g*f
+end
+
