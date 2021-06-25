@@ -308,12 +308,12 @@ end
 
 function addeq!(z::GFElem{BigInt}, x::GFElem{BigInt})
    R = parent(x)
-   p = R.p::T
+   p = R.p::BigInt
    d = addeq!(z.d, x.d)
    if d < p
-      return GFElem{T}(d, R)
+      return GFElem{BigInt}(d, R)
    else
-      return GFElem{T}(d - p, R)
+      return GFElem{BigInt}(d - p, R)
    end
 end
 
@@ -323,12 +323,12 @@ end
 
 function add!(z::GFElem{BigInt}, x::GFElem{BigInt}, y::GFElem{BigInt})
    R = parent(x)
-   p = R.p::T
+   p = R.p::BigInt
    d = add!(z.d, x.d, y.d)
    if d < p
-      return GFElem{T}(d, R)
+      return GFElem{BigInt}(d, R)
    else
-      return GFElem{T}(d - p, R)
+      return GFElem{BigInt}(d - p, R)
    end
 end
 
