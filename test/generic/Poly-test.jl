@@ -173,7 +173,7 @@ end
       @test isa(h, PolyElem)
       @test isa(k, PolyElem)
 
-      @test base_ring(g) == QQ
+      @test base_ring(g) === QQ
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -182,9 +182,9 @@ end
       @test length(h) == 0
       @test length(k) == 0
 
-      @test parent(g) != parent(f)
-      @test parent(h) != parent(f)
-      @test parent(k) == parent(f)
+      @test parent(g) !== parent(f)
+      @test parent(h) !== parent(f)
+      @test parent(k) === parent(f)
 
       p = similar(f, cached=false)
       q = similar(f, "z", cached=false)
@@ -192,9 +192,9 @@ end
       s = similar(f)
       t = similar(f)
 
-      @test parent(p) == parent(f)
-      @test parent(q) != parent(r)
-      @test parent(s) == parent(t)
+      @test parent(p) === parent(f)
+      @test parent(q) !== parent(r)
+      @test parent(s) === parent(t)
    end
 end
 
@@ -202,7 +202,7 @@ end
    f = polynomial(ZZ, [1, 2, 3], "y")
 
    @test isa(f, PolyElem)
-   @test base_ring(f) == ZZ
+   @test base_ring(f) === ZZ
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
    @test parent(f).S == :y
@@ -210,7 +210,7 @@ end
    g = polynomial(ZZ, [1, 2, 3])
 
    @test isa(g, PolyElem)
-   @test base_ring(g) == ZZ
+   @test base_ring(g) === ZZ
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
    @test parent(g).S == :x
@@ -219,8 +219,8 @@ end
    k = polynomial(ZZ, [1, 2, 3], cached=false)
    m = polynomial(ZZ, [1, 2, 3], cached=false)
 
-   @test parent(h) == parent(g)
-   @test parent(k) != parent(m)
+   @test parent(h) === parent(g)
+   @test parent(k) !== parent(m)
 
    p = polynomial(ZZ, BigInt[])
    q = polynomial(ZZ, [])
@@ -249,14 +249,14 @@ end
    @test length(h) == 0
    @test length(k) == 0
 
-   @test base_ring(g) == QQ
+   @test base_ring(g) === QQ
 
    @test parent(g).S == :y
    @test parent(h).S == :y
 
-   @test parent(g) != parent(f)
-   @test parent(h) != parent(f)
-   @test parent(k) == parent(f)
+   @test parent(g) !== parent(f)
+   @test parent(h) !== parent(f)
+   @test parent(k) === parent(f)
 
    p = zero(f, cached=false)
    q = zero(f, "z", cached=false)
@@ -264,9 +264,9 @@ end
    s = zero(f)
    t = zero(f)
 
-   @test parent(p) == parent(f)
-   @test parent(q) != parent(r)
-   @test parent(s) == parent(t)
+   @test parent(p) === parent(f)
+   @test parent(q) !== parent(r)
+   @test parent(s) === parent(t)
 end
 
 @testset "Generic.Poly.manipulation" begin
