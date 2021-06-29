@@ -16,7 +16,7 @@ export PolyCoeffs, PolynomialRing, PolyRing, addmul!, characteristic,
        pseudodivrem, pseudorem, remove, resultant, resultant_ducos,
        resultant_euclidean, resultant_lehmer, resultant_subresultant,
        resultant_sylvester, resx, shift_left, shift_right, subst,
-       sylvester_matrix, symbols, tail, valuation, var
+       sylvester_matrix, symbols, tail, use_karamul, valuation, var
 
 ###############################################################################
 #
