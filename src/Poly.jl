@@ -678,9 +678,17 @@ function mul_classical(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    return z
 end
 
+function use_karamul(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+   return length(a) > 5 && length(b) > 5
+end
+
 function *(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    check_parent(a, b)
-   return mul_classical(a, b)
+   if use_karamul(a, b)
+      return mul_karatsuba(a, b)
+   else
+      return mul_classical(a, b)
+   end
 end
 
 ###############################################################################

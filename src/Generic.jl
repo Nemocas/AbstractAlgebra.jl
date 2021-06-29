@@ -31,7 +31,7 @@ import ..AbstractAlgebra: CacheDictType, get_cached!
 
 import ..AbstractAlgebra: CycleDec, Field, FieldElement, Integers, Map,
                           NCRing, NCRingElem, Perm, Rationals, Ring, RingElem,
-                          RingElement
+                          RingElement, GFElem
 
 import ..AbstractAlgebra: add!, addeq!, addmul!, base_ring, canonical_unit,
                           can_solve_with_solution_lu,
@@ -54,7 +54,7 @@ import ..AbstractAlgebra: add!, addeq!, addmul!, base_ring, canonical_unit,
                           set_length!, set_precision!, set_valuation!,
                           shift_left, shift_right, snf, sqrt, symbols,
                           term_degree, terms_degrees, trailing_coefficient,
-                          valuation, var, vars, zero!
+                          use_karamul, valuation, var, vars, zero!
 
 using ..AbstractAlgebra
 
