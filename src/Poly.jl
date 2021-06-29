@@ -684,7 +684,8 @@ end
 
 function *(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    check_parent(a, b)
-   if use_karamul(a, b)
+   # karatsuba recurses into * so check lengths are > 1
+   if use_karamul(a, b) && length(a) > 1 && length(b) > 1
       return mul_karatsuba(a, b)
    else
       return mul_classical(a, b)
