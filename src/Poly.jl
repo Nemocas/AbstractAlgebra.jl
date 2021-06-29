@@ -525,7 +525,7 @@ end
 @doc Markdown.doc"""
     mul_karatsuba(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
 
-Return $a \times b$ using one non-recursive application the Karatsuba algorithm.
+Return $a \times b$ using the Karatsuba algorithm.
 """
 function mul_karatsuba(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    # we assume len(a) != 0 != lenb and parent(a) == parent(b)
