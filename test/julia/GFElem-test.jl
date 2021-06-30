@@ -201,8 +201,8 @@ end
       s = rand(S)
 
       for n = 0:20
-         @test r == 0 || a == r^n
-         @test s == 0 || b == s^n
+         @test a == r^n
+         @test b == s^n
 
          a *= r
          b *= s
@@ -220,8 +220,8 @@ end
       sinv = s == 0 ? S(0) : inv(s)
 
       for n = 0:20
-         @test r == 0 || a == r^(-n)
-         @test s == 0 || b == s^(-n)
+         @test a == r^(-n)
+         @test b == s^(-n)
 
          a *= rinv
          b *= sinv

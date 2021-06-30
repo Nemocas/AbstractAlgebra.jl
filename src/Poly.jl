@@ -1292,12 +1292,12 @@ Return $a^b \pmod{d}$. There are no restrictions on $b$.
 """
 function powermod(a::PolyElem{T}, b::Int, d::PolyElem{T}) where T <: RingElement
    check_parent(a, d)
-   if length(a) == 0
+   if b == 0
+      z = one(parent(a))
+   elseif length(a) == 0
       z = zero(parent(a))
    elseif length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
-   elseif b == 0
-      z = one(parent(a))
    else
       if b < 0
          a = invmod(a, d)

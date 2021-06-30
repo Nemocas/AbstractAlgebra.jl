@@ -298,7 +298,7 @@ end
       for expn = 0:10
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
+         @test r1 == r2
 
          r2 *= f
       end
