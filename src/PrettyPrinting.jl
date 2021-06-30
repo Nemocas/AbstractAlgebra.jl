@@ -337,7 +337,7 @@ function canonicalizeTimes(obj::Expr)
       return canonicalize(obj.args[2])
    end
    if op == :cdot
-      return canonicalizeOperation(obj)
+      return canonicalize_general_recursive(obj)
    end
    obj = flatten_op(obj, op)
    newobj = Expr(:call, op)
@@ -367,11 +367,10 @@ function canonicalizeTimes(obj::Expr)
    return newobj
 end
 
-function canonicalizeOperation(obj::Expr)
-   @assert obj.head == :call
-   newobj = Expr(:call, obj.args[1])
-   for i in 2:length(obj.args)
-      push!(newobj.args, canonicalize(obj.args[i]))
+function canonicalize_general_recursive(obj::Expr)
+   newobj = Expr(obj.head)
+   for i in obj.args
+      push!(newobj.args, canonicalize(i))
    end
    return newobj
 end
@@ -384,22 +383,9 @@ function canonicalize(obj::Expr)
          return canonicalizeMinus(obj)
       elseif obj.args[1] == :* || obj.args[1] == :cdot
          return canonicalizeTimes(obj)
-      elseif obj.args[1] == :/ || obj.args[1] == :// || obj.args[1] == :^
-         return canonicalizeOperation(obj)
-      else
-         return obj
       end
-   elseif obj.head == :vcat || obj.head == :vect || obj.head == :tuple ||
-          obj.head == :list || obj.head == :series || obj.head == :sequence ||
-          obj.head == :row || obj.head == :hcat || obj.head === :ref ||
-          obj.head == :matrix || obj.head == :latex_form
-      newobj = Expr(obj.head)
-      for i in obj.args
-         push!(newobj.args, canonicalize(i))
-      end
-      return newobj
    end
-   return obj
+   return canonicalize_general_recursive(obj)
 end
 
 #fallback
