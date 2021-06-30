@@ -1019,7 +1019,7 @@ end
       for expn = 0:10
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
+         @test r1 == r2
 
          r2 *= f
       end
@@ -1044,7 +1044,7 @@ end
       for expn = 0:10
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
+         @test r1 == r2
 
          r2 *= f
       end
@@ -1066,7 +1066,7 @@ end
       for expn = 0:4 # cannot set high power here
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || isapprox(r1, r2)
+         @test isapprox(r1, r2)
 
          r2 *= f
       end
@@ -1091,7 +1091,7 @@ end
       for expn = 0:10
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
+         @test r1 == r2
 
          r2 *= f
       end
@@ -1138,7 +1138,7 @@ if false
          for expn = 0:5
             r = powermod(f, expn, g)
 
-            @test (f == 0 && expn == 0 && r == 0) || r == p
+            @test r == p
 
             p = mulmod(p, f, g)
          end
@@ -1178,7 +1178,7 @@ if false
          for expn = 0:5
             r = powermod(f, expn, g)
 
-            @test (f == 0 && expn == 0 && r == 0) || r == p
+            @test r == p
 
             p = mulmod(p, f, g)
          end
@@ -1215,7 +1215,7 @@ if false
          for expn = 0:5
             r = powermod(f, expn, g)
 
-            @test (f == 0 && expn == 0 && r == 0) || isapprox(r, p)
+            @test isapprox(r, p)
 
             p = mulmod(p, f, g)
          end
@@ -1253,7 +1253,7 @@ if false
          for expn = 0:5
             r = powermod(f, expn, g)
 
-            @test (f == 0 && expn == 0 && r == 0) || r == p
+            @test r == p
 
             p = mulmod(p, f, g)
          end

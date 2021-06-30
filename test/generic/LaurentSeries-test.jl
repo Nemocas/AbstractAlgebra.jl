@@ -550,7 +550,7 @@ end
       for expn = 0:10
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || isequal(r1, r2)
+         @test isequal(r1, r2)
 
          r2 *= f
       end
@@ -566,7 +566,7 @@ end
       for expn = 0:4 # cannot set high power here
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || isapprox(r1, r2)
+         @test isapprox(r1, r2)
 
          r2 *= f
       end
@@ -585,7 +585,7 @@ end
       for expn = 0:10
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || isequal(r1, r2)
+         @test isequal(r1, r2)
 
          r2 *= f
       end

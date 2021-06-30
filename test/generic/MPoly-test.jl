@@ -553,7 +553,7 @@ end
             r *= f
          end
 
-         @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r
+         @test f^expn == r
       end
 
       @test_throws DomainError rand(varlist)^-1

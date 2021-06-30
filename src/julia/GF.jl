@@ -206,6 +206,7 @@ function ^(x::GFElem{T}, y::Integer) where T <: Integer
    R = parent(x)
    p = R.p::T
    if x.d == 0
+      y == 0 && return one(R)
       return deepcopy(x)
    end
    if y < 0

@@ -407,7 +407,9 @@ end
 
 function isequal(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     check_parent(x, y)
-    return precision(x) == precision(y) && poly(x) == poly(y)
+    prec = precision(x)
+    prec == precision(y) || return false
+    return truncate_poly(poly(x), prec) == truncate_poly(poly(y), prec)
 end
 
 ###############################################################################
