@@ -207,6 +207,7 @@ function ^(x::GFElem{T}, y::Integer) where T <: Integer
    p = R.p::T
    if x.d == 0
       y == 0 && return one(R)
+      y < 0 && throw(DivideError())
       return deepcopy(x)
    end
    if y < 0

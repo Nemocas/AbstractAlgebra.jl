@@ -209,7 +209,11 @@ end
       end
    end
 
+   @test_throws DivideError R(0)^(-1)
+   @test_throws DivideError S(0)^(-1)
+
    for iter = 1:100
+
       a = R(1)
       b = S(1)
 
@@ -220,8 +224,8 @@ end
       sinv = s == 0 ? S(0) : inv(s)
 
       for n = 0:20
-         @test a == r^(-n)
-         @test b == s^(-n)
+         @test r == 0 || a == r^(-n)
+         @test s == 0 || b == s^(-n)
 
          a *= rinv
          b *= sinv
