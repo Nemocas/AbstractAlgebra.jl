@@ -355,32 +355,6 @@ const MatrixElem{T} = Union{MatElem{T}, MatAlgElem{T}}
 
 ###############################################################################
 #
-#  Version information
-#
-################################################################################
-
-function versioninfo()
-  print("AbstractAlgebra version 0.3.0\n")
-  abstractalgebrarepo = dirname(dirname(@__FILE__))
-
-  print("AbstractAlgebra: ")
-  prepo = Base.LibGit2.GitRepo(abstractalgebrarepo)
-  Base.LibGit2.with(LibGit2.head(prepo)) do phead
-    print("commit: ")
-    print(string(LibGit2.Oid(phead))[1:8])
-    print(" date: ")
-    commit = Base.LibGit2.get(Base.LibGit2.GitCommit, prepo, LibGit2.Oid(phead))
-    print(Base.Dates.unix2datetime(Base.LibGit2.author(commit).time))
-    print(")\n")
-  end
-
-  finalize(prepo)
-
-  return nothing
-end
-
-###############################################################################
-#
 #   Julia types
 #
 ###############################################################################
