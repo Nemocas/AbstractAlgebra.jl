@@ -238,15 +238,10 @@ macro show_name(io, O)
 end
 
 function find_name(A, M = Main)
-  for a = names(Main)
+  for a = names(M)
     a === :ans && continue
-    d = Meta.parse("$M.$a")
-    try
-      z = eval(d);
-      if z === A
+    if isdefined(M, a) && getfield(M, a) === A
         return a
-      end
-    catch e
     end
   end
 end
