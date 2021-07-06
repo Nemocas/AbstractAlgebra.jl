@@ -1,4 +1,4 @@
-using Documenter, AbstractAlgebra, Kroki
+using Documenter, AbstractAlgebra
 
 makedocs(
          format = Documenter.HTML(),
