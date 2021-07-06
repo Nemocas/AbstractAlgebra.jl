@@ -40,7 +40,7 @@ Generic.partitions
 You may also have a look at [JuLie.jl](https://github.com/ulthiel/JuLie.jl) package for more utilities related to partitions.
 
 The number of all partitions can be computed by the hidden function `_numpart`.
-Much faster implementation is available in [Nemo.jl](https://nemocas.github.io/Nemo.jl/latest/arb.html#Nemo.numpart-Tuple{Int64,ArbField}).
+Much faster implementation is available in [Nemo.jl](https://nemocas.github.io/Nemo.jl/dev/arb.html#Nemo.numpart-Tuple{Int64,ArbField}).
 
 ```@docs
 Generic._numpart
