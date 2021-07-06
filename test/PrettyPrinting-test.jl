@@ -100,6 +100,7 @@
 
    # bugfix: ensure multiple levels of canonicalize produce :(a + b + -c)
    @test canonical_string(:((*)(a) + (*)((*)(b) + -1*c))) == "a + b - c"
+   @test canonical_string(:(f((*)(a) + (*)((*)(b) + -1*c)))) == "f(a + b - c)"
 
    function latex_string(x)
       return AbstractAlgebra.expr_to_latex_string(AbstractAlgebra.canonicalize(x))
