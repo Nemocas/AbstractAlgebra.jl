@@ -1,4 +1,4 @@
-# Visualiation of the types of AbstractAlgebra.jl
+# Visualization of the types of AbstractAlgebra.jl
 
 AbstractAlgebra.jl implements a couple of abstract types which can be extended.
 
