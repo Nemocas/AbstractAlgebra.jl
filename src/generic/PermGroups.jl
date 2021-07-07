@@ -12,13 +12,10 @@
 
 parent_type(::Type{Perm{T}}) where T = SymmetricGroup{T}
 
-elem_type(::Type{SymmetricGroup{T}}) where T = Perm{T}
-
 parent(g::Perm{T}) where T = SymmetricGroup(T(length(g.d)))
 
 check_parent(g::Perm, h::Perm) = length(g.d) == length(h.d) ||
    throw(ArgumentError("incompatible permutation groups"))
-
 
 ###############################################################################
 #
@@ -30,6 +27,9 @@ check_parent(g::Perm, h::Perm) = length(g.d) == length(h.d) ||
 # note: we don't use hash(g.d, h), as it's unnecessarily slow for this use-case
 Base.hash(g::Perm, h::UInt) = foldl((h, x) -> hash(x, h), g.d,
                                     init = hash(0x0d9939c64ab650ca, h))
+
+Base.deepcopy_internal(g::Perm, stackdict::IdDict) =
+   Perm(Base.deepcopy_internal(g.d, stackdict), false)
 
 function getindex(g::Perm, n::Integer)
    return g.d[n]
@@ -626,6 +626,8 @@ julia> unique(A)
 """
 elements!(G::SymmetricGroup)= (p for p in AllPerms(G.n))
 
+Base.IteratorSize(::Type{<:SymmetricGroup}) = Base.HasLength()
+
 @inline function Base.iterate(G::SymmetricGroup)
    A = AllPerms(G.n)
    a, b = iterate(A)
@@ -642,7 +644,7 @@ end
 
 Base.eltype(::Type{SymmetricGroup{T}}) where T = Perm{T}
 
-Base.length(G::SymmetricGroup) = order(G)
+Base.length(G::SymmetricGroup) = order(Int, G)
 
 ###############################################################################
 #
@@ -650,28 +652,23 @@ Base.length(G::SymmetricGroup) = order(G)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    order(G::SymmetricGroup) -> BigInt
-
-Return the order of the full permutation group as `BigInt`.
-"""
-order(G::SymmetricGroup) = order(BigInt, G)
-order(::Type{T}, G::SymmetricGroup) where T = factorial(T(G.n))
-
-@doc Markdown.doc"""
-    order(a::Perm) -> BigInt
-
-Return the order of permutation `a` as `BigInt`.
-
-If you are sure that computation over `T` (or its `Int` promotion) will not
-overflow you may use the method `order(T::Type, a::Perm)` which bypasses
-computation with `BigInt`s and returns `promote(T, Int)`.
-"""
-order(a::Perm) = order(BigInt, a)
-function order(::Type{T}, a::Perm) where T
-   TT = promote_type(T, Int)
-   return reduce(lcm, diff(cycles(a).cptrs), init = one(TT))
+function gens(G::SymmetricGroup{I}) where {I}
+   G.n == 1 && return eltype(G)[]
+   if G.n == 2
+      a = one(G)
+      a[1], a[2] = 2, 1
+      return [a]
+   end
+   a, b = one(G), one(G)
+   circshift!(a.d, b.d, -1)
+   b[1], b[2] = 2, 1
+   return [a, b]
 end
+
+order(::Type{I}, G::SymmetricGroup) where {I} = convert(I, factorial(G.n))
+
+order(::Type{I}, g::Perm) where {I} =
+   convert(I, foldl(lcm, length(c) for c in cycles(g)))
 
 @doc Markdown.doc"""
     matrix_repr(a::Perm)
@@ -762,7 +759,7 @@ rand(rng::AbstractRNG, rs::Random.SamplerTrivial{SymmetricGroup{T}}) where {T} =
 ###############################################################################
 
 function perm(a::AbstractVector{<:Integer}, check::Bool = true)
-  return Perm(a, check)
+   return Perm(a, check)
 end
 
 one(G::SymmetricGroup) = Perm(G.n)
