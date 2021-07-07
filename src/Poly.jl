@@ -573,6 +573,8 @@ function mul_karatsuba(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
       u = addeq!(u, coeff(z1, i - 1))
       setcoeff!(r, i + m - 1, u)
    end
+   # necessary for finite characteristic
+   r = set_length!(r, normalise(r, length(r)))
    return r
 end
 
