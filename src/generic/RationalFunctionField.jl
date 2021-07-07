@@ -499,10 +499,11 @@ rand(S::RationalFunctionField, v...) = rand(GLOBAL_RNG, S, v...)
 ###############################################################################
 
 promote_rule(::Type{Rat{T}}, ::Type{Rat{T}}) where T <: FieldElement = Rat{T}
+
 promote_rule(::Type{Rat{T}}, ::Type{Rat{T}}) where T <: FieldElem = Rat{T}
 
 function promote_rule(::Type{Rat{T}}, ::Type{U}) where {T <: FieldElement, U <: RingElem}
-   promote_rule(T, U) == T ? Rat{T} : Union{}
+   promote_rule(Frac{dense_poly_type(T)}, U) === Frac{dense_poly_type(T)} ? Rat{T} : Union{}
 end
 
 ###############################################################################

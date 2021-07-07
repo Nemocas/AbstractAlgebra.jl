@@ -195,7 +195,10 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       f = LaurentPolyWrap(x^3 + 2x^2 - 1)
       @test f == f
       @test f == LaurentPolyWrap(x^3 + 2x^2 - 1)
+      @test f == x^3 + 2x^2 - 1
+      @test x^3 + 2x^2 - 1 == f
       @test f != x
+      @test x != f
       @test f != LaurentPolyWrap(x^3 + 2x^2 - 1, -2)
    end
 

@@ -855,10 +855,6 @@ end
 
 *(a::Rat{T}, b::FunctionFieldElem{T}) where T <: FieldElement = b*a
 
-*(a::FunctionFieldElem, b::RingElem) = a*base_ring(a)(b)
-
-*(a::RingElem, b::FunctionFieldElem) = b*a
-
 function +(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
    parent(b) != base_ring(a) && error("Unable to coerce element")
    return a + parent(a)(b)
@@ -869,10 +865,6 @@ end
 +(a::FunctionFieldElem, b::Union{Integer, Rational}) = a + base_ring(a)(b)
 
 +(a::Union{Integer, Rational}, b::FunctionFieldElem) = b + a
-
-+(a::FunctionFieldElem, b::RingElem) = a + base_ring(a)(b)
-
-+(a::RingElem, b::FunctionFieldElem) = b + a
 
 function -(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
    parent(b) != base_ring(a) && error("Unable to coerce element")
@@ -887,10 +879,6 @@ end
 -(a::FunctionFieldElem, b::Union{Integer, Rational}) = a - base_ring(a)(b)
 
 -(a::Union{Integer, Rational}, b::FunctionFieldElem) = base_ring(b)(a) - b
-
--(a::FunctionFieldElem, b::RingElem) = a - base_ring(a)(b)
-
--(a::RingElem, b::FunctionFieldElem) = base_ring(b)(a) - b
 
 ###############################################################################
 #
@@ -969,10 +957,6 @@ end
 ==(a::FunctionFieldElem, b::Union{Integer, Rational}) = a == base_ring(a)(b)
 
 ==(a::Union{Integer, Rational}, b::FunctionFieldElem) = b == a
-
-==(a::FunctionFieldElem, b::RingElem) = a == base_ring(a)(b)
-
-==(a::RingElem, b::FunctionFieldElem) = b == a
 
 ###############################################################################
 #
@@ -1240,8 +1224,10 @@ rand(K::FunctionField, v...) = rand(Random.GLOBAL_RNG, K, v...)
 
 promote_rule(::Type{FunctionFieldElem{T}}, ::Type{FunctionFieldElem{T}}) where T <: FieldElement = FunctionFieldElem{T}
 
-function promote_rule(::Type{FunctionFieldElem{T}}, ::Type{U}) where {T <: FieldElem, U <: RingElem}
-   promote_rule(T, U) == T ? FunctionFieldElem{T} : Union{}
+function promote_rule(::Type{FunctionFieldElem{T}}, ::Type{U}) where
+      {T <: FieldElement, U <: RingElem}
+   # The base ring element type of FunctionFieldElem{T} is Rat{T}, not T
+   promote_rule(Rat{T}, U) == Rat{T} ? FunctionFieldElem{T} : Union{}
 end
 
 ###############################################################################
