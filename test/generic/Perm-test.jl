@@ -177,7 +177,7 @@ end
    @test length(AllPerms(T(6))) == 720
    @test length(unique([deepcopy(p) for p in AllPerms(T(6))])) == 720
    @test order(G) isa BigInt
-   @test order(T, G) isa promote_type(T, Int)
+   @test order(T, G) isa T
    @test order(G) == 720
 
    @test collect(G) isa Vector{Perm{T}}
@@ -274,7 +274,7 @@ end
    @test cycles(one(G)) isa Generic.CycleDec{T}
    @test collect(cycles(one(G))) == [T[i] for i in 1:10]
    @test order(one(G)) isa BigInt
-   @test order(T, one(G)) isa promote_type(Int, T)
+   @test order(T, one(G)) isa T
    @test order(one(G)) == 1
 
    @test collect(cycles(a)) == [T[1,2,3,5,6,7], T[4], T[8,9,10]]
@@ -287,7 +287,7 @@ end
    @test cycles(a)[1:3] == [T[1,2,3,5,6,7], T[4], T[8,9,10]]
 
    @test order(a) isa BigInt
-   @test order(T, a) isa promote_type(Int, T)
+   @test order(T, a) isa T
    @test order(a) == 6
    @test a^6 == one(G)
 
