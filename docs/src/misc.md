@@ -17,3 +17,8 @@ use the following functions:
 set_html_as_latex
 get_html_as_latex
 ```
+
+## Updating the type diagrams
+
+Updating the diagrams of the documentation can be done by modifying and running
+the script `docs/create_type_diagrams.jl`. Note that this requires the package `Kroki`.
