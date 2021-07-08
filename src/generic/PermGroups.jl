@@ -665,7 +665,7 @@ function gens(G::SymmetricGroup{I}) where {I}
    return [a, b]
 end
 
-order(::Type{I}, G::SymmetricGroup) where {I} = convert(I, factorial(G.n))
+order(::Type{T}, G::SymmetricGroup) where {I} = convert(T, factorial(T(G.n)))
 
 order(::Type{I}, g::Perm) where {I} =
    convert(I, foldl(lcm, length(c) for c in cycles(g)))
