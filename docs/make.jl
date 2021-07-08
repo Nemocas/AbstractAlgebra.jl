@@ -16,7 +16,8 @@ makedocs(
                  "extending_abstractalgebra.md"
                 ],
              "constructors.md",
-             "Rings" => [ "rings.md",
+             "Rings" => [ "ring_introduction.md",
+                          "rings.md",
                           "ncrings.md",
                           "euclidean.md",
                           "integer.md",
