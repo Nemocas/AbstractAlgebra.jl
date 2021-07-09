@@ -9,7 +9,7 @@
 
 abstract type Set end
 
-abstract type Group <: Set end # with * as operation
+const Group = GroupsCore.Group # with * as operation
 
 abstract type AdditiveGroup <: Set end # with + as operation
 
@@ -25,7 +25,7 @@ abstract type Field <: Ring end
 
 abstract type SetElem end
 
-abstract type GroupElem <: SetElem end # with * as operation
+const GroupElem = GroupsCore.GroupElement # with * as operation
 
 abstract type AdditiveGroupElem <: SetElem end # with + as operation
 
