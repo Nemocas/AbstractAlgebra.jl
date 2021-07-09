@@ -27,6 +27,16 @@ end
 
 promote_rule(::Type{T}, ::Type{T}) where T <: RingElement = T
 
+function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
+   U = promote_rule(T, S)
+   if U !== Union{}
+      return U
+   else
+      UU = promote_rule(S, T)
+      return UU
+   end
+end
+
 ###############################################################################
 #
 #   Generic catchall functions
@@ -34,10 +44,13 @@ promote_rule(::Type{T}, ::Type{T}) where T <: RingElement = T
 ###############################################################################
 
 function +(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   if S == promote_rule(S, T)
+   U = promote_rule_sym(S, T)
+   if S === U
       +(x, parent(x)(y))
-   else
+   elseif T === U
       +(parent(y)(x), y)
+   else
+      error("Cannot promote to common type")
    end
 end
 
@@ -46,10 +59,13 @@ end
 +(x::RingElement, y::RingElem) = parent(y)(x) + y
 
 function -(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   if S == promote_rule(S, T)
+   U = promote_rule_sym(S, T)
+   if S === U
       -(x, parent(x)(y))
-   else
+   elseif T === U
       -(parent(y)(x), y)
+   else
+      error("Cannot promote to common type")
    end
 end
 
@@ -58,10 +74,13 @@ end
 -(x::RingElement, y::RingElem) = parent(y)(x) - y
 
 function *(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   if S == promote_rule(S, T)
+   U = promote_rule_sym(S, T)
+   if S === U
       *(x, parent(x)(y))
-   else
+   elseif T === U
       *(parent(y)(x), y)
+   else
+      error("Cannot promote to common type")
    end
 end
 
@@ -81,10 +100,13 @@ If no exact division is possible, an exception is raised.
 function divexact end
 
 function divexact(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   if S == promote_rule(S, T)
+   U = promote_rule_sym(S, T)
+   if S === U
       divexact(x, parent(x)(y))
-   else
+   elseif T === U
       divexact(parent(y)(x), y)
+   else
+      error("Cannot promote to common type")
    end
 end
 
@@ -107,10 +129,10 @@ function divides(x::T, y::T) where {T <: RingElem}
 end
 
 function ==(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   R = promote_rule(S, T)
-   if S == R
+   U = promote_rule_sym(S, T)
+   if S === U
       ==(x, parent(x)(y))
-   elseif T == R
+   elseif T === U
       ==(parent(y)(x), y)
    else
       false

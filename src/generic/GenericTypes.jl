@@ -846,7 +846,7 @@ end
 
 const FunctionFieldDict = CacheDictType{Tuple{Poly, PolyElem, Symbol}, Field}()
 
-mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.Field
+mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
    num::Poly{<:PolyElem{T}}
    den::PolyElem{T}
    parent::FunctionField{T}

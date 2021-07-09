@@ -265,8 +265,6 @@ function promote_rule(::Type{Poly{T}}, ::Type{U}) where {T <: RingElement, U <: 
    promote_rule(T, U) == T ? Poly{T} : Union{}
 end
 
-
-
 ###############################################################################
 #
 #   Parent object call overload

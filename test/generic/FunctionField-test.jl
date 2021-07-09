@@ -25,6 +25,7 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
       @test typeof(S) <: Generic.FunctionField
 
       @test isa(y, Generic.FunctionFieldElem)
+      @test y isa FieldElem
 
       a = S()
 
@@ -839,3 +840,19 @@ end
       end
    end  
 end      
+
+@testset "Generic.FunctionField.polynomial_ring" begin
+   for i = 1:length(P1)
+      S, y = FunctionField(P1[i], "y")
+
+      St, t = PolynomialRing(S, "t", cached = false)
+      @test t + y == y + t
+      @test t * y == y * t
+      @test t + 1 == 1 + t
+      @test t * 1 == 1 * t
+      @test t + BigInt(1) == BigInt(1) + t
+      @test t * BigInt(1) == BigInt(1) * t
+      @test t + one(R1) == one(R1) + t
+      @test t * one(R1) == one(R1) * t
+   end
+end

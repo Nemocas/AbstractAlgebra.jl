@@ -321,11 +321,9 @@ rand(S::LaurentPolyWrapRing, degrees_range, v...) =
 
 promote_rule(::Type{L}, ::Type{L}) where {L <: LaurentPolyWrap} = L
 
-function promote_rule(::Type{L}, ::Type{U}) where
-       {T<:RingElement, L <: LaurentPolyWrap{T}, U <: RingElement}
-   promote_rule(T, U) == T ? L : Union{}
+function promote_rule(::Type{LaurentPolyWrap{S, T}}, ::Type{U}) where {S, T, U}
+   promote_rule(T, U) == T ? LaurentPolyWrap{S, T} : Union{}
 end
-
 
 ################################################################################
 #

@@ -111,6 +111,9 @@ end
    @test b*(x + 1) == (-x-1)//(x-1)
 
    @test (x + 1)*b == (-x-1)//(x-1)
+
+   @test denominator(a) * a == a * denominator(a)
+   @test denominator(a) + a == a + denominator(a)
 end
 
 @testset "Generic.RationalFunctionField.comparison" begin
