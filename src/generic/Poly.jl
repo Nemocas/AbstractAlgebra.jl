@@ -60,6 +60,54 @@ end
 #
 ###############################################################################
 
+function use_karamul(a::Poly{BigInt}, b::Poly{BigInt})
+   minlen = min(length(a), length(b))
+   if minlen == 0
+      return false
+   end
+   if minlen > 175
+      return true
+   end
+   bits = 0
+   for i = 1:length(a)
+      bits += ndigits(a.coeffs[i], base=2)
+   end
+   for i = 1:length(b)
+      bits += ndigits(b.coeffs[i], base=2)
+   end
+   return minlen*div(bits, length(a) + length(b)) > 30000
+end
+
+function use_karamul(a::Poly{Rational{BigInt}}, b::Poly{Rational{BigInt}})
+   minlen = min(length(a), length(b))
+   if minlen == 0
+      return false
+   end
+   if minlen > 17
+      return true
+   end
+   bits = 0
+   for i = 1:length(a)
+      bits += ndigits(numerator(a.coeffs[i]), base=2)
+      bits += ndigits(denominator(a.coeffs[i]), base=2)
+   end
+   for i = 1:length(b)
+      bits += ndigits(numerator(b.coeffs[i]), base=2)
+      bits += ndigits(denominator(b.coeffs[i]), base=2)
+   end
+   return minlen^1.7*div(bits, 2*(length(a) + length(b))) > 48500
+end
+
+function use_karamul(a::Poly{GFElem{Int}}, b::Poly{GFElem{Int}})
+   return min(length(a), length(b)) > 75
+end
+
+function use_karamul(a::Poly{GFElem{BigInt}}, b::Poly{GFElem{BigInt}})
+   minlen = min(length(a), length(b))
+   bits = ndigits(characteristic(parent(a)), base=2)
+   return minlen^2*bits > 2000
+end
+
 @doc Markdown.doc"""
     mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where T <: RingElement
 

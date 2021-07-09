@@ -16,7 +16,7 @@ export PolyCoeffs, PolynomialRing, PolyRing, addmul!, characteristic,
        pseudodivrem, pseudorem, remove, resultant, resultant_ducos,
        resultant_euclidean, resultant_lehmer, resultant_subresultant,
        resultant_sylvester, resx, shift_left, shift_right, subst,
-       sylvester_matrix, symbols, tail, valuation, var
+       sylvester_matrix, symbols, tail, use_karamul, valuation, var
 
 ###############################################################################
 #
@@ -530,7 +530,7 @@ end
 @doc Markdown.doc"""
     mul_karatsuba(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
 
-Return $a \times b$ using one non-recursive application the Karatsuba algorithm.
+Return $a \times b$ using the Karatsuba algorithm.
 """
 function mul_karatsuba(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    # we assume len(a) != 0 != lenb and parent(a) == parent(b)
@@ -578,6 +578,8 @@ function mul_karatsuba(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
       u = addeq!(u, coeff(z1, i - 1))
       setcoeff!(r, i + m - 1, u)
    end
+   # necessary for finite characteristic
+   r = set_length!(r, normalise(r, length(r)))
    return r
 end
 
@@ -683,9 +685,18 @@ function mul_classical(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    return z
 end
 
+function use_karamul(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+   return length(a) > 5 && length(b) > 5
+end
+
 function *(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    check_parent(a, b)
-   return mul_classical(a, b)
+   # karatsuba recurses into * so check lengths are > 1
+   if use_karamul(a, b) && length(a) > 1 && length(b) > 1
+      return mul_karatsuba(a, b)
+   else
+      return mul_classical(a, b)
+   end
 end
 
 ###############################################################################
