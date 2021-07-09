@@ -17,6 +17,7 @@ makedocs(
                 ],
              "constructors.md",
              "Rings" => [ "ring_introduction.md",
+                          "ring.md",
                           "integer.md",
                           "polynomial.md",
                           "ncpolynomial.md",
