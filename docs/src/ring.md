@@ -1,4 +1,4 @@
-# Rings
+# Ring functionality
 
 AbstractAlgebra has both commutative and noncommutative rings. Together we
 refer to them below as rings.
@@ -79,7 +79,7 @@ to construct certain objects in that ring.
 (R::NCRing{T})(a::T) where T <: RingElement
 ```
 
-## Basic ring functionality
+## Basic functions
 
 All rings in AbstractAlgebra are expected to implement basic ring operations,
 unary minus, binary addition, subtraction and multiplication, equality testing,
@@ -93,6 +93,13 @@ zero(R::NCRing)
 one(R::NCRing)
 iszero(a::NCRingElement)
 isone(a::NCRingElement)
+```
+
+In addition, the following is implemented where it is
+mathematically/algorithmically viable to do so.
+
+```julia
+isunit(a::NCRingElement)
 ```
 
 The following standard Julia functions are also implemented for all ring
