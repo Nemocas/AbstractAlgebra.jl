@@ -127,7 +127,7 @@ characteristic(R::ResRing)
 
 Return the characteristic of the given residue ring.
 
-## Residue ring functionality provided by AbstractAlgebra.jl
+## Residue ring functions
 
 ### Basic functionality
 

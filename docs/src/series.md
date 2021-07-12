@@ -320,7 +320,7 @@ characteristic(R::SeriesRing)
 
 Return the characteristic of the given series ring.
 
-## Series functionality provided by AbstractAlgebra.jl
+## Series functions
 
 Unless otherwise noted, the functions below are available for all series
 models, including Laurent series. We denote this by using the abstract type
