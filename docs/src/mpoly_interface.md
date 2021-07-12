@@ -590,7 +590,7 @@ monomial is most significant with respect to the ordering.
 exponent(f::MyMPoly{T}, i::Int, j::Int) where T <: RingElem
 ```
 
-Return the exponent of the $j$-th variable in the $n$-th term of the polynomial
+Return the exponent of the $j$-th variable in the $i$-th term of the polynomial
 $f$. The first term is the one with whose monomial is most significant with
 respect to the ordering.
 
@@ -758,8 +758,7 @@ Evaluate the polynomial at the given values in the coefficient ring of the
 polynomial. The result should be an element of the coefficient ring.
 
 ```julia
-evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: RingElem, U <: Intege
-r}
+evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: RingElem, U <: Integer}
 ```
 
 Evaluate the polynomial $f$ at the values specified by the entries of the array $A$.

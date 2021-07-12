@@ -113,13 +113,209 @@ julia> derivative(k, 2)
 
 ```
 
-All of the examples here are generic polynomial rings, but specialised implementations
-of polynomial rings provided by external modules will also usually provide a
-`PolynomialRing` constructor to allow creation of their polynomial rings.
+## Polynomial constructors
 
-## Polynomial functionality provided by AbstractAlgebra.jl
+Multivariate polynomials can be constructed from the generators in the
+usual way using arithmetic operations.
+
+Also, all of the standard ring element constructors may be used to construct
+multivariate polynomials.
+
+```julia
+(R::MPolyRing)() # constructs zero
+(R::MPolyRing)(c::Integer)
+(R::MPolyRing)(c::elem_type(R))
+(R::MPolyRing{T})(a::T) where T <: RingElement
+```
+
+For more efficient construction of multivariate polynomial, one can use the
+`MPoly` build context, where terms (coefficient followed by an exponent vector)
+are pushed onto a context one at a time and then the polynomial constructed
+from those terms in one go using the `finish` function.
+
+```julia
+MPolyBuildCtx(R::MPolyRing)
+push_term!(M::MPolyBuildCtx, c::RingElem, v::Vector{Int})
+finish(M::MPolyBuildCtx)
+```
+
+When a multivariate polynomial type has a representation that allows constant
+time access (e.g. it is represented internally by arrays), the following
+additional constructor is available. It takes and array of coefficients and
+and array of exponent vectors.
+
+```julia
+(S::MPolyRing{T})(A::Vector{T}, m::Vector{Vector{Int}}) where T <: RingElem
+```
+
+Create the polynomial in the given ring with nonzero coefficients specified by
+the elements of $A$ and corresponding exponent vectors given by the elements of
+$m$.
+
+**Examples**
+
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> C = MPolyBuildCtx(R)
+Builder for a polynomial in Multivariate Polynomial Ring in x, y over Integers
+
+julia> push_term!(C, ZZ(3), [1, 2]);
+
+
+julia> push_term!(C, ZZ(2), [1, 1]);
+
+
+julia> push_term!(C, ZZ(4), [0, 0]); 
+
+
+julia> f = finish(C)
+3*x*y^2 + 2*x*y + 4
+
+julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
+
+julia> f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
+2*x^3*y^2 + 3*x + y
+```
+
+## Functions for types and parents of multivariate polynomial rings
+
+```julia
+base_ring(R::MPolyRing)
+base_ring(a::MPolyElem)
+```
+
+Return the coefficient ring of the given polynomial ring or polynomial,
+respectively.
+
+
+```julia
+parent(a::MPolyElem)
+```
+
+Return the polynomial ring of the given polynomial.
+
+```julia
+characteristic(R::MPolyRing)
+```
+
+Return the characteristic of the given polynomial ring.
+
+## Polynomial functions
 
 ### Basic manipulation
+
+All the standard ring functions are available, including the following.
+
+```julia
+zero(R::MPolyRing)
+one(R::MPolyRing)
+iszero(a::MPolyElem)
+isone(a::MPolyElem)
+```
+
+```
+divexact(a::T, b::T) where T <: MPolyElem
+```
+
+All basic functions from the Multivariate Polynomial interface are provided.
+
+```julia
+symbols(S::MPolyRing)
+nvars(f::MPolyRing)
+gens(S::MPolyRing)
+gen(S::MPolyRing, i::Int)
+```
+
+```julia
+ordering(S::MPolyRing{T})
+```
+
+Note that the currently supported orderings are `:lex`, `:deglex` and
+`:degrevlex`.
+
+```julia
+length(f::MPolyElem)
+degrees(f::MPolyElem)
+total_degree(f::MPolyElem)
+```
+
+```julia
+isgen(x::MPolyElem)
+```
+
+```julia
+divexact(f::T, g::T) where T <: MPolyElem
+```
+
+For multivariate polynomial types that allow constant time access to
+coefficients, the following are also available, allowing access to the given
+coefficient, monomial or term. Terms are numbered from the most significant
+first.
+
+```julia
+coeff(f::MPolyElem, n::Int)
+coeff(a::MPolyElem, exps::Vector{Int})
+```
+
+Access a coefficient by term number or exponent vector.
+
+```julia
+monomial(f::MPolyElem, n::Int)
+monomial!(m::T, f::T, n::Int) where T <: MPolyElem
+```
+
+The second version writes the result into a preexisting polynomial
+object to save an allocation.
+
+```julia
+term(f::MPolyElem, n::Int)
+```
+
+```julia
+exponent(f::MyMPolyElem}, i::Int, j::Int)
+```
+
+Return the exponent of the $j$-th variable in the $i$-th term of the polynomial
+$f$.
+
+```julia
+exponent_vector(a::MPolyElem, i::Int)
+```
+
+```julia
+setcoeff!(a::MPolyElem{T}, exps::Vector{Int}, c::T) where T <: RingElement
+```
+
+Although multivariate polynomial rings are not usually Euclidean, the following
+functions from the Euclidean interface are often provided.
+
+```julia
+divides(f::T, g::T) where T <: MPolyElem
+remove(f::T, g::T) where T <: MPolyElem
+valuation(f::T, g::T) where T <: MPolyElem
+```
+
+```julia
+divrem(f::T, g::T) where T <: MPolyElem
+div(f::T, g::T) where T <: MPolyElem
+```
+
+Compute a tuple $(q, r)$ such that $f = qg + r$, where the coefficients of terms of
+$r$ whose monomials are divisible by the leading monomial of $g$ are reduced modulo the
+leading coefficient of $g$ (according to the Euclidean function on the coefficients).
+The `divrem` version returns both quotient and remainder whilst the `div` version only
+returns the quotient.
+
+Note that the result of these functions depend on the ordering of the polynomial ring.
+
+```julia
+gcd(f::T, g::T) where T <: MPolyElem
+```
+
+The following functionality is also provided for all multivariate polynomials.
 
 ```@docs
 isunivariate(::MPolyRing{T}) where T <: RingElement
@@ -207,6 +403,27 @@ true
 julia> c = coeff(f, x^2)
 1
 
+```
+
+### Square root
+
+Over rings for which an exact square root is available, it is possible to take
+the square root of a polynomial or test whether it is a square.
+
+```julia
+sqrt(f::MPolyElem, check::bool=true)
+issquare(::MPolyElem)
+```
+
+### Iterators
+
+The following iterators are provided for multivariate polynomials.
+
+```julia
+coefficients(p::MPoly)
+monomials(p::MPoly)
+terms(p::MPoly)
+exponent_vectors(a::MPoly)
 ```
 
 ### Changing base (coefficient) rings
@@ -542,4 +759,27 @@ It is possible to test whether a polynomial is homogeneous with respect to the s
 
 ```@docs
 ishomogeneous(x::MPolyElem{T}) where T <: RingElement
+```
+
+## Random generation
+
+Random multivariate polynomials in a given ring can be constructed by passing
+a range of degrees for the variables and a range on the number of terms.
+Additional parameters are used to generate the coefficients of the polynomial.
+
+Note that zero coefficients may currently be generated, leading to less than
+the requested number of terms.
+
+```julia
+rand(R::MPolyRing, exp_range::UnitRange{Int}, term_range::UnitRange{Int}, v...)
+```
+
+** Examples **
+
+```@repl
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+f = rand(R, -1:2, 3:5, -10:10)
+
+S, (s, t) = PolynomialRing(GF(7), ["x", "y"])
+g = rand(S, -1:2, 3:5)
 ```
