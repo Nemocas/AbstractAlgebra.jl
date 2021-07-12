@@ -94,12 +94,75 @@ All of the examples here are generic residue rings, but specialised implementati
 of residue rings provided by external modules will also usually provide a
 `ResidueRing` constructor to allow creation of their residue rings.
 
-## Basic ring functionality
+## Residue constructors
 
-Residue rings in AbstractAlgebra.jl implement the full Ring interface. Of course
-the entire Residue Ring interface is also implemented.
+One can use the parent objects of a residue ring to construct residues, as per any
+ring.
 
-We give some examples of such functionality.
+```julia
+(R::ResRing)() # constructs zero
+(R::ResRing)(c::Integer)
+(R::ResRing)(c::elem_type(R))
+(R::ResRing{T})(a::T) where T <: RingElement
+```
+
+## Functions for types and parents of residue rings
+
+```julia
+base_ring(R::ResRing)
+base_ring(a::ResElem)
+```
+
+Return the base ring over which the ring was constructed.
+
+```julia
+parent(a::ResElem)
+```
+
+Return the parent of the given residue.
+
+```julia
+characteristic(R::ResRing)
+```
+
+Return the characteristic of the given residue ring.
+
+## Residue ring functionality provided by AbstractAlgebra.jl
+
+### Basic functionality
+
+Residue rings implement the Ring interface.
+
+```julia
+zero(R::NCRing)
+one(R::NCRing)
+iszero(a::NCRingElement)
+isone(a::NCRingElement)
+```
+
+```julia
+divexact(a::T, b::T) where T <: RingElement
+inv(a::T)
+```
+
+The Residue Ring interface is also implemented.
+
+```julia
+modulus(S::ResRing)
+```
+
+```julia
+data(f::ResElem)
+lift(f::ResElem)
+```
+
+Return a lift of the residue to the base ring.
+
+The following functions are also provided for residues.
+
+```@docs
+modulus(::ResElem)
+```
 
 **Examples**
 
@@ -140,30 +203,6 @@ Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x 
 julia> f == deepcopy(f)
 true
 
-```
-
-## Residue ring functionality provided by AbstractAlgebra.jl
-
-The functionality listed below is automatically provided by AbstractAlgebra.jl for
-any residue ring module that implements the full Residue Ring interface.
-This includes AbstractAlgebra.jl's own generic residue rings.
-
-But if a C library provides all the functionality documented in the Residue Ring
-interface, then all the functions described here will also be automatically supplied by
-AbstractAlgebra.jl for that residue ring type.
-
-Of course, modules are free to provide specific implementations of the functions
-described here, that override the generic implementation.
-
-### Basic functionality
-
-```@docs
-modulus(::ResElem)
-```
-
-**Examples**
-
-```jldoctest
 julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
@@ -254,4 +293,24 @@ true
 
 julia> sqrt(a)
 532
+```
+
+### Random generation
+
+Random residues can be generated using `rand`. The parameters after the residue
+ring are used to generate elements of the base ring.
+
+```julia
+rand(R::ResRing, v...)
+```
+
+** Examples **
+
+```@repl
+R = ResidueRing(ZZ, 7)
+f = rand(R, 0:6)
+
+S, x = PolynomialRing(QQ, "x")
+U = ResidueField(S, x^3 + 3x + 1)
+g = rand(S, 2:2, -10:10)
 ```
