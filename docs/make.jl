@@ -28,6 +28,7 @@ makedocs(
                           "mseries.md",
                           "residue.md"],
              "Fields" => [ "field_introduction.md",
+                           "field.md",
                            "fraction.md",
                            "rational.md",
                            "function_field.md",
