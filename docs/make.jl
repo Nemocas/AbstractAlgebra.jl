@@ -38,6 +38,7 @@ makedocs(
              "Groups" => [ "perm.md",
                            "ytabs.md"],
              "Modules" => [ "module_introduction.md",
+                            "module.md",
                             "free_module.md",
                             "submodule.md",
                             "quotient_module.md",
