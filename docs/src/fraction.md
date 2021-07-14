@@ -72,16 +72,119 @@ x + 1
 
 ```
 
-All of the examples here are generic fraction fields, but specialised implementations
-of fraction fields provided by external modules will also usually provide a
-`FractionField` constructor to allow creation of the fraction fields they provide.
+## Fraction constructors
 
-## Basic field functionality
+One can construct fractions using the fraction field parent object, as for any
+ring or field.
 
-Fraction fields in AbstractAlgebra.jl implement the full Field interface. Of course
-the entire Fraction Field interface is also implemented.
+```julia
+(R::FracField)() # constructs zero
+(R::FracField)(c::Integer)
+(R::FracField)(c::elem_type(R))
+(R::FracField{T})(a::T) where T <: RingElement
+```
 
-We give some examples of such functionality.
+One may also use the Julia double slash operator to construct elements of the
+fraction field without constructing the fraction field parent first.
+
+```julia
+//(x::T, y::T) where T <: RingElement
+```
+
+**Examples**
+
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia> S = FractionField(R)
+Fraction field of Univariate Polynomial Ring in x over Rationals
+
+julia> f = S(x + 1)
+x + 1
+
+julia> g = (x^2 + x + 1)//(x^3 + 3x + 1)
+(x^2 + x + 1)//(x^3 + 3*x + 1)
+```
+
+## Functions for types and parents of fraction fields
+
+Fraction fields in AbstractAlgebra.jl implement the Ring interface.
+
+```julia
+base_ring(R::FracField)
+base_ring(a::FracElem)
+```
+
+Return the base ring of which the fraction field was constructed.
+
+```julia
+parent(a::FracElem)
+```
+
+Return the fraction field of the given fraction.
+
+```julia
+characteristic(R::FracField)
+```
+
+Return the characteristic of the base ring of the fraction field.
+
+
+**Examples**
+
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia> S = FractionField(R)
+Fraction field of Univariate Polynomial Ring in x over Rationals
+
+julia> f = S(x + 1)
+x + 1
+
+julia> U = base_ring(S)
+Univariate Polynomial Ring in x over Rationals
+
+julia> V = base_ring(f)
+Univariate Polynomial Ring in x over Rationals
+
+julia> T = parent(f)
+Fraction field of Univariate Polynomial Ring in x over Rationals
+
+julia> m = characteristic(S)
+0
+```
+
+## Fraction field functions
+
+### Basic functions
+
+Fraction fields implement the Ring interface.
+
+```julia
+zero(R::FracField)
+one(R::FracField)
+iszero(a::FracElem)
+isone(a::FracElem)
+```
+
+```julia
+inv(a::T) where T <: FracElem
+```
+
+They also implement the field interface.
+
+```julia
+isunit(f::FracElem)
+```
+
+And they implement the fraction field interface.
+
+```julia
+numerator(a::FracElem)
+denominator(a::FracElem)
+```
 
 **Examples**
 
@@ -110,18 +213,6 @@ true
 julia> iszero(f)
 false
 
-julia> m = characteristic(S)
-0
-
-julia> U = base_ring(S)
-Univariate Polynomial Ring in x over Rationals
-
-julia> V = base_ring(f)
-Univariate Polynomial Ring in x over Rationals
-
-julia> T = parent(f)
-Fraction field of Univariate Polynomial Ring in x over Rationals
-
 julia> r = deepcopy(f)
 x + 1
 
@@ -130,21 +221,7 @@ x^2 + x + 1
 
 julia> d = denominator(g)
 x^3 + 3*x + 1
-
 ```
-
-## Fraction field functionality provided by AbstractAlgebra.jl
-
-The functionality listed below is automatically provided by AbstractAlgebra.jl for
-any fraction field module that implements the full Fraction Field interface.
-This includes AbstractAlgebra.jl's own generic fraction fields.
-
-But if a C library provides all the functionality documented in the Fraction Field
-interface, then all the functions described here will also be automatically supplied by
-AbstractAlgebra.jl for that fraction field type.
-
-Of course, modules are free to provide specific implementations of the functions
-described here, that override the generic implementation.
 
 ### Greatest common divisor
 
@@ -229,4 +306,24 @@ julia> v, q = remove(f^3*g, x + 1)
 julia> v = valuation(f^3*g, x + 1)
 3
 
+```
+
+### Random generation
+
+Random fractions can be generated using `rand`. The parameters passed after the
+fraction field tell `rand` how to generate random elements of the base ring.
+
+```julia
+rand(R::FracField, v...)
+```
+
+** Examples **
+
+```@repl
+K = FractionField(ZZ)
+f = rand(K, -10:10)
+
+R, x = PolynomialRing(ZZ, "x")
+S = FractionField(R)
+g = rand(S, -1:3, -10:10)
 ```

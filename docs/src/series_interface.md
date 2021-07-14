@@ -441,3 +441,19 @@ sufficient to specialise only similar. For both similar and zero only the most
 general method has to be implemented as all other methods call out to this more
 general method.
 
+### Random generation
+
+Random series can be constructed using the `rand` function. A range of possible
+valuations is provided. The maximum precision of the ring is used as a bound on
+the precision. Other parameters are used to construct random coefficients.
+
+```julia
+rand(R::SeriesRing, val_range::UnitRange{Int}, v...)
+```
+
+** Examples **
+
+```@repl
+R, x = PowerSeriesRing(ZZ, 10, "x")
+f = rand(R, 3:5, -10:10)
+```

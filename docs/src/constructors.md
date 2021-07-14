@@ -20,7 +20,7 @@ BigInt
 
 ## How we construct objects in AbstractAlgebra.jl
 
-As we explain in [Elements and parents](#elements-and-parents), Julia types
+As we explain in [Elements and parents](https://nemocas.github.io/AbstractAlgebra.jl/dev/extending_abstractalgebra/#Elements-and-parents), Julia types
 don't contain enough information to properly model groups, rings, fields, etc.
 Instead of using types to construct objects, we use special objects that we
 refer to as parent objects. They behave a lot like Julia types.

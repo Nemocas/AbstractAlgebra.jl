@@ -285,8 +285,6 @@ transpose(::MyMat{T}) where T <: RingElem
 
 Return the transpose of the given matrix.
 
-The standard Julia tick notation can also be used for transposing a matrix.
-
 **Examples**
 
 ```jldoctest
@@ -302,11 +300,6 @@ julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [   -2   t + 2   t^2 + t + 1]
 
 julia> B = transpose(A)
-[t + 1   t^2            -2]
-[    t     t         t + 2]
-[    1     t   t^2 + t + 1]
-
-julia> C = A'
 [t + 1   t^2            -2]
 [    t     t         t + 2]
 [    1     t   t^2 + t + 1]
