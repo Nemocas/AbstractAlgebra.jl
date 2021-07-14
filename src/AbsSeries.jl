@@ -91,12 +91,19 @@ end
 ###############################################################################
 
 function similar(x::AbsSeriesElem, R::Ring, max_prec::Int,
-                                 var::Symbol=var(parent(x)); cached::Bool=true)
+                                   s::Symbol=var(parent(x)); cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.AbsSeries{TT}(V, 0, max_prec)
    # Default similar is supposed to return a Generic series
-   p.parent = Generic.AbsSeriesRing{TT}(R, max_prec, var, cached)
+   if base_ring(x) === R && s == var(parent(x)) &&
+            typeof(x) === Generic.AbsSeries{TT} &&
+            max_precision(parent(x)) == max_prec
+      # steal parent in case it is not cached
+      p.parent = parent(x)
+   else
+      p.parent = Generic.AbsSeriesRing{TT}(R, max_prec, s, cached)
+   end
    return p
 end
 
