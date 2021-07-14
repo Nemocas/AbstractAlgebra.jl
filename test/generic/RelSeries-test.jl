@@ -167,8 +167,8 @@ end
       @test isa(m, RelSeriesElem)
       @test isa(n, RelSeriesElem)
 
-      @test base_ring(g) == QQ
-      @test base_ring(m) == QQ
+      @test base_ring(g) === QQ
+      @test base_ring(m) === QQ
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -179,11 +179,11 @@ end
       @test iszero(m)
       @test iszero(n)
 
-      @test parent(g) != parent(f)
-      @test parent(h) != parent(f)
-      @test parent(k) == parent(f)
-      @test parent(m) != parent(f)
-      @test parent(n) != parent(f)
+      @test parent(g) !== parent(f)
+      @test parent(h) !== parent(f)
+      @test parent(k) === parent(f)
+      @test parent(m) !== parent(f)
+      @test parent(n) !== parent(f)
 
       p = similar(f, cached=false)
       q = similar(f, "z", cached=false)
@@ -191,9 +191,9 @@ end
       s = similar(f)
       t = similar(f)
 
-      @test parent(p) != parent(f)
-      @test parent(q) != parent(r)
-      @test parent(s) == parent(t)
+      @test parent(p) === parent(f)
+      @test parent(q) !== parent(r)
+      @test parent(s) === parent(t)
    end
 end
 
@@ -201,7 +201,7 @@ end
    f = rel_series(ZZ, [1, 2, 3], 3, 5, 2, "y")
 
    @test isa(f, RelSeriesElem)
-   @test base_ring(f) == ZZ
+   @test base_ring(f) === ZZ
    @test coeff(f, 2) == 1
    @test coeff(f, 4) == 3
    @test parent(f).S == :y
@@ -209,7 +209,7 @@ end
    g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
 
    @test isa(g, RelSeriesElem)
-   @test base_ring(g) == ZZ
+   @test base_ring(g) === ZZ
    @test coeff(g, 4) == 1
    @test coeff(g, 6) == 3
    @test parent(g).S == :x
@@ -218,8 +218,8 @@ end
    k = rel_series(ZZ, [1, 2, 3], 1, 6, 0, cached=false)
    m = rel_series(ZZ, [1, 2, 3], 3, 9, 5, cached=false)
 
-   @test parent(h) == parent(g)
-   @test parent(k) != parent(m)
+   @test parent(h) === parent(g)
+   @test parent(k) !== parent(m)
 
    p = rel_series(ZZ, BigInt[], 0, 3, 1)
    q = rel_series(ZZ, [], 0, 3, 2)
