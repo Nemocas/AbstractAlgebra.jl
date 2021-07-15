@@ -668,14 +668,14 @@ Return $a^b$. We require $b \geq 0$.
 function ^(a::RelSeriesElem{T}, b::Int) where T <: RingElement
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing power series efficiently
-   if pol_length(a) == 0
+   if b == 0
+      # in fact, the result would be exact 1 if we had exact series
+      z = one(parent(a))
+      return z
+   elseif pol_length(a) == 0
       z = parent(a)()
       z = set_precision!(z, b*valuation(a))
       z = set_valuation!(z, b*valuation(a))
-      return z
-   elseif b == 0
-      # in fact, the result would be exact 1 if we had exact series
-      z = one(parent(a))
       return z
    elseif isgen(a)
       z = parent(a)()
