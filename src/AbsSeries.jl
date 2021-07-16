@@ -761,6 +761,35 @@ end
 
 ###############################################################################
 #
+#   Composition
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    compose(a::AbsSeriesElem, b::AbsSeriesElem)
+
+Compose the series $a$ with the series $b$ and return the result,
+i.e. return $a\circ b$. The two series do not need to be in the same ring,
+however the series $b$ must have positive valuation or an exception is raised.
+"""
+function compose(a::AbsSeriesElem, b::AbsSeriesElem)
+   valuation(b) == 0 && error("Series being substituted must have positive valuation")
+   i = length(a)
+   R = base_ring(a)
+   S = parent(b)
+   if i == 0
+      return zero(R) + zero(S)
+   end
+   z = coeff(a, i - 1) * one(S)
+   while i > 1
+      i -= 1
+      z = z*b + coeff(a, i - 1)
+   end
+   return z
+end
+
+###############################################################################
+#
 #   Square root
 #
 ###############################################################################

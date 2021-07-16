@@ -518,6 +518,15 @@ julia> d = inv(b)
 
 ```
 
+### Composition
+
+```@docs
+compose(a::AbsSeriesElem, b::AbsSeriesElem)
+```
+
+Note that `subst` can be used instead of `compose`, however the provided
+functionality is the same. General series substitution is not well-defined.
+
 ### Derivative and integral
 
 ```@docs
