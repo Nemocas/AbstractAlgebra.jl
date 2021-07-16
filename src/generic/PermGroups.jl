@@ -665,10 +665,10 @@ function gens(G::SymmetricGroup{I}) where {I}
    return [a, b]
 end
 
-order(::Type{T}, G::SymmetricGroup) where {I} = convert(T, factorial(T(G.n)))
+order(::Type{T}, G::SymmetricGroup) where {T} = convert(T, factorial(T(G.n)))
 
-order(::Type{I}, g::Perm) where {I} =
-   convert(I, foldl(lcm, length(c) for c in cycles(g)))
+order(::Type{T}, g::Perm) where {T} =
+   convert(T, foldl(lcm, length(c) for c in cycles(g)))
 
 @doc Markdown.doc"""
     matrix_repr(a::Perm)
