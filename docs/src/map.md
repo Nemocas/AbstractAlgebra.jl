@@ -1,23 +1,11 @@
 # Map interface
 
-Maps in Nemo model maps on sets $f : D \to C$ for some domain $D$ and codomain $C$, which
-have no real limitations except that elements of the codomain and domain be represented
-by element objects in the system.
-
-Maps $f : D \to C$ in AbstractAlgebra are modeled by Julia objects that are able to be
-called on a single element $d \in D$ of the domain to yield an element $f(d) \in C$ of the
-codomain. We say that the map is being applied.
-
-Maps can be constructed from Julia functions, or they can be represented by some other
-kind of data, e.g. a matrix, or built up from other maps.
+Maps in AbstractAlgebra can be constructed from Julia functions, or they can be
+represented by some other kind of data, e.g. a matrix, or built up from other maps.
 
 In the following, we will always use the word "function" to mean a Julia function, and
 reserve the word "map" for a map on sets, whether mathematically, or as an object in the
 system.
-
-Maps in AbstractAlgebra have a domain and codomain, can be applied, composed and composed
-with the identity map (assuming its domain is compatible). Various special kinds of map
-provide more functionality.
 
 ## Parent objects
 
