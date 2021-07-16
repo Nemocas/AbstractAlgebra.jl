@@ -4,6 +4,8 @@
 #
 ###############################################################################
 
+export root, iroot
+
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -175,6 +177,72 @@ function issquare(a::T) where T <: Integer
    end
    s = isqrt(a)
    return a == s*s
+end
+
+###############################################################################
+#
+#   Root
+#
+###############################################################################
+
+function root(a::BigInt, n::Int; check::Bool=false)
+    a < 0 && iseven(n) && throw(DomainError((a, n),
+                      "Argument `a` must be positive if exponent `n` is even"))
+    n <= 0 && throw(DomainError(n, "Exponent must be positive"))
+    z = BigInt()
+    exact = Bool(ccall((:__gmpz_root, :libgmp), Cint,
+                  (Ref{BigInt}, Ref{BigInt}, Cint), z, a, n))
+    check && !exact && error("Not a perfect n-th power (n = $n)")
+    return z
+end
+
+@doc Markdown.doc"""
+    root(a::T, n::Int; check::Bool=false) where T <: Integer
+
+Return the $n$-th root of $a$. If `check=true` the function will test if the
+input was a perfect $n$-th power, otherwise an exception will be raised. We
+require $n > 0$ and also $a \geq 0$ if $n$ is even.
+"""
+function root(a::T, n::Int; check::Bool=false) where T <: Integer
+   if n == 2
+      a < 0 && throw(DomainError((a, n),
+                      "Argument `a` must be positive if exponent `n` is even"))
+      s = isqrt(a)
+      exact = true
+      if check
+         r = a - s*s
+         exact = r == 0
+         !exact && error("Not a perfect n-th power (n = $n)")
+      end
+      return s
+   else
+      return T(root(BigInt(a), n; check=check))
+   end
+end
+
+function iroot(a::BigInt, n::Int)
+    a < 0 && iseven(n) && throw(DomainError((a, n),
+                      "Argument `a` must be positive if exponent `n` is even"))
+    n <= 0 && throw(DomainError(n, "Exponent must be positive"))
+    z = BigInt()
+    ccall((:__gmpz_root, :libgmp), Cint,
+                  (Ref{BigInt}, Ref{BigInt}, Cint), z, a, n)
+    return z
+end
+
+@doc Markdown.doc"""
+    iroot(a::T, n::Int) where T <: Integer
+
+Return the truncated integer part of the $n$-th root of $a$ (round towards
+zero). We require $n > 0$ and also $a \geq 0$ if $n$ is even.
+"""
+function iroot(a::T, n::Int) where T <: Integer
+   if n == 2
+       a < 0 && throw(DomainError((a, n),
+                      "Argument `a` must be positive if exponent `n` is even"))
+       return isqrt(a)
+   end
+   return T(root(BigInt(a), n))
 end
 
 ###############################################################################

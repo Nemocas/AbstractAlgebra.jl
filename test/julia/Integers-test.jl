@@ -171,6 +171,50 @@ end
    end
 end
 
+@testset "Julia.Integers.root" begin
+   @test root(BigInt(1000), 3) == 10
+   @test root(-BigInt(27), 3) == -3
+   @test root(BigInt(27), 3; check=true) == 3
+   @test root(BigInt(16), 2; check=true) == 4
+
+   @test_throws DomainError root(-BigInt(1000), 4)
+   @test_throws DomainError root(BigInt(1000), -3)
+   @test_throws DomainError root(BigInt(-16), 2)
+
+   @test_throws ErrorException root(BigInt(1100), 3; check=true)
+   @test_throws ErrorException root(-BigInt(40), 3; check=true)
+
+   @test iroot(BigInt(1000), 3) == 10
+   @test iroot(BigInt(1100), 3) == 10
+   @test iroot(-BigInt(40), 3) == -3
+   @test iroot(BigInt(17), 2) == 4
+
+   @test_throws DomainError iroot(-BigInt(1000), 4)
+   @test_throws DomainError iroot(BigInt(1000), -3)
+   @test_throws DomainError iroot(-BigInt(16), 2)
+
+   @test root(1000, 3) == 10
+   @test root(-27, 3) == -3
+   @test root(27, 3; check=true) == 3
+   @test root(16, 2; check=true) == 4
+
+   @test_throws DomainError root(-1000, 4)
+   @test_throws DomainError root(1000, -3)
+   @test_throws DomainError root(-16, 2)
+
+   @test_throws ErrorException root(1100, 3; check=true)
+   @test_throws ErrorException root(-40, 3; check=true)
+
+   @test iroot(1000, 3) == 10
+   @test iroot(1100, 3) == 10
+   @test iroot(-40, 3) == -3
+   @test iroot(17, 2) == 4
+
+   @test_throws DomainError iroot(-1000, 4)
+   @test_throws DomainError iroot(1000, -3)
+   @test_throws DomainError iroot(-16, 2)
+end
+
 @testset "Julia.Integers.exp" begin
    @test AbstractAlgebra.exp(0) == 1
    @test_throws DomainError AbstractAlgebra.exp(1)
