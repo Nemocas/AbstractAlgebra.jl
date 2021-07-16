@@ -616,6 +616,12 @@ end
       end
    end
 
+   # regression test (see #931)
+   Zn = ResidueRing(ZZ, 2)
+   R, x = PowerSeriesRing(Zn, 10, "x")
+   f = O(x^2)
+   @test isequal(f^0, 1 + O(x^10))
+
    f = rand(R, 0:12, 0:rand(1:25))
    @test_throws DomainError f^-1
    @test_throws DomainError f^-rand(2:100)
