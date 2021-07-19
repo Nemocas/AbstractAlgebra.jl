@@ -6,7 +6,7 @@ julia&gt; 2x^-3 + x^2
 x^2 + 2*x^-3
 
 julia&gt; rand(R, -3:3, -9:9)
--3*x^2 - 8*x + 4 + 3*x^-1 - 6*x^-2 + 9*x^-3</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/493f57635749f3f992abd883dabbb676b84c3ead/src/LaurentPoly.jl#L15">source</a></section></article><h2 id="Basic-functionality"><a class="docs-heading-anchor" href="#Basic-functionality">Basic functionality</a><a id="Basic-functionality-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-functionality" title="Permalink"></a></h2><p>Laurent polynomials implement the ring interface (except for <code>divexact</code>), and some methods from the polynomial interface, for example:</p><pre><code class="language-julia-repl">julia&gt; R, x = LaurentPolynomialRing(ZZ, &quot;x&quot;)
+-3*x^2 - 8*x + 4 + 3*x^-1 - 6*x^-2 + 9*x^-3</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/07976306f04a1e7824dd0ffd21d0d211902a7388/src/LaurentPoly.jl#L15">source</a></section></article><h2 id="Basic-functionality"><a class="docs-heading-anchor" href="#Basic-functionality">Basic functionality</a><a id="Basic-functionality-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-functionality" title="Permalink"></a></h2><p>Laurent polynomials implement the ring interface (except for <code>divexact</code>), and some methods from the polynomial interface, for example:</p><pre><code class="language-julia-repl">julia&gt; R, x = LaurentPolynomialRing(ZZ, &quot;x&quot;)
 (Univariate Laurent Polynomial Ring in x over Integers, x)
 
 julia&gt; var(R)
