@@ -1039,7 +1039,7 @@ end
 
 Return the square root of the power series $a$.
 """
-function Base.sqrt(a::RelSeriesElem)
+function Base.sqrt(a::RelSeriesElem; check::Bool=false)
    aval = valuation(a)
    !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
@@ -1057,7 +1057,7 @@ function Base.sqrt(a::RelSeriesElem)
    asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
    if prec > 0
-      g = sqrt(polcoeff(a, 0))
+      g = sqrt(polcoeff(a, 0); check=check)
       asqrt = setcoeff!(asqrt, 0, g)
       g2 = g + g
    end

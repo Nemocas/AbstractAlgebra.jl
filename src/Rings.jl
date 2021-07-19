@@ -245,16 +245,34 @@ end
 
 Return the square root of the element `a`.
 """
-function Base.sqrt(a::FieldElem)
+function Base.sqrt(a::FieldElem; check::Bool=false)
   R = parent(a)
   R, t = PolynomialRing(R, "t", cached = false)
   f = factor(t^2 - a)
   for (p, e) in f
-    if degree(p) == 1
+    if !check || degree(p) == 1
       return -divexact(coeff(p, 0), coeff(p, 1))
     end
   end
   throw(error("Element $a does not have a square root"))
+end
+
+# assumes the existence of sqrt without check argument for input
+function Base.sqrt(a::RingElem; check::Bool=false)
+  s = sqrt(a)
+  if check
+    s != a^2 && error("Element $a does not have a square root")
+  end
+  return s
+end  
+
+# assumes the existence of issquare and sqrt for input  
+function issquare_with_sqrt(a::RingElem)
+  if issquare(a)
+     return true, sqrt(a)
+  else
+     return false, parent(a)()
+  end
 end
 
 ###############################################################################

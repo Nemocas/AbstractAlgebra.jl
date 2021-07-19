@@ -406,14 +406,14 @@ function issquare(a::Rat)
 end
 
 @doc Markdown.doc"""
-    Base.sqrt(a::Rat)
+    Base.sqrt(a::Rat; check::Bool=false)
 
 Return the square root of $a$ if it is a square, otherwise raise an
 exception.
 """
-function Base.sqrt(a::Rat)
+function Base.sqrt(a::Rat; check::Bool=false)
    R = parent(a)
-   return R(sqrt(data(a)))
+   return R(sqrt(data(a); check=check))
 end
 
 ###############################################################################

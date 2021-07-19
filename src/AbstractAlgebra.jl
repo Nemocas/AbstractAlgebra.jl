@@ -70,8 +70,8 @@ function log(a::T) where T
    return Base.log(a)
 end
 
-function sqrt(a::T) where T
-  return Base.sqrt(a)
+function sqrt(a::T; check::Bool=false) where T
+  return Base.sqrt(a; check=check)
 end
 
 function divrem(a::T, b::T) where T

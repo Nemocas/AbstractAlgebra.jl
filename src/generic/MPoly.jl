@@ -1656,7 +1656,7 @@ end
 #
 ###############################################################################
 
-function sqrt_classical_char2(a::MPoly{T}) where {T <: RingElement}
+function sqrt_classical_char2(a::MPoly{T}; check::Bool=false) where {T <: RingElement}
    par = parent(a)
    m = length(a)
    if m == 0
@@ -1677,12 +1677,12 @@ function sqrt_classical_char2(a::MPoly{T}) where {T <: RingElement}
       if !d1 || !d2
          return false, par()
       end
-      Qc[i] = sqrt(a.coeffs[i])
+      Qc[i] = sqrt(a.coeffs[i]; check=check)
    end
    return true, par(Qc, Qe) # return result
 end
 
-function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingElement}
+function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -1735,7 +1735,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
    if !d1 || !d2
       return false, par()
    end
-   Qc[1] = sqrt(a.coeffs[1])
+   Qc[1] = sqrt(a.coeffs[1]; check=check)
    mb = -2*Qc[1]
    # if exact sqrt is not checked, compute last exponent that needs dealing with
    if !check
@@ -1876,9 +1876,9 @@ function sqrt_heap(a::MPoly{T}, bits::Int, check::Bool=true) where {T <: RingEle
    return true, parent(a)(Qc, Qe) # return result
 end
 
-function sqrt_heap(a::MPoly{T}, check::Bool=true) where {T <: RingElement}
+function sqrt_heap(a::MPoly{T}; check::Bool=false) where {T <: RingElement}
    if characteristic(base_ring(a)) == 2
-      return sqrt_classical_char2(a)
+      return sqrt_classical_char2(a; check=check)
    end
    v, d = max_fields(a)
    exp_bits = 8
@@ -1900,24 +1900,24 @@ function sqrt_heap(a::MPoly{T}, check::Bool=true) where {T <: RingElement}
       par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
       a1 = par(a.coeffs, e1)
       a1.length = a.length
-      flag, q = sqrt_heap(a1, exp_bits, check)
+      flag, q = sqrt_heap(a1, exp_bits; check=check)
       eq = zeros(UInt, N, length(q))
       unpack_monomials(eq, q.exps, k, exp_bits, length(q))
    else
-      flag, q = sqrt_heap(a, exp_bits, check)
+      flag, q = sqrt_heap(a, exp_bits; check=check)
       eq = q.exps
    end
    return flag, parent(a)(q.coeffs, eq)
 end
 
-function Base.sqrt(a::MPoly{T}, check::Bool=true) where {T <: RingElement}
-   flag, q = sqrt_heap(a, check)
+function Base.sqrt(a::MPoly{T}; check::Bool=false) where {T <: RingElement}
+   flag, q = sqrt_heap(a; check=check)
    !flag && error("Not a square in square root")
    return q
 end
 
 function issquare(a::MPoly{T}) where {T <: RingElement}
-   flag, q = sqrt_heap(a)
+   flag, q = sqrt_heap(a; check=true)
    return flag
 end
 

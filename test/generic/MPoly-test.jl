@@ -624,13 +624,13 @@ end
 
             @test q^2 == f^2
 
-            q = sqrt(f^2, false)
+            q = sqrt(f^2; check=false)
 
             @test q^2 == f^2
 
             if f != 0
                x = varlist[rand(1:num_vars)]
-               @test_throws ErrorException sqrt(f^2*(x^2 - x))
+               @test_throws ErrorException sqrt(f^2*(x^2 - x); check=true)
             end
          end
       end
@@ -662,7 +662,7 @@ end
 
             if f != 0
                x = varlist[rand(1:num_vars)]
-               @test_throws ErrorException sqrt(f^2*(x^2 - x))
+               @test_throws ErrorException sqrt(f^2*(x^2 - x); check=true)
             end
          end
       end

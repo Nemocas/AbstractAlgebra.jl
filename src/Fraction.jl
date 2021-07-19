@@ -634,13 +634,13 @@ function issquare(a::FracElem{T}) where T <: RingElem
 end
 
 @doc Markdown.doc"""
-    Base.sqrt(a::FracElem{T}) where T <: RingElem
+    Base.sqrt(a::FracElem{T}; check::Bool=false) where T <: RingElem
 
 Return the square root of $a$ if it is a square, otherwise raise an
 exception.
 """
-function Base.sqrt(a::FracElem{T}) where T <: RingElem
-   return parent(a)(sqrt(numerator(a)), sqrt(denominator(a)))
+function Base.sqrt(a::FracElem{T}; check::Bool=false) where T <: RingElem
+   return parent(a)(sqrt(numerator(a), check=check), sqrt(denominator(a); check=check))
 end
 
 ###############################################################################

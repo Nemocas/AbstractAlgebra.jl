@@ -364,12 +364,12 @@ function issquare(a::ResFieldElem{T}) where T <: Integer
 end
 
 @doc Markdown.doc"""
-    sqrt(a::ResFieldElem{T}) where T <: Integer
+    sqrt(a::ResFieldElem{T}; check::Bool=false) where T <: Integer
 
 Return the square root of $a$ if it is a square, otherwise an exception is
 raised.
 """
-function Base.sqrt(a::ResFieldElem{T}) where T <: Integer
+function Base.sqrt(a::ResFieldElem{T}; check::Bool=false) where T <: Integer
    U = parent(a)
    p = modulus(a)
    if p == 2 # special case, cannot find a quadratic nonresidue mod 2
@@ -409,7 +409,7 @@ function Base.sqrt(a::ResFieldElem{T}) where T <: Integer
          u = u^2
          i += 1
       end
-      i == M && error("Not a square in sqrt")
+      check && i == M && error("Not a square in sqrt")
       b = c
       for j = 1:M - i - 1
          b = b^2

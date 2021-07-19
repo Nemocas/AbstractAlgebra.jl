@@ -1719,7 +1719,7 @@ end
 #
 ################################################################################
 
-function sqrt_classical_char2(f::PolyElem{T}) where T <: RingElement
+function sqrt_classical_char2(f::PolyElem{T}; check::Bool=false) where T <: RingElement
    S = parent(f)
    R = base_ring(f)
    if iszero(f)
@@ -1741,18 +1741,18 @@ function sqrt_classical_char2(f::PolyElem{T}) where T <: RingElement
       if !issquare(c)
          return false, S()
       end
-      d[i] = sqrt(c)
+      d[i] = sqrt(c; check=check)
    end
    q = S(d)
    q = set_length!(q, lenq)
    return true, q
 end
 
-function sqrt_classical(f::PolyElem{T}, check::Bool=true) where T <: RingElement
+function sqrt_classical(f::PolyElem{T}; check::Bool=false) where T <: RingElement
    S = parent(f)
    R = base_ring(f)
    if characteristic(R) == 2
-      return sqrt_classical_char2(f)
+      return sqrt_classical_char2(f; check=check)
    end
    if iszero(f)
       return true, S()
@@ -1766,7 +1766,7 @@ function sqrt_classical(f::PolyElem{T}, check::Bool=true) where T <: RingElement
    end
    lenq = div(m + 1, 2)
    d = Array{T}(undef, lenq)
-   d[lenq] = sqrt(coeff(f, m - 1))
+   d[lenq] = sqrt(coeff(f, m - 1); check=check)
    b = -2*d[lenq]
    k = 1
    c = R()
@@ -1799,15 +1799,15 @@ function sqrt_classical(f::PolyElem{T}, check::Bool=true) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    Base.sqrt(f::PolyElem{T}, check::Bool=true) where T <: RingElement
+    Base.sqrt(f::PolyElem{T}; check::Bool=false) where T <: RingElement
 
 Return the square root of $f$ if it is a perfect square, otherwise an
-exception is raised. If `check` is set to `false` the function assumes
-the input is square and may not fully check this.
+exception is raised. If `check` is set to `true` the function checks that
+the input is a square and raises an exception if not..
 """
-function Base.sqrt(f::PolyElem{T}, check::Bool=true) where T <: RingElement
-   flag, q = sqrt_classical(f, check)
-   !flag && error("Not a square in sqrt")
+function Base.sqrt(f::PolyElem{T}; check::Bool=false) where T <: RingElement
+   flag, q = sqrt_classical(f; check=check)
+   check && !flag && error("Not a square in sqrt")
    return q
 end
 
@@ -1817,7 +1817,7 @@ end
 Return `true` if $f$ is a perfect square.
 """
 function issquare(f::PolyElem{T}) where T <: RingElement
-   flag, q = sqrt_classical(f)
+   flag, q = sqrt_classical(f; check=true)
    return flag
 end
 

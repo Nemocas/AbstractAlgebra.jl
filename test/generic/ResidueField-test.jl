@@ -288,7 +288,7 @@ end
              end
 
              @test !issquare(z*a)
-             @test_throws ErrorException sqrt(z*a)
+             @test_throws ErrorException sqrt(z*a; check=true)
          end
       end
    end
@@ -308,7 +308,7 @@ end
              end
 
              @test !issquare(z*a)
-             @test_throws ErrorException sqrt(z*a)
+             @test_throws ErrorException sqrt(z*a; check=true)
          end
       end
    end
