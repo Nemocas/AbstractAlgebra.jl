@@ -785,6 +785,8 @@ function compose(a::AbsSeriesElem, b::AbsSeriesElem)
       i -= 1
       z = z*b + coeff(a, i - 1)
    end
+   z = set_precision!(z, min(precision(z), valuation(b)*precision(a)))
+   z = set_length!(z, min(pol_length(z), precision(z)))
    return z
 end
 

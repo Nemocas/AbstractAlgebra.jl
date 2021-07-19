@@ -787,6 +787,83 @@ end
     end
 end
 
+@testset "Generic.RelSeries.compose" begin
+    # Exact ring
+    R, x = PowerSeriesRing(ZZ, 10, "x")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+     
+        g = rand(R, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(x, g) == g
+        @test compose(x^2, g) == g^2
+        @test compose(R(), g) == R()
+    end
+
+    S, y = PowerSeriesRing(ZZ, 10, "y")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(S, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(R(), g) == S()
+    end
+
+    # Inexact field
+    R, x = PowerSeriesRing(RealField, 10, "x")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(R, 1:10, -10:10)
+
+        @test isapprox(compose(f1 + f2, g), compose(f1, g) + compose(f2, g))
+        @test isapprox(compose(x, g), g)
+        @test isapprox(compose(x^2, g), g^2)
+        @test isapprox(compose(R(), g), R())
+    end
+
+    S, y = PowerSeriesRing(RealField, 10, "y")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(S, 1:10, -10:10)
+        @test isapprox(compose(f1 + f2, g), compose(f1, g) + compose(f2, g))
+        @test isapprox(compose(R(), g), S())
+    end
+
+    # Non-integral domain
+    T = ResidueRing(ZZ, 6)
+    R, x = PowerSeriesRing(T, 10, "x")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(R, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(x, g) == g
+        @test compose(x^2, g) == g^2
+        @test compose(R(), g) == R()
+    end
+
+    S, y = PowerSeriesRing(T, 10, "y")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(S, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(R(), g) == S()
+    end
+end
+
 @testset "Generic.RelSeries.square_root" begin
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x")

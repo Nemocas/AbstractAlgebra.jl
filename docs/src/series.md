@@ -521,7 +521,7 @@ julia> d = inv(b)
 ### Composition
 
 ```@docs
-compose(a::AbsSeriesElem, b::AbsSeriesElem)
+compose(a::RelSeriesElem, b::RelSeriesElem)
 ```
 
 Note that `subst` can be used instead of `compose`, however the provided
