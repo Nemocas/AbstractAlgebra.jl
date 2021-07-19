@@ -977,6 +977,51 @@ end
 
 ###############################################################################
 #
+#   Composition
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    compose(a::RelSeriesElem, b::RelSeriesElem)
+
+Compose the series $a$ with the series $b$ and return the result,
+i.e. return $a\circ b$. The two series do not need to be in the same ring,
+however the series $b$ must have positive valuation or an exception is raised.
+"""
+function compose(a::RelSeriesElem, b::RelSeriesElem)
+   valuation(b) == 0 && error("Series being substituted must have positive valuation")
+   i = pol_length(a)
+   R = base_ring(a)
+   S = parent(b)
+   if i == 0
+      return zero(R) + zero(S)
+   end
+   z = polcoeff(a, i - 1) * one(S)
+   while i > 1
+      i -= 1
+      c = S(polcoeff(a, i - 1))
+      z = z*b
+      if !iszero(c)
+         c = set_precision!(c, precision(z))
+         z += c
+      end
+   end
+   z *= b^valuation(a)
+   zprec = min(precision(z), valuation(b)*precision(a))
+   z = set_precision!(z, zprec)
+   z = set_valuation!(z, min(valuation(z), zprec))
+   zlen = max(0, precision(z) - valuation(z))
+   z = set_length!(z, min(zlen, pol_length(z)))
+   return z
+end
+
+# General substitution is not well-defined
+function subst(a::SeriesElem, b::SeriesElem)
+   return compose(a, b)
+end
+
+###############################################################################
+#
 #   Square root
 #
 ###############################################################################
