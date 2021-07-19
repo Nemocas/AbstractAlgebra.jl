@@ -145,6 +145,7 @@ AbstractAlgebra.sqrt(a::BigInt)
 
 ```@docs
 issquare(a::BigInt)
+issquare_with_sqrt(a::BigInt)
 ```
 
 ```@docs
