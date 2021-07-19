@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export iroot, ispower, ispower_with_root, root, issquare_with_sqrt
+export iroot, ispower, ispower_with_root, root, issquare_with_sqrt,
+       isdivisible_by
 
 ###############################################################################
 #
@@ -107,6 +108,28 @@ function divides(a::T, b::T) where T <: Integer
    q, r = divrem(a, b)
    return r == 0, q
 end
+
+@doc Markdown.doc"""
+    isdivisible_by(a::T, b::T) where T <: Integer
+
+Return `true` if $a$ is divisible by $b$, i.e. if there exists $c$ such that
+$a = bc$.
+"""
+function isdivisible_by(a::T, b::T) where T <: Integer
+   if b == 0
+      return a == 0
+   end
+   r = rem(a, b)
+   return r == 0
+end
+
+function isdivisible_by(a::BigInt, b::BigInt)
+   if b == 0
+      return a == 0
+   end
+   return Bool(ccall((:__gmpz_divisible_p, :libgmp), Cint,
+                                             (Ref{BigInt}, Ref{BigInt}), a, b))
+end   
 
 ###############################################################################
 #

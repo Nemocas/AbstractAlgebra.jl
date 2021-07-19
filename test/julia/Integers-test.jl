@@ -72,6 +72,8 @@ end
          @test flagR
          @test qR == a2
       end
+      
+      @test isdivisible_by(a1*a2, a1)
 
       if b1 != 0
          flagS, qS = divides(b1*b2, b1)
@@ -79,6 +81,8 @@ end
          @test flagS
          @test qS == b2
       end
+      
+      @test isdivisible_by(b1*b2, b1)
    end
 end
 

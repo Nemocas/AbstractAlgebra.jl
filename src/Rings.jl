@@ -111,6 +111,14 @@ function divides(x::T, y::T) where {T <: RingElem}
    return iszero(r), q
 end
 
+function isdivisible_by(x::T, y::T) where T <: RingElem
+   if iszero(y)
+      return iszero(x)
+   end
+   r = rem(x, y)
+   return iszero(r)
+end
+
 function ==(x::RingElem, y::RingElem)
   fl, u, v = try_promote(x, y)
   if fl
