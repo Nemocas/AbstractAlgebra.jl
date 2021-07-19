@@ -141,6 +141,9 @@ end
    @test issquare_with_sqrt(-S(1)) == (false, 0)
    @test issquare_with_sqrt(R(3)) == (false, 0)
    @test issquare_with_sqrt(S(3)) == (false, 0)
+
+   @test_throws ErrorException AbstractAlgebra.sqrt(2; check=true)
+   @test_throws ErrorException AbstractAlgebra.sqrt(S(2); check=true)
 end
 
 @testset "Julia.Integers.root" begin
