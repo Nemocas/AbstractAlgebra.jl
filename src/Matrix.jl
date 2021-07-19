@@ -798,6 +798,57 @@ function -(x::MatrixElem{T}, y::T) where {T <: RingElem}
    return z
 end
 
+################################################################################
+#
+#  Promotion
+#
+################################################################################
+
+function Base.promote(x::MatrixElem{S},
+                      y::MatrixElem{T}) where {S <: RingElement,
+                                               T <: RingElement}
+   U = promote_rule_sym(S, T)
+   if U === S
+      return x, change_base_ring(base_ring(x), y)
+   elseif U === T
+      return change_base_ring(base_ring(y), x), y
+   else
+      error("Cannot promote to common type")
+   end
+end
+
+*(x::MatrixElem, y::MatrixElem) = *(promote(x, y)...)
+
++(x::MatrixElem, y::MatrixElem) = +(promote(x, y)...)
+
+==(x::MatrixElem, y::MatrixElem) = ==(promote(x, y)...)
+
+function Base.promote(x::MatrixElem{S}, y::T) where {S <: RingElement, T <: RingElement}
+   U = promote_rule_sym(S, T)
+   if U === S
+      return x, base_ring(x)(y)
+   else
+      error("Cannot promote to common type")
+   end
+end
+
+function Base.promote(x::S, y::MatrixElem{T}) where {S <: RingElement, T <: RingElement}
+   u, v = Base.promote(y, x)
+   return v, u
+end
+
+*(x::MatrixElem, y::RingElem) = *(promote(x, y)...)
+
+*(x::RingElem, y::MatrixElem) = *(promote(x, y)...)
+
++(x::MatrixElem, y::RingElem) = +(promote(x, y)...)
+
++(x::RingElem, y::MatrixElem) = +(promote(x, y)...)
+
+==(x::MatrixElem, y::RingElem) = ==(promote(x, y)...)
+
+==(x::RingElem, y::MatrixElem) = ==(promote(x, y)...)
+
 ###############################################################################
 #
 #   Powering

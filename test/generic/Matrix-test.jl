@@ -1078,6 +1078,37 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    end
 end
 
+@testset "Generic.Mat.promotion" begin
+   m = [1 2; 3 4]
+   F = ResidueField(ZZ, 3)
+   R, t = PolynomialRing(F, "t")
+   A = matrix(R, m)
+   B = matrix(F, m)
+
+   @test typeof(A * B) == typeof(A)
+   @test typeof(B * A) == typeof(A)
+   @test A * B == A^2
+   @test B * A == A^2
+   
+   @test typeof(A + B) == typeof(A)
+   @test typeof(B + A) == typeof(A)
+   @test A + B == A + A
+   @test B + A == A + A
+
+   @test typeof(F(2) * A) == typeof(A)
+   @test typeof(A * F(2)) == typeof(A)
+   @test F(2) * A == R(2) * A
+   @test A * F(2) == A * R(2)
+
+   @test typeof(F(2) + A) == typeof(A)
+   @test typeof(A + F(2)) == typeof(A)
+   @test F(2) + A == R(2) + A
+   @test A + F(2) == A + R(2)
+
+   @test one(F) == R[1 0; 0 1]
+   @test R[1 0; 0 1] == one(R)
+end
+
 @testset "Generic.Mat.permutation" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)

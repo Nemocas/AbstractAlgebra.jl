@@ -37,57 +37,49 @@ function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
    end
 end
 
+@inline function try_promote(x::S, y::T) where {S <: RingElem, T <: RingElem}
+   U = promote_rule_sym(S, T)
+   if S === U
+      return true, x, parent(x)(y)
+   elseif T === U
+      return true, parent(y)(x), y
+   else
+      return false, x, y
+   end
+end
+
+function Base.promote(x::S, y::T) where {S <: RingElem, T <: RingElem}
+  fl, u, v = try_promote(x, y)
+  if fl
+    return u, v
+  else
+    error("Cannot promote to common type")
+  end
+end
+
 ###############################################################################
 #
 #   Generic catchall functions
 #
 ###############################################################################
 
-function +(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      +(x, parent(x)(y))
-   elseif T === U
-      +(parent(y)(x), y)
-   else
-      error("Cannot promote to common type")
-   end
-end
++(x::RingElem, y::RingElem) = +(promote(x, y)...)
 
 +(x::RingElem, y::RingElement) = x + parent(x)(y)
 
 +(x::RingElement, y::RingElem) = parent(y)(x) + y
 
-function -(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      -(x, parent(x)(y))
-   elseif T === U
-      -(parent(y)(x), y)
-   else
-      error("Cannot promote to common type")
-   end
-end
+-(x::RingElem, y::RingElem) = -(promote(x, y)...)
 
 -(x::RingElem, y::RingElement) = x - parent(x)(y)
 
 -(x::RingElement, y::RingElem) = parent(y)(x) - y
 
-function *(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      *(x, parent(x)(y))
-   elseif T === U
-      *(parent(y)(x), y)
-   else
-      error("Cannot promote to common type")
-   end
-end
+*(x::RingElem, y::RingElem) = *(promote(x, y)...)
 
 *(x::RingElem, y::RingElement) = x*parent(x)(y)
 
 *(x::RingElement, y::RingElem) = parent(y)(x)*y
-
 
 """
     divexact(x, y)
@@ -99,16 +91,7 @@ If no exact division is possible, an exception is raised.
 """
 function divexact end
 
-function divexact(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      divexact(x, parent(x)(y))
-   elseif T === U
-      divexact(parent(y)(x), y)
-   else
-      error("Cannot promote to common type")
-   end
-end
+divexact(x::RingElem, y::RingElem) = divexact(promote(x, y)...)
 
 divexact(x::RingElem, y::RingElement) = divexact(x, parent(x)(y))
 
@@ -128,15 +111,13 @@ function divides(x::T, y::T) where {T <: RingElem}
    return iszero(r), q
 end
 
-function ==(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      ==(x, parent(x)(y))
-   elseif T === U
-      ==(parent(y)(x), y)
-   else
-      false
-   end
+function ==(x::RingElem, y::RingElem)
+  fl, u, v = try_promote(x, y)
+  if fl
+    return u == v
+  else
+    return false
+  end
 end
 
 ==(x::RingElem, y::RingElement) = x == parent(x)(y)
