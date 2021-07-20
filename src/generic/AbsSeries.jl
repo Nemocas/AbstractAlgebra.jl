@@ -214,26 +214,10 @@ function mul!(c::AbsSeries{T}, a::AbsSeries{T}, b::AbsSeries{T}) where T <: Ring
          fit!(c, lenc)
          d = c.coeffs
       end
-      t = base_ring(a)()
 
-      for i = 1:min(lena, lenc)
-         d[i] = mul!(d[i], coeff(a, i - 1), coeff(b, 0))
-      end
-
-      if lenc > lena
-         for i = 2:min(lenb, lenc - lena + 1)
-            d[lena + i - 1] = mul!(d[lena + i - 1], coeff(a, lena - 1), coeff(b, i - 1))
-         end
-      end
-
-      for i = 1:lena - 1
-         if lenc > i
-            for j = 2:min(lenb, lenc - i + 1)
-               t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
-               d[i + j - 1] = addeq!(d[i + j - 1], t)
-            end
-         end
-      end
+      cutoff = mullow_fast_cutoff(a, b)
+      AbstractAlgebra.DensePoly.mullow_fast!(d, lenc,
+                          a.coeffs, lena, b.coeffs, lenb, base_ring(a), cutoff)
 
       c.coeffs = d
       c.length = normalise(c, lenc)
