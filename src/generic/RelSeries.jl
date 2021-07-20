@@ -68,6 +68,59 @@ end
 #
 ###############################################################################
 
+function mullow_fast_cutoff(a::RelSeries{BigInt}, b::RelSeries{BigInt})
+   bits = 0
+   for i = 1:pol_length(a)
+      bits += ndigits(a.coeffs[i], base=2)
+   end
+   for i = 1:pol_length(b)
+      bits += ndigits(b.coeffs[i], base=2)
+   end
+   bits = div(bits, pol_length(a) + pol_length(b))
+   len = 2
+   while len*bits <= 30000
+      len *= 2
+   end
+   return len
+end
+
+function mullow_fast_cutoff(a::RelSeries{Rational{BigInt}}, b::RelSeries{Rational{BigInt}})
+   bits = 0
+   for i = 1:pol_length(a)
+      bits += ndigits(numerator(a.coeffs[i]), base=2)
+      bits += ndigits(denominator(a.coeffs[i]), base=2)
+   end
+   for i = 1:pol_length(b)
+      bits += ndigits(numerator(b.coeffs[i]), base=2)
+      bits += ndigits(denominator(b.coeffs[i]), base=2)
+   end
+   bits = div(bits, 2*(pol_length(a) + pol_length(b)))
+   len = 2
+   while len^1.7*bits <= 48500
+      len *= 2
+   end
+   return len
+end
+
+
+function mullow_fast_cutoff(a::RelSeries{GFElem{Int}}, b::RelSeries{GFElem{Int}})
+   return 75
+end
+
+function mullow_fast_cutoff(a::RelSeries{GFElem{BigInt}}, b::RelSeries{GFElem{BigInt}})
+   bits = ndigits(characteristic(parent(a)), base=2)
+   len = 2
+   while len^2*bits <= 2000
+      len *= 2
+   end
+   return len
+end
+
+# generic fallback
+function mullow_fast_cutoff(a::T, b::T) where {S <: RingElement, T <: RelSeries{S}}
+   return 5
+end
+
 function *(a::RelSeries{T}, b::RelSeries{T}) where T <: RingElement
    check_parent(a, b)
    lena = pol_length(a)
