@@ -66,23 +66,23 @@ end
 #
 ###############################################################################
 
-divexact(a::T, b::T) where T <: AbstractFloat = a/b
+divexact(a::T, b::T; check::Bool=false) where T <: AbstractFloat = a/b
 
-divexact(a::AbstractFloat, b::Union{Signed, Unsigned}) = a/b
+divexact(a::AbstractFloat, b::Union{Signed, Unsigned}; check::Bool=false) = a/b
 
-divexact(a::BigFloat, b::BigInt) = a/b
+divexact(a::BigFloat, b::BigInt; check::Bool=false) = a/b
 
-divexact(a::Union{Signed, Unsigned}, b::AbstractFloat) = a/b
+divexact(a::Union{Signed, Unsigned}, b::AbstractFloat; check::Bool=false) = a/b
 
-divexact(a::BigInt, b::BigFloat) = a/b
+divexact(a::BigInt, b::BigFloat; check::Bool=false) = a/b
 
-divexact(a::AbstractFloat, b::Rational{T}) where T <: Union{Signed, Unsigned} = a/b
+divexact(a::AbstractFloat, b::Rational{T}; check::Bool=false) where T <: Union{Signed, Unsigned} = a/b
 
-divexact(a::BigFloat, b::Rational{BigInt}) = a/b
+divexact(a::BigFloat, b::Rational{BigInt}; check::Bool=false) = a/b
 
-divexact(a::Rational{T}, b::AbstractFloat) where T <: Union{Signed, Unsigned} = a/b
+divexact(a::Rational{T}, b::AbstractFloat; check::Bool=false) where T <: Union{Signed, Unsigned} = a/b
 
-divexact(a::Rational{BigInt}, b::BigFloat) = a/b
+divexact(a::Rational{BigInt}, b::BigFloat; check::Bool=false) = a/b
 
 function divides(a::BigFloat, b::BigFloat)
    if b == 0

@@ -264,11 +264,11 @@ end
 @doc Markdown.doc"""
      divexact(a::LocElem{T}, b::LocElem{T}, checked::Bool = true)  where {T <: RingElem}
 Returns element 'c' of given localization s.th. `c`*$b$ = $a$ if such element exists.
-If 'checked = false' the corresponding element of the Fraction Field is returned and it is not
-checked whether it is an element of the given localization.
+If 'checked = true' the result is check to ensure it is an element of the given
+localization.
 """
-function divexact(a::LocElem, b::LocElem, checked::Bool = true)
-   d = divides(a, b, checked)
+function divexact(a::LocElem, b::LocElem,; check::Bool=false)
+   d = divides(a, b, check)
    d[1] ? d[2] : error("$a not divisible by $b in the given Localization")
 end
 

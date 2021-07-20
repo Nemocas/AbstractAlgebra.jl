@@ -1973,13 +1973,13 @@ end
 
 *(n::T, a::MPoly{T}) where {T <: RingElem} = a*n
 
-function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
+function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
    N = size(a.exps, 1)
    r = zero(a)
    fit!(r, length(a))
    j = 1
    for i = 1:length(a)
-     c = divexact(a.coeffs[i], n)
+     c = divexact(a.coeffs[i], n; check=check)
       if c != 0
          r.coeffs[j] = c
          monomial_set!(r.exps, j, a.exps, i, N)
@@ -1991,13 +1991,13 @@ function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    return r
 end
 
-function divexact(a::MPoly{T}, n::T) where {T <: RingElem}
+function divexact(a::MPoly{T}, n::T; check::Bool=false) where {T <: RingElem}
    N = size(a.exps, 1)
    r = zero(a)
    fit!(r, length(a))
    j = 1
    for i = 1:length(a)
-      c = divexact(a.coeffs[i], n)
+      c = divexact(a.coeffs[i], n; check=check)
       if c != 0
          r.coeffs[j] = c
          monomial_set!(r.exps, j, a.exps, i, N)
@@ -2596,9 +2596,9 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return flag, parent(a)(q.coeffs, eq)
 end
 
-function divexact(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+function divexact(a::MPoly{T}, b::MPoly{T}; check::Bool=false) where {T <: RingElement}
    d, q = divides(a, b)
-   d == false && error("Not an exact division in divexact")
+   check && d == false && error("Not an exact division in divexact")
    return q
 end
 

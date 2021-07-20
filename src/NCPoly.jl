@@ -366,11 +366,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}) where T <: NCRingElem
+    divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=false) where T <: NCRingElem
 
 Assuming $f = qg$, return $q$.
 """
-function divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}) where T <: NCRingElem
+function divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=false) where T <: NCRingElem
    check_parent(f, g)
    iszero(g) && throw(DivideError())
    if iszero(f)
@@ -385,7 +385,7 @@ function divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}) where T <: NCRingEle
    leng = length(g)
    while length(f) >= leng
       lenf = length(f)
-      q1 = d[lenf - leng + 1] = divexact_right(coeff(f, lenf - 1), coeff(g, leng - 1))
+      q1 = d[lenf - leng + 1] = divexact_right(coeff(f, lenf - 1), coeff(g, leng - 1); check=check)
       f = f - shift_left(q1*g, lenf - leng)
       if length(f) == lenf # inexact case
          f = set_length!(f, normalise(f, lenf - 1))
@@ -397,11 +397,11 @@ function divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}) where T <: NCRingEle
 end
 
 @doc Markdown.doc"""
-    divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}) where T <: NCRingElem
+    divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=false) where T <: NCRingElem
 
 Assuming $f = gq$, return $q$.
 """
-function divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}) where T <: NCRingElem
+function divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=false) where T <: NCRingElem
    check_parent(f, g)
    iszero(g) && throw(DivideError())
    if iszero(f)
@@ -416,7 +416,7 @@ function divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}) where T <: NCRingElem
    leng = length(g)
    while length(f) >= leng
       lenf = length(f)
-      q1 = d[lenf - leng + 1] = divexact_left(coeff(f, lenf - 1), coeff(g, leng - 1))
+      q1 = d[lenf - leng + 1] = divexact_left(coeff(f, lenf - 1), coeff(g, leng - 1); check=check)
       f = f - shift_left(g*q1, lenf - leng)
       if length(f) == lenf # inexact case
          f = set_length!(f, normalise(f, lenf - 1))
@@ -434,59 +434,61 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact_right(a::NCPolyElem{T}, b::T) where T <: NCRingElem
+    divexact_right(a::NCPolyElem{T}, b::T; check::Bool=false) where T <: NCRingElem
 
 Assuming $a = qb$, return $q$.
 """
-function divexact_right(a::NCPolyElem{T}, b::T) where T <: NCRingElem
+function divexact_right(a::NCPolyElem{T}, b::T; check::Bool=false) where T <: NCRingElem
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact_right(coeff(a, i - 1), b))
+      z = setcoeff!(z, i - 1, divexact_right(coeff(a, i - 1), b; check=check))
    end
    z = set_length!(z, length(a))
    return z
 end
 
 @doc Markdown.doc"""
-    divexact_left(a::NCPolyElem{T}, b::T) where T <: NCRingElem
+    divexact_left(a::NCPolyElem{T}, b::T; check::Bool=false) where T <: NCRingElem
 
 Assuming $a = bq$, return $q$.
 """
-function divexact_left(a::NCPolyElem{T}, b::T) where T <: NCRingElem
+function divexact_left(a::NCPolyElem{T}, b::T; check::Bool=false) where T <: NCRingElem
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact_left(coeff(a, i - 1), b))
+      z = setcoeff!(z, i - 1, divexact_left(coeff(a, i - 1), b; check=check))
    end
    z = set_length!(z, length(a))
    return z
 end
 
 @doc Markdown.doc"""
-    divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
+    divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
 
 Assuming $a = qb$, return $q$.
 """
-function divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
+function divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact_right(coeff(a, i - 1), b))
+      z = setcoeff!(z, i - 1, divexact_right(coeff(a, i - 1), b; check=check))
    end
    z = set_length!(z, length(a))
    return z
 end
 
 @doc Markdown.doc"""
-    divexact_left(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
+    divexact_left(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
 
 Assuming $a = bq$, return $q$.
 """
-divexact_left(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}) = divexact_right(a, b)
+function divexact_left(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+   return divexact_right(a, b; check=check)
+end
 
 ###############################################################################
 #

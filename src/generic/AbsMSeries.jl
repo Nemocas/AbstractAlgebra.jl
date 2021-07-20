@@ -457,12 +457,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
+    divexact(x::AbsMSeries{T}, y::AbsMSeries{T}; check::Bool=false) where T <: RingElement
 
 Return the exact quotient of the series $x$ by the series $y$. This function
 currently assumes $y$ is an invertible series.
 """
-function divexact(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
+function divexact(x::AbsMSeries{T}, y::AbsMSeries{T}; check::Bool=false) where T <: RingElement
     check_parent(x, y)
     return x*inv(y)
 end

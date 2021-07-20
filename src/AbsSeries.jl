@@ -638,18 +638,17 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 #
 ###############################################################################
 
-function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingElement
+function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}; check::Bool=false) where T <: RingElement
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
    if v2 != 0
       v1 = valuation(x)
-      if v1 >= v2
-         x = shift_right(x, v2)
-         y = shift_right(y, v2)
-      else
+      if check && v1 < v2
          error("Not an exact division")
       end
+      x = shift_right(x, v2)
+      y = shift_right(y, v2)
    else
       x = deepcopy(x)
    end
@@ -657,11 +656,15 @@ function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingEleme
    res = parent(x)()
    res = set_precision!(res, min(precision(x), precision(y) + valuation(x)))
    lc = coeff(y, 0)
-   iszero(lc) && error("Not an exact division")
+   check && iszero(lc) && error("Not an exact division")
    lenr = precision(x)
    for i = valuation(x):lenr - 1
-      flag, q = divides(coeff(x, i), lc)
-      !flag && error("Not an exact division")
+      if check
+         flag, q = divides(coeff(x, i), lc)
+         !flag && error("Not an exact division")
+      else
+         q = divexact(coeff(x, i), lc; check=check)
+      end
       res = setcoeff!(res, i, q)
       for j = 0:min(precision(y) - 1, lenr - i - 1)
          x = setcoeff!(x, i + j, coeff(x, i + j) - coeff(y, j)*q)
@@ -677,26 +680,26 @@ end
 #
 ###############################################################################
 
-function divexact(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
    z = set_precision!(z, precision(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y; check=check))
    end
    return z
 end
 
-function divexact(x::AbsSeriesElem{T}, y::T) where {T <: RingElem}
+function divexact(x::AbsSeriesElem{T}, y::T; check::Bool=false) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
    z = set_precision!(z, precision(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y; check=check))
    end
    return z
 end

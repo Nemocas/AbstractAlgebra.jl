@@ -1028,7 +1028,7 @@ end
 
 # assuming b divides a (behaviour is undefined otherwise), computes the last n
 # terms of the quotient, i.e. computes divexact(a, b) mod x^n
-function divexact_low(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingElement
+function divexact_low(a::PolyElem{T}, b::PolyElem{T}, n::Int; check::Bool=false) where T <: RingElement
     r = parent(a)()
     if iszero(b)
        return r
@@ -1047,8 +1047,12 @@ function divexact_low(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingEle
     a = truncate(a, n)
     b = truncate(b, n)
     for i = 0:n - 1
-        flag, q = divides(coeff(a, 0), coeff(b, 0))
-        !flag && error("Not an exact division")
+        if check
+           flag, q = divides(coeff(a, 0), coeff(b, 0))
+           !flag && error("Not an exact division")
+        else
+           q = divexact(coeff(a, 0), coeff(b, 0))
+        end
         r = setcoeff!(r, i, q)
         a = shift_right(a - q*b, 1)
         b = truncate(b, n - i - 1)
@@ -1359,7 +1363,7 @@ end
 #
 ###############################################################################
 
-function divexact(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+function divexact(f::PolyElem{T}, g::PolyElem{T}; check::Bool=false) where T <: RingElement
    check_parent(f, g)
    iszero(g) && throw(DivideError())
    if iszero(f)
@@ -1374,13 +1378,13 @@ function divexact(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
    leng = length(g)
    while length(f) >= leng
       lenf = length(f)
-      q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1))
+      q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1); check=check)
       f = f - shift_left(q1*g, lenf - leng)
       if length(f) == lenf # inexact case
          f = set_length!(f, normalise(f, lenf - 1))
       end
    end
-   length(f) != 0 && throw(ArgumentError("not an exact division"))
+   check && length(f) != 0 && throw(ArgumentError("not an exact division"))
    q = parent(f)(d)
    q = set_length!(q, lenq)
    return q
@@ -1392,23 +1396,23 @@ end
 #
 ###############################################################################
 
-function divexact(a::PolyElem{T}, b::T) where {T <: RingElem}
+function divexact(a::PolyElem{T}, b::T; check::Bool=false) where {T <: RingElem}
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
+      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b; check=check))
    end
    z = set_length!(z, length(a))
    return z
 end
 
-function divexact(a::PolyElem, b::Union{Integer, Rational, AbstractFloat})
+function divexact(a::PolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
+      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b; check=check))
    end
    z = set_length!(z, length(a))
    return z

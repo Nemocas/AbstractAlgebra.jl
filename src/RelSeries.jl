@@ -851,18 +851,17 @@ end
 #
 ###############################################################################
 
-function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}) where T <: RingElement
+function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}; check::Bool=false) where T <: RingElement
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
    if v2 != 0
       v1 = valuation(x)
-      if v1 >= v2
-         x = shift_right(x, v2)
-         y = shift_right(y, v2)
-      else
+      if check && v1 < v2
          error("Not an exact division")
       end
+      x = shift_right(x, v2)
+      y = shift_right(y, v2)
    else
       x = deepcopy(x)
    end
@@ -871,11 +870,15 @@ function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}) where T <: RingEleme
    res = set_precision!(res, min(precision(x), valuation(x) + precision(y)))
    res = set_valuation!(res, valuation(x))
    lc = coeff(y, 0)
-   lc == 0 && error("Not an exact division")
+   check && lc == 0 && error("Not an exact division")
    lenr = precision(x) - valuation(x)
    for i = 0:lenr - 1
-      flag, q = divides(polcoeff(x, i), lc)
-      !flag && error("Not an exact division")
+      if check
+         flag, q = divides(polcoeff(x, i), lc)
+         !flag && error("Not an exact division")
+      else
+         q = divexact(polcoeff(x, i), lc)
+      end
       res = setcoeff!(res, i, q)
       for j = 0:min(precision(y) - 1, lenr - i - 1)
          x = setcoeff!(x, i + j, polcoeff(x, i + j) - polcoeff(y, j)*q)
@@ -891,7 +894,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::RelSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -899,12 +902,12 @@ function divexact(x::RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    z = set_precision!(z, precision(x))
    z = set_valuation!(z, valuation(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
    end
    return z
 end
 
-function divexact(x::RelSeriesElem{T}, y::T) where {T <: RingElem}
+function divexact(x::RelSeriesElem{T}, y::T; check::Bool=false) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -912,7 +915,7 @@ function divexact(x::RelSeriesElem{T}, y::T) where {T <: RingElem}
    z = set_precision!(z, precision(x))
    z = set_valuation!(z, valuation(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
    end
    return z
 end

@@ -319,12 +319,10 @@ end
 #
 ###############################################################################
 
-function divexact(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
+function divexact(a::ResElem{T}, b::ResElem{T}; check::Bool=false) where {T <: RingElement}
    check_parent(a, b)
    fl, q = divides(a, b)
-   if !fl
-      error("Impossible inverse in divexact")
-   end
+   check && !fl && error("Impossible inverse in divexact")
    return q
 end
 
@@ -338,13 +336,13 @@ function divides(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
    R = parent(a)
    m = modulus(R)
    gb = gcd(B, m)
-   ub = divexact(B, gb)
+   ub = divexact(B, gb; check=true)
    q, r = divrem(A, gb)
    if !iszero(r)
      return false, b
    end
-   ub = divexact(B, gb)
-   b1 = invmod(ub, divexact(m, gb))
+   ub = divexact(B, gb; check=true)
+   b1 = invmod(ub, divexact(m, gb; check=true))
    rs = R(q)*b1
    return true, rs
 end

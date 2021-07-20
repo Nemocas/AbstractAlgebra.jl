@@ -1272,7 +1272,7 @@ end
       @test divexact(f*g, g) == f
    end
 
-   @test_throws ArgumentError divexact(x^2, x - 1)
+   @test_throws ArgumentError divexact(x^2, x - 1; check=true)
 
    # Fake finite field of char 7, degree 2
    S, y = PolynomialRing(GF(7), "y")
