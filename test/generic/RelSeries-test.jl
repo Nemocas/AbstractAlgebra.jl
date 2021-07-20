@@ -149,7 +149,7 @@ end
    @test modulus(T) == 7
 end
 
-@testset "Generic.AbsSeries.similar" begin
+@testset "Generic.RelSeries.similar" begin
    R, x = PowerSeriesRing(ZZ, 10, "x")
 
    for iters = 1:10
