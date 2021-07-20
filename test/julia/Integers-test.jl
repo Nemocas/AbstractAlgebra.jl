@@ -53,6 +53,10 @@ end
    R = zz
    S = ZZ
 
+   @test_throws ArgumentError divexact(10, 4; check=true)
+   @test_throws ArgumentError divexact(big(10), big(4); check=true)
+   @test_throws ArgumentError divexact(big(10), 4; check=true)
+
    for iter = 1:1000
       a1 = rand(R, -100:100)
       a2 = rand(R, -100:100)
@@ -61,16 +65,18 @@ end
 
       @test a2 == 0 || divexact(a1*a2, a2) == a1
       @test b2 == 0 || divexact(b1*b2, b2) == b1
-
-      @test_throws ArgumentError divexact(10, 4)
-      @test_throws ArgumentError divexact(big(10), big(4))
-      @test_throws ArgumentError divexact(big(10), 4)
+      @test a1 == 0 || divexact(b1*a1, a1) == b1
 
       if a1 != 0
          flagR, qR = divides(a1*a2, a1)
 
          @test flagR
          @test qR == a2
+
+         flagT, qT = divides(b1*a1, a1)
+
+         @test flagT
+         @test qT == b1
       end
       
       @test isdivisible_by(a1*a2, a1)
@@ -81,8 +87,10 @@ end
          @test flagS
          @test qS == b2
       end
-      
+
       @test isdivisible_by(b1*b2, b1)
+
+      @test isdivisible_by(b1*a1, a1)
    end
 end
 

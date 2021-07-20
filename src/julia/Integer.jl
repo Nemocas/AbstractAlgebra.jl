@@ -101,7 +101,7 @@ end
 #
 ###############################################################################
 
-function divides(a::T, b::T) where T <: Integer
+function divides(a::Integer, b::Integer)
    if b == 0
       return a == 0, b
    end
@@ -110,12 +110,12 @@ function divides(a::T, b::T) where T <: Integer
 end
 
 @doc Markdown.doc"""
-    isdivisible_by(a::T, b::T) where T <: Integer
+    isdivisible_by(a::Integer, b::Integer)
 
 Return `true` if $a$ is divisible by $b$, i.e. if there exists $c$ such that
 $a = bc$.
 """
-function isdivisible_by(a::T, b::T) where T <: Integer
+function isdivisible_by(a::Integer, b::Integer)
    if b == 0
       return a == 0
    end
@@ -129,7 +129,23 @@ function isdivisible_by(a::BigInt, b::BigInt)
    end
    return Bool(ccall((:__gmpz_divisible_p, :libgmp), Cint,
                                              (Ref{BigInt}, Ref{BigInt}), a, b))
-end   
+end
+
+function isdivisible_by(a::BigInt, b::Int)
+   if b == 0
+      return a == 0
+   end
+   return Bool(ccall((:__gmpz_divisible_ui_p, :libgmp), Cint,
+                                        (Ref{BigInt}, Int), a, b < 0 ? -b : b))
+end
+
+function isdivisible_by(a::BigInt, b::UInt)
+   if b == 0
+      return a == 0
+   end
+   return Bool(ccall((:__gmpz_divisible_ui_p, :libgmp), Cint,
+                                                    (Ref{BigInt}, UInt), a, b))
+end
 
 ###############################################################################
 #
@@ -137,10 +153,57 @@ end
 #
 ###############################################################################
 
-function divexact(a::Integer, b::Integer)
-   q, r = divrem(a, b)
-   iszero(r) || throw(ArgumentError("not an exact division"))
-   q
+function divexact(a::Integer, b::Integer; check::Bool=false)
+   if check
+      q, r = divrem(a, b)
+      iszero(r) || throw(ArgumentError("Not an exact division"))
+   else
+      q = div(a, b)
+   end
+   return q
+end
+
+function divexact(a::BigInt, b::BigInt; check::Bool=false)
+   q = BigInt()
+   if check
+      r = BigInt()
+      ccall((:__gmpz_tdiv_qr, :libgmp), Nothing,
+              (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), q, r, a, b)
+      r != 0 && throw(ArgumentError("Not an exact division"))
+   else
+      ccall((:__gmpz_divexact, :libgmp), Nothing,
+                              (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), q, a, b)
+   end
+   return q
+end
+
+function divexact(a::BigInt, b::Int; check::Bool=false)
+   q = BigInt()
+   sgn = b < 0
+   if check
+      r = BigInt()
+      ccall((:__gmpz_tdiv_qr_ui, :libgmp), Nothing,
+           (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Int), q, r, a, sgn ? -b : b)
+      r != 0 && throw(ArgumentError("Not an exact division"))
+   else
+      ccall((:__gmpz_divexact_ui, :libgmp), Nothing,
+                           (Ref{BigInt}, Ref{BigInt}, Int), q, a, sgn ? -b : b)
+   end
+   return sgn ? -q : q
+end
+
+function divexact(a::BigInt, b::UInt; check::Bool=false)
+   q = BigInt()
+   if check
+      r = BigInt()
+      ccall((:__gmpz_tdiv_qr_ui, :libgmp), Nothing,
+                     (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, UInt), q, r, a, b)
+      r != 0 && throw(ArgumentError("Not an exact division"))
+   else
+      ccall((:__gmpz_divexact_ui, :libgmp), Nothing,
+                                     (Ref{BigInt}, Ref{BigInt}, UInt), q, a, b)
+   end
+   return q
 end
 
 ###############################################################################
