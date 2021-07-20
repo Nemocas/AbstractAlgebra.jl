@@ -137,6 +137,25 @@ true
 
 ```
 
+### Divisibility testing
+
+```@docs
+isdivisible_by(a::BigInt, b::BigInt)
+```
+
+** Examples **
+
+```jldoctest
+julia> r = ZZ(6)
+6
+
+julia> s = ZZ(3)
+3
+
+julia> isdivisible_by(r, s)
+true
+```
+
 ### Square root
 
 ```@docs
