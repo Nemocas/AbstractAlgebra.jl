@@ -137,6 +137,7 @@ function *(a::RelSeries{T}, b::RelSeries{T}) where T <: RingElement
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, prec)
    d = Array{T}(undef, lenz)
+   cutoff = mullow_fast_cutoff(a, b)
    AbstractAlgebra.DensePoly.mullow_fast!(d, lenz,
                           a.coeffs, lena, b.coeffs, lenb, base_ring(a), cutoff)
    z = parent(a)(d, lenz, prec + zval, zval)
@@ -196,6 +197,7 @@ function mul!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where T <: Ring
          fit!(c, lenc)
 	     d = c.coeffs
       end
+      cutoff = mullow_fast_cutoff(a, b)
       AbstractAlgebra.DensePoly.mullow_fast!(d, lenc,
                           a.coeffs, lena, b.coeffs, lenb, base_ring(a), cutoff)
       c.coeffs = d
