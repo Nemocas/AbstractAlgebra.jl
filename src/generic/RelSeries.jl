@@ -62,7 +62,35 @@ function characteristic(a::RelSeriesRing{T}) where T <: RingElement
    return characteristic(base_ring(a))
 end
 
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
 
+function *(a::RelSeries{T}, b::RelSeries{T}) where T <: RingElement
+   check_parent(a, b)
+   lena = pol_length(a)
+   lenb = pol_length(b)
+   aval = valuation(a)
+   bval = valuation(b)
+   zval = aval + bval
+   prec = min(precision(a) - aval, precision(b) - bval)
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   if lena == 0 || lenb == 0
+      return parent(a)(Array{T}(undef, 0), 0, prec + zval, zval)
+   end
+   t = base_ring(a)()
+   lenz = min(lena + lenb - 1, prec)
+   d = Array{T}(undef, lenz)
+   AbstractAlgebra.DensePoly.mullow_fast!(d, lenz,
+                          a.coeffs, lena, b.coeffs, lenb, base_ring(a), cutoff)
+   z = parent(a)(d, lenz, prec + zval, zval)
+   z = set_length!(z, normalise(z, lenz))
+   renormalize!(z)
+   return z
+end
 
 ###############################################################################
 #
@@ -113,25 +141,10 @@ function mul!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where T <: Ring
          d = T[base_ring(c)() for i in 1:lenc]
       else
          fit!(c, lenc)
-	 d = c.coeffs
+	     d = c.coeffs
       end
-      t = base_ring(a)()
-      for i = 1:min(lena, lenc)
-         d[i] = mul!(d[i], polcoeff(a, i - 1), polcoeff(b, 0))
-      end
-      if lenc > lena
-         for i = 2:min(lenb, lenc - lena + 1)
-            d[lena + i - 1] = mul!(d[lena + i - 1], polcoeff(a, lena - 1), polcoeff(b, i - 1))
-         end
-      end
-      for i = 1:lena - 1
-         if lenc > i
-            for j = 2:min(lenb, lenc - i + 1)
-               t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
-               d[i + j - 1] = addeq!(d[i + j - 1], t)
-            end
-         end
-      end
+      AbstractAlgebra.DensePoly.mullow_fast!(d, lenc,
+                          a.coeffs, lena, b.coeffs, lenb, base_ring(a), cutoff)
       c.coeffs = d
       c.length = normalise(c, lenc)
    end
