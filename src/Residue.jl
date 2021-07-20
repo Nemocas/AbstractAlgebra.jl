@@ -336,13 +336,13 @@ function divides(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
    R = parent(a)
    m = modulus(R)
    gb = gcd(B, m)
-   ub = divexact(B, gb; check=true)
+   ub = divexact(B, gb)
    q, r = divrem(A, gb)
    if !iszero(r)
      return false, b
    end
-   ub = divexact(B, gb; check=true)
-   b1 = invmod(ub, divexact(m, gb; check=true))
+   ub = divexact(B, gb)
+   b1 = invmod(ub, divexact(m, gb))
    rs = R(q)*b1
    return true, rs
 end
