@@ -70,7 +70,7 @@ function log(a::T) where T
    return Base.log(a)
 end
 
-function sqrt(a::T; check::Bool=false) where T
+function sqrt(a::T; check::Bool=true) where T
   return Base.sqrt(a; check=check)
 end
 

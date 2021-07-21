@@ -116,7 +116,7 @@ end
 #
 ###############################################################################
 
-function Base.sqrt(a::AbstractFloat; check::Bool=false)
+function Base.sqrt(a::AbstractFloat; check::Bool=true)
    return Base.sqrt(a)
 end
 

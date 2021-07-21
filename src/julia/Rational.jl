@@ -167,12 +167,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    sqrt(a::Rational{T}; check::Bool=false) where T <: Integer
+    sqrt(a::Rational{T}; check::Bool=true) where T <: Integer
 
-Return the square root of $a$ if it is the square of a rational, otherwise
-throw an error.
+Return the square root of $a$. By default the function throws an exception if
+the input is not square. If `check=false` this check is supressed.
 """
-function sqrt(a::Rational{T}; check::Bool=false) where T <: Integer
+function sqrt(a::Rational{T}; check::Bool=true) where T <: Integer
    return sqrt(numerator(a, false); check=check)//sqrt(denominator(a, false); check=check)
 end
 

@@ -1130,11 +1130,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    sqrt(a::Generic.LaurentSeriesElem; check::Bool=false)
+    sqrt(a::Generic.LaurentSeriesElem; check::Bool=true)
 
-Return the square root of the power series $a$.
+Return the square root of the power series $a$. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
 """
-function Base.sqrt(a::LaurentSeriesElem; check::Bool=false)
+function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
    aval = valuation(a)
    check && !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)

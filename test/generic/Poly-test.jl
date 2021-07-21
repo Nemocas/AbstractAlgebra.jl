@@ -2759,7 +2759,7 @@ end
       @test q^2 == f^2
 
       if f != 0
-         @test_throws ErrorException sqrt(f^2*x; check=true)
+         @test_throws ErrorException sqrt(f^2*x)
       end
    end
 
@@ -2781,7 +2781,7 @@ end
       @test q^2 == f^2
 
       if f != 0
-         @test_throws ErrorException sqrt(f^2*x; check=true)
+         @test_throws ErrorException sqrt(f^2*x)
       end
    end
 
@@ -2807,7 +2807,7 @@ end
          @test q^2 == f^2
 
          if f != 0
-            @test_throws ErrorException sqrt(f^2*x; check=true)
+            @test_throws ErrorException sqrt(f^2*x)
          end
       end
    end

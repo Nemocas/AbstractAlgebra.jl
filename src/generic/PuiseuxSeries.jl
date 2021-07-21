@@ -534,11 +534,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    sqrt(a::Generic.PuiseuxSeriesElem{T}; check::Bool=false) where T <: RingElement
+    sqrt(a::Generic.PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
 
-Return the square root of the given Puiseux series $a$.
+Return the square root of the given Puiseux series $a$. By default the function
+will throw an exception if the input is not square. If `check=false` this test
+is omitted.
 """
-function Base.sqrt(a::PuiseuxSeriesElem{T}; check::Bool=false) where T <: RingElement
+function Base.sqrt(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
    val = valuation(a.data)
    S = parent(a)
    if mod(val, 2) != 0

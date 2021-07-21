@@ -1037,9 +1037,11 @@ end
 @doc Markdown.doc"""
     sqrt(a::RelSeriesElem)
 
-Return the square root of the power series $a$.
+Return the square root of the power series $a$. By default the function raises
+an exception if the input is not a square. If `check=false` this check is
+omitted.
 """
-function Base.sqrt(a::RelSeriesElem; check::Bool=false)
+function Base.sqrt(a::RelSeriesElem; check::Bool=true)
    aval = valuation(a)
    !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)

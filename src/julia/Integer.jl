@@ -157,12 +157,13 @@ sqrt_moduli = [3, 5, 7, 8]
 sqrt_residues = [[0, 1], [0, 1, 4], [0, 1, 2, 4], [0, 1, 4]]
 
 @doc Markdown.doc"""
-    sqrt(a::T; check::Bool=false) where T <: Integer
+    sqrt(a::T; check::Bool=true) where T <: Integer
 
-Return the integer square root of $a$. If `check=true` and $a$ is not a
-perfect square an exception is thrown. This check is not performed by default.
+Return the integer square root of $a$. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
 """
-function sqrt(a::T; check::Bool=false) where T <: Integer
+function sqrt(a::T; check::Bool=true) where T <: Integer
    s = isqrt(a)
    (check && s*s != a) && error("Not a square in sqrt")
    return s

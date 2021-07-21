@@ -630,7 +630,7 @@ end
 
             if f != 0
                x = varlist[rand(1:num_vars)]
-               @test_throws ErrorException sqrt(f^2*(x^2 - x); check=true)
+               @test_throws ErrorException sqrt(f^2*(x^2 - x))
             end
          end
       end
@@ -662,7 +662,7 @@ end
 
             if f != 0
                x = varlist[rand(1:num_vars)]
-               @test_throws ErrorException sqrt(f^2*(x^2 - x); check=true)
+               @test_throws ErrorException sqrt(f^2*(x^2 - x))
             end
          end
       end

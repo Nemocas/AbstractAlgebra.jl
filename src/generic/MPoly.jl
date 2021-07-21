@@ -1656,7 +1656,7 @@ end
 #
 ###############################################################################
 
-function sqrt_classical_char2(a::MPoly{T}; check::Bool=false) where {T <: RingElement}
+function sqrt_classical_char2(a::MPoly{T}; check::Bool=true) where {T <: RingElement}
    par = parent(a)
    m = length(a)
    if m == 0
@@ -1673,8 +1673,10 @@ function sqrt_classical_char2(a::MPoly{T}; check::Bool=false) where {T <: RingEl
    # compute square root
    for i = 1:m
       d1 = monomial_halves!(Qe, i, a.exps, i, mask, N)
-      d2 = issquare(a.coeffs[i])
-      if !d1 || !d2
+      if check
+         d2 = issquare(a.coeffs[i])
+      end
+      if check && !d1 || !d2
          return false, par()
       end
       Qc[i] = sqrt(a.coeffs[i]; check=check)
@@ -1731,8 +1733,8 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
    reuse = zeros(Int, 0)
    # get leading coeff of sqrt
    d1 = monomial_halves!(Qe, 1, a.exps, 1, mask, N)
-   d2 = issquare(a.coeffs[1])
-   if !d1 || !d2
+   d2 = check ? issquare(a.coeffs[1]) : true
+   if check && !d1 || !d2
       return false, par()
    end
    Qc[1] = sqrt(a.coeffs[1]; check=check)
@@ -1841,8 +1843,12 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
          k -= 1
       else
          # if not, check the accumulation is divisible by leading coeff
-         d2, Qc[k] = divides(qc, mb)
-         if !d1 || !d2 # if accumulation term is not divisible, return false
+         if check
+            d2, Qc[k] = divides(qc, mb)
+         else
+            d2, Qc[k] = true, divexact(qc, mb)
+         end
+         if check && !d1 || !d2 # if accumulation term is not divisible, return false
             return false, par()
          end
          viewalloc += 1
@@ -1876,7 +1882,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
    return true, parent(a)(Qc, Qe) # return result
 end
 
-function sqrt_heap(a::MPoly{T}; check::Bool=false) where {T <: RingElement}
+function sqrt_heap(a::MPoly{T}; check::Bool=true) where {T <: RingElement}
    if characteristic(base_ring(a)) == 2
       return sqrt_classical_char2(a; check=check)
    end
@@ -1910,9 +1916,9 @@ function sqrt_heap(a::MPoly{T}; check::Bool=false) where {T <: RingElement}
    return flag, parent(a)(q.coeffs, eq)
 end
 
-function Base.sqrt(a::MPoly{T}; check::Bool=false) where {T <: RingElement}
+function Base.sqrt(a::MPoly{T}; check::Bool=true) where {T <: RingElement}
    flag, q = sqrt_heap(a; check=check)
-   !flag && error("Not a square in square root")
+   check && !flag && error("Not a square in square root")
    return q
 end
 

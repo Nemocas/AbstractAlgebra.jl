@@ -1719,36 +1719,38 @@ end
 #
 ################################################################################
 
-function sqrt_classical_char2(f::PolyElem{T}; check::Bool=false) where T <: RingElement
+function sqrt_classical_char2(f::PolyElem{T}; check::Bool=true) where T <: RingElement
    S = parent(f)
    R = base_ring(f)
-   if iszero(f)
+   if check && iszero(f)
       return true, S()
    end
    m = length(f)
-   if iseven(m) # square polys have even degree
+   if check && iseven(m) # square polys have even degree
       return false, S()
    end
-   for i = 1:2:m # polynomial must have even exponents
-      if !iszero(coeff(f, i))
-         return false, S()
+   if check
+      for i = 1:2:m # polynomial must have even exponents
+         if !iszero(coeff(f, i))
+            return false, S()
+         end
       end
    end
    lenq = div(m + 1, 2)
    d = Array{T}(undef, lenq)
    for i = 1:lenq
       c = coeff(f, 2*i - 2)
-      if !issquare(c)
+      if check && !issquare(c)
          return false, S()
       end
-      d[i] = sqrt(c; check=check)
+      d[i] = sqrt(c; check=false)
    end
    q = S(d)
    q = set_length!(q, lenq)
    return true, q
 end
 
-function sqrt_classical(f::PolyElem{T}; check::Bool=false) where T <: RingElement
+function sqrt_classical(f::PolyElem{T}; check::Bool=true) where T <: RingElement
    S = parent(f)
    R = base_ring(f)
    if characteristic(R) == 2
@@ -1758,15 +1760,15 @@ function sqrt_classical(f::PolyElem{T}; check::Bool=false) where T <: RingElemen
       return true, S()
    end
    m = length(f)
-   if iseven(m) # square polys have even degree
+   if check && iseven(m) # square polys have even degree
       return false, S()
    end
-   if !issquare(coeff(f, m - 1))
+   if check && !issquare(coeff(f, m - 1))
       return false, S()
    end
    lenq = div(m + 1, 2)
    d = Array{T}(undef, lenq)
-   d[lenq] = sqrt(coeff(f, m - 1); check=check)
+   d[lenq] = sqrt(coeff(f, m - 1))
    b = -2*d[lenq]
    k = 1
    c = R()
@@ -1784,11 +1786,15 @@ function sqrt_classical(f::PolyElem{T}; check::Bool=false) where T <: RingElemen
       end
       qc = reduce!(qc)
       if i >= lenq - 1
-         flag, d[lenq - k] = divides(qc, b)
-         if !flag
-            return false, S()
+         if check
+            flag, d[lenq - k] = divides(qc, b)
+            if !flag
+               return false, S()
+            end
+         else
+            d[lenq - k] = divexact(qc, b)
          end
-      elseif !iszero(qc)
+      elseif check && !iszero(qc)
          return false, S()
       end
       k += 1
@@ -1799,13 +1805,12 @@ function sqrt_classical(f::PolyElem{T}; check::Bool=false) where T <: RingElemen
 end
 
 @doc Markdown.doc"""
-    Base.sqrt(f::PolyElem{T}; check::Bool=false) where T <: RingElement
+    Base.sqrt(f::PolyElem{T}; check::Bool=true) where T <: RingElement
 
-Return the square root of $f$ if it is a perfect square, otherwise an
-exception is raised. If `check` is set to `true` the function checks that
-the input is a square and raises an exception if not..
+Return the square root of $f$. By default the function checks the input is
+square and raises an exception if not. If `check=false` this check is omitted.
 """
-function Base.sqrt(f::PolyElem{T}; check::Bool=false) where T <: RingElement
+function Base.sqrt(f::PolyElem{T}; check::Bool=true) where T <: RingElement
    flag, q = sqrt_classical(f; check=check)
    check && !flag && error("Not a square in sqrt")
    return q
@@ -1817,7 +1822,7 @@ end
 Return `true` if $f$ is a perfect square.
 """
 function issquare(f::PolyElem{T}) where T <: RingElement
-   flag, q = sqrt_classical(f; check=true)
+   flag, q = sqrt_classical(f)
    return flag
 end
 
