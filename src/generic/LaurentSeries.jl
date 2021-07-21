@@ -1014,7 +1014,7 @@ end
 ###############################################################################
 
 function divexact(x::LaurentSeriesElem{T},
-           y::LaurentSeriesElem{T}; check::Bool=false) where {T <: RingElement}
+           y::LaurentSeriesElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
@@ -1040,12 +1040,7 @@ function divexact(x::LaurentSeriesElem{T},
    lenr = div(precision(res) - valuation(res) + sr - 1, sr)
    leny = div(precision(y) + sr - 1, sr)
    for i = 0:lenr - 1
-      if check
-         flag, q = divides(polcoeff(x, i), lc)
-         !flag && error("Not an exact division")
-      else
-         q = divexact(polcoeff(x, i), lc)
-      end
+      q = divexact(polcoeff(x, i), lc; check=check)
       res = setcoeff!(res, i, q)
       for j = 0:min(leny - 1, lenr - i - 1)
          x = setcoeff!(x, i + j, polcoeff(x, i + j) - polcoeff(y, j)*q)
@@ -1062,7 +1057,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -1076,7 +1071,7 @@ function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloa
    return z
 end
 
-function divexact(x::LaurentSeriesElem{T}, y::T; check::Bool=false) where {T <: RingElem}
+function divexact(x::LaurentSeriesElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()

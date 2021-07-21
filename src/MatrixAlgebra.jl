@@ -227,24 +227,24 @@ end
 ###############################################################################
 
 function divexact_left(f::MatAlgElem{T},
-                       g::MatAlgElem{T}; check::Bool=false) where T <: RingElement
+                       g::MatAlgElem{T}; check::Bool=true) where T <: RingElement
    ginv, d = pseudo_inv(g)
    return divexact(ginv*f, d; check=check)
 end
 
 function divexact_right(f::MatAlgElem{T},
-                       g::MatAlgElem{T}; check::Bool=false) where T <: RingElement
+                       g::MatAlgElem{T}; check::Bool=true) where T <: RingElement
    ginv, d = pseudo_inv(g)
    return divexact(f*ginv, d; check=check)
 end
 
 function divexact_left(f::MatAlgElem{T},
-                       g::MatAlgElem{T}; check::Bool=false) where T <: FieldElement
+                       g::MatAlgElem{T}; check::Bool=true) where T <: FieldElement
    return inv(g)*f
 end
 
 function divexact_right(f::MatAlgElem{T},
-                       g::MatAlgElem{T}; check::Bool=false) where T <: FieldElement
+                       g::MatAlgElem{T}; check::Bool=true) where T <: FieldElement
    return f*inv(g)
 end
 
@@ -254,19 +254,19 @@ end
 #
 ###############################################################################
 
-function divexact_left(x::MatAlgElem{T}, y::T; check::Bool=false) where {T <: RingElem}
+function divexact_left(x::MatAlgElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    return divexact(x, y; check=check)
 end
 
-function divexact_right(x::MatAlgElem{T}, y::T; check::Bool=false) where {T <: RingElem}
+function divexact_right(x::MatAlgElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    return divexact(x, y; check=check)
 end
 
-function divexact_left(x::MatAlgElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact_left(x::MatAlgElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    return divexact(x, y; check=check)
 end
 
-function divexact_right(x::MatAlgElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact_right(x::MatAlgElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    return divexact(x, y; check=check)
 end
 

@@ -56,7 +56,7 @@ end
 
 *(x::RingElement, y::NCRingElem) = parent(y)(x)*y
 
-function divexact_left(x::S, y::T; check::Bool=false) where {S <: NCRingElem, T <: NCRingElem}
+function divexact_left(x::S, y::T; check::Bool=true) where {S <: NCRingElem, T <: NCRingElem}
    if S == promote_rule(S, T)
       divexact_left(x, parent(x)(y); check=check)
    else
@@ -64,7 +64,7 @@ function divexact_left(x::S, y::T; check::Bool=false) where {S <: NCRingElem, T 
    end
 end
 
-function divexact_right(x::S, y::T; check::Bool=false) where {S <: NCRingElem, T <: NCRingElem}
+function divexact_right(x::S, y::T; check::Bool=true) where {S <: NCRingElem, T <: NCRingElem}
    if S == promote_rule(S, T)
       divexact_right(x, parent(x)(y); check=check)
    else
@@ -72,11 +72,11 @@ function divexact_right(x::S, y::T; check::Bool=false) where {S <: NCRingElem, T
    end
 end
 
-function divexact_left(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact_left(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    return divexact_left(x, parent(x)(y); check=check)
 end
 
-function divexact_right(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact_right(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    return divexact_right(x, parent(x)(y); check=check)
 end
 

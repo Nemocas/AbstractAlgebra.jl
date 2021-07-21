@@ -91,15 +91,15 @@ If no exact division is possible, an exception is raised.
 """
 function divexact end
 
-divexact(x::RingElem, y::RingElem; check::Bool=false) = divexact(promote(x, y)...; check=check)
+divexact(x::RingElem, y::RingElem; check::Bool=true) = divexact(promote(x, y)...; check=check)
 
-divexact(x::RingElem, y::RingElement; check::Bool=false) = divexact(x, parent(x)(y); check=check)
+divexact(x::RingElem, y::RingElement; check::Bool=true) = divexact(x, parent(x)(y); check=check)
 
-divexact(x::RingElement, y::RingElem; check::Bool=false) = divexact(parent(y)(x), y; check=check)
+divexact(x::RingElement, y::RingElem; check::Bool=true) = divexact(parent(y)(x), y; check=check)
 
-divexact_left(x::T, y::T; check::Bool=false) where T <: RingElement = divexact(x, y; check=check)
+divexact_left(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x, y; check=check)
 
-divexact_right(x::T, y::T; check::Bool=false) where T <: RingElement = divexact(x, y; check=check)
+divexact_right(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x, y; check=check)
 
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 

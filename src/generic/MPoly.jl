@@ -1973,7 +1973,7 @@ end
 
 *(n::T, a::MPoly{T}) where {T <: RingElem} = a*n
 
-function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    N = size(a.exps, 1)
    r = zero(a)
    fit!(r, length(a))
@@ -1991,7 +1991,7 @@ function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat}; check::B
    return r
 end
 
-function divexact(a::MPoly{T}, n::T; check::Bool=false) where {T <: RingElem}
+function divexact(a::MPoly{T}, n::T; check::Bool=true) where {T <: RingElem}
    N = size(a.exps, 1)
    r = zero(a)
    fit!(r, length(a))
@@ -2596,7 +2596,7 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return flag, parent(a)(q.coeffs, eq)
 end
 
-function divexact(a::MPoly{T}, b::MPoly{T}; check::Bool=false) where {T <: RingElement}
+function divexact(a::MPoly{T}, b::MPoly{T}; check::Bool=true) where {T <: RingElement}
    d, q = divides(a, b)
    check && d == false && error("Not an exact division in divexact")
    return q

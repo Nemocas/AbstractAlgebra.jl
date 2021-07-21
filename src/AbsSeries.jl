@@ -638,7 +638,7 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 #
 ###############################################################################
 
-function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}; check::Bool=false) where T <: RingElement
+function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}; check::Bool=true) where T <: RingElement
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
@@ -659,12 +659,7 @@ function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}; check::Bool=false) w
    check && iszero(lc) && error("Not an exact division")
    lenr = precision(x)
    for i = valuation(x):lenr - 1
-      if check
-         flag, q = divides(coeff(x, i), lc)
-         !flag && error("Not an exact division")
-      else
-         q = divexact(coeff(x, i), lc; check=check)
-      end
+      q = divexact(coeff(x, i), lc; check=check)
       res = setcoeff!(res, i, q)
       for j = 0:min(precision(y) - 1, lenr - i - 1)
          x = setcoeff!(x, i + j, coeff(x, i + j) - coeff(y, j)*q)
@@ -680,7 +675,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -692,7 +687,7 @@ function divexact(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}; 
    return z
 end
 
-function divexact(x::AbsSeriesElem{T}, y::T; check::Bool=false) where {T <: RingElem}
+function divexact(x::AbsSeriesElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()

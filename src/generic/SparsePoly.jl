@@ -929,7 +929,7 @@ function divides(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    return true, parent(a)(Qc, Qe)
 end
 
-function divexact(a::SparsePoly{T}, b::SparsePoly{T}; check::Bool=false) where {T <: RingElement}
+function divexact(a::SparsePoly{T}, b::SparsePoly{T}; check::Bool=true) where {T <: RingElement}
    d, q = divides(a, b)
    check && d == false && error("Not an exact division in divexact")
    return q
@@ -953,14 +953,14 @@ function divides(a::SparsePoly{T}, b::T) where {T <: RingElem}
    return true, parent(a)(Qc, a.exps)
 end
 
-function divexact(a::SparsePoly{T}, b::T; check::Bool=false) where {T <: RingElem}
+function divexact(a::SparsePoly{T}, b::T; check::Bool=true) where {T <: RingElem}
    len = length(a)
    exps = deepcopy(a.exps)
    coeffs = [divexact(a.coeffs[i], b; check=check) for i in 1:len]
    return parent(a)(coeffs, exps)
 end
 
-function divexact(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    len = length(a)
    exps = deepcopy(a.exps)
    coeffs = [divexact(a.coeffs[i], b; check=check) for i in 1:len]

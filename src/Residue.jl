@@ -319,7 +319,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::ResElem{T}, b::ResElem{T}; check::Bool=false) where {T <: RingElement}
+function divexact(a::ResElem{T}, b::ResElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(a, b)
    fl, q = divides(a, b)
    check && !fl && error("Impossible inverse in divexact")

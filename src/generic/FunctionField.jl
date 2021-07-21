@@ -981,7 +981,7 @@ end
 ###############################################################################
 
 function divexact(a::FunctionFieldElem{T},
-            b::FunctionFieldElem{T}; check::Bool=false) where T <: FieldElement
+            b::FunctionFieldElem{T}; check::Bool=true) where T <: FieldElement
    return a*inv(b)
 end
 
@@ -992,7 +992,7 @@ end
 ###############################################################################
 
 function divexact(a::FunctionFieldElem,
-                                b::Union{Rational, Integer}; check::Bool=false)
+                                b::Union{Rational, Integer}; check::Bool=true)
    S = parent(a)
    anum = numerator(a, false)
    aden = denominator(a, false)
@@ -1002,7 +1002,7 @@ function divexact(a::FunctionFieldElem,
 end
 
 function divexact(a::FunctionFieldElem{T},
-                                  b::T; check::Bool=false) where T <: FieldElem
+                                  b::T; check::Bool=true) where T <: FieldElem
    S = parent(a)
    anum = numerator(a, false)
    aden = denominator(a, false)
@@ -1012,7 +1012,7 @@ function divexact(a::FunctionFieldElem{T},
 end
 
 function divexact(a::FunctionFieldElem{T},
-                          b::Rat{T}; check::Bool=false) where T <: FieldElement
+                          b::Rat{T}; check::Bool=true) where T <: FieldElement
    S = parent(a)
    base_ring(a) != parent(b) && error("Incompatible fields")
    bnum = numerator(b, false)
@@ -1022,26 +1022,26 @@ function divexact(a::FunctionFieldElem{T},
    return S(_rat_poly_canonicalise(anum*bden, aden*bnum)...)
 end
 
-function divexact(a::FunctionFieldElem, b::RingElem; check::Bool=false)
+function divexact(a::FunctionFieldElem, b::RingElem; check::Bool=true)
    return divexact(a, base_ring(a)(b))
 end
 
 function divexact(a::Union{Rational, Integer},
-                                       b::FunctionFieldElem; check::Bool=false)
+                                       b::FunctionFieldElem; check::Bool=true)
    return a*inv(b)
 end
 
 function divexact(a::T,
-            b::FunctionFieldElem{T}; check::Bool=false) where T <: FieldElement
+            b::FunctionFieldElem{T}; check::Bool=true) where T <: FieldElement
    return a*inv(b)
 end
 
 function divexact(a::Rat{T},
-            b::FunctionFieldElem{T}; check::Bool=false) where T <: FieldElement
+            b::FunctionFieldElem{T}; check::Bool=true) where T <: FieldElement
    return a*inv(b)
 end
 
-divexact(a::RingElem, b::FunctionFieldElem; check::Bool=false) = a*inv(b)
+divexact(a::RingElem, b::FunctionFieldElem; check::Bool=true) = a*inv(b)
 
 ###############################################################################
 #

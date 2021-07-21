@@ -851,7 +851,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}; check::Bool=false) where T <: RingElement
+function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}; check::Bool=true) where T <: RingElement
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
@@ -873,12 +873,7 @@ function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}; check::Bool=false) w
    check && lc == 0 && error("Not an exact division")
    lenr = precision(x) - valuation(x)
    for i = 0:lenr - 1
-      if check
-         flag, q = divides(polcoeff(x, i), lc)
-         !flag && error("Not an exact division")
-      else
-         q = divexact(polcoeff(x, i), lc)
-      end
+      q = divexact(polcoeff(x, i), lc; check=check)
       res = setcoeff!(res, i, q)
       for j = 0:min(precision(y) - 1, lenr - i - 1)
          x = setcoeff!(x, i + j, polcoeff(x, i + j) - polcoeff(y, j)*q)
@@ -894,7 +889,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::RelSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact(x::RelSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -907,7 +902,7 @@ function divexact(x::RelSeriesElem, y::Union{Integer, Rational, AbstractFloat}; 
    return z
 end
 
-function divexact(x::RelSeriesElem{T}, y::T; check::Bool=false) where {T <: RingElem}
+function divexact(x::RelSeriesElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()

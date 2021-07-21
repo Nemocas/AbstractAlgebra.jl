@@ -153,7 +153,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::Integer, b::Integer; check::Bool=false)
+function divexact(a::Integer, b::Integer; check::Bool=true)
    if check
       q, r = divrem(a, b)
       iszero(r) || throw(ArgumentError("Not an exact division"))
@@ -163,7 +163,7 @@ function divexact(a::Integer, b::Integer; check::Bool=false)
    return q
 end
 
-function divexact(a::BigInt, b::BigInt; check::Bool=false)
+function divexact(a::BigInt, b::BigInt; check::Bool=true)
    q = BigInt()
    if check
       r = BigInt()
@@ -177,7 +177,7 @@ function divexact(a::BigInt, b::BigInt; check::Bool=false)
    return q
 end
 
-function divexact(a::BigInt, b::Int; check::Bool=false)
+function divexact(a::BigInt, b::Int; check::Bool=true)
    q = BigInt()
    sgn = b < 0
    if check
@@ -192,7 +192,7 @@ function divexact(a::BigInt, b::Int; check::Bool=false)
    return sgn ? -q : q
 end
 
-function divexact(a::BigInt, b::UInt; check::Bool=false)
+function divexact(a::BigInt, b::UInt; check::Bool=true)
    q = BigInt()
    if check
       r = BigInt()

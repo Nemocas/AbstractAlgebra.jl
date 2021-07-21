@@ -110,17 +110,17 @@ end
 #
 ###############################################################################
 
-divexact(a::Rational, b::Integer; check::Bool=false) = a//b
+divexact(a::Rational, b::Integer; check::Bool=true) = a//b
 
-divexact(a::Integer, b::Rational; check::Bool=false) = a//b
+divexact(a::Integer, b::Rational; check::Bool=true) = a//b
 
-divexact(a::Rational, b::Rational; check::Bool=false) = a//b
+divexact(a::Rational, b::Rational; check::Bool=true) = a//b
 
 function divides(a::T, b::T) where T <: Rational
    if b == 0
       return false, T(0)
    else
-      return true, divexact(a, b)
+      return true, divexact(a, b; check=false)
    end
 end
 

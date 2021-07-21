@@ -945,7 +945,7 @@ function make_bases_coprime!(a::Array{Pair{E, Int}}, b::Array{Pair{E, Int}}) whe
 end
 
 # Return A/b^bexp
-function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=false) where E
+function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where E
 
   R = parent(A.unit)
   a = collect(A.fac)
@@ -962,7 +962,7 @@ function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=false) where E
     end
     aexp_new = aexps[i] - bexp
     if check && aexp_new < 0
-      error("non-exact division in divexact_pow")
+      error("Not an exact division")
     elseif aexp_new > 0
       push!(abases, abase_new)
       push!(aexps, aexp_new)
@@ -976,7 +976,7 @@ function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=false) where E
   end
 
   if check && !isconstant(b)
-    error("non-exact division in divexact_pow")
+    error("Not an exact division")
   end
 
   #return Fac{E}(one(R), Dict(abases .=> aexps))

@@ -366,11 +366,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=false) where T <: NCRingElem
+    divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=true) where T <: NCRingElem
 
-Assuming $f = qg$, return $q$.
+Assuming $f = qg$, return $q$. By default if the division is not exact an
+exception is raised. If `check=false` this test is omitted.
 """
-function divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=false) where T <: NCRingElem
+function divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=true) where T <: NCRingElem
    check_parent(f, g)
    iszero(g) && throw(DivideError())
    if iszero(f)
@@ -391,17 +392,19 @@ function divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=false) w
          f = set_length!(f, normalise(f, lenf - 1))
       end
    end
+   check && length(f) != 0 && error("Not an exact division")
    q = parent(f)(d)
    q = set_length!(q, lenq)
    return q
 end
 
 @doc Markdown.doc"""
-    divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=false) where T <: NCRingElem
+    divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=true) where T <: NCRingElem
 
-Assuming $f = gq$, return $q$.
+Assuming $f = gq$, return $q$. By default if the division is not exact an
+exception is raised. If `check=false` this test is omitted.
 """
-function divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=false) where T <: NCRingElem
+function divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=true) where T <: NCRingElem
    check_parent(f, g)
    iszero(g) && throw(DivideError())
    if iszero(f)
@@ -422,6 +425,7 @@ function divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=false) wh
          f = set_length!(f, normalise(f, lenf - 1))
       end
    end
+   check && length(f) != 0 && error("Not an exact division")
    q = parent(f)(d)
    q = set_length!(q, lenq)
    return q
@@ -434,11 +438,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact_right(a::NCPolyElem{T}, b::T; check::Bool=false) where T <: NCRingElem
+    divexact_right(a::NCPolyElem{T}, b::T; check::Bool=true) where T <: NCRingElem
 
-Assuming $a = qb$, return $q$.
+Assuming $a = qb$, return $q$. By default if the division is not exact an
+exception is raised. If `check=false` this test is omitted.
 """
-function divexact_right(a::NCPolyElem{T}, b::T; check::Bool=false) where T <: NCRingElem
+function divexact_right(a::NCPolyElem{T}, b::T; check::Bool=true) where T <: NCRingElem
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -450,11 +455,12 @@ function divexact_right(a::NCPolyElem{T}, b::T; check::Bool=false) where T <: NC
 end
 
 @doc Markdown.doc"""
-    divexact_left(a::NCPolyElem{T}, b::T; check::Bool=false) where T <: NCRingElem
+    divexact_left(a::NCPolyElem{T}, b::T; check::Bool=true) where T <: NCRingElem
 
-Assuming $a = bq$, return $q$.
+Assuming $a = bq$, return $q$. By default if the division is not exact an
+exception is raised. If `check=false` this test is omitted.
 """
-function divexact_left(a::NCPolyElem{T}, b::T; check::Bool=false) where T <: NCRingElem
+function divexact_left(a::NCPolyElem{T}, b::T; check::Bool=true) where T <: NCRingElem
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -466,11 +472,12 @@ function divexact_left(a::NCPolyElem{T}, b::T; check::Bool=false) where T <: NCR
 end
 
 @doc Markdown.doc"""
-    divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+    divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
 
-Assuming $a = qb$, return $q$.
+Assuming $a = qb$, return $q$. By default if the division is not exact an
+exception is raised. If `check=false` this test is omitted.
 """
-function divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -482,11 +489,12 @@ function divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat
 end
 
 @doc Markdown.doc"""
-    divexact_left(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+    divexact_left(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
 
-Assuming $a = bq$, return $q$.
+Assuming $a = bq$, return $q$. By default if the division is not exact an
+exception is raised. If `check=false` this test is omitted.
 """
-function divexact_left(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact_left(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    return divexact_right(a, b; check=check)
 end
 

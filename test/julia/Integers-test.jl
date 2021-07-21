@@ -53,9 +53,9 @@ end
    R = zz
    S = ZZ
 
-   @test_throws ArgumentError divexact(10, 4; check=true)
-   @test_throws ArgumentError divexact(big(10), big(4); check=true)
-   @test_throws ArgumentError divexact(big(10), 4; check=true)
+   @test_throws ArgumentError divexact(10, 4)
+   @test_throws ArgumentError divexact(big(10), big(4))
+   @test_throws ArgumentError divexact(big(10), 4)
 
    for iter = 1:1000
       a1 = rand(R, -100:100)

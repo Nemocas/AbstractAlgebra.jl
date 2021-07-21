@@ -1028,7 +1028,7 @@ end
 
 # assuming b divides a (behaviour is undefined otherwise), computes the last n
 # terms of the quotient, i.e. computes divexact(a, b) mod x^n
-function divexact_low(a::PolyElem{T}, b::PolyElem{T}, n::Int; check::Bool=false) where T <: RingElement
+function divexact_low(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingElement
     r = parent(a)()
     if iszero(b)
        return r
@@ -1047,12 +1047,7 @@ function divexact_low(a::PolyElem{T}, b::PolyElem{T}, n::Int; check::Bool=false)
     a = truncate(a, n)
     b = truncate(b, n)
     for i = 0:n - 1
-        if check
-           flag, q = divides(coeff(a, 0), coeff(b, 0))
-           !flag && error("Not an exact division")
-        else
-           q = divexact(coeff(a, 0), coeff(b, 0))
-        end
+        q = divexact(coeff(a, 0), coeff(b, 0); check=false)
         r = setcoeff!(r, i, q)
         a = shift_right(a - q*b, 1)
         b = truncate(b, n - i - 1)
@@ -1363,7 +1358,7 @@ end
 #
 ###############################################################################
 
-function divexact(f::PolyElem{T}, g::PolyElem{T}; check::Bool=false) where T <: RingElement
+function divexact(f::PolyElem{T}, g::PolyElem{T}; check::Bool=true) where T <: RingElement
    check_parent(f, g)
    iszero(g) && throw(DivideError())
    if iszero(f)
@@ -1396,7 +1391,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::PolyElem{T}, b::T; check::Bool=false) where {T <: RingElem}
+function divexact(a::PolyElem{T}, b::T; check::Bool=true) where {T <: RingElem}
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -1407,7 +1402,7 @@ function divexact(a::PolyElem{T}, b::T; check::Bool=false) where {T <: RingElem}
    return z
 end
 
-function divexact(a::PolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact(a::PolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))

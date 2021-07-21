@@ -1023,7 +1023,7 @@ otherwise return `false`.
 #
 ###############################################################################
 
-function divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=false)
+function divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -1033,7 +1033,7 @@ function divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}; che
    return z
 end
 
-function divexact(x::MatrixElem{T}, y::T; check::Bool=false) where {T <: RingElem}
+function divexact(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
