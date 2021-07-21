@@ -181,8 +181,8 @@ end
    @test_throws DomainError root(BigInt(1000), -3)
    @test_throws DomainError root(BigInt(-16), 2)
 
-   @test_throws ErrorException root(BigInt(1100), 3; check=true)
-   @test_throws ErrorException root(-BigInt(40), 3; check=true)
+   @test_throws ErrorException root(BigInt(1100), 3)
+   @test_throws ErrorException root(-BigInt(40), 3)
 
    @test iroot(BigInt(1000), 3) == 10
    @test iroot(BigInt(1100), 3) == 10
@@ -195,15 +195,15 @@ end
 
    @test root(1000, 3) == 10
    @test root(-27, 3) == -3
-   @test root(27, 3; check=true) == 3
-   @test root(16, 2; check=true) == 4
+   @test root(27, 3) == 3
+   @test root(16, 2) == 4
 
    @test_throws DomainError root(-1000, 4)
    @test_throws DomainError root(1000, -3)
    @test_throws DomainError root(-16, 2)
 
-   @test_throws ErrorException root(1100, 3; check=true)
-   @test_throws ErrorException root(-40, 3; check=true)
+   @test_throws ErrorException root(1100, 3)
+   @test_throws ErrorException root(-40, 3)
 
    @test iroot(1000, 3) == 10
    @test iroot(1100, 3) == 10
