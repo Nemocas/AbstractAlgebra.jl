@@ -83,6 +83,11 @@ end
 function (a::FracField{T})(b::T, c::T) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
+   u = canonical_unit(c)
+   if !isone(u)
+      b = divexact(b, u)
+      c = divexact(c, u)
+   end
    z = Frac{T}(b, c)
    z.parent = a
    return z
@@ -90,13 +95,22 @@ end
 
 function (a::FracField{T})(b::T, c::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
-   z = Frac{T}(b, base_ring(a)(c))
+   if !isone(c)
+      b = divexact(b, c)
+      c = divexact(c, c)
+    end
+    z = Frac{T}(b, base_ring(a)(c))
    z.parent = a
    return z
 end
 
 function (a::FracField{T})(b::Union{Integer, Rational, AbstractFloat}, c::T) where {T <: RingElement}
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
+   u = canonical_unit(c)
+   if !isone(u)
+      b = divexact(b, u)
+      c = divexact(c, u)
+   end
    z = Frac{T}(base_ring(a)(b), c)
    z.parent = a
    return z
