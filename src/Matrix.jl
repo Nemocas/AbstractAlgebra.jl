@@ -1918,21 +1918,24 @@ end
 
 @doc Markdown.doc"""
     combinations(n::Int, k::Int)
+    combinations(v::AbstractVector, k::Int)
 
-Return an array consisting of k-combinations of {1,...,n} as arrays.
+Return an array consisting of k-combinations of {1,...,n} (or a given vector v)
+as arrays.
 """
-function combinations(n::Int, k::Int)
-   ans = Vector{Int}[]
+function combinations(n::Int, k::Int) combinations(1:n, k) end
+function combinations(v::AbstractVector{T}, k::Int) where T
+   n = length(v)
+   ans = Vector{T}[]
    k > n && return ans
-   _combinations_dfs!(ans, Vector{Int}(undef, k), n, k)
+   _combinations_dfs!(ans, Vector{T}(undef, k), v, n, k)
    return ans
 end
-
-function _combinations_dfs!(ans::Vector{Vector{Int}}, comb::Vector{Int}, n::Int, k::Int)
+function _combinations_dfs!(ans::Vector{Vector{T}}, comb::Vector{T}, v::AbstractVector{T}, n::Int, k::Int) where T
    k < 1 && (pushfirst!(ans, comb[:]); return)
    for m in n:-1:1
-      comb[k] = m
-      _combinations_dfs!(ans, comb, m - 1, k - 1)
+      comb[k] = v[m]
+      _combinations_dfs!(ans, comb, v, m - 1, k - 1)
    end
 end
 
