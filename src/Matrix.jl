@@ -1917,21 +1917,22 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    combinations(n::Int,k::Int)
+    combinations(n::Int, k::Int)
 
 Return an array consisting of k-combinations of {1,...,n} as arrays.
 """
-function combinations(n, k)
-   if (k == 0)
-      r = Array{Array{Int, 1}, 1}(undef, 1)
-      r[1] = []
-      return r
-   elseif k > n
-      return Array{Array{Int, 1 }, 1}(undef, 0)
-   elseif k == n
-      return [collect(1:k)]
-   else
-      return vcat(combinations(n - 1, k), [append!(l, [n]) for l in combinations(n - 1, k - 1)])
+function combinations(n::Int, k::Int)
+   ans = Vector{Int}[]
+   k > n && return ans
+   _combinations_dfs!(ans, Vector{Int}(undef, k), n, k)
+   return ans
+end
+
+function _combinations_dfs!(ans::Vector{Vector{Int}}, comb::Vector{Int}, n::Int, k::Int)
+   k < 1 && (pushfirst!(ans, comb[:]); return)
+   for m in n:-1:1
+      comb[k] = m
+      _combinations_dfs!(ans, comb, m - 1, k - 1)
    end
 end
 
