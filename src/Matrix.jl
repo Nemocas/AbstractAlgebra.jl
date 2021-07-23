@@ -1923,7 +1923,7 @@ end
 Return an array consisting of k-combinations of {1,...,n} (or a given vector v)
 as arrays.
 """
-function combinations(n::Int, k::Int) combinations(1:n, k) end
+combinations(n::Int, k::Int) = combinations(1:n, k)
 function combinations(v::AbstractVector{T}, k::Int) where T
    n = length(v)
    ans = Vector{T}[]
