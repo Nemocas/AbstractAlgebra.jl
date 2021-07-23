@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export root, iroot
+export iroot, ispower, ispower_with_root, root
 
 ###############################################################################
 #
@@ -219,6 +219,76 @@ function root(a::T, n::Int; check::Bool=true) where T <: Integer
       return T(root(BigInt(a), n; check=check))
    end
 end
+
+moduli3 = [7, 8, 13]
+residues3 = [[0, 1, 6], [0, 1, 3, 5, 7], [0, 1, 5, 8, 12]]
+
+moduli5 = [8, 11, 31]
+residues5 = [[0, 1, 3, 5, 7], [0, 1, 10], [0, 1, 5, 6, 25, 26, 30]]
+
+moduli7 = [8, 29, 43]
+residues7 = [[0, 1, 3, 5, 7], [0, 1, 12, 17, 28], [0, 1, 6, 7, 36, 37, 42]]
+
+function ispower_moduli(a::Integer, n::Int)
+   if mod(n, 3) == 0
+      for i = 1:length(moduli3)
+         if !(mod(a, moduli3[i]) in residues3[i])
+            return false
+         end
+      end
+   elseif (n % 5) == 0
+      for i = 1:length(moduli5)
+         if !(mod(a, moduli5[i]) in residues5[i])
+            return false
+         end
+      end
+   elseif (n % 3) == 0
+      for i = 1:length(moduli7)
+         if !(mod(a, moduli7[i]) in residues7[i])
+            return false
+         end
+      end
+   elseif isodd(n)
+      if !(mod(a, moduli5[1]) in residues5[1])
+            return false
+      end
+   end
+   return true
+end
+
+function ispower_with_root(a::BigInt, n::Int)
+   n <= 0 && throw(DomainError(n, "exponent n must be positive"))
+   if n == 1
+      return true, a
+   elseif !ispower_moduli(a, n)
+      return false, zero(BigInt)
+   end
+      
+   q = fmpz()
+   r = fmpz()
+   ccall((:__gmpz_rootrem, :libgmp), Nothing,
+                     (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Cint), q, r, a, n)
+   return iszero(r) ? (true, q) : (false, zero(BigInt))
+end
+
+function ispower_with(a::BigInt, n::Int)
+   if !ispower_moduli(a, n)
+      return false
+   end
+
+   q = fmpz()
+   r = fmpz()
+   ccall((:__gmpz_rootrem, :libgmp), Nothing,
+                     (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Cint), q, r, a, n)
+
+   return r == 0
+end
+
+@doc Markdown.doc"""
+    ispower(a::BigInt, n::Int)
+
+Return `true` if `a` is a perfect `n`-th power, i.e. if there is
+"""
 
 function iroot(a::BigInt, n::Int)
     a < 0 && iseven(n) && throw(DomainError((a, n),
