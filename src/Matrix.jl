@@ -1937,7 +1937,7 @@ function combinations(v::AbstractVector{T}, k::Int) where T
 end
 function _combinations_dfs!(ans::Vector{Vector{T}}, comb::Vector{T}, v::AbstractVector{T}, n::Int, k::Int) where T
    k < 1 && (pushfirst!(ans, comb[:]); return)
-   for m in n:-1:1
+   for m in n:-1:k
       comb[k] = v[m]
       _combinations_dfs!(ans, comb, v, m - 1, k - 1)
    end
