@@ -440,13 +440,21 @@ make sense but are passed to the function.
 ### Exact division
 
 ```julia
-divexact(f::MyElem, g::MyElem)
+divexact(f::MyElem, g::MyElem; check::Bool=true)
 ```
 
 Return $f/g$, though note that Julia uses `/` for floating point division. Here we
 mean exact division in the ring, i.e. return $q$ such that $f = gq$. A `DivideError()`
-should be thrown if $g$ is zero. If no exact quotient exists or an impossible inverse
-is unavoidably encountered, an error should be thrown.
+should be thrown if $g$ is zero.
+
+If `check=true` the function should check that the division is exact and throw
+an exception if not.
+
+If `check=false` the check may be omitted for performance reasons. The behaviour
+is then undefined if a division is performed that is not exact. This may include
+throwing an exception, returning meaningless results, hanging or crashing. The
+function should only be called with `check=false` if it is already known that the
+division will be exact.
 
 ### Inverse
 
