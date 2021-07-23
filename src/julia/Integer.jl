@@ -256,39 +256,56 @@ function ispower_moduli(a::Integer, n::Int)
    return true
 end
 
-function ispower_with_root(a::BigInt, n::Int)
+@doc Markdown.doc"""
+    ispower_with_root(a::T, n::Int) where T <: Integer
+
+Return `true, q` if $a$ is a perfect $n$-th power with $a = q^n$. Otherwise
+return `false, 0`. We require $n > 0$.
+"""
+function ispower_with_root(a::T, n::Int) where T <: Integer
    n <= 0 && throw(DomainError(n, "exponent n must be positive"))
-   if n == 1
-      return true, a
-   elseif !ispower_moduli(a, n)
+   if n == 1 || a == 0 || a == 1
+      return (true, a)
+   elseif a == -1
+      return isodd(n) ? (true, a) : (false, zero(T))
+   elseif mod(n, 2) == 0 && a < 0
       return false, zero(BigInt)
+   elseif !ispower_moduli(a, n)
+      return (false, zero(BigInt))
    end
       
-   q = fmpz()
-   r = fmpz()
+   q = BigInt()
+   r = BigInt()
    ccall((:__gmpz_rootrem, :libgmp), Nothing,
-                     (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Cint), q, r, a, n)
-   return iszero(r) ? (true, q) : (false, zero(BigInt))
-end
-
-function ispower_with(a::BigInt, n::Int)
-   if !ispower_moduli(a, n)
-      return false
-   end
-
-   q = fmpz()
-   r = fmpz()
-   ccall((:__gmpz_rootrem, :libgmp), Nothing,
-                     (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Cint), q, r, a, n)
-
-   return r == 0
+                     (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Int), q, r, a, n)
+   return iszero(r) ? (true, T(q)) : (false, zero(T))
 end
 
 @doc Markdown.doc"""
-    ispower(a::BigInt, n::Int)
+    ispower(a::T, n::Int) where T <: Integer
 
-Return `true` if `a` is a perfect `n`-th power, i.e. if there is
+Return `true` if $a$ is a perfect $n$-th power, i.e. if there is an integer $b$
+such that $a = b^n$. We require $n > 0$.
 """
+function ispower(a::T, n::Int) where T <: Integer
+   n <= 0 && throw(DomainError(n, "n is not positive"))
+   if n == 1 || a == 0 || a == 1
+      return true
+   elseif a == -1
+      return isodd(n) ? true : false
+   elseif mod(n, 2) == 0 && a < 0
+      return false
+   elseif !ispower_moduli(a, n)
+      return false
+   end
+   
+   q = BigInt()
+   r = BigInt()
+   ccall((:__gmpz_rootrem, :libgmp), Nothing,
+                     (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Int), q, r, BigInt(a), n)
+
+   return r == 0
+end
 
 function iroot(a::BigInt, n::Int)
     a < 0 && iseven(n) && throw(DomainError((a, n),
