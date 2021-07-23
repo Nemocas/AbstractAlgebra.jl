@@ -1918,12 +1918,16 @@ end
 
 @doc Markdown.doc"""
     combinations(n::Int, k::Int)
-    combinations(v::AbstractVector, k::Int)
 
-Return an array consisting of k-combinations of {1,...,n} (or a given vector v)
-as arrays.
+Return an array consisting of k-combinations of {1,...,n} as arrays.
 """
 combinations(n::Int, k::Int) = combinations(1:n, k)
+
+@doc Markdown.doc"""
+    combinations(v::AbstractVector, k::Int)
+
+Return an array consisting of k-combinations of a given vector v as arrays.
+"""
 function combinations(v::AbstractVector{T}, k::Int) where T
    n = length(v)
    ans = Vector{T}[]
