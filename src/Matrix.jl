@@ -1917,21 +1917,29 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    combinations(n::Int,k::Int)
+    combinations(n::Int, k::Int)
 
 Return an array consisting of k-combinations of {1,...,n} as arrays.
 """
-function combinations(n, k)
-   if (k == 0)
-      r = Array{Array{Int, 1}, 1}(undef, 1)
-      r[1] = []
-      return r
-   elseif k > n
-      return Array{Array{Int, 1 }, 1}(undef, 0)
-   elseif k == n
-      return [collect(1:k)]
-   else
-      return vcat(combinations(n - 1, k), [append!(l, [n]) for l in combinations(n - 1, k - 1)])
+combinations(n::Int, k::Int) = combinations(1:n, k)
+
+@doc Markdown.doc"""
+    combinations(v::AbstractVector, k::Int)
+
+Return an array consisting of k-combinations of a given vector v as arrays.
+"""
+function combinations(v::AbstractVector{T}, k::Int) where T
+   n = length(v)
+   ans = Vector{T}[]
+   k > n && return ans
+   _combinations_dfs!(ans, Vector{T}(undef, k), v, n, k)
+   return ans
+end
+function _combinations_dfs!(ans::Vector{Vector{T}}, comb::Vector{T}, v::AbstractVector{T}, n::Int, k::Int) where T
+   k < 1 && (pushfirst!(ans, comb[:]); return)
+   for m in n:-1:k
+      comb[k] = v[m]
+      _combinations_dfs!(ans, comb, v, m - 1, k - 1)
    end
 end
 
