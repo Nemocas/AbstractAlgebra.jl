@@ -100,19 +100,6 @@ base ring of the series ring.
 It may be desirable to implement an addition version which accepts an array of Julia
 `Int` values if this can be done more efficiently.
 
-**Examples**
-
-```jldoctest
-julia> S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_relative)
-(Univariate power series ring in x over Rationals, x + O(x^11))
-
-julia> T, y = LaurentSeriesRing(ZZ, 10, "y")
-(Laurent series ring in y over Integers, y + O(y^11))
-
-julia> U, z = LaurentSeriesField(QQ, 10, "z")
-(Laurent series field in z over Rationals, z + O(z^11))
-```
-
 For absolute power series we have:
 
 ```julia
@@ -129,17 +116,6 @@ modifying the polynomial underlying it.
 
 It is permitted to have trailing zeros in the array, but it is not needed, even if the
 precision is bigger than the length of the array.
-
-**Examples**
-
-```jldoctest
-julia> S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
-(Univariate power series ring in x over Rationals, x + O(x^10))
-
-julia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
-2*x + 3*x^2 + x^3 + O(x^6)
-
-```
 
 It is also possible to create series directly without having to create the
 corresponding series ring.
@@ -170,28 +146,6 @@ desired, set `cached=false`. However, this means that subsequent series created
 in the same way will not be compatible. Instead, one should use the parent
 object of the first series to create subsequent series instead of calling this
 function repeatedly with cached=false.
-
-**Examples**
-
-```jldoctest
-julia> f = abs_series(ZZ, [1, 2, 3], 3, 5, "y")
-1 + 2*y + 3*y^2 + O(y^5)
-
-julia> g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
-x^4 + 2*x^5 + 3*x^6 + O(x^7)
-
-julia> k = abs_series(ZZ, [1, 2, 3], 1, 6, cached=false)
-1 + O(x^6)
-
-julia> p = rel_series(ZZ, BigInt[], 0, 3, 1)
-O(x^3)
-
-julia> q = abs_series(ZZ, [], 0, 6)
-O(x^6)
-
-julia> s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
-1 + 2*x + 3*x^2 + O(x^5)
-```
 
 ### Data type and parent object methods
 
@@ -227,20 +181,6 @@ that the output of an operation will be if it cannot be represented to full prec
 This value is usually supplied upon creation of the series ring and stored in the ring.
 It is independent of the precision which each series in the ring actually has. Those
 are stored on a per element basis in the actual series elements.
-
-**Examples**
-
-```jldoctest
-julia> S, x = PowerSeriesRing(QQ, 10, "x")
-(Univariate power series ring in x over Rationals, x + O(x^11))
-
-julia> vsym = var(S)
-:x
-
-julia> max_precision(S) == 10
-true
-
-```
 
 ### Basic manipulation of rings and elements
 
@@ -356,42 +296,6 @@ gen(R::MySeriesRing{T}) where T <: RingElem
 
 Return the generator `x` of the series ring.
 
-**Examples**
-
-```jldoctest
-julia> S, x = PowerSeriesRing(ZZ, 10, "x")
-(Univariate power series ring in x over Integers, x + O(x^11))
-
-julia> f = 1 + 3x + x^3 + O(x^5)
-1 + 3*x + x^3 + O(x^5)
-
-julia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0], 4, 10, 3);
-
-julia> n = pol_length(f)
-4
-
-julia> c = polcoeff(f, 1)
-3
-
-julia> set_length!(g, 3)
-x^3 + 2*x^4 + O(x^10)
-
-julia> g = setcoeff!(g, 2, BigInt(11))
-x^3 + 2*x^4 + 11*x^5 + O(x^10)
-
-julia> fit!(g, 8)
-
-julia> g = setcoeff!(g, 7, BigInt(4))
-x^3 + 2*x^4 + 11*x^5 + O(x^10)
-
-julia> w = gen(S)
-x + O(x^11)
-
-julia> isgen(w)
-true
-
-```
-
 ## Optional functionality for series
 
 ### Similar and zero
@@ -441,19 +345,3 @@ sufficient to specialise only similar. For both similar and zero only the most
 general method has to be implemented as all other methods call out to this more
 general method.
 
-### Random generation
-
-Random series can be constructed using the `rand` function. A range of possible
-valuations is provided. The maximum precision of the ring is used as a bound on
-the precision. Other parameters are used to construct random coefficients.
-
-```julia
-rand(R::SeriesRing, val_range::UnitRange{Int}, v...)
-```
-
-** Examples **
-
-```@repl
-R, x = PowerSeriesRing(ZZ, 10, "x")
-f = rand(R, 3:5, -10:10)
-```
