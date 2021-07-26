@@ -442,6 +442,16 @@ julia> Z = divexact(2*A, 2)
 [  t^2       t             t]
 [   -2   t + 2   t^2 + t + 1]
 
+julia> M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
+[2   3   0]
+[1   1   1]
+
+julia> M[1, 2] = BigInt(4)
+4
+
+julia> c = M[1, 1]
+2
+
 ```
 
 ### Transpose
