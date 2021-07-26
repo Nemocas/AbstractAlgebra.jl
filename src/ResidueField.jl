@@ -74,7 +74,7 @@ end
 Return the characteristic of the residue field.
 """
 function characteristic(R::ResField)
-   return characteristic(base_ring(r))
+   return characteristic(base_ring(R))
 end
 
 @doc Markdown.doc"""
@@ -496,4 +496,3 @@ function ResidueField(R::Ring, a::RingElement; cached::Bool = true)
 
    return Generic.ResField{T}(R(a), cached)
 end
-
