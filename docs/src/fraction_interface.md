@@ -47,10 +47,11 @@ Note that the type `T` must (transitively) belong to the abstract type `RingElem
 
 ### Constructors
 
-We provide the following constructors. Note that these constructors don't require
-construction of the parent object first. This is easier to achieve if the fraction
-element type doesn't contain a reference to the parent object, but merely contains a
-reference to the base ring. The parent object can then be constructed on demand.
+The following constructors create fractions. Note that these constructors don't
+require construction of the parent object first. This is easier to achieve if
+the fraction element type doesn't contain a reference to the parent object, but
+merely contains a reference to the base ring. The parent object can then be
+constructed on demand.
 
 ```julia
 //(x::T, y::T) where T <: RingElem
@@ -70,23 +71,6 @@ Return $x/y$ where $x$ is in the base ring of $y$.
 
 Return $x/y$ where $y$ is in the base ring of $x$.
 
-**Examples**
-
-```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
-
-julia> f = (x^2 + x + 1)//(x^3 + 3x + 1)
-(x^2 + x + 1)//(x^3 + 3*x + 1)
-
-julia> g = f//x
-(x^2 + x + 1)//(x^4 + 3*x^2 + x)
-
-julia> h = x//f
-(x^4 + 3*x^2 + x)//(x^2 + x + 1)
-
-```
-
 ### Basic manipulation of fields and elements
 
 ```julia
@@ -102,21 +86,4 @@ denominator(d::MyFrac{T}) where T <: RingElem
 
 Given a fraction $d = a/b$ return $b$, where $a/b$ is in lowest terms with respect to
 the `canonical_unit` and `gcd` functions on the base ring.
-
-**Examples**
-
-```jldoctest
-julia> R, x = PolynomialRing(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
-
-julia> f = (x^2 + x + 1)//(x^3 + 3x + 1)
-(x^2 + x + 1)//(x^3 + 3*x + 1)
-
-julia> n = numerator(f)
-x^2 + x + 1
-
-julia> d = denominator(f)
-x^3 + 3*x + 1
-
-```
 
