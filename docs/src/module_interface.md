@@ -93,31 +93,6 @@ rels(M::MyModule{T}) where T <: RingElement
 Return a Julia vector of all the relations between the generators of `M`. Each
 relation is given as an AbstractAlgebra row matrix.
 
-**Examples**
-
-```jldoctest
-julia> M = FreeModule(QQ, 2)
-Vector space of dimension 2 over Rationals
-
-julia> n = ngens(M)
-2
-
-julia> G = gens(M)
-2-element Array{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}},1}:
- (1//1, 0//1)
- (0//1, 1//1)
-
-julia> R = rels(M)
-AbstractAlgebra.Generic.MatSpaceElem{Rational{BigInt}}[]
-
-julia> g1 = gen(M, 1)
-(1//1, 0//1)
-
-julia> !iszero(g1)
-true
-
-```
-
 ### Element constructors
 
 We can construct elements of a module $M$ by specifying linear combinations
@@ -139,20 +114,6 @@ coerce $n$ into $M$ using the notation $M(n)$ in certain circumstances.
 In particular the element $n$ will be automatically coerced along any canonical
 injection of a submodule map and along any canonical projection of a quotient
 map. There must be a path from $N$ to $M$ along such maps.
-
-**Examples**
-
-```julia
-F = FreeModule(ZZ, 3)
-
-S1, f = sub(F, [rand(F, -10:10)])
-
-S, g = sub(F, [rand(F, -10:10)])
-Q, h = quo(F, S)
-
-m = rand(S1, -10:10)
-n = Q(m)
-```
 
 ### Arithmetic operators
 
