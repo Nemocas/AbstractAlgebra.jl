@@ -69,20 +69,12 @@ function modulus(r::ResFieldElem)
 end
 
 @doc Markdown.doc"""
-    characteristic(r::ResField)
+    characteristic(R::ResField)
 
-Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
-residue $r$ belongs to.
+Return the characteristic of the residue field.
 """
-function characteristic(r::ResField)
-   R = base_ring(r)
-   while R != Union{}
-      if typeof(R) <: Field
-         return characteristic(R)
-      end
-      R = base_ring(R)
-   end
-   return characteristic(base_ring(R))
+function characteristic(R::ResField)
+   return characteristic(base_ring(r))
 end
 
 @doc Markdown.doc"""
@@ -110,8 +102,7 @@ function isunit(a::ResFieldElem)
    return isone(g)
 end
 
-deepcopy_internal(a::ResFieldElem, dict::IdDict) =
-   parent(a)(deepcopy(data(a)))
+deepcopy_internal(a::ResFieldElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
 
 ###############################################################################
 #
