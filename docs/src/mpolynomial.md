@@ -400,9 +400,101 @@ true
 julia> isunit(R(1))
 true
 
-julia> c = coeff(f, x^2)
+julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = x^3*y + 3x*y^2 + 1
+x^3*y + 3*x*y^2 + 1
+
+julia> c1 = coeff(f, 1)
 1
 
+julia> c2 = coeff(f, x^3*y)
+1
+
+julia> m = monomial(f, 2)
+x*y^2
+
+julia> e1 = exponent(f, 1, 1)
+3
+
+julia> v1 = exponent_vector(f, 1)
+2-element Array{Int64,1}:
+ 3
+ 1
+
+julia> t1 = term(f, 1)
+x^3*y
+
+julia> setcoeff!(f, [3, 1], 12)
+12*x^3*y + 3*x*y^2 + 1
+
+julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
+(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
+
+julia> V = symbols(S)
+2-element Array{Symbol,1}:
+ :x
+ :y
+
+julia> X = gens(S)
+2-element Array{AbstractAlgebra.Generic.MPoly{Rational{BigInt}},1}:
+ x
+ y
+
+julia> ord = ordering(S)
+:deglex
+
+julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = x^3*y + 3x*y^2 + 1
+x^3*y + 3*x*y^2 + 1
+
+julia> n = length(f)
+3
+
+julia> isgen(y)
+true
+
+julia> nvars(S) == 2
+true
+
+julia> d = total_degree(f)
+4
+
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = 2x^2*y + 2x + y + 1
+2*x^2*y + 2*x + y + 1
+
+julia> g = x^2*y^2 + 1
+x^2*y^2 + 1
+
+julia> flag, q = divides(f*g, f)
+(true, x^2*y^2 + 1)
+
+julia> d = divexact(f*g, f)
+x^2*y^2 + 1
+
+julia> v, q = remove(f*g^3, g)
+(3, 2*x^2*y + 2*x + y + 1)
+
+julia> n = valuation(f*g^3, g)
+3
+
+julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
+
+julia> f = 3x^2*y^2 + 2x + 1
+3*x^2*y^2 + 2*x + 1
+
+julia> f1 = divexact(f, 5)
+3//5*x^2*y^2 + 2//5*x + 1//5
+
+julia> f2 = divexact(f, QQ(2, 3))
+9//2*x^2*y^2 + 3*x + 3//2
 ```
 
 ### Square root
@@ -415,6 +507,22 @@ sqrt(f::MPolyElem, check::bool=true)
 issquare(::MPolyElem)
 ```
 
+**Examples**
+
+```@jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = -4*x^5*y^4 + 5*x^5*y^3 + 4*x^4 - x^3*y^4
+-4*x^5*y^4 + 5*x^5*y^3 + 4*x^4 - x^3*y^4
+
+julia> sqrt(f^2)
+4*x^5*y^4 - 5*x^5*y^3 - 4*x^4 + x^3*y^4
+
+julia> issquare(f)
+false
+```
+
 ### Iterators
 
 The following iterators are provided for multivariate polynomials.
@@ -424,6 +532,40 @@ coefficients(p::MPoly)
 monomials(p::MPoly)
 terms(p::MPoly)
 exponent_vectors(a::MPoly)
+```
+
+**Examples**
+
+```jldoctest
+julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = x^3*y + 3x*y^2 + 1
+x^3*y + 3*x*y^2 + 1
+
+julia> C = collect(coefficients(f))
+3-element Array{BigInt,1}:
+ 1
+ 3
+ 1
+
+julia> M = collect(monomials(f))
+3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
+ x^3*y
+ x*y^2
+ 1
+
+julia> T = collect(terms(f))
+3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
+ x^3*y
+ 3*x*y^2
+ 1
+
+julia> V = collect(exponent_vectors(f))
+3-element Array{Array{Int64,1},1}:
+ [3, 1]
+ [1, 2]
+ [0, 0]
 ```
 
 ### Changing base (coefficient) rings
@@ -751,6 +893,11 @@ y + 1
 julia> derivative(f, y)
 x + 1
 
+julia> derivative(f, 1)
+y + 1
+
+julia> derivative(f, 2)
+x + 1
 ```
 
 ### Homogeneous polynomials
