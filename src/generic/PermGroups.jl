@@ -685,10 +685,10 @@ julia> p = Perm([2,3,1])
 (1,2,3)
 
 julia> matrix_repr(p)
-3×3 SparseArrays.SparseMatrixCSC{Int64,Int64} with 3 stored entries:
-  [3, 1]  =  1
-  [1, 2]  =  1
-  [2, 3]  =  1
+3×3 SparseArrays.SparseMatrixCSC{Int64, Int64} with 3 stored entries:
+ ⋅  1  ⋅
+ ⋅  ⋅  1
+ 1  ⋅  ⋅
 
 julia> Array(ans)
 3×3 Matrix{Int64}:

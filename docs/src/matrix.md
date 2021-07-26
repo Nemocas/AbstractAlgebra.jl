@@ -272,11 +272,11 @@ julia> collect(x)
 
 julia> Set(x)
 Set{BigInt} with 6 elements:
+  5
   4
+  6
   2
   3
-  5
-  6
   1
 ```
 
