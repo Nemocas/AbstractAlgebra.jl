@@ -1,3 +1,4 @@
+include("Rings-conformance-tests.jl")
 include("WeakValueDict-test.jl")
 include("Groups-test.jl")
 include("NCRings-test.jl")
