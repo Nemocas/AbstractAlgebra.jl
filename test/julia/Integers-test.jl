@@ -1,47 +1,9 @@
-@testset "Julia.Integers.constructors" begin
-   R = zz
-   S = ZZ
-
-   @test elem_type(R) == Int
-   @test elem_type(S) == BigInt
-   @test elem_type(AbstractAlgebra.Integers{Int}) == Int
-   @test elem_type(AbstractAlgebra.Integers{BigInt}) == BigInt
-   @test parent_type(Int) == AbstractAlgebra.Integers{Int}
-   @test parent_type(BigInt) == AbstractAlgebra.Integers{BigInt}
-
-   @test isa(R, AbstractAlgebra.Integers)
-   @test isa(S, AbstractAlgebra.Integers)
-
-   @test isa(R(), Int)
-   @test isa(S(), BigInt)
-
-   @test isa(R(11), Int)
-   @test isa(S(BigInt(11)), BigInt)
-   @test isa(S(11), BigInt)
-
-   a = R(11)
-   b = S(11)
-
-   @test isa(R(a), Int)
-   @test isa(S(b), BigInt)
-end
-
 @testset "Julia.Integers.manipulation" begin
    R = zz
    S = ZZ
 
-   @test iszero(zero(R))
-   @test iszero(zero(S))
-
-   @test isone(one(R))
-   @test isone(one(S))
-
-   @test !isunit(R())
-   @test !isunit(S())
    @test !isunit(R(3))
    @test !isunit(S(3))
-   @test isunit(R(1))
-   @test isunit(S(1))
    @test isunit(R(-1))
    @test isunit(S(-1))
 

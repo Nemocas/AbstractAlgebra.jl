@@ -5,29 +5,6 @@
    @test R == FractionField(zz)
    @test S == FractionField(ZZ)
 
-   @test elem_type(R) == Rational{Int}
-   @test elem_type(S) == Rational{BigInt}
-   @test elem_type(AbstractAlgebra.Rationals{Int}) == Rational{Int}
-   @test elem_type(AbstractAlgebra.Rationals{BigInt}) == Rational{BigInt}
-   @test parent_type(Rational{Int}) == AbstractAlgebra.Rationals{Int}
-   @test parent_type(Rational{BigInt}) == AbstractAlgebra.Rationals{BigInt}
-
-   @test isa(R, AbstractAlgebra.Rationals)
-   @test isa(S, AbstractAlgebra.Rationals)
-
-   @test isa(R(), Rational{Int})
-   @test isa(S(), Rational{BigInt})
-
-   @test isa(R(11), Rational{Int})
-   @test isa(R(11//3), Rational{Int})
-   @test isa(R(11, 3), Rational{Int})
-   @test isa(S(BigInt(11)), Rational{BigInt})
-   @test isa(S(BigInt(11)//BigInt(3)), Rational{BigInt})
-   @test isa(S(Rational{BigInt}(11)), Rational{BigInt})
-   @test isa(S(11), Rational{BigInt})
-   @test isa(S(11, 3), Rational{BigInt})
-   @test isa(S(BigInt(11), BigInt(3)), Rational{BigInt})
-
    a = R(11)
    b = S(11)
 
@@ -46,14 +23,6 @@ end
    R = qq
    S = QQ
 
-   @test iszero(zero(R))
-   @test iszero(zero(S))
-
-   @test isone(one(R))
-   @test isone(one(S))
-
-   @test !isunit(R())
-   @test !isunit(S())
    @test isunit(R(3))
    @test isunit(S(3))
 end

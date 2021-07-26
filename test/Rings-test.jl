@@ -21,15 +21,6 @@ include("algorithms/DensePoly-test.jl")
 end
 
 @testset "Generic.Rings.elem/parent_type" begin
-   for (R, el, par) in [(GF(3), AbstractAlgebra.GFElem{Int}, AbstractAlgebra.GFField{Int}),
-                        (ZZ["x"][1], Generic.Poly{BigInt}, Generic.PolyRing{BigInt})]
-      x = R(2)
-      @test elem_type(R) == el
-      @test elem_type(typeof(R)) == el
-      @test parent_type(x) == par
-      @test parent_type(typeof(x)) == par
-   end
-
    @test_throws MethodError parent_type('c')
    @test_throws MethodError parent_type(Char)
    @test parent_type(big(1)) == AbstractAlgebra.Integers{BigInt}
@@ -37,3 +28,7 @@ end
    @test_throws MethodError elem_type('c')
    @test_throws MethodError elem_type(Char)
 end
+
+include("julia/Integers-test.jl")
+
+include("Rings-conformance-tests.jl")
