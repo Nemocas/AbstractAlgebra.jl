@@ -192,7 +192,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
             else
                try
                   t = divexact(b*a, b)
-                  @test equaltiy(t*b, a*b)
+                  @test equality(t*b, a*b)
                catch
                end
             end

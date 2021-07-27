@@ -51,6 +51,12 @@ function test_elem(R::AbstractAlgebra.Integers{BigInt})
 end
 test_Ring_interface_recursive(ZZ)
 
+function test_elem(R::AbstractAlgebra.Generic.ResRing{BigInt})
+   return R(rand(0:characteristic(R)))
+end
+test_Ring_interface(ResidueRing(ZZ, 1))   # isgen fails on polys
+test_Ring_interface_recursive(ResidueRing(ZZ, -4))
+
 function test_elem(R::AbstractAlgebra.Rationals{BigInt})
    n = big(2)^rand(1:100)
    return QQ(rand(-n:n)//rand(1:n))
