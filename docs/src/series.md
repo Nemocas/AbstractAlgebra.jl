@@ -731,7 +731,7 @@ the precision. Other parameters are used to construct random coefficients.
 rand(R::SeriesRing, val_range::UnitRange{Int}, v...)
 ```
 
-** Examples **
+**Examples**
 
 ```@repl
 R, x = PowerSeriesRing(ZZ, 10, "x")

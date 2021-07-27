@@ -921,7 +921,7 @@ the requested number of terms.
 rand(R::MPolyRing, exp_range::UnitRange{Int}, term_range::UnitRange{Int}, v...)
 ```
 
-** Examples **
+**Examples**
 
 ```@repl
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])

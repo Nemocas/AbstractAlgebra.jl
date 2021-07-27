@@ -1074,7 +1074,7 @@ rand(R::PolyRing, deg_range::UnitRange{Int}, v...)
 rand(R::PolyRing, deg::Int, v...)
 ```
 
-** Examples **
+**Examples**
 
 ```julia
 R, x = PolynomialRing(ZZ, "x")

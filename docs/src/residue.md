@@ -297,7 +297,7 @@ ring are used to generate elements of the base ring.
 rand(R::ResRing, v...)
 ```
 
-** Examples **
+**Examples**
 
 ```@repl
 R = ResidueRing(ZZ, 7)

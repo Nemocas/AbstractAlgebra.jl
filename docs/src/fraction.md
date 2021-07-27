@@ -323,7 +323,7 @@ fraction field tell `rand` how to generate random elements of the base ring.
 rand(R::FracField, v...)
 ```
 
-** Examples **
+**Examples**
 
 ```@repl
 K = FractionField(ZZ)

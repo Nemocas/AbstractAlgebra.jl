@@ -288,7 +288,7 @@ matrix. Modifying the submatrix also modifies the original matrix.
 
 The syntax for views is as for Julia's own views.
 
-** Examples **
+**Examples**
 
 ```@repl
 M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
