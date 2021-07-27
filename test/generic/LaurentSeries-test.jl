@@ -590,6 +590,14 @@ end
          r2 *= f
       end
    end
+
+   # regression test (see #967)
+   Zn = ResidueRing(ZZ, 4)
+   R, x = LaurentSeriesRing(Zn, 5, "x")
+   f = 2*x^6 + O(x^11)
+
+   @test isequal(f*f, f^2)
+   @test isequal(f^0, one(R))
 end
 
 @testset "Generic.LaurentSeries.shift" begin

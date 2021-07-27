@@ -625,6 +625,14 @@ end
    f = rand(R, 0:12, 0:rand(1:25))
    @test_throws DomainError f^-1
    @test_throws DomainError f^-rand(2:100)
+
+   # regression test (see #967)
+   Zn = ResidueRing(ZZ, 4)
+   R, x = PowerSeriesRing(Zn, 5, "x")
+   f = 2*x^6 + O(x^11)
+
+   @test isequal(f*f, f^2)
+   @test isequal(f^0, one(R))
 end
 
 @testset "Generic.RelSeries.shift" begin
