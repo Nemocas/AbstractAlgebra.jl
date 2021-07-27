@@ -346,6 +346,9 @@ end
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
    B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
 
+   @test nrows(S) == 3
+   @test ncols(S) == 3
+
    @test dense_matrix_type(R) == elem_type(S)
 
    let ET = AbstractAlgebra.Generic.Poly{Rational{BigInt}}

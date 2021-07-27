@@ -232,6 +232,20 @@ in Nemo, which depends on AbstractAlgebra, we define
 `dense_matrix_type(::Type{fmpz}) = fmpz_mat`.
 
 ```julia
+nrows(M::MyMatSpace{T}) where T <: RingElem
+nrows(M::MyMatAlgebra{T}) where T <: RingElem
+```
+
+Return the number of rows of matrices in the matrix space.
+
+```julia
+ncols(M:MyMatSpace{T}) where T <: RingElem
+ncols(M:MyMatAlgebra{T}) where T <: RingElem
+```
+
+Return the number of columns of matrices in the matrix space.
+
+```julia
 nrows(f::MyMat{T}) where T <: RingElem
 ```
 

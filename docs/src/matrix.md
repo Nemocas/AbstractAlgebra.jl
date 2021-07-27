@@ -320,10 +320,12 @@ dense_matrix_type(::Ring)
 ```
 
 ```@docs
-nrows(::MatrixElem)
+nrows(::MatSpace)
+ncols(::MatSpace)
 ```
 
 ```@docs
+nrows(::MatrixElem)
 ncols(::MatrixElem)
 ```
 
