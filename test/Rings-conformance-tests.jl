@@ -389,16 +389,6 @@ function test_MatAlgebra_interface(S::MatAlgebra; reps = 20)
          end
       end
 
-      if nrows(S) > 0
-         @testset "Views" begin
-            a = test_elem(S)::ST
-            b = test_elem(S)::ST
-            N1 = @view a[1:1, 1:1]
-            N2 = @view b[1:1, 1:1]
-            @test N1*N2 == matrix(R, 1, 1, a[1, 1]*b[1, 1])
-         end
-      end
-
       @testset "Basic manipulation of matrices" begin
          for k in 1:reps
             a = test_elem(S)::ST
