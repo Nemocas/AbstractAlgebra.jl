@@ -1,9 +1,5 @@
-import AbstractAlgebra: NCRingElem, NCRingElement
 
-const reps = 50
-
-
-function equality(a::T, b::T) where T <: NCRingElement
+function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
    if isexact_type(T)
       return a == b
    else
@@ -12,19 +8,18 @@ function equality(a::T, b::T) where T <: NCRingElement
 end
 
 
-function test_NCRing_interface(
-   R::AbstractAlgebra.NCRing,
-   example_elements::Vector{T}
-) where T <: NCRingElement
+function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
+
+   T = elem_type(R)
 
    @testset "NCRing interface for $(R)" begin
 
       @testset "Functions for types and parents of rings" begin
-         @test elem_type(R) == T
          @test elem_type(typeof(R)) == T
          @test parent_type(T) == typeof(R)
-         for x in example_elements
-            @test parent(x) == R
+         for i in 1:reps
+            a = test_elem(R)::T
+            @test parent(a) == R
          end
          @test isdomain_type(T) isa Bool
          @test isexact_type(T) isa Bool
@@ -44,14 +39,11 @@ function test_NCRing_interface(
          @test R(BigInt(1)) isa T
          @test R(BigInt(-2)) isa T
          @test R(BigInt(3)^100) isa T
-         for x in example_elements
-            @test R(x) isa T
+         for i in 1:reps
+            a = test_elem(R)::T
+            @test R(a) isa T
          end
       end
-
-      elems = deepcopy(example_elements)
-      append!(elems, T[R(0), R(1), R(-2), R(BigInt(0)), R(BigInt(1)),
-                       R(BigInt(-2))#=, R(BigInt(3)^100)=#])
 
       @testset "Basic functions" begin
          @test iszero(R())       # R() is supposed to construct 0 ?
@@ -61,17 +53,18 @@ function test_NCRing_interface(
          @test isone(R(1))
          @test isone(R(0)) || !isunit(R(0))
          @test isunit(R(1))
-         for x in example_elements
-            @test hash(x) isa UInt
-            @test hash(x) == hash(deepcopy(x))
-            @test sprint(show, "text/plain", x) isa String
+         for i in 1:reps
+            a = test_elem(R)::T
+            @test hash(a) isa UInt
+            @test hash(a) == hash(deepcopy(a))
+            @test sprint(show, "text/plain", a) isa String
          end
          @test sprint(show, "text/plain", R) isa String
 
          for i in 1:reps
-            a = rand(elems)
-            b = rand(elems)
-            c = rand(elems)
+            a = test_elem(R)::T
+            b = test_elem(R)::T
+            c = test_elem(R)::T
             A = deepcopy(a)
             B = deepcopy(b)
             C = deepcopy(c)
@@ -93,15 +86,21 @@ function test_NCRing_interface(
          end
       end
 
-      if !(R isa AbstractAlgebra.Ring) && !iszero(one(R)) && isdomain_type(T)
+      if !(R isa AbstractAlgebra.Ring)
          @testset "Basic functionality for noncommutative rings only" begin
             for i in 1:reps
-               a = rand(elems)
-               b = rand(elems)
+               a = test_elem(R)::T
+               b = test_elem(R)::T
                A = deepcopy(a)
                B = deepcopy(b)
-               @test iszero(b) || equality(divexact_left(b*a, b), a)
-               @test iszero(b) || equality(divexact_right(a*b, b), a)
+               # documentation is not clear on divexact
+               if (isdomain_type(T))
+                  @test iszero(b) || equality(divexact_left(b*a, b), a)
+                  @test iszero(b) || equality(divexact_right(a*b, b), a)
+               else
+                  @test iszero(b) || equality(b*divexact_left(b*a, b), b*a)
+                  @test iszero(b) || equality(divexact_right(a*b, b)*b, a*b)
+               end
                @test A == a
                @test B == b
             end
@@ -110,9 +109,9 @@ function test_NCRing_interface(
 
       @testset "Unsafe ring operators" begin
          for i in 1:reps
-            a = rand(elems)
-            b = rand(elems)
-            c = rand(elems)
+            a = test_elem(R)::T
+            b = test_elem(R)::T
+            c = test_elem(R)::T
             A = deepcopy(a)
             B = deepcopy(b)
             C = deepcopy(c)
@@ -142,8 +141,7 @@ function test_NCRing_interface(
             x = deepcopy(a)
             @test addeq!(x, b) == ab
 
-            # hmmm, doc says three args but describes four args 
-            # BigFloat may fuse, so isapprox
+            # isapprox as BigFloat may fuse
             t = R()
             x = deepcopy(a)
             @test equality(addmul!(x, b, c, t), a+b*c)
@@ -163,29 +161,29 @@ function test_NCRing_interface(
 end
 
 
-function test_Ring_interface(
-   R::AbstractAlgebra.Ring,
-   example_elements::Vector{T}
-) where T <: RingElement
+function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
+
+   T = elem_type(R)
 
    @testset "Ring interface for $(R)" begin
 
-      test_NCRing_interface(R, example_elements)
+      test_NCRing_interface(R)
 
-      elems = deepcopy(example_elements)
-      append!(elems, T[R(0), R(1), R(-2), R(BigInt(0)), R(BigInt(1)),
-                       R(BigInt(-2))#=, R(BigInt(3)^100)=#])
-
-      if !iszero(one(R)) && isdomain_type(T)
+      if !iszero(one(R))
          @testset "Basic functionality for commutative rings only" begin
             for i in 1:reps
-               a = rand(elems)
-               b = rand(elems)
+               a = test_elem(R)::T
+               b = test_elem(R)::T
                A = deepcopy(a)
                B = deepcopy(b)
                @test isone(inv(one(R)))
                @test a*b == b*a
-               @test iszero(b) || divexact(b*a, b) == a
+               # documentation is not clear on divexact
+               if (isdomain_type(T))
+                  @test iszero(b) || divexact(b*a, b) == a
+               else
+                  @test iszero(b) || divexact(b*a, b)*b == a*b
+               end
                @test A == a
                @test B == b
             end
@@ -194,38 +192,54 @@ function test_Ring_interface(
    end
 end
 
+function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
 
-function test_EuclideanRing_interface(
-   R::AbstractAlgebra.Ring,
-   example_elements::Vector{T}
-) where T <: RingElem
+   T = elem_type(R)
 
-   if isexact_type(T)
-      return
+   @testset "Field interface for $(R)" begin
+
+      test_Ring_interface(R, reps = reps)
+
+      @test iszero(R(characteristic(R)))
+      @test iszero(characteristic(R) * one(R))
+      @test iszero(one(R) * characteristic(R))
+
+      for i in 1:reps
+         a = test_elem(R)::T
+         @test isunit(a) == !iszero(a)
+      end
    end
+end
+
+
+function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
+
+   T = elem_type(R)
+
+   isexact_type(T) || return
 
    for i in 1:reps
-      f = rand(elems)
-      g = rand(elems)
-      m = rand(elems)
+      f = test_elem(R)::T
+      g = test_elem(R)::T
+      m = test_elem(R)::T
       if iszero(m)
          m = one(R)
       end
 
       @test (div(f, m), mod(f, m)) == divrem(f, m)
-      @test mulmod(f, g, m) == mod(f*g, m)
-      @test powmod(f, 3, m) == mod(f^3, m)
+      @test divides(mulmod(f, g, m) - mod(f*g, m), m)[1]
+      @test divides(powermod(f, 3, m) - mod(f^3, m), m)[1]
 
       if isunit(gcd(f, m))
          a = invmod(f, m)
-         @test isone(mulmod(a, f, m))
+         @test divides(mulmod(a, f, m) - one(R), m)[1]
       end
 
       @test divides(f*m, m) == (true, f)
-      (a, b) == divides(f*m + g, m)
+      (a, b) = divides(f*m + g, m)
       @test !a || b*m == f*m + g
 
-      if !isunit(m)
+      if !isunit(m) && !iszero(f)
          (v, q) = remove(f, m)
          @test valuation(f, m) == v
          @test q*m^v == f
@@ -234,12 +248,12 @@ function test_EuclideanRing_interface(
       end
 
       if iszero(f) && iszero(g)
-         @test gcd(f, g)*lcm(f, g) == f*g
-      else
          @test iszero(gcd(f, g))
+      else
+         @test gcd(f, g)*lcm(f, g) == f*g
       end
 
-      (d, s, t) == gcdx(f, g)
+      (d, s, t) = gcdx(f, g)
       @test d == gcd(f, g)
       @test d == s*f + t*g
       @test gcdinv(f, g) == (d, s)
@@ -247,38 +261,37 @@ function test_EuclideanRing_interface(
 end
 
 
-function test_Poly_interface(
-   Rx::AbstractAlgebra.PolyRing,
-   example_elements::Vector{T}
-) where T <: PolyElem
+function test_elem(Rx::AbstractAlgebra.PolyRing)
+   R = base_ring(Rx)
+   return Rx(elem_type(R)[test_elem(R) for i in 1:rand(0:6)])
+end
+
+function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
+
+   T = elem_type(Rx)
 
    @testset "Poly interface for $(Rx)" begin
 
-      test_Ring_interface(Rx, example_elements)
+      test_Ring_interface(Rx; reps = reps)
 
       x = gen(Rx)
       R = base_ring(Rx)
 
       @testset "Polynomial Constructors" begin
-         for a in example_elements
+         for i in 1:reps
+            a = test_elem(Rx)::T
             for b in coefficients(a)
                @assert Rx(b) isa T
             end
             @test a == Rx(collect(coefficients(a)))
          end
          @test Rx([0, 1, 2]) == x + 2*x^2
+         @test Rx([big(0), big(1), big(2)]) == x + 2*x^2
          @test Rx(map(R, [0, 1, 2])) == x + 2*x^2
       end
 
-      elems = deepcopy(example_elements)
-      push!(elems, Rx([0]))
-      push!(elems, Rx([0, 1]))
-      push!(elems, Rx([0, 0, 1]))
-      push!(elems, Rx([0, 1, 2]))
-      push!(elems, Rx([1, 2, 3]))
-
       if R isa AbstractAlgebra.Field
-         test_EuclideanRing_interface(Rx, example_elements)
+         test_EuclideanRing_interface(Rx, reps = 2 + fld(reps, 2))
       end
 
       @testset "Basic functionality" begin
@@ -287,7 +300,8 @@ function test_Poly_interface(
          @test length(symbols(Rx)) == 1
          @test isgen(gen(Rx))
          @test ismonic(x)
-         for a in elems
+         for i in 1:reps
+            a = test_elem(Rx)
             @test iszero(a) || degree(a) >= 0
             @test equality(a, leading_coefficient(a)*x^max(0, degree(a)) + tail(a))
             @test constant_coefficient(a) isa elem_type(R)
@@ -300,50 +314,36 @@ function test_Poly_interface(
    end
 end
 
-
-function test_Ring_interface_recursive(
-   R::AbstractAlgebra.Ring,
-   example_elements::Vector{T}
-) where T <: RingElement
-
-   test_Ring_interface(R, example_elements)   
-
+function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
+   test_Ring_interface(R; reps = reps)
    Rx, _ = PolynomialRing(R, "x")
-   test_Poly_interface(Rx, [Rx(T[rand(example_elements) for j in 1:rand(0:6)]) for i in 1:6])
+   test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
+end
+
+function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 50)
+   test_Ring_interface_recursive(R, reps = reps)
+   test_Field_interface(R, reps = reps)
 end
 
 
-#InexactError on R(BigInt(3) ^ 100)
-#failure on iszero(b) || divexact(b * a, b) == a
-#test_Ring_interface(zz, Int[11, 2^30, 2^40])
-
-test_Ring_interface_recursive(ZZ, BigInt[11])
-
-test_Ring_interface_recursive(QQ, Rational{BigInt}[11//5])
-
-#no method matching (::AbstractAlgebra.Floats{Float64})(::Bool)
-#test_Ring_interface(RDF, Float64[11, 11//3, 1.2])
-
-#no method matching (::AbstractAlgebra.Floats{BigFloat})(::Bool)
-#test_Ring_interface(RealField, BigFloat[11, 11/3, 1.2, big(11), big(11)//big(3), big(1.2), Rational{BigInt}(11)])
-
-R = GF(3)
-test_Ring_interface(R, AbstractAlgebra.GFElem{Int}[R(2)])
-test_Ring_interface_recursive(R, AbstractAlgebra.GFElem{Int}[R(2)])
-
-#R = ResidueRing(ZZ, 1)
-#falure on isone(one(R))
-#test_Ring_interface(R, AbstractAlgebra.Generic.Res{BigInt}[R(2)])
-
-R = GF(13)
-test_Ring_interface(R, AbstractAlgebra.GFElem{Int}[R(11)])
-
-R = GF(big(13))
-test_Ring_interface(R, AbstractAlgebra.GFElem{BigInt}[R(11), R(big(11))])
-
-R, x = ZZ["x"]
-test_Ring_interface(R, Generic.Poly{BigInt}[x, x^2-big(2)^100, x^5])
-test_Poly_interface(R, Generic.Poly{BigInt}[x, x^2-big(2)^100, x^5])
-test_Ring_interface_recursive(R, Generic.Poly{BigInt}[x, x^2-big(2)^100, x^5])
+function test_elem(R::AbstractAlgebra.Integers{BigInt})
+   n = big(2)^rand(1:100)
+   return ZZ(rand((-n):n))
+end
+test_Ring_interface_recursive(ZZ)
 
 
+function test_elem(R::AbstractAlgebra.Rationals{BigInt})
+   n = big(2)^rand(1:100)
+   return QQ(rand((-n):n)//rand(1:n))
+end
+test_Field_interface_recursive(QQ)
+
+
+function test_elem(R::AbstractAlgebra.GFField)
+   return R(rand(0:characteristic(R)))
+end
+test_Field_interface_recursive(GF(3))
+test_Field_interface_recursive(GF(13))
+test_Field_interface_recursive(GF(big(13)))
+test_Field_interface_recursive(GF(big(10)^20 + 39))
