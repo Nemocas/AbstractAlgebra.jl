@@ -693,9 +693,10 @@ function ^(a::RelSeriesElem{T}, b::Int) where T <: RingElement
       z = set_length!(z, 1)
       return z
    elseif pol_length(a) == 1
-      z = parent(a)(polcoeff(a, 0)^b)
+      c = polcoeff(a, 0)^b
+      z = parent(a)(c)
       z = set_precision!(z, (b - 1)*valuation(a) + precision(a))
-      z = set_valuation!(z, b*valuation(a))
+      z = set_valuation!(z, iszero(c) ? precision(z) : b*valuation(a))
       return z
    elseif b == 1
       return deepcopy(a)

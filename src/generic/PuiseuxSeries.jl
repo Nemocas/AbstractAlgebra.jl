@@ -463,11 +463,11 @@ end
 
 function ^(a::PuiseuxSeriesElem{T}, b::Int) where T <: RingElement
    # special case powers of x for constructing power series efficiently
-   if iszero(a.data)
-      return parent(a)(a.data^b, a.scale)
-   elseif b == 0
+   if b == 0
       # in fact, the result would be exact 1 if we had exact series
       return one(parent(a))
+   elseif iszero(a.data)
+      return parent(a)(a.data^b, a.scale)
    elseif pol_length(a.data) == 1
       return parent(a)(a.data^b, a.scale)
    elseif b == 1

@@ -802,15 +802,15 @@ Return $a^b$. We require $b \geq 0$.
 """
 function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
    # special case powers of x for constructing power series efficiently
-   if pol_length(a) == 0
+   if b == 0
+      # in fact, the result would be exact 1 if we had exact series
+      z = one(parent(a))
+      return z
+   elseif pol_length(a) == 0
       z = parent(a)()
       z = set_precision!(z, b*valuation(a))
       z = set_valuation!(z, b*valuation(a))
       z = set_scale!(z, 1)
-      return z
-   elseif b == 0
-      # in fact, the result would be exact 1 if we had exact series
-      z = one(parent(a))
       return z
    elseif isgen(a)
       z = parent(a)()
@@ -822,9 +822,10 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
       z = set_length!(z, 1)
       return z
    elseif pol_length(a) == 1
-      z = parent(a)(polcoeff(a, 0)^b)
+      c = polcoeff(a, 0)^b
+      z = parent(a)(c)
       z = set_precision!(z, (b - 1)*valuation(a) + precision(a))
-      z = set_valuation!(z, b*valuation(a))
+      z = set_valuation!(z, iszero(c) ? precision(z) : b*valuation(a))
       z = set_scale!(z, 1)
       return z
    elseif b == 1
