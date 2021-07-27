@@ -188,11 +188,11 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
             @test a*b == b*a
             # documentation is not clear on divexact
             if isdomain_type(T)
-               @test iszero(b) || divexact(b*a, b) == a
+               @test iszero(b) || equality(divexact(b*a, b), a)
             else
                try
                   t = divexact(b*a, b)
-                  @test t*b == a*b
+                  @test equaltiy(t*b, a*b)
                catch
                end
             end

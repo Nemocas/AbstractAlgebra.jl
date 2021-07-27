@@ -35,15 +35,25 @@ include("julia/Integers-test.jl")
 
 include("Rings-conformance-tests.jl")
 
+function test_elem(R::AbstractAlgebra.Floats{Float64})
+   return rand(Float64)*rand(-100:100)
+end
+test_Ring_interface(RDF)
+
+function test_elem(R::AbstractAlgebra.Floats{BigFloat})
+   return rand(BigFloat)*rand(-100:100)
+end
+test_Ring_interface(RealField)
+
 function test_elem(R::AbstractAlgebra.Integers{BigInt})
    n = big(2)^rand(1:100)
-   return ZZ(rand((-n):n))
+   return ZZ(rand(-n:n))
 end
 test_Ring_interface_recursive(ZZ)
 
 function test_elem(R::AbstractAlgebra.Rationals{BigInt})
    n = big(2)^rand(1:100)
-   return QQ(rand((-n):n)//rand(1:n))
+   return QQ(rand(-n:n)//rand(1:n))
 end
 test_Field_interface_recursive(QQ)
 
