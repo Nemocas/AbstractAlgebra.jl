@@ -924,6 +924,7 @@ rand(R::MPolyRing, exp_range::UnitRange{Int}, term_range::UnitRange{Int}, v...)
 **Examples**
 
 ```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 f = rand(R, -1:2, 3:5, -10:10)
 

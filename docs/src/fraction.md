@@ -326,6 +326,7 @@ rand(R::FracField, v...)
 **Examples**
 
 ```@repl
+using AbstractAlgebra # hide
 K = FractionField(ZZ)
 f = rand(K, -10:10)
 

@@ -300,6 +300,7 @@ rand(R::ResRing, v...)
 **Examples**
 
 ```@repl
+using AbstractAlgebra # hide
 R = ResidueRing(ZZ, 7)
 f = rand(R, 0:6)
 

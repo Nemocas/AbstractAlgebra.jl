@@ -734,6 +734,7 @@ rand(R::SeriesRing, val_range::UnitRange{Int}, v...)
 **Examples**
 
 ```@repl
+using AbstractAlgebra # hide
 R, x = PowerSeriesRing(ZZ, 10, "x")
 f = rand(R, 3:5, -10:10)
 ```
