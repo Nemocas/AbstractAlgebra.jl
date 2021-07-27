@@ -31,4 +31,26 @@ end
 
 include("julia/Integers-test.jl")
 
+# very generic testing: just define test_elem(R) and call test_Ring_interface(R)
+
 include("Rings-conformance-tests.jl")
+
+function test_elem(R::AbstractAlgebra.Integers{BigInt})
+   n = big(2)^rand(1:100)
+   return ZZ(rand((-n):n))
+end
+test_Ring_interface_recursive(ZZ)
+
+function test_elem(R::AbstractAlgebra.Rationals{BigInt})
+   n = big(2)^rand(1:100)
+   return QQ(rand((-n):n)//rand(1:n))
+end
+test_Field_interface_recursive(QQ)
+
+function test_elem(R::AbstractAlgebra.GFField)
+   return R(rand(0:characteristic(R)))
+end
+test_Field_interface_recursive(GF(3))
+test_Field_interface_recursive(GF(13))
+test_Field_interface_recursive(GF(big(13)))
+test_Field_interface_recursive(GF(big(10)^20 + 39))

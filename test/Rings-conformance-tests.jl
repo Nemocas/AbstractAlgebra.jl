@@ -441,27 +441,3 @@ function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 50)
    test_Ring_interface_recursive(R, reps = reps)
    test_Field_interface(R, reps = reps)
 end
-
-####
-
-function test_elem(R::AbstractAlgebra.Integers{BigInt})
-   n = big(2)^rand(1:100)
-   return ZZ(rand((-n):n))
-end
-test_Ring_interface_recursive(ZZ)
-
-
-function test_elem(R::AbstractAlgebra.Rationals{BigInt})
-   n = big(2)^rand(1:100)
-   return QQ(rand((-n):n)//rand(1:n))
-end
-test_Field_interface_recursive(QQ)
-
-
-function test_elem(R::AbstractAlgebra.GFField)
-   return R(rand(0:characteristic(R)))
-end
-test_Field_interface_recursive(GF(3))
-test_Field_interface_recursive(GF(13))
-test_Field_interface_recursive(GF(big(13)))
-test_Field_interface_recursive(GF(big(10)^20 + 39))
