@@ -216,7 +216,7 @@ function (a::Floats{T})(b::AbstractFloat) where T <: AbstractFloat
    return T(b)
 end
 
-function (a::Floats{T})(b::Union{Signed, Unsigned}) where T <: AbstractFloat
+function (a::Floats{T})(b::Integer) where T <: AbstractFloat
    return T(b)
 end
 
