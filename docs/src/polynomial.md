@@ -334,17 +334,8 @@ julia> h = mod(f, g)
 julia> q, r = divrem(f, g)
 (0, (3*x^2 + x + 2)*y + x^2 + 1)
 
-julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
-
-julia> f = 2x^2*y + 2x + y + 1
-2*x^2*y + 2*x + y + 1
-
-julia> g = x + y
-x + y
-
-julia> q = div(f, g)
-2*x*y - 2*y^2 + 2
+julia> div(g, f)
+(-5//11*x^2 + 2//11*x + 6//11)*y - 13//121*x^2 - 3//11*x - 78//121
 
 julia> d = gcd(f*h, g*h)
 y + 1//11*x^2 + 6//11
