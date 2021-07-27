@@ -543,7 +543,6 @@ julia> fit!(g, 8)
 
 julia> g = setcoeff!(g, 7, BigInt(4))
 4*x^7 + x^3 + 11*x^2 + 2*x + 1
-`
 ```
 
 ### Iterators
