@@ -16,6 +16,10 @@ function base_ring(a::MatAlgebra{T}) where {T <: RingElement}
    a.base_ring::parent_type(T)
 end
 
+function isdomain_type(::Type{AbstractAlgebra.Generic.MatAlgElem{T}}) where T <: RingElement
+   return false # e.g. nilpotent matrices
+end
+
 function check_parent(a::MatAlgElem{T}, b::MatAlgElem{T}, throw::Bool = true) where T <: RingElement
   fl = (base_ring(a) != base_ring(b) || degree(a) != degree(b))
   fl && throw && error("Incompatible matrix spaces in matrix operation")
