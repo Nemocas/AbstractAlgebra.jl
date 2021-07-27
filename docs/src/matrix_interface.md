@@ -20,9 +20,11 @@ corresponding value for entry $[1, 1]$ (the function is never called on empty ma
 
 For matrix algebras, all of the ring interface must be implemented.
 
-Note that AbstractAlgebra.jl matrices are not the same as Julia matrices. We store a
-base ring in our matrix and matrices are row major instead of column major in order to
-support the numerous large C libraries that use this convention.
+!!! note
+
+    AbstractAlgebra.jl matrices are not the same as Julia matrices. We store a
+    base ring in our matrix and matrices are row major instead of column major in order to
+    support the numerous large C libraries that use this convention.
 
 All AbstractAlgebra.jl matrices are assumed to be mutable. This is usually critical to
 performance.

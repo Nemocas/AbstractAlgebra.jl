@@ -108,10 +108,13 @@ set_foo!(M::Map(MyMap), a) = set_field(M, :foo, a)
 
 In general, setters should be used rarely for map types.
 
-Note that by providing getter and setter functions, map types need not even contain
-fields with the given name. For example, for a `MyMap` map type for maps between integers, one does not wish to explicitly store the domain and codomain in `MyMap`. Instead, we
-can define the getter functions `domain` and `codomain` to return `JuliaZZ` for any
-`MyMap` object.
+!!! note
+
+    By providing getter and setter functions, map types need not even contain
+    fields with the given name. For example, for a `MyMap` map type for maps
+    between integers, one does not wish to explicitly store the domain and
+    codomain in `MyMap`. Instead, we can define the getter functions `domain`
+    and `codomain` to return `JuliaZZ` for any `MyMap` object.
 
 ```julia
 domain(M::Map(MyMap)) = JuliaZZ

@@ -51,10 +51,12 @@ Most of the generic code in AbstractAlgebra makes use of the union type
 `RingElement` instead of `RingElem` so that the
 generic functions also accept the Julia Base ring types.
 
-One must be careful when defining ad hoc binary operations for ring element
-types. It is often necessary to define separate versions of the functions for
-`RingElem` then for each of the Julia types separately in
-order to avoid ambiguity warnings.
+!!! note
+
+    One must be careful when defining ad hoc binary operations for ring element
+    types. It is often necessary to define separate versions of the functions for
+    `RingElem` then for each of the Julia types separately in
+    order to avoid ambiguity warnings.
 
 Note that even though `RingElement` is a union type we still
 have the following inclusion
@@ -94,10 +96,12 @@ in AbstractAlgebra.jl or by external libraries wanting to use AbstractAlgebra.jl
 We give this interface for fictitious types `MyParent` for the type of the ring parent
 object `R` and `MyElem` for the type of the elements of the ring.
 
-Note that generic functions in AbstractAlgebra.jl may not rely on the existence of
-functions that are not documented here. If they do, those functions will only be
-available for rings that implement that additional functionality, and should be
-documented as such.
+!!! note
+
+    Generic functions in AbstractAlgebra.jl may not rely on the existence of
+    functions that are not documented here. If they do, those functions will only be
+    available for rings that implement that additional functionality, and should be
+    documented as such.
 
 ### Data type and parent object methods
 
@@ -126,11 +130,13 @@ of polynomials over the integers would be the integer ring.
 
 If the ring is not parameterised by another ring, this function must return `Union{}`.
 
-Note that there is a distinction between a base ring and other kinds of parameters. For
-example, in the ring $\mathbb{Z}/n\mathbb{Z}$, the modulus $n$ is a parameter, but the
-only base ring is $\mathbb{Z}$. We consider the ring $\mathbb{Z}/n\mathbb{Z}$ to have
-been constructed from the base ring $\mathbb{Z}$ by taking its quotient by a (principal)
-ideal.
+!!! note
+
+    There is a distinction between a base ring and other kinds of parameters. For
+    example, in the ring $\mathbb{Z}/n\mathbb{Z}$, the modulus $n$ is a parameter, but the
+    only base ring is $\mathbb{Z}$. We consider the ring $\mathbb{Z}/n\mathbb{Z}$ to have
+    been constructed from the base ring $\mathbb{Z}$ by taking its quotient by a (principal)
+    ideal.
 
 ```julia
 parent(f::MyElem)
@@ -476,8 +482,10 @@ The results of `deepcopy` and all arithmetic operations, including powering and 
 can be assumed to be new objects without other references being held, as can objects
 returned from constructors.
 
-Note that `R(a)` where `R` is the ring `a` belongs to, does not create a new value. For
-this case, use `deepcopy(a)`.
+!!! note
+
+    It is important to recognise that `R(a)` where `R` is the ring `a` belongs
+    to, does not create a new value. For this case, use `deepcopy(a)`.
 
 ```julia
 zero!(f::MyElem)

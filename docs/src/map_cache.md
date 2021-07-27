@@ -22,8 +22,10 @@ Importantly, the supertype of the resulting `Generic.MapCache` object is identic
 that of the map being cached. This means that any functions that would accept the
 original map will also accept the cached version.
 
-Note that caching of maps only works for maps that correctly abstract access to their
-fields using accessor functions, as described in the map interface.
+!!! note
+
+    Caching of maps only works for maps that correctly abstract access to their
+    fields using accessor functions, as described in the map interface.
 
 ## Cached map constructors
 
