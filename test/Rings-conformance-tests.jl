@@ -94,12 +94,20 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
                A = deepcopy(a)
                B = deepcopy(b)
                # documentation is not clear on divexact
-               if (isdomain_type(T))
+               if isdomain_type(T)
                   @test iszero(b) || equality(divexact_left(b*a, b), a)
                   @test iszero(b) || equality(divexact_right(a*b, b), a)
                else
-                  @test iszero(b) || equality(b*divexact_left(b*a, b), b*a)
-                  @test iszero(b) || equality(divexact_right(a*b, b)*b, a*b)
+                  try
+                     t = divexact_left(b*a, b)
+                     @test equality(b*t, b*a)
+                  catch
+                  end
+                  try
+                     t = divexact_right(a*b, b)
+                     @test equality(t*b, a*b)
+                  catch
+                  end
                end
                @test A == a
                @test B == b
@@ -170,24 +178,26 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
 
       test_NCRing_interface(R)
 
-      if !iszero(one(R))
-         @testset "Basic functionality for commutative rings only" begin
-            for i in 1:reps
-               a = test_elem(R)::T
-               b = test_elem(R)::T
-               A = deepcopy(a)
-               B = deepcopy(b)
-               @test isone(inv(one(R)))
-               @test a*b == b*a
-               # documentation is not clear on divexact
-               if (isdomain_type(T))
-                  @test iszero(b) || divexact(b*a, b) == a
-               else
-                  @test iszero(b) || divexact(b*a, b)*b == a*b
+      @testset "Basic functionality for commutative rings only" begin
+         for i in 1:reps
+            a = test_elem(R)::T
+            b = test_elem(R)::T
+            A = deepcopy(a)
+            B = deepcopy(b)
+            @test isone(inv(one(R)))
+            @test a*b == b*a
+            # documentation is not clear on divexact
+            if isdomain_type(T)
+               @test iszero(b) || divexact(b*a, b) == a
+            else
+               try
+                  t = divexact(b*a, b)
+                  @test t*b == a*b
+               catch
                end
-               @test A == a
-               @test B == b
             end
+            @test A == a
+            @test B == b
          end
       end
    end
