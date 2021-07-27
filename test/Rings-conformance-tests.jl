@@ -142,15 +142,16 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
             @test addeq!(x, b) == ab
 
             # isapprox as BigFloat may fuse
-            t = R()
-            x = deepcopy(a)
-            @test equality(addmul!(x, b, c, t), a+b*c)
-            x = deepcopy(a)
-            @test equality(addmul!(x, x, c, t), a+a*c)
-            x = deepcopy(a)
-            @test equality(addmul!(x, b, x, t), a+b*a)
-            x = deepcopy(a)
-            @test equality(addmul!(x, x, x, t), a+a*a)
+            # matrices don't implement addmul!
+            #t = R()
+            #x = deepcopy(a)
+            #@test equality(addmul!(x, b, c, t), a+b*c)
+            #x = deepcopy(a)
+            #@test equality(addmul!(x, x, c, t), a+a*c)
+            #x = deepcopy(a)
+            #@test equality(addmul!(x, b, x, t), a+b*a)
+            #x = deepcopy(a)
+            #@test equality(addmul!(x, x, x, t), a+a*a)
 
             @test A == a
             @test B == b
@@ -314,10 +315,126 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
    end
 end
 
+function test_elem(S::Union{AbstractAlgebra.MatSpace,
+                            AbstractAlgebra.MatAlgebra})
+   R = base_ring(S)
+   return S(elem_type(R)[test_elem(R) for i in 1:nrows(S), j in 1:ncols(S)])
+end
+
+
+function test_MatSpace_interface(S::MatSpace; reps = 20)
+
+   ST = elem_type(S)
+   R = base_ring(S)
+   T = elem_type(R)
+
+   @testset "MatSpace interface for $(S)" begin
+
+      @testset "Constructors" begin
+         for k in 1:reps
+            a = test_elem(S)::ST
+            @test nrows(a) == nrows(S)
+            @test ncols(a) == ncols(S)
+            @test a == S(T[a[i, j] for i in 1:nrows(a), j in 1:ncols(a)])
+            @test a == S(T[a[i, j] for i in 1:nrows(a) for j in 1:ncols(a)])
+            @test a == matrix(R, T[a[i, j] for i in 1:nrows(a), j in 1:ncols(a)])
+            @test a == matrix(R, nrows(S), ncols(S),
+                              T[a[i, j] for i in 1:nrows(a) for j in 1:ncols(a)])
+         end
+         @test iszero(zero_matrix(R, nrows(S), ncols(S)))
+      end
+
+      @testset "Views" begin
+         M = matrix(R, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
+         N1 = @view M[1:2, :]
+         N2 = @view M[:, 1:2]
+         @test N1*N2 == matrix(R, 2, 2, BigInt[14, 20, 20, 29])
+      end
+
+      @testset "Basic manipulation of matrices" begin
+         for k in 1:reps
+            a = test_elem(S)::ST
+            A = deepcopy(a)
+            b = zero_matrix(R, nrows(a), ncols(a))
+            for i in 1:nrows(a), j in 1:ncols(a)
+               b[i, j] = a[i, j]
+            end
+            @test b == a
+            @test transpose(transpose(a)) == a
+            @test a == A
+         end
+      end
+   end
+end
+
+function test_MatAlgebra_interface(S::MatAlgebra; reps = 20)
+
+   ST = elem_type(S)
+   R = base_ring(S)
+   T = elem_type(R)
+
+   @test nrows(S) == ncols(S)
+
+   @testset "MatAlgebra interface for $(S)" begin
+
+      test_NCRing_interface(S, reps = reps)
+
+      @testset "Constructors" begin
+         for k in 1:reps
+            a = test_elem(S)::ST
+            @test nrows(a) == nrows(S)
+            @test ncols(a) == ncols(S)
+            @test a == S(T[a[i, j] for i in 1:nrows(a), j in 1:ncols(a)])
+            @test a == S(T[a[i, j] for i in 1:nrows(a) for j in 1:ncols(a)])
+         end
+      end
+
+      if nrows(S) > 0
+         @testset "Views" begin
+            a = test_elem(S)::ST
+            b = test_elem(S)::ST
+            N1 = @view a[1:1, 1:1]
+            N2 = @view b[1:1, 1:1]
+            @test N1*N2 == matrix(R, 1, 1, a[1, 1]*b[1, 1])
+         end
+      end
+
+      @testset "Basic manipulation of matrices" begin
+         for k in 1:reps
+            a = test_elem(S)::ST
+            A = deepcopy(a)
+            b = zero(S)
+            for i in 1:nrows(a), j in 1:ncols(a)
+               b[i, j] = a[i, j]
+            end
+            @test b == a
+            @test transpose(transpose(a)) == a
+            @test a == A
+         end
+      end
+
+      @testset "Determinant" begin
+         for k in 1:reps
+            a = test_elem(S)::ST
+            b = test_elem(S)::ST
+            A = deepcopy(a)
+            B = deepcopy(b)
+            @test det(a*b) == det(a)*det(b)
+            @test a == A
+            @test b == B
+         end
+      end
+   end
+end
+
 function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
    test_Ring_interface(R; reps = reps)
    Rx, _ = PolynomialRing(R, "x")
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
+   S = MatrixAlgebra(R, rand(0:3))
+   test_MatAlgebra_interface(S, reps = 2 + fld(reps, 2))
+   S = MatrixSpace(R, rand(0:3), rand(0:3))
+   test_MatSpace_interface(S, reps = 2 + fld(reps, 2))
 end
 
 function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 50)
@@ -325,6 +442,7 @@ function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 50)
    test_Field_interface(R, reps = reps)
 end
 
+####
 
 function test_elem(R::AbstractAlgebra.Integers{BigInt})
    n = big(2)^rand(1:100)
