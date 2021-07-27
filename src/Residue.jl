@@ -81,7 +81,7 @@ one(R::ResRing) = R(1)
 
 iszero(a::ResElem) = iszero(data(a))
 
-isone(a::ResElem) = isone(data(a))
+isone(a::ResElem) = isone(data(a)) || a == one(parent(a))
 
 function isunit(a::ResElem)
    g = gcd(data(a), modulus(a))
