@@ -24,6 +24,8 @@ parent(a::MatAlgElem{T}, cached::Bool = true) where T <: RingElement =
 
 isexact_type(::Type{MatAlgElem{T}}) where T <: RingElement = isexact_type(T)
 
+isdomain_type(::Type{MatAlgElem{T}}) where T <: RingElement = false
+
 ###############################################################################
 #
 #   Transpose
