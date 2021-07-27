@@ -91,20 +91,20 @@ coefficients, must be available.
 (S::MyPolyRing{T})(A::Array{T, 1}) where T <: RingElem
 ```
 
-Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[i]`.
+Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[1 + i]`.
 
 ```julia
 (S::MyPolyRing{T})(A::Array{U, 1}) where T <: RingElem, U <: RingElem
 ```
 
-Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[i]`.
+Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[1 + i]`.
 The elements of the array are assumed to be able to be coerced into the base ring `R`.
 
 ```julia
 (S::MyPolyRing{T})(A::Array{U, 1}) where T <: RingElem, U <: Integer
 ```
 
-Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[i]`.
+Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[1 + i]`.
 
 It may be desirable to have a additional version of the function that accepts an array
 of Julia `Int` values  if this can be done more efficiently.
