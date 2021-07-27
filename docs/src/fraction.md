@@ -105,6 +105,12 @@ x + 1
 
 julia> g = (x^2 + x + 1)//(x^3 + 3x + 1)
 (x^2 + x + 1)//(x^3 + 3*x + 1)
+
+julia> x//f
+x//(x + 1)
+
+julia> f//x
+(x + 1)//x
 ```
 
 ## Functions for types and parents of fraction fields
@@ -317,9 +323,10 @@ fraction field tell `rand` how to generate random elements of the base ring.
 rand(R::FracField, v...)
 ```
 
-** Examples **
+**Examples**
 
 ```@repl
+using AbstractAlgebra # hide
 K = FractionField(ZZ)
 f = rand(K, -10:10)
 

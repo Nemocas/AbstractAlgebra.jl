@@ -99,6 +99,9 @@ Vector space of dimension 2 over Rationals
 
 julia> z = zero(M)
 (0//1, 0//1)
+
+julia> iszero(z)
+true
 ```
 
 ### Element constructors

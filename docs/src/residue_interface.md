@@ -68,20 +68,6 @@ modulus(S::MyResRing{T}) where T <: AbstractAlgebra.RingElem
 Return the modulus of the given residue ring, i.e. if the residue ring $S$ was specified
 to be $R/(m)$, return $m$.
 
-**Examples**
-
-```jldoctest
-julia> R, x = PolynomialRing(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
-
-julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
-
-julia> m = modulus(S)
-x^3 + 3*x + 1
-
-```
-
 ### Basic manipulation of rings and elements
 
 ```julia
@@ -93,21 +79,4 @@ Given a residue $r \pmod{m}$, represented as such, return $r$. In the special
 case where machine integers are used to represent the residue, `data` will
 return the machine integer, whereas `lift` will return a multiprecision
 integer. Otherwise `lift` falls back to `data` by default.
-
-**Examples**
-
-```jldoctest
-julia> R, x = PolynomialRing(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
-
-julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
-
-julia> f = S(x^2 + 2)
-x^2 + 2
-
-julia> d = data(f)
-x^2 + 2
-
-```
 

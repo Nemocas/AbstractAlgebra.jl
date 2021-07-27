@@ -109,23 +109,6 @@ Create the polynomial in the given ring whose degree $i$ coefficient is given by
 It may be desirable to have a additional version of the function that accepts an array
 of Julia `Int` values  if this can be done more efficiently.
 
-**Examples**
-
-```jldoctest
-julia> S, x = PolynomialRing(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
-
-julia> f = S(Rational{BigInt}[2, 3, 1])
-x^2 + 3*x + 2
-
-julia> g = S(BigInt[1, 0, 4])
-4*x^2 + 1
-
-julia> h = S([4, 7, 2, 9])
-9*x^3 + 2*x^2 + 7*x + 4
-
-```
-
 It is also possible to create polynomials directly without first creating the
 corresponding polynomial ring.
 
@@ -141,16 +124,6 @@ polynomial is not cached. However, this means that subsequent polynomials
 created in the same way will not be compatible. Instead, one should use the
 parent object of the first polynomial to create subsequent polynomials instead
 of calling this function repeatedly with `cached=false`.
-
-**Examples**
-
-```jldoctest
-julia> f = polynomial(ZZ, [1, 2, 3])
-3*x^2 + 2*x + 1
-
-julia> f = polynomial(ZZ, [1, 2, 3], "y")
-3*y^2 + 2*y + 1
-```
 
 ### Data type and parent object methods
 
@@ -181,21 +154,6 @@ Return the type of a polynomial whose coefficients have the given type.
 
 This function is defined for generic polynomials and only needs to be defined for
 custom polynomial rings, e.g. ones defined by a C implementation.
-
-**Examples**
-
-```jldoctest
-julia> S, x = PolynomialRing(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
-
-julia> vsym = var(S)
-:x
-
-julia> V = symbols(S)
-1-element Array{Symbol,1}:
- :x
-
-```
 
 ### Basic manipulation of rings and elements
 
@@ -261,35 +219,6 @@ polynomials in every function that can be called on them. Explicit adjustment by
 the generic code in AbstractAlgebra.jl is not required. In such cases, this function
 can also be defined to do nothing.
 
-**Examples**
-
-```jldoctest
-julia> S, x = PolynomialRing(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
-
-julia> f = x^3 + 3x + 1
-x^3 + 3*x + 1
-
-julia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0]);
-
-julia> n = length(f)
-4
-
-julia> c = coeff(f, 1)
-3
-
-julia> g = set_length!(g, normalise(g, 7))
-x^3 + 2*x + 1
-
-julia> g = setcoeff!(g, 2, BigInt(11))
-x^3 + 11*x^2 + 2*x + 1
-
-julia> fit!(g, 8)
-
-julia> g = setcoeff!(g, 7, BigInt(4))
-4*x^7 + x^3 + 11*x^2 + 2*x + 1
-```
-
 ## Optional functionality for polynomial rings
 
 Sometimes parts of the Euclidean Ring interface can and should be implemented for
@@ -315,36 +244,19 @@ functionality provided by AbstractAlgebra.jl, using the same interface.
 Obviously additional functionality can also be added to that provided by
 AbstractAlgebra.jl on an ad hoc basis.
 
-### Similar and zero
+### Similar
 
-The following functions are available for all univariate polynomial types. The
-functions `similar` and `zero` do the same thing, but they are both provided
-for uniformity with other parts of the interface.
-
-```julia
-similar(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
-zero(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
-```
-
-Construct the zero polynomial with the same variable as the given polynomial
-with coefficients in the given ring.
+The `similar` function is available for all univariate polynomial types, but
+new polynomial rings can define a specialised version of it if required.
 
 ```julia
-similar(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: RingElem
-similar(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: RingElem
-zero(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: RingElem
-zero(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: RingElem
+similar(x::MyPoly{T}, R::Ring=base_ring(x), var::String=String(var(parent(x)))) where T <: RingElem
 ```
 
 Construct the zero polynomial with the given variable and coefficients in the
-given ring, if specified, and in the coefficient ring of the given polynomial
-otherwise.
+given ring, if specified, and with the defaults shown if not.
 
 Custom polynomial rings may choose which polynomial type is best-suited to
-return for the given ring and variable. If they don't specialise these
-function the default is a `Generic.Poly`. The default implementation of `zero`
-calls out to `similar`, so it's generally sufficient to specialise only
-`similar`. For both `similar` and `zero` only the most general method has to
-be implemented (e.g. `similar(x::MyPoly, R::Ring, var::String)` as all other
-methods call out to this more general method.
+return for any given arguments. If they don't specialise the function the
+default polynomial type returned is a `Generic.Poly`.
 

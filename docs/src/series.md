@@ -179,6 +179,34 @@ abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::AbstractString="x"
 rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
 ```
 
+**Examples**
+
+```@jldoctest
+julia> S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
+(Univariate power series ring in x over Rationals, x + O(x^10))
+
+julia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
+2*x + 3*x^2 + x^3 + O(x^6)
+
+julia> f = abs_series(ZZ, [1, 2, 3], 3, 5, "y")
+1 + 2*y + 3*y^2 + O(y^5)
+
+julia> g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
+x^4 + 2*x^5 + 3*x^6 + O(x^7)
+
+julia> k = abs_series(ZZ, [1, 2, 3], 1, 6, cached=false)
+1 + O(x^6)
+
+julia> p = rel_series(ZZ, BigInt[], 0, 3, 1)
+O(x^3)
+
+julia> q = abs_series(ZZ, [], 0, 6)
+O(x^6)
+
+julia> s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
+1 + 2*x + 3*x^2 + O(x^5)
+```
+
 ## Big-oh notation
 
 Series elements can be given a precision using the big-oh notation. This is provided
@@ -202,7 +230,6 @@ julia> f = 1 + 2x + O(x^5)
 
 julia> g = 2y + 7y^2 + O(y^7)
 2*y + 7*y^2 + O(y^7)
-
 ```
 
 What is happening here in practice is that `O(x^n)` is creating the series `0 + O(x^n)`
@@ -425,6 +452,9 @@ Integers
 julia> v = var(S)
 :x
 
+julia> max_precision(S) == 10
+true
+
 julia> T = parent(x + 1)
 Univariate power series ring in x over Integers
 
@@ -464,6 +494,24 @@ julia> p = valuation(b)
 julia> c = coeff(b, 2)
 1 + t^2 + O(t^10)
 
+julia> S, x = PowerSeriesRing(ZZ, 10, "x")
+(Univariate power series ring in x over Integers, x + O(x^11))
+
+julia> f = 1 + 3x + x^3 + O(x^5)
+1 + 3*x + x^3 + O(x^5)
+
+julia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0], 4, 10, 3);
+
+julia> set_length!(g, 3)
+x^3 + 2*x^4 + O(x^10)
+
+julia> g = setcoeff!(g, 2, BigInt(11))
+x^3 + 2*x^4 + 11*x^5 + O(x^10)
+
+julia> fit!(g, 8)
+
+julia> g = setcoeff!(g, 7, BigInt(4))
+x^3 + 2*x^4 + 11*x^5 + O(x^10)
 ```
 
 ### Change base ring
@@ -673,3 +721,20 @@ julia> h = sqrt(a)
 
 ```
 
+### Random generation
+
+Random series can be constructed using the `rand` function. A range of possible
+valuations is provided. The maximum precision of the ring is used as a bound on
+the precision. Other parameters are used to construct random coefficients.
+
+```julia
+rand(R::SeriesRing, val_range::UnitRange{Int}, v...)
+```
+
+**Examples**
+
+```@repl
+using AbstractAlgebra # hide
+R, x = PowerSeriesRing(ZZ, 10, "x")
+f = rand(R, 3:5, -10:10)
+```

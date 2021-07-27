@@ -169,8 +169,64 @@ y
 julia> S(x)
 x
 
+julia> S, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia> f = S(Rational{BigInt}[2, 3, 1])
+x^2 + 3*x + 2
+
+julia> g = S(BigInt[1, 0, 4])
+4*x^2 + 1
+
+julia> h = S([4, 7, 2, 9])
+9*x^3 + 2*x^2 + 7*x + 4
+
 julia> p = polynomial(ZZ, [1, 2, 3])
 3*x^2 + 2*x + 1
+
+julia> f = polynomial(ZZ, [1, 2, 3], "y")
+3*y^2 + 2*y + 1
+```
+
+## Similar and zero
+
+Another way of constructing polynomials is to construct one similar to an
+existing polynomial using either similar or zero. 
+
+```julia
+similar(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
+zero(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
+```
+
+Construct the zero polynomial with the same variable as the given polynomial
+with coefficients in the given ring. Both functions behave the same way for
+polynomials.
+
+```julia
+similar(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: RingElem
+similar(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: RingElem
+zero(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: RingElem
+zero(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: RingElem
+```
+
+Construct the zero polynomial with the given variable and coefficients in the
+given ring, if specified, and in the coefficient ring of the given polynomial
+otherwise.
+
+**Examples**
+
+```@jldoctest
+julia> f = 1 + 2x + 3x^2
+3*x^2 + 2*x + 1
+
+julia> g = similar(f)
+0
+
+julia> h = similar(f, QQ)
+0
+
+julia> k = similar(f, QQ, "y")
+0
 ```
 
 ## Functions for types and parents of polynomial rings
@@ -212,6 +268,8 @@ Univariate Polynomial Ring in x over Integers
 julia> T = parent(y + 1)
 Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers
 ```
+
+## Euclidean polynomial rings
 
 For polynomials over a field, the Euclidean Ring interface is implemented.
 
@@ -275,6 +333,9 @@ julia> h = mod(f, g)
 
 julia> q, r = divrem(f, g)
 (0, (3*x^2 + x + 2)*y + x^2 + 1)
+
+julia> div(g, f)
+(-5//11*x^2 + 2//11*x + 6//11)*y - 13//121*x^2 - 3//11*x - 78//121
 
 julia> d = gcd(f*h, g*h)
 y + 1//11*x^2 + 6//11
@@ -406,6 +467,10 @@ julia> V, w = PolynomialRing(U, "w")
 julia> var(R)
 :x
 
+julia> symbols(R)
+1-element Array{Symbol,1}:
+ :x
+
 julia> a = zero(S)
 0
 
@@ -453,6 +518,31 @@ true
 
 julia> ismonomial(x*y^2)
 false
+
+julia> S, x = PolynomialRing(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> f = x^3 + 3x + 1
+x^3 + 3*x + 1
+
+julia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0]);
+
+julia> n = length(f)
+4
+
+julia> c = coeff(f, 1)
+3
+
+julia> g = set_length!(g, normalise(g, 7))
+x^3 + 2*x + 1
+
+julia> g = setcoeff!(g, 2, BigInt(11))
+x^3 + 11*x^2 + 2*x + 1
+
+julia> fit!(g, 8)
+
+julia> g = setcoeff!(g, 7, BigInt(4))
+4*x^7 + x^3 + 11*x^2 + 2*x + 1
 ```
 
 ### Iterators
@@ -984,7 +1074,7 @@ rand(R::PolyRing, deg_range::UnitRange{Int}, v...)
 rand(R::PolyRing, deg::Int, v...)
 ```
 
-** Examples **
+**Examples**
 
 ```julia
 R, x = PolynomialRing(ZZ, "x")

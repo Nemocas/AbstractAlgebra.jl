@@ -288,15 +288,30 @@ matrix. Modifying the submatrix also modifies the original matrix.
 
 The syntax for views is as for Julia's own views.
 
-** Examples **
+**Examples**
 
-```@repl
-M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
+```@jldoctest
+julia> M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
+[1   2   3]
+[2   3   4]
+[3   4   5]
 
-N1 = @view M[1:2, :]
-N2 = @view M[:, 1:2]
+julia>
 
-R = N1*N2
+julia> N1 = @view M[1:2, :]
+[1   2   3]
+[2   3   4]
+
+julia> N2 = @view M[:, 1:2]
+[1   2]
+[2   3]
+[3   4]
+
+julia>
+
+julia> R = N1*N2
+[14   20]
+[20   29]
 ```
 
 ## Matrix functionality provided by AbstractAlgebra.jl
@@ -441,6 +456,16 @@ julia> Z = divexact(2*A, 2)
 [t + 1       t             1]
 [  t^2       t             t]
 [   -2   t + 2   t^2 + t + 1]
+
+julia> M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
+[2   3   0]
+[1   1   1]
+
+julia> M[1, 2] = BigInt(4)
+4
+
+julia> c = M[1, 1]
+2
 
 ```
 

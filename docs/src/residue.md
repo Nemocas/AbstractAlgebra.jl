@@ -188,8 +188,14 @@ true
 julia> iszero(f)
 false
 
+julia> isunit(f)
+true
+
 julia> m = modulus(S)
 x^3 + 3*x + 1
+
+julia> d = data(f)
+x + 1
 
 julia> U = base_ring(S)
 Univariate Polynomial Ring in x over Rationals
@@ -205,19 +211,6 @@ true
 
 julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
-
-julia> S = ResidueRing(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
-
-julia> r = S(x + 1)
-x + 1
-
-julia> a = modulus(S)
-x^3 + 3*x + 1
-
-julia> isunit(r)
-true
-
 ```
 
 ### Inversion
@@ -304,9 +297,10 @@ ring are used to generate elements of the base ring.
 rand(R::ResRing, v...)
 ```
 
-** Examples **
+**Examples**
 
 ```@repl
+using AbstractAlgebra # hide
 R = ResidueRing(ZZ, 7)
 f = rand(R, 0:6)
 
