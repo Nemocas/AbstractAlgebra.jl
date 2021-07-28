@@ -173,13 +173,13 @@ zero!(a::NCRingElement)
 mul!(a::T, b::T, c::T) where T <: NCRingElement
 add!(a::T, b::T, c::T) where T <: NCRingElement
 addeq!(a::T, b::T) where T <: NCRingElement
-addmul!(a::T, b::T, c::T) where T <: NCRingElement
+addmul!(a::T, b::T, c::T, t::T) where T <: NCRingElement
 ```
 
 In each case the mutated object is the leftmost parameter.
 
 The `addeq!(a, b)` operation does the same thing as `add!(a, a, b)`. The
-`addmul!(a, b, c, t)` operation does the same thing as
+optional `addmul!(a, b, c, t)` operation does the same thing as
 `mul!(t, b, c); addeq!(a, t)` where `t` is a temporary which can be mutated so
 that an addition allocation is not needed.
 
