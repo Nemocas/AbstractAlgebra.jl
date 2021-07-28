@@ -743,6 +743,9 @@ polynomial type (i.e. polynomials of degree less than one).
 
 using AbstractAlgebra
 
+using Random: Random, SamplerTrivial, GLOBAL_RNG
+using RandomExtensions: RandomExtensions, Make2, AbstractRNG
+
 import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type,
        isexact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
        get_cached!, isunit, characteristic, Ring, RingElem
@@ -922,6 +925,15 @@ function addeq!(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
 end
 
 # Random generation
+
+RandomExtensions.maketype(R::ConstPolyRing, _) = elem_type(R)
+
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{ConstPoly,ConstPolyRing}}) =
+        sp[][1](rand(rng, sp[][2]))
+
+rand(rng::AbstractRNG, R::ConstPolyRing, n::UnitRange{Int}) = R(rand(rng, n))
+
+rand(R::ConstPolyRing, n::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, n)
 
 # Promotion rules
 
