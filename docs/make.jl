@@ -64,7 +64,8 @@ makedocs(
                               "fraction_interface.md",
                               "module_interface.md",
                               "matrix_interface.md",
-                              "map_interface.md"]
+                              "map_interface.md",
+                              "rand.md"]
          ]
 )
 
