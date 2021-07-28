@@ -739,6 +739,8 @@ Here is a minimal example of implementing the Ring Interface for a constant
 polynomial type (i.e. polynomials of degree less than one).
 
 ```julia
+# ConstPoly.jl : Implements constant polynomials
+
 using AbstractAlgebra
 
 import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type,
@@ -746,8 +748,6 @@ import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type
        get_cached!, isunit, characteristic, Ring, RingElem
 
 import Base: show, +, -, *, ^, ==, inv, isone, iszero
-
-# ConstPoly.jl : Implements constant polynomials
 
 struct ConstPolyRing{T <: RingElement}
    base_ring::Ring
