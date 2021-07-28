@@ -20,7 +20,7 @@ argument to specify how to randomise them.
 
 The usual way of generating random values that Julia and these extensions
 provide would look as follows:
-#
+
 ```julia
 julia> using AbstractAlgebra
 
