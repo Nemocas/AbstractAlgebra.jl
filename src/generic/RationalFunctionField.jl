@@ -109,9 +109,12 @@ isone(a::Rat) = isone(data(a))
 
 isunit(a::Rat) = isunit(data(a))
 
-function deepcopy_internal(a::Rat, dic::IdDict)
+gen(R::RationalFunctionField) = R(gen(base_ring(R.fraction_field)))
+
+
+function deepcopy_internal(a::Rat, dict::IdDict)
    R = parent(a)
-   return R(deepcopy(data(a)))
+   return R(deepcopy_internal(data(a), dict))
 end
 
 ###############################################################################
