@@ -111,7 +111,6 @@ isunit(a::Rat) = isunit(data(a))
 
 gen(R::RationalFunctionField) = R(gen(base_ring(R.fraction_field)))
 
-
 function deepcopy_internal(a::Rat, dict::IdDict)
    R = parent(a)
    return R(deepcopy_internal(data(a), dict))
@@ -588,4 +587,3 @@ function RationalFunctionField(k::Field, s::Symbol; cached=true)
 
    return par_object, t
 end
-
