@@ -750,7 +750,7 @@ import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type
        isexact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
        get_cached!, isunit, characteristic, Ring, RingElem
 
-import Base: show, +, -, *, ^, ==, inv, isone, iszero
+import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero
 
 struct ConstPolyRing{T <: RingElement}
    base_ring::Ring
@@ -824,20 +824,6 @@ end
 
 function show(io::IO, f::ConstPoly)
    print(io, f.c)
-end
-
-# Constructors
-
-function (R::ConstPolyRing{T})() where T <: RingElement
-   r = ConstPoly{T}(0)
-   r.parent = R
-   return r
-end
-
-function (R::ConstPolyRing{T})(c::Integer) where T <: RingElement
-   r = ConstPoly{T}(base_ring(R)(c))
-   r.parent = R
-   return r
 end
 
 # Unary operations
