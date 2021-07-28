@@ -34,12 +34,14 @@ base/coefficient ring $R$ and the ordering are stored in the parent object.
 The polynomial element types belong to the abstract type `MPolyElem{T}`
 and the polynomial ring types belong to the abstract type `MPolyRing{T}`.
 
-Note that both the generic polynomial ring type `Generic.MPolyRing{T}` and the abstract
-type it belongs to, `MPolyRing{T}` are both called `MPolyRing`. The
-former is a (parameterised) concrete type for a polynomial ring over a given base ring
-whose elements have type `T`. The latter is an abstract type representing all
-multivariate polynomial ring types in AbstractAlgebra.jl, whether generic or very
-specialised (e.g. supplied by a C library).
+!!! note
+
+    Note that both the generic polynomial ring type `Generic.MPolyRing{T}` and the abstract
+    type it belongs to, `MPolyRing{T}` are both called `MPolyRing`. The
+    former is a (parameterised) concrete type for a polynomial ring over a given base ring
+    whose elements have type `T`. The latter is an abstract type representing all
+    multivariate polynomial ring types in AbstractAlgebra.jl, whether generic or very
+    specialised (e.g. supplied by a C library).
 
 ## Polynomial ring constructors
 

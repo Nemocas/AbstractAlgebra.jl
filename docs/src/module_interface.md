@@ -7,9 +7,11 @@ end
 
 # Module Interface
 
-Note: the module infrastructure in AbstractAlgebra should be considered
-experimental at this stage. This means that the interface may change in
-the future.
+!!! note
+
+    The module infrastructure in AbstractAlgebra should be considered
+    experimental at this stage. This means that the interface may change in
+    the future.
 
 AbstractAlgebra allows the construction of finitely presented modules (i.e.
 with finitely many generators and relations), starting from free modules. The

@@ -141,10 +141,12 @@ As a shortcut for this function we have the following operator:
 *(f::Map{D, U}, g::Map{U, C}) where {D, U, C} = compose(f, g)
 ```
 
-Note the order of composition. If we have maps $f : X \to Y$, $g : Y \to Z$ the correct
-order of the maps in this operator is `f*g`, so that `(f*g)(x) = g(f(x))`.
+!!! note
 
-This is chosen so that for left $R$-module morphisms represented by a matrix, the order
-of matrix multiplication will match the order of composition of the corresponding
-morphisms.
+    Observe the order of composition. If we have maps $f : X \to Y$, $g : Y \to Z$ the correct
+    order of the maps in this operator is `f*g`, so that `(f*g)(x) = g(f(x))`.
+
+    This is chosen so that for left $R$-module morphisms represented by a matrix, the order
+    of matrix multiplication will match the order of composition of the corresponding
+    morphisms.
 

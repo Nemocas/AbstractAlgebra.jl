@@ -529,10 +529,12 @@ The evaluation should succeed for any set of values for which a
 multiplication is defined with the product of a coefficient and all the
 values before it.
 
-Note that the values may be in non-commutative rings. Products are
-performed in the order of the variables in the polynomial ring that the
-polynomial belongs to, preceded by a multiplication by the coefficient
-on the left.
+!!! note
+
+    The values at which a polynomial is evaluated may be in non-commutative
+    rings. Products are performed in the order of the variables in the
+    polynomial ring that the polynomial belongs to, preceded by a
+    multiplication by the coefficient on the left.
 
 ### Derivations
 

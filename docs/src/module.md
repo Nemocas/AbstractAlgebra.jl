@@ -206,10 +206,12 @@ true
 isisomorphic(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 ```
 
-Note that this function relies on the Smith normal form over the base ring of
-the modules being able to be made unique. This is true for Euclidean domains
-for which `divrem` has a fixed choice of quotient and remainder, but it will
-not in general be true for Euclidean rings that are not domains.
+!!! note
+
+    Note that this function relies on the Smith normal form over the base ring of
+    the modules being able to be made unique. This is true for Euclidean domains
+    for which `divrem` has a fixed choice of quotient and remainder, but it will
+    not in general be true for Euclidean rings that are not domains.
 
 **Examples**
 

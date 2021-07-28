@@ -253,9 +253,11 @@ types can also be supported). The function must not assume that the polynomial a
 has space for $n + 1$ coefficients. The polynomial must be resized if this is not the
 case.
 
-Note that this function is not required to normalise the polynomial and is not
-necessarily useful to the user, but is used extensively by the generic functionality in
-AbstractAlgebra.jl. It is for setting raw coefficients in the representation.
+!!! note
+
+    This function is not required to normalise the polynomial and is not
+    necessarily useful to the user, but is used extensively by the generic functionality in
+    AbstractAlgebra.jl. It is for setting raw coefficients in the representation.
 
 ```julia
 normalise(f::MySeries{T}, n::Int)

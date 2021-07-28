@@ -26,12 +26,14 @@ and the fraction field types belong to the abstract type `FracField{T}`.
 This enables one to write generic functions that can accept any AbstractAlgebra
 fraction type.
 
-Note that both the generic fraction field type `Generic.FracField{T}` and the abstract
-type it belongs to, `FracField{T}` are both called `FracField`. The
-former is a (parameterised) concrete type for a fraction field over a given base ring
-whose elements have type `T`. The latter is an abstract type representing all
-fraction field types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
-supplied by a C library).
+!!! note
+
+    Both the generic fraction field type `Generic.FracField{T}` and the abstract
+    type it belongs to, `FracField{T}` are both called `FracField`. The
+    former is a (parameterised) concrete type for a fraction field over a given base ring
+    whose elements have type `T`. The latter is an abstract type representing all
+    fraction field types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
+    supplied by a C library).
 
 ## Fraction field constructors
 
