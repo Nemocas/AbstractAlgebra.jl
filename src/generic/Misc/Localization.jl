@@ -50,7 +50,7 @@ const LocDict = Dict{Tuple{AbstractAlgebra.Ring, RingElement, Bool}, AbstractAlg
 function isin(a, L::Loc{T}) where {T <: RingElem}
   iszero(a) && return true
   L.comp || (!isone(gcd(denominator(a), prime(L))) && return false)
-  L.comp && ppio(denominator(a), prime(L))[1] != denominator(a.data) && return false
+  L.comp && ppio(denominator(a), prime(L))[1] != denominator(a) && return false
   return true
 end
 
@@ -377,7 +377,7 @@ end
 ###############################################################################
 
 function ^(a::LocElem, b::Int)
-   return parent(a)(data(a)^b, parent(a), false)
+   return parent(a)(data(a)^b)
 end
 
 ###############################################################################
