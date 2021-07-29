@@ -299,7 +299,7 @@ function (a::PolyRing{T})(b::AbstractAlgebra.PolyElem{T}) where T <: RingElement
    return b
 end
 
-function (a::PolyRing{T})(b::Array{T, 1}) where T <: RingElement
+function (a::PolyRing{T})(b::Vector{T}) where T <: RingElement
    R = base_ring(a)
    for i = 1:length(b)
       b[i] = R(b[i])
@@ -309,7 +309,7 @@ function (a::PolyRing{T})(b::Array{T, 1}) where T <: RingElement
    return z
 end
 
-function (a::PolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: RingElement}
+function (a::PolyRing{T})(b::Vector{S}) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    len = length(b)
    entries = Array{T}(undef, len)

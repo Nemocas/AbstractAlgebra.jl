@@ -72,7 +72,7 @@ coefficients, must be available.
 For relative power series and Laurent series we have:
 
 ```julia
-(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int, val::Int) where T <: RingElem
+(S::MySeriesRing{T})(A::Vector{T}, len::Int, prec::Int, val::Int) where T <: RingElem
 ```
 
 Create the series in the given ring whose valuation is `val`, whose absolute precision
@@ -84,14 +84,14 @@ It is permitted to have trailing zeros in the array, but it is not needed, even 
 precision minus the valuation is bigger than the length of the array.
 
 ```julia
-(S::MySeriesRing{T})(A::Array{U, 1}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: RingElem}
+(S::MySeriesRing{T})(A::Vector{U}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: RingElem}
 ```
 
 As above, but where the array is an array of coefficient that can be coerced into the
 base ring of the series ring.
 
 ```julia
-(S::MySeriesRing{T})(A::Array{U, 1}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: Integer}
+(S::MySeriesRing{T})(A::Vector{U}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: Integer}
 ```
 
 As above, but where the array is an array of integers that can be coerced into the
@@ -103,7 +103,7 @@ It may be desirable to implement an addition version which accepts an array of J
 For absolute power series we have:
 
 ```julia
-(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int) where T <: RingElem
+(S::MySeriesRing{T})(A::Vector{T}, len::Int, prec::Int) where T <: RingElem
 ```
 
 Create the series in the given ring whose absolute precision is given by `prec` and the

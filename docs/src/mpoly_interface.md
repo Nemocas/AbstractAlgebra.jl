@@ -483,7 +483,7 @@ polynomial types.
 ### Reduction by an ideal
 
 ```julia
-divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T <: RingElem
+divrem(f::MyMPoly{T}, G::Vector{MyMPoly{T}}) where T <: RingElem
 ```
 
 As per the `divrem` function above, except that each term of $r$ starting with the

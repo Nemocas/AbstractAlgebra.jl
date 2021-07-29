@@ -25,7 +25,7 @@ end
 
 # Simulate user matrix type belonging to AbstractArray
 # with getindex but no setindex!
-struct MyTestMatrix{T} <: AbstractArray{T, 2}
+struct MyTestMatrix{T} <: AbstractMatrix{T}
    d::T
    dim::Int
 end

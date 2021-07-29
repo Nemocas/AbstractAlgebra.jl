@@ -44,7 +44,7 @@ function check_parent(a::MatElem, b::MatElem, throw::Bool = true)
   return !fl
 end
 
-function _check_dim(r::Int, c::Int, arr::AbstractArray{T, 2}, transpose::Bool = false) where {T}
+function _check_dim(r::Int, c::Int, arr::AbstractMatrix{T}, transpose::Bool = false) where {T}
   if !transpose
     size(arr) != (r, c) && throw(ErrorConstrDimMismatch(r, c, size(arr)...))
   else
@@ -53,7 +53,7 @@ function _check_dim(r::Int, c::Int, arr::AbstractArray{T, 2}, transpose::Bool = 
   return nothing
 end
 
-function _check_dim(r::Int, c::Int, arr::AbstractArray{T, 1}) where {T}
+function _check_dim(r::Int, c::Int, arr::AbstractVector{T}) where {T}
   length(arr) != r*c && throw(ErrorConstrDimMismatch(r, c, length(arr)))
   return nothing
 end
@@ -1965,7 +1965,7 @@ Return an array consisting of the k-minors of A
 function minors(A::MatElem, k::Int)
    row_indices = combinations(nrows(A), k)
    col_indices = combinations(ncols(A), k)
-   mins = Array{elem_type(base_ring(A)), 1}(undef, 0)
+   mins = Vector{elem_type(base_ring(A))}(undef, 0)
    for ri in row_indices
       for ci in col_indices
          push!(mins, det(A[ri, ci]))
@@ -2224,8 +2224,8 @@ function solve_fflu_precomp(p::Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <
    s = base_ring(b)()
    minus_one = R(-1)
    y = similar(x, c, m)
-   diag = Array{elem_type(R), 1}(undef, n)
-   piv = Array{Int, 1}(undef, n)
+   diag = Vector{elem_type(R)}(undef, n)
+   piv = Vector{Int}(undef, n)
 
    rnk = 0
    l = 0
@@ -2352,8 +2352,8 @@ function solve_lu_precomp(p::Perm, LU::MatElem{T}, b::MatElem{T}) where {T <: Fi
    s = base_ring(b)()
    y = similar(x, c, m)
 
-   diag = Array{elem_type(R), 1}(undef, n)
-   piv = Array{Int, 1}(undef, n)
+   diag = Vector{elem_type(R)}(undef, n)
+   piv = Vector{Int}(undef, n)
 
    l = 0
    rnk = 0
@@ -4311,7 +4311,7 @@ function kb_search_first_pivot(H, start_element::Int = 1)
 end
 
 # Reduces the entries above H[pivot[c], c]
-function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
+function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
 
    # Let c = 4 and pivot[c] = 4. H could look like this:
    # ( 0 . * # * )
@@ -4365,7 +4365,7 @@ function kb_canonical_row!(H, U, r::Int, c::Int, with_trafo::Bool)
    return nothing
 end
 
-function kb_sort_rows!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int, 1}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
+function kb_sort_rows!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
    m = nrows(H)
    n = ncols(H)
    pivot2 = zeros(Int, m)
@@ -4900,7 +4900,7 @@ end
 function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) where {T <: PolyElem}
    last_row == 0 ? m = nrows(P) : m = last_row
    last_col == 0 ? n = ncols(P) : n = last_col
-   pivots = Array{Array{Int,1}}(undef, n)
+   pivots = Array{Vector{Int}}(undef, n)
    for i = 1:n
       pivots[i] = zeros(Int, 0)
    end
@@ -4923,7 +4923,7 @@ end
 The weak Popov form is defined by T. Mulders and A. Storjohann in
 "On lattice reduction for polynomial matrices"
 =#
-function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pivots::Array{Array{Int,1}},
+function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}},
                                                    extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyElem}
    last_row == 0 ? m = nrows(P) : m = last_row
    last_col == 0 ? n = ncols(P) : n = last_col
@@ -4990,8 +4990,8 @@ function rank_profile_popov(A::MatElem{T}) where {T <: PolyElem}
    U = similar(A, 0, 0)
    V = U
    r = 0
-   rank_profile = Array{Int,1}(undef, 0)
-   pivots = Array{Array{Int,1}}(undef, n)
+   rank_profile = Vector{Int}(undef, 0)
+   pivots = Array{Vector{Int}}(undef, n)
    for i = 1:n
       pivots[i] = zeros(Int, 0)
    end
@@ -5116,10 +5116,10 @@ function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: Pol
    end
 end
 
-function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Array{Array{Int,1}}, with_trafo::Bool) where {T <: PolyElem}
+function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}}, with_trafo::Bool) where {T <: PolyElem}
    m = nrows(P)
    n = ncols(P)
-   pivots2 = Array{NTuple{3,Int},1}(undef, m)
+   pivots2 = Vector{NTuple{3,Int}}(undef, m)
    for r = 1:m
       pivots2[r] = (r,n,-1)
    end
@@ -6030,23 +6030,23 @@ randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
 ################################################################################
 
 @doc Markdown.doc"""
-    matrix(R::Ring, arr::AbstractArray{T, 2}) where {T}
+    matrix(R::Ring, arr::AbstractMatrix{T}) where {T}
 
 Constructs the matrix over $R$ with entries as in `arr`.
 """
-function matrix(R::Ring, arr::AbstractArray{T, 2}) where {T}
+function matrix(R::Ring, arr::AbstractMatrix{T}) where {T}
    if elem_type(R) === T
       z = Generic.MatSpaceElem{elem_type(R)}(arr)
       z.base_ring = R
       return z
    else
-      arr_coerce = convert(Array{elem_type(R), 2}, map(R, arr))::Array{elem_type(R), 2}
+      arr_coerce = convert(Matrix{elem_type(R)}, map(R, arr))::Matrix{elem_type(R)}
       return matrix(R, arr_coerce)
    end
 end
 
 @doc Markdown.doc"""
-    matrix(R::Ring, r::Int, c::Int, arr::AbstractArray{T, 1}) where {T}
+    matrix(R::Ring, r::Int, c::Int, arr::AbstractVector{T}) where {T}
 
 Constructs the $r \times c$ matrix over $R$, where the entries are taken
 row-wise from `arr`.
@@ -6059,7 +6059,7 @@ function matrix(R::Ring, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
      z.base_ring = R
      return z
    else
-     arr_coerce = convert(Array{elem_type(R), 1}, map(R, arr))::Array{elem_type(R), 1}
+     arr_coerce = convert(Vector{elem_type(R)}, map(R, arr))::Vector{elem_type(R)}
      return matrix(R, r, c, arr_coerce)
    end
 end
@@ -6196,7 +6196,7 @@ julia> A = ZZ[1 2 3; 4 5 6]
 [4   5   6]
 
 julia> Matrix(A)
-2×3 Array{BigInt,2}:
+2×3 Matrix{BigInt}:
  1  2  3
  4  5  6
 ```
@@ -6215,7 +6215,7 @@ julia> R, x = ZZ["x"]; A = R[x^0 x^1; x^2 x^3]
 [x^2   x^3]
 
 julia> Array(A)
-2×2 Array{AbstractAlgebra.Generic.Poly{BigInt},2}:
+2×2 Matrix{AbstractAlgebra.Generic.Poly{BigInt}}:
  1    x
  x^2  x^3
 ```

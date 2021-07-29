@@ -144,7 +144,7 @@ see `partitions!`.
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> Generic.partitions(5)
-7-element Array{AbstractAlgebra.Generic.Partition{Int64},1}:
+7-element Vector{AbstractAlgebra.Generic.Partition{Int64}}:
  1₅
  2₁1₃
  3₁1₂
@@ -538,15 +538,10 @@ julia> y = YoungTableau([4,3,1]);
 
 
 julia> matrix_repr(y)
-3×4 SparseArrays.SparseMatrixCSC{Int64,Int64} with 8 stored entries:
-  [1, 1]  =  1
-  [2, 1]  =  5
-  [3, 1]  =  8
-  [1, 2]  =  2
-  [2, 2]  =  6
-  [1, 3]  =  3
-  [2, 3]  =  7
-  [1, 4]  =  4
+3×4 SparseArrays.SparseMatrixCSC{Int64, Int64} with 8 stored entries:
+ 1  2  3  4
+ 5  6  7  ⋅
+ 8  ⋅  ⋅  ⋅
 ```
 """
 function matrix_repr(Y::YoungTableau{T}) where T

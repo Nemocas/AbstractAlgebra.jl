@@ -38,7 +38,7 @@ end
 @testset "youngtabs.youngtableau_type" begin
    lambda = [4,3,1]
    @test YoungTableau(Partition(lambda)) isa Generic.YoungTableau
-   @test YoungTableau(Partition(lambda)) isa AbstractArray{Int, 2}
+   @test YoungTableau(Partition(lambda)) isa AbstractMatrix{Int}
    @test YoungTableau(lambda) isa Generic.YoungTableau
 
    Y = YoungTableau(lambda)

@@ -194,7 +194,7 @@ function (a::MatSpace{T})(b::Mat{T}) where {T <: RingElement}
    return b
 end
 
-function (a::MatSpace{T})(b::Array{T, 2}) where T <: RingElement
+function (a::MatSpace{T})(b::Matrix{T}) where T <: RingElement
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
    if !isempty(b)
@@ -205,7 +205,7 @@ function (a::MatSpace{T})(b::Array{T, 2}) where T <: RingElement
    return z
 end
 
-function (a::MatSpace{T})(b::AbstractArray{S, 2}) where {S <: RingElement, T <: RingElement}
+function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
    entries = Array{T}(undef, a.nrows, a.ncols)
@@ -219,9 +219,9 @@ function (a::MatSpace{T})(b::AbstractArray{S, 2}) where {S <: RingElement, T <: 
    return z
 end
 
-function (a::MatSpace{T})(b::AbstractArray{S, 1}) where {S <: RingElement, T <: RingElement}
+function (a::MatSpace{T})(b::AbstractVector{S}) where {S <: RingElement, T <: RingElement}
    _check_dim(a.nrows, a.ncols, b)
-   b = Array{S, 2}(transpose(reshape(b, a.ncols, a.nrows)))
+   b = Matrix{S}(transpose(reshape(b, a.ncols, a.nrows)))
    z = a(b)
    return z
 end

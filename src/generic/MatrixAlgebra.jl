@@ -179,7 +179,7 @@ function (a::MatAlgebra{T})(b::MatAlgElem{T}) where {T <: RingElement}
    return b
 end
 
-function (a::MatAlgebra{T})(b::Array{S, 2}) where {S <: RingElement, T <: RingElement}
+function (a::MatAlgebra{T})(b::Matrix{S}) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    _check_dim(a.n, a.n, b)
    entries = Array{T}(undef, a.n, a.n)
@@ -193,9 +193,9 @@ function (a::MatAlgebra{T})(b::Array{S, 2}) where {S <: RingElement, T <: RingEl
    return z
 end
 
-function (a::MatAlgebra{T})(b::Array{S, 1}) where {S <: RingElement, T <: RingElement}
+function (a::MatAlgebra{T})(b::Vector{S}) where {S <: RingElement, T <: RingElement}
    _check_dim(a.n, a.n, b)
-   b = Array{S, 2}(transpose(reshape(b, a.n, a.n)))
+   b = Matrix{S}(transpose(reshape(b, a.n, a.n)))
    z = a(b)
    return z
 end

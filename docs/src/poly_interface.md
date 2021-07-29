@@ -88,20 +88,20 @@ In addition to the standard constructors, the following constructors, taking an 
 coefficients, must be available.
 
 ```julia
-(S::MyPolyRing{T})(A::Array{T, 1}) where T <: RingElem
+(S::MyPolyRing{T})(A::Vector{T}) where T <: RingElem
 ```
 
 Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[1 + i]`.
 
 ```julia
-(S::MyPolyRing{T})(A::Array{U, 1}) where T <: RingElem, U <: RingElem
+(S::MyPolyRing{T})(A::Vector{U}) where T <: RingElem, U <: RingElem
 ```
 
 Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[1 + i]`.
 The elements of the array are assumed to be able to be coerced into the base ring `R`.
 
 ```julia
-(S::MyPolyRing{T})(A::Array{U, 1}) where T <: RingElem, U <: Integer
+(S::MyPolyRing{T})(A::Vector{U}) where T <: RingElem, U <: Integer
 ```
 
 Create the polynomial in the given ring whose degree $i$ coefficient is given by `A[1 + i]`.

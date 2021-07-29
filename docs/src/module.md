@@ -81,7 +81,7 @@ julia> n = ngens(M)
 2
 
 julia> G = gens(M)
-2-element Array{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}},1}:
+2-element Vector{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}}}:
  (1//1, 0//1)
  (0//1, 1//1)
 
@@ -289,7 +289,7 @@ Codomain: Quotient module over Integers with 3 generators and relations:
 [3 9 -1], [0 20 -10])
 
 julia> invs = invariant_factors(Q)
-2-element Array{BigInt,1}:
+2-element Vector{BigInt}:
  10
   0
 

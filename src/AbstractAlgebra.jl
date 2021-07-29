@@ -544,7 +544,7 @@ function SkewDiagram(lambda::Generic.Partition, mu::Generic.Partition)
   Generic.SkewDiagram(lambda, mu)
 end
 
-function YoungTableau(part::Generic.Partition, tab::Array{Int, 2})
+function YoungTableau(part::Generic.Partition, tab::Matrix{Int})
    Generic.YoungTableau(part, tab)
 end
 
@@ -705,7 +705,7 @@ end
 #
 ###############################################################################
 
-function sig_exists(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1}) where {U, V, W, X}
+function sig_exists(T::Type{Tuple{U, V, W}}, sig_table::Vector{X}) where {U, V, W, X}
    for s in sig_table
       if s === T
          return true

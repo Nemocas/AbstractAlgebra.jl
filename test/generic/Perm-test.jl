@@ -307,7 +307,7 @@ end
    @test order(p^5) == 6
 
    if VERSION <= v"1.2"
-      @test matrix_repr(a) isa AbstractArray{T,2}
+      @test matrix_repr(a) isa AbstractMatrix{T}
       @test matrix_repr(a) isa SparseMatrixCSC{T,T}
       M = matrix_repr(a)
       for (idx, val) in enumerate(a.d)

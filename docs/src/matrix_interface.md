@@ -76,23 +76,23 @@ In addition to the standard constructors, the following constructors, taking an 
 elements, must be available.
 
 ```julia
-(S::MyMatSpace{T})(A::Array{T, 2}) where T <: RingElem
-(S::MyMatAlgebra{T})(A::Array{T, 2}) where T <: RingElem
+(S::MyMatSpace{T})(A::Matrix{T}) where T <: RingElem
+(S::MyMatAlgebra{T})(A::Matrix{T}) where T <: RingElem
 ```
 
 Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`.
 
 ```julia
-(S::MyMatSpace{T})(A::Array{S, 2}) where {S <: RingElem, T <: RingElem}
-(S::MyMatAlgebra{T})(A::Array{S, 2}) where {S <: RingElem, T <: RingElem}
+(S::MyMatSpace{T})(A::Matrix{S}) where {S <: RingElem, T <: RingElem}
+(S::MyMatAlgebra{T})(A::Matrix{S}) where {S <: RingElem, T <: RingElem}
 ```
 
 Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`,
 where `S` is the type of elements that can be coerced into the base ring of the matrix.
 
 ```julia
-(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: RingElem, T <: RingElem}
-(S::MyMatAlgebra{T})(A::Array{S, 1}) where {S <: RingElem, T <: RingElem}
+(S::MyMatSpace{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
+(S::MyMatAlgebra{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
 ```
 
 Create the matrix in the given space/algebra of matrices (with dimensions $m\times n$
@@ -106,7 +106,7 @@ their parent. Instead, parents are constructed on-the-fly if requested. (The sam
 strategy is used for matrix algebras.)
 
 ```julia
-matrix(R::Ring, arr::Array{T, 2}) where T <: RingElem
+matrix(R::Ring, arr::Matrix{T}) where T <: RingElem
 ```
 
 Given an $m\times n$ Julia matrix of entries, construct the corresponding
@@ -115,7 +115,7 @@ coerced into `R`.
 
 
 ```julia
-matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: RingElem
+matrix(R::Ring, r::Int, c::Int, A::Vector{T}) where T <: RingElem
 ```
 
 Construct the given $r\times c$ AbstractAlgebra.jl matrix over the ring `R` whose
