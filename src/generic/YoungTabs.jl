@@ -144,7 +144,7 @@ see `partitions!`.
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> Generic.partitions(5)
-7-element Array{AbstractAlgebra.Generic.Partition{Int64},1}:
+7-element Vector{AbstractAlgebra.Generic.Partition{Int64}}:
  1₅
  2₁1₃
  3₁1₂

@@ -1178,19 +1178,19 @@ argument `cached` to `false` will prevent the parent object `T` from being
 cached. `S` is a symbol corresponding to the ordering of the polynomial and
 can be one of `:lex`, `:deglex` or `:degrevlex`.
 """
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1};
+function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{String};
                                    cached::Bool = true, ordering::Symbol = :lex)
    return PolynomialRing(R, [Symbol(v) for v in s];
                                    cached=cached, ordering=ordering)
 end
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{Char, 1};
+function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Char};
                                    cached::Bool = true, ordering::Symbol = :lex)
    return PolynomialRing(R, [Symbol(v) for v in s];
                                    cached=cached, ordering=ordering)
 end
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{Symbol, 1};
+function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol};
                                    cached::Bool = true, ordering::Symbol = :lex)
    return Generic.PolynomialRing(R, s; cached=cached, ordering=ordering)
 end

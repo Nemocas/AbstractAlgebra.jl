@@ -330,7 +330,7 @@ function (a::AbsSeriesRing{T})(b::AbsSeriesElem{T}) where T <: RingElement
    return b
 end
 
-function (a::AbsSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int) where T <: RingElement
+function (a::AbsSeriesRing{T})(b::Vector{T}, len::Int, prec::Int) where T <: RingElement
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
    end
@@ -339,7 +339,7 @@ function (a::AbsSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int) where T <: R
    return z
 end
 
-function (a::AbsSeriesRing{T})(b::Array{S, 1}, len::Int, prec::Int) where {S <: RingElement, T <: RingElement}
+function (a::AbsSeriesRing{T})(b::Vector{S}, len::Int, prec::Int) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    lenb = length(b)
    entries = Array{T}(undef, lenb)

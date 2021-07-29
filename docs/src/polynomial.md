@@ -126,9 +126,9 @@ For polynommials there is also the following more general constructor accepting
 an array of coefficients.
 
 ```julia
-(S::PolyRing{T})(A::Array{T, 1}) where T <: RingElem
-(S::PolyRing{T})(A::Array{U, 1}) where T <: RingElem, U <: RingElem
-(S::PolyRing{T})(A::Array{U, 1}) where T <: RingElem, U <: Integer
+(S::PolyRing{T})(A::Vector{T}) where T <: RingElem
+(S::PolyRing{T})(A::Vector{U}) where T <: RingElem, U <: RingElem
+(S::PolyRing{T})(A::Vector{U}) where T <: RingElem, U <: Integer
 ```
 
 Construct the polynomial in the ring `S` with the given array of coefficients,
@@ -470,7 +470,7 @@ julia> var(R)
 :x
 
 julia> symbols(R)
-1-element Array{Symbol,1}:
+1-element Vector{Symbol}:
  :x
 
 julia> a = zero(S)
@@ -565,7 +565,7 @@ julia> f = x^2 + 2
 x^2 + 2
 
 julia> C = collect(coefficients(f))
-3-element Array{BigInt,1}:
+3-element Vector{BigInt}:
  2
  0
  1
@@ -930,11 +930,11 @@ x^2 - 34*x + 1
 ### Newton representation
 
 ```@docs
-monomial_to_newton!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})
+monomial_to_newton!{T <: RingElem}(::Vector{T}, ::Vector{T})
 ```
 
 ```@docs
-newton_to_monomial!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})
+newton_to_monomial!{T <: RingElem}(::Vector{T}, ::Vector{T})
 ```
 
 **Examples**
@@ -953,7 +953,7 @@ julia> g = deepcopy(f)
 3*x*y^2 + (x + 1)*y + 3
 
 julia> roots = [R(1), R(2), R(3)]
-3-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
  1
  2
  3
@@ -973,7 +973,7 @@ roots(f::PolyElem, R::Field)
 ### Interpolation
 
 ```@docs
-interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})
+interpolate{T <: RingElem}(::PolyRing, ::Vector{T}, ::Vector{T})
 ```
 
 **Examples**
@@ -986,14 +986,14 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> xs = [R(1), R(2), R(3), R(4)]
-4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
  1
  2
  3
  4
 
 julia> ys = [R(1), R(4), R(9), R(16)]
-4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
  1
  4
  9
@@ -1011,7 +1011,7 @@ polynomial_to_power_sums(::PolyElem{T}) where T <: RingElem
 ```
 
 ```@docs
-power_sums_to_polynomial(::Array{T, 1}) where T <: RingElem
+power_sums_to_polynomial(::Vector{T}) where T <: RingElem
 ```
 
 **Examples**

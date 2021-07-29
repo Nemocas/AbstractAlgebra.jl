@@ -160,15 +160,15 @@ not already in that ring.
 For relative series we have:
 
 ```julia
-(S::SeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int, val::Int) where T <: RingElem
-(S::SeriesRing{T})(A::Array{U, 1}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: RingElem}
-(S::SeriesRing{T})(A::Array{U, 1}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: Integer}
+(S::SeriesRing{T})(A::Vector{T}, len::Int, prec::Int, val::Int) where T <: RingElem
+(S::SeriesRing{T})(A::Vector{U}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: RingElem}
+(S::SeriesRing{T})(A::Vector{U}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: Integer}
 ```
 
 And for absolute series:
 
 ```julia
-(S::SeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int) where T <: RingElem
+(S::SeriesRing{T})(A::Vector{T}, len::Int, prec::Int) where T <: RingElem
 ```
 
 It is also possible to create series directly without having to create the

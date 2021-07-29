@@ -1645,7 +1645,7 @@ function (R::LaurentSeriesField{T})(b::LaurentSeriesElem{T}) where {T <: FieldEl
    return b
 end
 
-function (R::LaurentSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
+function (R::LaurentSeriesRing{T})(b::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
@@ -1657,7 +1657,7 @@ function (R::LaurentSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int
    return z
 end
 
-function (R::LaurentSeriesField{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
+function (R::LaurentSeriesField{T})(b::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end

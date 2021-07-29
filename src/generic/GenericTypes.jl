@@ -134,7 +134,7 @@ julia> for p in ap; println(p) end
 [5]
 
 julia> unique(collect(ap))
-1-element Array{Array{Int64,1},1}:
+1-element Vector{Vector{Int64}}:
  [5]
 
 
@@ -157,7 +157,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    SkewDiagram(lambda::Partition, mu::Partition) <: AbstractArray{Int, 2}
+    SkewDiagram(lambda::Partition, mu::Partition) <: AbstractMatrix{Int}
 
 Implements a skew diagram, i.e. a difference of two Young diagrams
 represented by partitions `lambda` and `mu`.
@@ -179,7 +179,7 @@ julia> xi = SkewDiagram(l,m)
 
 ```
 """
-struct SkewDiagram{T<:Integer} <: AbstractArray{T, 2}
+struct SkewDiagram{T<:Integer} <: AbstractMatrix{T}
    lam::Partition{T}
    mu::Partition{T}
 
@@ -204,7 +204,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}
+    YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractMatrix{Int}
 
 Return the Young tableaux of partition `part`, filled linearly
 by `fill` vector. Note that `fill` vector is in **row-major** format.
@@ -228,7 +228,7 @@ julia> y.part
 4₁3₁1₁
 
 julia> y.fill
-8-element Array{Int64,1}:
+8-element Vector{Int64}:
  1
  2
  3
@@ -239,7 +239,7 @@ julia> y.fill
  8
 ```
 """
-struct YoungTableau{T<:Integer} <: AbstractArray{T, 2}
+struct YoungTableau{T<:Integer} <: AbstractMatrix{T}
    part::Partition{T}
    fill::Vector{T}
 
@@ -271,13 +271,13 @@ end
 const PolyID = CacheDictType{Tuple{Ring, Symbol}, Ring}()
 
 mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyElem{T}
-   coeffs::Array{T, 1}
+   coeffs::Vector{T}
    length::Int
    parent::PolyRing{T}
 
    Poly{T}() where T <: RingElement = new{T}(Array{T}(undef, 0), 0)
 
-   function Poly{T}(b::Array{T, 1}) where T <: RingElement
+   function Poly{T}(b::Vector{T}) where T <: RingElement
       z = new{T}(b)
       z.length = normalise(z, length(b))
       return z
@@ -306,13 +306,13 @@ end
 const NCPolyID = CacheDictType{Tuple{NCRing, Symbol}, NCRing}()
 
 mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyElem{T}
-   coeffs::Array{T, 1}
+   coeffs::Vector{T}
    length::Int
    parent::NCPolyRing{T}
 
    NCPoly{T}() where T <: NCRingElem = new{T}(Array{T}(undef, 0), 0)
 
-   function NCPoly{T}(b::Array{T, 1}) where T <: NCRingElem
+   function NCPoly{T}(b::Vector{T}) where T <: NCRingElem
       z = new{T}(b)
       z.length = normalise(z, length(b))
       return z
@@ -338,12 +338,12 @@ end
 
 mutable struct MPolyRing{T <: RingElement} <: AbstractAlgebra.MPolyRing{T}
    base_ring::Ring
-   S::Array{Symbol, 1}
+   S::Vector{Symbol}
    ord::Symbol
    num_vars::Int
    N::Int
 
-   function MPolyRing{T}(R::Ring, s::Array{Symbol, 1}, ord::Symbol, N::Int,
+   function MPolyRing{T}(R::Ring, s::Vector{Symbol}, ord::Symbol, N::Int,
                          cached::Bool = true) where T <: RingElement
       return get_cached!(MPolyID, (R, s, ord, N), cached) do
          new{T}(R, s, ord, length(s), N)
@@ -351,11 +351,11 @@ mutable struct MPolyRing{T <: RingElement} <: AbstractAlgebra.MPolyRing{T}
    end
 end
 
-const MPolyID = CacheDictType{Tuple{Ring, Array{Symbol, 1}, Symbol, Int}, Ring}()
+const MPolyID = CacheDictType{Tuple{Ring, Vector{Symbol}, Symbol, Int}, Ring}()
 
 mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyElem{T}
-   coeffs::Array{T, 1}
-   exps::Array{UInt, 2}
+   coeffs::Vector{T}
+   exps::Matrix{UInt}
    length::Int
    parent::MPolyRing{T}
 
@@ -364,7 +364,7 @@ mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyElem{T}
       return new{T}(Array{T}(undef, 0), Array{UInt}(undef, N, 0), 0, R)
    end
 
-   MPoly{T}(R::MPolyRing, a::Array{T, 1}, b::Array{UInt, 2}) where T <: RingElement = new{T}(a, b, length(a), R)
+   MPoly{T}(R::MPolyRing, a::Vector{T}, b::Matrix{UInt}) where T <: RingElement = new{T}(a, b, length(a), R)
 
    function MPoly{T}(R::MPolyRing, a::T) where T <: RingElement
       N = R.N
@@ -423,14 +423,14 @@ end
 const SparsePolyID = CacheDictType{Tuple{Ring, Symbol}, SparsePolyRing}()
 
 mutable struct SparsePoly{T <: RingElement} <: AbstractAlgebra.RingElem
-   coeffs::Array{T, 1}
+   coeffs::Vector{T}
    exps::Array{UInt}
    length::Int
    parent::SparsePolyRing{T}
 
    SparsePoly{T}() where T <: RingElement = new{T}(Array{T}(undef, 0), Array{UInt}(undef, 0), 0)
 
-   SparsePoly{T}(a::Array{T, 1}, b::Array{UInt, 1}) where T <: RingElement = new{T}(a, b, length(a))
+   SparsePoly{T}(a::Vector{T}, b::Vector{UInt}) where T <: RingElement = new{T}(a, b, length(a))
 
    SparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(undef, 0), Array{UInt}(undef, 0), 0) :
                                                new{T}([a], [UInt(0)], 1)
@@ -558,13 +558,13 @@ end
 const RelSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
 mutable struct RelSeries{T <: RingElement} <: AbstractAlgebra.RelSeriesElem{T}
-   coeffs::Array{T, 1}
+   coeffs::Vector{T}
    length::Int
    prec::Int
    val::Int
    parent::RelSeriesRing{T}
 
-   function RelSeries{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int) where T <: RingElement
+   function RelSeries{T}(a::Vector{T}, length::Int, prec::Int, val::Int) where T <: RingElement
       new{T}(a, length, prec, val)
    end
 
@@ -592,12 +592,12 @@ end
 const AbsSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
 mutable struct AbsSeries{T <: RingElement} <: AbstractAlgebra.AbsSeriesElem{T}
-   coeffs::Array{T, 1}
+   coeffs::Vector{T}
    length::Int
    prec::Int
    parent::AbsSeriesRing{T}
 
-   AbsSeries{T}(a::Array{T, 1}, length::Int, prec::Int) where T <: RingElement = new{T}(a, length, prec)
+   AbsSeries{T}(a::Vector{T}, length::Int, prec::Int) where T <: RingElement = new{T}(a, length, prec)
    AbsSeries{T}(a::AbsSeries{T}) where T <: RingElement = a
 end
 
@@ -622,14 +622,14 @@ end
 const LaurentSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
 mutable struct LaurentSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingElem
-   coeffs::Array{T, 1}
+   coeffs::Vector{T}
    length::Int
    prec::Int
    val::Int
    scale::Int
    parent::LaurentSeriesRing{T}
 
-   function LaurentSeriesRingElem{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int, scale::Int) where T <: RingElement
+   function LaurentSeriesRingElem{T}(a::Vector{T}, length::Int, prec::Int, val::Int, scale::Int) where T <: RingElement
       new{T}(a, length, prec, val, scale)
    end
 end
@@ -653,14 +653,14 @@ mutable struct LaurentSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
 end
 
 mutable struct LaurentSeriesFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
-   coeffs::Array{T, 1}
+   coeffs::Vector{T}
    length::Int
    prec::Int
    val::Int
    scale::Int
    parent::LaurentSeriesField{T}
 
-   function LaurentSeriesFieldElem{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int, scale::Int) where T <: FieldElement
+   function LaurentSeriesFieldElem{T}(a::Vector{T}, length::Int, prec::Int, val::Int, scale::Int) where T <: FieldElement
       new{T}(a, length, prec, val, scale)
    end
 end
@@ -881,18 +881,18 @@ end
 const MatDict = CacheDictType{Tuple{Ring, Int, Int}, MatSpace}()
 
 mutable struct MatSpaceElem{T <: RingElement} <: Mat{T}
-   entries::Array{T, 2}
+   entries::Matrix{T}
    base_ring::Ring
 
-   function MatSpaceElem{T}(A::Array{T, 2}) where T <: RingElement
+   function MatSpaceElem{T}(A::Matrix{T}) where T <: RingElement
       return new{T}(A)
     end
 
-   function MatSpaceElem{T}(A::AbstractArray{T, 2}) where T <: RingElement
+   function MatSpaceElem{T}(A::AbstractMatrix{T}) where T <: RingElement
       return new{T}(Array(A))
    end
 
-   function MatSpaceElem{T}(r::Int, c::Int, A::Array{T, 1}) where T <: RingElement
+   function MatSpaceElem{T}(r::Int, c::Int, A::Vector{T}) where T <: RingElement
       t = Array{T}(undef, r, c)
       for i = 1:r
          for j = 1:c
@@ -904,7 +904,7 @@ mutable struct MatSpaceElem{T <: RingElement} <: Mat{T}
 end
 
 mutable struct MatSpaceView{T <: RingElement, V, W} <: Mat{T}
-   entries::SubArray{T, 2, Array{T, 2}, V, W}
+   entries::SubArray{T, 2, Matrix{T}, V, W}
    base_ring::Ring
 end
 
@@ -928,14 +928,14 @@ end
 const MatAlgDict = CacheDictType{Tuple{Ring, Int}, NCRing}()
 
 mutable struct MatAlgElem{T <: RingElement} <: AbstractAlgebra.MatAlgElem{T}
-   entries::Array{T, 2}
+   entries::Matrix{T}
    base_ring::Ring
 
-   function MatAlgElem{T}(A::Array{T, 2}) where T <: RingElement
+   function MatAlgElem{T}(A::Matrix{T}) where T <: RingElement
       return new{T}(A)
    end
 
-   function MatAlgElem{T}(n::Int, A::Array{T, 1}) where T <: RingElement
+   function MatAlgElem{T}(n::Int, A::Vector{T}) where T <: RingElement
       t = Array{T}(undef, n, n)
       for i = 1:n
          for j = 1:n

@@ -215,7 +215,7 @@ function ModuleHomomorphism(D::DirectSumModule{T}, A::AbstractAlgebra.FPModule{T
    return ModuleHomomorphism(D, A, vcat([x.matrix for x = m]...))
 end
 
-function ModuleHomomorphism(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Array{<:Any, 2}) where T <: RingElement
+function ModuleHomomorphism(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Matrix{<:Any}) where T <: RingElement
    SD = summands(D)
    SA = summands(A)
    size(m) == (length(SD), length(SA)) || error("dimensions do not match")

@@ -177,7 +177,7 @@ Codomain: Submodule over Integers with 2 generators and no relations
 ])
 
 julia> summands(D)
-3-element Array{AbstractAlgebra.Generic.Submodule{BigInt},1}:
+3-element Vector{AbstractAlgebra.Generic.Submodule{BigInt}}:
  Submodule over Integers with 2 generators and no relations
 
  Submodule over Integers with 2 generators and no relations
@@ -214,7 +214,7 @@ any homomorphism may be thought of as a matrix containing maps from the $i$-th
 source summand to the $j$-th target module:
 
 ```
-ModuleHomomorphism(D::DirectSumModule{T}, S::DirectSumModule{T}, m::Array{Any, 2}) where T <: RingElement
+ModuleHomomorphism(D::DirectSumModule{T}, S::DirectSumModule{T}, m::Matrix{Any}) where T <: RingElement
 ```
 
 Given a matrix $m$ such that the $(i,j)$-th entry is either $0$ (`Int(0)`)
@@ -222,7 +222,7 @@ or a `ModuleHomomorphism` from the $i$-th summand of $D$ to the $j$-th summand o
 $S$, construct the corresponding homomorphism.
 
 ```
-ModuleHomomorphism(D::DirectSumModule{T}, S::FPModuleElem{T}, m::Array{ModuleHomomorphism, 1})
+ModuleHomomorphism(D::DirectSumModule{T}, S::FPModuleElem{T}, m::Vector{ModuleHomomorphism})
 ```
 Given an array $a$ of `ModuleHomomorphism` such that $a_i$, the $i$-th entry
 of $a$ is a `ModuleHomomorphism` from the $i$-th summand of `D` into `S`,

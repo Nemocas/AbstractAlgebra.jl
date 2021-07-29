@@ -223,7 +223,7 @@ if there is no such term.
 function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
-   exp2 = Array{UInt, 1}(undef, N)
+   exp2 = Vector{UInt}(undef, N)
    ord = parent(a).ord
    if ord == :lex
       exp2[:] = exps[end:-1:1]
@@ -264,7 +264,7 @@ function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
    c = base_ring(a)(c)
    A = a.exps
    N = size(A, 1)
-   exp2 = Array{UInt, 1}(undef, N)
+   exp2 = Vector{UInt}(undef, N)
    ord = parent(a).ord
    if ord == :lex
       exp2[:] = exps[end:-1:1]
@@ -362,7 +362,7 @@ function monomial_drmask(R::MPolyRing{T}, bits::Int) where T <: RingElement
 end
 
 # Sets the i-th exponent vector of the exponent array A to zero
-function monomial_zero!(A::Array{UInt, 2}, i::Int, N::Int)
+function monomial_zero!(A::Matrix{UInt}, i::Int, N::Int)
    for k = 1:N
       A[k, i] = UInt(0)
    end
@@ -371,7 +371,7 @@ end
 
 # Returns true if the i-th exponent vector of the exponent array A is zero
 # For degree orderings, this inefficiently also checks the degree field
-function monomial_iszero(A::Array{UInt, 2}, i::Int, N::Int)
+function monomial_iszero(A::Matrix{UInt}, i::Int, N::Int)
    for k = 1:N
       if A[k, i] != UInt(0)
          return false
@@ -382,7 +382,7 @@ end
 
 # Returns true if the i-th and j-th exponent vectors of the array A are equal
 # For degree orderings, this inefficiently also checks the degree fields
-function monomial_isequal(A::Array{UInt, 2}, i::Int, j::Int, N::Int)
+function monomial_isequal(A::Matrix{UInt}, i::Int, j::Int, N::Int)
    for k = 1:N
       if A[k, i] != A[k, j]
          return false
@@ -393,7 +393,7 @@ end
 
 # Returns true if the i-th exponent vector of the array A is less than that of
 # the j-th, according to the ordering of R
-function monomial_isless(A::Array{UInt, 2}, i::Int, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function monomial_isless(A::Matrix{UInt}, i::Int, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    if R.ord == :degrevlex
       if (xor(A[N, i], drmask)) < (xor(A[N, j], drmask))
          return true
@@ -421,7 +421,7 @@ end
 
 # Return true if the i-th exponent vector of the array A is less than the j-th
 # exponent vector of the array B
-function monomial_isless(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function monomial_isless(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    if R.ord == :degrevlex
       if xor(A[N, i], drmask) < xor(B[N, j], drmask)
          return true
@@ -449,7 +449,7 @@ end
 
 # Set the i-th exponent vector of the array A to the word by word minimum of
 # itself and the j-th exponent vector of B. Used for lexical orderings only.
-function monomial_vecmin!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
+function monomial_vecmin!(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, N::Int)
    for k = 1:N
       if B[k, j] < A[k, i]
          A[k, i] = B[k, j]
@@ -459,7 +459,7 @@ function monomial_vecmin!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, 
 end
 
 # Set the i-th exponent vector of the array A to the j-th exponent vector of B
-function monomial_set!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
+function monomial_set!(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, N::Int)
    for k = 1:N
       A[k, i] = B[k, j]
    end
@@ -469,7 +469,7 @@ end
 # Set the i-th exponent vector of the array A to the word by word reverse of
 # the j-th exponent vector of B, excluding the degree. (Used for printing
 # degrevlex only.)
-function monomial_reverse!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
+function monomial_reverse!(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, N::Int)
    for k = 1:N - 1
       A[N - k, i] = B[k, j]
    end
@@ -478,8 +478,8 @@ end
 
 # Set the i-th exponent vector of the array A to the word by word sum of the
 # j1-th exponent vector of B and the j2-th exponent vector of C
-function monomial_add!(A::Array{UInt, 2}, i::Int,
-                B::Array{UInt, 2}, j1::Int, C::Array{UInt, 2}, j2::Int, N::Int)
+function monomial_add!(A::Matrix{UInt}, i::Int,
+                B::Matrix{UInt}, j1::Int, C::Matrix{UInt}, j2::Int, N::Int)
    for k = 1:N
       A[k, i] = B[k, j1] + C[k, j2]
    end
@@ -488,8 +488,8 @@ end
 
 # Set the i-th exponent vector of the array A to the word by word difference of
 # the j1-th exponent vector of B and the j2-th exponent vector of C
-function monomial_sub!(A::Array{UInt, 2}, i::Int,
-                B::Array{UInt, 2}, j1::Int, C::Array{UInt, 2}, j2::Int, N::Int)
+function monomial_sub!(A::Matrix{UInt}, i::Int,
+                B::Matrix{UInt}, j1::Int, C::Matrix{UInt}, j2::Int, N::Int)
    for k = 1:N
       A[k, i] = B[k, j1] - C[k, j2]
    end
@@ -499,7 +499,7 @@ end
 # Set the i-th exponent vector of the array A to the scalar product of the j-th
 # exponent vector of the array B with the non-negative integer n. (Used for
 # raising a monomial to a power.)
-function monomial_mul!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, n::Int, N::Int)
+function monomial_mul!(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, n::Int, N::Int)
    for k = 1:N
       A[k, i] = B[k, j]*reinterpret(UInt, n)
    end
@@ -512,7 +512,7 @@ end
 # a mask must be supplied which has 1's in all bit positions that correspond to
 # an overflow of the corresponding exponent field. (Used for testing
 # divisibility of monomials, and returning the quotient monomial.)
-function monomial_divides!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j1::Int, C::Array{UInt, 2}, j2::Int, mask::UInt, N::Int)
+function monomial_divides!(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j1::Int, C::Matrix{UInt}, j2::Int, mask::UInt, N::Int)
    flag = true
    for k = 1:N
      A[k, i] = reinterpret(UInt, reinterpret(Int, B[k, j1]) - reinterpret(Int, C[k, j2]))
@@ -525,7 +525,7 @@ end
 
 # Return true is the j-th exponent vector of the array B can be halved
 # If so the i-th exponent i-th exponent vector of A is set to the half
-function monomial_halves!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, mask::UInt, N::Int)
+function monomial_halves!(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, mask::UInt, N::Int)
    flag = true
    for k = 1:N
       b = reinterpret(Int, B[k, j])
@@ -545,7 +545,7 @@ end
 # condition. Note that a mask must be supplied which has 1's in all bit
 # positions that correspond to an overflow of the corresponding exponent field.
 # Used for overflow detection inside algorithms.
-function monomial_overflows(A::Array{UInt, 2}, i::Int, mask::UInt, N::Int)
+function monomial_overflows(A::Matrix{UInt}, i::Int, mask::UInt, N::Int)
    for k = 1:N
       if (A[k, i] & mask) != UInt(0)
          return true
@@ -558,7 +558,7 @@ end
 # bigger than the j-th exponent vector of B with respect to the ordering,
 # zero if it is equal and a negative integer if it is less. (Used to compare
 # monomials with respect to an ordering.)
-function monomial_cmp(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function monomial_cmp(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    k = N
    while k > 1 && A[k, i] == B[k, j]
       k -= 1
@@ -685,7 +685,7 @@ of length $1$ with coefficient $1$).
 function monomial(x::MPoly, i::Int)
    R = base_ring(x)
    N = size(x.exps, 1)
-   exps = Array{UInt, 2}(undef, N, 1)
+   exps = Matrix{UInt}(undef, N, 1)
    monomial_set!(exps, 1, x.exps, i, N)
    return parent(x)([one(R)], exps)
 end
@@ -713,7 +713,7 @@ Return the $i$-th nonzero term of the polynomial $x$ (as a polynomial).
 function term(x::MPoly, i::Int)
    R = base_ring(x)
    N = size(x.exps, 1)
-   exps = Array{UInt, 2}(undef, N, 1)
+   exps = Matrix{UInt}(undef, N, 1)
    monomial_set!(exps, 1, x.exps, i, N)
    return parent(x)([deepcopy(x.coeffs[i])], exps)
 end
@@ -1102,8 +1102,8 @@ function -(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return r
 end
 
-function do_copy(Ac::Array{T, 1}, Bc::Array{T, 1},
-               Ae::Array{UInt, 2}, Be::Array{UInt, 2},
+function do_copy(Ac::Vector{T}, Bc::Vector{T},
+               Ae::Matrix{UInt}, Be::Matrix{UInt},
         s1::Int, r::Int, n1::Int, par::MPolyRing{T}) where {T <: RingElement}
    N = size(Ae, 1)
    for i = 1:n1
@@ -1113,8 +1113,8 @@ function do_copy(Ac::Array{T, 1}, Bc::Array{T, 1},
    return n1
 end
 
-function do_merge(Ac::Array{T, 1}, Bc::Array{T, 1},
-               Ae::Array{UInt, 2}, Be::Array{UInt, 2},
+function do_merge(Ac::Vector{T}, Bc::Vector{T},
+               Ae::Matrix{UInt}, Be::Matrix{UInt},
         s1::Int, s2::Int, r::Int, n1::Int, n2::Int, par::MPolyRing{T}) where {T <: RingElement}
    i = 1
    j = 1
@@ -1387,7 +1387,7 @@ heapright(i::Int) = 2i + 1
 heapparent(i::Int) = div(i, 2)
 
 # either chain (exp, x) or insert into heap
-function heapinsert!(xs::Array{heap_s, 1}, ys::Array{heap_t, 1}, m::Int, exp::Int, exps::Array{UInt, 2}, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function heapinsert!(xs::Vector{heap_s}, ys::Vector{heap_t}, m::Int, exp::Int, exps::Matrix{UInt}, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    i = n = length(xs) + 1
    @inbounds if i != 1 && monomial_isequal(exps, exp, xs[1].exp, N)
       ys[m] = heap_t(ys[m].i, ys[m].j, xs[1].n)
@@ -1414,7 +1414,7 @@ function heapinsert!(xs::Array{heap_s, 1}, ys::Array{heap_t, 1}, m::Int, exp::In
    return true
 end
 
-function nheapinsert!(xs::Array{heap_s, 1}, ys::Array{nheap_t, 1}, m::Int, exp::Int, exps::Array{UInt, 2}, N::Int, p::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function nheapinsert!(xs::Vector{heap_s}, ys::Vector{nheap_t}, m::Int, exp::Int, exps::Matrix{UInt}, N::Int, p::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    i = n = length(xs) + 1
    @inbounds if i != 1 && monomial_isequal(exps, exp, xs[1].exp, N)
       ys[m] = nheap_t(ys[m].i, ys[m].j, p, xs[1].n)
@@ -1441,7 +1441,7 @@ function nheapinsert!(xs::Array{heap_s, 1}, ys::Array{nheap_t, 1}, m::Int, exp::
    return true
 end
 
-function heappop!(xs::Array{heap_s, 1}, exps::Array{UInt, 2}, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function heappop!(xs::Vector{heap_s}, exps::Matrix{UInt}, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    s = length(xs)
    x = xs[1]
    i = 1
@@ -1557,7 +1557,7 @@ end
 
 # Pack the monomials from the array b into an array a, with k entries packed
 # into each word, and where each field is the given number of bits
-function pack_monomials(a::Array{UInt, 2}, b::Array{UInt, 2}, k::Int, bits::Int, len::Int)
+function pack_monomials(a::Matrix{UInt}, b::Matrix{UInt}, k::Int, bits::Int, len::Int)
    for i = 1:len
       m = 0
       n = 1
@@ -1582,7 +1582,7 @@ end
 
 # Unpack the monomials from the array b into the array a, where there are k
 # entries packed into each word, in fields of the given number of bits
-function unpack_monomials(a::Array{UInt, 2}, b::Array{UInt, 2}, k::Int, bits::Int, len::Int)
+function unpack_monomials(a::Matrix{UInt}, b::Matrix{UInt}, k::Int, bits::Int, len::Int)
    mask = (UInt(1) << bits) - UInt(1)
    for i = 1:len
       m = 0
@@ -2078,7 +2078,7 @@ end
 #
 ###############################################################################
 
-function from_exp(R::Integers, A::Array{UInt, 2}, j::Int, N::Int)
+function from_exp(R::Integers, A::Matrix{UInt}, j::Int, N::Int)
    z = R(reinterpret(Int, A[1, j]))
    for k = 2:N
       z <<= sizeof(Int)*8
@@ -2087,7 +2087,7 @@ function from_exp(R::Integers, A::Array{UInt, 2}, j::Int, N::Int)
    return z
 end
 
-function from_exp(R::Ring, A::Array{UInt, 2}, j::Int, N::Int)
+function from_exp(R::Ring, A::Matrix{UInt}, j::Int, N::Int)
    z = R(reinterpret(Int, A[1, j]))
    for k = 2:N
       z *= 2^(sizeof(Int)*4)
@@ -3043,7 +3043,7 @@ function Base.divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return parent(a)(q.coeffs, eq), parent(a)(r.coeffs, er)
 end
 
-function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) where {T <: RingElement}
+function divrem_monagan_pearce(a::MPoly{T}, b::Vector{MPoly{T}}, bits::Int) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    len = length(b)
@@ -3225,7 +3225,7 @@ end
 Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
 each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i] + r`.
 """
-function Base.divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
+function Base.divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
    v1, d = max_fields(a)
    len = length(b)
    N = parent(a).N
@@ -3367,7 +3367,7 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
    # First work out types of products
    r = R()
    c = zero(R)
-   U = Array{Any, 1}(undef, length(vals))
+   U = Vector{Any}(undef, length(vals))
    for j = 1:length(vals)
       W = typeof(vals[j])
       if ((W <: Integer && W != BigInt) ||
@@ -3889,7 +3889,7 @@ function addmul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
    return a
 end
 
-function resize_exps!(a::Array{UInt, 2}, n::Int)
+function resize_exps!(a::Matrix{UInt}, n::Int)
    if n > size(a, 2)
       N = size(a, 1)
       A = reshape(a, size(a, 2)*N)
@@ -4027,7 +4027,7 @@ function (a::MPolyRing{T})(b::MPoly{T}) where {T <: RingElement}
    return b
 end
 
-function (a::MPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingElement}
+function (a::MPolyRing{T})(b::Vector{T}, m::Matrix{UInt}) where {T <: RingElement}
    if length(b) > 0 && isassigned(b, 1)
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
@@ -4038,7 +4038,7 @@ end
 # This is the main user interface for efficiently creating a polynomial. It accepts
 # an array of coefficients and an array of exponent vectors. Sorting, coalescing of
 # like terms and removal of zero terms is performed.
-function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: RingElement}
+function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement}
    if length(b) > 0 && isassigned(b, 1)
        parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
@@ -4049,7 +4049,7 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: R
 
    N = a.N
    ord = ordering(a)
-   Pe = Array{UInt, 2}(undef, N, length(m))
+   Pe = Matrix{UInt}(undef, N, length(m))
 
    if ord == :lex
       for i = 1:length(m)
@@ -4085,7 +4085,7 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{Symbol, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(s) + 1 : length(s)
    parent_obj = MPolyRing{T}(R, s, ordering, N, cached)
@@ -4093,7 +4093,7 @@ function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{Symbol, 1}; cached::Bo
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
    return PolynomialRing(R, [Symbol(v) for v in s]; cached=cached, ordering=ordering)
 end
 

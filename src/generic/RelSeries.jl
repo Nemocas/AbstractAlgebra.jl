@@ -372,7 +372,7 @@ function (R::RelSeriesRing{T})(b::RelSeriesElem{T}) where T <: RingElement
    return b
 end
 
-function (R::RelSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) where T <: RingElement
+function (R::RelSeriesRing{T})(b::Vector{T}, len::Int, prec::Int, val::Int) where T <: RingElement
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
@@ -381,7 +381,7 @@ function (R::RelSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) wh
    return z
 end
 
-function (R::RelSeriesRing{T})(b::Array{S, 1}, len::Int, prec::Int, val::Int) where {S <: RingElement, T <: RingElement}
+function (R::RelSeriesRing{T})(b::Vector{S}, len::Int, prec::Int, val::Int) where {S <: RingElement, T <: RingElement}
    R0 = base_ring(R)
    lenb = length(b)
    entries = Array{T}(undef, lenb)

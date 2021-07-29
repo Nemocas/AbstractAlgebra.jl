@@ -156,7 +156,7 @@ julia> U = base_ring(R)
 Integers
 
 julia> v = symbols(R)
-1-element Array{Symbol,1}:
+1-element Vector{Symbol}:
  :x
 
 julia> T = parent(x + 1)

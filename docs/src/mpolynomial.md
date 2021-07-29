@@ -50,7 +50,7 @@ construct the polynomial ring itself. This is accomplished with one of the follo
 constructors.
 
 ```julia
-PolynomialRing(R::Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)
+PolynomialRing(R::Ring, S::Vector{String}; cached::Bool = true, ordering::Symbol=:lex)
 PolynomialRing(R::Ring, n::Int, s::String="x"; cached::Bool = false, ordering::Symbol = :lex)
 ```
 
@@ -373,7 +373,7 @@ julia> f = x^2 + 2x + 1
 x^2 + 2*x + 1
 
 julia> V = vars(f)
-1-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
+1-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
  x
 
 julia> var_index(y) == 2
@@ -386,7 +386,7 @@ julia> degree(f, 2) == 0
 true
 
 julia> d = degrees(f)
-2-element Array{Int64,1}:
+2-element Vector{Int64}:
  2
  0
 
@@ -421,7 +421,7 @@ julia> e1 = exponent(f, 1, 1)
 3
 
 julia> v1 = exponent_vector(f, 1)
-2-element Array{Int64,1}:
+2-element Vector{Int64}:
  3
  1
 
@@ -435,12 +435,12 @@ julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> V = symbols(S)
-2-element Array{Symbol,1}:
+2-element Vector{Symbol}:
  :x
  :y
 
 julia> X = gens(S)
-2-element Array{AbstractAlgebra.Generic.MPoly{Rational{BigInt}},1}:
+2-element Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}:
  x
  y
 
@@ -546,25 +546,25 @@ julia> f = x^3*y + 3x*y^2 + 1
 x^3*y + 3*x*y^2 + 1
 
 julia> C = collect(coefficients(f))
-3-element Array{BigInt,1}:
+3-element Vector{BigInt}:
  1
  3
  1
 
 julia> M = collect(monomials(f))
-3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
+3-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
  x^3*y
  x*y^2
  1
 
 julia> T = collect(terms(f))
-3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
+3-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
  x^3*y
  3*x*y^2
  1
 
 julia> V = collect(exponent_vectors(f))
-3-element Array{Array{Int64,1},1}:
+3-element Vector{Vector{Int64}}:
  [3, 1]
  [1, 2]
  [0, 0]

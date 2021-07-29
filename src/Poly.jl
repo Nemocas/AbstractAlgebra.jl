@@ -2693,7 +2693,7 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: F
 end
 
 @doc Markdown.doc"""
-    polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement -> Array{T, 1}
+    polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement -> Vector{T}
 
 Uses Newton (or Newton-Girard) formulas to compute the first $n$
 sums of powers of the roots of $f$ from the coefficients of $f$, starting
@@ -2728,7 +2728,7 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: R
 end
 
 @doc Markdown.doc"""
-    power_sums_to_polynomial(P::Array{T, 1};
+    power_sums_to_polynomial(P::Vector{T};
                      parent::AbstractAlgebra.PolyRing{T}=
    AbstractAlgebra.PolyRing(parent(P[1])) where T <: RingElement -> PolyElem{T}
 
@@ -2737,13 +2737,13 @@ with given sums of powers of roots. The list must be nonempty and contain
 `degree(f)` entries where $f$ is the polynomial to be recovered. The list
 must start with the sum of first powers of the roots.
 """
-function power_sums_to_polynomial(P::Array{T, 1}; 
+function power_sums_to_polynomial(P::Vector{T}; 
                            parent::AbstractAlgebra.PolyRing{T}=
 	         AbstractAlgebra.PolyRing(parent(P[1]))) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
 
-function power_sums_to_polynomial(P::Array{T, 1}, Rx::AbstractAlgebra.PolyRing{T}) where T <: FieldElement
+function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T}) where T <: FieldElement
     d = length(P)
     R = base_ring(Rx)
     s = rel_series(R, P, d, d, 0)
@@ -2753,7 +2753,7 @@ function power_sums_to_polynomial(P::Array{T, 1}, Rx::AbstractAlgebra.PolyRing{T
     return Rx([polcoeff(r1, d - i) for i = 0:d])
 end
 
-function power_sums_to_polynomial(P::Array{T, 1}, Rx::AbstractAlgebra.PolyRing{T}) where T <: RingElement
+function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T}) where T <: RingElement
     E = T[one(parent(P[1]))]
     R = parent(P[1])
     last_non_zero = 0
@@ -2781,7 +2781,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where T <: RingElement
+    monomial_to_newton!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
 
 Converts a polynomial $p$, given as an array of coefficients, in-place
 from its coefficients given in the standard monomial basis to the Newton
@@ -2790,7 +2790,7 @@ determines output coefficients $c_i$ such that
 $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots + c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
 is equal to the input polynomial.
 """
-function monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where T <: RingElement
+function monomial_to_newton!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
    n = length(roots)
    if n > 0
       R = parent(roots[1])
@@ -2806,7 +2806,7 @@ function monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where T <: Ring
 end
 
 @doc Markdown.doc"""
-    newton_to_monomial!(P::Array{T, 1}, roots::Array{T, 1}) where T <: RingElement
+    newton_to_monomial!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
 
 Converts a polynomial $p$, given as an array of coefficients, in-place
 from its coefficients given in the Newton basis for the roots
@@ -2815,7 +2815,7 @@ this evaluates
 $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots + c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
 where $c_i$ are the input coefficients given by $p$.
 """
-function newton_to_monomial!(P::Array{T, 1}, roots::Array{T, 1}) where T <: RingElement
+function newton_to_monomial!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
    n = length(roots)
    if n > 0
       R = parent(roots[1])
@@ -2838,7 +2838,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    interpolate(S::PolyRing, x::Array{T, 1}, y::Array{T, 1}) where T <: RingElement
+    interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingElement
 
 Given two arrays of values $xs$ and $ys$ of the same length $n$, find
 the polynomial $f$ in the polynomial ring $R$ of length at most $n$ such that
@@ -2846,7 +2846,7 @@ $f$ has the value $ys$ at the points $xs$. The values in the arrays $xs$ and
 $ys$ must belong to the base ring of the polynomial ring $R$. If no such
 polynomial exists, an exception is raised.
 """
-function interpolate(S::PolyRing, x::Array{T, 1}, y::Array{T, 1}) where T <: RingElement
+function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingElement
    length(x) != length(y) && error("Array lengths don't match in interpolate")
    !isdomain_type(T) && error("interpolation requires a domain type")
    n = length(x)
@@ -2876,7 +2876,7 @@ function interpolate(S::PolyRing, x::Array{T, 1}, y::Array{T, 1}) where T <: Rin
    return r
 end
 
-function interpolate(S::PolyRing, x::Array{T, 1}, y::Array{T, 1}) where {T <: ResElem}
+function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where {T <: ResElem}
    length(x) != length(y) && error("Array lengths don't match in interpolate")
    n = length(x)
    if n == 0

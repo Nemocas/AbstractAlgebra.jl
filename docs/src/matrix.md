@@ -111,16 +111,16 @@ as shown above. The first method is from an array of elements.
 This can be done with either two or one dimensional arrays.
 
 ```julia
-(S::MatSpace{T})(A::Array{S, 2}) where {S <: RingElement, T <: RingElement}
-(S::MatAlgebra{T})(A::Array{S, 2}) where {S <: RingElement, T <: RingElement}
+(S::MatSpace{T})(A::Matrix{S}) where {S <: RingElement, T <: RingElement}
+(S::MatAlgebra{T})(A::Matrix{S}) where {S <: RingElement, T <: RingElement}
 ```
 
 Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`,
 where `S` is the type of elements that can be coerced into the base ring of the matrix.
 
 ```julia
-(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: RingElem, T <: RingElem}
-(S::MyMatAlgebra{T})(A::Array{S, 1}) where {S <: RingElem, T <: RingElem}
+(S::MyMatSpace{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
+(S::MyMatAlgebra{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
 ```
 
 Create the matrix in the given space/algebra of matrices (with dimensions $m\times n$
@@ -198,7 +198,7 @@ It is also possible to create matrices (in a matrix space only) directly, withou
 creating the corresponding matrix space (the inner constructor being called directly).
 
 ```julia
-matrix(R::Ring, arr::Array{T, 2}) where T <: RingElement
+matrix(R::Ring, arr::Matrix{T}) where T <: RingElement
 ```
 
 Given an $m\times n$ Julia matrix of entries, construct the corresponding
@@ -207,7 +207,7 @@ coerced into `R`.
 
 
 ```julia
-matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: RingElement
+matrix(R::Ring, r::Int, c::Int, A::Vector{T}) where T <: RingElement
 ```
 
 Construct the given $r\times c$ AbstractAlgebra.jl matrix over the ring `R` whose
@@ -266,7 +266,7 @@ julia> M = MatrixSpace(ZZ, 2, 3); x = M(1:6)
 [4   5   6]
 
 julia> collect(x)
-2×3 Array{BigInt,2}:
+2×3 Matrix{BigInt}:
  1  2  3
  4  5  6
 
@@ -761,7 +761,7 @@ julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
 [4   5   5]
 
 julia> A = powers(M, 4)
-5-element Array{AbstractAlgebra.Generic.MatSpaceElem{BigInt},1}:
+5-element Vector{AbstractAlgebra.Generic.MatSpaceElem{BigInt}}:
  [1 0 0; 0 1 0; 0 0 1]
  [1 2 3; 2 3 4; 4 5 5]
  [17 23 26; 24 33 38; 34 48 57]
@@ -1040,7 +1040,7 @@ julia> A = ZZ[1 2 3; 4 5 6]
 [4   5   6]
 
 julia> minors(A, 2)
-3-element Array{BigInt,1}:
+3-element Vector{BigInt}:
  -3
  -6
  -3
@@ -1070,7 +1070,7 @@ julia> pfaffian(M)
 x1*x6 - x2*x5 + x3*x4
 
 julia> pfaffians(M, 2)
-6-element Array{AbstractAlgebra.Generic.MPoly{Rational{BigInt}},1}:
+6-element Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}:
  x1
  x2
  x4
