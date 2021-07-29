@@ -1,31 +1,4 @@
 @testset "Julia.GFElem.constructors" begin
-   R = GF(13)
-   S = GF(BigInt(13))
-
-   @test elem_type(R) == AbstractAlgebra.GFElem{Int}
-   @test elem_type(S) == AbstractAlgebra.GFElem{BigInt}
-   @test elem_type(AbstractAlgebra.GFField{Int}) == AbstractAlgebra.GFElem{Int}
-   @test elem_type(AbstractAlgebra.GFField{BigInt}) == AbstractAlgebra.GFElem{BigInt}
-   @test parent_type(AbstractAlgebra.GFElem{Int}) == AbstractAlgebra.GFField{Int}
-   @test parent_type(AbstractAlgebra.GFElem{BigInt}) == AbstractAlgebra.GFField{BigInt}
-
-   @test isa(R, AbstractAlgebra.GFField)
-   @test isa(S, AbstractAlgebra.GFField)
-
-   @test isa(R(), AbstractAlgebra.GFElem)
-   @test isa(S(), AbstractAlgebra.GFElem)
-
-   @test isa(R(11), AbstractAlgebra.GFElem)
-   @test isa(S(BigInt(11)), AbstractAlgebra.GFElem)
-   @test isa(S(11), AbstractAlgebra.GFElem)
-   @test isa(S(BigInt(11)), AbstractAlgebra.GFElem)
-
-   a = R(11)
-   b = S(11)
-
-   @test isa(R(a), AbstractAlgebra.GFElem)
-   @test isa(S(b), AbstractAlgebra.GFElem)
-
    @test_throws DomainError GF(4)
    @test_throws DomainError GF(4, check=true)
    F = GF(4, check=false)
@@ -50,12 +23,6 @@ end
 @testset "Julia.GFElem.manipulation" begin
    R = GF(13)
    S = GF(BigInt(13))
-
-   @test iszero(zero(R))
-   @test iszero(zero(S))
-
-   @test isone(one(R))
-   @test isone(one(S))
 
    @test characteristic(R) == 13
    @test characteristic(S) == 13

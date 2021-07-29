@@ -21,15 +21,6 @@ include("algorithms/DensePoly-test.jl")
 end
 
 @testset "Generic.Rings.elem/parent_type" begin
-   for (R, el, par) in [(GF(3), AbstractAlgebra.GFElem{Int}, AbstractAlgebra.GFField{Int}),
-                        (ZZ["x"][1], Generic.Poly{BigInt}, Generic.PolyRing{BigInt})]
-      x = R(2)
-      @test elem_type(R) == el
-      @test elem_type(typeof(R)) == el
-      @test parent_type(x) == par
-      @test parent_type(typeof(x)) == par
-   end
-
    @test_throws MethodError parent_type('c')
    @test_throws MethodError parent_type(Char)
    @test parent_type(big(1)) == AbstractAlgebra.Integers{BigInt}
@@ -37,3 +28,45 @@ end
    @test_throws MethodError elem_type('c')
    @test_throws MethodError elem_type(Char)
 end
+
+include("julia/Integers-test.jl")
+
+# very generic testing: just define test_elem(R) and call test_Ring_interface(R)
+
+include("Rings-conformance-tests.jl")
+
+function test_elem(R::AbstractAlgebra.Floats{Float64})
+   return rand(Float64)*rand(-100:100)
+end
+test_Ring_interface(RDF)
+
+function test_elem(R::AbstractAlgebra.Floats{BigFloat})
+   return rand(BigFloat)*rand(-100:100)
+end
+test_Ring_interface(RealField)
+
+function test_elem(R::AbstractAlgebra.Integers{BigInt})
+   n = big(2)^rand(1:100)
+   return ZZ(rand(-n:n))
+end
+test_Ring_interface_recursive(ZZ)
+
+function test_elem(R::AbstractAlgebra.Generic.ResRing{BigInt})
+   return R(rand(0:characteristic(R)))
+end
+test_Ring_interface(ResidueRing(ZZ, 1))   # isgen fails on polys
+test_Ring_interface_recursive(ResidueRing(ZZ, -4))
+
+function test_elem(R::AbstractAlgebra.Rationals{BigInt})
+   n = big(2)^rand(1:100)
+   return QQ(rand(-n:n)//rand(1:n))
+end
+test_Field_interface_recursive(QQ)
+
+function test_elem(R::AbstractAlgebra.GFField)
+   return R(rand(0:characteristic(R)))
+end
+test_Field_interface_recursive(GF(3))
+test_Field_interface_recursive(GF(13))
+test_Field_interface_recursive(GF(big(13)))
+test_Field_interface_recursive(GF(big(10)^20 + 39))
