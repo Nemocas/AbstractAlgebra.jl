@@ -270,7 +270,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::GFElem{T}, y::GFElem{T}) where T <: Integer
+function divexact(x::GFElem{T}, y::GFElem{T}; check::Bool=true) where T <: Integer
    check_parent(x, y)
    return x*inv(y)
 end

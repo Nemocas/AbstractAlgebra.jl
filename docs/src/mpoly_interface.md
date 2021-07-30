@@ -310,7 +310,7 @@ Over rings for which an exact square root is available, it is possible to take
 the square root of a polynomial or test whether it is a square.
 
 ```julia
-sqrt(f::MyMPoly{T}, check::bool=true) where T <: RingElem
+sqrt(f::MyMPoly{T}, check::Bool=true) where T <: RingElem
 ```
 
 Return the square root of the polynomial $f$ and raise an exception if it is

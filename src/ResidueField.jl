@@ -310,12 +310,9 @@ end
 #
 ###############################################################################
 
-function divexact(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
+function divexact(a::ResFieldElem{T}, b::ResFieldElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(a, b)
    fl, q = divides(a, b)
-   if !fl
-      error("Impossible inverse in divexact")
-   end
    return q
 end
 

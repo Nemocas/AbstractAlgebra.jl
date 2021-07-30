@@ -82,24 +82,26 @@ end
 *(x::RingElement, y::RingElem) = parent(y)(x)*y
 
 """
-    divexact(x, y)
+    divexact(x, y; check::Bool=true)
 
 Return an exact quotient of `x` by `y`, i.e. an element
 `z` such that `x == yz`; when `x` and `y` do not belong to the same ring,
 they are first coerced into a common ring.
-If no exact division is possible, an exception is raised.
+By default if no exact division is possible, an exception is raised. If
+`check=false` this check may be omitted for performance reasons and the
+behaviour of the function undefined if the division is not exact.
 """
 function divexact end
 
-divexact(x::RingElem, y::RingElem) = divexact(promote(x, y)...)
+divexact(x::RingElem, y::RingElem; check::Bool=true) = divexact(promote(x, y)...; check=check)
 
-divexact(x::RingElem, y::RingElement) = divexact(x, parent(x)(y))
+divexact(x::RingElem, y::RingElement; check::Bool=true) = divexact(x, parent(x)(y); check=check)
 
-divexact(x::RingElement, y::RingElem) = divexact(parent(y)(x), y)
+divexact(x::RingElement, y::RingElem; check::Bool=true) = divexact(parent(y)(x), y; check=check)
 
-divexact_left(x::T, y::T) where T <: RingElement = divexact(x, y)
+divexact_left(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x, y; check=check)
 
-divexact_right(x::T, y::T) where T <: RingElement = divexact(x, y)
+divexact_right(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x, y; check=check)
 
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 
@@ -109,6 +111,14 @@ function divides(x::T, y::T) where {T <: RingElem}
    end
    q, r = divrem(x, y)
    return iszero(r), q
+end
+
+function isdivisible_by(x::T, y::T) where T <: RingElem
+   if iszero(y)
+      return iszero(x)
+   end
+   r = rem(x, y)
+   return iszero(r)
 end
 
 function ==(x::RingElem, y::RingElem)

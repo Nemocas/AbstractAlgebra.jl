@@ -1013,7 +1013,8 @@ end
 #
 ###############################################################################
 
-function divexact(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingElement}
+function divexact(x::LaurentSeriesElem{T},
+           y::LaurentSeriesElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
@@ -1039,8 +1040,7 @@ function divexact(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: 
    lenr = div(precision(res) - valuation(res) + sr - 1, sr)
    leny = div(precision(y) + sr - 1, sr)
    for i = 0:lenr - 1
-      flag, q = divides(polcoeff(x, i), lc)
-      !flag && error("Not an exact division")
+      q = divexact(polcoeff(x, i), lc; check=check)
       res = setcoeff!(res, i, q)
       for j = 0:min(leny - 1, lenr - i - 1)
          x = setcoeff!(x, i + j, polcoeff(x, i + j) - polcoeff(y, j)*q)
@@ -1057,7 +1057,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -1066,12 +1066,12 @@ function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloa
    z = set_valuation!(z, valuation(x))
    z = set_scale!(z, scale(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
    end
    return z
 end
 
-function divexact(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem}
+function divexact(x::LaurentSeriesElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -1080,7 +1080,7 @@ function divexact(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem}
    z = set_valuation!(z, valuation(x))
    z = set_scale!(z, scale(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
    end
    return z
 end

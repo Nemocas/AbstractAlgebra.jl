@@ -413,12 +413,12 @@ end
 #
 ###############################################################################
 
-function divexact(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+function divexact(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
     s = gcd(a.scale, b.scale)
     zscale = div(a.scale*b.scale, s)
     ainf = div(a.scale, s)
     binf = div(b.scale, s)
-    z = parent(a)(divexact(inflate(a.data, binf), inflate(b.data, ainf)), zscale)
+    z = parent(a)(divexact(inflate(a.data, binf), inflate(b.data, ainf); check=check), zscale)
     z = rescale!(z)
     return z
 end
@@ -429,12 +429,12 @@ end
 #
 ###############################################################################
 
-function divexact(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-   return parent(x)(divexact(x.data, y), x.scale)
+function divexact(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+   return parent(x)(divexact(x.data, y; check=check), x.scale)
 end
 
-function divexact(x::PuiseuxSeriesElem{T}, y::T) where {T <: RingElem}
-   return parent(x)(divexact(x.data, y), x.scale)
+function divexact(x::PuiseuxSeriesElem{T}, y::T; check::Bool=true) where {T <: RingElem}
+   return parent(x)(divexact(x.data, y; check=check), x.scale)
 end
 
 ###############################################################################

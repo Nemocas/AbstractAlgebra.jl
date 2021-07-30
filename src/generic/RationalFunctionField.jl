@@ -315,10 +315,10 @@ end
 #
 ###############################################################################
 
-function divexact(a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function divexact(a::Rat{T}, b::Rat{T}; check::Bool=true) where T <: FieldElement
    check_parent(a, b)
    R = parent(a)
-   return R(divexact(data(a), data(b)))
+   return R(divexact(data(a), data(b); check=check))
 end
 
 function divides(a::Rat{T}, b::Rat{T}) where T <: FieldElement
@@ -334,24 +334,24 @@ end
 #
 ###############################################################################
 
-function divexact(a::Rat, b::Union{Integer, Rational, AbstractFloat})
+function divexact(a::Rat, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    R = parent(a)
-   return R(divexact(data(a), b))
+   return R(divexact(data(a), b; check=check))
 end
 
-function divexact(a::Union{Integer, Rational, AbstractFloat}, b::Rat)
+function divexact(a::Union{Integer, Rational, AbstractFloat}, b::Rat; check::Bool=true)
    R = parent(b)
-   return R(divexact(a, data(b)))
+   return R(divexact(a, data(b); check=check))
 end
 
-function divexact(a::Rat{T}, b::T) where T <: FieldElem
+function divexact(a::Rat{T}, b::T; check::Bool=true) where T <: FieldElem
    R = parent(a)
-   return R(divexact(data(a), b))
+   return R(divexact(data(a), b; check=check))
 end
 
-function divexact(a::T, b::Rat{T}) where T <: FieldElem
+function divexact(a::T, b::Rat{T}; check::Bool=true) where T <: FieldElem
    R = parent(b)
-   return R(divexact(a, data(b)))
+   return R(divexact(a, data(b); check=check))
 end
 
 ##############################################################################
