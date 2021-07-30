@@ -688,7 +688,7 @@ deflate(::PolyElem)
 ### Square root
 
 ```@docs
-Base.sqrt(::PolyElem{T}, ::Bool) where T <: RingElement
+Base.sqrt(::PolyElem{T}; check::Bool) where T <: RingElement
 ```
 
 **Examples**
