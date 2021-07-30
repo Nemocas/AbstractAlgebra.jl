@@ -148,6 +148,16 @@ issquare(a::BigInt)
 ```
 
 ```@docs
+root(a::BigInt)
+iroot(a::BigInt)
+```
+
+```@docs
+ispower(a::BigInt)
+ispower_with_root(a::BigInt)
+```
+
+```@docs
 AbstractAlgebra.exp(a::BigInt)
 ```
 

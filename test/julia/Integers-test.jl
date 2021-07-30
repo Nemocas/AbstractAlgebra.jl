@@ -133,6 +133,73 @@ end
    end
 end
 
+@testset "Julia.Integers.root" begin
+   @test root(BigInt(1000), 3) == 10
+   @test root(-BigInt(27), 3) == -3
+   @test root(BigInt(27), 3; check=true) == 3
+   @test root(BigInt(16), 2; check=true) == 4
+
+   @test_throws DomainError root(-BigInt(1000), 4)
+   @test_throws DomainError root(BigInt(1000), -3)
+   @test_throws DomainError root(BigInt(-16), 2)
+
+   @test_throws ErrorException root(BigInt(1100), 3)
+   @test_throws ErrorException root(-BigInt(40), 3)
+
+   @test iroot(BigInt(1000), 3) == 10
+   @test iroot(BigInt(1100), 3) == 10
+   @test iroot(-BigInt(40), 3) == -3
+   @test iroot(BigInt(17), 2) == 4
+
+   @test_throws DomainError iroot(-BigInt(1000), 4)
+   @test_throws DomainError iroot(BigInt(1000), -3)
+   @test_throws DomainError iroot(-BigInt(16), 2)
+
+   @test root(1000, 3) == 10
+   @test root(-27, 3) == -3
+   @test root(27, 3) == 3
+   @test root(16, 2) == 4
+
+   @test_throws DomainError root(-1000, 4)
+   @test_throws DomainError root(1000, -3)
+   @test_throws DomainError root(-16, 2)
+
+   @test_throws ErrorException root(1100, 3)
+   @test_throws ErrorException root(-40, 3)
+
+   @test iroot(1000, 3) == 10
+   @test iroot(1100, 3) == 10
+   @test iroot(-40, 3) == -3
+   @test iroot(17, 2) == 4
+
+   @test_throws DomainError iroot(-1000, 4)
+   @test_throws DomainError iroot(1000, -3)
+   @test_throws DomainError iroot(-16, 2)
+
+   for T in [BigInt, Int]
+      for i = 1:1000
+         n = rand(1:20)
+         a = BigInt(rand(-1000:1000))
+         if iseven(n)
+            a = abs(a)
+         end
+         p = a^n
+         if T == BigInt || ndigits(p; base=2) < ndigits(typemax(T); base=2)
+            p = T(p)
+
+            @test ispower(p, n)
+
+            flag, q = ispower_with_root(p, n)
+
+            @test flag && q == a
+         end
+      end
+
+      @test_throws DomainError ispower(T(5), -1)
+      @test_throws DomainError ispower_with_root(T(5), 0)
+   end
+end
+
 @testset "Julia.Integers.exp" begin
    @test AbstractAlgebra.exp(0) == 1
    @test_throws DomainError AbstractAlgebra.exp(1)

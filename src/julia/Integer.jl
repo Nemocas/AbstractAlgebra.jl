@@ -4,6 +4,8 @@
 #
 ###############################################################################
 
+export iroot, ispower, ispower_with_root, root
+
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -175,6 +177,159 @@ function issquare(a::T) where T <: Integer
    end
    s = isqrt(a)
    return a == s*s
+end
+
+###############################################################################
+#
+#   Root
+#
+###############################################################################
+
+function root(a::BigInt, n::Int; check::Bool=true)
+    a < 0 && iseven(n) && throw(DomainError((a, n),
+                      "Argument `a` must be positive if exponent `n` is even"))
+    n <= 0 && throw(DomainError(n, "Exponent must be positive"))
+    z = BigInt()
+    exact = Bool(ccall((:__gmpz_root, :libgmp), Cint,
+                  (Ref{BigInt}, Ref{BigInt}, Cint), z, a, n))
+    check && !exact && error("Not a perfect n-th power (n = $n)")
+    return z
+end
+
+@doc Markdown.doc"""
+    root(a::T, n::Int; check::Bool=true) where T <: Integer
+
+Return the $n$-th root of $a$. If `check=true` the function will test if the
+input was a perfect $n$-th power, otherwise an exception will be raised. We
+require $n > 0$ and also $a \geq 0$ if $n$ is even.
+"""
+function root(a::T, n::Int; check::Bool=true) where T <: Integer
+   if n == 2
+      a < 0 && throw(DomainError((a, n),
+                      "Argument `a` must be positive if exponent `n` is even"))
+      s = isqrt(a)
+      exact = true
+      if check
+         r = a - s*s
+         exact = r == 0
+         !exact && error("Not a perfect n-th power (n = $n)")
+      end
+      return s
+   else
+      return T(root(BigInt(a), n; check=check))
+   end
+end
+
+moduli3 = [7, 8, 13]
+residues3 = [[0, 1, 6], [0, 1, 3, 5, 7], [0, 1, 5, 8, 12]]
+
+moduli5 = [8, 11, 31]
+residues5 = [[0, 1, 3, 5, 7], [0, 1, 10], [0, 1, 5, 6, 25, 26, 30]]
+
+moduli7 = [8, 29, 43]
+residues7 = [[0, 1, 3, 5, 7], [0, 1, 12, 17, 28], [0, 1, 6, 7, 36, 37, 42]]
+
+function ispower_moduli(a::Integer, n::Int)
+   if mod(n, 3) == 0
+      for i = 1:length(moduli3)
+         if !(mod(a, moduli3[i]) in residues3[i])
+            return false
+         end
+      end
+   elseif (n % 5) == 0
+      for i = 1:length(moduli5)
+         if !(mod(a, moduli5[i]) in residues5[i])
+            return false
+         end
+      end
+   elseif (n % 3) == 0
+      for i = 1:length(moduli7)
+         if !(mod(a, moduli7[i]) in residues7[i])
+            return false
+         end
+      end
+   elseif isodd(n)
+      if !(mod(a, moduli5[1]) in residues5[1])
+            return false
+      end
+   end
+   return true
+end
+
+@doc Markdown.doc"""
+    ispower_with_root(a::T, n::Int) where T <: Integer
+
+Return `true, q` if $a$ is a perfect $n$-th power with $a = q^n$. Otherwise
+return `false, 0`. We require $n > 0$.
+"""
+function ispower_with_root(a::T, n::Int) where T <: Integer
+   n <= 0 && throw(DomainError(n, "exponent n must be positive"))
+   if n == 1 || a == 0 || a == 1
+      return (true, a)
+   elseif a == -1
+      return isodd(n) ? (true, a) : (false, zero(T))
+   elseif mod(n, 2) == 0 && a < 0
+      return false, zero(BigInt)
+   elseif !ispower_moduli(a, n)
+      return (false, zero(BigInt))
+   end
+      
+   q = BigInt()
+   r = BigInt()
+   ccall((:__gmpz_rootrem, :libgmp), Nothing,
+                     (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Int), q, r, a, n)
+   return iszero(r) ? (true, T(q)) : (false, zero(T))
+end
+
+@doc Markdown.doc"""
+    ispower(a::T, n::Int) where T <: Integer
+
+Return `true` if $a$ is a perfect $n$-th power, i.e. if there is an integer $b$
+such that $a = b^n$. We require $n > 0$.
+"""
+function ispower(a::T, n::Int) where T <: Integer
+   n <= 0 && throw(DomainError(n, "n is not positive"))
+   if n == 1 || a == 0 || a == 1
+      return true
+   elseif a == -1
+      return isodd(n) ? true : false
+   elseif mod(n, 2) == 0 && a < 0
+      return false
+   elseif !ispower_moduli(a, n)
+      return false
+   end
+   
+   q = BigInt()
+   r = BigInt()
+   ccall((:__gmpz_rootrem, :libgmp), Nothing,
+                     (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Int), q, r, BigInt(a), n)
+
+   return r == 0
+end
+
+function iroot(a::BigInt, n::Int)
+    a < 0 && iseven(n) && throw(DomainError((a, n),
+                      "Argument `a` must be positive if exponent `n` is even"))
+    n <= 0 && throw(DomainError(n, "Exponent must be positive"))
+    z = BigInt()
+    ccall((:__gmpz_root, :libgmp), Cint,
+                  (Ref{BigInt}, Ref{BigInt}, Cint), z, a, n)
+    return z
+end
+
+@doc Markdown.doc"""
+    iroot(a::T, n::Int) where T <: Integer
+
+Return the truncated integer part of the $n$-th root of $a$ (round towards
+zero). We require $n > 0$ and also $a \geq 0$ if $n$ is even.
+"""
+function iroot(a::T, n::Int) where T <: Integer
+   if n == 2
+       a < 0 && throw(DomainError((a, n),
+                      "Argument `a` must be positive if exponent `n` is even"))
+       return isqrt(a)
+   end
+   return T(iroot(BigInt(a), n))
 end
 
 ###############################################################################
