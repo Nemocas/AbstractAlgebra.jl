@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export iroot, ispower, ispower_with_root, root
+export iroot, ispower, ispower_with_root, root, issquare_with_sqrt
 
 ###############################################################################
 #
@@ -153,18 +153,61 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    sqrt(a::T) where T <: Integer
+sqrt_moduli = [3, 5, 7, 8]
+sqrt_residues = [[0, 1], [0, 1, 4], [0, 1, 2, 4], [0, 1, 4]]
 
-Return the integer square root of $a$. If $a$ is not a perfect square an
-exception is thrown. If `check` is set to `false` this check is not
-performed.
+@doc Markdown.doc"""
+    sqrt(a::T; check::Bool=true) where T <: Integer
+
+Return the integer square root of $a$. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
 """
-function sqrt(a::T, check::Bool=true) where T <: Integer
+function sqrt(a::T; check::Bool=true) where T <: Integer
    s = isqrt(a)
    (check && s*s != a) && error("Not a square in sqrt")
    return s
 end
+
+@doc Markdown.doc"""
+    issquare_with_sqrt(a::T) where T <: Integer
+
+Return `(true, s)` if $a$ is a perfect square, where $s^2 = a$. Otherwise
+return `(false, 0)`.
+"""
+function issquare_with_sqrt(a::T) where T <: Integer
+   if a < 0
+      return false, zero(T)
+   end
+   s = isqrt(a)
+   if a == s*s
+      return true, s
+   else
+      return false, zero(T)
+   end
+end
+
+function issquare_with_sqrt(a::BigInt)
+   if a < 0
+      return false, zero(BigInt)
+   end
+   for i = 1:length(sqrt_moduli)
+      res = mod(a, sqrt_moduli[i])
+      if !(res in sqrt_residues[i])
+         return false, zero(BigInt)
+      end
+   end
+   z = BigInt()
+   r = BigInt()
+   ccall((:__gmpz_sqrtrem, :libgmp), Cint,
+         (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), z, r, a)
+   if iszero(r)
+      return true, z
+   else
+      return false, zero(BigInt)
+   end
+end
+
 
 @doc Markdown.doc"""
     issquare(a::T) where T <: Integer
@@ -177,6 +220,14 @@ function issquare(a::T) where T <: Integer
    end
    s = isqrt(a)
    return a == s*s
+end
+
+function issquare(a::BigInt)
+   if a < 0
+      return false
+   end
+   return Bool(ccall((:__gmpz_perfect_square_p, :libgmp), Cint,
+                     (Ref{BigInt},), a))
 end
 
 ###############################################################################

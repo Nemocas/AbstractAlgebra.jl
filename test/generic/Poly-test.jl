@@ -2754,7 +2754,7 @@ end
 
       @test q^2 == f^2
 
-      q = sqrt(f^2, false)
+      q = sqrt(f^2; check=false)
 
       @test q^2 == f^2
 
@@ -2776,7 +2776,7 @@ end
 
       @test q^2 == f^2
 
-      q = sqrt(f^2, false)
+      q = sqrt(f^2; check=false)
 
       @test q^2 == f^2
 
@@ -2802,7 +2802,7 @@ end
 
          @test q^2 == f^2
 
-         q = sqrt(f^2, false)
+         q = sqrt(f^2; check=false)
 
          @test q^2 == f^2
 

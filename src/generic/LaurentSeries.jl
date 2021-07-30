@@ -1130,13 +1130,15 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    sqrt(a::Generic.LaurentSeriesElem)
+    sqrt(a::Generic.LaurentSeriesElem; check::Bool=true)
 
-Return the square root of the power series $a$.
+Return the square root of the power series $a$. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
 """
-function Base.sqrt(a::LaurentSeriesElem)
+function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
    aval = valuation(a)
-   !iseven(aval) && error("Not a square in sqrt")
+   check && !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    aval2 = div(aval, 2)
@@ -1155,7 +1157,7 @@ function Base.sqrt(a::LaurentSeriesElem)
    asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
    if prec > 0
-      g = sqrt(polcoeff(a, 0))
+      g = sqrt(polcoeff(a, 0); check=check)
       asqrt = setcoeff!(asqrt, 0, g)
       g2 = g + g
    end

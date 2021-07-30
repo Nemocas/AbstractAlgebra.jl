@@ -804,11 +804,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    sqrt(a::AbsSeriesElem)
+    sqrt(a::AbsSeriesElem; check::Bool=true)
 
-Return the square root of the power series $a$.
+Return the square root of the power series $a$. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
 """
-function Base.sqrt(a::AbsSeriesElem)
+function Base.sqrt(a::AbsSeriesElem; check::Bool=true)
    # Given a power series f = f0 + f1*x + f2*x^2 + ..., compute the square root
    # g = g0 + g1*x + g2*x^2 + ... using the relations g0^2 = f0, 2g0*g1 = f1
    # 2g0*g2 = f2 - g1^2, 2g0*g3 = f3 - 2g1*g2, 2g0*g4 = f4 - (2g1*g3 + g2^2), etc.
@@ -830,7 +832,7 @@ function Base.sqrt(a::AbsSeriesElem)
       asqrt = setcoeff!(asqrt, n - 1, R())
    end
    if prec > aval2
-      g = sqrt(coeff(a, aval))
+      g = sqrt(coeff(a, aval); check=check)
       asqrt = setcoeff!(asqrt, aval2, g)
       g2 = g + g
    end

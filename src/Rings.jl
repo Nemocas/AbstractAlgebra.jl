@@ -243,18 +243,38 @@ end
 @doc Markdown.doc"""
     sqrt(a::FieldElem)
 
-Return the square root of the element `a`.
+Return the square root of the element `a`. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
 """
-function Base.sqrt(a::FieldElem)
+function Base.sqrt(a::FieldElem; check::Bool=true)
   R = parent(a)
   R, t = PolynomialRing(R, "t", cached = false)
   f = factor(t^2 - a)
   for (p, e) in f
-    if degree(p) == 1
+    if !check || degree(p) == 1
       return -divexact(coeff(p, 0), coeff(p, 1))
     end
   end
   throw(error("Element $a does not have a square root"))
+end
+
+# assumes the existence of sqrt without check argument for input
+function Base.sqrt(a::RingElem; check::Bool=true)
+  s = sqrt(a)
+  if check
+    s != a^2 && error("Element $a does not have a square root")
+  end
+  return s
+end  
+
+# assumes the existence of issquare and sqrt for input  
+function issquare_with_sqrt(a::RingElem)
+  if issquare(a)
+     return true, sqrt(a)
+  else
+     return false, parent(a)()
+  end
 end
 
 ###############################################################################
