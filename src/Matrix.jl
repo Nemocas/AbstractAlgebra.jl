@@ -2747,6 +2747,133 @@ end
 
 ###############################################################################
 #
+#   Solving with kernel
+#
+###############################################################################
+
+function can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}; side = :right) where T <: FieldElement
+  @assert base_ring(A) == base_ring(B)
+  if side === :right
+    @assert nrows(A) == nrows(B)
+    return _can_solve_with_kernel(A, B)
+  elseif side === :left
+    b, C, K = _can_solve_with_kernel(transpose(A), transpose(B))
+    @assert ncols(A) == ncols(B)
+    if b
+      return b, transpose(C), transpose(K)
+    else
+      return b, C, K
+    end
+  else
+    error("Unsupported argument :$side for side: Must be :left or :right")
+  end
+end
+
+function _can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: FieldElement
+  R = base_ring(A)
+  mu = [A B]
+  rk, mu = rref(mu)
+  p = find_pivot(mu)
+  if any(i->i>ncols(A), p)
+    return false, B, B
+  end
+  sol = zero_matrix(R, ncols(A), ncols(B))
+  for i = 1:length(p)
+    for j = 1:ncols(B)
+      sol[p[i], j] = mu[i, ncols(A) + j]
+    end
+  end
+  n = zero_matrix(R, ncols(A), ncols(A) - length(p))
+  np = sort(setdiff(1:ncols(A), p))
+  i = 0
+  push!(p, ncols(A) + 1)
+  for j = 1:length(np)
+    if np[j] >= p[i + 1]
+      i += 1
+    end
+    if i > 0
+      n[p[i], j] = -mu[i, np[j]]
+    end
+    n[np[j], j] = 1
+  end
+  return true, sol, n
+end
+
+@doc Markdown.doc"""
+    can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: RingElement
+
+If $Ax = B$ is soluble, returns `true, S, K` where `S` is a particular solution
+and $K$ is the kernel. Otherwise returns `false, S, K` where $S$ and $K$ are
+undefined, though of the right type for type stability.
+Tries to solve $Ax = B$ for $x$ if `side = :right` or $xA = B$ if `side = :left`.
+"""
+function can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}; side = :right) where T <: RingElement
+  @assert base_ring(A) == base_ring(B)
+  if side === :right
+    @assert nrows(A) == nrows(B)
+    b, c, K =_can_solve_with_kernel(transpose(A), B)
+    return b, transpose(c), K
+  elseif side === :left
+    b, C, K = _can_solve_with_kernel(A, transpose(B))
+    @assert ncols(A) == ncols(B)
+    if b
+      return b, C, transpose(K)
+    else
+      return b, C, K
+    end
+  else
+    error("Unsupported argument :$side for side: Must be :left or :right")
+  end
+end
+
+# Note that _a_ must be supplied transposed and the solution is transposed
+function _can_solve_with_kernel(a::MatElem{S}, b::MatElem{S}) where S <: RingElement
+  H, T = hnf_with_transform(a)
+  z = zero_matrix(base_ring(a), ncols(b), ncols(a))
+  l = min(nrows(a), ncols(a))
+  b = deepcopy(b)
+  for i = 1:ncols(b)
+    for j = 1:l
+      k = 1
+      while k <= ncols(H) && iszero(H[j, k])
+        k += 1
+      end
+      if k > ncols(H)
+        continue
+      end
+      q, r = divrem(b[k, i], H[j, k])
+      if !iszero(r)
+        return false, b, b
+      end
+      for h = k:ncols(H)
+        b[h, i] -= q*H[j, h]
+      end
+      z[i, j] = q
+    end
+  end
+  if !iszero(b)
+    return false, b, b
+  end
+  for i = nrows(H):-1:1
+    for j = 1:ncols(H)
+      if !iszero(H[i, j])
+        N = zero_matrix(base_ring(a), ncols(a), nrows(H) - i)
+        for k = 1:nrows(N)
+          for l = 1:ncols(N)
+            N[k,l] = T[nrows(T) - l + 1, k]
+          end
+        end
+        return true, z*T, N
+      end
+    end
+  end
+  N = similar(a, ncols(a), 0)
+
+  return true, z*T, N
+end
+
+###############################################################################
+#
 #   Upper triangular solving
 #
 ###############################################################################
