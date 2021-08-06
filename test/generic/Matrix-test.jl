@@ -2566,6 +2566,62 @@ end
    end
 end
 
+@testset "Generic.Mat.can_solve_with_kernel" begin
+   # Exact Ring, Exact field
+
+   for F in [ZZ, QQ]
+      for iters = 1:1000
+         m = rand(0:10)
+         n = rand(0:10)
+         k = rand(0:10)
+
+         R = MatrixSpace(F, m, n)
+         S = MatrixSpace(F, m, k)
+         U = MatrixSpace(F, n, k)
+
+         # random with solution
+         r = rand(0:min(m, n))
+         M = randmat_with_rank(R, r, -20:20)
+         X = rand(U, -20:20)
+
+         B = M*X
+
+         flag, Sol, K = can_solve_with_kernel(M, B)
+
+         @test iszero(M*K)
+         @test flag && M*Sol == B
+
+         # fully random
+         B = rand(S, -20:20)
+
+         flag, Sol, K = can_solve_with_kernel(M, B)
+         flag2, Sol2 = can_solve_with_solution(M, B)
+    
+         @test flag == flag2
+         if flag
+            @test M*Sol == B
+            @test iszero(M*K)
+
+            rk, N = kernel(M)
+            @test nrows(N) == nrows(K)
+            @test rk == ncols(K)
+         end
+
+         # left kernel, random with solution
+         r = rand(0:min(n, k))
+         M = randmat_with_rank(U, r, -20:20)
+         X = rand(R, -20:20)
+
+         B = X*M
+
+         flag, Sol, K = can_solve_with_kernel(M, B; side=:left)
+
+         @test iszero(K*M)
+         @test flag && Sol*M == B
+      end
+   end
+end
+
 @testset "Generic.Mat.inversion" begin
    for dim = 2:5
       R = MatrixSpace(ZZ, dim, dim)

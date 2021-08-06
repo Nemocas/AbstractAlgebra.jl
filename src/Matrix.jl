@@ -2774,7 +2774,7 @@ function _can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: FieldEl
   mu = [A B]
   rk, mu = rref(mu)
   p = find_pivot(mu)
-  if any(i->i>ncols(A), p)
+  if any(i -> i > ncols(A), p)
     return false, B, B
   end
   sol = zero_matrix(R, ncols(A), ncols(B))
@@ -2829,7 +2829,7 @@ end
 # Note that _a_ must be supplied transposed and the solution is transposed
 function _can_solve_with_kernel(a::MatElem{S}, b::MatElem{S}) where S <: RingElement
   H, T = hnf_with_transform(a)
-  z = zero_matrix(base_ring(a), ncols(b), ncols(a))
+  z = zero_matrix(base_ring(a), ncols(b), nrows(a))
   l = min(nrows(a), ncols(a))
   b = deepcopy(b)
   for i = 1:ncols(b)
@@ -2857,18 +2857,20 @@ function _can_solve_with_kernel(a::MatElem{S}, b::MatElem{S}) where S <: RingEle
   for i = nrows(H):-1:1
     for j = 1:ncols(H)
       if !iszero(H[i, j])
-        N = zero_matrix(base_ring(a), ncols(a), nrows(H) - i)
+        N = zero_matrix(base_ring(a), nrows(a), nrows(H) - i)
         for k = 1:nrows(N)
           for l = 1:ncols(N)
-            N[k,l] = T[nrows(T) - l + 1, k]
+            N[k, l] = T[nrows(T) - l + 1, k]
           end
         end
         return true, z*T, N
       end
     end
   end
-  N = similar(a, ncols(a), 0)
-
+  N = zero(a, nrows(a), nrows(H))
+  for i = 1:min(nrows(N), ncols(N))
+     N[i, i] = 1
+  end
   return true, z*T, N
 end
 
