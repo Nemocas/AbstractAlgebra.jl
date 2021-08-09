@@ -263,7 +263,7 @@ function Base.sqrt(a::FieldElem; check::Bool=true)
   f = factor(t^2 - a)
   for (p, e) in f
     if !check || degree(p) == 1
-      return -divexact(coeff(p, 0), coeff(p, 1))
+      return -divexact(coeff(p, 0), coeff(p, 1); check=check)
     end
   end
   throw(error("Element $a does not have a square root"))

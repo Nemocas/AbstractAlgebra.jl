@@ -1176,7 +1176,7 @@ function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
          c = addeq!(c, p)
       end
       c = polcoeff(a, n) - c
-      c = divexact(c, g2)
+      c = divexact(c, g2; check=check)
       asqrt = setcoeff!(asqrt, n, c)
     end
     asqrt = set_scale!(asqrt, s)
