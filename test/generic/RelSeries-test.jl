@@ -909,6 +909,22 @@ end
       @test divexact(f, g)*g == f
    end
 
+   # Exact field
+   R, x = PowerSeriesRing(QQ, 10, "x")
+   for iter = 1:300
+      s = rand(0:12)
+      f = rand(R, s:s, -10:10)
+      while valuation(f) != s || !isunit(coeff(f, s))
+         f = rand(R, s:s, -10:10)
+      end
+      g = rand(R, s:s, -10:10)
+      while valuation(g) != s || !isunit(coeff(g, s))
+         g = rand(R, s:s, -10:10)
+      end
+
+      @test divexact(f, g)*g == f
+   end
+
    # Inexact field
    R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:300
