@@ -211,7 +211,12 @@ end
 ###############################################################################
 
 function ^(a::ResElem, b::Int)
-   parent(a)(powermod(data(a), b, modulus(a)))
+   if b < 0
+      # powermod throws a DivideError when it should throw an ImpossibleInverse
+      parent(a)(powermod(data(inv(a)), -b, modulus(a)))
+   else
+      parent(a)(powermod(data(a), b, modulus(a)))
+   end
 end
 
 ###############################################################################
@@ -307,9 +312,7 @@ inverse is encountered, an exception is raised.
 """
 function Base.inv(a::ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
-   if g != 1
-      error("Impossible inverse in inv")
-   end
+   isone(g) || throw(ImpossibleInverse(a))
    return parent(a)(ainv)
 end
 

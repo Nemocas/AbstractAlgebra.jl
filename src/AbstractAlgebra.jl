@@ -132,7 +132,7 @@ export ZZ, QQ, zz, qq, RealField, RDF
 export create_accessors, get_handle, package_handle, zeros,
        Array, sig_exists
 
-export error_dim_negative, ErrorConstrDimMismatch
+export ImpossibleInverse, error_dim_negative, ErrorConstrDimMismatch
 
 export crt, factor, factor_squarefree
 
