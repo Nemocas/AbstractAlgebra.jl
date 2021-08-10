@@ -2783,20 +2783,32 @@ function _can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: FieldEl
       sol[p[i], j] = mu[i, ncols(A) + j]
     end
   end
-  n = zero_matrix(R, ncols(A), ncols(A) - length(p))
-  np = sort(setdiff(1:ncols(A), p))
-  i = 0
-  push!(p, ncols(A) + 1)
-  for j = 1:length(np)
-    if np[j] >= p[i + 1]
-      i += 1
+  nullity = ncols(A) - length(p)
+  X = zero(A, ncols(A), nullity)
+  pivots = zeros(Int, max(nrows(A), ncols(A)))
+  np = rk
+  j = k = 1
+  for i = 1:rk
+    while iszero(mu[i, j])
+      pivots[np + k] = j
+      j += 1
+      k += 1
     end
-    if i > 0
-      n[p[i], j] = -mu[i, np[j]]
-    end
-    n[np[j], j] = 1
+    pivots[i] = j
+    j += 1
   end
-  return true, sol, n
+  while k <= nullity
+    pivots[np + k] = j
+    j += 1
+    k += 1
+  end
+  for i = 1:nullity
+    for j = 1:rk
+      X[pivots[j], i] = -mu[j, pivots[np + i]]
+    end
+    X[pivots[np + i], i] = one(R)
+  end
+  return true, sol, X
 end
 
 @doc Markdown.doc"""
