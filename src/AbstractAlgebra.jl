@@ -18,7 +18,8 @@ using Test # for "interface-conformance" functions
 import_exclude = [:import_exclude, :QQ, :ZZ,
                   :RealField, :NumberField,
                   :AbstractAlgebra,
-                  :exp, :sqrt, :div, :divrem, :numerator, :denominator,
+                  :inv, :log, :exp, :sqrt, :div, :divrem,
+                  :numerator, :denominator,
                   :promote_rule,
                   :Set, :Module, :Ring, :Group, :Field]
 
@@ -53,7 +54,7 @@ import LinearAlgebra: lu, lu!, tr
 ################################################################################
 
 # This is the list of functions for which we locally have a different behavior.
-const Base_import_exclude = [:exp, :log, :sqrt, :div, :divrem, :numerator,
+const Base_import_exclude = [:exp, :log, :sqrt, :inv, :div, :divrem, :numerator,
 		             :denominator]
 
 ################################################################################
