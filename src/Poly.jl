@@ -16,7 +16,8 @@ export PolyCoeffs, PolynomialRing, PolyRing, addmul!, characteristic,
        pseudodivrem, pseudorem, remove, resultant, resultant_ducos,
        resultant_euclidean, resultant_lehmer, resultant_subresultant,
        resultant_sylvester, resx, shift_left, shift_right, subst,
-       sylvester_matrix, symbols, tail, use_karamul, valuation, var
+       sylvester_matrix, symbols, tail, use_karamul, valuation, var,
+       set_coefficient!
 
 ###############################################################################
 #
@@ -158,6 +159,24 @@ leading term (if any).
 """
 function tail(a::PolynomialElem)
    return iszero(a) ? zero(parent(a)) : truncate(a, length(a) - 1)
+end
+
+@doc Markdown.doc"""
+    set_coefficient!(c::PolynomialElem{T}, n::Int, a::T) where T <: RingElement
+    set_coefficient!(c::PolynomialElem{T}, n::Int, a::U) where {T <: RingElement, U <: Integer}
+
+Set the coefficient of degree $n$ to $a$.
+"""
+function set_coefficient!(c::PolynomialElem{T}, n::Int, a::T) where T <: RingElement
+   return setcoeff!(c, n, a) # merely acts as generic fallback
+end
+
+function set_coefficient!(c::PolynomialElem{T}, n::Int, a::U) where {T <: RingElement, U <: Integer}
+   return setcoeff!(c, n, base_ring(c)(a)) # merely acts as generic fallback
+end
+
+function set_coefficient!(c::PolynomialElem{T}, n::Int, a::T) where T <: Integer
+   return setcoeff!(c, n, a) # merely acts as generic fallback
 end
 
 @doc Markdown.doc"""
