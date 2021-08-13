@@ -402,6 +402,34 @@ end
 
 ###############################################################################
 #
+#   UnivPolyRing / UnivPoly
+#
+###############################################################################
+
+mutable struct UnivPolyRing{T <: RingElement, U <: MPoly} <: Ring
+   base_ring::Ring
+   S::Vector{Symbol}
+   ord::Symbol
+   num_vars::Int
+
+   function UnivPolyRing{T, U}(R::Ring, s::Vector{Symbol}, ord::Symbol, poly_type::Type{U},
+                         cached::Bool = true) where {T <: RingElement, U <: MPoly}
+      return get_cached!(UnivPolyID, (R, s, ord, poly_type), cached) do
+         new{T, U}(R, s, ord, length(s))
+      end::UnivPolyRing{T, U}
+   end
+end
+
+const UnivPolyID = CacheDictType{Tuple{Ring, Vector{Symbol}, Symbol, DataType}, Ring}()
+
+mutable struct UnivPoly{T <: RingElement, U <: MPoly} <: RingElem
+   p::U
+   num_vars::Int
+   parent::UnivPolyRing{T}
+end
+
+###############################################################################
+#
 #   SparsePolyRing / SparsePoly
 #
 ###############################################################################
