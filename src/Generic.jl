@@ -77,6 +77,8 @@ include("generic/NCPoly.jl")
 
 include("generic/MPoly.jl")
 
+include("generic/UnivPoly.jl")
+
 include("generic/SparsePoly.jl")
 
 include("generic/LaurentPoly.jl")

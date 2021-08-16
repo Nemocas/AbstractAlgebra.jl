@@ -1211,6 +1211,11 @@ function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::Symbol=:x;
          ordering = ordering)
 end
 
+function MPolyRing(R::Ring, n::Int)
+   T = elem_type(R)
+   return Generic.MPolyRing{T}(R, [Symbol("x$i") for i in 1:n], :lex, n, false)
+end
+
 ################################################################################
 #
 #  Fancy macro

@@ -409,6 +409,7 @@ include("ResidueField.jl")
 include("NumberField.jl")
 include("Fraction.jl")
 include("MPoly.jl")
+include("UnivPoly.jl")
 
 ###############################################################################
 #
