@@ -131,7 +131,7 @@ function (S::UnivPolyRing{T, U})(p::UnivPoly{T, U}) where {T <: RingElement, U <
       for (c, v) in zip(coefficients(p.p), exponent_vectors(p.p))
          push_term!(ctx, c, vcat(v, v0))
       end
-      p.p = finish(ctx)
+      p = UnivPoly{T, U}(finish(ctx), S)
    end
    return p
 end
