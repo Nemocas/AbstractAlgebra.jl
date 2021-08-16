@@ -6,10 +6,6 @@
 
 export UniversalPolynomialRing
 
-function show(io::IO, p::UnivPolyRing)
-   print(io, "Universal Polynomial Ring")
-end
-
 ###############################################################################
 #
 #   UniversalPolynomialRing constructor
