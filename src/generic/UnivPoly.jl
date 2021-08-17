@@ -44,6 +44,65 @@ end
 
 ###############################################################################
 #
+#   Manipulating terms and monomials
+#
+###############################################################################
+
+exponent_vector(p::UnivPoly, i::Int) = exponent_vector(p.p, i)
+
+function exponent(p::UnivPoly, i::Int, j::Int)
+   if j > nvars(parent(p.p)) && j <= nvars(parent(p))
+      return 0
+   end
+   return exponent(p.p, i, j)
+end
+
+function set_exponent_vector!(p::UnivPoly, i::Int, exps::Vector{Int})
+   S = parent(p)
+   len = length(exps)
+   if len != nvars(parent(p.p))
+      p.p = upgrade(S, p.p)
+      if len < nvars(S)
+         exps = vcat(exps, zeros(Int, nvars(S) - len))
+      end
+   end
+   p.p = set_exponent_vector!(p.p, i, exps)
+   return p
+end
+
+function coeff(p::UnivPoly, exps::Vector{Int})
+   S = parent(p)
+   len = length(exps)
+   n = nvars(parent(p.p))
+   if len > n
+      if !iszero(exps[n + 1:len])
+         return base_ring(S)()
+      end
+      return coeff(p.p, exps[1:n])
+   end
+   n = nvars(parent(p.p))
+   if len < n
+      exps = vcat(exps, zeros(Int, n - len))
+   end
+   return coeff(p.p, exps)
+end
+
+function setcoeff!(p::UnivPoly, exps::Vector{Int}, c::T) where T <: RingElement
+   c = base_ring(p.p)(c)
+   S = parent(p)
+   len = length(exps)
+   if len != nvars(parent(p.p))
+      p.p = upgrade(S, p.p)
+      if len < nvars(S)
+         exps = vcat(exps, zeros(Int, nvars(S) - len))
+      end
+   end
+   p.p = setcoeff!(p.p, exps, c)
+   return p
+end
+
+###############################################################################
+#
 #   Basic manipulation
 #
 ###############################################################################
@@ -132,16 +191,21 @@ end
 #
 ###############################################################################
 
+function upgrade(S::UnivPolyRing{T, U}, pp::MPolyElem{T}) where {T, U}
+   n = nvars(S) - nvars(parent(pp))
+   ctx = MPolyBuildCtx(mpoly_ring(S))
+   v0 = zeros(Int, n)
+   for (c, v) in zip(coefficients(pp), exponent_vectors(pp))
+      push_term!(ctx, c, vcat(v, v0))
+   end
+   return finish(ctx)
+end
+
 function (S::UnivPolyRing{T, U})(p::UnivPoly{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    parent(p) !== S && error("Unable to coerce")
    n = nvars(S) - nvars(parent(p.p))
    if n != 0
-      ctx = MPolyBuildCtx(mpoly_ring(S))
-      v0 = zeros(Int, n)
-      for (c, v) in zip(coefficients(p.p), exponent_vectors(p.p))
-         push_term!(ctx, c, vcat(v, v0))
-      end
-      p = UnivPoly{T, U}(finish(ctx), S)
+      p = UnivPoly{T, U}(upgrade(S, p.p), S)
    end
    return p
 end
