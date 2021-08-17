@@ -439,6 +439,20 @@ end
 
 ###############################################################################
 #
+#   Ad hoc comparison functions
+#
+###############################################################################
+
+==(p::UnivPoly, n::Union{Integer, Rational, AbstractFloat}) = p.p == n
+
+==(n::Union{Integer, Rational, AbstractFloat}, p::UnivPoly) = p.p == n
+
+==(p::UnivPoly{T, U}, n::T) where {T <: RingElem, U} = p.p == n
+
+==(n::T, p::UnivPoly{T, U}) where {T <: RingElem, U} = p.p == n
+
+###############################################################################
+#
 #   Parent object overload
 #
 ###############################################################################
