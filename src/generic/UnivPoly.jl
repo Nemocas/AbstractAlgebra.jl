@@ -107,6 +107,50 @@ end
 #
 ###############################################################################
 
+isunit(p::UnivPoly) = isunit(p.p)
+
+isgen(p::UnivPoly) = isgen(p.p)
+
+ishomogeneous(p::UnivPoly) = ishomogeneous(p.p)
+
+coeff(p::UnivPoly, i::Int) = coeff(p.p, i)
+
+trailing_coefficient(p) = trailing_coefficient(p.p)
+
+function monomial(p::UnivPoly{T, U}, i::Int) where {T, U}
+   S = parent(p)
+   m = monomial(p.p, i)
+   return UnivPoly{T, U}(m, S)
+end
+
+function monomial!(m::UnivPoly{T, U}, p::UnivPoly{T, U}, i::Int) where {T, U}
+   parent(m) != parent(p) && error("Incompatible monomial")
+   if parent(m.p) != parent(p.p)
+      m.p = parent(p.p)()
+   end
+   m.p = monomial!(m.p, p.p, i)
+   return m
+end
+
+function term(p::UnivPoly{T, U}, i::Int) where {T, U}
+   S = parent(p)
+   t = term(p.p, i)
+   return UnivPoly{T, U}(t, S)
+end
+
+max_fields(p::UnivPoly) = max_fields(p.p)
+
+function degree(p::UnivPoly, i::Int)
+   if i <= nvars(parent(p)) && i > nvars(parent(p.p))
+      return 0
+   end
+   return degree(p.p, i)
+end
+
+total_degree(p::UnivPoly) = total_degree(p.p)
+
+length(p::UnivPoly) = length(p.p)
+
 function gen(S::UnivPolyRing{T, U}, s::Symbol) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    i = findfirst(x->x==s, S.S)
    if typeof(i) == Nothing
@@ -122,6 +166,16 @@ gen(S::UnivPolyRing, s::Union{Char, String}) = gen(S, Symbol(s))
 gens(S::UnivPolyRing, v::Vector{Symbol}) = tuple([gen(S, s) for s in v]...)
 
 gens(S::UnivPolyRing, v::Vector{T}) where T <: Union{Char, String} = gens(S, [Symbol(s) for s in v])
+
+function Base.hash(p::UnivPoly, h::UInt)
+   b = 0xcf418d4529109236%UInt
+   for (c, v) in zip(coefficients(p.p), exponent_vectors(p.p))
+      b = xor(b, xor(Base.hash(v[1:findlast(x->x>0, v)], h), h))
+      b = xor(b, xor(hash(c, h), h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
 
 ###############################################################################
 #
