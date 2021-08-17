@@ -1846,7 +1846,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
          if check
             d2, Qc[k] = divides(qc, mb)
          else
-            d2, Qc[k] = true, divexact(qc, mb)
+            d2, Qc[k] = true, divexact(qc, mb; check=check)
          end
          if check && !d1 || !d2 # if accumulation term is not divisible, return false
             return false, par()

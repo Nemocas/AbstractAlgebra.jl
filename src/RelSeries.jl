@@ -1076,7 +1076,7 @@ function Base.sqrt(a::RelSeriesElem; check::Bool=true)
          c = addeq!(c, p)
       end
       c = polcoeff(a, n) - c
-      c = divexact(c, g2)
+      c = divexact(c, g2; check=check)
       asqrt = setcoeff!(asqrt, n, c)
    end
    asqrt = set_length!(asqrt, normalise(asqrt, prec))

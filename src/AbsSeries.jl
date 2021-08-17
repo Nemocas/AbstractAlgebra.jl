@@ -849,7 +849,7 @@ function Base.sqrt(a::AbsSeriesElem; check::Bool=true)
          c = addeq!(c, p)
       end
       c = coeff(a, n + aval) - c
-      c = divexact(c, g2)
+      c = divexact(c, g2; check=check)
       asqrt = setcoeff!(asqrt, aval2 + n, c)
    end
    asqrt = set_length!(asqrt, normalise(asqrt, prec))

@@ -1791,7 +1791,7 @@ function sqrt_classical(f::PolyElem{T}; check::Bool=true) where T <: RingElement
                return false, S()
             end
          else
-            d[lenq - k] = divexact(qc, b)
+            d[lenq - k] = divexact(qc, b; check=check)
          end
       elseif check && !iszero(qc)
          return false, S()
