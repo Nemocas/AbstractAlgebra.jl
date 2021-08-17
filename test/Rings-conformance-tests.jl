@@ -296,6 +296,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
             end
             @test a == Rx(collect(coefficients(a)))
          end
+         @test Rx(Int[]) == zero(Rx)
          @test Rx([0, 1, 2]) == x + 2*x^2
          @test Rx([big(0), big(1), big(2)]) == x + 2*x^2
          @test Rx(map(R, [0, 1, 2])) == x + 2*x^2
