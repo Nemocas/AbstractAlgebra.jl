@@ -326,6 +326,51 @@ end
 
 ###############################################################################
 #
+#   Map coefficients
+#
+###############################################################################
+
+function _make_parent(g, p::PuiseuxSeriesElem, cached::Bool)
+   R = parent(g(zero(base_ring(p))))
+   S = parent(p)
+   sym = String(var(S))
+   max_prec = max_precision(S)
+   return AbstractAlgebra.PuiseuxSeriesRing(R, max_prec, sym; cached=cached)[1]
+end
+
+function map_coefficients(g, p::PuiseuxSeriesElem{<:RingElement};
+                    cached::Bool = true,
+                    parent::Ring = _make_parent(g, p, cached))
+   return _map(g, p, parent)
+end
+
+function _map(g, p::PuiseuxSeriesElem, Rx)
+   R = base_ring(Rx)
+   res = Rx(map_coefficients(g, p.data), scale(p))
+   res = rescale!(res)
+   return res
+end
+
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function _change_puiseux_series_ring(R, Rx, cached)
+   P, _ = AbstractAlgebra.PuiseuxSeriesRing(R, max_precision(Rx),
+                                               string(var(Rx)), cached = cached)
+   return P
+end
+
+function change_base_ring(R::Ring, p::PuiseuxSeriesElem{T};
+                    cached::Bool = true, parent::Ring =
+          _change_puiseux_series_ring(R, parent(p), cached)) where T <: RingElement
+   return _map(R, p, parent)
+end
+
+###############################################################################
+#
 #   Unary operators
 #
 ###############################################################################

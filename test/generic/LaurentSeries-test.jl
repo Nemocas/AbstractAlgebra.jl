@@ -170,6 +170,36 @@ end
    @test modulus(T) == 7
 end
 
+@testset "Generic.LaurentSeries.change_base_ring" begin
+   Zx, x = LaurentSeriesRing(ZZ, 10, "x")
+   @test 1 == map_coefficients(sqrt, x^0)
+   p = Zx(BigInt[i for i in 1:10], 10, 11, 5, 1)
+   q = Zx(BigInt[i for i in 10:-1:1], 10, 11, 5, 1)
+   pq = p * q
+   for R in [QQ, GF(2), GF(13), ZZ]
+      pR = change_base_ring(R, p)
+      qR = change_base_ring(R, q, parent = parent(pR))
+      @test parent(qR) === parent(pR)
+      pqR = change_base_ring(R, pq, parent = parent(pR))
+      @test pR * qR == pqR
+   end
+
+   ps = map_coefficients(z -> z^2, p)
+   @test ps == Zx(BigInt[i^2 for i in 1:10], 10, 11, 5, 1)
+
+   f = x^2 + 3x^3 + 2x^6
+   @test map_coefficients(one, f) == x^2 + x^3 + x^6
+   f2 = map_coefficients(t -> t + 2, f)
+   @test f2 == 3x^2 + 5x^3 + 4x^6
+   for i in [0, 1, 4, 5]
+      @test coeff(f2, i) !== coeff(f, i)
+   end
+
+   F = GF(11)
+   P, y = LaurentSeriesRing(F, 10, "x")
+   @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
+end
+
 @testset "Generic.LaurentSeries.unary_ops" begin
    #  Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")

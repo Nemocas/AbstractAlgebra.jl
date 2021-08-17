@@ -428,6 +428,56 @@ end
 
 ###############################################################################
 #
+#   Map coefficients
+#
+###############################################################################
+
+function _make_parent(g, p::LaurentSeriesElem, cached::Bool)
+   R = parent(g(zero(base_ring(p))))
+   S = parent(p)
+   sym = String(var(S))
+   max_prec = max_precision(S)
+   return AbstractAlgebra.LaurentSeriesRing(R, max_prec, sym; cached=cached)[1]
+end
+
+function map_coefficients(g, p::LaurentSeriesElem{<:RingElement};
+                    cached::Bool = true,
+                    parent::Ring = _make_parent(g, p, cached))
+   return _map(g, p, parent)
+end
+
+function _map(g, p::LaurentSeriesElem, Rx)
+   R = base_ring(Rx)
+   new_coefficients = elem_type(R)[let c = polcoeff(p, i)
+                                     iszero(c) ? zero(R) : R(g(c))
+                                   end for i in 0:pol_length(p) - 1]
+   res = Rx(new_coefficients, pol_length(p), precision(p), valuation(p), scale(p), false)
+   res = set_length!(res, normalise(res, pol_length(res)))
+   renormalize!(res)
+   res = rescale!(res)
+   return res
+end
+
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function _change_laurent_series_ring(R, Rx, cached)
+   P, _ = AbstractAlgebra.LaurentSeriesRing(R, max_precision(Rx),
+                                               string(var(Rx)), cached = cached)
+   return P
+end
+
+function change_base_ring(R::Ring, p::LaurentSeriesElem{T};
+                    cached::Bool = true, parent::Ring =
+          _change_laurent_series_ring(R, parent(p), cached)) where T <: RingElement
+   return _map(R, p, parent)
+end
+
+###############################################################################
+#
 #   Unary operators
 #
 ###############################################################################
