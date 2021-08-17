@@ -26,6 +26,22 @@ end
 
 nvars(S::UnivPolyRing) = length(S.S)
 
+symbols(S::UnivPolyRing) = S.S
+
+function vars(p::UnivPoly{T, U}) where {T, U}
+   S = parent(p)
+   V = vars(p.p)
+   return [UnivPoly{T, U}(v, S) for v in V]
+end
+
+ordering(p::UnivPolyRing) = ordering(mpoly_ring(p))
+
+function check_parent(a::UnivPoly{T, U}, b::UnivPoly{T, U}, throw::Bool = true) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+   flag = parent(a) != parent(b)
+   flag & throw && error("Incompatible polynomial rings in polynomial operation")
+   return !flag
+end
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -48,12 +64,6 @@ gens(S::UnivPolyRing, v::Vector{Symbol}) = tuple([gen(S, s) for s in v]...)
 
 gens(S::UnivPolyRing, v::Vector{T}) where T <: Union{Char, String} = gens(S, [Symbol(s) for s in v])
 
-function check_parent(a::UnivPoly{T, U}, b::UnivPoly{T, U}, throw::Bool = true) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
-   flag = parent(a) != parent(b)
-   flag & throw && error("Incompatible polynomial rings in polynomial operation")
-   return !flag
-end
-      
 ###############################################################################
 #
 #   String I/O
