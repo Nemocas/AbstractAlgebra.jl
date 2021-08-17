@@ -5,7 +5,7 @@
 ###############################################################################
 
 export iroot, ispower, ispower_with_root, root, issquare_with_sqrt,
-       isdivisible_by
+       isdivisible_by, isprobable_prime
 
 ###############################################################################
 #

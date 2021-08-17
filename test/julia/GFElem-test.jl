@@ -282,7 +282,7 @@ end
 
 @testset "Julia.GFElem.unsafe_operators" begin
    n = rand(ZZ(2)^9:ZZ(2)^10-1)
-   while !AbstractAlgebra.isprobable_prime(n)
+   while !isprobable_prime(n)
       n = rand(ZZ(2)^9:ZZ(2)^10-1)
    end
    R, x = PolynomialRing(GF(n), "x")
