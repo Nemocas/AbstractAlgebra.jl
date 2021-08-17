@@ -345,6 +345,40 @@ function Base.sqrt(p::UnivPoly{T, U}; check=true) where {T, U}
    return UnivPoly{T, U}(s, S)
 end
 
+function issquare(p::UnivPoly)
+   return issquare(p.p)
+end
+
+###############################################################################
+#
+#   Ad hoc arithmetic functions
+#
+###############################################################################
+
+function *(p::UnivPoly{T, U}, n::Union{Integer, Rational, AbstractFloat}) where {T, U}
+   S = parent(p)
+   return UnivPoly{T, U}(p.p*n, S)
+end
+
+function *(p::UnivPoly{T, U}, n::T) where {T <: RingElem, U}
+   S = parent(p)
+   return UnivPoly{T, U}(p.p*n, S)
+end
+
+*(n::Union{Integer, Rational, AbstractFloat}, p::UnivPoly) = p*n
+
+*(n::T, p::UnivPoly{T, U}) where {T <: RingElem, U} = p*n
+
+function divexact(p::UnivPoly{T, U}, n::Union{Integer, Rational, BigFloat}; check::Bool=true) where {T, U}
+   S = parent(p)
+   return UnivPoly{T, U}(divexact(p.p, n; check=check), S)
+end
+
+function divexact(p::UnivPoly{T, U}, n::T; check::Bool=true) where {T <: RingElem, U}
+   S = parent(p)
+   return UnivPoly{T, U}(divexact(p.p, n; check=check), S)
+end
+
 ###############################################################################
 #
 #   Parent object overload
