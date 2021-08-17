@@ -297,6 +297,20 @@ end
 
    @test constant_coefficient(y^2 + 2x) == 2x
 
+   g = 3x*y + x + 1
+
+   @test set_coefficient!(g, 0, 2x + 2) == 3x*y + 2x + 2
+   @test set_coefficient!(g, 2, 2) == 2y^2 + 3x*y + 2x + 2
+   @test set_coefficient!(g, 2, 0) == 3x*y + 2x + 2
+   @test length(g) == 2
+
+   gz = 3x^2 + 2x + 1
+
+   @test set_coefficient!(gz, 2, ZZ(0)) == 2x + 1
+   @test set_coefficient!(gz, 4, 6) == 6x^4 + 2x + 1
+   @test set_coefficient!(gz, 6, 0) == 6x^4 + 2x + 1
+   @test length(gz) == 5
+
    @test tail(2x*y + 2x + y + 1) == 2x + 1
    @test tail(R(3)) == 0
    @test tail(3x*y) == 0

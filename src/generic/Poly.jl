@@ -37,6 +37,24 @@ function setcoeff!(c::Poly{T}, n::Int, a::T) where T <: RingElement
    return c
 end
 
+function set_coefficient!(c::Poly{T}, n::Int, a::T) where T <: RingElement
+   c = setcoeff!(c, n, a)
+   c = set_length!(c, normalise(c, length(c)))
+   return c  
+end
+
+function set_coefficient!(c::Poly{T}, n::Int, a::U) where {T <: RingElement, U <: Integer}
+   c = setcoeff!(c, n, base_ring(c)(a))
+   c = set_length!(c, normalise(c, length(c)))
+   return c
+end
+
+function set_coefficient!(c::Poly{T}, n::Int, a::T) where T <: Integer
+   c = setcoeff!(c, n, a)
+   c = set_length!(c, normalise(c, length(c)))
+   return c
+end
+
 function normalise(a::Poly, n::Int)
    while n > 0 && iszero(a.coeffs[n])
       n -= 1
