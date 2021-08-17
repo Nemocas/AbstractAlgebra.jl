@@ -1,3 +1,12 @@
+function test_elem(R::AbstractAlgebra.Integers{BigInt})
+   n = big(2)^rand(1:100)
+   return rand(ZZ, -n:n)
+end
+
+@testset "Julia.Integers.conformance_tests" begin
+   test_Ring_interface_recursive(ZZ)
+end
+
 @testset "Julia.Integers.manipulation" begin
    R = zz
    S = ZZ
