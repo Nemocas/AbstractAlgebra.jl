@@ -453,6 +453,101 @@ end
 
 ###############################################################################
 #
+#   Powering
+#
+###############################################################################
+
+function ^(p::UnivPoly{T, U}, b::Int) where {T, U}
+   S = parent(p)
+   return UnivPoly{T, U}(p.p^b, S)
+end
+
+###############################################################################
+#
+#   Inflation/deflation
+#
+###############################################################################
+
+function deflate(p::UnivPoly{T, U}, shift::Vector{Int}, defl::Vector{Int}) where {T, U}
+   S = parent(p)
+   vlen = length(shift)
+   vlen != length(defl) && error("Vector lengths do not match")
+   num = nvars(parent(p.p))
+   pp = p.p
+   if vlen == num
+      return UnivPoly{T, U}(deflate(pp, shift, defl), S)
+   end
+   if vlen > num
+      pp = upgrade(S, pp)
+      num = nvars(parent(pp))
+   end
+   if vlen < num
+      shift = vcat(shift, zeros(Int, num - vlen))
+      defl = vcat(defl, ones(Int, num - vlen))
+   end
+   return UnivPoly{T, U}(deflate(pp, shift, defl), S)
+end
+
+function inflate(p::UnivPoly{T, U}, shift::Vector{Int}, defl::Vector{Int}) where {T, U}
+   S = parent(p)
+   vlen = length(shift)
+   vlen != length(defl) && error("Vector lengths do not match")
+   num = nvars(parent(p.p))
+   pp = p.p
+   if vlen == num
+      return UnivPoly{T, U}(inflate(pp, shift, defl), S)
+   end
+   if vlen > num
+      pp = upgrade(S, pp)
+      num = nvars(parent(pp))
+   end
+   if vlen < num
+      shift = vcat(shift, zeros(Int, num - vlen))
+      defl = vcat(defl, ones(Int, num - vlen))
+   end
+   return UnivPoly{T, U}(inflate(pp, shift, defl), S)
+end
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+function divexact(a::UnivPoly{T, U}, b::UnivPoly{T, U}; check::Bool=true) where {T, U}
+   check_parent(a, b)
+   a, b = promote(a, b)
+   return UnivPoly{T, U}(divexact(a.p, b.p; check=check), a.parent)
+end
+
+function divides(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
+   check_parent(a, b)
+   a, b = promote(a, b)
+   flag, q = divides(a.p, b.p)
+   return flag, UnivPoly{T, U}(q, a.parent)
+end
+
+###############################################################################
+#
+#   Euclidean division
+#
+###############################################################################
+
+function Base.div(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
+   check_parent(a, b)
+   a, b = promote(a, b)
+   return UnivPoly{T, U}(div(a.p, b.p), a.parent)
+end
+
+function Base.divrem(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
+   check_parent(a, b)
+   a, b = promote(a, b)
+   q, r = divrem(a.p, b.p)
+   return UnivPoly{T, U}(q, a.parent), UnivPoly{T, U}(r, a.parent)
+end
+
+###############################################################################
+#
 #   Parent object overload
 #
 ###############################################################################
