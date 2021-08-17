@@ -883,6 +883,24 @@ function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}; check::Bool=true) wh
    return res
 end
 
+function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}; check::Bool=true) where T <: FieldElement
+   check_parent(x, y)
+   iszero(y) && throw(DivideError())
+   v2 = valuation(y)
+   if v2 != 0
+      v1 = valuation(x)
+      if check && v1 < v2
+         error("Not an exact division")
+      end
+      x = shift_right(x, v2)
+      y = shift_right(y, v2)
+   else
+      x = deepcopy(x)
+   end
+   y = truncate(y, precision(x))
+   return x*inv(y)
+end
+
 ###############################################################################
 #
 #   Ad hoc exact division
