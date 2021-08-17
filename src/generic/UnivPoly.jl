@@ -419,6 +419,24 @@ function ==(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    return true
 end
 
+function isless(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
+   check_parent(a, b)
+   if parent(a.p) === parent(b.p)
+      return isless(a.p, b.p)
+   end
+   S = parent(a)
+   num = nvars(S)
+   s = a.p
+   t = b.p
+   if nvars(parent(s)) != num
+      s = upgrade(S, s)
+   end
+   if nvars(parent(t)) != num
+      t = upgrade(S, t)
+   end
+   return isless(s, t)
+end
+
 ###############################################################################
 #
 #   Parent object overload
