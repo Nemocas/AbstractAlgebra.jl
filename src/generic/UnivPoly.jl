@@ -381,6 +381,46 @@ end
 
 ###############################################################################
 #
+#   Comparison
+#
+###############################################################################
+
+function ==(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
+   check_parent(a, b)
+   if length(a) != length(b)
+      return false
+   end
+   n1 = nvars(parent(a.p))
+   n2 = nvars(parent(b.p))
+   if n1 == n2
+      for (v1, v2) in zip(exponent_vectors(a.p), exponent_vectors(b.p))
+         if v1 != v2
+            return false
+         end
+      end
+   elseif n1 > n2
+      for (v1, v2) in zip(exponent_vectors(a.p), exponent_vectors(b.p))
+         if v1[1:n2] != v2 || !iszero(v1[n2 + 1:n1])
+            return false
+         end
+      end
+   else # n2 > n1
+      for (v1, v2) in zip(exponent_vectors(a.p), exponent_vectors(b.p))
+         if v1 != v2[1:n1] || !iszero(v2[n1 + 1:n2])
+            return false
+         end
+      end
+   end
+   for (c1, c2) in zip(coefficients(a.p), coefficients(b.p))
+      if c1 != c2
+         return false
+      end
+   end
+   return true
+end
+
+###############################################################################
+#
 #   Parent object overload
 #
 ###############################################################################
