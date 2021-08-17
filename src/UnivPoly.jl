@@ -8,6 +8,28 @@ export UniversalPolynomialRing
 
 ###############################################################################
 #
+#   Iterators
+#
+###############################################################################
+
+function coefficients(a::AbstractAlgebra.UnivPolyElem)
+   return Generic.UnivPolyCoeffs(a)
+end
+
+function exponent_vectors(a::AbstractAlgebra.UnivPolyElem)
+   return Generic.UnivPolyExponentVectors(a)
+end
+
+function monomials(a::AbstractAlgebra.UnivPolyElem)
+   return Generic.UnivPolyMonomials(a)
+end
+
+function terms(a::AbstractAlgebra.UnivPolyElem)
+   return Generic.UnivPolyTerms(a)
+end
+
+###############################################################################
+#
 #   UniversalPolynomialRing constructor
 #
 ###############################################################################

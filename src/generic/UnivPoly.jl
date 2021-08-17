@@ -241,6 +241,100 @@ end
 
 ###############################################################################
 #
+#   Iterators
+#
+###############################################################################
+
+function Base.iterate(x::UnivPolyCoeffs)
+   if length(x.poly) >= 1
+      return coeff(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::UnivPolyCoeffs, state)
+   state += 1
+   if length(x.poly) >= state
+      return coeff(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::UnivPolyExponentVectors)
+   if length(x.poly) >= 1
+      return exponent_vector(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::UnivPolyExponentVectors, state)
+   state += 1
+   if length(x.poly) >= state
+      return exponent_vector(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::UnivPolyTerms)
+   if length(x.poly) >= 1
+      return term(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::UnivPolyTerms, state)
+   state += 1
+   if length(x.poly) >= state
+      return term(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::UnivPolyMonomials)
+   if length(x.poly) >= 1
+      return monomial(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::UnivPolyMonomials, state)
+   state += 1
+   if length(x.poly) >= state
+      return monomial(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.length(x::Union{UnivPolyCoeffs, UnivPolyExponentVectors, UnivPolyTerms, UnivPolyMonomials})
+   return length(x.poly)
+end
+
+function Base.eltype(x::UnivPolyCoeffs{T}) where T <: AbstractAlgebra.UnivPolyElem{S} where S <: RingElement
+   return S
+end
+
+function Base.eltype(x::UnivPolyExponentVectors{T}) where T <: AbstractAlgebra.UnivPolyElem{S} where S <: RingElement
+   return Vector{Int}
+end
+
+function Base.eltype(x::UnivPolyMonomials{T}) where T <: AbstractAlgebra.UnivPolyElem{S} where S <: RingElement
+   return T
+end
+
+function Base.eltype(x::UnivPolyTerms{T}) where T <: AbstractAlgebra.UnivPolyElem{S} where S <: RingElement
+   return T
+end
+
+###############################################################################
+#
 #   Parent object overload
 #
 ###############################################################################

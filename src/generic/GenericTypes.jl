@@ -427,6 +427,22 @@ mutable struct UnivPoly{T <: RingElement, U <: MPoly} <: AbstractAlgebra.UnivPol
    parent::UnivPolyRing{T}
 end
 
+struct UnivPolyCoeffs{T <: AbstractAlgebra.RingElem}
+   poly::T
+end
+
+struct UnivPolyExponentVectors{T <: AbstractAlgebra.RingElem}
+   poly::T
+end
+
+struct UnivPolyTerms{T <: AbstractAlgebra.RingElem}
+   poly::T
+end
+
+struct UnivPolyMonomials{T <: AbstractAlgebra.RingElem}
+   poly::T
+end
+
 ###############################################################################
 #
 #   SparsePolyRing / SparsePoly
