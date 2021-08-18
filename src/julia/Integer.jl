@@ -606,7 +606,7 @@ RandomExtensions.maketype(R::AbstractAlgebra.Integers{T}, _) where {T} = T
 
 # define rand(make(ZZ, n:m))
 rand(rng::AbstractRNG,
-     sp::SamplerTrivial{<:Make2{T, Integers{T}, UnitRange{Int}}}
+     sp::SamplerTrivial{<:Make2{T, Integers{T}, <:AbstractArray{<:Integer}}}
      ) where {T} =
         sp[][1](rand(rng, sp[][2]))
 
