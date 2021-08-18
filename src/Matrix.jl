@@ -2880,8 +2880,8 @@ end
 
 function can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: FracElem{T} where T <: PolyElem
    if side == :left
-      (f, x) = can_solve_with_solution(a', b'; side=:right)
-      return (f, x')
+      (f, x) = can_solve_with_solution(transpose(a), transpose(b); side=:right)
+      return (f, transpose(x))
    elseif side == :right
       d = numerator(one(base_ring(a)))
       for i = 1:nrows(a)
@@ -2915,8 +2915,8 @@ end
 # The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
 function can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: Union{FracElem, Rational{BigInt}}
    if side == :left
-      (f, x) = can_solve_with_solution(a', b'; side=:right)
-      return (f, x')
+      (f, x) = can_solve_with_solution(transpose(a), transpose(b); side=:right)
+      return (f, transpose(x))
    elseif side == :right
       d = numerator(one(base_ring(a)))
       for i = 1:nrows(a)
@@ -2952,8 +2952,8 @@ is raised.
 """
 function can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: RingElement
    if side == :right
-      (f, x) = can_solve_with_solution(a', b'; side=:left)
-      return (f, x')
+      (f, x) = can_solve_with_solution(transpose(a), transpose(b); side=:left)
+      return (f, transpose(x))
    elseif side == :left
       @assert ncols(a) == ncols(b)
       H, T = hnf_with_transform(a)
@@ -2993,8 +2993,8 @@ end
 
 function can_solve_with_solution(A::MatElem{T}, B::MatElem{T}; side::Symbol = :right) where T <: FieldElement
    if side == :right
-      (f, x) = can_solve_with_solution(A', B', side = :left)
-      return (f, x')
+      (f, x) = can_solve_with_solution(transpose(A), transpose(B), side = :left)
+      return (f, transpose(x))
    elseif side == :left
       R = base_ring(A)
       ncols(A) != ncols(B) && error("Incompatible matrices")

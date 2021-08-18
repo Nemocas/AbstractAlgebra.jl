@@ -231,5 +231,5 @@ function ModuleHomomorphism(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Mat
       end
    end
 
-   return ModuleHomomorphism(D, A, hvcat(Tuple([length(SD) for i = 1:length(SA)]), map(x->(x.matrix)', m)...)')
+   return ModuleHomomorphism(D, A, transpose(hvcat(Tuple([length(SD) for i = 1:length(SA)]), map(x->transpose(x.matrix), m)...)))
 end

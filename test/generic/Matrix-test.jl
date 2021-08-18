@@ -211,10 +211,10 @@ end
       @test_throws ErrorConstrDimMismatch matrix(R, 2, 4, map(T, arr2))
    end
 
-   M = matrix(R, arr')
+   M = matrix(R, transpose(arr))
    @test isa(M, Generic.MatSpaceElem{elem_type(R)})
 
-   M = matrix(R, 2, 3, view(arr2', 1:6))
+   M = matrix(R, 2, 3, view(transpose(arr2), 1:6))
    @test isa(M, Generic.MatSpaceElem{elem_type(R)})
 
    M3 = zero_matrix(R, 2, 3)
@@ -2152,8 +2152,8 @@ end
       (flag, _) = can_solve_with_solution(M, X)
       @assert !flag
 
-      @assert !can_solve(M, X'; side = :left)
-      (flag, _) = can_solve_with_solution(M, X'; side = :left)
+      @assert !can_solve(M, transpose(X); side = :left)
+      (flag, _) = can_solve_with_solution(M, transpose(X); side = :left)
       @assert !flag
    end
 
