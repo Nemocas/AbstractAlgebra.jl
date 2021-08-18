@@ -19,7 +19,7 @@ struct CycleDec{T<:Integer}
 end
 
 @doc Markdown.doc"""
-   Perm{T<:Integer}
+    Perm{T<:Integer}
    
 The type of permutations.
 Fieldnames:

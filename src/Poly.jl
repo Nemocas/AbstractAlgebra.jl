@@ -1534,7 +1534,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   pseudorem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+    pseudorem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
 
 Return the pseudoremainder of $f$ divided by $g$. If $g = 0$ we throw a
 `DivideError()`.
@@ -1556,7 +1556,7 @@ function pseudorem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-   pseudodivrem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+    pseudodivrem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
 
 Return a tuple $(q, r)$ consisting of the pseudoquotient and pseudoremainder
 of $f$ divided by $g$. If $g = 0$ we throw a `DivideError()`.
@@ -1598,7 +1598,7 @@ end
 #CF TODO: use squaring for fast large valuation
 
 @doc Markdown.doc"""
-   remove(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
+    remove(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
 
 Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
 $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
@@ -1625,7 +1625,7 @@ function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-   remove(z::PolyElem{T}, p::PolyElem{T}) where T <: Union{ResElem, FieldElement}
+    remove(z::PolyElem{T}, p::PolyElem{T}) where T <: Union{ResElem, FieldElement}
 
 Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
 $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
@@ -1652,7 +1652,7 @@ function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: Union{ResElem, FieldE
 end
 
 @doc Markdown.doc"""
-   valuation(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
+    valuation(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
 
 Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
 $p^k$ divides $z$.
@@ -1665,7 +1665,7 @@ function valuation(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-   divides(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+    divides(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
 
 Return a pair consisting of a flag which is set to `true` if $g$ divides
 $f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
@@ -1709,7 +1709,7 @@ function divides(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-   divides(z::PolyElem{T}, x::T) where T <: RingElement
+    divides(z::PolyElem{T}, x::T) where T <: RingElement
 
 Return a pair consisting of a flag which is set to `true` if $x$ divides
 $z$ and `false` otherwise, and a polynomial $y$ such that $z = xy$ if
