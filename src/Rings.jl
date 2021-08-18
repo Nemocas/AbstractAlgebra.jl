@@ -217,10 +217,6 @@ end
 
 transpose(x::T) where {T <: RingElem} = deepcopy(x)
 
-adjoint(x::T) where {T <: MatElem} = transpose(x)
-
-adjoint(x::T) where {T <: RingElem} = deepcopy(x)
-
 ###############################################################################
 #
 #   Coprime bases
