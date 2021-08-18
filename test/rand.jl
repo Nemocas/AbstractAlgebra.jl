@@ -1,5 +1,5 @@
 using Random: Random, MersenneTwister, randsubseq, AbstractRNG
-using RandomExtensions: make
+using AbstractAlgebra.RandomExtensions: make
 
 const rng = MersenneTwister()
 

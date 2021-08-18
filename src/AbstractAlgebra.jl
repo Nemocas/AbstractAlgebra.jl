@@ -809,8 +809,14 @@ function test_module(x, y)
       test_function_name *= "gen_$(lowercase(y))"
    end
 
-   cmd = "using Test; using AbstractAlgebra; include(\"$test_file\"); $test_function_name();"
-   @info("spawning ", `$julia_exe -e \"$cmd\"`)
+   cmd = """
+         using Test
+         using AbstractAlgebra
+         include("test/rand.jl")
+         include("$test_file")
+         $test_function_name()
+         """
+   @info("spawning ", `$julia_exe --project=$(Base.active_project()) -e $cmd`)
    run(`$julia_exe -e $cmd`)
 end
 
