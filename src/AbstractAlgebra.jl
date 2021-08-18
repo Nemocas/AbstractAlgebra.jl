@@ -102,7 +102,7 @@ end
 # and in Generic.jl.
 # They should not be imported/exported anywhere else.
 
-import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh, axes,
+import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh, axes,
              bin, ceil, checkbounds, conj, convert, cmp, cos, cosh, cospi, cot,
              coth, dec, deepcopy, deepcopy_internal, expm1, exponent, fill,
              floor, gcd, gcdx, getindex, hash, hcat, hex, hypot, intersect,
