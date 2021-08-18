@@ -20,9 +20,11 @@ corresponding value for entry $[1, 1]$ (the function is never called on empty ma
 
 For matrix algebras, all of the ring interface must be implemented.
 
-Note that AbstractAlgebra.jl matrices are not the same as Julia matrices. We store a
-base ring in our matrix and matrices are row major instead of column major in order to
-support the numerous large C libraries that use this convention.
+!!! note
+
+    AbstractAlgebra.jl matrices are not the same as Julia matrices. We store a
+    base ring in our matrix and matrices are row major instead of column major in order to
+    support the numerous large C libraries that use this convention.
 
 All AbstractAlgebra.jl matrices are assumed to be mutable. This is usually critical to
 performance.
@@ -74,63 +76,28 @@ In addition to the standard constructors, the following constructors, taking an 
 elements, must be available.
 
 ```julia
-(S::MyMatSpace{T})(A::Array{T, 2}) where T <: RingElem
-(S::MyMatAlgebra{T})(A::Array{T, 2}) where T <: RingElem
+(S::MyMatSpace{T})(A::Matrix{T}) where T <: RingElem
+(S::MyMatAlgebra{T})(A::Matrix{T}) where T <: RingElem
 ```
 
 Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`.
 
 ```julia
-(S::MyMatSpace{T})(A::Array{S, 2}) where {S <: RingElem, T <: RingElem}
-(S::MyMatAlgebra{T})(A::Array{S, 2}) where {S <: RingElem, T <: RingElem}
+(S::MyMatSpace{T})(A::Matrix{S}) where {S <: RingElem, T <: RingElem}
+(S::MyMatAlgebra{T})(A::Matrix{S}) where {S <: RingElem, T <: RingElem}
 ```
 
 Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`,
 where `S` is the type of elements that can be coerced into the base ring of the matrix.
 
 ```julia
-(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: RingElem, T <: RingElem}
-(S::MyMatAlgebra{T})(A::Array{S, 1}) where {S <: RingElem, T <: RingElem}
+(S::MyMatSpace{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
+(S::MyMatAlgebra{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
 ```
 
 Create the matrix in the given space/algebra of matrices (with dimensions $m\times n$
 say), whose $(i, j)$ entry is given by `A[i*(n - 1) + j]` and where `S` is the type of
 elements that can be coerced into the base ring of the matrix.
-
-**Examples**
-
-```jldoctest
-julia> S = MatrixSpace(QQ, 2, 3)
-Matrix Space of 2 rows and 3 columns over Rationals
-
-julia> T = MatrixAlgebra(QQ, 2)
-Matrix Algebra of degree 2 over Rationals
-
-julia> M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
-[2//1   3//1   1//1]
-[1//1   0//1   4//1]
-
-julia> M2 = S(BigInt[2 3 1; 1 0 4])
-[2//1   3//1   1//1]
-[1//1   0//1   4//1]
-
-julia> M3 = S(BigInt[2, 3, 1, 1, 0, 4])
-[2//1   3//1   1//1]
-[1//1   0//1   4//1]
-
-julia> N1 = T(Rational{BigInt}[2 3; 1 0])
-[2//1   3//1]
-[1//1   0//1]
-
-julia> N2 = T(BigInt[2 3; 1 0])
-[2//1   3//1]
-[1//1   0//1]
-
-julia> N3 = T(BigInt[2, 3, 1, 1])
-[2//1   3//1]
-[1//1   1//1]
-
-```
 
 It is also possible to create matrices (in a matrix space only) directly, without first
 creating the corresponding matrix space (the inner constructor being called directly).
@@ -139,7 +106,7 @@ their parent. Instead, parents are constructed on-the-fly if requested. (The sam
 strategy is used for matrix algebras.)
 
 ```julia
-matrix(R::Ring, arr::Array{T, 2}) where T <: RingElem
+matrix(R::Ring, arr::Matrix{T}) where T <: RingElem
 ```
 
 Given an $m\times n$ Julia matrix of entries, construct the corresponding
@@ -148,7 +115,7 @@ coerced into `R`.
 
 
 ```julia
-matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: RingElem
+matrix(R::Ring, r::Int, c::Int, A::Vector{T}) where T <: RingElem
 ```
 
 Construct the given $r\times c$ AbstractAlgebra.jl matrix over the ring `R` whose
@@ -160,31 +127,6 @@ zero_matrix(R::Ring, r::Int, c::Int)
 ```
 
 Construct the $r\times c$ AbstractAlgebra.jl zero matrix over the ring `R`.
-
-**Examples**
-
-```jldoctest
-julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
-[3   1   2]
-[2   0   1]
-
-julia> N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
-[3   1]
-[2   2]
-[0   1]
-
-julia> P = zero_matrix(ZZ, 3, 2)
-[0   0]
-[0   0]
-[0   0]
-
-julia> R = MatrixAlgebra(ZZ, 2)
-Matrix Algebra of degree 2 over Integers
-
-julia> M = R()
-[0   0]
-[0   0]
-```
 
 ### Views
 
@@ -212,15 +154,6 @@ the use of views.
 The `similar` function also returns a matrix of type `MatSpaceElem` when
 applied to a view, rather than another view.
 
-```julia
-M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
-
-N1 = @view M[1:2, :]
-N2 = @view M[:, 1:2]
-
-R = N1*N2
-```
-
 ### Basic manipulation of matrices
 
 ```julia
@@ -230,6 +163,20 @@ dense_matrix_type(::Type{T}) where T <: RingElem
 Return the type of dense matrices whose entries have the given type. E.g.
 in Nemo, which depends on AbstractAlgebra, we define
 `dense_matrix_type(::Type{fmpz}) = fmpz_mat`.
+
+```julia
+nrows(M::MyMatSpace{T}) where T <: RingElem
+nrows(M::MyMatAlgebra{T}) where T <: RingElem
+```
+
+Return the number of rows of matrices in the matrix space.
+
+```julia
+ncols(M:MyMatSpace{T}) where T <: RingElem
+ncols(M:MyMatAlgebra{T}) where T <: RingElem
+```
+
+Return the number of columns of matrices in the matrix space.
 
 ```julia
 nrows(f::MyMat{T}) where T <: RingElem
@@ -257,26 +204,6 @@ Set the $(i, j)$-th entry of the matrix $M$ to $d$, which is assumed to be in th
 base ring of the matrix. The matrix must have such an entry and the matrix is mutated
 in place and not returned from the function.
 
-**Examples**
-
-```jldoctest
-julia> M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
-[2   3   0]
-[1   1   1]
-
-julia> m = nrows(M)
-2
-
-julia> n = ncols(M)
-3
-
-julia> M[1, 2] = BigInt(4)
-4
-
-julia> c = M[1, 1]
-2
-
-```
 ### Transpose
 
 ```julia
@@ -284,34 +211,6 @@ transpose(::MyMat{T}) where T <: RingElem
 ```
 
 Return the transpose of the given matrix.
-
-The standard Julia tick notation can also be used for transposing a matrix.
-
-**Examples**
-
-```jldoctest
-julia> R, t = PolynomialRing(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
-
-julia> S = MatrixSpace(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
-
-julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-[t + 1       t             1]
-[  t^2       t             t]
-[   -2   t + 2   t^2 + t + 1]
-
-julia> B = transpose(A)
-[t + 1   t^2            -2]
-[    t     t         t + 2]
-[    1     t   t^2 + t + 1]
-
-julia> C = A'
-[t + 1   t^2            -2]
-[    t     t         t + 2]
-[    1     t   t^2 + t + 1]
-
-```
 
 ## Optional functionality for matrices
 
@@ -331,29 +230,6 @@ Base.getindex(M::MyMat, rows::AbstractVector{Int}, cols::AbstractVector{Int})
 Return a new matrix with the same entries as the submatrix with the given range of rows
 and columns.
 
-**Examples**
-
-```jldoctest
-julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
-[1   2   3]
-[2   3   4]
-[3   4   5]
-
-julia> N1 = M[1:2, :]
-[1   2   3]
-[2   3   4]
-
-julia> N2 = M[:, :]
-[1   2   3]
-[2   3   4]
-[3   4   5]
-
-julia> N3 = M[2:3, 2:3]
-[3   4]
-[4   5]
-
-```
-
 ### Optional row swapping
 
 ```julia
@@ -362,21 +238,6 @@ swap_rows!(M::MyMat{T}, i::Int, j::Int) where T <: RingElem
 
 Swap the rows of `M` in place. The function returns the mutated matrix (since
 matrices are assumed to be mutable in AbstractAlgebra.jl).
-
-**Examples**
-
-```jldoctest
-julia> M = identity_matrix(ZZ, 3)
-[1   0   0]
-[0   1   0]
-[0   0   1]
-
-julia> swap_rows!(M, 1, 2)
-[0   1   0]
-[1   0   0]
-[0   0   1]
-
-```
 
 ### Optional concatenation
 
@@ -395,34 +256,6 @@ vcat(M::MyMat{T}, N::MyMat{T}) where T <: RingElem
 
 Return the vertical concatenation of $M$ and $N$. It is assumed that the number of
 columns of $M$ and $N$ are the same.
-
-**Examples**
-
-```jldoctest
-julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
-[1   2   3]
-[2   3   4]
-[3   4   5]
-
-julia> N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
-[1   0   1]
-[0   1   0]
-[1   0   1]
-
-julia> P = hcat(M, N)
-[1   2   3   1   0   1]
-[2   3   4   0   1   0]
-[3   4   5   1   0   1]
-
-julia> Q = vcat(M, N)
-[1   2   3]
-[2   3   4]
-[3   4   5]
-[1   0   1]
-[0   1   0]
-[1   0   1]
-
-```
 
 ### Optional similar and zero
 
@@ -466,46 +299,6 @@ Base.isassigned(M::MyMat, i, j)
 Test whether the given matrix has a value associated with indices `i` and `j`.
 It is recommended to overload this method for custom matrices.
 
-**Examples**
-
-```jldoctest
-julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
-[3   1   2]
-[2   0   1]
-
-julia> isassigned(M, 1, 2)
-true
-
-julia> isassigned(M, 4, 4)
-false
-
-julia> A = similar(M)
-[#undef   #undef   #undef]
-[#undef   #undef   #undef]
-
-julia> isassigned(A, 1, 2)
-false
-
-julia> B = zero(M)
-[0   0   0]
-[0   0   0]
-
-julia> C = similar(M, 4, 5)
-[#undef   #undef   #undef   #undef   #undef]
-[#undef   #undef   #undef   #undef   #undef]
-[#undef   #undef   #undef   #undef   #undef]
-[#undef   #undef   #undef   #undef   #undef]
-
-julia> base_ring(B)
-Integers
-
-julia> D = zero(M, QQ, 2, 2)
-[0//1   0//1]
-[0//1   0//1]
-
-julia> base_ring(D)
-Rationals
-```
 ### Optional symmetry test
 
 ```julia
@@ -515,22 +308,3 @@ LinearAlgebra.issymmetric(a::MatrixElem)
 Return `true` if the given matrix is symmetric with respect to its main diagonal,
 otherwise return `false`.
 
-**Examples**
-
-```jldoctest
-julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
-[1   2   3]
-[2   4   5]
-[3   5   6]
-
-julia> issymmetric(M)
-true
-
-julia> N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
-[1   2   3]
-[4   5   6]
-[7   8   9]
-
-julia> issymmetric(N)
-false
-```

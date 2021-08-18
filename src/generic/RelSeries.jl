@@ -62,7 +62,89 @@ function characteristic(a::RelSeriesRing{T}) where T <: RingElement
    return characteristic(base_ring(a))
 end
 
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
 
+function mullow_fast_cutoff(a::RelSeries{BigInt}, b::RelSeries{BigInt})
+   bits = 0
+   for i = 1:pol_length(a)
+      bits += ndigits(a.coeffs[i], base=2)
+   end
+   for i = 1:pol_length(b)
+      bits += ndigits(b.coeffs[i], base=2)
+   end
+   bits = div(bits, pol_length(a) + pol_length(b))
+   len = 2
+   while len*bits <= 30000
+      len *= 2
+   end
+   return len
+end
+
+function mullow_fast_cutoff(a::RelSeries{Rational{BigInt}}, b::RelSeries{Rational{BigInt}})
+   bits = 0
+   for i = 1:pol_length(a)
+      bits += ndigits(numerator(a.coeffs[i]), base=2)
+      bits += ndigits(denominator(a.coeffs[i]), base=2)
+   end
+   for i = 1:pol_length(b)
+      bits += ndigits(numerator(b.coeffs[i]), base=2)
+      bits += ndigits(denominator(b.coeffs[i]), base=2)
+   end
+   bits = div(bits, 2*(pol_length(a) + pol_length(b)))
+   len = 2
+   while len^1.7*bits <= 48500
+      len *= 2
+   end
+   return len
+end
+
+
+function mullow_fast_cutoff(a::RelSeries{GFElem{Int}}, b::RelSeries{GFElem{Int}})
+   return 75
+end
+
+function mullow_fast_cutoff(a::RelSeries{GFElem{BigInt}}, b::RelSeries{GFElem{BigInt}})
+   bits = ndigits(characteristic(parent(a)), base=2)
+   len = 2
+   while len^2*bits <= 2000
+      len *= 2
+   end
+   return len
+end
+
+# generic fallback
+function mullow_fast_cutoff(a::T, b::T) where {S <: RingElement, T <: RelSeries{S}}
+   return 5
+end
+
+function *(a::RelSeries{T}, b::RelSeries{T}) where T <: RingElement
+   check_parent(a, b)
+   lena = pol_length(a)
+   lenb = pol_length(b)
+   aval = valuation(a)
+   bval = valuation(b)
+   zval = aval + bval
+   prec = min(precision(a) - aval, precision(b) - bval)
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   if lena == 0 || lenb == 0
+      return parent(a)(Array{T}(undef, 0), 0, prec + zval, zval)
+   end
+   t = base_ring(a)()
+   lenz = min(lena + lenb - 1, prec)
+   d = Array{T}(undef, lenz)
+   cutoff = mullow_fast_cutoff(a, b)
+   AbstractAlgebra.DensePoly.mullow_fast!(d, lenz,
+                          a.coeffs, lena, b.coeffs, lenb, base_ring(a), cutoff)
+   z = parent(a)(d, lenz, prec + zval, zval)
+   z = set_length!(z, normalise(z, lenz))
+   renormalize!(z)
+   return z
+end
 
 ###############################################################################
 #
@@ -113,25 +195,11 @@ function mul!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where T <: Ring
          d = T[base_ring(c)() for i in 1:lenc]
       else
          fit!(c, lenc)
-	 d = c.coeffs
+	     d = c.coeffs
       end
-      t = base_ring(a)()
-      for i = 1:min(lena, lenc)
-         d[i] = mul!(d[i], polcoeff(a, i - 1), polcoeff(b, 0))
-      end
-      if lenc > lena
-         for i = 2:min(lenb, lenc - lena + 1)
-            d[lena + i - 1] = mul!(d[lena + i - 1], polcoeff(a, lena - 1), polcoeff(b, i - 1))
-         end
-      end
-      for i = 1:lena - 1
-         if lenc > i
-            for j = 2:min(lenb, lenc - i + 1)
-               t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
-               d[i + j - 1] = addeq!(d[i + j - 1], t)
-            end
-         end
-      end
+      cutoff = mullow_fast_cutoff(a, b)
+      AbstractAlgebra.DensePoly.mullow_fast!(d, lenc,
+                          a.coeffs, lena, b.coeffs, lenb, base_ring(a), cutoff)
       c.coeffs = d
       c.length = normalise(c, lenc)
    end
@@ -304,7 +372,7 @@ function (R::RelSeriesRing{T})(b::RelSeriesElem{T}) where T <: RingElement
    return b
 end
 
-function (R::RelSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) where T <: RingElement
+function (R::RelSeriesRing{T})(b::Vector{T}, len::Int, prec::Int, val::Int) where T <: RingElement
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
@@ -313,7 +381,7 @@ function (R::RelSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) wh
    return z
 end
 
-function (R::RelSeriesRing{T})(b::Array{S, 1}, len::Int, prec::Int, val::Int) where {S <: RingElement, T <: RingElement}
+function (R::RelSeriesRing{T})(b::Vector{S}, len::Int, prec::Int, val::Int) where {S <: RingElement, T <: RingElement}
    R0 = base_ring(R)
    lenb = length(b)
    entries = Array{T}(undef, lenb)

@@ -34,12 +34,14 @@ All univariate polynomial element types belong to the abstract type
 type `PolyRing{T}`. This enables one to write generic functions that
 can accept any AbstractAlgebra polynomial type.
 
-Note that both the generic polynomial ring type `Generic.PolyRing{T}` and the abstract
-type it belongs to, `PolyRing{T}`, are called `PolyRing`. The
-former is a (parameterised) concrete type for a polynomial ring over a given base ring
-whose elements have type `T`. The latter is an abstract type representing all
-polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
-supplied by a C library).
+!!! note
+
+    Both the generic polynomial ring type `Generic.PolyRing{T}` and the abstract
+    type it belongs to, `PolyRing{T}`, are called `PolyRing`. The
+    former is a (parameterised) concrete type for a polynomial ring over a given base ring
+    whose elements have type `T`. The latter is an abstract type representing all
+    polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
+    supplied by a C library).
 
 ## Polynomial ring constructors
 
@@ -76,8 +78,8 @@ Given a base ring `R` return the polynomial ring $S = R[x]$. Note that unlike
 the constructors above, the return type is not a tuple. Only the ring is
 returned and not the generator. The polynomial ring is not cached.
 
-Here are some examples of creating polynomial rings and making use of the
-resulting parent objects to coerce various elements into the polynomial ring.
+Here are some examples of creating polynomial rings and their associated
+generators.
 
 **Examples**
 
@@ -91,21 +93,6 @@ julia> S, y = PolynomialRing(R, "y")
 julia> T, z = QQ["z"]
 (Univariate Polynomial Ring in z over Rationals, z)
 
-julia> f = R()
-0
-
-julia> g = R(123)
-123
-
-julia> h = S(BigInt(1234))
-1234
-
-julia> k = S(x + 1)
-x + 1
-
-julia> m = T(z + 1)
-z + 1
-
 julia> U = PolyRing(ZZ)
 Univariate Polynomial Ring in x over Integers
 ```
@@ -114,22 +101,48 @@ All of the examples here are generic polynomial rings, but specialised implement
 of polynomial rings provided by external modules will also usually provide a
 `PolynomialRing` constructor to allow creation of their polynomial rings.
 
-## Basic ring functionality
+## Polynomial constructors
 
 Once a polynomial ring is constructed, there are various ways to construct
 polynomials in that ring.
 
 The easiest way is simply using the generator returned by the `PolynomialRing`
-constructor and build up the polynomial using basic arithmetic, as described in
-the Ring interface.
+constructor and build up the polynomial using basic arithmetic.
 
-The Julia language also has special syntax for the construction of polynomials in terms
+The Julia language has special syntax for the construction of polynomials in terms
 of a generator, e.g. we can write `2x` instead of `2*x`.
 
-The polynomial rings in AbstractAlgebra.jl implement the full Ring interface. Of course
-the entire Univariate Polynomial Ring interface is also implemented.
+A second way is to use the polynomial ring to construct a polynomial. There are
+the usual ways of constructing an element of a ring.
 
-We give some examples of such functionality.
+```julia
+(R::PolyRing)() # constructs zero
+(R::PolyRing)(c::Integer)
+(R::PolyRing)(c::elem_type(R))
+(R::PolyRing{T})(a::T) where T <: RingElement
+```
+
+For polynommials there is also the following more general constructor accepting
+an array of coefficients.
+
+```julia
+(S::PolyRing{T})(A::Vector{T}) where T <: RingElem
+(S::PolyRing{T})(A::Vector{U}) where T <: RingElem, U <: RingElem
+(S::PolyRing{T})(A::Vector{U}) where T <: RingElem, U <: Integer
+```
+
+Construct the polynomial in the ring `S` with the given array of coefficients,
+i.e. where `A[1]` is the constant coefficient.
+
+A third way of constructing polynomials is to construct them directly without
+creating the polynomial ring.
+
+```julia
+polynomial(R::Ring, arr::Vector{T}, var::String="x"; cached::Bool=true)
+```
+
+Given an array of coefficients construct the polynomial with those coefficients
+over the given ring and with the given variable.
 
 **Examples**
 
@@ -146,20 +159,107 @@ x^3 + 3*x + 21
 julia> g = (x + 1)*y^2 + 2x + 1
 (x + 1)*y^2 + 2*x + 1
 
-julia> h = zero(S)
+julia> R()
 0
 
-julia> k = one(R)
+julia> S(1)
 1
 
-julia> isone(k)
-true
+julia> S(y)
+y
 
-julia> iszero(f)
-false
+julia> S(x)
+x
 
-julia> n = length(g)
-3
+julia> S, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia> f = S(Rational{BigInt}[2, 3, 1])
+x^2 + 3*x + 2
+
+julia> g = S(BigInt[1, 0, 4])
+4*x^2 + 1
+
+julia> h = S([4, 7, 2, 9])
+9*x^3 + 2*x^2 + 7*x + 4
+
+julia> p = polynomial(ZZ, [1, 2, 3])
+3*x^2 + 2*x + 1
+
+julia> f = polynomial(ZZ, [1, 2, 3], "y")
+3*y^2 + 2*y + 1
+```
+
+## Similar and zero
+
+Another way of constructing polynomials is to construct one similar to an
+existing polynomial using either similar or zero. 
+
+```julia
+similar(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
+zero(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
+```
+
+Construct the zero polynomial with the same variable as the given polynomial
+with coefficients in the given ring. Both functions behave the same way for
+polynomials.
+
+```julia
+similar(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: RingElem
+similar(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: RingElem
+zero(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: RingElem
+zero(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: RingElem
+```
+
+Construct the zero polynomial with the given variable and coefficients in the
+given ring, if specified, and in the coefficient ring of the given polynomial
+otherwise.
+
+**Examples**
+
+```@jldoctest
+julia> f = 1 + 2x + 3x^2
+3*x^2 + 2*x + 1
+
+julia> g = similar(f)
+0
+
+julia> h = similar(f, QQ)
+0
+
+julia> k = similar(f, QQ, "y")
+0
+```
+
+## Functions for types and parents of polynomial rings
+
+```julia
+base_ring(R::PolyRing)
+base_ring(a::PolyElem)
+```
+
+Return the coefficient ring of the given polynomial ring or polynomial.
+
+```julia
+parent(a::NCRingElement)
+```
+
+Return the polynomial ring of the given polynomial..
+
+```julia
+characteristic(R::NCRing)
+```
+
+Return the characteristic of the given polynomial ring.
+
+**Examples**
+
+```jldoctest
+julia> R, x = PolynomialRing(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> S, y = PolynomialRing(R, "y")
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> U = base_ring(S)
 Univariate Polynomial Ring in x over Integers
@@ -167,21 +267,38 @@ Univariate Polynomial Ring in x over Integers
 julia> V = base_ring(y + 1)
 Univariate Polynomial Ring in x over Integers
 
-julia> v = var(S)
-:y
-
 julia> T = parent(y + 1)
 Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers
-
-julia> g == deepcopy(g)
-true
-
-julia> t = divexact(2g, 2)
-(x + 1)*y^2 + 2*x + 1
-
 ```
 
+## Euclidean polynomial rings
+
 For polynomials over a field, the Euclidean Ring interface is implemented.
+
+```julia
+mod(f::PolyElem, g::PolyElem)
+divrem(f::PolyElem, g::PolyElem)
+div(f::PolyElem, g::PolyElem)
+```
+
+```julia
+mulmod(f::PolyElem, g::PolyElem, m::PolyElem)
+powermod(f::PolyElem, e::Int, m::PolyElem)
+invmod(f::PolyElem, m::PolyElem)
+```
+
+```julia
+divides(f::PolyElem, g::PolyElem)
+remove(f::PolyElem, p::PolyElem)
+valuation(f::PolyElem, p::PolyElem)
+```
+
+```julia
+gcd(f::PolyElem, g::PolyElem)
+lcm(f::PolyElem, g::PolyElem)
+gcdx(f::PolyElem, g::PolyElem)
+gcdinv(f::PolyElem, g::PolyElem)
+```
 
 **Examples**
 
@@ -219,6 +336,9 @@ julia> h = mod(f, g)
 julia> q, r = divrem(f, g)
 (0, (3*x^2 + x + 2)*y + x^2 + 1)
 
+julia> div(g, f)
+(-5//11*x^2 + 2//11*x + 6//11)*y - 13//121*x^2 - 3//11*x - 78//121
+
 julia> d = gcd(f*h, g*h)
 y + 1//11*x^2 + 6//11
 
@@ -246,20 +366,37 @@ Functions in the Euclidean Ring interface are supported over residue rings that 
 not fields, except that if an impossible inverse is encountered during the computation
 an error is thrown.
 
-## Polynomial functionality provided by AbstractAlgebra.jl
-
-The functionality listed below is automatically provided by AbstractAlgebra.jl for
-any polynomial module that implements the full Univariate Polynomial Ring interface.
-This includes AbstractAlgebra.jl's own generic polynomial rings.
-
-But if a C library provides all the functionality documented in the Univariate
-Polynomial Ring interface, then all the functions described here will also be
-automatically supplied by AbstractAlgebra.jl for that polynomial type.
-
-Of course, modules are free to provide specific implementations of the functions
-described here, that override the generic implementation.
+## Polynomial functions
 
 ### Basic functionality
+
+All basic ring functionality is provided for polynomials. The most important
+such functions are the following.
+
+```julia
+zero(R::PolyRing)
+one(R::PolyRing)
+iszero(a::PolyElem)
+isone(a::PolyElem)
+```
+
+```julia
+divexact(a::T, b::T) where T <: PolyElem
+```
+
+All functions in the polynomial interface are provided. The most important
+are the following.
+
+```julia
+var(S::PolyRing)
+symbols(S::PolyRing{T}) where T <: RingElem
+```
+
+Return a symbol or length 1 array of symbols, respectively, specifying the
+variable of the polynomial ring. This symbol is converted to a string when
+printing polynomials in that ring.
+
+In addition, the following basic functions are provided.
 
 ```@docs
 modulus{T <: ResElem}(::PolyElem{T})
@@ -269,6 +406,10 @@ modulus{T <: ResElem}(::PolyElem{T})
 leading_coefficient(::PolyElem)
 trailing_coefficient(::PolyElem)
 constant_coefficient(::PolynomialElem)
+```
+
+```@docs
+set_coefficient!(::PolynomialElem{T}, ::Int, c::T) where T <: RingElement
 ```
 
 ```@docs
@@ -329,11 +470,21 @@ Residue ring of Integers modulo 17
 julia> V, w = PolynomialRing(U, "w")
 (Univariate Polynomial Ring in w over Residue ring of Integers modulo 17, w)
 
+julia> var(R)
+:x
+
+julia> symbols(R)
+1-element Vector{Symbol}:
+ :x
+
 julia> a = zero(S)
 0
 
 julia> b = one(S)
 1
+
+julia> isone(b)
+true
 
 julia> c = BigInt(1)//2*z^2 + BigInt(1)//3
 1//2*z^2 + 1//3
@@ -349,6 +500,9 @@ y
 
 julia> g = isgen(w)
 true
+
+julia> divexact((2x + 1)*(x + 1), (x + 1))
+2*x + 1
 
 julia> m = isunit(b)
 true
@@ -371,6 +525,30 @@ true
 julia> ismonomial(x*y^2)
 false
 
+julia> S, x = PolynomialRing(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> f = x^3 + 3x + 1
+x^3 + 3*x + 1
+
+julia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0]);
+
+julia> n = length(f)
+4
+
+julia> c = coeff(f, 1)
+3
+
+julia> g = set_length!(g, normalise(g, 7))
+x^3 + 2*x + 1
+
+julia> g = set_coefficient!(g, 2, BigInt(11))
+x^3 + 11*x^2 + 2*x + 1
+
+julia> fit!(g, 8)
+
+julia> g = setcoeff!(g, 7, BigInt(4))
+4*x^7 + x^3 + 11*x^2 + 2*x + 1
 ```
 
 ### Iterators
@@ -391,7 +569,7 @@ julia> f = x^2 + 2
 x^2 + 2
 
 julia> C = collect(coefficients(f))
-3-element Array{BigInt,1}:
+3-element Vector{BigInt}:
  2
  0
  1
@@ -514,7 +692,7 @@ deflate(::PolyElem)
 ### Square root
 
 ```@docs
-Base.sqrt(::PolyElem{T}, ::Bool) where T <: RingElement
+Base.sqrt(::PolyElem{T}; check::Bool) where T <: RingElement
 ```
 
 **Examples**
@@ -756,11 +934,11 @@ x^2 - 34*x + 1
 ### Newton representation
 
 ```@docs
-monomial_to_newton!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})
+monomial_to_newton!{T <: RingElem}(::Vector{T}, ::Vector{T})
 ```
 
 ```@docs
-newton_to_monomial!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})
+newton_to_monomial!{T <: RingElem}(::Vector{T}, ::Vector{T})
 ```
 
 **Examples**
@@ -779,7 +957,7 @@ julia> g = deepcopy(f)
 3*x*y^2 + (x + 1)*y + 3
 
 julia> roots = [R(1), R(2), R(3)]
-3-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
  1
  2
  3
@@ -799,7 +977,7 @@ roots(f::PolyElem, R::Field)
 ### Interpolation
 
 ```@docs
-interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})
+interpolate{T <: RingElem}(::PolyRing, ::Vector{T}, ::Vector{T})
 ```
 
 **Examples**
@@ -812,14 +990,14 @@ julia> S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> xs = [R(1), R(2), R(3), R(4)]
-4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
  1
  2
  3
  4
 
 julia> ys = [R(1), R(4), R(9), R(16)]
-4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:
+4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
  1
  4
  9
@@ -837,7 +1015,7 @@ polynomial_to_power_sums(::PolyElem{T}) where T <: RingElem
 ```
 
 ```@docs
-power_sums_to_polynomial(::Array{T, 1}) where T <: RingElem
+power_sums_to_polynomial(::Vector{T}) where T <: RingElem
 ```
 
 **Examples**
@@ -890,3 +1068,29 @@ julia> g = chebyshev_u(15, y)
 32768*y^15 - 114688*y^13 + 159744*y^11 - 112640*y^9 + 42240*y^7 - 8064*y^5 + 672*y^3 - 16*y
 
 ```
+
+### Random generation
+
+One may generate random polynomials with degrees in a given range. Additional
+parameters are used to construct coefficients as elements of the coefficient
+ring.
+
+```julia
+rand(R::PolyRing, deg_range::UnitRange{Int}, v...)
+rand(R::PolyRing, deg::Int, v...)
+```
+
+**Examples**
+
+```julia
+R, x = PolynomialRing(ZZ, "x")
+f = rand(R, -1:3, -10:10)
+
+S, y = PolynomialRing(GF(7), "y")
+g = rand(S, 2:2)
+
+U, z = PolynomialRing(R, "z")
+h = rand(U, 3:3, -1:2, -10:10)
+```
+
+

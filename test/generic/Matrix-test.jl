@@ -25,7 +25,7 @@ end
 
 # Simulate user matrix type belonging to AbstractArray
 # with getindex but no setindex!
-struct MyTestMatrix{T} <: AbstractArray{T, 2}
+struct MyTestMatrix{T} <: AbstractMatrix{T}
    d::T
    dim::Int
 end
@@ -345,6 +345,9 @@ end
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
    B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
+
+   @test nrows(S) == 3
+   @test ncols(S) == 3
 
    @test dense_matrix_type(R) == elem_type(S)
 
@@ -1076,6 +1079,37 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
       @test A * t == t * A
       @test A * t == S(A.entries .* t)
    end
+end
+
+@testset "Generic.Mat.promotion" begin
+   m = [1 2; 3 4]
+   F = ResidueField(ZZ, 3)
+   R, t = PolynomialRing(F, "t")
+   A = matrix(R, m)
+   B = matrix(F, m)
+
+   @test typeof(A * B) == typeof(A)
+   @test typeof(B * A) == typeof(A)
+   @test A * B == A^2
+   @test B * A == A^2
+   
+   @test typeof(A + B) == typeof(A)
+   @test typeof(B + A) == typeof(A)
+   @test A + B == A + A
+   @test B + A == A + A
+
+   @test typeof(F(2) * A) == typeof(A)
+   @test typeof(A * F(2)) == typeof(A)
+   @test F(2) * A == R(2) * A
+   @test A * F(2) == A * R(2)
+
+   @test typeof(F(2) + A) == typeof(A)
+   @test typeof(A + F(2)) == typeof(A)
+   @test F(2) + A == R(2) + A
+   @test A + F(2) == A + R(2)
+
+   @test one(F) == R[1 0; 0 1]
+   @test R[1 0; 0 1] == one(R)
 end
 
 @testset "Generic.Mat.permutation" begin

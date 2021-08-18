@@ -48,7 +48,7 @@ julia> var(R)
 :x
 
 julia> symbols(R)
-1-element Array{Symbol,1}:
+1-element Vector{Symbol}:
  :x
 
 julia> nvars(R)
@@ -58,7 +58,7 @@ julia> f = x^-2 + 2x
 2*x + x^-2
 
 julia> coeff.(f, -2:2)
-5-element Array{BigInt,1}:
+5-element Vector{BigInt}:
  1
  0
  0

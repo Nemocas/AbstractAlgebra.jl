@@ -428,6 +428,56 @@ end
 
 ###############################################################################
 #
+#   Map coefficients
+#
+###############################################################################
+
+function _make_parent(g, p::LaurentSeriesElem, cached::Bool)
+   R = parent(g(zero(base_ring(p))))
+   S = parent(p)
+   sym = String(var(S))
+   max_prec = max_precision(S)
+   return AbstractAlgebra.LaurentSeriesRing(R, max_prec, sym; cached=cached)[1]
+end
+
+function map_coefficients(g, p::LaurentSeriesElem{<:RingElement};
+                    cached::Bool = true,
+                    parent::Ring = _make_parent(g, p, cached))
+   return _map(g, p, parent)
+end
+
+function _map(g, p::LaurentSeriesElem, Rx)
+   R = base_ring(Rx)
+   new_coefficients = elem_type(R)[let c = polcoeff(p, i)
+                                     iszero(c) ? zero(R) : R(g(c))
+                                   end for i in 0:pol_length(p) - 1]
+   res = Rx(new_coefficients, pol_length(p), precision(p), valuation(p), scale(p), false)
+   res = set_length!(res, normalise(res, pol_length(res)))
+   renormalize!(res)
+   res = rescale!(res)
+   return res
+end
+
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function _change_laurent_series_ring(R, Rx, cached)
+   P, _ = AbstractAlgebra.LaurentSeriesRing(R, max_precision(Rx),
+                                               string(var(Rx)), cached = cached)
+   return P
+end
+
+function change_base_ring(R::Ring, p::LaurentSeriesElem{T};
+                    cached::Bool = true, parent::Ring =
+          _change_laurent_series_ring(R, parent(p), cached)) where T <: RingElement
+   return _map(R, p, parent)
+end
+
+###############################################################################
+#
 #   Unary operators
 #
 ###############################################################################
@@ -802,15 +852,15 @@ Return $a^b$. We require $b \geq 0$.
 """
 function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
    # special case powers of x for constructing power series efficiently
-   if pol_length(a) == 0
+   if b == 0
+      # in fact, the result would be exact 1 if we had exact series
+      z = one(parent(a))
+      return z
+   elseif pol_length(a) == 0
       z = parent(a)()
       z = set_precision!(z, b*valuation(a))
       z = set_valuation!(z, b*valuation(a))
       z = set_scale!(z, 1)
-      return z
-   elseif b == 0
-      # in fact, the result would be exact 1 if we had exact series
-      z = one(parent(a))
       return z
    elseif isgen(a)
       z = parent(a)()
@@ -822,9 +872,10 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
       z = set_length!(z, 1)
       return z
    elseif pol_length(a) == 1
-      z = parent(a)(polcoeff(a, 0)^b)
+      c = polcoeff(a, 0)^b
+      z = parent(a)(c)
       z = set_precision!(z, (b - 1)*valuation(a) + precision(a))
-      z = set_valuation!(z, b*valuation(a))
+      z = set_valuation!(z, iszero(c) ? precision(z) : b*valuation(a))
       z = set_scale!(z, 1)
       return z
    elseif b == 1
@@ -1012,7 +1063,8 @@ end
 #
 ###############################################################################
 
-function divexact(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingElement}
+function divexact(x::LaurentSeriesElem{T},
+           y::LaurentSeriesElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
@@ -1038,8 +1090,7 @@ function divexact(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: 
    lenr = div(precision(res) - valuation(res) + sr - 1, sr)
    leny = div(precision(y) + sr - 1, sr)
    for i = 0:lenr - 1
-      flag, q = divides(polcoeff(x, i), lc)
-      !flag && error("Not an exact division")
+      q = divexact(polcoeff(x, i), lc; check=check)
       res = setcoeff!(res, i, q)
       for j = 0:min(leny - 1, lenr - i - 1)
          x = setcoeff!(x, i + j, polcoeff(x, i + j) - polcoeff(y, j)*q)
@@ -1056,7 +1107,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -1065,12 +1116,12 @@ function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloa
    z = set_valuation!(z, valuation(x))
    z = set_scale!(z, scale(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
    end
    return z
 end
 
-function divexact(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem}
+function divexact(x::LaurentSeriesElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -1079,7 +1130,7 @@ function divexact(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem}
    z = set_valuation!(z, valuation(x))
    z = set_scale!(z, scale(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
    end
    return z
 end
@@ -1129,13 +1180,15 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    sqrt(a::Generic.LaurentSeriesElem)
+    sqrt(a::Generic.LaurentSeriesElem; check::Bool=true)
 
-Return the square root of the power series $a$.
+Return the square root of the power series $a$. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
 """
-function Base.sqrt(a::LaurentSeriesElem)
+function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
    aval = valuation(a)
-   !iseven(aval) && error("Not a square in sqrt")
+   check && !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    aval2 = div(aval, 2)
@@ -1154,7 +1207,7 @@ function Base.sqrt(a::LaurentSeriesElem)
    asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
    if prec > 0
-      g = sqrt(polcoeff(a, 0))
+      g = sqrt(polcoeff(a, 0); check=check)
       asqrt = setcoeff!(asqrt, 0, g)
       g2 = g + g
    end
@@ -1173,7 +1226,7 @@ function Base.sqrt(a::LaurentSeriesElem)
          c = addeq!(c, p)
       end
       c = polcoeff(a, n) - c
-      c = divexact(c, g2)
+      c = divexact(c, g2; check=check)
       asqrt = setcoeff!(asqrt, n, c)
     end
     asqrt = set_scale!(asqrt, s)
@@ -1644,7 +1697,7 @@ function (R::LaurentSeriesField{T})(b::LaurentSeriesElem{T}) where {T <: FieldEl
    return b
 end
 
-function (R::LaurentSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
+function (R::LaurentSeriesRing{T})(b::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
@@ -1656,7 +1709,7 @@ function (R::LaurentSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int
    return z
 end
 
-function (R::LaurentSeriesField{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
+function (R::LaurentSeriesField{T})(b::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end

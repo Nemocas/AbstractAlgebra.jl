@@ -20,7 +20,7 @@
 
       @test typeof(S) <: Generic.MPolyRing
 
-      isa(symbols(S), Array{Symbol, 1})
+      isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
          @test isa(varlist[j], MPolyElem)
@@ -412,7 +412,7 @@ end
    for nvars = 1:10
       var_names = ["x$j" for j in 1:nvars]
       for nterms = 1:10
-         exps = Array{Int,2}(round.(rand(nvars, nterms) .* max))
+         exps = Matrix{Int}(round.(rand(nvars, nterms) .* max))
          degrees = []
          for nord = 1:20
             ord = rand_ordering()
@@ -624,7 +624,7 @@ end
 
             @test q^2 == f^2
 
-            q = sqrt(f^2, false)
+            q = sqrt(f^2; check=false)
 
             @test q^2 == f^2
 
@@ -945,7 +945,7 @@ end
          eval_num = rand(0:num_vars)
          V = Int[] # random list of variable indices
          Vflag = [false for i in 1:num_vars] # whether each variable is in V
-         Vval = Array{elem_type(R), 1}(undef, 0) # value substituted for variables in V
+         Vval = Vector{elem_type(R)}(undef, 0) # value substituted for variables in V
          Vals = [R(0) for i in 1:num_vars] # value subst. for each variable of pol
 
          for i = 1:eval_num
@@ -961,7 +961,7 @@ end
          end
 
          W = Int[] # remaining variables
-         Wval = Array{elem_type(R), 1}(undef, 0) # values for those variables
+         Wval = Vector{elem_type(R)}(undef, 0) # values for those variables
 
          for v = 1:num_vars
             if !Vflag[v] # no value for this var yet

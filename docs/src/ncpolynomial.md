@@ -33,12 +33,14 @@ and the polynomial ring types belong to the abstract type
 `NCPolyRing{T}`. This enables one to write generic functions that can
 accept any AbstractAlgebra polynomial type.
 
-Note that both the generic polynomial ring type `Generic.NCPolyRing{T}` and the abstract
-type it belongs to, `NCPolyRing{T}` are both called `NCPolyRing`. The 
-former is a (parameterised) concrete type for a polynomial ring over a given base ring
-whose elements have type `T`. The latter is an abstract type representing all
-polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
-supplied by a C library).
+!!! note
+
+    Note that both the generic polynomial ring type `Generic.NCPolyRing{T}` and the abstract
+    type it belongs to, `NCPolyRing{T}` are both called `NCPolyRing`. The 
+    former is a (parameterised) concrete type for a polynomial ring over a given base ring
+    whose elements have type `T`. The latter is an abstract type representing all
+    polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
+    supplied by a C library).
 
 ## Polynomial ring constructors
 

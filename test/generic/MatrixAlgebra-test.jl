@@ -70,6 +70,9 @@ end
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
    B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
 
+   @test nrows(S) == 3
+   @test ncols(S) == 3
+
    @test isexact_type(typeof(A))
 
    @test iszero(zero(S))
@@ -172,6 +175,37 @@ end
    @test BigInt(3)*A == A*BigInt(3)
    @test Rational{BigInt}(3)*A == A*Rational{BigInt}(3)
    @test (t - 1)*A == A*(t - 1)
+end
+
+@testset "Generic.MatAlg.promotion" begin
+   m = [1 2; 3 4]
+   F = ResidueField(ZZ, 3)
+   R, t = PolynomialRing(F, "t")
+   A = MatrixAlgebra(R, 2)(m)
+   B = MatrixAlgebra(F, 2)(m)
+
+   @test typeof(A * B) == typeof(A)
+   @test typeof(B * A) == typeof(A)
+   @test A * B == A^2
+   @test B * A == A^2
+   
+   @test typeof(A + B) == typeof(A)
+   @test typeof(B + A) == typeof(A)
+   @test A + B == A + A
+   @test B + A == A + A
+
+   @test typeof(F(2) * A) == typeof(A)
+   @test typeof(A * F(2)) == typeof(A)
+   @test F(2) * A == R(2) * A
+   @test A * F(2) == A * R(2)
+
+   @test typeof(F(2) + A) == typeof(A)
+   @test typeof(A + F(2)) == typeof(A)
+   @test F(2) + A == R(2) + A
+   @test A + F(2) == A + R(2)
+
+   @test one(F) == R[1 0; 0 1]
+   @test R[1 0; 0 1] == one(R)
 end
 
 @testset "Generic.MatAlg.permutation" begin

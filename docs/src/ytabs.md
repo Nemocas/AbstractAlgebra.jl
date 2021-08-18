@@ -86,7 +86,7 @@ is a standard Young tableau of $4_1 3_2 1$ where the bijection assigns consecuti
 
 ### Constructors
 
-In AbstractAlgebra.jl Young tableau are implemented as essentially row-major sparse matrices, i.e. `YoungTableau <: AbstractArray{Int,2}` but only the defining `Partition` and the (row-major) fill-vector is stored.
+In AbstractAlgebra.jl Young tableau are implemented as essentially row-major sparse matrices, i.e. `YoungTableau <: AbstractMatrix{Int}` but only the defining `Partition` and the (row-major) fill-vector is stored.
 
 ```@docs
 Generic.YoungTableau

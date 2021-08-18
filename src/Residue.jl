@@ -81,7 +81,7 @@ one(R::ResRing) = R(1)
 
 iszero(a::ResElem) = iszero(data(a))
 
-isone(a::ResElem) = isone(data(a))
+isone(a::ResElem) = isone(data(a)) || a == one(parent(a))
 
 function isunit(a::ResElem)
    g = gcd(data(a), modulus(a))
@@ -319,12 +319,10 @@ end
 #
 ###############################################################################
 
-function divexact(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
+function divexact(a::ResElem{T}, b::ResElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(a, b)
    fl, q = divides(a, b)
-   if !fl
-      error("Impossible inverse in divexact")
-   end
+   check && !fl && error("Impossible inverse in divexact")
    return q
 end
 

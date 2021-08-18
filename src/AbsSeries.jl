@@ -91,12 +91,19 @@ end
 ###############################################################################
 
 function similar(x::AbsSeriesElem, R::Ring, max_prec::Int,
-                                 var::Symbol=var(parent(x)); cached::Bool=true)
+                                   s::Symbol=var(parent(x)); cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.AbsSeries{TT}(V, 0, max_prec)
    # Default similar is supposed to return a Generic series
-   p.parent = Generic.AbsSeriesRing{TT}(R, max_prec, var, cached)
+   if base_ring(x) === R && s == var(parent(x)) &&
+            typeof(x) === Generic.AbsSeries{TT} &&
+            max_precision(parent(x)) == max_prec
+      # steal parent in case it is not cached
+      p.parent = parent(x)
+   else
+      p.parent = Generic.AbsSeriesRing{TT}(R, max_prec, s, cached)
+   end
    return p
 end
 
@@ -631,18 +638,17 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 #
 ###############################################################################
 
-function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingElement
+function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}; check::Bool=true) where T <: RingElement
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
    if v2 != 0
       v1 = valuation(x)
-      if v1 >= v2
-         x = shift_right(x, v2)
-         y = shift_right(y, v2)
-      else
+      if check && v1 < v2
          error("Not an exact division")
       end
+      x = shift_right(x, v2)
+      y = shift_right(y, v2)
    else
       x = deepcopy(x)
    end
@@ -650,11 +656,10 @@ function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingEleme
    res = parent(x)()
    res = set_precision!(res, min(precision(x), precision(y) + valuation(x)))
    lc = coeff(y, 0)
-   iszero(lc) && error("Not an exact division")
+   check && iszero(lc) && error("Not an exact division")
    lenr = precision(x)
    for i = valuation(x):lenr - 1
-      flag, q = divides(coeff(x, i), lc)
-      !flag && error("Not an exact division")
+      q = divexact(coeff(x, i), lc; check=check)
       res = setcoeff!(res, i, q)
       for j = 0:min(precision(y) - 1, lenr - i - 1)
          x = setcoeff!(x, i + j, coeff(x, i + j) - coeff(y, j)*q)
@@ -664,32 +669,50 @@ function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingEleme
    return res
 end
 
+function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}; check::Bool=true) where T <: FieldElement
+   check_parent(x, y)
+   iszero(y) && throw(DivideError())
+   v2 = valuation(y)
+   if v2 != 0
+      v1 = valuation(x)
+      if check && v1 < v2
+         error("Not an exact division")
+      end
+      x = shift_right(x, v2)
+      y = shift_right(y, v2)
+   else
+      x = deepcopy(x)
+   end
+   y = truncate(y, precision(x))
+   return x*inv(y)
+end
+
 ###############################################################################
 #
 #   Ad hoc exact division
 #
 ###############################################################################
 
-function divexact(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
    z = set_precision!(z, precision(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y; check=check))
    end
    return z
 end
 
-function divexact(x::AbsSeriesElem{T}, y::T) where {T <: RingElem}
+function divexact(x::AbsSeriesElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
    z = set_precision!(z, precision(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y; check=check))
    end
    return z
 end
@@ -761,16 +784,49 @@ end
 
 ###############################################################################
 #
+#   Composition
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    compose(a::AbsSeriesElem, b::AbsSeriesElem)
+
+Compose the series $a$ with the series $b$ and return the result,
+i.e. return $a\circ b$. The two series do not need to be in the same ring,
+however the series $b$ must have positive valuation or an exception is raised.
+"""
+function compose(a::AbsSeriesElem, b::AbsSeriesElem)
+   valuation(b) == 0 && error("Series being substituted must have positive valuation")
+   i = length(a)
+   R = base_ring(a)
+   S = parent(b)
+   if i == 0
+      return zero(R) + zero(S)
+   end
+   z = coeff(a, i - 1) * one(S)
+   while i > 1
+      i -= 1
+      z = z*b + coeff(a, i - 1)
+   end
+   z = set_precision!(z, min(precision(z), valuation(b)*precision(a)))
+   z = set_length!(z, min(pol_length(z), precision(z)))
+   return z
+end
+
+###############################################################################
+#
 #   Square root
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    sqrt(a::AbsSeriesElem)
+    sqrt(a::AbsSeriesElem; check::Bool=true)
 
-Return the square root of the power series $a$.
+Return the square root of the power series $a$. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
 """
-function Base.sqrt(a::AbsSeriesElem)
+function Base.sqrt(a::AbsSeriesElem; check::Bool=true)
    # Given a power series f = f0 + f1*x + f2*x^2 + ..., compute the square root
    # g = g0 + g1*x + g2*x^2 + ... using the relations g0^2 = f0, 2g0*g1 = f1
    # 2g0*g2 = f2 - g1^2, 2g0*g3 = f3 - 2g1*g2, 2g0*g4 = f4 - (2g1*g3 + g2^2), etc.
@@ -792,7 +848,7 @@ function Base.sqrt(a::AbsSeriesElem)
       asqrt = setcoeff!(asqrt, n - 1, R())
    end
    if prec > aval2
-      g = sqrt(coeff(a, aval))
+      g = sqrt(coeff(a, aval); check=check)
       asqrt = setcoeff!(asqrt, aval2, g)
       g2 = g + g
    end
@@ -811,7 +867,7 @@ function Base.sqrt(a::AbsSeriesElem)
          c = addeq!(c, p)
       end
       c = coeff(a, n + aval) - c
-      c = divexact(c, g2)
+      c = divexact(c, g2; check=check)
       asqrt = setcoeff!(asqrt, aval2 + n, c)
    end
    asqrt = set_length!(asqrt, normalise(asqrt, prec))

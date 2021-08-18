@@ -116,28 +116,6 @@ finish(M::MPolyBuildCtx)
 Finish construction of the polynomial, sort the terms, remove duplicate and
 zero terms and return the created polynomial.
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> C = MPolyBuildCtx(R)
-Builder for a polynomial in Multivariate Polynomial Ring in x, y over Integers
-
-julia> push_term!(C, ZZ(3), [1, 2])
-Builder for a polynomial in Multivariate Polynomial Ring in x, y over Integers
-
-julia> finish(C)
-3*x*y^2
-
-julia> push_term!(C, ZZ(2), [1, 1]); finish(C)
-3*x*y^2 + 2*x*y
-
-julia> push_term!(C, ZZ(4), [0, 0]); finish(C)
-3*x*y^2 + 2*x*y + 4
-```
-
 ### Data type and parent object methods
 
 ```julia
@@ -177,27 +155,6 @@ ordering(S::MyMPolyRing{T})
 
 Return the ordering of the given polynomial ring as a symbol. Supported values currently
 include `:lex`, `:deglex` and `:degrevlex`.
-
-**Examples**
-
-```jldoctest
-julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
-(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
-
-julia> V = symbols(S)
-2-element Array{Symbol,1}:
- :x
- :y
-
-julia> X = gens(S)
-2-element Array{AbstractAlgebra.Generic.MPoly{Rational{BigInt}},1}:
- x
- y
-
-julia> ord = ordering(S)
-:deglex
-
-```
 
 ### Basic manipulation of rings and elements
 
@@ -269,53 +226,6 @@ variable, in the order given when the polynomial ring was created.
 Generic code will provide this function automatically for random access
 polynomials that implement the `exponent_vector` function.
 
-**Examples**
-
-```jldoctest
-julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> f = x^3*y + 3x*y^2 + 1
-x^3*y + 3*x*y^2 + 1
-
-julia> n = length(f)
-3
-
-julia> isgen(y)
-true
-
-julia> nvars(S) == 2
-true
-
-julia> C = collect(coefficients(f))
-3-element Array{BigInt,1}:
- 1
- 3
- 1
-
-julia> M = collect(monomials(f))
-3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
- x^3*y
- x*y^2
- 1
-
-julia> T = collect(terms(f))
-3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
- x^3*y
- 3*x*y^2
- 1
-
-julia> V = collect(exponent_vectors(f))
-3-element Array{Array{Int64,1},1}:
- [3, 1]
- [1, 2]
- [0, 0]
-
-julia> d = total_degree(f)
-4
-
-```
-
 ### Exact division
 
 For any ring that implements exact division, the following can be implemented.
@@ -346,32 +256,6 @@ valuation(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 
 Return $v$ such that the highest power of $g$ that divides $f$ is $g^v$.
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> f = 2x^2*y + 2x + y + 1
-2*x^2*y + 2*x + y + 1
-
-julia> g = x^2*y^2 + 1
-x^2*y^2 + 1
-
-julia> flag, q = divides(f*g, f)
-(true, x^2*y^2 + 1)
-
-julia> d = divexact(f*g, f)
-x^2*y^2 + 1
-
-julia> v, q = remove(f*g^3, g)
-(3, 2*x^2*y + 2*x + y + 1)
-
-julia> n = valuation(f*g^3, g)
-3
-
-```
-
 ### Ad hoc exact division
 
 For any ring that implements exact division, the following can be implemented.
@@ -383,23 +267,6 @@ divexact(f::MyMPoly{T}, c::T) where T <: RingElem
 ```
 
 Divide the polynomial exactly by the constant $c$.
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
-
-julia> f = 3x^2*y^2 + 2x + 1
-3*x^2*y^2 + 2*x + 1
-
-julia> f1 = divexact(f, 5)
-3//5*x^2*y^2 + 2//5*x + 1//5
-
-julia> f2 = divexact(f, QQ(2, 3))
-9//2*x^2*y^2 + 3*x + 3//2
-
-```
 
 ### Euclidean division
 
@@ -426,26 +293,6 @@ div(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 As per the `divrem` function, but returning the quotient only. Especially when the
 quotient happens to be exact, this function can be exceedingly fast.
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
-
-julia> f = 2x^2*y + 2x + y + 1
-2*x^2*y + 2*x + y + 1
-
-julia> g = x + y
-x + y
-
-julia> q = div(f, g)
-2*x*y - 2*y^2 + 2
-
-julia> q, r = divrem(f, g)
-(2*x*y - 2*y^2 + 2, 2*y^3 - y + 1)
-
-```
-
 ### GCD
 
 In cases where there is a meaningful Euclidean structure on the coefficient ring, it is
@@ -457,30 +304,13 @@ gcd(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 
 Return a greatest common divisor of $f$ and $g$.
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> f = 2x^2*y + 2x + y + 1
-2*x^2*y + 2*x + y + 1
-
-julia> g = x^2*y^2 + 1
-x^2*y^2 + 1
-
-julia> d = gcd(f*g^2, f^2*g)
-2*x^4*y^3 + 2*x^3*y^2 + x^2*y^3 + x^2*y^2 + 2*x^2*y + 2*x + y + 1
-
-```
-
 ### Square root
 
 Over rings for which an exact square root is available, it is possible to take
 the square root of a polynomial or test whether it is a square.
 
 ```julia
-sqrt(f::MyMPoly{T}, check::bool=true) where T <: RingElem
+sqrt(f::MyMPoly{T}, check::Bool=true) where T <: RingElem
 ```
 
 Return the square root of the polynomial $f$ and raise an exception if it is
@@ -493,22 +323,6 @@ issquare(::MyMPoly{T}) where T <: RingElem
 ```
 
 Return `true` if $f$ is a square.
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> f = -4*x^5*y^4 + 5*x^5*y^3 + 4*x^4 - x^3*y^4
--4*x^5*y^4 + 5*x^5*y^3 + 4*x^4 - x^3*y^4
-
-julia> sqrt(f^2)
-4*x^5*y^4 - 5*x^5*y^3 - 4*x^4 + x^3*y^4
-
-julia> issquare(f)
-false
-```
 
 ## Interface for sparse distributed, random access multivariates
 
@@ -540,17 +354,6 @@ to the ordering. All exponents must be non-negative.
 
 A library may also optionally provide an interface that makes use of `BigInt`
 (or any other big integer type) for exponents instead of `Int`.
-
-**Examples**
-
-```jldoctest
-julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
-
-julia> f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
-2*x^3*y^2 + 3*x + y
-
-```
 
 ### Sparse distributed, random access basic manipulation
 
@@ -590,7 +393,7 @@ monomial is most significant with respect to the ordering.
 exponent(f::MyMPoly{T}, i::Int, j::Int) where T <: RingElem
 ```
 
-Return the exponent of the $j$-th variable in the $n$-th term of the polynomial
+Return the exponent of the $j$-th variable in the $i$-th term of the polynomial
 $f$. The first term is the one with whose monomial is most significant with
 respect to the ordering.
 
@@ -613,40 +416,6 @@ function takes $O(\log n)$ operations if a term with the given exponent already
 exists and $c \neq 0$, or if the term is inserted at the end of the polynomial.
 Otherwise it can take $O(n)$ operations in the worst case. This function must
 return the modified polynomial.
-
-**Examples**
-
-```jldoctest
-julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> f = x^3*y + 3x*y^2 + 1
-x^3*y + 3*x*y^2 + 1
-
-julia> c1 = coeff(f, 1)
-1
-
-julia> c2 = coeff(f, x^3*y)
-1
-
-julia> m = monomial(f, 2)
-x*y^2
-
-julia> e1 = exponent(f, 1, 1)
-3
-
-julia> v1 = exponent_vector(f, 1)
-2-element Array{Int64,1}:
- 3
- 1
-
-julia> t1 = term(f, 1)
-x^3*y
-
-julia> setcoeff!(f, [3, 1], 12)
-12*x^3*y + 3*x*y^2 + 1
-
-```
 
 ### Unsafe functions
 
@@ -714,7 +483,7 @@ polynomial types.
 ### Reduction by an ideal
 
 ```julia
-divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T <: RingElem
+divrem(f::MyMPoly{T}, G::Vector{MyMPoly{T}}) where T <: RingElem
 ```
 
 As per the `divrem` function above, except that each term of $r$ starting with the
@@ -728,26 +497,6 @@ The result is again dependent on the ordering in general, but if the polynomials
 are over a field and the reduced generators of a Groebner basis, then the result is
 unique.
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
-
-julia> f = 2x^2*y + 2x + y + 1
-2*x^2*y + 2*x + y + 1
-
-julia> g = x + y
-x + y
-
-julia> h = y + 1
-y + 1
-
-julia> Q, r = divrem(f, [g, h])
-(AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[2*x*y - 2*y^2 + 2, 2*y^2 - 2*y + 1], 0)
-
-```
-
 ### Evaluation
 
 ```julia
@@ -758,8 +507,7 @@ Evaluate the polynomial at the given values in the coefficient ring of the
 polynomial. The result should be an element of the coefficient ring.
 
 ```julia
-evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: RingElem, U <: Intege
-r}
+evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: RingElem, U <: Integer}
 ```
 
 Evaluate the polynomial $f$ at the values specified by the entries of the array $A$.
@@ -781,59 +529,12 @@ The evaluation should succeed for any set of values for which a
 multiplication is defined with the product of a coefficient and all the
 values before it.
 
-Note that the values may be in non-commutative rings. Products are
-performed in the order of the variables in the polynomial ring that the
-polynomial belongs to, preceded by a multiplication by the coefficient
-on the left.
+!!! note
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> S = MatrixAlgebra(ZZ, 2)
-Matrix Algebra of degree 2 over Integers
-
-julia> f = x*y + x + y + 1
-x*y + x + y + 1
-
-julia> evaluate(f, [ZZ(1), ZZ(2)])
-6
-
-julia> evaluate(f, [2, 3])
-12
-
-julia> f(1, 2)
-6
-
-julia> f(ZZ(1), ZZ(2))
-6
-
-julia> f(x - y, x + y)
-x^2 + 2*x - y^2 + 1
-
-julia> M1 = S([1 2; 3 4])
-[1   2]
-[3   4]
-
-julia> M2 = S([2 4; 1 -1])
-[2    4]
-[1   -1]
-
-julia> M3 = S([1 -1; 1 1])
-[1   -1]
-[1    1]
-
-julia> f(M1, M2)
-[ 8    8]
-[14   12]
-
-julia> f(M1, ZZ(2))
-[6    6]
-[9   15]
-
-```
+    The values at which a polynomial is evaluated may be in non-commutative
+    rings. Products are performed in the order of the variables in the
+    polynomial ring that the polynomial belongs to, preceded by a
+    multiplication by the coefficient on the left.
 
 ### Derivations
 
@@ -847,19 +548,3 @@ derivative(f::MyMPoly{T}, j::Int) where T <: RingElem
 Compute the derivative of $f$ with respect to the $j$-th variable of the
 polynomial ring.
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> f = x*y + x + y + 1
-x*y + x + y + 1
-
-julia> derivative(f, 1)
-y + 1
-
-julia> derivative(f, 2)
-x + 1
-
-```

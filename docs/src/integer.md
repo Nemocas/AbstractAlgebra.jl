@@ -137,6 +137,25 @@ true
 
 ```
 
+### Divisibility testing
+
+```@docs
+isdivisible_by(a::BigInt, b::BigInt)
+```
+
+** Examples **
+
+```jldoctest
+julia> r = ZZ(6)
+6
+
+julia> s = ZZ(3)
+3
+
+julia> isdivisible_by(r, s)
+true
+```
+
 ### Square root
 
 ```@docs
@@ -145,6 +164,17 @@ AbstractAlgebra.sqrt(a::BigInt)
 
 ```@docs
 issquare(a::BigInt)
+issquare_with_sqrt(a::BigInt)
+```
+
+```@docs
+root(a::BigInt)
+iroot(a::BigInt)
+```
+
+```@docs
+ispower(a::BigInt)
+ispower_with_root(a::BigInt)
 ```
 
 ```@docs

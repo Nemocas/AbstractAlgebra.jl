@@ -21,7 +21,8 @@ import GroupsCore: gens, ngens, order, mul!
 import_exclude = [:import_exclude, :QQ, :ZZ,
                   :RealField, :NumberField,
                   :AbstractAlgebra,
-                  :exp, :sqrt, :div, :divrem, :numerator, :denominator,
+                  :inv, :log, :exp, :sqrt, :div, :divrem,
+                  :numerator, :denominator,
                   :promote_rule,
                   :Set, :Module, :Ring, :Group, :Field]
 
@@ -56,7 +57,7 @@ import LinearAlgebra: lu, lu!, tr
 ################################################################################
 
 # This is the list of functions for which we locally have a different behavior.
-const Base_import_exclude = [:exp, :log, :sqrt, :div, :divrem, :numerator,
+const Base_import_exclude = [:exp, :log, :sqrt, :inv, :div, :divrem, :numerator,
 		             :denominator]
 
 ################################################################################
@@ -73,8 +74,8 @@ function log(a::T) where T
    return Base.log(a)
 end
 
-function sqrt(a::T) where T
-  return Base.sqrt(a)
+function sqrt(a::T; check::Bool=true) where T
+  return Base.sqrt(a; check=check)
 end
 
 function divrem(a::T, b::T) where T
@@ -442,7 +443,7 @@ import .Generic: abs_series, abs_series_type,
                  isone, isreverse, isrimhook, issubmodule,
                  isunit,
                  laurent_ring, lcm, leading_coefficient, leading_monomial,
-		 leading_term, length,
+                 leading_term, length,
                  leglength, main_variable,
                  main_variable_extract, main_variable_insert,
                  map1, map2, map_from_func,
@@ -454,25 +455,25 @@ import .Generic: abs_series, abs_series_type,
                  monomial_iszero, monomial_set!,
                  MPolyBuildCtx, mullow_karatsuba,
                  ngens, norm, normalise,
-		 num_coeff, one,
+                 num_coeff, one,
                  order, ordering, parity, partitionseq, Perm, perm,
                  permtype, @perm_str, polcoeff, poly, poly_ring,
                  precision, preimage, preimage_map,
-		 prime, push_term!,
+                 prime, push_term!,
                  rand_ordering, reduce!,
                  rels, rel_series, rel_series_type,
-		 rescale!, retraction_map, reverse,
+                 rescale!, retraction_map, reverse,
                  right_kernel, rowlength, section_map, setcoeff!,
                  set_exponent_vector!, set_limit!,
                  setpermstyle, size,
                  sort_terms!, summands,
                  supermodule, term, terms, total_degree,
                  to_univariate, trailing_coefficient,
-		 truncate, upscale, var_index,
+                 truncate, upscale, var_index,
                  zero,
        # Moved from Hecke into Misc
-		 Loc, Localization, LocElem,
-		 roots, sturm_sequence
+                 Loc, Localization, LocElem,
+                 roots, sturm_sequence
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export abs_series, abs_series_type,
@@ -502,7 +503,7 @@ export abs_series, abs_series_type,
                  issubmodule, issymmetric,
                  isterm_recursive, isunit, iszero,
                  lcm, leading_coefficient, leading_monomial, leading_term,
-		 length,
+                 length,
                  main_variable, main_variable_extract, main_variable_insert,
                  mat, matrix_repr, max_fields, mod,
                  monomial, monomial!, monomials,
@@ -511,18 +512,18 @@ export abs_series, abs_series_type,
                  mul_ks, mul_red!, mullow_karatsuba, mulmod,
                  needs_parentheses, newton_to_monomial!, ngens,
                  normalise, nullspace, num_coeff,
-		 one, order, ordering,
+                 one, order, ordering,
                  parent_type, parity, partitionseq, Perm, perm, permtype,
                  @perm_str, polcoeff, polynomial, poly,
-		 poly_ring, pow_multinomial,
+                 poly_ring, pow_multinomial,
                  ppio, precision, preimage, prime,
-		 push_term!, rank,
+                 push_term!, rank,
                  rand_ordering, reduce!,
                  renormalize!, rel_series, rel_series_type, rels,
-		 resultant, resultant_ducos,
+                 resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, reverse, rowlength,
-		 setcoeff!, set_exponent_vector!,
+                 setcoeff!, set_exponent_vector!,
                  setpermstyle,
                  size, sort_terms!, subst, summands, supermodule,
                  sylvester_matrix, term, terms, to_univariate,
@@ -531,8 +532,8 @@ export abs_series, abs_series_type,
                  MatrixElem, PolynomialElem,
        # Moved from Hecke into Misc
                  divexact_low, divhigh,
-		 ismonic, Loc, Localization, LocElem, mulhigh_n,
-		 PolyCoeffs, roots, sturm_sequence
+                 ismonic, Loc, Localization, LocElem, mulhigh_n,
+                 PolyCoeffs, roots, sturm_sequence
 
 # TODO remove these two once removed from dependent packages (Hecke)
 export displayed_with_minus_in_front, show_minus_one
@@ -547,7 +548,7 @@ function SkewDiagram(lambda::Generic.Partition, mu::Generic.Partition)
   Generic.SkewDiagram(lambda, mu)
 end
 
-function YoungTableau(part::Generic.Partition, tab::Array{Int, 2})
+function YoungTableau(part::Generic.Partition, tab::Matrix{Int})
    Generic.YoungTableau(part, tab)
 end
 
@@ -708,7 +709,7 @@ end
 #
 ###############################################################################
 
-function sig_exists(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1}) where {U, V, W, X}
+function sig_exists(T::Type{Tuple{U, V, W}}, sig_table::Vector{X}) where {U, V, W, X}
    for s in sig_table
       if s === T
          return true

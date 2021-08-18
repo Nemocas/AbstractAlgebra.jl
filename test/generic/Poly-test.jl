@@ -297,6 +297,20 @@ end
 
    @test constant_coefficient(y^2 + 2x) == 2x
 
+   g = 3x*y + x + 1
+
+   @test set_coefficient!(g, 0, 2x + 2) == 3x*y + 2x + 2
+   @test set_coefficient!(g, 2, 2) == 2y^2 + 3x*y + 2x + 2
+   @test set_coefficient!(g, 2, 0) == 3x*y + 2x + 2
+   @test length(g) == 2
+
+   gz = 3x^2 + 2x + 1
+
+   @test set_coefficient!(gz, 2, ZZ(0)) == 2x + 1
+   @test set_coefficient!(gz, 4, 6) == 6x^4 + 2x + 1
+   @test set_coefficient!(gz, 6, 0) == 6x^4 + 2x + 1
+   @test length(gz) == 5
+
    @test tail(2x*y + 2x + y + 1) == 2x + 1
    @test tail(R(3)) == 0
    @test tail(3x*y) == 0
@@ -1272,7 +1286,7 @@ end
       @test divexact(f*g, g) == f
    end
 
-   @test_throws ArgumentError divexact(x^2, x - 1)
+   @test_throws ArgumentError divexact(x^2, x - 1; check=true)
 
    # Fake finite field of char 7, degree 2
    S, y = PolynomialRing(GF(7), "y")
@@ -2754,7 +2768,7 @@ end
 
       @test q^2 == f^2
 
-      q = sqrt(f^2, false)
+      q = sqrt(f^2; check=false)
 
       @test q^2 == f^2
 
@@ -2776,7 +2790,7 @@ end
 
       @test q^2 == f^2
 
-      q = sqrt(f^2, false)
+      q = sqrt(f^2; check=false)
 
       @test q^2 == f^2
 
@@ -2802,7 +2816,7 @@ end
 
          @test q^2 == f^2
 
-         q = sqrt(f^2, false)
+         q = sqrt(f^2; check=false)
 
          @test q^2 == f^2
 

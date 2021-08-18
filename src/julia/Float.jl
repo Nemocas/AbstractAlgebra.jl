@@ -66,29 +66,29 @@ end
 #
 ###############################################################################
 
-divexact(a::T, b::T) where T <: AbstractFloat = a/b
+divexact(a::T, b::T; check::Bool=true) where T <: AbstractFloat = a/b
 
-divexact(a::AbstractFloat, b::Union{Signed, Unsigned}) = a/b
+divexact(a::AbstractFloat, b::Union{Signed, Unsigned}; check::Bool=true) = a/b
 
-divexact(a::BigFloat, b::BigInt) = a/b
+divexact(a::BigFloat, b::BigInt; check::Bool=true) = a/b
 
-divexact(a::Union{Signed, Unsigned}, b::AbstractFloat) = a/b
+divexact(a::Union{Signed, Unsigned}, b::AbstractFloat; check::Bool=true) = a/b
 
-divexact(a::BigInt, b::BigFloat) = a/b
+divexact(a::BigInt, b::BigFloat; check::Bool=true) = a/b
 
-divexact(a::AbstractFloat, b::Rational{T}) where T <: Union{Signed, Unsigned} = a/b
+divexact(a::AbstractFloat, b::Rational{T}; check::Bool=true) where T <: Union{Signed, Unsigned} = a/b
 
-divexact(a::BigFloat, b::Rational{BigInt}) = a/b
+divexact(a::BigFloat, b::Rational{BigInt}; check::Bool=true) = a/b
 
-divexact(a::Rational{T}, b::AbstractFloat) where T <: Union{Signed, Unsigned} = a/b
+divexact(a::Rational{T}, b::AbstractFloat; check::Bool=true) where T <: Union{Signed, Unsigned} = a/b
 
-divexact(a::Rational{BigInt}, b::BigFloat) = a/b
+divexact(a::Rational{BigInt}, b::BigFloat; check::Bool=true) = a/b
 
 function divides(a::BigFloat, b::BigFloat)
    if b == 0
       return false, BigFloat(0)
    else
-      return true, divexact(a, b)
+      return true, divexact(a, b; check=false)
    end
 end
 
@@ -108,6 +108,16 @@ function gcd(a::T, b::T) where T <: AbstractFloat
    else
       return T(1)
    end
+end
+
+###############################################################################
+#
+#   Square root
+#
+###############################################################################
+
+function Base.sqrt(a::AbstractFloat; check::Bool=true)
+   return Base.sqrt(a)
 end
 
 ###############################################################################
@@ -216,7 +226,7 @@ function (a::Floats{T})(b::AbstractFloat) where T <: AbstractFloat
    return T(b)
 end
 
-function (a::Floats{T})(b::Union{Signed, Unsigned}) where T <: AbstractFloat
+function (a::Floats{T})(b::Integer) where T <: AbstractFloat
    return T(b)
 end
 

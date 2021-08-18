@@ -149,7 +149,7 @@ end
    @test modulus(T) == 7
 end
 
-@testset "Generic.AbsSeries.similar" begin
+@testset "Generic.RelSeries.similar" begin
    R, x = PowerSeriesRing(ZZ, 10, "x")
 
    for iters = 1:10
@@ -167,8 +167,8 @@ end
       @test isa(m, RelSeriesElem)
       @test isa(n, RelSeriesElem)
 
-      @test base_ring(g) == QQ
-      @test base_ring(m) == QQ
+      @test base_ring(g) === QQ
+      @test base_ring(m) === QQ
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -179,11 +179,11 @@ end
       @test iszero(m)
       @test iszero(n)
 
-      @test parent(g) != parent(f)
-      @test parent(h) != parent(f)
-      @test parent(k) == parent(f)
-      @test parent(m) != parent(f)
-      @test parent(n) != parent(f)
+      @test parent(g) !== parent(f)
+      @test parent(h) !== parent(f)
+      @test parent(k) === parent(f)
+      @test parent(m) !== parent(f)
+      @test parent(n) !== parent(f)
 
       p = similar(f, cached=false)
       q = similar(f, "z", cached=false)
@@ -191,9 +191,9 @@ end
       s = similar(f)
       t = similar(f)
 
-      @test parent(p) != parent(f)
-      @test parent(q) != parent(r)
-      @test parent(s) == parent(t)
+      @test parent(p) === parent(f)
+      @test parent(q) !== parent(r)
+      @test parent(s) === parent(t)
    end
 end
 
@@ -201,7 +201,7 @@ end
    f = rel_series(ZZ, [1, 2, 3], 3, 5, 2, "y")
 
    @test isa(f, RelSeriesElem)
-   @test base_ring(f) == ZZ
+   @test base_ring(f) === ZZ
    @test coeff(f, 2) == 1
    @test coeff(f, 4) == 3
    @test parent(f).S == :y
@@ -209,7 +209,7 @@ end
    g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
 
    @test isa(g, RelSeriesElem)
-   @test base_ring(g) == ZZ
+   @test base_ring(g) === ZZ
    @test coeff(g, 4) == 1
    @test coeff(g, 6) == 3
    @test parent(g).S == :x
@@ -218,8 +218,8 @@ end
    k = rel_series(ZZ, [1, 2, 3], 1, 6, 0, cached=false)
    m = rel_series(ZZ, [1, 2, 3], 3, 9, 5, cached=false)
 
-   @test parent(h) == parent(g)
-   @test parent(k) != parent(m)
+   @test parent(h) === parent(g)
+   @test parent(k) !== parent(m)
 
    p = rel_series(ZZ, BigInt[], 0, 3, 1)
    q = rel_series(ZZ, [], 0, 3, 2)
@@ -625,6 +625,14 @@ end
    f = rand(R, 0:12, 0:rand(1:25))
    @test_throws DomainError f^-1
    @test_throws DomainError f^-rand(2:100)
+
+   # regression test (see #967)
+   Zn = ResidueRing(ZZ, 4)
+   R, x = PowerSeriesRing(Zn, 5, "x")
+   f = 2*x^6 + O(x^11)
+
+   @test isequal(f*f, f^2)
+   @test isequal(f^0, one(R))
 end
 
 @testset "Generic.RelSeries.shift" begin
@@ -787,6 +795,83 @@ end
     end
 end
 
+@testset "Generic.RelSeries.compose" begin
+    # Exact ring
+    R, x = PowerSeriesRing(ZZ, 10, "x")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+     
+        g = rand(R, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(x, g) == g
+        @test compose(x^2, g) == g^2
+        @test compose(R(), g) == R()
+    end
+
+    S, y = PowerSeriesRing(ZZ, 10, "y")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(S, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(R(), g) == S()
+    end
+
+    # Inexact field
+    R, x = PowerSeriesRing(RealField, 10, "x")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(R, 1:10, -10:10)
+
+        @test isapprox(compose(f1 + f2, g), compose(f1, g) + compose(f2, g))
+        @test isapprox(compose(x, g), g)
+        @test isapprox(compose(x^2, g), g^2)
+        @test isapprox(compose(R(), g), R())
+    end
+
+    S, y = PowerSeriesRing(RealField, 10, "y")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(S, 1:10, -10:10)
+        @test isapprox(compose(f1 + f2, g), compose(f1, g) + compose(f2, g))
+        @test isapprox(compose(R(), g), S())
+    end
+
+    # Non-integral domain
+    T = ResidueRing(ZZ, 6)
+    R, x = PowerSeriesRing(T, 10, "x")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(R, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(x, g) == g
+        @test compose(x^2, g) == g^2
+        @test compose(R(), g) == R()
+    end
+
+    S, y = PowerSeriesRing(T, 10, "y")
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(S, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(R(), g) == S()
+    end
+end
+
 @testset "Generic.RelSeries.square_root" begin
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x")
@@ -810,6 +895,22 @@ end
 @testset "Generic.RelSeries.exact_division" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
+   for iter = 1:300
+      s = rand(0:12)
+      f = rand(R, s:s, -10:10)
+      while valuation(f) != s || !isunit(coeff(f, s))
+         f = rand(R, s:s, -10:10)
+      end
+      g = rand(R, s:s, -10:10)
+      while valuation(g) != s || !isunit(coeff(g, s))
+         g = rand(R, s:s, -10:10)
+      end
+
+      @test divexact(f, g)*g == f
+   end
+
+   # Exact field
+   R, x = PowerSeriesRing(QQ, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, s:s, -10:10)

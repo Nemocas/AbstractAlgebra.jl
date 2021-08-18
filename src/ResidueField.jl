@@ -69,19 +69,11 @@ function modulus(r::ResFieldElem)
 end
 
 @doc Markdown.doc"""
-    characteristic(r::ResField)
+    characteristic(R::ResField)
 
-Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
-residue $r$ belongs to.
+Return the characteristic of the residue field.
 """
-function characteristic(r::ResField)
-   R = base_ring(r)
-   while R != Union{}
-      if typeof(R) <: Field
-         return characteristic(R)
-      end
-      R = base_ring(R)
-   end
+function characteristic(R::ResField)
    return characteristic(base_ring(R))
 end
 
@@ -110,8 +102,7 @@ function isunit(a::ResFieldElem)
    return isone(g)
 end
 
-deepcopy_internal(a::ResFieldElem, dict::IdDict) =
-   parent(a)(deepcopy(data(a)))
+deepcopy_internal(a::ResFieldElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
 
 ###############################################################################
 #
@@ -319,12 +310,9 @@ end
 #
 ###############################################################################
 
-function divexact(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
+function divexact(a::ResFieldElem{T}, b::ResFieldElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(a, b)
    fl, q = divides(a, b)
-   if !fl
-      error("Impossible inverse in divexact")
-   end
    return q
 end
 
@@ -373,12 +361,12 @@ function issquare(a::ResFieldElem{T}) where T <: Integer
 end
 
 @doc Markdown.doc"""
-    sqrt(a::ResFieldElem{T}) where T <: Integer
+    sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
 
-Return the square root of $a$ if it is a square, otherwise an exception is
-raised.
+Return the square root of $a$. By default the function will throw an exception
+if the input is not square. If `check=false` this test is omitted.
 """
-function Base.sqrt(a::ResFieldElem{T}) where T <: Integer
+function Base.sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
    U = parent(a)
    p = modulus(a)
    if p == 2 # special case, cannot find a quadratic nonresidue mod 2
@@ -418,7 +406,7 @@ function Base.sqrt(a::ResFieldElem{T}) where T <: Integer
          u = u^2
          i += 1
       end
-      i == M && error("Not a square in sqrt")
+      check && i == M && error("Not a square in sqrt")
       b = c
       for j = 1:M - i - 1
          b = b^2
@@ -505,4 +493,3 @@ function ResidueField(R::Ring, a::RingElement; cached::Bool = true)
 
    return Generic.ResField{T}(R(a), cached)
 end
-

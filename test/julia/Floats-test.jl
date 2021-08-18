@@ -1,37 +1,3 @@
-@testset "Julia.Floats.constructors" begin
-   R = RDF
-   S = RealField
-
-   @test elem_type(R) == Float64
-   @test elem_type(S) == BigFloat
-   @test elem_type(AbstractAlgebra.Floats{Float64}) == Float64
-   @test elem_type(AbstractAlgebra.Floats{BigFloat}) == BigFloat
-   @test parent_type(Float64) == AbstractAlgebra.Floats{Float64}
-   @test parent_type(BigFloat) == AbstractAlgebra.Floats{BigFloat}
-
-   @test isa(R, AbstractAlgebra.Floats)
-   @test isa(S, AbstractAlgebra.Floats)
-
-   @test isa(R(), Float64)
-   @test isa(S(), BigFloat)
-
-   @test isa(R(11), Float64)
-   @test isa(R(11//3), Float64)
-   @test isa(R(1.2), Float64)
-   @test isa(S(BigInt(11)), BigFloat)
-   @test isa(S(1.2), BigFloat)
-   @test isa(S(BigFloat(1.2)), BigFloat)
-   @test isa(S(BigInt(11)//BigInt(3)), BigFloat)
-   @test isa(S(Rational{BigInt}(11)), BigFloat)
-   @test isa(S(11), BigFloat)
-
-   a = R(11)
-   b = S(11)
-
-   @test isa(R(a), Float64)
-   @test isa(S(b), BigFloat)
-end
-
 @testset "Julia.Floats.printing" begin
    R, x = PolynomialRing(RealField, "x")
 
@@ -51,14 +17,6 @@ end
    R = RDF
    S = RealField
 
-   @test iszero(zero(R))
-   @test iszero(zero(S))
-
-   @test isone(one(R))
-   @test isone(one(S))
-
-   @test !isunit(R())
-   @test !isunit(S())
    @test isunit(R(3))
    @test isunit(S(3))
 end

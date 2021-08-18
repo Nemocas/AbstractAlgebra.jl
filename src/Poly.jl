@@ -16,7 +16,8 @@ export PolyCoeffs, PolynomialRing, PolyRing, addmul!, characteristic,
        pseudodivrem, pseudorem, remove, resultant, resultant_ducos,
        resultant_euclidean, resultant_lehmer, resultant_subresultant,
        resultant_sylvester, resx, shift_left, shift_right, subst,
-       sylvester_matrix, symbols, tail, use_karamul, valuation, var
+       sylvester_matrix, symbols, tail, use_karamul, valuation, var,
+       set_coefficient!
 
 ###############################################################################
 #
@@ -158,6 +159,24 @@ leading term (if any).
 """
 function tail(a::PolynomialElem)
    return iszero(a) ? zero(parent(a)) : truncate(a, length(a) - 1)
+end
+
+@doc Markdown.doc"""
+    set_coefficient!(c::PolynomialElem{T}, n::Int, a::T) where T <: RingElement
+    set_coefficient!(c::PolynomialElem{T}, n::Int, a::U) where {T <: RingElement, U <: Integer}
+
+Set the coefficient of degree $n$ to $a$.
+"""
+function set_coefficient!(c::PolynomialElem{T}, n::Int, a::T) where T <: RingElement
+   return setcoeff!(c, n, a) # merely acts as generic fallback
+end
+
+function set_coefficient!(c::PolynomialElem{T}, n::Int, a::U) where {T <: RingElement, U <: Integer}
+   return setcoeff!(c, n, base_ring(c)(a)) # merely acts as generic fallback
+end
+
+function set_coefficient!(c::PolynomialElem{T}, n::Int, a::T) where T <: Integer
+   return setcoeff!(c, n, a) # merely acts as generic fallback
 end
 
 @doc Markdown.doc"""
@@ -1047,8 +1066,7 @@ function divexact_low(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingEle
     a = truncate(a, n)
     b = truncate(b, n)
     for i = 0:n - 1
-        flag, q = divides(coeff(a, 0), coeff(b, 0))
-        !flag && error("Not an exact division")
+        q = divexact(coeff(a, 0), coeff(b, 0); check=false)
         r = setcoeff!(r, i, q)
         a = shift_right(a - q*b, 1)
         b = truncate(b, n - i - 1)
@@ -1359,7 +1377,7 @@ end
 #
 ###############################################################################
 
-function divexact(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+function divexact(f::PolyElem{T}, g::PolyElem{T}; check::Bool=true) where T <: RingElement
    check_parent(f, g)
    iszero(g) && throw(DivideError())
    if iszero(f)
@@ -1374,13 +1392,13 @@ function divexact(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
    leng = length(g)
    while length(f) >= leng
       lenf = length(f)
-      q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1))
+      q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1); check=check)
       f = f - shift_left(q1*g, lenf - leng)
       if length(f) == lenf # inexact case
          f = set_length!(f, normalise(f, lenf - 1))
       end
    end
-   length(f) != 0 && throw(ArgumentError("not an exact division"))
+   check && length(f) != 0 && throw(ArgumentError("not an exact division"))
    q = parent(f)(d)
    q = set_length!(q, lenq)
    return q
@@ -1392,23 +1410,23 @@ end
 #
 ###############################################################################
 
-function divexact(a::PolyElem{T}, b::T) where {T <: RingElem}
+function divexact(a::PolyElem{T}, b::T; check::Bool=true) where {T <: RingElem}
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
+      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b; check=check))
    end
    z = set_length!(z, length(a))
    return z
 end
 
-function divexact(a::PolyElem, b::Union{Integer, Rational, AbstractFloat})
+function divexact(a::PolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
+      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b; check=check))
    end
    z = set_length!(z, length(a))
    return z
@@ -1719,49 +1737,51 @@ end
 #
 ################################################################################
 
-function sqrt_classical_char2(f::PolyElem{T}) where T <: RingElement
+function sqrt_classical_char2(f::PolyElem{T}; check::Bool=true) where T <: RingElement
    S = parent(f)
    R = base_ring(f)
-   if iszero(f)
+   if check && iszero(f)
       return true, S()
    end
    m = length(f)
-   if iseven(m) # square polys have even degree
+   if check && iseven(m) # square polys have even degree
       return false, S()
    end
-   for i = 1:2:m # polynomial must have even exponents
-      if !iszero(coeff(f, i))
-         return false, S()
+   if check
+      for i = 1:2:m # polynomial must have even exponents
+         if !iszero(coeff(f, i))
+            return false, S()
+         end
       end
    end
    lenq = div(m + 1, 2)
    d = Array{T}(undef, lenq)
    for i = 1:lenq
       c = coeff(f, 2*i - 2)
-      if !issquare(c)
+      if check && !issquare(c)
          return false, S()
       end
-      d[i] = sqrt(c)
+      d[i] = sqrt(c; check=false)
    end
    q = S(d)
    q = set_length!(q, lenq)
    return true, q
 end
 
-function sqrt_classical(f::PolyElem{T}, check::Bool=true) where T <: RingElement
+function sqrt_classical(f::PolyElem{T}; check::Bool=true) where T <: RingElement
    S = parent(f)
    R = base_ring(f)
    if characteristic(R) == 2
-      return sqrt_classical_char2(f)
+      return sqrt_classical_char2(f; check=check)
    end
    if iszero(f)
       return true, S()
    end
    m = length(f)
-   if iseven(m) # square polys have even degree
+   if check && iseven(m) # square polys have even degree
       return false, S()
    end
-   if !issquare(coeff(f, m - 1))
+   if check && !issquare(coeff(f, m - 1))
       return false, S()
    end
    lenq = div(m + 1, 2)
@@ -1784,11 +1804,15 @@ function sqrt_classical(f::PolyElem{T}, check::Bool=true) where T <: RingElement
       end
       qc = reduce!(qc)
       if i >= lenq - 1
-         flag, d[lenq - k] = divides(qc, b)
-         if !flag
-            return false, S()
+         if check
+            flag, d[lenq - k] = divides(qc, b)
+            if !flag
+               return false, S()
+            end
+         else
+            d[lenq - k] = divexact(qc, b; check=check)
          end
-      elseif !iszero(qc)
+      elseif check && !iszero(qc)
          return false, S()
       end
       k += 1
@@ -1799,15 +1823,14 @@ function sqrt_classical(f::PolyElem{T}, check::Bool=true) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    Base.sqrt(f::PolyElem{T}, check::Bool=true) where T <: RingElement
+    Base.sqrt(f::PolyElem{T}; check::Bool=true) where T <: RingElement
 
-Return the square root of $f$ if it is a perfect square, otherwise an
-exception is raised. If `check` is set to `false` the function assumes
-the input is square and may not fully check this.
+Return the square root of $f$. By default the function checks the input is
+square and raises an exception if not. If `check=false` this check is omitted.
 """
-function Base.sqrt(f::PolyElem{T}, check::Bool=true) where T <: RingElement
-   flag, q = sqrt_classical(f, check)
-   !flag && error("Not a square in sqrt")
+function Base.sqrt(f::PolyElem{T}; check::Bool=true) where T <: RingElement
+   flag, q = sqrt_classical(f; check=check)
+   check && !flag && error("Not a square in sqrt")
    return q
 end
 
@@ -2693,7 +2716,7 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: F
 end
 
 @doc Markdown.doc"""
-    polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement -> Array{T, 1}
+    polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement -> Vector{T}
 
 Uses Newton (or Newton-Girard) formulas to compute the first $n$
 sums of powers of the roots of $f$ from the coefficients of $f$, starting
@@ -2728,7 +2751,7 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: R
 end
 
 @doc Markdown.doc"""
-    power_sums_to_polynomial(P::Array{T, 1};
+    power_sums_to_polynomial(P::Vector{T};
                      parent::AbstractAlgebra.PolyRing{T}=
    AbstractAlgebra.PolyRing(parent(P[1])) where T <: RingElement -> PolyElem{T}
 
@@ -2737,13 +2760,13 @@ with given sums of powers of roots. The list must be nonempty and contain
 `degree(f)` entries where $f$ is the polynomial to be recovered. The list
 must start with the sum of first powers of the roots.
 """
-function power_sums_to_polynomial(P::Array{T, 1}; 
+function power_sums_to_polynomial(P::Vector{T}; 
                            parent::AbstractAlgebra.PolyRing{T}=
 	         AbstractAlgebra.PolyRing(parent(P[1]))) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
 
-function power_sums_to_polynomial(P::Array{T, 1}, Rx::AbstractAlgebra.PolyRing{T}) where T <: FieldElement
+function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T}) where T <: FieldElement
     d = length(P)
     R = base_ring(Rx)
     s = rel_series(R, P, d, d, 0)
@@ -2753,7 +2776,7 @@ function power_sums_to_polynomial(P::Array{T, 1}, Rx::AbstractAlgebra.PolyRing{T
     return Rx([polcoeff(r1, d - i) for i = 0:d])
 end
 
-function power_sums_to_polynomial(P::Array{T, 1}, Rx::AbstractAlgebra.PolyRing{T}) where T <: RingElement
+function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T}) where T <: RingElement
     E = T[one(parent(P[1]))]
     R = parent(P[1])
     last_non_zero = 0
@@ -2781,7 +2804,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where T <: RingElement
+    monomial_to_newton!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
 
 Converts a polynomial $p$, given as an array of coefficients, in-place
 from its coefficients given in the standard monomial basis to the Newton
@@ -2790,7 +2813,7 @@ determines output coefficients $c_i$ such that
 $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots + c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
 is equal to the input polynomial.
 """
-function monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where T <: RingElement
+function monomial_to_newton!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
    n = length(roots)
    if n > 0
       R = parent(roots[1])
@@ -2806,7 +2829,7 @@ function monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where T <: Ring
 end
 
 @doc Markdown.doc"""
-    newton_to_monomial!(P::Array{T, 1}, roots::Array{T, 1}) where T <: RingElement
+    newton_to_monomial!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
 
 Converts a polynomial $p$, given as an array of coefficients, in-place
 from its coefficients given in the Newton basis for the roots
@@ -2815,7 +2838,7 @@ this evaluates
 $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots + c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
 where $c_i$ are the input coefficients given by $p$.
 """
-function newton_to_monomial!(P::Array{T, 1}, roots::Array{T, 1}) where T <: RingElement
+function newton_to_monomial!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
    n = length(roots)
    if n > 0
       R = parent(roots[1])
@@ -2838,7 +2861,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    interpolate(S::PolyRing, x::Array{T, 1}, y::Array{T, 1}) where T <: RingElement
+    interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingElement
 
 Given two arrays of values $xs$ and $ys$ of the same length $n$, find
 the polynomial $f$ in the polynomial ring $R$ of length at most $n$ such that
@@ -2846,7 +2869,7 @@ $f$ has the value $ys$ at the points $xs$. The values in the arrays $xs$ and
 $ys$ must belong to the base ring of the polynomial ring $R$. If no such
 polynomial exists, an exception is raised.
 """
-function interpolate(S::PolyRing, x::Array{T, 1}, y::Array{T, 1}) where T <: RingElement
+function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingElement
    length(x) != length(y) && error("Array lengths don't match in interpolate")
    !isdomain_type(T) && error("interpolation requires a domain type")
    n = length(x)
@@ -2876,7 +2899,7 @@ function interpolate(S::PolyRing, x::Array{T, 1}, y::Array{T, 1}) where T <: Rin
    return r
 end
 
-function interpolate(S::PolyRing, x::Array{T, 1}, y::Array{T, 1}) where {T <: ResElem}
+function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where {T <: ResElem}
    length(x) != length(y) && error("Array lengths don't match in interpolate")
    n = length(x)
    if n == 0

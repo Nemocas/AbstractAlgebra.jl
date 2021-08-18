@@ -37,86 +37,71 @@ function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
    end
 end
 
+@inline function try_promote(x::S, y::T) where {S <: RingElem, T <: RingElem}
+   U = promote_rule_sym(S, T)
+   if S === U
+      return true, x, parent(x)(y)
+   elseif T === U
+      return true, parent(y)(x), y
+   else
+      return false, x, y
+   end
+end
+
+function Base.promote(x::S, y::T) where {S <: RingElem, T <: RingElem}
+  fl, u, v = try_promote(x, y)
+  if fl
+    return u, v
+  else
+    error("Cannot promote to common type")
+  end
+end
+
 ###############################################################################
 #
 #   Generic catchall functions
 #
 ###############################################################################
 
-function +(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      +(x, parent(x)(y))
-   elseif T === U
-      +(parent(y)(x), y)
-   else
-      error("Cannot promote to common type")
-   end
-end
++(x::RingElem, y::RingElem) = +(promote(x, y)...)
 
 +(x::RingElem, y::RingElement) = x + parent(x)(y)
 
 +(x::RingElement, y::RingElem) = parent(y)(x) + y
 
-function -(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      -(x, parent(x)(y))
-   elseif T === U
-      -(parent(y)(x), y)
-   else
-      error("Cannot promote to common type")
-   end
-end
+-(x::RingElem, y::RingElem) = -(promote(x, y)...)
 
 -(x::RingElem, y::RingElement) = x - parent(x)(y)
 
 -(x::RingElement, y::RingElem) = parent(y)(x) - y
 
-function *(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      *(x, parent(x)(y))
-   elseif T === U
-      *(parent(y)(x), y)
-   else
-      error("Cannot promote to common type")
-   end
-end
+*(x::RingElem, y::RingElem) = *(promote(x, y)...)
 
 *(x::RingElem, y::RingElement) = x*parent(x)(y)
 
 *(x::RingElement, y::RingElem) = parent(y)(x)*y
 
-
 """
-    divexact(x, y)
+    divexact(x, y; check::Bool=true)
 
 Return an exact quotient of `x` by `y`, i.e. an element
 `z` such that `x == yz`; when `x` and `y` do not belong to the same ring,
 they are first coerced into a common ring.
-If no exact division is possible, an exception is raised.
+By default if no exact division is possible, an exception is raised. If
+`check=false` this check may be omitted for performance reasons and the
+behaviour of the function undefined if the division is not exact.
 """
 function divexact end
 
-function divexact(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      divexact(x, parent(x)(y))
-   elseif T === U
-      divexact(parent(y)(x), y)
-   else
-      error("Cannot promote to common type")
-   end
-end
+divexact(x::RingElem, y::RingElem; check::Bool=true) = divexact(promote(x, y)...; check=check)
 
-divexact(x::RingElem, y::RingElement) = divexact(x, parent(x)(y))
+divexact(x::RingElem, y::RingElement; check::Bool=true) = divexact(x, parent(x)(y); check=check)
 
-divexact(x::RingElement, y::RingElem) = divexact(parent(y)(x), y)
+divexact(x::RingElement, y::RingElem; check::Bool=true) = divexact(parent(y)(x), y; check=check)
 
-divexact_left(x::T, y::T) where T <: RingElement = divexact(x, y)
+divexact_left(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x, y; check=check)
 
-divexact_right(x::T, y::T) where T <: RingElement = divexact(x, y)
+divexact_right(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x, y; check=check)
 
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 
@@ -128,15 +113,21 @@ function divides(x::T, y::T) where {T <: RingElem}
    return iszero(r), q
 end
 
-function ==(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      ==(x, parent(x)(y))
-   elseif T === U
-      ==(parent(y)(x), y)
-   else
-      false
+function isdivisible_by(x::T, y::T) where T <: RingElem
+   if iszero(y)
+      return iszero(x)
    end
+   r = rem(x, y)
+   return iszero(r)
+end
+
+function ==(x::RingElem, y::RingElem)
+  fl, u, v = try_promote(x, y)
+  if fl
+    return u == v
+  else
+    return false
+  end
 end
 
 ==(x::RingElem, y::RingElement) = x == parent(x)(y)
@@ -262,18 +253,38 @@ end
 @doc Markdown.doc"""
     sqrt(a::FieldElem)
 
-Return the square root of the element `a`.
+Return the square root of the element `a`. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
 """
-function Base.sqrt(a::FieldElem)
+function Base.sqrt(a::FieldElem; check::Bool=true)
   R = parent(a)
   R, t = PolynomialRing(R, "t", cached = false)
   f = factor(t^2 - a)
   for (p, e) in f
-    if degree(p) == 1
-      return -divexact(coeff(p, 0), coeff(p, 1))
+    if !check || degree(p) == 1
+      return -divexact(coeff(p, 0), coeff(p, 1); check=check)
     end
   end
   throw(error("Element $a does not have a square root"))
+end
+
+# assumes the existence of sqrt without check argument for input
+function Base.sqrt(a::RingElem; check::Bool=true)
+  s = sqrt(a)
+  if check
+    s != a^2 && error("Element $a does not have a square root")
+  end
+  return s
+end  
+
+# assumes the existence of issquare and sqrt for input  
+function issquare_with_sqrt(a::RingElem)
+  if issquare(a)
+     return true, sqrt(a)
+  else
+     return false, parent(a)()
+  end
 end
 
 ###############################################################################

@@ -163,8 +163,8 @@ end
       @test isa(m, AbsSeriesElem)
       @test isa(n, AbsSeriesElem)
 
-      @test base_ring(g) == QQ
-      @test base_ring(m) == QQ
+      @test base_ring(g) === QQ
+      @test base_ring(m) === QQ
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -175,11 +175,11 @@ end
       @test iszero(m)
       @test iszero(n)
 
-      @test parent(g) != parent(f)
-      @test parent(h) != parent(f)
-      @test parent(k) == parent(f)
-      @test parent(m) != parent(f)
-      @test parent(n) != parent(f)
+      @test parent(g) !== parent(f)
+      @test parent(h) !== parent(f)
+      @test parent(k) === parent(f)
+      @test parent(m) !== parent(f)
+      @test parent(n) !== parent(f)
 
       p = similar(f, cached=false)
       q = similar(f, "z", cached=false)
@@ -187,9 +187,9 @@ end
       s = similar(f)
       t = similar(f)
 
-      @test parent(p) != parent(f)
-      @test parent(q) != parent(r)
-      @test parent(s) == parent(t)
+      @test parent(p) === parent(f)
+      @test parent(q) !== parent(r)
+      @test parent(s) === parent(t)
    end
 end
 
@@ -197,7 +197,7 @@ end
    f = abs_series(ZZ, [1, 2, 3], 3, 5, "y")
 
    @test isa(f, AbsSeriesElem)
-   @test base_ring(f) == ZZ
+   @test base_ring(f) === ZZ
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
    @test parent(f).S == :y
@@ -205,7 +205,7 @@ end
    g = abs_series(ZZ, [1, 2, 3], 3, 5)
 
    @test isa(g, AbsSeriesElem)
-   @test base_ring(g) == ZZ
+   @test base_ring(g) === ZZ
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
    @test parent(g).S == :x
@@ -214,8 +214,8 @@ end
    k = abs_series(ZZ, [1, 2, 3], 1, 6, cached=false)
    m = abs_series(ZZ, [1, 2, 3], 3, 9, cached=false)
 
-   @test parent(h) == parent(g)
-   @test parent(k) != parent(m)
+   @test parent(h) === parent(g)
+   @test parent(k) !== parent(m)
 
    p = abs_series(ZZ, BigInt[], 0, 4)
    q = abs_series(ZZ, [], 0, 6)
@@ -772,7 +772,84 @@ end
 
        @test f*inv(f) == 1
     end
- end
+end
+
+@testset "Generic.AbsSeries.compose" begin
+    # Exact ring
+    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+     
+        g = rand(R, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(x, g) == g
+        @test compose(x^2, g) == g^2
+        @test compose(R(), g) == R()
+    end
+
+    S, y = PowerSeriesRing(ZZ, 10, "y", model=:capped_absolute)
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(S, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(R(), g) == S()
+    end
+
+    # Inexact field
+    R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(R, 1:10, -10:10)
+
+        @test isapprox(compose(f1 + f2, g), compose(f1, g) + compose(f2, g))
+        @test isapprox(compose(x, g), g)
+        @test isapprox(compose(x^2, g), g^2)
+        @test isapprox(compose(R(), g), R())
+    end
+
+    S, y = PowerSeriesRing(RealField, 10, "y", model=:capped_absolute)
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(S, 1:10, -10:10)
+        @test isapprox(compose(f1 + f2, g), compose(f1, g) + compose(f2, g))
+        @test isapprox(compose(R(), g), S())
+    end
+
+    # Non-integral domain
+    T = ResidueRing(ZZ, 6)
+    R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(R, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(x, g) == g
+        @test compose(x^2, g) == g^2
+        @test compose(R(), g) == R()
+    end
+
+    S, y = PowerSeriesRing(T, 10, "y", model=:capped_absolute)
+    for iter = 1:300
+        f1 = rand(R, 0:10, -10:10)
+        f2 = rand(R, 0:10, -10:10)
+
+        g = rand(S, 1:10, -10:10)
+
+        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
+        @test compose(R(), g) == S()
+    end
+end
 
 @testset "Generic.AbsSeries.square_root" begin
     # Exact ring
@@ -797,6 +874,22 @@ end
 @testset "Generic.AbsSeries.exact_division" begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   for iter = 1:300
+      s = rand(0:9)
+      f = rand(R, s:s, -10:10)
+      while valuation(f) != s || !isunit(coeff(f, s))
+         f = rand(R, s:s, -10:10)
+      end
+      g = rand(R, s:s, -10:10)
+      while valuation(g) != s || !isunit(coeff(g, s))
+         g = rand(R, s:s, -10:10)
+      end
+
+      @test divexact(f, g)*g == f
+   end
+
+   # Exact field
+   R, x = PowerSeriesRing(QQ, 10, "x", model=:capped_absolute)
    for iter = 1:300
       s = rand(0:9)
       f = rand(R, s:s, -10:10)

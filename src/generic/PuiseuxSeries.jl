@@ -326,6 +326,51 @@ end
 
 ###############################################################################
 #
+#   Map coefficients
+#
+###############################################################################
+
+function _make_parent(g, p::PuiseuxSeriesElem, cached::Bool)
+   R = parent(g(zero(base_ring(p))))
+   S = parent(p)
+   sym = String(var(S))
+   max_prec = max_precision(S)
+   return AbstractAlgebra.PuiseuxSeriesRing(R, max_prec, sym; cached=cached)[1]
+end
+
+function map_coefficients(g, p::PuiseuxSeriesElem{<:RingElement};
+                    cached::Bool = true,
+                    parent::Ring = _make_parent(g, p, cached))
+   return _map(g, p, parent)
+end
+
+function _map(g, p::PuiseuxSeriesElem, Rx)
+   R = base_ring(Rx)
+   res = Rx(map_coefficients(g, p.data), scale(p))
+   res = rescale!(res)
+   return res
+end
+
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function _change_puiseux_series_ring(R, Rx, cached)
+   P, _ = AbstractAlgebra.PuiseuxSeriesRing(R, max_precision(Rx),
+                                               string(var(Rx)), cached = cached)
+   return P
+end
+
+function change_base_ring(R::Ring, p::PuiseuxSeriesElem{T};
+                    cached::Bool = true, parent::Ring =
+          _change_puiseux_series_ring(R, parent(p), cached)) where T <: RingElement
+   return _map(R, p, parent)
+end
+
+###############################################################################
+#
 #   Unary operators
 #
 ###############################################################################
@@ -413,12 +458,12 @@ end
 #
 ###############################################################################
 
-function divexact(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+function divexact(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
     s = gcd(a.scale, b.scale)
     zscale = div(a.scale*b.scale, s)
     ainf = div(a.scale, s)
     binf = div(b.scale, s)
-    z = parent(a)(divexact(inflate(a.data, binf), inflate(b.data, ainf)), zscale)
+    z = parent(a)(divexact(inflate(a.data, binf), inflate(b.data, ainf); check=check), zscale)
     z = rescale!(z)
     return z
 end
@@ -429,12 +474,12 @@ end
 #
 ###############################################################################
 
-function divexact(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-   return parent(x)(divexact(x.data, y), x.scale)
+function divexact(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+   return parent(x)(divexact(x.data, y; check=check), x.scale)
 end
 
-function divexact(x::PuiseuxSeriesElem{T}, y::T) where {T <: RingElem}
-   return parent(x)(divexact(x.data, y), x.scale)
+function divexact(x::PuiseuxSeriesElem{T}, y::T; check::Bool=true) where {T <: RingElem}
+   return parent(x)(divexact(x.data, y; check=check), x.scale)
 end
 
 ###############################################################################
@@ -463,11 +508,11 @@ end
 
 function ^(a::PuiseuxSeriesElem{T}, b::Int) where T <: RingElement
    # special case powers of x for constructing power series efficiently
-   if iszero(a.data)
-      return parent(a)(a.data^b, a.scale)
-   elseif b == 0
+   if b == 0
       # in fact, the result would be exact 1 if we had exact series
       return one(parent(a))
+   elseif iszero(a.data)
+      return parent(a)(a.data^b, a.scale)
    elseif pol_length(a.data) == 1
       return parent(a)(a.data^b, a.scale)
    elseif b == 1
@@ -534,17 +579,19 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    sqrt(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
+    sqrt(a::Generic.PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
 
-Return the square root of the given Puiseux series $a$.
+Return the square root of the given Puiseux series $a$. By default the function
+will throw an exception if the input is not square. If `check=false` this test
+is omitted.
 """
-function Base.sqrt(a::PuiseuxSeriesElem{T}) where T <: RingElement
+function Base.sqrt(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
    val = valuation(a.data)
    S = parent(a)
    if mod(val, 2) != 0
-      return S(sqrt(inflate(a.data, 2)), a.scale*2)
+      return S(sqrt(inflate(a.data, 2); check=check), a.scale*2)
    else
-      return S(sqrt(a.data), a.scale)
+      return S(sqrt(a.data; check=check), a.scale)
    end
 end
 

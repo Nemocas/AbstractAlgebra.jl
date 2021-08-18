@@ -52,7 +52,7 @@ Perm{Int32}
 ```
 """
 mutable struct Perm{T<:Integer} <: AbstractAlgebra.AbstractPerm
-   d::Array{T, 1}
+   d::Vector{T}
    modified::Bool
    cycles::CycleDec{T}
 

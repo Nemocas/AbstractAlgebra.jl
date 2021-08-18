@@ -235,7 +235,7 @@ function ==(a::heap_sr, b::heap_sr)
    return a.exp == b.exp
 end
 
-function heapinsert!(xs::Array{heap_sr, 1}, ys::Array{heap_t, 1}, m::Int, exp::UInt)
+function heapinsert!(xs::Vector{heap_sr}, ys::Vector{heap_t}, m::Int, exp::UInt)
    i = n = length(xs) + 1
    @inbounds if i != 1 && exp == xs[1].exp
       ys[m] = heap_t(ys[m].i, ys[m].j, xs[1].n)
@@ -262,7 +262,7 @@ function heapinsert!(xs::Array{heap_sr, 1}, ys::Array{heap_t, 1}, m::Int, exp::U
    return
 end
 
-function heappop!(xs::Array{heap_sr, 1})
+function heappop!(xs::Vector{heap_sr})
    s = length(xs)
    x = xs[1]
    i = 1
@@ -929,9 +929,9 @@ function divides(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    return true, parent(a)(Qc, Qe)
 end
 
-function divexact(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
+function divexact(a::SparsePoly{T}, b::SparsePoly{T}; check::Bool=true) where {T <: RingElement}
    d, q = divides(a, b)
-   d == false && error("Not an exact division in divexact")
+   check && d == false && error("Not an exact division in divexact")
    return q
 end
 
@@ -953,17 +953,17 @@ function divides(a::SparsePoly{T}, b::T) where {T <: RingElem}
    return true, parent(a)(Qc, a.exps)
 end
 
-function divexact(a::SparsePoly{T}, b::T) where {T <: RingElem}
+function divexact(a::SparsePoly{T}, b::T; check::Bool=true) where {T <: RingElem}
    len = length(a)
    exps = deepcopy(a.exps)
-   coeffs = [divexact(a.coeffs[i], b) for i in 1:len]
+   coeffs = [divexact(a.coeffs[i], b; check=check) for i in 1:len]
    return parent(a)(coeffs, exps)
 end
 
-function divexact(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat})
+function divexact(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    len = length(a)
    exps = deepcopy(a.exps)
-   coeffs = [divexact(a.coeffs[i], b) for i in 1:len]
+   coeffs = [divexact(a.coeffs[i], b; check=check) for i in 1:len]
    return parent(a)(coeffs, exps)
 end
 
@@ -1678,7 +1678,7 @@ function (a::SparsePolyRing{T})(b::SparsePoly{T}) where {T <: RingElement}
    return b
 end
 
-function (a::SparsePolyRing{T})(b::Array{T, 1}, m::Array{UInt, 1}) where {T <: RingElement}
+function (a::SparsePolyRing{T})(b::Vector{T}, m::Vector{UInt}) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end

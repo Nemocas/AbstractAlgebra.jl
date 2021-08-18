@@ -109,9 +109,11 @@ isone(a::Rat) = isone(data(a))
 
 isunit(a::Rat) = isunit(data(a))
 
-function deepcopy_internal(a::Rat, dic::IdDict)
+gen(R::RationalFunctionField) = R(gen(base_ring(R.fraction_field)))
+
+function deepcopy_internal(a::Rat, dict::IdDict)
    R = parent(a)
-   return R(deepcopy(data(a)))
+   return R(deepcopy_internal(data(a), dict))
 end
 
 ###############################################################################
@@ -313,10 +315,10 @@ end
 #
 ###############################################################################
 
-function divexact(a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function divexact(a::Rat{T}, b::Rat{T}; check::Bool=true) where T <: FieldElement
    check_parent(a, b)
    R = parent(a)
-   return R(divexact(data(a), data(b)))
+   return R(divexact(data(a), data(b); check=check))
 end
 
 function divides(a::Rat{T}, b::Rat{T}) where T <: FieldElement
@@ -332,24 +334,24 @@ end
 #
 ###############################################################################
 
-function divexact(a::Rat, b::Union{Integer, Rational, AbstractFloat})
+function divexact(a::Rat, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    R = parent(a)
-   return R(divexact(data(a), b))
+   return R(divexact(data(a), b; check=check))
 end
 
-function divexact(a::Union{Integer, Rational, AbstractFloat}, b::Rat)
+function divexact(a::Union{Integer, Rational, AbstractFloat}, b::Rat; check::Bool=true)
    R = parent(b)
-   return R(divexact(a, data(b)))
+   return R(divexact(a, data(b); check=check))
 end
 
-function divexact(a::Rat{T}, b::T) where T <: FieldElem
+function divexact(a::Rat{T}, b::T; check::Bool=true) where T <: FieldElem
    R = parent(a)
-   return R(divexact(data(a), b))
+   return R(divexact(data(a), b; check=check))
 end
 
-function divexact(a::T, b::Rat{T}) where T <: FieldElem
+function divexact(a::T, b::Rat{T}; check::Bool=true) where T <: FieldElem
    R = parent(b)
-   return R(divexact(a, data(b)))
+   return R(divexact(a, data(b); check=check))
 end
 
 ##############################################################################
@@ -404,14 +406,14 @@ function issquare(a::Rat)
 end
 
 @doc Markdown.doc"""
-    Base.sqrt(a::Rat)
+    Base.sqrt(a::Rat; check::Bool=true)
 
-Return the square root of $a$ if it is a square, otherwise raise an
-exception.
+Return the square root of $a$. By default the function will throw an exception
+if the input is not square. If `check=false` this test is omitted.
 """
-function Base.sqrt(a::Rat)
+function Base.sqrt(a::Rat; check::Bool=true)
    R = parent(a)
-   return R(sqrt(data(a)))
+   return R(sqrt(data(a); check=check))
 end
 
 ###############################################################################
@@ -585,4 +587,3 @@ function RationalFunctionField(k::Field, s::Symbol; cached=true)
 
    return par_object, t
 end
-

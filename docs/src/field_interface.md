@@ -44,10 +44,12 @@ Most of the generic code in AbstractAlgebra makes use of the union type
 `FieldElement` instead of `FieldElem` so that the
 generic functions also accept the Julia Base field types.
                                                                 
-One must be careful when defining ad hoc binary operations for field element
-types. It is often necessary to define separate versions of the functions for
-`FieldElem` then for each of the Julia types separately in
-order to avoid ambiguity warnings.
+!!! note
+    
+    One must be careful when defining ad hoc binary operations for field element
+    types. It is often necessary to define separate versions of the functions for
+    `FieldElem` then for each of the Julia types separately in
+    order to avoid ambiguity warnings.
 
 Note that even though `FieldElement` is a union type we still
 have the following inclusion
@@ -87,10 +89,12 @@ in AbstractAlgebra.jl or by external libraries wanting to use AbstractAlgebra.jl
 We give this interface for fictitious types `MyParent` for the type of the field parent
 object `R` and `MyElem` for the type of the elements of the field.
 
-Note that generic functions in AbstractAlgebra.jl may not rely on the existence of
-functions that are not documented here. If they do, those functions will only be
-available for fields that implement that additional functionality, and should be
-documented as such.
+!!! note
+
+    Generic functions in AbstractAlgebra.jl may not rely on the existence of
+    functions that are not documented here. If they do, those functions will only be
+    available for fields that implement that additional functionality, and should be
+    documented as such.
 
 In the first place, all fields are rings and therefore any field type must implement
 all of the Ring interface. The functionality below is in addition to this basic

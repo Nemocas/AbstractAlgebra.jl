@@ -110,17 +110,17 @@ end
 #
 ###############################################################################
 
-divexact(a::Rational, b::Integer) = a//b
+divexact(a::Rational, b::Integer; check::Bool=true) = a//b
 
-divexact(a::Integer, b::Rational) = a//b
+divexact(a::Integer, b::Rational; check::Bool=true) = a//b
 
-divexact(a::Rational, b::Rational) = a//b
+divexact(a::Rational, b::Rational; check::Bool=true) = a//b
 
 function divides(a::T, b::T) where T <: Rational
    if b == 0
       return false, T(0)
    else
-      return true, divexact(a, b)
+      return true, divexact(a, b; check=false)
    end
 end
 
@@ -167,13 +167,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    sqrt(a::Rational{T}) where T <: Integer
+    sqrt(a::Rational{T}; check::Bool=true) where T <: Integer
 
-Return the square root of $a$ if it is the square of a rational, otherwise
-throw an error.
+Return the square root of $a$. By default the function throws an exception if
+the input is not square. If `check=false` this check is supressed.
 """
-function sqrt(a::Rational{T}, check::Bool=true) where T <: Integer
-   return sqrt(numerator(a, check))//sqrt(denominator(a, check))
+function sqrt(a::Rational{T}; check::Bool=true) where T <: Integer
+   return sqrt(numerator(a, false); check=check)//sqrt(denominator(a, false); check=check)
 end
 
 @doc Markdown.doc"""

@@ -1,47 +1,9 @@
-@testset "Julia.Integers.constructors" begin
-   R = zz
-   S = ZZ
-
-   @test elem_type(R) == Int
-   @test elem_type(S) == BigInt
-   @test elem_type(AbstractAlgebra.Integers{Int}) == Int
-   @test elem_type(AbstractAlgebra.Integers{BigInt}) == BigInt
-   @test parent_type(Int) == AbstractAlgebra.Integers{Int}
-   @test parent_type(BigInt) == AbstractAlgebra.Integers{BigInt}
-
-   @test isa(R, AbstractAlgebra.Integers)
-   @test isa(S, AbstractAlgebra.Integers)
-
-   @test isa(R(), Int)
-   @test isa(S(), BigInt)
-
-   @test isa(R(11), Int)
-   @test isa(S(BigInt(11)), BigInt)
-   @test isa(S(11), BigInt)
-
-   a = R(11)
-   b = S(11)
-
-   @test isa(R(a), Int)
-   @test isa(S(b), BigInt)
-end
-
 @testset "Julia.Integers.manipulation" begin
    R = zz
    S = ZZ
 
-   @test iszero(zero(R))
-   @test iszero(zero(S))
-
-   @test isone(one(R))
-   @test isone(one(S))
-
-   @test !isunit(R())
-   @test !isunit(S())
    @test !isunit(R(3))
    @test !isunit(S(3))
-   @test isunit(R(1))
-   @test isunit(S(1))
    @test isunit(R(-1))
    @test isunit(S(-1))
 
@@ -91,6 +53,10 @@ end
    R = zz
    S = ZZ
 
+   @test_throws ArgumentError divexact(10, 4)
+   @test_throws ArgumentError divexact(big(10), big(4))
+   @test_throws ArgumentError divexact(big(10), 4)
+
    for iter = 1:1000
       a1 = rand(R, -100:100)
       a2 = rand(R, -100:100)
@@ -99,17 +65,21 @@ end
 
       @test a2 == 0 || divexact(a1*a2, a2) == a1
       @test b2 == 0 || divexact(b1*b2, b2) == b1
-
-      @test_throws ArgumentError divexact(10, 4)
-      @test_throws ArgumentError divexact(big(10), big(4))
-      @test_throws ArgumentError divexact(big(10), 4)
+      @test a1 == 0 || divexact(b1*a1, a1) == b1
 
       if a1 != 0
          flagR, qR = divides(a1*a2, a1)
 
          @test flagR
          @test qR == a2
+
+         flagT, qT = divides(b1*a1, a1)
+
+         @test flagT
+         @test qT == b1
       end
+      
+      @test isdivisible_by(a1*a2, a1)
 
       if b1 != 0
          flagS, qS = divides(b1*b2, b1)
@@ -117,6 +87,10 @@ end
          @test flagS
          @test qS == b2
       end
+
+      @test isdivisible_by(b1*b2, b1)
+
+      @test isdivisible_by(b1*a1, a1)
    end
 end
 
@@ -168,6 +142,86 @@ end
       @test AbstractAlgebra.sqrt(g)^2 == g
       @test issquare(f)
       @test issquare(g)
+      @test issquare_with_sqrt(f) == (true, r)
+      @test issquare_with_sqrt(g) == (true, s)
+   end
+
+   @test issquare(-R(1)) == false
+   @test issquare(-S(1)) == false
+
+   @test issquare_with_sqrt(-R(1)) == (false, 0)
+   @test issquare_with_sqrt(-S(1)) == (false, 0)
+   @test issquare_with_sqrt(R(3)) == (false, 0)
+   @test issquare_with_sqrt(S(3)) == (false, 0)
+
+   @test_throws ErrorException AbstractAlgebra.sqrt(2)
+   @test_throws ErrorException AbstractAlgebra.sqrt(S(2))
+end
+
+@testset "Julia.Integers.root" begin
+   @test root(BigInt(1000), 3) == 10
+   @test root(-BigInt(27), 3) == -3
+   @test root(BigInt(27), 3; check=true) == 3
+   @test root(BigInt(16), 2; check=true) == 4
+
+   @test_throws DomainError root(-BigInt(1000), 4)
+   @test_throws DomainError root(BigInt(1000), -3)
+   @test_throws DomainError root(BigInt(-16), 2)
+
+   @test_throws ErrorException root(BigInt(1100), 3)
+   @test_throws ErrorException root(-BigInt(40), 3)
+
+   @test iroot(BigInt(1000), 3) == 10
+   @test iroot(BigInt(1100), 3) == 10
+   @test iroot(-BigInt(40), 3) == -3
+   @test iroot(BigInt(17), 2) == 4
+
+   @test_throws DomainError iroot(-BigInt(1000), 4)
+   @test_throws DomainError iroot(BigInt(1000), -3)
+   @test_throws DomainError iroot(-BigInt(16), 2)
+
+   @test root(1000, 3) == 10
+   @test root(-27, 3) == -3
+   @test root(27, 3) == 3
+   @test root(16, 2) == 4
+
+   @test_throws DomainError root(-1000, 4)
+   @test_throws DomainError root(1000, -3)
+   @test_throws DomainError root(-16, 2)
+
+   @test_throws ErrorException root(1100, 3)
+   @test_throws ErrorException root(-40, 3)
+
+   @test iroot(1000, 3) == 10
+   @test iroot(1100, 3) == 10
+   @test iroot(-40, 3) == -3
+   @test iroot(17, 2) == 4
+
+   @test_throws DomainError iroot(-1000, 4)
+   @test_throws DomainError iroot(1000, -3)
+   @test_throws DomainError iroot(-16, 2)
+
+   for T in [BigInt, Int]
+      for i = 1:1000
+         n = rand(1:20)
+         a = BigInt(rand(-1000:1000))
+         if iseven(n)
+            a = abs(a)
+         end
+         p = a^n
+         if T == BigInt || ndigits(p; base=2) < ndigits(typemax(T); base=2)
+            p = T(p)
+
+            @test ispower(p, n)
+
+            flag, q = ispower_with_root(p, n)
+
+            @test flag && q == a
+         end
+      end
+
+      @test_throws DomainError ispower(T(5), -1)
+      @test_throws DomainError ispower_with_root(T(5), 0)
    end
 end
 

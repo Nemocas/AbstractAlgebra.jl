@@ -182,12 +182,19 @@ end
 ###############################################################################
 
 function similar(x::RelSeriesElem, R::Ring, max_prec::Int,
-                                 var::Symbol=var(parent(x)); cached::Bool=true)
+                                   s::Symbol=var(parent(x)); cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.RelSeries{TT}(V, 0, max_prec, max_prec)
    # Default similar is supposed to return a Generic series
-   p.parent = Generic.RelSeriesRing{TT}(R, max_prec, var, cached)
+   if base_ring(x) === R && s == var(parent(x)) &&
+            typeof(x) === Generic.RelSeries{TT} &&
+            max_precision(parent(x)) == max_prec
+       # steal parent in case it is not cached
+       p.parent = parent(x)
+   else
+       p.parent = Generic.RelSeriesRing{TT}(R, max_prec, s, cached)
+   end
    return p
 end
 
@@ -686,9 +693,10 @@ function ^(a::RelSeriesElem{T}, b::Int) where T <: RingElement
       z = set_length!(z, 1)
       return z
    elseif pol_length(a) == 1
-      z = parent(a)(polcoeff(a, 0)^b)
+      c = polcoeff(a, 0)^b
+      z = parent(a)(c)
       z = set_precision!(z, (b - 1)*valuation(a) + precision(a))
-      z = set_valuation!(z, b*valuation(a))
+      z = set_valuation!(z, iszero(c) ? precision(z) : b*valuation(a))
       return z
    elseif b == 1
       return deepcopy(a)
@@ -843,18 +851,17 @@ end
 #
 ###############################################################################
 
-function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}) where T <: RingElement
+function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}; check::Bool=true) where T <: RingElement
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
    if v2 != 0
       v1 = valuation(x)
-      if v1 >= v2
-         x = shift_right(x, v2)
-         y = shift_right(y, v2)
-      else
+      if check && v1 < v2
          error("Not an exact division")
       end
+      x = shift_right(x, v2)
+      y = shift_right(y, v2)
    else
       x = deepcopy(x)
    end
@@ -863,11 +870,10 @@ function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}) where T <: RingEleme
    res = set_precision!(res, min(precision(x), valuation(x) + precision(y)))
    res = set_valuation!(res, valuation(x))
    lc = coeff(y, 0)
-   lc == 0 && error("Not an exact division")
+   check && lc == 0 && error("Not an exact division")
    lenr = precision(x) - valuation(x)
    for i = 0:lenr - 1
-      flag, q = divides(polcoeff(x, i), lc)
-      !flag && error("Not an exact division")
+      q = divexact(polcoeff(x, i), lc; check=check)
       res = setcoeff!(res, i, q)
       for j = 0:min(precision(y) - 1, lenr - i - 1)
          x = setcoeff!(x, i + j, polcoeff(x, i + j) - polcoeff(y, j)*q)
@@ -877,13 +883,31 @@ function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}) where T <: RingEleme
    return res
 end
 
+function divexact(x::RelSeriesElem{T}, y::RelSeriesElem{T}; check::Bool=true) where T <: FieldElement
+   check_parent(x, y)
+   iszero(y) && throw(DivideError())
+   v2 = valuation(y)
+   if v2 != 0
+      v1 = valuation(x)
+      if check && v1 < v2
+         error("Not an exact division")
+      end
+      x = shift_right(x, v2)
+      y = shift_right(y, v2)
+   else
+      x = deepcopy(x)
+   end
+   y = truncate(y, precision(x))
+   return x*inv(y)
+end
+
 ###############################################################################
 #
 #   Ad hoc exact division
 #
 ###############################################################################
 
-function divexact(x::RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::RelSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -891,12 +915,12 @@ function divexact(x::RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    z = set_precision!(z, precision(x))
    z = set_valuation!(z, valuation(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
    end
    return z
 end
 
-function divexact(x::RelSeriesElem{T}, y::T) where {T <: RingElem}
+function divexact(x::RelSeriesElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -904,7 +928,7 @@ function divexact(x::RelSeriesElem{T}, y::T) where {T <: RingElem}
    z = set_precision!(z, precision(x))
    z = set_valuation!(z, valuation(x))
    for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
    end
    return z
 end
@@ -977,6 +1001,51 @@ end
 
 ###############################################################################
 #
+#   Composition
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    compose(a::RelSeriesElem, b::RelSeriesElem)
+
+Compose the series $a$ with the series $b$ and return the result,
+i.e. return $a\circ b$. The two series do not need to be in the same ring,
+however the series $b$ must have positive valuation or an exception is raised.
+"""
+function compose(a::RelSeriesElem, b::RelSeriesElem)
+   valuation(b) == 0 && error("Series being substituted must have positive valuation")
+   i = pol_length(a)
+   R = base_ring(a)
+   S = parent(b)
+   if i == 0
+      return zero(R) + zero(S)
+   end
+   z = polcoeff(a, i - 1) * one(S)
+   while i > 1
+      i -= 1
+      c = S(polcoeff(a, i - 1))
+      z = z*b
+      if !iszero(c)
+         c = set_precision!(c, precision(z))
+         z += c
+      end
+   end
+   z *= b^valuation(a)
+   zprec = min(precision(z), valuation(b)*precision(a))
+   z = set_precision!(z, zprec)
+   z = set_valuation!(z, min(valuation(z), zprec))
+   zlen = max(0, precision(z) - valuation(z))
+   z = set_length!(z, min(zlen, pol_length(z)))
+   return z
+end
+
+# General substitution is not well-defined
+function subst(a::SeriesElem, b::SeriesElem)
+   return compose(a, b)
+end
+
+###############################################################################
+#
 #   Square root
 #
 ###############################################################################
@@ -984,9 +1053,11 @@ end
 @doc Markdown.doc"""
     sqrt(a::RelSeriesElem)
 
-Return the square root of the power series $a$.
+Return the square root of the power series $a$. By default the function raises
+an exception if the input is not a square. If `check=false` this check is
+omitted.
 """
-function Base.sqrt(a::RelSeriesElem)
+function Base.sqrt(a::RelSeriesElem; check::Bool=true)
    aval = valuation(a)
    !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
@@ -1004,7 +1075,7 @@ function Base.sqrt(a::RelSeriesElem)
    asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
    if prec > 0
-      g = sqrt(polcoeff(a, 0))
+      g = sqrt(polcoeff(a, 0); check=check)
       asqrt = setcoeff!(asqrt, 0, g)
       g2 = g + g
    end
@@ -1023,7 +1094,7 @@ function Base.sqrt(a::RelSeriesElem)
          c = addeq!(c, p)
       end
       c = polcoeff(a, n) - c
-      c = divexact(c, g2)
+      c = divexact(c, g2; check=check)
       asqrt = setcoeff!(asqrt, n, c)
    end
    asqrt = set_length!(asqrt, normalise(asqrt, prec))

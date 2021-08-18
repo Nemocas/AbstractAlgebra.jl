@@ -103,12 +103,31 @@ julia> C = S(R(11))
 
 ```
 
-We also allow matrices over a given base ring to be constructed directly (see the
-Matrix interface).
-
 ## Matrix element constructors
 
-In addition to coercing elements into a matrix space as above, we provide the
+There are a few ways to construc matrices other than by coercing elements
+as shown above. The first method is from an array of elements.
+
+This can be done with either two or one dimensional arrays.
+
+```julia
+(S::MatSpace{T})(A::Matrix{S}) where {S <: RingElement, T <: RingElement}
+(S::MatAlgebra{T})(A::Matrix{S}) where {S <: RingElement, T <: RingElement}
+```
+
+Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`,
+where `S` is the type of elements that can be coerced into the base ring of the matrix.
+
+```julia
+(S::MyMatSpace{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
+(S::MyMatAlgebra{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
+```
+
+Create the matrix in the given space/algebra of matrices (with dimensions $m\times n$
+say), whose $(i, j)$ entry is given by `A[i*(n - 1) + j]` and where `S` is the type of
+elements that can be coerced into the base ring of the matrix.
+
+We also provide the
 following syntax for constructing literal matrices (similar to how Julia
 arrays can be be constructed).
 
@@ -126,6 +145,36 @@ Also see the Matrix interface for a list of other ways to create matrices.
 **Examples**
 
 ```jldoctest
+julia> S = MatrixSpace(QQ, 2, 3)
+Matrix Space of 2 rows and 3 columns over Rationals
+
+julia> T = MatrixAlgebra(QQ, 2)
+Matrix Algebra of degree 2 over Rationals
+
+julia> M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
+[2//1   3//1   1//1]
+[1//1   0//1   4//1]
+
+julia> M2 = S(BigInt[2 3 1; 1 0 4])
+[2//1   3//1   1//1]
+[1//1   0//1   4//1]
+
+julia> M3 = S(BigInt[2, 3, 1, 1, 0, 4])
+[2//1   3//1   1//1]
+[1//1   0//1   4//1]
+
+julia> N1 = T(Rational{BigInt}[2 3; 1 0])
+[2//1   3//1]
+[1//1   0//1]
+
+julia> N2 = T(BigInt[2 3; 1 0])
+[2//1   3//1]
+[1//1   0//1]
+
+julia> N3 = T(BigInt[2, 3, 1, 1])
+[2//1   3//1]
+[1//1   1//1]
+
 julia> R, t = PolynomialRing(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
@@ -143,6 +192,57 @@ julia> P = R[1; 2; t] # create a column vector
 [1]
 [2]
 [t]
+```
+
+It is also possible to create matrices (in a matrix space only) directly, without first
+creating the corresponding matrix space (the inner constructor being called directly).
+
+```julia
+matrix(R::Ring, arr::Matrix{T}) where T <: RingElement
+```
+
+Given an $m\times n$ Julia matrix of entries, construct the corresponding
+AbstractAlgebra.jl matrix over the given ring `R`, assuming all the entries can be
+coerced into `R`.
+
+
+```julia
+matrix(R::Ring, r::Int, c::Int, A::Vector{T}) where T <: RingElement
+```
+
+Construct the given $r\times c$ AbstractAlgebra.jl matrix over the ring `R` whose
+$(i, j)$ entry is given by `A[c*(i - 1) + j]`, assuming that all the entries can be
+coerced into `R`.
+
+```julia
+zero_matrix(R::Ring, r::Int, c::Int)
+```
+
+Construct the $r\times c$ AbstractAlgebra.jl zero matrix over the ring `R`.
+
+**Examples**
+
+```jldoctest
+julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
+[3   1   2]
+[2   0   1]
+
+julia> N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
+[3   1]
+[2   2]
+[0   1]
+
+julia> P = zero_matrix(ZZ, 3, 2)
+[0   0]
+[0   0]
+[0   0]
+
+julia> R = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
+
+julia> M = R()
+[0   0]
+[0   0]
 ```
 
 ## Conversion to Julia matrices and iteration
@@ -166,18 +266,52 @@ julia> M = MatrixSpace(ZZ, 2, 3); x = M(1:6)
 [4   5   6]
 
 julia> collect(x)
-2×3 Array{BigInt,2}:
+2×3 Matrix{BigInt}:
  1  2  3
  4  5  6
 
 julia> Set(x)
 Set{BigInt} with 6 elements:
+  5
   4
+  6
   2
   3
-  5
-  6
   1
+```
+
+### Views
+
+As per Julia, AbstractAlgebra supports the construction of matrix views. 
+These allow one to work with a submatrix of a given
+matrix. Modifying the submatrix also modifies the original matrix.
+
+The syntax for views is as for Julia's own views.
+
+**Examples**
+
+```@jldoctest
+julia> M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
+[1   2   3]
+[2   3   4]
+[3   4   5]
+
+julia>
+
+julia> N1 = @view M[1:2, :]
+[1   2   3]
+[2   3   4]
+
+julia> N2 = @view M[:, 1:2]
+[1   2]
+[2   3]
+[3   4]
+
+julia>
+
+julia> R = N1*N2
+[14   20]
+[20   29]
 ```
 
 ## Matrix functionality provided by AbstractAlgebra.jl
@@ -201,10 +335,12 @@ dense_matrix_type(::Ring)
 ```
 
 ```@docs
-nrows(::MatrixElem)
+nrows(::MatSpace)
+ncols(::MatSpace)
 ```
 
 ```@docs
+nrows(::MatrixElem)
 ncols(::MatrixElem)
 ```
 
@@ -323,6 +459,78 @@ julia> Z = divexact(2*A, 2)
 [  t^2       t             t]
 [   -2   t + 2   t^2 + t + 1]
 
+julia> M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
+[2   3   0]
+[1   1   1]
+
+julia> M[1, 2] = BigInt(4)
+4
+
+julia> c = M[1, 1]
+2
+
+```
+
+### Transpose
+
+```julia
+transpose(::MatElem{T}) where T <: RingElem
+```
+
+Return the transpose of the given matrix.
+
+**Examples**
+
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = MatrixSpace(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> B = transpose(A)
+[t + 1   t^2            -2]
+[    t     t         t + 2]
+[    1     t   t^2 + t + 1]
+
+```
+
+### Submatrices
+
+Submatrices are only available for matrix spaces, not for matrix
+algebras and generally only available for generic matrices built
+on Julia arrays.
+
+Submatrices return a new matrix with the same entries as the
+submatrix with the given range of rows and columns. They are best
+illustrated with examples.
+
+**Examples**
+
+```jldoctest
+julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
+[1   2   3]
+[2   3   4]
+[3   4   5]
+
+julia> N1 = M[1:2, :]
+[1   2   3]
+[2   3   4]
+
+julia> N2 = M[:, :]
+[1   2   3]
+[2   3   4]
+[3   4   5]
+
+julia> N3 = M[2:3, 2:3]
+[3   4]
+[4   5]
+
 ```
 
 ### Elementary row and column operations
@@ -367,6 +575,177 @@ julia> multiply_row(M, 2, 3)
 [8   10   10]
 ```
 
+### Row swapping
+
+```julia
+swap_rows!(M::MatElem, i::Int, j::Int)
+```
+
+Swap the rows of `M` in place. The function returns the mutated matrix (since
+matrices are assumed to be mutable in AbstractAlgebra.jl).
+
+**Examples**
+
+```jldoctest
+julia> M = identity_matrix(ZZ, 3)
+[1   0   0]
+[0   1   0]
+[0   0   1]
+
+julia> swap_rows!(M, 1, 2)
+[0   1   0]
+[1   0   0]
+[0   0   1]
+
+```
+
+### Concatenation
+
+The following are only available for matrix spaces, not for matrix algebras.
+
+```julia
+hcat(M::T, N::T) where T <: MatElem
+```
+
+Return the horizontal concatenation of $M$ and $N$. It is assumed that the number of
+rows of $M$ and $N$ are the same.
+
+```julia
+vcat(M::T, N::T) where T <: MatElem
+```
+
+Return the vertical concatenation of $M$ and $N$. It is assumed that the number of
+columns of $M$ and $N$ are the same.
+
+**Examples**
+
+```jldoctest
+julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
+[1   2   3]
+[2   3   4]
+[3   4   5]
+
+julia> N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
+[1   0   1]
+[0   1   0]
+[1   0   1]
+
+julia> P = hcat(M, N)
+[1   2   3   1   0   1]
+[2   3   4   0   1   0]
+[3   4   5   1   0   1]
+
+julia> Q = vcat(M, N)
+[1   2   3]
+[2   3   4]
+[3   4   5]
+[1   0   1]
+[0   1   0]
+[1   0   1]
+
+```
+
+### Similar and zero
+
+Both `similar` and `zero` construct new matrices, but
+the entries are either undefined with `similar` or zero-initialized with `zero`.
+
+```julia
+similar(x::MatElem, R::Ring=base_ring(x))
+zero(x::MatElem, R::Ring=base_ring(x))
+```
+
+Construct the matrix with the same dimensions as the given matrix, and the
+same base ring unless explicitly specified.
+
+```julia
+similar(x::MatElem, R::Ring, r::Int, c::Int)
+similar(x::MatElem, r::Int, c::Int)
+zero(x::MatElem, R::Ring, r::Int, c::Int)
+zero(x::MatElem, r::Int, c::Int)
+```
+
+Construct the $r\times c$ matrix with `R` as base ring (which defaults to the
+base ring of the the given matrix).
+If $x$ belongs to a matrix algebra and $r \neq c$, an exception is raised, and it's
+also possible to specify only one `Int` as the order (e.g. `similar(x, n)`).
+
+```julia
+Base.isassigned(M::MatElem, i, j)
+```
+
+Test whether the given matrix has a value associated with indices `i` and `j`.
+
+**Examples**
+
+```jldoctest
+julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
+[3   1   2]
+[2   0   1]
+
+julia> isassigned(M, 1, 2)
+true
+
+julia> isassigned(M, 4, 4)
+false
+
+julia> A = similar(M)
+[#undef   #undef   #undef]
+[#undef   #undef   #undef]
+
+julia> isassigned(A, 1, 2)
+false
+
+julia> B = zero(M)
+[0   0   0]
+[0   0   0]
+
+julia> C = similar(M, 4, 5)
+[#undef   #undef   #undef   #undef   #undef]
+[#undef   #undef   #undef   #undef   #undef]
+[#undef   #undef   #undef   #undef   #undef]
+[#undef   #undef   #undef   #undef   #undef]
+
+julia> base_ring(B)
+Integers
+
+julia> D = zero(M, QQ, 2, 2)
+[0//1   0//1]
+[0//1   0//1]
+
+julia> base_ring(D)
+Rationals
+```
+
+### Symmetry testing
+
+```julia
+LinearAlgebra.issymmetric(a::MatrixElem)
+```
+
+Return `true` if the given matrix is symmetric with respect to its main diagonal,
+otherwise return `false`.
+
+**Examples**
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
+[1   2   3]
+[2   4   5]
+[3   5   6]
+
+julia> issymmetric(M)
+true
+
+julia> N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
+[1   2   3]
+[4   5   6]
+[7   8   9]
+
+julia> issymmetric(N)
+false
+```
+
 ### Powering
 
 ```@docs
@@ -382,7 +761,7 @@ julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
 [4   5   5]
 
 julia> A = powers(M, 4)
-5-element Array{AbstractAlgebra.Generic.MatSpaceElem{BigInt},1}:
+5-element Vector{AbstractAlgebra.Generic.MatSpaceElem{BigInt}}:
  [1 0 0; 0 1 0; 0 0 1]
  [1 2 3; 2 3 4; 4 5 5]
  [17 23 26; 24 33 38; 34 48 57]
@@ -661,7 +1040,7 @@ julia> A = ZZ[1 2 3; 4 5 6]
 [4   5   6]
 
 julia> minors(A, 2)
-3-element Array{BigInt,1}:
+3-element Vector{BigInt}:
  -3
  -6
  -3
@@ -691,7 +1070,7 @@ julia> pfaffian(M)
 x1*x6 - x2*x5 + x3*x4
 
 julia> pfaffians(M, 2)
-6-element Array{AbstractAlgebra.Generic.MPoly{Rational{BigInt}},1}:
+6-element Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}:
  x1
  x2
  x4

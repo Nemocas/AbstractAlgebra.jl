@@ -51,10 +51,12 @@ Most of the generic code in AbstractAlgebra makes use of the union type
 `RingElement` instead of `RingElem` so that the
 generic functions also accept the Julia Base ring types.
 
-One must be careful when defining ad hoc binary operations for ring element
-types. It is often necessary to define separate versions of the functions for
-`RingElem` then for each of the Julia types separately in
-order to avoid ambiguity warnings.
+!!! note
+
+    One must be careful when defining ad hoc binary operations for ring element
+    types. It is often necessary to define separate versions of the functions for
+    `RingElem` then for each of the Julia types separately in
+    order to avoid ambiguity warnings.
 
 Note that even though `RingElement` is a union type we still
 have the following inclusion
@@ -94,10 +96,12 @@ in AbstractAlgebra.jl or by external libraries wanting to use AbstractAlgebra.jl
 We give this interface for fictitious types `MyParent` for the type of the ring parent
 object `R` and `MyElem` for the type of the elements of the ring.
 
-Note that generic functions in AbstractAlgebra.jl may not rely on the existence of
-functions that are not documented here. If they do, those functions will only be
-available for rings that implement that additional functionality, and should be
-documented as such.
+!!! note
+
+    Generic functions in AbstractAlgebra.jl may not rely on the existence of
+    functions that are not documented here. If they do, those functions will only be
+    available for rings that implement that additional functionality, and should be
+    documented as such.
 
 ### Data type and parent object methods
 
@@ -126,11 +130,13 @@ of polynomials over the integers would be the integer ring.
 
 If the ring is not parameterised by another ring, this function must return `Union{}`.
 
-Note that there is a distinction between a base ring and other kinds of parameters. For
-example, in the ring $\mathbb{Z}/n\mathbb{Z}$, the modulus $n$ is a parameter, but the
-only base ring is $\mathbb{Z}$. We consider the ring $\mathbb{Z}/n\mathbb{Z}$ to have
-been constructed from the base ring $\mathbb{Z}$ by taking its quotient by a (principal)
-ideal.
+!!! note
+
+    There is a distinction between a base ring and other kinds of parameters. For
+    example, in the ring $\mathbb{Z}/n\mathbb{Z}$, the modulus $n$ is a parameter, but the
+    only base ring is $\mathbb{Z}$. We consider the ring $\mathbb{Z}/n\mathbb{Z}$ to have
+    been constructed from the base ring $\mathbb{Z}$ by taking its quotient by a (principal)
+    ideal.
 
 ```julia
 parent(f::MyElem)
@@ -434,13 +440,21 @@ make sense but are passed to the function.
 ### Exact division
 
 ```julia
-divexact(f::MyElem, g::MyElem)
+divexact(f::MyElem, g::MyElem; check::Bool=true)
 ```
 
 Return $f/g$, though note that Julia uses `/` for floating point division. Here we
 mean exact division in the ring, i.e. return $q$ such that $f = gq$. A `DivideError()`
-should be thrown if $g$ is zero. If no exact quotient exists or an impossible inverse
-is unavoidably encountered, an error should be thrown.
+should be thrown if $g$ is zero.
+
+If `check=true` the function should check that the division is exact and throw
+an exception if not.
+
+If `check=false` the check may be omitted for performance reasons. The behaviour
+is then undefined if a division is performed that is not exact. This may include
+throwing an exception, returning meaningless results, hanging or crashing. The
+function should only be called with `check=false` if it is already known that the
+division will be exact.
 
 ### Inverse
 
@@ -476,8 +490,10 @@ The results of `deepcopy` and all arithmetic operations, including powering and 
 can be assumed to be new objects without other references being held, as can objects
 returned from constructors.
 
-Note that `R(a)` where `R` is the ring `a` belongs to, does not create a new value. For
-this case, use `deepcopy(a)`.
+!!! note
+
+    It is important to recognise that `R(a)` where `R` is the ring `a` belongs
+    to, does not create a new value. For this case, use `deepcopy(a)`.
 
 ```julia
 zero!(f::MyElem)
@@ -724,3 +740,240 @@ Set $c = c + ab$ in-place. Return the mutated value. The value $t$ should be a t
 of the same type as $a$, $b$ and $c$, which can be used arbitrarily by the
 implementation to speed up the computation. Aliasing between $a$, $b$ and $c$ is
 permitted.
+
+## Minimal example of ring implementation
+
+Here is a minimal example of implementing the Ring Interface for a constant
+polynomial type (i.e. polynomials of degree less than one).
+
+```julia
+# ConstPoly.jl : Implements constant polynomials
+
+using AbstractAlgebra
+
+using Random: Random, SamplerTrivial, GLOBAL_RNG
+using RandomExtensions: RandomExtensions, Make2, AbstractRNG
+
+import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type,
+       isexact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
+       get_cached!, isunit, characteristic, Ring, RingElem
+
+import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero
+
+struct ConstPolyRing{T <: RingElement}
+   base_ring::Ring
+
+   function ConstPolyRing{T}(R::Ring, cached::Bool) where T <: RingElement
+      return get_cached!(ConstPolyID, R, cached) do
+         new{T}(R)
+      end::ConstPolyRing{T}
+   end
+end
+
+const ConstPolyID = AbstractAlgebra.CacheDictType{Ring, ConstPolyRing}()
+   
+mutable struct ConstPoly{T <: RingElement} <: RingElem
+   c::T
+   parent::ConstPolyRing{T}
+
+   function ConstPoly{T}(c::T) where T <: RingElement
+      return new(c)
+   end
+end
+
+# Data type and parent object methods
+
+parent_type(::Type{ConstPoly{T}}) where T <: RingElement = ConstPolyRing{T}
+
+elem_type(::Type{ConstPolyRing{T}}) where T <: RingElement = ConstPoly{T}
+
+base_ring(R::ConstPolyRing) = R.base_ring
+
+parent(f::ConstPoly) = f.parent
+
+isdomain_type(::Type{ConstPoly{T}}) where T <: RingElement = isdomain_type(T)
+
+isexact_type(::Type{ConstPoly{T}}) where T <: RingElement = isexact_type(T)
+
+function Base.hash(f::ConstPoly, h::UInt)
+   r = 0x65125ab8e0cd44ca
+   return xor(r, hash(f.c, h))
+end
+
+function deepcopy_internal(f::ConstPoly)
+   r = ConstPoly(f.c)
+   r.parent = f.parent # parent should not be deepcopied
+end
+
+# Basic manipulation
+
+zero(R::ConstPolyRing) = R()
+
+one(R::ConstPolyRing) = R(1)
+
+iszero(f::ConstPoly) = iszero(f.c)
+
+isone(f::ConstPoly) = isone(f.c)
+
+isunit(f::ConstPoly) = isunit(f.c)
+
+characteristic(R::ConstPolyRing) = characteristic(base_ring(R))
+
+# Canonical unit
+
+canonical_unit(f::ConstPoly) = canonical_unit(f.c)
+
+# String I/O
+
+function show(io::IO, R::ConstPolyRing)
+   print(io, "Constant polynomials over ")
+   show(io, base_ring(R))
+end
+
+function show(io::IO, f::ConstPoly)
+   print(io, f.c)
+end
+
+# Unary operations
+
+function -(f::ConstPoly)
+   R = parent(f)
+   return R(-f.c)
+end
+
+# Binary operations
+
+function +(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
+   parent(f) != parent(g) && error("Incompatible rings")
+   R = parent(f)
+   return R(f.c + g.c)
+end
+
+function -(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
+   parent(f) != parent(g) && error("Incompatible rings")
+   R = parent(f)
+   return R(f.c - g.c)
+end
+
+function *(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
+   parent(f) != parent(g) && error("Incompatible rings")
+   R = parent(f)
+   return R(f.c*g.c)
+end
+
+# Comparison
+
+function ==(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
+   parent(f) != parent(g) && error("Incompatible rings")
+   return f.c == g.c
+end
+
+function isequal(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
+   parent(f) != parent(g) && error("Incompatible rings")
+   return isequal(f.c, g.c)
+end
+
+# Powering
+
+function ^(f::ConstPoly, e::Int)
+   e < 0 && throw(DomainError(e, "exponent must be nonnegative"))
+   R = parent(f)
+   return R(f.c^e)
+end
+
+# Exact division
+
+function divexact(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
+   parent(f) != parent(g) && error("Incompatible rings")
+   R = parent(f)
+   return R(divexact(f.c, g.c))
+end
+
+# Inverse
+
+function inv(f::ConstPoly)
+   R = parent(f)
+   return R(AbstractAlgebra.inv(f.c))
+end
+
+# Unsafe operators
+
+function zero!(f::ConstPoly)
+   f.c = 0
+   return f
+end
+
+function mul!(f::ConstPoly{T}, g::ConstPoly{T}, h::ConstPoly{T}) where T <: RingElement
+   f.c = g.c*h.c
+   return f
+end
+
+function add!(f::ConstPoly{T}, g::ConstPoly{T}, h::ConstPoly{T}) where T <: RingElement
+   f.c = g.c + h.c
+   return f
+end
+
+function addeq!(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
+   f.c += g.c
+   return f
+end
+
+# Random generation
+
+RandomExtensions.maketype(R::ConstPolyRing, _) = elem_type(R)
+
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{ConstPoly,ConstPolyRing}}) =
+        sp[][1](rand(rng, sp[][2]))
+
+rand(rng::AbstractRNG, R::ConstPolyRing, n::UnitRange{Int}) = R(rand(rng, n))
+
+rand(R::ConstPolyRing, n::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, n)
+
+# Promotion rules
+
+promote_rule(::Type{ConstPoly{T}}, ::Type{ConstPoly{T}}) where T <: RingElement = ConstPoly{T}
+
+function promote_rule(::Type{ConstPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? ConstPoly{T} : Union{}
+end
+
+# Constructors
+
+function (R::ConstPolyRing{T})() where T <: RingElement
+   r = ConstPoly{T}(base_ring(R)(0))
+   r.parent = R
+   return r
+end
+
+function (R::ConstPolyRing{T})(c::Integer) where T <: RingElement
+   r = ConstPoly{T}(base_ring(R)(c))
+   r.parent = R
+   return r
+end
+
+# Needed to prevent ambiguity
+function (R::ConstPolyRing{T})(c::T) where T <: Integer
+   r = ConstPoly{T}(base_ring(R)(c))
+   r.parent = R
+   return r
+end
+
+function (R::ConstPolyRing{T})(c::T) where T <: RingElement
+   base_ring(R) != parent(c) && error("Unable to coerce element")
+   r = ConstPoly{T}(c)
+   r.parent = R
+   return r
+end
+
+function (R::ConstPolyRing{T})(f::ConstPoly{T}) where T <: RingElement
+   R != parent(f) && error("Unable to coerce element")
+   return f
+end
+
+# Parent constructor
+
+function ConstantPolynomialRing(R::Ring, cached::Bool=true)
+   T = elem_type(R)
+   return ConstPolyRing{T}(R, cached)
+end
+```

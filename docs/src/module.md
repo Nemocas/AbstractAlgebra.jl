@@ -5,20 +5,13 @@ DocTestSetup = quote
 end
 ```
 
-# Module Interface
-
-Note: the module infrastructure in AbstractAlgebra should be considered
-experimental at this stage. This means that the interface may change in
-the future.
+# Finitely presented modules
 
 AbstractAlgebra allows the construction of finitely presented modules (i.e.
-with finitely many generators and relations), starting from free modules. The
-generic code provided by AbstractAlgebra will only work for modules over
-euclidean domains, however there is nothing preventing a library from
-implementing more general modules using the same interface.
+with finitely many generators and relations), starting from free modules.
 
-All finitely presented module types in AbstractAlgebra follow the following
-interface.
+The generic code provided by AbstractAlgebra will only work for modules over
+euclidean domains.
 
 Free modules can be built over both commutative and noncommutative rings. Other
 types of module are restricted to fields and euclidean rings.
@@ -36,57 +29,43 @@ element types
 Note that the abstract types are parameterised. The type `T` should usually be
 the type of elements of the ring the module is over.
 
-## Required functionality for modules
+## Module functions
 
-We suppose that `R` is a fictitious base ring and that `S` is a module over `R` with
-parent object `S` of type `MyModule{T}`. We also assume the elements in the module have
-type `MyModuleElem{T}`, where `T` is the type of elements of the ring the module is
-over.
+All finitely presented modules over a Euclidean domain implement the following
+functions.
 
-Of course, in practice these types may not be parameterised, but we use parameterised
-types here to make the interface clearer.
-
-Note that the type `T` must (transitively) belong to the abstract type `RingElement`
-or `NCRingElem`.
-
-We describe the functionality below for modules over commutative rings, i.e. with
-element type belonging to `RingElement`, however similar constructors should be
-available for element types belonging to `NCRingElem` instead, for free modules over
-a noncommutative ring.
-
-Although not part of the module interface, implementations of modules that wish to
-follow our interface should use the same function names for submodules, quotient
-modules, direct sums and module homomorphisms if they wish to remain compatible
-with our module generics in the future.
-
-### Basic manipulation
+### Basic functions
 
 ```julia
-iszero(m::MyModuleElem{T}) where T <: RingElement
+zero(M::FPModule)
+```
+
+```julia
+iszero(m::FPModuleElem{T}) where T <: RingElement
 ```
 
 Return `true` if the given module element is zero.
 
 ```julia
-ngens(M::MyModule{T}) where T <: RingElement
+ngens(M::FPModule{T}) where T <: RingElement
 ```
 
 Return the number of generators of the module $M$ in its current representation.
 
 ```julia
-gen(M::MyModule{T}, i::Int) where T <: RingElement
+gen(M::FPModule{T}, i::Int) where T <: RingElement
 ```
 
 Return the $i$-th generator (indexed from $1$) of the module $M$.
 
 ```julia
-gens(M::MyModule{T}) where T <: RingElement
+gens(M::FPModule{T}) where T <: RingElement
 ```
 
 Return a Julia array of the generators of the module $M$.
 
 ```julia
-rels(M::MyModule{T}) where T <: RingElement
+rels(M::FPModule{T}) where T <: RingElement
 ```
 
 Return a Julia vector of all the relations between the generators of `M`. Each
@@ -102,7 +81,7 @@ julia> n = ngens(M)
 2
 
 julia> G = gens(M)
-2-element Array{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}},1}:
+2-element Vector{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}}}:
  (1//1, 0//1)
  (0//1, 1//1)
 
@@ -115,6 +94,14 @@ julia> g1 = gen(M, 1)
 julia> !iszero(g1)
 true
 
+julia> M = FreeModule(QQ, 2)
+Vector space of dimension 2 over Rationals
+
+julia> z = zero(M)
+(0//1, 0//1)
+
+julia> iszero(z)
+true
 ```
 
 ### Element constructors
@@ -123,7 +110,7 @@ We can construct elements of a module $M$ by specifying linear combinations
 of the generators of $M$. This is done by passing a vector of ring elements.
 
 ```julia
-(M::Module{T})(v::Vector{T}) where T <: RingElement
+(M::FPModule{T})(v::Vector{T}) where T <: RingElement
 ```
 
 Construct the element of the module $M$ corrsponding to $\sum_i g[i]v[i]$
@@ -161,13 +148,11 @@ the ring the module is defined over and compared for equality.
 In the case of a noncommutative ring, both left and right scalar multiplication
 are defined.
 
-## Generic functionality provided
-
-AbstractAlgebra provides the following functionality for all module types
-that implement the interface above. Of course, this functionality can also
-be provided by special implementations if desired.
-
 ### Basic manipulation
+
+```julia
+zero(M::FPModule)
+```
 
 **Examples**
 
@@ -198,7 +183,7 @@ julia> m[1]
 2
 ```
 
-### Comparison
+### Module comparison
 
 ```@docs
 ==(::FPModule{T}, ::FPModule{T}) where T <: RingElement
@@ -221,10 +206,12 @@ true
 isisomorphic(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 ```
 
-Note that this function relies on the Smith normal form over the base ring of
-the modules being able to be made unique. This is true for Euclidean domains
-for which `divrem` has a fixed choice of quotient and remainder, but it will
-not in general be true for Euclidean rings that are not domains.
+!!! note
+
+    Note that this function relies on the Smith normal form over the base ring of
+    the modules being able to be made unique. This is true for Euclidean domains
+    for which `divrem` has a fixed choice of quotient and remainder, but it will
+    not in general be true for Euclidean rings that are not domains.
 
 **Examples**
 
@@ -302,8 +289,10 @@ Codomain: Quotient module over Integers with 3 generators and relations:
 [3 9 -1], [0 20 -10])
 
 julia> invs = invariant_factors(Q)
-2-element Array{BigInt,1}:
+2-element Vector{BigInt}:
  10
   0
 
 ```
+
+

@@ -199,7 +199,7 @@ function (a::NCPolyRing{T})(b::NCPolyElem{T}) where T <: NCRingElem
    return b
 end
 
-function (a::NCPolyRing{T})(b::Array{T, 1}) where T <: NCRingElem
+function (a::NCPolyRing{T})(b::Vector{T}) where T <: NCRingElem
    R = base_ring(a)
    for i = 1:length(b)
       b[i] = R(b[i])
@@ -209,7 +209,7 @@ function (a::NCPolyRing{T})(b::Array{T, 1}) where T <: NCRingElem
    return z
 end
 
-function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: NCRingElem}
+function (a::NCPolyRing{T})(b::Vector{S}) where {S <: RingElement, T <: NCRingElem}
    R = base_ring(a)
    len = length(b)
    entries = Array{T}(undef, len)
@@ -221,7 +221,7 @@ function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: NCRing
    return z
 end
 
-function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: NCRingElem, T <: NCRingElem}
+function (a::NCPolyRing{T})(b::Vector{S}) where {S <: NCRingElem, T <: NCRingElem}
    R = base_ring(a)
    len = length(b)
    entries = Array{T}(undef, len)

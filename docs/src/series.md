@@ -138,6 +138,75 @@ julia> V = AbsSeriesRing(ZZ, 10)
 Univariate power series ring in x over Integers
 ```
 
+## Power series constructors
+
+Series can be constructed using arithmetic operators using the generator of the
+series. Also see the big-oh notation below for specifying the precision.
+
+All of the standard ring constructors can also be used to construct power series.
+
+```julia
+(R::SeriesRing)() # constructs zero
+(R::SeriesRing)(c::Integer)
+(R::SeriesRing)(c::elem_type(R))
+(R::SeriesRing{T})(a::T) where T <: RingElement
+```
+
+In addition, the following constructors that are specific to power series are
+provided. They take an array of coefficients, a length, precision and
+valuation. Coefficients will be coerced into the coefficient ring if they are
+not already in that ring.
+
+For relative series we have:
+
+```julia
+(S::SeriesRing{T})(A::Vector{T}, len::Int, prec::Int, val::Int) where T <: RingElem
+(S::SeriesRing{T})(A::Vector{U}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: RingElem}
+(S::SeriesRing{T})(A::Vector{U}, len::Int, prec::Int, val::Int) where {T <: RingElem, U <: Integer}
+```
+
+And for absolute series:
+
+```julia
+(S::SeriesRing{T})(A::Vector{T}, len::Int, prec::Int) where T <: RingElem
+```
+
+It is also possible to create series directly without having to create the
+corresponding series ring.
+
+```julia
+abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+```
+
+**Examples**
+
+```@jldoctest
+julia> S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
+(Univariate power series ring in x over Rationals, x + O(x^10))
+
+julia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
+2*x + 3*x^2 + x^3 + O(x^6)
+
+julia> f = abs_series(ZZ, [1, 2, 3], 3, 5, "y")
+1 + 2*y + 3*y^2 + O(y^5)
+
+julia> g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
+x^4 + 2*x^5 + 3*x^6 + O(x^7)
+
+julia> k = abs_series(ZZ, [1, 2, 3], 1, 6, cached=false)
+1 + O(x^6)
+
+julia> p = rel_series(ZZ, BigInt[], 0, 3, 1)
+O(x^3)
+
+julia> q = abs_series(ZZ, [], 0, 6)
+O(x^6)
+
+julia> s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
+1 + 2*x + 3*x^2 + O(x^5)
+```
+
 ## Big-oh notation
 
 Series elements can be given a precision using the big-oh notation. This is provided
@@ -161,7 +230,6 @@ julia> f = 1 + 2x + O(x^5)
 
 julia> g = 2y + 7y^2 + O(y^7)
 2*y + 7*y^2 + O(y^7)
-
 ```
 
 What is happening here in practice is that `O(x^n)` is creating the series `0 + O(x^n)`
@@ -257,10 +325,96 @@ one can often treat absolute power series rings as though they were rings. Howev
 this depends on all series being given a precision equal to the specified maximum
 precision and not a lower precision.
 
-## Basic ring functionality
+## Functions for types and parents of series rings
 
-All power series models provide the functionality described in the Ring and Series Ring
-interfaces.
+```julia
+base_ring(R::SeriesRing)
+base_ring(a::SeriesElem)
+```
+
+Return the coefficient ring of the given series ring or series.
+
+
+```julia
+parent(a::SeriesElem)
+```
+
+Return the parent of the given series.
+
+```julia
+characteristic(R::SeriesRing)
+```
+
+Return the characteristic of the given series ring.
+
+## Series functions
+
+Unless otherwise noted, the functions below are available for all series
+models, including Laurent series. We denote this by using the abstract type
+`RelSeriesElem`, even though absolute series and Laurent series types
+do not belong to this abstract type.
+
+### Basic functionality
+
+Series implement the Ring Interface
+
+```julia
+zero(R::SeriesRing)
+one(R::SeriesRing)
+iszero(a::SeriesElem)
+isone(a::SeriesElem)
+```
+
+```julia
+divexact(a::T, b::T) where T <: SeriesElem
+inv(a::SeriesElem) 
+```
+
+Series also implement the Series Interface, the most important basic
+functions being the following.
+
+```julia
+var(S::SeriesRing)
+```
+
+Return a symbol for the variable of the given series ring.
+
+```julia
+max_precision(S::SeriesRing)
+```
+
+Return the precision cap of the given series ring.
+
+
+```julia
+precision(f::SeriesElem)
+valuation(f::SeriesElem)
+```
+
+```julia
+gen(R::SeriesRing)
+```
+
+The following functions are also provided for all series.
+
+```julia
+coeff(a::SeriesElem, n::Int)
+```
+
+Return the degree $n$ coefficient of the given power series. Note coefficients
+are numbered from $n = 0$ for the constant coefficient. If $n$ exceeds the
+current precision of the power series, the function returns a zero coefficient.
+
+For power series types, $n$ must be non-negative. Laurent series do not have this
+restriction.
+
+```@docs
+modulus{T <: ResElem}(::SeriesElem{T})
+```
+
+```@docs
+isgen(::RelSeriesElem)
+```
 
 **Examples**
 
@@ -298,6 +452,9 @@ Integers
 julia> v = var(S)
 :x
 
+julia> max_precision(S) == 10
+true
+
 julia> T = parent(x + 1)
 Univariate power series ring in x over Integers
 
@@ -310,47 +467,6 @@ julia> t = divexact(2g, 2)
 julia> p = precision(f)
 10
 
-```
-
-## Series functionality provided by AbstractAlgebra.jl
-
-
-The functionality below is automatically provided by AbstractAlgebra.jl for any series
-module that implements the full Series Ring interface. This includes AbstractAlgebra's
-own generic series rings.
-
-Of course, modules are encouraged to provide specific implementations of the functions
-described here, that override the generic implementation.
-
-Unless otherwise noted, the functions are available for all series models, including
-Laurent series. We denote this by using the abstract type
-`RelSeriesElem`, even though absolute series and Laurent series types
-do not belong to this abstract type.
-
-### Basic functionality
-
-```julia
-coeff(a::SeriesElem, n::Int)
-```
-
-Return the degree $n$ coefficient of the given power series. Note coefficients
-are numbered from $n = 0$ for the constant coefficient. If $n$ exceeds the
-current precision of the power series, the function returns a zero coefficient.
-
-For power series types, $n$ must be non-negative. Laurent series do not have this
-restriction.
-
-```@docs
-modulus{T <: ResElem}(::SeriesElem{T})
-```
-
-```@docs
-isgen(::RelSeriesElem)
-```
-
-**Examples**
-
-```jldoctest
 julia> R, t = PowerSeriesRing(QQ, 10, "t")
 (Univariate power series ring in t over Rationals, t + O(t^11))
 
@@ -378,6 +494,24 @@ julia> p = valuation(b)
 julia> c = coeff(b, 2)
 1 + t^2 + O(t^10)
 
+julia> S, x = PowerSeriesRing(ZZ, 10, "x")
+(Univariate power series ring in x over Integers, x + O(x^11))
+
+julia> f = 1 + 3x + x^3 + O(x^5)
+1 + 3*x + x^3 + O(x^5)
+
+julia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0], 4, 10, 3);
+
+julia> set_length!(g, 3)
+x^3 + 2*x^4 + O(x^10)
+
+julia> g = setcoeff!(g, 2, BigInt(11))
+x^3 + 2*x^4 + 11*x^5 + O(x^10)
+
+julia> fit!(g, 8)
+
+julia> g = setcoeff!(g, 7, BigInt(4))
+x^3 + 2*x^4 + 11*x^5 + O(x^10)
 ```
 
 ### Change base ring
@@ -518,6 +652,15 @@ julia> d = inv(b)
 
 ```
 
+### Composition
+
+```@docs
+compose(a::RelSeriesElem, b::RelSeriesElem)
+```
+
+Note that `subst` can be used instead of `compose`, however the provided
+functionality is the same. General series substitution is not well-defined.
+
 ### Derivative and integral
 
 ```@docs
@@ -576,4 +719,22 @@ true
 julia> h = sqrt(a)
 1 + 1//2*z + 11//8*z^2 - 11//16*z^3 - 77//128*z^4 + O(z^5)
 
+```
+
+### Random generation
+
+Random series can be constructed using the `rand` function. A range of possible
+valuations is provided. The maximum precision of the ring is used as a bound on
+the precision. Other parameters are used to construct random coefficients.
+
+```julia
+rand(R::SeriesRing, val_range::UnitRange{Int}, v...)
+```
+
+**Examples**
+
+```@repl
+using AbstractAlgebra # hide
+R, x = PowerSeriesRing(ZZ, 10, "x")
+f = rand(R, 3:5, -10:10)
 ```

@@ -980,8 +980,8 @@ end
 #
 ###############################################################################
 
-function divexact(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}) where
-                                                              T <: FieldElement
+function divexact(a::FunctionFieldElem{T},
+            b::FunctionFieldElem{T}; check::Bool=true) where T <: FieldElement
    return a*inv(b)
 end
 
@@ -991,7 +991,8 @@ end
 #
 ###############################################################################
 
-function divexact(a::FunctionFieldElem, b::Union{Rational, Integer})
+function divexact(a::FunctionFieldElem,
+                                b::Union{Rational, Integer}; check::Bool=true)
    S = parent(a)
    anum = numerator(a, false)
    aden = denominator(a, false)
@@ -1000,7 +1001,8 @@ function divexact(a::FunctionFieldElem, b::Union{Rational, Integer})
    return S(rnum, rden*aden)
 end
 
-function divexact(a::FunctionFieldElem{T}, b::T) where T <: FieldElem
+function divexact(a::FunctionFieldElem{T},
+                                  b::T; check::Bool=true) where T <: FieldElem
    S = parent(a)
    anum = numerator(a, false)
    aden = denominator(a, false)
@@ -1009,7 +1011,8 @@ function divexact(a::FunctionFieldElem{T}, b::T) where T <: FieldElem
    return S(rnum, rden*aden)
 end
 
-function divexact(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
+function divexact(a::FunctionFieldElem{T},
+                          b::Rat{T}; check::Bool=true) where T <: FieldElement
    S = parent(a)
    base_ring(a) != parent(b) && error("Incompatible fields")
    bnum = numerator(b, false)
@@ -1019,15 +1022,26 @@ function divexact(a::FunctionFieldElem{T}, b::Rat{T}) where T <: FieldElement
    return S(_rat_poly_canonicalise(anum*bden, aden*bnum)...)
 end
 
-divexact(a::FunctionFieldElem, b::RingElem) = divexact(a, base_ring(a)(b))
+function divexact(a::FunctionFieldElem, b::RingElem; check::Bool=true)
+   return divexact(a, base_ring(a)(b))
+end
 
-divexact(a::Union{Rational, Integer}, b::FunctionFieldElem) = a*inv(b)
+function divexact(a::Union{Rational, Integer},
+                                       b::FunctionFieldElem; check::Bool=true)
+   return a*inv(b)
+end
 
-divexact(a::T, b::FunctionFieldElem{T}) where T <: FieldElement = a*inv(b)
+function divexact(a::T,
+            b::FunctionFieldElem{T}; check::Bool=true) where T <: FieldElement
+   return a*inv(b)
+end
 
-divexact(a::Rat{T}, b::FunctionFieldElem{T}) where T <: FieldElement = a*inv(b)
+function divexact(a::Rat{T},
+            b::FunctionFieldElem{T}; check::Bool=true) where T <: FieldElement
+   return a*inv(b)
+end
 
-divexact(a::RingElem, b::FunctionFieldElem) = a*inv(b)
+divexact(a::RingElem, b::FunctionFieldElem; check::Bool=true) = a*inv(b)
 
 ###############################################################################
 #

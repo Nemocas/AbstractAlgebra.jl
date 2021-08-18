@@ -179,7 +179,7 @@ function ModuleHomomorphism(M1::FPModule{T},
 end
 
 function ModuleHomomorphism(M1::FPModule{T},
-               M2::FPModule{T}, v::Array{S, 1}) where
+               M2::FPModule{T}, v::Vector{S}) where
                         {T <: RingElement, S<:FPModuleElem{T}}
    return Generic.ModuleHomomorphism(M1, M2, v)
 end

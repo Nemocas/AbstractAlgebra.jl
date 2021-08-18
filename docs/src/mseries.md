@@ -69,10 +69,12 @@ the resulting parent objects to coerce various elements into the series ring.
 Note that one can also use the function call `O(x^n)` to specify the precision
 in the variable `x` of a given series expression should be precision `n`.
 
-Note that it is not possible to use `x^0` in this function, since there is no
-distinction between `x^0` and `y^0` as far as the system is concerned. If one
-wishes to set the precision of a variable to precision `0`, one must use the
-`set_precision!` function described below.
+!!! note
+
+    It is not possible to use `x^0` in the `O()` function, since there is no
+    distinction between `x^0` and `y^0` as far as the system is concerned. If one
+    wishes to set the precision of a variable to precision `0`, one must use the
+    `set_precision!` function described below.
 
 If one wants a series with the same precision in all variables, one can use
 `O(R, n)` where `R` is the series ring and `n` is the desired precision.
@@ -84,7 +86,7 @@ precisions can be replaced by a single integer.
 
 ```jldoctest
 julia> R, (x, y) = PowerSeriesRing(ZZ, [2, 3], ["x", "y"])
-(Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt,AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^2), y + O(y^3) + O(x^2)])
+(Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^2), y + O(y^3) + O(x^2)])
 
 julia> f = R()
 O(y^3) + O(x^2)
@@ -102,7 +104,7 @@ julia> m = x + y + O(y^2)
 y + x + O(y^2) + O(x^2)
 
 julia> R, (x, y) = PowerSeriesRing(ZZ, 3, ["x", "y"])
-(Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt,AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^3), y + O(y^3) + O(x^3)])
+(Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^3), y + O(y^3) + O(x^3)])
 
 julia> n = x + y + O(R, 2)
 y + x + O(y^2) + O(x^2)
@@ -119,14 +121,18 @@ arithmetic, as described in the Ring interface.
 
 The power series rings in AbstractAlgebra.jl implement the full Ring interface.
 
-We give some examples of such functionality. Note that divexact can currently
-only divide by unit series (i.e. whose constant coefficient is invertible).
+We give some examples of such functionality. 
+
+!!! note
+
+    The divexact function can currently only divide by unit series (i.e. whose
+    constant coefficient is invertible).
 
 **Examples**
 
 ```jldoctest
 julia> R, (x,) = PowerSeriesRing(ZZ, [5], ["x"])
-(Multivariate power series ring in x over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt,AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(x^5)])
+(Multivariate power series ring in x over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(x^5)])
 
 julia> f = x^3 + 3x + 21
 21 + 3*x + x^3 + O(x^5)
@@ -150,7 +156,7 @@ julia> U = base_ring(R)
 Integers
 
 julia> v = symbols(R)
-1-element Array{Symbol,1}:
+1-element Vector{Symbol}:
  :x
 
 julia> T = parent(x + 1)
