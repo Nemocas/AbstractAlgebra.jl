@@ -650,6 +650,24 @@ end
 
 ###############################################################################
 #
+#   GCD
+#
+###############################################################################
+
+function gcd(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T <: RingElement, U}
+   check_parent(a, b)
+   a, b = univ_promote(a, b)
+   return UnivPoly{T, U}(gcd(a.p, b.p), a.parent)
+end
+
+function lcm(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T <: RingElement, U}
+   check_parent(a, b)
+   a, b = univ_promote(a, b)
+   return UnivPoly{T, U}(lcm(a.p, b.p), a.parent)
+end
+
+###############################################################################
+#
 #   Parent object overload
 #
 ###############################################################################
