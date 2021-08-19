@@ -688,6 +688,49 @@ end
 
 ###############################################################################
 #
+#   Unsafe functions
+#
+###############################################################################
+
+function add!(a::UnivPoly{T, U}, b::UnivPoly{T, U}, c::UnivPoly{T, U}) where {T <: RingElement, U}
+   a.p = (b + c).p
+   return a
+end
+
+function mul!(a::UnivPoly{T, U}, b::UnivPoly{T, U}, c::UnivPoly{T, U}) where {T <: RingElement, U}
+   a.p = (b*c).p
+   return a
+end
+
+function addeq!(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T <: RingElement, U}
+   a.p = (a + b).p
+   return a
+end
+
+function addmul!(a::UnivPoly{T, U}, b::UnivPoly{T, U}, c::UnivPoly{T, U}) where {T <: RingElement, U}
+   a.p = (a + b*c).p
+   return a
+end
+
+function zero!(a::UnivPoly{T, U}) where {T <: RingElement, U}
+   a.p = zero!(a.p)
+   return a
+end
+
+###############################################################################
+#
+#   Promotion rules
+#
+###############################################################################
+
+promote_rule(::Type{UnivPoly{T, U}}, ::Type{UnivPoly{T, U}}) where {T <: RingElement, U} = UnivPoly{T, U}
+
+function promote_rule(::Type{UnivPoly{T, U}}, ::Type{V}) where {T <: RingElement, U, V <: RingElement}
+   promote_rule(T, V) == T ? UnivPoly{T, U} : Union{}
+end
+
+###############################################################################
+#
 #   Parent object overload
 #
 ###############################################################################
