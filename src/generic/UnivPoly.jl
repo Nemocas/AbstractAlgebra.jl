@@ -211,7 +211,7 @@ end
 #
 ###############################################################################
 
-function promote(x::UnivPoly{T, U}, y::UnivPoly{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+function univ_promote(x::UnivPoly{T, U}, y::UnivPoly{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    nx = nvars(parent(x.p))
    ny = nvars(parent(y.p))
    if nx == ny
@@ -223,19 +223,19 @@ end
 
 function +(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
-   a, b = promote(a, b)
+   a, b = univ_promote(a, b)
    return UnivPoly{T, U}(a.p + b.p, a.parent)
 end
 
 function -(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
-   a, b = promote(a, b)
+   a, b = univ_promote(a, b)
    return UnivPoly{T, U}(a.p - b.p, a.parent)
 end
 
 function *(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
-   a, b = promote(a, b)
+   a, b = univ_promote(a, b)
    return UnivPoly{T, U}(a.p*b.p, a.parent)
 end
 
@@ -516,13 +516,13 @@ end
 
 function divexact(a::UnivPoly{T, U}, b::UnivPoly{T, U}; check::Bool=true) where {T, U}
    check_parent(a, b)
-   a, b = promote(a, b)
+   a, b = univ_promote(a, b)
    return UnivPoly{T, U}(divexact(a.p, b.p; check=check), a.parent)
 end
 
 function divides(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
-   a, b = promote(a, b)
+   a, b = univ_promote(a, b)
    flag, q = divides(a.p, b.p)
    return flag, UnivPoly{T, U}(q, a.parent)
 end
@@ -535,13 +535,13 @@ end
 
 function Base.div(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
-   a, b = promote(a, b)
+   a, b = univ_promote(a, b)
    return UnivPoly{T, U}(div(a.p, b.p), a.parent)
 end
 
 function Base.divrem(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
-   a, b = promote(a, b)
+   a, b = univ_promote(a, b)
    q, r = divrem(a.p, b.p)
    return UnivPoly{T, U}(q, a.parent), UnivPoly{T, U}(r, a.parent)
 end
