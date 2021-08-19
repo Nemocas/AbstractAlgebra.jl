@@ -14,10 +14,10 @@ base_ring(S::UnivPolyRing) = S.base_ring
 
 parent(p::UnivPoly) = p.parent
 
-elem_type(S::UnivPolyRing{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}} =
+elem_type(::Type{UnivPolyRing{T, U}}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}} =
    UnivPoly{T, U}
 
-parent_type(p::UnivPoly{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}} =
+parent_type(::Type{UnivPoly{T, U}}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}} =
    UnivPolyRing{T, U}
 
 function mpoly_ring(S::UnivPolyRing{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
@@ -99,6 +99,10 @@ function setcoeff!(p::UnivPoly, exps::Vector{Int}, c::T) where T <: RingElement
    end
    p.p = setcoeff!(p.p, exps, c)
    return p
+end
+
+function setcoeff!(a::UnivPoly{T, U}, i::Int, c::RingElement) where {T, U}
+   setcoeff!(a.p, i, c)
 end
 
 ###############################################################################
@@ -668,6 +672,22 @@ end
 
 ###############################################################################
 #
+#   MPolyBuildCtx
+#
+###############################################################################
+
+function sort_terms!(p::UnivPoly{T, U}) where {T, U}
+   p.p = sort_terms!(p.p)
+   return p
+end
+
+function combine_like_terms!(p::UnivPoly{T, U}) where {T, U}
+   p.p = combine_like_terms!(p.p)
+   return p
+end
+
+###############################################################################
+#
 #   Parent object overload
 #
 ###############################################################################
@@ -680,6 +700,10 @@ function upgrade(S::UnivPolyRing{T, U}, pp::MPolyElem{T}) where {T, U}
       push_term!(ctx, c, vcat(v, v0))
    end
    return finish(ctx)
+end
+
+function (a::UnivPolyRing{T, U})() where {T <: RingElement, U}
+   return UnivPoly{T, U}(mpoly_ring(a)(), a)
 end
 
 function (S::UnivPolyRing{T, U})(p::UnivPoly{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
