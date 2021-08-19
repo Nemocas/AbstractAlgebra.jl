@@ -167,6 +167,8 @@ gens(S::UnivPolyRing, v::Vector{Symbol}) = tuple([gen(S, s) for s in v]...)
 
 gens(S::UnivPolyRing, v::Vector{T}) where T <: Union{Char, String} = gens(S, [Symbol(s) for s in v])
 
+var_index(x::UnivPoly) = var_index(x.p)
+
 function Base.hash(p::UnivPoly, h::UInt)
    b = 0xcf418d4529109236%UInt
    for (c, v) in zip(coefficients(p.p), exponent_vectors(p.p))
@@ -623,6 +625,27 @@ end
 
 function evaluate(a::UnivPoly{T, U}, vals::Vector{V}) where {T <: RingElement, U, V <: NCRingElem}
    return a(vals...)
+end
+
+function evaluate(a::UnivPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+   length(vars) != length(vals) && error("Numbers of variables and values do not match")
+   vars2 = Vector{Int}(undef, 0)
+   vals2 = Vector{U}(undef, 0)
+   num = nvars(parent(a.p))
+   n = nvars(parent(a))
+   for i = 1:length(vars)
+      vars[i] > n && error("Unknown variable")
+      if vars[i] <= num
+         push!(vars2, vars[i])
+         push!(vals2, vals[i])
+      end
+   end
+   return evaluate(a.p, vars2, vals2)
+end
+
+function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UnivPoly{T, U}, V <: RingElement} where {T <: RingElement, U}
+   varidx = Int[var_index(x) for x in vars]
+   return evaluate(a, varidx, vals)
 end
 
 ###############################################################################
