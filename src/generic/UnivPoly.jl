@@ -548,6 +548,85 @@ end
 
 ###############################################################################
 #
+#   Evaluation
+#
+###############################################################################
+
+function evaluate(a::UnivPoly{T, U}, A::Vector{T}) where {T <: RingElement, U}
+   R = base_ring(a)
+   n = length(A)
+   num = nvars(parent(a.p))
+   if n > num
+      n > nvars(parent(a)) && error("Too many values")
+      return evaluate(a.p, A[1:num])
+   end
+   if n < num
+      A = vcat(A, [zero(R) for i = 1:num - n])
+   end
+   return evaluate(a.p, A)
+end
+
+function evaluate(a::UnivPoly{T, U}, A::Vector{V}) where {T <: RingElement, U, V <: Union{Integer, Rational, AbstractFloat}}
+   n = length(A)
+   num = nvars(parent(a.p))
+   if n > num
+      n > nvars(parent(a)) && error("Too many values")
+      return evaluate(a.p, A[1:num])
+   end
+   if n < num
+      A = vcat(A, zeros(V, num - n))
+   end
+   return evaluate(a.p, A)
+end
+
+function evaluate(a::UnivPoly{T, U}, A::Vector{V}) where {T <: RingElement, U, V <: RingElement}
+   n = length(A)
+   num = nvars(parent(a.p))
+   if n > num
+      n > nvars(parent(a)) && error("Too many values")
+      return evaluate(a.p, A[1:num])
+   end
+   if n < num
+      if n == 0
+         R = base_ring(a)
+         return evaluate(a.p, zeros(R, num))
+      else
+         R = parent(A[1])
+         A = vcat(A, zeros(R, num - n))
+         return evaluate(a.p, A)
+     end
+   end
+   return evaluate(a.p, A)
+end
+
+function (a::UnivPoly{T, U})(vals::T...) where {T <: RingElement, U}
+   return evaluate(a, [vals...])
+end
+
+function (a::UnivPoly{T, U})(vals::V...) where {T <: RingElement, U, V <: Union{Integer, Rational, AbstractFloat}}
+   return evaluate(a, [vals...])
+end
+
+function (a::UnivPoly{T, U})(vals::Union{NCRingElem, RingElement}...) where {T <: RingElement, U}
+   A = [vals...]
+   n = length(vals)
+   num = nvars(parent(a.p))
+   if n > num
+      n > nvars(parent(a)) && error("Too many values")
+      return a.p(vals[1:num]...)
+   end
+   if n < num
+      A = vcat(A, zeros(Int, num - n))
+   end
+   return a.p(A...)
+end
+
+function evaluate(a::UnivPoly{T, U}, vals::Vector{V}) where {T <: RingElement, U, V <: NCRingElem}
+   return a(vals...)
+end
+
+###############################################################################
+#
 #   Parent object overload
 #
 ###############################################################################
