@@ -745,8 +745,20 @@ function upgrade(S::UnivPolyRing{T, U}, pp::MPolyElem{T}) where {T, U}
    return finish(ctx)
 end
 
+function (a::UnivPolyRing{T, U})(b::RingElement) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+   return a(base_ring(a)(b))
+end
+
 function (a::UnivPolyRing{T, U})() where {T <: RingElement, U}
    return UnivPoly{T, U}(mpoly_ring(a)(), a)
+end
+
+function (a::UnivPolyRing{T, U})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+   return UnivPoly{T, U}(mpoly_ring(a)(b), a)
+end
+
+function (a::UnivPolyRing{T, U})(b::T) where {T <: RingElem, U <: AbstractAlgebra.MPolyElem{T}}
+   return UnivPoly{T, U}(mpoly_ring(a)(b), a)
 end
 
 function (S::UnivPolyRing{T, U})(p::UnivPoly{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
@@ -756,6 +768,19 @@ function (S::UnivPolyRing{T, U})(p::UnivPoly{T, U}) where {T <: RingElement, U <
       p = UnivPoly{T, U}(upgrade(S, p.p), S)
    end
    return p
+end
+
+function (a::UnivPolyRing{T, U})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+   if length(m) != 0
+      len = length(m[1])
+      num = nvars(mpoly_ring(a))
+      if len != num
+         for i = 1:length(m)
+            m[i] = vcat(m[i], zeros(Int, num - len))
+         end
+      end
+   end
+   return UnivPoly{T, U}(mpoly_ring(a)(b, m), a)
 end
 
 ###############################################################################
