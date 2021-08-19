@@ -308,7 +308,7 @@ end
 RandomExtensions.maketype(R::Rationals{T}, _) where {T} = Rational{T}
 
 function rand(rng::AbstractRNG,
-              sp::SamplerTrivial{<:Make2{Rational{T}, Rationals{T}, UnitRange{Int}}}
+              sp::SamplerTrivial{<:Make2{Rational{T}, Rationals{T}, <:AbstractArray{<:Integer}}}
               ) where {T}
    R, n = sp[][1:end]
    d = T(0)
