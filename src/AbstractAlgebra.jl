@@ -14,6 +14,9 @@ using InteractiveUtils
 
 using Test # for "interface-conformance" functions
 
+import GroupsCore
+import GroupsCore: gens, ngens, order, mul!
+
 # A list of all symbols external packages should not import from AbstractAlgebra
 import_exclude = [:import_exclude, :QQ, :ZZ,
                   :RealField, :NumberField,
@@ -417,7 +420,7 @@ include("Generic.jl")
 
 # Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
 # as we have our own
-import .Generic: abs_series, abs_series_type, 
+import .Generic: abs_series, abs_series_type,
                  base_field, basis,
                  character,
                  check_composable, collength,
