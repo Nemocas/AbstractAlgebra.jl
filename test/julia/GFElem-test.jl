@@ -1,3 +1,14 @@
+function test_elem(R::AbstractAlgebra.GFField)
+   return rand(R)
+end
+
+@testset "Julia.GFElem.conformance_tests" begin
+   test_Field_interface_recursive(GF(3))
+   test_Field_interface_recursive(GF(13))
+   test_Field_interface_recursive(GF(big(13)))
+   test_Field_interface_recursive(GF(big(10)^20 + 39))
+end
+
 @testset "Julia.GFElem.constructors" begin
    @test_throws DomainError GF(4)
    @test_throws DomainError GF(4, check=true)

@@ -1,3 +1,30 @@
+function test_elem(R::AbstractAlgebra.Generic.ResRing{BigInt})
+   return rand(R, 0:characteristic(R))
+end
+
+function test_elem(R::AbstractAlgebra.Generic.ResRing{AbstractAlgebra.Generic.Poly{T}}) where T
+   return rand(R, 0:100, -100:100)
+end
+
+@testset "Generic.Res.conformance_tests" begin
+   test_Ring_interface(ResidueRing(ZZ, 1))   # isgen fails on polys
+   test_Ring_interface_recursive(ResidueRing(ZZ, -4))
+
+   #
+   R = ResidueRing(ZZ, 16453889)
+   test_Ring_interface_recursive(R)
+
+   #
+   S, x = PolynomialRing(R, "x")
+   T = ResidueRing(S, x^3 + 3x + 1)
+   test_Ring_interface_recursive(T)
+
+   #
+   S, x = PolynomialRing(ZZ, "x")
+   T = ResidueRing(S, x^2 + 1)
+   #test_Ring_interface_recursive(T)   # TODO: currently fails because `inv(one(T))` fails
+end
+
 @testset "Generic.Res.constructors" begin
    B = ZZ
 

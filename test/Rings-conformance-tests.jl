@@ -1,3 +1,17 @@
+# very generic testing: just define test_elem(R) to produce elements of R,
+# then invoke one of these functions, as appropriate:
+# - test_NCRing_interface(R)
+# - test_Ring_interface(R)
+# - test_Ring_interface_recursive(R)
+# - test_Field_interface(R)
+# - test_Field_interface_recursive(R)
+#
+# The "recursive" variants perform additional tests on algebraic
+# structures derived from the original ring, by calling these helpers:
+# - test_EuclideanRing_interface(R)
+# - test_Poly_interface(R)
+# - test_MatSpace_interface(R)
+# - test_MatAlgebra_interface(R)
 
 function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
    if isexact_type(T)
@@ -14,6 +28,8 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
 
    @testset "NCRing interface for $(R)" begin
 
+      @test T <: NCRingElem || T <: RingElement
+
       @testset "Functions for types and parents of rings" begin
          @test elem_type(typeof(R)) == T
          @test parent_type(T) == typeof(R)
@@ -23,9 +39,13 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          end
          @test isdomain_type(T) isa Bool
          @test isexact_type(T) isa Bool
-         @test iszero(R(characteristic(R)))
-         @test iszero(characteristic(R) * one(R))
-         @test iszero(one(R) * characteristic(R))
+
+         # some rings don't support characteristic and return -1 (see issue #993)
+         if characteristic(R) != -1
+            @test iszero(R(characteristic(R)))
+            @test iszero(characteristic(R) * one(R))
+            @test iszero(one(R) * characteristic(R))
+         end
       end
 
       @testset "Constructors" begin
@@ -164,9 +184,11 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
             @test A == a
             @test B == b
             @test C == c
-         end         
+         end
       end
    end
+
+   return nothing
 end
 
 
@@ -175,6 +197,8 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
    T = elem_type(R)
 
    @testset "Ring interface for $(R)" begin
+
+      @test T <: RingElement
 
       test_NCRing_interface(R)
 
@@ -201,6 +225,8 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
          end
       end
    end
+
+   return nothing
 end
 
 function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
@@ -220,6 +246,8 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
          @test isunit(a) == !iszero(a)
       end
    end
+
+   return nothing
 end
 
 
@@ -269,6 +297,8 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
       @test d == s*f + t*g
       @test gcdinv(f, g) == (d, s)
    end
+
+   return nothing
 end
 
 
@@ -324,6 +354,8 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
          end
       end
    end
+
+   return nothing
 end
 
 function test_elem(S::Union{AbstractAlgebra.MatSpace,
@@ -376,6 +408,8 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
          end
       end
    end
+
+   return nothing
 end
 
 function test_MatAlgebra_interface(S::MatAlgebra; reps = 20)
@@ -426,6 +460,8 @@ function test_MatAlgebra_interface(S::MatAlgebra; reps = 20)
          end
       end
    end
+
+   return nothing
 end
 
 function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
