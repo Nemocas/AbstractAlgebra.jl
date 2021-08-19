@@ -111,6 +111,10 @@ end
 #
 ###############################################################################
 
+zero(R::UnivPolyRing{T, U}) where {T, U} = UnivPoly{T, U}(zero(mpoly_ring(R)), R)
+
+one(R::UnivPolyRing{T, U}) where {T, U} = UnivPoly{T, U}(one(mpoly_ring(R)), R)
+
 isunit(p::UnivPoly) = isunit(p.p)
 
 isgen(p::UnivPoly) = isgen(p.p)
@@ -550,6 +554,24 @@ function Base.divrem(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    a, b = univ_promote(a, b)
    q, r = divrem(a.p, b.p)
    return UnivPoly{T, U}(q, a.parent), UnivPoly{T, U}(r, a.parent)
+end
+
+###############################################################################
+#
+#   Derivative
+#
+###############################################################################
+
+function derivative(p::UnivPoly{T, U}, j::Int) where {T, U}
+   j > nvars(parent(p)) && error("No such variable")
+   if j > nvars(parent(p.p))
+      return zero(parent(p))
+   end
+   return UnivPoly{T, U}(derivative(p.p, j), p.parent)
+end
+
+function derivative(p::UnivPoly{T, U}, x::UnivPoly{T, U}) where {T, U}
+   return derivative(p, var_index(x))
 end
 
 ###############################################################################
