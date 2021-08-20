@@ -12,6 +12,20 @@
 
 base_ring(S::UnivPolyRing) = S.base_ring
 
+base_ring(p::UnivPoly) = base_ring(parent(p))
+
+coefficient_ring(S::UnivPolyRing) = base_ring(S)
+
+coefficient_ring(p::UnivPoly) = base_ring(p)
+
+function isdomain_type(::Type{T}) where {S <: RingElement, U <: MPolyElem{S}, T <: UnivPoly{S, U}}
+   return isdomain_type(S)
+end
+
+function isexact_type(::Type{T}) where {S <: RingElement, U <: MPolyElem{S}, T <: UnivPoly{S, U}}
+   return isexact_type(S)
+end
+
 parent(p::UnivPoly) = p.parent
 
 elem_type(::Type{UnivPolyRing{T, U}}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}} =
@@ -115,6 +129,10 @@ zero(R::UnivPolyRing{T, U}) where {T, U} = UnivPoly{T, U}(zero(mpoly_ring(R)), R
 
 one(R::UnivPolyRing{T, U}) where {T, U} = UnivPoly{T, U}(one(mpoly_ring(R)), R)
 
+iszero(p::UnivPoly) = iszero(p.p)
+
+isone(p::UnivPoly) = isone(p.p)
+
 isunit(p::UnivPoly) = isunit(p.p)
 
 isgen(p::UnivPoly) = isgen(p.p)
@@ -176,6 +194,14 @@ gens(S::UnivPolyRing, v::Vector{Symbol}) = tuple([gen(S, s) for s in v]...)
 gens(S::UnivPolyRing, v::Vector{T}) where T <: Union{Char, String} = gens(S, [Symbol(s) for s in v])
 
 var_index(x::UnivPoly) = var_index(x.p)
+
+function vars(p::UnivPoly{T, U}) where {T <: RingElement, U}
+   V = vars(p.p)
+   S = parent(p)
+   return [UnivPoly{T, U}(v, S) for v in V]
+end
+
+characteristic(R::UnivPolyRing) = characteristic(base_ring(R))
 
 function Base.hash(p::UnivPoly, h::UInt)
    b = 0xcf418d4529109236%UInt
