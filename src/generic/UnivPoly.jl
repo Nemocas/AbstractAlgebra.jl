@@ -600,6 +600,8 @@ end
 #
 ###############################################################################
 
+deflation(p::UnivPoly{T, U}) where {T, U} = deflation(p.p)
+
 function deflate(p::UnivPoly{T, U}, shift::Vector{Int}, defl::Vector{Int}) where {T, U}
    S = parent(p)
    vlen = length(shift)
@@ -620,6 +622,10 @@ function deflate(p::UnivPoly{T, U}, shift::Vector{Int}, defl::Vector{Int}) where
    return UnivPoly{T, U}(deflate(pp, shift, defl), S)
 end
 
+function deflate(p::UnivPoly{T, U}, defl::Vector{Int}) where {T, U}
+   return deflate(p, zeros(Int, length(defl)), defl)
+end
+
 function inflate(p::UnivPoly{T, U}, shift::Vector{Int}, defl::Vector{Int}) where {T, U}
    S = parent(p)
    vlen = length(shift)
@@ -638,6 +644,10 @@ function inflate(p::UnivPoly{T, U}, shift::Vector{Int}, defl::Vector{Int}) where
       defl = vcat(defl, ones(Int, num - vlen))
    end
    return UnivPoly{T, U}(inflate(pp, shift, defl), S)
+end
+
+function inflate(p::UnivPoly{T, U}, defl::Vector{Int}) where {T, U}
+   return inflate(p, zeros(Int, length(defl)), defl)
 end
 
 ###############################################################################
