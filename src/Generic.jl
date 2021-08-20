@@ -55,8 +55,9 @@ import ..AbstractAlgebra: add!, addeq!, addmul!, base_ring, canonical_unit,
                           set_coefficient!, set_field!,
                           set_length!, set_precision!, set_valuation!,
                           shift_left, shift_right, snf, sqrt, symbols, tail,
-                          term_degree, terms_degrees, trailing_coefficient,
-                          use_karamul, valuation, var, var_index, vars, zero!
+                          term_degree, terms_degrees, to_univariate,
+                          trailing_coefficient, use_karamul, valuation, var,
+                          var_index, vars, zero!
 
 using ..AbstractAlgebra
 

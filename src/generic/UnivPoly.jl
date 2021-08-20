@@ -845,6 +845,24 @@ end
 
 ###############################################################################
 #
+#   Univariate polynomials
+#
+###############################################################################
+
+function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::UnivPoly{T, U}) where {T <: RingElement, U}
+   return to_univariate(R, p.p)
+end
+
+isunivariate(p::UnivPoly) = isunivariate(p.p)
+
+isunivariate(R::UnivPolyRing) = isunivariate(mpoly_ring(R))
+
+function coefficients_of_univariate(p::UnivPoly, check_univariate::Bool=true)
+   return coefficients_of_univariate(p.p, check_univariate)
+end
+
+###############################################################################
+#
 #   MPolyBuildCtx
 #
 ###############################################################################
