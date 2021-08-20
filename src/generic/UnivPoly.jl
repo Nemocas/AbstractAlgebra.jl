@@ -861,6 +861,49 @@ function coefficients_of_univariate(p::UnivPoly, check_univariate::Bool=true)
    return coefficients_of_univariate(p.p, check_univariate)
 end
 
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function _change_univ_poly_ring(R, Rx, cached)
+   P, _ = AbstractAlgebra.PolynomialRing(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
+   S = AbstractAlgebra.UniversalPolynomialRing(R; ordering=ordering(Rx), cached=cached)
+   S.S = deepcopy(symbols(Rx))
+   S.mpoly_ring = P
+   return S
+end
+
+function change_base_ring(R::Ring, p::UnivPoly{T, U}; cached = true, parent::UnivPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement, U}
+   base_ring(parent) != R && error("Base rings do not match.")
+   return _map(R, p, parent)
+end
+
+function change_coefficient_ring(R::Ring, p::UnivPoly{T, U}; cached = true, parent::UnivPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement, U}
+  return change_base_ring(R, p, cached = cached, parent = parent)
+end
+
+################################################################################
+#
+#  Map
+#
+################################################################################
+
+function map_coefficients(f, p::UnivPoly; cached = true, parent::UnivPolyRing = _change_univ_poly_ring(parent(f(zero(base_ring(p)))), parent(p), cached))
+   return _map(f, p, parent)
+end
+
+function _map(g, p::UnivPoly, Rx)
+   cvzip = zip(coefficients(p), exponent_vectors(p))
+   M = MPolyBuildCtx(Rx)
+   for (c, v) in cvzip
+      push_term!(M, g(c), v)
+   end
+
+   return finish(M)
+end
+
 ###############################################################################
 #
 #   MPolyBuildCtx
