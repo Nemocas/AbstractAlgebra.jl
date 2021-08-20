@@ -215,6 +215,35 @@ end
 
 ###############################################################################
 #
+#   Multivariate coefficients
+#
+###############################################################################
+
+function coeff(p::UnivPoly{T, U}, vars::Vector{Int}, exps::Vector{Int}) where {T, U}
+   len = length(vars)
+   len != length(exps) && error("Number of variables does not match number of exponents")
+   S = parent(p)
+   n = nvars(S)
+   num = nvars(parent(p.p))
+   vars2 = Vector{Int}(undef, 0)
+   exps2 = Vector{Int}(undef, 0)
+   for i = 1:len
+      vars[i] > n && error("Variable index not in range")
+      if vars[i] <= num
+         push!(vars2, vars[i])
+         push!(exps2, exps[i])
+      end
+   end
+   return UnivPoly{T, U}(coeff(p.p, vars2, exps2), S)
+end
+
+function coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where {U, V, T <: UnivPoly{U, V}}
+   varidx = [var_index(x) for x in vars]
+   return coeff(a, varidx, exps)
+end
+
+###############################################################################
+#
 #   String I/O
 #
 ###############################################################################
