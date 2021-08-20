@@ -139,7 +139,38 @@ isgen(p::UnivPoly) = isgen(p.p)
 
 ishomogeneous(p::UnivPoly) = ishomogeneous(p.p)
 
+ismonomial(p::UnivPoly) = ismonomial(p.p)
+
+isconstant(p::UnivPoly) = isconstant(p.p)
+
+isterm(p::UnivPoly) = isterm(p.p)
+
 coeff(p::UnivPoly, i::Int) = coeff(p.p, i)
+
+function coeff(p::UnivPoly{T, U}, m::UnivPoly{T, U}) where {T, U}
+   !ismonomial(m) && error("Not a monomial")
+   check_parent(p, m)
+   v1 = first(exponent_vectors(m))
+   len = length(v1)
+   n = nvars(parent(p.p))
+   R = base_ring(p)
+   if len > n
+      if !iszero(v1[n + 1:len])
+         return zero(R)
+      end
+      v1 = v1[1:n]
+   end
+   if len < n
+      v1 = vcat(v1, zeros(Int, n - len))
+   end
+   cvzip = zip(coefficients(p.p), exponent_vectors(p.p))
+   for (c, v) in cvzip
+      if v == v1
+         return c
+      end
+   end
+   return zero(R)
+end
 
 trailing_coefficient(p) = trailing_coefficient(p.p)
 
@@ -164,6 +195,27 @@ function term(p::UnivPoly{T, U}, i::Int) where {T, U}
    return UnivPoly{T, U}(t, S)
 end
 
+leading_coefficient(p::UnivPoly) = leading_coefficient(p.p)
+
+trailing_coefficient(p::UnivPoly) = trailing_coefficient(p.p)
+
+function tail(p::UnivPoly{T, U}) where {T, U}
+   S = parent(p)
+   return UnivPoly{T, U}(tail(p.p), S)
+end
+
+constant_coefficient(p::UnivPoly) = constant_coefficient(p.p)
+
+function leading_monomial(p::UnivPoly{T, U}) where {T, U}
+   S = parent(p)
+   return UnivPoly{T, U}(leading_monomial(p.p), S)
+end
+
+function leading_term(p::UnivPoly{T, U}) where {T, U}
+   S = parent(p)
+   return UnivPoly{T, U}(leading_term(p.p), S)
+end
+
 max_fields(p::UnivPoly) = max_fields(p.p)
 
 function degree(p::UnivPoly, i::Int)
@@ -171,6 +223,21 @@ function degree(p::UnivPoly, i::Int)
       return 0
    end
    return degree(p.p, i)
+end
+
+function degree(f::UnivPoly{T, U}, x::UnivPoly{T, U}) where {T, U}
+   check_parent(f, x)
+   return degree(f, var_index(x))
+end
+
+function degrees(p::UnivPoly)
+   v = degrees(p.p)
+   len = length(v)
+   num = nvars(parent(p))
+   if len < num
+      v = vcat(v, zeros(Int, num - len))
+   end
+   return v
 end
 
 total_degree(p::UnivPoly) = total_degree(p.p)
