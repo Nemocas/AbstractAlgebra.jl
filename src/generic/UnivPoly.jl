@@ -260,6 +260,16 @@ gens(S::UnivPolyRing, v::Vector{Symbol}) = tuple([gen(S, s) for s in v]...)
 
 gens(S::UnivPolyRing, v::Vector{T}) where T <: Union{Char, String} = gens(S, [Symbol(s) for s in v])
 
+function gen(S::UnivPolyRing{T, U}, i::Int) where {T, U}
+   i > nvars(S) && error("Variable index out of range")
+   return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
+end
+
+function gens(S::UnivPolyRing)
+   n = nvars(S)
+   return [gen(S, i) for i in 1:n]
+end
+
 var_index(x::UnivPoly) = var_index(x.p)
 
 function vars(p::UnivPoly{T, U}) where {T <: RingElement, U}
@@ -918,6 +928,50 @@ end
 function combine_like_terms!(p::UnivPoly{T, U}) where {T, U}
    p.p = combine_like_terms!(p.p)
    return p
+end
+
+###############################################################################
+#
+#   Random elements
+#
+###############################################################################
+
+RandomExtensions.maketype(S::AbstractAlgebra.UnivPolyRing, _, _, _) = elem_type(S)
+
+function RandomExtensions.make(S::AbstractAlgebra.UnivPolyRing, term_range::UnitRange{Int},
+                               exp_bound::UnitRange{Int}, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      Make(S, term_range, exp_bound, vs[1])
+   else
+      make(S, term_range, exp_bound, make(R, vs...))
+   end
+end
+
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
+                 <:RingElement,<:AbstractAlgebra.UnivPolyRing,UnitRange{Int},UnitRange{Int}}})
+   S, term_range, exp_bound, v = sp[][1:end]
+   f = S()
+   g = gens(S)
+   R = base_ring(S)
+   for i = 1:rand(rng, term_range)
+      term = S(1)
+      for j = 1:length(g)
+         term *= g[j]^rand(rng, exp_bound)
+      end
+      term *= rand(rng, v)
+      f += term
+   end
+   return f
+end
+
+function rand(rng::AbstractRNG, S::AbstractAlgebra.UnivPolyRing,
+              term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
+   rand(rng, make(S, term_range, exp_bound, v...))
+end
+
+function rand(S::AbstractAlgebra.UnivPolyRing, term_range, exp_bound, v...)
+   rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
 end
 
 ###############################################################################

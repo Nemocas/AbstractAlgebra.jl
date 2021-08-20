@@ -567,6 +567,9 @@ end
 # zero if it is equal and a negative integer if it is less. (Used to compare
 # monomials with respect to an ordering.)
 function monomial_cmp(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
+   if N == 0
+      return 0
+   end
    k = N
    while k > 1 && A[k, i] == B[k, j]
       k -= 1
