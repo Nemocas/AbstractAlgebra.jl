@@ -412,10 +412,10 @@ mutable struct UnivPolyRing{T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    ord::Symbol
    mpoly_ring::AbstractAlgebra.MPolyRing{T}
 
-   function UnivPolyRing{T, U}(R::Ring, ord::Symbol) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
-      return get_cached!(UnivPolyID, (R, ord, U), true) do
+   function UnivPolyRing{T, U}(R::Ring, ord::Symbol, cached::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+      return get_cached!(UnivPolyID, (R, ord, U), cached) do
          new{T, U}(R, Vector{Symbol}(undef, 0), ord,
-                      PolynomialRing(R, Vector{Symbol}(undef, 0); cached=true, ordering=ord)[1])
+                      PolynomialRing(R, Vector{Symbol}(undef, 0); cached=cached, ordering=ord)[1])
       end::UnivPolyRing{T, U}
    end
 end

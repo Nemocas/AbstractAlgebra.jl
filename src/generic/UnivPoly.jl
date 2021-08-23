@@ -117,6 +117,7 @@ end
 
 function setcoeff!(a::UnivPoly{T, U}, i::Int, c::RingElement) where {T, U}
    setcoeff!(a.p, i, c)
+   return a
 end
 
 ###############################################################################
@@ -980,6 +981,10 @@ end
 #
 ###############################################################################
 
+function fit!(a::UnivPoly, n::Int)
+   fit!(a.p, n)
+end
+
 function add!(a::UnivPoly{T, U}, b::UnivPoly{T, U}, c::UnivPoly{T, U}) where {T <: RingElement, U}
    a.p = (b + c).p
    return a
@@ -1081,6 +1086,6 @@ function UniversalPolynomialRing(R::Ring; ordering=:lex, cached=true)
    T = elem_type(R)
    U = mpoly_type(T)
 
-   return UnivPolyRing{T, U}(R, ordering)
+   return UnivPolyRing{T, U}(R, ordering, cached)
 end
 
