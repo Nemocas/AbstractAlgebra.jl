@@ -265,7 +265,7 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          m = one(R)
       end
 
-      @test (div(f, m), mod(f, m)) == divrem(f, m)
+      @test (div(f, m), rem(f, m)) == divrem(f, m)
       @test divides(mulmod(f, g, m) - mod(f*g, m), m)[1]
       @test divides(powermod(f, 3, m) - mod(f^3, m), m)[1]
 
