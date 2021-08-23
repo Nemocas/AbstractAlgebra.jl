@@ -122,4 +122,68 @@ end
    end
 end
 
+@testset "Generic.UnivPoly.term_monomial" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         ord = rand_ordering()
+
+         S = UniversalPolynomialRing(R; ordering=ord, cached=false)
+
+         f1 = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         f2 = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         f3 = rand(S, 0:5, 0:10, -10:10)
+         x2 = gen(S, "x")
+
+         @test exponent_vector(x, 1) == [1]
+         @test exponent_vector(x2, 1) == [1, 0, 0]
+         @test exponent_vector(y + z, 1) == [0, 1, 0]
+         @test exponent_vector(y + z, 2) == [0, 0, 1]
+
+         @test exponent(x, 1, 1) == 1
+         @test exponent(x, 1, 2) == 0
+         @test exponent(y, 1, 1) == 0
+         @test exponent(y, 1, 2) == 1
+
+         g = deepcopy(x)
+         g = set_exponent_vector!(g, 1, [2])
+
+         @test g == x^2
+
+         fit!(g, 2)
+         g = set_exponent_vector!(g, 2, [1, 2, 3])
+         g = setcoeff!(g, 2, R(3))
+         g = sort_terms!(g)
+
+         @test g == x^2 + 3x*y^2*z^3
+
+         g = x^2*y*z
+         g = setcoeff!(g, 1, 5)
+
+         @test g == 5x^2*y*z
+
+         h = deepcopy(x + y + z)
+         h = set_exponent_vector!(h, 1, [2])
+
+         @test h == x^2 + y + z
+
+         @test coeff(x, [1, 2, 3]) == 0
+         @test coeff(x, [1]) == 1
+         @test coeff(x, [1, 0, 0]) == 1
+         @test coeff(g, [2, 1, 1]) == 5
+         @test coeff(h, [2]) == 1
+
+         k = deepcopy(x)
+         k = setcoeff!(k, [1], 4)
+
+         @test k == 4x
+
+         l = x*y^2
+         l = setcoeff!(l, [1, 2], 5)
+
+         @test l == 5x*y^2
+      end
+   end
+end
 
