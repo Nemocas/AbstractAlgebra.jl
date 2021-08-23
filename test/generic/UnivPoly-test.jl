@@ -129,11 +129,8 @@ end
 
          S = UniversalPolynomialRing(R; ordering=ord, cached=false)
 
-         f1 = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
-         f2 = rand(S, 0:5, 0:10, -10:10)
          y, z = gens(S, ["y", "z"])
-         f3 = rand(S, 0:5, 0:10, -10:10)
          x2 = gen(S, "x")
 
          @test exponent_vector(x, 1) == [1]
@@ -187,3 +184,115 @@ end
    end
 end
 
+@testset "Generic.UnivPoly.basic_manipulation" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         @test iszero(zero(S))
+         @test isone(one(S))
+         @test isunit(one(S))
+         @test !isgen(S())
+         @test ishomogeneous(S())
+         @test !ismonomial(S())
+         @test isconstant(S())
+         @test !isterm(S())
+         @test trailing_coefficient(S()) == 0
+         @test leading_coefficient(S()) == 0
+         @test constant_coefficient(S()) == 0
+         @test total_degree(S()) == -1
+         @test length(gens(S)) == 0
+         @test characteristic(S) == 0
+
+         x = gen(S, "x")
+         y, z = gens(S, ["y", "z"])
+         x2 = gen(S, "x")
+
+         @test !iszero(x)
+         @test !iszero(x2)
+         @test iszero(zero(S))
+         @test !isone(x)
+         @test !isone(x2)
+         @test isone(one(S))
+         @test !isunit(x)
+         @test !isunit(x2)
+         @test isunit(one(S))
+         @test isgen(x)
+         @test isgen(x2)
+         @test isgen(y)
+         @test ishomogeneous(x + y + z)
+         @test ishomogeneous(x2)
+         @test ishomogeneous(S())
+         @test ismonomial(x^2)
+         @test ismonomial(x2^2)
+         @test ismonomial(y)
+         @test !isconstant(x)
+         @test !isconstant(x2)
+         @test isconstant(S(1))
+         @test isterm(2x^2*y)
+         @test isterm(3x2)
+         @test coeff(3x^2 + 2y + z, 2) == 2
+         @test coeff(2x2^2 + 3x2 + 5, 1) == 2
+         @test coeff(3x^2 + 2y + z, x2^2) == 3
+         @test coeff(3x2^2, x^2) == 3
+         @test coeff(3x^2 + 2y, x2) == 0
+         @test coeff(3x2^2, x) == 0
+         @test monomial(3x^2 + 2y + z, 1) == x^2
+         @test monomial(2x2^2 + 2x2 + 4, 2) == x
+
+         v = S()
+         monomial!(v, 3x^2 + 2y + z, 1)
+
+         @test v == x^2
+
+         v = deepcopy(x2)
+         monomial!(v, 3x^2 + 2y + z, 2)
+
+         @test v == y
+
+         @test term(3x^2 + 2y + z, 1) == 3x^2
+         @test term(2x2^2 + 2x2 + 4, 2) == 2x
+         @test leading_coefficient(3x^2 + 2y + z) == 3
+         @test leading_coefficient(2x2^2 + 2x2 + 4) == 2
+         @test trailing_coefficient(3x^2 + 2y + z) == 1
+         @test trailing_coefficient(2x2^2 + 2x2) == 2
+         @test tail(3x^2 + 2y + z) == 2y + z
+         @test tail(2x2^2 + 2x2 + 4) == 2x + 4
+         @test constant_coefficient(3x^2 + 2y + z + 4) == 4
+         @test constant_coefficient(2x2^2 + 2x2) == 0
+         @test leading_monomial(3x^2 + 2y + z + 4) == x^2
+         @test leading_monomial(2x2^2 + 2x2) == x^2
+         @test leading_term(3x^2 + 2y + z + 4) == 3x^2
+         @test leading_term(2x2^2 + 2x2) == 2x^2
+         @test max_fields(3x^2 + 2y + z + 4) == ([1, 1, 2], 2)
+         @test max_fields(2x2^2 + 2x2) == ([0, 0, 2], 2)
+         @test degree(3x^2 + 2y + z + 4, 1) == 2
+         @test degree(2x2^2 + 2x2, 1) == 2
+         @test degree(3x^2*y + 2x + 3y + 1, x) == 2
+         @test degree(2x2^2 + 3x2 + 1, x) == 2
+         @test degree(2x2^2 + 3x2 + 1, y) == 0
+         @test degrees(3x^2*y + 2x + 3y + 1) == [2, 1, 0]
+         @test degrees(2x2^2 + 2x2 + 1) == [2, 0, 0]
+         @test total_degree(3x^2*y + 2x + 3y + 1) == 3
+         @test total_degree(2x2^2 + 3x2 + 1) == 2
+         @test length(3x^2*y + 2x + 3y + 1) == 4
+         @test length(2x2^2 + 3x2 + 1) == 3
+
+         @test gen(S, :x) == x
+         @test gens(S, ['x', 'y']) == (x, y)
+         @test gen(S, 1) == x
+         @test gen(S, 2) == y
+         @test gen(S, 3) == z
+         @test gens(S) == [x, y, z]
+
+         @test var_index(x) == 1
+         @test var_index(x2) == 1
+         @test var_index(y) == 2
+
+         @test vars(3x^2*y + 2x + 3y + 1) == [x, y]
+         @test vars(2x2^2 + 3x2 + 1) == [x]
+
+         @test characteristic(S) == 0
+      end
+   end
+end

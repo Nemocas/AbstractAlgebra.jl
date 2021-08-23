@@ -173,8 +173,6 @@ function coeff(p::UnivPoly{T, U}, m::UnivPoly{T, U}) where {T, U}
    return zero(R)
 end
 
-trailing_coefficient(p) = trailing_coefficient(p.p)
-
 function monomial(p::UnivPoly{T, U}, i::Int) where {T, U}
    S = parent(p)
    m = monomial(p.p, i)
@@ -266,9 +264,9 @@ function gen(S::UnivPolyRing{T, U}, i::Int) where {T, U}
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
 end
 
-function gens(S::UnivPolyRing)
+function gens(S::UnivPolyRing{T, U}) where {T, U}
    n = nvars(S)
-   return [gen(S, i) for i in 1:n]
+   return UnivPoly{T, U}[gen(S, i) for i in 1:n]
 end
 
 var_index(x::UnivPoly) = var_index(x.p)
