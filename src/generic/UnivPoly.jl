@@ -744,12 +744,15 @@ end
 #
 ###############################################################################
 
-function evaluate(a::UnivPoly{T, U}, A::Vector{T}) where {T <: RingElement, U}
+function evaluate(a::UnivPoly{T, U}, A::Vector{T}) where {T <: RingElem, U}
    R = base_ring(a)
    n = length(A)
    num = nvars(parent(a.p))
    if n > num
       n > nvars(parent(a)) && error("Too many values")
+      if nvars(parent(a.p)) == 0
+         return constant_coefficient(a.p)*one(parent(A[1]))
+      end
       return evaluate(a.p, A[1:num])
    end
    if n < num
@@ -763,6 +766,9 @@ function evaluate(a::UnivPoly{T, U}, A::Vector{V}) where {T <: RingElement, U, V
    num = nvars(parent(a.p))
    if n > num
       n > nvars(parent(a)) && error("Too many values")
+      if nvars(parent(a.p)) == 0
+         return constant_coefficient(a.p)*one(parent(A[1]))
+      end
       return evaluate(a.p, A[1:num])
    end
    if n < num
@@ -776,6 +782,9 @@ function evaluate(a::UnivPoly{T, U}, A::Vector{V}) where {T <: RingElement, U, V
    num = nvars(parent(a.p))
    if n > num
       n > nvars(parent(a)) && error("Too many values")
+      if nvars(parent(a.p)) == 0
+         return constant_coefficient(a.p)*one(parent(A[1]))
+      end
       return evaluate(a.p, A[1:num])
    end
    if n < num
@@ -805,6 +814,9 @@ function (a::UnivPoly{T, U})(vals::Union{NCRingElem, RingElement}...) where {T <
    num = nvars(parent(a.p))
    if n > num
       n > nvars(parent(a)) && error("Too many values")
+      if nvars(parent(a.p)) == 0
+         return constant_coefficient(a.p)*one(parent(A[1]))
+      end
       return a.p(vals[1:num]...)
    end
    if n < num

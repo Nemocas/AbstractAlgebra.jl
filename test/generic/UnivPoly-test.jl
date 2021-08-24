@@ -892,3 +892,61 @@ end
       end
    end
 end
+
+@testset "Generic.UnivPoly.evaluation" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         f = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         g = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         h = rand(S, 0:5, 0:10, -10:10)
+
+         U, w = PolynomialRing(R, "v")
+
+         n = rand(1:3)
+         V = [rand(-10:10) for v in 1:n]
+
+         @test evaluate(f, V) == evaluate(f, [R(v) for v in V])
+         @test evaluate(f, V) == evaluate(f, [ZZ(v) for v in V])
+         @test evaluate(f, V) == evaluate(f, [U(v) for v in V])
+         @test evaluate(f, V) == f(V...)
+         @test evaluate(f, V) == f([ZZ(v) for v in V]...)
+         @test evaluate(f, V) == f([U(v) for v in V]...)
+
+         @test evaluate(g, V) == evaluate(g, [R(v) for v in V])
+         @test evaluate(g, V) == evaluate(g, [ZZ(v) for v in V])
+         @test evaluate(g, V) == evaluate(g, [U(v) for v in V])
+         @test evaluate(g, V) == g(V...)
+         @test evaluate(g, V) == g([ZZ(v) for v in V]...)
+         @test evaluate(g, V) == g([U(v) for v in V]...)
+
+         @test evaluate(h, V) == evaluate(h, [R(v) for v in V])
+         @test evaluate(h, V) == evaluate(h, [ZZ(v) for v in V])
+         @test evaluate(h, V) == evaluate(h, [U(v) for v in V])
+         @test evaluate(h, V) == h(V...)
+         @test evaluate(h, V) == h([ZZ(v) for v in V]...)
+         @test evaluate(h, V) == h([U(v) for v in V]...)
+
+         V = [rand(-10:10) for v in 1:2]
+
+         @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [R(V[1])])
+         @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [ZZ(V[1])])
+         @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [U(V[1])])
+         @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [R(v) for v in V[1:2]])
+         @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [ZZ(v) for v in V[1:2]])
+
+         @test evaluate(g, [1], [V[1]]) == evaluate(g, [1], [R(V[1])])
+         @test evaluate(g, [1], [V[1]]) == evaluate(g, [1], [ZZ(V[1])])
+         @test evaluate(g, [1, 3], [V[1], V[2]]) == evaluate(g, [1, 3], [R(v) for v in V[1:2]])
+         @test evaluate(g, [1, 3], [V[1], V[2]]) == evaluate(g, [1, 3], [ZZ(v) for v in V[1:2]])
+
+         @test evaluate(h, [1], [V[1]]) == evaluate(h, [1], [R(V[1])])
+         @test evaluate(h, [1], [V[1]]) == evaluate(h, [1], [ZZ(V[1])])
+         @test evaluate(h, [1, 3], [V[1], V[2]]) == evaluate(h, [1, 3], [R(v) for v in V[1:2]])
+         @test evaluate(h, [1, 3], [V[1], V[2]]) == evaluate(h, [1, 3], [ZZ(v) for v in V[1:2]])
+      end
+   end
+end
