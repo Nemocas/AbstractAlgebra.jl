@@ -986,3 +986,36 @@ end
       end
    end
 end
+
+@testset "Generic.UnivPoly.univariate_polynomials" begin
+   for R in [ZZ, QQ]
+      S = UniversalPolynomialRing(R; cached=false)
+
+      U, y = PolynomialRing(R, "y")
+
+      x = gen(S, "x")
+
+      @test isunivariate(S)
+
+      y, z = gens(S, ["y", "z"])
+
+      @test !isunivariate(S)
+
+      f = 3x^3 + 2x^2 + x + 4
+      g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
+      h = 3y^2 + 2y + 1
+
+      @test isunivariate(f)
+      @test !isunivariate(g)
+      @test isunivariate(h)
+
+      f1 = to_univariate(U, f)
+      h1 = to_univariate(U, h)
+
+      @test length(f) == length(f1)
+      @test length(h) == length(h1)
+
+      @test coefficients_of_univariate(f) == [R(4), R(1), R(2), R(3)]
+      @test coefficients_of_univariate(h) == [R(1), R(2), R(3)]
+   end
+end
