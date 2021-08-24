@@ -706,3 +706,56 @@ end
       end
    end
 end
+
+@testset "Generic.UnivPoly.euclidean_division" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         f = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         g = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         h = rand(S, 0:5, 0:10, -10:10)
+
+         if !iszero(f)
+            @test div(f, f) == 1
+            @test div(f*g, f) == g
+            @test div(f*h, f) == h
+
+            q, r = divrem(f, f)
+            @test q == 1 && r == 0
+            q, r = divrem(f*g, f)
+            @test q == g && r == 0
+            q, r = divrem(f*h, f)
+            @test q == h && r == 0
+         end
+
+         if !iszero(g)
+            @test div(g, g) == 1
+            @test div(g*f, g) == f
+            @test div(g*h, g) == h
+
+            q, r = divrem(g, g)
+            @test q == 1 && r == 0
+            q, r = divrem(g*f, g)
+            @test q == f && r == 0
+            q, r = divrem(g*h, g)
+            @test q == h && r == 0
+         end
+
+         if !iszero(h)
+            @test div(h, h) == 1
+            @test div(h*f, h) == f
+            @test div(h*g, h) == g
+            
+            q, r = divrem(h, h)
+            @test q == 1 && r == 0
+            q, r = divrem(h*f, h)
+            @test q == f && r == 0
+            q, r = divrem(h*g, h)
+            @test q == g && r == 0
+         end
+      end
+   end
+end
