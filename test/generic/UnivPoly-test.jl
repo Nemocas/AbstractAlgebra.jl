@@ -1054,3 +1054,44 @@ end
       @test length(h) == length(h2)
    end
 end
+
+@testset "Generic.UnivPoly.unsafe_operators" begin
+   for R in [ZZ, QQ]
+      S = UniversalPolynomialRing(R; cached=false)
+
+      U, y = PolynomialRing(R, "y")
+
+      x = gen(S, "x")
+      y, z = gens(S, ["y", "z"])
+
+      f = 3x^3 + 2x^2 + x + 4
+      g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
+      h = 3y^2 + 2y + 1
+
+      f1 = deepcopy(f)
+      f1 = add!(f1, g, h)
+      
+      @test f1 == g + h
+
+      f2 = deepcopy(f)
+      f2 = addeq!(f2, g)
+
+      @test f2 == f + g
+
+      f3 = deepcopy(f)
+      f3 = mul!(f3, g, h)
+
+      @test f3 == g*h
+
+      f4 = deepcopy(f)
+      f4 = addmul!(f4, g, h)
+
+      @test f4 == f + g*h
+
+      f5 = deepcopy(f)
+      f5 = zero!(f5)
+
+      @test f5 == 0
+   end
+end
+
