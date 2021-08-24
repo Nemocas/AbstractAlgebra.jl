@@ -483,3 +483,36 @@ end
       end
    end
 end
+
+@testset "Generic.UnivPoly.comparison" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         f = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         g = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         h = rand(S, 0:5, 0:10, -10:10)
+
+         @test f == f
+         @test g == g
+         @test h == h
+         @test f == deepcopy(f)
+         @test g == deepcopy(g)
+         @test h == deepcopy(h)
+
+         if !iszero(g)
+             @test f != g + f
+             @test g + f != f
+         end
+         if !iszero(h)
+             @test g != g + h
+             @test g + h != g
+             @test f != f + h
+             @test f + h != f
+         end
+      end
+   end
+end
+
