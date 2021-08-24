@@ -427,3 +427,59 @@ end
       end
    end
 end
+
+@testset "Generic.UnivPoly.adhoc_binary_operations" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         f = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         g = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         h = rand(S, 0:5, 0:10, -10:10)
+
+         c1 = rand(R, -10:10)
+         c2 = rand(R, -10:10)
+         d1 = rand(-10:10)
+         d2 = rand(-10:10)
+
+         @test c1*f + c2*f == (c1 + c2)*f
+         @test f*c1 + f*c2 == (c1 + c2)*f
+         @test c1*g + c2*g == (c1 + c2)*g
+         @test g*c1 + g*c2 == (c1 + c2)*g
+         @test c1*h + c2*h == (c1 + c2)*h
+         @test h*c1 + h*c2 == (c1 + c2)*h
+
+         @test d1*f + d2*f == (d1 + d2)*f
+         @test f*d1 + f*d2 == (d1 + d2)*f
+         @test d1*g + d2*g == (d1 + d2)*g
+         @test g*d1 + g*d2 == (d1 + d2)*g
+         @test d1*h + d2*h == (d1 + d2)*h
+         @test h*d1 + h*d2 == (d1 + d2)*h
+
+         @test R(d1)*f + R(d2)*f == (d1 + d2)*f
+         @test f*R(d1) + f*R(d2) == (d1 + d2)*f
+         @test R(d1)*g + R(d2)*g == (d1 + d2)*g
+         @test g*R(d1) + g*R(d2) == (d1 + d2)*g
+         @test R(d1)*h + R(d2)*h == (d1 + d2)*h
+         @test h*R(d1) + h*R(d2) == (d1 + d2)*h
+
+         if !iszero(c1)
+            @test divexact(c1*f, c1) == f
+            @test divexact(c1*g, c1) == g
+            @test divexact(c1*h, c1) == h
+         end
+
+         if !iszero(d1)
+            @test divexact(d1*f, d1) == f
+            @test divexact(d1*g, d1) == g
+            @test divexact(d1*h, d1) == h
+
+            @test divexact(d1*f, R(d1)) == f
+            @test divexact(d1*g, R(d1)) == g
+            @test divexact(d1*h, R(d1)) == h
+         end
+      end
+   end
+end
