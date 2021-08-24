@@ -729,8 +729,8 @@ function remove(z::UnivPoly{T, U}, p::UnivPoly{T, U}) where {T, U}
    check_parent(z, p)
    S = parent(z)
    z, p = univ_promote(z, p)
-   flag, q = remove(z.p, p.p)
-   return flag, UnivPoly{T, U}(q, S)
+   val, q = remove(z.p, p.p)
+   return val, UnivPoly{T, U}(q, S)
 end
 
 function valuation(z::UnivPoly{T}, p::UnivPoly{T}) where {T, U}

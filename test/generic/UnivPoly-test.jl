@@ -788,3 +788,107 @@ end
       end
    end
 end
+
+@testset "Generic.UnivPoly.remove_valuation" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         f = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         g = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         h = rand(S, 0:5, 0:10, -10:10)
+
+         n = rand(0:5)
+         p = f*f^n
+         if !iszero(f) && !isunit(f)
+            val, q = remove(p, f)
+            val2 = valuation(p, f)
+            @test val == val2
+            @test p == q*f^val
+            @test val >= n
+         end
+
+         n = rand(0:5)
+         p = g*f^n
+         if !iszero(f) && !isunit(f) && !iszero(g)
+            val, q = remove(p, f)
+            val2 = valuation(p, f)
+            @test val == val2
+            @test p == q*f^val
+            @test val >= n
+         end
+
+         n = rand(0:5)
+         p = h*f^n
+         if !iszero(f) && !isunit(f) && !iszero(h)
+            val, q = remove(p, f)
+            val2 = valuation(p, f)
+            @test val == val2
+            @test p == q*f^val
+            @test val >= n
+         end
+
+         n = rand(0:5)
+         p = f*g^n
+         if !iszero(f) && !iszero(g) && !isunit(g)
+            val, q = remove(p, g)
+            val2 = valuation(p, g)
+            @test val == val2
+            @test p == q*g^val
+            @test val >= n
+         end
+
+         n = rand(0:5)
+         p = g*g^n
+         if !iszero(g) && !isunit(g)
+            val, q = remove(p, g)
+            val2 = valuation(p, g)
+            @test val == val2
+            @test p == q*g^val
+            @test val >= n
+         end
+
+         n = rand(0:5)
+         p = h*g^n
+         if !iszero(g) && !isunit(g) && !iszero(h)
+            val, q = remove(p, g)
+            val2 = valuation(p, g)
+            @test val == val2
+            @test p == q*g^val
+            @test val >= n
+         end
+
+         n = rand(0:5)
+         p = f*h^n
+         if !iszero(f) && !iszero(h) && !isunit(h)
+            val, q = remove(p, h)
+            val2 = valuation(p, h)
+            @test val == val2
+            @test p == q*h^val
+            @test val >= n
+         end
+
+         n = rand(0:5)
+         p = g*h^n
+         if !iszero(g) && !isunit(h) && !iszero(h)
+            val, q = remove(p, h)
+            val2 = valuation(p, h)
+            @test val == val2
+            @test p == q*h^val
+            @test val >= n
+         end
+
+         n = rand(0:5)
+         p = h*h^n
+         if !iszero(h) && !isunit(h)
+            val, q = remove(p, h)
+            val2 = valuation(p, h)
+            @test val == val2
+            @test p == q*h^val
+            @test val >= n
+         end
+      end
+   end
+end
