@@ -296,3 +296,32 @@ end
       end
    end
 end
+
+@testset "Generic.UnivPoly.multivariate_coefficients" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         x = gen(S, "x")
+         y, z = gens(S, ["y", "z"])
+         x2 = gen(S, "x")
+
+         f = 3x^3 + 2x2 + x + 4
+         g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
+
+         @test coeff(f, [1], [3]) == 3
+         @test coeff(f, [1, 2, 3], [3, 1, 2]) == 0
+         @test coeff(f, [1, 2, 3], [3, 0, 0]) == 3
+         @test coeff(g, [1], [3]) == 3y^2 + 2y*z
+         @test coeff(g, [2], [1]) == 2x^3*z + 2x^2*z + 2
+         @test coeff(g, [1, 2, 3], [0, 0, 0]) == 1
+
+         @test coeff(f, [x], [3]) == 3
+         @test coeff(f, [x2, y, z], [3, 1, 2]) == 0
+         @test coeff(f, [x, y, z], [3, 0, 0]) == 3
+         @test coeff(g, [x2], [3]) == 3y^2 + 2y*z
+         @test coeff(g, [y], [1]) == 2x^3*z + 2x^2*z + 2
+         @test coeff(g, [x2, y, z], [0, 0, 0]) == 1
+      end
+   end
+end
