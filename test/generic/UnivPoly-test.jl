@@ -350,4 +350,30 @@ end
       end
    end
 end
-  
+
+@testset "Generic.UnivPoly.unary_operations" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         f = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         g = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         h = rand(S, 0:5, 0:10, -10:10)
+
+         @test f + g == g + f
+         @test f + h == h + f
+         @test g + h == h + g
+         
+         @test f - g == -(g - f)
+         @test f - h == -(h - f)
+         @test g - h == -(h - g)
+         
+         @test f*g == g*f
+         @test f*h == h*f
+         @test g*h == h*g
+      end
+   end
+end
+
