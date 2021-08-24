@@ -277,6 +277,8 @@ function vars(p::UnivPoly{T, U}) where {T <: RingElement, U}
    return [UnivPoly{T, U}(v, S) for v in V]
 end
 
+canonical_unit(p::UnivPoly) = canonical_unit(p.p)
+
 characteristic(R::UnivPolyRing) = characteristic(base_ring(R))
 
 function Base.hash(p::UnivPoly, h::UInt)
