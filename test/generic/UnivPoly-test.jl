@@ -1019,3 +1019,38 @@ end
       @test coefficients_of_univariate(h) == [R(1), R(2), R(3)]
    end
 end
+
+@testset "Generic.UnivPoly.map" begin
+   for R in [ZZ, QQ]
+      S = UniversalPolynomialRing(R; cached=false)
+
+      U, y = PolynomialRing(R, "y")
+
+      x = gen(S, "x")
+      y, z = gens(S, ["y", "z"])
+
+      f = 3x^3 + 2x^2 + x + 4
+      g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
+      h = 3y^2 + 2y + 1
+
+      f1 = change_base_ring(U, f)
+      g1 = change_base_ring(U, g)
+      h1 = change_base_ring(U, h)
+
+      @test length(f) == length(f1)
+      @test length(g) == length(g1)
+      @test length(h) == length(h1)
+
+      @test base_ring(f1) === U
+      @test base_ring(g1) === U
+      @test base_ring(h1) === U
+
+      f2 = map_coefficients(x->x^2, f)
+      g2 = map_coefficients(x->x^2, g)
+      h2 = map_coefficients(x->x^2, h)
+
+      @test length(f) == length(f2)
+      @test length(g) == length(g2)
+      @test length(h) == length(h2)
+   end
+end
