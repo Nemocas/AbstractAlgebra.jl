@@ -743,6 +743,9 @@ intended to be specified, and not needed for current applications).
 function max_fields(f::MPoly{T}) where {T <: RingElement}
    A = f.exps
    N = size(A, 1)
+   if N == 0
+      return Int[], 0
+   end
    biggest = zeros(Int, N)
    for i = 1:length(f)
       for k = 1:N

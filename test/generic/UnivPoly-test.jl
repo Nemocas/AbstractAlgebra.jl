@@ -647,3 +647,62 @@ end
       end
    end
 end
+
+@testset "Generic.UnivPoly.exact_division" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         f = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         g = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         h = rand(S, 0:5, 0:10, -10:10)
+
+         if !iszero(f)
+            @test divexact(f, f) == 1
+            @test divexact(f*g, f) == g
+            @test divexact(f*h, f) == h
+         end
+
+         if !iszero(g)
+            @test divexact(g, g) == 1
+            @test divexact(g*f, g) == f
+            @test divexact(g*h, g) == h
+         end
+
+         if !iszero(h)
+            @test divexact(h, h) == 1
+            @test divexact(h*f, h) == f
+            @test divexact(h*g, h) == g
+         end
+
+         f1, q1 = divides(f*f, f)
+         @test f1 && (iszero(f) || q1 == f)
+
+         f2, q2 = divides(f*g, f)
+         @test f2 && (iszero(f) || q2 == g)
+
+         f3, q3 = divides(f*h, f)
+         @test f3 && (iszero(f) || q3 == h)
+
+         f1, q1 = divides(g*g, g)
+         @test f1 && (iszero(g) || q1 == g)
+
+         f2, q2 = divides(g*f, g)
+         @test f2 && (iszero(g) || q2 == f)
+
+         f3, q3 = divides(g*h, g)
+         @test f3 && (iszero(g) || q3 == h)
+
+         f1, q1 = divides(h*h, h)
+         @test f1 && (iszero(h) || q1 == h)
+
+         f2, q2 = divides(h*f, h)
+         @test f2 && (iszero(h) || q2 == f)
+
+         f3, q3 = divides(h*g, h)
+         @test f3 && (iszero(h) || q3 == g)
+      end
+   end
+end
