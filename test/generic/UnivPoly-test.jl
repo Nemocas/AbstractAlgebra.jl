@@ -306,7 +306,7 @@ end
          y, z = gens(S, ["y", "z"])
          x2 = gen(S, "x")
 
-         f = 3x^3 + 2x2 + x + 4
+         f = 3x^3 + 2x^2 + x + 4
          g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
 
          @test coeff(f, [1], [3]) == 3
@@ -351,7 +351,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.unary_operations" begin
+@testset "Generic.UnivPoly.binary_operations" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = UniversalPolynomialRing(R; cached=false)
@@ -377,3 +377,53 @@ end
    end
 end
 
+@testset "Generic.UnivPoly.iterators" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         x = gen(S, "x")
+
+         h = 3x^3 + 2x^2 + x + 4
+
+         @test collect(exponent_vectors(h)) == [[3], [2], [1], [0]]
+
+         y, z = gens(S, ["y", "z"])
+
+         f = 3x^3 + 2x^2 + x + 4
+         g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
+
+         @test collect(coefficients(f)) == [R(v) for v in [3, 2, 1, 4]]
+         @test collect(exponent_vectors(f)) == [[3, 0, 0], [2, 0, 0], [1, 0, 0], [0, 0, 0]]
+         @test sum(terms(f)) == f
+         @test collect(monomials(f)) == [x^3, x^2, x, S(1)]
+
+         @test collect(coefficients(g)) == [R(v) for v in [3, 2, 2, 3, 2, 1]]
+         @test collect(exponent_vectors(g)) == [[3, 2, 0], [3, 1, 1], [2, 1, 1], [1, 0, 0], [0, 1, 0], [0, 0, 0]]
+         @test sum(terms(g)) == g
+         @test collect(monomials(g)) == [x^3*y^2, x^3*y*z, x^2*y*z, x, y, S(1)]
+      end
+   end
+end
+
+@testset "Generic.UnivPoly.square_root" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         x = gen(S, "x")
+
+         f = rand(S, 0:5, 0:10, -10:10)
+
+         @test sqrt(f^2) == f || sqrt(f^2) == -f
+         @test issquare(f^2)
+
+         y, z = gens(S, ["y", "z"])
+
+         g = rand(S, 0:5, 0:10, -10:10)
+
+         @test sqrt(g^2) == g || sqrt(g^2) == -g
+         @test issquare(g^2)
+      end
+   end
+end
