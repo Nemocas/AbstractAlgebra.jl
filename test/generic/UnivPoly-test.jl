@@ -759,3 +759,32 @@ end
       end
    end
 end
+
+@testset "Generic.UnivPoly.derivative" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         x = gen(S, "x")
+         y, z = gens(S, ["y", "z"])
+         x2 = gen(S, "x")
+
+         f = 3x^3 + 2x^2 + x + 4
+         g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
+
+         @test derivative(f, 1) == 9x^2 + 4x + 1
+         @test derivative(f, 2) == 0
+
+         @test derivative(g, 1) == 9x^2*y^2 + 6x^2*y*z + 4x*y*z + 3
+         @test derivative(g, 2) == 6x^3*y + 2x^3*z + 2x^2*z + 2
+         
+         @test derivative(f, x) == 9x^2 + 4x + 1
+         @test derivative(f, x2) == 9x^2 + 4x + 1
+         @test derivative(f, y) == 0
+
+         @test derivative(g, x) == 9x^2*y^2 + 6x^2*y*z + 4x*y*z + 3
+         @test derivative(g, x2) == 9x^2*y^2 + 6x^2*y*z + 4x*y*z + 3
+         @test derivative(g, y) == 6x^3*y + 2x^3*z + 2x^2*z + 2
+      end
+   end
+end
