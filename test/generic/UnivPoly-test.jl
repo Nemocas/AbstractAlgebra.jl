@@ -512,6 +512,14 @@ end
              @test f != f + h
              @test f + h != f
          end
+
+         @test y < x
+         @test z < x
+         @test z < y
+         @test x^2*y*z < x^2*y*z^5
+         @test x < x^2
+         @test x < x^2*y
+         @test y^2 < y^2*z^3
       end
    end
 end
