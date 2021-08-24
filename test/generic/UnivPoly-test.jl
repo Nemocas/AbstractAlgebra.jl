@@ -524,3 +524,81 @@ end
    end
 end
 
+@testset "Generic.UnivPoly.adhoc_comparison" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         f = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         g = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         h = rand(S, 0:5, 0:10, -10:10)
+
+         c = rand(R, -10:10)
+         d = rand(-10:10)
+
+         @test S(c) == c
+         @test c == S(c)
+         @test S(d) == d
+         @test d == S(d)
+         @test S(d) == R(d)
+         @test R(d) == S(d)
+
+         if !isconstant(f)
+            @test f != c
+            @test c != f
+            @test f != d
+            @test d != f
+            @test f != R(d)
+            @test R(d) != f
+         end
+
+         if !isconstant(g)
+            @test g != c
+            @test c != g
+            @test g != d
+            @test d != g
+            @test g != R(d)
+            @test R(d) != g
+         end
+
+         if !isconstant(h)
+            @test h != c
+            @test c != h
+            @test h != d
+            @test d != h
+            @test h != R(d)
+            @test R(d) != h
+         end
+      end
+   end
+end
+
+@testset "Generic.UnivPoly.powering" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         f = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         g = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         h = rand(S, 0:5, 0:10, -10:10)
+
+         pf = S(1)
+         pg = S(1)
+         ph = S(1)
+
+         for i = 0:5
+            @test pf == f^i
+            @test pg == g^i
+            @test ph == h^i
+
+            pf *= f
+            pg *= g
+            ph *= h
+         end
+      end
+   end
+end
