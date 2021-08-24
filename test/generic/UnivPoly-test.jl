@@ -620,7 +620,8 @@ end
          
          fi = inflate(f, shift, defl)
 
-         @test deflate(fi, shift, defl) == f
+         @test deflate(fi, shift, defl) == f        
+         @test deflate(inflate(f, defl), defl) == f
 
          shift2, defl2 = deflation(fi)
 
@@ -629,6 +630,7 @@ end
          gi = inflate(g, shift, defl)
 
          @test deflate(gi, shift, defl) == g
+         @test deflate(inflate(g, defl), defl) == g
 
          shift2, defl2 = deflation(gi)
 
@@ -637,6 +639,7 @@ end
          hi = inflate(h, shift, defl)
 
          @test deflate(hi, shift, defl) == h
+         @test deflate(inflate(h, defl), defl) == h
 
          shift2, defl2 = deflation(hi)
 
