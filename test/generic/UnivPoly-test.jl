@@ -602,3 +602,45 @@ end
       end
    end
 end
+
+@testset "Generic.UnivPoly.inflation_deflation" begin
+   for R in [ZZ, QQ]
+      for iters = 1:100
+         S = UniversalPolynomialRing(R; cached=false)
+
+         f = rand(S, 0:5, 0:10, -10:10)
+         x = gen(S, "x")
+         g = rand(S, 0:5, 0:10, -10:10)
+         y, z = gens(S, ["y", "z"])
+         h = rand(S, 0:5, 0:10, -10:10)
+
+         n = rand(0:3)
+         shift = [rand(0:5) for i in 1:n]
+         defl = [rand(1:5) for i in 1:n]
+         
+         fi = inflate(f, shift, defl)
+
+         @test deflate(fi, shift, defl) == f
+
+         shift2, defl2 = deflation(fi)
+
+         @test inflate(deflate(fi, shift2, defl2), shift2, defl2) == fi
+
+         gi = inflate(g, shift, defl)
+
+         @test deflate(gi, shift, defl) == g
+
+         shift2, defl2 = deflation(gi)
+
+         @test inflate(deflate(gi, shift2, defl2), shift2, defl2) == gi
+
+         hi = inflate(h, shift, defl)
+
+         @test deflate(hi, shift, defl) == h
+
+         shift2, defl2 = deflation(hi)
+
+         @test inflate(deflate(hi, shift2, defl2), shift2, defl2) == hi
+      end
+   end
+end
