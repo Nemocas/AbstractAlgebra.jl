@@ -2,6 +2,8 @@ parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 
 elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
+dense_poly_type(::Type{T}) where T <: RingElement = Poly{T}
+
 function setcoeff!(c::Poly{T}, n::Int, a::T) where T <: RingElement
    if !iszero(a) || n + 1 <= length(c)
       fit!(c, n + 1)

@@ -37,6 +37,24 @@ isone(a::PolynomialElem) = length(a) == 1 && isone(coeff(a, 0))
 
 canonical_unit(x::PolynomialElem) = canonical_unit(leading_coefficient(x))
 
+function leading_coefficient(a::PolynomialElem)
+   return length(a) == 0 ? zero(base_ring(a)) : coeff(a, length(a) - 1)
+end
+
+function trailing_coefficient(a::PolynomialElem)
+   if iszero(a)
+      return zero(base_ring(a))
+   else
+      for i = 1:length(a)
+         c = coeff(a, i - 1)
+         if !iszero(c)
+            return c
+         end
+      end
+      return coeff(a, length(a) - 1)
+   end
+end
+
 function -(a::PolynomialElem)
    len = length(a)
    z = parent(a)()
@@ -221,6 +239,40 @@ end
 
 ==(x::Union{Integer, Rational, AbstractFloat}, y::PolyElem) = y == x
 
+function shift_left(f::PolynomialElem, n::Int)
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
+   if n == 0
+      return f
+   end
+   flen = length(f)
+   r = parent(f)()
+   fit!(r, flen + n)
+   for i = 1:n
+      r = setcoeff!(r, i - 1, zero(base_ring(f)))
+   end
+   for i = 1:flen
+      r = setcoeff!(r, i + n - 1, coeff(f, i - 1))
+   end
+   return r
+end
+
+function shift_right(f::PolynomialElem, n::Int)
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
+   flen = length(f)
+   if n >= flen
+      return zero(parent(f))
+   end
+   if n == 0
+      return f
+   end
+   r = parent(f)()
+   fit!(r, flen - n)
+   for i = 1:flen - n
+      r = setcoeff!(r, i - 1, coeff(f, i + n - 1))
+   end
+   return r
+end
+
 function divexact(f::PolyElem{T}, g::PolyElem{T}; check::Bool=true) where T <: RingElement
    check_parent(f, g)
    iszero(g) && throw(DivideError())
@@ -379,6 +431,58 @@ function pseudodivrem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
   q = set_length!(q, lenq)
   s = b^k
   return q*s, f*s
+end
+
+function isterm(a::PolynomialElem)
+   if iszero(a)
+      return false
+   end
+   for i = 1:length(a) - 1
+      if !iszero(coeff(a, i - 1))
+         return false
+      end
+   end
+   return true
+end
+
+isterm_recursive(a::T) where T <: RingElement = true
+
+function isterm_recursive(a::PolynomialElem)
+   if !isterm_recursive(leading_coefficient(a))
+      return false
+   end
+   for i = 1:length(a) - 1
+      if !iszero(coeff(a, i - 1))
+         return false
+      end
+   end
+   return true
+end
+
+function ismonomial(a::PolynomialElem)
+   if !isone(leading_coefficient(a))
+      return false
+   end
+   for i = 1:length(a) - 1
+      if !iszero(coeff(a, i - 1))
+         return false
+      end
+   end
+   return true
+end
+
+ismonomial_recursive(a::T) where T <: RingElement = isone(a)
+
+function ismonomial_recursive(a::PolynomialElem)
+   if !ismonomial_recursive(leading_coefficient(a))
+      return false
+   end
+   for i = 1:length(a) - 1
+      if !iszero(coeff(a, i - 1))
+         return false
+      end
+   end
+   return true
 end
 
 function term_gcd(a::T, b::T) where T <: RingElement

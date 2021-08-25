@@ -68,4 +68,4 @@ include("julia/Rational.jl")
 elem_type(x) = elem_type(typeof(x))
 parent_type(x) = elem_type(typeof(x))
 
-
+//(x::T, y::Union{Integer, Rational}) where {T <: RingElem} = x//parent(x)(y)

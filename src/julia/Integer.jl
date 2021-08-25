@@ -97,16 +97,6 @@ function divexact(a::BigInt, b::UInt; check::Bool=true)
    return q
 end
 
-function inv(a::T) where T <: Integer
-   if a == 1
-      return one(T)
-   elseif a == -1
-      return -one(T)
-   end
-   iszero(a) && throw(DivideError())
-   throw(ArgumentError("not a unit"))
-end
-
 function gcdinv(a::T, b::T) where T <: Integer
    g, s, t = gcdx(a, b)
    return g, s

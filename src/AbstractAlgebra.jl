@@ -2,7 +2,7 @@ module AbstractAlgebra
 
 using InteractiveUtils
 
-import Base: iszero, +, -, *, ==, //, !=
+import Base: inv, gcd, zero, iszero, length, ^, +, -, *, ==, //, !=
 
 export elem_type, parent_type
 
@@ -34,7 +34,8 @@ include("Fraction.jl")
 
 include("Generic.jl")
 
-import .Generic: Generic, elem_type, parent_type
+import .Generic: Generic, elem_type, parent_type, fit!, coeff, setcoeff!, normalise,
+                 set_length!, zero!, add!, addeq!, mul!
 
 export Generic
 
