@@ -330,8 +330,9 @@ end
 #
 ###############################################################################
 
-function show(io::IO, p::UnivPolyRing)
-   print(io, "Universal Polynomial Ring")
+function show(io::IO, R::UnivPolyRing)
+   print(io, "Universal Polynomial Ring over ")
+   show(io, base_ring(R))
 end
 
 function Base.show(io::IO, ::MIME"text/plain", a::UnivPoly)

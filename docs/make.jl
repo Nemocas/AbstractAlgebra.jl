@@ -23,6 +23,7 @@ makedocs(
                  "polynomial.md",
                  "ncpolynomial.md",
                  "mpolynomial.md",
+                 "univpolynomial.md",
                  "laurent_polynomial.md",
                  "series.md",
                  "puiseux.md",
