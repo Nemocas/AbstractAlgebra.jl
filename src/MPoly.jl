@@ -952,7 +952,7 @@ function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyE
       error("Can only convert univariate polynomials of type MPoly.")
    end
    if isconstant(p)
-      return leading_coefficient(p)
+      return R(leading_coefficient(p))
    end
    return R(coefficients_of_univariate(p))
 end
