@@ -26,7 +26,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
 
    T = elem_type(R)
 
-   @testset "NCRing interface for $(R)" begin
+   @testset "NCRing interface for $(R) of type $(typeof(R))" begin
 
       @test T <: NCRingElem || T <: RingElement
 
@@ -196,7 +196,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
 
    T = elem_type(R)
 
-   @testset "Ring interface for $(R)" begin
+   @testset "Ring interface for $(R) of type $(typeof(R))" begin
 
       @test T <: RingElement
 
@@ -233,7 +233,7 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
 
    T = elem_type(R)
 
-   @testset "Field interface for $(R)" begin
+   @testset "Field interface for $(R) of type $(typeof(R))" begin
 
       test_Ring_interface(R, reps = reps)
 
@@ -257,45 +257,49 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
 
    isexact_type(T) || return
 
-   for i in 1:reps
-      f = test_elem(R)::T
-      g = test_elem(R)::T
-      m = test_elem(R)::T
-      if iszero(m)
-         m = one(R)
+   @testset "Euclidean Ring interface for $(R) of type $(typeof(R))" begin
+
+      for i in 1:reps
+         f = test_elem(R)::T
+         g = test_elem(R)::T
+         m = test_elem(R)::T
+         if iszero(m)
+            m = one(R)
+         end
+
+         @test (div(f, m), mod(f, m)) == divrem(f, m)
+         @test divides(mulmod(f, g, m) - mod(f*g, m), m)[1]
+         @test divides(powermod(f, 3, m) - mod(f^3, m), m)[1]
+
+         if isunit(gcd(f, m))
+            a = invmod(f, m)
+            @test divides(mulmod(a, f, m) - one(R), m)[1]
+         end
+
+         @test divides(f*m, m) == (true, f)
+         (a, b) = divides(f*m + g, m)
+         @test !a || b*m == f*m + g
+
+         if !isunit(m) && !iszero(f)
+            (v, q) = remove(f, m)
+            @test valuation(f, m) == v
+            @test q*m^v == f
+            @test remove(q, m) == (0, q)
+            @test valuation(q, m) == 0
+         end
+
+         if iszero(f) && iszero(g)
+            @test iszero(gcd(f, g))
+         else
+            @test gcd(f, g)*lcm(f, g) == f*g
+         end
+
+         (d, s, t) = gcdx(f, g)
+         @test d == gcd(f, g)
+         @test d == s*f + t*g
+         @test gcdinv(f, g) == (d, s)
       end
 
-      @test (div(f, m), mod(f, m)) == divrem(f, m)
-      @test divides(mulmod(f, g, m) - mod(f*g, m), m)[1]
-      @test divides(powermod(f, 3, m) - mod(f^3, m), m)[1]
-
-      if isunit(gcd(f, m))
-         a = invmod(f, m)
-         @test divides(mulmod(a, f, m) - one(R), m)[1]
-      end
-
-      @test divides(f*m, m) == (true, f)
-      (a, b) = divides(f*m + g, m)
-      @test !a || b*m == f*m + g
-
-      if !isunit(m) && !iszero(f)
-         (v, q) = remove(f, m)
-         @test valuation(f, m) == v
-         @test q*m^v == f
-         @test remove(q, m) == (0, q)
-         @test valuation(q, m) == 0
-      end
-
-      if iszero(f) && iszero(g)
-         @test iszero(gcd(f, g))
-      else
-         @test gcd(f, g)*lcm(f, g) == f*g
-      end
-
-      (d, s, t) = gcdx(f, g)
-      @test d == gcd(f, g)
-      @test d == s*f + t*g
-      @test gcdinv(f, g) == (d, s)
    end
 
    return nothing
@@ -311,7 +315,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
 
    T = elem_type(Rx)
 
-   @testset "Poly interface for $(Rx)" begin
+   @testset "Poly interface for $(Rx) of type $(typeof(Rx))" begin
 
       test_Ring_interface(Rx; reps = reps)
 
@@ -371,7 +375,7 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
    R = base_ring(S)
    T = elem_type(R)
 
-   @testset "MatSpace interface for $(S)" begin
+   @testset "MatSpace interface for $(S) of type $(typeof(S))" begin
 
       @testset "Constructors" begin
          for k in 1:reps
@@ -420,7 +424,7 @@ function test_MatAlgebra_interface(S::MatAlgebra; reps = 20)
 
    @test nrows(S) == ncols(S)
 
-   @testset "MatAlgebra interface for $(S)" begin
+   @testset "MatAlgebra interface for $(S) of type $(typeof(S))" begin
 
       test_NCRing_interface(S, reps = reps)
 
