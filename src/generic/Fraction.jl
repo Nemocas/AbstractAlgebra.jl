@@ -1,24 +1,6 @@
-###############################################################################
-#
-#   Fraction.jl : generic fraction fields
-#
-###############################################################################
-
-###############################################################################
-#
-#   Data type and parent object methods
-#
-###############################################################################
-
 parent_type(::Type{Frac{T}}) where T <: RingElem = FracField{T}
 
 elem_type(::Type{FracField{T}}) where {T <: RingElem} = Frac{T}
-
-###############################################################################
-#
-#   Basic manipulation
-#
-###############################################################################
 
 function Base.numerator(a::Frac, canonicalise::Bool=true)
    if canonicalise
@@ -44,24 +26,12 @@ function deepcopy_internal(a::Frac{T}, dict::IdDict) where {T <: RingElem}
    return v
 end
 
-###############################################################################
-#
-#   Promotion rules
-#
-###############################################################################
-
 promote_rule(::Type{Frac{T}}, ::Type{Frac{T}}) where T <: RingElement = Frac{T}
 promote_rule(::Type{Frac{T}}, ::Type{Frac{T}}) where T <: RingElem = Frac{T}
 
 function promote_rule(::Type{Frac{T}}, ::Type{U}) where {T <: RingElem, U <: RingElem}
    promote_rule(T, U) == T ? Frac{T} : Union{}
 end
-
-###############################################################################
-#
-#   Parent object call overloading
-#
-###############################################################################
 
 function (a::FracField{T})(b::RingElement) where {T <: RingElement}
    return a(base_ring(a)(b))
@@ -152,12 +122,6 @@ function (a::FracField{T})(b::Frac{T}) where {T <: RingElement}
    a != parent(b) && error("Could not coerce to fraction")
    return b
 end
-
-###############################################################################
-#
-#   FractionField constructor
-#
-###############################################################################
 
 function FractionField(R::AbstractAlgebra.Ring; cached=true)
    R2 = R

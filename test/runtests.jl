@@ -1,9 +1,16 @@
 using AbstractAlgebra
 
-using SparseArrays, LinearAlgebra
-using AbstractAlgebra: mul! # disambiguate from LinearAlgebra.mul!
-
 using Test
 
-include("rand.jl")
-include("AbstractAlgebra-test.jl")
+R, x = PolynomialRing(QQ, "x")
+
+a = x//(x + 1)
+
+b = QQ(1//2)
+
+S, a = RationalFunctionField(QQ, "a")
+
+y = S(a)
+
+y*b
+

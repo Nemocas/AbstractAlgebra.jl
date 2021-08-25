@@ -1,16 +1,4 @@
-###############################################################################
-#
-#   RationalFunctionField.jl : Generic rational function fields
-#
-###############################################################################
-
-export RationalFunctionField, norm
-
-###############################################################################
-#
-#   Data type and parent object methods
-#
-###############################################################################
+export RationalFunctionField
 
 parent_type(::Type{Rat{T}}) where T <: FieldElement = RationalFunctionField{T}
 
@@ -28,29 +16,11 @@ function fraction_field(a::RationalFunctionField{T}) where T <: FieldElement
    return a.fraction_field::FracField{dense_poly_type(T)}
 end
 
-function isdomain_type(::Type{T}) where {S <: FieldElement, T <: Rat{S}}
-   return true
-end
-
-function isexact_type(a::Type{T}) where {S <: FieldElement, T <: Rat{S}}
-   return isexact_type(S)
-end
-
-function characteristic(R::RationalFunctionField)
-   return characteristic(base_ring(R))
-end
-
 function check_parent(a::Rat{T}, b::Rat{T}, throw::Bool = true) where T <: FieldElement
    fl = parent(a) != parent(b)
    fl && throw && error("Incompatible rings in rationa function field operation")
    return !fl
 end
-
-###############################################################################
-#
-#   Constructors
-#
-###############################################################################
 
 function //(x::Rat{T}, y::Rat{T}) where T <: FieldElement
    check_parent(x, y)
@@ -80,12 +50,6 @@ function //(x::Rat{Rational{BigInt}}, y::Rational{BigInt})
    return R(divexact(data(x), y))
 end
 
-###############################################################################
-#
-#   Basic manipulation
-#
-###############################################################################
-
 function Base.hash(a::Rat, h::UInt)
    b = 0x2d122a968560a3c0%UInt
    return xor(b, hash(data(a), h))
@@ -107,8 +71,6 @@ iszero(a::Rat) = iszero(data(a))
 
 isone(a::Rat) = isone(data(a))
 
-isunit(a::Rat) = isunit(data(a))
-
 gen(R::RationalFunctionField) = R(gen(base_ring(R.fraction_field)))
 
 function deepcopy_internal(a::Rat, dict::IdDict)
@@ -116,53 +78,12 @@ function deepcopy_internal(a::Rat, dict::IdDict)
    return R(deepcopy_internal(data(a), dict))
 end
 
-###############################################################################
-#
-#   Canonicalisation
-#
-###############################################################################
-
 canonical_unit(a::Rat) = a
-
-###############################################################################
-#
-#   AbstractString I/O
-#
-###############################################################################
-
-function AbstractAlgebra.expressify(a::Rat; context = nothing)
-   d = data(a)
-   return expressify(d)
-end
-
-function show(io::IO, ::MIME"text/plain", a::Rat)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
-
-function show(io::IO, a::Rat)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
-
-function show(io::IO, a::RationalFunctionField)
-   print(IOContext(io, :compact => true), "Rational function field over ", base_ring(a))
-end
-
-###############################################################################
-#
-#   Unary operators
-#
-###############################################################################
 
 function -(a::Rat)
    R = parent(a)
    return R(-data(a))
 end
-
-###############################################################################
-#
-#   Binary operators
-#
-###############################################################################
 
 function +(a::Rat{T}, b::Rat{T}) where T <: FieldElement
    check_parent(a, b)
@@ -181,12 +102,6 @@ function *(a::Rat{T}, b::Rat{T}) where T <: FieldElement
    R = parent(a)
    return R(data(a) * data(b))
 end
-
-###############################################################################
-#
-#   Ad hoc binary operators
-#
-###############################################################################
 
 function *(a::Rat, b::Union{Integer, Rational, AbstractFloat})
    R = parent(a)
@@ -248,12 +163,6 @@ function -(a::T, b::Rat{T}) where T <: FieldElem
    return R(a - data(b))
 end
 
-###############################################################################
-#
-#   Comparisons
-#
-###############################################################################
-
 function ==(a::Rat{T}, b::Rat{T}) where T <: FieldElement
    check_parent(a, b)
    return data(a) == data(b)
@@ -264,242 +173,6 @@ function isequal(a::Rat{T}, b::Rat{T}) where T <: FieldElement
    return data(a) == data(b)
 end
 
-###############################################################################
-#
-#   Ad hoc comparisons
-#
-###############################################################################
-
-function ==(a::Rat, b::Union{Integer, Rational, AbstractFloat})
-   R = parent(a)
-   return data(a) == b
-end
-
-function ==(a::Union{Integer, Rational, AbstractFloat}, b::Rat)
-   R = parent(b)
-   return a == data(b)
-end
-
-function ==(a::Rat{T}, b::T) where T <: FieldElem
-   R = parent(a)
-   return data(a) == b
-end
-
-function ==(a::T, b::Rat{T}) where T <: FieldElem
-   R = parent(b)
-   return a == data(b)
-end
-
-function ==(a::Rat{T}, b::Poly{T}) where T <: FieldElement
-   return a == parent(a)(b)
-end
-
-function ==(a::Poly{T}, b::Rat{T}) where T <: FieldElement
-   return parent(b)(a) == b
-end
-
-###############################################################################
-#
-#   Inversion
-#
-###############################################################################
-
-function Base.inv(a::Rat)
-   R = parent(a)
-   return R(inv(data(a)))
-end
-
-###############################################################################
-#
-#   Exact division
-#
-###############################################################################
-
-function divexact(a::Rat{T}, b::Rat{T}; check::Bool=true) where T <: FieldElement
-   check_parent(a, b)
-   R = parent(a)
-   return R(divexact(data(a), data(b); check=check))
-end
-
-function divides(a::Rat{T}, b::Rat{T}) where T <: FieldElement
-   check_parent(a, b)
-   R = parent(a)
-   d, q = divides(data(a), data(b))
-   return d, R(q)
-end
-
-###############################################################################
-#
-#   Ad hoc exact division
-#
-###############################################################################
-
-function divexact(a::Rat, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
-   R = parent(a)
-   return R(divexact(data(a), b; check=check))
-end
-
-function divexact(a::Union{Integer, Rational, AbstractFloat}, b::Rat; check::Bool=true)
-   R = parent(b)
-   return R(divexact(a, data(b); check=check))
-end
-
-function divexact(a::Rat{T}, b::T; check::Bool=true) where T <: FieldElem
-   R = parent(a)
-   return R(divexact(data(a), b; check=check))
-end
-
-function divexact(a::T, b::Rat{T}; check::Bool=true) where T <: FieldElem
-   R = parent(b)
-   return R(divexact(a, data(b); check=check))
-end
-
-##############################################################################
-#
-#  Evaluation
-#
-##############################################################################
-
-function evaluate(f::Rat{T}, v::U) where {T <: RingElement, U <: RingElement}
-    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
-end
-
-function evaluate(f::Rat{T}, v::U) where {T <: PolyElem, U <: Integer}
-    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
-end
-
-###############################################################################
-#
-#   Powering
-#
-###############################################################################
-
-function ^(a::Rat{T}, b::Int) where T <: FieldElement
-   R = parent(a)
-   return R(data(a)^b)
-end
-
-##############################################################################
-#
-#  Derivative
-#
-##############################################################################
-
-function derivative(f::Rat)
-   R = parent(f)
-   return R(derivative(data(f)))
-end
-
-###############################################################################
-#
-#   Square root
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    issquare(a::Rat)
-
-Return `true` if $a$ is a square.
-"""
-function issquare(a::Rat)
-   return issquare(data(a))
-end
-
-@doc Markdown.doc"""
-    Base.sqrt(a::Rat; check::Bool=true)
-
-Return the square root of $a$. By default the function will throw an exception
-if the input is not square. If `check=false` this test is omitted.
-"""
-function Base.sqrt(a::Rat; check::Bool=true)
-   R = parent(a)
-   return R(sqrt(data(a); check=check))
-end
-
-###############################################################################
-#
-#   GCD
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    gcd(a::Rat{T}, b::Rat{T}) where {T <: RingElem}
-
-Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
-the GCD of $a/b$ and $c/d$ to be gcd$(ad, bc)/bd$, reduced to lowest terms.
-"""
-function gcd(a::Rat{T}, b::Rat{T}) where T <: FieldElement
-   check_parent(a, b)
-   R = parent(a)
-   return R(gcd(data(a), data(b)))
-end
-
-###############################################################################
-#
-#   Unsafe operators and functions
-#
-###############################################################################
-
-function zero!(c::Rat)
-   c.d = zero!(data(c))
-   return c
-end
-
-function mul!(c::Rat{T}, a::Rat{T}, b::Rat{T}) where T <: FieldElement
-   c.d = mul!(data(c), data(a), data(b))
-   return c
-end
-
-function addeq!(a::Rat{T}, b::Rat{T}) where T <: FieldElement
-   a.d = addeq!(data(a), data(b))
-   return a
-end
-
-function add!(c::Rat{T}, a::Rat{T}, b::Rat{T}) where T <: FieldElement
-   c.d = add!(data(c), data(a), data(b))
-   return c
-end
-
-###############################################################################
-#
-#   Random functions
-#
-###############################################################################
-
-RandomExtensions.maketype(R::RationalFunctionField, _) = elem_type(R)
-
-function RandomExtensions.make(S::RationalFunctionField, vs...)
-   R = base_ring(fraction_field(S))
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      RandomExtensions.Make(S, vs[1]) # forward to default Make constructor
-   else
-      make(S, make(R, vs...))
-   end
-end
-
-function rand(rng::AbstractRNG,
-              sp::SamplerTrivial{<:Make2{<:FieldElement, <:RationalFunctionField}})
-   S, v = sp[][1:end]
-   R = base_ring(fraction_field(S))
-   n = rand(rng, v)
-   d = R()
-   while iszero(d)
-      d = rand(rng, v)
-   end
-   return S(fraction_field(S)(n, d))
-end
-
-rand(rng::AbstractRNG, S::RationalFunctionField, v...) =
-   rand(rng, make(S, v...))
-
-rand(S::RationalFunctionField, v...) = rand(GLOBAL_RNG, S, v...)
-
-###############################################################################
-#
-#   Promotion rules
-#
-###############################################################################
-
 promote_rule(::Type{Rat{T}}, ::Type{Rat{T}}) where T <: FieldElement = Rat{T}
 
 promote_rule(::Type{Rat{T}}, ::Type{Rat{T}}) where T <: FieldElem = Rat{T}
@@ -507,12 +180,6 @@ promote_rule(::Type{Rat{T}}, ::Type{Rat{T}}) where T <: FieldElem = Rat{T}
 function promote_rule(::Type{Rat{T}}, ::Type{U}) where {T <: FieldElement, U <: RingElem}
    promote_rule(Frac{dense_poly_type(T)}, U) === Frac{dense_poly_type(T)} ? Rat{T} : Union{}
 end
-
-###############################################################################
-#
-#   Parent object call overloading
-#
-###############################################################################
 
 function (a::RationalFunctionField{T})() where T <: FieldElement
    K = fraction_field(a)
@@ -567,12 +234,6 @@ end
 function (a::RationalFunctionField)(b::RingElem)
    return a(fraction_field(a)(b))
 end
-
-###############################################################################
-#
-#   RationalFunctionField constructor
-#
-###############################################################################
 
 function RationalFunctionField(k::Field, s::Symbol; cached=true)
    T = elem_type(k)

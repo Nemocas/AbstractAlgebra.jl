@@ -1,18 +1,4 @@
-###############################################################################
-#
-#   Rational.jl : Additional AbstractAlgebra functionality for Julia Rationals
-#
-###############################################################################
-
-###############################################################################
-#
-#   Data type and parent object methods
-#
-###############################################################################
-
 const JuliaQQ = Rationals{BigInt}()
-
-const qq = Rationals{Int}()
 
 parent(a::Rational{T}) where T <: Integer = Rationals{T}()
 
@@ -20,11 +6,7 @@ elem_type(::Type{Rationals{T}}) where T <: Integer = Rational{T}
 
 parent_type(::Type{Rational{T}}) where T <: Integer = Rationals{T}
 
-base_ring(a::Rational{Int}) = zz
-
 base_ring(a::Rational{BigInt}) = JuliaZZ
-
-base_ring(a::Rationals{Int}) = zz
 
 base_ring(a::Rationals{BigInt}) = JuliaZZ
 
@@ -32,69 +14,11 @@ base_ring(a::Rationals{T}) where T <: Integer = Integers{T}()
 
 base_ring(a::Rational{T}) where T <: Integer = Integers{T}()
 
-isexact_type(::Type{Rational{T}}) where T <: Integer = true
-
-isdomain_type(::Type{Rational{T}}) where T <: Integer = true
-
-###############################################################################
-#
-#   Basic manipulation
-#
-###############################################################################
-
 zero(::Rationals{T}) where T <: Integer = Rational{T}(0)
 
 one(::Rationals{T}) where T <: Integer = Rational{T}(1)
 
-isunit(a::Rational) = a != 0
-
 canonical_unit(a::Rational)  = a
-
-function numerator(a::Rational, canonicalise::Bool=true)
-   return Base.numerator(a) # all other types ignore canonicalise
-end
-
-function denominator(a::Rational, canonicalise::Bool=true)
-   return Base.denominator(a) # all other types ignore canonicalise
-end
-
-characteristic(a::Rational{T}) where T <: Integer = 0
-
-###############################################################################
-#
-#   String I/O
-#
-###############################################################################
-
-function expressify(a::Rational; context = nothing)
-    n = numerator(a)
-    d = denominator(a)
-    if isone(d)
-        return n
-    else
-        return Expr(:call, ://, n, d)
-    end
-end
-
-function show(io::IO, R::Rationals)
-   print(io, "Rationals")
-end
-
-###############################################################################
-#
-#   Divides
-#
-###############################################################################
-
-function divides(a::Rational{T}, b::Rational{T}) where T <: Integer
-   return true, a//b
-end
-
-###############################################################################
-#
-#   Division with remainder
-#
-###############################################################################
 
 function divrem(a::Rational{T}, b::Rational{T}) where T <: Integer
    return a//b, zero(Rational{T})
@@ -103,12 +27,6 @@ end
 function div(a::Rational{T}, b::Rational{T}) where T <: Integer
    return a//b
 end
-
-###############################################################################
-#
-#   Exact division
-#
-###############################################################################
 
 divexact(a::Rational, b::Integer; check::Bool=true) = a//b
 
@@ -123,12 +41,6 @@ function divides(a::T, b::T) where T <: Rational
       return true, divexact(a, b; check=false)
    end
 end
-
-###############################################################################
-#
-#   GCD
-#
-###############################################################################
 
 function gcd(p::Rational{T}, q::Rational{T}) where T <: Integer
    a = p.num*q.den
@@ -158,63 +70,6 @@ function gcdx(p::Rational{T}, q::Rational{T}) where {T <: Integer}
       return (g, zero(p), zero(p))
    end
 end
-
-
-###############################################################################
-#
-#   Square root
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    sqrt(a::Rational{T}; check::Bool=true) where T <: Integer
-
-Return the square root of $a$. By default the function throws an exception if
-the input is not square. If `check=false` this check is supressed.
-"""
-function sqrt(a::Rational{T}; check::Bool=true) where T <: Integer
-   return sqrt(numerator(a, false); check=check)//sqrt(denominator(a, false); check=check)
-end
-
-@doc Markdown.doc"""
-    issquare(a::Rational{T}) where T <: Integer
-
-Return true if $a$ is the square of a rational.
-"""
-function issquare(a::Rational{T}) where T <: Integer
-   return issquare(numerator(a)) && issquare(denominator(a))
-end
-
-###############################################################################
-#
-#   Exponential
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    exp(a::Rational{T}) where T <: Integer
-
-Return $1$ if $a = 0$, otherwise throw an exception.
-"""
-function exp(a::Rational{T}) where T <: Integer
-   a != 0 && throw(DomainError(a, "a must be 0"))
-   return Rational{T}(1)
-end
-
-@doc Markdown.doc"""
-    log(a::Rational{T}) where T <: Integer
-
-Return $0$ if $a = 1$, otherwise throw an exception.
-"""
-function log(a::Rational{T}) where T <: Integer
-   a != 1 && throw(DomainError(a, "a must be 1"))
-end
-
-###############################################################################
-#
-#   Unsafe functions
-#
-###############################################################################
 
 function zero!(a::Rational{T}) where T <: Integer
    n = a.num
@@ -299,37 +154,6 @@ function addmul!(a::Rational{T}, b::Rational{T}, c::Rational{T}, d::Rational{T})
    return a
 end
 
-###############################################################################
-#
-#   Random generation
-#
-###############################################################################
-
-RandomExtensions.maketype(R::Rationals{T}, _) where {T} = Rational{T}
-
-function rand(rng::AbstractRNG,
-              sp::SamplerTrivial{<:Make2{Rational{T}, Rationals{T}, <:AbstractArray{<:Integer}}}
-              ) where {T}
-   R, n = sp[][1:end]
-   d = T(0)
-   while d == 0
-      d = T(rand(rng, n))
-   end
-   n = T(rand(rng, n))
-   return R(n, d)
-end
-
-
-rand(rng::AbstractRNG, R::Rationals, n) = rand(rng, make(R, n))
-
-rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
-
-###############################################################################
-#
-#   Parent object call overload
-#
-###############################################################################
-
 function (R::Rationals{T})() where T <: Integer
    return Rational{T}(0)
 end
@@ -341,11 +165,5 @@ end
 function (R::Rationals{T})(b::Integer, c::Integer) where T <: Integer
    return Rational{T}(b, c)
 end
-
-###############################################################################
-#
-#   FractionField constructor
-#
-###############################################################################
 
 FractionField(R::Integers{T}) where T <: Integer = Rationals{T}()
