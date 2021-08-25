@@ -65,5 +65,7 @@ include("julia/Integer.jl")
 
 include("julia/Rational.jl")
 
+elem_type(x) = elem_type(typeof(x))
+parent_type(x) = elem_type(typeof(x))
 
 

@@ -10,7 +10,7 @@ import ..AbstractAlgebra: Field, FieldElement, Integers,
                           RingElement
 
 import ..AbstractAlgebra: base_ring, canonical_unit, denominator,
-                          numerator
+                          numerator, iszero
 
 using ..AbstractAlgebra
 

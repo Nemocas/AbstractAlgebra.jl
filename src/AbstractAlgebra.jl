@@ -2,7 +2,7 @@ module AbstractAlgebra
 
 using InteractiveUtils
 
-import Base: +, -, *, ==, //, !=
+import Base: iszero, +, -, *, ==, //, !=
 
 export elem_type, parent_type
 
