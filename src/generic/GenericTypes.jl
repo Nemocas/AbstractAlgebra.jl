@@ -1338,3 +1338,30 @@ mutable struct DirectSumModuleElem{T <: RingElement} <: AbstractAlgebra.FPModule
       z = new{T}(v, m)
    end
 end
+
+###############################################################################
+#
+#   IdealSet/Ideal
+#
+###############################################################################
+
+mutable struct IdealSet{T <: RingElement} <: AbstractAlgebra.Set
+   base_ring::Ring
+
+   function IdealSet{T}(R::Ring, cached::Bool = true) where T <: RingElement
+      return get_cached!(IdealSetDict, R, cached) do
+         new{T}(R)
+      end::IdealSet{T}
+   end
+end
+
+const IdealSetDict = CacheDictType{Ring, IdealSet}()
+
+mutable struct Ideal{T <: RingElement} <: AbstractAlgebra.Ideal{T}
+    gens::Vector{T}
+    parent::IdealSet{T}
+
+    function Ideal{T}(gens::T...) where T <: RingElement
+       z = new{T}([gens...])
+    end
+end

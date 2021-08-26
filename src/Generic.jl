@@ -69,6 +69,8 @@ using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")
 
+include("generic/Ideal.jl")
+
 include("generic/PermGroups.jl")
 
 include("generic/YoungTabs.jl")
