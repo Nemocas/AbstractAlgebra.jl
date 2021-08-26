@@ -126,11 +126,11 @@ export SetElem, GroupElem, AdditiveGroupElem, NCRingElem, RingElem, ModuleElem, 
 export SetMap, FunctionalMap, IdentityMap
 
 export NCPolyElem, PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
-       MatElem, MatAlgElem, FinFieldElem, MPolyElem, UnivPolyElem, NumFieldElem,
+       MatElem, MatAlgElem, FinFieldElem, MPolyElem, UnivPolyElem, NumFieldElem, Ideal,
        SimpleNumFieldElem, FreeAssAlgElem
 
 export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
-       FinField, MPolyRing, UnivPolyRing, NumField, SimpleNumField,
+       FinField, MPolyRing, UnivPolyRing, NumField, SimpleNumField, IdealSet,
        FreeAssAlgebra
 
 export ZZ, QQ, zz, qq, RealField, RDF
@@ -376,6 +376,7 @@ include("Map.jl")
 include("MapCache.jl")
 include("MapWithInverse.jl")
 include("ModuleHomomorphism.jl")
+include("Ideal.jl")
 include("YoungTabs.jl")
 include("PermGroups.jl")
 include("LaurentSeries.jl")
