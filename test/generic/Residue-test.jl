@@ -337,32 +337,32 @@ end
 
 
    R = ResidueRing(ZZ, ZZ(4))
-   @test_throws DivideError R(4)^-1
-   @test_throws ImpossibleInverse R(2)^-1
+   @test_throws NotInvertibleError R(4)^-1
+   @test_throws NotInvertibleError R(2)^-1
    try
       R(2)^-1
    catch e
-      @test e isa ImpossibleInverse
+      @test e isa NotInvertibleError
       @test e.data == 2
       @test modulus(e.mod) == 4
    end
 
    R = ResidueRing(ZZ, 4)
-   @test_throws DivideError R(4)^-1
-   @test_throws ImpossibleInverse R(2)^-1
+   @test_throws NotInvertibleError R(4)^-1
+   @test_throws NotInvertibleError R(2)^-1
    try
       R(2)^-1
    catch e
-      @test e isa ImpossibleInverse
+      @test e isa NotInvertibleError
       @test e.data == 2
       @test modulus(e.mod) == 4
    end
 
    R = ResidueRing(ZZ, ZZ(5))
-   @test_throws DivideError R(5)^-1
+   @test_throws NotInvertibleError R(5)^-1
 
    R = ResidueRing(ZZ, 5)
-   @test_throws DivideError R(5)^-1
+   @test_throws NotInvertibleError R(5)^-1
 end
 
 @testset "Generic.Res.inversion" begin

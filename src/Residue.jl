@@ -312,7 +312,7 @@ inverse is encountered, an exception is raised.
 """
 function Base.inv(a::ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
-   isone(g) || throw(ImpossibleInverse(a))
+   isone(g) || throw(NotInvertibleError(a))
    return parent(a)(ainv)
 end
 

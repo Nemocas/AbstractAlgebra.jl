@@ -4,30 +4,26 @@
 #
 ###############################################################################
 
-mutable struct ImpossibleInverse{T, S} <: Exception
+mutable struct NotInvertibleError{T, S} <: Exception
   data::T   # element that could not be inverted
   mod::S    # ring or modulus with respect to which it could not be inverted
 end
 
-function ImpossibleInverse(x::T, y::S) where {T <: RingElement, S}
-  if iszero(x)
-    throw(DivideError())
-  else
-    throw(ImpossibleInverse{T, S}(x, y))
-  end
+function NotInvertibleError(x::T, y::S) where {T <: RingElement, S}
+  return NotInvertibleError{T, S}(x, y)
 end
 
-function ImpossibleInverse(x::RingElement)
-  return ImpossibleInverse(x, parent(x))
+function NotInvertibleError(x::RingElement)
+  return NotInvertibleError(x, parent(x))
 end
 
-function Base.showerror(io::IO, e::ImpossibleInverse{T, S}) where {T, S <: Ring}
+function Base.showerror(io::IO, e::NotInvertibleError{T, S}) where {T, S <: Ring}
   print(io, e.data)
   print(io, " is not invertible in ")
   print(io, e.mod)
 end
 
-function Base.showerror(io::IO, e::ImpossibleInverse)
+function Base.showerror(io::IO, e::NotInvertibleError)
   print(io, e.data)
   print(io, " is not invertible modulo ")
   print(io, e.mod)
