@@ -212,7 +212,7 @@ end
 
 function ^(a::ResElem, b::Int)
    if b < 0
-      # powermod throws a DivideError when it should throw an ImpossibleInverse
+      # powermod throws a DivideError when it should throw an NotInvertibleError
       parent(a)(powermod(data(inv(a)), -b, modulus(a)))
    else
       parent(a)(powermod(data(a), b, modulus(a)))
