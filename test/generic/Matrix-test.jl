@@ -1005,6 +1005,23 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
       @test A * t == S(A.entries .* t)
    end
 
+   function _test_matrix_vector_prod(R, randargs...)
+      for S in (MatrixSpace(R, 2, 3), MatrixAlgebra(R, 2))
+         A = rand(S, randargs...)
+         v0 = elem_type(R)[]
+         v1 = elem_type(R)[rand(R, randargs...)]
+         v2 = elem_type(R)[rand(R, randargs...) for i in 1:2]
+         @test A*v0 == [zero(R) for i in 1:nrows(A)]
+         @test v0*A == [zero(R) for i in 1:ncols(A)]
+         @test A*v1 == [A[i,1]*v1[1] for i in 1:nrows(A)]
+         @test v1*A == [v1[1]*A[1,i] for i in 1:ncols(A)]
+         @test A*v2 == [A[i,1]*v2[1] + A[i,2]*v2[2] for i in 1:nrows(A)]
+         @test v2*A == [v2[1]*A[1,i] + v2[2]*A[2,i] for i in 1:ncols(A)]
+      end
+   end
+
+   _test_matrix_vector_prod(R, -1000:1000)
+
    # Exact field
    R = GF(7)
    S = MatrixSpace(R, rand(1:9), rand(1:9))
@@ -1019,6 +1036,8 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
       @test A * t == t * A
       @test A * t == S(A.entries .* t)
    end
+
+   _test_matrix_vector_prod(R)
 
    # Inexact ring
    R = RealField["t"][1]
@@ -1035,6 +1054,8 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
       @test A * t == S(A.entries .* t)
    end
 
+   _test_matrix_vector_prod(R, -1:200, -1000:1000)
+
    # Inexact field
    R = RealField
    S = MatrixSpace(R, rand(1:9), rand(1:9))
@@ -1049,6 +1070,8 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
       @test A * t == t * A
       @test A * t == S(A.entries .* t)
    end
+
+   _test_matrix_vector_prod(R, -1000:1000)
 
    # Non-integral domain
    R = ResidueRing(ZZ, 6)
@@ -1065,6 +1088,8 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
       @test A * t == S(A.entries .* t)
    end
 
+   _test_matrix_vector_prod(R, 0:5)
+
    # Fraction field
    R = QQ
    S = MatrixSpace(R, rand(1:9), rand(1:9))
@@ -1079,6 +1104,8 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
       @test A * t == t * A
       @test A * t == S(A.entries .* t)
    end
+
+   _test_matrix_vector_prod(R, -1000:1000)
 end
 
 @testset "Generic.Mat.promotion" begin

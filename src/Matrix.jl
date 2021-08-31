@@ -812,6 +812,34 @@ function -(x::MatrixElem{T}, y::T) where {T <: RingElem}
    return z
 end
 
+function *(x::MatrixElem{T}, y::Vector{T}) where {T <: RingElement}
+   m = nrows(x)
+   n = min(ncols(x), length(y))
+   r = T[zero(base_ring(x)) for i in 1:m]
+   tmp = base_ring(x)()
+   for i in 1:m
+      for j in 1:n
+         r[i] = addmul_delayed_reduction!(r[i], x[i, j], y[j], tmp)
+      end
+      r[i] = reduce!(r[i])
+   end
+   return r
+end
+
+function *(x::Vector{T}, y::MatrixElem{T}) where {T <: RingElement}
+   m = min(length(x), nrows(y))
+   n = ncols(y)
+   r = T[zero(base_ring(y)) for j in 1:n]
+   tmp = base_ring(y)()
+   for j in 1:n
+      for i in 1:m
+         r[j] = addmul_delayed_reduction!(r[j], x[i], y[i, j], tmp)
+      end
+      r[j] = reduce!(r[j])
+   end
+   return r
+end
+
 ################################################################################
 #
 #  Promotion
