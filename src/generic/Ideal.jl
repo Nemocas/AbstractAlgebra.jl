@@ -46,27 +46,41 @@ function reduce(I::Ideal{T}) where T <: RingElement
    end
 end
 
-# Extend the basis V of polynomials satisfying 1, 2, 3, 4 below by the
+# Extend the basis V of polynomials satisfying 1-6 below by the
 # polynomials in D, all of which have degree at least that of those in
 # V and such that the degrees of the polynomials in D is *decreasing*.
 function extend_ideal_basis(D::Vector{T}, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    while !isempty(D)
       d = pop!(D)
-@assert length(d) >= length(V[length(V)])
       V = extend_ideal_basis(d, V)
    end
    return V
 end
 
-# Given a nonempty vector V of polynomials of satisfying 1, 2, 3, 4 below and a
+function reduce_tail(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+   p = divexact(p, canonical_unit(p))
+   i = length(V)
+   for n = length(p) - 1:-1:1
+      while i > 0 && length(V[i]) > n
+         i -= 1
+      end
+      if i != 0
+         q = AbstractAlgebra.div(coeff(p, n - 1), leading_coefficient(V[i]))
+         p -= q*shift_left(V[i], n - length(V[i]))
+      end
+   end
+   return p
+end
+
+# Given a nonempty vector V of polynomials of satisfying 1-6 below and a
 # polynomial p whose degree is at least that of all the polynomials in V, add
-# p to V and perform reduction steps so that 1, 2, 3 and 4 still hold.
+# p to V and perform reduction steps so that 1-6 still hold.
 function extend_ideal_basis(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    n = length(V)
    lc = leading_coefficient(V[n])
    # check if p can be added without any reduction
    if length(p) > length(V[n]) && !isunit(lc) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
-      return vcat(V, [p])
+      return vcat(V, [reduce_tail(p, V)])
    end
    # check if p and V[n] are constant
    if isconstant(V[n]) && isconstant(p)
@@ -75,7 +89,8 @@ function extend_ideal_basis(p::T, V::Vector{T}) where {U <: RingElement, T <: Ab
    # check if p can replace V[n]
    swap = false
    if length(p) == length(V[n]) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
-      p, V = V[n], vcat(V[1:n-1], [p])
+      s = V[1:n - 1]
+      p, V = V[n], vcat(s, [reduce_tail(p, s)])
       swap = true
    end
    # check if leading coefficients divide leading_coefficient of p
@@ -90,7 +105,7 @@ function extend_ideal_basis(p::T, V::Vector{T}) where {U <: RingElement, T <: Ab
       if iszero(p) # p was absorbed, yay!
          return V
       end
-      return extend_ideal_basis(reverse(V), [p])
+      return extend_ideal_basis(reverse(V), [divexact(p, canonical_unit(p))])
    end
    if n < length(V) # we made some progress
       return extend_ideal_basis(vcat(reverse(V[n+1:end]), [p]), V[1:n])
@@ -105,6 +120,9 @@ function extend_ideal_basis(p::T, V::Vector{T}) where {U <: RingElement, T <: Ab
    if length(r) == length(V[n]) # V[n] can be reduced by r and switched
       q = divexact(leading_coefficient(V[n]), g)
       r, V[n] = V[n] - q*r, r
+      if n > 1
+         V[n] = reduce_tail(V[n], V[1:n-1])
+      end
       if length(r) > length(p)
          r, p = p, r
       end
@@ -120,16 +138,16 @@ function extend_ideal_basis(p::T, V::Vector{T}) where {U <: RingElement, T <: Ab
          V = insert!(V, n, p)
       end
    else # length(r) > length(V[n])
-      V = vcat(V, [r])
       if length(p) == 0 # one polynomial was absorbed, yay
-         return V
+         return vcat(V, [reduce_tail(r, V)])
       end
+      V = vcat(V, [r])
       r = p
    end
    lenr = length(r)
    n = findfirst(x->length(x) >= lenr, V)
    if n == 1 # r is the smallest polynomial
-      return extend_ideal_basis(reverse(V), [r])
+      return extend_ideal_basis(reverse(V), [divexact(r, canonical_unit(r))])
    end
    return extend_ideal_basis(vcat(reverse(V[n:end]), [r]), V[1:n - 1])
 end
@@ -140,6 +158,7 @@ end
 # 3. The leading coefficient of f_i divides that of f_{i-1} for all i
 # 4. Only the final polynomial may have leading coefficient that is a unit
 # 5. The polynomials are all canonicalised (divided by their canonical_unit)
+# 6. The tail of each polynomial is reduced mod the other polynomials in the basis
 function reduce(I::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    if hasmethod(gcdx, Tuple{U, U})
       V = gens(I)
@@ -157,11 +176,9 @@ function reduce(I::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyE
             end
             d = S(d0)
          end
-         V = [d]
-         V = extend_ideal_basis(D, V) # ensure 1, 2, 3, 4 hold
+         V = [divexact(d, canonical_unit(d))]
+         V = extend_ideal_basis(D, V)
       end
-      # deal with 5
-      V = map(x->divexact(x, canonical_unit(x)), V)
       return Ideal{T}(base_ring(I), V)
    else
       error("Not implemented")
