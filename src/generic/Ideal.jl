@@ -44,11 +44,13 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
    lm::NTuple{N, Int}   # leading monomial as exponent vector
    lcm::NTuple{N, Int}  # lcm of lm's in tree rooted here, as exponent vector
    in_heap::Bool # whether node is in the heap
+   path::Bool # used for marking paths to divisible nodes
 
    function lmnode{U, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
       node = new{U, N}(p, nothing, nothing)
       node.lm = Tuple(exponent_vector(p, 1))
       node.lcm = node.lm
+      node.path = false
       return node::lmnode{U, N}
    end
 end
@@ -164,31 +166,82 @@ function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, T 
    return V
 end
 
-function find_divisor_nodes!(W::Vector{lmnode{U, N}}, b::T, d::T)  where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+# divides1 = leading coeff of d divides leading coeff of b node and ** holds
+# divides2 = leading coeff of b node divides leading coeff of d and ** holds
+# eq       = leading monomials of b node and d are the same
+# ** lm of b node divides that of lm of d
+function find_divisor_nodes!(b::T, d::T)  where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+   divides1 = true
+   divides2 = false
+   eq = false
+   b.path = true
    if b.up != nothing
       found = false
       if lm_divides(d, b.up)
          found = true
-         find_divisor_nodes!(W, b.up, d)
+         divides1, divides2, eq = find_divisor_nodes!(b.up, d)
       end
       while b.next != nothing
          if lm_divides(d, b.next.up)
             found = true
-            find_divisor_nodes!(W, b.next.up, d)
+            d1, d2, eq0 = find_divisor_nodes!(b.next.up, d)
+            divides1 &= d1
+            divides2 |= d2
+            eq |= eq0 
          else
             b = b.next
          end
-         if !found
-            push!(W, b)
-         end
+      end
+      if !found
+         divides1 = divides(leading_coefficient(b.poly), leading_coefficient(d.poly))[1]
+         divides2 = divides(leading_coefficient(d.poly), leading_coefficient(b.poly))[1]
+         eq = b.lm == d.lm
       end
    else
-      push!(W, b)
+      divides1 = divides(leading_coefficient(b.poly), leading_coefficient(d.poly))[1]
+      divides2 = divides(leading_coefficient(d.poly), leading_coefficient(b.poly))[1]
+      eq = b.lm == d.lm
    end
-   return W
+   return divides1, divides2, eq
 end
 
-function basis_insert(B::Vector{T}, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function basis_attach_node(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+   if b.up != nothing
+      found = false
+      if b.up.path
+         found = true
+         basis_attach_node(b.up, d)
+      end
+      b2 = b
+      while b2.next != nothing
+         b2 = b2.next
+         if b2.up.path
+            found = true
+            basis_attach_node(b2.up, d)
+         end
+      end
+      if !found # we must attach to this node
+         b2.next = lmnode{U, N}(nothing)
+         b2.next.up = d
+      end
+   else
+      # we must attach to this node
+      b.up = d
+   end
+   b.path = false # clear path flag
+   b.lcm = lm_lcm(b, d) # update lcm for current node
+end
+
+function basis_attach(B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+   d.poly = divexact(d.poly, canonical_unit(d.poly))
+   for b in B
+      if lm_divides(d, b) # d is divisible by at least one node in tree b
+         basis_attach_node(b, d)
+      end
+   end
+end
+
+function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, B::Vector{T}, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
    node_divides = false
    if lm_is_constant(d)
       for b in B
@@ -199,56 +252,33 @@ function basis_insert(B::Vector{T}, d::T, heap::Vector{T}) where {U <: AbstractA
          end
       end
    else
-      W = Vector{lmnode{U, N}}()
-      for b in B
-         if lm_divides(d, b) # d is divisible by something in tree d
+      for i in 1:length(B)
+         b = B[i]
+         if lm_divides(d, b) # d is divisible by something in tree b
             node_divides = true
-            # first find all maximal divisor nodes
-            find_divisor_nodes!(W, b, d) # find maximal node dividing d
-            for n in W
-               if n.lm == d.lm # leading monomials are the same
-                  error("Not implemented")
-               end
-            end
-            for n in W
-               if ((flag, q) = divides(leading_coefficient(d.poly), leading_coefficient(n.poly)))[1]
-                  error("Not implemented")
-               end
-            end
+            # first find all maximal divisor nodes and characterise
+            W[i] = find_divisor_nodes!(b, d) # mark path to maximal nodes dividing d
+         else
+            W[i] = true, false, false # just so test below is not interfered with
          end
       end
-      attached = true
-      if node_divides # divisor nodes found
-         for n in W
-            if !((flag, q) = divides(leading_coefficient(n.poly), leading_coefficient(d.poly)))[1]
-               attached = false
-               break
-            end
-         end
-         if attached
-            # poly can be attached to tree at W[1]
-            n = W[1]
-            if n.up != nothing
-               while n.next != nothing
-                  n = n.next
-               end
-               n.next = lmnode{U, N}(nothing)
-               n = n.next
-               n.lm = d.lm
-               n.lcm = d.lcm
-            end
-            d.poly = divexact(d.poly, canonical_unit(d.poly))
-            n.up = d
-            # update lcms below n
-         else      
-            # no progress, use gcdx
-            error("Not implemented") 
+      w = true, false, false
+      for v in W
+         w = w[1] & v[1], w[2] | v[2], w[3] | v[3]
+      end
+      if node_divides
+         if w[1] & !w[2] & !w[3]
+            # poly can be attached to basis
+            basis_attach(B, d)
+         else
+            error("Not implemented")
          end
       end
    end
    if !node_divides # d not divisible by the root of any tree
       d.poly = divexact(d.poly, canonical_unit(d.poly))
       push!(B, d) # add to basis
+      push!(W, (true, false, false))
    end
    return Nothing
 end
@@ -279,10 +309,11 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          # canonicalise
          d.poly = divexact(d.poly, canonical_unit(d.poly))
          B = [d]
+         W = [(true, false, false)]
          # do reduction
          while !isempty(heap)
             d = heappop!(heap)
-            basis_insert(B, d, heap)
+            basis_insert(W, B, d, heap)
          end
          # extract polynomials from B
          V = extract_gens(B)
