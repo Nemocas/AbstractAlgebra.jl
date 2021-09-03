@@ -263,7 +263,7 @@ function reduce_leading_term!(d::T, b::T, q::V) where {V <: RingElement, U <: Ab
 end
 
 function reduce_leading_term!(d::T, b::U, q::V) where {V <: RingElement, U <: AbstractAlgebra.MPolyElem{V}, N, T <: lmnode{U, N}}
-      infl = [1 for in in 1:N]
+   infl = [1 for in in 1:N]
    shift = exponent_vector(d.poly, 1) .- exponent_vector(b, 1)
    d.poly -= q*inflate(b, shift, infl)
    if !iszero(d.poly)
@@ -345,29 +345,33 @@ function tree_evict(b::T, d::T, d1::T, heap::Vector{T}) where {U <: AbstractAlge
    node_lcm = b.lm
    if b.up != nothing
       if lm_divides_lcm(b.up, d)
-         if lm_divides(b.up, d) && !b.up.in_heap
-            tree_remove(b.up, d1, heap)
+         if lm_divides(b.up, d)
+            if !b.up.in_heap
+               tree_remove(b.up, d1, heap)
+            end
             b.up = nothing
          else
             tree_evict(b.up, d, d1, heap)
-            node_lcm = lcm.(node_lcm, b.up.lcm)
+            node_lcm = max.(node_lcm, b.up.lcm)
          end
       else
-         node_lcm = lcm.(node_lcm, b.up.lcm)
+         node_lcm = max.(node_lcm, b.up.lcm)
       end
       b2 = b
       while b2 != nothing && b2.next != nothing
          if lm_divides_lcm(b2.next.up, d)
-            if lm_divides(b2.next.up, d) && !b2.next.up.in_heap
-               tree_remove(b2.next.up, d1, heap)
+            if lm_divides(b2.next.up, d)
+               if !b2.next.up.in_heap
+                  tree_remove(b2.next.up, d1, heap)
+               end
                b2.next.up = nothing
                b2.next = b2.next.next
             else
                tree_evict(b2.next.up, d, d1, heap)
-               node_lcm = lcm.(node_lcm, b2.next.up.lcm)
+               node_lcm = max.(node_lcm, b2.next.up.lcm)
             end
          else
-            node_lcm = lcm.(node_lcm, b2.next.up.lcm)
+            node_lcm = max.(node_lcm, b2.next.up.lcm)
          end
          b2 = b2.next
       end
@@ -399,6 +403,10 @@ function reduce_leading_term!(X::Vector{T}, d::T, b::T) where {V <: RingElement,
       reduce_leading_term!(b, p, q)
       r = lmnode{U, N}(b.poly)
       b.poly = p
+      if !iszero(b.poly)
+         b.lm = Tuple(exponent_vector(b.poly, 1))
+         b.lcm = b.lm
+      end
       push!(X, d, r, b)
    else
       r = lmnode{U, N}(p)
@@ -491,9 +499,9 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
          end
       end
 println("    ***************")
-# println("    B = ", B)
-# println("    W = ", W)
-# println("    d = ", d)
+println("    B = ", B)
+println("    W = ", W)
+println("    d = ", d)
       w = true, false, false
       for v in W
          w = w[1] & v[1], w[2] | v[2], w[3] | v[3]
@@ -525,8 +533,10 @@ println("CASE 2:")
                # evict terms divisible by new d
                for i in length(B):-1:1
                   if lm_divides_lcm(B[i], d)
-                     if lm_divides(B[i], d) && !B[i].in_heap
-                        tree_remove(B[i], d, heap)
+                     if lm_divides(B[i], d)
+                        if !B[i].in_heap
+                           tree_remove(B[i], d, heap)
+                        end
                         deleteat!(B, i)
                         deleteat!(W, i)
                      else
@@ -554,8 +564,10 @@ println("CASE 3:")
             # evict terms divisible by old d (it will not be placed back on heap by eviction)
             for i in length(B):-1:1
                if lm_divides_lcm(B[i], d1)
-                  if lm_divides(B[i], d1) && !B[i].in_heap
-                     tree_remove(B[i], d1, heap)
+                  if lm_divides(B[i], d1)
+                     if !B[i].in_heap
+                        tree_remove(B[i], d1, heap)
+                     end
                      deleteat!(B, i)
                      deleteat!(W, i)
                   else
@@ -569,8 +581,10 @@ println("CASE 3:")
                   # evict terms divisible by new d
                   for i in length(B):-1:1
                      if lm_divides_lcm(B[i], d)
-                        if lm_divides(B[i], d) && !B[i].in_heap
-                           tree_remove(B[i], d1, heap)
+                        if lm_divides(B[i], d)
+                           if !B[i].in_heap
+                              tree_remove(B[i], d1, heap)
+                           end
                            deleteat!(B, i)
                            deleteat!(W, i)
                         else
@@ -601,8 +615,10 @@ println("CASE 4:")
                   # evict terms divisible by new d
                   for i in length(B):-1:1
                      if lm_divides_lcm(B[i], d)
-                        if lm_divides(B[i], d) && !B[i].in_heap
-                           tree_remove(B[i], d, heap)
+                        if lm_divides(B[i], d)
+                           if !B[i].in_heap
+                              tree_remove(B[i], d, heap)
+                           end
                            deleteat!(B, i)
                            deleteat!(W, i)
                         else
