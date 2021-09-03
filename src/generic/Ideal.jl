@@ -48,8 +48,10 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
 
    function lmnode{U, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
       node = new{U, N}(p, nothing, nothing)
-      node.lm = Tuple(exponent_vector(p, 1))
-      node.lcm = node.lm
+      if p != nothing && !iszero(p)
+         node.lm = Tuple(exponent_vector(p, 1))
+         node.lcm = node.lm
+      end
       node.path = false
       return node::lmnode{U, N}
    end
@@ -106,6 +108,7 @@ function lm_is_constant(node::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyEle
 end
 
 function heapinsert!(heap::Vector{lmnode{U, N}}, node::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+@assert !iszero(node.poly)
    i = n = length(heap) + 1
    if i != 1 && lm_precedes(heap[1], node)
       i = 1
@@ -153,7 +156,8 @@ function heappop!(heap::Vector{lmnode{U, N}}) where {U <: AbstractAlgebra.MPolyE
    x.in_heap = false
    x.up = nothing
    x.next = nothing
-   x.lm = x.lcm
+   x.lm = Tuple(exponent_vector(x.poly, 1))
+   x.lcm = x.lm
    return x
 end
 
@@ -166,7 +170,9 @@ function extract_gens(V::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPol
    if node.next != nothing
       V = extract_gens(V, node.next)
    end
-   push!(V, node.poly)
+   if node.poly != nothing
+      push!(V, node.poly)
+   end
    return V
 end
 
@@ -193,15 +199,17 @@ function find_divisor_nodes!(b::T, d::T)  where {U <: AbstractAlgebra.MPolyElem{
          found = true
          divides1, divides2, eq = find_divisor_nodes!(b.up, d)
       end
-      while b.next != nothing
-         if lm_divides(d, b.next.up)
+      b2 = b
+      while b2 != nothing && b2.next != nothing
+         if lm_divides(d, b2.next.up)
             found = true
-            d1, d2, eq0 = find_divisor_nodes!(b.next.up, d)
+            d1, d2, eq0 = find_divisor_nodes!(b2.next.up, d)
             divides1 &= d1
             divides2 |= d2
             eq |= eq0 
+            break
          else
-            b = b.next
+            b2 = b2.next
          end
       end
       if !found
@@ -254,20 +262,30 @@ function reduce_leading_term!(d::T, b::T, q::V) where {V <: RingElement, U <: Ab
    end
 end
 
-function tree_reduce_node!(d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function reduce_leading_term!(d::T, b::U, q::V) where {V <: RingElement, U <: AbstractAlgebra.MPolyElem{V}, N, T <: lmnode{U, N}}
+      infl = [1 for in in 1:N]
+   shift = exponent_vector(d.poly, 1) .- exponent_vector(b, 1)
+   d.poly -= q*inflate(b, shift, infl)
+   if !iszero(d.poly)
+      d.lm = Tuple(exponent_vector(d.poly, 1))
+      d.lcm = d.lm
+   end
+end
+
+function tree_reduce_node!(d::T, b::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
    reduced = false
    if b.up != nothing
       found = false
       if b.up.path
          found = true
-         reduced = tree_reduce_node!(d, b.up)
+         reduced = tree_reduce_node!(d, b.up, B)
       end
       b2 = b
       while !reduced && b2.next != nothing
          b2 = b2.next
          if b2.up.path
             found = true
-            reduced = tree_reduce_node!(d, b2.up)
+            reduced = tree_reduce_node!(d, b2.up, B)
          end
       end
       if !reduced && !found # we must check this node
@@ -305,14 +323,14 @@ end
 function tree_remove(b::T, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
    if b.up != nothing
       if !b.up.in_heap
-         tree_remove(b.up, heap)
+         tree_remove(b.up, d, heap)
       end
       b.up = nothing
       b2 = b
       while b2.next != nothing
          b2 = b2.next
          if !b2.up.in_heap
-            tree_remove(b2.up)
+            tree_remove(b2.up, d, heap)
          end
          b2.up = nothing
       end
@@ -323,33 +341,33 @@ function tree_remove(b::T, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MP
    end
 end
 
-function tree_evict(b::T, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
-   node_lcm = Tuple(1 for i in 1:N)
+function tree_evict(b::T, d::T, d1::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+   node_lcm = b.lm
    if b.up != nothing
       if lm_divides_lcm(b.up, d)
          if lm_divides(b.up, d) && !b.up.in_heap
-            tree_remove(b.up, d, heap)
+            tree_remove(b.up, d1, heap)
             b.up = nothing
          else
-            tree_evict(b.up)
-            node_lcm = lcm.(node_lcm, b.up)
+            tree_evict(b.up, d, d1, heap)
+            node_lcm = lcm.(node_lcm, b.up.lcm)
          end
       else
-         node_lcm = lcm.(node_lcm, b.up)
+         node_lcm = lcm.(node_lcm, b.up.lcm)
       end
       b2 = b
-      while b2.next != nothing
+      while b2 != nothing && b2.next != nothing
          if lm_divides_lcm(b2.next.up, d)
             if lm_divides(b2.next.up, d) && !b2.next.up.in_heap
-               tree_remove(b2.next.up, d, heap)
+               tree_remove(b2.next.up, d1, heap)
                b2.next.up = nothing
                b2.next = b2.next.next
             else
-               tree_evict(b2.next.up)
-               node_lcm = lcm.(node_lcm, b2.next.up)
+               tree_evict(b2.next.up, d, d1, heap)
+               node_lcm = lcm.(node_lcm, b2.next.up.lcm)
             end
          else
-            node_lcm = lcm.(node_lcm, b2.next.up)
+            node_lcm = lcm.(node_lcm, b2.next.up.lcm)
          end
          b2 = b2.next
       end
@@ -360,12 +378,19 @@ function tree_evict(b::T, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPo
          b.next = b.next.next
       end
    end
+   b.lcm = node_lcm
 end
 
 function reduce_leading_term!(X::Vector{T}, d::T, b::T) where {V <: RingElement, U <: AbstractAlgebra.MPolyElem{V}, N, T <: lmnode{U, N}}
    eq = d.lm == b.lm
    g, s, t = gcdx(leading_coefficient(d.poly), leading_coefficient(b.poly))
-   p = s*d.poly + t*b.poly # p has leading coeff g dividing lc(d) and lc(b)
+   if eq
+      p = s*d.poly + t*b.poly # p has leading coeff g dividing lc(d) and lc(b)
+   else
+      shift = exponent_vector(d.poly, 1) .- exponent_vector(b.poly, 1)
+      infl = [1 for i in 1:N]
+      p = s*d.poly + t*inflate(b.poly, shift, infl)
+   end
    # reduce d and b by p and replace b by p (temporarily)
    q = divexact(leading_coefficient(d.poly), leading_coefficient(p))
    reduce_leading_term!(d, p, q)
@@ -374,10 +399,10 @@ function reduce_leading_term!(X::Vector{T}, d::T, b::T) where {V <: RingElement,
       reduce_leading_term!(b, p, q)
       r = lmnode{U, N}(b.poly)
       b.poly = p
-      push!(X, b, r, d)
+      push!(X, d, r, b)
    else
       r = lmnode{U, N}(p)
-      push!(X, r, d)
+      push!(X, d, r)
    end
 end
 
@@ -429,15 +454,17 @@ function tree_reduce_gcdx!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlgebra
             reduced = tree_reduce_gcdx!(X, d, b2.up)
          end
       end
-      if !reduced && !found
+      if !reduced && !found && !divides(leading_coefficient(b.poly), leading_coefficient(d.poly))[1]
          # we have reached the right node
          reduce_leading_term!(X, d, b)
          reduced = true
       end
    else
       # we have reached the right node
-      reduce_leading_term!(X, d, b)
-      reduced = true
+      if !divides(leading_coefficient(b.poly), leading_coefficient(d.poly))[1]
+         reduce_leading_term!(X, d, b)
+         reduced = true
+      end
    end
    return reduced
 end
@@ -445,9 +472,6 @@ end
 function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vector{T}, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
    node_divides = false
    if lm_is_constant(d)
-      # should not happen as nothing in heap can divide something in basis, except if
-      # lm is the same, which implies there is nothing but constants in basis, which means
-      # this term from heap should have already been merged in reduce function below
       for b in B
          if lm_is_constant(b)
             S = parent(d.poly)
@@ -455,7 +479,6 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
             node_divides = true
          end
       end
-      error("Should not happen")
    else
       for i in 1:length(B)
          b = B[i]
@@ -467,12 +490,17 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
             W[i] = true, false, false # just so test below is not interfered with
          end
       end
+println("    ***************")
+# println("    B = ", B)
+# println("    W = ", W)
+# println("    d = ", d)
       w = true, false, false
       for v in W
          w = w[1] & v[1], w[2] | v[2], w[3] | v[3]
       end
       if node_divides
          if w[1] & !w[2] & !w[3]
+println("CASE 1:")
             # poly can be attached to basis
             d.poly = divexact(d.poly, canonical_unit(d.poly))
             for b in B
@@ -481,12 +509,13 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
                end
             end
          elseif w[2]
+println("CASE 2:")
             # lt of poly can be reduced
             reduced = false
             for i in 1:length(B)
                if !reduced && W[i][2] # some node of b has leading coeff dividing leading coeff of d
                   # reduce leading coeff of d
-                  reduced = tree_reduce_node!(d, B[i])
+                  reduced = tree_reduce_node!(d, B[i], B)
                end
                if B[i].path
                   tree_clear_path(B[i])
@@ -499,8 +528,9 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
                      if lm_divides(B[i], d) && !B[i].in_heap
                         tree_remove(B[i], d, heap)
                         deleteat!(B, i)
+                        deleteat!(W, i)
                      else
-                        tree_evict(B[i], d, heap)
+                        tree_evict(B[i], d, d, heap)
                      end
                   end
                end
@@ -508,10 +538,11 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
                heapinsert!(heap, d)
             end
          elseif w[3]
+println("CASE 3:")
             # lt of poly can be reduced
             reduced = false
             for i in 1:length(B)
-               if !reduced && W[i][2] # some node of b has leading coeff dividing leading coeff of d
+               if !reduced && W[i][3] # some node of b has leading coeff dividing leading coeff of d
                   # reduce leading coeff of d
                   reduced = tree_reduce_equal_lm!(X, d, B[i])
                end
@@ -519,15 +550,16 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
                   tree_clear_path(B[i])
                end
             end
-            d = pop!(X)
+            d1 = pop!(X)
             # evict terms divisible by old d (it will not be placed back on heap by eviction)
             for i in length(B):-1:1
-               if lm_divides_lcm(B[i], d)
-                  if lm_divides(B[i], d) && !B[i].in_heap
-                     tree_remove(B[i], d, heap)
+               if lm_divides_lcm(B[i], d1)
+                  if lm_divides(B[i], d1) && !B[i].in_heap
+                     tree_remove(B[i], d1, heap)
                      deleteat!(B, i)
+                     deleteat!(W, i)
                   else
-                     tree_evict(B[i], d, heap)
+                     tree_evict(B[i], d1, d1, heap)
                   end
                end
             end
@@ -538,10 +570,11 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
                   for i in length(B):-1:1
                      if lm_divides_lcm(B[i], d)
                         if lm_divides(B[i], d) && !B[i].in_heap
-                           tree_remove(B[i], d, heap)
+                           tree_remove(B[i], d1, heap)
                            deleteat!(B, i)
+                           deleteat!(W, i)
                         else
-                           tree_evict(B[i], d, heap)
+                           tree_evict(B[i], d, d1, heap)
                         end
                      end
                   end
@@ -550,10 +583,11 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
                end
             end
          else
+println("CASE 4:")
             # leading term of d can be reduced
             reduced = false
             for i in 1:length(B)
-               if !reduced && W[i][2] # some node of b has leading coeff dividing leading coeff of d
+               if !reduced && !W[i][1] && B[i].path # some node of b has leading monomial dividing leading monomial of d
                   # reduce leading coeff of d
                   reduced = tree_reduce_gcdx!(X, d, B[i])
                end
@@ -570,11 +604,12 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
                         if lm_divides(B[i], d) && !B[i].in_heap
                            tree_remove(B[i], d, heap)
                            deleteat!(B, i)
+                           deleteat!(W, i)
                         else
-                           tree_evict(B[i], d, heap)
+                           tree_evict(B[i], d, d, heap)
                         end
                      end
-                  end
+                  end 
                   # insert d on heap
                   heapinsert!(heap, d)
                end
