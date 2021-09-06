@@ -45,6 +45,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
    lcm::NTuple{N, Int}  # lcm of lm's in tree rooted here, as exponent vector
    in_heap::Bool # whether node is in the heap
    path::Bool # used for marking paths to divisible nodes
+   path2::Bool # mark paths when following existing paths
 
    function lmnode{U, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
       node = new{U, N}(p, nothing, nothing)
@@ -53,6 +54,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
          node.lcm = node.lm
       end
       node.path = false
+      node.path2 = false
       return node::lmnode{U, N}
    end
 end
@@ -79,6 +81,16 @@ end
 function lm_divides(node1::lmnode{U, N}, node2::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
    for i = 1:N
       if node2.lm[i] > node1.lm[i]
+         return false
+      end
+   end
+   return true
+end
+
+function lm_divides(f::lmnode{U, N}, i::Int, node2::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+   V = exponent_vector(f.poly, i)
+   for j = 1:N
+      if node2.lm[j] > V[j]
          return false
       end
    end
@@ -197,20 +209,22 @@ function find_divisor_nodes!(b::T, d::T)  where {U <: AbstractAlgebra.MPolyElem{
       found = false
       if lm_divides(d, b.up)
          found = true
-         divides1, divides2, eq = find_divisor_nodes!(b.up, d)
+         if !b.up.path
+            divides1, divides2, eq = find_divisor_nodes!(b.up, d)
+         end
       end
       b2 = b
       while b2 != nothing && b2.next != nothing
          if lm_divides(d, b2.next.up)
             found = true
-            d1, d2, eq0 = find_divisor_nodes!(b2.next.up, d)
-            divides1 &= d1
-            divides2 |= d2
-            eq |= eq0 
-            break
-         else
-            b2 = b2.next
+            if !b2.next.up.path
+               d1, d2, eq0 = find_divisor_nodes!(b2.next.up, d)
+               divides1 &= d1
+               divides2 |= d2
+               eq |= eq0 
+            end
          end
+         b2 = b2.next
       end
       if !found
          divides1 = divides(leading_coefficient(b.poly), leading_coefficient(d.poly))[1]
@@ -230,14 +244,18 @@ function tree_attach_node(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:Ri
       found = false
       if b.up.path
          found = true
-         tree_attach_node(b.up, d)
+         if !b.up.path2
+            tree_attach_node(b.up, d)
+         end
       end
       b2 = b
       while b2.next != nothing
          b2 = b2.next
          if b2.up.path
             found = true
-            tree_attach_node(b2.up, d)
+            if !b.up.path2
+               tree_attach_node(b2.up, d)
+            end
          end
       end
       if !found # we must attach to this node
@@ -248,7 +266,7 @@ function tree_attach_node(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:Ri
       # we must attach to this node
       b.up = d
    end
-   b.path = false # clear path flag
+   b.path2 = true # mark path as visited
    b.lcm = lm_lcm(b, d) # update lcm for current node
 end
 
@@ -278,14 +296,18 @@ function tree_reduce_node!(d::T, b::T, B::Vector{T}) where {U <: AbstractAlgebra
       found = false
       if b.up.path
          found = true
-         reduced = tree_reduce_node!(d, b.up, B)
+         if !b.up.path2
+            reduced = tree_reduce_node!(d, b.up, B)
+         end
       end
       b2 = b
       while !reduced && b2.next != nothing
          b2 = b2.next
          if b2.up.path
             found = true
-            reduced = tree_reduce_node!(d, b2.up, B)
+            if !b2.up.path2
+               reduced = tree_reduce_node!(d, b2.up, B)
+            end
          end
       end
       if !reduced && !found # we must check this node
@@ -301,6 +323,7 @@ function tree_reduce_node!(d::T, b::T, B::Vector{T}) where {U <: AbstractAlgebra
          reduced = true
       end
    end
+   b.path2 = true
    return reduced
 end
 
@@ -318,6 +341,7 @@ function tree_clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEleme
       end
    end
    b.path = false # clear path flag
+   b.path2 = false
 end
 
 function tree_remove(b::T, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
@@ -387,30 +411,45 @@ end
 
 function reduce_leading_term!(X::Vector{T}, d::T, b::T) where {V <: RingElement, U <: AbstractAlgebra.MPolyElem{V}, N, T <: lmnode{U, N}}
    eq = d.lm == b.lm
-   g, s, t = gcdx(leading_coefficient(d.poly), leading_coefficient(b.poly))
-   if eq
-      p = s*d.poly + t*b.poly # p has leading coeff g dividing lc(d) and lc(b)
-   else
-      shift = exponent_vector(d.poly, 1) .- exponent_vector(b.poly, 1)
-      infl = [1 for i in 1:N]
-      p = s*d.poly + t*inflate(b.poly, shift, infl)
-   end
-   # reduce d and b by p and replace b by p (temporarily)
-   q = divexact(leading_coefficient(d.poly), leading_coefficient(p))
-   reduce_leading_term!(d, p, q)
-   if eq
-      q = divexact(leading_coefficient(b.poly), leading_coefficient(p))
-      reduce_leading_term!(b, p, q)
+   if eq && ((flag, q) = divides(leading_coefficient(b.poly), leading_coefficient(d.poly)))[1]
+      # reduce b by p and mark for eviction
+      p = b.poly
+      reduce_leading_term!(b, d.poly, q)
+      push!(X, d)
       r = lmnode{U, N}(b.poly)
-      b.poly = p
-      if !iszero(b.poly)
-         b.lm = Tuple(exponent_vector(b.poly, 1))
-         b.lcm = b.lm
+      if !iszero(r.poly)
+         push!(X, r)
       end
-      push!(X, d, r, b)
+      b.poly = p
+      b.lm = Tuple(exponent_vector(b.poly, 1))
+      b.lcm = b.lm
+      push!(X, b)
    else
-      r = lmnode{U, N}(p)
-      push!(X, d, r)
+      g, s, t = gcdx(leading_coefficient(d.poly), leading_coefficient(b.poly))
+      if eq
+         p = s*d.poly + t*b.poly # p has leading coeff g dividing lc(d) and lc(b)
+      else
+         shift = exponent_vector(d.poly, 1) .- exponent_vector(b.poly, 1)
+         infl = [1 for i in 1:N]
+         p = s*d.poly + t*inflate(b.poly, shift, infl)
+      end
+      # reduce d and b by p and replace b by p (temporarily)
+      q = divexact(leading_coefficient(d.poly), leading_coefficient(p))
+      reduce_leading_term!(d, p, q)
+      if eq
+         q = divexact(leading_coefficient(b.poly), leading_coefficient(p))
+         reduce_leading_term!(b, p, q)
+         r = lmnode{U, N}(b.poly)
+         b.poly = p
+         if !iszero(b.poly)
+            b.lm = Tuple(exponent_vector(b.poly, 1))
+            b.lcm = b.lm
+         end
+         push!(X, d, r, b)
+      else
+         r = lmnode{U, N}(p)
+         push!(X, d, r)
+      end
    end
 end
 
@@ -420,14 +459,18 @@ function tree_reduce_equal_lm!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlg
       found = false
       if b.up.path
          found = true
-         reduced = tree_reduce_equal_lm!(X, d, b.up)
+         if !b.up.path2
+            reduced = tree_reduce_equal_lm!(X, d, b.up)
+         end
       end
       b2 = b
       while !reduced && b2.next != nothing
          b2 = b2.next
          if b2.up.path
             found = true
-            reduced = tree_reduce_equal_lm!(X, d, b2.up)
+            if !b2.up.path2
+               reduced = tree_reduce_equal_lm!(X, d, b2.up)
+            end
          end
       end
       if !reduced && !found # we must check this node
@@ -443,6 +486,7 @@ function tree_reduce_equal_lm!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlg
          reduced = true
       end
    end
+   b.path2 = true
    return reduced
 end
 
@@ -452,14 +496,18 @@ function tree_reduce_gcdx!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlgebra
       found = false
       if b.up.path
          found = true
-         reduced = tree_reduce_gcdx!(X, d, b.up)
+         if !b.up.path2
+            reduced = tree_reduce_gcdx!(X, d, b.up)
+         end
       end
       b2 = b
       while !reduced && b2.next != nothing
          b2 = b2.next
          if b2.up.path
             found = true
-            reduced = tree_reduce_gcdx!(X, d, b2.up)
+            if !b2.up.path2
+               reduced = tree_reduce_gcdx!(X, d, b2.up)
+            end
          end
       end
       if !reduced && !found && !divides(leading_coefficient(b.poly), leading_coefficient(d.poly))[1]
@@ -474,7 +522,51 @@ function tree_reduce_gcdx!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlgebra
          reduced = true
       end
    end
+   b.path2 = true
    return reduced
+end
+
+# Reduce the i-th term of f by the polys in tree b, the root of which divides it
+function reduce_tail!(f::T, i::Int, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+   mon = Tuple(exponent_vector(f.poly, i))
+   reduced_to_zero = false
+   b.path = true
+   if b.up != nothing
+      if lm_divides(f, i, b.up) && !b.up.path
+         reduced_to_zero = reduce_tail!(f, i, b.up)
+      end
+      b2 = b
+      while !reduced_to_zero && b2 != nothing && b2.next != nothing
+         if lm_divides(f, i, b2.next.up) && !b2.next.up.path
+            reduced_to_zero = reduce_tail!(f, i, b2.next.up)
+         end
+         b2 = b2.next
+      end
+   end
+   if !reduced_to_zero
+      shift = exponent_vector(f.poly, i) .- exponent_vector(b.poly, 1)
+      infl = [1 for j in 1:N]
+      q = div(coeff(f.poly, i), leading_coefficient(b.poly))
+      f.poly -= q*inflate(b.poly, shift, infl)
+      reduced_to_zero = length(f.poly) < i || Tuple(exponent_vector(f.poly, i)) != mon
+   end
+   return reduced_to_zero 
+end
+
+function reduce_tail!(f::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+   i = 2
+   while i <= length(f.poly)
+      reduced_to_zero = false
+      for b in B
+         if !reduced_to_zero && lm_divides(f, i, b)
+            reduced_to_zero = reduce_tail!(f, i, b)
+            tree_clear_path(b)
+         end
+      end
+      if !reduced_to_zero
+         i += 1
+      end
+   end
 end
 
 function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vector{T}, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
@@ -498,26 +590,28 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
             W[i] = true, false, false # just so test below is not interfered with
          end
       end
-println("    ***************")
-println("    B = ", B)
-println("    W = ", W)
-println("    d = ", d)
+#println("    ***************")
+#println("    B = ", B)
+#println("    W = ", W)
+#println("    d = ", d)
       w = true, false, false
       for v in W
          w = w[1] & v[1], w[2] | v[2], w[3] | v[3]
       end
       if node_divides
          if w[1] & !w[2] & !w[3]
-println("CASE 1:")
+#println("CASE 1:")
             # poly can be attached to basis
-            d.poly = divexact(d.poly, canonical_unit(d.poly))
             for b in B
                if b.path # d is divisible by at least one node in tree b
                   tree_attach_node(b, d)
+                  tree_clear_path(b)
                end
             end
+            reduce_tail!(d, B)
+            d.poly = divexact(d.poly, canonical_unit(d.poly))
          elseif w[2]
-println("CASE 2:")
+#println("CASE 2:")
             # lt of poly can be reduced
             reduced = false
             for i in 1:length(B)
@@ -548,7 +642,7 @@ println("CASE 2:")
                heapinsert!(heap, d)
             end
          elseif w[3]
-println("CASE 3:")
+#println("CASE 3:")
             # lt of poly can be reduced
             reduced = false
             for i in 1:length(B)
@@ -597,7 +691,7 @@ println("CASE 3:")
                end
             end
          else
-println("CASE 4:")
+#println("CASE 4:")
             # leading term of d can be reduced
             reduced = false
             for i in 1:length(B)
@@ -634,9 +728,10 @@ println("CASE 4:")
       end
    end
    if !node_divides # d not divisible by the root of any tree
-      d.poly = divexact(d.poly, canonical_unit(d.poly))
       push!(B, d) # add to basis
       push!(W, (true, false, false))
+      reduce_tail!(d, B)
+      d.poly = divexact(d.poly, canonical_unit(d.poly))
    end
    return Nothing
 end
