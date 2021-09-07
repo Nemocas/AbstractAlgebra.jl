@@ -71,12 +71,52 @@ end
 # heapright(i::Int) = 2i + 1
 # heapparent(i::Int) = div(i, 2)
 
-function lm_precedes(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+function lm_precedes(node1::lmnode{U, :lex, N}, node2::lmnode{U, :lex, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
    for i = 1:N
       if node2.lm[i] < node1.lm[i]
          return true
       end
       if node2.lm[i] > node1.lm[i]
+         return false
+      end
+   end
+   return true
+end
+
+function lm_precedes(node1::lmnode{U, :deglex, N}, node2::lmnode{U, :deglex, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+   s1 = sum(node1.lm)
+   s2 = sum(node2.lm)
+   if s2 < s1
+      return true
+   end
+   if s2 > s1
+      return false
+   end
+   for i = 1:N
+      if node2.lm[i] < node1.lm[i]
+         return true
+      end
+      if node2.lm[i] > node1.lm[i]
+         return false
+      end
+   end
+   return true
+end
+
+function lm_precedes(node1::lmnode{U, :degrevlex, N}, node2::lmnode{U, :degrevlex, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+   s1 = sum(node1.lm)
+   s2 = sum(node2.lm)
+   if s2 < s1
+      return true
+   end
+   if s2 > s1
+      return false
+   end
+   for i = N:-1:1
+      if node2.lm[i] > node1.lm[i]
+         return true
+      end
+      if node2.lm[i] < node1.lm[i]
          return false
       end
    end
