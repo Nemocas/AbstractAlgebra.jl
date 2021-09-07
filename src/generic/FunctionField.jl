@@ -1041,8 +1041,6 @@ function divexact(a::Rat{T},
    return a*inv(b)
 end
 
-divexact(a::RingElem, b::FunctionFieldElem; check::Bool=true) = a*inv(b)
-
 ###############################################################################
 #
 #   Norm
