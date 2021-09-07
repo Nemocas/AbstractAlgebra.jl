@@ -854,5 +854,6 @@ end
       @test t * BigInt(1) == BigInt(1) * t
       @test t + one(R1) == one(R1) + t
       @test t * one(R1) == one(R1) * t
+      @test divexact(t, one(S)) == t
    end
 end
