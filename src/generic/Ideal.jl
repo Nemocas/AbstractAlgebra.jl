@@ -55,8 +55,13 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
       end
       node.path = false
       node.path2 = false
+      node.in_heap = false
       return node::lmnode{U, N}
    end
+end
+
+function show(io::IO, n::lmnode)
+   print(io, "Node(", n.poly, ", ", n.up, ", ", n.next, ")")
 end
 
 # heap implementation for sorting polys by lm, head = smallest
@@ -174,10 +179,11 @@ function heappop!(heap::Vector{lmnode{U, N}}) where {U <: AbstractAlgebra.MPolyE
 end
 
 function extract_gens(V::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPolyElem, T <: lmnode{U, N}}
-   node.in_heap = true # mark node as visited
    # depth first
    if node.up != nothing
-      V = extract_gens(V, node.up)
+      if !node.up.path
+         V = extract_gens(V, node.up)
+      end
    end
    if node.next != nothing
       V = extract_gens(V, node.next)
@@ -185,6 +191,7 @@ function extract_gens(V::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPol
    if node.poly != nothing
       push!(V, node.poly)
    end
+   node.path = true
    return V
 end
 
@@ -393,11 +400,12 @@ function tree_evict(b::T, d::T, d1::T, heap::Vector{T}) where {U <: AbstractAlge
             else
                tree_evict(b2.next.up, d, d1, heap)
                node_lcm = max.(node_lcm, b2.next.up.lcm)
+               b2 = b2.next
             end
          else
             node_lcm = max.(node_lcm, b2.next.up.lcm)
+            b2 = b2.next
          end
-         b2 = b2.next
       end
    end
    if b.up == nothing
@@ -569,6 +577,137 @@ function reduce_tail!(f::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{
    end
 end
 
+function check_tree_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+   if b.in_heap
+      println(b)
+      error("node is in heap")
+   end
+   if b.next != nothing && b.up == nothing
+       println(b)
+       error("tree node error")
+   end
+   if b.up != nothing
+       check_tree_path(b.up)
+       while b.next != nothing
+          check_tree_path(b.next)
+          b = b.next
+       end
+   else
+      if b.path
+         println(b)
+         error("path is set")
+      end
+      if b.path2
+         println(b2)
+         error("path2 is set")
+      end
+   end
+end
+
+function extract_nodes(V::Vector{T}, node::T) where {N, U <: AbstractAlgebra.MPolyElem, T <: lmnode{U, N}}
+   # depth first
+   if node.up != nothing
+      if !node.up.path
+         V = extract_nodes(V, node.up)
+      end
+   end
+   if node.next != nothing
+      V = extract_nodes(V, node.next)
+   end
+   if node.poly != nothing
+      push!(V, node)
+   end
+   node.path = true
+   return V
+end
+
+function extract_nodes(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, T <: lmnode{U, N}}
+   V = Vector{T}()
+   for node in B
+      V = extract_nodes(V, node)
+   end
+   for node in B
+      tree_clear_path(node)
+   end
+   return V
+end
+
+function basis_check(B::Vector{T}, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+   for b in B
+      check_tree_path(b)
+   end
+   V = extract_nodes(B)
+   for i = 1:length(V)
+      for j = i + 1:length(V)
+         if V[i] === V[j]
+            println("B = ", B)
+            println("V = ", V)
+            error("Duplicate entries in basis")
+         end
+      end
+      if iszero(V[i].poly)
+         error("poly is zero")
+      end
+      for k = 1:length(heap)
+         if V[i] === heap[k]
+            println(V[i])
+            error("entry in heap and basis")
+         end
+      end
+   end
+   for b in V
+      if b.lm != Tuple(exponent_vector(b.poly, 1))
+         println(b)
+         error("lm field is incorrect")
+      end
+      if b.up == nothing
+         if b.lm != b.lcm
+            println(b)
+            error("lcm doesn't match lm")
+         end
+      else
+         node_lcm = b.lm
+         node_lcm = max.(node_lcm, b.up.lcm)
+         if !lm_divides(b.up, b)
+            println(b)
+            error("lm does not divide up")
+         end
+         if b.lm == b.up.lm
+            if !divides(leading_coefficient(b.poly), leading_coefficient(b.up.poly))[1]
+               error("leading coefficients of equal leading monomials don't divide")
+               println(b)
+            end
+         end
+         b2 = b
+         while b2.next != nothing
+            if !lm_divides(b2.next.up, b)
+               println(b)
+               error("lm does not divide next")
+            end
+            node_lcm = max.(node_lcm, b2.next.up.lcm)
+            b2 = b2.next
+         end
+         if b.lcm != node_lcm
+            println(b)
+            println(b.lcm)
+            println(node_lcm)
+            error("lcm is incorrect")
+         end
+      end
+   end
+   for i = 1:length(V)
+      for k = 1:length(heap)
+         if lm_divides(V[i], heap[k]) && V[i].lm != heap[k].lm
+            println(V[i])
+            println(heap[k])
+            error("entry in heap divides entry in basis")
+         end
+      end
+   end
+end
+
+const LMNODE_DEBUG = false
+
 function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vector{T}, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
    node_divides = false
    if lm_is_constant(d)
@@ -590,17 +729,21 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
             W[i] = true, false, false # just so test below is not interfered with
          end
       end
-#println("    ***************")
-#println("    B = ", B)
-#println("    W = ", W)
-#println("    d = ", d)
+      if LMNODE_DEBUG
+         println("    ***************")
+         println("    B = ", B)
+         println("    W = ", W)
+         println("    d = ", d)
+      end
       w = true, false, false
       for v in W
          w = w[1] & v[1], w[2] | v[2], w[3] | v[3]
       end
       if node_divides
          if w[1] & !w[2] & !w[3]
-#println("CASE 1:")
+            if LMNODE_DEBUG
+               println("CASE 1:")
+            end
             # poly can be attached to basis
             for b in B
                if b.path # d is divisible by at least one node in tree b
@@ -608,10 +751,12 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
                   tree_clear_path(b)
                end
             end
-            reduce_tail!(d, B)
             d.poly = divexact(d.poly, canonical_unit(d.poly))
+            reduce_tail!(d, B)
          elseif w[2]
-#println("CASE 2:")
+            if LMNODE_DEBUG
+               println("CASE 2:")
+            end
             # lt of poly can be reduced
             reduced = false
             for i in 1:length(B)
@@ -642,7 +787,9 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
                heapinsert!(heap, d)
             end
          elseif w[3]
-#println("CASE 3:")
+            if LMNODE_DEBUG
+               println("CASE 3:")
+            end
             # lt of poly can be reduced
             reduced = false
             for i in 1:length(B)
@@ -691,7 +838,9 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
                end
             end
          else
-#println("CASE 4:")
+            if LMNODE_DEBUG
+               println("CASE 4:")
+            end
             # leading term of d can be reduced
             reduced = false
             for i in 1:length(B)
@@ -730,8 +879,11 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
    if !node_divides # d not divisible by the root of any tree
       push!(B, d) # add to basis
       push!(W, (true, false, false))
-      reduce_tail!(d, B)
       d.poly = divexact(d.poly, canonical_unit(d.poly))
+      reduce_tail!(d, B)
+   end
+   if LMNODE_DEBUG
+      basis_check(B, heap)
    end
    return Nothing
 end
