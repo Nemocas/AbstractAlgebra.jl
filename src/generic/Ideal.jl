@@ -37,18 +37,18 @@ gens(I::Ideal) = I.gens
 #
 ###############################################################################
 
-mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    poly::Union{U, Nothing}
-   up::Union{lmnode{U}, Nothing}   # out (divisible leading monomials)
-   next::Union{lmnode{U}, Nothing} # extend current node so out-degree can be > 1
+   up::Union{lmnode{U, V, N}, Nothing}   # out (divisible leading monomials)
+   next::Union{lmnode{U, V, N}, Nothing} # extend current node so out-degree can be > 1
    lm::NTuple{N, Int}   # leading monomial as exponent vector
    lcm::NTuple{N, Int}  # lcm of lm's in tree rooted here, as exponent vector
    in_heap::Bool # whether node is in the heap
    path::Bool # used for marking paths to divisible nodes
    path2::Bool # mark paths when following existing paths
 
-   function lmnode{U, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
-      node = new{U, N}(p, nothing, nothing)
+   function lmnode{U, V, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+      node = new{U, V, N}(p, nothing, nothing)
       if p != nothing && !iszero(p)
          node.lm = Tuple(exponent_vector(p, 1))
          node.lcm = node.lm
@@ -56,7 +56,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
       node.path = false
       node.path2 = false
       node.in_heap = false
-      return node::lmnode{U, N}
+      return node::lmnode{U, V, N}
    end
 end
 
@@ -71,7 +71,7 @@ end
 # heapright(i::Int) = 2i + 1
 # heapparent(i::Int) = div(i, 2)
 
-function lm_precedes(node1::lmnode{U, N}, node2::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+function lm_precedes(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    for i = 1:N
       if node2.lm[i] < node1.lm[i]
          return true
@@ -83,7 +83,7 @@ function lm_precedes(node1::lmnode{U, N}, node2::lmnode{U, N}) where {U <: Abstr
    return true
 end
 
-function lm_divides(node1::lmnode{U, N}, node2::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+function lm_divides(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    for i = 1:N
       if node2.lm[i] > node1.lm[i]
          return false
@@ -92,21 +92,21 @@ function lm_divides(node1::lmnode{U, N}, node2::lmnode{U, N}) where {U <: Abstra
    return true
 end
 
-function lm_divides(f::lmnode{U, N}, i::Int, node2::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
-   V = exponent_vector(f.poly, i)
+function lm_divides(f::lmnode{U, V, N}, i::Int, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+   D = exponent_vector(f.poly, i)
    for j = 1:N
-      if node2.lm[j] > V[j]
+      if node2.lm[j] > D[j]
          return false
       end
    end
    return true
 end
 
-function lm_lcm(node1::lmnode{U, N}, node2::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+function lm_lcm(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    return Tuple(max(node1.lcm[i], node2.lcm[i]) for i in 1:N)
 end
 
-function lm_divides_lcm(node1::lmnode{U, N}, node2::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+function lm_divides_lcm(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    for i = 1:N
       if node2.lm[i] > node1.lcm[i]
          return false
@@ -115,7 +115,7 @@ function lm_divides_lcm(node1::lmnode{U, N}, node2::lmnode{U, N}) where {U <: Ab
    return true
 end
 
-function lm_is_constant(node::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+function lm_is_constant(node::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    for i = 1:N
       if node.lm[i] != 0
          return false
@@ -124,7 +124,7 @@ function lm_is_constant(node::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyEle
    return true
 end
 
-function heapinsert!(heap::Vector{lmnode{U, N}}, node::lmnode{U, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+function heapinsert!(heap::Vector{lmnode{U, V, N}}, node::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
 @assert !iszero(node.poly)
    i = n = length(heap) + 1
    if i != 1 && lm_precedes(heap[1], node)
@@ -148,7 +148,7 @@ function heapinsert!(heap::Vector{lmnode{U, N}}, node::lmnode{U, N}) where {U <:
    return Nothing
 end
 
-function heappop!(heap::Vector{lmnode{U, N}}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+function heappop!(heap::Vector{lmnode{U, V, N}}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    s = length(heap)
    x = heap[1]
    i = 1
@@ -178,36 +178,36 @@ function heappop!(heap::Vector{lmnode{U, N}}) where {U <: AbstractAlgebra.MPolyE
    return x
 end
 
-function extract_gens(V::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPolyElem, T <: lmnode{U, N}}
+function extract_gens(D::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPolyElem, V, T <: lmnode{U, V, N}}
    # depth first
    if node.up != nothing
       if !node.up.path
-         V = extract_gens(V, node.up)
+         extract_gens(D, node.up)
       end
    end
    if node.next != nothing
-      V = extract_gens(V, node.next)
+      extract_gens(D, node.next)
    end
    if node.poly != nothing
-      push!(V, node.poly)
+      push!(D, node.poly)
    end
    node.path = true
-   return V
+   return nothing
 end
 
-function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, T <: lmnode{U, N}}
-   V = Vector{U}()
+function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, V, T <: lmnode{U, V, N}}
+   D = Vector{U}()
    for node in B
-      V = extract_gens(V, node)
+      extract_gens(D, node)
    end
-   return V
+   return D
 end
 
 # divides1 = leading coeff of d divides leading coeff of b node and ** holds
 # divides2 = leading coeff of b node divides leading coeff of d and ** holds
 # eq       = leading monomials of b node and d are the same
 # ** lm of b node divides that of lm of d
-function find_divisor_nodes!(b::T, d::T)  where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function find_divisor_nodes!(b::T, d::T)  where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, V, T <: lmnode{U, V, N}}
    divides1 = true
    divides2 = false
    eq = false
@@ -246,7 +246,7 @@ function find_divisor_nodes!(b::T, d::T)  where {U <: AbstractAlgebra.MPolyElem{
    return divides1, divides2, eq
 end
 
-function tree_attach_node(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function tree_attach_node(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, V, T <: lmnode{U, V, N}}
    if b.up != nothing
       found = false
       if b.up.path
@@ -266,7 +266,7 @@ function tree_attach_node(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:Ri
          end
       end
       if !found # we must attach to this node
-         b2.next = lmnode{U, N}(nothing)
+         b2.next = lmnode{U, V, N}(nothing)
          b2.next.up = d
       end
    else
@@ -277,7 +277,7 @@ function tree_attach_node(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:Ri
    b.lcm = lm_lcm(b, d) # update lcm for current node
 end
 
-function reduce_leading_term!(d::T, b::T, q::V) where {V <: RingElement, U <: AbstractAlgebra.MPolyElem{V}, N, T <: lmnode{U, N}}
+function reduce_leading_term!(d::T, b::T, q::W) where {W <: RingElement, U <: AbstractAlgebra.MPolyElem{W}, N, V, T <: lmnode{U, V, N}}
    infl = [1 for in in 1:N]
    shift = exponent_vector(d.poly, 1) .- exponent_vector(b.poly, 1)
    d.poly -= q*inflate(b.poly, shift, infl)
@@ -287,7 +287,7 @@ function reduce_leading_term!(d::T, b::T, q::V) where {V <: RingElement, U <: Ab
    end
 end
 
-function reduce_leading_term!(d::T, b::U, q::V) where {V <: RingElement, U <: AbstractAlgebra.MPolyElem{V}, N, T <: lmnode{U, N}}
+function reduce_leading_term!(d::T, b::U, q::W) where {W <: RingElement, U <: AbstractAlgebra.MPolyElem{W}, V, N, T <: lmnode{U, V, N}}
    infl = [1 for in in 1:N]
    shift = exponent_vector(d.poly, 1) .- exponent_vector(b, 1)
    d.poly -= q*inflate(b, shift, infl)
@@ -297,7 +297,7 @@ function reduce_leading_term!(d::T, b::U, q::V) where {V <: RingElement, U <: Ab
    end
 end
 
-function tree_reduce_node!(d::T, b::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function tree_reduce_node!(d::T, b::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    reduced = false
    if b.up != nothing
       found = false
@@ -334,7 +334,7 @@ function tree_reduce_node!(d::T, b::T, B::Vector{T}) where {U <: AbstractAlgebra
    return reduced
 end
 
-function tree_clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function tree_clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if b.up != nothing
       if b.up.path
          tree_clear_path(b.up)
@@ -351,7 +351,7 @@ function tree_clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEleme
    b.path2 = false
 end
 
-function tree_remove(b::T, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function tree_remove(b::T, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if b.up != nothing
       if !b.up.in_heap
          tree_remove(b.up, d, heap)
@@ -372,7 +372,7 @@ function tree_remove(b::T, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MP
    end
 end
 
-function tree_evict(b::T, d::T, d1::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function tree_evict(b::T, d::T, d1::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    node_lcm = b.lm
    if b.up != nothing
       if lm_divides_lcm(b.up, d)
@@ -417,14 +417,14 @@ function tree_evict(b::T, d::T, d1::T, heap::Vector{T}) where {U <: AbstractAlge
    b.lcm = node_lcm
 end
 
-function reduce_leading_term!(X::Vector{T}, d::T, b::T) where {V <: RingElement, U <: AbstractAlgebra.MPolyElem{V}, N, T <: lmnode{U, N}}
+function reduce_leading_term!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    eq = d.lm == b.lm
    if eq && ((flag, q) = divides(leading_coefficient(b.poly), leading_coefficient(d.poly)))[1]
       # reduce b by p and mark for eviction
       p = b.poly
       reduce_leading_term!(b, d.poly, q)
       push!(X, d)
-      r = lmnode{U, N}(b.poly)
+      r = lmnode{U, V, N}(b.poly)
       if !iszero(r.poly)
          push!(X, r)
       end
@@ -447,7 +447,7 @@ function reduce_leading_term!(X::Vector{T}, d::T, b::T) where {V <: RingElement,
       if eq
          q = divexact(leading_coefficient(b.poly), leading_coefficient(p))
          reduce_leading_term!(b, p, q)
-         r = lmnode{U, N}(b.poly)
+         r = lmnode{U, V, N}(b.poly)
          b.poly = p
          if !iszero(b.poly)
             b.lm = Tuple(exponent_vector(b.poly, 1))
@@ -455,13 +455,13 @@ function reduce_leading_term!(X::Vector{T}, d::T, b::T) where {V <: RingElement,
          end
          push!(X, d, r, b)
       else
-         r = lmnode{U, N}(p)
+         r = lmnode{U, V, N}(p)
          push!(X, d, r)
       end
    end
 end
 
-function tree_reduce_equal_lm!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function tree_reduce_equal_lm!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    reduced = false
    if b.up != nothing
       found = false
@@ -498,7 +498,7 @@ function tree_reduce_equal_lm!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlg
    return reduced
 end
 
-function tree_reduce_gcdx!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function tree_reduce_gcdx!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    reduced = false
    if b.up != nothing
       found = false
@@ -535,7 +535,7 @@ function tree_reduce_gcdx!(X::Vector{T}, d::T, b::T) where {U <: AbstractAlgebra
 end
 
 # Reduce the i-th term of f by the polys in tree b, the root of which divides it
-function reduce_tail!(f::T, i::Int, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function reduce_tail!(f::T, i::Int, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    mon = Tuple(exponent_vector(f.poly, i))
    reduced_to_zero = false
    b.path = true
@@ -561,7 +561,7 @@ function reduce_tail!(f::T, i::Int, b::T) where {U <: AbstractAlgebra.MPolyElem{
    return reduced_to_zero 
 end
 
-function reduce_tail!(f::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function reduce_tail!(f::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    i = 2
    while i <= length(f.poly)
       reduced_to_zero = false
@@ -577,7 +577,7 @@ function reduce_tail!(f::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{
    end
 end
 
-function check_tree_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function check_tree_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if b.in_heap
       println(b)
       error("node is in heap")
@@ -604,58 +604,58 @@ function check_tree_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEleme
    end
 end
 
-function extract_nodes(V::Vector{T}, node::T) where {N, U <: AbstractAlgebra.MPolyElem, T <: lmnode{U, N}}
+function extract_nodes(D::Vector{T}, node::T) where {U <: AbstractAlgebra.MPolyElem, V, N, T <: lmnode{U, V, N}}
    # depth first
    if node.up != nothing
       if !node.up.path
-         V = extract_nodes(V, node.up)
+         extract_nodes(D, node.up)
       end
    end
    if node.next != nothing
-      V = extract_nodes(V, node.next)
+      extract_nodes(D, node.next)
    end
    if node.poly != nothing
-      push!(V, node)
+      push!(D, node)
    end
    node.path = true
-   return V
+   return nothing
 end
 
-function extract_nodes(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, T <: lmnode{U, N}}
-   V = Vector{T}()
+function extract_nodes(B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem, V, N, T <: lmnode{U, V, N}}
+   D = Vector{T}()
    for node in B
-      V = extract_nodes(V, node)
+      extract_nodes(D, node)
    end
    for node in B
       tree_clear_path(node)
    end
-   return V
+   return D
 end
 
-function basis_check(B::Vector{T}, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function basis_check(B::Vector{T}, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    for b in B
       check_tree_path(b)
    end
-   V = extract_nodes(B)
-   for i = 1:length(V)
-      for j = i + 1:length(V)
-         if V[i] === V[j]
+   D = extract_nodes(B)
+   for i = 1:length(D)
+      for j = i + 1:length(D)
+         if D[i] === D[j]
             println("B = ", B)
-            println("V = ", V)
+            println("D = ", D)
             error("Duplicate entries in basis")
          end
       end
-      if iszero(V[i].poly)
+      if iszero(D[i].poly)
          error("poly is zero")
       end
       for k = 1:length(heap)
-         if V[i] === heap[k]
-            println(V[i])
+         if D[i] === heap[k]
+            println(D[i])
             error("entry in heap and basis")
          end
       end
    end
-   for b in V
+   for b in D
       if b.lm != Tuple(exponent_vector(b.poly, 1))
          println(b)
          error("lm field is incorrect")
@@ -695,10 +695,10 @@ function basis_check(B::Vector{T}, heap::Vector{T}) where {U <: AbstractAlgebra.
          end
       end
    end
-   for i = 1:length(V)
+   for i = 1:length(D)
       for k = 1:length(heap)
-         if lm_divides(V[i], heap[k]) && V[i].lm != heap[k].lm
-            println(V[i])
+         if lm_divides(D[i], heap[k]) && D[i].lm != heap[k].lm
+            println(D[i])
             println(heap[k])
             error("entry in heap divides entry in basis")
          end
@@ -708,7 +708,7 @@ end
 
 const LMNODE_DEBUG = false
 
-function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vector{T}, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, T <: lmnode{U, N}}
+function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vector{T}, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    node_divides = false
    if lm_is_constant(d)
       for b in B
@@ -890,15 +890,16 @@ end
 
 function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    if hasmethod(gcdx, Tuple{T, T})
-      V = gens(I)
-      # Step 1: compute V a vector of polynomials giving the same basis as I
+      B = gens(I)
+      # Step 1: compute B a vector of polynomials giving the same basis as I
       #         but for which 1, 2, 3 above hold
-      if length(V) > 1
+      if length(B) > 1
          # make heap
+         V = ordering(parent(B[1]))
          N = nvars(base_ring(I))
-         heap = Vector{lmnode{U, N}}()
-         for v in V
-            heapinsert!(heap, lmnode{U, N}(v))
+         heap = Vector{lmnode{U, V, N}}()
+         for v in B
+            heapinsert!(heap, lmnode{U, V, N}(v))
          end
          d = heappop!(heap)
          # take gcd of constant polys
@@ -913,18 +914,18 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          end
          # canonicalise
          d.poly = divexact(d.poly, canonical_unit(d.poly))
-         B = [d]
+         B2 = [d]
          W = [(true, false, false)]
-         X = lmnode{U, N}[]
+         X = lmnode{U, V, N}[]
          # do reduction
          while !isempty(heap)
             d = heappop!(heap)
-            basis_insert(W, X, B, d, heap)
+            basis_insert(W, X, B2, d, heap)
          end
-         # extract polynomials from B
-         V = extract_gens(B)
+         # extract polynomials from B2
+         B = extract_gens(B2)
       end
-      return Ideal{U}(base_ring(I), V)
+      return Ideal{U}(base_ring(I), B)
    else
       error("Not implemented")
    end

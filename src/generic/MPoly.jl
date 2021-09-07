@@ -3835,7 +3835,6 @@ function main_variable_insert(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingE
    end
 end
 
-
 ###############################################################################
 #
 #   Build context
