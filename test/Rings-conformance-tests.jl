@@ -210,6 +210,10 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
             B = deepcopy(b)
             @test isone(inv(one(R)))
             @test a*b == b*a
+            @test equality(a^1, a)
+            @test equality(a^2, a*a)
+            @test equality(a^3, a*a*a)
+            @test equality(a^4, a*a*a*a)
             # documentation is not clear on divexact
             if isdomain_type(T)
                @test iszero(b) || equality(divexact(b*a, b), a)
