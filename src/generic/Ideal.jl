@@ -83,7 +83,7 @@ function lm_precedes(node1::lmnode{U, :lex, N}, node2::lmnode{U, :lex, N}) where
    return true
 end
 
-function lm_precedes(node1::lmnode{U, :deglex, N}, node2::lmnode{U, :deglex, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+function lm_precedes(node1::lmnode{U, :deglex, N}, node2::lmnode{U, :deglex, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
    s1 = sum(node1.lm)
    s2 = sum(node2.lm)
    if s2 < s1
@@ -103,7 +103,7 @@ function lm_precedes(node1::lmnode{U, :deglex, N}, node2::lmnode{U, :deglex, N})
    return true
 end
 
-function lm_precedes(node1::lmnode{U, :degrevlex, N}, node2::lmnode{U, :degrevlex, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+function lm_precedes(node1::lmnode{U, :degrevlex, N}, node2::lmnode{U, :degrevlex, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
    s1 = sum(node1.lm)
    s2 = sum(node2.lm)
    if s2 < s1
@@ -286,13 +286,13 @@ function find_divisor_nodes!(b::T, d::T)  where {U <: AbstractAlgebra.MPolyElem{
    return divides1, divides2, eq
 end
 
-function tree_attach_node(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, V, T <: lmnode{U, V, N}}
+function tree_attach_node(X::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N, V, T <: lmnode{U, V, N}}
    if b.up != nothing
       found = false
       if b.up.path
          found = true
          if !b.up.path2
-            tree_attach_node(b.up, d)
+            tree_attach_node(X, b.up, d)
          end
       end
       b2 = b
@@ -301,7 +301,7 @@ function tree_attach_node(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:Ri
          if b2.up.path
             found = true
             if !b.up.path2
-               tree_attach_node(b2.up, d)
+               tree_attach_node(X, b2.up, d)
             end
          end
       end
@@ -746,7 +746,7 @@ function basis_check(B::Vector{T}, heap::Vector{T}) where {U <: AbstractAlgebra.
    end
 end
 
-const LMNODE_DEBUG = false
+const LMNODE_DEBUG = true
 
 function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vector{T}, d::T, heap::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    node_divides = false
@@ -787,12 +787,33 @@ function basis_insert(W::Vector{Tuple{Bool, Bool, Bool}}, X::Vector{T}, B::Vecto
             # poly can be attached to basis
             for b in B
                if b.path # d is divisible by at least one node in tree b
-                  tree_attach_node(b, d)
+                  tree_attach_node(X, b, d)
                   tree_clear_path(b)
                end
             end
             d.poly = divexact(d.poly, canonical_unit(d.poly))
             reduce_tail!(d, B)
+            while !isempty(X)
+               d = pop!(X)
+               if !iszero(d.poly)
+                  # evict terms divisible by new d
+                  for i in length(B):-1:1
+                     if lm_divides_lcm(B[i], d)
+                        if lm_divides(B[i], d)
+                           if !B[i].in_heap
+                              tree_remove(B[i], d, heap)
+                           end
+                           deleteat!(B, i)
+                           deleteat!(W, i)
+                        else
+                           tree_evict(B[i], d, d, heap)
+                        end
+                     end
+                  end 
+                  # insert d on heap
+                  heapinsert!(heap, d)
+               end
+            end
          elseif w[2]
             if LMNODE_DEBUG
                println("CASE 2:")
@@ -977,110 +998,267 @@ end
 #
 ###############################################################################
 
+struct snode{T<:AbstractAlgebra.PolyElem{<:RingElement}}
+   poly::T
+   sgen::Int # generation of spolys
+end
+
 # Extend the basis V of polynomials satisfying 1-6 below by the
 # polynomials in D, all of which have degree at least that of those in
 # V and such that the degrees of the polynomials in D is *decreasing*.
-function extend_ideal_basis(D::Vector{T}, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function extend_ideal_basis(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}, W <: snode{T}}
+   sgen = 1
    while !isempty(D)
       d = pop!(D)
-      V = extend_ideal_basis(d, V)
+      V = extend_ideal_basis(D, d, V, H)
+      while !isempty(H)
+         V = insert_fragments(D, V, H)
+         sgen += 1
+         V = insert_spolys(D, V, H, sgen)
+      end
    end
    return V
 end
 
-function reduce_tail(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
-   p = divexact(p, canonical_unit(p))
+function reduce_tail(f::W, V::Vector{W}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}, W <: snode{T}}
+   p = divexact(f.poly, canonical_unit(f.poly))
    i = length(V)
    for n = length(p) - 1:-1:1
-      while i > 0 && length(V[i]) > n
+      while i > 0 && length(V[i].poly) > n
          i -= 1
       end
       if i != 0
-         q = AbstractAlgebra.div(coeff(p, n - 1), leading_coefficient(V[i]))
-         p -= q*shift_left(V[i], n - length(V[i]))
+         q = AbstractAlgebra.div(coeff(p, n - 1), leading_coefficient(V[i].poly))
+         p -= q*shift_left(V[i].poly, n - length(V[i].poly))
       end
    end
-   return p
+   return p == f.poly ? snode{T}(p, f.sgen) : snode{T}(p, 0)
+end
+
+function insert_spolys(D::Vector{W}, V::Vector{W}, H::Vector{T}, sgen::Int) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}, W <: snode{T}}
+   return V
+end
+
+function insert_fragments(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}, W <: snode{T}}
+   max_len = 0
+   for h in H
+      max_len = max(max_len, length(h))
+   end
+   while !isempty(H)
+      n = length(V)
+      len = length(V[n].poly)
+      if max_len >= len # may be fragments that are too long
+         V2 = T[]
+         i = 1
+         j = 1
+         max_length = 0
+         while i <= length(H)
+            if length(H[i]) >= len # fragment is too long
+               push!(V2, H[i])
+            else
+               H[j] = H[i]
+               max_length = max(max_length, length(H[j]))
+               j += 1
+            end
+            i += 1
+         end
+         while length(H) >= j
+            pop!(H)
+         end
+         if length(V2) > 0
+            # put long fragments back in D
+            sort!(V2, by=degree, rev=true)
+            D = vcat(D, [snode{T}(p, 0) for p in V2])
+         end
+      end
+      if !isempty(H)
+         p = pop!(H)
+         while n >= 1 && length(V[n].poly) > length(p)
+            n -= 1
+         end
+         # Reduce p by leading coefficients that divide
+         while n >= 1 && ((_, q) = divides(leading_coefficient(p), leading_coefficient(V[n].poly)))[1]
+            p -= q*shift_left(V[n].poly, length(p) - length(V[n].poly))
+            while n >= 1 && length(V[n].poly) > length(p)
+               n -= 1
+            end
+         end
+         # Insert p
+         if !iszero(p)
+            if n >= 1
+               v = V[n].poly
+               if length(p) == length(v)
+                  if ((flag, q) = divides(leading_coefficient(v), leading_coefficient(p)))[1]
+                     # V[n] can be swapped with p and reduced
+                     V[n], r = reduce_tail(snode{T}(p, 0), V[1:n - 1]), V[n].poly
+                     r -= q*p
+                     if !iszero(r)
+                        push!(H, r)
+                     end
+                  else # use gcdx
+                     g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
+                     p, r = s*v + t*p, p # p has leading coefficient g dividing that of r (old p) and v
+                     V[n] = reduce_tail(snode{T}(p, 0), V[1:n - 1])
+                     q = divexact(leading_coefficient(r), g)
+                     r -= q*p
+                     if !iszero(r)
+                        push!(H, r)
+                     end
+                     q = divexact(leading_coefficient(v), g)
+                     v -= q*p
+                     if !iszero(v)
+                        push!(H, v)
+                     end
+                  end
+               else # length(p) > length(v)
+                  if divides(leading_coefficient(v), leading_coefficient(p))[1]
+                     # p can be inserted
+                     insert!(V, n + 1, reduce_tail(snode{T}(p, 0), V[1:n]))
+                     n += 1
+                  else # use gcdx
+                     g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
+                     r = s*shift_left(v, length(p) - length(v)) + t*p # r has leading coeff g dividing that of p
+                     q = divexact(leading_coefficient(p), g)
+                     p -= r*q
+                     if !iszero(p)
+                        push!(H, p)
+                     end
+                     p = r
+                     # p can be inserted
+                     insert!(V, n + 1, reduce_tail(snode{T}(p, 0), V[1:n]))
+                     n += 1
+                  end
+               end
+            else # p is the smallest polynomial
+               insert!(V, 1, snode{T}(p, 0))
+               v = V[2].poly
+               n = 2
+               if !divides(leading_coefficient(p), leading_coefficient(v))[1] # use gcdx
+                  g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
+                  p = s*v + t*shift_left(p, length(v) - length(p)) # p has leading coefficient g dividing that of v
+                  q = divexact(leading_coefficient(v), g)
+                  r, V[n] = v - q*p, reduce_tail(snode{T}(p, 0), V[1:1])
+                  if !iszero(r)
+                     push!(H, r)
+                  end 
+               end
+            end
+            # adjust entries above p
+            while n < length(V)
+               v = V[n + 1].poly
+               if ((flag, q) = divides(leading_coefficient(v), leading_coefficient(p)))[1]
+                  v -= q*shift_left(p, length(v) - length(p))
+                  if !iszero(v)
+                     push!(H, v)
+                  end
+                  deleteat!(V, n + 1)
+               elseif divides(leading_coefficient(p), leading_coefficient(v))[1]
+                  break
+               else
+                  # use gcdx
+                  g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
+                  p = s*v + t*shift_left(p, length(v) - length(p)) # p has leading coefficient g dividing that of v
+                  q = divexact(leading_coefficient(v), g)
+                  r, V[n + 1] = v - q*p, reduce_tail(snode{T}(p, 0), V[1:n])
+                  if !iszero(r)
+                     push!(H, r)
+                  end
+                  n += 1
+               end
+            end
+         end
+      end
+   end
+   return V
 end
 
 # Given a nonempty vector V of polynomials of satisfying 1-6 below and a
 # polynomial p whose degree is at least that of all the polynomials in V, add
-# p to V and perform reduction steps so that 1-6 still hold.
-function extend_ideal_basis(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
-   n = length(V)
-   lc = leading_coefficient(V[n])
-   # check if p can be added without any reduction
-   if length(p) > length(V[n]) && !isunit(lc) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
-      return vcat(V, [reduce_tail(p, V)])
-   end
-   # check if p and V[n] are constant
-   if isconstant(V[n]) && isconstant(p)
-      return [parent(p)(gcd(constant_coefficient(p), constant_coefficient(V[n])))]
-   end
-   # check if p can replace V[n]
-   swap = false
-   if length(p) == length(V[n]) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
-      s = V[1:n - 1]
-      p, V = V[n], vcat(s, [reduce_tail(p, s)])
-      swap = true
-   end
-   # check if leading coefficients divide leading_coefficient of p
-   while n >= 1 && (swap || ((_, q) = divides(leading_coefficient(p), leading_coefficient(V[n])))[1])
-      p -= q*shift_left(V[n], length(p) - length(V[n]))
-      while n >= 1 && length(V[n]) > length(p)
-         n -= 1
+# p to V and perform reduction steps so that 1-6 still hold. Fragments which
+# are generated and need to be added later go in H.
+function extend_ideal_basis(D::Vector{W}, f::W, V::Vector{W}, H::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}, W <: snode{T}}
+   while true
+      p = f.poly
+      n = length(V)
+      lc = leading_coefficient(V[n].poly)
+      # check if p can be added without any reduction
+      if length(p) > length(V[n].poly) && !isunit(lc) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
+         return vcat(V, [reduce_tail(f, V)])
       end
+      # check if p and V[n] are constant
+      if isconstant(V[n].poly) && isconstant(p)
+         return [snode{T}(parent(p)(gcd(constant_coefficient(p), constant_coefficient(V[n].poly))), 1)]
+      end
+      # check if p can replace V[n]
       swap = false
-   end
-   if n == 0 # p is smallest polynomial
+      if length(p) == length(V[n].poly) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
+         S = V[1:n - 1]
+         p, V = V[n].poly, vcat(S, [reduce_tail(f, S)])
+         swap = true
+      end
+      # check if leading coefficients divide leading_coefficient of p
+      while n >= 1 && (swap || ((_, q) = divides(leading_coefficient(p), leading_coefficient(V[n].poly)))[1])
+         p -= q*shift_left(V[n].poly, length(p) - length(V[n].poly))
+         while n >= 1 && length(V[n].poly) > length(p)
+            n -= 1
+         end
+         swap = false
+      end
       if iszero(p) # p was absorbed, yay!
          return V
       end
-      return extend_ideal_basis(reverse(V), [divexact(p, canonical_unit(p))])
-   end
-   if n < length(V) # we made some progress
-      return extend_ideal_basis(vcat(reverse(V[n+1:end]), [p]), V[1:n])
-   end
-   # we made no progress, use gcdx
-   n = length(V)
-   v = V[n]
-   g, s, t = gcdx(leading_coefficient(p), leading_coefficient(v))
-   r = s*p + t*shift_left(v, length(p) - length(v)) # r has leading coeff g
-   q = divexact(leading_coefficient(p), g)
-   p -= q*shift_left(r, length(p) - length(r))
-   if length(r) == length(V[n]) # V[n] can be reduced by r and switched
-      q = divexact(leading_coefficient(V[n]), g)
-      r, V[n] = V[n] - q*r, r
-      if n > 1
-         V[n] = reduce_tail(V[n], V[1:n-1])
-      end
-      if length(r) > length(p)
-         r, p = p, r
-      end
-      if length(p) == 0 # both polynomials were absorbed, yay!
+      if n < length(V) # we made some progress, p is a fragment
+         push!(H, p)
          return V
       end
-      if length(r) == 0 # one polynomial was absorbed, yay!
-         r = p
-      else
-         # insert p in V
-         lenp = length(p)
-         n = findfirst(x->length(x) >= lenp, V)
-         V = insert!(V, n, p)
+      # we made no progress, use gcdx
+      n = length(V)
+      v = V[n].poly
+      g, s, t = gcdx(leading_coefficient(p), leading_coefficient(v))
+      r = s*p + t*shift_left(v, length(p) - length(v)) # r has leading coeff g
+      q = divexact(leading_coefficient(p), g)
+      p -= q*shift_left(r, length(p) - length(r))
+      if length(r) == length(v) # V[n] can be reduced by r and switched
+         q = divexact(leading_coefficient(v), g)
+         r, V[n] = v - q*r, snode{T}(r, 0)
+         if n > 1
+            V[n] = reduce_tail(V[n], V[1:n-1])
+         end
+         if length(r) > length(p)
+            r, p = p, r
+         end
+         if length(p) == 0 # both polynomials were absorbed, yay!
+            return V
+         end
+         if length(r) == 0 # one polynomial was absorbed, yay!
+            if length(p) < length(v)
+               push!(H, p)
+               return V
+            end
+            # p still needs reducing
+         else
+            if length(p) < length(v)
+               push!(H, p, r)
+               return V
+            end
+            push!(H, r)
+            # p still needs reducing
+         end
+      else # length(r) > length(V[n])
+         if length(p) != 0
+            if length(p) >= length(v)
+              push!(D, snode{T}(r, 0))
+            else 
+               push!(H, p)
+               p = r
+            end
+         else
+            p = r 
+         end
+         # p still needs reduction
       end
-   else # length(r) > length(V[n])
-      if length(p) == 0 # one polynomial was absorbed, yay
-         return vcat(V, [reduce_tail(r, V)])
-      end
-      V = vcat(V, [r])
-      r = p
+      f = snode{T}(p, 0)
    end
-   lenr = length(r)
-   n = findfirst(x->length(x) >= lenr, V)
-   if n == 1 # r is the smallest polynomial
-      return extend_ideal_basis(reverse(V), [divexact(r, canonical_unit(r))])
-   end
-   return extend_ideal_basis(vcat(reverse(V[n:end]), [r]), V[1:n - 1])
 end
       
 # We call an ideal over a polynomial ring over a Euclidean domain reduced if
@@ -1093,8 +1271,8 @@ end
 function reduce(I::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    if hasmethod(gcdx, Tuple{U, U})
       V = gens(I)
-      # Step 1: compute V a vector of polynomials giving the same basis as I
-      #         but for which 1, 2, 3 above hold
+      # Compute V a vector of polynomials giving the same basis as I
+      # but for which the above hold
       if length(V) > 1
          D = sort(V, by=degree, rev=true)
          d = pop!(D)
@@ -1107,8 +1285,12 @@ function reduce(I::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyE
             end
             d = S(d0)
          end
-         V = [divexact(d, canonical_unit(d))]
-         V = extend_ideal_basis(D, V)
+         W = [snode{T}(divexact(d, canonical_unit(d)), 1)]
+         B = [snode{T}(p, 0) for p in D]
+         H = T[]
+         W = extend_ideal_basis(B, W, H)
+         # extract polys from nodes
+         V = [n.poly for n in W]
       end
       return Ideal{T}(base_ring(I), V)
    else
