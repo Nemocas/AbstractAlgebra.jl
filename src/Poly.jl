@@ -1999,7 +1999,9 @@ Return a least common multiple of $a$ and $b$ if it exists.
 """
 function lcm(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    check_parent(a, b)
-   return a*divexact(b, gcd(a, b))
+   g = gcd(a, b)
+   iszero(g) && return g
+   return a*divexact(b, g)
 end
 
 @doc Markdown.doc"""
