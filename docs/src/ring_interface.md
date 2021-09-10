@@ -756,11 +756,11 @@ using RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
 import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type,
        isexact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
-       get_cached!, isunit, characteristic, Ring, RingElem
+       get_cached!, isunit, characteristic, Ring, RingElem, expressify
 
-import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero
+import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand
 
-struct ConstPolyRing{T <: RingElement}
+struct ConstPolyRing{T <: RingElement} <: Ring
    base_ring::Ring
 
    function ConstPolyRing{T}(R::Ring, cached::Bool) where T <: RingElement
@@ -832,6 +832,17 @@ end
 
 function show(io::IO, f::ConstPoly)
    print(io, f.c)
+end
+
+# Expressification (optional)
+
+function expressify(R::ConstPolyRing; context = nothing)
+   return Expr(:sequence, Expr(:text, "Constant polynomials over "),
+                          expressify(base_ring(R), context = context))
+end
+
+function expressify(f::ConstPoly; context = nothing)
+   return expressify(f.c, context = context)
 end
 
 # Unary operations
@@ -976,4 +987,17 @@ function ConstantPolynomialRing(R::Ring, cached::Bool=true)
    T = elem_type(R)
    return ConstPolyRing{T}(R, cached)
 end
+```
+
+The above implementation of `ConstantPolynomialRing` may be tested as follows.
+
+```julia
+using Test
+include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
+
+function test_elem(R::ConstPolyRing{elem_type(ZZ)})
+   return rand(R, -999:999)
+end
+
+test_Ring_interface(ConstantPolynomialRing(ZZ))
 ```
