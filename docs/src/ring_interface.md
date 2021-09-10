@@ -758,7 +758,8 @@ import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type
        isexact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
        get_cached!, isunit, characteristic, Ring, RingElem, expressify
 
-import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand
+import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
+             deepcopy_internal, hash
 
 struct ConstPolyRing{T <: RingElement} <: Ring
    base_ring::Ring
@@ -795,14 +796,15 @@ isdomain_type(::Type{ConstPoly{T}}) where T <: RingElement = isdomain_type(T)
 
 isexact_type(::Type{ConstPoly{T}}) where T <: RingElement = isexact_type(T)
 
-function Base.hash(f::ConstPoly, h::UInt)
+function hash(f::ConstPoly, h::UInt)
    r = 0x65125ab8e0cd44ca
    return xor(r, hash(f.c, h))
 end
 
-function deepcopy_internal(f::ConstPoly)
-   r = ConstPoly(f.c)
+function deepcopy_internal(f::ConstPoly{T}, d::IdDict) where T <: RingElement
+   r = ConstPoly{T}(deepcopy_internal(f.c, d))
    r.parent = f.parent # parent should not be deepcopied
+   return r
 end
 
 # Basic manipulation
@@ -910,7 +912,7 @@ end
 # Unsafe operators
 
 function zero!(f::ConstPoly)
-   f.c = 0
+   f.c = zero(base_ring(parent(f)))
    return f
 end
 
@@ -995,9 +997,11 @@ The above implementation of `ConstantPolynomialRing` may be tested as follows.
 using Test
 include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
 
-function test_elem(R::ConstPolyRing{elem_type(ZZ)})
-   return rand(R, -999:999)
+S, _ = PolynomialRing(QQ, "x")
+
+function test_elem(R::ConstPolyRing{elem_type(S)})
+   return R(rand(base_ring(R), 1:6, -999:999))
 end
 
-test_Ring_interface(ConstantPolynomialRing(ZZ))
+test_Ring_interface(ConstantPolynomialRing(S))
 ```
