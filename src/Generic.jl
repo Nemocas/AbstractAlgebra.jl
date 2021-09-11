@@ -37,25 +37,29 @@ import ..AbstractAlgebra: add!, addeq!, addmul!, base_ring, canonical_unit,
                           can_solve_with_solution_lu,
                           can_solve_with_solution_fflu, change_base_ring,
                           characteristic, check_parent, codomain, coeff,
-                          coefficients, compose, constant_coefficient,
-                          content, data, deflate, deflation, degree,
+                          coefficient_ring, coefficients,
+                          coefficients_of_univariate, compose,
+                          constant_coefficient,
+                          content, data, deflate, deflation, degree, degrees,
                           degrees_range, denominator, derivative, div,
                           divexact, divides, divrem, domain, elem_type,
                           evaluate, exp, exponent_vectors, expressify, factor,
                           gen, gens, get_field, identity_matrix, inflate,
                           integral, inv, isconstant, isdomain_type,
                           isexact_type, isgen, ismonomial, isreduced_form,
-                          issquare, isunit, leading_coefficient, log,
+                          issquare, isterm, isunit, leading_coefficient, 
+                          isunivariate, leading_monomial, leading_term, log,
                           map_coefficients, max_precision, minpoly, modulus,
                           mul!, mul_classical, mul_karatsuba, mullow,
                           numerator, ncols, ngens, nrows, nvars, O, order, parent_type,
                           pol_length, primpart, promote_rule, pseudodivrem,
-                          pseudorem, reduced_form, renormalize!,
+                          pseudorem, reduced_form, remove, renormalize!,
                           set_coefficient!, set_field!,
                           set_length!, set_precision!, set_valuation!,
-                          shift_left, shift_right, snf, sqrt, symbols,
-                          term_degree, terms_degrees, trailing_coefficient,
-                          use_karamul, valuation, var, vars, zero!
+                          shift_left, shift_right, snf, sqrt, symbols, tail,
+                          term_degree, terms_degrees, to_univariate,
+                          trailing_coefficient, use_karamul, valuation, var,
+                          var_index, vars, zero!
 
 using ..AbstractAlgebra
 
@@ -76,6 +80,8 @@ include("generic/Poly.jl")
 include("generic/NCPoly.jl")
 
 include("generic/MPoly.jl")
+
+include("generic/UnivPoly.jl")
 
 include("generic/SparsePoly.jl")
 

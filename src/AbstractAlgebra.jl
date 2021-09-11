@@ -126,10 +126,11 @@ export SetElem, GroupElem, AdditiveGroupElem, NCRingElem, RingElem, ModuleElem, 
 export SetMap, FunctionalMap, IdentityMap
 
 export NCPolyElem, PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
-       MatElem, MatAlgElem, FinFieldElem, MPolyElem, NumFieldElem, SimpleNumFieldElem
+       MatElem, MatAlgElem, FinFieldElem, MPolyElem, UnivPolyElem, NumFieldElem,
+       SimpleNumFieldElem
 
 export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
-       FinField, MPolyRing, NumField, SimpleNumField
+       FinField, MPolyRing, UnivPolyRing, NumField, SimpleNumField
 
 export ZZ, QQ, zz, qq, RealField, RDF
 
@@ -409,6 +410,7 @@ include("ResidueField.jl")
 include("NumberField.jl")
 include("Fraction.jl")
 include("MPoly.jl")
+include("UnivPoly.jl")
 
 ###############################################################################
 #
@@ -469,7 +471,7 @@ import .Generic: abs_series, abs_series_type,
                  sort_terms!, summands,
                  supermodule, term, terms, total_degree,
                  to_univariate, trailing_coefficient,
-                 truncate, upscale, var_index,
+                 truncate, upscale,
                  zero,
        # Moved from Hecke into Misc
                  Loc, Localization, LocElem,
@@ -484,7 +486,7 @@ export abs_series, abs_series_type,
                  chebyshev_t,
                  chebyshev_u, check_composable, check_parent,
                  collength, combine_like_terms!, cycles,
-                 defining_polynomial, degrees,
+                 defining_polynomial,
                  dense_matrix_type, dense_poly_type, det,
                  discriminant,
                  elem_type,
@@ -502,7 +504,7 @@ export abs_series, abs_series_type,
                  isnegative, isone, isreverse,
                  issubmodule, issymmetric,
                  isterm_recursive, isunit, iszero,
-                 lcm, leading_coefficient, leading_monomial, leading_term,
+                 lcm,
                  length,
                  main_variable, main_variable_extract, main_variable_insert,
                  mat, matrix_repr, max_fields, mod,
@@ -526,9 +528,9 @@ export abs_series, abs_series_type,
                  setcoeff!, set_exponent_vector!,
                  setpermstyle,
                  size, sort_terms!, subst, summands, supermodule,
-                 sylvester_matrix, term, terms, to_univariate,
+                 sylvester_matrix, term, terms,
                  total_degree, trailing_coefficient, truncate,
-                 var_index, zero,
+                 zero,
                  MatrixElem, PolynomialElem,
        # Moved from Hecke into Misc
                  divexact_low, divhigh,

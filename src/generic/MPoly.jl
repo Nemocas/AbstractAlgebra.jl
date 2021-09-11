@@ -16,6 +16,14 @@ parent_type(::Type{MPoly{T}}) where T <: RingElement = MPolyRing{T}
 
 elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
+@doc Markdown.doc"""
+    mpoly_type(::Type{T}) where T <: RingElement
+
+Return the type of a multivariate polynomial whose coefficients have the given
+type.
+"""
+mpoly_type(::Type{T}) where T <: RingElement = MPoly{T}
+
 base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 @doc Markdown.doc"""
@@ -163,7 +171,7 @@ end
 @doc Markdown.doc"""
     exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
 
-Return coefficient of the j-th variables in the i-th term of the polynomial.
+Return exponent of the j-th variable in the i-th term of the polynomial.
 Term and variable numbering begins at $1$ and variables are ordered as
 during the creation of the ring.
 """
@@ -559,6 +567,9 @@ end
 # zero if it is equal and a negative integer if it is less. (Used to compare
 # monomials with respect to an ordering.)
 function monomial_cmp(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
+   if N == 0
+      return 0
+   end
    k = N
    while k > 1 && A[k, i] == B[k, j]
       k -= 1
@@ -732,6 +743,9 @@ intended to be specified, and not needed for current applications).
 function max_fields(f::MPoly{T}) where {T <: RingElement}
    A = f.exps
    N = size(A, 1)
+   if N == 0
+      return Int[], 0
+   end
    biggest = zeros(Int, N)
    for i = 1:length(f)
       for k = 1:N
