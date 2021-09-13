@@ -1132,6 +1132,38 @@ function reduce_tail(f::W, V::Vector{W}) where {U <: RingElement, T <: AbstractA
    return p == f.poly ? snode{T}(p, f.sgen) : snode{T}(p, 0)
 end
 
+function reduce_tail(f::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+   p = divexact(f, canonical_unit(f))
+   i = length(V)
+   n = length(p) - 1
+   while n > 0
+      c = coeff(p, n - 1)
+      while n > 0 && iszero(c)
+         n -= 1
+         if n > 0
+            c = coeff(p, n - 1)
+         end
+      end
+      if n > 0
+         while i > 0 && length(V[i]) > n
+            i -= 1
+         end
+         if i != 0 && !iszero(c)
+            h = leading_coefficient(V[i]) # should be nonnegative
+            h < 0 && error("h must be positive")
+            q, r = AbstractAlgebra.divrem(c, h)
+            if r >= ((h + 1) >> 1)
+               q += 1
+            end 
+            u = shift_left(V[i], n - length(V[i]))
+            p -= q*u        
+         end
+         n -= 1
+      end
+   end
+   return p
+end
+
 function reduce(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    i = length(V)
    n = length(p)
@@ -1415,7 +1447,7 @@ end
 # 4. Only the final polynomial may have leading coefficient that is a unit
 # 5. The polynomials are all canonicalised (divided by their canonical_unit)
 # 6. The tail of each polynomial is reduced mod the other polynomials in the basis
-function reduce(I::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function reduce(I::Ideal{T}; complete_reduction::Bool=true) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    if hasmethod(gcdx, Tuple{U, U})
       V = gens(I)
       # Compute V a vector of polynomials giving the same basis as I
@@ -1441,6 +1473,11 @@ function reduce(I::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyE
       elseif length(V) == 1
          d = V[1]
          V = [divexact(d, canonical_unit(d))]
+      end
+      if complete_reduction
+         for i = 2:length(V)
+            V[i] = reduce_tail(V[i], V[1:i - 1])
+         end
       end
       return Ideal{T}(base_ring(I), V)
    else
