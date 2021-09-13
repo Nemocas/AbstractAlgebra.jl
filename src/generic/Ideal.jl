@@ -1100,7 +1100,7 @@ function extend_ideal_basis(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <
    return V
 end
 
-function reduce_tail(f::W, V::Vector{W}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}, W <: snode{T}}
+function reduce_tail(f::W, V::AbstractVector{W}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}, W <: snode{T}}
    p = divexact(f.poly, canonical_unit(f.poly))
    i = length(V)
    n = length(p) - 1
@@ -1132,7 +1132,7 @@ function reduce_tail(f::W, V::Vector{W}) where {U <: RingElement, T <: AbstractA
    return p == f.poly ? snode{T}(p, f.sgen) : snode{T}(p, 0)
 end
 
-function reduce_tail(f::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function reduce_tail(f::T, V::AbstractVector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    p = divexact(f, canonical_unit(f))
    i = length(V)
    n = length(p) - 1
@@ -1266,7 +1266,7 @@ function insert_fragments(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <: 
                if length(p) == length(v)
                   if ((flag, q) = divides(leading_coefficient(v), leading_coefficient(p)))[1]
                      # V[n] can be swapped with p and reduced
-                     V[n], r = reduce_tail(snode{T}(p, 0), V[1:n - 1]), V[n].poly
+                     V[n], r = reduce_tail(snode{T}(p, 0), view(V, 1:n - 1)), V[n].poly
                      r -= q*p
                      if !iszero(r)
                         mypush!(H, r)
@@ -1274,7 +1274,7 @@ function insert_fragments(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <: 
                   else # use gcdx
                      g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
                      p, r = s*v + t*p, p # p has leading coefficient g dividing that of r (old p) and v
-                     V[n] = reduce_tail(snode{T}(p, 0), V[1:n - 1])
+                     V[n] = reduce_tail(snode{T}(p, 0), view(V, 1:n - 1))
                      q = divexact(leading_coefficient(r), g)
                      r -= q*p
                      if !iszero(r)
@@ -1289,7 +1289,7 @@ function insert_fragments(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <: 
                else # length(p) > length(v)
                   if divides(leading_coefficient(v), leading_coefficient(p))[1]
                      # p can be inserted
-                     insert!(V, n + 1, reduce_tail(snode{T}(p, 0), V[1:n]))
+                     insert!(V, n + 1, reduce_tail(snode{T}(p, 0), view(V, 1:n)))
                      n += 1
                   else # use gcdx
                      g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
@@ -1301,7 +1301,7 @@ function insert_fragments(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <: 
                      end
                      p = r
                      # p can be inserted
-                     insert!(V, n + 1, reduce_tail(snode{T}(p, 0), V[1:n]))
+                     insert!(V, n + 1, reduce_tail(snode{T}(p, 0), view(V, 1:n)))
                      n += 1
                   end
                end
@@ -1316,7 +1316,7 @@ function insert_fragments(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <: 
                   g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
                   p = s*v + t*shift_left(p, length(v) - length(p)) # p has leading coefficient g dividing that of v
                   q = divexact(leading_coefficient(v), g)
-                  r, V[n] = v - q*p, reduce_tail(snode{T}(p, 0), V[1:1])
+                  r, V[n] = v - q*p, reduce_tail(snode{T}(p, 0), view(V, 1:1))
                   if !iszero(r)
                      mypush!(H, r)
                   end
@@ -1339,20 +1339,13 @@ function insert_fragments(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <: 
                   g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
                   p = s*v + t*shift_left(p, length(v) - length(p)) # p has leading coefficient g dividing that of v
                   q = divexact(leading_coefficient(v), g)
-                  r, V[n + 1] = v - q*p, reduce_tail(snode{T}(p, 0), V[1:n])
+                  r, V[n + 1] = v - q*p, reduce_tail(snode{T}(p, 0), view(V, 1:n))
                   if !iszero(r)
                   mypush!(H, r)
                   end
-#                  V[n + 1] = reduce_tail(V[n + 1], V[orig_n:n])
                   n += 1
                end
             end
-#=
-            while n < length(V)
-               V[n + 1] = reduce_tail(V[n + 1], V[orig_n:n])
-               n += 1
-            end
-=#
          end
       end
    end
@@ -1379,8 +1372,7 @@ function extend_ideal_basis(D::Vector{W}, f::W, V::Vector{W}, H::Vector{T}) wher
       # check if p can replace V[n]
       swap = false
       if length(p) == length(V[n].poly) && !isunit(lc) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
-         S = V[1:n - 1]
-         p, V = V[n].poly, vcat(S, [reduce_tail(f, S)])
+         p, V[n] = V[n].poly, reduce_tail(f, view(V, 1:n - 1))
          swap = true
       end
       # check if leading coefficients divide leading_coefficient of p
@@ -1407,7 +1399,7 @@ function extend_ideal_basis(D::Vector{W}, f::W, V::Vector{W}, H::Vector{T}) wher
       p -= q*r
       if length(r) == length(v) # V[n] can be reduced by r and switched
          q = divexact(leading_coefficient(v), g)
-         r, V[n] = v - q*r, reduce_tail(snode{T}(r, 0), V[1:n - 1])
+         r, V[n] = v - q*r, reduce_tail(snode{T}(r, 0), view(V, 1:n - 1))
          if length(r) > length(p)
             r, p = p, r
          end
