@@ -1050,7 +1050,7 @@ function mysize(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
       c = coeff(f, i - 1)
       if !iszero(c)
          j += 1
-         s += Base.log(ndigits(coeff(f, i - 1); base=2))*i*i
+         s += Base.log(ndigits(coeff(f, i - 1); base=2))*j*j
       end
    end
    return s
@@ -1061,7 +1061,7 @@ function mysize2(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}
 end
 
 function mypush!(H::Vector{T}, f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
-   index = searchsortedfirst(H, f, by=mysize2, rev=true) # find index at which to insert x
+   index = searchsortedfirst(H, f, by=mysize, rev=true) # find index at which to insert x
    insert!(H, index, f)
 end
 
@@ -1316,8 +1316,17 @@ function insert_fragments(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <: 
                   q = divexact(leading_coefficient(v), g)
                   r, V[n + 1] = v - q*p, reduce_tail(snode{T}(p, 0), view(V, 1:n))
                   if !iszero(r)
-                  mypush!(H, r)
+                     mypush!(H, r)
                   end
+                  if isterm(V[orig_n].poly)
+                     V[n + 1] = reduce_tail(V[n + 1], view(V, orig_n:orig_n))
+                  end
+                  n += 1
+               end
+            end
+            if isterm(V[orig_n].poly)
+               while n < length(V)
+                  V[n + 1] = reduce_tail(V[n + 1], view(V, orig_n:orig_n))
                   n += 1
                end
             end
