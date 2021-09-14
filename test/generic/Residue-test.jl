@@ -361,6 +361,35 @@ end
    @test T(x + 1)^1 == T(x + 1)
    @test T(x + 1)^2 == T(2x)
    @test T(x + 1)^3 == T(2x - 2)
+
+
+   R = ResidueRing(ZZ, ZZ(4))
+   @test_throws NotInvertibleError R(4)^-1
+   @test_throws NotInvertibleError R(2)^-1
+   try
+      R(2)^-1
+   catch e
+      @test e isa NotInvertibleError
+      @test e.data == 2
+      @test modulus(e.mod) == 4
+   end
+
+   R = ResidueRing(ZZ, 4)
+   @test_throws NotInvertibleError R(4)^-1
+   @test_throws NotInvertibleError R(2)^-1
+   try
+      R(2)^-1
+   catch e
+      @test e isa NotInvertibleError
+      @test e.data == 2
+      @test modulus(e.mod) == 4
+   end
+
+   R = ResidueRing(ZZ, ZZ(5))
+   @test_throws NotInvertibleError R(5)^-1
+
+   R = ResidueRing(ZZ, 5)
+   @test_throws NotInvertibleError R(5)^-1
 end
 
 @testset "Generic.Res.inversion" begin

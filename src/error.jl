@@ -4,6 +4,32 @@
 #
 ###############################################################################
 
+mutable struct NotInvertibleError{T, S} <: Exception
+  data::T   # element that could not be inverted
+  mod::S    # ring or modulus with respect to which it could not be inverted
+end
+
+function NotInvertibleError(x::T, y::S) where {T <: RingElement, S}
+  return NotInvertibleError{T, S}(x, y)
+end
+
+function NotInvertibleError(x::RingElement)
+  return NotInvertibleError(x, parent(x))
+end
+
+function Base.showerror(io::IO, e::NotInvertibleError{T, S}) where {T, S <: Ring}
+  print(io, e.data)
+  print(io, " is not invertible in ")
+  print(io, e.mod)
+end
+
+function Base.showerror(io::IO, e::NotInvertibleError)
+  print(io, e.data)
+  print(io, " is not invertible modulo ")
+  print(io, e.mod)
+end
+
+
 mutable struct ErrorConstrDimMismatch <: Exception
   expect_r::Int
   expect_c::Int
