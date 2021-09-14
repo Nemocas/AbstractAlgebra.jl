@@ -37,11 +37,12 @@ using RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
 import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type,
        isexact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
-       get_cached!, isunit, characteristic, Ring, RingElem
+       get_cached!, isunit, characteristic, Ring, RingElem, expressify
 
-import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero
+import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
+             deepcopy_internal, hash
 
-struct ConstPolyRing{T &lt;: RingElement}
+struct ConstPolyRing{T &lt;: RingElement} &lt;: Ring
    base_ring::Ring
 
    function ConstPolyRing{T}(R::Ring, cached::Bool) where T &lt;: RingElement
@@ -76,14 +77,15 @@ isdomain_type(::Type{ConstPoly{T}}) where T &lt;: RingElement = isdomain_type(T)
 
 isexact_type(::Type{ConstPoly{T}}) where T &lt;: RingElement = isexact_type(T)
 
-function Base.hash(f::ConstPoly, h::UInt)
+function hash(f::ConstPoly, h::UInt)
    r = 0x65125ab8e0cd44ca
    return xor(r, hash(f.c, h))
 end
 
-function deepcopy_internal(f::ConstPoly)
-   r = ConstPoly(f.c)
+function deepcopy_internal(f::ConstPoly{T}, d::IdDict) where T &lt;: RingElement
+   r = ConstPoly{T}(deepcopy_internal(f.c, d))
    r.parent = f.parent # parent should not be deepcopied
+   return r
 end
 
 # Basic manipulation
@@ -113,6 +115,17 @@ end
 
 function show(io::IO, f::ConstPoly)
    print(io, f.c)
+end
+
+# Expressification (optional)
+
+function expressify(R::ConstPolyRing; context = nothing)
+   return Expr(:sequence, Expr(:text, &quot;Constant polynomials over &quot;),
+                          expressify(base_ring(R), context = context))
+end
+
+function expressify(f::ConstPoly; context = nothing)
+   return expressify(f.c, context = context)
 end
 
 # Unary operations
@@ -180,7 +193,7 @@ end
 # Unsafe operators
 
 function zero!(f::ConstPoly)
-   f.c = 0
+   f.c = zero(base_ring(parent(f)))
    return f
 end
 
@@ -256,4 +269,13 @@ end
 function ConstantPolynomialRing(R::Ring, cached::Bool=true)
    T = elem_type(R)
    return ConstPolyRing{T}(R, cached)
-end</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../interface_introduction/">« Introduction</a><a class="docs-footer-nextpage" href="../euclidean_interface/">Euclidean Ring Interface »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 11 September 2021 13:20">Saturday 11 September 2021</span>. Using Julia version 1.6.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre><p>The above implementation of <code>ConstantPolynomialRing</code> may be tested as follows.</p><pre><code class="language-julia">using Test
+include(joinpath(pathof(AbstractAlgebra), &quot;..&quot;, &quot;..&quot;, &quot;test&quot;, &quot;Rings-conformance-tests.jl&quot;))
+
+S, _ = PolynomialRing(QQ, &quot;x&quot;)
+
+function test_elem(R::ConstPolyRing{elem_type(S)})
+   return R(rand(base_ring(R), 1:6, -999:999))
+end
+
+test_Ring_interface(ConstantPolynomialRing(S))</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../interface_introduction/">« Introduction</a><a class="docs-footer-nextpage" href="../euclidean_interface/">Euclidean Ring Interface »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 14 September 2021 07:26">Tuesday 14 September 2021</span>. Using Julia version 1.6.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
