@@ -1324,13 +1324,15 @@ function insert_fragments(D::Vector{W}, V::Vector{W}, H::Vector{T}) where {U <: 
                   n += 1
                end
             end
+            for k = orig_n:2:n
+               insert_spoly(V, H, k)
+            end
             if isterm(V[orig_n].poly)
                while n < length(V)
                   V[n + 1] = reduce_tail(V[n + 1], view(V, orig_n:orig_n))
                   n += 1
                end
             end
-            insert_spoly(V, H, orig_n)
          end
       end
    end
