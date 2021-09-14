@@ -77,8 +77,7 @@ Return a greatest common divisor of $f$ and $g$.
 lcm(f::MyElem, g::MyElem)
 ```
 
-Return $fg/gcd(f, g)$ if either $f$ or $g$ is not zero, otherwise it throws a
-`DivideError()`.
+Return a least common multiple of $f$ and $g$.
 
 ```julia
 gcdx(f::MyElem, g::MyElem)

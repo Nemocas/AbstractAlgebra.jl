@@ -254,6 +254,11 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
    return nothing
 end
 
+function equality_up_to_units(a, b)
+   iszero(a) && return iszero(b)
+   iszero(b) && return iszero(a)
+   return divides(a, b)[1] && divides(b, a)[1]
+end
 
 function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
 
@@ -292,11 +297,8 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
             @test valuation(q, m) == 0
          end
 
-         if iszero(f) && iszero(g)
-            @test iszero(gcd(f, g))
-         else
-            @test gcd(f, g)*lcm(f, g) == f*g
-         end
+         @test !(iszero(f) && iszero(g)) || iszero(gcd(f, g))
+         @test equality_up_to_units(gcd(f, g)*lcm(f, g), f*g)
 
          (d, s, t) = gcdx(f, g)
          @test d == gcd(f, g)

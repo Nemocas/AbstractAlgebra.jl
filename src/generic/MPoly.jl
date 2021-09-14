@@ -3536,12 +3536,10 @@ end
 Return the least common multiple of a and b in parent(a).
 """
 function lcm(a::MPolyElem{T}, b::MPolyElem{T}) where {T <: RingElement}
-   if iszero(a) && iszero(b)
-      check_parent(a, b)
-      return a
-   else
-      return divrem(a * b, gcd(a,b))[1]
-   end
+   check_parent(a, b)
+   g = gcd(a, b)
+   iszero(g) && return g
+   return a*divexact(b, g)
 end
 
 function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
