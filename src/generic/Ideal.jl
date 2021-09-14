@@ -1044,9 +1044,14 @@ function check_v(V::Vector{W}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:Ri
 end
 
 function mysize(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
-   s = 0
+   s = 0.0
+   j = 0
    for i = 1:length(f)
-      s += ndigits(coeff(f, i - 1); base=2)*i
+      c = coeff(f, i - 1)
+      if !iszero(c)
+         j += 1
+         s += Base.log(ndigits(coeff(f, i - 1); base=2))*i*i
+      end
    end
    return s
 end
@@ -1363,7 +1368,10 @@ function extend_ideal_basis(D::Vector{W}, f::W, V::Vector{W}, H::Vector{T}) wher
       lc = leading_coefficient(V[n].poly)
       # check if p can be added without any reduction
       if length(p) > length(V[n].poly) && !divides(leading_coefficient(p), lc)[1] && ((_, q) = divides(lc, leading_coefficient(p)))[1]
-         return vcat(V, [reduce_tail(f, V)])
+         f = reduce_tail(f, V)
+         V = push!(V, f)
+         insert_spolys(V, H, n + 1)
+         return V
       end
       # check if p and V[n] are constant
       if isconstant(V[n].poly) && isconstant(p)
@@ -1373,6 +1381,7 @@ function extend_ideal_basis(D::Vector{W}, f::W, V::Vector{W}, H::Vector{T}) wher
       swap = false
       if length(p) == length(V[n].poly) && !isunit(lc) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
          p, V[n] = V[n].poly, reduce_tail(f, view(V, 1:n - 1))
+         insert_spolys(V, H, n)
          swap = true
       end
       # check if leading coefficients divide leading_coefficient of p
@@ -1400,6 +1409,7 @@ function extend_ideal_basis(D::Vector{W}, f::W, V::Vector{W}, H::Vector{T}) wher
       if length(r) == length(v) # V[n] can be reduced by r and switched
          q = divexact(leading_coefficient(v), g)
          r, V[n] = v - q*r, reduce_tail(snode{T}(r, 0), view(V, 1:n - 1))
+         insert_spolys(V, H, n)
          if length(r) > length(p)
             r, p = p, r
          end
