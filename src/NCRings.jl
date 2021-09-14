@@ -109,7 +109,7 @@ end
 @doc Markdown.doc"""
     isunit(a::T) where {T <: NCRingElem}
 
-Return true if the $a$ is invertable, else return false.
+Return true if $a$ is invertible, else return false.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)

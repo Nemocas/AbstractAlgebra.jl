@@ -16,16 +16,31 @@
 # """
 function crt end
 
-# @doc Markdown.doc"""
-#     factor(a::T, b::R)
+@doc Markdown.doc"""
+    factor(a::T)
 
-# Return factorization of element $a$. 
-# """
+Return a factorization of the element $a$ as a `Fac{T}`.
+"""
 function factor end
 
-# @doc Markdown.doc"""
-#     factor_squarefree(a::T)
+@doc Markdown.doc"""
+    factor_squarefree(a::T)
 
-# Return square free factorization of element $a$.
-# """
+Return a squarefree factorization of the element $a$ as a `Fac{T}`.
+"""
 function factor_squarefree end
+
+@doc Markdown.doc"""
+    isirreducible(a)
+
+Return `true` if $a$ is irreducible, else return `false`.
+"""
+function isirreducible end
+
+@doc Markdown.doc"""
+    issquarefree(a)
+
+Return `true` if $a$ is squarefree, else return `false`.
+"""
+function issquarefree end
+
