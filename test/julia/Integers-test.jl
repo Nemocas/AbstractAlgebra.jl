@@ -5,6 +5,7 @@ end
 
 @testset "Julia.Integers.conformance_tests" begin
    test_Ring_interface_recursive(ZZ)
+   test_EuclideanRing_interface(ZZ)
 end
 
 @testset "Julia.Integers.manipulation" begin
