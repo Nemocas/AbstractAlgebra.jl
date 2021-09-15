@@ -252,7 +252,8 @@ end
 ####
 
 function test_elem(R::ConstPolyRing{elem_type(ZZ)})
-   return R(BigInt(rand(Int)))
+   n = rand(1:999)
+   return R(rand(-n:n))
 end
 
 @testset "GenericFunctions.Ring_interface" begin

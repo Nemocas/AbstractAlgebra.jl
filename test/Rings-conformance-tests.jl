@@ -289,15 +289,25 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          if isunit(gcd(f, m))
             a = invmod(f, m)
             @test divides(mulmod(a, f, m) - one(R), m)[1]
+            @test divides(powermod(f, -1, m) - a^1, m)[1]
+            @test divides(powermod(f, -2, m) - a^2, m)[1]
+            @test divides(powermod(f, -3, m) - a^3, m)[1]
          end
 
          @test divides(f*m, m) == (true, f)
          (a, b) = divides(f*m + g, m)
          @test !a || b*m == f*m + g
 
+         #TODO: enable once https://github.com/Nemocas/Nemo.jl/issues/1174
+         #@test_throws Exception remove(f, zero(R))
+         #@test_throws Exception valuation(f, zero(R))
+
          if !isunit(m) && !iszero(f)
+            n = rand(0:3)
+            f *= m^n
             (v, q) = remove(f, m)
             @test valuation(f, m) == v
+            @test v >= n
             @test q*m^v == f
             @test remove(q, m) == (0, q)
             @test valuation(q, m) == 0

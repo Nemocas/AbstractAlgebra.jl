@@ -4,12 +4,8 @@
 #
 ###############################################################################
 
-function ^(a::T, n::Integer) where T <: RingElem
-   n < 0 && throw(DomainError(n, "exponent must be >= 0"))
-   R = parent(a)
-   if n < 2
-      return n == 1 ? deepcopy(a) : one(R)
-   end
+function internal_power(a, n)
+   @assert n > 1
    while iseven(n)
       a = a*a
       n >>= 1
@@ -22,6 +18,20 @@ function ^(a::T, n::Integer) where T <: RingElem
       end
    end
    return z
+end
+
+function ^(a::T, n::Integer) where T <: RingElem
+   if n > 1
+      return internal_power(a, n)
+   elseif n == 1
+      return deepcopy(a)
+   elseif n == 0
+      return one(parent(a))
+   elseif n == -1
+      return inv(a)
+   else
+      return internal_power(inv(a), -widen(n))
+   end
 end
 
 ###############################################################################
@@ -42,12 +52,8 @@ function mulmod(a::T, b::T, m::T) where T <: RingElement
    return mod(a*b, m)
 end
 
-function powermod(a::T, n::UInt, m::T) where T <: RingElem
-   parent(a) == parent(m) || error("Incompatible parents")
-   R = parent(a)
-   if n < 2
-      return n == 1 ? deepcopy(a) : one(R)
-   end
+function internal_powermod(a, n, m)
+   @assert n > 1
    while iseven(n)
       a = mulmod(a, a, m)
       n >>= 1
@@ -62,11 +68,18 @@ function powermod(a::T, n::UInt, m::T) where T <: RingElem
    return z
 end
 
-function powermod(a::T, e::Int, m::T) where T <: RingElem
-   if e < 0
-      return powermod(invmod(a, m), -e%UInt, m)
+function powermod(a::T, n::Integer, m::T) where T <: RingElem
+   parent(a) == parent(m) || error("Incompatible parents")
+   if n > 1
+      return internal_powermod(a, n, m)
+   elseif n == 1
+      return mod(a, m)
+   elseif n == 0
+      return mod(one(parent(a)), m)
+   elseif n == -1
+      return invmod(a, m)
    else
-      return powermod(a, e%UInt, m)
+      return internal_powermod(invmod(a, m), -widen(n), m)
    end
 end
 
@@ -85,7 +98,7 @@ function divides(a::T, b::T) where T <: RingElem
    return iszero(r), q
 end
 
-function remove(a::T, b::T) where T <: RingElement
+function remove(a::T, b::T) where T <: Union{RingElem, Number}
    parent(a) == parent(b) || error("Incompatible parents")
    if (iszero(b) || isunit(b))
       throw(ArgumentError("Second argument must be a non-zero non-unit"))
@@ -101,7 +114,7 @@ function remove(a::T, b::T) where T <: RingElement
    return v, a
 end
 
-function valuation(a::T, b::T) where T <: RingElement
+function valuation(a::T, b::T) where T <: Union{RingElem, Number}
    return remove(a, b)[1]
 end
 
