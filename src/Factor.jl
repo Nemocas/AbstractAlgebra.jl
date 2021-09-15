@@ -15,8 +15,8 @@ export Fac, unit
 @doc Markdown.doc"""
     Fac{T <: RingElement}
 
-Type for factored ring elements. The structure holds a unit of type `T` and an
-iterable collection of `T => Int` pairs for the factors and exponents.
+Type for factored ring elements. The structure holds a unit of type `T` and is
+an iterable collection of `T => Int` pairs for the factors and exponents.
 """
 mutable struct Fac{T <: RingElement}
    unit::T
@@ -39,7 +39,7 @@ end
 @doc Markdown.doc"""
     unit(a::Fac{T}) -> T
 
-Return the unit of the factorisation.
+Return the unit of the factorization.
 """
 unit(a::Fac) = a.unit
 
@@ -48,11 +48,11 @@ unit(a::Fac) = a.unit
 @doc Markdown.doc"""
     evaluate(a::Fac{T}) -> T
 
-Multiply out the factorisation into a single element.
+Multiply out the factorization into a single element.
 """
 function evaluate(a::Fac)
    r = a.unit
-   for (p, e) in a.fac
+   for (p, e) in a
       r *= p^e
    end
    return r
