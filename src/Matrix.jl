@@ -812,32 +812,48 @@ function -(x::MatrixElem{T}, y::T) where {T <: RingElem}
    return z
 end
 
-function *(x::MatrixElem{T}, y::Vector{T}) where {T <: RingElement}
-   m = nrows(x)
+function mul!(z::Vector{T}, x::MatrixElem{T}, y::Vector{T}) where T <: RingElement
    n = min(ncols(x), length(y))
-   r = T[zero(base_ring(x)) for i in 1:m]
    tmp = base_ring(x)()
-   for i in 1:m
-      for j in 1:n
-         r[i] = addmul_delayed_reduction!(r[i], x[i, j], y[j], tmp)
+   for i in 1:nrows(x)
+      if n > 0
+         z[i] = mul!(z[i], x[i, 1], y[1])
+         for j in 2:n
+            z[i] = addmul_delayed_reduction!(z[i], x[i, j], y[j], tmp)
+         end
+         z[i] = reduce!(z[i])
+      else
+         z[i] = zero!(z[i])
       end
-      r[i] = reduce!(r[i])
    end
-   return r
+   return z
 end
 
-function *(x::Vector{T}, y::MatrixElem{T}) where {T <: RingElement}
+function *(x::MatrixElem{T}, y::Vector{T}) where T <: RingElement
+   ncols(x) == length(y) || error("Incompatible dimensions")
+   return mul!(T[base_ring(x)() for i in 1:nrows(x)], x, y)
+end
+
+function mul!(z::Vector{T}, x::Vector{T}, y::MatrixElem{T}) where T <: RingElement
    m = min(length(x), nrows(y))
-   n = ncols(y)
-   r = T[zero(base_ring(y)) for j in 1:n]
    tmp = base_ring(y)()
-   for j in 1:n
-      for i in 1:m
-         r[j] = addmul_delayed_reduction!(r[j], x[i], y[i, j], tmp)
+   for j in 1:ncols(y)
+      if m > 0
+         z[j] = mul!(z[j], x[1], y[1, j])
+         for i in 2:m
+            z[j] = addmul_delayed_reduction!(z[j], x[i], y[i, j], tmp)
+         end
+         z[j] = reduce!(z[j])
+      else
+         z[j] = zero!(z[j])
       end
-      r[j] = reduce!(r[j])
    end
-   return r
+   return z
+end
+
+function *(x::Vector{T}, y::MatrixElem{T}) where T <: RingElement
+   length(x) == nrows(y) || error("Incompatible dimensions")
+   return mul!(T[base_ring(y)() for j in 1:ncols(y)], x, y)
 end
 
 ################################################################################

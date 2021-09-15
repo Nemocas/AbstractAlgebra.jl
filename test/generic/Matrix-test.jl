@@ -1006,18 +1006,29 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    end
 
    function _test_matrix_vector_prod(R, randargs...)
-      for S in (MatrixSpace(R, 2, 3), MatrixAlgebra(R, 2))
-         A = rand(S, randargs...)
-         v0 = elem_type(R)[]
-         v1 = elem_type(R)[rand(R, randargs...)]
-         v2 = elem_type(R)[rand(R, randargs...) for i in 1:2]
-         @test A*v0 == [zero(R) for i in 1:nrows(A)]
-         @test v0*A == [zero(R) for i in 1:ncols(A)]
-         @test A*v1 == [A[i,1]*v1[1] for i in 1:nrows(A)]
-         @test v1*A == [v1[1]*A[1,i] for i in 1:ncols(A)]
-         @test A*v2 == [A[i,1]*v2[1] + A[i,2]*v2[2] for i in 1:nrows(A)]
-         @test v2*A == [v2[1]*A[1,i] + v2[2]*A[2,i] for i in 1:ncols(A)]
-      end
+      A = rand(MatrixSpace(R, 3, 2), randargs...)
+      v = elem_type(R)[rand(R, randargs...) for i in 1:2]
+      @test A*v == [A[i,1]*v[1] + A[i,2]*v[2] for i in 1:nrows(A)]
+      v = elem_type(R)[rand(R, randargs...) for i in 1:3]
+      @test v*A == [v[1]*A[1,i] + v[2]*A[2,i] + v[3]*A[3,i] for i in 1:ncols(A)]
+
+      A = rand(MatrixAlgebra(R, 2), randargs...)
+      v = elem_type(R)[rand(R, randargs...) for i in 1:2]
+      @test A*v == [A[i,1]*v[1] + A[i,2]*v[2] for i in 1:nrows(A)]
+      v = elem_type(R)[rand(R, randargs...) for i in 1:2]
+      @test v*A == [v[1]*A[1,i] + v[2]*A[2,i] for i in 1:ncols(A)]
+
+      A = rand(MatrixSpace(R, 0, 2), randargs...)
+      v = elem_type(R)[rand(R, randargs...) for i in 1:2]
+      @test A*v == elem_type(R)[]
+      v = elem_type(R)[]
+      @test v*A == [zero(R) for i in 1:ncols(A)]
+
+      A = rand(MatrixSpace(R, 2, 0), randargs...)
+      v = elem_type(R)[]
+      @test A*v == [zero(R) for i in 1:nrows(A)]
+      v = elem_type(R)[rand(R, randargs...) for i in 1:2]
+      @test v*A == elem_type(R)[]
    end
 
    _test_matrix_vector_prod(R, -1000:1000)
