@@ -139,7 +139,7 @@ export create_accessors, get_handle, package_handle, zeros,
 
 export NotInvertibleError, error_dim_negative, ErrorConstrDimMismatch
 
-export crt, factor, factor_squarefree
+export crt, factor, factor_squarefree, isirreducible, issquarefree
 
 function expressify
 end

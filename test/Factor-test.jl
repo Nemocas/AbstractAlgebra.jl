@@ -1,6 +1,7 @@
 @testset "Fac.constructors" begin
    f = Fac(-1, Dict{Int, Int}(2 => 3, 3 => 1))
 
+   @test -24 == evaluate(f)
    @test -24 == unit(f)*prod([p^e for (p, e) in f])
 end
 
@@ -14,6 +15,7 @@ end
    R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
    f = Fac(x, Dict(x*y => 1, x + y => 1))
 
+   @test evaluate(f) == x * (x + y) * (x*y)
    @test string(f) == "x * (x + y) * (x*y)" ||
          string(f) == "x * (x*y) * (x + y)"
 end

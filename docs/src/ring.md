@@ -194,4 +194,31 @@ degrees for a univariate polynomial.
 rand(R::NCRing, v...)
 ```
 
+## Factorization
+
+For commutative rings supporting factorization and irreducibility testing, the
+following optional functions may be implemented.
+
+```julia
+isirreducible(a::T) where T <: RingElement
+issquarefree(a::T) where T <: RingElement
+```
+
+Decide whether `a` is irreducible or squarefree, respectively.
+
+```julia
+factor(a::T) where T <: RingElement
+factor_squarefree(a::T) where T <: RingElement
+```
+
+Return a factorization into irreducible or squarefree elements, respectively.
+The return is an object of type `Fac{T}`.
+
+```@docs
+Fac
+unit(a::Fac)
+evaluate(a::Fac)
+getindex(a::Fac, b)
+setindex!(a::Fac{Int}, c::Int, b::Int)
+```
 
