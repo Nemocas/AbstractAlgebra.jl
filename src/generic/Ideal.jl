@@ -1470,6 +1470,9 @@ function reduce(I::Ideal{T}; complete_reduction::Bool=true) where {U <: RingElem
          for i = 1:length(D)
             for j = i + 1:length(D)
                res = gcd(resultant(D[i], D[j]), res)
+               if isunit(res)
+                  break
+               end
             end
          end
          if iszero(res) # remove common gcd of all polys
@@ -1483,6 +1486,9 @@ function reduce(I::Ideal{T}; complete_reduction::Bool=true) where {U <: RingElem
             for i = 1:length(D)
                for j = i + 1:length(D)
                   res = gcd(resultant(D[i], D[j]), res)
+                  if isunit(res)
+                     break
+                  end
                end
             end
          end
