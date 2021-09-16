@@ -1041,6 +1041,7 @@ end
 function mysize(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    s = 0.0
    j = 0
+   # heuristic really punishes polys with lots of terms
    for i = 1:length(f)
       c = coeff(f, i - 1)
       if !iszero(c)
@@ -1059,7 +1060,6 @@ function mypush!(H::Vector{T}, f::T) where {U <: RingElement, T <: AbstractAlgeb
    index = searchsortedfirst(H, f, by=mysize, rev=true) # find index at which to insert x
    insert!(H, index, f)
 end
-
 
 # Extend the basis V of polynomials satisfying 1-6 below by the
 # polynomials in D, all of which have degree at least that of those in
@@ -1163,6 +1163,8 @@ function reduce(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebr
    return p
 end
 
+# An S-polynomial of f and g is a linear combination which makes the leading
+# coefficients cancel. E.g. if p = 3x^2, q = 2x then S-poly(p, q) = 2*p - 3x*q
 function insert_spoly(V::Vector{T}, H::Vector{T}, n::Int, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    p1 = V[n]
    if n > 1
@@ -1346,7 +1348,7 @@ end
 # Given a nonempty vector V of polynomials of satisfying 1-6 below and a
 # polynomial p whose degree is at least that of all the polynomials in V, add
 # p to V and perform reduction steps so that 1-6 still hold. Fragments which
-# are generated and need to be added later go in H.
+# are generated and need to be added go in H.
 function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    while true
       n = length(V)
@@ -1449,6 +1451,7 @@ end
 # 4. Only the final polynomial may have leading coefficient that is a unit
 # 5. The polynomials are all canonicalised (divided by their canonical_unit)
 # 6. The tail of each polynomial is reduced mod the other polynomials in the basis
+# 7. All the S-polynomials of pairs in the basis reduce to zero
 function reduce(I::Ideal{T}; complete_reduction::Bool=true) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    if hasmethod(gcdx, Tuple{U, U})
       V = gens(I)
