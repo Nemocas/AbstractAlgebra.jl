@@ -886,20 +886,14 @@ function isequal(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
    return isequal(f.c, g.c)
 end
 
-# Powering
-
-function ^(f::ConstPoly, e::Int)
-   e < 0 && throw(DomainError(e, "exponent must be nonnegative"))
-   R = parent(f)
-   return R(f.c^e)
-end
+# Powering need not be implemented if * is
 
 # Exact division
 
-function divexact(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
+function divexact(f::ConstPoly{T}, g::ConstPoly{T}; check::Bool = true) where T <: RingElement
    parent(f) != parent(g) && error("Incompatible rings")
    R = parent(f)
-   return R(divexact(f.c, g.c))
+   return R(divexact(f.c, g.c, check = check))
 end
 
 # Inverse

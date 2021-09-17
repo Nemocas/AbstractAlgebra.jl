@@ -3,29 +3,29 @@
 If a ring provides a meaningful Euclidean structure such that a useful Euclidean
 remainder can be computed practically, various additional functionality is provided
 by AbstractAlgebra.jl for those rings. This functionality depends on the following
-functions existing.
-
-```julia
-mod(f::MyElem, g::MyElem)
-```
-
-Return the Euclidean remainder of $f$ by $g$. A `DivideError()` should be thrown if
-$g$ is zero. An error should be thrown if an impossible inverse is encountered.
+functions existing. An implementation must provide `divrem`, and the remaining
+are optional as generic fallbacks exist.
 
 ```julia
 divrem(f::MyElem, g::MyElem)
 ```
 
-Return a pair `q, r` consisting of the Euclidean quotient and remainder of $f$ by $g$.
-A `DivideError` should be thrown if $g$ is zero. An error should be thrown if an
-impossible inverse is encountered.
+Return a pair `q, r` consisting of the Euclidean quotient and remainder of $f$
+by $g$. A `DivideError` should be thrown if $g$ is zero.
+
+```julia
+mod(f::MyElem, g::MyElem)
+```
+
+Return the Euclidean remainder of $f$ by $g$. A `DivideError` should be thrown
+if $g$ is zero.
 
 ```julia
 div(f::MyElem, g::MyElem)
 ```
 
-Return the Euclidean quotient of $f$ by $g$. A `DivideError` should be thrown if $g$
-is zero. An error should be thrown if an impossible inverse is encountered.
+Return the Euclidean quotient of $f$ by $g$. A `DivideError` should be thrown
+if $g$ is zero.
 
 ```julia
 mulmod(f::MyElem, g::MyElem, m::MyElem)
@@ -43,8 +43,8 @@ Return $f^e \pmod{m}$.
 invmod(f::MyElem, m::MyElem)
 ```
 
-Return the inverse of $f$ modulo $m$. If such an inverse doesn't exist, an impossible
-inverse error should be thrown.
+Return the inverse of $f$ modulo $m$. If such an inverse doesn't exist, a
+`NotInvertibleError` should be thrown.
 
 ```julia
 divides(f::MyElem, g::MyElem)
@@ -71,7 +71,8 @@ Return `v` where $p^v$ is the highest power of $p$ dividing $f$.
 gcd(f::MyElem, g::MyElem)
 ```
 
-Return a greatest common divisor of $f$ and $g$.
+Return a greatest common divisor of $f$ and $g$. The return is expected to be
+unit normalized such that if the return is a unit, that unit should be one.
 
 ```julia
 lcm(f::MyElem, g::MyElem)
@@ -83,8 +84,8 @@ Return a least common multiple of $f$ and $g$.
 gcdx(f::MyElem, g::MyElem)
 ```
 
-Return a triple `d, s, t` such that $d = gcd(f, g)$ and $d = sf + tg$, with $s$ reduced
-modulo $g$ and $t$ reduced modulo $f$.
+Return a triple `d, s, t` such that $d = gcd(f, g)$ and $d = sf + tg$, with $s$
+loosely reduced modulo $g/d$ and $t$ loosely reduced modulo $f/d$.
 
 ```julia
 gcdinv(f::MyElem, g::MyElem)

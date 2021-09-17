@@ -105,14 +105,6 @@ divexact_right(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x
 
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 
-function divides(x::T, y::T) where {T <: RingElem}
-   if iszero(y)
-      return iszero(x), y
-   end
-   q, r = divrem(x, y)
-   return iszero(r), q
-end
-
 function isdivisible_by(x::T, y::T) where T <: RingElem
    if iszero(y)
       return iszero(x)
