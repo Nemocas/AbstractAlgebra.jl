@@ -69,10 +69,10 @@ function _enable_deg!(p::LaurentPolyWrap, i::Int)
 end
 
 # the underlying storage is adjusted (increased) to allow setting the coeff
-function setcoeff!(p::LaurentPolyWrap, i::Int, a)
+function set_coefficient!(p::LaurentPolyWrap, i::Int, a)
    _enable_deg!(p, i)
-   setcoeff!(p.poly, i - p.mindeg, a)
-   p
+   p.poly = set_coefficient!(p.poly, i - p.mindeg, a)
+   return p
 end
 
 iszero(p::LaurentPolyWrap) = iszero(p.poly)
@@ -165,7 +165,7 @@ function divexact(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}; check::Bool = tr
    return LaurentPolyWrap(f, p.mindeg - q.mindeg)
 end
 
-function inv(p::LaurentPolyWrap)
+function Base.inv(p::LaurentPolyWrap)
    isunit(p) || error(DivideError())
    v, g = remove(p.poly, gen(parent(p.poly)))
    return LaurentPolyWrap(inv(g), -p.mindeg-v)
@@ -190,8 +190,9 @@ end
 
 function canonical_unit(p::LaurentPolyWrap)
    iszero(p) && return one(parent(p))
-   v = remove(p.poly, gen(parent(p.poly)))
-   return LaurentPolyWrap(canonical_unit(p.poly), p.mindeg + v)
+   R = parent(p.poly)
+   v, _ = remove(p.poly, gen(R))
+   return LaurentPolyWrap(R(canonical_unit(p.poly)), p.mindeg + v)
 end
 
 function gcd(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T

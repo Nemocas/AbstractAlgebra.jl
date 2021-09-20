@@ -147,22 +147,21 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test leading_coefficient(f) == 2
       @test trailing_coefficient(f) == 3
 
-      @test canonical_unit(f) == 1
+      @test canonical_unit(f) == y^-3
 
       @test hash(f) != hash(3y^-3 + y)
       @test hash(f) != hash(3y^-2 + 2y)
 
-      setcoeff!(f, -3, big(4))
+      set_coefficient!(f, -3, big(4))
       @test f == 4y^-3 + 2y
 
-      setcoeff!(f, -3, big(0))
+      set_coefficient!(f, -3, big(0))
       @test f == 2y
 
-      setcoeff!(f, -50, big(-2))
+      set_coefficient!(f, -50, big(-2))
       @test f == -2y^-50 + 2y
 
-      # TODO: make this work
-      @test_broken iszero(setcoeff!(setcoeff!(f, 1, big(0)), -50, big(0)))
+      @test iszero(set_coefficient!(set_coefficient!(deepcopy(f), 1, big(0)), -50, big(0)))
 
       @test !isone(f)
       @test !iszero(f)
