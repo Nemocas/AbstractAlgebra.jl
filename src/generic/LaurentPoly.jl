@@ -172,6 +172,13 @@ function divides(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
    return ok, LaurentPolyWrap(f, a.mindeg - b.mindeg - vb)
 end
 
+function isdivisible_by(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
+   iszero(b) && return iszero(a)
+   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   # should use isdivisible_by here, but it throws on ZZ[x]
+   return divides(a.poly, ub)[1]
+end
+
 function Base.inv(p::LaurentPolyWrap)
    isunit(p) || error(DivideError())
    v, g = remove(p.poly, gen(parent(p.poly)))

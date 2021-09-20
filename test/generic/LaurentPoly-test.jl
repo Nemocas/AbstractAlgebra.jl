@@ -196,6 +196,12 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
       @test !divides(y+1, 2*y+3)[1]
       @test_throws Exception divexact(y+1, 2*y+3)
+
+      @test isdivisible_by(zero(L), zero(L))
+      @test !isdivisible_by(one(L), zero(L))
+
+      @test isdivisible_by(2*y+3, 2+3*y^-1)
+      @test !isdivisible_by(3*y+4, 2+3*y^-1)
    end
 
    @testset "comparisons" begin
