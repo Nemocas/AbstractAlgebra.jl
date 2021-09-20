@@ -625,6 +625,7 @@ function (a::Integers{T})() where T <: Integer
    return T(0)
 end
 
-function (a::Integers{T})(b::Integer) where T <: Integer
+function (a::Integers{T})(b::Union{Integer, Rational}) where T <: Integer
    return T(b)
 end
+

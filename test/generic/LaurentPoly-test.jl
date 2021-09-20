@@ -407,7 +407,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
       @test change_base_ring(QQ, z) == q
       @test change_base_ring(QQ, fz) == q^2 - q - 2q^-2
-      @test_broken change_base_ring(ZZ, q) == z
+      @test change_base_ring(ZZ, q) == z
 
       @test map_coefficients(x -> x^2, fz) == z^2 + z + 4z^-2
       @test map_coefficients(one, fz) == z^2 + z + z^-2
@@ -431,7 +431,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
    @testset "conformance" begin
       L, y = LaurentPolynomialRing(QQ, "y")
       function Main.test_elem(R::typeof(L))
-         rand(R, -5:5, -99:99)
+         n = rand(0:10)
+         if n == 0
+            return zero(R)
+         else
+            m = rand(0:5)
+            rand(R, -m:n-m, -99:99)
+         end
       end
       test_Ring_interface(L)
       test_EuclideanRing_interface(L)
