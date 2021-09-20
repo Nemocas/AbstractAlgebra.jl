@@ -1,3 +1,11 @@
+module PrettyPrinting
+
+using Markdown
+
+import ..AbstractAlgebra: RingElem, NCRingElem, MatrixElem
+
+using ..AbstractAlgebra
+
 ################################################################################
 #
 #  Expression to string
@@ -124,6 +132,35 @@ function expressify(@nospecialize(a); context = nothing)::String
     else
         return s
     end
+end
+
+# Only when AbstractAlgebra.expressify(a::T; context = nothing) has been
+# defined may enable_all_show_via_expressify be used.
+# AA defines Base.show for "text/latex" and "text/html" for a general set
+# of x, but for backward compatibility it is not defined for general x and
+# "text/plain" or the mime-less version.
+# Rationale: when neither Base.show nor AA.expressify is defined for T, then,
+# since expressify calls Base.show for backward compatibility, a definition of
+# Base.show in terms of expressify would give a stack overflow.
+
+macro enable_all_show_via_expressify(T)
+  return quote
+    function Base.show(io::IO, x::$(esc(T)))
+       AbstractAlgebra.show_via_expressify(io, x)
+    end
+
+    function Base.show(io::IO, mi::MIME"text/plain", x::$(esc(T)))
+       AbstractAlgebra.show_via_expressify(io, mi, x)
+    end
+
+    function Base.show(io::IO, mi::MIME"text/latex", x::$(esc(T)))
+       AbstractAlgebra.show_via_expressify(io, mi, x)
+    end
+
+    function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))
+       AbstractAlgebra.show_via_expressify(io, mi, x)
+    end
+  end
 end
 
 ################################################################################
@@ -1225,4 +1262,6 @@ end
 function print_obj(S::printer, mi::MIME, obj, left::Int, right::Int)
    push(S, "[??? unknown object ???]")
 end
+
+end # PrettyPrinting
 

@@ -460,13 +460,7 @@ function expressify(@nospecialize(a::Union{PolynomialElem, NCPolyElem}),
    return sum
 end
 
-function Base.show(io::IO, ::MIME"text/plain", a::Union{PolynomialElem, NCPolyElem})
-   print(io, obj_to_string(a, context = io))
-end
-
-function Base.show(io::IO, a::Union{PolynomialElem, NCPolyElem})
-   print(io, obj_to_string(a, context = io))
-end
+@enable_all_show_via_expressify Union{PolynomialElem, NCPolyElem}
 
 function show(io::IO, p::PolyRing)
    print(io, "Univariate Polynomial Ring in ")

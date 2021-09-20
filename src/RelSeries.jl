@@ -287,8 +287,7 @@ end
 #
 ###############################################################################
 
-function expressify(a::RelSeriesElem,
-                                    x = var(parent(a)); context = nothing)
+function expressify(a::RelSeriesElem, x = var(parent(a)); context = nothing)
     sum = Expr(:call, :+)
     v = valuation(a)
     for i in 0:pol_length(a) - 1
@@ -313,13 +312,7 @@ function expressify(a::RelSeriesElem,
     return sum
 end
 
-function Base.show(io::IO, a::SeriesElem)
-  print(io, obj_to_string(a, context = io))
-end
-
-function Base.show(io::IO, ::MIME"text/plain", a::SeriesElem)
-  print(io, obj_to_string(a, context = io))
-end
+@enable_all_show_via_expressify SeriesElem
 
 function show(io::IO, a::SeriesRing)
    print(io, "Univariate power series ring in ", var(a), " over ")

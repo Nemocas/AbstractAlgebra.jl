@@ -767,13 +767,7 @@ function AbstractAlgebra.expressify(a::FunctionFieldElem; context = nothing)
    end
 end
 
-function show(io::IO, ::MIME"text/plain", a::FunctionFieldElem)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
- end
- 
- function show(io::IO, a::FunctionFieldElem)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
- end
+@enable_all_show_via_expressify FunctionFieldElem
 
 function show(io::IO, R::FunctionField)
    print(IOContext(io, :compact => true), "Function Field over ",

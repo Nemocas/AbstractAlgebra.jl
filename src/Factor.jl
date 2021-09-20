@@ -128,17 +128,7 @@ function expressify(@nospecialize(a::Fac); context = nothing)
    return prod
 end
 
-function Base.show(io::IO, mi::MIME"text/plain", a::Fac)
-   show_via_expressify(io, mi, a)
-end
-
-function Base.show(io::IO, mi::MIME"text/html", a::Fac)
-   show_via_expressify(io, mi, a)
-end
-
-function Base.show(io::IO, a::Fac)
-   show_via_expressify(io, a)
-end
+@enable_all_show_via_expressify Fac
 
 ################################################################################
 #

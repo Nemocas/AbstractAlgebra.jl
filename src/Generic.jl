@@ -59,7 +59,9 @@ import ..AbstractAlgebra: add!, addeq!, addmul!, base_ring, canonical_unit,
                           shift_left, shift_right, snf, sqrt, symbols, tail,
                           term_degree, terms_degrees, to_univariate,
                           trailing_coefficient, use_karamul, valuation, var,
-                          var_index, vars, zero!
+                          var_index, vars, zero!,
+                          @enable_all_show_via_expressify
+
 
 using ..AbstractAlgebra
 

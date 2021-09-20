@@ -99,13 +99,7 @@ function expressify(a::AbsMSeriesElem,
    return sum
 end
 
-function Base.show(io::IO, a::MSeriesElem)
-   print(io, obj_to_string(a, context = io))
-end
-
-function Base.show(io::IO, ::MIME"text/plain", a::MSeriesElem)
-   print(io, obj_to_string(a, context = io))
-end
+@enable_all_show_via_expressify MSeriesElem
 
 function show(io::IO, a::MSeriesRing)
    v = join([String(s) for s in symbols(a)], ", ")

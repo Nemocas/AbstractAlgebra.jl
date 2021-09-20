@@ -468,13 +468,8 @@ function expressify(a::MPolyElem, x = symbols(parent(a)); context = nothing)
    return sum
 end
 
-function Base.show(io::IO, ::MIME"text/plain", a::MPolyElem)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
+@enable_all_show_via_expressify MPolyElem
 
-function Base.show(io::IO, a::MPolyElem)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
 
 function show(io::IO, p::MPolyRing)
    local max_vars = 5 # largest number of variables to print
