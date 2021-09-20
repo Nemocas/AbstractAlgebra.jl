@@ -160,6 +160,56 @@ end
 
 *(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where {T} = LaurentPolyWrap(p.poly * q.poly, p.mindeg + q.mindeg)
 
+function divexact(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}; check::Bool = true) where T
+   f = divexact(p.poly, q.poly, check = check)
+   return LaurentPolyWrap(f, p.mindeg - q.mindeg)
+end
+
+function inv(p::LaurentPolyWrap)
+   isunit(p) || error(DivideError())
+   v, g = remove(p.poly, gen(parent(p.poly)))
+   return LaurentPolyWrap(inv(g), -p.mindeg-v)
+end
+
+function isunit(p::LaurentPolyWrap)
+   iszero(p) && return false
+   v, g = remove(p.poly, gen(parent(p.poly)))
+   return length(g) < 2
+end
+
+function divrem(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
+   iszero(q) && error(DivideError())
+   iszero(p) && return one(parent(p)), p
+   #euc structure: write p (and q) as unit * poly, so remove "x" from p.poly
+   # the degree is then the euc function
+   vp, up = remove(p.poly, gen(parent(p.poly)))
+   vq, uq = remove(q.poly, gen(parent(q.poly)))
+   qq, rr = divrem(up, uq)
+   return LaurentPolyWrap(qq, p.mindeg+vp-q.mindeg-vq), LaurentPolyWrap(rr, p.mindeg+vp)
+end
+
+function canonical_unit(p::LaurentPolyWrap)
+   iszero(p) && return one(parent(p))
+   v = remove(p.poly, gen(parent(p.poly)))
+   return LaurentPolyWrap(canonical_unit(p.poly), p.mindeg + v)
+end
+
+function gcd(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
+   return LaurentPolyWrap(gcd(p.poly, q.poly), 0)
+end
+
+function gcdx(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
+   vp, up = remove(p.poly, gen(parent(p.poly)))
+   vq, uq = remove(p.poly, gen(parent(p.poly)))
+   g, e, f = gcdx(up, uq)
+   return LaurentPolyWrap(g, 0), LaurentPolyWrap(e, -p.mindeg - vp), 
+                                 LaurentPolyWrap(f, -q.mindeg - vq)
+end
+
+function lcm(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
+   return LaurentPolyWrap(lcm(p.poly, q.poly), 0)
+end
+
 ###############################################################################
 #
 #   Ad hoc binary operators
