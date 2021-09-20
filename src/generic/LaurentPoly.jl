@@ -196,15 +196,35 @@ function canonical_unit(p::LaurentPolyWrap)
 end
 
 function gcd(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
-   return LaurentPolyWrap(gcd(p.poly, q.poly), 0)
+   if iszero(p)
+      return divexact(q, canonical_unit(q))
+   elseif iszero(q)
+      return divexact(p, canonical_unit(p))
+   end
+   vp, up = remove(p.poly, gen(parent(p.poly)))
+   vq, uq = remove(q.poly, gen(parent(q.poly)))
+   return LaurentPolyWrap(gcd(up, uq), 0)
 end
 
-function gcdx(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
-   vp, up = remove(p.poly, gen(parent(p.poly)))
-   vq, uq = remove(p.poly, gen(parent(p.poly)))
-   g, e, f = gcdx(up, uq)
-   return LaurentPolyWrap(g, 0), LaurentPolyWrap(e, -p.mindeg - vp), 
-                                 LaurentPolyWrap(f, -q.mindeg - vq)
+function gcdx(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
+   parent(a) == parent(b) || error("Incompatible parents")
+   R = parent(a)
+   if iszero(a)
+      if iszero(b)
+         return zero(R), zero(R), zero(R)
+      else
+         t = canonical_unit(b)
+         return divexact(b, t), zero(R), inv(t)
+      end
+   elseif iszero(b)
+      t = canonical_unit(a)
+      return divexact(a, t), inv(t), zero(R)
+   end
+   va, ua = remove(a.poly, gen(parent(a.poly)))
+   vb, ub = remove(b.poly, gen(parent(a.poly)))
+   g, s, t = gcdx(ua, ub)
+   return LaurentPolyWrap(g, 0), LaurentPolyWrap(s, -a.mindeg - va),
+                                 LaurentPolyWrap(t, -b.mindeg - vb)
 end
 
 function lcm(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T

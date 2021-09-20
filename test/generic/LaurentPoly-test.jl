@@ -414,4 +414,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test sprint(show, "text/plain", -y*z + (-y*z^2)) == "-y*z^2 - y*z"
       @test sprint(show, "text/plain", -y^0*z) == "-z"
    end
+
+   @testset "conformance" begin
+      L, y = LaurentPolynomialRing(QQ, "y")
+      function Main.test_elem(R::typeof(L))
+         rand(R, -5:5, -99:99)
+      end
+      test_Ring_interface(L)
+      test_EuclideanRing_interface(L)
+   end
 end
