@@ -183,6 +183,19 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       ff = deepcopy(f)
       @test parent(f) === parent(ff)
       @test f == ff && f !== ff
+
+      g = y^2*(y+1)*(y+2)
+      ok, q = divides(y*(y+1)*(y+2), g)
+      @test ok && q == y^-1
+      @test divexact(y*(y+1)*(y+2), g) == y^-1
+
+      g = set_coefficient!(1+y+y^2, 0, zero(ZZ))
+      ok, q = divides(y+1, g)
+      @test ok && q == y^-1
+      @test divexact(y+1, g) == y^-1
+
+      @test !divides(y+1, 2*y+3)[1]
+      @test_throws Exception divexact(y+1, 2*y+3)
    end
 
    @testset "comparisons" begin

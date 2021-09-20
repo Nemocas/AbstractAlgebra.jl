@@ -160,9 +160,16 @@ end
 
 *(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where {T} = LaurentPolyWrap(p.poly * q.poly, p.mindeg + q.mindeg)
 
-function divexact(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}; check::Bool = true) where T
-   f = divexact(p.poly, q.poly, check = check)
-   return LaurentPolyWrap(f, p.mindeg - q.mindeg)
+function divexact(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}; check::Bool = true) where T
+   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   f = divexact(a.poly, ub, check = check)
+   return LaurentPolyWrap(f, a.mindeg - b.mindeg - vb)
+end
+
+function divides(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
+   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   ok, f = divides(a.poly, ub)
+   return ok, LaurentPolyWrap(f, a.mindeg - b.mindeg - vb)
 end
 
 function Base.inv(p::LaurentPolyWrap)
@@ -177,7 +184,7 @@ function isunit(p::LaurentPolyWrap)
    return length(g) < 2
 end
 
-function divrem(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
+function Base.divrem(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
    iszero(q) && error(DivideError())
    iszero(p) && return one(parent(p)), p
    #euc structure: write p (and q) as unit * poly, so remove "x" from p.poly
@@ -221,7 +228,7 @@ function gcdx(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
       return divexact(a, t), inv(t), zero(R)
    end
    va, ua = remove(a.poly, gen(parent(a.poly)))
-   vb, ub = remove(b.poly, gen(parent(a.poly)))
+   vb, ub = remove(b.poly, gen(parent(b.poly)))
    g, s, t = gcdx(ua, ub)
    return LaurentPolyWrap(g, 0), LaurentPolyWrap(s, -a.mindeg - va),
                                  LaurentPolyWrap(t, -b.mindeg - vb)
