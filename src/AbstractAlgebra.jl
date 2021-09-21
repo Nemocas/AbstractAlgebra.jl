@@ -376,7 +376,8 @@ import .PrettyPrinting: get_html_as_latex, set_html_as_latex, expressify,
                         expr_to_string, expr_to_latex_string, canonicalize,
                         printer, print_integer_string, get_syntactic_sign_abs,
                         is_syntactic_one, is_syntactic_zero,
-                        obj_to_string, obj_to_latex_string, show_obj, print_obj
+                        obj_to_string, obj_to_string_wrt_times,
+                        obj_to_latex_string, show_obj, print_obj
 
 export @enable_all_show_via_expressify
 

@@ -6,6 +6,26 @@ import ..AbstractAlgebra: RingElem, NCRingElem, MatrixElem
 
 using ..AbstractAlgebra
 
+# printing is done with respect to the following precedences
+# There is no point in using the julia values because we add our own ops
+const prec_lowest      = 0
+const prec_inf_Plus    = 11    # infix a+b+c
+const prec_inf_Minus   = 11    # infix a-b-c
+const prec_inf_Times   = 13    # infix a*b*c
+const prec_inf_Divide  = 13    # infix a/b/c
+const prec_inf_DoubleDivide  = 14    # infix a//b//c
+const prec_inf_CenterDot = 15  # non associative * with spaces, \cdot in latex
+const prec_pre_Plus    = 20    # prefix +a not used
+const prec_pre_Minus   = 21    # prefix -a
+const prec_pre_Times   = 22    # prefix *a not used
+const prec_pre_Divide  = 23    # prefix /b not used
+const prec_inf_Power   = 30    # infix a^b
+const prec_post_call   = 99    # a(b) i.e. whether a+b(c) is (a+b)(c) vs a+(b(c))
+const prec_post_ref    = 100   # a[b]
+
+const prec_post_FractionBox    = 50    # precedence for a/b in 2d form
+const prec_post_SuperscriptBox = 51    # precedence for a^b in 2d form
+
 ################################################################################
 #
 #  Expression to string
@@ -22,6 +42,17 @@ end
 
 function obj_to_string(@nospecialize(obj); context = nothing)
    return sprint(show_via_expressify, MIME("text/plain"), obj, context = context)
+end
+
+# parenthesize obj as if it were a term in a product
+function obj_to_string_wrt_times(@nospecialize(obj); context = nothing)
+   io = IOBuffer()
+   S = AbstractAlgebra.printer(io)
+   print_obj(S, MIME("text/plain"),
+             canonicalize(expressify(obj, context = context)),
+             prec_inf_Times, prec_inf_Times)
+   finish(S)
+   return String(take!(io))
 end
 
 function obj_to_latex_string(@nospecialize(obj); context = nothing)
@@ -435,26 +466,6 @@ end
 #   Printing
 #
 ################################################################################
-
-# printing is done with respect to the following precedences
-# There is no point in using the julia values because we add our own ops
-prec_lowest      = 0
-prec_inf_Plus    = 11    # infix a+b+c
-prec_inf_Minus   = 11    # infix a-b-c
-prec_inf_Times   = 13    # infix a*b*c
-prec_inf_Divide  = 13    # infix a/b/c
-prec_inf_DoubleDivide  = 14    # infix a//b//c
-prec_inf_CenterDot = 15  # non associative * with spaces, \cdot in latex
-prec_pre_Plus    = 20    # prefix +a not used
-prec_pre_Minus   = 21    # prefix -a
-prec_pre_Times   = 22    # prefix *a not used
-prec_pre_Divide  = 23    # prefix /b not used
-prec_inf_Power   = 30    # infix a^b
-prec_post_call   = 99    # a(b) i.e. whether a+b(c) is (a+b)(c) vs a+(b(c))
-prec_post_ref    = 100   # a[b]
-
-prec_post_FractionBox    = 50    # precedence for a/b in 2d form
-prec_post_SuperscriptBox = 51    # precedence for a^b in 2d form
 
 mutable struct printer
    io::IO
