@@ -3,7 +3,7 @@
    T = FractionField(S)
 
    @test FractionField(S, cached = true) === FractionField(S, cached = true)
-   @test FractionField(S, cached = false) !== FractionField(S, cached = true)
+   @test FractionField(S) === FractionField(S)
 
    @test elem_type(T) == Generic.Frac{elem_type(S)}
    @test elem_type(Generic.FracField{elem_type(S)}) == Generic.Frac{elem_type(S)}

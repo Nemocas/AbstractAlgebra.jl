@@ -21,20 +21,17 @@ struct ConstPolyRing{T <: RingElement} <: Ring
    base_ring::Ring
 
    function ConstPolyRing{T}(R::Ring, cached::Bool) where T <: RingElement
-      return get_cached!(ConstPolyID, R, cached) do
-         new{T}(R)
-      end::ConstPolyRing{T}
+      cached == true || @warn "ring type is immutable"
+      new{T}(R)
    end
 end
 
-const ConstPolyID = AbstractAlgebra.CacheDictType{Ring, ConstPolyRing}()
-   
 mutable struct ConstPoly{T <: RingElement} <: RingElem
    c::T
    parent::ConstPolyRing{T}
 
    function ConstPoly{T}(c::T) where T <: RingElement
-      return new(c)
+      new{T}(c)
    end
 end
 

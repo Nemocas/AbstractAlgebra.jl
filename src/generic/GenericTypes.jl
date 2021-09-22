@@ -716,17 +716,14 @@ const LaurentSeriesElem{T} = Union{LaurentSeriesRingElem{T}, LaurentSeriesFieldE
 #
 ###############################################################################
 
-mutable struct PuiseuxSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
+struct PuiseuxSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    laurent_ring::Ring
 
    function PuiseuxSeriesRing{T}(R::LaurentSeriesRing{T}, cached::Bool = true) where T <: RingElement
-      return get_cached!(PuiseuxSeriesID, R, cached) do
-         new{T}(R)
-      end::PuiseuxSeriesRing{T}
+      cached == true || @warn "ring type is immutable"
+      new{T}(R)
    end
 end
-
-const PuiseuxSeriesID = CacheDictType{Ring, Ring}()
 
 mutable struct PuiseuxSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingElem
    data::LaurentSeriesRingElem{T}
@@ -744,17 +741,14 @@ end
 #
 ###############################################################################
 
-mutable struct PuiseuxSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
+struct PuiseuxSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    laurent_ring::Field
 
    function PuiseuxSeriesField{T}(R::LaurentSeriesField{T}, cached::Bool = true) where T <: FieldElement
-      return get_cached!(PuiseuxSeriesFieldID, R, cached) do
-         new{T}(R)
-      end::PuiseuxSeriesField{T}
+      cached == true || @warn "ring type is immutable"
+      new{T}(R)
    end
 end
-
-const PuiseuxSeriesFieldID = CacheDictType{Ring, Field}()
 
 mutable struct PuiseuxSeriesFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
    data::LaurentSeriesFieldElem{T}
@@ -812,17 +806,14 @@ end
 #
 ###############################################################################
 
-mutable struct FracField{T <: RingElem} <: AbstractAlgebra.FracField{T}
+struct FracField{T <: RingElem} <: AbstractAlgebra.FracField{T}
    base_ring::Ring
 
    function FracField{T}(R::Ring, cached::Bool = true) where T <: RingElem
-      return get_cached!(FracDict, R, cached) do
-         new{T}(R)
-      end::FracField{T}
+      cached == true || @warn "ring type is immutable"
+      new{T}(R)
    end
 end
-
-const FracDict = CacheDictType{Ring, Ring}()
 
 mutable struct Frac{T <: RingElem} <: AbstractAlgebra.FracElem{T}
    num::T
@@ -838,7 +829,7 @@ end
 #
 ###############################################################################
 
-struct RationalFunctionField{T <: FieldElement} <: AbstractAlgebra.Field
+mutable struct RationalFunctionField{T <: FieldElement} <: AbstractAlgebra.Field
    S::Symbol
    fraction_field::FracField{<:PolyElem{T}}
    base_ring::Field
