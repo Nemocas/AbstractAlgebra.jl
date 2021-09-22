@@ -539,15 +539,10 @@ julia> n = length(f)
 julia> c = coeff(f, 1)
 3
 
-julia> g = set_length!(g, normalise(g, 7))
-x^3 + 2*x + 1
-
-julia> g = set_coefficient!(g, 2, BigInt(11))
+julia> g = set_coefficient!(g, 2, ZZ(11))
 x^3 + 11*x^2 + 2*x + 1
 
-julia> fit!(g, 8)
-
-julia> g = setcoeff!(g, 7, BigInt(4))
+julia> g = set_coefficient!(g, 7, ZZ(4))
 4*x^7 + x^3 + 11*x^2 + 2*x + 1
 ```
 
