@@ -414,13 +414,26 @@ end
 
 ################################################################################
 #
-#  map_coefficients
+#  Change base ring / map_coefficients
 #
 ################################################################################
 
-function map_coefficients(f, p::LaurentPolyWrap)
-   fp = map_coefficients(f, p.poly)
-   return LaurentPolyWrap(LaurentPolyWrapRing(parent(fp)), fp, p.mindeg)
+function AbstractAlgebra._map(g, p::LaurentPolyWrap, Rx::LaurentPolyWrapRing)
+   return LaurentPolyWrap(Rx,
+                        AbstractAlgebra._map(g, p.poly, Rx.polyring), p.mindeg)
+end
+
+function change_base_ring(R::Ring, p::LaurentPolyWrap; cached::Bool = true,
+                 parent::LaurentPolyWrapRing = LaurentPolyWrapRing(
+         AbstractAlgebra._change_poly_ring(R, parent(p.poly), cached), cached))
+
+   return AbstractAlgebra._map(R, p, parent)
+end
+
+function map_coefficients(g, p::LaurentPolyWrap; cached::Bool = true,
+                       parent::LaurentPolyWrapRing = LaurentPolyWrapRing(
+                      AbstractAlgebra._make_parent(g, p.poly, cached), cached))
+   return AbstractAlgebra._map(g, p, parent)
 end
 
 ###############################################################################
