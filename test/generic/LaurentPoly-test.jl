@@ -30,9 +30,9 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
          @test characteristic(L) == characteristic(R)
 
-         @test LaurentPolyWrap(x) == y
-         @test LaurentPolyWrap(2x^2 + 3x + 4) == 2y^2 + 3y + 4
-         @test LaurentPolyWrap(2x^2 + 3x + 4, -1) * y == 2y^2 + 3y + 4
+         @test LaurentPolyWrap(L, x) == y
+         @test LaurentPolyWrap(L, 2x^2 + 3x + 4) == 2y^2 + 3y + 4
+         @test LaurentPolyWrap(L, 2x^2 + 3x + 4, -1) * y == 2y^2 + 3y + 4
 
          @test L(y) === y
          f = y^2 + y
@@ -122,7 +122,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test hash(zero(y)) == hash(zero(y))
       @test hash(one(y)) == hash(one(y))
 
-      f1 = f = LaurentPolyWrap(x, -2)
+      f1 = f = LaurentPolyWrap(L, x, -2)
       @test terms_degrees(f) == -2:-1
       @test trail_degree(f) == -1
       @test lead_degree(f) == -1
@@ -136,7 +136,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test leading_coefficient(f) == 1
       @test trailing_coefficient(f) == 1
 
-      f2 = f = LaurentPolyWrap(3 + 2*x^4, -3)
+      f2 = f = LaurentPolyWrap(L, 3 + 2*x^4, -3)
       @test terms_degrees(f) == -3:1
       @test trail_degree(f) == -3
       @test lead_degree(f) == 1
@@ -168,7 +168,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test isone(f^0)
       @test iszero(f-f)
 
-      for f in (f1, f2, LaurentPolyWrap(rand(parent(x), 0:9, -9:9), rand(-9:9)))
+      for f in (f1, f2, LaurentPolyWrap(L, rand(parent(x), 0:9, -9:9), rand(-9:9)))
          @test hash(f) == hash(f)
          @test hash(f, rand(UInt)) != hash(f) # very unlikely failure
          @test hash(f-f) == hash(zero(f))
@@ -210,14 +210,14 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
       @test y == y
 
-      f = LaurentPolyWrap(x^3 + 2x^2 - 1)
+      f = LaurentPolyWrap(L, x^3 + 2x^2 - 1)
       @test f == f
-      @test f == LaurentPolyWrap(x^3 + 2x^2 - 1)
+      @test f == LaurentPolyWrap(L, x^3 + 2x^2 - 1)
       @test f == x^3 + 2x^2 - 1
       @test x^3 + 2x^2 - 1 == f
       @test f != x
       @test x != f
-      @test f != LaurentPolyWrap(x^3 + 2x^2 - 1, -2)
+      @test f != LaurentPolyWrap(L, x^3 + 2x^2 - 1, -2)
    end
 
    @testset "unary & binary & adhoc arithmetic operations" begin
@@ -227,7 +227,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test -(-y) == y
       @test iszero(y + (-y))
       @test y + y - y == y
-      @test 2y*y*y + 3y*y - 5y + 8 == LaurentPolyWrap(2x^3 + 3x^2 - 5x + 8)
+      @test 2y*y*y + 3y*y - 5y + 8 == LaurentPolyWrap(L, 2x^3 + 3x^2 - 5x + 8)
 
       c = rand(-9:9)
       for i = -9:9
@@ -236,11 +236,11 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       end
 
       fx = rand(parent(x), 1:9, -9:9)
-      f = LaurentPolyWrap(fx)
-      @test f*f == LaurentPolyWrap(fx*fx)
+      f = LaurentPolyWrap(L, fx)
+      @test f*f == LaurentPolyWrap(L, fx*fx)
 
-      f = LaurentPolyWrap(fx, -3)
-      @test y*y*y*y*y*y*f*f == LaurentPolyWrap(fx*fx)
+      f = LaurentPolyWrap(L, fx, -3)
+      @test y*y*y*y*y*y*f*f == LaurentPolyWrap(L, fx*fx)
       @test y*y*y*y*y*y*f*f == y^6 * f^2
 
       # with polynomials as base ring
@@ -248,14 +248,12 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       L, y = LaurentPolynomialRing(P, "y")
       @test parent(x*y) == L
       @test parent(y*x) == L
-      @test 3*y == y*3 == LaurentPolyWrap(3*x, 0)
 
       # with Laurent polynomials as base ring
       P, x = LaurentPolynomialRing(ZZ, "x")
       L, y = LaurentPolynomialRing(P, "y")
       @test parent(x*y) == L
       @test parent(y*x) == L
-      @test 3*y == y*3 == LaurentPolyWrap((3*x).poly, 0)
 
       # as base ring of polynomials
       L, y = LaurentPolynomialRing(ZZ, "y")
@@ -294,13 +292,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       L, y = LaurentPolynomialRing(ZZ, "y")
       x = y.poly
 
-      @test 2y^-2 + 3y^-1 + 4y^0 + 5y + 6y^2 == LaurentPolyWrap(2 + 3x + 4x^2 + 5x^3 + 6x^4, -2)
+      @test 2y^-2 + 3y^-1 + 4y^0 + 5y + 6y^2 == LaurentPolyWrap(L, 2 + 3x + 4x^2 + 5x^3 + 6x^4, -2)
 
       fx = rand(parent(x), 1:9, -9:9)
-      f = d -> LaurentPolyWrap(fx, d)
+      f = d -> LaurentPolyWrap(L, fx, d)
 
       for e in rand(0:9, 2)
-         fxe = LaurentPolyWrap(fx^e)
+         fxe = LaurentPolyWrap(L, fx^e)
          for i = -3:3
             @test y^(-i*e) * f(i)^e == fxe
          end
