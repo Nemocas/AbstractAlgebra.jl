@@ -444,6 +444,8 @@ end
 
 (R::LaurentPolyWrapRing)(b::RingElement) = LaurentPolyWrap(R, R.polyring(b))
 
+(R::LaurentPolyWrapRing)(b::RingElement, d::Int) = LaurentPolyWrap(R, R.polyring(b), d)
+
 (R::LaurentPolyWrapRing)() = LaurentPolyWrap(R, R.polyring())
 
 function (R::LaurentPolyWrapRing)(p::LaurentPolyWrap)
