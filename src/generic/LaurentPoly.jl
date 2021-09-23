@@ -159,34 +159,43 @@ end
 
 *(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where {T} = LaurentPolyWrap(parent(p), p.poly * q.poly, p.mindeg + q.mindeg)
 
+function _remove_gen(a::LaurentPolyWrap)
+   for i in 0:3
+      if !iszero(coeff(a.poly, i))
+         return i, (i == 0 ? a.poly : shift_right(a.poly, i))
+      end
+   end
+   return remove(a.poly, gen(parent(a.poly)))
+end
+
 function divexact(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}; check::Bool = true) where T
-   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   vb, ub = _remove_gen(b)
    f = divexact(a.poly, ub, check = check)
    return LaurentPolyWrap(parent(a), f, a.mindeg - b.mindeg - vb)
 end
 
 function divides(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
-   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   vb, ub = _remove_gen(b)
    ok, f = divides(a.poly, ub)
    return ok, LaurentPolyWrap(parent(a), f, a.mindeg - b.mindeg - vb)
 end
 
 function isdivisible_by(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
    iszero(b) && return iszero(a)
-   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   vb, ub = _remove_gen(b)
    # should use isdivisible_by here, but it throws on ZZ[x]
    return divides(a.poly, ub)[1]
 end
 
 function Base.inv(p::LaurentPolyWrap)
-   isunit(p) || error(DivideError())
-   v, g = remove(p.poly, gen(parent(p.poly)))
+   isunit(p) || throw(NotInvertibleError(p))
+   v, g = _remove_gen(p)
    return LaurentPolyWrap(parent(p), inv(g), -p.mindeg-v)
 end
 
 function isunit(p::LaurentPolyWrap)
    iszero(p) && return false
-   v, g = remove(p.poly, gen(parent(p.poly)))
+   v, g = _remove_gen(p)
    return length(g) < 2
 end
 
@@ -195,8 +204,8 @@ function Base.divrem(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
    iszero(p) && return one(parent(p)), p
    #euc structure: write p (and q) as unit * poly, so remove "x" from p.poly
    # the degree is then the euc function
-   vp, up = remove(p.poly, gen(parent(p.poly)))
-   vq, uq = remove(q.poly, gen(parent(q.poly)))
+   vp, up = _remove_gen(p)
+   vq, uq = _remove_gen(q)
    qq, rr = divrem(up, uq)
    return LaurentPolyWrap(parent(p), qq, p.mindeg+vp-q.mindeg-vq),
           LaurentPolyWrap(parent(p), rr, p.mindeg+vp)
@@ -205,18 +214,19 @@ end
 function canonical_unit(p::LaurentPolyWrap)
    iszero(p) && return one(parent(p))
    R = parent(p.poly)
-   v, _ = remove(p.poly, gen(R))
+   v, _ = _remove_gen(p)
    return LaurentPolyWrap(parent(p), R(canonical_unit(p.poly)), p.mindeg + v)
 end
 
 function gcd(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
+   parent(p) == parent(q) || error("Incompatible parents")
    if iszero(p)
       return divexact(q, canonical_unit(q))
    elseif iszero(q)
       return divexact(p, canonical_unit(p))
    end
-   vp, up = remove(p.poly, gen(parent(p.poly)))
-   vq, uq = remove(q.poly, gen(parent(q.poly)))
+   vp, up = _remove_gen(p)
+   vq, uq = _remove_gen(q)
    return LaurentPolyWrap(parent(p), gcd(up, uq), 0)
 end
 
@@ -234,8 +244,8 @@ function gcdx(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
       t = canonical_unit(a)
       return divexact(a, t), inv(t), zero(R)
    end
-   va, ua = remove(a.poly, gen(parent(a.poly)))
-   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   va, ua = _remove_gen(a)
+   vb, ub = _remove_gen(b)
    g, s, t = gcdx(ua, ub)
    return LaurentPolyWrap(R, g, 0), LaurentPolyWrap(R, s, -a.mindeg - va),
                                     LaurentPolyWrap(R, t, -b.mindeg - vb)
