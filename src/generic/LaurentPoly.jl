@@ -443,9 +443,9 @@ end
 #
 ###############################################################################
 
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Symbol)
-   P, x = AbstractAlgebra.PolynomialRing(R, s)
-   R = LaurentPolyWrapRing(P)
+function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
+   P, x = AbstractAlgebra.PolynomialRing(R, s, cached = cached)
+   R = LaurentPolyWrapRing(P, cached)
    R, LaurentPolyWrap(R, x)
 end
 

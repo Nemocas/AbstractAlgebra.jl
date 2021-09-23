@@ -11,6 +11,20 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
          P, _ = PolynomialRing(R, "x0")
          L, y = LaurentPolynomialRing(R, "y")
 
+         @test LaurentPolynomialRing(R, "y", cached = true)[1] ===
+               LaurentPolynomialRing(R, "y", cached = true)[1]
+
+         @test LaurentPolynomialRing(R, "y", cached = true)[1] !==
+               LaurentPolynomialRing(R, "y", cached = false)[1]
+
+         P2, _ = PolynomialRing(R, "x0", cached = false)
+
+         @test LaurentPolynomialRing(P, "y")[1] ===
+               LaurentPolynomialRing(P, "y")[1]
+
+         @test LaurentPolynomialRing(P2, "y")[1] !==
+               LaurentPolynomialRing(P, "y")[1]
+
          x = y.poly
 
          @test L isa LaurentPolyWrapRing{elem_type(R)}
@@ -202,6 +216,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
       @test isdivisible_by(2*y+3, 2+3*y^-1)
       @test !isdivisible_by(3*y+4, 2+3*y^-1)
+   end
+
+   @testset "coercion" begin
+      R, x = PolynomialRing(ZZ, "x")
+      L, x1 = LaurentPolynomialRing(ZZ, "x")
+      @test L(x) == x1
+      @test L(x+x^2) == x1+x1^2
    end
 
    @testset "comparisons" begin
@@ -445,5 +466,6 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       end
       test_Ring_interface(L)
       test_EuclideanRing_interface(L)
+      test_Ring_interface_recursive(L)
    end
 end

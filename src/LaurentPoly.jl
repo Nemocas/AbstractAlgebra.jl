@@ -33,15 +33,15 @@ julia> rand(R, -3:3, -9:9)
 """
 LaurentPolynomialRing(R::Ring, s::Union{AbstractString, Char, Symbol})
 
-function LaurentPolynomialRing(R::Ring, s::Symbol)
-   return Generic.LaurentPolynomialRing(R, s)
+function LaurentPolynomialRing(R::Ring, s::Symbol; cached::Bool = true)
+   return Generic.LaurentPolynomialRing(R, s, cached = cached)
 end
 
-function LaurentPolynomialRing(R::Ring, s::Char)
-   return LaurentPolynomialRing(R, Symbol(s))
+function LaurentPolynomialRing(R::Ring, s::Char; cached::Bool = true)
+   return Generic.LaurentPolynomialRing(R, Symbol(s), cached = cached)
 end
 
-function LaurentPolynomialRing(R::Ring, s::AbstractString)
-   return LaurentPolynomialRing(R, Symbol(s))
+function LaurentPolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
+   return Generic.LaurentPolynomialRing(R, Symbol(s), cached = cached)
 end
 

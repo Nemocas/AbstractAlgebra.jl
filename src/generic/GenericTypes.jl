@@ -493,11 +493,17 @@ mutable struct LaurentPolyWrapRing{T  <: RingElement,
                                   } <: LaurentPolynomialRing{T}
    polyring::PR
 
-   function LaurentPolyWrapRing(pr::PR) where {T <: RingElement,
-                                               PR <: AbstractAlgebra.PolyRing{T}}
-      new{T, PR}(pr)
+   function LaurentPolyWrapRing(pr::PR, cached::Bool = true) where {
+                                             T <: RingElement,
+                                             PR <: AbstractAlgebra.PolyRing{T}}
+
+      return get_cached!(LaurentPolyWrapRingID, pr, cached) do
+         new{T, PR}(pr)
+      end::LaurentPolyWrapRing{T, PR}
    end
 end
+
+const LaurentPolyWrapRingID = CacheDictType{Ring, LaurentPolyWrapRing}()
 
 mutable struct LaurentPolyWrap{T  <: RingElement,
                                PE <: AbstractAlgebra.PolyElem{T},
