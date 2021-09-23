@@ -299,26 +299,16 @@ end
 #
 ###############################################################################
 
-function zero!(p::LaurentPolyWrap)
-   q = zero!(p.poly)
-   if q !== p.poly
-      LaurentPolyWrap(q, 0)
-   else
-      p.mindeg = 0
-      p
-   end
+function zero!(z::LaurentPolyWrap)
+   z.poly = zero!(z.poly)
+   z.mindeg = 0
+   return z
 end
 
-function mul!(c::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
-   am = a.mindeg
-   bm = b.mindeg
-   d = mul!(c.poly, a.poly, b.poly)
-   if d === c.poly
-      c.mindeg = am + bm
-      c
-   else
-      LaurentPolyWrap(d, am + bm)
-   end
+function mul!(z::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
+   z.mindeg = a.mindeg + b.mindeg
+   z.poly = mul!(z.poly, a.poly, b.poly)
+   return z
 end
 
 function addeq!(c::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}) where T
