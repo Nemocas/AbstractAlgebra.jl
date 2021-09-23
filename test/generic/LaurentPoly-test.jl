@@ -147,22 +147,21 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test leading_coefficient(f) == 2
       @test trailing_coefficient(f) == 3
 
-      @test canonical_unit(f) == 1
+      @test canonical_unit(f) == y^-3
 
       @test hash(f) != hash(3y^-3 + y)
       @test hash(f) != hash(3y^-2 + 2y)
 
-      setcoeff!(f, -3, big(4))
+      set_coefficient!(f, -3, big(4))
       @test f == 4y^-3 + 2y
 
-      setcoeff!(f, -3, big(0))
+      set_coefficient!(f, -3, big(0))
       @test f == 2y
 
-      setcoeff!(f, -50, big(-2))
+      set_coefficient!(f, -50, big(-2))
       @test f == -2y^-50 + 2y
 
-      # TODO: make this work
-      @test_broken iszero(setcoeff!(setcoeff!(f, 1, big(0)), -50, big(0)))
+      @test iszero(set_coefficient!(set_coefficient!(deepcopy(f), 1, big(0)), -50, big(0)))
 
       @test !isone(f)
       @test !iszero(f)
@@ -184,6 +183,25 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       ff = deepcopy(f)
       @test parent(f) === parent(ff)
       @test f == ff && f !== ff
+
+      g = y^2*(y+1)*(y+2)
+      ok, q = divides(y*(y+1)*(y+2), g)
+      @test ok && q == y^-1
+      @test divexact(y*(y+1)*(y+2), g) == y^-1
+
+      g = set_coefficient!(1+y+y^2, 0, zero(ZZ))
+      ok, q = divides(y+1, g)
+      @test ok && q == y^-1
+      @test divexact(y+1, g) == y^-1
+
+      @test !divides(y+1, 2*y+3)[1]
+      @test_throws Exception divexact(y+1, 2*y+3)
+
+      @test isdivisible_by(zero(L), zero(L))
+      @test !isdivisible_by(one(L), zero(L))
+
+      @test isdivisible_by(2*y+3, 2+3*y^-1)
+      @test !isdivisible_by(3*y+4, 2+3*y^-1)
    end
 
    @testset "comparisons" begin
@@ -395,7 +413,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
       @test change_base_ring(QQ, z) == q
       @test change_base_ring(QQ, fz) == q^2 - q - 2q^-2
-      @test_broken change_base_ring(ZZ, q) == z
+      @test change_base_ring(ZZ, q) == z
 
       @test map_coefficients(x -> x^2, fz) == z^2 + z + 4z^-2
       @test map_coefficients(one, fz) == z^2 + z + z^-2
@@ -414,5 +432,20 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test sprint(show, "text/plain", 3*(y^0)*z) == "3*z"
       @test sprint(show, "text/plain", -y*z + (-y*z^2)) == "-y*z^2 - y*z"
       @test sprint(show, "text/plain", -y^0*z) == "-z"
+   end
+
+   @testset "conformance" begin
+      L, y = LaurentPolynomialRing(QQ, "y")
+      function Main.test_elem(R::typeof(L))
+         n = rand(0:10)
+         if n == 0
+            return zero(R)
+         else
+            m = rand(0:5)
+            rand(R, -m:n-m, -99:99)
+         end
+      end
+      test_Ring_interface(L)
+      test_EuclideanRing_interface(L)
    end
 end

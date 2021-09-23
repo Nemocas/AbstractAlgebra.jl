@@ -5,7 +5,7 @@
 ###############################################################################
 
 export iroot, ispower, ispower_with_root, root, issquare_with_sqrt,
-       isdivisible_by, isprobable_prime
+       isprobable_prime
 
 ###############################################################################
 #
@@ -625,6 +625,7 @@ function (a::Integers{T})() where T <: Integer
    return T(0)
 end
 
-function (a::Integers{T})(b::Integer) where T <: Integer
+function (a::Integers{T})(b::Union{Integer, Rational}) where T <: Integer
    return T(b)
 end
+
