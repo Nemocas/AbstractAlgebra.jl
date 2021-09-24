@@ -10,13 +10,12 @@
 #
 ###############################################################################
 
-parent_type(::Type{LaurentPolyWrap{T, PE}}) where {T, PE} =
-   LaurentPolyWrapRing{T, parent_type(PE)}
+parent_type(::Type{LaurentPolyWrap{T, PE, LR}}) where {T, PE, LR} = LR
 
 elem_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} =
-   LaurentPolyWrap{T, elem_type(PR)}
+                  LaurentPolyWrap{T, elem_type(PR), LaurentPolyWrapRing{T, PR}}
 
-parent(p::LaurentPolyWrap) = LaurentPolyWrapRing(parent(p.poly))
+parent(p::LaurentPolyWrap) = p.parent
 
 base_ring(R::LaurentPolyWrapRing) = base_ring(R.polyring)
 
@@ -79,16 +78,16 @@ iszero(p::LaurentPolyWrap) = iszero(p.poly)
 
 isone(p::LaurentPolyWrap) = ismonomial(p, 0)
 
-zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(zero(R.polyring))
-one(R::LaurentPolyWrapRing) = LaurentPolyWrap(one(R.polyring))
+zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, zero(R.polyring))
+one(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, one(R.polyring))
 
-gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(gen(R.polyring))
+gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, gen(R.polyring))
 
 isgen(p::LaurentPolyWrap) = ismonomial(p, 1)
 
-# only an optimization over the default Base implementation (maybe 1.4 speed-up)
-deepcopy_internal(p::LaurentPolyWrap, dict::IdDict) =
-   LaurentPolyWrap(deepcopy_internal(p.poly, dict), p.mindeg)
+function deepcopy_internal(p::LaurentPolyWrap, dict::IdDict)
+   return LaurentPolyWrap(p.parent, deepcopy_internal(p.poly, dict), p.mindeg)
+end
 
 ###############################################################################
 #
@@ -137,7 +136,7 @@ end
 #
 ###############################################################################
 
--(p::LaurentPolyWrap) = LaurentPolyWrap(-p.poly, p.mindeg)
+-(p::LaurentPolyWrap) = LaurentPolyWrap(parent(p), -p.poly, p.mindeg)
 
 ###############################################################################
 #
@@ -153,41 +152,50 @@ function +(p::LaurentPolyWrap, q::LaurentPolyWrap)
    if p.mindeg < q.mindeg
       q_ = shift_left(q_, q.mindeg - p.mindeg)
    end
-   LaurentPolyWrap(p_ + q_, p.mindeg)
+   LaurentPolyWrap(parent(p), p_ + q_, p.mindeg)
 end
 
 -(p::LaurentPolyWrap, q::LaurentPolyWrap) = p + (-q) # TODO: optimize
 
-*(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where {T} = LaurentPolyWrap(p.poly * q.poly, p.mindeg + q.mindeg)
+*(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where {T} = LaurentPolyWrap(parent(p), p.poly * q.poly, p.mindeg + q.mindeg)
+
+function _remove_gen(a::LaurentPolyWrap)
+   for i in 0:3
+      if !iszero(coeff(a.poly, i))
+         return i, (i == 0 ? a.poly : shift_right(a.poly, i))
+      end
+   end
+   return remove(a.poly, gen(parent(a.poly)))
+end
 
 function divexact(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}; check::Bool = true) where T
-   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   vb, ub = _remove_gen(b)
    f = divexact(a.poly, ub, check = check)
-   return LaurentPolyWrap(f, a.mindeg - b.mindeg - vb)
+   return LaurentPolyWrap(parent(a), f, a.mindeg - b.mindeg - vb)
 end
 
 function divides(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
-   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   vb, ub = _remove_gen(b)
    ok, f = divides(a.poly, ub)
-   return ok, LaurentPolyWrap(f, a.mindeg - b.mindeg - vb)
+   return ok, LaurentPolyWrap(parent(a), f, a.mindeg - b.mindeg - vb)
 end
 
 function isdivisible_by(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
    iszero(b) && return iszero(a)
-   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   vb, ub = _remove_gen(b)
    # should use isdivisible_by here, but it throws on ZZ[x]
    return divides(a.poly, ub)[1]
 end
 
 function Base.inv(p::LaurentPolyWrap)
-   isunit(p) || error(DivideError())
-   v, g = remove(p.poly, gen(parent(p.poly)))
-   return LaurentPolyWrap(inv(g), -p.mindeg-v)
+   isunit(p) || throw(NotInvertibleError(p))
+   v, g = _remove_gen(p)
+   return LaurentPolyWrap(parent(p), inv(g), -p.mindeg-v)
 end
 
 function isunit(p::LaurentPolyWrap)
    iszero(p) && return false
-   v, g = remove(p.poly, gen(parent(p.poly)))
+   v, g = _remove_gen(p)
    return length(g) < 2
 end
 
@@ -196,28 +204,30 @@ function Base.divrem(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
    iszero(p) && return one(parent(p)), p
    #euc structure: write p (and q) as unit * poly, so remove "x" from p.poly
    # the degree is then the euc function
-   vp, up = remove(p.poly, gen(parent(p.poly)))
-   vq, uq = remove(q.poly, gen(parent(q.poly)))
+   vp, up = _remove_gen(p)
+   vq, uq = _remove_gen(q)
    qq, rr = divrem(up, uq)
-   return LaurentPolyWrap(qq, p.mindeg+vp-q.mindeg-vq), LaurentPolyWrap(rr, p.mindeg+vp)
+   return LaurentPolyWrap(parent(p), qq, p.mindeg+vp-q.mindeg-vq),
+          LaurentPolyWrap(parent(p), rr, p.mindeg+vp)
 end
 
 function canonical_unit(p::LaurentPolyWrap)
    iszero(p) && return one(parent(p))
    R = parent(p.poly)
-   v, _ = remove(p.poly, gen(R))
-   return LaurentPolyWrap(R(canonical_unit(p.poly)), p.mindeg + v)
+   v, _ = _remove_gen(p)
+   return LaurentPolyWrap(parent(p), R(canonical_unit(p.poly)), p.mindeg + v)
 end
 
 function gcd(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
+   parent(p) == parent(q) || error("Incompatible parents")
    if iszero(p)
       return divexact(q, canonical_unit(q))
    elseif iszero(q)
       return divexact(p, canonical_unit(p))
    end
-   vp, up = remove(p.poly, gen(parent(p.poly)))
-   vq, uq = remove(q.poly, gen(parent(q.poly)))
-   return LaurentPolyWrap(gcd(up, uq), 0)
+   vp, up = _remove_gen(p)
+   vq, uq = _remove_gen(q)
+   return LaurentPolyWrap(parent(p), gcd(up, uq), 0)
 end
 
 function gcdx(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
@@ -234,15 +244,15 @@ function gcdx(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
       t = canonical_unit(a)
       return divexact(a, t), inv(t), zero(R)
    end
-   va, ua = remove(a.poly, gen(parent(a.poly)))
-   vb, ub = remove(b.poly, gen(parent(b.poly)))
+   va, ua = _remove_gen(a)
+   vb, ub = _remove_gen(b)
    g, s, t = gcdx(ua, ub)
-   return LaurentPolyWrap(g, 0), LaurentPolyWrap(s, -a.mindeg - va),
-                                 LaurentPolyWrap(t, -b.mindeg - vb)
+   return LaurentPolyWrap(R, g, 0), LaurentPolyWrap(R, s, -a.mindeg - va),
+                                    LaurentPolyWrap(R, t, -b.mindeg - vb)
 end
 
 function lcm(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
-   return LaurentPolyWrap(lcm(p.poly, q.poly), 0)
+   return LaurentPolyWrap(parent(p), lcm(p.poly, q.poly), 0)
 end
 
 ###############################################################################
@@ -251,13 +261,13 @@ end
 #
 ###############################################################################
 
-*(p::LaurentPolyWrap{T}, a::T) where {T<:RingElem} = LaurentPolyWrap(p.poly * a, p.mindeg)
+*(p::LaurentPolyWrap{T}, a::T) where {T<:RingElem} = LaurentPolyWrap(parent(p), p.poly * a, p.mindeg)
 *(a::T, p::LaurentPolyWrap{T}) where {T<:RingElem} = p * a
 
-*(p::LaurentPolyWrap, a::Union{Integer,Rational,AbstractFloat}) = LaurentPolyWrap(p.poly * a, p.mindeg)
+*(p::LaurentPolyWrap, a::Union{Integer,Rational,AbstractFloat}) = LaurentPolyWrap(parent(p), p.poly * a, p.mindeg)
 *(a::Union{Integer,Rational,AbstractFloat}, p::LaurentPolyWrap) = p * a
 
-+(p::LaurentPolyWrap, a::RingElement) = p + LaurentPolyWrap(one(p.poly) * a)
++(p::LaurentPolyWrap, a::RingElement) = p + LaurentPolyWrap(parent(p), one(p.poly) * a)
 +(a::RingElement, p::LaurentPolyWrap) = p + a
 
 ###############################################################################
@@ -268,14 +278,14 @@ end
 
 function ^(p::LaurentPolyWrap, e::Integer)
    if e >= 0
-      LaurentPolyWrap(p.poly^e, p.mindeg * e)
+      LaurentPolyWrap(parent(p), p.poly^e, p.mindeg * e)
    else
       # p must be a term, whose coeff is invertible
       deg = term_degree(p)
       c = coeff(p, deg)
       # the following is to allow x^-3 even if 1^-3 is failing
       c = isone(c) ? c : c^e
-      LaurentPolyWrap(c * one(p.poly), deg * e)
+      LaurentPolyWrap(parent(p), c * one(p.poly), deg * e)
    end
 end
 
@@ -299,26 +309,16 @@ end
 #
 ###############################################################################
 
-function zero!(p::LaurentPolyWrap)
-   q = zero!(p.poly)
-   if q !== p.poly
-      LaurentPolyWrap(q, 0)
-   else
-      p.mindeg = 0
-      p
-   end
+function zero!(z::LaurentPolyWrap)
+   z.poly = zero!(z.poly)
+   z.mindeg = 0
+   return z
 end
 
-function mul!(c::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
-   am = a.mindeg
-   bm = b.mindeg
-   d = mul!(c.poly, a.poly, b.poly)
-   if d === c.poly
-      c.mindeg = am + bm
-      c
-   else
-      LaurentPolyWrap(d, am + bm)
-   end
+function mul!(z::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
+   z.mindeg = a.mindeg + b.mindeg
+   z.poly = mul!(z.poly, a.poly, b.poly)
+   return z
 end
 
 function addeq!(c::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}) where T
@@ -348,19 +348,21 @@ end
 function canonicalize(f::LaurentPolyWrap)
    td = trail_degree(f)
    tdp = td - f.mindeg # trail degree for f.poly
-   LaurentPolyWrap(shift_right(f.poly, tdp), td)
+   return LaurentPolyWrap(parent(f), shift_right(f.poly, tdp), td)
 end
 
 function shift_left(f::LaurentPolyWrap, n::Integer)
    n < 0 && throw(DomainError(n, "n must be >= 0"))
    f = canonicalize(f) # this ensures the underlying polynomial is copied
-   LaurentPolyWrap(f.poly, f.mindeg + n)
+   f.mindeg += n
+   return f
 end
 
 function shift_right(f::LaurentPolyWrap, n::Integer)
    n < 0 && throw(DomainError(n, "n must be >= 0"))
    f = canonicalize(f) # this ensures the underlying polynomial is copied
-   LaurentPolyWrap(f.poly, f.mindeg - n)
+   f.mindeg -= n
+   return f
 end
 
 ###############################################################################
@@ -385,8 +387,8 @@ end
 
 function rand(rng::AbstractRNG,
               sp::SamplerTrivial{<:Make3{<:LaurentPolyWrap, <:LaurentPolyWrapRing}})
-   v, m = sp[][2:end]
-   LaurentPolyWrap(rand(rng, v), m)
+   R, v, m = sp[][1:end]
+   LaurentPolyWrap(R, rand(rng, v), m)
 end
 
 rand(rng::AbstractRNG, S::LaurentPolyWrapRing, degrees_range, v...) =
@@ -406,18 +408,32 @@ rand(S::LaurentPolyWrapRing, degrees_range, v...) =
 
 promote_rule(::Type{L}, ::Type{L}) where {L <: LaurentPolyWrap} = L
 
-function promote_rule(::Type{LaurentPolyWrap{S, T}}, ::Type{U}) where {S, T, U}
-   promote_rule(T, U) == T ? LaurentPolyWrap{S, T} : Union{}
+function promote_rule(::Type{LaurentPolyWrap{S, T, V}}, ::Type{U}) where {S, T, U, V}
+   promote_rule(T, U) == T ? LaurentPolyWrap{S, T, V} : Union{}
 end
 
 ################################################################################
 #
-#  map_coefficients
+#  Change base ring / map_coefficients
 #
 ################################################################################
 
-function map_coefficients(f, p::LaurentPolyWrap)
-    return LaurentPolyWrap(map_coefficients(f, p.poly), p.mindeg)
+function AbstractAlgebra._map(g, p::LaurentPolyWrap, Rx::LaurentPolyWrapRing)
+   return LaurentPolyWrap(Rx,
+                        AbstractAlgebra._map(g, p.poly, Rx.polyring), p.mindeg)
+end
+
+function change_base_ring(R::Ring, p::LaurentPolyWrap; cached::Bool = true,
+                 parent::LaurentPolyWrapRing = LaurentPolyWrapRing(
+         AbstractAlgebra._change_poly_ring(R, parent(p.poly), cached), cached))
+
+   return AbstractAlgebra._map(R, p, parent)
+end
+
+function map_coefficients(g, p::LaurentPolyWrap; cached::Bool = true,
+                       parent::LaurentPolyWrapRing = LaurentPolyWrapRing(
+                      AbstractAlgebra._make_parent(g, p.poly, cached), cached))
+   return AbstractAlgebra._map(g, p, parent)
 end
 
 ###############################################################################
@@ -426,13 +442,14 @@ end
 #
 ###############################################################################
 
-(R::LaurentPolyWrapRing)(b::RingElement) = LaurentPolyWrap(R.polyring(b))
+(R::LaurentPolyWrapRing)(b::RingElement) = LaurentPolyWrap(R, R.polyring(b))
 
-(R::LaurentPolyWrapRing)() = LaurentPolyWrap(R.polyring())
+(R::LaurentPolyWrapRing)(b::RingElement, d::Int) = LaurentPolyWrap(R, R.polyring(b), d)
+
+(R::LaurentPolyWrapRing)() = LaurentPolyWrap(R, R.polyring())
 
 function (R::LaurentPolyWrapRing)(p::LaurentPolyWrap)
-   parent(p) == R ? p :
-                    LaurentPolyWrap(R.polyring(p.poly), p.mindeg)
+   parent(p) == R ? p : LaurentPolyWrap(R, R.polyring(p.poly), p.mindeg)
 end
 
 ###############################################################################
@@ -441,8 +458,9 @@ end
 #
 ###############################################################################
 
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Symbol)
-   P, x = AbstractAlgebra.PolynomialRing(R, s)
-   LaurentPolyWrapRing(P), LaurentPolyWrap(x)
+function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
+   P, x = AbstractAlgebra.PolynomialRing(R, s, cached = cached)
+   R = LaurentPolyWrapRing(P, cached)
+   R, LaurentPolyWrap(R, x)
 end
 

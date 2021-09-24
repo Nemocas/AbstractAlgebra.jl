@@ -488,20 +488,28 @@ end
 
 abstract type LaurentPolynomialRing{T} <: AbstractAlgebra.LaurentPolynomialRing{T} end
 
-struct LaurentPolyWrapRing{T  <: RingElement,
-                           PR <: AbstractAlgebra.PolyRing{T}
-                          } <: LaurentPolynomialRing{T}
+mutable struct LaurentPolyWrapRing{T  <: RingElement,
+                                   PR <: AbstractAlgebra.PolyRing{T}
+                                  } <: LaurentPolynomialRing{T}
    polyring::PR
 
-   function LaurentPolyWrapRing(pr::PR) where {T <: RingElement,
-                                               PR <: AbstractAlgebra.PolyRing{T}}
-      new{T, PR}(pr)
+   function LaurentPolyWrapRing(pr::PR, cached::Bool = true) where {
+                                             T <: RingElement,
+                                             PR <: AbstractAlgebra.PolyRing{T}}
+
+      return get_cached!(LaurentPolyWrapRingID, pr, cached) do
+         new{T, PR}(pr)
+      end::LaurentPolyWrapRing{T, PR}
    end
 end
 
+const LaurentPolyWrapRingID = CacheDictType{Ring, LaurentPolyWrapRing}()
+
 mutable struct LaurentPolyWrap{T  <: RingElement,
-                               PE <: AbstractAlgebra.PolyElem{T}
+                               PE <: AbstractAlgebra.PolyElem{T},
+                               LR <: LaurentPolyWrapRing{T}
                               } <: AbstractAlgebra.LaurentPolyElem{T}
+   parent::LR
    poly::PE
    mindeg::Int
 
@@ -511,9 +519,11 @@ mutable struct LaurentPolyWrap{T  <: RingElement,
    # `LaurentPolyWrap(poly*x^i, mindeg-i)` is another valid representation for the same
    # Laurent polynomial, where i is an integer.
 
-   function LaurentPolyWrap(poly::PE, mindeg::Int=0) where {T  <: RingElement,
-                                                            PE <: AbstractAlgebra.PolyElem{T}}
-      new{T, PE}(poly, mindeg)
+   function LaurentPolyWrap(parent::LR, poly::PE, mindeg::Int = 0) where {
+                                             T  <: RingElement,
+                                             PE <: AbstractAlgebra.PolyElem{T},
+                                             LR <: LaurentPolyWrapRing{T}}
+      new{T, PE, LR}(parent, poly, mindeg)
    end
 end
 
@@ -838,7 +848,7 @@ end
 #
 ###############################################################################
 
-struct RationalFunctionField{T <: FieldElement} <: AbstractAlgebra.Field
+mutable struct RationalFunctionField{T <: FieldElement} <: AbstractAlgebra.Field
    S::Symbol
    fraction_field::FracField{<:PolyElem{T}}
    base_ring::Field
