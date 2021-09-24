@@ -127,9 +127,7 @@ function expressify(@nospecialize(a::ResFieldElem); context = nothing)
    return expressify(data(a), context = context)
 end
 
-function show(io::IO, x::ResFieldElem)
-   print(IOContext(io, :compact => true), data(x))
-end
+@enable_all_show_via_expressify ResFieldElem
 
 function show(io::IO, a::ResField)
    print(IOContext(io, :compact => true), "Residue field of ", base_ring(a), " modulo ", modulus(a))

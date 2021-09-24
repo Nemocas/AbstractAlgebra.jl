@@ -120,13 +120,7 @@ function expressify(a::FracElem; context = nothing)
     end
 end
 
-function show(io::IO, ::MIME"text/plain", a::FracElem)
-  print(io, obj_to_string(a, context = io))
-end
-
-function show(io::IO, a::FracElem)
-  print(io, obj_to_string(a, context = io))
-end
+@enable_all_show_via_expressify FracElem
 
 function show(io::IO, a::FracField)
    print(IOContext(io, :compact => true), "Fraction field of ", base_ring(a))

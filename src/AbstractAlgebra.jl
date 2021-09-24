@@ -141,12 +141,6 @@ export NotInvertibleError, error_dim_negative, ErrorConstrDimMismatch
 
 export crt, factor, factor_squarefree, isirreducible, issquarefree
 
-function expressify
-end
-
-function show_via_expressify
-end
-
 ###############################################################################
 # Macros for fancy printing and extending objects when desired
 # fancy printing (and extending)
@@ -368,6 +362,24 @@ include("julia/JuliaTypes.jl")
 ###############################################################################
 
 include("fundamental_interface.jl")
+
+################################################################################
+#
+#   Printing
+#
+################################################################################
+
+include("PrettyPrinting.jl")
+
+import .PrettyPrinting: get_html_as_latex, set_html_as_latex, expressify,
+                        show_via_expressify, @enable_all_show_via_expressify,
+                        expr_to_string, expr_to_latex_string, canonicalize,
+                        printer, print_integer_string, get_syntactic_sign_abs,
+                        is_syntactic_one, is_syntactic_zero,
+                        obj_to_string, obj_to_string_wrt_times,
+                        obj_to_latex_string, show_obj, print_obj
+
+export @enable_all_show_via_expressify
 
 ###############################################################################
 #
@@ -645,14 +657,6 @@ include("error.jl")
 ###############################################################################
 
 include("Groups.jl")
-
-################################################################################
-#
-#   Printing
-#
-################################################################################
-
-include("PrettyPrinting.jl")
 
 ################################################################################
 #

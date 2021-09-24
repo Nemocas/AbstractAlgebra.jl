@@ -131,13 +131,7 @@ function expressify(a::ResElem; context = nothing)
    return expressify(data(a), context = context)
 end
 
-function show(io::IO, ::MIME"text/plain", a::ResElem)
-  print(io, obj_to_string(a, context = io))
-end
-
-function show(io::IO, a::ResElem)
-  print(io, obj_to_string(a, context = io))
-end
+@enable_all_show_via_expressify ResElem
 
 function show(io::IO, a::ResRing)
    print(IOContext(io, :compact => true), "Residue ring of ", base_ring(a), " modulo ", modulus(a))
