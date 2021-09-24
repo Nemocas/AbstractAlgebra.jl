@@ -5,28 +5,28 @@
 ###############################################################################
 
 export MatrixSpace, add_column, add_column!, add_row, add_row!, can_solve,
-       can_solve_left_reduced_triu, can_solve_with_solution, 
-       can_solve_with_solution_interpolation, charpoly,
-       charpoly_danilevsky!, charpoly_danilevsky_ff!, charpoly_hessenberg!, 
-       _check_dim, _checkbounds, dense_matrix_type, det_popov, diagonal_matrix,
-       extended_weak_popov, extended_weak_popov_with_transform, fflu!, fflu,
-       find_pivot_popov, gram, hessenberg!, hessenberg, hnf, hnf_cohen,
-       hnf_cohen_with_transform, hnf_kb, hnf_kb!, hnf_kb_with_transform,
-       hnf_minors, hnf_minors_with_transform, hnf_via_popov,
-       hnf_via_popov_with_transform, hnf_with_transform, identity_matrix,
-       ishessenberg, ishnf, isinvertible, isinvertible_with_inverse, ispopov,
-       isrref, issnf, issquare, istriu, isweak_popov, iszero_column,
-       iszero_row, kernel, kronecker_product, left_kernel, lu, lu!,
-       map_entries, map_entries!, matrix, minpoly, minors, multiply_column,
-       multiply_column!, multiply_row, multiply_row!, nrows, ncols, pfaffian,
-       pfaffians, popov, popov_with_transform, powers, pseudo_inv,
-       randmat_triu, randmat_with_rank, rank, rank_profile_popov, reverse_cols,
-       reverse_cols!, reverse_rows, reverse_rows!, right_kernel, rref, rref!,
-       rref_rational, rref_rational!, similarity!, snf, snf_with_transform,
-       snf_kb, snf_kb!, snf_kb_with_transform, solve, solve_ff, solve_left,
-       solve_rational, solve_triu, solve_with_det, swap_cols, swap_cols!,
-       swap_rows, swap_rows!, tr, typed_hvcat, typed_hcat, weak_popov,
-       weak_popov_with_transform, zero!, zero_matrix
+       can_solve_left_reduced_triu, can_solve_with_kernel,
+       can_solve_with_solution,  can_solve_with_solution_interpolation,
+       charpoly, charpoly_danilevsky!, charpoly_danilevsky_ff!,
+       charpoly_hessenberg!,_check_dim, _checkbounds, dense_matrix_type,
+       det_popov, diagonal_matrix, extended_weak_popov,
+       extended_weak_popov_with_transform, fflu!, fflu, find_pivot_popov, gram,
+       hessenberg!, hessenberg, hnf, hnf_cohen, hnf_cohen_with_transform,
+       hnf_kb, hnf_kb!, hnf_kb_with_transform, hnf_minors,
+       hnf_minors_with_transform, hnf_via_popov, hnf_via_popov_with_transform,
+       hnf_with_transform, identity_matrix, ishessenberg, ishnf, isinvertible,
+       isinvertible_with_inverse, ispopov, isrref, issnf, issquare, istriu,
+       isweak_popov, iszero_column, iszero_row, kernel, kronecker_product,
+       left_kernel, lu, lu!, map_entries, map_entries!, matrix, minpoly,
+       minors, multiply_column, multiply_column!, multiply_row, multiply_row!,
+       nrows, ncols, pfaffian, pfaffians, popov, popov_with_transform, powers,
+       pseudo_inv, randmat_triu, randmat_with_rank, rank, rank_profile_popov,
+       reverse_cols, reverse_cols!, reverse_rows, reverse_rows!, right_kernel,
+       rref, rref!, rref_rational, rref_rational!, similarity!, snf,
+       snf_with_transform, snf_kb, snf_kb!, snf_kb_with_transform, solve,
+       solve_ff, solve_left, solve_rational, solve_triu, solve_with_det,
+       swap_cols, swap_cols!, swap_rows, swap_rows!, tr, typed_hvcat,
+       typed_hcat, weak_popov, weak_popov_with_transform, zero!, zero_matrix
 
 ###############################################################################
 #
@@ -2787,6 +2787,147 @@ function find_pivot(A::MatElem{T}) where T <: RingElement
     push!(p, j)
   end
   return p
+end
+
+###############################################################################
+#
+#   Solving with kernel
+#
+###############################################################################
+
+function can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}; side = :right) where T <: FieldElement
+  @assert base_ring(A) == base_ring(B)
+  if side === :right
+    @assert nrows(A) == nrows(B)
+    return _can_solve_with_kernel(A, B)
+  elseif side === :left
+    b, C, K = _can_solve_with_kernel(transpose(A), transpose(B))
+    @assert ncols(A) == ncols(B)
+    if b
+      return b, transpose(C), transpose(K)
+    else
+      return b, C, K
+    end
+  else
+    error("Unsupported argument :$side for side: Must be :left or :right")
+  end
+end
+
+function _can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: FieldElement
+  R = base_ring(A)
+  mu = [A B]
+  rk, mu = rref(mu)
+  p = find_pivot(mu)
+  if any(i -> i > ncols(A), p)
+    return false, B, B
+  end
+  sol = zero_matrix(R, ncols(A), ncols(B))
+  for i = 1:length(p)
+    for j = 1:ncols(B)
+      sol[p[i], j] = mu[i, ncols(A) + j]
+    end
+  end
+  nullity = ncols(A) - length(p)
+  X = zero(A, ncols(A), nullity)
+  pivots = zeros(Int, max(nrows(A), ncols(A)))
+  np = rk
+  j = k = 1
+  for i = 1:rk
+    while iszero(mu[i, j])
+      pivots[np + k] = j
+      j += 1
+      k += 1
+    end
+    pivots[i] = j
+    j += 1
+  end
+  while k <= nullity
+    pivots[np + k] = j
+    j += 1
+    k += 1
+  end
+  for i = 1:nullity
+    for j = 1:rk
+      X[pivots[j], i] = -mu[j, pivots[np + i]]
+    end
+    X[pivots[np + i], i] = one(R)
+  end
+  return true, sol, X
+end
+
+@doc Markdown.doc"""
+    can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: RingElement
+
+If $Ax = B$ is soluble, returns `true, S, K` where `S` is a particular solution
+and $K$ is the kernel. Otherwise returns `false, S, K` where $S$ and $K$ are
+undefined, though of the right type for type stability.
+Tries to solve $Ax = B$ for $x$ if `side = :right` or $xA = B$ if `side = :left`.
+"""
+function can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}; side = :right) where T <: RingElement
+  @assert base_ring(A) == base_ring(B)
+  if side === :right
+    @assert nrows(A) == nrows(B)
+    b, c, K =_can_solve_with_kernel(transpose(A), B)
+    return b, transpose(c), K
+  elseif side === :left
+    b, C, K = _can_solve_with_kernel(A, transpose(B))
+    @assert ncols(A) == ncols(B)
+    if b
+      return b, C, transpose(K)
+    else
+      return b, C, K
+    end
+  else
+    error("Unsupported argument :$side for side: Must be :left or :right")
+  end
+end
+
+# Note that _a_ must be supplied transposed and the solution is transposed
+function _can_solve_with_kernel(a::MatElem{S}, b::MatElem{S}) where S <: RingElement
+  H, T = hnf_with_transform(a)
+  z = zero_matrix(base_ring(a), ncols(b), nrows(a))
+  l = min(nrows(a), ncols(a))
+  b = deepcopy(b)
+  for i = 1:ncols(b)
+    for j = 1:l
+      k = 1
+      while k <= ncols(H) && iszero(H[j, k])
+        k += 1
+      end
+      if k > ncols(H)
+        continue
+      end
+      q, r = divrem(b[k, i], H[j, k])
+      if !iszero(r)
+        return false, b, b
+      end
+      for h = k:ncols(H)
+        b[h, i] -= q*H[j, h]
+      end
+      z[i, j] = q
+    end
+  end
+  if !iszero(b)
+    return false, b, b
+  end
+  for i = nrows(H):-1:1
+    for j = 1:ncols(H)
+      if !iszero(H[i, j])
+        N = zero_matrix(base_ring(a), nrows(a), nrows(H) - i)
+        for k = 1:nrows(N)
+          for l = 1:ncols(N)
+            N[k, l] = T[nrows(T) - l + 1, k]
+          end
+        end
+        return true, z*T, N
+      end
+    end
+  end
+  N = zero(a, nrows(a), nrows(H))
+  for i = 1:min(nrows(N), ncols(N))
+     N[i, i] = 1
+  end
+  return true, z*T, N
 end
 
 ###############################################################################
