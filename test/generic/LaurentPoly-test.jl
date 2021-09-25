@@ -355,6 +355,18 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       end
    end
 
+   @testset "derivative" begin
+      for R in (ZZ, QQ, GF(5))
+         L, x = LaurentPolynomialRing(R, "x")
+         @test derivative(zero(L)) == zero(L)
+         @test derivative(one(L)) == zero(L)
+         @test derivative(x) == one(L)
+         @test derivative(x^-5) == -5*x^-6
+         @test derivative(1 + 2*x + x^5) == 2 + 5*x^4
+         @test derivative(x^-5 + x) == -5*x^-6 + 1
+      end
+   end
+
    @testset "unsafe functions" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
 

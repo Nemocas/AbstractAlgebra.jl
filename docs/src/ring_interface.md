@@ -761,7 +761,7 @@ import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type
 import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
              deepcopy_internal, hash
 
-struct ConstPolyRing{T <: RingElement} <: Ring
+mutable struct ConstPolyRing{T <: RingElement} <: Ring
    base_ring::Ring
 
    function ConstPolyRing{T}(R::Ring, cached::Bool) where T <: RingElement
