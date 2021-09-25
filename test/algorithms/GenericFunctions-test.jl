@@ -17,7 +17,7 @@ import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
 
 import Main: test_Ring_interface, test_EuclideanRing_interface, test_elem
 
-struct ConstPolyRing{T <: RingElement} <: Ring
+mutable struct ConstPolyRing{T <: RingElement} <: Ring
    base_ring::Ring
 
    function ConstPolyRing{T}(R::Ring, cached::Bool) where T <: RingElement
