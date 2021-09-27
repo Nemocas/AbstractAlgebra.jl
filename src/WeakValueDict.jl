@@ -1,9 +1,64 @@
-# Weak value dictionaries
-#
-# This file is a modification of base/weakkeydict.jl from the Julia project.
+# Weak value containers
 
 import Base: isempty, setindex!, getkey, length, iterate, empty, delete!, pop!,
        get, sizehint!, copy
+
+################################################################################
+#
+# WeakValueCache
+#
+################################################################################
+
+"""
+`WeakValueCache()` constructs a hash table whose values may be collected at
+anytime and behave as if they have disappeared from the table once collected.
+Putting something into a weak value cache `d[k] = v` and not modifying the
+entry only necessarily means that `d[k] == v` at a later point in time if `v`
+is loosely _in use_ in between.
+"""
+mutable struct WeakValueCache{K, V}
+   data::Dict{K, WeakRef}
+   gen::UInt32
+
+   function WeakValueCache{K, V}() where {K, V}
+      return new{K, V}(Dict{K, WeakRef}(), 0)
+   end
+end
+
+function _clean!(d::WeakValueCache)
+   iszero((d.gen += 1) % 256) || return
+   # It is not clear what this does, but it is supposed to at least try to
+   # cleanup some 'empty' entries, that is, entries whose .value member
+   # has become nothing. It doesn't have to cleanup everything, it would just
+   # be nice if it kept the number of empty entries from running away.
+   i = Base.skip_deleted_floor!(d.data)
+   while i != 0
+      if d.data.vals[i].value === nothing
+         Base._delete!(d.data, i)
+      end
+      i = Base.skip_deleted(d.data, i + 1)
+   end
+end
+
+function Base.get!(default::Base.Callable, d::WeakValueCache, key)
+   if haskey(d.data, key)
+      x = d.data[key].value
+      x == nothing || return x
+   end
+   x = default()
+   Base.setindex!(d.data, WeakRef(x), key)
+   _clean!(d)
+   return x
+end
+
+
+################################################################################
+#
+# WeakValueDict
+# This section is a modification of base/weakkeydict.jl from the Julia project.
+#
+################################################################################
+
 """
     WeakValueDict([itr])
 
