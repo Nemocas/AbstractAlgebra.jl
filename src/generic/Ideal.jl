@@ -42,6 +42,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    up::Union{lmnode{U, V, N}, Nothing}   # out (divisible leading monomials)
    next::Union{lmnode{U, V, N}, Nothing} # extend current node so out-degree can be > 1
    equal::Union{lmnode{U, V, N}, Nothing} # to chain nodes with equal lm
+   reducer::Union{lmnode{U, V, N}, Nothing} # best reducer found so far for node
    lm::NTuple{N, Int}   # leading monomial as exponent vector
    lcm::NTuple{N, Int}  # lcm of lm's in tree rooted here, as exponent vector
    in_heap::Bool # whether node is in the heap
@@ -920,6 +921,16 @@ end
 #
 ###############################################################################
 
+# First stage reduction
+# Do one round of reduction of leading terms by others
+# Each node will be reduced mod the leading coeff of the best node
+# whose leading term divides it and if there are none, by the
+# best node whose leading monomial divides it
+# The reductions are not actually done here; the best reducer
+# is just attached to the node
+function basis_reducer1(B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+end
+
 function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if lm_divides(b, d) # divides in both directions, so equal
       d.equal = b.equal
@@ -950,9 +961,11 @@ function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
          b.up = d
       end
    end
+   compute_lcm(b)
    b.path = true
 end
 
+# insert a node into the basis
 function basis_insert(B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    inserted = false
    for b in B
@@ -965,6 +978,57 @@ function basis_insert(B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyElem{
       push!(B, d)
    end
    clear_path(B)
+end
+
+function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   if lm_divides(b, d) # we have arrived
+      if d.up != nothing
+         d.up = b
+      else
+         n = lmnode{U, V, N}(nothing)
+         n.up = b
+         n.next = d.next
+         d.next = n
+      end
+   else
+      if b.up != nothing
+         if lm_divides_lcm(b.up, d)
+            insert_links(d, b.up)
+         end
+         b2 = b
+         while b2.next != nothing
+            b2 = b2.next
+            if lm_divides_lcm(b.up, d)
+               insert_links(d, b.up)
+            end   
+         end
+      end
+   end
+   b.path = true
+end
+
+# add links from node to existing nodes in basis
+function insert_links(d::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   for b in B
+      if lm_divides_lcm(b, d)
+         insert_links(d, b)
+      end
+   end
+   compute_lcm(d)
+   clear_path(B)
+end
+
+# (Re)compute the lcm for node b (assuming all nodes above it have correct lcm)
+function compute_lcm(b::T)  where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   b.lcm = b.lm
+   if b.up != nothing
+      b.lcm = max.(b.lcm, b.up.lcm)
+   end
+   b2 = b
+   while b2.next != nothing
+      b2 = b2.next
+      b.lcm = max.(b.lcm, b2.up.lcm)
+   end
 end
 
 function clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
@@ -1046,6 +1110,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          # do reduction
          while !isempty(heap)
             d = heappop!(heap)
+            insert_links(d, B2)
             basis_insert(B2, d)
          end
          # extract polynomials from B2
