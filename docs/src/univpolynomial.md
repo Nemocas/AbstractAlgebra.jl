@@ -18,7 +18,7 @@ would consist of two integers. Later, when the ring has more variable, these
 exponent vectors will still be accepted. The exponent vectors are simply padded
 out to the full number of variables behind the scenes.
 
-## Generic sparse distributed multivariable polynomial types
+## Generic sparse distributed universal multivariable polynomial types
 
 AbstractAlgebra provides a generic universal polynomial type `Generic.UnivPoly{T, U}`
 where `T` is the type of elements of the coefficient ring and `U` is the type of
