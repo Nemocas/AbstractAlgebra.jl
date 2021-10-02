@@ -450,7 +450,13 @@ end
 function get!(wkh::WeakValueDict{K}, key, default) where {K}
     v = lock(wkh) do
         if key !== nothing && haskey(wkh.ht, key)
-            wkh.ht[key].value
+            x = wkh.ht[key].value
+            if x === nothing
+                wkh[key] = WeakRef(default)
+                default
+            else
+                x
+            end
         else
             wkh[key] = WeakRef(default)
             default
@@ -462,7 +468,12 @@ function Base.get!(default::Base.Callable, wkh::WeakValueDict{K}, key) where {K}
     v = lock(wkh) do
         _cleanup_locked(wkh)
         if key !== nothing && haskey(wkh.ht, key)
-            wkh.ht[key].value
+            x = wkh.ht[key].value
+            if x === nothing
+                wkh[key] = default()
+            else
+                x
+            end
         else
             wkh[key] = default()
         end
@@ -488,26 +499,34 @@ function Base.get(wkh::WeakValueDict{K, V}, key, default) where {K, V}
         if x === default
             return x
         else
-            return x.value::V
+            y = x.value
+            if y === nothing
+                return default
+            else
+               return y::V
+            end
         end
     end
 end
+
+#### the rest of these look dodgy
+
 function Base.get(default::Base.Callable, wkh::WeakValueDict{K}, key) where {K}
     key === nothing && throw(KeyError(nothing))
     lock(wkh) do
-        return get(default, wkh.ht, key)
+        return get(default, wkh.ht, key)  # ???
     end
 end
 function Base.pop!(wkh::WeakValueDict{K}, key) where {K}
     key === nothing && throw(KeyError(nothing))
     lock(wkh) do
-        return pop!(wkh.ht, key).value
+        return pop!(wkh.ht, key).value  # ???
     end
 end
 function Base.pop!(wkh::WeakValueDict{K}, key, default) where {K}
     key === nothing && return default
     lock(wkh) do
-        return pop!(wkh.ht, key, default)
+        return pop!(wkh.ht, key, default)  # ect.
     end
 end
 function Base.delete!(wkh::WeakValueDict, key)
