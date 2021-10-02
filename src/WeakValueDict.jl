@@ -1,110 +1,60 @@
 # Weak value containers
 
 import Base: isempty, setindex!, getkey, length, iterate, empty, delete!, pop!,
-       get, sizehint!, copy, empty!, haskey, getindex
+       get, sizehint!, copy
+
+#=
+A typical mutable object has a life like
+
+   A. born
+   B. possibly in use and modified by program
+   C. declared dead
+   D. some finalizers may be called on the object (or one of its members)
+   E. actually dead: object's memory is collected
+
+Prior to julia 1.6, the .value of a WeakRef can be an object between D and E
+(https://github.com/JuliaLang/julia/issues/35169) and this is the "correct and
+expected behavior". Julia 1.6 silently introduced a breaking change in the
+WeakRef type: now the .value member cannot be anything past C, that is,
+a WeakRef cannot reach a finalized object. This is a welcomed change and
+greatly simplifies working with weak references.
+
+The following two sections are broken on julia < 1.6
+=#
 
 ################################################################################
 #
 # WeakValueCache
 # This section is a modification of base/dict.jl from the Julia project to
-# support disappearing entries. It might work if isfinalized can be implemented.
+# support disappearing entries. It makes no pretense of satsifying any
+# dictionary interface.
 #
 ################################################################################
-
-#=
-The weak value containers cannot be useful without special modifications to the
-value types. Julia's original sin is that the WeakRef type is broken by design
-(https://github.com/JuliaLang/julia/issues/35169). A typical mutable object
-may have a life like
-
-   A. born
-   B. in use and modified by program
-   C. declared dead
-   D. some finalizers may be called on the object (or one of its members)
-   E. actually dead: object's memory is collected
-
-The problem is that .value of a WeakRef can be an object between D and E. Since
-the finalizers generally put the object into an invalid state, this is useless
-(the stated rationale for this terrible behaviour is that finalizers are capable
-of resurrecting objects from the dead, so state D -> B is possible).
-
-To have a somewhat working WeakValue dictionary or cache, it is necessary to
-know if the object has transitioned past D. For this, we make the assumption
-the finalizers attached do not resurrect objects from the dead, and the
-assumption that the validity of the objects can be determined by a method such
-as `isfinalized`. Examples:
-
-   1. NmodRing: here we have
-
-         mutable struct NmodRing <: Ring
-            n::UInt
-            ninv::UInt
-         end
-
-      and this is fine
-
-         isfinalized(x::NmodRing) = false
-
-   2. FmpzModRing: already things get bad because here we have
-
-         mutable struct FmpzModRing <: Ring
-            n::fmpz
-            ninv::fmpz_mod_ctx_struct
-            isfinalized::Bool          # possible addition to the struct
-         end
-
-      and the fictitious
-
-         isfinalized(x::FmpzModRing) = x.isfinalized
-
-      When this is declared dead, the object itself and the two members can be
-      finalized in any order. We could try not attaching a finalizer to the
-      .ninv, and have the finalizer for the FmpzModRing clean up the
-      .ninv member and set the .isfinalized member to true, but there is no way
-      to know if the finalizer on the .n has run or not, and thus the validity
-      of the FmpzModRing object cannot be determined without special treatment
-      of the .n member
-
-   3. For the arbitrarily nested rings in AA, one would have to essentially
-      reimplement the GC, which is not going to happen.
-=#
-
-# is x an invalid object? i.e. have finalizers on x or any part of x run?
-function isfinalized(x)
-   # v0.22 tests might pass with isfinalized(x) = false and
-   # CacheDictType = WeakValueCache, but this only by luck.
-   error("not implemented")
-   return false
-end
-
-# for the .value member of a WeakRef
-function isdead(x)
-   return x == nothing || isfinalized(x)
-end
-
 
 """
 `WeakValueCache()` constructs a hash table whose values may be collected at
 anytime and behave as if they have disappeared from the table once collected.
 Putting something into a weak value cache `d[k] = v` and not modifying the
 entry only necessarily means that `d[k] == v` at a later point in time if `v`
-is loosely _in use_ in between. `WeakValueCache` does not work unless the
-predicate `isfinalized` is properly implemented for the type of the values.
+is loosely _in use_ in between.
 """
 mutable struct WeakValueCache{K, V}
-   slots::Vector{UInt8}
+   slots::Vector{UInt8} # 0x0 empty, 0x1 filled, 0x2 missing
    keys::Vector{K}
    vals::Vector{WeakRef}
-   nmissing::Int
-   nfilled::Int
-   maxprobe::Int
+   nmissing::Int  # count of 0x2 in slots
+   nfilled::Int   # count of 0x1 in slots
+   maxprobe::Int  # how far past hashindex(key) must we look for key?
+   ndirty::Int    # inc when we see a nothing in the values, reset by cleanall!
    age::UInt64
 
    function WeakValueCache{K, V}() where V where K
       n = 16
-      new(zeros(UInt8,n), Vector{K}(undef, n), Vector{WeakRef}(undef, n), 0, 0, 0, 0)
+      new(zeros(UInt8,n), Vector{K}(undef, n), Vector{WeakRef}(undef, n), 0, 0, 0, 0, 0)
    end
 end
+
+Base.length(h::WeakValueCache) = h.nfilled
 
 function Base.show(io::IO, h::WeakValueCache)
    print(io, "\n")
@@ -115,7 +65,7 @@ function Base.show(io::IO, h::WeakValueCache)
       if isassigned(h.vals, i)
          show(io, h.vals[i])
          x = h.vals[i].value
-         if !isdead(x) && !isimmutable(x)
+         if x !== nothing && ismutable(x)
             print(io, " @ ")
             show(io, pointer_from_objref(x))
          end
@@ -135,43 +85,8 @@ _tablesz(x::Integer) = x < 16 ? 16 : one(x)<<((sizeof(x)<<3)-leading_zeros(x-1))
 
 hashindex(key, sz) = (((hash(key)::UInt % Int) & (sz-1)) + 1)::Int
 
-isslotempty(h::WeakValueCache, i::Int) = h.slots[i] == 0x0
-isslotfilled(h::WeakValueCache, i::Int) = h.slots[i] == 0x1
-isslotmissing(h::WeakValueCache, i::Int) = h.slots[i] == 0x2
-
-function _isconsistent(h::WeakValueCache)
-   nfilled = nmissing = 0
-   for i in 1:length(h.slots)
-      nfilled += isslotfilled(h, i)
-      nmissing += isslotmissing(h, i)
-   end
-   return nfilled == h.nfilled && nmissing == h.nmissing
-end
-
-# missing or filled or empty -> filled
-function _setindex!(h::WeakValueCache, v, key, index)
-   @assert _isconsistent(h)
-   h.keys[index] = key
-   h.vals[index] = v
-   if isslotfilled(h, index)
-      return h
-   elseif isslotmissing(h, index)
-      h.nmissing -= 1
-   end
-   h.nfilled += 1
-   h.slots[index] = 0x1
-   h.age += 1
-   sz = length(h.keys)
-   if h.nmissing*4 > sz*3 || h.nfilled*3 > sz*2
-      rehash!(h, h.nfilled > 64000 ? h.nfilled*2 : h.nfilled*4)
-   end
-   return h
-end
-
 # filled -> missing
 function _deleteindex!(h::WeakValueCache, index) where {K,V}
-   @assert _isconsistent(h)
-   @assert isslotfilled(h, index)
    h.nfilled -= 1
    h.nmissing += 1
    h.slots[index] = 0x2
@@ -181,7 +96,39 @@ function _deleteindex!(h::WeakValueCache, index) where {K,V}
    return h
 end
 
-function rehash!(h::WeakValueCache{K,V}, newsz = length(h.keys)) where V where K
+# cleanup all nothing values
+function cleanall!(h::WeakValueCache)
+   for i in 1:length(h.slots)
+      if h.slots[i] == 1 && h.vals[i].value === nothing
+         _deleteindex!(h, i)
+      end
+   end
+   h.ndirty = 0
+end
+
+# missing or filled or empty -> filled
+function _setindex!(h::WeakValueCache, v, key, index)
+   h.keys[index] = key
+   h.vals[index] = v
+   if h.slots[index] == 0x1
+      return h
+   elseif h.slots[index] == 0x2
+      h.nmissing -= 1
+   end
+   h.nfilled += 1
+   h.slots[index] = 0x1
+   h.age += 1
+   if h.ndirty > 10
+      cleanall!(h)
+   end
+   sz = length(h.keys)
+   if h.nmissing*4 > sz*3 || h.nfilled*3 > sz*2
+      rehash!(h, h.nfilled > 64000 ? h.nfilled*2 : h.nfilled*4)
+   end
+   return h
+end
+
+function rehash!(h::WeakValueCache{K, V}, newsz = length(h.keys)) where {K, V}
    olds = h.slots
    oldk = h.keys
    oldv = h.vals
@@ -205,7 +152,7 @@ function rehash!(h::WeakValueCache{K,V}, newsz = length(h.keys)) where V where K
       if olds[i] == 0x1
          k = oldk[i]
          v = oldv[i]
-         if !isdead(v.value)
+         if v.value !== nothing
             index0 = index = hashindex(k, newsz)
             while slots[index] != 0x0
                index = (index & (newsz-1)) + 1
@@ -228,7 +175,7 @@ function rehash!(h::WeakValueCache{K,V}, newsz = length(h.keys)) where V where K
    return h
 end
 
-function empty!(h::WeakValueCache{K,V}) where V where K
+function Base.empty!(h::WeakValueCache{K,V}) where V where K
    fill!(h.slots, 0x0)
    sz = length(h.slots)
    empty!(h.keys)
@@ -247,13 +194,12 @@ function ht_keyindex(h::WeakValueCache{K,V}, key) where V where K
    iter = 0
    index = hashindex(key, sz)
    while iter <= h.maxprobe
-      if isslotempty(h, index)
+      if h.slots[index] == 0x0
          break
-      elseif isslotfilled(h, index)
+      elseif h.slots[index] == 0x1
          x = h.vals[index].value
-         if isdead(x)
-            # filled -> missing
-            _deleteindex!(h, index)
+         if x === nothing
+            # don't modify h here
          elseif key === h.keys[index] || isequal(key, h.keys[index])
             return index
          end
@@ -267,15 +213,15 @@ end
 # get the index where a key is stored, or -pos if not present
 # and the key would be inserted at pos
 # This version is for use by setindex! and get!
-function ht_keyindex2!(h::WeakValueCache{K,V}, key) where V where K
+function ht_keyindex2!(h::WeakValueCache{K, V}, key) where V where K
    sz = length(h.keys)
    iter = 0
    index = hashindex(key, sz)
    avail = 0
    while iter <= h.maxprobe
-      if isslotempty(h, index)
+      if h.slots[index] == 0x0
          return avail < 0 ? avail : -index
-      elseif isslotmissing(h, index)
+      elseif h.slots[index] == 0x2
          if avail == 0
             # found an available slot, but need to keep scanning
             # in case "key" already exists in a later collided slot.
@@ -283,8 +229,9 @@ function ht_keyindex2!(h::WeakValueCache{K,V}, key) where V where K
          end
       else
          x = h.vals[index].value
-         if isdead(x)
+         if x === nothing
             # filled -> missing
+            h.ndirty += 1
             _deleteindex!(h, index)
             if avail == 0
                # ditto
@@ -300,9 +247,9 @@ function ht_keyindex2!(h::WeakValueCache{K,V}, key) where V where K
    avail < 0 && return avail
    # Check if key is not present, may need to keep searching to find slot
    while iter <= max(16, sz>>6)
-      if isslotfilled(h,index)
+      if h.slots[index] == 0x1
          x = h.vals[index].value
-         if isdead(x)
+         if x === nothing
             h.maxprobe = iter
             return -index
          end
@@ -329,16 +276,16 @@ end
 
 ### getindex / haskey ####
 
-function haskey(h::WeakValueCache, key)
+function Base.haskey(h::WeakValueCache, key)
    index = ht_keyindex(h, key)
-   return index > 0 && !isdead(h.vals[index].value)
+   return index > 0 && h.vals[index].value !== nothing
 end
 
-function getindex(h::WeakValueCache{K, V}, key) where {K, V}
+function Base.getindex(h::WeakValueCache{K, V}, key) where {K, V}
    index = ht_keyindex(h, key)
    if index > 0
       x = h.vals[index].value
-      if !isdead(x)
+      if x !== nothing
          return x::V
       end
    end
@@ -347,17 +294,17 @@ end
 
 ### get! ####
 
-function Base.get!(default::Base.Callable, h::WeakValueCache{K, V}, key0) where {K, V}
+function Base.get!(default, h::WeakValueCache{K, V}, key0) where {K, V}
    key = convert(K, key0)
    isequal(key, key0) || throw(ArgumentError("$key0 is not a valid key for type $K"))
    return get!(default, h, key)
 end
 
-function Base.get!(default::Base.Callable, h::WeakValueCache{K, V}, key::K) where {K, V}
+function Base.get!(default, h::WeakValueCache{K, V}, key::K) where {K, V}
    index = ht_keyindex2!(h, key)
    if index > 0
       x = h.vals[index].value
-      if !isdead(x)
+      if x !== nothing
          return x::V
       end
    else
@@ -393,16 +340,12 @@ end
 ################################################################################
 #
 # WeakValueDict
-# This section is a modification of base/weakkeydict.jl from the Julia project,
-#  and cannot be made to work without substantial changes.
+# This section is a modification of base/weakkeydict.jl from the Julia project.
+# It pretends to satisfy the dictionary interface.
 #
 ################################################################################
 
-#=
-This WeakValueDict is broken because it does not attempt to recognize invalid
-objects. The locks here are used to prevent finalizers from running while the
-internal ht is being modified/inspected, but this neither useful nor necessary.
-=#
+# TODO figure out what the locks here are accomplishing
 
 """
     WeakValueDict([itr])

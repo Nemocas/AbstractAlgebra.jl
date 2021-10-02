@@ -324,8 +324,10 @@ include("WeakValueDict.jl")
 #
 ###############################################################################
 
-@static if false # VERSION >= v"1.6"
-  const CacheDictType = WeakValueDict
+@static if VERSION >= v"1.6"
+#  const CacheDictType = Dict
+  const CacheDictType = WeakValueCache
+#  const CacheDictType = WeakValueDict
 else
   const CacheDictType = Dict
 end
