@@ -1,4 +1,104 @@
+WeakValueCache = AbstractAlgebra.WeakValueCache
 WeakValueDict = AbstractAlgebra.WeakValueDict
+
+@testset "WeakValueCache" begin
+   d = WeakValueCache{BigInt, BigInt}()
+   ddef  = Dict{BigInt, BigInt}()
+   dmay  = Dict{BigInt, BigInt}()
+   for k in 1:30
+      for i in 1:20
+         for j in 1:2
+            x = BigInt(rand(1:999))
+            y = BigInt(rand(1:999))
+            ddef[x] = y
+            d[x] = y
+            y = deepcopy(y)
+            @test d[x] == y
+            @test ddef[x] == y
+         end
+         x = BigInt(rand(1:999))      
+         delete!(ddef, x)
+         delete!(d, x)
+         @test !haskey(d, x)
+         x = BigInt(rand(1:999))
+         @test get(d, x, BigInt(0)) == get(ddef, x, BigInt(0))
+
+         @test length(d) >= length(ddef)
+
+         for j in 1:2
+            x = BigInt(-rand(1:999))
+            y = BigInt(-rand(1:999))
+            dmay[x] = y
+            d[x] = deepcopy(y)
+            @test get(d, x, y) == dmay[x]
+         end
+         x = BigInt(-rand(1:999))
+         delete!(dmay, x)
+         delete!(d, x)
+         @test !haskey(d, x)
+         x = BigInt(rand(1:999))
+         y = get(dmay, x, nothing)
+         @test y == nothing || get(d, x, y) == y
+      end
+      GC.gc(true)
+   end
+
+   empty!(d)
+   empty!(ddef)
+   empty!(dmay)
+   for k in 1:30
+      for i in 1:20
+         for j in 1:2
+            x = BigInt(rand(1:999))
+            y = BigInt(rand(1:999))
+            ddef[x] = y
+            delete!(d, x)
+            @test (get!(d, x) do; return y; end) == y
+            y = deepcopy(y)
+            @test d[x] == y
+            @test ddef[x] == y
+         end
+         x = BigInt(rand(1:999))      
+         delete!(ddef, x)
+         delete!(d, x)
+         @test !haskey(d, x)
+         x = BigInt(rand(1:999))
+         @test get(d, x, BigInt(0)) == get(ddef, x, BigInt(0))
+
+         @test length(d) >= length(ddef)
+
+         for j in 1:2
+            x = BigInt(-rand(1:999))
+            y = BigInt(-rand(1:999))
+            dmay[x] = y
+            delete!(d, x)
+            @test (get!(d, x) do; return deepcopy(y); end) == dmay[x]
+            @test (get!(d, Int(x)) do; return deepcopy(y); end) == dmay[x]
+         end
+         x = BigInt(-rand(1:999))
+         delete!(dmay, x)
+         delete!(d, x)
+         @test !haskey(d, x)
+         x = BigInt(rand(1:999))
+         y = get(dmay, x, nothing)
+         @test y == nothing || get(d, x, y) == y
+      end
+      GC.gc(true)
+   end
+
+   # test get! where default modifies d
+   empty!(d)
+   AbstractAlgebra.rehash!(d, 5)
+   empty!(ddef)
+   x = BigInt(1)
+   y = BigInt(2)
+   ddef[1] = x
+   ddef[2] = y
+   get!(d, 2) do; d[1] = x; return y; end
+   @test d[1] == x
+   @test d[2] == y
+   @test length(string(d)) > 3
+end
 
 @testset "WeakValueDict" begin
     A = [1]

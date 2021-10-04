@@ -46,9 +46,9 @@ mutable struct WeakValueCache{K, V}
    nfilled::Int   # count of 0x1 in slots
    maxprobe::Int  # how far past hashindex(key) must we look for key?
    ndirty::Int    # inc when we see a nothing in the values, reset by cleanall!
-   age::UInt64
+   age::UInt64    # only used for an optimization in get!(default, ...)
 
-   function WeakValueCache{K, V}() where V where K
+   function WeakValueCache{K, V}() where {K, V}
       n = 16
       new(zeros(UInt8,n), Vector{K}(undef, n), Vector{WeakRef}(undef, n), 0, 0, 0, 0, 0)
    end
@@ -86,7 +86,7 @@ _tablesz(x::Integer) = x < 16 ? 16 : one(x)<<((sizeof(x)<<3)-leading_zeros(x-1))
 hashindex(key, sz) = (((hash(key)::UInt % Int) & (sz-1)) + 1)::Int
 
 # filled -> missing
-function _deleteindex!(h::WeakValueCache, index) where {K,V}
+function _deleteindex!(h::WeakValueCache, index) where {K, V}
    h.nfilled -= 1
    h.nmissing += 1
    h.slots[index] = 0x2
@@ -175,7 +175,7 @@ function rehash!(h::WeakValueCache{K, V}, newsz = length(h.keys)) where {K, V}
    return h
 end
 
-function Base.empty!(h::WeakValueCache{K,V}) where V where K
+function Base.empty!(h::WeakValueCache{K, V}) where {K, V}
    fill!(h.slots, 0x0)
    sz = length(h.slots)
    empty!(h.keys)
@@ -189,7 +189,7 @@ function Base.empty!(h::WeakValueCache{K,V}) where V where K
 end
 
 # get the index where a key is stored, or -1 if not present
-function ht_keyindex(h::WeakValueCache{K,V}, key) where V where K
+function ht_keyindex(h::WeakValueCache{K, V}, key) where {K, V}
    sz = length(h.keys)
    iter = 0
    index = hashindex(key, sz)
@@ -213,7 +213,7 @@ end
 # get the index where a key is stored, or -pos if not present
 # and the key would be inserted at pos
 # This version is for use by setindex! and get!
-function ht_keyindex2!(h::WeakValueCache{K, V}, key) where V where K
+function ht_keyindex2!(h::WeakValueCache{K, V}, key) where {K, V}
    sz = length(h.keys)
    iter = 0
    index = hashindex(key, sz)
@@ -292,12 +292,23 @@ function Base.getindex(h::WeakValueCache{K, V}, key) where {K, V}
    throw(KeyError(key))
 end
 
+function Base.get(h::WeakValueCache{K, V}, key, default) where {K, V}
+   index = ht_keyindex(h, key)
+   if index > 0
+      x = h.vals[index].value
+      if x !== nothing
+         return x::V
+      end
+   end
+   return default
+end
+
 ### get! ####
 
 function Base.get!(default, h::WeakValueCache{K, V}, key0) where {K, V}
    key = convert(K, key0)
    isequal(key, key0) || throw(ArgumentError("$key0 is not a valid key for type $K"))
-   return get!(default, h, key)
+   return Base.get!(default, h, key)
 end
 
 function Base.get!(default, h::WeakValueCache{K, V}, key::K) where {K, V}
@@ -329,7 +340,8 @@ function setindex!(h::WeakValueCache{K, V}, v0, key0) where {K, V}
    setindex!(h, v0, key)
 end
 
-function setindex!(h::WeakValueCache{K, V}, v0, key::K) where V where K
+# the WeakRef makes key conversion essentially useless
+function setindex!(h::WeakValueCache{K, V}, v0, key::K) where {K, V}
    x = convert(V, v0)
    index = ht_keyindex2!(h, key)
    _setindex!(h, WeakRef(x), key, abs(index))
