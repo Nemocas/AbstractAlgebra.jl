@@ -56,6 +56,13 @@ end
 
 basis(N::FreeModule) = gens(N)
 
+function Base.hash(a::FreeModuleElem, h::UInt)
+   b = 0x3a1fe8d97f5f372e%UInt
+   b = xor(b, xor(hash(a.v, h), h))
+   b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   return b
+end
+
 ###############################################################################
 #
 #   String I/O
