@@ -185,6 +185,24 @@ function *(a::NCPolyElem{T}, b::T) where T <: NCRingElem
    return z
 end
 
+function +(a::T, b::NCPolyElem{T}) where {T <: NCRingElem}
+   z = deepcopy(b)
+   len = length(z)
+   z = setcoeff!(z, 0, a + coeff(b, 0))
+   z = set_length!(z, normalise(z, len))
+   return z
+end
+
++(a::NCPolyElem{T}, b::T) where {T <: NCRingElem} =  b + a
+
++(a::Union{Integer, Rational}, b::NCPolyElem{T}) where {T <: NCRingElem} =  parent(b)(a) + b
+
++(a::NCPolyElem{T}, b::Union{Integer, Rational}) where {T <: NCRingElem} =  b + a
+
+-(a::Union{Integer, Rational}, b::NCPolyElem{T}) where {T <: NCRingElem} =  parent(b)(a) - b
+
+-(a::NCPolyElem{T}, b::Union{Integer, Rational}) where {T <: NCRingElem} =  a - parent(a)(b)
+
 ###############################################################################
 #
 #   Powering

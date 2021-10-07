@@ -166,6 +166,13 @@ end
       @test f*d1 - f*d2 == f*(d1 - d2)
       @test f*d1 + f*d2 == f*(d1 + d2)
    end
+
+   # Fix for some ambiguity
+   QQx, x = QQ["x"]
+   y = gen(Generic.NCPolyRing{elem_type(QQx)}(QQx, :y, false))
+   @test y * x == x * y
+   @test y - 2 == -(2 - y)
+   @test y - QQ(2) == -(QQ(2) - y)
 end
 
 @testset "Generic.NCPoly.comparison" begin
