@@ -56,6 +56,8 @@ end
 
 basis(N::FreeModule) = gens(N)
 
+Base.hash(a::FreeModuleElem, h::UInt) = hash(a.v, u)
+
 ###############################################################################
 #
 #   String I/O
