@@ -165,6 +165,10 @@ function promote_rule(::Type{NCPoly{T}}, ::Type{U}) where {T <: NCRingElem, U <:
    promote_rule(T, U) == T ? NCPoly{T} : Union{}
 end
 
+function promote_rule(::Type{NCPoly{T}}, ::Type{U}) where {T <: NCRingElem, U <: Union{Rational, Integer}}
+   promote_rule(T, U) === T ? NCPoly{T} : Union{}
+end
+
 ###############################################################################
 #
 #   Parent object call overload
