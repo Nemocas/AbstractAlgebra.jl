@@ -43,6 +43,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    next::Union{lmnode{U, V, N}, Nothing} # extend current node so out-degree can be > 1
    equal::Union{lmnode{U, V, N}, Nothing} # to chain nodes with equal lm
    reducer::Union{lmnode{U, V, N}, Nothing} # best reducer found so far for node
+   index::Int # index within best reducer array
    lm::NTuple{N, Int}   # leading monomial as exponent vector
    lcm::NTuple{N, Int}  # lcm of lm's in tree rooted here, as exponent vector
    in_heap::Bool # whether node is in the heap
@@ -50,7 +51,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    path2::Bool # mark paths when following existing paths
 
    function lmnode{U, V, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
-      node = new{U, V, N}(p, nothing, nothing, nothing)
+      node = new{U, V, N}(p, nothing, nothing, nothing, nothing, 0)
       if p != nothing && !iszero(p)
          node.lm = Tuple(exponent_vector(p, 1))
          node.lcm = node.lm
@@ -921,14 +922,126 @@ end
 #
 ###############################################################################
 
-# First stage reduction
+function smod(c::T, h::T) where T <: RingElement
+   if h < 0
+      h = abs(h)
+   end
+   r = AbstractAlgebra.mod(c, h)
+   if r >= ((h + 1) >> 1)
+      r -= h
+   end
+   return r
+end
+
+# heuristic for size of reducer polynomials (smaller is better), used to sort
+# potential reducers
+function reducer_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   s = 0.0
+   # heuristic really punishes polys with lots of terms
+   for i = 1:length(f.poly)
+      c = coeff(f.poly, i)
+      if !iszero(c)
+         s += Base.log(ndigits(c; base=2))*i*i
+      end
+   end
+   return s
+end
+
+# used for heuristics, to select one kind of reducer over another preferentially
+# current strategy is to prefer reducer which gives degree reduction over
+# everything else, but this is probably wrong based on what Singular does
+# function will return best reducer in sorted list X for reducing b
+function find_best_reducer(b::T, X::Vector{T}, best::Union{T, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   c = leading_coefficient(b.poly)
+   best_divides = false
+   if best != nothing
+      best_divides = divides(c, leading_coefficient(best.poly))[1]
+   end
+   # check first for leading coefficient that divides c
+   for i = length(X):-1:1
+      if X[i] != b # poly can't be reduced by itself
+         if divides(c, leading_coefficient(X[i].poly))[1]
+            if best == nothing
+               return X[i]
+            else
+               if !best_divides
+                  return X[i]
+               else
+                  if reducer_size(X[i]) < reducer_size(best)
+                     return X[i]
+                  else
+                     return best # already the best
+                  end
+               end
+            end
+         end
+      end
+   end
+   # check for leading coefficient that will reduce c
+   if !best_divides
+      for i = length(X):-1:1
+         if X[i] != b # poly can't be reduced by itself
+            if smod(c, leading_coefficient(X[i].poly)) != c
+               if best == nothing || reducer_size(X[i]) < reducer_size(best)
+                  return X[i]
+               else
+                  return best # already the best
+               end
+            end
+         end
+      end
+   end
+   return best 
+end
+
+# attach best reducer to each node in tree
+# see best_reducer description below for details
+function best_reducer(b::T, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   # insert nodes equal to b in X
+   b2 = b
+   oldindex = 0 # index of previous equal node in X, 0 terminates list
+   while b2 != nothing
+      index = searchsortedfirst(X, b2, by=reducer_size, rev=true) # find index at which to insert x
+      b2.index = oldindex
+      insert!(X, index, b2)
+      oldindex = index
+      b2 = b2.equal
+   end
+   # set best reducer of B for each node equal to b
+   b2 = b
+   while b2 != nothing
+      b2.reducer = find_best_reducer(b2::T, X::Vector{T}, b2.reducer)
+      b2 = b2.equal
+   end
+   # recurse to b.up, b.next etc
+   if b.up != nothing
+      best_reducer(b.up, X)
+      b2 = b
+      while b2.next != nothing
+         b2 = b2.next
+         best_reducer(b2.up, X)
+      end
+   end
+   # remove nodes equal to b from X
+   while oldindex != 0
+      index = X[oldindex].index
+      deleteat!(X, oldindex)
+      oldindex = index
+   end
+end
+
 # Setup for one round of reduction of leading terms by others
 # Each node will be reduced mod the leading coeff of the best node
 # whose leading term divides it and if there are none, by the
 # best node whose leading monomial divides it
 # The reductions are not actually done here; the best reducer
 # is just attached to the node
-function basis_reducer1(B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+# The best reducers along the current path so far are given by the
+# ordered array X
+function best_reducer(B::Vector{T}, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   for b in B
+      best_reducer(b, X)
+   end
 end
 
 # insert a node into the given branch of basis
@@ -1114,12 +1227,16 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          end
          B2 = [d]
          X = lmnode{U, V, N}[] # fragments
-         # do reduction
+         # insert everything in tree
          while !isempty(heap)
             d = heappop!(heap)
             insert_links(d, B2)
             basis_insert(B2, d)
          end
+         # do reduction
+         X = Vector{lmnode{U, V, N}}()
+         # attach best reducers to nodes
+         best_reducer(B2, X)
          # extract polynomials from B2
          B = extract_gens(B2)
       end
