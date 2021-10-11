@@ -917,12 +917,12 @@ end
 
 ###############################################################################
 #
-#   Ideal reduction for mulivariates over Euclidean domain (new implementation)
+#   Ideal reduction for multivariates over Euclidean domain (new implementation)
 #
 ###############################################################################
 
 # First stage reduction
-# Do one round of reduction of leading terms by others
+# Setup for one round of reduction of leading terms by others
 # Each node will be reduced mod the leading coeff of the best node
 # whose leading term divides it and if there are none, by the
 # best node whose leading monomial divides it
@@ -931,6 +931,7 @@ end
 function basis_reducer1(B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
 end
 
+# insert a node into the given branch of basis
 function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if lm_divides(b, d) # divides in both directions, so equal
       d.equal = b.equal
@@ -980,6 +981,7 @@ function basis_insert(B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyElem{
    clear_path(B)
 end
 
+# insert link from d to nodes it divides
 function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if lm_divides(b, d) # we have arrived
       if d.up != nothing
@@ -1007,7 +1009,7 @@ function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
    b.path = true
 end
 
-# add links from node to existing nodes in basis
+# add links from node d to existing nodes in basis that it divides
 function insert_links(d::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    for b in B
       if lm_divides_lcm(b, d)
@@ -1031,6 +1033,7 @@ function compute_lcm(b::T)  where {U <: AbstractAlgebra.MPolyElem{<:RingElement}
    end
 end
 
+# clear all path flags in given branch
 function clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if b.up != nothing
       if b.up.path
@@ -1047,12 +1050,14 @@ function clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, 
    b.path = false # clear path flag
 end
 
+# clear all path flags in basis
 function clear_path(B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    for b in B
       clear_path(b)
    end
 end
 
+# extract generators from branch and store in array D
 function extract_gens(D::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPolyElem, V, T <: lmnode{U, V, N}}
    # depth first
    if node.up != nothing
@@ -1075,6 +1080,7 @@ function extract_gens(D::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPol
    return nothing
 end
 
+# extract all generators from basis into array D which is returned
 function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, V, T <: lmnode{U, V, N}}
    D = Vector{U}()
    for node in B
@@ -1083,6 +1089,7 @@ function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, V,
    return D
 end
 
+# main reduction routine
 function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    if hasmethod(gcdx, Tuple{T, T})
       B = gens(I)
