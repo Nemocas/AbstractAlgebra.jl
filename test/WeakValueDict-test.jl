@@ -1,9 +1,12 @@
 WeakValueCache = AbstractAlgebra.WeakValueCache
 WeakValueDict = AbstractAlgebra.WeakValueDict
 
+if VERSION >= v"1.6"
 @testset "WeakValueCache" begin
    d = WeakValueCache{BigInt, BigInt}()
+   # keys missing from/present in ddeg are definitely missing from/present in d
    ddef  = Dict{BigInt, BigInt}()
+   # if a key is in d, its value should match that of dmay
    dmay  = Dict{BigInt, BigInt}()
    for k in 1:30
       for i in 1:20
@@ -99,6 +102,7 @@ WeakValueDict = AbstractAlgebra.WeakValueDict
    @test d[2] == y
    @test length(string(d)) > 3
 end
+end # if VERSION >= v"1.6"
 
 @testset "WeakValueDict" begin
     A = [1]
