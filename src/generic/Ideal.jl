@@ -947,6 +947,71 @@ function reducer_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}
    return s
 end
 
+function leading_coefficient_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   return abs(leading_coefficient(f.poly))
+end
+
+function reduce_by_reducer(H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   reduced = false
+   if b.reducer != nothing
+      reduced = true
+   end
+   return reduced
+end
+
+# reduce nodes in a tree depth first
+# X is used to sort equal nodes
+# H is used for fragments
+# returns true if some reduction actually occurred
+function reduce_nodes(H::Vector{T}, b::T, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   b.path = true
+   # depth first
+   reduced = false
+   if b.up != nothing
+      if !b.up.path
+         reduced |= reduce_nodes(H, b.up, X)
+      end
+      b2 = b
+      while b2.next != nothing
+         b2 = b2.next
+         if !b2.up.path
+            reduced |= reduce_nodes(H, b2.up, X)
+         end
+      end
+   end
+   # reduce nodes equal to b
+   # first sort nodes by leading coefficient
+   push!(X, b)
+   b2 = b
+   while b2.equal != nothing
+      b2 = b2.equal
+      index = searchsortedfirst(X, b2, by=leading_coefficient_size, rev=true) # find index at which to insert x
+   end
+   # do reductions
+   for b in X
+      reduced |= reduce_by_reducer(H, b)
+   end   
+   # empty X
+   while !isempty(X)
+      pop!(X)
+   end
+   return reduced
+end
+
+# actually performs the reductions which have been attached to nodes by best_reducer
+# X is used to sort equal nodes
+# H is used for fragments
+# returns true if some reduction actually occurred
+function reduce_nodes(H::Vector{T}, B::Vector{T}, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   reduced = false
+   for b in B
+      if !b.path
+         reduced |= reduce_nodes(H, b, X)
+      end
+   end
+   return reduced
+end
+
 # used for heuristics, to select one kind of reducer over another preferentially
 # current strategy is to prefer reducer which gives degree reduction over
 # everything else, but this is probably wrong based on what Singular does
@@ -1235,8 +1300,11 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          end
          # do reduction
          X = Vector{lmnode{U, V, N}}()
+         H = Vector{lmnode{U, V, N}}()
          # attach best reducers to nodes
          best_reducer(B2, X)
+         # do reductions
+         reduce_nodes(H, B2, X)
          # extract polynomials from B2
          B = extract_gens(B2)
       end
