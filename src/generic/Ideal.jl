@@ -983,11 +983,12 @@ end
 function reducer_size(f::Tuple{Int, T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    s = 0.0
    # heuristic really punishes polys with lots of terms
-   for i = 1:length(f[2].poly)
+   len = length(f[2].poly)
+   j = len
+   for i = 1:len
       c = coeff(f[2].poly, i)
-      if !iszero(c)
-         s += Base.log(ndigits(c; base=2))*i*i
-      end
+      s += Base.log(ndigits(c; base=2))*j*j
+      j -= 1      
    end
    return s
 end
