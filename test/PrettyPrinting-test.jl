@@ -107,14 +107,16 @@
    end
 
    @test latex_string(Symbol("a")) == "a"
+   @test latex_string(Symbol("a_1")) == "a_{1}"
    @test latex_string(Symbol("α")) == "{\\alpha}"
-   @test latex_string(Symbol("x1")) == "\\operatorname{x1}"
-   @test latex_string(Symbol("xy_1")) == "\\operatorname{xy}_{1}"
-   @test latex_string(Symbol("sin")) == "\\operatorname{sin}"
-   @test latex_string(Symbol("sin_cos")) == "\\operatorname{sin\\_cos}"
-   @test latex_string(Symbol("sin_1")) == "\\operatorname{sin}_{1}"
-   @test latex_string(Symbol("sin_cos_1")) == "\\operatorname{sin\\_cos}_{1}"
-   @test latex_string(Symbol("αaβb_1_2")) == "\\operatorname{{\\alpha}a{\\beta}b}_{1,2}"
+   @test latex_string(Symbol("α_1")) == "{\\alpha}_{1}"
+   @test latex_string(Symbol("x1")) == "\\mathop{\\mathrm{x1}}"
+   @test latex_string(Symbol("xy_1")) == "\\mathop{\\mathrm{xy}}_{1}"
+   @test latex_string(Symbol("sin")) == "\\mathop{\\mathrm{sin}}"
+   @test latex_string(Symbol("sin_cos")) == "\\mathop{\\mathrm{sin\\_cos}}"
+   @test latex_string(Symbol("sin_1")) == "\\mathop{\\mathrm{sin}}_{1}"
+   @test latex_string(Symbol("sin_cos_1")) == "\\mathop{\\mathrm{sin\\_cos}}_{1}"
+   @test latex_string(Symbol("αaβb_1_2")) == "\\mathop{\\mathrm{{\\alpha}a{\\beta}b}}_{1,2}"
 
    @test latex_string(:(+())) == "0"
    @test latex_string(:(-())) == "0"
@@ -141,7 +143,7 @@
    @test latex_string(:(a+sqrt(b*c))) == "a + \\sqrt{b c}"
    @test latex_string(:(sqrt(a)^b)) == "\\left(\\sqrt{a}\\right)^{b}"
    @test latex_string(:((a//b)^c)) == "\\left(\\frac{a}{b}\\right)^{c}"
-   @test latex_string(:(ff(-a)*-b)) == "-\\operatorname{ff}\\left(-a\\right) b"
+   @test latex_string(:(ff(-a)*-b)) == "-\\mathop{\\mathrm{ff}}\\left(-a\\right) b"
    @test latex_string(:(a^(-b//c) - ((-a)*b)*c - ((a*b)*(-c*d)))) ==
                                          "a^{-\\frac{b}{c}} + a b c + a b c d"                             
    @test latex_string(:((-a//b)*c+d*(e//f)*g^h + ((-i)*j)//k^l)) ==
