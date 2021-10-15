@@ -245,21 +245,24 @@ julia> M = R()
 [0   0]
 ```
 
-## Block matrix constructors
+## Block diagonal matrix constructors
 
 It is also possible to create block diagonal matrices from a vector of
 existing matrices. It is also possible to construct them from Julia
 matrices if one supplies the base ring.
 
+Note that if the input matrices are not square, the output matrix may
+not be square.
+
 ```@docs
-block_matrix(::Vector{<:MatElem{T}}) where T <: RingElement
-block_matrix(::Ring, ::Vector{<:Matrix{T}}) where T <: RingElement
+block_diagonal_matrix(::Vector{<:MatElem{T}}) where T <: RingElement
+block_diagonal_matrix(::Ring, ::Vector{<:Matrix{T}}) where T <: RingElement
 ```
 
 **Examples**
 
 ```jldoctest
-julia> block_matrix(ZZ, [[1 2; 3 4], [4 5 6; 7 8 9]])
+julia> block_diagonal_matrix(ZZ, [[1 2; 3 4], [4 5 6; 7 8 9]])
 [1   2   0   0   0]
 [3   4   0   0   0]
 [0   0   4   5   6]
@@ -273,7 +276,7 @@ julia> N = matrix(ZZ, [4 5 6; 7 8 9])
 [4   5   6]
 [7   8   9]
 
-julia> block_matrix([M, N])
+julia> block_diagonal_matrix([M, N])
 [1   2   0   0   0]
 [3   4   0   0   0]
 [0   0   4   5   6]

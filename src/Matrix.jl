@@ -5,7 +5,7 @@
 ###############################################################################
 
 export MatrixSpace, add_column, add_column!, add_row, add_row!,
-       block_matrix, can_solve,
+       block_diagonal_matrix, can_solve,
        can_solve_left_reduced_triu, can_solve_with_kernel,
        can_solve_with_solution,  can_solve_with_solution_interpolation,
        charpoly, charpoly_danilevsky!, charpoly_danilevsky_ff!,
@@ -262,17 +262,17 @@ end
 
 ###############################################################################
 #
-#   Block matrices    
+#   Block diagonal matrices    
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    block_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
+    block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
 
 Create the block diagonal matrix whose blocks are given by the matrices in `V`.
 There must be at least one matrix in V.
 """
-function block_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
+function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
    length(V) > 0 || error("At least one matrix is required")
    rows = sum(nrows(N) for N in V)
    cols = sum(ncols(N) for N in V)
@@ -301,14 +301,14 @@ function block_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-   block_matrix(R::Ring, V::Vector{<:Matrix{T}}) where T <: RingElement
+   block_diagonal_matrix(R::Ring, V::Vector{<:Matrix{T}}) where T <: RingElement
 
 Create the block diagonal matrix over the ring `R` whose blocks are given
 by the matrices in `V`. Entries are coerced into `R` upon creation.
 """
-function block_matrix(R::Ring, V::Vector{<:Matrix{T}}) where T <: RingElement
+function block_diagonal_matrix(R::Ring, V::Vector{<:Matrix{T}}) where T <: RingElement
    if length(V) == 0
-      return matrix(R, Matrix{T}(undef, (0, 0)))
+      return zero_matrix(R, 0, 0)
    end
    rows = sum(size(N)[1] for N in V)
    cols = sum(size(N)[2] for N in V)
