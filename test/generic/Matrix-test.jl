@@ -297,12 +297,12 @@ end
    N = matrix(ZZ, N1)
    K = matrix(ZZ, K1)
 
-   @test block_matrix([M, N, K]) == matrix(ZZ, [1 2 0 0 0; 3 4 0 0 0; 0 0 5 6 7; 0 0 8 9 10; 0 0 0 0 0; 0 0 0 0 0])
-   @test block_matrix([K]) == matrix(ZZ, 2, 0, [])
+   @test block_diagonal_matrix([M, N, K]) == matrix(ZZ, [1 2 0 0 0; 3 4 0 0 0; 0 0 5 6 7; 0 0 8 9 10; 0 0 0 0 0; 0 0 0 0 0])
+   @test block_diagonal_matrix([K]) == matrix(ZZ, 2, 0, [])
 
-   @test block_matrix(ZZ, Matrix{Int}[]) == matrix(ZZ, 0, 0, [])
-   @test block_matrix(ZZ, [M1, N1, K1]) == block_matrix([M, N, K])
-   @test block_matrix(ZZ, [K1]) == block_matrix([K])
+   @test block_diagonal_matrix(ZZ, Matrix{Int}[]) == matrix(ZZ, 0, 0, [])
+   @test block_diagonal_matrix(ZZ, [M1, N1, K1]) == block_diagonal_matrix([M, N, K])
+   @test block_diagonal_matrix(ZZ, [K1]) == block_diagonal_matrix([K])
 end
 
 @testset "Generic.Mat.size/axes" begin
