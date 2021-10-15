@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export MatrixSpace, add_column, add_column!, add_row, add_row!, can_solve,
+export MatrixSpace, add_column, add_column!, add_row, add_row!,
+       block_matrix, can_solve,
        can_solve_left_reduced_triu, can_solve_with_kernel,
        can_solve_with_solution,  can_solve_with_solution_interpolation,
        charpoly, charpoly_danilevsky!, charpoly_danilevsky_ff!,
@@ -257,6 +258,75 @@ function iszero_column(M::MatrixElem{T}, i::Int) where T <: RingElement
     end
   end
   return true
+end
+
+###############################################################################
+#
+#   Block matrices    
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    block_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
+
+Create the block diagonal matrix whose blocks are given by the matrices in `V`.
+There must be at least one matrix in V.
+"""
+function block_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
+   length(V) > 0 || error("At least one matrix is required")
+   rows = sum(nrows(N) for N in V)
+   cols = sum(ncols(N) for N in V)
+   R = base_ring(V[1])
+   M = similar(V[1], rows, cols)
+   start_row = 1
+   start_col = 1
+   for i = 1:length(V)
+      end_row = start_row + nrows(V[i]) - 1
+      end_col = start_col + ncols(V[i]) - 1
+      for j = start_row:end_row
+         for k = 1:start_col - 1
+            M[j, k] = zero(R)
+         end
+         for k = start_col:end_col
+            M[j, k] = V[i][j - start_row + 1, k - start_col + 1]
+         end
+         for k = end_col + 1:cols
+            M[j, k] = zero(R)
+         end
+      end
+      start_row = end_row + 1
+      start_col = end_col + 1
+   end
+   return M
+end
+
+@doc Markdown.doc"""
+   block_matrix(R::Ring, V::Vector{<:Matrix{T}}) where T <: RingElement
+
+Create the block diagonal matrix over the ring `R` whose blocks are given
+by the matrices in `V`. Entries are coerced into `R` upon creation.
+"""
+function block_matrix(R::Ring, V::Vector{<:Matrix{T}}) where T <: RingElement
+   if length(V) == 0
+      return matrix(R, Matrix{T}(undef, (0, 0)))
+   end
+   rows = sum(size(N)[1] for N in V)
+   cols = sum(size(N)[2] for N in V)
+   M = zero_matrix(R, rows, cols)
+   start_row = 1
+   start_col = 1
+   for i = 1:length(V)
+      end_row = start_row + size(V[i])[1] - 1
+      end_col = start_col + size(V[i])[2] - 1
+      for j = start_row:end_row
+         for k = start_col:end_col
+            M[j, k] = R(V[i][j - start_row + 1, k - start_col + 1])
+         end
+      end
+      start_row = end_row + 1
+      start_col = end_col + 1
+   end
+   return M
 end
 
 ###############################################################################

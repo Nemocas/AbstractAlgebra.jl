@@ -245,6 +245,41 @@ julia> M = R()
 [0   0]
 ```
 
+## Block matrix constructors
+
+It is also possible to create block diagonal matrices from a vector of
+existing matrices. It is also possible to construct them from Julia
+matrices if one supplies the base ring.
+
+```@docs
+block_matrix(::Vector{<:MatElem{T}}) where T <: RingElement
+block_matrix(::Ring, ::Vector{<:Matrix{T}}) where T <: RingElement
+```
+
+**Examples**
+
+```jldoctest
+julia> block_matrix(ZZ, [[1 2; 3 4], [4 5 6; 7 8 9]])
+[1   2   0   0   0]
+[3   4   0   0   0]
+[0   0   4   5   6]
+[0   0   7   8   9]
+
+julia> M = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> N = matrix(ZZ, [4 5 6; 7 8 9])
+[4   5   6]
+[7   8   9]
+
+julia> block_matrix([M, N])
+[1   2   0   0   0]
+[3   4   0   0   0]
+[0   0   4   5   6]
+[0   0   7   8   9]
+```
+
 ## Conversion to Julia matrices and iteration
 
 While `AbstractAlgebra` matrices are not instances of `AbstractArray`,
