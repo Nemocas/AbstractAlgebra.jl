@@ -46,7 +46,8 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    equal::Union{lmnode{U, V, N}, Nothing} # to chain nodes with equal lm
    reducer::Union{lmnode{U, V, N}, Nothing} # best reducer found so far for node
    active::Bool # whether polynomial is still actively being reduced
-   settled::Bool # whether polynomial has stopped reducing
+   new_node::Bool # whether the node was added to the lattice since last time
+   settled::Int # 0 = newly reduced, 1 = no reducers remove lc, 2 = none reduce lc, 3 = no reducers
    lm::NTuple{N, Int}   # leading monomial as exponent vector
    lcm::NTuple{N, Int}  # lcm of lm's in tree rooted here, as exponent vector
    in_heap::Bool # whether node is in the heap
@@ -56,7 +57,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    size::Float64
 
    function lmnode{U, V, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
-      node = new{U, V, N}(p, nothing, nothing, nothing, nothing, true, false)
+      node = new{U, V, N}(p, nothing, nothing, nothing, nothing, true, true, 0)
       node.size = 0.0
       if p != nothing && !iszero(p)
          node.lm = Tuple(exponent_vector(p, 1))
@@ -1123,7 +1124,7 @@ end
 # current strategy is to prefer reducer which gives degree reduction over
 # everything else, but this is probably wrong based on what Singular does
 # function will return best reducer in sorted list X for reducing b
-function find_best_reducer(b::T, X::Vector{Tuple{Int, T}}, best::Union{T, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function find_best_reducer(b::T, X::Vector{Tuple{Int, T}}, Xnew::Vector{Tuple{Int, T}}, best::Union{T, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    # prevent nodes that are not active from being reduced
    if !b.active
       return nothing
@@ -1155,9 +1156,7 @@ function find_best_reducer(b::T, X::Vector{Tuple{Int, T}}, best::Union{T, Nothin
       end
    end
    if !best_divides
-      if best == nothing # we have no reducer, should compute spolys
-         b.settled = true
-      end
+      b.settled = 1
       # check if current best already reduces leading coefficient
       best_reduces = false
       if best != nothing
@@ -1180,6 +1179,7 @@ function find_best_reducer(b::T, X::Vector{Tuple{Int, T}}, best::Union{T, Nothin
          end
       end
       if !best_reduces
+         b.settled = 2
          for i = length(X):-1:1
             if X[i][2] != b # poly can't be reduced by itself
                if !divides(leading_coefficient(X[i][2].poly), c)[1]
@@ -1191,7 +1191,8 @@ function find_best_reducer(b::T, X::Vector{Tuple{Int, T}}, best::Union{T, Nothin
                   end
                end
             end
-         end   
+         end
+         b.settled = 3 # no reducer   
       end
    end
    return best
@@ -1199,10 +1200,10 @@ end
 
 # attach best reducer to each node in tree
 # see best_reducer description below for details
-function best_reducer(b::T, X::Vector{Tuple{Int, T}}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function best_reducer(b::T, X::Vector{Tuple{Int, T}}, Xnew::Vector{Tuple{Int, T}}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    # insert nodes equal to b in X
    b2 = b
-   oldindex = 0 # index of previous equal node in X2, 0 terminates list
+   oldindex = 0 # index of previous equal node in X, 0 terminates list
    while b2 != nothing
       index = searchsortedfirst(X, (oldindex, b2), by=reducer_size, rev=true) # find index at which to insert x
       insert!(X, index, (oldindex, b2))
@@ -1212,19 +1213,19 @@ function best_reducer(b::T, X::Vector{Tuple{Int, T}}) where {U <: AbstractAlgebr
    # set best reducer of B for each node equal to b
    b2 = b
    while b2 != nothing
-      b2.reducer = find_best_reducer(b2, X, b2.reducer)
+      b2.reducer = find_best_reducer(b2, X, Xnew, b2.reducer)
       b2 = b2.equal
    end
    # recurse to b.up, b.next etc
    if b.up != nothing
-      best_reducer(b.up, X)
+      best_reducer(b.up, X, Xnew)
       b2 = b
       while b2.next != nothing
          b2 = b2.next
-         best_reducer(b2.up, X)
+         best_reducer(b2.up, X, Xnew)
       end
    end
-   # remove nodes equal to b from X2
+   # remove nodes equal to b from X
    while oldindex != 0
       index = (X[oldindex])[1]
       deleteat!(X, oldindex)
@@ -1235,14 +1236,16 @@ end
 # Setup for one round of reduction of leading terms by others
 # Each node will be reduced mod the leading coeff of the best node
 # whose leading term divides it and if there are none, by the
-# best node whose leading monomial divides it
+# best node whose leading monomial divides it and if none exists
+# gcd polynomials will be created if possible
 # The reductions are not actually done here; the best reducer
 # is just attached to the node
 # The best reducers along the current path so far are given by the
-# ordered array X
-function best_reducer(B::Vector{T}, X::Vector{Tuple{Int, T}}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+# ordered array X unless they are for new nodes since last time, in
+# which case they will go in Xnew
+function best_reducer(B::Vector{T}, X::Vector{Tuple{Int, T}}, Xnew::Vector{Tuple{Int, T}}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    for b in B
-      best_reducer(b, X)
+      best_reducer(b, X, Xnew)
    end
 end
 
@@ -1532,7 +1535,7 @@ function generate_spolys(S::Vector{T}, B::Vector{T}, S2::Vector{T}) where {N, U 
          deleteat!(S2, i)
          i -= 1
          len -= 1
-      elseif s.settled
+      elseif s.settled >= 1 # only generate spolys for polys without level 1 reducers
          compute_spolys(S, B, s)
          deleteat!(S2, i)
          i -= 1
@@ -1578,11 +1581,12 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          # do reduction
          X = Vector{lmnode{U, V, N}}()
          X2 = Vector{Tuple{Int, lmnode{U, V, N}}}()
+         X2new = Vector{Tuple{Int, lmnode{U, V, N}}}()
          H = Vector{lmnode{U, V, N}}()
          reduction_occurs = true
          while reduction_occurs
             # attach best reducers to nodes
-            best_reducer(B2, X2)
+            best_reducer(B2, X2, X2new)
             # do reductions
             reduction_occurs = reduce_nodes(H, B2, X)
             clear_path(B2)
