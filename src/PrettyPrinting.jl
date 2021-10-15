@@ -1152,8 +1152,12 @@ function underscorify(x::String)
    while n > 1 && tryparse(Int, y[n]) != nothing
       n -= 1
    end
-   # at this point we need operatorname and escaped underscores
-   z = "\\operatorname{" * join(y[1:n], "\\_") * "}"
+   if n == 1 && length(y[1]) == 1
+      z = y[1]
+   else
+      # at this point we need operatorname and escaped underscores
+      z = "\\mathop{\\mathrm{" * join(y[1:n], "\\_") * "}}"
+   end
    if n < length(y)
       z = z * "_{" * join(y[n+1:end], ",") * "}"
    end
