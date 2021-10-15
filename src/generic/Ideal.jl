@@ -46,18 +46,22 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    equal::Union{lmnode{U, V, N}, Nothing} # to chain nodes with equal lm
    reducer::Union{lmnode{U, V, N}, Nothing} # best reducer found so far for node
    active::Bool # whether polynomial is still actively being reduced
+   settled::Bool # whether polynomial has stopped reducing
    lm::NTuple{N, Int}   # leading monomial as exponent vector
    lcm::NTuple{N, Int}  # lcm of lm's in tree rooted here, as exponent vector
    in_heap::Bool # whether node is in the heap
    path::Bool # used for marking paths to divisible nodes
    path2::Bool # mark paths when following existing paths
    num::Int
+   size::Float64
 
    function lmnode{U, V, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
-      node = new{U, V, N}(p, nothing, nothing, nothing, nothing, true)
+      node = new{U, V, N}(p, nothing, nothing, nothing, nothing, true, false)
+      node.size = 0.0
       if p != nothing && !iszero(p)
          node.lm = Tuple(exponent_vector(p, 1))
          node.lcm = node.lm
+         node.size = reducer_size((0, node))
       end
       node.path = false
       node.path2 = false
@@ -981,6 +985,9 @@ end
 # heuristic for size of reducer polynomials (smaller is better), used to sort
 # potential reducers
 function reducer_size(f::Tuple{Int, T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   if f[2].size != 0.0
+      return f[2].size
+   end
    s = 0.0
    # heuristic really punishes polys with lots of terms
    len = length(f[2].poly)
@@ -1016,22 +1023,41 @@ function reduce_by_reducer(H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPoly
             q += 1
          end
       end
-      if sign
-         q = -q
-      end
-      infl = [1 for in in 1:N]
-      shift = exponent_vector(b.poly, 1) .- exponent_vector(b.reducer.poly, 1)
-      d = b.poly - q*inflate(b.reducer.poly, shift, infl)
-      if coeff_divides
-         # leading coeff of reducer divides leading coeff of b.poly
-         if !iszero(d) # we have a fragment
-            push!(H, lmnode{U, V, N}(d))
+      if iszero(q) # need gcd polynomial
+         if sign
+            h = -h
          end
-         b.active = false
-         b.reducer = nothing
+         g, s, t = gcdx(c, h)
+         infl = [1 for in in 1:N]
+         shift = exponent_vector(b.poly, 1) .- exponent_vector(b.reducer.poly, 1)
+         d = s*b.poly + t*inflate(b.reducer.poly, shift, infl)
+         q = divexact(c, g)
+         p = b.poly - q*d # reduce b by d (the gcd poly)
+         b.poly = d # replace b with gcd poly
+         b.size = 0.0 # update size
+         b.size = reducer_size((0, b))
+         if !iszero(p)
+            push!(H, lmnode{U, V, N}(p))
+         end
       else
-         # case 2: leading coeff is reduced
-         b.poly = d
+         if sign
+            q = -q
+         end
+         infl = [1 for in in 1:N]
+         shift = exponent_vector(b.poly, 1) .- exponent_vector(b.reducer.poly, 1)
+         d = b.poly - q*inflate(b.reducer.poly, shift, infl)
+         if coeff_divides
+            # leading coeff of reducer divides leading coeff of b.poly
+            if !iszero(d) # we have a fragment
+               push!(H, lmnode{U, V, N}(d))
+            end
+            b.active = false
+         else
+            # case 2: leading coeff is reduced
+            b.poly = d
+            b.size = 0.0 # update size
+            b.size = reducer_size((0, b))
+         end
       end
       reduced = true
    end
@@ -1128,21 +1154,47 @@ function find_best_reducer(b::T, X::Vector{Tuple{Int, T}}, best::Union{T, Nothin
          end
       end
    end
-   # check for leading coefficient that will reduce c
    if !best_divides
+      if best == nothing # we have no reducer, should compute spolys
+         b.settled = true
+      end
+      # check if current best already reduces leading coefficient
+      best_reduces = false
+      if best != nothing
+         best_reduces = smod(c, leading_coefficient(best.poly)) != c
+      end
+      # check for leading coefficient that will reduce c
       for i = length(X):-1:1
          if X[i][2] != b # poly can't be reduced by itself
             if smod(c, leading_coefficient(X[i][2].poly)) != c
-               if best == nothing || reducer_size(X[i]) < reducer_size((0, best))
+               if !best_reduces
                   return X[i][2]
                else
-                  return best # already the best
+                  if reducer_size(X[i]) < reducer_size((0, best))
+                     return X[i][2]
+                  else
+                     return best # already the best
+                  end
                end
             end
          end
       end
+      if !best_reduces
+         for i = length(X):-1:1
+            if X[i][2] != b # poly can't be reduced by itself
+               if !divides(leading_coefficient(X[i][2].poly), c)[1]
+                  # can do gcd polynomial
+                  if best == nothing || reducer_size(X[i]) < reducer_size((0, best))
+                     return X[i][2]
+                  else
+                     return best
+                  end
+               end
+            end
+         end   
+      end
    end
-   return best 
+   return best
 end
 
 # attach best reducer to each node in tree
@@ -1205,8 +1257,16 @@ end
 # insert a node into the given branch of basis
 function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if lm_divides(b, d) # divides in both directions, so equal
-      d.equal = b.equal
-      b.equal = d
+      equal = b.poly == d.poly
+      b2 = b
+      while !equal && b2.equal != nothing
+         b2 = b2.equal
+         equal = b2.poly == d.poly
+      end
+      if !equal # avoid inserting equal polynomials
+         d.equal = b.equal
+         b.equal = d
+      end
    else # not equal to current node
       if b.up != nothing
          flag = lm_divides(d, b.up)
@@ -1253,8 +1313,7 @@ function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlge
       push!(B, d)
    end
    clear_path(B)
-   compute_spolys(S, B, d)
-   clear_path(B)
+   push!(S, d) # store for later computation of spolys
 end
 
 # return true if d has a direct connection up to b
@@ -1375,7 +1434,7 @@ function insert_links(d::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{
    while i <= len
       b = B[i]
       if lm_divides_lcm(b, d)
-         if !insert_links(d, b)
+         if insert_links(d, b)
             deleteat!(B, i) # node is divisible by new node
             len -= 1
             i -= 1
@@ -1464,6 +1523,25 @@ function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, V,
    return D
 end
 
+function generate_spolys(S::Vector{T}, B::Vector{T}, S2::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, V, T <: lmnode{U, V, N}}
+   i = 1
+   len = length(S2)
+   while i <= len
+      s = S2[i]
+      if !s.active
+         deleteat!(S2, i)
+         i -= 1
+         len -= 1
+      elseif s.settled
+         compute_spolys(S, B, s)
+         deleteat!(S2, i)
+         i -= 1
+         len -= 1
+      end
+      i += 1
+   end
+end
+
 # main reduction routine
 function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    node_num[] = 0
@@ -1491,10 +1569,11 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          B2 = [d]
          X = lmnode{U, V, N}[] # fragments
          S = lmnode{U, V, N}[] # spolys
+         S2 = lmnode{U, V, N}[] # nodes for which we have not computed spolys
          # insert everything in tree
          while !isempty(heap)
             d = heappop!(heap)
-            basis_insert(S, B2, d)
+            basis_insert(S2, B2, d)
          end
          # do reduction
          X = Vector{lmnode{U, V, N}}()
@@ -1515,9 +1594,10 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                end
             end
             # insert fragments (including s-polys)
-            insert_fragments(S, B2, H)
-# println("B2 = ", B2)
-# readline(stdin)
+            insert_fragments(S2, B2, H)
+            generate_spolys(S, B2, S2)
+println("B2 = ", B2)
+readline(stdin)
          end
          # extract polynomials from B2
          B = extract_gens(B2)
