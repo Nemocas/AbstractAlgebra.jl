@@ -1,15 +1,13 @@
-WeakValueCache = AbstractAlgebra.WeakValueCache
 WeakValueDict = AbstractAlgebra.WeakValueDict
 
-if VERSION >= v"1.6"
-@testset "WeakValueCache" begin
-   d = WeakValueCache{BigInt, BigInt}()
+function test_weak_cache(T, kreps, ireps)
+   d = T{BigInt, BigInt}()
    # keys missing from/present in ddeg are definitely missing from/present in d
    ddef  = Dict{BigInt, BigInt}()
    # if a key is in d, its value should match that of dmay
    dmay  = Dict{BigInt, BigInt}()
-   for k in 1:30
-      for i in 1:20
+   for k in 1:kreps
+      for i in 1:ireps
          for j in 1:2
             x = BigInt(rand(1:999))
             y = BigInt(rand(1:999))
@@ -49,8 +47,8 @@ if VERSION >= v"1.6"
    empty!(d)
    empty!(ddef)
    empty!(dmay)
-   for k in 1:30
-      for i in 1:20
+   for k in 1:kreps
+      for i in 1:ireps
          for j in 1:2
             x = BigInt(rand(1:999))
             y = BigInt(rand(1:999))
@@ -89,22 +87,34 @@ if VERSION >= v"1.6"
       GC.gc(true)
    end
 
-   # test get! where default modifies d
    empty!(d)
-   AbstractAlgebra.rehash!(d, 5)
+   if T === AbstractAlgebra.WeakValueCache
+      AbstractAlgebra.rehash!(d, 5) # test internal function
+   end
    empty!(ddef)
    x = BigInt(1)
    y = BigInt(2)
    ddef[1] = x
    ddef[2] = y
+   # test get! where default modifies d
    get!(d, 2) do; d[1] = x; return y; end
    @test d[1] == x
    @test d[2] == y
    @test length(string(d)) > 3
 end
-end # if VERSION >= v"1.6"
+
+
+@testset "WeakValueCache" begin
+   if VERSION >= v"1.6"
+      test_weak_cache(AbstractAlgebra.WeakValueCache, 30, 20)
+   end
+end
 
 @testset "WeakValueDict" begin
+   if VERSION >= v"1.6"
+      test_weak_cache(AbstractAlgebra.WeakValueDict, 30, 20)
+   end
+
     A = [1]
     B = [2]
     C = [3]

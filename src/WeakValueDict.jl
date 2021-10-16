@@ -443,10 +443,6 @@ lock(f, wkh::WeakValueDict) = Base.lock(f, wkh.lock)
 trylock(f, wkh::WeakValueDict) = Base.trylock(f, wkh.lock)
 
 function Base.setindex!(wkh::WeakValueDict{K}, v, key) where K
-    !isa(key, K) && throw(ArgumentError("$(Base.limitrepr(key)) is not a valid key for type $K"))
-    # 'nothing' is not valid both because 'finalizer' will reject it,
-    # and because we therefore use it as a sentinel value
-    v === nothing && throw(ArgumentError("`nothing` is not a valid WeakValueDict key"))
     lock(wkh) do
         _cleanup_locked(wkh)
         k = getkey(wkh.ht, key, nothing)
@@ -461,7 +457,7 @@ function Base.setindex!(wkh::WeakValueDict{K}, v, key) where K
 end
 function get!(wkh::WeakValueDict{K}, key, default) where {K}
     v = lock(wkh) do
-        if key !== nothing && haskey(wkh.ht, key)
+        if haskey(wkh.ht, key)
             x = wkh.ht[key].value
             if x === nothing
                 wkh[key] = WeakRef(default)
@@ -479,7 +475,7 @@ end
 function Base.get!(default::Base.Callable, wkh::WeakValueDict{K}, key) where {K}
     v = lock(wkh) do
         _cleanup_locked(wkh)
-        if key !== nothing && haskey(wkh.ht, key)
+        if haskey(wkh.ht, key)
             x = wkh.ht[key].value
             if x === nothing
                 wkh[key] = default()
@@ -524,25 +520,21 @@ end
 #### the rest of these look dodgy
 
 function Base.get(default::Base.Callable, wkh::WeakValueDict{K}, key) where {K}
-    key === nothing && throw(KeyError(nothing))
     lock(wkh) do
         return get(default, wkh.ht, key)  # ???
     end
 end
 function Base.pop!(wkh::WeakValueDict{K}, key) where {K}
-    key === nothing && throw(KeyError(nothing))
     lock(wkh) do
         return pop!(wkh.ht, key).value  # ???
     end
 end
 function Base.pop!(wkh::WeakValueDict{K}, key, default) where {K}
-    key === nothing && return default
     lock(wkh) do
         return pop!(wkh.ht, key, default)  # ect.
     end
 end
 function Base.delete!(wkh::WeakValueDict, key)
-    key === nothing && return wkh
     lock(wkh) do
         delete!(wkh.ht, key)
     end
@@ -555,13 +547,11 @@ function Base.empty!(wkh::WeakValueDict)
     return wkh
 end
 function Base.haskey(wkh::WeakValueDict{K}, key) where {K}
-    key === nothing && return false
     lock(wkh) do
         return haskey(wkh.ht, key)
     end
 end
 function Base.getindex(wkh::WeakValueDict{K}, key) where {K}
-    key === nothing && throw(KeyError(nothing))
     lock(wkh) do
         return getindex(wkh.ht, key).value
     end
