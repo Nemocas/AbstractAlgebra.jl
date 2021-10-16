@@ -110,6 +110,10 @@ function test_weak_cache(T, kreps, ireps)
    GC.@preserve x y begin
       d[x] = y
       @test (get(d, x) do; return BigInt(3); end) isa BigInt
+
+      @test pop!(d, x) == y
+      @test_throws KeyError pop!(d, x)
+      @test pop!(d, x, y) === y
    end
 end
 

@@ -274,6 +274,33 @@ function delete!(h::WeakValueCache, key)
    return h
 end
 
+### pop! ####
+
+function pop!(h::WeakValueCache, key)
+   index = ht_keyindex(h, key)
+   if index > 0
+      x = h.vals[index].value
+      _deleteindex!(h, index)
+      if x !== nothing
+         return x
+      end
+   end
+   throw(KeyError(key))
+end
+
+function pop!(h::WeakValueCache, key, default)
+   index = ht_keyindex(h, key)
+   if index > 0
+      x = h.vals[index].value
+      _deleteindex!(h, index)
+      if x !== nothing
+         return x
+      end
+   end
+   return default
+end
+
+
 ### getindex / haskey ####
 
 function Base.haskey(h::WeakValueCache, key)
@@ -540,30 +567,45 @@ function Base.get(default::Base.Callable, wkh::WeakValueDict{K}, key) where {K}
     end
 end
 
-#### the rest of these look dodgy
-
 function Base.pop!(wkh::WeakValueDict{K}, key) where {K}
     lock(wkh) do
-        return pop!(wkh.ht, key).value  # ???
+        x = pop!(wkh.ht, key).value
+        if x !== nothing
+            return x
+        end
+        throw(KeyError(key))
     end
 end
+
 function Base.pop!(wkh::WeakValueDict{K}, key, default) where {K}
     lock(wkh) do
-        return pop!(wkh.ht, key, default)  # ect.
+        x = pop!(wkh.ht, key, nothing)
+        if x !== nothing
+            y = x.value
+            if y !== nothing
+                return y
+            end
+        end
+        return default
     end
 end
+
 function Base.delete!(wkh::WeakValueDict, key)
     lock(wkh) do
         delete!(wkh.ht, key)
     end
     return wkh
 end
+
 function Base.empty!(wkh::WeakValueDict)
     lock(wkh) do
         empty!(wkh.ht)
     end
     return wkh
 end
+
+#### the rest of these look dodgy
+
 function Base.haskey(wkh::WeakValueDict{K}, key) where {K}
     lock(wkh) do
         return haskey(wkh.ht, key)
