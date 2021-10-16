@@ -604,8 +604,6 @@ function Base.empty!(wkh::WeakValueDict)
     return wkh
 end
 
-#### the rest of these look dodgy
-
 function Base.haskey(wkh::WeakValueDict{K}, key) where {K}
     lock(wkh) do
         return haskey(wkh.ht, key)
@@ -613,11 +611,16 @@ function Base.haskey(wkh::WeakValueDict{K}, key) where {K}
 end
 function Base.getindex(wkh::WeakValueDict{K}, key) where {K}
     lock(wkh) do
-        return getindex(wkh.ht, key).value
+        x = getindex(wkh.ht, key).value
+        if x !== nothing
+            return x
+        end
+        throw(KeyError(key))
     end
 end
 
 Base.isempty(wkh::WeakValueDict) = length(wkh) == 0
+
 function Base.length(t::WeakValueDict)
     lock(t) do
         _cleanup_locked(t)

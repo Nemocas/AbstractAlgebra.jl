@@ -97,11 +97,22 @@ function test_weak_cache(T, kreps, ireps)
    GC.@preserve x y begin
       ddef[1] = x
       ddef[2] = y
+
       # test get! where default modifies d
       get!(d, 2) do; d[1] = x; return y; end
       @test d[1] == x
       @test d[2] == y
       @test length(string(d)) > 3
+
+      @test_throws KeyError d[3]
+   end
+
+   d[3] = BigInt(4)
+   GC.gc(true)
+   try z = d[3]
+      @test z == 4
+   catch e
+      @test e isa KeyError
    end
 
    empty!(d)
