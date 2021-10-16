@@ -322,7 +322,8 @@ function Base.get!(default, h::WeakValueCache{K, V}, key::K) where {K, V}
       index = -index
    end
    age0 = h.age
-   x = convert(V, default())
+   # the WeakRef makes value conversion essentially useless
+   x = default()::V
    if h.age == age0
       _setindex!(h, WeakRef(x), key, index)
    else
@@ -340,7 +341,6 @@ function setindex!(h::WeakValueCache{K, V}, v0, key0) where {K, V}
    setindex!(h, v0, key)
 end
 
-# the WeakRef makes key conversion essentially useless
 function setindex!(h::WeakValueCache{K, V}, v0, key::K) where {K, V}
    x = convert(V, v0)
    index = ht_keyindex2!(h, key)
