@@ -510,71 +510,71 @@ empty(d::WeakValueDict, ::Type{K}, ::Type{V}) where {K, V} = WeakValueDict{K, V}
 
 IteratorSize(::Type{<:WeakValueDict}) = SizeUnknown()
 
-islocked(wkh::WeakValueDict) = Base.islocked(wkh.lock)
-lock(f, wkh::WeakValueDict) = Base.lock(f, wkh.lock)
-trylock(f, wkh::WeakValueDict) = Base.trylock(f, wkh.lock)
+islocked(wvh::WeakValueDict) = Base.islocked(wvh.lock)
+lock(f, wvh::WeakValueDict) = Base.lock(f, wvh.lock)
+trylock(f, wvh::WeakValueDict) = Base.trylock(f, wvh.lock)
 
-function Base.setindex!(wkh::WeakValueDict{K}, v, key) where K
-    lock(wkh) do
-        _cleanup_locked(wkh)
-        k = getkey(wkh.ht, key, nothing)
+function Base.setindex!(wvh::WeakValueDict{K}, v, key) where K
+    lock(wvh) do
+        _cleanup_locked(wvh)
+        k = getkey(wvh.ht, key, nothing)
         # The object gets the finalizer no matter if the key is already there or not.
-        finalizer(wkh.finalizer, v)
+        finalizer(wvh.finalizer, v)
         if k === nothing
             k = key
         end
-        wkh.ht[k] = WeakRef(v)
+        wvh.ht[k] = WeakRef(v)
     end
-    return wkh
+    return wvh
 end
-function get!(wkh::WeakValueDict{K}, key, default) where {K}
-    v = lock(wkh) do
-        if haskey(wkh.ht, key)
-            x = wkh.ht[key].value
+function get!(wvh::WeakValueDict{K}, key, default) where {K}
+    v = lock(wvh) do
+        if haskey(wvh.ht, key)
+            x = wvh.ht[key].value
             if x === nothing
-                wkh[key] = WeakRef(default)
+                wvh[key] = WeakRef(default)
                 default
             else
                 x
             end
         else
-            wkh[key] = WeakRef(default)
+            wvh[key] = WeakRef(default)
             default
         end
     end
     return v
 end
-function Base.get!(default::Base.Callable, wkh::WeakValueDict{K}, key) where {K}
-    v = lock(wkh) do
-        _cleanup_locked(wkh)
-        if haskey(wkh.ht, key)
-            x = wkh.ht[key].value
+function Base.get!(default::Base.Callable, wvh::WeakValueDict{K}, key) where {K}
+    v = lock(wvh) do
+        _cleanup_locked(wvh)
+        if haskey(wvh.ht, key)
+            x = wvh.ht[key].value
             if x === nothing
-                wkh[key] = default()
+                wvh[key] = default()
             else
                 x
             end
         else
-            wkh[key] = default()
+            wvh[key] = default()
         end
     end
     return v
 end
 
-function Base.getkey(wkh::WeakValueDict{K}, kk, default) where K
-    k = lock(wkh) do
-        _cleanup_locked(wkh)
-        getkey(wkh.ht, kk, nothing)
+function Base.getkey(wvh::WeakValueDict{K}, kk, default) where K
+    k = lock(wvh) do
+        _cleanup_locked(wvh)
+        getkey(wvh.ht, kk, nothing)
     end
     return k === nothing ? default : k::K
 end
 
 map!(f, iter::Base.ValueIterator{<:WeakValueDict})= map!(f, values(iter.dict.ht))
 
-function Base.get(wkh::WeakValueDict{K, V}, key, default) where {K, V}
-    lock(wkh) do
-        _cleanup_locked(wkh)
-        x = get(wkh.ht, key, default)
+function Base.get(wvh::WeakValueDict{K, V}, key, default) where {K, V}
+    lock(wvh) do
+        _cleanup_locked(wvh)
+        x = get(wvh.ht, key, default)
         if x === default
             return x
         else
@@ -588,9 +588,9 @@ function Base.get(wkh::WeakValueDict{K, V}, key, default) where {K, V}
     end
 end
 
-function Base.get(default::Base.Callable, wkh::WeakValueDict{K}, key) where {K}
-    lock(wkh) do
-        x = get(wkh.ht, key, nothing)
+function Base.get(default::Base.Callable, wvh::WeakValueDict{K}, key) where {K}
+    lock(wvh) do
+        x = get(wvh.ht, key, nothing)
         if x !== nothing
             y = x.value
             if y !== nothing
@@ -601,9 +601,9 @@ function Base.get(default::Base.Callable, wkh::WeakValueDict{K}, key) where {K}
     end
 end
 
-function Base.pop!(wkh::WeakValueDict{K}, key) where {K}
-    lock(wkh) do
-        x = pop!(wkh.ht, key).value
+function Base.pop!(wvh::WeakValueDict{K}, key) where {K}
+    lock(wvh) do
+        x = pop!(wvh.ht, key).value
         if x !== nothing
             return x
         end
@@ -611,9 +611,9 @@ function Base.pop!(wkh::WeakValueDict{K}, key) where {K}
     end
 end
 
-function Base.pop!(wkh::WeakValueDict{K}, key, default) where {K}
-    lock(wkh) do
-        x = pop!(wkh.ht, key, nothing)
+function Base.pop!(wvh::WeakValueDict{K}, key, default) where {K}
+    lock(wvh) do
+        x = pop!(wvh.ht, key, nothing)
         if x !== nothing
             y = x.value
             if y !== nothing
@@ -624,28 +624,28 @@ function Base.pop!(wkh::WeakValueDict{K}, key, default) where {K}
     end
 end
 
-function Base.delete!(wkh::WeakValueDict, key)
-    lock(wkh) do
-        delete!(wkh.ht, key)
+function Base.delete!(wvh::WeakValueDict, key)
+    lock(wvh) do
+        delete!(wvh.ht, key)
     end
-    return wkh
+    return wvh
 end
 
-function Base.empty!(wkh::WeakValueDict)
-    lock(wkh) do
-        empty!(wkh.ht)
+function Base.empty!(wvh::WeakValueDict)
+    lock(wvh) do
+        empty!(wvh.ht)
     end
-    return wkh
+    return wvh
 end
 
-function Base.haskey(wkh::WeakValueDict{K}, key) where {K}
-    lock(wkh) do
-        return haskey(wkh.ht, key)
+function Base.haskey(wvh::WeakValueDict{K}, key) where {K}
+    lock(wvh) do
+        return haskey(wvh.ht, key)
     end
 end
-function Base.getindex(wkh::WeakValueDict{K}, key) where {K}
-    lock(wkh) do
-        x = getindex(wkh.ht, key).value
+function Base.getindex(wvh::WeakValueDict{K}, key) where {K}
+    lock(wvh) do
+        x = getindex(wvh.ht, key).value
         if x !== nothing
             return x
         end
@@ -653,7 +653,7 @@ function Base.getindex(wkh::WeakValueDict{K}, key) where {K}
     end
 end
 
-Base.isempty(wkh::WeakValueDict) = length(wkh) == 0
+Base.isempty(wvh::WeakValueDict) = length(wvh) == 0
 
 function Base.length(t::WeakValueDict)
     lock(t) do
