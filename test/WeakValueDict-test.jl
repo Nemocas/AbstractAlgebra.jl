@@ -126,6 +126,27 @@ function test_weak_cache(T, kreps, ireps)
       @test_throws KeyError pop!(d, x)
       @test pop!(d, x, y) === y
    end
+
+   x = BigInt(1)
+   y = BigInt(2)
+   z = BigInt(3)
+   GC.@preserve x y z begin
+      D = T{BigInt, BigInt}(1=>x)
+      @test D[1] === x
+      @test_throws KeyError D[2]
+
+      D = T{BigInt, BigInt}(1=>x, 2=>y, 3=>z)
+      @test D[1] === x
+      @test D[2] === y
+      @test D[3] === z
+      @test_throws KeyError D[4]
+
+      D = T{BigInt, BigInt}([(1,x), (2,y), (3,z)])
+      @test D[1] === x
+      @test D[2] === y
+      @test D[3] === z
+      @test_throws KeyError D[4]
+   end
 end
 
 

@@ -1,4 +1,6 @@
-# Weak value containers
+# Weak value containers satisfying a reasonable subset of the Dict interface.
+# Most notably, length(d) cannot be assumed to match the length of an iteration
+# over d.
 
 import Base: isempty, setindex!, getkey, length, iterate, empty, delete!, pop!,
        get, sizehint!, copy
@@ -26,10 +28,13 @@ The following two sections are broken on julia < 1.6
 #
 # WeakValueCache
 # This section is a modification of base/dict.jl from the Julia project to
-# support disappearing entries. It makes no pretense of satsifying any
-# dictionary interface.
+# support disappearing entries.
 #
 ################################################################################
+
+# This one works by tracking stale entries in ht_keyindex2. Once .ndirty gets
+# above a certain threshold in _setindex!, cleanall! is called. The reashing
+# also cleans all stale entries.
 
 """
 `WeakValueCache()` constructs a hash table whose values may be collected at
@@ -52,6 +57,27 @@ mutable struct WeakValueCache{K, V}
       n = 16
       new(zeros(UInt8,n), Vector{K}(undef, n), Vector{WeakRef}(undef, n), 0, 0, 0, 0, 0)
    end
+end
+
+function WeakValueCache{K, V}(kv) where {K, V}
+   h = WeakValueCache{K, V}()
+   for (k, v) in kv
+      h[k] = v
+   end
+   return h
+end
+
+function WeakValueCache{K, V}(p::Pair) where {K, V}
+   return setindex!(WeakValueCache{K, V}(), p.second, p.first)
+end
+
+function WeakValueCache{K, V}(ps::Pair...) where V where K
+    h = WeakValueCache{K, V}()
+    sizehint!(h, length(ps))
+    for p in ps
+        h[p.first] = p.second
+    end
+    return h
 end
 
 Base.length(h::WeakValueCache) = h.nfilled
@@ -172,6 +198,10 @@ function rehash!(h::WeakValueCache{K, V}, newsz = length(h.keys)) where {K, V}
    h.nfilled = count
    h.nmissing = 0
    h.maxprobe = maxprobe
+   return h
+end
+
+function Base.sizehint!(h::WeakValueCache, newsz)
    return h
 end
 
@@ -391,11 +421,15 @@ end
 #
 # WeakValueDict
 # This section is a modification of base/weakkeydict.jl from the Julia project.
-# It pretends to satisfy the dictionary interface.
 #
 ################################################################################
 
-# TODO figure out what the locks here are accomplishing
+# This one works by wrapping a normal Dict and attaching finalizers to the
+# values so that the dictionary can know when the GC has run, and thus when it
+# is time to try cleaning up some of the stale entries.
+# TODO It is not clear if the lock is adding any discernible function given the
+# behavior of >=1.6 above. Specifically, the internals of Base.iterate with
+# its GC.safepoint() is a mystery.
 
 """
     WeakValueDict([itr])
