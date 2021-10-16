@@ -303,6 +303,17 @@ function Base.get(h::WeakValueCache{K, V}, key, default) where {K, V}
    return default
 end
 
+function get(default, h::WeakValueCache{K, V}, key) where {K, V}
+   index = ht_keyindex(h, key)
+   if index > 0
+      x = h.vals[index].value
+      if x !== nothing
+         return x::V
+      end
+   end
+   return default()
+end
+
 ### get! ####
 
 function Base.get!(default, h::WeakValueCache{K, V}, key0) where {K, V}
@@ -500,7 +511,6 @@ end
 map!(f, iter::Base.ValueIterator{<:WeakValueDict})= map!(f, values(iter.dict.ht))
 
 function Base.get(wkh::WeakValueDict{K, V}, key, default) where {K, V}
-    key === nothing && throw(KeyError(nothing))
     lock(wkh) do
         _cleanup_locked(wkh)
         x = get(wkh.ht, key, default)
@@ -517,13 +527,21 @@ function Base.get(wkh::WeakValueDict{K, V}, key, default) where {K, V}
     end
 end
 
-#### the rest of these look dodgy
-
 function Base.get(default::Base.Callable, wkh::WeakValueDict{K}, key) where {K}
     lock(wkh) do
-        return get(default, wkh.ht, key)  # ???
+        x = get(wkh.ht, key, nothing)
+        if x !== nothing
+            y = x.value
+            if y !== nothing
+                return y
+            end
+        end
+        return default()
     end
 end
+
+#### the rest of these look dodgy
+
 function Base.pop!(wkh::WeakValueDict{K}, key) where {K}
     lock(wkh) do
         return pop!(wkh.ht, key).value  # ???
