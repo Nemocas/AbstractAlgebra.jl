@@ -62,7 +62,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
       if p != nothing && !iszero(p)
          node.lm = Tuple(exponent_vector(p, 1))
          node.lcm = node.lm
-         node.size = reducer_size((0, node))
+         node.size = reducer_size(node)
       end
       node.path = false
       node.path2 = false
@@ -985,16 +985,16 @@ end
 
 # heuristic for size of reducer polynomials (smaller is better), used to sort
 # potential reducers
-function reducer_size(f::Tuple{Int, T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   if f[2].size != 0.0
-      return f[2].size
+function reducer_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   if f.size != 0.0
+      return f.size
    end
    s = 0.0
    # heuristic really punishes polys with lots of terms
-   len = length(f[2].poly)
+   len = length(f.poly)
    j = len
    for i = 1:len
-      c = coeff(f[2].poly, i)
+      c = coeff(f.poly, i)
       s += Base.log(ndigits(c; base=2))*j*j
       j -= 1      
    end
@@ -1036,7 +1036,7 @@ function reduce_by_reducer(H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPoly
          p = b.poly - q*d # reduce b by d (the gcd poly)
          b.poly = d # replace b with gcd poly
          b.size = 0.0 # update size
-         b.size = reducer_size((0, b))
+         b.size = reducer_size(b)
          if !iszero(p)
             push!(H, lmnode{U, V, N}(p))
          end
@@ -1057,7 +1057,7 @@ function reduce_by_reducer(H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPoly
             # case 2: leading coeff is reduced
             b.poly = d
             b.size = 0.0 # update size
-            b.size = reducer_size((0, b))
+            b.size = reducer_size(b)
          end
       end
       reduced = true
@@ -1120,100 +1120,145 @@ function reduce_nodes(H::Vector{T}, B::Vector{T}, X::Vector{T}) where {U <: Abst
    return reduced
 end
 
+function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_divides::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   c = leading_coefficient(b.poly)
+   best_size = best == nothing ? 0.0 : reducer_size(best)
+   for i = length(X):-1:1
+      if X[i] != b # poly can't be reduced by itself
+         if divides(c, leading_coefficient(X[i].poly))[1]
+            if best == nothing || !best_divides
+               best = X[i]
+               best_size = reducer_size(X[i])
+               best_divides = true
+            else
+               red_size = reducer_size(X[i])
+               if red_size < best_size
+                  best = X[i]
+                  best_size = red_size
+                  best_divides = true
+               end
+            end
+         end
+      end
+   end
+   return best, best_divides
+end
+
+function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_reduces::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   c = leading_coefficient(b.poly)
+   best_size = best == nothing ? 0.0 : reducer_size(best)
+   for i = length(X):-1:1
+      if X[i] != b # poly can't be reduced by itself
+         if smod(c, leading_coefficient(X[i].poly)) != c
+            if best == nothing || !best_reduces
+               best = X[i]
+               best_size = reducer_size(X[i])
+               best_reduces = true
+            else
+               red_size = reducer_size(X[i])
+               if red_size < best_size
+                  best = X[i]
+                  best_size = red_size
+                  best_reduces = true
+               end
+            end
+         end
+      end
+   end
+   return best, best_reduces
+end
+
+function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   c = leading_coefficient(b.poly)
+   best_size = best == nothing ? 0.0 : reducer_size(best)
+   for i = length(X):-1:1
+      if X[i] != b # poly can't be reduced by itself
+         if !divides(leading_coefficient(X[i].poly), c)[1]
+            if best == nothing || !best_is_gcd
+               best = X[i]
+               best_size = reducer_size(X[i])
+               best_is_gcd = true
+            else
+               red_size = reducer_size(X[i])
+               if red_size < best_size
+                  best = X[i]
+                  best_size = red_size
+                  best_is_gcd = true
+               end
+            end
+         end
+      end
+   end
+   return best, best_is_gcd
+end
+
 # used for heuristics, to select one kind of reducer over another preferentially
 # current strategy is to prefer reducer which gives degree reduction over
 # everything else, but this is probably wrong based on what Singular does
 # function will return best reducer in sorted list X for reducing b
-function find_best_reducer(b::T, X::Vector{Tuple{Int, T}}, Xnew::Vector{Tuple{Int, T}}, best::Union{T, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    # prevent nodes that are not active from being reduced
    if !b.active
       return nothing
    end
-   # check if current best has leading coeff dividing c = lc(b)
    c = leading_coefficient(b.poly)
-   best_divides = false
-   if best != nothing
-      best_divides = divides(c, leading_coefficient(best.poly))[1]
+   best = b.reducer
+   # 1. check for leading coefficient that divides c
+   best_divides = best == nothing ? false : divides(c, leading_coefficient(best.poly))[1]
+   if b.settled == 0
+      best, best_divides = find_best_divides(b, X, best, best_divides)
    end
-   # check first for leading coefficient that divides c
-   for i = length(X):-1:1
-      if X[i][2] != b # poly can't be reduced by itself
-         if divides(c, leading_coefficient(X[i][2].poly))[1]
-            if best == nothing
-               return X[i][2]
-            else
-               if !best_divides
-                  return X[i][2]
-               else
-                  if reducer_size(X[i]) < reducer_size((0, best))
-                     return X[i][2]
-                  else
-                     return best # already the best
-                  end
-               end
-            end
-         end
-      end
-   end
-   if !best_divides
+   best, best_divides = find_best_divides(b, Xnew, best, best_divides)
+   if best_divides
+      b.settled = 0
+      return best
+   else
       b.settled = 1
-      # check if current best already reduces leading coefficient
-      best_reduces = false
-      if best != nothing
-         best_reduces = smod(c, leading_coefficient(best.poly)) != c
-      end
-      # check for leading coefficient that will reduce c
-      for i = length(X):-1:1
-         if X[i][2] != b # poly can't be reduced by itself
-            if smod(c, leading_coefficient(X[i][2].poly)) != c
-               if !best_reduces
-                  return X[i][2]
-               else
-                  if reducer_size(X[i]) < reducer_size((0, best))
-                     return X[i][2]
-                  else
-                     return best # already the best
-                  end
-               end
-            end
-         end
-      end
-      if !best_reduces
-         b.settled = 2
-         for i = length(X):-1:1
-            if X[i][2] != b # poly can't be reduced by itself
-               if !divides(leading_coefficient(X[i][2].poly), c)[1]
-                  # can do gcd polynomial
-                  if best == nothing || reducer_size(X[i]) < reducer_size((0, best))
-                     return X[i][2]
-                  else
-                     return best
-                  end
-               end
-            end
-         end
-         b.settled = 3 # no reducer   
-      end
+   end
+   # 2. check for leading coefficient that reduces c
+   best_reduces = best == nothing ? false : smod(c, leading_coefficient(best.poly)) != c
+   if b.settled <= 1
+      best, best_reduces = find_best_reduces(b, X, best, best_reduces)
+   end
+   best, best_reduces = find_best_reduces(b, Xnew, best, best_reduces)
+   if best_reduces
+      return best
+   else
+      b.settled = 2
+   end
+   # 3. check for leading coefficient that is not divisible by c (gcd poly possible)
+   best_is_gcd = best == nothing ? false : !divides(leading_coefficient(best.poly), c)[1]
+   if b.settled <= 2
+      best, best_is_gcd = find_best_gcd(b, X, best, best_is_gcd)
+   end
+   best, best_is_gcd = find_best_gcd(b, Xnew, best, best_is_gcd)
+   if best_is_gcd
+      return best
+   else
+      b.settled = 3 # no reducer found
    end
    return best
 end
 
 # attach best reducer to each node in tree
 # see best_reducer description below for details
-function best_reducer(b::T, X::Vector{Tuple{Int, T}}, Xnew::Vector{Tuple{Int, T}}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    # insert nodes equal to b in X
    b2 = b
-   oldindex = 0 # index of previous equal node in X, 0 terminates list
+   oldlen = length(X)
+   newlen = length(Xnew)
    while b2 != nothing
-      index = searchsortedfirst(X, (oldindex, b2), by=reducer_size, rev=true) # find index at which to insert x
-      insert!(X, index, (oldindex, b2))
-      oldindex = index
+      if b2.new_node
+         push!(Xnew, b2)
+      else
+         push!(X, b2)
+      end
       b2 = b2.equal
    end
    # set best reducer of B for each node equal to b
    b2 = b
    while b2 != nothing
-      b2.reducer = find_best_reducer(b2, X, Xnew, b2.reducer)
+      b2.reducer = find_best_reducer(b2, X, Xnew)
       b2 = b2.equal
    end
    # recurse to b.up, b.next etc
@@ -1225,11 +1270,13 @@ function best_reducer(b::T, X::Vector{Tuple{Int, T}}, Xnew::Vector{Tuple{Int, T}
          best_reducer(b2.up, X, Xnew)
       end
    end
-   # remove nodes equal to b from X
-   while oldindex != 0
-      index = (X[oldindex])[1]
-      deleteat!(X, oldindex)
-      oldindex = index
+   # remove nodes equal to b from X and Xnew
+   while length(X) != oldlen
+      pop!(X)
+   end
+   while length(Xnew) != newlen
+      d = pop!(Xnew)
+      d.new_node = false
    end
 end
 
@@ -1243,7 +1290,7 @@ end
 # The best reducers along the current path so far are given by the
 # ordered array X unless they are for new nodes since last time, in
 # which case they will go in Xnew
-function best_reducer(B::Vector{T}, X::Vector{Tuple{Int, T}}, Xnew::Vector{Tuple{Int, T}}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function best_reducer(B::Vector{T}, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    for b in B
       best_reducer(b, X, Xnew)
    end
@@ -1580,8 +1627,8 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          end
          # do reduction
          X = Vector{lmnode{U, V, N}}()
-         X2 = Vector{Tuple{Int, lmnode{U, V, N}}}()
-         X2new = Vector{Tuple{Int, lmnode{U, V, N}}}()
+         X2 = Vector{lmnode{U, V, N}}()
+         X2new = Vector{lmnode{U, V, N}}()
          H = Vector{lmnode{U, V, N}}()
          reduction_occurs = true
          while reduction_occurs
@@ -1600,8 +1647,8 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
             # insert fragments (including s-polys)
             insert_fragments(S2, B2, H)
             generate_spolys(S, B2, S2)
-println("B2 = ", B2)
-readline(stdin)
+# println("B2 = ", B2)
+# readline(stdin)
          end
          # extract polynomials from B2
          B = extract_gens(B2)
