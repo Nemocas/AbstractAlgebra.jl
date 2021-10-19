@@ -60,6 +60,9 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
       node = new{U, V, N}(p, nothing, nothing, nothing, nothing, true, true, 0)
       node.size = 0.0
       if p != nothing && !iszero(p)
+         if leading_coefficient(p) < 0
+            p = -p
+         end
          node.lm = Tuple(exponent_vector(p, 1))
          node.lcm = node.lm
          node.size = reducer_size(node)
@@ -79,21 +82,59 @@ end
 
 function show_inner(io::IO, n::lmnode)
    if !n.path
-      print(io, "Node(p", n.num, "=", n.poly, ", ")
+      print(io, "Node(p", n.num)
+      if n.active
+         print(io, "(Y)")
+      else
+         print(io, "(N)")
+      end
+      print(io, "=", n.poly, ", ")
       show_inner(io, n.up)
       print(io, ", ")
       if n.next == nothing
          print(io, "nothing")
       else
-         show_inner(io, n.next.up)
+         if n.next.next != nothing
+            print(io, "n", n.num, ":[")
+         end
+         n2 = n.next
+         while n2 != nothing
+            show_inner(io, n2.up)
+            n2 = n2.next
+            if n2 != nothing
+               print(io, ", ")
+            end
+         end
+         if n.next.next != nothing
+            print(io, "]")
+         end
       end
       print(io, ", ")
-      show_inner(io, n.equal)
-      if n.active
-         print(io, ", Y)")
+      if n.equal == nothing
+         print(io, "nothing")
       else
-         print(io, ", N)")
+         if n.equal.equal != nothing
+            print(io, "e", n.num, ":[")
+         end
+         n2 = n.equal
+         while n2 != nothing
+            print(io, "e", n2.num)
+            if n2.active
+               print(io, "(Y)")
+            else
+               print(io, "(N)")
+            end
+            print(io, "=", n2.poly)
+            n2 = n2.equal
+            if n2 != nothing
+               print(io, ", ")
+            end
+         end
+         if n.equal.equal != nothing
+            print(io, "]")
+         end
       end
+      print(io, ")")
    else
       print(io, "N", n.num)
    end
@@ -1297,8 +1338,9 @@ function best_reducer(B::Vector{T}, X::Vector{T}, Xnew::Vector{T}) where {U <: A
 end
 
 # insert fragments into basis
-function insert_fragments(S::Vector{T}, B::Vector{T}, H::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   while !isempty(H)
+function insert_fragments(S::Vector{T}, B::Vector{T}, H::Vector{T}, bound::NTuple{N, Int}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   sort!(H, by=x->sum(max.(x.lm, bound) .- bound), rev=true)
+   while !isempty(H) && max.(H[end].lm, bound) == bound
       d = pop!(H)
       basis_insert(S, B, d)
    end
@@ -1461,13 +1503,13 @@ function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
       end
    else
       if b.up != nothing
-         if lm_divides_lcm(b.up, d)
+         if lm_divides_lcm(b.up, d) && !b.up.path
             insert_links(d, b.up)
          end
          b2 = b
          while b2.next != nothing
             b2 = b2.next
-            if lm_divides_lcm(b.up, d)
+            if lm_divides_lcm(b.up, d) && !b.up.path
                insert_links(d, b.up)
             end   
          end
@@ -1582,7 +1624,7 @@ function generate_spolys(S::Vector{T}, B::Vector{T}, S2::Vector{T}) where {N, U 
          deleteat!(S2, i)
          i -= 1
          len -= 1
-      elseif s.settled >= 1 # only generate spolys for polys without level 1 reducers
+      elseif s.settled >= 3 # only generate spolys for polys without level 1 reducers
          compute_spolys(S, B, s)
          deleteat!(S2, i)
          i -= 1
@@ -1616,39 +1658,64 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
             end
             d.poly = S(d0)
          end
+         bound = d.lm
          B2 = [d]
          X = lmnode{U, V, N}[] # fragments
          S = lmnode{U, V, N}[] # spolys
          S2 = lmnode{U, V, N}[] # nodes for which we have not computed spolys
          # insert everything in tree
+         H = Vector{lmnode{U, V, N}}()
          while !isempty(heap)
             d = heappop!(heap)
+            bound = max.(bound, d.lm)
             basis_insert(S2, B2, d)
          end
          # do reduction
          X = Vector{lmnode{U, V, N}}()
          X2 = Vector{lmnode{U, V, N}}()
          X2new = Vector{lmnode{U, V, N}}()
-         H = Vector{lmnode{U, V, N}}()
-         reduction_occurs = true
-         while reduction_occurs
-            # attach best reducers to nodes
-            best_reducer(B2, X2, X2new)
-            # do reductions
-            reduction_occurs = reduce_nodes(H, B2, X)
-            clear_path(B2)
-            # move s-polys from S to fragments
-            while !isempty(S)
-               d = pop!(S)
-               if !iszero(d.poly)
-                  push!(H, d)
+         while true
+            reduction_occurs = true
+            while reduction_occurs
+#println("B2 = ", B2)
+#readline(stdin)
+               # attach best reducers to nodes
+               best_reducer(B2, X2, X2new)
+               # do reductions
+#println("1: B2 = ", B2)
+#readline(stdin)
+               reduction_occurs = reduce_nodes(H, B2, X)
+               clear_path(B2)
+               # move s-polys from S to fragments
+#println("2: B2 = ", B2)
+#readline(stdin)
+               while !isempty(S)
+                  d = pop!(S)
+                  if !iszero(d.poly)
+                     push!(H, d)
+                  end
                end
+               # insert fragments (including s-polys)
+               insert_fragments(S2, B2, H, bound)
+#println("3: B2 = ", B2)
+#println("S = ", S)
+#println("S2 = ", S2)
+#readline(stdin)
+               generate_spolys(S, B2, S2)
+#println("4: B2 = ", B2)
+#readline(stdin)
             end
-            # insert fragments (including s-polys)
-            insert_fragments(S2, B2, H)
-            generate_spolys(S, B2, S2)
-# println("B2 = ", B2)
-# readline(stdin)
+#println("isempty = ", isempty(H))
+            if isempty(H)
+               break
+            else
+               bound = max.(bound, H[end].lm)
+            end
+#println("B2 = ", B2)
+#println("S = ", S)
+#println("S2 = ", S2)
+#println("")
+#readline(stdin)
          end
          # extract polynomials from B2
          B = extract_gens(B2)
