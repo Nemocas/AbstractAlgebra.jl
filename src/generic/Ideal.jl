@@ -1349,11 +1349,11 @@ end
 # insert a node into the given branch of basis
 function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if lm_divides(b, d) # divides in both directions, so equal
-      equal = b.poly == d.poly
+      equal = b.poly == d.poly || b.poly == -d.poly
       b2 = b
       while !equal && b2.equal != nothing
          b2 = b2.equal
-         equal = b2.poly == d.poly
+         equal = b2.poly == d.poly || b2.poly == -d.poly
       end
       if !equal # avoid inserting equal polynomials
          d.equal = b.equal
@@ -1612,6 +1612,7 @@ function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, V,
    for node in B
       extract_gens(D, node)
    end
+   clear_path(B)
    return D
 end
 
@@ -1624,7 +1625,7 @@ function generate_spolys(S::Vector{T}, B::Vector{T}, S2::Vector{T}) where {N, U 
          deleteat!(S2, i)
          i -= 1
          len -= 1
-      elseif s.settled >= 3 # only generate spolys for polys without level 1 reducers
+      elseif s.settled >= 3 # only generate spolys for polys without level 3 reducers
          compute_spolys(S, B, s)
          deleteat!(S2, i)
          i -= 1
@@ -1665,12 +1666,14 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          S2 = lmnode{U, V, N}[] # nodes for which we have not computed spolys
          # insert everything in tree
          H = Vector{lmnode{U, V, N}}()
+         H2 = Vector{lmnode{U, V, N}}()
          while !isempty(heap)
             d = heappop!(heap)
             bound = max.(bound, d.lm)
             basis_insert(S2, B2, d)
          end
          # do reduction
+         G = Vector{U}()
          X = Vector{lmnode{U, V, N}}()
          X2 = Vector{lmnode{U, V, N}}()
          X2new = Vector{lmnode{U, V, N}}()
@@ -1695,6 +1698,23 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                      push!(H, d)
                   end
                end
+               # reduce contents of H if no reduction has occurred
+               if !reduction_occurs && !isempty(H)
+                  if !reduction_occurs
+                     G = extract_gens(B2)
+                  end
+                  if !isempty(G)
+                     while !isempty(H)
+                        d = pop!(H)
+                        q, p = Base.divrem(d.poly, G)
+                        if !iszero(p)
+                           pnode = lmnode{U, V, N}(p)
+                           push!(H2, pnode)
+                        end
+                     end
+                     H, H2 = H2, H
+                  end
+               end
                # insert fragments (including s-polys)
                insert_fragments(S2, B2, H, bound)
 #println("3: B2 = ", B2)
@@ -1705,17 +1725,18 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
 #println("4: B2 = ", B2)
 #readline(stdin)
             end
-#println("isempty = ", isempty(H))
+#println("B2 = ", B2)
+#println("S2 = ", S2)
+#println("S = ", S)
+#println("")
+#readline(stdin)
             if isempty(H)
+#println("S2 = ", S2)
+#println("S = ", S)               
                break
             else
                bound = max.(bound, H[end].lm)
             end
-#println("B2 = ", B2)
-#println("S = ", S)
-#println("S2 = ", S2)
-#println("")
-#readline(stdin)
          end
          # extract polynomials from B2
          B = extract_gens(B2)
