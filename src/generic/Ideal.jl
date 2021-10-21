@@ -80,6 +80,13 @@ function show_inner(io::IO, n::Nothing)
    print(io, "nothing")
 end
 
+function print_poly(io::IO, p::MPolyElem)
+   print(io, leading_term(p))
+   if length(p) > 1
+      print(io, "+...")
+   end
+end
+
 function show_inner(io::IO, n::lmnode)
    if !n.path
       print(io, "Node(p", n.num)
@@ -88,7 +95,9 @@ function show_inner(io::IO, n::lmnode)
       else
          print(io, "(N)")
       end
-      print(io, "=", n.poly, ", ")
+      print(io, "=")
+      print_poly(io, n.poly)
+      print(io, ", ")
       show_inner(io, n.up)
       print(io, ", ")
       if n.next == nothing
@@ -124,7 +133,8 @@ function show_inner(io::IO, n::lmnode)
             else
                print(io, "(N)")
             end
-            print(io, "=", n2.poly)
+            print(io, "=")
+            print_poly(io, n2.poly)
             n2 = n2.equal
             if n2 != nothing
                print(io, ", ")
@@ -1050,7 +1060,7 @@ function reduce_by_reducer(H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPoly
    reduced = false
    if b.reducer != nothing
       c = leading_coefficient(b.poly)
-      h = leading_coefficient(b.reducer.poly) # should be nonnegative
+      h = leading_coefficient(b.reducer.poly)
       sign = false
       if h < 0
          h = -h
@@ -1078,6 +1088,7 @@ function reduce_by_reducer(H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPoly
          b.poly = d # replace b with gcd poly
          b.size = 0.0 # update size
          b.size = reducer_size(b)
+         b.new_node = true
          if !iszero(p)
             push!(H, lmnode{U, V, N}(p))
          end
@@ -1099,6 +1110,7 @@ function reduce_by_reducer(H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPoly
             b.poly = d
             b.size = 0.0 # update size
             b.size = reducer_size(b)
+            b.new_node = true
          end
       end
       reduced = true
@@ -1136,10 +1148,29 @@ function reduce_nodes(H::Vector{T}, b::T, X::Vector{T}) where {U <: AbstractAlge
       index = searchsortedfirst(X, b2, by=leading_coefficient_size, rev=true) # find index at which to insert x
       insert!(X, index, b2)
    end
+   filter!(x->x.active, X)
+   i = 1
+   len = length(X)
+   while i < len
+      c1 = leading_coefficient(X[i].poly)
+      j = i + 1
+      while j <= len && (leading_coefficient(X[j].poly) == c1 ||
+                        leading_coefficient(X[j].poly) == -c1)
+         if X[j].poly == X[i].poly || X[j] == -X[i].poly
+            X[j].active = false
+            deleteat!(X, j)
+            reduced = true
+            j -= 1
+            len -= 1
+         end
+         j += 1
+      end
+      i += 1
+   end
    # do reductions
-   for b in X
-      reduced |= reduce_by_reducer(H, b)
-   end   
+   for b2 in X
+      reduced |= reduce_by_reducer(H, b2)
+   end
    # empty X
    while !isempty(X)
       pop!(X)
@@ -1167,16 +1198,20 @@ function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_div
    for i = length(X):-1:1
       if X[i] != b # poly can't be reduced by itself
          if divides(c, leading_coefficient(X[i].poly))[1]
-            if best == nothing || !best_divides
-               best = X[i]
-               best_size = reducer_size(X[i])
-               best_divides = true
-            else
-               red_size = reducer_size(X[i])
-               if red_size < best_size
+            if X[i].reducer != b &&
+               ((X[i].poly != b.poly && X[i].poly != -b.poly) ||
+               X[i].active)
+               if best == nothing || !best_divides
                   best = X[i]
-                  best_size = red_size
+                  best_size = reducer_size(X[i])
                   best_divides = true
+               else
+                  red_size = reducer_size(X[i])
+                  if red_size < best_size
+                     best = X[i]
+                     best_size = red_size
+                     best_divides = true
+                  end
                end
             end
          end
@@ -1190,7 +1225,8 @@ function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_red
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
       if X[i] != b # poly can't be reduced by itself
-         if smod(c, leading_coefficient(X[i].poly)) != c
+         h = smod(c, leading_coefficient(X[i].poly))
+         if h != c && h != 0
             if best == nothing || !best_reduces
                best = X[i]
                best_size = reducer_size(X[i])
@@ -1214,7 +1250,8 @@ function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd:
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
       if X[i] != b # poly can't be reduced by itself
-         if !divides(leading_coefficient(X[i].poly), c)[1]
+         if !divides(leading_coefficient(X[i].poly), c)[1] &&
+            !divides(c, leading_coefficient(X[i].poly))[1]
             if best == nothing || !best_is_gcd
                best = X[i]
                best_size = reducer_size(X[i])
@@ -1340,7 +1377,10 @@ end
 # insert fragments into basis
 function insert_fragments(S::Vector{T}, B::Vector{T}, H::Vector{T}, bound::NTuple{N, Int}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    sort!(H, by=x->sum(max.(x.lm, bound) .- bound), rev=true)
-   while !isempty(H) && max.(H[end].lm, bound) == bound
+   while !isempty(H)
+      if max.(H[end].lm, bound) != bound
+         break
+      end
       d = pop!(H)
       basis_insert(S, B, d)
    end
@@ -1349,15 +1389,20 @@ end
 # insert a node into the given branch of basis
 function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if lm_divides(b, d) # divides in both directions, so equal
-      equal = b.poly == d.poly || b.poly == -d.poly
-      b2 = b
-      while !equal && b2.equal != nothing
-         b2 = b2.equal
-         equal = b2.poly == d.poly || b2.poly == -d.poly
-      end
-      if !equal # avoid inserting equal polynomials
-         d.equal = b.equal
-         b.equal = d
+      if d.active # avoid inserting equal polynomials
+         d2 = b
+         found = false
+         while d2 != nothing
+            if d == d2
+               found = true
+               break
+            end
+            d2 = d2.equal
+         end
+         if !found
+            d.equal = b.equal
+            b.equal = d
+         end
       end
    else # not equal to current node
       if b.up != nothing
@@ -1376,14 +1421,14 @@ function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
             end
          end
          if !flag # not inserted yet
-            if b != d
+            if b != d && d.active && d.settled != -1
                n = lmnode{U, V, N}(nothing)
                n.up = d
                n.next = b.next
                b.next = n
             end
          end
-      else
+      elseif d.active && d.settled != -1
          b.up = d
       end
    end
@@ -1405,7 +1450,10 @@ function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlge
       push!(B, d)
    end
    clear_path(B)
-   push!(S, d) # store for later computation of spolys
+   if d.active
+      push!(S, d) # store for later computation of spolys
+      d.settled = 0
+   end
 end
 
 # return true if d has a direct connection up to b
@@ -1435,25 +1483,8 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
          compute_spolys(S, b2.up, d)
       end
    end
-   if b.poly != nothing
-      if b.active
-         if b != d && !lm_divides(b, d) && !lm_divides(d, b)
-            s = compute_spoly(b, d)
-            if !divides(s.poly, d.poly)[1] && !divides(s.poly, b.poly)[1]
-               push!(S, s)
-            end
-         end
-         if connected(b, d) || connected(d, b)
-            s = compute_spoly(b, d)
-            if !divides(s.poly, d.poly)[1] && !divides(s.poly, b.poly)[1]
-               push!(S, s)
-            end
-         end 
-      end
-   end
    n = b
-   while n.equal != nothing
-      n = n.equal
+   while n != nothing
       if n.active
          if n != d && !lm_divides(n, d) && !lm_divides(d, n)
             s = compute_spoly(n, d)
@@ -1461,13 +1492,14 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
                push!(S, s)
             end
          end
-         if connected(n, d) || connected(d, n)
+         if connected(b, d) || connected(d, b)
             s = compute_spoly(n, d)
             if !divides(s.poly, d.poly)[1] && !divides(s.poly, n.poly)[1]
                push!(S, s)
             end
          end 
       end
+      n = n.equal
    end
    b.path = true
    return nothing
@@ -1491,15 +1523,28 @@ function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
    remove = false
    if lm_divides(b, d) # we have arrived
       if !lm_divides(d, b) # make sure node is not equal
-         if d.up == nothing
-            d.up = b
-         else
-            n = lmnode{U, V, N}(nothing)
-            n.up = b
-            n.next = d.next
-            d.next = n
+         if d.settled != -1
+            if d.up == nothing
+               d.up = b
+            else
+               n = lmnode{U, V, N}(nothing)
+               n.up = b
+               n.next = d.next
+               d.next = n
+            end
          end
          remove = true
+      else
+         b2 = b
+         while b2 != nothing
+            if d.poly == b2.poly || d.poly == -b2.poly
+               d.active = false
+            end
+            b2 = b2.equal
+         end
+         d.settled = -1 # flag as equal
+         d.up = nothing
+         d.next = nothing
       end
    else
       if b.up != nothing
@@ -1509,8 +1554,8 @@ function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
          b2 = b
          while b2.next != nothing
             b2 = b2.next
-            if lm_divides_lcm(b.up, d) && !b.up.path
-               insert_links(d, b.up)
+            if lm_divides_lcm(b2.up, d) && !b2.up.path
+               insert_links(d, b2.up)
             end   
          end
       end
@@ -1691,6 +1736,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                clear_path(B2)
                # move s-polys from S to fragments
 #println("2: B2 = ", B2)
+#println("")
 #readline(stdin)
                while !isempty(S)
                   d = pop!(S)
@@ -1699,7 +1745,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                   end
                end
                # reduce contents of H if no reduction has occurred
-               if !reduction_occurs && !isempty(H)
+               if !isempty(H) && !reduction_occurs
                   if !reduction_occurs
                      G = extract_gens(B2)
                   end
@@ -1720,6 +1766,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
 #println("3: B2 = ", B2)
 #println("S = ", S)
 #println("S2 = ", S2)
+#println("")
 #readline(stdin)
                generate_spolys(S, B2, S2)
 #println("4: B2 = ", B2)
@@ -1733,7 +1780,9 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
             if isempty(H)
 #println("S2 = ", S2)
 #println("S = ", S)               
-               break
+               if isempty(S) && isempty(S2)
+                  break
+               end
             else
                bound = max.(bound, H[end].lm)
             end
