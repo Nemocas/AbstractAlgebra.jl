@@ -67,6 +67,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
          node.lcm = node.lm
          node.size = reducer_size(node)
       end
+      node.equal = node
       node.path = false
       node.path2 = false
       node.in_heap = false
@@ -125,14 +126,14 @@ function show_inner(io::IO, n::lmnode)
          end
       end
       print(io, ", ")
-      if n.equal == nothing
+      if n.equal == n
          print(io, "nothing")
       else
-         if n.equal.equal != nothing
+         if n.equal.equal != n
             print(io, "e", n.num, ":[")
          end
          n2 = n.equal
-         while n2 != nothing
+         while n2 != n
             print(io, "e", n2.num)
             if n2.active
                print(io, "(Y)")
@@ -142,11 +143,11 @@ function show_inner(io::IO, n::lmnode)
             print(io, "=")
             print_poly(io, n2.poly)
             n2 = n2.equal
-            if n2 != nothing
+            if n2 != n
                print(io, ", ")
             end
          end
-         if n.equal.equal != nothing
+         if n.equal.equal != n
             print(io, "]")
          end
       end
@@ -1149,7 +1150,7 @@ function reduce_nodes(H::Vector{T}, b::T, X::Vector{T}) where {U <: AbstractAlge
    # first sort nodes by leading coefficient
    push!(X, b)
    b2 = b
-   while b2.equal != nothing
+   while b2.equal != b
       b2 = b2.equal
       index = searchsortedfirst(X, b2, by=leading_coefficient_size, rev=true) # find index at which to insert x
       insert!(X, index, b2)
@@ -1331,17 +1332,20 @@ function best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractA
    b2 = b
    oldlen = length(X)
    newlen = length(Xnew)
-   while b2 != nothing
+   bend = nothing
+   while b2 != bend
       if b2.new_node
          push!(Xnew, b2)
       else
          push!(X, b2)
       end
       b2 = b2.equal
+      bend = b
    end
    # set best reducer of B for each node equal to b
-   b2 = b
-   while b2 != nothing
+   b.reducer = find_best_reducer(b, X, Xnew)
+   b2 = b.equal
+   while b2 != b
       b2.reducer = find_best_reducer(b2, X, Xnew)
       b2 = b2.equal
    end
@@ -1396,12 +1400,11 @@ end
 function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if lm_divides(b, d) # divides in both directions, so equal
       if d.active # avoid inserting equal polynomials
-         d2 = b
-         found = false
-         while d2 != nothing
+         found = d == b
+         d2 = b.equal
+         while !found && d2 != b
             if d == d2
                found = true
-               break
             end
             d2 = d2.equal
          end
@@ -1462,13 +1465,20 @@ function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlge
    end
 end
 
-# return true if d has a direct connection up to b
+# return true if d has a connection up to b
 function connected(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   while d != nothing
-      if d.up == b
-         return true
+   d2 = d
+   dend = nothing
+   while d2 != dend
+      dn = d2
+      while dn != nothing
+         if dn.up == b
+             return true
+         end
+         dn = dn.next
       end
-      d = d.next
+      d2 = d2.equal
+      dend = d
    end
    return false
 end
@@ -1490,7 +1500,8 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
       end
    end
    n = b
-   while n != nothing
+   nend = nothing
+   while n != nend
       if n.active
          if n != d && !lm_divides(n, d) && !lm_divides(d, n)
             s = compute_spoly(n, d)
@@ -1506,6 +1517,7 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
          end 
       end
       n = n.equal
+      nend = b
    end
    b.path = true
    return nothing
@@ -1542,11 +1554,13 @@ function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
          remove = true
       else
          b2 = b
-         while b2 != nothing
+         nend = nothing
+         while b2 != nend
             if d.poly == b2.poly || d.poly == -b2.poly
                d.active = false
             end
             b2 = b2.equal
+            nend = b
          end
          d.settled = -1 # flag as equal
          d.up = nothing
@@ -1647,7 +1661,7 @@ function extract_gens(D::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPol
       end
    end
    n = node
-   while n.equal != nothing
+   while n.equal != node
       if n.equal.active
          push!(D, n.equal.poly)
       end
