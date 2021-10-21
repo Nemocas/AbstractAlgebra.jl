@@ -80,10 +80,16 @@ function show_inner(io::IO, n::Nothing)
    print(io, "nothing")
 end
 
+poly_level = 2
+
 function print_poly(io::IO, p::MPolyElem)
-   print(io, leading_term(p))
-   if length(p) > 1
-      print(io, "+...")
+   if poly_level == 1
+      print(io, leading_term(p))
+      if length(p) > 1
+         print(io, "+...")
+      end
+   else
+      print(io, p)
    end
 end
 
@@ -1015,7 +1021,7 @@ function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingE
    fc = leading_coefficient(f.poly)
    gc = leading_coefficient(g.poly)
    c = lcm(fc, gc)
-   llcm = lm_lcm(f, g)
+   llcm = max.(f.lm, g.lm)
    infl = [1 for in in 1:N]
    shiftf = llcm .- exponent_vector(f.poly, 1)
    shiftg = llcm .- exponent_vector(g.poly, 1)
@@ -1226,7 +1232,7 @@ function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_red
    for i = length(X):-1:1
       if X[i] != b # poly can't be reduced by itself
          h = smod(c, leading_coefficient(X[i].poly))
-         if h != c && h != 0
+         if h != c && h != 0 && X[i].reducer != b
             if best == nothing || !best_reduces
                best = X[i]
                best_size = reducer_size(X[i])
@@ -1251,7 +1257,7 @@ function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd:
    for i = length(X):-1:1
       if X[i] != b # poly can't be reduced by itself
          if !divides(leading_coefficient(X[i].poly), c)[1] &&
-            !divides(c, leading_coefficient(X[i].poly))[1]
+            !divides(c, leading_coefficient(X[i].poly))[1] && X[i].reducer != b
             if best == nothing || !best_is_gcd
                best = X[i]
                best_size = reducer_size(X[i])
@@ -1766,10 +1772,12 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
 #println("3: B2 = ", B2)
 #println("S = ", S)
 #println("S2 = ", S2)
+#println("H = ", H)
 #println("")
 #readline(stdin)
                generate_spolys(S, B2, S2)
-#println("4: B2 = ", B2)
+#println("4: S = ", S)
+#println("4: S2 = ", S2)
 #readline(stdin)
             end
 #println("B2 = ", B2)
