@@ -1030,6 +1030,18 @@ function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingE
    return lmnode{U, V, N}(s)
 end
 
+function compute_gpoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   fc = leading_coefficient(f.poly)
+   gc = leading_coefficient(g.poly)
+   _, s, t = gcdx(fc, gc)
+   llcm = max.(f.lm, g.lm)
+   infl = [1 for in in 1:N]
+   shiftf = llcm .- exponent_vector(f.poly, 1)
+   shiftg = llcm .- exponent_vector(g.poly, 1)
+   g = s*inflate(f.poly, shiftf, infl) + t*inflate(g.poly, shiftg, infl)
+   return lmnode{U, V, N}(g)
+end
+
 function smod(c::T, h::T) where T <: RingElement
    if h < 0
       h = abs(h)
@@ -1207,7 +1219,7 @@ function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_div
          h = leading_coefficient(X[i].poly)
          if divides(c, h)[1]
             usable = true
-            if (c == h || c == -h) && (X[i].lm == b.lm)
+            if X[i].lm == b.lm
                x2 = X[i]
                while x2 != nothing
                   if x2 == b
@@ -1216,7 +1228,7 @@ function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_div
                   x2 = x2.reducer
                end
             end
-            if usable && ((X[i].poly != b.poly && X[i].poly != -b.poly) || X[i].active)
+            if usable && ((c != h && c != -h) || X[i].active)
                if best == nothing || !best_divides
                   best = X[i]
                   best_size = reducer_size(X[i])
@@ -1534,6 +1546,8 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
             if !divides(s.poly, d.poly)[1] && !divides(s.poly, n.poly)[1]
                push!(S, s)
             end
+            g = compute_gpoly(n, d)
+            push!(S, g)
          end
          if connected1(b, d) || connected2(d, b)
             s = compute_spoly(n, d)
