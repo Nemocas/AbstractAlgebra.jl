@@ -1759,7 +1759,8 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
             S = parent(d.poly)
             d0 = constant_coefficient(d.poly)
             while !isempty(heap) && isconstant(heap[1].poly)
-               di = constant_coefficient(pop!(heap).poly)
+               h = heappop!(heap)
+               di = constant_coefficient(h.poly)
                d0 = gcd(d0, di)
             end
             d.poly = S(d0)
@@ -1782,6 +1783,12 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          X = Vector{lmnode{U, V, N}}()
          X2 = Vector{lmnode{U, V, N}}()
          X2new = Vector{lmnode{U, V, N}}()
+#println("0: B2 = ", B2)
+#println("S = ", S)
+#println("S2 = ", S2)
+#println("H = ", H)
+#println("")
+#readline(stdin)
          while true
             reduction_occurs = true
             while reduction_occurs
@@ -1823,16 +1830,16 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                end
                # insert fragments (including s-polys)
                insert_fragments(S2, B2, H, bound)
-#println("3: B2 = ", B2)
-#println("S = ", S)
-#println("S2 = ", S2)
-#println("H = ", H)
-#println("")
-#readline(stdin)
+println("3: B2 = ", B2)
+println("S = ", S)
+println("S2 = ", S2)
+println("H = ", H)
+println("")
+readline(stdin)
                generate_spolys(S, B2, S2)
-#println("4: S = ", S)
-#println("4: S2 = ", S2)
-#readline(stdin)
+println("4: S = ", S)
+println("4: S2 = ", S2)
+readline(stdin)
             end
 #println("B2 = ", B2)
 #println("S2 = ", S2)
