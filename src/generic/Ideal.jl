@@ -1204,10 +1204,19 @@ function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_div
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
       if X[i] != b # poly can't be reduced by itself
-         if divides(c, leading_coefficient(X[i].poly))[1]
-            if X[i].reducer != b &&
-               ((X[i].poly != b.poly && X[i].poly != -b.poly) ||
-               X[i].active)
+         h = leading_coefficient(X[i].poly)
+         if divides(c, h)[1]
+            usable = true
+            if (c == h || c == -h) && (X[i].lm == b.lm)
+               x2 = X[i]
+               while x2 != nothing
+                  if x2 == b
+                     usable = false
+                  end
+                  x2 = x2.reducer
+               end
+            end
+            if usable && ((X[i].poly != b.poly && X[i].poly != -b.poly) || X[i].active)
                if best == nothing || !best_divides
                   best = X[i]
                   best_size = reducer_size(X[i])
@@ -1466,7 +1475,7 @@ function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlge
 end
 
 # return true if d has a connection up to b
-function connected(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function connected1(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    d2 = d
    dend = nothing
    while d2 != dend
@@ -1479,6 +1488,23 @@ function connected(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEleme
       end
       d2 = d2.equal
       dend = d
+   end
+   return false
+end
+
+function connected2(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   dn = d
+   while dn != nothing
+      b2 = b
+      bend = nothing
+      while b2 != bend
+         if dn.up == b2
+            return true
+         end
+         b2 = b2.equal
+         bend = b
+      end
+      dn = dn.next
    end
    return false
 end
@@ -1509,7 +1535,7 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
                push!(S, s)
             end
          end
-         if connected(b, d) || connected(d, b)
+         if connected1(b, d) || connected2(d, b)
             s = compute_spoly(n, d)
             if !divides(s.poly, d.poly)[1] && !divides(s.poly, n.poly)[1]
                push!(S, s)
