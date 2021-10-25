@@ -1260,17 +1260,29 @@ function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_red
    for i = length(X):-1:1
       if X[i] != b # poly can't be reduced by itself
          h = smod(c, leading_coefficient(X[i].poly))
-         if h != c && h != 0 && X[i].reducer != b
-            if best == nothing || !best_reduces
-               best = X[i]
-               best_size = reducer_size(X[i])
-               best_reduces = true
-            else
-               red_size = reducer_size(X[i])
-               if red_size < best_size
+         if h != c && h != 0
+            usable = true
+            if X[i].lm == b.lm
+               x2 = X[i]
+               while x2 != nothing
+                  if x2 == b
+                     usable = false
+                  end
+                  x2 = x2.reducer
+               end
+            end
+            if usable
+               if best == nothing || !best_reduces
                   best = X[i]
-                  best_size = red_size
+                  best_size = reducer_size(X[i])
                   best_reduces = true
+               else
+                  red_size = reducer_size(X[i])
+                  if red_size < best_size
+                     best = X[i]
+                     best_size = red_size
+                     best_reduces = true
+                  end
                end
             end
          end
@@ -1285,17 +1297,29 @@ function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd:
    for i = length(X):-1:1
       if X[i] != b # poly can't be reduced by itself
          if !divides(leading_coefficient(X[i].poly), c)[1] &&
-            !divides(c, leading_coefficient(X[i].poly))[1] && X[i].reducer != b
-            if best == nothing || !best_is_gcd
-               best = X[i]
-               best_size = reducer_size(X[i])
-               best_is_gcd = true
-            else
-               red_size = reducer_size(X[i])
-               if red_size < best_size
+            !divides(c, leading_coefficient(X[i].poly))[1]
+            usable = true
+            if X[i].lm == b.lm
+               x2 = X[i]
+               while x2 != nothing
+                  if x2 == b
+                     usable = false
+                  end
+                  x2 = x2.reducer
+               end
+            end
+            if usable
+               if best == nothing || !best_is_gcd
                   best = X[i]
-                  best_size = red_size
+                  best_size = reducer_size(X[i])
                   best_is_gcd = true
+               else
+                  red_size = reducer_size(X[i])
+                  if red_size < best_size
+                     best = X[i]
+                     best_size = red_size
+                     best_is_gcd = true
+                  end
                end
             end
          end
@@ -1794,7 +1818,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          B2 = [d]
          X = lmnode{U, V, N}[] # fragments
          S = lmnode{U, V, N}[] # spolys
-         S2 = [d] # nodes for which we have not computed spolys
+         S2 = lmnode{U, V, N}[] # nodes for which we have not computed spolys
          # insert everything in tree
          H = Vector{lmnode{U, V, N}}()
          H2 = Vector{lmnode{U, V, N}}()
@@ -1837,7 +1861,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                   end
                end
                # reduce contents of H if no reduction has occurred
-               if !isempty(H) && !reduction_occurs
+               if !isempty(H)
                   if !reduction_occurs
                      G = extract_gens(B2)
                   end
