@@ -1075,7 +1075,7 @@ function leading_coefficient_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:
    return abs(leading_coefficient(f.poly))
 end
 
-function reduce_by_reducer(H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    reduced = false
    if b.reducer != nothing
       c = leading_coefficient(b.poly)
@@ -1108,6 +1108,9 @@ function reduce_by_reducer(H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPoly
          b.size = 0.0 # update size
          b.size = reducer_size(b)
          b.new_node = true
+         if length(b.poly) == 1 # special case, must recompute s-polys
+            push!(S, b)
+         end
          if !iszero(p)
             push!(H, lmnode{U, V, N}(p))
          end
@@ -1130,6 +1133,9 @@ function reduce_by_reducer(H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPoly
             b.size = 0.0 # update size
             b.size = reducer_size(b)
             b.new_node = true
+            if length(b.poly) == 1 # special case, must recompute s-polys
+               push!(S, b)
+            end
          end
       end
       reduced = true
@@ -1142,19 +1148,19 @@ end
 # X is used to sort equal nodes
 # H is used for fragments
 # returns true if some reduction actually occurred
-function reduce_nodes(H::Vector{T}, b::T, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    b.path = true
    # depth first
    reduced = false
    if b.up != nothing
       if !b.up.path
-         reduced |= reduce_nodes(H, b.up, X)
+         reduced |= reduce_nodes(S, H, b.up, X)
       end
       b2 = b
       while b2.next != nothing
          b2 = b2.next
          if !b2.up.path
-            reduced |= reduce_nodes(H, b2.up, X)
+            reduced |= reduce_nodes(S, H, b2.up, X)
          end
       end
    end
@@ -1188,7 +1194,7 @@ function reduce_nodes(H::Vector{T}, b::T, X::Vector{T}) where {U <: AbstractAlge
    end
    # do reductions
    for b2 in X
-      reduced |= reduce_by_reducer(H, b2)
+      reduced |= reduce_by_reducer(S, H, b2)
    end
    # empty X
    while !isempty(X)
@@ -1201,11 +1207,11 @@ end
 # X is used to sort equal nodes
 # H is used for fragments
 # returns true if some reduction actually occurred
-function reduce_nodes(H::Vector{T}, B::Vector{T}, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function reduce_nodes(S::Vector{T}, H::Vector{T}, B::Vector{T}, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    reduced = false
    for b in B
       if !b.path
-         reduced |= reduce_nodes(H, b, X)
+         reduced |= reduce_nodes(S, H, b, X)
       end
    end
    return reduced
@@ -1420,18 +1426,32 @@ end
 # insert a node into the given branch of basis
 function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if lm_divides(b, d) # divides in both directions, so equal
-      if d.active # avoid inserting equal polynomials
-         found = d == b
+      if d.active # avoid inserting polynomials that are a constant multiple of existing ones
+         found = false
+         c = leading_coefficient(d.poly)
+         if length(d.poly) == length(b.poly)
+            h = leading_coefficient(b.poly)
+            flag, q = divides(c, h)
+            if flag
+               found = d.poly == q*b.poly
+            end
+         end
          d2 = b.equal
          while !found && d2 != b
-            if d == d2
-               found = true
+            if length(d.poly) == length(d2.poly)
+               h = leading_coefficient(d2.poly)
+               flag, q = divides(c, h)
+               if flag
+                  found = d.poly == q*d2.poly
+               end
             end
             d2 = d2.equal
          end
          if !found
             d.equal = b.equal
             b.equal = d
+         else
+            d.active = false
          end
       end
    else # not equal to current node
@@ -1468,7 +1488,7 @@ end
 
 # insert a node into the basis
 function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   insert_links(d, B)
+  insert_links(d, B)
    inserted = false
    for b in B
       if lm_divides(d, b)
@@ -1486,37 +1506,41 @@ function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlge
    end
 end
 
-# return true if d has a connection up to b
-function connected1(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   d2 = d
-   dend = nothing
-   while d2 != dend
-      dn = d2
-      while dn != nothing
-         if dn.up == b
-             return true
-         end
-         dn = dn.next
-      end
-      d2 = d2.equal
-      dend = d
+function find_base(d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   if d.up != nothing
+      return d
    end
-   return false
+   d2 = d
+   while d2.equal != d
+      d2 = d2.equal
+      if d2.up != nothing
+         return d2
+      end
+   end
+   # declare d to be base
+   return d
 end
 
-function connected2(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   dn = d
-   while dn != nothing
-      b2 = b
-      bend = nothing
-      while b2 != bend
-         if dn.up == b2
+# return true if d has a connection up to b
+function connected(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   if !lm_divides(b, d)
+      return false
+   end
+   if d.up != nothing
+      d2 = d
+      while d2 != nothing
+         if b == d2.up
             return true
          end
-         b2 = b2.equal
-         bend = b
+         d2 = d2.next
       end
-      dn = dn.next
+      d2 = d
+      while d2 != nothing
+         if connected(b, d2.up)
+            return true
+         end
+         d2 = d2.next
+      end
    end
    return false
 end
@@ -1549,7 +1573,8 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
             g = compute_gpoly(n, d)
             push!(S, g)
          end
-         if connected1(b, d) || connected2(d, b)
+         dbase = find_base(d)
+         if connected(b, dbase) || connected(dbase, b)
             s = compute_spoly(n, d)
             if !divides(s.poly, d.poly)[1] && !divides(s.poly, n.poly)[1]
                push!(S, s)
@@ -1769,7 +1794,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          B2 = [d]
          X = lmnode{U, V, N}[] # fragments
          S = lmnode{U, V, N}[] # spolys
-         S2 = lmnode{U, V, N}[] # nodes for which we have not computed spolys
+         S2 = [d] # nodes for which we have not computed spolys
          # insert everything in tree
          H = Vector{lmnode{U, V, N}}()
          H2 = Vector{lmnode{U, V, N}}()
@@ -1799,7 +1824,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                # do reductions
 #println("1: B2 = ", B2)
 #readline(stdin)
-               reduction_occurs = reduce_nodes(H, B2, X)
+               reduction_occurs = reduce_nodes(S2, H, B2, X)
                clear_path(B2)
                # move s-polys from S to fragments
 #println("2: B2 = ", B2)
@@ -1830,16 +1855,16 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                end
                # insert fragments (including s-polys)
                insert_fragments(S2, B2, H, bound)
-println("3: B2 = ", B2)
-println("S = ", S)
-println("S2 = ", S2)
-println("H = ", H)
-println("")
-readline(stdin)
+#println("3: B2 = ", B2)
+#println("S = ", S)
+#println("S2 = ", S2)
+#println("H = ", H)
+#println("")
+#readline(stdin)
                generate_spolys(S, B2, S2)
-println("4: S = ", S)
-println("4: S2 = ", S2)
-readline(stdin)
+#println("4: S = ", S)
+#println("4: S2 = ", S2)
+#readline(stdin)
             end
 #println("B2 = ", B2)
 #println("S2 = ", S2)
