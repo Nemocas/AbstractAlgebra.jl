@@ -1023,7 +1023,7 @@ function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingE
    gc = leading_coefficient(g.poly)
    c = lcm(fc, gc)
    llcm = max.(f.lm, g.lm)
-   infl = [1 for in in 1:N]
+   infl = [1 for i in 1:N]
    shiftf = llcm .- exponent_vector(f.poly, 1)
    shiftg = llcm .- exponent_vector(g.poly, 1)
    s = divexact(c, fc)*inflate(f.poly, shiftf, infl) - divexact(c, gc)*inflate(g.poly, shiftg, infl)
@@ -1035,7 +1035,7 @@ function compute_gpoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingE
    gc = leading_coefficient(g.poly)
    _, s, t = gcdx(fc, gc)
    llcm = max.(f.lm, g.lm)
-   infl = [1 for in in 1:N]
+   infl = [1 for i in 1:N]
    shiftf = llcm .- exponent_vector(f.poly, 1)
    shiftg = llcm .- exponent_vector(g.poly, 1)
    g = s*inflate(f.poly, shiftf, infl) + t*inflate(g.poly, shiftg, infl)
@@ -1260,7 +1260,7 @@ function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_red
    for i = length(X):-1:1
       if X[i] != b # poly can't be reduced by itself
          h = smod(c, leading_coefficient(X[i].poly))
-         if h != c && h != 0
+         if h != c && h != 0 && !divides(leading_coefficient(X[i].poly), c)[1]
             usable = true
             if X[i].lm == b.lm
                x2 = X[i]
@@ -1512,7 +1512,7 @@ end
 
 # insert a node into the basis
 function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-  insert_links(d, B)
+   insert_links(d, B)
    inserted = false
    for b in B
       if lm_divides(d, b)
@@ -1596,6 +1596,7 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
             end
             g = compute_gpoly(n, d)
             push!(S, g)
+            break
          end
          dbase = find_base(d)
          if connected(b, dbase) || connected(dbase, b)
@@ -1603,6 +1604,7 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
             if !divides(s.poly, d.poly)[1] && !divides(s.poly, n.poly)[1]
                push!(S, s)
             end
+            break
          end 
       end
       n = n.equal
@@ -1885,7 +1887,9 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
 #println("H = ", H)
 #println("")
 #readline(stdin)
-               generate_spolys(S, B2, S2)
+               if !reduction_occurs
+                  generate_spolys(S, B2, S2)
+               end
 #println("4: S = ", S)
 #println("4: S2 = ", S2)
 #readline(stdin)
