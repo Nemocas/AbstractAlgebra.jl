@@ -1556,6 +1556,15 @@ function connected(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEleme
          if b == d2.up
             return true
          end
+         if b.up == nothing
+            b2 = b.equal
+            while b2 != b
+               if b2 == d2.up
+                  return true
+               end
+               b2 = b2.equal
+            end
+         end
          d2 = d2.next
       end
       d2 = d
