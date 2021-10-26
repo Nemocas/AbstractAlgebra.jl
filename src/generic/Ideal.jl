@@ -1108,9 +1108,8 @@ function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: Abstrac
          b.size = 0.0 # update size
          b.size = reducer_size(b)
          b.new_node = true
-         if length(b.poly) == 1 # special case, must recompute s-polys
-            push!(S, b)
-         end
+         # must recompute s-polys
+         push!(S, b)
          if !iszero(p)
             push!(H, lmnode{U, V, N}(p))
          end
@@ -1133,9 +1132,8 @@ function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: Abstrac
             b.size = 0.0 # update size
             b.size = reducer_size(b)
             b.new_node = true
-            if length(b.poly) == 1 # special case, must recompute s-polys
-               push!(S, b)
-            end
+            # must recompute s-polys
+            push!(S, b)
          end
       end
       reduced = true
@@ -1258,7 +1256,7 @@ function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_red
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
-      if X[i] != b # poly can't be reduced by itself
+      if X[i] != b && X[i].active # poly can't be reduced by itself
          h = smod(c, leading_coefficient(X[i].poly))
          if h != c && h != 0 && !divides(leading_coefficient(X[i].poly), c)[1]
             usable = true
@@ -1295,7 +1293,7 @@ function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd:
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
-      if X[i] != b # poly can't be reduced by itself
+      if X[i] != b && X[i].active # poly can't be reduced by itself
          if !divides(leading_coefficient(X[i].poly), c)[1] &&
             !divides(c, leading_coefficient(X[i].poly))[1]
             usable = true
@@ -1836,7 +1834,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          while !isempty(heap)
             d = heappop!(heap)
             bound = max.(bound, d.lm)
-            basis_insert(S2, B2, d)
+            push!(H, d)
          end
          # do reduction
          G = Vector{U}()
@@ -1901,6 +1899,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                end
 #println("4: S = ", S)
 #println("4: S2 = ", S2)
+#println("")
 #readline(stdin)
             end
 #println("B2 = ", B2)
