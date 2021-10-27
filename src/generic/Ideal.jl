@@ -4,6 +4,8 @@
 #
 ###############################################################################
 
+export normal_form
+
 ###############################################################################
 #
 #   Type and parent functions
@@ -61,9 +63,9 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
       node.size = 0.0
       if p != nothing && !iszero(p)
          if leading_coefficient(p) < 0
-            p = -p
+            node.poly = -node.poly
          end
-         node.lm = Tuple(exponent_vector(p, 1))
+         node.lm = Tuple(exponent_vector(node.poly, 1))
          node.lcm = node.lm
          node.size = reducer_size(node)
       end
@@ -1018,6 +1020,38 @@ end
 #
 ###############################################################################
 
+function normal_form(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
+   if iszero(p)
+      return zero(parent(p))
+   end
+   n = 1
+   len = length(p)
+   infl = [1 for i in 1:nvars(parent(p))]
+   while n <= len
+      for i = 1:length(V)
+         c = coeff(p, n)
+         mv = exponent_vector(V[i], 1)
+         mp = exponent_vector(p, n)
+         if max.(mv, mp) == mp # leading monomial divides
+            h = leading_coefficient(V[i]) # should be nonnegative
+            q, r = AbstractAlgebra.divrem(c, h)
+            if !iszero(q)
+               shift = mp .- mv
+               u = inflate(V[i], shift, infl)
+               p -= q*u
+               if iszero(r)
+                  n -= 1
+                  break
+               end
+            end        
+         end
+      end
+      n += 1
+      len = length(p)
+   end
+   return p
+end
+
 function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    fc = leading_coefficient(f.poly)
    gc = leading_coefficient(g.poly)
@@ -1042,15 +1076,32 @@ function compute_gpoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingE
    return lmnode{U, V, N}(g)
 end
 
-function smod(c::T, h::T) where T <: RingElement
-   if h < 0
-      h = abs(h)
-   end
-   r = AbstractAlgebra.mod(c, h)
-   if r >= ((h + 1) >> 1)
-      r -= h
-   end
-   return r
+function spoly(f::T, g::T) where T <: MPolyElem
+   n = nvars(parent(f))
+   fc = leading_coefficient(f)
+   gc = leading_coefficient(g)
+   mf = exponent_vector(f, 1)
+   mg = exponent_vector(g, 1)
+   c = lcm(fc, gc)
+   llcm = max.(mf, mg)
+   infl = [1 for i in 1:n]
+   shiftf = llcm .- mf
+   shiftg = llcm .- mg
+   s = divexact(c, fc)*inflate(f, shiftf, infl) - divexact(c, gc)*inflate(g, shiftg, infl)
+end
+
+function gpoly(f::T, g::T) where T <: MPolyElem
+   n = nvars(parent(f))
+   fc = leading_coefficient(f)
+   gc = leading_coefficient(g)
+   mf = exponent_vector(f, 1)
+   mg = exponent_vector(g, 1)
+   _, s, t = gcdx(fc, gc)
+   llcm = max.(mf, mg)
+   infl = [1 for i in 1:n]
+   shiftf = llcm .- mf
+   shiftg = llcm .- mg
+   g = s*inflate(f, shiftf, infl) + t*inflate(g, shiftg, infl)
 end
 
 # heuristic for size of reducer polynomials (smaller is better), used to sort
@@ -1072,7 +1123,7 @@ function reducer_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}
 end
 
 function leading_coefficient_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   return abs(leading_coefficient(f.poly))
+   return leading_coefficient(f.poly)
 end
 
 function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
@@ -1080,30 +1131,22 @@ function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: Abstrac
    if b.reducer != nothing
       c = leading_coefficient(b.poly)
       h = leading_coefficient(b.reducer.poly)
-      sign = false
-      if h < 0
-         h = -h
-         sign = true
-      end
       q, r = AbstractAlgebra.divrem(c, h)
       coeff_divides = false
       if iszero(r)
          coeff_divides = true
-      else
-         if r >= ((h + 1) >> 1)
-            q += 1
-         end
       end
       if iszero(q) # need gcd polynomial
-         if sign
-            h = -h
-         end
+         sp = compute_spoly(b, b.reducer)
          g, s, t = gcdx(c, h)
          infl = [1 for in in 1:N]
          shift = exponent_vector(b.poly, 1) .- exponent_vector(b.reducer.poly, 1)
          d = s*b.poly + t*inflate(b.reducer.poly, shift, infl)
          q = divexact(c, g)
          p = b.poly - q*d # reduce b by d (the gcd poly)
+         if leading_coefficient(d) < 0
+            d = -d
+         end
          b.poly = d # replace b with gcd poly
          b.size = 0.0 # update size
          b.size = reducer_size(b)
@@ -1114,9 +1157,6 @@ function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: Abstrac
             push!(H, lmnode{U, V, N}(p))
          end
       else
-         if sign
-            q = -q
-         end
          infl = [1 for in in 1:N]
          shift = exponent_vector(b.poly, 1) .- exponent_vector(b.reducer.poly, 1)
          d = b.poly - q*inflate(b.reducer.poly, shift, infl)
@@ -1128,6 +1168,9 @@ function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: Abstrac
             b.active = false
          else
             # case 2: leading coeff is reduced
+            if leading_coefficient(d) < 0
+               d = -d
+            end
             b.poly = d
             b.size = 0.0 # update size
             b.size = reducer_size(b)
@@ -1177,8 +1220,7 @@ function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <
    while i < len
       c1 = leading_coefficient(X[i].poly)
       j = i + 1
-      while j <= len && (leading_coefficient(X[j].poly) == c1 ||
-                        leading_coefficient(X[j].poly) == -c1)
+      while j <= len && leading_coefficient(X[j].poly) == c1
          if X[j].poly == X[i].poly || X[j] == -X[i].poly
             X[j].active = false
             deleteat!(X, j)
@@ -1219,7 +1261,7 @@ function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_div
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
-      if X[i] != b # poly can't be reduced by itself
+      if X[i] != b && X[i].reducer == nothing # poly can't be reduced by itself
          h = leading_coefficient(X[i].poly)
          if divides(c, h)[1]
             usable = true
@@ -1232,7 +1274,7 @@ function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_div
                   x2 = x2.reducer
                end
             end
-            if usable && ((c != h && c != -h) || X[i].active)
+            if usable && (c != h || X[i].active)
                if best == nothing || !best_divides
                   best = X[i]
                   best_size = reducer_size(X[i])
@@ -1256,8 +1298,8 @@ function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_red
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
-      if X[i] != b && X[i].active # poly can't be reduced by itself
-         h = smod(c, leading_coefficient(X[i].poly))
+      if X[i] != b && X[i].active && X[i].reducer == nothing # poly can't be reduced by itself
+         h = AbstractAlgebra.mod(c, leading_coefficient(X[i].poly))
          if h != c && h != 0 && !divides(leading_coefficient(X[i].poly), c)[1]
             usable = true
             if X[i].lm == b.lm
@@ -1293,7 +1335,7 @@ function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd:
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
-      if X[i] != b && X[i].active # poly can't be reduced by itself
+      if X[i] != b && X[i].active  && X[i].reducer == nothing # poly can't be reduced by itself
          if !divides(leading_coefficient(X[i].poly), c)[1] &&
             !divides(c, leading_coefficient(X[i].poly))[1]
             usable = true
@@ -1350,7 +1392,7 @@ function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: Abst
       b.settled = 1
    end
    # 2. check for leading coefficient that reduces c
-   best_reduces = best == nothing ? false : smod(c, leading_coefficient(best.poly)) != c
+   best_reduces = best == nothing ? false : AbstractAlgebra.mod(c, leading_coefficient(best.poly)) != c
    if b.settled <= 1
       best, best_reduces = find_best_reduces(b, X, best, best_reduces)
    end
@@ -1598,9 +1640,7 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
       if n.active
          if n != d && !lm_divides(n, d) && !lm_divides(d, n)
             s = compute_spoly(n, d)
-            if !divides(s.poly, d.poly)[1] && !divides(s.poly, n.poly)[1]
-               push!(S, s)
-            end
+            push!(S, s)
             g = compute_gpoly(n, d)
             push!(S, g)
             break
@@ -1608,9 +1648,7 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
          dbase = find_base(d)
          if connected(b, dbase) || connected(dbase, b)
             s = compute_spoly(n, d)
-            if !divides(s.poly, d.poly)[1] && !divides(s.poly, n.poly)[1]
                push!(S, s)
-            end
             break
          end 
       end
@@ -1888,6 +1926,11 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                end
                # insert fragments (including s-polys)
                insert_fragments(S2, B2, H, bound)
+#BB = extract_gens(B2)
+#println("B = ", BB)
+#println("")
+#readline(stdin)
+
 #println("3: B2 = ", B2)
 #println("S = ", S)
 #println("S2 = ", S2)
@@ -1917,7 +1960,6 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                bound = max.(bound, H[end].lm)
             end
          end
-         # extract polynomials from B2
          B = extract_gens(B2)
       end
       B = [divexact(d, canonical_unit(d)) for d in B]
@@ -2051,11 +2093,7 @@ function reduce_tail(f::T, V::AbstractVector{T}, res::U) where {U <: RingElement
          end
          if i != 0 && !iszero(c)
             h = leading_coefficient(V[i]) # should be nonnegative
-            h < 0 && error("h must be positive")
             q, r = AbstractAlgebra.divrem(c, h)
-            if r >= ((h + 1) >> 1)
-               q += 1
-            end 
             u = shift_left(V[i], n - length(V[i]))
             p -= q*u
             if !iszero(res)
@@ -2086,9 +2124,6 @@ function reduce(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebr
          if i != 0 && !iszero(c)
             h = leading_coefficient(V[i]) # should be nonnegative
             q, r = AbstractAlgebra.divrem(c, h)
-            if r >= ((h + 1) >> 1)
-               q += 1
-            end 
             u = shift_left(V[i], n - length(V[i]))
             p -= q*u        
          end
