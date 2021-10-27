@@ -1915,7 +1915,7 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                   if !isempty(G)
                      while !isempty(H)
                         d = pop!(H)
-                        q, p = Base.divrem(d.poly, G)
+                        p = normal_form(d.poly, G)
                         if !iszero(p)
                            pnode = lmnode{U, V, N}(p)
                            push!(H2, pnode)
