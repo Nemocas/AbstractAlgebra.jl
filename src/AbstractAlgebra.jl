@@ -324,13 +324,13 @@ include("WeakValueDict.jl")
 #
 ###############################################################################
 
-@static if false #VERSION >= v"1.6"
+@static if VERSION >= v"1.6"
   const CacheDictType = WeakValueDict
 else
   const CacheDictType = Dict
 end
 
-function get_cached!(default::Base.Callable, dict::AbstractDict,
+function get_cached!(default::Base.Callable, dict,
                                              key,
                                              use_cache::Bool)
    return use_cache ? Base.get!(default, dict, key) : default()

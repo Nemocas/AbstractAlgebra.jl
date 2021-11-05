@@ -1,6 +1,166 @@
 WeakValueDict = AbstractAlgebra.WeakValueDict
 
+function test_weak_cache(T, kreps, ireps)
+   d = T{BigInt, BigInt}()
+   # keys missing from/present in ddeg are definitely missing from/present in d
+   ddef  = Dict{BigInt, BigInt}()
+   # if a key is in d, its value should match that of dmay
+   dmay  = Dict{BigInt, BigInt}()
+   for k in 1:kreps
+      for i in 1:ireps
+         for j in 1:2
+            x = BigInt(rand(1:999))
+            y = BigInt(rand(1:999))
+            ddef[x] = y
+            d[x] = y
+            y = deepcopy(y)
+            @test d[x] == y
+            @test ddef[x] == y
+         end
+         x = BigInt(rand(1:999))      
+         delete!(ddef, x)
+         delete!(d, x)
+         @test !haskey(d, x)
+         x = BigInt(rand(1:999))
+         @test get(d, x, BigInt(0)) == get(ddef, x, BigInt(0))
+
+         @test length(d) >= length(ddef)
+
+         for j in 1:2
+            x = BigInt(-rand(1:999))
+            y = BigInt(-rand(1:999))
+            dmay[x] = y
+            d[x] = deepcopy(y)
+            @test get(d, x, y) == dmay[x]
+         end
+         x = BigInt(-rand(1:999))
+         delete!(dmay, x)
+         delete!(d, x)
+         @test !haskey(d, x)
+         x = BigInt(rand(1:999))
+         y = get(dmay, x, nothing)
+         @test y == nothing || get(d, x, y) == y
+      end
+      GC.gc(true)
+   end
+
+   empty!(d)
+   empty!(ddef)
+   empty!(dmay)
+   for k in 1:kreps
+      for i in 1:ireps
+         for j in 1:2
+            x = BigInt(rand(1:999))
+            y = BigInt(rand(1:999))
+            ddef[x] = y
+            delete!(d, x)
+            @test (get!(d, x) do; return y; end) == y
+            y = deepcopy(y)
+            @test d[x] == y
+            @test ddef[x] == y
+         end
+         x = BigInt(rand(1:999))      
+         delete!(ddef, x)
+         delete!(d, x)
+         @test !haskey(d, x)
+         x = BigInt(rand(1:999))
+         @test get(d, x, BigInt(0)) == get(ddef, x, BigInt(0))
+
+         @test length(d) >= length(ddef)
+
+         for j in 1:2
+            x = BigInt(-rand(1:999))
+            y = BigInt(-rand(1:999))
+            dmay[x] = y
+            delete!(d, x)
+            @test (get!(d, x) do; return deepcopy(y); end) == dmay[x]
+            @test (get!(d, Int(x)) do; return deepcopy(y); end) == dmay[x]
+         end
+         x = BigInt(-rand(1:999))
+         delete!(dmay, x)
+         delete!(d, x)
+         @test !haskey(d, x)
+         x = BigInt(rand(1:999))
+         y = get(dmay, x, nothing)
+         @test y == nothing || get(d, x, y) == y
+      end
+      GC.gc(true)
+   end
+
+   empty!(d)
+   if T === AbstractAlgebra.WeakValueCache
+      AbstractAlgebra.rehash!(d, 5) # test internal function
+   end
+   empty!(ddef)
+   x = BigInt(1)
+   y = BigInt(2)
+   GC.@preserve x y begin
+      ddef[1] = x
+      ddef[2] = y
+
+      # test get! where default modifies d
+      get!(d, 2) do; d[1] = x; return y; end
+      @test d[1] == x
+      @test d[2] == y
+      @test length(string(d)) > 3
+
+      @test_throws KeyError d[3]
+   end
+
+   d[3] = BigInt(4)
+   GC.gc(true)
+   try z = d[3]
+      @test z == 4
+   catch e
+      @test e isa KeyError
+   end
+
+   empty!(d)
+   x = BigInt(1)
+   y = BigInt(2)
+   GC.@preserve x y begin
+      d[x] = y
+      @test (get(d, x) do; return BigInt(3); end) isa BigInt
+
+      @test pop!(d, x) == y
+      @test_throws KeyError pop!(d, x)
+      @test pop!(d, x, y) === y
+   end
+
+   x = BigInt(1)
+   y = BigInt(2)
+   z = BigInt(3)
+   GC.@preserve x y z begin
+      D = T{BigInt, BigInt}(1=>x)
+      @test D[1] === x
+      @test_throws KeyError D[2]
+
+      D = T{BigInt, BigInt}(1=>x, 2=>y, 3=>z)
+      @test D[1] === x
+      @test D[2] === y
+      @test D[3] === z
+      @test_throws KeyError D[4]
+
+      D = T{BigInt, BigInt}([(1,x), (2,y), (3,z)])
+      @test D[1] === x
+      @test D[2] === y
+      @test D[3] === z
+      @test_throws KeyError D[4]
+   end
+end
+
+
+@testset "WeakValueCache" begin
+   if VERSION >= v"1.6"
+      test_weak_cache(AbstractAlgebra.WeakValueCache, 30, 20)
+   end
+end
+
 @testset "WeakValueDict" begin
+   if VERSION >= v"1.6"
+      test_weak_cache(AbstractAlgebra.WeakValueDict, 30, 20)
+   end
+
     A = [1]
     B = [2]
     C = [3]
