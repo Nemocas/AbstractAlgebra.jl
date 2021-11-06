@@ -103,6 +103,8 @@ include("generic/Matrix.jl")
 
 include("generic/MatrixAlgebra.jl")
 
+include("generic/FreeAssAlgebra.jl")
+
 include("generic/Fraction.jl")
 
 include("generic/RationalFunctionField.jl")
