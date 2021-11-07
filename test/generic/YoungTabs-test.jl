@@ -72,7 +72,7 @@ end
    end
 
    Z = copy(Y)
-   @test Z isa YoungTableau
+   @test Z isa Generic.YoungTableau
    @test Y == Z
    @test Z.fill !== Y.fill
 end
