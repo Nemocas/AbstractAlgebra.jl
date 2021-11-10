@@ -879,6 +879,8 @@ end
 
 +(x::MatrixElem, y::MatrixElem) = +(promote(x, y)...)
 
+-(x::MatrixElem, y::MatrixElem) = -(promote(x, y)...)
+
 ==(x::MatrixElem, y::MatrixElem) = ==(promote(x, y)...)
 
 function Base.promote(x::MatrixElem{S}, y::T) where {S <: RingElement, T <: RingElement}
