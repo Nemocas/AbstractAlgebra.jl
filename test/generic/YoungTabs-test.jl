@@ -70,6 +70,11 @@ end
    for i in 1:sum(Y.part)
      @test Y[something(findfirst(isequal(i), Y), 0)] == i
    end
+
+   Z = copy(Y)
+   @test Z isa Generic.YoungTableau
+   @test Y == Z
+   @test Z.fill !== Y.fill
 end
 
 @testset "youngtabs.conjugation" begin

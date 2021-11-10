@@ -387,6 +387,8 @@ end
 
 hash(Y::YoungTableau, h::UInt) = hash(Y.part, hash(Y.fill, hash(typeof(Y), h)))
 
+Base.copy(Y::YoungTableau) = YoungTableau(Y.part, copy(Y.fill))
+
 ##############################################################################
 #
 #   String I/O for YoungTableaux
