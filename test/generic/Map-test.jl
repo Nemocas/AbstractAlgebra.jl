@@ -67,6 +67,13 @@ end
 
    @test map1(t) === f
    @test map2(t) === s
+
+   V = FreeModule(QQ, 2)
+   f = AbstractAlgebra.ModuleHomomorphism(V, V, QQ[1 1; 1 2])
+   g = identity_map(V)
+   h = f * g
+   @test domain(h) == V
+   @test codomain(h) == V
 end
 
 @testset "Generic.Map.IdentityMap" begin
