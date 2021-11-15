@@ -22,7 +22,7 @@ set_field!(M, f, g) = setfield!(M, f, g) # fall back to Julia builtin
 domain(f::Map) = get_field(f, :domain)
 codomain(f::Map) = get_field(f, :codomain)
 
-function check_composable(a::Map{D, U}, b::Map{U, C}) where {D, U, C}
+function check_composable(a::Map, b::Map)
    codomain(a) != domain(b) && error("Incompatible maps")
 end
 
@@ -32,7 +32,7 @@ end
 #
 ###############################################################################
 
-function compose(f::Map{D, U}, g::Map{U, C}) where {D, U, C}
+function compose(f::Map, g::Map)
    check_composable(f, g)
    return Generic.CompositeMap(f, g)
 end

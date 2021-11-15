@@ -1011,8 +1011,8 @@ mutable struct CompositeMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.S
    map1::AbstractAlgebra.Map
    map2::AbstractAlgebra.Map
 
-   function CompositeMap(map1::AbstractAlgebra.Map{D, U}, map2::AbstractAlgebra.Map{U, C}) where {D, U, C}
-      return new{D, C}(domain(map1), codomain(map2), map1, map2)
+   function CompositeMap(map1, map2)
+     return new{typeof(domain(map1)), typeof(codomain(map2))}(domain(map1), codomain(map2), map1, map2)
    end
 end
 
