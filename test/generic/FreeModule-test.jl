@@ -105,3 +105,11 @@ end
       @test m*c == c*m
    end
 end
+
+@testset "Generic.FreeModule.hash" begin
+   R, x = PolynomialRing(ZZ, "x")
+   M = FreeModule(R, 5)
+
+   # ensure hash works
+   @test hash(zero(M)) isa UInt
+end
