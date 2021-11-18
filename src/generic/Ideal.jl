@@ -1364,16 +1364,18 @@ function extend_ideal_basis(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) wh
 end
 
 function reduce_by_resultant(f::T, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
-   res12 = ((res + 1) >> 1)
+   len = 0
    for i = 1:length(f)
       c = coeff(f, i - 1)
       q, r = AbstractAlgebra.divrem(c, res)
-      if r >= res12
-         r -= res
-      end
       setcoeff!(f, i - 1, r)
+      if !iszero(r)
+         len = i
+      end
    end
-   f = set_length!(f, normalise(f, length(f)))
+   if len < length(f)
+      f = set_length!(f, len)
+   end
    return divexact(f, canonical_unit(f))
 end
 
