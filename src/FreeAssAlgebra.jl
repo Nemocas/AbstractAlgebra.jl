@@ -4,18 +4,26 @@
 #
 ###############################################################################
 
+export FreeAssociativeAlgebra
+
 ###############################################################################
 #
 #   Data type and parent object methods
 #
 ###############################################################################
 
+base_ring(a::FreeAssAlgElem{T}) where T <: RingElement = base_ring(parent(a))
+
+coefficient_ring(a::FreeAssAlgElem{T}) where T <: RingElement = base_ring(a)
+
+coefficient_ring(R::FreeAssAlgebra{T}) where T <: RingElement = base_ring(R)
+
 function isdomain_type(::Type{S}) where {T <: RingElement, S <: FreeAssAlgElem{T}}
-   return isdomain_type(S)
+   return isdomain_type(T)
 end
 
 function isexact_type(a::Type{S}) where {T <: RingElement, S <: FreeAssAlgElem{T}}
-   return isexact_type(S)
+   return isexact_type(T)
 end
 
 ###############################################################################
@@ -90,6 +98,70 @@ end
 
 ###############################################################################
 #
+# Hashing
+#
+###############################################################################
+
+function Base.hash(x::FreeAssAlgElem{T}, h::UInt) where T <: RingElement
+   b = 0x6220ed52502c8d9f%UInt
+   for (c, e) in zip(coefficients(x), exponent_words(x))
+      b = xor(b, xor(hash(c, h), h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+      b = xor(b, xor(hash(e, h), h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
+
+###############################################################################
+#
+#   Random elements
+#
+###############################################################################
+
+RandomExtensions.maketype(S::AbstractAlgebra.FreeAssAlgebra, _, _, _) = elem_type(S)
+
+function RandomExtensions.make(S::AbstractAlgebra.FreeAssAlgebra,
+                               term_range::UnitRange{Int},
+                               exp_bound::UnitRange{Int}, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      Make(S, term_range, exp_bound, vs[1])
+   else
+      make(S, term_range, exp_bound, make(R, vs...))
+   end
+end
+
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
+                 <:NCRingElement,<:AbstractAlgebra.FreeAssAlgebra,UnitRange{Int},UnitRange{Int}}})
+   S, term_range, exp_bound, v = sp[][1:end]
+   f = S()
+   g = gens(S)
+   R = base_ring(S)
+   isempty(g) && return S(rand(rng, v))
+   for i = 1:rand(rng, term_range)
+      term = S(1)
+      for j = 1:rand(rng, exp_bound)
+         term *= rand(g)
+      end
+      term *= rand(rng, v)
+      f += term
+   end
+   return f
+end
+
+function rand(rng::AbstractRNG, S::AbstractAlgebra.FreeAssAlgebra,
+              term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
+   m = make(S, term_range, exp_bound, v...)
+   rand(rng, m)
+end
+
+function rand(S::AbstractAlgebra.FreeAssAlgebra, term_range, exp_bound, v...)
+   rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
+end
+
+###############################################################################
+#
 #   FreeAssociativeAlgebra constructor
 #
 ###############################################################################
@@ -118,6 +190,16 @@ function FreeAssociativeAlgebra(
    cached::Bool = false)
 
    S = [Symbol(s, i) for i in 1:n]
-   return Generic.FreeAssociativeAlgebra(R, n, S; cached=cached)
+   return Generic.FreeAssociativeAlgebra(R, S; cached=cached)
+end
+
+function FreeAssociativeAlgebra(
+   R::AbstractAlgebra.Ring,
+   n::Int,
+   s::Symbol=:x;
+   cached::Bool = false)
+
+   S = [Symbol(s, i) for i in 1:n]
+   return Generic.FreeAssociativeAlgebra(R, S; cached=cached)
 end
 

@@ -126,11 +126,6 @@ end
 
 ==(x::RingElement, y::RingElem) = parent(y)(x) == y
 
-function addmul!(z::T, x::T, y::T, c::T) where {T <: RingElem}
-   c = mul!(c, x, y)
-   z = addeq!(z, c)
-   return z
-end
 
 ###############################################################################
 #

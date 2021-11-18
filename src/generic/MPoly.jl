@@ -3832,10 +3832,6 @@ function main_variable_insert(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingE
 end
 
 
-
-
-
-
 ###############################################################################
 #
 #   Build context
@@ -3844,13 +3840,13 @@ end
 
 # We use Ring instead of MPolyRing to support other multivariate objects
 # e.g. Series, non-commutative rings in Singular, etc.
-function MPolyBuildCtx(R::AbstractAlgebra.Ring)
+function MPolyBuildCtx(R::AbstractAlgebra.NCRing)
    return MPolyBuildCtx(R, Nothing)
 end
 
 function show(io::IO, M::MPolyBuildCtx)
    iocomp = IOContext(io, :compact => true)
-   print(iocomp, "Builder for a polynomial in ", parent(M.poly))
+   print(iocomp, "Builder for an element of ", parent(M.poly))
 end
 
 function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
@@ -3858,7 +3854,11 @@ function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
       return M
    end
    len = length(M.poly) + 1
-   set_exponent_vector!(M.poly, len, expv)
+   if T <: AbstractAlgebra.FreeAssAlgElem
+      set_exponent_word!(M.poly, len, expv)
+   else
+      set_exponent_vector!(M.poly, len, expv)
+   end
    setcoeff!(M.poly, len, c)
    return M
 end

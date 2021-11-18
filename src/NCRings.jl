@@ -84,6 +84,28 @@ function check_parent(a::NCRingElement, b::NCRingElement, throw::Bool=true)
    return !c
 end
 
+function zero!(z::NCRingElem)
+   return zero(parent(z))
+end
+
+function add!(z::T, x::T, y::T) where T <: NCRingElem
+   return x + y
+end
+
+function addeq!(z::T, y::T) where T <: NCRingElem
+   return z + y
+end
+
+function mul!(z::T, x::T, y::T) where T <: NCRingElem
+   return x*y
+end
+
+function addmul!(z::T, x::T, y::T, c::T) where T <: NCRingElem
+   c = mul!(c, x, y)
+   z = addeq!(z, c)
+   return z
+end
+
 ###############################################################################
 #
 #   Basic manipulation

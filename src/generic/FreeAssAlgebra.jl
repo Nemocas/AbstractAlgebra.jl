@@ -4,6 +4,8 @@
 #
 ###############################################################################
 
+export set_exponent_word
+
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -52,9 +54,9 @@ end
 
 function Base.deepcopy_internal(a::FreeAssAlgElem{T}, dict::IdDict) where {T <: RingElement}
    return FreeAssAlgElem{T}(a.parent,
-                           deepcopy_internal(a.coeffs, dict),
-                           deepcopy_internal(a.exps, dict),
-                           a.length)
+                            deepcopy_internal(a.coeffs, dict),
+                            deepcopy_internal(a.exps, dict),
+                            a.length)
 end
 
 function zero(a::FreeAssAlgebra{T}) where T
@@ -90,11 +92,33 @@ function gens(a::FreeAssAlgebra{T}) where {T <: RingElement}
    return [gen(a, i) for i in 1:nvars(a)]
 end
 
+# BOGUS
+function isunit(x::FreeAssAlgElem)
+   return x.length == 1 && isempty(x.exps[1]) && isunit(x.coeffs[1])
+end
+
+
+###############################################################################
+#
+#   Promotion rules
+#
+###############################################################################
+
+promote_rule(::Type{FreeAssAlgElem{T}}, ::Type{FreeAssAlgElem{T}}) where T <: RingElement = FreeAssAlgElem{T}
+
+function promote_rule(::Type{FreeAssAlgElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? FreeAssAlgElem{T} : Union{}
+end
+
 ###############################################################################
 #
 #   Parent object call overload
 #
 ###############################################################################
+
+function (a::FreeAssAlgebra{T})() where T
+   return zero(a)
+end
 
 function (a::FreeAssAlgebra{T})(b::T) where T
    iszero(b) && return zero(a)
@@ -102,7 +126,14 @@ function (a::FreeAssAlgebra{T})(b::T) where T
 end
 
 function (a::FreeAssAlgebra{T})(b::Integer) where T
-   return a(base_ring(a)(b))
+   iszero(b) && return zero(a)
+   R = base_ring(a)
+   return FreeAssAlgElem{T}(a, T[R(b)], [Int[]], 1)
+end
+
+function (a::FreeAssAlgebra{T})(b::FreeAssAlgElem{T}) where T <: RingElement
+   parent(b) != a && error("Unable to coerce element")
+   return b
 end
 
 function (a::FreeAssAlgebra{T})(c::Vector{T}, e::Vector{Vector{Int}}) where T
@@ -111,7 +142,8 @@ function (a::FreeAssAlgebra{T})(c::Vector{T}, e::Vector{Vector{Int}}) where T
    end
    n = length(c)
    n == length(e) || error("coefficient array and exponent array should have the same length")
-   return FreeAssAlgelem{T}(a, copy(c), copy(e), n)
+   z = FreeAssAlgElem{T}(a, copy(c), copy(e), n)
+   return combine_like_terms!(sort_terms!(z))
 end
 
 ###############################################################################
@@ -158,6 +190,45 @@ end
 function total_degree(a::FreeAssAlgElem{T}) where T
    # currently stored in dexlex
    return length(a) > 0 ? length(leading_word(a)) : -1
+end
+
+###############################################################################
+#
+# Unsafe functions
+#
+###############################################################################
+
+function fit!(a::FreeAssAlgElem{T}, n::Int) where T <: RingElement
+   if length(a.coeffs) < n
+      resize!(a.coeffs, n)
+   end
+   if length(a.exps) < n
+      resize!(a.exps, n)
+   end
+   return nothing
+end
+
+for T in [RingElem, Integer, Rational, AbstractFloat]
+   @eval begin
+      function setcoeff!(a::FreeAssAlgElem{S}, i::Int, c::S) where {S <: $T}
+         fit!(a, i)
+         a.coeffs[i] = c
+         if i > length(a)
+            a.length = i
+         end
+         return a
+      end
+   end
+end
+
+function set_exponent_word!(a::FreeAssAlgElem{T}, i::Int, w::Vector{Int}) where T <: RingElement
+   all(i -> (i <= nvars(parent(a))), w) || error("variable index out of range")
+   fit!(a, i)
+   a.exps[i] = w
+   if i > length(a)
+      a.length = i
+   end
+   return a
 end
 
 ###############################################################################
@@ -227,7 +298,14 @@ end
 #
 ###############################################################################
 
-function *(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T
+function -(a::FreeAssAlgElem{T}) where T <: RingElement
+   n = length(a)
+   R = parent(a)
+   zcoeffs = T[-a.coeffs[i] for i in 1:n]
+   return FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n)
+end
+
+function *(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T <: RingElement
    zcoeffs = T[]
    zexps = Vector{Int}[]
    for i in 1:a.length, j in 1:b.length
@@ -238,7 +316,7 @@ function *(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T
    return combine_like_terms!(sort_terms!(z))
 end
 
-function +(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T
+function +(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T <: RingElement
    zcoeffs = T[]
    zexps = Vector{Int}[]
    i = j = 1
@@ -275,7 +353,7 @@ function +(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T
    return FreeAssAlgElem{T}(parent(a), zcoeffs, zexps, length(zcoeffs))
 end
 
-function -(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T
+function -(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T <: RingElement
    zcoeffs = T[]
    zexps = Vector{Int}[]
    i = j = 1
@@ -312,7 +390,7 @@ function -(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T
    return FreeAssAlgElem{T}(parent(a), zcoeffs, zexps, length(zcoeffs))
 end
 
-function ^(a::FreeAssAlgElem{T}, b::Integer) where T
+function ^(a::FreeAssAlgElem{T}, b::Integer) where T <: RingElement
    if b == 0
       return one(parent(a))
    elseif b == 1
@@ -415,6 +493,48 @@ function AbstractAlgebra.divexact_right(f::FreeAssAlgElem{T}, g::FreeAssAlgElem{
    return FreeAssAlgElem{T}(R, qcoeffs, qexps, length(qcoeffs))
 end
 
+
+###############################################################################
+#
+#   Ad hoc arithmetic functions
+#
+###############################################################################
+
+function *(a::FreeAssAlgElem{T}, b::Union{Integer, Rational, AbstractFloat}) where T
+   n = length(a)
+   R = parent(a)
+   b = base_ring(R)(b)
+   zcoeffs = T[a.coeffs[i]*b for i in 1:n]
+   return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
+end
+
+function *(a::FreeAssAlgElem{T}, b::T) where T <: RingElem
+   n = length(a)
+   R = parent(a)
+   b = base_ring(R)(b)
+   zcoeffs = T[a.coeffs[i]*b for i in 1:n]
+   return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
+end
+
+*(n::Union{Integer, Rational, AbstractFloat}, a::FreeAssAlgElem) = a*n
+
+*(n::T, a::FreeAssAlgElem{T}) where {T <: RingElem} = a*n
+
+function divexact(a::FreeAssAlgElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+   n = length(a)
+   R = parent(a)
+   b = base_ring(R)(b)
+   zcoeffs = T[divexact(a.coeffs[i], b, check = check) for i in 1:n]
+   return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
+end
+
+function divexact(a::MPoly{T}, b::T; check::Bool=true) where {T <: RingElem}
+   n = length(a)
+   R = parent(a)
+   b = base_ring(R)(b)
+   zcoeffs = T[divexact(a.coeffs[i], b, check = check) for i in 1:n]
+   return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
+end
 
 ###############################################################################
 #

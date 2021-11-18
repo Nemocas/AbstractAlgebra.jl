@@ -127,10 +127,11 @@ export SetMap, FunctionalMap, IdentityMap
 
 export NCPolyElem, PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
        MatElem, MatAlgElem, FinFieldElem, MPolyElem, UnivPolyElem, NumFieldElem,
-       SimpleNumFieldElem
+       SimpleNumFieldElem, FreeAssAlgElem
 
 export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
-       FinField, MPolyRing, UnivPolyRing, NumField, SimpleNumField
+       FinField, MPolyRing, UnivPolyRing, NumField, SimpleNumField,
+       FreeAssAlgebra
 
 export ZZ, QQ, zz, qq, RealField, RDF
 
@@ -479,7 +480,7 @@ import .Generic: abs_series, abs_series_type,
                  rels, rel_series, rel_series_type,
                  rescale!, retraction_map, reverse,
                  right_kernel, rowlength, section_map, setcoeff!,
-                 set_exponent_vector!, set_limit!,
+                 set_exponent_vector!, set_exponent_word!, set_limit!,
                  setpermstyle, size,
                  sort_terms!, summands,
                  supermodule, term, terms, total_degree,
@@ -538,7 +539,7 @@ export abs_series, abs_series_type,
                  resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, reverse, rowlength,
-                 setcoeff!, set_exponent_vector!,
+                 setcoeff!, set_exponent_vector!, set_exponent_word!,
                  setpermstyle,
                  size, sort_terms!, subst, summands, supermodule,
                  sylvester_matrix, term, terms,
