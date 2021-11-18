@@ -1716,6 +1716,32 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
    end
 end
       
+function find_resultant_in_ideal(D::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+   res = zero(base_ring(D[1]))
+   V = similar(D, 0)
+   for i = 1:length(D)
+      for j = i + 1:length(D)
+         r = resultant(D[i], D[j])
+         if iszero(r)
+            g = gcd(D[i], D[j])
+            push!(V, g*resultant(divexact(D[i], g), divexact(D[j], g)))
+         else
+            res = gcd(r, res)
+            if isunit(res)
+               break
+            end
+         end
+      end
+      if isunit(res)
+         break
+      end
+   end
+   if !isempty(V)
+      res = gcd(res, find_resultant_in_ideal(V))
+   end
+   return res
+end
+
 # We call an ideal over a polynomial ring over a Euclidean domain reduced if
 # 1. There is only one polynomial of each degree in the ideal
 # 2. The degree of polynomials in the basis increases
@@ -1755,14 +1781,7 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
             for i in 1:length(D)
                D[i] = divexact(D[i], g)
             end
-            for i = 1:length(D)
-               for j = i + 1:length(D)
-                  res = gcd(resultant(D[i], D[j]), res)
-                  if isunit(res)
-                     break
-                  end
-               end
-            end
+            res = find_resultant_in_ideal(D)
          end
          if isunit(res) # everything reduces to 0
             V = [one(S)*g]
