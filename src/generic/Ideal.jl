@@ -39,7 +39,14 @@ gens(I::Ideal) = I.gens
 #
 ###############################################################################
 
-node_num = [0]
+const LMNODE_DEBUG = false # whether to print debugging information
+const poly_level = 1 # 1 = display leading terms only, 2 = display entire polynomials
+const print_inactive = false # whether to print polynomials and node nums of inactive nodes
+const print_prompt = false # whether to wait for a keypress between debug output
+
+print_node_level = [0] # 0 = print only polynomials in nodes, 1 = print lattice of nodes
+
+node_num = [0] # for enumerating nodes when printing
 
 mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    poly::Union{U, Nothing}
@@ -102,8 +109,6 @@ function show_inner(io::IO, n::Nothing)
    print(io, "nothing")
 end
 
-poly_level = 2
-
 function print_poly(io::IO, p::MPolyElem)
    if poly_level == 1
       print(io, leading_term(p))
@@ -117,14 +122,21 @@ end
 
 function show_inner(io::IO, n::lmnode)
    if !n.path
-      print(io, "Node(p", n.num)
-      if n.active
-         print(io, "(Y)")
+      print(io, "Node(")
+      if print_inactive || n.active
+         print(io, "p", n.num)
+         if print_inactive
+            if n.active
+               print(io, "(Y)")
+            else
+               print(io, "(N)")
+            end
+         end
+         print(io, "=")
+         print_poly(io, n.poly)
       else
-         print(io, "(N)")
+         print(io, "_")
       end
-      print(io, "=")
-      print_poly(io, n.poly)
       print(io, ", ")
       show_inner(io, n.up)
       print(io, ", ")
@@ -179,9 +191,30 @@ function show_inner(io::IO, n::lmnode)
    n.path = true
 end
 
-function show(io::IO, n::lmnode)
-   show_inner(io, n)
-   clear_path(n)
+function show(io::IO, B::Vector{<:lmnode})
+   if print_node_level[] == 0
+      BB = extract_gens(B)
+      print(io, "[")
+      for i = 1:length(BB) - 1
+         print_poly(io, BB[i])
+         print(io, ", ")
+      end
+      if !isempty(BB)
+         print_poly(io, BB[end])
+      end
+      print(io, "]")
+   else
+      print(io, "[")
+      for i in 1:length(B) - 1
+         show_inner(io, B[i])
+         print(io, ", ")
+      end
+      if !isempty(B)
+         show_inner(io, B[end])
+      end
+      print(io, "]")
+      clear_path(B)
+   end
 end
 
 # heap implementation for sorting polys by lm, head = smallest
@@ -1169,28 +1202,15 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
          X = Vector{lmnode{U, V, N}}()
          X2 = Vector{lmnode{U, V, N}}()
          X2new = Vector{lmnode{U, V, N}}()
-#println("0: B2 = ", B2)
-#println("S = ", S)
-#println("S2 = ", S2)
-#println("H = ", H)
-#println("")
-#readline(stdin)
          while true
             reduction_occurs = true
             while reduction_occurs
-#println("B2 = ", B2)
-#readline(stdin)
                # attach best reducers to nodes
                best_reducer(B2, X2, X2new)
                # do reductions
-#println("1: B2 = ", B2)
-#readline(stdin)
                reduction_occurs = reduce_nodes(S2, H, B2, X)
                clear_path(B2)
                # move s-polys from S to fragments
-#println("2: B2 = ", B2)
-#println("")
-#readline(stdin)
                while !isempty(S)
                   d = pop!(S)
                   if !iszero(d.poly)
@@ -1216,33 +1236,25 @@ function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPoly
                end
                # insert fragments (including s-polys)
                insert_fragments(S2, B2, H, bound)
-#BB = extract_gens(B2)
-#println("B = ", BB)
-#println("")
-#readline(stdin)
-
-#println("3: B2 = ", B2)
-#println("S = ", S)
-#println("S2 = ", S2)
-#println("H = ", H)
-#println("")
-#readline(stdin)
+if LMNODE_DEBUG
+   print_node_level[] = 1
+   println("B2 = ", B2)
+   print_node_level[] = 0
+   println("S = ", S)
+   println("S2 = ", S2)
+   println("H = ", H)
+   println("")
+   if print_prompt
+      readline(stdin)
+   end
+end
                if !reduction_occurs
                   generate_spolys(S, B2, S2)
                end
-#println("4: S = ", S)
-#println("4: S2 = ", S2)
-#println("")
-#readline(stdin)
+
             end
-#println("B2 = ", B2)
-#println("S2 = ", S2)
-#println("S = ", S)
-#println("")
-#readline(stdin)
             if isempty(H)
-#println("S2 = ", S2)
-#println("S = ", S)               
+             
                if isempty(S) && isempty(S2)
                   break
                end
