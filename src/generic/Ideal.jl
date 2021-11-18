@@ -1373,6 +1373,7 @@ function reduce_by_resultant(f::T, res::U) where {U <: RingElement, T <: Abstrac
       end
       setcoeff!(f, i - 1, r)
    end
+   f = set_length!(f, normalise(f, length(f)))
    return divexact(f, canonical_unit(f))
 end
 
@@ -1408,7 +1409,7 @@ function reduce_tail(f::T, V::AbstractVector{T}, res::U) where {U <: RingElement
    return p
 end
 
-function reduce_poly(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function normal_form(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    i = length(V)
    n = length(p)
    while n > 0
@@ -1427,7 +1428,7 @@ function reduce_poly(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractA
             h = leading_coefficient(V[i]) # should be nonnegative
             q, r = AbstractAlgebra.divrem(c, h)
             u = shift_left(V[i], n - length(V[i]))
-            p -= q*u        
+            p -= q*u       
          end
          n = min(n - 1, length(p))
       end
@@ -1813,6 +1814,16 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
    else
       error("Not implemented")
    end
+end
+
+###############################################################################
+#
+#   Normal form
+#
+###############################################################################
+
+function normal_form(p::T, V::Ideal{T}) where {T <: RingElement}
+   return normal_form(p, gens(V))
 end
 
 ###############################################################################

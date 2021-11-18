@@ -131,3 +131,23 @@ end
    end
 end
 
+@testset "Generic.Ideal.ideal_reduction(univariate)" begin
+   R, x = PolynomialRing(ZZ, "x")
+
+   for i = 1:300
+      n = rand(0:5)
+      V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
+      I = Ideal(R, V)
+
+      for v in V
+         @test normal_form(v, I) == 0
+      end
+
+      G = gens(I)
+
+      for i = 2:length(G)
+         @test length(G[i]) > length(G[i - 1])
+         @test divides(leading_coefficient(G[i - 1]), leading_coefficient(G[i]))[1]
+      end
+   end
+end
