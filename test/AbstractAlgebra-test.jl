@@ -1,3 +1,4 @@
+include("Ideals-test.jl")
 include("conformance-tests.jl")
 
 include("Attributes-test.jl")

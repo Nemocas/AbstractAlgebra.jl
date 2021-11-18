@@ -1160,7 +1160,7 @@ function generate_spolys(S::Vector{T}, B::Vector{T}, S2::Vector{T}) where {N, U 
 end
 
 # main reduction routine
-function reduce(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+function reduce_gens(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    node_num[] = 0
    if hasmethod(gcdx, Tuple{T, T})
       B = gens(I)
@@ -1408,7 +1408,7 @@ function reduce_tail(f::T, V::AbstractVector{T}, res::U) where {U <: RingElement
    return p
 end
 
-function reduce(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function reduce_poly(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    i = length(V)
    n = length(p)
    while n > 0
@@ -1724,7 +1724,7 @@ end
 # 5. The polynomials are all canonicalised (divided by their canonical_unit)
 # 6. The tail of each polynomial is reduced mod the other polynomials in the basis
 # 7. All the S-polynomials of pairs in the basis reduce to zero
-function reduce(I::Ideal{T}; complete_reduction::Bool=true) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    if hasmethod(gcdx, Tuple{U, U})
       V = gens(I)
       # Compute V a vector of polynomials giving the same basis as I
@@ -1805,13 +1805,13 @@ end
 function reduce_euclidean(I::Ideal{T}) where T <: RingElement
 end
 
-function reduce(I::Ideal{T}) where T <: RingElement
+function reduce_gens(I::Ideal{T}) where T <: RingElement
    if hasmethod(gcdx, Tuple{T, T})
       I = reduce_euclidean(I)
    end
 end
 
-function reduce(I::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyElem{U}}
+function reduce_gens(I::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyElem{U}}
    return reduce_euclidean(I)
 end
 
@@ -1823,12 +1823,12 @@ end
 
 function Ideal(R::Ring, V::Vector{T}) where T <: RingElement
    I = Ideal{elem_type(R)}(R, filter(!iszero, map(R, V)))
-   return reduce(I)
+   return reduce_gens(I)
 end
 
 function Ideal(R::Ring, v::T...) where T <: RingElement
    I = Ideal{elem_type(R)}(R, filter(!iszero, [map(R, v)...]))
-   return reduce(I)
+   return reduce_gens(I)
 end
 
 ###############################################################################
