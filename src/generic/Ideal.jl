@@ -1237,16 +1237,16 @@ function reduce_gens(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.
                # insert fragments (including s-polys)
                insert_fragments(S2, B2, H, bound)
 if LMNODE_DEBUG
-   print_node_level[] = 1
-   println("B2 = ", B2)
-   print_node_level[] = 0
-   println("S = ", S)
-   println("S2 = ", S2)
-   println("H = ", H)
-   println("")
-   if print_prompt
-      readline(stdin)
-   end
+               print_node_level[] = 1
+               println("B2 = ", B2)
+               print_node_level[] = 0
+               println("S = ", S)
+               println("S2 = ", S2)
+               println("H = ", H)
+               println("")
+               if print_prompt
+                  readline(stdin)
+               end
 end
                if !reduction_occurs
                   generate_spolys(S, B2, S2)
@@ -1835,6 +1835,18 @@ end
 ###############################################################################
 
 function reduce_euclidean(I::Ideal{T}) where T <: RingElement
+   V = gens(I)
+   if length(V) > 1
+      v = V[1]
+      for i = 2:length(V)
+         v = gcd(v, V[i])
+      end
+      V = [v]
+   end
+   if !isempty(V) && iszero(V[1])
+      pop!(V)
+   end
+   return Ideal{T}(base_ring(I), V)
 end
 
 function reduce_gens(I::Ideal{T}) where T <: RingElement

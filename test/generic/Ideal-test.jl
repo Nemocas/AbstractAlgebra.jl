@@ -151,3 +151,20 @@ end
       end
    end
 end
+
+@testset "Generic.Ideal.ideal_reduction(integer)" begin
+   for i = 1:300
+      n = rand(0:10)
+      V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
+      I = Ideal(ZZ, V)
+      G = gens(I)
+
+      @test length(G) == 1 || (length(V) == 0 && length(G) == 0) || (iszero(V) || length(G) == 0)
+
+      if !isempty(G)
+         for v in V
+            @test divides(v, G[1])[1]
+         end
+      end
+   end
+end
