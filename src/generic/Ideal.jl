@@ -1843,8 +1843,12 @@ function reduce_euclidean(I::Ideal{T}) where T <: RingElement
       end
       V = [v]
    end
-   if !isempty(V) && iszero(V[1])
-      pop!(V)
+   if !isempty(V)
+      if iszero(V[1])
+         pop!(V)
+      else
+         V[1] = divexact(V[1], canonical_unit(V[1]))
+      end
    end
    return Ideal{T}(base_ring(I), V)
 end
