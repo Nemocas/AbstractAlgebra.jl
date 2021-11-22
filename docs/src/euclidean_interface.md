@@ -20,6 +20,13 @@ mod(f::MyElem, g::MyElem)
 Return the Euclidean remainder of $f$ by $g$. A `DivideError` should be thrown
 if $g$ is zero.
 
+!!! note
+    For best compatibility with the internal assumptions made by AbstractAlgebra,
+    the Euclidean remainder function should provide unique representatives for
+    the residue classes, that is, the `mod` function should satisfy
+        1. $\operatorname{mod}(a_1, b) = \operatorname{mod}(a_2, b)$ if and only if $b \mid (a_1 - a_2)$, and
+        2. $\operatorname{mod}(0, b) = 0$.
+
 ```julia
 div(f::MyElem, g::MyElem)
 ```
@@ -71,8 +78,12 @@ Return `v` where $p^v$ is the highest power of $p$ dividing $f$.
 gcd(f::MyElem, g::MyElem)
 ```
 
-Return a greatest common divisor of $f$ and $g$. The return is expected to be
-unit normalized such that if the return is a unit, that unit should be one.
+Return a greatest common divisor of $f$ and $g$.
+
+!!! note
+    For best compatibility with the internal assumptions made by
+    AbstractAlgebra, the return is expected to be unit normalized in such a
+    way that if the return is a unit, that unit should be one.
 
 ```julia
 lcm(f::MyElem, g::MyElem)
