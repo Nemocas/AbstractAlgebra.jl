@@ -22,6 +22,7 @@
       isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
+         @test coefficient_ring(varlist[j]) === R
          @test isa(varlist[j], FreeAssAlgElem)
          @test isa(gens(S)[j], FreeAssAlgElem)
       end
@@ -102,13 +103,15 @@ end
    R, (x, y, z) = FreeAssociativeAlgebra(ZZ, [:x, :x, :x])
    a = x + y + z
    @test divexact(2*a, 2) == a
+   @test divexact_left(2*a, 2) == a
+   @test divexact_right(a*2, 2) == a
    @test_throws ArgumentError divexact(2*a + 3, 2)
    @test_throws ArgumentError divexact_left(2*a + 3, R(2))
-   @test_throws ArgumentError divexact_right(2*a + 3, R(2))
+   @test_throws ArgumentError divexact_right(3 - 2*a, R(2))
    @test_throws ArgumentError divexact_left(a*x + 1, x)
-   @test_throws ArgumentError divexact_right(a*x + 1, x)
-   @test_throws ArgumentError divexact_left(x*a + 1, x)
-   @test_throws ArgumentError divexact_right(x*a + 1, x)
+   @test_throws ArgumentError divexact_right(1 + a*x, x)
+   @test_throws ArgumentError divexact_left(x*a - 1, x)
+   @test_throws ArgumentError divexact_right(1 - x*a, x)
 end
 
 @testset "Generic.FreeAssAlgebra.NCRing_interface" begin

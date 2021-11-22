@@ -504,18 +504,6 @@ end
 #
 ###############################################################################
 
-function *(a::FreeAssAlgElem{T}, b::Integer) where T <: RingElement
-   n = length(a)
-   R = parent(a)
-   b = base_ring(R)(b)
-   zcoeffs = T[a.coeffs[i]*b for i in 1:n]
-   return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
-end
-
-function *(n::Union{Integer, Rational, AbstractFloat}, a::FreeAssAlgElem)
-    return a*n
-end
-
 function divexact(a::FreeAssAlgElem{T}, b::Integer; check::Bool = true) where T <: RingElement
 
    n = length(a)
