@@ -48,6 +48,45 @@ print_node_level = [0] # 0 = print only polynomials in nodes, 1 = print lattice 
 
 node_num = [0] # for enumerating nodes when printing
 
+# The main node structure used in the lattice of leading monomials
+# Each node contains a polynomial and a lattice of nodes shows which
+# leading monomials are divisible by which others
+# The nodes directly above a node (i.e. ones it divides) are given
+# by the field `up` and then by `next.up`, `next.next.up`, etc.
+# Nodes with polynomials having equal leading monomials are chained
+# together via the `equal` field in a closed loop that eventually
+# links back to the present node
+# Only the nodes on the backbone of the lattice show divisibility
+# via the `up` and `next` fields; `equal` nodes have the same
+# divisibility relations with other nodes and so the information
+# is not duplicated for these
+# When reduction occurs, the best reducer node is first attached
+# to the node at the `reducer` field
+# Nodes are marked as inactive by settting the `active` field to
+# `false` if they are no removed from the basis/lattice
+# The inactive nodes are retained as potential reducers in the
+# lattice, and possibly purged at regular intervals
+# One does not have to check if a node can be reduced by a node
+# that was already in the lattice before the last lot of reductions
+# if the node could not be reduced by anything at the time of the
+# last round of reductions, but if a node is new since the last
+# round then it is marked as such by setting `new_node` to true
+# since it could potentially be a reducer or reduced by anything
+# There are various kinds of reduction possible, including having
+# the leading coefficient removed and having the leading coefficient
+# reduced and nodes that had no reducers of a given kind at a given
+# round are marked as such via the `settled` field so that they are
+# not checked for this against old nodes again
+# The leading monomial of a node is stored for easy access in the
+# `lm` field and the least common multiple of all leading monomials
+# in the subtree rooted at a given node are also stored in that node
+# The `path` flag is used to mark visited nodes when traversing the
+# lattice
+# Each node is given a unique number so they can be printed easily
+# The size of a node with respect the heuristic used to sort
+# potential reducers by `size` is cached on the node in the `size`
+# field
+
 mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    poly::Union{U, Nothing}
    up::Union{lmnode{U, V, N}, Nothing}   # out (divisible leading monomials)
@@ -60,8 +99,8 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    lm::NTuple{N, Int}   # leading monomial as exponent vector
    lcm::NTuple{N, Int}  # lcm of lm's in tree rooted here, as exponent vector
    path::Bool # used for marking paths to divisible nodes
-   num::Int
-   size::Float64
+   num::Int # for counting nodes (used in printing)
+   size::Float64 # caches the size of the polynomial
 
    function lmnode{U, V, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
       node = new{U, V, N}(p, nothing, nothing, nothing, nothing, true, true, 0)
@@ -82,20 +121,14 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    end
 end
 
-function lm_divides(f::lmnode{U, V, N}, i::Int, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
-   D = exponent_vector(f.poly, i)
-   for j = 1:N
-      if node2.lm[j] > D[j]
-         return false
-      end
-   end
-   return true
-end
-
+# compute the lcm of the leading monomials of the given nodes as a tuple
 function lm_lcm(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    return Tuple(max(node1.lcm[i], node2.lcm[i]) for i in 1:N)
 end
 
+# return `true` if the leading monomial of `node2` divides the lcm of the
+# leading monomials of the tree rooted at `node1`, i.e. return `true` if
+# `node2` could divide some node in the tree rooted at `node1`
 function lm_divides_lcm(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    for i = 1:N
       if node2.lm[i] > node1.lcm[i]
@@ -105,10 +138,14 @@ function lm_divides_lcm(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U
    return true
 end
 
+# print "nothing" at up, next nodes which lead nowhere
 function show_inner(io::IO, n::Nothing)
    print(io, "nothing")
 end
 
+# print a polynomial, either just the leading monomial if the
+# `poly_level` debug flag above is 1 and the whole thing
+# otherwise
 function print_poly(io::IO, p::MPolyElem)
    if poly_level == 1
       print(io, leading_term(p))
@@ -120,6 +157,9 @@ function print_poly(io::IO, p::MPolyElem)
    end
 end
 
+# print a node and all its fields recursively, excluding
+# inactive nodes if the debug flag `print_inactive` above
+# is set to `false`
 function show_inner(io::IO, n::lmnode)
    if !n.path
       print(io, "Node(")
@@ -191,6 +231,7 @@ function show_inner(io::IO, n::lmnode)
    n.path = true
 end
 
+# print a vector of nodes
 function show(io::IO, B::Vector{<:lmnode})
    if print_node_level[] == 0
       BB = extract_gens(B)
@@ -374,6 +415,7 @@ function reduce_coefficients(p::U, V::Vector{U}, start::Int) where U <: Abstract
    return p
 end
 
+# return the polynomial `p` tail reduced by the given basis `V`
 function tail_reduce(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
    len = length(p)
    if len <= 1
@@ -382,6 +424,9 @@ function tail_reduce(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
    return reduce_coefficients(p, V, 2)
 end
 
+# return the normal form of the polynomial `p` after reduction by
+# the given basis `V`
+# this is internal, the user facing version being given below
 function normal_form(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
    if iszero(p)
       return zero(parent(p))
@@ -389,6 +434,7 @@ function normal_form(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
    return reduce_coefficients(p, V, 1)
 end
 
+# given two nodes, return a node giving the spoly of the two nodes
 function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    fc = leading_coefficient(f.poly)
    gc = leading_coefficient(g.poly)
@@ -401,6 +447,7 @@ function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingE
    return lmnode{U, V, N}(s)
 end
 
+# given two nodes, return a node giving the gpoly of the two nodes
 function compute_gpoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    fc = leading_coefficient(f.poly)
    gc = leading_coefficient(g.poly)
@@ -413,6 +460,7 @@ function compute_gpoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingE
    return lmnode{U, V, N}(g)
 end
 
+# given two polynomials, return the spoly of the two
 function spoly(f::T, g::T) where T <: MPolyElem
    n = nvars(parent(f))
    fc = leading_coefficient(f)
@@ -427,6 +475,7 @@ function spoly(f::T, g::T) where T <: MPolyElem
    s = divexact(c, fc)*inflate(f, shiftf, infl) - divexact(c, gc)*inflate(g, shiftg, infl)
 end
 
+# given two polynomials, return the gpoly of the two
 function gpoly(f::T, g::T) where T <: MPolyElem
    n = nvars(parent(f))
    fc = leading_coefficient(f)
@@ -467,16 +516,22 @@ function reducer_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}
    j = len
    for i = 1:len
       c = coeff(f.poly, i)
+      # larger coefficients are also somewhat punished
       s += Base.log(ndigits(c; base=2))*j*j
       j -= 1      
    end
    return s
 end
 
+# returns the leading coefficient of a node for use in sorting
 function leading_coefficient_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    return leading_coefficient(f.poly)
 end
 
+# reduce the node `b` by the reducer attached to it, inactivating
+# `b` if its leading term is removed, and putting any fragments in
+# `H` and marking `b` for recomputation of spolys (by placing it in
+# `S`) if it has been merely modified
 function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    reduced = false
    if b.reducer != nothing
@@ -537,8 +592,10 @@ function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: Abstrac
 end
 
 # reduce nodes in a tree depth first
-# X is used to sort equal nodes
-# H is used for fragments
+# X is used as temporary space to sort equal nodes
+# H is used for fragments that must be inserted into the basis
+# S is used to mark nodes for computation of spolys when they cease
+# being reduced
 # returns true if some reduction actually occurred
 function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    b.path = true
@@ -565,6 +622,8 @@ function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <
       index = searchsortedfirst(X, b2, by=leading_coefficient_size, rev=true) # find index at which to insert x
       insert!(X, index, b2)
    end
+   # of the active nodes, remove ones which are the same up to units
+   # TODO: is this still required?
    filter!(x->x.active, X)
    i = 1
    len = length(X)
@@ -587,16 +646,19 @@ function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <
    for b2 in X
       reduced |= reduce_by_reducer(S, H, b2)
    end
-   # empty X
+   # clear nodes from temporary space X
    while !isempty(X)
       pop!(X)
    end
    return reduced
 end
 
-# actually performs the reductions which have been attached to nodes by best_reducer
+# actually performs the reductions which have been attached to nodes
+# by best_reducer
 # X is used to sort equal nodes
 # H is used for fragments
+# S is used to mark nodes for generation of spolys when they stop
+# being reduced
 # returns true if some reduction actually occurred
 function reduce_nodes(S::Vector{T}, H::Vector{T}, B::Vector{T}, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    reduced = false
@@ -608,14 +670,23 @@ function reduce_nodes(S::Vector{T}, H::Vector{T}, B::Vector{T}, X::Vector{T}) wh
    return reduced
 end
 
+# given a node b and a list of potential reducers, find the
+# best one which will remove the leading coefficient of `b`
+# if it exists
+# the current best reducer and whether it would remove
+# the leading coefficient are also passed in
 function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_divides::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
-      if X[i] != b && X[i].reducer == nothing # poly can't be reduced by itself
+      # poly can't be reduced by itself or by a node that will be reduced
+      # in this round
+      if X[i] != b && X[i].reducer == nothing
          h = leading_coefficient(X[i].poly)
          if divides(c, h)[1]
             usable = true
+            # make sure a circular chain of reduction can't occur
+            # TODO: is this still possible? (see comment immediately above)
             if X[i].lm == b.lm
                x2 = X[i]
                while x2 != nothing
@@ -625,6 +696,10 @@ function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_div
                   x2 = x2.reducer
                end
             end
+            # if there's currently no reducer or this one is better
+            # attach the reducer that has been found
+            # only reduce by nodes with same lm if active, else it
+            # could be removed by an equal node or fragments thereof
             if usable && (c != h || X[i].active)
                if best == nothing || !best_divides
                   best = X[i]
@@ -645,14 +720,23 @@ function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_div
    return best, best_divides
 end
 
+# given a node b and a list of potential reducers, find the
+# best one which will reduce the leading coefficient of `b`
+# if it exists
+# the current best reducer and whether it would reduce
+# the leading coefficient are also passed in
 function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_reduces::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
-      if X[i] != b && X[i].active && X[i].reducer == nothing # poly can't be reduced by itself
+      # poly can't be reduced by itself or a node that will be reduced
+      # in this round
+      if X[i] != b && X[i].active && X[i].reducer == nothing
          h = AbstractAlgebra.mod(c, leading_coefficient(X[i].poly))
          if h != c && h != 0 && !divides(leading_coefficient(X[i].poly), c)[1]
             usable = true
+            # check there are no cycles of reducers
+            # TODO: is this still possible? (see comment immediately above)
             if X[i].lm == b.lm
                x2 = X[i]
                while x2 != nothing
@@ -662,6 +746,8 @@ function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_red
                   x2 = x2.reducer
                end
             end
+            # if node currently doesn't have a reducer or this one is
+            # better, attach the reducer just found
             if usable
                if best == nothing || !best_reduces
                   best = X[i]
@@ -682,14 +768,23 @@ function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_red
    return best, best_reduces
 end
 
+# given a node b and a list of potential reducers, find the
+# best one which will give a smaller leading coefficient if
+# we gcd with the leading coefficient of `b` if such exists
+# the current best reducer and whether it would gcd to reduce
+# the leading coefficient are also passed in
 function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
-      if X[i] != b && X[i].active  && X[i].reducer == nothing # poly can't be reduced by itself
+       # poly can't be reduced by itself or by node that will be reduced
+       # in this round
+      if X[i] != b && X[i].active  && X[i].reducer == nothing
          if !divides(leading_coefficient(X[i].poly), c)[1] &&
             !divides(c, leading_coefficient(X[i].poly))[1]
             usable = true
+            # check there are no cycles of reducers
+            # TODO: is this still possible? (see comment immediately above)
             if X[i].lm == b.lm
                x2 = X[i]
                while x2 != nothing
@@ -699,6 +794,8 @@ function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd:
                   x2 = x2.reducer
                end
             end
+            # if node currently doesn't have a reducer or this one is
+            # better, attach the reducer just found
             if usable
                if best == nothing || !best_is_gcd
                   best = X[i]
@@ -721,8 +818,9 @@ end
 
 # used for heuristics, to select one kind of reducer over another preferentially
 # current strategy is to prefer reducer which gives degree reduction over
-# everything else, but this is probably wrong based on what Singular does
-# function will return best reducer in sorted list X for reducing b
+# everything else and reduction of leading coefficient after that
+# the function takes a list of potential reducers (i.e. nodes from further down
+# the tree), with the ones that are new since last round being in `Xnew`
 function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    # prevent nodes that are not active from being reduced
    if !b.active
@@ -768,7 +866,9 @@ function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: Abst
 end
 
 # attach best reducer to each node in tree
-# see best_reducer description below for details
+# `X` and `Xnew` will be used to make a list of potential
+# reducers (i.e. nodes further down in tree), with `Xnew`
+# being those that are new since last round
 function best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    # insert nodes equal to b in X
    b2 = b
@@ -810,23 +910,27 @@ function best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractA
    end
 end
 
-# Setup for one round of reduction of leading terms by others
+# Setup for one round of reduction
 # Each node will be reduced mod the leading coeff of the best node
 # whose leading term divides it and if there are none, by the
 # best node whose leading monomial divides it and if none exists
 # gcd polynomials will be created if possible
 # The reductions are not actually done here; the best reducer
 # is just attached to the node
-# The best reducers along the current path so far are given by the
-# ordered array X unless they are for new nodes since last time, in
-# which case they will go in Xnew
+# The potential reducers along the current path so far are given by
+# the array `X` unless they are for new nodes since last time, in
+# which case they will go in `Xnew`
 function best_reducer(B::Vector{T}, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    for b in B
       best_reducer(b, X, Xnew)
    end
 end
 
-# insert fragments into basis
+# insert fragments from `H` into basis `B`
+# they are sorted by `size` of leading monomial and only
+# those below a current bound are inserted
+# nodes are marked for generation of spolys when they stop
+# being reduced, by placing them in `S`
 function insert_fragments(S::Vector{T}, B::Vector{T}, H::Vector{T}, bound::NTuple{N, Int}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    sort!(H, by=x->sum(max.(x.lm, bound) .- bound), rev=true)
    while !isempty(H)
@@ -901,9 +1005,11 @@ function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
    b.path = true
 end
 
-# insert a node into the basis
+# insert a node `d` into the basis `B`
 function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+   # first link `d` to nodes it divides
    insert_links(d, B)
+   # now insert it if any existing nodes divide it
    inserted = false
    for b in B
       if lm_divides(d, b)
@@ -911,16 +1017,25 @@ function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlge
          basis_insert(b, d)
       end
    end
+   # otherwise just add it to the basis as an independent root
    if inserted == false # was not inserted
       push!(B, d)
    end
    clear_path(B)
+   # if the polynomial wasn't a constant multiple of an existing one
+   # (which is flagged using the `active` field), mark it for later
+   # computation of spolys when it stops being reduced
    if d.active
       push!(S, d) # store for later computation of spolys
       d.settled = 0
    end
 end
 
+# give a node in the lattice, find the node with equal lm
+# which is on the backbone of the lattice
+# if all nodes with equal lm seem to be leaves, just declare
+# `d` itself to be the base node (which won't matter where)
+# this function is used
 function find_base(d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if d.up != nothing
       return d
@@ -936,7 +1051,8 @@ function find_base(d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V
    return d
 end
 
-# return true if d has a connection up to b
+# return true if `d`` has a connection up to `b`, i.e.
+# `d` divides `b`
 function connected(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if !lm_divides(b, d)
       return false
@@ -1010,10 +1126,10 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
    return nothing
 end
 
-# compute spolys of all polys in basis with d, except d itself
-# and polys whose lc divides that of d or which that of d divides
-# unless directly connected to d
-# s-polys are collected in S (not fragments to avoid too many
+# compute spolys of all polys in basis `B` with `d`, except `d itself
+# and polys whose lc divides that of `d or which that of `d divides
+# unless directly connected to `d`
+# s-polys are collected in `S` (not in fragments `H` to avoid too many
 # s-polys being added in a single round)
 # they are later moved to fragments
 function compute_spolys(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
@@ -1103,7 +1219,7 @@ function compute_lcm(b::T)  where {U <: AbstractAlgebra.MPolyElem{<:RingElement}
    end
 end
 
-# clear all path flags in given branch
+# clear all path flags in given branch, i.e. reset path flags
 function clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if b.up != nothing
       if b.up.path
@@ -1120,14 +1236,16 @@ function clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, 
    b.path = false # clear path flag
 end
 
-# clear all path flags in basis
+# clear all path flags in basis, i.e. reset path flags
 function clear_path(B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    for b in B
       clear_path(b)
    end
 end
 
-# extract generators from branch and store in array D
+# extract generators (polynomials) from branch and store in
+# array `D`
+# only polys from active nodes are extracted
 function extract_gens(D::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPolyElem, V, T <: lmnode{U, V, N}}
    # depth first
    if node.up != nothing
@@ -1168,6 +1286,10 @@ function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, V,
    return D
 end
 
+# for all nodes in `S2` (marked for spoly generation) which are
+# still active, generate spolys against all relevant polys in
+# basis `B` and place the spolys in `S` (for later insertion
+# into fragments)
 function generate_spolys(S::Vector{T}, B::Vector{T}, S2::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, V, T <: lmnode{U, V, N}}
    i = 1
    len = length(S2)
@@ -1192,8 +1314,10 @@ function reduce_gens(I::Ideal{U}; complete_reduction::Bool=true) where {T <: Rin
    node_num[] = 0
    if hasmethod(gcdx, Tuple{T, T})
       B = gens(I)
+      # nothing to be done if only one poly
       if length(B) > 1
          # make heap
+         # TODO: is heap still required?
          V = ordering(parent(B[1]))
          N = nvars(base_ring(I))
          heap = Vector{lmnode{U, V, N}}()
@@ -1276,26 +1400,38 @@ if IDEAL_MULTIV_DEBUG
                   readline(stdin)
                end
 end
+               # when no further reduction is possible in lattice
+               # generate spolys
                if !reduction_occurs
                   generate_spolys(S, B2, S2)
                end
 
             end
+            # if we have no fragments to insert
             if isempty(H)
-             
+               # and no spolys to compute or insert
                if isempty(S) && isempty(S2)
+                  # we are done
                   break
                end
             else
+               # else if there are fragments, increase
+               # bound so next one at least will be inserted
                bound = max.(bound, H[end].lm)
             end
          end
+         # get all still active nodes from basis, we are done
          B = extract_gens(B2)
       end
+      # canonicalise basis elements
       B = [divexact(d, canonical_unit(d)) for d in B]
+      # do tail reduction if requested
       if complete_reduction
          B = [tail_reduce(d, B) for d in B]
       end
+      # sort by leading monomial then leading coefficient
+      # TODO: is sort by leading coefficient necessary?
+      # isn't monomial order already a total order
       B = sort!(B, lt = isless_monomial_lc)
       return Ideal{U}(base_ring(I), B)
    else
