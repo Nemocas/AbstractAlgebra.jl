@@ -1016,7 +1016,7 @@ mutable struct FreeAssAlgebra{T <: RingElement} <: AbstractAlgebra.FreeAssAlgebr
    end
 end
 
-const FreeAssAlgID = CacheDictType{Tuple{Ring, Vector{Symbol}}, Ring}()
+const FreeAssAlgID = CacheDictType{Tuple{Ring, Vector{Symbol}}, NCRing}()
 
 # *** Note on length:
 # length(.coeffs), and length(.exps) may be greater than the real length .length
