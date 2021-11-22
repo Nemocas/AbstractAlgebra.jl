@@ -39,7 +39,7 @@ gens(I::Ideal) = I.gens
 #
 ###############################################################################
 
-const LMNODE_DEBUG = false # whether to print debugging information
+const IDEAL_MULTIV_DEBUG = false # whether to print debugging information
 const poly_level = 1 # 1 = display leading terms only, 2 = display entire polynomials
 const print_inactive = false # whether to print polynomials and node nums of inactive nodes
 const print_prompt = false # whether to wait for a keypress between debug output
@@ -343,11 +343,10 @@ end
 #
 ###############################################################################
 
-function normal_form(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
-   if iszero(p)
-      return zero(parent(p))
-   end
-   n = 1
+# Reduce coefficients of polynomial p starting from term with index `start`
+# (numbered from 1). Used for `normal_form` and `tail_reduce`.
+function reduce_coefficients(p::U, V::Vector{U}, start::Int) where U <: AbstractAlgebra.MPolyElem
+   n = start
    len = length(p)
    infl = [1 for i in 1:nvars(parent(p))]
    while n <= len
@@ -356,7 +355,7 @@ function normal_form(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
          mv = exponent_vector(V[i], 1)
          mp = exponent_vector(p, n)
          if max.(mv, mp) == mp # leading monomial divides
-            h = leading_coefficient(V[i]) # should be nonnegative
+            h = leading_coefficient(V[i]) # should be positive
             q, r = AbstractAlgebra.divrem(c, h)
             if !iszero(q)
                shift = mp .- mv
@@ -373,6 +372,21 @@ function normal_form(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
       len = length(p)
    end
    return p
+end
+
+function tail_reduce(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
+   len = length(p)
+   if len <= 1
+      return p
+   end
+   return reduce_coefficients(p, V, 2)
+end
+
+function normal_form(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
+   if iszero(p)
+      return zero(parent(p))
+   end
+   return reduce_coefficients(p, V, 1)
 end
 
 function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
@@ -425,6 +439,20 @@ function gpoly(f::T, g::T) where T <: MPolyElem
    shiftf = llcm .- mf
    shiftg = llcm .- mg
    g = s*inflate(f, shiftf, infl) + t*inflate(g, shiftg, infl)
+end
+
+# used for sorting polynomials in final basis, first by leading monomial and
+# then by leading coefficient
+function isless_monomial_lc(p::U, q::U) where U <: AbstractAlgebra.MPolyElem{<:RingElement}
+   plm = leading_monomial(p)
+   qlm = leading_monomial(q)
+   if plm < qlm
+      return true
+   end
+   if plm == qlm && leading_coefficient(p) < leading_coefficient(q)
+      return true
+   end
+   return false
 end
 
 # heuristic for size of reducer polynomials (smaller is better), used to sort
@@ -1160,7 +1188,7 @@ function generate_spolys(S::Vector{T}, B::Vector{T}, S2::Vector{T}) where {N, U 
 end
 
 # main reduction routine
-function reduce_gens(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+function reduce_gens(I::Ideal{U}; complete_reduction::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    node_num[] = 0
    if hasmethod(gcdx, Tuple{T, T})
       B = gens(I)
@@ -1236,7 +1264,7 @@ function reduce_gens(I::Ideal{U}) where {T <: RingElement, U <: AbstractAlgebra.
                end
                # insert fragments (including s-polys)
                insert_fragments(S2, B2, H, bound)
-if LMNODE_DEBUG
+if IDEAL_MULTIV_DEBUG
                print_node_level[] = 1
                println("B2 = ", B2)
                print_node_level[] = 0
@@ -1265,6 +1293,10 @@ end
          B = extract_gens(B2)
       end
       B = [divexact(d, canonical_unit(d)) for d in B]
+      if complete_reduction
+         B = [tail_reduce(d, B) for d in B]
+      end
+      B = sort!(B, lt = isless_monomial_lc)
       return Ideal{U}(base_ring(I), B)
    else
       error("Not implemented")
@@ -1824,7 +1856,7 @@ end
 #
 ###############################################################################
 
-function normal_form(p::T, V::Ideal{T}) where {T <: RingElement}
+function normal_form(p::T, V::Ideal{T}) where T <: RingElement
    return normal_form(p, gens(V))
 end
 
@@ -1857,6 +1889,7 @@ function reduce_gens(I::Ideal{T}) where T <: RingElement
    if hasmethod(gcdx, Tuple{T, T})
       I = reduce_euclidean(I)
    end
+   return I
 end
 
 function reduce_gens(I::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyElem{U}}
