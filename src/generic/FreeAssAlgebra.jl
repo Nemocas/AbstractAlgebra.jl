@@ -42,7 +42,7 @@ end
 
 function check_parent(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}, throw::Bool = true) where T <: RingElement
    b = parent(a) != parent(b)
-   b & throw && error("Incompatible polynomial rings in polynomial operation")
+   b & throw && error("Incompatible rings in operation")
    return !b
 end
 
@@ -158,12 +158,12 @@ end
 
 function term(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
    R = parent(a)
-   return FreeAssAlgElem{T}(R, a.coeffs[i], [a.exps[i]], 1)
+   return FreeAssAlgElem{T}(R, [a.coeffs[i]], [a.exps[i]], 1)
 end
 
 function monomial(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
    R = parent(a)
-   return FreeAssAlgElem{T}(R, T[one(R)], [a.exps[i]], 1)
+   return FreeAssAlgElem{T}(R, T[one(base_ring(R))], [a.exps[i]], 1)
 end
 
 function exponent_word(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
@@ -178,18 +178,20 @@ function Base.iterate(a::FreeAssAlgExponentWords, state = 0)
 end
 
 function leading_coefficient(a::FreeAssAlgElem{T}) where T
-   a.length > 0 || return zero(base_ring(a))
-   return a.coeffs[1]
+   return a.length > 0 ? coeff(a, 1) : zero(base_ring(a))
 end
 
-function leading_word(a::FreeAssAlgElem{T}) where T
-   a.length > 0 || error("element is zero")
-   return a.exps[1]
+function leading_monomial(a::FreeAssAlgElem{T}) where T
+   return a.length > 0 ? monomial(a, 1) : a
+end
+
+function leading_term(a::FreeAssAlgElem{T}) where T
+   return a.length > 0 ? term(a, 1) : a
 end
 
 function total_degree(a::FreeAssAlgElem{T}) where T
    # currently stored in dexlex
-   return length(a) > 0 ? length(leading_word(a)) : -1
+   return length(a) > 0 ? length(a.exps[1]) : -1
 end
 
 ###############################################################################
@@ -400,7 +402,7 @@ function ^(a::FreeAssAlgElem{T}, b::Integer) where T <: RingElement
          e = [Int[]]
       else
          b < 0 && throw(NotInvertibleError(a))
-         e = [reduce(vcat, [a.exps[1] for i in 1:b])]
+         e = Vector{Int}[reduce(vcat, [a.exps[1] for i in 1:b])]
       end
       return FreeAssAlgElem{T}(parent(a), [a.coeffs[1]^b], e, 1)
    else
@@ -425,7 +427,7 @@ end
 
 
 # return (true, l, r) with a = l*b*r and length(l) minimal
-#     or (false, junk, junk)
+#     or (false, junk, junk) if a is not two-sided divisible by b
 function word_divides_leftmost(a::Vector{Int}, b::Vector{Int})
    n = length(b)
    for i in 0:length(a)-n
@@ -444,6 +446,8 @@ function word_divides_leftmost(a::Vector{Int}, b::Vector{Int})
    return (false, Int[], Int[])
 end
 
+# return (true, l, r) with a = l*b*r and length(r) minimal
+#     or (false, junk, junk) if a is not two-sided divisible by b
 function word_divides_rightmost(a::Vector{Int}, b::Vector{Int})
    n = length(b)
    for i in length(a)-n:-1:0
@@ -469,7 +473,7 @@ function AbstractAlgebra.divexact_left(f::FreeAssAlgElem{T}, g::FreeAssAlgElem{T
    qexps = Vector{Int}[]
    while length(f) > 0
       ok, ml, mr = word_divides_leftmost(f.exps[1], g.exps[1])
-      ok && isempty(ml) || error("not exact division")
+      ok && isempty(ml) || throw(ArgumentError("Not an exact division"))
       qi = divexact(f.coeffs[1], g.coeffs[1])
       push!(qcoeffs, qi)
       push!(qexps, mr)
@@ -484,7 +488,7 @@ function AbstractAlgebra.divexact_right(f::FreeAssAlgElem{T}, g::FreeAssAlgElem{
    qexps = Vector{Int}[]
    while length(f) > 0
       ok, ml, mr = word_divides_rightmost(f.exps[1], g.exps[1])
-      ok && isempty(mr) || error("not exact division")
+      ok && isempty(mr) || throw(ArgumentError("Not an exact division"))
       qi = divexact(f.coeffs[1], g.coeffs[1])
       push!(qcoeffs, qi)
       push!(qexps, ml)
@@ -500,7 +504,7 @@ end
 #
 ###############################################################################
 
-function *(a::FreeAssAlgElem{T}, b::Union{Integer, Rational, AbstractFloat}) where T
+function *(a::FreeAssAlgElem{T}, b::Integer) where T <: RingElement
    n = length(a)
    R = parent(a)
    b = base_ring(R)(b)
@@ -508,27 +512,12 @@ function *(a::FreeAssAlgElem{T}, b::Union{Integer, Rational, AbstractFloat}) whe
    return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
 end
 
-function *(a::FreeAssAlgElem{T}, b::T) where T <: RingElem
-   n = length(a)
-   R = parent(a)
-   b = base_ring(R)(b)
-   zcoeffs = T[a.coeffs[i]*b for i in 1:n]
-   return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
+function *(n::Union{Integer, Rational, AbstractFloat}, a::FreeAssAlgElem)
+    return a*n
 end
 
-*(n::Union{Integer, Rational, AbstractFloat}, a::FreeAssAlgElem) = a*n
+function divexact(a::FreeAssAlgElem{T}, b::Integer; check::Bool = true) where T <: RingElement
 
-*(n::T, a::FreeAssAlgElem{T}) where {T <: RingElem} = a*n
-
-function divexact(a::FreeAssAlgElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
-   n = length(a)
-   R = parent(a)
-   b = base_ring(R)(b)
-   zcoeffs = T[divexact(a.coeffs[i], b, check = check) for i in 1:n]
-   return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
-end
-
-function divexact(a::MPoly{T}, b::T; check::Bool=true) where {T <: RingElem}
    n = length(a)
    R = parent(a)
    b = base_ring(R)(b)

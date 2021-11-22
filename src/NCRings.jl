@@ -20,52 +20,46 @@ promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElem = T
 #
 ###############################################################################
 
-function +(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
-   if S == promote_rule(S, T)
-      +(x, parent(x)(y))
-   else
-      +(parent(y)(x), y)
-   end
++(x::NCRingElem, y::NCRingElem) = +(promote(x, y)...)
+
++(x::NCRingElem, y::NCRingElement) = x + parent(x)(y)
+
++(x::NCRingElement, y::NCRingElem) = parent(y)(x) + y
+
+-(x::NCRingElem, y::NCRingElem) = -(promote(x, y)...)
+
+-(x::NCRingElem, y::NCRingElement) = x - parent(x)(y)
+
+-(x::NCRingElement, y::NCRingElem) = parent(y)(x) - y
+
+*(x::NCRingElem, y::NCRingElem) = *(promote(x, y)...)
+
+*(x::NCRingElem, y::NCRingElement) = x*parent(x)(y)
+
+*(x::NCRingElement, y::NCRingElem) = parent(y)(x)*y
+
+function divexact_left(x::NCRingElem, y::NCRingElem; check::Bool = true)
+   return divexact_left(promote(x, y)...)
 end
 
-function -(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
-   if S == promote_rule(S, T)
-      -(x, parent(x)(y))
-   else
-      -(parent(y)(x), y)
-   end
+function divexact_right(x::NCRingElem, y::NCRingElem; check::Bool = true)
+   return divexact_right(promote(x, y)...)
 end
 
-function *(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
-   if S == promote_rule(S, T)
-      *(x, parent(x)(y))
-   else
-      *(parent(y)(x), y)
-   end
+function divexact_left(
+   x::NCRingElem,
+   y::Union{Integer, Rational, AbstractFloat};
+   check::Bool = true)
+
+   return divexact_left(x, parent(x)(y); check = check)
 end
 
-function divexact_left(x::S, y::T; check::Bool=true) where {S <: NCRingElem, T <: NCRingElem}
-   if S == promote_rule(S, T)
-      divexact_left(x, parent(x)(y); check=check)
-   else
-      divexact_left(parent(y)(x), y; check=check)
-   end
-end
+function divexact_right(
+   x::NCRingElem,
+   y::Union{Integer, Rational, AbstractFloat};
+   check::Bool = true)
 
-function divexact_right(x::S, y::T; check::Bool=true) where {S <: NCRingElem, T <: NCRingElem}
-   if S == promote_rule(S, T)
-      divexact_right(x, parent(x)(y); check=check)
-   else
-      divexact_right(parent(y)(x), y; check=check)
-   end
-end
-
-function divexact_left(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
-   return divexact_left(x, parent(x)(y); check=check)
-end
-
-function divexact_right(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
-   return divexact_right(x, parent(x)(y); check=check)
+   return divexact_right(x, parent(x)(y); check = check)
 end
 
 function ==(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
