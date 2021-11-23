@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export set_exponent_word
+export exponent_word, set_exponent_word
 
 ###############################################################################
 #
@@ -166,6 +166,13 @@ function monomial(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
    return FreeAssAlgElem{T}(R, T[one(base_ring(R))], [a.exps[i]], 1)
 end
 
+@doc Markdown.doc"""
+    exponent_word(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
+
+Return a vector of variable indices corresponding to the monomial of the
+$i$-th term of $a$. Term numbering begins at $1$, and the variable
+indices are given in the order of the variables for the ring.
+"""
 function exponent_word(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
    0 < i <= length(a) || error("index out of range")
    return a.exps[i]
@@ -192,6 +199,16 @@ end
 function total_degree(a::FreeAssAlgElem{T}) where T
    # currently stored in dexlex
    return length(a) > 0 ? length(a.exps[1]) : -1
+end
+
+function Base.length(x::FreeAssAlgExponentWords{T}) where {S <: RingElement,
+                                                           T <: FreeAssAlgElem{S}}
+   return length(x.poly)
+end
+
+function Base.eltype(x::FreeAssAlgExponentWords{T}) where {S <: RingElement,
+                                                           T <: FreeAssAlgElem{S}}
+   return Vector{Int}
 end
 
 ###############################################################################

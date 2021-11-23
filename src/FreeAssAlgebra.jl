@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export FreeAssociativeAlgebra
+export exponent_words, FreeAssociativeAlgebra
 
 ###############################################################################
 #
@@ -80,19 +80,25 @@ end
 #
 ###############################################################################
 
-function coefficients(a::FreeAssAlgElem)
+function coefficients(a::AbstractAlgebra.FreeAssAlgElem)
    return Generic.MPolyCoeffs(a)
 end
 
-function terms(a::FreeAssAlgElem)
+function terms(a::AbstractAlgebra.FreeAssAlgElem)
    return Generic.MPolyTerms(a)
 end
 
-function monomials(a::FreeAssAlgElem)
+function monomials(a::AbstractAlgebra.FreeAssAlgElem)
    return Generic.MPolyMonomials(a)
 end
 
-function exponent_words(a::FreeAssAlgElem)
+@doc Markdown.doc"""
+    exponent_words(a::AbstractAlgebra.FreeAssAlgElem{T}) where T <: RingElement
+
+Return an iterator for the exponent words of the given polynomial. To
+retrieve an array of the exponent words, use `collect(exponent_words(a))`.
+"""
+function exponent_words(a::AbstractAlgebra.FreeAssAlgElem{T}) where T <: RingElement
    return Generic.FreeAssAlgExponentWords(a)
 end
 
