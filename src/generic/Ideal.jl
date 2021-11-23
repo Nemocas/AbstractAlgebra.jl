@@ -1447,6 +1447,7 @@ end
 
 const IDEAL_UNIV_DEBUG = false
 
+# Debugging: check that polynomials are in order of degree
 function check_d(D::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:RingElement}}
    if !isempty(D)
       len = length(D[1])
@@ -1459,6 +1460,9 @@ function check_d(D::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:Ri
    end
 end
 
+# debugging: check polynomials are in order of degree, that there is not more than one
+# polynomial with a unit as leading coefficient, that coefficients divide one another
+# and that there are not two leading coefficients that are associate
 function check_v(V::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:RingElement}}
    len = length(V[1]) - 1
    c = 2*leading_coefficient(V[1])
@@ -1485,6 +1489,7 @@ function check_v(V::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:Ri
    end
 end
 
+# heuristic "size" of polynomials
 function mysize(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    s = 0.0
    j = 0
@@ -1493,24 +1498,28 @@ function mysize(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
       c = coeff(f, i - 1)
       if !iszero(c)
          j += 1
+         # large coeffs are also punished
          s += Base.log(ndigits(coeff(f, i - 1); base=2))*j*j
       end
    end
    return s
 end
 
+# heuristic as above, but first orders polynomials with respect to
+# degree
 function mysize2(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    return (length(f) << 40) + mysize(f)
 end
 
+# insert polynomial into H in sorted order wrt mysize
 function mypush!(H::Vector{T}, f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    index = searchsortedfirst(H, f, by=mysize, rev=true) # find index at which to insert x
    insert!(H, index, f)
 end
 
-# Extend the basis V of polynomials satisfying 1-6 below by the
-# polynomials in D, all of which have degree at least that of those in
-# V and such that the degrees of the polynomials in D is *decreasing*.
+# extend the basis `V` of polynomials satisfying 1-6 below by the
+# polynomials in `D`, all of which have degree at least that of those in
+# `V` and such that the degrees of the polynomials in `D` is *decreasing*.
 function extend_ideal_basis(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    sgen = 1
    while !isempty(D)
@@ -1531,6 +1540,8 @@ function extend_ideal_basis(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) wh
    return V
 end
 
+# reduce a polynomials coefficients by a resultant `res` that
+# is in the ideal
 function reduce_by_resultant(f::T, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    len = 0
    for i = 1:length(f)
@@ -1547,6 +1558,7 @@ function reduce_by_resultant(f::T, res::U) where {U <: RingElement, T <: Abstrac
    return divexact(f, canonical_unit(f))
 end
 
+# do tail reduction of the polynomial `f` by the basis `V`
 function reduce_tail(f::T, V::AbstractVector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    p = iszero(res) ? f : reduce_by_resultant(f, res)
    p = divexact(p, canonical_unit(p))
@@ -1579,6 +1591,8 @@ function reduce_tail(f::T, V::AbstractVector{T}, res::U) where {U <: RingElement
    return p
 end
 
+# return the normal form of `p` by the basis `V`
+# this is internal; see below for the user facing version
 function normal_form(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    i = length(V)
    n = length(p)
@@ -1606,8 +1620,11 @@ function normal_form(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractA
    return p
 end
 
-# An S-polynomial of f and g is a linear combination which makes the leading
-# coefficients cancel. E.g. if p = 3x^2, q = 2x then S-poly(p, q) = 2*p - 3x*q
+# an S-polynomial of f and g is a linear combination which makes the leading
+# coefficients cancel, e.g. if p = 3x^2, q = 2x then S-poly(p, q) = 2*p - 3x*q
+# this function inserts spolys of `v[n]` and `V[n - 1]` and of `V[n]` and
+# and `V[n + 1]` (if those exist) into `H`, reducing coefficients by the
+# resultant `res` if available
 function insert_spoly(V::Vector{T}, H::Vector{T}, n::Int, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    p1 = V[n]
    if n > 1
@@ -1630,6 +1647,8 @@ function insert_spoly(V::Vector{T}, H::Vector{T}, n::Int, res::U) where {U <: Ri
    end
 end
 
+# insert fragments from `H` into basis `V`, placing any long
+# fragments back in `D` instead
 function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    max_len = 0
    for h in H
@@ -1788,10 +1807,10 @@ function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) wher
    return V
 end
 
-# Given a nonempty vector V of polynomials of satisfying 1-6 below and a
-# polynomial p whose degree is at least that of all the polynomials in V, add
-# p to V and perform reduction steps so that 1-6 still hold. Fragments which
-# are generated and need to be added go in H.
+# given a nonempty vector `V` of polynomials of satisfying 1-6 below and a
+# polynomial `p` whose degree is at least that of all the polynomials in `V`,
+# add `p` to `V` and perform reduction steps so that 1-6 still hold
+# fragments which are generated and need to be added go in `H`
 function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    while true
       n = length(V)
@@ -1887,6 +1906,10 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
    end
 end
       
+# if possible, find a resultant (or preferably gcd of resultants)
+# which exists in the idea
+# this can be used to reduce coefficients of polynomials to keep
+# them small throughout the algorithm
 function find_resultant_in_ideal(D::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    res = zero(base_ring(D[1]))
    V = similar(D, 0)
@@ -1921,6 +1944,15 @@ end
 # 5. The polynomials are all canonicalised (divided by their canonical_unit)
 # 6. The tail of each polynomial is reduced mod the other polynomials in the basis
 # 7. All the S-polynomials of pairs in the basis reduce to zero
+# The algorithm proceeds by starting with all polynomials in D which is sorted
+# first by degree, then by "size"
+# if possible, we find a resultant in the ideal which can be used to reduce
+# coefficients
+# polynomials are added one at a time to the basis `V`, reducing existing
+# elements of the basis
+# this may generate fragments which are placed in `H`
+# when a new poly is added to the basis, spolys are also generated for all
+# the polynomials reduced by the new poly and for the new poly itself
 function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    if hasmethod(gcdx, Tuple{U, U})
       V = gens(I)
