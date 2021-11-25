@@ -85,6 +85,9 @@
       @test leading_term(f1) == leading_coefficient(f1)*leading_monomial(f1)
       @test total_degree(f1) >= total_degree(f1 - leading_term(f1))
 
+      @test collect(exponent_words(varlist[1] + 1)) == [Int[1], Int[]]
+      @test isone(varlist[1]^0)
+
       _, varlist = PolynomialRing(QQ, var_names)
       y = varlist[1]
       @test x in [x, y]
