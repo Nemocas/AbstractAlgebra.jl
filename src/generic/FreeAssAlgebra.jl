@@ -372,10 +372,11 @@ function +(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T <: RingElement
    return FreeAssAlgElem{T}(parent(a), zcoeffs, zexps, length(zcoeffs))
 end
 
-function -(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T <: RingElement
+# a - b ignoring the first "start" terms of both
+function _sub_rest(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}, start::Int) where T <: RingElement
    zcoeffs = T[]
    zexps = Vector{Int}[]
-   i = j = 1
+   i = j = start + 1
    while i <= a.length && j <= b.length
       c = word_cmp(a.exps[i], b.exps[j])
       if c < 0
@@ -407,6 +408,10 @@ function -(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T <: RingElement
       j += 1
    end
    return FreeAssAlgElem{T}(parent(a), zcoeffs, zexps, length(zcoeffs))
+end
+
+function -(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T <: RingElement
+   return _sub_rest(a, b, 0)
 end
 
 function ^(a::FreeAssAlgElem{T}, b::Integer) where T <: RingElement
@@ -494,7 +499,7 @@ function AbstractAlgebra.divexact_left(f::FreeAssAlgElem{T}, g::FreeAssAlgElem{T
       qi = divexact(f.coeffs[1], g.coeffs[1])
       push!(qcoeffs, qi)
       push!(qexps, mr)
-      f -= mul_term(qi, ml, g, mr)
+      f = _sub_rest(f, mul_term(qi, ml, g, mr), 1) # enforce lt cancelation
    end
    return FreeAssAlgElem{T}(R, qcoeffs, qexps, length(qcoeffs))
 end
@@ -509,7 +514,7 @@ function AbstractAlgebra.divexact_right(f::FreeAssAlgElem{T}, g::FreeAssAlgElem{
       qi = divexact(f.coeffs[1], g.coeffs[1])
       push!(qcoeffs, qi)
       push!(qexps, ml)
-      f -= mul_term(qi, ml, g, mr)
+      f = _sub_rest(f, mul_term(qi, ml, g, mr), 1) # enforce lt cancelation
    end
    return FreeAssAlgElem{T}(R, qcoeffs, qexps, length(qcoeffs))
 end
