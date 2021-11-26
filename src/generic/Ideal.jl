@@ -31,6 +31,11 @@ parent_type(::Type{Ideal{S}}) where S <: RingElement = IdealSet{S}
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    gens(I::Ideal) = I.gens
+
+Return a list of generators of the ideal `I` in reduced form and canonicalised.
+"""
 gens(I::Ideal) = I.gens
 
 ###############################################################################
@@ -2024,8 +2029,13 @@ end
 #
 ###############################################################################
 
-function normal_form(p::T, V::Ideal{T}) where T <: RingElement
-   return normal_form(p, gens(V))
+@doc Markdown.doc"""
+    normal_form(p::T, I::Ideal{T}) where T <: RingElement
+
+Return the normal form of the polynomial `p` with respect to the ideal `I`.
+"""
+function normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.MPolyElem{T}}
+   return normal_form(p, gens(I))
 end
 
 ###############################################################################
@@ -2044,6 +2054,11 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    Base.contains(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+
+Return `true` if the ideal `J` is contained in the ideal `I`.
+"""
 function Base.contains(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
    G = gens(J)
    for v in G
