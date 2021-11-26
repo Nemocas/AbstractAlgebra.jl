@@ -2067,6 +2067,13 @@ function +(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
    return Ideal(R, vcat(G1, G2))
 end
 
+function *(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   R = base_ring(I)
+   G1 = gens(I)
+   G2 = gens(J)
+   return Ideal(R, [v*w for v in G1 for w in G2])
+end
+
 ###############################################################################
 #
 #   Ideal reduction in Euclidean domain
