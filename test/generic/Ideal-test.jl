@@ -1,14 +1,16 @@
-function mix_ideal(I::Ideal{T}) where T <: MPolyElem
+function mix_ideal(I::Ideal{T}) where T <: RingElem
    G = gens(I)
    R = base_ring(I)
    if length(G) == 0
       return I
    end
    if length(G) == 1
+      n = rand(0:5)
+      H = T[rand(-10:10)*G[1] for i in 1:n]
       if rand(0:1) == 1
-         return Ideal(R, [-G[1]])
+         return Ideal(R, vcat([-G[1]], H))
       else
-         return I
+         return Ideal(R, vcat([G[1]], H))
       end
    end
    n = rand(0:length(G))
@@ -21,7 +23,6 @@ function mix_ideal(I::Ideal{T}) where T <: MPolyElem
          end
       end
    end
-println(G)
    return Ideal(R, G)   
 end
 
@@ -215,3 +216,54 @@ end
       end
    end
 end
+
+@testset "Generic.Ideal.comparison" begin
+   # multivariate
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+
+   # random examples
+   for i = 1:100
+      n = rand(0:3)
+      V = elem_type(R)[]
+      for j = 1:n
+         push!(V, rand(R, 0:3, 0:3, -10:10))
+      end
+      
+      I = Ideal(R, V)
+
+      @test I == mix_ideal(I)
+   end
+
+   # univariate
+   R, x = PolynomialRing(ZZ, "x")
+
+   for i = 1:300
+      n = rand(0:5)
+      V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
+      I = Ideal(R, V)
+
+      @test I == mix_ideal(I)
+   end
+
+   # Fp[x]
+   Fp = GF(31)
+   R, x = PolynomialRing(Fp, "x")
+
+   for i = 1:300
+      n = rand(0:10)
+      V = elem_type(R)[rand(R, 0:5) for i in 1:n]
+      I = Ideal(R, V)
+
+      @test I == mix_ideal(I)
+   end
+
+   # integer
+   for i = 1:300
+      n = rand(0:10)
+      V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
+      I = Ideal(ZZ, V)
+
+      @test I == mix_ideal(I)
+   end
+end
+
