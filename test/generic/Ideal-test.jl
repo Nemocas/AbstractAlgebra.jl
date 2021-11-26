@@ -1,3 +1,30 @@
+function mix_ideal(I::Ideal{T}) where T <: MPolyElem
+   G = gens(I)
+   R = base_ring(I)
+   if length(G) == 0
+      return I
+   end
+   if length(G) == 1
+      if rand(0:1) == 1
+         return Ideal(R, [-G[1]])
+      else
+         return I
+      end
+   end
+   n = rand(0:length(G))
+   H = T[sum(rand(-10:10)*G[i] for i = 1:length(G)) for j = 1:n]
+   G = vcat(G, H)
+   for i = 1:length(G)
+      for j = 1:length(G)
+         if i != j
+            G[i] += rand(-10:10)*G[j]
+         end
+      end
+   end
+println(G)
+   return Ideal(R, G)   
+end
+
 function spoly(f::T, g::T) where T <: MPolyElem
    fc = leading_coefficient(f)
    gc = leading_coefficient(g)
