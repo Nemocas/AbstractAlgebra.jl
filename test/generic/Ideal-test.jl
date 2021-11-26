@@ -501,11 +501,13 @@ end
          push!(V, rand(R, 0:3, 0:3, -10:10))
       end
       c = rand(R, 0:3, 0:3, -10:10)
+      d = rand(R, 0:3, 0:3, -10:10)
 
       I = Ideal(R, V)
 
       @test I*c == Ideal(R, gens(I*c))
       @test c*I == Ideal(R, gens(I*c))
+      @test c*I*d == d*I*c
    end
 
    # univariate
@@ -516,9 +518,11 @@ end
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
       I = Ideal(R, V)
       c = rand(R, 0:10, -10:10)
+      d = rand(R, 0:10, -10:10)
 
       @test I*c == Ideal(R, gens(I*c))
       @test c*I == Ideal(R, gens(I*c))
+      @test c*I*d == d*I*c
    end
 
    # Fp[x]
@@ -530,9 +534,11 @@ end
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       I = Ideal(R, V)
       c = rand(R, 0:5)
+      d = rand(R, 0:5)
 
       @test I*c == Ideal(R, gens(I*c))
       @test c*I == Ideal(R, gens(I*c))
+      @test c*I*d == d*I*c
    end
 
    # integer
@@ -541,8 +547,10 @@ end
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       I = Ideal(ZZ, V)
       c = rand(ZZ, -10:10)
+      d = rand(ZZ, -10:10)
 
       @test I*c == Ideal(ZZ, gens(I*c))
       @test c*I == Ideal(ZZ, gens(I*c))
+      @test c*I*d == d*I*c
    end
 end
