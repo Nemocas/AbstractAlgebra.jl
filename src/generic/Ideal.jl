@@ -2076,6 +2076,41 @@ end
 
 ###############################################################################
 #
+#   Ad hoc binary operations
+#
+###############################################################################
+
+function *(I::Ideal{T}, p::T) where T <: RingElement
+   R = base_ring(I)
+   G = gens(I)
+   if iszero(p)
+      return Ideal(R, T[])
+   end
+   p = divexact(p, canonical_unit(p))
+   return Ideal(R, [v*p for v in G])
+end
+
+function *(p::T, I::Ideal{T}) where T <: RingElement
+   return I*p
+end
+
+function *(I::Ideal{T}, p::S) where {S <: RingElement, T <: RingElement}
+   R = base_ring(I)
+   G = gens(I)
+   if iszero(p*one(R))
+      return Ideal(R, T[])
+   end
+   V = [v*p for v in G]
+   V = [divexact(v, canonical_unit(v)) for v in V]
+   return Ideal(R, V)
+end
+
+function *(p::S, I::Ideal{T}) where {S <: RingElement, T <: RingElement}
+   return I*p
+end
+
+###############################################################################
+#
 #   Ideal reduction in Euclidean domain
 #
 ###############################################################################

@@ -489,3 +489,60 @@ end
    end
 end
 
+@testset "Generic.Ideal.adhoc_multiplication" begin
+   # multivariate
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+
+   # random examples
+   for i = 1:100
+      n = rand(0:3)
+      V = elem_type(R)[]
+      for j = 1:n
+         push!(V, rand(R, 0:3, 0:3, -10:10))
+      end
+      c = rand(R, 0:3, 0:3, -10:10)
+
+      I = Ideal(R, V)
+
+      @test I*c == Ideal(R, gens(I*c))
+      @test c*I == Ideal(R, gens(I*c))
+   end
+
+   # univariate
+   R, x = PolynomialRing(ZZ, "x")
+
+   for i = 1:300
+      n = rand(0:5)
+      V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
+      I = Ideal(R, V)
+      c = rand(R, 0:10, -10:10)
+
+      @test I*c == Ideal(R, gens(I*c))
+      @test c*I == Ideal(R, gens(I*c))
+   end
+
+   # Fp[x]
+   Fp = GF(31)
+   R, x = PolynomialRing(Fp, "x")
+
+   for i = 1:300
+      n = rand(0:10)
+      V = elem_type(R)[rand(R, 0:5) for i in 1:n]
+      I = Ideal(R, V)
+      c = rand(R, 0:5)
+
+      @test I*c == Ideal(R, gens(I*c))
+      @test c*I == Ideal(R, gens(I*c))
+   end
+
+   # integer
+   for i = 1:300
+      n = rand(0:10)
+      V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
+      I = Ideal(ZZ, V)
+      c = rand(ZZ, -10:10)
+
+      @test I*c == Ideal(ZZ, gens(I*c))
+      @test c*I == Ideal(ZZ, gens(I*c))
+   end
+end
