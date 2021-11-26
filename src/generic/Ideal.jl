@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export normal_form
+export normal_form, contains
 
 ###############################################################################
 #
@@ -2036,6 +2036,22 @@ end
 
 function ==(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
    return gens(I) == gens(J)
+end
+
+###############################################################################
+#
+#   Containment
+#
+###############################################################################
+
+function Base.contains(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   G = gens(J)
+   for v in G
+      if !iszero(normal_form(v, I))
+         return false
+      end
+   end
+   return true
 end
 
 ###############################################################################
