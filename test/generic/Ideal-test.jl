@@ -302,8 +302,6 @@ end
       I = Ideal(R, V)
       J = Ideal(R, vcat(V, W))
 
-      println(I)
-      println(J)
       @test contains(J, I)
    end
 
@@ -334,6 +332,78 @@ end
       J = Ideal(ZZ, vcat(V, W))
 
       @test contains(J, I)
+   end
+end
+
+@testset "Generic.Ideal.addition" begin
+   # multivariate
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+
+   # random examples
+   for i = 1:100
+      n = rand(0:3)
+      m = rand(0:3)
+      V = elem_type(R)[]
+      W = elem_type(R)[]
+      for j = 1:n
+         push!(V, rand(R, 0:3, 0:3, -10:10))
+      end
+      for j = 1:m
+         push!(W, rand(R, 0:3, 0:3, -10:10))
+      end
+
+      I = Ideal(R, V)
+      J = Ideal(R, W)
+
+      @test contains(I + J, I)
+      @test contains(I + J, J)
+   end
+
+   # univariate
+   R, x = PolynomialRing(ZZ, "x")
+
+   for i = 1:300
+      n = rand(0:5)
+      m = rand(0:5)
+      V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
+      W = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:m]
+
+      I = Ideal(R, V)
+      J = Ideal(R, W)
+
+      @test contains(I + J, I)
+      @test contains(I + J, J)
+   end
+
+   # Fp[x]
+   Fp = GF(31)
+   R, x = PolynomialRing(Fp, "x")
+
+   for i = 1:300
+      n = rand(0:10)
+      m = rand(0:10)
+      V = elem_type(R)[rand(R, 0:5) for i in 1:n]
+      W = elem_type(R)[rand(R, 0:5) for i in 1:m]
+
+      I = Ideal(R, V)
+      J = Ideal(R, W)
+
+      @test contains(I + J, I)
+      @test contains(I + J, J)
+   end
+
+   # integer
+   for i = 1:300
+      n = rand(0:10)
+      m = rand(0:10)
+      V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
+      W = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
+
+      I = Ideal(ZZ, V)
+      J = Ideal(ZZ, W)
+
+      @test contains(I + J, I)
+      @test contains(I + J, J)
    end
 end
 
