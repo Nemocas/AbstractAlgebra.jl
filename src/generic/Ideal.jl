@@ -2030,11 +2030,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    normal_form(p::T, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.MPolyElem{T}}
+    normal_form(p::T, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.MPolyElem{T}}}
 
 Return the normal form of the polynomial `p` with respect to the ideal `I`.
 """
-function normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.MPolyElem{T}}
+function normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.MPolyElem{T}}}
    return normal_form(p, gens(I))
 end
 
