@@ -179,10 +179,28 @@ end
 @doc Markdown.doc"""
     issquare(a::Rational{T}) where T <: Integer
 
-Return true if $a$ is the square of a rational.
+Return `true` if $a$ is the square of a rational.
 """
 function issquare(a::Rational{T}) where T <: Integer
    return issquare(numerator(a)) && issquare(denominator(a))
+end
+
+@doc Markdown.doc"""
+    issquare_with_sqrt(a::Rational{T}) where T <: Integer
+
+Return `true, s` if $a$ is the square of a rational where `s` is a square root.
+Otherwise return `false, 0`.
+"""
+function issquare_with_sqrt(a::Rational{T}) where T <: Integer
+   f1, s1 = issquare_with_sqrt(numerator(a))
+   if !f1
+      return false, zero(T)
+   end
+   f2, s2 = issquare_with_sqrt(denominator(a))
+   if !f2
+      return false, zero(T)
+   end
+   return true, s1//s2
 end
 
 ###############################################################################
