@@ -127,10 +127,11 @@ export SetMap, FunctionalMap, IdentityMap
 
 export NCPolyElem, PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
        MatElem, MatAlgElem, FinFieldElem, MPolyElem, UnivPolyElem, NumFieldElem,
-       SimpleNumFieldElem
+       SimpleNumFieldElem, FreeAssAlgElem
 
 export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
-       FinField, MPolyRing, UnivPolyRing, NumField, SimpleNumField
+       FinField, MPolyRing, UnivPolyRing, NumField, SimpleNumField,
+       FreeAssAlgebra
 
 export ZZ, QQ, zz, qq, RealField, RDF
 
@@ -435,6 +436,7 @@ include("NumberField.jl")
 include("Fraction.jl")
 include("MPoly.jl")
 include("UnivPoly.jl")
+include("FreeAssAlgebra.jl")
 
 ###############################################################################
 #
@@ -456,7 +458,7 @@ import .Generic: abs_series, abs_series_type,
                  dim, disable_cache!,
                  downscale,
                  enable_cache!, exp_gcd,
-                 exponent, exponent_vector,
+                 exponent, exponent_vector, exponent_word,
                  finish, fit!, gcd, gcdx,
                  has_left_neighbor, has_bottom_neighbor, hash,
                  hooklength, identity_map,
@@ -490,7 +492,7 @@ import .Generic: abs_series, abs_series_type,
                  rels, rel_series, rel_series_type,
                  rescale!, retraction_map, reverse,
                  right_kernel, rowlength, section_map, setcoeff!,
-                 set_exponent_vector!, set_limit!,
+                 set_exponent_vector!, set_exponent_word!, set_limit!,
                  setpermstyle, size,
                  sort_terms!, summands,
                  supermodule, term, terms, total_degree,
@@ -514,7 +516,7 @@ export abs_series, abs_series_type,
                  dense_matrix_type, dense_poly_type, det,
                  discriminant,
                  elem_type,
-                 exponent, exponent_vector,
+                 exponent, exponent_vector, exponent_word,
                  finish, fit!, gcd, gen,
                  gens, gcdinv, gcdx,
                  has_left_neighbor, has_bottom_neighbor, hash,
@@ -549,7 +551,7 @@ export abs_series, abs_series_type,
                  resultant, resultant_ducos,
                  resultant_euclidean, resultant_subresultant,
                  resultant_sylvester, resx, reverse, rowlength,
-                 setcoeff!, set_exponent_vector!,
+                 setcoeff!, set_exponent_vector!, set_exponent_word!,
                  setpermstyle,
                  size, sort_terms!, subst, summands, supermodule,
                  sylvester_matrix, term, terms,

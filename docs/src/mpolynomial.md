@@ -161,7 +161,7 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> C = MPolyBuildCtx(R)
-Builder for a polynomial in Multivariate Polynomial Ring in x, y over Integers
+Builder for an element of Multivariate Polynomial Ring in x, y over Integers
 
 julia> push_term!(C, ZZ(3), [1, 2]);
 

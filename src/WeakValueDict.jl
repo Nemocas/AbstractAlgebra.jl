@@ -527,7 +527,7 @@ function Base.setindex!(wvh::WeakValueDict{K}, v, key) where K
     end
     return wvh
 end
-function get!(wvh::WeakValueDict{K}, key, default) where {K}
+function get!(wvh::WeakValueDict{K, V}, key, default) where {K, V}
     v = lock(wvh) do
         if haskey(wvh.ht, key)
             x = wvh.ht[key].value
@@ -542,9 +542,9 @@ function get!(wvh::WeakValueDict{K}, key, default) where {K}
             default
         end
     end
-    return v
+    return v::V
 end
-function Base.get!(default::Base.Callable, wvh::WeakValueDict{K}, key) where {K}
+function Base.get!(default::Base.Callable, wvh::WeakValueDict{K, V}, key) where {K, V}
     v = lock(wvh) do
         _cleanup_locked(wvh)
         if haskey(wvh.ht, key)
@@ -558,7 +558,7 @@ function Base.get!(default::Base.Callable, wvh::WeakValueDict{K}, key) where {K}
             wvh[key] = default()
         end
     end
-    return v
+    return v::V
 end
 
 function Base.getkey(wvh::WeakValueDict{K}, kk, default) where K
@@ -588,36 +588,36 @@ function Base.get(wvh::WeakValueDict{K, V}, key, default) where {K, V}
     end
 end
 
-function Base.get(default::Base.Callable, wvh::WeakValueDict{K}, key) where {K}
+function Base.get(default::Base.Callable, wvh::WeakValueDict{K, V}, key) where {K, V}
     lock(wvh) do
         x = get(wvh.ht, key, nothing)
         if x !== nothing
             y = x.value
             if y !== nothing
-                return y
+                return y::V
             end
         end
         return default()
     end
 end
 
-function Base.pop!(wvh::WeakValueDict{K}, key) where {K}
+function Base.pop!(wvh::WeakValueDict{K, V}, key) where {K, V}
     lock(wvh) do
         x = pop!(wvh.ht, key).value
         if x !== nothing
-            return x
+            return x::V
         end
         throw(KeyError(key))
     end
 end
 
-function Base.pop!(wvh::WeakValueDict{K}, key, default) where {K}
+function Base.pop!(wvh::WeakValueDict{K, V}, key, default) where {K, V}
     lock(wvh) do
         x = pop!(wvh.ht, key, nothing)
         if x !== nothing
             y = x.value
             if y !== nothing
-                return y
+                return y::V
             end
         end
         return default
@@ -643,11 +643,11 @@ function Base.haskey(wvh::WeakValueDict{K}, key) where {K}
         return haskey(wvh.ht, key)
     end
 end
-function Base.getindex(wvh::WeakValueDict{K}, key) where {K}
+function Base.getindex(wvh::WeakValueDict{K, V}, key) where {K, V}
     lock(wvh) do
         x = getindex(wvh.ht, key).value
         if x !== nothing
-            return x
+            return x::V
         end
         throw(KeyError(key))
     end

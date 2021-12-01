@@ -29,6 +29,7 @@ makedocs(
                  "puiseux.md",
                  "mseries.md",
                  "residue.md",
+                 "free_associative_algebra.md",
              ],
              "Fields" => [
                  "field_introduction.md",

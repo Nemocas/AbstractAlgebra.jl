@@ -375,7 +375,7 @@ end
 
 # Iterators
 
-struct MPolyCoeffs{T <: AbstractAlgebra.RingElem}
+struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem}
    poly::T
 end
 
@@ -383,11 +383,11 @@ struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem}
    poly::T
 end
 
-struct MPolyTerms{T <: AbstractAlgebra.RingElem}
+struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
    poly::T
 end
 
-struct MPolyMonomials{T <: AbstractAlgebra.RingElem}
+struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
    poly::T
 end
 
@@ -997,6 +997,43 @@ mutable struct MatAlgElem{T <: RingElement} <: AbstractAlgebra.MatAlgElem{T}
       end
       return new{T}(t)
    end
+end
+
+###############################################################################
+#
+#   FreeAssAlgebra / FreeAssAlgElem
+#
+###############################################################################
+
+mutable struct FreeAssAlgebra{T <: RingElement} <: AbstractAlgebra.FreeAssAlgebra{T}
+   base_ring::Ring
+   S::Vector{Symbol}
+
+   function FreeAssAlgebra{T}(R::Ring, s::Vector{Symbol}, cached::Bool = true) where T <: RingElement
+      return get_cached!(FreeAssAlgID, (R, s), cached) do
+         new{T}(R, s)
+      end::FreeAssAlgebra{T}
+   end
+end
+
+const FreeAssAlgID = CacheDictType{Tuple{Ring, Vector{Symbol}}, NCRing}()
+
+# *** Note on length:
+# length(.coeffs), and length(.exps) may be greater than the real length .length
+# *** Note on current ownership conventions in .exps:
+# the object of course owns the vector .exps and can mutate its length.
+# However, the object does not necessarily own the entries in the .exps vector
+# and should only mutate them when sole ownership is known.
+mutable struct FreeAssAlgElem{T <: RingElement} <: AbstractAlgebra.FreeAssAlgElem{T}
+   parent::FreeAssAlgebra{T}
+   coeffs::Vector{T}
+   exps::Vector{Vector{Int}}  # TODO: Int -> UInt8 for nvars < 256, ect
+   length::Int
+end
+
+# the iterators for coeffs, terms, ect. are shared with MPoly. Just this remains
+struct FreeAssAlgExponentWords{T <: AbstractAlgebra.NCRingElem}
+   poly::T
 end
 
 ###############################################################################

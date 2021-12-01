@@ -23,9 +23,11 @@ end
 # The AbstractAlgebra promotion system is used to define catch all functions for
 # arithmetic between arbitrary ring elements.
 #
+# TODO: move this to NCRing.jl
+#
 ################################################################################
 
-promote_rule(::Type{T}, ::Type{T}) where T <: RingElement = T
+promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElement = T
 
 function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
    U = promote_rule(T, S)
@@ -37,7 +39,7 @@ function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
    end
 end
 
-@inline function try_promote(x::S, y::T) where {S <: RingElem, T <: RingElem}
+@inline function try_promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
    U = promote_rule_sym(S, T)
    if S === U
       return true, x, parent(x)(y)
@@ -48,7 +50,7 @@ end
    end
 end
 
-function Base.promote(x::S, y::T) where {S <: RingElem, T <: RingElem}
+function Base.promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
   fl, u, v = try_promote(x, y)
   if fl
     return u, v
@@ -126,11 +128,6 @@ end
 
 ==(x::RingElement, y::RingElem) = parent(y)(x) == y
 
-function addmul!(z::T, x::T, y::T, c::T) where {T <: RingElem}
-   c = mul!(c, x, y)
-   z = addeq!(z, c)
-   return z
-end
 
 ###############################################################################
 #
