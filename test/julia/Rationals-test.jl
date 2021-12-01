@@ -105,7 +105,21 @@ end
       @test AbstractAlgebra.sqrt(g)^2 == g
       @test issquare(f)
       @test issquare(g)
+   
+      @test issquare_with_sqrt(f) == (true, abs(r))
+      @test issquare_with_sqrt(g) == (true, abs(s))
    end
+
+   @test issquare(-R(1)) == false
+   @test issquare(-S(1)) == false
+
+   @test issquare_with_sqrt(-R(1)) == (false, 0)
+   @test issquare_with_sqrt(-S(1)) == (false, 0)
+   @test issquare_with_sqrt(R(3)) == (false, 0)
+   @test issquare_with_sqrt(S(3)) == (false, 0)
+   @test issquare_with_sqrt(R(2, 9)) == (false, 0)
+   @test issquare_with_sqrt(R(1, 5)) == (false, 0)
+   @test issquare_with_sqrt(R(3, 7)) == (false, 0)
 end
 
 @testset "Julia.Rationals.exp" begin
