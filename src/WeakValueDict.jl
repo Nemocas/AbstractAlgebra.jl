@@ -670,9 +670,7 @@ function Base.iterate(t::WeakValueDict{K,V}, state...) where {K, V}
             wkv, state = y
             k = wkv[1]
             v = wkv[2].value
-            if VERSION >= v"1.6"
-              GC.safepoint() # ensure `v` is now gc-rooted
-            end
+            GC.safepoint() # ensure `v` is now gc-rooted
             k === nothing && continue # indicates `k` is scheduled for deletion
             kv = Pair{K,V}(k::K, v)
             return (kv, state)
