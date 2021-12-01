@@ -101,6 +101,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    active::Bool # whether polynomial is still actively being reduced
    new_node::Bool # whether the node was added to the lattice since last time
    settled::Int # 0 = newly reduced, 1 = no reducers remove lc, 2 = none reduce lc, 3 = no reducers
+   new_settled::Int # used for temporary when computing settled
    lm::NTuple{N, Int}   # leading monomial as exponent vector
    lcm::NTuple{N, Int}  # lcm of lm's in tree rooted here, as exponent vector
    path::Bool # used for marking paths to divisible nodes
@@ -108,7 +109,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    size::Float64 # caches the size of the polynomial
 
    function lmnode{U, V, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
-      node = new{U, V, N}(p, nothing, nothing, nothing, nothing, true, true, 0)
+      node = new{U, V, N}(p, nothing, nothing, nothing, nothing, true, true, 0, 0)
       node.size = 0.0
       if p != nothing && !iszero(p)
          if leading_coefficient(p) < 0
@@ -604,6 +605,8 @@ end
 # returns true if some reduction actually occurred
 function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    b.path = true
+   b.settled = b.new_settled
+   b.new_settled = 0
    # depth first
    reduced = false
    if b.up != nothing
@@ -624,6 +627,8 @@ function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <
    b2 = b
    while b2.equal != b
       b2 = b2.equal
+      b2.settled = b2.new_settled
+      b2.new_settled = 0
       index = searchsortedfirst(X, b2, by=leading_coefficient_size, rev=true) # find index at which to insert x
       insert!(X, index, b2)
    end
@@ -840,10 +845,10 @@ function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: Abst
    end
    best, best_divides = find_best_divides(b, Xnew, best, best_divides)
    if best_divides
-      b.settled = 0
+      b.new_settled = 0
       return best
    else
-      b.settled = 1
+      b.new_settled = 1
    end
    # 2. check for leading coefficient that reduces c
    best_reduces = best == nothing ? false : AbstractAlgebra.mod(c, leading_coefficient(best.poly)) != c
@@ -854,7 +859,7 @@ function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: Abst
    if best_reduces
       return best
    else
-      b.settled = 2
+      b.new_settled = 2
    end
    # 3. check for leading coefficient that is not divisible by c (gcd poly possible)
    best_is_gcd = best == nothing ? false : !divides(leading_coefficient(best.poly), c)[1]
@@ -865,7 +870,7 @@ function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: Abst
    if best_is_gcd
       return best
    else
-      b.settled = 3 # no reducer found
+      b.new_settled = 3 # no reducer found
    end
    return best
 end

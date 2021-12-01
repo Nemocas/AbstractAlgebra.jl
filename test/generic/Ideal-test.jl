@@ -55,6 +55,11 @@ end
 function testit(R, V)
    I = Ideal(R, V)
    G = I.gens
+   if Ideal(R, G) != I
+      println("I = ", G)
+      println("I not reduced")
+      return false
+   end
    for v in V
       r = normal_form(v, G)
       if r != 0
