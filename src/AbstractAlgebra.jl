@@ -173,33 +173,33 @@ macro declare_other()
    esc(quote other::Dict{Symbol, Any} end )
 end
 
-function set_name!(G, name::String)
-   set_special(G, :name => name)
-end
-
-function hasspecial(G)
-   if !isdefined(G, :other)
-      return false, nothing
+function hasspecial(G::Any)
+   if isdefined(G, :other)
+      return true, G.other
    else
-     return true, G.other
+      return false, nothing
    end
 end
 
-function get_special(G, s::Symbol)
+function get_special(G::Any, s::Symbol)
    fl, D = hasspecial(G)
    fl && return get(D, s, nothing)
-   nothing
+   return nothing
 end
 
-function set_name!(G)
-   s = get_special(G, :name)
-   s === nothing || return
-   sy = find_name(G)
-   sy === nothing && return
-   set_name!(G, string(sy))
+function get_special!(func::Function, G::Any, s::Symbol)
+   fl, D = hasspecial(G)
+   fl && return Base.get!(func, D, s)
+   return nothing
 end
 
-function set_special(G, data::Pair{Symbol, <:Any}...)
+function get_special!(G::Any, s::Symbol, default::Any)
+   fl, D = hasspecial(G)
+   fl && return Base.get!(D, s, default)
+   return nothing
+end
+
+function set_special(G::Any, data::Pair{Symbol, <:Any}...)
   if !isdefined(G, :other)
     D = G.other = Dict{Symbol, Any}()
   else
@@ -209,6 +209,18 @@ function set_special(G, data::Pair{Symbol, <:Any}...)
   for d in data
     push!(D, d)
   end
+end
+
+function set_name!(G::Any, name::String)
+   set_special(G, :name => name)
+end
+
+function set_name!(G)
+   s = get_special(G, :name)
+   s === nothing || return
+   sy = find_name(G)
+   sy === nothing && return
+   set_name!(G, string(sy))
 end
 
 extra_name(G) = nothing
