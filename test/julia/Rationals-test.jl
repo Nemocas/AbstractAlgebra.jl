@@ -120,6 +120,9 @@ end
    @test issquare_with_sqrt(R(2, 9)) == (false, 0)
    @test issquare_with_sqrt(R(1, 5)) == (false, 0)
    @test issquare_with_sqrt(R(3, 7)) == (false, 0)
+   @test issquare_with_sqrt(S(2, 9)) == (false, 0)
+   @test issquare_with_sqrt(S(1, 5)) == (false, 0)
+   @test issquare_with_sqrt(S(3, 7)) == (false, 0)
 end
 
 @testset "Julia.Rationals.exp" begin
