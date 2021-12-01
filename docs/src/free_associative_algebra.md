@@ -103,12 +103,21 @@ symbols(S::FreeAssAlgebra)
 nvars(f::FreeAssAlgebra)
 gens(S::FreeAssAlgebra)
 gen(S::FreeAssAlgebra, i::Int)
-length(f::FreeAssAlgElem)
 isgen(x::FreeAssAlgElem)
+total_degree(a::FreeAssAlgElem)
+length(f::FreeAssAlgElem)
+```
+
+As with multivariate polynomials, an implementation must provide access to
+the elements as a sum of individual terms *in some order*. The `length`
+function provides the number of such terms, and the following functions
+provide the first such term.
+
+
+```julia
 leading_coefficient(a::FreeAssAlgElem)
 leading_monomial(a::FreeAssAlgElem)
 leading_term(a::FreeAssAlgElem)
-total_degree(a::FreeAssAlgElem)
 ```
 
 For types that allow constant time access to coefficients, the following are
