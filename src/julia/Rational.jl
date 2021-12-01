@@ -189,7 +189,7 @@ end
     issquare_with_sqrt(a::Rational{T}) where T <: Integer
 
 Return `true, s` if $a$ is the square of a rational where `s` is a square root.
-Otherwise return `false, 0`..
+Otherwise return `false, 0`.
 """
 function issquare_with_sqrt(a::Rational{T}) where T <: Integer
    f1, s1 = issquare_with_sqrt(numerator(a))
