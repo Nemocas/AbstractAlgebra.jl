@@ -19,8 +19,8 @@ implemented using a Julia array of coefficients and a vector of
 vectors of `Int`s for the monomial words. Parent objects of such elements have
 type `Generic.FreeAssAlgebra{T}`.
 
-The element types belong to the abstract type `NCRingElem{T}`,
-and the algebra types belong to the abstract type `NCRing{T}`.
+The element types belong to the abstract type `NCRingElem`,
+and the algebra types belong to the abstract type `NCRing`.
 
 The following basic functions are implemented.
 ```julia
