@@ -1114,7 +1114,7 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
    n = b
    nend = nothing
    while n != nend
-      if n.active
+      if n.active && n.settled == 3
          if n != d && !lm_divides(n, d) && !lm_divides(d, n)
             s = compute_spoly(n, d)
             push!(S, s)
@@ -1125,7 +1125,7 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
          dbase = find_base(d)
          if connected(b, dbase) || connected(dbase, b)
             s = compute_spoly(n, d)
-               push!(S, s)
+            push!(S, s)
             break
          end 
       end
