@@ -2775,6 +2775,10 @@ end
       if f != 0
          @test_throws ErrorException sqrt(f^2*x)
       end
+
+      f1, s1 = issquare_with_sqrt(f)
+
+      @test !f1 || f == s1^2
    end
 
    # Exact field
@@ -2797,6 +2801,10 @@ end
       if f != 0
          @test_throws ErrorException sqrt(f^2*x)
       end
+
+      f1, s1 = issquare_with_sqrt(f)
+
+      @test !f1 || f == s1^2
    end
 
    # Characteristic p field
@@ -2823,6 +2831,10 @@ end
          if f != 0
             @test_throws ErrorException sqrt(f^2*x)
          end
+
+         f1, s1 = issquare_with_sqrt(f)
+
+         @test !f1 || f == s1^2
       end
    end
 end

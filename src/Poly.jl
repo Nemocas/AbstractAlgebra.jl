@@ -1838,6 +1838,10 @@ function issquare(f::PolyElem{T}) where T <: RingElement
    return flag
 end
 
+function issquare_with_sqrt(f::PolyElem{T}) where T <: RingElement
+   return sqrt_classical(f, check=true)
+end
+
 ###############################################################################
 #
 #   Content, primitive part, GCD and LCM
