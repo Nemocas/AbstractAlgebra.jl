@@ -151,15 +151,11 @@ end
 
 
 @testset "WeakValueCache" begin
-   if VERSION >= v"1.6"
-      test_weak_cache(AbstractAlgebra.WeakValueCache, 30, 20)
-   end
+   test_weak_cache(AbstractAlgebra.WeakValueCache, 30, 20)
 end
 
 @testset "WeakValueDict" begin
-   if VERSION >= v"1.6"
-      test_weak_cache(AbstractAlgebra.WeakValueDict, 30, 20)
-   end
+    test_weak_cache(AbstractAlgebra.WeakValueDict, 30, 20)
 
     A = [1]
     B = [2]

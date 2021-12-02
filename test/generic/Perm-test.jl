@@ -305,15 +305,6 @@ end
    @test collect(cycles(p^5)) == [T[1,9], T[2], T[3], T[4], T[5], T[6,10,8], T[7]]
    @test Generic.permtype(p^5) == [3, 2, 1, 1, 1, 1, 1]
    @test order(p^5) == 6
-
-   if VERSION <= v"1.2"
-      @test matrix_repr(a) isa AbstractMatrix{T}
-      @test matrix_repr(a) isa SparseMatrixCSC{T,T}
-      M = matrix_repr(a)
-      for (idx, val) in enumerate(a.d)
-         @test M[idx, val] == 1
-      end
-   end
 end
 
 @testset "Perm.characters" begin
