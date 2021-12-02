@@ -1941,6 +1941,10 @@ function issquare(a::MPoly{T}) where {T <: RingElement}
    return flag
 end
 
+function issquare_with_sqrt(a::MPoly{T}) where {T <: RingElement}
+   return flag, q = sqrt_heap(a; check=true)
+end
+
 ###############################################################################
 #
 #   Ad hoc arithmetic functions

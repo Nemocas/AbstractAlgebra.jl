@@ -632,6 +632,10 @@ end
                x = varlist[rand(1:num_vars)]
                @test_throws ErrorException sqrt(f^2*(x^2 - x))
             end
+
+            f1, s1 = issquare_with_sqrt(f)
+
+            @test !f1 || s1^2 == f
          end
       end
    end
@@ -664,6 +668,10 @@ end
                x = varlist[rand(1:num_vars)]
                @test_throws ErrorException sqrt(f^2*(x^2 - x))
             end
+
+            f1, s1 = issquare_with_sqrt(f)
+
+            @test !f1 || s1^2 == f
          end
       end
    end
