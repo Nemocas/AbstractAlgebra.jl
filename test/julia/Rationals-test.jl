@@ -125,6 +125,65 @@ end
    @test issquare_with_sqrt(S(3, 7)) == (false, 0)
 end
 
+@testset "Julia.Rationals.root" begin
+   @test root(BigInt(1000)//27, 3) == 10//3
+   @test root(-BigInt(27)//343, 3) == -3//7
+   @test root(BigInt(27)//1331, 3; check=true) == 3//11
+   @test root(BigInt(16)//9, 2; check=true) == 4//3
+
+   @test_throws DomainError root(-BigInt(1000)//81, 4)
+   @test_throws DomainError root(BigInt(1000)//81, -3)
+   @test_throws DomainError root(BigInt(-16)//27, 2)
+
+   @test_throws ErrorException root(BigInt(1100)//27, 3)
+   @test_throws ErrorException root(BigInt(27)//1100, 3)
+   @test_throws ErrorException root(BigInt(1100)//13, 3)
+   @test_throws ErrorException root(-BigInt(40)//27, 3)
+   @test_throws ErrorException root(-BigInt(27)//4, 3)
+
+   @test root(1000//27, 3) == 10//3
+   @test root(-27//343, 3) == -3//7
+   @test root(27//1331, 3) == 3//11
+   @test root(16//9, 2) == 4//3
+
+   @test_throws DomainError root(-1000//81, 4)
+   @test_throws DomainError root(1000//81, -3)
+   @test_throws DomainError root(-16//27, 2)
+
+   @test_throws ErrorException root(1100//27, 3)
+   @test_throws ErrorException root(27//1100, 3)
+   @test_throws ErrorException root(1100//13, 3)
+   @test_throws ErrorException root(-40//27, 3)
+   @test_throws ErrorException root(-27//4, 3)
+
+   for T in [BigInt, Int]
+      for i = 1:1000
+         n = rand(1:20)
+         a = BigInt(rand(-1000:1000))
+         if iseven(n)
+            a = abs(a)
+         end
+         b = BigInt(rand(1:1000))
+         p = a^n
+         q = b^n
+         if T == BigInt || (ndigits(p; base=2) < ndigits(typemax(T); base=2) &&
+                            ndigits(q; base=2) < ndigits(typemax(T); base=2))
+            p = T(p)
+            q = T(q)
+
+            @test ispower(p//q, n)
+
+            flag, r = ispower_with_root(p//q, n)
+
+            @test flag && r == a//b
+         end
+      end
+
+      @test_throws DomainError ispower(Rational{T}(5//3), -1)
+      @test_throws DomainError ispower_with_root(Rational{T}(5//3), 0)
+   end
+end
+
 @testset "Julia.Rationals.exp" begin
    @test AbstractAlgebra.exp(0//1) == 1
    @test_throws DomainError AbstractAlgebra.exp(1//1)
