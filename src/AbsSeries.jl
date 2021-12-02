@@ -819,25 +819,21 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    sqrt(a::AbsSeriesElem; check::Bool=true)
-
-Return the square root of the power series $a$. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
-"""
-function Base.sqrt(a::AbsSeriesElem; check::Bool=true)
+function sqrt_classical(a::AbsSeriesElem; check::Bool=true)
    # Given a power series f = f0 + f1*x + f2*x^2 + ..., compute the square root
    # g = g0 + g1*x + g2*x^2 + ... using the relations g0^2 = f0, 2g0*g1 = f1
    # 2g0*g2 = f2 - g1^2, 2g0*g3 = f3 - 2g1*g2, 2g0*g4 = f4 - (2g1*g3 + g2^2), etc.
    # where the terms being subtracted are those contributing to the i-th
    # coefficient of the square of g
-   aval = valuation(a)
-   !iseven(aval) && error("Not a square in sqrt")
+   S = parent(a)
    R = base_ring(a)
+   aval = valuation(a)
+   if check && !iseven(aval)
+      return false, zero(S)
+   end
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    if iszero(a)
-      return deepcopy(a)
+      return true, deepcopy(a)
    end
    aval2 = div(aval, 2)
    prec = precision(a) - aval2
@@ -848,7 +844,11 @@ function Base.sqrt(a::AbsSeriesElem; check::Bool=true)
       asqrt = setcoeff!(asqrt, n - 1, R())
    end
    if prec > aval2
-      g = sqrt(coeff(a, aval); check=check)
+      c = coeff(a, aval)
+      if check && !issquare(c)
+         return false, zero(S)
+      end
+      g = sqrt(; check=check)
       asqrt = setcoeff!(asqrt, aval2, g)
       g2 = g + g
    end
@@ -867,11 +867,42 @@ function Base.sqrt(a::AbsSeriesElem; check::Bool=true)
          c = addeq!(c, p)
       end
       c = coeff(a, n + aval) - c
-      c = divexact(c, g2; check=check)
+      if check
+         flag, c = divides(c, g2)
+         if !flag
+            return false, zero(S)
+         end
+      else
+         c = divexact(c, g2; check=check)
+      end
       asqrt = setcoeff!(asqrt, aval2 + n, c)
    end
    asqrt = set_length!(asqrt, normalise(asqrt, prec))
-   return asqrt
+   return true, asqrt
+end
+
+@doc Markdown.doc"""
+    sqrt(a::AbsSeriesElem; check::Bool=true)
+
+Return the square root of the power series $a$. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
+"""
+function Base.sqrt(a::AbsSeriesElem; check::Bool=true)
+   flag, q = sqrt_classical(a; check=check)
+   if check && !flag
+      error("Not a square in sqrt")
+   end
+   return q
+end
+
+function issquare(a::AbsSeriesElem)
+   flag, q = sqrt_classical(a; check=true)
+   return flag
+end
+
+function issquare_with_sqrt(a::AbsSeriesElem)
+   return sqrt_classical(a; check=true)
 end
 
 ###############################################################################
