@@ -819,6 +819,31 @@ end
 #
 ###############################################################################
 
+function sqrt_classical_char2(a::AbsSeriesElem; check::Bool=true)
+   S = parent(a)
+   R = base_ring(a)
+   prec = div(precision(a) + 1, 2)
+   asqrt = parent(a)()
+   fit!(asqrt, prec)
+   asqrt = set_precision!(asqrt, prec)
+   if check
+      for i = 1:2:precision(a) - 1 # series must have even exponents
+         if !iszero(coeff(a, i))
+            return false, S()
+         end
+      end
+   end
+   for i = 0:prec - 1
+      c = coeff(a, 2*i)
+      if check && !issquare(c)
+         return false, S()
+      end
+      asqrt = setcoeff!(asqrt, i, sqrt(c; check=false))
+   end
+   asqrt = set_length!(asqrt, normalise(asqrt, prec))
+   return true, asqrt
+end
+
 function sqrt_classical(a::AbsSeriesElem; check::Bool=true)
    # Given a power series f = f0 + f1*x + f2*x^2 + ..., compute the square root
    # g = g0 + g1*x + g2*x^2 + ... using the relations g0^2 = f0, 2g0*g1 = f1
@@ -835,6 +860,9 @@ function sqrt_classical(a::AbsSeriesElem; check::Bool=true)
    if iszero(a)
       return true, deepcopy(a)
    end
+   if characteristic(R) == 2
+      return sqrt_classical_char2(a; check=check)
+   end
    aval2 = div(aval, 2)
    prec = precision(a) - aval2
    asqrt = parent(a)()
@@ -848,7 +876,7 @@ function sqrt_classical(a::AbsSeriesElem; check::Bool=true)
       if check && !issquare(c)
          return false, zero(S)
       end
-      g = sqrt(; check=check)
+      g = sqrt(c; check=check)
       asqrt = setcoeff!(asqrt, aval2, g)
       g2 = g + g
    end

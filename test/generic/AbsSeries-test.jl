@@ -859,6 +859,16 @@ end
        g = f^2
 
        @test isequal(sqrt(g)^2, g)
+
+       @test issquare(g)
+
+       f1, s1 = issquare_with_sqrt(g)
+
+       @test f1 && s1^2 == g
+
+       if g*x != 0
+           @test_throws ErrorException sqrt(g*x)
+       end
     end
 
     # Inexact field
@@ -868,6 +878,37 @@ end
        g = f^2
 
        @test isapprox(sqrt(g)^2, g)
+    end
+
+    # Characteristic p field
+    for p in [2, 7, 19, 65537, ZZ(2), ZZ(7), ZZ(19), ZZ(65537)]
+        R = ResidueField(ZZ, p)
+
+        S, x = PowerSeriesRing(R, 10, "x", model=:capped_absolute)
+
+        for iter = 1:10
+            f = rand(S, 0:10, 0:Int(p))
+
+            s = f^2
+
+            @test issquare(s)
+
+            q = sqrt(s)
+
+            @test q^2 == s
+
+            q = sqrt(s; check=false)
+
+            @test q^2 == s
+
+            f1, s1 = issquare_with_sqrt(s)
+
+            @test f1 && s1^2 == s
+
+            if s*x != 0
+                @test_throws ErrorException sqrt(s*x)
+            end
+        end
     end
 end
 

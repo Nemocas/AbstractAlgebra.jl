@@ -1043,32 +1043,72 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    sqrt(a::RelSeriesElem)
-
-Return the square root of the power series $a$. By default the function raises
-an exception if the input is not a square. If `check=false` this check is
-omitted.
-"""
-function Base.sqrt(a::RelSeriesElem; check::Bool=true)
-   aval = valuation(a)
-   !iseven(aval) && error("Not a square in sqrt")
+function sqrt_classical_char2(a::RelSeriesElem; check::Bool=true)
+   S = parent(a)
    R = base_ring(a)
+   prec = div(precision(a) + 1, 2)
+   if iszero(a)
+      asqrt = parent(a)()
+      asqrt = set_precision!(asqrt, prec)
+      asqrt = set_valuation!(asqrt, prec)
+      return true, asqrt
+   end
+   aval = valuation(a)
+   if check && !iseven(aval)
+      return false, S()
+   end
+   aval2 = div(aval, 2)
+   asqrt = parent(a)()
+   fit!(asqrt, prec)
+   asqrt = set_precision!(asqrt, prec)
+   asqrt = set_valuation!(asqrt, aval2)
+   if check
+      for i = 1:2:precision(a) - aval - 1 # series must have even exponents
+         if !iszero(polcoeff(a, i))
+            return false, S()
+         end
+      end
+   end
+   for i = 0:prec - aval2 - 1
+      c = polcoeff(a, 2*i)
+      if check && !issquare(c)
+         return false, S()
+      end
+      asqrt = setcoeff!(asqrt, i, sqrt(c; check=false))
+   end
+   asqrt = set_length!(asqrt, normalise(asqrt, prec))
+   return true, asqrt
+end
+
+function sqrt_classical(a::RelSeriesElem; check::Bool=true)
+   R = base_ring(a)
+   S = parent(a)
+   aval = valuation(a)
+   if check && !iseven(aval)
+      return false, S()
+   end
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
+   if characteristic(R) == 2
+      return sqrt_classical_char2(a, check=check)
+   end
    aval2 = div(aval, 2)
    prec = precision(a) - aval
    if prec == 0
       asqrt = parent(a)()
       asqrt = set_precision!(asqrt, aval2)
       asqrt = set_valuation!(asqrt, aval2)
-      return asqrt
+      return true, asqrt
    end
    asqrt = parent(a)()
    fit!(asqrt, prec)
    asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
    if prec > 0
-      g = sqrt(polcoeff(a, 0); check=check)
+      c = polcoeff(a, 0)
+      if check && !issquare(c)
+         return false, zero(S)
+      end
+      g = sqrt(c; check=check)
       asqrt = setcoeff!(asqrt, 0, g)
       g2 = g + g
    end
@@ -1087,11 +1127,42 @@ function Base.sqrt(a::RelSeriesElem; check::Bool=true)
          c = addeq!(c, p)
       end
       c = polcoeff(a, n) - c
-      c = divexact(c, g2; check=check)
+      if check
+         flag, c = divides(c, g2)
+         if !flag
+            return false, zero(S)
+         end
+      else
+         c = divexact(c, g2; check=check)
+      end
       asqrt = setcoeff!(asqrt, n, c)
    end
    asqrt = set_length!(asqrt, normalise(asqrt, prec))
-   return asqrt
+   return true, asqrt
+end
+
+@doc Markdown.doc"""
+    sqrt(a::RelSeriesElem)
+
+Return the square root of the power series $a$. By default the function raises
+an exception if the input is not a square. If `check=false` this check is
+omitted.
+"""
+function Base.sqrt(a::RelSeriesElem; check::Bool=true)
+   flag, q = sqrt_classical(a; check=check)
+   if check && !flag
+      error("Not a square in sqrt")
+   end
+   return q
+end
+
+function issquare(a::RelSeriesElem)
+   flag, q = sqrt_classical(a; check=true)
+   return flag
+end
+
+function issquare_with_sqrt(a::RelSeriesElem)
+   return sqrt_classical(a; check=true)
 end
 
 ###############################################################################
