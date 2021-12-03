@@ -141,19 +141,10 @@ julia> n = numerator(r)
 The functionality below supplements that provided by Julia itself for its
 `Rational{BigInt}` type.
 
-### Square root
+### Square and n-th root
 
-```@docs
-AbstractAlgebra.sqrt(a::Rational{BigInt})
-```
-
-```@docs
-issquare(a::Rational{BigInt})
-```
-
-```@docs
-AbstractAlgebra.exp(a::Rational{BigInt})
-```
+The functions `sqrt`, `issquare`, `issquare_with_sqrt` are all provided, as are
+`root`, `ispower` and `ispower_with_root`.
 
 **Examples**
 
@@ -164,8 +155,8 @@ julia> d = AbstractAlgebra.sqrt(ZZ(36)//ZZ(25))
 julia> issquare(ZZ(9)//ZZ(16))
 true
 
-julia> m = AbstractAlgebra.exp(ZZ(0)//ZZ(1))
-1//1
+julia> root(ZZ(27)//64, 3)
+3//4
 ```
 
 
