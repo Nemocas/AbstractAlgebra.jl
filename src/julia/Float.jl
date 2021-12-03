@@ -120,6 +120,14 @@ function Base.sqrt(a::AbstractFloat; check::Bool=true)
    return Base.sqrt(a)
 end
 
+function issquare(a::AbstractFloat)
+   return true
+end
+
+function issquare_with_sqrt(a::AbstractFloat)
+   return true, Base.sqrt(a)
+end
+
 ###############################################################################
 #
 #   Unsafe functions
