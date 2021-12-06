@@ -1553,6 +1553,7 @@ end
 # reduce a polynomials coefficients by a resultant `res` that
 # is in the ideal
 function reduce_by_resultant(f::T, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+   f = deepcopy(f)
    len = 0
    for i = 1:length(f)
       c = coeff(f, i - 1)

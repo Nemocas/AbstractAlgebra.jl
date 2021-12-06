@@ -1,4 +1,4 @@
-function mix_ideal(I::Ideal{T}) where T <: RingElem
+function mix_ideal(I::Ideal{T}) where T <: RingElement
    G = gens(I)
    R = base_ring(I)
    if length(G) == 0
