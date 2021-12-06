@@ -166,31 +166,14 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    sqrt(a::Rational{T}; check::Bool=true) where T <: Integer
-
-Return the square root of $a$. By default the function throws an exception if
-the input is not square. If `check=false` this check is supressed.
-"""
 function sqrt(a::Rational{T}; check::Bool=true) where T <: Integer
    return sqrt(numerator(a, false); check=check)//sqrt(denominator(a, false); check=check)
 end
 
-@doc Markdown.doc"""
-    issquare(a::Rational{T}) where T <: Integer
-
-Return `true` if $a$ is the square of a rational.
-"""
 function issquare(a::Rational{T}) where T <: Integer
    return issquare(numerator(a)) && issquare(denominator(a))
 end
 
-@doc Markdown.doc"""
-    issquare_with_sqrt(a::Rational{T}) where T <: Integer
-
-Return `true, s` if $a$ is the square of a rational where `s` is a square root.
-Otherwise return `false, 0`.
-"""
 function issquare_with_sqrt(a::Rational{T}) where T <: Integer
    f1, s1 = issquare_with_sqrt(numerator(a))
    if !f1
@@ -201,6 +184,34 @@ function issquare_with_sqrt(a::Rational{T}) where T <: Integer
       return false, zero(T)
    end
    return true, s1//s2
+end
+
+###############################################################################
+#
+#   Root
+#
+###############################################################################
+
+function root(a::Rational{T}, n::Int; check::Bool=true) where T <: Integer
+   num = root(numerator(a, false), n; check=check)
+   den = root(denominator(a, false), n; check=check)   
+   return num//den
+end
+
+function ispower(a::Rational{T}, n::Int) where T <: Integer
+   return ispower(numerator(a), n) && ispower(denominator(a), n)
+end
+
+function ispower_with_root(a::Rational{T}, n::Int) where T <: Integer
+   f1, r1 = ispower_with_root(numerator(a), n)
+   if !f1
+      return false, zero(T)
+   end
+   f2, r2 = ispower_with_root(denominator(a), n)
+   if !f2
+      return false, zero(T)
+   end
+   return true, r1//r2
 end
 
 ###############################################################################

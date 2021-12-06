@@ -245,9 +245,8 @@ sqrt_residues = [[0, 1], [0, 1, 4], [0, 1, 2, 4], [0, 1, 4]]
 @doc Markdown.doc"""
     sqrt(a::T; check::Bool=true) where T <: Integer
 
-Return the integer square root of $a$. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
+Return the square root of $a$. By default the function will throw an exception
+if the input is not square. If `check=false` this test is omitted.
 """
 function sqrt(a::T; check::Bool=true) where T <: Integer
    s = isqrt(a)
@@ -294,7 +293,6 @@ function issquare_with_sqrt(a::BigInt)
    end
 end
 
-
 @doc Markdown.doc"""
     issquare(a::T) where T <: Integer
 
@@ -338,7 +336,7 @@ end
 
 Return the $n$-th root of $a$. If `check=true` the function will test if the
 input was a perfect $n$-th power, otherwise an exception will be raised. We
-require $n > 0$ and also $a \geq 0$ if $n$ is even.
+require $n > 0$.
 """
 function root(a::T, n::Int; check::Bool=true) where T <: Integer
    if n == 2
@@ -421,7 +419,7 @@ end
 @doc Markdown.doc"""
     ispower(a::T, n::Int) where T <: Integer
 
-Return `true` if $a$ is a perfect $n$-th power, i.e. if there is an integer $b$
+Return `true` if $a$ is a perfect $n$-th power, i.e. if there is a $b$
 such that $a = b^n$. We require $n > 0$.
 """
 function ispower(a::T, n::Int) where T <: Integer
