@@ -2939,7 +2939,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    function istriu(A::MatrixElem{T}) where T <: RingElement
+    istriu(A::MatrixElem{T}) where T <: RingElement
 
 Return `true` if $A$ is an upper triangular matrix.
 """
