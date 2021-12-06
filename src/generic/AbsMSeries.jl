@@ -560,12 +560,9 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{AbsMSeries{T}}, ::Type{AbsMSeries{T}}) where
-                                               T <: RingElement = AbsMSeries{T}
-
-function promote_rule(::Type{AbsMSeries{T}}, ::Type{U}) where
-                                           {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? AbsMSeries{T} : Union{}
+function promote_rule(::Type{AbsMSeries{T, V}}, ::Type{U}) where
+                                        {V, T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? AbsMSeries{T, V} : Union{}
 end
 
 ###############################################################################

@@ -214,6 +214,9 @@ end
 
          @test isequal(f*c1 - f*c2, f*(c1 - c2))
          @test isequal(f*c1 + f*c2, f*(c1 + c2))
+
+         @test isequal(f + c1, c1 + f)
+         @test isequal(c1 * f, f * c1)
       end
    end
 end
