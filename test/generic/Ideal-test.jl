@@ -182,6 +182,8 @@ end
          @test length(G[i]) > length(G[i - 1])
          @test divides(leading_coefficient(G[i - 1]), leading_coefficient(G[i]))[1]
       end
+
+      @test Ideal(R, gens(I)) == I
    end
 end
 
@@ -199,6 +201,8 @@ end
             @test divides(v, G[1])[1]
          end
       end
+
+      @test Ideal(ZZ, gens(I)) == I
    end
 end
 
@@ -219,6 +223,8 @@ end
             @test divides(v, G[1])[1]
          end
       end
+
+      @test Ideal(R, gens(I)) == I
    end
 end
 
@@ -424,10 +430,10 @@ end
       W = elem_type(R)[]
       X = elem_type(R)[]
       for j = 1:n
-         push!(V, rand(R, 0:3, 0:3, -10:10))
+         push!(V, rand(R, 0:2, 0:3, -10:10))
       end
       for j = 1:m
-         push!(W, rand(R, 0:3, 0:3, -10:10))
+         push!(W, rand(R, 0:3, 0:2, -10:10))
       end
       for j = 1:m
          push!(X, rand(R, 0:3, 0:3, -10:10))
@@ -447,9 +453,9 @@ end
       n = rand(0:5)
       m = rand(0:5)
       k = rand(0:5)
-      V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
-      W = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:m]
-      X = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:k]
+      V = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:n]
+      W = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:m]
+      X = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:k]
 
       I = Ideal(R, V)
       J = Ideal(R, W)

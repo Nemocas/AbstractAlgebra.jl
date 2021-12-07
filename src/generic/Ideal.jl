@@ -1917,12 +1917,40 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
    end
 end
       
+function remove_constant_multiples(V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+   len = length(V)
+   for i = 1:len
+      j = i + 1
+      while j <= len
+         if is_constant_multiple(V[j], V[i])
+            deleteat!(V, j)
+            len -= 1
+            j -= 1
+         end
+         j += 1
+      end
+   end
+   V = collect(reverse(V))
+   for i = 1:len
+      j = i + 1
+      while j <= len
+         if is_constant_multiple(V[j], V[i])
+            deleteat!(V, j)
+            len -= 1
+            j -= 1
+         end
+         j += 1
+      end
+   end
+   return V
+end
+
 # if possible, find a resultant (or preferably gcd of resultants)
 # which exists in the idea
 # this can be used to reduce coefficients of polynomials to keep
 # them small throughout the algorithm
-function find_resultant_in_ideal(D::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
-   res = zero(base_ring(D[1]))
+function find_resultant_in_ideal(R::Ring, D::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+   res = zero(R)
    V = similar(D, 0)
    for i = 1:length(D)
       for j = i + 1:length(D)
@@ -1942,9 +1970,23 @@ function find_resultant_in_ideal(D::Vector{T}) where {U <: RingElement, T <: Abs
       end
    end
    if !isempty(V)
-      res = gcd(res, find_resultant_in_ideal(V))
+      V = remove_constant_multiples(V)
+      res = gcd(res, find_resultant_in_ideal(R, V))
    end
    return res
+end
+
+function is_constant_multiple(f::T, g::T) where T <: AbstractAlgebra.PolyElem
+   if length(f) == length(g)
+      c1 = leading_coefficient(f)
+      c2 = leading_coefficient(g)
+      if ((flag, q) = divides(c1, c2))[1]
+         if f == g*q
+            return true
+         end
+      end
+   end
+   return false
 end
 
 # We call an ideal over a polynomial ring over a Euclidean domain reduced if
@@ -1969,16 +2011,19 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
       V = gens(I)
       # Compute V a vector of polynomials giving the same basis as I
       # but for which the above hold
+      V = filter(!iszero, V)
+      V = remove_constant_multiples(V)
       if length(V) > 1
          # compute resultant
          S = parent(V[1])
+         R = base_ring(S)
          D = sort(V, by=mysize2, rev=true)
-         res = zero(base_ring(D[1]))
+         res = zero(R)
          while !isempty(D) && isconstant(D[end])
             di = constant_coefficient(pop!(D))
             res = gcd(di, res)
          end
-         g = one(base_ring(S))
+         g = one(R)
          for i = 1:length(D)
             for j = i + 1:length(D)
                res = gcd(resultant(D[i], D[j]), res)
@@ -1992,10 +2037,18 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
             for v in D
                g = gcd(v, g)
             end
+            D2 = Vector{T}()
+            r2 = zero(R)
             for i in 1:length(D)
                D[i] = divexact(D[i], g)
+               if !isconstant(D[i])
+                  push!(D2, D[i])
+               else
+                  r2 = gcd(r2, constant_coefficient(D[i]))
+               end
             end
-            res = find_resultant_in_ideal(D)
+            res = find_resultant_in_ideal(R, D2)
+            res = gcd(res, r2)
          end
          if isunit(res) # everything reduces to 0
             V = [one(S)*g]
@@ -2066,6 +2119,18 @@ end
 Return `true` if the ideal `J` is contained in the ideal `I`.
 """
 function Base.contains(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   G1 = gens(J)
+   G2 = gens(I)
+   if isempty(G1)
+      return true
+   end
+   if isempty(G2)
+      return false
+   end
+   return divides(G1[1], G2[1])[1]
+end
+
+function Base.contains(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Union{AbstractAlgebra.PolyElem{U}, AbstractAlgebra.MPolyElem{U}}}
    G = gens(J)
    for v in G
       if !iszero(normal_form(v, I))
