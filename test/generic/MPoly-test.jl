@@ -50,6 +50,16 @@
 
       @test isa(f1, MPolyElem)
 
+      Va = [rand(-100:100) for i in 1:5]
+      f1a = S(Va, W1)
+
+      @test isa(f1a, MPolyElem)
+
+      Vb = [ZZ(rand(-100:100)) for i in 1:5]
+      f1b = S(Vb, W1)
+
+      @test isa(f1b, MPolyElem)
+
       f2 = S()
       fit!(f2, 5)
 
