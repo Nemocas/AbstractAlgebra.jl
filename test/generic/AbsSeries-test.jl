@@ -875,6 +875,10 @@ end
 
     @test_throws ErrorException sqrt(f)
 
+    f = 7 + 12*x + 17*x^2 + 12*x^3 + 25*x^4 + 30*x^5 + 20*x^6 + 25*x^8 + O(x^10)
+
+    @test_throws ErrorException sqrt(f)
+
     # Inexact field
     R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
     for iter = 1:300
@@ -898,7 +902,7 @@ end
     flag, s = issquare_with_sqrt(f^2)
 
     @test flag && isapprox(s, f)
-    
+
     # Characteristic p field
     for p in [2, 7, 19, 65537, ZZ(2), ZZ(7), ZZ(19), ZZ(65537)]
         R = ResidueField(ZZ, p)
