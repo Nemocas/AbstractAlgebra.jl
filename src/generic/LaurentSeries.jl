@@ -1179,17 +1179,13 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    sqrt(a::Generic.LaurentSeriesElem; check::Bool=true)
-
-Return the square root of the power series $a$. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
-"""
-function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
-   aval = valuation(a)
-   check && !iseven(aval) && error("Not a square in sqrt")
+function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
+   S = parent(a)
    R = base_ring(a)
+   aval = valuation(a)
+   if check && !iseven(aval)
+      return false, S()
+   end
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    aval2 = div(aval, 2)
    prec = precision(a) - aval
@@ -1198,7 +1194,7 @@ function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
       asqrt = set_precision!(asqrt, aval2)
       asqrt = set_valuation!(asqrt, aval2)
       asqrt = set_scale!(asqrt, 1)
-      return asqrt
+      return true, asqrt
    end
    asqrt = parent(a)()
    s = scale(a)
@@ -1207,7 +1203,11 @@ function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
    asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
    if prec > 0
-      g = sqrt(polcoeff(a, 0); check=check)
+      c = polcoeff(a, 0)
+      if check && !issquare(c)
+         return false, zero(S)
+      end
+      g = sqrt(c; check=check)
       asqrt = setcoeff!(asqrt, 0, g)
       g2 = g + g
    end
@@ -1226,13 +1226,42 @@ function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
          c = addeq!(c, p)
       end
       c = polcoeff(a, n) - c
-      c = divexact(c, g2; check=check)
+      if check
+         flag, c = divides(c, g2)
+         if !flag
+            return false, zero(S)
+         end
+      else
+         c = divexact(c, g2; check=check)
+      end
       asqrt = setcoeff!(asqrt, n, c)
     end
     asqrt = set_scale!(asqrt, s)
     asqrt = set_length!(asqrt, normalise(asqrt, zlen))
     asqrt = rescale!(asqrt)
-    return asqrt
+    return true, asqrt
+end
+
+@doc Markdown.doc"""
+    sqrt(a::Generic.LaurentSeriesElem; check::Bool=true)
+
+Return the square root of the power series $a$. By default the function will
+throw an exception if the input is not square. If `check=false` this test is
+omitted.
+"""
+function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
+   flag, s = sqrt_classical(a, check=check)
+   check && !flag && error("Not a square in sqrt")
+   return s
+end
+
+function issquare(a::LaurentSeriesElem)
+   flag, q = sqrt_classical(a; check=true)
+   return flag
+end
+
+function issquare_with_sqrt(a::LaurentSeriesElem)
+   return sqrt_classical(a; check=true)
 end
 
 ###############################################################################
