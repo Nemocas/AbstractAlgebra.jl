@@ -892,6 +892,10 @@ end
        end
     end
 
+    f = 4 + 12*x + 17*x^2 + 12*x^3 + 25*x^4 + 30*x^5 + 20*x^6 + 25*x^8 + O(x^10)
+
+    @test_throws ErrorException sqrt(f)
+
     # Inexact field
     R, x = PowerSeriesRing(RealField, 10, "x")
     for iter = 1:300
@@ -900,6 +904,21 @@ end
 
        @test isapprox(sqrt(g)^2, g)
     end
+
+    f = 0.4684049219189188040246563105029053986072540283203125*x +
+        0.7468877608885249319570220905006863176822662353515625*x^2 +
+        0.70502205920556537677157393773086369037628173828125*x^3 +
+        0.0338681672304976810750076765543781220912933349609375*x^4 +
+        0.520844397208659604103786477935500442981719970703125*x^5 +
+        0.3137863950850567906769583714776672422885894775390625*x^6 +
+        0.593894760292587253758256338187493383884429931640625*x^7 +
+        0.62582529337203851582671632058918476104736328125*x^8 +
+        0.8365754395386633124331865474232472479343414306640625*x^9 +
+        O(x^10)
+
+    flag, s = issquare_with_sqrt(f^2)
+
+    @test flag && isapprox(s, f)
 
     # Characteristic p field
     for p in [2, 7, 19, 65537, ZZ(2), ZZ(7), ZZ(19), ZZ(65537)]
@@ -931,6 +950,23 @@ end
             end
         end
     end
+
+    R = ResidueField(ZZ, 2)
+    T, y = PolynomialRing(R, "x")
+
+    S, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+
+    f = 1 + y^2*x^2 + (y^2 + y + 1)*x^4 + O(x^10)
+
+    @test_throws ErrorException sqrt(f)
+
+    f = x + y^4*x^4 + (y^4 + y^2 + 1)*x^8 + O(x^11)
+
+    @test_throws ErrorException sqrt(f)
+
+    f = zero(S)
+
+    @test iszero(sqrt(f))
 end
 
 @testset "Generic.RelSeries.exact_division" begin
