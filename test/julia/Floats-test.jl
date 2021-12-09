@@ -85,3 +85,22 @@ end
       @test (s1 == 0 && s2 == 0) || gcd(s1, s2) == 1
    end
 end
+
+@testset "Julia.Floats.gcd" begin
+   R = RDF
+   S = RealField
+
+   r = R(-0.1)
+   s = S(-0.1)
+
+   @test !issquare(r)
+   @test !issquare(s)
+
+   f1, s1 = issquare_with_sqrt(r)
+
+   @test !f1
+
+   f2, s2 = issquare_with_sqrt(s)
+
+   @test !f2
+end
