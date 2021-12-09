@@ -121,11 +121,15 @@ function Base.sqrt(a::AbstractFloat; check::Bool=true)
 end
 
 function issquare(a::AbstractFloat)
-   return true
+   return a > 0
 end
 
-function issquare_with_sqrt(a::AbstractFloat)
-   return true, Base.sqrt(a)
+function issquare_with_sqrt(a::T) where T <: AbstractFloat
+   if a > 0
+      return true, Base.sqrt(a)
+   else
+      return false, zero(T)
+   end
 end
 
 ###############################################################################
