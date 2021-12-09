@@ -511,7 +511,7 @@ issquare(::MPolyElem)
 
 **Examples**
 
-```@jldoctest
+```jldoctest
 julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
