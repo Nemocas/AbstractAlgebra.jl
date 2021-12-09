@@ -896,6 +896,10 @@ end
 
     @test_throws ErrorException sqrt(f)
 
+    f = 7 + 12*x + 17*x^2 + 12*x^3 + 25*x^4 + 30*x^5 + 20*x^6 + 25*x^8 + O(x^10)
+
+    @test_throws ErrorException sqrt(f)
+
     # Inexact field
     R, x = PowerSeriesRing(RealField, 10, "x")
     for iter = 1:300
@@ -954,7 +958,7 @@ end
     R = ResidueField(ZZ, 2)
     T, y = PolynomialRing(R, "x")
 
-    S, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+    S, x = PowerSeriesRing(T, 10, "x")
 
     f = 1 + y^2*x^2 + (y^2 + y + 1)*x^4 + O(x^10)
 
