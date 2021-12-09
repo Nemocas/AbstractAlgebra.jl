@@ -60,7 +60,8 @@ import ..AbstractAlgebra: add!, addeq!, addmul!, base_ring, canonical_unit,
                           term_degree, terms_degrees, to_univariate,
                           trailing_coefficient, use_karamul, valuation, var,
                           var_index, vars, zero!,
-                          @enable_all_show_via_expressify
+                          @enable_all_show_via_expressify,
+                          @attributes
 
 
 using ..AbstractAlgebra
