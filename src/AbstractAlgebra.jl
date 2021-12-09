@@ -142,24 +142,24 @@ export NotInvertibleError, error_dim_negative, ErrorConstrDimMismatch
 
 export crt, factor, factor_squarefree, isirreducible, issquarefree
 
+include("Attributes.jl")
+
 ###############################################################################
-# Macros for fancy printing and extending objects when desired
-# fancy printing (and extending)
-# change
+# Macros for fancy printing. to use, enable attribute storage for your struct,
+# i.e.m change
 #
-# struct bla..
-# ..
-# end
+#   mutable struct bla..
+#   ...
+#   end
 #
 # to
 #
-# struct bla ..
-# @declare_other
-# ...
-# end
+#   @attributes mutable struct bla ..
+#   ...
+#   end
 #
-# Then, in the show function, start with
-# @show_name(io, obj)
+# Then, in the `show` method, start with
+#   @show_name(io, obj)
 # If the user assigned a name to the object (in the REPL mainly) by doing
 # A = bla...
 # then, in the compact printing only the name "A" is printed
@@ -170,54 +170,12 @@ export crt, factor, factor_squarefree, isirreducible, issquarefree
 #
 ###############################################################################
 
-macro declare_other()
-   esc(quote other::Dict{Symbol, Any} end )
-end
-
-function hasspecial(G::Any)
-   if isdefined(G, :other)
-      return true, G.other
-   else
-      return false, nothing
-   end
-end
-
-function get_special(G::Any, s::Symbol)
-   fl, D = hasspecial(G)
-   fl && return get(D, s, nothing)
-   return nothing
-end
-
-function get_special!(func::Function, G::Any, s::Symbol)
-   fl, D = hasspecial(G)
-   fl && return Base.get!(func, D, s)
-   return nothing
-end
-
-function get_special!(G::Any, s::Symbol, default::Any)
-   fl, D = hasspecial(G)
-   fl && return Base.get!(D, s, default)
-   return nothing
-end
-
-function set_special(G::Any, data::Pair{Symbol, <:Any}...)
-  if !isdefined(G, :other)
-    D = G.other = Dict{Symbol, Any}()
-  else
-    D = G.other
-  end
-
-  for d in data
-    push!(D, d)
-  end
-end
-
 function set_name!(G::Any, name::String)
-   set_special(G, :name => name)
+   set_attribute!(G, :name => name)
 end
 
 function set_name!(G)
-   s = get_special(G, :name)
+   s = get_attribute(G, :name)
    s === nothing || return
    sy = find_name(G)
    sy === nothing && return
@@ -230,7 +188,7 @@ macro show_name(io, O)
   return :( begin
     local i = $(esc(io))
     local o = $(esc(O))
-    s = get_special(o, :name)
+    s = get_attribute(o, :name)
     if s === nothing
       sy = find_name(o)
       if sy === nothing
@@ -262,7 +220,7 @@ macro show_special(io, O)
   return :( begin
     local i = $(esc(io))
     local o = $(esc(O))
-    s = get_special(o, :show)
+    s = get_attribute(o, :show)
     if s !== nothing
       s(i, o)
       return
@@ -275,7 +233,7 @@ macro show_special_elem(io, e)
     local i = $(esc(io))
     local a = $(esc(e))
     local o = parent(a)
-    s = get_special(o, :show_elem)
+    s = get_attribute(o, :show_elem)
     if s !== nothing
       s(i, a)
       return
