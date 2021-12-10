@@ -290,13 +290,11 @@ The syntax for views is as for Julia's own views.
 
 **Examples**
 
-```@jldoctest
+```jldoctest
 julia> M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
 [1   2   3]
 [2   3   4]
 [3   4   5]
-
-julia>
 
 julia> N1 = @view M[1:2, :]
 [1   2   3]
@@ -306,8 +304,6 @@ julia> N2 = @view M[:, 1:2]
 [1   2]
 [2   3]
 [3   4]
-
-julia>
 
 julia> R = N1*N2
 [14   20]

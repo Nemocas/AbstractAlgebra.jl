@@ -181,7 +181,7 @@ rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::Abstract
 
 **Examples**
 
-```@jldoctest
+```jldoctest
 julia> S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
 (Univariate power series ring in x over Rationals, x + O(x^10))
 

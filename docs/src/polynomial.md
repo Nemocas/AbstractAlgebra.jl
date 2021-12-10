@@ -217,7 +217,10 @@ otherwise.
 
 **Examples**
 
-```@jldoctest
+```jldoctest
+julia> R, x = PolynomialRing(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
 julia> f = 1 + 2x + 3x^2
 3*x^2 + 2*x + 1
 
@@ -1015,7 +1018,7 @@ power_sums_to_polynomial(::Vector{T}) where T <: RingElem
 
 **Examples**
 
-```@jldoctest
+```jldoctest
 julia> R, x = PolynomialRing(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
