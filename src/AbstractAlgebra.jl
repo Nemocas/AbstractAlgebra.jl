@@ -171,11 +171,11 @@ include("Attributes.jl")
 ###############################################################################
 
 function set_name!(G::Any, name::String)
-   set_attribute!(G, :name => name)
+   set_special(G, :name => name)
 end
 
 function set_name!(G)
-   s = get_attribute(G, :name)
+   s = get_special(G, :name)
    s === nothing || return
    sy = find_name(G)
    sy === nothing && return
@@ -188,7 +188,7 @@ macro show_name(io, O)
   return :( begin
     local i = $(esc(io))
     local o = $(esc(O))
-    s = get_attribute(o, :name)
+    s = get_special(o, :name)
     if s === nothing
       sy = find_name(o)
       if sy === nothing
@@ -220,7 +220,7 @@ macro show_special(io, O)
   return :( begin
     local i = $(esc(io))
     local o = $(esc(O))
-    s = get_attribute(o, :show)
+    s = get_special(o, :show)
     if s !== nothing
       s(i, o)
       return
@@ -233,7 +233,7 @@ macro show_special_elem(io, e)
     local i = $(esc(io))
     local a = $(esc(e))
     local o = parent(a)
-    s = get_attribute(o, :show_elem)
+    s = get_special(o, :show_elem)
     if s !== nothing
       s(i, a)
       return
