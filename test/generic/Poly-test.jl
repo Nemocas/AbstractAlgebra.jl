@@ -2807,6 +2807,15 @@ end
       @test !f1 || f == s1^2
    end
 
+   f = x^2 + x + 1//4
+
+   @test issquare(f) # duplication intended, see #1075
+   @test issquare(f) # duplication intended, see #1075
+
+   f = -1//8*x^17 - 11//16*x^16 + 1//2*x^15 - 1//3*x^14 + 4//3*x^13 + 3//5*x^12 + 5//4*x^11 - 7//15*x^10 + 1//5*x^9 + 1//4*x^8 + 1//3*x^7 - 2*x^6 + 8//3*x^5 + 14*x^4 - x^2 + 9//2*x - 2//7
+
+   @test issquare(f^2) # see #1075
+
    # Characteristic p field
    for p in [2, 7, 19, 65537, ZZ(2), ZZ(7), ZZ(19), ZZ(65537)]
       R = ResidueField(ZZ, p)

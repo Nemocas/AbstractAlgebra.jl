@@ -245,6 +245,9 @@ end
 #
 ###############################################################################
 
+# No actual mutation is permitted for Julia types
+# See #1077
+
 function zero!(a::Rational{T}) where T <: Integer
    n = a.num
    n = zero!(n)

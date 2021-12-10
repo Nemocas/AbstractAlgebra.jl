@@ -126,6 +126,9 @@ end
 #
 ###############################################################################
 
+# No actual mutation is permitted for Julia types
+# See #1077
+
 function zero!(a::T) where T <: AbstractFloat
    return T(0)
 end
