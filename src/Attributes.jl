@@ -1,9 +1,5 @@
 export @attributes, has_attribute, get_attribute, get_attribute!, set_attribute!
 
-# TODO: rename `other` to something less generic, e.g. `__attrs` however this
-# will break some code in Oscar 0.7.0, which directly accesses the `other`
-# field
-
 if VERSION >= v"1.7"
    import Base: ismutabletype
 else
@@ -79,7 +75,7 @@ macro attributes(expr)
       #    @attributes mutable struct Type ... end
 
       # add member for storing the attributes
-      push!(expr.args[3].args, :(other::Dict{Symbol,Any}))
+      push!(expr.args[3].args, :(__attrs::Dict{Symbol,Any}))
       return quote
         Base.@__doc__($(esc(expr)))
       end
@@ -110,7 +106,7 @@ macro attributes(expr)
    error("attributes can only be attached to mutable structs")
 end
 
-_is_attribute_storing_type(::Type{T}) where T = Base.issingletontype(T) || isstructtype(T) && ismutable(T) && hasfield(T, :other)
+_is_attribute_storing_type(::Type{T}) where T = Base.issingletontype(T) || isstructtype(T) && ismutable(T) && hasfield(T, :__attrs)
 
 # storage for attributes of singletons
 const _singleton_attr_storage = Dict{Type, Dict{Symbol, Any}}()
@@ -130,8 +126,8 @@ function _get_attributes(G::T) where T
    if Base.issingletontype(T)
       return Base.get(_singleton_attr_storage, T, nothing)
    end
-   isstructtype(T) && ismutable(T) && hasfield(T, :other) || error("attributes storage not supported for type $T")
-   return isdefined(G, :other) ? G.other : nothing
+   isstructtype(T) && ismutable(T) && hasfield(T, :__attrs) || error("attributes storage not supported for type $T")
+   return isdefined(G, :__attrs) ? G.__attrs : nothing
 end
 
 """
@@ -149,11 +145,11 @@ function _get_attributes!(G::T) where T
    if Base.issingletontype(T)
       return Base.get!(() -> Dict{Symbol, Any}(), _singleton_attr_storage, T)
    end
-   isstructtype(T) && ismutable(T) && hasfield(T, :other) || error("attributes storage not supported for type $T")
-   if !isdefined(G, :other)
-      G.other = Dict{Symbol, Any}()
+   isstructtype(T) && ismutable(T) && hasfield(T, :__attrs) || error("attributes storage not supported for type $T")
+   if !isdefined(G, :__attrs)
+      G.__attrs = Dict{Symbol, Any}()
    end
-   return G.other
+   return G.__attrs
 end
 
 """
@@ -222,14 +218,4 @@ function set_attribute!(G::Any, attr::Symbol, value::Any)
    D = _get_attributes!(G)
    D[attr] = value
    return nothing
-end
-
-
-#@deprecate hasspecial(x) _get_attributes(x) false   # nothing ever really calls hasspecial
-@deprecate get_special(x,y) get_attribute(x,y) false
-@deprecate set_special(x...) set_attribute!(x...) false
-
-# TODO: deprecate this macro...
-macro declare_other()
-   esc(quote other::Dict{Symbol, Any} end)
 end
