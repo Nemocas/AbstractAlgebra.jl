@@ -540,58 +540,31 @@ end
 #
 ###############################################################################
 
-function zero!(a::Integer)
-   return 0
-end
+# No actual mutation is permitted for Julia types
+# See #1077
 
-function zero!(a::BigInt)
-   ccall((:__gmpz_set_si, :libgmp), Nothing, (Ref{BigInt}, Int), a, 0)
-   return a
+function zero!(a::T) where T <: Integer
+   return T(0)
 end
 
 function mul!(a::T, b::T, c::T) where T <: Integer
    return b*c
 end
 
-function mul!(a::BigInt, b::BigInt, c::BigInt)
-   ccall((:__gmpz_mul, :libgmp), Nothing, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
-   return a
-end
-
 function add!(a::T, b::T, c::T) where T <: Integer
    return b + c
-end
-
-function add!(a::BigInt, b::BigInt, c::BigInt)
-   ccall((:__gmpz_add, :libgmp), Nothing, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
-   return a
 end
 
 function addeq!(a::T, b::T) where T <: Integer
    return a + b
 end
 
-function addeq!(a::BigInt, b::BigInt)
-   ccall((:__gmpz_add, :libgmp), Nothing, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, a, b)
-   return a
-end
-
 function addmul!(a::T, b::T, c::T, d::T) where T <: Integer
    return a + b*c
 end
 
-function addmul!(a::BigInt, b::BigInt, c::BigInt, d::BigInt)
-   ccall((:__gmpz_addmul, :libgmp), Nothing, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
-   return a
-end
-
 function addmul!(a::T, b::T, c::T) where T <: Integer # special case, no temporary required
    return a + b*c
-end
-
-function addmul!(a::BigInt, b::BigInt, c::BigInt) # special case, no temporary required
-   ccall((:__gmpz_addmul, :libgmp), Nothing, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
-   return a
 end
 
 ###############################################################################

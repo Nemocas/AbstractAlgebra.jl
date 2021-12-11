@@ -126,69 +126,31 @@ end
 #
 ###############################################################################
 
-function zero!(a::AbstractFloat)
-   return 0
-end
+# No actual mutation is permitted for Julia types
+# See #1077
 
-function zero!(a::BigFloat)
-   ccall((:mpfr_set_si, :libmpfr), Nothing,
-         (Ref{BigFloat}, Int, Int32), a, 0, Base.MPFR.ROUNDING_MODE[])
-   return a
+function zero!(a::T) where T <: AbstractFloat
+   return T(0)
 end
 
 function mul!(a::T, b::T, c::T) where T <: AbstractFloat
    return b*c
 end
 
-function mul!(a::BigFloat, b::BigFloat, c::BigFloat)
-   ccall((:mpfr_mul, :libmpfr), Nothing,
-         (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
-                 a, b, c, Base.MPFR.ROUNDING_MODE[])
-   return a
-end
-
 function add!(a::T, b::T, c::T) where T <: AbstractFloat
    return b + c
-end
-
-function add!(a::BigFloat, b::BigFloat, c::BigFloat)
-   ccall((:mpfr_add, :libmpfr), Nothing,
-         (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
-                 a, b, c, Base.MPFR.ROUNDING_MODE[])
-   return a
 end
 
 function addeq!(a::T, b::T) where T <: AbstractFloat
    return a + b
 end
 
-function addeq!(a::BigFloat, b::BigFloat)
-   ccall((:mpfr_add, :libmpfr), Nothing,
-         (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
-                 a, a, b, Base.MPFR.ROUNDING_MODE[])
-   return a
-end
-
 function addmul!(a::T, b::T, c::T, d::T) where T <: AbstractFloat
    return a + b*c
 end
 
-function addmul!(a::BigFloat, b::BigFloat, c::BigFloat, d::BigFloat)
-   ccall((:mpfr_fma, :libmpfr), Nothing,
-         (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
-                 a, b, c, a, Base.MPFR.ROUNDING_MODE[])
-   return a
-end
-
 function addmul!(a::T, b::T, c::T) where T <: AbstractFloat # special case, no temporary required
    return a + b*c
-end
-
-function addmul!(a::BigFloat, b::BigFloat, c::BigFloat) # special case, no temporary required
-   ccall((:mpfr_fma, :libmpfr), Nothing,
-         (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
-                 a, b, c, a, Base.MPFR.ROUNDING_MODE[])
-   return a
 end
 
 ###############################################################################
