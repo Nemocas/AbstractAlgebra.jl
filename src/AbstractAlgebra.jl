@@ -135,8 +135,8 @@ export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
 
 export ZZ, QQ, zz, qq, RealField, RDF
 
-export create_accessors, get_handle, package_handle, zeros,
-       Array, sig_exists
+export create_accessors, get_handle, zeros,
+       sig_exists
 
 export NotInvertibleError, error_dim_negative, ErrorConstrDimMismatch
 
@@ -640,11 +640,11 @@ include("Deprecations.jl")
 #
 ###############################################################################
 
-const package_handle = [1]
+const package_handle = Ref(0)
 
 function get_handle()
-   package_handle[1] += 1
-   return package_handle[1] - 1
+   package_handle[] += 1
+   return package_handle[]
 end
 
 ###############################################################################
