@@ -791,7 +791,7 @@ end
    @test flag && isapprox(s, f)
 
    # Characteristic p field
-   for p in [7, 19, 65537, ZZ(7), ZZ(19), ZZ(65537)]
+   for p in [2, 7, 19, 65537, ZZ(7), ZZ(19), ZZ(65537)]
       R = ResidueField(ZZ, p)
 
       S, x = LaurentSeriesField(R, 10, "x")
@@ -820,6 +820,23 @@ end
           end
       end
    end
+
+    R = ResidueField(ZZ, 2)
+    T, y = PolynomialRing(R, "x")
+
+    S, x = LaurentSeriesRing(T, 10, "x")
+
+    f = 1 + y^2*x^2 + (y^2 + y + 1)*x^4 + O(x^10)
+
+    @test_throws ErrorException sqrt(f)
+
+    f = x + y^4*x^4 + (y^4 + y^2 + 1)*x^8 + O(x^11)
+
+    @test_throws ErrorException sqrt(f)
+
+    f = zero(S)
+
+    @test iszero(sqrt(f))
 end
 
 @testset "Generic.LaurentSeries.exact_division" begin

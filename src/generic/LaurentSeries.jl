@@ -1179,6 +1179,48 @@ end
 #
 ###############################################################################
 
+function sqrt_classical_char2(a::LaurentSeriesElem; check::Bool=true)
+   S = parent(a)
+   R = base_ring(a)
+   prec = div(precision(a) + 1, 2)
+   if iszero(a)
+      asqrt = parent(a)()
+      asqrt = set_precision!(asqrt, prec)
+      asqrt = set_valuation!(asqrt, prec)
+      asqrt = set_scale!(asqrt, 1)
+      return true, asqrt
+   end
+   aval = valuation(a)
+   if check && !iseven(aval)
+      return false, S()
+   end
+   s = scale(a)
+   zlen = pol_length(a)
+   if check
+      if isodd(s) && zlen > 1
+         # valuation is even, scale of square must be even
+         # unless polynomial length is one
+         return false, S()
+      end
+   end
+   asqrt = parent(a)()
+   zlen = pol_length(a)
+   fit!(asqrt, zlen)
+   aval2 = div(aval, 2)
+   asqrt = set_precision!(asqrt, prec)
+   asqrt = set_valuation!(asqrt, aval2)
+   asqrt = set_scale!(asqrt, div(s + 1, 2)) # deals with s = 1
+   for i = 0:zlen - 1
+      c = polcoeff(a, i)
+      if check && !issquare(c)
+         return false, S()
+      end
+      asqrt = setcoeff!(asqrt, i, sqrt(c; check=false))
+   end
+   asqrt = set_length!(asqrt, zlen)
+   return true, asqrt
+end
+
 function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
    S = parent(a)
    R = base_ring(a)
@@ -1187,6 +1229,9 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
       return false, S()
    end
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
+   if characteristic(R) == 2
+      return sqrt_classical_char2(a, check=check)
+   end
    aval2 = div(aval, 2)
    prec = precision(a) - aval
    if prec == 0
@@ -1199,7 +1244,7 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
    asqrt = parent(a)()
    s = scale(a)
    zlen = div(prec + s - 1, s)
-   fit!(asqrt, prec)
+   fit!(asqrt, zlen)
    asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
    if prec > 0
