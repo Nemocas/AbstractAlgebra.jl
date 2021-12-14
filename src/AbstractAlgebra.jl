@@ -656,8 +656,8 @@ end
 mutable struct AccessorNotSetError <: Exception
 end
 
-function create_accessors(T, S, handle)
-   get = function(a, error::Bool = true)
+function create_accessors(::Type{T}, ::Type{S}, handle) where {T, S}
+   get = function(a::T, error::Bool = true)
       if handle > length(a.auxilliary_data) ||
          !isassigned(a.auxilliary_data, handle)
         if error
@@ -666,9 +666,9 @@ function create_accessors(T, S, handle)
           return nothing
         end
       end
-      return a.auxilliary_data[handle]
+      return a.auxilliary_data[handle]::S
    end
-   set = function(a, b)
+   set = function(a::T, b::S)
       if handle > length(a.auxilliary_data)
          resize!(a.auxilliary_data, handle)
       end
