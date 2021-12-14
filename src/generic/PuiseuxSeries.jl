@@ -585,17 +585,47 @@ Return the square root of the given Puiseux series $a$. By default the function
 will throw an exception if the input is not square. If `check=false` this test
 is omitted.
 """
-function Base.sqrt(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
+function sqrt_classical(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
    val = valuation(a.data)
    S = parent(a)
-   if mod(val, 2) != 0
-      return S(sqrt(inflate(a.data, 2); check=check), a.scale*2)
+   R = base_ring(S)
+   if mod(val, 2) != 0 || (characteristic(R) == 2 && isodd(scale(a.data)))
+      d = inflate(a.data, 2)
+      sscale = a.scale*2
    else
-      return S(sqrt(a.data; check=check), a.scale)
+      d = a.data
+      sscale = a.scale
    end
+   flag, s = sqrt_classical(d; check=check)
+   if check && !flag
+      return false, zero(S)
+   end
+   return true, S(s, sscale)
 end
 
-###############################################################################
+@doc Markdown.doc"""
+    sqrt(a::Generic.PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
+
+Return the square root of the given Puiseux series $a$. By default the function
+will throw an exception if the input is not square. If `check=false` this test
+is omitted.
+"""
+function Base.sqrt(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
+   flag, s = sqrt_classical(a; check=check)
+   check && !flag && error("Not a square in sqrt")
+   return s
+end
+
+function issquare(a::PuiseuxSeriesElem{T}) where T <: RingElement
+   flag, s = sqrt_classical(a; check=true)
+   return flag
+end
+
+function issquare_with_sqrt(a::PuiseuxSeriesElem{T}) where T <: RingElement
+   return sqrt_classical(a; check=true)
+end
+
+########################################################
 #
 #   Derivative and integral
 #
