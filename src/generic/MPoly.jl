@@ -291,7 +291,7 @@ function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
       while hi >= lo
          v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
          if v == 0
-            if c != 0 # just insert the coefficient
+            if !iszero(c) # just insert the coefficient
                a.coeffs[lo + n] = c
             else # coefficient is zero, shift everything
                for i = lo + n:length(a) - 1
@@ -311,7 +311,7 @@ function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
       end
    end
    # exponent not found, must insert at lo
-   if c != 0
+   if !iszero(c)
       lena = length(a)
       fit!(a, lena + 1)
       A = a.exps
@@ -1038,7 +1038,7 @@ function +(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          i += 1
       elseif cmpexp == 0
          c = a.coeffs[i] + b.coeffs[j]
-         if c != 0
+         if !iszero(c)
             r.coeffs[k] = c
             monomial_set!(r.exps, k, a.exps, i, N)
          else
@@ -1085,7 +1085,7 @@ function -(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          i += 1
       elseif cmpexp == 0
          c = a.coeffs[i] - b.coeffs[j]
-         if c != 0
+         if !iszero(c)
             r.coeffs[k] = c
             monomial_set!(r.exps, k, a.exps, i, N)
          else
@@ -1142,7 +1142,7 @@ function do_merge(Ac::Vector{T}, Bc::Vector{T},
          i += 1
       elseif cmpexp == 0
          Ac[s1 + i] = addeq!(Ac[s1 + i], Ac[s2 + j])
-         if Ac[s1 + i] != 0
+         if !iszero(Ac[s1 + i])
             Bc[r + k] = Ac[s1 + i]
             monomial_set!(Be, r + k, Ae, s1 + i, N)
          else
@@ -1209,7 +1209,7 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       k = 1
       for j = 1:n
          s = Ac[sa + k] = c*b.coeffs[j]
-         if s != 0
+         if !iszero(s)
             monomial_add!(Ae, sa + k, b.exps, j, a.exps, i, N)
             k += 1
          end
@@ -1560,7 +1560,7 @@ function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElemen
             end
          end
       end
-      if Rc[k] == 0
+      if iszero(Rc[k])
          k -= 1
       end
    end
@@ -1853,7 +1853,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
          end
       end
       # if terms from heap combine to zero, remove new result term
-      if qc == 0
+      if iszero(qc)
          k -= 1
       else
          # if not, check the accumulation is divisible by leading coeff
@@ -1958,7 +1958,7 @@ function *(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    j = 1
    for i = 1:length(a)
       c = a.coeffs[i]*n
-      if c != 0
+      if !iszero(c)
          r.coeffs[j] = c
          monomial_set!(r.exps, j, a.exps, i, N)
          j += 1
@@ -1976,7 +1976,7 @@ function *(a::MPoly{T}, n::T) where {T <: RingElem}
    j = 1
    for i = 1:length(a)
       c = a.coeffs[i]*n
-      if c != 0
+      if !iszero(c)
          r.coeffs[j] = c
          monomial_set!(r.exps, j, a.exps, i, N)
          j += 1
@@ -1998,7 +1998,7 @@ function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat}; check::B
    j = 1
    for i = 1:length(a)
      c = divexact(a.coeffs[i], n; check=check)
-      if c != 0
+      if !iszero(c)
          r.coeffs[j] = c
          monomial_set!(r.exps, j, a.exps, i, N)
          j += 1
@@ -2016,7 +2016,7 @@ function divexact(a::MPoly{T}, n::T; check::Bool=true) where {T <: RingElem}
    j = 1
    for i = 1:length(a)
       c = divexact(a.coeffs[i], n; check=check)
-      if c != 0
+      if !iszero(c)
          r.coeffs[j] = c
          monomial_set!(r.exps, j, a.exps, i, N)
          j += 1
@@ -2264,7 +2264,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
             largest[v.i] = v.j + 1
          end
       end
-      if C != 0
+      if !iszero(C)
          temp = divexact(C, from_exp(R, exp_copy, 1, N) - kp1f1)
          SS = addeq!(SS, temp)
          gc[gnext] = divexact(temp, f.coeffs[1])
@@ -2279,14 +2279,14 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
             largest[2] = gnext
          end
       end
-      if SS != 0
+      if !iszero(SS)
          Rc[rnext] = SS
          monomial_add!(Re, rnext, ge, gnext, f.exps, 1, N)
          SS = R()
       else
          rnext -= 1
       end
-      if C == 0
+      if iszero(C)
          gnext -= 1
       end
    end
@@ -2334,7 +2334,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       return deepcopy(a)
    elseif b == 2
       return a*a
-   elseif characteristic(base_ring(a)) != 0
+   elseif !iszero(characteristic(base_ring(a)))
       # pow_fps requires char 0 so use pow_rmul if not or unsure
       return pow_rmul(a, b)
    else
@@ -2753,7 +2753,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
             k -= 1
          else
             tq, tr = divrem(qc, mb)
-            if tq != 0
+            if !iszero(tq)
                Qc[k] = tq
                monomial_set!(Qe, k, texp, 1, N)
                for i = 2:s
@@ -2969,7 +2969,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
             k -= 1
          else
             tq, tr = divrem(qc, mb)
-            if tr != 0
+            if !iszero(tr)
                l += 1
                if l >= r_alloc
                   r_alloc *= 2
@@ -2979,7 +2979,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
                Rc[l] = -tr
                monomial_set!(Re, l, exp_copy, 1, N)
             end
-            if tq != 0
+            if !iszero(tq)
                Qc[k] = tq
                monomial_set!(Qe, k, texp, 1, N)
                for i = 2:s
@@ -3183,14 +3183,14 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Vector{MPoly{T}}, bits::Int) wher
             push!(reuse, xn)
          end
       end
-      if qc != 0
+      if !iszero(qc)
          div_flag = false
          for w = 1:len
             d1 = monomial_divides!(texp, 1, exp_copy, 1, b[w].exps, 1, mask, N)
             if d1
                tq, qc = divrem(qc, mb[w])
                div_flag = qc == 0
-               if tq != 0
+               if !iszero(tq)
                   k[w] += 1
                   if k[w] > q_alloc[w]
                      q_alloc[w] *= 2
@@ -3996,7 +3996,7 @@ function combine_like_terms!(a::MPoly{T}) where T <: RingElement
          c += a.coeffs[i]
          i += 1
       end
-      if c != 0
+      if !iszero(c)
          j += 1
          a.coeffs[j] = c
          monomial_set!(A, j, A, k, N)
