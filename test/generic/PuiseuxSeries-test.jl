@@ -642,6 +642,46 @@ end
 
       @test isapprox(sqrt(g)^2, g)
    end
+
+   # Characteristic p field
+   for p in [2, 7, 19, 65537, ZZ(7), ZZ(19), ZZ(65537)]
+      R = ResidueField(ZZ, p)
+
+      S, x = PuiseuxSeriesField(R, 10, "x")
+
+      for iter = 1:10
+          f = rand(S, -12:12, 1:6, 0:Int(p))
+
+          s = f^2
+
+          @test issquare(s)
+
+          q = sqrt(s)
+
+          @test q^2 == s
+
+          q = sqrt(s; check=false)
+
+          @test q^2 == s
+
+          f1, s1 = issquare_with_sqrt(s)
+
+          @test f1 && s1^2 == s
+      end
+   end
+
+   R = ResidueField(ZZ, 2)
+   T, y = PolynomialRing(R, "x")
+
+   S, x = LaurentSeriesRing(T, 10, "x")
+
+   f = x + x^(3//2) + x^2 + x^(5//2) +O(x^6)
+
+   @test issquare(f^2)
+
+   f = x + x^(3//2) + y*x^2 + 7*x^(5//2) +O(x^6)
+
+   @test_throws ErrorException sqrt(f)
 end
 
 @testset "Generic.PuiseuxSeries.exact_division" begin
