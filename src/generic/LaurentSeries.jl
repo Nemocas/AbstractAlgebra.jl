@@ -1224,13 +1224,13 @@ end
 function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
    S = parent(a)
    R = base_ring(a)
-   aval = valuation(a)
-   if check && !iseven(aval)
-      return false, S()
-   end
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    if characteristic(R) == 2
       return sqrt_classical_char2(a, check=check)
+   end
+   aval = valuation(a)
+   if check && !iseven(aval)
+      return false, S()
    end
    aval2 = div(aval, 2)
    prec = precision(a) - aval

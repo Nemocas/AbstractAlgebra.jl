@@ -830,6 +830,10 @@ end
 
     @test_throws ErrorException sqrt(f)
 
+    f = x^2 + x^3
+
+    @test_throws ErrorException sqrt(f)
+
     f = x + y^4*x^4 + (y^4 + y^2 + 1)*x^8 + O(x^11)
 
     @test_throws ErrorException sqrt(f)
