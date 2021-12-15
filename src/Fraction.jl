@@ -637,6 +637,19 @@ function Base.sqrt(a::FracElem{T}; check::Bool=true) where T <: RingElem
    return parent(a)(sqrt(numerator(a); check=check), sqrt(denominator(a); check=check))
 end
 
+function issquare_with_sqrt(a::FracElem{T}) where T <: RingElem
+   S = parent(a)
+   f1, s1 = issquare_with_sqrt(numerator(a))
+   if !f1
+      return false, zero(S)
+   end
+   f2, s2 = issquare_with_sqrt(denominator(a))
+   if !f2
+      return false, zero(S)
+   end
+   return true, s1//s2
+end
+
 ###############################################################################
 #
 #   GCD
