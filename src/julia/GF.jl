@@ -279,6 +279,79 @@ divides(a::GFElem{T}, b::GFElem{T}) where T <: Integer = true, divexact(a, b)
 
 ###############################################################################
 #
+#   Square root
+#
+###############################################################################
+
+# helper function, computes Legendre symbol
+# assumes p is an odd prime and a is in range [0, p)
+legendre(a::T, p::T) where T <: Integer = powermod(a, div(p - 1, 2), p)
+
+# Tonelli-Shanks algorithm for square root modulo a prime p
+function sqrt_tonelli_shanks(a::GFElem{T}; check::Bool=true) where T <: Integer
+   R = parent(a)
+   p = R.p
+   if p == 2 || iszero(a)
+      return true, a
+   end
+   n = a.d
+   if check && legendre(n, p) != 1
+      return false, zero(R)
+   end
+   q = p - 1
+   s = T(trailing_zeros(q))
+   q = div(q, T(1) << s)
+   if isone(s)
+      r = powermod(n, div(p + 1, 4), p)
+      return true, r
+   end
+   # find a quadratic nonresidue mod p
+   z = T(2)
+   while z < p
+      if legendre(z, p) == p - 1
+         break
+      end
+      z += 1
+   end
+   c = powermod(z, q, p)
+   r = powermod(n, div(q + 1, 2), p)
+   t = powermod(n, q, p)
+   m = s
+   t2 = zero(R)
+   while !isone(t)
+      t2 = mulmod(t, t, p)
+      for i in T(1):m
+         if isone(t2)
+            break
+         end
+         t2 = mulmod(t2, t2, p)
+      end
+      b = powermod(c, 1 << (m - i - 1), p)
+      r = mulmod(r, b, p)
+      c = mulmod(b, b, p)
+      t = mulmod(t, c, p)
+      m = i
+   end
+   return true, r
+end
+
+function Base.sqrt(a::GFElem{T}; check::Bool=true) where T <: Integer
+   f1, s1 = sqrt_tonelli_shanks(a; check=check)
+   check && !f1 && error("Not a square in sqrt")
+   return s1
+end
+
+function issquare(a::GFElem{T}) where T <: Integer
+   f1, s1 = sqrt_tonelli_shanks(a; check=true)
+   return f1
+end
+
+function issquare_with_sqrt(a::GFElem{T}) where T <: Integer
+   return sqrt_tonelli_shanks(a; check=true)
+end
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################
