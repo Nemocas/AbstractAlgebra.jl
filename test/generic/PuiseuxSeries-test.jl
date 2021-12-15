@@ -673,7 +673,7 @@ end
    R = ResidueField(ZZ, 2)
    T, y = PolynomialRing(R, "x")
 
-   S, x = LaurentSeriesRing(T, 10, "x")
+   S, x = PuiseuxSeriesRing(T, 10, "x")
 
    f = x + x^(3//2) + x^2 + x^(5//2) +O(x^6)
 
