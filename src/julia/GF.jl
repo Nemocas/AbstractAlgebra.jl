@@ -320,11 +320,13 @@ function sqrt_tonelli_shanks(a::GFElem{T}; check::Bool=true) where T <: Integer
    t2 = zero(R)
    while !isone(t)
       t2 = mulmod(t, t, p)
-      for i in T(1):m
+      i = T(1)
+      while i <= m
          if isone(t2)
             break
          end
          t2 = mulmod(t2, t2, p)
+         i += 1
       end
       b = powermod(c, 1 << (m - i - 1), p)
       r = mulmod(r, b, p)

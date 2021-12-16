@@ -283,6 +283,37 @@ end
    end
 end
 
+@testset "Julia.GFElem.square_root" begin
+   for p in  [2, 7, 19, 65537, 1073741827, ZZ(2), ZZ(7), ZZ(19), ZZ(65537), ZZ(1073741827)]
+      R = GF(p)
+
+      z = rand(R)
+      if p != 2
+         while issquare(z)
+            z = rand(R)
+         end
+      end
+
+      for i = 1:1000
+          a = rand(R)
+
+          f1, s = issquare_with_sqrt(a^2)
+
+          @test f1 && s^2 == a^2
+
+          @test issquare(a^2)
+
+          @test sqrt(a^2)^2 == a^2
+
+          if p != 2 && !iszero(a)
+             @test !issquare(z*a^2)
+
+             @test_throws ErrorException sqrt(z*a^2)
+          end 
+       end
+   end
+end
+
 @testset "Julia.GFElem.iteration" begin
    for n = [2, 3, 5, 13, 31]
       R = GF(n)
