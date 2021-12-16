@@ -23,10 +23,17 @@ module Tmp
     struct NotSupported
         x::Int
     end
+
+    # To have the :curly in the expression
+    mutable struct FooBar{T}
+        x::Int
+    end
+    @attributes Tmp.FooBar{Bar}
 end
 
 # test @attributes applied to a struct typename in another module
 @attributes Tmp.Quux
+@attributes Tmp.FooBar{Tmp.Quux}
 
 @testset "@attributes input validation" begin
 
@@ -106,7 +113,7 @@ end
 
 end
 
-@testset "attributes for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux)
+@testset "attributes for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux, Tmp.FooBar{Tmp.Bar}, Tmp.FooBar{Tmp.Quux})
 
     # test querying attributes when no attribute storage exists
     x = T(1)
