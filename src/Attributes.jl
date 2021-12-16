@@ -84,12 +84,16 @@ macro attributes(expr)
         Base.@__doc__($(esc(expr)))
       end
    elseif expr isa Symbol || (expr isa Expr && expr.head === :. &&
-                              length(expr.args) == 2 && expr.args[2] isa QuoteNode)
+                              length(expr.args) == 2 && expr.args[2] isa QuoteNode) ||
+                              (expr isa Expr && expr.head === :curly &&
+                                expr.args[1] isa Symbol || (expr.args[1] isa Expr && expr.args[1].head === :. &&
+                                length(expr.args[1].args) == 2 && expr.args[1].args[2] isa QuoteNode))
       # Handle the following usage:
       #    @attributes Type
       #    @attributes Module.Type
       #    @attributes Module.Submodule.Type
       #    etc.
+      #    @attributes [Module[.Submodule].]Type{T}
       return esc(quote
          # do nothing if the type already has storage for attributes
          if !AbstractAlgebra._is_attribute_storing_type($expr)
