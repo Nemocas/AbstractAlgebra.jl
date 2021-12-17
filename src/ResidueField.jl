@@ -296,7 +296,7 @@ inverse is encountered, an exception is raised.
 """
 function Base.inv(a::ResFieldElem)
    g, ainv = gcdinv(data(a), modulus(a))
-   if g != 1
+   if !isone(g)
       error("Impossible inverse in inv")
    end
    return parent(a)(ainv)

@@ -4155,7 +4155,7 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
          continue
       end
       cu = canonical_unit(H[k, i])
-      if cu != 1
+      if !isone(cu)
          for c = i:n
             H[k, c] = divexact(H[k, c], cu)
         end
@@ -4539,7 +4539,7 @@ end
 # Multiplies row r by a unit such that the entry H[r, c] is "canonical"
 function kb_canonical_row!(H, U, r::Int, c::Int, with_trafo::Bool)
    cu = canonical_unit(H[r, c])
-   if cu != 1
+   if !isone(cu)
       for j = c:ncols(H)
          H[r, j] = divexact(H[r, j], cu)
       end
@@ -5402,7 +5402,7 @@ function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T
       end
       r = pivots[i][1]
       cu = canonical_unit(P[r, i])
-      if cu != 1
+      if !isone(cu)
          for j = 1:n
             P[r, j] = divexact(P[r, j], cu)
          end
