@@ -532,7 +532,7 @@ function ^(a::PuiseuxSeriesElem{T}, b::Int) where T <: RingElement
 end
 
 function ^(a::PuiseuxSeriesElem{T}, b::Rational{Int}) where T <: RingElement
-   (pol_length(a.data) != 1 || polcoeff(a.data, 0) != 1) && error("Rational power not implemented")
+   (pol_length(a.data) != 1 || !isone(polcoeff(a.data, 0)) && error("Rational power not implemented")
    z = parent(a)(a.data^numerator(b), a.scale*denominator(b))
    z = rescale!(z)
    return z

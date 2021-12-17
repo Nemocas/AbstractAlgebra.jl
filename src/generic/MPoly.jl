@@ -639,7 +639,7 @@ function isgen(x::MPoly{T}) where {T <: RingElement}
    if length(x) != 1
       return false
    end
-   if coeff(x, 1) != 1
+   if !isone(coeff(x, 1))
       return false
    end
    return isgen(x, Val{parent(x).ord})
