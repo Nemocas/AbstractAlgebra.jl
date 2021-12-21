@@ -180,7 +180,7 @@ end
 Return the value stored for the attribute `attr` of `G, or if no value has been set,
 store `key => f()` and return `f()`.
 """
-function get_attribute!(f::Function, G::Any, attr::Symbol)
+function get_attribute!(f, G::Any, attr::Symbol)
    D = _get_attributes!(G)
    return Base.get!(f, D, attr)
 end

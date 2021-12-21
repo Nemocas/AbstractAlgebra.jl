@@ -106,4 +106,9 @@ end
     @test get_attribute!(() -> 42, x, :bar7) == 0
     @test get_attribute(x, :bar7) == 0
 
+    # test get_attribute! with callback a type
+    @test get_attribute(x, :bar8) == nothing
+    @test get_attribute!(Vector{Int}, x, :bar8) isa Vector{Int}
+    @test get_attribute(x, :bar8) == []
+
 end
