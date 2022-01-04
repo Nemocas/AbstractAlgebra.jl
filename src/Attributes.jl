@@ -177,7 +177,7 @@ end
 """
     get_attribute!(f::Function, G::Any, attr::Symbol)
 
-Return the value stored for the attribute `attr` of `G, or if no value has been set,
+Return the value stored for the attribute `attr` of `G`, or if no value has been set,
 store `key => f()` and return `f()`.
 """
 function get_attribute!(f, G::Any, attr::Symbol)
