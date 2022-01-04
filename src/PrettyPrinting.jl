@@ -155,14 +155,7 @@ end
 #        Expr(:hcat, a, b)       => a b
 
 
-# generic fallback in case expressify is not defined
-function expressify(@nospecialize(a); context = nothing)::String
-    s = sprint(print, a; context = context)::String
-    if needs_parentheses(a)::Bool
-        return "(" * s * ")"
-    else
-        return s
-    end
+function expressify
 end
 
 # Only when AbstractAlgebra.expressify(a::T; context = nothing) has been

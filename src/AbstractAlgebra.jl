@@ -494,7 +494,7 @@ export abs_series, abs_series_type,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx,
                  mul_ks, mul_red!, mullow_karatsuba, mulmod,
-                 needs_parentheses, newton_to_monomial!, ngens,
+                 newton_to_monomial!, ngens,
                  normal_form, normalise, nullspace, num_coeff,
                  one, order, ordering,
                  parent_type, parity, partitionseq, Perm, perm, permtype,
@@ -518,9 +518,6 @@ export abs_series, abs_series_type,
                  divexact_low, divhigh,
                  ismonic, Loc, Localization, LocElem, mulhigh_n,
                  PolyCoeffs, roots, sturm_sequence
-
-# TODO remove these two once removed from dependent packages (Hecke)
-export displayed_with_minus_in_front, show_minus_one
 
 ################################################################################
 #
@@ -743,22 +740,7 @@ include("algorithms/DensePoly.jl")
 #
 ###############################################################################
 
-needs_parentheses(x) = false
-
 function isnegative end
-
-# TODO remove these two once removed from dependent packages (Hecke)
-@noinline function displayed_with_minus_in_front(x)
-  Base.depwarn("This function is deprecated",
-               :displayed_with_minus_in_front)
-  return string(x)[1] == "-"
-end
-
-@noinline function show_minus_one(x)
-  Base.depwarn("This function is deprecated",
-               :show_minus_one)
-  return true
-end
 
 ###############################################################################
 #
