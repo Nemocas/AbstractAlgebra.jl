@@ -3,6 +3,16 @@ using AbstractAlgebra: terms_degrees, LaurentPolyElem
 using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
                                trail_degree, lead_degree
 
+function test_elem(R::LaurentPolyWrapRing)
+   n = rand(0:10)
+   if n == 0
+      return zero(R)
+   else
+      m = rand(0:5)
+      rand(R, -m:n-m, -99:99)
+   end
+end
+
 @testset "Generic.LaurentPoly" begin
    @testset "constructors" begin
       L0, y0 = LaurentPolynomialRing(zz, "y0")
@@ -467,15 +477,6 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "conformance" begin
       L, y = LaurentPolynomialRing(QQ, "y")
-      function Main.test_elem(R::typeof(L))
-         n = rand(0:10)
-         if n == 0
-            return zero(R)
-         else
-            m = rand(0:5)
-            rand(R, -m:n-m, -99:99)
-         end
-      end
       test_Ring_interface(L)
       test_EuclideanRing_interface(L)
       test_Ring_interface_recursive(L)
