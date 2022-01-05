@@ -15,7 +15,9 @@ import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type
 import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
              deepcopy_internal, hash
 
-import Main: test_Ring_interface, test_EuclideanRing_interface, test_elem
+import ..test_Ring_interface
+import ..test_EuclideanRing_interface
+import ..test_elem
 
 mutable struct ConstPolyRing{T <: RingElement} <: Ring
    base_ring::Ring
