@@ -156,6 +156,7 @@ end
 
 
 function expressify
+   return sprint(print, a; context = context)::String
 end
 
 # Only when AbstractAlgebra.expressify(a::T; context = nothing) has been
