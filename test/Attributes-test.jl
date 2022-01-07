@@ -84,6 +84,17 @@ end
     @test get_attribute(x, :bar3, 42) == 0
     @test get_attribute(x, :bar3) == 0
 
+    # test get_attribute with callback for new entry
+    @test get_attribute(x, :bar8) == nothing
+    @test get_attribute(() -> 42, x, :bar8) == 42
+    @test get_attribute(x, :bar8) == nothing
+
+    # test get_attribute with callback for pre-existing entry
+    set_attribute!(x, :bar9 => 0)
+    @test get_attribute(x, :bar9) == 0
+    @test get_attribute(() -> 42, x, :bar9) == 0
+    @test get_attribute(x, :bar9) == 0
+
     # test get_attribute! with default value for new entry
     @test get_attribute(x, :bar4) == nothing
     @test get_attribute!(x, :bar4, 42) == 42

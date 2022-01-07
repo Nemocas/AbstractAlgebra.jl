@@ -163,6 +163,27 @@ function has_attribute(G::Any, attr::Symbol)
 end
 
 """
+    get_attribute(f::Function, G::Any, attr::Symbol)
+
+Return the value stored for the attribute `attr`, or if no value has been set,
+return `f()`.
+
+This is intended to be called using `do` block syntax.
+
+```julia
+get_attribute(obj, attr) do
+    # default value calculated here if needed
+    ...
+end
+```
+"""
+function get_attribute(f, G::Any, attr::Symbol)
+   D = _get_attributes(G)
+   D isa Dict && return get(f, D, attr)
+   return f()
+end
+
+"""
     get_attribute(G::Any, attr::Symbol, default::Any = nothing)
 
 Return the value stored for the attribute `attr`, or if no value has been set,
@@ -179,6 +200,15 @@ end
 
 Return the value stored for the attribute `attr` of `G`, or if no value has been set,
 store `key => f()` and return `f()`.
+
+This is intended to be called using `do` block syntax.
+
+```julia
+get_attribute!(obj, attr) do
+    # default value calculated here if needed
+    ...
+end
+```
 """
 function get_attribute!(f, G::Any, attr::Symbol)
    D = _get_attributes!(G)
