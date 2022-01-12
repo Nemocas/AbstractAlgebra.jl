@@ -123,3 +123,48 @@ end
     @test get_attribute(x, :bar8) == []
 
 end
+
+
+# attribute caching
+
+
+uncached_attr(obj::T) where T = [obj,T]
+
+"""
+    cached_attr(obj::T) where T
+
+A cached attribute.
+"""
+@attr cached_attr(obj::T) where T = [obj,T]
+
+@testset "attribute caching for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux, Tmp.FooBar{Tmp.Bar}, Tmp.FooBar{Tmp.Quux})
+
+    x = T()
+
+    # check uncached case: multiple calls return equal but not identical results
+    y = uncached_attr(x)
+    @test y == [x,T]
+    @test uncached_attr(x) == y
+    @test uncached_attr(x) !== y
+
+    # check cached case: multiple calls return identical results
+    y = cached_attr(x)
+    @test y == [x,T]
+    @test cached_attr(x) == y
+    @test cached_attr(x) === y
+
+    # verify docstring is correctly attached
+    @test string(@doc cached_attr) ==
+        """
+        ```
+        cached_attr(obj::T) where T
+        ```
+
+        A cached attribute.
+        """
+
+    # test function location is tracked accurately (this requires that the
+    # definition of uncached_attr is before that of cached_attr)
+    @test functionloc(uncached_attr)[1] == functionloc(cached_attr)[1]
+    @test functionloc(uncached_attr)[2] < functionloc(cached_attr)[2]
+end
