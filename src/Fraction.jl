@@ -114,9 +114,9 @@ function expressify(a::FracElem; context = nothing)
     n = numerator(a, true)
     d = denominator(a, true)
     if isone(d)
-        return expressify(n)
+        return expressify(n; context)
     else
-        return Expr(:call, ://, expressify(n), expressify(d))
+        return Expr(:call, ://, expressify(n; context), expressify(d; context))
     end
 end
 

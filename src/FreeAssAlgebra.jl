@@ -67,7 +67,7 @@ end
 
 function expressify(a::FreeAssAlgebra; context = nothing)
    return Expr(:sequence, Expr(:text, "Free associative algebra over "),
-                          expressify(base_ring(a)),
+                          expressify(base_ring(a); context = context),
                           Expr(:text, " on "),
                           Expr(:series, symbols(a)...))
 end

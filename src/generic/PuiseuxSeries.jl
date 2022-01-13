@@ -302,7 +302,7 @@ function AbstractAlgebra.expressify(a::PuiseuxSeriesElem,
         end
     end
     expo = precision(b)//den
-    push!(sum.args, Expr(:call, :O, Expr(:call, :^, x, expressify(expo))))
+    push!(sum.args, Expr(:call, :O, Expr(:call, :^, x, expressify(expo; context))))
     return sum
 end
 
