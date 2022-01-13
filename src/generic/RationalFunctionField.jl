@@ -132,7 +132,7 @@ canonical_unit(a::Rat) = a
 
 function AbstractAlgebra.expressify(a::Rat; context = nothing)
    d = data(a)
-   return expressify(d)
+   return expressify(d; context)
 end
 
 function show(io::IO, ::MIME"text/plain", a::Rat)
