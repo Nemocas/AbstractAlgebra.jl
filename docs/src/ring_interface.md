@@ -353,8 +353,16 @@ the following method should be implemented.
 expressify(f::MyElem; context = nothing)
 ```
 
-which must return either `Expr`, `Symbol`, `Integer` or `String`. In case one
-implements `expressify`, one can define the following show methods for `MyElem`:
+which must return either `Expr`, `Symbol`, `Integer` or `String`.
+
+For a type which implements  `expressify`, one can automatically derive `show` methods
+supporting output as plain text, LaTeX and `html` by using the following:
+
+```julia
+@enable_all_show_via_expressify MyElem
+```
+
+This defines the following show methods for the specified type `MyElem`:
 
 ```julia
 function Base.show(io::IO, a::MyElem)
@@ -391,6 +399,10 @@ function expressify(f::MyElem; context = nothing)
                          expressify(f.b, context = context))
 end
 ```
+
+For further information about this, please consult the comments in the
+implementation in `src/PrettyPrinting.jl`.
+
 
 ### Unary operations
 
