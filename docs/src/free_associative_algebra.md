@@ -33,7 +33,7 @@ characteristic(R::FreeAssAlgebra)
 ## Free algebra constructors
 
 ```julia
-FreeAssociativeAlgebra(R::Ring, s::Union{Vector{String}, Vector{Char}, Vector{Symbol}}; cached::Bool = true)
+FreeAssociativeAlgebra(R::Ring, s::Union{AbstractVector{<:AbstractString}, AbstractVector{Symbol}, AbstractVector{Char}}; cached::Bool = true)
 FreeAssociativeAlgebra(R::Ring, n::Int, s::Union{String, Char, Symbol}; cached::Bool = false)
 ```
 
