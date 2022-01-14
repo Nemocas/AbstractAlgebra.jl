@@ -174,8 +174,8 @@ end
 
 function FreeAssociativeAlgebra(
    R::AbstractAlgebra.Ring,
-   s::Vector{T};
-   cached::Bool = true) where T <: Union{String, Char}
+   s::Union{Vector{String}, Vector{Char}};
+   cached::Bool = true)
 
    S = [Symbol(v) for v in s]
    return Generic.FreeAssociativeAlgebra(R, S, cached=cached)
