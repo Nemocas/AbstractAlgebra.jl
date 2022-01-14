@@ -303,9 +303,12 @@ function word_gt(a::Vector{Int}, b::Vector{Int})
 end
 
 function sort_terms!(z::FreeAssAlgElem{T}) where T
-   p = sortperm(z.exps, lt = word_gt)
-   z.coeffs = [z.coeffs[p[i]] for i in 1:length(p)]
-   z.exps = [z.exps[p[i]] for i in 1:length(p)]
+   n = length(z)
+   if n > 1
+      p = sortperm(view(z.exps, 1:n), lt = word_gt)
+      z.coeffs = [z.coeffs[p[i]] for i in 1:n]
+      z.exps = [z.exps[p[i]] for i in 1:n]
+   end
    return z
 end
 
