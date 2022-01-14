@@ -85,9 +85,12 @@
       @test leading_term(f1) == leading_coefficient(f1)*leading_monomial(f1)
       @test total_degree(f1) >= total_degree(f1 - leading_term(f1))
 
+      @test !isgen(zero(S))
+      @test !isgen(one(S))
       for i in 1:num_vars
          g = gen(S, i)
          @test isgen(g)
+         @test !isgen(g + 1)
          @test leading_exponent_word(g) == [i]
       end
 
