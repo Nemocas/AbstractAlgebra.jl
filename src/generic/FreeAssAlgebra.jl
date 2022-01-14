@@ -275,9 +275,9 @@ end
 function ==(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T
    fl = check_parent(a, b, false)
    !fl && return false
-   return (a.length == b.length) && 
-          (view(a.coeffs, 1:a.length) == view(b.coeffs, 1:b.length)) &&
-          (view(a.exps, 1:a.length) == view(b.exps, 1:b.length))
+   return a.length == b.length && 
+          view(a.exps, 1:a.length) == view(b.exps, 1:b.length) &&
+          view(a.coeffs, 1:a.length) == view(b.coeffs, 1:b.length)
 end
 
 function word_cmp(a::Vector{Int}, b::Vector{Int})
