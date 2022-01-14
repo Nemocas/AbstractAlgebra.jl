@@ -196,6 +196,10 @@ function leading_term(a::FreeAssAlgElem{T}) where T
    return a.length > 0 ? term(a, 1) : a
 end
 
+function leading_exponent_word(a::FreeAssAlgElem{T}) where T
+    return exponent_word(a, 1)
+end
+
 function total_degree(a::FreeAssAlgElem{T}) where T
    # currently stored in dexlex
    return length(a) > 0 ? length(a.exps[1]) : -1

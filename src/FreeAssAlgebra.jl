@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export exponent_words, FreeAssociativeAlgebra
+export exponent_words, FreeAssociativeAlgebra, leading_exponent_word
 
 ###############################################################################
 #

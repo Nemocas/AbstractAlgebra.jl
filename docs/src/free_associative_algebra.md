@@ -118,6 +118,7 @@ provide the first such term.
 leading_coefficient(a::FreeAssAlgElem)
 leading_monomial(a::FreeAssAlgElem)
 leading_term(a::FreeAssAlgElem)
+leading_exponent_word(a::FreeAssAlgElem)
 ```
 
 For types that allow constant time access to coefficients, the following are
