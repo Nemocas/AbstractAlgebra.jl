@@ -161,15 +161,18 @@ end
 ###############################################################################
 
 function coeff(a::FreeAssAlgElem, i::Int)
+   0 < i <= length(a) || error("index out of range")
    return a.coeffs[i]
 end
 
 function term(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
+   0 < i <= length(a) || error("index out of range")
    R = parent(a)
    return FreeAssAlgElem{T}(R, [a.coeffs[i]], [a.exps[i]], 1)
 end
 
 function monomial(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
+   0 < i <= length(a) || error("index out of range")
    R = parent(a)
    return FreeAssAlgElem{T}(R, T[one(base_ring(R))], [a.exps[i]], 1)
 end
@@ -253,7 +256,8 @@ for T in [RingElem, Integer, Rational, AbstractFloat]
 end
 
 function set_exponent_word!(a::FreeAssAlgElem{T}, i::Int, w::Vector{Int}) where T <: RingElement
-   all(i -> (i <= nvars(parent(a))), w) || error("variable index out of range")
+   n = nvars(parent(a))
+   all(x -> 0 < x <= n, w) || error("variable index out of range")
    fit!(a, i)
    a.exps[i] = w
    if i > length(a)
