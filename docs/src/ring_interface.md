@@ -400,8 +400,58 @@ function expressify(f::MyElem; context = nothing)
 end
 ```
 
-For further information about this, please consult the comments in the
-implementation in `src/PrettyPrinting.jl`.
+As noted above, expressify should return an `Expr`, `Symbol`, `Integer` or
+`String`. The rendering of such expressions with a particular MIME type to an
+output context is controlled by the following rules which are subject to change
+slightly in future versions of AbstracAlgebra.
+
+`Integer`: The printing of integers is straightforward and automatically
+includes transformations such as `1 + (-2)*x => 1 - 2*x` as this is cumbersome
+to implement per-type.
+
+`Symbol`: Since variable names are stored as mere symbols in AbstractAlgebra,
+some transformations related to subscripts are applied to symbols automatically
+in latex output. The `\operatorname{` in the following table is actually
+replaced with the more portable `\mathop{\mathrm{`.
+
+expressify             | latex output
+:----------------------|:-----------------------------
+`Symbol("a")`          | `a`
+`Symbol("α")`          | `{\alpha}`
+`Symbol("x1")`         | `\operatorname{x1}`
+`Symbol("xy_1")`       | `\operatorname{xy}_{1}`
+`Symbol("sin")`        | `\operatorname{sin}`
+`Symbol("sin_cos")`    | `\operatorname{sin\_cos}`
+`Symbol("sin_1")`      | `\operatorname{sin}_{1}`
+`Symbol("sin_cos_1")`  | `\operatorname{sin\_cos}_{1}`
+`Symbol("αaβb_1_2")`   | `\operatorname{{\alpha}a{\beta}b}_{1,2}`
+
+`Expr`: These are the most versatile as the `Expr` objects themselves contain
+a symbolic head and any number of arguments. What looks like `f(a,b)` in textual
+output is `Expr(:call, :f, :a, :b)` under the hood. AbstractAlgebra currently
+contains the following printing rules for such expressions.
+
+expressify                 | output    | latex notes
+:--------------------------|:----------|:------------
+`Expr(:call, :+, a, b)`    | `a + b`   |
+`Expr(:call, :*, a, b)`    | `a*b`     | one space for implied multiplication
+`Expr(:call, :cdot, a, b)` | `a * b`   | a real `\cdot` is used
+`Expr(:call, :^, a, b)`    | `a^b`     | may include some courtesy parentheses
+`Expr(:call, ://, a, b)`   | `a//b`    | will create a fraction box
+`Expr(:call, :/, a, b)`    | `a/b`     | will not create a fraction box
+`Expr(:call, a, b, c)`     | `a(b, c)` |
+`Expr(:ref, a, b, c)`      | `a[b, c]` |
+`Expr(:vcat, a, b)`        | `[a; b]`  | actually vertical
+`Expr(:vect, a, b)`        | `[a, b]`  |
+`Expr(:tuple, a, b)`       | `(a, b)`  |
+`Expr(:list, a, b)`        | `{a, b}`  |
+`Expr(:series, a, b)`      | `a, b`    |
+`Expr(:sequence, a, b)`    | `ab`      |
+`Expr(:row, a, b)`         | `a b`     | combine with `:vcat` to make matrices
+`Expr(:hcat, a, b)`        | `a b`     |
+
+`String`: Strings are printed verbatim and should only be used as a last resort
+as they provide absolutely no precedence information on their contents.
 
 
 ### Unary operations
