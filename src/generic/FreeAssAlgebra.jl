@@ -74,7 +74,7 @@ function iszero(a::FreeAssAlgElem{T}) where T
 end
 
 function isone(a::FreeAssAlgElem{T}) where T
-   if length(a) == 0
+   if length(a) < 1
       return isone(zero(base_ring(a)))
    else
       return a.length == 1 && isone(a.coeffs[1]) && isempty(a.exps[1])
@@ -90,6 +90,14 @@ end
 
 function gens(a::FreeAssAlgebra{T}) where {T <: RingElement}
    return [gen(a, i) for i in 1:nvars(a)]
+end
+
+function isgen(a::FreeAssAlgElem{T}) where T
+    if length(a) < 1
+        return iszero(one(base_ring(a)))
+    else
+      return a.length == 1 && isone(a.coeffs[1]) && length(a.exps[1]) == 1
+    end
 end
 
 # BOGUS

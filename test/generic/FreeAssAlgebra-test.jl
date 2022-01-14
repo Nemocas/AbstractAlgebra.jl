@@ -86,7 +86,9 @@
       @test total_degree(f1) >= total_degree(f1 - leading_term(f1))
 
       for i in 1:num_vars
-         @test leading_exponent_word(gen(S, i)) == [i]
+         g = gen(S, i)
+         @test isgen(g)
+         @test leading_exponent_word(g) == [i]
       end
 
       @test collect(exponent_words(varlist[1] + 1)) == [Int[1], Int[]]
