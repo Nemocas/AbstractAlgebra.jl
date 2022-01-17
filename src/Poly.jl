@@ -272,7 +272,7 @@ function isterm_recursive(a::PolynomialElem)
 end
 
 @doc Markdown.doc"""
-    ismonomial_recursive(a::PolynomialElem)
+    ismonomial(a::PolynomialElem)
 
 Return `true` if the given polynomial is a monomial.
 """
