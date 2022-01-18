@@ -74,6 +74,8 @@
 
       C = MPolyBuildCtx(S)
 
+      @test_throws push_term!(C, one(base_ring(S)), zeros(Int, num_vars + 1))
+
       for i = 1:5
          push_term!(C, V[i], W1[i])
       end

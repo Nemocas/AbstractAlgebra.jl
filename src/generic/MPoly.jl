@@ -3854,6 +3854,9 @@ function show(io::IO, M::MPolyBuildCtx)
 end
 
 function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
+   if T <: AbstractAlgebra.MPolyElem && length(expv) != nvars(parent(M.poly))
+      error("length of exponent vector should match the number of variables")
+   end
    if iszero(c)
       return M
    end
