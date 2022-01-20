@@ -99,6 +99,17 @@ than the length, even for constant polynomials.
 """
 degree(a::PolynomialElem) = length(a) - 1
 
+
+@doc Markdown.doc"""
+    isconstant(a::PolynomialElem)
+
+Return `true` if `a` is a degree zero polynomial or the zero polynomial, i.e.
+a constant polynomial.
+"""
+function isconstant(a::PolynomialElem)
+   return length(a) <= 1
+end
+
 @doc Markdown.doc"""
     modulus(a::PolyElem{T}) where {T <: ResElem}
 
@@ -373,6 +384,17 @@ end
 #  Iterators
 #
 ###############################################################################
+
+@doc Markdown.doc"""
+    exponent_vectors(a::AbstractAlgebra.PolyElem)
+
+Return an iterator for the exponent vectors of the given polynomial. The
+exponent vectors will have length 1 and may correspond to terms with zero
+coefficient but will not give exponents higher than the degree.
+"""
+function exponent_vectors(a::AbstractAlgebra.PolyElem)
+   return Generic.MPolyExponentVectors(a)
+end
 
 struct PolyCoeffs{T <: RingElement}
    f::T

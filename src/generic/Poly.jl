@@ -269,7 +269,61 @@ function add!(c::Poly{T}, a::Poly{T}, b::Poly{T}) where T <: RingElement
    c = set_length!(c, normalise(c, len))
    return c
 end
- 
+
+###############################################################################
+#
+#   Iterators
+#
+###############################################################################
+
+function Base.iterate(a::Generic.MPolyExponentVectors{T}, st::Int = -1) where T <: AbstractAlgebra.PolyElem
+   st += 1
+   if st > degree(a.poly)
+       return nothing
+   else
+       return Int[st], st
+   end
+end
+
+###############################################################################
+#
+#   Build context
+#
+###############################################################################
+
+# used to provide a uniform interface to build ctxs for poly and mpoly
+mutable struct PolyBuildCtx{T, S}
+   poly::Vector{T}
+   parent::S
+end
+
+# TODO the MPolyBuildCtx function should be renamed BuildCtx
+function MPolyBuildCtx(R::AbstractAlgebra.PolyRing)
+   T = elem_type(coefficient_ring(R))
+   S = typeof(R)
+   return PolyBuildCtx{T, S}(T[], R)
+end
+
+function push_term!(B::PolyBuildCtx{T, S}, c::T, expv::Vector{Int}) where {S, T}
+   if length(expv) != 1
+      error("length of exponent vector should match the number of variables")
+   end
+   i = expv[1] + 1
+   if iszero(c)
+      return B
+   end
+   while i > length(B.poly)
+      push!(B.poly, zero(coefficient_ring(B.parent))::T)
+   end
+   B.poly[i] += c
+   return B
+end
+
+function finish(B::PolyBuildCtx{T, S}) where {T, S}
+   res = B.parent(B.poly)  # construction of univar from array of coeffs
+   B.poly = T[]            # apparently res can have ownership of the B.poly
+   return res
+end
 
 ###############################################################################
 #
