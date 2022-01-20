@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export exponent_words, FreeAssociativeAlgebra
+export exponent_words, FreeAssociativeAlgebra, leading_exponent_word
 
 ###############################################################################
 #
@@ -174,8 +174,8 @@ end
 
 function FreeAssociativeAlgebra(
    R::AbstractAlgebra.Ring,
-   s::Vector{T};
-   cached::Bool = true) where T <: Union{String, Char}
+   s::Union{AbstractVector{<:AbstractString}, AbstractVector{Symbol}, AbstractVector{Char}};
+   cached::Bool = true)
 
    S = [Symbol(v) for v in s]
    return Generic.FreeAssociativeAlgebra(R, S, cached=cached)
@@ -192,7 +192,7 @@ end
 function FreeAssociativeAlgebra(
    R::AbstractAlgebra.Ring,
    n::Int,
-   s::Union{String, Char, Symbol};
+   s::Union{AbstractString, Symbol, Char};
    cached::Bool = false)
 
    S = [Symbol(s, i) for i in 1:n]

@@ -33,7 +33,7 @@ characteristic(R::FreeAssAlgebra)
 ## Free algebra constructors
 
 ```julia
-FreeAssociativeAlgebra(R::Ring, s::Vector{<: Union{String, Char, Symbol}}; cached::Bool = true)
+FreeAssociativeAlgebra(R::Ring, s::Union{AbstractVector{<:AbstractString}, AbstractVector{Symbol}, AbstractVector{Char}}; cached::Bool = true)
 FreeAssociativeAlgebra(R::Ring, n::Int, s::Union{String, Char, Symbol}; cached::Bool = false)
 ```
 
@@ -118,6 +118,7 @@ provide the first such term.
 leading_coefficient(a::FreeAssAlgElem)
 leading_monomial(a::FreeAssAlgElem)
 leading_term(a::FreeAssAlgElem)
+leading_exponent_word(a::FreeAssAlgElem)
 ```
 
 For types that allow constant time access to coefficients, the following are

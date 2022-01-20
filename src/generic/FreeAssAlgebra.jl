@@ -74,7 +74,7 @@ function iszero(a::FreeAssAlgElem{T}) where T
 end
 
 function isone(a::FreeAssAlgElem{T}) where T
-   if length(a) == 0
+   if length(a) < 1
       return isone(zero(base_ring(a)))
    else
       return a.length == 1 && isone(a.coeffs[1]) && isempty(a.exps[1])
@@ -90,6 +90,14 @@ end
 
 function gens(a::FreeAssAlgebra{T}) where {T <: RingElement}
    return [gen(a, i) for i in 1:nvars(a)]
+end
+
+function isgen(a::FreeAssAlgElem{T}) where T
+    if length(a) < 1
+        return iszero(one(base_ring(a)))
+    else
+      return a.length == 1 && isone(a.coeffs[1]) && length(a.exps[1]) == 1
+    end
 end
 
 # BOGUS
@@ -153,15 +161,18 @@ end
 ###############################################################################
 
 function coeff(a::FreeAssAlgElem, i::Int)
+   0 < i <= length(a) || error("index out of range")
    return a.coeffs[i]
 end
 
 function term(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
+   0 < i <= length(a) || error("index out of range")
    R = parent(a)
    return FreeAssAlgElem{T}(R, [a.coeffs[i]], [a.exps[i]], 1)
 end
 
 function monomial(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
+   0 < i <= length(a) || error("index out of range")
    R = parent(a)
    return FreeAssAlgElem{T}(R, T[one(base_ring(R))], [a.exps[i]], 1)
 end
@@ -194,6 +205,10 @@ end
 
 function leading_term(a::FreeAssAlgElem{T}) where T
    return a.length > 0 ? term(a, 1) : a
+end
+
+function leading_exponent_word(a::FreeAssAlgElem{T}) where T
+    return exponent_word(a, 1)
 end
 
 function total_degree(a::FreeAssAlgElem{T}) where T
@@ -241,7 +256,8 @@ for T in [RingElem, Integer, Rational, AbstractFloat]
 end
 
 function set_exponent_word!(a::FreeAssAlgElem{T}, i::Int, w::Vector{Int}) where T <: RingElement
-   all(i -> (i <= nvars(parent(a))), w) || error("variable index out of range")
+   n = nvars(parent(a))
+   all(x -> 0 < x <= n, w) || error("variable index out of range")
    fit!(a, i)
    a.exps[i] = w
    if i > length(a)
@@ -259,9 +275,9 @@ end
 function ==(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T
    fl = check_parent(a, b, false)
    !fl && return false
-   return (a.length == b.length) && 
-          (view(a.coeffs, 1:a.length) == view(b.coeffs, 1:b.length)) &&
-          (view(a.exps, 1:a.length) == view(b.exps, 1:b.length))
+   return a.length == b.length && 
+          view(a.exps, 1:a.length) == view(b.exps, 1:b.length) &&
+          view(a.coeffs, 1:a.length) == view(b.coeffs, 1:b.length)
 end
 
 function word_cmp(a::Vector{Int}, b::Vector{Int})
@@ -287,9 +303,12 @@ function word_gt(a::Vector{Int}, b::Vector{Int})
 end
 
 function sort_terms!(z::FreeAssAlgElem{T}) where T
-   p = sortperm(z.exps, lt = word_gt)
-   z.coeffs = [z.coeffs[p[i]] for i in 1:length(p)]
-   z.exps = [z.exps[p[i]] for i in 1:length(p)]
+   n = length(z)
+   if n > 1
+      p = sortperm(view(z.exps, 1:n), lt = word_gt)
+      z.coeffs = [z.coeffs[p[i]] for i in 1:n]
+      z.exps = [z.exps[p[i]] for i in 1:n]
+   end
    return z
 end
 
