@@ -106,20 +106,22 @@ end
    R, x = PolynomialRing(ZZ, "x")
 
    C = collect(coefficients(R()))
-
    @test C == []
 
    C = collect(coefficients(R(1)))
-
    @test C == [R(1)]
 
    C = collect(coefficients(x + 2))
-
    @test C == [R(2), R(1)]
 
    C = collect(coefficients(x^2 + 2))
-
    @test C == [R(2), R(), R(1)]
+end
+
+@testset "Generic.Poly.conformance" begin
+   # test_elem should already be defined on ZZ; polys are automatic from there
+   R, x = PolynomialRing(ZZ, "x")
+   test_Poly_interface(R)
 end
 
 @testset "Generic.Poly.printing" begin
@@ -274,12 +276,12 @@ end
    S, y = PolynomialRing(R, "y")
 
    @test iszero(zero(S))
-
    @test isone(one(S))
-
    @test isgen(gen(S))
-
    @test isunit(one(S))
+   @test isconstant(zero(S))
+   @test isconstant(one(S))
+   @test !isconstant(gen(S))
 
    @test ismonic(R(1))
    @test ismonic(x^2 + 3)
@@ -291,10 +293,9 @@ end
 
    f = 2x*y + x^2 + 1
 
+   @test !isconstant(f)
    @test leading_coefficient(f) == 2x
-
    @test trailing_coefficient(2x*y + x^2) == x^2
-
    @test constant_coefficient(y^2 + 2x) == 2x
 
    g = 3x*y + x + 1
