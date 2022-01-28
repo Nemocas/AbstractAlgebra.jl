@@ -565,3 +565,30 @@ end
       @test c*I*d == d*I*c
    end
 end
+
+@testset "Generic.Ideal.intersection" begin
+   # multivariate
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+
+   # random examples
+   for i = 1:50
+      n = rand(0:3)
+      m = rand(0:3)
+      V = elem_type(R)[]
+      W = elem_type(R)[]
+      for j = 1:n
+         push!(V, rand(R, 0:2, 0:3, -10:10))
+      end
+      for j = 1:m
+         push!(W, rand(R, 0:3, 0:2, -10:10))
+      end
+
+      I = Ideal(R, V)
+      J = Ideal(R, W)
+      
+      K = intersect(I, J)
+
+      @test contains(I, K)
+      @test contains(J, K)
+   end
+end

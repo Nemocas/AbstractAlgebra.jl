@@ -114,6 +114,10 @@ ideals.
 contains(::Ideal{T}, ::Ideal{T}) where T <: RingElement
 ```
 
+```@docs
+intersection(::Ideal{T}, ::Ideal{T}) where T <: RingElement
+```
+
 **Examples**
 
 ```jldoctest
@@ -141,6 +145,9 @@ julia> contains(J, I)
 false
 
 julia> contains(I, J)
+true
+
+julia> intersection(I, J) == J
 true
 ```
 

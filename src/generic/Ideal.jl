@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export normal_form, contains
+export normal_form, contains, intersection
 
 ###############################################################################
 #
@@ -2138,6 +2138,40 @@ function Base.contains(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: U
       end
    end
    return true
+end
+
+###############################################################################
+#
+#   Intersection
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    intersection(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+
+Return the intersection of the ideals `I` and `J`.
+"""
+function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.MPolyElem{U}}
+   if contains(I, J)
+      return J
+   elseif contains(J, I)
+      return I
+   end
+   S = base_ring(I) # poly ring
+   R = base_ring(S) # coefficient ring
+   # create ring with additional variable "t" with higher precedence
+   tsym = gensym()
+   Sup, Supv = AbstractAlgebra.PolynomialRing(R, vcat(tsym, symbols(S)); cached=false, ordering=ordering(S))
+   G1 = gens(I)
+   G2 = gens(J)
+   ISup = Ideal(Sup, elem_type(Sup)[f(Supv[2:end]...) for f in G1])
+   JSup = Ideal(Sup, elem_type(Sup)[f(Supv[2:end]...) for f in G2])
+   t = Supv[1]
+   # compute t*I + (1 - t)*J
+   IntSup = t*ISup + (1 - t)*JSup
+   G = filter(x->!in(t, vars(x)), gens(IntSup))
+   GInt = elem_type(S)[f(vcat(S(1), gens(S))...) for f in G]
+   return Ideal(S, GInt)
 end
 
 ###############################################################################
