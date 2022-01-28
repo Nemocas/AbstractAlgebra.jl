@@ -2151,6 +2151,32 @@ end
 
 Return the intersection of the ideals `I` and `J`.
 """
+function intersection(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   R = base_ring(I)
+   G1 = gens(I)
+   G2 = gens(J)
+   if isempty(G1)
+      return deepcopy(I)
+   end
+   if isempty(G2)
+      return deepcopy(J)
+   end
+   return Ideal(R, lcm(G1[1], G2[1]))
+end
+
+function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyElem{U}}
+   R = base_ring(I)
+   G1 = gens(I)
+   G2 = gens(J)
+   if isempty(G1)
+      return deepcopy(I)
+   end
+   if isempty(G2)
+      return deepcopy(J)
+   end
+   return Ideal(R, lcm(G1[1], G2[1]))
+end
+
 function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    if contains(I, J)
       return J

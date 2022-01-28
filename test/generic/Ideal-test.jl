@@ -609,4 +609,39 @@ end
       @test contains(I, K)
       @test contains(J, K)
    end
+
+   # Fp[x]
+   Fp = GF(31)
+   R, x = PolynomialRing(Fp, "x")
+
+   for i = 1:300
+      n = rand(0:10)
+      m = rand(0:10)
+      V = elem_type(R)[rand(R, 0:5) for i in 1:n]
+      W = elem_type(R)[rand(R, 0:5) for i in 1:m]
+      
+      I = Ideal(R, V)
+      J = Ideal(R, W)
+
+      K = intersection(I, J)
+
+      @test contains(I, K)
+      @test contains(J, K)
+   end
+
+   # integer
+   for i = 1:300
+      n = rand(0:10)
+      m = rand(0:10)
+      V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
+      W = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:m]
+      
+      I = Ideal(ZZ, V)
+      J = Ideal(ZZ, W)
+      
+      K = intersection(I, J)
+
+      @test contains(I, K)
+      @test contains(J, K)
+   end
 end
