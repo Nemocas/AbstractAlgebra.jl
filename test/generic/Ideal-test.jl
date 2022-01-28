@@ -586,7 +586,25 @@ end
       I = Ideal(R, V)
       J = Ideal(R, W)
       
-      K = intersect(I, J)
+      K = intersection(I, J)
+
+      @test contains(I, K)
+      @test contains(J, K)
+   end
+
+   # univariate
+   R, x = PolynomialRing(ZZ, "x")
+
+   for i = 1:300
+      n = rand(0:5)
+      m = rand(0:5)
+      V = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:n]
+      W = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:m]
+
+      I = Ideal(R, V)
+      J = Ideal(R, W)
+
+      K = intersection(I, J)
 
       @test contains(I, K)
       @test contains(J, K)
