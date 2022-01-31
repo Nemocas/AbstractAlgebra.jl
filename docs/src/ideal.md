@@ -8,8 +8,10 @@ end
 # Ideal functionality
 
 AbstractAlgebra.jl provides a module, implemented in `src/generic/Ideal.jl` for
-ideals of a Euclidean domain or of a univariate or multivariate polynomial ring
-over a Euclidean domain, assuming the existence of a `gcdx` function.
+ideals of a Euclidean domain (assuming the existence of a `gcdx` function)
+or of a univariate or multivariate polynomial ring
+over the integers. Univariate and multivariate polynomial rings over other
+domains (other than fields) are not supported at this time.
 
 ## Generic ideal types
 
