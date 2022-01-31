@@ -633,7 +633,6 @@ function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <
       insert!(X, index, b2)
    end
    # of the active nodes, remove ones which are the same up to units
-   # TODO: is this still required?
    filter!(x->x.active, X)
    i = 1
    len = length(X)
@@ -696,7 +695,6 @@ function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_div
          if divides(c, h)[1]
             usable = true
             # make sure a circular chain of reduction can't occur
-            # TODO: is this still possible? (see comment immediately above)
             if X[i].lm == b.lm
                x2 = X[i]
                while x2 != nothing
@@ -746,7 +744,6 @@ function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_red
          if h != c && h != 0 && !divides(leading_coefficient(X[i].poly), c)[1]
             usable = true
             # check there are no cycles of reducers
-            # TODO: is this still possible? (see comment immediately above)
             if X[i].lm == b.lm
                x2 = X[i]
                while x2 != nothing
@@ -794,7 +791,6 @@ function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd:
             !divides(c, leading_coefficient(X[i].poly))[1]
             usable = true
             # check there are no cycles of reducers
-            # TODO: is this still possible? (see comment immediately above)
             if X[i].lm == b.lm
                x2 = X[i]
                while x2 != nothing
@@ -1322,131 +1318,123 @@ end
 # main reduction routine
 function reduce_gens(I::Ideal{U}; complete_reduction::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    node_num[] = 0
-   if hasmethod(gcdx, Tuple{T, T})
-      B = gens(I)
-      # nothing to be done if only one poly
-      if length(B) > 1
-         # make heap
-         # TODO: is heap still required?
-         V = ordering(parent(B[1]))
-         N = nvars(base_ring(I))
-         heap = Vector{lmnode{U, V, N}}()
-         for v in B
-            heapinsert!(heap, lmnode{U, V, N}(v))
+   B = gens(I)
+   # nothing to be done if only one poly
+   if length(B) > 1
+      # make heap
+      V = ordering(parent(B[1]))
+      N = nvars(base_ring(I))
+      heap = Vector{lmnode{U, V, N}}()
+      for v in B
+         heapinsert!(heap, lmnode{U, V, N}(v))
+      end
+      d = heappop!(heap)
+      # take gcd of constant polys
+      if isconstant(d.poly)
+         S = parent(d.poly)
+         d0 = constant_coefficient(d.poly)
+         while !isempty(heap) && isconstant(heap[1].poly)
+            h = heappop!(heap)
+            di = constant_coefficient(h.poly)
+            d0 = gcd(d0, di)
          end
+         d.poly = S(d0)
+      end
+      bound = d.lm
+      B2 = [d]
+      X = lmnode{U, V, N}[] # fragments
+      S = lmnode{U, V, N}[] # spolys
+      S2 = lmnode{U, V, N}[] # nodes for which we have not computed spolys
+      # insert everything in tree
+      H = Vector{lmnode{U, V, N}}()
+      H2 = Vector{lmnode{U, V, N}}()
+      while !isempty(heap)
          d = heappop!(heap)
-         # take gcd of constant polys
-         if isconstant(d.poly)
-            S = parent(d.poly)
-            d0 = constant_coefficient(d.poly)
-            while !isempty(heap) && isconstant(heap[1].poly)
-               h = heappop!(heap)
-               di = constant_coefficient(h.poly)
-               d0 = gcd(d0, di)
+         bound = max.(bound, d.lm)
+         push!(H, d)
+      end
+      # do reduction
+      G = Vector{U}()
+      X = Vector{lmnode{U, V, N}}()
+      X2 = Vector{lmnode{U, V, N}}()
+      X2new = Vector{lmnode{U, V, N}}()
+      while true
+         reduction_occurs = true
+         while reduction_occurs
+            # attach best reducers to nodes
+            best_reducer(B2, X2, X2new)
+            # do reductions
+            reduction_occurs = reduce_nodes(S2, H, B2, X)
+            clear_path(B2)
+            # move s-polys from S to fragments
+            while !isempty(S)
+               d = pop!(S)
+               if !iszero(d.poly)
+                  push!(H, d)
+               end
             end
-            d.poly = S(d0)
-         end
-         bound = d.lm
-         B2 = [d]
-         X = lmnode{U, V, N}[] # fragments
-         S = lmnode{U, V, N}[] # spolys
-         S2 = lmnode{U, V, N}[] # nodes for which we have not computed spolys
-         # insert everything in tree
-         H = Vector{lmnode{U, V, N}}()
-         H2 = Vector{lmnode{U, V, N}}()
-         while !isempty(heap)
-            d = heappop!(heap)
-            bound = max.(bound, d.lm)
-            push!(H, d)
-         end
-         # do reduction
-         G = Vector{U}()
-         X = Vector{lmnode{U, V, N}}()
-         X2 = Vector{lmnode{U, V, N}}()
-         X2new = Vector{lmnode{U, V, N}}()
-         while true
-            reduction_occurs = true
-            while reduction_occurs
-               # attach best reducers to nodes
-               best_reducer(B2, X2, X2new)
-               # do reductions
-               reduction_occurs = reduce_nodes(S2, H, B2, X)
-               clear_path(B2)
-               # move s-polys from S to fragments
-               while !isempty(S)
-                  d = pop!(S)
-                  if !iszero(d.poly)
-                     push!(H, d)
-                  end
-               end
-               # reduce contents of H if no reduction has occurred
-               if !isempty(H)
-                  if !reduction_occurs
-                     G = extract_gens(B2)
-                  end
-                  if !isempty(G)
-                     while !isempty(H)
-                        d = pop!(H)
-                        p = normal_form(d.poly, G)
-                        if !iszero(p)
-                           pnode = lmnode{U, V, N}(p)
-                           push!(H2, pnode)
-                        end
-                     end
-                     H, H2 = H2, H
-                  end
-               end
-               # insert fragments (including s-polys)
-               insert_fragments(S2, B2, H, bound)
-if IDEAL_MULTIV_DEBUG
-               print_node_level[] = 1
-               println("B2 = ", B2)
-               print_node_level[] = 0
-               println("S = ", S)
-               println("S2 = ", S2)
-               println("H = ", H)
-               println("")
-               if print_prompt
-                  readline(stdin)
-               end
-end
-               # when no further reduction is possible in lattice
-               # generate spolys
+            # reduce contents of H if no reduction has occurred
+            if !isempty(H)
                if !reduction_occurs
-                  generate_spolys(S, B2, S2)
+                  G = extract_gens(B2)
                end
-
+               if !isempty(G)
+                  while !isempty(H)
+                     d = pop!(H)
+                     p = normal_form(d.poly, G)
+                     if !iszero(p)
+                        pnode = lmnode{U, V, N}(p)
+                        push!(H2, pnode)
+                     end
+                  end
+                  H, H2 = H2, H
+               end
             end
-            # if we have no fragments to insert
-            if isempty(H)
-               # and no spolys to compute or insert
-               if isempty(S) && isempty(S2)
-                  # we are done
-                  break
-               end
-            else
-               # else if there are fragments, increase
-               # bound so next one at least will be inserted
-               bound = max.(bound, H[end].lm)
+            # insert fragments (including s-polys)
+            insert_fragments(S2, B2, H, bound)
+if IDEAL_MULTIV_DEBUG
+            print_node_level[] = 1
+            println("B2 = ", B2)
+            print_node_level[] = 0
+            println("S = ", S)
+            println("S2 = ", S2)
+            println("H = ", H)
+            println("")
+            if print_prompt
+               readline(stdin)
+            end
+end
+            # when no further reduction is possible in lattice
+            # generate spolys
+            if !reduction_occurs
+               generate_spolys(S, B2, S2)
             end
          end
-         # get all still active nodes from basis, we are done
-         B = extract_gens(B2)
+         # if we have no fragments to insert
+         if isempty(H)
+            # and no spolys to compute or insert
+            if isempty(S) && isempty(S2)
+               # we are done
+               break
+            end
+         else
+            # else if there are fragments, increase
+            # bound so next one at least will be inserted
+            bound = max.(bound, H[end].lm)
+         end
       end
-      # canonicalise basis elements
-      B = [divexact(d, canonical_unit(d)) for d in B]
-      # do tail reduction if requested
-      if complete_reduction
-         B = [tail_reduce(d, B) for d in B]
-      end
-      # sort by leading monomial then leading coefficient
-      # TODO: is sort by leading coefficient necessary?
-      # isn't monomial order already a total order
-      B = sort!(B, lt = isless_monomial_lc)
-      return Ideal{U}(base_ring(I), B)
-   else
-      error("Not implemented")
+      # get all still active nodes from basis, we are done
+      B = extract_gens(B2)
    end
+   # canonicalise basis elements
+   B = [divexact(d, canonical_unit(d)) for d in B]
+   # do tail reduction if requested
+   if complete_reduction
+      B = [tail_reduce(d, B) for d in B]
+   end
+   # sort by leading monomial then leading coefficient
+   B = sort!(B, lt = isless_monomial_lc)
+   return Ideal{U}(base_ring(I), B)
 end
 
 ###############################################################################
@@ -2007,79 +1995,75 @@ end
 # when a new poly is added to the basis, spolys are also generated for all
 # the polynomials reduced by the new poly and for the new poly itself
 function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
-   if hasmethod(gcdx, Tuple{U, U})
-      V = gens(I)
-      # Compute V a vector of polynomials giving the same basis as I
-      # but for which the above hold
-      V = filter(!iszero, V)
-      V = remove_constant_multiples(V)
-      if length(V) > 1
-         # compute resultant
-         S = parent(V[1])
-         R = base_ring(S)
-         D = sort(V, by=mysize2, rev=true)
-         res = zero(R)
-         while !isempty(D) && isconstant(D[end])
-            di = constant_coefficient(pop!(D))
-            res = gcd(di, res)
-         end
-         g = one(R)
-         for i = 1:length(D)
-            for j = i + 1:length(D)
-               res = gcd(resultant(D[i], D[j]), res)
-               if isunit(res)
-                  break
-               end
-            end
-         end
-         if iszero(res) # remove common gcd of all polys
-            g = zero(S)
-            for v in D
-               g = gcd(v, g)
-            end
-            D2 = Vector{T}()
-            r2 = zero(R)
-            for i in 1:length(D)
-               D[i] = divexact(D[i], g)
-               if !isconstant(D[i])
-                  push!(D2, D[i])
-               else
-                  r2 = gcd(r2, constant_coefficient(D[i]))
-               end
-            end
-            res = find_resultant_in_ideal(R, D2)
-            res = gcd(res, r2)
-         end
-         if isunit(res) # everything reduces to 0
-            V = [one(S)*g]
-         else
-            res = divexact(res, canonical_unit(res))
-            V = [S(res)]
-            B0 = [reduce_by_resultant(p, res) for p in D]
-            B0 = filter(!iszero, B0)
-            B = sort(B0, by=mysize2, rev=true)
-            H = T[]
-            V = extend_ideal_basis(B, V, H, res)
-            # multiply polys by original gcd
-            if !isone(g)
-               for i = 1:length(V)
-                  V[i] *= g
-               end
-            end
-         end
-      elseif length(V) == 1
-         d = V[1]
-         V = [divexact(d, canonical_unit(d))]
+   V = gens(I)
+   # Compute V a vector of polynomials giving the same basis as I
+   # but for which the above hold
+   V = filter(!iszero, V)
+   V = remove_constant_multiples(V)
+   if length(V) > 1
+      # compute resultant
+      S = parent(V[1])
+      R = base_ring(S)
+      D = sort(V, by=mysize2, rev=true)
+      res = zero(R)
+      while !isempty(D) && isconstant(D[end])
+         di = constant_coefficient(pop!(D))
+         res = gcd(di, res)
       end
-      if complete_reduction
-         for i = 2:length(V)
-            V[i] = reduce_tail(V[i], V[1:i - 1], zero(base_ring(V[1])))
+      g = one(R)
+      for i = 1:length(D)
+         for j = i + 1:length(D)
+            res = gcd(resultant(D[i], D[j]), res)
+            if isunit(res)
+               break
+            end
          end
       end
-      return Ideal{T}(base_ring(I), V)
-   else
-      error("Not implemented")
+      if iszero(res) # remove common gcd of all polys
+         g = zero(S)
+         for v in D
+            g = gcd(v, g)
+         end
+         D2 = Vector{T}()
+         r2 = zero(R)
+         for i in 1:length(D)
+            D[i] = divexact(D[i], g)
+            if !isconstant(D[i])
+               push!(D2, D[i])
+            else
+               r2 = gcd(r2, constant_coefficient(D[i]))
+            end
+         end
+         res = find_resultant_in_ideal(R, D2)
+         res = gcd(res, r2)
+      end
+      if isunit(res) # everything reduces to 0
+         V = [one(S)*g]
+      else
+         res = divexact(res, canonical_unit(res))
+         V = [S(res)]
+         B0 = [reduce_by_resultant(p, res) for p in D]
+         B0 = filter(!iszero, B0)
+         B = sort(B0, by=mysize2, rev=true)
+         H = T[]
+         V = extend_ideal_basis(B, V, H, res)
+         # multiply polys by original gcd
+         if !isone(g)
+            for i = 1:length(V)
+               V[i] *= g
+            end
+         end
+      end
+   elseif length(V) == 1
+      d = V[1]
+      V = [divexact(d, canonical_unit(d))]
    end
+   if complete_reduction
+      for i = 2:length(V)
+         V[i] = reduce_tail(V[i], V[1:i - 1], zero(base_ring(V[1])))
+      end
+   end
+   return Ideal{T}(base_ring(I), V)
 end
 
 ###############################################################################
@@ -2304,9 +2288,7 @@ function reduce_euclidean(I::Ideal{T}) where T <: RingElement
 end
 
 function reduce_gens(I::Ideal{T}) where T <: RingElement
-   if hasmethod(gcdx, Tuple{T, T})
-      I = reduce_euclidean(I)
-   end
+   I = reduce_euclidean(I)
    return I
 end
 
