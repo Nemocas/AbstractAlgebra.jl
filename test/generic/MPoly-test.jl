@@ -393,8 +393,9 @@ end
             g = rand(S, 0:4, 0:5, -10:10)
          end
 
-         @test leading_monomial(f*g) ==
-	       leading_monomial(f)*leading_monomial(g)
+         @test leading_monomial(f*g) == leading_monomial(f)*leading_monomial(g)
+         @test leading_exponent_vector(f*g) == leading_exponent_vector(f) +
+                                               leading_exponent_vector(g)
          @test leading_monomial(one(S)) == one(S)
          @test_throws ArgumentError leading_monomial(zero(S))
          @test_throws ArgumentError leading_exponent_vector(zero(S))
