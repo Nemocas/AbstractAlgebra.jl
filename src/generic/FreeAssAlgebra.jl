@@ -200,15 +200,24 @@ function leading_coefficient(a::FreeAssAlgElem{T}) where T
 end
 
 function leading_monomial(a::FreeAssAlgElem{T}) where T
-   return a.length > 0 ? monomial(a, 1) : a
+   if length(a) < 1
+      throw(ArgumentError("Zero polynomial does not have a leading monomial"))
+   end
+   return monomial(a, 1)
 end
 
 function leading_term(a::FreeAssAlgElem{T}) where T
-   return a.length > 0 ? term(a, 1) : a
+   if length(a) < 1
+      throw(ArgumentError("Zero polynomial does not have a leading term"))
+   end
+   return term(a, 1)
 end
 
 function leading_exponent_word(a::FreeAssAlgElem{T}) where T
-    return exponent_word(a, 1)
+   if length(a) < 1
+      throw(ArgumentError("Zero polynomial does not have a leading exponent word"))
+   end
+   return exponent_word(a, 1)
 end
 
 function total_degree(a::FreeAssAlgElem{T}) where T

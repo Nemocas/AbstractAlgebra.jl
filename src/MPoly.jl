@@ -8,7 +8,8 @@ export MPolyBuildCtx, @PolynomialRing, change_base_ring,
        coefficients_of_univariate, coeffs, combine_like_terms!, deflation,
        degrees, derivative, divides, exponent, exponent_vector,
        exponent_vectors, gens, isconstant, isdegree, ishomogeneous, ismonomial,
-       isreverse, isterm, isunivariate, lcm, leading_coefficient,
+       isreverse, isterm, isunivariate,
+       lcm, leading_coefficient, leading_exponent_vector,
        leading_monomial, leading_term, main_variable, main_variable_extract,
        main_variable_insert, map_coefficients, max_fields, monomial, monomial!,
        monomial_iszero, monomials, monomial_set!, nvars, ordering,
@@ -276,27 +277,41 @@ end
 @doc Markdown.doc"""
     leading_monomial(p::MPolyElem)
 
-Return the leading monomial of the polynomial p.
+Return the leading monomial of $p$.
+This function throws an `ArgumentError` if $p$ is zero.
 """
 function leading_monomial(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
-      return p
-   else
-      return first(monomials(p))
+      throw(ArgumentError("Zero polynomial does not have a leading monomial"))
    end
+   return first(monomials(p))
+end
+
+@doc Markdown.doc"""
+    leading_exponent_vector(p::MPolyElem)
+
+Return the exponent vector of the leading term of $p$. The return is a Julia
+1-dimensional array giving the exponent for each variable of the leading term.
+This function throws an `ArgumentError` if $p$ is zero.
+"""
+function leading_exponent_vector(p::MPolyElem{T}) where T <: RingElement
+   if iszero(p)
+      throw(ArgumentError("Zero polynomial does not have a leading exponent vector"))
+   end
+   return first(exponent_vectors(p))
 end
 
 @doc Markdown.doc"""
     leading_term(p::MPolyElem)
 
 Return the leading term of the polynomial p.
+This function throws an `ArgumentError` if $p$ is zero.
 """
 function leading_term(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
-      return p
-   else
-      return first(terms(p))
+      throw(ArgumentError("Zero polynomial does not have a leading term"))
    end
+   return first(terms(p))
 end
 
 @doc Markdown.doc"""
