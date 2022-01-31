@@ -239,14 +239,6 @@ end
 
 isunit(a::PolynomialElem) = length(a) == 1 && isunit(coeff(a, 0))
 
-@doc Markdown.doc"""
-    isconstant(a::PolynomialElem)
-
-Return `true` if the given polynomial is constant, i.e. has length less at most
-one, otherwise return `false`.
-"""
-isconstant(a::PolynomialElem) = length(a) <= 1
-
 ###############################################################################
 #
 #  Monomial and term
