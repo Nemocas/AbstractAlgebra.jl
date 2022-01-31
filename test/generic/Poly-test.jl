@@ -293,7 +293,7 @@ end
 
    @test isconstant(S())
    @test isconstant(S(1))
-   @teat !isconstant(y)
+   @test !isconstant(y)
 
    f = 2x*y + x^2 + 1
 
