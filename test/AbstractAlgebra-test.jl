@@ -1,4 +1,3 @@
-include("Ideals-test.jl")
 include("conformance-tests.jl")
 
 include("Attributes-test.jl")
@@ -7,6 +6,7 @@ include("Groups-test.jl")
 include("NCRings-test.jl")
 include("Rings-test.jl")
 include("Fields-test.jl")
+include("Ideals-test.jl")
 include("Modules-test.jl")
 include("Maps-test.jl")
 include("Benchmark-test.jl")
