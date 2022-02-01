@@ -102,6 +102,23 @@ function testit(R, V)
    return true
 end
 
+@testset "Generic.Ideal.constructors" begin
+   I = Ideal(ZZ, 3, 5)
+   S = parent(I)
+
+   @test typeof(IdealSet(ZZ)) == Generic.IdealSet{BigInt}
+
+   @test typeof(S) == Generic.IdealSet{BigInt}
+
+   @test base_ring(S) == ZZ
+
+   @test parent(I) == S
+
+   @test elem_type(S) == Generic.Ideal{BigInt}
+
+   @test parent_type(I) == Generic.IdealSet{BigInt}
+end
+
 @testset "Generic.Ideal.ideal_reduction(multivariate)" begin
    R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
 
@@ -416,6 +433,10 @@ end
       @test contains(I + J, I)
       @test contains(I + J, J)
    end
+
+   I = Ideal(ZZ, 2)
+
+   @test contains(I, Ideal(ZZ, BigInt[]))
 end
 
 @testset "Generic.Ideal.multiplication" begin
@@ -534,6 +555,10 @@ end
       @test I*c == Ideal(R, gens(I*c))
       @test c*I == Ideal(R, gens(I*c))
       @test c*I*d == d*I*c
+
+      m = rand(ZZ, -10:10)
+
+      @test m*I == I*m
    end
 
    # Fp[x]
