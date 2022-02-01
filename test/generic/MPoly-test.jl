@@ -342,9 +342,13 @@ end
       f = rand(R, 5:10, 1:10, -100:100)
       g = rand(R, 5:10, 1:10, -100:100)
 
-      @test leading_term(f*g) == leading_term(f)*leading_term(g)
+      if !iszero(f) && !iszero(g)
+         @test leading_term(f*g) == leading_term(f)*leading_term(g)
+      else
+         @test_throws ArgumentError leading_term(f)*leading_term(g)
+      end
       @test leading_term(one(R)) == one(R)
-      @test leading_term(zero(R)) == zero(R)
+      @test_throws ArgumentError leading_term(zero(R))
 
       for v in vars_R
          @test leading_term(v) == v
@@ -389,10 +393,12 @@ end
             g = rand(S, 0:4, 0:5, -10:10)
          end
 
-         @test leading_monomial(f*g) ==
-	       leading_monomial(f)*leading_monomial(g)
+         @test leading_monomial(f*g) == leading_monomial(f)*leading_monomial(g)
+         @test leading_exponent_vector(f*g) == leading_exponent_vector(f) +
+                                               leading_exponent_vector(g)
          @test leading_monomial(one(S)) == one(S)
-         @test leading_monomial(zero(S)) == zero(S)
+         @test_throws ArgumentError leading_monomial(zero(S))
+         @test_throws ArgumentError leading_exponent_vector(zero(S))
 
          for v in varlist
             @test leading_monomial(v) == v

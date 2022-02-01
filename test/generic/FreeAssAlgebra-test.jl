@@ -82,8 +82,14 @@
       end
       @test f1 == f4
 
-      @test leading_term(f1) == leading_coefficient(f1)*leading_monomial(f1)
-      @test total_degree(f1) >= total_degree(f1 - leading_term(f1))
+      if !iszero(f1)
+         @test leading_term(f1) == leading_coefficient(f1)*leading_monomial(f1)
+         @test total_degree(f1) >= total_degree(f1 - leading_term(f1))
+      else
+         @test_throws ArgumentError leading_term(f1)
+         @test_throws ArgumentError leading_monomial(f1)
+         @test_throws ArgumentError leading_exponent_word(f1)
+      end
 
       @test !isgen(zero(S))
       @test !isgen(one(S))
@@ -93,6 +99,10 @@
          @test !isgen(g + 1)
          @test leading_exponent_word(g) == [i]
       end
+
+      @test_throws ArgumentError leading_term(zero(S))
+      @test_throws ArgumentError leading_monomial(zero(S))
+      @test_throws ArgumentError leading_exponent_word(zero(S))
 
       @test collect(exponent_words(varlist[1] + 1)) == [Int[1], Int[]]
       @test isone(varlist[1]^0)
