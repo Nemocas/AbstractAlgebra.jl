@@ -4,12 +4,16 @@
 #
 ###############################################################################
 
-function Ideal(R::Ring, V::Vector{T}) where T <: RingElement
+function Ideal(R::Ring, V::Vector)
    return Generic.Ideal(R, V)
 end
 
 function Ideal(R::Ring, v::T...) where T <: RingElement
    return Generic.Ideal(R, v...)
+end
+
+function Ideal(R::Ring)
+   return Generic.Ideal(R, [])
 end
 
 ###############################################################################

@@ -117,6 +117,10 @@ end
    @test elem_type(S) == Generic.Ideal{BigInt}
 
    @test parent_type(I) == Generic.IdealSet{BigInt}
+
+   J = Ideal(ZZ)
+
+   @test parent(J) == S
 end
 
 @testset "Generic.Ideal.ideal_reduction(multivariate)" begin

@@ -2312,6 +2312,8 @@ function Ideal(R::Ring, v::T...) where T <: RingElement
    return reduce_gens(I)
 end
 
+Ideal(R::Ring, V::Vector{Any}) = Ideal(R, elem_type(R)[R(v) for v in V])
+
 ###############################################################################
 #
 #   IdealSet constructor
