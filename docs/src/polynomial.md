@@ -436,6 +436,10 @@ issquare(::PolyElem)
 ```
 
 ```@docs
+length(::PolynomialElem)
+```
+
+```@docs
 degree(::PolynomialElem)
 ```
 
