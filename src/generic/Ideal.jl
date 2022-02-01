@@ -32,11 +32,11 @@ parent_type(::Type{Ideal{S}}) where S <: RingElement = IdealSet{S}
 ###############################################################################
 
 @doc Markdown.doc"""
-    gens(I::Ideal) = I.gens
+    gens(I::Ideal{T}) where T <: RingElement
 
 Return a list of generators of the ideal `I` in reduced form and canonicalised.
 """
-gens(I::Ideal) = I.gens
+gens(I::Ideal{T}) where T <: RingElement = I.gens
 
 ###############################################################################
 #
@@ -2073,7 +2073,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    normal_form(p::T, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.MPolyElem{T}}}
+    normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.MPolyElem{T}}}
 
 Return the normal form of the polynomial `p` with respect to the ideal `I`.
 """
