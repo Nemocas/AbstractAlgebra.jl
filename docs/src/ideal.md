@@ -81,7 +81,7 @@ AbstractAlgebra.Generic.Ideal{BigInt}(BigInt[1], Integers)
 ### Basic functionality
 
 ```@docs
-gens(::Ideal{T}) where T <: RingElement
+gens(::Generic.Ideal{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -113,11 +113,11 @@ ideals.
 ### Containment
 
 ```@docs
-contains(::Ideal{T}, ::Ideal{T}) where T <: RingElement
+contains(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
 ```
 
 ```@docs
-intersection(::Ideal{T}, ::Ideal{T}) where T <: RingElement
+intersection(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -159,7 +159,7 @@ For ideal of polynomial rings it is possible to return the normal form of
 a polynomial with respect to an ideal.
 
 ```@docs
-normal_form(::U, ::Ideal{U}) where {T <: RingElement, U <: Union{PolyElem{T}, MPolyElem{T}}
+normal_form(::U, ::Generic.Ideal{U}) where {T <: RingElement, U <: Union{PolyElem{T}, MPolyElem{T}}
 ```
 
 **Examples**
