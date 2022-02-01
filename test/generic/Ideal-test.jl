@@ -365,6 +365,11 @@ end
 
       @test contains(J, I)
    end
+
+   I = Ideal(ZZ, 2)
+
+   @test contains(I, Ideal(ZZ, BigInt[]))
+   @test !contains(Ideal(ZZ, BigInt[]), I)
 end
 
 @testset "Generic.Ideal.addition" begin
@@ -437,10 +442,6 @@ end
       @test contains(I + J, I)
       @test contains(I + J, J)
    end
-
-   I = Ideal(ZZ, 2)
-
-   @test contains(I, Ideal(ZZ, BigInt[]))
 end
 
 @testset "Generic.Ideal.multiplication" begin
