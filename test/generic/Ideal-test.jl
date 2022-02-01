@@ -170,7 +170,7 @@ end
    for i = 1:300
       n = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
-      I = Ideal(R, V)
+      I = Ideal(R, V...)
 
       for v in V
          @test normal_form(v, I) == 0
@@ -191,7 +191,7 @@ end
    for i = 1:300
       n = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
-      I = Ideal(ZZ, V)
+      I = Ideal(ZZ, V...)
       G = gens(I)
 
       @test length(G) == 1 || (length(V) == 0 && length(G) == 0) || (iszero(V) || length(G) == 0)
@@ -213,7 +213,7 @@ end
    for i = 1:300
       n = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
-      I = Ideal(R, V)
+      I = Ideal(R, V...)
       G = gens(I)
 
       @test length(G) == 1 || (length(V) == 0 && length(G) == 0) || (iszero(V) || length(G) == 0)
