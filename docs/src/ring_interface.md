@@ -324,26 +324,6 @@ This should print a human readable, textual representation of the object (to the
 IO object). It can recursively call the corresponding `show` functions for any of its
 components.
 
-!!! note
-
-    The functionality of the function `needs_parentheses` has been replaced by
-    `expressify` and `needs_parentheses` will be removed in future versions.
-
-It may be necessary in some cases to print parentheses around components of $f$ or to
-print signs of components. For these, the following functions will exist for each
-component or component type.
-
-```julia
-needs_parentheses(f::MyElem)
-```
-
-Should return `true` if parentheses are needed around this object when printed, e.g. as
-a coefficient of a polynomial. As an example, non-constant polynomials would need such
-parentheses if used as coefficients of another polynomial.
-
-Note that since this approach quickly leads to unnecessary parentheses, the
-expression method below is preferred.
-
 ### Expressions
 
 To obtain best results when printing composed types derived from other types, e.g., polynomials,

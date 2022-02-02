@@ -176,12 +176,6 @@ function show(io::IO, L::Loc)
    end
 end
 
-needs_parentheses(x::LocElem) = needs_parentheses(data(x))
-
-displayed_with_minus_in_front(x::LocElem) = displayed_with_minus_in_front(data(x))
-
-show_minus_one(::Type{LocElem{T}}) where {T <: RingElement} = true
-
 ###############################################################################
 #
 #   Unary operations
