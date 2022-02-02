@@ -291,6 +291,10 @@ end
    @test !ismonic(-R(1))
    @test !ismonic(-2x^2*y + 3x + 2y + 1)
 
+   @test isconstant(S())
+   @test isconstant(S(1))
+   @test !isconstant(y)
+
    f = 2x*y + x^2 + 1
 
    @test !isconstant(f)

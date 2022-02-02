@@ -54,6 +54,9 @@ makedocs(
                  "direct_sum.md",
                  "module_homomorphism.md",
              ],
+             "Ideals" => [
+                 "ideal.md",
+             ],
              "Matrices" => [
                  "matrix_introduction.md",
                  "matrix.md",

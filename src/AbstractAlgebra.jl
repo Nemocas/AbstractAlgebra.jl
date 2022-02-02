@@ -126,11 +126,11 @@ export SetElem, GroupElem, AdditiveGroupElem, NCRingElem, RingElem, ModuleElem, 
 export SetMap, FunctionalMap, IdentityMap
 
 export NCPolyElem, PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
-       MatElem, MatAlgElem, FinFieldElem, MPolyElem, UnivPolyElem, NumFieldElem,
+       MatElem, MatAlgElem, FinFieldElem, MPolyElem, UnivPolyElem, NumFieldElem, Ideal,
        SimpleNumFieldElem, FreeAssAlgElem
 
 export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
-       FinField, MPolyRing, UnivPolyRing, NumField, SimpleNumField,
+       FinField, MPolyRing, UnivPolyRing, NumField, SimpleNumField, IdealSet,
        FreeAssAlgebra
 
 export ZZ, QQ, zz, qq, RealField, RDF
@@ -376,6 +376,7 @@ include("Map.jl")
 include("MapCache.jl")
 include("MapWithInverse.jl")
 include("ModuleHomomorphism.jl")
+include("Ideal.jl")
 include("YoungTabs.jl")
 include("PermGroups.jl")
 include("LaurentSeries.jl")
@@ -416,7 +417,7 @@ import .Generic: abs_series, abs_series_type,
                  finish, fit!, gcd, gcdx,
                  has_left_neighbor, has_bottom_neighbor, hash,
                  hooklength, identity_map,
-                 image_map, image_fn,
+                 image_map, image_fn, intersection,
                  inverse_fn, inverse_image_fn,
                  inverse_mat, reverse_rows, reverse_rows!,
                  inv!, invmod,
@@ -437,7 +438,7 @@ import .Generic: abs_series, abs_series_type,
                  monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!,
                  MPolyBuildCtx, mullow_karatsuba,
-                 ngens, norm, normalise,
+                 ngens, norm, normal_form, normalise,
                  num_coeff, one,
                  order, ordering, parity, partitionseq, Perm, perm,
                  permtype, @perm_str, polcoeff, poly, poly_ring,
@@ -475,7 +476,7 @@ export abs_series, abs_series_type,
                  finish, fit!, gcd, gen,
                  gens, gcdinv, gcdx,
                  has_left_neighbor, has_bottom_neighbor, hash,
-                 interpolate,
+                 interpolate, intersection,
                  inv!, inverse_image_fn,
                  inverse_mat, invmod,
                  iscompatible, isdegree, isdivisible_by,
@@ -494,7 +495,7 @@ export abs_series, abs_series_type,
                  MPolyBuildCtx,
                  mul_ks, mul_red!, mullow_karatsuba, mulmod,
                  needs_parentheses, newton_to_monomial!, ngens,
-                 normalise, nullspace, num_coeff,
+                 normal_form, normalise, nullspace, num_coeff,
                  one, order, ordering,
                  parent_type, parity, partitionseq, Perm, perm, permtype,
                  @perm_str, polcoeff, polynomial, poly,

@@ -133,6 +133,8 @@ include("generic/MapWithInverse.jl")
 
 include("generic/MapCache.jl")
 
+include("generic/Ideal.jl")
+
 ###############################################################################
 #
 #   Temporary miscellaneous files being moved from Hecke.jl
