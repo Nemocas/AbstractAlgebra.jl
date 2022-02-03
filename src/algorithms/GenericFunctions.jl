@@ -40,14 +40,47 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    divrem(f::T, g::T) where T <: RingElem
+
+Return a pair `q, r` consisting of the Euclidean quotient and remainder of $f$
+by $g$. A `DivideError` should be thrown if $g$ is zero.
+"""
+function divrem end
+
+@doc Markdown.doc"""
+    mod(f::T, g::T) where T <: RingElem
+
+Return the Euclidean remainder of $f$ by $g$. A `DivideError` should be thrown
+if $g$ is zero.
+
+!!! note
+    For best compatibility with the internal assumptions made by AbstractAlgebra,
+    the Euclidean remainder function should provide unique representatives for
+    the residue classes; the `mod` function should satisfy
+
+    1. `mod(a_1, b) = mod(a_2, b)` if and only if $b$ divides $a_1 - a_2$, and
+    2. `mod(0, b) = 0`.
+"""
 function mod(a::T, b::T) where T <: RingElem
    return divrem(a, b)[2]
 end
 
+@doc Markdown.doc"""
+    div(f::T, g::T) where T <: RingElem
+
+Return the Euclidean quotient of $f$ by $g$. A `DivideError` should be thrown
+if $g$ is zero.
+"""
 function Base.div(a::T, b::T) where T <: RingElem
    return divrem(a, b)[1]
 end
 
+@doc Markdown.doc"""
+    mulmod(f::T, g::T, m::T) where T <: RingElem
+
+Return `mod(f*g, m)` but possibly computed more efficiently.
+"""
 function mulmod(a::T, b::T, m::T) where T <: RingElement
    return mod(a*b, m)
 end
@@ -68,6 +101,11 @@ function internal_powermod(a, n, m)
    return z
 end
 
+@doc Markdown.doc"""
+    powermod(f::T, e::Int, m::T) where T <: RingElem
+
+Return `mod(f^e, m)` but possibly computed more efficiently.
+"""
 function powermod(a::T, n::Integer, m::T) where T <: RingElem
    parent(a) == parent(m) || error("Incompatible parents")
    if n > 1
@@ -83,12 +121,27 @@ function powermod(a::T, n::Integer, m::T) where T <: RingElem
    end
 end
 
+@doc Markdown.doc"""
+    invmod(f::T, m::T) where T <: RingElem
+
+Return an inverse of $f$ modulo $m$, meaning that `isone(mod(invmod(f,m)*f,m))`
+returns `true`.
+
+If such an inverse doesn't exist, a `NotInvertibleError` should be thrown.
+"""
 function invmod(a::T, m::T) where T <: RingElem
    g, s = gcdinv(a, m)
    isone(g) || throw(NotInvertibleError(a, m))
    return mod(s, m)  # gcdinv has no canonicity requirement on s
 end
 
+@doc Markdown.doc"""
+    divides(f::T, g::T) where T <: RingElem
+
+Return a pair, `flag, q`, where `flag` is set to `true` if $g$ divides $f$, in which
+case `q` is set to the quotient, or `flag` is set to `false` and `q`
+is set to `zero(f)`.
+"""
 function divides(a::T, b::T) where T <: RingElem
    parent(a) == parent(b) || error("Incompatible parents")
    if iszero(b)
@@ -98,6 +151,14 @@ function divides(a::T, b::T) where T <: RingElem
    return iszero(r), q
 end
 
+@doc Markdown.doc"""
+    remove(f::T, p::T) where T <: RingElem
+
+Return a pair `v, q` where $p^v$ is the highest power of $p$ dividing $f$ and $q$ is
+the cofactor after $f$ is divided by this power.
+
+See also [`valuation`](@ref), which only returns the valuation.
+"""
 function remove(a::T, b::T) where T <: Union{RingElem, Number}
    parent(a) == parent(b) || error("Incompatible parents")
    if (iszero(b) || isunit(b))
@@ -114,10 +175,29 @@ function remove(a::T, b::T) where T <: Union{RingElem, Number}
    return v, a
 end
 
+@doc Markdown.doc"""
+    valuation(f::T, p::T) where T <: RingElem
+
+Return `v` where $p^v$ is the highest power of $p$ dividing $f$.
+
+See also [`remove`](@ref).
+"""
 function valuation(a::T, b::T) where T <: Union{RingElem, Number}
    return remove(a, b)[1]
 end
 
+@doc Markdown.doc"""
+    gcd(f::T, g::T) where T <: RingElem
+
+Return a greatest common divisor of $f$ and $g$, i.e., an element $d$
+which is a common divisor of $f$ and $g$, and with the property that
+any other common divisor of $f$ and $g$ divides $d$.
+
+!!! note
+    For best compatibility with the internal assumptions made by
+    AbstractAlgebra, the return is expected to be unit-normalized in such a
+    way that if the return is a unit, that unit should be one.
+"""
 function gcd(a::T, b::T) where T <: RingElem
    parent(a) == parent(b) || error("Incompatible parents")
    while !iszero(b)
@@ -126,12 +206,25 @@ function gcd(a::T, b::T) where T <: RingElem
    return iszero(a) ? a : divexact(a, canonical_unit(a))
 end
 
+@doc Markdown.doc"""
+    lcm(f::T, g::T) where T <: RingElem
+
+Return a least common multiple of $f$ and $g$, i.e., an element $d$
+which is a common multiple of $f$ and $g$, and with the property that
+any other common multiple of $f$ and $g$ is a multiple of $d$.
+"""
 function lcm(a::T, b::T) where T <: RingElem
    g = gcd(a, b)
    iszero(g) && return g
    return a*divexact(b, g)
 end
 
+@doc Markdown.doc"""
+    gcdx(f::T, g::T) where T <: RingElem
+
+Return a triple `d, s, t` such that $d = gcd(f, g)$ and $d = sf + tg$, with $s$
+loosely reduced modulo $g/d$ and $t$ loosely reduced modulo $f/d$.
+"""
 function gcdx(a::T, b::T) where T <: RingElem
    parent(a) == parent(b) || error("Incompatible parents")
    R = parent(a)
@@ -157,6 +250,12 @@ function gcdx(a::T, b::T) where T <: RingElem
    return divexact(a, t), divexact(m11, t), divexact(m21, t)
 end
 
+@doc Markdown.doc"""
+    gcdinv(f::T, g::T) where T <: RingElem
+
+Return a tuple `d, s` such that $d = gcd(f, g)$ and $s = (f/d)^{-1} \pmod{g/d}$. Note
+that $d = 1$ iff $f$ is invertible modulo $g$, in which case $s = f^{-1} \pmod{g}$.
+"""
 function gcdinv(a::T, b::T) where T <: RingElem
    g, s, t = gcdx(a, b)
    return (g, s)

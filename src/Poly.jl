@@ -1333,22 +1333,12 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    mulmod(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-
-Return $a\times b \pmod{d}$.
-"""
 function mulmod(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T}) where T <: RingElement
    check_parent(a, b)
    check_parent(a, d)
    return mod(a*b, d)
 end
 
-@doc Markdown.doc"""
-    powermod(a::PolyElem{T}, b::Int, d::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-
-Return $a^b \pmod{d}$. There are no restrictions on $b$.
-"""
 function powermod(a::PolyElem{T}, b::Int, d::PolyElem{T}) where T <: RingElement
    check_parent(a, d)
    if b == 0
@@ -1382,11 +1372,6 @@ function powermod(a::PolyElem{T}, b::Int, d::PolyElem{T}) where T <: RingElement
    return z
 end
 
-@doc Markdown.doc"""
-    invmod(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-
-Return $a^{-1} \pmod{d}$.
-"""
 function invmod(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    g, z = gcdinv(a, b)
@@ -1463,11 +1448,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    mod(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-
-Return $f \pmod{g}$.
-"""
 function mod(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
    check_parent(f, g)
    if length(g) == 0
@@ -1496,12 +1476,6 @@ function rem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
   return mod(f, g)
 end
 
-@doc Markdown.doc"""
-    divrem(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-
-Return a tuple $(q, r)$ such that $f = qg + r$ where $q$ is the euclidean
-quotient of $f$ by $g$.
-"""
 function Base.divrem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
    check_parent(f, g)
    if length(g) == 0
@@ -1532,11 +1506,6 @@ function Base.divrem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
    return q, f
 end
 
-@doc Markdown.doc"""
-    div(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-
-Return the euclidean quotient of $f$ by $g$.
-"""
 function Base.div(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
    q, r = divrem(f, g)
    return q
@@ -1622,14 +1591,6 @@ end
 
 #CF TODO: use squaring for fast large valuation
 
-@doc Markdown.doc"""
-    remove(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
-
-Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
-$p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
-
-See also `valuation`, which only returns the valuation.
-"""
 function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
  check_parent(z, p)
  !isexact_type(T) && error("remove requires an exact ring")
@@ -1649,14 +1610,6 @@ function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
  return v, q
 end
 
-@doc Markdown.doc"""
-    remove(z::PolyElem{T}, p::PolyElem{T}) where T <: Union{ResElem, FieldElement}
-
-Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
-$p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
-
-See also `valuation`, which only returns the valuation.
-"""
 function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: Union{ResElem, FieldElement}
  check_parent(z, p)
  !isexact_type(T) && error("remove requires an exact ring")
@@ -1676,26 +1629,6 @@ function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: Union{ResElem, FieldE
  return v, q
 end
 
-@doc Markdown.doc"""
-    valuation(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
-
-Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
-$p^k$ divides $z$.
-
-See also `remove`, which also returns $z/p^k$.
-"""
-function valuation(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
- v, _ = remove(z, p)
- return v
-end
-
-@doc Markdown.doc"""
-    divides(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
-
-Return a pair consisting of a flag which is set to `true` if $g$ divides
-$f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
-such a polynomial exists. If not, the value of $h$ is undetermined.
-"""
 function divides(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
   check_parent(f, g)
   !isexact_type(T) && error("divides requires an exact ring")
@@ -1733,13 +1666,6 @@ function divides(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
   return iszero(f), q
 end
 
-@doc Markdown.doc"""
-    divides(z::PolyElem{T}, x::T) where T <: RingElement
-
-Return a pair consisting of a flag which is set to `true` if $x$ divides
-$z$ and `false` otherwise, and a polynomial $y$ such that $z = xy$ if
-such a polynomial exists. If not, the value of $y$ is undetermined.
-"""
 function divides(z::PolyElem{T}, x::T) where T <: RingElement
   parent(x) != base_ring(z) && error("Wrong parents in divides")
   q = parent(z)()
@@ -1911,11 +1837,6 @@ function term_content(a::PolyElem{T}) where T <: RingElement
    return parent(a)()
 end
 
-@doc Markdown.doc"""
-    gcd(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
-
-Return a greatest common divisor of $a$ and $b$ if it exists.
-"""
 function gcd(a::PolyElem{T}, b::PolyElem{T}, ignore_content::Bool = false) where T <: RingElement
    check_parent(a, b)
    if length(b) > length(a)
@@ -2021,11 +1942,6 @@ function gcd(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldEle
    return divexact(b, d)
 end
 
-@doc Markdown.doc"""
-    lcm(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
-
-Return a least common multiple of $a$ and $b$ if it exists.
-"""
 function lcm(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    check_parent(a, b)
    g = gcd(a, b)
@@ -2627,12 +2543,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-
-Return a tuple $(g, s, t)$ such that $g$ is the greatest common divisor of
-$a$ and $b$ and such that $g = a\times s + b\times t$.
-"""
 function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    !isexact_type(T) && error("gcdx requires exact Bezout domain")
@@ -2673,13 +2583,6 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldEl
    return divexact(A, d), divexact(u1, d), divexact(v1, d)
 end
 
-@doc Markdown.doc"""
-    gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-
-Return a tuple $(g, s)$ such that $g$ is the greatest common divisor of $a$
-and $b$ and such that $s = a^{-1} \pmod{b}$. This function is useful for
-inverting modulo a polynomial and checking that it really was invertible.
-"""
 function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    R = base_ring(a)
