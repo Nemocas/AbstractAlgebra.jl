@@ -92,8 +92,13 @@ function expressify(a::AbsMSeriesElem,
 
    push!(sum.args, poly_sum)
 
-   for i in nvars(parent(a)):-1:1
-      push!(sum.args, Expr(:call, :O, Expr(:call, :^, x[i], a.prec[i])))
+   wp = parent(a).weighted_prec
+   if wp == -1
+      for i in nvars(parent(a)):-1:1
+         push!(sum.args, Expr(:call, :O, Expr(:call, :^, x[i], a.prec[i])))
+      end
+   else
+      push!(sum.args, Expr(:call, :O, :($wp)))
    end
 
    return sum
@@ -178,6 +183,19 @@ function PowerSeriesRing(R::Ring, prec::Vector{Int},
                                                T <: Union{Char, AbstractString}
    sym = [Symbol(v) for v in s]
    return Generic.PowerSeriesRing(R, prec, sym; cached=cached, model=model)
+end
+
+function PowerSeriesRing(R::Ring, weights::Vector{Int}, prec::Int,
+                  s::Vector{T}; cached=true, model=:capped_absolute) where
+                                                                    T <: Symbol
+   return Generic.PowerSeriesRing(R, weights, prec, s; cached=cached, model=model)
+end
+
+function PowerSeriesRing(R::Ring, weights::Vector{Int}, prec::Int,
+   s::Vector{T}; cached=true, model=:capped_absolute) where
+                                               T <: Union{Char, AbstractString}
+   sym = [Symbol(v) for v in s]
+   return Generic.PowerSeriesRing(R, weights, prec, sym; cached=cached, model=model)
 end
 
 function PowerSeriesRing(R::Ring, prec::Int,
