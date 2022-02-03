@@ -2613,7 +2613,6 @@ function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, Field
    u1 *= inv(c1)
    u2 *= inv(c2)
    while lenb > 0
-      d = lena - lenb
       (Q, B), A = divrem(A, B), B
       lena = lenb
       lenb = length(B)
