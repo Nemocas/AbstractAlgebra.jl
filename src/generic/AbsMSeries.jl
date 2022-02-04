@@ -316,7 +316,7 @@ Return $a$ truncated to (absolute) precisions given by the vector `prec`.
 """
 function truncate(a::AbsMSeries, prec::Vector{Int})
     R = parent(a)
-    R.weighted_prec != 1 && error("Operation not permitted")
+    R.weighted_prec != -1 && error("Operation not permitted")
     length(prec) != nvars(R) &&
              error("Array length not equal to number of variables in truncate")
     trunc_needed = false
