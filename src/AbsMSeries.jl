@@ -136,14 +136,31 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{
    f = S()
    g = gens(S)
    R = base_ring(S)
-   prec = max_precision(S)
-   for i = 1:rand(rng, term_range)
-      term = S(1)
-      for j = 1:length(g)
-         term *= g[j]^rand(rng, 0:prec[j])
+   if S.weighted_prec == -1
+      prec = max_precision(S)
+      for i = 1:rand(rng, term_range)
+         term = S(1)
+         for j = 1:length(g)
+            term *= g[j]^rand(rng, 0:prec[j])
+         end
+         term *= rand(rng, v)
+         f += term
       end
-      term *= rand(rng, v)
-      f += term
+   else
+      wt = weights(S)
+      for i = 1:rand(rng, term_range)
+         total = rand(0:S.weighted_prec)
+         vv = Int[rand(0:total) for i = 1:length(g) - 1]
+         vv = vcat(0, sort!(vv), total)
+         w = Int[vv[i + 1] - vv[i] for i = 1:length(vv) - 1]
+         ex = [Int(round(w[i]/wt[i])) for i in 1:length(w)]
+         term = S(1)
+         for j = 1:length(g)
+            term *= g[j]^ex[j]
+         end
+         term *= rand(rng, v)
+         f += term
+      end
    end
    return f
 end
