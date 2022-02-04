@@ -337,8 +337,9 @@ function truncate(a::AbsMSeries, prec::Vector{Int})
         q = truncate_poly(poly(a), prec)
     else
         q = truncate_poly(poly(a), prec, R.weighted_prec)  
+        prec = a.prec
     end
-    return R(q, a.prec)
+    return R(q, prec)
 end
 
 ###############################################################################
