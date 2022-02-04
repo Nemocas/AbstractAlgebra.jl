@@ -430,6 +430,9 @@ Random.gentype(T::Type{<:GFField}) = elem_type(T)
 ###############################################################################
 
 promote_rule(::Type{GFElem{S}}, ::Type{T}) where {S <: Integer, T <: Integer} = GFElem{S}
+promote_rule(::Type{gfp_elem}, ::Type{fmpz}) = gfp_elem
+promote_rule(::Type{gfp_mpoly}, ::Type{fmpz}) = gfp_mpoly
+promote_rule(::Type{gfp_elem}, ::Type{Generic.Frac{gfp_mpoly}}) = Generic.Frac{gfp_mpoly}
 
 ###############################################################################
 #
