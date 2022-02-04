@@ -313,32 +313,25 @@ end
     truncate(a::AbstractAlgebra.AbsMSeries, prec::Vector{Int})
 
 Return $a$ truncated to (absolute) precisions given by the vector `prec`.
-If the ring is weighted `prec` is instead interpreted as weights for
-the variables and truncation is with respect to the global weighted
-precision.
 """
 function truncate(a::AbsMSeries, prec::Vector{Int})
     R = parent(a)
+    R.weighted_prec != 1 && error("Operation not permitted")
     length(prec) != nvars(R) &&
              error("Array length not equal to number of variables in truncate")
     trunc_needed = false
-    if R.weighted_prec == -1
-        p = precision(a)
-        for i = 1:nvars(R)
-            if prec[i] < p[i]
-                trunc_needed = true
-                break
-            end
-        end
-        if !trunc_needed
-            return a
-        end
-        prec = min.(prec, p)
-        q = truncate_poly(poly(a), prec)
-    else
-        q = truncate_poly(poly(a), prec, R.weighted_prec)  
-        prec = a.prec
+    p = precision(a)
+    for i = 1:nvars(R)
+       if prec[i] < p[i]
+          trunc_needed = true
+          break
+       end
     end
+    if !trunc_needed
+       return a
+    end
+    prec = min.(prec, p)
+    q = truncate_poly(poly(a), prec)
     return R(q, prec)
 end
 
