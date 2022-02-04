@@ -350,7 +350,7 @@ end
 
 function -(a::AbsMSeries)
     R = parent(a)
-    return R(-poly(a), precision(a))
+    return R(-poly(a), a.prec)
 end
 
 ###############################################################################
@@ -478,6 +478,7 @@ end
 
 function isequal(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     check_parent(x, y)
+    R = parent(x)
     if R.weighted_prec == -1
         prec = precision(x)
         prec == precision(y) || return false
