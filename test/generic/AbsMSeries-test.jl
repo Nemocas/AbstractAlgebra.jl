@@ -44,6 +44,43 @@
    R2, (x2, y2) = PowerSeriesRing(ZZ, 3, ["x", "y"])
 
    @test R1 === R2
+
+   # weighted
+
+   for nvars in 1:5
+      weights = [rand(1:4) for i in 1:nvars]
+      prec = rand(0:40)
+      R, gens = PowerSeriesRing(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
+   
+      f = rand(R, 0:10, -10:10)
+
+      @test parent_type(f) == Generic.AbsMSeriesRing{Rational{BigInt},
+                                               Generic.MPoly{Rational{BigInt}}}
+
+      @test elem_type(R) == Generic.AbsMSeries{Rational{BigInt},
+                                               Generic.MPoly{Rational{BigInt}}}
+
+      @test R isa Generic.AbsMSeriesRing
+
+      @test f isa Generic.AbsMSeries
+
+      @test R() isa Generic.AbsMSeries
+
+      @test R(rand(-10:10)) isa Generic.AbsMSeries
+
+      @test R(rand(QQ, -10:10)) isa Generic.AbsMSeries
+
+      p = rand(R.poly_ring, 0:10, 0:10, -10:10)
+      p = Generic.truncate_poly(p, weights, prec)
+
+      @test R(p, [0 for i in 1:nvars]) isa Generic.AbsMSeries
+
+      R, gens = PowerSeriesRing(S, weights, prec, ["x$(i)" for i in 1:nvars])
+     
+      @test R(ZZ(2)) isa Generic.AbsMSeries
+
+      @test R(x) isa Generic.AbsMSeries
+   end
 end
 
 @testset "Generic.AbsMSeries.printing" begin
@@ -54,6 +91,16 @@ end
    @test string(x) == "x + O(y^3) + O(x^5)"
    @test string(y) == "y + O(y^3) + O(x^5)"
    @test string(x^2 - y) == "-y + x^2 + O(y^3) + O(x^5)"
+
+   # weighted 
+
+   R, (x, y) = PowerSeriesRing(ZZ, [2, 3], 10, ["x", "y"])
+
+   @test string(zero(R)) == "O(10)"
+   @test string(one(R)) == "1 + O(10)"
+   @test string(x) == "x + O(10)"
+   @test string(y) == "y + O(10)"
+   @test string(x^2 - y) == "-y + x^2 + O(10)"
 end
 
 @testset "Generic.AbsMSeries.manipulation" begin
@@ -119,6 +166,61 @@ end
 
    S = ResidueRing(ZZ, 7)
    R, (x, y) = PowerSeriesRing(S, [2, 3], ["x", "y"])
+
+   @test characteristic(R) == 7
+
+   # weighted
+
+   R, (x, y) = PowerSeriesRing(ZZ, [2, 3], 10, ["x", "y"])
+
+   f = x^2 + 2x*y + y + 1
+
+   @test Generic.poly(f) isa Generic.MPoly{BigInt}
+
+   @test length(f) == 4
+
+   @test nvars(R) == 2
+
+   @test precision(f) == 10
+
+   @test coeff(f, 3) == 2
+   @test coeff(f, 1) == 1
+   @test_throws BoundsError coeff(f, 0)
+   @test_throws BoundsError coeff(f, 5)
+
+   @test iszero(zero(R))
+   @test isone(one(R))
+   @test !iszero(one(R))
+   @test !isone(zero(R))
+   @test zero(R) == 0
+   @test one(R) == 1
+
+   @test isunit(1 + y + x)
+   @test !isunit(x)
+   @test !isunit(2 + x)
+
+   @test isgen(gen(R, 1))
+   @test isgen(gen(R, 2))
+   @test !isgen(x^2)
+   @test !isgen(R(1))
+
+   @test gens(R) == [x, y]
+
+   @test parent(x) == R
+
+   @test symbols(R) == [:x, :y]
+
+   @test base_ring(x) == ZZ
+   @test base_ring(R) == ZZ
+
+   @test deepcopy(f) == f
+
+   @test hash(f) isa UInt
+
+   @test characteristic(R) == 0
+
+   S = ResidueRing(ZZ, 7)
+   R, (x, y) = PowerSeriesRing(S, [2, 3], 10, ["x", "y"])
 
    @test characteristic(R) == 7
 end
