@@ -255,7 +255,7 @@ end
 
 
 """
-   @attr funcdef
+   @attr [RetType] funcdef
 
 This macro is applied to the definition of a unary function, and enables
 caching ("memoization") of its return values based on the argument. This
@@ -266,23 +266,20 @@ The name of the function is used as name for the underlying attribute.
 
 Effectively, this turns code like this:
 ```julia
-function myattr(obj::Foo)
+@attr function RetType myattr(obj::Foo)
    # ... expensive computation
    return result
 end
 ```
-into something roughly like this:
+into something essentially equivalent to this:
 ```julia
 function myattr(obj::Foo)
   return get_attribute!(obj, :myattr) do
     # ... expensive computation
     return result
-  end
+  end::RetType
 end
 ```
-However, care is taken to preserve information inferred about the
-return type of the function.
-
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -291,7 +288,7 @@ julia> @attributes mutable struct Foo
            Foo(x::Int) = new(x)
        end;
 
-julia> @attr function myattr(obj::Foo)
+julia> @attr Int function myattr(obj::Foo)
                 println("Performing expensive computation")
                 return factorial(obj.x)
              end;
@@ -307,10 +304,21 @@ julia> myattr(obj) # second time uses the cached result
 
 ```
 """
-macro attr(expr)
+macro attr(ex1, exs...)
+   if length(exs) == 0
+      rettype = Any
+      expr = ex1
+   elseif length(exs) == 1
+      rettype = ex1
+      expr = exs[1]
+   else
+      throw(ArgumentError("too many macro arguments"))
+   end
    d = MacroTools.splitdef(expr)
-   length(d[:args]) == 1 || error("Only a single argument is supported")
-   length(d[:kwargs]) == 0 || error("Keyword arguments are not supported")
+   length(d[:args]) == 1 || throw(ArgumentError("Only unary functions are supported"))
+   length(d[:kwargs]) == 0 || throw(ArgumentError("Keyword arguments are not supported"))
+
+# TODO: handle optional ::RetType
 
    # store the original function name
    name = d[:name]
@@ -322,15 +330,11 @@ macro attr(expr)
    compute_def[:name] = compute_name
    compute = MacroTools.combinedef(compute_def)
 
-   # generate another unique identifier to store the return value of the
-   # original function, which will be inferred using `Base.return_types`
-   rettype_name = gensym("rettype_$(name)")
-
    argname = d[:args][1]
    wrapper_def = copy(d)
    wrapper_def[:name] = name
    wrapper_def[:body] = quote
-      return get_attribute!(() -> $(compute_name)($argname), $(argname), Symbol($(string(name))))::$(rettype_name)
+      return get_attribute!(() -> $(compute_name)($argname), $(argname), Symbol($(string(name))))::$(rettype)
    end
    # insert the correct line number, so that `functionloc(name)` works correctly
    wrapper_def[:body].args[1] = __source__
@@ -338,9 +342,9 @@ macro attr(expr)
 
    result = quote
       $(compute)
-      const $(rettype_name) = Union{Base.return_types($(compute_name))...}
       Base.@__doc__ $(wrapper)
    end
+
 
    # TODO: perhaps also generate a tester, i.e.:
    #    has_attrname(obj::T) = has_attribute(obj, :attrname))
