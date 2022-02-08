@@ -276,7 +276,7 @@ Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Intege
 
 ## Euclidean polynomial rings
 
-For polynomials over a field, the Euclidean Ring interface is implemented.
+For polynomials over a field, the [Euclidean Ring Interface](@ref) is implemented.
 
 ```julia
 mod(f::PolyElem, g::PolyElem)

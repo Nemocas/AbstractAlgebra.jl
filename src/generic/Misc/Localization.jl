@@ -242,12 +242,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-     divides(a::LocElem{T}, b::LocElem{T}, checked::Bool = true) where {T <: RingElem}
-Returns tuple (`true`,`c`) if $b$ divides $a$ where `c`*$b$ = $a$.
-If 'checked = false' the corresponding element of the Fraction Field is returned and it is not
-checked whether it is an element of the given localization.
-"""
 function divides(a::LocElem, b::LocElem; checked::Bool = true)
    check_parent(a, b)
    c = divexact(data(a), data(b); check=false)
@@ -257,6 +251,7 @@ end
 
 @doc Markdown.doc"""
      divexact(a::LocElem{T}, b::LocElem{T}, checked::Bool = true)  where {T <: RingElem}
+
 Returns element 'c' of given localization s.th. `c`*$b$ = $a$ if such element exists.
 If 'checked = true' the result is checked to ensure it is an element of the given
 localization.
@@ -266,10 +261,6 @@ function divexact(a::LocElem, b::LocElem,; checked::Bool=true, check::Bool=true)
    d[1] ? d[2] : error("$a not divisible by $b in the given Localization")
 end
 
-@doc Markdown.doc"""
-     divrem(a::LocElem{T}, b::LocElem{T}, checked::Bool = true)  where {T <: RingElem}
-In case the ring is euclidean, return a euclidean division.
-"""
 function Base.divrem(a::LocElem{T}, b::LocElem{T}, checked::Bool = true)  where {T <: RingElem}
   check_parent(a, b)
   L = parent(a)
@@ -309,11 +300,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    gcd(a::LocElem{T}, b::LocElem{T}) where {T <: RingElement}
-
-Returns gcd of $a$ and $b$ in canonical representation.
-"""
 function gcd(a::LocElem{T}, b::LocElem{T}) where {T <: RingElement}
    check_parent(a,b)
    iszero(a) && return inv(canonical_unit(b)) * b
@@ -327,11 +313,6 @@ function gcd(a::LocElem{T}, b::LocElem{T}) where {T <: RingElement}
    return par(elem)
 end
 
-@doc Markdown.doc"""
-    lcm(a::LocElem{T}, b::LocElem{T}) where {T <: RingElement}
-
-Returns lcm of $a$ and $b$ in canonical representation.
-"""
 function lcm(a::LocElem{T}, b::LocElem{T}) where {T <: RingElement}
    check_parent(a,b)
    par = parent(a)
@@ -350,12 +331,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    gcdx(a::LocElem{T}, b::LocElem{T}) where {T <: RingElement}
-
-Returns tuple `(g,u,v)` s.th. `g` = gcd($a$,$b$) and `g` = `u` * $a$ + `v` * $b$.
-Requires method gcdx for ring that is localized.
-"""
 function gcdx(a::LocElem{T}, b::LocElem{T}) where {T <: RingElement}
    check_parent(a,b)
    L = parent(a)
