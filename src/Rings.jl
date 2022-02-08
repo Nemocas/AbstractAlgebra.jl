@@ -218,6 +218,9 @@ transpose(x::T) where {T <: RingElem} = deepcopy(x)
 # This is used in various Euclidean domains for Chinese remaindering.
 
 function ppio(a::E, b::E) where E <: RingElem
+   if iszero(a)
+     return one(parent(a)), a
+   end
    c = gcd(a, b)
    n = div(a, c)
    g = gcd(c, n)
