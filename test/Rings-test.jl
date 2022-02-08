@@ -31,4 +31,10 @@ end
    @test_throws MethodError elem_type(Char)
 end
 
+@testset "ppio" begin
+   Qx, x = QQ["x"]
+   p, q = @inferred ppio(zero(Qx), x)
+   @test isone(p) && q == zero(Qx)
+end
+
 include("julia/Integers-test.jl")
