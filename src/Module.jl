@@ -98,7 +98,8 @@ function ==(m::FPModuleElem{T}, n::FPModuleElem{T}) where T <: RingElement
 end
 
 function hash(m::FPModuleElem{T}, h::UInt)  where T <: RingElement
-   return hash(Generic._matrix(m), h)
+   b = 0xe08f5b4ea1cd9a12%UInt
+   return xor(hash(Generic._matrix(m), h), b)
 end
 
 ###############################################################################
