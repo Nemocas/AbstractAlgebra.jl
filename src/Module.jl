@@ -97,10 +97,9 @@ function ==(m::FPModuleElem{T}, n::FPModuleElem{T}) where T <: RingElement
    return Generic._matrix(m) == Generic._matrix(n)
 end
 
-function hash(m::FPModuleElem{T}, u::UInt=UInt(124))  where T <: RingElement
-   return hash(Generic._matrix(m), u)
+function hash(m::FPModuleElem{T}, h::UInt)  where T <: RingElement
+   return hash(Generic._matrix(m), h)
 end
-
 
 ###############################################################################
 #
