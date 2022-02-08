@@ -97,6 +97,11 @@ function ==(m::FPModuleElem{T}, n::FPModuleElem{T}) where T <: RingElement
    return Generic._matrix(m) == Generic._matrix(n)
 end
 
+function hash(m::FPModuleElem{T}, h::UInt)  where T <: RingElement
+   b = 0xe08f5b4ea1cd9a12%UInt
+   return xor(hash(Generic._matrix(m), h), b)
+end
+
 ###############################################################################
 #
 #   Intersection

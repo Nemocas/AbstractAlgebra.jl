@@ -18,6 +18,14 @@
 
    @test isa(N([R(2), R(7)]), Generic.SubmoduleElem)
 
+   # hashing
+   gN = gens(N)
+   D = Dict(gN[1] => 1)
+   @test haskey(D, gN[1])
+   @test haskey(D, N(R.([1, 0])))
+   @test !haskey(D, gN[2])
+   @test !haskey(D, N(R.([0, 1])))
+
    F = FreeModule(R, 5)
    nsubs = rand(0:5)
    subs = Generic.Submodule{elem_type(R)}[sub(F, [rand(F, -10:10)])[1] for i in 1:nsubs]

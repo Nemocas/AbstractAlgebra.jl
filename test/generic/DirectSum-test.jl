@@ -21,6 +21,11 @@ using Random
 
    @test isa(m, Generic.DirectSumModuleElem)
 
+   D, h = direct_sum(Q)
+   m = D([])
+
+   @test isa(m, Generic.DirectSumModuleElem)
+
    F = FreeModule(QQ,2)
    D, inj, pro = DirectSum(F, F)
    f = D([gen(F, 1), gen(F,2)])
@@ -36,6 +41,10 @@ end
          M = [rand_module(R, -10:10) for i in 1:num]
 
          D, f, g = DirectSum(M...)
+
+         @test summands(D) == M
+
+         D, f, g = direct_sum(M...)
 
          @test summands(D) == M
       end

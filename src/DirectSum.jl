@@ -34,5 +34,5 @@ function direct_sum(m::Vector{<:Module{T}}) where T <: RingElement
 end
 
 function direct_sum(m::Module{T}...) where T <: RingElement
-   Generic.DirectSum(m...)
+   Generic.DirectSum([m...])
 end

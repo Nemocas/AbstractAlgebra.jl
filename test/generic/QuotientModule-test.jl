@@ -61,6 +61,14 @@
    m = Q([])
 
    @test isa(m, Generic.QuotientModuleElem)
+
+   F = FreeModule(QQ, 3)
+   m = F([1, 0, 0])
+   n = F([0, 1, 0])
+   S, f = sub(F, [m, n])
+   SS, ff = sub(F, [m])
+   Q, g = quo(S, SS)
+   @test dim(Q) == 1
 end
 
 @testset "Generic.QuotientModule.manipulation" begin
