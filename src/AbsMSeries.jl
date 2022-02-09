@@ -65,13 +65,19 @@ end
 
 function expressify(a::AbsMSeriesElem,
                                      x = symbols(parent(a)); context = nothing)
+   R = parent(a)
    apoly = poly(a)
 
    poly_sum = Expr(:call, :+)
    n = nvars(parent(apoly))
 
    iter = zip(coefficients(apoly), exponent_vectors(apoly))
-   cv = reverse!(collect(iter))
+   citer = collect(iter)
+   if R.weighted_prec != -1
+      cv = sort!(citer; by=(tup->Base.sum(weights(R) .* tup[2])))
+   else
+      cv = reverse!(citer)
+   end
 
    for (c, v) in cv
       prod = Expr(:call, :*)
