@@ -9,9 +9,15 @@ end
 
 AbstractAlgebra.jl provide multivariate series over a commutative ring.
 
-Currently only series with capped absolute precision are provided. The
-precision in each variable can be set, but is capped at some maximum
-precision which is set when defining the ring.
+Series with capped absolute precision are provided with and without
+weights.
+
+For the unweighted case precision in each variable can be set per series,
+but is capped at some maximum precision which is set when defining the
+ring.
+
+For the weighted case, a single precision is set on the ring only. Terms
+are truncated at that precision (after applying weights).
 
 ## Generic multivariate series
 
@@ -21,16 +27,20 @@ Generic multivariate series over a commutative ring,
 Such series are capped absolute series and have type `Generic.AbsMSeries{T}`
 where `T` is the type of elements of the coefficient ring.
 
-Internally they consist of a multivariate polynomial and a vector of
-precisions, one for each variable. See the file
-`src/generic/GenericTypes.jl` for details of the type.
+Internally they consist of a multivariate polynomial. For unweighted series
+they also contain a vector of precisions, one for each variable.
+
+For weighted series weights and a precision are stored on the ring only.
+The vector of precisions in the series objects is ignored.
+
+See the file `src/generic/GenericTypes.jl` for details of the type.
 
 The series are implemented in terms of multivariate polynomials which are
 used internally to keep track of the coefficients of the series.
 
-Only lex ordering is provided at present, though series print in reverse
-order to what multivariate polynomials would print, i.e. least significant
-term first, as would be expected for series.
+Only lex ordering is provided at present both weighted and unweighted,
+though series print in reverse order to what multivariate polynomials would
+print, i.e. least significant term first, as would be expected for series.
 
 Parent objects of such series have type `Generic.AbsMSeriesRing{T}`.
 
@@ -49,25 +59,43 @@ multivariate series type.
 
 In order to construct multivariate series in AbstractAlgebra.jl, one must first
 construct the series ring itself. This is accomplished with the following
-constructor.
+constructors.
+
+For the unweighted case:
 
 ```julia
 PowerSeriesRing(R::Ring, prec::Vector{Int}, s::Vector{U}; cached::Bool = true) where U <: AbstractString
 ```
 
-Given a base ring `R` and vector of strings `s` specifying how the generators
+Given a base ring `R` and a vector of strings `s` specifying how the generators
 (variables) should be printed, along with a vector of precisions, one for each
 variable, return a tuple `U, (x, y, ...)` representing the new series ring $S$
 and the generators $x, y, \ldots$ of the ring as a tuple. By default the parent
-object `S` will depend only on `R` and the variable names `x, y, ...` and will
-be cached. Setting the optional argument `cached` to `false` will prevent the
-parent object `S` from being cached.
+object `S` will depend on `R`, the precision vector and the variable names
+`x, y, ...` and will be cached. Setting the optional argument `cached` to
+`false` will prevent the parent object `S` from being cached.
+
+In the weighted case:
+
+```
+PowerSeriesRing(R::Ring, weights::Vector{Int}, s::Vector{U}, prec::Int; cached::Bool = true) where U <: AbstractString
+```
+
+Given a base ring `R` and a vector of strings `s` specifying how the generators
+(variables) should be printed, along with a vector of weights, one for each
+variable and a bound on the (weighted) precision, return a tuple
+`U, (x, y, ...)` representing the new series ring $S$ and the generators
+$x, y, \ldots$ of the ring as a tuple. By default the parent object `S` will
+depend on `R`, the precision, the vector of weights and the variable names
+`x, y, ...` and will be cached. Setting the optional argument `cached` to
+`false` will prevent the parent object `S` from being cached.
 
 Here are some examples of creating multivariate series rings and making use of
 the resulting parent objects to coerce various elements into the series ring.
 
-Note that one can also use the function call `O(x^n)` to specify the precision
-in the variable `x` of a given series expression should be precision `n`.
+Note that one can also use the function call `O(x^n)` with unweighted series to
+specify the precision in the variable `x` of a given series expression should be
+precision `n`.
 
 !!! note
 
@@ -80,7 +108,7 @@ If one wants a series with the same precision in all variables, one can use
 `O(R, n)` where `R` is the series ring and `n` is the desired precision.
 
 If all the precisions are to be the same, the vector of integers for the
-precisions can be replaced by a single integer.
+precisions can be replaced by a single integer in the constructor.
 
 **Examples**
 
@@ -108,6 +136,15 @@ julia> R, (x, y) = PowerSeriesRing(ZZ, 3, ["x", "y"])
 
 julia> n = x + y + O(R, 2)
 y + x + O(y^2) + O(x^2)
+
+julia> R, (x, y) = PowerSeriesRing(ZZ, [2, 3], 10, ["x", "y"])
+(Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(10), y + O(10)])
+
+julia> R()
+O(10)
+
+julia> R(x)
+x + O(10)
 ```
 
 ## Basic ring functionality
@@ -167,7 +204,18 @@ true
 
 julia> t = divexact(f*x, 1 + x)
 21*x - 18*x^2 + 18*x^3 - 17*x^4 + O(x^5)
+
+julia> R, (x, y) = PowerSeriesRing(ZZ, [2, 3], 10, ["x", "y"])
+(Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(10), y + O(10)])
+
+julia> f = 3x^2*y + 1
+1 + 3*y*x^2 + O(10)
+
+julia> one(R)
+1 + O(10)
 ```
+
+Note that division is not available for weighted series.
 
 ## Power series functionality provided by AbstractAlgebra.jl
 
@@ -175,6 +223,8 @@ The functionality listed below is automatically provided by AbstractAlgebra.jl
 for absolute series over any commutative ring.
 
 ### Basic functionality
+
+The following are provided for weighted and unweighted series:
 
 ```@docs
 nvars(::Generic.AbsMSeriesRing)
@@ -186,14 +236,6 @@ symbols(::MSeriesRing)
 
 ```@docs
 precision(::Generic.AbsMSeries)
-```
-
-```@docs
-max_precision(::Generic.AbsMSeriesRing)
-```
-
-```@docs
-valuation(::Generic.AbsMSeries)
 ```
 
 ```@docs
@@ -224,6 +266,16 @@ isunit(::Generic.AbsMSeries)
 length(::Generic.AbsMSeries)
 ```
 
+The following are only available for unweighted series.
+
+```@docs
+max_precision(::Generic.AbsMSeriesRing)
+```
+
+```@docs
+valuation(::Generic.AbsMSeries)
+```
+
 ### Iteration
 
 ```@docs
@@ -240,17 +292,23 @@ exponent_vectors(::Generic.AbsMSeries)
 truncate(::Generic.AbsMSeries, ::Vector{Int})
 ```
 
+Truncation is not available for weighted series.
+
 ### Inversion
 
 ```@docs
 Base.inv(::Generic.AbsMSeries)
 ```
 
+Inversion is not available for weighted series.
+
 ### Exact division
 
 ```@docs
 divexact(::Generic.AbsMSeries{T}, ::Generic.AbsMSeries{T}) where T <: RingElem
 ```
+
+Division is not available for weighted series.
 
 ### Evaluation
 
