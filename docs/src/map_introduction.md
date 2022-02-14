@@ -12,8 +12,9 @@ Maps can be constructed from Julia functions, or they can be represented by
 some other kind of data, e.g. a matrix, or built up from other maps.
 
 Maps in AbstractAlgebra have a domain and codomain, can be applied, composed
-and composed with the identity map (assuming its domain is compatible). Various
-special kinds of map provide more functionality.
+with other maps. Various special kinds of map provide more functionality.
+
+For details please refer to the [Map Interface](@ref) documentation.
 
 For example, there are functional maps which wrap a Julia function, cached
 maps which cache values so they do not have to be recomputed each time they

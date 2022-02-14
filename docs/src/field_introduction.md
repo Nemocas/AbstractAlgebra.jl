@@ -1,4 +1,4 @@
-# Introduction.
+# Introduction
 
 A number of basic fields are provided, such as the rationals, finite
 fields, the real field, etc.
