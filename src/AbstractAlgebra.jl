@@ -823,7 +823,6 @@ export gen
 export gens
 export get_attribute
 export get_attribute!
-export get_field
 export gram
 export has_attribute
 export has_bottom_neighbor
@@ -1060,7 +1059,6 @@ export set_attribute!
 export set_coefficient!
 export set_exponent_vector!
 export set_exponent_word!
-export set_field!
 export set_length!
 export set_limit!
 export set_precision!

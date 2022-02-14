@@ -90,42 +90,6 @@ if all features of the generic Map infrastructure are required. It is bad practi
 write functions for `MyMap` directly instead of `Map(MyMap)`, since other users will be
 unable to use generic constructions over the map type `MyMap`.
 
-## Getters and setters
-
-When writing new map types, it is very important to define getters and setters of the
-fields of the new map type, rather than to access them directly.
-
-Let us suppose that the `MyMap` type has a field called `foo`. Rather than access this
-field by writing `M.foo`, one must access it using `foo(M)` (at least until Julia 1.1).
-
-If such a getter only needs to access the field `foo` of `M`, there is a standard way of
-defining such a getter and setter when defining a new map type.
-
-```julia
-foo(M::Map(MyMap)) = get_field(M, :foo)
-```
-
-To set a field of a map, one needs a setter, which can be implemented as follows:
-
-```julia
-set_foo!(M::Map(MyMap), a) = set_field(M, :foo, a)
-```
-
-In general, setters should be used rarely for map types.
-
-!!! note
-
-    By providing getter and setter functions, map types need not even contain
-    fields with the given name. For example, for a `MyMap` map type for maps
-    between integers, one does not wish to explicitly store the domain and
-    codomain in `MyMap`. Instead, we can define the getter functions `domain`
-    and `codomain` to return `JuliaZZ` for any `MyMap` object.
-
-```julia
-domain(M::Map(MyMap)) = JuliaZZ
-codomain(M::Map(MyMap)) = JuliaZZ
-```
-
 ## Required functionality for maps
 
 All map types must implement a standard interface, which we specify here.

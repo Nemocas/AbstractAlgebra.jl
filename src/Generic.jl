@@ -165,9 +165,9 @@ import ..AbstractAlgebra: FieldElement
 import ..AbstractAlgebra: gen
 import ..AbstractAlgebra: gens
 import ..AbstractAlgebra: get_cached!
-import ..AbstractAlgebra: get_field
 import ..AbstractAlgebra: GFElem
 import ..AbstractAlgebra: identity_matrix
+import ..AbstractAlgebra: image_fn
 import ..AbstractAlgebra: inflate
 import ..AbstractAlgebra: Integers
 import ..AbstractAlgebra: integral
@@ -224,7 +224,6 @@ import ..AbstractAlgebra: Ring
 import ..AbstractAlgebra: RingElem
 import ..AbstractAlgebra: RingElement
 import ..AbstractAlgebra: set_coefficient!
-import ..AbstractAlgebra: set_field!
 import ..AbstractAlgebra: set_length!
 import ..AbstractAlgebra: set_precision!
 import ..AbstractAlgebra: set_valuation!

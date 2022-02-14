@@ -2,10 +2,10 @@ mutable struct MyMap <: Map{AbstractAlgebra.Integers{BigInt}, AbstractAlgebra.In
    a::Int
 end
 
-Generic.domain(f::Map(MyMap)) = AbstractAlgebra.JuliaZZ
-Generic.codomain(f::Map(MyMap)) = AbstractAlgebra.JuliaZZ
+Generic.domain(f::MyMap) = AbstractAlgebra.JuliaZZ
+Generic.codomain(f::MyMap) = AbstractAlgebra.JuliaZZ
 
-a(f::Map(MyMap)) = Generic.get_field(f, :a)
+a(f::MyMap) = f.a
 
 (f::MyMap)(x) =  a(f)*(x + 1)
 

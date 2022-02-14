@@ -4,11 +4,9 @@
 #
 ################################################################################
 
-get_field(M::MapCache, f) = getfield(M.map, f) # pass accessors through
-set_field!(M::MapCache, f) = setfield(M.map, f) # pass accessors through
-
 domain(M::MapCache{D, C}) where {D, C} = domain(M.map)::D
 codomain(M::MapCache{D, C}) where {D, C} = codomain(M.map)::C
+image_fn(M::MapCache{D, C}) where {D, C} = image_fn(M.map)
 
 function set_limit!(M::MapCache, limit::Int)
    limit < 0 && error("Limit must be nonnegative")
