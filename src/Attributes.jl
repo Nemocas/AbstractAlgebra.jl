@@ -24,6 +24,9 @@ The latter variant is useful to enable attribute storage for types defined in
 other packages. Note that `@attributes` is idempotent: when applied to a type
 for which attribute storage is already available, it does nothing.
 
+For singleton types, attribute storage is also supported, and in fact always
+enabled. Thus it is not necessary to apply this macro to such a type.
+
 !!! note
     When applied to a struct definition this macro adds a new field to the
     struct. For structs without constructor, this will change the signature of
@@ -82,6 +85,10 @@ macro attributes(expr)
       return quote
         Base.@__doc__($(esc(expr)))
       end
+   elseif expr isa Expr && expr.head === :struct && !expr.args[1] && all(x -> x isa LineNumberNode, expr.args[3].args)
+      # Ignore application to singleton types:
+      #    @attributes struct Singleton end
+      return esc(expr)
    elseif expr isa Symbol || (expr isa Expr && expr.head === :. &&
                               length(expr.args) == 2 && expr.args[2] isa QuoteNode) ||
                               (expr isa Expr && expr.head === :curly &&
