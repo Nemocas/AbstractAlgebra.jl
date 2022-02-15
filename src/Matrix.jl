@@ -74,7 +74,7 @@ function _checkbounds(A, rows::AbstractArray{Int}, cols::AbstractArray{Int})
       throw(BoundsError(A, cols))
 end
 
-function check_square(A::MatrixElem)
+function check_square(A::MatrixElem{T}) where T <: RingElement
    issquare(A) || throw(DomainError(A, "matrix must be square"))
    A
 end
@@ -118,36 +118,36 @@ function Base.hash(a::MatElem, h::UInt)
 end
 
 @doc Markdown.doc"""
-    nrows(a::MatrixElem)
+    nrows(a::MatrixElem{T}) where T <: RingElement
 
 Return the number of rows of the given matrix.
 """
-nrows(::MatrixElem)
+nrows(::MatrixElem{T}) where T <: RingElement
 
 @doc Markdown.doc"""
-    ncols(a::MatrixElem)
+    ncols(a::MatrixElem{T}) where T <: RingElement
 
 Return the number of columns of the given matrix.
 """
-ncols(::MatrixElem)
+ncols(::MatrixElem{T}) where T <: RingElement
 
 @doc Markdown.doc"""
-    length(a::MatrixElem)
+    length(a::MatrixElem{T}) where T <: RingElement
 
 Return the number of entries in the given matrix.
 """
-length(a::MatrixElem) = nrows(a) * ncols(a)
+length(a::MatrixElem{T}) where T <: RingElement = nrows(a) * ncols(a)
 
 @doc Markdown.doc"""
-    isempty(a::MatrixElem)
+    isempty(a::MatrixElem{T}) where T <: RingElement
 
 Return `true` if `a` does not contain any entry (i.e. `length(a) == 0`), and `false` otherwise.
 """
-isempty(a::MatrixElem) = (nrows(a) == 0) | (ncols(a) == 0)
+isempty(a::MatrixElem{T}) where T <: RingElement = (nrows(a) == 0) | (ncols(a) == 0)
 
-Base.eltype(::Type{<:MatrixElem{T}}) where {T} = T
+Base.eltype(::Type{<:MatrixElem{T}}) where {T <: RingElement} = T
 
-function Base.isassigned(a::MatrixElem, i, j)
+function Base.isassigned(a::MatrixElem{T}, i, j) where T <: RingElement
     try
         a[i, j]
         true
@@ -168,18 +168,18 @@ Return the zero matrix in the given matrix space.
 zero(a::MatSpace) = a()
 
 @doc Markdown.doc"""
-    zero(x::MatrixElem, R::Ring, r::Int, c::Int)
-    zero(x::MatrixElem, R::Ring=base_ring(x))
-    zero(x::MatrixElem, r::Int, c::Int)
+    zero(x::MatrixElem{T}, R::Ring, r::Int, c::Int) where T <: RingElement
+    zero(x::MatrixElem{T}, R::Ring=base_ring(x)) where T <: RingElement
+    zero(x::MatrixElem{T}, r::Int, c::Int) where T <: RingElement
 
 Return a zero matrix similar to the given matrix, with optionally different
 base ring or dimensions.
 """
-zero(x::MatrixElem, R::Ring=base_ring(x)) = zero(x, R, nrows(x), ncols(x))
-zero(x::MatrixElem, R::Ring, r::Int, c::Int) = zero!(similar(x, R, r, c))
-zero(x::MatrixElem, r::Int, c::Int) = zero(x, base_ring(x), r, c)
+zero(x::MatrixElem{T}, R::Ring=base_ring(x)) where T <: RingElement = zero(x, R, nrows(x), ncols(x))
+zero(x::MatrixElem{T}, R::Ring, r::Int, c::Int) where T <: RingElement = zero!(similar(x, R, r, c))
+zero(x::MatrixElem{T}, r::Int, c::Int) where T <: RingElement = zero(x, base_ring(x), r, c)
 
-function zero!(x::MatrixElem)
+function zero!(x::MatrixElem{T}) where T <: RingElement
    R = base_ring(x)
    for i = 1:nrows(x), j = 1:ncols(x)
       x[i, j] = zero(R)
@@ -196,14 +196,14 @@ square matrices or else an error is thrown.
 one(a::MatSpace) = check_square(a)(1)
 
 @doc Markdown.doc"""
-    one(a::MatrixElem)
+    one(a::MatrixElem{T}) where T <: RingElement
 
 Return the identity matrix in the same matrix space as $a$. If the space does
 not contain square matrices, an error is thrown.
 """
-one(a::MatrixElem) = identity_matrix(a)
+one(a::MatrixElem{T}) where T <: RingElement = identity_matrix(a)
 
-function iszero(a::MatrixElem)
+function iszero(a::MatrixElem{T}) where T <: RingElement
    for i = 1:nrows(a)
       for j = 1:ncols(a)
          if !iszero(a[i, j])
@@ -214,7 +214,7 @@ function iszero(a::MatrixElem)
   return true
 end
 
-function isone(a::MatrixElem)
+function isone(a::MatrixElem{T}) where T <: RingElement
    issquare(a) || return false
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -355,7 +355,7 @@ similar(x::MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
 #
 ###############################################################################
 
-canonical_unit(a::MatrixElem) = canonical_unit(a[1, 1])
+canonical_unit(a::MatrixElem{T}) where T <: RingElement = canonical_unit(a[1, 1])
 
 ###############################################################################
 #
@@ -414,9 +414,9 @@ function Base.view(M::MatElem{T}, rows::Colon, cols::Colon) where T <: RingEleme
    return view(M, 1:nrows(M), 1:ncols(M))
 end
 
-Base.firstindex(M::MatrixElem, i::Int) = 1
+Base.firstindex(M::MatrixElem{T}, i::Int) where T <: RingElement = 1
 
-function Base.lastindex(M::MatrixElem, i::Int)
+function Base.lastindex(M::MatrixElem{T}, i::Int) where T <: RingElement
    if i == 1
       return nrows(M)
    elseif i == 2
@@ -432,23 +432,23 @@ end
 #
 ###############################################################################
 
-Base.ndims(::MatrixElem) = 2
+Base.ndims(::MatrixElem{T}) where T <: RingElement = 2
 
 # Cartesian indexing
 
-Base.eachindex(a::MatrixElem) = CartesianIndices((nrows(a), ncols(a)))
+Base.eachindex(a::MatrixElem{T}) where T <: RingElement = CartesianIndices((nrows(a), ncols(a)))
 
-Base.@propagate_inbounds Base.getindex(a::MatrixElem, I::CartesianIndex) =
+Base.@propagate_inbounds Base.getindex(a::MatrixElem{T}, I::CartesianIndex) where T <: RingElement =
    a[I[1], I[2]]
 
-Base.@propagate_inbounds function Base.setindex!(a::MatrixElem, x, I::CartesianIndex)
+Base.@propagate_inbounds function Base.setindex!(a::MatrixElem{T}, x, I::CartesianIndex) where T <: RingElement
    a[I[1], I[2]] = x
    a
 end
 
 # iteration
 
-function Base.iterate(a::MatrixElem, ij=(0, 1))
+function Base.iterate(a::MatrixElem{T}, ij=(0, 1)) where T <: RingElement
    i, j = ij
    i += 1
    if i > nrows(a)
@@ -469,7 +469,7 @@ Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default
 #
 ###############################################################################
 
-function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::UnitRange{Int}, c::UnitRange{Int}) where T
+function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::UnitRange{Int}, c::UnitRange{Int}) where T <: RingElement
     _checkbounds(a, r, c)
     size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
     startr = first(r)
@@ -481,7 +481,7 @@ function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::UnitRange{
     end
 end
 
-function setindex!(a::MatrixElem{T}, b::Vector, r::UnitRange{Int}, c::UnitRange{Int}) where T
+function setindex!(a::MatrixElem{T}, b::Vector, r::UnitRange{Int}, c::UnitRange{Int}) where T <: RingElement
     _checkbounds(a, r, c)
     if !((length(r) == 1 && length(c) == length(b)) || length(c) == 1 && length(r) == length(b))
       throw(DimensionMismatch("tried to assign vector of length $(length(b)) to a $(length(r))x$(length(c)) destination"))
@@ -496,27 +496,27 @@ function setindex!(a::MatrixElem{T}, b::Vector, r::UnitRange{Int}, c::UnitRange{
 end
 
 # UnitRange{Int}, Colon
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, ::Colon) where T = setindex!(a, b, r, 1:ncols(a))
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, ::Colon) where T <: RingElement = setindex!(a, b, r, 1:ncols(a))
 
 # Colon, UnitRange{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::UnitRange{Int}) where T = setindex!(a, b, 1:nrows(a), c)
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::UnitRange{Int}) where T <: RingElement = setindex!(a, b, 1:nrows(a), c)
 
 # Colon, Colon
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, ::Colon) where T = setindex!(a, b, 1:nrows(a), 1:ncols(a))
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, ::Colon) where T <: RingElement = setindex!(a, b, 1:nrows(a), 1:ncols(a))
 
 # Int, UnitRange{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, c::UnitRange{Int}) where T = setindex!(a, b, r:r, c)
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, c::UnitRange{Int}) where T <: RingElement = setindex!(a, b, r:r, c)
 
 # UnitRange{Int}, Int
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, c::Int) where T = setindex!(a, b, r, c:c)
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, c::Int) where T <: RingElement = setindex!(a, b, r, c:c)
 
 # Int, Colon
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, ::Colon) where T = setindex!(a, b, r:r, 1:ncols(a))
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, ::Colon) where T <: RingElement = setindex!(a, b, r:r, 1:ncols(a))
 
 # Colon, Int
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::Int) where T = setindex!(a, b, 1:nrows(a), c:c)
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::Int) where T <: RingElement = setindex!(a, b, 1:nrows(a), c:c)
 
-function _setindex!(a::MatrixElem{T}, b, r, c) where T
+function _setindex!(a::MatrixElem{T}, b, r, c) where T <: RingElement
    for (i, i2) in enumerate(r)
       for (j, j2) in enumerate(c)
          a[i2, j2] = b[i, j]
@@ -524,7 +524,7 @@ function _setindex!(a::MatrixElem{T}, b, r, c) where T
    end
 end
 
-function _setindex!(a::MatrixElem{T}, b::Vector, r, c) where T
+function _setindex!(a::MatrixElem{T}, b::Vector, r, c) where T <: RingElement
    for (i, i2) in enumerate(r)
       for (j, j2) in enumerate(c)
          a[i2, j2] = b[i + j - 1]
@@ -533,25 +533,25 @@ function _setindex!(a::MatrixElem{T}, b::Vector, r, c) where T
 end
 
 # Vector{Int}, Vector{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::Vector{Int}) where T = _setindex!(a, b, r, c)
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::Vector{Int}) where T <: RingElement = _setindex!(a, b, r, c)
 
 # Vector{Int}, UnitRange{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::UnitRange{Int}) where T = _setindex!(a, b, r, c)
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::UnitRange{Int}) where T <: RingElement = _setindex!(a, b, r, c)
 
 # UnitRange{Int}, Vector{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, c::Vector{Int}) where T = _setindex!(a, b, r, c)
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, c::Vector{Int}) where T <: RingElement = _setindex!(a, b, r, c)
 
 # Vector{Int}, Colon
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, ::Colon) where T = _setindex!(a, b, r, 1:ncols(a))
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, ::Colon) where T <: RingElement = _setindex!(a, b, r, 1:ncols(a))
 
 # Colon, Vector{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::Vector{Int}) where T = _setindex!(a, b, 1:nrows(a), c)
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::Vector{Int}) where T <: RingElement = _setindex!(a, b, 1:nrows(a), c)
 
 # Int, Vector{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, c::Vector{Int}) where T = setindex!(a, b, r:r, c)
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, c::Vector{Int}) where T <: RingElement = setindex!(a, b, r:r, c)
 
 # Vector{Int}, Int
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::Int) where T = setindex!(a, b, r, c:c)
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::Int) where T <: RingElement = setindex!(a, b, r, c:c)
 
 ################################################################################
 #
@@ -559,13 +559,13 @@ setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}
 #
 ################################################################################
 
-size(x::MatrixElem) = (nrows(x), ncols(x))
+size(x::MatrixElem{T}) where T <: RingElement = (nrows(x), ncols(x))
 
-size(t::MatrixElem, d::Integer) = d <= 2 ? size(t)[d] : 1
+size(t::MatrixElem{T}, d::Integer) where T <: RingElement = d <= 2 ? size(t)[d] : 1
 
-axes(t::MatrixElem) = Base.OneTo.(size(t))
+axes(t::MatrixElem{T}) where T <: RingElement = Base.OneTo.(size(t))
 
-axes(t::MatrixElem, d::Integer) = Base.OneTo(size(t, d))
+axes(t::MatrixElem{T}, d::Integer) where T <: RingElement = Base.OneTo(size(t, d))
 
 ###############################################################################
 #
@@ -595,7 +595,7 @@ Base.length(M::MatSpace) = BigInt(length(base_ring(M)))^(nrows(M)*ncols(M))
 #
 ###############################################################################
 
-function expressify(a::MatrixElem; context = nothing)
+function expressify(a::MatrixElem{T}; context = nothing) where T <: RingElement
    r = nrows(a)
    c = ncols(a)
    isempty(a) && return "$r by $c empty matrix"
@@ -614,15 +614,15 @@ function expressify(a::MatrixElem; context = nothing)
    return mat
 end
 
-function Base.show(io::IO, a::MatrixElem)
+function Base.show(io::IO, a::MatrixElem{T}) where T <: RingElement
    show_via_expressify(io, a)
 end
 
-function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem)
+function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem{T}) where T <: RingElement
    show_via_expressify(io, mi, a)
 end
 
-function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem)
+function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: RingElement
    r = nrows(a)
    c = ncols(a)
 
@@ -665,7 +665,7 @@ end
 #
 ###############################################################################
 
-function -(x::MatrixElem)
+function -(x::MatrixElem{T}) where T <: RingElement
    z = similar(x)
    for i in 1:nrows(x)
       for j in 1:ncols(x)
@@ -725,7 +725,7 @@ end
 #
 ###############################################################################
 
-function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
+function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement
    z = similar(y)
    for i = 1:nrows(y)
       for j = 1:ncols(y)
@@ -745,7 +745,7 @@ function *(x::T, y::MatrixElem{T}) where {T <: RingElem}
    return z
 end
 
-*(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}) = y*x
+*(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement = y*x
 
 *(x::MatrixElem{T}, y::T) where {T <: RingElem} = y*x
 
@@ -754,7 +754,7 @@ end
 
 Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
+function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -774,7 +774,7 @@ end
 
 Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}) = y + x
++(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement = y + x
 
 @doc Markdown.doc"""
     +(x::T, y::MatrixElem{T}) where {T <: RingElem}
@@ -803,11 +803,11 @@ Return $x + S(y)$ where $S$ is the parent of $x$.
 +(x::MatrixElem{T}, y::T) where {T <: RingElem} = y + x
 
 @doc Markdown.doc"""
-    -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
+    -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement
 
 Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
+function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -823,11 +823,11 @@ function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    -(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+    -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
 
 Return $x - S(y)$, where $S$ is the parent of $x$.
 """
-function -(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+function -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
    z = similar(x)
    R = base_ring(x)
    for i = 1:nrows(x)
@@ -985,14 +985,14 @@ end
 #
 ###############################################################################
 
-Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, T <: MatrixElem} = x^p
+Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: RingElement, T <: MatrixElem{U}} = x^p
 
 @doc Markdown.doc"""
-    ^(a::MatrixElem, b::Int)
+    ^(a::MatrixElem{T}, b::Int) where T <: RingElement
 
 Return $a^b$. We require that the matrix $a$ is square.
 """
-function ^(a::MatrixElem, b::Int)
+function ^(a::MatrixElem{T}, b::Int) where T <: RingElement
    !issquare(a) && error("Incompatible matrix dimensions in power")
    if b < 0
       return inv(a)^(-b)
@@ -1074,12 +1074,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
 
 Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 otherwise return `false`.
 """
-function ==(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+function ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
          return false
@@ -1096,12 +1096,12 @@ function ==(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
 end
 
 @doc Markdown.doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement
 
 Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement = y == x
 
 @doc Markdown.doc"""
     ==(x::MatrixElem{T}, y::T) where {T <: RingElem}
@@ -1139,7 +1139,7 @@ otherwise return `false`.
 #
 ###############################################################################
 
-function divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true) where T <: RingElement
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -1166,12 +1166,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    issymmetric(a::MatrixElem)
+    issymmetric(a::MatrixElem{T}) where T <: RingElement
 
 Return `true` if the given matrix is symmetric with respect to its main
 diagonal, otherwise return `false`.
 """
-function issymmetric(a::MatrixElem)
+function issymmetric(a::MatrixElem{T}) where T <: RingElement
     if !issquare(a)
         return false
     end
@@ -1241,12 +1241,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    tr(x::MatrixElem)
+    tr(x::MatrixElem{T}) where T <: RingElement
 
 Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
 require the matrix to be square.
 """
-function tr(x::MatrixElem)
+function tr(x::MatrixElem{T}) where T <: RingElement
    !issquare(x) && error("Not a square matrix in trace")
    d = zero(base_ring(x))
    for i = 1:nrows(x)
@@ -1262,12 +1262,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    content(x::MatrixElem)
+    content(x::MatrixElem{T}) where T <: RingElement
 
 Return the content of the matrix $a$, i.e. the greatest common divisor of all
 its entries, assuming it exists.
 """
-function content(x::MatrixElem)
+function content(x::MatrixElem{T}) where T <: RingElement
   d = zero(base_ring(x))
   for i = 1:nrows(x)
      for j = 1:ncols(x)
@@ -1287,11 +1287,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    *(P::perm, x::MatrixElem)
+    *(P::perm, x::MatrixElem{T}) where T <: RingElement
 
 Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 """
-function *(P::Perm, x::MatrixElem)
+function *(P::Perm, x::MatrixElem{T}) where T <: RingElement
    z = similar(x)
    m = nrows(x)
    n = ncols(x)
@@ -5663,12 +5663,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    swap_rows(a::MatrixElem, i::Int, j::Int)
+    swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
 Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 row are swapped.
 """
-function swap_rows(a::MatrixElem, i::Int, j::Int)
+function swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
    b = deepcopy(a)
    swap_rows!(b, i, j)
@@ -5676,11 +5676,11 @@ function swap_rows(a::MatrixElem, i::Int, j::Int)
 end
 
 @doc Markdown.doc"""
-    swap_rows!(a::MatrixElem, i::Int, j::Int)
+    swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
 Swap the $i$th and $j$th row of $a$.
 """
-function swap_rows!(a::MatrixElem, i::Int, j::Int)
+function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
    if i != j
       for k = 1:ncols(a)
@@ -5693,12 +5693,12 @@ function swap_rows!(a::MatrixElem, i::Int, j::Int)
 end
 
 @doc Markdown.doc"""
-    swap_cols(a::MatrixElem, i::Int, j::Int)
+    swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
 Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 row are swapped.
 """
-function swap_cols(a::MatrixElem, i::Int, j::Int)
+function swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    (1 <= i <= ncols(a) && 1 <= j <= ncols(a)) || throw(BoundsError())
    b = deepcopy(a)
    swap_cols!(b, i, j)
@@ -5706,11 +5706,11 @@ function swap_cols(a::MatrixElem, i::Int, j::Int)
 end
 
 @doc Markdown.doc"""
-    swap_cols!(a::MatrixElem, i::Int, j::Int)
+    swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
 Swap the $i$th and $j$th column of $a$.
 """
-function swap_cols!(a::MatrixElem, i::Int, j::Int)
+function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    if i != j
       for k = 1:nrows(a)
          x = a[k, i]
@@ -5722,12 +5722,12 @@ function swap_cols!(a::MatrixElem, i::Int, j::Int)
 end
 
 @doc Markdown.doc"""
-    reverse_rows!(a::MatrixElem)
+    reverse_rows!(a::MatrixElem{T}) where T <: RingElement
 
 Swap the $i$th and $r - i$th row of $a$ for $1 \leq i \leq r/2$,
 where $r$ is the number of rows of $a$.
 """
-function reverse_rows!(a::MatrixElem)
+function reverse_rows!(a::MatrixElem{T}) where T <: RingElement
    k = div(nrows(a), 2)
    for i in 1:k
       swap_rows!(a, i, nrows(a) - i + 1)
@@ -5736,24 +5736,24 @@ function reverse_rows!(a::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    reverse_rows(a::MatrixElem)
+    reverse_rows(a::MatrixElem{T}) where T <: RingElement
 
 Return a matrix $b$ with the entries of $a$, where the $i$th and $r - i$th
 row is swapped for $1 \leq i \leq r/2$. Here $r$ is the number of rows of
 $a$.
 """
-function reverse_rows(a::MatrixElem)
+function reverse_rows(a::MatrixElem{T}) where T <: RingElement
    b = deepcopy(a)
    return reverse_rows!(b)
 end
 
 @doc Markdown.doc"""
-    reverse_cols!(a::MatrixElem)
+    reverse_cols!(a::MatrixElem{T}) where T <: RingElement
 
 Swap the $i$th and $r - i$th column of $a$ for $1 \leq i \leq c/2$,
 where $c$ is the number of columns of $a$.
 """
-function reverse_cols!(a::MatrixElem)
+function reverse_cols!(a::MatrixElem{T}) where T <: RingElement
    k = div(ncols(a), 2)
    for i in 1:k
       swap_cols!(a, i, ncols(a) - i + 1)
@@ -5762,13 +5762,13 @@ function reverse_cols!(a::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    reverse_cols(a::MatrixElem)
+    reverse_cols(a::MatrixElem{T}) where T <: RingElement
 
 Return a matrix $b$ with the entries of $a$, where the $i$th and $r - i$th
 column is swapped for $1 \leq i \leq c/2$. Here $c$ is the number of columns
 of$a$.
 """
-function reverse_cols(a::MatrixElem)
+function reverse_cols(a::MatrixElem{T}) where T <: RingElement
    b = deepcopy(a)
    return reverse_cols!(b)
 end
@@ -5780,14 +5780,14 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
+    add_column!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
 
 Add $s$ times the $i$-th row to the $j$-th row of $a$.
 
 By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
 """
-function add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
+function add_column!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
    v = base_ring(a)(s)
    nc = ncols(a)
    !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
@@ -5801,7 +5801,7 @@ function add_column!(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nro
 end
 
 @doc Markdown.doc"""
-    add_column(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
+    add_column(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
 
 Create a copy of $a$ and add $s$ times the $i$-th row to the $j$-th row of $a$.
 
@@ -5809,20 +5809,20 @@ By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
 
 """
-function add_column(a::MatrixElem, s::RingElement, i::Int, j::Int, rows = 1:nrows(a))
+function add_column(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
    b = deepcopy(a)
    return add_column!(b, s, i, j, rows)
 end
 
 @doc Markdown.doc"""
-    add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
+    add_row!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
 
 Add $s$ times the $i$-th row to the $j$-th row of $a$.
 
 By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
 """
-function add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
+function add_row!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
    v = base_ring(a)(s)
    nr = nrows(a)
    !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
@@ -5836,14 +5836,14 @@ function add_row!(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(
 end
 
 @doc Markdown.doc"""
-    add_row(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
+    add_row(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
 
 Create a copy of $a$ and add $s$ times the $i$-th row to the $j$-th row of $a$.
 
 By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
 """
-function add_row(a::MatrixElem, s::RingElement, i::Int, j::Int, cols = 1:ncols(a))
+function add_row(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
    b = deepcopy(a)
    return add_row!(b, s, i, j, cols)
 end
@@ -5851,14 +5851,14 @@ end
 # Multiply column
 
 @doc Markdown.doc"""
-    multiply_column!(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
+    multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
 
 Multiply the $i$th column of $a$ with $s$.
 
 By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
 """
-function multiply_column!(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
+function multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
    c = base_ring(a)(s)
    nc = ncols(a)
    !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
@@ -5870,14 +5870,14 @@ function multiply_column!(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(
 end
 
 @doc Markdown.doc"""
-    multiply_column(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
+    multiply_column(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
 
 Create a copy of $a$ and multiply the $i$th column of $a$ with $s$.
 
 By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
 """
-function multiply_column(a::MatrixElem, s::RingElement, i::Int, rows = 1:nrows(a))
+function multiply_column(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
    b = deepcopy(a)
    return multiply_column!(b, s, i, rows)
 end
@@ -5885,14 +5885,14 @@ end
 # Multiply row
 
 @doc Markdown.doc"""
-    multiply_row!(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
+    multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
 
 Multiply the $i$th row of $a$ with $s$.
 
 By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
 """
-function multiply_row!(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
+function multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
    c = base_ring(a)(s)
    nr = nrows(a)
    !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
@@ -5904,14 +5904,14 @@ function multiply_row!(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
 end
 
 @doc Markdown.doc"""
-    multiply_row(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
+    multiply_row(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
 
 Create a copy of $a$ and multiply  the $i$th row of $a$ with $s$.
 
 By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
 """
-function multiply_row(a::MatrixElem, s::RingElement, i::Int, cols = 1:ncols(a))
+function multiply_row(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
    b = deepcopy(a)
    return multiply_row!(b, s, i, cols)
 end
@@ -5967,12 +5967,12 @@ function vcat(a::MatElem, b::MatElem)
 end
 
 @doc Markdown.doc"""
-    vcat(A::MatrixElem...) -> MatrixElem
+    vcat(A::MatrixElem{T}...) where T <: RingElement -> MatrixElem
 
 Return the horizontal concatenation of the matrices $A$.
 All component matrices need to have the same base ring and number of columns.
 """
-function Base.vcat(A::MatrixElem...)
+function Base.vcat(A::MatrixElem{T}...) where T <: RingElement
   return _vcat(A)
 end
 
@@ -6005,12 +6005,12 @@ function _vcat(A)
 end
 
 @doc Markdown.doc"""
-    hcat(A::MatrixElem...) -> MatrixElem
+    hcat(A::MatrixElem{T}...) where T <: RingElement -> MatrixElem
 
 Return the horizontal concatenating of the matrices $A$.
 All component matrices need to have the same base ring and number of rows.
 """
-function Base.hcat(A::MatrixElem...)
+function Base.hcat(A::MatrixElem{T}...) where T <: RingElement
   return _hcat(A)
 end
 
@@ -6042,7 +6042,7 @@ function _hcat(A)
   return M
 end
 
-function Base.cat(A::MatrixElem...;dims)
+function Base.cat(A::MatrixElem{T}...;dims) where T <: RingElement
   @assert dims == (1,2) || isa(dims, Int)
 
   if isa(dims, Int)
@@ -6066,7 +6066,7 @@ function Base.cat(A::MatrixElem...;dims)
   return X
 end
 
-function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem...)
+function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem{T}...) where T <: RingElement
   nr = 0
   k = 1
   for i in 1:length(rows)
@@ -6109,11 +6109,11 @@ _change_base_ring(R::Ring, a::MatElem) = zero_matrix(R, nrows(a), ncols(a))
 _change_base_ring(R::Ring, a::MatAlgElem) = MatrixAlgebra(R, nrows(a))()
 
 @doc Markdown.doc"""
-    change_base_ring(R::Ring, M::MatrixElem)
+    change_base_ring(R::Ring, M::MatrixElem{T}) where T <: RingElement
 
 Return the matrix obtained by coercing each entry into `R`.
 """
-function change_base_ring(R::Ring, M::MatrixElem)
+function change_base_ring(R::Ring, M::MatrixElem{T}) where T <: RingElement
    N = _change_base_ring(R, M)
    for i = 1:nrows(M), j = 1:ncols(M)
       N[i,j] = R(M[i,j])
@@ -6128,11 +6128,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    map_entries!(f, dst::MatrixElem, src::MatrixElem)
+    map_entries!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: RingElement, U <: RingElement}
 
 Like `map_entries`, but stores the result in `dst` rather than a new matrix.
 """
-function map_entries!(f, dst::MatrixElem, src::MatrixElem)
+function map_entries!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: RingElement, U <: RingElement}
    for i = 1:nrows(src), j = 1:ncols(src)
       dst[i, j] = f(src[i, j])
    end
@@ -6140,19 +6140,19 @@ function map_entries!(f, dst::MatrixElem, src::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    map!(f, dst::MatrixElem, src::MatrixElem)
+    map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: RingElement, U <: RingElement}
 
 Like `map`, but stores the result in `dst` rather than a new matrix.
 This is equivalent to `map_entries!(f, dst, src)`.
 """
-Base.map!(f, dst::MatrixElem, src::MatrixElem) = map_entries!(f, dst, src)
+Base.map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: RingElement, U <: RingElement} = map_entries!(f, dst, src)
 
 @doc Markdown.doc"""
-    map_entries(f, a::MatrixElem)
+    map_entries(f, a::MatrixElem{T}) where T <: RingElement
 
 Transform matrix `a` by applying `f` on each element.
 """
-function map_entries(f, a::MatrixElem)
+function map_entries(f, a::MatrixElem{T}) where T <: RingElement
    isempty(a) && return _change_base_ring(parent(f(zero(base_ring(a)))), a)
    b11 = f(a[1, 1])
    b = _change_base_ring(parent(b11), a)
@@ -6165,12 +6165,12 @@ function map_entries(f, a::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    map(f, a::MatrixElem)
+    map(f, a::MatrixElem{T}) where T <: RingElement
 
 Transform matrix `a` by applying `f` on each element.
 This is equivalent to `map_entries(f, a)`.
 """
-Base.map(f, a::MatrixElem) = map_entries(f, a)
+Base.map(f, a::MatrixElem{T}) where T <: RingElement = map_entries(f, a)
 
 ###############################################################################
 #
@@ -6442,7 +6442,7 @@ end
 ###############################################################################
 
 """
-    Matrix(A::MatrixElem)
+    Matrix(A::MatrixElem{T}) where T <: RingElement
 
 Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
 
@@ -6458,10 +6458,10 @@ julia> Matrix(A)
  4  5  6
 ```
 """
-Matrix(M::MatrixElem) = eltype(M)[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
+Matrix(M::MatrixElem{T}) where T <: RingElement = eltype(M)[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
 
 """
-    Array(A::MatrixElem)
+    Array(A::MatrixElem{T}) where T <: RingElement
 
 Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
 
@@ -6477,4 +6477,4 @@ julia> Array(A)
  x^2  x^3
 ```
 """
-Array(M::MatrixElem) = Matrix(M)
+Array(M::MatrixElem{T}) where T <: RingElement = Matrix(M)
