@@ -3869,17 +3869,7 @@ function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
    return M
 end
 
-# this finish function holds a reference to the returned poly and can't be
-# used to construct multiple polynomials
 function finish(M::MPolyBuildCtx{T}) where T
-   M.poly = sort_terms!(M.poly)
-   M.poly = combine_like_terms!(M.poly)
-   return M.poly
-end
-
-# this is the way finish should work, but it is only introduced for
-# FreeAssAlgElem to not break anything with respect to the old finish behavior
-function finish(M::MPolyBuildCtx{T}) where T <: FreeAssAlgElem
    (res, M.poly) = (M.poly, zero(parent(M.poly)))
    return combine_like_terms!(sort_terms!(res))
 end
