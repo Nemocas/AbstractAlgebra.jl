@@ -135,8 +135,7 @@ export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
 
 export ZZ, QQ, zz, qq, RealField, RDF
 
-export create_accessors, get_handle, zeros,
-       sig_exists
+export create_accessors, get_handle, zeros
 
 export NotInvertibleError, error_dim_negative, ErrorConstrDimMismatch
 
@@ -674,21 +673,6 @@ function create_accessors(T, S, handle)
       a.auxilliary_data[handle] = b
    end
    return get, set
-end
-
-###############################################################################
-#
-#   Promote rule helpers
-#
-###############################################################################
-
-function sig_exists(T::Type{Tuple{U, V, W}}, sig_table::Vector{X}) where {U, V, W, X}
-   for s in sig_table
-      if s === T
-         return true
-      end
-   end
-   return false
 end
 
 ###############################################################################
