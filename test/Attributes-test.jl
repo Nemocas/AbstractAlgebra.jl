@@ -52,7 +52,6 @@ end
 # applying @attributes to a singleton typename is supported but does nothing
 @attributes Tmp.Singleton
 
-
 @testset "@attributes input validation" begin
 
     @test_throws Exception @attributes Int
