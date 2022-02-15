@@ -92,9 +92,9 @@
       @test !(y in keys(Dict(x => 1)))
    end
 
-   R, (x, y) = QQ["x", "y"]
+   R1, (x, y) = QQ["x", "y"]
 
-   B = MPolyBuildCtx(R)
+   B = MPolyBuildCtx(R1)
 
    push_term!(B, QQ(6), [6, 6])
    p = finish(B)
