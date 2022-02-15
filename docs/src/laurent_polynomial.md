@@ -80,6 +80,6 @@ julia> map_coefficients(x->2x, f)
 julia> change_base_ring(RealField, f)
 5.0*x^3 + 2.0*x + x^-2
 
-julia> lead(f), trail(f)
+julia> leading_coefficient(f), trailing_coefficient(f)
 (5, 1)
 ```
