@@ -332,10 +332,23 @@ end
 
    @test isa(matrix(R, 2, 2, [1 2; 3 4]), MatElem)
 
-   # these currently fail
+   # these are not supported
    # @test isa(matrix(R, 2, 2, [[1 2; 3 4] [2 3; 4 5]; [3 4; 5 6] [4 5; 6 7]]), MatElem)
    # @test isa(matrix(R, 2, 2, [matrix(R, [1 2; 3 4]) matrix(R, [2 3; 3 4]); matrix(R, [3 4; 5 6]) matrix(R, [4 5; 6 7])]), MatElem)
    # @test isa(matrix(R,  matrix(R, [R([1 2; 3 4]) R([2 3; 3 4]); R([3 4; 5 6]) R([4 5; 6 7])]), MatElem)
+
+   A = [1 2; 3 4]
+   B = [2 3; 4 5]
+   C = [3 4; 5 6]
+   D = [4 5; 6 7]
+
+   RA = R(A)
+   RB = R(B)
+   RC = R(C)
+   RD = R(D)
+
+   @test isa(matrix(R, 2, 2, [A, B, C, D]), MatElem)
+   @test isa(matrix(R, 2, 2, [RA, RB, RC, RD]), MatElem)
 end
 
 @testset "Generic.Mat.size/axes" begin

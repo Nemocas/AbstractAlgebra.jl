@@ -448,7 +448,7 @@ end
 
 # iteration
 
-function Base.iterate(a::MatrixElem{T}, ij=(0, 1)) where T <: RingElement
+function Base.iterate(a::MatrixElem{T}, ij=(0, 1)) where T <: NCRingElement
    i, j = ij
    i += 1
    if i > nrows(a)
@@ -595,7 +595,7 @@ Base.length(M::MatSpace) = BigInt(length(base_ring(M)))^(nrows(M)*ncols(M))
 #
 ###############################################################################
 
-function expressify(a::MatrixElem{T}; context = nothing) where T <: RingElement
+function expressify(a::MatrixElem{T}; context = nothing) where T <: NCRingElement
    r = nrows(a)
    c = ncols(a)
    isempty(a) && return "$r by $c empty matrix"
@@ -614,15 +614,15 @@ function expressify(a::MatrixElem{T}; context = nothing) where T <: RingElement
    return mat
 end
 
-function Base.show(io::IO, a::MatrixElem{T}) where T <: RingElement
+function Base.show(io::IO, a::MatrixElem{T}) where T <: NCRingElement
    show_via_expressify(io, a)
 end
 
-function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem{T}) where T <: RingElement
+function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem{T}) where T <: NCRingElement
    show_via_expressify(io, mi, a)
 end
 
-function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: RingElement
+function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: NCRingElement
    r = nrows(a)
    c = ncols(a)
 
