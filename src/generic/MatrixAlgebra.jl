@@ -143,7 +143,7 @@ end
 #
 ###############################################################################
 
-function (a::MatAlgebra{T})() where {T <: RingElement}
+function (a::MatAlgebra{T})() where {T <: NCRingElement}
    R = base_ring(a)
    entries = Array{T}(undef, a.n, a.n)
    for i = 1:a.n
@@ -156,7 +156,7 @@ function (a::MatAlgebra{T})() where {T <: RingElement}
    return z
 end
 
-function (a::MatAlgebra{T})(b::S) where {S <: RingElement, T <: RingElement}
+function (a::MatAlgebra{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    entries = Array{T}(undef, a.n, a.n)
    rb = R(b)
@@ -174,12 +174,12 @@ function (a::MatAlgebra{T})(b::S) where {S <: RingElement, T <: RingElement}
    return z
 end
 
-function (a::MatAlgebra{T})(b::MatAlgElem{T}) where {T <: RingElement}
+function (a::MatAlgebra{T})(b::MatAlgElem{T}) where {T <: NCRingElement}
    parent(b) != a && error("Unable to coerce matrix")
    return b
 end
 
-function (a::MatAlgebra{T})(b::Matrix{S}) where {S <: RingElement, T <: RingElement}
+function (a::MatAlgebra{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(a.n, a.n, b)
    entries = Array{T}(undef, a.n, a.n)
@@ -193,7 +193,7 @@ function (a::MatAlgebra{T})(b::Matrix{S}) where {S <: RingElement, T <: RingElem
    return z
 end
 
-function (a::MatAlgebra{T})(b::Vector{S}) where {S <: RingElement, T <: RingElement}
+function (a::MatAlgebra{T})(b::Vector{S}) where {S <: NCRingElement, T <: NCRingElement}
    _check_dim(a.n, a.n, b)
    b = Matrix{S}(transpose(reshape(b, a.n, a.n)))
    z = a(b)

@@ -318,6 +318,14 @@ end
    @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
 
    @test dense_matrix_type(R) == elem_type(S)
+
+   @test isa(S(), MatElem)
+   @test isa(S(ZZ(1)), MatElem)
+   @test isa(S(one(R)), MatElem)
+   @test isa(S([1 2; 3 4]), MatElem)
+   @test isa(S([1, 2, 3, 4]), MatElem)
+
+   @test parent(S()) == S
 end
 
 @testset "Generic.Mat.size/axes" begin

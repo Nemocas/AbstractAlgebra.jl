@@ -77,6 +77,14 @@ end
 
    @test isexact_type(elem_type(S)) == true
    @test isdomain_type(elem_type(S)) == false
+
+   @test isa(S(), MatAlgElem)
+   @test isa(S(ZZ(1)), MatAlgElem)
+   @test isa(S(one(R)), MatAlgElem)
+   @test isa(S([1 2; 3 4]), MatAlgElem)
+   @test isa(S([1, 2, 3, 4]), MatAlgElem)
+
+   @test parent(S()) == S
 end
 
 @testset "Generic.MatAlg.manipulation" begin

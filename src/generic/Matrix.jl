@@ -158,7 +158,7 @@ end
 #
 ###############################################################################
 
-function (a::MatSpace{T})() where {T <: RingElement}
+function (a::MatSpace{T})() where {T <: NCRingElement}
    R = base_ring(a)
    entries = Array{T}(undef, a.nrows, a.ncols)
    for i = 1:a.nrows
@@ -171,7 +171,7 @@ function (a::MatSpace{T})() where {T <: RingElement}
    return z
 end
 
-function (a::MatSpace{T})(b::S) where {S <: RingElement, T <: RingElement}
+function (a::MatSpace{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    entries = Array{T}(undef, a.nrows, a.ncols)
    rb = R(b)
@@ -189,12 +189,12 @@ function (a::MatSpace{T})(b::S) where {S <: RingElement, T <: RingElement}
    return z
 end
 
-function (a::MatSpace{T})(b::Mat{T}) where {T <: RingElement}
+function (a::MatSpace{T})(b::Mat{T}) where {T <: NCRingElement}
    parent(b) != a && error("Unable to coerce matrix")
    return b
 end
 
-function (a::MatSpace{T})(b::Matrix{T}) where T <: RingElement
+function (a::MatSpace{T})(b::Matrix{T}) where T <: NCRingElement
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
    if !isempty(b)
@@ -205,7 +205,7 @@ function (a::MatSpace{T})(b::Matrix{T}) where T <: RingElement
    return z
 end
 
-function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: RingElement, T <: RingElement}
+function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
    entries = Array{T}(undef, a.nrows, a.ncols)
@@ -219,7 +219,7 @@ function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: RingElement, T <: Ri
    return z
 end
 
-function (a::MatSpace{T})(b::AbstractVector{S}) where {S <: RingElement, T <: RingElement}
+function (a::MatSpace{T})(b::AbstractVector{S}) where {S <: NCRingElement, T <: NCRingElement}
    _check_dim(a.nrows, a.ncols, b)
    b = Matrix{S}(transpose(reshape(b, a.ncols, a.nrows)))
    z = a(b)
