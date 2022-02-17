@@ -61,6 +61,13 @@ end
    @test_throws ErrorConstrDimMismatch S([t t^2 t^3 ; t^4 t^5 t^6 ; t^7 t^8 t^9 ; t t^2 t^3])
    @test_throws ErrorConstrDimMismatch S([t, t^2])
    @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10])
+
+   # Test constructors over noncommutative ring
+   S = MatrixAlgebra(ZZ, 2)
+   
+   V = MatrixAlgebra(S, 2)
+
+   @test isa(V, MatAlgebra)
 end
 
 @testset "Generic.MatAlg.manipulation" begin

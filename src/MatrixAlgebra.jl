@@ -12,7 +12,7 @@ export MatrixAlgebra, divexact_left, divexact_right
 #
 ###############################################################################
 
-function base_ring(a::MatAlgebra{T}) where {T <: RingElement}
+function base_ring(a::MatAlgebra{T}) where {T <: NCRingElement}
    a.base_ring::parent_type(T)
 end
 
@@ -445,6 +445,6 @@ the ring $R$. If `cached == true` (the default), the returned parent object
 is cached so that it can returned by future calls to the constructor with the
 same degree and base ring.
 """
-function MatrixAlgebra(R::Ring, n::Int; cached::Bool = true)
+function MatrixAlgebra(R::NCRing, n::Int; cached::Bool = true)
    Generic.MatrixAlgebra(R, n, cached = cached)
 end

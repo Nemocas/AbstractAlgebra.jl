@@ -206,7 +206,7 @@ end
 #
 ###############################################################################
 
-function MatrixAlgebra(R::AbstractAlgebra.Ring, n::Int; cached::Bool = true)
+function MatrixAlgebra(R::AbstractAlgebra.NCRing, n::Int; cached::Bool = true)
    T = elem_type(R)
    return MatAlgebra{T}(R, n, cached)
 end

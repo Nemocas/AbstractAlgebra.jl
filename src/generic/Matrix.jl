@@ -232,7 +232,7 @@ end
 #
 ###############################################################################
 
-function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int; cached::Bool = true)
+function MatrixSpace(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end

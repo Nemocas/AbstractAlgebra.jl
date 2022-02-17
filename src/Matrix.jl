@@ -35,9 +35,9 @@ export MatrixSpace, add_column, add_column!, add_row, add_row!,
 #
 ###############################################################################
 
-base_ring(a::MatSpace{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
+base_ring(a::MatSpace{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T)
 
-base_ring(a::MatrixElem{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
+base_ring(a::MatrixElem{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T)
 
 function check_parent(a::MatElem, b::MatElem, throw::Bool = true)
   fl = (base_ring(a) != base_ring(b) || nrows(a) != nrows(b) || ncols(a) != ncols(b))
@@ -6424,14 +6424,14 @@ diagonal_matrix(x::RingElement, m::Int) = diagonal_matrix(x, m, m)
 ###############################################################################
 
 @doc Markdown.doc"""
-    MatrixSpace(R::Ring, r::Int, c::Int; cached::Bool = true)
+    MatrixSpace(R::NCRing, r::Int, c::Int; cached::Bool = true)
 
 Return parent object corresponding to the space of $r\times c$ matrices over
 the ring $R$. If `cached == true` (the default), the returned parent object
 is cached so that it can returned by future calls to the constructor with the
 same dimensions and base ring.
 """
-function MatrixSpace(R::Ring, r::Int, c::Int; cached::Bool = true)
+function MatrixSpace(R::NCRing, r::Int, c::Int; cached::Bool = true)
    return Generic.MatrixSpace(R, r, c, cached=cached)
 end
 

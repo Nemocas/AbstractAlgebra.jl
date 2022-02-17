@@ -303,6 +303,13 @@ end
    @test block_diagonal_matrix(ZZ, Matrix{Int}[]) == matrix(ZZ, 0, 0, [])
    @test block_diagonal_matrix(ZZ, [M1, N1, K1]) == block_diagonal_matrix([M, N, K])
    @test block_diagonal_matrix(ZZ, [K1]) == block_diagonal_matrix([K])
+
+   # Test constructors over noncommutative ring
+   S = MatrixAlgebra(ZZ, 2)
+   
+   V = MatrixSpace(S, 2, 3)
+
+   @test isa(V, MatSpace)
 end
 
 @testset "Generic.Mat.size/axes" begin
