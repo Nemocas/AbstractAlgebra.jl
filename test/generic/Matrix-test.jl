@@ -305,11 +305,19 @@ end
    @test block_diagonal_matrix(ZZ, [K1]) == block_diagonal_matrix([K])
 
    # Test constructors over noncommutative ring
-   S = MatrixAlgebra(ZZ, 2)
+   R = MatrixAlgebra(ZZ, 2)
    
-   V = MatrixSpace(S, 2, 3)
+   S = MatrixSpace(R, 2, 3)
 
-   @test isa(V, MatSpace)
+   @test isa(S, MatSpace)
+
+   @test base_ring(S) == R
+
+   @test elem_type(S) == Generic.MatSpaceElem{elem_type(R)}
+   @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
+   @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
+
+   @test dense_matrix_type(R) == elem_type(S)
 end
 
 @testset "Generic.Mat.size/axes" begin

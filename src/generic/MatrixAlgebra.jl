@@ -10,21 +10,21 @@
 #
 ###############################################################################
 
-parent_type(::Type{MatAlgElem{T}}) where T <: RingElement = MatAlgebra{T}
+parent_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = MatAlgebra{T}
 
-elem_type(::Type{MatAlgebra{T}}) where {T <: RingElement} = MatAlgElem{T}
+elem_type(::Type{MatAlgebra{T}}) where {T <: NCRingElement} = MatAlgElem{T}
 
 @doc Markdown.doc"""
-    parent(a::MatAlgElem{T}, cached::Bool = true) where T <: RingElement
+    parent(a::MatAlgElem{T}, cached::Bool = true) where T <: NCRingElement
 
 Return the parent object of the given matrix.
 """
-parent(a::MatAlgElem{T}, cached::Bool = true) where T <: RingElement =
+parent(a::MatAlgElem{T}, cached::Bool = true) where T <: NCRingElement =
     MatAlgebra{T}(a.base_ring, size(a.entries)[1], cached)
 
-isexact_type(::Type{MatAlgElem{T}}) where T <: RingElement = isexact_type(T)
+isexact_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = isexact_type(T)
 
-isdomain_type(::Type{MatAlgElem{T}}) where T <: RingElement = false
+isdomain_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = false
 
 ###############################################################################
 #

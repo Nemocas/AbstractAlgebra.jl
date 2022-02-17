@@ -16,7 +16,7 @@ function base_ring(a::MatAlgebra{T}) where {T <: NCRingElement}
    a.base_ring::parent_type(T)
 end
 
-function check_parent(a::MatAlgElem{T}, b::MatAlgElem{T}, throw::Bool = true) where T <: RingElement
+function check_parent(a::MatAlgElem{T}, b::MatAlgElem{T}, throw::Bool = true) where T <: NCRingElement
   fl = (base_ring(a) != base_ring(b) || degree(a) != degree(b))
   fl && throw && error("Incompatible matrix spaces in matrix operation")
   return !fl

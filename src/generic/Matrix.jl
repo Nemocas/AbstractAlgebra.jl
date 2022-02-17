@@ -10,26 +10,26 @@
 #
 ###############################################################################
 
-parent_type(::Type{S}) where {T <: RingElement, S <: Mat{T}} = MatSpace{T}
+parent_type(::Type{S}) where {T <: NCRingElement, S <: Mat{T}} = MatSpace{T}
 
-elem_type(::Type{MatSpace{T}}) where {T <: RingElement} = MatSpaceElem{T}
+elem_type(::Type{MatSpace{T}}) where {T <: NCRingElement} = MatSpaceElem{T}
 
 @doc Markdown.doc"""
-    parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: RingElement
+    parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: NCRingElement
 
 Return the parent object of the given matrix.
 """
-parent(a::Mat{T}, cached::Bool = true) where T <: RingElement =
+parent(a::Mat{T}, cached::Bool = true) where T <: NCRingElement =
     MatSpace{T}(a.base_ring, size(a.entries)..., cached)
 
-dense_matrix_type(::Type{T}) where T <: RingElement = MatSpaceElem{T}
+dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 
 @doc Markdown.doc"""
     dense_matrix_type(R::Ring)
     
 Return the type of matrices over the given ring.
 """
-dense_matrix_type(R::Ring) = dense_matrix_type(elem_type(R))
+dense_matrix_type(R::NCRing) = dense_matrix_type(elem_type(R))
 
 ###############################################################################
 #

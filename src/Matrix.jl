@@ -74,7 +74,7 @@ function _checkbounds(A, rows::AbstractArray{Int}, cols::AbstractArray{Int})
       throw(BoundsError(A, cols))
 end
 
-function check_square(A::MatrixElem{T}) where T <: RingElement
+function check_square(A::MatrixElem{T}) where T <: NCRingElement
    issquare(A) || throw(DomainError(A, "matrix must be square"))
    A
 end
