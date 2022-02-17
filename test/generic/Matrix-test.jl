@@ -326,6 +326,9 @@ end
    @test isa(S([1, 2, 3, 4]), MatElem)
 
    @test parent(S()) == S
+
+   @test isa(zero_matrix(R, 2, 2), MatElem)
+   @test isa(identity_matrix(R, 2), MatElem)
 end
 
 @testset "Generic.Mat.size/axes" begin

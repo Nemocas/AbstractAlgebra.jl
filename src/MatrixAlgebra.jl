@@ -408,7 +408,7 @@ randmat_with_rank(S::MatAlgebra{T}, rank::Int, v...) where {T <: RingElement} =
 #
 ###############################################################################
 
-function identity_matrix(M::MatAlgElem{T}, n::Int) where T <: RingElement
+function identity_matrix(M::MatAlgElem{T}, n::Int) where T <: NCRingElement
    R = base_ring(M)
    arr = Array{T}(undef, n, n)
    for i in 1:n
@@ -427,7 +427,7 @@ end
 Return the identity matrix over the same base ring as $M$ and with the
 same dimensions.
 """
-function identity_matrix(M::MatAlgElem{T}) where T <: RingElement
+function identity_matrix(M::MatAlgElem{T}) where T <: NCRingElement
    return identity_matrix(M, nrows(M))
 end
 

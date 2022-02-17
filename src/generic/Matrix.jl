@@ -57,7 +57,7 @@ ncols(a::Union{Mat, MatAlgElem}) = size(a.entries, 2)
 
 Base.@propagate_inbounds getindex(a::Union{Mat, MatAlgElem}, r::Int, c::Int) = a.entries[r, c]
 
-Base.@propagate_inbounds function setindex!(a::Union{Mat, MatAlgElem}, d::RingElement,
+Base.@propagate_inbounds function setindex!(a::Union{Mat, MatAlgElem}, d::NCRingElement,
                                             r::Int, c::Int)
     a.entries[r, c] = base_ring(a)(d)
 end

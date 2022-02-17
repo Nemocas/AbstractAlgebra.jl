@@ -6332,7 +6332,7 @@ end
 
 Return the $r \times c$ zero matrix over $R$.
 """
-function zero_matrix(R::Ring, r::Int, c::Int)
+function zero_matrix(R::NCRing, r::Int, c::Int)
    arr = Array{elem_type(R)}(undef, r, c)
    for i in 1:r
       for j in 1:c
@@ -6351,11 +6351,11 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    identity_matrix(R::Ring, n::Int)
+    identity_matrix(R::NCRing, n::Int)
 
 Return the $n \times n$ identity matrix over $R$.
 """
-identity_matrix(R::Ring, n::Int) = diagonal_matrix(one(R), n)
+identity_matrix(R::NCRing, n::Int) = diagonal_matrix(one(R), n)
 
 ################################################################################
 #
@@ -6364,17 +6364,17 @@ identity_matrix(R::Ring, n::Int) = diagonal_matrix(one(R), n)
 ################################################################################
 
 @doc Markdown.doc"""
-    identity_matrix(M::MatElem{T}) where T <: RingElement
+    identity_matrix(M::MatElem{T}) where T <: NCRingElement
 
 Construct the identity matrix in the same matrix space as `M`, i.e.
 with ones down the diagonal and zeroes elsewhere. `M` must be square.
 This is an alias for `one(M)`.
 """
-function identity_matrix(M::MatElem{T}) where T <: RingElement
+function identity_matrix(M::MatElem{T}) where T <: NCRingElement
    identity_matrix(check_square(M), nrows(M))
 end
 
-function identity_matrix(M::MatElem{T}, n::Int) where T <: RingElement
+function identity_matrix(M::MatElem{T}, n::Int) where T <: NCRingElement
    z = zero(M, n, n)
    R = base_ring(M)
    for i = 1:n
@@ -6407,7 +6407,7 @@ julia> diagonal_matrix(QQ(-1), 3)
 [ 0//1    0//1   -1//1]
 ```
 """
-function diagonal_matrix(x::RingElement, m::Int, n::Int)
+function diagonal_matrix(x::NCRingElement, m::Int, n::Int)
    z = zero_matrix(parent(x), m, n)
    for i in 1:min(m, n)
       z[i, i] = x
@@ -6415,7 +6415,7 @@ function diagonal_matrix(x::RingElement, m::Int, n::Int)
    return z
 end
 
-diagonal_matrix(x::RingElement, m::Int) = diagonal_matrix(x, m, m)
+diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
 
 ###############################################################################
 #
