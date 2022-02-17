@@ -6291,7 +6291,7 @@ randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
 
 Constructs the matrix over $R$ with entries as in `arr`.
 """
-function matrix(R::Ring, arr::AbstractMatrix{T}) where {T}
+function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
    if elem_type(R) === T
       z = Generic.MatSpaceElem{elem_type(R)}(arr)
       z.base_ring = R
@@ -6308,7 +6308,7 @@ end
 Constructs the $r \times c$ matrix over $R$, where the entries are taken
 row-wise from `arr`.
 """
-function matrix(R::Ring, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
+function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
    _check_dim(r, c, arr)
    ndims(arr) == 2 && return matrix(R, arr)
    if elem_type(R) === T

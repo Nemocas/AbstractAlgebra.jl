@@ -307,7 +307,7 @@ end
    # Test constructors over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 3)
+   S = MatrixSpace(R, 2, 2)
 
    @test isa(S, MatSpace)
 
@@ -329,6 +329,13 @@ end
 
    @test isa(zero_matrix(R, 2, 2), MatElem)
    @test isa(identity_matrix(R, 2), MatElem)
+
+   @test isa(matrix(R, 2, 2, [1 2; 3 4]), MatElem)
+
+   # these currently fail
+   # @test isa(matrix(R, 2, 2, [[1 2; 3 4] [2 3; 4 5]; [3 4; 5 6] [4 5; 6 7]]), MatElem)
+   # @test isa(matrix(R, 2, 2, [matrix(R, [1 2; 3 4]) matrix(R, [2 3; 3 4]); matrix(R, [3 4; 5 6]) matrix(R, [4 5; 6 7])]), MatElem)
+   # @test isa(matrix(R,  matrix(R, [R([1 2; 3 4]) R([2 3; 3 4]); R([3 4; 5 6]) R([4 5; 6 7])]), MatElem)
 end
 
 @testset "Generic.Mat.size/axes" begin
