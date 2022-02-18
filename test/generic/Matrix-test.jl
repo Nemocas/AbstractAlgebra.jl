@@ -349,6 +349,11 @@ end
 
    @test isa(matrix(R, 2, 2, [A, B, C, D]), MatElem)
    @test isa(matrix(R, 2, 2, [RA, RB, RC, RD]), MatElem)
+
+   @test isa(block_diagonal_matrix(R, [A, B]), MatElem)
+
+   # the following is not supported
+   # @test isa(block_diagonal_matrix([RA, RB]), MatElem)
 end
 
 @testset "Generic.Mat.size/axes" begin

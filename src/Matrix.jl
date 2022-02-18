@@ -267,12 +267,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
+    block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
 
 Create the block diagonal matrix whose blocks are given by the matrices in `V`.
 There must be at least one matrix in V.
 """
-function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
+function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
    length(V) > 0 || error("At least one matrix is required")
    rows = sum(nrows(N) for N in V)
    cols = sum(ncols(N) for N in V)
@@ -301,12 +301,12 @@ function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    block_diagonal_matrix(R::Ring, V::Vector{<:Matrix{T}}) where T <: RingElement
+   block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
 
 Create the block diagonal matrix over the ring `R` whose blocks are given
 by the matrices in `V`. Entries are coerced into `R` upon creation.
 """
-function block_diagonal_matrix(R::Ring, V::Vector{<:Matrix{T}}) where T <: RingElement
+function block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
    if length(V) == 0
       return zero_matrix(R, 0, 0)
    end
