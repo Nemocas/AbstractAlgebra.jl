@@ -388,6 +388,18 @@ end
    @test A^5 == A^2*A^3
 
    @test A^0 == one(S)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+
+   @test M^0 == one(S)
+   @test M^1 == M
+   @test M^2 == M*M
+   @test M^3 == M*M*M
 end
 
 @testset "Generic.MatAlg.exact_division" begin

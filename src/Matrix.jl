@@ -1067,14 +1067,14 @@ end
 #
 ###############################################################################
 
-Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: RingElement, T <: MatrixElem{U}} = x^p
+Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: NCRingElement, T <: MatrixElem{U}} = x^p
 
 @doc Markdown.doc"""
-    ^(a::MatrixElem{T}, b::Int) where T <: RingElement
+    ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
 
 Return $a^b$. We require that the matrix $a$ is square.
 """
-function ^(a::MatrixElem{T}, b::Int) where T <: RingElement
+function ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
    !issquare(a) && error("Incompatible matrix dimensions in power")
    if b < 0
       return inv(a)^(-b)

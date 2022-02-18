@@ -116,7 +116,7 @@ zero(x::MatAlgElem, n::Int) = zero!(similar(x, n))
 #
 ################################################################################
 
-function copy(d::MatAlgElem{T}) where T <: RingElement
+function copy(d::MatAlgElem{T}) where T <: NCRingElement
    z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
@@ -126,7 +126,7 @@ function copy(d::MatAlgElem{T}) where T <: RingElement
    return z
 end
 
-function deepcopy_internal(d::MatAlgElem{T}, dict::IdDict) where T <: RingElement
+function deepcopy_internal(d::MatAlgElem{T}, dict::IdDict) where T <: NCRingElement
    z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)

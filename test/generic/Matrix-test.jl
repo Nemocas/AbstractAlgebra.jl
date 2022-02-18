@@ -1413,6 +1413,18 @@ end
    A = S(Rational{BigInt}[2 3; 7 -4])
 
    @test A^-1 == inv(A)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+
+   @test M^0 == one(S)
+   @test M^1 == M
+   @test M^2 == M*M
+   @test M^3 == M*M*M
 end
 
 @testset "Generic.Mat.adhoc_exact_division" begin
