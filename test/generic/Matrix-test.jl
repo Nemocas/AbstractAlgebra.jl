@@ -1246,6 +1246,39 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    end
 
    _test_matrix_vector_prod(R, -1000:1000)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+   
+   t1 = rand(ZZ, -10:10)
+   t2 = rand(R, -10:10)
+
+   @test t1*(M + N) == t1*M + t1*N
+   @test t1*(M - N) == t1*M - t1*N
+   @test (M + N)*t1 == M*t1 + N*t1
+   @test (M - N)*t1 == M*t1 - N*t1
+
+   @test t2*(M + N) == t2*M + t2*N
+   @test t2*(M - N) == t2*M - t2*N
+   @test (M + N)*t2 == M*t2 + N*t2
+   @test (M - N)*t2 == M*t2 - N*t2
+
+   @test M + t1 == M - (-t1)
+   @test M + t2 == M - (-t2)
+
+   @test t1 + M == t1 - (-M)
+   @test t2 + M == t2 - (-M)
+
+   r1 = rand(R, -10:10)
+   r2 = rand(R, -10:10)
+
+   @test (M + N)*[r1, r2] == M*[r1, r2] + N*[r1, r2]
+   @test [r1, r2]*(M + N) == [r1, r2]*M + [r1, r2]*N
 end
 
 @testset "Generic.Mat.promotion" begin

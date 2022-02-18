@@ -725,7 +725,7 @@ end
 #
 ###############################################################################
 
-function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement
+function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    for i = 1:nrows(y)
       for j = 1:ncols(y)
@@ -735,7 +735,7 @@ function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T
    return z
 end
 
-function *(x::T, y::MatrixElem{T}) where {T <: RingElem}
+function *(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
    z = similar(y)
    for i = 1:nrows(y)
       for j = 1:ncols(y)
@@ -745,16 +745,52 @@ function *(x::T, y::MatrixElem{T}) where {T <: RingElem}
    return z
 end
 
-*(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement = y*x
+function *(x::T, y::MatrixElem{T}) where {T <: MatAlgElem}
+   z = similar(y)
+   for i = 1:nrows(y)
+      for j = 1:ncols(y)
+         z[i, j] = x*y[i, j]
+      end
+   end
+   return z
+end
 
-*(x::MatrixElem{T}, y::T) where {T <: RingElem} = y*x
+function *(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
+   z = similar(x)
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         z[i, j] = x[i, j]*y
+      end
+   end
+   return z
+end
+
+function *(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
+   z = similar(x)
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         z[i, j] = x[i, j]*y
+      end
+   end
+   return z
+end
+
+function *(x::MatrixElem{T}, y::T) where {T <: MatAlgElem}
+   z = similar(x)
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         z[i, j] = x[i, j]*y
+      end
+   end
+   return z
+end
 
 @doc Markdown.doc"""
     +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
 
 Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement
+function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -770,18 +806,32 @@ function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T
 end
 
 @doc Markdown.doc"""
-    +(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+    +(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
 
 Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement = y + x
++(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement = y + x
 
 @doc Markdown.doc"""
-    +(x::T, y::MatrixElem{T}) where {T <: RingElem}
+    +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 
 Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::T, y::MatrixElem{T}) where {T <: RingElem}
+function +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+   z = similar(y)
+   for i = 1:nrows(y)
+      for j = 1:ncols(y)
+         if i != j
+            z[i, j] = deepcopy(y[i, j])
+         else
+            z[i, j] = y[i, j] + x
+         end
+      end
+   end
+   return z
+end
+
+function +(x::T, y::MatrixElem{T}) where {T <: MatAlgElem}
    z = similar(y)
    for i = 1:nrows(y)
       for j = 1:ncols(y)
@@ -800,14 +850,16 @@ end
 
 Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::MatrixElem{T}, y::T) where {T <: RingElem} = y + x
++(x::MatrixElem{T}, y::T) where {T <: NCRingElem} = y + x
+
++(x::MatrixElem{T}, y::T) where {T <: MatAlgElem} = y + x
 
 @doc Markdown.doc"""
-    -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement
+    -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
 
 Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement
+function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -823,11 +875,11 @@ function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T
 end
 
 @doc Markdown.doc"""
-    -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+    -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
 
 Return $x - S(y)$, where $S$ is the parent of $x$.
 """
-function -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
    z = similar(x)
    R = base_ring(x)
    for i = 1:nrows(x)
@@ -843,11 +895,26 @@ function -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T
 end
 
 @doc Markdown.doc"""
-    -(x::T, y::MatrixElem{T}) where {T <: RingElem}
+    -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 
 Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::T, y::MatrixElem{T}) where {T <: RingElem}
+function -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+   z = similar(y)
+   R = base_ring(y)
+   for i = 1:nrows(y)
+      for j = 1:ncols(y)
+         if i != j
+            z[i, j] = -y[i, j]
+         else
+            z[i, j] = x - y[i, j]
+         end
+      end
+   end
+   return z
+end
+
+function -(x::T, y::MatrixElem{T}) where {T <: MatAlgElem}
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -863,11 +930,11 @@ function -(x::T, y::MatrixElem{T}) where {T <: RingElem}
 end
 
 @doc Markdown.doc"""
-    -(x::MatrixElem{T}, y::T) where {T <: RingElem}
+    -(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
 
 Return $x - S(y)$, where $S$ is the parent of $a$.
 """
-function -(x::MatrixElem{T}, y::T) where {T <: RingElem}
+function -(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
    z = similar(x)
    R = base_ring(x)
    for i = 1:nrows(x)
@@ -882,7 +949,22 @@ function -(x::MatrixElem{T}, y::T) where {T <: RingElem}
    return z
 end
 
-function mul!(z::Vector{T}, x::MatrixElem{T}, y::Vector{T}) where T <: RingElement
+function -(x::MatrixElem{T}, y::T) where {T <: MatAlgElem}
+   z = similar(x)
+   R = base_ring(x)
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         if i != j
+            z[i, j] = deepcopy(x[i, j])
+         else
+            z[i, j] = x[i, j] - y
+         end
+      end
+   end
+   return z
+end
+
+function mul!(z::Vector{T}, x::MatrixElem{T}, y::Vector{T}) where T <: NCRingElement
    n = min(ncols(x), length(y))
    tmp = base_ring(x)()
    for i in 1:nrows(x)
@@ -899,12 +981,12 @@ function mul!(z::Vector{T}, x::MatrixElem{T}, y::Vector{T}) where T <: RingEleme
    return z
 end
 
-function *(x::MatrixElem{T}, y::Vector{T}) where T <: RingElement
+function *(x::MatrixElem{T}, y::Vector{T}) where T <: NCRingElement
    ncols(x) == length(y) || error("Incompatible dimensions")
    return mul!(T[base_ring(x)() for i in 1:nrows(x)], x, y)
 end
 
-function mul!(z::Vector{T}, x::Vector{T}, y::MatrixElem{T}) where T <: RingElement
+function mul!(z::Vector{T}, x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
    m = min(length(x), nrows(y))
    tmp = base_ring(y)()
    for j in 1:ncols(y)
@@ -921,7 +1003,7 @@ function mul!(z::Vector{T}, x::Vector{T}, y::MatrixElem{T}) where T <: RingEleme
    return z
 end
 
-function *(x::Vector{T}, y::MatrixElem{T}) where T <: RingElement
+function *(x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
    length(x) == nrows(y) || error("Incompatible dimensions")
    return mul!(T[base_ring(y)() for j in 1:ncols(y)], x, y)
 end
@@ -933,8 +1015,8 @@ end
 ################################################################################
 
 function Base.promote(x::MatrixElem{S},
-                      y::MatrixElem{T}) where {S <: RingElement,
-                                               T <: RingElement}
+                      y::MatrixElem{T}) where {S <: NCRingElement,
+                                               T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
       return x, change_base_ring(base_ring(x), y)
@@ -953,7 +1035,7 @@ end
 
 ==(x::MatrixElem, y::MatrixElem) = ==(promote(x, y)...)
 
-function Base.promote(x::MatrixElem{S}, y::T) where {S <: RingElement, T <: RingElement}
+function Base.promote(x::MatrixElem{S}, y::T) where {S <: NCRingElement, T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
       return x, base_ring(x)(y)
@@ -962,22 +1044,22 @@ function Base.promote(x::MatrixElem{S}, y::T) where {S <: RingElement, T <: Ring
    end
 end
 
-function Base.promote(x::S, y::MatrixElem{T}) where {S <: RingElement, T <: RingElement}
+function Base.promote(x::S, y::MatrixElem{T}) where {S <: NCRingElement, T <: NCRingElement}
    u, v = Base.promote(y, x)
    return v, u
 end
 
-*(x::MatrixElem, y::RingElem) = *(promote(x, y)...)
+*(x::MatrixElem, y::NCRingElem) = *(promote(x, y)...)
 
-*(x::RingElem, y::MatrixElem) = *(promote(x, y)...)
+*(x::NCRingElem, y::MatrixElem) = *(promote(x, y)...)
 
-+(x::MatrixElem, y::RingElem) = +(promote(x, y)...)
++(x::MatrixElem, y::NCRingElem) = +(promote(x, y)...)
 
-+(x::RingElem, y::MatrixElem) = +(promote(x, y)...)
++(x::NCRingElem, y::MatrixElem) = +(promote(x, y)...)
 
-==(x::MatrixElem, y::RingElem) = ==(promote(x, y)...)
+==(x::MatrixElem, y::NCRingElem) = ==(promote(x, y)...)
 
-==(x::RingElem, y::MatrixElem) = ==(promote(x, y)...)
+==(x::NCRingElem, y::MatrixElem) = ==(promote(x, y)...)
 
 ###############################################################################
 #
