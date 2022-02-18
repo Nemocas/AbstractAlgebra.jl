@@ -118,36 +118,36 @@ function Base.hash(a::MatElem, h::UInt)
 end
 
 @doc Markdown.doc"""
-    nrows(a::MatrixElem{T}) where T <: RingElement
+    nrows(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of rows of the given matrix.
 """
-nrows(::MatrixElem{T}) where T <: RingElement
+nrows(::MatrixElem{T}) where T <: NCRingElement
 
 @doc Markdown.doc"""
-    ncols(a::MatrixElem{T}) where T <: RingElement
+    ncols(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of columns of the given matrix.
 """
-ncols(::MatrixElem{T}) where T <: RingElement
+ncols(::MatrixElem{T}) where T <: NCRingElement
 
 @doc Markdown.doc"""
-    length(a::MatrixElem{T}) where T <: RingElement
+    length(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of entries in the given matrix.
 """
-length(a::MatrixElem{T}) where T <: RingElement = nrows(a) * ncols(a)
+length(a::MatrixElem{T}) where T <: NCRingElement = nrows(a) * ncols(a)
 
 @doc Markdown.doc"""
-    isempty(a::MatrixElem{T}) where T <: RingElement
+    isempty(a::MatrixElem{T}) where T <: NCRingElement
 
 Return `true` if `a` does not contain any entry (i.e. `length(a) == 0`), and `false` otherwise.
 """
-isempty(a::MatrixElem{T}) where T <: RingElement = (nrows(a) == 0) | (ncols(a) == 0)
+isempty(a::MatrixElem{T}) where T <: NCRingElement = (nrows(a) == 0) | (ncols(a) == 0)
 
-Base.eltype(::Type{<:MatrixElem{T}}) where {T <: RingElement} = T
+Base.eltype(::Type{<:MatrixElem{T}}) where {T <: NCRingElement} = T
 
-function Base.isassigned(a::MatrixElem{T}, i, j) where T <: RingElement
+function Base.isassigned(a::MatrixElem{T}, i, j) where T <: NCRingElement
     try
         a[i, j]
         true
@@ -168,18 +168,18 @@ Return the zero matrix in the given matrix space.
 zero(a::MatSpace) = a()
 
 @doc Markdown.doc"""
-    zero(x::MatrixElem{T}, R::Ring, r::Int, c::Int) where T <: RingElement
-    zero(x::MatrixElem{T}, R::Ring=base_ring(x)) where T <: RingElement
-    zero(x::MatrixElem{T}, r::Int, c::Int) where T <: RingElement
+    zero(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
+    zero(x::MatrixElem{T}, R::NCRing=base_ring(x)) where T <: NCRingElement
+    zero(x::MatrixElem{T}, r::Int, c::Int) where T <: NCRingElement
 
 Return a zero matrix similar to the given matrix, with optionally different
 base ring or dimensions.
 """
-zero(x::MatrixElem{T}, R::Ring=base_ring(x)) where T <: RingElement = zero(x, R, nrows(x), ncols(x))
-zero(x::MatrixElem{T}, R::Ring, r::Int, c::Int) where T <: RingElement = zero!(similar(x, R, r, c))
-zero(x::MatrixElem{T}, r::Int, c::Int) where T <: RingElement = zero(x, base_ring(x), r, c)
+zero(x::MatrixElem{T}, R::NCRing=base_ring(x)) where T <: NCRingElement = zero(x, R, nrows(x), ncols(x))
+zero(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, R, r, c))
+zero(x::MatrixElem{T}, r::Int, c::Int) where T <: NCRingElement = zero(x, base_ring(x), r, c)
 
-function zero!(x::MatrixElem{T}) where T <: RingElement
+function zero!(x::MatrixElem{T}) where T <: NCRingElement
    R = base_ring(x)
    for i = 1:nrows(x), j = 1:ncols(x)
       x[i, j] = zero(R)
@@ -196,14 +196,14 @@ square matrices or else an error is thrown.
 one(a::MatSpace) = check_square(a)(1)
 
 @doc Markdown.doc"""
-    one(a::MatrixElem{T}) where T <: RingElement
+    one(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the identity matrix in the same matrix space as $a$. If the space does
 not contain square matrices, an error is thrown.
 """
-one(a::MatrixElem{T}) where T <: RingElement = identity_matrix(a)
+one(a::MatrixElem{T}) where T <: NCRingElement = identity_matrix(a)
 
-function iszero(a::MatrixElem{T}) where T <: RingElement
+function iszero(a::MatrixElem{T}) where T <: NCRingElement
    for i = 1:nrows(a)
       for j = 1:ncols(a)
          if !iszero(a[i, j])
@@ -214,7 +214,7 @@ function iszero(a::MatrixElem{T}) where T <: RingElement
   return true
 end
 
-function isone(a::MatrixElem{T}) where T <: RingElement
+function isone(a::MatrixElem{T}) where T <: NCRingElement
    issquare(a) || return false
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -233,11 +233,11 @@ function isone(a::MatrixElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    iszero_row(M::MatrixElem{T}, i::Int) where T <: RingElement
+    iszero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
 
 Return `true` if the $i$-th row of the matrix $M$ is zero.
 """
-function iszero_row(M::MatrixElem{T}, i::Int) where T <: RingElement
+function iszero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
   for j in 1:ncols(M)
     if !iszero(M[i, j])
       return false
@@ -247,11 +247,11 @@ function iszero_row(M::MatrixElem{T}, i::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    iszero_column(M::MatrixElem{T}, i::Int) where T <: RingElement
+    iszero_column(M::MatrixElem{T}, i::Int) where T <: NCRingElement
 
 Return `true` if the $i$-th column of the matrix $M$ is zero.
 """
-function iszero_column(M::MatrixElem{T}, i::Int) where T <: RingElement
+function iszero_column(M::MatrixElem{T}, i::Int) where T <: NCRingElement
   for j in 1:nrows(M)
     if !iszero(M[j, i])
       return false
@@ -335,7 +335,7 @@ end
 #
 ###############################################################################
 
-function _similar(x::MatrixElem{T}, R::Ring, r::Int, c::Int) where T <: RingElement
+function _similar(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
    TT = elem_type(R)
    M = Matrix{TT}(undef, (r, c))
    z = x isa MatElem ? Generic.MatSpaceElem{TT}(M) : Generic.MatAlgElem{TT}(M)
@@ -343,9 +343,9 @@ function _similar(x::MatrixElem{T}, R::Ring, r::Int, c::Int) where T <: RingElem
    return z
 end
 
-similar(x::MatElem, R::Ring, r::Int, c::Int) = _similar(x, R, r, c)
+similar(x::MatElem, R::NCRing, r::Int, c::Int) = _similar(x, R, r, c)
 
-similar(x::MatElem, R::Ring=base_ring(x)) = similar(x, R, nrows(x), ncols(x))
+similar(x::MatElem, R::NCRing=base_ring(x)) = similar(x, R, nrows(x), ncols(x))
 
 similar(x::MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
 

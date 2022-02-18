@@ -515,6 +515,32 @@ end
       @test eltype(m) == BigInt
       @test eltype(typeof(m)) == BigInt
    end
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+
+   M = rand(S, -10:10)
+
+   @test isa(hash(M), UInt)
+   @test nrows(M) == 2
+   @test ncols(M) == 2
+   @test length(M) == 4
+   @test isempty(M) == false
+   @test isassigned(M, 1, 1) == true
+
+   @test iszero(zero(M, 3, 3))
+   @test iszero(zero(M, QQ, 3, 3))
+   @test iszero(zero(M, QQ))
+   
+   zero!(M)
+   @test iszero(M)
+
+   @test isone(one(R))
+
+   @test iszero_row(M, 1)
+   @test iszero_column(M, 1)
 end
 
 @testset "Generic.Mat.unary_ops" begin

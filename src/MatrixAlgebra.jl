@@ -50,11 +50,11 @@ Return the degree $n$ of the given matrix algebra.
 degree(a::MatAlgebra) = nrows(a)
 
 @doc Markdown.doc"""
-    degree(a::MatAlgElem)
+    degree(a::MatAlgElem{T}) where T <: RingElement
 
 Return the degree $n$ of the given matrix algebra.
 """
-degree(a::MatAlgElem) = degree(parent(a))
+degree(a::MatAlgElem{T}) where T <: NCRingElement = degree(parent(a))
 
 zero(a::MatAlgebra) = a()
 
@@ -64,7 +64,7 @@ isunit(a::MatAlgElem{T}) where T <: RingElement = isunit(det(a))
 
 isunit(a::MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
 
-function characteristic(a::MatAlgebra{T}) where T <: RingElement
+function characteristic(a::MatAlgebra)
    return characteristic(base_ring(a))
 end
 
@@ -75,22 +75,22 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    similar(x::Generic.MatrixElem, R::Ring=base_ring(x))
-    similar(x::Generic.MatrixElem, R::Ring, r::Int, c::Int)
+    similar(x::Generic.MatrixElem, R::NCRing=base_ring(x))
+    similar(x::Generic.MatrixElem, R::NCRing, r::Int, c::Int)
     similar(x::Generic.MatrixElem, r::Int, c::Int)
-    similar(x::MatAlgElem, R::Ring, n::Int)
+    similar(x::MatAlgElem, R::NCRing, n::Int)
     similar(x::MatAlgElem, n::Int)
 
 Create an uninitialized matrix over the given ring and dimensions,
 with defaults based upon the given source matrix `x`.
 """
-similar(x::MatAlgElem, R::Ring, n::Int) = _similar(x, R, n, n)
+similar(x::MatAlgElem, R::NCRing, n::Int) = _similar(x, R, n, n)
 
-similar(x::MatAlgElem, R::Ring=base_ring(x)) = similar(x, R, degree(x))
+similar(x::MatAlgElem, R::NCRing=base_ring(x)) = similar(x, R, degree(x))
 
 similar(x::MatAlgElem, n::Int) = similar(x, base_ring(x), n)
 
-function similar(x::MatAlgElem{T}, R::Ring, m::Int, n::Int) where T <: RingElement
+function similar(x::MatAlgElem{T}, R::NCRing, m::Int, n::Int) where T <: NCRingElement
    m != n && error("Dimensions don't match in similar")
    return similar(x, R, n)
 end
@@ -98,16 +98,16 @@ end
 similar(x::MatAlgElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
 
 @doc Markdown.doc"""
-    zero(x::MatrixElem, R::Ring=base_ring(x))
-    zero(x::MatrixElem, R::Ring, r::Int, c::Int)
+    zero(x::MatrixElem, R::NCRing=base_ring(x))
+    zero(x::MatrixElem, R::NCRing, r::Int, c::Int)
     zero(x::MatrixElem, r::Int, c::Int)
-    zero(x::MatAlgElem, R::Ring, n::Int)
+    zero(x::MatAlgElem, R::NCRing, n::Int)
     zero(x::MatAlgElem, n::Int)
 
 Create a zero matrix over the given ring and dimensions,
 with defaults based upon the given source matrix `x`.
 """
-zero(x::MatAlgElem, R::Ring, n::Int) = zero!(similar(x, R, n))
+zero(x::MatAlgElem, R::NCRing, n::Int) = zero!(similar(x, R, n))
 zero(x::MatAlgElem, n::Int) = zero!(similar(x, n))
 
 ################################################################################
