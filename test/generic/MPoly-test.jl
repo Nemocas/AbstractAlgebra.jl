@@ -92,6 +92,21 @@
       @test !(y in keys(Dict(x => 1)))
    end
 
+   R1, (x, y) = QQ["x", "y"]
+
+   B = MPolyBuildCtx(R1)
+
+   push_term!(B, QQ(6), [6, 6])
+   p = finish(B)
+
+   @test p == 6x^6*y^6
+
+   push_term!(B, QQ(5), [5, 5])
+
+   q = finish(B) 
+
+   @test q == 5x^5*y^5
+
    # test "getindex" syntax
    S, (y, z) = R["y", "z"]
    @test S isa Generic.MPolyRing{Generic.Poly{BigInt}}
