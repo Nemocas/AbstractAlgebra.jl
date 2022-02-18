@@ -559,13 +559,13 @@ setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}
 #
 ################################################################################
 
-size(x::MatrixElem{T}) where T <: RingElement = (nrows(x), ncols(x))
+size(x::MatrixElem{T}) where T <: NCRingElement = (nrows(x), ncols(x))
 
-size(t::MatrixElem{T}, d::Integer) where T <: RingElement = d <= 2 ? size(t)[d] : 1
+size(t::MatrixElem{T}, d::Integer) where T <: NCRingElement = d <= 2 ? size(t)[d] : 1
 
-axes(t::MatrixElem{T}) where T <: RingElement = Base.OneTo.(size(t))
+axes(t::MatrixElem{T}) where T <: NCRingElement = Base.OneTo.(size(t))
 
-axes(t::MatrixElem{T}, d::Integer) where T <: RingElement = Base.OneTo(size(t, d))
+axes(t::MatrixElem{T}, d::Integer) where T <: NCRingElement = Base.OneTo(size(t, d))
 
 ###############################################################################
 #

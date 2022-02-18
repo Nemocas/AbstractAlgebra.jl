@@ -403,6 +403,21 @@ end
    @test_throws ErrorException lastindex(B, 3)
 
    @test !issquare(B)
+
+   # test over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+
+   M = rand(S, -10:10)
+
+   @test firstindex(M, 1) == 1
+   @test lastindex(M, 1) == 2
+   @test size(M) == (2, 2)
+   @test size(M, 1) == 2
+   @test axes(M) == (1:2, 1:2)
+   @test axes(M, 1) == 1:2
+   @test issquare(M)
 end
 
 @testset "Generic.Mat.manipulation" begin

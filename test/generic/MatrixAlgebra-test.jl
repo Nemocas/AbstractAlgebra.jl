@@ -143,19 +143,6 @@ end
    @test nrows(A) == ncols(A) == 3
    @test degree(A) == 3
 
-   @test issquare(A)
-   @test size(A) == (3, 3)
-   @test size(A, 1) == 3
-   @test size(A, 2) == 3
-   @test_throws BoundsError size(A, 0)
-   @test_throws BoundsError size(A, -rand(1:99))
-   @test axes(A) == (1:3, 1:3)
-   @test axes(A, 1) == 1:3
-   @test axes(A, 2) == 1:3
-   @test axes(A, rand(3:99)) == 1:1
-   @test_throws BoundsError axes(A, 0)
-   @test_throws BoundsError axes(A, -rand(1:99))
-
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
@@ -183,6 +170,41 @@ end
    @test iszero_column(M, 1)
 
    @test degree(M) == 2
+end
+
+@testset "Generic.MatAlg.size/axes"
+   R, t = PolynomialRing(QQ, "t")
+   S = MatrixAlgebra(R, 3)
+
+   A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+   
+   @test issquare(A)
+   @test size(A) == (3, 3)
+   @test size(A, 1) == 3
+   @test size(A, 2) == 3
+   @test_throws BoundsError size(A, 0)
+   @test_throws BoundsError size(A, -rand(1:99))
+   @test axes(A) == (1:3, 1:3)
+   @test axes(A, 1) == 1:3
+   @test axes(A, 2) == 1:3
+   @test axes(A, rand(3:99)) == 1:1
+   @test_throws BoundsError axes(A, 0)
+   @test_throws BoundsError axes(A, -rand(1:99))
+
+   # test over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+
+   @test firstindex(M, 1) == 1
+   @test lastindex(M, 1) == 2
+   @test size(M) == (2, 2)
+   @test size(M, 1) == 2
+   @test axes(M) == (1:2, 1:2)
+   @test axes(M, 1) == 1:2
+   @test issquare(M)
 end
 
 @testset "Generic.MatAlg.unary_ops" begin
