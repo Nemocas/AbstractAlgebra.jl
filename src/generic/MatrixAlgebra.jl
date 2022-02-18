@@ -100,7 +100,7 @@ end
 #
 ###############################################################################
 
-function zero!(M::MatAlgElem{T}) where T <: RingElement
+function zero!(M::MatAlgElem{T}) where T <: NCRingElement
    n = degree(M)
    R = base_ring(M)
    for i = 1:n
@@ -112,12 +112,12 @@ function zero!(M::MatAlgElem{T}) where T <: RingElement
 end
 
 function mul!(A::MatAlgElem{T}, B::MatAlgElem{T},
-                                C::MatAlgElem{T}) where T <: RingElement
+                                C::MatAlgElem{T}) where T <: NCRingElement
    return B*C
 end
 
 function add!(A::MatAlgElem{T}, B::MatAlgElem{T},
-                                C::MatAlgElem{T}) where T <: RingElement
+                                C::MatAlgElem{T}) where T <: NCRingElement
    n = degree(A)
    for i = 1:n
       for j = 1:n
@@ -127,7 +127,7 @@ function add!(A::MatAlgElem{T}, B::MatAlgElem{T},
    return A
 end
 
-function addeq!(A::MatAlgElem{T}, B::MatAlgElem{T}) where T <: RingElement
+function addeq!(A::MatAlgElem{T}, B::MatAlgElem{T}) where T <: NCRingElement
    n = degree(A)
    for i = 1:n
       for j = 1:n

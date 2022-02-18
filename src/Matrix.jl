@@ -665,7 +665,7 @@ end
 #
 ###############################################################################
 
-function -(x::MatrixElem{T}) where T <: RingElement
+function -(x::MatrixElem{T}) where T <: NCRingElement
    z = similar(x)
    for i in 1:nrows(x)
       for j in 1:ncols(x)
@@ -681,7 +681,7 @@ end
 #
 ###############################################################################
 
-function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
    check_parent(x, y)
    r = similar(x)
    for i = 1:nrows(x)
@@ -692,7 +692,7 @@ function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    return r
 end
 
-function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
    check_parent(x, y)
    r = similar(x)
    for i = 1:nrows(x)
@@ -703,7 +703,7 @@ function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    return r
 end
 
-function *(x::MatElem{T}, y::MatElem{T}) where {T <: RingElement}
+function *(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
    A = similar(x, nrows(x), ncols(y))
    C = base_ring(x)()
@@ -1027,13 +1027,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+    ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
-function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
    b = check_parent(x, y, false)
    !b && return false
    for i = 1:nrows(x)
@@ -1047,14 +1047,14 @@ function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+    isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 useful in cases where the entries of the matrices are inexact, e.g. power
 series. Only if the power series are precisely the same, to the same precision,
 are they declared equal by this function.
 """
-function isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+function isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
    b = check_parent(x, y, false)
    !b && return false
    for i = 1:nrows(x)

@@ -215,6 +215,15 @@ end
    B = S([-t - 1 (-t) -R(1); -t^2 (-t) (-t); -R(-2) (-t - 2) (-t^2 - t - 1)])
 
    @test -A == B
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+
+   @test -(-M) == M
 end
 
 @testset "Generic.MatAlg.binary_ops" begin
@@ -229,6 +238,19 @@ end
    @test A - B == S([t-1 t-3 R(0); t^2 - t R(-1) R(-2); R(-1) (-t^2 + t + 2) (-t^3 + t^2 + t + 1)])
 
    @test A*B == S([t^2 + 2*t + 1 2*t^2 + 4*t + 3 t^3 + t^2 + 3*t + 1; 3*t^2 - t (t^3 + 4*t^2 + t) t^4 + 2*t^2 + 2*t; t-5 t^4 + t^3 + 2*t^2 + 3*t - 4 t^5 + 1*t^4 + t^3 + t^2 + 4*t + 2])
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+   P = rand(S, -10:10)
+
+   @test M + N == N + M
+   @test M - N == M + (-N)
+   @test M*(N + P) == M*N + M*P
 end
 
 @testset "Generic.MatAlg.adhoc_binary" begin

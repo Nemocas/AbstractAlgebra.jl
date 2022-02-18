@@ -162,7 +162,7 @@ end
 #
 ###############################################################################
 
-function *(x::MatAlgElem{T}, y::MatAlgElem{T}) where {T <: RingElement}
+function *(x::MatAlgElem{T}, y::MatAlgElem{T}) where {T <: NCRingElement}
    degree(x) != degree(y) && error("Incompatible matrix degrees")
    A = similar(x)
    C = base_ring(x)()

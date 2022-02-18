@@ -615,6 +615,15 @@ end
    z = zero_matrix(F2(), 2, 3)
    @test -z   isa F2Matrix
    @test -z.m isa Generic.MatSpaceElem{F2Elem}
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+
+   M = rand(S, -10:10)
+
+   @test -(-M) == M
 end
 
 @testset "Generic.Mat.getindex" begin
@@ -1073,6 +1082,19 @@ end
          @test A * B == S(A.entries * B.entries)
       end
    end
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+   P = rand(S, -10:10)
+   
+   @test M + N == N + M
+   @test M - N == M + (-N)
+   @test M*(N + P) == M*N + M*P
 end
 
 # add x to all the elements of the main diagonal of a copy of M
