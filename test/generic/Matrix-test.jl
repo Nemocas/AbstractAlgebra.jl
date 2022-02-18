@@ -3730,6 +3730,21 @@ end
 
    @test fflu(N3) == fflu(M) # tests that deepcopy is correct
    @test M2 == M
+
+   # Test views over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 4, 4)
+   
+   M = rand(S, -10:10)
+
+   N1 = @view M[:,1:2]
+   N2 = @view M[1:2, :]
+   N3 = @view M[:,:]
+
+   @test isa(N1, Generic.MatSpaceView)
+   @test isa(N2, Generic.MatSpaceView)
+   @test isa(N3, Generic.MatSpaceView)
 end
 
 @testset "Generic.Mat.change_base_ring" begin

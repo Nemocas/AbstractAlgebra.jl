@@ -355,7 +355,7 @@ similar(x::MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
 #
 ###############################################################################
 
-canonical_unit(a::MatrixElem{T}) where T <: RingElement = canonical_unit(a[1, 1])
+canonical_unit(a::MatrixElem{T}) where T <: NCRingElement = canonical_unit(a[1, 1])
 
 ###############################################################################
 #
@@ -402,21 +402,21 @@ function _to_indices(x, rows, cols)
    (rows, cols)
 end
 
-function Base.view(M::MatElem{T}, rows::Colon, cols::UnitRange{Int}) where T <: RingElement
+function Base.view(M::MatElem{T}, rows::Colon, cols::UnitRange{Int}) where T <: NCRingElement
    return view(M, 1:nrows(M), cols)
 end
 
-function Base.view(M::MatElem{T}, rows::UnitRange{Int}, cols::Colon) where T <: RingElement
+function Base.view(M::MatElem{T}, rows::UnitRange{Int}, cols::Colon) where T <: NCRingElement
    return view(M, rows, 1:ncols(M))
 end
 
-function Base.view(M::MatElem{T}, rows::Colon, cols::Colon) where T <: RingElement
+function Base.view(M::MatElem{T}, rows::Colon, cols::Colon) where T <: NCRingElement
    return view(M, 1:nrows(M), 1:ncols(M))
 end
 
-Base.firstindex(M::MatrixElem{T}, i::Int) where T <: RingElement = 1
+Base.firstindex(M::MatrixElem{T}, i::Int) where T <: NCRingElement = 1
 
-function Base.lastindex(M::MatrixElem{T}, i::Int) where T <: RingElement
+function Base.lastindex(M::MatrixElem{T}, i::Int) where T <: NCRingElement
    if i == 1
       return nrows(M)
    elseif i == 2
