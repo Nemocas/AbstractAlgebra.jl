@@ -172,7 +172,7 @@ end
    @test degree(M) == 2
 end
 
-@testset "Generic.MatAlg.size/axes"
+@testset "Generic.MatAlg.size/axes" begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
