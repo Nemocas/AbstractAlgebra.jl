@@ -27,7 +27,7 @@ dense_poly_type(::Type{T}) where T <: RingElement = Poly{T}
 #
 ###############################################################################
 
-function setcoeff!(c::Poly{T}, n::Int, a::T) where T <: RingElement
+function setcoeff!(c::Poly{T}, n::Int, a::S) where {T <: RingElement, S <: RingElement}
    if !iszero(a) || n + 1 <= length(c)
       fit!(c, n + 1)
       c.coeffs[n + 1] = a
