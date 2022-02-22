@@ -359,6 +359,22 @@ end
    @test A == B
 
    @test A != one(S)
+
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+   N = deepcopy(M)
+   
+   @test M == M
+   @test M == N
+   @test M == copy(M)
+   @test isequal(M, M)
+   @test isequal(M, N)
+   @test isequal(M, copy(M))
 end
 
 @testset "Generic.MatAlg.adhoc_comparison" begin

@@ -1378,6 +1378,21 @@ end
 
       @test matrix(R, copy(A.entries)) == A
    end
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+   N = deepcopy(M)
+   
+   @test M == M
+   @test M == N
+   @test M == copy(M)
+   @test isequal(M, M)
+   @test isequal(M, N)
+   @test isequal(M, copy(M))
 end
 
 @testset "Generic.Mat.adhoc_comparison" begin
