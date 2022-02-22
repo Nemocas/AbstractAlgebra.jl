@@ -37,7 +37,7 @@ isdomain_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = false
 
 Return the transpose of the given matrix.
 """
-function transpose(x::MatAlgElem{T}) where T <: RingElement
+function transpose(x::MatAlgElem{T}) where T <: NCRingElement
    arr = permutedims(x.entries, [2, 1])
    z = MatAlgElem{T}(arr)
    z.base_ring = base_ring(x)

@@ -1499,6 +1499,15 @@ end
    S = MatrixAlgebra(R, 3)
    @test issymmetric(S([t + 1 t R(1); t t^2 t; R(1) t R(5)]))
    @test !issymmetric(S([t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+
+   @test issymmetric(M + transpose(M))
 end
 
 @testset "Generic.Mat.transpose" begin

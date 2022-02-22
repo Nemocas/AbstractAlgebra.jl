@@ -1311,7 +1311,7 @@ end
 Return `true` if the given matrix is symmetric with respect to its main
 diagonal, otherwise return `false`.
 """
-function issymmetric(a::MatrixElem{T}) where T <: RingElement
+function issymmetric(a::MatrixElem{T}) where T <: NCRingElement
     if !issquare(a)
         return false
     end

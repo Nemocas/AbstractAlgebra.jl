@@ -484,6 +484,15 @@ end
    A = S(arr)
    B = S(permutedims(arr, [2, 1]))
    @test transpose(A) == B
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+
+   @test issymmetric(M + transpose(M))
 end
 
 @testset "Generic.MatAlg.gram" begin
