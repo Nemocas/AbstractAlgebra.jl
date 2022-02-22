@@ -1161,7 +1161,7 @@ end
 Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 otherwise return `false`.
 """
-function ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
          return false
@@ -1183,15 +1183,15 @@ end
 Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement = y == x
 
 @doc Markdown.doc"""
-    ==(x::MatrixElem{T}, y::T) where {T <: RingElem}
+    ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
 
 Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 otherwise return `false`.
 """
-function ==(x::MatrixElem{T}, y::T) where {T <: RingElem}
+function ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
          return false
@@ -1208,12 +1208,30 @@ function ==(x::MatrixElem{T}, y::T) where {T <: RingElem}
 end
 
 @doc Markdown.doc"""
-    ==(x::T, y::MatrixElem{T}) where {T <: RingElem}
+    ==(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 
 Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 otherwise return `false`.
 """
-==(x::T, y::MatrixElem{T}) where {T <: RingElem} = y == x
+==(x::T, y::MatrixElem{T}) where {T <: NCRingElem} = y == x
+
+function ==(x::MatrixElem{T}, y::T) where T <: MatAlgElem
+   for i = 1:min(nrows(x), ncols(x))
+      if x[i, i] != y
+         return false
+      end
+   end
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         if i != j && !iszero(x[i, j])
+            return false
+         end
+      end
+   end
+   return true
+end
+
+==(x::T, y::MatrixElem{T}) where T <: MatAlgElem = y == x
 
 ###############################################################################
 #

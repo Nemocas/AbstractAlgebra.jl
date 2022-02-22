@@ -393,6 +393,21 @@ end
    @test t + 1 == S(t + 1)
    @test A != one(S)
    @test one(S) == one(S)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   @test S(5) == 5
+   @test 5 == S(5)
+   @test S(BigInt(5)) == 5
+   @test 5 == S(BigInt(5))
+
+   m = rand(R, -10:10)
+
+   @test S(m) == m
+   @test m == S(m)
 end
 
 @testset "Generic.MatAlg.powering" begin
