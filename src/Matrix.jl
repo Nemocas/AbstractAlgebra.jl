@@ -1239,7 +1239,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true) where T <: RingElement
+function divexact(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true) where T <: NCRingElement
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -1254,6 +1254,46 @@ function divexact(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: RingElem
    for i = 1:nrows(x)
       for j = 1:ncols(x)
          z[i, j] = divexact(x[i, j], y; check=check)
+      end
+   end
+   return z
+end
+
+function divexact_left(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
+   z = similar(x)
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         z[i, j] = divexact_left(x[i, j], y; check=check)
+      end
+   end
+   return z
+end
+
+function divexact_right(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
+   z = similar(x)
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         z[i, j] = divexact_right(x[i, j], y; check=check)
+      end
+   end
+   return z
+end
+
+function divexact_left(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: MatAlgElem}
+   z = similar(x)
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         z[i, j] = divexact_left(x[i, j], y; check=check)
+      end
+   end
+   return z
+end
+
+function divexact_right(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: MatAlgElem}
+   z = similar(x)
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         z[i, j] = divexact_right(x[i, j], y; check=check)
       end
    end
    return z

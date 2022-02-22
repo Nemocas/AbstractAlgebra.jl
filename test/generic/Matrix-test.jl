@@ -1467,6 +1467,28 @@ end
    @test divexact(12*A, BigInt(12)) == A
    @test divexact(12*A, Rational{BigInt}(12)) == A
    @test divexact((1 + t)*A, 1 + t) == A
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+
+   S = MatrixSpace(R, 2, 2)
+   T = MatrixSpace(U, 2, 2)
+
+   M = rand(S, -10:10)
+
+   @test divexact(5*M, 5) == M
+
+   c = rand(R, -10:10)
+
+   @test divexact_left(c*M, c) == M
+   @test divexact_right(M*c, c) == M
+
+   N = rand(T, 0:5, -10:10)
+   d = rand(U, 0:5, -10:10)
+
+   @test divexact_left(d*N, d) == N
+   @test divexact_right(N*d, d) == N
 end
 
 @testset "Generic.Mat.issymmetric" begin

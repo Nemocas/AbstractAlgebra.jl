@@ -185,6 +185,28 @@ function *(a::NCPolyElem{T}, b::T) where T <: NCRingElem
    return z
 end
 
+function *(a::T, b::NCPolyElem{T}) where T <: MatAlgElem
+   len = length(b)
+   z = parent(b)()
+   fit!(z, len)
+   for i = 1:len
+      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
+   end
+   z = set_length!(z, normalise(z, len))
+   return z
+end
+
+function *(a::NCPolyElem{T}, b::T) where T <: MatAlgElem
+   len = length(a)
+   z = parent(a)()
+   fit!(z, len)
+   for i = 1:len
+      z = setcoeff!(z, i - 1, coeff(a, i - 1)*b)
+   end
+   z = set_length!(z, normalise(z, len))
+   return z
+end
+
 function +(a::T, b::NCPolyElem{T}) where {T <: NCRingElem}
    z = deepcopy(b)
    len = length(z)
