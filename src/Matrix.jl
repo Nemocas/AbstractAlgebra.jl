@@ -745,16 +745,6 @@ function *(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
    return z
 end
 
-function *(x::T, y::MatrixElem{T}) where {T <: MatAlgElem}
-   z = similar(y)
-   for i = 1:nrows(y)
-      for j = 1:ncols(y)
-         z[i, j] = x*y[i, j]
-      end
-   end
-   return z
-end
-
 function *(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
    z = similar(x)
    for i = 1:nrows(x)
@@ -766,16 +756,6 @@ function *(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T
 end
 
 function *(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
-   z = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         z[i, j] = x[i, j]*y
-      end
-   end
-   return z
-end
-
-function *(x::MatrixElem{T}, y::T) where {T <: MatAlgElem}
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -831,28 +811,12 @@ function +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
    return z
 end
 
-function +(x::T, y::MatrixElem{T}) where {T <: MatAlgElem}
-   z = similar(y)
-   for i = 1:nrows(y)
-      for j = 1:ncols(y)
-         if i != j
-            z[i, j] = deepcopy(y[i, j])
-         else
-            z[i, j] = y[i, j] + x
-         end
-      end
-   end
-   return z
-end
-
 @doc Markdown.doc"""
     +(x::Generic.MatrixElem{T}, y::T) where {T <: RingElem}
 
 Return $x + S(y)$ where $S$ is the parent of $x$.
 """
 +(x::MatrixElem{T}, y::T) where {T <: NCRingElem} = y + x
-
-+(x::MatrixElem{T}, y::T) where {T <: MatAlgElem} = y + x
 
 @doc Markdown.doc"""
     -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
@@ -914,42 +878,12 @@ function -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
    return z
 end
 
-function -(x::T, y::MatrixElem{T}) where {T <: MatAlgElem}
-   z = similar(y)
-   R = base_ring(y)
-   for i = 1:nrows(y)
-      for j = 1:ncols(y)
-         if i != j
-            z[i, j] = -y[i, j]
-         else
-            z[i, j] = x - y[i, j]
-         end
-      end
-   end
-   return z
-end
-
 @doc Markdown.doc"""
     -(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
 
 Return $x - S(y)$, where $S$ is the parent of $a$.
 """
 function -(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
-   z = similar(x)
-   R = base_ring(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if i != j
-            z[i, j] = deepcopy(x[i, j])
-         else
-            z[i, j] = x[i, j] - y
-         end
-      end
-   end
-   return z
-end
-
-function -(x::MatrixElem{T}, y::T) where {T <: MatAlgElem}
    z = similar(x)
    R = base_ring(x)
    for i = 1:nrows(x)
@@ -1027,13 +961,13 @@ function Base.promote(x::MatrixElem{S},
    end
 end
 
-*(x::MatrixElem, y::MatrixElem) = *(promote(x, y)...)
+*(x::MatElem, y::MatElem) = *(promote(x, y)...)
 
-+(x::MatrixElem, y::MatrixElem) = +(promote(x, y)...)
++(x::MatElem, y::MatElem) = +(promote(x, y)...)
 
--(x::MatrixElem, y::MatrixElem) = -(promote(x, y)...)
+-(x::MatElem, y::MatElem) = -(promote(x, y)...)
 
-==(x::MatrixElem, y::MatrixElem) = ==(promote(x, y)...)
+==(x::MatElem, y::MatElem) = ==(promote(x, y)...)
 
 function Base.promote(x::MatElem{S}, y::T) where {S <: NCRingElement, T <: NCRingElement}
    U = promote_rule_sym(S, T)
@@ -1049,17 +983,17 @@ function Base.promote(x::S, y::MatElem{T}) where {S <: NCRingElement, T <: NCRin
    return v, u
 end
 
-*(x::MatrixElem, y::NCRingElem) = *(promote(x, y)...)
+*(x::MatElem, y::NCRingElem) = *(promote(x, y)...)
 
-*(x::NCRingElem, y::MatrixElem) = *(promote(x, y)...)
+*(x::NCRingElem, y::MatElem) = *(promote(x, y)...)
 
-+(x::MatrixElem, y::NCRingElem) = +(promote(x, y)...)
++(x::MatElem, y::NCRingElem) = +(promote(x, y)...)
 
-+(x::NCRingElem, y::MatrixElem) = +(promote(x, y)...)
++(x::NCRingElem, y::MatElem) = +(promote(x, y)...)
 
-==(x::MatrixElem, y::NCRingElem) = ==(promote(x, y)...)
+==(x::MatElem, y::NCRingElem) = ==(promote(x, y)...)
 
-==(x::NCRingElem, y::MatrixElem) = ==(promote(x, y)...)
+==(x::NCRingElem, y::MatElem) = ==(promote(x, y)...)
 
 ###############################################################################
 #
@@ -1215,24 +1149,6 @@ otherwise return `false`.
 """
 ==(x::T, y::MatrixElem{T}) where {T <: NCRingElem} = y == x
 
-function ==(x::MatrixElem{T}, y::T) where T <: MatAlgElem
-   for i = 1:min(nrows(x), ncols(x))
-      if x[i, i] != y
-         return false
-      end
-   end
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if i != j && !iszero(x[i, j])
-            return false
-         end
-      end
-   end
-   return true
-end
-
-==(x::T, y::MatrixElem{T}) where T <: MatAlgElem = y == x
-
 ###############################################################################
 #
 #   Ad hoc exact division
@@ -1270,26 +1186,6 @@ function divexact_left(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: NCR
 end
 
 function divexact_right(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
-   z = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         z[i, j] = divexact_right(x[i, j], y; check=check)
-      end
-   end
-   return z
-end
-
-function divexact_left(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: MatAlgElem}
-   z = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         z[i, j] = divexact_left(x[i, j], y; check=check)
-      end
-   end
-   return z
-end
-
-function divexact_right(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: MatAlgElem}
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)

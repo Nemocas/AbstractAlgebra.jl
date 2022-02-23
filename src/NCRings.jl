@@ -6,13 +6,56 @@
 
 include("Rings.jl")
 
-###############################################################################
+################################################################################
 #
 #   Promotion system
 #
-###############################################################################
+# The promote_rule functions are not extending Base.promote_rule. The
+# AbstractAlgebra promotion system is orthogonal to the built-in julia promotion
+# system. The julia system assumes that whenever you have a method signature of
+# the form Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
+# corresponding Base.convert(::Type{R}, ::T) and similar for S. Since we
+# cannot use the julia convert system (we need an instance of the type and not
+# the type), we cannot use the julia promotion system.
+#
+# The AbstractAlgebra promotion system is used to define catch all functions for
+# arithmetic between arbitrary ring elements.
+#
+# TODO: move this to NCRing.jl
+#
+################################################################################
 
-promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElem = T
+promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElement = T
+
+function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
+   U = promote_rule(T, S)
+   if U !== Union{}
+      return U
+   else
+      UU = promote_rule(S, T)
+      return UU
+   end
+end
+
+@inline function try_promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
+   U = promote_rule_sym(S, T)
+   if S === U
+      return true, x, parent(x)(y)
+   elseif T === U
+      return true, parent(y)(x), y
+   else
+      return false, x, y
+   end
+end
+
+function Base.promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
+  fl, u, v = try_promote(x, y)
+  if fl
+    return u, v
+  else
+    error("Cannot promote to common type")
+  end
+end
 
 ###############################################################################
 #
@@ -38,6 +81,19 @@ promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElem = T
 
 *(x::NCRingElement, y::NCRingElem) = parent(y)(x)*y
 
+function ==(x::NCRingElem, y::NCRingElem)
+   fl, u, v = try_promote(x, y)
+   if fl
+     return u == v
+   else
+     return false
+   end
+ end
+ 
+ ==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)
+ 
+ ==(x::NCRingElement, y::NCRingElem) = parent(y)(x) == y
+
 function divexact_left(x::NCRingElem, y::NCRingElem; check::Bool = true)
    return divexact_left(promote(x, y)...)
 end
@@ -60,14 +116,6 @@ function divexact_right(
    check::Bool = true)
 
    return divexact_right(x, parent(x)(y); check = check)
-end
-
-function ==(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
-   if S == promote_rule(S, T)
-      ==(x, parent(x)(y))
-   else
-      ==(parent(y)(x), y)
-   end
 end
 
 Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p

@@ -203,7 +203,7 @@ end
 
 ==(x::Union{Integer, Rational, AbstractFloat}, y::MatAlgElem) = y == x
 
-function ==(x::MatAlgElem{T}, y::T) where {T <: RingElem}
+function ==(x::MatAlgElem{T}, y::T) where T <: NCRingElem
    n = degree(x)
    for i = 1:n
       if x[i, i] != y
@@ -219,6 +219,8 @@ function ==(x::MatAlgElem{T}, y::T) where {T <: RingElem}
    end
    return true
 end
+
+==(x::T, y::MatAlgElem{T}) where T <: NCRingElem = y == x
 
 ###############################################################################
 #
@@ -246,28 +248,6 @@ end
 function divexact_right(f::MatAlgElem{T},
                        g::MatAlgElem{T}; check::Bool=true) where T <: FieldElement
    return f*inv(g)
-end
-
-###############################################################################
-#
-#   Ad hoc exact division
-#
-###############################################################################
-
-function divexact_left(x::MatAlgElem{T}, y::T; check::Bool=true) where {T <: RingElem}
-   return divexact(x, y; check=check)
-end
-
-function divexact_right(x::MatAlgElem{T}, y::T; check::Bool=true) where {T <: RingElem}
-   return divexact(x, y; check=check)
-end
-
-function divexact_left(x::MatAlgElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
-   return divexact(x, y; check=check)
-end
-
-function divexact_right(x::MatAlgElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
-   return divexact(x, y; check=check)
 end
 
 ###############################################################################

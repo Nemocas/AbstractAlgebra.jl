@@ -185,28 +185,6 @@ function *(a::NCPolyElem{T}, b::T) where T <: NCRingElem
    return z
 end
 
-function *(a::T, b::NCPolyElem{T}) where T <: MatAlgElem
-   len = length(b)
-   z = parent(b)()
-   fit!(z, len)
-   for i = 1:len
-      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
-   end
-   z = set_length!(z, normalise(z, len))
-   return z
-end
-
-function *(a::NCPolyElem{T}, b::T) where T <: MatAlgElem
-   len = length(a)
-   z = parent(a)()
-   fit!(z, len)
-   for i = 1:len
-      z = setcoeff!(z, i - 1, coeff(a, i - 1)*b)
-   end
-   z = set_length!(z, normalise(z, len))
-   return z
-end
-
 function +(a::T, b::NCPolyElem{T}) where {T <: NCRingElem}
    z = deepcopy(b)
    len = length(z)
@@ -215,17 +193,7 @@ function +(a::T, b::NCPolyElem{T}) where {T <: NCRingElem}
    return z
 end
 
-function +(a::T, b::NCPolyElem{T}) where {T <: MatAlgElem}
-   z = deepcopy(b)
-   len = length(z)
-   z = setcoeff!(z, 0, a + coeff(b, 0))
-   z = set_length!(z, normalise(z, len))
-   return z
-end
-
 +(a::NCPolyElem{T}, b::T) where {T <: NCRingElem} =  b + a
-
-+(a::NCPolyElem{T}, b::T) where {T <: MatAlgElem} =  b + a
 
 +(a::Union{Integer, Rational}, b::NCPolyElem{T}) where {T <: NCRingElem} =  parent(b)(a) + b
 
@@ -363,11 +331,6 @@ Return `true` if $x = y$.
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::Union{Integer, Rational, AbstractFloat}, y::NCPolyElem) = y == x
-
-==(x::NCPolyElem{T}, y::T) where T <: MatAlgElem = ((length(x) == 0 && y == 0)
-|| (length(x) == 1 && coeff(x, 0) == y))
-
-==(x::T, y::NCPolyElem{T}) where T <: MatAlgElem = y == x
 
 ###############################################################################
 #

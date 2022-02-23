@@ -465,7 +465,7 @@ end
 
    @test divexact(5*M, 5) == M
 
-   c = rand(R, -10:10)
+   c = rand(R, 1:10)
 
    @test divexact_left(c*M, c) == M
    @test divexact_right(M*c, c) == M
