@@ -6107,12 +6107,12 @@ function vcat(a::MatElem, b::MatElem)
 end
 
 @doc Markdown.doc"""
-    vcat(A::MatrixElem{T}...) where T <: RingElement -> MatrixElem
+    vcat(A::MatrixElem{T}...) where T <: NCRingElement -> MatrixElem
 
 Return the horizontal concatenation of the matrices $A$.
 All component matrices need to have the same base ring and number of columns.
 """
-function Base.vcat(A::MatrixElem{T}...) where T <: RingElement
+function Base.vcat(A::MatrixElem{T}...) where T <: NCRingElement
   return _vcat(A)
 end
 
@@ -6145,12 +6145,12 @@ function _vcat(A)
 end
 
 @doc Markdown.doc"""
-    hcat(A::MatrixElem{T}...) where T <: RingElement -> MatrixElem
+    hcat(A::MatrixElem{T}...) where T <: NCRingElement -> MatrixElem
 
 Return the horizontal concatenating of the matrices $A$.
 All component matrices need to have the same base ring and number of rows.
 """
-function Base.hcat(A::MatrixElem{T}...) where T <: RingElement
+function Base.hcat(A::MatrixElem{T}...) where T <: NCRingElement
   return _hcat(A)
 end
 
@@ -6182,7 +6182,7 @@ function _hcat(A)
   return M
 end
 
-function Base.cat(A::MatrixElem{T}...;dims) where T <: RingElement
+function Base.cat(A::MatrixElem{T}...;dims) where T <: NCRingElement
   @assert dims == (1,2) || isa(dims, Int)
 
   if isa(dims, Int)
@@ -6206,7 +6206,7 @@ function Base.cat(A::MatrixElem{T}...;dims) where T <: RingElement
   return X
 end
 
-function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem{T}...) where T <: RingElement
+function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem{T}...) where T <: NCRingElement
   nr = 0
   k = 1
   for i in 1:length(rows)

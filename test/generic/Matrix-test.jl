@@ -3422,6 +3422,18 @@ end
                                     3 4 3 4 1;
                                     0 1 0 1 0;
                                     0 1 0 1 2;])
+
+   # Test constructors over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+
+   @test isa(hcat(M, N), MatElem)
+   @test isa(vcat(M, N), MatElem)
+   @test isa([M N; M N], MatElem)
 end
 
 @testset "Generic.Mat.hnf_minors" begin
