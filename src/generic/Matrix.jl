@@ -146,9 +146,9 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{S}, ::Type{S}) where {T <: RingElement, S <: Mat{T}} = MatSpaceElem{T}
+promote_rule(::Type{S}, ::Type{S}) where {T <: NCRingElement, S <: Mat{T}} = MatSpaceElem{T}
 
-function promote_rule(::Type{S}, ::Type{U}) where {T <: RingElement, S <: Mat{T}, U <: RingElement}
+function promote_rule(::Type{S}, ::Type{U}) where {T <: NCRingElement, S <: Mat{T}, U <: NCRingElement}
    promote_rule(T, U) == T ? MatSpaceElem{T} : Union{}
 end
 

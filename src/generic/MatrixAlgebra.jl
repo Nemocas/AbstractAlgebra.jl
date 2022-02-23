@@ -139,6 +139,18 @@ end
 
 ###############################################################################
 #
+#   Promotion rules
+#
+###############################################################################
+
+promote_rule(::Type{S}, ::Type{S}) where {T <: NCRingElement, S <: MatAlgElem{T}} = MatAlgElem{T}
+
+function promote_rule(::Type{S}, ::Type{U}) where {T <: NCRingElement, S <: MatAlgElem{T}, U <: NCRingElement}
+   promote_rule(T, U) == T ? MatAlgElem{T} : Union{}
+end
+
+###############################################################################
+#
 #   Parent object call overload
 #
 ###############################################################################

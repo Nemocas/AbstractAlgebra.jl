@@ -364,6 +364,11 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::Union{Integer, Rational, AbstractFloat}, y::NCPolyElem) = y == x
 
+==(x::NCPolyElem{T}, y::T) where T <: MatAlgElem = ((length(x) == 0 && y == 0)
+|| (length(x) == 1 && coeff(x, 0) == y))
+
+==(x::T, y::NCPolyElem{T}) where T <: MatAlgElem = y == x
+
 ###############################################################################
 #
 #   Truncation
