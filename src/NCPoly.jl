@@ -215,7 +215,17 @@ function +(a::T, b::NCPolyElem{T}) where {T <: NCRingElem}
    return z
 end
 
+function +(a::T, b::NCPolyElem{T}) where {T <: MatAlgElem}
+   z = deepcopy(b)
+   len = length(z)
+   z = setcoeff!(z, 0, a + coeff(b, 0))
+   z = set_length!(z, normalise(z, len))
+   return z
+end
+
 +(a::NCPolyElem{T}, b::T) where {T <: NCRingElem} =  b + a
+
++(a::NCPolyElem{T}, b::T) where {T <: MatAlgElem} =  b + a
 
 +(a::Union{Integer, Rational}, b::NCPolyElem{T}) where {T <: NCRingElem} =  parent(b)(a) + b
 

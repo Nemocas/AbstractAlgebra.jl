@@ -1049,6 +1049,20 @@ function Base.promote(x::S, y::MatrixElem{T}) where {S <: NCRingElement, T <: NC
    return v, u
 end
 
+function Base.promote(x::MatrixElem{S}, y::T) where {S <: NCRingElement, T <: RingElement}
+   U = promote_rule_sym(S, T)
+   if U === S
+      return x, base_ring(x)(y)
+   else
+      error("Cannot promote to common type")
+   end
+end
+
+function Base.promote(x::S, y::MatrixElem{T}) where {S <: RingElement, T <: NCRingElement}
+   u, v = Base.promote(y, x)
+   return v, u
+end
+
 *(x::MatrixElem, y::NCRingElem) = *(promote(x, y)...)
 
 *(x::NCRingElem, y::MatrixElem) = *(promote(x, y)...)
