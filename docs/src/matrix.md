@@ -8,17 +8,17 @@ end
 # Matrix functionality
 
 AbstractAlgebra.jl provides a module, implemented in `src/Matrix.jl` for
-matrices over any commutative ring belonging to the AbstractAlgebra abstract type
+matrices over any ring belonging to the AbstractAlgebra abstract type
 hierarchy. This functionality will work for any matrix type which
 follows the Matrix interface.
 
 Similarly, AbstractAlgebra.jl provides a module in `src/MatrixAlgebra.jl` for
-matrix algebras over a commutative ring.
+matrix algebras over a ring.
 
 ## Generic matrix types
 
-AbstractAlgebra.jl allows the creation of dense matrices over any computable commutative
-ring $R$. Generic matrices over a commutative ring are implemented in
+AbstractAlgebra.jl allows the creation of dense matrices over any computable
+ring $R$. Generic matrices over a ring are implemented in
 `src/generic/Matrix.jl`.
 
 Generic matrix algebras of $m\times m$ matrices are implemented in
