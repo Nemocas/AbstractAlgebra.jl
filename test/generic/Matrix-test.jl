@@ -3912,6 +3912,17 @@ end
    z = zero_matrix(F2(), 2, 3)
    @test change_base_ring(F2(), z)   isa F2Matrix
    @test change_base_ring(F2(), z.m) isa F2Matrix
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+
+   N = change_base_ring(U, M)
+
+   @test isa(N, MatElem)
 end
 
 @testset "Generic.Mat.map" begin
@@ -3956,6 +3967,20 @@ end
    z = zero_matrix(F2(), 2, 3)
    @test map(identity, z)   isa F2Matrix
    @test map(identity, z.m) isa F2Matrix
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+   S = MatrixSpace(R, 2, 2)
+   T = MatrixSpace(U, 2, 2)
+
+   M = rand(S, -10:10)
+   N = rand(T, 0:5, -10:10)
+   P = map(x->x^2, M)
+   Q = map(x->x^2, N)
+
+   @test isa(P, MatElem)
+   @test isa(Q, MatElem)
 end
 
 @testset "Generic.Mat.similar/zero" begin

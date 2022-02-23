@@ -1527,6 +1527,35 @@ end
    end
 end
 
+@testset "Generic.MatAlg.change_base_ring" begin
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+
+   N = change_base_ring(U, M)
+
+   @test isa(N, MatAlgElem)
+end
+
+@testset "Generic.MatAlg.map" begin
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+   S = MatrixAlgebra(U, 2)
+
+   M = rand(R, -10:10)
+   N = map(U, M)
+   P = map(x->x^2, M)
+   Q = map(S, M)
+
+   @test isa(N, MatAlgElem)
+   @test isa(P, MatAlgElem)
+   @test isa(Q, MatAlgElem)
+end
+
 @testset "Generic.MatAlg.rand" begin
    M = MatrixAlgebra(ZZ, 3)
 

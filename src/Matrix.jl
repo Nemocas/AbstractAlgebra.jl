@@ -6245,15 +6245,15 @@ end
 
 # like change_base_ring, but without initializing the entries
 # this function exists until a better API is implemented
-_change_base_ring(R::Ring, a::MatElem) = zero_matrix(R, nrows(a), ncols(a))
-_change_base_ring(R::Ring, a::MatAlgElem) = MatrixAlgebra(R, nrows(a))()
+_change_base_ring(R::NCRing, a::MatElem) = zero_matrix(R, nrows(a), ncols(a))
+_change_base_ring(R::NCRing, a::MatAlgElem) = MatrixAlgebra(R, nrows(a))()
 
 @doc Markdown.doc"""
-    change_base_ring(R::Ring, M::MatrixElem{T}) where T <: RingElement
+    change_base_ring(R::NCRing, M::MatrixElem{T}) where T <: NCRingElement
 
 Return the matrix obtained by coercing each entry into `R`.
 """
-function change_base_ring(R::Ring, M::MatrixElem{T}) where T <: RingElement
+function change_base_ring(R::NCRing, M::MatrixElem{T}) where T <: NCRingElement
    N = _change_base_ring(R, M)
    for i = 1:nrows(M), j = 1:ncols(M)
       N[i,j] = R(M[i,j])
@@ -6268,11 +6268,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    map_entries!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: RingElement, U <: RingElement}
+    map_entries!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement}
 
 Like `map_entries`, but stores the result in `dst` rather than a new matrix.
 """
-function map_entries!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: RingElement, U <: RingElement}
+function map_entries!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement}
    for i = 1:nrows(src), j = 1:ncols(src)
       dst[i, j] = f(src[i, j])
    end
@@ -6280,19 +6280,19 @@ function map_entries!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: Rin
 end
 
 @doc Markdown.doc"""
-    map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: RingElement, U <: RingElement}
+    map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement}
 
 Like `map`, but stores the result in `dst` rather than a new matrix.
 This is equivalent to `map_entries!(f, dst, src)`.
 """
-Base.map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: RingElement, U <: RingElement} = map_entries!(f, dst, src)
+Base.map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
 
 @doc Markdown.doc"""
-    map_entries(f, a::MatrixElem{T}) where T <: RingElement
+    map_entries(f, a::MatrixElem{T}) where T <: NCRingElement
 
 Transform matrix `a` by applying `f` on each element.
 """
-function map_entries(f, a::MatrixElem{T}) where T <: RingElement
+function map_entries(f, a::MatrixElem{T}) where T <: NCRingElement
    isempty(a) && return _change_base_ring(parent(f(zero(base_ring(a)))), a)
    b11 = f(a[1, 1])
    b = _change_base_ring(parent(b11), a)
@@ -6305,12 +6305,12 @@ function map_entries(f, a::MatrixElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    map(f, a::MatrixElem{T}) where T <: RingElement
+    map(f, a::MatrixElem{T}) where T <: NCRingElement
 
 Transform matrix `a` by applying `f` on each element.
 This is equivalent to `map_entries(f, a)`.
 """
-Base.map(f, a::MatrixElem{T}) where T <: RingElement = map_entries(f, a)
+Base.map(f, a::MatrixElem{T}) where T <: NCRingElement = map_entries(f, a)
 
 ###############################################################################
 #
