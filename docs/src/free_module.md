@@ -18,6 +18,8 @@ AbstractAlgebra provides generic types for free modules and vector spaces,
 via the type `FreeModule{T}` for free modules, where `T`
 is the type of the elements of the ring $R$ over which the module is built.
 
+Elements of a free module have type `FreeModuleElem{T}`.
+
 Vector spaces are simply free modules over a field.
 
 The implementation of generic free modules can be found in
@@ -32,7 +34,8 @@ cache (which usually makes use of a dictionary).
 
 ## Abstract types
 
-The type `FreeModule{T}` belongs to `FPModule{T}`.
+The type `FreeModule{T}` belongs to `FPModule{T}` and `FreeModuleElem{T}`
+to `FPModuleElem{T}`. Here the `FP` prefix stands for finitely presented.
 
 ## Functionality for free modules
 

@@ -22,6 +22,10 @@ module Tmp
     struct Singleton
     end
 
+    # applying @attributes to a singleton type definition is supported but does nothing
+    @attributes struct AnotherSingleton
+    end
+
     struct NotSupported
         x::Int
         NotSupported() = new(0)
@@ -45,6 +49,9 @@ end
 @attributes Tmp.Quux
 @attributes Tmp.FooBar{Tmp.Quux}
 
+# applying @attributes to a singleton typename is supported but does nothing
+@attributes Tmp.Singleton
+
 @testset "@attributes input validation" begin
 
     @test_throws Exception @attributes Int
@@ -52,7 +59,7 @@ end
 
 end
 
-@testset "attributes for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux, Tmp.FooBar{Tmp.Bar}, Tmp.FooBar{Tmp.Quux})
+@testset "attributes for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux, Tmp.Singleton, Tmp.AnotherSingleton, Tmp.FooBar{Tmp.Bar}, Tmp.FooBar{Tmp.Quux})
 
     x = T()
 

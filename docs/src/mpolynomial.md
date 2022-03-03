@@ -141,6 +141,9 @@ push_term!(M::MPolyBuildCtx, c::RingElem, v::Vector{Int})
 finish(M::MPolyBuildCtx)
 ```
 
+Note that the `finish` function resets the build context so that it can be
+used to construct multiple polynomials..
+
 When a multivariate polynomial type has a representation that allows constant
 time access (e.g. it is represented internally by arrays), the following
 additional constructor is available. It takes and array of coefficients and
@@ -174,6 +177,12 @@ julia> push_term!(C, ZZ(4), [0, 0]);
 
 julia> f = finish(C)
 3*x*y^2 + 2*x*y + 4
+
+julia> push_term!(C, ZZ(4), [1, 1]);
+
+
+julia> f = finish(C)
+4*x*y
 
 julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
