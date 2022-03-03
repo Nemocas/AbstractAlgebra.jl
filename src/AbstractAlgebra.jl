@@ -135,7 +135,7 @@ export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
 
 export ZZ, QQ, zz, qq, RealField, RDF
 
-export create_accessors, get_handle, zeros
+export zeros
 
 export NotInvertibleError, error_dim_negative, ErrorConstrDimMismatch
 
@@ -631,49 +631,6 @@ include("Groups.jl")
 ################################################################################
 
 include("Deprecations.jl")
-
-###############################################################################
-#
-#   Package handle creation
-#
-###############################################################################
-
-const package_handle = Ref(0)
-
-function get_handle()
-   package_handle[] += 1
-   return package_handle[]
-end
-
-###############################################################################
-#
-#   Auxilliary data accessors
-#
-###############################################################################
-
-mutable struct AccessorNotSetError <: Exception
-end
-
-function create_accessors(T, S, handle)
-   get = function(a, error::Bool = true)
-      if handle > length(a.auxilliary_data) ||
-         !isassigned(a.auxilliary_data, handle)
-        if error
-          throw(AccessorNotSetError())
-        else
-          return nothing
-        end
-      end
-      return a.auxilliary_data[handle]
-   end
-   set = function(a, b)
-      if handle > length(a.auxilliary_data)
-         resize!(a.auxilliary_data, handle)
-      end
-      a.auxilliary_data[handle] = b
-   end
-   return get, set
-end
 
 ###############################################################################
 #
