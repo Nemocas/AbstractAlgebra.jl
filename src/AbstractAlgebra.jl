@@ -121,7 +121,7 @@ using RandomExtensions: RandomExtensions, make, Make2
 export elem_type, parent_type
 
 export SetElem, GroupElem, AdditiveGroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElement,
-       FieldElement, Map, AccessorNotSetError
+       FieldElement, Map
 
 export SetMap, FunctionalMap, IdentityMap
 
