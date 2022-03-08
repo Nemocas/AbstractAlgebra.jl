@@ -844,6 +844,39 @@ end
 
 ###############################################################################
 #
+#   FactoredFracField / FactoredFrac
+#
+###############################################################################
+
+mutable struct FactoredFracField{T <: Union{RingElement}} <: AbstractAlgebra.FracField{T}
+   base_ring::AbstractAlgebra.Ring
+
+   function FactoredFracField{T}(R::Ring, cached::Bool = true) where T <: RingElement
+      return get_cached!(FactoredFracDict, R, cached) do
+         new{T}(R)
+      end::FactoredFracField{T}
+   end
+end
+
+const FactoredFracDict = CacheDictType{Ring, Ring}()
+
+mutable struct FactoredFracTerm{T <: RingElement}
+   base::T
+   exp::Int
+end
+
+# *** ownership conventions:
+# the object owns the .terms vector but not necessarily its entries, so mutating
+# the vector is allowed when mutating the object but be aware before mutating
+# any entry of the vector
+mutable struct FactoredFrac{T <: RingElement} <: AbstractAlgebra.FracElem{T}
+   unit::T
+   terms::Vector{FactoredFracTerm{T}}
+   parent::FactoredFracField{T}
+end
+
+###############################################################################
+#
 #   RationalFunctionField / rational_function
 #
 ###############################################################################

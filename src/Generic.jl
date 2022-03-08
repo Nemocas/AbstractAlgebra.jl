@@ -109,6 +109,8 @@ include("generic/FreeAssAlgebra.jl")
 
 include("generic/Fraction.jl")
 
+include("generic/FactoredFraction.jl")
+
 include("generic/RationalFunctionField.jl")
 
 include("generic/FunctionField.jl")
