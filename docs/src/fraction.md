@@ -19,6 +19,14 @@ where `T` is the type of elements of the base ring. See the file
 
 Parent objects of such fraction elements have type `Generic.FracField{T}`.
 
+## Factored fraction types
+
+AbstractAlgebra.jl also implements a fraction type `Generic.FactoredFrac{T}`
+with parent objects of such fractions having type `Generic.FactoredFracField{T}`.
+As opposed to the fractions of type `Generic.Frac{T}`, which are just a
+numerator and denominator, these fractions are maintained in factored form as
+much as possible.
+
 ## Abstract types
 
 All fraction element types belong to the abstract type `FracElem{T}`
@@ -71,7 +79,39 @@ julia> h = S(BigInt(1234))
 
 julia> k = S(x + 1)
 x + 1
+```
 
+## Factored Fraction field constructors
+
+The corresponding factored field uses the following constructor.
+
+```julia
+FactoredFractionField(R::Ring; cached::Bool = true)
+```
+
+**Examples**
+
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> S = FactoredFractionField(R)
+Factored fraction field of Multivariate Polynomial Ring in x, y over Integers
+
+julia> (X, Y) = (S(x), S(y))
+(x, y)
+
+julia> f = X^6*(X+Y)^2*(X^2+Y)^3*(X+2*Y)^-3*(X+3*Y)^-4
+x^6*(x + y)^2*(x^2 + y)^3/((x + 2*y)^3*(x + 3*y)^4)
+
+julia> numerator(f)
+x^14 + 2*x^13*y + x^12*y^2 + 3*x^12*y + 6*x^11*y^2 + 3*x^10*y^3 + 3*x^10*y^2 + 6*x^9*y^3 + 3*x^8*y^4 + x^8*y^3 + 2*x^7*y^4 + x^6*y^5
+
+julia> denominator(f)
+x^7 + 18*x^6*y + 138*x^5*y^2 + 584*x^4*y^3 + 1473*x^3*y^4 + 2214*x^2*y^5 + 1836*x*y^6 + 648*y^7
+
+julia> derivative(f, x)
+x^5*(x + y)*(x^2 + y)^2*(7*x^5 + 58*x^4*y + 127*x^3*y^2 + x^3*y + 72*x^2*y^3 + 22*x^2*y^2 + 61*x*y^3 + 36*y^4)/((x + 2*y)^4*(x + 3*y)^5)
 ```
 
 ## Fraction constructors
@@ -336,3 +376,38 @@ R, x = PolynomialRing(ZZ, "x")
 S = FractionField(R)
 g = rand(S, -1:3, -10:10)
 ```
+
+### Extra functionality for factored fractions
+
+The `Generic.FactoredFrac{T}` type implements an interface similar to that of
+the `Fac{T}` type for iterating over the terms in the factorisation. There is
+also the function `push_term!(a, b, e)` for efficiently performing `a *= b^e`,
+and the function `normalise` returns relatively prime terms.
+
+**Examples**
+
+```jldoctest
+julia> F = FactoredFractionField(ZZ)
+Factored fraction field of Integers
+
+julia> f = F(-1)
+-1
+
+julia> push_term!(f, 10, 10)
+-10^10
+
+julia> push_term!(f, 42, -8)
+-10^10/42^8
+
+julia> normalise(f)
+-5^10*2^2/21^8
+
+julia> unit(f)
+-1
+
+julia> collect(f)
+2-element Vector{Tuple{BigInt, Int64}}:
+ (10, 10)
+ (42, -8)
+```
+

@@ -94,7 +94,7 @@ function Base.deepcopy_internal(a::FactoredFrac{T}, dict::IdDict) where T <: Rin
                           a.parent)
 end
 
-# the non-expanding hash function would have to normalize the bases, and then
+# the non-expanding hash function would have to normalise the bases, and then
 # either sort the bases or combine the hashes of the bases in a commutative way
 
 function Base.numerator(a::FactoredFrac, canonicalise::Bool=true)
@@ -155,7 +155,7 @@ function isone(a::FactoredFrac{T}) where T
         end
         ok && return false
     end
-    z = normalize(a)
+    z = normalise(a)
     return isempty(z.terms) && isone(z.unit)
 end
 
@@ -297,7 +297,7 @@ function mul_by_base_elem(a::FactoredFrac{T}, b::T) where T <: RingElement
         return zero(F)
     else
         z = FactoredFrac{T}(a.unit, map(copy, a.terms), F)
-        _append_pow_normalize!(z, b, 1, 1)
+        _append_pow_normalise!(z, b, 1, 1)
         return z
     end
 end
@@ -445,7 +445,7 @@ function derivative(a::FactoredFrac{T}, i::Int) where {T <: MPolyElem}
     for (b, e) in a
         s += divexact(p, b)*e*derivative(b, i)
     end
-    return _append_pow_normalize!(z, s::T, 1, 1)
+    return _append_pow_normalise!(z, s::T, 1, 1)
 end
 
 ################################################################################
@@ -505,11 +505,11 @@ function _make_base_elem(F::FactoredFracField{T}, a::T) where T <: RingElement
 end
 
 # return a version of a with coprime bases
-function normalize(a::FactoredFrac{T}) where T
+function normalise(a::FactoredFrac{T}) where T
     z = FactoredFrac{T}(a.unit, FactoredFracTerm{T}[], parent(a))
     if !iszero(z.unit)
         for i in a.terms
-			_append_pow_normalize!(z, i.base, i.exp, 1)
+			_append_pow_normalise!(z, i.base, i.exp, 1)
         end
     end
     return z
@@ -586,7 +586,7 @@ function _append_pow!(z::FactoredFrac{T}, f::T, e::Int) where T
 end
 
 # z *= a^e with normalization
-function _append_pow_normalize!(z::FactoredFrac{T}, a::T, e::Int, i::Int) where T
+function _append_pow_normalise!(z::FactoredFrac{T}, a::T, e::Int, i::Int) where T
     iszero(e) && return z
     if iszero(a)
         z.unit = a
@@ -620,7 +620,7 @@ function _append_pow_normalize!(z::FactoredFrac{T}, a::T, e::Int, i::Int) where 
             end
         else
             a = abar
-            _append_pow_normalize!(z, g, e, i)
+            _append_pow_normalise!(z, g, e, i)
         end
     end
     if isunit(a)
@@ -636,12 +636,12 @@ end
 # p*a = b*g and gcd(a, g) == 1
 function _append_coprimefac!(l::FactoredFrac{T}, b::T, e::Int, g::T) where T
     @assert !iszero(b)
-    _append_pow_normalize!(l, g, e, 1)
+    _append_pow_normalise!(l, g, e, 1)
     a = b
     r = gcd(a, g)
     while !isunit(r)
         @assert !iszero(r)
-        _append_pow_normalize!(l, r, e, 1)
+        _append_pow_normalise!(l, r, e, 1)
         a = divexact(a, r)
         r = gcd(r, a)
     end
@@ -665,12 +665,12 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
             if !isunit(g)
                 e = Base.checked_sub(b[i].exp, c[j].exp)
                 if e >= 0
-                    _append_pow_normalize!(z, g, c[j].exp, 1)
+                    _append_pow_normalise!(z, g, c[j].exp, 1)
                     if e > 0
                         push!(b, FactoredFracTerm{T}(g, e))
                     end
                 else
-                    _append_pow_normalize!(z, g, b[i].exp, 1)
+                    _append_pow_normalise!(z, g, b[i].exp, 1)
                     push!(c, FactoredFracTerm{T}(g, Base.checked_neg(e)))
                 end
             end
@@ -693,7 +693,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
     i = 1
     while i <= length(b)
         if b[i].exp < 0
-			_append_pow_normalize!(z, b[i].base, b[i].exp, 1)
+			_append_pow_normalise!(z, b[i].base, b[i].exp, 1)
             cbar *= b[i].base^Base.checked_neg(b[i].exp)
         else
             bbar *= b[i].base^b[i].exp
@@ -703,7 +703,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
     j = 1
     while j <= length(c)
         if c[j].exp < 0
-			_append_pow_normalize!(z, c[j].base, c[j].exp, 1)
+			_append_pow_normalise!(z, c[j].base, c[j].exp, 1)
             bbar *= c[j].base^Base.checked_neg(c[j].exp)
         else
             cbar *= c[j].base^c[j].exp

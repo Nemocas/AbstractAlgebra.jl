@@ -121,7 +121,7 @@ end
     end
 end
 
-@testset "Generic.FactoredFrac.ZZ.normalize" begin
+@testset "Generic.FactoredFrac.ZZ.normalise" begin
     FF = FactoredFractionField(ZZ)
 
     a = one(FF)
@@ -139,7 +139,7 @@ end
     @test collect(a) == [(ZZ(4), 3), (ZZ(2), -6)]
     @test !AbstractAlgebra.Generic._bases_are_nice(a)
 
-    a = AbstractAlgebra.Generic.normalize(a)
+    a = normalise(a)
     @test length(a) == 0
     @test isone(a)
     @test isunit(a)
@@ -148,12 +148,12 @@ end
     a = one(FF)
     push_term!(a, 4, 3)
     push_term!(a, 6, -3)
-    a = AbstractAlgebra.Generic.normalize(a)
+    a = normalise(a)
     @test a == 4^3//6^3
     @test length(a) == 2
 
     push_term!(a, 0, 3)
-    a = AbstractAlgebra.Generic.normalize(a)
+    a = normalise(a)
     @test iszero(a)
     @test length(a) == 0
 end

@@ -848,7 +848,7 @@ end
 #
 ###############################################################################
 
-mutable struct FactoredFracField{T <: Union{RingElement}} <: AbstractAlgebra.FracField{T}
+mutable struct FactoredFracField{T <: RingElement} <: AbstractAlgebra.FracField{T}
    base_ring::AbstractAlgebra.Ring
 
    function FactoredFracField{T}(R::Ring, cached::Bool = true) where T <: RingElement
