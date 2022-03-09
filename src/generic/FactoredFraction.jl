@@ -36,7 +36,7 @@ end
 
 ###############################################################################
 #
-#   Constructors
+#   Constructors and Parent Call Overloads
 #
 ###############################################################################
 
@@ -77,7 +77,9 @@ end
 
 # construction of the fraction a/b
 function (F::FactoredFracField{T})(a::RingElement, b::RingElement) where T <: RingElement
-    return _append_pow!(_make_base_elem(F, base_ring(F)(a)), base_ring(F)(b), -1)
+    a = base_ring(F)(a)
+    b = base_ring(F)(b)
+    return _append_pow!(_make_base_elem(F, a), b, -1)
 end
 
 ###############################################################################
@@ -95,7 +97,7 @@ end
 # the non-expanding hash function would have to normalize the bases, and then
 # either sort the bases or combine the hashes of the bases in a commutative way
 
-function Base.numerator(a::FactoredFrac, canonicalise::Bool=true)    
+function Base.numerator(a::FactoredFrac, canonicalise::Bool=true)
     z = unit(a)
     for (b, e) in a
         if canonicalise
@@ -185,24 +187,14 @@ function Base.length(a::FactoredFrac)
     Base.length(a.terms)
 end
 
-###############################################################################
-#
-#   Promotion
-#
-###############################################################################
-
-function AbstractAlgebra.promote_rule(
-   ::Type{AbstractAlgebra.Generic.Frac{T}},
-   ::Type{FactoredFrac{T}}
-) where T <: RingElem
-    return FactoredFrac{T}
+function push_term!(a::FactoredFrac{T}, b::T, e::Int) where T <: RingElement
+    parent(b) == base_ring(a) || error("Incompatible parents")
+    push!(a.terms, FactoredFracTerm{T}(b, e))
+    return a
 end
 
-function AbstractAlgebra.promote_rule(
-   ::Type{FactoredFrac{T}},
-   ::Type{AbstractAlgebra.Generic.Frac{T}}
-) where T <: RingElem
-    return FactoredFrac{T}
+function push_term!(a::FactoredFrac{T}, b, e::Int) where T <: RingElement
+    return push_term!(a, base_ring(a)(b), e)
 end
 
 ###############################################################################
@@ -239,14 +231,14 @@ end
 
 function ==(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
     (g, x, y) = _gcdhelper(a, b)
-    return x == y    
+    return x == y
 end
 
 function +(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T
    return a + parent(a)(b)
 end
 
-function +(a::FactoredFrac{T}, b::T) where T
+function +(a::FactoredFrac{T}, b::T) where T <: RingElem
    return a + parent(a)(b)
 end
 
@@ -254,7 +246,7 @@ function +(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T
    return parent(a)(b) + a
 end
 
-function +(b::T, a::FactoredFrac{T}) where T
+function +(b::T, a::FactoredFrac{T}) where T <: RingElem
    return parent(a)(b) + a
 end
 
@@ -267,7 +259,7 @@ function -(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T
    return a - parent(a)(b)
 end
 
-function -(a::FactoredFrac{T}, b::T) where T
+function -(a::FactoredFrac{T}, b::T) where T <: RingElem
    return a - parent(a)(b)
 end
 
@@ -275,7 +267,7 @@ function -(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T
    return parent(a)(b) - a
 end
 
-function -(b::T, a::FactoredFrac{T}) where T
+function -(b::T, a::FactoredFrac{T}) where T <: RingElem
    return parent(a)(b) - a
 end
 
@@ -391,7 +383,7 @@ function divexact(a::Union{Integer, Rational}, b::FactoredFrac{T}) where T
     return divexact(parent(b)(a), b)
 end
 
-function divexact(a::T, b::FactoredFrac{T}) where T
+function divexact(a::T, b::FactoredFrac{T}) where T <: RingElem
     return divexact(parent(b)(a), b)
 end
 
@@ -424,7 +416,7 @@ function evaluate(f::FactoredFrac{T}, v::Vector{U}) where {T <: RingElement, U <
     end
     return z
 end
-  
+
 function evaluate(f::FactoredFrac{T}, v::U) where {T <: RingElement, U <: RingElement}
     z = evaluate(unit(f), v)
     for (b, e) in f
@@ -432,7 +424,7 @@ function evaluate(f::FactoredFrac{T}, v::U) where {T <: RingElement, U <: RingEl
     end
     return z
 end
- 
+
 ##############################################################################
 #
 #  Derivative
@@ -462,7 +454,7 @@ end
 #
 ################################################################################
 
-function remove(a::FactoredFrac{T}, p::T) where {T}
+function remove(a::FactoredFrac{T}, p::T) where T <: RingElement
     z = FactoredFrac{T}(unit(a), FactoredFracTerm{T}[], parent(a))
     v = 0
     for (b, e) in a
@@ -481,7 +473,7 @@ end
 ###############################################################################
 
 function zero!(c::FactoredFrac)
-    zero!(c.unit)
+    c.unit = zero!(c.unit)
     empty!(c.terms)
     return c
 end
@@ -517,7 +509,7 @@ function normalize(a::FactoredFrac{T}) where T
     z = FactoredFrac{T}(a.unit, FactoredFracTerm{T}[], parent(a))
     if !iszero(z.unit)
         for i in a.terms
-			_append_pow_normalize!(z, a[j].base, a[j].exp, 1)
+			_append_pow_normalize!(z, i.base, i.exp, 1)
         end
     end
     return z
@@ -534,11 +526,8 @@ end
 
 function _gcd_cofactors(a::T, b::T) where T
     g = gcd(a, b)
-    if iszero(g)
-        return (g, a, b)
-    else
-        return (g, divexact(a, g), divexact(b, g))
-    end
+    iszero(g) && return (g, a, b)
+    return (g, divexact(a, g), divexact(b, g))
 end
 
 function copy(a::FactoredFracTerm{T}) where T
@@ -575,12 +564,6 @@ function _bases_are_nice(a::FactoredFrac{T}) where T
 end
 
 # z *= f^e with no extra normalization
-function _append_pow!(z::FactoredFrac{T}, f::FactoredFrac{T}, e::Int) where T
-    z.unit *= f.unit^e
-    _append_pow!(z, f.terms, e)
-    return z
-end
-
 function _append_pow!(z::FactoredFrac{T}, f::Vector{FactoredFracTerm{T}}, e::Int) where T
     for i in f
         ie = Base.checked_mul(i.exp, e)
@@ -594,7 +577,7 @@ end
 function _append_pow!(z::FactoredFrac{T}, f::T, e::Int) where T
     if !iszero(e)
         if isunit(f)
-            z.unit *= f^e
+            z.unit *= _pow(f, e)
         else
             push!(z.terms, FactoredFracTerm{T}(f, e))
         end
@@ -713,7 +696,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
 			_append_pow_normalize!(z, b[i].base, b[i].exp, 1)
             cbar *= b[i].base^Base.checked_neg(b[i].exp)
         else
-            bbar *= b[i].base^b[i].exp            
+            bbar *= b[i].base^b[i].exp
         end
         i += 1
     end
@@ -723,7 +706,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
 			_append_pow_normalize!(z, c[j].base, c[j].exp, 1)
             bbar *= c[j].base^Base.checked_neg(c[j].exp)
         else
-            cbar *= c[j].base^c[j].exp            
+            cbar *= c[j].base^c[j].exp
         end
         j += 1
     end
