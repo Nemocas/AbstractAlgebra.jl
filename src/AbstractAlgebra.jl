@@ -391,6 +391,7 @@ include("Fraction.jl")
 include("MPoly.jl")
 include("UnivPoly.jl")
 include("FreeAssAlgebra.jl")
+include("LaurentMPoly.jl")
 
 ###############################################################################
 #

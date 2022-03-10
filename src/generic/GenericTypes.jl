@@ -529,6 +529,46 @@ end
 
 ###############################################################################
 #
+#   LaurentMPolyRing / LaurentMPoly
+#
+###############################################################################
+
+mutable struct LaurentMPolyWrapRing{T  <: RingElement,
+                                    PR <: AbstractAlgebra.MPolyRing{T}
+                                   } <: AbstractAlgebra.LaurentMPolyRing{T}
+   mpolyring::PR
+
+   function LaurentMPolyWrapRing(pr::PR, cached::Bool = true) where {
+                                             T <: RingElement,
+                                             PR <: AbstractAlgebra.MPolyRing{T}}
+
+      return get_cached!(LaurentMPolyWrapRingID, pr, cached) do
+         new{T, PR}(pr)
+      end::LaurentMPolyWrapRing{T, PR}
+   end
+end
+
+const LaurentMPolyWrapRingID = CacheDictType{Ring, LaurentMPolyWrapRing}()
+
+mutable struct LaurentMPolyWrap{T  <: RingElement,
+                                PE <: AbstractAlgebra.MPolyElem{T},
+                                LR <: LaurentMPolyWrapRing{T}
+                               } <: AbstractAlgebra.LaurentMPolyElem{T}
+   parent::LR
+   mpoly::PE
+   mindegs::Vector{Int} # meaning ditto, vector not necessarily owned by object
+   function LaurentMPolyWrap(parent::LR,
+                             poly::PE,
+                             mindegs::Vector{Int} = zeros(Int, nvars(parent))
+                            ) where {T  <: RingElement,
+                                     PE <: AbstractAlgebra.MPolyElem{T},
+                                     LR <: LaurentMPolyWrapRing{T}}
+      new{T, PE, LR}(parent, poly, mindegs)
+   end
+end
+
+###############################################################################
+#
 #   ResRing / Res
 #
 ###############################################################################

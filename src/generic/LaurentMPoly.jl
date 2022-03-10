@@ -1,0 +1,568 @@
+###############################################################################
+#
+#   LaurentMPoly.jl : Generic multivariate Laurent polynomials over rings
+#
+###############################################################################
+
+###############################################################################
+#
+#   Data type and parent object methods
+#
+###############################################################################
+
+parent_type(::Type{LaurentMPolyWrap{T, PE, LR}}) where {T, PE, LR} = LR
+
+elem_type(::Type{LaurentMPolyWrapRing{T, PR}}) where {T, PR} =
+                LaurentMPolyWrap{T, elem_type(PR), LaurentMPolyWrapRing{T, PR}}
+
+parent(p::LaurentMPolyWrap) = p.parent
+
+base_ring(R::LaurentMPolyWrapRing) = base_ring(R.mpolyring)
+
+symbols(R::LaurentMPolyWrapRing) = symbols(R.mpolyring)
+
+nvars(R::LaurentMPolyWrapRing) = nvars(R.mpolyring)
+
+characteristic(R::LaurentMPolyWrapRing) = characteristic(R.mpolyring)
+
+###############################################################################
+#
+#   Basic manipulation
+#
+###############################################################################
+
+function deepcopy_internal(p::LaurentMPolyWrap, dict::IdDict)
+   return LaurentMPolyWrap(p.parent, deepcopy_internal(p.poly, dict),
+                                     deepcopy_internal(p.mindegs, dict))
+end
+
+function zero(R::LaurentMPolyWrapRing)
+    return LaurentMPolyWrap(R, zero(R.mpolyring))
+end
+
+function one(R::LaurentMPolyWrapRing)
+    return LaurentMPolyWrap(R, one(R.mpolyring))
+end
+
+function gen(R::LaurentMPolyWrapRing)
+    return LaurentMPolyWrap(R, gen(R.mpolyring))
+end
+
+function iszero(a::LaurentMPolyWrap)
+    return iszero(a.mpoly)
+end
+
+function isone(a::LaurentMPolyWrap)
+    isone(length(a.mpoly)) || return false
+    isone(leading_coefficient(a.mpoly)) || return false
+    e = leading_exponent_vector(a.mpoly)
+    for i in 1:length(e)
+        e[i] == -a.mindegs[i] || return false
+    end
+    return true
+end
+
+function isgen(a::LaurentMPolyWrap)
+    isone(length(a.mpoly)) || return false
+    isone(leading_coefficient(a.mpoly)) || return false
+    e = leading_exponent_vector(a.mpoly)
+    found = false
+    for i in 1:length(e)
+        s = e[i] + a.mindegs[i]
+        if isone(s)
+            if found
+                return false
+            end
+            found = true
+        elseif !iszero(s)
+            return false
+        end
+    end
+    return found
+end
+
+###############################################################################
+#
+#   Arithmetic
+#
+###############################################################################
+
+function +(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+    check_parent(a, b)
+    if a.mindegs == b.mindegs
+        return LaurentMPolyWrap(parent(a), a.mpoly + b.mpoly, a.mindegs)
+    end
+    g, x, y = _gcdhelper(a, b)
+    z, d = _normalize(x + y)
+    return LaurentMPolyWrap(parent(a), z, add!(d, d, g))
+end
+
+function -(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+    check_parent(a, b)
+    if a.mindegs == b.mindegs
+        return LaurentMPolyWrap(parent(a), a.mpoly - b.mpoly, a.mindegs)
+    end
+    g, x, y = _gcdhelper(a, b)
+    z, d = _normalize(x - y)
+    return LaurentMPolyWrap(parent(a), z, add!(d, d, g))
+end
+
+function -(a::LaurentMPolyWrap)
+    LaurentMPolyWrap(parent(a), -a.mpoly, a.mindegs)
+end
+
+# For ^ and *, if the inputs are normalized and the base ring is a domain,
+# then the output will be normalized with this code
+function ^(a::LaurentMPolyWrap, b::Integer)
+    # possible promotion of the vector and then conversion back to Vector{Int}
+    if b >= 0
+        return LaurentMPolyWrap(parent(a), a.mpoly^b, a.mindegs*b)
+    else
+        ap, ad = _normalize(a)
+        return LaurentMPolyWrap(parent(a), inv(ap)^-b, ad*b)
+    end
+end
+
+function *(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+    check_parent(a, b)
+    return LaurentMPolyWrap(parent(a), a.mpoly*b.mpoly, a.mindegs + b.mindegs)
+end
+
+function divides(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+    check_parent(a, b)
+    (bp, bd) = _normalize(b)
+    flag, q = divides(a.mpoly, bp)
+    return flag, LaurentMPolyWrap(parent(a), q, sub!(bd, a.mindegs, bd))
+end
+
+function divexact(a::LaurentMPolyWrap, b::LaurentMPolyWrap; check::Bool=true)
+    check_parent(a, b)
+    (bp, bd) = _normalize(b)
+    q = divexact(a.mpoly, bp, check=check)
+    return LaurentMPolyWrap(parent(a), q, sub!(bd, a.mindegs, bd))
+end
+
+function inv(a::LaurentMPolyWrap)
+    (ap, ad) = _normalize(a)
+    q = divexact(a.mpoly, bp, check=check)
+    return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
+end
+
+function gcd(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+    check_parent(a, b)
+    ap, ad = _normalize(a)
+    bp, bd = _normalize(b)
+    return LaurentMPolyWrap(parent(a), gcd(ap, bp), zero!(ad))
+end
+
+function divrem(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+    check_parent(a, b)
+    error("divrem not implemented for LaurentMPoly")
+end
+
+###############################################################################
+#
+#   Canonicalisation
+#
+###############################################################################
+
+function canonical_unit(a::LaurentMPolyWrap)
+    amin, aiszero = _mindegs(a.mpoly)
+    aiszero && return one(parent(a))
+    return LaurentPolyWrap(parent(a), parent(a.mpoly)(canonical_unit(a.mpoly)),
+                                      add!(amin, amin, a.mindegs))
+end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+function evaluate(a::LaurentMPolyWrap, b::Vector)
+    length(b) == nvars(parent(a)) || error("Number of variables does not match number of values")
+    (ap, ad) = _normalize(a)
+    z = evaluate(ap, b)
+    for i in 1:nvars(parent(a))
+        if !iszero(a.mindegs[i])
+            z *= b[i]^a.mindegs[i]
+        end
+    end
+    return z
+end
+
+###############################################################################
+#
+#   Derivative
+#
+###############################################################################
+
+# this has a chance of generating non-normalized output from normalized input
+function derivative(a::LaurentMPolyWrap, j::Int)
+    z = derivative(a.mpoly, j)
+    e = copy(a.mindegs)
+    if !iszero(e[j])
+        z = gen(parent(a.mpoly), j)*z + e[j]*a.mpoly
+        e[j] -= 1
+    end
+    return LaurentPolyWrap(parent(a), z, e)
+end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+function zero!(z::LaurentMPolyWrap)
+   z.mpoly = zero!(z.mpoly)
+   z.mindegs = zeros(Int, nvars(parent(z)))
+   return z
+end
+
+###############################################################################
+#
+#   Internal helpers
+#
+###############################################################################
+
+function zero!(z::Vector{Int})
+    for i in 1:length(z)
+        z[i] = 0
+    end
+end
+
+function min_broadcast!(z::Vector{Int}, a::Vector{Int}, b::Vector{Int})
+    for i in 1:length(z)
+        z[i] = min(a[i], b[i])
+    end
+    return z
+end
+
+function add!(z::Vector{Int}, a::Vector{Int}, b::Vector{Int})
+    for i in 1:length(z)
+        z[i] = a[i] + b[i]
+    end
+    return z
+end
+
+function sub!(z::Vector{Int}, a::Vector{Int}, b::Vector{Int})
+    for i in 1:length(z)
+        z[i] = a[i] - b[i]
+    end
+    return z
+end
+
+# min broadcasted over all all exponent vectors
+# a return of (0, true) indicates the min is infinite
+# TODO specialize for implementations
+function _mindegs(a::MPolyElem)
+    d = zeros(Int, nvars(parent(a)))
+    first = true
+    for e in exponent_vectors(a)
+        if first
+            d = e
+        else
+            min_broadcast!(d, d, e)
+        end
+        first = false
+    end
+    return d, first
+end
+
+# TODO specialize for implementations
+function _divexact_by_exponent_vector(a::MPolyElem, d::Vector)
+    for i in 1:length(d)
+        if d[i] > 0
+            a = divexact(a, gen(parent(a), i)^d[i])
+        elseif d[i] < 0
+            a = a * gen(parent(a), i)^-d[i]
+        end
+    end
+    return a
+end
+
+# return equivalent members (mpoly, mindegs) where the mpoly is normalized
+function _normalize(a::LaurentMPolyWrap)
+    ap, ad = _normalize(a.mpoly)
+    return ap, add!(ad, ad, a.mindegs)
+end
+
+# A normalized mpoly is either zero or not divisible by any gen
+function _normalize(a::MPolyElem)
+    d, isinf = _mindegs(a)
+    return _divexact_by_exponent_vector(a, d), d
+end
+
+# pull out a monomial common factor g, leaving mpolys
+function _gcdhelper(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+    amin, aiszero = _mindegs(a.mpoly)
+    add!(amin, amin, a.mindegs)
+    if aiszero
+        bp, bd = _normalize(b.mpoly)
+        return (bd, a.poly, bp)
+    end
+    bmin, biszero = _mindegs(b.mpoly)
+    add!(bmin, bmin, b.mindegs)
+    if biszero
+        ap, ad = _normalize(a.mpoly)
+        return (ad, ap, b.poly)
+    end
+    g = min.(amin, bmin)
+    sub!(amin, g, a.mindegs)
+    sub!(bmin, g, b.mindegs)
+    return (g, _divexact_by_exponent_vector(a.mpoly, amin),
+               _divexact_by_exponent_vector(b.mpoly, bmin))
+end
+
+###############################################################################
+#
+#   Iterators
+#
+###############################################################################
+
+function coefficients(a::LaurentMPolyWrap)
+    return coefficients(a.mpoly)
+end
+
+#### exponent vectors
+
+struct LaurentMPolyWrapExponentVectors{T, S}
+    poly::T
+    it::S
+end
+
+function exponent_vectors(a::LaurentMPolyWrap)
+    t = exponent_vectors(a.mpoly)
+    return LaurentMPolyWrapExponentVectors{typeof(a), typeof(t)}(a, t)
+end
+
+function Base.iterate(a::LaurentMPolyWrapExponentVectors)
+    t = Base.iterate(a.it)
+    return isnothing(t) ? t : (add!(t[1], t[1], a.poly.mindegs), t[2])
+end
+
+function Base.iterate(a::LaurentMPolyWrapExponentVectors, state)
+    t = Base.iterate(a.it, state)
+    return isnothing(t) ? t : (add!(t[1], t[1], a.poly.mindegs), t[2])
+end
+
+function Base.eltype(::Type{LaurentMPolyWrapExponentVectors{T}}) where T
+    return Vector{T}
+end
+
+function Base.length(a::LaurentMPolyWrapExponentVectors)
+    return length(a.it)
+end
+
+#### monomials
+
+struct LaurentMPolyWrapMonomials{T, S}
+    poly::T
+    it::S
+end
+
+function monomials(a::LaurentMPolyWrap)
+    t = exponent_vectors(a.mpoly)
+    return MPolyWrapMonomials{typeof(a), typeof(t)}(a, t)
+end
+
+function Base.iterate(a::LaurentMPolyWrapMonomials)
+    t = Base.iterate(a.it)
+    if isnothing(t)
+        return t
+    else
+        m = LaurentMPolyWrap(parent(a.poly),
+                             one(parent(a.poly)),
+                             add!(t[1], t[1], a.poly.mindegs))
+        return (m, t[2])
+    end
+end
+
+function Base.iterate(a::LaurentMPolyWrapMonomials, state)
+    t = Base.iterate(a.it, state)
+    if isnothing(t)
+        return t
+    else
+        m = LaurentMPolyWrap(parent(a.poly),
+                             one(parent(a.poly)),
+                             add!(t[1], t[1], a.poly.mindegs))
+        return (m, t[2])
+    end
+end
+
+function Base.eltype(::Type{LaurentMPolyWrapMonomials{T}}) where T
+    return T
+end
+
+function Base.length(a::LaurentMPolyWrapMonomials)
+    return length(a.it)
+end
+
+#### terms
+
+struct LaurentMPolyWrapTerms{T, S}
+    poly::T
+    it::S
+end
+
+function terms(a::LaurentMPolyWrap)
+    t = terms(a.mpoly)
+    return MPolyWrapTerms{typeof(a), typeof(t)}(a, t)
+end
+
+function Base.iterate(a::LaurentMPolyWrapTerms)
+    t = Base.iterate(a.it)
+    if isnothing(t)
+        return t
+    else
+        m = LaurentMPolyWrap(parent(a.poly), t[1], a.poly.mindegs)
+        return (m, t[2])
+    end
+end
+
+function Base.iterate(a::LaurentMPolyWrapTerms, state)
+    t = Base.iterate(a.it, state)
+    if isnothing(t)
+        return t
+    else
+        m = LaurentMPolyWrap(parent(a.poly), t[1], a.poly.mindegs)
+        return (m, t[2])
+    end
+end
+
+function Base.eltype(::Type{LaurentMPolyWrapTerms{T}}) where T
+    return T
+end
+
+function Base.length(a::LaurentMPolyWrapTerms)
+    return length(a.it)
+end
+
+###############################################################################
+#
+#   Build Context
+#
+###############################################################################
+
+mutable struct LaurentMPolyBuildCtx{T, S}
+    coeffs::Vector{T}
+    exps::Vector{Vector{Int}}
+    parent::S
+end
+
+function MPolyBuildCtx(R::AbstractAlgebra.LaurentMPolyRing)
+    T = elem_type(coefficient_ring(R))
+    return PolyBuildCtx{T, typeof(R)}(T[], Vector{Int}[], R)
+end
+
+function push_term!(B::LaurentMPolyBuildCtx{T, S}, c::T, expv::Vector{Int}) where {S, T}
+    if length(expv) != nvars(B.parent)
+        error("length of exponent vector should match the number of variables")
+    end
+    push!(B.coeffs, c)
+    push!(B.exps, expv)
+    return B
+end
+
+function finish(B::LaurentMPolyBuildCtx{T, S}) where {T, S}
+    res = B.parent(B.coeffs, B.exps)
+    B.coeffs = T[]
+    B.exps = Vector{Int}[]
+    return res
+end
+
+###############################################################################
+#
+#   Parent object call overload
+#
+###############################################################################
+
+function (a::LaurentMPolyWrapRing{T})() where T <: RingElement
+    return zero(a)
+end
+
+function (a::LaurentMPolyWrapRing{T})(b::RingElement) where T <: RingElement
+   return LaurentMPolyWrap(a, a.mpolyring(b))
+end
+
+function (a::LaurentMPolyWrapRing{T})(b::MPolyElem{T}) where T <: RingElement
+   parent(b) == a.mpolyring || error("Unable to coerce polynomial")
+   return LaurentMPolyWrap(a, b)
+end
+
+function (a::LaurentMPolyWrapRing{T})(b::LaurentMPolyWrap{T}) where T <: RingElement
+   parent(b) == a || error("Unable to coerce polynomial")
+   return b
+end
+
+function (a::LaurentMPolyWrapRing{T})(b::Vector{T}, e::Vector{Vector{Int}}) where T <: RingElement
+    if isempty(e)
+        return zero(a)
+    end
+    n = nvars(a)
+    m = copy(e[1])
+    for i in 1:length(e)
+        length(e[i]) == n || error("Exponent vector $i has length $(length(m[i])) (expected $(n))")
+        min_broadcast!(m, m, e[i])
+    end
+    return LaurentMPolyWrap(a, a.mpolyring(b, map(x -> x - m, e), m))
+end
+
+###############################################################################
+#
+#   Ad hoc arithmetic
+#
+###############################################################################
+
+###############################################################################
+#
+#   Random elements
+#
+###############################################################################
+
+###############################################################################
+#
+#   Promotion rules
+#
+###############################################################################
+
+################################################################################
+#
+#  Change base ring / map_coefficients
+#
+################################################################################
+
+function AbstractAlgebra._map(g, p::LaurentMPolyWrap, R::LaurentMPolyWrapRing)
+   return LaurentMPolyWrap(R, AbstractAlgebra._map(g, p.mpoly, Rx.mpolyring),
+                              p.mindeg)
+end
+
+function change_base_ring(
+    R::Ring,
+    p::LaurentMPolyWrap;
+    cached::Bool = true,
+    parent::LaurentMPolyWrapRing = LaurentMPolyWrapRing(
+       AbstractAlgebra._change_mpoly_ring(R, parent(p.mpoly), cached), cached))
+
+   return AbstractAlgebra._map(R, p, parent)
+end
+
+function map_coefficients(g, p::LaurentMPolyWrap; cached::Bool = true,
+                       parent::LaurentMPolyWrapRing = LaurentPolyMWrapRing(
+                      AbstractAlgebra._make_parent(g, p.poly, cached), cached))
+   return AbstractAlgebra._map(g, p, parent)
+end
+
+###############################################################################
+#
+#   LaurentPolynomialRing constructor
+#
+###############################################################################
+
+function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true)
+   P, x = AbstractAlgebra.PolynomialRing(R, s, cached = cached)
+   R = LaurentMPolyWrapRing(P, cached)
+   R, map(p -> LaurentMPolyWrap(R, p), x)
+end
+
