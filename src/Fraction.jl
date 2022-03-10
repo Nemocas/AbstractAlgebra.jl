@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export FractionField
+export FractionField, FactoredFractionField
 
 ###############################################################################
 #
@@ -914,3 +914,14 @@ base ring $R$ is supplied.
 function FractionField(R::Ring; cached=true)
    return Generic.FractionField(R; cached=cached)
 end
+
+@doc Markdown.doc"""
+    FactoredFractionField(R::Ring; cached=true)
+
+Return the parent object of the fraction field over the given base ring $R$,
+where the elements are maintained in factored form as much as possible.
+"""
+function FactoredFractionField(R::Ring; cached=true)
+   return Generic.FactoredFractionField(R; cached=cached)
+end
+
