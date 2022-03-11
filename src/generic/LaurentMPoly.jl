@@ -31,9 +31,20 @@ characteristic(R::LaurentMPolyWrapRing) = characteristic(R.mpolyring)
 #
 ###############################################################################
 
-function deepcopy_internal(p::LaurentMPolyWrap, dict::IdDict)
-   return LaurentMPolyWrap(p.parent, deepcopy_internal(p.poly, dict),
-                                     deepcopy_internal(p.mindegs, dict))
+function deepcopy_internal(a::LaurentMPolyWrap, dict::IdDict)
+   return LaurentMPolyWrap(a.parent, deepcopy_internal(a.mpoly, dict),
+                                     deepcopy_internal(a.mindegs, dict))
+end
+
+function Base.hash(a::LaurentMPolyWrap, h::UInt)
+    (ap, ad) = _normalize(a)
+    h = hash(ap, h)
+    h ^= 0x9c64b62806a3d51d%UInt
+    return hash(ad, h)
+end
+
+function length(a::LaurentMPolyWrap)
+    return length(a.mpoly)
 end
 
 function zero(R::LaurentMPolyWrapRing)
@@ -44,8 +55,8 @@ function one(R::LaurentMPolyWrapRing)
     return LaurentMPolyWrap(R, one(R.mpolyring))
 end
 
-function gen(R::LaurentMPolyWrapRing)
-    return LaurentMPolyWrap(R, gen(R.mpolyring))
+function gen(R::LaurentMPolyWrapRing, i::Int)
+    return LaurentMPolyWrap(R, gen(R.mpolyring, i))
 end
 
 function iszero(a::LaurentMPolyWrap)
@@ -62,23 +73,31 @@ function isone(a::LaurentMPolyWrap)
     return true
 end
 
-function isgen(a::LaurentMPolyWrap)
-    isone(length(a.mpoly)) || return false
-    isone(leading_coefficient(a.mpoly)) || return false
+function _var_index(a::LaurentMPolyWrap)
+    isone(length(a)) || return 0
+    isone(leading_coefficient(a)) || return 0
     e = leading_exponent_vector(a.mpoly)
-    found = false
+    found = 0
     for i in 1:length(e)
         s = e[i] + a.mindegs[i]
         if isone(s)
-            if found
-                return false
-            end
-            found = true
+            found == 0 || return 0
+            found = i
         elseif !iszero(s)
-            return false
+            return 0
         end
     end
     return found
+end
+
+function var_index(a::LaurentMPolyWrap)
+    z = _var_index(a)
+    iszero(z) && error("Not a variable in var_index")
+    return z
+end
+
+function isgen(a::LaurentMPolyWrap)
+    return !iszero(_var_index(a))
 end
 
 ###############################################################################
@@ -86,6 +105,15 @@ end
 #   Arithmetic
 #
 ###############################################################################
+
+function ==(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+    check_parent(a, b, false) || return false
+    if a.mindegs == b.mindegs
+        return a.mpoly == b.mpoly
+    end
+    g, x, y = _gcdhelper(a, b)
+    return x == y
+end
 
 function +(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
     check_parent(a, b)
@@ -144,7 +172,6 @@ end
 
 function inv(a::LaurentMPolyWrap)
     (ap, ad) = _normalize(a)
-    q = divexact(a.mpoly, bp, check=check)
     return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
 end
 
@@ -169,8 +196,8 @@ end
 function canonical_unit(a::LaurentMPolyWrap)
     amin, aiszero = _mindegs(a.mpoly)
     aiszero && return one(parent(a))
-    return LaurentPolyWrap(parent(a), parent(a.mpoly)(canonical_unit(a.mpoly)),
-                                      add!(amin, amin, a.mindegs))
+    return LaurentMPolyWrap(parent(a), parent(a.mpoly)(canonical_unit(a.mpoly)),
+                                       add!(amin, amin, a.mindegs))
 end
 
 ###############################################################################
@@ -230,6 +257,7 @@ function zero!(z::Vector{Int})
     for i in 1:length(z)
         z[i] = 0
     end
+    return z
 end
 
 function min_broadcast!(z::Vector{Int}, a::Vector{Int}, b::Vector{Int})
@@ -249,6 +277,13 @@ end
 function sub!(z::Vector{Int}, a::Vector{Int}, b::Vector{Int})
     for i in 1:length(z)
         z[i] = a[i] - b[i]
+    end
+    return z
+end
+
+function neg!(z::Vector{Int}, a::Vector{Int})
+    for i in 1:length(z)
+        z[i] = -a[i]
     end
     return z
 end
@@ -299,14 +334,14 @@ function _gcdhelper(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
     amin, aiszero = _mindegs(a.mpoly)
     add!(amin, amin, a.mindegs)
     if aiszero
-        bp, bd = _normalize(b.mpoly)
-        return (bd, a.poly, bp)
+        bp, bd = _normalize(b)
+        return (bd, a.mpoly, bp)
     end
     bmin, biszero = _mindegs(b.mpoly)
     add!(bmin, bmin, b.mindegs)
     if biszero
-        ap, ad = _normalize(a.mpoly)
-        return (ad, ap, b.poly)
+        ap, ad = _normalize(a)
+        return (ad, ap, b.mpoly)
     end
     g = min.(amin, bmin)
     sub!(amin, g, a.mindegs)
@@ -321,11 +356,22 @@ end
 #
 ###############################################################################
 
+#### coefficients
+
+function leading_coefficient(a::LaurentMPolyWrap)
+    return leading_coefficient(a.mpoly)
+end
+
 function coefficients(a::LaurentMPolyWrap)
     return coefficients(a.mpoly)
 end
 
 #### exponent vectors
+
+function leading_exponent_vector(a::LaurentMPolyWrap)
+    e = leading_exponent_vector(a.mpoly)
+    return add!(e, e, a.mindegs)
+end
 
 struct LaurentMPolyWrapExponentVectors{T, S}
     poly::T
@@ -356,6 +402,10 @@ function Base.length(a::LaurentMPolyWrapExponentVectors)
 end
 
 #### monomials
+
+function leading_monomial(a::LaurentMPolyWrap)
+    return LaurentMPolyWrap(parent(a), leading_monomial(a.mpoly), a.mindegs)
+end
 
 struct LaurentMPolyWrapMonomials{T, S}
     poly::T
@@ -400,6 +450,10 @@ function Base.length(a::LaurentMPolyWrapMonomials)
 end
 
 #### terms
+
+function leading_term(a::LaurentMPolyWrap)
+    return LaurentMPolyWrap(parent(a), leading_term(a.mpoly), a.mindegs)
+end
 
 struct LaurentMPolyWrapTerms{T, S}
     poly::T
@@ -512,12 +566,6 @@ end
 ###############################################################################
 #
 #   Ad hoc arithmetic
-#
-###############################################################################
-
-###############################################################################
-#
-#   Random elements
 #
 ###############################################################################
 

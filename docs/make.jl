@@ -25,6 +25,7 @@ makedocs(
                  "mpolynomial.md",
                  "univpolynomial.md",
                  "laurent_polynomial.md",
+                 "laurent_mpolynomial.md",
                  "series.md",
                  "puiseux.md",
                  "mseries.md",

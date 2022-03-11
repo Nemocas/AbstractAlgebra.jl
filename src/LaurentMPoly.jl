@@ -43,6 +43,83 @@ end
 
 ###############################################################################
 #
+#   Basic manipulation
+#
+###############################################################################
+
+function gens(R::LaurentMPolyRing)
+    return [gen(R, i) for i in 1:nvars(R)]
+end
+
+# BOGUS
+function isunit(a::LaurentMPolyElem)
+    return length(a) == 1 && isunit(leading_coefficient(a))
+end
+
+###############################################################################
+#
+#   Derivative
+#
+###############################################################################
+
+function derivative(a::LaurentMPolyElem{T}, x::LaurentMPolyElem{T}) where T <: RingElement
+   check_parent(a, x)
+   return derivative(a, var_index(x))
+end
+
+###############################################################################
+#
+#   Random elements
+#
+###############################################################################
+
+function RandomExtensions.maketype(S::AbstractAlgebra.LaurentMPolyRing, _, _, _)
+    return elem_type(S)
+end
+
+function RandomExtensions.make(S::AbstractAlgebra.LaurentMPolyRing,
+                               term_range::UnitRange{Int},
+                               exp_bound::UnitRange{Int},
+                               vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      Make(S, term_range, exp_bound, vs[1])
+   else
+      make(S, term_range, exp_bound, make(R, vs...))
+   end
+end
+
+function rand(rng::AbstractRNG,
+              sp::SamplerTrivial{<:Make4{<:RingElement,
+                                         <:AbstractAlgebra.LaurentMPolyRing,
+                                         UnitRange{Int},
+                                         UnitRange{Int}}})
+   S, term_range, exp_bound, v = sp[][1:end]
+   f = zero(S)
+   g = gens(S)
+   R = base_ring(S)
+   for i = 1:rand(rng, term_range)
+      term = one(S)
+      for j = 1:length(g)
+         term *= g[j]^rand(rng, exp_bound)
+      end
+      term *= rand(rng, v)
+      f += term
+   end
+   return f
+end
+
+function rand(rng::AbstractRNG, S::AbstractAlgebra.LaurentMPolyRing,
+              term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
+   rand(rng, make(S, term_range, exp_bound, v...))
+end
+
+function rand(S::AbstractAlgebra.LaurentMPolyRing, term_range, exp_bound, v...)
+   rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
+end
+
+###############################################################################
+#
 #   LaurentPolynomialRing constructor
 #
 ###############################################################################
