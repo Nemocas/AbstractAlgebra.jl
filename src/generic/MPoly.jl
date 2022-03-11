@@ -2045,9 +2045,9 @@ function ==(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          if a.exps[j, i] != b.exps[j, i]
             return false
          end
-         if a.coeffs[i] != b.coeffs[i]
-            return false
-         end
+      end
+      if a.coeffs[i] != b.coeffs[i]
+         return false
       end
    end
    return true

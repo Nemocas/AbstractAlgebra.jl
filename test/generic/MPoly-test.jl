@@ -1519,3 +1519,8 @@ end
       end
    end
 end
+
+@testset "Generic.MPoly.equality" begin
+    R, _ = PolynomialRing(ZZ, Symbol[])
+    @test R(1) != R(2)
+end
