@@ -19,6 +19,8 @@ parent(p::LaurentMPolyWrap) = p.parent
 
 base_ring(R::LaurentMPolyWrapRing) = base_ring(R.mpolyring)
 
+coefficient_ring(R::LaurentMPolyWrapRing) = coefficient_ring(R.mpolyring)
+
 symbols(R::LaurentMPolyWrapRing) = symbols(R.mpolyring)
 
 nvars(R::LaurentMPolyWrapRing) = nvars(R.mpolyring)
@@ -232,7 +234,7 @@ function derivative(a::LaurentMPolyWrap, j::Int)
         z = gen(parent(a.mpoly), j)*z + e[j]*a.mpoly
         e[j] -= 1
     end
-    return LaurentPolyWrap(parent(a), z, e)
+    return LaurentMPolyWrap(parent(a), z, e)
 end
 
 ###############################################################################
@@ -393,8 +395,8 @@ function Base.iterate(a::LaurentMPolyWrapExponentVectors, state)
     return isnothing(t) ? t : (add!(t[1], t[1], a.poly.mindegs), t[2])
 end
 
-function Base.eltype(::Type{LaurentMPolyWrapExponentVectors{T}}) where T
-    return Vector{T}
+function Base.eltype(::Type{LaurentMPolyWrapExponentVectors{T, S}}) where {T, S}
+    return Vector{Int}
 end
 
 function Base.length(a::LaurentMPolyWrapExponentVectors)
@@ -413,35 +415,23 @@ struct LaurentMPolyWrapMonomials{T, S}
 end
 
 function monomials(a::LaurentMPolyWrap)
-    t = exponent_vectors(a.mpoly)
-    return MPolyWrapMonomials{typeof(a), typeof(t)}(a, t)
+    t = monomials(a.mpoly)
+    return LaurentMPolyWrapMonomials{typeof(a), typeof(t)}(a, t)
 end
 
 function Base.iterate(a::LaurentMPolyWrapMonomials)
     t = Base.iterate(a.it)
-    if isnothing(t)
-        return t
-    else
-        m = LaurentMPolyWrap(parent(a.poly),
-                             one(parent(a.poly)),
-                             add!(t[1], t[1], a.poly.mindegs))
-        return (m, t[2])
-    end
+    return isnothing(t) ? t :
+                (LaurentMPolyWrap(parent(a.poly), t[1], a.poly.mindegs), t[2])
 end
 
 function Base.iterate(a::LaurentMPolyWrapMonomials, state)
     t = Base.iterate(a.it, state)
-    if isnothing(t)
-        return t
-    else
-        m = LaurentMPolyWrap(parent(a.poly),
-                             one(parent(a.poly)),
-                             add!(t[1], t[1], a.poly.mindegs))
-        return (m, t[2])
-    end
+    return isnothing(t) ? t :
+                (LaurentMPolyWrap(parent(a.poly), t[1], a.poly.mindegs), t[2])
 end
 
-function Base.eltype(::Type{LaurentMPolyWrapMonomials{T}}) where T
+function Base.eltype(::Type{LaurentMPolyWrapMonomials{T, S}}) where {T, S}
     return T
 end
 
@@ -462,30 +452,22 @@ end
 
 function terms(a::LaurentMPolyWrap)
     t = terms(a.mpoly)
-    return MPolyWrapTerms{typeof(a), typeof(t)}(a, t)
+    return LaurentMPolyWrapTerms{typeof(a), typeof(t)}(a, t)
 end
 
 function Base.iterate(a::LaurentMPolyWrapTerms)
     t = Base.iterate(a.it)
-    if isnothing(t)
-        return t
-    else
-        m = LaurentMPolyWrap(parent(a.poly), t[1], a.poly.mindegs)
-        return (m, t[2])
-    end
+    return isnothing(t) ? t :
+                 (LaurentMPolyWrap(parent(a.poly), t[1], a.poly.mindegs), t[2])
 end
 
 function Base.iterate(a::LaurentMPolyWrapTerms, state)
     t = Base.iterate(a.it, state)
-    if isnothing(t)
-        return t
-    else
-        m = LaurentMPolyWrap(parent(a.poly), t[1], a.poly.mindegs)
-        return (m, t[2])
-    end
+    return isnothing(t) ? t :
+                 (LaurentMPolyWrap(parent(a.poly), t[1], a.poly.mindegs), t[2])
 end
 
-function Base.eltype(::Type{LaurentMPolyWrapTerms{T}}) where T
+function Base.eltype(::Type{LaurentMPolyWrapTerms{T, S}}) where {T, S}
     return T
 end
 
@@ -507,13 +489,11 @@ end
 
 function MPolyBuildCtx(R::AbstractAlgebra.LaurentMPolyRing)
     T = elem_type(coefficient_ring(R))
-    return PolyBuildCtx{T, typeof(R)}(T[], Vector{Int}[], R)
+    return LaurentMPolyBuildCtx{T, typeof(R)}(T[], Vector{Int}[], R)
 end
 
 function push_term!(B::LaurentMPolyBuildCtx{T, S}, c::T, expv::Vector{Int}) where {S, T}
-    if length(expv) != nvars(B.parent)
-        error("length of exponent vector should match the number of variables")
-    end
+    length(expv) == nvars(B.parent) || error("length of exponent vector should match the number of variables")
     push!(B.coeffs, c)
     push!(B.exps, expv)
     return B
@@ -560,7 +540,7 @@ function (a::LaurentMPolyWrapRing{T})(b::Vector{T}, e::Vector{Vector{Int}}) wher
         length(e[i]) == n || error("Exponent vector $i has length $(length(m[i])) (expected $(n))")
         min_broadcast!(m, m, e[i])
     end
-    return LaurentMPolyWrap(a, a.mpolyring(b, map(x -> x - m, e), m))
+    return LaurentMPolyWrap(a, a.mpolyring(b, map(x -> x - m, e)), m)
 end
 
 ###############################################################################
@@ -582,8 +562,8 @@ end
 ################################################################################
 
 function AbstractAlgebra._map(g, p::LaurentMPolyWrap, R::LaurentMPolyWrapRing)
-   return LaurentMPolyWrap(R, AbstractAlgebra._map(g, p.mpoly, Rx.mpolyring),
-                              p.mindeg)
+   return LaurentMPolyWrap(R, AbstractAlgebra._map(g, p.mpoly, R.mpolyring),
+                              p.mindegs)
 end
 
 function change_base_ring(
@@ -592,13 +572,13 @@ function change_base_ring(
     cached::Bool = true,
     parent::LaurentMPolyWrapRing = LaurentMPolyWrapRing(
        AbstractAlgebra._change_mpoly_ring(R, parent(p.mpoly), cached), cached))
-
    return AbstractAlgebra._map(R, p, parent)
 end
 
 function map_coefficients(g, p::LaurentMPolyWrap; cached::Bool = true,
-                       parent::LaurentMPolyWrapRing = LaurentPolyMWrapRing(
-                      AbstractAlgebra._make_parent(g, p.poly, cached), cached))
+                       parent::LaurentMPolyWrapRing = LaurentMPolyWrapRing(
+                        AbstractAlgebra._change_mpoly_ring(AbstractAlgebra.parent(g(zero(base_ring(p.mpoly)))), AbstractAlgebra.parent(p.mpoly), cached),
+                            cached))
    return AbstractAlgebra._map(g, p, parent)
 end
 
