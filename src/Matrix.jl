@@ -301,7 +301,7 @@ function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-   block_diagonal_matrix(R::Ring, V::Vector{<:Matrix{T}}) where T <: RingElement
+    block_diagonal_matrix(R::Ring, V::Vector{<:Matrix{T}}) where T <: RingElement
 
 Create the block diagonal matrix over the ring `R` whose blocks are given
 by the matrices in `V`. Entries are coerced into `R` upon creation.

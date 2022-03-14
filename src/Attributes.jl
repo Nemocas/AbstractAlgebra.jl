@@ -262,7 +262,7 @@ end
 
 
 """
-   @attr [RetType] funcdef
+    @attr [RetType] funcdef
 
 This macro is applied to the definition of a unary function, and enables
 caching ("memoization") of its return values based on the argument. This
