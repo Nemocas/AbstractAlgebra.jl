@@ -64,7 +64,6 @@ makedocs(
              ],
              "Maps" => [
                  "map_introduction.md",
-                 "map.md",
                  "functional_map.md",
                  "map_cache.md",
                  "map_with_inverse.md",

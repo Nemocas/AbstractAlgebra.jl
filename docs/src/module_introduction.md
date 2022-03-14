@@ -1,4 +1,4 @@
-# Introduction.
+# Introduction
 
 As with many generic constructions in AbstractAlgebra, the modules that are
 provided in AbstractAlgebra itself work over a Euclidean domain. Moreover,

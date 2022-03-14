@@ -1,4 +1,9 @@
-# Map interface
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = :(using AbstractAlgebra)
+```
+
+# Map Interface
 
 Maps in AbstractAlgebra can be constructed from Julia functions, or they can be
 represented by some other kind of data, e.g. a matrix, or built up from other maps.
