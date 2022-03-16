@@ -244,7 +244,7 @@ end
 ###############################################################################
 
 function zero!(z::LaurentMPolyWrap)
-   z.mpoly = zero!(z.mpoly)
+   z.mpoly = zero(parent(z.mpoly))
    z.mindegs = zeros(Int, nvars(parent(z)))
    return z
 end

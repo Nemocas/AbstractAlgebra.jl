@@ -555,7 +555,7 @@ mutable struct LaurentMPolyWrap{T  <: RingElement,
                                 LR <: LaurentMPolyWrapRing{T}
                                } <: AbstractAlgebra.LaurentMPolyElem{T}
    parent::LR
-   mpoly::PE
+   mpoly::PE            # not necessarily owned by object
    mindegs::Vector{Int} # meaning ditto, vector not necessarily owned by object
    function LaurentMPolyWrap(parent::LR,
                              poly::PE,
