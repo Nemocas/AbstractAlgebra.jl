@@ -1216,6 +1216,21 @@ function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol};
    return Generic.PolynomialRing(R, s; cached=cached, ordering=ordering)
 end
 
+@doc Markdown.doc"""
+    PolynomialRing(R::Ring, n::Int, s::String; cached::Bool = false, ordering::Symbol = :lex)
+
+Given a string `s` and a number of variables `n` will
+do the same as the first constructor except that the variables will be
+automatically numbered. For example if `s` is the string `x` and `n = 3` then
+the variables will print as `x1`, `x2`, `x3`.
+
+By default the parent object `S` will depend only on `R` and  `(x, ...)` and
+will be cached. Setting the optional argument `cached` to `false` will prevent
+the parent object `S` from being cached.
+
+The optional named argument `ordering` can be used to specify an ordering. The
+currently supported options are `:lex`, `:deglex` and `:degrevlex`.
+"""
 function PolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::String;
                                   cached::Bool = false, ordering::Symbol = :lex)
    return PolynomialRing(R, n, Symbol(s); cached=cached, ordering=ordering)

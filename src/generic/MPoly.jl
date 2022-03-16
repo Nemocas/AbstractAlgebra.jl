@@ -3843,6 +3843,12 @@ end
 
 # We use Ring instead of MPolyRing to support other multivariate objects
 # e.g. Series, non-commutative rings in Singular, etc.
+
+@doc Markdown.doc"""
+    MPolyBuildCtx(R::MPolyRing)
+
+Return a build context for creating polynomials in the given ring.
+"""
 function MPolyBuildCtx(R::AbstractAlgebra.NCRing)
    return MPolyBuildCtx(R, Nothing)
 end
@@ -3852,6 +3858,12 @@ function show(io::IO, M::MPolyBuildCtx)
    print(iocomp, "Builder for an element of ", parent(M.poly))
 end
 
+@doc Markdown.doc"""
+    push_term!(M::MPolyBuildCtx, c::RingElem, v::Vector{Int})
+
+Add the term with coefficient `c` and exponent vector `v` to the polynomial under
+construction in the build context `M`.
+"""
 function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
    if T <: AbstractAlgebra.MPolyElem && length(expv) != nvars(parent(M.poly))
       error("length of exponent vector should match the number of variables")
@@ -3869,6 +3881,12 @@ function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
    return M
 end
 
+@doc Markdown.doc"""
+    finish(M::MPolyBuildCtx)
+
+Finish construction of the polynomial, sort the terms, remove duplicate and
+zero terms and return the created polynomial.
+"""
 function finish(M::MPolyBuildCtx{T}) where T
    (res, M.poly) = (M.poly, zero(parent(M.poly)))
    return combine_like_terms!(sort_terms!(res))
@@ -3930,7 +3948,7 @@ function fit!(a::MPoly{T}, n::Int) where {T <: RingElement}
    end
    return nothing
 end
-
+#
 function zero!(a::MPoly{T}) where {T <: RingElement}
    a.length = 0
    return a
@@ -4024,11 +4042,21 @@ function (a::MPolyRing{T})(b::RingElement) where {T <: RingElement}
    return a(base_ring(a)(b))
 end
 
+@doc Markdown.doc"""
+    (a::MPolyRing{T})() where {T <: RingElement}
+
+Construct the zero polynomial in the given polynomial ring.
+"""
 function (a::MPolyRing{T})() where {T <: RingElement}
    z = MPoly{T}(a)
    return z
 end
 
+@doc Markdown.doc"""
+    (a::MPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+
+Construct the constant polynomial `b` in the given polynomial ring.
+"""
 function (a::MPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    z = MPoly{T}(a, base_ring(a)(b))
    return z
@@ -4039,6 +4067,11 @@ function (a::MPolyRing{T})(b::T) where {T <: Union{Integer, Rational, AbstractFl
    return z
 end
 
+@doc Markdown.doc"""
+    (a::MPolyRing{T})(b::T) where {T <: RingElement}
+
+Construct the constant polynomial `b` in the given polynomial ring.
+"""
 function (a::MPolyRing{T})(b::T) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
    z = MPoly{T}(a, b)
