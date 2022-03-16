@@ -21,11 +21,12 @@ end
     @test L == LaurentPolynomialRing(GF(5), ['x', 'y'])[1]
     @test L != LaurentPolynomialRing(GF(5), [:x, :y], cached = false)[1]
 
-    #only works because of the caching
+    # only works because of the caching
     R, (X, Y) = PolynomialRing(coefficient_ring(L), symbols(L))
     @test one(L) == L(one(R))
     @test x == L(X)
     @test y == L(Y)
+    @test X + x == 2*x
 end
 
 @testset "Generic.LaurentMPoly.derivative" begin

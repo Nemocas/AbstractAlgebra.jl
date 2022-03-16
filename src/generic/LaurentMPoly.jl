@@ -545,15 +545,15 @@ end
 
 ###############################################################################
 #
-#   Ad hoc arithmetic
-#
-###############################################################################
-
-###############################################################################
-#
 #   Promotion rules
 #
 ###############################################################################
+
+# If U can be promoted to R[x,y], then U can be promoted to R[x,1/x,y,1/y].
+# Handles promotion from R[x,y] to R[x,1/x,y,1/y] as well.
+function promote_rule(::Type{LaurentMPolyWrap{T, PE, LR}}, ::Type{U}) where {T, PE, LR, U}
+   promote_rule(PE, U) == PE ? LaurentMPolyWrap{T, PE, LR} : Union{}
+end
 
 ################################################################################
 #
