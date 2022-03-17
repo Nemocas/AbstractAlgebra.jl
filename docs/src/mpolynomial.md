@@ -212,7 +212,8 @@ Return the polynomial ring of the given polynomial.
 characteristic(R::MPolyRing)
 ```
 
-Return the characteristic of the given polynomial ring.
+Return the characteristic of the given polynomial ring. If the characteristic
+is not known, an exception is raised.
 
 ## Polynomial functions
 

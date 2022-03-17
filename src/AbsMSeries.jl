@@ -51,7 +51,8 @@ base_ring(a::MSeriesElem) = base_ring(parent(a))
 @doc Markdown.doc"""
     characteristic(a::MSeriesRing)
 
-Return the characteristic of the base ring of the series `a`.
+Return the characteristic of the base ring of the series `a`. If the
+characteristic is not known, an exception is raised.
 """
 function characteristic(a::MSeriesRing)
     return characteristic(base_ring(a))

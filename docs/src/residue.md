@@ -127,7 +127,8 @@ Return the parent of the given residue.
 characteristic(R::ResRing)
 ```
 
-Return the characteristic of the given residue ring.
+Return the characteristic of the given residue ring. If the characteristic is
+not known, an exception is raised.
 
 ## Residue ring functions
 

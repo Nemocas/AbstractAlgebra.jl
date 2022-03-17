@@ -176,7 +176,8 @@ Return the fraction field of the given fraction.
 characteristic(R::FracField)
 ```
 
-Return the characteristic of the base ring of the fraction field.
+Return the characteristic of the base ring of the fraction field. If the
+characteristic is not known an exception is raised.
 
 
 **Examples**

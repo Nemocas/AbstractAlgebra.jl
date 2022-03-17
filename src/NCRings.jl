@@ -131,8 +131,9 @@ function isunit end
 #
 ###############################################################################
 
-# -1 means the characteristic is not known by default
-characteristic(R::NCRing) = -1
+function characteristic(R::NCRing)
+   error("Characteristic not known")
+end
 
 ###############################################################################
 #

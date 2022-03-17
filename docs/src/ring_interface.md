@@ -691,9 +691,8 @@ characteristic(R::MyParent)
 ```
 
 Return the characteristic of the ring. The function should not be defined if
-it is not possible to unconditionally give the characteristic as the function
-is used in some generic code for correctness, but will always take the safe
-path if the function is not defined.
+it is not possible to unconditionally give the characteristic. AbstractAlgebra
+will raise an exception is such cases.
 
 ### Optional binary ad hoc operators
 
