@@ -177,6 +177,7 @@ corresponding series ring.
 ```julia
 abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
 rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
 ```
 
 **Examples**
@@ -205,6 +206,9 @@ O(x^6)
 
 julia> s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
 1 + 2*x + 3*x^2 + O(x^5)
+
+julia> s = laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2; max_precision=10)
+1 + 2*x^2 + 3*x^4 + O(x^5)
 ```
 
 ## Big-oh notation
