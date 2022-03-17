@@ -30,6 +30,12 @@ end
 
    R = Generic.ResidueRing(B, 16453889)
 
+   S = quo(B, 16453889)
+   U = quo(B, 16453889; cached=false)
+
+   @test S === R
+   @test U !== R
+
    @test Generic.ResidueRing(B, 16453889, cached = true) === Generic.ResidueRing(B, 16453889, cached = true)
    @test Generic.ResidueRing(B, 16453889, cached = false) !== Generic.ResidueRing(B, 16453889, cached = true)
 

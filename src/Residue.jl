@@ -449,3 +449,13 @@ function ResidueRing(R::PolyRing, a::RingElement; cached::Bool = true)
 
    return Generic.ResRing{T}(R(a), cached)
 end
+
+@doc Markdown.doc"""
+    quo(R::Ring, a::RingElement; cached::Bool = true)
+
+Shortcut for `ResidueRing(R, a)`.
+"""
+function quo(R::Ring, a::RingElement; cached::Bool = true)
+   return ResidueRing(R, a; cached=cached)
+end
+
