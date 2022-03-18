@@ -453,9 +453,23 @@ end
 @doc Markdown.doc"""
     quo(R::Ring, a::RingElement; cached::Bool = true)
 
-Shortcut for `ResidueRing(R, a)`.
+Returns `S, f` where `S = ResidueRing(R, a)` and `f` is the 
+projection map from `R` to `S`.
 """
 function quo(R::Ring, a::RingElement; cached::Bool = true)
-   return ResidueRing(R, a; cached=cached)
+   S = ResidueRing(R, a; cached=cached)
+   f = map_from_func(x->S(x), R, S)
+   return S, f
 end
 
+@doc Markdown.doc"""
+    quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
+
+Returns `S, f` where `S = ResidueField(R, a)` and `f` is the 
+projection map from `R` to `S`.
+"""
+function quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
+   S = ResidueField(R, a; cached=cached)
+   f = map_from_func(x->S(x), R, S)
+   return S, f
+end
