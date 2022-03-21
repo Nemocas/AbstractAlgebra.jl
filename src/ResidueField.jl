@@ -89,6 +89,10 @@ end
 
 data(a::ResFieldElem) = a.data
 
+lift(a::ResFieldElem) = data(a)
+
+lift(a::ResFieldElem{Int}) = BigInt(data(a))
+
 zero(R::ResField) = R(0)
 
 one(R::ResField) = R(1)
@@ -490,4 +494,18 @@ function ResidueField(R::Ring, a::RingElement; cached::Bool = true)
    T = elem_type(R)
 
    return Generic.ResField{T}(R(a), cached)
+end
+
+@doc Markdown.doc"""
+    quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
+
+Returns `S, f` where `S = ResidueField(R, a)` and `f` is the 
+projection map from `R` to `S`. This map is supplied as a map with section
+where the section is the lift of an element of the residue field back
+to the ring `R`.
+"""
+function quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
+   S = ResidueField(R, a; cached=cached)
+   f = map_with_section_from_func(x->S(x), x->lift(x), R, S)
+   return S, f
 end

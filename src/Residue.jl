@@ -454,22 +454,13 @@ end
     quo(R::Ring, a::RingElement; cached::Bool = true)
 
 Returns `S, f` where `S = ResidueRing(R, a)` and `f` is the 
-projection map from `R` to `S`.
+projection map from `R` to `S`. This map is supplied as a map with section
+where the section is the lift of an element of the residue field back
+to the ring `R`.
 """
 function quo(R::Ring, a::RingElement; cached::Bool = true)
    S = ResidueRing(R, a; cached=cached)
-   f = map_from_func(x->S(x), R, S)
+   f = map_with_section_from_func(x->S(x), x->lift(x), R, S)
    return S, f
 end
 
-@doc Markdown.doc"""
-    quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
-
-Returns `S, f` where `S = ResidueField(R, a)` and `f` is the 
-projection map from `R` to `S`.
-"""
-function quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
-   S = ResidueField(R, a; cached=cached)
-   f = map_from_func(x->S(x), R, S)
-   return S, f
-end

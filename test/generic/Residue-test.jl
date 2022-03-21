@@ -28,19 +28,6 @@ end
 @testset "Generic.Res.constructors" begin
    B = ZZ
 
-   R = Generic.ResidueField(B, 16453889)
-
-   S, f1 = quo(Field, B, 16453889)
-   U, f2 = quo(Field, B, 16453889; cached=false)
-
-   @test S === R
-   @test U !== R
-
-   c1 = rand(B, -1000:1000)
-
-   @test f1(c1) == S(c1)
-   @test f2(c1) == S(c1)
-
    R = Generic.ResidueRing(B, 16453889)
 
    S, f1 = quo(B, 16453889)
@@ -48,6 +35,9 @@ end
 
    @test S === R
    @test U !== R
+
+   v1 = rand(R, -100:100)
+   @test f1(inv(f1)(v1)) == v1
 
    c1 = rand(B, -1000:1000)
 

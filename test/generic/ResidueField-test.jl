@@ -3,6 +3,20 @@
 
    R = Generic.ResidueField(B, 16453889)
 
+   S, f1 = quo(Field, B, 16453889)
+   U, f2 = quo(Field, B, 16453889; cached=false)
+
+   @test S === R
+   @test U !== R
+
+   v1 = rand(R, -100:100)
+   @test f1(inv(f1)(v1)) == v1
+
+   c1 = rand(B, -1000:1000)
+
+   @test f1(c1) == S(c1)
+   @test f2(c1) == S(c1)
+
    @test Generic.ResidueField(B, 16453889, cached = true) === Generic.ResidueField(B, 16453889, cached = true)
    @test Generic.ResidueField(B, 16453889, cached = true) !== Generic.ResidueField(B, 16453889, cached = false)
 
@@ -94,6 +108,8 @@ end
 
    @test isone(h)
 
+   @test lift(h) == 1
+
    @test data(h) == 1
 
    @test canonical_unit(R(11)) == R(11)
@@ -101,6 +117,11 @@ end
    @test canonical_unit(T(x + 1)) == T(x + 1)
 
    @test deepcopy(h) == h
+
+   S = ResidueField(zz, 23)
+
+   @test lift(S(1)) == 1
+   @test isa(lift(S(1)), BigInt)
 end
 
 @testset "Generic.ResF.unary_ops" begin
