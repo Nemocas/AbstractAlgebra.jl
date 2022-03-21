@@ -49,29 +49,12 @@ In order to construct multivariate polynomials in AbstractAlgebra.jl, one must f
 construct the polynomial ring itself. This is accomplished with one of the following
 constructors.
 
-```julia
+```@docs
 PolynomialRing(R::Ring, S::Vector{String}; cached::Bool = true, ordering::Symbol=:lex)
-PolynomialRing(R::Ring, n::Int, s::String="x"; cached::Bool = false, ordering::Symbol = :lex)
+PolynomialRing(R::Ring, n::Int, s::String; cached::Bool = false, ordering::Symbol = :lex)
 ```
 
-The first constructor, given a base ring `R` and an array `S` of strings
-specifying how the generators (variables) should be printed, will return a
-tuple `S, (x, ...)` representing the new polynomial ring $S = R[x, \ldots]$ and
-a tuple of the generators $(x, ...)$ of the ring.
-
-The second constructor given a string `s` and a number of variables `n` will
-do the same as the first constructor except that the variables will be
-automatically numbered. For example if `s` is the string `x` and `n = 3` then
-the variables will print as `x1`, `x2`, `x3`.
-
-By default the parent object `S` will depend only on `R` and  `(x, ...)` and
-will be cached. Setting the optional argument `cached` to `false` will prevent
-the parent object `S` from being cached.
-
-The optional named argument `ordering` can be used to specify an ordering. The
-currently supported options are `:lex`, `:deglex` and `:degrevlex`.
-
-Like for univariate polynomials, a shorthand version of this function is
+Like for univariate polynomials, a shorthand constructor is
 provided when the number of generators is greater than `1`: given a base ring
 `R`, we abbreviate the constructor as follows:
 
@@ -124,9 +107,9 @@ Also, all of the standard ring element constructors may be used to construct
 multivariate polynomials.
 
 ```julia
-(R::MPolyRing)() # constructs zero
-(R::MPolyRing)(c::Integer)
-(R::MPolyRing)(c::elem_type(R))
+(R::MPolyRing{T})() where T <: RingElement
+(R::MPolyRing{T})(c::Integer) where T <: RingElement
+(R::MPolyRing{T})(a::elem_type(R)) where T <: RingElement
 (R::MPolyRing{T})(a::T) where T <: RingElement
 ```
 
@@ -135,7 +118,7 @@ For more efficient construction of multivariate polynomial, one can use the
 are pushed onto a context one at a time and then the polynomial constructed
 from those terms in one go using the `finish` function.
 
-```julia
+```@docs
 MPolyBuildCtx(R::MPolyRing)
 push_term!(M::MPolyBuildCtx, c::RingElem, v::Vector{Int})
 finish(M::MPolyBuildCtx)
