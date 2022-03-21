@@ -913,7 +913,7 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    derivative(f::AbstractAlgebra.MPolyElem{T}, x::Int) where {T <: RingElement}
+    derivative(f::AbstractAlgebra.MPolyElem{T}, j::Int) where {T <: RingElement}
 
 Return the partial derivative of `f` with respect to $j$-th variable
 of the polynomial ring.

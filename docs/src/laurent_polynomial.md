@@ -37,7 +37,7 @@ LaurentPolynomialRing
 
 ## Basic functionality
 
-Laurent polynomials implement the ring interface (except for `divexact`), and some methods
+Laurent polynomials implement the ring interface, and some methods
 from the polynomial interface, for example:
 
 ```jldoctest

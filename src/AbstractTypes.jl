@@ -79,6 +79,8 @@ abstract type UnivPolyRing{T} <: Ring end
 
 abstract type LaurentPolynomialRing{T} <: Ring end
 
+abstract type LaurentMPolyRing{T} <: Ring end
+
 abstract type SeriesRing{T} <: Ring end
 
 abstract type MSeriesRing{T} <: Ring end
@@ -117,6 +119,8 @@ abstract type MPolyElem{T} <: RingElem end
 abstract type UnivPolyElem{T} <: RingElem end
 
 abstract type LaurentPolyElem{T} <: RingElem end
+
+abstract type LaurentMPolyElem{T} <: RingElem end
 
 abstract type ResElem{T} <: RingElem end
 
