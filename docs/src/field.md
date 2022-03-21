@@ -26,7 +26,8 @@ their elements.
 characteristic(R::MyParent)
 ```
 
-Return the characteristic of the field.
+Return the characteristic of the field. If the characteristic is not known, an
+exception is raised.
 
 ## Basic functions
 

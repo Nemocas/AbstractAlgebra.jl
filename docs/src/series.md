@@ -345,7 +345,8 @@ Return the parent of the given series.
 characteristic(R::SeriesRing)
 ```
 
-Return the characteristic of the given series ring.
+Return the characteristic of the given series ring. If the characteristic is
+not known, an exception is raised.
 
 ## Series functions
 

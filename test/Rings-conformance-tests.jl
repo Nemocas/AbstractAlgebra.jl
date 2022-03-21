@@ -40,11 +40,12 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          @test isdomain_type(T) isa Bool
          @test isexact_type(T) isa Bool
 
-         # some rings don't support characteristic and return -1 (see issue #993)
-         if characteristic(R) != -1
+         # some rings don't support characteristic and raise an exception (see issue #993)
+         try ch = characteristic(R)
             @test iszero(R(characteristic(R)))
             @test iszero(characteristic(R) * one(R))
             @test iszero(one(R) * characteristic(R))
+         catch
          end
       end
 
