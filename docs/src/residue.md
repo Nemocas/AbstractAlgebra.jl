@@ -98,7 +98,7 @@ julia> k = S(x + 1)
 x + 1
 
 julia> U, f = quo(R, x^3 + 3x + 1)
-(Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, Map with the following data
+(Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, Map with section with the following data
 
 Domain:
 =======
