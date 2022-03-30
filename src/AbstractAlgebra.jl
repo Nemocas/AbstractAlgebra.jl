@@ -120,6 +120,8 @@ using RandomExtensions: RandomExtensions, make, Make2
 
 export elem_type, parent_type
 
+export Field
+
 export SetElem, GroupElem, AdditiveGroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElement,
        FieldElement, Map
 
