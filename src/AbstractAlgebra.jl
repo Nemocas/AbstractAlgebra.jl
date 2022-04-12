@@ -30,7 +30,7 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
 # imported here and in Generic.jl, and exported below.
 # They should not be imported/exported anywhere else.
 
-import LinearAlgebra: det, is_symmetric, is_triu, norm, nullspace, rank,
+import LinearAlgebra: det, issymmetric, istriu, norm, nullspace, rank,
                       transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
@@ -145,6 +145,13 @@ export crt, factor, factor_squarefree, is_irreducible, is_squarefree
 
 include("Attributes.jl")
 include("AliasMacro.jl")
+
+# alternative names for LinearAlgebra
+const is_symmetric = issymmetric
+const is_upper_triangular = istriu
+
+# for backwards compatibility
+export issymmetric, istriu
 
 ###############################################################################
 # Macros for fancy printing. to use, enable attribute storage for your struct,
@@ -687,6 +694,8 @@ include("algorithms/DensePoly.jl")
 ###############################################################################
 
 function is_negative end
+
+include("Aliases.jl")
 
 ###############################################################################
 #

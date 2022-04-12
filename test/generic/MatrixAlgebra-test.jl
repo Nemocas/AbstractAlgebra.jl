@@ -1282,10 +1282,10 @@ if false # see bug 160
         A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
         H = hnf_minors(A)
-        @test is_triu(H)
+        @test is_upper_triangular(H)
 
         H, U = hnf_minors_with_transform(A)
-        @test is_triu(H)
+        @test is_upper_triangular(H)
         @test is_unit(det(U))
         @test U*A == H
 
@@ -1301,10 +1301,10 @@ if false # see bug 160
         B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
 
         H = hnf_minors(B)
-        @test is_triu(H)
+        @test is_upper_triangular(H)
 
         H, U = hnf_minors_with_transform(B)
-        @test is_triu(H)
+        @test is_upper_triangular(H)
         @test is_unit(det(U))
         @test U*B == H
     end
@@ -1318,10 +1318,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = AbstractAlgebra.hnf_kb(A)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(A)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
    @test is_unit(det(U))
    @test U*A == H
 
@@ -1337,10 +1337,10 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = AbstractAlgebra.hnf_kb(B)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(B)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
    @test is_unit(det(U))
    @test U*B == H
 end
@@ -1353,10 +1353,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = AbstractAlgebra.hnf_cohen(A)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_cohen_with_transform(A)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
    @test is_unit(det(U))
    @test U*A == H
 
@@ -1372,10 +1372,10 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = AbstractAlgebra.hnf_cohen(B)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_cohen_with_transform(B)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
    @test is_unit(det(U))
    @test U*B == H
 end
@@ -1388,10 +1388,10 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = hnf(A)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
 
    H, U = hnf_with_transform(A)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
    @test is_unit(det(U))
    @test U*A == H
 
@@ -1407,10 +1407,10 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = hnf(B)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
 
    H, U = hnf_with_transform(B)
-   @test is_triu(H)
+   @test is_upper_triangular(H)
    @test is_unit(det(U))
    @test U*B == H
 end

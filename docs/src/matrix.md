@@ -409,7 +409,7 @@ one(::MatElem{T}) where T <: RingElement
 ```
 
 ```@docs
-is_triu(::MatrixElem{T}) where T <: RingElement
+is_upper_triangular(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -754,7 +754,7 @@ Rationals
 ### Symmetry testing
 
 ```julia
-LinearAlgebra.is_symmetric(a::MatrixElem)
+is_symmetric(a::MatrixElem)
 ```
 
 Return `true` if the given matrix is symmetric with respect to its main diagonal,

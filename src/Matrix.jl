@@ -16,7 +16,7 @@ export MatrixSpace, add_column, add_column!, add_row, add_row!,
        hnf_kb, hnf_kb!, hnf_kb_with_transform, hnf_minors,
        hnf_minors_with_transform, hnf_via_popov, hnf_via_popov_with_transform,
        hnf_with_transform, identity_matrix, is_hessenberg, is_hnf, is_invertible,
-       is_invertible_with_inverse, is_popov, is_rref, is_snf, is_square, is_triu,
+       is_invertible_with_inverse, is_popov, is_rref, is_snf, is_square, is_upper_triangular,
        is_skew_symmetric,
        is_weak_popov, is_zero_column, is_zero_row, kernel, kronecker_product,
        left_kernel, lu, lu!, map_entries, map_entries!, matrix, minpoly,
@@ -1207,6 +1207,8 @@ end
 
 Return `true` if the given matrix is symmetric with respect to its main
 diagonal, i.e., `tr(M) == M`, otherwise return `false`.
+
+Alias for `LinearAlgebra.issymmetric`.
 """
 function is_symmetric(a::MatrixElem{T}) where T <: NCRingElement
     if !is_square(a)
@@ -3061,11 +3063,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    is_triu(A::MatrixElem{T}) where T <: RingElement
+    is_upper_triangular(A::MatrixElem{T}) where T <: RingElement
 
 Return `true` if $A$ is an upper triangular matrix.
+
+Alias for `LinearAlgebra.istriu`.
 """
-function is_triu(A::MatrixElem{T}) where T <: RingElement
+function is_upper_triangular(A::MatrixElem{T}) where T <: RingElement
    m = nrows(A)
    n = ncols(A)
    d = 0
