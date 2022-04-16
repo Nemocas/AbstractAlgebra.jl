@@ -2334,8 +2334,8 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       return deepcopy(a)
    elseif b == 2
       return a*a
-   elseif !iszero(characteristic(base_ring(a)))
-      # pow_fps requires char 0 so use pow_rmul if not or unsure
+   elseif !isexact_type(T) || !iszero(characteristic(base_ring(a)))
+      # pow_fps requires char 0 or exact ring, so use pow_rmul if not or unsure
       return pow_rmul(a, b)
    else
       v, d = max_fields(a)

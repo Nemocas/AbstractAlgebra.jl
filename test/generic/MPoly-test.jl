@@ -602,6 +602,12 @@ end
    for i = 1:5
       @test f^i == f*f^(i - 1)
    end
+
+   # Over non-exact field
+   F = RealField
+   R, u = PolynomialRing(F, 3)
+   x = F(0.77)*u[1] + F(0.77)*one(F)*u[2] + F(0.63)*u[3]
+   @test x^5 == x*x*x*x*x
 end
 
 @testset "Generic.MPoly.divides" begin
