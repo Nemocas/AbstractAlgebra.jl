@@ -74,6 +74,7 @@ end
     @test a == sum(terms(a))
     @test a == sum(coefficients(a) .* monomials(a))
     @test a == L(collect(coefficients(a)), collect(exponent_vectors(a)))
+    @test iszero((@inferred constant_coefficient(a)))
 
     b = MPolyBuildCtx(L)
     for (c, e) in zip(coefficients(a), exponent_vectors(a))
@@ -86,4 +87,14 @@ end
 
     Q, (X, Y) = LaurentPolynomialRing(QQ, ["x", "y"])
     @test change_base_ring(QQ, a) == 2*X^-2*Y + 3*X*Y^-3
+
+    b = MPolyBuildCtx(L)
+    push_term!(b, 1, [0, 0])
+    push_term!(b, 2, [-2, -1])
+    p = @inferred finish(b)
+    @test p == 1 + 2 * x^-2 * y^-1
+    @test constant_coefficient(p) == 1
+
+    p = inv(inv(x))
+    @test constant_coefficient(p) == 0
 end

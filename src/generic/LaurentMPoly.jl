@@ -368,6 +368,12 @@ function coefficients(a::LaurentMPolyWrap)
     return coefficients(a.mpoly)
 end
 
+function constant_coefficient(a::LaurentMPolyWrap)
+    e = -a.mindegs
+    any(x -> x < 0, e) && return zero(coefficient_ring(parent(a)))
+    return coeff(a.mpoly, e)
+end
+
 #### exponent vectors
 
 function leading_exponent_vector(a::LaurentMPolyWrap)
@@ -492,7 +498,7 @@ function MPolyBuildCtx(R::AbstractAlgebra.LaurentMPolyRing)
     return LaurentMPolyBuildCtx{T, typeof(R)}(T[], Vector{Int}[], R)
 end
 
-function push_term!(B::LaurentMPolyBuildCtx{T, S}, c::T, expv::Vector{Int}) where {S, T}
+function push_term!(B::LaurentMPolyBuildCtx{T, S}, c::U, expv::Vector{Int}) where {S, T, U}
     length(expv) == nvars(B.parent) || error("length of exponent vector should match the number of variables")
     push!(B.coeffs, c)
     push!(B.exps, expv)
