@@ -189,6 +189,28 @@ function divrem(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
     error("divrem not implemented for LaurentMPoly")
 end
 
+function factor(a::LaurentMPolyWrap)
+   R = parent(a)
+   ap, ad = _normalize(a)
+   f = factor(ap)
+   d = Dict{typeof(a), Int}()
+   for (p, e) in f
+      d[LaurentMPolyWrap(R, p)] = e
+   end
+   return Fac(LaurentMPolyWrap(R, unit(f), ad), d)
+end
+
+function factor_squarefree(a::LaurentMPolyWrap)
+   R = parent(a)
+   ap, ad = _normalize(a)
+   f = factor_squarefree(ap)
+   d = Dict{typeof(a), Int}()
+   for (p, e) in f
+      d[LaurentMPolyWrap(R, p)] = e
+   end
+   return Fac(LaurentMPolyWrap(R, unit(f), ad), d)
+end
+
 ###############################################################################
 #
 #   Canonicalisation

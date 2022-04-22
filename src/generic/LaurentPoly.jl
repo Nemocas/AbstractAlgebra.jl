@@ -165,6 +165,10 @@ function _remove_gen(a::LaurentPolyWrap)
          return i, (i == 0 ? a.poly : shift_right(a.poly, i))
       end
    end
+   # we need something finite on zero input
+   if iszero(a.poly)
+      return (0, a.poly)
+   end
    return remove(a.poly, gen(parent(a.poly)))
 end
 
@@ -253,6 +257,28 @@ end
 
 function lcm(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
    return LaurentPolyWrap(parent(p), lcm(p.poly, q.poly), 0)
+end
+
+function factor(a::LaurentPolyWrap)
+   R = parent(a)
+   va, ua = _remove_gen(a)
+   f = factor(ua)
+   d = Dict{typeof(a), Int}()
+   for (p, e) in f
+      d[LaurentPolyWrap(R, p, 0)] = e
+   end
+   return Fac(LaurentPolyWrap(R, unit(f), a.mindeg + va), d)
+end
+
+function factor_squarefree(a::LaurentPolyWrap)
+   R = parent(a)
+   va, ua = _remove_gen(a)
+   f = factor_squarefree(ua)
+   d = Dict{typeof(a), Int}()
+   for (p, e) in f
+      d[LaurentPolyWrap(R, p, 0)] = e
+   end
+   return Fac(LaurentPolyWrap(R, unit(f), a.mindeg + va), d)
 end
 
 ###############################################################################
