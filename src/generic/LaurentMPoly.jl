@@ -235,8 +235,8 @@ function evaluate(a::LaurentMPolyWrap, b::Vector)
     (ap, ad) = _normalize(a)
     z = evaluate(ap, b)
     for i in 1:nvars(parent(a))
-        if !iszero(a.mindegs[i])
-            z *= b[i]^a.mindegs[i]
+        if !iszero(ad[i])
+            z *= b[i]^ad[i]
         end
     end
     return z

@@ -42,6 +42,7 @@ end
 @testset "Generic.LaurentMPoly.euclidean" begin
     L, (x, y) = LaurentPolynomialRing(ZZ, ["x", "y"])
     @test isone(gcd(x, y))
+    @test isone(gcd(inv(x), inv(y)))
     @test_throws Exception divrem(x, y)
 end
 
@@ -61,6 +62,7 @@ end
     @test divides(a^2, a) == (true, a)
 
     @test evaluate(x^-1 + y, [QQ(2), QQ(3)]) == 1//2 + 3
+    @test evaluate(inv(x)*x, [QQ(2), QQ(3)]) == 1
 
     a = 2*x^-2*y + 3*x*y^-3
     le = leading_exponent_vector(a)
