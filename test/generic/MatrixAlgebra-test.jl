@@ -61,6 +61,30 @@ end
    @test_throws ErrorConstrDimMismatch S([t t^2 t^3 ; t^4 t^5 t^6 ; t^7 t^8 t^9 ; t t^2 t^3])
    @test_throws ErrorConstrDimMismatch S([t, t^2])
    @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10])
+
+   # Test constructors over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   @test isa(S, MatAlgebra)
+
+   @test base_ring(S) == R
+
+   @test elem_type(S) == Generic.MatAlgElem{elem_type(R)}
+   @test elem_type(Generic.MatAlgebra{elem_type(R)}) == Generic.MatAlgElem{elem_type(R)}
+   @test parent_type(Generic.MatAlgElem{elem_type(R)}) == Generic.MatAlgebra{elem_type(R)}
+
+   @test isexact_type(elem_type(S)) == true
+   @test isdomain_type(elem_type(S)) == false
+
+   @test isa(S(), MatAlgElem)
+   @test isa(S(ZZ(1)), MatAlgElem)
+   @test isa(S(one(R)), MatAlgElem)
+   @test isa(S([1 2; 3 4]), MatAlgElem)
+   @test isa(S([1, 2, 3, 4]), MatAlgElem)
+
+   @test parent(S()) == S
 end
 
 @testset "Generic.MatAlg.manipulation" begin
@@ -119,6 +143,41 @@ end
    @test nrows(A) == ncols(A) == 3
    @test degree(A) == 3
 
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+
+   @test isa(hash(M), UInt)
+   @test nrows(M) == 2
+   @test ncols(M) == 2
+   @test length(M) == 4
+   @test isempty(M) == false
+   @test isassigned(M, 1, 1) == true
+
+   @test iszero(zero(M, 3, 3))
+   @test iszero(zero(M, QQ, 3, 3))
+   @test iszero(zero(M, QQ))
+   
+   zero!(M)
+   @test iszero(M)
+
+   @test isone(one(R))
+
+   @test iszero_row(M, 1)
+   @test iszero_column(M, 1)
+
+   @test degree(M) == 2
+end
+
+@testset "Generic.MatAlg.size/axes" begin
+   R, t = PolynomialRing(QQ, "t")
+   S = MatrixAlgebra(R, 3)
+
+   A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+   
    @test issquare(A)
    @test size(A) == (3, 3)
    @test size(A, 1) == 3
@@ -131,6 +190,21 @@ end
    @test axes(A, rand(3:99)) == 1:1
    @test_throws BoundsError axes(A, 0)
    @test_throws BoundsError axes(A, -rand(1:99))
+
+   # test over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+
+   @test firstindex(M, 1) == 1
+   @test lastindex(M, 1) == 2
+   @test size(M) == (2, 2)
+   @test size(M, 1) == 2
+   @test axes(M) == (1:2, 1:2)
+   @test axes(M, 1) == 1:2
+   @test issquare(M)
 end
 
 @testset "Generic.MatAlg.unary_ops" begin
@@ -141,6 +215,15 @@ end
    B = S([-t - 1 (-t) -R(1); -t^2 (-t) (-t); -R(-2) (-t - 2) (-t^2 - t - 1)])
 
    @test -A == B
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+
+   @test -(-M) == M
 end
 
 @testset "Generic.MatAlg.binary_ops" begin
@@ -155,6 +238,19 @@ end
    @test A - B == S([t-1 t-3 R(0); t^2 - t R(-1) R(-2); R(-1) (-t^2 + t + 2) (-t^3 + t^2 + t + 1)])
 
    @test A*B == S([t^2 + 2*t + 1 2*t^2 + 4*t + 3 t^3 + t^2 + 3*t + 1; 3*t^2 - t (t^3 + 4*t^2 + t) t^4 + 2*t^2 + 2*t; t-5 t^4 + t^3 + 2*t^2 + 3*t - 4 t^5 + 1*t^4 + t^3 + t^2 + 4*t + 2])
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+   P = rand(S, -10:10)
+
+   @test M + N == N + M
+   @test M - N == M + (-N)
+   @test M*(N + P) == M*N + M*P
 end
 
 @testset "Generic.MatAlg.adhoc_binary" begin
@@ -175,6 +271,39 @@ end
    @test BigInt(3)*A == A*BigInt(3)
    @test Rational{BigInt}(3)*A == A*Rational{BigInt}(3)
    @test (t - 1)*A == A*(t - 1)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+   
+   t1 = rand(ZZ, -10:10)
+   t2 = rand(R, -10:10)
+
+   @test t1*(M + N) == t1*M + t1*N
+   @test t1*(M - N) == t1*M - t1*N
+   @test (M + N)*t1 == M*t1 + N*t1
+   @test (M - N)*t1 == M*t1 - N*t1
+
+   @test t2*(M + N) == t2*M + t2*N
+   @test t2*(M - N) == t2*M - t2*N
+   @test (M + N)*t2 == M*t2 + N*t2
+   @test (M - N)*t2 == M*t2 - N*t2
+
+   @test M + t1 == M - (-t1)
+   @test M + t2 == M - (-t2)
+
+   @test t1 + M == t1 - (-M)
+   @test t2 + M == t2 - (-M)
+
+   r1 = rand(R, -10:10)
+   r2 = rand(R, -10:10)
+
+   @test (M + N)*[r1, r2] == M*[r1, r2] + N*[r1, r2]
+   @test [r1, r2]*(M + N) == [r1, r2]*M + [r1, r2]*N
 end
 
 @testset "Generic.MatAlg.promotion" begin
@@ -230,6 +359,22 @@ end
    @test A == B
 
    @test A != one(S)
+
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+   N = deepcopy(M)
+   
+   @test M == M
+   @test M == N
+   @test M == copy(M)
+   @test isequal(M, M)
+   @test isequal(M, N)
+   @test isequal(M, copy(M))
 end
 
 @testset "Generic.MatAlg.adhoc_comparison" begin
@@ -248,6 +393,21 @@ end
    @test t + 1 == S(t + 1)
    @test A != one(S)
    @test one(S) == one(S)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   @test S(5) == 5
+   @test 5 == S(5)
+   @test S(BigInt(5)) == 5
+   @test 5 == S(BigInt(5))
+
+   m = rand(R, -10:10)
+
+   @test S(m) == m
+   @test m == S(m)
 end
 
 @testset "Generic.MatAlg.powering" begin
@@ -259,6 +419,18 @@ end
    @test A^5 == A^2*A^3
 
    @test A^0 == one(S)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+
+   @test M^0 == one(S)
+   @test M^1 == M
+   @test M^2 == M*M
+   @test M^3 == M*M*M
 end
 
 @testset "Generic.MatAlg.exact_division" begin
@@ -281,6 +453,28 @@ end
    @test divexact(12*A, BigInt(12)) == A
    @test divexact(12*A, Rational{BigInt}(12)) == A
    @test divexact((1 + t)*A, 1 + t) == A
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+
+   S = MatrixAlgebra(R, 2)
+   T = MatrixAlgebra(U, 2)
+
+   M = rand(S, -10:10)
+
+   @test divexact(5*M, 5) == M
+
+   c = rand(R, 1:10)
+
+   @test divexact_left(c*M, c) == M
+   @test divexact_right(M*c, c) == M
+
+   N = rand(T, 0:5, -10:10)
+   d = rand(U, 0:5, -10:10)
+
+   @test divexact_left(d*N, d) == N
+   @test divexact_right(N*d, d) == N
 end
 
 @testset "Generic.MatAlg.transpose" begin
@@ -290,6 +484,15 @@ end
    A = S(arr)
    B = S(permutedims(arr, [2, 1]))
    @test transpose(A) == B
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+
+   @test issymmetric(M + transpose(M))
 end
 
 @testset "Generic.MatAlg.gram" begin
@@ -1322,6 +1525,35 @@ end
          @test_throws ErrorException sim_zero(m, S, r, r+2)
       end
    end
+end
+
+@testset "Generic.MatAlg.change_base_ring" begin
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+
+   N = change_base_ring(U, M)
+
+   @test isa(N, MatAlgElem)
+end
+
+@testset "Generic.MatAlg.map" begin
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+   S = MatrixAlgebra(U, 2)
+
+   M = rand(R, -10:10)
+   N = map(U, M)
+   P = map(x->x^2, M)
+   Q = map(S, M)
+
+   @test isa(N, MatAlgElem)
+   @test isa(P, MatAlgElem)
+   @test isa(Q, MatAlgElem)
 end
 
 @testset "Generic.MatAlg.rand" begin

@@ -1,7 +1,7 @@
 # Introduction
 
 AbstractAlgebra provides matrix spaces (mxn matrices) and matrix algebras
-(nxn matrices) over a commutative ring. Whilst both types of matrix provide
+(nxn matrices) over a ring. Whilst both types of matrix provide
 matrix multiplication for matrices whose dimensions are compatible for
 multiplication, only the latter kind of matrices form rings in the system.
 

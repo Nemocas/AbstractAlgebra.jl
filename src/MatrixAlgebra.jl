@@ -12,11 +12,11 @@ export MatrixAlgebra, divexact_left, divexact_right
 #
 ###############################################################################
 
-function base_ring(a::MatAlgebra{T}) where {T <: RingElement}
+function base_ring(a::MatAlgebra{T}) where {T <: NCRingElement}
    a.base_ring::parent_type(T)
 end
 
-function check_parent(a::MatAlgElem{T}, b::MatAlgElem{T}, throw::Bool = true) where T <: RingElement
+function check_parent(a::MatAlgElem{T}, b::MatAlgElem{T}, throw::Bool = true) where T <: NCRingElement
   fl = (base_ring(a) != base_ring(b) || degree(a) != degree(b))
   fl && throw && error("Incompatible matrix spaces in matrix operation")
   return !fl
@@ -50,11 +50,11 @@ Return the degree $n$ of the given matrix algebra.
 degree(a::MatAlgebra) = nrows(a)
 
 @doc Markdown.doc"""
-    degree(a::MatAlgElem)
+    degree(a::MatAlgElem{T}) where T <: RingElement
 
 Return the degree $n$ of the given matrix algebra.
 """
-degree(a::MatAlgElem) = degree(parent(a))
+degree(a::MatAlgElem{T}) where T <: NCRingElement = degree(parent(a))
 
 zero(a::MatAlgebra) = a()
 
@@ -64,7 +64,7 @@ isunit(a::MatAlgElem{T}) where T <: RingElement = isunit(det(a))
 
 isunit(a::MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
 
-function characteristic(a::MatAlgebra{T}) where T <: RingElement
+function characteristic(a::MatAlgebra)
    return characteristic(base_ring(a))
 end
 
@@ -75,22 +75,22 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    similar(x::Generic.MatrixElem, R::Ring=base_ring(x))
-    similar(x::Generic.MatrixElem, R::Ring, r::Int, c::Int)
+    similar(x::Generic.MatrixElem, R::NCRing=base_ring(x))
+    similar(x::Generic.MatrixElem, R::NCRing, r::Int, c::Int)
     similar(x::Generic.MatrixElem, r::Int, c::Int)
-    similar(x::MatAlgElem, R::Ring, n::Int)
+    similar(x::MatAlgElem, R::NCRing, n::Int)
     similar(x::MatAlgElem, n::Int)
 
 Create an uninitialized matrix over the given ring and dimensions,
 with defaults based upon the given source matrix `x`.
 """
-similar(x::MatAlgElem, R::Ring, n::Int) = _similar(x, R, n, n)
+similar(x::MatAlgElem, R::NCRing, n::Int) = _similar(x, R, n, n)
 
-similar(x::MatAlgElem, R::Ring=base_ring(x)) = similar(x, R, degree(x))
+similar(x::MatAlgElem, R::NCRing=base_ring(x)) = similar(x, R, degree(x))
 
 similar(x::MatAlgElem, n::Int) = similar(x, base_ring(x), n)
 
-function similar(x::MatAlgElem{T}, R::Ring, m::Int, n::Int) where T <: RingElement
+function similar(x::MatAlgElem{T}, R::NCRing, m::Int, n::Int) where T <: NCRingElement
    m != n && error("Dimensions don't match in similar")
    return similar(x, R, n)
 end
@@ -98,16 +98,16 @@ end
 similar(x::MatAlgElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
 
 @doc Markdown.doc"""
-    zero(x::MatrixElem, R::Ring=base_ring(x))
-    zero(x::MatrixElem, R::Ring, r::Int, c::Int)
+    zero(x::MatrixElem, R::NCRing=base_ring(x))
+    zero(x::MatrixElem, R::NCRing, r::Int, c::Int)
     zero(x::MatrixElem, r::Int, c::Int)
-    zero(x::MatAlgElem, R::Ring, n::Int)
+    zero(x::MatAlgElem, R::NCRing, n::Int)
     zero(x::MatAlgElem, n::Int)
 
 Create a zero matrix over the given ring and dimensions,
 with defaults based upon the given source matrix `x`.
 """
-zero(x::MatAlgElem, R::Ring, n::Int) = zero!(similar(x, R, n))
+zero(x::MatAlgElem, R::NCRing, n::Int) = zero!(similar(x, R, n))
 zero(x::MatAlgElem, n::Int) = zero!(similar(x, n))
 
 ################################################################################
@@ -116,7 +116,7 @@ zero(x::MatAlgElem, n::Int) = zero!(similar(x, n))
 #
 ################################################################################
 
-function copy(d::MatAlgElem{T}) where T <: RingElement
+function copy(d::MatAlgElem{T}) where T <: NCRingElement
    z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
@@ -126,7 +126,7 @@ function copy(d::MatAlgElem{T}) where T <: RingElement
    return z
 end
 
-function deepcopy_internal(d::MatAlgElem{T}, dict::IdDict) where T <: RingElement
+function deepcopy_internal(d::MatAlgElem{T}, dict::IdDict) where T <: NCRingElement
    z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
@@ -162,7 +162,7 @@ end
 #
 ###############################################################################
 
-function *(x::MatAlgElem{T}, y::MatAlgElem{T}) where {T <: RingElement}
+function *(x::MatAlgElem{T}, y::MatAlgElem{T}) where {T <: NCRingElement}
    degree(x) != degree(y) && error("Incompatible matrix degrees")
    A = similar(x)
    C = base_ring(x)()
@@ -203,7 +203,7 @@ end
 
 ==(x::Union{Integer, Rational, AbstractFloat}, y::MatAlgElem) = y == x
 
-function ==(x::MatAlgElem{T}, y::T) where {T <: RingElem}
+function ==(x::MatAlgElem{T}, y::T) where T <: NCRingElem
    n = degree(x)
    for i = 1:n
       if x[i, i] != y
@@ -219,6 +219,8 @@ function ==(x::MatAlgElem{T}, y::T) where {T <: RingElem}
    end
    return true
 end
+
+==(x::T, y::MatAlgElem{T}) where T <: NCRingElem = y == x
 
 ###############################################################################
 #
@@ -246,28 +248,6 @@ end
 function divexact_right(f::MatAlgElem{T},
                        g::MatAlgElem{T}; check::Bool=true) where T <: FieldElement
    return f*inv(g)
-end
-
-###############################################################################
-#
-#   Ad hoc exact division
-#
-###############################################################################
-
-function divexact_left(x::MatAlgElem{T}, y::T; check::Bool=true) where {T <: RingElem}
-   return divexact(x, y; check=check)
-end
-
-function divexact_right(x::MatAlgElem{T}, y::T; check::Bool=true) where {T <: RingElem}
-   return divexact(x, y; check=check)
-end
-
-function divexact_left(x::MatAlgElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
-   return divexact(x, y; check=check)
-end
-
-function divexact_right(x::MatAlgElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
-   return divexact(x, y; check=check)
 end
 
 ###############################################################################
@@ -408,7 +388,7 @@ randmat_with_rank(S::MatAlgebra{T}, rank::Int, v...) where {T <: RingElement} =
 #
 ###############################################################################
 
-function identity_matrix(M::MatAlgElem{T}, n::Int) where T <: RingElement
+function identity_matrix(M::MatAlgElem{T}, n::Int) where T <: NCRingElement
    R = base_ring(M)
    arr = Array{T}(undef, n, n)
    for i in 1:n
@@ -427,7 +407,7 @@ end
 Return the identity matrix over the same base ring as $M$ and with the
 same dimensions.
 """
-function identity_matrix(M::MatAlgElem{T}) where T <: RingElement
+function identity_matrix(M::MatAlgElem{T}) where T <: NCRingElement
    return identity_matrix(M, nrows(M))
 end
 
@@ -445,6 +425,6 @@ the ring $R$. If `cached == true` (the default), the returned parent object
 is cached so that it can returned by future calls to the constructor with the
 same degree and base ring.
 """
-function MatrixAlgebra(R::Ring, n::Int; cached::Bool = true)
+function MatrixAlgebra(R::NCRing, n::Int; cached::Bool = true)
    Generic.MatrixAlgebra(R, n, cached = cached)
 end

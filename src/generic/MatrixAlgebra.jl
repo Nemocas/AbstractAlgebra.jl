@@ -10,21 +10,21 @@
 #
 ###############################################################################
 
-parent_type(::Type{MatAlgElem{T}}) where T <: RingElement = MatAlgebra{T}
+parent_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = MatAlgebra{T}
 
-elem_type(::Type{MatAlgebra{T}}) where {T <: RingElement} = MatAlgElem{T}
+elem_type(::Type{MatAlgebra{T}}) where {T <: NCRingElement} = MatAlgElem{T}
 
 @doc Markdown.doc"""
-    parent(a::MatAlgElem{T}, cached::Bool = true) where T <: RingElement
+    parent(a::MatAlgElem{T}, cached::Bool = true) where T <: NCRingElement
 
 Return the parent object of the given matrix.
 """
-parent(a::MatAlgElem{T}, cached::Bool = true) where T <: RingElement =
+parent(a::MatAlgElem{T}, cached::Bool = true) where T <: NCRingElement =
     MatAlgebra{T}(a.base_ring, size(a.entries)[1], cached)
 
-isexact_type(::Type{MatAlgElem{T}}) where T <: RingElement = isexact_type(T)
+isexact_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = isexact_type(T)
 
-isdomain_type(::Type{MatAlgElem{T}}) where T <: RingElement = false
+isdomain_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = false
 
 ###############################################################################
 #
@@ -37,7 +37,7 @@ isdomain_type(::Type{MatAlgElem{T}}) where T <: RingElement = false
 
 Return the transpose of the given matrix.
 """
-function transpose(x::MatAlgElem{T}) where T <: RingElement
+function transpose(x::MatAlgElem{T}) where T <: NCRingElement
    arr = permutedims(x.entries, [2, 1])
    z = MatAlgElem{T}(arr)
    z.base_ring = base_ring(x)
@@ -100,7 +100,7 @@ end
 #
 ###############################################################################
 
-function zero!(M::MatAlgElem{T}) where T <: RingElement
+function zero!(M::MatAlgElem{T}) where T <: NCRingElement
    n = degree(M)
    R = base_ring(M)
    for i = 1:n
@@ -112,12 +112,12 @@ function zero!(M::MatAlgElem{T}) where T <: RingElement
 end
 
 function mul!(A::MatAlgElem{T}, B::MatAlgElem{T},
-                                C::MatAlgElem{T}) where T <: RingElement
+                                C::MatAlgElem{T}) where T <: NCRingElement
    return B*C
 end
 
 function add!(A::MatAlgElem{T}, B::MatAlgElem{T},
-                                C::MatAlgElem{T}) where T <: RingElement
+                                C::MatAlgElem{T}) where T <: NCRingElement
    n = degree(A)
    for i = 1:n
       for j = 1:n
@@ -127,7 +127,7 @@ function add!(A::MatAlgElem{T}, B::MatAlgElem{T},
    return A
 end
 
-function addeq!(A::MatAlgElem{T}, B::MatAlgElem{T}) where T <: RingElement
+function addeq!(A::MatAlgElem{T}, B::MatAlgElem{T}) where T <: NCRingElement
    n = degree(A)
    for i = 1:n
       for j = 1:n
@@ -139,11 +139,23 @@ end
 
 ###############################################################################
 #
+#   Promotion rules
+#
+###############################################################################
+
+promote_rule(::Type{S}, ::Type{S}) where {T <: NCRingElement, S <: MatAlgElem{T}} = MatAlgElem{T}
+
+function promote_rule(::Type{S}, ::Type{U}) where {T <: NCRingElement, S <: MatAlgElem{T}, U <: NCRingElement}
+   promote_rule(T, U) == T ? MatAlgElem{T} : Union{}
+end
+
+###############################################################################
+#
 #   Parent object call overload
 #
 ###############################################################################
 
-function (a::MatAlgebra{T})() where {T <: RingElement}
+function (a::MatAlgebra{T})() where {T <: NCRingElement}
    R = base_ring(a)
    entries = Array{T}(undef, a.n, a.n)
    for i = 1:a.n
@@ -156,7 +168,7 @@ function (a::MatAlgebra{T})() where {T <: RingElement}
    return z
 end
 
-function (a::MatAlgebra{T})(b::S) where {S <: RingElement, T <: RingElement}
+function (a::MatAlgebra{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    entries = Array{T}(undef, a.n, a.n)
    rb = R(b)
@@ -174,12 +186,12 @@ function (a::MatAlgebra{T})(b::S) where {S <: RingElement, T <: RingElement}
    return z
 end
 
-function (a::MatAlgebra{T})(b::MatAlgElem{T}) where {T <: RingElement}
+function (a::MatAlgebra{T})(b::MatAlgElem{T}) where {T <: NCRingElement}
    parent(b) != a && error("Unable to coerce matrix")
    return b
 end
 
-function (a::MatAlgebra{T})(b::Matrix{S}) where {S <: RingElement, T <: RingElement}
+function (a::MatAlgebra{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(a.n, a.n, b)
    entries = Array{T}(undef, a.n, a.n)
@@ -193,7 +205,7 @@ function (a::MatAlgebra{T})(b::Matrix{S}) where {S <: RingElement, T <: RingElem
    return z
 end
 
-function (a::MatAlgebra{T})(b::Vector{S}) where {S <: RingElement, T <: RingElement}
+function (a::MatAlgebra{T})(b::Vector{S}) where {S <: NCRingElement, T <: NCRingElement}
    _check_dim(a.n, a.n, b)
    b = Matrix{S}(transpose(reshape(b, a.n, a.n)))
    z = a(b)
@@ -206,7 +218,7 @@ end
 #
 ###############################################################################
 
-function MatrixAlgebra(R::AbstractAlgebra.Ring, n::Int; cached::Bool = true)
+function MatrixAlgebra(R::AbstractAlgebra.NCRing, n::Int; cached::Bool = true)
    T = elem_type(R)
    return MatAlgebra{T}(R, n, cached)
 end

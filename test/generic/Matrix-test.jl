@@ -303,6 +303,57 @@ end
    @test block_diagonal_matrix(ZZ, Matrix{Int}[]) == matrix(ZZ, 0, 0, [])
    @test block_diagonal_matrix(ZZ, [M1, N1, K1]) == block_diagonal_matrix([M, N, K])
    @test block_diagonal_matrix(ZZ, [K1]) == block_diagonal_matrix([K])
+
+   # Test constructors over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+
+   @test isa(S, MatSpace)
+
+   @test base_ring(S) == R
+
+   @test elem_type(S) == Generic.MatSpaceElem{elem_type(R)}
+   @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
+   @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
+
+   @test dense_matrix_type(R) == elem_type(S)
+
+   @test isa(S(), MatElem)
+   @test isa(S(ZZ(1)), MatElem)
+   @test isa(S(one(R)), MatElem)
+   @test isa(S([1 2; 3 4]), MatElem)
+   @test isa(S([1, 2, 3, 4]), MatElem)
+
+   @test parent(S()) == S
+
+   @test isa(zero_matrix(R, 2, 2), MatElem)
+   @test isa(identity_matrix(R, 2), MatElem)
+
+   @test isa(matrix(R, 2, 2, [1 2; 3 4]), MatElem)
+
+   # these are not supported
+   # @test isa(matrix(R, 2, 2, [[1 2; 3 4] [2 3; 4 5]; [3 4; 5 6] [4 5; 6 7]]), MatElem)
+   # @test isa(matrix(R, 2, 2, [matrix(R, [1 2; 3 4]) matrix(R, [2 3; 3 4]); matrix(R, [3 4; 5 6]) matrix(R, [4 5; 6 7])]), MatElem)
+   # @test isa(matrix(R,  matrix(R, [R([1 2; 3 4]) R([2 3; 3 4]); R([3 4; 5 6]) R([4 5; 6 7])]), MatElem)
+
+   A = [1 2; 3 4]
+   B = [2 3; 4 5]
+   C = [3 4; 5 6]
+   D = [4 5; 6 7]
+
+   RA = R(A)
+   RB = R(B)
+   RC = R(C)
+   RD = R(D)
+
+   @test isa(matrix(R, 2, 2, [A, B, C, D]), MatElem)
+   @test isa(matrix(R, 2, 2, [RA, RB, RC, RD]), MatElem)
+
+   @test isa(block_diagonal_matrix(R, [A, B]), MatElem)
+
+   # the following is not supported
+   # @test isa(block_diagonal_matrix([RA, RB]), MatElem)
 end
 
 @testset "Generic.Mat.size/axes" begin
@@ -352,6 +403,21 @@ end
    @test_throws ErrorException lastindex(B, 3)
 
    @test !issquare(B)
+
+   # test over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+
+   M = rand(S, -10:10)
+
+   @test firstindex(M, 1) == 1
+   @test lastindex(M, 1) == 2
+   @test size(M) == (2, 2)
+   @test size(M, 1) == 2
+   @test axes(M) == (1:2, 1:2)
+   @test axes(M, 1) == 1:2
+   @test issquare(M)
 end
 
 @testset "Generic.Mat.manipulation" begin
@@ -469,6 +535,32 @@ end
       @test eltype(m) == BigInt
       @test eltype(typeof(m)) == BigInt
    end
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+
+   M = rand(S, -10:10)
+
+   @test isa(hash(M), UInt)
+   @test nrows(M) == 2
+   @test ncols(M) == 2
+   @test length(M) == 4
+   @test isempty(M) == false
+   @test isassigned(M, 1, 1) == true
+
+   @test iszero(zero(M, 3, 3))
+   @test iszero(zero(M, QQ, 3, 3))
+   @test iszero(zero(M, QQ))
+   
+   zero!(M)
+   @test iszero(M)
+
+   @test isone(one(R))
+
+   @test iszero_row(M, 1)
+   @test iszero_column(M, 1)
 end
 
 @testset "Generic.Mat.unary_ops" begin
@@ -523,6 +615,15 @@ end
    z = zero_matrix(F2(), 2, 3)
    @test -z   isa F2Matrix
    @test -z.m isa Generic.MatSpaceElem{F2Elem}
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+
+   M = rand(S, -10:10)
+
+   @test -(-M) == M
 end
 
 @testset "Generic.Mat.getindex" begin
@@ -981,6 +1082,19 @@ end
          @test A * B == S(A.entries * B.entries)
       end
    end
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+   P = rand(S, -10:10)
+   
+   @test M + N == N + M
+   @test M - N == M + (-N)
+   @test M*(N + P) == M*N + M*P
 end
 
 # add x to all the elements of the main diagonal of a copy of M
@@ -1132,6 +1246,39 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    end
 
    _test_matrix_vector_prod(R, -1000:1000)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+   
+   t1 = rand(ZZ, -10:10)
+   t2 = rand(R, -10:10)
+
+   @test t1*(M + N) == t1*M + t1*N
+   @test t1*(M - N) == t1*M - t1*N
+   @test (M + N)*t1 == M*t1 + N*t1
+   @test (M - N)*t1 == M*t1 - N*t1
+
+   @test t2*(M + N) == t2*M + t2*N
+   @test t2*(M - N) == t2*M - t2*N
+   @test (M + N)*t2 == M*t2 + N*t2
+   @test (M - N)*t2 == M*t2 - N*t2
+
+   @test M + t1 == M - (-t1)
+   @test M + t2 == M - (-t2)
+
+   @test t1 + M == t1 - (-M)
+   @test t2 + M == t2 - (-M)
+
+   r1 = rand(R, -10:10)
+   r2 = rand(R, -10:10)
+
+   @test (M + N)*[r1, r2] == M*[r1, r2] + N*[r1, r2]
+   @test [r1, r2]*(M + N) == [r1, r2]*M + [r1, r2]*N
 end
 
 @testset "Generic.Mat.promotion" begin
@@ -1231,6 +1378,21 @@ end
 
       @test matrix(R, copy(A.entries)) == A
    end
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+   N = deepcopy(M)
+   
+   @test M == M
+   @test M == N
+   @test M == copy(M)
+   @test isequal(M, M)
+   @test isequal(M, N)
+   @test isequal(M, copy(M))
 end
 
 @testset "Generic.Mat.adhoc_comparison" begin
@@ -1249,6 +1411,21 @@ end
    @test t + 1 == S(t + 1)
    @test A != one(S)
    @test one(S) == one(S)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   @test S(5) == 5
+   @test 5 == S(5)
+   @test S(BigInt(5)) == 5
+   @test 5 == S(BigInt(5))
+
+   m = rand(R, -10:10)
+
+   @test S(m) == m
+   @test m == S(m)
 end
 
 @testset "Generic.Mat.powering" begin
@@ -1266,6 +1443,18 @@ end
    A = S(Rational{BigInt}[2 3; 7 -4])
 
    @test A^-1 == inv(A)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+
+   @test M^0 == one(S)
+   @test M^1 == M
+   @test M^2 == M*M
+   @test M^3 == M*M*M
 end
 
 @testset "Generic.Mat.adhoc_exact_division" begin
@@ -1278,6 +1467,28 @@ end
    @test divexact(12*A, BigInt(12)) == A
    @test divexact(12*A, Rational{BigInt}(12)) == A
    @test divexact((1 + t)*A, 1 + t) == A
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+
+   S = MatrixSpace(R, 2, 2)
+   T = MatrixSpace(U, 2, 2)
+
+   M = rand(S, -10:10)
+
+   @test divexact(5*M, 5) == M
+
+   c = rand(R, -10:10)
+
+   @test divexact_left(c*M, c) == M
+   @test divexact_right(M*c, c) == M
+
+   N = rand(T, 0:5, -10:10)
+   d = rand(U, 0:5, -10:10)
+
+   @test divexact_left(d*N, d) == N
+   @test divexact_right(N*d, d) == N
 end
 
 @testset "Generic.Mat.issymmetric" begin
@@ -1288,6 +1499,15 @@ end
    S = MatrixAlgebra(R, 3)
    @test issymmetric(S([t + 1 t R(1); t t^2 t; R(1) t R(5)]))
    @test !issymmetric(S([t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+
+   @test issymmetric(M + transpose(M))
 end
 
 @testset "Generic.Mat.transpose" begin
@@ -3202,6 +3422,18 @@ end
                                     3 4 3 4 1;
                                     0 1 0 1 0;
                                     0 1 0 1 2;])
+
+   # Test constructors over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 2, 2)
+
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+
+   @test isa(hcat(M, N), MatElem)
+   @test isa(vcat(M, N), MatElem)
+   @test isa([M N; M N], MatElem)
 end
 
 @testset "Generic.Mat.hnf_minors" begin
@@ -3653,6 +3885,21 @@ end
 
    @test fflu(N3) == fflu(M) # tests that deepcopy is correct
    @test M2 == M
+
+   # Test views over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixSpace(R, 4, 4)
+   
+   M = rand(S, -10:10)
+
+   N1 = @view M[:,1:2]
+   N2 = @view M[1:2, :]
+   N3 = @view M[:,:]
+
+   @test isa(N1, Generic.MatSpaceView)
+   @test isa(N2, Generic.MatSpaceView)
+   @test isa(N3, Generic.MatSpaceView)
 end
 
 @testset "Generic.Mat.change_base_ring" begin
@@ -3677,6 +3924,17 @@ end
    z = zero_matrix(F2(), 2, 3)
    @test change_base_ring(F2(), z)   isa F2Matrix
    @test change_base_ring(F2(), z.m) isa F2Matrix
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+   S = MatrixSpace(R, 2, 2)
+   
+   M = rand(S, -10:10)
+
+   N = change_base_ring(U, M)
+
+   @test isa(N, MatElem)
 end
 
 @testset "Generic.Mat.map" begin
@@ -3721,6 +3979,20 @@ end
    z = zero_matrix(F2(), 2, 3)
    @test map(identity, z)   isa F2Matrix
    @test map(identity, z.m) isa F2Matrix
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+   S = MatrixSpace(R, 2, 2)
+   T = MatrixSpace(U, 2, 2)
+
+   M = rand(S, -10:10)
+   N = rand(T, 0:5, -10:10)
+   P = map(x->x^2, M)
+   Q = map(x->x^2, N)
+
+   @test isa(P, MatElem)
+   @test isa(Q, MatElem)
 end
 
 @testset "Generic.Mat.similar/zero" begin

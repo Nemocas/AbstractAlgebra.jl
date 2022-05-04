@@ -8,17 +8,17 @@ end
 # Matrix functionality
 
 AbstractAlgebra.jl provides a module, implemented in `src/Matrix.jl` for
-matrices over any commutative ring belonging to the AbstractAlgebra abstract type
+matrices over any ring belonging to the AbstractAlgebra abstract type
 hierarchy. This functionality will work for any matrix type which
 follows the Matrix interface.
 
 Similarly, AbstractAlgebra.jl provides a module in `src/MatrixAlgebra.jl` for
-matrix algebras over a commutative ring.
+matrix algebras over a ring.
 
 ## Generic matrix types
 
-AbstractAlgebra.jl allows the creation of dense matrices over any computable commutative
-ring $R$. Generic matrices over a commutative ring are implemented in
+AbstractAlgebra.jl allows the creation of dense matrices over any computable
+ring $R$. Generic matrices over a ring are implemented in
 `src/generic/Matrix.jl`.
 
 Generic matrix algebras of $m\times m$ matrices are implemented in
@@ -291,8 +291,8 @@ and an `Array` constructors taking an `AbstractAlgebra` matrix as input
 are provided:
 
 ```@docs
-Matrix(::MatrixElem)
-Array(::MatrixElem)
+Matrix(::MatrixElem{T}) where T <: RingElement
+Array(::MatrixElem{T}) where T <: RingElement
 ```
 
 Matrices also support iteration, and therefore functions accepting an iterator
@@ -374,16 +374,16 @@ ncols(::MatSpace)
 ```
 
 ```@docs
-nrows(::MatrixElem)
-ncols(::MatrixElem)
+nrows(::MatrixElem{T}) where T <: RingElement
+ncols(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
-length(::MatElem)
+length(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isempty(::MatElem)
+isempty(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -400,12 +400,12 @@ diagonal_matrix(::RingElement, ::Int, ::Int)
 
 ```@docs
 zero(::MatSpace)
-zero(::MatrixElem, ::Ring)
+zero(::MatrixElem{T}, ::Ring) where T <: RingElement
 ```
 
 ```@docs
 one(::MatSpace)
-one(::MatElem)
+one(::MatElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -413,15 +413,15 @@ istriu(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
-change_base_ring(::Ring, ::MatElem)
+change_base_ring(::Ring, ::MatElem{T}) where T <: RingElement
 ```
 
 ```@docs
-Base.map(f, ::MatrixElem)
+Base.map(f, ::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
-Base.map!(f, ::MatrixElem, ::MatrixElem)
+Base.map!(f, ::MatrixElem{S}, ::MatrixElem{T}) where {S <: RingElement, T <: RingElement}
 ```
 
 **Examples**
@@ -570,14 +570,14 @@ julia> N3 = M[2:3, 2:3]
 ### Elementary row and column operations
 
 ```@docs
-add_column(::MatElem, ::Int, ::Int, ::Int)
-add_column!(::MatElem, ::Int, ::Int, ::Int)
-add_row(::MatElem, ::Int, ::Int, ::Int)
-add_row!(::MatElem, ::Int, ::Int, ::Int)
-multiply_column(::MatElem, ::Int, ::Int)
-multiply_column!(::MatElem, ::Int, ::Int)
-multiply_row(::MatElem, ::Int, ::Int)
-multiply_row!(::MatElem, ::Int, ::Int)
+add_column(::MatElem{T}, ::Int, ::Int, ::Int) where T <: RingElement
+add_column!(::MatElem{T}, ::Int, ::Int, ::Int) where T <: RingElement
+add_row(::MatElem{T}, ::Int, ::Int, ::Int) where T <: RingElement
+add_row!(::MatElem{T}, ::Int, ::Int, ::Int) where T <: RingElement
+multiply_column(::MatElem{T}, ::Int, ::Int) where T <: RingElement
+multiply_column!(::MatElem{T}, ::Int, ::Int) where T <: RingElement
+multiply_row(::MatElem{T}, ::Int, ::Int) where T <: RingElement
+multiply_row!(::MatElem{T}, ::Int, ::Int) where T <: RingElement
 
 ```
 
@@ -834,7 +834,7 @@ julia> B = gram(A)
 ### Trace
 
 ```@docs
-tr(::MatElem)
+tr(::MatElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -859,7 +859,7 @@ t^2 + 3*t + 2
 ### Content
 
 ```@docs
-content(::MatElem)
+content(::MatElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -884,7 +884,7 @@ julia> b = content(A)
 ### Permutation
 
 ```@docs
-*(::Perm, ::MatElem)
+*(::Perm, ::MatElem{T}) where T <: RingElement
 ```
 
 **Examples**

@@ -10,26 +10,26 @@
 #
 ###############################################################################
 
-parent_type(::Type{S}) where {T <: RingElement, S <: Mat{T}} = MatSpace{T}
+parent_type(::Type{S}) where {T <: NCRingElement, S <: Mat{T}} = MatSpace{T}
 
-elem_type(::Type{MatSpace{T}}) where {T <: RingElement} = MatSpaceElem{T}
+elem_type(::Type{MatSpace{T}}) where {T <: NCRingElement} = MatSpaceElem{T}
 
 @doc Markdown.doc"""
-    parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: RingElement
+    parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: NCRingElement
 
 Return the parent object of the given matrix.
 """
-parent(a::Mat{T}, cached::Bool = true) where T <: RingElement =
+parent(a::Mat{T}, cached::Bool = true) where T <: NCRingElement =
     MatSpace{T}(a.base_ring, size(a.entries)..., cached)
 
-dense_matrix_type(::Type{T}) where T <: RingElement = MatSpaceElem{T}
+dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 
 @doc Markdown.doc"""
     dense_matrix_type(R::Ring)
     
 Return the type of matrices over the given ring.
 """
-dense_matrix_type(R::Ring) = dense_matrix_type(elem_type(R))
+dense_matrix_type(R::NCRing) = dense_matrix_type(elem_type(R))
 
 ###############################################################################
 #
@@ -57,7 +57,7 @@ ncols(a::Union{Mat, MatAlgElem}) = size(a.entries, 2)
 
 Base.@propagate_inbounds getindex(a::Union{Mat, MatAlgElem}, r::Int, c::Int) = a.entries[r, c]
 
-Base.@propagate_inbounds function setindex!(a::Union{Mat, MatAlgElem}, d::RingElement,
+Base.@propagate_inbounds function setindex!(a::Union{Mat, MatAlgElem}, d::NCRingElement,
                                             r::Int, c::Int)
     a.entries[r, c] = base_ring(a)(d)
 end
@@ -70,7 +70,7 @@ Base.isassigned(a::Union{Mat,MatAlgElem}, i, j) = isassigned(a.entries, i, j)
 #
 ################################################################################
 
-function copy(d::MatSpaceElem{T}) where T <: RingElement
+function copy(d::MatSpaceElem{T}) where T <: NCRingElement
    z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
@@ -80,7 +80,7 @@ function copy(d::MatSpaceElem{T}) where T <: RingElement
    return z
 end
 
-function deepcopy_internal(d::MatSpaceElem{T}, dict::IdDict) where T <: RingElement
+function deepcopy_internal(d::MatSpaceElem{T}, dict::IdDict) where T <: NCRingElement
    z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
@@ -90,7 +90,7 @@ function deepcopy_internal(d::MatSpaceElem{T}, dict::IdDict) where T <: RingElem
    return z
 end
 
-function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: RingElement
+function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: NCRingElement
    return MatSpaceView(deepcopy(d.entries), d.base_ring)
 end
 
@@ -111,7 +111,7 @@ Base.@propagate_inbounds function getindex(M::MatElem, x::Integer)
    end
 end
 
-function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: RingElement
+function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: NCRingElement
    return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
 end
 
@@ -130,11 +130,11 @@ issquare(a::MatElem) = (nrows(a) == ncols(a))
 ###############################################################################
 
 @doc Markdown.doc"""
-    transpose(x::Mat)
+    transpose(x::Mat{T}) where T <: NCRingElement
 
 Return the transpose of the given matrix.
 """
-function transpose(x::Mat)
+function transpose(x::Mat{T}) where T <: NCRingElement
    y = MatSpaceElem{eltype(x)}(permutedims(x.entries))
    y.base_ring = x.base_ring
    y
@@ -146,9 +146,9 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{S}, ::Type{S}) where {T <: RingElement, S <: Mat{T}} = MatSpaceElem{T}
+promote_rule(::Type{S}, ::Type{S}) where {T <: NCRingElement, S <: Mat{T}} = MatSpaceElem{T}
 
-function promote_rule(::Type{S}, ::Type{U}) where {T <: RingElement, S <: Mat{T}, U <: RingElement}
+function promote_rule(::Type{S}, ::Type{U}) where {T <: NCRingElement, S <: Mat{T}, U <: NCRingElement}
    promote_rule(T, U) == T ? MatSpaceElem{T} : Union{}
 end
 
@@ -158,7 +158,7 @@ end
 #
 ###############################################################################
 
-function (a::MatSpace{T})() where {T <: RingElement}
+function (a::MatSpace{T})() where {T <: NCRingElement}
    R = base_ring(a)
    entries = Array{T}(undef, a.nrows, a.ncols)
    for i = 1:a.nrows
@@ -171,7 +171,7 @@ function (a::MatSpace{T})() where {T <: RingElement}
    return z
 end
 
-function (a::MatSpace{T})(b::S) where {S <: RingElement, T <: RingElement}
+function (a::MatSpace{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    entries = Array{T}(undef, a.nrows, a.ncols)
    rb = R(b)
@@ -189,12 +189,12 @@ function (a::MatSpace{T})(b::S) where {S <: RingElement, T <: RingElement}
    return z
 end
 
-function (a::MatSpace{T})(b::Mat{T}) where {T <: RingElement}
+function (a::MatSpace{T})(b::Mat{T}) where {T <: NCRingElement}
    parent(b) != a && error("Unable to coerce matrix")
    return b
 end
 
-function (a::MatSpace{T})(b::Matrix{T}) where T <: RingElement
+function (a::MatSpace{T})(b::Matrix{T}) where T <: NCRingElement
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
    if !isempty(b)
@@ -205,7 +205,7 @@ function (a::MatSpace{T})(b::Matrix{T}) where T <: RingElement
    return z
 end
 
-function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: RingElement, T <: RingElement}
+function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
    entries = Array{T}(undef, a.nrows, a.ncols)
@@ -219,7 +219,7 @@ function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: RingElement, T <: Ri
    return z
 end
 
-function (a::MatSpace{T})(b::AbstractVector{S}) where {S <: RingElement, T <: RingElement}
+function (a::MatSpace{T})(b::AbstractVector{S}) where {S <: NCRingElement, T <: NCRingElement}
    _check_dim(a.nrows, a.ncols, b)
    b = Matrix{S}(transpose(reshape(b, a.ncols, a.nrows)))
    z = a(b)
@@ -232,7 +232,7 @@ end
 #
 ###############################################################################
 
-function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int; cached::Bool = true)
+function MatrixSpace(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end

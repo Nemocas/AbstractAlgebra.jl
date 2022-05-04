@@ -988,37 +988,39 @@ end
 #
 ###############################################################################
 
+const NCRingElement = Union{NCRingElem, RingElement}
+
 # All MatSpaceElem's and views thereof
 abstract type Mat{T} <: MatElem{T} end
 
 # not really a mathematical ring
-mutable struct MatSpace{T <: RingElement} <: AbstractAlgebra.MatSpace{T}
+mutable struct MatSpace{T <: NCRingElement} <: AbstractAlgebra.MatSpace{T}
    nrows::Int
    ncols::Int
-   base_ring::Ring
+   base_ring::NCRing
 
-   function MatSpace{T}(R::Ring, r::Int, c::Int, cached::Bool = true) where T <: RingElement
+   function MatSpace{T}(R::NCRing, r::Int, c::Int, cached::Bool = true) where T <: NCRingElement
       return get_cached!(MatDict, (R, r, c), cached) do
          new{T}(r, c, R)
       end::MatSpace{T}
    end
 end
 
-const MatDict = CacheDictType{Tuple{Ring, Int, Int}, MatSpace}()
+const MatDict = CacheDictType{Tuple{NCRing, Int, Int}, MatSpace}()
 
-mutable struct MatSpaceElem{T <: RingElement} <: Mat{T}
+mutable struct MatSpaceElem{T <: NCRingElement} <: Mat{T}
    entries::Matrix{T}
-   base_ring::Ring
+   base_ring::NCRing
 
-   function MatSpaceElem{T}(A::Matrix{T}) where T <: RingElement
+   function MatSpaceElem{T}(A::Matrix{T}) where T <: NCRingElement
       return new{T}(A)
     end
 
-   function MatSpaceElem{T}(A::AbstractMatrix{T}) where T <: RingElement
+   function MatSpaceElem{T}(A::AbstractMatrix{T}) where T <: NCRingElement
       return new{T}(Array(A))
    end
 
-   function MatSpaceElem{T}(r::Int, c::Int, A::Vector{T}) where T <: RingElement
+   function MatSpaceElem{T}(r::Int, c::Int, A::Vector{T}) where T <: NCRingElement
       t = Array{T}(undef, r, c)
       for i = 1:r
          for j = 1:c
@@ -1029,9 +1031,9 @@ mutable struct MatSpaceElem{T <: RingElement} <: Mat{T}
    end
 end
 
-mutable struct MatSpaceView{T <: RingElement, V, W} <: Mat{T}
+mutable struct MatSpaceView{T <: NCRingElement, V, W} <: Mat{T}
    entries::SubArray{T, 2, Matrix{T}, V, W}
-   base_ring::Ring
+   base_ring::NCRing
 end
 
 ###############################################################################
@@ -1040,28 +1042,28 @@ end
 #
 ###############################################################################
 
-mutable struct MatAlgebra{T <: RingElement} <: AbstractAlgebra.MatAlgebra{T}
+mutable struct MatAlgebra{T <: NCRingElement} <: AbstractAlgebra.MatAlgebra{T}
    n::Int
-   base_ring::Ring
+   base_ring::NCRing
 
-   function MatAlgebra{T}(R::Ring, n::Int, cached::Bool = true) where T <: RingElement
+   function MatAlgebra{T}(R::NCRing, n::Int, cached::Bool = true) where T <: NCRingElement
       return get_cached!(MatAlgDict, (R, n), cached) do
          new{T}(n, R)
       end::MatAlgebra{T}
    end
 end
 
-const MatAlgDict = CacheDictType{Tuple{Ring, Int}, NCRing}()
+const MatAlgDict = CacheDictType{Tuple{NCRing, Int}, NCRing}()
 
-mutable struct MatAlgElem{T <: RingElement} <: AbstractAlgebra.MatAlgElem{T}
+mutable struct MatAlgElem{T <: NCRingElement} <: AbstractAlgebra.MatAlgElem{T}
    entries::Matrix{T}
-   base_ring::Ring
+   base_ring::NCRing
 
-   function MatAlgElem{T}(A::Matrix{T}) where T <: RingElement
+   function MatAlgElem{T}(A::Matrix{T}) where T <: NCRingElement
       return new{T}(A)
    end
 
-   function MatAlgElem{T}(n::Int, A::Vector{T}) where T <: RingElement
+   function MatAlgElem{T}(n::Int, A::Vector{T}) where T <: NCRingElement
       t = Array{T}(undef, n, n)
       for i = 1:n
          for j = 1:n

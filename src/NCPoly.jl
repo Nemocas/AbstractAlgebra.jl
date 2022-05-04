@@ -565,6 +565,44 @@ end
 # Note: composition is not associative, e.g. consider fo(goh) vs (fog)oh
 # for f and g of degree 2 and h of degree 1 -- and recall coeffs don't commute
 
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function change_base_ring(R::NCRing, p::NCPolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: NCRingElement
+   return _map(R, p, parent)
+end
+
+function change_coefficient_ring(R::NCRing, p::NCPolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: NCRingElement
+  return change_base_ring(R, p; cached = cached, parent = parent)
+end
+
+################################################################################
+#
+#  Map
+#
+################################################################################
+
+_make_parent(g, p::NCPolyElem, cached::Bool) =
+   _change_poly_ring(parent(g(zero(base_ring(p)))),
+                     parent(p), cached)
+
+function map_coefficients(g, p::NCPolyElem{<:NCRingElement};
+                    cached::Bool = true,
+                    parent::NCPolyRing = _make_parent(g, p, cached))
+   return _map(g, p, parent)
+end
+
+function _map(g, p::NCPolyElem, Rx)
+   R = base_ring(Rx)
+   new_coefficients = elem_type(R)[let c = coeff(p, i)
+                                     iszero(c) ? zero(R) : R(g(c))
+                                   end for i in 0:degree(p)]
+   return Rx(new_coefficients)
+end
+
 ###############################################################################
 #
 #   Unsafe functions
