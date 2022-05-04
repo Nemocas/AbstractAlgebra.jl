@@ -62,8 +62,6 @@ gen(R::NCPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
 isterm(a::T) where T <: NCRingElem = true
 
-ismonomial_monomial(a::T) where T <: NCRingElem = isone(a)
-
 ###############################################################################
 #
 #   String I/O
