@@ -81,7 +81,7 @@ end
 
    @test canonical_unit((x + 1)//(-x^2 + 1)) == -1//(x-1)
 
-   @test isunit((x + 1)//(-x^2 + 1))
+   @test is_unit((x + 1)//(-x^2 + 1))
 
    @test deepcopy((x + 1)//(-x^2 + 1)) == (x + 1)//(-x^2 + 1)
 
@@ -270,24 +270,24 @@ end
 
       g = a^2
 
-      @test issquare(g)
+      @test is_square(g)
 
       @test sqrt(g)^2 == g
 
-      f1, s1 = issquare_with_sqrt(g)
+      f1, s1 = is_square_with_sqrt(g)
 
       @test f1 && s1^2 == g
    end
 
    f = (3x^2 + 2x + 1)^2//(x + 4)
 
-   f1, s1 = issquare_with_sqrt(f)
+   f1, s1 = is_square_with_sqrt(f)
 
    @test !f1
 
    f = (3x^2 + 2x + 1)//(x + 4)^2
 
-   f2, s2 = issquare_with_sqrt(f)
+   f2, s2 = is_square_with_sqrt(f)
 
    @test !f2   
 end

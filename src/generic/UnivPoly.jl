@@ -18,12 +18,12 @@ coefficient_ring(S::UnivPolyRing) = base_ring(S)
 
 coefficient_ring(p::UnivPoly) = base_ring(p)
 
-function isdomain_type(::Type{T}) where {S <: RingElement, U <: MPolyElem{S}, T <: UnivPoly{S, U}}
-   return isdomain_type(S)
+function is_domain_type(::Type{T}) where {S <: RingElement, U <: MPolyElem{S}, T <: UnivPoly{S, U}}
+   return is_domain_type(S)
 end
 
-function isexact_type(::Type{T}) where {S <: RingElement, U <: MPolyElem{S}, T <: UnivPoly{S, U}}
-   return isexact_type(S)
+function is_exact_type(::Type{T}) where {S <: RingElement, U <: MPolyElem{S}, T <: UnivPoly{S, U}}
+   return is_exact_type(S)
 end
 
 parent(p::UnivPoly) = p.parent
@@ -134,22 +134,22 @@ iszero(p::UnivPoly) = iszero(p.p)
 
 isone(p::UnivPoly) = isone(p.p)
 
-isunit(p::UnivPoly) = isunit(p.p)
+is_unit(p::UnivPoly) = is_unit(p.p)
 
-isgen(p::UnivPoly) = isgen(p.p)
+is_gen(p::UnivPoly) = is_gen(p.p)
 
-ishomogeneous(p::UnivPoly) = ishomogeneous(p.p)
+is_homogeneous(p::UnivPoly) = is_homogeneous(p.p)
 
-ismonomial(p::UnivPoly) = ismonomial(p.p)
+is_monomial(p::UnivPoly) = is_monomial(p.p)
 
-isconstant(p::UnivPoly) = isconstant(p.p)
+is_constant(p::UnivPoly) = is_constant(p.p)
 
-isterm(p::UnivPoly) = isterm(p.p)
+is_term(p::UnivPoly) = is_term(p.p)
 
 coeff(p::UnivPoly, i::Int) = coeff(p.p, i)
 
 function coeff(p::UnivPoly{T, U}, m::UnivPoly{T, U}) where {T, U}
-   !ismonomial(m) && error("Not a monomial")
+   !is_monomial(m) && error("Not a monomial")
    check_parent(p, m)
    v1 = first(exponent_vectors(m))
    len = length(v1)
@@ -493,8 +493,8 @@ function Base.sqrt(p::UnivPoly{T, U}; check=true) where {T, U}
    return UnivPoly{T, U}(s, S)
 end
 
-function issquare(p::UnivPoly)
-   return issquare(p.p)
+function is_square(p::UnivPoly)
+   return is_square(p.p)
 end
 
 ###############################################################################
@@ -881,9 +881,9 @@ function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::UnivPoly{T, U}) where 
    return to_univariate(R, p.p)
 end
 
-isunivariate(p::UnivPoly) = isunivariate(p.p)
+is_univariate(p::UnivPoly) = is_univariate(p.p)
 
-isunivariate(R::UnivPolyRing) = isunivariate(mpoly_ring(R))
+is_univariate(R::UnivPolyRing) = is_univariate(mpoly_ring(R))
 
 function coefficients_of_univariate(p::UnivPoly, check_univariate::Bool=true)
    return coefficients_of_univariate(p.p, check_univariate)

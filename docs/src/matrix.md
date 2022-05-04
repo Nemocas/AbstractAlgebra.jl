@@ -409,7 +409,7 @@ one(::MatElem{T}) where T <: RingElement
 ```
 
 ```@docs
-istriu(::MatrixElem{T}) where T <: RingElement
+is_triu(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -754,7 +754,7 @@ Rationals
 ### Symmetry testing
 
 ```julia
-LinearAlgebra.issymmetric(a::MatrixElem)
+LinearAlgebra.is_symmetric(a::MatrixElem)
 ```
 
 Return `true` if the given matrix is symmetric with respect to its main diagonal,
@@ -768,7 +768,7 @@ julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
 [2   4   5]
 [3   5   6]
 
-julia> issymmetric(M)
+julia> is_symmetric(M)
 true
 
 julia> N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
@@ -776,7 +776,7 @@ julia> N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
 [4   5   6]
 [7   8   9]
 
-julia> issymmetric(N)
+julia> is_symmetric(N)
 false
 ```
 
@@ -962,8 +962,8 @@ rref{T <: FieldElem}(::MatElem{T})
 ```
 
 ```@docs
-isrref{T <: RingElem}(::MatElem{T})
-isrref{T <: FieldElem}(::MatElem{T})
+is_rref{T <: RingElem}(::MatElem{T})
+is_rref{T <: FieldElem}(::MatElem{T})
 ```
 
 **Examples**
@@ -986,7 +986,7 @@ julia> M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 julia> r, A = rref(M)
 (3, [1 0 0; 0 1 0; 0 0 1])
 
-julia> isrref(A)
+julia> is_rref(A)
 true
 
 julia> R, x = PolynomialRing(ZZ, "x")
@@ -1003,7 +1003,7 @@ julia> M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
 julia> r, A, d = rref_rational(M)
 (3, [-x^5-2*x^4-15*x^3-18*x^2-8*x-7 0 0; 0 -x^5-2*x^4-15*x^3-18*x^2-8*x-7 0; 0 0 -x^5-2*x^4-15*x^3-18*x^2-8*x-7], -x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7)
 
-julia> isrref(A)
+julia> is_rref(A)
 true
 ```
 
@@ -1261,11 +1261,11 @@ Base.inv{T <: RingElement}(::MatrixElem{T})
 ```
 
 ```@docs
-isinvertible_with_inverse{T <: RingElement}(::MatrixElem{T})
+is_invertible_with_inverse{T <: RingElement}(::MatrixElem{T})
 ```
 
 ```@docs
-isinvertible{T <: RingElement}(::MatrixElem{T})
+is_invertible{T <: RingElement}(::MatrixElem{T})
 ```
 
 **Examples**
@@ -1290,10 +1290,10 @@ julia> X = inv(A)
 [ 128//7817*x^2 - 655//7817*x + 2209//7817      599//23451*x^2 - 2027//23451*x - 1327//23451   -1805//23451*x^2 + 2702//23451*x - 7394//23451]
 [ 545//7817*x^2 + 570//7817*x + 2016//7817     -1297//23451*x^2 - 5516//23451*x - 337//23451   8254//23451*x^2 - 2053//23451*x + 16519//23451]
 
-julia> isinvertible(A)
+julia> is_invertible(A)
 true
 
-julia> isinvertible_with_inverse(A)
+julia> is_invertible_with_inverse(A)
 (true, [-343//7817*x^2+717//7817*x-2072//7817 -4964//23451*x^2+2195//23451*x-11162//23451 -232//23451*x^2-4187//23451*x-1561//23451; 128//7817*x^2-655//7817*x+2209//7817 599//23451*x^2-2027//23451*x-1327//23451 -1805//23451*x^2+2702//23451*x-7394//23451; 545//7817*x^2+570//7817*x+2016//7817 -1297//23451*x^2-5516//23451*x-337//23451 8254//23451*x^2-2053//23451*x+16519//23451])
 
 julia> R, x = PolynomialRing(ZZ, "x")
@@ -1378,7 +1378,7 @@ hessenberg{T <: RingElem}(::MatElem{T})
 ```
 
 ```@docs
-ishessenberg{T <: RingElem}(::MatElem{T})
+is_hessenberg{T <: RingElem}(::MatElem{T})
 ```
 
 **Examples**
@@ -1403,7 +1403,7 @@ julia> A = hessenberg(M)
 [0   1   3   2]
 [0   0   2   2]
 
-julia> ishessenberg(A)
+julia> is_hessenberg(A)
 true
 
 ```
@@ -1500,7 +1500,7 @@ hnf_with_transform{T <: RingElem}(::MatElem{T})
 ```
 
 ```@docs
-ishnf{T <: RingElem}(::MatElem{T})
+is_hnf{T <: RingElem}(::MatElem{T})
 ```
 
 **Examples**
@@ -1516,7 +1516,7 @@ julia> H = hnf(A)
 [0   1    17]
 [0   0   281]
 
-julia> ishnf(H)
+julia> is_hnf(H)
 true
 
 julia> H, U = hnf_with_transform(A)
@@ -1531,7 +1531,7 @@ julia> U*A
 ### Smith normal form
 
 ```@docs
-issnf(::MatrixElem{T}) where T <: RingElement
+is_snf(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -1567,7 +1567,7 @@ AbstractAlgebra.jl provides algorithms for computing the (weak) Popov of a matri
 entries in a univariate polynomial ring over a field.
 
 ```@docs
-isweak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
+is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
 ```
 
 ```@docs

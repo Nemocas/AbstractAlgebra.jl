@@ -8,8 +8,8 @@ export PolyCoeffs, PolynomialRing, PolyRing, addmul!, characteristic,
        chebyshev_t, chebyshev_u, coefficient_ring, coefficients, compose,
        constant_coefficient, content, deflate, deflation, degree, derivative,
        discriminant, divexact, divexact_low, divhigh, divides, evaluate,
-       gcdinv, inflate, integral, interpolate, ismonic, issquare, isterm,
-       isterm_recursive, map_coefficients, modulus,  monomial_to_newton!,
+       gcdinv, inflate, integral, interpolate, is_monic, is_square, is_term,
+       is_term_recursive, map_coefficients, modulus,  monomial_to_newton!,
        mul_classical, mulhigh_n, mul_karatsuba, mul_ks, mullow, mulmod,
        newton_to_monomial!, nvars, polynomial, polynomial_to_power_sums,
        power_sums_to_polynomial, pow_multinomial, primpart,
@@ -35,12 +35,12 @@ coefficient_ring(a::PolynomialElem) = base_ring(a)
 
 parent(a::PolynomialElem) = a.parent
 
-function isdomain_type(::Type{T}) where {S <: RingElement, T <: PolyElem{S}}
-   return isdomain_type(S)
+function is_domain_type(::Type{T}) where {S <: RingElement, T <: PolyElem{S}}
+   return is_domain_type(S)
 end
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: PolyElem{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: RingElement, T <: PolyElem{S}}
+   return is_exact_type(S)
 end
 
 @doc Markdown.doc"""
@@ -110,12 +110,12 @@ degree(a::PolynomialElem) = length(a) - 1
 
 
 @doc Markdown.doc"""
-    isconstant(a::PolynomialElem)
+    is_constant(a::PolynomialElem)
 
 Return `true` if `a` is a degree zero polynomial or the zero polynomial, i.e.
 a constant polynomial.
 """
-function isconstant(a::PolynomialElem)
+function is_constant(a::PolynomialElem)
    return length(a) <= 1
 end
 
@@ -227,26 +227,26 @@ iszero(a::PolynomialElem) = length(a) == 0
 isone(a::PolynomialElem) = length(a) == 1 && isone(coeff(a, 0))
 
 @doc Markdown.doc"""
-    isgen(a::PolynomialElem)
+    is_gen(a::PolynomialElem)
 
 Return `true` if the given polynomial is the constant generator of its
 polynomial ring, otherwise return `false`.
 """
-function isgen(a::PolynomialElem)
+function is_gen(a::PolynomialElem)
     return length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 end
 
 @doc Markdown.doc"""
-    ismonic(a::PolynomialElem)
+    is_monic(a::PolynomialElem)
 
 Return `true` if the given polynomial is monic, i.e. has leading coefficient
 equal to one, otherwise return `false`.
 """
-function ismonic(a::PolynomialElem)
+function is_monic(a::PolynomialElem)
     return isone(leading_coefficient(a))
 end
 
-isunit(a::PolynomialElem) = length(a) == 1 && isunit(coeff(a, 0))
+is_unit(a::PolynomialElem) = length(a) == 1 && is_unit(coeff(a, 0))
 
 ###############################################################################
 #
@@ -255,11 +255,11 @@ isunit(a::PolynomialElem) = length(a) == 1 && isunit(coeff(a, 0))
 ###############################################################################
 
 @doc Markdown.doc"""
-    isterm(a::PolynomialElem)
+    is_term(a::PolynomialElem)
 
 Return `true` if the given polynomial has one term.
 """
-function isterm(a::PolynomialElem)
+function is_term(a::PolynomialElem)
    if iszero(a)
       return false
    end
@@ -271,16 +271,16 @@ function isterm(a::PolynomialElem)
    return true
 end
 
-isterm_recursive(a::T) where T <: RingElement = true
+is_term_recursive(a::T) where T <: RingElement = true
 
 @doc Markdown.doc"""
-    isterm_recursive(a::PolynomialElem)
+    is_term_recursive(a::PolynomialElem)
 
 Return `true` if the given polynomial has one term. This function is
 recursive, with all scalar types returning true.
 """
-function isterm_recursive(a::PolynomialElem)
-   if !isterm_recursive(leading_coefficient(a))
+function is_term_recursive(a::PolynomialElem)
+   if !is_term_recursive(leading_coefficient(a))
       return false
    end
    for i = 1:length(a) - 1
@@ -292,11 +292,11 @@ function isterm_recursive(a::PolynomialElem)
 end
 
 @doc Markdown.doc"""
-    ismonomial(a::PolynomialElem)
+    is_monomial(a::PolynomialElem)
 
 Return `true` if the given polynomial is a monomial.
 """
-function ismonomial(a::PolynomialElem)
+function is_monomial(a::PolynomialElem)
    if !isone(leading_coefficient(a))
       return false
    end
@@ -308,16 +308,16 @@ function ismonomial(a::PolynomialElem)
    return true
 end
 
-ismonomial_recursive(a::T) where T <: RingElement = isone(a)
+is_monomial_recursive(a::T) where T <: RingElement = isone(a)
 
 @doc Markdown.doc"""
-    ismonomial_recursive(a::PolynomialElem)
+    is_monomial_recursive(a::PolynomialElem)
 
 Return `true` if the given polynomial is a monomial. This function is
 recursive, with all scalar types returning true.
 """
-function ismonomial_recursive(a::PolynomialElem)
-   if !ismonomial_recursive(leading_coefficient(a))
+function is_monomial_recursive(a::PolynomialElem)
+   if !is_monomial_recursive(leading_coefficient(a))
       return false
    end
    for i = 1:length(a) - 1
@@ -816,7 +816,7 @@ function ^(a::PolyElem{T}, b::Int) where T <: RingElement
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    R = parent(a)
-   if isgen(a)
+   if is_gen(a)
       z = R()
       fit!(z, b + 1)
       z = setcoeff!(z, b, deepcopy(coeff(a, 1)))
@@ -1593,9 +1593,9 @@ end
 
 function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
  check_parent(z, p)
- !isexact_type(T) && error("remove requires an exact ring")
+ !is_exact_type(T) && error("remove requires an exact ring")
  iszero(z) && error("Not yet implemented")
- (isunit(p) || iszero(p)) && throw(error("Second argument must be a non-zero non-unit"))
+ (is_unit(p) || iszero(p)) && throw(error("Second argument must be a non-zero non-unit"))
  flag, q = divides(z, p)
  if !flag
    return 0, z
@@ -1612,9 +1612,9 @@ end
 
 function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: Union{ResElem, FieldElement}
  check_parent(z, p)
- !isexact_type(T) && error("remove requires an exact ring")
+ !is_exact_type(T) && error("remove requires an exact ring")
  iszero(z) && error("Not yet implemented")
- (isunit(p) || iszero(p)) && throw(error("Second argument must be a non-zero non-unit"))
+ (is_unit(p) || iszero(p)) && throw(error("Second argument must be a non-zero non-unit"))
  q, r = divrem(z, p)
  if !iszero(r)
    return 0, z
@@ -1631,7 +1631,7 @@ end
 
 function divides(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
   check_parent(f, g)
-  !isexact_type(T) && error("divides requires an exact ring")
+  !is_exact_type(T) && error("divides requires an exact ring")
   if length(f) == 0
      return true, parent(f)()
   end
@@ -1709,7 +1709,7 @@ function sqrt_classical_char2(f::PolyElem{T}; check::Bool=true) where T <: RingE
    d = Array{T}(undef, lenq)
    for i = 1:lenq
       c = coeff(f, 2*i - 2)
-      if check && !issquare(c)
+      if check && !is_square(c)
          return false, S()
       end
       d[i] = sqrt(c; check=false)
@@ -1732,7 +1732,7 @@ function sqrt_classical(f::PolyElem{T}; check::Bool=true) where T <: RingElement
    if check && iseven(m) # square polys have even degree
       return false, S()
    end
-   if check && !issquare(coeff(f, m - 1))
+   if check && !is_square(coeff(f, m - 1))
       return false, S()
    end
    lenq = div(m + 1, 2)
@@ -1786,16 +1786,16 @@ function Base.sqrt(f::PolyElem{T}; check::Bool=true) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    issquare(f::PolyElem{T}) where T <: RingElement
+    is_square(f::PolyElem{T}) where T <: RingElement
 
 Return `true` if $f$ is a perfect square.
 """
-function issquare(f::PolyElem{T}) where T <: RingElement
+function is_square(f::PolyElem{T}) where T <: RingElement
    flag, q = sqrt_classical(f)
    return flag
 end
 
-function issquare_with_sqrt(f::PolyElem{T}) where T <: RingElement
+function is_square_with_sqrt(f::PolyElem{T}) where T <: RingElement
    return sqrt_classical(f, check=true)
 end
 
@@ -1859,10 +1859,10 @@ function gcd(a::PolyElem{T}, b::PolyElem{T}, ignore_content::Bool = false) where
       b = divexact(b, c2)
       c = gcd(c1, c2)
    end
-   lead_monomial = isterm_recursive(leading_coefficient(a)) ||
-                   isterm_recursive(leading_coefficient(b))
-   trail_monomial = isterm_recursive(trailing_coefficient(a)) ||
-                    isterm_recursive(trailing_coefficient(b))
+   lead_monomial = is_term_recursive(leading_coefficient(a)) ||
+                   is_term_recursive(leading_coefficient(b))
+   trail_monomial = is_term_recursive(trailing_coefficient(a)) ||
+                    is_term_recursive(trailing_coefficient(b))
    lead_a = leading_coefficient(a)
    lead_b = leading_coefficient(b)
    g = one(parent(a))
@@ -1886,8 +1886,8 @@ function gcd(a::PolyElem{T}, b::PolyElem{T}, ignore_content::Bool = false) where
       end
    end
    if !ignore_content
-      if !isterm_recursive(leading_coefficient(b)) &&
-         !isterm_recursive(trailing_coefficient(b))
+      if !is_term_recursive(leading_coefficient(b)) &&
+         !is_term_recursive(trailing_coefficient(b))
          if lead_monomial # lead term monomial, so content contains rest
             d = divexact(leading_coefficient(b),
 	                 term_content(leading_coefficient(b)))
@@ -1898,7 +1898,7 @@ function gcd(a::PolyElem{T}, b::PolyElem{T}, ignore_content::Bool = false) where
             b = divexact(b, d)
          else
             glead = gcd(lead_a, lead_b)
-            if isterm_recursive(glead)
+            if is_term_recursive(glead)
                d = divexact(leading_coefficient(b),
 			     term_content(leading_coefficient(b)))
                b = divexact(b, d)
@@ -2368,7 +2368,7 @@ Return the resultant of the given polynomials.
 """
 function resultant(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElement
   R = parent(p)
-  if !isexact_type(T)
+  if !is_exact_type(T)
      return resultant_sylvester(p, q)
   end
   try
@@ -2545,7 +2545,7 @@ end
 
 function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
-   !isexact_type(T) && error("gcdx requires exact Bezout domain")
+   !is_exact_type(T) && error("gcdx requires exact Bezout domain")
    if length(a) == 0
       if length(b) == 0
          return zero(parent(a)), zero(parent(a)), zero(parent(a))
@@ -2632,7 +2632,7 @@ end
 
 function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: FieldElement
     degree(f) < 1 && error("Polynomial has no roots")
-    !ismonic(f) && error("Requires monic polynomial")
+    !is_monic(f) && error("Requires monic polynomial")
     iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
     n < 0 && throw(DomainError(n, "number of terms must be nonnegative"))
     d = degree(f)
@@ -2659,7 +2659,7 @@ monic, at least degree $1$ and have nonzero constant coefficient.
 function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement
     # plain vanilla recursion
     degree(f) < 1 && error("Polynomial has no roots")
-    !ismonic(f) && error("Requires monic polynomial")
+    !is_monic(f) && error("Requires monic polynomial")
     iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
     n < 0 && throw(DomainError(n, "number of terms must be nonnegative"))
     d = degree(f)
@@ -2804,7 +2804,7 @@ polynomial exists, an exception is raised.
 """
 function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingElement
    length(x) != length(y) && error("Array lengths don't match in interpolate")
-   !isdomain_type(T) && error("interpolation requires a domain type")
+   !is_domain_type(T) && error("interpolation requires a domain type")
    n = length(x)
    if n == 0
       return S()

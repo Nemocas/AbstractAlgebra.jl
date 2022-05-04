@@ -52,8 +52,8 @@ parent(a::NCRingElement)
 Return the parent of the given ring element.
 
 ```julia
-isdomain_type(::Type{T}) where T <: NCRingElement
-isexact_type(::Type{T}) where T <: NCRingElement
+is_domain_type(::Type{T}) where T <: NCRingElement
+is_exact_type(::Type{T}) where T <: NCRingElement
 ```
 
 Return true if the given ring element type can only belong to elements of an
@@ -99,7 +99,7 @@ In addition, the following is implemented where it is
 mathematically/algorithmically viable to do so.
 
 ```julia
-isunit(a::NCRingElement)
+is_unit(a::NCRingElement)
 ```
 
 The following standard Julia functions are also implemented for all ring
@@ -200,8 +200,8 @@ For commutative rings supporting factorization and irreducibility testing, the
 following optional functions may be implemented.
 
 ```julia
-isirreducible(a::T) where T <: RingElement
-issquarefree(a::T) where T <: RingElement
+is_irreducible(a::T) where T <: RingElement
+is_squarefree(a::T) where T <: RingElement
 ```
 
 Decide whether `a` is irreducible or squarefree, respectively.

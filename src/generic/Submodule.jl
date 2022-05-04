@@ -126,7 +126,7 @@ end
 function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingElement, S <: AbstractAlgebra.FPModuleElem{T}}
    R = base_ring(m)
    r = length(gens)
-   while r > 0 && iszero_row(_matrix(gens[r]), 1) # check that not all gens are zero
+   while r > 0 && is_zero_row(_matrix(gens[r]), 1) # check that not all gens are zero
       r -= 1
    end
    if r == 0
@@ -154,7 +154,7 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
       mat = reduced_form(mat)
       # Remove zero rows
       num = r
-      while num > 0 && iszero_row(mat, num)
+      while num > 0 && is_zero_row(mat, num)
          num -= 1
       end
       # Reduce modulo old relations
@@ -168,7 +168,7 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
    end
    # Remove zero rows
    num = r
-   while num > 0 && iszero_row(mat, num)
+   while num > 0 && is_zero_row(mat, num)
       num -= 1
    end
    # Rewrite matrix without zero rows and add old relations as rows
@@ -224,7 +224,7 @@ end
 
 function sub(m::AbstractAlgebra.FPModule{T}, subs::Vector{Submodule{T}}) where T <: RingElement
    for N in subs
-      flag, P = iscompatible(m, N)
+      flag, P = is_compatible(m, N)
       (!flag || P !== m) && error("Incompatible submodules")
    end
    gens = vcat((generators(s) for s in subs)...)

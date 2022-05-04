@@ -374,7 +374,7 @@ end
    @test_throws BoundsError axes(A, 0)
    @test_throws BoundsError axes(A, -rand(1:99))
 
-   @test issquare(A)
+   @test is_square(A)
 
    @test A[1:end, 1:end] == A
    @test firstindex(A, 1) == 1
@@ -402,7 +402,7 @@ end
    @test lastindex(B, 2) == ncols(B)
    @test_throws ErrorException lastindex(B, 3)
 
-   @test !issquare(B)
+   @test !is_square(B)
 
    # test over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
@@ -417,7 +417,7 @@ end
    @test size(M, 1) == 2
    @test axes(M) == (1:2, 1:2)
    @test axes(M, 1) == 1:2
-   @test issquare(M)
+   @test is_square(M)
 end
 
 @testset "Generic.Mat.manipulation" begin
@@ -467,10 +467,10 @@ end
 
    C = S([t + 1 R(0) R(1); t^2 R(0) t; R(0) R(0) R(0)])
 
-   @test iszero_row(C, 3)
-   @test !iszero_row(C, 1)
-   @test iszero_column(C, 2)
-   @test !iszero_column(C, 1)
+   @test is_zero_row(C, 3)
+   @test !is_zero_row(C, 1)
+   @test is_zero_column(C, 2)
+   @test !is_zero_column(C, 1)
 
    @test length(A) == length(B) == length(C) == 9
    @test !any(isempty, (A, B, C))
@@ -559,8 +559,8 @@ end
 
    @test isone(one(R))
 
-   @test iszero_row(M, 1)
-   @test iszero_column(M, 1)
+   @test is_zero_row(M, 1)
+   @test is_zero_column(M, 1)
 end
 
 @testset "Generic.Mat.unary_ops" begin
@@ -983,7 +983,7 @@ end
       @test A + B == S(A.entries + B.entries)
       @test A - B == S(A.entries - B.entries)
       @test A + B == A - (-B)
-      if issquare(A)
+      if is_square(A)
          @test A * B == S(A.entries * B.entries)
       end
    end
@@ -1002,7 +1002,7 @@ end
       @test A + B == S(A.entries + B.entries)
       @test A - B == S(A.entries - B.entries)
       @test A + B == A - (-B)
-      if issquare(A)
+      if is_square(A)
          @test A * B == S(A.entries * B.entries)
       end
    end
@@ -1021,7 +1021,7 @@ end
       @test A + B == S(A.entries + B.entries)
       @test A - B == S(A.entries - B.entries)
       @test A + B == A - (-B)
-      if issquare(A)
+      if is_square(A)
          @test A * B == S(A.entries * B.entries)
       end
    end
@@ -1040,7 +1040,7 @@ end
       @test A + B == S(A.entries + B.entries)
       @test A - B == S(A.entries - B.entries)
       @test A + B == A - (-B)
-      if issquare(A)
+      if is_square(A)
          @test A * B == S(A.entries * B.entries)
       end
    end
@@ -1059,7 +1059,7 @@ end
       @test A + B == S(A.entries + B.entries)
       @test A - B == S(A.entries - B.entries)
       @test A + B == A - (-B)
-      if issquare(A)
+      if is_square(A)
          @test A * B == S(A.entries * B.entries)
       end
    end
@@ -1078,7 +1078,7 @@ end
       @test A + B == S(A.entries + B.entries)
       @test A - B == S(A.entries - B.entries)
       @test A + B == A - (-B)
-      if issquare(A)
+      if is_square(A)
          @test A * B == S(A.entries * B.entries)
       end
    end
@@ -1491,14 +1491,14 @@ end
    @test divexact_right(N*d, d) == N
 end
 
-@testset "Generic.Mat.issymmetric" begin
+@testset "Generic.Mat.is_symmetric" begin
    R, t = PolynomialRing(QQ, "t")
-   @test !issymmetric(matrix(R, [t + 1 t R(1); t^2 t t]))
-   @test issymmetric(matrix(R, [t + 1 t R(1); t t^2 t; R(1) t R(5)]))
-   @test !issymmetric(matrix(R, [t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
+   @test !is_symmetric(matrix(R, [t + 1 t R(1); t^2 t t]))
+   @test is_symmetric(matrix(R, [t + 1 t R(1); t t^2 t; R(1) t R(5)]))
+   @test !is_symmetric(matrix(R, [t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
    S = MatrixAlgebra(R, 3)
-   @test issymmetric(S([t + 1 t R(1); t t^2 t; R(1) t R(5)]))
-   @test !issymmetric(S([t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
+   @test is_symmetric(S([t + 1 t R(1); t t^2 t; R(1) t R(5)]))
+   @test !is_symmetric(S([t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
 
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
@@ -1507,7 +1507,7 @@ end
    
    M = rand(S, -10:10)
 
-   @test issymmetric(M + transpose(M))
+   @test is_symmetric(M + transpose(M))
 end
 
 @testset "Generic.Mat.is_skew_symmetric" begin
@@ -2557,7 +2557,7 @@ end
 
       if do_test
          @test r == i
-         @test isrref(A)
+         @test is_rref(A)
       end
    end
 
@@ -2574,12 +2574,12 @@ end
       r, N, d = rref_rational(M)
 
       @test r == rank
-      @test isrref(N)
+      @test is_rref(N)
 
       N2 = change_base_ring(QQ, N)
       N2 = divexact(N2, d)
 
-      @test isrref(N2)
+      @test is_rref(N2)
    end
 
 
@@ -2592,7 +2592,7 @@ end
       r, A, d = rref_rational(M)
 
       @test r == i
-      @test isrref(A)
+      @test is_rref(A)
    end
 
    # Exact field
@@ -2607,7 +2607,7 @@ end
       r, A = rref(M)
 
       @test r == i
-      @test isrref(A)
+      @test is_rref(A)
    end
 
    R = GF(7)
@@ -2621,7 +2621,7 @@ end
       r, N = rref(M)
 
       @test r == rank
-      @test isrref(N)
+      @test is_rref(N)
    end
 
    # Multiple level exact ring
@@ -2636,60 +2636,60 @@ end
       r, A, d = rref_rational(M)
 
       @test r == i
-      @test isrref(A)
+      @test is_rref(A)
    end
 end
 
-@testset "Generic.Mat.isinvertible" begin
+@testset "Generic.Mat.is_invertible" begin
    R, x = PolynomialRing(QQ, "x")
 
    let
       M = matrix(R, 1, 1, [R(1)])
 
-      @test isinvertible(M)
-      (flag, _) = isinvertible_with_inverse(M)
+      @test is_invertible(M)
+      (flag, _) = is_invertible_with_inverse(M)
       @test flag
-      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      (flag, _) = is_invertible_with_inverse(M; side = :right)
       @test flag
    end
 
    let
       M = matrix(R, 1, 1, [x])
 
-      @test !isinvertible(M)
-      (flag, _) = isinvertible_with_inverse(M)
+      @test !is_invertible(M)
+      (flag, _) = is_invertible_with_inverse(M)
       @test !flag
-      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      (flag, _) = is_invertible_with_inverse(M; side = :right)
       @test !flag
    end
 
    let
       M = matrix(ZZ, 2, 2, [1, 1, 1, 1])
 
-      @test !isinvertible(M)
-      (flag, _) = isinvertible_with_inverse(M)
+      @test !is_invertible(M)
+      (flag, _) = is_invertible_with_inverse(M)
       @test !flag
-      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      (flag, _) = is_invertible_with_inverse(M; side = :right)
       @test !flag
    end
 
    let
       M = matrix(QQ, 4, 4, [1, 1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1, -1, -1, 1])
 
-      @test isinvertible(M)
-      (flag, _) = isinvertible_with_inverse(M)
+      @test is_invertible(M)
+      (flag, _) = is_invertible_with_inverse(M)
       @test flag
-      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      (flag, _) = is_invertible_with_inverse(M; side = :right)
       @test flag
    end
 
    let
       M = matrix(QQ, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 0])
 
-      @test isinvertible(M)
-      (flag, _) = isinvertible_with_inverse(M)
+      @test is_invertible(M)
+      (flag, _) = is_invertible_with_inverse(M)
       @test flag
-      (flag, _) = isinvertible_with_inverse(M; side = :right)
+      (flag, _) = is_invertible_with_inverse(M; side = :right)
       @test flag
    end
 
@@ -2704,9 +2704,9 @@ end
 
       I_m = matrix(QQ, m, m, [i == j ? 1 : 0 for i in 1:m, j in 1:m])
 
-      (flag_l, x_l) = isinvertible_with_inverse(L_l; side = :left)
+      (flag_l, x_l) = is_invertible_with_inverse(L_l; side = :left)
       @test flag_l && x_l * L_l == I_m
-      (flag_r, x_r) = isinvertible_with_inverse(L_r; side = :right)
+      (flag_r, x_r) = is_invertible_with_inverse(L_r; side = :right)
       @test flag_r && L_r * x_r == I_m
    end
 
@@ -2716,10 +2716,10 @@ end
 
       L = randmat_with_rank(M, rand(0:n-1), -10:10)
 
-      @test !isinvertible(L)
-      (flag, _) = isinvertible_with_inverse(L; side = :left)
+      @test !is_invertible(L)
+      (flag, _) = is_invertible_with_inverse(L; side = :left)
       @test !flag
-      (flag, _) = isinvertible_with_inverse(L; side = :right)
+      (flag, _) = is_invertible_with_inverse(L; side = :right)
       @test !flag
    end
 end
@@ -2922,7 +2922,7 @@ end
       @test N isa elem_type(R)
       @test c isa eltype(M)
 
-      @test isunit(c)
+      @test is_unit(c)
       @test N[i,j] == -1
       @test M*N == N*M == c*R(1)
 
@@ -3015,7 +3015,7 @@ end
 
          A = hessenberg(M)
 
-         @test ishessenberg(A)
+         @test is_hessenberg(A)
       end
    end
 
@@ -3461,11 +3461,11 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = hnf_minors(A)
-   @test ishnf(H)
+   @test is_hnf(H)
 
    H, U = hnf_minors_with_transform(A)
-   @test ishnf(H)
-   @test isunit(det(U))
+   @test is_hnf(H)
+   @test is_unit(det(U))
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
@@ -3480,11 +3480,11 @@ end
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
 
    H = hnf_minors(B)
-   @test ishnf(H)
+   @test is_hnf(H)
 
    H, U = hnf_minors_with_transform(B)
-   @test ishnf(H)
-   @test isunit(det(U))
+   @test is_hnf(H)
+   @test is_unit(det(U))
    @test U*B == H
 end
 
@@ -3494,7 +3494,7 @@ end
    H, U = AbstractAlgebra.hnf_kb_with_transform(M)
 
    @test H == matrix(ZZ, BigInt[4 1 9; 0 5 3; 0 0 10])
-   @test isunit(det(U))
+   @test is_unit(det(U))
    @test U*M == H
 
    R, x = PolynomialRing(QQ, "x")
@@ -3504,11 +3504,11 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = AbstractAlgebra.hnf_kb(A)
-   @test ishnf(H)
+   @test is_hnf(H)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(A)
-   @test ishnf(H)
-   @test isunit(det(U))
+   @test is_hnf(H)
+   @test is_unit(det(U))
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
@@ -3523,11 +3523,11 @@ end
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    H = AbstractAlgebra.hnf_kb(B)
-   @test ishnf(H)
+   @test is_hnf(H)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(B)
-   @test ishnf(H)
-   @test isunit(det(U))
+   @test is_hnf(H)
+   @test is_unit(det(U))
    @test U*B == H
 
    # hnf_kb! must not assume it "owns" entries of its input
@@ -3562,11 +3562,11 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = AbstractAlgebra.hnf_cohen(A)
-   @test ishnf(H)
+   @test is_hnf(H)
 
    H, U = AbstractAlgebra.hnf_cohen_with_transform(A)
-   @test ishnf(H)
-   @test isunit(det(U))
+   @test is_hnf(H)
+   @test is_unit(det(U))
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
@@ -3581,11 +3581,11 @@ end
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    H = AbstractAlgebra.hnf_cohen(B)
-   @test ishnf(H)
+   @test is_hnf(H)
 
    H, U = AbstractAlgebra.hnf_cohen_with_transform(B)
-   @test ishnf(H)
-   @test isunit(det(U))
+   @test is_hnf(H)
+   @test is_unit(det(U))
    @test U*B == H
 end
 
@@ -3597,11 +3597,11 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = hnf(A)
-   @test ishnf(H)
+   @test is_hnf(H)
 
    H, U = hnf_with_transform(A)
-   @test ishnf(H)
-   @test isunit(det(U))
+   @test is_hnf(H)
+   @test is_unit(det(U))
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
@@ -3616,11 +3616,11 @@ end
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    H = hnf(B)
-   @test ishnf(H)
+   @test is_hnf(H)
 
    H, U = hnf_with_transform(B)
-   @test ishnf(H)
-   @test isunit(det(U))
+   @test is_hnf(H)
+   @test is_unit(det(U))
    @test U*B == H
 end
 
@@ -3632,12 +3632,12 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    T = AbstractAlgebra.snf_kb(A)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(A)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*A*K == T
 
    # Fake up finite field of char 7, degree 2
@@ -3652,12 +3652,12 @@ end
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    T = AbstractAlgebra.snf_kb(B)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(B)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*B*K == T
 
    # snf_kb! must not assume it "owns" entries of its input
@@ -3692,12 +3692,12 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    T = snf(A)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = snf_with_transform(A)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*A*K == T
 
    # Fake up finite field of char 7, degree 2
@@ -3712,12 +3712,12 @@ end
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    T = snf(B)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = snf_with_transform(B)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*B*K == T
 end
 
@@ -3728,12 +3728,12 @@ end
    r = 2 # == rank(A)
 
    P = weak_popov(A)
-   @test isweak_popov(P, r)
+   @test is_weak_popov(P, r)
 
    P, U = weak_popov_with_transform(A)
-   @test isweak_popov(P, r)
+   @test is_weak_popov(P, r)
    @test U*A == P
-   @test isunit(det(U))
+   @test is_unit(det(U))
 
    F = GF(7)
 
@@ -3743,12 +3743,12 @@ end
    s = 2 # == rank(B)
 
    P = weak_popov(B)
-   @test isweak_popov(P, s)
+   @test is_weak_popov(P, s)
 
    P, U = weak_popov_with_transform(B)
-   @test isweak_popov(P, s)
+   @test is_weak_popov(P, s)
    @test U*B == P
-   @test isunit(det(U))
+   @test is_unit(det(U))
 
    # some random tests
 
@@ -3757,12 +3757,12 @@ end
       A = rand(M, -1:5, -5:5)
       r = rank(A)
       P = weak_popov(A)
-      @test isweak_popov(P, r)
+      @test is_weak_popov(P, r)
 
       P, U = weak_popov_with_transform(A)
-      @test isweak_popov(P, r)
+      @test is_weak_popov(P, r)
       @test U*A == P
-      @test isunit(det(U))
+      @test is_unit(det(U))
    end
 
    R = GF(randprime(100))
@@ -3773,12 +3773,12 @@ end
       A = rand(M, 1:5)
       r = rank(A)
       P = weak_popov(A)
-      @test isweak_popov(P, r)
+      @test is_weak_popov(P, r)
 
       P, U = weak_popov_with_transform(A)
-      @test isweak_popov(P, r)
+      @test is_weak_popov(P, r)
       @test U*A == P
-      @test isunit(det(U))
+      @test is_unit(det(U))
    end
 
    R = ResidueField(ZZ, randprime(100))
@@ -3789,12 +3789,12 @@ end
       A = rand(M, -1:5, 0:100)
       r = rank(A)
       P = weak_popov(A)
-      @test isweak_popov(P, r)
+      @test is_weak_popov(P, r)
 
       P, U = weak_popov_with_transform(A)
-      @test isweak_popov(P, r)
+      @test is_weak_popov(P, r)
       @test U*A == P
-      @test isunit(det(U))
+      @test is_unit(det(U))
    end
 end
 
@@ -3805,22 +3805,22 @@ end
    r = 2 # == rank(A)
 
    P = popov(A)
-   @test ispopov(P, r)
+   @test is_popov(P, r)
 
    P, U = popov_with_transform(A)
-   @test ispopov(P, r)
+   @test is_popov(P, r)
    @test U*A == P
-   @test isunit(det(U))
+   @test is_unit(det(U))
 
    A = matrix(R, 3, 3, [ x^4, 0, 0, x^3, x^4, x^3, x^3, x^5, x^5 ])
    r = 3 # == rank(A)
    P = popov(A)
-   @test ispopov(P, r)
+   @test is_popov(P, r)
 
    P, U = popov_with_transform(A)
-   @test ispopov(P, r)
+   @test is_popov(P, r)
    @test U*A == P
-   @test isunit(det(U))
+   @test is_unit(det(U))
 
    F = GF(7)
 
@@ -3830,12 +3830,12 @@ end
    s = 2 # == rank(B)
 
    P = popov(B)
-   @test ispopov(P, s)
+   @test is_popov(P, s)
 
    P, U = popov_with_transform(B)
-   @test ispopov(P, s)
+   @test is_popov(P, s)
    @test U*B == P
-   @test isunit(det(U))
+   @test is_unit(det(U))
 
    # some random tests
 
@@ -3844,12 +3844,12 @@ end
       A = rand(M, -1:5, -5:5)
       r = rank(A)
       P = popov(A)
-      @test ispopov(P, r)
+      @test is_popov(P, r)
 
       P, U = popov_with_transform(A)
-      @test ispopov(P, r)
+      @test is_popov(P, r)
       @test U*A == P
-      @test isunit(det(U))
+      @test is_unit(det(U))
    end
 
    R = GF(randprime(100))
@@ -3860,12 +3860,12 @@ end
       A = rand(M, 1:5)
       r = rank(A)
       P = popov(A)
-      @test ispopov(P, r)
+      @test is_popov(P, r)
 
       P, U = popov_with_transform(A)
-      @test ispopov(P, r)
+      @test is_popov(P, r)
       @test U*A == P
-      @test isunit(det(U))
+      @test is_unit(det(U))
    end
 
    R = ResidueField(ZZ, randprime(100))
@@ -3876,12 +3876,12 @@ end
       A = rand(M, -1:5, 0:100)
       r = rank(A)
       P = popov(A)
-      @test ispopov(P, r)
+      @test is_popov(P, r)
 
       P, U = popov_with_transform(A)
-      @test ispopov(P, r)
+      @test is_popov(P, r)
       @test U*A == P
-      @test isunit(det(U))
+      @test is_unit(det(U))
    end
 end
 

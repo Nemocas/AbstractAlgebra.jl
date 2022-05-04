@@ -277,27 +277,27 @@ end
 
    @test iszero(zero(S))
    @test isone(one(S))
-   @test isgen(gen(S))
-   @test isunit(one(S))
-   @test isconstant(zero(S))
-   @test isconstant(one(S))
-   @test !isconstant(gen(S))
+   @test is_gen(gen(S))
+   @test is_unit(one(S))
+   @test is_constant(zero(S))
+   @test is_constant(one(S))
+   @test !is_constant(gen(S))
 
-   @test ismonic(R(1))
-   @test ismonic(x^2 + 3)
-   @test ismonic(y^2 + x*y + 1)
-   @test !ismonic(x^2*y + 3x + 1)
-   @test !ismonic(x^2*y + 3x + 2y + 1)
-   @test !ismonic(-R(1))
-   @test !ismonic(-2x^2*y + 3x + 2y + 1)
+   @test is_monic(R(1))
+   @test is_monic(x^2 + 3)
+   @test is_monic(y^2 + x*y + 1)
+   @test !is_monic(x^2*y + 3x + 1)
+   @test !is_monic(x^2*y + 3x + 2y + 1)
+   @test !is_monic(-R(1))
+   @test !is_monic(-2x^2*y + 3x + 2y + 1)
 
-   @test isconstant(S())
-   @test isconstant(S(1))
-   @test !isconstant(y)
+   @test is_constant(S())
+   @test is_constant(S(1))
+   @test !is_constant(y)
 
    f = 2x*y + x^2 + 1
 
-   @test !isconstant(f)
+   @test !is_constant(f)
    @test leading_coefficient(f) == 2x
    @test trailing_coefficient(2x*y + x^2) == x^2
    @test constant_coefficient(y^2 + 2x) == 2x
@@ -335,18 +335,18 @@ end
 
    @test deepcopy(h) == h
 
-   @test isterm_recursive(2*x*y^2)
-   @test !isterm_recursive(2*(x + 1)*y^2)
+   @test is_term_recursive(2*x*y^2)
+   @test !is_term_recursive(2*(x + 1)*y^2)
 
-   @test !isterm(2*x*y^2 + 1)
-   @test isterm(2*x*y^2)
+   @test !is_term(2*x*y^2 + 1)
+   @test is_term(2*x*y^2)
 
-   @test !ismonomial_recursive(2*x*y^2)
+   @test !is_monomial_recursive(2*x*y^2)
 
-   @test ismonomial(y^2)
+   @test is_monomial(y^2)
 
-   @test !ismonomial_recursive(2*x*y^2 + y + 1)
-   @test !ismonomial(2*y^2)
+   @test !is_monomial_recursive(2*x*y^2 + y + 1)
+   @test !is_monomial(2*y^2)
 
    @test characteristic(R) == 0
 end
@@ -2610,7 +2610,7 @@ end
       while d
          f = rand(R, 0:10, -10:10)
          g = rand(R, 0:10, -10:10)
-         while isunit(g)
+         while is_unit(g)
            g = rand(R, 0:10, -10:10)
          end
 
@@ -2655,7 +2655,7 @@ end
       while d
          f = rand(R, 0:10, -10:10)
          g = rand(R, 0:10, -10:10)
-         while isunit(g)
+         while is_unit(g)
             g = rand(R, 0:10, -10:10)
          end
 
@@ -2693,7 +2693,7 @@ end
       while d
          f = rand(R, 0:10, 0:22)
          g = rand(R, 0:10, 0:22)
-         while isunit(g)
+         while is_unit(g)
             f = rand(R, 0:10, 0:22)
             g = rand(R, 0:10, 0:22)
          end
@@ -2731,7 +2731,7 @@ end
       while d
          f = rand(R, 0:10)
          g = rand(R, 0:10)
-         while isunit(g)
+         while is_unit(g)
             g = rand(R, 0:10)
          end
 
@@ -2767,7 +2767,7 @@ end
 
       p = f^2
 
-      @test issquare(p)
+      @test is_square(p)
 
       q = sqrt(f^2)
 
@@ -2781,7 +2781,7 @@ end
          @test_throws ErrorException sqrt(f^2*x)
       end
 
-      f1, s1 = issquare_with_sqrt(f)
+      f1, s1 = is_square_with_sqrt(f)
 
       @test !f1 || f == s1^2
    end
@@ -2793,7 +2793,7 @@ end
 
       p = f^2
 
-      @test issquare(p)
+      @test is_square(p)
 
       q = sqrt(f^2)
 
@@ -2807,19 +2807,19 @@ end
          @test_throws ErrorException sqrt(f^2*x)
       end
 
-      f1, s1 = issquare_with_sqrt(f)
+      f1, s1 = is_square_with_sqrt(f)
 
       @test !f1 || f == s1^2
    end
 
    f = x^2 + x + 1//4
 
-   @test issquare(f) # duplication intended, see #1075
-   @test issquare(f) # duplication intended, see #1075
+   @test is_square(f) # duplication intended, see #1075
+   @test is_square(f) # duplication intended, see #1075
 
    f = -1//8*x^17 - 11//16*x^16 + 1//2*x^15 - 1//3*x^14 + 4//3*x^13 + 3//5*x^12 + 5//4*x^11 - 7//15*x^10 + 1//5*x^9 + 1//4*x^8 + 1//3*x^7 - 2*x^6 + 8//3*x^5 + 14*x^4 - x^2 + 9//2*x - 2//7
 
-   @test issquare(f^2) # see #1075
+   @test is_square(f^2) # see #1075
 
    # Characteristic p field
    for p in [2, 7, 19, 65537, ZZ(2), ZZ(7), ZZ(19), ZZ(65537)]
@@ -2832,7 +2832,7 @@ end
 
          s = f^2
 
-         @test issquare(s)
+         @test is_square(s)
 
          q = sqrt(f^2)
 
@@ -2846,7 +2846,7 @@ end
             @test_throws ErrorException sqrt(f^2*x)
          end
 
-         f1, s1 = issquare_with_sqrt(f)
+         f1, s1 = is_square_with_sqrt(f)
 
          @test !f1 || f == s1^2
       end

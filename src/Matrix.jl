@@ -15,10 +15,10 @@ export MatrixSpace, add_column, add_column!, add_row, add_row!,
        hessenberg!, hessenberg, hnf, hnf_cohen, hnf_cohen_with_transform,
        hnf_kb, hnf_kb!, hnf_kb_with_transform, hnf_minors,
        hnf_minors_with_transform, hnf_via_popov, hnf_via_popov_with_transform,
-       hnf_with_transform, identity_matrix, ishessenberg, ishnf, isinvertible,
-       isinvertible_with_inverse, ispopov, isrref, issnf, issquare, istriu,
+       hnf_with_transform, identity_matrix, is_hessenberg, is_hnf, is_invertible,
+       is_invertible_with_inverse, is_popov, is_rref, is_snf, is_square, is_triu,
        is_skew_symmetric,
-       isweak_popov, iszero_column, iszero_row, kernel, kronecker_product,
+       is_weak_popov, is_zero_column, is_zero_row, kernel, kronecker_product,
        left_kernel, lu, lu!, map_entries, map_entries!, matrix, minpoly,
        minors, multiply_column, multiply_column!, multiply_row, multiply_row!,
        nrows, ncols, pfaffian, pfaffians, popov, popov_with_transform, powers,
@@ -76,7 +76,7 @@ function _checkbounds(A, rows::AbstractArray{Int}, cols::AbstractArray{Int})
 end
 
 function check_square(A::MatrixElem{T}) where T <: NCRingElement
-   issquare(A) || throw(DomainError(A, "matrix must be square"))
+   is_square(A) || throw(DomainError(A, "matrix must be square"))
    A
 end
 
@@ -216,7 +216,7 @@ function iszero(a::MatrixElem{T}) where T <: NCRingElement
 end
 
 function isone(a::MatrixElem{T}) where T <: NCRingElement
-   issquare(a) || return false
+   is_square(a) || return false
    for i = 1:nrows(a)
       for j = 1:ncols(a)
          if i == j
@@ -234,11 +234,11 @@ function isone(a::MatrixElem{T}) where T <: NCRingElement
 end
 
 @doc Markdown.doc"""
-    iszero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
+    is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
 
 Return `true` if the $i$-th row of the matrix $M$ is zero.
 """
-function iszero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
+function is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
   for j in 1:ncols(M)
     if !iszero(M[i, j])
       return false
@@ -248,11 +248,11 @@ function iszero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
 end
 
 @doc Markdown.doc"""
-    iszero_column(M::MatrixElem{T}, i::Int) where T <: NCRingElement
+    is_zero_column(M::MatrixElem{T}, i::Int) where T <: NCRingElement
 
 Return `true` if the $i$-th column of the matrix $M$ is zero.
 """
-function iszero_column(M::MatrixElem{T}, i::Int) where T <: NCRingElement
+function is_zero_column(M::MatrixElem{T}, i::Int) where T <: NCRingElement
   for j in 1:nrows(M)
     if !iszero(M[j, i])
       return false
@@ -556,7 +556,7 @@ setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}
 
 ################################################################################
 #
-#   Size, axes and issquare
+#   Size, axes and is_square
 #
 ################################################################################
 
@@ -1010,7 +1010,7 @@ Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: NCRingElement, T <:
 Return $a^b$. We require that the matrix $a$ is square.
 """
 function ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
-   !issquare(a) && error("Incompatible matrix dimensions in power")
+   !is_square(a) && error("Incompatible matrix dimensions in power")
    if b < 0
       return inv(a)^(-b)
    end
@@ -1203,13 +1203,13 @@ end
 ###############################################################################
 
 """
-    issymmetric(a::MatrixElem{T}) where T <: RingElement
+    is_symmetric(a::MatrixElem{T}) where T <: RingElement
 
 Return `true` if the given matrix is symmetric with respect to its main
 diagonal, i.e., `tr(M) == M`, otherwise return `false`.
 """
-function issymmetric(a::MatrixElem{T}) where T <: NCRingElement
-    if !issquare(a)
+function is_symmetric(a::MatrixElem{T}) where T <: NCRingElement
+    if !is_square(a)
         return false
     end
     for row in 2:nrows(a)
@@ -1284,7 +1284,7 @@ Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
 require the matrix to be square.
 """
 function tr(x::MatrixElem{T}) where T <: RingElement
-   !issquare(x) && error("Not a square matrix in trace")
+   !is_square(x) && error("Not a square matrix in trace")
    d = zero(base_ring(x))
    for i = 1:nrows(x)
       d = addeq!(d, x[i, i])
@@ -1440,7 +1440,7 @@ function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldEle
 end
 
 function fflu!(P::Perm, A::MatrixElem{T}) where {T <: RingElement}
-   if !isdomain_type(T)
+   if !is_domain_type(T)
       error("Not implemented")
    end
    m = nrows(A)
@@ -1757,12 +1757,12 @@ function rref(M::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc Markdown.doc"""
-    isrref(M::MatrixElem{T}) where {T <: RingElement}
+    is_rref(M::MatrixElem{T}) where {T <: RingElement}
 
 Return `true` if $M$ is in reduced row echelon form, otherwise return
 `false`.
 """
-function isrref(M::MatrixElem{T}) where {T <: RingElement}
+function is_rref(M::MatrixElem{T}) where {T <: RingElement}
    m = nrows(M)
    n = ncols(M)
    c = 1
@@ -1787,12 +1787,12 @@ function isrref(M::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    isrref(M::MatrixElem{T}) where {T <: FieldElement}
+    is_rref(M::MatrixElem{T}) where {T <: FieldElement}
 
 Return `true` if $M$ is in reduced row echelon form, otherwise return
 `false`.
 """
-function isrref(M::MatrixElem{T}) where {T <: FieldElement}
+function is_rref(M::MatrixElem{T}) where {T <: FieldElement}
    m = nrows(M)
    n = ncols(M)
    c = 1
@@ -1995,7 +1995,7 @@ end
 Return the determinant of the matrix $M$. We assume $M$ is square.
 """
 function det(M::MatrixElem{T}) where {T <: FieldElement}
-   !issquare(M) && error("Not a square matrix in det")
+   !is_square(M) && error("Not a square matrix in det")
    if nrows(M) == 0
       return one(base_ring(M))
    end
@@ -2008,7 +2008,7 @@ end
 Return the determinant of the matrix $M$. We assume $M$ is square.
 """
 function det(M::MatrixElem{T}) where {T <: RingElement}
-   !issquare(M) && error("Not a square matrix in det")
+   !is_square(M) && error("Not a square matrix in det")
    if nrows(M) == 0
       return one(base_ring(M))
    end
@@ -2021,7 +2021,7 @@ end
 
 function det_interpolation(M::MatrixElem{T}) where {T <: PolyElem}
    n = nrows(M)
-   !isdomain_type(elem_type(typeof(base_ring(base_ring(M))))) &&
+   !is_domain_type(elem_type(typeof(base_ring(base_ring(M))))) &&
           error("Generic interpolation requires a domain type")
    R = base_ring(M)
    if n == 0
@@ -2056,7 +2056,7 @@ function det_interpolation(M::MatrixElem{T}) where {T <: PolyElem}
 end
 
 function det(M::MatrixElem{T}) where {S <: FinFieldElem, T <: PolyElem{S}}
-   !issquare(M) && error("Not a square matrix in det")
+   !is_square(M) && error("Not a square matrix in det")
    if nrows(M) == 0
       return one(base_ring(M))
    end
@@ -2064,7 +2064,7 @@ function det(M::MatrixElem{T}) where {S <: FinFieldElem, T <: PolyElem{S}}
 end
 
 function det(M::MatrixElem{T}) where {T <: PolyElem}
-   !issquare(M) && error("Not a square matrix in det")
+   !is_square(M) && error("Not a square matrix in det")
    if nrows(M) == 0
       return one(base_ring(M))
    end
@@ -2248,7 +2248,7 @@ function pfaffian_bfl(M::MatElem)
 end
 
 function trace_of_prod(M::MatElem, N::MatElem)
-   issquare(M) && issquare(N) || error("Not a square matrix in trace")
+   is_square(M) && is_square(N) || error("Not a square matrix in trace")
    d = zero(base_ring(M))
    for i = 1:nrows(M)
       d += (M[i, :] * N[:, i])[1, 1]
@@ -3061,11 +3061,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    istriu(A::MatrixElem{T}) where T <: RingElement
+    is_triu(A::MatrixElem{T}) where T <: RingElement
 
 Return `true` if $A$ is an upper triangular matrix.
 """
-function istriu(A::MatrixElem{T}) where T <: RingElement
+function is_triu(A::MatrixElem{T}) where T <: RingElement
    m = nrows(A)
    n = ncols(A)
    d = 0
@@ -3362,14 +3362,14 @@ will be the determinant of $M$ up to sign. If $M$ is singular an exception
 is raised.
 """
 function pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
-   issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    flag, X, d = can_solve_with_solution_fflu(M, identity_matrix(M))
    !flag && error("Singular matrix in pseudo_inv")
    return X, d
 end
 
 function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
-   issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    flag, A = can_solve_with_solution_lu(M, identity_matrix(M))
    !flag && error("Singular matrix in inv")
    return A
@@ -3384,9 +3384,9 @@ identity matrix. If $M$ is not invertible over the base ring an exception is
 raised.
 """
 function Base.inv(M::MatrixElem{T}) where {T <: RingElement}
-   issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    X, d = pseudo_inv(M)
-   isunit(d) || throw(DomainError(M, "Matrix is not invertible."))
+   is_unit(d) || throw(DomainError(M, "Matrix is not invertible."))
    return divexact(X, d)
 end
 
@@ -3397,7 +3397,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    isinvertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+    is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
 
 Given an $n\times m$ matrix $A$ over a ring, return a tuple `(flag, B)`.
 If `side` is `:right` and `flag` is true, $B$ is the right inverse of $A$
@@ -3405,7 +3405,7 @@ i.e. $AB$ is the $n\times n$ unit matrix. If `side` is `:left` and `flag` is
 true, $B$ is the left inverse of $A$ i.e. $BA$ is the $m\times m$ unit matrix.
 If `flag` is false, no right or left inverse exists.
 """
-function isinvertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+function is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
    if (side == :left && nrows(A) < ncols(A)) || (side == :right && ncols(A) < nrows(A))
       return (false, zero(A, 0, 0))
    end
@@ -3417,14 +3417,14 @@ function isinvertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where
 end
 
 @doc Markdown.doc"""
-    isinvertible(A::MatrixElem{T}) where {T <: RingElement}
+    is_invertible(A::MatrixElem{T}) where {T <: RingElement}
 
 Return true if a given square matrix is invertible, false otherwise. If
-the inverse should also be computed, use `isinvertible_with_inverse`.
+the inverse should also be computed, use `is_invertible_with_inverse`.
 """
-isinvertible(A::MatrixElem{T}) where {T <: RingElement} = issquare(A) && isunit(det(A))
+is_invertible(A::MatrixElem{T}) where {T <: RingElement} = is_square(A) && is_unit(det(A))
 
-isinvertible(A::MatrixElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) == rank(A)
+is_invertible(A::MatrixElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) == rank(A)
 
 ###############################################################################
 #
@@ -3544,12 +3544,12 @@ function is guaranteed to be in flipped upper triangular format (i.e. upper
 triangular format if columns and rows are reversed).
 """
 function left_kernel(x::MatElem{T}) where T <: RingElement
-   !isdomain_type(elem_type(base_ring(x))) && error("Not implemented")
+   !is_domain_type(elem_type(base_ring(x))) && error("Not implemented")
    R = base_ring(x)
    H, U = hnf_with_transform(x)
    i = nrows(H)
    zero_rows = false
-   while i > 0 && iszero_row(H, i)
+   while i > 0 && is_zero_row(H, i)
       zero_rows = true
       i -= 1
    end
@@ -3606,7 +3606,7 @@ end
 ###############################################################################
 
 function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
-   !issquare(A) && error("Dimensions don't match in hessenberg")
+   !is_square(A) && error("Dimensions don't match in hessenberg")
    R = base_ring(A)
    n = nrows(A)
    u = R()
@@ -3657,19 +3657,19 @@ above and on the diagonal and in the diagonal line immediately below the
 diagonal.
 """
 function hessenberg(A::MatrixElem{T}) where {T <: RingElement}
-   !issquare(A) && error("Dimensions don't match in hessenberg")
+   !is_square(A) && error("Dimensions don't match in hessenberg")
    M = deepcopy(A)
    hessenberg!(M)
    return M
 end
 
 @doc Markdown.doc"""
-    ishessenberg(A::MatrixElem{T}) where {T <: RingElement}
+    is_hessenberg(A::MatrixElem{T}) where {T <: RingElement}
 
 Return `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
-function ishessenberg(A::MatrixElem{T}) where {T <: RingElement}
-   if !issquare(A)
+function is_hessenberg(A::MatrixElem{T}) where {T <: RingElement}
+   if !is_square(A)
       return false
    end
    n = nrows(A)
@@ -3690,7 +3690,7 @@ end
 ###############################################################################
 
 function charpoly_hessenberg!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
-   !issquare(A) && error("Dimensions don't match in charpoly")
+   !is_square(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
@@ -3716,7 +3716,7 @@ function charpoly_hessenberg!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
 end
 
 function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
-   !issquare(A) && error("Dimensions don't match in charpoly")
+   !is_square(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
@@ -3834,7 +3834,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
 end
 
 function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
-   !issquare(A) && error("Dimensions don't match in charpoly")
+   !is_square(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
@@ -3939,7 +3939,7 @@ polynomial ring $R$ of the resulting polynomial must be supplied
 and the matrix is assumed to be square.
 """
 function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
-   !issquare(Y) && error("Dimensions don't match in charpoly")
+   !is_square(Y) && error("Dimensions don't match in charpoly")
    R = base_ring(Y)
    base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
    n = nrows(Y)
@@ -4020,7 +4020,7 @@ Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
-   !issquare(M) && error("Not a square matrix in minpoly")
+   !is_square(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
    if n == 0
@@ -4116,7 +4116,7 @@ Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   !issquare(M) && error("Not a square matrix in minpoly")
+   !is_square(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
    if n == 0
@@ -4811,11 +4811,11 @@ function hnf_with_transform(A)
 end
 
 @doc Markdown.doc"""
-    ishnf(M::MatrixElem{T}) where T <: RingElement
+    is_hnf(M::MatrixElem{T}) where T <: RingElement
 
 Return `true` if the matrix is in Hermite normal form.
 """
-function ishnf(M::MatrixElem{T}) where T <: RingElement
+function is_hnf(M::MatrixElem{T}) where T <: RingElement
    r = nrows(M)
    c = ncols(M)
    row = 1
@@ -4865,11 +4865,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    issnf(A::MatrixElem{T}) where T <: RingElement
+    is_snf(A::MatrixElem{T}) where T <: RingElement
 
 Return `true` if $A$ is in Smith Normal Form.
 """
-function issnf(A::MatrixElem{T}) where T <: RingElement
+function is_snf(A::MatrixElem{T}) where T <: RingElement
    m = nrows(A)
    n = ncols(A)
    a = A[1, 1]
@@ -5040,11 +5040,11 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    isweak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+    is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
 
 Return `true` if $P$ is a matrix in weak Popov form of the given rank.
 """
-function isweak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
    zero_rows = 0
    pivots = zeros(ncols(P))
    for r = 1:nrows(P)
@@ -5066,11 +5066,11 @@ function isweak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
 end
 
 @doc Markdown.doc"""
-    ispopov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+    is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
 
 Return `true` if $P$ is a matrix in Popov form with the given rank.
 """
-function ispopov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+function is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
    zero_rows = 0
    for r = 1:nrows(P)
       p = find_pivot_popov(P, r)
@@ -6292,7 +6292,7 @@ end
 randmat_triu(S::MatSpace, v...) = randmat_triu(Random.GLOBAL_RNG, S, v...)
 
 function randmat_with_rank(rng::AbstractRNG, S::MatSpace{T}, rank::Int, v...) where {T <: RingElement}
-   if !isdomain_type(T) && !(T <: ResElem)
+   if !is_domain_type(T) && !(T <: ResElem)
       error("Not implemented")
    end
    M = S()

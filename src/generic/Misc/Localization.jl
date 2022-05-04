@@ -28,7 +28,7 @@ mutable struct Loc{T} <: AbstractAlgebra.Ring
       end
    end
    function Loc{T}(prime::T, cached::Bool = true, comp::Bool = false) where {T <: RingElem}
-     isunit(prime) && error("no-point")
+     is_unit(prime) && error("no-point")
      if cached && haskey(LocDict, (parent(prime), prime, comp))
        return LocDict[parent(prime), prime, comp]::Loc{T}
      else
@@ -152,7 +152,7 @@ iszero(a::LocElem) = iszero(data(a))
 
 isone(a::LocElem) = isone(data(a))
 
-function isunit(a::LocElem{T})  where {T <: RingElem}
+function is_unit(a::LocElem{T})  where {T <: RingElem}
   return isin(inv(a.data), parent(a))
 end
 

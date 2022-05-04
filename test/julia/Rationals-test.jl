@@ -32,8 +32,8 @@ end
    R = qq
    S = QQ
 
-   @test isunit(R(3))
-   @test isunit(S(3))
+   @test is_unit(R(3))
+   @test is_unit(S(3))
 end
 
 @testset "Julia.Rationals.exact_division" begin
@@ -103,26 +103,26 @@ end
 
       @test AbstractAlgebra.sqrt(f)^2 == f
       @test AbstractAlgebra.sqrt(g)^2 == g
-      @test issquare(f)
-      @test issquare(g)
+      @test is_square(f)
+      @test is_square(g)
    
-      @test issquare_with_sqrt(f) == (true, abs(r))
-      @test issquare_with_sqrt(g) == (true, abs(s))
+      @test is_square_with_sqrt(f) == (true, abs(r))
+      @test is_square_with_sqrt(g) == (true, abs(s))
    end
 
-   @test issquare(-R(1)) == false
-   @test issquare(-S(1)) == false
+   @test is_square(-R(1)) == false
+   @test is_square(-S(1)) == false
 
-   @test issquare_with_sqrt(-R(1)) == (false, 0)
-   @test issquare_with_sqrt(-S(1)) == (false, 0)
-   @test issquare_with_sqrt(R(3)) == (false, 0)
-   @test issquare_with_sqrt(S(3)) == (false, 0)
-   @test issquare_with_sqrt(R(2, 9)) == (false, 0)
-   @test issquare_with_sqrt(R(1, 5)) == (false, 0)
-   @test issquare_with_sqrt(R(3, 7)) == (false, 0)
-   @test issquare_with_sqrt(S(2, 9)) == (false, 0)
-   @test issquare_with_sqrt(S(1, 5)) == (false, 0)
-   @test issquare_with_sqrt(S(3, 7)) == (false, 0)
+   @test is_square_with_sqrt(-R(1)) == (false, 0)
+   @test is_square_with_sqrt(-S(1)) == (false, 0)
+   @test is_square_with_sqrt(R(3)) == (false, 0)
+   @test is_square_with_sqrt(S(3)) == (false, 0)
+   @test is_square_with_sqrt(R(2, 9)) == (false, 0)
+   @test is_square_with_sqrt(R(1, 5)) == (false, 0)
+   @test is_square_with_sqrt(R(3, 7)) == (false, 0)
+   @test is_square_with_sqrt(S(2, 9)) == (false, 0)
+   @test is_square_with_sqrt(S(1, 5)) == (false, 0)
+   @test is_square_with_sqrt(S(3, 7)) == (false, 0)
 end
 
 @testset "Julia.Rationals.root" begin
@@ -171,16 +171,16 @@ end
             p = T(p)
             q = T(q)
 
-            @test ispower(p//q, n)
+            @test is_power(p//q, n)
 
-            flag, r = ispower_with_root(p//q, n)
+            flag, r = is_power_with_root(p//q, n)
 
             @test flag && r == a//b
          end
       end
 
-      @test_throws DomainError ispower(Rational{T}(5//3), -1)
-      @test_throws DomainError ispower_with_root(Rational{T}(5//3), 0)
+      @test_throws DomainError is_power(Rational{T}(5//3), -1)
+      @test_throws DomainError is_power_with_root(Rational{T}(5//3), 0)
    end
 end
 

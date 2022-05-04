@@ -98,7 +98,7 @@ function var_index(a::LaurentMPolyWrap)
     return z
 end
 
-function isgen(a::LaurentMPolyWrap)
+function is_gen(a::LaurentMPolyWrap)
     return !iszero(_var_index(a))
 end
 

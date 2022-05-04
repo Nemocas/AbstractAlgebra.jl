@@ -142,7 +142,7 @@ end
     a = normalise(a)
     @test length(a) == 0
     @test isone(a)
-    @test isunit(a)
+    @test is_unit(a)
     @test a == 1
 
     a = one(FF)

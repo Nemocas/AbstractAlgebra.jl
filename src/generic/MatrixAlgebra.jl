@@ -22,9 +22,9 @@ Return the parent object of the given matrix.
 parent(a::MatAlgElem{T}, cached::Bool = true) where T <: NCRingElement =
     MatAlgebra{T}(a.base_ring, size(a.entries)[1], cached)
 
-isexact_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = isexact_type(T)
+is_exact_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = is_exact_type(T)
 
-isdomain_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = false
+is_domain_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = false
 
 ###############################################################################
 #

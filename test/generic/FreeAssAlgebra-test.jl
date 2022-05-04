@@ -91,12 +91,12 @@
          @test_throws ArgumentError leading_exponent_word(f1)
       end
 
-      @test !isgen(zero(S))
-      @test !isgen(one(S))
+      @test !is_gen(zero(S))
+      @test !is_gen(one(S))
       for i in 1:num_vars
          g = gen(S, i)
-         @test isgen(g)
-         @test !isgen(g + 1)
+         @test is_gen(g)
+         @test !is_gen(g + 1)
          @test leading_exponent_word(g) == [i]
       end
 

@@ -104,7 +104,7 @@ end
 
    h = one(T)
 
-   @test isunit(h)
+   @test is_unit(h)
 
    @test isone(h)
 
@@ -304,11 +304,11 @@ end
 
           if !iszero(a)
              z = rand(R, 1:p - 1)
-             while issquare(z)
+             while is_square(z)
                 z = rand(R, 1:p - 1)
              end
 
-             @test !issquare(z*a)
+             @test !is_square(z*a)
              @test_throws ErrorException sqrt(z*a)
          end
       end
@@ -324,11 +324,11 @@ end
 
           if !iszero(a)
              z = rand(R, 1:Int(p - 1))
-             while issquare(z)
+             while is_square(z)
                 z = rand(R, 1:Int(p - 1))
              end
 
-             @test !issquare(z*a)
+             @test !is_square(z*a)
              @test_throws ErrorException sqrt(z*a)
          end
       end

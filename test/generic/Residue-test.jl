@@ -7,7 +7,7 @@ function test_elem(R::AbstractAlgebra.Generic.ResRing{AbstractAlgebra.Generic.Po
 end
 
 @testset "Generic.Res.conformance_tests" begin
-   test_Ring_interface(ResidueRing(ZZ, 1))   # isgen fails on polys
+   test_Ring_interface(ResidueRing(ZZ, 1))   # is_gen fails on polys
    test_Ring_interface_recursive(ResidueRing(ZZ, -4))
 
    #
@@ -147,7 +147,7 @@ end
 
    h = one(T)
 
-   @test isunit(h)
+   @test is_unit(h)
 
    @test isone(h)
 
@@ -168,7 +168,7 @@ end
 
    @test isone(one(T))
    @test iszero(zero(T))
-   @test isunit(T(x))
+   @test is_unit(T(x))
    @test canonical_unit(T(x)) == T(x)
    @test modulus(T) == x^2 + 1
 

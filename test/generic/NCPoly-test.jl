@@ -70,9 +70,9 @@ end
 
    @test isone(one(S))
 
-   @test isgen(gen(S))
+   @test is_gen(gen(S))
 
-   @test isunit(one(S))
+   @test is_unit(one(S))
 
    f = 2*y + 1
 
@@ -95,13 +95,13 @@ end
 
    @test deepcopy(h) == h
 
-   @test isterm(rand(R, -10:10)*y^2)
+   @test is_term(rand(R, -10:10)*y^2)
 
-   @test !ismonomial(2*y^2)
+   @test !is_monomial(2*y^2)
 
-   @test ismonomial(y^2)
+   @test is_monomial(y^2)
 
-   @test !ismonomial(y^2 + y + 1)
+   @test !is_monomial(y^2 + y + 1)
 end
 
 @testset "Generic.NCPoly.rand" begin

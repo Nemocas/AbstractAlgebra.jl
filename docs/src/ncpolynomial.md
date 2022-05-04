@@ -195,15 +195,15 @@ gen(::NCPolyRing)
 ```
 
 ```@docs
-isgen(::NCPolyElem)
+is_gen(::NCPolyElem)
 ```
 
 ```@docs
-ismonomial(::NCPolyElem)
+is_monomial(::NCPolyElem)
 ```
 
 ```@docs
-isterm(::NCPolyElem)
+is_term(::NCPolyElem)
 ```
 
 **Examples**
@@ -236,19 +236,19 @@ x
 julia> y = gen(T)
 y
 
-julia> g = isgen(y)
+julia> g = is_gen(y)
 true
 
-julia> m = isunit(b)
+julia> m = is_unit(b)
 true
 
 julia> n = degree(d)
 2
 
-julia> isterm(2y^2)
+julia> is_term(2y^2)
 true
 
-julia> ismonomial(y^2)
+julia> is_monomial(y^2)
 true
 
 ```

@@ -14,8 +14,8 @@ base_ring(R::NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)
 
 coefficient_ring(R::NCPolyRing) = base_ring(R)
 
-function isexact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyElem{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyElem{S}}
+   return is_exact_type(S)
 end
 
 @doc Markdown.doc"""
@@ -60,7 +60,7 @@ Return the generator of the given polynomial ring.
 """
 gen(R::NCPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
-isterm(a::T) where T <: NCRingElem = true
+is_term(a::T) where T <: NCRingElem = true
 
 ###############################################################################
 #
@@ -216,7 +216,7 @@ function ^(a::NCPolyElem{T}, b::Int) where T <: NCRingElem
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    R = parent(a)
-   if isgen(a)
+   if is_gen(a)
       z = R()
       fit!(z, b + 1)
       z = setcoeff!(z, b, deepcopy(coeff(a, 1)))

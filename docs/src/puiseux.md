@@ -238,7 +238,7 @@ modulus{T <: ResElem}(::Generic.PuiseuxSeriesElem{T})
 ```
 
 ```@docs
-isgen(::Generic.PuiseuxSeriesElem)
+is_gen(::Generic.PuiseuxSeriesElem)
 ```
 
 **Examples**
@@ -256,10 +256,10 @@ O(x^4)
 julia> b = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)
 (3 + t + O(t^10))*x + (1 + t^2 + O(t^10))*x^2 + O(x^4)
 
-julia> k = isgen(gen(R))
+julia> k = is_gen(gen(R))
 true
 
-julia> m = isunit(-1 + x^(1//3) + 2x^2)
+julia> m = is_unit(-1 + x^(1//3) + 2x^2)
 true
 
 julia> n = valuation(a)

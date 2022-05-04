@@ -161,7 +161,7 @@ See also [`valuation`](@ref), which only returns the valuation.
 """
 function remove(a::T, b::T) where T <: Union{RingElem, Number}
    parent(a) == parent(b) || error("Incompatible parents")
-   if (iszero(b) || isunit(b))
+   if (iszero(b) || is_unit(b))
       throw(ArgumentError("Second argument must be a non-zero non-unit"))
    end
    if iszero(a)
@@ -289,16 +289,16 @@ Return a squarefree factorization of the element $a$ as a `Fac{T}`.
 function factor_squarefree end
 
 @doc Markdown.doc"""
-    isirreducible(a)
+    is_irreducible(a)
 
 Return `true` if $a$ is irreducible, else return `false`.
 """
-function isirreducible end
+function is_irreducible end
 
 @doc Markdown.doc"""
-    issquarefree(a)
+    is_squarefree(a)
 
 Return `true` if $a$ is squarefree, else return `false`.
 """
-function issquarefree end
+function is_squarefree end
 

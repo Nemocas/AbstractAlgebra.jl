@@ -132,7 +132,7 @@ The functionality below supplements that provided by Julia itself for its `BigIn
 julia> r = ZZ(-1)
 -1
 
-julia> isunit(r)
+julia> is_unit(r)
 true
 
 ```
@@ -140,7 +140,7 @@ true
 ### Divisibility testing
 
 ```@docs
-isdivisible_by(a::BigInt, b::BigInt)
+is_divisible_by(a::BigInt, b::BigInt)
 ```
 
 ** Examples **
@@ -152,7 +152,7 @@ julia> r = ZZ(6)
 julia> s = ZZ(3)
 3
 
-julia> isdivisible_by(r, s)
+julia> is_divisible_by(r, s)
 true
 ```
 
@@ -163,8 +163,8 @@ AbstractAlgebra.sqrt(a::BigInt)
 ```
 
 ```@docs
-issquare(a::BigInt)
-issquare_with_sqrt(a::BigInt)
+is_square(a::BigInt)
+is_square_with_sqrt(a::BigInt)
 ```
 
 ```@docs
@@ -173,8 +173,8 @@ iroot(a::BigInt)
 ```
 
 ```@docs
-ispower(a::BigInt)
-ispower_with_root(a::BigInt)
+is_power(a::BigInt)
+is_power_with_root(a::BigInt)
 ```
 
 ```@docs
@@ -187,7 +187,7 @@ AbstractAlgebra.exp(a::BigInt)
 julia> d = AbstractAlgebra.sqrt(ZZ(36))
 6
 
-julia> issquare(ZZ(9))
+julia> is_square(ZZ(9))
 true
 
 julia> m = AbstractAlgebra.exp(ZZ(0))

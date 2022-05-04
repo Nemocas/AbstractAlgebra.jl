@@ -47,18 +47,18 @@ function isone(a::AbsSeriesElem)
 end
 
 @doc Markdown.doc"""
-    isgen(a::AbsSeriesElem)
+    is_gen(a::AbsSeriesElem)
 
 Return `true` if the given power series is arithmetically equal to the
 generator of its power series ring to its current precision, otherwise return
 `false`.
 """
-function isgen(a::AbsSeriesElem)
+function is_gen(a::AbsSeriesElem)
    return (valuation(a) == 1 && length(a) == 2 && isone(coeff(a, 1))) ||
            precision(a) == 0
 end
 
-isunit(a::AbsSeriesElem) = valuation(a) == 0 && isunit(coeff(a, 0))
+is_unit(a::AbsSeriesElem) = valuation(a) == 0 && is_unit(coeff(a, 0))
 
 @doc Markdown.doc"""
     valuation(a::AbsSeriesElem)
@@ -485,7 +485,7 @@ function ^(a::AbsSeriesElem{T}, b::Int) where T <: RingElement
       z = one(parent(a))
       z = set_precision!(z, precision(a))
       return z
-   elseif precision(a) > 0 && isgen(a) && b > 0
+   elseif precision(a) > 0 && is_gen(a) && b > 0
       # arithmetic operators must not introduce new aliasing
       return deepcopy(shift_left(a, b - 1))
    elseif length(a) == 1
@@ -730,7 +730,7 @@ Return the inverse of the power series $a$, i.e. $1/a$.
 """
 function Base.inv(a::AbsSeriesElem)
    iszero(a) && throw(DivideError())
-   !isunit(a) && error("Unable to invert power series")
+   !is_unit(a) && error("Unable to invert power series")
    R = base_ring(a)
    a1 = coeff(a, 0)
    ainv = parent(a)()
@@ -835,7 +835,7 @@ function sqrt_classical_char2(a::AbsSeriesElem; check::Bool=true)
    end
    for i = 0:prec - 1
       c = coeff(a, 2*i)
-      if check && !issquare(c)
+      if check && !is_square(c)
          return false, S()
       end
       asqrt = setcoeff!(asqrt, i, sqrt(c; check=false))
@@ -856,7 +856,7 @@ function sqrt_classical(a::AbsSeriesElem; check::Bool=true)
    if check && !iseven(aval)
       return false, zero(S)
    end
-   !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
+   !is_domain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    if iszero(a)
       return true, deepcopy(a)
    end
@@ -873,7 +873,7 @@ function sqrt_classical(a::AbsSeriesElem; check::Bool=true)
    end
    if prec > aval2
       c = coeff(a, aval)
-      if check && !issquare(c)
+      if check && !is_square(c)
          return false, zero(S)
       end
       g = sqrt(c; check=check)
@@ -924,12 +924,12 @@ function Base.sqrt(a::AbsSeriesElem; check::Bool=true)
    return q
 end
 
-function issquare(a::AbsSeriesElem)
+function is_square(a::AbsSeriesElem)
    flag, q = sqrt_classical(a; check=true)
    return flag
 end
 
-function issquare_with_sqrt(a::AbsSeriesElem)
+function is_square_with_sqrt(a::AbsSeriesElem)
    return sqrt_classical(a; check=true)
 end
 
@@ -1006,7 +1006,7 @@ function Base.exp(a::AbsSeriesElem{T}) where T <: RingElement
          s = addmul_delayed_reduction!(s, coeff(d, j - 1), coeff(z, k - j), C)
       end
       s = reduce!(s)
-      !isunit(base_ring(a)(k)) && error("Unable to divide in exp")
+      !is_unit(base_ring(a)(k)) && error("Unable to divide in exp")
       z = setcoeff!(z, k, divexact(s, k))
    end
    z = set_length!(z, normalise(z, precision(a)))

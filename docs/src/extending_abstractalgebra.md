@@ -43,7 +43,7 @@ that all rings should extend:
 ```@docs
 isone
 iszero
-isunit
+is_unit
 ```
 
 With the same logic as earlier, groups only need to extend one of the methods

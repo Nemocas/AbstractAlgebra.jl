@@ -18,10 +18,10 @@ base_ring(r::ResFieldElem) = base_ring(parent(r))
 
 parent(a::ResFieldElem) = a.parent
 
-isdomain_type(a::Type{T}) where T <: ResFieldElem = true
+is_domain_type(a::Type{T}) where T <: ResFieldElem = true
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: ResFieldElem{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: RingElement, T <: ResFieldElem{S}}
+   return is_exact_type(S)
 end
 
 function check_parent_type(a::ResField{T}, b::ResField{T}) where {T <: RingElement}
@@ -101,7 +101,7 @@ iszero(a::ResFieldElem) = iszero(data(a))
 
 isone(a::ResFieldElem) = isone(data(a))
 
-function isunit(a::ResFieldElem)
+function is_unit(a::ResFieldElem)
    g = gcd(data(a), modulus(a))
    return isone(g)
 end
@@ -349,11 +349,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    issquare(a::ResFieldElem{T}) where T <: Integer
+    is_square(a::ResFieldElem{T}) where T <: Integer
 
 Return `true` if $a$ is a square.
 """
-function issquare(a::ResFieldElem{T}) where T <: Integer
+function is_square(a::ResFieldElem{T}) where T <: Integer
    if iszero(a)
       return true
    end
@@ -383,7 +383,7 @@ function Base.sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
    end
    # find a quadratic nonresidue z mod p
    z = U(rand(1:p - 1))
-   while issquare(z)
+   while is_square(z)
       z = U(rand(1:p - 1))
    end
    # set up

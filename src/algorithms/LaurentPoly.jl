@@ -15,9 +15,9 @@
 
 base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 
-isdomain_type(::Type{<:LaurentPolyElem{T}}) where {T} = isdomain_type(T)
+is_domain_type(::Type{<:LaurentPolyElem{T}}) where {T} = is_domain_type(T)
 
-isexact_type(::Type{<:LaurentPolyElem{T}}) where {T} = isexact_type(T)
+is_exact_type(::Type{<:LaurentPolyElem{T}}) where {T} = is_exact_type(T)
 
 function check_parent(a::LaurentPolyElem, b::LaurentPolyElem, throw::Bool = true)
    c = parent(a) == parent(b)
@@ -122,35 +122,35 @@ end
 
 gens(R::LaurentPolynomialRing) = [gen(R)]
 
-isgen(p::LaurentPolyElem) = p == gen(parent(p))
+is_gen(p::LaurentPolyElem) = p == gen(parent(p))
 
 # whether p is a (monic) monomial of degree i, non-recursively:
 # return true iff `p` has only one non-null coefficient
 # (of degree i) at the outer layer, and this coefficient is one
 # (as an element of the base ring)
-function ismonomial(p::LaurentPolyElem, i::Integer)
+function is_monomial(p::LaurentPolyElem, i::Integer)
    dr = degrees_range(p)
    length(dr) == 1 || return false
    dr[] == i || return false
    isone(coeff(p, i))
 end
 
-function ismonomial(p::LaurentPolyElem)
+function is_monomial(p::LaurentPolyElem)
    dr = degrees_range(p)
    length(dr) == 1 || return false
    isone(coeff(p, dr[]))
 end
 
-function ismonomial_recursive(p::LaurentPolyElem)
+function is_monomial_recursive(p::LaurentPolyElem)
    dr = degrees_range(p)
    length(dr) == 1 || return false
-   ismonomial_recursive(coeff(p, dr[]))
+   is_monomial_recursive(coeff(p, dr[]))
 end
 
-function isunit(p::LaurentPolyElem)
+function is_unit(p::LaurentPolyElem)
    dr = degrees_range(p)
    length(dr) == 1 || return false
-   isunit(coeff(p, dr[]))
+   is_unit(coeff(p, dr[]))
 end
 
 ###############################################################################

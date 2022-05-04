@@ -32,7 +32,7 @@ divexact_right(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x
 
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 
-function isdivisible_by(x::T, y::T) where T <: RingElem
+function is_divisible_by(x::T, y::T) where T <: RingElem
    if iszero(y)
       return iszero(x)
    end
@@ -70,11 +70,11 @@ Base.broadcastable(m::RingElem) = Ref(m)
 
 # Type can only represent elements of an exact ring
 # true unless explicitly specified
-isexact_type(R::Type{T}) where T <: RingElem = true
+is_exact_type(R::Type{T}) where T <: RingElem = true
 
 # Type can only represent elements of domains
 # false unless explicitly specified
-isdomain_type(R::Type{T}) where T <: RingElem = false
+is_domain_type(R::Type{T}) where T <: RingElem = false
 
 ###############################################################################
 #
@@ -155,9 +155,9 @@ function Base.sqrt(a::RingElem; check::Bool=true)
   return s
 end  
 
-# assumes the existence of issquare and sqrt for input  
-function issquare_with_sqrt(a::RingElem)
-  if issquare(a)
+# assumes the existence of is_square and sqrt for input  
+function is_square_with_sqrt(a::RingElem)
+  if is_square(a)
      return true, sqrt(a)
   else
      return false, parent(a)()

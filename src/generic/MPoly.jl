@@ -597,9 +597,9 @@ function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
    return b
 end
 
-isunit(x::MPolyElem) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && isunit(x.coeffs[1])
+is_unit(x::MPolyElem) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && is_unit(x.coeffs[1])
 
-function isgen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
+function is_gen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
    exps = x.exps
    N = size(exps, 1)
    for k = 1:N
@@ -619,38 +619,38 @@ function isgen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
    return false
 end
 
-function isgen(x::MPoly{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
+function is_gen(x::MPoly{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
    N = size(x.exps, 1)
    return x.exps[N, 1] == UInt(1)
 end
 
-function isgen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function is_gen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
     N = size(x.exps, 1)
     return x.exps[N, 1] == UInt(1)
 end
 
 @doc Markdown.doc"""
-    isgen(x::MPoly{T}) where {T <: RingElement}
+    is_gen(x::MPoly{T}) where {T <: RingElement}
 
 Return `true` if the given polynomial is a generator (variable) of the
 polynomial ring it belongs to.
 """
-function isgen(x::MPoly{T}) where {T <: RingElement}
+function is_gen(x::MPoly{T}) where {T <: RingElement}
    if length(x) != 1
       return false
    end
    if !isone(coeff(x, 1))
       return false
    end
-   return isgen(x, Val{parent(x).ord})
+   return is_gen(x, Val{parent(x).ord})
 end
 
 @doc Markdown.doc"""
-    ishomogeneous(x::MPoly{T}) where {T <: RingElement}
+    is_homogeneous(x::MPoly{T}) where {T <: RingElement}
 
 Return `true` if the given polynomial is homogeneous with respect to the standard grading and `false` otherwise.
 """
-function ishomogeneous(x::MPoly{T}) where {T <: RingElement}
+function is_homogeneous(x::MPoly{T}) where {T <: RingElement}
    last_deg = 0
    is_first = true
 
@@ -851,7 +851,7 @@ length(x::MPoly) = x.length
 
 isone(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && x.coeffs[1] == 1
 
-isconstant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
+is_constant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
 function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    Re = deepcopy_internal(a.exps, dict)
@@ -1688,7 +1688,7 @@ function sqrt_classical_char2(a::MPoly{T}; check::Bool=true) where {T <: RingEle
    for i = 1:m
       d1 = monomial_halves!(Qe, i, a.exps, i, mask, N)
       if check
-         d2 = issquare(a.coeffs[i])
+         d2 = is_square(a.coeffs[i])
       end
       if check && !d1 || !d2
          return false, par()
@@ -1747,7 +1747,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
    reuse = zeros(Int, 0)
    # get leading coeff of sqrt
    d1 = monomial_halves!(Qe, 1, a.exps, 1, mask, N)
-   d2 = check ? issquare(a.coeffs[1]) : true
+   d2 = check ? is_square(a.coeffs[1]) : true
    if check && !d1 || !d2
       return false, par()
    end
@@ -1936,12 +1936,12 @@ function Base.sqrt(a::MPoly{T}; check::Bool=true) where {T <: RingElement}
    return q
 end
 
-function issquare(a::MPoly{T}) where {T <: RingElement}
+function is_square(a::MPoly{T}) where {T <: RingElement}
    flag, q = sqrt_heap(a; check=true)
    return flag
 end
 
-function issquare_with_sqrt(a::MPoly{T}) where {T <: RingElement}
+function is_square_with_sqrt(a::MPoly{T}) where {T <: RingElement}
    return flag, q = sqrt_heap(a; check=true)
 end
 
@@ -2061,7 +2061,7 @@ to the monomial ordering of the parent ring.
 """
 function Base.isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    check_parent(a, b)
-   (!ismonomial(a) || !ismonomial(b)) && error("Not monomials in comparison")
+   (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
    N = size(a.exps, 1)
    return monomial_isless(a.exps, 1, b.exps, 1, N, parent(a), UInt(0))
 end
@@ -2334,7 +2334,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       return deepcopy(a)
    elseif b == 2
       return a*a
-   elseif !isexact_type(T) || !iszero(characteristic(base_ring(a)))
+   elseif !is_exact_type(T) || !iszero(characteristic(base_ring(a)))
       # pow_fps requires char 0 or exact ring, so use pow_rmul if not or unsure
       return pow_rmul(a, b)
    else

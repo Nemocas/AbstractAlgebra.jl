@@ -93,14 +93,14 @@ end
    @test zero(R) == 0
    @test one(R) == 1
 
-   @test isunit(1 + y + x)
-   @test !isunit(x)
-   @test !isunit(2 + x)
+   @test is_unit(1 + y + x)
+   @test !is_unit(x)
+   @test !is_unit(2 + x)
 
-   @test isgen(gen(R, 1))
-   @test isgen(gen(R, 2))
-   @test !isgen(x^2)
-   @test !isgen(R(1))
+   @test is_gen(gen(R, 1))
+   @test is_gen(gen(R, 2))
+   @test !is_gen(x^2)
+   @test !is_gen(R(1))
 
    @test gens(R) == [x, y]
 
@@ -287,7 +287,7 @@ end
 
       for iter = 1:30
          f = rand(R, 0:8, -10:10)
-         while !isunit(f)
+         while !is_unit(f)
             f = rand(R, 0:8, -10:10)
          end
 
@@ -304,7 +304,7 @@ end
       for iter = 1:30
          f = rand(R, 0:8, -10:10)
          g = rand(R, 0:8, -10:10)
-         while !isunit(g)
+         while !is_unit(g)
             g = rand(R, 0:8, -10:10)
          end
 

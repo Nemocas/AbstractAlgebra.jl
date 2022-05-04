@@ -32,7 +32,7 @@ exception is raised.
 ## Basic functions
 
 ```julia
-isunit(f::MyElem)
+is_unit(f::MyElem)
 ```
 
 Return `true` if the given element is invertible, i.e. nonzero in the field.

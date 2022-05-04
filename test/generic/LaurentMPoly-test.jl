@@ -49,12 +49,12 @@ end
 @testset "Generic.LaurentMPoly.mpoly" begin
     L, (x, y) = LaurentPolynomialRing(ZZ, ["x", "y"])
 
-    @test isgen(x)
-    @test isgen(y)
-    @test !isgen(one(L))
-    @test !isgen(inv(x))
-    @test !isgen(inv(y))
-    @test !isgen(x*y)
+    @test is_gen(x)
+    @test is_gen(y)
+    @test !is_gen(one(L))
+    @test !is_gen(inv(x))
+    @test !is_gen(inv(y))
+    @test !is_gen(x*y)
 
     @test iszero(L(elem_type(coefficient_ring(L))[], Vector{Int}[]))
 

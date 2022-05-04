@@ -213,11 +213,11 @@ gens(::Generic.AbsMSeriesRing)
 ```
 
 ```@docs
-isgen(::Generic.AbsMSeries)
+is_gen(::Generic.AbsMSeries)
 ```
 
 ```@docs
-isunit(::Generic.AbsMSeries)
+is_unit(::Generic.AbsMSeries)
 ```
 
 ```@docs

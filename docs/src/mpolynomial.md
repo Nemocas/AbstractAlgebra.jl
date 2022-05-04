@@ -238,7 +238,7 @@ total_degree(f::MPolyElem)
 ```
 
 ```julia
-isgen(x::MPolyElem)
+is_gen(x::MPolyElem)
 ```
 
 ```julia
@@ -313,7 +313,7 @@ gcd(f::T, g::T) where T <: MPolyElem
 The following functionality is also provided for all multivariate polynomials.
 
 ```@docs
-isunivariate(::MPolyRing{T}) where T <: RingElement
+is_univariate(::MPolyRing{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -337,19 +337,19 @@ degrees(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isconstant(::MPolyElem{T}) where T <: RingElement
+is_constant(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isterm(::MPolyElem{T}) where T <: RingElement
+is_term(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-ismonomial(::MPolyElem{T}) where T <: RingElement
+is_monomial(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isunivariate(::MPolyElem{T}) where T <: RingElement
+is_univariate(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -383,16 +383,16 @@ julia> d = degrees(f)
  2
  0
 
-julia> isconstant(R(1))
+julia> is_constant(R(1))
 true
 
-julia> isterm(2x)
+julia> is_term(2x)
 true
 
-julia> ismonomial(y)
+julia> is_monomial(y)
 true
 
-julia> isunit(R(1))
+julia> is_unit(R(1))
 true
 
 julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
@@ -449,7 +449,7 @@ x^3*y + 3*x*y^2 + 1
 julia> n = length(f)
 3
 
-julia> isgen(y)
+julia> is_gen(y)
 true
 
 julia> nvars(S) == 2
@@ -499,7 +499,7 @@ the square root of a polynomial or test whether it is a square.
 
 ```julia
 sqrt(f::MPolyElem, check::bool=true)
-issquare(::MPolyElem)
+is_square(::MPolyElem)
 ```
 
 **Examples**
@@ -514,7 +514,7 @@ julia> f = -4*x^5*y^4 + 5*x^5*y^3 + 4*x^4 - x^3*y^4
 julia> sqrt(f^2)
 4*x^5*y^4 - 5*x^5*y^3 - 4*x^4 + x^3*y^4
 
-julia> issquare(f)
+julia> is_square(f)
 false
 ```
 
@@ -900,7 +900,7 @@ x + 1
 It is possible to test whether a polynomial is homogeneous with respect to the standard grading using the function
 
 ```@docs
-ishomogeneous(x::MPolyElem{T}) where T <: RingElement
+is_homogeneous(x::MPolyElem{T}) where T <: RingElement
 ```
 
 ## Random generation

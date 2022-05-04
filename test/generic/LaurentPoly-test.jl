@@ -71,11 +71,11 @@ end
          @test_throws Exception L("x")
          @test_throws Exception L(y0)
 
-         @test isdomain_type(typeof(y))
-         @test isexact_type(typeof(y))
+         @test is_domain_type(typeof(y))
+         @test is_exact_type(typeof(y))
 
          R, r = LaurentPolynomialRing(RDF, "r")
-         @test !isexact_type(typeof(r))
+         @test !is_exact_type(typeof(r))
       end
    end
 
@@ -101,38 +101,38 @@ end
       @test !isone(zero(y))
       @test !isone(y)
 
-      @test isgen(y)
-      @test isgen(gen(L))
-      @test !isgen(one(y))
-      @test !isgen(zero(y))
+      @test is_gen(y)
+      @test is_gen(gen(L))
+      @test !is_gen(one(y))
+      @test !is_gen(zero(y))
       @test y == gen(L)
 
       @test gens(L)[1] == y
       @test length(gens(L)) == 1
 
-      @test ismonomial(y)
-      @test ismonomial(y^-3)
-      @test !ismonomial(2y)
-      @test !ismonomial(y^-1 + y)
-      @test ismonomial(z^2)
+      @test is_monomial(y)
+      @test is_monomial(y^-3)
+      @test !is_monomial(2y)
+      @test !is_monomial(y^-1 + y)
+      @test is_monomial(z^2)
       # TODO: remove Z constructor below, when ambiguities are fixed
-      @test ismonomial(Z(y^-3)*z^4)
-      @test ismonomial_recursive(Z(y^-3)*z^4)
-      @test !ismonomial_recursive(Z(y+y^2)*z)
-      @test ismonomial_recursive(x^2*t^-3)
-      @test !ismonomial(x^2*t^-3)
-      @test !ismonomial_recursive((x+x^2)*t)
+      @test is_monomial(Z(y^-3)*z^4)
+      @test is_monomial_recursive(Z(y^-3)*z^4)
+      @test !is_monomial_recursive(Z(y+y^2)*z)
+      @test is_monomial_recursive(x^2*t^-3)
+      @test !is_monomial(x^2*t^-3)
+      @test !is_monomial_recursive((x+x^2)*t)
 
-      @test !isunit(zero(L))
+      @test !is_unit(zero(L))
 
       for e = -5:5
-         @test isunit(y^e)
+         @test is_unit(y^e)
       end
 
       if base_ring(L) isa AbstractAlgebra.Field
          for e = -5:5
-            @test isunit(2*y^e)
-            @test isunit(3*y^(2e))
+            @test is_unit(2*y^e)
+            @test is_unit(3*y^(2e))
          end
       end
 
@@ -221,11 +221,11 @@ end
       @test !divides(y+1, 2*y+3)[1]
       @test_throws Exception divexact(y+1, 2*y+3)
 
-      @test isdivisible_by(zero(L), zero(L))
-      @test !isdivisible_by(one(L), zero(L))
+      @test is_divisible_by(zero(L), zero(L))
+      @test !is_divisible_by(one(L), zero(L))
 
-      @test isdivisible_by(2*y+3, 2+3*y^-1)
-      @test !isdivisible_by(3*y+4, 2+3*y^-1)
+      @test is_divisible_by(2*y+3, 2+3*y^-1)
+      @test !is_divisible_by(3*y+4, 2+3*y^-1)
    end
 
    @testset "coercion" begin

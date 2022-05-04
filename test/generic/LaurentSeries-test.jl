@@ -138,13 +138,13 @@ end
    @test precision(a) == 31
    @test precision(b) == 4
 
-   @test isgen(gen(S))
+   @test is_gen(gen(S))
 
    @test iszero(zero(S))
 
    @test isone(one(S))
 
-   @test isunit(-1 + x + 2x^2)
+   @test is_unit(-1 + x + 2x^2)
 
    @test isequal(deepcopy(a), a)
    @test isequal(deepcopy(b), b)
@@ -811,7 +811,7 @@ end
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = R()
-      while iszero(f) || !isunit(polcoeff(f, 0))
+      while iszero(f) || !is_unit(polcoeff(f, 0))
          f = rand(R, -12:12, -10:10)
       end
 
@@ -834,7 +834,7 @@ end
    R, x = LaurentSeriesRing(T, 10, "x")
    for iter = 1:300
       f = R()
-      while iszero(f) || !isunit(polcoeff(f, 0))
+      while iszero(f) || !is_unit(polcoeff(f, 0))
          f = rand(R, -12:12, 0:5)
       end
 
@@ -851,9 +851,9 @@ end
 
       @test isequal(sqrt(g)^2, g)
 
-      @test issquare(g)
+      @test is_square(g)
 
-      f1, s1 = issquare_with_sqrt(g)
+      f1, s1 = is_square_with_sqrt(g)
 
       @test f1 && s1^2 == g
 
@@ -890,7 +890,7 @@ end
         0.8365754395386633124331865474232472479343414306640625*x^9 +
         O(x^10)
 
-   flag, s = issquare_with_sqrt(f^2)
+   flag, s = is_square_with_sqrt(f^2)
 
    @test flag && isapprox(s, f)
 
@@ -905,7 +905,7 @@ end
 
           s = f^2
 
-          @test issquare(s)
+          @test is_square(s)
 
           q = sqrt(s)
 
@@ -915,7 +915,7 @@ end
 
           @test q^2 == s
 
-          f1, s1 = issquare_with_sqrt(s)
+          f1, s1 = is_square_with_sqrt(s)
 
           @test f1 && s1^2 == s
 
@@ -953,7 +953,7 @@ end
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       g = rand(R, -12:12, -10:10)
-      while iszero(g) || !isunit(polcoeff(g, 0))
+      while iszero(g) || !is_unit(polcoeff(g, 0))
          g = rand(R, -12:12, -10:10)
       end
 
@@ -979,7 +979,7 @@ end
    for iter = 1:3000
       f = rand(R, -12:12, 0:5)
       g = rand(R, -12:12, 0:5)
-      while iszero(g) || !isunit(polcoeff(g, 0))
+      while iszero(g) || !is_unit(polcoeff(g, 0))
          g = rand(R, -12:12, 0:5)
       end
 
@@ -1018,7 +1018,7 @@ end
    for iter = 1:300
       f = rand(R, -12:12, 0:5)
       c = T()
-      while !isunit(c)
+      while !is_unit(c)
          c = rand(T, 0:5)
       end
 
@@ -1060,11 +1060,11 @@ end
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
 
       f = S()
-      while !isunit(f)
+      while !is_unit(f)
          f = rand(S, 0:0, -10:10)
       end
       g = S()
-      while !isunit(g) || !isunit(f + g)
+      while !is_unit(g) || !is_unit(f + g)
          g = rand(S, 0:0, -10:10)
       end
       f *= x
@@ -1121,11 +1121,11 @@ end
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
 
       f = S()
-      while !isunit(coeff(f, 0))
+      while !is_unit(coeff(f, 0))
          f = rand(S, 0:0, -10:10)
       end
       g = S()
-      while !isunit(coeff(g, 0)) || !isunit(coeff(f + g, 0))
+      while !is_unit(coeff(g, 0)) || !is_unit(coeff(f + g, 0))
          g = rand(S, 0:0, -10:10)
       end
       f *= x

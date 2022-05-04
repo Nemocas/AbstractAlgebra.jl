@@ -225,51 +225,51 @@ end
 
 @testset "youngtabs.rimhooks" begin
    xi = Partition([2,1])/Partition(Int[], false)
-   @test isrimhook(xi) == true
+   @test is_rimhook(xi) == true
 
    xi = SkewDiagram([2,1], [1])
-   @test isrimhook(xi) == false
+   @test is_rimhook(xi) == false
 
    xi = Partition([2,2])/Partition(Int[], false)
-   @test isrimhook(xi) == false
+   @test is_rimhook(xi) == false
 
    xi = SkewDiagram([2,2], [1])
-   @test isrimhook(xi) == true
+   @test is_rimhook(xi) == true
 
    xi = SkewDiagram([4,3,1], [2,2])
-   @test isrimhook(xi) == false
+   @test is_rimhook(xi) == false
 
    xi = SkewDiagram([4,3,1], [2,1])
-   @test isrimhook(xi) == false
+   @test is_rimhook(xi) == false
 
    xi = SkewDiagram([4,3,1], [1])
-   @test isrimhook(xi) == false
+   @test is_rimhook(xi) == false
 
    xi = SkewDiagram([4,3,1], [2])
-   @test isrimhook(xi) == true
+   @test is_rimhook(xi) == true
 
    xi = Partition([4,3,2,1])/Partition([2,2,2,1])
-   @test isrimhook(xi) == true
+   @test is_rimhook(xi) == true
 
    xi = Partition([4,3,2,1])/Partition([3,3,2,1])
-   @test isrimhook(xi) == true
+   @test is_rimhook(xi) == true
 
    xi = Partition([4,3,2,1])/Partition([2,2,1,1])
-   @test isrimhook(xi) == false
+   @test is_rimhook(xi) == false
 
    xi = Partition([4,3,2,1])/Partition([3,2,2,1])
-   @test isrimhook(xi) == false
+   @test is_rimhook(xi) == false
 
    xi = Partition([4,3,2,1])/Partition([3,3,1,1])
-   @test isrimhook(xi) == false
+   @test is_rimhook(xi) == false
 
    xi = Partition([4,3,2,1])/Partition([4,3,2,1])
-   @test isrimhook(xi) == true
+   @test is_rimhook(xi) == true
 
    lambda = Partition([5,3,2,2,1])
    mu = Partition([2,2,1])
 
-   @test isrimhook(lambda/mu) == false # is disconnected
+   @test is_rimhook(lambda/mu) == false # is disconnected
 end
 
 @testset "youngtabs.partitionseqs" begin

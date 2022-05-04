@@ -64,7 +64,7 @@ symbols(S::LaurentMPolyRing)
 nvars(f::LaurentMPolyRing)
 gens(S::LaurentMPolyRing)
 gen(S::LaurentMPolyRing, i::Int)
-isgen(x::LaurentMPolyElem)
+is_gen(x::LaurentMPolyElem)
 var_index(p::LaurentMPolyElem)
 length(f::LaurentMPolyElem)
 ```
