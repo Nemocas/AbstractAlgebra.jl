@@ -144,6 +144,7 @@ export NotInvertibleError, error_dim_negative, ErrorConstrDimMismatch
 export crt, factor, factor_squarefree, isirreducible, issquarefree
 
 include("Attributes.jl")
+include("AliasMacro.jl")
 
 ###############################################################################
 # Macros for fancy printing. to use, enable attribute storage for your struct,
