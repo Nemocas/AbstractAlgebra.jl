@@ -780,6 +780,11 @@ julia> issymmetric(N)
 false
 ```
 
+
+```julia
+is_skew_symmetric(::MatElem)
+```
+
 ### Powering
 
 ```@docs
