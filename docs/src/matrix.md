@@ -507,31 +507,8 @@ julia> c = M[1, 1]
 
 ### Transpose
 
-```julia
-transpose(::MatElem{T}) where T <: RingElem
-```
-
-Return the transpose of the given matrix.
-
-**Examples**
-
-```jldoctest
-julia> R, t = PolynomialRing(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
-
-julia> S = MatrixSpace(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
-
-julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-[t + 1       t             1]
-[  t^2       t             t]
-[   -2   t + 2   t^2 + t + 1]
-
-julia> B = transpose(A)
-[t + 1   t^2            -2]
-[    t     t         t + 2]
-[    1     t   t^2 + t + 1]
-
+```@docs
+transpose(::MatrixElem{T}) where T <: RingElement
 ```
 
 ### Submatrices
@@ -609,29 +586,17 @@ julia> multiply_row(M, 2, 3)
 [8   10   10]
 ```
 
-### Row swapping
+### Swapping rows and columns
 
-```julia
-swap_rows!(M::MatElem, i::Int, j::Int)
+```@docs
+swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
+swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
+swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
+swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 ```
 
 Swap the rows of `M` in place. The function returns the mutated matrix (since
 matrices are assumed to be mutable in AbstractAlgebra.jl).
-
-**Examples**
-
-```jldoctest
-julia> M = identity_matrix(ZZ, 3)
-[1   0   0]
-[0   1   0]
-[0   0   1]
-
-julia> swap_rows!(M, 1, 2)
-[0   1   0]
-[1   0   0]
-[0   0   1]
-
-```
 
 ### Concatenation
 
@@ -756,10 +721,6 @@ Rationals
 ```@docs
 is_symmetric(a::MatrixElem{T}) where T <: RingElement
 ```
-
-Return `true` if the given matrix is symmetric with respect to its main diagonal,
-otherwise return `false`.
-
 
 ```@docs
 is_skew_symmetric(::MatElem)
