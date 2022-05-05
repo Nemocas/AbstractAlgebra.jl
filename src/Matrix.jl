@@ -17,6 +17,7 @@ export MatrixSpace, add_column, add_column!, add_row, add_row!,
        hnf_minors_with_transform, hnf_via_popov, hnf_via_popov_with_transform,
        hnf_with_transform, identity_matrix, ishessenberg, ishnf, isinvertible,
        isinvertible_with_inverse, ispopov, isrref, issnf, issquare, istriu,
+       is_skew_symmetric,
        isweak_popov, iszero_column, iszero_row, kernel, kronecker_product,
        left_kernel, lu, lu!, map_entries, map_entries!, matrix, minpoly,
        minors, multiply_column, multiply_column!, multiply_row, multiply_row!,
@@ -1201,11 +1202,11 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+"""
     issymmetric(a::MatrixElem{T}) where T <: RingElement
 
 Return `true` if the given matrix is symmetric with respect to its main
-diagonal, otherwise return `false`.
+diagonal, i.e., `tr(M) == M`, otherwise return `false`.
 """
 function issymmetric(a::MatrixElem{T}) where T <: NCRingElement
     if !issquare(a)
@@ -2132,20 +2133,35 @@ end
 #
 ###############################################################################
 
-function isskew_symmetric(M::MatElem)
+"""
+    is_skew_symmetric(M::MatElem)
+
+Return `true` if the given matrix is skew symmetric with respect to its main
+diagonal, i.e., `tr(M) == -M`, otherwise return `false`.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> M = matrix(ZZ, [0 -1 -2; 1 0 -3; 2 3 0])
+[0   -1   -2]
+[1    0   -3]
+[2    3    0]
+
+julia> is_skew_symmetric(M)
+true
+
+```
+"""
+function is_skew_symmetric(M::MatElem)
    n = nrows(M)
    n == ncols(M) || return false
-   for i in 1:n
-      iszero(M[i, i]) || return false
-      for j in i + 1:n
-         M[i, j] == -M[j, i] || return false
-      end
+   for i in 1:n, j in 1:i
+      M[i, j] == -M[j, i] || return false
    end
    return true
 end
 
 function check_skew_symmetric(M::MatElem)
-   isskew_symmetric(M) || throw(DomainError(M, "matrix must be skew-symmetric"))
+   is_skew_symmetric(M) || throw(DomainError(M, "matrix must be skew-symmetric"))
    return M
 end
 
