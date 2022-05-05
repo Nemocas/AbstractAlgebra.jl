@@ -1475,20 +1475,28 @@ end
    S = MatrixSpace(R, 2, 2)
    T = MatrixSpace(U, 2, 2)
 
-   M = rand(S, -10:10)
+   for i = 1:50
+       M = rand(S, -10:10)
 
-   @test divexact(5*M, 5) == M
+       @test divexact(5*M, 5) == M
 
-   c = rand(R, -10:10)
+       c = rand(R, -10:10)
+       while rank(c) != 2
+           c = rand(R, -10:10)
+       end
 
-   @test divexact_left(c*M, c) == M
-   @test divexact_right(M*c, c) == M
+       @test divexact_left(c*M, c) == M
+       @test divexact_right(M*c, c) == M
 
-   N = rand(T, 0:5, -10:10)
-   d = rand(U, 0:5, -10:10)
+       N = rand(T, 0:5, -10:10)
+       d = rand(U, 0:5, -10:10)
+       while iszero(d) || rank(leading_coefficient(d)) != 2
+          d = rand(U, 0:5, -10:10)
+       end
 
-   @test divexact_left(d*N, d) == N
-   @test divexact_right(N*d, d) == N
+       @test divexact_left(d*N, d) == N
+       @test divexact_right(N*d, d) == N
+   end
 end
 
 @testset "Generic.Mat.is_symmetric" begin
