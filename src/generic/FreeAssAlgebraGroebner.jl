@@ -223,6 +223,7 @@ end
 # the return vector is of the form [(w_2, w_1^'), ...]
 # if w_1^' or w_2 is empty, the corresponding obstruction is not returned
 function right_obstructions(a::Vector{Int}, b::Vector{Int})
+
     return left_obstructions(b, a)
 end
 
@@ -613,9 +614,11 @@ Markdown.@doc doc"""
 
 Compute a groebner basis for the ideal spanned by g. Stop when `reduction_bound` many
 non-zero entries have been added to the groebner basis.
-""" function groebner_basis(
+""" 
+function groebner_basis(
     g::Vector{FreeAssAlgElem{T}},
     reduction_bound = typemax(Int)::Int,
 ) where {T<:FieldElement}
     return groebner_basis_buchberger(g, reduction_bound)
 end
+

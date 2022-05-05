@@ -326,7 +326,6 @@ include("generic/AhoCorasick.jl")
 
 include("generic/FreeAssAlgebraGroebner.jl")
 
-
 ###############################################################################
 #
 #   Temporary miscellaneous files being moved from Hecke.jl
