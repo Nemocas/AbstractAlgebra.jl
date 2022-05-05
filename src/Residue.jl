@@ -18,10 +18,10 @@ base_ring(r::ResElem) = base_ring(parent(r))
 
 parent(a::ResElem) = a.parent
 
-isdomain_type(a::Type{T}) where T <: ResElem = false
+is_domain_type(a::Type{T}) where T <: ResElem = false
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: ResElem{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: RingElement, T <: ResElem{S}}
+   return is_exact_type(S)
 end
 
 function check_parent_type(a::ResRing{T}, b::ResRing{T}) where {T <: RingElement}
@@ -83,7 +83,7 @@ iszero(a::ResElem) = iszero(data(a))
 
 isone(a::ResElem) = isone(data(a)) || a == one(parent(a))
 
-function isunit(a::ResElem)
+function is_unit(a::ResElem)
    g = gcd(data(a), modulus(a))
    return isone(g)
 end
@@ -444,7 +444,7 @@ end
 
 function ResidueRing(R::PolyRing, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
-   !isunit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
+   !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
    T = elem_type(R)
 
    return Generic.ResRing{T}(R(a), cached)

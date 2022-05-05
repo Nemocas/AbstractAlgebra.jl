@@ -134,7 +134,7 @@ function zero(F::FactoredFracField{T}) where T
     FactoredFrac{T}(zero(base_ring(F)), FactoredFracTerm{T}[], F)
 end
 
-function isunit(a::FactoredFrac{T}) where T
+function is_unit(a::FactoredFrac{T}) where T
     return !iszero(a)
 end
 
@@ -147,10 +147,10 @@ function isone(a::FactoredFrac{T}) where T
     for i in a.terms
         # if some base appears to a non-zero power and is not a unit and is
         # relatively prime to all other bases, then a cannot be one.
-        ok = !iszero(i.exp) && !isunit(i.base)
+        ok = !iszero(i.exp) && !is_unit(i.base)
         for j in a.terms
             if j !== i
-                ok = ok && isunit(gcd(i.base, j.base))
+                ok = ok && is_unit(gcd(i.base, j.base))
             end
         end
         ok && return false
@@ -333,13 +333,13 @@ function *(b::FactoredFrac{T}, c::FactoredFrac{T}) where T <: RingElement
         j = 1
         while j <= length(c)
             (g, b[i].base, c[j].base) = _gcd_cofactors(b[i].base, c[j].base)
-            if isunit(g)
+            if is_unit(g)
                 z.unit *= _pow(g, Base.checked_add(b[i].exp, c[j].exp))
             else
                 b[i].base = _append_coprimefac!(z, b[i].base, b[i].exp, g)
                 c[j].base = _append_coprimefac!(z, c[j].base, c[j].exp, g)
             end
-            if isunit(c[j].base)
+            if is_unit(c[j].base)
                 z.unit *= _pow(c[j].base, c[j].exp)
                 c[j] = c[end]
                 pop!(c)
@@ -347,7 +347,7 @@ function *(b::FactoredFrac{T}, c::FactoredFrac{T}) where T <: RingElement
                 j += 1
             end
         end
-        if isunit(b[i].base)
+        if is_unit(b[i].base)
             z.unit *= _pow(b[i].base, b[i].exp)
             b[i] = b[end]
             pop!(b)
@@ -497,7 +497,7 @@ end
 ###############################################################################
 
 function _make_base_elem(F::FactoredFracField{T}, a::T) where T <: RingElement
-    if iszero(a) || isunit(a)
+    if iszero(a) || is_unit(a)
         return FactoredFrac{T}(a, FactoredFracTerm{T}[], F)
     else
         return FactoredFrac{T}(one(base_ring(F)), [FactoredFracTerm{T}(a, 1)], F)
@@ -540,7 +540,7 @@ function _bases_are_coprime(a::FactoredFrac{T}) where T
     while i <= length(a)
         j = i + 1
         while j <= length(a)
-            if !isunit(gcd(a[i].base, a[j].base))
+            if !is_unit(gcd(a[i].base, a[j].base))
                 return false
             end
             j += 1
@@ -556,7 +556,7 @@ function _bases_are_nice(a::FactoredFrac{T}) where T
         return false
     end
     for i in a.terms
-        if isunit(i.base)
+        if is_unit(i.base)
             return false
         end
     end
@@ -576,7 +576,7 @@ end
 
 function _append_pow!(z::FactoredFrac{T}, f::T, e::Int) where T
     if !iszero(e)
-        if isunit(f)
+        if is_unit(f)
             z.unit *= _pow(f, e)
         else
             push!(z.terms, FactoredFracTerm{T}(f, e))
@@ -595,13 +595,13 @@ function _append_pow_normalise!(z::FactoredFrac{T}, a::T, e::Int, i::Int) where 
     end
     input_is_good = _bases_are_coprime(z)
     l = z.terms
-    while i <= length(l) && !isunit(a)
+    while i <= length(l) && !is_unit(a)
         (g, lbar, abar) = _gcd_cofactors(l[i].base, a)
         # (g*lbar)^l[i].exp * (g*abar)^e
         # (lbar)^l[i].exp * (g)^(l[i].exp+e) * (abar)^e
-        if isunit(g)
+        if is_unit(g)
             i += 1
-        elseif isunit(lbar)
+        elseif is_unit(lbar)
             a = abar
             z.unit *= _pow(lbar, l[i].exp)
             l[i].base = g
@@ -610,7 +610,7 @@ function _append_pow_normalise!(z::FactoredFrac{T}, a::T, e::Int, i::Int) where 
                 l[i] = l[end]
                 pop!(l)
             end
-        elseif isunit(abar)
+        elseif is_unit(abar)
             z.unit *= _pow(abar, e)
             l[i].base = lbar
             a = g
@@ -623,7 +623,7 @@ function _append_pow_normalise!(z::FactoredFrac{T}, a::T, e::Int, i::Int) where 
             _append_pow_normalise!(z, g, e, i)
         end
     end
-    if isunit(a)
+    if is_unit(a)
         z.unit *= _pow(a, e)
     else
         push!(l, FactoredFracTerm{T}(a, e))
@@ -639,7 +639,7 @@ function _append_coprimefac!(l::FactoredFrac{T}, b::T, e::Int, g::T) where T
     _append_pow_normalise!(l, g, e, 1)
     a = b
     r = gcd(a, g)
-    while !isunit(r)
+    while !is_unit(r)
         @assert !iszero(r)
         _append_pow_normalise!(l, r, e, 1)
         a = divexact(a, r)
@@ -662,7 +662,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
         j = 1
         while j <= length(c)
             (g, b[i].base, c[j].base) = _gcd_cofactors(b[i].base, c[j].base)
-            if !isunit(g)
+            if !is_unit(g)
                 e = Base.checked_sub(b[i].exp, c[j].exp)
                 if e >= 0
                     _append_pow_normalise!(z, g, c[j].exp, 1)
@@ -674,7 +674,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
                     push!(c, FactoredFracTerm{T}(g, Base.checked_neg(e)))
                 end
             end
-            if isunit(c[j].base)
+            if is_unit(c[j].base)
                 cbar *= _pow(c[j].base, c[j].exp)
                 c[j] = c[end]
                 pop!(c)
@@ -682,7 +682,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
                 j += 1
             end
         end
-        if isunit(b[i].base)
+        if is_unit(b[i].base)
             bbar *= _pow(b[i].base, b[i].exp)
             b[i] = b[end]
             pop!(b)

@@ -159,7 +159,7 @@ function (M::QuotientModule{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: R
    if M === N
       return a
    else
-      flag, P = iscompatible(M, N)
+      flag, P = is_compatible(M, N)
       if flag && P === M
          while N !== M
             a = N.map(a)
@@ -182,7 +182,7 @@ function projection(v::AbstractAlgebra.MatElem{T}, crels::AbstractAlgebra.MatEle
    R = base_ring(N)
    # remove zero rows
    nr = nrows(crels)
-   while nr > 0 && iszero_row(crels, nr)
+   while nr > 0 && is_zero_row(crels, nr)
       nr -= 1
    end
    # put into row vectors
@@ -259,9 +259,9 @@ function make_direct_sub(m::Submodule{T}, subm::Submodule{T}) where T <: RingEle
 end
 
 function quo(m::AbstractAlgebra.FPModule{T}, subm::Submodule{T}) where T <: RingElement
-   if !issubmodule(m, subm) 
+   if !is_submodule(m, subm) 
      subm = make_direct_sub(m, subm)[1]
-     @assert issubmodule(m, subm)
+     @assert is_submodule(m, subm)
    end
 
    R = base_ring(m)

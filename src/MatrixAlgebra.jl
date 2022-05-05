@@ -60,9 +60,9 @@ zero(a::MatAlgebra) = a()
 
 one(a::MatAlgebra) = a(1)
 
-isunit(a::MatAlgElem{T}) where T <: RingElement = isunit(det(a))
+is_unit(a::MatAlgElem{T}) where T <: RingElement = is_unit(det(a))
 
-isunit(a::MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
+is_unit(a::MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
 
 function characteristic(a::MatAlgebra)
    return characteristic(base_ring(a))
@@ -138,11 +138,11 @@ end
 
 ################################################################################
 #
-#   issquare
+#   is_square
 #
 ################################################################################
 
-issquare(a::MatAlgElem) = true
+is_square(a::MatAlgElem) = true
 
 ###############################################################################
 #

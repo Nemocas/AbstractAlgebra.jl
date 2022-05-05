@@ -203,7 +203,7 @@ true
 ### Isomorphism
 
 ```@docs
-isisomorphic(::FPModule{T}, ::FPModule{T}) where T <: RingElement
+is_isomorphic(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 ```
 
 !!! note
@@ -239,7 +239,7 @@ Domain: Submodule over Integers with 2 generators and no relations
 
 Codomain: Free module of rank 3 over Integers)
 
-julia> isisomorphic(S, I)
+julia> is_isomorphic(S, I)
 true
 
 ```

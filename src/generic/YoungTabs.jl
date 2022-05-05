@@ -249,12 +249,12 @@ at first `true` and ending at last `false`.
 partitionseq(seq::BitVector) = seq[something(findfirst(isequal(true), seq), 0):something(findlast(isequal(false), seq), 0)]
 
 @doc Markdown.doc"""
-    isrimhook(R::BitVector, idx::Integer, len::Integer)
+    is_rimhook(R::BitVector, idx::Integer, len::Integer)
 
 `R[idx:idx+len]` forms a rim hook in the Young Diagram of partition
 corresponding to `R` iff `R[idx] == true` and `R[idx+len] == false`.
 """
-function isrimhook(R::BitVector, idx::Integer, len::Integer)
+function is_rimhook(R::BitVector, idx::Integer, len::Integer)
    return (R[idx+len] == false) && (R[idx] == true)
 end
 
@@ -290,7 +290,7 @@ function MN1inner(R::BitVector, mu::Partition, t::Integer, charvals)
          if R[i] != R[i+mu[t]-1]
             sgn = !sgn
          end
-         if isrimhook(R, i, mu[t])
+         if is_rimhook(R, i, mu[t])
             R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
             essR = (partitionseq(R), mu[t+1:end])
             if !haskey(charvals, essR)
@@ -861,12 +861,12 @@ function has_bottom_neighbor(xi::SkewDiagram, i::Integer, j::Integer)
 end
 
 @doc Markdown.doc"""
-    isrimhook(xi::SkewDiagram)
+    is_rimhook(xi::SkewDiagram)
 
 Check if `xi` represents a rim-hook diagram, i.e. its diagram is
 edge-connected and contains no $2\times 2$ squares.
 """
-function isrimhook(xi::SkewDiagram{T}) where T
+function is_rimhook(xi::SkewDiagram{T}) where T
    i = 1
    j = xi.lam[1]
    while i != length(xi.lam) && j != 1
@@ -902,7 +902,7 @@ whether `xi` is actually a rim-hook.
 """
 function leglength(xi::SkewDiagram, check::Bool=true)
    if check
-      isrimhook(xi) || throw(ArgumentError("$xi is not a rimhook. leglength is defined only for rim hooks"))
+      is_rimhook(xi) || throw(ArgumentError("$xi is not a rimhook. leglength is defined only for rim hooks"))
    end
    m = zeros(length(xi.lam))
    m[1:length(xi.mu)] = xi.mu

@@ -68,7 +68,7 @@ julia> coeff.(f, -2:2)
 julia> set_coefficient!(f, 3, ZZ(5))
 5*x^3 + 2*x + x^-2
 
-julia> isgen(f)
+julia> is_gen(f)
 false
 
 julia> shift_left(f,2)

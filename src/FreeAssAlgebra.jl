@@ -18,12 +18,12 @@ coefficient_ring(a::FreeAssAlgElem{T}) where T <: RingElement = base_ring(a)
 
 coefficient_ring(R::FreeAssAlgebra{T}) where T <: RingElement = base_ring(R)
 
-function isdomain_type(::Type{S}) where {T <: RingElement, S <: FreeAssAlgElem{T}}
-   return isdomain_type(T)
+function is_domain_type(::Type{S}) where {T <: RingElement, S <: FreeAssAlgElem{T}}
+   return is_domain_type(T)
 end
 
-function isexact_type(a::Type{S}) where {T <: RingElement, S <: FreeAssAlgElem{T}}
-   return isexact_type(T)
+function is_exact_type(a::Type{S}) where {T <: RingElement, S <: FreeAssAlgElem{T}}
+   return is_exact_type(T)
 end
 
 ###############################################################################

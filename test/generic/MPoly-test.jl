@@ -173,12 +173,12 @@ end
       S, varlist = PolynomialRing(R, var_names, ordering = ord)
       g = gens(S)
 
-      @test !isgen(S(1))
+      @test !is_gen(S(1))
 
       for i = 1:num_vars
-         @test isgen(varlist[i])
-         @test isgen(g[i])
-         @test !isgen(g[i] + 1)
+         @test is_gen(varlist[i])
+         @test is_gen(g[i])
+         @test !is_gen(g[i] + 1)
          @test gen(S, i) == g[i]
          @test var_index(gen(S, i)) == i
       end
@@ -236,8 +236,8 @@ end
       end
 
       max_degs, biggest = max_fields(f)
-      deg = isdegree(ordering(S))
-      rev = isreverse(ordering(S))
+      deg = is_degree(ordering(S))
+      rev = is_reverse(ordering(S))
 
       if deg
          @test max_degs[num_vars + 1] <= 100*num_vars
@@ -273,18 +273,18 @@ end
 
       @test iszero(zero(S))
 
-      @test isunit(S(1))
-      @test !isunit(S(0))
-      @test !isunit(gen(S, 1))
+      @test is_unit(S(1))
+      @test !is_unit(S(0))
+      @test !is_unit(gen(S, 1))
 
-      @test isconstant(S(rand(-100:100)))
-      @test isconstant(S(zero(S)))
+      @test is_constant(S(rand(-100:100)))
+      @test is_constant(S(zero(S)))
 
       g = rand(S, 1:1, 0:100, 0:0, 1:100)
       h = rand(S, 1:1, 0:100, 0:0, 1:1)
 
-      @test isterm(g)
-      @test ismonomial(h)
+      @test is_term(g)
+      @test is_monomial(h)
    end
 
    for num_vars = 1:4
@@ -293,37 +293,37 @@ end
       S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
 
       for iter = 1:10
-         @test ishomogeneous(zero(S))
-         @test ishomogeneous(one(S))
+         @test is_homogeneous(zero(S))
+         @test is_homogeneous(one(S))
          for v in varlist
-            @test ishomogeneous(v)
-            @test !ishomogeneous(v + one(S))
+            @test is_homogeneous(v)
+            @test !is_homogeneous(v + one(S))
          end
       end
    end
 
    R, (x, ) = PolynomialRing(ZZ, ["x"])
 
-   @test isunivariate(R)
-   @test isunivariate(x)
-   @test isunivariate(R())
-   @test isunivariate(R(1))
-   @test isunivariate(x^3 + 3x)
+   @test is_univariate(R)
+   @test is_univariate(x)
+   @test is_univariate(R())
+   @test is_univariate(R(1))
+   @test is_univariate(x^3 + 3x)
 
    R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-   @test !isunivariate(R)
-   @test isunivariate(x)
-   @test isunivariate(y)
-   @test isunivariate(R())
-   @test isunivariate(R(1))
-   @test isunivariate(x^3 + 3*x)
-   @test isunivariate(2*y^4 + 3*y + 5)
-   @test !isunivariate(x + y)
-   @test !isunivariate(x*y)
-   @test !isunivariate(x^3 + 3x + y + 1)
-   @test !isunivariate(x^3 + 3x + y)
-   @test !isunivariate(y^4 + 3x + 1)
+   @test !is_univariate(R)
+   @test is_univariate(x)
+   @test is_univariate(y)
+   @test is_univariate(R())
+   @test is_univariate(R(1))
+   @test is_univariate(x^3 + 3*x)
+   @test is_univariate(2*y^4 + 3*y + 5)
+   @test !is_univariate(x + y)
+   @test !is_univariate(x*y)
+   @test !is_univariate(x^3 + 3x + y + 1)
+   @test !is_univariate(x^3 + 3x + y)
+   @test !is_univariate(y^4 + 3x + 1)
 end
 
 @testset "Generic.MPoly.multivariate_coeff" begin
@@ -657,7 +657,7 @@ end
 
             p = f^2
 
-            @test issquare(p)
+            @test is_square(p)
 
             q = sqrt(f^2)
 
@@ -672,7 +672,7 @@ end
                @test_throws ErrorException sqrt(f^2*(x^2 - x))
             end
 
-            f1, s1 = issquare_with_sqrt(f)
+            f1, s1 = is_square_with_sqrt(f)
 
             @test !f1 || s1^2 == f
          end
@@ -693,7 +693,7 @@ end
 
             s = f^2
 
-            @test issquare(s)
+            @test is_square(s)
 
             q = sqrt(f^2)
 
@@ -708,7 +708,7 @@ end
                @test_throws ErrorException sqrt(f^2*(x^2 - x))
             end
 
-            f1, s1 = issquare_with_sqrt(f)
+            f1, s1 = is_square_with_sqrt(f)
 
             @test !f1 || s1^2 == f
          end
@@ -1170,7 +1170,7 @@ end
       for iter = 1:100
          f = S()
          g = S()
-         while f == 0 || g == 0 || isconstant(g)
+         while f == 0 || g == 0 || is_constant(g)
             f = rand(S, 0:5, 0:100, 0:0, -100:100)
             g = rand(S, 0:5, 0:100, 0:0, -100:100)
          end

@@ -52,8 +52,8 @@ function gens(R::LaurentMPolyRing)
 end
 
 # BOGUS
-function isunit(a::LaurentMPolyElem)
-    return length(a) == 1 && isunit(leading_coefficient(a))
+function is_unit(a::LaurentMPolyElem)
+    return length(a) == 1 && is_unit(leading_coefficient(a))
 end
 
 ###############################################################################

@@ -90,7 +90,7 @@ end
 
          D2, f, g = DirectSum(shuffle(M))
 
-         @test isisomorphic(D1, D2)
+         @test is_isomorphic(D1, D2)
       end
    end
 end

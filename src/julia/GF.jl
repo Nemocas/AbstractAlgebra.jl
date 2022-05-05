@@ -22,9 +22,9 @@ base_ring(a::GFElem) = Union{}
 
 parent(a::GFElem) = a.parent
 
-isexact_type(::Type{GFElem{T}}) where T <: Integer = true
+is_exact_type(::Type{GFElem{T}}) where T <: Integer = true
 
-isdomain_type(::Type{GFElem{T}}) where T <: Integer = true
+is_domain_type(::Type{GFElem{T}}) where T <: Integer = true
 
 function check_parent(a::GFElem, b::GFElem)
    a.parent != b.parent && error("Operations on distinct finite fields not supported")
@@ -79,7 +79,7 @@ iszero(a::GFElem{T}) where T <: Integer = a.d == 0
 
 isone(a::GFElem{T}) where T <: Integer = a.d == 1
 
-isunit(a::GFElem) = a.d != 0
+is_unit(a::GFElem) = a.d != 0
 
 @doc Markdown.doc"""
     characteristic(R::GFField)
@@ -343,12 +343,12 @@ function Base.sqrt(a::GFElem{T}; check::Bool=true) where T <: Integer
    return s1
 end
 
-function issquare(a::GFElem{T}) where T <: Integer
+function is_square(a::GFElem{T}) where T <: Integer
    f1, s1 = sqrt_tonelli_shanks(a; check=true)
    return f1
 end
 
-function issquare_with_sqrt(a::GFElem{T}) where T <: Integer
+function is_square_with_sqrt(a::GFElem{T}) where T <: Integer
    return sqrt_tonelli_shanks(a; check=true)
 end
 
@@ -470,6 +470,6 @@ When `check == false`, no check is made, but the behaviour of the resulting obje
 is undefined if $p$ is composite.
 """
 function GF(p::T; check::Bool=true) where T <: Integer
-   check && !isprobable_prime(p) && throw(DomainError(p, "Characteristic is not prime in GF(p)"))
+   check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic is not prime in GF(p)"))
    return GFField{T}(p)
 end

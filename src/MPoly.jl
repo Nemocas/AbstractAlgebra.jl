@@ -7,8 +7,8 @@
 export MPolyBuildCtx, @PolynomialRing, change_base_ring,
        coefficients_of_univariate, coeffs, combine_like_terms!, deflation,
        degrees, derivative, divides, exponent, exponent_vector,
-       exponent_vectors, gens, isconstant, isdegree, ishomogeneous, ismonomial,
-       isreverse, isterm, isunivariate,
+       exponent_vectors, gens, is_constant, is_degree, is_homogeneous, is_monomial,
+       is_reverse, is_term, is_univariate,
        lcm, leading_coefficient, leading_exponent_vector,
        leading_monomial, leading_term, main_variable, main_variable_extract,
        main_variable_insert, map_coefficients, max_fields, monomial, monomial!,
@@ -28,12 +28,12 @@ coefficient_ring(a::MPolyElem) = base_ring(a)
 
 coefficient_ring(R::MPolyRing) = base_ring(R)
 
-function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyElem{S}}
-   return isdomain_type(S)
+function is_domain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyElem{S}}
+   return is_domain_type(S)
 end
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyElem{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyElem{S}}
+   return is_exact_type(S)
 end
 
 @doc Markdown.doc"""
@@ -69,7 +69,7 @@ Return the index of the given variable $x$. If $x$ is not a variable
 in a multivariate polynomial ring, an exception is raised.
 """
 function var_index(x::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
-   !ismonomial(x) && error("Not a variable in var_index")
+   !is_monomial(x) && error("Not a variable in var_index")
    exps = first(exponent_vectors(x))
    count = 0
    index = 0
@@ -171,19 +171,19 @@ function Base.hash(x::MPolyElem{T}, h::UInt) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    isdegree(s::Symbol)
+    is_degree(s::Symbol)
 
 Return `true` if the given symbol represents a degree ordering (deglex or
 degrevlex).
 """
-isdegree(s::Symbol) = s == :deglex || s == :degrevlex
+is_degree(s::Symbol) = s == :deglex || s == :degrevlex
 
 @doc Markdown.doc"""
-    isreverse(s::Symbol)
+    is_reverse(s::Symbol)
 
 Return `true` if the given symbol represents a reverse ordering (degrevlex).
 """
-isreverse(s::Symbol) = s == :degrevlex
+is_reverse(s::Symbol) = s == :degrevlex
 
 @doc Markdown.doc"""
     coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
@@ -192,7 +192,7 @@ Return the coefficient of the monomial $m$ of the polynomial $f$. If there
 is no such monomial, zero is returned.
 """
 function coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-    !ismonomial(m) && error("Not a monomial in coeff")
+    !is_monomial(m) && error("Not a monomial in coeff")
     v1 = first(exponent_vectors(m))
     cvzip = zip(coefficients(f), exponent_vectors(f))
     for (c, v) in cvzip
@@ -378,35 +378,35 @@ end
 
 iszero(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement = length(x) == 0
 
-function isunit(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+function is_unit(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return length(x) == 1 && iszero(first(exponent_vectors(x))) &&
-          isunit(first(coefficients(x)))
+          is_unit(first(coefficients(x)))
 end
 
 @doc Markdown.doc"""
-    isconstant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+    is_constant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 
 Return `true` if `x` is a degree zero polynomial or the zero polynomial, i.e.
 a constant polynomial.
 """
-function isconstant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+function is_constant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
     return length(x) == 0 || (length(x) == 1 &&
                         iszero(first(exponent_vectors(x))))
 end
 
 @doc Markdown.doc"""
-    isterm(x::MPoly)
+    is_term(x::MPoly)
 
 Return `true` if the given polynomial has precisely one term.
 """
-isterm(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement = length(x) == 1
+is_term(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement = length(x) == 1
 
 @doc Markdown.doc"""
-    ismonomial(x::AbstractAlgebra.MPolyElem)
+    is_monomial(x::AbstractAlgebra.MPolyElem)
 
 Return `true` if the given polynomial has precisely one term whose coefficient is one.
 """
-function ismonomial(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+function is_monomial(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return length(x) == 1 && isone(first(coefficients(x)))
 end
 
@@ -958,25 +958,25 @@ $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
 """
 function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
-   if !isunivariate(p)
+   if !is_univariate(p)
       error("Can only convert univariate polynomials of type MPoly.")
    end
-   if isconstant(p)
+   if is_constant(p)
       return R(leading_coefficient(p))
    end
    return R(coefficients_of_univariate(p))
 end
 
 @doc Markdown.doc"""
-    isunivariate(p::AbstractAlgebra.MPolyElem)
+    is_univariate(p::AbstractAlgebra.MPolyElem)
 
 Returns `true` if $p$ is a univariate polynomial, i.e. involves at most one
 variable (thus constant polynomials are considered univariate), and `false`
 otherwise. The result depends on the terms of the polynomial, not simply on
 the number of variables in the polynomial ring.
 """
-function isunivariate(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-   if isconstant(p)
+function is_univariate(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   if is_constant(p)
       return true
    end
    var = -1
@@ -996,12 +996,12 @@ function isunivariate(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    isunivariate(R::AbstractAlgebra.MPolyRing)
+    is_univariate(R::AbstractAlgebra.MPolyRing)
 
 Returns `true` if $R$ is a univariate polynomial ring, i.e. has exactly one
 variable, and `false` otherwise.
 """
-function isunivariate(R::AbstractAlgebra.MPolyRing{T}) where T <: RingElement
+function is_univariate(R::AbstractAlgebra.MPolyRing{T}) where T <: RingElement
    return nvars(R) == 1
 end
 

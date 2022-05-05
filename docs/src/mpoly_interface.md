@@ -179,7 +179,7 @@ Return the total degree of the polynomial $f$, i.e. the highest sum of
 exponents occuring in any term of $f$.
 
 ```julia
-isgen(x::MyMPoly{T}) where T <: RingElem
+is_gen(x::MyMPoly{T}) where T <: RingElem
 ```
 
 Return `true` if $x$ is a generator of the polynomial ring.
@@ -319,7 +319,7 @@ perfect square and this assumption is not fully checked. This can be
 significantly faster.
 
 ```julia
-issquare(::MyMPoly{T}) where T <: RingElem
+is_square(::MyMPoly{T}) where T <: RingElem
 ```
 
 Return `true` if $f$ is a square.

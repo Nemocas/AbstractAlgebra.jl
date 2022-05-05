@@ -211,7 +211,7 @@ true
 julia> iszero(f)
 false
 
-julia> isunit(f)
+julia> is_unit(f)
 true
 
 julia> m = modulus(S)
@@ -288,7 +288,7 @@ julia> h = gcd(f, g)
 ### Square Root
 
 ```@docs
-issquare{T <: Integer}(::ResFieldElem{T})
+is_square{T <: Integer}(::ResFieldElem{T})
 ```
 
 ```@docs
@@ -304,7 +304,7 @@ Residue field of Integers modulo 733
 julia> a = R(86)
 86
 
-julia> issquare(a)
+julia> is_square(a)
 true
 
 julia> sqrt(a)

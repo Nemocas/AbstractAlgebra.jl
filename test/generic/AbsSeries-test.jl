@@ -114,13 +114,13 @@ end
    @test precision(a) == 30
    @test precision(b) == 4
 
-   @test isgen(gen(S))
+   @test is_gen(gen(S))
 
    @test iszero(zero(S))
 
    @test isone(one(S))
 
-   @test isunit(-1 + x + 2x^2)
+   @test is_unit(-1 + x + 2x^2)
 
    @test isequal(deepcopy(a), a)
    @test isequal(deepcopy(b), b)
@@ -730,7 +730,7 @@ end
     R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
     for iter = 1:300
        f = R()
-       while !isunit(f)
+       while !is_unit(f)
           f = rand(R, 0:0, -10:10)
        end
 
@@ -766,7 +766,7 @@ end
     R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
     for iter = 1:300
        f = R()
-       while !isunit(f)
+       while !is_unit(f)
           f = rand(R, 0:0, 0:5)
        end
 
@@ -860,9 +860,9 @@ end
 
        @test isequal(sqrt(g)^2, g)
 
-       @test issquare(g)
+       @test is_square(g)
 
-       f1, s1 = issquare_with_sqrt(g)
+       f1, s1 = is_square_with_sqrt(g)
 
        @test f1 && s1^2 == g
 
@@ -899,7 +899,7 @@ end
         0.8365754395386633124331865474232472479343414306640625*x^9 +
         O(x^10)
 
-    flag, s = issquare_with_sqrt(f^2)
+    flag, s = is_square_with_sqrt(f^2)
 
     @test flag && isapprox(s, f)
 
@@ -914,7 +914,7 @@ end
 
             s = f^2
 
-            @test issquare(s)
+            @test is_square(s)
 
             q = sqrt(s)
 
@@ -924,7 +924,7 @@ end
 
             @test q^2 == s
 
-            f1, s1 = issquare_with_sqrt(s)
+            f1, s1 = is_square_with_sqrt(s)
 
             @test f1 && s1^2 == s
 
@@ -958,11 +958,11 @@ end
    for iter = 1:300
       s = rand(0:9)
       f = rand(R, s:s, -10:10)
-      while valuation(f) != s || !isunit(coeff(f, s))
+      while valuation(f) != s || !is_unit(coeff(f, s))
          f = rand(R, s:s, -10:10)
       end
       g = rand(R, s:s, -10:10)
-      while valuation(g) != s || !isunit(coeff(g, s))
+      while valuation(g) != s || !is_unit(coeff(g, s))
          g = rand(R, s:s, -10:10)
       end
 
@@ -974,11 +974,11 @@ end
    for iter = 1:300
       s = rand(0:9)
       f = rand(R, s:s, -10:10)
-      while valuation(f) != s || !isunit(coeff(f, s))
+      while valuation(f) != s || !is_unit(coeff(f, s))
          f = rand(R, s:s, -10:10)
       end
       g = rand(R, s:s, -10:10)
-      while valuation(g) != s || !isunit(coeff(g, s))
+      while valuation(g) != s || !is_unit(coeff(g, s))
          g = rand(R, s:s, -10:10)
       end
 
@@ -1007,11 +1007,11 @@ end
    for iter = 1:300
       s = rand(0:9)
       f = rand(R, s:s, 0:5)
-      while valuation(f) != s || !isunit(coeff(f, s))
+      while valuation(f) != s || !is_unit(coeff(f, s))
          f = rand(R, s:s, 0:5)
       end
       g = rand(R, s:s, 0:5)
-      while valuation(g) != s || !isunit(coeff(g, s))
+      while valuation(g) != s || !is_unit(coeff(g, s))
          g = rand(R, s:s, 0:5)
       end
 
@@ -1050,7 +1050,7 @@ end
    for iter = 1:300
       f = rand(R, 0:0, 0:5)
       c = T()
-      while !isunit(c)
+      while !is_unit(c)
          c = rand(T, 0:5)
       end
 
@@ -1092,11 +1092,11 @@ end
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
 
       f = S()
-      while !isunit(f)
+      while !is_unit(f)
          f = rand(S, 0:0, -10:10)
       end
       g = S()
-      while !isunit(g) || !isunit(f + g)
+      while !is_unit(g) || !is_unit(f + g)
          g = rand(S, 0:0, -10:10)
       end
       f *= x
@@ -1150,11 +1150,11 @@ end
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
 
       f = S()
-      while !isunit(coeff(f, 0))
+      while !is_unit(coeff(f, 0))
          f = rand(S, 0:0, -10:10)
       end
       g = S()
-      while !isunit(coeff(g, 0)) || !isunit(coeff(f + g, 0))
+      while !is_unit(coeff(g, 0)) || !is_unit(coeff(f + g, 0))
          g = rand(S, 0:0, -10:10)
       end
       f *= x

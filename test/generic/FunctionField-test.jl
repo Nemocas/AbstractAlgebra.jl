@@ -60,7 +60,7 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
 
    @test parent(y1) === S1
 
-   @test isexact_type(typeof(y1)) == true
+   @test is_exact_type(typeof(y1)) == true
 
    @test characteristic(S1) == 0
    @test characteristic(S2) == 23
@@ -117,11 +117,11 @@ end
 
       @test isone(one(S))
 
-      @test isgen(gen(S))
+      @test is_gen(gen(S))
 
-      @test isunit(one(S))
-      @test !isunit(zero(S))
-      @test isunit(gen(S))
+      @test is_unit(one(S))
+      @test !is_unit(zero(S))
+      @test is_unit(gen(S))
 
       @test degree(S) == length(modulus(S)) - 1
 

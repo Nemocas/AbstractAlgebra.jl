@@ -44,10 +44,10 @@ end
    @test degree(R) == 1
    @test degree(S) == 1
 
-   @test !isunit(R())
-   @test !isunit(S())
-   @test isunit(R(3))
-   @test isunit(S(3))
+   @test !is_unit(R())
+   @test !is_unit(S())
+   @test is_unit(R(3))
+   @test is_unit(S(3))
 
    @test deepcopy(R(3)) == R(3)
    @test deepcopy(S(3)) == S(3)
@@ -289,7 +289,7 @@ end
 
       z = rand(R)
       if p != 2
-         while issquare(z)
+         while is_square(z)
             z = rand(R)
          end
       end
@@ -297,16 +297,16 @@ end
       for i = 1:1000
           a = rand(R)
 
-          f1, s = issquare_with_sqrt(a^2)
+          f1, s = is_square_with_sqrt(a^2)
 
           @test f1 && s^2 == a^2
 
-          @test issquare(a^2)
+          @test is_square(a^2)
 
           @test sqrt(a^2)^2 == a^2
 
           if p != 2 && !iszero(a)
-             @test !issquare(z*a^2)
+             @test !is_square(z*a^2)
 
              @test_throws ErrorException sqrt(z*a^2)
           end 
@@ -324,7 +324,7 @@ end
 
 @testset "Julia.GFElem.unsafe_operators" begin
    n = rand(ZZ(2)^9:ZZ(2)^10-1)
-   while !isprobable_prime(n)
+   while !is_probable_prime(n)
       n = rand(ZZ(2)^9:ZZ(2)^10-1)
    end
    R, x = PolynomialRing(GF(n), "x")

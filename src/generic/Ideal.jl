@@ -1330,10 +1330,10 @@ function reduce_gens(I::Ideal{U}; complete_reduction::Bool=true) where {T <: Rin
       end
       d = heappop!(heap)
       # take gcd of constant polys
-      if isconstant(d.poly)
+      if is_constant(d.poly)
          S = parent(d.poly)
          d0 = constant_coefficient(d.poly)
-         while !isempty(heap) && isconstant(heap[1].poly)
+         while !isempty(heap) && is_constant(heap[1].poly)
             h = heappop!(heap)
             di = constant_coefficient(h.poly)
             d0 = gcd(d0, di)
@@ -1472,7 +1472,7 @@ function check_v(V::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:Ri
    end
    n = length(V)
    if n >= 2
-      if isunit(leading_coefficient(V[n])) && isunit(leading_coefficient(V[n - 1]))
+      if is_unit(leading_coefficient(V[n])) && is_unit(leading_coefficient(V[n - 1]))
          error(m, ": Two unit leading coefficients")
       end
    end
@@ -1785,7 +1785,7 @@ function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) wher
                   if !iszero(r)
                      mypush!(H, r)
                   end
-                  if isterm(V[orig_n])
+                  if is_term(V[orig_n])
                      V[n + 1] = reduce_tail(V[n + 1], view(V, orig_n:orig_n), res)
                   end
                   n += 1
@@ -1794,7 +1794,7 @@ function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) wher
             for k = orig_n:2:min(n + 1, length(V))
                insert_spoly(V, H, k, res)
             end
-            if isterm(V[orig_n])
+            if is_term(V[orig_n])
                while n < length(V)
                   V[n + 1] = reduce_tail(V[n + 1], view(V, orig_n:orig_n), res)
                   n += 1
@@ -1822,12 +1822,12 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
          return V
       end
       # check if p and V[n] are constant
-      if isconstant(V[n]) && isconstant(p)
+      if is_constant(V[n]) && is_constant(p)
          return [parent(p)(gcd(constant_coefficient(p), constant_coefficient(V[n])))]
       end
       # check if p can replace V[n]
       swap = false
-      if length(p) == length(V[n]) && !isunit(lc) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
+      if length(p) == length(V[n]) && !is_unit(lc) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
          p, V[n] = V[n], reduce_tail(p, view(V, 1:n - 1), res)
          insert_spoly(V, H, n, res)
          swap = true
@@ -1948,12 +1948,12 @@ function find_resultant_in_ideal(R::Ring, D::Vector{T}) where {U <: RingElement,
             push!(V, g*resultant(divexact(D[i], g), divexact(D[j], g)))
          else
             res = gcd(r, res)
-            if isunit(res)
+            if is_unit(res)
                break
             end
          end
       end
-      if isunit(res)
+      if is_unit(res)
          break
       end
    end
@@ -2006,7 +2006,7 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
       R = base_ring(S)
       D = sort(V, by=mysize2, rev=true)
       res = zero(R)
-      while !isempty(D) && isconstant(D[end])
+      while !isempty(D) && is_constant(D[end])
          di = constant_coefficient(pop!(D))
          res = gcd(di, res)
       end
@@ -2014,7 +2014,7 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
       for i = 1:length(D)
          for j = i + 1:length(D)
             res = gcd(resultant(D[i], D[j]), res)
-            if isunit(res)
+            if is_unit(res)
                break
             end
          end
@@ -2028,7 +2028,7 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
          r2 = zero(R)
          for i in 1:length(D)
             D[i] = divexact(D[i], g)
-            if !isconstant(D[i])
+            if !is_constant(D[i])
                push!(D2, D[i])
             else
                r2 = gcd(r2, constant_coefficient(D[i]))
@@ -2037,7 +2037,7 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
          res = find_resultant_in_ideal(R, D2)
          res = gcd(res, r2)
       end
-      if isunit(res) # everything reduces to 0
+      if is_unit(res) # everything reduces to 0
          V = [one(S)*g]
       else
          res = divexact(res, canonical_unit(res))

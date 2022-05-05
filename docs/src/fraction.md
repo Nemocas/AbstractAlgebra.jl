@@ -225,7 +225,7 @@ inv(a::T) where T <: FracElem
 They also implement the field interface.
 
 ```julia
-isunit(f::FracElem)
+is_unit(f::FracElem)
 ```
 
 And they implement the fraction field interface.
@@ -298,7 +298,7 @@ julia> h = gcd(f, g)
 ### Square root
 
 ```@docs
-issquare{T <: RingElem}(::FracElem{T})
+is_square{T <: RingElem}(::FracElem{T})
 ```
 
 ```@docs
@@ -320,7 +320,7 @@ julia> a = (21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 
 julia> sqrt(a^2)
 (21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
 
-julia> issquare(a^2)
+julia> is_square(a^2)
 true
 ```
 

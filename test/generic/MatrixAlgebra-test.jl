@@ -75,8 +75,8 @@ end
    @test elem_type(Generic.MatAlgebra{elem_type(R)}) == Generic.MatAlgElem{elem_type(R)}
    @test parent_type(Generic.MatAlgElem{elem_type(R)}) == Generic.MatAlgebra{elem_type(R)}
 
-   @test isexact_type(elem_type(S)) == true
-   @test isdomain_type(elem_type(S)) == false
+   @test is_exact_type(elem_type(S)) == true
+   @test is_domain_type(elem_type(S)) == false
 
    @test isa(S(), MatAlgElem)
    @test isa(S(ZZ(1)), MatAlgElem)
@@ -97,7 +97,7 @@ end
    @test nrows(S) == 3
    @test ncols(S) == 3
 
-   @test isexact_type(typeof(A))
+   @test is_exact_type(typeof(A))
 
    @test iszero(zero(S))
    @test isone(one(S))
@@ -110,8 +110,8 @@ end
    U = MatrixAlgebra(QQ, 3)
    C = U([1 2 3; 5 6 7; 9 8 5])
 
-   @test !isunit(A)
-   @test isunit(C)
+   @test !is_unit(A)
+   @test is_unit(C)
 
    B[1, 1] = R(3)
    @test B[1, 1] == R(3)
@@ -129,10 +129,10 @@ end
 
    C = S([t + 1 R(0) R(1); t^2 R(0) t; R(0) R(0) R(0)])
 
-   @test iszero_row(C, 3)
-   @test !iszero_row(C, 1)
-   @test iszero_column(C, 2)
-   @test !iszero_column(C, 1)
+   @test is_zero_row(C, 3)
+   @test !is_zero_row(C, 1)
+   @test is_zero_column(C, 2)
+   @test !is_zero_column(C, 1)
 
    S = MatrixAlgebra(QQ, 3)
    A = S([1 2 3; 4 5 6; 7 8 9])
@@ -166,8 +166,8 @@ end
 
    @test isone(one(R))
 
-   @test iszero_row(M, 1)
-   @test iszero_column(M, 1)
+   @test is_zero_row(M, 1)
+   @test is_zero_column(M, 1)
 
    @test degree(M) == 2
 end
@@ -178,7 +178,7 @@ end
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
    
-   @test issquare(A)
+   @test is_square(A)
    @test size(A) == (3, 3)
    @test size(A, 1) == 3
    @test size(A, 2) == 3
@@ -204,7 +204,7 @@ end
    @test size(M, 1) == 2
    @test axes(M) == (1:2, 1:2)
    @test axes(M, 1) == 1:2
-   @test issquare(M)
+   @test is_square(M)
 end
 
 @testset "Generic.MatAlg.unary_ops" begin
@@ -492,7 +492,7 @@ end
    
    M = rand(S, -10:10)
 
-   @test issymmetric(M + transpose(M))
+   @test is_symmetric(M + transpose(M))
 end
 
 @testset "Generic.MatAlg.gram" begin
@@ -896,7 +896,7 @@ end
 
       if do_test
          @test r == i
-         @test isrref(A)
+         @test is_rref(A)
       end
    end
 
@@ -909,7 +909,7 @@ end
       r, A, d = rref_rational(M)
 
       @test r == i
-      @test isrref(A)
+      @test is_rref(A)
    end
 
    R, x = PolynomialRing(QQ, "x")
@@ -922,7 +922,7 @@ end
       r, A = rref(M)
 
       @test r == i
-      @test isrref(A)
+      @test is_rref(A)
    end
 
    R, x = PolynomialRing(ZZ, "x")
@@ -935,7 +935,7 @@ end
       r, A, d = rref_rational(M)
 
       @test r == i
-      @test isrref(A)
+      @test is_rref(A)
    end
 end
 
@@ -1087,7 +1087,7 @@ end # of @testset "Generic.MatAlg.inversion"
 
          A = hessenberg(M)
 
-         @test ishessenberg(A)
+         @test is_hessenberg(A)
       end
    end
 end
@@ -1282,11 +1282,11 @@ if false # see bug 160
         A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
         H = hnf_minors(A)
-        @test istriu(H)
+        @test is_upper_triangular(H)
 
         H, U = hnf_minors_with_transform(A)
-        @test istriu(H)
-        @test isunit(det(U))
+        @test is_upper_triangular(H)
+        @test is_unit(det(U))
         @test U*A == H
 
         # Fake up finite field of char 7, degree 2
@@ -1301,11 +1301,11 @@ if false # see bug 160
         B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
 
         H = hnf_minors(B)
-        @test istriu(H)
+        @test is_upper_triangular(H)
 
         H, U = hnf_minors_with_transform(B)
-        @test istriu(H)
-        @test isunit(det(U))
+        @test is_upper_triangular(H)
+        @test is_unit(det(U))
         @test U*B == H
     end
 end
@@ -1318,11 +1318,11 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = AbstractAlgebra.hnf_kb(A)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(A)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
@@ -1337,11 +1337,11 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = AbstractAlgebra.hnf_kb(B)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(B)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*B == H
 end
 
@@ -1353,11 +1353,11 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = AbstractAlgebra.hnf_cohen(A)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_cohen_with_transform(A)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
@@ -1372,11 +1372,11 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = AbstractAlgebra.hnf_cohen(B)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_cohen_with_transform(B)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*B == H
 end
 
@@ -1388,11 +1388,11 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = hnf(A)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = hnf_with_transform(A)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
@@ -1407,11 +1407,11 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = hnf(B)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = hnf_with_transform(B)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*B == H
 end
 
@@ -1423,12 +1423,12 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    T = AbstractAlgebra.snf_kb(A)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(A)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*A*K == T
 
    # Fake up finite field of char 7, degree 2
@@ -1443,12 +1443,12 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    T = AbstractAlgebra.snf_kb(B)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(B)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*B*K == T
 end
 
@@ -1460,12 +1460,12 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    T = snf(A)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = snf_with_transform(A)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*A*K == T
 
    # Fake up finite field of char 7, degree 2
@@ -1480,12 +1480,12 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    T = snf(B)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = snf_with_transform(B)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*B*K == T
 end
 

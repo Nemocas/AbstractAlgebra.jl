@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-function ispower(a::RingElem, n::Int)
+function is_power(a::RingElem, n::Int)
     if isone(a) || iszero(a)
         return true, a
     end
@@ -23,7 +23,7 @@ function ispower(a::RingElem, n::Int)
 end
   
 function root(a::RingElem, n::Int)
-    fl, b = ispower(a, n)
+    fl, b = is_power(a, n)
     fl || error("element does not have a $n-th root")
     return b
 end

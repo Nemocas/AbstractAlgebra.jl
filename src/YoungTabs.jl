@@ -1,5 +1,5 @@
 export Partition, AllParts, YoungTableau, SkewDiagram
-export hooklength, dim, isrimhook, leglength
+export hooklength, dim, is_rimhook, leglength
 
 ##############################################################################
 #

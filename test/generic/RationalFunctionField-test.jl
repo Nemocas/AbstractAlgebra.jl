@@ -66,7 +66,7 @@ end
 
    @test canonical_unit((x + 1)//(-x^2 + 1)) == -1//(x-1)
 
-   @test isunit((x + 1)//(-x^2 + 1))
+   @test is_unit((x + 1)//(-x^2 + 1))
 
    @test deepcopy((x + 1)//(-x^2 + 1)) == (x + 1)//(-x^2 + 1)
 
@@ -247,7 +247,7 @@ end
    for i = 1:100
       a = rand(R, 1:5, -10:10)
 
-      @test issquare(a^2)
+      @test is_square(a^2)
 
       @test sqrt(a^2)^2 == a^2
    end

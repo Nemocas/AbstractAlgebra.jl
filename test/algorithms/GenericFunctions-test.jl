@@ -8,9 +8,9 @@ using AbstractAlgebra, Test
 using Random: Random, SamplerTrivial, GLOBAL_RNG
 using RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
-import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type,
-       isexact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
-       get_cached!, isunit, characteristic, Ring, RingElem, expressify
+import AbstractAlgebra: parent_type, elem_type, base_ring, parent, is_domain_type,
+       is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
+       get_cached!, is_unit, characteristic, Ring, RingElem, expressify
 
 import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
              deepcopy_internal, hash
@@ -50,9 +50,9 @@ base_ring(R::ConstPolyRing) = R.base_ring
 
 parent(f::ConstPoly) = f.parent
 
-isdomain_type(::Type{ConstPoly{T}}) where T <: RingElement = isdomain_type(T)
+is_domain_type(::Type{ConstPoly{T}}) where T <: RingElement = is_domain_type(T)
 
-isexact_type(::Type{ConstPoly{T}}) where T <: RingElement = isexact_type(T)
+is_exact_type(::Type{ConstPoly{T}}) where T <: RingElement = is_exact_type(T)
 
 function hash(f::ConstPoly, h::UInt)
    r = 0x65125ab8e0cd44ca
@@ -75,7 +75,7 @@ iszero(f::ConstPoly) = iszero(f.c)
 
 isone(f::ConstPoly) = isone(f.c)
 
-isunit(f::ConstPoly) = isunit(f.c)
+is_unit(f::ConstPoly) = is_unit(f.c)
 
 characteristic(R::ConstPolyRing) = characteristic(base_ring(R))
 

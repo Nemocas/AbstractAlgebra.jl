@@ -96,11 +96,11 @@ supermodule(::Generic.Submodule{T}) where T <: RingElement
 ```
 
 ```@docs
-issubmodule(::FPModule{T}, ::FPModule{T}) where T <: RingElement
+is_submodule(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 ```
 
 ```@docs
-iscompatible(::FPModule{T}, ::FPModule{T}) where T <: RingElement
+is_compatible(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -136,10 +136,10 @@ Codomain: Free module of rank 2 over Integers)
 julia> supermodule(N1) == M
 true
 
-julia> iscompatible(N1, N2)
+julia> is_compatible(N1, N2)
 (true, Free module of rank 2 over Integers)
 
-julia> issubmodule(N1, M)
+julia> is_submodule(N1, M)
 false
 
 

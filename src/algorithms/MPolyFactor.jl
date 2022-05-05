@@ -64,7 +64,7 @@ function mulpow!(a::Fac{T}, b::T, e::Int) where T
   if e == 0
     return
   end
-  if isconstant(b)
+  if is_constant(b)
     a.unit *= b^e
   elseif haskey(a.fac, b)
     a.fac[b] += e
@@ -411,7 +411,7 @@ function hlift_without_lcc(
     return false, fac
   end
 
-  if !isconstant(m)
+  if !is_constant(m)
     fac = [primitive_part(i, mainvar) for i in fac]
   end
 
@@ -455,7 +455,7 @@ function hlift_with_lcc(
     return false, fac
   end
 
-  if !isconstant(m)
+  if !is_constant(m)
     fac = [primitive_part(i, mainvar) for i in fac]
   end
 
@@ -499,7 +499,7 @@ function hlift_have_lcs(
 
   fac = zeros(R, r)
   for j in 1:r
-    @assert isconstant(lc_evals[1, j])
+    @assert is_constant(lc_evals[1, j])
     fac[j] = Auf[j]*divexact(lc_evals[1, j], get_lc(Auf[j], mainvar))
   end
 
@@ -853,7 +853,7 @@ function mfactor_irred_bivar_char_zero(a::E, xvar::Int, yvar::Int) where E
     @goto next_alpha
   end
 
-  @assert isconstant(cont)
+  @assert is_constant(cont)
 
   return map(make_monic, res)
 end
@@ -932,7 +932,7 @@ function make_bases_coprime!(a::Array{Pair{E, Int}}, b::Array{Pair{E, Int}}) whe
       ai = a[i].first
       bj = b[j].first
       (g, ai, bi) = gcdcofactors(ai, bj)
-      if !isconstant(g)
+      if !is_constant(g)
         a[i] = ai => a[i].second
         b[i] = bi => b[i].second
         push!(a, g => a[i].second)
@@ -940,8 +940,8 @@ function make_bases_coprime!(a::Array{Pair{E, Int}}, b::Array{Pair{E, Int}}) whe
       end
     end
   end
-  filter!(t->!isconstant(t.first), a)
-  filter!(t->!isconstant(t.first), b)
+  filter!(t->!is_constant(t.first), a)
+  filter!(t->!is_constant(t.first), b)
 end
 
 # Return A/b^bexp
@@ -954,9 +954,9 @@ function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where E
 
   i = 1 # index strickly before which everthing is coprime to b
 
-  while i <= length(abases) && !isconstant(b)
+  while i <= length(abases) && !is_constant(b)
     abase_new, abases[i], b = gcdcofactors(abases[i], b)
-    if isconstant(abase_new)
+    if is_constant(abase_new)
       i += 1
       continue
     end
@@ -967,7 +967,7 @@ function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where E
       push!(abases, abase_new)
       push!(aexps, aexp_new)
     end
-    if isconstant(abases[i])
+    if is_constant(abases[i])
       deleteat!(abases, i)
       deleteat!(aexps, i)
     else
@@ -975,7 +975,7 @@ function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where E
     end
   end
 
-  if check && !isconstant(b)
+  if check && !is_constant(b)
     error("Not an exact division")
   end
 
@@ -1109,7 +1109,7 @@ function lcc_kaltofen(
       # this means there are extraneous factors and so hlift will fail
       return false, divs
     end
-    if !isconstant(cont)
+    if !is_constant(cont)
       continue
     end
 
@@ -1251,7 +1251,7 @@ function mfactor_sqrfree_char_zero(a::E) where E
       return res
     end
   end
-  @assert isconstant(a)
+  @assert is_constant(a)
   mulpow!(res, a, 1)
   return res
 end

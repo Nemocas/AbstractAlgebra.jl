@@ -209,7 +209,7 @@ implementing the following functions. For precise definitions and meaning please
 
 ```@docs
 Generic.partitionseq
-isrimhook(::BitVector, ::Int, ::Int)
+is_rimhook(::BitVector, ::Int, ::Int)
 Generic.MN1inner
 ```
 
@@ -232,7 +232,7 @@ getindex(xi::Generic.SkewDiagram, n::Integer)
 The support for skew diagrams is very rudimentary. The following functions are available:
 
 ```@docs
-isrimhook(::Generic.SkewDiagram)
+is_rimhook(::Generic.SkewDiagram)
 leglength
 matrix_repr(::Generic.SkewDiagram)
 ```

@@ -143,8 +143,8 @@ The functionality below supplements that provided by Julia itself for its
 
 ### Square and n-th root
 
-The functions `sqrt`, `issquare`, `issquare_with_sqrt` are all provided, as are
-`root`, `ispower` and `ispower_with_root`.
+The functions `sqrt`, `is_square`, `is_square_with_sqrt` are all provided, as are
+`root`, `is_power` and `is_power_with_root`.
 
 **Examples**
 
@@ -152,7 +152,7 @@ The functions `sqrt`, `issquare`, `issquare_with_sqrt` are all provided, as are
 julia> d = AbstractAlgebra.sqrt(ZZ(36)//ZZ(25))
 6//5
 
-julia> issquare(ZZ(9)//ZZ(16))
+julia> is_square(ZZ(9)//ZZ(16))
 true
 
 julia> root(ZZ(27)//64, 3)

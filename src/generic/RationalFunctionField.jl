@@ -28,12 +28,12 @@ function fraction_field(a::RationalFunctionField{T}) where T <: FieldElement
    return a.fraction_field::FracField{dense_poly_type(T)}
 end
 
-function isdomain_type(::Type{T}) where {S <: FieldElement, T <: Rat{S}}
+function is_domain_type(::Type{T}) where {S <: FieldElement, T <: Rat{S}}
    return true
 end
 
-function isexact_type(a::Type{T}) where {S <: FieldElement, T <: Rat{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: FieldElement, T <: Rat{S}}
+   return is_exact_type(S)
 end
 
 function characteristic(R::RationalFunctionField)
@@ -107,7 +107,7 @@ iszero(a::Rat) = iszero(data(a))
 
 isone(a::Rat) = isone(data(a))
 
-isunit(a::Rat) = isunit(data(a))
+is_unit(a::Rat) = is_unit(data(a))
 
 gen(R::RationalFunctionField) = R(gen(base_ring(R.fraction_field)))
 
@@ -397,12 +397,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    issquare(a::Rat)
+    is_square(a::Rat)
 
 Return `true` if $a$ is a square.
 """
-function issquare(a::Rat)
-   return issquare(data(a))
+function is_square(a::Rat)
+   return is_square(data(a))
 end
 
 @doc Markdown.doc"""

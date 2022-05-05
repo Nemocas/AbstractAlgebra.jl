@@ -131,12 +131,12 @@ zero(R::AbsMSeriesRing) = R(0)
 one(R::AbsMSeriesRing) = R(1)
 
 @doc Markdown.doc"""
-    isunit(a::AbsMSeries)
+    is_unit(a::AbsMSeries)
 
 Return `true` if the series is a unit in its series ring, i.e. if its constant
 term is a unit in the base ring.
 """
-isunit(a::AbsMSeries) = isunit(constant_coefficient(poly(a)))
+is_unit(a::AbsMSeries) = is_unit(constant_coefficient(poly(a)))
 
 @doc Markdown.doc"""
     gen(R::AbsMSeriesRing, i::Int)
@@ -161,11 +161,11 @@ gens(R::AbsMSeriesRing) = [gen(R, i) for i in 1:nvars(R)]
 
 
 @doc Markdown.doc"""
-    isgen(a::AbsMSeries)
+    is_gen(a::AbsMSeries)
 
 Return true if the series $a$ is a generator of its parent series ring.
 """
-function isgen(a::AbsMSeries)
+function is_gen(a::AbsMSeries)
     R = parent(a)
     p = poly(a)
     v = vars(p)
@@ -370,7 +370,7 @@ function ^(a::AbsMSeries, b::Int) where T <: RingElement
         p = one(poly_ring(R))
         p = truncate_poly(p, prec)
         return R(p, prec)
-    elseif isconstant(poly(a))
+    elseif is_constant(poly(a))
         return R(poly(a)^b, precision(a))
     elseif b == 1
         return deepcopy(a)
@@ -425,7 +425,7 @@ Return the inverse of the series $x$. An exception is raised if the series is
 not a unit.
 """
 function Base.inv(x::AbsMSeries)
-    !isunit(x) && error("Not a unit")
+    !is_unit(x) && error("Not a unit")
     R = parent(x)
     prec = [1 for n in 1:nvars(R)]
     cinv = inv(coeff(x, 1))

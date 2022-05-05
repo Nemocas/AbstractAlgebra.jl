@@ -26,12 +26,12 @@ whose rows are the returned relations will be in reduced form (hnf/rref).
 rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels::Vector{dense_matrix_type(T)}
 
 @doc Markdown.doc"""
-    iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+    is_compatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 Return `true, P` if the given modules are compatible, i.e. that they are
 (transitively) submodules of the same module, P. Otherwise return `false, M`.
 """
-function iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+function is_compatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
    check_parent(M, N)
    M1 = M
    M2 = N
@@ -55,14 +55,14 @@ function iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModul
 end
 
 @doc Markdown.doc"""
-    issubmodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+    is_submodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 Return `true` if $N$ was constructed as a submodule of $M$. The relation
 is taken transitively (i.e. subsubmodules are submodules for the purposes
 of this relation, etc). The module $M$ is also considered a submodule of
 itself for this relation.
 """
-function issubmodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+function is_submodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
    check_parent(M, N)
    if M === N
       return true
@@ -90,7 +90,7 @@ end
 function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    # count the nonzero rows
    nrels = nrows(M)
-   while nrels > 0 && iszero_row(M, nrels)
+   while nrels > 0 && is_zero_row(M, nrels)
       nrels -= 1
    end
    # find relations with non-unit pivot
@@ -105,7 +105,7 @@ function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
          col += 1
          new_col += 1
       end
-      if !isunit(M[i, col])
+      if !is_unit(M[i, col])
          push!(culled, i)
          push!(gen_cols, col)
          push!(pivots, new_col)

@@ -19,9 +19,9 @@ function reduced_form(mat::MatElem{T}) where T <: FieldElement
   return m
 end
 
-isreduced_form(mat::MatElem{T}) where T <: RingElement = ishnf(mat)
+isreduced_form(mat::MatElem{T}) where T <: RingElement = is_hnf(mat)
 
-isreduced_form(mat::MatElem{T}) where T <: FieldElement = isrref(mat)
+isreduced_form(mat::MatElem{T}) where T <: FieldElement = is_rref(mat)
 
 ###############################################################################
 #

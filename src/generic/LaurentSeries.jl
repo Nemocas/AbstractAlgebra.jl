@@ -39,11 +39,11 @@ base_ring(R::LaurentSeriesField{T}) where T <: FieldElement = R.base_ring::paren
 
 base_ring(a::LaurentSeriesElem) = base_ring(parent(a))
 
-function isdomain_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesElem{S}}
-   return isdomain_type(S)
+function is_domain_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesElem{S}}
+   return is_domain_type(S)
 end
 
-isexact_type(a::Type{T}) where T <: LaurentSeriesElem = false
+is_exact_type(a::Type{T}) where T <: LaurentSeriesElem = false
 
 @doc Markdown.doc"""
     var(a::LaurentSeriesRing)
@@ -319,17 +319,17 @@ function isone(a::LaurentSeriesElem)
 end
 
 @doc Markdown.doc"""
-    isgen(a::Generic.LaurentSeriesElem)
+    is_gen(a::Generic.LaurentSeriesElem)
 
 Return `true` if the given power series is arithmetically equal to the
 generator of its power series ring to its current precision, otherwise return
 `false`.
 """
-function isgen(a::LaurentSeriesElem)
+function is_gen(a::LaurentSeriesElem)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-isunit(a::LaurentSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a, 0))
+is_unit(a::LaurentSeriesElem) = valuation(a) == 0 && is_unit(polcoeff(a, 0))
 
 @doc Markdown.doc"""
     modulus(a::Generic.LaurentSeriesElem{T}) where {T <: ResElem}
@@ -997,7 +997,7 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
       z = set_valuation!(z, b*valuation(a))
       z = set_scale!(z, 1)
       return z
-   elseif isgen(a)
+   elseif is_gen(a)
       z = parent(a)()
       fit!(z, 1)
       z = set_precision!(z, b + precision(a) - 1)
@@ -1291,7 +1291,7 @@ function Base.inv(a::LaurentSeriesElem)
    ainv = set_precision!(ainv, precision(a) - 2*valuation(a))
    ainv = set_valuation!(ainv, -valuation(a))
    ainv = set_scale!(ainv, sa)
-   !isunit(a1) && error("Unable to invert power series")
+   !is_unit(a1) && error("Unable to invert power series")
    if lenz != 0
       ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
    end
@@ -1347,7 +1347,7 @@ function sqrt_classical_char2(a::LaurentSeriesElem; check::Bool=true)
    asqrt = set_scale!(asqrt, div(s + 1, 2)) # deals with s = 1
    for i = 0:zlen - 1
       c = polcoeff(a, i)
-      if check && !issquare(c)
+      if check && !is_square(c)
          return false, S()
       end
       asqrt = setcoeff!(asqrt, i, sqrt(c; check=false))
@@ -1359,7 +1359,7 @@ end
 function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
    S = parent(a)
    R = base_ring(a)
-   !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
+   !is_domain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    if characteristic(R) == 2
       return sqrt_classical_char2(a, check=check)
    end
@@ -1384,7 +1384,7 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
    asqrt = set_valuation!(asqrt, aval2)
    if prec > 0
       c = polcoeff(a, 0)
-      if check && !issquare(c)
+      if check && !is_square(c)
          return false, zero(S)
       end
       g = sqrt(c; check=check)
@@ -1435,12 +1435,12 @@ function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
    return s
 end
 
-function issquare(a::LaurentSeriesElem)
+function is_square(a::LaurentSeriesElem)
    flag, q = sqrt_classical(a; check=true)
    return flag
 end
 
-function issquare_with_sqrt(a::LaurentSeriesElem)
+function is_square_with_sqrt(a::LaurentSeriesElem)
    return sqrt_classical(a; check=true)
 end
 

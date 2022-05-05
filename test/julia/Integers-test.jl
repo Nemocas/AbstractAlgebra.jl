@@ -12,10 +12,10 @@ end
    R = zz
    S = ZZ
 
-   @test !isunit(R(3))
-   @test !isunit(S(3))
-   @test isunit(R(-1))
-   @test isunit(S(-1))
+   @test !is_unit(R(3))
+   @test !is_unit(S(3))
+   @test is_unit(R(-1))
+   @test is_unit(S(-1))
 
    @test check_parent(S(1), S(1))
 end
@@ -89,7 +89,7 @@ end
          @test qT == b1
       end
       
-      @test isdivisible_by(a1*a2, a1)
+      @test is_divisible_by(a1*a2, a1)
 
       if b1 != 0
          flagS, qS = divides(b1*b2, b1)
@@ -98,9 +98,9 @@ end
          @test qS == b2
       end
 
-      @test isdivisible_by(b1*b2, b1)
+      @test is_divisible_by(b1*b2, b1)
 
-      @test isdivisible_by(b1*a1, a1)
+      @test is_divisible_by(b1*a1, a1)
    end
 end
 
@@ -150,19 +150,19 @@ end
 
       @test AbstractAlgebra.sqrt(f)^2 == f
       @test AbstractAlgebra.sqrt(g)^2 == g
-      @test issquare(f)
-      @test issquare(g)
-      @test issquare_with_sqrt(f) == (true, r)
-      @test issquare_with_sqrt(g) == (true, s)
+      @test is_square(f)
+      @test is_square(g)
+      @test is_square_with_sqrt(f) == (true, r)
+      @test is_square_with_sqrt(g) == (true, s)
    end
 
-   @test issquare(-R(1)) == false
-   @test issquare(-S(1)) == false
+   @test is_square(-R(1)) == false
+   @test is_square(-S(1)) == false
 
-   @test issquare_with_sqrt(-R(1)) == (false, 0)
-   @test issquare_with_sqrt(-S(1)) == (false, 0)
-   @test issquare_with_sqrt(R(3)) == (false, 0)
-   @test issquare_with_sqrt(S(3)) == (false, 0)
+   @test is_square_with_sqrt(-R(1)) == (false, 0)
+   @test is_square_with_sqrt(-S(1)) == (false, 0)
+   @test is_square_with_sqrt(R(3)) == (false, 0)
+   @test is_square_with_sqrt(S(3)) == (false, 0)
 
    @test_throws ErrorException AbstractAlgebra.sqrt(2)
    @test_throws ErrorException AbstractAlgebra.sqrt(S(2))
@@ -222,16 +222,16 @@ end
          if T == BigInt || ndigits(p; base=2) < ndigits(typemax(T); base=2)
             p = T(p)
 
-            @test ispower(p, n)
+            @test is_power(p, n)
 
-            flag, q = ispower_with_root(p, n)
+            flag, q = is_power_with_root(p, n)
 
             @test flag && q == a
          end
       end
 
-      @test_throws DomainError ispower(T(5), -1)
-      @test_throws DomainError ispower_with_root(T(5), 0)
+      @test_throws DomainError is_power(T(5), -1)
+      @test_throws DomainError is_power_with_root(T(5), 0)
    end
 end
 

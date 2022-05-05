@@ -141,10 +141,17 @@ export zeros
 
 export NotInvertibleError, error_dim_negative, ErrorConstrDimMismatch
 
-export crt, factor, factor_squarefree, isirreducible, issquarefree
+export crt, factor, factor_squarefree, is_irreducible, is_squarefree
 
 include("Attributes.jl")
 include("AliasMacro.jl")
+
+# alternative names for LinearAlgebra
+const is_symmetric = issymmetric
+const is_upper_triangular = istriu
+
+# for backwards compatibility
+export issymmetric, istriu
 
 ###############################################################################
 # Macros for fancy printing. to use, enable attribute storage for your struct,
@@ -424,10 +431,10 @@ import .Generic: abs_series, abs_series_type,
                  inverse_fn, inverse_image_fn,
                  inverse_mat, reverse_rows, reverse_rows!,
                  inv!, invmod,
-                 iscompatible, isdegree, isdivisible_by,
-                 ishomogeneous, isisomorphic,
-                 isone, isreverse, isrimhook, issubmodule,
-                 isunit,
+                 is_compatible, is_degree, is_divisible_by,
+                 is_homogeneous, is_isomorphic,
+                 isone, is_reverse, is_rimhook, is_submodule,
+                 is_unit,
                  laurent_ring, laurent_series, lcm,
                  leading_coefficient, leading_monomial,
                  leading_exponent_vector,
@@ -483,13 +490,13 @@ export abs_series, abs_series_type,
                  interpolate, intersection,
                  inv!, inverse_image_fn,
                  inverse_mat, invmod,
-                 iscompatible, isdegree, isdivisible_by,
-                 isdomain_type, isexact_type, isgen,
-                 ishomogeneous,
-                 isisomorphic, ismonomial, ismonomial_recursive,
-                 isnegative, isone, isreverse,
-                 issubmodule, issymmetric,
-                 isterm_recursive, isunit, iszero,
+                 is_compatible, is_degree, is_divisible_by,
+                 is_domain_type, is_exact_type, is_gen,
+                 is_homogeneous,
+                 is_isomorphic, is_monomial, is_monomial_recursive,
+                 is_negative, isone, is_reverse,
+                 is_submodule, is_symmetric,
+                 is_term_recursive, is_unit, iszero,
                  lcm,
                  laurent_series, length,
                  main_variable, main_variable_extract, main_variable_insert,
@@ -520,7 +527,7 @@ export abs_series, abs_series_type,
                  MatrixElem, PolynomialElem,
        # Moved from Hecke into Misc
                  divexact_low, divhigh,
-                 ismonic, Loc, Localization, LocElem, mulhigh_n,
+                 is_monic, Loc, Localization, LocElem, mulhigh_n,
                  PolyCoeffs, roots, sturm_sequence
 
 ################################################################################
@@ -686,7 +693,9 @@ include("algorithms/DensePoly.jl")
 #
 ###############################################################################
 
-function isnegative end
+function is_negative end
+
+include("Aliases.jl")
 
 ###############################################################################
 #
