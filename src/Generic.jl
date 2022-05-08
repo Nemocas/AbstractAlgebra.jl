@@ -1,7 +1,7 @@
 module Generic
 
 import LinearAlgebra: det, issymmetric, norm,
-                      nullspace, rank, transpose!, hessenberg
+                      nullspace, rank, hessenberg
 
 import LinearAlgebra: istriu, lu, lu!, tr
 

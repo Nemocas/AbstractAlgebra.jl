@@ -1,5 +1,7 @@
 using Documenter, AbstractAlgebra
 
+DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, :(using AbstractAlgebra); recursive = true)
+
 makedocs(
          format = Documenter.HTML(),
          sitename = "AbstractAlgebra.jl",

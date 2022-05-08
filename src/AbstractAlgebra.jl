@@ -31,7 +31,7 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
 # They should not be imported/exported anywhere else.
 
 import LinearAlgebra: det, issymmetric, istriu, norm, nullspace, rank,
-                      transpose!, hessenberg
+                      hessenberg
 
 import LinearAlgebra: lu, lu!, tr
 

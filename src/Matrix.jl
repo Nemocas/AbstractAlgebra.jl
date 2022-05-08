@@ -302,7 +302,7 @@ function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
 end
 
 @doc Markdown.doc"""
-   block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
+    block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
 
 Create the block diagonal matrix over the ring `R` whose blocks are given
 by the matrices in `V`. Entries are coerced into `R` upon creation.
@@ -1209,6 +1209,26 @@ Return `true` if the given matrix is symmetric with respect to its main
 diagonal, i.e., `tr(M) == M`, otherwise return `false`.
 
 Alias for `LinearAlgebra.issymmetric`.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
+[1   2   3]
+[2   4   5]
+[3   5   6]
+
+julia> is_symmetric(M)
+true
+
+julia> N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
+[1   2   3]
+[4   5   6]
+[7   8   9]
+
+julia> is_symmetric(N)
+false
+```
 """
 function is_symmetric(a::MatrixElem{T}) where T <: NCRingElement
     if !is_square(a)
@@ -1223,6 +1243,35 @@ function is_symmetric(a::MatrixElem{T}) where T <: NCRingElement
     end
     return true
 end
+
+
+@doc Markdown.doc"""
+    transpose(x::MatrixElem{T}) where T <: RingElement
+
+Return the transpose of the given matrix.
+
+# Examples
+
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = MatrixSpace(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> B = transpose(A)
+[t + 1   t^2            -2]
+[    t     t         t + 2]
+[    1     t   t^2 + t + 1]
+
+```
+""" transpose(x::MatrixElem{T}) where T <: RingElement
+
 
 ###############################################################################
 #
@@ -1259,6 +1308,27 @@ end
 Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
 the $r\times r$ matrix whose entries $i, j$ are the dot products of the
 $i$-th and $j$-th rows, respectively.
+
+# Examples
+
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = MatrixSpace(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> B = gram(A)
+[2*t^2 + 2*t + 2   t^3 + 2*t^2 + t                   2*t^2 + t - 1]
+[t^3 + 2*t^2 + t       t^4 + 2*t^2                       t^3 + 3*t]
+[  2*t^2 + t - 1         t^3 + 3*t   t^4 + 2*t^3 + 4*t^2 + 6*t + 9]
+
+```
 """
 function gram(x::MatElem)
    z = similar(x, nrows(x), nrows(x))
@@ -1284,6 +1354,25 @@ end
 
 Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
 require the matrix to be square.
+
+# Examples
+
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = MatrixSpace(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> b = tr(A)
+t^2 + 3*t + 2
+
+```
 """
 function tr(x::MatrixElem{T}) where T <: RingElement
    !is_square(x) && error("Not a square matrix in trace")
@@ -1305,6 +1394,25 @@ end
 
 Return the content of the matrix $a$, i.e. the greatest common divisor of all
 its entries, assuming it exists.
+
+# Examples
+
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = MatrixSpace(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> b = content(A)
+1
+
+```
 """
 function content(x::MatrixElem{T}) where T <: RingElement
   d = zero(base_ring(x))
@@ -1329,6 +1437,33 @@ end
     *(P::perm, x::MatrixElem{T}) where T <: RingElement
 
 Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
+
+# Examples
+
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = MatrixSpace(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> G = SymmetricGroup(3)
+Full symmetric group over 3 elements
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> P = G([1, 3, 2])
+(2,3)
+
+julia> B = P*A
+[t + 1       t             1]
+[   -2   t + 2   t^2 + t + 1]
+[  t^2       t             t]
+
+```
 """
 function *(P::Perm, x::MatrixElem{T}) where T <: RingElement
    z = similar(x)
@@ -1991,11 +2126,6 @@ function det_fflu(M::MatrixElem{T}) where {T <: RingElement}
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
 
-@doc Markdown.doc"""
-    det(M::MatrixElem{T}) where {T <: FieldElement}
-
-Return the determinant of the matrix $M$. We assume $M$ is square.
-"""
 function det(M::MatrixElem{T}) where {T <: FieldElement}
    !is_square(M) && error("Not a square matrix in det")
    if nrows(M) == 0
@@ -2008,6 +2138,28 @@ end
     det(M::MatrixElem{T}) where {T <: RingElement}
 
 Return the determinant of the matrix $M$. We assume $M$ is square.
+
+# Examples
+
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia> K, a = NumberField(x^3 + 3x + 1, "a")
+(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
+
+julia> S = MatrixSpace(K, 3, 3)
+Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+[            0   2*x + 3   x^2 + 1]
+[      x^2 - 2     x - 1       2*x]
+[x^2 + 3*x + 1       2*x         1]
+
+julia> d = det(A)
+11*x^2 - 30*x - 5
+
+```
 """
 function det(M::MatrixElem{T}) where {T <: RingElement}
    !is_square(M) && error("Not a square matrix in det")
@@ -2115,7 +2267,22 @@ end
 @doc Markdown.doc"""
     minors(A::MatElem, k::Int)
 
-Return an array consisting of the k-minors of A
+Return an array consisting of the `k`-minors of `A`.
+
+# Examples
+
+```jldoctest
+julia> A = ZZ[1 2 3; 4 5 6]
+[1   2   3]
+[4   5   6]
+
+julia> minors(A, 2)
+3-element Vector{BigInt}:
+ -3
+ -6
+ -3
+
+```
 """
 function minors(A::MatElem, k::Int)
    row_indices = combinations(nrows(A), k)
@@ -2170,7 +2337,7 @@ end
 @doc Markdown.doc"""
     pfaffian(M::MatElem)
 
-Return the Pfaffian of a skew-symmetric matrix M.
+Return the Pfaffian of a skew-symmetric matrix `M`.
 """
 function pfaffian(M::MatElem)
    check_skew_symmetric(M)
@@ -2188,7 +2355,7 @@ end
 @doc Markdown.doc"""
     pfaffians(M::MatElem, k::Int)
 
-Return an array consisting of the k-Pfaffians of a skew-symmetric matrix M.
+Return a vector consisting of the `k`-Pfaffians of a skew-symmetric matrix `M`.
 """
 function pfaffians(M::MatElem, k::Int)
    check_skew_symmetric(M)
@@ -2318,6 +2485,28 @@ end
     rank(M::MatrixElem{T}) where {T <: RingElement}
 
 Return the rank of the matrix $M$.
+
+# Examples
+
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia> K, a = NumberField(x^3 + 3x + 1, "a")
+(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
+
+julia> S = MatrixSpace(K, 3, 3)
+Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+[            0   2*x + 3   x^2 + 1]
+[      x^2 - 2     x - 1       2*x]
+[x^2 + 3*x + 1       2*x         1]
+
+julia> d = rank(A)
+3
+
+```
 """
 function rank(M::MatrixElem{T}) where {T <: RingElement}
    n = nrows(M)
@@ -2330,11 +2519,6 @@ function rank(M::MatrixElem{T}) where {T <: RingElement}
    return r
 end
 
-@doc Markdown.doc"""
-    rank(M::MatrixElem{T}) where {T <: FieldElement}
-
-Return the rank of the matrix $M$.
-"""
 function rank(M::MatrixElem{T}) where {T <: FieldElement}
    n = nrows(M)
    if n == 0
@@ -3446,6 +3630,28 @@ $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
 the vector space kernel over the fraction field of the base ring if the
 latter is not a field. In AbstractAlgebra we use the name "kernel" for a
 function to compute an integral kernel.
+
+# Examples
+
+```jldoctest
+julia> R, x = PolynomialRing(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> S = MatrixSpace(R, 4, 4)
+Matrix Space of 4 rows and 4 columns over Univariate Polynomial Ring in x over Integers
+
+julia> M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
+              -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;
+              -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;
+              -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])
+[  -6*x^2 + 6*x + 12   -12*x^2 - 21*x - 15    -15*x^2 + 21*x + 33     -21*x^2 - 9*x - 9]
+[  -8*x^2 + 8*x + 16   -16*x^2 + 38*x - 20     90*x^2 - 82*x - 44    60*x^2 + 54*x - 34]
+[   -4*x^2 + 4*x + 8    -8*x^2 + 13*x - 10     35*x^2 - 31*x - 14    22*x^2 + 21*x - 15]
+[-10*x^2 + 10*x + 20   -20*x^2 + 70*x - 25   150*x^2 - 140*x - 85   105*x^2 + 90*x - 50]
+
+julia> n, N = nullspace(M)
+(2, [1320*x^4-330*x^2-1320*x-1320 1056*x^4+1254*x^3+1848*x^2-66*x-330; -660*x^4+1320*x^3+1188*x^2-1848*x-1056 -528*x^4+132*x^3+1584*x^2+660*x-264; 396*x^3-396*x^2-792*x 0; 0 396*x^3-396*x^2-792*x])
+```
 """
 function nullspace(M::MatElem{T}) where {T <: RingElement}
    n = ncols(M)
@@ -3941,6 +4147,30 @@ end
 Return the characteristic polynomial $p$ of the matrix $M$. The
 polynomial ring $R$ of the resulting polynomial must be supplied
 and the matrix is assumed to be square.
+
+# Examples
+
+```jldoctest
+julia> R = ResidueRing(ZZ, 7)
+Residue ring of Integers modulo 7
+
+julia> S = MatrixSpace(R, 4, 4)
+Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
+
+julia> T, x = PolynomialRing(R, "x")
+(Univariate Polynomial Ring in x over Residue ring of Integers modulo 7, x)
+
+julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+[1   2   4   3]
+[2   5   1   0]
+[6   1   3   2]
+[1   1   3   5]
+
+julia> A = charpoly(T, M)
+x^4 + 2*x^2 + 6*x + 2
+
+```
 """
 function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
    !is_square(Y) && error("Dimensions don't match in charpoly")
@@ -4017,12 +4247,6 @@ end
 # charpoly iff it has degree n. Otherwise it is meaningless (but it is
 # extremely fast to compute over some fields).
 
-@doc Markdown.doc"""
-    minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
-
-Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
-of the resulting polynomial must be supplied and the matrix must be square.
-"""
 function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
    !is_square(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
@@ -4118,6 +4342,27 @@ end
 
 Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 of the resulting polynomial must be supplied and the matrix must be square.
+
+# Examples
+
+```jldoctest
+julia> R = GF(13)
+Finite field F_13
+
+julia> T, y = PolynomialRing(R, "y")
+(Univariate Polynomial Ring in y over Finite field F_13, y)
+
+julia> M = R[7 6 1;
+             7 7 5;
+             8 12 5]
+[7    6   1]
+[7    7   5]
+[8   12   5]
+
+julia> A = minpoly(T, M)
+y^2 + 10*y
+
+```
 """
 function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
    !is_square(M) && error("Not a square matrix in minpoly")
@@ -5686,6 +5931,26 @@ $P$ be the $n\times n$ identity matrix that has had all zero entries of row
 $r$ replaced with $d$, then the transform applied is equivalent to
 $M = P^{-1}MP$. We require $M$ to be a square matrix. A similarity transform
 preserves the minimal and characteristic polynomials of a matrix.
+
+# Examples
+
+```jldoctest
+julia> R = ResidueRing(ZZ, 7)
+Residue ring of Integers modulo 7
+
+julia> S = MatrixSpace(R, 4, 4)
+Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
+
+julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+[1   2   4   3]
+[2   5   1   0]
+[6   1   3   2]
+[1   1   3   5]
+
+julia> similarity!(M, 1, R(3))
+
+```
 """
 function similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
    n = nrows(A)
@@ -5723,6 +5988,25 @@ end
 
 Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 row are swapped.
+
+**Examples**
+
+```jldoctest
+julia> M = identity_matrix(ZZ, 3)
+[1   0   0]
+[0   1   0]
+[0   0   1]
+
+julia> swap_rows(M, 1, 2)
+[0   1   0]
+[1   0   0]
+[0   0   1]
+
+julia> M  # was not modified
+[1   0   0]
+[0   1   0]
+[0   0   1]
+```
 """
 function swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
@@ -5734,7 +6018,27 @@ end
 @doc Markdown.doc"""
     swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
-Swap the $i$th and $j$th row of $a$.
+Swap the $i$th and $j$th row of $a$ in place. The function returns the mutated
+matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
+
+**Examples**
+
+```jldoctest
+julia> M = identity_matrix(ZZ, 3)
+[1   0   0]
+[0   1   0]
+[0   0   1]
+
+julia> swap_rows!(M, 1, 2)
+[0   1   0]
+[1   0   0]
+[0   0   1]
+
+julia> M  # was modified
+[0   1   0]
+[1   0   0]
+[0   0   1]
+```
 """
 function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
@@ -5764,7 +6068,8 @@ end
 @doc Markdown.doc"""
     swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
-Swap the $i$th and $j$th column of $a$.
+Swap the $i$th and $j$th column of $a$ in place. The function returns the mutated
+matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 """
 function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    if i != j

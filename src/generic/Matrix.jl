@@ -129,11 +129,6 @@ is_square(a::MatElem) = (nrows(a) == ncols(a))
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    transpose(x::Mat{T}) where T <: NCRingElement
-
-Return the transpose of the given matrix.
-"""
 function transpose(x::Mat{T}) where T <: NCRingElement
    y = MatSpaceElem{eltype(x)}(permutedims(x.entries))
    y.base_ring = x.base_ring
