@@ -35,12 +35,12 @@ end
 
          Q, g = quo(M, M1)
 
-         @test issubmodule(M, M)
-         @test issubmodule(M, M1)
-         @test issubmodule(M, M2)
-         @test !issubmodule(M, Q)
-         @test !issubmodule(M1, F)
-         @test !issubmodule(M1, M)
+         @test is_submodule(M, M)
+         @test is_submodule(M, M1)
+         @test is_submodule(M, M2)
+         @test !is_submodule(M, Q)
+         @test !is_submodule(M1, F)
+         @test !is_submodule(M1, M)
 
          ngens3 = rand(1:5)
          gens3 = [rand(M, -10:10) for j in 1:ngens3]
@@ -50,31 +50,31 @@ end
          gens4 = [rand(M3, -10:10) for j in 1:ngens4]
          M4, f4 = sub(M3, gens4)
 
-         flag, U = iscompatible(M1, M3)
+         flag, U = is_compatible(M1, M3)
          @test flag == true && U == M
 
-         flag, U = iscompatible(M1, M4)
+         flag, U = is_compatible(M1, M4)
          @test flag == true && U == M
 
-         flag, U = iscompatible(M2, M3)
+         flag, U = is_compatible(M2, M3)
          @test flag == true && U == M
 
-         flag, U = iscompatible(M2, M4)
+         flag, U = is_compatible(M2, M4)
          @test flag == true && U == M
 
-         flag, U = iscompatible(M, M)
+         flag, U = is_compatible(M, M)
          @test flag == true && U == M
 
-         flag, U = iscompatible(M1, Q)
+         flag, U = is_compatible(M1, Q)
          @test flag == false
 
-         flag, U = iscompatible(M2, Q)
+         flag, U = is_compatible(M2, Q)
          @test flag == false
 
-         flag, U = iscompatible(Q, M1)
+         flag, U = is_compatible(Q, M1)
          @test flag == false
 
-         flag, U = iscompatible(Q, M2)
+         flag, U = is_compatible(Q, M2)
          @test flag == false
       end
    end
@@ -173,7 +173,7 @@ end
 
          I, k = image(f)
 
-         @test isisomorphic(Q, I)
+         @test is_isomorphic(Q, I)
       end
    end
 
@@ -188,7 +188,7 @@ end
 
          I, g = image(f1)
 
-         @test isisomorphic(I, M1)
+         @test is_isomorphic(I, M1)
       end
    end
 end

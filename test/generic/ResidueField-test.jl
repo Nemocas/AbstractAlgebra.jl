@@ -3,6 +3,20 @@
 
    R = Generic.ResidueField(B, 16453889)
 
+   S, f1 = quo(Field, B, 16453889)
+   U, f2 = quo(Field, B, 16453889; cached=false)
+
+   @test S === R
+   @test U !== R
+
+   v1 = rand(R, -100:100)
+   @test f1(inv(f1)(v1)) == v1
+
+   c1 = rand(B, -1000:1000)
+
+   @test f1(c1) == S(c1)
+   @test f2(c1) == S(c1)
+
    @test Generic.ResidueField(B, 16453889, cached = true) === Generic.ResidueField(B, 16453889, cached = true)
    @test Generic.ResidueField(B, 16453889, cached = true) !== Generic.ResidueField(B, 16453889, cached = false)
 
@@ -90,9 +104,11 @@ end
 
    h = one(T)
 
-   @test isunit(h)
+   @test is_unit(h)
 
    @test isone(h)
+
+   @test lift(h) == 1
 
    @test data(h) == 1
 
@@ -101,6 +117,11 @@ end
    @test canonical_unit(T(x + 1)) == T(x + 1)
 
    @test deepcopy(h) == h
+
+   S = ResidueField(zz, 23)
+
+   @test lift(S(1)) == 1
+   @test isa(lift(S(1)), BigInt)
 end
 
 @testset "Generic.ResF.unary_ops" begin
@@ -283,11 +304,11 @@ end
 
           if !iszero(a)
              z = rand(R, 1:p - 1)
-             while issquare(z)
+             while is_square(z)
                 z = rand(R, 1:p - 1)
              end
 
-             @test !issquare(z*a)
+             @test !is_square(z*a)
              @test_throws ErrorException sqrt(z*a)
          end
       end
@@ -303,11 +324,11 @@ end
 
           if !iszero(a)
              z = rand(R, 1:Int(p - 1))
-             while issquare(z)
+             while is_square(z)
                 z = rand(R, 1:Int(p - 1))
              end
 
-             @test !issquare(z*a)
+             @test !is_square(z*a)
              @test_throws ErrorException sqrt(z*a)
          end
       end

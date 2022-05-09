@@ -13,7 +13,7 @@ matrices and the algebra (ring) of $m\times m$ matrices are supported.
 As the space of $m\times n$ matrices over a commutative ring is not itself a commutative
 ring, not all of the Ring interface needs to be implemented for such matrices in.
 
-In particular, the following functions do not need to be implemented: `isdomain_type`,
+In particular, the following functions do not need to be implemented: `is_domain_type`,
 and `divexact`.
 The `canonical_unit` function should be implemented, but simply needs to return the
 corresponding value for entry $[1, 1]$ (the function is never called on empty matrices).
@@ -302,7 +302,7 @@ It is recommended to overload this method for custom matrices.
 ### Optional symmetry test
 
 ```julia
-LinearAlgebra.issymmetric(a::MatrixElem)
+is_symmetric(a::MatrixElem)
 ```
 
 Return `true` if the given matrix is symmetric with respect to its main diagonal,

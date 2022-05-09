@@ -103,7 +103,7 @@ symbols(S::FreeAssAlgebra)
 nvars(f::FreeAssAlgebra)
 gens(S::FreeAssAlgebra)
 gen(S::FreeAssAlgebra, i::Int)
-isgen(x::FreeAssAlgElem)
+is_gen(x::FreeAssAlgElem)
 total_degree(a::FreeAssAlgElem)
 length(f::FreeAssAlgElem)
 ```

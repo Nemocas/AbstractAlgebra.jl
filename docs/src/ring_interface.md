@@ -155,7 +155,7 @@ the type of the elements. For example, this is the case for the ring of integers
 in fact for any ring element type that isn't parameterised or generic in any way.
 
 ```julia
-isdomain_type(::Type{MyElem})
+is_domain_type(::Type{MyElem})
 ```
 
 Return `true` if every element of the given element type (which may be parameterised
@@ -164,7 +164,7 @@ if this cannot be guaranteed, the function returns `false`.
 
 For example, if `MyElem` was the type of elements of generic residue rings of a
 polynomial ring, the answer to the question would depend on the modulus of the residue
-ring. Therefore `isdomain_type` would have to return `false`, since we cannot guarantee
+ring. Therefore `is_domain_type` would have to return `false`, since we cannot guarantee
 that we are dealing with elements of an integral domain in general. But if the given
 element type was for rational integers, the answer would be `true`, since every rational
 integer has as parent the ring of rational integers, which is an integral domain.
@@ -173,7 +173,7 @@ Note that this function depends only on the type of an element and cannot access
 information about the object itself, or its parent.
 
 ```julia
-isexact_type(::Type{MyElem})
+is_exact_type(::Type{MyElem})
 ```
 
 Return `true` if every element of the given type is represented exactly. For example,
@@ -681,7 +681,7 @@ doesn't exist.
 ### Optional basic manipulation functionality
 
 ```julia
-isunit(f::MyElem)
+is_unit(f::MyElem)
 ```
 
 Return `true` if the given element is a unit in the ring it belongs to.
@@ -691,9 +691,8 @@ characteristic(R::MyParent)
 ```
 
 Return the characteristic of the ring. The function should not be defined if
-it is not possible to unconditionally give the characteristic as the function
-is used in some generic code for correctness, but will always take the safe
-path if the function is not defined.
+it is not possible to unconditionally give the characteristic. AbstractAlgebra
+will raise an exception is such cases.
 
 ### Optional binary ad hoc operators
 
@@ -796,9 +795,9 @@ using AbstractAlgebra
 using Random: Random, SamplerTrivial, GLOBAL_RNG
 using RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
-import AbstractAlgebra: parent_type, elem_type, base_ring, parent, isdomain_type,
-       isexact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
-       get_cached!, isunit, characteristic, Ring, RingElem, expressify
+import AbstractAlgebra: parent_type, elem_type, base_ring, parent, is_domain_type,
+       is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
+       get_cached!, is_unit, characteristic, Ring, RingElem, expressify
 
 import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
              deepcopy_internal, hash
@@ -834,9 +833,9 @@ base_ring(R::ConstPolyRing) = R.base_ring
 
 parent(f::ConstPoly) = f.parent
 
-isdomain_type(::Type{ConstPoly{T}}) where T <: RingElement = isdomain_type(T)
+is_domain_type(::Type{ConstPoly{T}}) where T <: RingElement = is_domain_type(T)
 
-isexact_type(::Type{ConstPoly{T}}) where T <: RingElement = isexact_type(T)
+is_exact_type(::Type{ConstPoly{T}}) where T <: RingElement = is_exact_type(T)
 
 function hash(f::ConstPoly, h::UInt)
    r = 0x65125ab8e0cd44ca
@@ -859,7 +858,7 @@ iszero(f::ConstPoly) = iszero(f.c)
 
 isone(f::ConstPoly) = isone(f.c)
 
-isunit(f::ConstPoly) = isunit(f.c)
+is_unit(f::ConstPoly) = is_unit(f.c)
 
 characteristic(R::ConstPolyRing) = characteristic(base_ring(R))
 

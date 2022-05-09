@@ -91,13 +91,13 @@ end
          y, z = gens(S, ["y", "z"])
          f3 = rand(S, 0:5, 0:10, -10:10)
 
-         @test isdomain_type(typeof(f1))
-         @test isdomain_type(typeof(f2))
-         @test isdomain_type(typeof(f3))
+         @test is_domain_type(typeof(f1))
+         @test is_domain_type(typeof(f2))
+         @test is_domain_type(typeof(f3))
 
-         @test isexact_type(typeof(f1))
-         @test isexact_type(typeof(f2))
-         @test isexact_type(typeof(f3))
+         @test is_exact_type(typeof(f1))
+         @test is_exact_type(typeof(f2))
+         @test is_exact_type(typeof(f3))
 
          @test parent(f1) === S
          @test parent(f2) === S
@@ -191,12 +191,12 @@ end
 
          @test iszero(zero(S))
          @test isone(one(S))
-         @test isunit(one(S))
-         @test !isgen(S())
-         @test ishomogeneous(S())
-         @test !ismonomial(S())
-         @test isconstant(S())
-         @test !isterm(S())
+         @test is_unit(one(S))
+         @test !is_gen(S())
+         @test is_homogeneous(S())
+         @test !is_monomial(S())
+         @test is_constant(S())
+         @test !is_term(S())
          @test trailing_coefficient(S()) == 0
          @test leading_coefficient(S()) == 0
          @test constant_coefficient(S()) == 0
@@ -214,23 +214,23 @@ end
          @test !isone(x)
          @test !isone(x2)
          @test isone(one(S))
-         @test !isunit(x)
-         @test !isunit(x2)
-         @test isunit(one(S))
-         @test isgen(x)
-         @test isgen(x2)
-         @test isgen(y)
-         @test ishomogeneous(x + y + z)
-         @test ishomogeneous(x2)
-         @test ishomogeneous(S())
-         @test ismonomial(x^2)
-         @test ismonomial(x2^2)
-         @test ismonomial(y)
-         @test !isconstant(x)
-         @test !isconstant(x2)
-         @test isconstant(S(1))
-         @test isterm(2x^2*y)
-         @test isterm(3x2)
+         @test !is_unit(x)
+         @test !is_unit(x2)
+         @test is_unit(one(S))
+         @test is_gen(x)
+         @test is_gen(x2)
+         @test is_gen(y)
+         @test is_homogeneous(x + y + z)
+         @test is_homogeneous(x2)
+         @test is_homogeneous(S())
+         @test is_monomial(x^2)
+         @test is_monomial(x2^2)
+         @test is_monomial(y)
+         @test !is_constant(x)
+         @test !is_constant(x2)
+         @test is_constant(S(1))
+         @test is_term(2x^2*y)
+         @test is_term(3x2)
          @test coeff(3x^2 + 2y + z, 2) == 2
          @test coeff(2x2^2 + 3x2 + 5, 1) == 2
          @test coeff(3x^2 + 2y + z, x2^2) == 3
@@ -416,14 +416,14 @@ end
          f = rand(S, 0:5, 0:10, -10:10)
 
          @test sqrt(f^2) == f || sqrt(f^2) == -f
-         @test issquare(f^2)
+         @test is_square(f^2)
 
          y, z = gens(S, ["y", "z"])
 
          g = rand(S, 0:5, 0:10, -10:10)
 
          @test sqrt(g^2) == g || sqrt(g^2) == -g
-         @test issquare(g^2)
+         @test is_square(g^2)
       end
    end
 end
@@ -545,7 +545,7 @@ end
          @test S(d) == R(d)
          @test R(d) == S(d)
 
-         if !isconstant(f)
+         if !is_constant(f)
             @test f != c
             @test c != f
             @test f != d
@@ -554,7 +554,7 @@ end
             @test R(d) != f
          end
 
-         if !isconstant(g)
+         if !is_constant(g)
             @test g != c
             @test c != g
             @test g != d
@@ -563,7 +563,7 @@ end
             @test R(d) != g
          end
 
-         if !isconstant(h)
+         if !is_constant(h)
             @test h != c
             @test c != h
             @test h != d
@@ -802,7 +802,7 @@ end
 
          n = rand(0:5)
          p = f*f^n
-         if !iszero(f) && !isunit(f)
+         if !iszero(f) && !is_unit(f)
             val, q = remove(p, f)
             val2 = valuation(p, f)
             @test val == val2
@@ -812,7 +812,7 @@ end
 
          n = rand(0:5)
          p = g*f^n
-         if !iszero(f) && !isunit(f) && !iszero(g)
+         if !iszero(f) && !is_unit(f) && !iszero(g)
             val, q = remove(p, f)
             val2 = valuation(p, f)
             @test val == val2
@@ -822,7 +822,7 @@ end
 
          n = rand(0:5)
          p = h*f^n
-         if !iszero(f) && !isunit(f) && !iszero(h)
+         if !iszero(f) && !is_unit(f) && !iszero(h)
             val, q = remove(p, f)
             val2 = valuation(p, f)
             @test val == val2
@@ -832,7 +832,7 @@ end
 
          n = rand(0:5)
          p = f*g^n
-         if !iszero(f) && !iszero(g) && !isunit(g)
+         if !iszero(f) && !iszero(g) && !is_unit(g)
             val, q = remove(p, g)
             val2 = valuation(p, g)
             @test val == val2
@@ -842,7 +842,7 @@ end
 
          n = rand(0:5)
          p = g*g^n
-         if !iszero(g) && !isunit(g)
+         if !iszero(g) && !is_unit(g)
             val, q = remove(p, g)
             val2 = valuation(p, g)
             @test val == val2
@@ -852,7 +852,7 @@ end
 
          n = rand(0:5)
          p = h*g^n
-         if !iszero(g) && !isunit(g) && !iszero(h)
+         if !iszero(g) && !is_unit(g) && !iszero(h)
             val, q = remove(p, g)
             val2 = valuation(p, g)
             @test val == val2
@@ -862,7 +862,7 @@ end
 
          n = rand(0:5)
          p = f*h^n
-         if !iszero(f) && !iszero(h) && !isunit(h)
+         if !iszero(f) && !iszero(h) && !is_unit(h)
             val, q = remove(p, h)
             val2 = valuation(p, h)
             @test val == val2
@@ -872,7 +872,7 @@ end
 
          n = rand(0:5)
          p = g*h^n
-         if !iszero(g) && !isunit(h) && !iszero(h)
+         if !iszero(g) && !is_unit(h) && !iszero(h)
             val, q = remove(p, h)
             val2 = valuation(p, h)
             @test val == val2
@@ -882,7 +882,7 @@ end
 
          n = rand(0:5)
          p = h*h^n
-         if !iszero(h) && !isunit(h)
+         if !iszero(h) && !is_unit(h)
             val, q = remove(p, h)
             val2 = valuation(p, h)
             @test val == val2
@@ -995,19 +995,19 @@ end
 
       x = gen(S, "x")
 
-      @test isunivariate(S)
+      @test is_univariate(S)
 
       y, z = gens(S, ["y", "z"])
 
-      @test !isunivariate(S)
+      @test !is_univariate(S)
 
       f = 3x^3 + 2x^2 + x + 4
       g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
       h = 3y^2 + 2y + 1
 
-      @test isunivariate(f)
-      @test !isunivariate(g)
-      @test isunivariate(h)
+      @test is_univariate(f)
+      @test !is_univariate(g)
+      @test is_univariate(h)
 
       f1 = to_univariate(U, f)
       h1 = to_univariate(U, h)

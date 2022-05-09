@@ -177,6 +177,7 @@ corresponding series ring.
 ```julia
 abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
 rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
 ```
 
 **Examples**
@@ -205,6 +206,9 @@ O(x^6)
 
 julia> s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
 1 + 2*x + 3*x^2 + O(x^5)
+
+julia> s = laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2; max_precision=10)
+1 + 2*x^2 + 3*x^4 + O(x^5)
 ```
 
 ## Big-oh notation
@@ -345,7 +349,8 @@ Return the parent of the given series.
 characteristic(R::SeriesRing)
 ```
 
-Return the characteristic of the given series ring.
+Return the characteristic of the given series ring. If the characteristic is
+not known, an exception is raised.
 
 ## Series functions
 
@@ -413,7 +418,7 @@ modulus{T <: ResElem}(::SeriesElem{T})
 ```
 
 ```@docs
-isgen(::RelSeriesElem)
+is_gen(::RelSeriesElem)
 ```
 
 **Examples**
@@ -479,10 +484,10 @@ O(x^4)
 julia> b = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)
 (3 + t + O(t^10))*x + (1 + t^2 + O(t^10))*x^2 + O(x^4)
 
-julia> k = isgen(gen(R))
+julia> k = is_gen(gen(R))
 true
 
-julia> m = isunit(-1 + x + 2x^2)
+julia> m = is_unit(-1 + x + 2x^2)
 true
 
 julia> n = valuation(a)

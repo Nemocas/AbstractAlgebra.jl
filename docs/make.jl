@@ -1,5 +1,7 @@
 using Documenter, AbstractAlgebra
 
+DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, :(using AbstractAlgebra); recursive = true)
+
 makedocs(
          format = Documenter.HTML(),
          sitename = "AbstractAlgebra.jl",
@@ -25,6 +27,7 @@ makedocs(
                  "mpolynomial.md",
                  "univpolynomial.md",
                  "laurent_polynomial.md",
+                 "laurent_mpolynomial.md",
                  "series.md",
                  "puiseux.md",
                  "mseries.md",
@@ -64,7 +67,6 @@ makedocs(
              ],
              "Maps" => [
                  "map_introduction.md",
-                 "map.md",
                  "functional_map.md",
                  "map_cache.md",
                  "map_with_inverse.md",

@@ -30,8 +30,8 @@ end
    R = RDF
    S = RealField
 
-   @test isunit(R(3))
-   @test isunit(S(3))
+   @test is_unit(R(3))
+   @test is_unit(S(3))
 end
 
 @testset "Julia.Floats.exact_division" begin
@@ -93,14 +93,14 @@ end
    r = R(-0.1)
    s = S(-0.1)
 
-   @test !issquare(r)
-   @test !issquare(s)
+   @test !is_square(r)
+   @test !is_square(s)
 
-   f1, s1 = issquare_with_sqrt(r)
+   f1, s1 = is_square_with_sqrt(r)
 
    @test !f1
 
-   f2, s2 = issquare_with_sqrt(s)
+   f2, s2 = is_square_with_sqrt(s)
 
    @test !f2
 end

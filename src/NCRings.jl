@@ -6,13 +6,56 @@
 
 include("Rings.jl")
 
-###############################################################################
+################################################################################
 #
 #   Promotion system
 #
-###############################################################################
+# The promote_rule functions are not extending Base.promote_rule. The
+# AbstractAlgebra promotion system is orthogonal to the built-in julia promotion
+# system. The julia system assumes that whenever you have a method signature of
+# the form Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
+# corresponding Base.convert(::Type{R}, ::T) and similar for S. Since we
+# cannot use the julia convert system (we need an instance of the type and not
+# the type), we cannot use the julia promotion system.
+#
+# The AbstractAlgebra promotion system is used to define catch all functions for
+# arithmetic between arbitrary ring elements.
+#
+# TODO: move this to NCRing.jl
+#
+################################################################################
 
-promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElem = T
+promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElement = T
+
+function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
+   U = promote_rule(T, S)
+   if U !== Union{}
+      return U
+   else
+      UU = promote_rule(S, T)
+      return UU
+   end
+end
+
+@inline function try_promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
+   U = promote_rule_sym(S, T)
+   if S === U
+      return true, x, parent(x)(y)
+   elseif T === U
+      return true, parent(y)(x), y
+   else
+      return false, x, y
+   end
+end
+
+function Base.promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
+  fl, u, v = try_promote(x, y)
+  if fl
+    return u, v
+  else
+    error("Cannot promote to common type")
+  end
+end
 
 ###############################################################################
 #
@@ -38,6 +81,19 @@ promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElem = T
 
 *(x::NCRingElement, y::NCRingElem) = parent(y)(x)*y
 
+function ==(x::NCRingElem, y::NCRingElem)
+   fl, u, v = try_promote(x, y)
+   if fl
+     return u == v
+   else
+     return false
+   end
+ end
+ 
+ ==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)
+ 
+ ==(x::NCRingElement, y::NCRingElem) = parent(y)(x) == y
+
 function divexact_left(x::NCRingElem, y::NCRingElem; check::Bool = true)
    return divexact_left(promote(x, y)...)
 end
@@ -60,14 +116,6 @@ function divexact_right(
    check::Bool = true)
 
    return divexact_right(x, parent(x)(y); check = check)
-end
-
-function ==(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
-   if S == promote_rule(S, T)
-      ==(x, parent(x)(y))
-   else
-      ==(parent(y)(x), y)
-   end
 end
 
 Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
@@ -107,7 +155,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    isunit(a::T) where {T <: NCRingElem}
+    is_unit(a::T) where {T <: NCRingElem}
 
 Return true if $a$ is invertible, else return false.
 
@@ -116,14 +164,14 @@ Return true if $a$ is invertible, else return false.
 julia> S, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> isunit(x), isunit(S(1)), isunit(S(4))
+julia> is_unit(x), is_unit(S(1)), is_unit(S(4))
 (false, true, true)
 
-julia> isunit(ZZ(-1)), isunit(ZZ(4))
+julia> is_unit(ZZ(-1)), is_unit(ZZ(4))
 (true, false)
 ```
 """
-function isunit end
+function is_unit end
 
 ###############################################################################
 #
@@ -131,8 +179,9 @@ function isunit end
 #
 ###############################################################################
 
-# -1 means the characteristic is not known by default
-characteristic(R::NCRing) = -1
+function characteristic(R::NCRing)
+   error("Characteristic not known")
+end
 
 ###############################################################################
 #
@@ -146,6 +195,28 @@ zero(x::NCRingElem) = zero(parent(x))
 
 ###############################################################################
 #
+#   Delayed reduction
+#
+###############################################################################
+
+# Fall back to ordinary multiplication
+function mul_red!(a::T, b::T, c::T, flag::Bool) where T <: NCRingElement
+   return mul!(a, b, c)
+end
+
+# Define addmul_delayed_reduction! for all ring elem types
+function addmul_delayed_reduction!(a::T, b::T, c::T, d::T) where T <: NCRingElement
+   d = mul_red!(d, b, c, false)
+   return addeq!(a, d)
+end
+
+# Fall back to nop
+function reduce!(a::NCRingElement)
+   return a
+end
+
+###############################################################################
+#
 #   Baby-steps giant-steps powering
 #
 ###############################################################################
@@ -153,11 +224,28 @@ zero(x::NCRingElem) = zero(parent(x))
 @doc Markdown.doc"""
     powers(a::Union{NCRingElement, MatElem}, d::Int)
 
-Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$
+Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$.
+
+# Examples
+```jldoctest
+julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
+[1   2   3]
+[2   3   4]
+[4   5   5]
+
+julia> A = powers(M, 4)
+5-element Vector{AbstractAlgebra.Generic.MatSpaceElem{BigInt}}:
+ [1 0 0; 0 1 0; 0 0 1]
+ [1 2 3; 2 3 4; 4 5 5]
+ [17 23 26; 24 33 38; 34 48 57]
+ [167 233 273; 242 337 394; 358 497 579]
+ [1725 2398 2798; 2492 3465 4044; 3668 5102 5957]
+
+```
 """
 function powers(a::T, d::Int) where {T <: Union{NCRingElement, MatElem}}
    d < 0 && throw(DomainError(d, "the second argument must be nonnegative"))
-   a isa MatElem && !issquare(a) && throw(DomainError(a, "matrix must be square"))
+   a isa MatElem && !is_square(a) && throw(DomainError(a, "matrix must be square"))
    M = Array{T}(undef, d + 1)
    M[1] = one(a)
    if d > 0

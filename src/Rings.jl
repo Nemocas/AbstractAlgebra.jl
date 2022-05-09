@@ -8,81 +8,6 @@ function isequal(a::RingElem, b::RingElem)
    return parent(a) == parent(b) && a == b
 end
 
-################################################################################
-#
-#   Promotion system
-#
-# The promote_rule functions are not extending Base.promote_rule. The
-# AbstractAlgebra promotion system is orthogonal to the built-in julia promotion
-# system. The julia system assumes that whenever you have a method signature of
-# the form Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
-# corresponding Base.convert(::Type{R}, ::T) and similar for S. Since we
-# cannot use the julia convert system (we need an instance of the type and not
-# the type), we cannot use the julia promotion system.
-#
-# The AbstractAlgebra promotion system is used to define catch all functions for
-# arithmetic between arbitrary ring elements.
-#
-# TODO: move this to NCRing.jl
-#
-################################################################################
-
-promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElement = T
-
-function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
-   U = promote_rule(T, S)
-   if U !== Union{}
-      return U
-   else
-      UU = promote_rule(S, T)
-      return UU
-   end
-end
-
-@inline function try_promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
-   U = promote_rule_sym(S, T)
-   if S === U
-      return true, x, parent(x)(y)
-   elseif T === U
-      return true, parent(y)(x), y
-   else
-      return false, x, y
-   end
-end
-
-function Base.promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
-  fl, u, v = try_promote(x, y)
-  if fl
-    return u, v
-  else
-    error("Cannot promote to common type")
-  end
-end
-
-###############################################################################
-#
-#   Generic catchall functions
-#
-###############################################################################
-
-+(x::RingElem, y::RingElem) = +(promote(x, y)...)
-
-+(x::RingElem, y::RingElement) = x + parent(x)(y)
-
-+(x::RingElement, y::RingElem) = parent(y)(x) + y
-
--(x::RingElem, y::RingElem) = -(promote(x, y)...)
-
--(x::RingElem, y::RingElement) = x - parent(x)(y)
-
--(x::RingElement, y::RingElem) = parent(y)(x) - y
-
-*(x::RingElem, y::RingElem) = *(promote(x, y)...)
-
-*(x::RingElem, y::RingElement) = x*parent(x)(y)
-
-*(x::RingElement, y::RingElem) = parent(y)(x)*y
-
 """
     divexact(x, y; check::Bool=true)
 
@@ -107,27 +32,13 @@ divexact_right(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x
 
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 
-function isdivisible_by(x::T, y::T) where T <: RingElem
+function is_divisible_by(x::T, y::T) where T <: RingElem
    if iszero(y)
       return iszero(x)
    end
    r = rem(x, y)
    return iszero(r)
 end
-
-function ==(x::RingElem, y::RingElem)
-  fl, u, v = try_promote(x, y)
-  if fl
-    return u == v
-  else
-    return false
-  end
-end
-
-==(x::RingElem, y::RingElement) = x == parent(x)(y)
-
-==(x::RingElement, y::RingElem) = parent(y)(x) == y
-
 
 ###############################################################################
 #
@@ -153,39 +64,17 @@ Base.broadcastable(m::RingElem) = Ref(m)
 
 ###############################################################################
 #
-#   Delayed reduction
-#
-###############################################################################
-
-# Fall back to ordinary multiplication
-function mul_red!(a::T, b::T, c::T, flag::Bool) where T <: RingElement
-   return mul!(a, b, c)
-end
-
-# Define addmul_delayed_reduction! for all ring elem types
-function addmul_delayed_reduction!(a::T, b::T, c::T, d::T) where T <: RingElement
-   d = mul_red!(d, b, c, false)
-   return addeq!(a, d)
-end
-
-# Fall back to nop
-function reduce!(a::RingElement)
-   return a
-end
-
-###############################################################################
-#
 #   Type traits
 #
 ###############################################################################
 
 # Type can only represent elements of an exact ring
 # true unless explicitly specified
-isexact_type(R::Type{T}) where T <: RingElem = true
+is_exact_type(R::Type{T}) where T <: RingElem = true
 
 # Type can only represent elements of domains
 # false unless explicitly specified
-isdomain_type(R::Type{T}) where T <: RingElem = false
+is_domain_type(R::Type{T}) where T <: RingElem = false
 
 ###############################################################################
 #
@@ -218,6 +107,9 @@ transpose(x::T) where {T <: RingElem} = deepcopy(x)
 # This is used in various Euclidean domains for Chinese remaindering.
 
 function ppio(a::E, b::E) where E <: RingElem
+   if iszero(a)
+     return one(parent(a)), a
+   end
    c = gcd(a, b)
    n = div(a, c)
    g = gcd(c, n)
@@ -263,9 +155,9 @@ function Base.sqrt(a::RingElem; check::Bool=true)
   return s
 end  
 
-# assumes the existence of issquare and sqrt for input  
-function issquare_with_sqrt(a::RingElem)
-  if issquare(a)
+# assumes the existence of is_square and sqrt for input  
+function is_square_with_sqrt(a::RingElem)
+  if is_square(a)
      return true, sqrt(a)
   else
      return false, parent(a)()

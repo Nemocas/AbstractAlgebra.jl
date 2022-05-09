@@ -12,6 +12,7 @@ include("generic/PuiseuxSeries-test.jl")
 include("generic/AbsMSeries-test.jl")
 include("generic/Matrix-test.jl")
 include("generic/MPoly-test.jl")
+include("generic/LaurentMPoly-test.jl")
 include("generic/UnivPoly-test.jl")
 include("algorithms/MPolyFactor-test.jl")
 include("algorithms/DensePoly-test.jl")
@@ -29,6 +30,12 @@ end
 
    @test_throws MethodError elem_type('c')
    @test_throws MethodError elem_type(Char)
+end
+
+@testset "ppio" begin
+   Qx, x = QQ["x"]
+   p, q = @inferred ppio(zero(Qx), x)
+   @test isone(p) && q == zero(Qx)
 end
 
 include("julia/Integers-test.jl")

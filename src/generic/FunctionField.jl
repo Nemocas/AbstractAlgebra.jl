@@ -544,8 +544,8 @@ base_field(R::FunctionField) = base_ring(R)
 
 parent(a::FunctionFieldElem) = a.parent
 
-function isexact_type(a::Type{T}) where {S <: FieldElement, T <: FunctionFieldElem{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: FieldElement, T <: FunctionFieldElem{S}}
+   return is_exact_type(S)
 end
 
 @doc Markdown.doc"""
@@ -688,21 +688,21 @@ iszero(a::FunctionFieldElem) = iszero(numerator(a, false))
 
 isone(a::FunctionFieldElem) = numerator(a, false) == denominator(a, false)
 
-isunit(a::FunctionFieldElem) = !iszero(a)
+is_unit(a::FunctionFieldElem) = !iszero(a)
 
 @doc Markdown.doc"""
-    isgen(a::FunctionFieldElem)
+    is_gen(a::FunctionFieldElem)
 
 Return `true` if `a` is the generator of the function field returned by the
 function field constructor.
 """
-function isgen(a::FunctionFieldElem)
+function is_gen(a::FunctionFieldElem)
    S = parent(a)
    if degree(S) == 1
       return a == S(-coeff(modulus(S), 0)//coeff(modulus(S), 1))
    else
-      return isgen(numerator(a, false)) && isone(denominator(a, false)) ||
-             isgen(numerator(a, true)) && isone(denominator(a, true))
+      return is_gen(numerator(a, false)) && isone(denominator(a, false)) ||
+             is_gen(numerator(a, true)) && isone(denominator(a, true))
    end
 end
 
@@ -883,7 +883,7 @@ end
 function ^(a::FunctionFieldElem{T}, b::Int) where T <: FieldElement
    b < 0 && error("Not implemented")
    R = parent(a)
-   if isgen(a) && b < 2*length(numerator(R)) - 3 # special case powers of generator
+   if is_gen(a) && b < 2*length(numerator(R)) - 3 # special case powers of generator
       return R(deepcopy(power_precomp(R, b)),
                deepcopy(power_precomp_den(R, b)))
    elseif b == 0

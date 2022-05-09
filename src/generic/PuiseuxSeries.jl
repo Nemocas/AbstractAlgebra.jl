@@ -83,11 +83,11 @@ Return a symbol representing the variable of the given Puiseux series field.
 """
 var(R::PuiseuxSeriesField{T}) where T <: FieldElement = var(laurent_ring(R))
 
-function isdomain_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesElem{S}}
-   return isdomain_type(S)
+function is_domain_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesElem{S}}
+   return is_domain_type(S)
 end
 
-isexact_type(a::Type{T}) where T <: PuiseuxSeriesElem = false
+is_exact_type(a::Type{T}) where T <: PuiseuxSeriesElem = false
 
 function check_parent(a::PuiseuxSeriesElem, b::PuiseuxSeriesElem, throw::Bool = true)
    fl = parent(a) != parent(b)
@@ -213,17 +213,17 @@ function isone(a::PuiseuxSeriesElem)
 end
 
 @doc Markdown.doc"""
-    isgen(a::Generic.PuiseuxSeriesElem)
+    is_gen(a::Generic.PuiseuxSeriesElem)
 
 Return `true` if the given Puiseux series is arithmetically equal to the
 generator of its Puiseux series ring to its current precision, otherwise return
 `false`.
 """
-function isgen(a::PuiseuxSeriesElem)
+function is_gen(a::PuiseuxSeriesElem)
    return valuation(a) == 1 && pol_length(a.data) == 1 && isone(polcoeff(a.data, 0))
 end
 
-isunit(a::PuiseuxSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a.data, 0))
+is_unit(a::PuiseuxSeriesElem) = valuation(a) == 0 && is_unit(polcoeff(a.data, 0))
 
 @doc Markdown.doc"""
     modulus(a::Generic.PuiseuxSeriesElem{T}) where {T <: ResElem}
@@ -616,12 +616,12 @@ function Base.sqrt(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingEle
    return s
 end
 
-function issquare(a::PuiseuxSeriesElem{T}) where T <: RingElement
+function is_square(a::PuiseuxSeriesElem{T}) where T <: RingElement
    flag, s = sqrt_classical(a; check=true)
    return flag
 end
 
-function issquare_with_sqrt(a::PuiseuxSeriesElem{T}) where T <: RingElement
+function is_square_with_sqrt(a::PuiseuxSeriesElem{T}) where T <: RingElement
    return sqrt_classical(a; check=true)
 end
 

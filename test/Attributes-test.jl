@@ -22,6 +22,10 @@ module Tmp
     struct Singleton
     end
 
+    # applying @attributes to a singleton type definition is supported but does nothing
+    @attributes struct AnotherSingleton
+    end
+
     struct NotSupported
         x::Int
         NotSupported() = new(0)
@@ -33,11 +37,20 @@ module Tmp
         FooBar{T}() where T = new(0)
     end
     @attributes Tmp.FooBar{Bar}
+
+
+    @attributes mutable struct Container{T}
+        x::T
+        Container(x::T) where T = new{T}(x)
+    end
 end
 
 # test @attributes applied to a struct typename in another module
 @attributes Tmp.Quux
 @attributes Tmp.FooBar{Tmp.Quux}
+
+# applying @attributes to a singleton typename is supported but does nothing
+@attributes Tmp.Singleton
 
 @testset "@attributes input validation" begin
 
@@ -46,7 +59,7 @@ end
 
 end
 
-@testset "attributes for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux, Tmp.FooBar{Tmp.Bar}, Tmp.FooBar{Tmp.Quux})
+@testset "attributes for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux, Tmp.Singleton, Tmp.AnotherSingleton, Tmp.FooBar{Tmp.Bar}, Tmp.FooBar{Tmp.Quux})
 
     x = T()
 
@@ -128,30 +141,45 @@ end
 # attribute caching
 
 
-uncached_attr(obj::T) where T = [obj,T]
+uncached_attr(obj::T) where T = (obj,T,[])
 
 """
     cached_attr(obj::T) where T
 
 A cached attribute.
 """
-@attr cached_attr(obj::T) where T = [obj,T]
+@attr Tuple{T,DataType,Vector{Any}} cached_attr(obj::T) where T = (obj,T,[])
+
+# cached attribute without return type specification
+@attr cached_attr2(obj::T) where T = (obj,T,[])
+
+# cached attribute with return type specification depending on the input type
+my_derived_type(::Type{Tmp.Container{T}}) where T = T
+@attr my_derived_type(T) cached_attr3(obj::T) where T <: Tmp.Container = obj.x
 
 @testset "attribute caching for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux, Tmp.FooBar{Tmp.Bar}, Tmp.FooBar{Tmp.Quux})
 
     x = T()
 
     # check uncached case: multiple calls return equal but not identical results
-    y = uncached_attr(x)
-    @test y == [x,T]
+    y = @inferred uncached_attr(x)
+    @test y == (x,T,[])
     @test uncached_attr(x) == y
     @test uncached_attr(x) !== y
 
     # check cached case: multiple calls return identical results
-    y = cached_attr(x)
-    @test y == [x,T]
+    y = @inferred cached_attr(x)
+    @test y == (x,T,[])
     @test cached_attr(x) == y
     @test cached_attr(x) === y
+
+    # check cached without type specification is not inferring return types correctly
+    @test_throws ErrorException @inferred cached_attr2(x)
+
+    # check when return type is derived via a function from input type
+    z = Tmp.Container(x)
+    y = @inferred cached_attr3(z)
+    @test y === x
 
     # verify docstring is correctly attached
     @test string(@doc cached_attr) ==
@@ -167,4 +195,21 @@ A cached attribute.
     # definition of uncached_attr is before that of cached_attr)
     @test functionloc(uncached_attr)[1] == functionloc(cached_attr)[1]
     @test functionloc(uncached_attr)[2] < functionloc(cached_attr)[2]
+end
+
+if VERSION >= v"1.7"
+    # the following tests need the improved `@macroexpand` from Julia 1.7
+    @testset "@attr error handling" begin
+        # wrong number of arguments
+        @test_throws ArgumentError @macroexpand @attr foo() = 1
+        @test_throws ArgumentError @macroexpand @attr foo(x::Int, y::Int) = 1
+        @test_throws ArgumentError @macroexpand @attr Int foo() = 1
+        @test_throws ArgumentError @macroexpand @attr Int foo(x::Int, y::Int) = 1
+        @test_throws ArgumentError @macroexpand @attr Int foo(x::Int) = 1 Any
+        @test_throws ArgumentError @macroexpand @attr Int Int Int
+
+        # wrong kind of arguments
+        #@test_throws ArgumentError @macroexpand @attr Int Int
+        #@test_throws ArgumentError @macroexpand @attr foo(x::Int) = 1 Int
+    end
 end

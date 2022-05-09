@@ -14,12 +14,12 @@ parent_type(::Type{SparsePoly{T}}) where {T <: RingElement} = SparsePolyRing{T}
 
 elem_type(::Type{SparsePolyRing{T}}) where {T <: RingElement} = SparsePoly{T}
 
-function isdomain_type(a::Type{SparsePoly{T}}) where T <: RingElement
-   return isdomain_type(T)
+function is_domain_type(a::Type{SparsePoly{T}}) where T <: RingElement
+   return is_domain_type(T)
 end
 
-function isexact_type(a::Type{SparsePoly{T}}) where T <: RingElement
-   return isexact_type(T)
+function is_exact_type(a::Type{SparsePoly{T}}) where T <: RingElement
+   return is_exact_type(T)
 end
 
 var(a::SparsePolyRing) = a.S
@@ -1414,14 +1414,14 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    # check if we are in the univariate case
    constant_coeffs = true
    for i = 1:a.length
-      if !isconstant(a.coeffs[i])
+      if !is_constant(a.coeffs[i])
          constant_coeffs = false
          break
       end
    end
    if constant_coeffs
       for i = 1:b.length
-         if !isconstant(b.coeffs[i])
+         if !is_constant(b.coeffs[i])
             constant_coeffs = false
             break
          end

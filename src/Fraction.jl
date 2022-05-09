@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export FractionField
+export FractionField, FactoredFractionField
 
 ###############################################################################
 #
@@ -18,12 +18,12 @@ base_ring(a::FracElem) = base_ring(parent(a))
 
 parent(a::FracElem) = a.parent
 
-function isdomain_type(::Type{T}) where {S <: RingElement, T <: FracElem{S}}
-   return isdomain_type(S)
+function is_domain_type(::Type{T}) where {S <: RingElement, T <: FracElem{S}}
+   return is_domain_type(S)
 end
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: FracElem{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: RingElement, T <: FracElem{S}}
+   return is_exact_type(S)
 end
 
 @doc Markdown.doc"""
@@ -94,7 +94,7 @@ iszero(a::FracElem) = iszero(numerator(a, false))
 
 isone(a::FracElem) = numerator(a, false) == denominator(a, false)
 
-isunit(a::FracElem) = !iszero(numerator(a, false))
+is_unit(a::FracElem) = !iszero(numerator(a, false))
 
 ###############################################################################
 #
@@ -619,12 +619,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    issquare(a::FracElem{T}) where T <: RingElem
+    is_square(a::FracElem{T}) where T <: RingElem
 
 Return `true` if $a$ is a square.
 """
-function issquare(a::FracElem{T}) where T <: RingElem
-   return issquare(numerator(a)) && issquare(denominator(a))
+function is_square(a::FracElem{T}) where T <: RingElem
+   return is_square(numerator(a)) && is_square(denominator(a))
 end
 
 @doc Markdown.doc"""
@@ -637,13 +637,13 @@ function Base.sqrt(a::FracElem{T}; check::Bool=true) where T <: RingElem
    return parent(a)(sqrt(numerator(a); check=check), sqrt(denominator(a); check=check))
 end
 
-function issquare_with_sqrt(a::FracElem{T}) where T <: RingElem
+function is_square_with_sqrt(a::FracElem{T}) where T <: RingElem
    S = parent(a)
-   f1, s1 = issquare_with_sqrt(numerator(a))
+   f1, s1 = is_square_with_sqrt(numerator(a))
    if !f1
       return false, zero(S)
    end
-   f2, s2 = issquare_with_sqrt(denominator(a))
+   f2, s2 = is_square_with_sqrt(denominator(a))
    if !f2
       return false, zero(S)
    end
@@ -914,3 +914,14 @@ base ring $R$ is supplied.
 function FractionField(R::Ring; cached=true)
    return Generic.FractionField(R; cached=cached)
 end
+
+@doc Markdown.doc"""
+    FactoredFractionField(R::Ring; cached=true)
+
+Return the parent object of the fraction field over the given base ring $R$,
+where the elements are maintained in factored form as much as possible.
+"""
+function FactoredFractionField(R::Ring; cached=true)
+   return Generic.FactoredFractionField(R; cached=cached)
+end
+

@@ -162,7 +162,7 @@ function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
    nunits = 0
    while nunits < min(nrows(S), ncols(S))
       nunits += 1
-      if !isunit(S[nunits, nunits])
+      if !is_unit(S[nunits, nunits])
          nunits -= 1
          break
       end
@@ -213,7 +213,7 @@ function invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElemen
    nunits = 0
    while nunits < min(nrows(S), ncols(S))
       nunits += 1
-      if !isunit(S[nunits, nunits])
+      if !is_unit(S[nunits, nunits])
          nunits -= 1
          break
       end

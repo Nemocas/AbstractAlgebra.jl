@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export iscompatible, isisomorphic, issubmodule, rels
+export is_compatible, is_isomorphic, is_submodule, rels
 
 ###############################################################################
 #
@@ -97,6 +97,11 @@ function ==(m::FPModuleElem{T}, n::FPModuleElem{T}) where T <: RingElement
    return Generic._matrix(m) == Generic._matrix(n)
 end
 
+function hash(m::FPModuleElem{T}, h::UInt)  where T <: RingElement
+   b = 0xe08f5b4ea1cd9a12%UInt
+   return xor(hash(Generic._matrix(m), h), b)
+end
+
 ###############################################################################
 #
 #   Intersection
@@ -113,7 +118,7 @@ module $P$.
 function Base.intersect(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
    check_parent(M, N)
    # Compute the common supermodule P of M and N
-   flag, P = iscompatible(M, N)
+   flag, P = is_compatible(M, N)
    !flag && error("Modules not compatible")
    # Compute the generators of M as elements of P
    G1 = gens(M)
@@ -181,7 +186,7 @@ etc.) must extend this notion of equality to the modules they create.
 function ==(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
    check_parent(M, N)
    # Compute the common supermodule P of M and N
-   flag, P = iscompatible(M, N)
+   flag, P = is_compatible(M, N)
    !flag && error("Modules not compatible")
    # Compute the generators of M as elements of P
    G1 = gens(M)
@@ -247,11 +252,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    isisomorphic(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
+    is_isomorphic(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
 
 Return `true` if the modules $M$ and $N$ are isomorphic.
 """
-function isisomorphic(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
+function is_isomorphic(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
    return invariant_factors(M) == invariant_factors(N)
 end
 

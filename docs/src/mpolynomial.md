@@ -49,29 +49,12 @@ In order to construct multivariate polynomials in AbstractAlgebra.jl, one must f
 construct the polynomial ring itself. This is accomplished with one of the following
 constructors.
 
-```julia
+```@docs
 PolynomialRing(R::Ring, S::Vector{String}; cached::Bool = true, ordering::Symbol=:lex)
-PolynomialRing(R::Ring, n::Int, s::String="x"; cached::Bool = false, ordering::Symbol = :lex)
+PolynomialRing(R::Ring, n::Int, s::String; cached::Bool = false, ordering::Symbol = :lex)
 ```
 
-The first constructor, given a base ring `R` and an array `S` of strings
-specifying how the generators (variables) should be printed, will return a
-tuple `S, (x, ...)` representing the new polynomial ring $S = R[x, \ldots]$ and
-a tuple of the generators $(x, ...)$ of the ring.
-
-The second constructor given a string `s` and a number of variables `n` will
-do the same as the first constructor except that the variables will be
-automatically numbered. For example if `s` is the string `x` and `n = 3` then
-the variables will print as `x1`, `x2`, `x3`.
-
-By default the parent object `S` will depend only on `R` and  `(x, ...)` and
-will be cached. Setting the optional argument `cached` to `false` will prevent
-the parent object `S` from being cached.
-
-The optional named argument `ordering` can be used to specify an ordering. The
-currently supported options are `:lex`, `:deglex` and `:degrevlex`.
-
-Like for univariate polynomials, a shorthand version of this function is
+Like for univariate polynomials, a shorthand constructor is
 provided when the number of generators is greater than `1`: given a base ring
 `R`, we abbreviate the constructor as follows:
 
@@ -124,9 +107,9 @@ Also, all of the standard ring element constructors may be used to construct
 multivariate polynomials.
 
 ```julia
-(R::MPolyRing)() # constructs zero
-(R::MPolyRing)(c::Integer)
-(R::MPolyRing)(c::elem_type(R))
+(R::MPolyRing{T})() where T <: RingElement
+(R::MPolyRing{T})(c::Integer) where T <: RingElement
+(R::MPolyRing{T})(a::elem_type(R)) where T <: RingElement
 (R::MPolyRing{T})(a::T) where T <: RingElement
 ```
 
@@ -135,11 +118,14 @@ For more efficient construction of multivariate polynomial, one can use the
 are pushed onto a context one at a time and then the polynomial constructed
 from those terms in one go using the `finish` function.
 
-```julia
+```@docs
 MPolyBuildCtx(R::MPolyRing)
 push_term!(M::MPolyBuildCtx, c::RingElem, v::Vector{Int})
 finish(M::MPolyBuildCtx)
 ```
+
+Note that the `finish` function resets the build context so that it can be
+used to construct multiple polynomials..
 
 When a multivariate polynomial type has a representation that allows constant
 time access (e.g. it is represented internally by arrays), the following
@@ -175,6 +161,12 @@ julia> push_term!(C, ZZ(4), [0, 0]);
 julia> f = finish(C)
 3*x*y^2 + 2*x*y + 4
 
+julia> push_term!(C, ZZ(4), [1, 1]);
+
+
+julia> f = finish(C)
+4*x*y
+
 julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
@@ -203,7 +195,8 @@ Return the polynomial ring of the given polynomial.
 characteristic(R::MPolyRing)
 ```
 
-Return the characteristic of the given polynomial ring.
+Return the characteristic of the given polynomial ring. If the characteristic
+is not known, an exception is raised.
 
 ## Polynomial functions
 
@@ -245,7 +238,7 @@ total_degree(f::MPolyElem)
 ```
 
 ```julia
-isgen(x::MPolyElem)
+is_gen(x::MPolyElem)
 ```
 
 ```julia
@@ -320,7 +313,7 @@ gcd(f::T, g::T) where T <: MPolyElem
 The following functionality is also provided for all multivariate polynomials.
 
 ```@docs
-isunivariate(::MPolyRing{T}) where T <: RingElement
+is_univariate(::MPolyRing{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -344,19 +337,19 @@ degrees(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isconstant(::MPolyElem{T}) where T <: RingElement
+is_constant(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isterm(::MPolyElem{T}) where T <: RingElement
+is_term(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-ismonomial(::MPolyElem{T}) where T <: RingElement
+is_monomial(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isunivariate(::MPolyElem{T}) where T <: RingElement
+is_univariate(::MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -390,16 +383,16 @@ julia> d = degrees(f)
  2
  0
 
-julia> isconstant(R(1))
+julia> is_constant(R(1))
 true
 
-julia> isterm(2x)
+julia> is_term(2x)
 true
 
-julia> ismonomial(y)
+julia> is_monomial(y)
 true
 
-julia> isunit(R(1))
+julia> is_unit(R(1))
 true
 
 julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
@@ -456,7 +449,7 @@ x^3*y + 3*x*y^2 + 1
 julia> n = length(f)
 3
 
-julia> isgen(y)
+julia> is_gen(y)
 true
 
 julia> nvars(S) == 2
@@ -506,7 +499,7 @@ the square root of a polynomial or test whether it is a square.
 
 ```julia
 sqrt(f::MPolyElem, check::bool=true)
-issquare(::MPolyElem)
+is_square(::MPolyElem)
 ```
 
 **Examples**
@@ -521,7 +514,7 @@ julia> f = -4*x^5*y^4 + 5*x^5*y^3 + 4*x^4 - x^3*y^4
 julia> sqrt(f^2)
 4*x^5*y^4 - 5*x^5*y^3 - 4*x^4 + x^3*y^4
 
-julia> issquare(f)
+julia> is_square(f)
 false
 ```
 
@@ -907,7 +900,7 @@ x + 1
 It is possible to test whether a polynomial is homogeneous with respect to the standard grading using the function
 
 ```@docs
-ishomogeneous(x::MPolyElem{T}) where T <: RingElement
+is_homogeneous(x::MPolyElem{T}) where T <: RingElement
 ```
 
 ## Random generation

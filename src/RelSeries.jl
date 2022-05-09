@@ -33,11 +33,11 @@ base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 base_ring(a::SeriesElem) = base_ring(parent(a))
 
-function isdomain_type(::Type{T}) where {S <: RingElement, T <: SeriesElem{S}}
-   return isdomain_type(S)
+function is_domain_type(::Type{T}) where {S <: RingElement, T <: SeriesElem{S}}
+   return is_domain_type(S)
 end
 
-isexact_type(a::Type{T}) where T <: SeriesElem = false
+is_exact_type(a::Type{T}) where T <: SeriesElem = false
 
 @doc Markdown.doc"""
     var(a::SeriesRing)
@@ -134,17 +134,17 @@ function isone(a::RelSeriesElem)
 end
 
 @doc Markdown.doc"""
-    isgen(a::RelSeriesElem)
+    is_gen(a::RelSeriesElem)
 
 Return `true` if the given power series is arithmetically equal to the
 generator of its power series ring to its current precision, otherwise return
 `false`.
 """
-function isgen(a::RelSeriesElem)
+function is_gen(a::RelSeriesElem)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-isunit(a::RelSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a, 0))
+is_unit(a::RelSeriesElem) = valuation(a) == 0 && is_unit(polcoeff(a, 0))
 
 @doc Markdown.doc"""
     modulus(a::SeriesElem{T}) where {T <: ResElem}
@@ -677,7 +677,7 @@ function ^(a::RelSeriesElem{T}, b::Int) where T <: RingElement
       z = set_precision!(z, b*valuation(a))
       z = set_valuation!(z, b*valuation(a))
       return z
-   elseif isgen(a)
+   elseif is_gen(a)
       z = parent(a)()
       fit!(z, 1)
       z = set_precision!(z, b + precision(a) - 1)
@@ -939,7 +939,7 @@ Return the inverse of the power series $a$, i.e. $1/a$.
 """
 function Base.inv(a::RelSeriesElem)
    iszero(a) && throw(DivideError())
-   !isunit(a) && error("Unable to invert power series")
+   !is_unit(a) && error("Unable to invert power series")
    R = base_ring(a)
    a1 = polcoeff(a, 0)
    ainv = parent(a)()
@@ -1071,7 +1071,7 @@ function sqrt_classical_char2(a::RelSeriesElem; check::Bool=true)
    end
    for i = 0:prec - aval2 - 1
       c = polcoeff(a, 2*i)
-      if check && !issquare(c)
+      if check && !is_square(c)
          return false, S()
       end
       asqrt = setcoeff!(asqrt, i, sqrt(c; check=false))
@@ -1087,7 +1087,7 @@ function sqrt_classical(a::RelSeriesElem; check::Bool=true)
    if check && !iseven(aval)
       return false, S()
    end
-   !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
+   !is_domain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    if characteristic(R) == 2
       return sqrt_classical_char2(a, check=check)
    end
@@ -1105,7 +1105,7 @@ function sqrt_classical(a::RelSeriesElem; check::Bool=true)
    asqrt = set_valuation!(asqrt, aval2)
    if prec > 0
       c = polcoeff(a, 0)
-      if check && !issquare(c)
+      if check && !is_square(c)
          return false, zero(S)
       end
       g = sqrt(c; check=check)
@@ -1156,12 +1156,12 @@ function Base.sqrt(a::RelSeriesElem; check::Bool=true)
    return q
 end
 
-function issquare(a::RelSeriesElem)
+function is_square(a::RelSeriesElem)
    flag, q = sqrt_classical(a; check=true)
    return flag
 end
 
-function issquare_with_sqrt(a::RelSeriesElem)
+function is_square_with_sqrt(a::RelSeriesElem)
    return sqrt_classical(a; check=true)
 end
 
@@ -1296,7 +1296,7 @@ function Base.exp(a::RelSeriesElem{T}) where T <: RingElement
          s = addmul_delayed_reduction!(s, c, polcoeff(z, k - j), C)
       end
       s = reduce!(s)
-      !isunit(R(k)) && error("Unable to divide in exp")
+      !is_unit(R(k)) && error("Unable to divide in exp")
       z = setcoeff!(z, k, divexact(s, k))
    end
    z = set_length!(z, normalise(z, preca))

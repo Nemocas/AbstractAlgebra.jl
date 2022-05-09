@@ -14,8 +14,8 @@ base_ring(R::NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)
 
 coefficient_ring(R::NCPolyRing) = base_ring(R)
 
-function isexact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyElem{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyElem{S}}
+   return is_exact_type(S)
 end
 
 @doc Markdown.doc"""
@@ -60,9 +60,7 @@ Return the generator of the given polynomial ring.
 """
 gen(R::NCPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
-isterm(a::T) where T <: NCRingElem = true
-
-ismonomial_monomial(a::T) where T <: NCRingElem = isone(a)
+is_term(a::T) where T <: NCRingElem = true
 
 ###############################################################################
 #
@@ -218,7 +216,7 @@ function ^(a::NCPolyElem{T}, b::Int) where T <: NCRingElem
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    R = parent(a)
-   if isgen(a)
+   if is_gen(a)
       z = R()
       fit!(z, b + 1)
       z = setcoeff!(z, b, deepcopy(coeff(a, 1)))
@@ -564,6 +562,44 @@ end
 
 # Note: composition is not associative, e.g. consider fo(goh) vs (fog)oh
 # for f and g of degree 2 and h of degree 1 -- and recall coeffs don't commute
+
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function change_base_ring(R::NCRing, p::NCPolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: NCRingElement
+   return _map(R, p, parent)
+end
+
+function change_coefficient_ring(R::NCRing, p::NCPolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: NCRingElement
+  return change_base_ring(R, p; cached = cached, parent = parent)
+end
+
+################################################################################
+#
+#  Map
+#
+################################################################################
+
+_make_parent(g, p::NCPolyElem, cached::Bool) =
+   _change_poly_ring(parent(g(zero(base_ring(p)))),
+                     parent(p), cached)
+
+function map_coefficients(g, p::NCPolyElem{<:NCRingElement};
+                    cached::Bool = true,
+                    parent::NCPolyRing = _make_parent(g, p, cached))
+   return _map(g, p, parent)
+end
+
+function _map(g, p::NCPolyElem, Rx)
+   R = base_ring(Rx)
+   new_coefficients = elem_type(R)[let c = coeff(p, i)
+                                     iszero(c) ? zero(R) : R(g(c))
+                                   end for i in 0:degree(p)]
+   return Rx(new_coefficients)
+end
 
 ###############################################################################
 #

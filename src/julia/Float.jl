@@ -22,9 +22,9 @@ parent_type(::Type{T}) where T <: AbstractFloat = Floats{T}
 
 base_ring(a::Floats{T}) where T <: AbstractFloat = Union{}
 
-isdomain_type(::Type{T}) where T <: AbstractFloat = true
+is_domain_type(::Type{T}) where T <: AbstractFloat = true
 
-isexact_type(::Type{T}) where T <: AbstractFloat = false
+is_exact_type(::Type{T}) where T <: AbstractFloat = false
 
 ###############################################################################
 #
@@ -36,7 +36,7 @@ zero(::Floats{T}) where T <: AbstractFloat = T(0)
 
 one(::Floats{T}) where T <: AbstractFloat = T(1)
 
-isunit(a::AbstractFloat) = a != 0
+is_unit(a::AbstractFloat) = a != 0
 
 canonical_unit(a::AbstractFloat) = a
 
@@ -120,11 +120,11 @@ function Base.sqrt(a::AbstractFloat; check::Bool=true)
    return Base.sqrt(a)
 end
 
-function issquare(a::AbstractFloat)
+function is_square(a::AbstractFloat)
    return a > 0
 end
 
-function issquare_with_sqrt(a::T) where T <: AbstractFloat
+function is_square_with_sqrt(a::T) where T <: AbstractFloat
    if a > 0
       return true, Base.sqrt(a)
    else

@@ -14,7 +14,7 @@
 # - test_MatAlgebra_interface(R)
 
 function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
-   if isexact_type(T)
+   if is_exact_type(T)
       return a == b
    else
       return isapprox(a, b)
@@ -37,14 +37,15 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
             a = test_elem(R)::T
             @test parent(a) == R
          end
-         @test isdomain_type(T) isa Bool
-         @test isexact_type(T) isa Bool
+         @test is_domain_type(T) isa Bool
+         @test is_exact_type(T) isa Bool
 
-         # some rings don't support characteristic and return -1 (see issue #993)
-         if characteristic(R) != -1
+         # some rings don't support characteristic and raise an exception (see issue #993)
+         try ch = characteristic(R)
             @test iszero(R(characteristic(R)))
             @test iszero(characteristic(R) * one(R))
             @test iszero(one(R) * characteristic(R))
+         catch
          end
       end
 
@@ -71,8 +72,8 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          @test isone(one(R))
          @test iszero(R(0))
          @test isone(R(1))
-         @test isone(R(0)) || !isunit(R(0))
-         @test isunit(R(1))
+         @test isone(R(0)) || !is_unit(R(0))
+         @test is_unit(R(1))
          for i in 1:reps
             a = test_elem(R)::T
             @test hash(a) isa UInt
@@ -118,7 +119,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
                A = deepcopy(a)
                B = deepcopy(b)
                # documentation is not clear on divexact
-               if isdomain_type(T)
+               if is_domain_type(T)
                   @test iszero(b) || equality(divexact_left(b*a, b), a)
                   @test iszero(b) || equality(divexact_right(a*b, b), a)
                else
@@ -215,7 +216,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
             @test isone(AbstractAlgebra.inv(one(R)))
             @test a*b == b*a
             # documentation is not clear on divexact
-            if isdomain_type(T)
+            if is_domain_type(T)
                @test iszero(b) || equality(divexact(b*a, b), a)
             else
                try
@@ -247,7 +248,7 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
 
       for i in 1:reps
          a = test_elem(R)::T
-         @test isunit(a) == !iszero(a)
+         @test is_unit(a) == !iszero(a)
       end
    end
 
@@ -264,7 +265,7 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
 
    T = elem_type(R)
 
-   isexact_type(T) || return
+   is_exact_type(T) || return
 
    @testset "Euclidean Ring interface for $(R) of type $(typeof(R))" begin
 
@@ -286,7 +287,7 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
             @test divides(fi - mod(f^i, m), m)[1]
          end
 
-         if isunit(gcd(f, m))
+         if is_unit(gcd(f, m))
             a = invmod(f, m)
             @test divides(mulmod(a, f, m) - one(R), m)[1]
             @test divides(powermod(f, -1, m) - a^1, m)[1]
@@ -302,7 +303,7 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          #@test_throws Exception remove(f, zero(R))
          #@test_throws Exception valuation(f, zero(R))
 
-         if !isunit(m) && !iszero(f)
+         if !is_unit(m) && !iszero(f)
             n = rand(0:3)
             f *= m^n
             (v, q) = remove(f, m)
@@ -372,17 +373,17 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
          @test var(Rx) isa Symbol
          @test symbols(Rx) isa Vector{Symbol}
          @test length(symbols(Rx)) == 1
-         @test isgen(gen(Rx))
-         @test ismonic(x)
+         @test is_gen(gen(Rx))
+         @test is_monic(x)
          for i in 1:reps
             a = test_elem(Rx)
             @test iszero(a) || degree(a) >= 0
             @test equality(a, leading_coefficient(a)*x^max(0, degree(a)) + tail(a))
             @test constant_coefficient(a) isa elem_type(R)
             @test trailing_coefficient(a) isa elem_type(R)
-            @test isgen(x)
-            @test iszero(one(Rx)) || !isgen(x^2)
-            @test ismonic(a) == isone(leading_coefficient(a))
+            @test is_gen(x)
+            @test iszero(one(Rx)) || !is_gen(x^2)
+            @test is_monic(a) == isone(leading_coefficient(a))
          end
       end
    end

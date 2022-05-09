@@ -92,7 +92,7 @@ function gens(a::FreeAssAlgebra{T}) where {T <: RingElement}
    return [gen(a, i) for i in 1:nvars(a)]
 end
 
-function isgen(a::FreeAssAlgElem{T}) where T
+function is_gen(a::FreeAssAlgElem{T}) where T
     if length(a) < 1
         return iszero(one(base_ring(a)))
     else
@@ -101,8 +101,8 @@ function isgen(a::FreeAssAlgElem{T}) where T
 end
 
 # BOGUS
-function isunit(x::FreeAssAlgElem)
-   return x.length == 1 && isempty(x.exps[1]) && isunit(x.coeffs[1])
+function is_unit(x::FreeAssAlgElem)
+   return x.length == 1 && isempty(x.exps[1]) && is_unit(x.coeffs[1])
 end
 
 

@@ -18,10 +18,10 @@ base_ring(r::ResElem) = base_ring(parent(r))
 
 parent(a::ResElem) = a.parent
 
-isdomain_type(a::Type{T}) where T <: ResElem = false
+is_domain_type(a::Type{T}) where T <: ResElem = false
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: ResElem{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: RingElement, T <: ResElem{S}}
+   return is_exact_type(S)
 end
 
 function check_parent_type(a::ResRing{T}, b::ResRing{T}) where {T <: RingElement}
@@ -83,7 +83,7 @@ iszero(a::ResElem) = iszero(data(a))
 
 isone(a::ResElem) = isone(data(a)) || a == one(parent(a))
 
-function isunit(a::ResElem)
+function is_unit(a::ResElem)
    g = gcd(data(a), modulus(a))
    return isone(g)
 end
@@ -444,8 +444,23 @@ end
 
 function ResidueRing(R::PolyRing, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
-   !isunit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
+   !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
    T = elem_type(R)
 
    return Generic.ResRing{T}(R(a), cached)
 end
+
+@doc Markdown.doc"""
+    quo(R::Ring, a::RingElement; cached::Bool = true)
+
+Returns `S, f` where `S = ResidueRing(R, a)` and `f` is the 
+projection map from `R` to `S`. This map is supplied as a map with section
+where the section is the lift of an element of the residue field back
+to the ring `R`.
+"""
+function quo(R::Ring, a::RingElement; cached::Bool = true)
+   S = ResidueRing(R, a; cached=cached)
+   f = map_with_section_from_func(x->S(x), x->lift(x), R, S)
+   return S, f
+end
+

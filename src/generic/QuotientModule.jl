@@ -159,7 +159,7 @@ function (M::QuotientModule{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: R
    if M === N
       return a
    else
-      flag, P = iscompatible(M, N)
+      flag, P = is_compatible(M, N)
       if flag && P === M
          while N !== M
             a = N.map(a)
@@ -182,7 +182,7 @@ function projection(v::AbstractAlgebra.MatElem{T}, crels::AbstractAlgebra.MatEle
    R = base_ring(N)
    # remove zero rows
    nr = nrows(crels)
-   while nr > 0 && iszero_row(crels, nr)
+   while nr > 0 && is_zero_row(crels, nr)
       nr -= 1
    end
    # put into row vectors
@@ -220,8 +220,50 @@ function compute_combined_rels(m::AbstractAlgebra.FPModule{T}, srels::Vector{S})
    return combined_rels
 end
 
+function make_direct_sub(m::Submodule{T}, subm::Submodule{T}) where T <: RingElement
+  chain_m = []
+  up = m
+  while isa(up, Submodule)
+     push!(chain_m, up.map)
+     up = codomain(up.map)
+  end
+
+  chain_s = []
+  up = subm
+  found = false
+  while isa(up, Submodule)
+     push!(chain_s, up.map)
+     up = codomain(up.map)
+     if any(x->codomain(x) === up, chain_m)
+        found = true
+        break
+     end
+  end
+
+  found || error("module is not a submodule")
+  p = 1
+  while codomain(chain_m[p]) !== codomain(chain_s[end])
+     p += 1
+  end
+  gns = elem_type(m)[]
+  for g = gens(subm)
+     for mp = chain_s
+        g = mp(g)
+     end
+     for mp = chain_m[p:-1:1]
+        g = preimage(mp, g)
+     end
+     push!(gns, g)
+  end
+  return sub(m, gns)
+end
+
 function quo(m::AbstractAlgebra.FPModule{T}, subm::Submodule{T}) where T <: RingElement
-   !issubmodule(m, subm) && error("Not a submodule in QuotientModule constructor")
+   if !is_submodule(m, subm) 
+     subm = make_direct_sub(m, subm)[1]
+     @assert is_submodule(m, subm)
+   end
+
    R = base_ring(m)
    if subm === m # quotient of submodule by itself
       srels = dense_matrix_type(T)[_matrix(v) for v in gens(subm)]

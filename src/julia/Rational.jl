@@ -32,9 +32,9 @@ base_ring(a::Rationals{T}) where T <: Integer = Integers{T}()
 
 base_ring(a::Rational{T}) where T <: Integer = Integers{T}()
 
-isexact_type(::Type{Rational{T}}) where T <: Integer = true
+is_exact_type(::Type{Rational{T}}) where T <: Integer = true
 
-isdomain_type(::Type{Rational{T}}) where T <: Integer = true
+is_domain_type(::Type{Rational{T}}) where T <: Integer = true
 
 ###############################################################################
 #
@@ -46,7 +46,7 @@ zero(::Rationals{T}) where T <: Integer = Rational{T}(0)
 
 one(::Rationals{T}) where T <: Integer = Rational{T}(1)
 
-isunit(a::Rational) = a != 0
+is_unit(a::Rational) = a != 0
 
 canonical_unit(a::Rational)  = a
 
@@ -170,16 +170,16 @@ function sqrt(a::Rational{T}; check::Bool=true) where T <: Integer
    return sqrt(numerator(a, false); check=check)//sqrt(denominator(a, false); check=check)
 end
 
-function issquare(a::Rational{T}) where T <: Integer
-   return issquare(numerator(a)) && issquare(denominator(a))
+function is_square(a::Rational{T}) where T <: Integer
+   return is_square(numerator(a)) && is_square(denominator(a))
 end
 
-function issquare_with_sqrt(a::Rational{T}) where T <: Integer
-   f1, s1 = issquare_with_sqrt(numerator(a))
+function is_square_with_sqrt(a::Rational{T}) where T <: Integer
+   f1, s1 = is_square_with_sqrt(numerator(a))
    if !f1
       return false, zero(T)
    end
-   f2, s2 = issquare_with_sqrt(denominator(a))
+   f2, s2 = is_square_with_sqrt(denominator(a))
    if !f2
       return false, zero(T)
    end
@@ -198,16 +198,16 @@ function root(a::Rational{T}, n::Int; check::Bool=true) where T <: Integer
    return num//den
 end
 
-function ispower(a::Rational{T}, n::Int) where T <: Integer
-   return ispower(numerator(a), n) && ispower(denominator(a), n)
+function is_power(a::Rational{T}, n::Int) where T <: Integer
+   return is_power(numerator(a), n) && is_power(denominator(a), n)
 end
 
-function ispower_with_root(a::Rational{T}, n::Int) where T <: Integer
-   f1, r1 = ispower_with_root(numerator(a), n)
+function is_power_with_root(a::Rational{T}, n::Int) where T <: Integer
+   f1, r1 = is_power_with_root(numerator(a), n)
    if !f1
       return false, zero(T)
    end
-   f2, r2 = ispower_with_root(denominator(a), n)
+   f2, r2 = is_power_with_root(denominator(a), n)
    if !f2
       return false, zero(T)
    end

@@ -37,7 +37,7 @@ LaurentPolynomialRing
 
 ## Basic functionality
 
-Laurent polynomials implement the ring interface (except for `divexact`), and some methods
+Laurent polynomials implement the ring interface, and some methods
 from the polynomial interface, for example:
 
 ```jldoctest
@@ -68,7 +68,7 @@ julia> coeff.(f, -2:2)
 julia> set_coefficient!(f, 3, ZZ(5))
 5*x^3 + 2*x + x^-2
 
-julia> isgen(f)
+julia> is_gen(f)
 false
 
 julia> shift_left(f,2)
@@ -80,6 +80,6 @@ julia> map_coefficients(x->2x, f)
 julia> change_base_ring(RealField, f)
 5.0*x^3 + 2.0*x + x^-2
 
-julia> lead(f), trail(f)
+julia> leading_coefficient(f), trailing_coefficient(f)
 (5, 1)
 ```

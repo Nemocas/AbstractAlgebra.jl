@@ -4,8 +4,8 @@
 #
 ###############################################################################
 
-export iroot, ispower, ispower_with_root, root, issquare_with_sqrt,
-       isprobable_prime
+export iroot, is_power, is_power_with_root, root, is_square_with_sqrt,
+       is_probable_prime
 
 ###############################################################################
 #
@@ -25,9 +25,9 @@ parent_type(::Type{T}) where T <: Integer = Integers{T}
 
 base_ring(a::Integers{T}) where T <: Integer = Union{}
 
-isexact_type(::Type{T}) where T <: Integer = true
+is_exact_type(::Type{T}) where T <: Integer = true
 
-isdomain_type(::Type{T}) where T <: Integer = true
+is_domain_type(::Type{T}) where T <: Integer = true
 
 ###############################################################################
 #
@@ -39,7 +39,7 @@ zero(::Integers{T}) where T <: Integer = T(0)
 
 one(::Integers{T}) where T <: Integer = T(1)
 
-isunit(a::Integer) = a == 1 || a == -1
+is_unit(a::Integer) = a == 1 || a == -1
 
 canonical_unit(a::T) where T <: Integer = a < 0 ? T(-1) : T(1)
 
@@ -110,12 +110,12 @@ function divides(a::Integer, b::Integer)
 end
 
 @doc Markdown.doc"""
-    isdivisible_by(a::Integer, b::Integer)
+    is_divisible_by(a::Integer, b::Integer)
 
 Return `true` if $a$ is divisible by $b$, i.e. if there exists $c$ such that
 $a = bc$.
 """
-function isdivisible_by(a::Integer, b::Integer)
+function is_divisible_by(a::Integer, b::Integer)
    if b == 0
       return a == 0
    end
@@ -123,7 +123,7 @@ function isdivisible_by(a::Integer, b::Integer)
    return r == 0
 end
 
-function isdivisible_by(a::BigInt, b::BigInt)
+function is_divisible_by(a::BigInt, b::BigInt)
    if b == 0
       return a == 0
    end
@@ -131,7 +131,7 @@ function isdivisible_by(a::BigInt, b::BigInt)
                                              (Ref{BigInt}, Ref{BigInt}), a, b))
 end
 
-function isdivisible_by(a::BigInt, b::Int)
+function is_divisible_by(a::BigInt, b::Int)
    if b == 0
       return a == 0
    end
@@ -139,7 +139,7 @@ function isdivisible_by(a::BigInt, b::Int)
                                         (Ref{BigInt}, Int), a, b < 0 ? -b : b))
 end
 
-function isdivisible_by(a::BigInt, b::UInt)
+function is_divisible_by(a::BigInt, b::UInt)
    if b == 0
       return a == 0
    end
@@ -255,12 +255,12 @@ function sqrt(a::T; check::Bool=true) where T <: Integer
 end
 
 @doc Markdown.doc"""
-    issquare_with_sqrt(a::T) where T <: Integer
+    is_square_with_sqrt(a::T) where T <: Integer
 
 Return `(true, s)` if $a$ is a perfect square, where $s^2 = a$. Otherwise
 return `(false, 0)`.
 """
-function issquare_with_sqrt(a::T) where T <: Integer
+function is_square_with_sqrt(a::T) where T <: Integer
    if a < 0
       return false, zero(T)
    end
@@ -272,7 +272,7 @@ function issquare_with_sqrt(a::T) where T <: Integer
    end
 end
 
-function issquare_with_sqrt(a::BigInt)
+function is_square_with_sqrt(a::BigInt)
    if a < 0
       return false, zero(BigInt)
    end
@@ -294,11 +294,11 @@ function issquare_with_sqrt(a::BigInt)
 end
 
 @doc Markdown.doc"""
-    issquare(a::T) where T <: Integer
+    is_square(a::T) where T <: Integer
 
 Return true if $a$ is a square.
 """
-function issquare(a::T) where T <: Integer
+function is_square(a::T) where T <: Integer
    if a < 0
       return false
    end
@@ -306,7 +306,7 @@ function issquare(a::T) where T <: Integer
    return a == s*s
 end
 
-function issquare(a::BigInt)
+function is_square(a::BigInt)
    if a < 0
       return false
    end
@@ -392,12 +392,12 @@ function ispower_moduli(a::Integer, n::Int)
 end
 
 @doc Markdown.doc"""
-    ispower_with_root(a::T, n::Int) where T <: Integer
+    is_power_with_root(a::T, n::Int) where T <: Integer
 
 Return `true, q` if $a$ is a perfect $n$-th power with $a = q^n$. Otherwise
 return `false, 0`. We require $n > 0$.
 """
-function ispower_with_root(a::T, n::Int) where T <: Integer
+function is_power_with_root(a::T, n::Int) where T <: Integer
    n <= 0 && throw(DomainError(n, "exponent n must be positive"))
    if n == 1 || a == 0 || a == 1
       return (true, a)
@@ -417,12 +417,12 @@ function ispower_with_root(a::T, n::Int) where T <: Integer
 end
 
 @doc Markdown.doc"""
-    ispower(a::T, n::Int) where T <: Integer
+    is_power(a::T, n::Int) where T <: Integer
 
 Return `true` if $a$ is a perfect $n$-th power, i.e. if there is a $b$
 such that $a = b^n$. We require $n > 0$.
 """
-function ispower(a::T, n::Int) where T <: Integer
+function is_power(a::T, n::Int) where T <: Integer
    n <= 0 && throw(DomainError(n, "n is not positive"))
    if n == 1 || a == 0 || a == 1
       return true
@@ -529,7 +529,7 @@ end
 #
 ###############################################################################
 
-function isprobable_prime(x::Integer, reps::Integer=25)
+function is_probable_prime(x::Integer, reps::Integer=25)
    return ccall((:__gmpz_probab_prime_p, :libgmp), Cint,
                 (Ref{BigInt}, Cint), x, reps) != 0
 end

@@ -18,10 +18,10 @@ base_ring(r::ResFieldElem) = base_ring(parent(r))
 
 parent(a::ResFieldElem) = a.parent
 
-isdomain_type(a::Type{T}) where T <: ResFieldElem = true
+is_domain_type(a::Type{T}) where T <: ResFieldElem = true
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: ResFieldElem{S}}
-   return isexact_type(S)
+function is_exact_type(a::Type{T}) where {S <: RingElement, T <: ResFieldElem{S}}
+   return is_exact_type(S)
 end
 
 function check_parent_type(a::ResField{T}, b::ResField{T}) where {T <: RingElement}
@@ -89,6 +89,10 @@ end
 
 data(a::ResFieldElem) = a.data
 
+lift(a::ResFieldElem) = data(a)
+
+lift(a::ResFieldElem{Int}) = BigInt(data(a))
+
 zero(R::ResField) = R(0)
 
 one(R::ResField) = R(1)
@@ -97,7 +101,7 @@ iszero(a::ResFieldElem) = iszero(data(a))
 
 isone(a::ResFieldElem) = isone(data(a))
 
-function isunit(a::ResFieldElem)
+function is_unit(a::ResFieldElem)
    g = gcd(data(a), modulus(a))
    return isone(g)
 end
@@ -345,11 +349,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    issquare(a::ResFieldElem{T}) where T <: Integer
+    is_square(a::ResFieldElem{T}) where T <: Integer
 
 Return `true` if $a$ is a square.
 """
-function issquare(a::ResFieldElem{T}) where T <: Integer
+function is_square(a::ResFieldElem{T}) where T <: Integer
    if iszero(a)
       return true
    end
@@ -379,7 +383,7 @@ function Base.sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
    end
    # find a quadratic nonresidue z mod p
    z = U(rand(1:p - 1))
-   while issquare(z)
+   while is_square(z)
       z = U(rand(1:p - 1))
    end
    # set up
@@ -490,4 +494,18 @@ function ResidueField(R::Ring, a::RingElement; cached::Bool = true)
    T = elem_type(R)
 
    return Generic.ResField{T}(R(a), cached)
+end
+
+@doc Markdown.doc"""
+    quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
+
+Returns `S, f` where `S = ResidueField(R, a)` and `f` is the 
+projection map from `R` to `S`. This map is supplied as a map with section
+where the section is the lift of an element of the residue field back
+to the ring `R`.
+"""
+function quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
+   S = ResidueField(R, a; cached=cached)
+   f = map_with_section_from_func(x->S(x), x->lift(x), R, S)
+   return S, f
 end

@@ -76,14 +76,14 @@ end
 
 iszero(p::LaurentPolyWrap) = iszero(p.poly)
 
-isone(p::LaurentPolyWrap) = ismonomial(p, 0)
+isone(p::LaurentPolyWrap) = is_monomial(p, 0)
 
 zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, zero(R.polyring))
 one(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, one(R.polyring))
 
 gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, gen(R.polyring))
 
-isgen(p::LaurentPolyWrap) = ismonomial(p, 1)
+is_gen(p::LaurentPolyWrap) = is_monomial(p, 1)
 
 function deepcopy_internal(p::LaurentPolyWrap, dict::IdDict)
    return LaurentPolyWrap(p.parent, deepcopy_internal(p.poly, dict), p.mindeg)
@@ -165,6 +165,10 @@ function _remove_gen(a::LaurentPolyWrap)
          return i, (i == 0 ? a.poly : shift_right(a.poly, i))
       end
    end
+   # we need something finite on zero input
+   if iszero(a.poly)
+      return (0, a.poly)
+   end
    return remove(a.poly, gen(parent(a.poly)))
 end
 
@@ -180,20 +184,20 @@ function divides(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
    return ok, LaurentPolyWrap(parent(a), f, a.mindeg - b.mindeg - vb)
 end
 
-function isdivisible_by(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
+function is_divisible_by(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
    iszero(b) && return iszero(a)
    vb, ub = _remove_gen(b)
-   # should use isdivisible_by here, but it throws on ZZ[x]
+   # should use is_divisible_by here, but it throws on ZZ[x]
    return divides(a.poly, ub)[1]
 end
 
 function Base.inv(p::LaurentPolyWrap)
-   isunit(p) || throw(NotInvertibleError(p))
+   is_unit(p) || throw(NotInvertibleError(p))
    v, g = _remove_gen(p)
    return LaurentPolyWrap(parent(p), inv(g), -p.mindeg-v)
 end
 
-function isunit(p::LaurentPolyWrap)
+function is_unit(p::LaurentPolyWrap)
    iszero(p) && return false
    v, g = _remove_gen(p)
    return length(g) < 2
@@ -253,6 +257,28 @@ end
 
 function lcm(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
    return LaurentPolyWrap(parent(p), lcm(p.poly, q.poly), 0)
+end
+
+function factor(a::LaurentPolyWrap)
+   R = parent(a)
+   va, ua = _remove_gen(a)
+   f = factor(ua)
+   d = Dict{typeof(a), Int}()
+   for (p, e) in f
+      d[LaurentPolyWrap(R, p, 0)] = e
+   end
+   return Fac(LaurentPolyWrap(R, unit(f), a.mindeg + va), d)
+end
+
+function factor_squarefree(a::LaurentPolyWrap)
+   R = parent(a)
+   va, ua = _remove_gen(a)
+   f = factor_squarefree(ua)
+   d = Dict{typeof(a), Int}()
+   for (p, e) in f
+      d[LaurentPolyWrap(R, p, 0)] = e
+   end
+   return Fac(LaurentPolyWrap(R, unit(f), a.mindeg + va), d)
 end
 
 ###############################################################################

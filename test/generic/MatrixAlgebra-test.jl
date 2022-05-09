@@ -61,6 +61,30 @@ end
    @test_throws ErrorConstrDimMismatch S([t t^2 t^3 ; t^4 t^5 t^6 ; t^7 t^8 t^9 ; t t^2 t^3])
    @test_throws ErrorConstrDimMismatch S([t, t^2])
    @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10])
+
+   # Test constructors over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   @test isa(S, MatAlgebra)
+
+   @test base_ring(S) == R
+
+   @test elem_type(S) == Generic.MatAlgElem{elem_type(R)}
+   @test elem_type(Generic.MatAlgebra{elem_type(R)}) == Generic.MatAlgElem{elem_type(R)}
+   @test parent_type(Generic.MatAlgElem{elem_type(R)}) == Generic.MatAlgebra{elem_type(R)}
+
+   @test is_exact_type(elem_type(S)) == true
+   @test is_domain_type(elem_type(S)) == false
+
+   @test isa(S(), MatAlgElem)
+   @test isa(S(ZZ(1)), MatAlgElem)
+   @test isa(S(one(R)), MatAlgElem)
+   @test isa(S([1 2; 3 4]), MatAlgElem)
+   @test isa(S([1, 2, 3, 4]), MatAlgElem)
+
+   @test parent(S()) == S
 end
 
 @testset "Generic.MatAlg.manipulation" begin
@@ -73,7 +97,7 @@ end
    @test nrows(S) == 3
    @test ncols(S) == 3
 
-   @test isexact_type(typeof(A))
+   @test is_exact_type(typeof(A))
 
    @test iszero(zero(S))
    @test isone(one(S))
@@ -86,8 +110,8 @@ end
    U = MatrixAlgebra(QQ, 3)
    C = U([1 2 3; 5 6 7; 9 8 5])
 
-   @test !isunit(A)
-   @test isunit(C)
+   @test !is_unit(A)
+   @test is_unit(C)
 
    B[1, 1] = R(3)
    @test B[1, 1] == R(3)
@@ -105,10 +129,10 @@ end
 
    C = S([t + 1 R(0) R(1); t^2 R(0) t; R(0) R(0) R(0)])
 
-   @test iszero_row(C, 3)
-   @test !iszero_row(C, 1)
-   @test iszero_column(C, 2)
-   @test !iszero_column(C, 1)
+   @test is_zero_row(C, 3)
+   @test !is_zero_row(C, 1)
+   @test is_zero_column(C, 2)
+   @test !is_zero_column(C, 1)
 
    S = MatrixAlgebra(QQ, 3)
    A = S([1 2 3; 4 5 6; 7 8 9])
@@ -119,7 +143,42 @@ end
    @test nrows(A) == ncols(A) == 3
    @test degree(A) == 3
 
-   @test issquare(A)
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+
+   @test isa(hash(M), UInt)
+   @test nrows(M) == 2
+   @test ncols(M) == 2
+   @test length(M) == 4
+   @test isempty(M) == false
+   @test isassigned(M, 1, 1) == true
+
+   @test iszero(zero(M, 3, 3))
+   @test iszero(zero(M, QQ, 3, 3))
+   @test iszero(zero(M, QQ))
+   
+   zero!(M)
+   @test iszero(M)
+
+   @test isone(one(R))
+
+   @test is_zero_row(M, 1)
+   @test is_zero_column(M, 1)
+
+   @test degree(M) == 2
+end
+
+@testset "Generic.MatAlg.size/axes" begin
+   R, t = PolynomialRing(QQ, "t")
+   S = MatrixAlgebra(R, 3)
+
+   A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+   
+   @test is_square(A)
    @test size(A) == (3, 3)
    @test size(A, 1) == 3
    @test size(A, 2) == 3
@@ -131,6 +190,21 @@ end
    @test axes(A, rand(3:99)) == 1:1
    @test_throws BoundsError axes(A, 0)
    @test_throws BoundsError axes(A, -rand(1:99))
+
+   # test over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+
+   @test firstindex(M, 1) == 1
+   @test lastindex(M, 1) == 2
+   @test size(M) == (2, 2)
+   @test size(M, 1) == 2
+   @test axes(M) == (1:2, 1:2)
+   @test axes(M, 1) == 1:2
+   @test is_square(M)
 end
 
 @testset "Generic.MatAlg.unary_ops" begin
@@ -141,6 +215,15 @@ end
    B = S([-t - 1 (-t) -R(1); -t^2 (-t) (-t); -R(-2) (-t - 2) (-t^2 - t - 1)])
 
    @test -A == B
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+
+   @test -(-M) == M
 end
 
 @testset "Generic.MatAlg.binary_ops" begin
@@ -155,6 +238,19 @@ end
    @test A - B == S([t-1 t-3 R(0); t^2 - t R(-1) R(-2); R(-1) (-t^2 + t + 2) (-t^3 + t^2 + t + 1)])
 
    @test A*B == S([t^2 + 2*t + 1 2*t^2 + 4*t + 3 t^3 + t^2 + 3*t + 1; 3*t^2 - t (t^3 + 4*t^2 + t) t^4 + 2*t^2 + 2*t; t-5 t^4 + t^3 + 2*t^2 + 3*t - 4 t^5 + 1*t^4 + t^3 + t^2 + 4*t + 2])
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+   P = rand(S, -10:10)
+
+   @test M + N == N + M
+   @test M - N == M + (-N)
+   @test M*(N + P) == M*N + M*P
 end
 
 @testset "Generic.MatAlg.adhoc_binary" begin
@@ -175,6 +271,39 @@ end
    @test BigInt(3)*A == A*BigInt(3)
    @test Rational{BigInt}(3)*A == A*Rational{BigInt}(3)
    @test (t - 1)*A == A*(t - 1)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+   N = rand(S, -10:10)
+   
+   t1 = rand(ZZ, -10:10)
+   t2 = rand(R, -10:10)
+
+   @test t1*(M + N) == t1*M + t1*N
+   @test t1*(M - N) == t1*M - t1*N
+   @test (M + N)*t1 == M*t1 + N*t1
+   @test (M - N)*t1 == M*t1 - N*t1
+
+   @test t2*(M + N) == t2*M + t2*N
+   @test t2*(M - N) == t2*M - t2*N
+   @test (M + N)*t2 == M*t2 + N*t2
+   @test (M - N)*t2 == M*t2 - N*t2
+
+   @test M + t1 == M - (-t1)
+   @test M + t2 == M - (-t2)
+
+   @test t1 + M == t1 - (-M)
+   @test t2 + M == t2 - (-M)
+
+   r1 = rand(R, -10:10)
+   r2 = rand(R, -10:10)
+
+   @test (M + N)*[r1, r2] == M*[r1, r2] + N*[r1, r2]
+   @test [r1, r2]*(M + N) == [r1, r2]*M + [r1, r2]*N
 end
 
 @testset "Generic.MatAlg.promotion" begin
@@ -230,6 +359,22 @@ end
    @test A == B
 
    @test A != one(S)
+
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+   N = deepcopy(M)
+   
+   @test M == M
+   @test M == N
+   @test M == copy(M)
+   @test isequal(M, M)
+   @test isequal(M, N)
+   @test isequal(M, copy(M))
 end
 
 @testset "Generic.MatAlg.adhoc_comparison" begin
@@ -248,6 +393,21 @@ end
    @test t + 1 == S(t + 1)
    @test A != one(S)
    @test one(S) == one(S)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   @test S(5) == 5
+   @test 5 == S(5)
+   @test S(BigInt(5)) == 5
+   @test 5 == S(BigInt(5))
+
+   m = rand(R, -10:10)
+
+   @test S(m) == m
+   @test m == S(m)
 end
 
 @testset "Generic.MatAlg.powering" begin
@@ -259,6 +419,18 @@ end
    @test A^5 == A^2*A^3
 
    @test A^0 == one(S)
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+
+   @test M^0 == one(S)
+   @test M^1 == M
+   @test M^2 == M*M
+   @test M^3 == M*M*M
 end
 
 @testset "Generic.MatAlg.exact_division" begin
@@ -281,6 +453,28 @@ end
    @test divexact(12*A, BigInt(12)) == A
    @test divexact(12*A, Rational{BigInt}(12)) == A
    @test divexact((1 + t)*A, 1 + t) == A
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+
+   S = MatrixAlgebra(R, 2)
+   T = MatrixAlgebra(U, 2)
+
+   M = rand(S, -10:10)
+
+   @test divexact(5*M, 5) == M
+
+   c = rand(R, 1:10)
+
+   @test divexact_left(c*M, c) == M
+   @test divexact_right(M*c, c) == M
+
+   N = rand(T, 0:5, -10:10)
+   d = rand(U, 0:5, -10:10)
+
+   @test divexact_left(d*N, d) == N
+   @test divexact_right(N*d, d) == N
 end
 
 @testset "Generic.MatAlg.transpose" begin
@@ -290,6 +484,15 @@ end
    A = S(arr)
    B = S(permutedims(arr, [2, 1]))
    @test transpose(A) == B
+
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+
+   @test is_symmetric(M + transpose(M))
 end
 
 @testset "Generic.MatAlg.gram" begin
@@ -693,7 +896,7 @@ end
 
       if do_test
          @test r == i
-         @test isrref(A)
+         @test is_rref(A)
       end
    end
 
@@ -706,7 +909,7 @@ end
       r, A, d = rref_rational(M)
 
       @test r == i
-      @test isrref(A)
+      @test is_rref(A)
    end
 
    R, x = PolynomialRing(QQ, "x")
@@ -719,7 +922,7 @@ end
       r, A = rref(M)
 
       @test r == i
-      @test isrref(A)
+      @test is_rref(A)
    end
 
    R, x = PolynomialRing(ZZ, "x")
@@ -732,7 +935,7 @@ end
       r, A, d = rref_rational(M)
 
       @test r == i
-      @test isrref(A)
+      @test is_rref(A)
    end
 end
 
@@ -884,7 +1087,7 @@ end # of @testset "Generic.MatAlg.inversion"
 
          A = hessenberg(M)
 
-         @test ishessenberg(A)
+         @test is_hessenberg(A)
       end
    end
 end
@@ -1079,11 +1282,11 @@ if false # see bug 160
         A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
         H = hnf_minors(A)
-        @test istriu(H)
+        @test is_upper_triangular(H)
 
         H, U = hnf_minors_with_transform(A)
-        @test istriu(H)
-        @test isunit(det(U))
+        @test is_upper_triangular(H)
+        @test is_unit(det(U))
         @test U*A == H
 
         # Fake up finite field of char 7, degree 2
@@ -1098,11 +1301,11 @@ if false # see bug 160
         B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
 
         H = hnf_minors(B)
-        @test istriu(H)
+        @test is_upper_triangular(H)
 
         H, U = hnf_minors_with_transform(B)
-        @test istriu(H)
-        @test isunit(det(U))
+        @test is_upper_triangular(H)
+        @test is_unit(det(U))
         @test U*B == H
     end
 end
@@ -1115,11 +1318,11 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = AbstractAlgebra.hnf_kb(A)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(A)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
@@ -1134,11 +1337,11 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = AbstractAlgebra.hnf_kb(B)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(B)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*B == H
 end
 
@@ -1150,11 +1353,11 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = AbstractAlgebra.hnf_cohen(A)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_cohen_with_transform(A)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
@@ -1169,11 +1372,11 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = AbstractAlgebra.hnf_cohen(B)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = AbstractAlgebra.hnf_cohen_with_transform(B)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*B == H
 end
 
@@ -1185,11 +1388,11 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = hnf(A)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = hnf_with_transform(A)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
@@ -1204,11 +1407,11 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = hnf(B)
-   @test istriu(H)
+   @test is_upper_triangular(H)
 
    H, U = hnf_with_transform(B)
-   @test istriu(H)
-   @test isunit(det(U))
+   @test is_upper_triangular(H)
+   @test is_unit(det(U))
    @test U*B == H
 end
 
@@ -1220,12 +1423,12 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    T = AbstractAlgebra.snf_kb(A)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(A)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*A*K == T
 
    # Fake up finite field of char 7, degree 2
@@ -1240,12 +1443,12 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    T = AbstractAlgebra.snf_kb(B)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = AbstractAlgebra.snf_kb_with_transform(B)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*B*K == T
 end
 
@@ -1257,12 +1460,12 @@ end
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    T = snf(A)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = snf_with_transform(A)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*A*K == T
 
    # Fake up finite field of char 7, degree 2
@@ -1277,12 +1480,12 @@ end
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    T = snf(B)
-   @test issnf(T)
+   @test is_snf(T)
 
    T, U, K = snf_with_transform(B)
-   @test issnf(T)
-   @test isunit(det(U))
-   @test isunit(det(K))
+   @test is_snf(T)
+   @test is_unit(det(U))
+   @test is_unit(det(K))
    @test U*B*K == T
 end
 
@@ -1322,6 +1525,35 @@ end
          @test_throws ErrorException sim_zero(m, S, r, r+2)
       end
    end
+end
+
+@testset "Generic.MatAlg.change_base_ring" begin
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+   S = MatrixAlgebra(R, 2)
+   
+   M = rand(S, -10:10)
+
+   N = change_base_ring(U, M)
+
+   @test isa(N, MatAlgElem)
+end
+
+@testset "Generic.MatAlg.map" begin
+   # Tests over noncommutative ring
+   R = MatrixAlgebra(ZZ, 2)
+   U, x = PolynomialRing(R, "x")
+   S = MatrixAlgebra(U, 2)
+
+   M = rand(R, -10:10)
+   N = map(U, M)
+   P = map(x->x^2, M)
+   Q = map(S, M)
+
+   @test isa(N, MatAlgElem)
+   @test isa(P, MatAlgElem)
+   @test isa(Q, MatAlgElem)
 end
 
 @testset "Generic.MatAlg.rand" begin

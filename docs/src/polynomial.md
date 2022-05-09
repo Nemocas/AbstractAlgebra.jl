@@ -253,7 +253,8 @@ Return the polynomial ring of the given polynomial..
 characteristic(R::NCRing)
 ```
 
-Return the characteristic of the given polynomial ring.
+Return the characteristic of the given polynomial ring. If the characteristic
+is not known, an exception is raised.
 
 **Examples**
 
@@ -276,7 +277,7 @@ Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Intege
 
 ## Euclidean polynomial rings
 
-For polynomials over a field, the Euclidean Ring interface is implemented.
+For polynomials over a field, the [Euclidean Ring Interface](@ref) is implemented.
 
 ```julia
 mod(f::PolyElem, g::PolyElem)
@@ -424,15 +425,15 @@ gen(::PolyElem)
 ```
 
 ```@docs
-isgen(::PolyElem)
+is_gen(::PolyElem)
 ```
 
 ```@docs
-ismonic(::PolyElem)
+is_monic(::PolyElem)
 ```
 
 ```@docs
-issquare(::PolyElem)
+is_square(::PolyElem)
 ```
 
 ```@docs
@@ -444,23 +445,23 @@ degree(::PolynomialElem)
 ```
 
 ```@docs
-ismonomial(::PolyElem)
+is_monomial(::PolyElem)
 ```
 
 ```@docs
-ismonomial_recursive(::PolyElem)
+is_monomial_recursive(::PolyElem)
 ```
 
 ```@docs
-isterm(::PolyElem)
+is_term(::PolyElem)
 ```
 
 ```@docs
-isterm_recursive(::PolyElem)
+is_term_recursive(::PolyElem)
 ```
 
 ```@docs
-isconstant(::PolynomialElem)
+is_constant(::PolynomialElem)
 ```
 
 **Examples**
@@ -509,13 +510,13 @@ x
 julia> y = gen(S)
 y
 
-julia> g = isgen(w)
+julia> g = is_gen(w)
 true
 
 julia> divexact((2x + 1)*(x + 1), (x + 1))
 2*x + 1
 
-julia> m = isunit(b)
+julia> m = is_unit(b)
 true
 
 julia> n = degree(d)
@@ -524,16 +525,16 @@ julia> n = degree(d)
 julia> r = modulus(w)
 17
 
-julia> isterm(2y^2)
+julia> is_term(2y^2)
 true
 
-julia> ismonomial(y^2)
+julia> is_monomial(y^2)
 true
 
-julia> ismonomial_recursive(x*y^2)
+julia> is_monomial_recursive(x*y^2)
 true
 
-julia> ismonomial(x*y^2)
+julia> is_monomial(x*y^2)
 false
 
 julia> S, x = PolynomialRing(ZZ, "x")

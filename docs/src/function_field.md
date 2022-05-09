@@ -155,7 +155,7 @@ julia> h = gcd(f, g)
 ### Square root
 
 ```@docs
-issquare(::Generic.Rat{T}) where T <: FieldElem
+is_square(::Generic.Rat{T}) where T <: FieldElem
 ```
 
 ```@docs
@@ -174,7 +174,7 @@ julia> a = (21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 
 julia> sqrt(a^2)
 (21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
 
-julia> issquare(a^2)
+julia> is_square(a^2)
 true
 ```
 
@@ -336,7 +336,7 @@ gen(::Generic.FunctionField{T}) where T <: FieldElement
 ```
 
 ```@docs
-isgen(a::Generic.FunctionFieldElem)
+is_gen(a::Generic.FunctionFieldElem)
 ```
 
 ```@docs
@@ -392,7 +392,7 @@ julia> degree(S)
 julia> gen(S)
 y
 
-julia> isgen(y)
+julia> is_gen(y)
 true
 
 julia> coeff(a, 1)

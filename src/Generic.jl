@@ -1,7 +1,7 @@
 module Generic
 
 import LinearAlgebra: det, issymmetric, norm,
-                      nullspace, rank, transpose!, hessenberg
+                      nullspace, rank, hessenberg
 
 import LinearAlgebra: istriu, lu, lu!, tr
 
@@ -43,24 +43,27 @@ import ..AbstractAlgebra: add!, addeq!, addmul!, base_ring, canonical_unit,
                           content, data, deflate, deflation, degree, degrees,
                           degrees_range, denominator, derivative, div,
                           divexact, divides, divrem, domain, elem_type,
-                          evaluate, exp, exponent_vectors, expressify, factor,
+                          evaluate, exp, exponent_vectors, expressify,
+                          factor, factor_squarefree,
                           gen, gens, get_field, identity_matrix, inflate,
-                          integral, inv, isconstant, isdomain_type,
-                          isexact_type, isgen, ismonomial, isreduced_form,
-                          issquare, issquare_with_sqrt, isterm, isunit,
-                          leading_coefficient, 
-                          isunivariate, leading_monomial, leading_term, log,
+                          integral, inv, is_constant, is_domain_type,
+                          is_exact_type, is_gen, is_monomial, isreduced_form,
+                          is_square, is_square_with_sqrt, is_term, is_unit,
+                          is_univariate, leading_monomial, leading_term, log,
+                          leading_coefficient, leading_exponent_vector,
                           map_coefficients, max_precision, minpoly, modulus,
-                          mul!, mul_classical, mul_karatsuba, mullow,
-                          numerator, ncols, ngens, nrows, nvars, O, order, parent_type,
-                          pol_length, primpart, promote_rule, pseudodivrem,
-                          pseudorem, reduced_form, remove, renormalize!,
+                          monomials, mul!, mul_classical, mul_karatsuba, mullow,
+                          numerator, ncols, ngens, nrows, nvars, O, order,
+                          parent_type, pol_length, primpart, promote_rule,
+                          pseudodivrem, pseudorem, reduced_form,
+                          remove, renormalize!,
                           set_coefficient!, set_field!,
                           set_length!, set_precision!, set_valuation!,
-                          shift_left, shift_right, snf, sqrt, symbols, tail,
-                          term_degree, terms_degrees, to_univariate,
-                          trailing_coefficient, use_karamul, valuation, var,
-                          var_index, vars, zero!,
+                          shift_left, shift_right, snf, sqrt, symbols,
+                          tail, terms, term_degree, terms_degrees,
+                          to_univariate, trailing_coefficient,
+                          use_karamul,
+                          valuation, var, var_index, vars, zero!,
                           @enable_all_show_via_expressify,
                           @attributes
 
@@ -91,6 +94,8 @@ include("generic/SparsePoly.jl")
 
 include("generic/LaurentPoly.jl")
 
+include("generic/LaurentMPoly.jl")
+
 include("generic/RelSeries.jl")
 
 include("generic/AbsSeries.jl")
@@ -108,6 +113,8 @@ include("generic/MatrixAlgebra.jl")
 include("generic/FreeAssAlgebra.jl")
 
 include("generic/Fraction.jl")
+
+include("generic/FactoredFraction.jl")
 
 include("generic/RationalFunctionField.jl")
 
