@@ -32,8 +32,6 @@ end
 #
 ###############################################################################
 
-const hashp_seed = UInt === UInt64 ? 0xcdaf0e0b5ade239b : 0x5ade239b
-
 function Base.hash(p::LaurentPolyElem, h::UInt)
    for i in terms_degrees(p)
       c = coeff(p, i)
@@ -42,7 +40,7 @@ function Base.hash(p::LaurentPolyElem, h::UInt)
          h = hash(c, h)
       end
    end
-   hash(hashp_seed, h)
+   return h
 end
 
 # required implementation
