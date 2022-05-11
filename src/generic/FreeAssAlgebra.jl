@@ -339,6 +339,38 @@ function combine_like_terms!(z::FreeAssAlgElem{T}) where T
    return z
 end
 
+function isless(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where T
+        if p == q
+                return false
+        end
+        l = 0
+        if length(p.exps) < length(q.exps)
+                l = length(p.exps)
+        else 
+                l = length(q.exps)
+        end
+        sort_terms!(p)
+        sort_terms!(q)
+        for i in 1:l
+                if word_gt(q.exps[i], p.exps[i])
+                        return true
+                elseif word_gt(p.exps[i], q.exps[i])
+                        return false
+                elseif p.coeffs[i] == q.coeffs[i]
+                        return p.coeffs[i] < q.coeffs[i]
+                end
+        end
+        if length(p.exps) < length(q.exps)
+                return true
+        else 
+                return false
+        end
+end
+
+function <(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where T
+        return isless(p, q)
+end
+
 ###############################################################################
 #
 #   Arithmetic

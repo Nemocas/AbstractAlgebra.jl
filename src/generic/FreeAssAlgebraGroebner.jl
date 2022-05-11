@@ -3,7 +3,8 @@
 #   FreeAssAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groeber basis
 #
 ###############################################################################
-
+include("../AbstractTypes.jl")
+include("FreeAssAlgebra.jl")
 export groebner_basis, interreduce!
 
 const groebner_debug_level = 0
@@ -396,12 +397,13 @@ end
 
 function groebner_basis_buchberger(
    g::Vector{FreeAssAlgElem{T}},
-   degbound = typemax(Int)::Int
+   reduction_bound = typemax(Int)::Int
 ) where T <: FieldElement
 
    g = copy(g)
    R = parent(g[1])
    checked_obstructions = 0
+   nonzero_reductions = 0
 
    # step 1
    s = length(g)
@@ -436,9 +438,10 @@ function groebner_basis_buchberger(
             println("checked $checked_obstructions obstructions")
          end
       end
-      if iszero(Sp) || total_degree(Sp) > degbound
+      if iszero(Sp)
          continue
       end
+      nonzero_reductions += 1
 
       # step4
       s += 1
@@ -446,14 +449,17 @@ function groebner_basis_buchberger(
       if groebner_debug_level > 0
          println("adding new obstructions! checked $checked_obstructions so far")
       end
+      if nonzero_reductions >= reduction_bound
+              return g
+      end
       B = add_obstructions(g, B, s)
    end
 end
 
 function groebner_basis(
    g::Vector{FreeAssAlgElem{T}},
-   degbound = typemax(Int)::Int
+   reduction_bound = typemax(Int)::Int
 ) where T <: FieldElement
-   return groebner_basis_buchberger(g, degbound)
+   return groebner_basis_buchberger(g, reduction_bound)
 end
 
