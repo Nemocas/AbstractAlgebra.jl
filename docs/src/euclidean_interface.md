@@ -22,7 +22,11 @@ divides(f::T, g::T) where T <: RingElem
 remove(f::T, p::T) where T <: RingElem
 valuation(f::T, p::T) where T <: RingElem
 gcd(f::T, g::T) where T <: RingElem
+gcd(f::T, g::T, hs::T...) where T <: RingElem
+gcd(fs::AbstractArray{<:T}) where T <: RingElem
 lcm(f::T, g::T) where T <: RingElem
+lcm(f::T, g::T, hs::T...) where T <: RingElem
+lcm(fs::AbstractArray{<:T}) where T <: RingElem
 gcdx(f::T, g::T) where T <: RingElem
 gcdinv(f::T, g::T) where T <: RingElem
 ```

@@ -85,8 +85,8 @@ end
       s2 = rand(S, -100:100)
       s3 = rand(S, -100:100)
 
-      @test gcd(r1, gcd(r2, r3)) == gcd(gcd(r1, r2), r3)
-      @test gcd(s1, gcd(s2, s3)) == gcd(gcd(s1, s2), s3)
+      @test gcd(r1, gcd(r2, r3)) == gcd(gcd(r1, r2), r3) == gcd(r1, r2, r3) == gcd([r1, r2, r3])
+      @test gcd(s1, gcd(s2, s3)) == gcd(gcd(s1, s2), s3) == gcd(s1, s2, s3) == gcd([s1, s2, s3])
    end
 end
 

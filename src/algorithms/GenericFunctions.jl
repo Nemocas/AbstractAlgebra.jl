@@ -207,6 +207,26 @@ function gcd(a::T, b::T) where T <: RingElem
 end
 
 @doc Markdown.doc"""
+    gcd(fs::AbstractArray{<:T}) where T <: RingElem
+
+Return a greatest common divisor of the elements in `fs`.
+Requires that `fs` is not empty.
+"""
+function gcd(fs::AbstractArray{<:T}) where T <: RingElem
+   length(fs) > 0 || error("Empty collection")
+   return reduce(gcd, fs)
+end
+
+@doc Markdown.doc"""
+    gcd(f::T, g::T, hs::T...) where T <: RingElem
+
+Return a greatest common divisor of $f$, $g$ and the elements in `hs`.
+"""
+function gcd(f::T, g::T, hs::T...) where T <: RingElem
+   return gcd(f, gcd(g, hs...))
+end
+
+@doc Markdown.doc"""
     lcm(f::T, g::T) where T <: RingElem
 
 Return a least common multiple of $f$ and $g$, i.e., an element $d$
@@ -217,6 +237,26 @@ function lcm(a::T, b::T) where T <: RingElem
    g = gcd(a, b)
    iszero(g) && return g
    return a*divexact(b, g)
+end
+
+@doc Markdown.doc"""
+    lcm(fs::AbstractArray{<:T}) where T <: RingElem
+
+Return a least common multiple of the elements in `fs`.
+Requires that `fs` is not empty.
+"""
+function lcm(fs::AbstractArray{<:T}) where T <: RingElem
+   length(fs) > 0 || error("Empty collection")
+   return reduce(lcm, fs)
+end
+
+@doc Markdown.doc"""
+    lcm(f::T, g::T, hs::T...) where T <: RingElem
+
+Return a least common multiple of $f$, $g$ and the elements in `hs`.
+"""
+function lcm(f::T, g::T, hs::T...) where T <: RingElem
+   return lcm(f, lcm(g, hs...))
 end
 
 @doc Markdown.doc"""
