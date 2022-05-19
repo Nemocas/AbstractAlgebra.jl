@@ -803,7 +803,6 @@ function pow_multinomial(a::PolyElem{T}, e::Int) where T <: RingElement
       res[k + 1] = divexact(res[k + 1], d)
    end
    z = parent(a)(res)
-   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -1052,7 +1051,6 @@ function mullow(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingElement
       d[i] = reduce!(d[i])
    end
    z = parent(a)(d)
-   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -2828,7 +2826,6 @@ function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingEle
    end
    newton_to_monomial!(P, x)
    r = S(P)
-   r = set_length!(r, normalise(r, n))
    return r
 end
 
@@ -2857,7 +2854,6 @@ function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where {T <: ResEle
    end
    newton_to_monomial!(P, x)
    r = S(P)
-   r = set_length!(r, normalise(r, n))
    return r
 end
 
