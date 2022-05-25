@@ -22,10 +22,10 @@ base_ring(a::Rat) = base_ring(parent(a))
 
 parent(a::Rat) = a.parent
 
-data(x::Rat{T}) where T <: FieldElement = x.d::Frac{dense_poly_type(T)}
+data(x::Rat{T}) where T <: FieldElement = x.d::Union{Frac{dense_poly_type(T)}, Frac{mpoly_type(T)}}
 
 function fraction_field(a::RationalFunctionField{T}) where T <: FieldElement
-   return a.fraction_field::FracField{dense_poly_type(T)}
+   return a.fraction_field::Union{FracField{dense_poly_type(T)}, FracField{mpoly_type(T)}}
 end
 
 function is_domain_type(::Type{T}) where {S <: FieldElement, T <: Rat{S}}
@@ -110,6 +110,8 @@ isone(a::Rat) = isone(data(a))
 is_unit(a::Rat) = is_unit(data(a))
 
 gen(R::RationalFunctionField) = R(gen(base_ring(R.fraction_field)))
+
+gens(R::RationalFunctionField) = [R(g) for g in gens(base_ring(R.fraction_field))]
 
 function deepcopy_internal(a::Rat, dict::IdDict)
    R = parent(a)
@@ -368,6 +370,14 @@ function evaluate(f::Rat{T}, v::U) where {T <: PolyElem, U <: Integer}
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
+function evaluate(f::Rat{T}, v::Vector{U}) where {T <: RingElement, U <: RingElement}
+   return evaluate(numerator(f), v)//evaluate(denominator(f), v)
+end
+
+function evaluate(f::Rat{T}, v::Vector{U}) where {T <: PolyElem, U <: Integer}
+   return evaluate(numerator(f), v)//evaluate(denominator(f), v)
+end
+
 ###############################################################################
 #
 #   Powering
@@ -388,6 +398,11 @@ end
 function derivative(f::Rat)
    R = parent(f)
    return R(derivative(data(f)))
+end
+
+function derivative(f::Rat, x::MPolyElem)
+   R = parent(f)
+   return R(derivative(data(f), x))
 end
 
 ###############################################################################
@@ -505,7 +520,8 @@ promote_rule(::Type{Rat{T}}, ::Type{Rat{T}}) where T <: FieldElement = Rat{T}
 promote_rule(::Type{Rat{T}}, ::Type{Rat{T}}) where T <: FieldElem = Rat{T}
 
 function promote_rule(::Type{Rat{T}}, ::Type{U}) where {T <: FieldElement, U <: RingElem}
-   promote_rule(Frac{dense_poly_type(T)}, U) === Frac{dense_poly_type(T)} ? Rat{T} : Union{}
+   promote_rule(Frac{dense_poly_type(T)}, U) === Frac{dense_poly_type(T)} ? Rat{T} : 
+   promote_rule(Frac{mpoly_type(T)}, U) === Frac{mpoly_type(T)} ? Rat{T} : Union{}
 end
 
 ###############################################################################
@@ -521,7 +537,7 @@ function (a::RationalFunctionField{T})() where T <: FieldElement
    return z
 end
 
-function (a::RationalFunctionField{T})(b::Frac{<:PolyElem{T}}) where T <: FieldElement
+function (a::RationalFunctionField{T})(b::Frac{<:Union{PolyElem{T}, MPolyElem{T}}}) where T <: FieldElement
    K = fraction_field(a)
    parent(b) != K && error("Unable to coerce rational function")
    z = Rat{T}(b)
@@ -529,7 +545,7 @@ function (a::RationalFunctionField{T})(b::Frac{<:PolyElem{T}}) where T <: FieldE
    return z::Rat{T}
 end
 
-function (a::RationalFunctionField{T})(n::S, d::S) where {T <: FieldElement, S <: PolyElem{T}}
+function (a::RationalFunctionField{T})(n::S, d::S) where {T <: FieldElement, S <: Union{PolyElem{T}, MPolyElem{T}}}
    R = parent(n)
    g = gcd(n, d)
    if !isone(g)
@@ -578,12 +594,30 @@ function RationalFunctionField(k::Field, s::Symbol; cached=true)
    T = elem_type(k)
 
    R, x = AbstractAlgebra.PolynomialRing(k, s, cached=cached)
-   g = x//1
+   S = FractionField(R)
+   g = S(x)
    t = Rat{T}(g)
 
    par_object = RationalFunctionField{T}(k, parent(g), s, cached)
 
    t.parent = par_object
+
+   return par_object, t
+end
+
+function RationalFunctionField(k::Field, s::Vector{Symbol}; cached=true)
+   T = elem_type(k)
+
+   R, x = AbstractAlgebra.PolynomialRing(k, s, cached=cached)
+   S = FractionField(R)
+   g = [S(xi) for xi in x]
+   t = [Rat{T}(gi) for gi in g]
+
+   par_object = RationalFunctionField{T}(k, parent(g[1]), s, cached)
+
+   for ti in t
+      ti.parent = par_object
+   end
 
    return par_object, t
 end
