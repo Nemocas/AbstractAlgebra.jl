@@ -922,11 +922,11 @@ end
 ###############################################################################
 
 mutable struct RationalFunctionField{T <: FieldElement} <: AbstractAlgebra.Field
-   S::Symbol
-   fraction_field::FracField{<:PolyElem{T}}
+   S::Union{Symbol, Vector{Symbol}}
+   fraction_field::FracField{<:Union{PolyElem{T},MPolyElem{T}}}
    base_ring::Field
 
-   function RationalFunctionField{T}(k::Field, frac_field::FracField{<:PolyElem{T}}, sym::Symbol, cached::Bool = true) where T <: FieldElement
+   function RationalFunctionField{T}(k::Field, frac_field::FracField{<:Union{PolyElem{T},MPolyElem{T}}}, sym::Union{Symbol, Vector{Symbol}}, cached::Bool = true) where T <: FieldElement
       return get_cached!(RationalFunctionFieldDict, (k, sym), cached) do
          U = elem_type(k)
          new{U}(sym, frac_field, k)
@@ -934,13 +934,14 @@ mutable struct RationalFunctionField{T <: FieldElement} <: AbstractAlgebra.Field
    end
 end
 
-const RationalFunctionFieldDict = CacheDictType{Tuple{Field, Symbol}, Field}()
+const RationalFunctionFieldDict = CacheDictType{Tuple{Field, Union{Symbol, Vector{Symbol}}}, Field}()
 
 mutable struct Rat{T <: FieldElement} <: AbstractAlgebra.FieldElem
-   d::Frac{<:PolyElem{T}}
+   d::Frac{<:Union{PolyElem{T}, MPolyElem{T}}}
    parent::RationalFunctionField{T}
 
    Rat{T}(f::Frac{<:PolyElem{T}}) where T <: FieldElement = new{T}(f)
+   Rat{T}(f::Frac{<:MPolyElem{T}}) where T <: FieldElement = new{T}(f)
 end
 
 ###############################################################################
