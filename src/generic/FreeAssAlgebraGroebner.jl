@@ -1,13 +1,46 @@
 ###############################################################################
 #
-#   FreeAssAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groeber basis
+#   FreeAssAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groebner basis
 #
 ###############################################################################
-include("../AbstractTypes.jl")
-include("FreeAssAlgebra.jl")
+#include("../AbstractTypes.jl")
+#include("FreeAssAlgebra.jl")
 export groebner_basis, interreduce!
 
+using DataStructures
+
 const groebner_debug_level = 0
+const Monomial = Vector{Int}
+
+abstract type Obstruction{T} end 
+"""
+represents the overlap of the leading term of two polynomials
+"""
+
+struct ObstructionTriple{T} <: Obstruction{T} 
+        first_poly::FreeAssAlgElem{T}
+        second_poly::FreeAssAlgElem{T}
+        pre_and_suffixes::NTuple{4, Monomial}
+end
+
+function FreeAssAlgElem{T}(R::FreeAssAlgebra{T}, mon::Monomial) where T
+        return FreeAssAlgElem{T}(R, [one(base_ring(R))], [mon], 1)
+end
+
+"""
+takes an obstruction triple (p, q, o) and returns the common multiple 
+of the leading terms of p and q defined by o
+TODO documentation
+"""
+function common_multiple_leading_term(ot::ObstructionTriple{T}) where T
+    return FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[1]) * FreeAssAlgElem{T}(parent(ot.first_poly), _leading_word(ot.first_poly)) * FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[2])
+end
+
+function s_polynomial(ot::ObstructionTriple{T}) where T
+    first_term = FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[1]) * ot.first_poly * FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[2])
+    second_term = FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[3]) * ot.second_poly * FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[4])
+       return inv(leading_coefficient(ot.first_poly)) * first_term - inv(leading_coefficient(ot.second_poly)) * second_term
+end
 
 # skip all of the extra length-checking
 function _leading_word(a::FreeAssAlgElem{T}) where T
@@ -17,7 +50,8 @@ end
 # normal form with leftmost word divisions
 function normal_form(
    f::FreeAssAlgElem{T},
-   g::Vector{FreeAssAlgElem{T}}
+   g::Vector{FreeAssAlgElem{T}},
+   suffix_match_vectors::Vector{Vector{Int}}
 ) where T <: FieldElement
    R = parent(f)
    s = length(g)
@@ -26,8 +60,8 @@ function normal_form(
    while length(f) > 0
       i = 1
    @label again
-      ok, ml, mr = word_divides_leftmost(f.exps[1], g[i].exps[1])
-      if !ok && i < s
+        ok, ml, mr = word_divides_leftmost(f.exps[1], g[i].exps[1], suffix_match_vectors[i])
+        if !ok && i < s
          i += 1
          @goto again
       end
@@ -271,7 +305,7 @@ function has_overlap(g1, g2, w1, w2, u1, u2)
    return is_subword_right(lw2, concatenated_word) # TODO maybe just comparing lengths should be sufficient
 end
 
-function is_redundant(
+function is_redundant(# TODO do we need g in the signature?
    obs::NTuple{4, Vector{Int}},
    obs_index::Int,
    s::Int,
@@ -347,51 +381,46 @@ function remove_redundancies!(
    # TODO case 4e from Thm 4.1 in Kreuzer Xiu
 end
 
-function get_obstructions(g::Vector{FreeAssAlgElem{T}}, s::Int) where T
-   dummy_obstr = (Int[], Int[], Int[], Int[])
-   empty_obstr_set = typeof(dummy_obstr)[]
-   new_B = typeof(empty_obstr_set)[
-              if i > j
-                 empty_obstr_set
-              elseif i == j
-                 obstructions(_leading_word(g[i]))
-              else
-                 obstructions(_leading_word(g[i]), _leading_word(g[j]))
-              end
-           for i in 1:s, j in 1:s]
-   obstr_count = 0
-   for i in 1:s, j in 1:s
-      obstr_count += length(new_B[i,j])
-   end
-   # TODO maybe here some redundancies can be removed too, check Kreuzer Xiu
-   if groebner_debug_level > 0
-      println("$obstr_count many obstructions")
-   end
-   return new_B
+function get_obstructions(g::Vector{FreeAssAlgElem{T}}) where T
+    s = length(g)
+    result = PriorityQueue{Obstruction{T}, FreeAssAlgElem{T}}()
+    for i in 1:s, j in 1:i
+        if i == j
+            obs = obstructions(_leading_word(g[i]))
+        else
+            obs = obstructions(_leading_word(g[i]), _leading_word(g[j]))
+        end
+        for o in obs
+            triple = ObstructionTriple{T}(g[i], g[j], o)
+            enqueue!(result, triple, common_multiple_leading_term(triple))
+        end
+    end
+    # TODO maybe here some redundancies can be removed too, check Kreuzer Xiu
+    if groebner_debug_level > 0
+        obstr_count = length(result)
+        println("$obstr_count many obstructions")
+    end
+    return result
 end
 
 
-function add_obstructions(
-   g::Vector{FreeAssAlgElem{T}},
-   B::Matrix{Vector{NTuple{4, Vector{Int64}}}},
-   s::Int
+function add_obstructions!(
+    obstruction_queue::PriorityQueue{Obstruction{T}, FreeAssAlgElem{T}},
+    g::Vector{FreeAssAlgElem{T}}
 ) where T
-   dummy_obstr = (Int[], Int[], Int[], Int[])
-   empty_obstr_set = typeof(dummy_obstr)[]
-   new_B = Vector{NTuple{4, Vector{Int64}}}[
-              if i < s && j < s
-                 # copy old entry
-                 B[i, j]
-              elseif i > j
-                 empty_obstr_set
-              elseif i == j
-                 obstructions(_leading_word(g[i]))
-              else
-                 obstructions(_leading_word(g[i]), _leading_word(g[j]))
-              end
-              for i in 1:s, j in 1:s]
-   remove_redundancies!(new_B, s, g)
-   return new_B
+    s = length(g)
+    for i in 1:s
+        if i == s
+            obs = obstructions(_leading_word(g[i]))
+        else
+            obs = obstructions(_leading_word(g[i]), _leading_word(g[s]))
+        end
+        for o in obs
+            triple = ObstructionTriple{T}(g[i], g[s], o)
+            enqueue!(obstruction_queue, triple, common_multiple_leading_term(triple))
+        end
+    end
+    #remove_redundancies!(new_B, s, g) TODO match remove_redundancies to new types
 end
 
 
@@ -401,40 +430,25 @@ function groebner_basis_buchberger(
 ) where T <: FieldElement
 
    g = copy(g)
-   R = parent(g[1])
    checked_obstructions = 0
    nonzero_reductions = 0
+   # compute a vector of suffix matches for all elements of g
+   # to make normal form computation more efficient
+   suffix_match_vectors = Vector{Vector{Int}}(undef, length(g))
+   for i in 1:length(g)
+       suffix_match_vectors[i] = calc_suffix_match_vector(g[i].exps[1])
+   end
 
    # step 1
-   s = length(g)
-   dummy_obstr = (Int[], Int[], Int[], Int[])
-   empty_obstr_set = typeof(dummy_obstr)[]
-
-   B = get_obstructions(g, s)
-   while true
-      @assert s == length(g)
-      i = j = 0
-      o = dummy_obstr
-      # check all entries with i <= j
-      for jj in 1:s, ii in 1:jj
-         if !isempty(B[ii, jj])
-           (i, j) = (ii, jj)
-           o = popfirst!(B[i, j])
-           break
-         end
-      end
-      if !(i > 0 && j > 0)
-         # B is empty
-         return g
-      end
-
-      # step3
-      S = _sub_rest(mul_term(inv(leading_coefficient(g[i])), o[1], g[i], o[2]),
-                    mul_term(inv(leading_coefficient(g[j])), o[3], g[j], o[4]), 1)
-      Sp = normal_form(S, g) # or normal_form_weak
-      checked_obstructions += 1
+   obstruction_queue = get_obstructions(g) 
+   while !isempty(obstruction_queue)
+      obstruction = dequeue!(obstruction_queue)
+      # step3 
+      S = s_polynomial(obstruction)
+      Sp = normal_form(S, g, suffix_match_vectors) # or normal_form_weak
       if groebner_debug_level > 0
-         if checked_obstructions % 5000 == 0
+          checked_obstructions += 1
+          if checked_obstructions % 5000 == 0
             println("checked $checked_obstructions obstructions")
          end
       end
@@ -442,18 +456,18 @@ function groebner_basis_buchberger(
          continue
       end
       nonzero_reductions += 1
-
       # step4
-      s += 1
       push!(g, Sp)
+      push!(suffix_match_vectors, calc_suffix_match_vector(Sp.exps[1]))
       if groebner_debug_level > 0
          println("adding new obstructions! checked $checked_obstructions so far")
       end
       if nonzero_reductions >= reduction_bound
               return g
       end
-      B = add_obstructions(g, B, s)
+      add_obstructions!(obstruction_queue, g)
    end
+   return g
 end
 
 function groebner_basis(

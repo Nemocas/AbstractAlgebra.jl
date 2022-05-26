@@ -508,24 +508,62 @@ function mul_term(c::T, w::Vector{Int}, a::FreeAssAlgElem{T}, wp::Vector{Int}) w
 end
 
 
+function calc_suffix_match_vector(b::Vector{Int})
+    pos = 1
+    cnd = 0
+    suffix_match_vector = Vector{Int}(undef, length(b) + 1)
+    suffix_match_vector[1] = -1
+    while pos < length(b)
+        if b[pos + 1] == b[cnd + 1]
+            suffix_match_vector[pos + 1] = suffix_match_vector[cnd + 1]
+        else
+            suffix_match_vector[pos + 1] = cnd
+            while cnd >= 0 && b[pos+1] != b[cnd+1]
+                cnd = suffix_match_vector[cnd+1]
+            end
+        end
+        pos = pos + 1
+        cnd = cnd + 1
+    end
+    suffix_match_vector[pos + 1] = cnd
+    return suffix_match_vector
+end
+
+function word_divides_leftmost(a::Vector{Int}, b::Vector{Int})
+    suffix_match_vector = calc_suffix_match_vector(b)
+    return word_divides_leftmost(a, b, suffix_match_vector)
+end
+
 # return (true, l, r) with a = l*b*r and length(l) minimal
 #     or (false, junk, junk) if a is not two-sided divisible by b
-function word_divides_leftmost(a::Vector{Int}, b::Vector{Int})
-   n = length(b)
-   for i in 0:length(a)-n
-      match = true
-      for j in 1:n
-         if b[j] != a[i+j]
-            match = false
-            break
-         end
-      end
-      if match
-         return (true, Int[a[k] for k in 1:i],
-                       Int[a[k] for k in 1+i+n:length(a)])
-      end
-   end
-   return (false, Int[], Int[])
+function word_divides_leftmost(a::Vector{Int}, b::Vector{Int}, suffix_match_vector::Vector{Int})
+    result_position = -1
+    match = false
+    j = 0
+    k = 0
+    while j < length(a)
+        if b[k + 1] == a[j + 1]
+            j = j+1
+            k = k+1
+            if k == length(b)
+                result_position = j - k 
+                match = true
+                break
+            end
+        else
+            k = suffix_match_vector[k + 1]
+            if k < 0
+                j = j+1
+                k = k+1
+            end
+        end
+
+    end
+    if match
+        return (true, Int[a[k] for k in 1:result_position],
+                 Int[a[k] for k in 1+result_position+length(b):length(a)])
+    end
+    return (false, Int[], Int[])
 end
 
 # return (true, l, r) with a = l*b*r and length(r) minimal
