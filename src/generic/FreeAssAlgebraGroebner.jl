@@ -576,7 +576,6 @@ function groebner_basis_buchberger(
     g::Vector{FreeAssAlgElem{T}},
     reduction_bound = typemax(Int)::Int,
 ) where {T<:FieldElement}
-
     g = copy(g)
     #   interreduce!(g) # on some small examples, this increases running time, so it might not be optimal to use this here
     checked_obstructions = 0
