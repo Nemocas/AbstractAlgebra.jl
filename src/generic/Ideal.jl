@@ -238,7 +238,7 @@ function show_inner(io::IO, n::lmnode)
 end
 
 # print a vector of nodes
-function show(io::IO, B::Vector{<:lmnode})
+function show(io::IO, B::Vector{lmnode})
    if print_node_level[] == 0
       BB = extract_gens(B)
       print(io, "[")
