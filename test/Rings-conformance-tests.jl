@@ -316,6 +316,8 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
 
          @test !(iszero(f) && iszero(g)) || iszero(gcd(f, g))
          @test equality_up_to_units(gcd(f, g)*lcm(f, g), f*g)
+         @test gcd(f, gcd(g, m)) == gcd(gcd(f, g), m) == gcd(f, g, m) == gcd([f, g, m])
+         @test lcm(f, lcm(g, m)) == lcm(lcm(f, g), m) == lcm(f, g, m) == lcm([f, g, m])
 
          (d, s, t) = gcdx(f, g)
          @test d == gcd(f, g)
