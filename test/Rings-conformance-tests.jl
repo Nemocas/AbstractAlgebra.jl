@@ -369,6 +369,25 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
 
       if R isa AbstractAlgebra.Field
          test_EuclideanRing_interface(Rx, reps = 2 + fld(reps, 2))
+
+         for i in 1:reps
+            a = test_elem(Rx)
+            b = test_elem(Rx)
+            for j in 1:3
+               q = test_elem(Rx)
+               a, b = q*a + b, a
+            end
+            if degree(a) < degree(b)
+               a, b = b, a
+            end
+            degree(a) > degree(b) >= 0 || continue
+            (A, B, m11, m12, m21, m22, s) = hgcd(a, b)
+            @test degree(A) >= cld(degree(a), 2) > degree(B)
+            @test m11*A + m12*B == a
+            @test m21*A + m22*B == b
+            @test m11*m22 - m21*m12 == s
+            @test s^2 == 1
+         end
       end
 
       @testset "Basic functionality" begin

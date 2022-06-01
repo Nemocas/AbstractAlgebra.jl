@@ -118,9 +118,14 @@ end
    @test C == [R(2), R(), R(1)]
 end
 
+
+
 @testset "Generic.Poly.conformance" begin
-   # test_elem should already be defined on ZZ; polys are automatic from there
    R, x = PolynomialRing(ZZ, "x")
+   test_Poly_interface(R)
+   R, x = PolynomialRing(QQ, "x")
+   test_Poly_interface(R)
+   R, x = PolynomialRing(GF(5), "x")
    test_Poly_interface(R)
 end
 
