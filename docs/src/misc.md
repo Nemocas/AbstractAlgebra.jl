@@ -47,6 +47,7 @@ for such types:
 
 ```@docs
 @attributes
+@attr
 has_attribute
 get_attribute
 get_attribute!
