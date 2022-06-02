@@ -921,27 +921,26 @@ end
 #
 ###############################################################################
 
-mutable struct RationalFunctionField{T <: FieldElement} <: AbstractAlgebra.Field
+mutable struct RationalFunctionField{T <: FieldElement, U <: Union{PolyElem{T}, MPolyElem{T}}} <: AbstractAlgebra.Field
    S::Union{Symbol, Vector{Symbol}}
-   fraction_field::FracField{<:Union{PolyElem{T},MPolyElem{T}}}
+   fraction_field::FracField{U}
    base_ring::Field
 
-   function RationalFunctionField{T}(k::Field, frac_field::FracField{<:Union{PolyElem{T},MPolyElem{T}}}, sym::Union{Symbol, Vector{Symbol}}, cached::Bool = true) where T <: FieldElement
+   function RationalFunctionField{T, U}(k::Field, frac_field::FracField{U}, sym::Union{Symbol, Vector{Symbol}}, cached::Bool = true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
       return get_cached!(RationalFunctionFieldDict, (k, sym), cached) do
-         U = elem_type(k)
-         new{U}(sym, frac_field, k)
-      end::RationalFunctionField{T}
+         T1 = elem_type(k)
+         new{T1, U}(sym, frac_field, k)
+      end::RationalFunctionField{T, U}
    end
 end
 
 const RationalFunctionFieldDict = CacheDictType{Tuple{Field, Union{Symbol, Vector{Symbol}}}, Field}()
 
-mutable struct Rat{T <: FieldElement} <: AbstractAlgebra.FieldElem
-   d::Frac{<:Union{PolyElem{T}, MPolyElem{T}}}
-   parent::RationalFunctionField{T}
+mutable struct Rat{T <: FieldElement, U <: Union{PolyElem, MPolyElem}} <: AbstractAlgebra.FieldElem
+   d::Frac{U}
+   parent::RationalFunctionField{T, U}
 
-   Rat{T}(f::Frac{<:PolyElem{T}}) where T <: FieldElement = new{T}(f)
-   Rat{T}(f::Frac{<:MPolyElem{T}}) where T <: FieldElement = new{T}(f)
+   Rat{T, U}(f::Frac{U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}} = new{T, U}(f)
 end
 
 ###############################################################################
@@ -959,8 +958,8 @@ mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
    traces::Vector{<:PolyElem{T}}
    traces_den::PolyElem{T}
    monic::Bool
-   pol::Poly{Rat{T}}
-   base_ring::RationalFunctionField{T}
+   pol::Poly{Rat{T, U}} where U <: PolyElem{T}
+   base_ring::RationalFunctionField{T, U} where U <: PolyElem{T}
 
    function FunctionField{T}(num::Poly{<:PolyElem{T}},
              den::PolyElem{T}, s::Symbol, cached::Bool = true) where

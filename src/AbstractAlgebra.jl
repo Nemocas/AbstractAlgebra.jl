@@ -560,15 +560,15 @@ function NumberField(a::Generic.Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cac
    return Generic.NumberField(a, s, t; cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Symbol; cached::Bool=true) where T <: FieldElement
+function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    return Generic.FunctionField(p, s; cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
+function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Char; cached::Bool=true) where T <: FieldElement
+function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Char; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
