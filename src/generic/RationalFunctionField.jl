@@ -32,7 +32,7 @@ function is_domain_type(::Type{S}) where {T <: FieldElement, U <: Union{PolyElem
    return true
 end
 
-function is_exact_type(a::Type{T}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}, S <: Rat{T, U}}
+function is_exact_type(a::Type{S}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}, S <: Rat{T, U}}
    return is_exact_type(T)
 end
 
