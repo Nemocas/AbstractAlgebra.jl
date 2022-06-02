@@ -12,35 +12,35 @@ export RationalFunctionField, norm
 #
 ###############################################################################
 
-parent_type(::Type{Rat{T}}) where T <: FieldElement = RationalFunctionField{T}
+parent_type(::Type{Rat{T, U}}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}} = RationalFunctionField{T, U}
 
-elem_type(::Type{RationalFunctionField{T}}) where T <: FieldElement = Rat{T}
+elem_type(::Type{RationalFunctionField{T, U}}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}} = Rat{T, U}
 
-base_ring(a::RationalFunctionField{T}) where T <: FieldElement = a.base_ring::parent_type(T)
+base_ring(a::RationalFunctionField{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}} = a.base_ring::parent_type(T)
 
 base_ring(a::Rat) = base_ring(parent(a))
 
 parent(a::Rat) = a.parent
 
-data(x::Rat{T}) where T <: FieldElement = x.d::Union{Frac{dense_poly_type(T)}, Frac{mpoly_type(T)}}
+data(x::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}} = x.d::Union{Frac{U}}
 
-function fraction_field(a::RationalFunctionField{T}) where T <: FieldElement
-   return a.fraction_field::Union{FracField{dense_poly_type(T)}, FracField{mpoly_type(T)}}
+function fraction_field(a::RationalFunctionField{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
+   return a.fraction_field::Union{FracField{U}}
 end
 
-function is_domain_type(::Type{T}) where {S <: FieldElement, T <: Rat{S}}
+function is_domain_type(::Type{S}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}, S <: Rat{T, U}}
    return true
 end
 
-function is_exact_type(a::Type{T}) where {S <: FieldElement, T <: Rat{S}}
-   return is_exact_type(S)
+function is_exact_type(a::Type{T}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}, S <: Rat{T, U}}
+   return is_exact_type(T)
 end
 
 function characteristic(R::RationalFunctionField)
    return characteristic(base_ring(R))
 end
 
-function check_parent(a::Rat{T}, b::Rat{T}, throw::Bool = true) where T <: FieldElement
+function check_parent(a::Rat{T, U}, b::Rat{T, U}, throw::Bool = true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    fl = parent(a) != parent(b)
    fl && throw && error("Incompatible rings in rationa function field operation")
    return !fl
@@ -52,30 +52,30 @@ end
 #
 ###############################################################################
 
-function //(x::Rat{T}, y::Rat{T}) where T <: FieldElement
+function //(x::Rat{T, U}, y::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    check_parent(x, y)
    R = parent(x)
    return R(divexact(data(x), data(y)))
 end
 
-function //(x::T, y::Rat{T}) where T <: FieldElement
+function //(x::T, y::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    R = parent(y)
    parent(x) != base_ring(y) && error("Incompatible elements")
    return R(divexact(x, data(y)))
 end
 
-function //(x::Rat{T}, y::T) where T <: FieldElement
+function //(x::Rat{T, U}, y::T) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    R = parent(x)
    base_ring(x) != parent(y) && error("Incompatible elements")
    return R(divexact(data(x), y))
 end
 
-function //(x::Rational{BigInt}, y::Rat{Rational{BigInt}})
+function //(x::Rational{BigInt}, y::Rat{Rational{BigInt}, U}) where U <: Union{PolyElem, MPolyElem}
    R = parent(y)
    return R(divexact(x, data(y)))
 end
 
-function //(x::Rat{Rational{BigInt}}, y::Rational{BigInt})
+function //(x::Rat{Rational{BigInt}, U}, y::Rational{BigInt}) where U <: Union{PolyElem, MPolyElem}
    R = parent(x)
    return R(divexact(data(x), y))
 end
@@ -166,19 +166,19 @@ end
 #
 ###############################################################################
 
-function +(a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function +(a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    check_parent(a, b)
    R = parent(a)
    return R(data(a) + data(b))
 end
 
-function -(a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function -(a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    check_parent(a, b)
    R = parent(a)
    return R(data(a) - data(b))
 end
 
-function *(a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function *(a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    check_parent(a, b)
    R = parent(a)
    return R(data(a) * data(b))
@@ -200,12 +200,12 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::Rat)
    return R(a*data(b))
 end
 
-function *(a::Rat{T}, b::T) where T <: FieldElem
+function *(a::Rat{T, U}, b::T) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
    R = parent(a)
    return R(data(a)*b)
 end
 
-function *(a::T, b::Rat{T}) where T <: FieldElem
+function *(a::T, b::Rat{T, U}) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
    R = parent(b)
    return R(a*data(b))
 end
@@ -220,12 +220,12 @@ function +(a::Union{Integer, Rational, AbstractFloat}, b::Rat)
    return R(a + data(b))
 end
 
-function +(a::Rat{T}, b::T) where T <: FieldElem
+function +(a::Rat{T, U}, b::T) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
    R = parent(a)
    return R(data(a) + b)
 end
 
-function +(a::T, b::Rat{T}) where T <: FieldElem
+function +(a::T, b::Rat{T, U}) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
    R = parent(b)
    return R(a + data(b))
 end
@@ -240,12 +240,12 @@ function -(a::Union{Integer, Rational, AbstractFloat}, b::Rat)
    return R(a - data(b))
 end
 
-function -(a::Rat{T}, b::T) where T <: FieldElem
+function -(a::Rat{T, U}, b::T) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
    R = parent(a)
    return R(data(a) - b)
 end
 
-function -(a::T, b::Rat{T}) where T <: FieldElem
+function -(a::T, b::Rat{T, U}) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
    R = parent(b)
    return R(a - data(b))
 end
@@ -256,12 +256,12 @@ end
 #
 ###############################################################################
 
-function ==(a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function ==(a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    check_parent(a, b)
    return data(a) == data(b)
 end
 
-function isequal(a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function isequal(a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    check_parent(a, b)
    return data(a) == data(b)
 end
@@ -282,21 +282,21 @@ function ==(a::Union{Integer, Rational, AbstractFloat}, b::Rat)
    return a == data(b)
 end
 
-function ==(a::Rat{T}, b::T) where T <: FieldElem
+function ==(a::Rat{T, U}, b::T) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
    R = parent(a)
    return data(a) == b
 end
 
-function ==(a::T, b::Rat{T}) where T <: FieldElem
+function ==(a::T, b::Rat{T, U}) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
    R = parent(b)
    return a == data(b)
 end
 
-function ==(a::Rat{T}, b::Poly{T}) where T <: FieldElement
+function ==(a::Rat{T, U}, b::Poly{T}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    return a == parent(a)(b)
 end
 
-function ==(a::Poly{T}, b::Rat{T}) where T <: FieldElement
+function ==(a::Poly{T}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    return parent(b)(a) == b
 end
 
@@ -317,13 +317,13 @@ end
 #
 ###############################################################################
 
-function divexact(a::Rat{T}, b::Rat{T}; check::Bool=true) where T <: FieldElement
+function divexact(a::Rat{T, U}, b::Rat{T, U}; check::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    check_parent(a, b)
    R = parent(a)
    return R(divexact(data(a), data(b); check=check))
 end
 
-function divides(a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function divides(a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    check_parent(a, b)
    R = parent(a)
    d, q = divides(data(a), data(b))
@@ -346,12 +346,12 @@ function divexact(a::Union{Integer, Rational, AbstractFloat}, b::Rat; check::Boo
    return R(divexact(a, data(b); check=check))
 end
 
-function divexact(a::Rat{T}, b::T; check::Bool=true) where T <: FieldElem
+function divexact(a::Rat{T, U}, b::T; check::Bool=true) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
    R = parent(a)
    return R(divexact(data(a), b; check=check))
 end
 
-function divexact(a::T, b::Rat{T}; check::Bool=true) where T <: FieldElem
+function divexact(a::T, b::Rat{T, U}; check::Bool=true) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
    R = parent(b)
    return R(divexact(a, data(b); check=check))
 end
@@ -362,19 +362,11 @@ end
 #
 ##############################################################################
 
-function evaluate(f::Rat{T}, v::U) where {T <: RingElement, U <: RingElement}
+function evaluate(f::Rat{T, U}, v::V) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}, V <: RingElement}
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::Rat{T}, v::U) where {T <: PolyElem, U <: Integer}
-    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
-end
-
-function evaluate(f::Rat{T}, v::Vector{U}) where {T <: RingElement, U <: RingElement}
-   return evaluate(numerator(f), v)//evaluate(denominator(f), v)
-end
-
-function evaluate(f::Rat{T}, v::Vector{U}) where {T <: PolyElem, U <: Integer}
+function evaluate(f::Rat{T, U}, v::Vector{V}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}, V <: RingElement}
    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
@@ -384,7 +376,7 @@ end
 #
 ###############################################################################
 
-function ^(a::Rat{T}, b::Int) where T <: FieldElement
+function ^(a::Rat, b::Int)
    R = parent(a)
    return R(data(a)^b)
 end
@@ -438,12 +430,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    gcd(a::Rat{T}, b::Rat{T}) where {T <: RingElem}
+    gcd(a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
 
 Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
 the GCD of $a/b$ and $c/d$ to be gcd$(ad, bc)/bd$, reduced to lowest terms.
 """
-function gcd(a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function gcd(a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    check_parent(a, b)
    R = parent(a)
    return R(gcd(data(a), data(b)))
@@ -460,17 +452,17 @@ function zero!(c::Rat)
    return c
 end
 
-function mul!(c::Rat{T}, a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function mul!(c::Rat{T, U}, a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    c.d = mul!(data(c), data(a), data(b))
    return c
 end
 
-function addeq!(a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function addeq!(a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    a.d = addeq!(data(a), data(b))
    return a
 end
 
-function add!(c::Rat{T}, a::Rat{T}, b::Rat{T}) where T <: FieldElement
+function add!(c::Rat{T}, a::Rat{T, U}, b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    c.d = add!(data(c), data(a), data(b))
    return c
 end
@@ -515,13 +507,12 @@ rand(S::RationalFunctionField, v...) = rand(GLOBAL_RNG, S, v...)
 #
 ###############################################################################
 
-promote_rule(::Type{Rat{T}}, ::Type{Rat{T}}) where T <: FieldElement = Rat{T}
+promote_rule(::Type{Rat{T, U}}, ::Type{Rat{T, U}}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}} = Rat{T, U}
 
-promote_rule(::Type{Rat{T}}, ::Type{Rat{T}}) where T <: FieldElem = Rat{T}
+promote_rule(::Type{Rat{T, U}}, ::Type{Rat{T, U}}) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}} = Rat{T, U}
 
-function promote_rule(::Type{Rat{T}}, ::Type{U}) where {T <: FieldElement, U <: RingElem}
-   promote_rule(Frac{dense_poly_type(T)}, U) === Frac{dense_poly_type(T)} ? Rat{T} : 
-   promote_rule(Frac{mpoly_type(T)}, U) === Frac{mpoly_type(T)} ? Rat{T} : Union{}
+function promote_rule(::Type{Rat{T, U}}, ::Type{V}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}, V <: RingElem}
+   promote_rule(Frac{U}, V) === Frac{U} ? Rat{T, U} : Union{}
 end
 
 ###############################################################################
@@ -530,29 +521,29 @@ end
 #
 ###############################################################################
 
-function (a::RationalFunctionField{T})() where T <: FieldElement
+function (a::RationalFunctionField{T, U})() where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    K = fraction_field(a)
-   z = Rat{T}(K())
+   z = Rat{T, U}(K())
    z.parent = a
    return z
 end
 
-function (a::RationalFunctionField{T})(b::Frac{<:Union{PolyElem{T}, MPolyElem{T}}}) where T <: FieldElement
+function (a::RationalFunctionField{T, U})(b::Frac{U}) where {T <: FieldElement, U <: Union{PolyElem{T}, MPolyElem{T}}}
    K = fraction_field(a)
    parent(b) != K && error("Unable to coerce rational function")
-   z = Rat{T}(b)
+   z = Rat{T, U}(b)
    z.parent = a
-   return z::Rat{T}
+   return z::Rat{T, U}
 end
 
-function (a::RationalFunctionField{T})(n::S, d::S) where {T <: FieldElement, S <: Union{PolyElem{T}, MPolyElem{T}}}
+function (a::RationalFunctionField{T, U})(n::U, d::U) where {T <: FieldElement, U <: Union{PolyElem{T}, MPolyElem{T}}}
    R = parent(n)
    g = gcd(n, d)
    if !isone(g)
       n = divexact(n, g)
       d = divexact(d, g)
    end
-   r = Frac{S}(n, d)
+   r = Frac{U}(n, d)
    try
       r.parent = FracDict[R]
    catch
@@ -561,21 +552,21 @@ function (a::RationalFunctionField{T})(n::S, d::S) where {T <: FieldElement, S <
    return a(r)
 end
 
-function (a::RationalFunctionField{T})(b::Rat{T}) where T <: FieldElement
+function (a::RationalFunctionField{T, U})(b::Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem{T}, MPolyElem{T}}}
    parent(b) != a && error("Unable to coerce rational function")
    return b
 end
 
-function (a::RationalFunctionField{T})(b::Integer) where T <: FieldElement
+function (a::RationalFunctionField{T, U})(b::Integer) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    K = fraction_field(a)
-   z = Rat{T}(K(b))
+   z = Rat{T, U}(K(b))
    z.parent = a
    return z
 end
 
-function (a::RationalFunctionField{T})(b::Rational{<:Integer}) where T <: FieldElement
+function (a::RationalFunctionField{T, U})(b::Rational{<:Integer}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    K = fraction_field(a)
-   z = Rat{T}(K(b))
+   z = Rat{T, U}(K(b))
    z.parent = a
    return z
 end
@@ -594,11 +585,14 @@ function RationalFunctionField(k::Field, s::Symbol; cached=true)
    T = elem_type(k)
 
    R, x = AbstractAlgebra.PolynomialRing(k, s, cached=cached)
+
+   U = elem_type(R)
+
    S = FractionField(R)
    g = S(x)
-   t = Rat{T}(g)
+   t = Rat{T, U}(g)
 
-   par_object = RationalFunctionField{T}(k, parent(g), s, cached)
+   par_object = RationalFunctionField{T, U}(k, parent(g), s, cached)
 
    t.parent = par_object
 
@@ -609,11 +603,14 @@ function RationalFunctionField(k::Field, s::Vector{Symbol}; cached=true)
    T = elem_type(k)
 
    R, x = AbstractAlgebra.PolynomialRing(k, s, cached=cached)
+
+   U = elem_type(R)
+
    S = FractionField(R)
    g = [S(xi) for xi in x]
-   t = [Rat{T}(gi) for gi in g]
+   t = [Rat{T, U}(gi) for gi in g]
 
-   par_object = RationalFunctionField{T}(k, parent(g[1]), s, cached)
+   par_object = RationalFunctionField{T, U}(k, parent(g[1]), s, cached)
 
    for ti in t
       ti.parent = par_object

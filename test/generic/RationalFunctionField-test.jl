@@ -6,9 +6,9 @@
    @test RationalFunctionField(QQ, "x", cached = true)[1] === RationalFunctionField(QQ, "x", cached = true)[1]
    @test RationalFunctionField(QQ, "x", cached = false)[1] !== RationalFunctionField(QQ, "x", cached = false)[1]
 
-   @test elem_type(T) == Generic.Rat{Rational{BigInt}}
-   @test elem_type(Generic.RationalFunctionField{Rational{BigInt}}) == Generic.Rat{Rational{BigInt}}
-   @test parent_type(Generic.Rat{Rational{BigInt}}) == Generic.RationalFunctionField{Rational{BigInt}}
+   @test elem_type(T) == Generic.Rat{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
+   @test elem_type(Generic.RationalFunctionField{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}) == Generic.Rat{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
+   @test parent_type(Generic.Rat{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}) == Generic.RationalFunctionField{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
 
    @test isa(T, Generic.RationalFunctionField)
 
@@ -47,7 +47,7 @@
    @test RationalFunctionField(QQ, ["x", "y"], cached = true)[1] === RationalFunctionField(QQ, ["x", "y"], cached = true)[1]
    @test RationalFunctionField(QQ, ["x", "y"], cached = false)[1] !== RationalFunctionField(QQ, ["x", "y"], cached = false)[1]
 
-   @test elem_type(T) == Generic.Rat{Rational{BigInt}}
+   @test elem_type(T) == Generic.Rat{Rational{BigInt}, Generic.MPoly{Rational{BigInt}}}
 
    @test isa(T, Generic.RationalFunctionField)
 
