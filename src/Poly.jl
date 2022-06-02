@@ -1982,7 +1982,8 @@ end
 ###############################################################################
 
 function mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)
-   return false
+   return degree(a11) + degree(a22) < 10 ||
+          degree(b11) + degree(b22) < 10
 end
 
 function mat22_mul(a11, a12, a21, a22, b11, b12, b21, b22)
@@ -1997,34 +1998,34 @@ function mat22_mul(a11, a12, a21, a22, b11, b12, b21, b22)
       C1 = R()
       C2 = R()
       C3 = R()
-      T0 = a11 - a21
-      T1 = b22 - b12
-      C2 = T0*T1
-      T0 = a21 + a22
-      T1 = b12 - b11
-      C3 = T0*T1
-      T0 = T0 - a11
-      T1 = b22 - T1
-      C1 = T0*T1
-      T0 = a12 - T0
-      C0 = T0*b22
-      T0 = a11*b11
-      C1 = T0 + C1
-      C2 = C1 + C2
-      C1 = C1 + C3
-      C3 = C2 + C3
-      C1 = C1 + C0
-      T1 = T1 - b21
-      C0 = a22* T1
-      C2 = C2 - C0
-      C0 = a12 * b21
-      C0 = C0 + T0
+      T0 = sub!(T0, a11, a21)
+      T1 = sub!(T1, b22, b12)
+      C2 = mul!(C2, T0, T1)
+      T0 = add!(T0, a21, a22)
+      T1 = sub!(T1, b12, b11)
+      C3 = mul!(C3, T0, T1)
+      T0 = sub!(T0, T0, a11)
+      T1 = sub!(T1, b22, T1)
+      C1 = mul!(C1, T0, T1)
+      T0 = sub!(T0, a12, T0)
+      C0 = mul!(C0, T0, b22)
+      T0 = mul!(T0, a11, b11)
+      C1 = add!(C1, T0, C1)
+      C2 = add!(C2, C1, C2)
+      C1 = add!(C1, C1, C3)
+      C3 = add!(C3, C2, C3)
+      C1 = add!(C1, C1, C0)
+      T1 = sub!(T1, T1, b21)
+      C0 = mul!(C0, a22, T1)
+      C2 = sub!(C2, C2, C0)
+      C0 = mul!(C0, a12, b21)
+      C0 = add!(C0, C0, T0)
       return C0, C1, C2, C3
    end
 end
 
 function hgcd_prefers_basecase(a::PolyElem, b::PolyElem)
-   return degree(b) < 5
+   return degree(b) < 10
 end
 
 function hgcd_basecase(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
@@ -2045,7 +2046,7 @@ function hgcd_basecase(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    return A, B, m11, m12, m21, m22, s
 end
 
-# Klaus Thull and CheeK. Yap
+# Klaus Thull and Chee K. Yap
 # "A Unified Approach to HGCD Algorithms for polynomials and integers"
 function hgcd_recursive(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    @assert degree(a) > degree(b)
