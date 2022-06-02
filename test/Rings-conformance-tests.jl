@@ -370,10 +370,11 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
       if R isa AbstractAlgebra.Field
          test_EuclideanRing_interface(Rx, reps = 2 + fld(reps, 2))
 
-         for i in 1:reps
+         for i in 1:10*reps
+println(i/(10*reps))
             a = test_elem(Rx)
             b = test_elem(Rx)
-            for j in 1:3
+            for j in 1:7
                q = test_elem(Rx)
                a, b = q*a + b, a
             end
