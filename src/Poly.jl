@@ -1981,9 +1981,50 @@ end
 #
 ###############################################################################
 
+function mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)
+   return false
+end
+
 function mat22_mul(a11, a12, a21, a22, b11, b12, b21, b22)
-   return (a11*b11 + a12*b21, a11*b12 + a12*b22,
-           a21*b11 + a22*b21, a21*b12 + a22*b22)
+   if mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)
+      return a11*b11 + a12*b21, a11*b12 + a12*b22,
+             a21*b11 + a22*b21, a21*b12 + a22*b22
+   else
+      R = parent(a11)
+      T0 = R()
+      T1 = R()
+      C0 = R()
+      C1 = R()
+      C2 = R()
+      C3 = R()
+      T0 = a11 - a21
+      T1 = b22 - b12
+      C2 = T0*T1
+      T0 = a21 + a22
+      T1 = b12 - b11
+      C3 = T0*T1
+      T0 = T0 - a11
+      T1 = b22 - T1
+      C1 = T0*T1
+      T0 = a12 - T0
+      C0 = T0*b22
+      T0 = a11*b11
+      C1 = T0 + C1
+      C2 = C1 + C2
+      C1 = C1 + C3
+      C3 = C2 + C3
+      C1 = C1 + C0
+      T1 = T1 - b21
+      C0 = a22* T1
+      C2 = C2 - C0
+      C0 = a12 * b21
+      C0 = C0 + T0
+      return C0, C1, C2, C3
+   end
+end
+
+function hgcd_prefers_basecase(a::PolyElem, b::PolyElem)
+   return degree(b) < 5
 end
 
 function hgcd_basecase(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
@@ -2001,17 +2042,16 @@ function hgcd_basecase(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
       m11, m12 = m11*q + m12, m11
       m21, m22 = m21*q + m22, m21
    end
-   @assert s == m11*m22 - m21*m12
-   @assert m11*A + m12*B == a
-   @assert m21*A + m22*B == b
    return A, B, m11, m12, m21, m22, s
 end
 
+# Klaus Thull and CheeK. Yap
+# "A Unified Approach to HGCD Algorithms for polynomials and integers"
 function hgcd_recursive(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    @assert degree(a) > degree(b)
    R = parent(a)
 
-   if degree(b) < 5
+   if degree(a) < 5 || hgcd_prefers_basecase(a, b)
       return hgcd_basecase(a, b)
    end
 
@@ -2026,8 +2066,13 @@ function hgcd_recursive(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
 
    A0, B0, R11, R12, R21, R22, Rs = hgcd_recursive(a0, b0)
 
-   ap = (R22*a - R12*b)*Rs
-   bp = (-R21*a + R11*b)*Rs
+   # the calculation of (ap,bp) = R^-1(A,B) can be optimized using A0 and B0
+   #     ap = (R22*a - R12*b)*Rs
+   #     bp = (-R21*a + R11*b)*Rs
+   ar = a - shift_left(a0, m)    # a = a0*x^m + ar
+   br = b - shift_left(b0, m)    # b = b0*x^m + br
+   ap = shift_left(A0, m) + (R22*ar - R12*br)*Rs
+   bp = shift_left(B0, m) + (R11*br - R21*ar)*Rs
 
    if degree(bp) < m
       return (ap, bp, R11, R12, R21, R22, Rs)
@@ -2043,15 +2088,24 @@ function hgcd_recursive(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
 
    c0 = shift_right(c, k)
    d0 = shift_right(d, k)
-
    @assert degree(c0) == 2*(l - m)
    C0, D0, S11, S12, S21, S22, Ss = hgcd_recursive(c0, d0)
 
+   # TODO due to the optimized multiplication by Q^-1, the matrix Q is only
+   # needed if it is needed for the output; add an option for this
    Qs = -Rs*Ss
    (Q11, Q12, Q21, Q22) = mat22_mul(R11*q + R12, R11, R21*q + R22, R21,
                                     S11, S12, S21, S22)
 
-   return (Q22*a - Q12*b)*Qs, (-Q21*a + Q11*b)*Qs, Q11, Q12, Q21, Q22, Qs
+   # (A,B) = Q^-1(a,b) = S^-1(c,d) can be optimized as well
+   #     A = (Q22*a - Q12*b)*Qs
+   #     B = (-Q21*a + Q11*b)*Qs
+   cr = c - shift_left(c0, k)    # c = c0*x^k + cr
+   dr = d - shift_left(d0, k)    # d = d0*x^k + dr
+   A = shift_left(C0, k) + (S22*cr - S12*dr)*Ss
+   B = shift_left(D0, k) + (S11*dr - S21*cr)*Ss
+
+   return A, B, Q11, Q12, Q21, Q22, Qs
 end
 
 @doc Markdown.doc"""
@@ -2073,20 +2127,6 @@ function hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    check_parent(a, b)
    @assert degree(a) > degree(b) >= 0
    return hgcd_recursive(a, b)
-
-   s = 1
-   A = a; B = b
-   m11 = one(R);  m12 = zero(R)
-   m21 = zero(R); m22 = one(R)
-   n = cld(degree(a), 2)
-   while n <= degree(B)
-      q, r = divrem(A, B)
-      s = -s
-      A, B = B, r
-      m11, m12 = m11*q + m12, m11
-      m21, m22 = m21*q + m22, m21
-   end
-   return A, B, m11, m12, m21, m22, s
 end
 
 ###############################################################################
