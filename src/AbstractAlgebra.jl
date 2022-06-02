@@ -141,10 +141,14 @@ export zeros
 
 export NotInvertibleError, error_dim_negative, ErrorConstrDimMismatch
 
-export crt,
+export add!, addeq!,
+       crt,
        factor, factor_squarefree,
        hgcd,
-       is_irreducible, is_squarefree
+       is_irreducible, is_squarefree,
+       mul!,
+       sub!,
+       zero!
 
 include("Attributes.jl")
 include("AliasMacro.jl")
