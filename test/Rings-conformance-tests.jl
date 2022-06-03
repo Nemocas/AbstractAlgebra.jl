@@ -373,7 +373,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
          for i in 1:reps
             a = test_elem(Rx)
             b = test_elem(Rx)
-            for j in 1:4
+            for j in 1:8
                q = test_elem(Rx)
                a, b = q*a + b, a
             end

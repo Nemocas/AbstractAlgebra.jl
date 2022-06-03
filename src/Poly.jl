@@ -1982,8 +1982,8 @@ end
 ###############################################################################
 
 function mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)
-   return degree(a11) + degree(a22) < 10 ||
-          degree(b11) + degree(b22) < 10
+   return degree(a11) + degree(a22) < 4 ||
+          degree(b11) + degree(b22) < 4
 end
 
 function mat22_mul(a11, a12, a21, a22, b11, b12, b21, b22)
@@ -2028,6 +2028,7 @@ function hgcd_prefers_basecase(a::PolyElem, b::PolyElem)
    return degree(b) < 10
 end
 
+# iterative basecase
 function hgcd_basecase(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    @assert degree(a) > degree(b)
    R = parent(a)
@@ -2048,7 +2049,12 @@ end
 
 # Klaus Thull and Chee K. Yap
 # "A Unified Approach to HGCD Algorithms for polynomials and integers"
-function hgcd_recursive(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
+function hgcd_recursive(
+   a::PolyElem{T},
+   b::PolyElem{T},
+   want_matrix::Bool = true
+) where T <: FieldElement
+
    @assert degree(a) > degree(b)
    R = parent(a)
 
@@ -2092,12 +2098,6 @@ function hgcd_recursive(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    @assert degree(c0) == 2*(l - m)
    C0, D0, S11, S12, S21, S22, Ss = hgcd_recursive(c0, d0)
 
-   # TODO due to the optimized multiplication by Q^-1, the matrix Q is only
-   # needed if it is needed for the output; add an option for this
-   Qs = -Rs*Ss
-   (Q11, Q12, Q21, Q22) = mat22_mul(R11*q + R12, R11, R21*q + R22, R21,
-                                    S11, S12, S21, S22)
-
    # (A,B) = Q^-1(a,b) = S^-1(c,d) can be optimized as well
    #     A = (Q22*a - Q12*b)*Qs
    #     B = (-Q21*a + Q11*b)*Qs
@@ -2105,6 +2105,14 @@ function hgcd_recursive(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    dr = d - shift_left(d0, k)    # d = d0*x^k + dr
    A = shift_left(C0, k) + (S22*cr - S12*dr)*Ss
    B = shift_left(D0, k) + (S11*dr - S21*cr)*Ss
+
+   Qs = -Rs*Ss
+   if want_matrix
+      (Q11, Q12, Q21, Q22) = mat22_mul(R11*q + R12, R11, R21*q + R22, R21,
+                                       S11, S12, S21, S22)
+   else
+      Q11 = Q12 = Q21 = Q22 = R()
+   end
 
    return A, B, Q11, Q12, Q21, Q22, Qs
 end
