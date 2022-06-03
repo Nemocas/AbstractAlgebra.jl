@@ -2135,7 +2135,77 @@ Assumes that the input satsifies `degree(a) > degree(b) >= 0`.
 function hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    check_parent(a, b)
    @assert degree(a) > degree(b) >= 0
-   return hgcd_recursive(a, b)
+   return hgcd_recursive(a, b, true)
+end
+
+
+function gcd_hgcd_prefers_basecase(a::PolyElem, b::PolyElem)
+   return length(b) < 10
+end
+
+function gcd_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
+   check_parent(a, b)
+   if length(a) < length(b)
+      a, b = b, a
+   end
+   while !iszero(b)
+      a, b = b, mod(a, b)
+      if iszero(a) || gcd_hgcd_prefers_basecase(a, b)
+         break
+      else
+         a, b, _, _, _, _, _ = hgcd_recursive(a, b, false)
+      end
+   end
+   while !iszero(b)
+      a, b = b, mod(a, b)
+   end
+   return iszero(a) ? zero(parent(a)) : divexact(a, leading_coefficient(a))
+end
+
+function gcdx_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
+   aorg = a
+   borg = b
+   check_parent(a, b)
+   R = parent(a)
+   # boilerplate
+   if iszero(a)
+      if iszero(b)
+         return zero(R), zero(R), zero(R)
+      else
+         d = leading_coefficient(b)
+         return divexact(b, d), zero(R), divexact(one(R), d)
+      end
+   end
+   if iszero(b)
+      d = leading_coefficient(a)
+      return divexact(a, d), divexact(one(R), d), zero(R)
+   end
+   # only keep track of one row of the matrix and calculate t with a division
+   m21, m22 = zero(R), one(R)
+   ms = 1
+   if length(a) < length(b)
+      a, b = b, a
+      m21, m22 = m22, m21
+      ms = -ms
+   end
+   while !iszero(b)
+      q, r = divrem(a, b)
+      a, b = b, r
+      m21, m22 = m21*q + m22, m21
+      ms = -ms
+      if iszero(b)
+         break
+      elseif !gcd_hgcd_prefers_basecase(a, b)
+         a, b, n11, n12, n21, n22, ns = hgcd_recursive(a, b, true)
+         m21, m22 = m21*n11 + m22*n21, m21*n12 + m22*n22
+         ms *= ns
+      end
+   end
+   l = leading_coefficient(a)
+   g = divexact(a, l)
+   s = divexact(ms*m22, l)
+   t = divexact(g - s*aorg, borg) # = divexact(-ms*m12, l)
+   return g, s, t
 end
 
 ###############################################################################

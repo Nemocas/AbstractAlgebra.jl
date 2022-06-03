@@ -380,6 +380,12 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
             if degree(a) < degree(b)
                a, b = b, a
             end
+
+            g, s, t = AbstractAlgebra.gcdx_hgcd(a, b)
+            @assert g == gcd(a, b)
+            @assert g == AbstractAlgebra.gcd_hgcd(a, b)
+            @assert g == s*a + t*b
+
             degree(a) > degree(b) >= 0 || continue
             (A, B, m11, m12, m21, m22, s) = hgcd(a, b)
             @test degree(A) >= cld(degree(a), 2) > degree(B)
