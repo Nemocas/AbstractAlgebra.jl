@@ -1916,7 +1916,23 @@ function gcd(a::PolyElem{T}, b::PolyElem{T}, ignore_content::Bool = false) where
    return divexact(b, canonical_unit(leading_coefficient(b)))
 end
 
-function gcd(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+function gcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
+   check_parent(a, b)
+   while !iszero(b)
+      a, b = b, mod(a, b)
+      if iszero(b) || hgcd_prefers_basecase(a, b)
+         break
+      else
+         a, b, _, _, _, _, _ = hgcd_recursive(a, b, false)
+      end
+   end
+   while !iszero(b)
+      a, b = b, mod(a, b)
+   end
+   return iszero(a) ? zero(parent(a)) : divexact(a, leading_coefficient(a))
+end
+
+function gcd(a::PolyElem{T}, b::PolyElem{T}) where T <: ResElem
    check_parent(a, b)
    if length(a) > length(b)
       (a, b) = (b, a)
@@ -2139,27 +2155,6 @@ function hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    @assert degree(a) > degree(b) >= 0
    return hgcd_recursive(a, b, true)
 end
-
-function gcd_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
-   check_parent(a, b)
-   if length(a) < length(b)
-      a, b = b, a
-   end
-   while !iszero(b)
-      a, b = b, mod(a, b)
-      if iszero(a) || hgcd_prefers_basecase(a, b)
-         break
-      else
-         a, b, _, _, _, _, _ = hgcd_recursive(a, b, false)
-      end
-   end
-   while !iszero(b)
-      a, b = b, mod(a, b)
-   end
-   return iszero(a) ? zero(parent(a)) : divexact(a, leading_coefficient(a))
-end
-
-
 
 ###############################################################################
 #
