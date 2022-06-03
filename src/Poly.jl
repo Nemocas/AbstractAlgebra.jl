@@ -1981,6 +1981,11 @@ end
 #
 ###############################################################################
 
+# these two functions determine cutoffs
+function hgcd_prefers_basecase(a::PolyElem, b::PolyElem)
+   return degree(b) < 10
+end
+
 function mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)
    return degree(a11) + degree(a22) < 4 ||
           degree(b11) + degree(b22) < 4
@@ -2024,9 +2029,6 @@ function mat22_mul(a11, a12, a21, a22, b11, b12, b21, b22)
    end
 end
 
-function hgcd_prefers_basecase(a::PolyElem, b::PolyElem)
-   return degree(b) < 10
-end
 
 # iterative basecase
 function hgcd_basecase(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
@@ -2138,11 +2140,6 @@ function hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    return hgcd_recursive(a, b, true)
 end
 
-
-function gcd_hgcd_prefers_basecase(a::PolyElem, b::PolyElem)
-   return length(b) < 10
-end
-
 function gcd_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    check_parent(a, b)
    if length(a) < length(b)
@@ -2150,7 +2147,7 @@ function gcd_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    end
    while !iszero(b)
       a, b = b, mod(a, b)
-      if iszero(a) || gcd_hgcd_prefers_basecase(a, b)
+      if iszero(a) || hgcd_prefers_basecase(a, b)
          break
       else
          a, b, _, _, _, _, _ = hgcd_recursive(a, b, false)
@@ -2162,51 +2159,7 @@ function gcd_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
    return iszero(a) ? zero(parent(a)) : divexact(a, leading_coefficient(a))
 end
 
-function gcdx_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
-   aorg = a
-   borg = b
-   check_parent(a, b)
-   R = parent(a)
-   # boilerplate
-   if iszero(a)
-      if iszero(b)
-         return zero(R), zero(R), zero(R)
-      else
-         d = leading_coefficient(b)
-         return divexact(b, d), zero(R), divexact(one(R), d)
-      end
-   end
-   if iszero(b)
-      d = leading_coefficient(a)
-      return divexact(a, d), divexact(one(R), d), zero(R)
-   end
-   # only keep track of one row of the matrix and calculate t with a division
-   m21, m22 = zero(R), one(R)
-   ms = 1
-   if length(a) < length(b)
-      a, b = b, a
-      m21, m22 = m22, m21
-      ms = -ms
-   end
-   while !iszero(b)
-      q, r = divrem(a, b)
-      a, b = b, r
-      m21, m22 = m21*q + m22, m21
-      ms = -ms
-      if iszero(b)
-         break
-      elseif !gcd_hgcd_prefers_basecase(a, b)
-         a, b, n11, n12, n21, n22, ns = hgcd_recursive(a, b, true)
-         m21, m22 = m21*n11 + m22*n21, m21*n12 + m22*n22
-         ms *= ns
-      end
-   end
-   l = leading_coefficient(a)
-   g = divexact(a, l)
-   s = divexact(ms*m22, l)
-   t = divexact(g - s*aorg, borg) # = divexact(-ms*m12, l)
-   return g, s, t
-end
+
 
 ###############################################################################
 #
@@ -2774,21 +2727,8 @@ end
 #
 ###############################################################################
 
-function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-   check_parent(a, b)
-   !is_exact_type(T) && error("gcdx requires exact Bezout domain")
-   if length(a) == 0
-      if length(b) == 0
-         return zero(parent(a)), zero(parent(a)), zero(parent(a))
-      else
-         d = leading_coefficient(b)
-         return divexact(b, d), zero(parent(a)), divexact(one(parent(a)), d)
-      end
-   end
-   if length(b) == 0
-      d = leading_coefficient(a)
-      return divexact(a, d), divexact(one(parent(a)), d), zero(parent(a))
-   end
+# _gcdx_.. assumes length(a) > 0 && length(b) > 0
+function _gcdx_basecase(a::PolyElem{T}, b::PolyElem{T}) where T
    swap = false
    if length(a) < length(b)
       a, b = b, a
@@ -2814,26 +2754,38 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldEl
    return divexact(A, d), divexact(u1, d), divexact(v1, d)
 end
 
-function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
-   R = base_ring(a)
+   R = parent(a)
+   !is_exact_type(T) && error("gcdx requires exact Bezout domain")
    if length(a) == 0
       if length(b) == 0
-         return zero(parent(a)), zero(parent(a))
+         return zero(R), zero(R), zero(R)
       else
          d = leading_coefficient(b)
-         return divexact(b, d), zero(parent(a))
+         return divexact(b, d), zero(R), divexact(one(R), d)
       end
    end
    if length(b) == 0
       d = leading_coefficient(a)
-      return divexact(a, d), parent(a)(inv(d))
+      return divexact(a, d), divexact(one(R), d), zero(R)
    end
+   if T <: FieldElement && !hgcd_prefers_basecase(a, b)
+      g, s = _gcdinv_hgcd(a, b)
+      return g, s, divexact(g - s*a, b)
+   else
+      return _gcdx_basecase(a, b)
+   end
+end
+
+# _gcdinv_.. assumes length(a) > 0 && length(b) > 0
+function _gcdinv_basecase(a::PolyElem{T}, b::PolyElem{T}) where T
+   R = parent(a)
    if length(a) < length(b)
       a, b = b, a
-      u1, u2 = zero(parent(a)), one(parent(a))
+      u1, u2 = zero(R), one(R)
    else
-      u1, u2 = one(parent(a)), zero(parent(a))
+      u1, u2 = one(R), zero(R)
    end
    lena = length(a)
    lenb = length(b)
@@ -2853,6 +2805,56 @@ function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, Field
    A, u1 = d*A, d*u1
    d = leading_coefficient(A)
    return divexact(A, d), divexact(u1, d)
+end
+
+function _gcdinv_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: FieldElement
+   R = parent(a)
+   m21, m22 = zero(R), one(R)
+   ms = 1
+   if length(a) < length(b)
+      a, b = b, a
+      m21, m22 = m22, m21
+      ms = -ms
+   end
+   while !iszero(b)
+      q, r = divrem(a, b)
+      a, b = b, r
+      m21, m22 = m21*q + m22, m21
+      ms = -ms
+      if iszero(b)
+         break
+      elseif !hgcd_prefers_basecase(a, b)
+         a, b, n11, n12, n21, n22, ns = hgcd_recursive(a, b, true)
+         m21, m22 = m21*n11 + m22*n21, m21*n12 + m22*n22
+         ms *= ns
+      end
+   end
+   l = leading_coefficient(a)
+   g = divexact(a, l)
+   s = divexact(m22, ms*l)
+   return g, s
+end
+
+function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+   check_parent(a, b)
+   R = parent(a)
+   if length(a) == 0
+      if length(b) == 0
+         return zero(R), zero(R)
+      else
+         d = leading_coefficient(b)
+         return divexact(b, d), zero(R)
+      end
+   end
+   if length(b) == 0
+      d = leading_coefficient(a)
+      return divexact(a, d), R(inv(d))
+   end
+   if T <: FieldElement && !hgcd_prefers_basecase(a, b)
+      return _gcdinv_hgcd(a, b)
+   else
+      return _gcdinv_basecase(a, b)
+   end
 end
 
 ################################################################################

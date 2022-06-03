@@ -381,7 +381,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
                a, b = b, a
             end
 
-            g, s, t = AbstractAlgebra.gcdx_hgcd(a, b)
+            g, s, t = gcdx(a, b)
             @assert g == gcd(a, b)
             @assert g == AbstractAlgebra.gcd_hgcd(a, b)
             @assert g == s*a + t*b
