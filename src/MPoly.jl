@@ -606,6 +606,49 @@ function deflate(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return deflate(f, defl), defl
 end
 
+function inflate_deflate_vectors(R::AbstractAlgebra.MPolyRing, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})::Tuple{Vector{Int},Vector{Int}}
+   unique(vars) != vars && error("Variables not unique")
+   !(length(vars) == length(shift) == length(defl)) && error("Number of variables does not match lengths of shift and deflation vectors")
+   shift1 = zeros(Int, nvars(R))
+   defl1 = ones(Int, nvars(R))
+   for i in 1:(length(vars))
+      !(1 <= vars[i] <= nvars(R)) && error("Variable index not in range")
+      shift1[vars[i]] = shift[i]
+      defl1[vars[i]] = defl[i]
+   end
+   return (shift1, defl1)
+end
+
+@doc Markdown.doc"""
+    deflate(f::T, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+
+Return a polynomial with the same coefficients as $f$ but where exponents of
+some variables (supplied as an array of variable indices) have been reduced by
+the given shifts (supplied as an array of shifts), then deflated (divided) by
+the given exponents (again supplied as an array of deflation factors). The
+algorithm automatically replaces a deflation of $0$ by $1$, to avoid division by
+$0$.
+"""
+function deflate(f::AbstractAlgebra.MPolyElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+   (shift1, defl1) = inflate_deflate_vectors(parent(f), vars, shift, defl)
+   return deflate(f, shift1, defl1)
+end
+
+@doc Markdown.doc"""
+    deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+
+Return a polynomial with the same coefficients as $f$ but where the exponents of
+the given variables have been reduced by the given shifts (supplied as an array
+of shifts), then deflated (divided) by the given exponents (again supplied as an
+array of deflation factors). The algorithm automatically replaces a deflation of
+$0$ by $1$, to avoid division by $0$.
+"""
+function deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+   varidx = [var_index(x) for x in vars]
+   return deflate(f, varidx, shift, defl)
+end
+
+
 @doc Markdown.doc"""
     inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
 
@@ -639,6 +682,34 @@ as an array of inflation factors, one for each variable).
 function inflate(f::AbstractAlgebra.MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
    return inflate(f, [0 for i in 1:nvars(parent(f))], defl)
 end
+
+@doc Markdown.doc"""
+    inflate(f::AbstractAlgebra.MPolyElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+
+Return a polynomial with the same coefficients as $f$ but where exponents of
+some variables (supplied as an array of variable indices) have been inflated
+(multiplied) by the given deflation exponents (supplied as an array of inflation
+factors) and then increased by the given shifts (again supplied as an array of
+shifts).
+"""
+function inflate(f::AbstractAlgebra.MPolyElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+   (shift1, defl1) = inflate_deflate_vectors(parent(f), vars, shift, defl)
+   return inflate(f, shift1, defl1)
+end
+
+@doc Markdown.doc"""
+    inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+
+Return a polynomial with the same coefficients as $f$ but where the exponents of
+the given variables have been inflated (multiplied) by the given deflation
+exponents (supplied as an array of inflation factors) and then increased by the
+given shifts (again supplied as an array of shifts).
+"""
+function inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+   varidx = [var_index(x) for x in vars]
+   return inflate(f, varidx, shift, defl)
+end
+
 
 ################################################################################
 #
@@ -1261,12 +1332,12 @@ end
 function build_names(prefix, indices...)
    map(i -> "$(prefix)[$(join(i, ","))]", Iterators.product(indices...))
 end
- 
+
 function build_variable(arg::Symbol)
    t = gensym()
    return t, :($(esc(t)) = String[$"$arg"])
 end
- 
+
 function build_variable(arg::Expr)
    isa(arg, Expr) || error("Expected $arg to be a variable name")
    Base.Meta.isexpr(arg, :ref) || error("Expected $arg to be of the form varname[idxset]")
@@ -1276,7 +1347,7 @@ function build_variable(arg::Expr)
    t = gensym()
    return t, :($(esc(t)) = build_names($prefix, $(esc.(arg.args[2:end])...)))
 end
- 
+
 function build_variables_strings(args)
    names = Symbol[]
    exprs = Expr[]
@@ -1288,7 +1359,7 @@ function build_variables_strings(args)
    end
    return names, exprs
 end
- 
+
 macro PolynomialRing(R, args...)
    names, exprs = build_variables_strings(args)
    all_names = gensym()
