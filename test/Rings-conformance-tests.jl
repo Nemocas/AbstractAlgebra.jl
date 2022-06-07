@@ -380,6 +380,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
                g, s, t = gcdx(a, b)
                @test g == gcd(a, b)
                @test g == s*a + t*b
+               @test (g, s) == gcdinv(a, b)
                if degree(a) < degree(b)
                   a, b = b, a
                end
