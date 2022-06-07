@@ -1999,12 +1999,11 @@ end
 
 # these two functions determine cutoffs
 function _hgcd_prefers_basecase(a, b)
-   return degree(b) < 10
+   return true
 end
 
 function _mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)
-   return degree(a11) + degree(a22) < 4 ||
-          degree(b11) + degree(b22) < 4
+   return true
 end
 
 function mat22_mul(a11, a12, a21, a22, b11, b12, b21, b22)
