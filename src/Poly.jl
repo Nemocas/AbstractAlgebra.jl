@@ -995,7 +995,7 @@ end
 @doc Markdown.doc"""
     truncate(a::PolynomialElem, n::Int)
 
-Return $a$ truncated to $n$ terms.
+Return $a$ truncated to $n$ terms, i.e. the remainder upon division by $x^n$.
 """
 function truncate(a::PolynomialElem, n::Int)
    lena = length(a)
@@ -2094,8 +2094,8 @@ function hgcd_recursive(
    # the calculation of (ap,bp) = R^-1(A,B) can be optimized using A0 and B0
    #     ap = (R22*a - R12*b)*Rs
    #     bp = (-R21*a + R11*b)*Rs
-   ar = a - shift_left(a0, m)    # a = a0*x^m + ar
-   br = b - shift_left(b0, m)    # b = b0*x^m + br
+   ar = truncate(a, m)    # a = a0*x^m + ar
+   br = truncate(b, m)    # b = b0*x^m + br
    ap = shift_left(A0, m) + (R22*ar - R12*br)*Rs
    bp = shift_left(B0, m) + (R11*br - R21*ar)*Rs
 
@@ -2119,8 +2119,8 @@ function hgcd_recursive(
    # (A,B) = Q^-1(a,b) = S^-1(c,d) can be optimized as well
    #     A = (Q22*a - Q12*b)*Qs
    #     B = (-Q21*a + Q11*b)*Qs
-   cr = c - shift_left(c0, k)    # c = c0*x^k + cr
-   dr = d - shift_left(d0, k)    # d = d0*x^k + dr
+   cr = truncate(c, k)    # c = c0*x^k + cr
+   dr = truncate(d, k)    # d = d0*x^k + dr
    A = shift_left(C0, k) + (S22*cr - S12*dr)*Ss
    B = shift_left(D0, k) + (S11*dr - S21*cr)*Ss
 
