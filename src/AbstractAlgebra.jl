@@ -146,9 +146,11 @@ export crt, factor, factor_squarefree, is_irreducible, is_squarefree
 include("Attributes.jl")
 include("AliasMacro.jl")
 
-# alternative names for LinearAlgebra
-const is_symmetric = issymmetric
-const is_upper_triangular = istriu
+# alternative names for some functions from Base and LinearAlgebra
+@alias is_one isone
+@alias is_zero iszero
+@alias is_symmetric issymmetric
+@alias is_upper_triangular istriu
 
 # for backwards compatibility
 export issymmetric, istriu
@@ -494,9 +496,9 @@ export abs_series, abs_series_type,
                  is_domain_type, is_exact_type, is_gen,
                  is_homogeneous,
                  is_isomorphic, is_monomial, is_monomial_recursive,
-                 is_negative, isone, is_reverse,
+                 is_negative, is_one, is_reverse,
                  is_submodule, is_symmetric,
-                 is_term_recursive, is_unit, iszero,
+                 is_term_recursive, is_unit, is_zero,
                  lcm,
                  laurent_series, length,
                  main_variable, main_variable_extract, main_variable_insert,
