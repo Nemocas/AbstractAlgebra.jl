@@ -244,7 +244,7 @@ function *(a::T, b::TotFrac{T}) where {T <: RingElem}
    if a == d
       return parent(a)(deepcopy(n))
    end
-   return parent(a)(a*n, deepcopy(d), false)
+   return parent(b)(a*n, deepcopy(d), false)
 end
 
 function +(a::TotFrac, b::Union{Integer, Rational})
