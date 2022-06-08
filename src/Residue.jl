@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ResidueRing, add!, addeq!, data, modulus, mul!, lift 
+export ResidueRing, add!, addeq!, data, modulus, mul!, lift, is_zero_divisor 
 
 ###############################################################################
 #
@@ -87,6 +87,8 @@ function is_unit(a::ResElem)
    g = gcd(data(a), modulus(a))
    return isone(g)
 end
+
+is_zero_divisor(a) = !is_unit(a)
 
 deepcopy_internal(a::ResElem, dict::IdDict) =
    parent(a)(deepcopy(data(a)))

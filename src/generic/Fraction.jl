@@ -160,7 +160,6 @@ end
 ###############################################################################
 
 function FractionField(R::AbstractAlgebra.Ring; cached=true)
-   R2 = R
    T = elem_type(R)
 
    return FracField{T}(R, cached)

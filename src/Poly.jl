@@ -248,6 +248,8 @@ end
 
 is_unit(a::PolynomialElem) = length(a) == 1 && is_unit(coeff(a, 0))
 
+is_zero_divisor(a::PolynomialElem) = is_zero_divisor(content(a))
+
 ###############################################################################
 #
 #  Monomial and term

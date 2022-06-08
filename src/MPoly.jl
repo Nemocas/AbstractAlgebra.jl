@@ -383,6 +383,10 @@ function is_unit(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
           is_unit(first(coefficients(x)))
 end
 
+function is_zero_divisor(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return is_zero_divisor(content(x))
+end
+
 @doc Markdown.doc"""
     is_constant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 

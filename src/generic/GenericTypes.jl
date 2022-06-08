@@ -884,6 +884,32 @@ end
 
 ###############################################################################
 #
+#   TotFracRing / TotFrac
+#
+###############################################################################
+
+mutable struct TotFracRing{T <: RingElem} <: AbstractAlgebra.Ring
+   base_ring::Ring
+
+   function TotFracRing{T}(R::Ring, cached::Bool = true) where T <: RingElem
+      return get_cached!(TotFracDict, R, cached) do
+         new{T}(R)
+      end::TotFracRing{T}
+   end
+end
+
+const TotFracDict = CacheDictType{Ring, Ring}()
+
+mutable struct TotFrac{T <: RingElem} <: AbstractAlgebra.RingElem
+   num::T
+   den::T
+   parent::TotFracRing{T}
+
+   TotFrac{T}(num::T, den::T) where T <: RingElem = new{T}(num, den)
+end
+
+###############################################################################
+#
 #   FactoredFracField / FactoredFrac
 #
 ###############################################################################
