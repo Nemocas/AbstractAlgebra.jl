@@ -620,7 +620,7 @@ function inflate_deflate_vectors(R::AbstractAlgebra.MPolyRing, vars::Vector{Int}
 end
 
 @doc Markdown.doc"""
-    deflate(f::T, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+    deflate(f::AbstractAlgebra.MPolyElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
 
 Return a polynomial with the same coefficients as $f$ but where exponents of
 some variables (supplied as an array of variable indices) have been reduced by
