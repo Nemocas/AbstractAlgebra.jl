@@ -5,6 +5,7 @@
 ###############################################################################
 #include("../AbstractTypes.jl")
 #include("FreeAssAlgebra.jl")
+include("FreeAssAhoCorasick.jl")
 export groebner_basis, interreduce!
 
 using DataStructures
@@ -45,6 +46,14 @@ end
 # skip all of the extra length-checking
 function _leading_word(a::FreeAssAlgElem{T}) where T
    return a.exps[1]
+end
+
+function normal_form(
+        f::FreeAssAlgElem{T},
+        g::Vector{FreeAssAlgElem{T}},
+        aut::AhoCorasickAutomaton
+    ) where T
+    #TODO
 end
 
 # normal form with leftmost word divisions
@@ -309,8 +318,9 @@ function is_redundant(# TODO do we need g in the signature?
    obs::NTuple{4, Vector{Int}},
    obs_index::Int,
    s::Int,
-   B::Matrix{Vector{NTuple{4, Vector{Int}}}}
-)
+   B::Matrix{Vector{NTuple{4, Vector{Int}}}},
+   g::Vector{FreeAssAlgElem{T}}
+) where T
    # cases 4b + 4c
    for j in 1:size(B)[1]
       for k in 1:length(B[j, s])
@@ -370,7 +380,7 @@ function remove_redundancies!(
    for i in 1:s
       k = 1
       while k <= length(B[i, s])
-         if is_redundant(B[i, s][k], i, s, B)
+         if is_redundant(B[i, s][k], i, s, B, g)
             deleteat!(B[i, s], k)
             del_counter += 1
          else
