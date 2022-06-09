@@ -40,53 +40,37 @@ Note that although the total ring of fractions of an integral domain `R` is
 mathematically the same thing as the fraction field of `R`, these will be
 different objects in AbstractAlgebra and have different types.
 
-## Generic fraction types
+## Generic total ring of fraction types
 
-AbstractAlgebra.jl implements a generic fraction type `Generic.Frac{T}`
-where `T` is the type of elements of the base ring. See the file
-`src/generic/GenericTypes.jl` for details.
+AbstractAlgebra.jl implements a generic type for elements of a total ring of
+fractions, namely`Generic.TotFrac{T}` where `T` is the type of elements of the
+base ring. See the file `src/generic/GenericTypes.jl` for details.
 
-Parent objects of such fraction elements have type `Generic.FracField{T}`.
-
-## Factored fraction types
-
-AbstractAlgebra.jl also implements a fraction type `Generic.FactoredFrac{T}`
-with parent objects of such fractions having type `Generic.FactoredFracField{T}`.
-As opposed to the fractions of type `Generic.Frac{T}`, which are just a
-numerator and denominator, these fractions are maintained in factored form as
-much as possible.
+Parent objects of such elements have type `Generic.TotFracRing{T}`.
 
 ## Abstract types
 
-All fraction element types belong to the abstract type `FracElem{T}`
-and the fraction field types belong to the abstract type `FracField{T}`.
-This enables one to write generic functions that can accept any AbstractAlgebra
-fraction type.
+The types for elements of a total ring of fractions belong directly to the
+abstract type `RingElem` and the type for the total ring of fractions parent
+object belongs directly to the abstract type `Ring`.
 
-!!! note
+## Total ring of fractions constructors
 
-    Both the generic fraction field type `Generic.FracField{T}` and the abstract
-    type it belongs to, `FracField{T}` are both called `FracField`. The
-    former is a (parameterised) concrete type for a fraction field over a given base ring
-    whose elements have type `T`. The latter is an abstract type representing all
-    fraction field types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
-    supplied by a C library).
-
-## Fraction field constructors
-
-In order to construct fractions in AbstractAlgebra.jl, one can first construct the
-fraction field itself. This is accomplished with the following constructor.
+In order to construct fractions in a total ring of fractions in
+AbstractAlgebra.jl, one must first construct the parent object for the total
+ring of fractions itself. This is accomplished with the following constructor.
 
 ```julia
-FractionField(R::Ring; cached::Bool = true)
+TotalRingOfFractions(R::Ring; cached::Bool = true)
 ```
 
-Given a base ring `R` return the parent object of the fraction field of $R$. By default
-the parent object `S` will depend only on `R` and will be cached. Setting the optional
-argument `cached` to `false` will prevent the parent object `S` from being cached.
+Given a base ring `R` return the parent object of the total ring of fractions
+of $R$. By default the parent object `S` will depend only on `R` and will be
+cached. Setting the optional argument `cached` to `false` will prevent the
+parent object `S` from being cached.
 
-Here are some examples of creating fraction fields and making use of the
-resulting parent objects to coerce various elements into the fraction field.
+Here are some examples of creating a total ring of fractions and making use of
+the resulting parent objects to coerce various elements into the ring.
 
 **Examples**
 
@@ -94,8 +78,8 @@ resulting parent objects to coerce various elements into the fraction field.
 julia> R, x = PolynomialRing(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S = FractionField(R)
-Fraction field of Univariate Polynomial Ring in x over Integers
+julia> S = TotalRingOfFractions(R)
+Total ring of fractions of Univariate Polynomial Ring in x over Integers
 
 julia> f = S()
 0
@@ -110,57 +94,23 @@ julia> k = S(x + 1)
 x + 1
 ```
 
-## Factored Fraction field constructors
-
-The corresponding factored field uses the following constructor.
-
-```julia
-FactoredFractionField(R::Ring; cached::Bool = true)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> S = FactoredFractionField(R)
-Factored fraction field of Multivariate Polynomial Ring in x, y over Integers
-
-julia> (X, Y) = (S(x), S(y))
-(x, y)
-
-julia> f = X^6*(X+Y)^2*(X^2+Y)^3*(X+2*Y)^-3*(X+3*Y)^-4
-x^6*(x + y)^2*(x^2 + y)^3/((x + 2*y)^3*(x + 3*y)^4)
-
-julia> numerator(f)
-x^14 + 2*x^13*y + x^12*y^2 + 3*x^12*y + 6*x^11*y^2 + 3*x^10*y^3 + 3*x^10*y^2 + 6*x^9*y^3 + 3*x^8*y^4 + x^8*y^3 + 2*x^7*y^4 + x^6*y^5
-
-julia> denominator(f)
-x^7 + 18*x^6*y + 138*x^5*y^2 + 584*x^4*y^3 + 1473*x^3*y^4 + 2214*x^2*y^5 + 1836*x*y^6 + 648*y^7
-
-julia> derivative(f, x)
-x^5*(x + y)*(x^2 + y)^2*(7*x^5 + 58*x^4*y + 127*x^3*y^2 + x^3*y + 72*x^2*y^3 + 22*x^2*y^2 + 61*x*y^3 + 36*y^4)/((x + 2*y)^4*(x + 3*y)^5)
-```
-
 ## Fraction constructors
 
-One can construct fractions using the fraction field parent object, as for any
-ring or field.
+One can construct fractions using the total ring of fractions parent object,
+as for any ring or field.
 
 ```julia
-(R::FracField)() # constructs zero
-(R::FracField)(c::Integer)
-(R::FracField)(c::elem_type(R))
-(R::FracField{T})(a::T) where T <: RingElement
+(R::TotFracRing)() # constructs zero
+(R::TotFracRing)(c::Integer)
+(R::TotFracRing)(c::elem_type(R))
+(R::TotFracRing{T})(a::T) where T <: RingElement
 ```
 
-One may also use the Julia double slash operator to construct elements of the
-fraction field without constructing the fraction field parent first.
-
-```julia
-//(x::T, y::T) where T <: RingElement
-```
+Although one cannot use the double slash operator `//` to construct elements
+of a total ring of fractions, as no parent has been specified, one can use the
+double slash operator to construct elements of a total ring of fractions so
+long as one of the arguments to the double slash operator is already in the
+total ring of fractions in question.
 
 **Examples**
 
@@ -168,45 +118,47 @@ fraction field without constructing the fraction field parent first.
 julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> S = FractionField(R)
-Fraction field of Univariate Polynomial Ring in x over Rationals
+julia> S = TotalRingOfFractions(R)
+Total ring of fractions of Univariate Polynomial Ring in x over Rationals
 
 julia> f = S(x + 1)
 x + 1
 
-julia> g = (x^2 + x + 1)//(x^3 + 3x + 1)
-(x^2 + x + 1)//(x^3 + 3*x + 1)
+julia> f//3
+(x + 1)//3
 
-julia> x//f
-x//(x + 1)
+julia> 3//f
+3//(x + 1)
 
 julia> f//x
 (x + 1)//x
 ```
 
-## Functions for types and parents of fraction fields
+## Functions for types and parents of total rings of fractions
 
-Fraction fields in AbstractAlgebra.jl implement the Ring interface.
-
-```julia
-base_ring(R::FracField)
-base_ring(a::FracElem)
-```
-
-Return the base ring of which the fraction field was constructed.
+Total rings of fractions in AbstractAlgebra.jl implement the Ring interface
+except for the `divexact` function which is not generically possible to
+implement.
 
 ```julia
-parent(a::FracElem)
+base_ring(R::TotFracRing)
+base_ring(a::TotFrac)
 ```
 
-Return the fraction field of the given fraction.
+Return the base ring of which the total ring of fractions was constructed.
 
 ```julia
-characteristic(R::FracField)
+parent(a::TotFrac)
 ```
 
-Return the characteristic of the base ring of the fraction field. If the
-characteristic is not known an exception is raised.
+Return the total ring of fractions that the given fraction belongs to.
+
+```julia
+characteristic(R::TotFracRing)
+```
+
+Return the characteristic of the base ring of the total ring of fractions. If
+the characteristic is not known an exception is raised.
 
 
 **Examples**
@@ -215,8 +167,8 @@ characteristic is not known an exception is raised.
 julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> S = FractionField(R)
-Fraction field of Univariate Polynomial Ring in x over Rationals
+julia> S = TotalRingOfFractions(R)
+Total ring of fractions of Univariate Polynomial Ring in x over Rationals
 
 julia> f = S(x + 1)
 x + 1
@@ -228,40 +180,39 @@ julia> V = base_ring(f)
 Univariate Polynomial Ring in x over Rationals
 
 julia> T = parent(f)
-Fraction field of Univariate Polynomial Ring in x over Rationals
+Total ring of fractions of Univariate Polynomial Ring in x over Rationals
 
 julia> m = characteristic(S)
 0
 ```
 
-## Fraction field functions
+## Total ring of fractions functions
 
 ### Basic functions
 
-Fraction fields implement the Ring interface.
+Total rings of fractions implement the Ring interface.
 
 ```julia
-zero(R::FracField)
-one(R::FracField)
-iszero(a::FracElem)
-isone(a::FracElem)
+zero(R::TotFracRing)
+one(R::TotFracRing)
+iszero(a::TotFrac)
+isone(a::TotFrac)
 ```
 
 ```julia
-inv(a::T) where T <: FracElem
+inv(a::T) where T <: TotFrac
 ```
 
-They also implement the field interface.
+They also implement some of the following functions which would usually be
+associated with the field and fraction field interfaces.
 
 ```julia
-is_unit(f::FracElem)
+is_unit(f::TotFrac)
 ```
 
-And they implement the fraction field interface.
-
 ```julia
-numerator(a::FracElem)
-denominator(a::FracElem)
+numerator(a::TotFrac)
+denominator(a::TotFrac)
 ```
 
 **Examples**
@@ -270,14 +221,14 @@ denominator(a::FracElem)
 julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> S = FractionField(R)
-Fraction field of Univariate Polynomial Ring in x over Rationals
+julia> S = TotalRingOfFractions(R)
+Total ring of fractions of Univariate Polynomial Ring in x over Rationals
 
 julia> f = S(x + 1)
 x + 1
 
-julia> g = (x^2 + x + 1)//(x^3 + 3x + 1)
-(x^2 + x + 1)//(x^3 + 3*x + 1)
+julia> g = f//(x^3 + 3x + 1)
+(x + 1)//(x^3 + 3*x + 1)
 
 julia> h = zero(S)
 0
@@ -295,149 +246,32 @@ julia> r = deepcopy(f)
 x + 1
 
 julia> n = numerator(g)
-x^2 + x + 1
+x + 1
 
 julia> d = denominator(g)
 x^3 + 3*x + 1
 ```
 
-### Greatest common divisor
-
-```@docs
-gcd{T <: RingElem}(::FracElem{T}, ::FracElem{T})
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = PolynomialRing(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
-
-julia> f = (x + 1)//(x^3 + 3x + 1)
-(x + 1)//(x^3 + 3*x + 1)
-
-julia> g = (x^2 + 2x + 1)//(x^2 + x + 1)
-(x^2 + 2*x + 1)//(x^2 + x + 1)
-
-julia> h = gcd(f, g)
-(x + 1)//(x^5 + x^4 + 4*x^3 + 4*x^2 + 4*x + 1)
-
-```
-
-### Square root
-
-```@docs
-is_square{T <: RingElem}(::FracElem{T})
-```
-
-```@docs
-Base.sqrt(::FracElem{T}) where {T <: RingElem}
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = PolynomialRing(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
-
-julia> S = FractionField(R)
-Fraction field of Univariate Polynomial Ring in x over Rationals
-
-julia> a = (21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
-(21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
-
-julia> sqrt(a^2)
-(21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
-
-julia> is_square(a^2)
-true
-```
-
-### Remove and valuation
-
-When working over a Euclidean domain, it is convenient to extend valuations to the
-fraction field. To facilitate this, we define the following functions.
-
-```@docs
-remove{T <: RingElem}(::FracElem{T}, ::T)
-```
-
-```@docs
-valuation{T <: RingElem}(::FracElem{T}, ::T)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
-
-julia> f = (x + 1)//(x^3 + 3x + 1)
-(x + 1)//(x^3 + 3*x + 1)
-
-julia> g = (x^2 + 1)//(x^2 + x + 1)
-(x^2 + 1)//(x^2 + x + 1)
-
-julia> v, q = remove(f^3*g, x + 1)
-(3, (x^2 + 1)//(x^11 + x^10 + 10*x^9 + 12*x^8 + 39*x^7 + 48*x^6 + 75*x^5 + 75*x^4 + 66*x^3 + 37*x^2 + 10*x + 1))
-
-julia> v = valuation(f^3*g, x + 1)
-3
-
-```
-
 ### Random generation
 
 Random fractions can be generated using `rand`. The parameters passed after the
-fraction field tell `rand` how to generate random elements of the base ring.
+total ring of fractions tell `rand` how to generate random elements of the base
+ring.
 
 ```julia
-rand(R::FracField, v...)
+rand(R::TotFracRing, v...)
 ```
 
 **Examples**
 
 ```@repl
 using AbstractAlgebra # hide
-K = FractionField(ZZ)
-f = rand(K, -10:10)
+R = ResidueRing(ZZ, 12)
+K = TotalRingOfFractions(R)
+f = rand(K, 0:11)
 
 R, x = PolynomialRing(ZZ, "x")
-S = FractionField(R)
+S = TotalRingOfFractions(R)
 g = rand(S, -1:3, -10:10)
-```
-
-### Extra functionality for factored fractions
-
-The `Generic.FactoredFrac{T}` type implements an interface similar to that of
-the `Fac{T}` type for iterating over the terms in the factorisation. There is
-also the function `push_term!(a, b, e)` for efficiently performing `a *= b^e`,
-and the function `normalise` returns relatively prime terms.
-
-**Examples**
-
-```jldoctest
-julia> F = FactoredFractionField(ZZ)
-Factored fraction field of Integers
-
-julia> f = F(-1)
--1
-
-julia> push_term!(f, 10, 10)
--10^10
-
-julia> push_term!(f, 42, -8)
--10^10/42^8
-
-julia> normalise(f)
--5^10*2^2/21^8
-
-julia> unit(f)
--1
-
-julia> collect(f)
-2-element Vector{Tuple{BigInt, Int64}}:
- (10, 10)
- (42, -8)
 ```
 

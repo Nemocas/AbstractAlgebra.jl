@@ -26,6 +26,14 @@
    @test isa(T(S(5)), Generic.TotFrac)
 
    @test isa(T(T(5)), Generic.TotFrac)
+
+   @test isa(T(3, 5)//7, Generic.TotFrac)
+
+   @test isa(5//T(7, 5), Generic.TotFrac)
+
+   @test isa(T(3, 5)//S(7), Generic.TotFrac)
+
+   @test isa(S(5)//T(7, 5), Generic.TotFrac)
 end
 
 @testset "Generic.Frac.printing" begin

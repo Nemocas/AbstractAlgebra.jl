@@ -60,6 +60,14 @@ function //(x::TotFrac{T}, y::T) where {T <: RingElem}
    parent(x)(numerator(x, false), denominator(x, false)*y)
 end
 
+function //(x::Integer, y::TotFrac{T}) where {T <: RingElem}
+   parent(y)(x*denominator(y, false), numerator(y, false))
+end
+
+function //(x::TotFrac{T}, y::Integer) where {T <: RingElem}
+   parent(x)(numerator(x, false), denominator(x, false)*y)
+end
+
 ###############################################################################
 #
 #   Basic manipulation

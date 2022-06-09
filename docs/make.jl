@@ -22,6 +22,7 @@ makedocs(
                  "ring_introduction.md",
                  "ring.md",
                  "integer.md",
+                 "total_fraction.md",
                  "polynomial.md",
                  "ncpolynomial.md",
                  "mpolynomial.md",
