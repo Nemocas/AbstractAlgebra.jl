@@ -247,21 +247,21 @@ function *(a::T, b::TotFrac{T}) where {T <: RingElem}
    return parent(b)(a*n, deepcopy(d), false)
 end
 
-function +(a::TotFrac, b::Union{Integer, Rational})
+function +(a::TotFrac, b::Integer)
    n = numerator(a, false) + denominator(a, false)*b
    d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
-function -(a::TotFrac, b::Union{Integer, Rational})
+function -(a::TotFrac, b::Integer, Rational)
    n = numerator(a, false) - denominator(a, false)*b
    d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
-+(a::Union{Integer, Rational}, b::TotFrac) = b + a
++(a::Integer, b::TotFrac) = b + a
 
-function -(a::Union{Integer, Rational}, b::TotFrac)
+function -(a::Integer, b::TotFrac)
    n = a*denominator(b, false) - numerator(b, false)
    d = denominator(b, false)
    return parent(b)(n, deepcopy(d))
@@ -270,13 +270,13 @@ end
 function +(a::TotFrac{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) + denominator(a, false)*b
    d = denominator(a, false)
-   return parent(a)(n, deepcopy(d))
+   return parent(a)(n, deepcopy(d), false)
 end
 
 function -(a::TotFrac{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) - denominator(a, false)*b
    d = denominator(a, false)
-   return parent(a)(n, deepcopy(d))
+   return parent(a)(n, deepcopy(d), false)
 end
 
 +(a::T, b::TotFrac{T}) where {T <: RingElem} = b + a
