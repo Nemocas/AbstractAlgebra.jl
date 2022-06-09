@@ -15,7 +15,7 @@ using InteractiveUtils
 using Test # for "interface-conformance" functions
 
 import GroupsCore
-import GroupsCore: gens, ngens, order, mul!
+import GroupsCore: gens, ngens, order, mul!, istrivial
 
 # A list of all symbols external packages should not import from AbstractAlgebra
 import_exclude = [:import_exclude, :QQ, :ZZ,
@@ -30,7 +30,7 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
 # imported here and in Generic.jl, and exported below.
 # They should not be imported/exported anywhere else.
 
-import LinearAlgebra: det, issymmetric, istriu, norm, nullspace, rank,
+import LinearAlgebra: det, ishermitian, issymmetric, istriu, norm, nullspace, rank,
                       hessenberg
 
 import LinearAlgebra: lu, lu!, tr
@@ -146,12 +146,31 @@ export crt, factor, factor_squarefree, is_irreducible, is_squarefree
 include("Attributes.jl")
 include("AliasMacro.jl")
 
-# alternative names for LinearAlgebra
-const is_symmetric = issymmetric
-const is_upper_triangular = istriu
+# alternative names for some functions from Base
+export is_equal, is_finite, is_inf, is_integer, is_less, is_one, is_real, is_subset, is_valid, is_zero
 
-# for backwards compatibility
-export issymmetric, istriu
+@alias is_equal isequal
+@alias is_finite isfinite
+@alias is_inf isinf
+@alias is_integer isinteger
+@alias is_less isless
+@alias is_one isone
+@alias is_real isreal
+@alias is_subset issubset
+@alias is_valid isvalid
+@alias is_zero iszero
+
+# alternative names for some functions from GroupsCore
+export is_trivial
+
+@alias is_trivial istrivial
+
+# alternative names for some functions from LinearAlgebra
+export is_hermitian, is_symmetric, is_upper_triangular
+
+@alias is_hermitian ishermitian
+@alias is_symmetric issymmetric
+@alias is_upper_triangular istriu
 
 ###############################################################################
 # Macros for fancy printing. to use, enable attribute storage for your struct,
@@ -494,9 +513,9 @@ export abs_series, abs_series_type,
                  is_domain_type, is_exact_type, is_gen,
                  is_homogeneous,
                  is_isomorphic, is_monomial, is_monomial_recursive,
-                 is_negative, isone, is_reverse,
+                 is_negative, is_reverse,
                  is_submodule, is_symmetric,
-                 is_term_recursive, is_unit, iszero,
+                 is_term_recursive, is_unit,
                  lcm,
                  laurent_series, length,
                  main_variable, main_variable_extract, main_variable_insert,
