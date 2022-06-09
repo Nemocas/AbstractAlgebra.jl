@@ -103,6 +103,8 @@ isone(a::TotFrac) = numerator(a, false) == denominator(a, false)
 
 is_unit(a::TotFrac) = !is_zero_divisor(numerator(a, false))
 
+is_zero_divisor(a::TotFrac) = is_zero_divisor(numerator(a, false))
+
 ###############################################################################
 #
 #   Canonicalisation

@@ -217,6 +217,8 @@ end
          @test !is_unit(x)
          @test !is_unit(x2)
          @test is_unit(one(S))
+         @test is_zero_divisor(S())
+         @test !is_zero_divisor(x)
          @test is_gen(x)
          @test is_gen(x2)
          @test is_gen(y)

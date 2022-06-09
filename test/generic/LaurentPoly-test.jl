@@ -136,6 +136,9 @@ end
          end
       end
 
+      @test is_zero_divisor(0*y)
+      @test !is_zero_divisor(y)
+
       @test leading_coefficient(zero(y)) == 0
       @test trailing_coefficient(zero(y)) == 0
       @test leading_coefficient(one(y)) == 1

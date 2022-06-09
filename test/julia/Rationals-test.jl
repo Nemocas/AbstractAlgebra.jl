@@ -34,6 +34,10 @@ end
 
    @test is_unit(R(3))
    @test is_unit(S(3))
+   @test is_zero_divisor(R(0))
+   @test is_zero_divisor(S(0))
+   @test !is_zero_divisor(R(3, 5))
+   @test !is_zero_divisor(S(3, 5))
 end
 
 @testset "Julia.Rationals.exact_division" begin

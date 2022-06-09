@@ -105,6 +105,7 @@ end
    h = one(T)
 
    @test is_unit(h)
+   @test !is_zero_divisor(h)
 
    @test isone(h)
 

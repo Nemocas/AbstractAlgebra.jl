@@ -68,6 +68,8 @@ end
 
    @test is_unit((x + 1)//(-x^2 + 1))
 
+   @test !is_zero_divisor((x + 1)//(-x^2 + 1))
+
    @test deepcopy((x + 1)//(-x^2 + 1)) == (x + 1)//(-x^2 + 1)
 
    @test characteristic(R) == 0

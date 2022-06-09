@@ -88,7 +88,9 @@ function is_unit(a::ResElem)
    return isone(g)
 end
 
-is_zero_divisor(a) = !is_unit(a)
+# currently residue rings are only allowed over domains
+# otherwise this function would be more complicated
+is_zero_divisor(a::ResElem) = !is_unit(a)
 
 deepcopy_internal(a::ResElem, dict::IdDict) =
    parent(a)(deepcopy(data(a)))

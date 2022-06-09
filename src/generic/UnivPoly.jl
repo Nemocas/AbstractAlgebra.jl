@@ -136,6 +136,8 @@ isone(p::UnivPoly) = isone(p.p)
 
 is_unit(p::UnivPoly) = is_unit(p.p)
 
+is_zero_divisor(p::UnivPoly) = is_zero_divisor(p.p)
+
 is_gen(p::UnivPoly) = is_gen(p.p)
 
 is_homogeneous(p::UnivPoly) = is_homogeneous(p.p)

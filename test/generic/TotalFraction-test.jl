@@ -68,6 +68,9 @@ end
    @test is_unit(S(5, 7))
    @test !is_unit(S(3, 7))
 
+   @test is_zero_divisor(S(3, 7))
+   @test !is_zero_divisor(S(5, 7))
+
    @test deepcopy(S(5, 7)) == S(5, 7)
 
    @test characteristic(S) == 12

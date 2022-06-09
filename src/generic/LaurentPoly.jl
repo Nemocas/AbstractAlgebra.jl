@@ -203,6 +203,8 @@ function is_unit(p::LaurentPolyWrap)
    return length(g) < 2
 end
 
+is_zero_divisor(p::LaurentPolyWrap) = is_zero_divisor(p.poly)
+
 function Base.divrem(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
    iszero(q) && error(DivideError())
    iszero(p) && return one(parent(p)), p
