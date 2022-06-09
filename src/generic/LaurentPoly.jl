@@ -200,7 +200,7 @@ end
 function is_unit(p::LaurentPolyWrap)
    iszero(p) && return false
    v, g = _remove_gen(p)
-   return length(g) < 2
+   return is_unit(g)
 end
 
 function Base.divrem(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
