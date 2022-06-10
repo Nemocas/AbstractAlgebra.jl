@@ -147,8 +147,9 @@ include("Attributes.jl")
 include("AliasMacro.jl")
 
 # alternative names for some functions from Base
-export is_equal, is_finite, is_inf, is_integer, is_less, is_one, is_real, is_subset, is_valid, is_zero
+export is_empty, is_equal, is_finite, is_inf, is_integer, is_less, is_one, is_real, is_subset, is_valid, is_zero
 
+@alias is_empty isempty
 @alias is_equal isequal
 @alias is_finite isfinite
 @alias is_inf isinf
