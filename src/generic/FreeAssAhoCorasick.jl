@@ -96,8 +96,6 @@ end
 """
 function search(automaton::AhoCorasickAutomaton, word)
     current_state = 1
-    output = []
-#    Set{Tuple{Int, Tuple{Int, Word}}}()
     for i in 1:length(word)
         c = word[i]
         while true
@@ -110,9 +108,10 @@ function search(automaton::AhoCorasickAutomaton, word)
             end
         end
         if automaton.output[current_state][1] != typemax(Int)
-            push!(output, (i, automaton.output[current_state]))
+            return (i, automaton.output[current_state])
+            #push!(output, (i, automaton.output[current_state]))
 #            union!(output_set, (i, automaton.output[current_state]))
         end
     end
-    return output
+    return nothing
 end

@@ -49,11 +49,11 @@ function _leading_word(a::FreeAssAlgElem{T}) where T
 end
 
 function gb_divides_leftmost_aho_corasick(a::Word, aut::AhoCorasickAutomaton)
-    divisibles = search(aut, a)
-    output = divisibles[1]
-    for d in divisibles[2:length(divisibles)]
-#TODO
+    match = search(aut, a)
+    if isnothing(math)
+        return (false, [], [])
     end
+    return (true, a[1:match[1] - length(match[2])], a[match[1] + 1:length(a)], match[1])
 end
 
 # implementation of the normal form function using aho corasick to check for all groebner basis elements in parallel
@@ -62,9 +62,21 @@ function normal_form(
         g::Vector{FreeAssAlgElem{T}},
         aut::AhoCorasickAutomaton
     ) where T
-    #TODO
+    R = parent(f)
+    rexps = Vector{Int}[]
+    rcoeffs = T[]
     while length(f) > 0
+        ok, left, right, match_index = gb_divides_leftmost_aho_corasick(f.exps[1], aut)
+        if ok
+            qi = divexact(f.coeffs[1], g[match_index].coeffs[1])
+            f = _sub_rest(f, mul_term(qi, left, g[match_index], right), 1)
+        else
+            push!(rcoeffs, f.coeffs[1])
+            push!(rexps, f.exps[1])
+            f = FreeAssAlgElem{T}(R, f.coeffs[2:end], f.exps[2:end], length(f)-1)
+        end
     end
+    return FreeAssAlgElem{T}(R, rcoeffs, rexps, length(rcoeffs))
 end
 
 
