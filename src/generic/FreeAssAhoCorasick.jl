@@ -11,7 +11,7 @@ const Word = Vector{Int}
 struct AhoCorasickAutomaton
     goto::Vector{Dict{Int, Int}}
     fail::Vector{Int}
-    output::Vector{Set{Word}}
+    output::Vector{Tuple{Int, Word}}
 end
 
 function AhoCorasickAutomaton(keywords::Vector{Word})
@@ -39,14 +39,14 @@ end
 
 function new_state!(automaton)
     push!(automaton.goto, Dict{Int, Int}())
-    push!(automaton.output, Set{Word}())
+    push!(automaton.output, (typemax(Int), []))
     push!(automaton.fail, 1)
     return length(automaton.goto)
 end
 
-function enter!(automaton::AhoCorasickAutomaton, keyword::Word)
+function enter!(automaton::AhoCorasickAutomaton, keyword::Word, current_index)
     current_state = 1
-    for c in keyword
+        for c in keyword
         new_state = get(automaton.goto[current_state], c, nothing)
         if isnothing(new_state)
             new_state = new_state!(automaton)
@@ -54,15 +54,17 @@ function enter!(automaton::AhoCorasickAutomaton, keyword::Word)
         end
         current_state = new_state
     end
-
-    push!(automaton.output[current_state], keyword)
-
+    if automaton.output[current_state][1] > current_index
+        automaton.output[current_state] = (current_index, keyword)
+    end
 end
 
 function construct_goto!(automaton::AhoCorasickAutomaton, keywords::Vector{Word})
     new_state!(automaton)
+    current_index = 1
     for keyword in keywords
-        enter!(automaton, keyword)
+        enter!(automaton, keyword, current_index)
+        current_index += 1
     end
 end
 
@@ -81,7 +83,10 @@ function construct_fail!(automaton::AhoCorasickAutomaton)
                 state = automaton.fail[state]
             end
             automaton.fail[new_state] = lookup(automaton, state, k)
-            union!(automaton.output[new_state], automaton.output[automaton.fail[new_state]])
+            if automaton.output[new_state][1] > automaton.output[automaton.fail[new_state]][1]
+                automaton.output[new_state] = automaton.output[automaton.fail[new_state]] # TODO check if this is the correct way to update output
+            end
+
         end
     end
 end
@@ -91,7 +96,8 @@ end
 """
 function search(automaton::AhoCorasickAutomaton, word)
     current_state = 1
-    output_set = Set{Word}()
+    output = []
+#    Set{Tuple{Int, Tuple{Int, Word}}}()
     for i in 1:length(word)
         c = word[i]
         while true
@@ -103,10 +109,10 @@ function search(automaton::AhoCorasickAutomaton, word)
                 current_state = automaton.fail[current_state]
             end
         end
-        if !isempty(automaton.output[current_state])
-            println(i)
+        if automaton.output[current_state][1] != typemax(Int)
+            push!(output, (i, automaton.output[current_state]))
+#            union!(output_set, (i, automaton.output[current_state]))
         end
-        union!(output_set, automaton.output[current_state])
     end
-    return output_set
+    return output
 end
