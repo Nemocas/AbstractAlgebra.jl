@@ -2271,6 +2271,47 @@ end
    end
 end
 
+@testset "Generic.Poly.gcd_gcdx_gcdinv_nonfield" begin
+
+   for n in (6, 101*103)
+      Zn = ResidueRing(ZZ, n)
+      R, x = PolynomialRing(Zn, "x")
+
+      for iter in 1:100
+         a = rand(R, 0:5, 1:n)
+         b = rand(R, 0:5, 1:n)
+         while length(a) <= 10 && length(b) <= 10
+            q = rand(R, 0:5, 1:n)
+            a, b = q*a + b, a
+         end
+
+         try
+            g = gcd(a, b)
+            @test is_divisible_by(a, g)
+            @test is_divisible_by(b, g)
+            g, s, t = gcdx(a, b)
+            @test g == s*a + t*b
+            g, s = gcdinv(a, b)
+            @test is_divisible_by(g - s*a, b)
+            if degree(a) > degree(b) >= 0
+               (A, B, m11, m12, m21, m22, s) = hgcd(a, b)
+               @test degree(A) >= cld(degree(a), 2) > degree(B)
+               @test m11*A + m12*B == a
+               @test m21*A + m22*B == b
+               @test m11*m22 - m21*m12 == s
+               @test s^2 == 1
+            end
+         catch e
+            @test e isa NotInvertibleError
+            @test e.mod == Zn
+            @test !is_zero(e.data)
+         end
+      end
+   end
+end
+
+
+
 @testset "Generic.Poly.newton_representation" begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")

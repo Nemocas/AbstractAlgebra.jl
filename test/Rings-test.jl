@@ -1,11 +1,11 @@
 include("julia/Integers-test.jl")
 
 # artifically low cutoffs for testing purposes
-function AbstractAlgebra._hgcd_prefers_basecase(a::T, b::T) where T <: PolyElem
+function AbstractAlgebra.hgcd_prefers_basecase(a::T, b::T) where T <: PolyElem
    return degree(b) < 5
 end
 
-function AbstractAlgebra._mat22_mul_prefers_classical(
+function AbstractAlgebra.mat22_mul_prefers_classical(
    a11::T, a12::T, a21::T, a22::T,
    b11::T, b12::T, b21::T, b22::T
 ) where T <: PolyElem
