@@ -50,10 +50,10 @@ end
 
 function gb_divides_leftmost_aho_corasick(a::Word, aut::AhoCorasickAutomaton)
     match = search(aut, a)
-    if isnothing(math)
-        return (false, [], [])
+    if isnothing(match)
+        return (false, [], [], -1)
     end
-    return (true, a[1:match[1] - length(match[2])], a[match[1] + 1:length(a)], match[1])
+    return (true, a[1:match[1] - length(match[2])], a[match[1] + 1:length(a)], match[2][1])
 end
 
 # implementation of the normal form function using aho corasick to check for all groebner basis elements in parallel
@@ -466,12 +466,9 @@ function groebner_basis_buchberger(
    g = copy(g)
    checked_obstructions = 0
    nonzero_reductions = 0
-   # compute a vector of suffix matches for all elements of g
+   # compute the aho corasick automaton
    # to make normal form computation more efficient
-   suffix_match_vectors = Vector{Vector{Int}}(undef, length(g))
-   for i in 1:length(g)
-       suffix_match_vectors[i] = calc_suffix_match_vector(g[i].exps[1])
-   end
+   aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in g])
 
    # step 1
    obstruction_queue = get_obstructions(g) 
@@ -479,7 +476,7 @@ function groebner_basis_buchberger(
       obstruction = dequeue!(obstruction_queue)
       # step3 
       S = s_polynomial(obstruction)
-      Sp = normal_form(S, g, suffix_match_vectors) # or normal_form_weak
+      Sp = normal_form(S, g, aut) # or normal_form_weak
       if groebner_debug_level > 0
           checked_obstructions += 1
           if checked_obstructions % 5000 == 0
@@ -492,7 +489,8 @@ function groebner_basis_buchberger(
       nonzero_reductions += 1
       # step4
       push!(g, Sp)
-      push!(suffix_match_vectors, calc_suffix_match_vector(Sp.exps[1]))
+      aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in g])
+
       if groebner_debug_level > 0
          println("adding new obstructions! checked $checked_obstructions so far")
       end
