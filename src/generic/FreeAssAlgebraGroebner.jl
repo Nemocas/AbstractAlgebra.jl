@@ -502,6 +502,63 @@ function groebner_basis_buchberger(
    return g
 end
 
+"""
+for benchmarking
+"""
+function groebner_basis_buchberger_slow(
+   g::Vector{FreeAssAlgElem{T}},
+   reduction_bound = typemax(Int)::Int
+) where T <: FieldElement
+
+   g = copy(g)
+   checked_obstructions = 0
+   nonzero_reductions = 0
+   # compute a vector of suffix matches for all elements of g
+   # to make normal form computation more efficient
+   suffix_match_vectors = Vector{Vector{Int}}(undef, length(g))
+   for i in 1:length(g)
+       suffix_match_vectors[i] = calc_suffix_match_vector(g[i].exps[1])
+   end
+
+   # step 1
+   obstruction_queue = get_obstructions(g) 
+   while !isempty(obstruction_queue)
+      obstruction = dequeue!(obstruction_queue)
+      # step3 
+      S = s_polynomial(obstruction)
+      Sp = normal_form(S, g, suffix_match_vectors) # or normal_form_weak
+      if groebner_debug_level > 0
+          checked_obstructions += 1
+          if checked_obstructions % 5000 == 0
+            println("checked $checked_obstructions obstructions")
+         end
+      end
+      if iszero(Sp)
+         continue
+      end
+      nonzero_reductions += 1
+      # step4
+      push!(g, Sp)
+      push!(suffix_match_vectors, calc_suffix_match_vector(Sp.exps[1]))
+      if groebner_debug_level > 0
+         println("adding new obstructions! checked $checked_obstructions so far")
+      end
+      if nonzero_reductions >= reduction_bound
+              return g
+      end
+      add_obstructions!(obstruction_queue, g)
+   end
+   return g
+end
+
+function groebner_basis_slow(
+   g::Vector{FreeAssAlgElem{T}},
+   reduction_bound = typemax(Int)::Int
+) where T <: FieldElement
+   return groebner_basis_buchberger_slow(g, reduction_bound)
+end
+
+
 function groebner_basis(
    g::Vector{FreeAssAlgElem{T}},
    reduction_bound = typemax(Int)::Int
