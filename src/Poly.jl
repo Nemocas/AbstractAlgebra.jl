@@ -1944,6 +1944,10 @@ end
 #     and is never used for mod or divrem or divexact. Or, if using flint for
 #     division, check the invertibility of the leading coefficient first.
 #  2. tune .._prefers_..
+#
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
 function gcd(a::PolyElem{T}, b::PolyElem{T}) where T <: Union{ResElem, FieldElement}
    check_parent(a, b)
    if length(a) < length(b)
@@ -2005,7 +2009,9 @@ end
 #
 ###############################################################################
 
-# these two functions determine cutoffs
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
 function hgcd_prefers_basecase(a, b)
    return true
 end
@@ -2161,7 +2167,7 @@ Returns the half-GCD of `a` and `b`, that is, a tuple
 
 Assumes that the input satsifies `degree(a) > degree(b) >= 0`.
 
-Cutoffs are currently dictated by the functions
+Cutoffs are currently dictated by the non-exported functions
 `hgcd_prefers_basecase(a, b)`
 `mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
 
@@ -2768,6 +2774,9 @@ function gcdx_basecase(a::PolyElem{T}, b::PolyElem{T}) where T
    return divexact(A, d), divexact(u1, d), divexact(v1, d)
 end
 
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
 function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    R = parent(a)
@@ -2852,6 +2861,9 @@ function gcdinv_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T
    return g, s
 end
 
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
 function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where T <: Union{ResElem, FieldElement}
    check_parent(a, b)
    R = parent(a)
