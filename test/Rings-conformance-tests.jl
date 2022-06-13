@@ -121,15 +121,27 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
                # documentation is not clear on divexact
                if is_domain_type(T)
                   @test iszero(b) || equality(divexact_left(b*a, b), a)
+                  @test iszero(b) || equality(divexact_left(b*a, b, check = true), a)
+                  @test iszero(b) || equality(divexact_left(b*a, b, check = false), a)
                   @test iszero(b) || equality(divexact_right(a*b, b), a)
+                  @test iszero(b) || equality(divexact_right(a*b, b, check = true), a)
+                  @test iszero(b) || equality(divexact_right(a*b, b, check = false), a)
                else
                   try
                      t = divexact_left(b*a, b)
+                     @test equality(b*t, b*a)
+                     t = divexact_left(b*a, b, check = true)
+                     @test equality(b*t, b*a)
+                     t = divexact_left(b*a, b, check = false)
                      @test equality(b*t, b*a)
                   catch
                   end
                   try
                      t = divexact_right(a*b, b)
+                     @test equality(t*b, a*b)
+                     t = divexact_right(a*b, b, check = true)
+                     @test equality(t*b, a*b)
+                     t = divexact_right(a*b, b, check = false)
                      @test equality(t*b, a*b)
                   catch
                   end
@@ -218,9 +230,15 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
             # documentation is not clear on divexact
             if is_domain_type(T)
                @test iszero(b) || equality(divexact(b*a, b), a)
+               @test iszero(b) || equality(divexact(b*a, b, check = true), a)
+               @test iszero(b) || equality(divexact(b*a, b, check = false), a)
             else
                try
                   t = divexact(b*a, b)
+                  @test equality(t*b, a*b)
+                  t = divexact(b*a, b, check = true)
+                  @test equality(t*b, a*b)
+                  t = divexact(b*a, b, check = false)
                   @test equality(t*b, a*b)
                catch
                end
