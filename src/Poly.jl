@@ -1939,11 +1939,6 @@ end
 
 # can throw NotInvertibleError for T <: ResElem
 #
-# To get a good gcd (ditto for gcdx and gcdinv) for fq_nmod_poly:
-#  1. Override gcd_basecase with the flint version, which does only divrem
-#  2. tune .._prefers_.. accordingly
-# To get a good gcd for gfp_poly:
-#  1. call flint in all cases
 # To get a good gcd for fmpz_mod_poly/nmod_poly that can throw NotInvertibleError:
 #  1. Ensure that flint is only used for polynomial addition and multiplication
 #     and is never used for mod or divrem or divexact. Or, if using flint for
@@ -3318,23 +3313,16 @@ end
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{<:RingElement,<:PolyRing,UnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
    R = base_ring(S)
-   f = S()
-   x = gen(S)
-   # degree -1 is zero polynomial
-   deg = rand(rng, deg_range)
-   if deg == -1
-      return f
+   len = 1 + rand(rng, deg_range)
+   if len <= 0
+      return zero(S)
    end
-   for i = 0:deg - 1
-      f += rand(rng, v)*x^i
-   end
+   c = elem_type(R)[rand(rng, v) for i in 1:len]
    # ensure leading coefficient is nonzero
-   c = R()
-   while iszero(c)
-      c = rand(rng, v)
+   while iszero(c[len])
+      c[len] = rand(rng, v)
    end
-   f += c*x^deg
-   return f
+   return S(c)
 end
 
 # define rand for make(S, deg, v)
