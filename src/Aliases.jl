@@ -1,7 +1,3 @@
-# make some Julia names compatible with our naming conventions
-@alias is_one isone
-@alias is_zero iszero
-
 # for backwards compatibility
 @alias iscompatible is_compatible
 @alias isconstant is_constant

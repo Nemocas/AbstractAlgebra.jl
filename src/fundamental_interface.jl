@@ -242,3 +242,44 @@ function gen end
 # ```
 # """
 function gens end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    zero!(a)
+
+Return the zero of `parent(a)`, possibly modifying the object `a` in the process.
+"""
+function zero! end
+
+@doc Markdown.doc"""
+    add!(a, b, c)
+
+Return `b + c`, possibly modifying the object `a` in the process.
+"""
+function add! end
+
+@doc Markdown.doc"""
+    addeq!(a, b)
+
+Return `a + b`, possibly modifying the object `a` in the process.
+"""
+function addeq! end
+
+@doc Markdown.doc"""
+    sub!(a, b, c)
+
+Return `b - c`, possibly modifying the object `a` in the process.
+"""
+function sub! end
+
+@doc Markdown.doc"""
+    mul!(a, b, c)
+
+Return `b*c`, possibly modifying the object `a` in the process.
+"""
+function mul! end

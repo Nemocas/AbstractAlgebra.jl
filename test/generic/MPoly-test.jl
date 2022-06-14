@@ -103,7 +103,7 @@
 
    push_term!(B, QQ(5), [5, 5])
 
-   q = finish(B) 
+   q = finish(B)
 
    @test q == 5x^5*y^5
 
@@ -816,10 +816,10 @@ end
       S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
 
       for iter = 1:10
-         f = rand(S, 0:4, 0:5, -10:10)
+         p = rand(S, 0:4, 0:5, -10:10)
          shift = [rand(0:10) for i in 1:num_vars]
          defl = [rand(1:10) for i in 1:num_vars]
-         f = inflate(f, shift, defl)
+         f = inflate(p, shift, defl)
 
          s, d = deflation(f)
          g = deflate(f, s, d)
@@ -827,11 +827,25 @@ end
 
          @test h == f
 
-	 @test deflate(inflate(f, d), d) == f
+         @test deflate(inflate(f, d), d) == f
 
-	 g = inflate(f, defl)
-	 h, defl = deflate(g)
-	 @test g == inflate(h, defl)
+         g = inflate(f, defl)
+         h, defl = deflate(g)
+         @test g == inflate(h, defl)
+
+         vars = unique([rand(varlist) for _ in varlist])
+         shift = [rand(0:10) for _ in vars]
+         defl = [rand(1:10) for _ in vars]
+
+         @test p == deflate(inflate(p, vars, shift, defl), vars, shift, defl)
+
+         x = rand(varlist)
+         f = p + evaluate(p, [x], [1])  # otherwise f0 is usually zero
+         f0 = coeff(f, [x], [0])
+         f1 = deflate(f - f0, [x], [1], [1])
+
+         @test f == f0 + x * f1
+         @test f == f0 + inflate(f1, [x], [1], [1])
       end
    end
 end
