@@ -1,4 +1,4 @@
-@testset "Generic.Frac.constructors" begin
+@testset "Generic.TotFrac.constructors" begin
    S = ResidueRing(ZZ, 12)
    T = TotalRingOfFractions(S)
 
@@ -36,7 +36,7 @@
    @test isa(S(5)//T(7, 5), Generic.TotFrac)
 end
 
-@testset "Generic.Frac.printing" begin
+@testset "Generic.TotFrac.printing" begin
    S, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
    K = TotalRingOfFractions(S)
 
@@ -44,14 +44,14 @@ end
    @test string(K(x, y)//z) == "x//(y*z)"
 end
 
-@testset "Generic.Frac.rand" begin
+@testset "Generic.TotFrac.rand" begin
    S = ResidueRing(ZZ, 12)
    K = TotalRingOfFractions(S)
 
    test_rand(K, 0:11)
 end
 
-@testset "Generic.Frac.manipulation" begin
+@testset "Generic.TotFrac.manipulation" begin
    R = ResidueRing(ZZ, 12)
    S = TotalRingOfFractions(R)
 
@@ -76,14 +76,14 @@ end
    @test characteristic(S) == 12
 end
 
-@testset "Generic.Frac.unary_ops" begin
+@testset "Generic.TotFrac.unary_ops" begin
    R = ResidueRing(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    @test -(S(5, 7)) == 1
 end
 
-@testset "Generic.Frac.binary_ops" begin
+@testset "Generic.TotFrac.binary_ops" begin
    R = ResidueRing(ZZ, 12)
    S = TotalRingOfFractions(R)
 
@@ -99,7 +99,7 @@ end
    end
 end
 
-@testset "Generic.Frac.adhoc_binary" begin
+@testset "Generic.TotFrac.adhoc_binary" begin
    R = ResidueRing(ZZ, 12)
    S = TotalRingOfFractions(R)
 
@@ -139,7 +139,7 @@ end
    @test a*R(7) == 3
 end
 
-@testset "Generic.Frac.comparison" begin
+@testset "Generic.TotFrac.comparison" begin
    R = ResidueRing(ZZ, 12)
    S = TotalRingOfFractions(R)
 
@@ -151,7 +151,7 @@ end
    @test isequal(a, S(3, 7))
 end
 
-@testset "Generic.Frac.adhoc_comparison" begin
+@testset "Generic.TotFrac.adhoc_comparison" begin
    R = ResidueRing(ZZ, 12)
    S = TotalRingOfFractions(R)
 
@@ -164,7 +164,7 @@ end
    @test R(3) == S(3, 1)
 end
 
-@testset "Generic.Frac.powering" begin
+@testset "Generic.TotFrac.powering" begin
    R = ResidueRing(ZZ, 12)
    S = TotalRingOfFractions(R)
 
@@ -173,7 +173,7 @@ end
    @test a^-12 == 1
 end
 
-@testset "Generic.Frac.inversion" begin
+@testset "Generic.TotFrac.inversion" begin
    R = ResidueRing(ZZ, 12)
    S = TotalRingOfFractions(R)
 
@@ -181,10 +181,10 @@ end
 
    @test inv(a)*a == 1
 
-   @test_throws(DivideError, inv(S(3, 7)))
+   @test_throws(NotInvertibleError, inv(S(3, 7)))
 end
 
-@testset "Generic.Frac.promotion" begin
+@testset "Generic.TotFrac.promotion" begin
    R = ResidueRing(ZZ, 12)
    S = TotalRingOfFractions(R)
 
@@ -192,7 +192,7 @@ end
    @test AbstractAlgebra.promote_rule(T, T) == T
 end
 
-@testset "Generic.Frac.unsafe_operators" begin
+@testset "Generic.TotFrac.unsafe_operators" begin
    R = ResidueRing(ZZ, 12)
    S = TotalRingOfFractions(R)
 

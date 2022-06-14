@@ -39,7 +39,8 @@ function Base.denominator(a::Frac, canonicalise::Bool=true)
 end
 
 function deepcopy_internal(a::Frac{T}, dict::IdDict) where {T <: RingElem}
-   v = Frac{T}(deepcopy(numerator(a, false)), deepcopy(denominator(a, false)))
+   v = Frac{T}(deepcopy(numerator(a, false), dict),
+               deepcopy(denominator(a, false), dict))
    v.parent = parent(a)
    return v
 end

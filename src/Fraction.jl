@@ -451,7 +451,7 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 Return the inverse of the fraction $a$.
 """
 function Base.inv(a::FracElem)
-   iszero(numerator(a, false)) && throw(DivideError())
+   iszero(numerator(a, false)) && throw(NotInvertibleError(a))
    return parent(a)(deepcopy(denominator(a, false)),
                     deepcopy(numerator(a, false)))
 end

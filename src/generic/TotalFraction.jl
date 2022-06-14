@@ -83,7 +83,8 @@ function Base.denominator(a::TotFrac, canonicalise::Bool=true)
 end
 
 function deepcopy_internal(a::TotFrac{T}, dict::IdDict) where {T <: RingElem}
-   v = TotFrac{T}(deepcopy(numerator(a, false)), deepcopy(denominator(a, false)))
+   v = TotFrac{T}(deepcopy(numerator(a, false), dict),
+                  deepcopy(denominator(a, false), dict))
    v.parent = parent(a)
    return v
 end
@@ -350,7 +351,7 @@ Return the inverse of the fraction $a$ if it exists, otherwise raise an
 exception.
 """
 function Base.inv(a::TotFrac)
-   is_zero_divisor(numerator(a, false)) && throw(DivideError())
+   is_zero_divisor(numerator(a, false)) && throw(NotInvertibleError(a))
    return parent(a)(deepcopy(denominator(a, false)),
                     deepcopy(numerator(a, false)))
 end
@@ -591,7 +592,7 @@ end
 
 ###############################################################################
 #
-#   FractionField constructor
+#   TotalRingOfFractions constructor
 #
 ###############################################################################
 
