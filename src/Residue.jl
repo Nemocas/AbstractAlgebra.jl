@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ResidueRing, add!, addeq!, data, modulus, mul!, lift, is_zero_divisor 
+export ResidueRing, data, modulus, lift, is_zero_divisor 
 
 ###############################################################################
 #
