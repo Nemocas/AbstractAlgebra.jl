@@ -200,7 +200,7 @@ end
 function is_unit(p::LaurentPolyWrap)
    iszero(p) && return false
    v, g = _remove_gen(p)
-   return length(g) < 2
+   return is_unit(g)
 end
 
 is_zero_divisor(p::LaurentPolyWrap) = is_zero_divisor(p.poly)

@@ -155,7 +155,7 @@ julia> push_term!(C, ZZ(3), [1, 2]);
 julia> push_term!(C, ZZ(2), [1, 1]);
 
 
-julia> push_term!(C, ZZ(4), [0, 0]); 
+julia> push_term!(C, ZZ(4), [0, 0]);
 
 
 julia> f = finish(C)
@@ -647,11 +647,15 @@ deflation(f::MPolyElem{T}) where T <: RingElement
 deflate(f::MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
 deflate(f::MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
 deflate(f::MPolyElem{T}) where T <: RingElement
+deflate(f::MPolyElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyElem
 ```
 
 ```@docs
 inflate(f::MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
 inflate(f::MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
+inflate(f::MPolyElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyElem
 ```
 
 **Examples**
@@ -673,6 +677,18 @@ julia> f2 = inflate(f1, def, shift)
 x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5*x*y^5 - x*y^2
 
 julia> f2 == f
+true
+
+julia> g = (x+y+1)^2
+x^2 + 2*x*y + 2*x + y^2 + 2*y + 1
+
+julia> g0 = coeff(g, [y], [0])
+x^2 + 2*x + 1
+
+julia> g1 = deflate(g - g0, [y], [1], [1])
+2*x + y + 2
+
+julia> g == g0 + y * g1
 true
 
 ```

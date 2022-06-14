@@ -123,6 +123,7 @@ end
       @test !is_monomial(x^2*t^-3)
       @test !is_monomial_recursive((x+x^2)*t)
 
+      @test !is_unit(LaurentPolynomialRing(ZZ, "x")[1](2))
       @test !is_unit(zero(L))
 
       for e = -5:5
