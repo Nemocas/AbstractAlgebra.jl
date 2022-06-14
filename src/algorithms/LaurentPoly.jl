@@ -13,6 +13,8 @@
 #
 ###############################################################################
 
+coefficient_ring(p::LaurentPolyElem) = coefficient_ring(parent(p))
+
 base_ring(p::LaurentPolyElem) = base_ring(parent(p))
 
 is_domain_type(::Type{<:LaurentPolyElem{T}}) where {T} = is_domain_type(T)

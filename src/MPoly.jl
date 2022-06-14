@@ -378,9 +378,16 @@ end
 
 iszero(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement = length(x) == 0
 
-function is_unit(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-   return length(x) == 1 && iszero(first(exponent_vectors(x))) &&
-          is_unit(first(coefficients(x)))
+function is_unit(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   if is_constant(a)
+      return is_unit(leading_coefficient(a))
+   elseif is_domain_type(elem_type(coefficient_ring(a)))
+      return false
+   elseif length(a) == 1
+      return false
+   else
+      throw(NotImplementedError(:is_unit, a))
+   end
 end
 
 @doc Markdown.doc"""

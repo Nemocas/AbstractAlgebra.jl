@@ -17,6 +17,8 @@ elem_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} =
 
 parent(p::LaurentPolyWrap) = p.parent
 
+coefficient_ring(R::LaurentPolyWrapRing) = coefficient_ring(R.polyring)
+
 base_ring(R::LaurentPolyWrapRing) = base_ring(R.polyring)
 
 var(R::LaurentPolyWrapRing) = var(R.polyring)
@@ -193,16 +195,18 @@ end
 
 # BOGUS
 function Base.inv(p::LaurentPolyWrap)
-   is_unit(p) || throw(NotInvertibleError(p))
    v, g = _remove_gen(p)
    return LaurentPolyWrap(parent(p), inv(g), -p.mindeg-v)
 end
 
 # BOGUS: 3+2x is a unit in (ZZ/6)[x,x^-1]
 function is_unit(p::LaurentPolyWrap)
-   iszero(p) && return false
    v, g = _remove_gen(p)
-   return is_unit(g)
+   if is_domain_type(elem_type(coefficient_ring(p))) || length(g) <= 1
+      return is_unit(g)
+   else
+      throw(NotImplementedError(:is_unit, p))
+   end
 end
 
 function Base.divrem(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T

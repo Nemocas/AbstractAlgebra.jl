@@ -229,6 +229,19 @@ end
       @test !is_divisible_by(3*y+4, 2+3*y^-1)
    end
 
+   @testset "Generic.LaurentMPoly.is_unit" begin
+      R, x = LaurentPolynomialRing(ResidueRing(ZZ, 6), "x")
+
+      @test is_unit(x)
+      @test !is_unit(2*x)
+      try
+         res = is_unit(3 + 2*x)
+         @test res
+      catch e
+         @test e isa NotImplementedError
+      end
+   end
+
    @testset "coercion" begin
       R, x = PolynomialRing(ZZ, "x")
       L, x1 = LaurentPolynomialRing(ZZ, "x")
