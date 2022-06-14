@@ -23,12 +23,16 @@ true
 """
 macro alias(alias_name::Symbol, real_name::Symbol)
     result = quote
-        """
-            $($(string(alias_name)))
+        if isdefined($__module__, $(QuoteNode(alias_name)))
+            $alias_name === $real_name || error("Alias '$($(string(alias_name)))' is already defined with a different value")
+        else
+            """
+                $($(string(alias_name)))
 
-        Alias for `$($(string(real_name)))`.
-        """
-        const $alias_name = $real_name
+            Alias for `$($(string(real_name)))`.
+            """
+            const $alias_name = $real_name
+        end
         if $(QuoteNode(real_name)) in names($__module__)
             export $alias_name
         elseif $(QuoteNode(alias_name)) in names($__module__)

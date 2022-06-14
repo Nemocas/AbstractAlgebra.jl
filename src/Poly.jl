@@ -995,7 +995,7 @@ end
 @doc Markdown.doc"""
     truncate(a::PolynomialElem, n::Int)
 
-Return $a$ truncated to $n$ terms.
+Return $a$ truncated to $n$ terms, i.e. the remainder upon division by $x^n$.
 """
 function truncate(a::PolynomialElem, n::Int)
    lena = length(a)
@@ -1916,28 +1916,56 @@ function gcd(a::PolyElem{T}, b::PolyElem{T}, ignore_content::Bool = false) where
    return divexact(b, canonical_unit(leading_coefficient(b)))
 end
 
-function gcd(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+# can throw NotInvertibleError
+function gcd_basecase(a::PolyElem{T}, b::PolyElem{T}) where T
+   while !iszero(b)
+      a, b = b, mod(a, b)
+   end
+   return iszero(a) ? zero(parent(a)) : divexact(a, leading_coefficient(a))
+end
+
+# can throw NotInvertibleError
+function gcd_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T
+   while !iszero(b)
+      a, b = b, mod(a, b)
+      if iszero(b) || hgcd_prefers_basecase(a, b)
+         break
+      else
+         a, b, _, _, _, _, _ = hgcd_recursive(a, b, false)
+      end
+   end
+   return gcd_basecase(a, b)
+end
+
+# can throw NotInvertibleError for T <: ResElem
+#
+# To get a good gcd for fmpz_mod_poly/nmod_poly that can throw NotInvertibleError:
+#  1. Ensure that flint is only used for polynomial addition and multiplication
+#     and is never used for mod or divrem or divexact. Or, if using flint for
+#     division, check the invertibility of the leading coefficient first.
+#  2. tune .._prefers_..
+#
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
+function gcd(a::PolyElem{T}, b::PolyElem{T}) where T <: Union{ResElem, FieldElement}
    check_parent(a, b)
-   if length(a) > length(b)
+   if length(a) < length(b)
       (a, b) = (b, a)
    end
    if iszero(b)
       if iszero(a)
-         return(a)
+         return a
       else
-         d = leading_coefficient(a)
-         return divexact(a, d)
+         return divexact(a, leading_coefficient(a))
       end
    end
-   g = gcd(content(a), content(b))
-   a = divexact(a, g)
-   b = divexact(b, g)
-   while !iszero(a)
-      (a, b) = (mod(b, a), a)
+   if T <: ResElem
+      # since we return a monic gcd, this step is not strictly necessary
+      a = divexact(a, content(a))
+      b = divexact(b, content(b))
    end
-   b = g*b
-   d = leading_coefficient(b)
-   return divexact(b, d)
+   return gcd_hgcd(a, b)
 end
 
 function lcm(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
@@ -1973,6 +2001,183 @@ function primpart(a::PolyElem)
    else
       return divexact(a, d)
    end
+end
+
+###############################################################################
+#
+#   Half GCD
+#
+###############################################################################
+
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
+function hgcd_prefers_basecase(a, b)
+   return true
+end
+
+function mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)
+   return true
+end
+
+function mat22_mul(a11, a12, a21, a22, b11, b12, b21, b22)
+   if mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)
+      return a11*b11 + a12*b21, a11*b12 + a12*b22,
+             a21*b11 + a22*b21, a21*b12 + a22*b22
+   else
+      R = parent(a11)
+      T0 = R()
+      T1 = R()
+      C0 = R()
+      C1 = R()
+      C2 = R()
+      C3 = R()
+      T0 = sub!(T0, a11, a21)
+      T1 = sub!(T1, b22, b12)
+      C2 = mul!(C2, T0, T1)
+      T0 = add!(T0, a21, a22)
+      T1 = sub!(T1, b12, b11)
+      C3 = mul!(C3, T0, T1)
+      T0 = sub!(T0, T0, a11)
+      T1 = sub!(T1, b22, T1)
+      C1 = mul!(C1, T0, T1)
+      T0 = sub!(T0, a12, T0)
+      C0 = mul!(C0, T0, b22)
+      T0 = mul!(T0, a11, b11)
+      C1 = add!(C1, T0, C1)
+      C2 = add!(C2, C1, C2)
+      C1 = add!(C1, C1, C3)
+      C3 = add!(C3, C2, C3)
+      C1 = add!(C1, C1, C0)
+      T1 = sub!(T1, T1, b21)
+      C0 = mul!(C0, a22, T1)
+      C2 = sub!(C2, C2, C0)
+      C0 = mul!(C0, a12, b21)
+      C0 = add!(C0, C0, T0)
+      return C0, C1, C2, C3
+   end
+end
+
+
+# iterative basecase
+# may throw NotInvertibleError
+function hgcd_basecase(a::PolyElem{T}, b::PolyElem{T}) where T
+   @assert length(a) > length(b)
+   R = parent(a)
+   s = 1
+   A = a; B = b
+   m11 = one(R);  m12 = zero(R)
+   m21 = zero(R); m22 = one(R)
+   n = cld(degree(a), 2)
+   while n <= degree(B)
+      q, r = divrem(A, B)
+      @assert length(r) < length(B)
+      s = -s
+      A, B = B, r
+      m11, m12 = m11*q + m12, m11
+      m21, m22 = m21*q + m22, m21
+   end
+   return A, B, m11, m12, m21, m22, s
+end
+
+# Klaus Thull and Chee K. Yap
+# "A Unified Approach to HGCD Algorithms for polynomials and integers"
+# may throw NotInvertibleError
+function hgcd_recursive(
+   a::PolyElem{T},
+   b::PolyElem{T},
+   want_matrix::Bool = true
+) where T
+
+   @assert length(a) > length(b)
+   R = parent(a)
+
+   if degree(a) < 5 || hgcd_prefers_basecase(a, b)
+      return hgcd_basecase(a, b)
+   end
+
+   m = cld(degree(a), 2)
+   mp = degree(a) - m
+   if degree(b) < m
+      return (a, b, one(R), zero(R), zero(R), one(R), 1)
+   end
+
+   a0 = shift_right(a, m)
+   b0 = shift_right(b, m)
+
+   A0, B0, R11, R12, R21, R22, Rs = hgcd_recursive(a0, b0)
+
+   # the calculation of (ap,bp) = R^-1(A,B) can be optimized using A0 and B0
+   #     ap = (R22*a - R12*b)*Rs
+   #     bp = (-R21*a + R11*b)*Rs
+   ar = truncate(a, m)    # a = a0*x^m + ar
+   br = truncate(b, m)    # b = b0*x^m + br
+   ap = shift_left(A0, m) + (R22*ar - R12*br)*Rs
+   bp = shift_left(B0, m) + (R11*br - R21*ar)*Rs
+
+   if degree(bp) < m
+      return (ap, bp, R11, R12, R21, R22, Rs)
+   end
+
+   q, r = divrem(ap, bp)
+   @assert length(r) < length(bp)
+   c = bp
+   d = r
+
+   l = degree(c)
+   k = 2*m - l
+   @assert l - m < cld(mp, 2)
+
+   c0 = shift_right(c, k)
+   d0 = shift_right(d, k)
+   @assert degree(c0) == 2*(l - m)
+   C0, D0, S11, S12, S21, S22, Ss = hgcd_recursive(c0, d0)
+
+   # (A,B) = Q^-1(a,b) = S^-1(c,d) can be optimized as well
+   #     A = (Q22*a - Q12*b)*Qs
+   #     B = (-Q21*a + Q11*b)*Qs
+   cr = truncate(c, k)    # c = c0*x^k + cr
+   dr = truncate(d, k)    # d = d0*x^k + dr
+   A = shift_left(C0, k) + (S22*cr - S12*dr)*Ss
+   B = shift_left(D0, k) + (S11*dr - S21*cr)*Ss
+
+   Qs = -Rs*Ss
+   if want_matrix
+      (Q11, Q12, Q21, Q22) = mat22_mul(R11*q + R12, R11, R21*q + R22, R21,
+                                       S11, S12, S21, S22)
+   else
+      Q11 = Q12 = Q21 = Q22 = R()
+   end
+
+   return A, B, Q11, Q12, Q21, Q22, Qs
+end
+
+@doc Markdown.doc"""
+    hgcd(a::PolyElem{T}, b::PolyElem{T}) where T
+
+Returns the half-GCD of `a` and `b`, that is, a tuple
+`(A, B, m11, m12, m21, m22, s::Int)` such that
+   1. m11*m22 - m12*m21 = s = +-1
+   2. m11*A + m12*B = a
+   3. m21*A + m22*B = b
+   4. `A` and `B` are consecutive remainders in the sequence for
+      division of `a` by `b` satisfying `deg(A) >= cld(deg(a), 2) > deg(B)
+   5. `[m11 m12; m21 m22]` is the product of `[q 1; 1 0]` for the quotients `q`
+      generated by such a remainder sequence.
+
+Assumes that the input satsifies `degree(a) > degree(b) >= 0`.
+
+Cutoffs are currently dictated by the non-exported functions
+`hgcd_prefers_basecase(a, b)`
+`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
+
+If the base ring of the polynomial ring is not a field, this function may throw
+a NotInvertibleError. Otherwise, the output should be valid.
+"""
+function hgcd(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+   check_parent(a, b)
+   @assert degree(a) > degree(b) >= 0
+   return hgcd_recursive(a, b, true)
 end
 
 ###############################################################################
@@ -2541,21 +2746,9 @@ end
 #
 ###############################################################################
 
-function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-   check_parent(a, b)
-   !is_exact_type(T) && error("gcdx requires exact Bezout domain")
-   if length(a) == 0
-      if length(b) == 0
-         return zero(parent(a)), zero(parent(a)), zero(parent(a))
-      else
-         d = leading_coefficient(b)
-         return divexact(b, d), zero(parent(a)), divexact(one(parent(a)), d)
-      end
-   end
-   if length(b) == 0
-      d = leading_coefficient(a)
-      return divexact(a, d), divexact(one(parent(a)), d), zero(parent(a))
-   end
+function gcdx_basecase(a::PolyElem{T}, b::PolyElem{T}) where T
+   @assert length(a) > 0
+   @assert length(b) > 0
    swap = false
    if length(a) < length(b)
       a, b = b, a
@@ -2581,26 +2774,42 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldEl
    return divexact(A, d), divexact(u1, d), divexact(v1, d)
 end
 
-function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
+function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
-   R = base_ring(a)
+   R = parent(a)
+   !is_exact_type(T) && error("gcdx requires exact Bezout domain")
    if length(a) == 0
       if length(b) == 0
-         return zero(parent(a)), zero(parent(a))
+         return zero(R), zero(R), zero(R)
       else
          d = leading_coefficient(b)
-         return divexact(b, d), zero(parent(a))
+         return divexact(b, d), zero(R), divexact(one(R), d)
       end
    end
    if length(b) == 0
       d = leading_coefficient(a)
-      return divexact(a, d), parent(a)(inv(d))
+      return divexact(a, d), divexact(one(R), d), zero(R)
    end
+   if hgcd_prefers_basecase(a, b)
+      return gcdx_basecase(a, b)
+   else
+      g, s = gcdinv_hgcd(a, b)
+      return g, s, divexact(g - s*a, b)
+   end
+end
+
+function gcdinv_basecase(a::PolyElem{T}, b::PolyElem{T}) where T
+   @assert length(a) > 0
+   @assert length(b) > 0
+   R = parent(a)
    if length(a) < length(b)
       a, b = b, a
-      u1, u2 = zero(parent(a)), one(parent(a))
+      u1, u2 = zero(R), one(R)
    else
-      u1, u2 = one(parent(a)), zero(parent(a))
+      u1, u2 = one(R), zero(R)
    end
    lena = length(a)
    lenb = length(b)
@@ -2620,6 +2829,61 @@ function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, Field
    A, u1 = d*A, d*u1
    d = leading_coefficient(A)
    return divexact(A, d), divexact(u1, d)
+end
+
+function gcdinv_hgcd(a::PolyElem{T}, b::PolyElem{T}) where T
+   @assert length(a) > 0
+   @assert length(b) > 0
+   R = parent(a)
+   m21, m22 = zero(R), one(R)
+   ms = 1
+   if length(a) < length(b)
+      a, b = b, a
+      m21, m22 = m22, m21
+      ms = -ms
+   end
+   while !iszero(b)
+      q, r = divrem(a, b)
+      a, b = b, r
+      m21, m22 = m21*q + m22, m21
+      ms = -ms
+      if iszero(b)
+         break
+      elseif !hgcd_prefers_basecase(a, b)
+         a, b, n11, n12, n21, n22, ns = hgcd_recursive(a, b, true)
+         m21, m22 = m21*n11 + m22*n21, m21*n12 + m22*n22
+         ms *= ns
+      end
+   end
+   l = leading_coefficient(a)
+   g = divexact(a, l)
+   s = divexact(m22, ms*l)
+   return g, s
+end
+
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
+function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where T <: Union{ResElem, FieldElement}
+   check_parent(a, b)
+   R = parent(a)
+   if length(a) == 0
+      if length(b) == 0
+         return zero(R), zero(R)
+      else
+         d = leading_coefficient(b)
+         return divexact(b, d), zero(R)
+      end
+   end
+   if length(b) == 0
+      d = leading_coefficient(a)
+      return divexact(a, d), R(inv(d))
+   end
+   if hgcd_prefers_basecase(a, b)
+      return gcdinv_basecase(a, b)
+   else
+      return gcdinv_hgcd(a, b)
+   end
 end
 
 ################################################################################
@@ -3061,23 +3325,16 @@ end
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{<:RingElement,<:PolyRing,UnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
    R = base_ring(S)
-   f = S()
-   x = gen(S)
-   # degree -1 is zero polynomial
-   deg = rand(rng, deg_range)
-   if deg == -1
-      return f
+   len = 1 + rand(rng, deg_range)
+   if len <= 0
+      return zero(S)
    end
-   for i = 0:deg - 1
-      f += rand(rng, v)*x^i
-   end
+   c = elem_type(R)[rand(rng, v) for i in 1:len]
    # ensure leading coefficient is nonzero
-   c = R()
-   while iszero(c)
-      c = rand(rng, v)
+   while iszero(c[len])
+      c[len] = rand(rng, v)
    end
-   f += c*x^deg
-   return f
+   return S(c)
 end
 
 # define rand for make(S, deg, v)

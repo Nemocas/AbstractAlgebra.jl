@@ -138,6 +138,10 @@ function addeq!(z::T, y::T) where T <: NCRingElem
    return z + y
 end
 
+function sub!(z::T, x::T, y::T) where T <: NCRingElem
+   return x - y
+end
+
 function mul!(z::T, x::T, y::T) where T <: NCRingElem
    return x*y
 end
