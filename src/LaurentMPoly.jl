@@ -33,10 +33,10 @@ end
 @enable_all_show_via_expressify LaurentMPolyElem
 
 function expressify(a::LaurentMPolyRing; context = nothing)
-    return Expr(:sequence, Expr(:text, "Multivariate Laurent Polynomial Ring over "),
-                           expressify(base_ring(a); context = context),
-                           Expr(:text, " in "),
-                           Expr(:series, symbols(a)...))
+    return Expr(:sequence, Expr(:text, "Multivariate Laurent Polynomial Ring in "),
+                           Expr(:series, symbols(a)...),
+                           Expr(:text, " over "),
+                           expressify(base_ring(a); context = context))
 end
 
 @enable_all_show_via_expressify LaurentMPolyRing
