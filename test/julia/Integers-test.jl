@@ -11,6 +11,10 @@ end
    @test !is_unit(S(3))
    @test is_unit(R(-1))
    @test is_unit(S(-1))
+   @test is_zero_divisor(R(0))
+   @test is_zero_divisor(S(0))
+   @test !is_zero_divisor(R(3))
+   @test !is_zero_divisor(S(3))
 
    @test check_parent(S(1), S(1))
 end

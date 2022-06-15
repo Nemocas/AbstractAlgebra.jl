@@ -277,6 +277,9 @@ end
       @test !is_unit(S(0))
       @test !is_unit(gen(S, 1))
 
+      @test is_zero_divisor(S())
+      @test !is_zero_divisor(gen(S, 1))
+
       @test is_constant(S(rand(-100:100)))
       @test is_constant(S(zero(S)))
 

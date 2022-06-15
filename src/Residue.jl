@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ResidueRing, data, modulus, lift
+export ResidueRing, data, modulus, lift, is_zero_divisor 
 
 ###############################################################################
 #
@@ -87,6 +87,10 @@ function is_unit(a::ResElem)
    g = gcd(data(a), modulus(a))
    return isone(g)
 end
+
+# currently residue rings are only allowed over domains
+# otherwise this function would be more complicated
+is_zero_divisor(a::ResElem) = !is_unit(a)
 
 deepcopy_internal(a::ResElem, dict::IdDict) =
    parent(a)(deepcopy(data(a)))

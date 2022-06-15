@@ -284,6 +284,8 @@ end
    @test isone(one(S))
    @test is_gen(gen(S))
    @test is_unit(one(S))
+   @test is_zero_divisor(S())
+   @test !is_zero_divisor(one(S))
    @test is_constant(zero(S))
    @test is_constant(one(S))
    @test !is_constant(gen(S))

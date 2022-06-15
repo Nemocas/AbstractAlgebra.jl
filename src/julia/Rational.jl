@@ -48,6 +48,8 @@ one(::Rationals{T}) where T <: Integer = Rational{T}(1)
 
 is_unit(a::Rational) = a != 0
 
+is_zero_divisor(a::Rational) = is_zero(a)
+
 canonical_unit(a::Rational)  = a
 
 function numerator(a::Rational, canonicalise::Bool=true)

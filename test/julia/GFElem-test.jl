@@ -48,6 +48,10 @@ end
    @test !is_unit(S())
    @test is_unit(R(3))
    @test is_unit(S(3))
+   @test is_zero_divisor(R())
+   @test is_zero_divisor(S())
+   @test !is_zero_divisor(R(3))
+   @test !is_zero_divisor(S(3))
 
    @test deepcopy(R(3)) == R(3)
    @test deepcopy(S(3)) == S(3)

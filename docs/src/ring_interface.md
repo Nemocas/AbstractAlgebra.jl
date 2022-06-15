@@ -687,6 +687,16 @@ is_unit(f::MyElem)
 Return `true` if the given element is a unit in the ring it belongs to.
 
 ```julia
+is_zero_divisor(f::MyElem)
+```
+
+Return `true` if the given element is a zero divisor in the ring it belongs to.
+When this function does not exist for a given ring then the total ring of
+fractions may not be usable over that ring. All fields in the system have a
+fallback defined for this function.
+
+
+```julia
 characteristic(R::MyParent)
 ```
 

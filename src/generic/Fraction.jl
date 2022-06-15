@@ -39,7 +39,8 @@ function Base.denominator(a::Frac, canonicalise::Bool=true)
 end
 
 function deepcopy_internal(a::Frac{T}, dict::IdDict) where {T <: RingElem}
-   v = Frac{T}(deepcopy(numerator(a, false)), deepcopy(denominator(a, false)))
+   v = Frac{T}(deepcopy_internal(numerator(a, false), dict),
+               deepcopy_internal(denominator(a, false), dict))
    v.parent = parent(a)
    return v
 end
@@ -160,7 +161,6 @@ end
 ###############################################################################
 
 function FractionField(R::AbstractAlgebra.Ring; cached=true)
-   R2 = R
    T = elem_type(R)
 
    return FracField{T}(R, cached)

@@ -123,6 +123,9 @@ end
       @test !is_unit(zero(S))
       @test is_unit(gen(S))
 
+      @test is_zero_divisor(zero(S))
+      @test !is_zero_divisor(one(S))
+
       @test degree(S) == length(modulus(S)) - 1
 
       @test defining_polynomial(S) == modulus(S)

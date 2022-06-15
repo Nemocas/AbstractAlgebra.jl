@@ -149,6 +149,9 @@ end
 
    @test is_unit(h)
 
+   @test is_zero_divisor(T(x + 9223338))
+   @test !is_zero_divisor(T(x + 1))
+
    @test isone(h)
 
    @test data(h) == 1
