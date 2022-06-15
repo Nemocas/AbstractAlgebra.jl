@@ -112,6 +112,8 @@ end
 
    @test !is_unit(A)
    @test is_unit(C)
+   @test !is_zero_divisor(A)
+   @test !is_zero_divisor(C)
 
    B[1, 1] = R(3)
    @test B[1, 1] == R(3)
@@ -142,6 +144,17 @@ end
 
    @test nrows(A) == ncols(A) == 3
    @test degree(A) == 3
+
+   # Tests over residue ring
+   S = MatrixAlgebra(ResidueRing(ZZ, 6), 2)
+   A = S([1 2; 3 4])
+   B = S([0 0; 3 3])
+   @test is_zero(A*B)
+   @test !is_unit(A)
+   @test !is_unit(B)
+   @test is_zero_divisor(A)
+   @test is_zero_divisor(B)
+   @test !is_zero_divisor(one(S))
 
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
