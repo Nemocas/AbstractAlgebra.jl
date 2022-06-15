@@ -5,8 +5,8 @@
 ###############################################################################
 #include("../AbstractTypes.jl")
 #include("FreeAssAlgebra.jl")
-include("FreeAssAhoCorasick.jl")
-export groebner_basis, interreduce!
+#include("FreeAssAhoCorasick.jl")
+export groebner_basis, interreduce!, groebner_basis_slow, gb_divides_leftmost_aho_corasick, normal_form, get_obstructions, s_polynomial, add_obstructions! #TODO remove unnecessary exports
 
 using DataStructures
 
@@ -53,7 +53,10 @@ function gb_divides_leftmost_aho_corasick(a::Word, aut::AhoCorasickAutomaton)
     if isnothing(match)
         return (false, [], [], -1)
     end
-    return (true, a[1:match[1] - length(match[2])], a[match[1] + 1:length(a)], match[2][1])
+#    println("a = $a")
+#    println("match = $match")
+return (true, a[1:match.last_position - length(match.keyword)], a[match.last_position + 1:end], match.keyword_index)
+#return (true, a[1:match[1] - length(match[2][2])], a[match[1] + 1:end], match[2][1])
 end
 
 # implementation of the normal form function using aho corasick to check for all groebner basis elements in parallel
@@ -81,6 +84,39 @@ end
 
 
 # normal form with leftmost word divisions
+function normal_form(
+   f::FreeAssAlgElem{T},
+   g::Vector{FreeAssAlgElem{T}},
+) where T <: FieldElement
+   R = parent(f)
+   s = length(g)
+   rcoeffs = T[]
+   rexps = Vector{Int}[]
+   while length(f) > 0
+      i = 1
+   @label again
+   ok, ml, mr = word_divides_leftmost(f.exps[1], g[i].exps[1])
+        if !ok && i < s
+         i += 1
+         @goto again
+      end
+      if ok
+         qi = divexact(f.coeffs[1], g[i].coeffs[1])
+         f = _sub_rest(f, mul_term(qi, ml, g[i], mr), 1) # enforce lt cancelation
+      else
+         push!(rcoeffs, f.coeffs[1])
+         push!(rexps, f.exps[1])
+         f = FreeAssAlgElem{T}(R, f.coeffs[2:end], f.exps[2:end], length(f)-1)
+      end
+   end
+   r = FreeAssAlgElem{T}(R, rcoeffs, rexps, length(rcoeffs))
+   return r
+end
+
+
+
+# normal form with leftmost word divisions
+
 function normal_form(
    f::FreeAssAlgElem{T},
    g::Vector{FreeAssAlgElem{T}},
@@ -432,7 +468,7 @@ function get_obstructions(g::Vector{FreeAssAlgElem{T}}) where T
     # TODO maybe here some redundancies can be removed too, check Kreuzer Xiu
     if groebner_debug_level > 0
         obstr_count = length(result)
-        println("$obstr_count many obstructions")
+        #println("$obstr_count many obstructions")
     end
     return result
 end
@@ -469,10 +505,10 @@ function groebner_basis_buchberger(
    # compute the aho corasick automaton
    # to make normal form computation more efficient
    aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in g])
-
    # step 1
    obstruction_queue = get_obstructions(g) 
    while !isempty(obstruction_queue)
+#       #println(length(obstruction_queue))
       obstruction = dequeue!(obstruction_queue)
       # step3 
       S = s_polynomial(obstruction)
@@ -480,12 +516,14 @@ function groebner_basis_buchberger(
       if groebner_debug_level > 0
           checked_obstructions += 1
           if checked_obstructions % 5000 == 0
-            println("checked $checked_obstructions obstructions")
+            #println("checked $checked_obstructions obstructions")
          end
       end
       if iszero(Sp)
+          #println("is zero")
          continue
       end
+      #println(Sp)
       nonzero_reductions += 1
       # step4
       push!(g, Sp)

@@ -1,17 +1,30 @@
-###############################################################################
 #
 #   FreeAssAhoCorasick.jl : implement bulk divide check for leading terms of free associative Algebra elements
 #   for use e.g. in Groebner Basis computation
 #
 ###############################################################################
+#TODO how to properly export this?
+export search, AhoCorasickAutomaton, AhoCorasickMatch, Word
+
 using DataStructures
 
 const Word = Vector{Int}
 
+"""
+Output stores for each node a tuple (i, k), where i is the index of the keyword k in 
+the original list of keywords. If several keywords would be the output of the node, only
+the one with the smallest index is stored
+"""
 struct AhoCorasickAutomaton
     goto::Vector{Dict{Int, Int}}
     fail::Vector{Int}
     output::Vector{Tuple{Int, Word}}
+end
+
+struct AhoCorasickMatch
+    last_position::Int
+    keyword_index::Int
+    keyword::Word
 end
 
 function AhoCorasickAutomaton(keywords::Vector{Word})
@@ -96,6 +109,7 @@ end
 """
 function search(automaton::AhoCorasickAutomaton, word)
     current_state = 1
+    result = AhoCorasickMatch(typemax(Int), typemax(Int), [])
     for i in 1:length(word)
         c = word[i]
         while true
@@ -107,11 +121,14 @@ function search(automaton::AhoCorasickAutomaton, word)
                 current_state = automaton.fail[current_state]
             end
         end
-        if automaton.output[current_state][1] != typemax(Int)
-            return (i, automaton.output[current_state])
+        if automaton.output[current_state][1] < result.keyword_index
+            result = AhoCorasickMatch(i, automaton.output[current_state][1], automaton.output[current_state][2])
             #push!(output, (i, automaton.output[current_state]))
 #            union!(output_set, (i, automaton.output[current_state]))
         end
     end
-    return nothing
+    if result.keyword == []
+        return nothing
+    end
+    return result
 end
