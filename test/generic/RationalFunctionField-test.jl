@@ -170,7 +170,7 @@ end
    a = (x + 1)//(-x^2 + 1)
 
    @test inv(a) == -x + 1
-   @test_throws DivideError inv(R())
+   @test_throws NotInvertibleError inv(R())
 end
 
 @testset "Generic.RationalFunctionField.exact_division" begin
