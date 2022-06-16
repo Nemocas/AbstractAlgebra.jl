@@ -375,16 +375,16 @@ function Base.inv(a::FactoredFrac{T}) where T
     return FactoredFrac{T}(inv(a.unit), z, parent(a))
 end
 
-function divexact(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
+function divexact(a::FactoredFrac{T}, b::FactoredFrac{T}; check::Bool = true) where T
     return a*inv(b)
 end
 
-function divexact(a::Union{Integer, Rational}, b::FactoredFrac{T}) where T
-    return divexact(parent(b)(a), b)
+function divexact(a::Union{Integer, Rational}, b::FactoredFrac{T}; check::Bool = true) where T
+    return divexact(parent(b)(a), b, check = check)
 end
 
-function divexact(a::T, b::FactoredFrac{T}) where T <: RingElem
-    return divexact(parent(b)(a), b)
+function divexact(a::T, b::FactoredFrac{T}; check::Bool = true) where T <: RingElem
+    return divexact(parent(b)(a), b, check = check)
 end
 
 ###############################################################################
