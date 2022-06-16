@@ -17,6 +17,11 @@ end
     @test L != LaurentPolynomialRing(GF(5), 2, 'x', cached = false)[1]
     @test L == LaurentPolynomialRing(GF(5), 2, :x, cached = true)[1]
 
+    @test base_ring(L) == GF(5)
+    @test coefficient_ring(L) == GF(5)
+    @test base_ring(x) == GF(5)
+    @test coefficient_ring(x) == GF(5)
+
     L, (x, y) = LaurentPolynomialRing(GF(5), ["x", "y"])
     @test L == LaurentPolynomialRing(GF(5), ['x', 'y'])[1]
     @test L != LaurentPolynomialRing(GF(5), [:x, :y], cached = false)[1]

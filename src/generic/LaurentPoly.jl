@@ -193,13 +193,12 @@ function is_divisible_by(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
    return divides(a.poly, ub)[1]
 end
 
-# BOGUS
+# may throw even when p is invertible
 function Base.inv(p::LaurentPolyWrap)
    v, g = _remove_gen(p)
    return LaurentPolyWrap(parent(p), inv(g), -p.mindeg-v)
 end
 
-# BOGUS: 3+2x is a unit in (ZZ/6)[x,x^-1]
 function is_unit(p::LaurentPolyWrap)
    v, g = _remove_gen(p)
    if is_domain_type(elem_type(coefficient_ring(p))) || length(g) <= 1

@@ -136,6 +136,19 @@ end
    @test_throws ArgumentError divexact_right(1 - x*a, x)
 end
 
+@testset "Generic.FreeAssAlgebra.is_unit" begin
+   R, (x,) = FreeAssociativeAlgebra(ResidueRing(ZZ, 4), ["x"])
+
+   @test !is_unit(x)
+   @test !is_unit(2*x)
+   try
+      res = is_unit(1 + 2*x)
+      @test res
+   catch e
+      @test e isa NotImplementedError
+   end
+end
+
 @testset "Generic.FreeAssAlgebra.NCRing_interface" begin
    test_NCRing_interface(FreeAssociativeAlgebra(ZZ, 3)[1])
 end
