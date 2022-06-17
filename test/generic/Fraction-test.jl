@@ -129,6 +129,18 @@ end
    @test b*(x + 1) == (-x-1)//(x-1)
 
    @test (x + 1)*b == (-x-1)//(x-1)
+
+   @test a + 2//3 == (4*x^2 - 3*x + 9)//(6*x^2 + 9)
+
+   @test 2//3 + a == (4*x^2 - 3*x + 9)//(6*x^2 + 9)
+
+   @test a - 2//3 == (-4*x^2 - 3*x - 3)//(6*x^2 + 9)
+
+   @test 2//3 - a == (4*x^2 + 3*x + 3)//(6*x^2 + 9)
+
+   @test a*(2//3) == (-2*x + 2)//(6*x^2 + 9)
+
+   @test (2//3)*a == (-2*x + 2)//(6*x^2 + 9)
 end
 
 @testset "Generic.Frac.comparison" begin
@@ -153,6 +165,10 @@ end
    @test one(S) == 1
 
    @test 1 == one(S)
+
+   @test  S(2)//3 == 2//3
+
+   @test 2//3 == S(2)//3
 end
 
 @testset "Generic.Frac.powering" begin

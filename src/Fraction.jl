@@ -286,7 +286,7 @@ end
 #
 ###############################################################################
 
-function *(a::FracElem, b::Union{Integer, Rational, AbstractFloat})
+function *(a::FracElem, b::Union{Integer, AbstractFloat})
    c = base_ring(a)(b)
    g = gcd(denominator(a, false), c)
    n = numerator(a, false)*divexact(c, g)
@@ -294,11 +294,31 @@ function *(a::FracElem, b::Union{Integer, Rational, AbstractFloat})
    return parent(a)(n, d)
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::FracElem)
+function *(a::FracElem, b::Rational)
+   bnum = base_ring(a)(numerator(b))
+   bden = base_ring(a)(denominator(b))
+   g1 = gcd(denominator(a, false), bnum)
+   g2 = gcd(numerator(a, false), bden)
+   n = divexact(numerator(a, false), g2)*divexact(bnum, g1)
+   d = divexact(denominator(a, false), g1)*divexact(bden, g2)
+   return parent(a)(n, d)
+end
+
+function *(a::Union{Integer, AbstractFloat}, b::FracElem)
    c = base_ring(b)(a)
    g = gcd(denominator(b, false), c)
    n = numerator(b, false)*divexact(c, g)
    d = divexact(denominator(b, false), g)
+   return parent(b)(n, d)
+end
+
+function *(a::Rational, b::FracElem)
+   anum = base_ring(b)(numerator(a))
+   aden = base_ring(b)(denominator(a))
+   g1 = gcd(denominator(b, false), anum)
+   g2 = gcd(numerator(b, false), aden)
+   n = divexact(numerator(b, false), g2)*divexact(anum, g1)
+   d = divexact(denominator(b, false), g1)*divexact(aden, g2)
    return parent(b)(n, d)
 end
 
@@ -316,25 +336,31 @@ function *(a::T, b::FracElem{T}) where {T <: RingElem}
    return parent(b)(n, d)
 end
 
-function +(a::FracElem, b::Union{Integer, Rational, AbstractFloat})
+function +(a::FracElem, b::Union{Integer, AbstractFloat})
    n = numerator(a, false) + denominator(a, false)*b
    d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
-function -(a::FracElem, b::Union{Integer, Rational, AbstractFloat})
++(a::FracElem, b::Rational) = return a + parent(a)(b)
+
+function -(a::FracElem, b::Union{Integer, AbstractFloat})
    n = numerator(a, false) - denominator(a, false)*b
    d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
+-(a::FracElem, b::Rational) = return a - parent(a)(b)
+
 +(a::Union{Integer, Rational, AbstractFloat}, b::FracElem) = b + a
 
-function -(a::Union{Integer, Rational, AbstractFloat}, b::FracElem)
+function -(a::Union{Integer, AbstractFloat}, b::FracElem)
    n = a*denominator(b, false) - numerator(b, false)
    d = denominator(b, false)
    return parent(b)(n, deepcopy(d))
 end
+
+-(a::Rational, b::FracElem) = return parent(b)(a) - b
 
 function +(a::FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) + denominator(a, false)*b
@@ -408,10 +434,17 @@ end
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(x::FracElem, y::Union{Integer, Rational, AbstractFloat})
+function ==(x::FracElem, y::Union{Integer, AbstractFloat})
    return (isone(denominator(x, false)) && numerator(x, false) == y) ||
           (isone(denominator(x, true)) && numerator(x, true) == y) ||
           (numerator(x, false) == denominator(x, false)*y)
+end
+
+function ==(x::FracElem, y::Rational)
+   return (numerator(x, false) == numerator(y, false) &&
+           denominator(x, false) == denominator(y, false)) ||
+           (numerator(x, false)*denominator(y, false) ==
+            denominator(x, false)*numerator(y, false))
 end
 
 @doc Markdown.doc"""

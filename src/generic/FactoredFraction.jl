@@ -234,7 +234,11 @@ function ==(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
     return x == y
 end
 
-function +(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T
+function +(a::FactoredFrac{T}, b::Integer) where T <: RingElem
+   return a + parent(a)(b)
+end
+
+function +(a::FactoredFrac{T}, b::Rational) where T <: RingElem
    return a + parent(a)(b)
 end
 
@@ -242,7 +246,11 @@ function +(a::FactoredFrac{T}, b::T) where T <: RingElem
    return a + parent(a)(b)
 end
 
-function +(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T
+function +(b::Integer, a::FactoredFrac{T}) where T <: RingElem
+   return parent(a)(b) + a
+end
+
+function +(b::Rational, a::FactoredFrac{T}) where T <: RingElem
    return parent(a)(b) + a
 end
 
@@ -255,7 +263,11 @@ function +(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
     return mul_by_base_elem(g, x + y)
 end
 
-function -(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T
+function -(a::FactoredFrac{T}, b::Integer) where T <: RingElem
+   return a - parent(a)(b)
+end
+
+function -(a::FactoredFrac{T}, b::Rational) where T <: RingElem
    return a - parent(a)(b)
 end
 
@@ -263,7 +275,11 @@ function -(a::FactoredFrac{T}, b::T) where T <: RingElem
    return a - parent(a)(b)
 end
 
-function -(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T
+function -(b::Integer, a::FactoredFrac{T}) where T <: RingElem
+   return parent(a)(b) - a
+end
+
+function -(b::Rational, a::FactoredFrac{T}) where T <: RingElem
    return parent(a)(b) - a
 end
 
@@ -307,16 +323,24 @@ function *(a::FactoredFrac{T}, b::T) where T <: RingElem
     return mul_by_base_elem(a, b)
 end
 
-function *(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T <: RingElem
+function *(a::FactoredFrac{T}, b::Integer) where T <: RingElem
     return mul_by_base_elem(a, base_ring(a)(b))
+end
+
+function *(a::FactoredFrac{T}, b::Rational) where T <: RingElem
+   return a*parent(a)(b)
 end
 
 function *(b::T, a::FactoredFrac{T}) where T <: RingElem
    return mul_by_base_elem(a, b)
 end
 
-function *(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T <: RingElem
+function *(b::Integer, a::FactoredFrac{T}) where T <: RingElem
    return mul_by_base_elem(a, base_ring(a)(b))
+end
+
+function *(b::Rational, a::FactoredFrac{T}) where T <: RingElem
+   return parent(a)(b)*a
 end
 
 function *(b::FactoredFrac{T}, c::FactoredFrac{T}) where T <: RingElement
