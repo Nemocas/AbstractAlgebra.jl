@@ -102,6 +102,20 @@ function is_gen(a::LaurentMPolyWrap)
     return !iszero(_var_index(a))
 end
 
+function inv(a::LaurentMPolyWrap)
+    (ap, ad) = _normalize(a)
+    return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
+end
+
+function is_unit(a::LaurentMPolyWrap)
+    (ap, ad) = _normalize(a)
+    if is_domain_type(elem_type(coefficient_ring(a))) || length(ap) <= 1
+        return is_unit(ap)
+    else
+        throw(NotImplementedError(:is_unit, a))
+    end
+end
+
 ###############################################################################
 #
 #   Arithmetic
@@ -170,11 +184,6 @@ function divexact(a::LaurentMPolyWrap, b::LaurentMPolyWrap; check::Bool=true)
     (bp, bd) = _normalize(b)
     q = divexact(a.mpoly, bp, check=check)
     return LaurentMPolyWrap(parent(a), q, sub!(bd, a.mindegs, bd))
-end
-
-function inv(a::LaurentMPolyWrap)
-    (ap, ad) = _normalize(a)
-    return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
 end
 
 function gcd(a::LaurentMPolyWrap, b::LaurentMPolyWrap)

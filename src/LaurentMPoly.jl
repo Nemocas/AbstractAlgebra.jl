@@ -51,10 +51,8 @@ function gens(R::LaurentMPolyRing)
     return [gen(R, i) for i in 1:nvars(R)]
 end
 
-# BOGUS
-function is_unit(a::LaurentMPolyElem)
-    return length(a) == 1 && is_unit(leading_coefficient(a))
-end
+coefficient_ring(a::LaurentMPolyElem) = coefficient_ring(parent(a))
+base_ring(a::LaurentMPolyElem) = base_ring(parent(a))
 
 ###############################################################################
 #

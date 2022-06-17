@@ -139,7 +139,8 @@ export ZZ, QQ, zz, qq, RealField, RDF
 
 export zeros
 
-export NotInvertibleError, error_dim_negative, ErrorConstrDimMismatch
+export NotImplementedError, NotInvertibleError, ErrorConstrDimMismatch,
+       error_dim_negative
 
 export add!, addeq!,
        crt,

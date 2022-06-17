@@ -597,8 +597,6 @@ function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
    return b
 end
 
-is_unit(x::MPolyElem) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && is_unit(x.coeffs[1])
-
 function is_gen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
    exps = x.exps
    N = size(exps, 1)

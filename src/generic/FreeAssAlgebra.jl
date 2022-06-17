@@ -100,11 +100,9 @@ function is_gen(a::FreeAssAlgElem{T}) where T
     end
 end
 
-# BOGUS
-function is_unit(x::FreeAssAlgElem)
-   return x.length == 1 && isempty(x.exps[1]) && is_unit(x.coeffs[1])
+function is_constant(a::FreeAssAlgElem{T}) where T
+    return length(a) == 0 || (length(a) == 1 && isempty(a.exps[1]))
 end
-
 
 ###############################################################################
 #

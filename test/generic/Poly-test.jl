@@ -358,6 +358,19 @@ end
    @test characteristic(R) == 0
 end
 
+@testset "Generic.Poly.is_unit" begin
+   R, x = PolynomialRing(ResidueRing(ZZ, 4), "x")
+
+   @test !is_unit(x)
+   @test !is_unit(2*x)
+   try
+      res = is_unit(1 + 2*x)
+      @test res
+   catch e
+      @test e isa NotImplementedError
+   end
+end
+
 @testset "Generic.Poly.deflation" begin
    R, x = PolynomialRing(ZZ, "x")
 

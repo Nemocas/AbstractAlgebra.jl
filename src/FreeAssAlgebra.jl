@@ -76,7 +76,7 @@ end
 
 ###############################################################################
 #
-#   Coeffs, Terms, etc.
+#   Basic Manipulation
 #
 ###############################################################################
 
@@ -100,6 +100,18 @@ retrieve an array of the exponent words, use `collect(exponent_words(a))`.
 """
 function exponent_words(a::AbstractAlgebra.FreeAssAlgElem{T}) where T <: RingElement
    return Generic.FreeAssAlgExponentWords(a)
+end
+
+function is_unit(a::FreeAssAlgElem{T}) where T
+   if is_constant(a)
+      return is_unit(leading_coefficient(a))
+   elseif is_domain_type(elem_type(coefficient_ring(a)))
+      return false
+   elseif length(a) == 1
+      return false
+   else
+      throw(NotImplementedError(:is_unit, a))
+   end
 end
 
 ###############################################################################

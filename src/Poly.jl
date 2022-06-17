@@ -233,7 +233,7 @@ Return `true` if the given polynomial is the constant generator of its
 polynomial ring, otherwise return `false`.
 """
 function is_gen(a::PolynomialElem)
-    return length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
+    return length(a) <= 2 && isone(coeff(a, 1)) && iszero(coeff(a, 0))
 end
 
 @doc Markdown.doc"""
@@ -246,7 +246,17 @@ function is_monic(a::PolynomialElem)
     return isone(leading_coefficient(a))
 end
 
-is_unit(a::PolynomialElem) = length(a) == 1 && is_unit(coeff(a, 0))
+function is_unit(a::PolynomialElem)
+   if length(a) <= 1
+      return is_unit(coeff(a, 0))
+   elseif is_domain_type(elem_type(coefficient_ring(a)))
+      return false
+   elseif !is_unit(coeff(a, 0)) || is_unit(coeff(a, length(a) - 1))
+      return false
+   else
+      throw(NotImplementedError(:is_unit, a))
+   end
+end
 
 is_zero_divisor(a::PolynomialElem) = is_zero_divisor(content(a))
 
