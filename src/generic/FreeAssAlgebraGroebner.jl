@@ -173,20 +173,41 @@ function normal_form_weak(
 end
 
 function interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
-   i = 1
-   while length(g) > 1 && length(g) >= i
-      r = normal_form(g[i], g[1:end .!= i])
-      if iszero(r)
-         deleteat!(g, i)
-      elseif g[i] != r
-         g[i] = r
-         i = 1
-      else
-         i += 1
-      end
-   end
-   return g
+    i = 1
+    while length(g) > 1 && length(g) >= i
+        aut = AhoCorasickAutomaton([g_j.exps[1] for g_j in g[1:end .!= i]])
+        r = normal_form(g[i], g[1:end .!= i], aut)
+        if iszero(r)
+            deleteat!(g, i)
+            println(length(g))
+        elseif g[i] != r
+            g[i] = r
+            #i = 1
+            i += 1
+        else
+            #println(i)
+            i += 1
+        end
+    end
+    return g
 end
+
+
+#function interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
+#   i = 1
+#   while length(g) > 1 && length(g) >= i
+#      r = normal_form(g[i], g[1:end .!= i])
+#      if iszero(r)
+#         deleteat!(g, i)
+#      elseif g[i] != r
+#         g[i] = r
+#         i = 1
+#      else
+#         i += 1
+#      end
+#   end
+#   return g
+#end
 
 ## checks whether there is an overlap between a and b at position i of b
 #  such that b[i:length(b)] = a[1:length(b)-i]
@@ -500,8 +521,13 @@ function groebner_basis_buchberger(
 ) where T <: FieldElement
 
    g = copy(g)
+   println(length(g))
+   interreduce!(g)
+   println(length(g))
+
    checked_obstructions = 0
    nonzero_reductions = 0
+   interreduce_counter = 0
    # compute the aho corasick automaton
    # to make normal form computation more efficient
    aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in g])
@@ -527,14 +553,31 @@ function groebner_basis_buchberger(
       nonzero_reductions += 1
       # step4
       push!(g, Sp)
-      aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in g])
+      insert_keyword!(aut, Sp.exps[1], length(g))
+      #aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in g])
 
+      interreduce_counter += 1
+      if interreduce_counter > 2000
+          println("starting interreduce")
+          interreduce!(g)
+          println("done interreducing")
+          interreduce_counter = 0
+          obstruction_queue = get_obstructions(g)
+          continue
+      end
       if groebner_debug_level > 0
          println("adding new obstructions! checked $checked_obstructions so far")
       end
       if nonzero_reductions >= reduction_bound
               return g
       end
+      #debug
+      if nonzero_reductions > 2000
+          println(length(obstruction_queue))
+          println(length(g))
+          println(nonzero_reductions)
+      end
+      #end debug
       add_obstructions!(obstruction_queue, g)
    end
    return g

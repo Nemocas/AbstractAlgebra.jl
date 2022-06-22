@@ -4,7 +4,7 @@
 #
 ###############################################################################
 #TODO how to properly export this?
-export search, AhoCorasickAutomaton, AhoCorasickMatch, Word
+export search, AhoCorasickAutomaton, AhoCorasickMatch, Word, insert_keyword!
 
 using DataStructures
 
@@ -15,7 +15,7 @@ Output stores for each node a tuple (i, k), where i is the index of the keyword 
 the original list of keywords. If several keywords would be the output of the node, only
 the one with the smallest index is stored
 """
-struct AhoCorasickAutomaton
+mutable struct AhoCorasickAutomaton
     goto::Vector{Dict{Int, Int}}
     fail::Vector{Int}
     output::Vector{Tuple{Int, Word}}
@@ -102,6 +102,12 @@ function construct_fail!(automaton::AhoCorasickAutomaton)
 
         end
     end
+end
+
+function insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
+    enter!(aut, keyword, index)
+    aut.fail = ones(Int, length(aut.goto))
+    construct_fail!(aut)
 end
 
 """
