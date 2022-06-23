@@ -47,6 +47,12 @@ end
     @test divexact(Zx(1), F(2, 3)) == 3//2
     @test divexact(F(2, 3), ZZ(1)) == 2//3
     @test divexact(ZZ(1), F(2, 3)) == 3//2
+
+    a = FF(-1//3)
+    @test (a + 1//2) - 1//2 == a
+    @test 1//2 - (1//2 + a) == -a
+    @test divexact((a * 1//2), 1//2) == a
+    @test divexact(1//2, 1//2 * a) == inv(a)
 end
 
 @testset "Generic.FactoredFrac.ZZ.evaluate" begin

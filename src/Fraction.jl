@@ -555,7 +555,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::FracElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(a::FracElem, b::Union{Integer, AbstractFloat}; check::Bool=true)
    b == 0 && throw(DivideError())
    c = base_ring(a)(b)
    g = gcd(numerator(a, false), c)
@@ -564,13 +564,21 @@ function divexact(a::FracElem, b::Union{Integer, Rational, AbstractFloat}; check
    return parent(a)(n, d)
 end
 
-function divexact(a::Union{Integer, Rational, AbstractFloat}, b::FracElem; check::Bool=true)
+function divexact(a::Union{Integer, AbstractFloat}, b::FracElem{T}; check::Bool=true) where T <: RingElem
    iszero(b) && throw(DivideError())
    c = base_ring(b)(a)
    g = gcd(numerator(b, false), c)
    n = denominator(b, false)*divexact(c, g; check=false)
    d = divexact(numerator(b, false), g; check=false)
    return parent(b)(n, d)
+end
+
+function divexact(a::FracElem{T}, b::Rational; check::Bool=true) where T <: RingElem
+   return divexact(a, parent(a)(b), check=check)
+end
+
+function divexact(a::Rational, b::FracElem{T}; check::Bool=true) where T <: RingElem
+   return divexact(parent(b)(a), b, check=check)
 end
 
 function divexact(a::FracElem{T}, b::T; check::Bool=true) where {T <: RingElem}
