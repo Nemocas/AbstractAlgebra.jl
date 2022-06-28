@@ -65,9 +65,10 @@ is_unit(a::MatAlgElem{T}) where T <: RingElement = is_unit(det(a))
 is_unit(a::MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
 
 # proof over a commutative ring: use adj(A)*A = det(A)*I = A*adj(A)
-function is_zero_divisor(a::MatAlgElem{T}) where T <: RingElement
-   return is_zero_divisor(det(a))
-end
+is_zero_divisor(a::MatAlgElem{T}) where T <: RingElement = is_zero_divisor(det(a))
+
+is_zero_divisor(a::MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
+
 
 function characteristic(a::MatAlgebra)
    return characteristic(base_ring(a))
