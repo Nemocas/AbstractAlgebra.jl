@@ -360,7 +360,7 @@ function Base.get(h::WeakValueCache{K, V}, key, default) where {K, V}
    return default
 end
 
-function get(default, h::WeakValueCache{K, V}, key) where {K, V}
+function get(default::Union{Function, Type}, h::WeakValueCache{K, V}, key) where {K, V}
    index = ht_keyindex(h, key)
    if index > 0
       x = h.vals[index].value
@@ -373,13 +373,13 @@ end
 
 ### get! ####
 
-function Base.get!(default, h::WeakValueCache{K, V}, key0) where {K, V}
+function Base.get!(default::Union{Function, Type}, h::WeakValueCache{K, V}, key0) where {K, V}
    key = convert(K, key0)
    isequal(key, key0) || throw(ArgumentError("$key0 is not a valid key for type $K"))
    return Base.get!(default, h, key)
 end
 
-function Base.get!(default, h::WeakValueCache{K, V}, key::K) where {K, V}
+function Base.get!(default::Union{Function, Type}, h::WeakValueCache{K, V}, key::K) where {K, V}
    index = ht_keyindex2!(h, key)
    if index > 0
       x = h.vals[index].value
@@ -544,7 +544,7 @@ function get!(wvh::WeakValueDict{K, V}, key, default) where {K, V}
     end
     return v::V
 end
-function Base.get!(default::Base.Callable, wvh::WeakValueDict{K, V}, key) where {K, V}
+function Base.get!(default::Union{Function, Type}, wvh::WeakValueDict{K, V}, key) where {K, V}
     v = lock(wvh) do
         _cleanup_locked(wvh)
         if haskey(wvh.ht, key)
@@ -588,7 +588,7 @@ function Base.get(wvh::WeakValueDict{K, V}, key, default) where {K, V}
     end
 end
 
-function Base.get(default::Base.Callable, wvh::WeakValueDict{K, V}, key) where {K, V}
+function Base.get(default::Union{Function, Type}, wvh::WeakValueDict{K, V}, key) where {K, V}
     lock(wvh) do
         x = get(wvh.ht, key, nothing)
         if x !== nothing
