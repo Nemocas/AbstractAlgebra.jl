@@ -137,8 +137,15 @@ function (a::FracField{T})(b::Union{Integer, Rational}, c::T) where {U <: FieldE
    return z
 end
 
-function (a::FracField{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (a::FracField{T})(b::Union{Integer, AbstractFloat}) where {T <: RingElement}
    z = Frac{T}(base_ring(a)(b), one(base_ring(a)))
+   z.parent = a
+   return z
+end
+
+function (a::FracField{T})(b::Rational) where {T <: RingElement}
+   z = Frac{T}(base_ring(a)(numerator(b, false)),
+               base_ring(a)(denominator(b, false)))
    z.parent = a
    return z
 end

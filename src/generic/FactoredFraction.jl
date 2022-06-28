@@ -234,7 +234,7 @@ function ==(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
     return x == y
 end
 
-function +(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T
+function +(a::FactoredFrac{T}, b::Rational) where T <: RingElem
    return a + parent(a)(b)
 end
 
@@ -242,7 +242,7 @@ function +(a::FactoredFrac{T}, b::T) where T <: RingElem
    return a + parent(a)(b)
 end
 
-function +(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T
+function +(b::Rational, a::FactoredFrac{T}) where T <: RingElem
    return parent(a)(b) + a
 end
 
@@ -255,7 +255,7 @@ function +(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
     return mul_by_base_elem(g, x + y)
 end
 
-function -(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T
+function -(a::FactoredFrac{T}, b::Rational) where T <: RingElem
    return a - parent(a)(b)
 end
 
@@ -263,7 +263,7 @@ function -(a::FactoredFrac{T}, b::T) where T <: RingElem
    return a - parent(a)(b)
 end
 
-function -(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T
+function -(b::Rational, a::FactoredFrac{T}) where T <: RingElem
    return parent(a)(b) - a
 end
 
@@ -307,7 +307,7 @@ function *(a::FactoredFrac{T}, b::T) where T <: RingElem
     return mul_by_base_elem(a, b)
 end
 
-function *(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T <: RingElem
+function *(a::FactoredFrac{T}, b::Integer) where T <: RingElem
     return mul_by_base_elem(a, base_ring(a)(b))
 end
 
@@ -315,7 +315,7 @@ function *(b::T, a::FactoredFrac{T}) where T <: RingElem
    return mul_by_base_elem(a, b)
 end
 
-function *(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T <: RingElem
+function *(b::Integer, a::FactoredFrac{T}) where T <: RingElem
    return mul_by_base_elem(a, base_ring(a)(b))
 end
 
@@ -379,13 +379,23 @@ function divexact(a::FactoredFrac{T}, b::FactoredFrac{T}; check::Bool = true) wh
     return a*inv(b)
 end
 
-function divexact(a::Union{Integer, Rational}, b::FactoredFrac{T}; check::Bool = true) where T
+function divexact(a::Integer, b::FactoredFrac{T}; check::Bool = true) where T
     return divexact(parent(b)(a), b, check = check)
 end
 
 function divexact(a::T, b::FactoredFrac{T}; check::Bool = true) where T <: RingElem
     return divexact(parent(b)(a), b, check = check)
 end
+
+#=
+function divexact(a::FactoredFrac{T}, b::Rational; check::Bool = true) where T <: RingElem
+   return divexact(a, parent(a)(b), check = check)
+end
+
+function divexact(a::Rational, b::FactoredFrac{T}; check::Bool = true) where T <: RingElem
+   return divexact(parent(b)(a), b, check = check)
+end
+=#
 
 ###############################################################################
 #
