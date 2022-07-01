@@ -783,6 +783,8 @@ end
 
       S, varlist = PolynomialRing(R, var_names, ordering = ord)
 
+      @test divrem(varlist[1], elem_type(S)[]) == (elem_type(S)[], varlist[1])
+
       for iter = 1:10
          f = S(0)
          while iszero(f)
