@@ -827,21 +827,31 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
 mutable struct AbsMSeriesRing{T <: RingElement, S} <:
                                                  AbstractAlgebra.MSeriesRing{T}
    poly_ring::AbstractAlgebra.MPolyRing{T}
-   prec_max::Vector{Int}
-   sym::Vector{Symbol}
+   prec_max::Vector{Int} # used for weights in weighted mode
+   sym::Vector{Symbol} # -1 if not weighted
+   weighted_prec::Int
 
    function AbsMSeriesRing{T, S}(poly_ring::AbstractAlgebra.MPolyRing{T},
             prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where
                           {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
       U = elem_type(poly_ring)
-      return get_cached!(AbsMSeriesID, (poly_ring, prec, s), cached) do
-         new{T, U}(poly_ring, prec, s)
+      return get_cached!(AbsMSeriesID, (poly_ring, prec, s, -1), cached) do
+         new{T, U}(poly_ring, prec, s, -1)
+      end::AbsMSeriesRing{T, S}
+   end
+
+   function AbsMSeriesRing{T, S}(poly_ring::AbstractAlgebra.MPolyRing{T},
+      weights::Vector{Int}, prec::Int, s::Vector{Symbol}, cached::Bool = true) where
+                    {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
+      U = elem_type(poly_ring)
+      return get_cached!(AbsMSeriesID, (poly_ring, weights, s, prec), cached) do
+         new{T, U}(poly_ring, weights, s, prec)
       end::AbsMSeriesRing{T, S}
    end
 end
-
+ 
 const AbsMSeriesID = CacheDictType{Tuple{Ring,
-                                          Vector{Int}, Vector{Symbol}}, Ring}()
+                                       Vector{Int}, Vector{Symbol}, Int}, Ring}()
 
 mutable struct AbsMSeries{T <: RingElement, S} <:
                                               AbstractAlgebra.AbsMSeriesElem{T}

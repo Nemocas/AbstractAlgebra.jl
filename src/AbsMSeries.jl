@@ -66,13 +66,19 @@ end
 
 function expressify(a::AbsMSeriesElem,
                                      x = symbols(parent(a)); context = nothing)
+   R = parent(a)
    apoly = poly(a)
 
    poly_sum = Expr(:call, :+)
    n = nvars(parent(apoly))
 
    iter = zip(coefficients(apoly), exponent_vectors(apoly))
-   cv = reverse!(collect(iter))
+   citer = collect(iter)
+   if R.weighted_prec != -1
+      cv = sort!(citer; by=(tup->Base.sum(weights(R) .* tup[2])))
+   else
+      cv = reverse!(citer)
+   end
 
    for (c, v) in cv
       prod = Expr(:call, :*)
@@ -93,8 +99,13 @@ function expressify(a::AbsMSeriesElem,
 
    push!(sum.args, poly_sum)
 
-   for i in nvars(parent(a)):-1:1
-      push!(sum.args, Expr(:call, :O, Expr(:call, :^, x[i], a.prec[i])))
+   wp = parent(a).weighted_prec
+   if wp == -1
+      for i in nvars(parent(a)):-1:1
+         push!(sum.args, Expr(:call, :O, Expr(:call, :^, x[i], a.prec[i])))
+      end
+   else
+      push!(sum.args, Expr(:call, :O, :($wp)))
    end
 
    return sum
@@ -132,14 +143,31 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{
    f = S()
    g = gens(S)
    R = base_ring(S)
-   prec = max_precision(S)
-   for i = 1:rand(rng, term_range)
-      term = S(1)
-      for j = 1:length(g)
-         term *= g[j]^rand(rng, 0:prec[j])
+   if S.weighted_prec == -1
+      prec = max_precision(S)
+      for i = 1:rand(rng, term_range)
+         term = S(1)
+         for j = 1:length(g)
+            term *= g[j]^rand(rng, 0:prec[j])
+         end
+         term *= rand(rng, v)
+         f += term
       end
-      term *= rand(rng, v)
-      f += term
+   else
+      wt = weights(S)
+      for i = 1:rand(rng, term_range)
+         total = rand(0:S.weighted_prec)
+         vv = Int[rand(0:total) for i = 1:length(g) - 1]
+         vv = vcat(0, sort!(vv), total)
+         w = Int[vv[i + 1] - vv[i] for i = 1:length(vv) - 1]
+         ex = [Int(round(w[i]/wt[i])) for i in 1:length(w)]
+         term = S(1)
+         for j = 1:length(g)
+            term *= g[j]^ex[j]
+         end
+         term *= rand(rng, v)
+         f += term
+      end
    end
    return f
 end
@@ -179,6 +207,19 @@ function PowerSeriesRing(R::Ring, prec::Vector{Int},
                                                T <: Union{Char, AbstractString}
    sym = [Symbol(v) for v in s]
    return Generic.PowerSeriesRing(R, prec, sym; cached=cached, model=model)
+end
+
+function PowerSeriesRing(R::Ring, weights::Vector{Int}, prec::Int,
+                  s::Vector{T}; cached=true, model=:capped_absolute) where
+                                                                    T <: Symbol
+   return Generic.PowerSeriesRing(R, weights, prec, s; cached=cached, model=model)
+end
+
+function PowerSeriesRing(R::Ring, weights::Vector{Int}, prec::Int,
+   s::Vector{T}; cached=true, model=:capped_absolute) where
+                                               T <: Union{Char, AbstractString}
+   sym = [Symbol(v) for v in s]
+   return Generic.PowerSeriesRing(R, weights, prec, sym; cached=cached, model=model)
 end
 
 function PowerSeriesRing(R::Ring, prec::Int,
