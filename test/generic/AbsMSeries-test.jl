@@ -505,7 +505,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = PowerSeriesRing(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
 
       for iter = 1:100
          c = rand(ZZ, -10:10)
@@ -526,13 +526,25 @@ end
       prec = [rand(1:8) for i in 1:nvars]
       R, gens = PowerSeriesRing(QQ, prec, ["x$(i)" for i in 1:nvars])
 
-      for iter = 1:30
+      for iter = 1:20*nvars
          f = rand(R, 0:8, -10:10)
-         while !is_unit(f)
-            f = rand(R, 0:8, -10:10)
+         if is_unit(f)
+            @test isequal(f*inv(f), one(R))
          end
+      end
+   end
 
-         @test isequal(f*inv(f), one(R))
+   # weighted
+
+   for nvars in 1:4
+      weights = [rand(1:4) for i in 1:nvars]
+      prec = rand(0:20)
+      R, gens = PowerSeriesRing(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
+      for iter = 1:20*nvars
+         f = rand(R, 0:8, -10:10)
+         if is_unit(f)
+            @test isequal(f*inv(f), one(R))
+         end
       end
    end
 end
@@ -542,14 +554,28 @@ end
       prec = [rand(1:8) for i in 1:nvars]
       R, gens = PowerSeriesRing(QQ, prec, ["x$(i)" for i in 1:nvars])
 
-      for iter = 1:30
+      for iter = 1:20*nvars
          f = rand(R, 0:8, -10:10)
          g = rand(R, 0:8, -10:10)
-         while !is_unit(g)
-            g = rand(R, 0:8, -10:10)
+         if is_unit(g)
+            @test isequal(divexact(f, g)*g, f)
          end
+      end
+   end
 
-         @test isequal(divexact(f, g)*g, f)
+   # weighted
+
+   for nvars in 1:4
+      weights = [rand(1:4) for i in 1:nvars]
+      prec = rand(0:20)
+      R, gens = PowerSeriesRing(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
+
+      for iter = 1:20*nvars
+         f = rand(R, 0:8, -10:10)
+         g = rand(R, 0:8, -10:10)
+         if is_unit(g)
+            @test isequal(divexact(f, g)*g, f)
+         end
       end
    end
 end

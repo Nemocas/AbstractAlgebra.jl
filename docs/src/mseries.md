@@ -215,8 +215,6 @@ julia> one(R)
 1 + O(10)
 ```
 
-Note that division is not available for weighted series.
-
 ## Power series functionality provided by AbstractAlgebra.jl
 
 The functionality listed below is automatically provided by AbstractAlgebra.jl
@@ -290,25 +288,14 @@ exponent_vectors(::Generic.AbsMSeries)
 
 ```@docs
 truncate(::Generic.AbsMSeries, ::Vector{Int})
+truncate(::Generic.AbsMSeries, ::Int)
 ```
-
-Truncation is not available for weighted series.
-
-### Inversion
-
-```@docs
-Base.inv(::Generic.AbsMSeries)
-```
-
-Inversion is not available for weighted series.
 
 ### Exact division
 
 ```@docs
 divexact(::Generic.AbsMSeries{T}, ::Generic.AbsMSeries{T}) where T <: RingElem
 ```
-
-Division is not available for weighted series.
 
 ### Evaluation
 
