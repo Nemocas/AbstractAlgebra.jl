@@ -234,10 +234,14 @@ end
          f = rand(R, 0:10, -10:10)
 
          prec2 = [rand(0:10) for i in 1:nvars]
-
          g = truncate(f, prec2)
-
+         @test g == f
          @test precision(g) == min.(prec, prec2)
+
+         prec3 = rand(0:10)
+         g = truncate(f, prec3)
+         @test g == f
+         @test precision(g) == [min(x, prec3) for x in prec]
       end
    end
 end
