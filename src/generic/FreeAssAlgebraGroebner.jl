@@ -179,9 +179,9 @@ function interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
     counter = 0
     while length(g) > 1 && length(g) >= i
         counter += 1
-        if counter % 5000 == 0
+        if counter % 500 == 0
             println(length(g))
-            println(i)
+#            println(i)
         end
         aut = AhoCorasickAutomaton([g_j.exps[1] for g_j in g[1:end .!= i]])
         r = normal_form(g[i], g[1:end .!= i], aut)
@@ -395,25 +395,31 @@ end
 # check whether there exists a w^'' such that
 # w1 LM(g1) w2 = w1 LM(g1) w^'' LM(g2) u2
 function has_overlap(g1, g2, w1, w2, u1, u2)
-   lw1 = _leading_word(g1)
+#   lw1 = _leading_word(g1)
    lw2 = _leading_word(g2)
-   concatenated_word = vcat(w1, lw1, w2)
-   for i in 1:length(w1)
-      c = popfirst!(concatenated_word)
-      @assert c == w1[i]
-   end
-   for i in 1:length(lw1)
-      c = popfirst!(concatenated_word)
-      @assert c == lw1[i]
-   end
-   for j in 0:length(u2)-1
-      c = pop!(concatenated_word)
-      @assert c = u2[length(u2)-j]
-   end
-   if length(concatenated_word) < length(lw2)
-      return false
-   end
-   return is_subword_right(lw2, concatenated_word) # TODO maybe just comparing lengths should be sufficient
+   return length(w2) < length(lw2) + length(u2)
+#
+#   concatenated_word = vcat(w1, lw1, w2)
+#   for i in 1:length(w1)
+#      c = popfirst!(concatenated_word)
+#      @assert c == w1[i]
+#   end
+#   for i in 1:length(lw1)
+#      c = popfirst!(concatenated_word)
+#      @assert c == lw1[i]
+#   end
+#   for j in 0:length(u2)-1
+#      c = pop!(concatenated_word)
+#      @assert c = u2[length(u2)-j]
+#   end
+#   if length(concatenated_word) < length(lw2)
+#      return false
+#   end
+#   return is_subword_right(lw2, concatenated_word) # TODO maybe just comparing lengths should be sufficient
+end
+
+function has_overlap(obs::ObstructionTriple{T}) where T
+    return has_overlap(obs.first_poly, obs.second_poly, obs.pre_and_suffixes[1], obs.pre_and_suffixes[2], obs.pre_and_suffixes[3], obs.pre_and_suffixes[4])
 end
 
 function is_redundant(# TODO do we need g in the signature?
@@ -473,22 +479,105 @@ function is_redundant(# TODO do we need g in the signature?
    return false
 end
 
+"""
+check, whether obs1 is a proper multiple of obs2, i.e. they belong to the same polynomials and are of the form
+obs1 = [w w_i, w_i' w'; w w_j, w_j' w'] and obs2 = [w_i, w_i'; w_j, w_j']
+"""
+function is_proper_multiple(obs1::ObstructionTriple{T}, obs2::ObstructionTriple{T}) where T
+    if obs1.first_poly != obs2.first_poly || obs1.second_poly != obs2.second_poly #TODO compare indices instead?
+        return false
+    end
+    if is_subword_right(obs2.pre_and_suffixes[1], obs1.pre_and_suffixes[1]) && is_subword_left(obs2.pre_and_suffixes[2], obs1.pre_and_suffixes[2])
+        w = copy(obs1.pre_and_suffixes[1])
+        w2 = copy(obs1.pre_and_suffixes[2])
+        for _ in 1:length(obs2.pre_and_suffixes[1])
+            pop!(w)
+        end
+        for _ in 1:length(obs2.pre_and_suffixes[2])
+            popfirst!(w2)
+        end
+        if length(w) + length(w2) == 0
+            return false
+        end
+        @assert obs1.pre_and_suffixes[1] == vcat(w, obs2.pre_and_suffixes[1])
+        @assert obs1.pre_and_suffixes[2] == vcat(obs2.pre_and_suffixes[2], w2)
+        return obs1.pre_and_suffixes[3] == vcat(w, obs2.pre_and_suffixes[3]) && obs1.pre_and_suffixes[4] == vcat(obs2.pre_and_suffixes[4], w2)
+    end
+end
+
+"""
+check, whether obs is a proper multiple of any of the obstructions in the priority queue
+"""
+function is_proper_multiple(obs::ObstructionTriple{T}, obstructions::PriorityQueue{Obstruction{T}, FreeAssAlgElem{T}}) where T
+    for obspair in obstructions
+        obs2 = obspair[1]
+        if is_proper_multiple(obs, obs2)
+            return true
+        end
+    end
+    return false
+end
+
+function is_redundant(# TODO do we need g in the signature?
+        obs::ObstructionTriple{T},
+        new_obstructions::PriorityQueue{Obstruction{T}, FreeAssAlgElem{T}},
+        newest_element::FreeAssAlgElem{T},
+        newest_index::Int
+    ) where T
+    println("is_redundant in use")
+    w1 = []
+    w2 = []
+    for i in 1:length(obs.second_poly.exps[1])
+        word_to_check = vcat(obs.pre_and_suffixes[3], obs.second_poly.exps[1], obs.pre_and_suffixes[4])
+        if check_center_overlap(newest_element.exps[1], word_to_check, i)
+            w1 = word_to_check[1:i-1]
+            w2 = word_to_check[i+length(newest_element.exps[1]):end]
+            break
+        end
+    end
+    if length(w1) + length(w2) == 0
+        return false
+    end
+    #TODO check equality
+    # maybe w w' = [] yields false?
+    obs1 = ObstructionTriple{T}(obs.first_poly, newest_element, (obs.pre_and_suffixes[1], obs.pre_and_suffixes[2], w1, w2), obs.first_index, newest_index)
+    obs2 = ObstructionTriple{T}(obs.second_poly, newest_element, (obs.pre_and_suffixes[3], obs.pre_and_suffixes[4], w1, w2), obs.second_index, newest_index)
+    o1_bool = !has_overlap(obs1) || is_proper_multiple(obs1, new_obstructions) # TODO maybe only call is_proper_multiple if both obs have no overlap for performance?
+    o2_bool = !has_overlap(obs2) || is_proper_multiple(obs2, new_obstructions)
+    return o1_bool && o2_bool
+end
+
+
 ## s is the index of the newly added layer of obstructions in B
 function remove_redundancies!(
         all_obstructions::PriorityQueue{Obstruction{T}, FreeAssAlgElem{T}},
-        newest_index::Int
+        newest_index::Int,
+        newest_element::FreeAssAlgElem{T}
 ) where T
    del_counter = 0
    new_obstructions = PriorityQueue{Obstruction{T}, FreeAssAlgElem{T}}()
+   old_obstructions = PriorityQueue{Obstruction{T}, FreeAssAlgElem{T}}()
    for obstr_pair in all_obstructions
        if obstr_pair[1].second_index == newest_index
            new_obstructions[obstr_pair[1]] = obstr_pair[2]
+       else
+           old_obstructions[obstr_pair[1]] = obstr_pair[2]
        end
    end
    for obstr_pair in new_obstructions
        if is_redundant(obstr_pair[1], new_obstructions)
            del_counter += 1
            delete!(new_obstructions, obstr_pair[1])
+           delete!(all_obstructions, obstr_pair[1])
+       end
+   end
+   if length(new_obstructions) == 0
+       return nothing
+   end
+       
+   for obstr_pair in old_obstructions
+       if is_redundant(obstr_pair[1], new_obstructions, newest_element, newest_index)
+           del_counter += 1
            delete!(all_obstructions, obstr_pair[1])
        end
    end
@@ -527,7 +616,7 @@ function get_obstructions(g::Vector{FreeAssAlgElem{T}}) where T
     # TODO maybe here some redundancies can be removed too, check Kreuzer Xiu
     if groebner_debug_level > 0
         obstr_count = length(result)
-        println("$obstr_count many obstructions")
+        #println("$obstr_count many obstructions")
     end
     return result
 end
@@ -549,7 +638,7 @@ function add_obstructions!(
             enqueue!(obstruction_queue, triple, common_multiple_leading_term(triple))
         end
     end
-    remove_redundancies!(obstruction_queue, s)
+    #remove_redundancies!(obstruction_queue, s, g[s])
     #remove_redundancies!(new_B, s, g) TODO match remove_redundancies to new types
 end
 
@@ -585,8 +674,8 @@ function groebner_basis_buchberger(
       if groebner_debug_level > 0
           checked_obstructions += 1
           if checked_obstructions % 5000 == 0
-            println("checked $checked_obstructions obstructions")
-            println(length(obstruction_queue))
+            #println("checked $checked_obstructions obstructions")
+            #println(length(obstruction_queue))
          end
       end
       if iszero(Sp)
