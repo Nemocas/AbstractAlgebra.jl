@@ -319,21 +319,33 @@ function truncate(a::AbsMSeries, prec::Vector{Int})
     R.weighted_prec != -1 && error("Operation not permitted")
     length(prec) != nvars(R) &&
              error("Array length not equal to number of variables in truncate")
-    trunc_needed = false
     p = precision(a)
-    for i = 1:nvars(R)
-       if prec[i] < p[i]
-          trunc_needed = true
-          break
-       end
-    end
-    if !trunc_needed
-       return a
-    end
     prec = min.(prec, p)
-    q = truncate_poly(poly(a), prec)
-    return R(q, prec)
+    if prec == p
+        # no truncation needed
+        return a
+    else
+        return R(truncate_poly(poly(a), prec), prec)
+    end
 end
+
+@doc Markdown.doc"""
+    truncate(a::AbstractAlgebra.AbsMSeries, prec::Int)
+
+Return $a$ truncated to precision `prec`. This either truncates by weight in
+the weighted cases or truncates each variable to precision `prec` in the
+unweighted case.
+"""
+function truncate(a::AbsMSeries, prec::Int)
+    R = parent(a)
+    if R.weighted_prec == -1
+        return truncate(a, [prec for i in 1:nvars(R)])
+    else
+        return R(truncate_poly(poly(a), weights(R), prec),
+                 [0 for i in 1:nvars(R)]) #??
+    end
+end
+
 
 ###############################################################################
 #
@@ -487,38 +499,45 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    Base.inv(x::AbsMSeries)
 
-Return the inverse of the series $x$. An exception is raised if the series is
-not a unit.
-"""
-function Base.inv(x::AbsMSeries)
-    !is_unit(x) && error("Not a unit")
-    R = parent(x)
-    R.weighted_prec != -1 && error("Operation not permitted in weighted ring")
-    !isunit(x) && error("Not a unit")
-    prec = [1 for n in 1:nvars(R)]
-    cinv = inv(coeff(x, 1))
-    xinv = R(poly_ring(R)(cinv), prec)
-    two = R(poly_ring(R)(2), prec)
-    # lift each variable in turn
-    for var = nvars(R):-1:1
-        nvar = precision(x)[var]
-        var_prec = [nvar]
-        while nvar != 1
-            nvar = div(nvar + 1, 2)
-            push!(var_prec, nvar)
+function Base.inv(a::AbsMSeries)
+    R = parent(a)
+    ainv = R(inv(constant_coefficient(poly(a))))
+    if R.weighted_prec == -1
+        # use the precision stored in the polynomial
+        # arithemetic uses precision stored in polynomials
+        max_n = sum(a.prec)
+        cur_n = 1
+        # 1-a*ainv = er where each monomial in er has total degree >= cur_n
+        # Furthermore, we only care about the terms in er where the exponent
+        # on variable i is restricted to the range [0, a.prec[i]).
+        # Therefore, with max_n = sum(a.prec), we are done if cur_n >= max_n
+        while true
+            cur_n *= 2
+            trunc = [min(a.prec[i], cur_n) for i in 1:nvars(R)]
+            set_precision!(ainv, trunc)
+            e = 2 - truncate(a, trunc)*ainv
+            (trunc == a.prec && isone(e)) && break
+            ainv = e*ainv
+            cur_n >= max_n && break
         end
-        # list var quadratically
-        for i = length(var_prec) - 1:-1:1
-            prec[var] = var_prec[i]
-            two = set_precision!(two, prec)
-            xinv = set_precision!(xinv, prec)
-            xinv = (two - x*xinv)*xinv
+    else
+        # use the precision stored in the parent
+        # arithmetic uses precision stored in parent
+        max_n = R.weighted_prec
+        cur_n = minimum(R.prec_max)
+        @assert cur_n > 0
+        # 1-a*ainv = er where each monomial in er has weight >= cur_n
+        while true
+            cur_n *= 2
+            trunc = min(max_n, cur_n)
+            e = 2 - truncate(a, trunc)*ainv
+            (trunc == max_n && isone(e)) && break
+            ainv = e*ainv
+            cur_n >= max_n && break
         end
     end
-    return xinv
+    return ainv
 end
 
 ###############################################################################
