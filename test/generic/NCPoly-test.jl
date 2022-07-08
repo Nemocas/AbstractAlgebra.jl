@@ -204,10 +204,12 @@ end
       @test R(d1) == d1
       @test d1 == R(d1)
 
-      @test R(c1) != c1 + f
-      @test c1 != R(c1) + f
-      @test R(d1) != d1 + f
-      @test d1 != R(d1) + f
+      if !iszero(f)
+        @test R(c1) != c1 + f
+        @test c1 != R(c1) + f
+        @test R(d1) != d1 + f
+        @test d1 != R(d1) + f
+      end
    end
 
    # Generic tower
