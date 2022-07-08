@@ -60,10 +60,17 @@ function obj_to_latex_string(@nospecialize(obj); context = nothing)
 end
 
 function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
+   if isdefined(Main, :IJulia) && Main.IJulia.inited
+      error("Dummy error for jupyter")
+   end
    show_via_expressify(io, mi, x)
 end
 
 function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
+   if isdefined(Main, :IJulia) && Main.IJulia.inited &&
+         !AbstractAlgebra.get_html_as_latex()
+      error("Dummy error for jupyter")
+   end
    if AbstractAlgebra.get_html_as_latex()
       io = IOContext(io, :size_limit => 1000)
    end
@@ -167,6 +174,27 @@ end
 # Rationale: when neither Base.show nor AA.expressify is defined for T, then,
 # since expressify calls Base.show for backward compatibility, a definition of
 # Base.show in terms of expressify would give a stack overflow.
+#
+# We have to be careful for jupyter. When jupyter prints an object x through
+# IJulia.jl, it collects sprint(show, m, x) for all m in
+# [ "text/plain", "text/html", "text/latex" ... ]
+# and then picks one according to some precedence. If there is a string for
+# either "text/html" or "text/latex", it will *not* use "text/plain". But
+# "text/plain" is the only thing which will trigger rendering using a monospace
+# font (hence it will look like "code"). This explains why all julia base
+# objects are printed using monospace: none of these objects has print methods
+# for text/html or text/latex.
+#
+# The challenge for us is that we always want to define text/latex and
+# text/html methods for sprint and friends. This has the disadvantage that if
+# get_html_as_latex()== false, then our objects will print their ordinary
+# string presentation, but since it is coming from text/html, it will be
+# rendered using the "normal" font.
+#
+# Thus, inside IJulia we will throw an error for text/latex (always) and
+# text/html (unless get_html_as_latex()).
+#
+# Super easy!
 
 macro enable_all_show_via_expressify(T)
   return quote
@@ -179,11 +207,18 @@ macro enable_all_show_via_expressify(T)
     end
 
     function Base.show(io::IO, mi::MIME"text/latex", x::$(esc(T)))
-       AbstractAlgebra.show_via_expressify(io, mi, x)
+       if isdefined(Main, :IJulia) && Main.IJulia.inited
+          error("Dummy error for jupyter")
+       end
+       return AbstractAlgebra.show_via_expressify(io, mi, x)
     end
 
     function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))
-       AbstractAlgebra.show_via_expressify(io, mi, x)
+       if isdefined(Main, :IJulia) && Main.IJulia.inited &&
+             !AbstractAlgebra.get_html_as_latex()
+          error("Dummy error for jupyter")
+       end
+       return AbstractAlgebra.show_via_expressify(io, mi, x)
     end
   end
 end
