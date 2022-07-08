@@ -186,7 +186,7 @@ end
 # for text/html or text/latex.
 #
 # The challenge for us is that we always want to define text/latex and
-# text/html methods. This has the disadvantage that if
+# text/html methods for sprint and friends. This has the disadvantage that if
 # get_html_as_latex()== false, then our objects will print their ordinary
 # string presentation, but since it is coming from text/html, it will be
 # rendered using the "normal" font.
