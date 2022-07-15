@@ -477,7 +477,7 @@ import .Generic: abs_series, abs_series_type,
                  matrix_repr, max_fields, mod,
                  monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!,
-                 MPolyBuildCtx, mullow_karatsuba,
+                 mpoly_type, MPolyBuildCtx, mullow_karatsuba,
                  ngens, norm, normal_form, normalise,
                  num_coeff, one,
                  order, ordering, parity, partitionseq, Perm, perm,
@@ -534,7 +534,7 @@ export abs_series, abs_series_type,
                  mat, matrix_repr, max_fields, mod,
                  monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
-                 MPolyBuildCtx,
+                 mpoly_type, MPolyBuildCtx,
                  mul_ks, mul_red!, mullow_karatsuba, mulmod,
                  newton_to_monomial!, ngens,
                  normal_form, normalise, nullspace, num_coeff,
@@ -591,15 +591,15 @@ function NumberField(a::Generic.Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cac
    return Generic.NumberField(a, s, t; cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Symbol; cached::Bool=true) where T <: FieldElement
+function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    return Generic.FunctionField(p, s; cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
+function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T}}, s::Char; cached::Bool=true) where T <: FieldElement
+function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Char; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 

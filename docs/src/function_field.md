@@ -8,17 +8,18 @@ end
 # Rational function fields
 
 AbstractAlgebra.jl provides a module, implemented in
-`src/generic/RationalFunctionField.jl` for rational function fields $k(x)$ over
-a field $k$.
+`src/generic/RationalFunctionField.jl` for rational function fields $k(x)$ or
+`k[x_1, x_2, \ldots, x_n]` over a field $k$.
 
 ## Generic rational function field type
 
-Rational functions in $k(x)$ have type `Generic.Rat{T}` where `T` is the type of
-elements of the coefficient field $k$. See the file
+Rational functions have type `Generic.Rat{T, U}` where `T` is the type of
+elements of the coefficient field $k$ and `U` is the type of polynomials
+(either univariate or multivariate) over that field. See the file
 `src/generic/GenericTypes.jl` for details.
 
 Parent objects corresponding to the rational function field $k$ have type
-`Generic.RationalFunctionField{T}`.
+`Generic.RationalFunctionField{T, U}`.
 
 ## Abstract types
 
@@ -29,16 +30,17 @@ and the rational function field types belong to the abstract type
 ## Rational function field constructors
 
 In order to construct rational functions in AbstractAlgebra.jl, one can first
-construct the function field itself. This is accomplished with the following
-constructor.
+construct the function field itself. This is accomplished with one of the
+following constructors.
 
 ```julia
 RationalFunctionField(k::Field, s::AbstractString; cached::Bool = true)
+RationalFunctionField(k::Field, s::Vector{String}; cached::Bool = true)
 ```
 
 Given a coefficient field `k` return a tuple `(S, x)` consisting of the parent
-object of the rational function field over $k$ and the generator `x`. By default
-the parent object `S` will depend only on `R` and `s` and will be cached.
+object of the rational function field over $k$ and the generator(s) `x`. By
+default the parent object `S` will depend only on `R` and `s` and will be cached.
 Setting the optional argument `cached` to `false` will prevent the parent object
 `S` from being cached.
 
@@ -65,6 +67,12 @@ x + 1
 
 julia> m = S(numerator(x + 1, false), numerator(x + 2, false))
 (x + 1)//(x + 2)
+
+julia> R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+(Rational function field over Rationals, AbstractAlgebra.Generic.Rat{Rational{BigInt}, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[x, y])
+
+julia> (x + y)//y^2
+(x + y)//y^2
 ```
 
 ## Basic rational function field functionality
@@ -132,7 +140,7 @@ The following functionality is provided for rational function fields.
 ### Greatest common divisor
 
 ```@docs
-gcd(::Generic.Rat{T}, ::Generic.Rat{T}) where T <: FieldElement
+gcd(::Generic.Rat{T, U}, ::Generic.Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
 ```
 
 **Examples**
@@ -155,11 +163,11 @@ julia> h = gcd(f, g)
 ### Square root
 
 ```@docs
-is_square(::Generic.Rat{T}) where T <: FieldElem
+is_square(::Generic.Rat{T, U}) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
 ```
 
 ```@docs
-Base.sqrt(::Generic.Rat{T}) where T <: FieldElem
+Base.sqrt(::Generic.Rat{T, U}) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
 ```
 
 **Examples**
@@ -207,7 +215,7 @@ constructs the rational function field they are an extension of, then supplies
 a polynomial over this field to the following constructor:
 
 ```julia
-FunctionField(p::Poly{Rat{T}}, s::AbstractString; cached::Bool=true) where T <: FieldElement
+FunctionField(p::Poly{Rat{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: PolyElem{T}}
 ```
 
 Given an irreducible polynomial `p` over a rational function field return a
