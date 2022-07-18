@@ -3,7 +3,7 @@
 #   FreeAssAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groebner basis
 #
 ###############################################################################
-
+#
 export groebner_basis, interreduce!, normal_form, normal_form_weak
 
 #using DataStructures
