@@ -54,10 +54,7 @@ function gb_divides_leftmost_aho_corasick(a::Word, aut::AhoCorasickAutomaton)
     if isnothing(match)
         return (false, [], [], -1)
     end
-#    println("a = $a")
-#    println("match = $match")
-return (true, a[1:match.last_position - length(match.keyword)], a[match.last_position + 1:end], match.keyword_index)
-#return (true, a[1:match[1] - length(match[2][2])], a[match[1] + 1:end], match[2][1])
+    return (true, a[1:match.last_position - length(match.keyword)], a[match.last_position + 1:end], match.keyword_index)
 end
 
 # implementation of the normal form function using aho corasick to check for all groebner basis elements in parallel
@@ -147,7 +144,6 @@ function interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
         counter += 1
         if counter % 500 == 0
             println(length(g))
-#            println(i)
         end
         aut = AhoCorasickAutomaton([g_j.exps[1] for g_j in g[1:end .!= i]])
         r = normal_form(g[i], g[1:end .!= i], aut)
