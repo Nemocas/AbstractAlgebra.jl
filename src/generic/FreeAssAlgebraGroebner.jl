@@ -246,36 +246,24 @@ function is_subobstruction(obs1::NTuple{4, Vector{Int}}, obs2::NTuple{4, Vector{
    end
 end
 
-# check whether there exists a w^'' such that
+# check whether there exists a (possibly empty) w^'' such that
 # w1 LM(g1) w2 = w1 LM(g1) w^'' LM(g2) u2
+# and if that is the case, i.e. there is no overlap, returns false
+# assumes that (w1, w2; u1, u2) are an obstruction of g1 and g2
+# i.e. w1 LM(g1) w2 = u1 LM(g2) u2
 function has_overlap(g1, g2, w1, w2, u1, u2)
-   lw1 = _leading_word(g1)
-   lw2 = _leading_word(g2)
-   concatenated_word = vcat(w1, lw1, w2)
-   for i in 1:length(w1)
-      c = popfirst!(concatenated_word)
-      @assert c == w1[i]
-   end
-   for i in 1:length(lw1)
-      c = popfirst!(concatenated_word)
-      @assert c == lw1[i]
-   end
-   for j in 0:length(u2)-1
-      c = pop!(concatenated_word)
-      @assert c = u2[length(u2)-j]
-   end
-   if length(concatenated_word) < length(lw2)
-      return false
-   end
-   return is_subword_right(lw2, concatenated_word) # TODO maybe just comparing lengths should be sufficient
+    @assert vcat(w1, _leading_word(g1), w2) == vcat(u1, _leading_word(g2), u2)
+    lw2 = _leading_word(g2)
+    return length(w2) < length(lw2) + length(u2)
 end
 
 function is_redundant(
    obs::NTuple{4, Vector{Int}},
    obs_index::Int,
    s::Int,
-   B::Matrix{Vector{NTuple{4, Vector{Int}}}}
-)
+   B::Matrix{Vector{NTuple{4, Vector{Int}}}},
+   g::Vector{FreeAssAlgElem{T}}
+) where T
    # cases 4b + 4c
    for j in 1:size(B)[1]
       for k in 1:length(B[j, s])
@@ -335,7 +323,7 @@ function remove_redundancies!(
    for i in 1:s
       k = 1
       while k <= length(B[i, s])
-         if is_redundant(B[i, s][k], i, s, B)
+         if is_redundant(B[i, s][k], i, s, B, g)
             deleteat!(B[i, s], k)
             del_counter += 1
          else
