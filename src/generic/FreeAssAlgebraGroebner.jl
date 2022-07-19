@@ -3,14 +3,11 @@
 #   FreeAssAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groebner basis
 #
 ###############################################################################
-#include("../AbstractTypes.jl")
-#include("FreeAssAlgebra.jl")
-#include("FreeAssAhoCorasick.jl")
 export groebner_basis, interreduce!, gb_divides_leftmost_aho_corasick, normal_form, get_obstructions, s_polynomial, add_obstructions!, remove_redundancies! #TODO remove unnecessary exports
 
 using DataStructures
 
-const groebner_debug_level = 1
+const groebner_debug_level = 0
 const Monomial = Vector{Int}
 
 abstract type Obstruction{T} end 
@@ -55,10 +52,7 @@ function gb_divides_leftmost_aho_corasick(a::Word, aut::AhoCorasickAutomaton)
     if isnothing(match)
         return (false, [], [], -1)
     end
-#    println("a = $a")
-#    println("match = $match")
 return (true, a[1:match.last_position - length(match.keyword)], a[match.last_position + 1:end], match.keyword_index)
-#return (true, a[1:match[1] - length(match[2][2])], a[match[1] + 1:end], match[2][1])
 end
 
 # implementation of the normal form function using aho corasick to check for all groebner basis elements in parallel
@@ -176,13 +170,7 @@ end
 
 function interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
     i = 1
-    counter = 0
     while length(g) > 1 && length(g) >= i
-        counter += 1
-        if counter % 500 == 0
-            println(length(g))
-#            println(i)
-        end
         aut = AhoCorasickAutomaton([g_j.exps[1] for g_j in g[1:end .!= i]])
         r = normal_form(g[i], g[1:end .!= i], aut)
         if iszero(r)
@@ -190,30 +178,12 @@ function interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
         elseif g[i] != r
             g[i] = r
             i = 1
-            #i += 1
         else
             i += 1
         end
     end
     return g
 end
-
-
-#function interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
-#   i = 1
-#   while length(g) > 1 && length(g) >= i
-#      r = normal_form(g[i], g[1:end .!= i])
-#      if iszero(r)
-#         deleteat!(g, i)
-#      elseif g[i] != r
-#         g[i] = r
-#         i = 1
-#      else
-#         i += 1
-#      end
-#   end
-#   return g
-#end
 
 ## checks whether there is an overlap between a and b at position i of b
 #  such that b[i:length(b)] = a[1:length(b)-i]
@@ -394,40 +364,24 @@ end
 
 # check whether there exists a w^'' such that
 # w1 LM(g1) w2 = w1 LM(g1) w^'' LM(g2) u2
-function has_overlap(g1, g2, w1, w2, u1, u2)
-#   lw1 = _leading_word(g1)
+# only returns the correct value, if all the arguments come from an obstruction
+function has_overlap(g2, w2, u2)
    lw2 = _leading_word(g2)
    return length(w2) < length(lw2) + length(u2)
-#
-#   concatenated_word = vcat(w1, lw1, w2)
-#   for i in 1:length(w1)
-#      c = popfirst!(concatenated_word)
-#      @assert c == w1[i]
-#   end
-#   for i in 1:length(lw1)
-#      c = popfirst!(concatenated_word)
-#      @assert c == lw1[i]
-#   end
-#   for j in 0:length(u2)-1
-#      c = pop!(concatenated_word)
-#      @assert c = u2[length(u2)-j]
-#   end
-#   if length(concatenated_word) < length(lw2)
-#      return false
-#   end
-#   return is_subword_right(lw2, concatenated_word) # TODO maybe just comparing lengths should be sufficient
+end
+
+function has_overlap(g1, g2, w1, w2, u1, u2)
+   lw2 = _leading_word(g2)
+   return length(w2) < length(lw2) + length(u2)
 end
 
 function has_overlap(obs::ObstructionTriple{T}) where T
-    return has_overlap(obs.first_poly, obs.second_poly, obs.pre_and_suffixes[1], obs.pre_and_suffixes[2], obs.pre_and_suffixes[3], obs.pre_and_suffixes[4])
+    return has_overlap(obs.second_poly, obs.pre_and_suffixes[2], obs.pre_and_suffixes[4])
 end
 
-function is_redundant(# TODO do we need g in the signature?
+function is_redundant(
         obs::ObstructionTriple{T},
         new_obstructions::PriorityQueue{Obstruction{T}, FreeAssAlgElem{T}}
-#   s::Int,
-#   B::Matrix{Vector{NTuple{4, Vector{Int}}}},
-#   g::Vector{FreeAssAlgElem{T}}
 ) where T
    # cases 4b + 4c
    for obstruction_pair in new_obstructions
@@ -447,35 +401,6 @@ function is_redundant(# TODO do we need g in the signature?
            end
        end
    end
-   #TODO maybe in a new function?
-#   # case 4d
-#   # size(B) should be (s, s)
-#   # we want to iterate over all B[i, obs_index] with i < s
-#   for i in 1:size(B)[1]-1
-#      for k in 1:length(B[i, obs_index])
-#         if is_subword_right(B[i, obs_index][k][3], obs[1]) && is_subword_left(B[i, obs_index][k][4], obs[2])
-#            if groebner_debug_level > 0
-#               show(obs)
-#               show(B[i, obs_index][k])
-#            end
-#            u1 = copy(obs[1])
-#            u2 = copy(obs[2])
-#            v1 = copy(B[i, obs_index][k][3])
-#            v2 = copy(B[i, obs_index][k][4])
-#            for i in 1:length(v1)
-#               pop!(u1)
-#            end
-#            for j in 1:length(v2)
-#               popfirst!(u2)
-#            end
-#            @assert word_cmp(vcat(u1, v1), obs[1]) == 0
-#            @assert word_cmp(vcat(v2, u2), obs[2]) == 0
-#            if !has_overlap(g[i], g[s], vcat(u1, B[i, obs_index][k][1]), vcat(B[i, obs_index][k][2], u2), obs[3], obs[4])
-#               return true
-#            end
-#         end
-#      end
-#   end
    return false
 end
 
@@ -518,13 +443,12 @@ function is_proper_multiple(obs::ObstructionTriple{T}, obstructions::PriorityQue
     return false
 end
 
-function is_redundant(# TODO do we need g in the signature?
+function is_redundant(
         obs::ObstructionTriple{T},
         new_obstructions::PriorityQueue{Obstruction{T}, FreeAssAlgElem{T}},
         newest_element::FreeAssAlgElem{T},
         newest_index::Int
     ) where T
-    println("is_redundant in use")
     w1 = []
     w2 = []
     for i in 1:length(obs.second_poly.exps[1])
@@ -538,8 +462,6 @@ function is_redundant(# TODO do we need g in the signature?
     if length(w1) + length(w2) == 0
         return false
     end
-    #TODO check equality
-    # maybe w w' = [] yields false?
     obs1 = ObstructionTriple{T}(obs.first_poly, newest_element, (obs.pre_and_suffixes[1], obs.pre_and_suffixes[2], w1, w2), obs.first_index, newest_index)
     obs2 = ObstructionTriple{T}(obs.second_poly, newest_element, (obs.pre_and_suffixes[3], obs.pre_and_suffixes[4], w1, w2), obs.second_index, newest_index)
     o1_bool = !has_overlap(obs1) || is_proper_multiple(obs1, new_obstructions) # TODO maybe only call is_proper_multiple if both obs have no overlap for performance?
@@ -581,18 +503,6 @@ function remove_redundancies!(
            delete!(all_obstructions, obstr_pair[1])
        end
    end
-
-#   for i in 1:s
-#      k = 1
-#      while k <= length(B[i, s])
-#         if is_redundant(B[i, s][k], i, s, B, g)
-#            deleteat!(B[i, s], k)
-#            del_counter += 1
-#         else
-#            k += 1
-#         end
-#      end
-#   end
    # TODO case 4e from Thm 4.1 in Kreuzer Xiu
    if del_counter > 0
        println("deleted obstructions: $del_counter")
@@ -616,7 +526,7 @@ function get_obstructions(g::Vector{FreeAssAlgElem{T}}) where T
     # TODO maybe here some redundancies can be removed too, check Kreuzer Xiu
     if groebner_debug_level > 0
         obstr_count = length(result)
-        #println("$obstr_count many obstructions")
+        println("$obstr_count many obstructions")
     end
     return result
 end
@@ -639,7 +549,6 @@ function add_obstructions!(
         end
     end
     #remove_redundancies!(obstruction_queue, s, g[s])
-    #remove_redundancies!(new_B, s, g) TODO match remove_redundancies to new types
 end
 
 
@@ -649,68 +558,35 @@ function groebner_basis_buchberger(
 ) where T <: FieldElement
 
    g = copy(g)
-   println(length(g))
-#   interreduce!(g)
-#   println("interreduced")
-#   println(length(g))
-
+#   interreduce!(g) # on some small examples, this increases running time, so it might not be optimal to use this here
    checked_obstructions = 0
    nonzero_reductions = 0
-   interreduce_counter = 0
    # compute the aho corasick automaton
    # to make normal form computation more efficient
    aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in g])
    # step 1
    obstruction_queue = get_obstructions(g) 
-
-    println(length(obstruction_queue))
-
    while !isempty(obstruction_queue)
-#       #println(length(obstruction_queue))
       obstruction = dequeue!(obstruction_queue)
       # step3 
       S = s_polynomial(obstruction)
       Sp = normal_form(S, g, aut) # or normal_form_weak
       if groebner_debug_level > 0
           checked_obstructions += 1
-          if checked_obstructions % 5000 == 0
-            #println("checked $checked_obstructions obstructions")
-            #println(length(obstruction_queue))
-         end
       end
       if iszero(Sp)
-          #println("is zero")
          continue
       end
-      #println(Sp)
       nonzero_reductions += 1
       # step4
       push!(g, Sp)
       insert_keyword!(aut, Sp.exps[1], length(g))
-      #aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in g])
-
-      interreduce_counter += 1
-#      if interreduce_counter > 2000
-#          println("starting interreduce")
-#          interreduce!(g)
-#          println("done interreducing")
-#          interreduce_counter = 0
-#          obstruction_queue = get_obstructions(g)
-#          continue
-#      end
-#      if groebner_debug_level > 0
-#         println("adding new obstructions! checked $checked_obstructions so far")
-#      end
+      if groebner_debug_level > 0
+         println("adding new obstructions! checked $checked_obstructions so far")
+      end
       if nonzero_reductions >= reduction_bound
               return g
       end
-      #debug
-      if nonzero_reductions > 2000
-         # println(length(obstruction_queue))
-         # println(length(g))
-         # println(nonzero_reductions)
-      end
-      #end debug
       add_obstructions!(obstruction_queue, g)
    end
    return g

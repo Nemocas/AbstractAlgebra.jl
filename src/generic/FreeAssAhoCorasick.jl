@@ -27,6 +27,11 @@ struct AhoCorasickMatch
     keyword::Word
 end
 
+Base.hash(m::AhoCorasickMatch) = hash(m.last_position, hash(m.keyword_index, hash(m.keyword)))
+function ==(m1::AhoCorasickMatch, m2::AhoCorasickMatch)
+    return m1.last_position == m2.last_position && m1.keyword_index == m2.keyword_index && m1.keyword == m2.keyword
+end
+
 function AhoCorasickAutomaton(keywords::Vector{Word})
     automaton = AhoCorasickAutomaton([], [], [])
     construct_goto!(automaton, keywords)
