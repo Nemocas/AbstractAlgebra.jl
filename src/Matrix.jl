@@ -1000,6 +1000,15 @@ end
 
 ==(x::NCRingElem, y::MatElem) = ==(promote(x, y)...)
 
+divexact(x::MatElem, y::NCRingElem; check::Bool = true) =
+    divexact(promote(x, y)...; check = check)
+
+divexact_left(x::MatElem, y::NCRingElem; check::Bool = true) =
+    divexact_left(promote(x, y)...; check = check)
+
+divexact_right(x::MatElem, y::NCRingElem; check::Bool = true) =
+    divexact_right(promote(x, y)...; check = check)
+
 ###############################################################################
 #
 #   Powering
