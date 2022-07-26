@@ -1468,6 +1468,15 @@ end
    @test divexact(12*A, Rational{BigInt}(12)) == A
    @test divexact((1 + t)*A, 1 + t) == A
 
+   Qx, x = QQ["x"]
+   Qxy, y = PolynomialRing(Qx, "y")
+   @test divexact(Qxy[2 0; 0 2], Qx(2)) == identity_matrix(Qxy, 2)
+   @test divexact(Qxy[2 0; 0 2], Qx(2), check = false) == identity_matrix(Qxy, 2)
+   @test divexact_left(Qxy[2 0; 0 2], Qx(2)) == identity_matrix(Qxy, 2)
+   @test divexact_left(Qxy[2 0; 0 2], Qx(2), check = false) == identity_matrix(Qxy, 2)
+   @test divexact_right(Qxy[2 0; 0 2], Qx(2)) == identity_matrix(Qxy, 2)
+   @test divexact_right(Qxy[2 0; 0 2], Qx(2), check = false) == identity_matrix(Qxy, 2)
+
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    U, x = PolynomialRing(R, "x")
