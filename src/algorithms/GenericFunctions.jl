@@ -301,18 +301,85 @@ function gcdinv(a::T, b::T) where T <: RingElem
    return (g, s)
 end
 
+function _crt_with_lcm_stub(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+   diff = r2 - r1
+   if iszero(m1)
+      check && !is_divisible_by(diff, m2) && error("no crt solution")
+      return (r1, m1)
+   elseif iszero(m2)
+      check && !is_divisible_by(diff, m1) && error("no crt solution")
+      return (r2, m2)
+   end
+   g, s = gcdinv(m1, m2)
+   if isone(g)
+      return (r1 + mulmod(diff, s, m2)*m1, m1*m2)
+   elseif !check
+      m1og = divexact(m1, g; check=false)
+      return (r1 + mulmod(diff, s, m2)*m1og, m1og*m2)
+   else
+      m2og = divexact(m2, g; check=false)
+      diff = divexact(diff, g; check=check)
+      return (r1 + mulmod(diff, s, m2og)*m1, m1*m2og)
+   end
+end
 
-# TODO: Move from CRT from Hecke to AbstractAlgebra?
-# Currently no implementation, only example on how the arbitrary inputs `crt`
-# should look like.
-# @doc Markdown.doc"""
-#     crt(r::AbstractVector{T}, m::AbstractVector{T}) where T
-#     crt(r::T, m::T...) where T
+function _crt_stub(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+    return _crt_with_lcm_stub(r1, m1, r2, m2; check=check)[1]
+end
 
-# Return $x$ in the Euclidean domain $T$ such that $x \equiv r_i \mod m_i$
-# for all $i$.
-# """
-function crt end
+@doc Markdown.doc"""
+    crt(r1:T, m1:T, r1::T, m2::T; check::Bool=true) where T <: RingElement
+
+Return an element congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$.
+If `check = true` and no solution exists, an error is thrown.
+"""
+function crt(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+   return _crt_stub(r1, m1, r2, m2; check=check)
+end
+
+@doc Markdown.doc"""
+    crt_with_lcm(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+
+Return a tuple consisting of an element congruent to $r_1$ modulo $m_1$ and
+$r_2$ modulo $m_2$ and the least common multiple of $m_1$ and $m_2$.
+If `check = true` and no solution exists, an error is thrown.
+"""
+function crt_with_lcm(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+   return _crt_with_lcm_stub(r1, m1, r2, m2; check=check)
+end
+
+function _crt_with_lcm_stub(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+   n = length(r)
+   @assert n == length(m)
+   @assert n > 0
+   n < 2 && return (r[1], m[1])
+   n == 2 && return crt_with_lcm(r[1], m[1], r[2], m[2]; check=check)
+   return reduce((a, b) -> crt_with_lcm(a[1], a[2], b[1], b[2]; check=check),
+                 ((r[i], m[i]) for i in 1:n))
+end
+
+function _crt_stub(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+    return _crt_with_lcm_stub(r, m; check=check)[1]
+end
+
+@doc Markdown.doc"""
+    crt(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+
+Return an element congruent to $r_i$ modulo $m_i$ for each $i$.
+"""
+function crt(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+   return _crt_stub(r, m; check=check)
+end
+
+@doc Markdown.doc"""
+    crt_with_lcm(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+
+Return a tuple consisting of an element congruent to $r_i$ modulo $m_i$ for
+each $i$ and the least common multiple of the $m_i$.
+"""
+function crt_with_lcm(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+   return _crt_with_lcm_stub(r, m; check=check)
+end
 
 @doc Markdown.doc"""
     factor(a::T)

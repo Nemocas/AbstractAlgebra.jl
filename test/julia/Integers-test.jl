@@ -136,6 +136,44 @@ end
    end
 end
 
+@testset "Julia.Integers.crt" begin
+   function testit(r, m, check=true)
+      n = length(r)
+      if n == 2 && rand(Bool)
+         a = @inferred crt(r[1], m[1], r[2], m[2]; check=check)
+         b, l = @inferred crt_with_lcm(r[1], m[1], r[2], m[2]; check=check)
+      else
+         a = @inferred crt(r, m; check=check)
+         b, l = @inferred crt_with_lcm(r, m; check=check)
+      end
+      for i in 1:length(r)
+         @test is_divisible_by(l, m[i])
+         @test is_divisible_by(a - r[i], m[i])
+         @test is_divisible_by(b - r[i], m[i])
+      end
+   end
+
+   testit([ZZ(1)], [ZZ(4)])
+   testit([ZZ(1)], [ZZ(0)])
+
+   testit([ZZ(1), ZZ(2)], [ZZ(4), ZZ(5)])
+   testit([ZZ(1), ZZ(3)], [ZZ(4), ZZ(6)], false)
+   testit([ZZ(1), ZZ(3)], [ZZ(4), ZZ(6)], true)
+   testit([ZZ(-1), ZZ(2)], [ZZ(0), ZZ(3)])
+   testit([ZZ(-1), ZZ(2)], [ZZ(3), ZZ(0)])
+   @test_throws Exception crt([ZZ(1), ZZ(2)], [ZZ(0), ZZ(3)])
+   @test_throws Exception crt([ZZ(1), ZZ(2)], [ZZ(3), ZZ(0)])
+   @test_throws Exception crt([ZZ(1), ZZ(2)], [ZZ(4), ZZ(6)])
+   @test parent(crt([ZZ(1), ZZ(2)], [ZZ(4), ZZ(6)]; check=false)) == ZZ # junk but no throw
+
+   testit([ZZ(1), ZZ(2), ZZ(3)], [ZZ(4), ZZ(5), ZZ(7)])
+   testit([ZZ(1), ZZ(2), ZZ(3)], [ZZ(4), ZZ(5), ZZ(6)])
+   testit([ZZ(-1), ZZ(2), ZZ(-1)], [ZZ(0), ZZ(3), ZZ(0)])
+   @test_throws Exception crt([ZZ(1), ZZ(2), ZZ(2)], [ZZ(4), ZZ(5), ZZ(6)])
+   @test_throws Exception crt([ZZ(-1), ZZ(2), ZZ(2)], [ZZ(0), ZZ(3), ZZ(0)])
+   @test_throws Exception crt([ZZ(-1), ZZ(-1), ZZ(2)], [ZZ(0), ZZ(0), ZZ(4)])
+end
+
 @testset "Julia.Integers.square_root" begin
    R = zz
    S = ZZ
