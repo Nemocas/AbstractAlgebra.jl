@@ -301,6 +301,8 @@ function gcdinv(a::T, b::T) where T <: RingElem
    return (g, s)
 end
 
+# TODO: Move from CRT from Hecke/src/Misc
+
 function _crt_with_lcm_stub(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
    diff = r2 - r1
    if iszero(m1)
