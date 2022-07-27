@@ -312,7 +312,10 @@ function _crt_with_lcm_stub(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where 
       check && !is_divisible_by(diff, m1) && error("no crt solution")
       return (r2, m2)
    end
-   g, s = gcdinv(m1, m2)
+   # eliminating one cofactor computation with g, s = gcdinv(m1, m2) should be
+   # sufficient, but almost all of Nemo's implementations of gcdinv are
+   # non-conforming (i.e. they throw or return a wrong gcd)
+   g, s, _ = gcdx(m1, m2)
    if isone(g)
       return (r1 + mulmod(diff, s, m2)*m1, m1*m2)
    elseif !check
