@@ -143,7 +143,7 @@ export NotImplementedError, NotInvertibleError, ErrorConstrDimMismatch,
        error_dim_negative
 
 export add!, addeq!,
-       crt,
+       crt, crt_with_lcm,
        factor, factor_squarefree,
        hgcd,
        is_irreducible, is_squarefree,
