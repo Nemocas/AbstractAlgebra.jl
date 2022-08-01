@@ -172,6 +172,10 @@ end
    @test_throws Exception crt([ZZ(1), ZZ(2), ZZ(2)], [ZZ(4), ZZ(5), ZZ(6)])
    @test_throws Exception crt([ZZ(-1), ZZ(2), ZZ(2)], [ZZ(0), ZZ(3), ZZ(0)])
    @test_throws Exception crt([ZZ(-1), ZZ(-1), ZZ(2)], [ZZ(0), ZZ(0), ZZ(4)])
+
+   testit(Int64[1, 1152921504606847008], Int64[2, 1152921504606847009])
+   testit(Int64[10, 100], Int64[1073741827, 536870923])
+   testit(Int64[2147483692, 2147483658], Int64[2147483693, 2147483659])
 end
 
 @testset "Julia.Integers.square_root" begin
