@@ -36,8 +36,7 @@ function is_divisible_by(x::T, y::T) where T <: RingElem
    if iszero(y)
       return iszero(x)
    end
-   r = rem(x, y)
-   return iszero(r)
+   return divides(x, y)[1]
 end
 
 ###############################################################################

@@ -647,7 +647,7 @@ end
          flag2, q2 = divides(f, p)
 
          @test flag == true
-
+         @test is_divisible_by(p, f)
          @test q * f == p
 
          q1 = divexact(p, f)
