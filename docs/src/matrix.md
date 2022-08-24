@@ -409,6 +409,22 @@ one(::MatElem{T}) where T <: RingElement
 ```
 
 ```@docs
+lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+```
+
+```@docs
+upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+```
+
+```@docs
+strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+```
+
+```@docs
+strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+```
+
+```@docs
 is_upper_triangular(::MatrixElem{T}) where T <: RingElement
 ```
 

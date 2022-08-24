@@ -19,7 +19,7 @@ export MatrixSpace, add_column, add_column!, add_row, add_row!,
        is_invertible_with_inverse, is_popov, is_rref, is_snf, is_square, is_upper_triangular,
        is_skew_symmetric,
        is_weak_popov, is_zero_column, is_zero_row, kernel, kronecker_product,
-       left_kernel, lu, lu!, map_entries, map_entries!, matrix, minpoly,
+       left_kernel, lower_triangular_matrix, lu, lu!, map_entries, map_entries!, matrix, minpoly,
        minors, multiply_column, multiply_column!, multiply_row, multiply_row!,
        nrows, ncols, pfaffian, pfaffians, popov, popov_with_transform, powers,
        pseudo_inv, randmat_triu, randmat_with_rank, rank, rank_profile_popov,
@@ -27,8 +27,9 @@ export MatrixSpace, add_column, add_column!, add_row, add_row!,
        rref, rref!, rref_rational, rref_rational!, similarity!, snf,
        snf_with_transform, snf_kb, snf_kb!, snf_kb_with_transform, solve,
        solve_ff, solve_left, solve_rational, solve_triu, solve_with_det,
+       strictly_lower_triangular_matrix, strictly_upper_triangular_matrix,
        swap_cols, swap_cols!, swap_rows, swap_rows!, tr, typed_hvcat,
-       typed_hcat, weak_popov, weak_popov_with_transform, zero_matrix
+       typed_hcat, upper_triangular_matrix, weak_popov, weak_popov_with_transform, zero_matrix
 
 ###############################################################################
 #
@@ -6790,6 +6791,162 @@ function diagonal_matrix(x::NCRingElement, m::Int, n::Int)
 end
 
 diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
+
+###############################################################################
+#
+#   Lower triangular matrix
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+
+Return the $n$ by $n$ matrix whose entries on and below the main diagonal are
+the elements of `L`, and which has zeroes elsewhere.
+The value of $n$ is determined by the condition that `L` has length
+$n(n+1)/2$.
+
+An exception is thrown if there is no integer $n$ with this property.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> lower_triangular_matrix([1, 2, 3])
+[1   0]
+[2   3]
+```
+"""
+function lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+   l = length(L)
+   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   n = Int(floor((Base.sqrt(1+8*l)-1)/2))
+   n == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   l == div(n*(n+1), 2) || throw(ArgumentError("Input vector of invalid length"))
+   R = parent(L[1])
+   M = zero_matrix(R, n, n)
+   pos = 1
+   for i in 1:n, j in 1:i
+      M[i,j] = L[pos]
+      pos += 1
+   end
+   return M
+end
+
+###############################################################################
+#
+#   Upper triangular matrix
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+
+Return the $n$ by $n$ matrix whose entries on and above the main diagonal are
+the elements of `L`, and which has zeroes elsewhere.
+The value of $n$ is determined by the condition that `L` has length
+$n(n+1)/2$.
+
+An exception is thrown if there is no integer $n$ with this property.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> upper_triangular_matrix([1, 2, 3])
+[1   2]
+[0   3]
+```
+"""
+function upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+   l = length(L)
+   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   n = Int(floor((Base.sqrt(1+8*l)-1)/2))
+   n == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   l == div(n*(n+1),2) || throw(ArgumentError("Input vector of invalid length"))
+   R = parent(L[1])
+   M = zero_matrix(R, n, n)
+   pos = 1
+   for i in 1:n, j in i:n
+      M[i,j] = L[pos]
+      pos += 1
+   end
+   return M
+end
+
+###############################################################################
+#
+#   Strictly lower triangular matrix
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+
+Return the $n$ by $n$ matrix whose entries below the main diagonal are
+the elements of `L`, and which has zeroes elsewhere.
+The value of $n$ is determined by the condition that `L` has length
+$(n-1)n/2$.
+
+An exception is thrown if there is no integer $n$ with this property.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> strictly_lower_triangular_matrix([1, 2, 3])
+[0   0   0]
+[1   0   0]
+[2   3   0]
+```
+"""
+function strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+   l = length(L)
+   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   n = Int(floor((Base.sqrt(1+8*l)+1)/2))
+   l == div((n-1)*n, 2) || throw(ArgumentError("Input vector of invalid length"))
+   R = parent(L[1])
+   M = zero_matrix(R, n, n)
+   pos = 1
+   for i in 2:n, j in 1:(i-1)
+      M[i,j] = L[pos]
+      pos += 1
+   end
+   return M
+end
+
+###############################################################################
+#
+#   Strictly upper triangular matrix
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+
+Return the $n$ by $n$ matrix whose entries above the main diagonal are
+the elements of `L`, and which has zeroes elsewhere.
+The value of $n$ is determined by the condition that `L` has length
+$(n-1)n/2$.
+
+An exception is thrown if there is no integer $n$ with this property.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> strictly_upper_triangular_matrix([1, 2, 3])
+[0   1   2]
+[0   0   3]
+[0   0   0]
+```
+"""
+function strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+   l = length(L)
+   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   n = Int(floor((Base.sqrt(1+8*l)+1)/2))
+   l == div((n-1)*n, 2) || throw(ArgumentError("Input vector of invalid length"))
+   R = parent(L[1])
+   M = zero_matrix(R, n, n)
+   pos = 1
+   for i in 1:(n-1), j in (i+1):n
+      M[i,j] = L[pos]
+      pos += 1
+   end
+   return M
+end
 
 ###############################################################################
 #
