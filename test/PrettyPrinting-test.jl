@@ -95,6 +95,8 @@
    @test canonical_string(:([a b; c d])) == "[a b; c d]"
    @test canonical_string(:([-a-b -c+d; -a -b-c+d])) == "[-a-b -c+d; -a -b-c+d]"
 
+   @test canonical_string(:(a + (b == c))) == "a + (b = c)"
+   @test canonical_string(:(a + (b == c == d))) == "a + (b = c = d)"
    @test canonical_string(:(a = b = c+d*1)) == "a = b = c + d"
    @test canonical_string(:((a = b) = c)) == "(a = b) = c"
    @test canonical_string(:(a == b == c)) == "a = b = c"

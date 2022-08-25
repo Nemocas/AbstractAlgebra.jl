@@ -674,12 +674,8 @@ function compare_op_string(mi::MIME"text/latex", op)
       return "="
    elseif op === :(<=)
       return "\\le"
-   elseif op === :(<)
-      return "<"
    elseif op === :(>=)
       return "\\ge"
-   elseif op === :(>)
-      return ">"
    elseif op === :(!=)
       return "\\neq"
    else
@@ -1296,7 +1292,7 @@ function print_obj(S::printer, mi::MIME, obj::Expr,
    elseif obj.head === :(=) && n == 2
       o = Expr(:call, :(=), obj.args[1], obj.args[2])
       printGenericInfix(S, mi, o, left, right, " = ", prec_inf_Equal, -1)
-   elseif obj.head === :comparison && isodd(n)
+   elseif obj.head === :comparison && isodd(n) && n > 1
       print_comparison(S, mi, obj, left, right, prec_inf_Equal)
    elseif obj.head == :vcat || obj.head == :vect || obj.head == :tuple ||
           obj.head == :list || obj.head == :series || obj.head == :sequence ||
@@ -1353,7 +1349,7 @@ function print_obj(S::printer, mi::MIME"text/latex", obj::Expr,
    elseif obj.head === :(=) && n == 2
       o = Expr(:call, :(=), obj.args[1], obj.args[2])
       printGenericInfix(S, mi, o, left, right, " = ", prec_inf_Equal, -1)
-   elseif obj.head === :comparison && isodd(n)
+   elseif obj.head === :comparison && isodd(n) && n > 1
       print_comparison(S, mi, obj, left, right, prec_inf_Equal)
    elseif obj.head === :vcat
       print_vcat(S, mi, obj, left, right)
