@@ -95,6 +95,20 @@
    @test canonical_string(:([a b; c d])) == "[a b; c d]"
    @test canonical_string(:([-a-b -c+d; -a -b-c+d])) == "[-a-b -c+d; -a -b-c+d]"
 
+   @test canonical_string(:(a + (b == c))) == "a + (b = c)"
+   @test canonical_string(:(a + (b == c == d))) == "a + (b = c = d)"
+   @test canonical_string(:(a = b = c+d*1)) == "a = b = c + d"
+   @test canonical_string(:((a = b) = c)) == "(a = b) = c"
+   @test canonical_string(:(a == b == c)) == "a = b = c"
+   @test canonical_string(:((a == b) == c)) == "(a = b) = c"
+   @test canonical_string(:(a == (b == c) == d)) == "a = (b = c) = d"
+   @test canonical_string(:(a == b)) == "a = b"
+   @test canonical_string(:(a != b)) == "a != b"
+   @test canonical_string(:(a > b))  == "a > b"
+   @test canonical_string(:(a >= b)) == "a >= b"
+   @test canonical_string(:(a < b))  == "a < b"
+   @test canonical_string(:(a <= b)) == "a <= b"
+
    @test canonical_string(:(if a; b; end;)) isa String
    @test canonical_string(1.2) isa String
 
@@ -168,6 +182,19 @@
 
    @test latex_string(Expr(:matrix, :([a b; c d]))) ==
            "\\left(\\begin{array}{cc}\na & b \\\\\nc & d\n\\end{array}\\right)"
+
+   @test latex_string(:(a = b = c+d*1)) == "a = b = c + d"
+   @test latex_string(:((a = b) = c)) == "\\left(a = b\\right) = c"
+   @test latex_string(:(a == b == c)) == "a = b = c"
+   @test latex_string(:((a == b) == c)) == "\\left(a = b\\right) = c"
+   @test latex_string(:(a == (b == c) == d)) == "a = \\left(b = c\\right) = d"
+   @test latex_string(:(a <= b + -2*c <= d != e)) == "a \\le b - 2 c \\le d \\neq e"
+   @test latex_string(:(a == b)) == "a = b"
+   @test latex_string(:(a != b)) == "a \\neq b"
+   @test latex_string(:(a > b))  == "a > b"
+   @test latex_string(:(a >= b)) == "a \\ge b"
+   @test latex_string(:(a < b))  == "a < b"
+   @test latex_string(:(a <= b)) == "a \\le b"
 
    @test latex_string(:(if a; b; end;)) isa String
    @test latex_string(1.2) isa String

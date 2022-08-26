@@ -9,6 +9,7 @@ using ..AbstractAlgebra
 # printing is done with respect to the following precedences
 # There is no point in using the julia values because we add our own ops
 const prec_lowest      = 0
+const prec_inf_Equal   = 5     # infix ==
 const prec_inf_Plus    = 11    # infix a+b+c
 const prec_inf_Minus   = 11    # infix a-b-c
 const prec_inf_Times   = 13    # infix a*b*c
@@ -660,6 +661,54 @@ function child_limits(S::printer, obj::Expr, off::Int, n::Int)
    return a, b
 end
 
+function compare_op_string(mi::MIME, op)
+   if op === :(==)
+      return "="
+   else
+      return string(op)
+   end
+end
+
+function compare_op_string(mi::MIME"text/latex", op)
+   if op === :(==)
+      return "="
+   elseif op === :(<=)
+      return "\\le"
+   elseif op === :(>=)
+      return "\\ge"
+   elseif op === :(!=)
+      return "\\neq"
+   else
+      return string(op)
+   end
+end
+
+function print_comparison(S::printer, mi::MIME, obj::Expr,
+                           left::Int, right::Int, prec::Int)
+   n = length(obj.args)
+   @assert isodd(n) && n > 1
+   sep = isterse(S) ? "" : " "
+
+   needp = prec <= left || prec <= right
+   if needp
+      left = right = prec_lowest
+      push_left_parenthesis(S, mi)
+   end
+
+   print_obj(S, mi, obj.args[1], left, prec)
+   for i in 2:2:n-3
+      push(S, sep*compare_op_string(mi, obj.args[i])*sep)
+      print_obj(S, mi, obj.args[i+1], prec, prec)
+   end
+   push(S, sep*compare_op_string(mi, obj.args[n-1])*sep)
+   print_obj(S, mi, obj.args[n], prec, right)
+
+   if needp
+      push_right_parenthesis(S, mi)
+   end
+end
+
+
 # dir > 0 left assiciate: +, -, *, /
 # dir < 0 right associative: ^
 # dir = 0 non associative:
@@ -953,7 +1002,7 @@ function print_call_or_ref(S::printer, mi::MIME, obj::Expr,
    end
 end
 
-function print_tuple_ect(S::printer, mi::MIME, obj::Expr, left::Int, right::Int)
+function print_tuple_etc(S::printer, mi::MIME, obj::Expr, left::Int, right::Int)
    n = length(obj.args)
 
    needp = prec_lowest < left || prec_lowest < right
@@ -1231,13 +1280,24 @@ function print_obj(S::printer, mi::MIME, obj::Expr,
          printGenericInfix(S, mi, obj, left, right, "//", prec_inf_DoubleDivide, +1)
       elseif obj.args[1] === :^
          printGenericInfix(S, mi, obj, left, right, "^", prec_inf_Power, -1)
+      elseif obj.args[1] === :(==) || obj.args[1] === :(!=) ||
+             obj.args[1] === :(>=) || obj.args[1] === :(>) ||
+             obj.args[1] === :(<=) || obj.args[1] === :(<)
+         o = compare_op_string(mi, obj.args[1])
+         o = isterse(S) ? o : " "*o*" "
+         printGenericInfix(S, mi, obj, left, right, o, prec_inf_Equal, 0)
       else
          print_call_or_ref(S, mi, obj, left, right)
       end
+   elseif obj.head === :(=) && n == 2
+      o = Expr(:call, :(=), obj.args[1], obj.args[2])
+      printGenericInfix(S, mi, o, left, right, " = ", prec_inf_Equal, -1)
+   elseif obj.head === :comparison && isodd(n) && n > 1
+      print_comparison(S, mi, obj, left, right, prec_inf_Equal)
    elseif obj.head == :vcat || obj.head == :vect || obj.head == :tuple ||
           obj.head == :list || obj.head == :series || obj.head == :sequence ||
           obj.head == :row || obj.head == :hcat
-      print_tuple_ect(S, mi, obj, left, right)
+      print_tuple_etc(S, mi, obj, left, right)
    elseif obj.head === :ref && n > 0
       print_call_or_ref(S, mi, obj, left, right)
    elseif obj.head === :text && n == 1
@@ -1270,6 +1330,12 @@ function print_obj(S::printer, mi::MIME"text/latex", obj::Expr,
          printDivides(S, mi, obj, left, right)
       elseif obj.args[1] === :^
          printPower(S, mi, obj, left, right)
+      elseif obj.args[1] === :(==) || obj.args[1] === :(!=) ||
+             obj.args[1] === :(>=) || obj.args[1] === :(>) ||
+             obj.args[1] === :(<=) || obj.args[1] === :(<)
+         o = compare_op_string(mi, obj.args[1])
+         o = isterse(S) ? o : " "*o*" "
+         printGenericInfix(S, mi, obj, left, right, o, prec_inf_Equal, 0)
       elseif obj.args[1] === :sqrt && length(obj.args) == 2
          needp = prec_inf_Power <= right # courtesy
          needp && push_left_parenthesis(S, mi)
@@ -1280,12 +1346,17 @@ function print_obj(S::printer, mi::MIME"text/latex", obj::Expr,
       else
          print_call_or_ref(S, mi, obj, left, right)
       end
+   elseif obj.head === :(=) && n == 2
+      o = Expr(:call, :(=), obj.args[1], obj.args[2])
+      printGenericInfix(S, mi, o, left, right, " = ", prec_inf_Equal, -1)
+   elseif obj.head === :comparison && isodd(n) && n > 1
+      print_comparison(S, mi, obj, left, right, prec_inf_Equal)
    elseif obj.head === :vcat
       print_vcat(S, mi, obj, left, right)
    elseif obj.head == :vect || obj.head == :tuple ||
           obj.head == :list || obj.head == :series || obj.head == :sequence ||
           obj.head == :row || obj.head == :hcat
-      print_tuple_ect(S, mi, obj, left, right)
+      print_tuple_etc(S, mi, obj, left, right)
    elseif obj.head === :ref && n > 0
       print_call_or_ref(S, mi, obj, left, right)
    elseif obj.head === :text && n == 1
