@@ -498,7 +498,7 @@ import .Generic: abs_series, abs_series_type,
                  unit, upscale,
                  zero,
        # Moved from Hecke into Misc
-                 Loc, Localization, LocElem,
+                 Loc, localization, LocElem,
                  roots, sturm_sequence
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
@@ -558,7 +558,7 @@ export abs_series, abs_series_type,
                  MatrixElem, PolynomialElem,
        # Moved from Hecke into Misc
                  divexact_low, divhigh,
-                 is_monic, Loc, Localization, LocElem, mulhigh_n,
+                 is_monic, Loc, localization, LocElem, mulhigh_n,
                  PolyCoeffs, roots, sturm_sequence
 
 ################################################################################
