@@ -356,6 +356,30 @@ end
    # @test isa(block_diagonal_matrix([RA, RB]), MatElem)
 end
 
+@testset "construct triangular matrices" begin
+   L1 = [1]
+   L2 = [1, 2, 3]
+   L3 = Int[]
+   L4 = [1, 2, 3, 4]
+
+   @test lower_triangular_matrix(L1) == matrix(ZZ, 1, 1, [1]);
+   @test upper_triangular_matrix(L1) == matrix(ZZ, 1, 1, [1]);
+   @test strictly_lower_triangular_matrix(L1) == matrix(ZZ, 2, 2, [0, 0, 1, 0]);
+   @test strictly_upper_triangular_matrix(L1) == matrix(ZZ, 2, 2, [0, 1, 0, 0]);
+
+   @test lower_triangular_matrix(L2) == matrix(ZZ, 2, 2, [1, 0, 2, 3]);
+   @test upper_triangular_matrix(L2) == matrix(ZZ, 2, 2, [1, 2, 0, 3]);
+   @test strictly_lower_triangular_matrix(L2) == matrix(ZZ, 3, 3, [0, 0, 0, 1, 0, 0, 2, 3, 0]);
+   @test strictly_upper_triangular_matrix(L2) == matrix(ZZ, 3, 3, [0, 1, 2, 0, 0, 3, 0, 0, 0]);
+
+   for L in [L3, L4]
+     @test_throws ArgumentError lower_triangular_matrix(L)
+     @test_throws ArgumentError upper_triangular_matrix(L)
+     @test_throws ArgumentError strictly_lower_triangular_matrix(L)
+     @test_throws ArgumentError strictly_upper_triangular_matrix(L)
+   end
+end
+
 @testset "Generic.Mat.size/axes" begin
    A = matrix(QQ, [1 2 3; 4 5 6; 7 8 9])
    B = matrix(QQ, [1 2 3 4; 5 6 7 8])
