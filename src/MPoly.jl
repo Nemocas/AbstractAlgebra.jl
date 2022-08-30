@@ -805,34 +805,54 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    # must be done in a certain order.
    # But addition is associative.
    S = parent(one(R)*one(parent(vals[1])))
-   r = elem_type(S)[zero(S)]
-   i = UInt(1)
    cvzip = zip(coefficients(a), exponent_vectors(a))
-   for (c, v) in cvzip
-      t = one(S)
-      for j = 1:length(vals)
-         exp = v[j]
-         if iszero(exp)
-           continue
+   if S === parent(a)
+      # Let's use a geobucket
+      rgeo = Generic.geobucket(S)
+      for (c, v) in cvzip
+         t = one(S)
+         for j = 1:length(vals)
+            exp = v[j]
+            if iszero(exp)
+               continue
+            end
+            if !haskey(powers[j], exp)
+               powers[j][exp] = vals[j]^exp
+            end
+            t = mul!(t, t, powers[j][exp])
          end
-         if !haskey(powers[j], exp)
-            powers[j][exp] = vals[j]^exp
+         push!(rgeo, mul!(t, c, t))
+      end
+      return finish(rgeo)
+   else
+      r = elem_type(S)[zero(S)]
+      i = UInt(1)
+      for (c, v) in cvzip
+         t = one(S)
+         for j = 1:length(vals)
+            exp = v[j]
+            if iszero(exp)
+               continue
+            end
+            if !haskey(powers[j], exp)
+               powers[j][exp] = vals[j]^exp
+            end
+            t *= powers[j][exp]
          end
-         t = t*powers[j][exp]
+         push!(r, c * t)
+         j = i = i + 1
+         while iseven(j) && length(r) > 1
+             top = pop!(r)
+             r[end] = addeq!(r[end], top)
+             j >>= 1
+         end
       end
-      push!(r, c*t)
-      j = i = i + 1
-      while iseven(j) && length(r) > 1
-          top = pop!(r)
-          r[end] = addeq!(r[end], top)
-          j >>= 1
+      while length(r) > 1
+         top = pop!(r)
+         r[end] = addeq!(r[end], top)
       end
+      return r[1]
    end
-   while length(r) > 1
-      top = pop!(r)
-      r[end] = addeq!(r[end], top)
-   end
-   return r[1]
 end
 
 @doc Markdown.doc"""
@@ -1196,6 +1216,14 @@ function _map(g, p::MPolyElem, Rx)
 
    return finish(M)
 end
+
+###############################################################################
+#
+#   Unsafe fallbacks
+#
+###############################################################################
+
+mul!(b::MPolyElem{T}, n::T, a::MPolyElem{T}) where {T <: RingElement} = a * n
 
 ###############################################################################
 #

@@ -1985,6 +1985,8 @@ function *(a::MPoly{T}, n::T) where {T <: RingElem}
    return r
 end
 
+mul!(b::MPoly{T}, n::T, a::MPoly{T}) where {T <: RingElement} = a * n
+
 *(n::Union{Integer, Rational, AbstractFloat}, a::MPoly) = a*n
 
 *(n::T, a::MPoly{T}) where {T <: RingElem} = a*n
