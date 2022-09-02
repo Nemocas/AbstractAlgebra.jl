@@ -988,6 +988,111 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    return a(vals...)
 end
 
+########################################################################
+# 
+#  Evaluation with multivariate logarithmic caching.
+#
+#  The code does the following. Given a multivariate polynomial 
+#  f = ∑ₐ cₐ ⋅ xᵃ in n variables and n elements p₁,…,pₙ on which 
+#  f will be evaluated, iterate through the terms cₐ ⋅ xᵃ of f. 
+#
+#  For every term, write the exponent as a sum of integer vectors 
+#  a = b⁽¹⁾ + b⁽²⁾+ ... + b⁽ᵐ⁾ where each of the b⁽ʲ⁾ has integer 
+#  entries (k₁, k₂, …, kₙ) that are either zero or a pure power 
+#  of 2. 
+#
+#  Then look up each one of the products p₁ᵏ¹ ⋅ p₂ᵏ² ⋅ … ⋅ pₙᵏⁿ 
+#  in a cache dictionary. If it's not there, these can be easily 
+#  computed as products of squares of other precomputed entries. 
+#
+#  Once all these lookups have been carried out, assemble the 
+#  final product for the monomial xᵃ using the obvious m multipli-
+#  cations and add them to the return list for summation. 
+#
+########################################################################
+
+function log_evaluate(f::MPolyElem, p::Vector{T}; 
+    power_cache::Dict{Vector{Int}, T}=Dict([[i==j ? 1 : 0 for i in 1:length(p)] => p[j] for j in 1:length(p)])
+  ) where {T}
+  iszero(f) && return zero(p[1])
+  n = length(p)
+  R = parent(f)
+  n == nvars(R) || error("number of components must equal the number of variables")
+
+  ### TODO: The following method can probably be improved by using 
+  # bitshift operations instead. But I don't know right now how 
+  # these can be accessed in julia. 
+  function as_sum_of_powers_of_2(k::Int)
+    k == 1 && return [1]
+    k == 0 && return [0]
+    a = k >> 1
+    r = k & 1
+    r == 0 && return [j << 1 for j in as_sum_of_powers_of_2(a)]
+    return push!([ j << 1 for j in as_sum_of_powers_of_2(a)], 1)
+  end
+
+  coordinates_to_the_powers_of_2 = [[(1, h)] for h in p]
+
+  function coordinate_to_the_power_of_2(i::Int, e::Int)
+    for (j, q) in coordinates_to_the_powers_of_2[i]
+      j == e && return q
+    end
+    (j, q) = last(coordinates_to_the_powers_of_2[i]) 
+    while j < e
+      (j, q) = (j << 1, q^2)
+      push!(coordinates_to_the_powers_of_2[i], (j, q))
+    end
+    return q
+  end
+
+
+  # The following method assumes that e contains entries 
+  # which are either zero or a power of 2.
+  function look_up(e::Vector{Int})
+    all(x->(x==0), e) && return one(p[1])
+    haskey(power_cache, e) && return power_cache[e]
+
+    if all(x->(x<=1), e) 
+      power = prod([p[i] for i in 1:length(p) if e[i] == 1])
+      power_cache[e] = power
+      return power
+    end
+
+    ### This is logarithmic bisection 
+    c = [k >> 1 for k in e]
+    d = e - c
+    power = look_up(c)*look_up(d)
+
+    power_cache[e] = power
+    return power
+  end
+
+  function eval_mon(a::Vector{Int})
+    haskey(power_cache, a) && return power_cache[a]
+
+    b = [as_sum_of_powers_of_2(k) for k in a]
+
+    m = maximum([length(s) for s in b])
+
+    e = [length(b[i])>=1 ? b[i][1] : 0 for i in 1:n]
+    result = look_up(e)
+    for j in 2:m
+      e = [length(b[i])>=j ? b[i][j] : 0 for i in 1:n]
+      result *= look_up(e)
+    end
+    return result
+  end
+
+  return sum([c*eval_mon(a) for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))])
+end
+
+# For a list of polynomials f to be evaluated on the same elements p, 
+# we can pass on the caching dictionary. 
+function log_evaluate(f::Vector{PolyType}, p::Vector{T}) where {PolyType<:MPolyElem, T}
+  D = Dict([[i==j ? 1 : 0 for i in 1:length(p)] => p[j] for j in 1:length(p)])
+  return [log_evaluate(g, p, power_cache=D) for g in f]
+end
+
 ################################################################################
 #
 #  Derivative

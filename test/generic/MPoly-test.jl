@@ -929,6 +929,9 @@ end
          r3 = evaluate(f + g, V1)
 
          @test r3 == r1 + r2
+         # The following does not work because log_evaluate does not 
+         # automatically convert to BigInt while evaluate somehow does.
+         #@test [r1, r2, r3] == AbstractAlgebra.log_evaluate([f, g, f+g], V1)
 
          V2 = [BigInt(rand(-10:10)) for i in 1:num_vars]
 
@@ -937,6 +940,7 @@ end
          r3 = evaluate(f + g, V2)
 
          @test r3 == r1 + r2
+         @test [r1, r2, r3] == AbstractAlgebra.log_evaluate([f, g, f+g], V2)
 
          V3 = [R(rand(-10:10)) for i in 1:num_vars]
 
@@ -945,6 +949,7 @@ end
          r3 = evaluate(f + g, V3)
 
          @test r3 == r1 + r2
+         @test [r1, r2, r3] == AbstractAlgebra.log_evaluate([f, g, f+g], V3)
       end
    end
 
@@ -968,6 +973,7 @@ end
          r3 = evaluate(f + g, V1)
 
          @test r3 == r1 + r2
+         @test [r1, r2, r3] == AbstractAlgebra.log_evaluate([f, g, f+g], V1)
       end
    end
 
