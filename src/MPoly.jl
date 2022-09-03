@@ -1044,7 +1044,7 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
       j = j << 1
       push!(list, k & j)
     end
-    return reverse(list)
+    return list
   end
 
   # The following method assumes that e contains entries 
@@ -1075,8 +1075,9 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
     end
     b, q = (length(cache) == 0 ? ([0 for i in 1:length(a)], one(p[1])) : last(cache))
 
-    if haskey(power_cache, a-b) 
-      q = q*power_cache[a-b]
+    e = a-b
+    if haskey(power_cache, e) 
+      q = q*power_cache[e]
       push!(cache, (a, q))
       return q
     end
@@ -1087,7 +1088,7 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
 
     result = q
     for j in 1:m
-      e = [length(c[i])>=j ? c[i][j] : 0 for i in 1:n]
+      e = [length(c[i])>0 ? pop!(c[i]) : 0 for i in 1:n]
       result *= look_up(e)
       b += e
       push!(cache, (b, result))
