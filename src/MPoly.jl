@@ -1082,22 +1082,22 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
       return q
     end
 
-    c = [as_sum_of_powers_of_2(k) for k in a-b]
+    c = [as_sum_of_powers_of_2(k) for k in e]
 
     m = maximum([length(s) for s in c])
 
     result = q
+    exp_list = [[length(c[i]) <= j ? 0 : c[i][j] for i in 1:n] for j in m:-1:1]
     for j in 1:m
-      e = [length(c[i])>0 ? pop!(c[i]) : 0 for i in 1:n]
-      result *= look_up(e)
-      b += e
+      result *= look_up(exp_list[j])
+      b += exp_list[j]
       push!(cache, (b, result))
     end
     return result
   end
 
-  return sum([c*eval_mon(a) for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))])
-  #return sum([c*eval_mon(a) for (c, a) in collect(zip(coefficients(f), exponent_vectors(f)))])
+  #return sum([c*eval_mon(a) for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))])
+  return sum([c*eval_mon(a) for (c, a) in collect(zip(coefficients(f), exponent_vectors(f)))])
 end
 
 # For a list of polynomials f to be evaluated on the same elements p, 
