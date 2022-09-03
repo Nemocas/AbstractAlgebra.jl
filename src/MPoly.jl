@@ -1096,8 +1096,8 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
     return result
   end
 
-  #return sum([c*eval_mon(a) for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))])
-  return sum([c*eval_mon(a) for (c, a) in collect(zip(coefficients(f), exponent_vectors(f)))])
+  return sum([c*eval_mon(a) for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))])
+  #return sum([c*eval_mon(a) for (c, a) in collect(zip(coefficients(f), exponent_vectors(f)))])
 end
 
 # For a list of polynomials f to be evaluated on the same elements p, 
