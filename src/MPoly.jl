@@ -996,8 +996,14 @@ end
 #  f = ∑ₐ cₐ ⋅ xᵃ in n variables and n elements p₁,…,pₙ on which 
 #  f will be evaluated, iterate through the terms cₐ ⋅ xᵃ of f. 
 #
-#  For every term, write the exponent as a sum of integer vectors 
-#  a = b⁽¹⁾ + b⁽²⁾+ ... + b⁽ᵐ⁾ where each of the b⁽ʲ⁾ has integer 
+#  On first stage, we have a stack with precomputed powers 
+#  from previous terms where every entry is divisible by the 
+#  previous one. Given xᵃ, pop from that stack until the top 
+#  element q = pᵇ divides pᵃ. Proceed with the computation 
+#  of pᵃ:q.
+#
+#  Write the exponent a - b as a sum of integer vectors 
+#  a - b = c⁽¹⁾ + c⁽²⁾+ ... + c⁽ᵐ⁾ where each of the c⁽ʲ⁾ has integer 
 #  entries (k₁, k₂, …, kₙ) that are either zero or a pure power 
 #  of 2. 
 #
@@ -1006,8 +1012,20 @@ end
 #  computed as products of squares of other precomputed entries. 
 #
 #  Once all these lookups have been carried out, assemble the 
-#  final product for the monomial xᵃ using the obvious m multipli-
-#  cations and add them to the return list for summation. 
+#  final product for the monomial q ⋅ pᵃ ⁻ ᵇ using the obvious 
+#  m+1 multiplications and add them to the return list for 
+#  summation. 
+#
+#  NOTE: In order for the above algorithm to be efficient, 
+#  one must iterate through the terms of f starting with 
+#  those of lowest degree first and going higher. Adjust this 
+#  according to the iterators! 
+#
+#  Moreover, we assume the iteration to proceed with consecutive 
+#  terms "close to one another" regarding their exponent vectors.
+#
+#  This is, for instance, the case when the terms are returned in 
+#  lexicographical order.
 #
 ########################################################################
 
@@ -1019,32 +1037,15 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
   R = parent(f)
   n == nvars(R) || error("number of components must equal the number of variables")
 
-  ### TODO: The following method can probably be improved by using 
-  # bitshift operations instead. But I don't know right now how 
-  # these can be accessed in julia. 
   function as_sum_of_powers_of_2(k::Int)
-    k == 1 && return [1]
-    k == 0 && return [0]
-    a = k >> 1
-    r = k & 1
-    r == 0 && return [j << 1 for j in as_sum_of_powers_of_2(a)]
-    return push!([ j << 1 for j in as_sum_of_powers_of_2(a)], 1)
-  end
-
-  coordinates_to_the_powers_of_2 = [[(1, h)] for h in p]
-
-  function coordinate_to_the_power_of_2(i::Int, e::Int)
-    for (j, q) in coordinates_to_the_powers_of_2[i]
-      j == e && return q
+    j = 1
+    list = [k & j]
+    while k >= j
+      j = j << 1
+      push!(list, k & j)
     end
-    (j, q) = last(coordinates_to_the_powers_of_2[i]) 
-    while j < e
-      (j, q) = (j << 1, q^2)
-      push!(coordinates_to_the_powers_of_2[i], (j, q))
-    end
-    return q
+    return reverse(list)
   end
-
 
   # The following method assumes that e contains entries 
   # which are either zero or a power of 2.
@@ -1067,23 +1068,35 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
     return power
   end
 
+  cache = Vector{Tuple{Vector{Int}, T}}()
   function eval_mon(a::Vector{Int})
-    haskey(power_cache, a) && return power_cache[a]
+    while length(cache)> 0 && !all(k->(k>=0), a-last(cache)[1])
+      pop!(cache)
+    end
+    b, q = (length(cache) == 0 ? ([0 for i in 1:length(a)], one(p[1])) : last(cache))
 
-    b = [as_sum_of_powers_of_2(k) for k in a]
+    if haskey(power_cache, a-b) 
+      q = q*power_cache[a-b]
+      push!(cache, (a, q))
+      return q
+    end
 
-    m = maximum([length(s) for s in b])
+    c = [as_sum_of_powers_of_2(k) for k in a-b]
 
-    e = [length(b[i])>=1 ? b[i][1] : 0 for i in 1:n]
-    result = look_up(e)
-    for j in 2:m
-      e = [length(b[i])>=j ? b[i][j] : 0 for i in 1:n]
+    m = maximum([length(s) for s in c])
+
+    result = q
+    for j in 1:m
+      e = [length(c[i])>=j ? c[i][j] : 0 for i in 1:n]
       result *= look_up(e)
+      b += e
+      push!(cache, (b, result))
     end
     return result
   end
 
   return sum([c*eval_mon(a) for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))])
+  #return sum([c*eval_mon(a) for (c, a) in collect(zip(coefficients(f), exponent_vectors(f)))])
 end
 
 # For a list of polynomials f to be evaluated on the same elements p, 
