@@ -1100,7 +1100,8 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
   # the full list iteratively; but without collecting the full 
   # list so that we do not store an unnecessary amount of 
   # intermediate terms 
-  sum_vec = T[]
+  sum_vec = [] # It is difficult to estimate the return type here a priori.
+               # since it might be different from T.
   for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))
     next = c*eval_mon(a)
     if length(sum_vec) == 0 
@@ -1111,15 +1112,15 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
     j = 1
     while length(sum_vec) >= j && !iszero(sum_vec[j]) 
       next += sum_vec[j]
-      sum_vec[j] = zero(next)
+      sum_vec[j] = 0
       j += 1
     end
     
     if j < length(sum_vec)
-      sum_vec[j] += next
+      sum_vec[j] = next
     else 
       push!(sum_vec, last(sum_vec) + next)
-      sum_vec[end-1] = zero(next)
+      sum_vec[end-1] = 0
     end
   end
   return sum(sum_vec)
@@ -1133,6 +1134,163 @@ function log_evaluate(f::Vector{PolyType}, p::Vector{T}) where {PolyType<:MPolyE
   D = Dict([[i==j ? 1 : 0 for i in 1:length(p)] => p[j] for j in 1:length(p)])
   return [log_evaluate(g, p, power_cache=D) for g in f]
 end
+
+# If we assume that the terms of f are iterated over in lexicographical 
+# order, then we can directly split f according to a multivariate 
+# Horner scheme for evaluation. At each step this means writing
+#
+#   f = c₀ + xₙᵃⁿ ⋅ fₙ + xₙ₋₁ᵃⁿ⁻¹ ⋅ fₙ₋₁ + … + x₁ᵃ¹ ⋅ f₁
+#
+# where 
+#
+#   1) fₖ has only terms < xₖ₋₁ w.r.t the lexicographical ordering;
+#   2) aₖ is the exponent of xₖ of the first term of f which is ≥ xₖ.
+#
+# Then we proceed by induction on the fₖ.
+#
+# This algorithm was found to be way more efficient than the standard 
+# `evaluate` in the case when f had many terms and the multiplication 
+# of the elements to be substituted was not cheap.
+#
+# Note that the recursion depth is bounded by the total degree d of f. 
+# Since the number of terms is O(dⁿ) with n the number of variables, 
+# this can be considered to be a reasonable bound. 
+#
+function horner_for_lex_evaluate(
+    f::MPolyElem, p::Vector{T};
+    power_cache::Vector{Vector{T}} = [[q] for q in p]
+  ) where {T}
+  R = parent(f)
+  kk = coefficient_ring(R)
+  iszero(f) && return zero(kk)
+
+  n = nvars(parent(f))
+  n == length(p) || error("wrong number of elements for substitution")
+  
+  function _look_up_power(i::Int, k::Int)
+    k == 0 && return one(p[i])
+    result = one(p[i])
+    j = 1
+    while k > 0
+      length(power_cache[i]) < j && (push!(power_cache[i], last(power_cache[i])^2))
+      if k & 1 == 1
+        result *= power_cache[i][j]
+      end
+      k >>= 1
+      j += 1
+    end
+    return result
+  end
+
+  function horner_for_lex_rec(terms::Vector{Tuple{CoeffType, Vector{Int}}}) where {CoeffType}
+    if length(terms) == 1
+      (c, e) = first(terms)
+      all(x->(x==0), e) && return c
+      return c*prod([_look_up_power(i, e[i]) for i in 1:n if e[i]>0])
+    elseif length(terms) == 0
+      # should never happen in internal use.
+      return zero(kk)
+    end
+
+    block_count = 0
+    blocks = [Vector{Tuple{CoeffType, Vector{Int}}}() for i in 1:n]
+    exp_offsets = [0 for i in 1:n]
+    bound = n-block_count
+    c0 = zero(kk)
+    for (c, e) in terms
+      # First handle the exceptional case
+      if iszero(e) 
+        c0 = c
+        continue
+      end
+
+      if block_count < n && !all(x->(x==0), e[1:end-block_count])
+        block_count += 1
+        while block_count < n && !all(x->(x==0), e[1:end-block_count])
+          block_count += 1
+        end
+        exp_offsets[block_count] = e[n-block_count+1]
+      end
+      e[n-block_count+1] -= exp_offsets[block_count]
+      push!(blocks[block_count], (c, e))
+    end
+
+    all(x->(x==0), exp_offsets) && return c0
+    return c0 + sum([_look_up_power(n-i+1, exp_offsets[i])*horner_for_lex_rec(blocks[i]) for i in 1:n if exp_offsets[i] != 0])
+  end
+
+  terms = Vector{Tuple{elem_type(kk), Vector{Int}}}(reverse(collect(zip(coefficients(f), exponent_vectors(f)))))
+  return horner_for_lex_rec(terms)
+end
+
+# In this case, caching should not make too much of a difference. 
+function horner_for_lex_evaluate(f::Vector{PolyType}, p::Vector{T}) where {PolyType<:MPolyElem, T}
+  power_cache::Vector{Vector{T}} = [[q] for q in p]
+  return [horner_for_lex_evaluate(g, p, power_cache=power_cache) for g in f]
+end
+
+# Another multivariate Horner pattern that turned out not to perform too well
+function horner_evaluate(f::MPolyElem, p::Vector{T}) where {T}
+  R = parent(f)
+  kk = coefficient_ring(R)
+  iszero(f) && return zero(kk)
+
+  n = nvars(parent(f))
+  n == length(p) || error("wrong number of elements for substitution")
+  
+  function horner_rec(terms::Vector{Tuple{CoeffType, Vector{Int}}}) where {CoeffType}
+    if length(terms) == 1
+      (c, e) = first(terms)
+      return c*prod([p[j]^e[j] for j in 1:n])
+    elseif length(terms) == 0
+      return zero(kk)
+    end
+
+    min_exp = Vector{Int}()
+    for (c, e) in terms
+      if all(k->(k != 0), e) 
+        min_exp = e
+        break
+      end
+    end
+
+    length(min_exp) == 0 && (min_exp = [1 for i in 1:n])
+
+    for (c, e) in terms
+      iszero(e) && continue
+      if all(k->(k>0), min_exp - e )
+        min_exp = e 
+      end
+    end
+
+    parts = [Vector{Tuple{CoeffType, Vector{Int}}}() for i in 1:2^n]
+    c0 = zero(kk)
+    for (c, e) in terms 
+      if iszero(e) 
+        c0 = c
+        continue
+      end
+      index = BigInt(0)
+      for j in 1:n
+        index <<= 1
+        e[j] >= min_exp[j] && (index += 1)
+      end
+      push!(parts[index], (c, e - [e[k] >= min_exp[k] ? min_exp[k] : 0 for k in 1:n]))
+    end
+
+    result = c0
+    powers = [p[end]^min_exp[end]]
+    for j in n-1:-1:1
+      q = p[j]^(min_exp[j])
+      powers = vcat(powers, [q], q*powers)
+    end
+    return c0 + sum([q*g for (q, g) in zip(powers, [horner_rec(t) for t in parts])])
+  end
+
+  terms = Vector{Tuple{elem_type(kk), Vector{Int}}}(reverse(collect(zip(coefficients(f), exponent_vectors(f)))))
+  return horner_rec(terms)
+end
+
 
 ################################################################################
 #

@@ -941,6 +941,7 @@ end
 
          @test r3 == r1 + r2
          @test [r1, r2, r3] == AbstractAlgebra.log_evaluate([f, g, f+g], V2)
+         @test [r1, r2, r3] == AbstractAlgebra.horner_for_lex_evaluate([f, g, f+g], V2)
 
          V3 = [R(rand(-10:10)) for i in 1:num_vars]
 
@@ -950,6 +951,7 @@ end
 
          @test r3 == r1 + r2
          @test [r1, r2, r3] == AbstractAlgebra.log_evaluate([f, g, f+g], V3)
+         @test [r1, r2, r3] == AbstractAlgebra.horner_for_lex_evaluate([f, g, f+g], V3)
       end
    end
 
@@ -974,6 +976,7 @@ end
 
          @test r3 == r1 + r2
          @test [r1, r2, r3] == AbstractAlgebra.log_evaluate([f, g, f+g], V1)
+         @test [r1, r2, r3] == AbstractAlgebra.horner_for_lex_evaluate([f, g, f+g], V1)
       end
    end
 
