@@ -1096,7 +1096,34 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
     return result
   end
 
-  return sum([c*eval_mon(a) for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))])
+  # The sum over the terms is piled up as if we were bisecting 
+  # the full list iteratively; but without collecting the full 
+  # list so that we do not store an unnecessary amount of 
+  # intermediate terms 
+  sum_vec = T[]
+  for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))
+    next = c*eval_mon(a)
+    if length(sum_vec) == 0 
+      push!(sum_vec, next)
+      continue
+    end
+
+    j = 1
+    while length(sum_vec) >= j && !iszero(sum_vec[j]) 
+      next += sum_vec[j]
+      sum_vec[j] = zero(next)
+      j += 1
+    end
+    
+    if j < length(sum_vec)
+      sum_vec[j] += next
+    else 
+      push!(sum_vec, last(sum_vec) + next)
+      sum_vec[end-1] = zero(next)
+    end
+  end
+  return sum(sum_vec)
+  #return sum([c*eval_mon(a) for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))])
   #return sum([c*eval_mon(a) for (c, a) in collect(zip(coefficients(f), exponent_vectors(f)))])
 end
 
