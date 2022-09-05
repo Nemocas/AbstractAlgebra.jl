@@ -1036,13 +1036,15 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
   n = length(p)
   R = parent(f)
   n == nvars(R) || error("number of components must equal the number of variables")
+  kk = coefficient_ring(R)
+  S = parent(one(kk)*one(p[1]))
 
   function as_sum_of_powers_of_2(k::Int)
     j = 1
-    list = [k & j]
+    list = Int[]
     while k >= j
-      j = j << 1
       push!(list, k & j)
+      j = j << 1
     end
     return list
   end
@@ -1077,9 +1079,9 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
 
     e = a-b
     if haskey(power_cache, e) 
-      q = q*power_cache[e]
-      push!(cache, (a, q))
-      return q
+      qq = q*power_cache[e]
+      push!(cache, (a, qq))
+      return qq
     end
 
     c = [as_sum_of_powers_of_2(k) for k in e]
@@ -1087,8 +1089,9 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
     m = maximum([length(s) for s in c])
 
     result = q
-    exp_list = [[length(c[i]) <= j ? 0 : c[i][j] for i in 1:n] for j in m:-1:1]
+    exp_list = [[length(c[i]) < j ? 0 : c[i][j] for i in 1:n] for j in m:-1:1]
     for j in 1:m
+      iszero(exp_list[j]) && continue
       result *= look_up(exp_list[j])
       b += exp_list[j]
       push!(cache, (b, result))
@@ -1100,10 +1103,9 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
   # the full list iteratively; but without collecting the full 
   # list so that we do not store an unnecessary amount of 
   # intermediate terms 
-  sum_vec = [] # It is difficult to estimate the return type here a priori.
-               # since it might be different from T.
+  sum_vec = elem_type(S)[] 
   for (c, a) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))
-    next = c*eval_mon(a)
+    next = S(c)*eval_mon(a)
     if length(sum_vec) == 0 
       push!(sum_vec, next)
       continue
@@ -1111,8 +1113,8 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
 
     j = 1
     while length(sum_vec) >= j && !iszero(sum_vec[j]) 
-      next += sum_vec[j]
-      sum_vec[j] = 0
+      add!(next, next, sum_vec[j])
+      sum_vec[j] = zero(S)
       j += 1
     end
     
@@ -1120,7 +1122,7 @@ function log_evaluate(f::MPolyElem, p::Vector{T};
       sum_vec[j] = next
     else 
       push!(sum_vec, last(sum_vec) + next)
-      sum_vec[end-1] = 0
+      sum_vec[end-1] = zero(S)
     end
   end
   return sum(sum_vec)
@@ -1163,6 +1165,7 @@ function horner_for_lex_evaluate(
   R = parent(f)
   ordering(R) == :lex || error("polynomial ring must have lexicographic ordering")
   kk = coefficient_ring(R)
+  S = parent(one(kk)*one(p[1]))
   iszero(f) && return zero(kk)
 
   n = nvars(parent(f))
@@ -1187,21 +1190,21 @@ function horner_for_lex_evaluate(
     if length(terms) == 1
       (c, e) = first(terms)
       all(x->(x==0), e) && return c
-      return c*prod([_look_up_power(i, e[i]) for i in 1:n if e[i]>0])
+      return S(c)*prod([_look_up_power(i, e[i]) for i in 1:n if e[i]>0])
     elseif length(terms) == 0
       # should never happen in internal use.
-      return zero(kk)
+      return zero(S)
     end
 
     block_count = 0
     blocks = [Vector{Tuple{CoeffType, Vector{Int}}}() for i in 1:n]
     exp_offsets = [0 for i in 1:n]
     bound = n-block_count
-    c0 = zero(kk)
+    c0 = zero(S)
     for (c, e) in terms
       # First handle the exceptional case
       if iszero(e) 
-        c0 = c
+        c0 = S(c)
         continue
       end
 
@@ -1222,12 +1225,12 @@ function horner_for_lex_evaluate(
     # take a shortcut from recursion for the last variable:
     if exp_offsets[1] > 0
       (c, e) = pop!(blocks[1])
-      tmp = c
+      tmp = S(c)
       last = e[n]
       while !isempty(blocks[1])
         (c, e) = pop!(blocks[1])
-        tmp *= _look_up_power(n, last - e[n])
-        tmp += c
+        mul!(tmp, tmp, _look_up_power(n, last - e[n]))
+        add!(tmp, tmp, S(c))
         last = e[n]
       end
       result = result + _look_up_power(n, exp_offsets[1])*tmp
