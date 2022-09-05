@@ -941,7 +941,6 @@ end
 
          @test r3 == r1 + r2
          @test [r1, r2, r3] == AbstractAlgebra.log_evaluate([f, g, f+g], V2)
-         @test [r1, r2, r3] == AbstractAlgebra.horner_for_lex_evaluate([f, g, f+g], V2)
 
          V3 = [R(rand(-10:10)) for i in 1:num_vars]
 
@@ -951,6 +950,32 @@ end
 
          @test r3 == r1 + r2
          @test [r1, r2, r3] == AbstractAlgebra.log_evaluate([f, g, f+g], V3)
+      end
+   end
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+
+      S, varlist = PolynomialRing(R, var_names, ordering = :lex)
+
+      for iter = 1:50
+         f = rand(S, 0:5, 0:100, 0:0, -100:100)
+         g = rand(S, 0:5, 0:100, 0:0, -100:100)
+
+         V2 = [BigInt(rand(-10:10)) for i in 1:num_vars]
+
+         r1 = evaluate(f, V2)
+         r2 = evaluate(g, V2)
+         r3 = evaluate(f + g, V2)
+
+         @test [r1, r2, r3] == AbstractAlgebra.horner_for_lex_evaluate([f, g, f+g], V2)
+
+         V3 = [R(rand(-10:10)) for i in 1:num_vars]
+
+         r1 = evaluate(f, V3)
+         r2 = evaluate(g, V3)
+         r3 = evaluate(f + g, V3)
+
          @test [r1, r2, r3] == AbstractAlgebra.horner_for_lex_evaluate([f, g, f+g], V3)
       end
    end
@@ -976,7 +1001,25 @@ end
 
          @test r3 == r1 + r2
          @test [r1, r2, r3] == AbstractAlgebra.log_evaluate([f, g, f+g], V1)
-         @test [r1, r2, r3] == AbstractAlgebra.horner_for_lex_evaluate([f, g, f+g], V1)
+      end
+   end
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+
+      S, varlist = PolynomialRing(R, var_names, ordering = :lex)
+
+      for iter = 1:50
+         f = rand(S, 0:5, 0:100, 0:0, 0:0, -100:100)
+         g = rand(S, 0:5, 0:100, 0:0, 0:0, -100:100)
+
+         V1 = [rand(R1, 0:0, -10:10) for i in 1:num_vars]
+
+         r1 = evaluate(f, V1)
+         r2 = evaluate(g, V1)
+         r3 = evaluate(f + g, V1)
+
+         @test [r1, r2, r3] == AbstractAlgebra.horner_for_lex_evaluate([f, g, f+g], V1) 
       end
    end
 

@@ -1161,6 +1161,7 @@ function horner_for_lex_evaluate(
     power_cache::Vector{Vector{T}} = [[q] for q in p]
   ) where {T}
   R = parent(f)
+  ordering(R) == :lex || error("polynomial ring must have lexicographic ordering")
   kk = coefficient_ring(R)
   iszero(f) && return zero(kk)
 
