@@ -1216,7 +1216,23 @@ function horner_for_lex_evaluate(
     end
 
     all(x->(x==0), exp_offsets) && return c0
-    return c0 + sum([_look_up_power(n-i+1, exp_offsets[i])*horner_for_lex_rec(blocks[i]) for i in 1:n if exp_offsets[i] != 0])
+    result = c0
+    # in order to avoid call stack congestion in the pseudo-univariate case, 
+    # take a shortcut from recursion for the last variable:
+    if exp_offsets[1] > 0
+      (c, e) = pop!(blocks[1])
+      tmp = c
+      last = e[n]
+      while !isempty(blocks[1])
+        (c, e) = pop!(blocks[1])
+        tmp *= _look_up_power(n, last - e[n])
+        tmp += c
+        last = e[n]
+      end
+      result = result + _look_up_power(n, exp_offsets[1])*tmp
+    end
+    all(x->(x==0), exp_offsets[2:n]) && return result
+    return result + sum([_look_up_power(n-i+1, exp_offsets[i])*horner_for_lex_rec(blocks[i]) for i in 2:n if exp_offsets[i] != 0])
   end
 
   terms = Vector{Tuple{elem_type(kk), Vector{Int}}}(reverse(collect(zip(coefficients(f), exponent_vectors(f)))))
