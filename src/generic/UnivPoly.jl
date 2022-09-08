@@ -738,7 +738,7 @@ function remove(z::UnivPoly{T, U}, p::UnivPoly{T, U}) where {T, U}
    return val, UnivPoly{T, U}(q, S)
 end
 
-function valuation(z::UnivPoly{T}, p::UnivPoly{T}) where {T, U}
+function valuation(z::UnivPoly{T}, p::UnivPoly{T}) where {T}
   v, _ = remove(z, p)
   return v
 end

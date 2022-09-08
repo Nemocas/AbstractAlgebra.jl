@@ -430,7 +430,7 @@ end
 #
 ###############################################################################
 
-function ^(a::AbsMSeries, b::Int) where T <: RingElement
+function ^(a::AbsMSeries, b::Int)
     b < 0 && throw(DomainError(b, "Can't take negative power"))
     R = parent(a)
     prec = precision(a)
