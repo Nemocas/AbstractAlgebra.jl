@@ -112,7 +112,7 @@ _tablesz(x::Integer) = x < 16 ? 16 : one(x)<<((sizeof(x)<<3)-leading_zeros(x-1))
 hashindex(key, sz) = (((hash(key)::UInt % Int) & (sz-1)) + 1)::Int
 
 # filled -> missing
-function _deleteindex!(h::WeakValueCache, index) where {K, V}
+function _deleteindex!(h::WeakValueCache, index)
    h.nfilled -= 1
    h.nmissing += 1
    h.slots[index] = 0x2
