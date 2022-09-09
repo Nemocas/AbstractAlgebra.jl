@@ -1,5 +1,5 @@
 include("conformance-tests.jl")
-
+include("algorithms/MPolyEvaluate-test.jl")#=
 include("error-test.jl")
 include("Attributes-test.jl")
 include("WeakValueDict-test.jl")
@@ -12,4 +12,4 @@ include("Modules-test.jl")
 include("Maps-test.jl")
 include("Benchmark-test.jl")
 include("Factor-test.jl")
-include("PrettyPrinting-test.jl")
+include("PrettyPrinting-test.jl")=#
