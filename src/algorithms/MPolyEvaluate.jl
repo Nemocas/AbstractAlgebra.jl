@@ -16,11 +16,27 @@ function pow!(z::T, a, b)::T where T
   return a^b
 end
 
-# a *= x^p, using t as temp. Must return the modifed a and t
-function mulpow!(a, x, p, t)
-  t = pow!(t, x, p)
-  a = mul!(a, a, t)
-  return (a, t)
+# a *= x^p, using ta and tx as temps. Must return the modifed a, ta, tx
+function mulpow!(a::T, x::S, p, ta::T, tx::S) where {T, S}
+  tx = pow!(tx, x, p)
+  ta = mul!(ta, a, tx)
+  (a, ta) = (ta, a)
+  return (a, ta, tx)
+end
+
+function mulpow!(a::T, x::S, p, ta::T, tx::S) where {T <: MPolyElem, S <: MPolyElem}
+  if p > 1 && (length(x) < 2 || length(a) < p*length(x))
+    tx = pow!(tx, x, p)
+    ta = mul!(ta, a, tx)
+    (a, ta) = (ta, a)
+  else
+    while p > 0
+      ta = mul!(ta, a, x)
+      (a, ta) = (ta, a)
+      p -= 1
+    end
+  end
+  return (a, ta, tx)
 end
 
 
@@ -157,6 +173,7 @@ function _split_qr!(
 end
 
 # evaluate B at vars = C
+# arithmetic between ctxB and ctxC should be in ctxA
 function _evaluate_horner_non_rec(
   ctxA::Ring,
   Bcoeffs, Bexps::Vector{Vector{Int}},
@@ -166,12 +183,12 @@ function _evaluate_horner_non_rec(
 
   Blen = length(Bcoeffs)
   if Blen < 1
-    return zero(ctxC)
+    return zero(ctxA)
   end
 
   nvars = length(Bexps[1])
   if nvars < 1
-    return ctxC(Bcoeffs[1+0])
+    return ctxA(Bcoeffs[1+0])
   end
 
   counts = zeros(Int, nvars)
@@ -184,8 +201,9 @@ function _evaluate_horner_non_rec(
   #   Otherwise, the return is in Bcoeffs[1+rtypes[1+rp]]
   rp = 0
   rtypes = zeros(Int, nvars + 1)
-  regs = elem_type(ctxC)[ctxC() for i in 1:nvars]
-  temp = ctxC()
+  regs = elem_type(ctxA)[ctxA() for i in 1:nvars]
+  tempC = ctxC()
+  tempA = ctxA()
 
   # the polynomials will be stored as null-terminated linked lists, null = -1
   Blist = zeros(Int, Blen)
@@ -211,8 +229,13 @@ function _evaluate_horner_non_rec(
     @goto horner_form_return
   elseif totalcounts == 1
     @assert Bexps[1+f][1+v] > 0
-    regs[1+rp] = pow!(regs[1+rp], C[1+v], Bexps[1+f][1+v])
-    regs[1+rp] = mul!(regs[1+rp], regs[1+rp], Bcoeffs[1+f])
+    if elem_type(ctxA) == elem_type(ctxC)
+      regs[1+rp] = pow!(regs[1+rp], C[1+v], Bexps[1+f][1+v])
+      regs[1+rp] = mul!(regs[1+rp], regs[1+rp], Bcoeffs[1+f])
+    else
+      tempC = pow!(tempC, C[1+v], Bexps[1+f][1+v])
+      regs[1+rp] = mul!(regs[1+rp], tempC, Bcoeffs[1+f])
+    end
     if Blist[1+f] != -1       # f has a second term that should be a scalar
       @assert Bexps[1+Blist[1+f]][1+v] == 0
       regs[1+rp] = add!(regs[1+rp], regs[1+rp], Bcoeffs[1+Blist[1+f]])
@@ -243,18 +266,18 @@ function _evaluate_horner_non_rec(
 
     if rtypes[1+rp-1] == -1 && rtypes[1+rp] == -1
       # both quotient and remainder are polynomials
-      regs[1+rp-1], temp = mulpow!(regs[1+rp-1], C[1+stack[end].v_var], stack[end].v_exp, temp)
-      temp = add!(temp, regs[1+rp-1], regs[1+rp])
-      regs[1+rp-1], temp = temp, regs[1+rp-1]
+      regs[1+rp-1], tempA, tempC = mulpow!(regs[1+rp-1], C[1+stack[end].v_var], stack[end].v_exp, tempA, tempC)
+      tempA = add!(tempA, regs[1+rp-1], regs[1+rp])
+      regs[1+rp-1], tempA = tempA, regs[1+rp-1]
     elseif rtypes[1+rp-1] == -1 && rtypes[1+rp] != -1
       # quotient is a polynomial, remainder is a scalar
-      regs[1+rp-1], temp = mulpow!(regs[1+rp-1], C[1+stack[end].v_var], stack[end].v_exp, temp)
+      regs[1+rp-1], tempA, tempC = mulpow!(regs[1+rp-1], C[1+stack[end].v_var], stack[end].v_exp, tempA, tempC)
       regs[1+rp-1] = add!(regs[1+rp-1], regs[1+rp-1], Bcoeffs[1+rtypes[1+rp]])
     elseif rtypes[1+rp-1] != -1 && rtypes[1+rp] == -1
       # quotient is a scalar, remainder is a polynomial
-      temp = pow!(temp, C[1+stack[end].v_var], stack[end].v_exp)
-      temp = mul!(temp, temp, Bcoeffs[1+rtypes[1+rp-1]])
-      regs[1+rp-1] = add!(regs[1+rp-1], temp, regs[1+rp])
+      tempC = pow!(tempC, C[1+stack[end].v_var], stack[end].v_exp)
+      tempA = mul!(tempA, tempC, Bcoeffs[1+rtypes[1+rp-1]])
+      regs[1+rp-1] = add!(regs[1+rp-1], regs[1+rp], tempA)
     else
       # done by simple case
       @assert false
@@ -265,7 +288,7 @@ function _evaluate_horner_non_rec(
     # remainder is zero
     @assert rtypes[1+rp] == -1
     # quotient is a polynomial
-    regs[1+rp], temp = mulpow!(regs[1+rp], C[1+stack[end].v_var], stack[end].v_exp, temp)
+    regs[1+rp], tempA, tempC = mulpow!(regs[1+rp], C[1+stack[end].v_var], stack[end].v_exp, tempA, tempC)
   end
   rtypes[1+rp] = -1
 
@@ -285,7 +308,7 @@ function _evaluate_horner_non_rec(
   if rtypes[1+rp] == -1
     return regs[1+rp]
   else
-    return ctxC(Bcoeffs[1+rtypes[1+rp]])
+    return ctxA(Bcoeffs[1+rtypes[1+rp]])
   end
 end
 
