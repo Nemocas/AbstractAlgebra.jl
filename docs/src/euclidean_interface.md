@@ -12,7 +12,7 @@ functions existing. An implementation must provide `divrem`, and the remaining
 are optional as generic fallbacks exist.
 
 ```@docs
-divrem
+Base.divrem(f::T, g::T) where T <: RingElem
 mod(f::T, g::T) where T <: RingElem
 Base.div(f::T, g::T) where T <: RingElem
 mulmod(f::T, g::T, m::T) where T <: RingElem
