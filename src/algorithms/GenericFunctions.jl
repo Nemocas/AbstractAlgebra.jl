@@ -46,7 +46,9 @@ end
 Return a pair `q, r` consisting of the Euclidean quotient and remainder of $f$
 by $g$. A `DivideError` should be thrown if $g$ is zero.
 """
-function divrem end
+function Base.divrem(a::T, b::T) where T <: RingElem
+  throw(NotImplementedError(:divrem, a, b))
+end
 
 @doc Markdown.doc"""
     mod(f::T, g::T) where T <: RingElem
