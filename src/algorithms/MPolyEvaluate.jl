@@ -39,6 +39,11 @@ function mulpow!(a::T, x::S, p, ta::T, tx::S) where {T <: MPolyElem, S <: MPolyE
   return (a, ta, tx)
 end
 
+###############################################################################
+#
+#   evaluate_horner
+#
+###############################################################################
 
 #=
 The conversion to Horner form can be stated as recursive. However, the call
@@ -319,5 +324,165 @@ function evaluate_horner(B::MPolyElem, C::Vector{<:RingElement})
   ctxA = parent(one(coefficient_ring(B)) * one(ctxC))
   Bexps = collect(exponent_vectors(B))
   return _evaluate_horner_non_rec(ctxA, Bcoeffs, Bexps, C, ctxC)
+end
+
+
+###############################################################################
+#
+#   evaluate_log
+#
+###############################################################################
+
+########################################################################
+#
+#  Evaluation with multivariate logarithmic caching.
+#
+#  The code does the following. Given a multivariate polynomial
+#  f = ∑ₐ cₐ ⋅ xᵃ in n variables and n elements p₁,…,pₙ on which
+#  f will be evaluated, iterate through the terms cₐ ⋅ xᵃ of f.
+#
+#  On first stage, we have a stack with precomputed powers
+#  from previous terms where every entry is divisible by the
+#  previous one. Given xᵃ, pop from that stack until the top
+#  element q = pᵇ divides pᵃ. Proceed with the computation
+#  of pᵃ:q.
+#
+#  Write the exponent a - b as a sum of integer vectors
+#  a - b = c⁽¹⁾ + c⁽²⁾+ ... + c⁽ᵐ⁾ where each of the c⁽ʲ⁾ has integer
+#  entries (k₁, k₂, …, kₙ) that are either zero or a pure power
+#  of 2.
+#
+#  Then look up each one of the products p₁ᵏ¹ ⋅ p₂ᵏ² ⋅ … ⋅ pₙᵏⁿ
+#  in a cache dictionary. If it's not there, these can be easily
+#  computed as products of squares of other precomputed entries.
+#
+#  Once all these lookups have been carried out, assemble the
+#  final product for the monomial q ⋅ pᵃ ⁻ ᵇ using the obvious
+#  m+1 multiplications and add them to the return list for
+#  summation.
+#
+#  NOTE: In order for the above algorithm to be efficient,
+#  one must iterate through the terms of f starting with
+#  those of lowest degree first and going higher. Adjust this
+#  according to the iterators!
+#
+#  Moreover, we assume the iteration to proceed with consecutive
+#  terms "close to one another" regarding their exponent vectors.
+#
+#  This is, for instance, the case when the terms are returned in
+#  lexicographical order.
+#
+########################################################################
+
+function _highest_bit(k::Int)
+  return 1 << (8*sizeof(Int)-1 - leading_zeros(k))
+end
+
+function _lowest_bit(k::Int)
+  return k & -k
+end
+
+# for evaluating prod_i p[i]^e[i] for a given e and fixed p
+mutable struct PowerCache{T}
+  p::Vector{T}
+
+  # holds prod_i p[i]^e[i] where each e[i] is zero or a power of 2
+  power_cache::Dict{Vector{Int}, T}
+
+  # monomials earlier in the cache divide later ones
+  # the sentinel monomial (0,0,...,0) is always present
+  cache::Vector{Tuple{Vector{Int}, T}}
+
+  function PowerCache{T}(p) where T
+    n = length(p)
+    return new{T}(p,
+                  Dict([[i==j ? 1 : 0 for i in 1:n] => p[j] for j in 1:n]),
+                  Tuple{Vector{Int}, T}[(zeros(Int, n), one(p[1]))]
+                 )
+  end
+end
+
+# should allow e to be mutated !!
+function look_up(PC::PowerCache, e::Vector{Int})
+  all(x->(x==0), e) && return one(p[1])
+  haskey(PC.power_cache, e) && return PC.power_cache[e]
+  e = deepcopy(e)   # !!
+  if all(x->(x<=1), e)
+    power = prod([PC.p[i] for i in 1:length(PC.p) if e[i] == 1])
+    PC.power_cache[e] = power
+    return power
+  end
+  c = [k >> 1 for k in e]
+  d = e - c
+  power = look_up(PC, c)*look_up(PC, d)
+  PC.power_cache[e] = power
+  return power
+end
+
+
+function eval_mon(PC::PowerCache, a::Vector{Int})
+  n = length(PC.p)
+  # pop the cache until the last monomial divides a
+  while begin b, q = last(PC.cache); e = a - b; any(x->x<0, e) end
+    pop!(PC.cache)
+  end
+
+  # a = b + e
+  if haskey(PC.power_cache, e)
+    qq = q*PC.power_cache[e]
+    push!(PC.cache, (a, qq))
+    return qq
+  end
+
+  # for the monomial e = [7,5], use e = (4,4) + (2,0) + (1,1)
+  mask = e[1]
+  for i in 2:n
+    mask |= e[i]
+  end
+  newe = zeros(Int, n)
+  result = q
+  while mask > 0
+    bit = _lowest_bit(mask)
+    mask = mask & ~bit
+    for i in 1:n
+      newe[i] = e[i] & bit
+    end
+    result *= look_up(PC, newe)
+    b += newe
+    push!(PC.cache, (b, result))
+  end
+  return result
+end
+
+function evaluate_log(f::MPolyElem, p::Vector{T}; power_cache = PowerCache{T}(p)) where {T}
+  n = length(p)
+  R = parent(f)
+  n == nvars(R) || error("number of components must equal the number of variables")
+  kk = coefficient_ring(R)
+  S = parent(one(kk)*one(p[1]))
+
+  r = elem_type(S)[]
+  i = UInt(0)
+  for (c, e) in reverse(collect(zip(coefficients(f), exponent_vectors(f))))
+    push!(r, c*eval_mon(power_cache, e))
+    j = i = i + 1
+    while iseven(j) && length(r) > 1
+      top = pop!(r)
+      r[end] = addeq!(r[end], top)
+      j >>= 1
+    end
+  end
+  while length(r) > 1
+    top = pop!(r)
+    r[end] = addeq!(r[end], top)
+  end
+  return isempty(r) ? zero(S) : r[1]
+end
+
+# For a list of polynomials f to be evaluated on the same elements p,
+# we can pass on the caching dictionary.
+function evaluate_log(f::Vector{PolyType}, p::Vector{T}) where {PolyType<:MPolyElem, T}
+  D = PowerCache{T}(p)
+  return [evaluate_log(g, p; power_cache = D) for g in f]
 end
 
