@@ -10,7 +10,9 @@ statement must come before the invocation of this macro.
 
 This can be used to provide aliases like `is_isomorphic` for `is_isomorphic`
 (or vice versa); unlike `@deprecate`, methods can be installed under either name,
-as the two names really refer to the same object
+as the two names really refer to the same object.
+
+The alias also gets a special docstring that points out that it is an alias
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -26,7 +28,7 @@ macro alias(alias_name::Symbol, real_name::Symbol)
         if isdefined($__module__, $(QuoteNode(alias_name)))
             $alias_name === $real_name || error("Alias '$($(string(alias_name)))' is already defined with a different value")
         else
-            """
+            @doc """
                 $($(string(alias_name)))
 
             Alias for `$($(string(real_name)))`.

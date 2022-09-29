@@ -1,6 +1,7 @@
 include("conformance-tests.jl")
 
 include("error-test.jl")
+include("AliasMacro-test.jl")
 include("Attributes-test.jl")
 include("WeakValueDict-test.jl")
 include("Groups-test.jl")
