@@ -41,12 +41,101 @@ end
 
 ###############################################################################
 #
+#   evaluate_horner_lex
+#
+###############################################################################
+
+# The usual univariate horner rule. Since Bexps is in lex order,
+# recursion is easy, and the depth is bounded by nvars
+function _horner_lex_rec(
+  res::Vector,
+  ctxA::Ring,
+  Bcoeffs, Bexps::Vector{Vector{Int}},
+  Bstart::Int, Bstop::Int, # ignore all terms outside this interval [Bstart, Bstop]
+  var::Int, # ignore all variables of index < var
+  C::Vector,
+  ctxC::Ring,
+  ta, tc) # temps
+
+  @assert Bstart <= Bstop
+  len = Bstop + 1 - Bstart
+
+  if len < 2
+    # evaluate a monomial
+    first = true
+    for v in var:length(Bexps[Bstart])
+      Bexps[Bstart][v] == 0 && continue
+      if first
+        tc = pow!(tc, C[v], Bexps[Bstart][v])
+        res[var] = mul!(res[var], Bcoeffs[Bstart], tc)
+      else
+        res[var], ta, tc = mulpow!(res[var], C[v], Bexps[Bstart][v], ta, tc)
+      end
+      first = false
+    end
+    if first
+      res[var] = deepcopy(ctxA(Bcoeffs[Bstart]))  # res[.] should be mutable
+      first = false
+    end
+    return (ta, tc)
+  end
+
+  i = Bstart
+  e = Bexps[i][var]
+  res[var] = zero!(res[var])
+
+@label next_term
+
+  i += 1
+  if i > Bstop
+    nexte = 0
+  elseif Bexps[i][var] == e
+    @goto next_term
+  else
+    nexte = Bexps[i][var]
+  end
+
+  (ta, tc) = _horner_lex_rec(res, ctxA, Bcoeffs, Bexps, Bstart, i-1, var+1, C, ctxC, ta, tc)
+  res[var] = addeq!(res[var], res[var+1])
+  res[var], ta, tc = mulpow!(res[var], C[var], e - nexte, ta, tc)
+
+  if i > Bstop
+    return (ta, tc)
+  end
+
+  Bstart = i
+  e = nexte
+  @goto next_term
+end
+
+function evaluate_horner_lex(B::MPolyElem, C::Vector{<:RingElement})
+  @assert nvars(parent(B)) <= length(C)
+  ctxC = parent(C[1])
+  Bcoeffs = collect(coefficients(B))
+  ctxA = parent(one(coefficient_ring(B)) * one(ctxC))
+  Bexps = collect(exponent_vectors(B))
+  n = length(Bexps)
+  if n < 1
+    return zero(ctxA)
+  end
+  p = sortperm(Bexps, rev=true)
+  if p != 1:n
+    Bcoeffs = [Bcoeffs[p[i]] for i in 1:n]
+    Bexps   = [Bexps[p[i]] for i in 1:n]
+  end
+  res = elem_type(ctxA)[ctxA() for i in 1:nvars(parent(B))+2]
+  _horner_lex_rec(res, ctxA, Bcoeffs, Bexps, 1, n, 1, C, ctxC, ctxA(), ctxC())
+  return res[1]
+end
+
+###############################################################################
+#
 #   evaluate_horner
 #
 ###############################################################################
 
 #=
-The conversion to Horner form can be stated as recursive. However, the call
+This conversion to Horner form can be stated as recursive. However, the call
 stack has depth proportional to the length of the input polynomial in the worst
 case. Therefore, the following iterative spaghetti ensues.
 
@@ -374,9 +463,10 @@ end
 #
 ########################################################################
 
-function _highest_bit(k::Int)
-  return 1 << (8*sizeof(Int)-1 - leading_zeros(k))
-end
+# change _lowest_bit to _highest_bit in eval_mon to iterate in different order
+#function _highest_bit(k::Int)
+#  return 1 << (8*sizeof(Int)-1 - leading_zeros(k))
+#end
 
 function _lowest_bit(k::Int)
   return k & -k

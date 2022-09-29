@@ -11,6 +11,10 @@ function test_evaluate(f, v, q = evaluate(f, v))
   @test typeof(q) == typeof(e3[1]) == typeof(e3[2])
   @test q == e3[1]
   @test q == e3[2]
+
+  e4 = AbstractAlgebra.evaluate_horner_lex(f, v)
+  @test typeof(q) == typeof(e4)
+  @test q == e4
 end
 
 @testset "MPolyEvaluate.ZZ(ZZ[x])" begin
@@ -29,7 +33,7 @@ end
 end
 
 @testset "MPolyEvaluate.ZZ(QQ)" begin
-  R, (x, y, z, t) = ZZ["x", "y", "z", "t"]
+  R, (x, y, z, t) = PolynomialRing(ZZ, ["x", "y", "z", "t"], ordering = :degrevlex)
   test_evaluate(zero(R), [QQ(), QQ(), QQ(), QQ()])
   test_evaluate(one(R), [QQ(), QQ(), QQ(), QQ()])
   for i in 1:100
