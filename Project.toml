@@ -2,6 +2,7 @@ name = "AbstractAlgebra"
 uuid = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
 version = "0.27.5"
 
+
 [deps]
 GroupsCore = "d5909c97-4eac-4ecc-a3dc-fdd0858a4120"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
