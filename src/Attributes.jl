@@ -330,9 +330,10 @@ macro attr(ex1, exs...)
    # store the original function name
    name = d[:name]
 
-   # take the original function and rename it; use a unique name to ensure
-   # there are no clashes caused by spurious additional methods
-   compute_name = gensym("compute_$(name)")
+   # take the original function and rename it; use a distinctive name to
+   # minimize the risk of accidental conflicts. We deliberately don't
+   # use gensym anymore because this interacts badly with Revise.
+   compute_name = Symbol("__compute_$(name)__")
    compute_def = copy(d)
    compute_def[:name] = compute_name
    compute = MacroTools.combinedef(compute_def)
