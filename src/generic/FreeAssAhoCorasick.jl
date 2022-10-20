@@ -3,7 +3,7 @@
 #   for use e.g. in Groebner Basis computation
 #
 ###############################################################################
-#TODO how to properly export this?
+
 export search, AhoCorasickAutomaton, AhoCorasickMatch, Word, insert_keyword!
 
 using DataStructures
@@ -134,8 +134,6 @@ function search(automaton::AhoCorasickAutomaton, word)
         end
         if automaton.output[current_state][1] < result.keyword_index
             result = AhoCorasickMatch(i, automaton.output[current_state][1], automaton.output[current_state][2])
-            #push!(output, (i, automaton.output[current_state]))
-#            union!(output_set, (i, automaton.output[current_state]))
         end
     end
     if result.keyword == []
