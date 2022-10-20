@@ -390,6 +390,14 @@ function is_unit(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    end
 end
 
+function content(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   z = zero(coefficient_ring(a))
+   for c in coefficients(a)
+      z = gcd(z, c)
+   end
+   return z
+end
+
 function is_zero_divisor(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return is_zero_divisor(content(x))
 end

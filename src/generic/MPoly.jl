@@ -3570,14 +3570,6 @@ function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return parent(a)(Cc, Ce)
 end
 
-function content(a::MPoly{T}) where {T <: RingElement}
-   z = base_ring(a)()
-   for i = 1:length(a)
-      z = gcd(z, coeff(a, i))
-   end
-   return z
-end
-
 function term_content(a::MPoly{T}) where {T <: RingElement}
    if a.length <= 1
       return a
