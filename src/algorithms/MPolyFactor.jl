@@ -165,7 +165,7 @@ function make_monic(a::E) where E
   if length(a) < 1
     return a
   end
-  lc = leading_coefficient(a)
+  lc = AbstractAlgebra.lc(a)
   if isone(lc)
     return a
   else

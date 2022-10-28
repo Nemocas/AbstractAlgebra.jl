@@ -204,11 +204,11 @@ function coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T})
 end
 
 @doc Markdown.doc"""
-    leading_coefficient(p::MPolyElem)
+    AbstractAlgebra.lc(p::MPolyElem)
 
 Return the leading coefficient of the polynomial $p$.
 """
-function leading_coefficient(p::MPolyElem{T}) where T <: RingElement
+function lc(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return zero(base_ring(p))
    else
@@ -216,13 +216,15 @@ function leading_coefficient(p::MPolyElem{T}) where T <: RingElement
    end
 end
 
+lc(p::PolyElem) = leading_coefficient(p)
+
 @doc Markdown.doc"""
-    trailing_coefficient(p::MPolyElem)
+    AbstractAlgebra.tc(p::MPolyElem)
 
 Return the trailing coefficient of the polynomial $p$, i.e. the coefficient of
 the last nonzero term, or zero if the polynomial is zero.
 """
-function trailing_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+function tc(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    coeff = zero(base_ring(p))
    for c in coefficients(p)
       coeff = c
@@ -231,12 +233,12 @@ function trailing_coefficient(p::AbstractAlgebra.MPolyElem{T}) where T <: RingEl
 end
 
 @doc Markdown.doc"""
-    tail(p::MPolyElem)
+    AbstractAlgebra.tl(p::MPolyElem)
 
 Return the tail of the polynomial $p$, i.e. the polynomial without its leading
 term (if any).
 """
-function tail(p::MPolyElem{T}) where T <: RingElement
+function tl(p::MPolyElem{T}) where T <: RingElement
    S = parent(p)
    if iszero(p)
       return S()
@@ -275,12 +277,12 @@ function constant_coefficient(p::MPolyElem)
 end
 
 @doc Markdown.doc"""
-    leading_monomial(p::MPolyElem)
+    AbstractAlgebra.lm(p::MPolyElem)
 
 Return the leading monomial of $p$.
 This function throws an `ArgumentError` if $p$ is zero.
 """
-function leading_monomial(p::MPolyElem{T}) where T <: RingElement
+function lm(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       throw(ArgumentError("Zero polynomial does not have a leading monomial"))
    end
@@ -302,12 +304,12 @@ function leading_exponent_vector(p::MPolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    leading_term(p::MPolyElem)
+    AbstractAlgebra.lt(p::MPolyElem)
 
 Return the leading term of the polynomial p.
 This function throws an `ArgumentError` if $p$ is zero.
 """
-function leading_term(p::MPolyElem{T}) where T <: RingElement
+function lt(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       throw(ArgumentError("Zero polynomial does not have a leading term"))
    end
@@ -380,7 +382,7 @@ iszero(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement = length(x) == 0
 
 function is_unit(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    if is_constant(a)
-      return is_unit(leading_coefficient(a))
+      return is_unit(lc(a))
    elseif is_domain_type(elem_type(coefficient_ring(a)))
       return false
    elseif length(a) == 1
@@ -1052,7 +1054,7 @@ function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyE
       error("Can only convert univariate polynomials of type MPoly.")
    end
    if is_constant(p)
-      return R(leading_coefficient(p))
+      return R(lc(p))
    end
    return R(coefficients_of_univariate(p))
 end

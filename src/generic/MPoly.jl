@@ -677,7 +677,7 @@ function coeff(x::MPoly, i::Int)
    return x.coeffs[i]
 end
 
-function trailing_coefficient(p::MPoly{T}) where T <: RingElement
+function AbstractAlgebra.tc(p::MPoly{T}) where T <: RingElement
    if iszero(p)
       return zero(base_ring(p))
    else

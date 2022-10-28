@@ -364,7 +364,7 @@ z^4-4*x*y-10*x*z^2+8*y^2*z^5-9*y^2*z^3
    end
 end
 
-@testset "Generic.MPoly.leading_term" begin
+@testset "Generic.MPoly.AbstractAlgebra.lt" begin
    for num_vars=1:10
       ord = rand_ordering()
       var_names = ["x$j" for j in 1:num_vars]
@@ -375,18 +375,18 @@ end
       g = rand(R, 5:10, 1:10, -100:100)
 
       if !iszero(f) && !iszero(g)
-         @test leading_term(f*g) == leading_term(f)*leading_term(g)
+         @test AbstractAlgebra.lt(f*g) == AbstractAlgebra.lt(f)*AbstractAlgebra.lt(g)
       else
-         @test_throws ArgumentError leading_term(f)*leading_term(g)
+         @test_throws ArgumentError AbstractAlgebra.lt(f)*AbstractAlgebra.lt(g)
       end
-      @test leading_term(one(R)) == one(R)
-      @test_throws ArgumentError leading_term(zero(R))
+      @test AbstractAlgebra.lt(one(R)) == one(R)
+      @test_throws ArgumentError AbstractAlgebra.lt(zero(R))
 
       for v in vars_R
-         @test leading_term(v) == v
+         @test AbstractAlgebra.lt(v) == v
       end
 
-      @test parent(leading_term(f)) == parent(f)
+      @test parent(AbstractAlgebra.lt(f)) == parent(f)
    end
 
    for num_vars = 1:4
@@ -398,15 +398,15 @@ end
          f = rand(S, 0:4, 0:5, -10:10)
          g = rand(S, 0:4, 0:5, -10:10)
 
-         @test leading_coefficient(f*g) ==
-	       leading_coefficient(f)*leading_coefficient(g)
-         @test leading_coefficient(one(S)) == one(base_ring(S))
+         @test AbstractAlgebra.lc(f*g) ==
+	       AbstractAlgebra.lc(f)*AbstractAlgebra.lc(g)
+         @test AbstractAlgebra.lc(one(S)) == one(base_ring(S))
 
          for v in varlist
-            @test leading_coefficient(v) == one(base_ring(S))
+            @test AbstractAlgebra.lc(v) == one(base_ring(S))
          end
 
-         @test parent(leading_coefficient(f)) == base_ring(f)
+         @test parent(AbstractAlgebra.lc(f)) == base_ring(f)
       end
    end
 
@@ -425,18 +425,18 @@ end
             g = rand(S, 0:4, 0:5, -10:10)
          end
 
-         @test leading_monomial(f*g) == leading_monomial(f)*leading_monomial(g)
+         @test AbstractAlgebra.lm(f*g) == AbstractAlgebra.lm(f)*AbstractAlgebra.lm(g)
          @test leading_exponent_vector(f*g) == leading_exponent_vector(f) +
                                                leading_exponent_vector(g)
-         @test leading_monomial(one(S)) == one(S)
-         @test_throws ArgumentError leading_monomial(zero(S))
+         @test AbstractAlgebra.lm(one(S)) == one(S)
+         @test_throws ArgumentError AbstractAlgebra.lm(zero(S))
          @test_throws ArgumentError leading_exponent_vector(zero(S))
 
          for v in varlist
-            @test leading_monomial(v) == v
+            @test AbstractAlgebra.lm(v) == v
          end
 
-         @test parent(leading_monomial(f)) == parent(f)
+         @test parent(AbstractAlgebra.lm(f)) == parent(f)
       end
    end
 
@@ -447,14 +447,14 @@ end
    @test constant_coefficient(2x) == 0
    @test constant_coefficient(2x^2 + 3y^3 + 4) == 4
 
-   @test trailing_coefficient(x^2*y + 7x*y + 3x + 2y + 5) == 5
-   @test trailing_coefficient(x^2*y + 7x*y + 3x + 2y) == 2
-   @test trailing_coefficient(R(2)) == 2
-   @test trailing_coefficient(R()) == 0
+   @test AbstractAlgebra.tc(x^2*y + 7x*y + 3x + 2y + 5) == 5
+   @test AbstractAlgebra.tc(x^2*y + 7x*y + 3x + 2y) == 2
+   @test (R(2)) == 2
+   @test (R()) == 0
 
-   @test tail(2x^2 + 2x*y + 3) == 2x*y + 3
-   @test tail(R(1)) == 0
-   @test tail(R()) == 0
+   @test AbstractAlgebra.tl(2x^2 + 2x*y + 3) == 2x*y + 3
+   @test AbstractAlgebra.tl(R(1)) == 0
+   @test AbstractAlgebra.tl(R()) == 0
 end
 
 @testset "Generic.MPoly.total_degree" begin

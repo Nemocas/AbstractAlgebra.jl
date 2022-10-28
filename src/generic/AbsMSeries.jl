@@ -200,7 +200,7 @@ function is_gen(a::AbsMSeries)
     p = poly(a)
     v = vars(p)
     return length(v) == 1 && length(p) == 1 &&
-          isone(leading_coefficient(p)) && sum(first(exponent_vectors(p))) == 1
+          isone(AbstractAlgebra.lc(p)) && sum(first(exponent_vectors(p))) == 1
 end
 
 function deepcopy_internal(a::AbsMSeries, dict::IdDict)

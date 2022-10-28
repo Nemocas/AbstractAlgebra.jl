@@ -112,7 +112,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
       node = new{U, V, N}(p, nothing, nothing, nothing, nothing, true, true, 0, 0)
       node.size = 0.0
       if p != nothing && !iszero(p)
-         if leading_coefficient(p) < 0
+         if AbstractAlgebra.lc(p) < 0
             node.poly = -node.poly
          end
          node.lm = Tuple(exponent_vector(node.poly, 1))
@@ -154,7 +154,7 @@ end
 # otherwise
 function print_poly(io::IO, p::MPolyElem)
    if poly_level == 1
-      print(io, leading_term(p))
+      print(io, AbstractAlgebra.lt(p))
       if length(p) > 1
          print(io, "+...")
       end
@@ -402,7 +402,7 @@ function reduce_coefficients(p::U, V::Vector{U}, start::Int) where U <: Abstract
          mv = exponent_vector(V[i], 1)
          mp = exponent_vector(p, n)
          if max.(mv, mp) == mp # leading monomial divides
-            h = leading_coefficient(V[i]) # should be positive
+            h = AbstractAlgebra.lc(V[i]) # should be positive
             q, r = AbstractAlgebra.divrem(c, h)
             if !iszero(q)
                shift = mp .- mv
@@ -442,8 +442,8 @@ end
 
 # given two nodes, return a node giving the spoly of the two nodes
 function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   fc = leading_coefficient(f.poly)
-   gc = leading_coefficient(g.poly)
+   fc = AbstractAlgebra.lc(f.poly)
+   gc = AbstractAlgebra.lc(g.poly)
    c = lcm(fc, gc)
    llcm = max.(f.lm, g.lm)
    infl = [1 for i in 1:N]
@@ -455,8 +455,8 @@ end
 
 # given two nodes, return a node giving the gpoly of the two nodes
 function compute_gpoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   fc = leading_coefficient(f.poly)
-   gc = leading_coefficient(g.poly)
+   fc = AbstractAlgebra.lc(f.poly)
+   gc = AbstractAlgebra.lc(g.poly)
    _, s, t = gcdx(fc, gc)
    llcm = max.(f.lm, g.lm)
    infl = [1 for i in 1:N]
@@ -469,8 +469,8 @@ end
 # given two polynomials, return the spoly of the two
 function spoly(f::T, g::T) where T <: MPolyElem
    n = nvars(parent(f))
-   fc = leading_coefficient(f)
-   gc = leading_coefficient(g)
+   fc = AbstractAlgebra.lc(f)
+   gc = AbstractAlgebra.lc(g)
    mf = exponent_vector(f, 1)
    mg = exponent_vector(g, 1)
    c = lcm(fc, gc)
@@ -484,8 +484,8 @@ end
 # given two polynomials, return the gpoly of the two
 function gpoly(f::T, g::T) where T <: MPolyElem
    n = nvars(parent(f))
-   fc = leading_coefficient(f)
-   gc = leading_coefficient(g)
+   fc = AbstractAlgebra.lc(f)
+   gc = AbstractAlgebra.lc(g)
    mf = exponent_vector(f, 1)
    mg = exponent_vector(g, 1)
    _, s, t = gcdx(fc, gc)
@@ -499,12 +499,12 @@ end
 # used for sorting polynomials in final basis, first by leading monomial and
 # then by leading coefficient
 function isless_monomial_lc(p::U, q::U) where U <: AbstractAlgebra.MPolyElem{<:RingElement}
-   plm = leading_monomial(p)
-   qlm = leading_monomial(q)
+   plm = AbstractAlgebra.lm(p)
+   qlm = AbstractAlgebra.lm(q)
    if plm < qlm
       return true
    end
-   if plm == qlm && leading_coefficient(p) < leading_coefficient(q)
+   if plm == qlm && AbstractAlgebra.lc(p) < AbstractAlgebra.lc(q)
       return true
    end
    return false
@@ -531,7 +531,7 @@ end
 
 # returns the leading coefficient of a node for use in sorting
 function leading_coefficient_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   return leading_coefficient(f.poly)
+   return AbstractAlgebra.lc(f.poly)
 end
 
 # reduce the node `b` by the reducer attached to it, inactivating
@@ -541,8 +541,8 @@ end
 function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    reduced = false
    if b.reducer != nothing
-      c = leading_coefficient(b.poly)
-      h = leading_coefficient(b.reducer.poly)
+      c = AbstractAlgebra.lc(b.poly)
+      h = AbstractAlgebra.lc(b.reducer.poly)
       q, r = AbstractAlgebra.divrem(c, h)
       coeff_divides = false
       if iszero(r)
@@ -556,7 +556,7 @@ function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: Abstrac
          d = s*b.poly + t*inflate(b.reducer.poly, shift, infl)
          q = divexact(c, g)
          p = b.poly - q*d # reduce b by d (the gcd poly)
-         if leading_coefficient(d) < 0
+         if AbstractAlgebra.lc(d) < 0
             d = -d
          end
          b.poly = d # replace b with gcd poly
@@ -580,7 +580,7 @@ function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: Abstrac
             b.active = false
          else
             # case 2: leading coeff is reduced
-            if leading_coefficient(d) < 0
+            if AbstractAlgebra.lc(d) < 0
                d = -d
             end
             b.poly = d
@@ -637,9 +637,9 @@ function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <
    i = 1
    len = length(X)
    while i < len
-      c1 = leading_coefficient(X[i].poly)
+      c1 = AbstractAlgebra.lc(X[i].poly)
       j = i + 1
-      while j <= len && leading_coefficient(X[j].poly) == c1
+      while j <= len && AbstractAlgebra.lc(X[j].poly) == c1
          if X[j].poly == X[i].poly || X[j] == -X[i].poly
             X[j].active = false
             deleteat!(X, j)
@@ -685,13 +685,13 @@ end
 # the current best reducer and whether it would remove
 # the leading coefficient are also passed in
 function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_divides::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   c = leading_coefficient(b.poly)
+   c = AbstractAlgebra.lc(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
       # poly can't be reduced by itself or by a node that will be reduced
       # in this round
       if X[i] != b && X[i].reducer == nothing
-         h = leading_coefficient(X[i].poly)
+         h = AbstractAlgebra.lc(X[i].poly)
          if divides(c, h)[1]
             usable = true
             # make sure a circular chain of reduction can't occur
@@ -734,14 +734,14 @@ end
 # the current best reducer and whether it would reduce
 # the leading coefficient are also passed in
 function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_reduces::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   c = leading_coefficient(b.poly)
+   c = AbstractAlgebra.lc(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
       # poly can't be reduced by itself or a node that will be reduced
       # in this round
       if X[i] != b && X[i].active && X[i].reducer == nothing
-         h = AbstractAlgebra.mod(c, leading_coefficient(X[i].poly))
-         if h != c && h != 0 && !divides(leading_coefficient(X[i].poly), c)[1]
+         h = AbstractAlgebra.mod(c, AbstractAlgebra.lc(X[i].poly))
+         if h != c && h != 0 && !divides(AbstractAlgebra.lc(X[i].poly), c)[1]
             usable = true
             # check there are no cycles of reducers
             if X[i].lm == b.lm
@@ -781,14 +781,14 @@ end
 # the current best reducer and whether it would gcd to reduce
 # the leading coefficient are also passed in
 function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
-   c = leading_coefficient(b.poly)
+   c = AbstractAlgebra.lc(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
        # poly can't be reduced by itself or by node that will be reduced
        # in this round
       if X[i] != b && X[i].active  && X[i].reducer == nothing
-         if !divides(leading_coefficient(X[i].poly), c)[1] &&
-            !divides(c, leading_coefficient(X[i].poly))[1]
+         if !divides(AbstractAlgebra.lc(X[i].poly), c)[1] &&
+            !divides(c, AbstractAlgebra.lc(X[i].poly))[1]
             usable = true
             # check there are no cycles of reducers
             if X[i].lm == b.lm
@@ -832,10 +832,10 @@ function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: Abst
    if !b.active
       return nothing
    end
-   c = leading_coefficient(b.poly)
+   c = AbstractAlgebra.lc(b.poly)
    best = b.reducer
    # 1. check for leading coefficient that divides c
-   best_divides = best == nothing ? false : divides(c, leading_coefficient(best.poly))[1]
+   best_divides = best == nothing ? false : divides(c, AbstractAlgebra.lc(best.poly))[1]
    if b.settled == 0
       best, best_divides = find_best_divides(b, X, best, best_divides)
    end
@@ -847,7 +847,7 @@ function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: Abst
       b.new_settled = 1
    end
    # 2. check for leading coefficient that reduces c
-   best_reduces = best == nothing ? false : AbstractAlgebra.mod(c, leading_coefficient(best.poly)) != c
+   best_reduces = best == nothing ? false : AbstractAlgebra.mod(c, AbstractAlgebra.lc(best.poly)) != c
    if b.settled <= 1
       best, best_reduces = find_best_reduces(b, X, best, best_reduces)
    end
@@ -858,7 +858,7 @@ function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: Abst
       b.new_settled = 2
    end
    # 3. check for leading coefficient that is not divisible by c (gcd poly possible)
-   best_is_gcd = best == nothing ? false : !divides(leading_coefficient(best.poly), c)[1]
+   best_is_gcd = best == nothing ? false : !divides(AbstractAlgebra.lc(best.poly), c)[1]
    if b.settled <= 2
       best, best_is_gcd = find_best_gcd(b, X, best, best_is_gcd)
    end
@@ -953,9 +953,9 @@ function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
    if lm_divides(b, d) # divides in both directions, so equal
       if d.active # avoid inserting polynomials that are a constant multiple of existing ones
          found = false
-         c = leading_coefficient(d.poly)
+         c = AbstractAlgebra.lc(d.poly)
          if length(d.poly) == length(b.poly)
-            h = leading_coefficient(b.poly)
+            h = AbstractAlgebra.lc(b.poly)
             flag, q = divides(c, h)
             if flag
                found = d.poly == q*b.poly
@@ -964,7 +964,7 @@ function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
          d2 = b.equal
          while !found && d2 != b
             if length(d.poly) == length(d2.poly)
-               h = leading_coefficient(d2.poly)
+               h = AbstractAlgebra.lc(d2.poly)
                flag, q = divides(c, h)
                if flag
                   found = d.poly == q*d2.poly
@@ -1463,7 +1463,7 @@ end
 # and that there are not two leading coefficients that are associate
 function check_v(V::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:RingElement}}
    len = length(V[1]) - 1
-   c = 2*leading_coefficient(V[1])
+   c = 2*AbstractAlgebra.lc(V[1])
    for v in V
       if length(v) <= len
          error(m, ": Polynomials not in order in V")
@@ -1472,18 +1472,18 @@ function check_v(V::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:Ri
    end
    n = length(V)
    if n >= 2
-      if is_unit(leading_coefficient(V[n])) && is_unit(leading_coefficient(V[n - 1]))
+      if is_unit(AbstractAlgebra.lc(V[n])) && is_unit(AbstractAlgebra.lc(V[n - 1]))
          error(m, ": Two unit leading coefficients")
       end
    end
    for v in V
-      if !divides(c, leading_coefficient(v))[1]
+      if !divides(c, AbstractAlgebra.lc(v))[1]
          error(m, ": Leading coefficients do not divide in V")
       end
-      if divides(leading_coefficient(v), c)[1]
+      if divides(AbstractAlgebra.lc(v), c)[1]
          error(m, ": Associate leading coefficients in V")
       end
-      c = leading_coefficient(v)
+      c = AbstractAlgebra.lc(v)
    end
 end
 
@@ -1576,7 +1576,7 @@ function reduce_tail(f::T, V::AbstractVector{T}, res::U) where {U <: RingElement
             i -= 1
          end
          if i != 0 && !iszero(c)
-            h = leading_coefficient(V[i]) # should be nonnegative
+            h = AbstractAlgebra.lc(V[i]) # should be nonnegative
             q, r = AbstractAlgebra.divrem(c, h)
             u = shift_left(V[i], n - length(V[i]))
             p -= q*u
@@ -1608,7 +1608,7 @@ function normal_form(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractA
             i -= 1
          end
          if i != 0 && !iszero(c)
-            h = leading_coefficient(V[i]) # should be nonnegative
+            h = AbstractAlgebra.lc(V[i]) # should be nonnegative
             q, r = AbstractAlgebra.divrem(c, h)
             u = shift_left(V[i], n - length(V[i]))
             p -= q*u       
@@ -1628,7 +1628,7 @@ function insert_spoly(V::Vector{T}, H::Vector{T}, n::Int, res::U) where {U <: Ri
    p1 = V[n]
    if n > 1
       p2 = V[n - 1]
-      c = divexact(leading_coefficient(p2), leading_coefficient(p1))
+      c = divexact(AbstractAlgebra.lc(p2), AbstractAlgebra.lc(p1))
       s = c*p1 - shift_left(p2, length(p1) - length(p2))
       s = reduce_by_resultant(s, res)
       if !iszero(s)
@@ -1637,7 +1637,7 @@ function insert_spoly(V::Vector{T}, H::Vector{T}, n::Int, res::U) where {U <: Ri
    end
    if n < length(V)
       p2 = V[n + 1]
-      c = divexact(leading_coefficient(p1), leading_coefficient(p2))
+      c = divexact(AbstractAlgebra.lc(p1), AbstractAlgebra.lc(p2))
       s = c*p2 - shift_left(p1, length(p2) - length(p1))
       s = reduce_by_resultant(s, res)
       if !iszero(s)
@@ -1686,12 +1686,12 @@ function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) wher
             n -= 1
          end
          # Reduce p by leading coefficients that divide
-         while n >= 1 && ((_, q) = divides(leading_coefficient(p), leading_coefficient(V[n])))[1]
+         while n >= 1 && ((_, q) = divides(AbstractAlgebra.lc(p), AbstractAlgebra.lc(V[n])))[1]
             best_v = V[n]
             best_size = mysize(V[n])
             best_q = q
             n1 = n - 1
-            while n1 >= 1 && ((_, q) = divides(leading_coefficient(p), leading_coefficient(V[n1])))[1]
+            while n1 >= 1 && ((_, q) = divides(AbstractAlgebra.lc(p), AbstractAlgebra.lc(V[n1])))[1]
                new_size = mysize(V[n1])
                if new_size < best_size
                   best_v = V[n1]
@@ -1711,7 +1711,7 @@ function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) wher
             if n >= 1
                v = V[n]
                if length(p) == length(v)
-                  if ((flag, q) = divides(leading_coefficient(v), leading_coefficient(p)))[1]
+                  if ((flag, q) = divides(AbstractAlgebra.lc(v), AbstractAlgebra.lc(p)))[1]
                      # V[n] can be swapped with p and reduced
                      V[n], r = reduce_tail(p, view(V, 1:n - 1), res), V[n]
                      r -= q*p
@@ -1720,16 +1720,16 @@ function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) wher
                         mypush!(H, r)
                      end
                   else # use gcdx
-                     g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
+                     g, s, t = gcdx(AbstractAlgebra.lc(v), AbstractAlgebra.lc(p))
                      p, r = s*v + t*p, p # p has leading coefficient g dividing that of r (old p) and v
                      V[n] = reduce_tail(p, view(V, 1:n - 1), res)
-                     q = divexact(leading_coefficient(r), g)
+                     q = divexact(AbstractAlgebra.lc(r), g)
                      r -= q*p
                      r = reduce_by_resultant(r, res)
                      if !iszero(r)
                         mypush!(H, r)
                      end
-                     q = divexact(leading_coefficient(v), g)
+                     q = divexact(AbstractAlgebra.lc(v), g)
                      v -= q*p
                      v = reduce_by_resultant(v, res)
                      if !iszero(v)
@@ -1738,14 +1738,14 @@ function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) wher
                      p = reduce_by_resultant(p, res)
                   end
                else # length(p) > length(v)
-                  if divides(leading_coefficient(v), leading_coefficient(p))[1]
+                  if divides(AbstractAlgebra.lc(v), AbstractAlgebra.lc(p))[1]
                      # p can be inserted
                      insert!(V, n + 1, reduce_tail(p, view(V, 1:n), res))
                      n += 1
                   else # use gcdx
-                     g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
+                     g, s, t = gcdx(AbstractAlgebra.lc(v), AbstractAlgebra.lc(p))
                      r = s*shift_left(v, length(p) - length(v)) + t*p # r has leading coeff g dividing that of p
-                     q = divexact(leading_coefficient(p), g)
+                     q = divexact(AbstractAlgebra.lc(p), g)
                      p -= r*q
                      p = reduce_by_resultant(p, res)
                      if !iszero(p)
@@ -1766,20 +1766,20 @@ function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) wher
             orig_n = n
             while n < length(V)
                v = V[n + 1]
-               if ((flag, q) = divides(leading_coefficient(v), leading_coefficient(p)))[1]
+               if ((flag, q) = divides(AbstractAlgebra.lc(v), AbstractAlgebra.lc(p)))[1]
                   v -= q*shift_left(p, length(v) - length(p))
                   v = reduce_by_resultant(v, res)
                   if !iszero(v)
                      mypush!(H, v)
                   end
                   deleteat!(V, n + 1)
-               elseif divides(leading_coefficient(p), leading_coefficient(v))[1]
+               elseif divides(AbstractAlgebra.lc(p), AbstractAlgebra.lc(v))[1]
                   break
                else
                   # use gcdx
-                  g, s, t = gcdx(leading_coefficient(v), leading_coefficient(p))
+                  g, s, t = gcdx(AbstractAlgebra.lc(v), AbstractAlgebra.lc(p))
                   p = s*v + t*shift_left(p, length(v) - length(p)) # p has leading coefficient g dividing that of v
-                  q = divexact(leading_coefficient(v), g)
+                  q = divexact(AbstractAlgebra.lc(v), g)
                   r, V[n + 1] = v - q*p, reduce_tail(p, view(V, 1:n), res)
                   r = reduce_by_resultant(r, res)
                   if !iszero(r)
@@ -1813,9 +1813,9 @@ end
 function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
    while true
       n = length(V)
-      lc = leading_coefficient(V[n])
+      lc = AbstractAlgebra.lc(V[n])
       # check if p can be added without any reduction
-      if length(p) > length(V[n]) && !divides(leading_coefficient(p), lc)[1] && ((_, q) = divides(lc, leading_coefficient(p)))[1]
+      if length(p) > length(V[n]) && !divides(AbstractAlgebra.lc(p), lc)[1] && ((_, q) = divides(lc, AbstractAlgebra.lc(p)))[1]
          p = reduce_tail(p, V, res)
          V = push!(V, p)
          insert_spoly(V, H, n + 1, res)
@@ -1827,18 +1827,18 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
       end
       # check if p can replace V[n]
       swap = false
-      if length(p) == length(V[n]) && !is_unit(lc) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
+      if length(p) == length(V[n]) && !is_unit(lc) && ((_, q) = divides(lc, AbstractAlgebra.lc(p)))[1]
          p, V[n] = V[n], reduce_tail(p, view(V, 1:n - 1), res)
          insert_spoly(V, H, n, res)
          swap = true
       end
-      # check if leading coefficients divide leading_coefficient of p
-      while n >= 1 && (swap || ((_, q) = divides(leading_coefficient(p), leading_coefficient(V[n])))[1])
+      # check if leading coefficients divide AbstractAlgebra.lc of p
+      while n >= 1 && (swap || ((_, q) = divides(AbstractAlgebra.lc(p), AbstractAlgebra.lc(V[n])))[1])
          best_v = V[n]
          best_size = mysize(V[n])
          best_q = q
          n1 = n - 1
-         while n1 >= 1 && ((_, q) = divides(leading_coefficient(p), leading_coefficient(V[n1])))[1]
+         while n1 >= 1 && ((_, q) = divides(AbstractAlgebra.lc(p), AbstractAlgebra.lc(V[n1])))[1]
             new_size = mysize(V[n1])
             if new_size < best_size
                best_v = V[n1]
@@ -1864,12 +1864,12 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
       # we made no progress, use gcdx
       n = length(V)
       v = V[n]
-      g, s, t = gcdx(leading_coefficient(p), leading_coefficient(v))
+      g, s, t = gcdx(AbstractAlgebra.lc(p), AbstractAlgebra.lc(v))
       r = s*p + t*shift_left(v, length(p) - length(v)) # r has leading coeff g
-      q = divexact(leading_coefficient(p), g)
+      q = divexact(AbstractAlgebra.lc(p), g)
       p -= q*r
       if length(r) == length(v) # V[n] can be reduced by r and switched
-         q = divexact(leading_coefficient(v), g)
+         q = divexact(AbstractAlgebra.lc(v), g)
          r, V[n] = v - q*r, reduce_tail(r, view(V, 1:n - 1), res)
          insert_spoly(V, H, n, res)
          r = reduce_by_resultant(r, res)
@@ -1966,8 +1966,8 @@ end
 
 function is_constant_multiple(f::T, g::T) where T <: AbstractAlgebra.PolyElem
    if length(f) == length(g)
-      c1 = leading_coefficient(f)
-      c2 = leading_coefficient(g)
+      c1 = AbstractAlgebra.lc(f)
+      c2 = AbstractAlgebra.lc(g)
       if ((flag, q) = divides(c1, c2))[1]
          if f == g*q
             return true

@@ -67,7 +67,7 @@ end
 
 function isone(a::LaurentMPolyWrap)
     isone(length(a.mpoly)) || return false
-    isone(leading_coefficient(a.mpoly)) || return false
+    isone(AbstractAlgebra.lc(a.mpoly)) || return false
     e = leading_exponent_vector(a.mpoly)
     for i in 1:length(e)
         e[i] == -a.mindegs[i] || return false
@@ -392,7 +392,7 @@ end
 #### coefficients
 
 function leading_coefficient(a::LaurentMPolyWrap)
-    return leading_coefficient(a.mpoly)
+    return AbstractAlgebra.lc(a.mpoly)
 end
 
 function coefficients(a::LaurentMPolyWrap)
@@ -443,7 +443,7 @@ end
 #### monomials
 
 function leading_monomial(a::LaurentMPolyWrap)
-    return LaurentMPolyWrap(parent(a), leading_monomial(a.mpoly), a.mindegs)
+    return LaurentMPolyWrap(parent(a), AbstractAlgebra.lm(a.mpoly), a.mindegs)
 end
 
 struct LaurentMPolyWrapMonomials{T, S}
@@ -479,7 +479,7 @@ end
 #### terms
 
 function leading_term(a::LaurentMPolyWrap)
-    return LaurentMPolyWrap(parent(a), leading_term(a.mpoly), a.mindegs)
+    return LaurentMPolyWrap(parent(a), AbstractAlgebra.lt(a.mpoly), a.mindegs)
 end
 
 struct LaurentMPolyWrapTerms{T, S}

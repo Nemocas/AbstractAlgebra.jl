@@ -18,7 +18,7 @@ function O(a::AbsMSeriesElem{T}) where T <: RingElement
     R = parent(a)
     p = poly(a)
     v = vars(p)
-    (length(v) != 1 || length(p) != 1 || !isone(leading_coefficient(p))) &&
+    (length(v) != 1 || length(p) != 1 || !isone(lc(p))) &&
                                                error("Not a pure power in O()")
     ind = var_index(v[1])
     exps = first(exponent_vectors(p))

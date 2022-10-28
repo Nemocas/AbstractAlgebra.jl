@@ -196,25 +196,25 @@ function term(p::UnivPoly{T, U}, i::Int) where {T, U}
    return UnivPoly{T, U}(t, S)
 end
 
-leading_coefficient(p::UnivPoly) = leading_coefficient(p.p)
+leading_coefficient(p::UnivPoly) = AbstractAlgebra.lc(p.p)
 
-trailing_coefficient(p::UnivPoly) = trailing_coefficient(p.p)
+trailing_coefficient(p::UnivPoly) = AbstractAlgebra.tc(p.p)
 
 function tail(p::UnivPoly{T, U}) where {T, U}
    S = parent(p)
-   return UnivPoly{T, U}(tail(p.p), S)
+   return UnivPoly{T, U}(AbstractAlgebra.tl(p.p), S)
 end
 
 constant_coefficient(p::UnivPoly) = constant_coefficient(p.p)
 
 function leading_monomial(p::UnivPoly{T, U}) where {T, U}
    S = parent(p)
-   return UnivPoly{T, U}(leading_monomial(p.p), S)
+   return UnivPoly{T, U}(AbstractAlgebra.lm(p.p), S)
 end
 
 function leading_term(p::UnivPoly{T, U}) where {T, U}
    S = parent(p)
-   return UnivPoly{T, U}(leading_term(p.p), S)
+   return UnivPoly{T, U}(AbstractAlgebra.lt(p.p), S)
 end
 
 max_fields(p::UnivPoly) = max_fields(p.p)

@@ -27,8 +27,8 @@ function mix_ideal(I::Ideal{T}) where T <: RingElement
 end
 
 function spoly(f::T, g::T) where T <: MPolyElem
-   fc = leading_coefficient(f)
-   gc = leading_coefficient(g)
+   fc = AbstractAlgebra.lc(f)
+   gc = AbstractAlgebra.lc(g)
    mf = exponent_vector(f, 1)
    mg = exponent_vector(g, 1)
    c = lcm(fc, gc)
@@ -40,8 +40,8 @@ function spoly(f::T, g::T) where T <: MPolyElem
 end
 
 function gpoly(f::T, g::T) where T <: MPolyElem
-   fc = leading_coefficient(f)
-   gc = leading_coefficient(g)
+   fc = AbstractAlgebra.lc(f)
+   gc = AbstractAlgebra.lc(g)
    mf = exponent_vector(f, 1)
    mg = exponent_vector(g, 1)
    _, s, t = gcdx(fc, gc)
@@ -201,7 +201,7 @@ end
 
       for i = 2:length(G)
          @test length(G[i]) > length(G[i - 1])
-         @test divides(leading_coefficient(G[i - 1]), leading_coefficient(G[i]))[1]
+         @test divides(AbstractAlgebra.lc(G[i - 1]), AbstractAlgebra.lc(G[i]))[1]
       end
 
       @test Ideal(R, gens(I)) == I

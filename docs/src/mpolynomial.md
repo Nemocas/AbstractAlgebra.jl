@@ -816,12 +816,12 @@ The leading and trailing coefficient, constant coefficient, leading monomial
 and leading term of a polynomial p are returned by the following functions:
 
 ```@docs
-leading_coefficient(::MPolyElem{T}) where T <: RingElement
-trailing_coefficient(p::MPolyElem{T}) where T <: RingElement
-leading_monomial(::MPolyElem{T}) where T <: RingElement
-leading_term(::MPolyElem{T}) where T <: RingElement
+AbstractAlgebra.lc(::MPolyElem{T}) where T <: RingElement
+AbstractAlgebra.tc(p::MPolyElem{T}) where T <: RingElement
+AbstractAlgebra.lm(::MPolyElem{T}) where T <: RingElement
+AbstractAlgebra.lt(::MPolyElem{T}) where T <: RingElement
 constant_coefficient(::MPolyElem{T}) where T <: RingElement
-tail(::MPolyElem{T}) where T <: RingElement
+AbstractAlgebra.tl(::MPolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -831,12 +831,12 @@ tail(::MPolyElem{T}) where T <: RingElement
 using AbstractAlgebra
 R,(x,y) = PolynomialRing(ZZ, ["x", "y"], ordering=:deglex)
 p = 2*x*y + 3*y^3 + 1
-leading_term(p)
-leading_monomial(p)
-leading_coefficient(p)
-leading_term(p) == leading_coefficient(p) * leading_monomial(p)
+AbstractAlgebra.lt(p)
+AbstractAlgebra.lm(p)
+AbstractAlgebra.lc(p)
+AbstractAlgebra.lt(p) == AbstractAlgebra.lc(p) * AbstractAlgebra.lm(p)
 constant_coefficient(p)
-tail(p)
+AbstractAlgebra.tl(p)
 ```
 
 ### Least common multiple, greatest common divisor
