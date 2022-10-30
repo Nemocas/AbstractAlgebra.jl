@@ -105,7 +105,7 @@ julia> C = S(R(11))
 
 ## Matrix element constructors
 
-There are a few ways to construc matrices other than by coercing elements
+There are a few ways to construct matrices other than by coercing elements
 as shown above. The first method is from an array of elements.
 
 This can be done with either two or one dimensional arrays.

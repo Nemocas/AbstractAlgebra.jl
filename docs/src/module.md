@@ -113,7 +113,7 @@ of the generators of $M$. This is done by passing a vector of ring elements.
 (M::FPModule{T})(v::Vector{T}) where T <: RingElement
 ```
 
-Construct the element of the module $M$ corrsponding to $\sum_i g[i]v[i]$
+Construct the element of the module $M$ corresponding to $\sum_i g[i]v[i]$
 where $g[i]$ are the generators of the module $M$. The resulting element
 will lie in the module $M$.
 

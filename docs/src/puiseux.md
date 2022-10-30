@@ -61,7 +61,7 @@ PuiseuxSeriesField(R::Field, prec_max::Int, s::AbstractString; cached::Bool = tr
 ```
 
 Given a base ring `R`, a maximum relative precision and a string `s` specifying how the
-generator (variable) should be printed, return a typle `S, x` representing the Puiseux
+generator (variable) should be printed, return a tuple `S, x` representing the Puiseux
 series ring and its generator.
 
 By default, `S` will depend only on `S`, `x` and the maximum precision and will be

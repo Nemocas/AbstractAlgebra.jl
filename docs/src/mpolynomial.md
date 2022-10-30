@@ -841,7 +841,7 @@ tail(p)
 
 ### Least common multiple, greatest common divisor
 
-The greated common divisor of two polynomials a and b is returned by
+The greatest common divisor of two polynomials a and b is returned by
 
 ```@docs
 gcd(a::Generic.MPoly{T}, b::Generic.MPoly{T}) where {T <: RingElement}

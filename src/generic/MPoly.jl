@@ -2131,7 +2131,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    N = parent(f).N
    drmask = monomial_drmask(par, bits)
    H = Array{heap_s}(undef, 0) # heap
-   I = Array{heap_t}(undef, 0) # auxilliary data for heap nodes
+   I = Array{heap_t}(undef, 0) # auxiliary data for heap nodes
    # set up output poly coeffs and exponents (corresponds to h in paper)
    r_alloc = k*(m - 1) + 1
    Rc = Array{T}(undef, r_alloc)

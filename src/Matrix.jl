@@ -2912,7 +2912,6 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
    pt = 1
    rnk = -1
    firstprm = true
-   failues = 0
    while l <= bound
       y[l] = base_ring(R)(pt - b2)
       # Running out of interpolation points doesn't imply there is no solution

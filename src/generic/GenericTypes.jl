@@ -245,7 +245,7 @@ struct YoungTableau{T<:Integer} <: AbstractMatrix{T}
 
    function YoungTableau(part::Partition{T},
       fill::AbstractVector{<:Integer}=collect(T(1):sum(part))) where T
-      @boundscheck sum(part) == length(fill) || throw(ArgumentError("Can't fill Young digaram of $part with $fill: different number of elemnets."))
+      @boundscheck sum(part) == length(fill) || throw(ArgumentError("Can't fill Young digaram of $part with $fill: different number of elements."))
 
       return new{T}(part, fill)
    end
@@ -1138,11 +1138,11 @@ const FreeAssAlgID = CacheDictType{Tuple{Ring, Vector{Symbol}}, NCRing}()
 mutable struct FreeAssAlgElem{T <: RingElement} <: AbstractAlgebra.FreeAssAlgElem{T}
    parent::FreeAssAlgebra{T}
    coeffs::Vector{T}
-   exps::Vector{Vector{Int}}  # TODO: Int -> UInt8 for nvars < 256, ect
+   exps::Vector{Vector{Int}}  # TODO: Int -> UInt8 for nvars < 256, etc
    length::Int
 end
 
-# the iterators for coeffs, terms, ect. are shared with MPoly. Just this remains
+# the iterators for coeffs, terms, etc. are shared with MPoly. Just this remains
 struct FreeAssAlgExponentWords{T <: AbstractAlgebra.NCRingElem}
    poly::T
 end

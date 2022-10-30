@@ -16,7 +16,7 @@ function pow!(z::T, a, b)::T where T
   return a^b
 end
 
-# a *= x^p, using ta and tx as temps. Must return the modifed a, ta, tx
+# a *= x^p, using ta and tx as temps. Must return the modified a, ta, tx
 function mulpow!(a::T, x::S, p, ta::T, tx::S) where {T, S}
   tx = pow!(tx, x, p)
   ta = mul!(ta, a, tx)
@@ -147,7 +147,7 @@ HornerForm(f):
     write f = q * v^e + r  where r is independent of the variable v
     return  HornerForm(q) * v^e + HornerForm(r)
 
-TODO: change all zero-based indicies into natural one-based indicies
+TODO: change all zero-based indices into natural one-based indices
 
 Since the evaluation proceeds in a top-down fashion (instead of bottom-up)
 the overhead of generating all of these q's and r's is quadratic in length(f)

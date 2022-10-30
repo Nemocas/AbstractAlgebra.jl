@@ -355,7 +355,7 @@ function flatten_recursive!(ans::Expr, obj::Expr, op::Symbol)
    end
 end
 
-# op(op(a,b),op(c,d)) => op(a,b,c,d) ect
+# op(op(a,b),op(c,d)) => op(a,b,c,d) etc
 function flatten_op(obj::Expr, op::Symbol)
    if !isaExprOp(obj, op)
       return obj
@@ -709,7 +709,7 @@ function print_comparison(S::printer, mi::MIME, obj::Expr,
 end
 
 
-# dir > 0 left assiciate: +, -, *, /
+# dir > 0 left associate: +, -, *, /
 # dir < 0 right associative: ^
 # dir = 0 non associative:
 function printGenericInfix(S::printer, mi::MIME, obj::Expr,

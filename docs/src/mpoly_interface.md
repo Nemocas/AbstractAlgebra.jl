@@ -176,7 +176,7 @@ total_degree(f::MyMPoly{T}) where T <: RingElem
 ```
 
 Return the total degree of the polynomial $f$, i.e. the highest sum of
-exponents occuring in any term of $f$.
+exponents occurring in any term of $f$.
 
 ```julia
 is_gen(x::MyMPoly{T}) where T <: RingElem

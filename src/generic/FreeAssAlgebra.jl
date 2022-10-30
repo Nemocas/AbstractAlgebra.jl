@@ -525,7 +525,7 @@ function AbstractAlgebra.divexact_left(f::FreeAssAlgElem{T}, g::FreeAssAlgElem{T
       qi = divexact(f.coeffs[1], g.coeffs[1])
       push!(qcoeffs, qi)
       push!(qexps, mr)
-      f = _sub_rest(f, mul_term(qi, ml, g, mr), 1) # enforce lt cancelation
+      f = _sub_rest(f, mul_term(qi, ml, g, mr), 1) # enforce lt cancellation
    end
    return FreeAssAlgElem{T}(R, qcoeffs, qexps, length(qcoeffs))
 end
@@ -540,7 +540,7 @@ function AbstractAlgebra.divexact_right(f::FreeAssAlgElem{T}, g::FreeAssAlgElem{
       qi = divexact(f.coeffs[1], g.coeffs[1])
       push!(qcoeffs, qi)
       push!(qexps, ml)
-      f = _sub_rest(f, mul_term(qi, ml, g, mr), 1) # enforce lt cancelation
+      f = _sub_rest(f, mul_term(qi, ml, g, mr), 1) # enforce lt cancellation
    end
    return FreeAssAlgElem{T}(R, qcoeffs, qexps, length(qcoeffs))
 end
