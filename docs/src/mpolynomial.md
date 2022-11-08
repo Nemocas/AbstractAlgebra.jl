@@ -270,7 +270,7 @@ term(f::MPolyElem, n::Int)
 ```
 
 ```julia
-exponent(f::MyMPolyElem}, i::Int, j::Int)
+exponent(f::MyMPolyElem, i::Int, j::Int)
 ```
 
 Return the exponent of the $j$-th variable in the $i$-th term of the polynomial
