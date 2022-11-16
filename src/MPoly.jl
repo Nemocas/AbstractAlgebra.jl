@@ -39,7 +39,7 @@ end
 @doc Markdown.doc"""
     vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
 
-Return the variables actually occuring in $p$.
+Return the variables actually occurring in $p$.
 """
 function vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
    U = typeof(p)

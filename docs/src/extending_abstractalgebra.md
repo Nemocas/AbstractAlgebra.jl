@@ -14,7 +14,7 @@ elem_type
 parent_type
 ```
 
-### Aquiring associated elements and parents
+### Acquiring associated elements and parents
 
 Further, if one has a base ring, like polynomials over the integers
 $\mathbb{Z}[x]$, then one should implement

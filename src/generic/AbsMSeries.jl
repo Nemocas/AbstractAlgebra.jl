@@ -505,7 +505,7 @@ function Base.inv(a::AbsMSeries)
     ainv = R(inv(constant_coefficient(poly(a))))
     if R.weighted_prec == -1
         # use the precision stored in the polynomial
-        # arithemetic uses precision stored in polynomials
+        # arithmetic uses precision stored in polynomials
         max_n = sum(a.prec)
         cur_n = 1
         # 1-a*ainv = er where each monomial in er has total degree >= cur_n

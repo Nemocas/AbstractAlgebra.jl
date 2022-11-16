@@ -659,7 +659,7 @@ function hliftstep_quartic(
   for i in 1:r
     taylor_get_coeffs!(B[i], fac[i], xalpha)
     Blen[i] = length(B[i])
-    # push extra stuff to avoid anoying length checks
+    # push extra stuff to avoid annoying length checks
     while length(B[i]) < liftdegs[m] + 1
       push!(B[i], zero(R))
     end
@@ -952,7 +952,7 @@ function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where E
   abases = E[t.first for t in a]
   aexps = Int[t.second for t in a]
 
-  i = 1 # index strickly before which everthing is coprime to b
+  i = 1 # index strickly before which everything is coprime to b
 
   while i <= length(abases) && !is_constant(b)
     abase_new, abases[i], b = gcdcofactors(abases[i], b)
@@ -988,7 +988,7 @@ end
 
 
 function lcc_kaltofen_step!(
-  divs::Vector{E},  # modifed
+  divs::Vector{E},  # modified
   Af::Fac{E},       # unmodified, possibly new one is returned
   Au::Vector{E},    # univariates in gen(v) from the lc's of bvar factors
   v::Int,           # the main variable for this step
@@ -1153,7 +1153,7 @@ end
 
 # factor a truly multivariate A in at least three variables
 function mfactor_irred_mvar_char_zero(
-  A::E,             # squarefree, primitve wrt mainvar, monic
+  A::E,             # squarefree, primitive wrt mainvar, monic
   mainvar::Int,
   minorvars::Vector{Int}
 ) where E

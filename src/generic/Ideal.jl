@@ -67,7 +67,7 @@ node_num = [0] # for enumerating nodes when printing
 # is not duplicated for these
 # When reduction occurs, the best reducer node is first attached
 # to the node at the `reducer` field
-# Nodes are marked as inactive by settting the `active` field to
+# Nodes are marked as inactive by setting the `active` field to
 # `false` if they are no removed from the basis/lattice
 # The inactive nodes are retained as potential reducers in the
 # lattice, and possibly purged at regular intervals

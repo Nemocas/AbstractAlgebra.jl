@@ -81,7 +81,7 @@ LaurentSeriesRing(R::Field, prec_max::Int, s::AbstractString; cached::Bool = tru
 
 Given a base ring `R`, a maximum precision (relative or absolute, depending on the
 model) and a string `s` specifying how the generator (variable) should be
-printed, return a typle `S, x` representing the series ring and its generator.
+printed, return a tuple `S, x` representing the series ring and its generator.
 
 By default, `S` will depend only on `S`, `x` and the maximum precision and will be
 cached. Setting the optional argument `cached` to `false` will prevent this.
