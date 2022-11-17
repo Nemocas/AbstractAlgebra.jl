@@ -332,7 +332,7 @@ function *(b::FactoredFrac{T}, c::FactoredFrac{T}) where T <: RingElement
     while i <= length(b)
         j = 1
         while j <= length(c)
-            (g, b[i].base, c[j].base) = _gcd_cofactors(b[i].base, c[j].base)
+            (g, b[i].base, c[j].base) = gcd_with_cofactors(b[i].base, c[j].base)
             if is_unit(g)
                 z.unit *= _pow(g, Base.checked_add(b[i].exp, c[j].exp))
             else
@@ -534,12 +534,6 @@ function _pow(a::T, e::Int) where T <: RingElement
     end
 end
 
-function _gcd_cofactors(a::T, b::T) where T
-    g = gcd(a, b)
-    iszero(g) && return (g, a, b)
-    return (g, divexact(a, g), divexact(b, g))
-end
-
 function copy(a::FactoredFracTerm{T}) where T
     return FactoredFracTerm{T}(a.base, a.exp)
 end
@@ -606,7 +600,7 @@ function _append_pow_normalise!(z::FactoredFrac{T}, a::T, e::Int, i::Int) where 
     input_is_good = _bases_are_coprime(z)
     l = z.terms
     while i <= length(l) && !is_unit(a)
-        (g, lbar, abar) = _gcd_cofactors(l[i].base, a)
+        (g, lbar, abar) = gcd_with_cofactors(l[i].base, a)
         # (g*lbar)^l[i].exp * (g*abar)^e
         # (lbar)^l[i].exp * (g)^(l[i].exp+e) * (abar)^e
         if is_unit(g)
@@ -671,7 +665,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
     while i <= length(b)
         j = 1
         while j <= length(c)
-            (g, b[i].base, c[j].base) = _gcd_cofactors(b[i].base, c[j].base)
+            (g, b[i].base, c[j].base) = gcd_with_cofactors(b[i].base, c[j].base)
             if !is_unit(g)
                 e = Base.checked_sub(b[i].exp, c[j].exp)
                 if e >= 0
