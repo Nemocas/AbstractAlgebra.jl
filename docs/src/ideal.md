@@ -13,6 +13,11 @@ or of a univariate or multivariate polynomial ring
 over the integers. Univariate and multivariate polynomial rings over other
 domains (other than fields) are not supported at this time.
 
+!!! info
+    A more complete implementation for ideals defined over other rings is
+    provided by [Hecke](https://github.com/thofma/Hecke.jl) and
+    [Oscar](https://github.com/oscar-system/Oscar.jl/).
+
 ## Generic ideal types
 
 AbstractAlgebra.jl provides a generic ideal type based on Julia arrays which
@@ -45,7 +50,7 @@ can accept any AbstractAlgebra ideal type.
 One may construct ideals in AbstractAlgebra.jl with the following constructor.
 
 ```julia
-Ideal(R::Ring, V::Vector{T}) where T <: RingElement
+Generic.Ideal(R::Ring, V::Vector{T}) where T <: RingElement
 ```
 
 Given a set of elements `V` in the ring `R`, construct the ideal of `R`
@@ -63,7 +68,7 @@ julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
  3*x^2*y - 3*y^2
  9*x^2*y + 7*x*y
 
-julia> I = Ideal(R, V)
+julia> I = Generic.Ideal(R, V)
 AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.MPoly{BigInt}}(AbstractAlgebra.Generic.MPoly{BigInt}[7*x*y + 9*y^2, 243*y^3 - 147*y^2, x*y^2 + 36*y^3 - 21*y^2, x^2*y + 162*y^3 - 99*y^2], Multivariate Polynomial Ring in x, y over Integers)
 
 julia> W = map(ZZ, [2, 5, 7])
@@ -72,7 +77,7 @@ julia> W = map(ZZ, [2, 5, 7])
  5
  7
 
-julia> J = Ideal(ZZ, W)
+julia> J = Generic.Ideal(ZZ, W)
 AbstractAlgebra.Generic.Ideal{BigInt}(BigInt[1], Integers)
 ```
 
@@ -96,7 +101,7 @@ julia> V = [1 + 2x^2 + 3x^3, 5x^4 + 1, 2x - 1]
  5*x^4 + 1
  2*x - 1
 
-julia> I = Ideal(R, V)
+julia> I = Generic.Ideal(R, V)
 AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(AbstractAlgebra.Generic.Poly{BigInt}[3, x + 1], Univariate Polynomial Ring in x over Integers)
 
 julia> gens(I)
@@ -137,10 +142,10 @@ julia> W = [1 + 2x^2 + 3x^3, 5x^4 + 1]
  3*x^3 + 2*x^2 + 1
  5*x^4 + 1
 
-julia> I = Ideal(R, V)
+julia> I = Generic.Ideal(R, V)
 AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(AbstractAlgebra.Generic.Poly{BigInt}[3, x + 1], Univariate Polynomial Ring in x over Integers)
 
-julia> J = Ideal(R, W)
+julia> J = Generic.Ideal(R, W)
 AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(AbstractAlgebra.Generic.Poly{BigInt}[282, 3*x + 255, x^2 + 107], Univariate Polynomial Ring in x over Integers)
 
 julia> contains(J, I)
@@ -173,7 +178,7 @@ julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
  3*x^2*y - 3*y^2
  9*x^2*y + 7*x*y
 
-julia> I = Ideal(R, V)
+julia> I = Generic.Ideal(R, V)
 AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.MPoly{BigInt}}(AbstractAlgebra.Generic.MPoly{BigInt}[7*x*y + 9*y^2, 243*y^3 - 147*y^2, x*y^2 + 36*y^3 - 21*y^2, x^2*y + 162*y^3 - 99*y^2], Multivariate Polynomial Ring in x, y over Integers)
 
 

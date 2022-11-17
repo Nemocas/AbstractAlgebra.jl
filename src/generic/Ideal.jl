@@ -2308,7 +2308,7 @@ function Ideal(R::Ring, V::Vector{T}) where T <: RingElement
 end
 
 function Ideal(R::Ring, v::T...) where T <: RingElement
-   I = Ideal{elem_type(R)}(R, filter(!iszero, [map(R, v)...]))
+   I = Ideal(R, filter(!iszero, [map(R, v)...]))
    return reduce_gens(I)
 end
 

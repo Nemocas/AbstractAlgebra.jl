@@ -1,4 +1,4 @@
-function mix_ideal(I::Ideal{T}) where T <: RingElement
+function mix_ideal(I::Generic.Ideal{T}) where T <: RingElement
    G = gens(I)
    R = base_ring(I)
    if length(G) == 0
@@ -8,9 +8,9 @@ function mix_ideal(I::Ideal{T}) where T <: RingElement
       n = rand(0:5)
       H = T[rand(-10:10)*G[1] for i in 1:n]
       if rand(0:1) == 1
-         return Ideal(R, vcat([-G[1]], H))
+         return Generic.Ideal(R, vcat([-G[1]], H))
       else
-         return Ideal(R, vcat([G[1]], H))
+         return Generic.Ideal(R, vcat([G[1]], H))
       end
    end
    n = rand(0:length(G))
@@ -23,7 +23,7 @@ function mix_ideal(I::Ideal{T}) where T <: RingElement
          end
       end
    end
-   return Ideal(R, G)   
+   return Generic.Ideal(R, G)   
 end
 
 function spoly(f::T, g::T) where T <: MPolyElem
@@ -53,9 +53,9 @@ function gpoly(f::T, g::T) where T <: MPolyElem
 end
 
 function testit(R, V)
-   I = Ideal(R, V)
+   I = Generic.Ideal(R, V)
    G = I.gens
-   if Ideal(R, G) != I
+   if Generic.Ideal(R, G) != I
       println("I = ", G)
       println("I not reduced")
       return false
@@ -103,10 +103,10 @@ function testit(R, V)
 end
 
 @testset "Generic.Ideal.constructors" begin
-   I = Ideal(ZZ, 3, 5)
+   I = Generic.Ideal(ZZ, 3, 5)
    S = parent(I)
 
-   @test typeof(IdealSet(ZZ)) == Generic.IdealSet{BigInt}
+   @test typeof(Generic.IdealSet(ZZ)) == Generic.IdealSet{BigInt}
 
    @test typeof(S) == Generic.IdealSet{BigInt}
 
@@ -118,7 +118,7 @@ end
 
    @test parent_type(I) == Generic.IdealSet{BigInt}
 
-   J = Ideal(ZZ)
+   J = Generic.Ideal(ZZ)
 
    @test parent(J) == S
 end
@@ -191,7 +191,7 @@ end
    for i = 1:300
       n = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
-      I = Ideal(R, V...)
+      I = Generic.Ideal(R, V...)
 
       for v in V
          @test normal_form(v, I) == 0
@@ -204,7 +204,7 @@ end
          @test divides(leading_coefficient(G[i - 1]), leading_coefficient(G[i]))[1]
       end
 
-      @test Ideal(R, gens(I)) == I
+      @test Generic.Ideal(R, gens(I)) == I
    end
 end
 
@@ -212,7 +212,7 @@ end
    for i = 1:300
       n = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
-      I = Ideal(ZZ, V...)
+      I = Generic.Ideal(ZZ, V...)
       G = gens(I)
 
       @test length(G) == 1 || (length(V) == 0 && length(G) == 0) || (iszero(V) || length(G) == 0)
@@ -223,7 +223,7 @@ end
          end
       end
 
-      @test Ideal(ZZ, gens(I)) == I
+      @test Generic.Ideal(ZZ, gens(I)) == I
    end
 end
 
@@ -234,7 +234,7 @@ end
    for i = 1:300
       n = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
-      I = Ideal(R, V...)
+      I = Generic.Ideal(R, V...)
       G = gens(I)
 
       @test length(G) == 1 || (length(V) == 0 && length(G) == 0) || (iszero(V) || length(G) == 0)
@@ -245,7 +245,7 @@ end
          end
       end
 
-      @test Ideal(R, gens(I)) == I
+      @test Generic.Ideal(R, gens(I)) == I
    end
 end
 
@@ -261,7 +261,7 @@ end
          push!(V, rand(R, 0:3, 0:3, -10:10))
       end
       
-      I = Ideal(R, V)
+      I = Generic.Ideal(R, V)
 
       @test I == mix_ideal(I)
    end
@@ -272,7 +272,7 @@ end
    for i = 1:300
       n = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
-      I = Ideal(R, V)
+      I = Generic.Ideal(R, V)
 
       @test I == mix_ideal(I)
    end
@@ -284,7 +284,7 @@ end
    for i = 1:300
       n = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
-      I = Ideal(R, V)
+      I = Generic.Ideal(R, V)
 
       @test I == mix_ideal(I)
    end
@@ -293,7 +293,7 @@ end
    for i = 1:300
       n = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
-      I = Ideal(ZZ, V)
+      I = Generic.Ideal(ZZ, V)
 
       @test I == mix_ideal(I)
    end
@@ -316,8 +316,8 @@ end
          push!(W, rand(R, 0:3, 0:3, -10:10))
       end
 
-      I = Ideal(R, V)
-      J = Ideal(R, vcat(V, W))
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, vcat(V, W))
 
       @test contains(J, I)
    end
@@ -331,8 +331,8 @@ end
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
       W = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:m]
 
-      I = Ideal(R, V)
-      J = Ideal(R, vcat(V, W))
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, vcat(V, W))
 
       @test contains(J, I)
    end
@@ -347,8 +347,8 @@ end
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       W = elem_type(R)[rand(R, 0:5) for i in 1:m]
 
-      I = Ideal(R, V)
-      J = Ideal(R, vcat(V, W))
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, vcat(V, W))
 
       @test contains(J, I)
    end
@@ -360,16 +360,16 @@ end
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       W = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:m]
 
-      I = Ideal(ZZ, V)
-      J = Ideal(ZZ, vcat(V, W))
+      I = Generic.Ideal(ZZ, V)
+      J = Generic.Ideal(ZZ, vcat(V, W))
 
       @test contains(J, I)
    end
 
-   I = Ideal(ZZ, 2)
+   I = Generic.Ideal(ZZ, 2)
 
-   @test contains(I, Ideal(ZZ, BigInt[]))
-   @test !contains(Ideal(ZZ, BigInt[]), I)
+   @test contains(I, Generic.Ideal(ZZ, BigInt[]))
+   @test !contains(Generic.Ideal(ZZ, BigInt[]), I)
 end
 
 @testset "Generic.Ideal.addition" begin
@@ -389,8 +389,8 @@ end
          push!(W, rand(R, 0:3, 0:3, -10:10))
       end
 
-      I = Ideal(R, V)
-      J = Ideal(R, W)
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, W)
 
       @test contains(I + J, I)
       @test contains(I + J, J)
@@ -405,8 +405,8 @@ end
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
       W = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:m]
 
-      I = Ideal(R, V)
-      J = Ideal(R, W)
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, W)
 
       @test contains(I + J, I)
       @test contains(I + J, J)
@@ -422,8 +422,8 @@ end
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       W = elem_type(R)[rand(R, 0:5) for i in 1:m]
 
-      I = Ideal(R, V)
-      J = Ideal(R, W)
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, W)
 
       @test contains(I + J, I)
       @test contains(I + J, J)
@@ -436,8 +436,8 @@ end
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       W = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:m]
 
-      I = Ideal(ZZ, V)
-      J = Ideal(ZZ, W)
+      I = Generic.Ideal(ZZ, V)
+      J = Generic.Ideal(ZZ, W)
 
       @test contains(I + J, I)
       @test contains(I + J, J)
@@ -465,9 +465,9 @@ end
          push!(X, rand(R, 0:3, 0:3, -10:10))
       end
 
-      I = Ideal(R, V)
-      J = Ideal(R, W)
-      K = Ideal(R, X)
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, W)
+      K = Generic.Ideal(R, X)
 
       @test I*(J + K) == I*J + I*K
    end
@@ -483,9 +483,9 @@ end
       W = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:m]
       X = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:k]
 
-      I = Ideal(R, V)
-      J = Ideal(R, W)
-      K = Ideal(R, X)
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, W)
+      K = Generic.Ideal(R, X)
 
       @test I*(J + K) == I*J + I*K
    end
@@ -502,9 +502,9 @@ end
       W = elem_type(R)[rand(R, 0:5) for i in 1:m]
       X = elem_type(R)[rand(R, 0:5) for i in 1:k]
 
-      I = Ideal(R, V)
-      J = Ideal(R, W)
-      K = Ideal(R, X)
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, W)
+      K = Generic.Ideal(R, X)
 
       @test I*(J + K) == I*J + I*K
    end
@@ -518,9 +518,9 @@ end
       W = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:m]
       X = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:k]
 
-      I = Ideal(ZZ, V)
-      J = Ideal(ZZ, W)
-      K = Ideal(ZZ, X)
+      I = Generic.Ideal(ZZ, V)
+      J = Generic.Ideal(ZZ, W)
+      K = Generic.Ideal(ZZ, X)
 
       @test I*(J + K) == I*J + I*K
    end
@@ -540,10 +540,10 @@ end
       c = rand(R, 0:3, 0:3, -10:10)
       d = rand(R, 0:3, 0:3, -10:10)
 
-      I = Ideal(R, V)
+      I = Generic.Ideal(R, V)
 
-      @test I*c == Ideal(R, gens(I*c))
-      @test c*I == Ideal(R, gens(I*c))
+      @test I*c == Generic.Ideal(R, gens(I*c))
+      @test c*I == Generic.Ideal(R, gens(I*c))
       @test c*I*d == d*I*c
    end
 
@@ -553,12 +553,12 @@ end
    for i = 1:300
       n = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
-      I = Ideal(R, V)
+      I = Generic.Ideal(R, V)
       c = rand(R, 0:10, -10:10)
       d = rand(R, 0:10, -10:10)
 
-      @test I*c == Ideal(R, gens(I*c))
-      @test c*I == Ideal(R, gens(I*c))
+      @test I*c == Generic.Ideal(R, gens(I*c))
+      @test c*I == Generic.Ideal(R, gens(I*c))
       @test c*I*d == d*I*c
 
       m = rand(ZZ, -10:10)
@@ -573,12 +573,12 @@ end
    for i = 1:300
       n = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
-      I = Ideal(R, V)
+      I = Generic.Ideal(R, V)
       c = rand(R, 0:5)
       d = rand(R, 0:5)
 
-      @test I*c == Ideal(R, gens(I*c))
-      @test c*I == Ideal(R, gens(I*c))
+      @test I*c == Generic.Ideal(R, gens(I*c))
+      @test c*I == Generic.Ideal(R, gens(I*c))
       @test c*I*d == d*I*c
    end
 
@@ -586,12 +586,12 @@ end
    for i = 1:300
       n = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
-      I = Ideal(ZZ, V)
+      I = Generic.Ideal(ZZ, V)
       c = rand(ZZ, -10:10)
       d = rand(ZZ, -10:10)
 
-      @test I*c == Ideal(ZZ, gens(I*c))
-      @test c*I == Ideal(ZZ, gens(I*c))
+      @test I*c == Generic.Ideal(ZZ, gens(I*c))
+      @test c*I == Generic.Ideal(ZZ, gens(I*c))
       @test c*I*d == d*I*c
    end
 end
@@ -613,8 +613,8 @@ end
          push!(W, rand(R, 0:3, 0:2, -10:10))
       end
 
-      I = Ideal(R, V)
-      J = Ideal(R, W)
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, W)
       
       K = intersection(I, J)
 
@@ -631,8 +631,8 @@ end
       V = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:n]
       W = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:m]
 
-      I = Ideal(R, V)
-      J = Ideal(R, W)
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, W)
 
       K = intersection(I, J)
 
@@ -650,8 +650,8 @@ end
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       W = elem_type(R)[rand(R, 0:5) for i in 1:m]
       
-      I = Ideal(R, V)
-      J = Ideal(R, W)
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, W)
 
       K = intersection(I, J)
 
@@ -666,8 +666,8 @@ end
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       W = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:m]
       
-      I = Ideal(ZZ, V)
-      J = Ideal(ZZ, W)
+      I = Generic.Ideal(ZZ, V)
+      J = Generic.Ideal(ZZ, W)
       
       K = intersection(I, J)
 
