@@ -138,6 +138,11 @@ is_unit(p::UnivPoly) = is_unit(p.p)
 
 is_zero_divisor(p::UnivPoly) = is_zero_divisor(p.p)
 
+function is_zero_divisor_with_annihilator(p::UnivPoly{T, U}) where {T, U}
+   f, b = is_zero_divisor_with_annihilator(p.p)
+   return f, UnivPoly{T, U}(b, parent(p))
+end
+
 is_gen(p::UnivPoly) = is_gen(p.p)
 
 is_homogeneous(p::UnivPoly) = is_homogeneous(p.p)

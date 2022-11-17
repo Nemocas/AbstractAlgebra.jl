@@ -402,6 +402,11 @@ function is_zero_divisor(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return is_zero_divisor(content(x))
 end
 
+function is_zero_divisor_with_annihilator(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   f, b = is_zero_divisor_with_annihilator(content(a))
+   return f, parent(a)(b)
+end
+
 @doc Markdown.doc"""
     is_constant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 

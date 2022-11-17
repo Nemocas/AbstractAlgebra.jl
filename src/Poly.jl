@@ -260,6 +260,11 @@ end
 
 is_zero_divisor(a::PolynomialElem) = is_zero_divisor(content(a))
 
+function is_zero_divisor_with_annihilator(a::PolyElem{T}) where T <: RingElement
+   f, b = is_zero_divisor_with_annihilator(content(a))
+   return f, parent(a)(b)
+end
+
 ###############################################################################
 #
 #  Monomial and term

@@ -69,6 +69,11 @@ is_zero_divisor(a::MatAlgElem{T}) where T <: RingElement = is_zero_divisor(det(a
 
 is_zero_divisor(a::MatAlgElem{T}) where T <: FieldElement = rank(a) != degree(a)
 
+function is_zero_divisor_with_annihilator(a::MatAlgElem{T}) where T <: RingElement
+   f, b = is_zero_divisor_with_annihilator(det(a))
+   throw(NotImplementedError(:adj, A)) #return f, b*adj(A)
+end
+
 
 function characteristic(a::MatAlgebra)
    return characteristic(base_ring(a))

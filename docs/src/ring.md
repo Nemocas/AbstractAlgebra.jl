@@ -101,6 +101,7 @@ mathematically/algorithmically viable to do so.
 ```julia
 is_unit(a::NCRingElement)
 is_zero_divisor(a::NCRingElement)
+is_zero_divisor_with_annihilator(a::NCRingElement)
 ```
 
 The following standard Julia functions are also implemented for all ring

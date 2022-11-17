@@ -395,31 +395,75 @@ function crt_with_lcm(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: R
    return _crt_with_lcm_stub(r, m; check=check)
 end
 
+###############################################################################
+#
+# Functions that can't really be implemented generically
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    is_zero_divisor(a::T) where T <: RingElement
+
+Return `true` if there exists a nonzero $b$ such that $a b = 0$ and
+`false` otherwise.
+"""
+function is_zero_divisor(a::T) where T <: RingElement
+   if !is_domain_type(T)
+      throw(NotImplementedError(:is_zero_divisor, a))
+   end
+   return is_zero(a) && !is_zero(one(parent(a)))
+end
+
+@doc Markdown.doc"""
+    is_zero_divisor_with_annihilator(a::T) where T <: RingElement
+
+Return `(true, b)` if there exists a nonzero $b$ such that $a b = 0$ and
+`(false, junk)` otherwise.
+"""
+function is_zero_divisor_with_annihilator(a::T) where T <: RingElement
+   if !is_domain_type(T)
+      if is_zero_divisor(a)
+         throw(NotImplementedError(:is_zero_divisor_with_annihilator, a))
+      end
+      return (false, parent(a)())
+   end
+   theone = one(parent(a))
+   return (is_zero(a) && !is_zero(theone), theone)
+end
+
 @doc Markdown.doc"""
     factor(a::T)
 
 Return a factorization of the element $a$ as a `Fac{T}`.
 """
-function factor end
+function factor(a)
+   throw(NotImplementedError(:factor, a))
+end
 
 @doc Markdown.doc"""
     factor_squarefree(a::T)
 
 Return a squarefree factorization of the element $a$ as a `Fac{T}`.
 """
-function factor_squarefree end
+function factor_squarefree(a)
+   throw(NotImplementedError(:factor_squarefree, a))
+end
 
 @doc Markdown.doc"""
     is_irreducible(a)
 
 Return `true` if $a$ is irreducible, else return `false`.
 """
-function is_irreducible end
+function is_irreducible(a)
+   throw(NotImplementedError(:is_irreducible, a))
+end
 
 @doc Markdown.doc"""
     is_squarefree(a)
 
 Return `true` if $a$ is squarefree, else return `false`.
 """
-function is_squarefree end
+function is_squarefree(a)
+   throw(NotImplementedError(:is_squarefree, a))
+end
 

@@ -92,6 +92,12 @@ end
 # otherwise this function would be more complicated
 is_zero_divisor(a::ResElem) = !is_unit(a)
 
+function is_zero_divisor_with_annihilator(a::ResElem)
+   g = gcd(data(a), modulus(a))
+   b = divexact(modulus(a), g)  # Modulus must be nonzero, so g is nonzero
+   return !is_unit(g), b
+end
+
 deepcopy_internal(a::ResElem, dict::IdDict) =
    parent(a)(deepcopy(data(a)))
 

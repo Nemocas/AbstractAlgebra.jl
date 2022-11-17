@@ -116,6 +116,13 @@ function is_unit(a::LaurentMPolyWrap)
     end
 end
 
+is_zero_divisor(p::LaurentMPolyWrap) = is_zero_divisor(p.mpoly)
+
+function is_zero_divisor_with_annihilator(p::LaurentMPolyWrap)
+   f, b = is_zero_divisor_with_annihilator(p.mpoly)
+   return f, LaurentMPolyWrap(parent(p), b)
+end
+
 ###############################################################################
 #
 #   Arithmetic
