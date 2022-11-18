@@ -68,8 +68,19 @@ end
    @test is_unit(S(5, 7))
    @test !is_unit(S(3, 7))
 
-   @test is_zero_divisor(S(3, 7))
-   @test !is_zero_divisor(S(5, 7))
+   a = S(5, 7)
+   @test !is_zero_divisor(a)
+   (f, h) = is_zero_divisor_with_annihilator(a)
+   @test !f
+   @test parent(h) == S
+
+   a = S(3, 7)
+   @test is_zero_divisor(a)
+   (f, h) = is_zero_divisor_with_annihilator(a)
+   @test f
+   @test parent(h) == S
+   @test !is_zero(h)
+   @test is_zero(h*a)
 
    @test deepcopy(S(5, 7)) == S(5, 7)
 

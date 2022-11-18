@@ -291,7 +291,11 @@ characteristic(R::UnivPolyRing) = characteristic(base_ring(R))
 function Base.hash(p::UnivPoly, h::UInt)
    b = 0xcf418d4529109236%UInt
    for (c, v) in zip(coefficients(p.p), exponent_vectors(p.p))
-      b = xor(b, xor(Base.hash(v[1:findlast(x->x>0, v)], h), h))
+      l = length(v)
+      while l > 0 && iszero(v[l])
+         l -= 1
+      end
+      b = xor(b, xor(Base.hash(v[1:l], h), h))
       b = xor(b, xor(hash(c, h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end

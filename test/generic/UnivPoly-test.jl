@@ -122,6 +122,16 @@ end
    end
 end
 
+function test_elem(R::AbstractAlgebra.Generic.UnivPolyRing{AbstractAlgebra.Generic.Res{BigInt}})
+    return rand(R, 0:4, 0:10, -10:10)
+end
+
+@testset "Generic.UnivPoly.conformance" begin
+   S = UniversalPolynomialRing(ResidueRing(ZZ, ZZ(6)))
+   gen(S, "x")
+   test_Ring_interface(S)
+end
+
 @testset "Generic.UnivPoly.term_monomial" begin
    for R in [ZZ, QQ]
       for iters = 1:100
