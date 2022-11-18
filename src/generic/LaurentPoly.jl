@@ -210,6 +210,11 @@ end
 
 is_zero_divisor(p::LaurentPolyWrap) = is_zero_divisor(p.poly)
 
+function is_zero_divisor_with_annihilator(p::LaurentPolyWrap)
+   f, b = is_zero_divisor_with_annihilator(p.poly)
+   return f, LaurentPolyWrap(parent(p), b)
+end
+
 function Base.divrem(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
    iszero(q) && error(DivideError())
    iszero(p) && return one(parent(p)), p

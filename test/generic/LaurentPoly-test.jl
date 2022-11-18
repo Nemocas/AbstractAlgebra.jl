@@ -497,5 +497,8 @@ end
       test_Ring_interface(L)
       test_EuclideanRing_interface(L)
       test_Ring_interface_recursive(L)
+
+      L, y = LaurentPolynomialRing(ResidueRing(ZZ, ZZ(6)), "y")
+      test_Ring_interface(L)
    end
 end

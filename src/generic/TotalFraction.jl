@@ -106,6 +106,12 @@ is_unit(a::TotFrac) = !is_zero_divisor(numerator(a, false))
 
 is_zero_divisor(a::TotFrac) = is_zero_divisor(numerator(a, false))
 
+function is_zero_divisor_with_annihilator(a::TotFrac)
+   f, b = is_zero_divisor_with_annihilator(numerator(a, false))
+   R = parent(a)
+   return f, R(b, one(base_ring(R)), false)
+end
+
 ###############################################################################
 #
 #   Canonicalisation

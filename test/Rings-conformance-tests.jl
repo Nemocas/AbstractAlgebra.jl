@@ -243,6 +243,16 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
                catch
                end
             end
+            try
+               (f, h) = is_zero_divisor_with_annihilator(a)
+               @test parent(h) == R
+               @test f == is_zero_divisor(a)
+               if f
+                  @test !is_zero(h)
+                  @test is_zero(a*h)
+               end
+            catch
+            end
             @test A == a
             @test B == b
          end
