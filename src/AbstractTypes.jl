@@ -45,6 +45,8 @@ abstract type FPModule{T} <: Module{T} end
 
 abstract type Ideal{T} <: Set end
 
+abstract type IdealSet{T} <: Set end
+
 # elements of parameterised domains
 
 abstract type ModuleElem{T} <: AdditiveGroupElem end
