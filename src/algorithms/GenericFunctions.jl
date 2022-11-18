@@ -36,7 +36,7 @@ end
 
 ###############################################################################
 #
-# Euclidean interface has 13 functions, 12 of which follow from divrem
+# The whole Euclidean interface can be derived from divrem if it is available.
 #
 ###############################################################################
 
@@ -193,11 +193,11 @@ function valuation(a::T, b::T) where T <: Union{RingElem, Number}
 end
 
 @doc Markdown.doc"""
-    gcd(f::T, g::T) where T <: RingElem
+    gcd(a::T, b::T) where T <: RingElem
 
-Return a greatest common divisor of $f$ and $g$, i.e., an element $d$
-which is a common divisor of $f$ and $g$, and with the property that
-any other common divisor of $f$ and $g$ divides $d$.
+Return a greatest common divisor of $a$ and $b$, i.e., an element $g$
+which is a common divisor of $a$ and $b$, and with the property that
+any other common divisor of $a$ and $b$ divides $g$.
 
 !!! note
     For best compatibility with the internal assumptions made by
@@ -230,6 +230,21 @@ Return a greatest common divisor of $f$, $g$ and the elements in `hs`.
 """
 function gcd(f::T, g::T, hs::T...) where T <: RingElem
    return gcd(f, gcd(g, hs...))
+end
+
+@doc Markdown.doc"""
+    gcd_with_cofactors(a::T, b::T) where T <: RingElem
+
+Return a tuple `(g, abar, bbar)` consisting of `g = gcd(a, b)` and cofactors
+`abar` and `bbar` with `a = g*abar` and `b = g*bbar`.
+"""
+function gcd_with_cofactors(a::T, b::T) where T <: RingElement
+   g = gcd(a, b)
+   if iszero(g) || isone(g)
+      return (g, a, b)
+   else
+      return (g, divexact(a, g), divexact(b, g))
+   end
 end
 
 @doc Markdown.doc"""

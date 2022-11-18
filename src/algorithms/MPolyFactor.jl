@@ -110,19 +110,6 @@ function from_univar(a, var::Int, Kxyz)
   return finish(r)
 end
 
-function gcdcofactors(a, b)
-  g = gcd(a, b)
-  if iszero(g)
-    @assert iszero(a)
-    @assert iszero(b)
-    return (g, a, b)
-  elseif isone(g)
-    return (g, a, b)
-  else
-    return (g, divexact(a, g), divexact(b, g))
-  end
-end
-
 # remove the content with respect to variable v
 function primitive_part(a::E, v::Int) where E
   R = parent(a)
@@ -931,7 +918,7 @@ function make_bases_coprime!(a::Array{Pair{E, Int}}, b::Array{Pair{E, Int}}) whe
     for j in 1:lenb
       ai = a[i].first
       bj = b[j].first
-      (g, ai, bi) = gcdcofactors(ai, bj)
+      (g, ai, bi) = gcd_with_cofactors(ai, bj)
       if !is_constant(g)
         a[i] = ai => a[i].second
         b[i] = bi => b[i].second
@@ -952,10 +939,10 @@ function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where E
   abases = E[t.first for t in a]
   aexps = Int[t.second for t in a]
 
-  i = 1 # index strickly before which everything is coprime to b
+  i = 1 # index strictly before which everything is coprime to b
 
   while i <= length(abases) && !is_constant(b)
-    abase_new, abases[i], b = gcdcofactors(abases[i], b)
+    abase_new, abases[i], b = gcd_with_cofactors(abases[i], b)
     if is_constant(abase_new)
       i += 1
       continue
@@ -1240,10 +1227,10 @@ function mfactor_sqrfree_char_zero(a::E) where E
   for v in 1:nvars(R)
     Sp = derivative(a, v)
     if !iszero(Sp)
-      (Sm, Ss, Y) = gcdcofactors(a, Sp)
+      (Sm, Ss, Y) = gcd_with_cofactors(a, Sp)
       k = 1
       while begin Z = Y - derivative(Ss, v); !iszero(Z) end
-        (S, Ss, Y) = gcdcofactors(Ss, Z)
+        (S, Ss, Y) = gcd_with_cofactors(Ss, Z)
         mulpow!(res, S, k)
         k += 1
       end
