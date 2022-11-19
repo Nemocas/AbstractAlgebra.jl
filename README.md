@@ -2,7 +2,6 @@
 
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://nemocas.github.io/AbstractAlgebra.jl/dev)
 [![Docs](https://img.shields.io/badge/docs-stable-blue.svg)](https://nemocas.github.io/AbstractAlgebra.jl/stable)
-[![Build status](https://ci.appveyor.com/api/projects/status/1w9ninmoidxkxshp/branch/master?svg=true)](https://ci.appveyor.com/project/thofma/abstractalgebra-jl/branch/master)
 [![Build Status](https://github.com/Nemocas/AbstractAlgebra.jl/workflows/Run%20tests/badge.svg)](https://github.com/Nemocas/AbstractAlgebra.jl/actions?query=workflow%3A%22Run%20tests%22+branch%3Amaster)
 [![Codecov](https://codecov.io/github/Nemocas/AbstractAlgebra.jl/coverage.svg?branch=master&token=)](https://codecov.io/gh/Nemocas/AbstractAlgebra.jl)
 
