@@ -959,6 +959,8 @@ end
          @test evaluate(h, [1], [V[1]]) == evaluate(h, [1], [ZZ(V[1])])
          @test evaluate(h, [1, 3], [V[1], V[2]]) == evaluate(h, [1, 3], [R(v) for v in V[1:2]])
          @test evaluate(h, [1, 3], [V[1], V[2]]) == evaluate(h, [1, 3], [ZZ(v) for v in V[1:2]])
+
+         @test evaluate(x, [1], [y]) == evaluate(z, [3], [y])
       end
    end
 end
