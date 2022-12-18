@@ -843,20 +843,21 @@ function evaluate(a::UnivPoly{T, U}, vals::Vector{V}) where {T <: RingElement, U
    return a(vals...)
 end
 
-function evaluate(a::UnivPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(a::UnivPoly{T, U}, vars::Vector{Int}, vals::Vector{V}) where {T <: RingElement, U, V <: RingElement}
    length(vars) != length(vals) && error("Numbers of variables and values do not match")
    vars2 = Vector{Int}(undef, 0)
    vals2 = Vector{U}(undef, 0)
    num = nvars(parent(a.p))
-   n = nvars(parent(a))
+   S = parent(a)
+   n = nvars(S)
    for i = 1:length(vars)
       vars[i] > n && error("Unknown variable")
       if vars[i] <= num
          push!(vars2, vars[i])
-         push!(vals2, vals[i])
+         push!(vals2, S(vals[i]).p)
       end
    end
-   return evaluate(a.p, vars2, vals2)
+   return evaluate(S(a).p, vars2, vals2)
 end
 
 function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UnivPoly{T, U}, V <: RingElement} where {T <: RingElement, U}
