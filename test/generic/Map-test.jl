@@ -99,4 +99,7 @@ end
 
    @test compose(g, g) === g
    @test compose(h, h) === h
+
+   @test inv(g) === g
+   @test inv(h) === h
 end
