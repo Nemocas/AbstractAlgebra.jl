@@ -857,7 +857,7 @@ function evaluate(a::UnivPoly{T, U}, vars::Vector{Int}, vals::Vector{V}) where {
          push!(vals2, S(vals[i]).p)
       end
    end
-   return evaluate(S(a).p, vars2, vals2)
+   return UnivPoly(evaluate(S(a).p, vars2, vals2), S)
 end
 
 function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UnivPoly{T, U}, V <: RingElement} where {T <: RingElement, U}
