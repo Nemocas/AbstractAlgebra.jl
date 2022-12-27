@@ -747,7 +747,7 @@ function mul_classical(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
 end
 
 function use_karamul(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
-   return length(a) > 5 && length(b) > 5
+   return false
 end
 
 function *(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
