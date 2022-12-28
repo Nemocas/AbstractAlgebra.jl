@@ -248,16 +248,16 @@ end
 function isaExprOp(@nospecialize(obj), op::Symbol)
    return isa(obj, Expr) &&
           length(obj.args) > 1 &&
-          obj.head == :call &&
-          obj.args[1] == op
+          obj.head === :call &&
+          obj.args[1] === op
 end
 
 # is obj a call to op with len arguments
 function isaExprOp(@nospecialize(obj), op::Symbol, len::Int)
    return isa(obj, Expr) &&
           length(obj.args) == len + 1 &&
-          obj.head == :call &&
-          obj.args[1] == op
+          obj.head === :call &&
+          obj.args[1] === op
 end
 
 # syntactic zeros can be removed from sums and turn a product into 0
@@ -281,11 +281,11 @@ function get_syntactic_sign_abs(obj::Expr)
    if obj.head !== :call
       return (1, obj)
    end
-   if length(obj.args) == 2 && obj.args[1] == :-
+   if length(obj.args) == 2 && obj.args[1] === :-
       # unary minus is negative
       (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
       return (-sgn, obj.args[2])
-   elseif length(obj.args) > 2 && obj.args[1] == :*
+   elseif length(obj.args) > 2 && obj.args[1] === :*
       # product is negative if first term is
       (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
       if sgn > 0
@@ -303,7 +303,7 @@ function get_syntactic_sign_abs(obj::Expr)
             return (sgn, newobj)
          end
       end
-   elseif length(obj.args) == 3 && (obj.args[1] == :/ || obj.args[1] == ://)
+   elseif length(obj.args) == 3 && (obj.args[1] === :/ || obj.args[1] === ://)
       # quotient is negative if numerator is
       (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
       if sgn > 0
@@ -371,7 +371,7 @@ function flatten_op(obj::Expr, op::Symbol)
 end
 
 function canonicalizePlusFinal!(obj::Expr)
-   @assert obj.head == :call && obj.args[1] == :+
+   @assert obj.head === :call && obj.args[1] === :+
    if length(obj.args) < 2
       return 0
    elseif length(obj.args) == 2
@@ -390,7 +390,7 @@ function canonicalizePlusFinal!(obj::Expr)
 end
 
 function canonicalizePlus(obj::Expr)
-   @assert obj.head == :call && obj.args[1] == :+
+   @assert obj.head === :call && obj.args[1] === :+
    if length(obj.args) < 2
       return 0
    elseif length(obj.args) == 2
@@ -410,7 +410,7 @@ function canonicalizePlus(obj::Expr)
 end
 
 function canonicalizeMinus(obj::Expr)
-   @assert obj.head == :call && obj.args[1] == :-
+   @assert obj.head === :call && obj.args[1] === :-
    if length(obj.args) < 2
       return 0
    elseif length(obj.args) == 2
@@ -428,13 +428,13 @@ end
 
 function canonicalizeTimes(obj::Expr)
    op = obj.args[1]
-   @assert obj.head == :call && (op == :* || op == :cdot)
+   @assert obj.head === :call && (op === :* || op === :cdot)
    if length(obj.args) < 2
       return 1
    elseif length(obj.args) == 2
       return canonicalize(obj.args[2])
    end
-   if op == :cdot
+   if op === :cdot
       return canonicalize_general_recursive(obj)
    end
    obj = flatten_op(obj, op)
@@ -474,12 +474,12 @@ function canonicalize_general_recursive(obj::Expr)
 end
 
 function canonicalize(obj::Expr)
-   if obj.head == :call && !isempty(obj.args)
-      if obj.args[1] == :+
+   if obj.head === :call && !isempty(obj.args)
+      if obj.args[1] === :+
          return canonicalizePlus(obj)
-      elseif obj.args[1] == :-
+      elseif obj.args[1] === :-
          return canonicalizeMinus(obj)
-      elseif obj.args[1] == :* || obj.args[1] == :cdot
+      elseif obj.args[1] === :* || obj.args[1] === :cdot
          return canonicalizeTimes(obj)
       end
    end
@@ -947,8 +947,8 @@ end
 function print_call_or_ref(S::printer, mi::MIME, obj::Expr,
                            left::Int, right::Int)
    n = length(obj.args)
-   @assert n > 0 && (obj.head == :call || obj.head == :ref)
-   prec = obj.head == :call ? prec_post_call : prec_post_ref
+   @assert n > 0 && (obj.head === :call || obj.head === :ref)
+   prec = obj.head === :call ? prec_post_call : prec_post_ref
 
    needp = prec <= left
    if needp
@@ -958,12 +958,12 @@ function print_call_or_ref(S::printer, mi::MIME, obj::Expr,
 
    if size_limit(S) < 0
       print_obj(S, mi, obj.args[1], left, prec)
-      obj.head == :call ? push_left_parenthesis(S, mi) : push_left_bracket(S, mi)
+      obj.head === :call ? push_left_parenthesis(S, mi) : push_left_bracket(S, mi)
       for i in 2:n
          i == 2 || push(S, isterse(S) ? "," : ", ")
          print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
       end
-      obj.head == :call ? push_right_parenthesis(S, mi) : push_right_bracket(S, mi)
+      obj.head === :call ? push_right_parenthesis(S, mi) : push_right_bracket(S, mi)
    elseif size_limit(S) == 0
       push_elision(S, mi)
    else
@@ -975,7 +975,7 @@ function print_call_or_ref(S::printer, mi::MIME, obj::Expr,
       else
          push_elision(S, mi)
       end
-      obj.head == :call ? push_left_parenthesis(S, mi) : push_left_bracket(S, mi)
+      obj.head === :call ? push_left_parenthesis(S, mi) : push_left_bracket(S, mi)
       wrote_elision = false
       for i in 2:n
          if i <= length(a)
@@ -994,7 +994,7 @@ function print_call_or_ref(S::printer, mi::MIME, obj::Expr,
          print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
          restore_size_limit(S)
       end
-      obj.head == :call ? push_right_parenthesis(S, mi) : push_right_bracket(S, mi)
+      obj.head === :call ? push_right_parenthesis(S, mi) : push_right_bracket(S, mi)
    end
 
    if needp
@@ -1007,19 +1007,19 @@ function print_tuple_etc(S::printer, mi::MIME, obj::Expr, left::Int, right::Int)
 
    needp = prec_lowest < left || prec_lowest < right
    sep = isterse(S) ? "," : ", "
-   if obj.head == :vcat
+   if obj.head === :vcat
       needp = false
       sep = "; "
-   elseif obj.head == :vect
+   elseif obj.head === :vect
       needp = false
-   elseif obj.head == :tuple
+   elseif obj.head === :tuple
       needp = false
-   elseif obj.head == :list
+   elseif obj.head === :list
       needp = false
-   elseif obj.head == :series
-   elseif obj.head == :sequence
+   elseif obj.head === :series
+   elseif obj.head === :sequence
       sep = ""
-   elseif obj.head == :row || obj.head == :hcat
+   elseif obj.head === :row || obj.head === :hcat
       sep = " "
    else
       error("invalid head")
@@ -1027,13 +1027,13 @@ function print_tuple_etc(S::printer, mi::MIME, obj::Expr, left::Int, right::Int)
 
    needp && push_left_parenthesis(S, mi)
 
-   if obj.head == :vcat || obj.head == :vect
+   if obj.head === :vcat || obj.head === :vect
       push_left_bracket(S, mi)
-   elseif obj.head == :list
+   elseif obj.head === :list
       push_left_curly(S, mi)
-   elseif obj.head == :tuple
+   elseif obj.head === :tuple
       push_left_parenthesis(S, mi)
-   elseif obj.head == :row || obj.head == :hcat
+   elseif obj.head === :row || obj.head === :hcat
       set_terse(S)
    end
 
@@ -1066,13 +1066,13 @@ function print_tuple_etc(S::printer, mi::MIME, obj::Expr, left::Int, right::Int)
       end
    end
 
-   if obj.head == :vcat || obj.head == :vect
+   if obj.head === :vcat || obj.head === :vect
       push_right_bracket(S, mi)
-   elseif obj.head == :list
+   elseif obj.head === :list
       push_right_curly(S, mi)
-   elseif obj.head == :tuple
+   elseif obj.head === :tuple
       push_right_parenthesis(S, mi)
-   elseif obj.head == :row || obj.head == :hcat
+   elseif obj.head === :row || obj.head === :hcat
       restore_terse(S)
    end
 
@@ -1101,7 +1101,7 @@ function print_vcat(S::printer, mi::MIME"text/latex", obj::Expr,
       ncols = 1
       for i in 1:nrows
          ei = obj.args[i]
-         if isa(ei, Expr) && (ei.head == :hcat || ei.head == :row)
+         if isa(ei, Expr) && (ei.head === :hcat || ei.head === :row)
             ncols = max(ncols, length(ei.args))
          end
       end
@@ -1113,7 +1113,7 @@ function print_vcat(S::printer, mi::MIME"text/latex", obj::Expr,
       nleaves = 1
       for i in 1:nrows
          ei = obj.args[i]
-         if isa(ei, Expr) && (ei.head == :hcat || ei.head == :row)
+         if isa(ei, Expr) && (ei.head === :hcat || ei.head === :row)
             ncols = max(ncols, length(ei.args))
          end
          nleaves += leaf_count(S, ei)
@@ -1143,7 +1143,7 @@ function print_vcat(S::printer, mi::MIME"text/latex", obj::Expr,
       ei = obj.args[i]
       if i <= b || i > nrows - b
          i == 1 || push(S, " \\\\\n")
-         if isa(ei, Expr) && (ei.head == :hcat || ei.head == :row)
+         if isa(ei, Expr) && (ei.head === :hcat || ei.head === :row)
             eilen = length(ei.args)
             for j in 1:min(a, eilen)
                j == 1 || push(S, " & ")
@@ -1294,9 +1294,9 @@ function print_obj(S::printer, mi::MIME, obj::Expr,
       printGenericInfix(S, mi, o, left, right, " = ", prec_inf_Equal, -1)
    elseif obj.head === :comparison && isodd(n) && n > 1
       print_comparison(S, mi, obj, left, right, prec_inf_Equal)
-   elseif obj.head == :vcat || obj.head == :vect || obj.head == :tuple ||
-          obj.head == :list || obj.head == :series || obj.head == :sequence ||
-          obj.head == :row || obj.head == :hcat
+   elseif obj.head === :vcat || obj.head === :vect || obj.head === :tuple ||
+          obj.head === :list || obj.head === :series || obj.head === :sequence ||
+          obj.head === :row || obj.head === :hcat
       print_tuple_etc(S, mi, obj, left, right)
    elseif obj.head === :ref && n > 0
       print_call_or_ref(S, mi, obj, left, right)
@@ -1353,9 +1353,9 @@ function print_obj(S::printer, mi::MIME"text/latex", obj::Expr,
       print_comparison(S, mi, obj, left, right, prec_inf_Equal)
    elseif obj.head === :vcat
       print_vcat(S, mi, obj, left, right)
-   elseif obj.head == :vect || obj.head == :tuple ||
-          obj.head == :list || obj.head == :series || obj.head == :sequence ||
-          obj.head == :row || obj.head == :hcat
+   elseif obj.head === :vect || obj.head === :tuple ||
+          obj.head === :list || obj.head === :series || obj.head === :sequence ||
+          obj.head === :row || obj.head === :hcat
       print_tuple_etc(S, mi, obj, left, right)
    elseif obj.head === :ref && n > 0
       print_call_or_ref(S, mi, obj, left, right)
