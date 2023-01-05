@@ -1836,8 +1836,8 @@ function rref_rational(M::MatrixElem{T}) where {T <: RingElement}
 end
 
 function rref!(A::MatrixElem{T}) where {T <: FieldElement}
-   m = nrows(A)
-   n = ncols(A)
+   m = nrows(A)::Int
+   n = ncols(A)::Int
    R = base_ring(A)
    P = one(SymmetricGroup(m))
    rnk = lu!(P, A)
