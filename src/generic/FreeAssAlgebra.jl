@@ -571,6 +571,34 @@ function divexact(a::FreeAssAlgElem{T}, b::Integer; check::Bool = true) where T 
    return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
 end
 
+
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function _change_freeassalg_ring(R, Rx, cached)
+    P, _ = AbstractAlgebra.FreeAssociativeAlgebra(R, symbols(Rx); cached=cached)
+    return P
+end
+
+function change_base_ring(R::Ring, p::FreeAssAlgElem{T}; cached=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(R, parent(p), cached)) where T <: RingElement
+    base_ring(parent) != R && error("Base rings do not match.")
+    return _map(R, p, parent)
+end
+
+function _map(g, p::FreeAssAlgElem{T}, Rx) where T <: RingElement
+    cvzip = zip(coefficients(p), exponent_words(p))
+    M = MPolyBuildCtx(Rx)
+    for (c, v) in cvzip
+        push_term!(M, g(c), v)
+    end
+
+    return finish(M)
+end
+
+
 ###############################################################################
 #
 #   FreeAssociativeAlgebra constructor
