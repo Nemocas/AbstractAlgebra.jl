@@ -232,6 +232,16 @@ function Base.eltype(x::FreeAssAlgExponentWords{T}) where {S <: RingElement,
                                                            T <: FreeAssAlgElem{S}}
    return Vector{Int}
 end
+               
+###############################################################################
+#
+#   Canonicalisation
+#
+###############################################################################
+
+function canonical_unit(a::FreeAssAlgElem{T}) where T <: RingElement
+   return canonical_unit(leading_coefficient(a))
+end
 
 ###############################################################################
 #
