@@ -232,6 +232,16 @@ function Base.eltype(x::FreeAssAlgExponentWords{T}) where {S <: RingElement,
                                                            T <: FreeAssAlgElem{S}}
    return Vector{Int}
 end
+               
+###############################################################################
+#
+#   Canonicalisation
+#
+###############################################################################
+
+function canonical_unit(a::FreeAssAlgElem{T}) where T <: RingElement
+   return canonical_unit(leading_coefficient(a))
+end
 
 ###############################################################################
 #
@@ -560,6 +570,38 @@ function divexact(a::FreeAssAlgElem{T}, b::Integer; check::Bool = true) where T 
    zcoeffs = T[divexact(a.coeffs[i], b, check = check) for i in 1:n]
    return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
 end
+
+
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function _change_freeassalg_ring(R, Rx, cached)
+    P, _ = AbstractAlgebra.FreeAssociativeAlgebra(R, symbols(Rx); cached=cached)
+    return P
+end
+
+function change_base_ring(R::Ring, a::FreeAssAlgElem{T}; cached=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(R, parent(a), cached)) where T <: RingElement
+    base_ring(parent) != R && error("Base rings do not match.")
+    return _map(R, a, parent)
+end
+
+function map_coefficients(f, a::FreeAssAlgElem{T}; cached=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(parent(f(zero(base_ring(a)))), parent(a), cached)) where T <: RingElement
+   return _map(f, a, parent)
+end
+
+function _map(g, a::FreeAssAlgElem{T}, Rx) where T <: RingElement
+    cvzip = zip(coefficients(a), exponent_words(a))
+    M = MPolyBuildCtx(Rx)
+    for (c, v) in cvzip
+        push_term!(M, g(c), v)
+    end
+
+    return finish(M)
+end
+
 
 ###############################################################################
 #

@@ -27,7 +27,7 @@
          @test isa(gens(S)[j], FreeAssAlgElem)
       end
 
-      f =  rand(S, 0:5, 0:10, 0:0, -100:100)
+      f = rand(S, 0:5, 0:10, 0:0, -100:100)
 
       @test isa(f, FreeAssAlgElem)
 
@@ -91,6 +91,8 @@
          @test_throws ArgumentError leading_exponent_word(f1)
       end
 
+      @test canonical_unit(f1) == canonical_unit(leading_coefficient(f1))
+
       @test !is_gen(zero(S))
       @test !is_gen(one(S))
       for i in 1:num_vars
@@ -119,6 +121,54 @@ end
 
 function test_elem(R::Generic.FreeAssAlgebra{elem_type(ZZ)})
    return rand(R, 0:4, 0:5, -10:10)
+end
+
+@testset "Generic.FreeAssAlgebra.change_base_ring" begin
+   F5 = ResidueRing(ZZ, 5)
+   R, varsR = PolynomialRing(F5, ["x"])
+   S, varsS = FreeAssociativeAlgebra(R, ["y"])
+   f = x -> x^2 + F5(3)
+   @test map_coefficients(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
+
+   for num_vars = 1:5
+      var_names = ["x$j" for j in 1:num_vars]
+
+      R, t = ZZ["t"]
+      Rx, varsRx = FreeAssociativeAlgebra(R, var_names)
+      S, _ = PolynomialRing(R, ["y", "z"])
+      Sx, varsSx = FreeAssociativeAlgebra(S, var_names)
+
+      @test typeof(change_base_ring(R, Rx(0))) == typeof(Rx(0))
+      @test typeof(change_base_ring(R, Rx(1))) == typeof(Rx(1))
+      @test typeof(change_base_ring(S, Rx(0))) == typeof(Sx(0))
+      @test typeof(change_base_ring(S, Rx(1))) == typeof(Sx(1))
+
+      @test change_base_ring(R, Rx(0)) == Rx(0)
+      @test change_base_ring(R, Rx(1)) == Rx(1)
+      @test change_base_ring(S, Rx(0)) == Sx(0)
+      @test change_base_ring(S, Rx(1)) == Sx(1)
+
+      # some pseudo-random non-trivial polynomial
+      f = sum((5 + i) * x^i for (i, x) in enumerate(varsRx)) + t^2 * prod(varsRx) - t + 42
+      g = sum((5 + i) * x^i for (i, x) in enumerate(varsSx)) + S(t)^2 * prod(varsSx) - S(t) + 42
+      @test change_base_ring(S, f, parent=Sx) == g
+
+      for _ in 1:10
+         f1 = rand(Rx, 0:5, 0:10, 0:0, -100:100)
+         f2 = rand(Rx, 0:5, 0:10, 0:0, -100:100)
+
+         g = change_base_ring(R, f1)
+         @test base_ring(g) === R
+         @test g == f1
+
+         g = change_base_ring(S, f1, parent=Sx)
+         @test base_ring(g) === S
+         @test parent(g) === Sx
+
+         @test change_base_ring(S, f1 + f2) == change_base_ring(S, f1) + change_base_ring(S, f2)
+         @test change_base_ring(S, f1 * f2) == change_base_ring(S, f1) * change_base_ring(S, f2)
+      end
+   end
 end
 
 @testset "Generic.FreeAssAlgebra.divexact" begin
