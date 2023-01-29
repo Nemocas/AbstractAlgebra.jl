@@ -1259,7 +1259,7 @@ end
    R, varsR = PolynomialRing(F2, ["x"])
    S, varsS = PolynomialRing(R, ["y"])
    f = x -> x^2
-   map_coefficients(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
+   @test map_coefficients(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
 
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
