@@ -10,9 +10,9 @@ other interested contributors.
 
 AbstractAlgebra.jl grew out of the Nemo project after a number of requests from the
 community for the pure Julia part of Nemo to be split off into a separate project. See
-the Nemo website for more details about Nemo.
+the Nemo repository for more details about Nemo.
 
-- [Nemo website](https://nemocas.org)
+- [Nemo repository](https://github.com/Nemocas/Nemo.jl)
 
 ## Features
 
