@@ -975,6 +975,31 @@ end
 
 ==(x::MatElem, y::MatElem) = ==(promote(x, y)...)
 
+# matrix * vec and vec * matrx
+function Base.promote(x::MatrixElem{S},
+                      y::Vector{T}) where {S <: NCRingElement,
+                                               T <: NCRingElement}
+   U = promote_rule_sym(S, T)
+   if U === S
+      return x, map(base_ring(x), y)
+   elseif U === T && length(y) != 0
+      return change_base_ring(parent(y[1]), x), y
+   else
+      error("Cannot promote to common type")
+   end
+end
+
+function Base.promote(x::Vector{S},
+                      y::MatrixElem{T}) where {S <: NCRingElement,
+                                               T <: NCRingElement}
+   yy, xx = promote(y, x)
+   return xx, yy
+end
+
+*(x::MatrixElem, y::Vector) = *(promote(x, y)...)
+
+*(x::Vector, y::MatrixElem) = *(promote(x, y)...)
+
 function Base.promote(x::MatElem{S}, y::T) where {S <: NCRingElement, T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
