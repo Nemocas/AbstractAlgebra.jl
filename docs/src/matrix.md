@@ -878,6 +878,12 @@ rank{T <: RingElem}(::MatElem{T})
 minors(::MatElem, ::Int)
 ```
 
+### Exterior power
+
+```@docs
+exterior_power(::MatElem, ::Int)
+```
+
 ### Pfaffian
 
 ```@docs
