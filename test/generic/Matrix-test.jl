@@ -1334,6 +1334,23 @@ end
 
    @test one(F) == R[1 0; 0 1]
    @test R[1 0; 0 1] == one(R)
+
+   # vector * matrix
+   m = [1 2; 3 4]
+   F = ResidueField(ZZ, 3)
+   R, t = PolynomialRing(F, "t")
+   A = matrix(R, m)
+   B = matrix(F, m)
+   v = [one(F), 2*one(F)]
+   vv = [one(R), 2*one(R)]
+   @test (@inferred A * v) == A * vv
+   @test (@inferred v * A) == vv * A
+
+   @test (@inferred B * vv) == A * vv
+   @test (@inferred vv * B) == vv * A
+
+   @test_throws ErrorException A * Rational{BigInt}[1 ,2]
+   @test_throws ErrorException Rational{BigInt}[1 ,2] * A
 end
 
 @testset "Generic.Mat.permutation" begin
