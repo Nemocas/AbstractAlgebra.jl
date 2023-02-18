@@ -1834,6 +1834,17 @@ end
    end
 end
 
+@testset "Generic.Mat.exterior_power" begin
+   S, z = PolynomialRing(ZZ,"z")
+   n = 5
+   A = matrix(S, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 9])
+   @test exterior_power(A, 3) == diagonal_matrix(det(A), 1)
+   @test exterior_power(A, 1) == A
+   @test exterior_power(A, 2) == S[-3 -6 -3;
+                                   -6 -12 -6;
+                                   -3 -6 -3]
+end
+
 @testset "Generic.Mat.pfaffian" begin
    n = 5
    R, x = PolynomialRing(QQ, ["x$i" for i in 1:binomial(n, 2)])

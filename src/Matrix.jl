@@ -11,7 +11,7 @@ export MatrixSpace, add_column, add_column!, add_row, add_row!,
        charpoly, charpoly_danilevsky!, charpoly_danilevsky_ff!,
        charpoly_hessenberg!,_check_dim, _checkbounds, dense_matrix_type,
        det_popov, diagonal_matrix, extended_weak_popov,
-       extended_weak_popov_with_transform, fflu!, fflu, find_pivot_popov, gram,
+       extended_weak_popov_with_transform, exterior_power, fflu!, fflu, find_pivot_popov, gram,
        hessenberg!, hessenberg, hnf, hnf_cohen, hnf_cohen_with_transform,
        hnf_kb, hnf_kb!, hnf_kb_with_transform, hnf_minors,
        hnf_minors_with_transform, hnf_via_popov, hnf_via_popov_with_transform,
@@ -2308,6 +2308,34 @@ function minors(A::MatElem, k::Int)
       end
    end
    return(mins)
+end
+
+@doc Markdown.doc"""
+    exterior_power(A::MatElem, k::Int) -> MatElem
+
+Return the `k`-th exterior power of `A`.
+
+# Examples
+
+```jldoctest
+julia> A = matrix(ZZ, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+julia> exterior_power(A, 2)
+[-3    -6   -3]
+[-6   -12   -6]
+[-3    -6   -3]
+```
+"""
+function exterior_power(A::MatElem, k::Int)
+  ri = combinations(nrows(A), k)
+  n = length(ri)
+  res = similar(A, n, n)
+   for i in 1:n
+     for j in 1:n
+       res[i, j] = det(A[ri[i], ri[j]])
+     end
+   end
+   return res 
 end
 
 ###############################################################################
