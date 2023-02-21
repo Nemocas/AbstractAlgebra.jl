@@ -318,14 +318,14 @@ end
    @test gcd(a, (x + 1)//(x - 1)) == 1//(2*x^2-x-1)
 end
 
-if @isdefined fmpq
+if @isdefined QQFieldElem
     @testset "Generic.Frac.remove_valuation" begin
-        a = fmpq(2, 3)
+        a = QQFieldElem(2, 3)
 
-        @test remove(a, BigInt(2)) == (1, fmpq(1, 3))
+        @test remove(a, BigInt(2)) == (1, QQFieldElem(1, 3))
         @test valuation(a, BigInt(2)) == 1
 
-        @test remove(a, BigInt(3)) == (-1, fmpq(2, 1))
+        @test remove(a, BigInt(3)) == (-1, QQFieldElem(2, 1))
         @test valuation(a, BigInt(3)) == -1
     end
 end

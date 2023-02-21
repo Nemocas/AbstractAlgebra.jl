@@ -1956,7 +1956,7 @@ end
 
 # can throw NotInvertibleError for T <: ResElem
 #
-# To get a good gcd for fmpz_mod_poly/nmod_poly that can throw NotInvertibleError:
+# To get a good gcd for ZZModPolyRingElem/zzModPolyRingElem that can throw NotInvertibleError:
 #  1. Ensure that flint is only used for polynomial addition and multiplication
 #     and is never used for mod or divrem or divexact. Or, if using flint for
 #     division, check the invertibility of the leading coefficient first.

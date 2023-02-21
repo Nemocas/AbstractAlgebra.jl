@@ -153,12 +153,12 @@ abstract type SimpleNumFieldElem{T} <: NumFieldElem{T} end
 # additional abstract types for parents, added ad hoc to form
 # collections of types as needed by applications
 
-abstract type FinField <: Field end    # for fq, fq_nmod, etc
+abstract type FinField <: Field end    # for FqPolyRepFieldElem, fqPolyRepFieldElem, etc
 
 # additional abstract types for elements, added ad hoc to form
 # collections of types as needed by applications
 
-abstract type FinFieldElem <: FieldElem end # for fq, fq_nmod, etc
+abstract type FinFieldElem <: FieldElem end # for FqPolyRepFieldElem, fqPolyRepFieldElem, etc
 
 ################################################################################
 #

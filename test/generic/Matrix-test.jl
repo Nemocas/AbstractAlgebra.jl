@@ -35,7 +35,7 @@ Base.getindex(a::MyTestMatrix{T}, r::Int, c::Int) where T = a.d
 Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
 
 # Simulate user Field, together with a specialized matrix type
-# (like fmpz / fmpz_mat)
+# (like ZZRingElem / ZZMatrix)
 struct F2 <: AbstractAlgebra.Field end
 
 Base.zero(::F2) = F2Elem(false)
