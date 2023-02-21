@@ -109,7 +109,7 @@
       @test collect(exponent_words(varlist[1] + 1)) == [Int[1], Int[]]
       @test isone(varlist[1]^0)
 
-      _, varlist = PolynomialRing(QQ, var_names)
+      _, varlist = polynomial_ring(QQ, var_names)
       y = varlist[1]
       @test x in [x, y]
       @test x in [y, x]
@@ -124,8 +124,8 @@ function test_elem(R::Generic.FreeAssAlgebra{elem_type(ZZ)})
 end
 
 @testset "Generic.FreeAssAlgebra.change_base_ring" begin
-   F5 = ResidueRing(ZZ, 5)
-   R, varsR = PolynomialRing(F5, ["x"])
+   F5 = residue_ring(ZZ, 5)
+   R, varsR = polynomial_ring(F5, ["x"])
    S, varsS = FreeAssociativeAlgebra(R, ["y"])
    f = x -> x^2 + F5(3)
    @test map_coefficients(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
@@ -135,7 +135,7 @@ end
 
       R, t = ZZ["t"]
       Rx, varsRx = FreeAssociativeAlgebra(R, var_names)
-      S, _ = PolynomialRing(R, ["y", "z"])
+      S, _ = polynomial_ring(R, ["y", "z"])
       Sx, varsSx = FreeAssociativeAlgebra(S, var_names)
 
       @test typeof(change_base_ring(R, Rx(0))) == typeof(Rx(0))
@@ -187,7 +187,7 @@ end
 end
 
 @testset "Generic.FreeAssAlgebra.is_unit" begin
-   R, (x,) = FreeAssociativeAlgebra(ResidueRing(ZZ, 4), ["x"])
+   R, (x,) = FreeAssociativeAlgebra(residue_ring(ZZ, 4), ["x"])
 
    @test !is_unit(x)
    @test !is_unit(2*x)

@@ -48,7 +48,7 @@ In order to construct polynomials in AbstractAlgebra.jl, one must first construc
 polynomial ring itself. This is accomplished with the following constructor.
 
 ```julia
-PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
+polynomial_ring(R::NCRing, s::AbstractString; cached::Bool = true)
 ```
 
 Given a base ring `R` and string `s` specifying how the generator (variable) should be
@@ -73,10 +73,10 @@ resulting parent objects to coerce various elements into the polynomial ring.
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
-julia> S, x = PolynomialRing(R, "x")
+julia> S, x = polynomial_ring(R, "x")
 (Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
-julia> T, y = PolynomialRing(S, "y")
+julia> T, y = polynomial_ring(S, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> U, z = R["z"]
@@ -101,14 +101,14 @@ z + 1
 
 All of the examples here are generic polynomial rings, but specialised implementations
 of polynomial rings provided by external modules will also usually provide a
-`PolynomialRing` constructor to allow creation of their polynomial rings.
+`polynomial_ring` constructor to allow creation of their polynomial rings.
 
 ## Basic ring functionality
 
 Once a polynomial ring is constructed, there are various ways to construct
 polynomials in that ring.
 
-The easiest way is simply using the generator returned by the `PolynomialRing`
+The easiest way is simply using the generator returned by the `polynomial_ring`
 constructor and build up the polynomial using basic arithmetic, as described in
 the Ring interface. 
 
@@ -126,10 +126,10 @@ We give some examples of such functionality.
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
-julia> S, x = PolynomialRing(R, "x")
+julia> S, x = polynomial_ring(R, "x")
 (Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
-julia> T, y = PolynomialRing(S, "y")
+julia> T, y = polynomial_ring(S, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> f = x^3 + 3x + 21
@@ -212,10 +212,10 @@ is_term(::NCPolyElem)
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
-julia> S, x = PolynomialRing(R, "x")
+julia> S, x = polynomial_ring(R, "x")
 (Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
-julia> T, y = PolynomialRing(S, "y")
+julia> T, y = polynomial_ring(S, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> a = zero(T)
@@ -269,10 +269,10 @@ mullow(::NCPolyElem{T}, ::NCPolyElem{T}, ::Int) where T <: NCRingElem
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
-julia> S, x = PolynomialRing(R, "x")
+julia> S, x = polynomial_ring(R, "x")
 (Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
-julia> T, y = PolynomialRing(S, "y")
+julia> T, y = polynomial_ring(S, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -302,10 +302,10 @@ reverse(::NCPolyElem)
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
-julia> S, x = PolynomialRing(R, "x")
+julia> S, x = polynomial_ring(R, "x")
 (Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
-julia> T, y = PolynomialRing(S, "y")
+julia> T, y = polynomial_ring(S, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -335,10 +335,10 @@ shift_right(::NCPolyElem, ::Int)
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
-julia> S, x = PolynomialRing(R, "x")
+julia> S, x = polynomial_ring(R, "x")
 (Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
-julia> T, y = PolynomialRing(S, "y")
+julia> T, y = polynomial_ring(S, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -368,10 +368,10 @@ evaluated at $a$ by writing $f(a)$.
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
-julia> S, x = PolynomialRing(R, "x")
+julia> S, x = polynomial_ring(R, "x")
 (Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
-julia> T, y = PolynomialRing(S, "y")
+julia> T, y = polynomial_ring(S, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 
@@ -401,10 +401,10 @@ derivative(::NCPolyElem)
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
-julia> S, x = PolynomialRing(R, "x")
+julia> S, x = polynomial_ring(R, "x")
 (Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
-julia> T, y = PolynomialRing(S, "y")
+julia> T, y = polynomial_ring(S, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3

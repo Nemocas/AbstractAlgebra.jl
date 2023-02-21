@@ -11,8 +11,8 @@ end
    R = qq
    S = QQ
 
-   @test R == FractionField(zz)
-   @test S == FractionField(ZZ)
+   @test R == fraction_field(zz)
+   @test S == fraction_field(ZZ)
 
    a = R(11)
    b = S(11)

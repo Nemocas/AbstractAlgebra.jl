@@ -708,17 +708,17 @@ end
 
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 
-function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int},
+function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
                   s::Vector{T}; cached=true, model=:capped_absolute) where
                                                                     T <: Symbol
     str = [String(a) for a in s]
     U = elem_type(R)
  
-    S, _ = AbstractAlgebra.PolynomialRing(R, str)
+    S, _ = AbstractAlgebra.polynomial_ring(R, str)
     V = elem_type(S)
 
     if model == :capped_absolute
@@ -730,13 +730,13 @@ function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int},
     return tuple(parent_obj, gens(parent_obj))
 end
 
-function PowerSeriesRing(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::Int,
+function power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::Int,
    s::Vector{T}; cached=true, model=:capped_absolute) where
                                                      T <: Symbol
    str = [String(a) for a in s]
    U = elem_type(R)
 
-   S, _ = AbstractAlgebra.PolynomialRing(R, str)
+   S, _ = AbstractAlgebra.polynomial_ring(R, str)
    V = elem_type(S)
 
    if model == :capped_absolute
@@ -748,9 +748,9 @@ function PowerSeriesRing(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::In
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int,
+function power_series_ring(R::AbstractAlgebra.Ring, prec::Int,
                   s::Vector{T}; cached=true, model=:capped_absolute) where
                                                                     T <: Symbol
     prec_vec = [prec for v in s]
-    return PowerSeriesRing(R, prec_vec, s; cached=cached, model=model)
+    return power_series_ring(R, prec_vec, s; cached=cached, model=model)
 end

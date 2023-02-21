@@ -415,7 +415,7 @@ mutable struct UnivPolyRing{T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
    function UnivPolyRing{T, U}(R::Ring, ord::Symbol, cached::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
       return get_cached!(UnivPolyID, (R, ord, U), cached) do
          new{T, U}(R, Vector{Symbol}(undef, 0), ord,
-                      PolynomialRing(R, Vector{Symbol}(undef, 0); cached=cached, ordering=ord)[1])
+                      polynomial_ring(R, Vector{Symbol}(undef, 0); cached=cached, ordering=ord)[1])
       end::UnivPolyRing{T, U}
    end
 end
@@ -696,19 +696,19 @@ end
 
 ###############################################################################
 #
-#   LaurentSeriesRing / LarentSeriesRingElem
+#   laurent_series_ring / LarentSeriesRingElem
 #
 ###############################################################################
 
-mutable struct LaurentSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
+mutable struct laurent_series_ring{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function LaurentSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+   function laurent_series_ring{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
       return get_cached!(LaurentSeriesID, (R, prec, s), cached) do
          new{T}(R, prec, s)
-      end::LaurentSeriesRing{T}
+      end::laurent_series_ring{T}
    end
 end
 
@@ -720,7 +720,7 @@ mutable struct LaurentSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingEl
    prec::Int
    val::Int
    scale::Int
-   parent::LaurentSeriesRing{T}
+   parent::laurent_series_ring{T}
 
    function LaurentSeriesRingElem{T}(a::Vector{T}, length::Int, prec::Int, val::Int, scale::Int) where T <: RingElement
       new{T}(a, length, prec, val, scale)
@@ -729,19 +729,19 @@ end
 
 ###############################################################################
 #
-#   LaurentSeriesField / LarentSeriesFieldElem
+#   laurent_series_field / LarentSeriesFieldElem
 #
 ###############################################################################
 
-mutable struct LaurentSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
+mutable struct laurent_series_field{T <: FieldElement} <: AbstractAlgebra.Field
    base_ring::Field
    prec_max::Int
    S::Symbol
 
-   function LaurentSeriesField{T}(R::Field, prec::Int, s::Symbol, cached::Bool = true) where T <: FieldElement
+   function laurent_series_field{T}(R::Field, prec::Int, s::Symbol, cached::Bool = true) where T <: FieldElement
       return get_cached!(LaurentSeriesID, (R, prec, s), cached) do
          new{T}(R, prec, s)
-      end::LaurentSeriesField{T}
+      end::laurent_series_field{T}
    end
 end
 
@@ -751,7 +751,7 @@ mutable struct LaurentSeriesFieldElem{T <: FieldElement} <: AbstractAlgebra.Fiel
    prec::Int
    val::Int
    scale::Int
-   parent::LaurentSeriesField{T}
+   parent::laurent_series_field{T}
 
    function LaurentSeriesFieldElem{T}(a::Vector{T}, length::Int, prec::Int, val::Int, scale::Int) where T <: FieldElement
       new{T}(a, length, prec, val, scale)
@@ -769,7 +769,7 @@ const LaurentSeriesElem{T} = Union{LaurentSeriesRingElem{T}, LaurentSeriesFieldE
 mutable struct PuiseuxSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    laurent_ring::Ring
 
-   function PuiseuxSeriesRing{T}(R::LaurentSeriesRing{T}, cached::Bool = true) where T <: RingElement
+   function PuiseuxSeriesRing{T}(R::laurent_series_ring{T}, cached::Bool = true) where T <: RingElement
       return get_cached!(PuiseuxSeriesID, R, cached) do
          new{T}(R)
       end::PuiseuxSeriesRing{T}
@@ -797,7 +797,7 @@ end
 mutable struct PuiseuxSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    laurent_ring::Field
 
-   function PuiseuxSeriesField{T}(R::LaurentSeriesField{T}, cached::Bool = true) where T <: FieldElement
+   function PuiseuxSeriesField{T}(R::laurent_series_field{T}, cached::Bool = true) where T <: FieldElement
       return get_cached!(PuiseuxSeriesFieldID, R, cached) do
          new{T}(R)
       end::PuiseuxSeriesField{T}

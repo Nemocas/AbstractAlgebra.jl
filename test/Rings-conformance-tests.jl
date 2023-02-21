@@ -567,11 +567,11 @@ end
 
 function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
    test_Ring_interface(R; reps = reps)
-   Rx, _ = PolynomialRing(R, "x")
+   Rx, _ = polynomial_ring(R, "x")
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
    S = MatrixAlgebra(R, rand(0:3))
    test_MatAlgebra_interface(S, reps = 2 + fld(reps, 2))
-   S = MatrixSpace(R, rand(0:3), rand(0:3))
+   S = matrix_space(R, rand(0:3), rand(0:3))
    test_MatSpace_interface(S, reps = 2 + fld(reps, 2))
 end
 

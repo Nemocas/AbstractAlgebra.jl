@@ -50,8 +50,8 @@ construct the polynomial ring itself. This is accomplished with one of the follo
 constructors.
 
 ```@docs
-PolynomialRing(R::Ring, S::Vector{String}; cached::Bool = true, ordering::Symbol=:lex)
-PolynomialRing(R::Ring, n::Int, s::String; cached::Bool = false, ordering::Symbol = :lex)
+polynomial_ring(R::Ring, S::Vector{String}; cached::Bool = true, ordering::Symbol=:lex)
+polynomial_ring(R::Ring, n::Int, s::String; cached::Bool = false, ordering::Symbol = :lex)
 ```
 
 Like for univariate polynomials, a shorthand constructor is
@@ -69,7 +69,7 @@ ring.
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:deglex)
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:deglex)
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> T, (z, t) = QQ["z", "t"]
@@ -143,7 +143,7 @@ $m$.
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> C = MPolyBuildCtx(R)
@@ -167,7 +167,7 @@ julia> push_term!(C, ZZ(4), [1, 1]);
 julia> f = finish(C)
 4*x*y
 
-julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"])
+julia> S, (x, y) = polynomial_ring(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
@@ -359,7 +359,7 @@ coeff(::MPolyElem{T}, ::MPolyElem{T}) where T <: RingElement
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^2 + 2x + 1
@@ -395,7 +395,7 @@ true
 julia> is_unit(R(1))
 true
 
-julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> S, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^3*y + 3x*y^2 + 1
@@ -424,7 +424,7 @@ x^3*y
 julia> setcoeff!(f, [3, 1], 12)
 12*x^3*y + 3*x*y^2 + 1
 
-julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
+julia> S, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering=:deglex)
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> V = symbols(S)
@@ -440,7 +440,7 @@ julia> X = gens(S)
 julia> ord = ordering(S)
 :deglex
 
-julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> S, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^3*y + 3x*y^2 + 1
@@ -458,7 +458,7 @@ true
 julia> d = total_degree(f)
 4
 
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = 2x^2*y + 2x + y + 1
@@ -479,7 +479,7 @@ julia> v, q = remove(f*g^3, g)
 julia> n = valuation(f*g^3, g)
 3
 
-julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> f = 3x^2*y^2 + 2x + 1
@@ -505,7 +505,7 @@ is_square(::MPolyElem)
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = -4*x^5*y^4 + 5*x^5*y^3 + 4*x^4 - x^3*y^4
@@ -532,7 +532,7 @@ exponent_vectors(a::MPoly)
 **Examples**
 
 ```jldoctest
-julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> S, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^3*y + 3x*y^2 + 1
@@ -579,7 +579,7 @@ map_coefficients(::Any, p::MPolyElem)
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> fz = x^2*y^2 + x + 1
@@ -598,10 +598,10 @@ In case a specific parent ring is constructed, it can also be passed to the func
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
-julia> S,  = PolynomialRing(QQ, ["x", "y"])
+julia> S,  = polynomial_ring(QQ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> fz = x^5 + y^3 + 1
@@ -626,7 +626,7 @@ coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: MPolyElem
 **Examples**
 
 ```jldoctest
-julia> R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+julia> R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
 (Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 
 julia> f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
@@ -661,7 +661,7 @@ inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <:
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
@@ -702,10 +702,10 @@ to_univariate(R::PolyRing{T}, p::MPolyElem{T}) where T <: RingElement
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
-julia> S, z = PolynomialRing(ZZ, "z")
+julia> S, z = polynomial_ring(ZZ, "z")
 (Univariate Polynomial Ring in z over Integers, z)
 
 julia> f = 2x^5 + 3x^4 - 2x^2 - 1
@@ -751,7 +751,7 @@ evaluate(::MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: NCRingElem}
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = 2x^2*y^2 + 3x + y + 1
@@ -775,7 +775,7 @@ julia> evaluate(f, [x + y, 2y - x])
 julia> f(x + y, 2y - x)
 2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
 
-julia> R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+julia> R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
 (Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 
 julia> f = x^2*y^2 + 2x*z + 3y*z + z + 1
@@ -829,7 +829,7 @@ tail(::MPolyElem{T}) where T <: RingElement
 
 ```julia
 using AbstractAlgebra
-R,(x,y) = PolynomialRing(ZZ, ["x", "y"], ordering=:deglex)
+R,(x,y) = polynomial_ring(ZZ, ["x", "y"], ordering=:deglex)
 p = 2*x*y + 3*y^3 + 1
 leading_term(p)
 leading_monomial(p)
@@ -863,7 +863,7 @@ lcm(a::MPolyElem{T}, b::MPolyElem{T}) where {T <: RingElement}
 ```jldoctest
 julia> using AbstractAlgebra
 
-julia> R,(x,y) = PolynomialRing(ZZ, ["x", "y"])
+julia> R,(x,y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> a = x*y + 2*y
@@ -892,7 +892,7 @@ derivative(::MPolyElem{T}, ::MPolyElem{T}) where T <: RingElement
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
+julia> R, (x, y) = AbstractAlgebra.polynomial_ring(ZZ, ["x", "y"])
 (Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x*y + x + y + 1
@@ -936,9 +936,9 @@ rand(R::MPolyRing, exp_range::UnitRange{Int}, term_range::UnitRange{Int}, v...)
 
 ```@repl
 using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 f = rand(R, -1:2, 3:5, -10:10)
 
-S, (s, t) = PolynomialRing(GF(7), ["x", "y"])
+S, (s, t) = polynomial_ring(GF(7), ["x", "y"])
 g = rand(S, -1:2, 3:5)
 ```

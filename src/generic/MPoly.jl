@@ -4130,11 +4130,11 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
+function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(s) + 1 : length(s)
    parent_obj = MPolyRing{T}(R, s, ordering, N, cached)
@@ -4142,7 +4142,7 @@ function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
-   return PolynomialRing(R, [Symbol(v) for v in s]; cached=cached, ordering=ordering)
+function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
+   return polynomial_ring(R, [Symbol(v) for v in s]; cached=cached, ordering=ordering)
 end
 

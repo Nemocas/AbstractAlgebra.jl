@@ -2171,7 +2171,7 @@ function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Ab
    R = base_ring(S) # coefficient ring
    # create ring with additional variable "t" with higher precedence
    tsym = gensym()
-   Sup, Supv = AbstractAlgebra.PolynomialRing(R, vcat(tsym, symbols(S)); cached=false, ordering=:degrevlex)
+   Sup, Supv = AbstractAlgebra.polynomial_ring(R, vcat(tsym, symbols(S)); cached=false, ordering=:degrevlex)
    G1 = gens(I)
    G2 = gens(J)
    ISup = Ideal(Sup, elem_type(Sup)[f(Supv[2:end]...) for f in G1])
@@ -2194,7 +2194,7 @@ function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Ab
    R = base_ring(S) # coefficient ring
    # create ring with additional variable "t" with higher precedence
    tsym = gensym()
-   Sup, Supv = AbstractAlgebra.PolynomialRing(R, vcat(tsym, symbols(S)); cached=false, ordering=ordering(S))
+   Sup, Supv = AbstractAlgebra.polynomial_ring(R, vcat(tsym, symbols(S)); cached=false, ordering=ordering(S))
    G1 = gens(I)
    G2 = gens(J)
    ISup = Ideal(Sup, elem_type(Sup)[f(Supv[2:end]...) for f in G1])

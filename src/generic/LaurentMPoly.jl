@@ -633,7 +633,7 @@ end
 ###############################################################################
 
 function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true)
-   P, x = AbstractAlgebra.PolynomialRing(R, s, cached = cached)
+   P, x = AbstractAlgebra.polynomial_ring(R, s, cached = cached)
    R = LaurentMPolyWrapRing(P, cached)
    R, map(p -> LaurentMPolyWrap(R, p), x)
 end

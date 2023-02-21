@@ -223,11 +223,11 @@ end
 
 ###############################################################################
 #
-#   MatrixSpace constructor
+#   matrix_space constructor
 #
 ###############################################################################
 
-function MatrixSpace(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
+function matrix_space(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end

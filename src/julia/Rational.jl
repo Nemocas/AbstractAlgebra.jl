@@ -378,8 +378,8 @@ end
 
 ###############################################################################
 #
-#   FractionField constructor
+#   fraction_field constructor
 #
 ###############################################################################
 
-FractionField(R::Integers{T}) where T <: Integer = Rationals{T}()
+fraction_field(R::Integers{T}) where T <: Integer = Rationals{T}()

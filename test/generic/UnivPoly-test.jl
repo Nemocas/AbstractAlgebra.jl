@@ -127,7 +127,7 @@ function test_elem(R::AbstractAlgebra.Generic.UnivPolyRing{AbstractAlgebra.Gener
 end
 
 @testset "Generic.UnivPoly.conformance" begin
-   S = UniversalPolynomialRing(ResidueRing(ZZ, ZZ(6)))
+   S = UniversalPolynomialRing(residue_ring(ZZ, ZZ(6)))
    gen(S, "x")
    test_Ring_interface(S)
 end
@@ -916,7 +916,7 @@ end
          y, z = gens(S, ["y", "z"])
          h = rand(S, 0:5, 0:10, -10:10)
 
-         U, w = PolynomialRing(R, "v")
+         U, w = polynomial_ring(R, "v")
 
          n = rand(1:3)
          V = [rand(-10:10) for v in 1:n]
@@ -1005,7 +1005,7 @@ end
    for R in [ZZ, QQ]
       S = UniversalPolynomialRing(R; cached=false)
 
-      U, y = PolynomialRing(R, "y")
+      U, y = polynomial_ring(R, "y")
 
       x = gen(S, "x")
 
@@ -1038,7 +1038,7 @@ end
    for R in [ZZ, QQ]
       S = UniversalPolynomialRing(R; cached=false)
 
-      U, y = PolynomialRing(R, "y")
+      U, y = polynomial_ring(R, "y")
 
       x = gen(S, "x")
       y, z = gens(S, ["y", "z"])
@@ -1073,7 +1073,7 @@ end
    for R in [ZZ, QQ]
       S = UniversalPolynomialRing(R; cached=false)
 
-      U, y = PolynomialRing(R, "y")
+      U, y = polynomial_ring(R, "y")
 
       x = gen(S, "x")
       y, z = gens(S, ["y", "z"])

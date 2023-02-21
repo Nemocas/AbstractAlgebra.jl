@@ -163,11 +163,11 @@ end
 
 ###############################################################################
 #
-#   FractionField constructor
+#   fraction_field constructor
 #
 ###############################################################################
 
-function FractionField(R::AbstractAlgebra.Ring; cached=true)
+function fraction_field(R::AbstractAlgebra.Ring; cached=true)
    T = elem_type(R)
 
    return FracField{T}(R, cached)

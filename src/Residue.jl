@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ResidueRing, data, modulus, lift, is_zero_divisor 
+export residue_ring, data, modulus, lift, is_zero_divisor 
 
 ###############################################################################
 #
@@ -430,12 +430,12 @@ rand(S::ResRing, v...) = rand(Random.GLOBAL_RNG, S, v...)
 
 ###############################################################################
 #
-#   ResidueRing constructor
+#   residue_ring constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    ResidueRing(R::Ring, a::RingElement; cached::Bool=true)
+    residue_ring(R::Ring, a::RingElement; cached::Bool=true)
 
 Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
 require $a \neq 0$. If `cached == true` (the default) then the resulting
@@ -443,7 +443,7 @@ residue ring parent object is cached and returned for any subsequent calls
 to the constructor with the same base ring $R$ and element $a$. A modulus
 of zero is not supported and throws an exception.
 """
-function ResidueRing(R::Ring, a::RingElement; cached::Bool = true)
+function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
    # Modulus of zero cannot be supported. E.g. A C library could not be expected to
    # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
@@ -452,7 +452,7 @@ function ResidueRing(R::Ring, a::RingElement; cached::Bool = true)
    return Generic.ResRing{T}(R(a), cached)
 end
 
-function ResidueRing(R::PolyRing, a::RingElement; cached::Bool = true)
+function residue_ring(R::PolyRing, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
    T = elem_type(R)
@@ -463,13 +463,13 @@ end
 @doc Markdown.doc"""
     quo(R::Ring, a::RingElement; cached::Bool = true)
 
-Returns `S, f` where `S = ResidueRing(R, a)` and `f` is the 
+Returns `S, f` where `S = residue_ring(R, a)` and `f` is the 
 projection map from `R` to `S`. This map is supplied as a map with section
 where the section is the lift of an element of the residue field back
 to the ring `R`.
 """
 function quo(R::Ring, a::RingElement; cached::Bool = true)
-   S = ResidueRing(R, a; cached=cached)
+   S = residue_ring(R, a; cached=cached)
    f = map_with_section_from_func(x->S(x), x->lift(x), R, S)
    return S, f
 end

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   ResidueField.jl : generic residue fields (modulo a principal ideal)
+#   residue_field.jl : generic residue fields (modulo a principal ideal)
 #
 ###############################################################################
 

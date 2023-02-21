@@ -19,7 +19,7 @@ import GroupsCore: gens, ngens, order, mul!, istrivial
 
 # A list of all symbols external packages should not import from AbstractAlgebra
 import_exclude = [:import_exclude, :QQ, :ZZ,
-                  :RealField, :NumberField,
+                  :RealField, :number_field,
                   :AbstractAlgebra,
                   :inv, :log, :exp, :sqrt, :div, :divrem,
                   :numerator, :denominator,
@@ -580,16 +580,16 @@ function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.
    Generic.YoungTableau(part, fill)
 end
 
-function NumberField(a::Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
-   return Generic.NumberField(a, Symbol(s), t; cached=cached)
+function number_field(a::Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+   return Generic.number_field(a, Symbol(s), t; cached=cached)
 end
 
-function NumberField(a::Generic.Poly{Rational{BigInt}}, s::Char, t = "\$"; cached = true)
-   return Generic.NumberField(a, Symbol(s), t; cached=cached)
+function number_field(a::Generic.Poly{Rational{BigInt}}, s::Char, t = "\$"; cached = true)
+   return Generic.number_field(a, Symbol(s), t; cached=cached)
 end
 
-function NumberField(a::Generic.Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cached = true)
-   return Generic.NumberField(a, s, t; cached=cached)
+function number_field(a::Generic.Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cached = true)
+   return Generic.number_field(a, s, t; cached=cached)
 end
 
 function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
@@ -627,12 +627,12 @@ export Generic
 #
 ###############################################################################
 
-getindex(R::NCRing, s::Union{String, Char, Symbol}) = PolynomialRing(R, s)
+getindex(R::NCRing, s::Union{String, Char, Symbol}) = polynomial_ring(R, s)
 getindex(R::NCRing, s::Union{String, Char, Symbol}, ss::Union{String, Char}...) =
-   PolynomialRing(R, [s, ss...])
+   polynomial_ring(R, [s, ss...])
 
 # syntax x = R["x"]["y"]
-getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{String, Char, Symbol}) = PolynomialRing(R[1], s)
+getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{String, Char, Symbol}) = polynomial_ring(R[1], s)
 
 ###############################################################################
 #

@@ -13,16 +13,16 @@
 @doc Markdown.doc"""
     laurent_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement
 
-Return the `LaurentSeriesRing` underlying the given `PuiseuxSeriesRing`.
+Return the `laurent_series_ring` underlying the given `PuiseuxSeriesRing`.
 """
-laurent_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = R.laurent_ring::LaurentSeriesRing{T}
+laurent_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = R.laurent_ring::laurent_series_ring{T}
 
 @doc Markdown.doc"""
     laurent_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement
 
-Return the `LaurentSeriesField` underlying the given `PuiseuxSeriesField`.
+Return the `laurent_series_field` underlying the given `PuiseuxSeriesField`.
 """
-laurent_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = R.laurent_ring::LaurentSeriesField{T}
+laurent_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = R.laurent_ring::laurent_series_field{T}
 
 @doc Markdown.doc"""
     O(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
@@ -868,7 +868,7 @@ end
 
 
 function PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached=true)
-   S, x = AbstractAlgebra.LaurentSeriesRing(R, prec, s; cached=cached)
+   S, x = AbstractAlgebra.laurent_series_ring(R, prec, s; cached=cached)
    T = elem_type(R)
 
    parent_obj = PuiseuxSeriesRing{T}(S, cached)
@@ -877,7 +877,7 @@ function PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached
 end
 
 function PuiseuxSeriesRing(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached= true)
-   S, x = AbstractAlgebra.LaurentSeriesField(R, prec, s; cached=cached)
+   S, x = AbstractAlgebra.laurent_series_field(R, prec, s; cached=cached)
    T = elem_type(R)
 
    parent_obj = PuiseuxSeriesField{T}(S, cached)
@@ -886,7 +886,7 @@ function PuiseuxSeriesRing(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cache
 end
 
 function PuiseuxSeriesField(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached = true)
-   S, x = AbstractAlgebra.LaurentSeriesField(R, prec, s; cached=cached)
+   S, x = AbstractAlgebra.laurent_series_field(R, prec, s; cached=cached)
    T = elem_type(R)
 
    parent_obj = PuiseuxSeriesField{T}(S, cached)

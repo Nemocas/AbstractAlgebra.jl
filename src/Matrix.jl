@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export MatrixSpace, add_column, add_column!, add_row, add_row!,
+export matrix_space, add_column, add_column!, add_row, add_row!,
        block_diagonal_matrix, can_solve,
        can_solve_left_reduced_triu, can_solve_with_kernel,
        can_solve_with_solution,  can_solve_with_solution_interpolation,
@@ -1292,10 +1292,10 @@ Return the transpose of the given matrix.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = PolynomialRing(QQ, "t")
+julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
-julia> S = MatrixSpace(R, 3, 3)
+julia> S = matrix_space(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -1351,10 +1351,10 @@ $i$-th and $j$-th rows, respectively.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = PolynomialRing(QQ, "t")
+julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
-julia> S = MatrixSpace(R, 3, 3)
+julia> S = matrix_space(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -1397,10 +1397,10 @@ require the matrix to be square.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = PolynomialRing(QQ, "t")
+julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
-julia> S = MatrixSpace(R, 3, 3)
+julia> S = matrix_space(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -1437,10 +1437,10 @@ its entries, assuming it exists.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = PolynomialRing(QQ, "t")
+julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
-julia> S = MatrixSpace(R, 3, 3)
+julia> S = matrix_space(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -1480,10 +1480,10 @@ Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = PolynomialRing(QQ, "t")
+julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
-julia> S = MatrixSpace(R, 3, 3)
+julia> S = matrix_space(R, 3, 3)
 Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia> G = SymmetricGroup(3)
@@ -2181,13 +2181,13 @@ Return the determinant of the matrix $M$. We assume $M$ is square.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, x = PolynomialRing(QQ, "x")
+julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> K, a = NumberField(x^3 + 3x + 1, "a")
+julia> K, a = number_field(x^3 + 3x + 1, "a")
 (Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
 
-julia> S = MatrixSpace(K, 3, 3)
+julia> S = matrix_space(K, 3, 3)
 Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
@@ -2556,13 +2556,13 @@ Return the rank of the matrix $M$.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, x = PolynomialRing(QQ, "x")
+julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> K, a = NumberField(x^3 + 3x + 1, "a")
+julia> K, a = number_field(x^3 + 3x + 1, "a")
 (Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
 
-julia> S = MatrixSpace(K, 3, 3)
+julia> S = matrix_space(K, 3, 3)
 Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
@@ -3700,10 +3700,10 @@ function to compute an integral kernel.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S = MatrixSpace(R, 4, 4)
+julia> S = matrix_space(R, 4, 4)
 Matrix Space of 4 rows and 4 columns over Univariate Polynomial Ring in x over Integers
 
 julia> M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
@@ -4217,13 +4217,13 @@ and the matrix is assumed to be square.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R = ResidueRing(ZZ, 7)
+julia> R = residue_ring(ZZ, 7)
 Residue ring of Integers modulo 7
 
-julia> S = MatrixSpace(R, 4, 4)
+julia> S = matrix_space(R, 4, 4)
 Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
 
-julia> T, x = PolynomialRing(R, "x")
+julia> T, x = polynomial_ring(R, "x")
 (Univariate Polynomial Ring in x over Residue ring of Integers modulo 7, x)
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
@@ -4415,7 +4415,7 @@ of the resulting polynomial must be supplied and the matrix must be square.
 julia> R = GF(13)
 Finite field F_13
 
-julia> T, y = PolynomialRing(R, "y")
+julia> T, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Finite field F_13, y)
 
 julia> M = R[7 6 1;
@@ -6001,10 +6001,10 @@ preserves the minimal and characteristic polynomials of a matrix.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R = ResidueRing(ZZ, 7)
+julia> R = residue_ring(ZZ, 7)
 Residue ring of Integers modulo 7
 
-julia> S = MatrixSpace(R, 4, 4)
+julia> S = matrix_space(R, 4, 4)
 Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
@@ -7004,20 +7004,20 @@ end
 
 ###############################################################################
 #
-#   MatrixSpace constructor
+#   matrix_space constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    MatrixSpace(R::NCRing, r::Int, c::Int; cached::Bool = true)
+    matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
 
 Return parent object corresponding to the space of $r\times c$ matrices over
 the ring $R$. If `cached == true` (the default), the returned parent object
 is cached so that it can returned by future calls to the constructor with the
 same dimensions and base ring.
 """
-function MatrixSpace(R::NCRing, r::Int, c::Int; cached::Bool = true)
-   return Generic.MatrixSpace(R, r, c, cached=cached)
+function matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
+   return Generic.matrix_space(R, r, c, cached=cached)
 end
 
 ###############################################################################

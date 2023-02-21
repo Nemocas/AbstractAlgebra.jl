@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export AbsSeriesRing, RelSeriesRing, PowerSeriesRing, coeff, polcoeff,
+export AbsSeriesRing, RelSeriesRing, power_series_ring, coeff, polcoeff,
        rel_series, rel_series_type, renormalize!, set_length!, set_precision!,
        set_valuation!
 
@@ -1177,7 +1177,7 @@ end
 Return the derivative of the power series $f$.
 
 ```
-julia> R, x = PowerSeriesRing(QQ, 10, "x")
+julia> R, x = power_series_ring(QQ, 10, "x")
 (Univariate power series ring in x over Rationals, x + O(x^11))
 
 julia> f = 2 + x + 3x^3
@@ -1214,7 +1214,7 @@ end
 Return the integral of the power series $f$.
 
 ```
-julia> R, x = PowerSeriesRing(QQ, 10, "x")
+julia> R, x = power_series_ring(QQ, 10, "x")
 (Univariate power series ring in x over Rationals, x + O(x^11))
 
 julia> f = 2 + x + 3x^3
@@ -1351,7 +1351,7 @@ function _make_parent(g, p::RelSeriesElem, cached::Bool)
    S = parent(p)
    sym = String(var(S))
    max_prec = max_precision(S)
-   return PowerSeriesRing(R, max_prec, sym; cached=cached)[1]
+   return power_series_ring(R, max_prec, sym; cached=cached)[1]
 end
 
 function map_coefficients(g, p::RelSeriesElem{<:RingElement};
@@ -1378,7 +1378,7 @@ end
 ################################################################################
 
 function _change_rel_series_ring(R, Rx, cached)
-   P, _ = PowerSeriesRing(R, max_precision(Rx),
+   P, _ = power_series_ring(R, max_precision(Rx),
                                                string(var(Rx)), cached = cached)
    return P
 end
@@ -1425,12 +1425,12 @@ rand(S::SeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val_range, v..
 
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    PowerSeriesRing(R::Ring, prec::Int, s::Union{AbstractString, char, Symbol}; cached=true, model=:capped_relative)
+    power_series_ring(R::Ring, prec::Int, s::Union{AbstractString, char, Symbol}; cached=true, model=:capped_relative)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a power series
 ring over the given base ring and a generator `x` for the power series ring.
@@ -1443,18 +1443,18 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-PowerSeriesRing(R::Ring, prec::Int, s::Union{AbstractString, Char, Symbol}; cached=true, model=:capped_relative)
+power_series_ring(R::Ring, prec::Int, s::Union{AbstractString, Char, Symbol}; cached=true, model=:capped_relative)
 
-function PowerSeriesRing(R::Ring, prec::Int, s::Symbol; cached=true, model=:capped_relative)
-   return Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
+function power_series_ring(R::Ring, prec::Int, s::Symbol; cached=true, model=:capped_relative)
+   return Generic.power_series_ring(R, prec, s; cached=cached, model=model)
 end
 
-function PowerSeriesRing(R::Ring, prec::Int, s::Char; cached=true, model=:capped_relative)
-   return PowerSeriesRing(R, prec, Symbol(s); cached=cached, model=model)
+function power_series_ring(R::Ring, prec::Int, s::Char; cached=true, model=:capped_relative)
+   return power_series_ring(R, prec, Symbol(s); cached=cached, model=model)
 end
 
-function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
-   return PowerSeriesRing(R, prec, Symbol(s); cached=cached, model=model)
+function power_series_ring(R::Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
+   return power_series_ring(R, prec, Symbol(s); cached=cached, model=model)
 end
 
 function AbsSeriesRing(R::Ring, prec::Int)

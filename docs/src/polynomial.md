@@ -49,7 +49,7 @@ In order to construct polynomials in AbstractAlgebra.jl, one must first construc
 polynomial ring itself. This is accomplished with the following constructor.
 
 ```julia
-PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
+polynomial_ring(R::Ring, s::AbstractString; cached::Bool = true)
 ```
 
 Given a base ring `R` and string `s` specifying how the generator (variable) should be
@@ -84,10 +84,10 @@ generators.
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> T, z = QQ["z"]
@@ -99,14 +99,14 @@ Univariate Polynomial Ring in x over Integers
 
 All of the examples here are generic polynomial rings, but specialised implementations
 of polynomial rings provided by external modules will also usually provide a
-`PolynomialRing` constructor to allow creation of their polynomial rings.
+`polynomial_ring` constructor to allow creation of their polynomial rings.
 
 ## Polynomial constructors
 
 Once a polynomial ring is constructed, there are various ways to construct
 polynomials in that ring.
 
-The easiest way is simply using the generator returned by the `PolynomialRing`
+The easiest way is simply using the generator returned by the `polynomial_ring`
 constructor and build up the polynomial using basic arithmetic.
 
 The Julia language has special syntax for the construction of polynomials in terms
@@ -147,10 +147,10 @@ over the given ring and with the given variable.
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = x^3 + 3x + 21
@@ -171,7 +171,7 @@ y
 julia> S(x)
 x
 
-julia> S, x = PolynomialRing(QQ, "x")
+julia> S, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> f = S(Rational{BigInt}[2, 3, 1])
@@ -218,7 +218,7 @@ otherwise.
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> f = 1 + 2x + 3x^2
@@ -259,10 +259,10 @@ is not known, an exception is raised.
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> U = base_ring(S)
@@ -307,13 +307,13 @@ gcdinv(f::PolyElem, g::PolyElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(QQ, "x")
+julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> S = ResidueRing(R, x^3 + 3x + 1)
+julia> S = residue_ring(R, x^3 + 3x + 1)
 Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
-julia> T, y = PolynomialRing(S, "y")
+julia> T, y = polynomial_ring(S, "y")
 (Univariate Polynomial Ring in y over Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, y)
 
 julia> f = (3*x^2 + x + 2)*y + x^2 + 1
@@ -467,19 +467,19 @@ is_constant(::PolynomialElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
-julia> T, z = PolynomialRing(QQ, "z")
+julia> T, z = polynomial_ring(QQ, "z")
 (Univariate Polynomial Ring in z over Rationals, z)
 
-julia> U = ResidueRing(ZZ, 17)
+julia> U = residue_ring(ZZ, 17)
 Residue ring of Integers modulo 17
 
-julia> V, w = PolynomialRing(U, "w")
+julia> V, w = polynomial_ring(U, "w")
 (Univariate Polynomial Ring in w over Residue ring of Integers modulo 17, w)
 
 julia> var(R)
@@ -537,7 +537,7 @@ true
 julia> is_monomial(x*y^2)
 false
 
-julia> S, x = PolynomialRing(ZZ, "x")
+julia> S, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> f = x^3 + 3x + 1
@@ -569,7 +569,7 @@ illustrated by example.
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> f = x^2 + 2
@@ -602,10 +602,10 @@ mullow{T <: RingElem}(::PolyElem{T}, ::PolyElem{T}, ::Int)
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -632,10 +632,10 @@ reverse(::PolyElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -662,10 +662,10 @@ shift_right(::PolyElem, ::Int)
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -705,7 +705,7 @@ Base.sqrt(::PolyElem{T}; check::Bool) where T <: RingElement
 **Examples**
 
 ```julia
-R, x = PolynomialRing(ZZ, "x")
+R, x = polynomial_ring(ZZ, "x")
 g = x^2+6*x+1
 sqrt(g^2)
 ```
@@ -721,7 +721,7 @@ map_coefficients(::Any, ::PolyElem{<:RingElement})
 **Examples**
 
 ```julia
-R, x = PolynomialRing(ZZ, "x")
+R, x = polynomial_ring(ZZ, "x")
 g = x^3+6*x + 1
 change_base_ring(GF(2), g)
 change_coefficient_ring(GF(2), g)
@@ -748,10 +748,10 @@ pseudodivrem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -781,8 +781,8 @@ primpart(::PolyElem)
 **Examples**
 
 ```
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
+R, x = polynomial_ring(ZZ, "x")
+S, y = polynomial_ring(R, "y")
 
 k = x*y^2 + (x + 1)*y + 3
 
@@ -811,10 +811,10 @@ evaluated at $a$ by writing $f(a)$.
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 
@@ -863,19 +863,19 @@ integral{T <: Union{ResElem, FieldElem}}(::PolyElem{T})
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
-julia> T, z = PolynomialRing(QQ, "z")
+julia> T, z = polynomial_ring(QQ, "z")
 (Univariate Polynomial Ring in z over Rationals, z)
 
-julia> U = ResidueRing(T, z^3 + 3z + 1)
+julia> U = residue_ring(T, z^3 + 3z + 1)
 Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3 + 3*z + 1
 
-julia> V, w = PolynomialRing(U, "w")
+julia> V, w = polynomial_ring(U, "w")
 (Univariate Polynomial Ring in w over Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3 + 3*z + 1, w)
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -913,10 +913,10 @@ discriminant(a::PolyElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = 3x*y^2 + (x + 1)*y + 3
@@ -951,10 +951,10 @@ newton_to_monomial!{T <: RingElem}(::Vector{T}, ::Vector{T})
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = 3x*y^2 + (x + 1)*y + 3
@@ -990,10 +990,10 @@ interpolate{T <: RingElem}(::PolyRing, ::Vector{T}, ::Vector{T})
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> xs = [R(1), R(2), R(3), R(4)]
@@ -1028,7 +1028,7 @@ power_sums_to_polynomial(::Vector{T}) where T <: RingElem
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> f = x^4 - 2*x^3 + 10*x^2 + 7*x - 5
@@ -1062,10 +1062,10 @@ chebyshev_u(::Int, ::PolyElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 
 julia> f = chebyshev_t(20, y)
@@ -1090,13 +1090,13 @@ rand(R::PolyRing, deg::Int, v...)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(ZZ, "x")
+R, x = polynomial_ring(ZZ, "x")
 f = rand(R, -1:3, -10:10)
 
-S, y = PolynomialRing(GF(7), "y")
+S, y = polynomial_ring(GF(7), "y")
 g = rand(S, 2:2)
 
-U, z = PolynomialRing(R, "z")
+U, z = polynomial_ring(R, "z")
 h = rand(U, 3:3, -1:2, -10:10)
 ```
 

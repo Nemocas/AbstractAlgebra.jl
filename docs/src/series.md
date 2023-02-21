@@ -40,7 +40,7 @@ These generic series have types `Generic.RelSeries{T}`, `Generic.AbsSeries{T}`,
 the file `src/generic/GenericTypes.jl` for details.
 
 The parent objects have types `Generic.AbsSeriesRing{T}`
-and `Generic.RelSeriesRing{T}` and `Generic.LaurentSeriesRing{T}` respectively.
+and `Generic.RelSeriesRing{T}` and `Generic.laurent_series_ring{T}` respectively.
 
 The default precision, string representation of the variable and base ring $R$
 of a generic power series are stored in its parent object.
@@ -68,15 +68,15 @@ In order to construct series in AbstractAlgebra.jl, one must first construct the
 itself. This is accomplished with any of the following constructors.
 
 ```julia
-PowerSeriesRing(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true, model=:capped_relative)
+power_series_ring(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true, model=:capped_relative)
 ```
 
 ```julia
-LaurentSeriesRing(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
+laurent_series_ring(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
 ```
 
 ```julia
-LaurentSeriesRing(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
+laurent_series_ring(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
 ```
 
 Given a base ring `R`, a maximum precision (relative or absolute, depending on the
@@ -110,16 +110,16 @@ various elements into those rings.
 **Examples**
 
 ```jldoctest
-julia> R, x = PowerSeriesRing(ZZ, 10, "x")
+julia> R, x = power_series_ring(ZZ, 10, "x")
 (Univariate power series ring in x over Integers, x + O(x^11))
 
-julia> S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
+julia> S, y = power_series_ring(ZZ, 10, "y"; model=:capped_absolute)
 (Univariate power series ring in y over Integers, y + O(y^10))
 
-julia> T, z = LaurentSeriesRing(ZZ, 10, "z")
+julia> T, z = laurent_series_ring(ZZ, 10, "z")
 (Laurent series ring in z over Integers, z + O(z^11))
 
-julia> U, w = LaurentSeriesField(QQ, 10, "w")
+julia> U, w = laurent_series_field(QQ, 10, "w")
 (Laurent series field in w over Rationals, w + O(w^11))
 
 julia> f = R()
@@ -183,7 +183,7 @@ laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::In
 **Examples**
 
 ```jldoctest
-julia> S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
+julia> S, x = power_series_ring(QQ, 10, "x"; model=:capped_absolute)
 (Univariate power series ring in x over Rationals, x + O(x^10))
 
 julia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
@@ -223,10 +223,10 @@ O(x::SeriesElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = PowerSeriesRing(ZZ, 10, "x")
+julia> R, x = power_series_ring(ZZ, 10, "x")
 (Univariate power series ring in x over Integers, x + O(x^11))
 
-julia> S, y = LaurentSeriesRing(ZZ, 10, "y")
+julia> S, y = laurent_series_ring(ZZ, 10, "y")
 (Laurent series ring in y over Integers, y + O(y^11))
 
 julia> f = 1 + 2x + O(x^5)
@@ -424,7 +424,7 @@ is_gen(::RelSeriesElem)
 **Examples**
 
 ```jldoctest
-julia> S, x = PowerSeriesRing(ZZ, 10, "x")
+julia> S, x = power_series_ring(ZZ, 10, "x")
 (Univariate power series ring in x over Integers, x + O(x^11))
 
 julia> f = 1 + 3x + x^3 + O(x^10)
@@ -472,10 +472,10 @@ julia> t = divexact(2g, 2)
 julia> p = precision(f)
 10
 
-julia> R, t = PowerSeriesRing(QQ, 10, "t")
+julia> R, t = power_series_ring(QQ, 10, "t")
 (Univariate power series ring in t over Rationals, t + O(t^11))
 
-julia> S, x = PowerSeriesRing(R, 30, "x")
+julia> S, x = power_series_ring(R, 30, "x")
 (Univariate power series ring in x over Univariate power series ring in t over Rationals, x + O(x^31))
 
 julia> a = O(x^4)
@@ -499,7 +499,7 @@ julia> p = valuation(b)
 julia> c = coeff(b, 2)
 1 + t^2 + O(t^10)
 
-julia> S, x = PowerSeriesRing(ZZ, 10, "x")
+julia> S, x = power_series_ring(ZZ, 10, "x")
 (Univariate power series ring in x over Integers, x + O(x^11))
 
 julia> f = 1 + 3x + x^3 + O(x^5)
@@ -529,7 +529,7 @@ change_base_ring(::Ring, ::AbsSeriesElem{<:RingElem})
 **Examples**
 
 ```jldoctest
-julia> R, x = PowerSeriesRing(ZZ, 10, "x")
+julia> R, x = power_series_ring(ZZ, 10, "x")
 (Univariate power series ring in x over Integers, x + O(x^11))
 
 julia> f = 4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
@@ -555,10 +555,10 @@ shift_right{T <: RingElem}(::RelSeriesElem{T}, ::Int)
 **Examples**
 
 ```jldoctest
-julia> R, t = PolynomialRing(QQ, "t")
+julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
-julia> S, x = PowerSeriesRing(R, 30, "x")
+julia> S, x = power_series_ring(R, 30, "x")
 (Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x + O(x^31))
 
 julia> a = 2x + x^3
@@ -596,10 +596,10 @@ truncate{T <: RingElem}(::RelSeriesElem{T}, ::Int)
 **Examples**
 
 ```jldoctest
-julia> R, t = PolynomialRing(QQ, "t")
+julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
-julia> S, x = PowerSeriesRing(R, 30, "x")
+julia> S, x = power_series_ring(R, 30, "x")
 (Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x + O(x^31))
 
 julia> a = 2x + x^3
@@ -637,10 +637,10 @@ Base.inv(::RelSeriesElem)
 **Examples**
 
 ```jldoctest
-julia> R, t = PolynomialRing(QQ, "t")
+julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
-julia> S, x = PowerSeriesRing(R, 30, "x")
+julia> S, x = power_series_ring(R, 30, "x")
 (Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x + O(x^31))
 
 julia> a = 1 + x + 2x^2 + O(x^5)
@@ -694,13 +694,13 @@ Base.sqrt(a::RelSeriesElem)
 **Examples**
 
 ```jldoctest
-julia> R, t = PolynomialRing(QQ, "t")
+julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
-julia> S, x = PowerSeriesRing(R, 30, "x")
+julia> S, x = power_series_ring(R, 30, "x")
 (Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x + O(x^31))
 
-julia> T, z = PowerSeriesRing(QQ, 30, "z")
+julia> T, z = power_series_ring(QQ, 30, "z")
 (Univariate power series ring in z over Rationals, z + O(z^31))
 
 julia> a = 1 + z + 3z^2 + O(z^5)
@@ -740,6 +740,6 @@ rand(R::SeriesRing, val_range::UnitRange{Int}, v...)
 
 ```@repl
 using AbstractAlgebra # hide
-R, x = PowerSeriesRing(ZZ, 10, "x")
+R, x = power_series_ring(ZZ, 10, "x")
 f = rand(R, 3:5, -10:10)
 ```

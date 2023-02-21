@@ -1,10 +1,10 @@
 ###############################################################################
 #
-#   ResidueField.jl : residue fields (modulo a principal ideal)
+#   residue_field.jl : residue fields (modulo a principal ideal)
 #
 ###############################################################################
 
-export ResidueField
+export residue_field
 
 ###############################################################################
 #
@@ -477,19 +477,19 @@ rand(S::ResField, v...) = rand(Random.GLOBAL_RNG, S, v...)
 
 ###############################################################################
 #
-#   ResidueField constructor
+#   residue_field constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    ResidueField(R::Ring, a::RingElement; cached::Bool = true)
+    residue_field(R::Ring, a::RingElement; cached::Bool = true)
 
 Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
 require $a \neq 0$. If `cached == true` (the default) then the resulting
 residue ring parent object is cached and returned for any subsequent calls
 to the constructor with the same base ring $R$ and element $a$.
 """
-function ResidueField(R::Ring, a::RingElement; cached::Bool = true)
+function residue_field(R::Ring, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DivideError())
    T = elem_type(R)
 
@@ -499,13 +499,13 @@ end
 @doc Markdown.doc"""
     quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
 
-Returns `S, f` where `S = ResidueField(R, a)` and `f` is the 
+Returns `S, f` where `S = residue_field(R, a)` and `f` is the 
 projection map from `R` to `S`. This map is supplied as a map with section
 where the section is the lift of an element of the residue field back
 to the ring `R`.
 """
 function quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
-   S = ResidueField(R, a; cached=cached)
+   S = residue_field(R, a; cached=cached)
    f = map_with_section_from_func(x->S(x), x->lift(x), R, S)
    return S, f
 end

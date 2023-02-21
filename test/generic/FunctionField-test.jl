@@ -848,7 +848,7 @@ end
    for i = 1:length(P1)
       S, y = FunctionField(P1[i], "y")
 
-      St, t = PolynomialRing(S, "t", cached = false)
+      St, t = polynomial_ring(S, "t", cached = false)
       @test t + y == y + t
       @test t * y == y * t
       @test t + 1 == 1 + t

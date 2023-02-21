@@ -1,9 +1,9 @@
 @testset "Generic.AbsMSeries.constructors" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
-      R, gens = PowerSeriesRing(QQ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(QQ, prec, ["x$(i)" for i in 1:nvars])
    
       f = rand(R, 0:10, -10:10)
 
@@ -33,15 +33,15 @@
 
       @test R(p, prec) isa Generic.AbsMSeries
 
-      R, gens = PowerSeriesRing(S, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(S, prec, ["x$(i)" for i in 1:nvars])
      
       @test R(ZZ(2)) isa Generic.AbsMSeries
 
       @test R(x) isa Generic.AbsMSeries
    end
 
-   R1, (x1, y1) = PowerSeriesRing(ZZ, [3, 3], ["x", "y"])
-   R2, (x2, y2) = PowerSeriesRing(ZZ, 3, ["x", "y"])
+   R1, (x1, y1) = power_series_ring(ZZ, [3, 3], ["x", "y"])
+   R2, (x2, y2) = power_series_ring(ZZ, 3, ["x", "y"])
 
    @test R1 === R2
 
@@ -50,7 +50,7 @@
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:40)
-      R, gens = PowerSeriesRing(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
    
       f = rand(R, 0:10, -10:10)
 
@@ -75,7 +75,7 @@
 
       @test R(p, [0 for i in 1:nvars]) isa Generic.AbsMSeries
 
-      R, gens = PowerSeriesRing(S, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(S, weights, prec, ["x$(i)" for i in 1:nvars])
      
       @test R(ZZ(2)) isa Generic.AbsMSeries
 
@@ -84,7 +84,7 @@
 end
 
 @testset "Generic.AbsMSeries.printing" begin
-   R, (x, y) = PowerSeriesRing(ZZ, [5, 3], ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, [5, 3], ["x", "y"])
 
    @test string(zero(R)) == "O(y^3) + O(x^5)"
    @test string(one(R)) == "1 + O(y^3) + O(x^5)"
@@ -94,7 +94,7 @@ end
 
    # weighted 
 
-   R, (x, y) = PowerSeriesRing(ZZ, [2, 3], 10, ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
 
    @test string(zero(R)) == "O(10)"
    @test string(one(R)) == "1 + O(10)"
@@ -104,7 +104,7 @@ end
 end
 
 @testset "Generic.AbsMSeries.manipulation" begin
-   R, (x, y) = PowerSeriesRing(ZZ, [5, 3], ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, [5, 3], ["x", "y"])
 
    f = x^2 + 2x*y + y + 1 + O(x^3) + O(y^2)
 
@@ -164,14 +164,14 @@ end
 
    @test characteristic(R) == 0
 
-   S = ResidueRing(ZZ, 7)
-   R, (x, y) = PowerSeriesRing(S, [2, 3], ["x", "y"])
+   S = residue_ring(ZZ, 7)
+   R, (x, y) = power_series_ring(S, [2, 3], ["x", "y"])
 
    @test characteristic(R) == 7
 
    # weighted
 
-   R, (x, y) = PowerSeriesRing(ZZ, [2, 3], 10, ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
 
    f = x^2 + 2x*y + y + 1
 
@@ -219,8 +219,8 @@ end
 
    @test characteristic(R) == 0
 
-   S = ResidueRing(ZZ, 7)
-   R, (x, y) = PowerSeriesRing(S, [2, 3], 10, ["x", "y"])
+   S = residue_ring(ZZ, 7)
+   R, (x, y) = power_series_ring(S, [2, 3], 10, ["x", "y"])
 
    @test characteristic(R) == 7
 end
@@ -228,7 +228,7 @@ end
 @testset "Generic.AbsMSeries.truncation" begin
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
-      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars])
 
       for iters = 1:100
          f = rand(R, 0:10, -10:10)
@@ -249,7 +249,7 @@ end
 @testset "Generic.AbsMSeries.unary_ops" begin
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
-      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars])
 
       for iters = 1:100
          f = rand(R, 0:10, -10:10)
@@ -264,7 +264,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = PowerSeriesRing(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
 
       for iters = 1:100
          f = rand(R, 0:10, -10:10)
@@ -278,7 +278,7 @@ end
 @testset "Generic.AbsMSeries.binary_ops" begin
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
-      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars])
 
       for iters = 1:100
          f = rand(R, 0:12, -10:10)
@@ -301,7 +301,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = PowerSeriesRing(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
 
       for iters = 1:100
          f = rand(R, 0:12, -10:10)
@@ -321,11 +321,11 @@ end
 end
 
 @testset "Generic.AbsMSeries.adhoc_binary_ops" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
-      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars])
 
       for iters = 1:100
          f = rand(R, 0:12, -10:10)
@@ -346,7 +346,7 @@ end
       end
    
       prec = [rand(0:10) for i in 1:nvars]
-      R, gens = PowerSeriesRing(S, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(S, prec, ["x$(i)" for i in 1:nvars])
 
       for iters = 1:100
          f = rand(R, 0:12, -1:2, -10:10)
@@ -369,7 +369,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = PowerSeriesRing(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
 
       for iters = 1:100
          f = rand(R, 0:12, -10:10)
@@ -391,7 +391,7 @@ end
    
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = PowerSeriesRing(S, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(S, weights, prec, ["x$(i)" for i in 1:nvars])
 
       for iters = 1:100
          f = rand(R, 0:12, -1:2, -10:10)
@@ -413,7 +413,7 @@ end
 @testset "Generic.AbsMSeries.powering" begin
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
-      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars])
       
       for iter = 1:100
          f = rand(R, 0:12, -10:10)
@@ -434,7 +434,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = PowerSeriesRing(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
       
       for iter = 1:100
          f = rand(R, 0:12, -10:10)
@@ -454,7 +454,7 @@ end
 @testset "Generic.AbsMSeries.comparison" begin
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
-      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars])
 
       for iter = 1:100
          f = rand(R, 0:12, -10:10)
@@ -475,7 +475,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = PowerSeriesRing(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
 
       for iter = 1:100
          f = rand(R, 0:12, -10:10)
@@ -489,7 +489,7 @@ end
 @testset "Generic.AbsMSeries.adhoc_comparison" begin
    for nvars in 1:5
       prec = [rand(1:10) for i in 1:nvars]
-      R, gens = PowerSeriesRing(ZZ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars])
 
       for iter = 1:100
          c = rand(ZZ, -10:10)
@@ -509,7 +509,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = PowerSeriesRing(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
 
       for iter = 1:100
          c = rand(ZZ, -10:10)
@@ -528,7 +528,7 @@ end
 @testset "Generic.AbsMSeries.inversion" begin
    for nvars in 1:4
       prec = [rand(1:8) for i in 1:nvars]
-      R, gens = PowerSeriesRing(QQ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(QQ, prec, ["x$(i)" for i in 1:nvars])
 
       for iter = 1:20*nvars
          f = rand(R, 0:8, -10:10)
@@ -543,7 +543,7 @@ end
    for nvars in 1:4
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = PowerSeriesRing(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
       for iter = 1:20*nvars
          f = rand(R, 0:8, -10:10)
          if is_unit(f)
@@ -556,7 +556,7 @@ end
 @testset "Generic.AbsMSeries.exact_division" begin
    for nvars in 1:4
       prec = [rand(1:8) for i in 1:nvars]
-      R, gens = PowerSeriesRing(QQ, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(QQ, prec, ["x$(i)" for i in 1:nvars])
 
       for iter = 1:20*nvars
          f = rand(R, 0:8, -10:10)
@@ -572,7 +572,7 @@ end
    for nvars in 1:4
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = PowerSeriesRing(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
 
       for iter = 1:20*nvars
          f = rand(R, 0:8, -10:10)
@@ -585,7 +585,7 @@ end
 end
 
 @testset "Generic.AbsMSeries.evaluation" begin
-   R, (x, y) = PowerSeriesRing(ZZ, [10, 10], ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, [10, 10], ["x", "y"])
 
    f = x^2 + y
 
@@ -607,7 +607,7 @@ end
 
    # weighted
 
-   R, (x, y) = PowerSeriesRing(ZZ, [2, 3], 30, ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, [2, 3], 30, ["x", "y"])
 
    f = x^2 + y
 

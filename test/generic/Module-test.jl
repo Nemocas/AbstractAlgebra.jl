@@ -3,7 +3,7 @@ function rand_homomorphism(M::AbstractAlgebra.FPModule{T}, vals...) where T <: R
    m = ngens(M)
    R = base_ring(M)
    F = FreeModule(R, rk)
-   S = MatrixSpace(R, rk, m)
+   S = matrix_space(R, rk, m)
    mat = rand(S, vals...)
    f = ModuleHomomorphism(F, M, mat)
    ngens1 = rand(1:3)

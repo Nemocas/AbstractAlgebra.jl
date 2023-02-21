@@ -17,31 +17,31 @@
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
 @testset "Generic.LaurentSeries.constructors" begin
-   R, x = LaurentSeriesRing(ZZ, 30, "x")
+   R, x = laurent_series_ring(ZZ, 30, "x")
 
-   @test LaurentSeriesRing(ZZ, 30, "x", cached = true)[1] === LaurentSeriesRing(ZZ, 30, "x", cached = true)[1]
-   @test LaurentSeriesRing(ZZ, 30, "x", cached = false)[1] !== LaurentSeriesRing(ZZ, 30, "x", cached = true)[1]
+   @test laurent_series_ring(ZZ, 30, "x", cached = true)[1] === laurent_series_ring(ZZ, 30, "x", cached = true)[1]
+   @test laurent_series_ring(ZZ, 30, "x", cached = false)[1] !== laurent_series_ring(ZZ, 30, "x", cached = true)[1]
 
-   S, t = PolynomialRing(QQ, "t")
-   T, y = LaurentSeriesRing(S, 30, "y")
+   S, t = polynomial_ring(QQ, "t")
+   T, y = laurent_series_ring(S, 30, "y")
 
-   U, z = LaurentSeriesField(QQ, 30, "z")
+   U, z = laurent_series_field(QQ, 30, "z")
 
    @test elem_type(R) == Generic.LaurentSeriesRingElem{BigInt}
-   @test elem_type(Generic.LaurentSeriesRing{BigInt}) == Generic.LaurentSeriesRingElem{BigInt}
-   @test parent_type(Generic.LaurentSeriesRingElem{BigInt}) == Generic.LaurentSeriesRing{BigInt}
+   @test elem_type(Generic.laurent_series_ring{BigInt}) == Generic.LaurentSeriesRingElem{BigInt}
+   @test parent_type(Generic.LaurentSeriesRingElem{BigInt}) == Generic.laurent_series_ring{BigInt}
 
    @test elem_type(T) == Generic.LaurentSeriesRingElem{elem_type(S)}
-   @test elem_type(Generic.LaurentSeriesRing{elem_type(S)}) == Generic.LaurentSeriesRingElem{elem_type(S)}
-   @test parent_type(Generic.LaurentSeriesRingElem{elem_type(S)}) == Generic.LaurentSeriesRing{elem_type(S)}
+   @test elem_type(Generic.laurent_series_ring{elem_type(S)}) == Generic.LaurentSeriesRingElem{elem_type(S)}
+   @test parent_type(Generic.LaurentSeriesRingElem{elem_type(S)}) == Generic.laurent_series_ring{elem_type(S)}
 
    @test elem_type(U) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
-   @test elem_type(Generic.LaurentSeriesField{Rational{BigInt}}) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
-   @test parent_type(Generic.LaurentSeriesFieldElem{Rational{BigInt}}) == Generic.LaurentSeriesField{Rational{BigInt}}
+   @test elem_type(Generic.laurent_series_field{Rational{BigInt}}) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
+   @test parent_type(Generic.LaurentSeriesFieldElem{Rational{BigInt}}) == Generic.laurent_series_field{Rational{BigInt}}
 
-   @test isa(R, Generic.LaurentSeriesRing)
-   @test isa(T, Generic.LaurentSeriesRing)
-   @test isa(U, Generic.LaurentSeriesField)
+   @test isa(R, Generic.laurent_series_ring)
+   @test isa(T, Generic.laurent_series_ring)
+   @test isa(U, Generic.laurent_series_field)
 
    a1 = x^3 + 2x + 1
    a2 = (t^2 + 1)*y^2 + (t + 3)*y + O(y^4)
@@ -101,28 +101,28 @@
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
    
-   R, x = LaurentSeriesRing(ZZ, 30, "x")
-   RR, x = LaurentSeriesRing(ZZ, 30, "x")
+   R, x = laurent_series_ring(ZZ, 30, "x")
+   RR, x = laurent_series_ring(ZZ, 30, "x")
    @test R === RR
-   RR, x = LaurentSeriesRing(ZZ, 30, "x", cached = false)
+   RR, x = laurent_series_ring(ZZ, 30, "x", cached = false)
    @test R !== RR
 end
 
 @testset "Generic.LaurentSeries.rand" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
 
    test_rand(R, -12:12, -10:10)
    test_rand(R, -12:12, make(ZZ, -10:10))
 
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
 
    test_rand(R, -12:12, -1:1)
    test_rand(R, -12:12, make(RealField, -1:1))
 end
 
 @testset "Generic.LaurentSeries.manipulation" begin
-   R, t = PolynomialRing(QQ, "t")
-   S, x = LaurentSeriesRing(R, 30, "x")
+   R, t = polynomial_ring(QQ, "t")
+   S, x = laurent_series_ring(R, 30, "x")
 
    @test max_precision(S) == 30
 
@@ -164,14 +164,14 @@ end
 
    @test characteristic(S) == 0
 
-   T = ResidueRing(ZZ, 7)
-   U, y = LaurentSeriesRing(T, 10, "y")
+   T = residue_ring(ZZ, 7)
+   U, y = laurent_series_ring(T, 10, "y")
 
    @test modulus(T) == 7
 end
 
 @testset "Generic.LaurentSeries.similar" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
 
    for iters = 1:10
       f = rand(R, 0:10, -10:10)
@@ -231,7 +231,7 @@ end
 end
 
 @testset "Generic.LaurentSeries.change_base_ring" begin
-   Zx, x = LaurentSeriesRing(ZZ, 10, "x")
+   Zx, x = laurent_series_ring(ZZ, 10, "x")
    @test 1 == map_coefficients(sqrt, x^0)
    p = Zx(BigInt[i for i in 1:10], 10, 11, 5, 1)
    q = Zx(BigInt[i for i in 10:-1:1], 10, 11, 5, 1)
@@ -256,7 +256,7 @@ end
    end
 
    F = GF(11)
-   P, y = LaurentSeriesRing(F, 10, "x")
+   P, y = laurent_series_ring(F, 10, "x")
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 end
 
@@ -306,7 +306,7 @@ end
 
 @testset "Generic.LaurentSeries.unary_ops" begin
    #  Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
 
@@ -315,7 +315,7 @@ end
    end
 
    #  Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -1:1)
 
@@ -324,8 +324,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = LaurentSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = laurent_series_ring(T, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 0:5)
 
@@ -336,7 +336,7 @@ end
 
 @testset "Generic.LaurentSeries.binary_ops" begin
    #  Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, -10:10)
       g = rand(R, -12:12, -10:10)
@@ -352,7 +352,7 @@ end
    end
 
    #  Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, -1:1)
       g = rand(R, -12:12, -1:1)
@@ -367,8 +367,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = LaurentSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = laurent_series_ring(T, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, 0:5)
       g = rand(R, -12:12, 0:5)
@@ -383,7 +383,7 @@ end
    end
 
    # Regression test for bug #484
-   R, x = LaurentSeriesRing(QQ, 20,"x")
+   R, x = laurent_series_ring(QQ, 20,"x")
    a = sum(n*x^n for n in 1:17)
    b = 83 + 43*x^10 + O(x^20)
    c = a + b
@@ -395,7 +395,7 @@ end
 
 @testset "Generic.LaurentSeries.inplace_binary_ops" begin
    #  Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, -10:10)
       g = rand(R, -12:12, -10:10)
@@ -408,7 +408,7 @@ end
    end
 
    #  Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, -1:1)
       g = rand(R, -12:12, -1:1)
@@ -421,8 +421,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = LaurentSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = laurent_series_ring(T, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, 0:5)
       g = rand(R, -12:12, 0:5)
@@ -437,7 +437,7 @@ end
 
 @testset "Generic.LaurentSeries.adhoc_binary_ops" begin
    # Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, -10:10)
       c1 = rand(ZZ, -10:10)
@@ -457,7 +457,7 @@ end
    end
 
    # Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, -1:1)
       c1 = rand(ZZ, -10:10)
@@ -477,8 +477,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = LaurentSeriesRing(R, 10, "x")
+   R = residue_ring(ZZ, 6)
+   S, x = laurent_series_ring(R, 10, "x")
    for iter = 1:500
       f = rand(S, -12:12, 0:5)
       c1 = rand(ZZ, -10:10)
@@ -505,7 +505,7 @@ end
 
    # Generic tower
    R, x = ZZ["x"]
-   S, y = LaurentSeriesRing(R, 10, "y")
+   S, y = laurent_series_ring(R, 10, "y")
    for iter = 1:100
       f = rand(S, -12:12, 0:5, -10:10)
       c1 = rand(ZZ, -10:10)
@@ -527,7 +527,7 @@ end
 
 @testset "Generic.LaurentSeries.comparison" begin
    # Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, -10:10)
       g = deepcopy(f)
@@ -543,7 +543,7 @@ end
    end
 
    # Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, -1:1)
       g = deepcopy(f)
@@ -559,8 +559,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = LaurentSeriesRing(R, 10, "x")
+   R = residue_ring(ZZ, 6)
+   S, x = laurent_series_ring(R, 10, "x")
    for iter = 1:500
       f = rand(S, -12:12, 0:5)
       g = deepcopy(f)
@@ -578,7 +578,7 @@ end
 
 @testset "Generic.LaurentSeries.adhoc_comparison" begin
    # Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = R()
       while f == 0
@@ -600,7 +600,7 @@ end
    end
 
    # Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:500
       f = R()
       while isapprox(f, R())
@@ -622,8 +622,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = LaurentSeriesRing(R, 10, "x")
+   R = residue_ring(ZZ, 6)
+   S, x = laurent_series_ring(R, 10, "x")
    for iter = 1:500
       f = S()
       while f == 0
@@ -651,7 +651,7 @@ end
 
    # Generic tower
    R, x = ZZ["x"]
-   S, y = LaurentSeriesRing(R, 10, "y")
+   S, y = laurent_series_ring(R, 10, "y")
    for iter = 1:100
       f = S()
       while f == 0
@@ -675,7 +675,7 @@ end
 
 @testset "Generic.LaurentSeries.powering" begin
    # Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
 
    for iter = 1:100
       f = rand(R, -12:12, -10:10)
@@ -691,7 +691,7 @@ end
    end
 
    # Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
 
    for iter = 1:100
       f = rand(R, -12:12, -1:1)
@@ -710,8 +710,8 @@ end
    for iter = 1:100
       n = rand(2:26)
 
-      Zn = ResidueRing(ZZ, n)
-      R, x = LaurentSeriesRing(Zn, 10, "x")
+      Zn = residue_ring(ZZ, n)
+      R, x = laurent_series_ring(Zn, 10, "x")
 
       f = rand(R, -12:12, 0:n - 1)
       r2 = R(1)
@@ -726,8 +726,8 @@ end
    end
 
    # regression test (see #967)
-   Zn = ResidueRing(ZZ, 4)
-   R, x = LaurentSeriesRing(Zn, 5, "x")
+   Zn = residue_ring(ZZ, 4)
+   R, x = laurent_series_ring(Zn, 5, "x")
    f = 2*x^6 + O(x^11)
 
    @test isequal(f*f, f^2)
@@ -736,7 +736,7 @@ end
 
 @testset "Generic.LaurentSeries.shift" begin
    # Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       s = rand(0:12)
@@ -747,7 +747,7 @@ end
    end
 
    # Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -1:1)
       s = rand(0:12)
@@ -758,8 +758,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = LaurentSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = laurent_series_ring(T, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 0:5)
       s = rand(0:12)
@@ -772,7 +772,7 @@ end
 
 @testset "Generic.LaurentSeries.truncation" begin
    # Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       s = rand(-12:12)
@@ -783,7 +783,7 @@ end
    end
 
    # Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -1:1)
       s = rand(-12:12)
@@ -794,8 +794,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = LaurentSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = laurent_series_ring(T, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 0:5)
       s = rand(-12:12)
@@ -808,7 +808,7 @@ end
 
 @testset "Generic.LaurentSeries.inversion" begin
    # Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = R()
       while iszero(f) || !is_unit(polcoeff(f, 0))
@@ -819,7 +819,7 @@ end
    end
 
    # Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:300
       f = R()
       while iszero(f)
@@ -830,8 +830,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = LaurentSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = laurent_series_ring(T, 10, "x")
    for iter = 1:300
       f = R()
       while iszero(f) || !is_unit(polcoeff(f, 0))
@@ -844,7 +844,7 @@ end
 
 @testset "Generic.LaurentSeries.square_root" begin
    # Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       g = f^2
@@ -871,7 +871,7 @@ end
    @test_throws ErrorException sqrt(f)
 
    # Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -1:1)
       g = f^2
@@ -896,9 +896,9 @@ end
 
    # Characteristic p field
    for p in [2, 7, 19, 65537, ZZ(7), ZZ(19), ZZ(65537)]
-      R = ResidueField(ZZ, p)
+      R = residue_field(ZZ, p)
 
-      S, x = LaurentSeriesField(R, 10, "x")
+      S, x = laurent_series_field(R, 10, "x")
 
       for iter = 1:10
           f = rand(S, 0:10, 0:Int(p))
@@ -925,10 +925,10 @@ end
       end
    end
 
-    R = ResidueField(ZZ, 2)
-    T, y = PolynomialRing(R, "x")
+    R = residue_field(ZZ, 2)
+    T, y = polynomial_ring(R, "x")
 
-    S, x = LaurentSeriesRing(T, 10, "x")
+    S, x = laurent_series_ring(T, 10, "x")
 
     f = 1 + y^2*x^2 + (y^2 + y + 1)*x^4 + O(x^10)
 
@@ -949,7 +949,7 @@ end
 
 @testset "Generic.LaurentSeries.exact_division" begin
    # Exact ring
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       g = rand(R, -12:12, -10:10)
@@ -961,7 +961,7 @@ end
    end
 
    # Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, -12:12, -1:1)
@@ -974,8 +974,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = LaurentSeriesRing(T, 3, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = laurent_series_ring(T, 3, "x")
    for iter = 1:3000
       f = rand(R, -12:12, 0:5)
       g = rand(R, -12:12, 0:5)
@@ -989,7 +989,7 @@ end
 
 @testset "Generic.LaurentSeries.adhoc_exact_division" begin
    # Exact field
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       c = ZZ()
@@ -1001,7 +1001,7 @@ end
    end
 
    # Inexact field
-   R, x = LaurentSeriesField(RealField, 10, "x")
+   R, x = laurent_series_field(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -1:1)
       c = RealField()
@@ -1013,8 +1013,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = LaurentSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = laurent_series_ring(T, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 0:5)
       c = T()
@@ -1028,7 +1028,7 @@ end
 
 @testset "Generic.LaurentSeries.derivative_integral" begin
    # Exact field
-   S, x = LaurentSeriesRing(QQ, 10, "x")
+   S, x = laurent_series_ring(QQ, 10, "x")
 
    for iter = 1:100
       f = rand(S, -10:10, -10:10)
@@ -1040,7 +1040,7 @@ end
    end
 
    # Inexact field
-   S, x = LaurentSeriesRing(RealField, 10, "x")
+   S, x = laurent_series_ring(RealField, 10, "x")
 
    for iter = 1:100
       f = rand(S, -10:10, -10:10)
@@ -1054,7 +1054,7 @@ end
 
 @testset "Generic.LaurentSeries.special_functions" begin
    # Exact field
-   S, x = LaurentSeriesRing(QQ, 10, "x")
+   S, x = laurent_series_ring(QQ, 10, "x")
 
    for iter = 1:100
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
@@ -1082,7 +1082,7 @@ end
    end
 
    # Inexact field
-   S, x = LaurentSeriesField(RealField, 10, "x")
+   S, x = laurent_series_field(RealField, 10, "x")
 
    for iter = 1:100
       @test isapprox(exp(x + O(x^iter)), exp(x + O(x^(iter - 1))))
@@ -1114,8 +1114,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 143)
-   S, x = LaurentSeriesRing(R, 10, "x")
+   R = residue_ring(ZZ, 143)
+   S, x = laurent_series_ring(R, 10, "x")
 
    for iter = 1:10
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))

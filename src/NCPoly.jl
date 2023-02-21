@@ -652,12 +652,12 @@ rand(S::NCPolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v..
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    PolynomialRing(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
+    polynomial_ring(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
 
 Given a base ring `R` and string `s` specifying how the generator (variable)
 should be printed, return a tuple `S, x` representing the new polynomial
@@ -666,16 +666,16 @@ object `S` will depend only on `R` and `x` and will be cached. Setting the
 optional argument `cached` to `false` will prevent the parent object `S` from
 being cached.
 """
-PolynomialRing(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
+polynomial_ring(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
 
-function PolynomialRing(R::NCRing, s::Symbol; cached::Bool = true)
-   return Generic.PolynomialRing(R, s, cached=cached)
+function polynomial_ring(R::NCRing, s::Symbol; cached::Bool = true)
+   return Generic.polynomial_ring(R, s, cached=cached)
 end
 
-function PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
-   return Generic.PolynomialRing(R, Symbol(s), cached=cached)
+function polynomial_ring(R::NCRing, s::AbstractString; cached::Bool = true)
+   return Generic.polynomial_ring(R, Symbol(s), cached=cached)
 end
 
-function PolynomialRing(R::NCRing, s::Char; cached::Bool = true)
-   return Generic.PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::NCRing, s::Char; cached::Bool = true)
+   return Generic.polynomial_ring(R, Symbol(s); cached=cached)
 end

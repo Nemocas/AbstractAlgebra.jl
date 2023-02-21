@@ -124,7 +124,7 @@ end
 end
 
 @testset "Generic.Ideal.ideal_reduction(multivariate)" begin
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
    for V in [
       [-10*x^2*y - 2, 4*x^2*y^2],
@@ -173,7 +173,7 @@ end
       @test testit(R, V)
    end
 
-   R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"]; ordering=:degrevlex)
+   R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"]; ordering=:degrevlex)
 
    for i = 1:100
       n = rand(0:2)
@@ -186,7 +186,7 @@ end
 end
 
 @testset "Generic.Ideal.ideal_reduction(univariate)" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for i = 1:300
       n = rand(0:5)
@@ -229,7 +229,7 @@ end
 
 @testset "Generic.Ideal.ideal_reduction(Fp[x])" begin
    Fp = GF(31)
-   R, x = PolynomialRing(Fp, "x")
+   R, x = polynomial_ring(Fp, "x")
 
    for i = 1:300
       n = rand(0:10)
@@ -251,7 +251,7 @@ end
 
 @testset "Generic.Ideal.comparison" begin
    # multivariate
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
    # random examples
    for i = 1:100
@@ -267,7 +267,7 @@ end
    end
 
    # univariate
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for i = 1:300
       n = rand(0:5)
@@ -279,7 +279,7 @@ end
 
    # Fp[x]
    Fp = GF(31)
-   R, x = PolynomialRing(Fp, "x")
+   R, x = polynomial_ring(Fp, "x")
 
    for i = 1:300
       n = rand(0:10)
@@ -301,7 +301,7 @@ end
 
 @testset "Generic.Ideal.containment" begin
    # multivariate
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
    # random examples
    for i = 1:100
@@ -323,7 +323,7 @@ end
    end
 
    # univariate
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for i = 1:300
       n = rand(0:5)
@@ -339,7 +339,7 @@ end
 
    # Fp[x]
    Fp = GF(31)
-   R, x = PolynomialRing(Fp, "x")
+   R, x = polynomial_ring(Fp, "x")
 
    for i = 1:300
       n = rand(0:10)
@@ -374,7 +374,7 @@ end
 
 @testset "Generic.Ideal.addition" begin
    # multivariate
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
    # random examples
    for i = 1:100
@@ -397,7 +397,7 @@ end
    end
 
    # univariate
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for i = 1:300
       n = rand(0:5)
@@ -414,7 +414,7 @@ end
 
    # Fp[x]
    Fp = GF(31)
-   R, x = PolynomialRing(Fp, "x")
+   R, x = polynomial_ring(Fp, "x")
 
    for i = 1:300
       n = rand(0:10)
@@ -446,7 +446,7 @@ end
 
 @testset "Generic.Ideal.multiplication" begin
    # multivariate
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
    # random examples
    for i = 1:50
@@ -473,7 +473,7 @@ end
    end
 
    # univariate
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for i = 1:300
       n = rand(0:5)
@@ -492,7 +492,7 @@ end
 
    # Fp[x]
    Fp = GF(31)
-   R, x = PolynomialRing(Fp, "x")
+   R, x = polynomial_ring(Fp, "x")
 
    for i = 1:300
       n = rand(0:10)
@@ -528,7 +528,7 @@ end
 
 @testset "Generic.Ideal.adhoc_multiplication" begin
    # multivariate
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
    # random examples
    for i = 1:100
@@ -548,7 +548,7 @@ end
    end
 
    # univariate
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for i = 1:300
       n = rand(0:5)
@@ -568,7 +568,7 @@ end
 
    # Fp[x]
    Fp = GF(31)
-   R, x = PolynomialRing(Fp, "x")
+   R, x = polynomial_ring(Fp, "x")
 
    for i = 1:300
       n = rand(0:10)
@@ -598,7 +598,7 @@ end
 
 @testset "Generic.Ideal.intersection" begin
    # multivariate
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
    # random examples
    for i = 1:50
@@ -623,7 +623,7 @@ end
    end
 
    # univariate
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for i = 1:300
       n = rand(0:5)
@@ -642,7 +642,7 @@ end
 
    # Fp[x]
    Fp = GF(31)
-   R, x = PolynomialRing(Fp, "x")
+   R, x = polynomial_ring(Fp, "x")
 
    for i = 1:300
       n = rand(0:10)

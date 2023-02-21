@@ -75,7 +75,7 @@ the resulting parent objects to coerce various elements into the ring.
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> S = TotalRingOfFractions(R)
@@ -115,7 +115,7 @@ total ring of fractions in question.
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(QQ, "x")
+julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = TotalRingOfFractions(R)
@@ -164,7 +164,7 @@ the characteristic is not known an exception is raised.
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(QQ, "x")
+julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = TotalRingOfFractions(R)
@@ -218,7 +218,7 @@ denominator(a::TotFrac)
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(QQ, "x")
+julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = TotalRingOfFractions(R)
@@ -266,11 +266,11 @@ rand(R::TotFracRing, v...)
 
 ```@repl
 using AbstractAlgebra # hide
-R = ResidueRing(ZZ, 12)
+R = residue_ring(ZZ, 12)
 K = TotalRingOfFractions(R)
 f = rand(K, 0:11)
 
-R, x = PolynomialRing(ZZ, "x")
+R, x = polynomial_ring(ZZ, "x")
 S = TotalRingOfFractions(R)
 g = rand(S, -1:3, -10:10)
 ```

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export FractionField, FactoredFractionField
+export fraction_field, FactoredFractionField
 
 ###############################################################################
 #
@@ -55,7 +55,7 @@ function //(x::T, y::T) where {T <: RingElem}
    try
       z.parent = Generic.FracDict[R]
    catch
-      z.parent = Generic.FractionField(R)
+      z.parent = Generic.fraction_field(R)
    end
    return z
 end
@@ -940,20 +940,20 @@ rand(S::FracField, v...) = rand(GLOBAL_RNG, S, v...)
 
 ###############################################################################
 #
-#   FractionField constructor
+#   fraction_field constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    FractionField(R::Ring; cached=true)
+    fraction_field(R::Ring; cached=true)
 
 Return the parent object of the fraction field over the given base ring $R$.
 If `cached == true` (the default), the returned parent object is cached so
 that it will always be returned by a call to the constructor when the same
 base ring $R$ is supplied.
 """
-function FractionField(R::Ring; cached=true)
-   return Generic.FractionField(R; cached=cached)
+function fraction_field(R::Ring; cached=true)
+   return Generic.fraction_field(R; cached=cached)
 end
 
 @doc Markdown.doc"""

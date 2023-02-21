@@ -261,7 +261,7 @@
    "\\left(\\begin{array}{cc}\na & b \\\\\nc \\\\\nd & e\n\\end{array}\\right)"
 
 
-   R, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"])
+   R, (a, b, c) = polynomial_ring(QQ, ["a", "b", "c"])
    p = a + b^2 + c^3
    @test sprint(show, p) == "a + b^2 + c^3"
    @test sprint(show, p, context = :compact => true) == "a + b^2 + c^3"
@@ -304,7 +304,7 @@
                                     "x^{20} & x^{20} y\n"*
                                     "\\end{array}"
 
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
    @test AbstractAlgebra.obj_to_string_wrt_times(x^2) == "x^2"
    @test AbstractAlgebra.obj_to_string_wrt_times(x*y) == "(x*y)"
    @test AbstractAlgebra.obj_to_string_wrt_times(x + y) == "(x + y)"

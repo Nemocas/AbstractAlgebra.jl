@@ -417,11 +417,11 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
+function polynomial_ring(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
    T = elem_type(R)
    parent_obj = PolyRing{T}(R, s, cached)
 

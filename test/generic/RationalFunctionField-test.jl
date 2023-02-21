@@ -443,7 +443,7 @@ end
 
 @testset "Generic.RationalFunctionField.evaluate" begin
    # Univariate
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    f = (x^2 + 2)//(x + 1)
 
@@ -451,7 +451,7 @@ end
    @test evaluate(f, QQ(2)) == 2
 
    # Multivariate
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    f = (x^2 + 2)//(y + 1)
 

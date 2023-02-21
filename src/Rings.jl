@@ -135,7 +135,7 @@ omitted.
 """
 function Base.sqrt(a::FieldElem; check::Bool=true)
   R = parent(a)
-  R, t = PolynomialRing(R, "t", cached = false)
+  R, t = polynomial_ring(R, "t", cached = false)
   f = factor(t^2 - a)
   for (p, e) in f
     if !check || degree(p) == 1

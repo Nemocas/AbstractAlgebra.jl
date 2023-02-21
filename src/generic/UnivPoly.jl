@@ -254,7 +254,7 @@ function gen(S::UnivPolyRing{T, U}, s::Symbol) where {T <: RingElement, U <: Abs
    i = findfirst(x->x==s, S.S)
    if typeof(i) == Nothing
       push!(S.S, s)
-      S.mpoly_ring = PolynomialRing(base_ring(S), S.S; cached=true, ordering=S.ord)[1]
+      S.mpoly_ring = polynomial_ring(base_ring(S), S.S; cached=true, ordering=S.ord)[1]
       i = length(S.S)
    end
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
@@ -908,7 +908,7 @@ end
 ################################################################################
 
 function _change_univ_poly_ring(R, Rx, cached)
-   P, _ = AbstractAlgebra.PolynomialRing(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
+   P, _ = AbstractAlgebra.polynomial_ring(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
    S = AbstractAlgebra.UniversalPolynomialRing(R; ordering=ordering(Rx), cached=cached)
    S.S = deepcopy(symbols(Rx))
    S.mpoly_ring = P

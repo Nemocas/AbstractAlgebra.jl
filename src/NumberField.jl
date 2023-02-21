@@ -1,8 +1,8 @@
 ###############################################################################
 #
-#   NumberField.jl - Number fields
+#   number_field.jl - Number fields
 #
 ###############################################################################
 
-export NumberField
+export number_field
 

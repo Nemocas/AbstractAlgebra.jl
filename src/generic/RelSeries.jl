@@ -395,11 +395,11 @@ end
 
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 
-function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached=true, model=:capped_relative)
+function power_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached=true, model=:capped_relative)
    T = elem_type(R)
 
    if model == :capped_relative

@@ -1,5 +1,5 @@
 @testset "Generic.TotFrac.constructors" begin
-   S = ResidueRing(ZZ, 12)
+   S = residue_ring(ZZ, 12)
    T = TotalRingOfFractions(S)
 
    @test TotalRingOfFractions(S, cached = true) === TotalRingOfFractions(S, cached = true)
@@ -37,7 +37,7 @@
 end
 
 @testset "Generic.TotFrac.printing" begin
-   S, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   S, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
    K = TotalRingOfFractions(S)
 
    @test string(K(x+y, z)) == "(x + y)//z"
@@ -45,14 +45,14 @@ end
 end
 
 @testset "Generic.TotFrac.rand" begin
-   S = ResidueRing(ZZ, 12)
+   S = residue_ring(ZZ, 12)
    K = TotalRingOfFractions(S)
 
    test_rand(K, 0:11)
 end
 
 @testset "Generic.TotFrac.manipulation" begin
-   R = ResidueRing(ZZ, 12)
+   R = residue_ring(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    @test denominator(S(5, 7)) == 7
@@ -88,14 +88,14 @@ end
 end
 
 @testset "Generic.TotFrac.unary_ops" begin
-   R = ResidueRing(ZZ, 12)
+   R = residue_ring(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    @test -(S(5, 7)) == 1
 end
 
 @testset "Generic.TotFrac.binary_ops" begin
-   R = ResidueRing(ZZ, 12)
+   R = residue_ring(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    for iter = 1:100
@@ -111,7 +111,7 @@ end
 end
 
 @testset "Generic.TotFrac.adhoc_binary" begin
-   R = ResidueRing(ZZ, 12)
+   R = residue_ring(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    a = S(3, 7)
@@ -151,7 +151,7 @@ end
 end
 
 @testset "Generic.TotFrac.comparison" begin
-   R = ResidueRing(ZZ, 12)
+   R = residue_ring(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    a = S(3, 7)
@@ -163,7 +163,7 @@ end
 end
 
 @testset "Generic.TotFrac.adhoc_comparison" begin
-   R = ResidueRing(ZZ, 12)
+   R = residue_ring(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    @test S(3, 1) == 3
@@ -176,7 +176,7 @@ end
 end
 
 @testset "Generic.TotFrac.powering" begin
-   R = ResidueRing(ZZ, 12)
+   R = residue_ring(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    a = S(5, 7)
@@ -185,7 +185,7 @@ end
 end
 
 @testset "Generic.TotFrac.inversion" begin
-   R = ResidueRing(ZZ, 12)
+   R = residue_ring(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    a = S(5, 7)
@@ -196,7 +196,7 @@ end
 end
 
 @testset "Generic.TotFrac.promotion" begin
-   R = ResidueRing(ZZ, 12)
+   R = residue_ring(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    T = elem_type(S)
@@ -204,7 +204,7 @@ end
 end
 
 @testset "Generic.TotFrac.unsafe_operators" begin
-   R = ResidueRing(ZZ, 12)
+   R = residue_ring(ZZ, 12)
    S = TotalRingOfFractions(R)
 
    a = S(5, 7)

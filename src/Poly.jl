@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export PolyCoeffs, PolynomialRing, PolyRing, addmul!, characteristic,
+export PolyCoeffs, polynomial_ring, PolyRing, addmul!, characteristic,
        chebyshev_t, chebyshev_u, coefficient_ring, coefficients, compose,
        constant_coefficient, content, deflate, deflation, degree, derivative,
        discriminant, divexact, divexact_low, divhigh, divides, evaluate,
@@ -3145,7 +3145,7 @@ end
 ################################################################################
 
 function _change_poly_ring(R, Rx, cached)
-   P, _ = PolynomialRing(R, string(var(Rx)), cached = cached)
+   P, _ = polynomial_ring(R, string(var(Rx)), cached = cached)
    return P
 end
 
@@ -3445,12 +3445,12 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    PolynomialRing(R::Ring, s::Union{String, Char, Symbol}; cached::Bool = true)
+    polynomial_ring(R::Ring, s::Union{String, Char, Symbol}; cached::Bool = true)
 
 Given a base ring `R` and string `s` specifying how the generator (variable)
 should be printed, return a tuple `S, x` representing the new polynomial
@@ -3459,18 +3459,18 @@ object `S` will depend only on `R` and `x` and will be cached. Setting the
 optional argument `cached` to `false` will prevent the parent object `S` from
 being cached.
 """
-PolynomialRing(R::Ring, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
+polynomial_ring(R::Ring, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
 
-function PolynomialRing(R::Ring, s::Symbol; cached::Bool = true)
-   return Generic.PolynomialRing(R, s; cached=cached)
+function polynomial_ring(R::Ring, s::Symbol; cached::Bool = true)
+   return Generic.polynomial_ring(R, s; cached=cached)
 end
 
-function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
-   return PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::Ring, s::AbstractString; cached::Bool = true)
+   return polynomial_ring(R, Symbol(s); cached=cached)
 end
 
-function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
-   return PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::Ring, s::Char; cached::Bool = true)
+   return polynomial_ring(R, Symbol(s); cached=cached)
 end
 
 function PolyRing(R::Ring)

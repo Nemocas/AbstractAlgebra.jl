@@ -547,7 +547,7 @@ function (a::RationalFunctionField{T, U})(n::U, d::U) where {T <: FieldElement, 
    try
       r.parent = FracDict[R]
    catch
-      r.parent = FractionField(R)
+      r.parent = fraction_field(R)
    end
    return a(r)
 end
@@ -584,11 +584,11 @@ end
 function RationalFunctionField(k::Field, s::Symbol; cached=true)
    T = elem_type(k)
 
-   R, x = AbstractAlgebra.PolynomialRing(k, s, cached=cached)
+   R, x = AbstractAlgebra.polynomial_ring(k, s, cached=cached)
 
    U = elem_type(R)
 
-   S = FractionField(R)
+   S = fraction_field(R)
    g = S(x)
    t = Rat{T, U}(g)
 
@@ -602,11 +602,11 @@ end
 function RationalFunctionField(k::Field, s::Vector{Symbol}; cached=true)
    T = elem_type(k)
 
-   R, x = AbstractAlgebra.PolynomialRing(k, s, cached=cached)
+   R, x = AbstractAlgebra.polynomial_ring(k, s, cached=cached)
 
    U = elem_type(R)
 
-   S = FractionField(R)
+   S = fraction_field(R)
    g = [S(xi) for xi in x]
    t = [Rat{T, U}(gi) for gi in g]
 

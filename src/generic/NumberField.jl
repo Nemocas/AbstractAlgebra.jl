@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   NumberField.jl - Generic number fields (mainly for test code)
+#   number_field.jl - Generic number fields (mainly for test code)
 #
 ###############################################################################
 
@@ -32,13 +32,13 @@ end
 
 ###############################################################################
 #
-#   NumberField constructor (mainly for test code)
+#   number_field constructor (mainly for test code)
 #
 ###############################################################################
 
-function NumberField(a::Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cached = true)
+function number_field(a::Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cached = true)
    S = parent(a)
-   R = ResidueField(S, a, cached=cached)
+   R = residue_field(S, a, cached=cached)
    x = gen(S)
    return R, R(x)
 end
