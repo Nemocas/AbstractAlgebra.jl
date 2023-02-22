@@ -5,7 +5,7 @@
 ###############################################################################
 
 export MPolyBuildCtx, @PolynomialRing, change_base_ring,
-       coefficients_of_univariate, coeffs, combine_like_terms!, deflation,
+       coefficients_of_univariate, combine_like_terms!, deflation,
        degrees, derivative, divides, exponent, exponent_vector,
        exponent_vectors, gens, is_constant, is_degree, is_homogeneous, is_monomial,
        is_reverse, is_term, is_univariate,
