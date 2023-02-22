@@ -60,6 +60,8 @@ jobs:
         uses: julia-actions/julia-buildpkg@latest
       - name: "Run tests"
         uses: julia-actions/julia-runtest@latest
+        with:
+          depwarn: error
       - name: "Run doctests"
         if: ${{ matrix.julia-version == '1.6' }}
         run: |
