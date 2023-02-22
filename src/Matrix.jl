@@ -1251,7 +1251,7 @@ Alias for `LinearAlgebra.issymmetric`.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
 [1   2   3]
 [2   4   5]
@@ -1291,7 +1291,7 @@ Return the transpose of the given matrix.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = PolynomialRing(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
@@ -1350,7 +1350,7 @@ $i$-th and $j$-th rows, respectively.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = PolynomialRing(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
@@ -1396,7 +1396,7 @@ require the matrix to be square.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = PolynomialRing(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
@@ -1436,7 +1436,7 @@ its entries, assuming it exists.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = PolynomialRing(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
@@ -1479,7 +1479,7 @@ Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = PolynomialRing(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
@@ -2180,7 +2180,7 @@ Return the determinant of the matrix $M$. We assume $M$ is square.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
@@ -2310,7 +2310,7 @@ Return an array consisting of the `k`-minors of `A`.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> A = ZZ[1 2 3; 4 5 6]
 [1   2   3]
 [4   5   6]
@@ -2342,7 +2342,7 @@ Return the `k`-th exterior power of `A`.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> A = matrix(ZZ, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 julia> exterior_power(A, 2)
@@ -2555,7 +2555,7 @@ Return the rank of the matrix $M$.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
@@ -3699,7 +3699,7 @@ function to compute an integral kernel.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = PolynomialRing(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
@@ -4216,7 +4216,7 @@ and the matrix is assumed to be square.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R = ResidueRing(ZZ, 7)
 Residue ring of Integers modulo 7
 
@@ -4411,7 +4411,7 @@ of the resulting polynomial must be supplied and the matrix must be square.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R = GF(13)
 Finite field F_13
 
@@ -6000,7 +6000,7 @@ preserves the minimal and characteristic polynomials of a matrix.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R = ResidueRing(ZZ, 7)
 Residue ring of Integers modulo 7
 
@@ -6057,7 +6057,7 @@ row are swapped.
 
 **Examples**
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
 [0   1   0]
@@ -6089,7 +6089,7 @@ matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 
 **Examples**
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
 [0   1   0]

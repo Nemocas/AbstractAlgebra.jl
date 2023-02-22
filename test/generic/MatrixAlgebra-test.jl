@@ -495,7 +495,10 @@ end
 
    @test divexact(5*M, 5) == M
 
-   c = rand(R, 1:10)
+   c = rand(R, 1:10)  # create a regular matrix
+   while rank(c) < nrows(c)
+      c = rand(R, 1:10)
+   end
 
    @test divexact_left(c*M, c) == M
    @test divexact_right(M*c, c) == M
