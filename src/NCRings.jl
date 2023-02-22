@@ -231,7 +231,7 @@ end
 Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
 [1   2   3]
 [2   3   4]
