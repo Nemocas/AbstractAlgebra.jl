@@ -165,4 +165,9 @@ import ..AbstractAlgebra: @alias
 
 @alias Rat RationalFunctionFieldElem
 
+@alias AbsSeriesRing AbsPowerSeriesRing
+@alias AbsSeriesElem AbsPowerSeriesRingElem
+@alias RelSeriesRing RelPowerSeriesRing
+@alias RelSeriesElem RelPowerSeriesRingElem
+
 end # generic
