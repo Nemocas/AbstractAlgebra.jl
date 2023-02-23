@@ -55,10 +55,7 @@
 @alias LaurentSeriesRing laurent_series_ring
 @alias LaurentSeriesField laurent_series_field
 @alias FractionField fraction_field
-@alias ResidueRing residue_ring
-@alias ResidueField residue_field
 @alias NumberField number_field
-
 
 @alias PolyElem PolyRingElem
 @alias NCPolyElem NCPolyRingElem
