@@ -150,16 +150,16 @@ end
 
    @test k == S(k)
 
-   S2 = MatrixSpace(R, 2, 2)
+   S2 = matrix_space(R, 2, 2)
    @test_throws ErrorConstrDimMismatch S2(k)
 
-   SZ = MatrixSpace(ZZ, 3, 3)
+   SZ = matrix_space(ZZ, 3, 3)
    @test_throws Exception SZ(k)
 
-   R2 = ResidueRing(ZZ, 2)
-   R3 = ResidueRing(ZZ, 3)
-   R2_1x2 = MatrixSpace(R2, 1, 2)
-   R3_1x2 = MatrixSpace(R3, 1, 2)
+   R2 = residue_ring(ZZ, 2)
+   R3 = residue_ring(ZZ, 3)
+   R2_1x2 = matrix_space(R2, 1, 2)
+   R3_1x2 = matrix_space(R3, 1, 2)
    m2 = R2_1x2([0, 1])
    @test_throws DomainError R3_1x2(m2)
 
