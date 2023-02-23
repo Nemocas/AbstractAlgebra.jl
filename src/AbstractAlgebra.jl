@@ -128,11 +128,11 @@ export SetElem, GroupElem, AdditiveGroupElem, NCRingElem, RingElem, ModuleElem, 
 export SetMap, FunctionalMap, IdentityMap
 
 export NCPolyRingElem, PolyRingElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
-       MatElem, MatAlgElem, FinFieldElem, MPolyRingElem, UnivPolyRingElem, NumFieldElem, Ideal,
+       MatElem, MatAlgElem, FinFieldElem, MPolyRingElem, UniversalPolyRingElem, NumFieldElem, Ideal,
        SimpleNumFieldElem, FreeAssAlgElem
 
 export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
-       FinField, MPolyRing, UnivPolyRing, NumField, SimpleNumField, IdealSet,
+       FinField, MPolyRing, UniversalPolyRing, NumField, SimpleNumField, IdealSet,
        FreeAssAlgebra
 
 export ZZ, QQ, zz, qq, RealField, RDF

@@ -10,29 +10,29 @@
 
          x = gen(S, "x")
 
-         @test isa(x, UnivPolyRingElem)
+         @test isa(x, UniversalPolyRingElem)
 
          y, z = gens(S, ["y", "z"])
 
          @test elem_type(S) == Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}
-         @test elem_type(Generic.UnivPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}
-         @test parent_type(Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UnivPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}
+         @test elem_type(Generic.UniversalPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}
+         @test parent_type(Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UniversalPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}
 
          @test base_ring(S) === R
          @test coefficient_ring(S) === R
 
-         @test typeof(S) <: Generic.UnivPolyRing
+         @test typeof(S) <: Generic.UniversalPolyRing
 
-         @test isa(x, UnivPolyRingElem)
-         @test isa(y, UnivPolyRingElem)
-         @test isa(z, UnivPolyRingElem)
+         @test isa(x, UniversalPolyRingElem)
+         @test isa(y, UniversalPolyRingElem)
+         @test isa(z, UniversalPolyRingElem)
 
          f = rand(S, 0:5, 0:10, -10:10)
 
-         @test isa(f, UnivPolyRingElem)
-         @test isa(S(2), UnivPolyRingElem)
-         @test isa(S(R(2)), UnivPolyRingElem)
-         @test isa(S(f), UnivPolyRingElem)
+         @test isa(f, UniversalPolyRingElem)
+         @test isa(S(2), UniversalPolyRingElem)
+         @test isa(S(R(2)), UniversalPolyRingElem)
+         @test isa(S(f), UniversalPolyRingElem)
 
          V = [R(rand(-10:10)) for i in 1:5]
          nused = rand(0:3)
@@ -40,7 +40,7 @@
          
          f1 = S(V, W)
 
-         @test isa(f1, UnivPolyRingElem)
+         @test isa(f1, UniversalPolyRingElem)
 
          f2 = S()
          fit!(f2, 5)
@@ -122,7 +122,7 @@ end
    end
 end
 
-function test_elem(R::AbstractAlgebra.Generic.UnivPolyRing{AbstractAlgebra.Generic.Res{BigInt}})
+function test_elem(R::AbstractAlgebra.Generic.UniversalPolyRing{AbstractAlgebra.Generic.Res{BigInt}})
     return rand(R, 0:4, 0:10, -10:10)
 end
 

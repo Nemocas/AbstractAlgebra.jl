@@ -10,11 +10,11 @@
 #
 ###############################################################################
 
-base_ring(S::UnivPolyRing) = S.base_ring
+base_ring(S::UniversalPolyRing) = S.base_ring
 
 base_ring(p::UnivPoly) = base_ring(parent(p))
 
-coefficient_ring(S::UnivPolyRing) = base_ring(S)
+coefficient_ring(S::UniversalPolyRing) = base_ring(S)
 
 coefficient_ring(p::UnivPoly) = base_ring(p)
 
@@ -28,19 +28,19 @@ end
 
 parent(p::UnivPoly) = p.parent
 
-elem_type(::Type{UnivPolyRing{T, U}}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}} =
+elem_type(::Type{UniversalPolyRing{T, U}}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}} =
    UnivPoly{T, U}
 
 parent_type(::Type{UnivPoly{T, U}}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}} =
-   UnivPolyRing{T, U}
+   UniversalPolyRing{T, U}
 
-function mpoly_ring(S::UnivPolyRing{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
+function mpoly_ring(S::UniversalPolyRing{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
    return S.mpoly_ring::parent_type(mpoly_type(T))
 end
 
-nvars(S::UnivPolyRing) = length(S.S)
+nvars(S::UniversalPolyRing) = length(S.S)
 
-symbols(S::UnivPolyRing) = S.S
+symbols(S::UniversalPolyRing) = S.S
 
 function vars(p::UnivPoly{T, U}) where {T, U}
    S = parent(p)
@@ -48,7 +48,7 @@ function vars(p::UnivPoly{T, U}) where {T, U}
    return [UnivPoly{T, U}(v, S) for v in V]
 end
 
-ordering(p::UnivPolyRing) = ordering(mpoly_ring(p))
+ordering(p::UniversalPolyRing) = ordering(mpoly_ring(p))
 
 function check_parent(a::UnivPoly{T, U}, b::UnivPoly{T, U}, throw::Bool = true) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
    flag = parent(a) != parent(b)
@@ -126,9 +126,9 @@ end
 #
 ###############################################################################
 
-zero(R::UnivPolyRing{T, U}) where {T, U} = UnivPoly{T, U}(zero(mpoly_ring(R)), R)
+zero(R::UniversalPolyRing{T, U}) where {T, U} = UnivPoly{T, U}(zero(mpoly_ring(R)), R)
 
-one(R::UnivPolyRing{T, U}) where {T, U} = UnivPoly{T, U}(one(mpoly_ring(R)), R)
+one(R::UniversalPolyRing{T, U}) where {T, U} = UnivPoly{T, U}(one(mpoly_ring(R)), R)
 
 iszero(p::UnivPoly) = iszero(p.p)
 
@@ -250,7 +250,7 @@ total_degree(p::UnivPoly) = total_degree(p.p)
 
 length(p::UnivPoly) = length(p.p)
 
-function gen(S::UnivPolyRing{T, U}, s::Symbol) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
+function gen(S::UniversalPolyRing{T, U}, s::Symbol) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
    i = findfirst(x->x==s, S.S)
    if typeof(i) == Nothing
       push!(S.S, s)
@@ -260,18 +260,18 @@ function gen(S::UnivPolyRing{T, U}, s::Symbol) where {T <: RingElement, U <: Abs
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
 end
 
-gen(S::UnivPolyRing, s::Union{Char, String}) = gen(S, Symbol(s))
+gen(S::UniversalPolyRing, s::Union{Char, String}) = gen(S, Symbol(s))
 
-gens(S::UnivPolyRing, v::Vector{Symbol}) = tuple([gen(S, s) for s in v]...)
+gens(S::UniversalPolyRing, v::Vector{Symbol}) = tuple([gen(S, s) for s in v]...)
 
-gens(S::UnivPolyRing, v::Vector{T}) where T <: Union{Char, String} = gens(S, [Symbol(s) for s in v])
+gens(S::UniversalPolyRing, v::Vector{T}) where T <: Union{Char, String} = gens(S, [Symbol(s) for s in v])
 
-function gen(S::UnivPolyRing{T, U}, i::Int) where {T, U}
+function gen(S::UniversalPolyRing{T, U}, i::Int) where {T, U}
    i > nvars(S) && error("Variable index out of range")
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
 end
 
-function gens(S::UnivPolyRing{T, U}) where {T, U}
+function gens(S::UniversalPolyRing{T, U}) where {T, U}
    n = nvars(S)
    return UnivPoly{T, U}[gen(S, i) for i in 1:n]
 end
@@ -286,7 +286,7 @@ end
 
 canonical_unit(p::UnivPoly) = canonical_unit(p.p)
 
-characteristic(R::UnivPolyRing) = characteristic(base_ring(R))
+characteristic(R::UniversalPolyRing) = characteristic(base_ring(R))
 
 function Base.hash(p::UnivPoly, h::UInt)
    b = 0xcf418d4529109236%UInt
@@ -341,7 +341,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, R::UnivPolyRing)
+function show(io::IO, R::UniversalPolyRing)
    print(io, "Universal Polynomial Ring over ")
    show(io, base_ring(R))
 end
@@ -476,19 +476,19 @@ function Base.length(x::Union{UnivPolyCoeffs, UnivPolyExponentVectors, UnivPolyT
    return length(x.poly)
 end
 
-function Base.eltype(x::UnivPolyCoeffs{T}) where T <: AbstractAlgebra.UnivPolyRingElem{S} where S <: RingElement
+function Base.eltype(x::UnivPolyCoeffs{T}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
    return S
 end
 
-function Base.eltype(x::UnivPolyExponentVectors{T}) where T <: AbstractAlgebra.UnivPolyRingElem{S} where S <: RingElement
+function Base.eltype(x::UnivPolyExponentVectors{T}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
    return Vector{Int}
 end
 
-function Base.eltype(x::UnivPolyMonomials{T}) where T <: AbstractAlgebra.UnivPolyRingElem{S} where S <: RingElement
+function Base.eltype(x::UnivPolyMonomials{T}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
    return T
 end
 
-function Base.eltype(x::UnivPolyTerms{T}) where T <: AbstractAlgebra.UnivPolyRingElem{S} where S <: RingElement
+function Base.eltype(x::UnivPolyTerms{T}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
    return T
 end
 
@@ -895,7 +895,7 @@ end
 
 is_univariate(p::UnivPoly) = is_univariate(p.p)
 
-is_univariate(R::UnivPolyRing) = is_univariate(mpoly_ring(R))
+is_univariate(R::UniversalPolyRing) = is_univariate(mpoly_ring(R))
 
 function coefficients_of_univariate(p::UnivPoly, check_univariate::Bool=true)
    return coefficients_of_univariate(p.p, check_univariate)
@@ -915,12 +915,12 @@ function _change_univ_poly_ring(R, Rx, cached)
    return S
 end
 
-function change_base_ring(R::Ring, p::UnivPoly{T, U}; cached = true, parent::UnivPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement, U}
+function change_base_ring(R::Ring, p::UnivPoly{T, U}; cached = true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement, U}
    base_ring(parent) != R && error("Base rings do not match.")
    return _map(R, p, parent)
 end
 
-function change_coefficient_ring(R::Ring, p::UnivPoly{T, U}; cached = true, parent::UnivPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement, U}
+function change_coefficient_ring(R::Ring, p::UnivPoly{T, U}; cached = true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement, U}
   return change_base_ring(R, p, cached = cached, parent = parent)
 end
 
@@ -930,7 +930,7 @@ end
 #
 ################################################################################
 
-function map_coefficients(f, p::UnivPoly; cached = true, parent::UnivPolyRing = _change_univ_poly_ring(parent(f(zero(base_ring(p)))), parent(p), cached))
+function map_coefficients(f, p::UnivPoly; cached = true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(base_ring(p)))), parent(p), cached))
    return _map(f, p, parent)
 end
 
@@ -966,9 +966,9 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(S::AbstractAlgebra.UnivPolyRing, _, _, _) = elem_type(S)
+RandomExtensions.maketype(S::AbstractAlgebra.UniversalPolyRing, _, _, _) = elem_type(S)
 
-function RandomExtensions.make(S::AbstractAlgebra.UnivPolyRing, term_range::UnitRange{Int},
+function RandomExtensions.make(S::AbstractAlgebra.UniversalPolyRing, term_range::UnitRange{Int},
                                exp_bound::UnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
@@ -979,7 +979,7 @@ function RandomExtensions.make(S::AbstractAlgebra.UnivPolyRing, term_range::Unit
 end
 
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
-                 <:RingElement,<:AbstractAlgebra.UnivPolyRing,UnitRange{Int},UnitRange{Int}}})
+                 <:RingElement,<:AbstractAlgebra.UniversalPolyRing,UnitRange{Int},UnitRange{Int}}})
    S, term_range, exp_bound, v = sp[][1:end]
    f = S()
    g = gens(S)
@@ -995,12 +995,12 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
    return f
 end
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.UnivPolyRing,
+function rand(rng::AbstractRNG, S::AbstractAlgebra.UniversalPolyRing,
               term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
    rand(rng, make(S, term_range, exp_bound, v...))
 end
 
-function rand(S::AbstractAlgebra.UnivPolyRing, term_range, exp_bound, v...)
+function rand(S::AbstractAlgebra.UniversalPolyRing, term_range, exp_bound, v...)
    rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
 end
 
@@ -1057,7 +1057,7 @@ end
 #
 ###############################################################################
 
-function upgrade(S::UnivPolyRing{T, U}, pp::MPoly{T}) where {T, U}
+function upgrade(S::UniversalPolyRing{T, U}, pp::MPoly{T}) where {T, U}
    alloc = length(pp.coeffs)
    n = nvars(S) - nvars(parent(pp))
    ctx = MPolyBuildCtx(mpoly_ring(S))
@@ -1070,7 +1070,7 @@ function upgrade(S::UnivPolyRing{T, U}, pp::MPoly{T}) where {T, U}
    return p
 end
 
-function upgrade(S::UnivPolyRing{T, U}, pp::MPolyRingElem{T}) where {T, U}
+function upgrade(S::UniversalPolyRing{T, U}, pp::MPolyRingElem{T}) where {T, U}
    n = nvars(S) - nvars(parent(pp))
    ctx = MPolyBuildCtx(mpoly_ring(S))
    v0 = zeros(Int, n)
@@ -1080,23 +1080,23 @@ function upgrade(S::UnivPolyRing{T, U}, pp::MPolyRingElem{T}) where {T, U}
    return finish(ctx)
 end
 
-function (a::UnivPolyRing{T, U})(b::RingElement) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
+function (a::UniversalPolyRing{T, U})(b::RingElement) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
    return a(base_ring(a)(b))
 end
 
-function (a::UnivPolyRing{T, U})() where {T <: RingElement, U}
+function (a::UniversalPolyRing{T, U})() where {T <: RingElement, U}
    return UnivPoly{T, U}(mpoly_ring(a)(), a)
 end
 
-function (a::UnivPolyRing{T, U})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
+function (a::UniversalPolyRing{T, U})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
    return UnivPoly{T, U}(mpoly_ring(a)(b), a)
 end
 
-function (a::UnivPolyRing{T, U})(b::T) where {T <: RingElem, U <: AbstractAlgebra.MPolyRingElem{T}}
+function (a::UniversalPolyRing{T, U})(b::T) where {T <: RingElem, U <: AbstractAlgebra.MPolyRingElem{T}}
    return UnivPoly{T, U}(mpoly_ring(a)(b), a)
 end
 
-function (S::UnivPolyRing{T, U})(p::UnivPoly{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
+function (S::UniversalPolyRing{T, U})(p::UnivPoly{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
    parent(p) !== S && error("Unable to coerce")
    n = nvars(S) - nvars(parent(p.p))
    if n != 0
@@ -1105,7 +1105,7 @@ function (S::UnivPolyRing{T, U})(p::UnivPoly{T, U}) where {T <: RingElement, U <
    return p
 end
 
-function (a::UnivPolyRing{T, U})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
+function (a::UniversalPolyRing{T, U})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
    if length(m) != 0
       len = length(m[1])
       num = nvars(mpoly_ring(a))
@@ -1128,6 +1128,6 @@ function UniversalPolynomialRing(R::Ring; ordering=:lex, cached=true)
    T = elem_type(R)
    U = mpoly_type(T)
 
-   return UnivPolyRing{T, U}(R, ordering, cached)
+   return UniversalPolyRing{T, U}(R, ordering, cached)
 end
 

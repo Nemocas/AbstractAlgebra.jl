@@ -63,6 +63,6 @@
 @alias PolyElem PolyRingElem
 @alias NCPolyElem NCPolyRingElem
 @alias MPolyElem MPolyRingElem
-@alias UnivPolyElem UnivPolyRingElem
+@alias UnivPolyElem UniversalPolyRingElem
 @alias LaurentPolyElem LaurentPolyRingElem
 @alias LaurentMPolyElem LaurentMPolyRingElem
