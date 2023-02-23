@@ -33,8 +33,8 @@ characteristic(R::FreeAssAlgebra)
 ## Free algebra constructors
 
 ```julia
-FreeAssociativeAlgebra(R::Ring, s::Union{AbstractVector{<:AbstractString}, AbstractVector{Symbol}, AbstractVector{Char}}; cached::Bool = true)
-FreeAssociativeAlgebra(R::Ring, n::Int, s::Union{String, Char, Symbol}; cached::Bool = false)
+free_associative_algebra(R::Ring, s::Union{AbstractVector{<:AbstractString}, AbstractVector{Symbol}, AbstractVector{Char}}; cached::Bool = true)
+free_associative_algebra(R::Ring, n::Int, s::Union{String, Char, Symbol}; cached::Bool = false)
 ```
 
 The first constructor, given a base ring `R` and an array `s` of variables,
@@ -52,7 +52,7 @@ the parent object `S` from being cached.
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = FreeAssociativeAlgebra(ZZ, ["x", "y"])
+julia> R, (x, y) = free_associative_algebra(ZZ, ["x", "y"])
 (Free associative algebra over Integers on x, y, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y])
 
 julia> (x + y + 1)^2
@@ -73,7 +73,7 @@ with coefficients and monomial words and not exponent vectors.
 **Examples**
 
 ```jldoctest
-julia> R, (x, y, z) = FreeAssociativeAlgebra(ZZ, ["x", "y", "z"])
+julia> R, (x, y, z) = free_associative_algebra(ZZ, ["x", "y", "z"])
 (Free associative algebra over Integers on x, y, z, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y, z])
 
 julia> B = MPolyBuildCtx(R)
@@ -141,7 +141,7 @@ exponent_word(a::Generic.FreeAssAlgElem{T}, i::Int) where T <: RingElement
 **Examples**
 
 ```jldoctest
-julia> R, (x, y, z) = FreeAssociativeAlgebra(ZZ, ["x", "y", "z"])
+julia> R, (x, y, z) = free_associative_algebra(ZZ, ["x", "y", "z"])
 (Free associative algebra over Integers on x, y, z, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y, z])
 
 julia> map(total_degree, (R(0), R(1), -x^2*y^2*z^2*x + z*y))
@@ -186,7 +186,7 @@ exponent_words(a::FreeAssAlgElem{T}) where T <: RingElement
 **Examples**
 
 ```jldoctest
-julia> R, (a, b, c) = FreeAssociativeAlgebra(ZZ, ["a", "b", "c"])
+julia> R, (a, b, c) = free_associative_algebra(ZZ, ["a", "b", "c"])
 (Free associative algebra over Integers on a, b, c, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[a, b, c])
 
 julia> collect(terms(3*b*a*c - b + c + 2))

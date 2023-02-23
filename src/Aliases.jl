@@ -68,3 +68,5 @@
 @alias AbsSeriesElem AbsPowerSeriesRingElem
 @alias RelSeriesRing RelPowerSeriesRing
 @alias RelSeriesElem RelPowerSeriesRingElem
+
+@alias FreeAssociativeAlgebra free_associative_algebra
