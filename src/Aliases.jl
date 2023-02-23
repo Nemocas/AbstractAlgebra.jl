@@ -39,8 +39,8 @@
 @alias Localization localization
 
 #
-# Some deprecation aliases follow. These use @alias instead of @deprecate
-# because there are still packages adding methods for these, which would break
+# Some deprecation aliases follow. They use @alias instead of @deprecate
+# because there are still packages adding methods for them, which would break
 # if we used @deprecate. Once those packages are updated, we can switch to
 # using @deprecate
 #
@@ -58,3 +58,11 @@
 @alias ResidueRing residue_ring
 @alias ResidueField residue_field
 @alias NumberField number_field
+
+
+@alias PolyElem PolyRingElem
+@alias NCPolyElem NCPolyRingElem
+@alias MPolyElem MPolyRingElem
+@alias UnivPolyElem UnivPolyRingElem
+@alias LaurentPolyElem LaurentPolyRingElem
+@alias LaurentMPolyElem LaurentMPolyRingElem

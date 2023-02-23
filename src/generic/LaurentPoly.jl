@@ -39,7 +39,7 @@ characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
 terms_degrees(p::LaurentPolyWrap) = p.mindeg .+ (0:degree(p.poly))
 
 """
-    trail_degree(p::LaurentPolyElem)
+    trail_degree(p::LaurentPolyRingElem)
 
 Return the degree of the term with lowest degree in `p`.
 The result is undefined when `p` is null.
@@ -50,7 +50,7 @@ function trail_degree(p::LaurentPolyWrap)
 end
 
 """
-    lead_degree(p::LaurentPolyElem)
+    lead_degree(p::LaurentPolyRingElem)
 
 Return the degree of the term with highest degree in `p`.
 The result is undefined when `p` is null.

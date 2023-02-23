@@ -40,10 +40,10 @@ AbstractAlgebra.jl provides two abstract types for multivariate polynomial rings
 their elements:
 
   * `MPolyRing{T}` is the abstract type for multivariate polynomial ring parent types
-  * `MPolyElem{T}` is the abstract type for multivariate polynomial types
+  * `MPolyRingElem{T}` is the abstract type for multivariate polynomial types
 
 We have that `MPolyRing{T} <: Ring` and
-`MPolyElem{T} <: RingElem`.
+`MPolyRingElem{T} <: RingElem`.
 
 Note that both abstract types are parameterised. The type `T` should usually be the type
 of elements of the coefficient ring of the polynomial ring. For example, in the case of

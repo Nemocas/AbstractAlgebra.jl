@@ -28,18 +28,18 @@ AbstractAlgebra provides two abstract types for polynomial rings and their eleme
 over a commutative ring:
 
   * `PolyRing{T}` is the abstract type for univariate polynomial ring parent types
-  * `PolyElem{T}` is the abstract type for univariate polynomial types
+  * `PolyRingElem{T}` is the abstract type for univariate polynomial types
 
 Similarly there are two abstract types for polynomial rings and their elements
 over a noncommutative ring:
 
   * `NCPolyRing{T}` is the abstract type for univariate polynomial ring parent types
-  * `NCPolyElem{T}` is the abstract type for univariate polynomial types
+  * `NCPolyRingElem{T}` is the abstract type for univariate polynomial types
 
 We have that `PolyRing{T} <: Ring` and
-`PolyElem{T} <: RingElem`. Similarly we have that
+`PolyRingElem{T} <: RingElem`. Similarly we have that
 `NCPolyRing{T} <: NCRing` and 
-`NCPolyElem{T} <: NCRingElem`.
+`NCPolyRingElem{T} <: NCRingElem`.
 
 Note that the abstract types are parameterised. The type `T` should usually be the type
 of elements of the coefficient ring of the polynomial ring. For example, in the case of
@@ -49,7 +49,7 @@ If the parent object for such a ring has type `MyZX` and polynomials in that rin
 type `MyZXPoly` then one would have:
 
   * `MyZX <: PolyRing{BigInt}`
-  * `MyZXPoly <: PolyElem{BigInt}`
+  * `MyZXPoly <: PolyRingElem{BigInt}`
 
 Polynomial rings should be made unique on the system by caching parent objects (unless
 an optional `cache` parameter is set to `false`). Polynomial rings should at least be

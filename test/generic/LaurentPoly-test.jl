@@ -1,4 +1,4 @@
-using AbstractAlgebra: terms_degrees, LaurentPolyElem
+using AbstractAlgebra: terms_degrees, LaurentPolyRingElem
 
 using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
                                trail_degree, lead_degree

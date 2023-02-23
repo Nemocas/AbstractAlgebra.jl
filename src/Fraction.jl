@@ -611,7 +611,7 @@ function evaluate(f::FracElem{T}, v::U) where {T <: RingElement, U <: RingElemen
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::FracElem{T}, v::U) where {T <: PolyElem, U <: Integer}
+function evaluate(f::FracElem{T}, v::U) where {T <: PolyRingElem, U <: Integer}
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
  
@@ -636,18 +636,18 @@ end
 ##############################################################################
 
 # Return the derivative with respect to `x`.
-function derivative(f::FracElem{T}, x::T) where {T <: MPolyElem}
+function derivative(f::FracElem{T}, x::T) where {T <: MPolyRingElem}
     return derivative(f, var_index(x))
 end
   
 # Return the derivative with respect to the `i`-th variable.
-function derivative(f::FracElem{T}, i::Int) where {T <: MPolyElem}
+function derivative(f::FracElem{T}, i::Int) where {T <: MPolyRingElem}
     n = numerator(f)
     d = denominator(f)
     return (derivative(n, i)*d - n*derivative(d, i))//d^2
 end
 
-function derivative(f::FracElem{T}) where {T <: PolyElem}
+function derivative(f::FracElem{T}) where {T <: PolyRingElem}
     n = numerator(f)
     d = denominator(f)
     return (derivative(n)*d - n*derivative(d))//d^2

@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-function  gen(R::ResField{PolyElem{Rational{BigInt}}})
+function  gen(R::ResField{PolyRingElem{Rational{BigInt}}})
    return R(gen(base_ring(R)))
 end
 

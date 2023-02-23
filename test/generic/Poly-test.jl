@@ -46,7 +46,7 @@ end
       @test typeof(R) <: AbstractAlgebra.Ring
       @test typeof(S) <: Generic.PolyRing
 
-      @test isa(y, PolyElem)
+      @test isa(y, PolyRingElem)
    end
 
    R, x = polynomial_ring(ZZ, "x")
@@ -54,45 +54,45 @@ end
 
    @test typeof(S) <: Generic.PolyRing
 
-   @test isa(y, PolyElem)
+   @test isa(y, PolyRingElem)
 
    T, z = polynomial_ring(S, "z")
 
    @test typeof(T) <: Generic.PolyRing
 
-   @test isa(z, PolyElem)
+   @test isa(z, PolyRingElem)
 
    f = x^2 + y^3 + z + 1
 
-   @test isa(f, PolyElem)
+   @test isa(f, PolyRingElem)
 
    g = S(2)
 
-   @test isa(g, PolyElem)
+   @test isa(g, PolyRingElem)
 
    h = S(x^2 + 2x + 1)
 
-   @test isa(h, PolyElem)
+   @test isa(h, PolyRingElem)
 
    j = T(x + 2)
 
-   @test isa(j, PolyElem)
+   @test isa(j, PolyRingElem)
 
    k = S([x, x + 2, x^2 + 3x + 1])
 
-   @test isa(k, PolyElem)
+   @test isa(k, PolyRingElem)
 
    l = S(k)
 
-   @test isa(l, PolyElem)
+   @test isa(l, PolyRingElem)
 
    m = S([1, 2, 3])
 
-   @test isa(m, PolyElem)
+   @test isa(m, PolyRingElem)
 
    n = S([ZZ(1), ZZ(2), ZZ(3)])
 
-   @test isa(n, PolyElem)
+   @test isa(n, PolyRingElem)
 
    @test x in [x, y]
    @test x in [y, x]
@@ -176,9 +176,9 @@ end
       h = similar(f, "y")
       k = similar(f)
 
-      @test isa(g, PolyElem)
-      @test isa(h, PolyElem)
-      @test isa(k, PolyElem)
+      @test isa(g, PolyRingElem)
+      @test isa(h, PolyRingElem)
+      @test isa(k, PolyRingElem)
 
       @test base_ring(g) === QQ
 
@@ -208,7 +208,7 @@ end
 @testset "Generic.Poly.polynomial" begin
    f = polynomial(ZZ, [1, 2, 3], "y")
 
-   @test isa(f, PolyElem)
+   @test isa(f, PolyRingElem)
    @test base_ring(f) === ZZ
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
@@ -216,7 +216,7 @@ end
 
    g = polynomial(ZZ, [1, 2, 3])
 
-   @test isa(g, PolyElem)
+   @test isa(g, PolyRingElem)
    @test base_ring(g) === ZZ
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
@@ -232,8 +232,8 @@ end
    p = polynomial(ZZ, BigInt[])
    q = polynomial(ZZ, [])
 
-   @test isa(p, PolyElem)
-   @test isa(q, PolyElem)
+   @test isa(p, PolyRingElem)
+   @test isa(q, PolyRingElem)
 
    @test length(p) == 0
    @test length(q) == 0
@@ -248,9 +248,9 @@ end
    h = zero(f, "y")
    k = zero(f)
 
-   @test isa(g, PolyElem)
-   @test isa(h, PolyElem)
-   @test isa(k, PolyElem)
+   @test isa(g, PolyRingElem)
+   @test isa(h, PolyRingElem)
+   @test isa(k, PolyRingElem)
 
    @test length(g) == 0
    @test length(h) == 0
@@ -2987,7 +2987,7 @@ end
       V = polynomial_to_power_sums(f)
 
       @test power_sums_to_polynomial(V, R) == f
-      @test isa(power_sums_to_polynomial(V), PolyElem)
+      @test isa(power_sums_to_polynomial(V), PolyRingElem)
 
       num = rand(0:2*degree(f))
       W = polynomial_to_power_sums(f, num)
@@ -3007,7 +3007,7 @@ end
       V = polynomial_to_power_sums(f)
 
       @test power_sums_to_polynomial(V, R) == f
-      @test isa(power_sums_to_polynomial(V), PolyElem)
+      @test isa(power_sums_to_polynomial(V), PolyRingElem)
 
       num = rand(0:2*degree(f))
       W = polynomial_to_power_sums(f, num)

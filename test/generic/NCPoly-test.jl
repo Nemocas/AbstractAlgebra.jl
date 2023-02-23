@@ -15,7 +15,7 @@
 
       @test typeof(S) <: Generic.NCPolyRing
 
-      @test isa(y, NCPolyElem)
+      @test isa(y, NCPolyRingElem)
    end
 
    S3, _ = R["x"]["y"]
@@ -27,39 +27,39 @@
 
    @test typeof(T) <: Generic.NCPolyRing
 
-   @test isa(z, NCPolyElem)
+   @test isa(z, NCPolyRingElem)
 
    f = one(R) + y^3 + z + 1
 
-   @test isa(f, NCPolyElem)
+   @test isa(f, NCPolyRingElem)
 
    g = S(2)
 
-   @test isa(g, NCPolyElem)
+   @test isa(g, NCPolyRingElem)
 
    h = S(rand(R, -10:10))
 
-   @test isa(h, NCPolyElem)
+   @test isa(h, NCPolyRingElem)
 
    j = T(rand(R, -10:10))
 
-   @test isa(j, NCPolyElem)
+   @test isa(j, NCPolyRingElem)
 
    k = S([rand(R, -10:10) for i in 1:3])
 
-   @test isa(k, NCPolyElem)
+   @test isa(k, NCPolyRingElem)
 
    l = S(k)
 
-   @test isa(l, NCPolyElem)
+   @test isa(l, NCPolyRingElem)
 
    m = S([1, 2, 3])
 
-   @test isa(m, NCPolyElem)
+   @test isa(m, NCPolyRingElem)
 
    n = S([ZZ(1), ZZ(2), ZZ(3)])
 
-   @test isa(n, NCPolyElem)
+   @test isa(n, NCPolyRingElem)
 end
 
 @testset "Generic.NCPoly.manipulation" begin

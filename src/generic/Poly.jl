@@ -276,7 +276,7 @@ end
 #
 ###############################################################################
 
-function Base.iterate(a::Generic.MPolyExponentVectors{T}, st::Int = -1) where T <: AbstractAlgebra.PolyElem
+function Base.iterate(a::Generic.MPolyExponentVectors{T}, st::Int = -1) where T <: AbstractAlgebra.PolyRingElem
    st += 1
    if st > degree(a.poly)
        return nothing
@@ -366,7 +366,7 @@ function (a::PolyRing{T})(b::T) where T <: RingElement
    return z
 end
 
-function (a::PolyRing{T})(b::AbstractAlgebra.PolyElem{T}) where T <: RingElement
+function (a::PolyRing{T})(b::AbstractAlgebra.PolyRingElem{T}) where T <: RingElement
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end

@@ -1281,10 +1281,10 @@ is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
 ```
 
 ```@docs
-weak_popov{T <: PolyElem}(::MatElem{T})
-weak_popov_with_transform{T <: PolyElem}(::MatElem{T})
-popov{T <: PolyElem}(::MatElem{T})
-popov_with_transform{T <: PolyElem}(::MatElem{T})
+weak_popov{T <: PolyRingElem}(::MatElem{T})
+weak_popov_with_transform{T <: PolyRingElem}(::MatElem{T})
+popov{T <: PolyRingElem}(::MatElem{T})
+popov_with_transform{T <: PolyRingElem}(::MatElem{T})
 ```
 
 **Examples**

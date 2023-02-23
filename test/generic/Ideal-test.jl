@@ -26,7 +26,7 @@ function mix_ideal(I::Generic.Ideal{T}) where T <: RingElement
    return Generic.Ideal(R, G)   
 end
 
-function spoly(f::T, g::T) where T <: MPolyElem
+function spoly(f::T, g::T) where T <: MPolyRingElem
    fc = leading_coefficient(f)
    gc = leading_coefficient(g)
    mf = exponent_vector(f, 1)
@@ -39,7 +39,7 @@ function spoly(f::T, g::T) where T <: MPolyElem
    s = divexact(c, fc)*inflate(f, shiftf, infl) - divexact(c, gc)*inflate(g, shiftg, infl)
 end
 
-function gpoly(f::T, g::T) where T <: MPolyElem
+function gpoly(f::T, g::T) where T <: MPolyRingElem
    fc = leading_coefficient(f)
    gc = leading_coefficient(g)
    mf = exponent_vector(f, 1)

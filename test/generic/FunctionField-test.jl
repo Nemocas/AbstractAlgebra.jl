@@ -130,13 +130,13 @@ end
 
       @test defining_polynomial(S) == modulus(S)
 
-      @test isa(numerator(S), PolyElem)
-      @test isa(denominator(S), PolyElem)
+      @test isa(numerator(S), PolyRingElem)
+      @test isa(denominator(S), PolyRingElem)
 
       T = elem_type(base_ring(base_ring(S)))
 
-      @test isa(numerator(y), Generic.Poly{<:PolyElem{T}})
-      @test isa(denominator(y), PolyElem{T})
+      @test isa(numerator(y), Generic.Poly{<:PolyRingElem{T}})
+      @test isa(denominator(y), PolyRingElem{T})
    end
 
    # characteristic 0

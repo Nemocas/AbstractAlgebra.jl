@@ -26,7 +26,7 @@ end
 # evaluation at x = alpha should use divrem. Don't use evaluate for this!!!
 
 # set t to the coefficients of q when expanded in powers of (x - alpha)
-function taylor_get_coeffs!(t::Vector{E}, q::E, xalpha::E) where E <: MPolyElem
+function taylor_get_coeffs!(t::Vector{E}, q::E, xalpha::E) where E <: MPolyRingElem
   R = parent(xalpha)
   empty!(t)
   while !iszero(q)
@@ -1348,7 +1348,7 @@ function mfactor_squarefree_char_zero(a::E) where E
 end
 
 # factor a multivariate over an exact field of characteristic 0
-function mfactor_char_zero(a::E) where E <: MPolyElem
+function mfactor_char_zero(a::E) where E <: MPolyRingElem
   tres = mfactor_squarefree_char_zero(a)
   # ensure factors are irreducible
   res = Fac{E}()

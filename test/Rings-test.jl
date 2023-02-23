@@ -1,14 +1,14 @@
 include("julia/Integers-test.jl")
 
 # artificially low cutoffs for testing purposes
-function AbstractAlgebra.hgcd_prefers_basecase(a::T, b::T) where T <: PolyElem
+function AbstractAlgebra.hgcd_prefers_basecase(a::T, b::T) where T <: PolyRingElem
    return degree(b) < 5
 end
 
 function AbstractAlgebra.mat22_mul_prefers_classical(
    a11::T, a12::T, a21::T, a22::T,
    b11::T, b12::T, b21::T, b22::T
-) where T <: PolyElem
+) where T <: PolyRingElem
 
    return degree(a11) + degree(a22) < 4 || degree(b11) + degree(b22) < 4
 end

@@ -140,7 +140,7 @@ The following functionality is provided for rational function fields.
 ### Greatest common divisor
 
 ```@docs
-gcd(::Generic.Rat{T, U}, ::Generic.Rat{T, U}) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
+gcd(::Generic.Rat{T, U}, ::Generic.Rat{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
 ```
 
 **Examples**
@@ -163,11 +163,11 @@ julia> h = gcd(f, g)
 ### Square root
 
 ```@docs
-is_square(::Generic.Rat{T, U}) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
+is_square(::Generic.Rat{T, U}) where {T <: FieldElem, U <: Union{PolyRingElem, MPolyRingElem}}
 ```
 
 ```@docs
-Base.sqrt(::Generic.Rat{T, U}) where {T <: FieldElem, U <: Union{PolyElem, MPolyElem}}
+Base.sqrt(::Generic.Rat{T, U}) where {T <: FieldElem, U <: Union{PolyRingElem, MPolyRingElem}}
 ```
 
 **Examples**
@@ -215,7 +215,7 @@ constructs the rational function field they are an extension of, then supplies
 a polynomial over this field to the following constructor:
 
 ```julia
-FunctionField(p::Poly{Rat{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: PolyElem{T}}
+FunctionField(p::Poly{Rat{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
 ```
 
 Given an irreducible polynomial `p` over a rational function field return a

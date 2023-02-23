@@ -198,7 +198,7 @@ function (a::NCPolyRing{T})(b::T) where T <: NCRingElem
    return z
 end
 
-function (a::NCPolyRing{T})(b::NCPolyElem{T}) where T <: NCRingElem
+function (a::NCPolyRing{T})(b::NCPolyRingElem{T}) where T <: NCRingElem
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end

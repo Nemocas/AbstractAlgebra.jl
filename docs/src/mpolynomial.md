@@ -31,7 +31,7 @@ base/coefficient ring $R$ and the ordering are stored in the parent object.
 
 ## Abstract types
 
-The polynomial element types belong to the abstract type `MPolyElem{T}`
+The polynomial element types belong to the abstract type `MPolyRingElem{T}`
 and the polynomial ring types belong to the abstract type `MPolyRing{T}`.
 
 !!! note
@@ -178,7 +178,7 @@ julia> f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
 
 ```julia
 base_ring(R::MPolyRing)
-base_ring(a::MPolyElem)
+base_ring(a::MPolyRingElem)
 ```
 
 Return the coefficient ring of the given polynomial ring or polynomial,
@@ -186,7 +186,7 @@ respectively.
 
 
 ```julia
-parent(a::MPolyElem)
+parent(a::MPolyRingElem)
 ```
 
 Return the polynomial ring of the given polynomial.
@@ -207,12 +207,12 @@ All the standard ring functions are available, including the following.
 ```julia
 zero(R::MPolyRing)
 one(R::MPolyRing)
-iszero(a::MPolyElem)
-isone(a::MPolyElem)
+iszero(a::MPolyRingElem)
+isone(a::MPolyRingElem)
 ```
 
 ```
-divexact(a::T, b::T) where T <: MPolyElem
+divexact(a::T, b::T) where T <: MPolyRingElem
 ```
 
 All basic functions from the Multivariate Polynomial interface are provided.
@@ -232,17 +232,17 @@ Note that the currently supported orderings are `:lex`, `:deglex` and
 `:degrevlex`.
 
 ```julia
-length(f::MPolyElem)
-degrees(f::MPolyElem)
-total_degree(f::MPolyElem)
+length(f::MPolyRingElem)
+degrees(f::MPolyRingElem)
+total_degree(f::MPolyRingElem)
 ```
 
 ```julia
-is_gen(x::MPolyElem)
+is_gen(x::MPolyRingElem)
 ```
 
 ```julia
-divexact(f::T, g::T) where T <: MPolyElem
+divexact(f::T, g::T) where T <: MPolyRingElem
 ```
 
 For multivariate polynomial types that allow constant time access to
@@ -251,51 +251,51 @@ coefficient, monomial or term. Terms are numbered from the most significant
 first.
 
 ```julia
-coeff(f::MPolyElem, n::Int)
-coeff(a::MPolyElem, exps::Vector{Int})
+coeff(f::MPolyRingElem, n::Int)
+coeff(a::MPolyRingElem, exps::Vector{Int})
 ```
 
 Access a coefficient by term number or exponent vector.
 
 ```julia
-monomial(f::MPolyElem, n::Int)
-monomial!(m::T, f::T, n::Int) where T <: MPolyElem
+monomial(f::MPolyRingElem, n::Int)
+monomial!(m::T, f::T, n::Int) where T <: MPolyRingElem
 ```
 
 The second version writes the result into a preexisting polynomial
 object to save an allocation.
 
 ```julia
-term(f::MPolyElem, n::Int)
+term(f::MPolyRingElem, n::Int)
 ```
 
 ```julia
-exponent(f::MyMPolyElem, i::Int, j::Int)
+exponent(f::MyMPolyRingElem, i::Int, j::Int)
 ```
 
 Return the exponent of the $j$-th variable in the $i$-th term of the polynomial
 $f$.
 
 ```julia
-exponent_vector(a::MPolyElem, i::Int)
+exponent_vector(a::MPolyRingElem, i::Int)
 ```
 
 ```julia
-setcoeff!(a::MPolyElem{T}, exps::Vector{Int}, c::T) where T <: RingElement
+setcoeff!(a::MPolyRingElem{T}, exps::Vector{Int}, c::T) where T <: RingElement
 ```
 
 Although multivariate polynomial rings are not usually Euclidean, the following
 functions from the Euclidean interface are often provided.
 
 ```julia
-divides(f::T, g::T) where T <: MPolyElem
-remove(f::T, g::T) where T <: MPolyElem
-valuation(f::T, g::T) where T <: MPolyElem
+divides(f::T, g::T) where T <: MPolyRingElem
+remove(f::T, g::T) where T <: MPolyRingElem
+valuation(f::T, g::T) where T <: MPolyRingElem
 ```
 
 ```julia
-divrem(f::T, g::T) where T <: MPolyElem
-div(f::T, g::T) where T <: MPolyElem
+divrem(f::T, g::T) where T <: MPolyRingElem
+div(f::T, g::T) where T <: MPolyRingElem
 ```
 
 Compute a tuple $(q, r)$ such that $f = qg + r$, where the coefficients of terms of
@@ -307,7 +307,7 @@ returns the quotient.
 Note that the result of these functions depend on the ordering of the polynomial ring.
 
 ```julia
-gcd(f::T, g::T) where T <: MPolyElem
+gcd(f::T, g::T) where T <: MPolyRingElem
 ```
 
 The following functionality is also provided for all multivariate polynomials.
@@ -317,43 +317,43 @@ is_univariate(::MPolyRing{T}) where T <: RingElement
 ```
 
 ```@docs
-vars(p::MPolyElem{T}) where T <: RingElement
+vars(p::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ```@docs
-var_index(::MPolyElem{T}) where T <: RingElement
+var_index(::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ```@docs
-degree(::MPolyElem{T}, ::Int) where T <: RingElement
+degree(::MPolyRingElem{T}, ::Int) where T <: RingElement
 ```
 
 ```@docs
-degree(::MPolyElem{T}, ::MPolyElem{T}) where T <: RingElement
+degree(::MPolyRingElem{T}, ::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ```@docs
-degrees(::MPolyElem{T}) where T <: RingElement
+degrees(::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ```@docs
-is_constant(::MPolyElem{T}) where T <: RingElement
+is_constant(::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ```@docs
-is_term(::MPolyElem{T}) where T <: RingElement
+is_term(::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ```@docs
-is_monomial(::MPolyElem{T}) where T <: RingElement
+is_monomial(::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ```@docs
-is_univariate(::MPolyElem{T}) where T <: RingElement
+is_univariate(::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ```@docs
-coeff(::MPolyElem{T}, ::MPolyElem{T}) where T <: RingElement
+coeff(::MPolyRingElem{T}, ::MPolyRingElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -498,8 +498,8 @@ Over rings for which an exact square root is available, it is possible to take
 the square root of a polynomial or test whether it is a square.
 
 ```julia
-sqrt(f::MPolyElem, check::bool=true)
-is_square(::MPolyElem)
+sqrt(f::MPolyRingElem, check::bool=true)
+is_square(::MPolyRingElem)
 ```
 
 **Examples**
@@ -571,9 +571,9 @@ using the following function, where $g$ is a function representing the
 structure homomorphism of the $T$-algebra $S$.
 
 ```@docs
-change_base_ring(::Ring, p::MPolyElem{T}) where {T <: RingElement}
-change_coefficient_ring(::Ring, p::MPolyElem{T}) where {T <: RingElement}
-map_coefficients(::Any, p::MPolyElem)
+change_base_ring(::Ring, p::MPolyRingElem{T}) where {T <: RingElement}
+change_coefficient_ring(::Ring, p::MPolyRingElem{T}) where {T <: RingElement}
+map_coefficients(::Any, p::MPolyRingElem)
 ```
 
 **Examples**
@@ -619,8 +619,8 @@ others may be required to appear to exponent zero), we can use the following
 function.
 
 ```@docs
-coeff(a::MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
-coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: MPolyElem
+coeff(a::MPolyRingElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
+coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: MPolyRingElem
 ```
 
 **Examples**
@@ -640,22 +640,22 @@ true
 ### Inflation/deflation
 
 ```@docs
-deflation(f::MPolyElem{T}) where T <: RingElement
+deflation(f::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ```@docs
-deflate(f::MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
-deflate(f::MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
-deflate(f::MPolyElem{T}) where T <: RingElement
-deflate(f::MPolyElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
-deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyElem
+deflate(f::MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+deflate(f::MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
+deflate(f::MPolyRingElem{T}) where T <: RingElement
+deflate(f::MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyRingElem
 ```
 
 ```@docs
-inflate(f::MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
-inflate(f::MPolyElem{T}, defl::Vector{Int}) where T <: RingElement
-inflate(f::MPolyElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
-inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyElem
+inflate(f::MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+inflate(f::MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
+inflate(f::MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyRingElem
 ```
 
 **Examples**
@@ -696,7 +696,7 @@ true
 ### Conversions
 
 ```@docs
-to_univariate(R::PolyRing{T}, p::MPolyElem{T}) where T <: RingElement
+to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -724,7 +724,7 @@ values belongs to, i.e. if all the values are in the coefficient ring, the
 result of the evaluation will be too.
 
 ```@docs
-evaluate(::MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
+evaluate(::MPolyRingElem{T}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
 ```
 
 The following functions allow evaluation of a polynomial at some of its
@@ -734,18 +734,18 @@ ring and all variables are given values, the result will be a constant
 polynomial, not a coefficient.
 
 ```@docs
-evaluate(::MPolyElem{T}, ::Vector{Int}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
+evaluate(::MPolyRingElem{T}, ::Vector{Int}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
 ```
 
 ```@docs
-evaluate(::S, ::Vector{S}, ::Vector{U}) where {S <: MPolyElem{T}, U <: RingElement} where T <: RingElement
+evaluate(::S, ::Vector{S}, ::Vector{U}) where {S <: MPolyRingElem{T}, U <: RingElement} where T <: RingElement
 ```
 
 The following function allows evaluation of a polynomial at values in a
 not necessarily commutative ring, e.g. elements of a matrix algebra.
 
 ```@docs
-evaluate(::MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+evaluate(::MPolyRingElem{T}, ::Vector{U}) where {T <: RingElement, U <: NCRingElem}
 ```
 
 **Examples**
@@ -816,12 +816,12 @@ The leading and trailing coefficient, constant coefficient, leading monomial
 and leading term of a polynomial p are returned by the following functions:
 
 ```@docs
-leading_coefficient(::MPolyElem{T}) where T <: RingElement
-trailing_coefficient(p::MPolyElem{T}) where T <: RingElement
-leading_monomial(::MPolyElem{T}) where T <: RingElement
-leading_term(::MPolyElem{T}) where T <: RingElement
-constant_coefficient(::MPolyElem{T}) where T <: RingElement
-tail(::MPolyElem{T}) where T <: RingElement
+leading_coefficient(::MPolyRingElem{T}) where T <: RingElement
+trailing_coefficient(p::MPolyRingElem{T}) where T <: RingElement
+leading_monomial(::MPolyRingElem{T}) where T <: RingElement
+leading_term(::MPolyRingElem{T}) where T <: RingElement
+constant_coefficient(::MPolyRingElem{T}) where T <: RingElement
+tail(::MPolyRingElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -855,7 +855,7 @@ However, if such a gcd is provided, the least common multiple of two
 polynomials a and b is returned by
 
 ```@docs
-lcm(a::MPolyElem{T}, b::MPolyElem{T}) where {T <: RingElement}
+lcm(a::MPolyRingElem{T}, b::MPolyRingElem{T}) where {T <: RingElement}
 ```
 
 **Examples**
@@ -886,7 +886,7 @@ true
 ### Derivations
 
 ```@docs
-derivative(::MPolyElem{T}, ::MPolyElem{T}) where T <: RingElement
+derivative(::MPolyRingElem{T}, ::MPolyRingElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -916,7 +916,7 @@ x + 1
 It is possible to test whether a polynomial is homogeneous with respect to the standard grading using the function
 
 ```@docs
-is_homogeneous(x::MPolyElem{T}) where T <: RingElement
+is_homogeneous(x::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ## Random generation

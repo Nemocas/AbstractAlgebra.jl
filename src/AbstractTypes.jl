@@ -112,17 +112,17 @@ abstract type SimpleNumField{T} <: NumField{T} end
 # that have some kind of base ring, and a generic
 # implementation is meaningful over that base ring
 
-abstract type PolyElem{T} <: RingElem end
+abstract type PolyRingElem{T} <: RingElem end
 
-abstract type NCPolyElem{T} <: NCRingElem end
+abstract type NCPolyRingElem{T} <: NCRingElem end
 
-abstract type MPolyElem{T} <: RingElem end
+abstract type MPolyRingElem{T} <: RingElem end
 
-abstract type UnivPolyElem{T} <: RingElem end
+abstract type UnivPolyRingElem{T} <: RingElem end
 
-abstract type LaurentPolyElem{T} <: RingElem end
+abstract type LaurentPolyRingElem{T} <: RingElem end
 
-abstract type LaurentMPolyElem{T} <: RingElem end
+abstract type LaurentMPolyRingElem{T} <: RingElem end
 
 abstract type ResElem{T} <: RingElem end
 

@@ -2212,7 +2212,7 @@ function det(M::MatrixElem{T}) where {T <: RingElement}
    end
 end
 
-function det_interpolation(M::MatrixElem{T}) where {T <: PolyElem}
+function det_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
    n = nrows(M)
    !is_domain_type(elem_type(typeof(base_ring(base_ring(M))))) &&
           error("Generic interpolation requires a domain type")
@@ -2248,7 +2248,7 @@ function det_interpolation(M::MatrixElem{T}) where {T <: PolyElem}
    return interpolate(R, x, d)
 end
 
-function det(M::MatrixElem{T}) where {S <: FinFieldElem, T <: PolyElem{S}}
+function det(M::MatrixElem{T}) where {S <: FinFieldElem, T <: PolyRingElem{S}}
    !is_square(M) && error("Not a square matrix in det")
    if nrows(M) == 0
       return one(base_ring(M))
@@ -2256,7 +2256,7 @@ function det(M::MatrixElem{T}) where {S <: FinFieldElem, T <: PolyElem{S}}
    return det_popov(M)
 end
 
-function det(M::MatrixElem{T}) where {T <: PolyElem}
+function det(M::MatrixElem{T}) where {T <: PolyRingElem}
    !is_square(M) && error("Not a square matrix in det")
    if nrows(M) == 0
       return one(base_ring(M))
@@ -2894,7 +2894,7 @@ function can_solve_with_solution_with_det(M::MatElem{T}, b::MatElem{T}) where {T
    return true, rank, p, pivots, x, d
 end
 
-function can_solve_with_solution_with_det(M::MatElem{T}, b::MatElem{T}) where {T <: PolyElem}
+function can_solve_with_solution_with_det(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
    flag, r, p, pivots, x, d = can_solve_with_solution_interpolation_inner(M, b)
    return flag, r, p, pivots, x, d
 end
@@ -2922,7 +2922,7 @@ function solve_ff(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    return S, d
 end
 
-function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T}) where {T <: PolyElem}
+function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
    m = nrows(M)
    h = ncols(b)
    c = ncols(M)
@@ -3074,7 +3074,7 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
    return true, rnk, prm, pivots, x, interpolate(R, y, d)
 end
 
-function can_solve_with_solution_interpolation(M::MatElem{T}, b::MatElem{T}) where {T <: PolyElem}
+function can_solve_with_solution_interpolation(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
    flag, r, p, pv, x, d = can_solve_with_solution_interpolation_inner(M, b)
    return flag, x, d
 end
@@ -3098,7 +3098,7 @@ function solve_ringelem(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    return solve_ff(M, b)
 end
 
-function solve_rational(M::MatElem{T}, b::MatElem{T}) where {T <: PolyElem}
+function solve_rational(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    nrows(M) != nrows(b) && error("Dimensions don't match in solve")
    flag = true
@@ -3441,7 +3441,7 @@ function can_solve_left_reduced_triu(r::MatElem{T},
    return true, x
 end
 
-function can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: FracElem{T} where T <: PolyElem
+function can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: FracElem{T} where T <: PolyRingElem
    if side == :left
       (f, x) = can_solve_with_solution(transpose(a), transpose(b); side=:right)
       return (f, transpose(x))
@@ -5355,11 +5355,11 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+    is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
 
 Return `true` if $P$ is a matrix in weak Popov form of the given rank.
 """
-function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
    zero_rows = 0
    pivots = zeros(ncols(P))
    for r = 1:nrows(P)
@@ -5381,11 +5381,11 @@ function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
 end
 
 @doc Markdown.doc"""
-    is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+    is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
 
 Return `true` if $P$ is a matrix in Popov form with the given rank.
 """
-function is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+function is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
    zero_rows = 0
    for r = 1:nrows(P)
       p = find_pivot_popov(P, r)
@@ -5438,25 +5438,25 @@ function is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
 end
 
 @doc Markdown.doc"""
-    weak_popov(A::MatElem{T}) where {T <: PolyElem}
+    weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return the weak Popov form of $A$.
 """
-function weak_popov(A::MatElem{T}) where {T <: PolyElem}
+function weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
    return _weak_popov(A, Val{false})
 end
 
 @doc Markdown.doc"""
-    weak_popov_with_transform(A::MatElem{T}) where {T <: PolyElem}
+    weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 
 Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
 is a transformation matrix so that $P = UA$.
 """
-function weak_popov_with_transform(A::MatElem{T}) where {T <: PolyElem}
+function weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
    return _weak_popov(A, Val{true})
 end
 
-function _weak_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyElem, S}
+function _weak_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
    P = deepcopy(A)
    m = nrows(P)
    W = similar(A, 0, 0)
@@ -5472,29 +5472,29 @@ function _weak_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <
 end
 
 @doc Markdown.doc"""
-    extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyElem}
+    extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
 
 Compute the weak Popov form $P$ of $A$ by applying simple row transformations
 on $A$ and a vector $W$ by applying the same transformations on the vector $V$.
 Return the tuple $(P, W)$.
 """
-function extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyElem}
+function extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
    return _extended_weak_popov(A, V, Val{false})
 end
 
 @doc Markdown.doc"""
-    extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyElem}
+    extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
 
 Compute the weak Popov form $P$ of $A$ by applying simple row transformations
 on $A$, a vector $W$ by applying the same transformations on the vector $V$,
 and a transformation matrix $U$ so that $P = UA$.
 Return the tuple $(P, W, U)$.
 """
-function extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyElem}
+function extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
    return _extended_weak_popov(A, V, Val{true})
 end
 
-function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyElem, S}
+function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
    @assert nrows(V) == nrows(A) && ncols(V) == 1
    P = deepcopy(A)
    W = deepcopy(V)
@@ -5510,7 +5510,7 @@ function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}} 
    end
 end
 
-function find_pivot_popov(P::MatElem{T}, r::Int, last_col::Int = 0) where {T <: PolyElem}
+function find_pivot_popov(P::MatElem{T}, r::Int, last_col::Int = 0) where {T <: PolyRingElem}
    last_col == 0 ? n = ncols(P) : n = last_col
    pivot = n
    for c = n-1:-1:1
@@ -5521,7 +5521,7 @@ function find_pivot_popov(P::MatElem{T}, r::Int, last_col::Int = 0) where {T <: 
    return pivot
 end
 
-function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) where {T <: PolyElem}
+function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
    last_row == 0 ? m = nrows(P) : m = last_row
    last_col == 0 ? n = ncols(P) : n = last_col
    pivots = Array{Vector{Int}}(undef, n)
@@ -5537,7 +5537,7 @@ function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) 
 end
 
 function weak_popov!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, extended::Bool = false,
-                                       with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyElem}
+                                       with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
    pivots = init_pivots_popov(P, last_row, last_col)
    weak_popov_with_pivots!(P, W, U, pivots, extended, with_trafo, last_row, last_col)
    return nothing
@@ -5548,7 +5548,7 @@ The weak Popov form is defined by T. Mulders and A. Storjohann in
 "On lattice reduction for polynomial matrices"
 =#
 function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}},
-                                                   extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyElem}
+                                                   extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
    last_row == 0 ? m = nrows(P) : m = last_row
    last_col == 0 ? n = ncols(P) : n = last_col
    @assert length(pivots) >= n
@@ -5602,12 +5602,12 @@ function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pi
 end
 
 @doc Markdown.doc"""
-    rank_profile_popov(A::MatElem{T}) where {T <: PolyElem}
+    rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return an array of $r$ row indices such that these rows of $A$ are linearly
 independent, where $r$ is the rank of $A$.
 """
-function rank_profile_popov(A::MatElem{T}) where {T <: PolyElem}
+function rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
    B = deepcopy(A)
    m = nrows(A)
    n = ncols(A)
@@ -5643,7 +5643,7 @@ function rank_profile_popov(A::MatElem{T}) where {T <: PolyElem}
    return rank_profile
 end
 
-function det_popov(A::MatElem{T}) where {T <: PolyElem}
+function det_popov(A::MatElem{T}) where {T <: PolyRingElem}
    nrows(A) != ncols(A) && error("Not a square matrix in det_popov.")
    B = deepcopy(A)
    n = ncols(B)
@@ -5708,25 +5708,25 @@ function det_popov(A::MatElem{T}) where {T <: PolyElem}
 end
 
 @doc Markdown.doc"""
-    popov(A::MatElem{T}) where {T <: PolyElem}
+    popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return the Popov form of $A$.
 """
-function popov(A::MatElem{T}) where {T <: PolyElem}
+function popov(A::MatElem{T}) where {T <: PolyRingElem}
    return _popov(A, Val{false})
 end
 
 @doc Markdown.doc"""
-    popov_with_transform(A::MatElem{T}) where {T <: PolyElem}
+    popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 
 Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
 is a transformation matrix so that $P = UA$.
 """
-function popov_with_transform(A::MatElem{T}) where {T <: PolyElem}
+function popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
    return _popov(A, Val{true})
 end
 
-function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyElem, S}
+function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
    P = deepcopy(A)
    m = nrows(P)
    if trafo == Val{true}
@@ -5740,7 +5740,7 @@ function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: Pol
    end
 end
 
-function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}}, with_trafo::Bool) where {T <: PolyElem}
+function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}}, with_trafo::Bool) where {T <: PolyRingElem}
    m = nrows(P)
    n = ncols(P)
    pivots2 = Vector{NTuple{3,Int}}(undef, m)
@@ -5776,7 +5776,7 @@ function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int
 end
 
 # Mulders, Storjohann: "On lattice reduction for polynomial matrices", Section 7
-function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T <: PolyElem}
+function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T <: PolyRingElem}
    m = nrows(P)
    n = ncols(P)
    W = similar(U, 0, 0)
@@ -5853,15 +5853,15 @@ function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T
    return nothing
 end
 
-function hnf_via_popov(A::MatElem{T}) where {T <: PolyElem}
+function hnf_via_popov(A::MatElem{T}) where {T <: PolyRingElem}
    return _hnf_via_popov(A, Val{false})
 end
 
-function hnf_via_popov_with_transform(A::MatElem{T}) where {T <: PolyElem}
+function hnf_via_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
    return _hnf_via_popov(A, Val{true})
 end
 
-function _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyElem, S}
+function _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
    H = deepcopy(A)
    m = nrows(H)
    if trafo == Val{true}
@@ -5875,7 +5875,7 @@ function _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {
    end
 end
 
-function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, r::Int, with_trafo::Bool) where {T <: PolyElem}
+function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, r::Int, with_trafo::Bool) where {T <: PolyRingElem}
    n = ncols(H)
    t = base_ring(H)()
    for c = 1:n
@@ -5898,7 +5898,7 @@ function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite:
    return nothing
 end
 
-function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, c::Int, with_trafo::Bool) where {T <: PolyElem}
+function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, c::Int, with_trafo::Bool) where {T <: PolyRingElem}
    m = nrows(H)
    n = ncols(H)
    t = base_ring(H)()
@@ -5925,7 +5925,7 @@ function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermi
    return nothing
 end
 
-function hnf_via_popov!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T <: PolyElem}
+function hnf_via_popov!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T <: PolyRingElem}
    m = nrows(H)
    n = ncols(H)
    R = base_ring(H)

@@ -292,7 +292,7 @@ end
 #
 ###############################################################################
 
-function truncate_poly(a::MPolyElem, prec::Vector{Int}, weighted_prec::Int=-1)
+function truncate_poly(a::MPolyRingElem, prec::Vector{Int}, weighted_prec::Int=-1)
     R = parent(a)
     ctx = MPolyBuildCtx(R)
     for (c, v) in zip(coefficients(a), exponent_vectors(a))
@@ -669,7 +669,7 @@ end
 ###############################################################################
 
 function (R::AbsMSeriesRing{T, S})(x::S, prec::Vector{Int}) where
-                          {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
+                          {T <: RingElement, S <: AbstractAlgebra.MPolyRingElem{T}}
     for v in prec
         v < 0 && error("Precision must be non-negative")
     end

@@ -127,8 +127,8 @@ export SetElem, GroupElem, AdditiveGroupElem, NCRingElem, RingElem, ModuleElem, 
 
 export SetMap, FunctionalMap, IdentityMap
 
-export NCPolyElem, PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
-       MatElem, MatAlgElem, FinFieldElem, MPolyElem, UnivPolyElem, NumFieldElem, Ideal,
+export NCPolyRingElem, PolyRingElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
+       MatElem, MatAlgElem, FinFieldElem, MPolyRingElem, UnivPolyRingElem, NumFieldElem, Ideal,
        SimpleNumFieldElem, FreeAssAlgElem
 
 export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
@@ -348,7 +348,7 @@ end
 
 include("AbstractTypes.jl")
 
-const PolynomialElem{T} = Union{PolyElem{T}, NCPolyElem{T}}
+const PolynomialElem{T} = Union{PolyRingElem{T}, NCPolyRingElem{T}}
 const MatrixElem{T} = Union{MatElem{T}, MatAlgElem{T}}
 
 ###############################################################################
@@ -592,15 +592,15 @@ function number_field(a::Generic.Poly{Rational{BigInt}}, s::Symbol, t = "\$"; ca
    return Generic.number_field(a, s, t; cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
+function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    return Generic.FunctionField(p, s; cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
+function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Char; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyElem, MPolyElem}}
+function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Char; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
@@ -632,7 +632,7 @@ getindex(R::NCRing, s::Union{String, Char, Symbol}, ss::Union{String, Char}...) 
    polynomial_ring(R, [s, ss...])
 
 # syntax x = R["x"]["y"]
-getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{String, Char, Symbol}) = polynomial_ring(R[1], s)
+getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyRingElem, NCPolyRingElem}}, s::Union{String, Char, Symbol}) = polynomial_ring(R[1], s)
 
 ###############################################################################
 #

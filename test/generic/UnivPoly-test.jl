@@ -10,7 +10,7 @@
 
          x = gen(S, "x")
 
-         @test isa(x, UnivPolyElem)
+         @test isa(x, UnivPolyRingElem)
 
          y, z = gens(S, ["y", "z"])
 
@@ -23,16 +23,16 @@
 
          @test typeof(S) <: Generic.UnivPolyRing
 
-         @test isa(x, UnivPolyElem)
-         @test isa(y, UnivPolyElem)
-         @test isa(z, UnivPolyElem)
+         @test isa(x, UnivPolyRingElem)
+         @test isa(y, UnivPolyRingElem)
+         @test isa(z, UnivPolyRingElem)
 
          f = rand(S, 0:5, 0:10, -10:10)
 
-         @test isa(f, UnivPolyElem)
-         @test isa(S(2), UnivPolyElem)
-         @test isa(S(R(2)), UnivPolyElem)
-         @test isa(S(f), UnivPolyElem)
+         @test isa(f, UnivPolyRingElem)
+         @test isa(S(2), UnivPolyRingElem)
+         @test isa(S(R(2)), UnivPolyRingElem)
+         @test isa(S(f), UnivPolyRingElem)
 
          V = [R(rand(-10:10)) for i in 1:5]
          nused = rand(0:3)
@@ -40,7 +40,7 @@
          
          f1 = S(V, W)
 
-         @test isa(f1, UnivPolyElem)
+         @test isa(f1, UnivPolyRingElem)
 
          f2 = S()
          fit!(f2, 5)

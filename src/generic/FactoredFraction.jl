@@ -442,7 +442,7 @@ end
 ##############################################################################
 
 # Return the derivative with respect to the `i`-th variable.
-function derivative(a::FactoredFrac{T}, i::Int) where {T <: MPolyElem}
+function derivative(a::FactoredFrac{T}, i::Int) where {T <: MPolyRingElem}
     z = FactoredFrac{T}(one(base_ring(a)), FactoredFracTerm{T}[], parent(a))
     p = unit(a)
     for (b, e) in a

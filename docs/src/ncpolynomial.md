@@ -28,7 +28,7 @@ base/coefficient ring $R$ is stored in the parent object.
 
 ## Abstract types
 
-The polynomial element types belong to the abstract type `NCPolyElem{T}`
+The polynomial element types belong to the abstract type `NCPolyRingElem{T}`
 and the polynomial ring types belong to the abstract type
 `NCPolyRing{T}`. This enables one to write generic functions that can
 accept any AbstractAlgebra polynomial type.
@@ -186,8 +186,8 @@ described here, that override the generic implementation.
 ### Basic functionality
 
 ```@docs
-leading_coefficient(::NCPolyElem)
-trailing_coefficient(::NCPolyElem)
+leading_coefficient(::NCPolyRingElem)
+trailing_coefficient(::NCPolyRingElem)
 ```
 
 ```@docs
@@ -195,15 +195,15 @@ gen(::NCPolyRing)
 ```
 
 ```@docs
-is_gen(::NCPolyElem)
+is_gen(::NCPolyRingElem)
 ```
 
 ```@docs
-is_monomial(::NCPolyElem)
+is_monomial(::NCPolyRingElem)
 ```
 
 ```@docs
-is_term(::NCPolyElem)
+is_term(::NCPolyRingElem)
 ```
 
 **Examples**
@@ -256,11 +256,11 @@ true
 ### Truncation
 
 ```@docs
-truncate(::NCPolyElem, ::Int)
+truncate(::NCPolyRingElem, ::Int)
 ```
 
 ```@docs
-mullow(::NCPolyElem{T}, ::NCPolyElem{T}, ::Int) where T <: NCRingElem
+mullow(::NCPolyRingElem{T}, ::NCPolyRingElem{T}, ::Int) where T <: NCRingElem
 ```
 
 **Examples**
@@ -292,8 +292,8 @@ julia> k = mullow(f, g, 4)
 ### Reversal
 
 ```@docs
-reverse(::NCPolyElem, ::Int)
-reverse(::NCPolyElem)
+reverse(::NCPolyRingElem, ::Int)
+reverse(::NCPolyRingElem)
 ```
 
 **Examples**
@@ -322,11 +322,11 @@ julia> h = reverse(f)
 ### Shifting
 
 ```@docs
-shift_left(::NCPolyElem, ::Int)
+shift_left(::NCPolyRingElem, ::Int)
 ```
 
 ```@docs
-shift_right(::NCPolyElem, ::Int)
+shift_right(::NCPolyRingElem, ::Int)
 ```
 
 **Examples**
@@ -355,8 +355,8 @@ x
 ### Evaluation
 
 ```@docs
-evaluate{T <: NCRingElem}(::NCPolyElem{T}, ::T)
-evaluate(::NCPolyElem, ::Integer)
+evaluate{T <: NCRingElem}(::NCPolyRingElem{T}, ::T)
+evaluate(::NCPolyRingElem, ::Integer)
 ```
 
 We also overload the functional notation so that the polynomial $f$ can be
@@ -392,7 +392,7 @@ julia> r = f(23)
 ### Derivative
 
 ```@docs
-derivative(::NCPolyElem)
+derivative(::NCPolyRingElem)
 ```
 
 **Examples**

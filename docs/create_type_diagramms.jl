@@ -80,13 +80,13 @@ skinparam RoundCorner 15
 ' Non-commutative rings
 "SetElem" -down-> "NCRingElem"
 "NCRingElem" -down--> "MatAlgElem{T}"
-"NCRingElem" -down--> "NCPolyElem{T}"
+"NCRingElem" -down--> "NCPolyRingElem{T}"
 "NCRingElem" -down-> "RingElem"
 
 ' Rings
-"RingElem" -down-> "PolyElem{T}"
-"PolyElem{T}" -down-> "SeriesElem{T}"
-"PolyElem{T}" -down-> "LaurentPolyElem{T}"
+"RingElem" -down-> "PolyRingElem{T}"
+"PolyRingElem{T}" -down-> "SeriesElem{T}"
+"PolyRingElem{T}" -down-> "LaurentPolyRingElem{T}"
 "RingElem" -down-> "ResElem{T}"
 "RingElem" -down---> "FieldElem"
 

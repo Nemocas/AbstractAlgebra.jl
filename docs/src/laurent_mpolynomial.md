@@ -19,7 +19,7 @@ AbstractAlgebra.jl provides a generic implementation of multivariate Laurent
 polynomials, built in terms of regular multivariate polynomials, in the file
 `src/generic/LaurentMPoly.jl`.
 
-The type `LaurentMPolyWrap{T, ...} <: LaurentMPolyElem{T}` implements generic
+The type `LaurentMPolyWrap{T, ...} <: LaurentMPolyRingElem{T}` implements generic
 multivariate Laurent polynomials by wrapping regular polynomials:
 a Laurent polynomial `l` wraps a polynomial `p` and a vector of integers $n_i$
 such that $l = \prod_i x_i^{n_i} * p$. The representation is said to be
@@ -31,7 +31,7 @@ The corresponding parent type is `LaurentMPolyWrapRing{T, ...} <: LaurentMPolyRi
 
 ## Abstract types
 
-Two abstract types `LaurentMPolyElem{T}` and `LaurentMPolyRing{T}`
+Two abstract types `LaurentMPolyRingElem{T}` and `LaurentMPolyRing{T}`
 are defined to represent Laurent polynomials and rings thereof, parameterized
 on a base ring `T`.
 
@@ -64,39 +64,39 @@ symbols(S::LaurentMPolyRing)
 nvars(f::LaurentMPolyRing)
 gens(S::LaurentMPolyRing)
 gen(S::LaurentMPolyRing, i::Int)
-is_gen(x::LaurentMPolyElem)
-var_index(p::LaurentMPolyElem)
-length(f::LaurentMPolyElem)
+is_gen(x::LaurentMPolyRingElem)
+var_index(p::LaurentMPolyRingElem)
+length(f::LaurentMPolyRingElem)
 ```
 
 ```julia
-coefficients(p::LaurentMPolyElem)
-monomials(p::LaurentMPolyElem)
-terms(p::LaurentMPolyElem)
-exponent_vectors(p::LaurentMPolyElem)
-leading_coefficient(p::LaurentMPolyElem)
-leading_monomial(p::LaurentMPolyElem)
-leading_term(p::LaurentMPolyElem)
-leading_exponent_vector(p::LaurentMPolyElem)
+coefficients(p::LaurentMPolyRingElem)
+monomials(p::LaurentMPolyRingElem)
+terms(p::LaurentMPolyRingElem)
+exponent_vectors(p::LaurentMPolyRingElem)
+leading_coefficient(p::LaurentMPolyRingElem)
+leading_monomial(p::LaurentMPolyRingElem)
+leading_term(p::LaurentMPolyRingElem)
+leading_exponent_vector(p::LaurentMPolyRingElem)
 ```
 
 ```julia
-change_base_ring(::Ring, p::LaurentMPolyElem)
-change_coefficient_ring(::Ring, p::LaurentMPolyElem)
-map_coefficients(::Any, p::LaurentMPolyElem)
+change_base_ring(::Ring, p::LaurentMPolyRingElem)
+change_coefficient_ring(::Ring, p::LaurentMPolyRingElem)
+map_coefficients(::Any, p::LaurentMPolyRingElem)
 ```
 
 ```julia
-evaluate(p::LaurentMPolyElem, ::Vector)
+evaluate(p::LaurentMPolyRingElem, ::Vector)
 ```
 
 ```julia
-derivative(p::LaurentMPolyElem, x::LaurentMPolyElem)
-derivative(p::LaurentMPolyElem, i::Int)
+derivative(p::LaurentMPolyRingElem, x::LaurentMPolyRingElem)
+derivative(p::LaurentMPolyRingElem, i::Int)
 ```
 
 ```julia
-rand(R::LaurentMPolyElem, length_range::UnitRange{Int}, exp_range::UnitRange{Int}, v...)
+rand(R::LaurentMPolyRingElem, length_range::UnitRange{Int}, exp_range::UnitRange{Int}, v...)
 ```
 
 The choice of canonical unit for Laurent polynomials includes the product

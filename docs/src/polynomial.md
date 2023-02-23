@@ -30,7 +30,7 @@ base/coefficient ring $R$ is stored in the parent object.
 ## Abstract types
 
 All univariate polynomial element types belong to the abstract type
-`PolyElem{T}` and the polynomial ring types belong to the abstract
+`PolyRingElem{T}` and the polynomial ring types belong to the abstract
 type `PolyRing{T}`. This enables one to write generic functions that
 can accept any AbstractAlgebra polynomial type.
 
@@ -238,7 +238,7 @@ julia> k = similar(f, QQ, "y")
 
 ```julia
 base_ring(R::PolyRing)
-base_ring(a::PolyElem)
+base_ring(a::PolyRingElem)
 ```
 
 Return the coefficient ring of the given polynomial ring or polynomial.
@@ -280,28 +280,28 @@ Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Intege
 For polynomials over a field, the [Euclidean Ring Interface](@ref) is implemented.
 
 ```julia
-mod(f::PolyElem, g::PolyElem)
-divrem(f::PolyElem, g::PolyElem)
-div(f::PolyElem, g::PolyElem)
+mod(f::PolyRingElem, g::PolyRingElem)
+divrem(f::PolyRingElem, g::PolyRingElem)
+div(f::PolyRingElem, g::PolyRingElem)
 ```
 
 ```julia
-mulmod(f::PolyElem, g::PolyElem, m::PolyElem)
-powermod(f::PolyElem, e::Int, m::PolyElem)
-invmod(f::PolyElem, m::PolyElem)
+mulmod(f::PolyRingElem, g::PolyRingElem, m::PolyRingElem)
+powermod(f::PolyRingElem, e::Int, m::PolyRingElem)
+invmod(f::PolyRingElem, m::PolyRingElem)
 ```
 
 ```julia
-divides(f::PolyElem, g::PolyElem)
-remove(f::PolyElem, p::PolyElem)
-valuation(f::PolyElem, p::PolyElem)
+divides(f::PolyRingElem, g::PolyRingElem)
+remove(f::PolyRingElem, p::PolyRingElem)
+valuation(f::PolyRingElem, p::PolyRingElem)
 ```
 
 ```julia
-gcd(f::PolyElem, g::PolyElem)
-lcm(f::PolyElem, g::PolyElem)
-gcdx(f::PolyElem, g::PolyElem)
-gcdinv(f::PolyElem, g::PolyElem)
+gcd(f::PolyRingElem, g::PolyRingElem)
+lcm(f::PolyRingElem, g::PolyRingElem)
+gcdx(f::PolyRingElem, g::PolyRingElem)
+gcdinv(f::PolyRingElem, g::PolyRingElem)
 ```
 
 **Examples**
@@ -380,12 +380,12 @@ such functions are the following.
 ```julia
 zero(R::PolyRing)
 one(R::PolyRing)
-iszero(a::PolyElem)
-isone(a::PolyElem)
+iszero(a::PolyRingElem)
+isone(a::PolyRingElem)
 ```
 
 ```julia
-divexact(a::T, b::T) where T <: PolyElem
+divexact(a::T, b::T) where T <: PolyRingElem
 ```
 
 All functions in the polynomial interface are provided. The most important
@@ -403,12 +403,12 @@ printing polynomials in that ring.
 In addition, the following basic functions are provided.
 
 ```@docs
-modulus{T <: ResElem}(::PolyElem{T})
+modulus{T <: ResElem}(::PolyRingElem{T})
 ```
 
 ```@docs
-leading_coefficient(::PolyElem)
-trailing_coefficient(::PolyElem)
+leading_coefficient(::PolyRingElem)
+trailing_coefficient(::PolyRingElem)
 constant_coefficient(::PolynomialElem)
 ```
 
@@ -421,19 +421,19 @@ tail(::PolynomialElem)
 ```
 
 ```@docs
-gen(::PolyElem)
+gen(::PolyRingElem)
 ```
 
 ```@docs
-is_gen(::PolyElem)
+is_gen(::PolyRingElem)
 ```
 
 ```@docs
-is_monic(::PolyElem)
+is_monic(::PolyRingElem)
 ```
 
 ```@docs
-is_square(::PolyElem)
+is_square(::PolyRingElem)
 ```
 
 ```@docs
@@ -445,19 +445,19 @@ degree(::PolynomialElem)
 ```
 
 ```@docs
-is_monomial(::PolyElem)
+is_monomial(::PolyRingElem)
 ```
 
 ```@docs
-is_monomial_recursive(::PolyElem)
+is_monomial_recursive(::PolyRingElem)
 ```
 
 ```@docs
-is_term(::PolyElem)
+is_term(::PolyRingElem)
 ```
 
 ```@docs
-is_term_recursive(::PolyElem)
+is_term_recursive(::PolyRingElem)
 ```
 
 ```@docs
@@ -592,11 +592,11 @@ julia> for c in coefficients(f)
 ### Truncation
 
 ```@docs
-truncate(::PolyElem, ::Int)
+truncate(::PolyRingElem, ::Int)
 ```
 
 ```@docs
-mullow{T <: RingElem}(::PolyElem{T}, ::PolyElem{T}, ::Int)
+mullow{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T}, ::Int)
 ```
 
 **Examples**
@@ -625,8 +625,8 @@ julia> k = mullow(f, g, 4)
 ### Reversal
 
 ```@docs
-reverse(::PolyElem, ::Int)
-reverse(::PolyElem)
+reverse(::PolyRingElem, ::Int)
+reverse(::PolyRingElem)
 ```
 
 **Examples**
@@ -652,11 +652,11 @@ julia> h = reverse(f)
 ### Shifting
 
 ```@docs
-shift_left(::PolyElem, ::Int)
+shift_left(::PolyRingElem, ::Int)
 ```
 
 ```@docs
-shift_right(::PolyElem, ::Int)
+shift_right(::PolyRingElem, ::Int)
 ```
 
 **Examples**
@@ -682,24 +682,24 @@ x
 ### Inflation and deflation
 
 ```@docs
-deflation(::PolyElem)
+deflation(::PolyRingElem)
 ```
 
 ```@docs
-inflate(::PolyElem, ::Int, ::Int)
-inflate(::PolyElem, ::Int)
+inflate(::PolyRingElem, ::Int, ::Int)
+inflate(::PolyRingElem, ::Int)
 ```
 
 ```@docs
-deflate(::PolyElem, ::Int, ::Int)
-deflate(::PolyElem, ::Int)
-deflate(::PolyElem)
+deflate(::PolyRingElem, ::Int, ::Int)
+deflate(::PolyRingElem, ::Int)
+deflate(::PolyRingElem)
 ```
 
 ### Square root
 
 ```@docs
-Base.sqrt(::PolyElem{T}; check::Bool) where T <: RingElement
+Base.sqrt(::PolyRingElem{T}; check::Bool) where T <: RingElement
 ```
 
 **Examples**
@@ -713,9 +713,9 @@ sqrt(g^2)
 ### Change of base ring
 
 ```@docs
-change_base_ring(::Ring, ::PolyElem{T}) where T <: RingElement
-change_coefficient_ring(::Ring, ::PolyElem{T}) where T <: RingElement
-map_coefficients(::Any, ::PolyElem{<:RingElement})
+change_base_ring(::Ring, ::PolyRingElem{T}) where T <: RingElement
+change_coefficient_ring(::Ring, ::PolyRingElem{T}) where T <: RingElement
+map_coefficients(::Any, ::PolyRingElem{<:RingElement})
 ```
 
 **Examples**
@@ -738,11 +738,11 @@ of $b$.
 We call $q$ the pseudoquotient and $r$ the pseudoremainder.
 
 ```@docs
-pseudorem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+pseudorem{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
 ```
 
 ```@docs
-pseudodivrem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+pseudodivrem{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
 ```
 
 **Examples**
@@ -771,11 +771,11 @@ julia> q, r = pseudodivrem(f, g)
 ### Content and primitive part
 
 ```@docs
-content(::PolyElem)
+content(::PolyRingElem)
 ```
 
 ```@docs
-primpart(::PolyElem)
+primpart(::PolyRingElem)
 ```
 
 **Examples**
@@ -793,16 +793,16 @@ p = primpart(k*(x^2 + 1))
 ### Evaluation, composition and substitution
 
 ```@docs
-evaluate{T <: RingElem}(::PolyElem{T}, ::T)
-evaluate(::PolyElem, ::Integer)
+evaluate{T <: RingElem}(::PolyRingElem{T}, ::T)
+evaluate(::PolyRingElem, ::Integer)
 ```
 
 ```@docs
-compose(::PolyElem, ::PolyElem)
+compose(::PolyRingElem, ::PolyRingElem)
 ```
 
 ```@docs
-subst{T <: RingElem}(::PolyElem{T}, ::Any)
+subst{T <: RingElem}(::PolyRingElem{T}, ::Any)
 ```
 
 We also overload the functional notation so that the polynomial $f$ can be
@@ -853,11 +853,11 @@ julia> r = f(23)
 ### Derivative and integral
 
 ```@docs
-derivative(::PolyElem)
+derivative(::PolyRingElem)
 ```
 
 ```@docs
-integral{T <: Union{ResElem, FieldElem}}(::PolyElem{T})
+integral{T <: Union{ResElem, FieldElem}}(::PolyRingElem{T})
 ```
 
 **Examples**
@@ -895,19 +895,19 @@ julia> k = integral(g)
 ### Resultant and discriminant
 
 ```@docs
-sylvester_matrix{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+sylvester_matrix{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
 ```
 
 ```@docs
-resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+resultant{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
 ```
 
 ```@docs
-resx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+resx{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
 ```
 
 ```@docs
-discriminant(a::PolyElem)
+discriminant(a::PolyRingElem)
 ```
 
 **Examples**
@@ -977,8 +977,8 @@ julia> newton_to_monomial!(g.coeffs, roots)
 ### Roots
 
 ```@docs
-roots(f::PolyElem)
-roots(f::PolyElem, R::Field)
+roots(f::PolyRingElem)
+roots(f::PolyRingElem, R::Field)
 ```
 
 ### Interpolation
@@ -1018,7 +1018,7 @@ y^2
 ### Power sums
 
 ```@docs
-polynomial_to_power_sums(::PolyElem{T}) where T <: RingElem
+polynomial_to_power_sums(::PolyRingElem{T}) where T <: RingElem
 ```
 
 ```@docs
@@ -1052,11 +1052,11 @@ Typically one uses the generator $x$ of a polynomial ring to get the respective
 special polynomials expressed in terms of that generator.
 
 ```@docs
-chebyshev_t(::Int, ::PolyElem)
+chebyshev_t(::Int, ::PolyRingElem)
 ```
 
 ```@docs
-chebyshev_u(::Int, ::PolyElem)
+chebyshev_u(::Int, ::PolyRingElem)
 ```
 
 **Examples**
