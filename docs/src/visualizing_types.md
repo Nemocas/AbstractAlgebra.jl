@@ -38,8 +38,8 @@ are defined over.
 
   - `Generic.Poly{T}` (`Generic.PolyRing{T}`)
   - `Generic.MPoly{T}` (`Generic.MPolyRing{T}`)
-  - `Generic.RelSeries{T}` (`Generic.RelSeriesRing{T}`)
-  - `Generic.AbsSeries{T}` (`Generic.AbsSeriesRing{T}`)
+  - `Generic.RelSeries{T}` (`Generic.RelPowerSeriesRing{T}`)
+  - `Generic.AbsSeries{T}` (`Generic.AbsPowerSeriesRing{T}`)
   - `Generic.LaurentSeriesRingElem{T}` (`Generic.LaurentSeriesRing{T}`)
   - `Generic.LaurentSeriesFieldElem{T}` (`Generic.LaurentSeriesField{T}`)
   - `Generic.ResidueRingElem{T}` (`Generic.ResidueRing{T}`)

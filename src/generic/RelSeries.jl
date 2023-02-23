@@ -10,9 +10,9 @@
 #
 ###############################################################################
 
-parent_type(::Type{RelSeries{T}}) where T <: RingElement = RelSeriesRing{T}
+parent_type(::Type{RelSeries{T}}) where T <: RingElement = RelPowerSeriesRing{T}
 
-elem_type(::Type{RelSeriesRing{T}}) where T <: RingElement = RelSeries{T}
+elem_type(::Type{RelPowerSeriesRing{T}}) where T <: RingElement = RelSeries{T}
 
 @doc Markdown.doc"""
     rel_series_type(::Type{T}) where T <: RingElement
@@ -40,12 +40,12 @@ function polcoeff(a::RelSeries, n::Int)
 end
 
 @doc Markdown.doc"""
-    gen(R::RelSeriesRing)
+    gen(R::RelPowerSeriesRing)
 
 Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
 $n$ is the maximum precision of the power series ring $R$.
 """
-function gen(R::RelSeriesRing)
+function gen(R::RelPowerSeriesRing)
    S = base_ring(R)
    return R([S(1)], 1, max_precision(R) + 1, 1)
 end
@@ -58,7 +58,7 @@ function deepcopy_internal(a::RelSeries{T}, dict::IdDict) where T <: RingElement
    return parent(a)(coeffs, pol_length(a), precision(a), valuation(a))
 end
 
-function characteristic(a::RelSeriesRing{T}) where T <: RingElement
+function characteristic(a::RelPowerSeriesRing{T}) where T <: RingElement
    return characteristic(base_ring(a))
 end
 
@@ -336,17 +336,17 @@ end
 #
 ###############################################################################
 
-function (R::RelSeriesRing{T})(b::RingElement) where T <: RingElement
+function (R::RelPowerSeriesRing{T})(b::RingElement) where T <: RingElement
    return R(base_ring(R)(b))
 end
 
-function (R::RelSeriesRing{T})() where T <: RingElement
+function (R::RelPowerSeriesRing{T})() where T <: RingElement
    z = RelSeries{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max)
    z.parent = R
    return z
 end
 
-function (R::RelSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (R::RelPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
    if b == 0
       z = RelSeries{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max)
    else
@@ -356,7 +356,7 @@ function (R::RelSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where
    return z
 end
 
-function (R::RelSeriesRing{T})(b::T) where {T <: RingElem}
+function (R::RelPowerSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
       z = RelSeries{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max)
@@ -367,12 +367,12 @@ function (R::RelSeriesRing{T})(b::T) where {T <: RingElem}
    return z
 end
 
-function (R::RelSeriesRing{T})(b::RelSeriesElem{T}) where T <: RingElement
+function (R::RelPowerSeriesRing{T})(b::RelPowerSeriesRingElem{T}) where T <: RingElement
    parent(b) != R && error("Unable to coerce power series")
    return b
 end
 
-function (R::RelSeriesRing{T})(b::Vector{T}, len::Int, prec::Int, val::Int) where T <: RingElement
+function (R::RelPowerSeriesRing{T})(b::Vector{T}, len::Int, prec::Int, val::Int) where T <: RingElement
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
@@ -381,7 +381,7 @@ function (R::RelSeriesRing{T})(b::Vector{T}, len::Int, prec::Int, val::Int) wher
    return z
 end
 
-function (R::RelSeriesRing{T})(b::Vector{S}, len::Int, prec::Int, val::Int) where {S <: RingElement, T <: RingElement}
+function (R::RelPowerSeriesRing{T})(b::Vector{S}, len::Int, prec::Int, val::Int) where {S <: RingElement, T <: RingElement}
    R0 = base_ring(R)
    lenb = length(b)
    entries = Array{T}(undef, lenb)
@@ -403,9 +403,9 @@ function power_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached
    T = elem_type(R)
 
    if model == :capped_relative
-      parent_obj = RelSeriesRing{T}(R, prec, s, cached)
+      parent_obj = RelPowerSeriesRing{T}(R, prec, s, cached)
    elseif model == :capped_absolute
-      parent_obj = AbsSeriesRing{T}(R, prec, s, cached)
+      parent_obj = AbsPowerSeriesRing{T}(R, prec, s, cached)
    else
       error("Unknown model")
    end

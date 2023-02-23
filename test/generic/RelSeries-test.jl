@@ -22,11 +22,11 @@
 end
 
 @testset "Generic.RelSeries.constructors" begin
-   S1 = RelSeriesRing(ZZ, 10)
-   S2 = RelSeriesRing(ZZ, 10)
+   S1 = RelPowerSeriesRing(ZZ, 10)
+   S2 = RelPowerSeriesRing(ZZ, 10)
 
    @test S1 !== S2
-   @test isa(S1, Generic.RelSeriesRing)
+   @test isa(S1, Generic.RelPowerSeriesRing)
 
    R, x = power_series_ring(ZZ, 30, "x")
 
@@ -37,16 +37,16 @@ end
    @test power_series_ring(S, 30, "y", cached = false)[1] !== power_series_ring(S, 30, "y", cached = true)[1]
 
    @test elem_type(R) == Generic.RelSeries{BigInt}
-   @test elem_type(Generic.RelSeriesRing{BigInt}) == Generic.RelSeries{BigInt}
-   @test parent_type(Generic.RelSeries{BigInt}) == Generic.RelSeriesRing{BigInt}
+   @test elem_type(Generic.RelPowerSeriesRing{BigInt}) == Generic.RelSeries{BigInt}
+   @test parent_type(Generic.RelSeries{BigInt}) == Generic.RelPowerSeriesRing{BigInt}
 
    @test elem_type(T) == Generic.RelSeries{elem_type(S)}
-   @test elem_type(Generic.RelSeriesRing{elem_type(S)}) == Generic.RelSeries{elem_type(S)}
-   @test parent_type(Generic.RelSeries{elem_type(S)}) == Generic.RelSeriesRing{elem_type(S)}
+   @test elem_type(Generic.RelPowerSeriesRing{elem_type(S)}) == Generic.RelSeries{elem_type(S)}
+   @test parent_type(Generic.RelSeries{elem_type(S)}) == Generic.RelPowerSeriesRing{elem_type(S)}
 
-   @test isa(R, Generic.RelSeriesRing)
+   @test isa(R, Generic.RelPowerSeriesRing)
 
-   @test isa(T, Generic.RelSeriesRing)
+   @test isa(T, Generic.RelPowerSeriesRing)
 
    a1 = x^3 + 2x + 1
    a2 = (t^2 + 1)*y^2 + (t + 3)*y + O(y^4)
@@ -161,11 +161,11 @@ end
       m = similar(f, QQ, 5)
       n = similar(f, 5)
 
-      @test isa(g, RelSeriesElem)
-      @test isa(h, RelSeriesElem)
-      @test isa(k, RelSeriesElem)
-      @test isa(m, RelSeriesElem)
-      @test isa(n, RelSeriesElem)
+      @test isa(g, RelPowerSeriesRingElem)
+      @test isa(h, RelPowerSeriesRingElem)
+      @test isa(k, RelPowerSeriesRingElem)
+      @test isa(m, RelPowerSeriesRingElem)
+      @test isa(n, RelPowerSeriesRingElem)
 
       @test base_ring(g) === QQ
       @test base_ring(m) === QQ
@@ -200,7 +200,7 @@ end
 @testset "Generic.RelSeries.rel_series" begin
    f = rel_series(ZZ, [1, 2, 3], 3, 5, 2, "y")
 
-   @test isa(f, RelSeriesElem)
+   @test isa(f, RelPowerSeriesRingElem)
    @test base_ring(f) === ZZ
    @test coeff(f, 2) == 1
    @test coeff(f, 4) == 3
@@ -208,7 +208,7 @@ end
 
    g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
 
-   @test isa(g, RelSeriesElem)
+   @test isa(g, RelPowerSeriesRingElem)
    @test base_ring(g) === ZZ
    @test coeff(g, 4) == 1
    @test coeff(g, 6) == 3
@@ -224,15 +224,15 @@ end
    p = rel_series(ZZ, BigInt[], 0, 3, 1)
    q = rel_series(ZZ, [], 0, 3, 2)
 
-   @test isa(p, RelSeriesElem)
-   @test isa(q, RelSeriesElem)
+   @test isa(p, RelPowerSeriesRingElem)
+   @test isa(q, RelPowerSeriesRingElem)
 
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
    r = rel_series(QQ, BigInt[1, 2, 3], 3, 11, 8)
 
-   @test isa(r, RelSeriesElem)
+   @test isa(r, RelPowerSeriesRingElem)
 
    s = rel_series(ZZ, [1, 2, 3], 3, 5, 0; max_precision=10)
    

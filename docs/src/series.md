@@ -39,24 +39,24 @@ These generic series have types `Generic.RelSeries{T}`, `Generic.AbsSeries{T}`,
 `Generic.LaurentSeriesRingElem{T}` and `Generic.LaurentSeriesFieldElem{T}`. See
 the file `src/generic/GenericTypes.jl` for details.
 
-The parent objects have types `Generic.AbsSeriesRing{T}`
-and `Generic.RelSeriesRing{T}` and `Generic.LaurentSeriesRing{T}` respectively.
+The parent objects have types `Generic.AbsPowerSeriesRing{T}`
+and `Generic.RelPowerSeriesRing{T}` and `Generic.LaurentSeriesRing{T}` respectively.
 
 The default precision, string representation of the variable and base ring $R$
 of a generic power series are stored in its parent object.
 
 ## Abstract types
-Relative power series elements belong to the abstract type `RelSeriesElem`.
+Relative power series elements belong to the abstract type `RelPowerSeriesRingElem`.
 
 Laurent series elements belong directly to either `RingElem` or
 `FieldElem` since it is more useful to be able to distinguish whether
 they belong to a ring or field than it is to distinguish that they are relative
 series.
 
-Absolute power series elements belong to `AbsSeriesElem`.
+Absolute power series elements belong to `AbsPowerSeriesRingElem`.
 
 The parent types for relative and absolute power series,
-`Generic.RelSeriesRing{T}` and `Generic.AbsSeriesRing{T}` respectively,
+`Generic.RelPowerSeriesRing{T}` and `Generic.AbsPowerSeriesRing{T}` respectively,
 belong to `SeriesRing{T}`.
 
 The parent types of Laurent series belong directly to `Ring` and `Field`
@@ -96,8 +96,8 @@ generic algorithms wherever possible when creating series rings where the
 symbol does not matter.
 
 ```julia
-AbsSeriesRing(R::Ring, prec::Int)
-RelSeriesRing(R::Ring, prec::Int)
+AbsPowerSeriesRing(R::Ring, prec::Int)
+RelPowerSeriesRing(R::Ring, prec::Int)
 ```
 
 Return the absolute or relative power series ring over the given base ring $R$
@@ -134,7 +134,7 @@ julia> h = U(BigInt(1234))
 julia> k = T(z + 1)
 1 + z + O(z^10)
 
-julia> V = AbsSeriesRing(ZZ, 10)
+julia> V = AbsPowerSeriesRing(ZZ, 10)
 Univariate power series ring in x over Integers
 ```
 
@@ -356,7 +356,7 @@ not known, an exception is raised.
 
 Unless otherwise noted, the functions below are available for all series
 models, including Laurent series. We denote this by using the abstract type
-`RelSeriesElem`, even though absolute series and Laurent series types
+`RelPowerSeriesRingElem`, even though absolute series and Laurent series types
 do not belong to this abstract type.
 
 ### Basic functionality
@@ -418,7 +418,7 @@ modulus{T <: ResElem}(::SeriesElem{T})
 ```
 
 ```@docs
-is_gen(::RelSeriesElem)
+is_gen(::RelPowerSeriesRingElem)
 ```
 
 **Examples**
@@ -522,8 +522,8 @@ x^3 + 2*x^4 + 11*x^5 + O(x^10)
 ### Change base ring
 
 ```@docs
-map_coefficients(::Any, ::AbsSeriesElem{<:RingElem})
-change_base_ring(::Ring, ::AbsSeriesElem{<:RingElem})
+map_coefficients(::Any, ::AbsPowerSeriesRingElem{<:RingElem})
+change_base_ring(::Ring, ::AbsPowerSeriesRingElem{<:RingElem})
 ```
 
 **Examples**
@@ -545,11 +545,11 @@ julia> change_base_ring(QQ, f)
 ### Shifting
 
 ```@docs
-shift_left{T <: RingElem}(::RelSeriesElem{T}, ::Int)
+shift_left{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
 ```
 
 ```@docs
-shift_right{T <: RingElem}(::RelSeriesElem{T}, ::Int)
+shift_right{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
 ```
 
 **Examples**
@@ -590,7 +590,7 @@ julia> k = shift_right(d, 3)
 ### Truncation
 
 ```@docs
-truncate{T <: RingElem}(::RelSeriesElem{T}, ::Int)
+truncate{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
 ```
 
 **Examples**
@@ -631,7 +631,7 @@ julia> k = truncate(d, 5)
 ### Division
 
 ```@docs
-Base.inv(::RelSeriesElem)
+Base.inv(::RelPowerSeriesRingElem)
 ```
 
 **Examples**
@@ -660,7 +660,7 @@ julia> d = inv(b)
 ### Composition
 
 ```@docs
-compose(a::RelSeriesElem, b::RelSeriesElem)
+compose(a::RelPowerSeriesRingElem, b::RelPowerSeriesRingElem)
 ```
 
 Note that `subst` can be used instead of `compose`, however the provided
@@ -669,11 +669,11 @@ functionality is the same. General series substitution is not well-defined.
 ### Derivative and integral
 
 ```@docs
-derivative(a::RelSeriesElem)
+derivative(a::RelPowerSeriesRingElem)
 ```
 
 ```@docs
-integral(a::RelSeriesElem)
+integral(a::RelPowerSeriesRingElem)
 ```
 
 ### Special functions
@@ -683,11 +683,11 @@ Base.log(a::SeriesElem{T}) where T <: FieldElem
 ```
 
 ```@docs
-Base.exp(a::RelSeriesElem)
+Base.exp(a::RelPowerSeriesRingElem)
 ```
 
 ```@docs
-Base.sqrt(a::RelSeriesElem)
+Base.sqrt(a::RelPowerSeriesRingElem)
 ```
 
 

@@ -22,11 +22,11 @@
 end
 
 @testset "Generic.AbsSeries.constructors" begin
-   S1 = AbsSeriesRing(ZZ, 10)
-   S2 = AbsSeriesRing(ZZ, 10)
+   S1 = AbsPowerSeriesRing(ZZ, 10)
+   S2 = AbsPowerSeriesRing(ZZ, 10)
 
    @test S1 !== S2
-   @test isa(S1, Generic.AbsSeriesRing)
+   @test isa(S1, Generic.AbsPowerSeriesRing)
 
    R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
@@ -34,16 +34,16 @@ end
    T, y = power_series_ring(S, 30, "y", model=:capped_absolute)
 
    @test elem_type(R) == Generic.AbsSeries{BigInt}
-   @test elem_type(Generic.AbsSeriesRing{BigInt}) == Generic.AbsSeries{BigInt}
-   @test parent_type(Generic.AbsSeries{BigInt}) == Generic.AbsSeriesRing{BigInt}
+   @test elem_type(Generic.AbsPowerSeriesRing{BigInt}) == Generic.AbsSeries{BigInt}
+   @test parent_type(Generic.AbsSeries{BigInt}) == Generic.AbsPowerSeriesRing{BigInt}
 
    @test elem_type(T) == Generic.AbsSeries{elem_type(S)}
-   @test elem_type(Generic.AbsSeriesRing{elem_type(S)}) == Generic.AbsSeries{elem_type(S)}
-   @test parent_type(Generic.AbsSeries{elem_type(S)}) == Generic.AbsSeriesRing{elem_type(S)}
+   @test elem_type(Generic.AbsPowerSeriesRing{elem_type(S)}) == Generic.AbsSeries{elem_type(S)}
+   @test parent_type(Generic.AbsSeries{elem_type(S)}) == Generic.AbsPowerSeriesRing{elem_type(S)}
 
-   @test isa(R, Generic.AbsSeriesRing)
+   @test isa(R, Generic.AbsPowerSeriesRing)
 
-   @test isa(T, Generic.AbsSeriesRing)
+   @test isa(T, Generic.AbsPowerSeriesRing)
 
    a1 = x^3 + 2x + 1
    a2 = (t^2 + 1)*y^2 + (t + 3)*y + O(y^4)
@@ -157,11 +157,11 @@ end
       m = similar(f, QQ, 5)
       n = similar(f, 5)
 
-      @test isa(g, AbsSeriesElem)
-      @test isa(h, AbsSeriesElem)
-      @test isa(k, AbsSeriesElem)
-      @test isa(m, AbsSeriesElem)
-      @test isa(n, AbsSeriesElem)
+      @test isa(g, AbsPowerSeriesRingElem)
+      @test isa(h, AbsPowerSeriesRingElem)
+      @test isa(k, AbsPowerSeriesRingElem)
+      @test isa(m, AbsPowerSeriesRingElem)
+      @test isa(n, AbsPowerSeriesRingElem)
 
       @test base_ring(g) === QQ
       @test base_ring(m) === QQ
@@ -196,7 +196,7 @@ end
 @testset "Generic.AbsSeries.abs_series" begin
    f = abs_series(ZZ, [1, 2, 3], 3, 5, "y")
 
-   @test isa(f, AbsSeriesElem)
+   @test isa(f, AbsPowerSeriesRingElem)
    @test base_ring(f) === ZZ
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
@@ -204,7 +204,7 @@ end
 
    g = abs_series(ZZ, [1, 2, 3], 3, 5)
 
-   @test isa(g, AbsSeriesElem)
+   @test isa(g, AbsPowerSeriesRingElem)
    @test base_ring(g) === ZZ
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
@@ -220,8 +220,8 @@ end
    p = abs_series(ZZ, BigInt[], 0, 4)
    q = abs_series(ZZ, [], 0, 6)
 
-   @test isa(p, AbsSeriesElem)
-   @test isa(q, AbsSeriesElem)
+   @test isa(p, AbsPowerSeriesRingElem)
+   @test isa(q, AbsPowerSeriesRingElem)
 
    @test length(p) == 0
    @test pol_length(p) == 0
@@ -230,7 +230,7 @@ end
 
    r = abs_series(QQ, BigInt[1, 2, 3], 3, 5)
 
-   @test isa(r, AbsSeriesElem)
+   @test isa(r, AbsPowerSeriesRingElem)
 
    s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
    

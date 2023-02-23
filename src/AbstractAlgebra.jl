@@ -127,7 +127,7 @@ export SetElem, GroupElem, AdditiveGroupElem, NCRingElem, RingElem, ModuleElem, 
 
 export SetMap, FunctionalMap, IdentityMap
 
-export NCPolyRingElem, PolyRingElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
+export NCPolyRingElem, PolyRingElem, SeriesElem, AbsPowerSeriesRingElem, RelPowerSeriesRingElem, ResElem, FracElem,
        MatElem, MatAlgElem, FinFieldElem, MPolyRingElem, UniversalPolyRingElem, NumFieldElem, Ideal,
        SimpleNumFieldElem, FreeAssAlgElem
 

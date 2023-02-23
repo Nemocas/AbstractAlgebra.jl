@@ -134,9 +134,9 @@ abstract type SeriesElem{T} <: RingElem end
 
 abstract type MSeriesElem{T} <: RingElem end
 
-abstract type RelSeriesElem{T} <: SeriesElem{T} end
+abstract type RelPowerSeriesRingElem{T} <: SeriesElem{T} end
 
-abstract type AbsSeriesElem{T} <: SeriesElem{T} end
+abstract type AbsPowerSeriesRingElem{T} <: SeriesElem{T} end
 
 abstract type AbsMSeriesElem{T} <: MSeriesElem{T} end
 

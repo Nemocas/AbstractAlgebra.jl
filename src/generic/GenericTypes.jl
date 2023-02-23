@@ -632,30 +632,30 @@ end
 
 ###############################################################################
 #
-#   RelSeriesRing / RelSeries
+#   RelPowerSeriesRing / RelSeries
 #
 ###############################################################################
 
-mutable struct RelSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
+mutable struct RelPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function RelSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+   function RelPowerSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
       return get_cached!(RelSeriesID, (R, prec, s), cached) do
          new{T}(R, prec, s)
-      end::RelSeriesRing{T}
+      end::RelPowerSeriesRing{T}
    end
 end
 
 const RelSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
-mutable struct RelSeries{T <: RingElement} <: AbstractAlgebra.RelSeriesElem{T}
+mutable struct RelSeries{T <: RingElement} <: AbstractAlgebra.RelPowerSeriesRingElem{T}
    coeffs::Vector{T}
    length::Int
    prec::Int
    val::Int
-   parent::RelSeriesRing{T}
+   parent::RelPowerSeriesRing{T}
 
    function RelSeries{T}(a::Vector{T}, length::Int, prec::Int, val::Int) where T <: RingElement
       new{T}(a, length, prec, val)
@@ -666,29 +666,29 @@ end
 
 ###############################################################################
 #
-#   AbsSeriesRing / AbsSeries
+#   AbsPowerSeriesRing / AbsSeries
 #
 ###############################################################################
 
-mutable struct AbsSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
+mutable struct AbsPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function AbsSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+   function AbsPowerSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
       return get_cached!(AbsSeriesID, (R, prec, s), cached) do
          new{T}(R, prec, s)
-      end::AbsSeriesRing{T}
+      end::AbsPowerSeriesRing{T}
    end
 end
 
 const AbsSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
-mutable struct AbsSeries{T <: RingElement} <: AbstractAlgebra.AbsSeriesElem{T}
+mutable struct AbsSeries{T <: RingElement} <: AbstractAlgebra.AbsPowerSeriesRingElem{T}
    coeffs::Vector{T}
    length::Int
    prec::Int
-   parent::AbsSeriesRing{T}
+   parent::AbsPowerSeriesRing{T}
 
    AbsSeries{T}(a::Vector{T}, length::Int, prec::Int) where T <: RingElement = new{T}(a, length, prec)
    AbsSeries{T}(a::AbsSeries{T}) where T <: RingElement = a
