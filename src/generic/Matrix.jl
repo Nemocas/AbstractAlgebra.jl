@@ -184,11 +184,6 @@ function (a::MatSpace{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    return z
 end
 
-function (a::MatSpace{T})(b::Mat{T}) where {T <: NCRingElement}
-   parent(b) != a && error("Unable to coerce matrix")
-   return b
-end
-
 function (a::MatSpace{T})(b::Matrix{T}) where T <: NCRingElement
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)

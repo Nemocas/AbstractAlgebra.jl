@@ -148,9 +148,13 @@ end
 
    @test isa(k, MatElem)
 
-   l = S(k)
+   @test k == S(k)
 
-   @test isa(l, MatElem)
+   S2 = MatrixSpace(R, 2, 2)
+   @test_throws ErrorConstrDimMismatch S2(k)
+
+   S3 = MatrixSpace(ZZ, 3, 3)
+   @test_throws DomainError S3(k)
 
    m = S()
 

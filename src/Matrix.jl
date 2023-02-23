@@ -61,6 +61,25 @@ function _check_dim(r::Int, c::Int, arr::AbstractVector{T}) where {T}
   return nothing
 end
 
+function _check_dim(r::Int, c::Int, a::MatrixElem)
+  size(a) == (r, c) || throw(ErrorConstrDimMismatch(r, c, size(a)...))
+  return nothing
+end
+
+function _check_bases(a, b)
+  base_ring(a) == base_ring(b) || throw(DomainError((a, b), "Base rings do not match."))
+  return nothing
+end
+
+function (s::MatSpace{T})(a::M) where {T, M <: MatrixElem{T}}
+  _check_dim(nrows(s), ncols(s), a)
+  _check_bases(s, a)
+  a isa eltype(s) && return a
+  b = eltype(s)(a)
+  b.base_ring = base_ring(s)
+  return b
+end
+
 _checkbounds(i::Int, j::Int) = 1 <= j <= i
 
 function _checkbounds(A, i::Int, j::Int)
