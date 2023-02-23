@@ -124,14 +124,14 @@ end
 
 Return the number of rows of the given matrix.
 """
-nrows(::MatrixElem{T}) where T <: NCRingElement
+nrows(a::MatrixElem{T}) where T <: NCRingElement
 
 @doc Markdown.doc"""
     ncols(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of columns of the given matrix.
 """
-ncols(::MatrixElem{T}) where T <: NCRingElement
+ncols(a::MatrixElem{T}) where T <: NCRingElement
 
 @doc Markdown.doc"""
     length(a::MatrixElem{T}) where T <: NCRingElement
