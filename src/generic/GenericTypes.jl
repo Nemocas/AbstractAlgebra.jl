@@ -972,11 +972,11 @@ end
 
 const RationalFunctionFieldDict = CacheDictType{Tuple{Field, Union{Symbol, Vector{Symbol}}}, Field}()
 
-mutable struct Rat{T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} <: AbstractAlgebra.FieldElem
+mutable struct RationalFunctionFieldElem{T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} <: AbstractAlgebra.FieldElem
    d::Frac{U}
    parent::RationalFunctionField{T, U}
 
-   Rat{T, U}(f::Frac{U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = new{T, U}(f)
+   RationalFunctionFieldElem{T, U}(f::Frac{U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = new{T, U}(f)
 end
 
 ###############################################################################
@@ -994,7 +994,7 @@ mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
    traces::Vector{<:PolyRingElem{T}}
    traces_den::PolyRingElem{T}
    monic::Bool
-   pol::Poly{Rat{T, U}} where U <: PolyRingElem{T}
+   pol::Poly{RationalFunctionFieldElem{T, U}} where U <: PolyRingElem{T}
    base_ring::RationalFunctionField{T, U} where U <: PolyRingElem{T}
 
    function FunctionField{T}(num::Poly{<:PolyRingElem{T}},

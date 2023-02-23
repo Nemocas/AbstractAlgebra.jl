@@ -13,7 +13,7 @@ AbstractAlgebra.jl provides a module, implemented in
 
 ## Generic rational function field type
 
-Rational functions have type `Generic.Rat{T, U}` where `T` is the type of
+Rational functions have type `Generic.RationalFunctionFieldElem{T, U}` where `T` is the type of
 elements of the coefficient field $k$ and `U` is the type of polynomials
 (either univariate or multivariate) over that field. See the file
 `src/generic/GenericTypes.jl` for details.
@@ -69,7 +69,7 @@ julia> m = S(numerator(x + 1, false), numerator(x + 2, false))
 (x + 1)//(x + 2)
 
 julia> R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
-(Rational function field over Rationals, AbstractAlgebra.Generic.Rat{Rational{BigInt}, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[x, y])
+(Rational function field over Rationals, AbstractAlgebra.Generic.RationalFunctionFieldElem{Rational{BigInt}, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[x, y])
 
 julia> (x + y)//y^2
 (x + y)//y^2
@@ -140,7 +140,7 @@ The following functionality is provided for rational function fields.
 ### Greatest common divisor
 
 ```@docs
-gcd(::Generic.Rat{T, U}, ::Generic.Rat{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
+gcd(::Generic.RationalFunctionFieldElem{T, U}, ::Generic.RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
 ```
 
 **Examples**
@@ -163,11 +163,11 @@ julia> h = gcd(f, g)
 ### Square root
 
 ```@docs
-is_square(::Generic.Rat{T, U}) where {T <: FieldElem, U <: Union{PolyRingElem, MPolyRingElem}}
+is_square(::Generic.RationalFunctionFieldElem{T, U}) where {T <: FieldElem, U <: Union{PolyRingElem, MPolyRingElem}}
 ```
 
 ```@docs
-Base.sqrt(::Generic.Rat{T, U}) where {T <: FieldElem, U <: Union{PolyRingElem, MPolyRingElem}}
+Base.sqrt(::Generic.RationalFunctionFieldElem{T, U}) where {T <: FieldElem, U <: Union{PolyRingElem, MPolyRingElem}}
 ```
 
 **Examples**
@@ -215,7 +215,7 @@ constructs the rational function field they are an extension of, then supplies
 a polynomial over this field to the following constructor:
 
 ```julia
-FunctionField(p::Poly{Rat{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
+FunctionField(p::Poly{RationalFunctionFieldElem{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
 ```
 
 Given an irreducible polynomial `p` over a rational function field return a

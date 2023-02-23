@@ -480,7 +480,7 @@ end
 
 # convert a polynomial over a rational function field to
 # a numerator and denominator
-function _rat_poly(p::Poly{Rat{T, U}}, var=parent(p).S; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
+function _rat_poly(p::Poly{RationalFunctionFieldElem{T, U}}, var=parent(p).S; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
    K = base_ring(p)
    R = base_ring(fraction_field(K))
    S = elem_type(R)
@@ -840,7 +840,7 @@ end
 
 *(a::T, b::FunctionFieldElem{T}) where T <: FieldElem = b*a
 
-function *(a::FunctionFieldElem{T}, b::Rat{T, U}) where {T <: FieldElement, U <: PolyRingElem}
+function *(a::FunctionFieldElem{T}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: PolyRingElem}
    parent(b) != base_ring(a) && error("Could not coerce element")
    R = parent(a)
    num = numerator(a, false)*numerator(b, false)
@@ -848,25 +848,25 @@ function *(a::FunctionFieldElem{T}, b::Rat{T, U}) where {T <: FieldElement, U <:
    return R(_rat_poly_canonicalise(num, den)...)
 end
 
-*(a::Rat{T, U}, b::FunctionFieldElem{T}) where {T <: FieldElement, U <: PolyRingElem} = b*a
+*(a::RationalFunctionFieldElem{T, U}, b::FunctionFieldElem{T}) where {T <: FieldElement, U <: PolyRingElem} = b*a
 
-function +(a::FunctionFieldElem{T}, b::Rat{T, U}) where {T <: FieldElement, U <: PolyRingElem}
+function +(a::FunctionFieldElem{T}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: PolyRingElem}
    parent(b) != base_ring(a) && error("Unable to coerce element")
    return a + parent(a)(b)
 end
 
-+(a::Rat{T, U}, b::FunctionFieldElem{T}) where {T <: FieldElement, U <: PolyRingElem} = b + a
++(a::RationalFunctionFieldElem{T, U}, b::FunctionFieldElem{T}) where {T <: FieldElement, U <: PolyRingElem} = b + a
 
 +(a::FunctionFieldElem, b::Union{Integer, Rational}) = a + base_ring(a)(b)
 
 +(a::Union{Integer, Rational}, b::FunctionFieldElem) = b + a
 
-function -(a::FunctionFieldElem{T}, b::Rat{T, U}) where {T <: FieldElement, U <: PolyRingElem}
+function -(a::FunctionFieldElem{T}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: PolyRingElem}
    parent(b) != base_ring(a) && error("Unable to coerce element")
    return a - parent(a)(b)
 end
 
-function -(a::Rat{T, U}, b::FunctionFieldElem{T}) where {T <: FieldElement, U <: PolyRingElem}
+function -(a::RationalFunctionFieldElem{T, U}, b::FunctionFieldElem{T}) where {T <: FieldElement, U <: PolyRingElem}
    parent(a) != base_ring(b) && error("Unable to coerce element")
    return parent(b)(a) - b
 end
@@ -937,7 +937,7 @@ end
 #
 ###############################################################################
 
-function ==(a::FunctionFieldElem{T}, b::Rat{T, U}) where {T <: FieldElement, U <: PolyRingElem}
+function ==(a::FunctionFieldElem{T}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: PolyRingElem}
    parent(b) != base_ring(a) && error("Unable to coerce element")
    if iszero(a) && iszero(b)
       return true
@@ -947,7 +947,7 @@ function ==(a::FunctionFieldElem{T}, b::Rat{T, U}) where {T <: FieldElement, U <
    return a == parent(a)(b)
 end
 
-==(a::Rat{T, U}, b::FunctionFieldElem{T}) where {T <: FieldElement, U <: PolyRingElem} = b == a
+==(a::RationalFunctionFieldElem{T, U}, b::FunctionFieldElem{T}) where {T <: FieldElement, U <: PolyRingElem} = b == a
 
 ==(a::FunctionFieldElem, b::Union{Integer, Rational}) = a == base_ring(a)(b)
 
@@ -1007,7 +1007,7 @@ function divexact(a::FunctionFieldElem{T},
 end
 
 function divexact(a::FunctionFieldElem{T},
-                          b::Rat{T, U}; check::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
+                          b::RationalFunctionFieldElem{T, U}; check::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
    S = parent(a)
    base_ring(a) != parent(b) && error("Incompatible fields")
    bnum = numerator(b, false)
@@ -1031,7 +1031,7 @@ function divexact(a::T,
    return a*inv(b)
 end
 
-function divexact(a::Rat{T, U},
+function divexact(a::RationalFunctionFieldElem{T, U},
    b::FunctionFieldElem{T}; check::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
    return a*inv(b)
 end
@@ -1112,7 +1112,7 @@ function zero!(a::FunctionFieldElem)
    return a
 end
 
-function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::Rat{T, U}) where {T <: FieldElement, U <: PolyRingElem}
+function setcoeff!(a::FunctionFieldElem{T}, n::Int, c::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: PolyRingElem}
    base_ring(a) != parent(c) && error("Unable to coerce element")
    n < 0 || n > degree(parent(a)) && error("Degree not in range")
    cnum = numerator(c.d, false)
@@ -1233,9 +1233,9 @@ promote_rule(::Type{FunctionFieldElem{T}}, ::Type{FunctionFieldElem{T}}) where T
 
 function promote_rule(::Type{FunctionFieldElem{T}}, ::Type{V}) where
       {T <: FieldElement, V <: RingElem}
-   # The base ring element type of FunctionFieldElem{T} is Rat{T, U}, not T
+   # The base ring element type of FunctionFieldElem{T} is RationalFunctionFieldElem{T, U}, not T
    U = dense_poly_type(T)
-   promote_rule(Rat{T, U}, V) == Rat{T, U} ? FunctionFieldElem{T} : Union{}
+   promote_rule(RationalFunctionFieldElem{T, U}, V) == RationalFunctionFieldElem{T, U} ? FunctionFieldElem{T} : Union{}
 end
 
 ###############################################################################
@@ -1271,7 +1271,7 @@ function (R::FunctionField{T})(a::T) where T <: FieldElem
    return z
 end
 
-function (R::FunctionField{T})(a::Rat{T, U}) where {T <: FieldElement, U <: PolyRingElem}
+function (R::FunctionField{T})(a::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: PolyRingElem}
    p = parent(power_precomp(R, 0))([numerator(a, false)])
    den = parent(power_precomp_den(R, 0))(denominator(a, false))
    z = FunctionFieldElem{T}(R, p, den)
@@ -1355,7 +1355,7 @@ function traces_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
    return P, Pden
 end
 
-function FunctionField(p::Poly{Rat{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
+function FunctionField(p::Poly{RationalFunctionFieldElem{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
    length(p) < 2 && error("Polynomial must have degree at least 1")
    pol, den = _rat_poly(p, s)
    

@@ -643,7 +643,7 @@ end
          @test divexact(f*g, f) == g
       end
 
-      for iters = 1:10 # Rat
+      for iters = 1:10 # RationalFunctionFieldElem
          f = R1()
          while iszero(f)
             f = rand(R1, 1:5, -10:10) # Rational BigInt
@@ -676,7 +676,7 @@ end
          @test divexact(f*g, f) == g
       end
 
-      for iters = 1:10 # Rat
+      for iters = 1:10 # RationalFunctionFieldElem
          f = R1()
          while iszero(f)
             f = rand(R2, 1:5) # Rational BigInt

@@ -592,15 +592,15 @@ function number_field(a::Generic.Poly{Rational{BigInt}}, s::Symbol, t = "\$"; ca
    return Generic.number_field(a, s, t; cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
+function FunctionField(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    return Generic.FunctionField(p, s; cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
+function FunctionField(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.Rat{T, U}}, s::Char; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
+function FunctionField(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::Char; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
