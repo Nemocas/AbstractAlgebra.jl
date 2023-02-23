@@ -13,16 +13,16 @@
 @doc Markdown.doc"""
     laurent_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement
 
-Return the `laurent_series_ring` underlying the given `PuiseuxSeriesRing`.
+Return the `LaurentSeriesRing` underlying the given `PuiseuxSeriesRing`.
 """
-laurent_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = R.laurent_ring::laurent_series_ring{T}
+laurent_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = R.laurent_ring::LaurentSeriesRing{T}
 
 @doc Markdown.doc"""
     laurent_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement
 
-Return the `laurent_series_field` underlying the given `PuiseuxSeriesField`.
+Return the `LaurentSeriesField` underlying the given `PuiseuxSeriesField`.
 """
-laurent_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = R.laurent_ring::laurent_series_field{T}
+laurent_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = R.laurent_ring::LaurentSeriesField{T}
 
 @doc Markdown.doc"""
     O(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement

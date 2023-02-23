@@ -40,7 +40,7 @@ These generic series have types `Generic.RelSeries{T}`, `Generic.AbsSeries{T}`,
 the file `src/generic/GenericTypes.jl` for details.
 
 The parent objects have types `Generic.AbsSeriesRing{T}`
-and `Generic.RelSeriesRing{T}` and `Generic.laurent_series_ring{T}` respectively.
+and `Generic.RelSeriesRing{T}` and `Generic.LaurentSeriesRing{T}` respectively.
 
 The default precision, string representation of the variable and base ring $R$
 of a generic power series are stored in its parent object.

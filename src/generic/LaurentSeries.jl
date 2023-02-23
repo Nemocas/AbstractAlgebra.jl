@@ -23,19 +23,19 @@ function O(a::LaurentSeriesElem{T}) where T <: RingElement
    return parent(a)(Array{T}(undef, 0), 0, val, val, 1)
 end
 
-parent_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRingElem{S}} = laurent_series_ring{S}
+parent_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRingElem{S}} = LaurentSeriesRing{S}
 
-parent_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesFieldElem{S}} = laurent_series_field{S}
+parent_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesFieldElem{S}} = LaurentSeriesField{S}
 
 parent(a::LaurentSeriesElem) = a.parent
 
-elem_type(::Type{T}) where {S <: RingElement, T <: laurent_series_ring{S}} = LaurentSeriesRingElem{S}
+elem_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRing{S}} = LaurentSeriesRingElem{S}
 
-elem_type(::Type{T}) where {S <: FieldElement, T <: laurent_series_field{S}} = LaurentSeriesFieldElem{S}
+elem_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesField{S}} = LaurentSeriesFieldElem{S}
 
-base_ring(R::laurent_series_ring{T}) where T <: RingElement = R.base_ring::parent_type(T)
+base_ring(R::LaurentSeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-base_ring(R::laurent_series_field{T}) where T <: FieldElement = R.base_ring::parent_type(T)
+base_ring(R::LaurentSeriesField{T}) where T <: FieldElement = R.base_ring::parent_type(T)
 
 base_ring(a::LaurentSeriesElem) = base_ring(parent(a))
 
@@ -46,20 +46,20 @@ end
 is_exact_type(a::Type{T}) where T <: LaurentSeriesElem = false
 
 @doc Markdown.doc"""
-    var(a::laurent_series_ring)
+    var(a::LaurentSeriesRing)
 
 Return the internal name of the generator of the power series ring. Note that
 this is returned as a `Symbol` not a `String`.
 """
-var(a::laurent_series_ring) = a.S
+var(a::LaurentSeriesRing) = a.S
 
 @doc Markdown.doc"""
-    var(a::laurent_series_field)
+    var(a::LaurentSeriesField)
 
 Return the internal name of the generator of the power series ring. Note that
 this is returned as a `Symbol` not a `String`.
 """
-var(a::laurent_series_field) = a.S
+var(a::LaurentSeriesField) = a.S
 
 function check_parent(a::LaurentSeriesElem, b::LaurentSeriesElem, throw::Bool = true)
    b = parent(a) != parent(b)
@@ -115,20 +115,20 @@ Return the scale factor of the polynomial underlying the given power series.
 scale(a::LaurentSeriesElem) = a.scale
 
 @doc Markdown.doc"""
-    max_precision(R::laurent_series_ring)
+    max_precision(R::LaurentSeriesRing)
 
 Return the maximum relative precision of power series in the given power
 series ring.
 """
-max_precision(R::laurent_series_ring) = R.prec_max
+max_precision(R::LaurentSeriesRing) = R.prec_max
 
 @doc Markdown.doc"""
-    max_precision(R::laurent_series_field)
+    max_precision(R::LaurentSeriesField)
 
 Return the maximum relative precision of power series in the given power
 series ring.
 """
-max_precision(R::laurent_series_field) = R.prec_max
+max_precision(R::LaurentSeriesField) = R.prec_max
 
 @doc Markdown.doc"""
     exp_gcd(a::Generic.LaurentSeriesElem)
@@ -282,32 +282,32 @@ function upscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
    return z
 end
 
-zero(R::laurent_series_ring) = R(0)
+zero(R::LaurentSeriesRing) = R(0)
 
-zero(R::laurent_series_field) = R(0)
+zero(R::LaurentSeriesField) = R(0)
 
-one(R::laurent_series_field) = R(1)
+one(R::LaurentSeriesField) = R(1)
 
-one(R::laurent_series_ring) = R(1)
+one(R::LaurentSeriesRing) = R(1)
 
 @doc Markdown.doc"""
-    gen(R::laurent_series_ring)
+    gen(R::LaurentSeriesRing)
 
 Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
 $n$ is the maximum precision of the power series ring $R$.
 """
-function gen(R::laurent_series_ring)
+function gen(R::LaurentSeriesRing)
    S = base_ring(R)
    return R([one(S)], 1, max_precision(R) + 1, 1, 1)
 end
 
 @doc Markdown.doc"""
-    gen(R::laurent_series_field)
+    gen(R::LaurentSeriesField)
 
 Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
 $n$ is the maximum precision of the power series ring $R$.
 """
-function gen(R::laurent_series_field)
+function gen(R::LaurentSeriesField)
    S = base_ring(R)
    return R([one(S)], 1, max_precision(R) + 1, 1, 1)
 end
@@ -369,7 +369,7 @@ function renormalize!(z::LaurentSeriesElem)
    return nothing
 end
 
-function characteristic(a::laurent_series_ring{T}) where T <: RingElement
+function characteristic(a::LaurentSeriesRing{T}) where T <: RingElement
    return characteristic(base_ring(a))
 end
 
@@ -391,7 +391,7 @@ function similar(x::LaurentSeriesElem, R::Ring, max_prec::Int,
       # steal parent in case it is not cached
       p.parent = parent(x)
    else
-      p.parent = Generic.laurent_series_ring{TT}(R, max_prec, s, cached)
+      p.parent = Generic.LaurentSeriesRing{TT}(R, max_prec, s, cached)
    end
    return p
 end
@@ -408,7 +408,7 @@ function similar(x::LaurentSeriesElem, R::Field, max_prec::Int,
       # steal parent in case it is not cached
       p.parent = parent(x)
    else
-      p.parent = Generic.laurent_series_field{TT}(R, max_prec, s, cached)
+      p.parent = Generic.LaurentSeriesField{TT}(R, max_prec, s, cached)
    end
    return p
 end
@@ -493,7 +493,7 @@ function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, 
    coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.LaurentSeriesRingElem{TT}(coeffs, len, prec, val, scale)
    # Default is supposed to return a Generic Laurent series
-   p.parent = Generic.laurent_series_ring{TT}(R, max_precision, Symbol(var), cached)
+   p.parent = Generic.LaurentSeriesRing{TT}(R, max_precision, Symbol(var), cached)
    return p
 end
 
@@ -504,7 +504,7 @@ function laurent_series(R::Field, arr::Vector{T}, len::Int, prec::Int, val::Int,
    coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.LaurentSeriesFieldElem{TT}(coeffs, len, prec, val, scale)
    # Default is supposed to return a Generic Laurent series
-   p.parent = Generic.laurent_series_field{TT}(R, max_precision, Symbol(var), cached)
+   p.parent = Generic.LaurentSeriesField{TT}(R, max_precision, Symbol(var), cached)
    return p
 end
 
@@ -551,12 +551,12 @@ function Base.show(io::IO, a::LaurentSeriesElem)
   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-function show(io::IO, a::laurent_series_ring)
+function show(io::IO, a::LaurentSeriesRing)
    print(io, "Laurent series ring in ", var(a), " over ")
    print(IOContext(io, :compact => true), base_ring(a))
 end
 
-function show(io::IO, a::laurent_series_field)
+function show(io::IO, a::LaurentSeriesField)
    print(io, "Laurent series field in ", var(a), " over ")
    print(IOContext(io, :compact => true), base_ring(a))
 end
@@ -572,7 +572,7 @@ function _make_parent(g, p::LaurentSeriesElem, cached::Bool)
    S = parent(p)
    sym = String(var(S))
    max_prec = max_precision(S)
-   return AbstractAlgebra.laurent_series_ring(R, max_prec, sym; cached=cached)[1]
+   return AbstractAlgebra.LaurentSeriesRing(R, max_prec, sym; cached=cached)[1]
 end
 
 function map_coefficients(g, p::LaurentSeriesElem{<:RingElement};
@@ -600,7 +600,7 @@ end
 ################################################################################
 
 function _change_laurent_series_ring(R, Rx, cached)
-   P, _ = AbstractAlgebra.laurent_series_ring(R, max_precision(Rx),
+   P, _ = AbstractAlgebra.LaurentSeriesRing(R, max_precision(Rx),
                                                string(var(Rx)), cached = cached)
    return P
 end
@@ -1776,7 +1776,7 @@ end
 #
 ###############################################################################
 
-const LaurentSeriesRingOrField = Union{laurent_series_ring,laurent_series_field}
+const LaurentSeriesRingOrField = Union{LaurentSeriesRing,LaurentSeriesField}
 
 RandomExtensions.maketype(S::LaurentSeriesRingOrField, ::UnitRange{Int}, _) = elem_type(S)
 
@@ -1834,27 +1834,27 @@ end
 #
 ###############################################################################
 
-function (R::laurent_series_ring{T})(b::RingElement) where {T <: RingElement}
+function (R::LaurentSeriesRing{T})(b::RingElement) where {T <: RingElement}
    return R(base_ring(R)(b))
 end
 
-function (R::laurent_series_field{T})(b::RingElement) where {T <: FieldElement}
+function (R::LaurentSeriesField{T})(b::RingElement) where {T <: FieldElement}
    return R(base_ring(R)(b))
 end
 
-function (R::laurent_series_ring{T})() where {T <: RingElement}
+function (R::LaurentSeriesRing{T})() where {T <: RingElement}
    z = LaurentSeriesRingElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    z.parent = R
    return z
 end
 
-function (R::laurent_series_field{T})() where {T <: FieldElement}
+function (R::LaurentSeriesField{T})() where {T <: FieldElement}
    z = LaurentSeriesFieldElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    z.parent = R
    return z
 end
 
-function (R::laurent_series_ring{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (R::LaurentSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    if b == 0
       z = LaurentSeriesRingElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
@@ -1864,7 +1864,7 @@ function (R::laurent_series_ring{T})(b::Union{Integer, Rational, AbstractFloat})
    return z
 end
 
-function (R::laurent_series_field{T})(b::Union{Rational, AbstractFloat}) where {T <: FieldElement}
+function (R::LaurentSeriesField{T})(b::Union{Rational, AbstractFloat}) where {T <: FieldElement}
    if b == 0
       z = LaurentSeriesFieldElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
@@ -1874,7 +1874,7 @@ function (R::laurent_series_field{T})(b::Union{Rational, AbstractFloat}) where {
    return z
 end
 
-function (R::laurent_series_ring{T})(b::T) where {T <: RingElem}
+function (R::LaurentSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
       z = LaurentSeriesRingElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
@@ -1885,7 +1885,7 @@ function (R::laurent_series_ring{T})(b::T) where {T <: RingElem}
    return z
 end
 
-function (R::laurent_series_field{T})(b::T) where {T <: FieldElem}
+function (R::LaurentSeriesField{T})(b::T) where {T <: FieldElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
       z = LaurentSeriesFieldElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
@@ -1896,17 +1896,17 @@ function (R::laurent_series_field{T})(b::T) where {T <: FieldElem}
    return z
 end
 
-function (R::laurent_series_ring{T})(b::LaurentSeriesElem{T}) where {T <: RingElement}
+function (R::LaurentSeriesRing{T})(b::LaurentSeriesElem{T}) where {T <: RingElement}
    parent(b) != R && error("Unable to coerce power series")
    return b
 end
 
-function (R::laurent_series_field{T})(b::LaurentSeriesElem{T}) where {T <: FieldElement}
+function (R::LaurentSeriesField{T})(b::LaurentSeriesElem{T}) where {T <: FieldElement}
    parent(b) != R && error("Unable to coerce power series")
    return b
 end
 
-function (R::laurent_series_ring{T})(b::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
+function (R::LaurentSeriesRing{T})(b::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
@@ -1918,7 +1918,7 @@ function (R::laurent_series_ring{T})(b::Vector{T}, len::Int, prec::Int, val::Int
    return z
 end
 
-function (R::laurent_series_field{T})(b::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
+function (R::LaurentSeriesField{T})(b::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
@@ -1939,7 +1939,7 @@ end
 function laurent_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached=true)
    T = elem_type(R)
 
-   parent_obj = laurent_series_ring{T}(R, prec, s, cached)
+   parent_obj = LaurentSeriesRing{T}(R, prec, s, cached)
 
    return parent_obj, gen(parent_obj)
 end
@@ -1947,7 +1947,7 @@ end
 function laurent_series_ring(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached=true)
    T = elem_type(R)
 
-   parent_obj = laurent_series_field{T}(R, prec, s, cached)
+   parent_obj = LaurentSeriesField{T}(R, prec, s, cached)
 
    return parent_obj, gen(parent_obj)
 end
@@ -1955,7 +1955,7 @@ end
 function laurent_series_field(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached=true)
    T = elem_type(R)
 
-   parent_obj = laurent_series_field{T}(R, prec, s, cached)
+   parent_obj = LaurentSeriesField{T}(R, prec, s, cached)
 
    return parent_obj, gen(parent_obj)
 end

@@ -28,20 +28,20 @@
    U, z = laurent_series_field(QQ, 30, "z")
 
    @test elem_type(R) == Generic.LaurentSeriesRingElem{BigInt}
-   @test elem_type(Generic.laurent_series_ring{BigInt}) == Generic.LaurentSeriesRingElem{BigInt}
-   @test parent_type(Generic.LaurentSeriesRingElem{BigInt}) == Generic.laurent_series_ring{BigInt}
+   @test elem_type(Generic.LaurentSeriesRing{BigInt}) == Generic.LaurentSeriesRingElem{BigInt}
+   @test parent_type(Generic.LaurentSeriesRingElem{BigInt}) == Generic.LaurentSeriesRing{BigInt}
 
    @test elem_type(T) == Generic.LaurentSeriesRingElem{elem_type(S)}
-   @test elem_type(Generic.laurent_series_ring{elem_type(S)}) == Generic.LaurentSeriesRingElem{elem_type(S)}
-   @test parent_type(Generic.LaurentSeriesRingElem{elem_type(S)}) == Generic.laurent_series_ring{elem_type(S)}
+   @test elem_type(Generic.LaurentSeriesRing{elem_type(S)}) == Generic.LaurentSeriesRingElem{elem_type(S)}
+   @test parent_type(Generic.LaurentSeriesRingElem{elem_type(S)}) == Generic.LaurentSeriesRing{elem_type(S)}
 
    @test elem_type(U) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
-   @test elem_type(Generic.laurent_series_field{Rational{BigInt}}) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
-   @test parent_type(Generic.LaurentSeriesFieldElem{Rational{BigInt}}) == Generic.laurent_series_field{Rational{BigInt}}
+   @test elem_type(Generic.LaurentSeriesField{Rational{BigInt}}) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
+   @test parent_type(Generic.LaurentSeriesFieldElem{Rational{BigInt}}) == Generic.LaurentSeriesField{Rational{BigInt}}
 
-   @test isa(R, Generic.laurent_series_ring)
-   @test isa(T, Generic.laurent_series_ring)
-   @test isa(U, Generic.laurent_series_field)
+   @test isa(R, Generic.LaurentSeriesRing)
+   @test isa(T, Generic.LaurentSeriesRing)
+   @test isa(U, Generic.LaurentSeriesField)
 
    a1 = x^3 + 2x + 1
    a2 = (t^2 + 1)*y^2 + (t + 3)*y + O(y^4)
