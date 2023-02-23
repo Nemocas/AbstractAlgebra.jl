@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ResidueRing, data, modulus, lift, is_zero_divisor 
+export residue_ring, data, modulus, lift, is_zero_divisor 
 
 ###############################################################################
 #
@@ -12,7 +12,7 @@ export ResidueRing, data, modulus, lift, is_zero_divisor
 #
 ###############################################################################
 
-base_ring(S::ResRing{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
+base_ring(S::ResidueRing{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
 base_ring(r::ResElem) = base_ring(parent(r))
 
@@ -24,7 +24,7 @@ function is_exact_type(a::Type{T}) where {S <: RingElement, T <: ResElem{S}}
    return is_exact_type(S)
 end
 
-function check_parent_type(a::ResRing{T}, b::ResRing{T}) where {T <: RingElement}
+function check_parent_type(a::ResidueRing{T}, b::ResidueRing{T}) where {T <: RingElement}
    # exists only to check types of parents agree
 end
 
@@ -51,11 +51,11 @@ function Base.hash(a::ResElem, h::UInt)
 end
 
 @doc Markdown.doc"""
-    modulus(R::ResRing)
+    modulus(R::ResidueRing)
 
 Return the modulus $a$ of the given residue ring $S = R/(a)$.
 """
-function modulus(S::ResRing)
+function modulus(S::ResidueRing)
    return S.modulus
 end
 
@@ -75,9 +75,9 @@ lift(a::ResElem) = data(a)
 
 lift(a::ResElem{Int}) = BigInt(data(a))
 
-zero(R::ResRing) = R(0)
+zero(R::ResidueRing) = R(0)
 
-one(R::ResRing) = R(1)
+one(R::ResidueRing) = R(1)
 
 iszero(a::ResElem) = iszero(data(a))
 
@@ -101,7 +101,7 @@ end
 deepcopy_internal(a::ResElem, dict::IdDict) =
    parent(a)(deepcopy(data(a)))
 
-function characteristic(a::ResRing{T}) where T <: Integer
+function characteristic(a::ResidueRing{T}) where T <: Integer
    return modulus(a)
 end
 
@@ -143,7 +143,7 @@ end
 
 @enable_all_show_via_expressify ResElem
 
-function show(io::IO, a::ResRing)
+function show(io::IO, a::ResidueRing)
    print(IOContext(io, :compact => true), "Residue ring of ", base_ring(a), " modulo ", modulus(a))
 end
 
@@ -404,18 +404,18 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(R::ResRing, _) = elem_type(R)
+RandomExtensions.maketype(R::ResidueRing, _) = elem_type(R)
 
 # define rand(make(S, v))
 function rand(rng::AbstractRNG,
               sp::SamplerTrivial{<:Make2{<:ResElem{T},
-                                         <:ResRing{T}}}
+                                         <:ResidueRing{T}}}
               ) where {T}
    S, v = sp[][1:end]
    S(rand(rng, v))
 end
 
-function RandomExtensions.make(S::ResRing, vs...)
+function RandomExtensions.make(S::ResidueRing, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, vs[1])
@@ -424,18 +424,18 @@ function RandomExtensions.make(S::ResRing, vs...)
    end
 end
 
-rand(rng::AbstractRNG, S::ResRing, v...) = rand(rng, make(S, v...))
+rand(rng::AbstractRNG, S::ResidueRing, v...) = rand(rng, make(S, v...))
 
-rand(S::ResRing, v...) = rand(Random.GLOBAL_RNG, S, v...)
+rand(S::ResidueRing, v...) = rand(Random.GLOBAL_RNG, S, v...)
 
 ###############################################################################
 #
-#   ResidueRing constructor
+#   residue_ring constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    ResidueRing(R::Ring, a::RingElement; cached::Bool=true)
+    residue_ring(R::Ring, a::RingElement; cached::Bool=true)
 
 Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
 require $a \neq 0$. If `cached == true` (the default) then the resulting
@@ -443,33 +443,33 @@ residue ring parent object is cached and returned for any subsequent calls
 to the constructor with the same base ring $R$ and element $a$. A modulus
 of zero is not supported and throws an exception.
 """
-function ResidueRing(R::Ring, a::RingElement; cached::Bool = true)
+function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
    # Modulus of zero cannot be supported. E.g. A C library could not be expected to
    # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    T = elem_type(R)
 
-   return Generic.ResRing{T}(R(a), cached)
+   return Generic.ResidueRing{T}(R(a), cached)
 end
 
-function ResidueRing(R::PolyRing, a::RingElement; cached::Bool = true)
+function residue_ring(R::PolyRing, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
    T = elem_type(R)
 
-   return Generic.ResRing{T}(R(a), cached)
+   return Generic.ResidueRing{T}(R(a), cached)
 end
 
 @doc Markdown.doc"""
     quo(R::Ring, a::RingElement; cached::Bool = true)
 
-Returns `S, f` where `S = ResidueRing(R, a)` and `f` is the 
+Returns `S, f` where `S = residue_ring(R, a)` and `f` is the 
 projection map from `R` to `S`. This map is supplied as a map with section
 where the section is the lift of an element of the residue field back
 to the ring `R`.
 """
 function quo(R::Ring, a::RingElement; cached::Bool = true)
-   S = ResidueRing(R, a; cached=cached)
+   S = residue_ring(R, a; cached=cached)
    f = map_with_section_from_func(x->S(x), x->lift(x), R, S)
    return S, f
 end

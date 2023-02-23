@@ -89,7 +89,7 @@ function (a::FracField{T})(b::T, c::T) where {T <: RingElement}
    return z
 end
 
-function (a::FracField{T})(b::T, c::T) where {U <: FieldElem, T <: PolyElem{U}}
+function (a::FracField{T})(b::T, c::T) where {U <: FieldElem, T <: PolyRingElem{U}}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
    u = canonical_unit(c)
@@ -109,7 +109,7 @@ function (a::FracField{T})(b::T, c::Union{Integer, Rational, AbstractFloat}) whe
    return z
 end
 
-function (a::FracField{T})(b::T, c::Rational) where {U <: FieldElem, T <: PolyElem{U}}
+function (a::FracField{T})(b::T, c::Rational) where {U <: FieldElem, T <: PolyRingElem{U}}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    b *= inv(c)
    z = Frac{T}(b, one(base_ring(a)))
@@ -124,7 +124,7 @@ function (a::FracField{T})(b::Union{Integer, Rational, AbstractFloat}, c::T) whe
    return z
 end
 
-function (a::FracField{T})(b::Union{Integer, Rational}, c::T) where {U <: FieldElem, T <: PolyElem{U}}
+function (a::FracField{T})(b::Union{Integer, Rational}, c::T) where {U <: FieldElem, T <: PolyRingElem{U}}
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
    b = base_ring(a)(b)
    u = canonical_unit(c)
@@ -163,11 +163,11 @@ end
 
 ###############################################################################
 #
-#   FractionField constructor
+#   fraction_field constructor
 #
 ###############################################################################
 
-function FractionField(R::AbstractAlgebra.Ring; cached=true)
+function fraction_field(R::AbstractAlgebra.Ring; cached=true)
    T = elem_type(R)
 
    return FracField{T}(R, cached)

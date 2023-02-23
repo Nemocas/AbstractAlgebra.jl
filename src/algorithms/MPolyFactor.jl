@@ -26,7 +26,7 @@ end
 # evaluation at x = alpha should use divrem. Don't use evaluate for this!!!
 
 # set t to the coefficients of q when expanded in powers of (x - alpha)
-function taylor_get_coeffs!(t::Vector{E}, q::E, xalpha::E) where E <: MPolyElem
+function taylor_get_coeffs!(t::Vector{E}, q::E, xalpha::E) where E <: MPolyRingElem
   R = parent(xalpha)
   empty!(t)
   while !iszero(q)
@@ -246,7 +246,7 @@ function pfracinit(
   end
 
   # univariate ring for gcdx
-  S, x = PolynomialRing(K, "x")
+  S, x = polynomial_ring(K, "x")
   sub = [k == mainvar ? x : S(1) for k in 1:nvars(R)]
 
   for j in 0:l
@@ -791,7 +791,7 @@ end
 function mfactor_irred_univar(a::E, var::Int) where E
   R = parent(a)
   K = base_ring(R)
-  Kx, _ = PolynomialRing(K, "x")
+  Kx, _ = polynomial_ring(K, "x")
   F = factor(to_univar(a, var, Kx))
   res = E[]
   ok = true
@@ -873,7 +873,7 @@ function hlift_bivar_combine(
   xdeg = degree(a, xvar)
   ydeg = degree(a, yvar)
 
-  Ky, y = PolynomialRing(K, "x")
+  Ky, y = polynomial_ring(K, "x")
 
   yalpha = gen(R, yvar) - R(alpha)
   yalphapow = yalpha^(ydeg + 1)
@@ -986,7 +986,7 @@ function lcc_kaltofen_step!(
   R = parent(Af.unit)
   r = length(Au)
   @assert r == length(divs)
-  Kx, _ = PolynomialRing(base_ring(R), string(gen(R,v)))
+  Kx, _ = polynomial_ring(base_ring(R), string(gen(R,v)))
 
   Auf = [collect(factor_squarefree(to_univar(Au[i], v, Kx)).fac) for i in 1:r]
 
@@ -1348,7 +1348,7 @@ function mfactor_squarefree_char_zero(a::E) where E
 end
 
 # factor a multivariate over an exact field of characteristic 0
-function mfactor_char_zero(a::E) where E <: MPolyElem
+function mfactor_char_zero(a::E) where E <: MPolyRingElem
   tres = mfactor_squarefree_char_zero(a)
   # ensure factors are irreducible
   res = Fac{E}()

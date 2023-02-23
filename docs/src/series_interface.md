@@ -27,8 +27,8 @@ Note that both abstract types are parameterised. The type `T` should usually be 
 of elements of the coefficient ring of the power series ring. For example, in the case
 of $\mathbb{Z}[[x]]$ the type `T` would be the type of an integer, e.g. `BigInt`.
 
-Within the `SeriesElem{T}` abstract type is the abstract type `RelSeriesElem{T}` for
-relative power series, and `AbsSeriesElem{T}` for absolute power series.
+Within the `SeriesElem{T}` abstract type is the abstract type `RelPowerSeriesRingElem{T}` for
+relative power series, and `AbsPowerSeriesRingElem{T}` for absolute power series.
 
 Relative series are typically stored with a valuation and a series that is either
 zero or that has nonzero constant term. Absolute series are stored starting from the
@@ -38,7 +38,7 @@ If the parent object for a relative series ring over the bignum integers has typ
 `MySeriesRing` and series in that ring have type `MySeries` then one would have:
 
   * `MySeriesRing <: SeriesRing{BigInt}`
-  * `MySeries <: RelSeriesElem{BigInt}`
+  * `MySeries <: RelPowerSeriesRingElem{BigInt}`
 
 Series rings should be made unique on the system by caching parent objects (unless
 an optional `cache` parameter is set to `false`). Series rings should at least be

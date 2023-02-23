@@ -14,13 +14,13 @@ export O, abs_series, abs_series_type, max_precision, pol_length, precision,
 ###############################################################################
 
 @doc Markdown.doc"""
-    O(a::AbsSeriesElem{T}) where T <: RingElement
+    O(a::AbsPowerSeriesRingElem{T}) where T <: RingElement
 
 Return $0 + O(x^\mathrm{deg}(a))$. Usually this function is called with $x^n$
 as parameter. Then the function returns the power series $0 + O(x^n)$, which
 can be used to set the precision of a power series when constructing it.
 """
-function O(a::AbsSeriesElem{T}) where T <: RingElement
+function O(a::AbsPowerSeriesRingElem{T}) where T <: RingElement
    if iszero(a)
       return deepcopy(a)    # 0 + O(x^n)
    end
@@ -34,39 +34,39 @@ end
 #
 ###############################################################################
 
-length(x::AbsSeriesElem) = x.length
+length(x::AbsPowerSeriesRingElem) = x.length
 
-pol_length(x::AbsSeriesElem) = length(x)
+pol_length(x::AbsPowerSeriesRingElem) = length(x)
 
-precision(x::AbsSeriesElem) = x.prec
+precision(x::AbsPowerSeriesRingElem) = x.prec
 
 iszero(a::SeriesElem) = length(a) == 0
 
-function isone(a::AbsSeriesElem)
+function isone(a::AbsPowerSeriesRingElem)
    return (length(a) == 1 && isone(coeff(a, 0))) || precision(a) == 0
 end
 
 @doc Markdown.doc"""
-    is_gen(a::AbsSeriesElem)
+    is_gen(a::AbsPowerSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to the
 generator of its power series ring to its current precision, otherwise return
 `false`.
 """
-function is_gen(a::AbsSeriesElem)
+function is_gen(a::AbsPowerSeriesRingElem)
    return (valuation(a) == 1 && length(a) == 2 && isone(coeff(a, 1))) ||
            precision(a) == 0
 end
 
-is_unit(a::AbsSeriesElem) = valuation(a) == 0 && is_unit(coeff(a, 0))
+is_unit(a::AbsPowerSeriesRingElem) = valuation(a) == 0 && is_unit(coeff(a, 0))
 
 @doc Markdown.doc"""
-    valuation(a::AbsSeriesElem)
+    valuation(a::AbsPowerSeriesRingElem)
 
 Return the valuation of the given power series, i.e. the degree of the first
 nonzero term (or the precision if it is arithmetically zero).
 """
-function valuation(a::AbsSeriesElem)
+function valuation(a::AbsPowerSeriesRingElem)
    for i = 1:length(a)
       if !iszero(coeff(a, i - 1))
          return i - 1
@@ -75,7 +75,7 @@ function valuation(a::AbsSeriesElem)
    return precision(a)
 end
 
-function Base.hash(a::AbsSeriesElem, h::UInt)
+function Base.hash(a::AbsPowerSeriesRingElem, h::UInt)
    b = 0xb44d6896204881f3%UInt
    for i in 0:length(a) - 1
       b = xor(b, hash(coeff(a, i), h), h)
@@ -90,7 +90,7 @@ end
 #
 ###############################################################################
 
-function similar(x::AbsSeriesElem, R::Ring, max_prec::Int,
+function similar(x::AbsPowerSeriesRingElem, R::Ring, max_prec::Int,
                                    s::Symbol=var(parent(x)); cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
@@ -102,76 +102,76 @@ function similar(x::AbsSeriesElem, R::Ring, max_prec::Int,
       # steal parent in case it is not cached
       p.parent = parent(x)
    else
-      p.parent = Generic.AbsSeriesRing{TT}(R, max_prec, s, cached)
+      p.parent = Generic.AbsPowerSeriesRing{TT}(R, max_prec, s, cached)
    end
    return p
 end
 
-function similar(x::AbsSeriesElem, R::Ring,
+function similar(x::AbsPowerSeriesRingElem, R::Ring,
                                  var::Symbol=var(parent(x)); cached::Bool=true)
    return similar(x, R, max_precision(parent(x)), var; cached = cached)
 end
 
-function similar(x::AbsSeriesElem, max_prec::Int,
+function similar(x::AbsPowerSeriesRingElem, max_prec::Int,
                                  var::Symbol=var(parent(x)); cached::Bool=true)
    return similar(x, base_ring(x), max_prec, var; cached=cached)
 end
 
-function similar(x::AbsSeriesElem,
+function similar(x::AbsPowerSeriesRingElem,
                                  var::Symbol=var(parent(x)); cached::Bool=true)
    return similar(x, base_ring(x),
                   max_precision(parent(x)), var; cached=cached)
 end
 
-function similar(x::AbsSeriesElem, R::Ring, max_prec::Int,
+function similar(x::AbsPowerSeriesRingElem, R::Ring, max_prec::Int,
                                                 var::String; cached::Bool=true)
    return similar(x, R, max_prec, Symbol(var); cached=cached)
 end
 
-function similar(x::AbsSeriesElem, R::Ring, var::String; cached::Bool=true)
+function similar(x::AbsPowerSeriesRingElem, R::Ring, var::String; cached::Bool=true)
    return similar(x, R, max_precision(parent(x)), Symbol(var); cached=cached)
 end
 
-function similar(x::AbsSeriesElem, max_prec::Int,
+function similar(x::AbsPowerSeriesRingElem, max_prec::Int,
                                                 var::String; cached::Bool=true)
    return similar(x, base_ring(x), max_prec, Symbol(var); cached=cached)
 end
 
-function similar(x::AbsSeriesElem, var::String; cached::Bool=true)
+function similar(x::AbsPowerSeriesRingElem, var::String; cached::Bool=true)
    return similar(x, base_ring(x),
                   max_precision(parent(x)), Symbol(var); cached=cached)
 end
 
-function zero(a::AbsSeriesElem, R::Ring, max_prec::Int,
+function zero(a::AbsPowerSeriesRingElem, R::Ring, max_prec::Int,
                                  var::Symbol=var(parent(a)); cached::Bool=true)
    return similar(a, R, max_prec, var; cached=cached)
 end
 
-function zero(a::AbsSeriesElem, R::Ring,
+function zero(a::AbsPowerSeriesRingElem, R::Ring,
                                  var::Symbol=var(parent(a)); cached::Bool=true)
    return similar(a, R, max_precision(parent(a)), var; cached=cached)
 end
 
-function zero(a::AbsSeriesElem, max_prec::Int,
+function zero(a::AbsPowerSeriesRingElem, max_prec::Int,
                                  var::Symbol=var(parent(a)); cached::Bool=true)
    return similar(a, base_ring(a), max_prec, var; cached=cached)
 end
 
-zero(a::AbsSeriesElem, var::Symbol=var(parent(a)); cached::Bool=true) =
+zero(a::AbsPowerSeriesRingElem, var::Symbol=var(parent(a)); cached::Bool=true) =
    similar(a, base_ring(a), max_precision(parent(a)), var; cached=cached)
 
-function zero(a::AbsSeriesElem, R::Ring, max_prec::Int,
+function zero(a::AbsPowerSeriesRingElem, R::Ring, max_prec::Int,
                                                 var::String; cached::Bool=true)
    return zero(a, R, max_prec, Symbol(var); cached=cached)
 end
 
-zero(a::AbsSeriesElem, R::Ring, var::String; cached::Bool=true) =
+zero(a::AbsPowerSeriesRingElem, R::Ring, var::String; cached::Bool=true) =
    zero(a, R, max_precision(parent(a)), Symbol(var); cached=cached)
 
-zero(a::AbsSeriesElem, max_prec::Int, var::String; cached::Bool=true) =
+zero(a::AbsPowerSeriesRingElem, max_prec::Int, var::String; cached::Bool=true) =
    zero(a, base_ring(a), max_prec, Symbol(var); cached=cached)
 
-zero(a::AbsSeriesElem, var::String; cached::Bool=true) =
+zero(a::AbsPowerSeriesRingElem, var::String; cached::Bool=true) =
    zero(a, base_ring(a), max_precision(parent(a)), Symbol(var); cached=cached)
 
 ###############################################################################
@@ -186,7 +186,7 @@ function abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::AbstractS
    coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.AbsSeries{TT}(coeffs, len, prec)
    # Default is supposed to return a Generic polynomial
-   p.parent = Generic.AbsSeriesRing{TT}(R, max_precision, Symbol(var), cached)
+   p.parent = Generic.AbsPowerSeriesRing{TT}(R, max_precision, Symbol(var), cached)
    return p
 end
 
@@ -196,7 +196,7 @@ end
 #
 ###############################################################################
 
-function expressify(a::AbsSeriesElem,
+function expressify(a::AbsPowerSeriesRingElem,
                                     x = var(parent(a)); context = nothing)
     sum = Expr(:call, :+)
     v = valuation(a)
@@ -229,7 +229,7 @@ end
 #
 ###############################################################################
 
-function -(a::AbsSeriesElem)
+function -(a::AbsPowerSeriesRingElem)
    len = length(a)
    z = parent(a)()
    z = set_precision!(z, precision(a))
@@ -246,7 +246,7 @@ end
 #
 ###############################################################################
 
-function +(a::AbsSeriesElem{T}, b::AbsSeriesElem{T}) where T <: RingElement
+function +(a::AbsPowerSeriesRingElem{T}, b::AbsPowerSeriesRingElem{T}) where T <: RingElement
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -274,7 +274,7 @@ function +(a::AbsSeriesElem{T}, b::AbsSeriesElem{T}) where T <: RingElement
    return z
 end
 
-function -(a::AbsSeriesElem{T}, b::AbsSeriesElem{T}) where T <: RingElement
+function -(a::AbsPowerSeriesRingElem{T}, b::AbsPowerSeriesRingElem{T}) where T <: RingElement
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -302,7 +302,7 @@ function -(a::AbsSeriesElem{T}, b::AbsSeriesElem{T}) where T <: RingElement
    return z
 end
 
-function *(a::AbsSeriesElem{T}, b::AbsSeriesElem{T}) where T <: RingElement
+function *(a::AbsPowerSeriesRingElem{T}, b::AbsPowerSeriesRingElem{T}) where T <: RingElement
    check_parent(a, b)
 
    lena = length(a)
@@ -350,7 +350,7 @@ end
 #
 ###############################################################################
 
-function *(a::T, b::AbsSeriesElem{T}) where {T <: RingElem}
+function *(a::T, b::AbsPowerSeriesRingElem{T}) where {T <: RingElem}
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -362,7 +362,7 @@ function *(a::T, b::AbsSeriesElem{T}) where {T <: RingElem}
    return z
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::AbsSeriesElem)
+function *(a::Union{Integer, Rational, AbstractFloat}, b::AbsPowerSeriesRingElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -374,9 +374,9 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbsSeriesElem)
    return z
 end
 
-*(a::AbsSeriesElem{T}, b::T) where {T <: RingElem} = b*a
+*(a::AbsPowerSeriesRingElem{T}, b::T) where {T <: RingElem} = b*a
 
-*(a::AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::AbsPowerSeriesRingElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################
 #
@@ -385,12 +385,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    shift_left(x::AbsSeriesElem{T}, n::Int) where T <: RingElement
+    shift_left(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
 $x^n$.
 """
-function shift_left(x::AbsSeriesElem{T}, n::Int) where T <: RingElement
+function shift_left(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    n < 0 && throw(DomainError(n, "n must be >= 0"))
    xlen = length(x)
    prec = precision(x) + n
@@ -415,12 +415,12 @@ function shift_left(x::AbsSeriesElem{T}, n::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    shift_right(x::AbsSeriesElem{T}, n::Int) where T <: RingElement
+    shift_right(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted right by $n$ terms, i.e. divided by
 $x^n$.
 """
-function shift_right(x::AbsSeriesElem{T}, n::Int) where T <: RingElement
+function shift_right(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    n < 0 && throw(DomainError(n, "n must be >= 0"))
    xlen = length(x)
    if n >= xlen
@@ -444,11 +444,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    truncate(a::AbsSeriesElem{T}, n::Int) where T <: RingElement
+    truncate(a::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return $a$ truncated to $n$ terms.
 """
-function truncate(a::AbsSeriesElem{T}, n::Int) where T <: RingElement
+function truncate(a::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    n < 0 && throw(DomainError(n, "n must be >= 0"))
    len = length(a)
    if precision(a) <= n
@@ -474,11 +474,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ^(a::AbsSeriesElem{T}, b::Int) where T <: RingElement
+    ^(a::AbsPowerSeriesRingElem{T}, b::Int) where T <: RingElement
 
 Return $a^b$. We require $b \geq 0$.
 """
-function ^(a::AbsSeriesElem{T}, b::Int) where T <: RingElement
+function ^(a::AbsPowerSeriesRingElem{T}, b::Int) where T <: RingElement
    b < 0 && throw(DomainError(b, "Can't take negative power"))
    # special case powers of x for constructing power series efficiently
    if b == 0
@@ -519,13 +519,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingElement
+    ==(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
-function ==(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingElement
+function ==(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T <: RingElement
    b = check_parent(x, y, false)
    !b && return false
 
@@ -556,13 +556,13 @@ function ==(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    isequal(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingElement
+    isequal(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
 power series are precisely the same, to the same precision, are they declared
 equal by this function.
 """
-function isequal(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}) where T <: RingElement
+function isequal(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T <: RingElement
    if parent(x) != parent(y)
       return false
    end
@@ -583,7 +583,7 @@ end
 #
 ###############################################################################
 
-function Base.isapprox(f::AbsSeriesElem, g::AbsSeriesElem; atol::Real=sqrt(eps()))
+function Base.isapprox(f::AbsPowerSeriesRingElem, g::AbsPowerSeriesRingElem; atol::Real=sqrt(eps()))
    check_parent(f, g)
    nmin = min(precision(f), precision(g))
    i = 1
@@ -603,34 +603,34 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::AbsSeriesElem{T}, y::T) where {T <: RingElem}
+    ==(x::AbsPowerSeriesRingElem{T}, y::T) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::AbsSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
+==(x::AbsPowerSeriesRingElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
       ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
-    ==(x::T, y::AbsSeriesElem{T}) where {T <: RingElem}
+    ==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::T, y::AbsSeriesElem{T}) where {T <: RingElem} = y == x
+==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem} = y == x
 
 @doc Markdown.doc"""
-    ==(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat})
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
+==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::AbsSeriesElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::AbsPowerSeriesRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::AbsSeriesElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::AbsPowerSeriesRingElem) = y == x
 
 ###############################################################################
 #
@@ -638,7 +638,7 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 #
 ###############################################################################
 
-function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}; check::Bool=true) where T <: RingElement
+function divexact(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}; check::Bool=true) where T <: RingElement
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
@@ -669,7 +669,7 @@ function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}; check::Bool=true) wh
    return res
 end
 
-function divexact(x::AbsSeriesElem{T}, y::AbsSeriesElem{T}; check::Bool=true) where T <: FieldElement
+function divexact(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}; check::Bool=true) where T <: FieldElement
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
@@ -693,7 +693,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -705,7 +705,7 @@ function divexact(x::AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}; 
    return z
 end
 
-function divexact(x::AbsSeriesElem{T}, y::T; check::Bool=true) where {T <: RingElem}
+function divexact(x::AbsPowerSeriesRingElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -724,11 +724,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    Base.inv(a::AbsSeriesElem)
+    Base.inv(a::AbsPowerSeriesRingElem)
 
 Return the inverse of the power series $a$, i.e. $1/a$.
 """
-function Base.inv(a::AbsSeriesElem)
+function Base.inv(a::AbsPowerSeriesRingElem)
    iszero(a) && throw(DivideError())
    !is_unit(a) && error("Unable to invert power series")
    R = base_ring(a)
@@ -754,7 +754,7 @@ function Base.inv(a::AbsSeriesElem)
    return ainv
 end
 
-function Base.inv(a::AbsSeriesElem{T}) where T <: FieldElement
+function Base.inv(a::AbsPowerSeriesRingElem{T}) where T <: FieldElement
     prec = precision(a)
     @assert valuation(a) == 0
     @assert prec != 0
@@ -789,13 +789,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    compose(a::AbsSeriesElem, b::AbsSeriesElem)
+    compose(a::AbsPowerSeriesRingElem, b::AbsPowerSeriesRingElem)
 
 Compose the series $a$ with the series $b$ and return the result,
 i.e. return $a\circ b$. The two series do not need to be in the same ring,
 however the series $b$ must have positive valuation or an exception is raised.
 """
-function compose(a::AbsSeriesElem, b::AbsSeriesElem)
+function compose(a::AbsPowerSeriesRingElem, b::AbsPowerSeriesRingElem)
    valuation(b) == 0 && error("Series being substituted must have positive valuation")
    i = length(a)
    R = base_ring(a)
@@ -819,7 +819,7 @@ end
 #
 ###############################################################################
 
-function sqrt_classical_char2(a::AbsSeriesElem; check::Bool=true)
+function sqrt_classical_char2(a::AbsPowerSeriesRingElem; check::Bool=true)
    S = parent(a)
    R = base_ring(a)
    prec = div(precision(a) + 1, 2)
@@ -844,7 +844,7 @@ function sqrt_classical_char2(a::AbsSeriesElem; check::Bool=true)
    return true, asqrt
 end
 
-function sqrt_classical(a::AbsSeriesElem; check::Bool=true)
+function sqrt_classical(a::AbsPowerSeriesRingElem; check::Bool=true)
    # Given a power series f = f0 + f1*x + f2*x^2 + ..., compute the square root
    # g = g0 + g1*x + g2*x^2 + ... using the relations g0^2 = f0, 2g0*g1 = f1
    # 2g0*g2 = f2 - g1^2, 2g0*g3 = f3 - 2g1*g2, 2g0*g4 = f4 - (2g1*g3 + g2^2), etc.
@@ -910,13 +910,13 @@ function sqrt_classical(a::AbsSeriesElem; check::Bool=true)
 end
 
 @doc Markdown.doc"""
-    sqrt(a::AbsSeriesElem; check::Bool=true)
+    sqrt(a::AbsPowerSeriesRingElem; check::Bool=true)
 
 Return the square root of the power series $a$. By default the function will
 throw an exception if the input is not square. If `check=false` this test is
 omitted.
 """
-function Base.sqrt(a::AbsSeriesElem; check::Bool=true)
+function Base.sqrt(a::AbsPowerSeriesRingElem; check::Bool=true)
    flag, q = sqrt_classical(a; check=check)
    if check && !flag
       error("Not a square in sqrt")
@@ -924,12 +924,12 @@ function Base.sqrt(a::AbsSeriesElem; check::Bool=true)
    return q
 end
 
-function is_square(a::AbsSeriesElem)
+function is_square(a::AbsPowerSeriesRingElem)
    flag, q = sqrt_classical(a; check=true)
    return flag
 end
 
-function is_square_with_sqrt(a::AbsSeriesElem)
+function is_square_with_sqrt(a::AbsPowerSeriesRingElem)
    return sqrt_classical(a; check=true)
 end
 
@@ -940,11 +940,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    derivative(f::AbsSeriesElem{T})
+    derivative(f::AbsPowerSeriesRingElem{T})
 
 Return the derivative of the power series $f$.
 """
-function derivative(f::AbsSeriesElem{T}) where T <: RingElement
+function derivative(f::AbsPowerSeriesRingElem{T}) where T <: RingElement
    g = parent(f)()
    g = set_precision!(g, precision(f) - 1)
    len = length(f) - 1
@@ -957,11 +957,11 @@ function derivative(f::AbsSeriesElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    integral(f::AbsSeriesElem{T})
+    integral(f::AbsPowerSeriesRingElem{T})
 
 Return the integral of the power series $f$.
 """
-function integral(f::AbsSeriesElem{T}) where T <: RingElement
+function integral(f::AbsPowerSeriesRingElem{T}) where T <: RingElement
    g = parent(f)()
    len = length(f) + 1
    fit!(g, len)
@@ -983,11 +983,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    exp(a::AbsSeriesElem)
+    exp(a::AbsPowerSeriesRingElem)
 
 Return the exponential of the power series $a$.
 """
-function Base.exp(a::AbsSeriesElem{T}) where T <: RingElement
+function Base.exp(a::AbsPowerSeriesRingElem{T}) where T <: RingElement
    if iszero(a)
       z = one(parent(a))
       z = set_precision!(z, precision(a))
@@ -1013,7 +1013,7 @@ function Base.exp(a::AbsSeriesElem{T}) where T <: RingElement
    return z
 end
 
-function Base.exp(a::AbsSeriesElem{T}) where T <: FieldElement
+function Base.exp(a::AbsPowerSeriesRingElem{T}) where T <: FieldElement
    if iszero(a)
       b = parent(a)(1)
       b = set_precision!(b, precision(a))
@@ -1056,12 +1056,12 @@ end
 #
 ################################################################################
 
-function _make_parent(g, p::AbsSeriesElem, cached::Bool)
+function _make_parent(g, p::AbsPowerSeriesRingElem, cached::Bool)
    R = parent(g(zero(base_ring(p))))
    S = parent(p)
    sym = String(var(S))
    max_prec = max_precision(S)
-   return PowerSeriesRing(R, max_prec, sym; model=:capped_absolute, cached=cached)[1]
+   return power_series_ring(R, max_prec, sym; model=:capped_absolute, cached=cached)[1]
 end
 
 @doc Markdown.doc"""
@@ -1073,13 +1073,13 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function map_coefficients(g, p::AbsSeriesElem{<:RingElement};
+function map_coefficients(g, p::AbsPowerSeriesRingElem{<:RingElement};
                     cached::Bool = true,
                     parent::Ring = _make_parent(g, p, cached))
    return _map(g, p, parent)
 end
 
-function _map(g, p::AbsSeriesElem, Rx)
+function _map(g, p::AbsPowerSeriesRingElem, Rx)
    R = base_ring(Rx)
    new_coefficients = elem_type(R)[let c = coeff(p, i)
                                      iszero(c) ? zero(R) : R(g(c))
@@ -1095,7 +1095,7 @@ end
 ################################################################################
 
 function _change_abs_series_ring(R, Rx, cached)
-   P, _ = PowerSeriesRing(R, max_precision(Rx),
+   P, _ = power_series_ring(R, max_precision(Rx),
                        string(var(Rx)), cached = cached, model=:capped_absolute)
    return P
 end
@@ -1110,7 +1110,7 @@ If the optional `parent` keyword is provided, the series will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function change_base_ring(R::Ring, p::AbsSeriesElem{T};
+function change_base_ring(R::Ring, p::AbsPowerSeriesRingElem{T};
                     cached::Bool = true, parent::Ring =
           _change_abs_series_ring(R, parent(p), cached)) where T <: RingElement
    return _map(R, p, parent)
@@ -1118,7 +1118,7 @@ end
 
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 

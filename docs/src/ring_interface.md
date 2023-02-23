@@ -24,7 +24,7 @@ types in generic/GenericTypes.jl:
 
 The parent type must belong to `Ring` and the element type must belong
 to `RingElem`. Of course, the types may belong to these abstract types
-transitively, e.g. `Poly{T}` actually belongs to `PolyElem{T}` which in
+transitively, e.g. `Poly{T}` actually belongs to `PolyRingElem{T}` which in
 turn belongs to `RingElem`.
 
 For parameterised rings, we advise that the types of both the parent objects and
@@ -1042,7 +1042,7 @@ The above implementation of `ConstantPolynomialRing` may be tested as follows.
 using Test
 include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
 
-S, _ = PolynomialRing(QQ, "x")
+S, _ = polynomial_ring(QQ, "x")
 
 function test_elem(R::ConstPolyRing{elem_type(S)})
    return R(rand(base_ring(R), 1:6, -999:999))

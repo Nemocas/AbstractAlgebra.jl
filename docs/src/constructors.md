@@ -41,10 +41,10 @@ parent object before one can use it to construct element objects.
 
 AbstractAlgebra.jl provides a set of functions for constructing such parent objects.
 For example, to create a parent object for univariate polynomials over the integers,
-we use the `PolynomialRing` parent object constructor.
+we use the `polynomial_ring` parent object constructor.
 
 ```julia
-R, x = PolynomialRing(ZZ, "x")
+R, x = polynomial_ring(ZZ, "x")
 f = x^3 + 3x + 1
 g = R(12)
 ```
@@ -62,14 +62,14 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 | $R = \mathbb{Z}$                 | `R = ZZ`                                    |
 | $R = \mathbb{Q}$                 | `R = QQ`                                    |
 | $R = \mathbb{F}_{p}$             | `R = GF(p)`                                 |
-| $R = \mathbb{Z}/n\mathbb{Z}$     | `R = ResidueRing(ZZ, n)`                    |
-| $S = R[x]$                       | `S, x = PolynomialRing(R, "x")`             |
-| $S = R[x, y]$                    | `S, (x, y) = PolynomialRing(R, ["x", "y"])` |
-| $S = R[[x]]$ (to precision $n$)  | `S, x = PowerSeriesRing(R, n, "x")`         |
-| $S = R((x))$ (to precision $n$)  | `S, x = LaurentSeriesRing(R, n, "x")`       |
-| $S = K((x))$ (to precision $n$)  | `S, x = LaurentSeriesField(K, n, "x")`      |
-| $S = \mathrm{Frac}_R$            | `S = FractionField(R)`                      |
-| $S = R/(f)$                      | `S = ResidueRing(R, f)`                     |
-| $S = R/(f)$ (with $(f)$ maximal) | `S = ResidueField(R, f)`                    |
-| $S = \mathrm{Mat}_{m\times n}(R)$| `S = MatrixSpace(R, m, n)`                  |
-| $S = \mathbb{Q}[x]/(f)$          | `S, a = NumberField(f, "a")`                |
+| $R = \mathbb{Z}/n\mathbb{Z}$     | `R = residue_ring(ZZ, n)`                   |
+| $S = R[x]$                       | `S, x = polynomial_ring(R, "x")`            |
+| $S = R[x, y]$                    | `S, (x, y) = polynomial_ring(R, ["x", "y"])`|
+| $S = R[[x]]$ (to precision $n$)  | `S, x = power_series_ring(R, n, "x")`       |
+| $S = R((x))$ (to precision $n$)  | `S, x = laurent_series_ring(R, n, "x")`     |
+| $S = K((x))$ (to precision $n$)  | `S, x = laurent_series_field(K, n, "x")`    |
+| $S = \mathrm{Frac}_R$            | `S = fraction_field(R)`                     |
+| $S = R/(f)$                      | `S = residue_ring(R, f)`                    |
+| $S = R/(f)$ (with $(f)$ maximal) | `S = residue_field(R, f)`                   |
+| $S = \mathrm{Mat}_{m\times n}(R)$| `S = matrix_space(R, m, n)`                 |
+| $S = \mathbb{Q}[x]/(f)$          | `S, a = number_field(f, "a")`               |

@@ -51,7 +51,7 @@ end
          m = rand(1:5)
          F = FreeModule(R, m)
 
-         S = MatrixSpace(R, m, ngens(M))
+         S = matrix_space(R, m, ngens(M))
          f = ModuleHomomorphism(F, M, rand(S, -10:10))
 
          k, h = kernel(f)
@@ -115,7 +115,7 @@ end
 
       n = ngens(M)
       R = base_ring(M)
-      S = MatrixSpace(R, n, n)
+      S = matrix_space(R, n, n)
       N = randmat_with_rank(S, n, -10:10)
       f = ModuleIsomorphism(M, M, N)
 

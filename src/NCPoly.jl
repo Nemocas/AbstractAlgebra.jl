@@ -14,7 +14,7 @@ base_ring(R::NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)
 
 coefficient_ring(R::NCPolyRing) = base_ring(R)
 
-function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyElem{S}}
+function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S}}
    return is_exact_type(S)
 end
 
@@ -40,7 +40,7 @@ symbols(a::NCPolyRing) = [a.S]
 #
 ###############################################################################
 
-function Base.hash(a::NCPolyElem, h::UInt)
+function Base.hash(a::NCPolyRingElem, h::UInt)
    b = 0xd3f41ffbf953cbd8%UInt
    for i in 0:length(a) - 1
       b = xor(b, xor(hash(coeff(a, i), h), h))
@@ -81,7 +81,7 @@ end
 #
 ###############################################################################
 
-function +(a::NCPolyElem{T}, b::NCPolyElem{T}) where T <: NCRingElem
+function +(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -105,7 +105,7 @@ function +(a::NCPolyElem{T}, b::NCPolyElem{T}) where T <: NCRingElem
    return z
 end
 
-function -(a::NCPolyElem{T}, b::NCPolyElem{T}) where T <: NCRingElem
+function -(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -129,7 +129,7 @@ function -(a::NCPolyElem{T}, b::NCPolyElem{T}) where T <: NCRingElem
    return z
 end
 
-function *(a::NCPolyElem{T}, b::NCPolyElem{T}) where T <: NCRingElem
+function *(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
    lena = length(a)
    lenb = length(b)
    if lena == 0 || lenb == 0
@@ -161,7 +161,7 @@ end
 #
 ###############################################################################
 
-function *(a::T, b::NCPolyElem{T}) where T <: NCRingElem
+function *(a::T, b::NCPolyRingElem{T}) where T <: NCRingElem
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -172,7 +172,7 @@ function *(a::T, b::NCPolyElem{T}) where T <: NCRingElem
    return z
 end
 
-function *(a::NCPolyElem{T}, b::T) where T <: NCRingElem
+function *(a::NCPolyRingElem{T}, b::T) where T <: NCRingElem
    len = length(a)
    z = parent(a)()
    fit!(z, len)
@@ -183,7 +183,7 @@ function *(a::NCPolyElem{T}, b::T) where T <: NCRingElem
    return z
 end
 
-function +(a::T, b::NCPolyElem{T}) where {T <: NCRingElem}
+function +(a::T, b::NCPolyRingElem{T}) where {T <: NCRingElem}
    z = deepcopy(b)
    len = length(z)
    z = setcoeff!(z, 0, a + coeff(b, 0))
@@ -191,15 +191,15 @@ function +(a::T, b::NCPolyElem{T}) where {T <: NCRingElem}
    return z
 end
 
-+(a::NCPolyElem{T}, b::T) where {T <: NCRingElem} =  b + a
++(a::NCPolyRingElem{T}, b::T) where {T <: NCRingElem} =  b + a
 
-+(a::Union{Integer, Rational}, b::NCPolyElem{T}) where {T <: NCRingElem} =  parent(b)(a) + b
++(a::Union{Integer, Rational}, b::NCPolyRingElem{T}) where {T <: NCRingElem} =  parent(b)(a) + b
 
-+(a::NCPolyElem{T}, b::Union{Integer, Rational}) where {T <: NCRingElem} =  b + a
++(a::NCPolyRingElem{T}, b::Union{Integer, Rational}) where {T <: NCRingElem} =  b + a
 
--(a::Union{Integer, Rational}, b::NCPolyElem{T}) where {T <: NCRingElem} =  parent(b)(a) - b
+-(a::Union{Integer, Rational}, b::NCPolyRingElem{T}) where {T <: NCRingElem} =  parent(b)(a) - b
 
--(a::NCPolyElem{T}, b::Union{Integer, Rational}) where {T <: NCRingElem} =  a - parent(a)(b)
+-(a::NCPolyRingElem{T}, b::Union{Integer, Rational}) where {T <: NCRingElem} =  a - parent(a)(b)
 
 ###############################################################################
 #
@@ -208,11 +208,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ^(a::NCPolyElem{T}, b::Int) where T <: NCRingElem
+    ^(a::NCPolyRingElem{T}, b::Int) where T <: NCRingElem
 
 Return $a^b$. We require $b \geq 0$.
 """
-function ^(a::NCPolyElem{T}, b::Int) where T <: NCRingElem
+function ^(a::NCPolyRingElem{T}, b::Int) where T <: NCRingElem
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    R = parent(a)
@@ -258,13 +258,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::NCPolyElem{T}, y::NCPolyElem{T}) where T <: NCRingElem
+    ==(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
-function ==(x::NCPolyElem{T}, y::NCPolyElem{T}) where T <: NCRingElem
+function ==(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
    b = check_parent(x, y, false)
    !b && return false
    if length(x) != length(y)
@@ -280,14 +280,14 @@ function ==(x::NCPolyElem{T}, y::NCPolyElem{T}) where T <: NCRingElem
 end
 
 @doc Markdown.doc"""
-    isequal(x::NCPolyElem{T}, y::NCPolyElem{T}) where T <: NCRingElem
+    isequal(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
 
 Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 useful in cases where the coefficients of the polynomial are inexact, e.g.
 power series. Only if the power series are precisely the same, to the same
 precision, are they declared equal by this function.
 """
-function isequal(x::NCPolyElem{T}, y::NCPolyElem{T}) where T <: NCRingElem
+function isequal(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
    if parent(x) != parent(y)
       return false
    end
@@ -309,26 +309,26 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::NCPolyElem{T}, y::T) where T <: NCRingElem
+    ==(x::NCPolyRingElem{T}, y::T) where T <: NCRingElem
 
 Return `true` if $x == y$.
 """
-==(x::NCPolyElem{T}, y::T) where T <: NCRingElem = ((length(x) == 0 && y == 0)
+==(x::NCPolyRingElem{T}, y::T) where T <: NCRingElem = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
-    ==(x::T, y::NCPolyElem{T}) where T <: NCRingElem
+    ==(x::T, y::NCPolyRingElem{T}) where T <: NCRingElem
 
 Return `true` if $x = y$.
 """
-==(x::T, y::NCPolyElem{T}) where T <: NCRingElem = y == x
+==(x::T, y::NCPolyRingElem{T}) where T <: NCRingElem = y == x
 
 @doc Markdown.doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::NCPolyElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::NCPolyRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::NCPolyElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::NCPolyRingElem) = y == x
 
 ###############################################################################
 #
@@ -337,11 +337,11 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 ###############################################################################
 
 @doc Markdown.doc"""
-    mullow(a::NCPolyElem{T}, b::NCPolyElem{T}, n::Int) where T <: NCRingElem
+    mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: NCRingElem
 
 Return $a\times b$ truncated to $n$ terms.
 """
-function mullow(a::NCPolyElem{T}, b::NCPolyElem{T}, n::Int) where T <: NCRingElem
+function mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: NCRingElem
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -382,12 +382,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=true) where T <: NCRingElem
+    divexact_right(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=true) where T <: NCRingElem
 
 Assuming $f = qg$, return $q$. By default if the division is not exact an
 exception is raised. If `check=false` this test is omitted.
 """
-function divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=true) where T <: NCRingElem
+function divexact_right(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=true) where T <: NCRingElem
    check_parent(f, g)
    iszero(g) && throw(DivideError())
    if iszero(f)
@@ -415,12 +415,12 @@ function divexact_right(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=true) wh
 end
 
 @doc Markdown.doc"""
-    divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=true) where T <: NCRingElem
+    divexact_left(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=true) where T <: NCRingElem
 
 Assuming $f = gq$, return $q$. By default if the division is not exact an
 exception is raised. If `check=false` this test is omitted.
 """
-function divexact_left(f::NCPolyElem{T}, g::NCPolyElem{T}; check::Bool=true) where T <: NCRingElem
+function divexact_left(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=true) where T <: NCRingElem
    check_parent(f, g)
    iszero(g) && throw(DivideError())
    if iszero(f)
@@ -454,12 +454,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact_right(a::NCPolyElem{T}, b::T; check::Bool=true) where T <: NCRingElem
+    divexact_right(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: NCRingElem
 
 Assuming $a = qb$, return $q$. By default if the division is not exact an
 exception is raised. If `check=false` this test is omitted.
 """
-function divexact_right(a::NCPolyElem{T}, b::T; check::Bool=true) where T <: NCRingElem
+function divexact_right(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: NCRingElem
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -471,12 +471,12 @@ function divexact_right(a::NCPolyElem{T}, b::T; check::Bool=true) where T <: NCR
 end
 
 @doc Markdown.doc"""
-    divexact_left(a::NCPolyElem{T}, b::T; check::Bool=true) where T <: NCRingElem
+    divexact_left(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: NCRingElem
 
 Assuming $a = bq$, return $q$. By default if the division is not exact an
 exception is raised. If `check=false` this test is omitted.
 """
-function divexact_left(a::NCPolyElem{T}, b::T; check::Bool=true) where T <: NCRingElem
+function divexact_left(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: NCRingElem
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -488,12 +488,12 @@ function divexact_left(a::NCPolyElem{T}, b::T; check::Bool=true) where T <: NCRi
 end
 
 @doc Markdown.doc"""
-    divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+    divexact_right(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
 
 Assuming $a = qb$, return $q$. By default if the division is not exact an
 exception is raised. If `check=false` this test is omitted.
 """
-function divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact_right(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -505,12 +505,12 @@ function divexact_right(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat
 end
 
 @doc Markdown.doc"""
-    divexact_left(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+    divexact_left(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
 
 Assuming $a = bq$, return $q$. By default if the division is not exact an
 exception is raised. If `check=false` this test is omitted.
 """
-function divexact_left(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact_left(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    return divexact_right(a, b; check=check)
 end
 
@@ -521,11 +521,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    evaluate(a::NCPolyElem, b::T) where T <: NCRingElem
+    evaluate(a::NCPolyRingElem, b::T) where T <: NCRingElem
 
 Evaluate the polynomial $a$ at the value $b$ and return the result.
 """
-function evaluate(a::NCPolyElem, b::T) where T <: NCRingElem
+function evaluate(a::NCPolyRingElem, b::T) where T <: NCRingElem
    i = length(a)
    R = base_ring(a)
    if i == 0
@@ -541,11 +541,11 @@ function evaluate(a::NCPolyElem, b::T) where T <: NCRingElem
 end
 
 @doc Markdown.doc"""
-    evaluate(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
+    evaluate(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat})
 
 Evaluate the polynomial $a$ at the value $b$ and return the result.
 """
-function evaluate(a::NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
+function evaluate(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat})
    i = length(a)
    R = base_ring(a)
    if i == 0
@@ -569,11 +569,11 @@ end
 #
 ################################################################################
 
-function change_base_ring(R::NCRing, p::NCPolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: NCRingElement
+function change_base_ring(R::NCRing, p::NCPolyRingElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: NCRingElement
    return _map(R, p, parent)
 end
 
-function change_coefficient_ring(R::NCRing, p::NCPolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: NCRingElement
+function change_coefficient_ring(R::NCRing, p::NCPolyRingElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: NCRingElement
   return change_base_ring(R, p; cached = cached, parent = parent)
 end
 
@@ -583,17 +583,17 @@ end
 #
 ################################################################################
 
-_make_parent(g, p::NCPolyElem, cached::Bool) =
+_make_parent(g, p::NCPolyRingElem, cached::Bool) =
    _change_poly_ring(parent(g(zero(base_ring(p)))),
                      parent(p), cached)
 
-function map_coefficients(g, p::NCPolyElem{<:NCRingElement};
+function map_coefficients(g, p::NCPolyRingElem{<:NCRingElement};
                     cached::Bool = true,
                     parent::NCPolyRing = _make_parent(g, p, cached))
    return _map(g, p, parent)
 end
 
-function _map(g, p::NCPolyElem, Rx)
+function _map(g, p::NCPolyRingElem, Rx)
    R = base_ring(Rx)
    new_coefficients = elem_type(R)[let c = coeff(p, i)
                                      iszero(c) ? zero(R) : R(g(c))
@@ -607,7 +607,7 @@ end
 #
 ###############################################################################
 
-function addmul!(z::NCPolyElem{T}, x::NCPolyElem{T}, y::NCPolyElem{T}, c::NCPolyElem{T}) where T <: NCRingElem
+function addmul!(z::NCPolyRingElem{T}, x::NCPolyRingElem{T}, y::NCPolyRingElem{T}, c::NCPolyRingElem{T}) where T <: NCRingElem
    c = mul!(c, x, y)
    z = addeq!(z, c)
    return z
@@ -631,7 +631,7 @@ function RandomExtensions.make(S::NCPolyRing, deg_range::UnitRange{Int}, vs...)
 end
 
 function rand(rng::AbstractRNG,
-              sp::SamplerTrivial{<:Make3{<:NCPolyElem,
+              sp::SamplerTrivial{<:Make3{<:NCPolyRingElem,
                                          <:NCPolyRing,
                                          UnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
@@ -652,12 +652,12 @@ rand(S::NCPolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v..
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    PolynomialRing(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
+    polynomial_ring(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
 
 Given a base ring `R` and string `s` specifying how the generator (variable)
 should be printed, return a tuple `S, x` representing the new polynomial
@@ -666,16 +666,16 @@ object `S` will depend only on `R` and `x` and will be cached. Setting the
 optional argument `cached` to `false` will prevent the parent object `S` from
 being cached.
 """
-PolynomialRing(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
+polynomial_ring(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
 
-function PolynomialRing(R::NCRing, s::Symbol; cached::Bool = true)
-   return Generic.PolynomialRing(R, s, cached=cached)
+function polynomial_ring(R::NCRing, s::Symbol; cached::Bool = true)
+   return Generic.polynomial_ring(R, s, cached=cached)
 end
 
-function PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
-   return Generic.PolynomialRing(R, Symbol(s), cached=cached)
+function polynomial_ring(R::NCRing, s::AbstractString; cached::Bool = true)
+   return Generic.polynomial_ring(R, Symbol(s), cached=cached)
 end
 
-function PolynomialRing(R::NCRing, s::Char; cached::Bool = true)
-   return Generic.PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::NCRing, s::Char; cached::Bool = true)
+   return Generic.polynomial_ring(R, Symbol(s); cached=cached)
 end

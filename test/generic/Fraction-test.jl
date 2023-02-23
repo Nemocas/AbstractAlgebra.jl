@@ -1,9 +1,9 @@
 @testset "Generic.Frac.constructors" begin
-   S, x = PolynomialRing(ZZ, "x")
-   T = FractionField(S)
+   S, x = polynomial_ring(ZZ, "x")
+   T = fraction_field(S)
 
-   @test FractionField(S, cached = true) === FractionField(S, cached = true)
-   @test FractionField(S, cached = false) !== FractionField(S, cached = true)
+   @test fraction_field(S, cached = true) === fraction_field(S, cached = true)
+   @test fraction_field(S, cached = false) !== fraction_field(S, cached = true)
 
    @test elem_type(T) == Generic.Frac{elem_type(S)}
    @test elem_type(Generic.FracField{elem_type(S)}) == Generic.Frac{elem_type(S)}
@@ -41,7 +41,7 @@
 
    @test isa(T(x + 2, x + 1)//T(x, x + 2), Generic.Frac)
 
-   TT = FractionField(PolynomialRing(QQ, "x")[1])
+   TT = fraction_field(polynomial_ring(QQ, "x")[1])
    a = TT(1)
    b = T(2)
 
@@ -53,7 +53,7 @@
 end
 
 @testset "Generic.Frac.printing" begin
-   S, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   S, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 
    @test string((x+y)//z) == "(x + y)//z"
    @test string(x//y//z) == "x//(y*z)"
@@ -61,15 +61,15 @@ end
 
 
 @testset "Generic.Frac.rand" begin
-   S, x = PolynomialRing(ZZ, "x")
-   K = FractionField(S)
+   S, x = polynomial_ring(ZZ, "x")
+   K = fraction_field(S)
 
    test_rand(K, -1:3, -3:3)
 end
 
 @testset "Generic.Frac.manipulation" begin
-   R = FractionField(ZZ)
-   S, x = PolynomialRing(ZZ, "x")
+   R = fraction_field(ZZ)
+   S, x = polynomial_ring(ZZ, "x")
 
    @test denominator((x + 1)//(-x^2 + 1)) == x - 1
 
@@ -91,14 +91,14 @@ end
 end
 
 @testset "Generic.Frac.unary_ops" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    @test -((x + 1)//(-x^2 + 1)) == 1//(x - 1)
 end
 
 @testset "Generic.Frac.binary_ops" begin
-   S, x = PolynomialRing(ZZ, "x")
-   K = FractionField(S)
+   S, x = polynomial_ring(ZZ, "x")
+   K = fraction_field(S)
 
    for iter = 1:100
       a = rand(K, -1:3, -3:3)
@@ -113,7 +113,7 @@ end
 end
 
 @testset "Generic.Frac.adhoc_binary" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    a = (-x + 1)//(2x^2 + 3)
    b = (x + 1)//(-x^2 + 1)
@@ -144,7 +144,7 @@ end
 end
 
 @testset "Generic.Frac.comparison" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    a = -((x + 1)//(-x^2 + 1))
 
@@ -154,7 +154,7 @@ end
 end
 
 @testset "Generic.Frac.adhoc_comparison" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    a = 1//(x - 1)
 
@@ -172,7 +172,7 @@ end
 end
 
 @testset "Generic.Frac.powering" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1)
 
@@ -180,7 +180,7 @@ end
 end
 
 @testset "Generic.Frac.inversion" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1)
 
@@ -188,8 +188,8 @@ end
 end
 
 @testset "Generic.Frac.exact_division" begin
-   S, x = PolynomialRing(ZZ, "x")
-   K = FractionField(S)
+   S, x = polynomial_ring(ZZ, "x")
+   K = fraction_field(S)
 
    for iter = 1:100
       a = K(); b = K(); c = K()
@@ -210,7 +210,7 @@ end
 end
 
 @testset "Generic.Frac.adhoc_exact_division" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    a = (-x + 1)//(2x^2 + 3)
    b = (x + 1)//(-x^2 + 1)
@@ -225,8 +225,8 @@ end
 end
 
 @testset "Generic.Frac.divides" begin
-   R, x = PolynomialRing(ZZ, "x")
-   S = FractionField(R)
+   R, x = polynomial_ring(ZZ, "x")
+   S = fraction_field(R)
 
    for i in 1:1000
      a = rand(S, -1:5, -10:10)
@@ -241,15 +241,15 @@ end
 end
 
 @testset "Generic.Frac.evaluate" begin
-   R = ResidueRing(ZZ, 5)
-   S, x = PolynomialRing(R, "x")
+   R = residue_ring(ZZ, 5)
+   S, x = polynomial_ring(R, "x")
 
    f = (x^2 + 2)//(x + 1)
 
    @test evaluate(f, 1) == R(4)
    @test evaluate(f, R(1)) == R(4)
 
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
    f = (x^2 + y)//(y + 2)
 
@@ -258,19 +258,19 @@ end
 end
 
 @testset "Generic.Frac.derivative" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    f = (x^2 + 1)//2x
 
    @test derivative(f) == (x^2 - 1)//2x^2
 
-   R, (x, ) = PolynomialRing(QQ, ["x"])
+   R, (x, ) = polynomial_ring(QQ, ["x"])
 
    f = (x^2 + 1)//2x
 
    @test derivative(f, x) == (x^2 - 1)//2x^2
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    f = (x^2 + x*y + y^2)//(x + y)
 
@@ -280,8 +280,8 @@ end
 end
 
 @testset "Generic.Frac.square_root" begin
-   R, x = PolynomialRing(QQ, "x")
-   S = FractionField(R)
+   R, x = polynomial_ring(QQ, "x")
+   S = fraction_field(R)
 
    for i = 1:100
       a = rand(S, -1:5, -10:10)
@@ -311,28 +311,28 @@ end
 end
 
 @testset "Generic.Frac.gcd" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1) - x//(2x + 1)
 
    @test gcd(a, (x + 1)//(x - 1)) == 1//(2*x^2-x-1)
 end
 
-if @isdefined fmpq
+if @isdefined QQFieldElem
     @testset "Generic.Frac.remove_valuation" begin
-        a = fmpq(2, 3)
+        a = QQFieldElem(2, 3)
 
-        @test remove(a, BigInt(2)) == (1, fmpq(1, 3))
+        @test remove(a, BigInt(2)) == (1, QQFieldElem(1, 3))
         @test valuation(a, BigInt(2)) == 1
 
-        @test remove(a, BigInt(3)) == (-1, fmpq(2, 1))
+        @test remove(a, BigInt(3)) == (-1, QQFieldElem(2, 1))
         @test valuation(a, BigInt(3)) == -1
     end
 end
 
 @testset "Generic.Frac.promotion" begin
-   S, x = PolynomialRing(QQ, "x")
-   F = FractionField(S)
+   S, x = polynomial_ring(QQ, "x")
+   F = fraction_field(S)
    T = elem_type(F)
    @test AbstractAlgebra.promote_rule(T, T) == T
 end

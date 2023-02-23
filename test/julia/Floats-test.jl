@@ -12,7 +12,7 @@ end
 end
 
 @testset "Julia.Floats.printing" begin
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    @test !occursin("+", string(2*x^2-3*x))
 end

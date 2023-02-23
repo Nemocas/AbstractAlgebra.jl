@@ -6,29 +6,29 @@
    @test RationalFunctionField(QQ, "x", cached = true)[1] === RationalFunctionField(QQ, "x", cached = true)[1]
    @test RationalFunctionField(QQ, "x", cached = false)[1] !== RationalFunctionField(QQ, "x", cached = false)[1]
 
-   @test elem_type(T) == Generic.Rat{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
-   @test elem_type(Generic.RationalFunctionField{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}) == Generic.Rat{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
-   @test parent_type(Generic.Rat{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}) == Generic.RationalFunctionField{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
+   @test elem_type(T) == Generic.RationalFunctionFieldElem{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
+   @test elem_type(Generic.RationalFunctionField{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}) == Generic.RationalFunctionFieldElem{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
+   @test parent_type(Generic.RationalFunctionFieldElem{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}) == Generic.RationalFunctionField{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
 
    @test isa(T, Generic.RationalFunctionField)
 
-   @test isa(T(3), Generic.Rat)
+   @test isa(T(3), Generic.RationalFunctionFieldElem)
 
-   @test isa(T(BigInt(7)), Generic.Rat)
+   @test isa(T(BigInt(7)), Generic.RationalFunctionFieldElem)
 
-   @test isa(T(x + 2), Generic.Rat)
+   @test isa(T(x + 2), Generic.RationalFunctionFieldElem)
 
-   @test isa(T(numerator(x^2 + 2x + 1, false), numerator(x + 1, false)), Generic.Rat)
+   @test isa(T(numerator(x^2 + 2x + 1, false), numerator(x + 1, false)), Generic.RationalFunctionFieldElem)
 
-   @test isa(T(), Generic.Rat)
+   @test isa(T(), Generic.RationalFunctionFieldElem)
 
-   @test isa((x + 3)//(x^2 + 2), Generic.Rat)
+   @test isa((x + 3)//(x^2 + 2), Generic.RationalFunctionFieldElem)
 
-   @test isa((x + 3)//12, Generic.Rat)
+   @test isa((x + 3)//12, Generic.RationalFunctionFieldElem)
 
-   @test isa(12//(x + 2), Generic.Rat)
+   @test isa(12//(x + 2), Generic.RationalFunctionFieldElem)
 
-   @test isa(((x + 1)//(x + 2))//((x + 3)//(x + 4)), Generic.Rat)
+   @test isa(((x + 1)//(x + 2))//((x + 3)//(x + 4)), Generic.RationalFunctionFieldElem)
 
    TT, x = RationalFunctionField(QQ, "x")
    a = TT(1)
@@ -47,29 +47,29 @@
    @test RationalFunctionField(QQ, ["x", "y"], cached = true)[1] === RationalFunctionField(QQ, ["x", "y"], cached = true)[1]
    @test RationalFunctionField(QQ, ["x", "y"], cached = false)[1] !== RationalFunctionField(QQ, ["x", "y"], cached = false)[1]
 
-   @test elem_type(T) == Generic.Rat{Rational{BigInt}, Generic.MPoly{Rational{BigInt}}}
+   @test elem_type(T) == Generic.RationalFunctionFieldElem{Rational{BigInt}, Generic.MPoly{Rational{BigInt}}}
 
    @test isa(T, Generic.RationalFunctionField)
 
-   @test isa(T(3), Generic.Rat)
+   @test isa(T(3), Generic.RationalFunctionFieldElem)
 
-   @test isa(T(BigInt(7)), Generic.Rat)
+   @test isa(T(BigInt(7)), Generic.RationalFunctionFieldElem)
 
-   @test isa(T(x + 2), Generic.Rat)
+   @test isa(T(x + 2), Generic.RationalFunctionFieldElem)
 
-   @test isa(T(x + y), Generic.Rat)
+   @test isa(T(x + y), Generic.RationalFunctionFieldElem)
 
-   @test isa(T(numerator(x^2 + 2y + 1, false), numerator(y + 1, false)), Generic.Rat)
+   @test isa(T(numerator(x^2 + 2y + 1, false), numerator(y + 1, false)), Generic.RationalFunctionFieldElem)
 
-   @test isa(T(), Generic.Rat)
+   @test isa(T(), Generic.RationalFunctionFieldElem)
 
-   @test isa((x + 3)//(y^2 + 2), Generic.Rat)
+   @test isa((x + 3)//(y^2 + 2), Generic.RationalFunctionFieldElem)
 
-   @test isa((x + 3)//12, Generic.Rat)
+   @test isa((x + 3)//12, Generic.RationalFunctionFieldElem)
 
-   @test isa(12//(y + 2), Generic.Rat)
+   @test isa(12//(y + 2), Generic.RationalFunctionFieldElem)
 
-   @test isa(((x + 1)//(y + 2))//((y + 3)//(x + 4)), Generic.Rat)
+   @test isa(((x + 1)//(y + 2))//((y + 3)//(x + 4)), Generic.RationalFunctionFieldElem)
 end
 
 @testset "Generic.RationalFunctionField.printing" begin
@@ -443,7 +443,7 @@ end
 
 @testset "Generic.RationalFunctionField.evaluate" begin
    # Univariate
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    f = (x^2 + 2)//(x + 1)
 
@@ -451,7 +451,7 @@ end
    @test evaluate(f, QQ(2)) == 2
 
    # Multivariate
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    f = (x^2 + 2)//(y + 1)
 

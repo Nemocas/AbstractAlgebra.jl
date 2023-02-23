@@ -64,7 +64,7 @@ constructors.
 For the unweighted case:
 
 ```julia
-PowerSeriesRing(R::Ring, prec::Vector{Int}, s::Vector{U}; cached::Bool = true) where U <: AbstractString
+power_series_ring(R::Ring, prec::Vector{Int}, s::Vector{U}; cached::Bool = true) where U <: AbstractString
 ```
 
 Given a base ring `R` and a vector of strings `s` specifying how the generators
@@ -78,7 +78,7 @@ object `S` will depend on `R`, the precision vector and the variable names
 In the weighted case:
 
 ```
-PowerSeriesRing(R::Ring, weights::Vector{Int}, s::Vector{U}, prec::Int; cached::Bool = true) where U <: AbstractString
+power_series_ring(R::Ring, weights::Vector{Int}, s::Vector{U}, prec::Int; cached::Bool = true) where U <: AbstractString
 ```
 
 Given a base ring `R` and a vector of strings `s` specifying how the generators
@@ -113,7 +113,7 @@ precisions can be replaced by a single integer in the constructor.
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = PowerSeriesRing(ZZ, [2, 3], ["x", "y"])
+julia> R, (x, y) = power_series_ring(ZZ, [2, 3], ["x", "y"])
 (Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^2), y + O(y^3) + O(x^2)])
 
 julia> f = R()
@@ -131,13 +131,13 @@ julia> k = R(x + 1)
 julia> m = x + y + O(y^2)
 y + x + O(y^2) + O(x^2)
 
-julia> R, (x, y) = PowerSeriesRing(ZZ, 3, ["x", "y"])
+julia> R, (x, y) = power_series_ring(ZZ, 3, ["x", "y"])
 (Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^3), y + O(y^3) + O(x^3)])
 
 julia> n = x + y + O(R, 2)
 y + x + O(y^2) + O(x^2)
 
-julia> R, (x, y) = PowerSeriesRing(ZZ, [2, 3], 10, ["x", "y"])
+julia> R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
 (Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(10), y + O(10)])
 
 julia> R()
@@ -153,7 +153,7 @@ Once a multivariate series ring is constructed, there are various ways to
 construct series in that ring.
 
 The easiest way is simply using the generators returned by the
-`PowerSeriesRing` constructor and build up the power series using basic
+`power_series_ring` constructor and build up the power series using basic
 arithmetic, as described in the Ring interface.
 
 The power series rings in AbstractAlgebra.jl implement the full Ring interface.
@@ -168,7 +168,7 @@ We give some examples of such functionality.
 **Examples**
 
 ```jldoctest
-julia> R, (x,) = PowerSeriesRing(ZZ, [5], ["x"])
+julia> R, (x,) = power_series_ring(ZZ, [5], ["x"])
 (Multivariate power series ring in x over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(x^5)])
 
 julia> f = x^3 + 3x + 21
@@ -205,7 +205,7 @@ true
 julia> t = divexact(f*x, 1 + x)
 21*x - 18*x^2 + 18*x^3 - 17*x^4 + O(x^5)
 
-julia> R, (x, y) = PowerSeriesRing(ZZ, [2, 3], 10, ["x", "y"])
+julia> R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
 (Multivariate power series ring in x, y over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(10), y + O(10)])
 
 julia> f = 3x^2*y + 1

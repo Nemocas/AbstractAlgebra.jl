@@ -92,7 +92,7 @@ node_num = [0] # for enumerating nodes when printing
 # potential reducers by `size` is cached on the node in the `size`
 # field
 
-mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+mutable struct lmnode{U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N}
    poly::Union{U, Nothing}
    up::Union{lmnode{U, V, N}, Nothing}   # out (divisible leading monomials)
    next::Union{lmnode{U, V, N}, Nothing} # extend current node so out-degree can be > 1
@@ -108,7 +108,7 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
    num::Int # for counting nodes (used in printing)
    size::Float64 # caches the size of the polynomial
 
-   function lmnode{U, V, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+   function lmnode{U, V, N}(p::Union{U, Nothing}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N}
       node = new{U, V, N}(p, nothing, nothing, nothing, nothing, true, true, 0, 0)
       node.size = 0.0
       if p != nothing && !iszero(p)
@@ -128,14 +128,14 @@ mutable struct lmnode{U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
 end
 
 # compute the lcm of the leading monomials of the given nodes as a tuple
-function lm_lcm(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+function lm_lcm(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N}
    return Tuple(max(node1.lcm[i], node2.lcm[i]) for i in 1:N)
 end
 
 # return `true` if the leading monomial of `node2` divides the lcm of the
 # leading monomials of the tree rooted at `node1`, i.e. return `true` if
 # `node2` could divide some node in the tree rooted at `node1`
-function lm_divides_lcm(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+function lm_divides_lcm(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N}
    for i = 1:N
       if node2.lm[i] > node1.lcm[i]
          return false
@@ -152,7 +152,7 @@ end
 # print a polynomial, either just the leading monomial if the
 # `poly_level` debug flag above is 1 and the whole thing
 # otherwise
-function print_poly(io::IO, p::MPolyElem)
+function print_poly(io::IO, p::MPolyRingElem)
    if poly_level == 1
       print(io, leading_term(p))
       if length(p) > 1
@@ -271,7 +271,7 @@ end
 # heapright(i::Int) = 2i + 1
 # heapparent(i::Int) = div(i, 2)
 
-function lm_precedes(node1::lmnode{U, :lex, N}, node2::lmnode{U, :lex, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+function lm_precedes(node1::lmnode{U, :lex, N}, node2::lmnode{U, :lex, N}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, N}
    for i = 1:N
       if node2.lm[i] < node1.lm[i]
          return true
@@ -283,7 +283,7 @@ function lm_precedes(node1::lmnode{U, :lex, N}, node2::lmnode{U, :lex, N}) where
    return true
 end
 
-function lm_precedes(node1::lmnode{U, :deglex, N}, node2::lmnode{U, :deglex, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+function lm_precedes(node1::lmnode{U, :deglex, N}, node2::lmnode{U, :deglex, N}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, N}
    s1 = sum(node1.lm)
    s2 = sum(node2.lm)
    if s2 < s1
@@ -303,7 +303,7 @@ function lm_precedes(node1::lmnode{U, :deglex, N}, node2::lmnode{U, :deglex, N})
    return true
 end
 
-function lm_precedes(node1::lmnode{U, :degrevlex, N}, node2::lmnode{U, :degrevlex, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, N}
+function lm_precedes(node1::lmnode{U, :degrevlex, N}, node2::lmnode{U, :degrevlex, N}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, N}
    s1 = sum(node1.lm)
    s2 = sum(node2.lm)
    if s2 < s1
@@ -323,7 +323,7 @@ function lm_precedes(node1::lmnode{U, :degrevlex, N}, node2::lmnode{U, :degrevle
    return true
 end
 
-function lm_divides(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+function lm_divides(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N}
    for i = 1:N
       if node2.lm[i] > node1.lm[i]
          return false
@@ -332,7 +332,7 @@ function lm_divides(node1::lmnode{U, V, N}, node2::lmnode{U, V, N}) where {U <: 
    return true
 end
 
-function heapinsert!(heap::Vector{lmnode{U, V, N}}, node::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+function heapinsert!(heap::Vector{lmnode{U, V, N}}, node::lmnode{U, V, N}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N}
    @assert !iszero(node.poly)
    i = n = length(heap) + 1
    if i != 1 && lm_precedes(heap[1], node)
@@ -355,7 +355,7 @@ function heapinsert!(heap::Vector{lmnode{U, V, N}}, node::lmnode{U, V, N}) where
    return Nothing
 end
    
-function heappop!(heap::Vector{lmnode{U, V, N}}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N}
+function heappop!(heap::Vector{lmnode{U, V, N}}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N}
    s = length(heap)
    x = heap[1]
    i = 1
@@ -392,7 +392,7 @@ end
 
 # Reduce coefficients of polynomial p starting from term with index `start`
 # (numbered from 1). Used for `normal_form` and `tail_reduce`.
-function reduce_coefficients(p::U, V::Vector{U}, start::Int) where U <: AbstractAlgebra.MPolyElem
+function reduce_coefficients(p::U, V::Vector{U}, start::Int) where U <: AbstractAlgebra.MPolyRingElem
    n = start
    len = length(p)
    infl = [1 for i in 1:nvars(parent(p))]
@@ -422,7 +422,7 @@ function reduce_coefficients(p::U, V::Vector{U}, start::Int) where U <: Abstract
 end
 
 # return the polynomial `p` tail reduced by the given basis `V`
-function tail_reduce(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
+function tail_reduce(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyRingElem
    len = length(p)
    if len <= 1
       return p
@@ -433,7 +433,7 @@ end
 # return the normal form of the polynomial `p` after reduction by
 # the given basis `V`
 # this is internal, the user facing version being given below
-function normal_form(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
+function normal_form(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyRingElem
    if iszero(p)
       return zero(parent(p))
    end
@@ -441,7 +441,7 @@ function normal_form(p::U, V::Vector{U}) where U <: AbstractAlgebra.MPolyElem
 end
 
 # given two nodes, return a node giving the spoly of the two nodes
-function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    fc = leading_coefficient(f.poly)
    gc = leading_coefficient(g.poly)
    c = lcm(fc, gc)
@@ -454,7 +454,7 @@ function compute_spoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingE
 end
 
 # given two nodes, return a node giving the gpoly of the two nodes
-function compute_gpoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function compute_gpoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    fc = leading_coefficient(f.poly)
    gc = leading_coefficient(g.poly)
    _, s, t = gcdx(fc, gc)
@@ -467,7 +467,7 @@ function compute_gpoly(f::T, g::T) where {U <: AbstractAlgebra.MPolyElem{<:RingE
 end
 
 # given two polynomials, return the spoly of the two
-function spoly(f::T, g::T) where T <: MPolyElem
+function spoly(f::T, g::T) where T <: MPolyRingElem
    n = nvars(parent(f))
    fc = leading_coefficient(f)
    gc = leading_coefficient(g)
@@ -482,7 +482,7 @@ function spoly(f::T, g::T) where T <: MPolyElem
 end
 
 # given two polynomials, return the gpoly of the two
-function gpoly(f::T, g::T) where T <: MPolyElem
+function gpoly(f::T, g::T) where T <: MPolyRingElem
    n = nvars(parent(f))
    fc = leading_coefficient(f)
    gc = leading_coefficient(g)
@@ -498,7 +498,7 @@ end
 
 # used for sorting polynomials in final basis, first by leading monomial and
 # then by leading coefficient
-function isless_monomial_lc(p::U, q::U) where U <: AbstractAlgebra.MPolyElem{<:RingElement}
+function isless_monomial_lc(p::U, q::U) where U <: AbstractAlgebra.MPolyRingElem{<:RingElement}
    plm = leading_monomial(p)
    qlm = leading_monomial(q)
    if plm < qlm
@@ -512,7 +512,7 @@ end
 
 # heuristic for size of reducer polynomials (smaller is better), used to sort
 # potential reducers
-function reducer_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function reducer_size(f::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if f.size != 0.0
       return f.size
    end
@@ -530,7 +530,7 @@ function reducer_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}
 end
 
 # returns the leading coefficient of a node for use in sorting
-function leading_coefficient_size(f::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function leading_coefficient_size(f::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    return leading_coefficient(f.poly)
 end
 
@@ -538,7 +538,7 @@ end
 # `b` if its leading term is removed, and putting any fragments in
 # `H` and marking `b` for recomputation of spolys (by placing it in
 # `S`) if it has been merely modified
-function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function reduce_by_reducer(S::Vector{T}, H::Vector{T}, b::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    reduced = false
    if b.reducer != nothing
       c = leading_coefficient(b.poly)
@@ -603,7 +603,7 @@ end
 # S is used to mark nodes for computation of spolys when they cease
 # being reduced
 # returns true if some reduction actually occurred
-function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function reduce_nodes(S::Vector{T}, H::Vector{T}, b::T, X::Vector{T}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    b.path = true
    b.settled = b.new_settled
    b.new_settled = 0
@@ -669,7 +669,7 @@ end
 # S is used to mark nodes for generation of spolys when they stop
 # being reduced
 # returns true if some reduction actually occurred
-function reduce_nodes(S::Vector{T}, H::Vector{T}, B::Vector{T}, X::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function reduce_nodes(S::Vector{T}, H::Vector{T}, B::Vector{T}, X::Vector{T}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    reduced = false
    for b in B
       if !b.path
@@ -684,7 +684,7 @@ end
 # if it exists
 # the current best reducer and whether it would remove
 # the leading coefficient are also passed in
-function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_divides::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function find_best_divides(b::T, X::Vector{T}, best::Union{T, Nothing}, best_divides::Bool) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
@@ -733,7 +733,7 @@ end
 # if it exists
 # the current best reducer and whether it would reduce
 # the leading coefficient are also passed in
-function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_reduces::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function find_best_reduces(b::T, X::Vector{T}, best::Union{T, Nothing}, best_reduces::Bool) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
@@ -780,7 +780,7 @@ end
 # we gcd with the leading coefficient of `b` if such exists
 # the current best reducer and whether it would gcd to reduce
 # the leading coefficient are also passed in
-function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd::Bool) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function find_best_gcd(b::T, X::Vector{T}, best::Union{T, Nothing}, best_is_gcd::Bool) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    c = leading_coefficient(b.poly)
    best_size = best == nothing ? 0.0 : reducer_size(best)
    for i = length(X):-1:1
@@ -827,7 +827,7 @@ end
 # everything else and reduction of leading coefficient after that
 # the function takes a list of potential reducers (i.e. nodes from further down
 # the tree), with the ones that are new since last round being in `Xnew`
-function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function find_best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    # prevent nodes that are not active from being reduced
    if !b.active
       return nothing
@@ -875,7 +875,7 @@ end
 # `X` and `Xnew` will be used to make a list of potential
 # reducers (i.e. nodes further down in tree), with `Xnew`
 # being those that are new since last round
-function best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function best_reducer(b::T, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    # insert nodes equal to b in X
    b2 = b
    oldlen = length(X)
@@ -926,7 +926,7 @@ end
 # The potential reducers along the current path so far are given by
 # the array `X` unless they are for new nodes since last time, in
 # which case they will go in `Xnew`
-function best_reducer(B::Vector{T}, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function best_reducer(B::Vector{T}, X::Vector{T}, Xnew::Vector{T}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    for b in B
       best_reducer(b, X, Xnew)
    end
@@ -937,7 +937,7 @@ end
 # those below a current bound are inserted
 # nodes are marked for generation of spolys when they stop
 # being reduced, by placing them in `S`
-function insert_fragments(S::Vector{T}, B::Vector{T}, H::Vector{T}, bound::NTuple{N, Int}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function insert_fragments(S::Vector{T}, B::Vector{T}, H::Vector{T}, bound::NTuple{N, Int}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    sort!(H, by=x->sum(max.(x.lm, bound) .- bound), rev=true)
    while !isempty(H)
       if max.(H[end].lm, bound) != bound
@@ -949,7 +949,7 @@ function insert_fragments(S::Vector{T}, B::Vector{T}, H::Vector{T}, bound::NTupl
 end
 
 # insert a node into the given branch of basis
-function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if lm_divides(b, d) # divides in both directions, so equal
       if d.active # avoid inserting polynomials that are a constant multiple of existing ones
          found = false
@@ -1012,7 +1012,7 @@ function basis_insert(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
 end
 
 # insert a node `d` into the basis `B`
-function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function basis_insert(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    # first link `d` to nodes it divides
    insert_links(d, B)
    # now insert it if any existing nodes divide it
@@ -1042,7 +1042,7 @@ end
 # if all nodes with equal lm seem to be leaves, just declare
 # `d` itself to be the base node (which won't matter where)
 # this function is used
-function find_base(d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function find_base(d::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if d.up != nothing
       return d
    end
@@ -1059,7 +1059,7 @@ end
 
 # return true if `d`` has a connection up to `b`, i.e.
 # `d` divides `b`
-function connected(b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function connected(b::T, d::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if !lm_divides(b, d)
       return false
    end
@@ -1093,7 +1093,7 @@ end
 
 # compute spolys of everything in tree b with d with exceptions
 # given in compute_spolys function below
-function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    # depth first
    if b.up != nothing
       if !b.up.path
@@ -1138,7 +1138,7 @@ end
 # s-polys are collected in `S` (not in fragments `H` to avoid too many
 # s-polys being added in a single round)
 # they are later moved to fragments
-function compute_spolys(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function compute_spolys(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    for b in B
       compute_spolys(S, b, d)
    end
@@ -1146,7 +1146,7 @@ function compute_spolys(S::Vector{T}, B::Vector{T}, d::T) where {U <: AbstractAl
 end
 
 # insert link from d to nodes it divides
-function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    remove = false
    if lm_divides(b, d) # we have arrived
       if !lm_divides(d, b) # make sure node is not equal
@@ -1194,7 +1194,7 @@ function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingEl
 end
 
 # add links from node d to existing nodes in basis that it divides
-function insert_links(d::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function insert_links(d::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    i = 1
    len = length(B)
    while i <= len
@@ -1213,7 +1213,7 @@ function insert_links(d::T, B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{
 end
 
 # (Re)compute the lcm for node b (assuming all nodes above it have correct lcm)
-function compute_lcm(b::T)  where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function compute_lcm(b::T)  where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    b.lcm = b.lm
    if b.up != nothing
       b.lcm = max.(b.lcm, b.up.lcm)
@@ -1226,7 +1226,7 @@ function compute_lcm(b::T)  where {U <: AbstractAlgebra.MPolyElem{<:RingElement}
 end
 
 # clear all path flags in given branch, i.e. reset path flags
-function clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function clear_path(b::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    if b.up != nothing
       if b.up.path
          clear_path(b.up)
@@ -1243,7 +1243,7 @@ function clear_path(b::T) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, 
 end
 
 # clear all path flags in basis, i.e. reset path flags
-function clear_path(B::Vector{T}) where {U <: AbstractAlgebra.MPolyElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
+function clear_path(B::Vector{T}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N, T <: lmnode{U, V, N}}
    for b in B
       clear_path(b)
    end
@@ -1252,7 +1252,7 @@ end
 # extract generators (polynomials) from branch and store in
 # array `D`
 # only polys from active nodes are extracted
-function extract_gens(D::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPolyElem, V, T <: lmnode{U, V, N}}
+function extract_gens(D::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPolyRingElem, V, T <: lmnode{U, V, N}}
    # depth first
    if node.up != nothing
       if !node.up.path
@@ -1283,7 +1283,7 @@ function extract_gens(D::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPol
 end
 
 # extract all generators from basis into array D which is returned
-function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, V, T <: lmnode{U, V, N}}
+function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyRingElem, V, T <: lmnode{U, V, N}}
    D = Vector{U}()
    for node in B
       extract_gens(D, node)
@@ -1296,7 +1296,7 @@ end
 # still active, generate spolys against all relevant polys in
 # basis `B` and place the spolys in `S` (for later insertion
 # into fragments)
-function generate_spolys(S::Vector{T}, B::Vector{T}, S2::Vector{T}) where {N, U <: AbstractAlgebra.MPolyElem, V, T <: lmnode{U, V, N}}
+function generate_spolys(S::Vector{T}, B::Vector{T}, S2::Vector{T}) where {N, U <: AbstractAlgebra.MPolyRingElem, V, T <: lmnode{U, V, N}}
    i = 1
    len = length(S2)
    while i <= len
@@ -1316,7 +1316,7 @@ function generate_spolys(S::Vector{T}, B::Vector{T}, S2::Vector{T}) where {N, U 
 end
 
 # main reduction routine
-function reduce_gens(I::Ideal{U}; complete_reduction::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+function reduce_gens(I::Ideal{U}; complete_reduction::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
    node_num[] = 0
    B = gens(I)
    # nothing to be done if only one poly
@@ -1446,7 +1446,7 @@ end
 const IDEAL_UNIV_DEBUG = false
 
 # Debugging: check that polynomials are in order of degree
-function check_d(D::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:RingElement}}
+function check_d(D::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyRingElem{<:RingElement}}
    if !isempty(D)
       len = length(D[1])
       for d in D
@@ -1461,7 +1461,7 @@ end
 # debugging: check polynomials are in order of degree, that there is not more than one
 # polynomial with a unit as leading coefficient, that coefficients divide one another
 # and that there are not two leading coefficients that are associate
-function check_v(V::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:RingElement}}
+function check_v(V::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyRingElem{<:RingElement}}
    len = length(V[1]) - 1
    c = 2*leading_coefficient(V[1])
    for v in V
@@ -1488,7 +1488,7 @@ function check_v(V::Vector{T}, m::Int) where {T <: AbstractAlgebra.PolyElem{<:Ri
 end
 
 # heuristic "size" of polynomials
-function mysize(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function mysize(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    s = 0.0
    j = 0
    # heuristic really punishes polys with lots of terms
@@ -1505,12 +1505,12 @@ end
 
 # heuristic as above, but first orders polynomials with respect to
 # degree
-function mysize2(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function mysize2(f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    return (length(f) << 40) + mysize(f)
 end
 
 # insert polynomial into H in sorted order wrt mysize
-function mypush!(H::Vector{T}, f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function mypush!(H::Vector{T}, f::T) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    index = searchsortedfirst(H, f, by=mysize, rev=true) # find index at which to insert x
    insert!(H, index, f)
 end
@@ -1518,7 +1518,7 @@ end
 # extend the basis `V` of polynomials satisfying 1-6 below by the
 # polynomials in `D`, all of which have degree at least that of those in
 # `V` and such that the degrees of the polynomials in `D` is *decreasing*.
-function extend_ideal_basis(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function extend_ideal_basis(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    sgen = 1
    while !isempty(D)
       d = pop!(D)
@@ -1540,7 +1540,7 @@ end
 
 # reduce a polynomials coefficients by a resultant `res` that
 # is in the ideal
-function reduce_by_resultant(f::T, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function reduce_by_resultant(f::T, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    f = deepcopy(f)
    len = 0
    for i = 1:length(f)
@@ -1558,7 +1558,7 @@ function reduce_by_resultant(f::T, res::U) where {U <: RingElement, T <: Abstrac
 end
 
 # do tail reduction of the polynomial `f` by the basis `V`
-function reduce_tail(f::T, V::AbstractVector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function reduce_tail(f::T, V::AbstractVector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    p = iszero(res) ? f : reduce_by_resultant(f, res)
    p = divexact(p, canonical_unit(p))
    i = length(V)
@@ -1592,7 +1592,7 @@ end
 
 # return the normal form of `p` by the basis `V`
 # this is internal; see below for the user facing version
-function normal_form(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function normal_form(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    i = length(V)
    n = length(p)
    while n > 0
@@ -1624,7 +1624,7 @@ end
 # this function inserts spolys of `v[n]` and `V[n - 1]` and of `V[n]` and
 # and `V[n + 1]` (if those exist) into `H`, reducing coefficients by the
 # resultant `res` if available
-function insert_spoly(V::Vector{T}, H::Vector{T}, n::Int, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function insert_spoly(V::Vector{T}, H::Vector{T}, n::Int, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    p1 = V[n]
    if n > 1
       p2 = V[n - 1]
@@ -1648,7 +1648,7 @@ end
 
 # insert fragments from `H` into basis `V`, placing any long
 # fragments back in `D` instead
-function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function insert_fragments(D::Vector{T}, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    max_len = 0
    for h in H
       max_len = max(max_len, length(h))
@@ -1810,7 +1810,7 @@ end
 # polynomial `p` whose degree is at least that of all the polynomials in `V`,
 # add `p` to `V` and perform reduction steps so that 1-6 still hold
 # fragments which are generated and need to be added go in `H`
-function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    while true
       n = length(V)
       lc = leading_coefficient(V[n])
@@ -1905,7 +1905,7 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
    end
 end
       
-function remove_constant_multiples(V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function remove_constant_multiples(V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    len = length(V)
    for i = 1:len
       j = i + 1
@@ -1937,7 +1937,7 @@ end
 # which exists in the idea
 # this can be used to reduce coefficients of polynomials to keep
 # them small throughout the algorithm
-function find_resultant_in_ideal(R::Ring, D::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function find_resultant_in_ideal(R::Ring, D::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    res = zero(R)
    V = similar(D, 0)
    for i = 1:length(D)
@@ -1964,7 +1964,7 @@ function find_resultant_in_ideal(R::Ring, D::Vector{T}) where {U <: RingElement,
    return res
 end
 
-function is_constant_multiple(f::T, g::T) where T <: AbstractAlgebra.PolyElem
+function is_constant_multiple(f::T, g::T) where T <: AbstractAlgebra.PolyRingElem
    if length(f) == length(g)
       c1 = leading_coefficient(f)
       c2 = leading_coefficient(g)
@@ -1994,7 +1994,7 @@ end
 # this may generate fragments which are placed in `H`
 # when a new poly is added to the basis, spolys are also generated for all
 # the polynomials reduced by the new poly and for the new poly itself
-function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    V = gens(I)
    # Compute V a vector of polynomials giving the same basis as I
    # but for which the above hold
@@ -2073,11 +2073,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.MPolyElem{T}}}
+    normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyRingElem{T}, AbstractAlgebra.MPolyRingElem{T}}}
 
 Return the normal form of the polynomial `p` with respect to the ideal `I`.
 """
-function normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.MPolyElem{T}}}
+function normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyRingElem{T}, AbstractAlgebra.MPolyRingElem{T}}}
    return normal_form(p, gens(I))
 end
 
@@ -2114,7 +2114,7 @@ function Base.contains(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
    return divides(G1[1], G2[1])[1]
 end
 
-function Base.contains(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Union{AbstractAlgebra.PolyElem{U}, AbstractAlgebra.MPolyElem{U}}}
+function Base.contains(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Union{AbstractAlgebra.PolyRingElem{U}, AbstractAlgebra.MPolyRingElem{U}}}
    G = gens(J)
    for v in G
       if !iszero(normal_form(v, I))
@@ -2148,7 +2148,7 @@ function intersection(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
    return Ideal(R, lcm(G1[1], G2[1]))
 end
 
-function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyElem{U}}
+function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyRingElem{U}}
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)
@@ -2161,7 +2161,7 @@ function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: FieldElement, T <: A
    return Ideal(R, lcm(G1[1], G2[1]))
 end
 
-function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyElem{U}}
+function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    if contains(I, J)
       return J
    elseif contains(J, I)
@@ -2171,7 +2171,7 @@ function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Ab
    R = base_ring(S) # coefficient ring
    # create ring with additional variable "t" with higher precedence
    tsym = gensym()
-   Sup, Supv = AbstractAlgebra.PolynomialRing(R, vcat(tsym, symbols(S)); cached=false, ordering=:degrevlex)
+   Sup, Supv = AbstractAlgebra.polynomial_ring(R, vcat(tsym, symbols(S)); cached=false, ordering=:degrevlex)
    G1 = gens(I)
    G2 = gens(J)
    ISup = Ideal(Sup, elem_type(Sup)[f(Supv[2:end]...) for f in G1])
@@ -2184,7 +2184,7 @@ function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Ab
    return Ideal(S, GInt)
 end
 
-function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.MPolyElem{U}}
+function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.MPolyRingElem{U}}
    if contains(I, J)
       return J
    elseif contains(J, I)
@@ -2194,7 +2194,7 @@ function intersection(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Ab
    R = base_ring(S) # coefficient ring
    # create ring with additional variable "t" with higher precedence
    tsym = gensym()
-   Sup, Supv = AbstractAlgebra.PolynomialRing(R, vcat(tsym, symbols(S)); cached=false, ordering=ordering(S))
+   Sup, Supv = AbstractAlgebra.polynomial_ring(R, vcat(tsym, symbols(S)); cached=false, ordering=ordering(S))
    G1 = gens(I)
    G2 = gens(J)
    ISup = Ideal(Sup, elem_type(Sup)[f(Supv[2:end]...) for f in G1])
@@ -2292,7 +2292,7 @@ function reduce_gens(I::Ideal{T}) where T <: RingElement
    return I
 end
 
-function reduce_gens(I::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyElem{U}}
+function reduce_gens(I::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyRingElem{U}}
    return reduce_euclidean(I)
 end
 

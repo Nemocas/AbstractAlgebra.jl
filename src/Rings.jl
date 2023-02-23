@@ -45,11 +45,11 @@ end
 #
 ###############################################################################
 
-function evaluate(x::AbstractAlgebra.PolyElem{T}, y::Integer) where T <: RingElem
+function evaluate(x::AbstractAlgebra.PolyRingElem{T}, y::Integer) where T <: RingElem
    return evaluate(x, base_ring(x)(y))
 end
 
-function evaluate(x::AbstractAlgebra.MPolyElem{T}, y::Integer) where T <: RingElem
+function evaluate(x::AbstractAlgebra.MPolyRingElem{T}, y::Integer) where T <: RingElem
    return evaluate(x, base_ring(x)(y))
 end
 
@@ -135,7 +135,7 @@ omitted.
 """
 function Base.sqrt(a::FieldElem; check::Bool=true)
   R = parent(a)
-  R, t = PolynomialRing(R, "t", cached = false)
+  R, t = polynomial_ring(R, "t", cached = false)
   f = factor(t^2 - a)
   for (p, e) in f
     if !check || degree(p) == 1

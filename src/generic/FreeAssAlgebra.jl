@@ -579,7 +579,7 @@ end
 ################################################################################
 
 function _change_freeassalg_ring(R, Rx, cached)
-    P, _ = AbstractAlgebra.FreeAssociativeAlgebra(R, symbols(Rx); cached=cached)
+    P, _ = AbstractAlgebra.free_associative_algebra(R, symbols(Rx); cached=cached)
     return P
 end
 
@@ -605,11 +605,11 @@ end
 
 ###############################################################################
 #
-#   FreeAssociativeAlgebra constructor
+#   free_associative_algebra constructor
 #
 ###############################################################################
 
-function FreeAssociativeAlgebra(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true)
+function free_associative_algebra(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true)
    parent_obj = FreeAssAlgebra{elem_type(R)}(R, s, cached)
    return (parent_obj, gens(parent_obj))
 end

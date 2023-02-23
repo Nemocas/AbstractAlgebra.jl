@@ -338,7 +338,7 @@ Base.sqrt(a::Generic.PuiseuxSeriesElem)
 **Examples**
 
 ```jldoctest
-julia> R, t = PolynomialRing(QQ, "t")
+julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S, x = PuiseuxSeriesRing(R, 30, "x")

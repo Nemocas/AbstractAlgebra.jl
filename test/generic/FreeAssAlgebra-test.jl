@@ -4,12 +4,12 @@
    for num_vars = 1:5
       var_names = ["x$j" for j in 1:num_vars]
 
-      S, varlist = FreeAssociativeAlgebra(R, var_names)
+      S, varlist = free_associative_algebra(R, var_names)
 
-      @test FreeAssociativeAlgebra(R, var_names, cached = true)[1] === FreeAssociativeAlgebra(R, var_names, cached = true)[1]
-      @test FreeAssociativeAlgebra(R, var_names, cached = false)[1] !== FreeAssociativeAlgebra(R, var_names, cached = true)[1]
-      @test FreeAssociativeAlgebra(R, num_vars, "x", cached = true)[1] === FreeAssociativeAlgebra(R, var_names, cached = true)[1]
-      @test FreeAssociativeAlgebra(R, num_vars, cached = true)[1] === FreeAssociativeAlgebra(R, var_names, cached = true)[1]
+      @test free_associative_algebra(R, var_names, cached = true)[1] === free_associative_algebra(R, var_names, cached = true)[1]
+      @test free_associative_algebra(R, var_names, cached = false)[1] !== free_associative_algebra(R, var_names, cached = true)[1]
+      @test free_associative_algebra(R, num_vars, "x", cached = true)[1] === free_associative_algebra(R, var_names, cached = true)[1]
+      @test free_associative_algebra(R, num_vars, cached = true)[1] === free_associative_algebra(R, var_names, cached = true)[1]
 
       @test elem_type(S) == Generic.FreeAssAlgElem{elem_type(R)}
       @test elem_type(Generic.FreeAssAlgebra{elem_type(R)}) == Generic.FreeAssAlgElem{elem_type(R)}
@@ -109,7 +109,7 @@
       @test collect(exponent_words(varlist[1] + 1)) == [Int[1], Int[]]
       @test isone(varlist[1]^0)
 
-      _, varlist = PolynomialRing(QQ, var_names)
+      _, varlist = polynomial_ring(QQ, var_names)
       y = varlist[1]
       @test x in [x, y]
       @test x in [y, x]
@@ -124,9 +124,9 @@ function test_elem(R::Generic.FreeAssAlgebra{elem_type(ZZ)})
 end
 
 @testset "Generic.FreeAssAlgebra.change_base_ring" begin
-   F5 = ResidueRing(ZZ, 5)
-   R, varsR = PolynomialRing(F5, ["x"])
-   S, varsS = FreeAssociativeAlgebra(R, ["y"])
+   F5 = residue_ring(ZZ, 5)
+   R, varsR = polynomial_ring(F5, ["x"])
+   S, varsS = free_associative_algebra(R, ["y"])
    f = x -> x^2 + F5(3)
    @test map_coefficients(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
 
@@ -134,9 +134,9 @@ end
       var_names = ["x$j" for j in 1:num_vars]
 
       R, t = ZZ["t"]
-      Rx, varsRx = FreeAssociativeAlgebra(R, var_names)
-      S, _ = PolynomialRing(R, ["y", "z"])
-      Sx, varsSx = FreeAssociativeAlgebra(S, var_names)
+      Rx, varsRx = free_associative_algebra(R, var_names)
+      S, _ = polynomial_ring(R, ["y", "z"])
+      Sx, varsSx = free_associative_algebra(S, var_names)
 
       @test typeof(change_base_ring(R, Rx(0))) == typeof(Rx(0))
       @test typeof(change_base_ring(R, Rx(1))) == typeof(Rx(1))
@@ -172,7 +172,7 @@ end
 end
 
 @testset "Generic.FreeAssAlgebra.divexact" begin
-   R, (x, y, z) = FreeAssociativeAlgebra(ZZ, [:x, :x, :x])
+   R, (x, y, z) = free_associative_algebra(ZZ, [:x, :x, :x])
    a = x + y + z
    @test divexact(2*a, 2) == a
    @test divexact_left(2*a, 2) == a
@@ -187,7 +187,7 @@ end
 end
 
 @testset "Generic.FreeAssAlgebra.is_unit" begin
-   R, (x,) = FreeAssociativeAlgebra(ResidueRing(ZZ, 4), ["x"])
+   R, (x,) = free_associative_algebra(residue_ring(ZZ, 4), ["x"])
 
    @test !is_unit(x)
    @test !is_unit(2*x)
@@ -200,6 +200,6 @@ end
 end
 
 @testset "Generic.FreeAssAlgebra.NCRing_interface" begin
-   test_NCRing_interface(FreeAssociativeAlgebra(ZZ, 3)[1])
+   test_NCRing_interface(free_associative_algebra(ZZ, 3)[1])
 end
 

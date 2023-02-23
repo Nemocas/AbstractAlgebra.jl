@@ -171,7 +171,7 @@ function remove(a::T, b::T) where T <: Union{RingElem, Number}
       throw(ArgumentError("Second argument must be a non-zero non-unit"))
    end
    if iszero(a)
-      return (0, zero(parent(a))) # questionable case, consistent with fmpz
+      return (0, zero(parent(a))) # questionable case, consistent with ZZRingElem
    end
    v = 0
    while begin; (ok, q) = divides(a, b); ok; end

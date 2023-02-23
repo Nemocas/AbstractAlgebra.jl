@@ -130,13 +130,13 @@ end
 
       @test defining_polynomial(S) == modulus(S)
 
-      @test isa(numerator(S), PolyElem)
-      @test isa(denominator(S), PolyElem)
+      @test isa(numerator(S), PolyRingElem)
+      @test isa(denominator(S), PolyRingElem)
 
       T = elem_type(base_ring(base_ring(S)))
 
-      @test isa(numerator(y), Generic.Poly{<:PolyElem{T}})
-      @test isa(denominator(y), PolyElem{T})
+      @test isa(numerator(y), Generic.Poly{<:PolyRingElem{T}})
+      @test isa(denominator(y), PolyRingElem{T})
    end
 
    # characteristic 0
@@ -643,7 +643,7 @@ end
          @test divexact(f*g, f) == g
       end
 
-      for iters = 1:10 # Rat
+      for iters = 1:10 # RationalFunctionFieldElem
          f = R1()
          while iszero(f)
             f = rand(R1, 1:5, -10:10) # Rational BigInt
@@ -676,7 +676,7 @@ end
          @test divexact(f*g, f) == g
       end
 
-      for iters = 1:10 # Rat
+      for iters = 1:10 # RationalFunctionFieldElem
          f = R1()
          while iszero(f)
             f = rand(R2, 1:5) # Rational BigInt
@@ -848,7 +848,7 @@ end
    for i = 1:length(P1)
       S, y = FunctionField(P1[i], "y")
 
-      St, t = PolynomialRing(S, "t", cached = false)
+      St, t = polynomial_ring(S, "t", cached = false)
       @test t + y == y + t
       @test t * y == y * t
       @test t + 1 == 1 + t

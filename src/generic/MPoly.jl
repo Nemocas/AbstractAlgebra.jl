@@ -938,19 +938,19 @@ function Base.length(x::Union{MPolyCoeffs, MPolyExponentVectors, MPolyTerms, MPo
    return length(x.poly)
 end
 
-function Base.eltype(x::MPolyCoeffs{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+function Base.eltype(x::MPolyCoeffs{T}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
    return S
 end
 
-function Base.eltype(x::MPolyExponentVectors{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+function Base.eltype(x::MPolyExponentVectors{T}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
    return Vector{Int}
 end
 
-function Base.eltype(x::MPolyMonomials{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+function Base.eltype(x::MPolyMonomials{T}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
    return T
 end
 
-function Base.eltype(x::MPolyTerms{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+function Base.eltype(x::MPolyTerms{T}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
    return T
 end
 
@@ -3536,11 +3536,11 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    lcm(a::AbstractAlgebra.MPolyElem{T}, a::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+    lcm(a::AbstractAlgebra.MPolyRingElem{T}, a::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
 
 Return the least common multiple of a and b in parent(a).
 """
-function lcm(a::MPolyElem{T}, b::MPolyElem{T}) where {T <: RingElement}
+function lcm(a::MPolyRingElem{T}, b::MPolyRingElem{T}) where {T <: RingElement}
    check_parent(a, b)
    g = gcd(a, b)
    iszero(g) && return g
@@ -3858,7 +3858,7 @@ Add the term with coefficient `c` and exponent vector `v` to the polynomial unde
 construction in the build context `M`.
 """
 function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
-   if T <: AbstractAlgebra.MPolyElem && length(expv) != nvars(parent(M.poly))
+   if T <: AbstractAlgebra.MPolyRingElem && length(expv) != nvars(parent(M.poly))
       error("length of exponent vector should match the number of variables")
    end
    if iszero(c)
@@ -4130,11 +4130,11 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
+function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(s) + 1 : length(s)
    parent_obj = MPolyRing{T}(R, s, ordering, N, cached)
@@ -4142,7 +4142,7 @@ function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
-   return PolynomialRing(R, [Symbol(v) for v in s]; cached=cached, ordering=ordering)
+function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
+   return polynomial_ring(R, [Symbol(v) for v in s]; cached=cached, ordering=ordering)
 end
 

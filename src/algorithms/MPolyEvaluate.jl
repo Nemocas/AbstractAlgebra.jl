@@ -24,7 +24,7 @@ function mulpow!(a::T, x::S, p, ta::T, tx::S) where {T, S}
   return (a, ta, tx)
 end
 
-function mulpow!(a::T, x::S, p, ta::T, tx::S) where {T <: MPolyElem, S <: MPolyElem}
+function mulpow!(a::T, x::S, p, ta::T, tx::S) where {T <: MPolyRingElem, S <: MPolyRingElem}
   if p > 1 && (length(x) < 2 || length(a) < p*length(x))
     tx = pow!(tx, x, p)
     ta = mul!(ta, a, tx)
@@ -108,7 +108,7 @@ function _horner_lex_rec(
   @goto next_term
 end
 
-function evaluate_horner_lex(B::MPolyElem, C::Vector{<:RingElement})
+function evaluate_horner_lex(B::MPolyRingElem, C::Vector{<:RingElement})
   @assert nvars(parent(B)) <= length(C)
   ctxC = parent(C[1])
   Bcoeffs = collect(coefficients(B))
@@ -406,7 +406,7 @@ function _evaluate_horner_non_rec(
   end
 end
 
-function evaluate_horner(B::MPolyElem, C::Vector{<:RingElement})
+function evaluate_horner(B::MPolyRingElem, C::Vector{<:RingElement})
   @assert nvars(parent(B)) <= length(C)
   ctxC = parent(C[1])
   Bcoeffs = collect(coefficients(B))
@@ -544,7 +544,7 @@ function eval_mon(PC::PowerCache, a::Vector{Int})
   return result
 end
 
-function evaluate_log(f::MPolyElem, p::Vector{T}; power_cache = PowerCache{T}(p)) where {T}
+function evaluate_log(f::MPolyRingElem, p::Vector{T}; power_cache = PowerCache{T}(p)) where {T}
   n = length(p)
   R = parent(f)
   n == nvars(R) || error("number of components must equal the number of variables")
@@ -571,7 +571,7 @@ end
 
 # For a list of polynomials f to be evaluated on the same elements p,
 # we can pass on the caching dictionary.
-function evaluate_log(f::Vector{PolyType}, p::Vector{T}) where {PolyType<:MPolyElem, T}
+function evaluate_log(f::Vector{PolyType}, p::Vector{T}) where {PolyType<:MPolyRingElem, T}
   D = PowerCache{T}(p)
   return [evaluate_log(g, p; power_cache = D) for g in f]
 end

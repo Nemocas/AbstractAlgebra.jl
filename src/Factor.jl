@@ -70,7 +70,7 @@ end
 Test whether $a$ is a factor of $b$.
 """
 function Base.in(a, b::Fac{T}) where {T}
-   # convert is necessary when T == fmpz, because hash on fmpz
+   # convert is necessary when T == ZZRingElem, because hash on ZZRingElem
    # doesn't coincide with hash on Integer
    convert(T, a) in keys(b.fac)
 end

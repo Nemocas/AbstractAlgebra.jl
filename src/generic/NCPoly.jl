@@ -198,7 +198,7 @@ function (a::NCPolyRing{T})(b::T) where T <: NCRingElem
    return z
 end
 
-function (a::NCPolyRing{T})(b::NCPolyElem{T}) where T <: NCRingElem
+function (a::NCPolyRing{T})(b::NCPolyRingElem{T}) where T <: NCRingElem
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end
@@ -261,11 +261,11 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
-function PolynomialRing(R::AbstractAlgebra.NCRing, s::Symbol; cached::Bool = true)
+function polynomial_ring(R::AbstractAlgebra.NCRing, s::Symbol; cached::Bool = true)
    T = elem_type(R)
    parent_obj = NCPolyRing{T}(R, s, cached)
 

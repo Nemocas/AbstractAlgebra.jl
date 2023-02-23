@@ -156,4 +156,18 @@ include("generic/Misc/Poly.jl")
 include("generic/Misc/Rings.jl")
 include("generic/Misc/Localization.jl")
 
+# TODO/FIXME: deprecate aliases, remove in the future
+import ..AbstractAlgebra: @alias
+@alias ResF ResidueFieldElem
+@alias ResField ResidueField
+@alias Res ResidueRingElem
+@alias ResRing ResidueRing
+
+@alias Rat RationalFunctionFieldElem
+
+@alias AbsSeriesRing AbsPowerSeriesRing
+@alias AbsSeriesElem AbsPowerSeriesRingElem
+@alias RelSeriesRing RelPowerSeriesRing
+@alias RelSeriesElem RelPowerSeriesRingElem
+
 end # generic

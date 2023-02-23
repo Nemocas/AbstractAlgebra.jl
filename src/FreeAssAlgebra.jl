@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export exponent_words, FreeAssociativeAlgebra, leading_exponent_word
+export exponent_words, free_associative_algebra, leading_exponent_word
 
 ###############################################################################
 #
@@ -180,44 +180,44 @@ end
 
 ###############################################################################
 #
-#   FreeAssociativeAlgebra constructor
+#   free_associative_algebra constructor
 #
 ###############################################################################
 
-function FreeAssociativeAlgebra(
+function free_associative_algebra(
    R::AbstractAlgebra.Ring,
    s::Union{AbstractVector{<:AbstractString}, AbstractVector{Symbol}, AbstractVector{Char}};
    cached::Bool = true)
 
    S = [Symbol(v) for v in s]
-   return Generic.FreeAssociativeAlgebra(R, S, cached=cached)
+   return Generic.free_associative_algebra(R, S, cached=cached)
 end
 
-function FreeAssociativeAlgebra(
+function free_associative_algebra(
    R::AbstractAlgebra.Ring,
    s::Vector{Symbol};
    cached::Bool = true)
 
-   return Generic.FreeAssociativeAlgebra(R, s, cached=cached)
+   return Generic.free_associative_algebra(R, s, cached=cached)
 end
 
-function FreeAssociativeAlgebra(
+function free_associative_algebra(
    R::AbstractAlgebra.Ring,
    n::Int,
    s::Union{AbstractString, Symbol, Char};
    cached::Bool = false)
 
    S = [Symbol(s, i) for i in 1:n]
-   return Generic.FreeAssociativeAlgebra(R, S; cached=cached)
+   return Generic.free_associative_algebra(R, S; cached=cached)
 end
 
-function FreeAssociativeAlgebra(
+function free_associative_algebra(
    R::AbstractAlgebra.Ring,
    n::Int,
    s::Symbol=:x;
    cached::Bool = false)
 
    S = [Symbol(s, i) for i in 1:n]
-   return Generic.FreeAssociativeAlgebra(R, S; cached=cached)
+   return Generic.free_associative_algebra(R, S; cached=cached)
 end
 

@@ -15,7 +15,7 @@ function randprime(n::Int)
 end
 
 @testset "Generic.MatAlg.constructors" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    @test MatrixAlgebra(R, 3, cached = false) !== MatrixAlgebra(R, 3, cached = false)
@@ -88,7 +88,7 @@ end
 end
 
 @testset "Generic.MatAlg.manipulation" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -146,7 +146,7 @@ end
    @test degree(A) == 3
 
    # Tests over residue ring
-   S = MatrixAlgebra(ResidueRing(ZZ, 6), 2)
+   S = MatrixAlgebra(residue_ring(ZZ, 6), 2)
    A = S([1 2; 3 4])
    B = S([0 0; 3 3])
    @test is_zero(A*B)
@@ -186,7 +186,7 @@ end
 end
 
 @testset "Generic.MatAlg.size/axes" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -221,7 +221,7 @@ end
 end
 
 @testset "Generic.MatAlg.unary_ops" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -240,7 +240,7 @@ end
 end
 
 @testset "Generic.MatAlg.binary_ops" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -267,7 +267,7 @@ end
 end
 
 @testset "Generic.MatAlg.adhoc_binary" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -321,8 +321,8 @@ end
 
 @testset "Generic.MatAlg.promotion" begin
    m = [1 2; 3 4]
-   F = ResidueField(ZZ, 3)
-   R, t = PolynomialRing(F, "t")
+   F = residue_field(ZZ, 3)
+   R, t = polynomial_ring(F, "t")
    A = MatrixAlgebra(R, 2)(m)
    B = MatrixAlgebra(F, 2)(m)
 
@@ -351,8 +351,8 @@ end
 
    # vector * matrix
    m = [1 2; 3 4]
-   F = ResidueField(ZZ, 3)
-   R, t = PolynomialRing(F, "t")
+   F = residue_field(ZZ, 3)
+   R, t = polynomial_ring(F, "t")
    A = MatrixAlgebra(R, 2)(m)
    B = MatrixAlgebra(F, 2)(m)
    v = [one(F), 2*one(F)]
@@ -368,7 +368,7 @@ end
 end
 
 @testset "Generic.MatAlg.permutation" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -380,7 +380,7 @@ end
 end
 
 @testset "Generic.MatAlg.comparison" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -408,7 +408,7 @@ end
 end
 
 @testset "Generic.MatAlg.adhoc_comparison" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -441,7 +441,7 @@ end
 end
 
 @testset "Generic.MatAlg.powering" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -474,7 +474,7 @@ end
 end
 
 @testset "Generic.MatAlg.adhoc_exact_division" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -486,7 +486,7 @@ end
 
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
-   U, x = PolynomialRing(R, "x")
+   U, x = polynomial_ring(R, "x")
 
    S = MatrixAlgebra(R, 2)
    T = MatrixAlgebra(U, 2)
@@ -511,7 +511,7 @@ end
 end
 
 @testset "Generic.MatAlg.transpose" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
    arr = [t + 1 t R(1); t^2 t t; t+1 t^2 R(-1)]
    A = S(arr)
@@ -529,7 +529,7 @@ end
 end
 
 @testset "Generic.MatAlg.gram" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -538,7 +538,7 @@ end
 end
 
 @testset "Generic.MatAlg.tr" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -547,7 +547,7 @@ end
 end
 
 @testset "Generic.MatAlg.content" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -556,8 +556,8 @@ end
 end
 
 @testset "Generic.MatAlg.lu" begin
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
    S = MatrixAlgebra(K, 3)
 
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
@@ -581,8 +581,8 @@ end
    @test r == 2
    @test P*A == L*U
 
-   R, z = PolynomialRing(ZZ, "z")
-   F = FractionField(R)
+   R, z = polynomial_ring(ZZ, "z")
+   F = fraction_field(R)
    S = MatrixAlgebra(F, 3)
 
    A = S([F(0), F(0), F(11), 78*z^3-102*z^2+48*z+12, F(92), -16*z^2+80*z-149, -377*z^3+493*z^2-232*z-58, F(-448), 80*z^2-385*z+719])
@@ -594,8 +594,8 @@ end
 end
 
 @testset "Generic.MatAlg.fflu" begin
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
    S = MatrixAlgebra(K, 3)
 
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
@@ -648,7 +648,7 @@ end
 end
 
 @testset "Generic.MatAlg.det" begin
-   S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
+   S, x = polynomial_ring(residue_ring(ZZ, 1009*2003), "x")
 
    for dim = 0:5
       R = MatrixAlgebra(S, dim)
@@ -658,7 +658,7 @@ end
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
 
-   S, z = PolynomialRing(ZZ, "z")
+   S, z = polynomial_ring(ZZ, "z")
 
    for dim = 0:5
       R = MatrixAlgebra(S, dim)
@@ -668,8 +668,8 @@ end
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
 
    for dim = 0:7
       S = MatrixAlgebra(K, dim)
@@ -679,8 +679,8 @@ end
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
 
    for dim = 0:5
       T = MatrixAlgebra(S, dim)
@@ -703,7 +703,7 @@ end
 
    S = MatrixAlgebra(ZZ, 9)
    (r, c) = (rand(1:9), rand(1:9))
-   T = MatrixSpace(ZZ, r, c)
+   T = matrix_space(ZZ, r, c)
    a = rand(S, -100:100)
    b = rand(T, -100:100)
    startr = rand(1:(9-r+1))
@@ -719,7 +719,7 @@ end
       S = MatrixAlgebra(ZZ, n)
       a = rand(S, -100:100)
       (r, c) = (rand(1:n), rand(1:m))
-      T = MatrixSpace(zz, r, c)
+      T = matrix_space(zz, r, c)
       b = rand(T, -2:2)
       startr = rand(1:(n-r+1))
       endr = startr + r - 1
@@ -752,7 +752,7 @@ end
             for R in [zz, ZZ]
                lr = r isa Colon ? nrows(a) : length(r)
                lc = c isa Colon ? ncols(a) : length(c)
-               T = MatrixSpace(zz, lr, lc)
+               T = matrix_space(zz, lr, lc)
                b = rand(T, -2:2)
                aa = deepcopy(a)
                a[r, c] = b
@@ -771,7 +771,7 @@ end
             for R in [zz, ZZ]
                lr = r isa Colon ? nrows(a) : length(r)
                lc = c isa Colon ? ncols(a) : length(c)
-               T = MatrixSpace(zz, lr, lc)
+               T = matrix_space(zz, lr, lc)
                _b = rand(T, -2:2)
                b = vec(Matrix(_b))
                a[r, c] = b
@@ -787,7 +787,7 @@ end
             for R in [zz, ZZ]
                lr = r isa Colon ? nrows(a) : length(r)
                lc = c isa Colon ? ncols(a) : length(c)
-               T = MatrixSpace(zz, lr, lc)
+               T = matrix_space(zz, lr, lc)
                _b = rand(T, -2:2)
                b = vec(Matrix(_b))
                a[r, c] = b
@@ -800,7 +800,7 @@ end
 end
 
 @testset "Generic.MatAlg.rank" begin
-   S = ResidueRing(ZZ, 20011*10007)
+   S = residue_ring(ZZ, 20011*10007)
    R = MatrixAlgebra(S, 5)
 
    for i = 0:5
@@ -823,14 +823,14 @@ end
       end
    end
 
-   S, z = PolynomialRing(ZZ, "z")
+   S, z = polynomial_ring(ZZ, "z")
    R = MatrixAlgebra(S, 4)
 
    M = R([S(-2) S(0) S(5) S(3); 5*z^2+5*z-5 S(0) S(-z^2+z) 5*z^2+5*z+1; 2*z-1 S(0) z^2+3*z+2 S(-4*z); 3*z-5 S(0) S(-5*z+5) S(1)])
 
    @test rank(M) == 3
 
-   R = MatrixSpace(S, 5, 5)
+   R = matrix_space(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(R, i, 0:3, -20:20)
@@ -838,8 +838,8 @@ end
       @test rank(M) == i
    end
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
    S = MatrixAlgebra(K, 3)
 
    M = S([a a^2 + 2*a - 1 2*a^2 - 1*a; 2*a+2 2*a^2 + 2*a (-2*a^2 - 2*a); (-a) (-a^2) a^2])
@@ -854,8 +854,8 @@ end
       @test rank(M) == i
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
    T = MatrixAlgebra(S, 3)
 
    M = T([(2*x^2)*y^2+(-2*x^2-2*x)*y+(-x^2+2*x) S(0) (-x^2-2)*y^2+(x^2+2*x+2)*y+(2*x^2-x-1);
@@ -888,8 +888,8 @@ end
       @test flag && M*x == b
    end
 
-   S, y = PolynomialRing(ZZ, "y")
-   K = FractionField(S)
+   S, y = polynomial_ring(ZZ, "y")
+   K = fraction_field(S)
 
    for dim = 0:5
       R = MatrixAlgebra(S, dim)
@@ -909,7 +909,7 @@ end
 end
 
 @testset "Generic.MatAlg.rref" begin
-   S = ResidueRing(ZZ, 20011*10007)
+   S = residue_ring(ZZ, 20011*10007)
    R = MatrixAlgebra(S, 5)
 
    for i = 0:5
@@ -933,7 +933,7 @@ end
       end
    end
 
-   S, z = PolynomialRing(ZZ, "z")
+   S, z = polynomial_ring(ZZ, "z")
    R = MatrixAlgebra(S, 5)
 
    for i = 0:5
@@ -945,8 +945,8 @@ end
       @test is_rref(A)
    end
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
    S = MatrixAlgebra(K, 5)
 
    for i = 0:5
@@ -958,8 +958,8 @@ end
       @test is_rref(A)
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
    T = MatrixAlgebra(S, 5)
 
    for i = 0:5
@@ -1010,8 +1010,8 @@ end
    end
    end
 
-   @testset "Matrix Algebra over ResidueRing" begin
-   S = ResidueRing(ZZ, 20011*10007)
+   @testset "Matrix Algebra over residue_ring" begin
+   S = residue_ring(ZZ, 20011*10007)
 
    for dim = 1:5
       R = MatrixAlgebra(S, dim)
@@ -1033,7 +1033,7 @@ end
    end
 
    @testset "Matrix Algebra over ZZ[x]" begin
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
 
    for dim = 2:5
       R = MatrixAlgebra(S, dim)
@@ -1060,9 +1060,9 @@ end
    end
    end
 
-   @testset "Matrix Algebra over NumberField over QQ" begin
-   R, x = PolynomialRing(QQ, "x")
-   S, a = NumberField(x^3 + 3x + 1, "a")
+   @testset "Matrix Algebra over number_field over QQ" begin
+   R, x = polynomial_ring(QQ, "x")
+   S, a = number_field(x^3 + 3x + 1, "a")
 
    for dim = 1:5
       R = MatrixAlgebra(S, dim)
@@ -1076,8 +1076,8 @@ end
    end
 
    @testset "Matrix Algebra over (ZZ[x])[y]" begin
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
 
    for dim = 2:5
       T = MatrixAlgebra(S, dim)
@@ -1110,7 +1110,7 @@ end
 end # of @testset "Generic.MatAlg.inversion"
 
 @testset "Generic.MatAlg.hessenberg" begin
-   R = ResidueRing(ZZ, 18446744073709551629)
+   R = residue_ring(ZZ, 18446744073709551629)
 
    for dim = 0:5
       S = MatrixAlgebra(R, dim)
@@ -1126,11 +1126,11 @@ end # of @testset "Generic.MatAlg.inversion"
 end
 
 @testset "Generic.MatAlg.charpoly" begin
-   R = ResidueRing(ZZ, 18446744073709551629)
+   R = residue_ring(ZZ, 18446744073709551629)
 
    for dim = 0:5
-      S = MatrixSpace(R, dim, dim)
-      U, x = PolynomialRing(R, "x")
+      S = matrix_space(R, dim, dim)
+      U, x = polynomial_ring(R, "x")
 
       for i = 1:10
          M = rand(S, -5:5)
@@ -1160,9 +1160,9 @@ end
       end
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   U, z = PolynomialRing(R, "z")
-   T = MatrixSpace(R, 6, 6)
+   R, x = polynomial_ring(ZZ, "x")
+   U, z = polynomial_ring(R, "z")
+   T = matrix_space(R, 6, 6)
 
    M = T()
    for i = 1:3
@@ -1185,7 +1185,7 @@ end
 
 @testset "Generic.MatAlg.minpoly" begin
    R = GF(103)
-   T, y = PolynomialRing(R, "y")
+   T, y = polynomial_ring(R, "y")
    S = MatrixAlgebra(R, 3)
 
    M = S([92 97 8;
@@ -1195,7 +1195,7 @@ end
    @test minpoly(T, M) == y^2+96*y+8
 
    R = GF(3)
-   T, y = PolynomialRing(R, "y")
+   T, y = polynomial_ring(R, "y")
    S = MatrixAlgebra(R, 4)
 
    M = S([1 2 0 2;
@@ -1206,7 +1206,7 @@ end
    @test minpoly(T, M) == y^2 + 2y
 
    R = GF(13)
-   T, y = PolynomialRing(R, "y")
+   T, y = polynomial_ring(R, "y")
    S = MatrixAlgebra(R, 3)
 
    M = S([7 6 1;
@@ -1253,9 +1253,9 @@ end
 
    @test minpoly(T, M) == 1
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   U, z = PolynomialRing(S, "z")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   U, z = polynomial_ring(S, "z")
    T = MatrixAlgebra(S, 6)
 
    M = T()
@@ -1270,8 +1270,8 @@ end
 
    @test degree(f) <= 3
 
-   R, x = PolynomialRing(ZZ, "x")
-   U, z = PolynomialRing(R, "z")
+   R, x = polynomial_ring(ZZ, "x")
+   U, z = polynomial_ring(R, "z")
    T = MatrixAlgebra(R, 6)
 
    M = T()
@@ -1294,7 +1294,7 @@ end
 end
 
 @testset "Generic.MatAlg.row_swapping" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    M = MatrixAlgebra(R, 3)
 
    a = M(map(R, [1 2 3; 4 5 6; 7 8 9]))
@@ -1308,7 +1308,7 @@ end
 
 if false # see bug 160
     @testset "Generic.MatAlg.hnf_minors" begin
-        R, x = PolynomialRing(QQ, "x")
+        R, x = polynomial_ring(QQ, "x")
 
         M = MatrixAlgebra(R, 3)
 
@@ -1323,11 +1323,11 @@ if false # see bug 160
         @test U*A == H
 
         # Fake up finite field of char 7, degree 2
-        R, x = PolynomialRing(GF(7), "x")
-        F = ResidueField(R, x^2 + 6x + 3)
+        R, x = polynomial_ring(GF(7), "x")
+        F = residue_field(R, x^2 + 6x + 3)
         a = F(x)
 
-        S, y = PolynomialRing(F, "y")
+        S, y = polynomial_ring(F, "y")
 
         N = MatrixAlgebra(S, 4)
 
@@ -1344,7 +1344,7 @@ if false # see bug 160
 end
 
 @testset "Generic.MatAlg.hnf_kb" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
 
@@ -1359,11 +1359,11 @@ end
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
    N = MatrixAlgebra(S, 3)
 
@@ -1379,7 +1379,7 @@ end
 end
 
 @testset "Generic.MatAlg.hnf_cohen" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
 
@@ -1394,11 +1394,11 @@ end
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
    N = MatrixAlgebra(S, 3)
 
@@ -1414,7 +1414,7 @@ end
 end
 
 @testset "Generic.MatAlg.hnf" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
 
@@ -1429,11 +1429,11 @@ end
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
    N = MatrixAlgebra(S, 3)
 
@@ -1449,7 +1449,7 @@ end
 end
 
 @testset "Generic.MatAlg.snf_kb" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
 
@@ -1465,11 +1465,11 @@ end
    @test U*A*K == T
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
    N = MatrixAlgebra(S, 3)
 
@@ -1486,7 +1486,7 @@ end
 end
 
 @testset "Generic.MatAlg.snf" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
 
@@ -1502,11 +1502,11 @@ end
    @test U*A*K == T
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
    N = MatrixAlgebra(S, 3)
 
@@ -1563,7 +1563,7 @@ end
 @testset "Generic.MatAlg.change_base_ring" begin
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
-   U, x = PolynomialRing(R, "x")
+   U, x = polynomial_ring(R, "x")
    S = MatrixAlgebra(R, 2)
    
    M = rand(S, -10:10)
@@ -1576,7 +1576,7 @@ end
 @testset "Generic.MatAlg.map" begin
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
-   U, x = PolynomialRing(R, "x")
+   U, x = polynomial_ring(R, "x")
    S = MatrixAlgebra(U, 2)
 
    M = rand(R, -10:10)

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export FractionField, FactoredFractionField
+export fraction_field, FactoredFractionField
 
 ###############################################################################
 #
@@ -55,7 +55,7 @@ function //(x::T, y::T) where {T <: RingElem}
    try
       z.parent = Generic.FracDict[R]
    catch
-      z.parent = Generic.FractionField(R)
+      z.parent = Generic.fraction_field(R)
    end
    return z
 end
@@ -611,7 +611,7 @@ function evaluate(f::FracElem{T}, v::U) where {T <: RingElement, U <: RingElemen
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::FracElem{T}, v::U) where {T <: PolyElem, U <: Integer}
+function evaluate(f::FracElem{T}, v::U) where {T <: PolyRingElem, U <: Integer}
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
  
@@ -636,18 +636,18 @@ end
 ##############################################################################
 
 # Return the derivative with respect to `x`.
-function derivative(f::FracElem{T}, x::T) where {T <: MPolyElem}
+function derivative(f::FracElem{T}, x::T) where {T <: MPolyRingElem}
     return derivative(f, var_index(x))
 end
   
 # Return the derivative with respect to the `i`-th variable.
-function derivative(f::FracElem{T}, i::Int) where {T <: MPolyElem}
+function derivative(f::FracElem{T}, i::Int) where {T <: MPolyRingElem}
     n = numerator(f)
     d = denominator(f)
     return (derivative(n, i)*d - n*derivative(d, i))//d^2
 end
 
-function derivative(f::FracElem{T}) where {T <: PolyElem}
+function derivative(f::FracElem{T}) where {T <: PolyRingElem}
     n = numerator(f)
     d = denominator(f)
     return (derivative(n)*d - n*derivative(d))//d^2
@@ -940,20 +940,20 @@ rand(S::FracField, v...) = rand(GLOBAL_RNG, S, v...)
 
 ###############################################################################
 #
-#   FractionField constructor
+#   fraction_field constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    FractionField(R::Ring; cached=true)
+    fraction_field(R::Ring; cached=true)
 
 Return the parent object of the fraction field over the given base ring $R$.
 If `cached == true` (the default), the returned parent object is cached so
 that it will always be returned by a call to the constructor when the same
 base ring $R$ is supplied.
 """
-function FractionField(R::Ring; cached=true)
-   return Generic.FractionField(R; cached=cached)
+function fraction_field(R::Ring; cached=true)
+   return Generic.fraction_field(R; cached=cached)
 end
 
 @doc Markdown.doc"""

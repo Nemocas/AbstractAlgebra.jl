@@ -12,19 +12,19 @@ export UniversalPolynomialRing
 #
 ###############################################################################
 
-function coefficients(a::AbstractAlgebra.UnivPolyElem)
+function coefficients(a::AbstractAlgebra.UniversalPolyRingElem)
    return Generic.UnivPolyCoeffs(a)
 end
 
-function exponent_vectors(a::AbstractAlgebra.UnivPolyElem)
+function exponent_vectors(a::AbstractAlgebra.UniversalPolyRingElem)
    return Generic.UnivPolyExponentVectors(a)
 end
 
-function monomials(a::AbstractAlgebra.UnivPolyElem)
+function monomials(a::AbstractAlgebra.UniversalPolyRingElem)
    return Generic.UnivPolyMonomials(a)
 end
 
-function terms(a::AbstractAlgebra.UnivPolyElem)
+function terms(a::AbstractAlgebra.UniversalPolyRingElem)
    return Generic.UnivPolyTerms(a)
 end
 

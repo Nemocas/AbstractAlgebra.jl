@@ -52,7 +52,7 @@ In order to construct rationals in AbstractAlgebra.jl, one can first construct t
 rational field itself. This is accomplished using either of the following constructors.
 
 ```julia
-FractionField(R::Integers{BigInt})
+fraction_field(R::Integers{BigInt})
 ```
 
 ```julia
@@ -83,7 +83,7 @@ julia> h = QQ(BigInt(1234))
 julia> k = QQ(BigInt(12), BigInt(7))
 12//7
 
-julia> QQ == FractionField(ZZ)
+julia> QQ == fraction_field(ZZ)
 true
 
 ```

@@ -6,7 +6,7 @@ function test_elem(R::AbstractAlgebra.LaurentMPolyRing{BigInt})
     rand(R, 1:9, -n:n, -99:99)
 end
 
-function test_elem(R::AbstractAlgebra.Generic.LaurentMPolyWrapRing{AbstractAlgebra.Generic.Res{BigInt}})
+function test_elem(R::AbstractAlgebra.Generic.LaurentMPolyWrapRing{AbstractAlgebra.Generic.ResidueRingElem{BigInt}})
     n = rand(1:5)
     # R: length between 1 and 9
     # R: exponents between -n and n
@@ -19,7 +19,7 @@ end
     test_Ring_interface(L)
     test_Ring_interface_recursive(L)
 
-    L, (x, y) = LaurentPolynomialRing(ResidueRing(ZZ, ZZ(6)), ["x", "y"])
+    L, (x, y) = LaurentPolynomialRing(residue_ring(ZZ, ZZ(6)), ["x", "y"])
     test_Ring_interface(L)
 end
 
@@ -38,7 +38,7 @@ end
     @test L != LaurentPolynomialRing(GF(5), [:x, :y], cached = false)[1]
 
     # only works because of the caching
-    R, (X, Y) = PolynomialRing(coefficient_ring(L), symbols(L))
+    R, (X, Y) = polynomial_ring(coefficient_ring(L), symbols(L))
     @test one(L) == L(one(R))
     @test x == L(X)
     @test y == L(Y)
@@ -46,7 +46,7 @@ end
 end
 
 @testset "Generic.LaurentMPoly.is_unit" begin
-   R, (x,) = LaurentPolynomialRing(ResidueRing(ZZ, 6), ["x"])
+   R, (x,) = LaurentPolynomialRing(residue_ring(ZZ, 6), ["x"])
 
    @test is_unit(x)
    @test !is_unit(2*x)

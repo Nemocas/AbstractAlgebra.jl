@@ -3,7 +3,7 @@ const RINGS = Dict(
    "exact field"         => (GF(7),              ()),
    "inexact ring"        => (RealField["t"][1],  (0:200, -1000:1000)),
    "inexact field"       => (RealField,          (-1000:1000,)),
-   "non-integral domain" => (ResidueRing(ZZ, 6), (0:5,)),
+   "non-integral domain" => (residue_ring(ZZ, 6), (0:5,)),
    "fraction field"      => (QQ,                 (-1000:1000,)),
 )
 
@@ -35,7 +35,7 @@ Base.getindex(a::MyTestMatrix{T}, r::Int, c::Int) where T = a.d
 Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
 
 # Simulate user Field, together with a specialized matrix type
-# (like fmpz / fmpz_mat)
+# (like ZZRingElem / ZZMatrix)
 struct F2 <: AbstractAlgebra.Field end
 
 Base.zero(::F2) = F2Elem(false)
@@ -82,7 +82,7 @@ AbstractAlgebra.parent_type(::Type{F2Matrix}) = F2MatSpace
 AbstractAlgebra.base_ring(::F2MatSpace) = F2()
 AbstractAlgebra.dense_matrix_type(::Type{F2}) = F2Matrix
 AbstractAlgebra.parent(a::F2Matrix) = F2MatSpace(nrows(a), ncols(a))
-AbstractAlgebra.MatrixSpace(::F2, r::Int, c::Int) = F2MatSpace(r, c)
+AbstractAlgebra.matrix_space(::F2, r::Int, c::Int) = F2MatSpace(r, c)
 
 AbstractAlgebra.nrows(a::F2Matrix) = nrows(a.m)
 AbstractAlgebra.ncols(a::F2Matrix) = ncols(a.m)
@@ -115,12 +115,12 @@ function AbstractAlgebra.matrix(R::F2, r::Int, c::Int, mat::AbstractMatrix{F2Ele
 end
 
 @testset "Generic.Mat.constructors" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
 
-   S = MatrixSpace(R, 3, 3)
+   S = matrix_space(R, 3, 3)
 
-   @test MatrixSpace(R, 3, 3, cached = false) !== MatrixSpace(R, 3, 3, cached = false)
-   @test MatrixSpace(R, 3, 3, cached = true) === MatrixSpace(R, 3, 3, cached = true)
+   @test matrix_space(R, 3, 3, cached = false) !== matrix_space(R, 3, 3, cached = false)
+   @test matrix_space(R, 3, 3, cached = true) === matrix_space(R, 3, 3, cached = true)
 
    @test elem_type(S) == Generic.MatSpaceElem{elem_type(R)}
    @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
@@ -271,12 +271,12 @@ end
 
    # Test creation from AbstractArray without setindex!
    A = MyTestMatrix(BigInt(3), 2)
-   S = MatrixSpace(ZZ, 2, 2)
+   S = matrix_space(ZZ, 2, 2)
 
    @test isa(S(A), Generic.MatSpaceElem{BigInt})
 
    # Test original matrix not modified
-   S = MatrixSpace(QQ, 2, 2)
+   S = matrix_space(QQ, 2, 2)
    a = Rational{BigInt}(1)
    A = [a a; a a]
    M = S(A)
@@ -307,7 +307,7 @@ end
    # Test constructors over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
 
    @test isa(S, MatSpace)
 
@@ -431,7 +431,7 @@ end
    # test over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
 
@@ -445,8 +445,8 @@ end
 end
 
 @testset "Generic.Mat.manipulation" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
    B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
@@ -538,7 +538,7 @@ end
    @test length(m0) == 0
    @test isempty(m0)
 
-   M45 = MatrixSpace(R, 4, 5)
+   M45 = matrix_space(R, 4, 5)
    for m45 in [rand(M45, -1:9, -9:9),
                rand(rng, M45, -1:9, -9:9),
                randmat_triu(M45, -1:9, -9:9),
@@ -563,7 +563,7 @@ end
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
 
@@ -588,8 +588,8 @@ end
 end
 
 @testset "Generic.Mat.unary_ops" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
    B = S([-t - 1 (-t) -R(1); -t^2 (-t) (-t); -R(-2) (-t - 2) (-t^2 - t - 1)])
@@ -597,7 +597,7 @@ end
    @test -A == B
 
    # Exact ring
-   S = MatrixSpace(ZZ, rand(0:9), rand(0:9))
+   S = matrix_space(ZZ, rand(0:9), rand(0:9))
    A = rand(S, -1000:1000)
 
    @test iszero(A + (-A))
@@ -605,7 +605,7 @@ end
    @test -A == S(-A.entries)
 
    # Exact field
-   S = MatrixSpace(GF(7), rand(0:9), rand(0:9))
+   S = matrix_space(GF(7), rand(0:9), rand(0:9))
    A = rand(S)
 
    @test iszero(A + (-A))
@@ -613,7 +613,7 @@ end
    @test -A == S(-A.entries)
 
    # Inexact ring
-   S = MatrixSpace(RealField["t"][1], rand(0:9), rand(0:9))
+   S = matrix_space(RealField["t"][1], rand(0:9), rand(0:9))
    A = rand(S, 0:200, -1000:1000)
 
    @test iszero(A + (-A))
@@ -621,7 +621,7 @@ end
    @test -A == S(-A.entries)
 
    # Inexact field
-   S = MatrixSpace(RealField, rand(0:9), rand(0:9))
+   S = matrix_space(RealField, rand(0:9), rand(0:9))
    A = rand(S, -1000:1000)
 
    @test iszero(A + (-A))
@@ -629,7 +629,7 @@ end
    @test -A == S(-A.entries)
 
    # Non-integral domain
-   S = MatrixSpace(ResidueRing(ZZ, 6), rand(0:9), rand(0:9))
+   S = matrix_space(residue_ring(ZZ, 6), rand(0:9), rand(0:9))
    A = rand(S, 0:5)
 
    @test iszero(A + (-A))
@@ -643,7 +643,7 @@ end
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
 
@@ -651,14 +651,14 @@ end
 end
 
 @testset "Generic.Mat.getindex" begin
-   S = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred A[1:2, 1:2]
 
    @test typeof(B) == typeof(A)
-   @test B == MatrixSpace(ZZ, 2, 2)([1 2; 4 5])
+   @test B == matrix_space(ZZ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A == S([1 2 3; 4 5 6; 7 8 9])
@@ -666,10 +666,10 @@ end
    C = @inferred B[1:2, 1:2]
 
    @test typeof(C) == typeof(A)
-   @test C == MatrixSpace(ZZ, 2, 2)([10 2; 4 5])
+   @test C == matrix_space(ZZ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
-   @test B == MatrixSpace(ZZ, 2, 2)([10 2; 4 5])
+   @test B == matrix_space(ZZ, 2, 2)([10 2; 4 5])
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 
    D = @inferred A[:, 2:3]
@@ -682,7 +682,7 @@ end
    @test D == @inferred D[:, :]
 
    # bounds check
-   S = MatrixSpace(ZZ, rand(1:9), 0)
+   S = matrix_space(ZZ, rand(1:9), 0)
    A = S()
    @test isempty(A)
    rows = UnitRange(extrema(rand(axes(A)[1], 2))...)
@@ -690,7 +690,7 @@ end
    @test size(A[rows, :]) == (length(rows), 0)
    @test_throws BoundsError A[1:10, :]
 
-   S = MatrixSpace(ZZ, 0, rand(1:9))
+   S = matrix_space(ZZ, 0, rand(1:9))
    A = S()
    @test isempty(A)
    cols = UnitRange(extrema(rand(axes(A)[2], 2))...)
@@ -698,7 +698,7 @@ end
    @test size(A[:, cols]) == (0, length(cols))
    @test_throws BoundsError A[:, 1:10]
 
-   S = MatrixSpace(ZZ, 0, 0)
+   S = matrix_space(ZZ, 0, 0)
    A = S()
    @test isempty(A)
    # A[:, :] must be a valid indexing
@@ -730,7 +730,7 @@ end
 
    # Exact ring
    R = ZZ
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, -1000:1000)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
@@ -748,7 +748,7 @@ end
 
    # Exact field
    R = GF(7)
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
@@ -766,7 +766,7 @@ end
 
    # Inexact ring
    R = RealField["t"][1]
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, 0:200, -1000:1000)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
@@ -784,7 +784,7 @@ end
 
    # Inexact field
    R = RealField
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, -1000:1000)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
@@ -799,8 +799,8 @@ end
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   R = residue_ring(ZZ, 6)
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, 0:5)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
@@ -816,7 +816,7 @@ end
 
    # Fraction field
    R = QQ
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, -1000:1000)
    ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
@@ -882,9 +882,9 @@ end
       end
    end
 
-   S = MatrixSpace(ZZ, 9, 9)
+   S = matrix_space(ZZ, 9, 9)
    (r, c) = (rand(1:9), rand(1:9))
-   T = MatrixSpace(ZZ, r, c)
+   T = matrix_space(ZZ, r, c)
    a = rand(S, -100:100)
    b = rand(T, -100:100)
    startr = rand(1:(9-r+1))
@@ -897,10 +897,10 @@ end
    for i in 1:10
       n = rand(1:9)
       m = rand(1:9)
-      S = MatrixSpace(ZZ, n, m)
+      S = matrix_space(ZZ, n, m)
       a = rand(S, -100:100)
       (r, c) = (rand(1:n), rand(1:m))
-      T = MatrixSpace(zz, r, c)
+      T = matrix_space(zz, r, c)
       b = rand(T, -2:2)
       startr = rand(1:(n-r+1))
       endr = startr + r - 1
@@ -933,7 +933,7 @@ end
             for R in [zz, ZZ]
                lr = r isa Colon ? nrows(a) : length(r)
                lc = c isa Colon ? ncols(a) : length(c)
-               T = MatrixSpace(zz, lr, lc)
+               T = matrix_space(zz, lr, lc)
                b = rand(T, -2:2)
                aa = deepcopy(a)
                a[r, c] = b
@@ -952,7 +952,7 @@ end
             for R in [zz, ZZ]
                lr = r isa Colon ? nrows(a) : length(r)
                lc = c isa Colon ? ncols(a) : length(c)
-               T = MatrixSpace(zz, lr, lc)
+               T = matrix_space(zz, lr, lc)
                _b = rand(T, -2:2)
                b = vec(Matrix(_b))
                a[r, c] = b
@@ -968,7 +968,7 @@ end
             for R in [zz, ZZ]
                lr = r isa Colon ? nrows(a) : length(r)
                lc = c isa Colon ? ncols(a) : length(c)
-               T = MatrixSpace(zz, lr, lc)
+               T = matrix_space(zz, lr, lc)
                _b = rand(T, -2:2)
                b = vec(Matrix(_b))
                a[r, c] = b
@@ -981,8 +981,8 @@ end
 end
 
 @testset "Generic.Mat.binary_ops" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
    B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
@@ -996,9 +996,9 @@ end
    # Exact ring
    R = ZZ
 
-   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+   for S in (matrix_space(R, rand(1:9), rand(1:9)),
              let n = rand(1:9)
-                MatrixSpace(R, n, n)
+                matrix_space(R, n, n)
              end)
 
       A = rand(S, -1000:1000)
@@ -1015,9 +1015,9 @@ end
    # Exact field
    R = GF(7)
 
-   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+   for S in (matrix_space(R, rand(1:9), rand(1:9)),
              let n = rand(1:9)
-                MatrixSpace(R, n, n)
+                matrix_space(R, n, n)
              end)
 
       A = rand(S)
@@ -1034,9 +1034,9 @@ end
    # Inexact ring
    R = RealField["t"][1]
 
-   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+   for S in (matrix_space(R, rand(1:9), rand(1:9)),
              let n = rand(1:9)
-                MatrixSpace(R, n, n)
+                matrix_space(R, n, n)
              end)
 
       A = rand(S, -1:20, -100:100)
@@ -1053,9 +1053,9 @@ end
    # Inexact field
    R = RealField
 
-   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+   for S in (matrix_space(R, rand(1:9), rand(1:9)),
              let n = rand(1:9)
-                MatrixSpace(R, n, n)
+                matrix_space(R, n, n)
              end)
 
       A = rand(S, -1000:1000)
@@ -1070,11 +1070,11 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
+   R = residue_ring(ZZ, 6)
 
-   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+   for S in (matrix_space(R, rand(1:9), rand(1:9)),
              let n = rand(1:9)
-                MatrixSpace(R, n, n)
+                matrix_space(R, n, n)
              end)
 
       A = rand(S, 0:5)
@@ -1091,9 +1091,9 @@ end
    # Fraction field
    R = QQ
 
-   for S in (MatrixSpace(R, rand(1:9), rand(1:9)),
+   for S in (matrix_space(R, rand(1:9), rand(1:9)),
              let n = rand(1:9)
-                MatrixSpace(R, n, n)
+                matrix_space(R, n, n)
              end)
 
       A = rand(S, -1000:1000)
@@ -1110,7 +1110,7 @@ end
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
    
    M = rand(S, -10:10)
    N = rand(S, -10:10)
@@ -1125,8 +1125,8 @@ end
 add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(CartesianIndices(M))]
 
 @testset "Generic.Mat.adhoc_binary" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
@@ -1145,7 +1145,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
 
    # Exact ring
    R = ZZ
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, -1000:1000)
 
@@ -1159,7 +1159,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    end
 
    function _test_matrix_vector_prod(R, randargs...)
-      A = rand(MatrixSpace(R, 3, 2), randargs...)
+      A = rand(matrix_space(R, 3, 2), randargs...)
       v = elem_type(R)[rand(R, randargs...) for i in 1:2]
       @test A*v == [A[i,1]*v[1] + A[i,2]*v[2] for i in 1:nrows(A)]
       v = elem_type(R)[rand(R, randargs...) for i in 1:3]
@@ -1171,13 +1171,13 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
       v = elem_type(R)[rand(R, randargs...) for i in 1:2]
       @test v*A == [v[1]*A[1,i] + v[2]*A[2,i] for i in 1:ncols(A)]
 
-      A = rand(MatrixSpace(R, 0, 2), randargs...)
+      A = rand(matrix_space(R, 0, 2), randargs...)
       v = elem_type(R)[rand(R, randargs...) for i in 1:2]
       @test A*v == elem_type(R)[]
       v = elem_type(R)[]
       @test v*A == [zero(R) for i in 1:ncols(A)]
 
-      A = rand(MatrixSpace(R, 2, 0), randargs...)
+      A = rand(matrix_space(R, 2, 0), randargs...)
       v = elem_type(R)[]
       @test A*v == [zero(R) for i in 1:nrows(A)]
       v = elem_type(R)[rand(R, randargs...) for i in 1:2]
@@ -1188,7 +1188,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
 
    # Exact field
    R = GF(7)
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S)
 
@@ -1205,7 +1205,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
 
    # Inexact ring
    R = RealField["t"][1]
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, -1:200, -1000:1000)
 
@@ -1222,7 +1222,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
 
    # Inexact field
    R = RealField
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, -1000:1000)
 
@@ -1238,8 +1238,8 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    _test_matrix_vector_prod(R, -1000:1000)
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   R = residue_ring(ZZ, 6)
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, 0:5)
 
@@ -1256,7 +1256,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
 
    # Fraction field
    R = QQ
-   S = MatrixSpace(R, rand(1:9), rand(1:9))
+   S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, -1000:1000)
 
@@ -1274,7 +1274,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
    
    M = rand(S, -10:10)
    N = rand(S, -10:10)
@@ -1307,8 +1307,8 @@ end
 
 @testset "Generic.Mat.promotion" begin
    m = [1 2; 3 4]
-   F = ResidueField(ZZ, 3)
-   R, t = PolynomialRing(F, "t")
+   F = residue_field(ZZ, 3)
+   R, t = polynomial_ring(F, "t")
    A = matrix(R, m)
    B = matrix(F, m)
 
@@ -1337,8 +1337,8 @@ end
 
    # vector * matrix
    m = [1 2; 3 4]
-   F = ResidueField(ZZ, 3)
-   R, t = PolynomialRing(F, "t")
+   F = residue_field(ZZ, 3)
+   R, t = polynomial_ring(F, "t")
    A = matrix(R, m)
    B = matrix(F, m)
    v = [one(F), 2*one(F)]
@@ -1354,8 +1354,8 @@ end
 end
 
 @testset "Generic.Mat.permutation" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
@@ -1365,7 +1365,7 @@ end
    @test A == inv(P)*(P*A)
 
    @testset "$name" for (name, (R, randparams)) in RINGS
-      S = MatrixSpace(R, rand(1:9), rand(0:9))
+      S = matrix_space(R, rand(1:9), rand(0:9))
       A = rand(S, randparams...)
       T = SymmetricGroup(nrows(A))
       P = rand(T)
@@ -1380,8 +1380,8 @@ end
 end
 
 @testset "Generic.Mat.comparison" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
    B = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -1391,7 +1391,7 @@ end
    @test A != one(S)
 
    @testset "$name" for (name, (R, randparams)) in RINGS
-      S = MatrixSpace(R, rand(1:9), rand(1:9))
+      S = matrix_space(R, rand(1:9), rand(1:9))
       seed = rand(1:999)
 
       Random.seed!(rng, seed)
@@ -1423,7 +1423,7 @@ end
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
    
    M = rand(S, -10:10)
    N = deepcopy(M)
@@ -1437,8 +1437,8 @@ end
 end
 
 @testset "Generic.Mat.adhoc_comparison" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
@@ -1456,7 +1456,7 @@ end
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
    
    @test S(5) == 5
    @test 5 == S(5)
@@ -1470,8 +1470,8 @@ end
 end
 
 @testset "Generic.Mat.powering" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
@@ -1479,7 +1479,7 @@ end
 
    @test A^0 == one(S)
 
-   S = MatrixSpace(QQ, 2, 2)
+   S = matrix_space(QQ, 2, 2)
 
    A = S(Rational{BigInt}[2 3; 7 -4])
 
@@ -1488,7 +1488,7 @@ end
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
    
    M = rand(S, -10:10)
 
@@ -1499,8 +1499,8 @@ end
 end
 
 @testset "Generic.Mat.adhoc_exact_division" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
@@ -1510,7 +1510,7 @@ end
    @test divexact((1 + t)*A, 1 + t) == A
 
    Qx, x = QQ["x"]
-   Qxy, y = PolynomialRing(Qx, "y")
+   Qxy, y = polynomial_ring(Qx, "y")
    @test divexact(Qxy[2 0; 0 2], Qx(2)) == identity_matrix(Qxy, 2)
    @test divexact(Qxy[2 0; 0 2], Qx(2), check = false) == identity_matrix(Qxy, 2)
    @test divexact_left(Qxy[2 0; 0 2], Qx(2)) == identity_matrix(Qxy, 2)
@@ -1520,10 +1520,10 @@ end
 
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
-   U, x = PolynomialRing(R, "x")
+   U, x = polynomial_ring(R, "x")
 
-   S = MatrixSpace(R, 2, 2)
-   T = MatrixSpace(U, 2, 2)
+   S = matrix_space(R, 2, 2)
+   T = matrix_space(U, 2, 2)
 
    for i = 1:50
        M = rand(S, -10:10)
@@ -1550,7 +1550,7 @@ end
 end
 
 @testset "Generic.Mat.is_symmetric" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    @test !is_symmetric(matrix(R, [t + 1 t R(1); t^2 t t]))
    @test is_symmetric(matrix(R, [t + 1 t R(1); t t^2 t; R(1) t R(5)]))
    @test !is_symmetric(matrix(R, [t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
@@ -1561,7 +1561,7 @@ end
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
    
    M = rand(S, -10:10)
 
@@ -1579,14 +1579,14 @@ end
 
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
    M = rand(S, -10:10)
 
    @test is_skew_symmetric(M - transpose(M))
 end
 
 @testset "Generic.Mat.transpose" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    arr = [t + 1 t R(1); t^2 t t]
    A = matrix(R, arr)
    B = matrix(R, permutedims(arr, [2, 1]))
@@ -1607,8 +1607,8 @@ end
 end
 
 @testset "Generic.Mat.gram" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
@@ -1616,8 +1616,8 @@ end
 end
 
 @testset "Generic.Mat.tr" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
@@ -1625,8 +1625,8 @@ end
 end
 
 @testset "Generic.Mat.content" begin
-   R, t = PolynomialRing(QQ, "t")
-   S = MatrixSpace(R, 3, 3)
+   R, t = polynomial_ring(QQ, "t")
+   S = matrix_space(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
@@ -1641,7 +1641,7 @@ end
       m = rand(0:100)
       n = rand(0:100)
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
+      S = matrix_space(R, m, n)
       A = randmat_with_rank(S, rank)
 
       r, P, L, U = lu(A)
@@ -1656,7 +1656,7 @@ end
       m = rand(0:30)
       n = rand(0:30)
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
+      S = matrix_space(R, m, n)
       A = randmat_with_rank(S, rank, -10:10)
 
       r, P, L, U = lu(A)
@@ -1666,9 +1666,9 @@ end
 
    # Extra tests
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-   S = MatrixSpace(K, 3, 3)
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
+   S = matrix_space(K, 3, 3)
 
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
@@ -1691,8 +1691,8 @@ end
    @test r == 2
    @test P*A == L*U
 
-   R, z = PolynomialRing(ZZ, "z")
-   F = FractionField(R)
+   R, z = polynomial_ring(ZZ, "z")
+   F = fraction_field(R)
 
    A = matrix(F, 3, 3, [0, 0, 11, 78*z^3-102*z^2+48*z+12, 92, -16*z^2+80*z-149, -377*z^3+493*z^2-232*z-58, -448, 80*z^2-385*z+719])
 
@@ -1711,7 +1711,7 @@ end
       n = rand(0:20)
 
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
+      S = matrix_space(R, m, n)
       A = S()
       for i = 1:m
          for j = 1:n
@@ -1722,7 +1722,7 @@ end
       r, d, P, L, U = fflu(A)
 
       R2 = parent(1//one(R))
-      V = MatrixSpace(R2, m, m)
+      V = matrix_space(R2, m, m)
       D = V()
       if m >= 1
           D[1, 1] = 1//L[1, 1]
@@ -1739,9 +1739,9 @@ end
 
  # Other tests
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-   S = MatrixSpace(K, 3, 3)
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
+   S = matrix_space(K, 3, 3)
 
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
@@ -1792,42 +1792,42 @@ end
 end
 
 @testset "Generic.Mat.det" begin
-   S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
+   S, x = polynomial_ring(residue_ring(ZZ, 1009*2003), "x")
 
    for dim = 0:5
-      R = MatrixSpace(S, dim, dim)
+      R = matrix_space(S, dim, dim)
 
       M = rand(R, -1:5, -100:100)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
 
-   S, z = PolynomialRing(ZZ, "z")
+   S, z = polynomial_ring(ZZ, "z")
 
    for dim = 0:5
-      R = MatrixSpace(S, dim, dim)
+      R = matrix_space(S, dim, dim)
 
       M = rand(R, -1:3, -20:20)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
 
    for dim = 0:7
-      S = MatrixSpace(K, dim, dim)
+      S = matrix_space(K, dim, dim)
 
       M = rand(S, -100:100)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
 
    for dim = 0:5
-      T = MatrixSpace(S, dim, dim)
+      T = matrix_space(S, dim, dim)
       M = rand(T, 0:2, -1:2, -10:10)
 
       @test det(M) == AbstractAlgebra.det_clow(M)
@@ -1835,9 +1835,9 @@ end
 end
 
 @testset "Generic.Mat.minors" begin
-   S, z = PolynomialRing(ZZ,"z")
+   S, z = polynomial_ring(ZZ,"z")
    n = 5
-   R = MatrixSpace(S, n, n)
+   R = matrix_space(S, n, n)
    for r = 0:n
       M = randmat_with_rank(R, r, 0:3, 0:3)
       @test [1] == minors(M, 0)
@@ -1852,7 +1852,7 @@ end
 end
 
 @testset "Generic.Mat.exterior_power" begin
-   S, z = PolynomialRing(ZZ,"z")
+   S, z = polynomial_ring(ZZ,"z")
    n = 5
    A = matrix(S, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 9])
    @test exterior_power(A, 3) == diagonal_matrix(det(A), 1)
@@ -1864,7 +1864,7 @@ end
 
 @testset "Generic.Mat.pfaffian" begin
    n = 5
-   R, x = PolynomialRing(QQ, ["x$i" for i in 1:binomial(n, 2)])
+   R, x = polynomial_ring(QQ, ["x$i" for i in 1:binomial(n, 2)])
    pf = [R(1), R(), x[1], R(), x[1]*x[6] - x[2]*x[5] + x[3]*x[4], R()]
    for dim in 0:5
       idx = 0
@@ -1879,15 +1879,15 @@ end
    end
 
    # do a big matrix which uses BFL
-   R = MatrixSpace(QQ, 12, 12)
+   R = matrix_space(QQ, 12, 12)
    M = rand(R, -5:5)
    M = transpose(M) - M
    @test det(M) == pfaffian(M)^2
    
-   S, z = PolynomialRing(ZZ, "z")
+   S, z = polynomial_ring(ZZ, "z")
    n = 5
    for dim = 0:n
-      R = MatrixSpace(S, dim, dim)
+      R = matrix_space(S, dim, dim)
       M = rand(R, -1:5, -5:5)
       M = transpose(M) - M
       @test [1] == pfaffians(M, 0)
@@ -1903,8 +1903,8 @@ end
 end
 
 @testset "Generic.Mat.rank" begin
-   S = ResidueRing(ZZ, 20011*10007)
-   R = MatrixSpace(S, 5, 5)
+   S = residue_ring(ZZ, 20011*10007)
+   R = matrix_space(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(R, i, -100:100)
@@ -1925,14 +1925,14 @@ end
       end
    end
 
-   S, z = PolynomialRing(ZZ, "z")
-   R = MatrixSpace(S, 4, 4)
+   S, z = polynomial_ring(ZZ, "z")
+   R = matrix_space(S, 4, 4)
 
    M = R([S(-2) S(0) S(5) S(3); 5*z^2+5*z-5 S(0) S(-z^2+z) 5*z^2+5*z+1; 2*z-1 S(0) z^2+3*z+2 S(-4*z); 3*z-5 S(0) S(-5*z+5) S(1)])
 
    @test rank(M) == 3
 
-   R = MatrixSpace(S, 5, 5)
+   R = matrix_space(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(R, i, -1:3, -20:20)
@@ -1940,15 +1940,15 @@ end
       @test rank(M) == i
    end
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-   S = MatrixSpace(K, 3, 3)
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
+   S = matrix_space(K, 3, 3)
 
    M = S([a a^2 + 2*a - 1 2*a^2 - 1*a; 2*a+2 2*a^2 + 2*a (-2*a^2 - 2*a); (-a) (-a^2) a^2])
 
    @test rank(M) == 2
 
-   S = MatrixSpace(K, 5, 5)
+   S = matrix_space(K, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(S, i, -100:100)
@@ -1956,9 +1956,9 @@ end
       @test rank(M) == i
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   T = MatrixSpace(S, 3, 3)
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   T = matrix_space(S, 3, 3)
 
    M = T([(2*x^2)*y^2+(-2*x^2-2*x)*y+(-x^2+2*x) S(0) (-x^2-2)*y^2+(x^2+2*x+2)*y+(2*x^2-x-1);
     (-x)*y^2+(-x^2+x-1)*y+(x^2-2*x+2) S(0) (2*x^2+x-1)*y^2+(-2*x^2-2*x-2)*y+(x^2-x);
@@ -1966,7 +1966,7 @@ end
 
    @test rank(M) == 2
 
-   T = MatrixSpace(S, 5, 5)
+   T = matrix_space(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(T, i, 0:2, -1:2, -20:20)
@@ -1984,9 +1984,9 @@ end
       n = rand(0:30)
       k = rand(0:30)
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
-      T = MatrixSpace(R, m, k)
-      U = MatrixSpace(R, n, k)
+      S = matrix_space(R, m, n)
+      T = matrix_space(R, m, k)
+      U = matrix_space(R, n, k)
       A = randmat_with_rank(S, rank, -20:20)
       if n > 0 && rand(0:1) == 0
          col = rand(1:n)
@@ -2014,9 +2014,9 @@ end
       n = rand(0:30)
       k = rand(0:30)
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
-      T = MatrixSpace(R, m, k)
-      U = MatrixSpace(R, n, k)
+      S = matrix_space(R, m, n)
+      T = matrix_space(R, m, k)
+      U = matrix_space(R, n, k)
       A = randmat_with_rank(S, rank, -20:20)
       B = rand(T, -20:20)
       flag1, X, d = Generic.can_solve_with_solution_fflu(A, B)
@@ -2035,9 +2035,9 @@ end
       n = rand(0:30)
       k = rand(0:30)
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
-      T = MatrixSpace(R, m, k)
-      U = MatrixSpace(R, n, k)
+      S = matrix_space(R, m, n)
+      T = matrix_space(R, m, k)
+      U = matrix_space(R, n, k)
       A = randmat_with_rank(S, rank)
       # randomly zero a column
       if n > 0 && rand(0:1) == 0
@@ -2062,9 +2062,9 @@ end
        n = rand(0:30)
        k = rand(0:30)
        rank = rand(0:min(m, n))
-       S = MatrixSpace(R, m, n)
-       T = MatrixSpace(R, m, k)
-       U = MatrixSpace(R, n, k)
+       S = matrix_space(R, m, n)
+       T = matrix_space(R, m, k)
+       U = matrix_space(R, n, k)
        A = randmat_with_rank(S, rank, -20:20)
        X2 = rand(U, -20:20)
        B = A*X2
@@ -2073,8 +2073,8 @@ end
     end
 
    for dim = 0:5
-      S = MatrixSpace(R, dim, dim)
-      U = MatrixSpace(R, dim, rand(1:5))
+      S = matrix_space(R, dim, dim)
+      U = matrix_space(R, dim, rand(1:5))
 
       M = randmat_with_rank(S, dim, -100:100)
       b = rand(U, -100:100)
@@ -2084,12 +2084,12 @@ end
       @test flag && M*x == b
    end
 
-   S, y = PolynomialRing(ZZ, "y")
-   K = FractionField(S)
+   S, y = polynomial_ring(ZZ, "y")
+   K = fraction_field(S)
 
    for dim = 0:5
-      R = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, rand(1:5))
+      R = matrix_space(S, dim, dim)
+      U = matrix_space(S, dim, rand(1:5))
 
       M = randmat_with_rank(R, dim, -1:5, -100:100)
       b = rand(U, 0:5, -100:100);
@@ -2112,9 +2112,9 @@ end
       n = rand(0:20)
       k = rand(0:20)
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
-      T = MatrixSpace(R, m, k)
-      U = MatrixSpace(R, n, k)
+      S = matrix_space(R, m, n)
+      T = matrix_space(R, m, k)
+      U = matrix_space(R, n, k)
       A = randmat_with_rank(S, rank, -10:10)
       X2 = rand(U, -10:10)
       B = A*X2
@@ -2137,9 +2137,9 @@ end
       n = rand(0:30)
       k = rand(0:30)
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
-      T = MatrixSpace(R, m, k)
-      U = MatrixSpace(R, n, k)
+      S = matrix_space(R, m, n)
+      T = matrix_space(R, m, k)
+      U = matrix_space(R, n, k)
       A = randmat_with_rank(S, rank, -20:20)
       X2 = rand(U, -20:20)
       B = A*X2
@@ -2156,9 +2156,9 @@ end
       n = rand(0:30)
       k = rand(0:30)
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
-      T = MatrixSpace(R, m, k)
-      U = MatrixSpace(R, n, k)
+      S = matrix_space(R, m, n)
+      T = matrix_space(R, m, k)
+      U = matrix_space(R, n, k)
       A = randmat_with_rank(S, rank, -20:20)
       X2 = rand(U, -20:20)
       B = A*X2
@@ -2166,11 +2166,11 @@ end
       @test A*X == B*d
    end
 
-   S = ResidueRing(ZZ, 20011*10007)
+   S = residue_ring(ZZ, 20011*10007)
 
    for dim = 0:5
-      R = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, rand(1:5))
+      R = matrix_space(S, dim, dim)
+      U = matrix_space(S, dim, rand(1:5))
 
       M = randmat_with_rank(R, dim, -100:100)
       b = rand(U, -100:100)
@@ -2190,14 +2190,14 @@ end
       end
    end
 
-   S, z = PolynomialRing(ZZ, "z")
+   S, z = polynomial_ring(ZZ, "z")
 
    for iters = 1:100
       m = rand(0:5)
       n = rand(0:5)
       k = rand(0:5)
-      R = MatrixSpace(S, m, n)
-      U = MatrixSpace(S, n, k)
+      R = matrix_space(S, m, n)
+      U = matrix_space(S, n, k)
       rnk = rand(0:min(m, n))
       M = randmat_with_rank(R, rnk, -1:3, -20:20)
       x2 = rand(U, 0:3, -20:20)
@@ -2212,12 +2212,12 @@ end
       @test M*x == d*b
    end
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
 
    for dim = 0:5
-      S = MatrixSpace(K, dim, dim)
-      U = MatrixSpace(K, dim, rand(1:5))
+      S = matrix_space(K, dim, dim)
+      U = matrix_space(K, dim, rand(1:5))
 
       M = randmat_with_rank(S, dim, -100:100)
       b = rand(U, -100:100)
@@ -2227,15 +2227,15 @@ end
       @test M*x == b
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
 
    for iters = 1:30
       m = rand(0:5)
       n = rand(0:5)
       k = rand(0:5)
-      R = MatrixSpace(S, m, n)
-      U = MatrixSpace(S, n, k)
+      R = matrix_space(S, m, n)
+      U = matrix_space(S, n, k)
       rnk = rand(0:min(m, n))
       M = randmat_with_rank(R, rnk, 0:2, -1:2, -20:20)
       x2 = rand(U, 0:2, -1:2, -20:20)
@@ -2250,11 +2250,11 @@ end
       @test M*x == d*b
    end
 
-   R, t = PolynomialRing(AbstractAlgebra.JuliaQQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
-   S, y = PolynomialRing(K, "y")
-   T = MatrixSpace(S, 3, 3)
-   U = MatrixSpace(S, 3, 1)
+   R, t = polynomial_ring(AbstractAlgebra.JuliaQQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
+   S, y = polynomial_ring(K, "y")
+   T = matrix_space(S, 3, 3)
+   U = matrix_space(S, 3, 1)
 
    M = T([3y*a^2 + (y + 1)*a + 2y (5y+1)*a^2 + 2a + y - 1 a^2 + (-a) + 2y; (y + 1)*a^2 + 2y - 4 3y*a^2 + (2y - 1)*a + y (4y - 1)*a^2 + (y - 1)*a + 5; 2a + y + 1 (2y + 2)*a^2 + 3y*a + 3y a^2 + (-y-1)*a + (-y - 3)])
    b = U(permutedims([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4], [2, 1]))
@@ -2272,8 +2272,8 @@ end
             n = rand(1:5)
             c = rand(1:5)
 
-            S = MatrixSpace(R, r, n)
-            U = MatrixSpace(R, n, c)
+            S = matrix_space(R, r, n)
+            U = matrix_space(R, n, c)
 
             X1 = rand(U, -20:20)
             M = rand(S, -20:20)
@@ -2285,7 +2285,7 @@ end
          end
       end
    end
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter = 1:4
       for dim = 0:5
@@ -2293,8 +2293,8 @@ end
          n = rand(1:5)
          c = rand(1:5)
 
-         S = MatrixSpace(R, r, n)
-         U = MatrixSpace(R, n, c)
+         S = matrix_space(R, r, n)
+         U = matrix_space(R, n, c)
 
          X1 = rand(U, -1:2, -10:10)
          M = rand(S, -1:2, -10:10)
@@ -2315,8 +2315,8 @@ end
             n = rand(1:5)
             c = rand(1:5)
 
-            S = MatrixSpace(R, r, n)
-            U = MatrixSpace(R, n, c)
+            S = matrix_space(R, r, n)
+            U = matrix_space(R, n, c)
 
             X1 = rand(S, -20:20)
             M = rand(U, -20:20)
@@ -2329,7 +2329,7 @@ end
       end
    end
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter = 1:4
       for dim = 0:5
@@ -2337,8 +2337,8 @@ end
          n = rand(1:5)
          c = rand(1:5)
 
-         S = MatrixSpace(R, r, n)
-         U = MatrixSpace(R, n, c)
+         S = matrix_space(R, r, n)
+         U = matrix_space(R, n, c)
 
          X1 = rand(S, -1:2, -10:10)
          M = rand(U, -1:2, -10:10)
@@ -2352,14 +2352,14 @@ end
 end
 
 @testset "Generic.Mat.can_solve" begin
-   R, x = PolynomialRing(QQ, "x")
-   S = FractionField(R)
+   R, x = polynomial_ring(QQ, "x")
+   S = fraction_field(R)
 
    for iter = 1:8
       m = rand(0:7)
 
-      T = MatrixSpace(R, m, m)
-      U = MatrixSpace(R, m, m)
+      T = matrix_space(R, m, m)
+      U = matrix_space(R, m, m)
 
       M = rand(T, -1:2, -10:10)
       X2 = rand(U, -1:2, -10:10)
@@ -2376,13 +2376,13 @@ end
       @test flag && X*M == b
    end
 
-   R, x = PolynomialRing(GF(65537), "x")
-   S = FractionField(R)
+   R, x = polynomial_ring(GF(65537), "x")
+   S = fraction_field(R)
 
    for iters = 1:10
       m = rand(1:15)
-      T = MatrixSpace(R, m, m)
-      U = MatrixSpace(R, m, m)
+      T = matrix_space(R, m, m)
+      U = matrix_space(R, m, m)
 
       M = rand(T, 0:2)
       X2 = rand(U, 0:2)
@@ -2415,8 +2415,8 @@ end
             c = rand(1:5)
 
             let
-               S = MatrixSpace(R, n, r)
-               U = MatrixSpace(R, c, n)
+               S = matrix_space(R, n, r)
+               U = matrix_space(R, c, n)
 
                X1 = rand(S, -20:20)
                M = rand(U, -20:20)
@@ -2429,8 +2429,8 @@ end
             end
 
             let
-               S = MatrixSpace(R, r, n)
-               U = MatrixSpace(R, n, c)
+               S = matrix_space(R, r, n)
+               U = matrix_space(R, n, c)
 
                X1 = rand(S, -20:20)
                M = rand(U, -20:20)
@@ -2445,7 +2445,7 @@ end
       end
    end
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter = 1:4
       for dim = 0:5
@@ -2454,8 +2454,8 @@ end
          c = rand(1:5)
 
          let
-            S = MatrixSpace(R, n, r)
-            U = MatrixSpace(R, c, n)
+            S = matrix_space(R, n, r)
+            U = matrix_space(R, c, n)
 
             X1 = rand(S, -1:2, -10:10)
             M = rand(U, -1:2, -10:10)
@@ -2473,8 +2473,8 @@ end
          end
 
          let
-            S = MatrixSpace(R, r, n)
-            U = MatrixSpace(R, n, c)
+            S = matrix_space(R, r, n)
+            U = matrix_space(R, n, c)
 
             X1 = rand(S, -1:2, -10:10)
             M = rand(U, -1:2, -10:10)
@@ -2533,24 +2533,24 @@ end
 end
 
 @testset "Generic.Mat.can_solve_with_solution_interpolation" begin
-   R1 = ResidueRing(ZZ, 65537)
-   R, x = PolynomialRing(R1, "x")
-   RZ, x = PolynomialRing(ZZ, "x")
+   R1 = residue_ring(ZZ, 65537)
+   R, x = polynomial_ring(R1, "x")
+   RZ, x = polynomial_ring(ZZ, "x")
 
    for iters = 1:50
       m = rand(0:10)
       n = rand(0:10)
       k = rand(0:10)
       rnk = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
-      T = MatrixSpace(R, n, k)
-      U = MatrixSpace(R, m, k)
+      S = matrix_space(R, m, n)
+      T = matrix_space(R, n, k)
+      U = matrix_space(R, m, k)
 
-      S1 = MatrixSpace(RZ, m, n)
+      S1 = matrix_space(RZ, m, n)
       MZ = randmat_with_rank(S1, rnk, 0:2, -20:20)
 
       M = matrix(R, m, n, [change_base_ring(R1, MZ[i, j]) for i in 1:m for j in 1:n])
-      K = FractionField(R)
+      K = fraction_field(R)
       MK = change_base_ring(K, M)
       X2 = rand(T, -1:2, 0:65536)
       B = M*X2
@@ -2567,12 +2567,12 @@ end
 end
 
 @testset "Generic.Mat.solve_triu" begin
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
 
    for dim = 0:10
-      S = MatrixSpace(K, dim, dim)
-      U = MatrixSpace(K, dim, rand(1:5))
+      S = matrix_space(K, dim, dim)
+      U = matrix_space(K, dim, rand(1:5))
 
       M = randmat_triu(S, -100:100)
       b = rand(U, -100:100)
@@ -2587,8 +2587,8 @@ end
    for iter = 1:40
       n = rand(1:6)
       m = rand(1:n)
-      S = MatrixSpace(ZZ, m, n)
-      U = MatrixSpace(ZZ, 1, n)
+      S = matrix_space(ZZ, m, n)
+      U = matrix_space(ZZ, 1, n)
 
       M = randmat_with_rank(S, rand(1:m), -20:20)
       r = rand(U, -20:20)
@@ -2604,8 +2604,8 @@ end
 @testset "Generic.Mat.rref" begin
    # Non-integral domain
 
-   S = ResidueRing(ZZ, 20011*10007)
-   R = MatrixSpace(S, 5, 5)
+   S = residue_ring(ZZ, 20011*10007)
+   R = matrix_space(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(R, i, -100:100)
@@ -2638,7 +2638,7 @@ end
       m = rand(0:50)
       n = rand(0:50)
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
+      S = matrix_space(R, m, n)
       M = randmat_with_rank(S, rank, -10:10)
       r, N, d = rref_rational(M)
 
@@ -2652,8 +2652,8 @@ end
    end
 
 
-   S, z = PolynomialRing(ZZ, "z")
-   R = MatrixSpace(S, 5, 5)
+   S, z = polynomial_ring(ZZ, "z")
+   R = matrix_space(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(R, i, -1:3, -20:20)
@@ -2666,9 +2666,9 @@ end
 
    # Exact field
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-   S = MatrixSpace(K, 5, 5)
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
+   S = matrix_space(K, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(S, i, -100:100)
@@ -2685,7 +2685,7 @@ end
       m = rand(0:50)
       n = rand(0:50)
       rank = rand(0:min(m, n))
-      S = MatrixSpace(R, m, n)
+      S = matrix_space(R, m, n)
       M = randmat_with_rank(S, rank)
       r, N = rref(M)
 
@@ -2695,9 +2695,9 @@ end
 
    # Multiple level exact ring
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   T = MatrixSpace(S, 5, 5)
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   T = matrix_space(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(T, i, 0:2, -1:2, -20:20)
@@ -2710,7 +2710,7 @@ end
 end
 
 @testset "Generic.Mat.is_invertible" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    let
       M = matrix(R, 1, 1, [R(1)])
@@ -2765,8 +2765,8 @@ end
    for _ in 1:100
       m = rand(1:10)
       n = rand(m:10)
-      M1 = MatrixSpace(QQ, n, m)
-      M2 = MatrixSpace(QQ, m, n)
+      M1 = matrix_space(QQ, n, m)
+      M2 = matrix_space(QQ, m, n)
 
       L_l = randmat_with_rank(M1, m, -10:10)
       L_r = randmat_with_rank(M2, m, -10:10)
@@ -2781,7 +2781,7 @@ end
 
    for _ in 1:100
       n = rand(1:10)
-      M = MatrixSpace(QQ, n, n)
+      M = matrix_space(QQ, n, n)
 
       L = randmat_with_rank(M, rand(0:n-1), -10:10)
 
@@ -2794,8 +2794,8 @@ end
 end
 
 @testset "Generic.Mat.nullspace" begin
-   S = ResidueRing(ZZ, 20011*10007)
-   R = MatrixSpace(S, 5, 5)
+   S = residue_ring(ZZ, 20011*10007)
+   R = matrix_space(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(R, i, -100:100)
@@ -2822,8 +2822,8 @@ end
       end
    end
 
-   S, z = PolynomialRing(ZZ, "z")
-   R = MatrixSpace(S, 5, 5)
+   S, z = polynomial_ring(ZZ, "z")
+   R = matrix_space(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(R, i, -1:3, -20:20)
@@ -2835,9 +2835,9 @@ end
       @test iszero(M*N)
    end
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-   S = MatrixSpace(K, 5, 5)
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
+   S = matrix_space(K, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(S, i, -100:100)
@@ -2849,9 +2849,9 @@ end
       @test iszero(M*N)
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   T = MatrixSpace(S, 5, 5)
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   T = matrix_space(S, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(T, i, 0:2, -1:2, -20:20)
@@ -2865,7 +2865,7 @@ end
 end
 
 @testset "Generic.Mat.kernel" begin
-   R = MatrixSpace(ZZ, 5, 5)
+   R = matrix_space(ZZ, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(R, i, -20:20)
@@ -2883,9 +2883,9 @@ end
       @test iszero(N*M)
    end
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-   S = MatrixSpace(K, 5, 5)
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
+   S = matrix_space(K, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(S, i, -100:100)
@@ -2903,8 +2903,8 @@ end
       @test iszero(N*M)
    end
 
-   R, x = PolynomialRing(QQ, "x")
-   T = MatrixSpace(R, 5, 5)
+   R, x = polynomial_ring(QQ, "x")
+   T = matrix_space(R, 5, 5)
 
    for i = 0:5
       M = randmat_with_rank(T, i, -1:2, -20:20)
@@ -2932,9 +2932,9 @@ end
          n = rand(0:10)
          k = rand(0:10)
 
-         R = MatrixSpace(F, m, n)
-         S = MatrixSpace(F, m, k)
-         U = MatrixSpace(F, n, k)
+         R = matrix_space(F, m, n)
+         S = matrix_space(F, m, k)
+         U = matrix_space(F, n, k)
 
          # random with solution
          r = rand(0:min(m, n))
@@ -2981,7 +2981,7 @@ end
 
 @testset "Generic.Mat.inversion" begin
    for dim = 2:5
-      R = MatrixSpace(ZZ, dim, dim)
+      R = matrix_space(ZZ, dim, dim)
       M = R(1)
       i = rand(1:dim-1)
       j = rand(i+1:dim)
@@ -3003,10 +3003,10 @@ end
       @test M*NN == NN*M == cc*R(1)
    end
 
-   S = ResidueRing(ZZ, 20011*10007)
+   S = residue_ring(ZZ, 20011*10007)
 
    for dim = 1:5
-      R = MatrixSpace(S, dim, dim)
+      R = matrix_space(S, dim, dim)
 
       M = randmat_with_rank(R, dim, -100:100)
 
@@ -3028,10 +3028,10 @@ end
       end
    end
 
-   S, z = PolynomialRing(ZZ, "z")
+   S, z = polynomial_ring(ZZ, "z")
 
    for dim = 1:5
-      R = MatrixSpace(S, dim, dim)
+      R = matrix_space(S, dim, dim)
 
       M = randmat_with_rank(R, dim, -1:3, -20:20)
 
@@ -3040,11 +3040,11 @@ end
       @test M*X == d*one(R)
    end
 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
 
    for dim = 1:5
-      S = MatrixSpace(K, dim, dim)
+      S = matrix_space(K, dim, dim)
 
       M = randmat_with_rank(S, dim, -100:100)
 
@@ -3053,11 +3053,11 @@ end
       @test M*X == d*one(S)
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
 
    for dim = 1:5
-      T = MatrixSpace(S, dim, dim)
+      T = matrix_space(S, dim, dim)
 
       M = randmat_with_rank(T, dim, 0:2, -1:2, -20:20)
 
@@ -3073,11 +3073,11 @@ end
 end
 
 @testset "Generic.Mat.hessenberg" begin
-   R = ResidueRing(ZZ, 18446744073709551629)
+   R = residue_ring(ZZ, 18446744073709551629)
 
    for dim = 0:5
-      S = MatrixSpace(R, dim, dim)
-      U, x = PolynomialRing(R, "x")
+      S = matrix_space(R, dim, dim)
+      U, x = polynomial_ring(R, "x")
 
       for i = 1:10
          M = rand(S, -5:5)
@@ -3095,10 +3095,10 @@ end
 end
 
 @testset "Generic.Mat.kronecker_product" begin
-   R = ResidueRing(ZZ, 18446744073709551629)
-   S = MatrixSpace(R, 2, 3)
-   S2 = MatrixSpace(R, 2, 2)
-   S3 = MatrixSpace(R, 3, 3)
+   R = residue_ring(ZZ, 18446744073709551629)
+   S = matrix_space(R, 2, 3)
+   S2 = matrix_space(R, 2, 2)
+   S3 = matrix_space(R, 3, 3)
 
    A = S(R.([2 3 5; 9 6 3]))
    B = S2(R.([2 3; 1 4]))
@@ -3109,11 +3109,11 @@ end
 end
 
 @testset "Generic.Mat.charpoly" begin
-   R = ResidueRing(ZZ, 18446744073709551629)
+   R = residue_ring(ZZ, 18446744073709551629)
 
    for dim = 0:5
-      S = MatrixSpace(R, dim, dim)
-      U, x = PolynomialRing(R, "x")
+      S = matrix_space(R, dim, dim)
+      U, x = polynomial_ring(R, "x")
 
       for i = 1:10
          M = rand(S, -5:5)
@@ -3143,9 +3143,9 @@ end
       end
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   U, z = PolynomialRing(R, "z")
-   T = MatrixSpace(R, 6, 6)
+   R, x = polynomial_ring(ZZ, "x")
+   U, z = polynomial_ring(R, "z")
+   T = matrix_space(R, 6, 6)
 
    M = T()
    for i = 1:3
@@ -3168,7 +3168,7 @@ end
 
 @testset "Generic.Mat.minpoly" begin
    R = GF(103)
-   T, y = PolynomialRing(R, "y")
+   T, y = polynomial_ring(R, "y")
 
    M = R[92 97 8;
           0 5 13;
@@ -3177,7 +3177,7 @@ end
    @test minpoly(T, M) == y^2+96*y+8
 
    R = GF(3)
-   T, y = PolynomialRing(R, "y")
+   T, y = polynomial_ring(R, "y")
 
    M = R[1 2 0 2;
          1 2 1 0;
@@ -3187,7 +3187,7 @@ end
    @test minpoly(T, M) == y^2 + 2y
 
    R = GF(13)
-   T, y = PolynomialRing(R, "y")
+   T, y = polynomial_ring(R, "y")
 
    M = R[7 6 1;
          7 7 5;
@@ -3220,20 +3220,20 @@ end
 
    @test minpoly(T, M) == (y^2+9*y+10)*(y^2+11*y+6)^2
 
-   S = MatrixSpace(R, 1, 1)
+   S = matrix_space(R, 1, 1)
    M = S()
 
    @test minpoly(T, M) == y
 
-   S = MatrixSpace(R, 0, 0)
+   S = matrix_space(R, 0, 0)
    M = S()
 
    @test minpoly(T, M) == 1
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   U, z = PolynomialRing(S, "z")
-   T = MatrixSpace(S, 6, 6)
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   U, z = polynomial_ring(S, "z")
+   T = matrix_space(S, 6, 6)
 
    M = T()
    for i = 1:3
@@ -3247,9 +3247,9 @@ end
 
    @test degree(f) <= 3
 
-   R, x = PolynomialRing(ZZ, "x")
-   U, z = PolynomialRing(R, "z")
-   T = MatrixSpace(R, 6, 6)
+   R, x = polynomial_ring(ZZ, "x")
+   U, z = polynomial_ring(R, "z")
+   T = matrix_space(R, 6, 6)
 
    M = T()
    for i = 1:3
@@ -3271,8 +3271,8 @@ end
 end
 
 @testset "Generic.Mat.row_col_swapping" begin
-   R, x = PolynomialRing(ZZ, "x")
-   M = MatrixSpace(R, 3, 2)
+   R, x = polynomial_ring(ZZ, "x")
+   M = matrix_space(R, 3, 2)
 
    a = M(map(R, [1 2; 3 4; 5 6]))
 
@@ -3311,11 +3311,11 @@ end
 end
 
 @testset "Generic.Mat.gen_mat_elem_op" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    for i in 1:10
       r = rand(1:50)
       c = rand(1:50)
-      S = MatrixSpace(R, r, c)
+      S = matrix_space(R, r, c)
       M = rand(S, -1:3, -100:100)
       c1, c2 = rand(1:c), rand(1:c)
       s = rand(-100:100)
@@ -3454,15 +3454,15 @@ end
 end
 
 @testset "Generic.Mat.concat" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for i = 1:10
       r = rand(0:10)
       c1 = rand(0:10)
       c2 = rand(0:10)
 
-      S1 = MatrixSpace(R, r, c1)
-      S2 = MatrixSpace(R, r, c2)
+      S1 = matrix_space(R, r, c1)
+      S2 = matrix_space(R, r, c2)
 
       M1 = rand(S1, -1:3, -100:100)
       M2 = rand(S2, -1:3, -100:100)
@@ -3512,7 +3512,7 @@ end
    # Test constructors over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
    N = rand(S, -10:10)
@@ -3523,9 +3523,9 @@ end
 end
 
 @testset "Generic.Mat.hnf_minors" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = matrix_space(R, 4, 3)
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
@@ -3538,13 +3538,13 @@ end
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
-   N = MatrixSpace(S, 4, 4)
+   N = matrix_space(S, 4, 4)
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
 
@@ -3566,9 +3566,9 @@ end
    @test is_unit(det(U))
    @test U*M == H
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = matrix_space(R, 4, 3)
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
@@ -3581,13 +3581,13 @@ end
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
-   N = MatrixSpace(S, 3, 4)
+   N = matrix_space(S, 3, 4)
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
@@ -3624,9 +3624,9 @@ end
 end
 
 @testset "Generic.Mat.hnf_cohen" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = matrix_space(R, 4, 3)
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
@@ -3639,13 +3639,13 @@ end
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
-   N = MatrixSpace(S, 3, 4)
+   N = matrix_space(S, 3, 4)
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
@@ -3659,9 +3659,9 @@ end
 end
 
 @testset "Generic.Mat.hnf" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = matrix_space(R, 4, 3)
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
@@ -3674,13 +3674,13 @@ end
    @test U*A == H
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
-   N = MatrixSpace(S, 3, 4)
+   N = matrix_space(S, 3, 4)
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
@@ -3694,9 +3694,9 @@ end
 end
 
 @testset "Generic.Mat.snf_kb" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = matrix_space(R, 4, 3)
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
@@ -3710,13 +3710,13 @@ end
    @test U*A*K == T
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
-   N = MatrixSpace(S, 3, 4)
+   N = matrix_space(S, 3, 4)
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
@@ -3754,9 +3754,9 @@ end
 end
 
 @testset "Generic.Mat.snf" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = matrix_space(R, 4, 3)
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
@@ -3770,13 +3770,13 @@ end
    @test U*A*K == T
 
    # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
+   R, x = polynomial_ring(GF(7), "x")
+   F = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
-   N = MatrixSpace(S, 3, 4)
+   N = matrix_space(S, 3, 4)
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
@@ -3791,7 +3791,7 @@ end
 end
 
 @testset "Generic.Mat.weak_popov" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
    r = 2 # == rank(A)
@@ -3806,7 +3806,7 @@ end
 
    F = GF(7)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
    B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
    s = 2 # == rank(B)
@@ -3822,7 +3822,7 @@ end
    # some random tests
 
    for i in 1:3
-      M = MatrixSpace(PolynomialRing(QQ, "x")[1], rand(1:5), rand(1:5))
+      M = matrix_space(polynomial_ring(QQ, "x")[1], rand(1:5), rand(1:5))
       A = rand(M, -1:5, -5:5)
       r = rank(A)
       P = weak_popov(A)
@@ -3836,7 +3836,7 @@ end
 
    R = GF(randprime(100))
 
-   M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
+   M = matrix_space(polynomial_ring(R, "x")[1], rand(1:5), rand(1:5))
 
    for i in 1:2
       A = rand(M, 1:5)
@@ -3850,9 +3850,9 @@ end
       @test is_unit(det(U))
    end
 
-   R = ResidueField(ZZ, randprime(100))
+   R = residue_field(ZZ, randprime(100))
 
-   M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
+   M = matrix_space(polynomial_ring(R, "x")[1], rand(1:5), rand(1:5))
 
    for i in 1:2
       A = rand(M, -1:5, 0:100)
@@ -3868,7 +3868,7 @@ end
 end
 
 @testset "Generic.Mat.popov" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
    r = 2 # == rank(A)
@@ -3893,7 +3893,7 @@ end
 
    F = GF(7)
 
-   S, y = PolynomialRing(F, "y")
+   S, y = polynomial_ring(F, "y")
 
    B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
    s = 2 # == rank(B)
@@ -3909,7 +3909,7 @@ end
    # some random tests
 
    for i in 1:3
-      M = MatrixSpace(PolynomialRing(QQ, "x")[1], rand(1:5), rand(1:5))
+      M = matrix_space(polynomial_ring(QQ, "x")[1], rand(1:5), rand(1:5))
       A = rand(M, -1:5, -5:5)
       r = rank(A)
       P = popov(A)
@@ -3923,7 +3923,7 @@ end
 
    R = GF(randprime(100))
 
-   M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
+   M = matrix_space(polynomial_ring(R, "x")[1], rand(1:5), rand(1:5))
 
    for i in 1:2
       A = rand(M, 1:5)
@@ -3937,9 +3937,9 @@ end
       @test is_unit(det(U))
    end
 
-   R = ResidueField(ZZ, randprime(100))
+   R = residue_field(ZZ, randprime(100))
 
-   M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
+   M = matrix_space(polynomial_ring(R, "x")[1], rand(1:5), rand(1:5))
 
    for i in 1:2
       A = rand(M, -1:5, 0:100)
@@ -3975,7 +3975,7 @@ end
    # Test views over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
-   S = MatrixSpace(R, 4, 4)
+   S = matrix_space(R, 4, 4)
    
    M = rand(S, -10:10)
 
@@ -3989,7 +3989,7 @@ end
 end
 
 @testset "Generic.Mat.change_base_ring" begin
-   for (P, Q, T) in ((MatrixSpace(ZZ, 2, 3), MatrixSpace(ZZ, 3, 2), MatElem),
+   for (P, Q, T) in ((matrix_space(ZZ, 2, 3), matrix_space(ZZ, 3, 2), MatElem),
                      (MatrixAlgebra(ZZ, 3), MatrixAlgebra(ZZ, 3), MatAlgElem))
       M = rand(P, -10:10)
       N = rand(Q, -10:10)
@@ -4013,8 +4013,8 @@ end
 
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
-   U, x = PolynomialRing(R, "x")
-   S = MatrixSpace(R, 2, 2)
+   U, x = polynomial_ring(R, "x")
+   S = matrix_space(R, 2, 2)
    
    M = rand(S, -10:10)
 
@@ -4027,8 +4027,8 @@ end
    u, v = rand(0:9, 2)
    for (mat, algebra) = ((rand(1:9, u, v), false),
                          (rand(1:9, u, u), true))
-      for R = [QQ, ZZ, GF(2), GF(7), PolynomialRing(GF(5), 'x')[1]]
-         M = algebra ? MatrixAlgebra(R, u) : MatrixSpace(R, u, v)
+      for R = [QQ, ZZ, GF(2), GF(7), polynomial_ring(GF(5), 'x')[1]]
+         M = algebra ? MatrixAlgebra(R, u) : matrix_space(R, u, v)
          m0 = M(mat)
          for f0 = (x -> x + 1, x -> x*2, x -> one(R), x -> zero(R))
             for f = (f0, map_from_func(f0, R, R))
@@ -4044,15 +4044,15 @@ end
             end
          end
       end
-      m0 = algebra ? MatrixAlgebra(ZZ, u)(mat) : MatrixSpace(ZZ, u, v)(mat)
+      m0 = algebra ? MatrixAlgebra(ZZ, u)(mat) : matrix_space(ZZ, u, v)(mat)
       m = deepcopy(m0)
-      for S = [QQ, ZZ, GF(2), GF(7), PolynomialRing(GF(5), 'x')[1]]
+      for S = [QQ, ZZ, GF(2), GF(7), polynomial_ring(GF(5), 'x')[1]]
          for f0 = (x -> S(x), x -> S(x + 1))
             for f = (f0, map_from_func(f0, ZZ, S))
                n = map_entries(f, m)
                @test n !== m
                @test m == m0 # map's input must not be mutated
-               M = algebra ? MatrixAlgebra(S, u) : MatrixSpace(S, u, v)
+               M = algebra ? MatrixAlgebra(S, u) : matrix_space(S, u, v)
                if !isempty(mat)
                   @test n == M(map(f isa Function ? f : f.image_fn, mat))
                end
@@ -4068,9 +4068,9 @@ end
 
    # Tests over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
-   U, x = PolynomialRing(R, "x")
-   S = MatrixSpace(R, 2, 2)
-   T = MatrixSpace(U, 2, 2)
+   U, x = polynomial_ring(R, "x")
+   S = matrix_space(R, 2, 2)
+   T = matrix_space(U, 2, 2)
 
    M = rand(S, -10:10)
    N = rand(T, 0:5, -10:10)
@@ -4085,7 +4085,7 @@ end
    for sim_zero in (similar, zero)
       test_zero = sim_zero === zero
       for R = (ZZ, GF(11))
-         M = MatrixSpace(R, rand(0:9), rand(0:9))
+         M = matrix_space(R, rand(0:9), rand(0:9))
          m = R == ZZ ? rand(M, -10:10) : rand(M)
          n = sim_zero(m)
          @test !test_zero || iszero(n)
@@ -4094,17 +4094,17 @@ end
          r, c = rand(0:9, 2)
          n = sim_zero(m, r, c)
          @test !test_zero || iszero(n)
-         @test parent(n) == MatrixSpace(R, r, c)
+         @test parent(n) == matrix_space(R, r, c)
          @test size(n) == (r, c)
          for S = [QQ, ZZ, GF(2), GF(5)]
             n = sim_zero(m, S)
             @test !test_zero || iszero(n)
-            @test parent(n) == MatrixSpace(S, size(n)...)
+            @test parent(n) == matrix_space(S, size(n)...)
             @test size(n) == (nrows(M), ncols(M))
             r, c = rand(0:9, 2)
             n = sim_zero(m, S, r, c)
             @test !test_zero || iszero(n)
-            @test parent(n) == MatrixSpace(S, r, c)
+            @test parent(n) == matrix_space(S, r, c)
             @test size(n) == (r, c)
          end
       end
@@ -4140,7 +4140,7 @@ end
 
    @test sprint(show, matrix(ZZ, [3 1 2; 2 0 1])) == "[3 1 2; 2 0 1]"
 
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    @test sprint(show, matrix(R, [-x-1 -x; 2*x+1 -1])) == "[-x-1 -x; 2*x+1 -1]"
 
@@ -4165,10 +4165,10 @@ end
 end
 
 @testset "Generic.Mat.rand" begin
-   M = MatrixSpace(ZZ, 2, 3)
+   M = matrix_space(ZZ, 2, 3)
    test_rand(M, 1:9)
 
-   M = MatrixSpace(GF(7), 3, 2)
+   M = matrix_space(GF(7), 3, 2)
    test_rand(M)
 
    sp = Random.Sampler(MersenneTwister, M)
@@ -4177,13 +4177,13 @@ end
    @test v isa Vector{elem_type(M)}
    @test all(x -> parent(x) == M, v)
 
-   M = MatrixSpace(F2(), 2, 3)
+   M = matrix_space(F2(), 2, 3)
    test_rand(M)
 end
 
 @testset "Generic.Mat.MatSpace_iteration" begin
    F = GF(2)
-   M = MatrixSpace(F, 2, 2)
+   M = matrix_space(F, 2, 2)
    xs = collect(M)
    ys = [ [0 0; 0 0], [1 0; 0 0], [0 1; 0 0], [1 1; 0 0],
           [0 0; 1 0], [1 0; 1 0], [0 1; 1 0], [1 1; 1 0],
@@ -4192,7 +4192,7 @@ end
    @test xs == M.(ys)
 
    F = GF(5)
-   M = MatrixSpace(F, 3, 4)
+   M = matrix_space(F, 3, 4)
    xs = collect(Iterators.take(M, 10))
    ys = [ [0 0 0 0; 0 0 0 0; 0 0 0 0], [1 0 0 0; 0 0 0 0; 0 0 0 0],
           [2 0 0 0; 0 0 0 0; 0 0 0 0], [3 0 0 0; 0 0 0 0; 0 0 0 0],

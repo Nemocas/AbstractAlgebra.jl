@@ -37,3 +37,36 @@
 @alias iszero_column is_zero_column
 @alias iszero_row is_zero_row
 @alias Localization localization
+
+#
+# Some deprecation aliases follow. They use @alias instead of @deprecate
+# because there are still packages adding methods for them, which would break
+# if we used @deprecate. Once those packages are updated, we can switch to
+# using @deprecate
+#
+
+# Deprecated in 0.27.*
+
+@alias MatrixSpace matrix_space
+#@deprecate MatrixSpace(R::Ring, rows::Int, cols::Int; cache::Bool=true) matrix_space(R, rows, cols; cache)
+
+@alias PolynomialRing polynomial_ring
+@alias PowerSeriesRing power_series_ring
+@alias LaurentSeriesRing laurent_series_ring
+@alias LaurentSeriesField laurent_series_field
+@alias FractionField fraction_field
+@alias NumberField number_field
+
+@alias PolyElem PolyRingElem
+@alias NCPolyElem NCPolyRingElem
+@alias MPolyElem MPolyRingElem
+@alias UnivPolyElem UniversalPolyRingElem
+@alias LaurentPolyElem LaurentPolyRingElem
+@alias LaurentMPolyElem LaurentMPolyRingElem
+
+@alias AbsSeriesRing AbsPowerSeriesRing
+@alias AbsSeriesElem AbsPowerSeriesRingElem
+@alias RelSeriesRing RelPowerSeriesRing
+@alias RelSeriesElem RelPowerSeriesRingElem
+
+@alias FreeAssociativeAlgebra free_associative_algebra

@@ -1,4 +1,4 @@
-using AbstractAlgebra: terms_degrees, LaurentPolyElem
+using AbstractAlgebra: terms_degrees, LaurentPolyRingElem
 
 using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
                                trail_degree, lead_degree
@@ -18,7 +18,7 @@ end
       L0, y0 = LaurentPolynomialRing(zz, "y0")
 
       for R in (ZZ, GF(5))
-         P, _ = PolynomialRing(R, "x0")
+         P, _ = polynomial_ring(R, "x0")
          L, y = LaurentPolynomialRing(R, "y")
 
          @test LaurentPolynomialRing(R, "y", cached = true)[1] ===
@@ -27,7 +27,7 @@ end
          @test LaurentPolynomialRing(R, "y", cached = true)[1] !==
                LaurentPolynomialRing(R, "y", cached = false)[1]
 
-         P2, _ = PolynomialRing(R, "x0", cached = false)
+         P2, _ = polynomial_ring(R, "x0", cached = false)
 
          @test LaurentPolynomialRing(P, "y")[1] ===
                LaurentPolynomialRing(P, "y")[1]
@@ -233,7 +233,7 @@ end
    end
 
    @testset "Generic.LaurentMPoly.is_unit" begin
-      R, x = LaurentPolynomialRing(ResidueRing(ZZ, 6), "x")
+      R, x = LaurentPolynomialRing(residue_ring(ZZ, 6), "x")
 
       @test is_unit(x)
       @test !is_unit(2*x)
@@ -246,7 +246,7 @@ end
    end
 
    @testset "coercion" begin
-      R, x = PolynomialRing(ZZ, "x")
+      R, x = polynomial_ring(ZZ, "x")
       L, x1 = LaurentPolynomialRing(ZZ, "x")
       @test L(x) == x1
       @test L(x+x^2) == x1+x1^2
@@ -292,7 +292,7 @@ end
       @test y*y*y*y*y*y*f*f == y^6 * f^2
 
       # with polynomials as base ring
-      P, x = PolynomialRing(ZZ, "x")
+      P, x = polynomial_ring(ZZ, "x")
       L, y = LaurentPolynomialRing(P, "y")
       @test parent(x*y) == L
       @test parent(y*x) == L
@@ -305,7 +305,7 @@ end
 
       # as base ring of polynomials
       L, y = LaurentPolynomialRing(ZZ, "y")
-      P, x = PolynomialRing(L, "x")
+      P, x = polynomial_ring(L, "x")
       @test parent(x*y) == P
       @test parent(y*x) == P
 
@@ -485,7 +485,7 @@ end
       @test sprint(show, "text/plain", L) == "Univariate Laurent Polynomial Ring in y over Integers"
       p = y^1; p.mindeg = -3
       @test sprint(show, "text/plain", p) == "y^-2"
-      R, z = PolynomialRing(L, "z")
+      R, z = polynomial_ring(L, "z")
       @test sprint(show, "text/plain", (y^2)*z) == "y^2*z"
       @test sprint(show, "text/plain", 3*(y^0)*z) == "3*z"
       @test sprint(show, "text/plain", -y*z + (-y*z^2)) == "-y*z^2 - y*z"
@@ -498,7 +498,7 @@ end
       test_EuclideanRing_interface(L)
       test_Ring_interface_recursive(L)
 
-      L, y = LaurentPolynomialRing(ResidueRing(ZZ, ZZ(6)), "y")
+      L, y = LaurentPolynomialRing(residue_ring(ZZ, ZZ(6)), "y")
       test_Ring_interface(L)
    end
 end

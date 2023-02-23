@@ -30,7 +30,7 @@ end
     @test divexact(ZZ(1), FF(2, 3)) == 3//2
     @test !iszero(gcd(FF(2//3), FF(4//5)))
 
-    Zx, x = PolynomialRing(ZZ, "x")
+    Zx, x = polynomial_ring(ZZ, "x")
     F = FactoredFractionField(Zx)
 
     @test F(2//3) == F(2, 3)
@@ -56,19 +56,19 @@ end
 end
 
 @testset "Generic.FactoredFrac.ZZ.evaluate" begin
-    Zx, x = PolynomialRing(ZZ, "x")
+    Zx, x = polynomial_ring(ZZ, "x")
     F = FactoredFractionField(Zx)
     x = F(x)
     @test evaluate(x//(x+1), 2//3) == 2//5
 
-    Zxy, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+    Zxy, (x, y) = polynomial_ring(ZZ, ["x", "y"])
     F = FactoredFractionField(Zxy)
     (x, y) = (F(x), F(y))
     @test evaluate(x//(x+y)^2, [1//3, 1//2]) == 12//25
 end
 
 @testset "Generic.FactoredFrac.ZZ.valuation" begin
-    Zxy, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+    Zxy, (x, y) = polynomial_ring(ZZ, ["x", "y"])
     F = FactoredFractionField(Zxy)
     (X, Y) = (F(x), F(y))
     @test remove(X//(X+Y)^2, x)   == (1, 1//(X+Y)^2)
@@ -165,7 +165,7 @@ end
 end
 
 @testset "Generic.FactoredFrac.ZZx" begin
-    Zx, x = PolynomialRing(ZZ, "x")
+    Zx, x = polynomial_ring(ZZ, "x")
     F = FactoredFractionField(Zx)
     x = F(x)
     a = divexact(x + 1, (x + 2)^2) + x
@@ -175,7 +175,7 @@ end
 end
 
 @testset "Generic.FactoredFrac.ZZxyz" begin
-    Zxyz, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+    Zxyz, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
     F = FactoredFractionField(Zxyz)
     (x, y, z) = (F(x), F(y), F(z))
     @test (inv(x+y) + inv(x+y+z))*(x+y)*(x+y+z) == 2*x+2*y+z
@@ -183,7 +183,7 @@ end
 end
 
 @testset "Generic.FactoredFrac.constructors" begin
-    S, x = PolynomialRing(ZZ, "x")
+    S, x = polynomial_ring(ZZ, "x")
     T = FactoredFractionField(S)
 
     @test FactoredFractionField(S, cached = true) === FactoredFractionField(S, cached = true)
@@ -214,7 +214,7 @@ end
 
     @test characteristic(T) == 0
 
-    TT = FactoredFractionField(PolynomialRing(QQ, "x")[1])
+    TT = FactoredFractionField(polynomial_ring(QQ, "x")[1])
     a = TT(1)
     b = T(2)
 
@@ -226,7 +226,7 @@ end
 end
 
 @testset "Generic.FactoredFrac.printing" begin
-    S, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+    S, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
     F = FactoredFractionField(S)
     (x, y, z) = (F(x), F(y), F(z))
 
@@ -240,7 +240,7 @@ end
 end
 
 @testset "Generic.FactoredFrac.derivative" begin
-    S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+    S, (x, y) = polynomial_ring(ZZ, ["x", "y"])
     F = FactoredFractionField(S)
     (X, Y) = (F(x), F(y))
 
