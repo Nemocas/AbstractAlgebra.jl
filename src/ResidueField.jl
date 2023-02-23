@@ -12,7 +12,7 @@ export residue_field
 #
 ###############################################################################
 
-base_ring(S::ResField{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
+base_ring(S::ResidueField{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
 base_ring(r::ResFieldElem) = base_ring(parent(r))
 
@@ -24,7 +24,7 @@ function is_exact_type(a::Type{T}) where {S <: RingElement, T <: ResFieldElem{S}
    return is_exact_type(S)
 end
 
-function check_parent_type(a::ResField{T}, b::ResField{T}) where {T <: RingElement}
+function check_parent_type(a::ResidueField{T}, b::ResidueField{T}) where {T <: RingElement}
    # exists only to check types of parents agree
 end
 
@@ -50,11 +50,11 @@ function Base.hash(a::ResFieldElem, h::UInt)
 end
 
 @doc Markdown.doc"""
-    modulus(S::ResField)
+    modulus(S::ResidueField)
 
 Return the modulus $a$ of the given residue ring $S = R/(a)$.
 """
-function modulus(S::ResField)
+function modulus(S::ResidueField)
    return S.modulus
 end
 
@@ -69,21 +69,21 @@ function modulus(r::ResFieldElem)
 end
 
 @doc Markdown.doc"""
-    characteristic(R::ResField)
+    characteristic(R::ResidueField)
 
 Return the characteristic of the residue field.
 """
-function characteristic(R::ResField)
+function characteristic(R::ResidueField)
    return characteristic(base_ring(R))
 end
 
 @doc Markdown.doc"""
-    characteristic(r::ResField{T}) where T <: Integer
+    characteristic(r::ResidueField{T}) where T <: Integer
 
 Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 residue $r$ belongs to.
 """
-function characteristic(r::ResField{T}) where T <: Integer
+function characteristic(r::ResidueField{T}) where T <: Integer
    return modulus(r)
 end
 
@@ -93,9 +93,9 @@ lift(a::ResFieldElem) = data(a)
 
 lift(a::ResFieldElem{Int}) = BigInt(data(a))
 
-zero(R::ResField) = R(0)
+zero(R::ResidueField) = R(0)
 
-one(R::ResField) = R(1)
+one(R::ResidueField) = R(1)
 
 iszero(a::ResFieldElem) = iszero(data(a))
 
@@ -133,7 +133,7 @@ end
 
 @enable_all_show_via_expressify ResFieldElem
 
-function show(io::IO, a::ResField)
+function show(io::IO, a::ResidueField)
    print(IOContext(io, :compact => true), "Residue field of ", base_ring(a), " modulo ", modulus(a))
 end
 
@@ -452,17 +452,17 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(R::ResField, _) = elem_type(R)
+RandomExtensions.maketype(R::ResidueField, _) = elem_type(R)
 
 function rand(rng::AbstractRNG,
               sp::SamplerTrivial{<:Make2{<:ResFieldElem{T},
-                                         <:ResField{T}}}
+                                         <:ResidueField{T}}}
               ) where {T}
    S, v = sp[][1:end]
    S(rand(rng, v))
 end
 
-function RandomExtensions.make(S::ResField, vs...)
+function RandomExtensions.make(S::ResidueField, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, vs[1])
@@ -471,9 +471,9 @@ function RandomExtensions.make(S::ResField, vs...)
    end
 end
 
-rand(rng::AbstractRNG, S::ResField, v...) = rand(rng, make(S, v...))
+rand(rng::AbstractRNG, S::ResidueField, v...) = rand(rng, make(S, v...))
 
-rand(S::ResField, v...) = rand(Random.GLOBAL_RNG, S, v...)
+rand(S::ResidueField, v...) = rand(Random.GLOBAL_RNG, S, v...)
 
 ###############################################################################
 #
@@ -493,7 +493,7 @@ function residue_field(R::Ring, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DivideError())
    T = elem_type(R)
 
-   return Generic.ResField{T}(R(a), cached)
+   return Generic.ResidueField{T}(R(a), cached)
 end
 
 @doc Markdown.doc"""

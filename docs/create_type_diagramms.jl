@@ -32,10 +32,10 @@ skinparam RoundCorner 15
 "Ring" -down-> "PolyRing{T}"
 "PolyRing{T}" -down-> "LaurentPolynomialRing{T}"
 "PolyRing{T}" -down-> "SeriesRing{T}"
-"Ring" -down-> "ResRing{T}"
+"Ring" -down-> "ResidueRing{T}"
 
 ' Fields
-"Field" -down-> "ResField{T}"
+"Field" -down-> "ResidueField{T}"
 "NumField{T}" -down-> "SimpleNumField{T}"
 "Field" -down-> "FracField{T}"
 "Field" -down-> "NumField{T}"

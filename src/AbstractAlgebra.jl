@@ -131,7 +131,7 @@ export NCPolyRingElem, PolyRingElem, SeriesElem, AbsSeriesElem, RelSeriesElem, R
        MatElem, MatAlgElem, FinFieldElem, MPolyRingElem, UniversalPolyRingElem, NumFieldElem, Ideal,
        SimpleNumFieldElem, FreeAssAlgElem
 
-export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
+export PolyRing, SeriesRing, ResidueRing, FracField, MatSpace, MatAlgebra,
        FinField, MPolyRing, UniversalPolyRing, NumField, SimpleNumField, IdealSet,
        FreeAssAlgebra
 

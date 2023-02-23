@@ -15,12 +15,12 @@ AbstractAlgebra.jl abstract type hierarchy.
 
 ## Generic residue types
 
-AbstractAlgebra.jl implements generic residue rings with type `Generic.Res{T}`
-or in the case of residue rings that are known to be fields, `Generic.ResF{T}`,
+AbstractAlgebra.jl implements generic residue rings with type `Generic.ResidueRingElem{T}`
+or in the case of residue rings that are known to be fields, `Generic.ResidueFieldElem{T}`,
 where `T` is the type of elements of the base ring. See the file
 `src/generic/GenericTypes.jl` for details.
 
-Parent objects of generic residue ring elements have type `Generic.ResRing{T}`
+Parent objects of generic residue ring elements have type `Generic.ResidueRing{T}`
 and those of residue fields have type `GenericResField{T}`.
 
 The defining modulus of the residue ring is stored in the parent object.
@@ -29,15 +29,15 @@ The defining modulus of the residue ring is stored in the parent object.
 
 All residue element types belong to the abstract type `ResElem{T}`
 or `ResFieldElem{T}` in the case of residue fields, and the
-residue ring types belong to the abstract type `ResRing{T}` or `ResField{T}`
+residue ring types belong to the abstract type `ResidueRing{T}` or `ResidueField{T}`
 respectively. This enables one to write generic functions that can accept any
 AbstractAlgebra residue type.
 
 
 !!! note
 
-    Note that both the generic residue ring type `Generic.ResRing{T}` and the
-    abstract type it belongs to, `ResRing{T}` are both called `ResRing`, and
+    Note that both the generic residue ring type `Generic.ResidueRing{T}` and the
+    abstract type it belongs to, `ResidueRing{T}` are both called `ResidueRing`, and
     similarly for the residue field types. In each case, the  former is a
     (parameterised) concrete type for a residue ring over a given base ring whose
     elements have type `T`. The latter is an abstract type representing all
@@ -122,16 +122,16 @@ One can use the parent objects of a residue ring to construct residues, as per a
 ring.
 
 ```julia
-(R::ResRing)() # constructs zero
-(R::ResRing)(c::Integer)
-(R::ResRing)(c::elem_type(R))
-(R::ResRing{T})(a::T) where T <: RingElement
+(R::ResidueRing)() # constructs zero
+(R::ResidueRing)(c::Integer)
+(R::ResidueRing)(c::elem_type(R))
+(R::ResidueRing{T})(a::T) where T <: RingElement
 ```
 
 ## Functions for types and parents of residue rings
 
 ```julia
-base_ring(R::ResRing)
+base_ring(R::ResidueRing)
 base_ring(a::ResElem)
 ```
 
@@ -144,7 +144,7 @@ parent(a::ResElem)
 Return the parent of the given residue.
 
 ```julia
-characteristic(R::ResRing)
+characteristic(R::ResidueRing)
 ```
 
 Return the characteristic of the given residue ring. If the characteristic is
@@ -171,7 +171,7 @@ inv(a::T)
 The Residue Ring interface is also implemented.
 
 ```julia
-modulus(S::ResRing)
+modulus(S::ResidueRing)
 ```
 
 ```julia
@@ -317,7 +317,7 @@ Random residues can be generated using `rand`. The parameters after the residue
 ring are used to generate elements of the base ring.
 
 ```julia
-rand(R::ResRing, v...)
+rand(R::ResidueRing, v...)
 ```
 
 **Examples**

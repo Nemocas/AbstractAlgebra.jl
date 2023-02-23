@@ -42,6 +42,6 @@ are defined over.
   - `Generic.AbsSeries{T}` (`Generic.AbsSeriesRing{T}`)
   - `Generic.LaurentSeriesRingElem{T}` (`Generic.LaurentSeriesRing{T}`)
   - `Generic.LaurentSeriesFieldElem{T}` (`Generic.LaurentSeriesField{T}`)
-  - `Generic.Res{T}` (`Generic.ResRing{T}`)
+  - `Generic.ResidueRingElem{T}` (`Generic.ResidueRing{T}`)
   - `Generic.Frac{T}` (`Generic.FracField{T}`)
   - `Generic.Mat{T}` (`Generic.MatSpace{T}`)

@@ -569,15 +569,15 @@ end
 
 ###############################################################################
 #
-#   ResRing / Res
+#   ResidueRing / ResidueRingElem
 #
 ###############################################################################
 
-mutable struct ResRing{T <: RingElement} <: AbstractAlgebra.ResRing{T}
+mutable struct ResidueRing{T <: RingElement} <: AbstractAlgebra.ResidueRing{T}
    base_ring::Ring
    modulus::T
 
-   function ResRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
+   function ResidueRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
       c = canonical_unit(modulus)
       if !isone(c)
         modulus = divexact(modulus, c)
@@ -586,30 +586,30 @@ mutable struct ResRing{T <: RingElement} <: AbstractAlgebra.ResRing{T}
 
       return get_cached!(ModulusDict, (R, modulus), cached) do
          new{T}(R, modulus)
-      end::ResRing{T}
+      end::ResidueRing{T}
    end
 end
 
 const ModulusDict = CacheDictType{Tuple{Ring, RingElement}, Ring}()
 
-mutable struct Res{T <: RingElement} <: AbstractAlgebra.ResElem{T}
+mutable struct ResidueRingElem{T <: RingElement} <: AbstractAlgebra.ResElem{T}
    data::T
-   parent::ResRing{T}
+   parent::ResidueRing{T}
 
-   Res{T}(a::T) where T <: RingElement = new{T}(a)
+   ResidueRingElem{T}(a::T) where T <: RingElement = new{T}(a)
 end
 
 ###############################################################################
 #
-#   ResField / ResFieldElem
+#   ResidueField / ResFieldElem
 #
 ###############################################################################
 
-mutable struct ResField{T <: RingElement} <: AbstractAlgebra.ResField{T}
+mutable struct ResidueField{T <: RingElement} <: AbstractAlgebra.ResidueField{T}
    base_ring::Ring
    modulus::T
 
-   function ResField{T}(modulus::T, cached::Bool = true) where T <: RingElement
+   function ResidueField{T}(modulus::T, cached::Bool = true) where T <: RingElement
       c = canonical_unit(modulus)
       if !isone(c)
         modulus = divexact(modulus, c)
@@ -617,17 +617,17 @@ mutable struct ResField{T <: RingElement} <: AbstractAlgebra.ResField{T}
       R = parent(modulus)
       return get_cached!(ModulusFieldDict, (R, modulus), cached) do
          new{T}(R, modulus)
-      end::ResField{T}
+      end::ResidueField{T}
    end
 end
 
 const ModulusFieldDict = CacheDictType{Tuple{Ring, RingElement}, Field}()
 
-mutable struct ResF{T <: RingElement} <: AbstractAlgebra.ResFieldElem{T}
+mutable struct ResidueFieldElem{T <: RingElement} <: AbstractAlgebra.ResFieldElem{T}
    data::T
-   parent::ResField{T}
+   parent::ResidueField{T}
 
-   ResF{T}(a::T) where T <: RingElement = new{T}(a)
+   ResidueFieldElem{T}(a::T) where T <: RingElement = new{T}(a)
 end
 
 ###############################################################################

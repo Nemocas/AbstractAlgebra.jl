@@ -1,4 +1,4 @@
-@testset "Generic.ResF.constructors" begin
+@testset "Generic.ResidueFieldElem.constructors" begin
    B = ZZ
 
    R = Generic.residue_field(B, 16453889)
@@ -20,40 +20,40 @@
    @test Generic.residue_field(B, 16453889, cached = true) === Generic.residue_field(B, 16453889, cached = true)
    @test Generic.residue_field(B, 16453889, cached = true) !== Generic.residue_field(B, 16453889, cached = false)
 
-   @test elem_type(R) == Generic.ResF{elem_type(B)}
-   @test elem_type(Generic.ResField{elem_type(B)}) == Generic.ResF{elem_type(B)}
-   @test parent_type(Generic.ResF{elem_type(B)}) == Generic.ResField{elem_type(B)}
+   @test elem_type(R) == Generic.ResidueFieldElem{elem_type(B)}
+   @test elem_type(Generic.ResidueField{elem_type(B)}) == Generic.ResidueFieldElem{elem_type(B)}
+   @test parent_type(Generic.ResidueFieldElem{elem_type(B)}) == Generic.ResidueField{elem_type(B)}
 
-   @test isa(R, Generic.ResField)
+   @test isa(R, Generic.ResidueField)
 
    a = R(123)
 
-   @test isa(a, Generic.ResF)
+   @test isa(a, Generic.ResidueFieldElem)
 
    b = R(a)
 
-   @test isa(b, Generic.ResF)
+   @test isa(b, Generic.ResidueFieldElem)
 
    c = R(ZZ(12))
 
-   @test isa(c, Generic.ResF)
+   @test isa(c, Generic.ResidueFieldElem)
 
    d = R()
 
-   @test isa(d, Generic.ResF)
+   @test isa(d, Generic.ResidueFieldElem)
 
    S, x = polynomial_ring(R, "x")
    T = residue_field(S, x^3 + 3x + 1)
 
-   @test isa(T, Generic.ResField)
+   @test isa(T, Generic.ResidueField)
 
    f = T(x^4)
 
-   @test isa(f, Generic.ResF)
+   @test isa(f, Generic.ResidueFieldElem)
 
    g = T(f)
 
-   @test isa(g, Generic.ResF)
+   @test isa(g, Generic.ResidueFieldElem)
 
    S = Generic.residue_ring(B, 2)
    x = R(1)
@@ -66,7 +66,7 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.ResF.printing" begin
+@testset "Generic.ResidueFieldElem.printing" begin
    R = Generic.residue_field(ZZ, 16453889)
 
    @test string(zero(R)) == "0"
@@ -80,7 +80,7 @@ end
    @test string(5*x^5+3*x^3+2*x^2+x+1) == "5*x^5 + 3*x^3 + 2*x^2 + x + 1"
 end
 
-@testset "Generic.ResF.rand" begin
+@testset "Generic.ResidueFieldElem.rand" begin
    R = Generic.residue_field(ZZ, 16453889)
 
    test_rand(R, 1:9) do f
@@ -88,7 +88,7 @@ end
    end
 end
 
-@testset "Generic.ResF.manipulation" begin
+@testset "Generic.ResidueFieldElem.manipulation" begin
    R = Generic.residue_field(ZZ, 16453889)
 
    @test modulus(R) == 16453889
@@ -125,7 +125,7 @@ end
    @test isa(lift(S(1)), BigInt)
 end
 
-@testset "Generic.ResF.unary_ops" begin
+@testset "Generic.ResidueFieldElem.unary_ops" begin
    R = Generic.residue_field(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
@@ -136,7 +136,7 @@ end
    @test -T(x^5 + 1) == T(x^2+16453880*x+16453885)
 end
 
-@testset "Generic.ResF.binary_ops" begin
+@testset "Generic.ResidueFieldElem.binary_ops" begin
    R = Generic.residue_field(ZZ, 13)
 
    f = R(4)
@@ -162,7 +162,7 @@ end
    @test n*p == T(3x^2 + 4x + 4)
 end
 
-@testset "Generic.ResF.gcd" begin
+@testset "Generic.ResidueFieldElem.gcd" begin
    R = Generic.residue_field(ZZ, 13)
 
    f = R(4)
@@ -180,7 +180,7 @@ end
    @test gcd(n, p) == 1
 end
 
-@testset "Generic.ResF.adhoc_binary" begin
+@testset "Generic.ResidueFieldElem.adhoc_binary" begin
    R = Generic.residue_field(ZZ, 7)
 
    a = R(3)
@@ -203,7 +203,7 @@ end
    @test f*5 == T(2*x^2+3*x+6)
 end
 
-@testset "Generic.ResF.comparison" begin
+@testset "Generic.ResidueFieldElem.comparison" begin
    R = Generic.residue_field(ZZ, 7)
 
    a = R(3)
@@ -229,7 +229,7 @@ end
    @test isequal(f, g)
 end
 
-@testset "Generic.ResF.adhoc_comparison" begin
+@testset "Generic.ResidueFieldElem.adhoc_comparison" begin
    R = Generic.residue_field(ZZ, 7)
 
    a = R(3)
@@ -245,7 +245,7 @@ end
    @test f != 5
 end
 
-@testset "Generic.ResF.powering" begin
+@testset "Generic.ResidueFieldElem.powering" begin
    R = Generic.residue_field(ZZ, 7)
 
    a = R(3)
@@ -260,7 +260,7 @@ end
    @test f^100 == T(x^2 + 2x + 1)
 end
 
-@testset "Generic.ResF.inversion" begin
+@testset "Generic.ResidueFieldElem.inversion" begin
    R = Generic.residue_field(ZZ, 47)
 
    a = R(5)
@@ -276,7 +276,7 @@ end
    @test inv(f) == T(26*x^2+31*x+10)
 end
 
-@testset "Generic.ResF.exact_division" begin
+@testset "Generic.ResidueFieldElem.exact_division" begin
    R = Generic.residue_field(ZZ, 47)
 
    a = R(5)
@@ -294,7 +294,7 @@ end
    @test divexact(f, g) == T(7*x^2+25*x+26)
 end
 
-@testset "Generic.ResF.square_root" begin
+@testset "Generic.ResidueFieldElem.square_root" begin
    for p in [3, 47, 733, 13913, 168937, 3980299, 57586577]
        R = Generic.residue_field(ZZ, p)
 

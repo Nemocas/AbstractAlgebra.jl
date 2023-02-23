@@ -87,9 +87,9 @@ abstract type SeriesRing{T} <: Ring end
 
 abstract type MSeriesRing{T} <: Ring end
 
-abstract type ResRing{T} <: Ring end
+abstract type ResidueRing{T} <: Ring end
 
-abstract type ResField{T} <: Field end
+abstract type ResidueField{T} <: Field end
 
 abstract type FracField{T} <: Field end
 

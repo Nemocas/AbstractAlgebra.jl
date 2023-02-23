@@ -122,7 +122,7 @@ end
    end
 end
 
-function test_elem(R::AbstractAlgebra.Generic.UniversalPolyRing{AbstractAlgebra.Generic.Res{BigInt}})
+function test_elem(R::AbstractAlgebra.Generic.UniversalPolyRing{AbstractAlgebra.Generic.ResidueRingElem{BigInt}})
     return rand(R, 0:4, 0:10, -10:10)
 end
 
