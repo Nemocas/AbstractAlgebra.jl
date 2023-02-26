@@ -74,7 +74,7 @@ function show(io::IO, M::MapWithRetraction)
    println(io, "")
    println(io, "Codomain:")
    println(io, "========")
-   println(io, codomain(M))
+   print(io, codomain(M))
 end
 
 function compose(f::MapWithRetraction{U, C}, g::MapWithRetraction{D, U}) where {D, U, C}
