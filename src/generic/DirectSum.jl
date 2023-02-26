@@ -158,7 +158,7 @@ function direct_sum_projection(D::DirectSumModule{T}, i::Int, v::AbstractAlgebra
    return elem_type(m)(m, matv)
 end
 
-function DirectSum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
+function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
    length(m) == 0 && error("Cannot take a direct sum of an empty vector of modules")
    # Check base rings are the same
    R = base_ring(m[1])
