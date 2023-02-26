@@ -30,10 +30,17 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
 # imported here and in Generic.jl, and exported below.
 # They should not be imported/exported anywhere else.
 
-import LinearAlgebra: det, ishermitian, issymmetric, istriu, norm, nullspace, rank,
-                      hessenberg
-
-import LinearAlgebra: lu, lu!, tr
+import LinearAlgebra: det
+import LinearAlgebra: hessenberg
+import LinearAlgebra: ishermitian
+import LinearAlgebra: issymmetric
+import LinearAlgebra: istriu
+import LinearAlgebra: lu
+import LinearAlgebra: lu!
+import LinearAlgebra: norm
+import LinearAlgebra: nullspace
+import LinearAlgebra: rank
+import LinearAlgebra: tr
 
 ################################################################################
 #
@@ -102,54 +109,177 @@ end
 # and in Generic.jl.
 # They should not be imported/exported anywhere else.
 
-import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh, axes,
-             bin, ceil, checkbounds, conj, convert, cmp, cos, cosh, cospi, cot,
-             coth, dec, deepcopy, deepcopy_internal, expm1, exponent, fill,
-             floor, gcd, gcdx, getindex, hash, hcat, hex, hypot, intersect,
-             invmod, isequal, isfinite, isless, isone, isqrt, isreal,
-             iszero, lcm, ldexp, length, log1p, mod, ndigits, oct, one,
-             parent, parse, powermod,
-             precision, rand, Rational, rem, reverse, setindex!,
-             show, sincos, similar, sign, sin, sinh, sinpi, size, string, tan,
-             tanh, trailing_zeros, transpose, truncate, typed_hvcat,
-             typed_hcat, typed_vcat, vcat, xor, zero, zeros,
-             +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
+import Base: abs
+import Base: acos
+import Base: acosh
+import Base: Array
+import Base: asin
+import Base: asinh
+import Base: atan
+import Base: atanh
+import Base: axes
+import Base: bin
+import Base: ceil
+import Base: checkbounds
+import Base: cmp
+import Base: conj
+import Base: convert
+import Base: cos
+import Base: cosh
+import Base: cospi
+import Base: cot
+import Base: coth
+import Base: dec
+import Base: deepcopy
+import Base: deepcopy_internal
+import Base: expm1
+import Base: exponent
+import Base: fill
+import Base: floor
+import Base: gcd
+import Base: gcdx
+import Base: getindex
+import Base: hash
+import Base: hcat
+import Base: hex
+import Base: hypot
+import Base: intersect
+import Base: invmod
+import Base: isequal
+import Base: isfinite
+import Base: isless
+import Base: isone
+import Base: isqrt
+import Base: isreal
+import Base: iszero
+import Base: lcm
+import Base: ldexp
+import Base: length
+import Base: log1p
+import Base: mod
+import Base: ndigits
+import Base: oct
+import Base: one
+import Base: parent
+import Base: parse
+import Base: powermod
+import Base: precision
+import Base: rand
+import Base: Rational
+import Base: rem
+import Base: reverse
+import Base: setindex!
+import Base: show
+import Base: sign
+import Base: similar
+import Base: sin
+import Base: sincos
+import Base: sinh
+import Base: sinpi
+import Base: size
+import Base: string
+import Base: tan
+import Base: tanh
+import Base: trailing_zeros
+import Base: transpose
+import Base: truncate
+import Base: typed_hcat
+import Base: typed_hvcat
+import Base: typed_vcat
+import Base: vcat
+import Base: xor
+import Base: zero
+import Base: zeros
+
+import Base: +
+import Base: -
+import Base: *
+import Base: ==
+import Base: ^
+import Base: &
+import Base: |
+import Base: <<
+import Base: >>
+import Base: ~
+import Base: <=
+import Base: >=
+import Base: <
+import Base: >
+import Base: //
+import Base: /
+import Base: !=
 
 using Random: Random, AbstractRNG, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make2
 
-export elem_type, parent_type
-
+export AbsPowerSeriesRingElem
+export add!
+export addeq!
+export AdditiveGroupElem
+export crt
+export crt_with_lcm
+export elem_type
+export error_dim_negative
+export ErrorConstrDimMismatch
+export factor
+export factor_squarefree
 export Field
-
-export SetElem, GroupElem, AdditiveGroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElement,
-       FieldElement, Map
-
-export SetMap, FunctionalMap, IdentityMap
-
-export NCPolyRingElem, PolyRingElem, SeriesElem, AbsPowerSeriesRingElem, RelPowerSeriesRingElem, ResElem, FracElem,
-       MatElem, MatAlgElem, FinFieldElem, MPolyRingElem, UniversalPolyRingElem, NumFieldElem, Ideal,
-       SimpleNumFieldElem, FreeAssAlgElem
-
-export PolyRing, SeriesRing, ResidueRing, FracField, MatSpace, MatAlgebra,
-       FinField, MPolyRing, UniversalPolyRing, NumField, SimpleNumField, IdealSet,
-       FreeAssAlgebra
-
-export ZZ, QQ, zz, qq, RealField, RDF
-
+export FieldElem
+export FieldElement
+export FinField
+export FinFieldElem
+export FracElem
+export FracField
+export FreeAssAlgebra
+export FreeAssAlgElem
+export FunctionalMap
+export GroupElem
+export hgcd
+export Ideal
+export IdealSet
+export IdentityMap
+export is_irreducible
+export is_squarefree
+export Map
+export MatAlgebra
+export MatAlgElem
+export MatElem
+export MatSpace
+export ModuleElem
+export MPolyRing
+export MPolyRingElem
+export mul!
+export NCPolyRingElem
+export NCRingElem
+export NotImplementedError
+export NotInvertibleError
+export NumField
+export NumFieldElem
+export parent_type
+export PolyRing
+export PolyRingElem
+export qq
+export QQ
+export RDF
+export RealField
+export RelPowerSeriesRingElem
+export ResElem
+export ResidueRing
+export RingElem
+export RingElement
+export SeriesElem
+export SeriesRing
+export SetElem
+export SetMap
+export SimpleNumField
+export SimpleNumFieldElem
+export sub!
+export UniversalPolyRing
+export UniversalPolyRingElem
+export zero!
 export zeros
-
-export NotImplementedError, NotInvertibleError, ErrorConstrDimMismatch,
-       error_dim_negative
-
-export add!, addeq!,
-       crt, crt_with_lcm,
-       factor, factor_squarefree,
-       hgcd,
-       is_irreducible, is_squarefree,
-       mul!,
-       sub!,
-       zero!
+export zz
+export ZZ
 
 include("Attributes.jl")
 include("AliasMacro.jl")
@@ -375,13 +505,24 @@ include("fundamental_interface.jl")
 
 include("PrettyPrinting.jl")
 
-import .PrettyPrinting: get_html_as_latex, set_html_as_latex, expressify,
-                        show_via_expressify, @enable_all_show_via_expressify,
-                        expr_to_string, expr_to_latex_string, canonicalize,
-                        printer, print_integer_string, get_syntactic_sign_abs,
-                        is_syntactic_one, is_syntactic_zero,
-                        obj_to_string, obj_to_string_wrt_times,
-                        obj_to_latex_string, show_obj, print_obj
+import .PrettyPrinting: @enable_all_show_via_expressify
+import .PrettyPrinting: canonicalize
+import .PrettyPrinting: expr_to_latex_string
+import .PrettyPrinting: expr_to_string
+import .PrettyPrinting: expressify
+import .PrettyPrinting: get_html_as_latex
+import .PrettyPrinting: get_syntactic_sign_abs
+import .PrettyPrinting: is_syntactic_one
+import .PrettyPrinting: is_syntactic_zero
+import .PrettyPrinting: obj_to_latex_string
+import .PrettyPrinting: obj_to_string
+import .PrettyPrinting: obj_to_string_wrt_times
+import .PrettyPrinting: print_integer_string
+import .PrettyPrinting: print_obj
+import .PrettyPrinting: printer
+import .PrettyPrinting: set_html_as_latex
+import .PrettyPrinting: show_obj
+import .PrettyPrinting: show_via_expressify
 
 export @enable_all_show_via_expressify
 
@@ -442,125 +583,305 @@ include("Generic.jl")
 
 # Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
 # as we have our own
-import .Generic: abs_series, abs_series_type,
-                 base_field, basis,
-                 character,
-                 check_composable, collength,
-                 combine_like_terms!, cycles,
-                 defining_polynomial, degrees,
-                 dense_matrix_type, dense_poly_type,
-                 dim, disable_cache!,
-                 downscale,
-                 enable_cache!, exp_gcd,
-                 exponent, exponent_vector, exponent_word,
-                 finish, fit!, gcd, gcdx,
-                 has_left_neighbor, has_bottom_neighbor, hash,
-                 hooklength, identity_map,
-                 image_map, image_fn, intersection,
-                 inverse_fn, inverse_image_fn,
-                 inverse_mat, reverse_rows, reverse_rows!,
-                 inv!, invmod,
-                 is_compatible, is_degree, is_divisible_by,
-                 is_homogeneous, is_isomorphic,
-                 isone, is_reverse, is_rimhook, is_submodule,
-                 is_unit,
-                 laurent_ring, laurent_series, lcm,
-                 leading_coefficient, leading_monomial,
-                 leading_exponent_vector,
-                 leading_term, leading_exponent_word, length,
-                 leglength, main_variable,
-                 main_variable_extract, main_variable_insert,
-                 map1, map2, map_from_func,
-                 map_with_preimage_from_func, map_with_retraction,
-                 map_with_retraction_from_func,
-                 map_with_section, map_with_section_from_func, mat,
-                 matrix_repr, max_fields, mod,
-                 monomial, monomial!, monomials,
-                 monomial_iszero, monomial_set!,
-                 mpoly_type, MPolyBuildCtx, mullow_karatsuba,
-                 ngens, norm, normal_form, normalise,
-                 num_coeff, one,
-                 order, ordering, parity, partitionseq, Perm, perm,
-                 permtype, @perm_str, polcoeff, poly, poly_ring,
-                 precision, preimage, preimage_map,
-                 prime, push_term!,
-                 rand_ordering, reduce!,
-                 rels, rel_series, rel_series_type,
-                 rescale!, retraction_map, reverse,
-                 right_kernel, rowlength, section_map, setcoeff!,
-                 set_exponent_vector!, set_exponent_word!, set_limit!,
-                 setpermstyle, size,
-                 sort_terms!, summands,
-                 supermodule, term, terms, total_degree,
-                 to_univariate, trailing_coefficient, truncate,
-                 unit, upscale, weights,
-                 to_univariate, trailing_coefficient, truncate,
-                 unit, upscale,
-                 zero,
-       # Moved from Hecke into Misc
-                 Loc, localization, LocElem,
-                 roots, sturm_sequence
+import .Generic: @perm_str
+import .Generic: abs_series
+import .Generic: abs_series_type
+import .Generic: base_field
+import .Generic: basis
+import .Generic: character
+import .Generic: check_composable
+import .Generic: collength
+import .Generic: combine_like_terms!
+import .Generic: cycles
+import .Generic: defining_polynomial
+import .Generic: degrees
+import .Generic: dense_matrix_type
+import .Generic: dense_poly_type
+import .Generic: dim
+import .Generic: disable_cache!
+import .Generic: downscale
+import .Generic: enable_cache!
+import .Generic: exp_gcd
+import .Generic: exponent
+import .Generic: exponent_vector
+import .Generic: exponent_word
+import .Generic: finish
+import .Generic: fit!
+import .Generic: gcd
+import .Generic: gcdx
+import .Generic: has_bottom_neighbor
+import .Generic: has_left_neighbor
+import .Generic: hash
+import .Generic: hooklength
+import .Generic: identity_map
+import .Generic: image_fn
+import .Generic: image_map
+import .Generic: intersection
+import .Generic: inv!
+import .Generic: inverse_fn
+import .Generic: inverse_image_fn
+import .Generic: inverse_mat
+import .Generic: invmod
+import .Generic: is_compatible
+import .Generic: is_degree
+import .Generic: is_divisible_by
+import .Generic: is_homogeneous
+import .Generic: is_isomorphic
+import .Generic: is_reverse
+import .Generic: is_rimhook
+import .Generic: is_submodule
+import .Generic: is_unit
+import .Generic: isone
+import .Generic: laurent_ring
+import .Generic: laurent_series
+import .Generic: lcm
+import .Generic: leading_coefficient
+import .Generic: leading_exponent_vector
+import .Generic: leading_exponent_word
+import .Generic: leading_monomial
+import .Generic: leading_term
+import .Generic: leglength
+import .Generic: length
+import .Generic: main_variable
+import .Generic: main_variable_extract
+import .Generic: main_variable_insert
+import .Generic: map_from_func
+import .Generic: map_with_preimage_from_func
+import .Generic: map_with_retraction
+import .Generic: map_with_retraction_from_func
+import .Generic: map_with_section
+import .Generic: map_with_section_from_func
+import .Generic: map1
+import .Generic: map2
+import .Generic: mat
+import .Generic: matrix_repr
+import .Generic: max_fields
+import .Generic: mod
+import .Generic: monomial
+import .Generic: monomial_iszero
+import .Generic: monomial_set!
+import .Generic: monomial!
+import .Generic: monomials
+import .Generic: mpoly_type
+import .Generic: MPolyBuildCtx
+import .Generic: mullow_karatsuba
+import .Generic: ngens
+import .Generic: norm
+import .Generic: normal_form
+import .Generic: normalise
+import .Generic: num_coeff
+import .Generic: one
+import .Generic: order
+import .Generic: ordering
+import .Generic: parity
+import .Generic: partitionseq
+import .Generic: perm
+import .Generic: permtype
+import .Generic: polcoeff
+import .Generic: poly
+import .Generic: poly_ring
+import .Generic: precision
+import .Generic: preimage
+import .Generic: preimage_map
+import .Generic: prime
+import .Generic: push_term!
+import .Generic: rand_ordering
+import .Generic: reduce!
+import .Generic: rel_series
+import .Generic: rel_series_type
+import .Generic: rels
+import .Generic: rescale!
+import .Generic: retraction_map
+import .Generic: reverse
+import .Generic: reverse_rows
+import .Generic: reverse_rows!
+import .Generic: right_kernel
+import .Generic: rowlength
+import .Generic: section_map
+import .Generic: set_exponent_vector!
+import .Generic: set_exponent_word!
+import .Generic: set_limit!
+import .Generic: setcoeff!
+import .Generic: setpermstyle
+import .Generic: size
+import .Generic: sort_terms!
+import .Generic: summands
+import .Generic: supermodule
+import .Generic: term
+import .Generic: terms
+import .Generic: to_univariate
+import .Generic: total_degree
+import .Generic: trailing_coefficient
+import .Generic: truncate
+import .Generic: unit
+import .Generic: upscale
+import .Generic: weights
+import .Generic: zero
+
+# Moved from Hecke into Misc
+import .Generic: Loc
+import .Generic: localization
+import .Generic: LocElem
+import .Generic: roots
+import .Generic: sturm_sequence
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
-export abs_series, abs_series_type,
-                 addmul_delayed_reduction!, addmul!,
-                 base_field, base_ring, basis,
-                 canonical_unit, can_solve_left_reduced_triu,
-                 change_base_ring, change_coefficient_ring, character,
-                 chebyshev_t,
-                 chebyshev_u, check_composable, check_parent,
-                 collength, combine_like_terms!, cycles,
-                 defining_polynomial,
-                 dense_matrix_type, dense_poly_type, det,
-                 discriminant,
-                 elem_type,
-                 exponent, exponent_vector, exponent_word,
-                 finish, fit!, gcd, gen,
-                 gens, gcdinv, gcdx, gcd_with_cofactors,
-                 has_left_neighbor, has_bottom_neighbor, hash,
-                 interpolate, intersection,
-                 inv!, inverse_image_fn,
-                 inverse_mat, invmod,
-                 is_compatible, is_degree, is_divisible_by,
-                 is_domain_type, is_exact_type, is_gen,
-                 is_homogeneous,
-                 is_isomorphic, is_monomial, is_monomial_recursive,
-                 is_negative, is_reverse,
-                 is_submodule, is_symmetric,
-                 is_term_recursive, is_unit,
-                 is_zero_divisor, is_zero_divisor_with_annihilator,
-                 lcm,
-                 laurent_series, length,
-                 main_variable, main_variable_extract, main_variable_insert,
-                 mat, matrix_repr, max_fields, mod,
-                 monomial, monomial!, monomials,
-                 monomial_iszero, monomial_set!, monomial_to_newton!,
-                 mpoly_type, MPolyBuildCtx,
-                 mul_ks, mul_red!, mullow_karatsuba, mulmod,
-                 newton_to_monomial!, ngens,
-                 normal_form, normalise, nullspace, num_coeff,
-                 one, order, ordering,
-                 parent_type, parity, partitionseq, Perm, perm, permtype,
-                 @perm_str, polcoeff, polynomial, poly,
-                 poly_ring, pow_multinomial,
-                 ppio, precision, preimage, prime,
-                 push_term!, rank,
-                 rand_ordering, reduce!,
-                 renormalize!, rel_series, rel_series_type, rels,
-                 resultant, resultant_ducos,
-                 resultant_euclidean, resultant_subresultant,
-                 resultant_sylvester, resx, reverse, rowlength,
-                 setcoeff!, set_exponent_vector!, set_exponent_word!,
-                 setpermstyle,
-                 size, sort_terms!, subst, summands, supermodule,
-                 sylvester_matrix, term, terms,
-                 total_degree, trailing_coefficient, truncate, weights,
-                 zero,
-                 MatrixElem, PolynomialElem,
-       # Moved from Hecke into Misc
-                 divexact_low, divhigh,
-                 is_monic, Loc, localization, LocElem, mulhigh_n,
-                 PolyCoeffs, roots, sturm_sequence
+export @perm_str
+export abs_series
+export abs_series_type
+export addmul_delayed_reduction!
+export addmul!
+export base_field
+export base_ring
+export basis
+export can_solve_left_reduced_triu
+export canonical_unit
+export change_base_ring
+export change_coefficient_ring
+export character
+export chebyshev_t
+export chebyshev_u
+export check_composable
+export check_parent
+export collength
+export combine_like_terms!
+export cycles
+export defining_polynomial
+export dense_matrix_type
+export dense_poly_type
+export det
+export discriminant
+export elem_type
+export exponent
+export exponent_vector
+export exponent_word
+export finish
+export fit!
+export gcd
+export gcd_with_cofactors
+export gcdinv
+export gcdx
+export gen
+export gens
+export has_bottom_neighbor
+export has_left_neighbor
+export hash
+export interpolate
+export intersection
+export inv!
+export inverse_image_fn
+export inverse_mat
+export invmod
+export is_compatible
+export is_degree
+export is_divisible_by
+export is_domain_type
+export is_exact_type
+export is_gen
+export is_homogeneous
+export is_isomorphic
+export is_monomial
+export is_monomial_recursive
+export is_negative
+export is_reverse
+export is_submodule
+export is_symmetric
+export is_term_recursive
+export is_unit
+export is_zero_divisor
+export is_zero_divisor_with_annihilator
+export laurent_series
+export lcm
+export length
+export main_variable
+export main_variable_extract
+export main_variable_insert
+export mat
+export matrix_repr
+export MatrixElem
+export max_fields
+export mod
+export monomial
+export monomial_iszero
+export monomial_set!
+export monomial_to_newton!
+export monomial!
+export monomials
+export mpoly_type
+export MPolyBuildCtx
+export mul_ks
+export mul_red!
+export mullow_karatsuba
+export mulmod
+export newton_to_monomial!
+export ngens
+export normal_form
+export normalise
+export nullspace
+export num_coeff
+export one
+export order
+export ordering
+export parent_type
+export parity
+export partitionseq
+export perm
+export permtype
+export polcoeff
+export poly
+export poly_ring
+export polynomial
+export PolynomialElem
+export pow_multinomial
+export ppio
+export precision
+export preimage
+export prime
+export push_term!
+export rand_ordering
+export rank
+export reduce!
+export rel_series
+export rel_series_type
+export rels
+export renormalize!
+export resultant
+export resultant_ducos
+export resultant_euclidean
+export resultant_subresultant
+export resultant_sylvester
+export resx
+export reverse
+export rowlength
+export set_exponent_vector!
+export set_exponent_word!
+export setcoeff!
+export setpermstyle
+export size
+export sort_terms!
+export subst
+export summands
+export supermodule
+export sylvester_matrix
+export term
+export terms
+export total_degree
+export trailing_coefficient
+export truncate
+export weights
+export zero
+
+# Moved from Hecke into Misc
+export divexact_low
+export divhigh
+export is_monic
+export Loc
+export localization
+export LocElem
+export mulhigh_n
+export PolyCoeffs
+export roots
+export sturm_sequence
 
 ################################################################################
 #

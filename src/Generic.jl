@@ -1,73 +1,250 @@
 module Generic
 
-import LinearAlgebra: det, issymmetric, norm,
-                      nullspace, rank, hessenberg
-
-import LinearAlgebra: istriu, lu, lu!, tr
+import LinearAlgebra: det
+import LinearAlgebra: hessenberg
+import LinearAlgebra: issymmetric
+import LinearAlgebra: istriu
+import LinearAlgebra: lu
+import LinearAlgebra: lu!
+import LinearAlgebra: norm
+import LinearAlgebra: nullspace
+import LinearAlgebra: rank
+import LinearAlgebra: tr
 
 using Markdown, Random, InteractiveUtils
 
 using Random: SamplerTrivial, GLOBAL_RNG
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 
-import Base: Array, abs, asin, asinh, atan, atanh, axes, bin, checkbounds, cmp, conj,
-             convert, copy, cos, cosh, dec, deepcopy, deepcopy_internal,
-             exponent, gcd, gcdx, getindex, hash, hcat, hex, intersect,
-             invmod, isapprox, isempty, isequal, isfinite, isless, isone, isqrt,
-             isreal, iszero, lcm, ldexp, length, Matrix, mod, ndigits, oct, one,
-             parent, parse, powermod,
-             precision, rand, Rational, rem, reverse, setindex!,
-             show, similar, sign, sin, sinh, size, string, tan, tanh,
-             trailing_zeros, transpose, truncate, typed_hvcat, typed_hcat,
-             vcat, xor, zero, zeros, +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=,
-             <, >, //, /, !=
+import Base: abs
+import Base: acos
+import Base: acosh
+import Base: Array
+import Base: asin
+import Base: asinh
+import Base: atan
+import Base: atanh
+import Base: axes
+import Base: bin
+import Base: ceil
+import Base: checkbounds
+import Base: cmp
+import Base: conj
+import Base: convert
+import Base: copy
+import Base: cos
+import Base: cosh
+import Base: cospi
+import Base: cot
+import Base: coth
+import Base: dec
+import Base: deepcopy
+import Base: deepcopy_internal
+import Base: expm1
+import Base: exponent
+import Base: floor
+import Base: gcd
+import Base: gcdx
+import Base: getindex
+import Base: hash
+import Base: hcat
+import Base: hex
+import Base: hypot
+import Base: intersect
+import Base: invmod
+import Base: isapprox
+import Base: isempty
+import Base: isequal
+import Base: isfinite
+import Base: isless
+import Base: isone
+import Base: isqrt
+import Base: isreal
+import Base: iszero
+import Base: lcm
+import Base: ldexp
+import Base: length
+import Base: log1p
+import Base: Matrix
+import Base: mod
+import Base: ndigits
+import Base: oct
+import Base: one
+import Base: parent
+import Base: parse
+import Base: powermod
+import Base: precision
+import Base: rand
+import Base: Rational
+import Base: rem
+import Base: reverse
+import Base: setindex!
+import Base: show
+import Base: sign
+import Base: similar
+import Base: sin
+import Base: sinh
+import Base: sinpi
+import Base: size
+import Base: string
+import Base: tan
+import Base: tanh
+import Base: trailing_zeros
+import Base: transpose
+import Base: truncate
+import Base: typed_hcat
+import Base: typed_hvcat
+import Base: vcat
+import Base: xor
+import Base: zero
+import Base: zeros
 
-import Base: floor, ceil, hypot, log1p, expm1, sin, cos, sinpi, cospi,
-             tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
-             acosh, sinpi, cospi
+import Base: +
+import Base: -
+import Base: *
+import Base: ==
+import Base: ^
+import Base: &
+import Base: |
+import Base: <<
+import Base: >>
+import Base: ~
+import Base: <=
+import Base: >=
+import Base: <
+import Base: >
+import Base: //
+import Base: /
+import Base: !=
 
 # The type and helper function for the dictionaries for hashing
-import ..AbstractAlgebra: CacheDictType, get_cached!
-
-import ..AbstractAlgebra: CycleDec, Field, FieldElement, Integers, Map,
-                          NCRing, NCRingElem, Perm, Rationals, Ring, RingElem,
-                          RingElement, GFElem
-
-import ..AbstractAlgebra: add!, addeq!, addmul!, base_ring, canonical_unit,
-                          can_solve_with_solution_lu,
-                          can_solve_with_solution_fflu, change_base_ring,
-                          characteristic, check_parent, codomain, coeff,
-                          coefficient_ring, coefficients,
-                          coefficients_of_univariate, compose,
-                          constant_coefficient,
-                          content, data, deflate, deflation, degree, degrees,
-                          degrees_range, denominator, derivative, div,
-                          divexact, divides, divrem, domain, elem_type,
-                          evaluate, exp, exponent_vectors, expressify,
-                          factor, factor_squarefree,
-                          gen, gens, get_field, identity_matrix, inflate,
-                          integral, inv, is_constant, is_domain_type,
-                          is_exact_type, is_gen, is_monomial, isreduced_form,
-                          is_square, is_square_with_sqrt, is_term, is_unit,
-                          is_univariate,
-                          is_zero_divisor, is_zero_divisor_with_annihilator,
-                          leading_monomial, leading_term, log,
-                          leading_coefficient, leading_exponent_vector,
-                          map_coefficients, max_precision, minpoly, modulus,
-                          monomials, mul!, mul_classical, mul_karatsuba, mullow,
-                          numerator, ncols, ngens, nrows, nvars, O, order,
-                          parent_type, pol_length, primpart, promote_rule,
-                          pseudodivrem, pseudorem, reduced_form,
-                          remove, renormalize!,
-                          set_coefficient!, set_field!,
-                          set_length!, set_precision!, set_valuation!,
-                          shift_left, shift_right, snf, sqrt, symbols,
-                          tail, terms, term_degree, terms_degrees,
-                          to_univariate, trailing_coefficient,
-                          use_karamul,
-                          valuation, var, var_index, vars, zero!,
-                          @enable_all_show_via_expressify,
-                          @attributes
+import ..AbstractAlgebra: @attributes
+import ..AbstractAlgebra: @enable_all_show_via_expressify
+import ..AbstractAlgebra: add!
+import ..AbstractAlgebra: addeq!
+import ..AbstractAlgebra: addmul!
+import ..AbstractAlgebra: base_ring
+import ..AbstractAlgebra: CacheDictType
+import ..AbstractAlgebra: can_solve_with_solution_fflu
+import ..AbstractAlgebra: can_solve_with_solution_lu
+import ..AbstractAlgebra: canonical_unit
+import ..AbstractAlgebra: change_base_ring
+import ..AbstractAlgebra: characteristic
+import ..AbstractAlgebra: check_parent
+import ..AbstractAlgebra: codomain
+import ..AbstractAlgebra: coeff
+import ..AbstractAlgebra: coefficient_ring
+import ..AbstractAlgebra: coefficients
+import ..AbstractAlgebra: coefficients_of_univariate
+import ..AbstractAlgebra: compose
+import ..AbstractAlgebra: constant_coefficient
+import ..AbstractAlgebra: content
+import ..AbstractAlgebra: CycleDec
+import ..AbstractAlgebra: data
+import ..AbstractAlgebra: deflate
+import ..AbstractAlgebra: deflation
+import ..AbstractAlgebra: degree
+import ..AbstractAlgebra: degrees
+import ..AbstractAlgebra: degrees_range
+import ..AbstractAlgebra: denominator
+import ..AbstractAlgebra: derivative
+import ..AbstractAlgebra: div
+import ..AbstractAlgebra: divexact
+import ..AbstractAlgebra: divides
+import ..AbstractAlgebra: divrem
+import ..AbstractAlgebra: domain
+import ..AbstractAlgebra: elem_type
+import ..AbstractAlgebra: evaluate
+import ..AbstractAlgebra: exp
+import ..AbstractAlgebra: exponent_vectors
+import ..AbstractAlgebra: expressify
+import ..AbstractAlgebra: factor
+import ..AbstractAlgebra: factor_squarefree
+import ..AbstractAlgebra: Field
+import ..AbstractAlgebra: FieldElement
+import ..AbstractAlgebra: gen
+import ..AbstractAlgebra: gens
+import ..AbstractAlgebra: get_cached!
+import ..AbstractAlgebra: get_field
+import ..AbstractAlgebra: GFElem
+import ..AbstractAlgebra: identity_matrix
+import ..AbstractAlgebra: inflate
+import ..AbstractAlgebra: Integers
+import ..AbstractAlgebra: integral
+import ..AbstractAlgebra: inv
+import ..AbstractAlgebra: is_constant
+import ..AbstractAlgebra: is_domain_type
+import ..AbstractAlgebra: is_exact_type
+import ..AbstractAlgebra: is_gen
+import ..AbstractAlgebra: is_monomial
+import ..AbstractAlgebra: is_square
+import ..AbstractAlgebra: is_square_with_sqrt
+import ..AbstractAlgebra: is_term
+import ..AbstractAlgebra: is_unit
+import ..AbstractAlgebra: is_univariate
+import ..AbstractAlgebra: is_zero_divisor
+import ..AbstractAlgebra: is_zero_divisor_with_annihilator
+import ..AbstractAlgebra: isreduced_form
+import ..AbstractAlgebra: leading_coefficient
+import ..AbstractAlgebra: leading_exponent_vector
+import ..AbstractAlgebra: leading_monomial
+import ..AbstractAlgebra: leading_term
+import ..AbstractAlgebra: log
+import ..AbstractAlgebra: Map
+import ..AbstractAlgebra: map_coefficients
+import ..AbstractAlgebra: max_precision
+import ..AbstractAlgebra: minpoly
+import ..AbstractAlgebra: modulus
+import ..AbstractAlgebra: monomials
+import ..AbstractAlgebra: mul_classical
+import ..AbstractAlgebra: mul_karatsuba
+import ..AbstractAlgebra: mul!
+import ..AbstractAlgebra: mullow
+import ..AbstractAlgebra: ncols
+import ..AbstractAlgebra: NCRing
+import ..AbstractAlgebra: NCRingElem
+import ..AbstractAlgebra: ngens
+import ..AbstractAlgebra: nrows
+import ..AbstractAlgebra: numerator
+import ..AbstractAlgebra: nvars
+import ..AbstractAlgebra: O
+import ..AbstractAlgebra: order
+import ..AbstractAlgebra: parent_type
+import ..AbstractAlgebra: Perm
+import ..AbstractAlgebra: pol_length
+import ..AbstractAlgebra: primpart
+import ..AbstractAlgebra: promote_rule
+import ..AbstractAlgebra: pseudodivrem
+import ..AbstractAlgebra: pseudorem
+import ..AbstractAlgebra: Rationals
+import ..AbstractAlgebra: reduced_form
+import ..AbstractAlgebra: remove
+import ..AbstractAlgebra: renormalize!
+import ..AbstractAlgebra: Ring
+import ..AbstractAlgebra: RingElem
+import ..AbstractAlgebra: RingElement
+import ..AbstractAlgebra: set_coefficient!
+import ..AbstractAlgebra: set_field!
+import ..AbstractAlgebra: set_length!
+import ..AbstractAlgebra: set_precision!
+import ..AbstractAlgebra: set_valuation!
+import ..AbstractAlgebra: shift_left
+import ..AbstractAlgebra: shift_right
+import ..AbstractAlgebra: snf
+import ..AbstractAlgebra: sqrt
+import ..AbstractAlgebra: symbols
+import ..AbstractAlgebra: tail
+import ..AbstractAlgebra: term_degree
+import ..AbstractAlgebra: terms
+import ..AbstractAlgebra: terms_degrees
+import ..AbstractAlgebra: to_univariate
+import ..AbstractAlgebra: trailing_coefficient
+import ..AbstractAlgebra: use_karamul
+import ..AbstractAlgebra: valuation
+import ..AbstractAlgebra: var
+import ..AbstractAlgebra: var_index
+import ..AbstractAlgebra: vars
+import ..AbstractAlgebra: zero!
 
 
 using ..AbstractAlgebra
