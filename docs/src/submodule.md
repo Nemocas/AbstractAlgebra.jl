@@ -54,10 +54,8 @@ julia> n = M([ZZ(2), ZZ(-1)])
 (2, -1)
 
 julia> N, f = sub(M, [m, n])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 2 over Integers)
 
 julia> v = N([ZZ(3), ZZ(4)])
@@ -76,10 +74,8 @@ julia> n = V([QQ(2), QQ(-1)])
 (2//1, -1//1)
 
 julia> N, f = sub(V, [m, n])
-(Subspace over Rationals with 2 generators and no relations
-, Module homomorphism with
+(Subspace over Rationals with 2 generators and no relations, Module homomorphism with
 Domain: Subspace over Rationals with 2 generators and no relations
-
 Codomain: Vector space of dimension 2 over Rationals)
 
 ```
@@ -120,17 +116,13 @@ julia> n = M([ZZ(1), ZZ(4)])
 (1, 4)
 
 julia> N1, = sub(M, [m, n])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 2 over Integers)
 
 julia> N2, = sub(M, [m])
-(Submodule over Integers with 1 generator and no relations
-, Module homomorphism with
+(Submodule over Integers with 1 generator and no relations, Module homomorphism with
 Domain: Submodule over Integers with 1 generator and no relations
-
 Codomain: Free module of rank 2 over Integers)
 
 julia> supermodule(N1) == M
@@ -150,10 +142,8 @@ julia> m = V([QQ(2), QQ(3)])
 (2//1, 3//1)
 
 julia> N, = sub(V, [m])
-(Subspace over Rationals with 1 generator and no relations
-, Module homomorphism with
+(Subspace over Rationals with 1 generator and no relations, Module homomorphism with
 Domain: Subspace over Rationals with 1 generator and no relations
-
 Codomain: Vector space of dimension 2 over Rationals)
 
 julia> dim(V)
@@ -184,17 +174,13 @@ julia> n = M([ZZ(1), ZZ(4)])
 (1, 4)
 
 julia> N1 = sub(M, [m, n])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 2 over Integers)
 
 julia> N2 = sub(M, [m])
-(Submodule over Integers with 1 generator and no relations
-, Module homomorphism with
+(Submodule over Integers with 1 generator and no relations, Module homomorphism with
 Domain: Submodule over Integers with 1 generator and no relations
-
 Codomain: Free module of rank 2 over Integers)
 
 julia> I = intersect(N1, N2)
