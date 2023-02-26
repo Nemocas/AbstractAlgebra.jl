@@ -934,11 +934,16 @@ rand(R::MPolyRing, exp_range::UnitRange{Int}, term_range::UnitRange{Int}, v...)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
-f = rand(R, -1:2, 3:5, -10:10)
+```jldoctest; setup = :(import Random; Random.seed!(42))
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
-S, (s, t) = polynomial_ring(GF(7), ["x", "y"])
-g = rand(S, -1:2, 3:5)
+julia> f = rand(R, -1:2, 3:5, -10:10)
+-6*x^3*y^4
+
+julia> S, (s, t) = polynomial_ring(GF(7), ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Finite field F_7, AbstractAlgebra.Generic.MPoly{AbstractAlgebra.GFElem{Int64}}[x, y])
+
+julia> g = rand(S, -1:2, 3:5)
+0
 ```
