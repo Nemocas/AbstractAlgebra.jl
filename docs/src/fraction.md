@@ -368,14 +368,21 @@ rand(R::FracField, v...)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-K = fraction_field(ZZ)
-f = rand(K, -10:10)
+```jldoctest; setup = :(import Random; Random.seed!(42))
+julia> K = fraction_field(ZZ)
+Rationals
 
-R, x = polynomial_ring(ZZ, "x")
-S = fraction_field(R)
-g = rand(S, -1:3, -10:10)
+julia> f = rand(K, -10:10)
+-1//1
+
+julia> R, x = polynomial_ring(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> S = fraction_field(R)
+Fraction field of Univariate Polynomial Ring in x over Integers
+
+julia> g = rand(S, -1:3, -10:10)
+(-8*x^2 + 4*x + 6)//(8*x^3 - 5*x^2 + 6*x - 10)
 ```
 
 ### Extra functionality for factored fractions

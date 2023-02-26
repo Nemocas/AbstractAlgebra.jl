@@ -738,8 +738,10 @@ rand(R::SeriesRing, val_range::UnitRange{Int}, v...)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = power_series_ring(ZZ, 10, "x")
-f = rand(R, 3:5, -10:10)
+```jldoctest; setup = :(import Random; Random.seed!(42))
+julia> R, x = power_series_ring(ZZ, 10, "x")
+(Univariate power series ring in x over Integers, x + O(x^11))
+
+julia> f = rand(R, 3:5, -10:10)
+5*x^5 - 5*x^6 + 2*x^7 - 6*x^8 - 4*x^9 + 8*x^10 - 10*x^11 + 7*x^12 + 10*x^13 - 6*x^14 + O(x^15)
 ```

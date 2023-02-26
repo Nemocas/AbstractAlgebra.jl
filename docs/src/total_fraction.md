@@ -264,14 +264,22 @@ rand(R::TotFracRing, v...)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = residue_ring(ZZ, 12)
-K = TotalRingOfFractions(R)
-f = rand(K, 0:11)
+```jldoctest; setup = :(import Random; Random.seed!(42))
+julia> R = residue_ring(ZZ, 12)
+Residue ring of Integers modulo 12
 
-R, x = polynomial_ring(ZZ, "x")
-S = TotalRingOfFractions(R)
-g = rand(S, -1:3, -10:10)
+julia> K = TotalRingOfFractions(R)
+Total ring of fractions of Residue ring of Integers modulo 12
+
+julia> f = rand(K, 0:11)
+8//7
+
+julia> R, x = polynomial_ring(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> S = TotalRingOfFractions(R)
+Total ring of fractions of Univariate Polynomial Ring in x over Integers
+
+julia> g = rand(S, -1:3, -10:10)
+-4//(-6*x^3 + 10*x^2 + 7*x - 10)
 ```
-
