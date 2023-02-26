@@ -61,7 +61,7 @@ AbstractAlgebra.jl, one must first construct the parent object for the total
 ring of fractions itself. This is accomplished with the following constructor.
 
 ```julia
-TotalRingOfFractions(R::Ring; cached::Bool = true)
+total_ring_of_fractions(R::Ring; cached::Bool = true)
 ```
 
 Given a base ring `R` return the parent object of the total ring of fractions
@@ -78,7 +78,7 @@ the resulting parent objects to coerce various elements into the ring.
 julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S = TotalRingOfFractions(R)
+julia> S = total_ring_of_fractions(R)
 Total ring of fractions of Univariate Polynomial Ring in x over Integers
 
 julia> f = S()
@@ -118,7 +118,7 @@ total ring of fractions in question.
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> S = TotalRingOfFractions(R)
+julia> S = total_ring_of_fractions(R)
 Total ring of fractions of Univariate Polynomial Ring in x over Rationals
 
 julia> f = S(x + 1)
@@ -167,7 +167,7 @@ the characteristic is not known an exception is raised.
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> S = TotalRingOfFractions(R)
+julia> S = total_ring_of_fractions(R)
 Total ring of fractions of Univariate Polynomial Ring in x over Rationals
 
 julia> f = S(x + 1)
@@ -221,7 +221,7 @@ denominator(a::TotFrac)
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> S = TotalRingOfFractions(R)
+julia> S = total_ring_of_fractions(R)
 Total ring of fractions of Univariate Polynomial Ring in x over Rationals
 
 julia> f = S(x + 1)
@@ -268,7 +268,7 @@ rand(R::TotFracRing, v...)
 julia> R = residue_ring(ZZ, 12)
 Residue ring of Integers modulo 12
 
-julia> K = TotalRingOfFractions(R)
+julia> K = total_ring_of_fractions(R)
 Total ring of fractions of Residue ring of Integers modulo 12
 
 julia> f = rand(K, 0:11)
@@ -277,7 +277,7 @@ julia> f = rand(K, 0:11)
 julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S = TotalRingOfFractions(R)
+julia> S = total_ring_of_fractions(R)
 Total ring of fractions of Univariate Polynomial Ring in x over Integers
 
 julia> g = rand(S, -1:3, -10:10)
