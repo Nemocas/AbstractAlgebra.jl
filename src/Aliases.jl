@@ -64,6 +64,8 @@
 @alias LaurentPolyElem LaurentPolyRingElem
 @alias LaurentMPolyElem LaurentMPolyRingElem
 
+@alias UnivPolyRing UniversalPolyRing
+
 @alias AbsSeriesRing AbsPowerSeriesRing
 @alias AbsSeriesElem AbsPowerSeriesRingElem
 @alias RelSeriesRing RelPowerSeriesRing
