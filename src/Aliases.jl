@@ -74,3 +74,5 @@
 @alias FreeAssociativeAlgebra free_associative_algebra
 
 @alias TotalRingOfFractions total_ring_of_fractions
+
+@alias DirectSum direct_sum

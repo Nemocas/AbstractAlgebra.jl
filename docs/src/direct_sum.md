@@ -29,7 +29,7 @@ elements to `FPModuleElem{T}`.
 ## Constructors
 
 ```@docs
-DirectSum(::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
+direct_sum
 ```
 
 **Examples**
@@ -71,7 +71,7 @@ julia> S3, f3 = sub(F, [m1, m2])
 Domain: Submodule over Integers with 2 generators and no relations
 Codomain: Free module of rank 5 over Integers)
 
-julia> D, f = DirectSum(S1, S2, S3)
+julia> D, f = direct_sum(S1, S2, S3)
 (DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
 Codomain: DirectSumModule over Integers, Module homomorphism with
@@ -137,7 +137,7 @@ julia> S3, f3 = sub(F, [m1, m2])
 Domain: Submodule over Integers with 2 generators and no relations
 Codomain: Free module of rank 5 over Integers)
 
-julia> D, f = DirectSum(S1, S2, S3)
+julia> D, f = direct_sum(S1, S2, S3)
 (DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
 Codomain: DirectSumModule over Integers, Module homomorphism with
@@ -175,7 +175,7 @@ julia> N = FreeModule(QQ, 2);
 
 julia> M = FreeModule(QQ, 1);
 
-julia> D, _ = DirectSum(M, N, M);
+julia> D, _ = direct_sum(M, N, M);
 
 julia> D([gen(M, 1), gen(N, 1), gen(M, 2)])
 (1//1, 1//1, 0//1, 0//1)
@@ -213,7 +213,7 @@ $S$, construct the corresponding homomorphism.
 ```jldoctest
 julia> N = FreeModule(QQ, 2);
 
-julia> D, _ = DirectSum(N, N);
+julia> D, _ = direct_sum(N, N);
 
 julia> p = ModuleHomomorphism(N, N, [3,4] .* basis(N));
 

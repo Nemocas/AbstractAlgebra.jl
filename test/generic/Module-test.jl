@@ -251,7 +251,7 @@ end
          @test parent(Q1(m7)) === Q1
          @test parent(Q2(m7)) === Q2
 
-         D, v = DirectSum(S1, Sa)
+         D, v = direct_sum(S1, Sa)
          m9 = rand(D, -10:10)
          @test parent(D(m9)) === D
       end
