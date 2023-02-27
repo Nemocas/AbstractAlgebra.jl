@@ -31,10 +31,10 @@ jobs:
           - ubuntu-latest
         include:
           # Add a few windows and macOS jobs (not too many, the number we can run in parallel is limited)
-          - os: macOS-latest
-            julia-version: '1.6'
-          - os: windows-latest
-            julia-version: '1.6'
+          - julia-version: '1.6'
+            os: macOS-latest
+          - julia-version: '1.6'
+            os: windows-latest
 
     steps:
       - uses: actions/checkout@v3
