@@ -4,18 +4,6 @@
 #
 ###############################################################################
 
-export MPolyBuildCtx, @polynomial_ring, change_base_ring,
-       coefficients_of_univariate, combine_like_terms!, deflation,
-       degrees, derivative, divides, exponent, exponent_vector,
-       exponent_vectors, gens, is_constant, is_degree, is_homogeneous, is_monomial,
-       is_reverse, is_term, is_univariate,
-       lcm, leading_coefficient, leading_exponent_vector,
-       leading_monomial, leading_term, main_variable, main_variable_extract,
-       main_variable_insert, map_coefficients, max_fields, monomial, monomial!,
-       monomial_iszero, monomials, monomial_set!, nvars, ordering,
-       rand_ordering, set_exponent_vector!, sort_terms!, symbols, tail, term,
-       terms, total_degree, to_univariate, var_index, vars
-
 ###############################################################################
 #
 #   Data type and parent object methods

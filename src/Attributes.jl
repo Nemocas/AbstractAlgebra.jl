@@ -1,8 +1,5 @@
 import MacroTools
 
-export @attributes, has_attribute, get_attribute, get_attribute!, set_attribute!
-export @attr
-
 if VERSION >= v"1.7"
    import Base: ismutabletype
 else

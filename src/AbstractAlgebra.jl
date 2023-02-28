@@ -562,10 +562,8 @@ include("PuiseuxSeries.jl")
 include("SparsePoly.jl")
 include("AbsMSeries.jl")
 include("RationalFunctionField.jl")
-include("FunctionField.jl")
 include("Residue.jl")
 include("ResidueField.jl")
-include("NumberField.jl")
 include("Fraction.jl")
 include("TotalFraction.jl")
 include("MPoly.jl")
@@ -584,12 +582,10 @@ include("Generic.jl")
 # Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
 # as we have our own
 import .Generic: @perm_str
-import .Generic: abs_series
 import .Generic: abs_series_type
 import .Generic: base_field
 import .Generic: basis
 import .Generic: character
-import .Generic: check_composable
 import .Generic: collength
 import .Generic: combine_like_terms!
 import .Generic: cycles
@@ -613,7 +609,6 @@ import .Generic: has_bottom_neighbor
 import .Generic: has_left_neighbor
 import .Generic: hash
 import .Generic: hooklength
-import .Generic: identity_map
 import .Generic: image_fn
 import .Generic: image_map
 import .Generic: intersection
@@ -623,11 +618,8 @@ import .Generic: inverse_image_fn
 import .Generic: inverse_mat
 import .Generic: invmod
 import .Generic: is_compatible
-import .Generic: is_degree
 import .Generic: is_divisible_by
 import .Generic: is_homogeneous
-import .Generic: is_isomorphic
-import .Generic: is_reverse
 import .Generic: is_rimhook
 import .Generic: is_submodule
 import .Generic: is_unit
@@ -645,15 +637,8 @@ import .Generic: length
 import .Generic: main_variable
 import .Generic: main_variable_extract
 import .Generic: main_variable_insert
-import .Generic: map_from_func
-import .Generic: map_with_preimage_from_func
-import .Generic: map_with_retraction
-import .Generic: map_with_retraction_from_func
-import .Generic: map_with_section
-import .Generic: map_with_section_from_func
 import .Generic: map1
 import .Generic: map2
-import .Generic: mat
 import .Generic: matrix_repr
 import .Generic: max_fields
 import .Generic: mod
@@ -681,21 +666,15 @@ import .Generic: polcoeff
 import .Generic: poly
 import .Generic: poly_ring
 import .Generic: precision
-import .Generic: preimage
 import .Generic: preimage_map
 import .Generic: prime
 import .Generic: push_term!
-import .Generic: rand_ordering
 import .Generic: reduce!
-import .Generic: rel_series
 import .Generic: rel_series_type
 import .Generic: rels
 import .Generic: rescale!
 import .Generic: retraction_map
 import .Generic: reverse
-import .Generic: reverse_rows
-import .Generic: reverse_rows!
-import .Generic: right_kernel
 import .Generic: rowlength
 import .Generic: section_map
 import .Generic: set_exponent_vector!
@@ -726,81 +705,236 @@ import .Generic: roots
 import .Generic: sturm_sequence
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
+export _check_dim
+export _checkbounds
+export @alias
+export @attr
+export @attributes
 export @perm_str
+export @polynomial_ring
 export abs_series
 export abs_series_type
+export AbsPowerSeriesRing
+export add_column
+export add_column!
+export add_row
+export add_row!
 export addmul_delayed_reduction!
 export addmul!
+export AllParts
+export AllPerms
 export base_field
 export base_ring
 export basis
+export block_diagonal_matrix
+export cached
+export can_solve
 export can_solve_left_reduced_triu
+export can_solve_with_kernel
+export can_solve_with_solution
+export can_solve_with_solution_interpolation
 export canonical_unit
 export change_base_ring
 export change_coefficient_ring
 export character
+export characteristic
+export charpoly
+export charpoly_danilevsky_ff!
+export charpoly_danilevsky!
+export charpoly_hessenberg!
 export chebyshev_t
 export chebyshev_u
 export check_composable
 export check_parent
+export codomain
+export coeff
+export coefficient_ring
+export coefficients
+export coefficients_of_univariate
 export collength
 export combine_like_terms!
+export compose
+export constant_coefficient
+export content
 export cycles
+export data
 export defining_polynomial
+export deflate
+export deflation
+export degree
+export degrees
 export dense_matrix_type
 export dense_poly_type
+export derivative
 export det
+export det_popov
+export diagonal_matrix
+export dim
+export direct_sum
+export disable_cache!
 export discriminant
+export divexact
+export divexact_left
+export divexact_low
+export divexact_right
+export divhigh
+export divides
+export domain
+export downscale
 export elem_type
+export enable_cache!
+export evaluate
+export exp_gcd
 export exponent
 export exponent_vector
+export exponent_vectors
 export exponent_word
+export exponent_words
+export extended_weak_popov
+export extended_weak_popov_with_transform
+export exterior_power
+export Fac
+export FactoredFractionField
+export fflu
+export fflu!
+export find_pivot_popov
 export finish
 export fit!
+export fraction_field
+export free_associative_algebra
+export free_module
+export FreeModule
+export FunctionField
 export gcd
 export gcd_with_cofactors
 export gcdinv
 export gcdx
 export gen
 export gens
+export get_attribute
+export get_attribute!
+export get_field
+export gram
+export has_attribute
 export has_bottom_neighbor
 export has_left_neighbor
 export hash
+export hessenberg
+export hessenberg!
+export hnf
+export hnf_cohen
+export hnf_cohen_with_transform
+export hnf_kb
+export hnf_kb_with_transform
+export hnf_kb!
+export hnf_minors
+export hnf_minors_with_transform
+export hnf_via_popov
+export hnf_via_popov_with_transform
+export hnf_with_transform
+export hooklength
+export ideal
+export identity_map
+export identity_matrix
+export image
+export image_fn
+export image_map
+export inflate
+export integral
 export interpolate
 export intersection
 export inv!
+export invariant_factors
+export inverse_fn
 export inverse_image_fn
 export inverse_mat
 export invmod
 export is_compatible
+export is_constant
 export is_degree
 export is_divisible_by
 export is_domain_type
 export is_exact_type
 export is_gen
+export is_hessenberg
+export is_hnf
 export is_homogeneous
+export is_invertible
+export is_invertible_with_inverse
 export is_isomorphic
+export is_monic
 export is_monomial
 export is_monomial_recursive
 export is_negative
+export is_popov
 export is_reverse
+export is_rimhook
+export is_rref
+export is_skew_symmetric
+export is_snf
+export is_square
 export is_submodule
 export is_symmetric
+export is_term
 export is_term_recursive
 export is_unit
+export is_univariate
+export is_upper_triangular
+export is_weak_popov
+export is_zero_column
 export is_zero_divisor
 export is_zero_divisor_with_annihilator
+export is_zero_row
+export kernel
+export kronecker_product
+export laurent_ring
 export laurent_series
+export laurent_series_field
+export laurent_series_ring
+export LaurentPolynomialRing
 export lcm
+export leading_coefficient
+export leading_exponent_vector
+export leading_exponent_word
+export leading_monomial
+export leading_term
+export left_kernel
+export leglength
 export length
+export lift
+export lower_triangular_matrix
+export lu
+export lu!
 export main_variable
 export main_variable_extract
 export main_variable_insert
+export map_coefficients
+export map_entries
+export map_entries!
+export map_from_func
+export map_with_preimage_from_func
+export map_with_retraction
+export map_with_retraction_from_func
+export map_with_section
+export map_with_section_from_func
+export map1
+export map2
 export mat
+export matrix
 export matrix_repr
+export matrix_space
+export MatrixAlgebra
 export MatrixElem
 export max_fields
+export max_precision
+export minors
+export minpoly
 export mod
+export module_homomorphism
+export module_isomorphism
+export ModuleHomomorphism
+export ModuleIsomorphism
+export modulus
 export monomial
 export monomial_iszero
 export monomial_set!
@@ -809,67 +943,177 @@ export monomial!
 export monomials
 export mpoly_type
 export MPolyBuildCtx
+export mul_classical
+export mul_karatsuba
 export mul_ks
 export mul_red!
+export mulhigh_n
+export mullow
 export mullow_karatsuba
 export mulmod
+export multiply_column
+export multiply_column!
+export multiply_row
+export multiply_row!
+export ncols
 export newton_to_monomial!
 export ngens
+export norm
 export normal_form
 export normalise
+export nrows
 export nullspace
 export num_coeff
+export number_field
+export nvars
+export O
 export one
 export order
 export ordering
 export parent_type
 export parity
+export Partition
 export partitionseq
 export perm
+export Perm
 export permtype
+export pfaffian
+export pfaffians
+export pol_length
 export polcoeff
 export poly
 export poly_ring
+export PolyCoeffs
 export polynomial
+export polynomial_ring
+export polynomial_to_power_sums
 export PolynomialElem
+export PolyRing
+export popov
+export popov_with_transform
 export pow_multinomial
+export power_series_ring
+export power_sums_to_polynomial
+export powers
 export ppio
 export precision
 export preimage
+export preimage_map
 export prime
+export primpart
+export pseudo_inv
+export pseudodivrem
+export pseudorem
+export PuiseuxSeriesField
+export PuiseuxSeriesRing
 export push_term!
+export quo
 export rand_ordering
+export randmat_triu
+export randmat_with_rank
 export rank
+export rank_profile_popov
+export RationalFunctionField
 export reduce!
 export rel_series
 export rel_series_type
+export RelPowerSeriesRing
 export rels
+export remove
 export renormalize!
+export rescale!
+export residue_field
+export residue_ring
 export resultant
 export resultant_ducos
 export resultant_euclidean
+export resultant_lehmer
 export resultant_subresultant
 export resultant_sylvester
 export resx
+export retraction_map
 export reverse
+export reverse_cols
+export reverse_cols!
+export reverse_rows
+export reverse_rows!
+export right_kernel
 export rowlength
+export rref
+export rref_rational
+export rref_rational!
+export rref!
+export section_map
+export set_attribute!
+export set_coefficient!
 export set_exponent_vector!
 export set_exponent_word!
+export set_field!
+export set_length!
+export set_limit!
+export set_precision!
+export set_valuation!
 export setcoeff!
 export setpermstyle
+export shift_left
+export shift_right
+export similarity!
 export size
+export SkewDiagram
+export snf
+export snf_kb
+export snf_kb_with_transform
+export snf_kb!
+export snf_with_transform
+export solve
+export solve_ff
+export solve_left
+export solve_rational
+export solve_triu
+export solve_with_det
 export sort_terms!
+export SparsePolynomialRing
+export strictly_lower_triangular_matrix
+export strictly_upper_triangular_matrix
+export sub
 export subst
 export summands
 export supermodule
+export swap_cols
+export swap_cols!
+export swap_rows
+export swap_rows!
 export sylvester_matrix
+export symbols
+export SymmetricGroup
+export tail
 export term
 export terms
+export to_univariate
 export total_degree
+export total_ring_of_fractions
+export tr
 export trailing_coefficient
 export truncate
+export typed_hcat
+export typed_hvcat
+export unit
+export UniversalPolynomialRing
+export upper_triangular_matrix
+export upscale
+export use_karamul
+export valuation
+export var
+export var_index
+export vars
+export vector_space
+export VectorSpace
+export weak_popov
+export weak_popov_with_transform
 export weights
+export YoungTableau
 export zero
+export zero_matrix
 
 # Moved from Hecke into Misc
 export divexact_low

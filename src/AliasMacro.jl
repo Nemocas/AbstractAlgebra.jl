@@ -43,4 +43,3 @@ macro alias(alias_name::Symbol, real_name::Symbol)
     end
     return esc(result)
 end
-export @alias

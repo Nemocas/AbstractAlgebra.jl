@@ -4,10 +4,6 @@
 #
 ###############################################################################
 
-export ModuleHomomorphism, ModuleIsomorphism, image, inverse_image_fn,
-       inverse_mat, mat, module_homomorphism, module_isomorphism,
-       preimage
-
 ###############################################################################
 #
 #   Basic manipulation

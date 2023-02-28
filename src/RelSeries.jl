@@ -4,10 +4,6 @@
 #
 ###############################################################################
 
-export AbsPowerSeriesRing, RelPowerSeriesRing, power_series_ring, coeff, polcoeff,
-       rel_series, rel_series_type, renormalize!, set_length!, set_precision!,
-       set_valuation!
-
 ###############################################################################
 #
 #   Data type and parent object methods
