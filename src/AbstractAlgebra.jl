@@ -378,7 +378,6 @@ function find_name(A, M = Main)
   if M === Main && isdefined(Main, :CurrentModule)
     a = find_name(A, Main.CurrentModule)
     if a !== nothing
-      @show :bingo
       return a
     end
   end
