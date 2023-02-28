@@ -4,9 +4,6 @@
 #
 ###############################################################################
 
-export O, abs_series, abs_series_type, max_precision, pol_length, precision,
-       valuation
-
 ###############################################################################
 #
 #   Data type and parent object methods

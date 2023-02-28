@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-export exponent_words, free_associative_algebra, leading_exponent_word
-
 ###############################################################################
 #
 #   Data type and parent object methods

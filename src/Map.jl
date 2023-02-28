@@ -4,9 +4,6 @@
 #
 ################################################################################
 
-export check_composable, codomain, compose, domain, get_field, identity_map,
-       image_fn, map1, map2, map_from_func, set_field!
-
 ################################################################################
 #
 #  All maps

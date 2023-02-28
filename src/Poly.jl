@@ -4,21 +4,6 @@
 #
 ###############################################################################
 
-export PolyCoeffs, polynomial_ring, PolyRing, addmul!, characteristic,
-       chebyshev_t, chebyshev_u, coefficient_ring, coefficients, compose,
-       constant_coefficient, content, deflate, deflation, degree, derivative,
-       discriminant, divexact, divexact_low, divhigh, divides, evaluate,
-       gcdinv, inflate, integral, interpolate, is_monic, is_square, is_term,
-       is_term_recursive, map_coefficients, modulus,  monomial_to_newton!,
-       mul_classical, mulhigh_n, mul_karatsuba, mul_ks, mullow, mulmod,
-       newton_to_monomial!, nvars, polynomial, polynomial_to_power_sums,
-       power_sums_to_polynomial, pow_multinomial, primpart,
-       pseudodivrem, pseudorem, remove, resultant, resultant_ducos,
-       resultant_euclidean, resultant_lehmer, resultant_subresultant,
-       resultant_sylvester, resx, shift_left, shift_right, subst,
-       sylvester_matrix, symbols, tail, use_karamul, valuation, var,
-       set_coefficient!
-
 ###############################################################################
 #
 #   Data type and parent object methods

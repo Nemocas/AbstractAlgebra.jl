@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-export PuiseuxSeriesField, PuiseuxSeriesRing, laurent_ring, rescale!
-
 ###############################################################################
 #
 #   PuiseuxSeriesRing constructor

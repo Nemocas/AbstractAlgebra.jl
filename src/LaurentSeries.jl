@@ -5,9 +5,6 @@
 #
 ###############################################################################
 
-export laurent_series_field, laurent_series_ring, deflate, downscale, exp_gcd,
-       inflate, upscale
-
 ###############################################################################
 #
 #   power_series_ring constructor
