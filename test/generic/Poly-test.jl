@@ -60,6 +60,16 @@ end
 
    @test typeof(T) <: Generic.PolyRing
 
+   ZZxyz, (x,y,z) = polynomial_ring(ZZ, 'x':'z')
+   @test ZZxyz isa Generic.PolyRing
+
+   ZZxyz2, (x2,y2,z2) = polynomial_ring(ZZ, (:x, 'y', GenericString("z")))
+   @test ZZxyz == ZZxyz2
+   @test (x,y,z) == (x2,y2,z2)
+
+   ZZxyz3, _ = polynomial_ring(ZZ, Union{String,Char,Symbol}["x", 'y', :z])
+   @test ZZxyz == ZZxyz3
+
    @test isa(z, PolyRingElem)
 
    f = x^2 + y^3 + z + 1
@@ -2966,12 +2976,6 @@ end
    F = GF(11)
    P, y = polynomial_ring(F, 'x')
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
-end
-
-@testset "Generic.Poly.printing" begin
-   M = MatrixAlgebra(ZZ, 3)
-   _, x = M['x']
-   @test string(M(-1)*x) isa String
 end
 
 @testset "Generic.Poly.polynomial_to_power_sums" begin
