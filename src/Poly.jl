@@ -3427,3 +3427,11 @@ function subst(f::PolyRingElem{T}, a::U) where {T <: RingElement, U}
    end
    return s
 end
+
+###############################################################################
+#
+#   polynomial_ring constructor
+#
+###############################################################################
+
+polynomial_ring_type(::Type{T}) where T<:Ring = Generic.PolyRing{elem_type(T)}

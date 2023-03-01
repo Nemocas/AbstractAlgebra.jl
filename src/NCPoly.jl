@@ -695,7 +695,7 @@ Falls back to `PolyRing{elem_type(T)}`.
 polynomial_ring_type(typeof(ZZ))
 ```
 """
-polynomial_ring_type(::Type{T}) where T<:NCRing = Generic.PolyRing{elem_type(T)}
+polynomial_ring_type(::Type{T}) where T<:NCRing = Generic.NCPolyRing{elem_type(T)}
 
 # Simplified constructor
 

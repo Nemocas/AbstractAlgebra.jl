@@ -1192,12 +1192,12 @@ export Generic
 #
 ###############################################################################
 
-getindex(R::NCRing, s::Union{String, Char, Symbol}) = polynomial_ring(R, s)
-getindex(R::NCRing, s::Union{String, Char, Symbol}, ss::Union{String, Char}...) =
+getindex(R::NCRing, s::Union{Symbol, AbstractString, Char}) = polynomial_ring(R, s)
+getindex(R::NCRing, s::Union{Symbol, AbstractString, Char}, ss::Union{Symbol, AbstractString, Char}...) =
    polynomial_ring(R, [s, ss...])
 
-# syntax x = R["x"]["y"]
-getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyRingElem, NCPolyRingElem}}, s::Union{String, Char, Symbol}) = polynomial_ring(R[1], s)
+# syntax: Rxy, y = R["x"]["y"]
+getindex(R::Tuple{NCRing, NCPolyRingElem}, s::Union{Symbol, AbstractString, Char}) = polynomial_ring(R[1], s)
 
 ###############################################################################
 #
