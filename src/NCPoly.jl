@@ -657,25 +657,46 @@ rand(S::NCPolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v..
 ###############################################################################
 
 @doc Markdown.doc"""
-    polynomial_ring(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
+    polynomial_ring(R::NCRing, s::Union{Symbol, AbstractString, Char}; cached::Bool = true)
 
-Given a base ring `R` and string `s` specifying how the generator (variable)
-should be printed, return a tuple `S, x` representing the new polynomial
-ring $S = R[x]$ and the generator $x$ of the ring. By default the parent
-object `S` will depend only on `R` and `x` and will be cached. Setting the
-optional argument `cached` to `false` will prevent the parent object `S` from
-being cached.
+Given a base ring `R` and symbol/string `s` specifying how the generator
+(variable) should be printed, return a tuple `S, x` representing the new
+polynomial ring $S = R[x]$ and the generator $x$ of the ring.
+
+By default the parent object `S` depends only on `R` and `x` and will be cached.
+Setting the optional argument `cached` to `false` will prevent the parent object `S` from being cached.
 """
-polynomial_ring(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
+polynomial_ring(R::NCRing, s::Union{Symbol, AbstractString, Char}; kw...)
 
-function polynomial_ring(R::NCRing, s::Symbol; cached::Bool = true)
-   return Generic.polynomial_ring(R, s, cached=cached)
+polynomial_ring(R::NCRing, s::Union{AbstractString, Char}; kw...) = polynomial_ring(R, Symbol(s); kw...)
+
+function polynomial_ring(R::NCRing, s::Symbol; kw...)
+   S = polynomial_ring_only(R, s; kw...)
+   (S, gen(S))
 end
 
-function polynomial_ring(R::NCRing, s::AbstractString; cached::Bool = true)
-   return Generic.polynomial_ring(R, Symbol(s), cached=cached)
-end
+@doc md"""
+    polynomial_ring_only(R::Ring, s::Symbol; cached::Bool=true)
 
-function polynomial_ring(R::NCRing, s::Char; cached::Bool = true)
-   return Generic.polynomial_ring(R, Symbol(s); cached=cached)
-end
+Like [`polynomial_ring(R::Ring, s::Symbol)`](@ref) but return only the
+polynomial ring.
+"""
+polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
+   polynomial_ring_type(T)(R, s, cached)
+
+@doc md"""
+    polynomial_ring_type(::Type{T}) where T<:NCRing
+
+The type of polynomial rings with coefficients of type `T`.
+Falls back to `PolyRing{elem_type(T)}`.
+
+# Examples
+```julia
+polynomial_ring_type(typeof(ZZ))
+```
+"""
+polynomial_ring_type(::Type{T}) where T<:NCRing = Generic.PolyRing{elem_type(T)}
+
+# Simplified constructor
+
+PolyRing(R::NCRing) = polynomial_ring_only(R, :x; cached=false)

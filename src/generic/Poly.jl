@@ -414,16 +414,3 @@ function (a::PolyRing{T})(b::T) where {T <: Integer}
    z.parent = a
    return z
 end
-
-###############################################################################
-#
-#   polynomial_ring constructor
-#
-###############################################################################
-
-function polynomial_ring(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
-   T = elem_type(R)
-   parent_obj = PolyRing{T}(R, s, cached)
-
-   return parent_obj, parent_obj([R(0), R(1)])
-end
