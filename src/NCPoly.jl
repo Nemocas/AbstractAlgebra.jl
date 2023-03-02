@@ -18,6 +18,33 @@ function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S
    return is_exact_type(S)
 end
 
+@doc md"""
+    poly_type(::Type{T}) where T<:NCRingElement
+
+The type of multivariate polynomials with coefficients of type `T`.
+Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
+
+# Examples
+```julia
+poly_type(typeof(ZZ()))
+```
+"""
+poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
+@alias dense_poly_type poly_type
+
+@doc md"""
+    poly_ring_type(::Type{T}) where T<:NCRing
+
+The type of polynomial rings with coefficients of type `T`.
+Implemented via [`poly_type`](@ref).
+
+# Examples
+```julia
+poly_ring_type(typeof(ZZ))
+```
+"""
+poly_ring_type(::Type{T}) where T<:NCRing = parent_type(poly_type(elem_type(T)))
+
 @doc Markdown.doc"""
     var(a::NCPolyRing)
 
@@ -682,20 +709,7 @@ Like [`polynomial_ring(R::Ring, s::Symbol)`](@ref) but return only the
 polynomial ring.
 """
 polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
-   polynomial_ring_type(T)(R, s, cached)
-
-@doc md"""
-    polynomial_ring_type(::Type{T}) where T<:NCRing
-
-The type of polynomial rings with coefficients of type `T`.
-Falls back to `PolyRing{elem_type(T)}`.
-
-# Examples
-```julia
-polynomial_ring_type(typeof(ZZ))
-```
-"""
-polynomial_ring_type(::Type{T}) where T<:NCRing = Generic.NCPolyRing{elem_type(T)}
+   poly_ring_type(T)(R, s, cached)
 
 # Simplified constructor
 

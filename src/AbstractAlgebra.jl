@@ -592,7 +592,6 @@ import .Generic: cycles
 import .Generic: defining_polynomial
 import .Generic: degrees
 import .Generic: dense_matrix_type
-import .Generic: dense_poly_type
 import .Generic: dim
 import .Generic: disable_cache!
 import .Generic: downscale
@@ -647,7 +646,6 @@ import .Generic: monomial_iszero
 import .Generic: monomial_set!
 import .Generic: monomial!
 import .Generic: monomials
-import .Generic: mpoly_type
 import .Generic: MPolyBuildCtx
 import .Generic: mullow_karatsuba
 import .Generic: ngens
@@ -942,6 +940,7 @@ export monomial_to_newton!
 export monomial!
 export monomials
 export mpoly_type
+export mpoly_ring_type
 export MPolyBuildCtx
 export mul_classical
 export mul_karatsuba
@@ -983,9 +982,12 @@ export pol_length
 export polcoeff
 export poly
 export poly_ring
+export poly_ring_type
+export poly_type
 export PolyCoeffs
 export polynomial
 export polynomial_ring
+export polynomial_ring_only
 export polynomial_to_power_sums
 export PolynomialElem
 export PolyRing

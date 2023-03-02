@@ -20,6 +20,8 @@ coefficient_ring(a::PolynomialElem) = base_ring(a)
 
 parent(a::PolynomialElem) = a.parent
 
+poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
+
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}}
    return is_domain_type(S)
 end
@@ -3427,11 +3429,3 @@ function subst(f::PolyRingElem{T}, a::U) where {T <: RingElement, U}
    end
    return s
 end
-
-###############################################################################
-#
-#   polynomial_ring constructor
-#
-###############################################################################
-
-polynomial_ring_type(::Type{T}) where T<:Ring = Generic.PolyRing{elem_type(T)}
