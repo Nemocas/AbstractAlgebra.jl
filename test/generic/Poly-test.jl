@@ -60,16 +60,6 @@ end
 
    @test typeof(T) <: Generic.PolyRing
 
-   ZZxyz, (x,y,z) = polynomial_ring(ZZ, 'x':'z')
-   @test ZZxyz isa Generic.PolyRing
-
-   ZZxyz2, (x2,y2,z2) = polynomial_ring(ZZ, (:x, 'y', GenericString("z")))
-   @test ZZxyz == ZZxyz2
-   @test (x,y,z) == (x2,y2,z2)
-
-   ZZxyz3, _ = polynomial_ring(ZZ, Union{String,Char,Symbol}["x", 'y', :z])
-   @test ZZxyz == ZZxyz3
-
    @test isa(z, PolyRingElem)
 
    f = x^2 + y^3 + z + 1
@@ -110,6 +100,16 @@ end
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
+
+   ZZxyz, (x,y,z) = polynomial_ring(ZZ, 'x':'z')
+   @test ZZxyz isa Generic.MPolyRing
+
+   ZZxyz2, (x2,y2,z2) = polynomial_ring(ZZ, (:x, 'y', GenericString("z")))
+   @test ZZxyz == ZZxyz2
+   @test (x,y,z) == (x2,y2,z2)
+
+   ZZxyz3, _ = polynomial_ring(ZZ, Union{String,Char,Symbol}["x", 'y', :z])
+   @test ZZxyz == ZZxyz3
 end
 
 @testset "Generic.Poly.iterators" begin
