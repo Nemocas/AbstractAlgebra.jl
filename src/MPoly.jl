@@ -1341,7 +1341,7 @@ polynomial_ring(R::Ring, n::Int, s::Union{AbstractString, Char}; kw...) =
    polynomial_ring(R, n, Symbol(s); kw...)
 
 polynomial_ring(R::Ring, n::Int, s::Symbol=:x; kw...) =
-   polynomial_ring(R, Symbol.(s, 1:n), kw...)
+   polynomial_ring(R, Symbol.(s, 1:n); kw...)
 
 MPolyRing(R::Ring, n::Int) =
    polynomial_ring_only(R, Symbol.(:x, 1:n); cached=false)
