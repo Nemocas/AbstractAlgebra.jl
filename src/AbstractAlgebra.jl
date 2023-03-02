@@ -375,6 +375,10 @@ macro show_name(io, O)
 end
 
 function find_name(A, M = Main)
+  # in Documenter, the examples are not run in the REPL.
+  # in the REPL: A = ... adds A to the global name space (Main....)
+  # in Documenter (doctests) all examples are run in their own module
+  # which is stored in CurrentModule, hence we need to search there as well
   if M === Main && isdefined(Main, :CurrentModule)
     a = find_name(A, Main.CurrentModule)
     if a !== nothing
