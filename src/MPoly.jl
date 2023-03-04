@@ -1299,15 +1299,18 @@ end
 @doc Markdown.doc"""
     polynomial_ring(R::Ring, s::Vector{T}; cached::Bool = true, ordering::Symbol = :lex) where T <: Union{Symbol, AbstractString, Char}
 
-Given a base ring `R` and an array of symbols/strings `s` specifying how the
-generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
-representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
-$x1, x2, ...$ of the polynomial ring.
+Given a base ring `R` and a vector `s` of variable names $x1, x2, \dots$ specifying
+how the generators (variables) should be printed, return a tuple `S, [x1, x2, ...]`
+representing the new polynomial ring $S = R[x1, x2, ...]$ and the generators
+$x1, x2, \dots$ of the polynomial ring.
 
-By default the parent object `T` depends only on `R` and `x1, x2, ...` and will be cached.
-Setting the optional argument `cached` to `false` will prevent the parent object `T` from being cached.
+Mathematically the object `S` depends only on `R` and `x1, x2, ...` and by
+default it will be cached, i.e., if `polynomial_ring` is invoked again with the
+same arguments, the same (*identical*) ring is returned. Setting the optional
+argument `cached` to `false` ensures a distinct new ring is returned, and will
+also prevent it from being cached.
 
-The `ordering` of the polynomial can be one of `:lex`, `:deglex` or `:degrevlex`.
+The `ordering` of the polynomial ring can be one of `:lex`, `:deglex` or `:degrevlex`.
 """
 polynomial_ring(R::Ring, s::Union{Tuple{Vararg{T}}, AbstractVector{T}}; kw...) where
       T<:Union{Symbol, AbstractString, Char} =
