@@ -1196,7 +1196,7 @@ export Generic
 
 getindex(R::NCRing, s::Union{Symbol, AbstractString, Char}) = polynomial_ring(R, s)
 getindex(R::NCRing, s::Union{Symbol, AbstractString, Char}, ss::Union{Symbol, AbstractString, Char}...) =
-   polynomial_ring(R, [s, ss...])
+   polynomial_ring(R, [Symbol(x) for x in (s, ss...)])
 
 # syntax: Rxy, y = R[:x][:y]
 getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingElem}}, s::Union{Symbol, AbstractString, Char}) = polynomial_ring(R[1], s)

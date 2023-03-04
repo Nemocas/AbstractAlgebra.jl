@@ -112,6 +112,19 @@
    @test S isa Generic.MPolyRing{Generic.Poly{BigInt}}
    @test y isa Generic.MPoly{Generic.Poly{BigInt}}
    @test z isa Generic.MPoly{Generic.Poly{BigInt}}
+
+   ZZxyz, (x,y,z) = polynomial_ring(ZZ, 'x':'z')
+   @test ZZxyz isa Generic.MPolyRing
+
+   ZZxyz2, (x2,y2,z2) = polynomial_ring(ZZ, (:x, 'y', GenericString("z")))
+   @test ZZxyz == ZZxyz2
+   @test (x,y,z) == (x2,y2,z2)
+
+   ZZxyz3, _ = polynomial_ring(ZZ, Union{String,Char,Symbol}["x", 'y', :z])
+   @test ZZxyz == ZZxyz3
+
+   ZZxyz4, _ = ZZ["x", 'y', :z]
+   @test ZZxyz == ZZxyz4
 end
 
 @testset "Generic.MPoly.printing" begin
