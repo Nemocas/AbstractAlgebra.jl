@@ -53,3 +53,28 @@ get_attribute
 get_attribute!
 set_attribute!
 ```
+
+The attributes system can be utilized to change the way certain objects are printed.
+We provide macros `@show_special` and `@show_name` for this purpose, both are
+called with the same argument
+as `show`: an `IO`-object and the object itself. Both are supposed to be
+used within the usual `show` function:
+```
+function show(io::IO, A::MyObj)
+   @show_name(io, A)
+   @show_special(io, A)
+
+   ... usual stuff
+```  
+
+`@show_special` checks if an attribute `:show_special` is present. If so, it has to be
+a function taking `IO` and the object. This is then called instead of the usual
+`show` function.
+
+`@show_name` will check if there is a variable in global (`Main` module) namespace
+with value bound to the object. In compact printing mode, the name is then shown
+instead of the object.
+
+Note: if the object is stored in several variable, the first one will be used. Also
+the name, once used for printing, is stored in the object - hence will not change
+anymore.
