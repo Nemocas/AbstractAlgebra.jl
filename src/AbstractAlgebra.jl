@@ -65,7 +65,7 @@ import LinearAlgebra: tr
 
 # This is the list of functions for which we locally have a different behavior.
 const Base_import_exclude = [:exp, :log, :sqrt, :inv, :div, :divrem, :numerator,
-		             :denominator]
+                             :denominator]
 
 ################################################################################
 #

@@ -95,7 +95,7 @@ struct Partition{T} <: AbstractVector{T}
 
    function Partition(n::Integer, part::AbstractVector{T}, check::Bool=true) where T
       if check
-	 issorted(part, rev=true) || sort!(part, rev=true)
+         issorted(part, rev=true) || sort!(part, rev=true)
          if length(part) > 0
             part[end] >= 1 || throw(ArgumentError("Found non-positive entry in partition: $(part[end])"))
          end

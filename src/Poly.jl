@@ -1124,7 +1124,7 @@ function divhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n0::Int) where T <: Rin
             c = coeff(a, da)
             for j = 0:min(degree(b) - 1, i)
                 t = mul!(t, coeff(r, da - degree(b) + j + 1),
-			                          coeff(b, degree(b) - j - 1))
+                         coeff(b, degree(b) - j - 1))
                 c = addeq!(c, t)
             end
             a = setcoeff!(a, da, c)
@@ -1256,8 +1256,8 @@ function deflation(p::PolyRingElem)
       if !iszero(coeff(p, exj))
          defl = gcd(defl, exj - shift)
          if defl == 1
-	    break
-	 end
+            break
+         end
       end
    end
    return shift, defl
@@ -1890,17 +1890,17 @@ function gcd(a::PolyRingElem{T}, b::PolyRingElem{T}, ignore_content::Bool = fals
          !is_term_recursive(trailing_coefficient(b))
          if lead_monomial # lead term monomial, so content contains rest
             d = divexact(leading_coefficient(b),
-	                 term_content(leading_coefficient(b)))
+                         term_content(leading_coefficient(b)))
             b = divexact(b, d)
          elseif trail_monomial # trail term is monomial, so ditto
             d = divexact(trailing_coefficient(b),
-			 term_content(trailing_coefficient(b)))
+                         term_content(trailing_coefficient(b)))
             b = divexact(b, d)
          else
             glead = gcd(lead_a, lead_b)
             if is_term_recursive(glead)
                d = divexact(leading_coefficient(b),
-			     term_content(leading_coefficient(b)))
+                            term_content(leading_coefficient(b)))
                b = divexact(b, d)
             else # last ditched attempt to find easy content
                h = gcd(leading_coefficient(b), glead)
@@ -2942,7 +2942,7 @@ function polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T 
     push!(P, E[1 + 1])
     for k = 2:n
         push!(P, (-1)^(k - 1)*k*E[k + 1] +
-		 sum((-1)^(k - 1 + i)*E[k - i + 1]*P[i] for i = 1:k - 1))
+              sum((-1)^(k - 1 + i)*E[k - i + 1]*P[i] for i = 1:k - 1))
     end
     return P
 end
@@ -2959,7 +2959,7 @@ must start with the sum of first powers of the roots.
 """
 function power_sums_to_polynomial(P::Vector{T}; 
                            parent::AbstractAlgebra.PolyRing{T}=
-	         AbstractAlgebra.PolyRing(parent(P[1]))) where T <: RingElement
+             AbstractAlgebra.PolyRing(parent(P[1]))) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
 

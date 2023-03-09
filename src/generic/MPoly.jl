@@ -1628,7 +1628,8 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8	      max_e = 2^(exp_bits - 1)
+      if exp_bits == sizeof(Int)*8
+         max_e = 2^(exp_bits - 1)
          break
       else
          max_e = 2^(exp_bits - 1)

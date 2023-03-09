@@ -519,7 +519,7 @@ function normalise(a::FactoredFrac{T}) where T
     z = FactoredFrac{T}(a.unit, FactoredFracTerm{T}[], parent(a))
     if !iszero(z.unit)
         for i in a.terms
-			_append_pow_normalise!(z, i.base, i.exp, 1)
+            _append_pow_normalise!(z, i.base, i.exp, 1)
         end
     end
     return z
@@ -697,7 +697,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
     i = 1
     while i <= length(b)
         if b[i].exp < 0
-			_append_pow_normalise!(z, b[i].base, b[i].exp, 1)
+            _append_pow_normalise!(z, b[i].base, b[i].exp, 1)
             cbar *= b[i].base^Base.checked_neg(b[i].exp)
         else
             bbar *= b[i].base^b[i].exp
@@ -707,7 +707,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
     j = 1
     while j <= length(c)
         if c[j].exp < 0
-			_append_pow_normalise!(z, c[j].base, c[j].exp, 1)
+            _append_pow_normalise!(z, c[j].base, c[j].exp, 1)
             bbar *= c[j].base^Base.checked_neg(c[j].exp)
         else
             cbar *= c[j].base^c[j].exp

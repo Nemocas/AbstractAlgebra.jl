@@ -399,7 +399,7 @@ end
          g = rand(S, 0:4, 0:5, -10:10)
 
          @test leading_coefficient(f*g) ==
-	       leading_coefficient(f)*leading_coefficient(g)
+               leading_coefficient(f)*leading_coefficient(g)
          @test leading_coefficient(one(S)) == one(base_ring(S))
 
          for v in varlist

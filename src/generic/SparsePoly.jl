@@ -1510,17 +1510,17 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
          trailing_coefficient(b).length != 1
          if lead_monomial # lead term monomial, so content contains rest
             d = divexact(leading_coefficient(b),
-			  term_content(leading_coefficient(b)))
+                         term_content(leading_coefficient(b)))
             b = divexact(b, d)
          elseif trail_monomial # trail term is monomial, so ditto
             d = divexact(trailing_coefficient(b),
-	          term_content(trailing_coefficient(b)))
+                         term_content(trailing_coefficient(b)))
             b = divexact(b, d)
          else
             glead = gcd(lead_a, lead_b)
             if glead.length == 1 # gcd of lead coeffs monomial
                d = divexact(leading_coefficient(b),
-			     term_content(leading_coefficient(b)))
+                            term_content(leading_coefficient(b)))
                b = divexact(b, d)
             else # last ditched attempt to find easy content
                h = gcd(leading_coefficient(b), glead)

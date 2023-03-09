@@ -195,7 +195,7 @@ function mul!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where T <: Ring
          d = T[base_ring(c)() for i in 1:lenc]
       else
          fit!(c, lenc)
-	     d = c.coeffs
+         d = c.coeffs
       end
       cutoff = mullow_fast_cutoff(a, b)
       AbstractAlgebra.DensePoly.mullow_fast!(d, lenc,

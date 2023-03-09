@@ -1135,7 +1135,7 @@ end
       @test isapprox(log(exp(f)), f)
 
       while coeff(f, 0) <= 0
-	 f = rand(S, 0:0, -10:10)
+         f = rand(S, 0:0, -10:10)
       end
 
       @test isapprox(exp(log(f)), f)
