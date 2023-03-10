@@ -4,7 +4,6 @@
 #
 ###############################################################################
 
-
 export search,
     AhoCorasickAutomaton, insert_keyword!, aho_corasick_automaton, AhoCorasickMatch#, Word
 
@@ -24,8 +23,6 @@ julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]]
 julia> aut = aho_corasick_automaton(keywords)
 julia> search(aut, [10, 4, 1, 2, 3, 4])
 AhoCorasickMatch(6, 1, [1, 2, 3, 4])
-
-
 ```
 """ mutable struct AhoCorasickAutomaton
     goto::Vector{Dict{Int,Int}}
