@@ -3,7 +3,7 @@
 #   FreeAssAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groebner basis
 #
 ###############################################################################
-export groebner_basis, interreduce!, gb_divides_leftmost_aho_corasick, normal_form
+export groebner_basis, interreduce!, gb_divides_leftmost, normal_form
 
 using DataStructures
 
@@ -47,7 +47,14 @@ function _leading_word(a::FreeAssAlgElem{T}) where T
    return a.exps[1]
 end
 
-function gb_divides_leftmost_aho_corasick(a::Word, aut::AhoCorasickAutomaton)
+Markdown.@doc doc"""
+gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
+
+If an element of the Groebner basis that is stored in `aut` divides `a`, 
+return (true, a1, a2, keyword_index), where `keyword_index` is the index of the 
+keyword that divides `a` such that `a = a1 aut[keyword_index] a2`.
+"""
+function gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
     match = search(aut, a)
     if isnothing(match)
         return (false, [], [], -1)
@@ -56,6 +63,12 @@ function gb_divides_leftmost_aho_corasick(a::Word, aut::AhoCorasickAutomaton)
 end
 
 # implementation of the normal form function using aho corasick to check for all groebner basis elements in parallel
+Markdown.@doc doc"""
+normal_form(f::FreeAssAlgElem{T}, g::Vector{FreeAssAlgElem{T}}, aut::AhoCorasickAutomaton)
+
+Assuming `g` is a groebner basis and `aut` an Aho-Corasick automaton for the elements of `g`, 
+compute the normal form of `f` with respect to `g`
+"""
 function normal_form(
         f::FreeAssAlgElem{T},
         g::Vector{FreeAssAlgElem{T}},
@@ -65,7 +78,7 @@ function normal_form(
     rexps = Vector{Int}[]
     rcoeffs = T[]
     while length(f) > 0
-        ok, left, right, match_index = gb_divides_leftmost_aho_corasick(f.exps[1], aut)
+        ok, left, right, match_index = gb_divides_leftmost(f.exps[1], aut)
         if ok
             qi = divexact(f.coeffs[1], g[match_index].coeffs[1])
             f = _sub_rest(f, mul_term(qi, left, g[match_index], right), 1)
@@ -77,7 +90,6 @@ function normal_form(
     end
     return FreeAssAlgElem{T}(R, rcoeffs, rexps, length(rcoeffs))
 end
-
 
 # normal form with leftmost word divisions
 function normal_form(
@@ -135,6 +147,13 @@ function normal_form_weak(
    return f
 end
 
+Markdown.@doc doc"""
+interreduce!(g::Vector{FreeAssAlgElem{T}})
+
+Interreduce a given Groebner basis with itself, i.e. compute the normal form of each 
+element of `g` with respect to the rest of the elements and discard elements with 
+normal form $0$ and duplicates.
+"""
 function interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
     i = 1
     while length(g) > 1 && length(g) >= i
@@ -551,6 +570,12 @@ function groebner_basis_buchberger(
    return g
 end
 
+Markdown.@doc doc"""
+groebner_basis(g::Vector{FreeAssAlgElem{T}}, reduction_bound = typemax(Int)::Int) 
+
+Compute a groebner basis for the ideal spanned by g. Stop when `reduction_bound` many
+non-zero entries have been added to the groebner basis.
+"""
 function groebner_basis(
    g::Vector{FreeAssAlgElem{T}},
    reduction_bound = typemax(Int)::Int

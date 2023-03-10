@@ -142,7 +142,7 @@ include("generic/MapCache.jl")
 
 include("generic/Ideal.jl")
 
-include("generic/FreeAssAhoCorasick.jl")
+include("generic/AhoCorasick.jl")
 
 include("generic/FreeAssAlgebraGroebner.jl")
 

@@ -3,21 +3,37 @@
 #   for use e.g. in Groebner Basis computation
 #
 ###############################################################################
-#TODO how to properly export this?
-export search, AhoCorasickAutomaton, AhoCorasickMatch, Word, insert_keyword!
+
+export search, AhoCorasickAutomaton, insert_keyword!, aho_corasick_automaton#, AhoCorasickMatch, Word
 
 using DataStructures
 
 const Word = Vector{Int}
 
+Markdown.@doc doc"""
+AhoCorasickAutomaton
+
+An Aho-Corasick automaton, which can be used to efficiently search for a fixed list of keywords (vectors of Ints) in 
+arbitrary lists of integers
+
+# Examples:
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]]
+julia> aut = AhoCorasickAutomaton(keywords)
+julia> search(aut, [10, 4, 1, 2, 3, 4]) 
+AhoCorasickMatch(6, 1, [1, 2, 3, 4])
+
+
+```
+"""
+mutable struct AhoCorasickAutomaton
+    goto::Vector{Dict{Int, Int}}
+    fail::Vector{Int}
 """
 Output stores for each node a tuple (i, k), where i is the index of the keyword k in 
 the original list of keywords. If several keywords would be the output of the node, only
 the one with the smallest index is stored
 """
-mutable struct AhoCorasickAutomaton
-    goto::Vector{Dict{Int, Int}}
-    fail::Vector{Int}
     output::Vector{Tuple{Int, Word}}
 end
 
@@ -25,6 +41,10 @@ struct AhoCorasickMatch
     last_position::Int
     keyword_index::Int
     keyword::Word
+end
+
+function aho_corasick_match(last_position::Int, keyword_index::Int, keyword::Word)
+    return AhoCorasickMatch(last_position, keyword_index, keyword)
 end
 
 Base.hash(m::AhoCorasickMatch) = hash(m.last_position, hash(m.keyword_index, hash(m.keyword)))
@@ -37,6 +57,10 @@ function AhoCorasickAutomaton(keywords::Vector{Word})
     construct_goto!(automaton, keywords)
     construct_fail!(automaton)
     return automaton
+end
+
+function aho_corasick_automaton(keywords::Vector{Word})
+    return AhoCorasickAutomaton(keywords)
 end
 
 function lookup(automaton::AhoCorasickAutomaton, current_state::Int, next_letter::Int)
@@ -109,14 +133,22 @@ function construct_fail!(automaton::AhoCorasickAutomaton)
     end
 end
 
+Markdown.@doc doc"""
+insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
+
+Insert a new keyword into a given Aho-Corasick automaton to avoid having to rebuild the entire 
+automaton.
+"""
 function insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
     enter!(aut, keyword, index)
     aut.fail = ones(Int, length(aut.goto))
     construct_fail!(aut)
 end
 
-"""
+Markdown.@doc doc"""
+search(automaton::AhoCorasickAutomaton, word)
 
+Search for the first occurrence of a keyword that is stored in `automaton` in the given `word`.
 """
 function search(automaton::AhoCorasickAutomaton, word)
     current_state = 1
