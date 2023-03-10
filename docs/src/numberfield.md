@@ -23,7 +23,7 @@ In order to construct number fields in AbstractAlgebra.jl, one must first constr
 field itself. This is accomplished with the following constructor.
 
 ```julia
-NumberField(f::Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+number_field(f::Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
 ```
 
 Given an irreducible defining polynomial $f$ in $\mathbb{Q}[x]$, return a tuple $(K, x)$
@@ -36,10 +36,10 @@ $\mathbb{Q}[x]$.
 **Examples**
 
 ```jldoctest
-julia> R, x = PolynomialRing(QQ, "x")
+julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> K, a = NumberField(x^3 + 3x + 1, "a")
+julia> K, a = number_field(x^3 + 3x + 1, "a")
 (Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
 
 julia> f = a^2 + 2a + 7
@@ -49,6 +49,6 @@ x^2 + 2*x + 7
 
 ## Basic field functionality
 
-The number field module in AbstractAlgebra.jl implements the full Field and ResidueRing
+The number field module in AbstractAlgebra.jl implements the full Field and residue_ring
 interfaces.
 

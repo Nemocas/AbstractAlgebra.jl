@@ -1,20 +1,15 @@
-# Deprecated in 0.11.*
+# Deprecated in 0.28.*
 
-@deprecate rref(a::MatrixElem{<:RingElement}) rref_rational(a)
-
-@deprecate rref!(a::MatrixElem{<:RingElement}) rref_rational!(a)
-
-# Deprecated in 0.12.*
-
-@deprecate MatrixSpace(R::Ring, n::Int, m::Int, cached::Bool) MatrixSpace(R, n, m, cached = cached)
-
-function (G::Generic.SymmetricGroup)()
-    Base.depwarn("(::SymmetricGroup)() to get the group identity is deprecated, use one(::SymmetricGroup) instead", :one)
-    return one(G)
+# we can't use @deprecate because this is also a typename
+function ResidueRing(R::Ring, a::RingElement; cached::Bool = true)
+    Base.depwarn("'ResidueRing(R::Ring, a::RingElement; cached::Bool = true)' is deprecated, use "*
+    "'residue_ring(C::Cone; set_attributes::Bool = true)' instead.", :ResidueRing)
+    return residue_ring(R, a; cached)
 end
 
-# Deprecated in 0.15.*
-
-@deprecate lead(f) leading_coefficient(f)
-
-@deprecate coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement coefficients(a)
+# we can't use @deprecate because this is also a typename
+function ResidueField(R::Ring, a::RingElement; cached::Bool = true)
+    Base.depwarn("'ResidueField(R::Ring, a::RingElement; cached::Bool = true)' is deprecated, use "*
+    "'residue_field(C::Cone; set_attributes::Bool = true)' instead.", :ResidueField)
+    return residue_field(R, a; cached)
+end

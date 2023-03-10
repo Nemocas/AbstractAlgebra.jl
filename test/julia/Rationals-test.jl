@@ -11,8 +11,8 @@ end
    R = qq
    S = QQ
 
-   @test R == FractionField(zz)
-   @test S == FractionField(ZZ)
+   @test R == fraction_field(zz)
+   @test S == fraction_field(ZZ)
 
    a = R(11)
    b = S(11)
@@ -34,6 +34,10 @@ end
 
    @test is_unit(R(3))
    @test is_unit(S(3))
+   @test is_zero_divisor(R(0))
+   @test is_zero_divisor(S(0))
+   @test !is_zero_divisor(R(3, 5))
+   @test !is_zero_divisor(S(3, 5))
 end
 
 @testset "Julia.Rationals.exact_division" begin
@@ -85,8 +89,8 @@ end
       s2 = rand(S, -100:100)
       s3 = rand(S, -100:100)
 
-      @test gcd(r1, gcd(r2, r3)) == gcd(gcd(r1, r2), r3)
-      @test gcd(s1, gcd(s2, s3)) == gcd(gcd(s1, s2), s3)
+      @test gcd(r1, gcd(r2, r3)) == gcd(gcd(r1, r2), r3) == gcd(r1, r2, r3) == gcd([r1, r2, r3])
+      @test gcd(s1, gcd(s2, s3)) == gcd(gcd(s1, s2), s3) == gcd(s1, s2, s3) == gcd([s1, s2, s3])
    end
 end
 

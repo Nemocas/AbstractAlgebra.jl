@@ -25,7 +25,7 @@ julia> G = SymmetricGroup(5); g = Perm([3,4,5,2,1])
 julia> parent(g) == G
 true
 
-julia> S, x = LaurentSeriesRing(ZZ, 3, "x")
+julia> S, x = laurent_series_ring(ZZ, 3, "x")
 (Laurent series ring in x over Integers, x + O(x^4))
 
 julia> parent(x) == S
@@ -43,7 +43,7 @@ Given a parent object (or its type), return the type of its elements.
 
 # Example
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S, x = PowerSeriesRing(QQ, 2, "x")
+julia> S, x = power_series_ring(QQ, 2, "x")
 (Univariate power series ring in x over Rationals, x + O(x^3))
 
 julia> elem_type(S) == typeof(x)
@@ -61,10 +61,10 @@ Given an element (or its type), return the type of its parent object.
 
 # Example
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> S = MatrixSpace(R, 2, 2)
+julia> S = matrix_space(R, 2, 2)
 Matrix Space of 2 rows and 2 columns over Univariate Polynomial Ring in x over Integers
 
 julia> a = rand(S, 0:1, 0:1);
@@ -83,7 +83,7 @@ Return base ring $R$ of given element or parent $a$.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S, x = PolynomialRing(QQ, "x")
+julia> S, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> base_ring(S) == QQ
@@ -112,7 +112,7 @@ be either an element or parent.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S = MatrixSpace(ZZ, 2, 2)
+julia> S = matrix_space(ZZ, 2, 2)
 Matrix Space of 2 rows and 2 columns over Integers
 
 julia> one(S)
@@ -149,7 +149,7 @@ julia> zero(S)
 [0//1   0//1]
 [0//1   0//1]
 
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> zero(x^3 + 2)
@@ -171,7 +171,7 @@ Return true if $a$ is the multiplicative identity, else return false.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S = MatrixSpace(ZZ, 2, 2); T = MatrixSpace(ZZ, 2, 3); U = MatrixSpace(ZZ, 3, 2);
+julia> S = matrix_space(ZZ, 2, 2); T = matrix_space(ZZ, 2, 3); U = matrix_space(ZZ, 3, 2);
 
 julia> isone(S([1 0; 0 1]))
 true
@@ -242,3 +242,44 @@ function gen end
 # ```
 # """
 function gens end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    zero!(a)
+
+Return the zero of `parent(a)`, possibly modifying the object `a` in the process.
+"""
+function zero! end
+
+@doc Markdown.doc"""
+    add!(a, b, c)
+
+Return `b + c`, possibly modifying the object `a` in the process.
+"""
+function add! end
+
+@doc Markdown.doc"""
+    addeq!(a, b)
+
+Return `a + b`, possibly modifying the object `a` in the process.
+"""
+function addeq! end
+
+@doc Markdown.doc"""
+    sub!(a, b, c)
+
+Return `b - c`, possibly modifying the object `a` in the process.
+"""
+function sub! end
+
+@doc Markdown.doc"""
+    mul!(a, b, c)
+
+Return `b*c`, possibly modifying the object `a` in the process.
+"""
+function mul! end

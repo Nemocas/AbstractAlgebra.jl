@@ -121,15 +121,27 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
                # documentation is not clear on divexact
                if is_domain_type(T)
                   @test iszero(b) || equality(divexact_left(b*a, b), a)
+                  @test iszero(b) || equality(divexact_left(b*a, b, check = true), a)
+                  @test iszero(b) || equality(divexact_left(b*a, b, check = false), a)
                   @test iszero(b) || equality(divexact_right(a*b, b), a)
+                  @test iszero(b) || equality(divexact_right(a*b, b, check = true), a)
+                  @test iszero(b) || equality(divexact_right(a*b, b, check = false), a)
                else
                   try
                      t = divexact_left(b*a, b)
+                     @test equality(b*t, b*a)
+                     t = divexact_left(b*a, b, check = true)
+                     @test equality(b*t, b*a)
+                     t = divexact_left(b*a, b, check = false)
                      @test equality(b*t, b*a)
                   catch
                   end
                   try
                      t = divexact_right(a*b, b)
+                     @test equality(t*b, a*b)
+                     t = divexact_right(a*b, b, check = true)
+                     @test equality(t*b, a*b)
+                     t = divexact_right(a*b, b, check = false)
                      @test equality(t*b, a*b)
                   catch
                   end
@@ -218,12 +230,28 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
             # documentation is not clear on divexact
             if is_domain_type(T)
                @test iszero(b) || equality(divexact(b*a, b), a)
+               @test iszero(b) || equality(divexact(b*a, b, check = true), a)
+               @test iszero(b) || equality(divexact(b*a, b, check = false), a)
             else
                try
                   t = divexact(b*a, b)
                   @test equality(t*b, a*b)
+                  t = divexact(b*a, b, check = true)
+                  @test equality(t*b, a*b)
+                  t = divexact(b*a, b, check = false)
+                  @test equality(t*b, a*b)
                catch
                end
+            end
+            try
+               (f, h) = is_zero_divisor_with_annihilator(a)
+               @test parent(h) == R
+               @test f == is_zero_divisor(a)
+               if f
+                  @test !is_zero(h)
+                  @test is_zero(a*h)
+               end
+            catch
             end
             @test A == a
             @test B == b
@@ -317,6 +345,22 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          @test !(iszero(f) && iszero(g)) || iszero(gcd(f, g))
          @test equality_up_to_units(gcd(f, g)*lcm(f, g), f*g)
 
+         g1 = gcd(f, gcd(g, m)) 
+         g2 = gcd(gcd(f, g), m)
+         g3 = gcd(f, g, m)
+         g4 = gcd([f, g, m])
+         @test equality_up_to_units(g1, g2)
+         @test equality_up_to_units(g2, g3)
+         @test equality_up_to_units(g3, g4)
+
+         l1 = lcm(f, lcm(g, m))
+         l2 = lcm(lcm(f, g), m)
+         l3 = lcm(f, g, m)
+         l4 = lcm([f, g, m])
+         @test equality_up_to_units(l1, l2)
+         @test equality_up_to_units(l2, l3)
+         @test equality_up_to_units(l3, l4)
+
          (d, s, t) = gcdx(f, g)
          @test d == gcd(f, g)
          @test d == s*f + t*g
@@ -367,6 +411,30 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
 
       if R isa AbstractAlgebra.Field
          test_EuclideanRing_interface(Rx, reps = 2 + fld(reps, 2))
+         @testset "Half-GCD" begin
+            for i in 1:reps
+               a = test_elem(Rx)
+               b = test_elem(Rx)
+               for j in 1:8
+                  q = test_elem(Rx)
+                  a, b = q*a + b, a
+               end
+               g, s, t = gcdx(a, b)
+               @test g == gcd(a, b)
+               @test g == s*a + t*b
+               @test (g, s) == gcdinv(a, b)
+               if degree(a) < degree(b)
+                  a, b = b, a
+               end
+               degree(a) > degree(b) >= 0 || continue
+               (A, B, m11, m12, m21, m22, s) = hgcd(a, b)
+               @test degree(A) >= cld(degree(a), 2) > degree(B)
+               @test m11*A + m12*B == a
+               @test m21*A + m22*B == b
+               @test m11*m22 - m21*m12 == s
+               @test s^2 == 1
+            end
+         end
       end
 
       @testset "Basic functionality" begin
@@ -499,11 +567,11 @@ end
 
 function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
    test_Ring_interface(R; reps = reps)
-   Rx, _ = PolynomialRing(R, "x")
+   Rx, _ = polynomial_ring(R, "x")
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
    S = MatrixAlgebra(R, rand(0:3))
    test_MatAlgebra_interface(S, reps = 2 + fld(reps, 2))
-   S = MatrixSpace(R, rand(0:3), rand(0:3))
+   S = matrix_space(R, rand(0:3), rand(0:3))
    test_MatSpace_interface(S, reps = 2 + fld(reps, 2))
 end
 

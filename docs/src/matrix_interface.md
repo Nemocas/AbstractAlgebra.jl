@@ -162,7 +162,7 @@ dense_matrix_type(::Type{T}) where T <: RingElem
 
 Return the type of dense matrices whose entries have the given type. E.g.
 in Nemo, which depends on AbstractAlgebra, we define
-`dense_matrix_type(::Type{fmpz}) = fmpz_mat`.
+`dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix`.
 
 ```julia
 nrows(M::MyMatSpace{T}) where T <: RingElem

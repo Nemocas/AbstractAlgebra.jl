@@ -34,7 +34,7 @@ corresponding to the ring $\mathbb{Z}/7\mathbb{Z}$. We then create a new element
 of this ring by calling the parent object `R`.
 
 ```julia
-R = ResidueRing(ZZ, 7)
+R = residue_ring(ZZ, 7)
 a = R(3)
 ```
 
@@ -69,7 +69,7 @@ the field itself.
 
 For example, we have an object of type `Generic.PolyRing` to model a generic
 polynomial ring, and elements of that polynomial ring would have
-type `Generic.PolyElem`.
+type `Generic.PolyRingElem`.
 
 For this purpose, we also have a hierarchy of abstract types, such as `FieldElem`, that
 the types of element objects can belong to.
@@ -89,7 +89,7 @@ f = x^2 + 3x + 1
 
 typeof(R) <: PolyRing
 
-typeof(f) <: PolyElem
+typeof(f) <: PolyRingElem
 
 parent(f) == R
 ```

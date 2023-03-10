@@ -5,18 +5,15 @@
 #
 ###############################################################################
 
-export LaurentSeriesField, LaurentSeriesRing, deflate, downscale, exp_gcd,
-       inflate, upscale
-
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    LaurentSeriesRing(R::Ring, prec::Int, s::Union{Char, AbstractString, Symbol}; cached=true)
-    LaurentSeriesField(R::Field, prec::Int, s::Union{Char, AbstractString; cached=true)
+    laurent_series_ring(R::Ring, prec::Int, s::Union{Char, AbstractString, Symbol}; cached=true)
+    laurent_series_field(R::Field, prec::Int, s::Union{Char, AbstractString; cached=true)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a Laurent series
 ring over the given base ring and a generator `x` for the Laurent series ring.
@@ -27,27 +24,27 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-function LaurentSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
-   return LaurentSeriesRing(R, prec, Symbol(s); cached=cached)
+function laurent_series_ring(R::Ring, prec::Int, s::AbstractString; cached=true)
+   return laurent_series_ring(R, prec, Symbol(s); cached=cached)
 end
 
-function LaurentSeriesRing(R::Ring, prec::Int, s::Symbol; cached=true)
-   return Generic.LaurentSeriesRing(R, prec, s; cached=cached)
+function laurent_series_ring(R::Ring, prec::Int, s::Symbol; cached=true)
+   return Generic.laurent_series_ring(R, prec, s; cached=cached)
 end
 
-function LaurentSeriesRing(R::Ring, prec::Int, s::Char; cached=true)
-   return LaurentSeriesRing(R, prec, Symbol(s); cached=cached)
+function laurent_series_ring(R::Ring, prec::Int, s::Char; cached=true)
+   return laurent_series_ring(R, prec, Symbol(s); cached=cached)
 end
 
-function LaurentSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
-   return LaurentSeriesField(R, prec, Symbol(s); cached=cached)
+function laurent_series_field(R::Field, prec::Int, s::AbstractString; cached=true)
+   return laurent_series_field(R, prec, Symbol(s); cached=cached)
 end
 
-function LaurentSeriesField(R::Field, prec::Int, s::Symbol; cached=true)
-   return Generic.LaurentSeriesField(R, prec, s; cached=cached)
+function laurent_series_field(R::Field, prec::Int, s::Symbol; cached=true)
+   return Generic.laurent_series_field(R, prec, s; cached=cached)
 end
 
-function LaurentSeriesField(R::Field, prec::Int, s::Char; cached=true)
-   return LaurentSeriesField(R, prec, Symbol(s); cached=cached)
+function laurent_series_field(R::Field, prec::Int, s::Char; cached=true)
+   return laurent_series_field(R, prec, Symbol(s); cached=cached)
 end
 

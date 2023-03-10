@@ -26,7 +26,7 @@ end
 # evaluation at x = alpha should use divrem. Don't use evaluate for this!!!
 
 # set t to the coefficients of q when expanded in powers of (x - alpha)
-function taylor_get_coeffs!(t::Vector{E}, q::E, xalpha::E) where E <: MPolyElem
+function taylor_get_coeffs!(t::Vector{E}, q::E, xalpha::E) where E <: MPolyRingElem
   R = parent(xalpha)
   empty!(t)
   while !iszero(q)
@@ -108,19 +108,6 @@ function from_univar(a, var::Int, Kxyz)
     push_term!(r, coeff(a, i), ev)
   end
   return finish(r)
-end
-
-function gcdcofactors(a, b)
-  g = gcd(a, b)
-  if iszero(g)
-    @assert iszero(a)
-    @assert iszero(b)
-    return (g, a, b)
-  elseif isone(g)
-    return (g, a, b)
-  else
-    return (g, divexact(a, g), divexact(b, g))
-  end
 end
 
 # remove the content with respect to variable v
@@ -259,7 +246,7 @@ function pfracinit(
   end
 
   # univariate ring for gcdx
-  S, x = PolynomialRing(K, "x")
+  S, x = polynomial_ring(K, "x")
   sub = [k == mainvar ? x : S(1) for k in 1:nvars(R)]
 
   for j in 0:l
@@ -659,7 +646,7 @@ function hliftstep_quartic(
   for i in 1:r
     taylor_get_coeffs!(B[i], fac[i], xalpha)
     Blen[i] = length(B[i])
-    # push extra stuff to avoid anoying length checks
+    # push extra stuff to avoid annoying length checks
     while length(B[i]) < liftdegs[m] + 1
       push!(B[i], zero(R))
     end
@@ -804,7 +791,7 @@ end
 function mfactor_irred_univar(a::E, var::Int) where E
   R = parent(a)
   K = base_ring(R)
-  Kx, _ = PolynomialRing(K, "x")
+  Kx, _ = polynomial_ring(K, "x")
   F = factor(to_univar(a, var, Kx))
   res = E[]
   ok = true
@@ -886,7 +873,7 @@ function hlift_bivar_combine(
   xdeg = degree(a, xvar)
   ydeg = degree(a, yvar)
 
-  Ky, y = PolynomialRing(K, "x")
+  Ky, y = polynomial_ring(K, "x")
 
   yalpha = gen(R, yvar) - R(alpha)
   yalphapow = yalpha^(ydeg + 1)
@@ -931,7 +918,7 @@ function make_bases_coprime!(a::Array{Pair{E, Int}}, b::Array{Pair{E, Int}}) whe
     for j in 1:lenb
       ai = a[i].first
       bj = b[j].first
-      (g, ai, bi) = gcdcofactors(ai, bj)
+      (g, ai, bi) = gcd_with_cofactors(ai, bj)
       if !is_constant(g)
         a[i] = ai => a[i].second
         b[i] = bi => b[i].second
@@ -952,10 +939,10 @@ function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where E
   abases = E[t.first for t in a]
   aexps = Int[t.second for t in a]
 
-  i = 1 # index strickly before which everthing is coprime to b
+  i = 1 # index strictly before which everything is coprime to b
 
   while i <= length(abases) && !is_constant(b)
-    abase_new, abases[i], b = gcdcofactors(abases[i], b)
+    abase_new, abases[i], b = gcd_with_cofactors(abases[i], b)
     if is_constant(abase_new)
       i += 1
       continue
@@ -988,7 +975,7 @@ end
 
 
 function lcc_kaltofen_step!(
-  divs::Vector{E},  # modifed
+  divs::Vector{E},  # modified
   Af::Fac{E},       # unmodified, possibly new one is returned
   Au::Vector{E},    # univariates in gen(v) from the lc's of bvar factors
   v::Int,           # the main variable for this step
@@ -999,7 +986,7 @@ function lcc_kaltofen_step!(
   R = parent(Af.unit)
   r = length(Au)
   @assert r == length(divs)
-  Kx, _ = PolynomialRing(base_ring(R), string(gen(R,v)))
+  Kx, _ = polynomial_ring(base_ring(R), string(gen(R,v)))
 
   Auf = [collect(factor_squarefree(to_univar(Au[i], v, Kx)).fac) for i in 1:r]
 
@@ -1153,7 +1140,7 @@ end
 
 # factor a truly multivariate A in at least three variables
 function mfactor_irred_mvar_char_zero(
-  A::E,             # squarefree, primitve wrt mainvar, monic
+  A::E,             # squarefree, primitive wrt mainvar, monic
   mainvar::Int,
   minorvars::Vector{Int}
 ) where E
@@ -1240,10 +1227,10 @@ function mfactor_sqrfree_char_zero(a::E) where E
   for v in 1:nvars(R)
     Sp = derivative(a, v)
     if !iszero(Sp)
-      (Sm, Ss, Y) = gcdcofactors(a, Sp)
+      (Sm, Ss, Y) = gcd_with_cofactors(a, Sp)
       k = 1
       while begin Z = Y - derivative(Ss, v); !iszero(Z) end
-        (S, Ss, Y) = gcdcofactors(Ss, Z)
+        (S, Ss, Y) = gcd_with_cofactors(Ss, Z)
         mulpow!(res, S, k)
         k += 1
       end
@@ -1361,7 +1348,7 @@ function mfactor_squarefree_char_zero(a::E) where E
 end
 
 # factor a multivariate over an exact field of characteristic 0
-function mfactor_char_zero(a::E) where E <: MPolyElem
+function mfactor_char_zero(a::E) where E <: MPolyRingElem
   tres = mfactor_squarefree_char_zero(a)
   # ensure factors are irreducible
   res = Fac{E}()

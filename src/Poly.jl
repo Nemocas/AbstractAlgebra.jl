@@ -4,21 +4,6 @@
 #
 ###############################################################################
 
-export PolyCoeffs, PolynomialRing, PolyRing, addmul!, characteristic,
-       chebyshev_t, chebyshev_u, coefficient_ring, coefficients, compose,
-       constant_coefficient, content, deflate, deflation, degree, derivative,
-       discriminant, divexact, divexact_low, divhigh, divides, evaluate,
-       gcdinv, inflate, integral, interpolate, is_monic, is_square, is_term,
-       is_term_recursive, map_coefficients, modulus,  monomial_to_newton!,
-       mul_classical, mulhigh_n, mul_karatsuba, mul_ks, mullow, mulmod,
-       newton_to_monomial!, nvars, polynomial, polynomial_to_power_sums,
-       power_sums_to_polynomial, pow_multinomial, primpart,
-       pseudodivrem, pseudorem, remove, resultant, resultant_ducos,
-       resultant_euclidean, resultant_lehmer, resultant_subresultant,
-       resultant_sylvester, resx, shift_left, shift_right, subst,
-       sylvester_matrix, symbols, tail, use_karamul, valuation, var,
-       set_coefficient!
-
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -35,11 +20,11 @@ coefficient_ring(a::PolynomialElem) = base_ring(a)
 
 parent(a::PolynomialElem) = a.parent
 
-function is_domain_type(::Type{T}) where {S <: RingElement, T <: PolyElem{S}}
+function is_domain_type(::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}}
    return is_domain_type(S)
 end
 
-function is_exact_type(a::Type{T}) where {S <: RingElement, T <: PolyElem{S}}
+function is_exact_type(a::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}}
    return is_exact_type(S)
 end
 
@@ -80,7 +65,7 @@ characteristic(a::PolyRing) = characteristic(base_ring(a))
 #
 ###############################################################################
 
-function Base.hash(a::PolyElem, h::UInt)
+function Base.hash(a::PolyRingElem, h::UInt)
    b = 0x53dd43cd511044d1%UInt
    for i in 0:length(a) - 1
       b = xor(b, xor(hash(coeff(a, i), h), h))
@@ -120,11 +105,11 @@ function is_constant(a::PolynomialElem)
 end
 
 @doc Markdown.doc"""
-    modulus(a::PolyElem{T}) where {T <: ResElem}
+    modulus(a::PolyRingElem{T}) where {T <: ResElem}
 
 Return the modulus of the coefficients of the given polynomial.
 """
-modulus(a::PolyElem{T}) where {T <: ResElem} = modulus(base_ring(a))
+modulus(a::PolyRingElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
 @doc Markdown.doc"""
     leading_coefficient(a::PolynomialElem)
@@ -233,7 +218,7 @@ Return `true` if the given polynomial is the constant generator of its
 polynomial ring, otherwise return `false`.
 """
 function is_gen(a::PolynomialElem)
-    return length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
+    return length(a) <= 2 && isone(coeff(a, 1)) && iszero(coeff(a, 0))
 end
 
 @doc Markdown.doc"""
@@ -246,7 +231,24 @@ function is_monic(a::PolynomialElem)
     return isone(leading_coefficient(a))
 end
 
-is_unit(a::PolynomialElem) = length(a) == 1 && is_unit(coeff(a, 0))
+function is_unit(a::PolynomialElem)
+   if length(a) <= 1
+      return is_unit(coeff(a, 0))
+   elseif is_domain_type(elem_type(coefficient_ring(a)))
+      return false
+   elseif !is_unit(coeff(a, 0)) || is_unit(coeff(a, length(a) - 1))
+      return false
+   else
+      throw(NotImplementedError(:is_unit, a))
+   end
+end
+
+is_zero_divisor(a::PolynomialElem) = is_zero_divisor(content(a))
+
+function is_zero_divisor_with_annihilator(a::PolyRingElem{T}) where T <: RingElement
+   f, b = is_zero_divisor_with_annihilator(content(a))
+   return f, parent(a)(b)
+end
 
 ###############################################################################
 #
@@ -334,7 +336,7 @@ end
 #
 ###############################################################################
 
-function similar(x::PolyElem, R::Ring, s::Symbol=var(parent(x)); cached::Bool=true)
+function similar(x::PolyRingElem, R::Ring, s::Symbol=var(parent(x)); cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.Poly{TT}(V)
@@ -349,28 +351,28 @@ function similar(x::PolyElem, R::Ring, s::Symbol=var(parent(x)); cached::Bool=tr
    return p
 end
 
-function similar(x::PolyElem, var::Symbol=var(parent(x)); cached::Bool=true)
+function similar(x::PolyRingElem, var::Symbol=var(parent(x)); cached::Bool=true)
    return similar(x, base_ring(x), var; cached=cached)
 end
 
-function similar(x::PolyElem, R::Ring, var::String; cached::Bool=true)
+function similar(x::PolyRingElem, R::Ring, var::String; cached::Bool=true)
    return similar(x, R, Symbol(var); cached=cached)
 end
 
-function similar(x::PolyElem, var::String; cached::Bool=true)
+function similar(x::PolyRingElem, var::String; cached::Bool=true)
    return similar(x, base_ring(x), Symbol(var); cached=cached)
 end
 
-zero(p::PolyElem, R::Ring, var::Symbol=var(parent(p)); cached::Bool=true) =
+zero(p::PolyRingElem, R::Ring, var::Symbol=var(parent(p)); cached::Bool=true) =
    similar(p, R, var; cached=cached)
 
-zero(p::PolyElem, var::Symbol=var(parent(p)); cached::Bool=true) =
+zero(p::PolyRingElem, var::Symbol=var(parent(p)); cached::Bool=true) =
    similar(p, base_ring(p), var; cached=cached)
 
-zero(p::PolyElem, R::Ring, var::String; cached::Bool=true) =
+zero(p::PolyRingElem, R::Ring, var::String; cached::Bool=true) =
    zero(p, R, Symbol(var); cached=cached)
 
-zero(p::PolyElem, var::String; cached::Bool=true) =
+zero(p::PolyRingElem, var::String; cached::Bool=true) =
    zero(p, base_ring(p), Symbol(var); cached=cached)
 
 ###############################################################################
@@ -395,13 +397,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    exponent_vectors(a::AbstractAlgebra.PolyElem)
+    exponent_vectors(a::AbstractAlgebra.PolyRingElem)
 
 Return an iterator for the exponent vectors of the given polynomial. The
 exponent vectors will have length 1 and may correspond to terms with zero
 coefficient but will not give exponents higher than the degree.
 """
-function exponent_vectors(a::AbstractAlgebra.PolyElem)
+function exponent_vectors(a::AbstractAlgebra.PolyRingElem)
    return Generic.MPolyExponentVectors(a)
 end
 
@@ -409,11 +411,11 @@ struct PolyCoeffs{T <: RingElement}
    f::T
 end
  
-function coefficients(f::PolyElem)
+function coefficients(f::PolyRingElem)
    return PolyCoeffs(f)
 end
  
-function Base.iterate(PC::PolyCoeffs{<:PolyElem}, st::Int = -1)
+function Base.iterate(PC::PolyCoeffs{<:PolyRingElem}, st::Int = -1)
    st += 1
    if st > degree(PC.f)
        return nothing
@@ -422,7 +424,7 @@ function Base.iterate(PC::PolyCoeffs{<:PolyElem}, st::Int = -1)
    end
 end
 
-function Base.iterate(PCR::Iterators.Reverse{<:PolyCoeffs{<:PolyElem}},
+function Base.iterate(PCR::Iterators.Reverse{<:PolyCoeffs{<:PolyRingElem}},
                                                    st::Int = degree(PCR.itr.f) + 1)
    st -= 1
    if st < 0
@@ -432,9 +434,9 @@ function Base.iterate(PCR::Iterators.Reverse{<:PolyCoeffs{<:PolyElem}},
    end
 end
  
-Base.IteratorEltype(M::PolyElem) = Base.HasEltype()
+Base.IteratorEltype(M::PolyRingElem) = Base.HasEltype()
 
-Base.eltype(M::PolyElem{T}) where {T} = T
+Base.eltype(M::PolyRingElem{T}) where {T} = T
 
 Base.eltype(M::PolyCoeffs) = Base.eltype(M.f)
  
@@ -444,19 +446,19 @@ Base.eltype(M::Iterators.Take{<:PolyCoeffs}) = Base.eltype(M.xs.f)
 
 Base.eltype(M::Iterators.Take{<:Iterators.Reverse{<:PolyCoeffs}}) = Base.eltype(M.xs.itr.f)
 
-Base.IteratorSize(M::PolyCoeffs{<:PolyElem}) = Base.HasLength()
+Base.IteratorSize(M::PolyCoeffs{<:PolyRingElem}) = Base.HasLength()
 
-Base.length(M::PolyCoeffs{<:PolyElem}) = length(M.f)
+Base.length(M::PolyCoeffs{<:PolyRingElem}) = length(M.f)
  
-function Base.lastindex(a::PolyCoeffs{<:PolyElem})
+function Base.lastindex(a::PolyCoeffs{<:PolyRingElem})
    return degree(a.f)
 end
  
-function Base.getindex(a::PolyCoeffs{<:PolyElem}, i::Int)
+function Base.getindex(a::PolyCoeffs{<:PolyRingElem}, i::Int)
    return coeff(a.f, i)
 end
 
-function Base.getindex(a::Iterators.Reverse{<:PolyCoeffs{<:PolyElem}}, i::Int)
+function Base.getindex(a::Iterators.Reverse{<:PolyCoeffs{<:PolyRingElem}}, i::Int)
    return coeff(a.itr.f, degree(a.itr.f) - i)
 end
 
@@ -474,7 +476,7 @@ canonical_unit(x::PolynomialElem) = canonical_unit(leading_coefficient(x))
 #
 ###############################################################################
 
-function expressify(@nospecialize(a::Union{PolynomialElem, NCPolyElem}),
+function expressify(@nospecialize(a::Union{PolynomialElem, NCPolyRingElem}),
    x = var(parent(a)); context = nothing)
    sum = Expr(:call, :+)
    for k in degree(a):-1:0
@@ -491,7 +493,7 @@ function expressify(@nospecialize(a::Union{PolynomialElem, NCPolyElem}),
    return sum
 end
 
-@enable_all_show_via_expressify Union{PolynomialElem, NCPolyElem}
+@enable_all_show_via_expressify Union{PolynomialElem, NCPolyRingElem}
 
 function show(io::IO, p::PolyRing)
    print(io, "Univariate Polynomial Ring in ")
@@ -523,7 +525,7 @@ end
 #
 ###############################################################################
 
-function +(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+function +(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -547,7 +549,7 @@ function +(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    return z
 end
 
-function -(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+function -(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -572,11 +574,11 @@ function -(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    mul_karatsuba(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+    mul_karatsuba(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
 
 Return $a \times b$ using the Karatsuba algorithm.
 """
-function mul_karatsuba(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+function mul_karatsuba(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
    # we assume len(a) != 0 != lenb and parent(a) == parent(b)
    lena = length(a)
    lenb = length(b)
@@ -627,7 +629,7 @@ function mul_karatsuba(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    return r
 end
 
-function mul_ks(a::PolyElem{T}, b::PolyElem{T}) where {T <: PolyElem}
+function mul_ks(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: PolyRingElem}
    lena = length(a)
    lenb = length(b)
    if lena == 0 || lenb == 0
@@ -699,7 +701,7 @@ function mul_ks(a::PolyElem{T}, b::PolyElem{T}) where {T <: PolyElem}
    return r
 end
 
-function mul_classical(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+function mul_classical(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
    lena = length(a)
    lenb = length(b)
    if lena == 0 || lenb == 0
@@ -729,11 +731,11 @@ function mul_classical(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
    return z
 end
 
-function use_karamul(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
-   return length(a) > 5 && length(b) > 5
+function use_karamul(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
+   return false
 end
 
-function *(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+function *(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
    check_parent(a, b)
    # karatsuba recurses into * so check lengths are > 1
    if use_karamul(a, b) && length(a) > 1 && length(b) > 1
@@ -749,7 +751,7 @@ end
 #
 ###############################################################################
 
-function *(a::T, b::PolyElem{T}) where {T <: RingElem}
+function *(a::T, b::PolyRingElem{T}) where {T <: RingElem}
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -771,7 +773,7 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
    return z
 end
 
-*(a::PolyElem{T}, b::T) where {T <: RingElem} = b*a
+*(a::PolyRingElem{T}, b::T) where {T <: RingElem} = b*a
 
 *(a::PolynomialElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
@@ -781,7 +783,7 @@ end
 #
 ###############################################################################
 
-function pow_multinomial(a::PolyElem{T}, e::Int) where T <: RingElement
+function pow_multinomial(a::PolyRingElem{T}, e::Int) where T <: RingElement
    e < 0 && throw(DomainError(e, "exponent must be >= 0"))
    lena = length(a)
    lenz = (lena - 1) * e + 1
@@ -803,16 +805,15 @@ function pow_multinomial(a::PolyElem{T}, e::Int) where T <: RingElement
       res[k + 1] = divexact(res[k + 1], d)
    end
    z = parent(a)(res)
-   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
 @doc Markdown.doc"""
-    ^(a::PolyElem{T}, b::Int) where T <: RingElement
+    ^(a::PolyRingElem{T}, b::Int) where T <: RingElement
 
 Return $a^b$. We require $b \geq 0$.
 """
-function ^(a::PolyElem{T}, b::Int) where T <: RingElement
+function ^(a::PolyRingElem{T}, b::Int) where T <: RingElement
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    R = parent(a)
@@ -868,13 +869,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::PolyElem{T}, y::PolyElem{T}) where T <: RingElement
+    ==(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
-function ==(x::PolyElem{T}, y::PolyElem{T}) where T <: RingElement
+function ==(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
    b = check_parent(x, y, false)
    !b && return false
    if length(x) != length(y)
@@ -890,14 +891,14 @@ function ==(x::PolyElem{T}, y::PolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    isequal(x::PolyElem{T}, y::PolyElem{T}) where T <: RingElement
+    isequal(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 useful in cases where the coefficients of the polynomial are inexact, e.g.
 power series. Only if the power series are precisely the same, to the same
 precision, are they declared equal by this function.
 """
-function isequal(x::PolyElem{T}, y::PolyElem{T}) where T <: RingElement
+function isequal(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
    if parent(x) != parent(y)
       return false
    end
@@ -919,11 +920,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::PolyElem{T}, y::T) where {T <: RingElem}
+    ==(x::PolyRingElem{T}, y::T) where {T <: RingElem}
 
 Return `true` if $x == y$.
 """
-==(x::PolyElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && iszero(y))
+==(x::PolyRingElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
@@ -935,18 +936,18 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
-    ==(x::T, y::PolyElem{T}) where T <: RingElem = y == x
+    ==(x::T, y::PolyRingElem{T}) where T <: RingElem = y == x
 
 Return `true` if $x = y$.
 """
-==(x::T, y::PolyElem{T}) where T <: RingElem = y == x
+==(x::T, y::PolyRingElem{T}) where T <: RingElem = y == x
 
 @doc Markdown.doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::PolyElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::PolyRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::PolyElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::PolyRingElem) = y == x
 
 ###############################################################################
 #
@@ -996,7 +997,7 @@ end
 @doc Markdown.doc"""
     truncate(a::PolynomialElem, n::Int)
 
-Return $a$ truncated to $n$ terms.
+Return $a$ truncated to $n$ terms, i.e. the remainder upon division by $x^n$.
 """
 function truncate(a::PolynomialElem, n::Int)
    lena = length(a)
@@ -1014,11 +1015,11 @@ function truncate(a::PolynomialElem, n::Int)
 end
 
 @doc Markdown.doc"""
-    mullow(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingElement
+    mullow(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where T <: RingElement
 
 Return $a\times b$ truncated to $n$ terms.
 """
-function mullow(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingElement
+function mullow(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where T <: RingElement
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -1052,13 +1053,12 @@ function mullow(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingElement
       d[i] = reduce!(d[i])
    end
    z = parent(a)(d)
-   z = set_length!(z, normalise(z, lenz))
    return z
 end
 
 # computes the terms of the product from degree deg(a) + deg(b) down to
 # deg(a) + deg(b) - n inclusive, setting the remaining terms to zero
-function mulhigh_n(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingElement
+function mulhigh_n(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where T <: RingElement
     # if a = sum a_i t^i and b = sum b_j t^j
     # want (i, j) such that i + j >= deg a + deg b - n
     r = parent(a)()
@@ -1072,7 +1072,7 @@ end
 
 # assuming b divides a (behaviour is undefined otherwise), computes the last n
 # terms of the quotient, i.e. computes divexact(a, b) mod x^n
-function divexact_low(a::PolyElem{T}, b::PolyElem{T}, n::Int) where T <: RingElement
+function divexact_low(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where T <: RingElement
     r = parent(a)()
     if iszero(b)
        return r
@@ -1104,7 +1104,7 @@ end
 # degree n0
 # if the division is not exact until at least the term of degree n0, an
 # exception may be raised
-function divhigh(a::PolyElem{T}, b::PolyElem{T}, n0::Int) where T <: RingElement
+function divhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n0::Int) where T <: RingElement
     r = parent(a)()
     n = degree(a) - degree(b) - n0
     fit!(r, degree(a) - degree(b) + 1)
@@ -1124,7 +1124,7 @@ function divhigh(a::PolyElem{T}, b::PolyElem{T}, n0::Int) where T <: RingElement
             c = coeff(a, da)
             for j = 0:min(degree(b) - 1, i)
                 t = mul!(t, coeff(r, da - degree(b) + j + 1),
-			                          coeff(b, degree(b) - j - 1))
+                         coeff(b, degree(b) - j - 1))
                 c = addeq!(c, t)
             end
             a = setcoeff!(a, da, c)
@@ -1234,13 +1234,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    deflation(p::PolyElem)
+    deflation(p::PolyRingElem)
 
 Return a tuple `(shift, defl)` where `shift` is the exponent of the trailing
 term of $p$ and `defl` is the gcd of the distance between the exponents of the
 nonzero terms of $p$. If $p = 0$, both `shift` and `defl` will be zero.
 """
-function deflation(p::PolyElem)
+function deflation(p::PolyRingElem)
    if iszero(p)
       return 0, 1
    end
@@ -1256,20 +1256,20 @@ function deflation(p::PolyElem)
       if !iszero(coeff(p, exj))
          defl = gcd(defl, exj - shift)
          if defl == 1
-	    break
-	 end
+            break
+         end
       end
    end
    return shift, defl
 end
 
 @doc Markdown.doc"""
-    inflate(f::PolyElem, shift::Int64, n::Int64) -> PolyElem
+    inflate(f::PolyRingElem, shift::Int64, n::Int64) -> PolyRingElem
 
 Given a polynomial $f$ in $x$, return $f(x^n)*x^j$, i.e. multiply
 all exponents by $n$ and shift $f$ left by $j$.
 """
-function inflate(f::PolyElem, j::Int64, n::Int64)
+function inflate(f::PolyRingElem, j::Int64, n::Int64)
     y = parent(f)()
     for i = 0:degree(f)
         y = setcoeff!(y, n*i + j, coeff(f, i))
@@ -1278,20 +1278,20 @@ function inflate(f::PolyElem, j::Int64, n::Int64)
 end
 
 @doc Markdown.doc"""
-    inflate(f::PolyElem, n::Int64) -> PolyElem
+    inflate(f::PolyRingElem, n::Int64) -> PolyRingElem
 
 Given a polynomial $f$ in $x$, return $f(x^n)$, i.e. multiply
 all exponents by $n$.
 """
-inflate(f::PolyElem, n::Int64) = inflate(f, 0, n)
+inflate(f::PolyRingElem, n::Int64) = inflate(f, 0, n)
 
 @doc Markdown.doc"""
-    deflate(f::PolyElem, shift::Int64, n::Int64) -> PolyElem
+    deflate(f::PolyRingElem, shift::Int64, n::Int64) -> PolyRingElem
 
 Given a polynomial $g$ in $x^n$ such that `f = g(x)*x^{shift}`, write $f$ as
 a polynomial in $x$, i.e. divide all exponents of $g$ by $n$.
 """
-function deflate(f::PolyElem, j::Int64, n::Int64)
+function deflate(f::PolyRingElem, j::Int64, n::Int64)
     y = parent(f)()
     for i = 0:div(degree(f) - j, n)
         y = setcoeff!(y, i, coeff(f, n*i + j))
@@ -1300,21 +1300,21 @@ function deflate(f::PolyElem, j::Int64, n::Int64)
 end
 
 @doc Markdown.doc"""
-    deflate(f::PolyElem, n::Int64) -> PolyElem
+    deflate(f::PolyRingElem, n::Int64) -> PolyRingElem
 
 Given a polynomial $f$ in $x^n$, write it as a polynomial in $x$, i.e. divide
 all exponents by $n$.
 """
-deflate(f::PolyElem, n::Int64) = deflate(f, 0, n)
+deflate(f::PolyRingElem, n::Int64) = deflate(f, 0, n)
 
 @doc Markdown.doc"""
-    deflate(x::PolyElem) -> PolyElem, Int
+    deflate(x::PolyRingElem) -> PolyRingElem, Int
 
 Deflate the polynomial $f$ maximally, i.e. find the largest $n$ s.th.
 $f$ can be deflated by $n$, i.e. $f$ is actually a polynomial in $x^n$.
 Return $g, n$ where $g$ is the deflation of $f$.
 """
-function deflate(f::PolyElem)
+function deflate(f::PolyRingElem)
    n = 0
    for i = 0:degree(f)
       if coeff(f, i) != 0
@@ -1333,13 +1333,13 @@ end
 #
 ###############################################################################
 
-function mulmod(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T}) where T <: RingElement
+function mulmod(a::PolyRingElem{T}, b::PolyRingElem{T}, d::PolyRingElem{T}) where T <: RingElement
    check_parent(a, b)
    check_parent(a, d)
    return mod(a*b, d)
 end
 
-function powermod(a::PolyElem{T}, b::Int, d::PolyElem{T}) where T <: RingElement
+function powermod(a::PolyRingElem{T}, b::Int, d::PolyRingElem{T}) where T <: RingElement
    check_parent(a, d)
    if b == 0
       z = one(parent(a))
@@ -1372,7 +1372,7 @@ function powermod(a::PolyElem{T}, b::Int, d::PolyElem{T}) where T <: RingElement
    return z
 end
 
-function invmod(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+function invmod(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    g, z = gcdinv(a, b)
    if g != 1
@@ -1387,7 +1387,7 @@ end
 #
 ###############################################################################
 
-function divexact(f::PolyElem{T}, g::PolyElem{T}; check::Bool=true) where T <: RingElement
+function divexact(f::PolyRingElem{T}, g::PolyRingElem{T}; check::Bool=true) where T <: RingElement
    check_parent(f, g)
    iszero(g) && throw(DivideError())
    if iszero(f)
@@ -1420,7 +1420,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::PolyElem{T}, b::T; check::Bool=true) where {T <: RingElem}
+function divexact(a::PolyRingElem{T}, b::T; check::Bool=true) where {T <: RingElem}
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -1431,7 +1431,7 @@ function divexact(a::PolyElem{T}, b::T; check::Bool=true) where {T <: RingElem}
    return z
 end
 
-function divexact(a::PolyElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(a::PolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -1448,7 +1448,7 @@ end
 #
 ###############################################################################
 
-function mod(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+function mod(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
    check_parent(f, g)
    if length(g) == 0
       throw(DivideError())
@@ -1472,11 +1472,11 @@ function mod(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
    return f
 end
 
-function rem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+function rem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
   return mod(f, g)
 end
 
-function Base.divrem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+function Base.divrem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
    check_parent(f, g)
    if length(g) == 0
       throw(DivideError())
@@ -1506,7 +1506,7 @@ function Base.divrem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
    return q, f
 end
 
-function Base.div(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+function Base.div(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
    q, r = divrem(f, g)
    return q
 end
@@ -1517,7 +1517,7 @@ end
 #
 ##############################################################################
 
-function Base.div(f::PolyElem{T}, g::T) where T <: Union{FieldElem, ResElem, AbstractFloat, Rational}
+function Base.div(f::PolyRingElem{T}, g::T) where T <: Union{FieldElem, ResElem, AbstractFloat, Rational}
    return div(f, parent(f)(g))
 end
 
@@ -1528,12 +1528,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    pseudorem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+    pseudorem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
 
 Return the pseudoremainder of $f$ divided by $g$. If $g = 0$ we throw a
 `DivideError()`.
 """
-function pseudorem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+function pseudorem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
   check_parent(f, g)
   iszero(g) && throw(DivideError())
   if length(f) < length(g)
@@ -1550,12 +1550,12 @@ function pseudorem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    pseudodivrem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+    pseudodivrem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
 
 Return a tuple $(q, r)$ consisting of the pseudoquotient and pseudoremainder
 of $f$ divided by $g$. If $g = 0$ we throw a `DivideError()`.
 """
-function pseudodivrem(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+function pseudodivrem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
   check_parent(f, g)
   iszero(g) && throw(DivideError())
   if length(f) < length(g)
@@ -1591,7 +1591,7 @@ end
 
 #CF TODO: use squaring for fast large valuation
 
-function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
+function remove(z::PolyRingElem{T}, p::PolyRingElem{T}) where T <: RingElement
  check_parent(z, p)
  !is_exact_type(T) && error("remove requires an exact ring")
  iszero(z) && error("Not yet implemented")
@@ -1610,7 +1610,7 @@ function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: RingElement
  return v, q
 end
 
-function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: Union{ResElem, FieldElement}
+function remove(z::PolyRingElem{T}, p::PolyRingElem{T}) where T <: Union{ResElem, FieldElement}
  check_parent(z, p)
  !is_exact_type(T) && error("remove requires an exact ring")
  iszero(z) && error("Not yet implemented")
@@ -1629,7 +1629,7 @@ function remove(z::PolyElem{T}, p::PolyElem{T}) where T <: Union{ResElem, FieldE
  return v, q
 end
 
-function divides(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
+function divides(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
   check_parent(f, g)
   !is_exact_type(T) && error("divides requires an exact ring")
   if length(f) == 0
@@ -1666,7 +1666,7 @@ function divides(f::PolyElem{T}, g::PolyElem{T}) where T <: RingElement
   return iszero(f), q
 end
 
-function divides(z::PolyElem{T}, x::T) where T <: RingElement
+function divides(z::PolyRingElem{T}, x::T) where T <: RingElement
   parent(x) != base_ring(z) && error("Wrong parents in divides")
   q = parent(z)()
   fit!(q, length(z))
@@ -1688,7 +1688,7 @@ end
 #
 ################################################################################
 
-function sqrt_classical_char2(f::PolyElem{T}; check::Bool=true) where T <: RingElement
+function sqrt_classical_char2(f::PolyRingElem{T}; check::Bool=true) where T <: RingElement
    S = parent(f)
    R = base_ring(f)
    if check && iszero(f)
@@ -1719,7 +1719,7 @@ function sqrt_classical_char2(f::PolyElem{T}; check::Bool=true) where T <: RingE
    return true, q
 end
 
-function sqrt_classical(f::PolyElem{T}; check::Bool=true) where T <: RingElement
+function sqrt_classical(f::PolyRingElem{T}; check::Bool=true) where T <: RingElement
    S = parent(f)
    R = base_ring(f)
    if characteristic(R) == 2
@@ -1774,28 +1774,28 @@ function sqrt_classical(f::PolyElem{T}; check::Bool=true) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    Base.sqrt(f::PolyElem{T}; check::Bool=true) where T <: RingElement
+    Base.sqrt(f::PolyRingElem{T}; check::Bool=true) where T <: RingElement
 
 Return the square root of $f$. By default the function checks the input is
 square and raises an exception if not. If `check=false` this check is omitted.
 """
-function Base.sqrt(f::PolyElem{T}; check::Bool=true) where T <: RingElement
+function Base.sqrt(f::PolyRingElem{T}; check::Bool=true) where T <: RingElement
    flag, q = sqrt_classical(f; check=check)
    check && !flag && error("Not a square in sqrt")
    return q
 end
 
 @doc Markdown.doc"""
-    is_square(f::PolyElem{T}) where T <: RingElement
+    is_square(f::PolyRingElem{T}) where T <: RingElement
 
 Return `true` if $f$ is a perfect square.
 """
-function is_square(f::PolyElem{T}) where T <: RingElement
+function is_square(f::PolyRingElem{T}) where T <: RingElement
    flag, q = sqrt_classical(f)
    return flag
 end
 
-function is_square_with_sqrt(f::PolyElem{T}) where T <: RingElement
+function is_square_with_sqrt(f::PolyRingElem{T}) where T <: RingElement
    return sqrt_classical(f, check=true)
 end
 
@@ -1813,13 +1813,13 @@ function term_content(a::T) where T <: RingElement
    return a
 end
 
-function term_gcd(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+function term_gcd(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
    d = min(degree(a), degree(b))
    x = gen(parent(a))
    return term_gcd(coeff(a, degree(a)), coeff(b, degree(b)))*x^d
 end
 
-function term_content(a::PolyElem{T}) where T <: RingElement
+function term_content(a::PolyRingElem{T}) where T <: RingElement
    for i = 1:length(a)
       c = coeff(a, i - 1)
       if !iszero(c)
@@ -1837,7 +1837,7 @@ function term_content(a::PolyElem{T}) where T <: RingElement
    return parent(a)()
 end
 
-function gcd(a::PolyElem{T}, b::PolyElem{T}, ignore_content::Bool = false) where T <: RingElement
+function gcd(a::PolyRingElem{T}, b::PolyRingElem{T}, ignore_content::Bool = false) where T <: RingElement
    check_parent(a, b)
    if length(b) > length(a)
       (a, b) = (b, a)
@@ -1890,17 +1890,17 @@ function gcd(a::PolyElem{T}, b::PolyElem{T}, ignore_content::Bool = false) where
          !is_term_recursive(trailing_coefficient(b))
          if lead_monomial # lead term monomial, so content contains rest
             d = divexact(leading_coefficient(b),
-	                 term_content(leading_coefficient(b)))
+                         term_content(leading_coefficient(b)))
             b = divexact(b, d)
          elseif trail_monomial # trail term is monomial, so ditto
             d = divexact(trailing_coefficient(b),
-			 term_content(trailing_coefficient(b)))
+                         term_content(trailing_coefficient(b)))
             b = divexact(b, d)
          else
             glead = gcd(lead_a, lead_b)
             if is_term_recursive(glead)
                d = divexact(leading_coefficient(b),
-			     term_content(leading_coefficient(b)))
+                            term_content(leading_coefficient(b)))
                b = divexact(b, d)
             else # last ditched attempt to find easy content
                h = gcd(leading_coefficient(b), glead)
@@ -1918,31 +1918,59 @@ function gcd(a::PolyElem{T}, b::PolyElem{T}, ignore_content::Bool = false) where
    return divexact(b, canonical_unit(leading_coefficient(b)))
 end
 
-function gcd(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+# can throw NotInvertibleError
+function gcd_basecase(a::PolyRingElem{T}, b::PolyRingElem{T}) where T
+   while !iszero(b)
+      a, b = b, mod(a, b)
+   end
+   return iszero(a) ? zero(parent(a)) : divexact(a, leading_coefficient(a))
+end
+
+# can throw NotInvertibleError
+function gcd_hgcd(a::PolyRingElem{T}, b::PolyRingElem{T}) where T
+   while !iszero(b)
+      a, b = b, mod(a, b)
+      if iszero(b) || hgcd_prefers_basecase(a, b)
+         break
+      else
+         a, b, _, _, _, _, _ = hgcd_recursive(a, b, false)
+      end
+   end
+   return gcd_basecase(a, b)
+end
+
+# can throw NotInvertibleError for T <: ResElem
+#
+# To get a good gcd for ZZModPolyRingElem/zzModPolyRingElem that can throw NotInvertibleError:
+#  1. Ensure that flint is only used for polynomial addition and multiplication
+#     and is never used for mod or divrem or divexact. Or, if using flint for
+#     division, check the invertibility of the leading coefficient first.
+#  2. tune .._prefers_..
+#
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
+function gcd(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: Union{ResElem, FieldElement}
    check_parent(a, b)
-   if length(a) > length(b)
+   if length(a) < length(b)
       (a, b) = (b, a)
    end
    if iszero(b)
       if iszero(a)
-         return(a)
+         return a
       else
-         d = leading_coefficient(a)
-         return divexact(a, d)
+         return divexact(a, leading_coefficient(a))
       end
    end
-   g = gcd(content(a), content(b))
-   a = divexact(a, g)
-   b = divexact(b, g)
-   while !iszero(a)
-      (a, b) = (mod(b, a), a)
+   if T <: ResElem
+      # since we return a monic gcd, this step is not strictly necessary
+      a = divexact(a, content(a))
+      b = divexact(b, content(b))
    end
-   b = g*b
-   d = leading_coefficient(b)
-   return divexact(b, d)
+   return gcd_hgcd(a, b)
 end
 
-function lcm(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+function lcm(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
    check_parent(a, b)
    g = gcd(a, b)
    iszero(g) && return g
@@ -1950,12 +1978,12 @@ function lcm(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    content(a::PolyElem)
+    content(a::PolyRingElem)
 
 Return the content of $a$, i.e. the greatest common divisor of its
 coefficients.
 """
-function content(a::PolyElem)
+function content(a::PolyRingElem)
    z = base_ring(a)() # normalise first coefficient
    for i = 1:length(a)
       z = gcd(z, coeff(a, i - 1))
@@ -1964,11 +1992,11 @@ function content(a::PolyElem)
 end
 
 @doc Markdown.doc"""
-    primpart(a::PolyElem)
+    primpart(a::PolyRingElem)
 
 Return the primitive part of $a$, i.e. the polynomial divided by its content.
 """
-function primpart(a::PolyElem)
+function primpart(a::PolyRingElem)
    d = content(a)
    if iszero(d)
       return zero(parent(a))
@@ -1979,16 +2007,193 @@ end
 
 ###############################################################################
 #
+#   Half GCD
+#
+###############################################################################
+
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
+function hgcd_prefers_basecase(a, b)
+   return true
+end
+
+function mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)
+   return true
+end
+
+function mat22_mul(a11, a12, a21, a22, b11, b12, b21, b22)
+   if mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)
+      return a11*b11 + a12*b21, a11*b12 + a12*b22,
+             a21*b11 + a22*b21, a21*b12 + a22*b22
+   else
+      R = parent(a11)
+      T0 = R()
+      T1 = R()
+      C0 = R()
+      C1 = R()
+      C2 = R()
+      C3 = R()
+      T0 = sub!(T0, a11, a21)
+      T1 = sub!(T1, b22, b12)
+      C2 = mul!(C2, T0, T1)
+      T0 = add!(T0, a21, a22)
+      T1 = sub!(T1, b12, b11)
+      C3 = mul!(C3, T0, T1)
+      T0 = sub!(T0, T0, a11)
+      T1 = sub!(T1, b22, T1)
+      C1 = mul!(C1, T0, T1)
+      T0 = sub!(T0, a12, T0)
+      C0 = mul!(C0, T0, b22)
+      T0 = mul!(T0, a11, b11)
+      C1 = add!(C1, T0, C1)
+      C2 = add!(C2, C1, C2)
+      C1 = add!(C1, C1, C3)
+      C3 = add!(C3, C2, C3)
+      C1 = add!(C1, C1, C0)
+      T1 = sub!(T1, T1, b21)
+      C0 = mul!(C0, a22, T1)
+      C2 = sub!(C2, C2, C0)
+      C0 = mul!(C0, a12, b21)
+      C0 = add!(C0, C0, T0)
+      return C0, C1, C2, C3
+   end
+end
+
+
+# iterative basecase
+# may throw NotInvertibleError
+function hgcd_basecase(a::PolyRingElem{T}, b::PolyRingElem{T}) where T
+   @assert length(a) > length(b)
+   R = parent(a)
+   s = 1
+   A = a; B = b
+   m11 = one(R);  m12 = zero(R)
+   m21 = zero(R); m22 = one(R)
+   n = cld(degree(a), 2)
+   while n <= degree(B)
+      q, r = divrem(A, B)
+      @assert length(r) < length(B)
+      s = -s
+      A, B = B, r
+      m11, m12 = m11*q + m12, m11
+      m21, m22 = m21*q + m22, m21
+   end
+   return A, B, m11, m12, m21, m22, s
+end
+
+# Klaus Thull and Chee K. Yap
+# "A Unified Approach to HGCD Algorithms for polynomials and integers"
+# may throw NotInvertibleError
+function hgcd_recursive(
+   a::PolyRingElem{T},
+   b::PolyRingElem{T},
+   want_matrix::Bool = true
+) where T
+
+   @assert length(a) > length(b)
+   R = parent(a)
+
+   if degree(a) < 5 || hgcd_prefers_basecase(a, b)
+      return hgcd_basecase(a, b)
+   end
+
+   m = cld(degree(a), 2)
+   mp = degree(a) - m
+   if degree(b) < m
+      return (a, b, one(R), zero(R), zero(R), one(R), 1)
+   end
+
+   a0 = shift_right(a, m)
+   b0 = shift_right(b, m)
+
+   A0, B0, R11, R12, R21, R22, Rs = hgcd_recursive(a0, b0)
+
+   # the calculation of (ap,bp) = R^-1(A,B) can be optimized using A0 and B0
+   #     ap = (R22*a - R12*b)*Rs
+   #     bp = (-R21*a + R11*b)*Rs
+   ar = truncate(a, m)    # a = a0*x^m + ar
+   br = truncate(b, m)    # b = b0*x^m + br
+   ap = shift_left(A0, m) + (R22*ar - R12*br)*Rs
+   bp = shift_left(B0, m) + (R11*br - R21*ar)*Rs
+
+   if degree(bp) < m
+      return (ap, bp, R11, R12, R21, R22, Rs)
+   end
+
+   q, r = divrem(ap, bp)
+   @assert length(r) < length(bp)
+   c = bp
+   d = r
+
+   l = degree(c)
+   k = 2*m - l
+   @assert l - m < cld(mp, 2)
+
+   c0 = shift_right(c, k)
+   d0 = shift_right(d, k)
+   @assert degree(c0) == 2*(l - m)
+   C0, D0, S11, S12, S21, S22, Ss = hgcd_recursive(c0, d0)
+
+   # (A,B) = Q^-1(a,b) = S^-1(c,d) can be optimized as well
+   #     A = (Q22*a - Q12*b)*Qs
+   #     B = (-Q21*a + Q11*b)*Qs
+   cr = truncate(c, k)    # c = c0*x^k + cr
+   dr = truncate(d, k)    # d = d0*x^k + dr
+   A = shift_left(C0, k) + (S22*cr - S12*dr)*Ss
+   B = shift_left(D0, k) + (S11*dr - S21*cr)*Ss
+
+   Qs = -Rs*Ss
+   if want_matrix
+      (Q11, Q12, Q21, Q22) = mat22_mul(R11*q + R12, R11, R21*q + R22, R21,
+                                       S11, S12, S21, S22)
+   else
+      Q11 = Q12 = Q21 = Q22 = R()
+   end
+
+   return A, B, Q11, Q12, Q21, Q22, Qs
+end
+
+@doc Markdown.doc"""
+    hgcd(a::PolyRingElem{T}, b::PolyRingElem{T}) where T
+
+Returns the half-GCD of `a` and `b`, that is, a tuple
+`(A, B, m11, m12, m21, m22, s::Int)` such that
+   1. m11*m22 - m12*m21 = s = +-1
+   2. m11*A + m12*B = a
+   3. m21*A + m22*B = b
+   4. `A` and `B` are consecutive remainders in the sequence for
+      division of `a` by `b` satisfying `deg(A) >= cld(deg(a), 2) > deg(B)
+   5. `[m11 m12; m21 m22]` is the product of `[q 1; 1 0]` for the quotients `q`
+      generated by such a remainder sequence.
+
+Assumes that the input satsifies `degree(a) > degree(b) >= 0`.
+
+Cutoffs are currently dictated by the non-exported functions
+`hgcd_prefers_basecase(a, b)`
+`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
+
+If the base ring of the polynomial ring is not a field, this function may throw
+a NotInvertibleError. Otherwise, the output should be valid.
+"""
+function hgcd(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
+   check_parent(a, b)
+   @assert degree(a) > degree(b) >= 0
+   return hgcd_recursive(a, b, true)
+end
+
+###############################################################################
+#
 #   Evaluation/composition
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    evaluate(a::PolyElem, b::T) where T <: RingElement
+    evaluate(a::PolyRingElem, b::T) where T <: RingElement
 
 Evaluate the polynomial expression $a$ at the value $b$ and return the result.
 """
-function evaluate(a::PolyElem, b::T) where T <: RingElement
+function evaluate(a::PolyRingElem, b::T) where T <: RingElement
    i = length(a)
    R = base_ring(a)
    S = parent(b)
@@ -2008,12 +2213,12 @@ function evaluate(a::PolyElem, b::T) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    compose(a::PolyElem, b::PolyElem)
+    compose(a::PolyRingElem, b::PolyRingElem)
 
 Compose the polynomial $a$ with the polynomial $b$ and return the result,
 i.e. return $a\circ b$.
 """
-function compose(a::PolyElem, b::PolyElem)
+function compose(a::PolyRingElem, b::PolyRingElem)
    i = length(a)
    R = base_ring(a)
    S = parent(b)
@@ -2063,11 +2268,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    integral(x::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+    integral(x::PolyRingElem{T}) where {T <: Union{ResElem, FieldElement}}
 
 Return the integral of the polynomial $x$.
 """
-function integral(x::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+function integral(x::PolyRingElem{T}) where {T <: Union{ResElem, FieldElement}}
    len = length(x)
    p = parent(x)()
    fit!(p, len + 1)
@@ -2092,7 +2297,7 @@ end
 # Dichotomous Lazard, computes Se0 from Sd0 and Sd1. See the paper,
 # "Optimizations of the subresultant algorithm" by Lionel Ducos, J. Pure and
 # Appl. Algebra 2000.
-function subresultant_lazard(Sd0::PolyElem{T}, Sd1::PolyElem{T}) where T <: RingElement
+function subresultant_lazard(Sd0::PolyRingElem{T}, Sd1::PolyRingElem{T}) where T <: RingElement
    n = length(Sd0) - length(Sd1) - 1
    if n == 0
       return Sd1
@@ -2115,7 +2320,7 @@ end
 
 # Ducos optimised calculation of Se1. See the paper, "Optimizations of the
 # subresultant algorithm" by Lionel Ducos, J. Pure and Appl. Algebra 2000.
-function subresultant_ducos(A::PolyElem{T}, Sd1::PolyElem{T}, Se0::PolyElem{T}, sd::T) where T <: RingElement
+function subresultant_ducos(A::PolyRingElem{T}, Sd1::PolyRingElem{T}, Se0::PolyRingElem{T}, sd::T) where T <: RingElement
    d1 = length(A)
    e1 = length(Sd1)
    cd1 = leading_coefficient(Sd1)
@@ -2143,11 +2348,11 @@ function subresultant_ducos(A::PolyElem{T}, Sd1::PolyElem{T}, Se0::PolyElem{T}, 
 end
 
 @doc Markdown.doc"""
-    resultant_ducos(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElement
+    resultant_ducos(p::PolyRingElem{T}, q::PolyRingElem{T}) where T <: RingElement
 
 Return the resultant of the $p$ and $q$.
 """
-function resultant_ducos(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElement
+function resultant_ducos(p::PolyRingElem{T}, q::PolyRingElem{T}) where T <: RingElement
    # See the paper, "Optimizations of the subresultant algorithm" by Lionel
    # Ducos, J. Pure and Appl. Algebra 2000.
    check_parent(p, q)
@@ -2205,7 +2410,7 @@ end
 # details can be found in, "Optimizations of the subresultant algorithm" by
 # Lionel Ducos, J. Pure and Appl. Algebra 2000. Note, the resultant is
 # the constant coefficient of S_0 (aka S_00 in other sources)
-function resultant_subresultant(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElement
+function resultant_subresultant(p::PolyRingElem{T}, q::PolyRingElem{T}) where T <: RingElement
    check_parent(p, q)
    if length(p) == 0 || length(q) == 0
       return zero(base_ring(p))
@@ -2249,7 +2454,7 @@ function resultant_subresultant(p::PolyElem{T}, q::PolyElem{T}) where T <: RingE
    end
 end
 
-function resultant_lehmer(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+function resultant_lehmer(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: Union{ResElem, FieldElement}}
    local crossover = 40
    R = base_ring(a)
    check_parent(a, b)
@@ -2326,11 +2531,11 @@ function resultant_lehmer(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResE
 end
 
 @doc Markdown.doc"""
-    sylvester_matrix(p::PolyElem, q::PolyElem)
+    sylvester_matrix(p::PolyRingElem, q::PolyRingElem)
 
 Return the sylvester matrix of the given polynomials.
 """
-function sylvester_matrix(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElement
+function sylvester_matrix(p::PolyRingElem{T}, q::PolyRingElem{T}) where T <: RingElement
    check_parent(p, q)
    R = base_ring(p)
    if length(p) == 0 || length(q) == 0
@@ -2352,7 +2557,7 @@ function sylvester_matrix(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElement
    return M
 end
 
-function resultant_sylvester(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElement
+function resultant_sylvester(p::PolyRingElem{T}, q::PolyRingElem{T}) where T <: RingElement
    check_parent(p, q)
    R = base_ring(p)
    if length(p) == 0 || length(q) == 0
@@ -2362,11 +2567,11 @@ function resultant_sylvester(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElem
 end
 
 @doc Markdown.doc"""
-    resultant(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElement
+    resultant(p::PolyRingElem{T}, q::PolyRingElem{T}) where T <: RingElement
 
 Return the resultant of the given polynomials.
 """
-function resultant(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElement
+function resultant(p::PolyRingElem{T}, q::PolyRingElem{T}) where T <: RingElement
   R = parent(p)
   if !is_exact_type(T)
      return resultant_sylvester(p, q)
@@ -2378,7 +2583,7 @@ function resultant(p::PolyElem{T}, q::PolyElem{T}) where T <: RingElement
   end
 end
 
-function resultant_euclidean(a::PolyElem{T}, b::PolyElem{T}) where T <: Union{ResElem, FieldElement}
+function resultant_euclidean(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: Union{ResElem, FieldElement}
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
       return zero(base_ring(a))
@@ -2419,7 +2624,7 @@ function resultant_euclidean(a::PolyElem{T}, b::PolyElem{T}) where T <: Union{Re
    return c1^(lb - 1)*c2^(la - 1)*s*sgn
 end
 
-function resultant(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+function resultant(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: Union{ResElem, FieldElement}}
    try
       return resultant_euclidean(a, b)
    catch
@@ -2434,11 +2639,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    discriminant(a::PolyElem)
+    discriminant(a::PolyRingElem)
 
 Return the discriminant of the given polynomial.
 """
-function discriminant(a::PolyElem)
+function discriminant(a::PolyRingElem)
    d = derivative(a)
    z = resultant(a, d)
    if length(a) - length(d) == 1
@@ -2457,12 +2662,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    resx(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+    resx(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
 
 Return a tuple $(r, s, t)$ such that $r$ is the resultant of $a$ and $b$ and
 such that $r = a\times s + b\times t$.
 """
-function resx(a::PolyElem{T}, b::PolyElem{T}) where T <: RingElement
+function resx(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
    check_parent(a, b)
    sgn = 1
    swap = false
@@ -2543,21 +2748,9 @@ end
 #
 ###############################################################################
 
-function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
-   check_parent(a, b)
-   !is_exact_type(T) && error("gcdx requires exact Bezout domain")
-   if length(a) == 0
-      if length(b) == 0
-         return zero(parent(a)), zero(parent(a)), zero(parent(a))
-      else
-         d = leading_coefficient(b)
-         return divexact(b, d), zero(parent(a)), divexact(one(parent(a)), d)
-      end
-   end
-   if length(b) == 0
-      d = leading_coefficient(a)
-      return divexact(a, d), divexact(one(parent(a)), d), zero(parent(a))
-   end
+function gcdx_basecase(a::PolyRingElem{T}, b::PolyRingElem{T}) where T
+   @assert length(a) > 0
+   @assert length(b) > 0
    swap = false
    if length(a) < length(b)
       a, b = b, a
@@ -2583,26 +2776,42 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldEl
    return divexact(A, d), divexact(u1, d), divexact(v1, d)
 end
 
-function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
+function gcdx(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
-   R = base_ring(a)
+   R = parent(a)
+   !is_exact_type(T) && error("gcdx requires exact Bezout domain")
    if length(a) == 0
       if length(b) == 0
-         return zero(parent(a)), zero(parent(a))
+         return zero(R), zero(R), zero(R)
       else
          d = leading_coefficient(b)
-         return divexact(b, d), zero(parent(a))
+         return divexact(b, d), zero(R), divexact(one(R), d)
       end
    end
    if length(b) == 0
       d = leading_coefficient(a)
-      return divexact(a, d), parent(a)(inv(d))
+      return divexact(a, d), divexact(one(R), d), zero(R)
    end
+   if hgcd_prefers_basecase(a, b)
+      return gcdx_basecase(a, b)
+   else
+      g, s = gcdinv_hgcd(a, b)
+      return g, s, divexact(g - s*a, b)
+   end
+end
+
+function gcdinv_basecase(a::PolyRingElem{T}, b::PolyRingElem{T}) where T
+   @assert length(a) > 0
+   @assert length(b) > 0
+   R = parent(a)
    if length(a) < length(b)
       a, b = b, a
-      u1, u2 = zero(parent(a)), one(parent(a))
+      u1, u2 = zero(R), one(R)
    else
-      u1, u2 = one(parent(a)), zero(parent(a))
+      u1, u2 = one(R), zero(R)
    end
    lena = length(a)
    lenb = length(b)
@@ -2624,13 +2833,68 @@ function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, Field
    return divexact(A, d), divexact(u1, d)
 end
 
+function gcdinv_hgcd(a::PolyRingElem{T}, b::PolyRingElem{T}) where T
+   @assert length(a) > 0
+   @assert length(b) > 0
+   R = parent(a)
+   m21, m22 = zero(R), one(R)
+   ms = 1
+   if length(a) < length(b)
+      a, b = b, a
+      m21, m22 = m22, m21
+      ms = -ms
+   end
+   while !iszero(b)
+      q, r = divrem(a, b)
+      a, b = b, r
+      m21, m22 = m21*q + m22, m21
+      ms = -ms
+      if iszero(b)
+         break
+      elseif !hgcd_prefers_basecase(a, b)
+         a, b, n11, n12, n21, n22, ns = hgcd_recursive(a, b, true)
+         m21, m22 = m21*n11 + m22*n21, m21*n12 + m22*n22
+         ms *= ns
+      end
+   end
+   l = leading_coefficient(a)
+   g = divexact(a, l)
+   s = divexact(m22, ms*l)
+   return g, s
+end
+
+#Cutoffs are currently dictated by the non-exported functions
+#`hgcd_prefers_basecase(a, b)`
+#`mat22_mul_prefers_classical(a11, a12, a21, a22, b11, b12, b21, b22)`
+function gcdinv(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: Union{ResElem, FieldElement}
+   check_parent(a, b)
+   R = parent(a)
+   if length(a) == 0
+      if length(b) == 0
+         return zero(R), zero(R)
+      else
+         d = leading_coefficient(b)
+         return divexact(b, d), zero(R)
+      end
+   end
+   if length(b) == 0
+      d = leading_coefficient(a)
+      return divexact(a, d), R(inv(d))
+   end
+   if hgcd_prefers_basecase(a, b)
+      return gcdinv_basecase(a, b)
+   else
+      return gcdinv_hgcd(a, b)
+   end
+end
+
 ################################################################################
 #
 #  Power sums
 #
 ################################################################################
 
-function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: FieldElement
+function polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T <: FieldElement
     degree(f) < 1 && error("Polynomial has no roots")
     !is_monic(f) && error("Requires monic polynomial")
     iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
@@ -2649,14 +2913,14 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: F
 end
 
 @doc Markdown.doc"""
-    polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement -> Vector{T}
+    polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T <: RingElement -> Vector{T}
 
 Uses Newton (or Newton-Girard) formulas to compute the first $n$
 sums of powers of the roots of $f$ from the coefficients of $f$, starting
 with the sum of (first powers of) the roots. The input polynomial must be
 monic, at least degree $1$ and have nonzero constant coefficient.
 """
-function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: RingElement
+function polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T <: RingElement
     # plain vanilla recursion
     degree(f) < 1 && error("Polynomial has no roots")
     !is_monic(f) && error("Requires monic polynomial")
@@ -2678,7 +2942,7 @@ function polynomial_to_power_sums(f::PolyElem{T}, n::Int=degree(f)) where T <: R
     push!(P, E[1 + 1])
     for k = 2:n
         push!(P, (-1)^(k - 1)*k*E[k + 1] +
-		 sum((-1)^(k - 1 + i)*E[k - i + 1]*P[i] for i = 1:k - 1))
+              sum((-1)^(k - 1 + i)*E[k - i + 1]*P[i] for i = 1:k - 1))
     end
     return P
 end
@@ -2686,7 +2950,7 @@ end
 @doc Markdown.doc"""
     power_sums_to_polynomial(P::Vector{T};
                      parent::AbstractAlgebra.PolyRing{T}=
-   AbstractAlgebra.PolyRing(parent(P[1])) where T <: RingElement -> PolyElem{T}
+   AbstractAlgebra.PolyRing(parent(P[1])) where T <: RingElement -> PolyRingElem{T}
 
 Uses the Newton (or Newton-Girard) identities to obtain the polynomial
 with given sums of powers of roots. The list must be nonempty and contain
@@ -2695,7 +2959,7 @@ must start with the sum of first powers of the roots.
 """
 function power_sums_to_polynomial(P::Vector{T}; 
                            parent::AbstractAlgebra.PolyRing{T}=
-	         AbstractAlgebra.PolyRing(parent(P[1]))) where T <: RingElement
+             AbstractAlgebra.PolyRing(parent(P[1]))) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
 
@@ -2828,7 +3092,6 @@ function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingEle
    end
    newton_to_monomial!(P, x)
    r = S(P)
-   r = set_length!(r, normalise(r, n))
    return r
 end
 
@@ -2857,7 +3120,6 @@ function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where {T <: ResEle
    end
    newton_to_monomial!(P, x)
    r = S(P)
-   r = set_length!(r, normalise(r, n))
    return r
 end
 
@@ -2868,12 +3130,12 @@ end
 ################################################################################
 
 function _change_poly_ring(R, Rx, cached)
-   P, _ = PolynomialRing(R, string(var(Rx)), cached = cached)
+   P, _ = polynomial_ring(R, string(var(Rx)), cached = cached)
    return P
 end
 
 @doc Markdown.doc"""
-    change_base_ring(R::Ring, p::PolyElem{<: RingElement}; parent::PolyRing)
+    change_base_ring(R::Ring, p::PolyRingElem{<: RingElement}; parent::PolyRing)
 
 Return the polynomial obtained by coercing the non-zero coefficients of `p`
 into `R`.
@@ -2882,12 +3144,12 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function change_base_ring(R::Ring, p::PolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement
+function change_base_ring(R::Ring, p::PolyRingElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement
    return _map(R, p, parent)
 end
 
 @doc Markdown.doc"""
-    change_coefficient_ring(R::Ring, p::PolyElem{<: RingElement}; parent::PolyRing)
+    change_coefficient_ring(R::Ring, p::PolyRingElem{<: RingElement}; parent::PolyRing)
 
 Return the polynomial obtained by coercing the non-zero coefficients of `p`
 into `R`.
@@ -2896,7 +3158,7 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function change_coefficient_ring(R::Ring, p::PolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement
+function change_coefficient_ring(R::Ring, p::PolyRingElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement
   return change_base_ring(R, p; cached = cached, parent = parent)
 end
 
@@ -2906,12 +3168,12 @@ end
 #
 ################################################################################
 
-_make_parent(g, p::PolyElem, cached::Bool) =
+_make_parent(g, p::PolyRingElem, cached::Bool) =
    _change_poly_ring(parent(g(zero(base_ring(p)))),
                      parent(p), cached)
 
 @doc Markdown.doc"""
-    map_coefficients(f, p::PolyElem{<: RingElement}; cached::Bool=true, parent::PolyRing)
+    map_coefficients(f, p::PolyRingElem{<: RingElement}; cached::Bool=true, parent::PolyRing)
 
 Transform the polynomial `p` by applying `f` on each non-zero coefficient.
 
@@ -2919,13 +3181,13 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function map_coefficients(g, p::PolyElem{<:RingElement};
+function map_coefficients(g, p::PolyRingElem{<:RingElement};
                     cached::Bool = true,
                     parent::PolyRing = _make_parent(g, p, cached))
    return _map(g, p, parent)
 end
 
-function _map(g, p::PolyElem, Rx)
+function _map(g, p::PolyRingElem, Rx)
    R = base_ring(Rx)
    new_coefficients = elem_type(R)[let c = coeff(p, i)
                                      iszero(c) ? zero(R) : R(g(c))
@@ -2939,7 +3201,7 @@ end
 #
 ###############################################################################
 
-function chebyshev_t_pair(n::Int, x::PolyElem)
+function chebyshev_t_pair(n::Int, x::PolyRingElem)
    if n == 0
       return one(parent(x)), x
    elseif n == 1
@@ -2957,12 +3219,12 @@ function chebyshev_t_pair(n::Int, x::PolyElem)
 end
 
 @doc Markdown.doc"""
-    chebyshev_t(n::Int, x::PolyElem)
+    chebyshev_t(n::Int, x::PolyRingElem)
 
 Return the Chebyshev polynomial of the first kind $T_n(x)$, defined by
 $T_n(x) = \cos(n \cos^{-1}(x))$.
 """
-function chebyshev_t(n::Int, x::PolyElem)
+function chebyshev_t(n::Int, x::PolyRingElem)
    if n == 0
       return one(parent(x))
    elseif n == 1
@@ -2978,7 +3240,7 @@ function chebyshev_t(n::Int, x::PolyElem)
    end
 end
 
-function chebyshev_u_pair(n::Int, x::PolyElem)
+function chebyshev_u_pair(n::Int, x::PolyRingElem)
    if n == 0
       return one(parent(x)), zero(parent(x))
    elseif n == 1
@@ -2998,12 +3260,12 @@ function chebyshev_u_pair(n::Int, x::PolyElem)
 end
 
 @doc Markdown.doc"""
-    chebyshev_u(n::Int, x::PolyElem)
+    chebyshev_u(n::Int, x::PolyRingElem)
 
 Return the Chebyshev polynomial of the first kind $U_n(x)$, defined by
 $(n+1) U_n(x) = T'_{n+1}(x)$.
 """
-function chebyshev_u(n::Int, x::PolyElem)
+function chebyshev_u(n::Int, x::PolyRingElem)
    if n == 0
       return one(parent(x))
    elseif n == 1
@@ -3027,7 +3289,7 @@ end
 #
 ###############################################################################
 
-function addmul!(z::PolyElem{T}, x::PolyElem{T}, y::PolyElem{T}, c::PolyElem{T}) where T <: RingElement
+function addmul!(z::PolyRingElem{T}, x::PolyRingElem{T}, y::PolyRingElem{T}, c::PolyRingElem{T}) where T <: RingElement
    c = mul!(c, x, y)
    z = addeq!(z, c)
    return z
@@ -3065,23 +3327,16 @@ end
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{<:RingElement,<:PolyRing,UnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
    R = base_ring(S)
-   f = S()
-   x = gen(S)
-   # degree -1 is zero polynomial
-   deg = rand(rng, deg_range)
-   if deg == -1
-      return f
+   len = 1 + rand(rng, deg_range)
+   if len <= 0
+      return zero(S)
    end
-   for i = 0:deg - 1
-      f += rand(rng, v)*x^i
-   end
+   c = elem_type(R)[rand(rng, v) for i in 1:len]
    # ensure leading coefficient is nonzero
-   c = R()
-   while iszero(c)
-      c = rand(rng, v)
+   while iszero(c[len])
+      c[len] = rand(rng, v)
    end
-   f += c*x^deg
-   return f
+   return S(c)
 end
 
 # define rand for make(S, deg, v)
@@ -3121,12 +3376,12 @@ rand(S::PolyRing, degs, v...) = rand(Random.GLOBAL_RNG, S, degs, v...)
 ###############################################################################
 
 @doc Markdown.doc"""
-    subst(f::PolyElem{T}, a::Any) where T <: RingElement
+    subst(f::PolyRingElem{T}, a::Any) where T <: RingElement
 
 Evaluate the polynomial $f$ at $a$. Note that $a$ can be anything, whether
 a ring element or not.
 """
-function subst(f::PolyElem{T}, a::U) where {T <: RingElement, U}
+function subst(f::PolyRingElem{T}, a::U) where {T <: RingElement, U}
    S = parent(a)
    n = degree(f)
    R = base_ring(f)
@@ -3175,12 +3430,12 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    PolynomialRing(R::Ring, s::Union{String, Char, Symbol}; cached::Bool = true)
+    polynomial_ring(R::Ring, s::Union{String, Char, Symbol}; cached::Bool = true)
 
 Given a base ring `R` and string `s` specifying how the generator (variable)
 should be printed, return a tuple `S, x` representing the new polynomial
@@ -3189,18 +3444,18 @@ object `S` will depend only on `R` and `x` and will be cached. Setting the
 optional argument `cached` to `false` will prevent the parent object `S` from
 being cached.
 """
-PolynomialRing(R::Ring, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
+polynomial_ring(R::Ring, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
 
-function PolynomialRing(R::Ring, s::Symbol; cached::Bool = true)
-   return Generic.PolynomialRing(R, s; cached=cached)
+function polynomial_ring(R::Ring, s::Symbol; cached::Bool = true)
+   return Generic.polynomial_ring(R, s; cached=cached)
 end
 
-function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
-   return PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::Ring, s::AbstractString; cached::Bool = true)
+   return polynomial_ring(R, Symbol(s); cached=cached)
 end
 
-function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
-   return PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::Ring, s::Char; cached::Bool = true)
+   return polynomial_ring(R, Symbol(s); cached=cached)
 end
 
 function PolyRing(R::Ring)

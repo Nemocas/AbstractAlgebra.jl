@@ -7,7 +7,7 @@ end
 
 # Permutations and Symmetric groups
 
-AbstractAlgebra.jl provides rudimentary native support for permutation groups (implemented in `src/generic/PermGroups.jl`). All functionality of permutations is accesible in the `Generic` submodule.
+AbstractAlgebra.jl provides rudimentary native support for permutation groups (implemented in `src/generic/PermGroups.jl`). All functionality of permutations is accessible in the `Generic` submodule.
 
 Permutations are represented internally via vector of integers, wrapped in type `Perm{T}`, where `T<:Integer` carries the information on the type of elements of a permutation. Symmetric groups are singleton parent objects of type `SymmetricGroup{T}` and are used mostly to store the length of a permutation, since it is not included in the permutation type.
 
@@ -16,7 +16,7 @@ Symmetric groups are created using the `SymmetricGroup` (inner) constructor.
 Both `SymmetricGroup` and `Perm` and can be parametrized by any type `T<:Integer` .
 By default the parameter is the `Int`-type native to the systems architecture.
 However, if you are sure that your permutations are small enough to fit into smaller integer type (such as `Int32`, `UInt16`, or even `Int8`), you may choose to change the parametrizing type accordingly.
-In practice this may result in decreased memory footprint (when storing multiple permutations) and noticable faster performance, if your workload is heavy in operations on permutations, which e.g. does not fit into cache of your cpu.
+In practice this may result in decreased memory footprint (when storing multiple permutations) and noticeable faster performance, if your workload is heavy in operations on permutations, which e.g. does not fit into cache of your cpu.
 
 All the permutation group types belong to the `Group` abstract type and the corresponding permutation element types belong to the `GroupElem` abstract type.
 

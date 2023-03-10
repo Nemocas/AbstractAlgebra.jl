@@ -528,7 +528,7 @@ end
 @doc Markdown.doc"""
     Base.inv(g::Perm)
 
-Return the inverse of the given permutation, i.e. the permuation $g^{-1}$
+Return the inverse of the given permutation, i.e. the permutation $g^{-1}$
 such that $g ∘ g^{-1} = g^{-1} ∘ g$ is the identity permutation.
 """
 function Base.inv(g::Perm)
@@ -589,7 +589,7 @@ Return an unsafe iterator over all permutations in `G`. Only one permutation
 is allocated and then modified in-place using the non-recursive
 [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
 
-Note: you need to explicitely copy permutations intended to be stored or
+Note: you need to explicitly copy permutations intended to be stored or
 modified.
 
 # Examples:

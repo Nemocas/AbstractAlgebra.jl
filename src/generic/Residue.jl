@@ -10,9 +10,9 @@
 #
 ###############################################################################
 
-parent_type(::Type{Res{T}}) where T <: RingElement = ResRing{T}
+parent_type(::Type{ResidueRingElem{T}}) where T <: RingElement = ResidueRing{T}
 
-elem_type(::Type{ResRing{T}}) where {T <: RingElement} = Res{T}
+elem_type(::Type{ResidueRing{T}}) where {T <: RingElement} = ResidueRingElem{T}
 
 ###############################################################################
 #
@@ -20,10 +20,10 @@ elem_type(::Type{ResRing{T}}) where {T <: RingElement} = Res{T}
 #
 ###############################################################################
 
-promote_rule(::Type{Res{T}}, ::Type{Res{T}}) where T <: RingElement = Res{T}
+promote_rule(::Type{ResidueRingElem{T}}, ::Type{ResidueRingElem{T}}) where T <: RingElement = ResidueRingElem{T}
 
-function promote_rule(::Type{Res{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? Res{T} : Union{}
+function promote_rule(::Type{ResidueRingElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? ResidueRingElem{T} : Union{}
 end
 
 ###############################################################################
@@ -32,30 +32,30 @@ end
 #
 ###############################################################################
 
-function (a::ResRing{T})(b::RingElement) where {T <: RingElement}
+function (a::ResidueRing{T})(b::RingElement) where {T <: RingElement}
    return a(base_ring(a)(b))
 end
 
-function (a::ResRing{T})() where {T <: RingElement}
-   z = Res{T}(zero(base_ring(a)))
+function (a::ResidueRing{T})() where {T <: RingElement}
+   z = ResidueRingElem{T}(zero(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::ResRing{T})(b::Integer) where {T <: RingElement}
-   z = Res{T}(mod(base_ring(a)(b), modulus(a)))
+function (a::ResidueRing{T})(b::Integer) where {T <: RingElement}
+   z = ResidueRingElem{T}(mod(base_ring(a)(b), modulus(a)))
    z.parent = a
    return z
 end
 
-function (a::ResRing{T})(b::T) where {T <: RingElem}
+function (a::ResidueRing{T})(b::T) where {T <: RingElem}
    base_ring(a) != parent(b) && error("Operation on incompatible objects")
-   z = Res{T}(mod(b, modulus(a)))
+   z = ResidueRingElem{T}(mod(b, modulus(a)))
    z.parent = a
    return z
 end
 
-function (a::ResRing{T})(b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
+function (a::ResidueRing{T})(b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    a != parent(b) && error("Operation on incompatible objects")
    return b
 end

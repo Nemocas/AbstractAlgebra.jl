@@ -32,8 +32,8 @@ end
    S1 = R["y"]
    S2 = ZZ["x"]["y"]
 
-   @test PolynomialRing(R, "y", cached = true)[1] === PolynomialRing(R, "y", cached = true)[1]
-   @test PolynomialRing(R, "y", cached = true)[1] !== PolynomialRing(R, "y", cached = false)[1]
+   @test polynomial_ring(R, "y", cached = true)[1] === polynomial_ring(R, "y", cached = true)[1]
+   @test polynomial_ring(R, "y", cached = true)[1] !== polynomial_ring(R, "y", cached = false)[1]
 
    for (S, y) in (S1, S2)
       @test base_ring(S) === R
@@ -46,53 +46,53 @@ end
       @test typeof(R) <: AbstractAlgebra.Ring
       @test typeof(S) <: Generic.PolyRing
 
-      @test isa(y, PolyElem)
+      @test isa(y, PolyRingElem)
    end
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
 
    @test typeof(S) <: Generic.PolyRing
 
-   @test isa(y, PolyElem)
+   @test isa(y, PolyRingElem)
 
-   T, z = PolynomialRing(S, "z")
+   T, z = polynomial_ring(S, "z")
 
    @test typeof(T) <: Generic.PolyRing
 
-   @test isa(z, PolyElem)
+   @test isa(z, PolyRingElem)
 
    f = x^2 + y^3 + z + 1
 
-   @test isa(f, PolyElem)
+   @test isa(f, PolyRingElem)
 
    g = S(2)
 
-   @test isa(g, PolyElem)
+   @test isa(g, PolyRingElem)
 
    h = S(x^2 + 2x + 1)
 
-   @test isa(h, PolyElem)
+   @test isa(h, PolyRingElem)
 
    j = T(x + 2)
 
-   @test isa(j, PolyElem)
+   @test isa(j, PolyRingElem)
 
    k = S([x, x + 2, x^2 + 3x + 1])
 
-   @test isa(k, PolyElem)
+   @test isa(k, PolyRingElem)
 
    l = S(k)
 
-   @test isa(l, PolyElem)
+   @test isa(l, PolyRingElem)
 
    m = S([1, 2, 3])
 
-   @test isa(m, PolyElem)
+   @test isa(m, PolyRingElem)
 
    n = S([ZZ(1), ZZ(2), ZZ(3)])
 
-   @test isa(n, PolyElem)
+   @test isa(n, PolyRingElem)
 
    @test x in [x, y]
    @test x in [y, x]
@@ -103,7 +103,7 @@ end
 end
 
 @testset "Generic.Poly.iterators" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    C = collect(coefficients(R()))
    @test C == []
@@ -118,21 +118,26 @@ end
    @test C == [R(2), R(), R(1)]
 end
 
+
+
 @testset "Generic.Poly.conformance" begin
-   # test_elem should already be defined on ZZ; polys are automatic from there
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
+   test_Poly_interface(R)
+   R, x = polynomial_ring(QQ, "x")
+   test_Poly_interface(R)
+   R, x = polynomial_ring(GF(5), "x")
    test_Poly_interface(R)
 end
 
 @testset "Generic.Poly.printing" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    @test string(zero(R)) == "0"
    @test string(one(R)) == "1"
    @test string(x) == "x"
    @test string(5*x^5-3*x^3+2*x^2-x+1) == "5*x^5 - 3*x^3 + 2*x^2 - x + 1"
 
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    @test string(zero(S)) == "0"
    @test string(one(S)) == "1"
@@ -141,7 +146,7 @@ end
 end
 
 @testset "Generic.Poly.rand" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    # TODO: test more than just the result type
    test_rand(R, -1:10, -10:10)
@@ -150,19 +155,19 @@ end
       test_rand(R, deg, -10:10)
    end
 
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    test_rand(S, -1:5, make(R, -1:10, make(ZZ, -10:10)))
    test_rand(S, -1:5, make(R, -1:10, -10:10))
    test_rand(S, -1:5, -1:10, -10:10)
 
-   T, z = PolynomialRing(GF(7), "z")
+   T, z = polynomial_ring(GF(7), "z")
 
    test_rand(T, -1:4)
 end
 
 @testset "Generic.Poly.similar" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iters = 1:10
       f = rand(R, 0:10, -10:10)
@@ -171,9 +176,9 @@ end
       h = similar(f, "y")
       k = similar(f)
 
-      @test isa(g, PolyElem)
-      @test isa(h, PolyElem)
-      @test isa(k, PolyElem)
+      @test isa(g, PolyRingElem)
+      @test isa(h, PolyRingElem)
+      @test isa(k, PolyRingElem)
 
       @test base_ring(g) === QQ
 
@@ -203,7 +208,7 @@ end
 @testset "Generic.Poly.polynomial" begin
    f = polynomial(ZZ, [1, 2, 3], "y")
 
-   @test isa(f, PolyElem)
+   @test isa(f, PolyRingElem)
    @test base_ring(f) === ZZ
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
@@ -211,7 +216,7 @@ end
 
    g = polynomial(ZZ, [1, 2, 3])
 
-   @test isa(g, PolyElem)
+   @test isa(g, PolyRingElem)
    @test base_ring(g) === ZZ
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
@@ -227,15 +232,15 @@ end
    p = polynomial(ZZ, BigInt[])
    q = polynomial(ZZ, [])
 
-   @test isa(p, PolyElem)
-   @test isa(q, PolyElem)
+   @test isa(p, PolyRingElem)
+   @test isa(q, PolyRingElem)
 
    @test length(p) == 0
    @test length(q) == 0
 end
 
 @testset "Generic.Poly.zero" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = rand(R, 0:10, -10:10)
 
@@ -243,9 +248,9 @@ end
    h = zero(f, "y")
    k = zero(f)
 
-   @test isa(g, PolyElem)
-   @test isa(h, PolyElem)
-   @test isa(k, PolyElem)
+   @test isa(g, PolyRingElem)
+   @test isa(h, PolyRingElem)
+   @test isa(k, PolyRingElem)
 
    @test length(g) == 0
    @test length(h) == 0
@@ -272,13 +277,15 @@ end
 end
 
 @testset "Generic.Poly.manipulation" begin
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
 
    @test iszero(zero(S))
    @test isone(one(S))
    @test is_gen(gen(S))
    @test is_unit(one(S))
+   @test is_zero_divisor(S())
+   @test !is_zero_divisor(one(S))
    @test is_constant(zero(S))
    @test is_constant(one(S))
    @test !is_constant(gen(S))
@@ -351,8 +358,21 @@ end
    @test characteristic(R) == 0
 end
 
+@testset "Generic.Poly.is_unit" begin
+   R, x = polynomial_ring(residue_ring(ZZ, 4), "x")
+
+   @test !is_unit(x)
+   @test !is_unit(2*x)
+   try
+      res = is_unit(1 + 2*x)
+      @test res
+   catch e
+      @test e isa NotImplementedError
+   end
+end
+
 @testset "Generic.Poly.deflation" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:1000
       f = rand(R, -1:20, -5:5)
@@ -375,7 +395,7 @@ end
 
 @testset "Generic.Poly.binary_ops" begin
    #  Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    for iter = 1:100
       f = rand(R, -1:10, -10:10)
       g = rand(R, -1:10, -10:10)
@@ -390,10 +410,10 @@ end
    end
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
    for iter = 1:100
       f = rand(R, -1:10, 0:1)
       g = rand(R, -1:10, 0:1)
@@ -408,7 +428,7 @@ end
    end
 
    #  Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
    for iter = 1:100
       f = rand(R, -1:10, -1:1)
       g = rand(R, -1:10, -1:1)
@@ -422,7 +442,7 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
+   T = residue_ring(ZZ, 6)
    R, x = T["x"]
    for iter = 1:100
       f = rand(R, -1:10, 0:5)
@@ -459,10 +479,10 @@ end
    end
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
    for iter = 1:500
       f = rand(R, -1:10, 0:1)
       c1 = rand(ZZ, -10:10)
@@ -502,7 +522,7 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
+   R = residue_ring(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
       f = rand(S, -1:10, 0:5)
@@ -564,10 +584,10 @@ end
    end
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
    for iter = 1:500
       f = rand(R, -1:10, 0:1)
       g = deepcopy(f)
@@ -591,7 +611,7 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
+   R = residue_ring(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
       f = rand(S, -1:10, 0:5)
@@ -624,10 +644,10 @@ end
    end
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
    for iter = 1:500
       f = rand(R, 0:10, 0:1)
       c1 = rand(ZZ, -10:10)
@@ -663,7 +683,7 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
+   R = residue_ring(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
       f = rand(S, 0:10, 0:5)
@@ -708,7 +728,7 @@ end
 
 @testset "Generic.Poly.unary_ops" begin
    #  Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    for iter = 1:300
       f = rand(R, -1:10, -10:10)
 
@@ -717,10 +737,10 @@ end
    end
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
    for iter = 1:300
       f = rand(R, -1:10, 0:1)
 
@@ -729,7 +749,7 @@ end
    end
 
    #  Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
    for iter = 1:300
       f = rand(R, -1:10, -1:1)
 
@@ -738,7 +758,7 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
+   T = residue_ring(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, -1:10, 0:5)
@@ -750,7 +770,7 @@ end
 
 @testset "Generic.Poly.truncation" begin
    #  Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    for iter = 1:300
       f = rand(R, -1:10, -10:10)
       g = rand(R, -1:10, -10:10)
@@ -812,10 +832,10 @@ end
    end
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
    for iter = 1:300
       f = rand(R, -1:10, 0:1)
       g = rand(R, -1:10, 0:1)
@@ -826,7 +846,7 @@ end
    end
 
    #  Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
    for iter = 1:300
       f = rand(R, -1:10, -1:1)
       g = rand(R, -1:10, -1:1)
@@ -836,7 +856,7 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
+   T = residue_ring(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, -1:10, 0:5)
@@ -876,10 +896,10 @@ end
    @test_throws DomainError reverse(f, -rand(2:100))
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
    for iter = 1:300
       f = rand(R, -1:10, 0:1)
       len = rand(length(f):12)
@@ -902,7 +922,7 @@ end
    @test_throws DomainError reverse(f, -rand(2:100))
 
    #  Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
    for iter = 1:300
       f = rand(R, -1:10, -1:1)
       len = rand(length(f):12)
@@ -925,7 +945,7 @@ end
    @test_throws DomainError reverse(f, -rand(2:100))
 
    #  Non-integral domain
-   T = ResidueRing(ZZ, 6)
+   T = residue_ring(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, -1:10, 0:5)
@@ -969,10 +989,10 @@ end
    @test_throws DomainError shift_left(f, -rand(2:100))
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
    for iter = 1:300
       f = rand(R, -1:10, 0:1)
       s = rand(0:10)
@@ -990,7 +1010,7 @@ end
    @test_throws DomainError shift_left(f, -rand(2:100))
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
    for iter = 1:300
       f = rand(R, -1:10, -1:1)
       s = rand(0:10)
@@ -1008,7 +1028,7 @@ end
    @test_throws DomainError shift_left(f, -rand(2:100))
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
+   T = residue_ring(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, -1:10, 0:5)
@@ -1029,7 +1049,7 @@ end
 
 @testset "Generic.Poly.powering" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:10
       f = rand(R, -1:10, -10:10)
@@ -1051,10 +1071,10 @@ end
    @test_throws DomainError pow_multinomial(f, -rand(2:100))
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
 
    for iter = 1:10
       f = rand(R, -1:10, 0:1)
@@ -1076,7 +1096,7 @@ end
    @test_throws DomainError pow_multinomial(f, -rand(2:100))
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter = 1:10
       f = rand(R, -1:10, -1:1)
@@ -1101,8 +1121,8 @@ end
    for iter = 1:10
       n = rand(2:26)
 
-      Zn = ResidueRing(ZZ, n)
-      R, x = PolynomialRing(Zn, "x")
+      Zn = residue_ring(ZZ, n)
+      R, x = polynomial_ring(Zn, "x")
 
       f = rand(R, -1:10, 0:n - 1)
       r2 = one(R)
@@ -1126,8 +1146,8 @@ end
 if false
    @testset "Generic.Poly.modular_arithmetic" begin
       # Exact ring
-      R = ResidueRing(ZZ, 23)
-      S, x = PolynomialRing(R, "x")
+      R = residue_ring(ZZ, 23)
+      S, x = polynomial_ring(R, "x")
 
       for iter = 1:100
          f = rand(S, -1:5, 0:22)
@@ -1164,10 +1184,10 @@ if false
       end
 
       # Fake finite field of char 7, degree 2
-      R, y = PolynomialRing(GF(7), "y")
-      F = ResidueField(R, y^2 + 6y + 3)
+      R, y = polynomial_ring(GF(7), "y")
+      F = residue_field(R, y^2 + 6y + 3)
       a = F(y)
-      S, x = PolynomialRing(F, "x")
+      S, x = polynomial_ring(F, "x")
 
       for iter = 1:100
          f = rand(S, -1:5, 0:1)
@@ -1204,7 +1224,7 @@ if false
       end
 
       # Inexact field
-      S, x = PolynomialRing(RealField, "x")
+      S, x = polynomial_ring(RealField, "x")
 
       for iter = 1:100
          f = rand(S, -1:5, -1:1)
@@ -1241,7 +1261,7 @@ if false
       end
 
       # Exact field
-      R, x = PolynomialRing(QQ, "y")
+      R, x = polynomial_ring(QQ, "y")
 
       for iter = 1:10
          f = rand(R, -1:5, -10:10)
@@ -1282,7 +1302,7 @@ end
 
 @testset "Generic.Poly.exact_division" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:100
       f = rand(R, -1:10, -100:100)
@@ -1294,10 +1314,10 @@ end
    @test_throws ArgumentError divexact(x^2, x - 1; check=true)
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
 
    for iter = 1:100
       f = rand(R, -1:10, 0:1)
@@ -1307,7 +1327,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter = 1:100
       f = rand(R, -1:10, -1:1)
@@ -1318,8 +1338,8 @@ end
 
    # Characteristic p ring
    n = 23
-   Zn = ResidueRing(ZZ, n)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, n)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter = 1:100
       f = rand(R, -1:10, 0:n - 1)
@@ -1331,7 +1351,7 @@ end
 
 @testset "Generic.Poly.adhoc_exact_division" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:100
       f = rand(R, -1:10, -100:100)
@@ -1353,10 +1373,10 @@ end
    end
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
 
    for iter = 1:100
       f = rand(R, -1:10, 0:1)
@@ -1376,7 +1396,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter = 1:100
       f = rand(R, -1:10, -1:1)
@@ -1397,8 +1417,8 @@ end
 
    # Characteristic p ring
    n = 23
-   Zn = ResidueRing(ZZ, n)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, n)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter = 1:100
       f = rand(R, -1:10, 0:22)
@@ -1415,8 +1435,8 @@ end
    end
 
    # Generic tower
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
 
    for iter = 1:100
       f = rand(S, -1:10, 0:10, -100:100)
@@ -1435,8 +1455,8 @@ end
 
 @testset "Generic.Poly.euclidean_division" begin
    # Exact ring
-   R = ResidueRing(ZZ, 23)
-   S, x = PolynomialRing(R, "x")
+   R = residue_ring(ZZ, 23)
+   S, x = polynomial_ring(R, "x")
 
    for iter = 1:100
       f = rand(S, -1:5, 0:22)
@@ -1457,10 +1477,10 @@ end
    end
 
    # Fake finite field of char 7, degree 2
-   R, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(R, y^2 + 6y + 3)
+   R, y = polynomial_ring(GF(7), "y")
+   F = residue_field(R, y^2 + 6y + 3)
    a = F(y)
-   S, x = PolynomialRing(F, "x")
+   S, x = polynomial_ring(F, "x")
 
    for iter = 1:100
       f = rand(S, -1:5, 0:1)
@@ -1481,7 +1501,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter = 1:100
       f = rand(R, -1:5, -1:1)
@@ -1502,7 +1522,7 @@ end
    end
 
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter = 1:100
       f = rand(R, -1:5, -10:10)
@@ -1525,7 +1545,7 @@ end
 
 @testset "Generic.Poly.ad_hoc_euclidean_division" begin
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter = 1:100
       f = rand(R, -1:5, -10:10)
@@ -1538,7 +1558,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter = 1:100
       f = rand(R, -1:5, -1:1)
@@ -1551,8 +1571,8 @@ end
    end
 
    # Residue ring
-   S = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(S, "x")
+   S = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(S, "x")
 
    for iter = 1:100
       f = rand(R, -1:5, 0:22)
@@ -1567,7 +1587,7 @@ end
 
 @testset "Generic.Poly.pseudodivision" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:100
       f = rand(R, -1:5, -10:10)
@@ -1585,8 +1605,8 @@ end
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter = 1:100
       f = rand(R, -1:5, 0:22)
@@ -1606,7 +1626,7 @@ end
 
 @testset "Generic.Poly.content_primpart_gcd" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:100
       f = rand(R, -1:10, -10:10)
@@ -1632,7 +1652,7 @@ end
    end
 
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter = 1:100
       f = rand(R, -1:5, -10:10)
@@ -1671,8 +1691,8 @@ end
    end
 
    # Characteristic p ring
-   R = ResidueRing(ZZ, 23)
-   S, x = PolynomialRing(R, "x")
+   R = residue_ring(ZZ, 23)
+   S, x = polynomial_ring(R, "x")
 
    for iter = 1:100
       f = rand(S, -1:10, 0:22)
@@ -1700,7 +1720,7 @@ end
 
    # Characteristic p field
    R = GF(23)
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    for iter = 1:100
       f = rand(S, -1:10)
@@ -1732,7 +1752,7 @@ end
 
 @testset "Generic.Poly.evaluation" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, -1:4, -10:10)
@@ -1753,7 +1773,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter in 1:10
       f = rand(R, -1:4, 0:1)
@@ -1774,8 +1794,8 @@ end
    end
 
    # Non-integral domain
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
       f = rand(R, -1:4, 0:22)
@@ -1798,7 +1818,7 @@ end
 
 @testset "Generic.Poly.composition" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, -1:5, -10:10)
@@ -1809,7 +1829,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter in 1:10
       f = rand(R, -1:5, 0:1)
@@ -1820,8 +1840,8 @@ end
    end
 
    # Non-integral domain
-   Zn = ResidueRing(ZZ, 6)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 6)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
       f = rand(R, -1:5, 0:5)
@@ -1834,7 +1854,7 @@ end
 
 @testset "Generic.Poly.derivative" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, -1:4, -100:100)
@@ -1846,7 +1866,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter in 1:10
       f = rand(R, -1:4, 0:1)
@@ -1858,8 +1878,8 @@ end
    end
 
    # Non-integral domain
-   Zn = ResidueRing(ZZ, 6)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 6)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
       f = rand(R, -1:4, 0:5)
@@ -1873,7 +1893,7 @@ end
 
 @testset "Generic.Poly.integral" begin
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter in 1:10
       f = rand(R, -1:10, -100:100)
@@ -1887,8 +1907,8 @@ end
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
       f = rand(R, -1:10, 0:22)
@@ -1902,7 +1922,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter in 1:10
       f = rand(R, -1:10, 0:1)
@@ -1917,7 +1937,7 @@ end
 end
 
 @testset "Generic.Poly.sylvester_matrix" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, 1:5, -10:10)
@@ -1942,7 +1962,7 @@ end
 
 @testset "Generic.Poly.resultant" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, -1:5, -10:10)
@@ -1957,7 +1977,7 @@ end
    end
 
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter in 1:10
       f = rand(R, -1:5, -10:10)
@@ -1973,8 +1993,8 @@ end
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
       f = rand(R, -1:5, 0:22)
@@ -1989,7 +2009,7 @@ end
    end
 
    # Characteristic p field
-   R, x = PolynomialRing(GF(23), "x")
+   R, x = polynomial_ring(GF(23), "x")
 
    for iter in 1:10
       f = rand(R, -1:5)
@@ -2004,7 +2024,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter in 1:10
       f = rand(R, -1:5, 0:1)
@@ -2018,8 +2038,8 @@ end
    end
 
    # Non-integral domain
-   Zn = ResidueRing(ZZ, 6)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 6)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
       f = rand(R, -1:5, 0:5)
@@ -2035,7 +2055,7 @@ end
 
 @testset "Generic.Poly.discriminant" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:100
       f = rand(R, 1:5, -10:10)
@@ -2047,7 +2067,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter = 1:100
       f = rand(R, 1:10, 0:1)
@@ -2060,8 +2080,8 @@ end
 
 #   TODO: Fix issue #291
 #   # Non-integral domain
-#   Zn = ResidueRing(ZZ, 6)
-#   R, x = PolynomialRing(Zn, "x")
+#   Zn = residue_ring(ZZ, 6)
+#   R, x = polynomial_ring(Zn, "x")
 #
 #   for iter = 1:100
 #      f = R()
@@ -2079,7 +2099,7 @@ end
 
 @testset "Generic.Poly.resx" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter in 1:100
       f = rand(R, 1:5, -10:10)
@@ -2096,7 +2116,7 @@ end
    end
 
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter in 1:100
       f = rand(R, 1:5, -10:10)
@@ -2113,7 +2133,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter in 1:100
       f = rand(R, 1:5, 0:1)
@@ -2130,8 +2150,8 @@ end
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:100
       f = rand(R, 1:5, 0:22)
@@ -2148,7 +2168,7 @@ end
    end
 
    # Characteristic p field
-   R, x = PolynomialRing(GF(23), "x")
+   R, x = polynomial_ring(GF(23), "x")
 
    for iter in 1:100
       f = rand(R, 1:5)
@@ -2168,8 +2188,8 @@ end
 #   Test will cause impossible inverse in the mean time
 #
 #   # Non-integral domain
-#   Zn = ResidueRing(ZZ, 6)
-#   R, x = PolynomialRing(Zn, "x")
+#   Zn = residue_ring(ZZ, 6)
+#   R, x = polynomial_ring(Zn, "x")
 #
 #   for iter in 1:100
 #      f = R()
@@ -2193,7 +2213,7 @@ end
 
 @testset "Generic.Poly.gcdx" begin
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter in 1:100
       f = rand(R, 1:5, -10:10)
@@ -2211,8 +2231,8 @@ end
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:100
       f = rand(R, 1:5, 0:22)
@@ -2229,7 +2249,7 @@ end
    end
 
    # Characteristic p field
-   R, x = PolynomialRing(GF(23), "x")
+   R, x = polynomial_ring(GF(23), "x")
 
    for iter in 1:100
       f = rand(R, 1:5)
@@ -2246,10 +2266,10 @@ end
    end
 
    # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
+   S, y = polynomial_ring(GF(7), "y")
+   F = residue_field(S, y^2 + 6y + 3)
    a = F(y)
-   R, x = PolynomialRing(F, "x")
+   R, x = polynomial_ring(F, "x")
 
    for iter in 1:100
       f = rand(R, 1:5, 0:1)
@@ -2266,9 +2286,50 @@ end
    end
 end
 
+@testset "Generic.Poly.gcd_gcdx_gcdinv_nonfield" begin
+
+   for n in (6, 101*103)
+      Zn = residue_ring(ZZ, n)
+      R, x = polynomial_ring(Zn, "x")
+
+      for iter in 1:100
+         a = rand(R, 0:5, 1:n)
+         b = rand(R, 0:5, 1:n)
+         while length(a) <= 10 && length(b) <= 10
+            q = rand(R, 0:5, 1:n)
+            a, b = q*a + b, a
+         end
+
+         try
+            g = gcd(a, b)
+            @test is_divisible_by(a, g)
+            @test is_divisible_by(b, g)
+            g, s, t = gcdx(a, b)
+            @test g == s*a + t*b
+            g, s = gcdinv(a, b)
+            @test is_divisible_by(g - s*a, b)
+            if degree(a) > degree(b) >= 0
+               (A, B, m11, m12, m21, m22, s) = hgcd(a, b)
+               @test degree(A) >= cld(degree(a), 2) > degree(B)
+               @test m11*A + m12*B == a
+               @test m21*A + m22*B == b
+               @test m11*m22 - m21*m12 == s
+               @test s^2 == 1
+            end
+         catch e
+            @test e isa NotInvertibleError
+            @test e.mod == Zn
+            @test !is_zero(e.data)
+         end
+      end
+   end
+end
+
+
+
 @testset "Generic.Poly.newton_representation" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, -1:10, -100:100)
@@ -2282,7 +2343,7 @@ end
    end
 
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter in 1:10
       f = rand(R, -1:10, -100:100)
@@ -2296,7 +2357,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter in 1:10
       f = rand(R, -1:10, 0:1)
@@ -2310,8 +2371,8 @@ end
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
       f = rand(R, -1:10, 0:22)
@@ -2326,7 +2387,7 @@ end
 
    # Characteristic p ring
    K = GF(23)
-   R, x = PolynomialRing(K, "x")
+   R, x = polynomial_ring(K, "x")
 
    for iter in 1:10
       f = rand(R, -1:10)
@@ -2340,8 +2401,8 @@ end
    end
 
    # Non-integral domain
-   Zn = ResidueRing(ZZ, 6)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 6)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
       f = rand(R, -1:10, 0:5)
@@ -2357,7 +2418,7 @@ end
 
 @testset "Generic.Poly.interpolation" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter in 1:10
       p = rand(R, 0:10, -10:10)
@@ -2371,7 +2432,7 @@ end
    end
 
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iter in 1:10
       p = rand(R, 0:10, -10:10)
@@ -2385,7 +2446,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for iter in 1:10
       p = rand(R, 0:10, 0:1)
@@ -2399,8 +2460,8 @@ end
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
       p = rand(R, 0:10, 0:22)
@@ -2415,7 +2476,7 @@ end
 
    # Characteristic p field
    K = GF(23)
-   R, x = PolynomialRing(K, "x")
+   R, x = polynomial_ring(K, "x")
 
    for iter in 1:10
       p = rand(R, 0:10)
@@ -2430,8 +2491,8 @@ end
 
 #   TODO: Fix issue #294 (if possible)
 #   # Non-integral domain
-#   Zn = ResidueRing(ZZ, 6)
-#   R, x = PolynomialRing(Zn, "x")
+#   Zn = residue_ring(ZZ, 6)
+#   R, x = polynomial_ring(Zn, "x")
 #
 #   for iter in 1:10
 #      p = R()
@@ -2450,7 +2511,7 @@ end
 
 @testset "Generic.Poly.special" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for n in 10:20
       T = chebyshev_t(n, x)
@@ -2469,7 +2530,7 @@ end
    end
 
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for n in 10:20
       T = chebyshev_t(n, x)
@@ -2488,7 +2549,7 @@ end
    end
 
    # Inexact field
-   R, x = PolynomialRing(RealField, "x")
+   R, x = polynomial_ring(RealField, "x")
 
    for n in 10:20
       T = chebyshev_t(n, x)
@@ -2507,8 +2568,8 @@ end
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(Zn, "x")
 
    for n in 10:20
       T = chebyshev_t(n, x)
@@ -2527,7 +2588,7 @@ end
    end
 
    # Characteristic p field
-   R, x = PolynomialRing(GF(23), "x")
+   R, x = polynomial_ring(GF(23), "x")
 
    for n in 10:20
       T = chebyshev_t(n, x)
@@ -2546,8 +2607,8 @@ end
    end
 
    # Non-integral domain
-   Zn = ResidueRing(ZZ, 6)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 6)
+   R, x = polynomial_ring(Zn, "x")
 
    for n in 10:20
       T = chebyshev_t(n, x)
@@ -2568,9 +2629,9 @@ end
 
 @testset "Generic.Poly.mul_karatsuba" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   T, z = PolynomialRing(S, "z")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   T, z = polynomial_ring(S, "z")
 
    f = x + y + 2z^2 + 1
 
@@ -2584,9 +2645,9 @@ end
 
 @testset "Generic.Poly.mul_ks" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   T, z = PolynomialRing(S, "z")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   T, z = polynomial_ring(S, "z")
 
    f = x + y + 2z^2 + 1
 
@@ -2596,7 +2657,7 @@ end
 
 @testset "Generic.Poly.remove_valuation" begin
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    @test_throws ErrorException remove(R(1), R(0))
    @test_throws ErrorException remove(R(1), R(-1))
@@ -2641,7 +2702,7 @@ end
    end
 
    # Exact field
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    @test_throws ErrorException remove(R(1), R(0))
    @test_throws ErrorException remove(R(1), R(1))
@@ -2683,8 +2744,8 @@ end
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(ZZ, 23)
+   R, x = polynomial_ring(Zn, "x")
 
    for iter = 1:10
       d = true
@@ -2722,7 +2783,7 @@ end
    end
 
    # Characteristic p field
-   R, x = PolynomialRing(GF(23), "x")
+   R, x = polynomial_ring(GF(23), "x")
 
    for iter = 1:10
       d = true
@@ -2761,7 +2822,7 @@ end
 
 @testset "Generic.Poly.square_root" begin
    # Exact ring
-   S, x = PolynomialRing(ZZ, "x")
+   S, x = polynomial_ring(ZZ, "x")
    for iter = 1:10
       f = rand(S, -1:20, -20:20)
 
@@ -2787,7 +2848,7 @@ end
    end
 
    # Exact field
-   S, x = PolynomialRing(QQ, "x")
+   S, x = polynomial_ring(QQ, "x")
    for iter = 1:10
       f = rand(S, -1:20, -20:20)
 
@@ -2823,9 +2884,9 @@ end
 
    # Characteristic p field
    for p in [2, 7, 19, 65537, ZZ(2), ZZ(7), ZZ(19), ZZ(65537)]
-      R = ResidueField(ZZ, p)
+      R = residue_field(ZZ, p)
 
-      S, x = PolynomialRing(R, "x")
+      S, x = polynomial_ring(R, "x")
 
       for iter = 1:10
          f = rand(S, -1:20, 0:Int(p))
@@ -2854,7 +2915,7 @@ end
 end
 
 @testset "Generic.Poly.generic_eval" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, -1:2, -100:100)
@@ -2864,7 +2925,7 @@ end
       @test f(g(h)) == f(g)(h)
    end
 
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x
    b = a = QQ(13)
@@ -2878,7 +2939,7 @@ end
 end
 
 @testset "Generic.Poly.change_base_ring" begin
-   Zx, x = PolynomialRing(ZZ,'x')
+   Zx, x = polynomial_ring(ZZ,'x')
    @test 1 == map_coefficients(sqrt, x^0)
    p = Zx([i for i in 1:10])
    q = Zx([i for i in 10:-1:1])
@@ -2903,7 +2964,7 @@ end
    end
 
    F = GF(11)
-   P, y = PolynomialRing(F, 'x')
+   P, y = polynomial_ring(F, 'x')
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 end
 
@@ -2914,7 +2975,7 @@ end
 end
 
 @testset "Generic.Poly.polynomial_to_power_sums" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for iters = 1:100
       f = rand(R, 0:10, -10:10)
@@ -2926,7 +2987,7 @@ end
       V = polynomial_to_power_sums(f)
 
       @test power_sums_to_polynomial(V, R) == f
-      @test isa(power_sums_to_polynomial(V), PolyElem)
+      @test isa(power_sums_to_polynomial(V), PolyRingElem)
 
       num = rand(0:2*degree(f))
       W = polynomial_to_power_sums(f, num)
@@ -2934,7 +2995,7 @@ end
       @test collect(Base.Iterators.take(V, d)) == collect(Base.Iterators.take(W, d))
    end
 
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iters = 1:100
       f = rand(R, 0:10, -10:10)
@@ -2946,7 +3007,7 @@ end
       V = polynomial_to_power_sums(f)
 
       @test power_sums_to_polynomial(V, R) == f
-      @test isa(power_sums_to_polynomial(V), PolyElem)
+      @test isa(power_sums_to_polynomial(V), PolyRingElem)
 
       num = rand(0:2*degree(f))
       W = polynomial_to_power_sums(f, num)

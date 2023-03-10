@@ -12,7 +12,7 @@ end
 
    @test string(Fac{BigInt}()) isa String
 
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
    f = Fac(x, Dict(x*y => 1, x + y => 1))
 
    @test evaluate(f) == x * (x + y) * (x*y)

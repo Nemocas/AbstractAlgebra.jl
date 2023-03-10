@@ -22,31 +22,31 @@
 end
 
 @testset "Generic.RelSeries.constructors" begin
-   S1 = RelSeriesRing(ZZ, 10)
-   S2 = RelSeriesRing(ZZ, 10)
+   S1 = RelPowerSeriesRing(ZZ, 10)
+   S2 = RelPowerSeriesRing(ZZ, 10)
 
    @test S1 !== S2
-   @test isa(S1, Generic.RelSeriesRing)
+   @test isa(S1, Generic.RelPowerSeriesRing)
 
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
-   S, t = PolynomialRing(QQ, "t")
-   T, y = PowerSeriesRing(S, 30, "y")
+   S, t = polynomial_ring(QQ, "t")
+   T, y = power_series_ring(S, 30, "y")
 
-   @test PowerSeriesRing(S, 30, "y", cached = true)[1] === PowerSeriesRing(S, 30, "y", cached = true)[1]
-   @test PowerSeriesRing(S, 30, "y", cached = false)[1] !== PowerSeriesRing(S, 30, "y", cached = true)[1]
+   @test power_series_ring(S, 30, "y", cached = true)[1] === power_series_ring(S, 30, "y", cached = true)[1]
+   @test power_series_ring(S, 30, "y", cached = false)[1] !== power_series_ring(S, 30, "y", cached = true)[1]
 
    @test elem_type(R) == Generic.RelSeries{BigInt}
-   @test elem_type(Generic.RelSeriesRing{BigInt}) == Generic.RelSeries{BigInt}
-   @test parent_type(Generic.RelSeries{BigInt}) == Generic.RelSeriesRing{BigInt}
+   @test elem_type(Generic.RelPowerSeriesRing{BigInt}) == Generic.RelSeries{BigInt}
+   @test parent_type(Generic.RelSeries{BigInt}) == Generic.RelPowerSeriesRing{BigInt}
 
    @test elem_type(T) == Generic.RelSeries{elem_type(S)}
-   @test elem_type(Generic.RelSeriesRing{elem_type(S)}) == Generic.RelSeries{elem_type(S)}
-   @test parent_type(Generic.RelSeries{elem_type(S)}) == Generic.RelSeriesRing{elem_type(S)}
+   @test elem_type(Generic.RelPowerSeriesRing{elem_type(S)}) == Generic.RelSeries{elem_type(S)}
+   @test parent_type(Generic.RelSeries{elem_type(S)}) == Generic.RelPowerSeriesRing{elem_type(S)}
 
-   @test isa(R, Generic.RelSeriesRing)
+   @test isa(R, Generic.RelPowerSeriesRing)
 
-   @test isa(T, Generic.RelSeriesRing)
+   @test isa(T, Generic.RelPowerSeriesRing)
 
    a1 = x^3 + 2x + 1
    a2 = (t^2 + 1)*y^2 + (t + 3)*y + O(y^4)
@@ -99,14 +99,14 @@ end
 end
 
 @testset "Generic.RelSeries.rand" begin
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
 
    test_rand(R, 0:12, -10:10)
 end
 
 @testset "Generic.RelSeries.manipulation" begin
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   R, t = polynomial_ring(QQ, "t")
+   S, x = power_series_ring(R, 30, "x")
 
    @test max_precision(S) == 30
 
@@ -143,14 +143,14 @@ end
 
    @test characteristic(S) == 0
 
-   T = ResidueRing(ZZ, 7)
-   U, y = PowerSeriesRing(T, 10, "y")
+   T = residue_ring(ZZ, 7)
+   U, y = power_series_ring(T, 10, "y")
 
    @test modulus(T) == 7
 end
 
 @testset "Generic.RelSeries.similar" begin
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
 
    for iters = 1:10
       f = rand(R, 0:10, -10:10)
@@ -161,11 +161,11 @@ end
       m = similar(f, QQ, 5)
       n = similar(f, 5)
 
-      @test isa(g, RelSeriesElem)
-      @test isa(h, RelSeriesElem)
-      @test isa(k, RelSeriesElem)
-      @test isa(m, RelSeriesElem)
-      @test isa(n, RelSeriesElem)
+      @test isa(g, RelPowerSeriesRingElem)
+      @test isa(h, RelPowerSeriesRingElem)
+      @test isa(k, RelPowerSeriesRingElem)
+      @test isa(m, RelPowerSeriesRingElem)
+      @test isa(n, RelPowerSeriesRingElem)
 
       @test base_ring(g) === QQ
       @test base_ring(m) === QQ
@@ -200,7 +200,7 @@ end
 @testset "Generic.RelSeries.rel_series" begin
    f = rel_series(ZZ, [1, 2, 3], 3, 5, 2, "y")
 
-   @test isa(f, RelSeriesElem)
+   @test isa(f, RelPowerSeriesRingElem)
    @test base_ring(f) === ZZ
    @test coeff(f, 2) == 1
    @test coeff(f, 4) == 3
@@ -208,7 +208,7 @@ end
 
    g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
 
-   @test isa(g, RelSeriesElem)
+   @test isa(g, RelPowerSeriesRingElem)
    @test base_ring(g) === ZZ
    @test coeff(g, 4) == 1
    @test coeff(g, 6) == 3
@@ -224,15 +224,15 @@ end
    p = rel_series(ZZ, BigInt[], 0, 3, 1)
    q = rel_series(ZZ, [], 0, 3, 2)
 
-   @test isa(p, RelSeriesElem)
-   @test isa(q, RelSeriesElem)
+   @test isa(p, RelPowerSeriesRingElem)
+   @test isa(q, RelPowerSeriesRingElem)
 
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
    r = rel_series(QQ, BigInt[1, 2, 3], 3, 11, 8)
 
-   @test isa(r, RelSeriesElem)
+   @test isa(r, RelPowerSeriesRingElem)
 
    s = rel_series(ZZ, [1, 2, 3], 3, 5, 0; max_precision=10)
    
@@ -241,7 +241,7 @@ end
 
 @testset "Generic.RelSeries.unary_ops" begin
    #  Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
 
@@ -250,7 +250,7 @@ end
    end
 
    #  Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x")
+   R, x = power_series_ring(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
 
@@ -259,8 +259,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
 
@@ -271,7 +271,7 @@ end
 
 @testset "Generic.RelSeries.binary_ops" begin
    #  Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
    for iter = 1:100
       f = rand(R, 0:12, -10:10)
       g = rand(R, 0:12, -10:10)
@@ -287,7 +287,7 @@ end
    end
 
    #  Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x")
+   R, x = power_series_ring(RealField, 10, "x")
    for iter = 1:100
       f = rand(R, 0:12, -1:1)
       g = rand(R, 0:12, -1:1)
@@ -302,8 +302,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x")
    for iter = 1:100
       f = rand(R, 0:12, 0:5)
       g = rand(R, 0:12, 0:5)
@@ -320,7 +320,7 @@ end
 
 @testset "Generic.RelSeries.adhoc_binary_ops" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, 0:12, -10:10)
       c1 = rand(ZZ, -10:10)
@@ -340,7 +340,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x")
+   R, x = power_series_ring(RealField, 10, "x")
    for iter = 1:500
       f = rand(R, 0:12, -1:1)
       c1 = rand(ZZ, -10:10)
@@ -360,8 +360,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = PowerSeriesRing(R, 10, "x")
+   R = residue_ring(ZZ, 6)
+   S, x = power_series_ring(R, 10, "x")
    for iter = 1:500
       f = rand(S, 0:12, 0:5)
       c1 = rand(ZZ, -10:10)
@@ -388,7 +388,7 @@ end
 
    # Generic tower
    R, x = ZZ["x"]
-   S, y = PowerSeriesRing(R, 10, "y")
+   S, y = power_series_ring(R, 10, "y")
    for iter = 1:100
       f = rand(S, 0:12, 0:5, -10:10)
       c1 = rand(ZZ, -10:10)
@@ -410,7 +410,7 @@ end
 
 @testset "Generic.RelSeries.comparison" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, 0:12, -10:10)
       g = deepcopy(f)
@@ -426,7 +426,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x")
+   R, x = power_series_ring(RealField, 10, "x")
    for iter = 1:500
       f = rand(R, 0:12, -1:1)
       g = deepcopy(f)
@@ -442,8 +442,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = PowerSeriesRing(R, 10, "x")
+   R = residue_ring(ZZ, 6)
+   S, x = power_series_ring(R, 10, "x")
    for iter = 1:500
       f = rand(S, 0:12, 0:5)
       g = deepcopy(f)
@@ -461,7 +461,7 @@ end
 
 @testset "Generic.RelSeries.adhoc_comparison" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = R()
       while f == 0
@@ -483,7 +483,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x")
+   R, x = power_series_ring(RealField, 10, "x")
    for iter = 1:500
       f = R()
       while isapprox(f, R())
@@ -505,8 +505,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = PowerSeriesRing(R, 10, "x")
+   R = residue_ring(ZZ, 6)
+   S, x = power_series_ring(R, 10, "x")
    for iter = 1:500
       f = S()
       while f == 0
@@ -534,7 +534,7 @@ end
 
    # Generic tower
    R, x = ZZ["x"]
-   S, y = PowerSeriesRing(R, 10, "y")
+   S, y = power_series_ring(R, 10, "y")
    for iter = 1:100
       f = S()
       while f == 0
@@ -558,7 +558,7 @@ end
 
 @testset "Generic.RelSeries.powering" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
 
    for iter = 1:100
       f = rand(R, 0:12, -10:10)
@@ -578,7 +578,7 @@ end
    @test_throws DomainError f^-rand(2:100)
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x")
+   R, x = power_series_ring(RealField, 10, "x")
 
    for iter = 1:100
       f = rand(R, 0:12, -1:1)
@@ -601,8 +601,8 @@ end
    for iter = 1:100
       n = rand(2:26)
 
-      Zn = ResidueRing(ZZ, n)
-      R, x = PowerSeriesRing(Zn, 10, "x")
+      Zn = residue_ring(ZZ, n)
+      R, x = power_series_ring(Zn, 10, "x")
 
       f = rand(R, 0:12, 0:n - 1)
       r2 = R(1)
@@ -617,8 +617,8 @@ end
    end
 
    # regression test (see #931)
-   Zn = ResidueRing(ZZ, 2)
-   R, x = PowerSeriesRing(Zn, 10, "x")
+   Zn = residue_ring(ZZ, 2)
+   R, x = power_series_ring(Zn, 10, "x")
    f = O(x^2)
    @test isequal(f^0, 1 + O(x^10))
 
@@ -627,8 +627,8 @@ end
    @test_throws DomainError f^-rand(2:100)
 
    # regression test (see #967)
-   Zn = ResidueRing(ZZ, 4)
-   R, x = PowerSeriesRing(Zn, 5, "x")
+   Zn = residue_ring(ZZ, 4)
+   R, x = power_series_ring(Zn, 5, "x")
    f = 2*x^6 + O(x^11)
 
    @test isequal(f*f, f^2)
@@ -637,7 +637,7 @@ end
 
 @testset "Generic.RelSeries.shift" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
       s = rand(0:12)
@@ -657,7 +657,7 @@ end
    @test_throws DomainError shift_right(f, -rand(2:100))
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x")
+   R, x = power_series_ring(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       s = rand(0:12)
@@ -677,8 +677,8 @@ end
    @test_throws DomainError shift_right(f, -rand(2:100))
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
       s = rand(0:12)
@@ -700,7 +700,7 @@ end
 
 @testset "Generic.RelSeries.truncation" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
       s = rand(0:12)
@@ -715,7 +715,7 @@ end
    @test_throws DomainError truncate(f, -rand(2:100))
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x")
+   R, x = power_series_ring(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       s = rand(0:12)
@@ -730,8 +730,8 @@ end
    @test_throws DomainError truncate(f, -rand(2:100))
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
       s = rand(0:12)
@@ -748,7 +748,7 @@ end
 
 @testset "Generic.RelSeries.inversion" begin
     # Exact ring
-    R, x = PowerSeriesRing(ZZ, 10, "x")
+    R, x = power_series_ring(ZZ, 10, "x")
     for iter = 1:300
        f = R()
        while !is_unit(f)
@@ -760,7 +760,7 @@ end
 
     # Exact field
     for prec = 1:10
-       R, x = PowerSeriesRing(QQ, prec, "x")
+       R, x = power_series_ring(QQ, prec, "x")
        for iter = 1:30
           f = R()
           while valuation(f) != 0
@@ -772,7 +772,7 @@ end
     end
 
     # Inexact field
-    R, x = PowerSeriesRing(RealField, 10, "x")
+    R, x = power_series_ring(RealField, 10, "x")
     for iter = 1:300
        f = R()
        while coeff(f, 0) == 0
@@ -783,8 +783,8 @@ end
     end
 
     # Non-integral domain
-    T = ResidueRing(ZZ, 6)
-    R, x = PowerSeriesRing(T, 10, "x")
+    T = residue_ring(ZZ, 6)
+    R, x = power_series_ring(T, 10, "x")
     for iter = 1:300
        f = R()
        while !is_unit(f)
@@ -797,7 +797,7 @@ end
 
 @testset "Generic.RelSeries.compose" begin
     # Exact ring
-    R, x = PowerSeriesRing(ZZ, 10, "x")
+    R, x = power_series_ring(ZZ, 10, "x")
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -810,7 +810,7 @@ end
         @test compose(R(), g) == R()
     end
 
-    S, y = PowerSeriesRing(ZZ, 10, "y")
+    S, y = power_series_ring(ZZ, 10, "y")
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -822,7 +822,7 @@ end
     end
 
     # Inexact field
-    R, x = PowerSeriesRing(RealField, 10, "x")
+    R, x = power_series_ring(RealField, 10, "x")
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -835,7 +835,7 @@ end
         @test isapprox(compose(R(), g), R())
     end
 
-    S, y = PowerSeriesRing(RealField, 10, "y")
+    S, y = power_series_ring(RealField, 10, "y")
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -846,8 +846,8 @@ end
     end
 
     # Non-integral domain
-    T = ResidueRing(ZZ, 6)
-    R, x = PowerSeriesRing(T, 10, "x")
+    T = residue_ring(ZZ, 6)
+    R, x = power_series_ring(T, 10, "x")
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -860,7 +860,7 @@ end
         @test compose(R(), g) == R()
     end
 
-    S, y = PowerSeriesRing(T, 10, "y")
+    S, y = power_series_ring(T, 10, "y")
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -874,7 +874,7 @@ end
 
 @testset "Generic.RelSeries.square_root" begin
     # Exact ring
-    R, x = PowerSeriesRing(ZZ, 10, "x")
+    R, x = power_series_ring(ZZ, 10, "x")
     for iter = 1:300
        f = rand(R, 0:10, -10:10)
        g = f^2
@@ -901,7 +901,7 @@ end
     @test_throws ErrorException sqrt(f)
 
     # Inexact field
-    R, x = PowerSeriesRing(RealField, 10, "x")
+    R, x = power_series_ring(RealField, 10, "x")
     for iter = 1:300
        f = rand(R, 0:10, -1:1)
        g = f^2
@@ -926,9 +926,9 @@ end
 
     # Characteristic p field
     for p in [2, 7, 19, 65537, ZZ(2), ZZ(7), ZZ(19), ZZ(65537)]
-        R = ResidueField(ZZ, p)
+        R = residue_field(ZZ, p)
 
-        S, x = PowerSeriesRing(R, 10, "x")
+        S, x = power_series_ring(R, 10, "x")
 
         for iter = 1:10
             f = rand(S, 0:10, 0:Int(p))
@@ -955,10 +955,10 @@ end
         end
     end
 
-    R = ResidueField(ZZ, 2)
-    T, y = PolynomialRing(R, "x")
+    R = residue_field(ZZ, 2)
+    T, y = polynomial_ring(R, "x")
 
-    S, x = PowerSeriesRing(T, 10, "x")
+    S, x = power_series_ring(T, 10, "x")
 
     f = 1 + y^2*x^2 + (y^2 + y + 1)*x^4 + O(x^10)
 
@@ -975,7 +975,7 @@ end
 
 @testset "Generic.RelSeries.exact_division" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, s:s, -10:10)
@@ -991,7 +991,7 @@ end
    end
 
    # Exact field
-   R, x = PowerSeriesRing(QQ, 10, "x")
+   R, x = power_series_ring(QQ, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, s:s, -10:10)
@@ -1007,7 +1007,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x")
+   R, x = power_series_ring(RealField, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, s:s, -1:1)
@@ -1023,8 +1023,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, s:s, 0:5)
@@ -1042,7 +1042,7 @@ end
 
 @testset "Generic.RelSeries.adhoc_exact_division" begin
    # Exact field
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
       c = ZZ()
@@ -1054,7 +1054,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x")
+   R, x = power_series_ring(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       c = RealField()
@@ -1066,8 +1066,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x")
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
       c = T()
@@ -1081,7 +1081,7 @@ end
 
 @testset "Generic.RelSeries.derivative_integral" begin
    # Exact field
-   S, x = PowerSeriesRing(QQ, 10, "x")
+   S, x = power_series_ring(QQ, 10, "x")
 
    for iter = 1:100
       f = rand(S, 0:10, -10:10)
@@ -1093,7 +1093,7 @@ end
    end
 
    # Inexact field
-   S, x = PowerSeriesRing(RealField, 10, "x")
+   S, x = power_series_ring(RealField, 10, "x")
 
    for iter = 1:100
       f = rand(S, 0:10, -10:10)
@@ -1107,7 +1107,7 @@ end
 
 @testset "Generic.RelSeries.special_functions" begin
    # Exact field
-   S, x = PowerSeriesRing(QQ, 10, "x")
+   S, x = power_series_ring(QQ, 10, "x")
 
    for iter = 1:100
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
@@ -1136,8 +1136,8 @@ end
 
    # Exact Ring
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 10, "x")
+   R, t = polynomial_ring(QQ, "t")
+   S, x = power_series_ring(R, 10, "x")
 
    c = exp(x + O(x^10))
 
@@ -1145,7 +1145,7 @@ end
              1//720*x^6 + 1//5040*x^7 + 1//40320*x^8 + 1//362880*x^9 + O(x^10))
 
    # Inexact field
-   S, x = PowerSeriesRing(RealField, 10, "x")
+   S, x = power_series_ring(RealField, 10, "x")
 
    for iter = 1:100
       @test isapprox(exp(x + O(x^iter)), exp(x + O(x^(iter - 1))))
@@ -1177,8 +1177,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 143)
-   S, x = PowerSeriesRing(R, 10, "x")
+   R = residue_ring(ZZ, 143)
+   S, x = power_series_ring(R, 10, "x")
 
    for iter = 1:10
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
@@ -1199,7 +1199,7 @@ end
 end
 
 @testset "Generic.RelSeries.change_base_ring" begin
-   Zx, x = PowerSeriesRing(ZZ, 10, "x")
+   Zx, x = power_series_ring(ZZ, 10, "x")
    @test 1 == map_coefficients(sqrt, x^0)
    p = Zx([i for i in 1:10], 10, 11, 5)
    q = Zx([i for i in 10:-1:1], 10, 11, 5)
@@ -1224,13 +1224,13 @@ end
    end
 
    F = GF(11)
-   P, y = PowerSeriesRing(F, 10, "x")
+   P, y = power_series_ring(F, 10, "x")
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 end
 
 @testset "Generic.RelSeries.unsafe_operators" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
    
    for iter = 1:300
       f = rand(R, 0:9, -10:10)

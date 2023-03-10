@@ -32,10 +32,10 @@ skinparam RoundCorner 15
 "Ring" -down-> "PolyRing{T}"
 "PolyRing{T}" -down-> "LaurentPolynomialRing{T}"
 "PolyRing{T}" -down-> "SeriesRing{T}"
-"Ring" -down-> "ResRing{T}"
+"Ring" -down-> "ResidueRing{T}"
 
 ' Fields
-"Field" -down-> "ResField{T}"
+"Field" -down-> "ResidueField{T}"
 "NumField{T}" -down-> "SimpleNumField{T}"
 "Field" -down-> "FracField{T}"
 "Field" -down-> "NumField{T}"
@@ -80,13 +80,13 @@ skinparam RoundCorner 15
 ' Non-commutative rings
 "SetElem" -down-> "NCRingElem"
 "NCRingElem" -down--> "MatAlgElem{T}"
-"NCRingElem" -down--> "NCPolyElem{T}"
+"NCRingElem" -down--> "NCPolyRingElem{T}"
 "NCRingElem" -down-> "RingElem"
 
 ' Rings
-"RingElem" -down-> "PolyElem{T}"
-"PolyElem{T}" -down-> "SeriesElem{T}"
-"PolyElem{T}" -down-> "LaurentPolyElem{T}"
+"RingElem" -down-> "PolyRingElem{T}"
+"PolyRingElem{T}" -down-> "SeriesElem{T}"
+"PolyRingElem{T}" -down-> "LaurentPolyRingElem{T}"
 "RingElem" -down-> "ResElem{T}"
 "RingElem" -down---> "FieldElem"
 

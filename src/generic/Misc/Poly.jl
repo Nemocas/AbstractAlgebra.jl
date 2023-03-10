@@ -4,7 +4,7 @@
 #
 ##############################################################################
 
-function is_power(a::PolyElem, n::Int)
+function is_power(a::PolyRingElem, n::Int)
     # not the best algorithm... but it works generically
     # probably a equal-degree-factorisation would be good + some more gcd's
     # implement some Newton-type algo?
@@ -22,7 +22,7 @@ end
 #
 ################################################################################
 
-function factor(f::PolyElem, R::Field)
+function factor(f::PolyRingElem, R::Field)
     Rt = AbstractAlgebra.PolyRing(R)
     f1 = change_base_ring(R, f, parent = Rt)
     return factor(f1)
@@ -49,11 +49,11 @@ end
 ################################################################################
 
 @doc doc"""
-    roots(f::PolyElem)
+    roots(f::PolyRingElem)
 
 Returns the roots of the polynomial `f` in the base ring of `f` as an array.
 """
-function roots(f::PolyElem)
+function roots(f::PolyRingElem)
     lf = factor(f)
     rts = Vector{elem_type(base_ring(f))}()
     for (p, e) in lf
@@ -65,17 +65,17 @@ function roots(f::PolyElem)
 end
 
 @doc doc"""
-    roots(f::PolyElem, R::Field)
+    roots(f::PolyRingElem, R::Field)
 
 Returns the roots of the polynomial `f` in the field `R` as an array.
 """
-function roots(f::PolyElem, R::Field)
+function roots(f::PolyRingElem, R::Field)
     Rt = AbstractAlgebra.PolyRing(R)
     f1 = change_base_ring(R, f, parent = Rt)
     return roots(f1)
 end
 
-function sturm_sequence(f::PolyElem{<:FieldElem})
+function sturm_sequence(f::PolyRingElem{<:FieldElem})
     g = f
     h = derivative(g)
     seq = typeof(f)[g,h]

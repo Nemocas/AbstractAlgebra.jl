@@ -113,7 +113,7 @@ of the generators of $M$. This is done by passing a vector of ring elements.
 (M::FPModule{T})(v::Vector{T}) where T <: RingElement
 ```
 
-Construct the element of the module $M$ corrsponding to $\sum_i g[i]v[i]$
+Construct the element of the module $M$ corresponding to $\sum_i g[i]v[i]$
 where $g[i]$ are the generators of the module $M$. The resulting element
 will lie in the module $M$.
 
@@ -215,28 +215,24 @@ is_isomorphic(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 
 **Examples**
 
-```repl
+```jldoctest; setup = :(import Random; Random.seed!(42))
 julia> M = FreeModule(ZZ, 3)
 Free module of rank 3 over Integers
 
 julia> m1 = rand(M, -10:10)
-(0, -8, -8)
+(5, -5, 2)
 
 julia> m2 = rand(M, -10:10)
-(-7, -5, -10)
+(-6, -4, 8)
 
 julia> S, f = sub(M, [m1, m2])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 3 over Integers)
 
 julia> I, g = image(f)
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 3 over Integers)
 
 julia> is_isomorphic(S, I)
@@ -258,40 +254,38 @@ invariant_factors(::FPModule{T}) where T <: RingElement
 
 **Examples**
 
-```repl
+```jldoctest; setup = :(import Random; Random.seed!(42))
 julia> M = FreeModule(ZZ, 3)
 Free module of rank 3 over Integers
 
 julia> m1 = rand(M, -10:10)
-(9, 7, 7)
+(5, -5, 2)
 
 julia> m2 = rand(M, -10:10)
-(-6, 2, -8)
+(-6, -4, 8)
 
 julia> S, f = sub(M, [m1, m2])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 3 over Integers)
 
 julia> Q, g = quo(M, S)
-(Quotient module over Integers with 3 generators and relations:
-[3 9 -1], [0 20 -10], Module homomorphism with
+(Quotient module over Integers with 2 generators and relations:
+[50 -52], Module homomorphism with
 Domain: Free module of rank 3 over Integers
-Codomain: Quotient module over Integers with 3 generators and relations:
-[3 9 -1], [0 20 -10])
+Codomain: Quotient module over Integers with 2 generators and relations:
+[50 -52])
 
 julia> I, f = snf(Q)
-(Invariant factor decomposed module over Integers with invariant factors BigInt[10, 0], Module homomorphism with
-Domain: Invariant factor decomposed module over Integers with invariant factors BigInt[10, 0]
-Codomain: Quotient module over Integers with 3 generators and relations:
-[3 9 -1], [0 20 -10])
+(Invariant factor decomposed module over Integers with invariant factors BigInt[2, 0], Module isomorphism with
+Domain: Invariant factor decomposed module over Integers with invariant factors BigInt[2, 0]
+Codomain: Quotient module over Integers with 2 generators and relations:
+[50 -52])
 
 julia> invs = invariant_factors(Q)
 2-element Vector{BigInt}:
- 10
-  0
+ 2
+ 0
 
 ```
 

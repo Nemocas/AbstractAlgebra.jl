@@ -597,8 +597,6 @@ function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
    return b
 end
 
-is_unit(x::MPolyElem) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && is_unit(x.coeffs[1])
-
 function is_gen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
    exps = x.exps
    N = size(exps, 1)
@@ -940,19 +938,19 @@ function Base.length(x::Union{MPolyCoeffs, MPolyExponentVectors, MPolyTerms, MPo
    return length(x.poly)
 end
 
-function Base.eltype(x::MPolyCoeffs{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+function Base.eltype(x::MPolyCoeffs{T}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
    return S
 end
 
-function Base.eltype(x::MPolyExponentVectors{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+function Base.eltype(x::MPolyExponentVectors{T}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
    return Vector{Int}
 end
 
-function Base.eltype(x::MPolyMonomials{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+function Base.eltype(x::MPolyMonomials{T}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
    return T
 end
 
-function Base.eltype(x::MPolyTerms{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+function Base.eltype(x::MPolyTerms{T}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
    return T
 end
 
@@ -1630,7 +1628,8 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8	      max_e = 2^(exp_bits - 1)
+      if exp_bits == sizeof(Int)*8
+         max_e = 2^(exp_bits - 1)
          break
       else
          max_e = 2^(exp_bits - 1)
@@ -2133,7 +2132,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    N = parent(f).N
    drmask = monomial_drmask(par, bits)
    H = Array{heap_s}(undef, 0) # heap
-   I = Array{heap_t}(undef, 0) # auxilliary data for heap nodes
+   I = Array{heap_t}(undef, 0) # auxiliary data for heap nodes
    # set up output poly coeffs and exponents (corresponds to h in paper)
    r_alloc = k*(m - 1) + 1
    Rc = Array{T}(undef, r_alloc)
@@ -3250,6 +3249,9 @@ Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
 each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i] + r`.
 """
 function Base.divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
+   if isempty(b)
+      return typeof(a)[], a
+   end
    v1, d = max_fields(a)
    len = length(b)
    N = parent(a).N
@@ -3535,11 +3537,11 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    lcm(a::AbstractAlgebra.MPolyElem{T}, a::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+    lcm(a::AbstractAlgebra.MPolyRingElem{T}, a::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
 
 Return the least common multiple of a and b in parent(a).
 """
-function lcm(a::MPolyElem{T}, b::MPolyElem{T}) where {T <: RingElement}
+function lcm(a::MPolyRingElem{T}, b::MPolyRingElem{T}) where {T <: RingElement}
    check_parent(a, b)
    g = gcd(a, b)
    iszero(g) && return g
@@ -3567,14 +3569,6 @@ function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    end
    Cc[1] = gcd(a.coeffs[1], b.coeffs[1])
    return parent(a)(Cc, Ce)
-end
-
-function content(a::MPoly{T}) where {T <: RingElement}
-   z = base_ring(a)()
-   for i = 1:length(a)
-      z = gcd(z, coeff(a, i))
-   end
-   return z
 end
 
 function term_content(a::MPoly{T}) where {T <: RingElement}
@@ -3865,7 +3859,7 @@ Add the term with coefficient `c` and exponent vector `v` to the polynomial unde
 construction in the build context `M`.
 """
 function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
-   if T <: AbstractAlgebra.MPolyElem && length(expv) != nvars(parent(M.poly))
+   if T <: AbstractAlgebra.MPolyRingElem && length(expv) != nvars(parent(M.poly))
       error("length of exponent vector should match the number of variables")
    end
    if iszero(c)
@@ -4137,11 +4131,11 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
+function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(s) + 1 : length(s)
    parent_obj = MPolyRing{T}(R, s, ordering, N, cached)
@@ -4149,7 +4143,7 @@ function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
-   return PolynomialRing(R, [Symbol(v) for v in s]; cached=cached, ordering=ordering)
+function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
+   return polynomial_ring(R, [Symbol(v) for v in s]; cached=cached, ordering=ordering)
 end
 

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   NumberField.jl - Generic number fields (mainly for test code)
+#   number_field.jl - Generic number fields (mainly for test code)
 #
 ###############################################################################
 
@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-function  gen(R::ResField{PolyElem{Rational{BigInt}}})
+function  gen(R::ResidueField{PolyRingElem{Rational{BigInt}}})
    return R(gen(base_ring(R)))
 end
 
@@ -20,7 +20,7 @@ end
 #
 ###############################################################################
 
-function RandomExtensions.make(S::ResField{Generic.Poly{Rational{BigInt}}}, vs...)
+function RandomExtensions.make(S::ResidueField{Generic.Poly{Rational{BigInt}}}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, vs[1])
@@ -32,13 +32,13 @@ end
 
 ###############################################################################
 #
-#   NumberField constructor (mainly for test code)
+#   number_field constructor (mainly for test code)
 #
 ###############################################################################
 
-function NumberField(a::Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cached = true)
+function number_field(a::Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cached = true)
    S = parent(a)
-   R = ResidueField(S, a, cached=cached)
+   R = residue_field(S, a, cached=cached)
    x = gen(S)
    return R, R(x)
 end

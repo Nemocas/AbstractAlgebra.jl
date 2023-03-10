@@ -4,32 +4,6 @@
 #
 ###############################################################################
 
-export MatrixSpace, add_column, add_column!, add_row, add_row!,
-       block_diagonal_matrix, can_solve,
-       can_solve_left_reduced_triu, can_solve_with_kernel,
-       can_solve_with_solution,  can_solve_with_solution_interpolation,
-       charpoly, charpoly_danilevsky!, charpoly_danilevsky_ff!,
-       charpoly_hessenberg!,_check_dim, _checkbounds, dense_matrix_type,
-       det_popov, diagonal_matrix, extended_weak_popov,
-       extended_weak_popov_with_transform, fflu!, fflu, find_pivot_popov, gram,
-       hessenberg!, hessenberg, hnf, hnf_cohen, hnf_cohen_with_transform,
-       hnf_kb, hnf_kb!, hnf_kb_with_transform, hnf_minors,
-       hnf_minors_with_transform, hnf_via_popov, hnf_via_popov_with_transform,
-       hnf_with_transform, identity_matrix, is_hessenberg, is_hnf, is_invertible,
-       is_invertible_with_inverse, is_popov, is_rref, is_snf, is_square, is_upper_triangular,
-       is_skew_symmetric,
-       is_weak_popov, is_zero_column, is_zero_row, kernel, kronecker_product,
-       left_kernel, lu, lu!, map_entries, map_entries!, matrix, minpoly,
-       minors, multiply_column, multiply_column!, multiply_row, multiply_row!,
-       nrows, ncols, pfaffian, pfaffians, popov, popov_with_transform, powers,
-       pseudo_inv, randmat_triu, randmat_with_rank, rank, rank_profile_popov,
-       reverse_cols, reverse_cols!, reverse_rows, reverse_rows!, right_kernel,
-       rref, rref!, rref_rational, rref_rational!, similarity!, snf,
-       snf_with_transform, snf_kb, snf_kb!, snf_kb_with_transform, solve,
-       solve_ff, solve_left, solve_rational, solve_triu, solve_with_det,
-       swap_cols, swap_cols!, swap_rows, swap_rows!, tr, typed_hvcat,
-       typed_hcat, weak_popov, weak_popov_with_transform, zero!, zero_matrix
-
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -58,6 +32,25 @@ end
 function _check_dim(r::Int, c::Int, arr::AbstractVector{T}) where {T}
   length(arr) != r*c && throw(ErrorConstrDimMismatch(r, c, length(arr)))
   return nothing
+end
+
+function _check_dim(r::Int, c::Int, a::MatrixElem)
+  size(a) == (r, c) || throw(ErrorConstrDimMismatch(r, c, size(a)...))
+  return nothing
+end
+
+function _check_bases(a, b)
+  base_ring(a) == base_ring(b) || throw(DomainError((a, b), "Base rings do not match."))
+  return nothing
+end
+
+function (s::MatSpace{T})(a::M) where {T, M <: MatrixElem{T}}
+  _check_dim(nrows(s), ncols(s), a)
+  _check_bases(s, a)
+  a isa eltype(s) && return a
+  b = eltype(s)(a)
+  b.base_ring = base_ring(s)
+  return b
 end
 
 _checkbounds(i::Int, j::Int) = 1 <= j <= i
@@ -123,14 +116,14 @@ end
 
 Return the number of rows of the given matrix.
 """
-nrows(::MatrixElem{T}) where T <: NCRingElement
+nrows(a::MatrixElem{T}) where T <: NCRingElement
 
 @doc Markdown.doc"""
     ncols(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of columns of the given matrix.
 """
-ncols(::MatrixElem{T}) where T <: NCRingElement
+ncols(a::MatrixElem{T}) where T <: NCRingElement
 
 @doc Markdown.doc"""
     length(a::MatrixElem{T}) where T <: NCRingElement
@@ -302,7 +295,7 @@ function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
 end
 
 @doc Markdown.doc"""
-   block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
+    block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
 
 Create the block diagonal matrix over the ring `R` whose blocks are given
 by the matrices in `V`. Entries are coerced into `R` upon creation.
@@ -620,6 +613,10 @@ function Base.show(io::IO, a::MatrixElem{T}) where T <: NCRingElement
 end
 
 function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem{T}) where T <: NCRingElement
+   if isdefined(Main, :IJulia) && Main.IJulia.inited &&
+         !AbstractAlgebra.get_html_as_latex()
+      error("Dummy error for jupyter")
+   end
    show_via_expressify(io, mi, a)
 end
 
@@ -970,6 +967,31 @@ end
 
 ==(x::MatElem, y::MatElem) = ==(promote(x, y)...)
 
+# matrix * vec and vec * matrx
+function Base.promote(x::MatrixElem{S},
+                      y::Vector{T}) where {S <: NCRingElement,
+                                               T <: NCRingElement}
+   U = promote_rule_sym(S, T)
+   if U === S
+      return x, map(base_ring(x), y)
+   elseif U === T && length(y) != 0
+      return change_base_ring(parent(y[1]), x), y
+   else
+      error("Cannot promote to common type")
+   end
+end
+
+function Base.promote(x::Vector{S},
+                      y::MatrixElem{T}) where {S <: NCRingElement,
+                                               T <: NCRingElement}
+   yy, xx = promote(y, x)
+   return xx, yy
+end
+
+*(x::MatrixElem, y::Vector) = *(promote(x, y)...)
+
+*(x::Vector, y::MatrixElem) = *(promote(x, y)...)
+
 function Base.promote(x::MatElem{S}, y::T) where {S <: NCRingElement, T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
@@ -995,6 +1017,15 @@ end
 ==(x::MatElem, y::NCRingElem) = ==(promote(x, y)...)
 
 ==(x::NCRingElem, y::MatElem) = ==(promote(x, y)...)
+
+divexact(x::MatElem, y::NCRingElem; check::Bool = true) =
+    divexact(promote(x, y)...; check = check)
+
+divexact_left(x::MatElem, y::NCRingElem; check::Bool = true) =
+    divexact_left(promote(x, y)...; check = check)
+
+divexact_right(x::MatElem, y::NCRingElem; check::Bool = true) =
+    divexact_right(promote(x, y)...; check = check)
 
 ###############################################################################
 #
@@ -1209,6 +1240,26 @@ Return `true` if the given matrix is symmetric with respect to its main
 diagonal, i.e., `tr(M) == M`, otherwise return `false`.
 
 Alias for `LinearAlgebra.issymmetric`.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
+[1   2   3]
+[2   4   5]
+[3   5   6]
+
+julia> is_symmetric(M)
+true
+
+julia> N = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
+[1   2   3]
+[4   5   6]
+[7   8   9]
+
+julia> is_symmetric(N)
+false
+```
 """
 function is_symmetric(a::MatrixElem{T}) where T <: NCRingElement
     if !is_square(a)
@@ -1223,6 +1274,35 @@ function is_symmetric(a::MatrixElem{T}) where T <: NCRingElement
     end
     return true
 end
+
+
+@doc Markdown.doc"""
+    transpose(x::MatrixElem{T}) where T <: RingElement
+
+Return the transpose of the given matrix.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, t = polynomial_ring(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = matrix_space(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> B = transpose(A)
+[t + 1   t^2            -2]
+[    t     t         t + 2]
+[    1     t   t^2 + t + 1]
+
+```
+""" transpose(x::MatrixElem{T}) where T <: RingElement
+
 
 ###############################################################################
 #
@@ -1259,6 +1339,27 @@ end
 Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
 the $r\times r$ matrix whose entries $i, j$ are the dot products of the
 $i$-th and $j$-th rows, respectively.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, t = polynomial_ring(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = matrix_space(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> B = gram(A)
+[2*t^2 + 2*t + 2   t^3 + 2*t^2 + t                   2*t^2 + t - 1]
+[t^3 + 2*t^2 + t       t^4 + 2*t^2                       t^3 + 3*t]
+[  2*t^2 + t - 1         t^3 + 3*t   t^4 + 2*t^3 + 4*t^2 + 6*t + 9]
+
+```
 """
 function gram(x::MatElem)
    z = similar(x, nrows(x), nrows(x))
@@ -1284,6 +1385,25 @@ end
 
 Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
 require the matrix to be square.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, t = polynomial_ring(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = matrix_space(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> b = tr(A)
+t^2 + 3*t + 2
+
+```
 """
 function tr(x::MatrixElem{T}) where T <: RingElement
    !is_square(x) && error("Not a square matrix in trace")
@@ -1305,6 +1425,25 @@ end
 
 Return the content of the matrix $a$, i.e. the greatest common divisor of all
 its entries, assuming it exists.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, t = polynomial_ring(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = matrix_space(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> b = content(A)
+1
+
+```
 """
 function content(x::MatrixElem{T}) where T <: RingElement
   d = zero(base_ring(x))
@@ -1329,6 +1468,33 @@ end
     *(P::perm, x::MatrixElem{T}) where T <: RingElement
 
 Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, t = polynomial_ring(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
+
+julia> S = matrix_space(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+
+julia> G = SymmetricGroup(3)
+Full symmetric group over 3 elements
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> P = G([1, 3, 2])
+(2,3)
+
+julia> B = P*A
+[t + 1       t             1]
+[   -2   t + 2   t^2 + t + 1]
+[  t^2       t             t]
+
+```
 """
 function *(P::Perm, x::MatrixElem{T}) where T <: RingElement
    z = similar(x)
@@ -1687,8 +1853,8 @@ function rref_rational(M::MatrixElem{T}) where {T <: RingElement}
 end
 
 function rref!(A::MatrixElem{T}) where {T <: FieldElement}
-   m = nrows(A)
-   n = ncols(A)
+   m = nrows(A)::Int
+   n = ncols(A)::Int
    R = base_ring(A)
    P = one(SymmetricGroup(m))
    rnk = lu!(P, A)
@@ -1991,11 +2157,6 @@ function det_fflu(M::MatrixElem{T}) where {T <: RingElement}
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
 
-@doc Markdown.doc"""
-    det(M::MatrixElem{T}) where {T <: FieldElement}
-
-Return the determinant of the matrix $M$. We assume $M$ is square.
-"""
 function det(M::MatrixElem{T}) where {T <: FieldElement}
    !is_square(M) && error("Not a square matrix in det")
    if nrows(M) == 0
@@ -2008,6 +2169,28 @@ end
     det(M::MatrixElem{T}) where {T <: RingElement}
 
 Return the determinant of the matrix $M$. We assume $M$ is square.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, x = polynomial_ring(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia> K, a = number_field(x^3 + 3x + 1, "a")
+(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
+
+julia> S = matrix_space(K, 3, 3)
+Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+[            0   2*x + 3   x^2 + 1]
+[      x^2 - 2     x - 1       2*x]
+[x^2 + 3*x + 1       2*x         1]
+
+julia> d = det(A)
+11*x^2 - 30*x - 5
+
+```
 """
 function det(M::MatrixElem{T}) where {T <: RingElement}
    !is_square(M) && error("Not a square matrix in det")
@@ -2021,7 +2204,7 @@ function det(M::MatrixElem{T}) where {T <: RingElement}
    end
 end
 
-function det_interpolation(M::MatrixElem{T}) where {T <: PolyElem}
+function det_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
    n = nrows(M)
    !is_domain_type(elem_type(typeof(base_ring(base_ring(M))))) &&
           error("Generic interpolation requires a domain type")
@@ -2057,7 +2240,7 @@ function det_interpolation(M::MatrixElem{T}) where {T <: PolyElem}
    return interpolate(R, x, d)
 end
 
-function det(M::MatrixElem{T}) where {S <: FinFieldElem, T <: PolyElem{S}}
+function det(M::MatrixElem{T}) where {S <: FinFieldElem, T <: PolyRingElem{S}}
    !is_square(M) && error("Not a square matrix in det")
    if nrows(M) == 0
       return one(base_ring(M))
@@ -2065,7 +2248,7 @@ function det(M::MatrixElem{T}) where {S <: FinFieldElem, T <: PolyElem{S}}
    return det_popov(M)
 end
 
-function det(M::MatrixElem{T}) where {T <: PolyElem}
+function det(M::MatrixElem{T}) where {T <: PolyRingElem}
    !is_square(M) && error("Not a square matrix in det")
    if nrows(M) == 0
       return one(base_ring(M))
@@ -2115,7 +2298,22 @@ end
 @doc Markdown.doc"""
     minors(A::MatElem, k::Int)
 
-Return an array consisting of the k-minors of A
+Return an array consisting of the `k`-minors of `A`.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> A = ZZ[1 2 3; 4 5 6]
+[1   2   3]
+[4   5   6]
+
+julia> minors(A, 2)
+3-element Vector{BigInt}:
+ -3
+ -6
+ -3
+
+```
 """
 function minors(A::MatElem, k::Int)
    row_indices = combinations(nrows(A), k)
@@ -2127,6 +2325,34 @@ function minors(A::MatElem, k::Int)
       end
    end
    return(mins)
+end
+
+@doc Markdown.doc"""
+    exterior_power(A::MatElem, k::Int) -> MatElem
+
+Return the `k`-th exterior power of `A`.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> A = matrix(ZZ, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+julia> exterior_power(A, 2)
+[-3    -6   -3]
+[-6   -12   -6]
+[-3    -6   -3]
+```
+"""
+function exterior_power(A::MatElem, k::Int)
+  ri = combinations(nrows(A), k)
+  n = length(ri)
+  res = similar(A, n, n)
+   for i in 1:n
+     for j in 1:n
+       res[i, j] = det(A[ri[i], ri[j]])
+     end
+   end
+   return res 
 end
 
 ###############################################################################
@@ -2170,7 +2396,7 @@ end
 @doc Markdown.doc"""
     pfaffian(M::MatElem)
 
-Return the Pfaffian of a skew-symmetric matrix M.
+Return the Pfaffian of a skew-symmetric matrix `M`.
 """
 function pfaffian(M::MatElem)
    check_skew_symmetric(M)
@@ -2188,7 +2414,7 @@ end
 @doc Markdown.doc"""
     pfaffians(M::MatElem, k::Int)
 
-Return an array consisting of the k-Pfaffians of a skew-symmetric matrix M.
+Return a vector consisting of the `k`-Pfaffians of a skew-symmetric matrix `M`.
 """
 function pfaffians(M::MatElem, k::Int)
    check_skew_symmetric(M)
@@ -2318,6 +2544,28 @@ end
     rank(M::MatrixElem{T}) where {T <: RingElement}
 
 Return the rank of the matrix $M$.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, x = polynomial_ring(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
+
+julia> K, a = number_field(x^3 + 3x + 1, "a")
+(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
+
+julia> S = matrix_space(K, 3, 3)
+Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+[            0   2*x + 3   x^2 + 1]
+[      x^2 - 2     x - 1       2*x]
+[x^2 + 3*x + 1       2*x         1]
+
+julia> d = rank(A)
+3
+
+```
 """
 function rank(M::MatrixElem{T}) where {T <: RingElement}
    n = nrows(M)
@@ -2330,11 +2578,6 @@ function rank(M::MatrixElem{T}) where {T <: RingElement}
    return r
 end
 
-@doc Markdown.doc"""
-    rank(M::MatrixElem{T}) where {T <: FieldElement}
-
-Return the rank of the matrix $M$.
-"""
 function rank(M::MatrixElem{T}) where {T <: FieldElement}
    n = nrows(M)
    if n == 0
@@ -2643,7 +2886,7 @@ function can_solve_with_solution_with_det(M::MatElem{T}, b::MatElem{T}) where {T
    return true, rank, p, pivots, x, d
 end
 
-function can_solve_with_solution_with_det(M::MatElem{T}, b::MatElem{T}) where {T <: PolyElem}
+function can_solve_with_solution_with_det(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
    flag, r, p, pivots, x, d = can_solve_with_solution_interpolation_inner(M, b)
    return flag, r, p, pivots, x, d
 end
@@ -2671,7 +2914,7 @@ function solve_ff(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    return S, d
 end
 
-function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T}) where {T <: PolyElem}
+function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
    m = nrows(M)
    h = ncols(b)
    c = ncols(M)
@@ -2714,7 +2957,6 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
    pt = 1
    rnk = -1
    firstprm = true
-   failues = 0
    while l <= bound
       y[l] = base_ring(R)(pt - b2)
       # Running out of interpolation points doesn't imply there is no solution
@@ -2751,7 +2993,7 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
             return flag, r, p, pv, zero(x), zero(R)
          end
          p = inv!(p)
-	 # Check that new solution has the same pivots as previous ones
+         # Check that new solution has the same pivots as previous ones
          if r != rnk || p != prm || pv != pivots
             if r < rnk # rank is too low: reject
                pt += 1
@@ -2824,7 +3066,7 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
    return true, rnk, prm, pivots, x, interpolate(R, y, d)
 end
 
-function can_solve_with_solution_interpolation(M::MatElem{T}, b::MatElem{T}) where {T <: PolyElem}
+function can_solve_with_solution_interpolation(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
    flag, r, p, pv, x, d = can_solve_with_solution_interpolation_inner(M, b)
    return flag, x, d
 end
@@ -2848,7 +3090,7 @@ function solve_ringelem(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    return solve_ff(M, b)
 end
 
-function solve_rational(M::MatElem{T}, b::MatElem{T}) where {T <: PolyElem}
+function solve_rational(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    nrows(M) != nrows(b) && error("Dimensions don't match in solve")
    flag = true
@@ -3191,7 +3433,7 @@ function can_solve_left_reduced_triu(r::MatElem{T},
    return true, x
 end
 
-function can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: FracElem{T} where T <: PolyElem
+function can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: FracElem{T} where T <: PolyRingElem
    if side == :left
       (f, x) = can_solve_with_solution(transpose(a), transpose(b); side=:right)
       return (f, transpose(x))
@@ -3446,6 +3688,28 @@ $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
 the vector space kernel over the fraction field of the base ring if the
 latter is not a field. In AbstractAlgebra we use the name "kernel" for a
 function to compute an integral kernel.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, x = polynomial_ring(ZZ, "x")
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> S = matrix_space(R, 4, 4)
+Matrix Space of 4 rows and 4 columns over Univariate Polynomial Ring in x over Integers
+
+julia> M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
+              -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;
+              -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;
+              -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])
+[  -6*x^2 + 6*x + 12   -12*x^2 - 21*x - 15    -15*x^2 + 21*x + 33     -21*x^2 - 9*x - 9]
+[  -8*x^2 + 8*x + 16   -16*x^2 + 38*x - 20     90*x^2 - 82*x - 44    60*x^2 + 54*x - 34]
+[   -4*x^2 + 4*x + 8    -8*x^2 + 13*x - 10     35*x^2 - 31*x - 14    22*x^2 + 21*x - 15]
+[-10*x^2 + 10*x + 20   -20*x^2 + 70*x - 25   150*x^2 - 140*x - 85   105*x^2 + 90*x - 50]
+
+julia> n, N = nullspace(M)
+(2, [1320*x^4-330*x^2-1320*x-1320 1056*x^4+1254*x^3+1848*x^2-66*x-330; -660*x^4+1320*x^3+1188*x^2-1848*x-1056 -528*x^4+132*x^3+1584*x^2+660*x-264; 396*x^3-396*x^2-792*x 0; 0 396*x^3-396*x^2-792*x])
+```
 """
 function nullspace(M::MatElem{T}) where {T <: RingElement}
    n = ncols(M)
@@ -3941,6 +4205,30 @@ end
 Return the characteristic polynomial $p$ of the matrix $M$. The
 polynomial ring $R$ of the resulting polynomial must be supplied
 and the matrix is assumed to be square.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = residue_ring(ZZ, 7)
+Residue ring of Integers modulo 7
+
+julia> S = matrix_space(R, 4, 4)
+Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
+
+julia> T, x = polynomial_ring(R, "x")
+(Univariate Polynomial Ring in x over Residue ring of Integers modulo 7, x)
+
+julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+[1   2   4   3]
+[2   5   1   0]
+[6   1   3   2]
+[1   1   3   5]
+
+julia> A = charpoly(T, M)
+x^4 + 2*x^2 + 6*x + 2
+
+```
 """
 function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
    !is_square(Y) && error("Dimensions don't match in charpoly")
@@ -4017,12 +4305,6 @@ end
 # charpoly iff it has degree n. Otherwise it is meaningless (but it is
 # extremely fast to compute over some fields).
 
-@doc Markdown.doc"""
-    minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
-
-Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
-of the resulting polynomial must be supplied and the matrix must be square.
-"""
 function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
    !is_square(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
@@ -4118,6 +4400,27 @@ end
 
 Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 of the resulting polynomial must be supplied and the matrix must be square.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = GF(13)
+Finite field F_13
+
+julia> T, y = polynomial_ring(R, "y")
+(Univariate Polynomial Ring in y over Finite field F_13, y)
+
+julia> M = R[7 6 1;
+             7 7 5;
+             8 12 5]
+[7    6   1]
+[7    7   5]
+[8   12   5]
+
+julia> A = minpoly(T, M)
+y^2 + 10*y
+
+```
 """
 function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
    !is_square(M) && error("Not a square matrix in minpoly")
@@ -5044,11 +5347,11 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+    is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
 
 Return `true` if $P$ is a matrix in weak Popov form of the given rank.
 """
-function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
    zero_rows = 0
    pivots = zeros(ncols(P))
    for r = 1:nrows(P)
@@ -5070,11 +5373,11 @@ function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
 end
 
 @doc Markdown.doc"""
-    is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+    is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
 
 Return `true` if $P$ is a matrix in Popov form with the given rank.
 """
-function is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
+function is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
    zero_rows = 0
    for r = 1:nrows(P)
       p = find_pivot_popov(P, r)
@@ -5127,25 +5430,25 @@ function is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyElem
 end
 
 @doc Markdown.doc"""
-    weak_popov(A::MatElem{T}) where {T <: PolyElem}
+    weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return the weak Popov form of $A$.
 """
-function weak_popov(A::MatElem{T}) where {T <: PolyElem}
+function weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
    return _weak_popov(A, Val{false})
 end
 
 @doc Markdown.doc"""
-    weak_popov_with_transform(A::MatElem{T}) where {T <: PolyElem}
+    weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 
 Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
 is a transformation matrix so that $P = UA$.
 """
-function weak_popov_with_transform(A::MatElem{T}) where {T <: PolyElem}
+function weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
    return _weak_popov(A, Val{true})
 end
 
-function _weak_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyElem, S}
+function _weak_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
    P = deepcopy(A)
    m = nrows(P)
    W = similar(A, 0, 0)
@@ -5161,29 +5464,29 @@ function _weak_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <
 end
 
 @doc Markdown.doc"""
-    extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyElem}
+    extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
 
 Compute the weak Popov form $P$ of $A$ by applying simple row transformations
 on $A$ and a vector $W$ by applying the same transformations on the vector $V$.
 Return the tuple $(P, W)$.
 """
-function extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyElem}
+function extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
    return _extended_weak_popov(A, V, Val{false})
 end
 
 @doc Markdown.doc"""
-    extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyElem}
+    extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
 
 Compute the weak Popov form $P$ of $A$ by applying simple row transformations
 on $A$, a vector $W$ by applying the same transformations on the vector $V$,
 and a transformation matrix $U$ so that $P = UA$.
 Return the tuple $(P, W, U)$.
 """
-function extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyElem}
+function extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
    return _extended_weak_popov(A, V, Val{true})
 end
 
-function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyElem, S}
+function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
    @assert nrows(V) == nrows(A) && ncols(V) == 1
    P = deepcopy(A)
    W = deepcopy(V)
@@ -5199,7 +5502,7 @@ function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}} 
    end
 end
 
-function find_pivot_popov(P::MatElem{T}, r::Int, last_col::Int = 0) where {T <: PolyElem}
+function find_pivot_popov(P::MatElem{T}, r::Int, last_col::Int = 0) where {T <: PolyRingElem}
    last_col == 0 ? n = ncols(P) : n = last_col
    pivot = n
    for c = n-1:-1:1
@@ -5210,7 +5513,7 @@ function find_pivot_popov(P::MatElem{T}, r::Int, last_col::Int = 0) where {T <: 
    return pivot
 end
 
-function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) where {T <: PolyElem}
+function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
    last_row == 0 ? m = nrows(P) : m = last_row
    last_col == 0 ? n = ncols(P) : n = last_col
    pivots = Array{Vector{Int}}(undef, n)
@@ -5226,7 +5529,7 @@ function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) 
 end
 
 function weak_popov!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, extended::Bool = false,
-                                       with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyElem}
+                                       with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
    pivots = init_pivots_popov(P, last_row, last_col)
    weak_popov_with_pivots!(P, W, U, pivots, extended, with_trafo, last_row, last_col)
    return nothing
@@ -5237,7 +5540,7 @@ The weak Popov form is defined by T. Mulders and A. Storjohann in
 "On lattice reduction for polynomial matrices"
 =#
 function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}},
-                                                   extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyElem}
+                                                   extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
    last_row == 0 ? m = nrows(P) : m = last_row
    last_col == 0 ? n = ncols(P) : n = last_col
    @assert length(pivots) >= n
@@ -5291,12 +5594,12 @@ function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pi
 end
 
 @doc Markdown.doc"""
-    rank_profile_popov(A::MatElem{T}) where {T <: PolyElem}
+    rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return an array of $r$ row indices such that these rows of $A$ are linearly
 independent, where $r$ is the rank of $A$.
 """
-function rank_profile_popov(A::MatElem{T}) where {T <: PolyElem}
+function rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
    B = deepcopy(A)
    m = nrows(A)
    n = ncols(A)
@@ -5332,7 +5635,7 @@ function rank_profile_popov(A::MatElem{T}) where {T <: PolyElem}
    return rank_profile
 end
 
-function det_popov(A::MatElem{T}) where {T <: PolyElem}
+function det_popov(A::MatElem{T}) where {T <: PolyRingElem}
    nrows(A) != ncols(A) && error("Not a square matrix in det_popov.")
    B = deepcopy(A)
    n = ncols(B)
@@ -5397,25 +5700,25 @@ function det_popov(A::MatElem{T}) where {T <: PolyElem}
 end
 
 @doc Markdown.doc"""
-    popov(A::MatElem{T}) where {T <: PolyElem}
+    popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return the Popov form of $A$.
 """
-function popov(A::MatElem{T}) where {T <: PolyElem}
+function popov(A::MatElem{T}) where {T <: PolyRingElem}
    return _popov(A, Val{false})
 end
 
 @doc Markdown.doc"""
-    popov_with_transform(A::MatElem{T}) where {T <: PolyElem}
+    popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 
 Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
 is a transformation matrix so that $P = UA$.
 """
-function popov_with_transform(A::MatElem{T}) where {T <: PolyElem}
+function popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
    return _popov(A, Val{true})
 end
 
-function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyElem, S}
+function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
    P = deepcopy(A)
    m = nrows(P)
    if trafo == Val{true}
@@ -5429,7 +5732,7 @@ function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: Pol
    end
 end
 
-function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}}, with_trafo::Bool) where {T <: PolyElem}
+function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}}, with_trafo::Bool) where {T <: PolyRingElem}
    m = nrows(P)
    n = ncols(P)
    pivots2 = Vector{NTuple{3,Int}}(undef, m)
@@ -5465,7 +5768,7 @@ function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int
 end
 
 # Mulders, Storjohann: "On lattice reduction for polynomial matrices", Section 7
-function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T <: PolyElem}
+function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T <: PolyRingElem}
    m = nrows(P)
    n = ncols(P)
    W = similar(U, 0, 0)
@@ -5542,15 +5845,15 @@ function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T
    return nothing
 end
 
-function hnf_via_popov(A::MatElem{T}) where {T <: PolyElem}
+function hnf_via_popov(A::MatElem{T}) where {T <: PolyRingElem}
    return _hnf_via_popov(A, Val{false})
 end
 
-function hnf_via_popov_with_transform(A::MatElem{T}) where {T <: PolyElem}
+function hnf_via_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
    return _hnf_via_popov(A, Val{true})
 end
 
-function _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyElem, S}
+function _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
    H = deepcopy(A)
    m = nrows(H)
    if trafo == Val{true}
@@ -5564,7 +5867,7 @@ function _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {
    end
 end
 
-function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, r::Int, with_trafo::Bool) where {T <: PolyElem}
+function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, r::Int, with_trafo::Bool) where {T <: PolyRingElem}
    n = ncols(H)
    t = base_ring(H)()
    for c = 1:n
@@ -5587,7 +5890,7 @@ function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite:
    return nothing
 end
 
-function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, c::Int, with_trafo::Bool) where {T <: PolyElem}
+function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, c::Int, with_trafo::Bool) where {T <: PolyRingElem}
    m = nrows(H)
    n = ncols(H)
    t = base_ring(H)()
@@ -5614,7 +5917,7 @@ function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermi
    return nothing
 end
 
-function hnf_via_popov!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T <: PolyElem}
+function hnf_via_popov!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T <: PolyRingElem}
    m = nrows(H)
    n = ncols(H)
    R = base_ring(H)
@@ -5686,6 +5989,26 @@ $P$ be the $n\times n$ identity matrix that has had all zero entries of row
 $r$ replaced with $d$, then the transform applied is equivalent to
 $M = P^{-1}MP$. We require $M$ to be a square matrix. A similarity transform
 preserves the minimal and characteristic polynomials of a matrix.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = residue_ring(ZZ, 7)
+Residue ring of Integers modulo 7
+
+julia> S = matrix_space(R, 4, 4)
+Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
+
+julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+[1   2   4   3]
+[2   5   1   0]
+[6   1   3   2]
+[1   1   3   5]
+
+julia> similarity!(M, 1, R(3))
+
+```
 """
 function similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
    n = nrows(A)
@@ -5723,6 +6046,25 @@ end
 
 Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 row are swapped.
+
+**Examples**
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> M = identity_matrix(ZZ, 3)
+[1   0   0]
+[0   1   0]
+[0   0   1]
+
+julia> swap_rows(M, 1, 2)
+[0   1   0]
+[1   0   0]
+[0   0   1]
+
+julia> M  # was not modified
+[1   0   0]
+[0   1   0]
+[0   0   1]
+```
 """
 function swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
@@ -5734,7 +6076,27 @@ end
 @doc Markdown.doc"""
     swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
-Swap the $i$th and $j$th row of $a$.
+Swap the $i$th and $j$th row of $a$ in place. The function returns the mutated
+matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
+
+**Examples**
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> M = identity_matrix(ZZ, 3)
+[1   0   0]
+[0   1   0]
+[0   0   1]
+
+julia> swap_rows!(M, 1, 2)
+[0   1   0]
+[1   0   0]
+[0   0   1]
+
+julia> M  # was modified
+[0   1   0]
+[1   0   0]
+[0   0   1]
+```
 """
 function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
@@ -5764,7 +6126,8 @@ end
 @doc Markdown.doc"""
     swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
-Swap the $i$th and $j$th column of $a$.
+Swap the $i$th and $j$th column of $a$ in place. The function returns the mutated
+matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 """
 function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    if i != j
@@ -6475,20 +6838,178 @@ diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
 
 ###############################################################################
 #
-#   MatrixSpace constructor
+#   Lower triangular matrix
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    MatrixSpace(R::NCRing, r::Int, c::Int; cached::Bool = true)
+    lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+
+Return the $n$ by $n$ matrix whose entries on and below the main diagonal are
+the elements of `L`, and which has zeroes elsewhere.
+The value of $n$ is determined by the condition that `L` has length
+$n(n+1)/2$.
+
+An exception is thrown if there is no integer $n$ with this property.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> lower_triangular_matrix([1, 2, 3])
+[1   0]
+[2   3]
+```
+"""
+function lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+   l = length(L)
+   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   (flag, m) = is_square_with_sqrt(8*l+1)
+   flag || throw(ArgumentError("Input vector of invalid length"))
+   n = div(m-1, 2)
+   R = parent(L[1])
+   M = zero_matrix(R, n, n)
+   pos = 1
+   for i in 1:n, j in 1:i
+      M[i,j] = L[pos]
+      pos += 1
+   end
+   return M
+end
+
+###############################################################################
+#
+#   Upper triangular matrix
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+
+Return the $n$ by $n$ matrix whose entries on and above the main diagonal are
+the elements of `L`, and which has zeroes elsewhere.
+The value of $n$ is determined by the condition that `L` has length
+$n(n+1)/2$.
+
+An exception is thrown if there is no integer $n$ with this property.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> upper_triangular_matrix([1, 2, 3])
+[1   2]
+[0   3]
+```
+"""
+function upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+   l = length(L)
+   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   (flag, m) = is_square_with_sqrt(8*l+1)
+   flag || throw(ArgumentError("Input vector of invalid length"))
+   n = div(m-1, 2)
+   R = parent(L[1])
+   M = zero_matrix(R, n, n)
+   pos = 1
+   for i in 1:n, j in i:n
+      M[i,j] = L[pos]
+      pos += 1
+   end
+   return M
+end
+
+###############################################################################
+#
+#   Strictly lower triangular matrix
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+
+Return the $n$ by $n$ matrix whose entries below the main diagonal are
+the elements of `L`, and which has zeroes elsewhere.
+The value of $n$ is determined by the condition that `L` has length
+$(n-1)n/2$.
+
+An exception is thrown if there is no integer $n$ with this property.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> strictly_lower_triangular_matrix([1, 2, 3])
+[0   0   0]
+[1   0   0]
+[2   3   0]
+```
+"""
+function strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+   l = length(L)
+   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   (flag, m) = is_square_with_sqrt(8*l+1)
+   flag || throw(ArgumentError("Input vector of invalid length"))
+   n = div(m+1, 2)
+   R = parent(L[1])
+   M = zero_matrix(R, n, n)
+   pos = 1
+   for i in 2:n, j in 1:(i-1)
+      M[i,j] = L[pos]
+      pos += 1
+   end
+   return M
+end
+
+###############################################################################
+#
+#   Strictly upper triangular matrix
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+
+Return the $n$ by $n$ matrix whose entries above the main diagonal are
+the elements of `L`, and which has zeroes elsewhere.
+The value of $n$ is determined by the condition that `L` has length
+$(n-1)n/2$.
+
+An exception is thrown if there is no integer $n$ with this property.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> strictly_upper_triangular_matrix([1, 2, 3])
+[0   1   2]
+[0   0   3]
+[0   0   0]
+```
+"""
+function strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+   l = length(L)
+   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   (flag, m) = is_square_with_sqrt(8*l+1)
+   flag || throw(ArgumentError("Input vector of invalid length"))
+   n = div(m+1, 2)
+   R = parent(L[1])
+   M = zero_matrix(R, n, n)
+   pos = 1
+   for i in 1:(n-1), j in (i+1):n
+      M[i,j] = L[pos]
+      pos += 1
+   end
+   return M
+end
+
+###############################################################################
+#
+#   matrix_space constructor
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
 
 Return parent object corresponding to the space of $r\times c$ matrices over
 the ring $R$. If `cached == true` (the default), the returned parent object
 is cached so that it can returned by future calls to the constructor with the
 same dimensions and base ring.
 """
-function MatrixSpace(R::NCRing, r::Int, c::Int; cached::Bool = true)
-   return Generic.MatrixSpace(R, r, c, cached=cached)
+function matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
+   return Generic.matrix_space(R, r, c, cached=cached)
 end
 
 ###############################################################################

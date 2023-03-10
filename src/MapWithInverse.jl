@@ -4,10 +4,6 @@
 #
 ################################################################################
 
-export image_map, inverse_fn, map_with_preimage_from_func, map_with_retraction,
-       map_with_retraction_from_func, map_with_section,
-       map_with_section_from_func, preimage_map, retraction_map, section_map
-       
 ################################################################################
 #
 #  MapWithSection

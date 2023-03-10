@@ -23,14 +23,14 @@ out to the full number of variables behind the scenes.
 AbstractAlgebra provides a generic universal polynomial type `Generic.UnivPoly{T, U}`
 where `T` is the type of elements of the coefficient ring and `U` is the type of
 the elements of the underlying multivariate polynomial ring. Essentially, `U` can
-be any type belonging to `MPolyElem{T}`.
+be any type belonging to `MPolyRingElem{T}`.
 
-Parent objects of such polynomials have type `Generic.UnivPolyRing{T, U}`.
+Parent objects of such polynomials have type `Generic.UniversalPolyRing{T, U}`.
 
 ## Abstract types
 
 AbstractAlgebra also provides abstract types for universal polynomials and their
-rings. These are `UnivPolyElem{T, U}` and `UnivPolyRing{T, U}` respectively.
+rings. These are `UniversalPolyRingElem{T, U}` and `UniversalPolyRing{T, U}` respectively.
 These in turn belong to `Ring`.
 
 ## Polynomial ring constructors
@@ -60,8 +60,8 @@ Universal Polynomial Ring over Integers
 There are two ways to add variables to a universal polynomial ring `S`.
 
 ```julia
-gen(S::UnivPolyRing, var::T) where T <: Union{Char, Symbol, String}
-gens(S::UnivPolyRing, vars::Vector{T}) where T <: Union{Char, Symbol, String}
+gen(S::UniversalPolyRing, var::T) where T <: Union{Char, Symbol, String}
+gens(S::UniversalPolyRing, vars::Vector{T}) where T <: Union{Char, Symbol, String}
 ```
 
 **Examples**

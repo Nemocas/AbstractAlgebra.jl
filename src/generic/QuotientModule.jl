@@ -61,7 +61,7 @@ function show_gens_rels(io::IO, N::AbstractAlgebra.FPModule{T}) where T <: RingE
       print(io, "s and ")
    end
    if length(rels(N)) == 0
-      println(io, "no relations")
+      print(io, "no relations")
    else
       println(io, "relations:")
       Nrels = [string(v) for v in rels(N)]

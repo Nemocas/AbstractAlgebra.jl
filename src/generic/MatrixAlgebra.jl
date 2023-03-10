@@ -32,11 +32,6 @@ is_domain_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = false
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    transpose(x::MatAlgElem{T}) where T <: RingElement
-
-Return the transpose of the given matrix.
-"""
 function transpose(x::MatAlgElem{T}) where T <: NCRingElement
    arr = permutedims(x.entries, [2, 1])
    z = MatAlgElem{T}(arr)

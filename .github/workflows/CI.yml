@@ -23,20 +23,21 @@ jobs:
       matrix:
         julia-version:
           - '1.6'
-          - '~1.7.0-0'
-          - '~1.8.0-0'
+          - '1.7'
+          - '1.8'
+          - '~1.9.0-0'
           - 'nightly'
         os:
           - ubuntu-latest
         include:
           # Add a few windows and macOS jobs (not too many, the number we can run in parallel is limited)
-          - os: macOS-latest
-            julia-version: '1.6'
-          - os: windows-latest
-            julia-version: '1.6'
+          - julia-version: '1.6'
+            os: macOS-latest
+          - julia-version: '1.6'
+            os: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           # For Codecov, we must also fetch the parent of the HEAD commit to
           # be able to properly deal with PRs / merges
@@ -46,7 +47,7 @@ jobs:
         with:
           version: ${{ matrix.julia-version }}
       - name: Cache artifacts
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         env:
           cache-name: cache-artifacts
         with:
@@ -60,6 +61,8 @@ jobs:
         uses: julia-actions/julia-buildpkg@latest
       - name: "Run tests"
         uses: julia-actions/julia-runtest@latest
+        with:
+          depwarn: error
       - name: "Run doctests"
         if: ${{ matrix.julia-version == '1.6' }}
         run: |
@@ -67,25 +70,26 @@ jobs:
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
-            using Documenter: doctest
+            using Documenter
             using AbstractAlgebra
+            DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, :(using AbstractAlgebra); recursive = true)
             doctest(AbstractAlgebra)'
       - name: "Process code coverage"
         uses: julia-actions/julia-processcoverage@v1
       - name: "Upload coverage data to Codecov"
         continue-on-error: true
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
 
   docs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1.6'
       - name: Cache artifacts
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         env:
           cache-name: cache-artifacts
         with:

@@ -138,6 +138,10 @@ function addeq!(z::T, y::T) where T <: NCRingElem
    return z + y
 end
 
+function sub!(z::T, x::T, y::T) where T <: NCRingElem
+   return x - y
+end
+
 function mul!(z::T, x::T, y::T) where T <: NCRingElem
    return x*y
 end
@@ -161,7 +165,7 @@ Return true if $a$ is invertible, else return false.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S, x = PolynomialRing(QQ, "x")
+julia> S, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> is_unit(x), is_unit(S(1)), is_unit(S(4))
@@ -224,7 +228,24 @@ end
 @doc Markdown.doc"""
     powers(a::Union{NCRingElement, MatElem}, d::Int)
 
-Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$
+Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
+[1   2   3]
+[2   3   4]
+[4   5   5]
+
+julia> A = powers(M, 4)
+5-element Vector{AbstractAlgebra.Generic.MatSpaceElem{BigInt}}:
+ [1 0 0; 0 1 0; 0 0 1]
+ [1 2 3; 2 3 4; 4 5 5]
+ [17 23 26; 24 33 38; 34 48 57]
+ [167 233 273; 242 337 394; 358 497 579]
+ [1725 2398 2798; 2492 3465 4044; 3668 5102 5957]
+
+```
 """
 function powers(a::T, d::Int) where {T <: Union{NCRingElement, MatElem}}
    d < 0 && throw(DomainError(d, "the second argument must be nonnegative"))

@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-export FractionField, FactoredFractionField
-
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -55,7 +53,7 @@ function //(x::T, y::T) where {T <: RingElem}
    try
       z.parent = Generic.FracDict[R]
    catch
-      z.parent = Generic.FractionField(R)
+      z.parent = Generic.fraction_field(R)
    end
    return z
 end
@@ -286,7 +284,7 @@ end
 #
 ###############################################################################
 
-function *(a::FracElem, b::Union{Integer, Rational, AbstractFloat})
+function *(a::FracElem, b::Union{Integer, AbstractFloat})
    c = base_ring(a)(b)
    g = gcd(denominator(a, false), c)
    n = numerator(a, false)*divexact(c, g)
@@ -294,11 +292,31 @@ function *(a::FracElem, b::Union{Integer, Rational, AbstractFloat})
    return parent(a)(n, d)
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::FracElem)
+function *(a::FracElem, b::Rational)
+   bnum = base_ring(a)(numerator(b))
+   bden = base_ring(a)(denominator(b))
+   g1 = gcd(denominator(a, false), bnum)
+   g2 = gcd(numerator(a, false), bden)
+   n = divexact(numerator(a, false), g2)*divexact(bnum, g1)
+   d = divexact(denominator(a, false), g1)*divexact(bden, g2)
+   return parent(a)(n, d)
+end
+
+function *(a::Union{Integer, AbstractFloat}, b::FracElem)
    c = base_ring(b)(a)
    g = gcd(denominator(b, false), c)
    n = numerator(b, false)*divexact(c, g)
    d = divexact(denominator(b, false), g)
+   return parent(b)(n, d)
+end
+
+function *(a::Rational, b::FracElem)
+   anum = base_ring(b)(numerator(a))
+   aden = base_ring(b)(denominator(a))
+   g1 = gcd(denominator(b, false), anum)
+   g2 = gcd(numerator(b, false), aden)
+   n = divexact(numerator(b, false), g2)*divexact(anum, g1)
+   d = divexact(denominator(b, false), g1)*divexact(aden, g2)
    return parent(b)(n, d)
 end
 
@@ -316,25 +334,31 @@ function *(a::T, b::FracElem{T}) where {T <: RingElem}
    return parent(b)(n, d)
 end
 
-function +(a::FracElem, b::Union{Integer, Rational, AbstractFloat})
+function +(a::FracElem, b::Union{Integer, AbstractFloat})
    n = numerator(a, false) + denominator(a, false)*b
    d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
-function -(a::FracElem, b::Union{Integer, Rational, AbstractFloat})
++(a::FracElem, b::Rational) = return a + parent(a)(b)
+
+function -(a::FracElem, b::Union{Integer, AbstractFloat})
    n = numerator(a, false) - denominator(a, false)*b
    d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
+-(a::FracElem, b::Rational) = return a - parent(a)(b)
+
 +(a::Union{Integer, Rational, AbstractFloat}, b::FracElem) = b + a
 
-function -(a::Union{Integer, Rational, AbstractFloat}, b::FracElem)
+function -(a::Union{Integer, AbstractFloat}, b::FracElem)
    n = a*denominator(b, false) - numerator(b, false)
    d = denominator(b, false)
    return parent(b)(n, deepcopy(d))
 end
+
+-(a::Rational, b::FracElem) = return parent(b)(a) - b
 
 function +(a::FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) + denominator(a, false)*b
@@ -408,10 +432,17 @@ end
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(x::FracElem, y::Union{Integer, Rational, AbstractFloat})
+function ==(x::FracElem, y::Union{Integer, AbstractFloat})
    return (isone(denominator(x, false)) && numerator(x, false) == y) ||
           (isone(denominator(x, true)) && numerator(x, true) == y) ||
           (numerator(x, false) == denominator(x, false)*y)
+end
+
+function ==(x::FracElem, y::Rational)
+   return (numerator(x, false) == numerator(y, false) &&
+           denominator(x, false) == denominator(y, false)) ||
+           (numerator(x, false)*denominator(y, false) ==
+            denominator(x, false)*numerator(y, false))
 end
 
 @doc Markdown.doc"""
@@ -451,7 +482,7 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 Return the inverse of the fraction $a$.
 """
 function Base.inv(a::FracElem)
-   iszero(numerator(a, false)) && throw(DivideError())
+   iszero(numerator(a, false)) && throw(NotInvertibleError(a))
    return parent(a)(deepcopy(denominator(a, false)),
                     deepcopy(numerator(a, false)))
 end
@@ -522,7 +553,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::FracElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(a::FracElem, b::Union{Integer, AbstractFloat}; check::Bool=true)
    b == 0 && throw(DivideError())
    c = base_ring(a)(b)
    g = gcd(numerator(a, false), c)
@@ -531,13 +562,21 @@ function divexact(a::FracElem, b::Union{Integer, Rational, AbstractFloat}; check
    return parent(a)(n, d)
 end
 
-function divexact(a::Union{Integer, Rational, AbstractFloat}, b::FracElem; check::Bool=true)
+function divexact(a::Union{Integer, AbstractFloat}, b::FracElem{T}; check::Bool=true) where T <: RingElem
    iszero(b) && throw(DivideError())
    c = base_ring(b)(a)
    g = gcd(numerator(b, false), c)
    n = denominator(b, false)*divexact(c, g; check=false)
    d = divexact(numerator(b, false), g; check=false)
    return parent(b)(n, d)
+end
+
+function divexact(a::FracElem{T}, b::Rational; check::Bool=true) where T <: RingElem
+   return divexact(a, parent(a)(b), check=check)
+end
+
+function divexact(a::Rational, b::FracElem{T}; check::Bool=true) where T <: RingElem
+   return divexact(parent(b)(a), b, check=check)
 end
 
 function divexact(a::FracElem{T}, b::T; check::Bool=true) where {T <: RingElem}
@@ -570,7 +609,7 @@ function evaluate(f::FracElem{T}, v::U) where {T <: RingElement, U <: RingElemen
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::FracElem{T}, v::U) where {T <: PolyElem, U <: Integer}
+function evaluate(f::FracElem{T}, v::U) where {T <: PolyRingElem, U <: Integer}
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
  
@@ -595,18 +634,18 @@ end
 ##############################################################################
 
 # Return the derivative with respect to `x`.
-function derivative(f::FracElem{T}, x::T) where {T <: MPolyElem}
+function derivative(f::FracElem{T}, x::T) where {T <: MPolyRingElem}
     return derivative(f, var_index(x))
 end
   
 # Return the derivative with respect to the `i`-th variable.
-function derivative(f::FracElem{T}, i::Int) where {T <: MPolyElem}
+function derivative(f::FracElem{T}, i::Int) where {T <: MPolyRingElem}
     n = numerator(f)
     d = denominator(f)
     return (derivative(n, i)*d - n*derivative(d, i))//d^2
 end
 
-function derivative(f::FracElem{T}) where {T <: PolyElem}
+function derivative(f::FracElem{T}) where {T <: PolyRingElem}
     n = numerator(f)
     d = denominator(f)
     return (derivative(n)*d - n*derivative(d))//d^2
@@ -899,20 +938,20 @@ rand(S::FracField, v...) = rand(GLOBAL_RNG, S, v...)
 
 ###############################################################################
 #
-#   FractionField constructor
+#   fraction_field constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    FractionField(R::Ring; cached=true)
+    fraction_field(R::Ring; cached=true)
 
 Return the parent object of the fraction field over the given base ring $R$.
 If `cached == true` (the default), the returned parent object is cached so
 that it will always be returned by a call to the constructor when the same
 base ring $R$ is supplied.
 """
-function FractionField(R::Ring; cached=true)
-   return Generic.FractionField(R; cached=cached)
+function fraction_field(R::Ring; cached=true)
+   return Generic.fraction_field(R; cached=cached)
 end
 
 @doc Markdown.doc"""

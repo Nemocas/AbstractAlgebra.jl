@@ -102,6 +102,27 @@ function is_gen(a::LaurentMPolyWrap)
     return !iszero(_var_index(a))
 end
 
+function inv(a::LaurentMPolyWrap)
+    (ap, ad) = _normalize(a)
+    return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
+end
+
+function is_unit(a::LaurentMPolyWrap)
+    (ap, ad) = _normalize(a)
+    if is_domain_type(elem_type(coefficient_ring(a))) || length(ap) <= 1
+        return is_unit(ap)
+    else
+        throw(NotImplementedError(:is_unit, a))
+    end
+end
+
+is_zero_divisor(p::LaurentMPolyWrap) = is_zero_divisor(p.mpoly)
+
+function is_zero_divisor_with_annihilator(p::LaurentMPolyWrap)
+   f, b = is_zero_divisor_with_annihilator(p.mpoly)
+   return f, LaurentMPolyWrap(parent(p), b)
+end
+
 ###############################################################################
 #
 #   Arithmetic
@@ -170,11 +191,6 @@ function divexact(a::LaurentMPolyWrap, b::LaurentMPolyWrap; check::Bool=true)
     (bp, bd) = _normalize(b)
     q = divexact(a.mpoly, bp, check=check)
     return LaurentMPolyWrap(parent(a), q, sub!(bd, a.mindegs, bd))
-end
-
-function inv(a::LaurentMPolyWrap)
-    (ap, ad) = _normalize(a)
-    return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
 end
 
 function gcd(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
@@ -315,7 +331,7 @@ end
 # min broadcasted over all all exponent vectors
 # a return of (0, true) indicates the min is infinite
 # TODO specialize for implementations
-function _mindegs(a::MPolyElem)
+function _mindegs(a::MPolyRingElem)
     d = zeros(Int, nvars(parent(a)))
     first = true
     for e in exponent_vectors(a)
@@ -330,7 +346,7 @@ function _mindegs(a::MPolyElem)
 end
 
 # TODO specialize for implementations
-function _divexact_by_exponent_vector(a::MPolyElem, d::Vector)
+function _divexact_by_exponent_vector(a::MPolyRingElem, d::Vector)
     for i in 1:length(d)
         if d[i] > 0
             a = divexact(a, gen(parent(a), i)^d[i])
@@ -348,7 +364,7 @@ function _normalize(a::LaurentMPolyWrap)
 end
 
 # A normalized mpoly is either zero or not divisible by any gen
-function _normalize(a::MPolyElem)
+function _normalize(a::MPolyRingElem)
     d, isinf = _mindegs(a)
     return _divexact_by_exponent_vector(a, d), d
 end
@@ -548,7 +564,7 @@ function (a::LaurentMPolyWrapRing{T})(b::RingElement) where T <: RingElement
    return LaurentMPolyWrap(a, a.mpolyring(b))
 end
 
-function (a::LaurentMPolyWrapRing{T})(b::MPolyElem{T}) where T <: RingElement
+function (a::LaurentMPolyWrapRing{T})(b::MPolyRingElem{T}) where T <: RingElement
    parent(b) == a.mpolyring || error("Unable to coerce polynomial")
    return LaurentMPolyWrap(a, b)
 end
@@ -617,7 +633,7 @@ end
 ###############################################################################
 
 function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true)
-   P, x = AbstractAlgebra.PolynomialRing(R, s, cached = cached)
+   P, x = AbstractAlgebra.polynomial_ring(R, s, cached = cached)
    R = LaurentMPolyWrapRing(P, cached)
    R, map(p -> LaurentMPolyWrap(R, p), x)
 end

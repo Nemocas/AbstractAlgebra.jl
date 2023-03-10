@@ -10,6 +10,18 @@
 #
 ###############################################################################
 
+function _absolute_basis(f::FinField)
+   basis = [one(f)]
+   deg = degree(f)
+   if deg > 1
+      a = gen(f) # not defined if deg == 1
+      for d = 2:deg
+         push!(basis, basis[end]*a)
+      end
+   end
+   return basis
+end
+
 struct FinFieldIterator{F}
    basis::Vector{F}
    coeffs::Vector{Int64} # coefficients in the base field, assumed to be a prime field;
@@ -17,23 +29,17 @@ struct FinFieldIterator{F}
                          # exhaust that many scalars with iteration
 
    function FinFieldIterator(f)
-      deg = degree(f)
+      basis = _absolute_basis(f)
+      deg = length(basis)
       BigInt(characteristic(f))^deg == order(f) ||
          throw(ArgumentError("iteration only supported for extension fields over a prime field"))
-      basis = [one(f)]
-      if deg > 1
-         a = gen(f) # not defined if deg == 1
-         for d = 2:deg
-            push!(basis, basis[end]*a)
-         end
-      end
       new{elem_type(f)}(basis, Int64[])
    end
 end
 
 function Base.iterate(f::FinField, st=FinFieldIterator(f))
    basis, coeffs = st.basis, st.coeffs
-   deg = degree(f)
+   deg = length(basis)
    char = characteristic(f)
    elt = zero(f)
    if isempty(coeffs) # "flag" indicating that this is the first iteration
@@ -73,5 +79,5 @@ function test_iterate(f::FinField)
       @test allunique(elts)
       @test length(elts) == order(f)
    end
-   elts
+   return elts
 end

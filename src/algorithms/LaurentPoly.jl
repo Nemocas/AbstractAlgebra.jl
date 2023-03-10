@@ -13,13 +13,15 @@
 #
 ###############################################################################
 
-base_ring(p::LaurentPolyElem) = base_ring(parent(p))
+coefficient_ring(p::LaurentPolyRingElem) = coefficient_ring(parent(p))
 
-is_domain_type(::Type{<:LaurentPolyElem{T}}) where {T} = is_domain_type(T)
+base_ring(p::LaurentPolyRingElem) = base_ring(parent(p))
 
-is_exact_type(::Type{<:LaurentPolyElem{T}}) where {T} = is_exact_type(T)
+is_domain_type(::Type{<:LaurentPolyRingElem{T}}) where {T} = is_domain_type(T)
 
-function check_parent(a::LaurentPolyElem, b::LaurentPolyElem, throw::Bool = true)
+is_exact_type(::Type{<:LaurentPolyRingElem{T}}) where {T} = is_exact_type(T)
+
+function check_parent(a::LaurentPolyRingElem, b::LaurentPolyRingElem, throw::Bool = true)
    c = parent(a) == parent(b)
    c || !throw || error("incompatible Laurent polynomial rings")
    return c
@@ -34,7 +36,7 @@ end
 
 const hashp_seed = UInt === UInt64 ? 0xcdaf0e0b5ade239b : 0x5ade239b
 
-function Base.hash(p::LaurentPolyElem, h::UInt)
+function Base.hash(p::LaurentPolyRingElem, h::UInt)
    for i in terms_degrees(p)
       c = coeff(p, i)
       if !iszero(c)
@@ -47,7 +49,7 @@ end
 
 # required implementation
 """
-    terms_degrees(p::LaurentPolyElem) -> AbstractVector{<:Integer}
+    terms_degrees(p::LaurentPolyRingElem) -> AbstractVector{<:Integer}
 
 Return a vector containing at least all the degrees of the non-null
 terms of `p`.
@@ -55,7 +57,7 @@ terms of `p`.
 function terms_degrees end
 
 # return a terms_degrees vector valid for both polys
-function terms_degrees(p::LaurentPolyElem, q::LaurentPolyElem)
+function terms_degrees(p::LaurentPolyRingElem, q::LaurentPolyRingElem)
    mdp = terms_degrees(p)
    mdq = terms_degrees(q)
    T = promote_type(eltype(mdp), eltype(mdq))
@@ -79,7 +81,7 @@ end
 
 # like terms_degrees, but return a "strict" range, whose min/max
 # corresponds to non-zero coeffs, or an empty range for p == 0
-function degrees_range(p::LaurentPolyElem)
+function degrees_range(p::LaurentPolyRingElem)
    mds = terms_degrees(p)
    T = eltype(mds)
    minp, maxp = isempty(mds) ? (T(0), T(0)) : extrema(mds)
@@ -95,7 +97,7 @@ end
 
 
 # return the degree of the unique term, throw if not a term
-function term_degree(p::LaurentPolyElem)
+function term_degree(p::LaurentPolyRingElem)
    isnull = true
    local deg
    mds = terms_degrees(p)
@@ -110,44 +112,44 @@ function term_degree(p::LaurentPolyElem)
    deg
 end
 
-function leading_coefficient(p::LaurentPolyElem)
+function leading_coefficient(p::LaurentPolyRingElem)
    dr = degrees_range(p)
    isempty(dr) ? zero(base_ring(p)) : coeff(p, last(dr))
 end
 
-function trailing_coefficient(p::LaurentPolyElem)
+function trailing_coefficient(p::LaurentPolyRingElem)
    dr = degrees_range(p)
    isempty(dr) ? zero(base_ring(p)) : coeff(p, first(dr))
 end
 
 gens(R::LaurentPolynomialRing) = [gen(R)]
 
-is_gen(p::LaurentPolyElem) = p == gen(parent(p))
+is_gen(p::LaurentPolyRingElem) = p == gen(parent(p))
 
 # whether p is a (monic) monomial of degree i, non-recursively:
 # return true iff `p` has only one non-null coefficient
 # (of degree i) at the outer layer, and this coefficient is one
 # (as an element of the base ring)
-function is_monomial(p::LaurentPolyElem, i::Integer)
+function is_monomial(p::LaurentPolyRingElem, i::Integer)
    dr = degrees_range(p)
    length(dr) == 1 || return false
    dr[] == i || return false
    isone(coeff(p, i))
 end
 
-function is_monomial(p::LaurentPolyElem)
+function is_monomial(p::LaurentPolyRingElem)
    dr = degrees_range(p)
    length(dr) == 1 || return false
    isone(coeff(p, dr[]))
 end
 
-function is_monomial_recursive(p::LaurentPolyElem)
+function is_monomial_recursive(p::LaurentPolyRingElem)
    dr = degrees_range(p)
    length(dr) == 1 || return false
    is_monomial_recursive(coeff(p, dr[]))
 end
 
-function is_unit(p::LaurentPolyElem)
+function is_unit(p::LaurentPolyRingElem)
    dr = degrees_range(p)
    length(dr) == 1 || return false
    is_unit(coeff(p, dr[]))
@@ -159,7 +161,7 @@ end
 #
 ###############################################################################
 
-==(p::LaurentPolyElem, q::LaurentPolyElem) =
+==(p::LaurentPolyRingElem, q::LaurentPolyRingElem) =
    all(i -> coeff(p, i) == coeff(q, i), terms_degrees(p, q))
 
 
@@ -169,17 +171,17 @@ end
 #
 ###############################################################################
 
-function Base.isapprox(p::LaurentPolyElem, q::LaurentPolyElem; atol::Real=sqrt(eps()))
+function Base.isapprox(p::LaurentPolyRingElem, q::LaurentPolyRingElem; atol::Real=sqrt(eps()))
    check_parent(p, q)
    all(terms_degrees(p, q)) do d
       isapprox(coeff(p, d), coeff(q, d); atol=atol)
    end
 end
 
-Base.isapprox(p::LaurentPolyElem{T}, q::T; atol::Real=sqrt(eps())) where {T} =
+Base.isapprox(p::LaurentPolyRingElem{T}, q::T; atol::Real=sqrt(eps())) where {T} =
    isapprox(p, parent(p)(q); atol=atol)
 
-Base.isapprox(q::T, p::LaurentPolyElem{T}; atol::Real=sqrt(eps())) where {T} =
+Base.isapprox(q::T, p::LaurentPolyRingElem{T}; atol::Real=sqrt(eps())) where {T} =
    isapprox(p, q; atol=atol)
 
 
@@ -189,7 +191,7 @@ Base.isapprox(q::T, p::LaurentPolyElem{T}; atol::Real=sqrt(eps())) where {T} =
 #
 ################################################################################
 
-change_base_ring(R::Ring, p::LaurentPolyElem) = map_coefficients(R, p)
+change_base_ring(R::Ring, p::LaurentPolyRingElem) = map_coefficients(R, p)
 
 ###############################################################################
 #
@@ -197,7 +199,7 @@ change_base_ring(R::Ring, p::LaurentPolyElem) = map_coefficients(R, p)
 #
 ###############################################################################
 
-canonical_unit(x::LaurentPolyElem) = canonical_unit(leading_coefficient(x))
+canonical_unit(x::LaurentPolyRingElem) = canonical_unit(leading_coefficient(x))
 
 ###############################################################################
 #
