@@ -20,7 +20,7 @@ coefficient_ring(a::PolynomialElem) = base_ring(a)
 
 parent(a::PolynomialElem) = a.parent
 
-poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
+dense_poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
 
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}}
    return is_domain_type(S)

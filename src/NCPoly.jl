@@ -19,31 +19,30 @@ function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S
 end
 
 @doc md"""
-    poly_type(::Type{T}) where T<:NCRingElement
+    dense_poly_type(::Type{T}) where T<:NCRingElement
 
 The type of multivariate polynomials with coefficients of type `T`.
 Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
 
 # Examples
 ```julia
-poly_type(typeof(ZZ()))
+dense_poly_type(typeof(ZZ()))
 ```
 """
-poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
-@alias dense_poly_type poly_type
+dense_poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
 
 @doc md"""
     poly_ring_type(::Type{T}) where T<:NCRing
 
 The type of polynomial rings with coefficients of type `T`.
-Implemented via [`poly_type`](@ref).
+Implemented via [`dense_poly_type`](@ref).
 
 # Examples
 ```julia
 poly_ring_type(typeof(ZZ))
 ```
 """
-poly_ring_type(::Type{T}) where T<:NCRing = parent_type(poly_type(elem_type(T)))
+poly_ring_type(::Type{T}) where T<:NCRing = parent_type(dense_poly_type(elem_type(T)))
 
 @doc Markdown.doc"""
     var(a::NCPolyRing)

@@ -983,7 +983,6 @@ export polcoeff
 export poly
 export poly_ring
 export poly_ring_type
-export poly_type
 export PolyCoeffs
 export polynomial
 export polynomial_ring
