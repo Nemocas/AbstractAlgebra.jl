@@ -986,7 +986,6 @@ export poly_ring_type
 export PolyCoeffs
 export polynomial
 export polynomial_ring
-export polynomial_ring_only
 export polynomial_to_power_sums
 export PolynomialElem
 export PolyRing
