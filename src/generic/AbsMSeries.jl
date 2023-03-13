@@ -12,6 +12,7 @@
 ###############################################################################
 
 function O(R::AbsMSeriesRing{T}, prec::Int) where T <: RingElement
+    R.weighted_prec != -1 && error("Operation not possible in weighted rings")
     prec < 0 && error("Precision must be nonnegative")
     return R(poly_ring(R)(), fill(prec, nvars(R)))
 end
@@ -44,6 +45,16 @@ function poly_ring(R::AbsMSeriesRing{T, S}) where {T <: RingElement, S}
 end
 
 @doc Markdown.doc"""
+    weights(R::AbsMSeriesRing)
+
+Return a vector of weights which the variables are weighted with.
+"""
+function weights(R::AbsMSeriesRing)
+   R.weighted_prec == -1 && error("Not a weighted ring")
+   return R.prec_max # prec doubles as weights in weighted mode
+end
+
+@doc Markdown.doc"""
     length(a::AbsMSeries)
 
 Return the number of nonzero terms in the series $a$.
@@ -61,8 +72,16 @@ nvars(R::AbsMSeriesRing) = nvars(poly_ring(R))
     precision(a::AbsMSeries)
 
 Return a vector of precisions, one for each variable in the series ring.
+If the ring is weighted the weighted precision is returned instead.
 """
-precision(a::AbsMSeries) = a.prec
+function precision(a::AbsMSeries)
+   S = parent(a)
+   if S.weighted_prec == -1
+      return a.prec
+   else
+      return S.weighted_prec
+   end
+end
 
 @doc Markdown.doc"""
     set_precision!(a::AbsMSeries, prec::Vector{Int})
@@ -72,6 +91,7 @@ vector `prec`. The precisions must be non-negative. The series will be
 truncated to the new precisions. The mutated series is returned.
 """
 function set_precision!(a::AbsMSeries, prec::Vector{Int})
+    parent(a).weighted_prec != -1 && error("Operation not possible in weighted rings")
     length(prec) != length(precision(a)) &&
                          error("Array length not equal to number of variables")
     if !exponents_lt(precision(a), prec)
@@ -88,7 +108,10 @@ Return a vector of precision caps, one for each variable in the ring.
 Arithmetic operations will be performed to precisions not exceeding these
 values.
 """
-max_precision(R::AbsMSeriesRing) = R.prec_max
+function max_precision(R::AbsMSeriesRing)
+   R.weighted_prec != -1 && error("Operation not possible in weighted rings")
+   return R.prec_max
+end
 
 @doc Markdown.doc"""
     valuation(a::AbsMSeries)
@@ -96,7 +119,8 @@ max_precision(R::AbsMSeriesRing) = R.prec_max
 Return the valuation of $a$ as a vector of integers, one for each variable.
 """
 function valuation(a::AbsMSeries)
-    p = poly(a)
+   parent(a).weighted_prec != -1 && error("Operation not possible in weighted rings")
+   p = poly(a)
     prec = precision(a)
     val = prec
     for v in exponent_vectors(p)
@@ -145,10 +169,16 @@ Return the $i$-th generator (variable) of the series ring $R$. Numbering starts
 from $1$ for the most significant variable.
 """
 function gen(R::AbsMSeriesRing, i::Int)
-    S = poly_ring(R)
-    prec = [R.prec_max[ind] for ind in 1:nvars(R)]
-    x = R.prec_max[i] > 1 ? gen(S, i) : S()
-    return R(x, prec)
+   S = poly_ring(R)
+   if R.weighted_prec == -1
+      prec = [R.prec_max[ind] for ind in 1:nvars(R)]
+      x = R.prec_max[i] > 1 ? gen(S, i) : S()
+   else
+      w = weights(R)
+      prec = [0 for ind in 1:nvars(R)]
+      x = R.weighted_prec > w[i] ? gen(S, i) : S()
+   end
+   return R(x, prec)
 end
 
 @doc Markdown.doc"""
@@ -174,7 +204,7 @@ function is_gen(a::AbsMSeries)
 end
 
 function deepcopy_internal(a::AbsMSeries, dict::IdDict)
-    return parent(a)(deepcopy_internal(poly(a), dict), precision(a))
+    return parent(a)(deepcopy_internal(poly(a), dict), a.prec)
 end
 
 function Base.hash(a::AbsMSeries, h::UInt)
@@ -252,19 +282,29 @@ function exponents_lt(v::Vector{Int}, p::Vector{Int})
     return all(((x, y),) -> x < y, zip(v, p))
 end
 
+function exponents_lt(v::Vector{Int}, w::Vector{Int}, p::Int)
+   return sum(v .* w) < p
+end
+
 ###############################################################################
 #
 #   Truncation
 #
 ###############################################################################
 
-function truncate_poly(a::MPolyElem, prec::Vector{Int})
+function truncate_poly(a::MPolyRingElem, prec::Vector{Int}, weighted_prec::Int=-1)
     R = parent(a)
     ctx = MPolyBuildCtx(R)
     for (c, v) in zip(coefficients(a), exponent_vectors(a))
-        if exponents_lt(v, prec)
-            push_term!(ctx, c, v)
-        end
+        if weighted_prec == -1
+            if exponents_lt(v, prec)
+                push_term!(ctx, c, v)
+            end
+        else
+            if exponents_lt(v, prec, weighted_prec)
+                push_term!(ctx, c, v)
+            end
+        end  
     end
     return finish(ctx)
 end
@@ -276,23 +316,36 @@ Return $a$ truncated to (absolute) precisions given by the vector `prec`.
 """
 function truncate(a::AbsMSeries, prec::Vector{Int})
     R = parent(a)
+    R.weighted_prec != -1 && error("Operation not permitted")
     length(prec) != nvars(R) &&
              error("Array length not equal to number of variables in truncate")
-    trunc_needed = false
     p = precision(a)
-    for i = 1:nvars(R)
-        if prec[i] < p[i]
-            trunc_needed = true
-            break
-        end
-    end
-    if !trunc_needed
-        return a
-    end
     prec = min.(prec, p)
-    q = truncate_poly(poly(a), prec)
-    return R(q, prec)
+    if prec == p
+        # no truncation needed
+        return a
+    else
+        return R(truncate_poly(poly(a), prec), prec)
+    end
 end
+
+@doc Markdown.doc"""
+    truncate(a::AbstractAlgebra.AbsMSeries, prec::Int)
+
+Return $a$ truncated to precision `prec`. This either truncates by weight in
+the weighted cases or truncates each variable to precision `prec` in the
+unweighted case.
+"""
+function truncate(a::AbsMSeries, prec::Int)
+    R = parent(a)
+    if R.weighted_prec == -1
+        return truncate(a, [prec for i in 1:nvars(R)])
+    else
+        return R(truncate_poly(poly(a), weights(R), prec),
+                 [0 for i in 1:nvars(R)]) #??
+    end
+end
+
 
 ###############################################################################
 #
@@ -302,7 +355,7 @@ end
 
 function -(a::AbsMSeries)
     R = parent(a)
-    return R(-poly(a), precision(a))
+    return R(-poly(a), a.prec)
 end
 
 ###############################################################################
@@ -314,25 +367,40 @@ end
 function +(a::AbsMSeries, b::AbsMSeries)
     check_parent(a, b)
     R = parent(a)
-    prec = min.(precision(a), precision(b))
-    z = truncate_poly(poly(a) + poly(b), prec)
+    if R.weighted_prec == -1
+        prec = min.(precision(a), precision(b))
+        z = truncate_poly(poly(a) + poly(b), prec)
+    else
+        z = poly(a) + poly(b)
+        prec = a.prec
+    end
     return R(z, prec)
 end
 
 function -(a::AbsMSeries, b::AbsMSeries)
     check_parent(a, b)
     R = parent(a)
-    prec = min.(precision(a), precision(b))
-    z = truncate_poly(poly(a) - poly(b), prec)
+    if R.weighted_prec == -1
+        prec = min.(precision(a), precision(b))
+        z = truncate_poly(poly(a) - poly(b), prec)
+    else
+        z = poly(a) - poly(b)
+        prec = a.prec
+    end
     return R(z, prec)
 end
 
 function *(a::AbsMSeries, b::AbsMSeries)
     check_parent(a, b)
     R = parent(a)
-    prec = min.(precision(a) .+ valuation(b), precision(b) .+ valuation(a))
-    prec = min.(prec, max_precision(R))
-    z = truncate_poly(poly(a)*poly(b), prec)
+    if R.weighted_prec == -1
+        prec = min.(precision(a) .+ valuation(b), precision(b) .+ valuation(a))
+        prec = min.(prec, max_precision(R))
+        z = truncate_poly(poly(a)*poly(b), prec)
+    else
+        z = truncate_poly(poly(a)*poly(b), weights(R), R.weighted_prec)
+        prec = a.prec
+    end
     return R(z, prec)
 end
 
@@ -344,12 +412,12 @@ end
 
 function *(a::T, b::AbsMSeries{T}) where {T <: RingElem}
     R = parent(b)
-    return R(a*poly(b), precision(b)) 
+    return R(a*poly(b), b.prec) 
 end
 
 function *(a::Union{Integer, Rational, AbstractFloat}, b::AbsMSeries)
     R = parent(b)
-    return R(a*poly(b), precision(b)) 
+    return R(a*poly(b), b.prec) 
 end
 
 *(a::AbsMSeries{T}, b::T) where T <: RingElem = b*a
@@ -362,16 +430,18 @@ end
 #
 ###############################################################################
 
-function ^(a::AbsMSeries, b::Int) where T <: RingElement
+function ^(a::AbsMSeries, b::Int)
     b < 0 && throw(DomainError(b, "Can't take negative power"))
     R = parent(a)
     prec = precision(a)
     if b == 0
         p = one(poly_ring(R))
-        p = truncate_poly(p, prec)
-        return R(p, prec)
+        if R.weighted_prec == -1
+            p = truncate_poly(p, prec)
+        end
+        return R(p, a.prec)
     elseif is_constant(poly(a))
-        return R(poly(a)^b, precision(a))
+        return R(poly(a)^b, a.prec)
     elseif b == 1
         return deepcopy(a)
     end
@@ -399,17 +469,28 @@ end
 
 function ==(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     check_parent(x, y)
-    prec = min.(precision(x), precision(y))
-    p1 = truncate_poly(poly(x), prec)
-    p2 = truncate_poly(poly(y), prec)
+    R = parent(x)
+    if R.weighted_prec == -1
+        prec = min.(precision(x), precision(y))
+        p1 = truncate_poly(poly(x), prec)
+        p2 = truncate_poly(poly(y), prec)
+    else
+        p1 = poly(x)
+        p2 = poly(y)
+    end
     return p1 == p2
 end
 
 function isequal(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     check_parent(x, y)
-    prec = precision(x)
-    prec == precision(y) || return false
-    return truncate_poly(poly(x), prec) == truncate_poly(poly(y), prec)
+    R = parent(x)
+    if R.weighted_prec == -1
+        prec = precision(x)
+        prec == precision(y) || return false
+        return truncate_poly(poly(x), prec) == truncate_poly(poly(y), prec)
+    else
+        return x == y
+    end
 end
 
 ###############################################################################
@@ -418,36 +499,45 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    Base.inv(x::AbsMSeries)
 
-Return the inverse of the series $x$. An exception is raised if the series is
-not a unit.
-"""
-function Base.inv(x::AbsMSeries)
-    !is_unit(x) && error("Not a unit")
-    R = parent(x)
-    prec = [1 for n in 1:nvars(R)]
-    cinv = inv(coeff(x, 1))
-    xinv = R(poly_ring(R)(cinv), prec)
-    two = R(poly_ring(R)(2), prec)
-    # lift each variable in turn
-    for var = nvars(R):-1:1
-        nvar = precision(x)[var]
-        var_prec = [nvar]
-        while nvar != 1
-            nvar = div(nvar + 1, 2)
-            push!(var_prec, nvar)
+function Base.inv(a::AbsMSeries)
+    R = parent(a)
+    ainv = R(inv(constant_coefficient(poly(a))))
+    if R.weighted_prec == -1
+        # use the precision stored in the polynomial
+        # arithmetic uses precision stored in polynomials
+        max_n = sum(a.prec)
+        cur_n = 1
+        # 1-a*ainv = er where each monomial in er has total degree >= cur_n
+        # Furthermore, we only care about the terms in er where the exponent
+        # on variable i is restricted to the range [0, a.prec[i]).
+        # Therefore, with max_n = sum(a.prec), we are done if cur_n >= max_n
+        while true
+            cur_n *= 2
+            trunc = [min(a.prec[i], cur_n) for i in 1:nvars(R)]
+            set_precision!(ainv, trunc)
+            e = 2 - truncate(a, trunc)*ainv
+            (trunc == a.prec && isone(e)) && break
+            ainv = e*ainv
+            cur_n >= max_n && break
         end
-        # list var quadratically
-        for i = length(var_prec) - 1:-1:1
-            prec[var] = var_prec[i]
-            two = set_precision!(two, prec)
-            xinv = set_precision!(xinv, prec)
-            xinv = (two - x*xinv)*xinv
+    else
+        # use the precision stored in the parent
+        # arithmetic uses precision stored in parent
+        max_n = R.weighted_prec
+        cur_n = minimum(R.prec_max)
+        @assert cur_n > 0
+        # 1-a*ainv = er where each monomial in er has weight >= cur_n
+        while true
+            cur_n *= 2
+            trunc = min(max_n, cur_n)
+            e = 2 - truncate(a, trunc)*ainv
+            (trunc == max_n && isone(e)) && break
+            ainv = e*ainv
+            cur_n >= max_n && break
         end
     end
-    return xinv
+    return ainv
 end
 
 ###############################################################################
@@ -538,19 +628,26 @@ function addeq!(a::AbsMSeries{T}, b::AbsMSeries{T}) where T <: RingElement
     R = parent(a)
     prec = min.(precision(a), precision(b))
     a.poly = addeq!(a.poly, b.poly)
-    a.poly = truncate_poly(a.poly, prec)
-    a.prec = prec
+    if R.weighted_prec == -1
+        a.poly = truncate_poly(a.poly, prec)
+        a.prec = prec
+    end
     return a
 end
 
 function mul!(c::AbsMSeries{T}, a::AbsMSeries{T}, b::AbsMSeries{T}) where
                                                             T <: RingElement
     R = parent(a)
-    prec = min.(precision(a) .+ valuation(b), precision(b) .+ valuation(a))
-    prec = min.(prec, max_precision(R))
-    c.poly = mul!(c.poly, a.poly, b.poly)
-    c.poly = truncate_poly(c.poly, prec)
-    c.prec = prec
+    if R.weighted_prec == -1
+        prec = min.(precision(a) .+ valuation(b), precision(b) .+ valuation(a))
+        prec = min.(prec, max_precision(R))
+        c.poly = mul!(c.poly, a.poly, b.poly)
+        c.poly = truncate_poly(c.poly, prec)
+        c.prec = prec
+    else
+        c.poly = mul!(c.poly, a.poly, b.poly)
+        c.poly = truncate_poly(c.poly, weights(R), R.weighted_prec)
+    end 
     return c
 end
 
@@ -572,7 +669,7 @@ end
 ###############################################################################
 
 function (R::AbsMSeriesRing{T, S})(x::S, prec::Vector{Int}) where
-                          {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
+                          {T <: RingElement, S <: AbstractAlgebra.MPolyRingElem{T}}
     for v in prec
         v < 0 && error("Precision must be non-negative")
     end
@@ -581,11 +678,19 @@ function (R::AbsMSeriesRing{T, S})(x::S, prec::Vector{Int}) where
 end
 
 function (R::AbsMSeriesRing)()
-    return R(poly_ring(R)(), max_precision(R))
+    if R.weighted_prec == -1
+        return R(poly_ring(R)(), max_precision(R))
+    else
+        return R(poly_ring(R)(), [0 for i in 1:nvars(R)])
+    end
 end
 
 function (R::AbsMSeriesRing{T})(x::T) where T <: RingElem
-    return R(poly_ring(R)(x), max_precision(R))
+    if R.weighted_prec == -1
+        return R(poly_ring(R)(x), max_precision(R))
+    else
+        return R(poly_ring(R)(x), [0 for i in 1:nvars(R)])
+    end
 end
 
 function (R::AbsMSeriesRing{T})(x::AbsMSeries{T}) where T <: RingElement
@@ -594,22 +699,26 @@ function (R::AbsMSeriesRing{T})(x::AbsMSeries{T}) where T <: RingElement
 end
 
 function (R::AbsMSeriesRing)(b::Union{Integer, Rational, AbstractFloat})
-    return R(poly_ring(R)(b), max_precision(R))
+    if R.weighted_prec == -1
+        return R(poly_ring(R)(b), max_precision(R))
+    else
+        return R(poly_ring(R)(b),  [0 for i in 1:nvars(R)])
+    end
 end
 
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 
-function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int},
+function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
                   s::Vector{T}; cached=true, model=:capped_absolute) where
                                                                     T <: Symbol
     str = [String(a) for a in s]
     U = elem_type(R)
  
-    S, _ = AbstractAlgebra.PolynomialRing(R, str)
+    S, _ = AbstractAlgebra.polynomial_ring(R, str)
     V = elem_type(S)
 
     if model == :capped_absolute
@@ -621,9 +730,27 @@ function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Vector{Int},
     return tuple(parent_obj, gens(parent_obj))
 end
 
-function PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int,
+function power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::Int,
+   s::Vector{T}; cached=true, model=:capped_absolute) where
+                                                     T <: Symbol
+   str = [String(a) for a in s]
+   U = elem_type(R)
+
+   S, _ = AbstractAlgebra.polynomial_ring(R, str)
+   V = elem_type(S)
+
+   if model == :capped_absolute
+      parent_obj = AbsMSeriesRing{U, V}(S, weights, prec, s, cached)
+   else
+      error("Unknown model")
+   end
+
+   return tuple(parent_obj, gens(parent_obj))
+end
+
+function power_series_ring(R::AbstractAlgebra.Ring, prec::Int,
                   s::Vector{T}; cached=true, model=:capped_absolute) where
                                                                     T <: Symbol
     prec_vec = [prec for v in s]
-    return PowerSeriesRing(R, prec_vec, s; cached=cached, model=model)
+    return power_series_ring(R, prec_vec, s; cached=cached, model=model)
 end

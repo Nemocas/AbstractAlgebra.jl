@@ -129,11 +129,6 @@ is_square(a::MatElem) = (nrows(a) == ncols(a))
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    transpose(x::Mat{T}) where T <: NCRingElement
-
-Return the transpose of the given matrix.
-"""
 function transpose(x::Mat{T}) where T <: NCRingElement
    y = MatSpaceElem{eltype(x)}(permutedims(x.entries))
    y.base_ring = x.base_ring
@@ -189,11 +184,6 @@ function (a::MatSpace{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    return z
 end
 
-function (a::MatSpace{T})(b::Mat{T}) where {T <: NCRingElement}
-   parent(b) != a && error("Unable to coerce matrix")
-   return b
-end
-
 function (a::MatSpace{T})(b::Matrix{T}) where T <: NCRingElement
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
@@ -228,11 +218,11 @@ end
 
 ###############################################################################
 #
-#   MatrixSpace constructor
+#   matrix_space constructor
 #
 ###############################################################################
 
-function MatrixSpace(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
+function matrix_space(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end

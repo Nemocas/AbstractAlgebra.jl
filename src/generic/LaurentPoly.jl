@@ -17,6 +17,8 @@ elem_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} =
 
 parent(p::LaurentPolyWrap) = p.parent
 
+coefficient_ring(R::LaurentPolyWrapRing) = coefficient_ring(R.polyring)
+
 base_ring(R::LaurentPolyWrapRing) = base_ring(R.polyring)
 
 var(R::LaurentPolyWrapRing) = var(R.polyring)
@@ -37,7 +39,7 @@ characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
 terms_degrees(p::LaurentPolyWrap) = p.mindeg .+ (0:degree(p.poly))
 
 """
-    trail_degree(p::LaurentPolyElem)
+    trail_degree(p::LaurentPolyRingElem)
 
 Return the degree of the term with lowest degree in `p`.
 The result is undefined when `p` is null.
@@ -48,7 +50,7 @@ function trail_degree(p::LaurentPolyWrap)
 end
 
 """
-    lead_degree(p::LaurentPolyElem)
+    lead_degree(p::LaurentPolyRingElem)
 
 Return the degree of the term with highest degree in `p`.
 The result is undefined when `p` is null.
@@ -191,16 +193,26 @@ function is_divisible_by(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
    return divides(a.poly, ub)[1]
 end
 
+# may throw even when p is invertible
 function Base.inv(p::LaurentPolyWrap)
-   is_unit(p) || throw(NotInvertibleError(p))
    v, g = _remove_gen(p)
    return LaurentPolyWrap(parent(p), inv(g), -p.mindeg-v)
 end
 
 function is_unit(p::LaurentPolyWrap)
-   iszero(p) && return false
    v, g = _remove_gen(p)
-   return length(g) < 2
+   if is_domain_type(elem_type(coefficient_ring(p))) || length(g) <= 1
+      return is_unit(g)
+   else
+      throw(NotImplementedError(:is_unit, p))
+   end
+end
+
+is_zero_divisor(p::LaurentPolyWrap) = is_zero_divisor(p.poly)
+
+function is_zero_divisor_with_annihilator(p::LaurentPolyWrap)
+   f, b = is_zero_divisor_with_annihilator(p.poly)
+   return f, LaurentPolyWrap(parent(p), b)
 end
 
 function Base.divrem(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
@@ -502,7 +514,7 @@ end
 ###############################################################################
 
 function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
-   P, x = AbstractAlgebra.PolynomialRing(R, s, cached = cached)
+   P, x = AbstractAlgebra.polynomial_ring(R, s, cached = cached)
    R = LaurentPolyWrapRing(P, cached)
    R, LaurentPolyWrap(R, x)
 end

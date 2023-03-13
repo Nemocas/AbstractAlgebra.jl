@@ -45,6 +45,8 @@ abstract type FPModule{T} <: Module{T} end
 
 abstract type Ideal{T} <: Set end
 
+abstract type IdealSet{T} <: Set end
+
 # elements of parameterised domains
 
 abstract type ModuleElem{T} <: AdditiveGroupElem end
@@ -75,7 +77,7 @@ abstract type NCPolyRing{T} <: NCRing end
 
 abstract type MPolyRing{T} <: Ring end
 
-abstract type UnivPolyRing{T} <: Ring end
+abstract type UniversalPolyRing{T} <: Ring end
 
 abstract type LaurentPolynomialRing{T} <: Ring end
 
@@ -85,9 +87,9 @@ abstract type SeriesRing{T} <: Ring end
 
 abstract type MSeriesRing{T} <: Ring end
 
-abstract type ResRing{T} <: Ring end
+abstract type ResidueRing{T} <: Ring end
 
-abstract type ResField{T} <: Field end
+abstract type ResidueField{T} <: Field end
 
 abstract type FracField{T} <: Field end
 
@@ -110,17 +112,17 @@ abstract type SimpleNumField{T} <: NumField{T} end
 # that have some kind of base ring, and a generic
 # implementation is meaningful over that base ring
 
-abstract type PolyElem{T} <: RingElem end
+abstract type PolyRingElem{T} <: RingElem end
 
-abstract type NCPolyElem{T} <: NCRingElem end
+abstract type NCPolyRingElem{T} <: NCRingElem end
 
-abstract type MPolyElem{T} <: RingElem end
+abstract type MPolyRingElem{T} <: RingElem end
 
-abstract type UnivPolyElem{T} <: RingElem end
+abstract type UniversalPolyRingElem{T} <: RingElem end
 
-abstract type LaurentPolyElem{T} <: RingElem end
+abstract type LaurentPolyRingElem{T} <: RingElem end
 
-abstract type LaurentMPolyElem{T} <: RingElem end
+abstract type LaurentMPolyRingElem{T} <: RingElem end
 
 abstract type ResElem{T} <: RingElem end
 
@@ -132,9 +134,9 @@ abstract type SeriesElem{T} <: RingElem end
 
 abstract type MSeriesElem{T} <: RingElem end
 
-abstract type RelSeriesElem{T} <: SeriesElem{T} end
+abstract type RelPowerSeriesRingElem{T} <: SeriesElem{T} end
 
-abstract type AbsSeriesElem{T} <: SeriesElem{T} end
+abstract type AbsPowerSeriesRingElem{T} <: SeriesElem{T} end
 
 abstract type AbsMSeriesElem{T} <: MSeriesElem{T} end
 
@@ -151,12 +153,12 @@ abstract type SimpleNumFieldElem{T} <: NumFieldElem{T} end
 # additional abstract types for parents, added ad hoc to form
 # collections of types as needed by applications
 
-abstract type FinField <: Field end    # for fq, fq_nmod, etc
+abstract type FinField <: Field end    # for FqPolyRepFieldElem, fqPolyRepFieldElem, etc
 
 # additional abstract types for elements, added ad hoc to form
 # collections of types as needed by applications
 
-abstract type FinFieldElem <: FieldElem end # for fq, fq_nmod, etc
+abstract type FinFieldElem <: FieldElem end # for FqPolyRepFieldElem, fqPolyRepFieldElem, etc
 
 ################################################################################
 #

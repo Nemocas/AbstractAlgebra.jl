@@ -1,5 +1,5 @@
 @testset "Generic.FreeModule.constructors" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    M = FreeModule(R, 5)
 
    @test FreeModule(R, 5, cached = true) === FreeModule(R, 5, cached = true)
@@ -21,14 +21,14 @@
 end
 
 @testset "Generic.FreeModule.manipulation" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    M = FreeModule(R, 5)
 
    @test rank(M) == 5
 end
 
 @testset "Generic.FreeModule.unary_ops" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:10
       M = FreeModule(R, 3)
@@ -52,7 +52,7 @@ end
 end
 
 @testset "Generic.FreeModule.binary_ops" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:10
       M = FreeModule(R, 3)
@@ -76,7 +76,7 @@ end
 end
 
 @testset "Generic.FreeModule.adhoc_binary" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:10
       M = FreeModule(R, 3)
@@ -107,7 +107,7 @@ end
 end
 
 @testset "Generic.FreeModule.hash" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    M = FreeModule(R, 5)
 
    # ensure hash works

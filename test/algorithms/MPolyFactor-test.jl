@@ -2,7 +2,7 @@
    # not much to test because we would need working univariate factorization
    @testset "hlift_have_lcs" begin
 
-      R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+      R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 
       fac = [y*x^2+z, (z+1)*x^3+x*y+z, (y*z+1)*x^2+1]
 
@@ -16,7 +16,7 @@
 
    @testset "hlift_bivar_combine" begin
 
-      R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+      R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
       p = y*(y*x+1)*((y+1)*x+y)*((y+2)*x+y)
 

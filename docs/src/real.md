@@ -54,7 +54,7 @@ resulting parent object to coerce various elements into the field.
 
 **Examples**
 
-```repl
+```jldoctest
 julia> RR = RealField
 Floats
 
@@ -83,7 +83,7 @@ We give some examples of such functionality.
 
 **Examples**
 
-```repl
+```jldoctest
 julia> RR = RealField
 Floats
 

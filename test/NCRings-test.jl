@@ -5,7 +5,7 @@ include("generic/FreeAssAlgebraGroebner-test.jl")
 
 @testset "NCRings.oftype" begin
    F = GF(3)
-   Fx, x = PolynomialRing(F, "x")
+   Fx, x = polynomial_ring(F, "x")
    z = oftype(x, 3)
    @test z == Fx(3)
    @test parent(z) === Fx
@@ -17,12 +17,12 @@ end
    A = MatrixAlgebra(ZZ, rand(1:9))
    a = rand(A, 1:9)
 
-   B, _ = PolynomialRing(A, "y")
+   B, _ = polynomial_ring(A, "y")
    b = rand(B, 1:9, 1:9)
 
    # matrices
    n = rand(1:9)
-   C = MatrixSpace(ZZ, n, n)
+   C = matrix_space(ZZ, n, n)
    c = rand(C, 1:9)
    
    # commutative rings
@@ -30,7 +30,7 @@ end
    e = rand(big.(-9:9))
    f = rand(1:9)//rand(1:9)
 
-   G, _ = PolynomialRing(ZZ, "x")
+   G, _ = polynomial_ring(ZZ, "x")
    g = rand(G, 1:9, 1:9)
 
    @testset "$T" for (x, T) in (x => string(nameof(typeof(x))) for x in (a, b, c, d, e, f, g))
@@ -53,6 +53,6 @@ end
    end
 
    # powers must error out on non-square matrices
-   M = MatrixSpace(ZZ, 2, rand(3:9))
+   M = matrix_space(ZZ, 2, rand(3:9))
    @test_throws DomainError powers(rand(M, 1:9), rand(1:9))
 end

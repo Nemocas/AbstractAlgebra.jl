@@ -1,5 +1,11 @@
 using Documenter, AbstractAlgebra
 
+# We do *not* call `DocMeta.setdocmeta!` with value `:(using AbstractAlgebra)`
+# because we want to force that each jldoctest has its individual
+# `setup = :(using AbstractAlgebra)`.
+# The reason is that the AbstractAlgebra doctests are run also in Nemo,
+# where `using AbstractAlgebra` is deliberately avoided.
+
 makedocs(
          format = Documenter.HTML(),
          sitename = "AbstractAlgebra.jl",
@@ -20,6 +26,7 @@ makedocs(
                  "ring_introduction.md",
                  "ring.md",
                  "integer.md",
+                 "total_fraction.md",
                  "polynomial.md",
                  "ncpolynomial.md",
                  "mpolynomial.md",

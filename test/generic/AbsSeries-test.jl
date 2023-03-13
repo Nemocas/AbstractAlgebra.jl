@@ -22,28 +22,28 @@
 end
 
 @testset "Generic.AbsSeries.constructors" begin
-   S1 = AbsSeriesRing(ZZ, 10)
-   S2 = AbsSeriesRing(ZZ, 10)
+   S1 = AbsPowerSeriesRing(ZZ, 10)
+   S2 = AbsPowerSeriesRing(ZZ, 10)
 
    @test S1 !== S2
-   @test isa(S1, Generic.AbsSeriesRing)
+   @test isa(S1, Generic.AbsPowerSeriesRing)
 
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
-   S, t = PolynomialRing(QQ, "t")
-   T, y = PowerSeriesRing(S, 30, "y", model=:capped_absolute)
+   S, t = polynomial_ring(QQ, "t")
+   T, y = power_series_ring(S, 30, "y", model=:capped_absolute)
 
    @test elem_type(R) == Generic.AbsSeries{BigInt}
-   @test elem_type(Generic.AbsSeriesRing{BigInt}) == Generic.AbsSeries{BigInt}
-   @test parent_type(Generic.AbsSeries{BigInt}) == Generic.AbsSeriesRing{BigInt}
+   @test elem_type(Generic.AbsPowerSeriesRing{BigInt}) == Generic.AbsSeries{BigInt}
+   @test parent_type(Generic.AbsSeries{BigInt}) == Generic.AbsPowerSeriesRing{BigInt}
 
    @test elem_type(T) == Generic.AbsSeries{elem_type(S)}
-   @test elem_type(Generic.AbsSeriesRing{elem_type(S)}) == Generic.AbsSeries{elem_type(S)}
-   @test parent_type(Generic.AbsSeries{elem_type(S)}) == Generic.AbsSeriesRing{elem_type(S)}
+   @test elem_type(Generic.AbsPowerSeriesRing{elem_type(S)}) == Generic.AbsSeries{elem_type(S)}
+   @test parent_type(Generic.AbsSeries{elem_type(S)}) == Generic.AbsPowerSeriesRing{elem_type(S)}
 
-   @test isa(R, Generic.AbsSeriesRing)
+   @test isa(R, Generic.AbsPowerSeriesRing)
 
-   @test isa(T, Generic.AbsSeriesRing)
+   @test isa(T, Generic.AbsPowerSeriesRing)
 
    a1 = x^3 + 2x + 1
    a2 = (t^2 + 1)*y^2 + (t + 3)*y + O(y^4)
@@ -92,16 +92,16 @@ end
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
 
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
-   S, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
+   S, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
    @test R === S
-   S, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute, cached = false)
+   S, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute, cached = false)
    @test R !== S
 end
 
 @testset "Generic.AbsSeries.manipulation" begin
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
+   R, t = polynomial_ring(QQ, "t")
+   S, x = power_series_ring(R, 30, "x", model=:capped_absolute)
 
    @test max_precision(S) == 30
 
@@ -139,14 +139,14 @@ end
    
    @test characteristic(R) == 0
 
-   T = ResidueRing(ZZ, 7)
-   U, y = PowerSeriesRing(T, 10, "y", model=:capped_absolute)
+   T = residue_ring(ZZ, 7)
+   U, y = power_series_ring(T, 10, "y", model=:capped_absolute)
 
    @test modulus(T) == 7
 end
 
 @testset "Generic.AbsSeries.similar" begin
-   R, x = PowerSeriesRing(ZZ, 10, "x"; model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x"; model=:capped_absolute)
 
    for iters = 1:10
       f = rand(R, 0:10, -10:10)
@@ -157,11 +157,11 @@ end
       m = similar(f, QQ, 5)
       n = similar(f, 5)
 
-      @test isa(g, AbsSeriesElem)
-      @test isa(h, AbsSeriesElem)
-      @test isa(k, AbsSeriesElem)
-      @test isa(m, AbsSeriesElem)
-      @test isa(n, AbsSeriesElem)
+      @test isa(g, AbsPowerSeriesRingElem)
+      @test isa(h, AbsPowerSeriesRingElem)
+      @test isa(k, AbsPowerSeriesRingElem)
+      @test isa(m, AbsPowerSeriesRingElem)
+      @test isa(n, AbsPowerSeriesRingElem)
 
       @test base_ring(g) === QQ
       @test base_ring(m) === QQ
@@ -196,7 +196,7 @@ end
 @testset "Generic.AbsSeries.abs_series" begin
    f = abs_series(ZZ, [1, 2, 3], 3, 5, "y")
 
-   @test isa(f, AbsSeriesElem)
+   @test isa(f, AbsPowerSeriesRingElem)
    @test base_ring(f) === ZZ
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
@@ -204,7 +204,7 @@ end
 
    g = abs_series(ZZ, [1, 2, 3], 3, 5)
 
-   @test isa(g, AbsSeriesElem)
+   @test isa(g, AbsPowerSeriesRingElem)
    @test base_ring(g) === ZZ
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
@@ -220,8 +220,8 @@ end
    p = abs_series(ZZ, BigInt[], 0, 4)
    q = abs_series(ZZ, [], 0, 6)
 
-   @test isa(p, AbsSeriesElem)
-   @test isa(q, AbsSeriesElem)
+   @test isa(p, AbsPowerSeriesRingElem)
+   @test isa(q, AbsPowerSeriesRingElem)
 
    @test length(p) == 0
    @test pol_length(p) == 0
@@ -230,7 +230,7 @@ end
 
    r = abs_series(QQ, BigInt[1, 2, 3], 3, 5)
 
-   @test isa(r, AbsSeriesElem)
+   @test isa(r, AbsPowerSeriesRingElem)
 
    s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
    
@@ -239,7 +239,7 @@ end
 
 @testset "Generic.AbsSeries.unary_ops" begin
    #  Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
 
@@ -248,7 +248,7 @@ end
    end
 
    #  Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
 
@@ -257,8 +257,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
 
@@ -269,7 +269,7 @@ end
 
 @testset "Generic.AbsSeries.binary_ops" begin
    #  Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:100
       f = rand(R, 0:12, -10:10)
       g = rand(R, 0:12, -10:10)
@@ -285,7 +285,7 @@ end
    end
 
    #  Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
    for iter = 1:100
       f = rand(R, 0:12, -1:1)
       g = rand(R, 0:12, -1:1)
@@ -300,8 +300,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x", model=:capped_absolute)
    for iter = 1:100
       f = rand(R, 0:12, 0:5)
       g = rand(R, 0:12, 0:5)
@@ -318,7 +318,7 @@ end
 
 @testset "Generic.AbsSeries.adhoc_binary_ops" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:500
       f = rand(R, 0:12, -10:10)
       c1 = rand(ZZ, -10:10)
@@ -338,7 +338,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
    for iter = 1:500
       f = rand(R, 0:12, -1:1)
       c1 = rand(ZZ, -10:10)
@@ -358,8 +358,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = PowerSeriesRing(R, 10, "x", model=:capped_absolute)
+   R = residue_ring(ZZ, 6)
+   S, x = power_series_ring(R, 10, "x", model=:capped_absolute)
    for iter = 1:500
       f = rand(S, 0:12, 0:5)
       c1 = rand(ZZ, -10:10)
@@ -386,7 +386,7 @@ end
 
    # Generic tower
    R, x = ZZ["x"]
-   S, y = PowerSeriesRing(R, 10, "y", model=:capped_absolute)
+   S, y = power_series_ring(R, 10, "y", model=:capped_absolute)
    for iter = 1:100
       f = rand(S, 0:12, -1:5, -10:10)
       c1 = rand(ZZ, -10:10)
@@ -408,7 +408,7 @@ end
 
 @testset "Generic.AbsSeries.comparison" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:500
       f = rand(R, 0:12, -10:10)
       g = deepcopy(f)
@@ -424,7 +424,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
    for iter = 1:500
       f = rand(R, 0:12, -1:1)
       g = deepcopy(f)
@@ -440,8 +440,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = PowerSeriesRing(R, 10, "x", model=:capped_absolute)
+   R = residue_ring(ZZ, 6)
+   S, x = power_series_ring(R, 10, "x", model=:capped_absolute)
    for iter = 1:500
       f = rand(S, 0:12, 0:5)
       g = deepcopy(f)
@@ -459,7 +459,7 @@ end
 
 @testset "Generic.AbsSeries.adhoc_comparison" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:500
       f = R()
       while f == 0
@@ -481,7 +481,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
    for iter = 1:500
       f = R()
       while isapprox(f, R())
@@ -503,8 +503,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = PowerSeriesRing(R, 10, "x", model=:capped_absolute)
+   R = residue_ring(ZZ, 6)
+   S, x = power_series_ring(R, 10, "x", model=:capped_absolute)
    for iter = 1:500
       f = S()
       while f == 0
@@ -532,7 +532,7 @@ end
 
    # Generic tower
    R, x = ZZ["x"]
-   S, y = PowerSeriesRing(R, 10, "y", model=:capped_absolute)
+   S, y = power_series_ring(R, 10, "y", model=:capped_absolute)
    for iter = 1:100
       f = S()
       while f == 0
@@ -556,7 +556,7 @@ end
 
 @testset "Generic.AbsSeries.powering" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
 
    for iter = 1:100
       f = rand(R, 0:12, -10:10)
@@ -572,7 +572,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
 
    for iter = 1:100
       f = rand(R, 0:12, -1:1)
@@ -591,8 +591,8 @@ end
    for iter = 1:100
       n = rand(2:26)
 
-      Zn = ResidueRing(ZZ, n)
-      R, x = PowerSeriesRing(Zn, 10, "x", model=:capped_absolute)
+      Zn = residue_ring(ZZ, n)
+      R, x = power_series_ring(Zn, 10, "x", model=:capped_absolute)
 
       f = rand(R, 0:12, 0:n - 1)
       r2 = R(1)
@@ -609,7 +609,7 @@ end
 
 @testset "Generic.AbsSeries.shift" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
       s = rand(0:12)
@@ -629,7 +629,7 @@ end
    @test_throws DomainError shift_right(f, -rand(2:100))
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       s = rand(0:12)
@@ -649,8 +649,8 @@ end
    @test_throws DomainError shift_right(f, -rand(2:100))
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
       s = rand(0:12)
@@ -672,7 +672,7 @@ end
 
 @testset "Generic.AbsSeries.truncation" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
       s = rand(0:12)
@@ -689,7 +689,7 @@ end
    @test_throws DomainError truncate(f, -rand(2:100))
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       s = rand(0:12)
@@ -706,8 +706,8 @@ end
    @test_throws DomainError truncate(f, -rand(2:100))
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
       s = rand(0:12)
@@ -727,7 +727,7 @@ end
 @testset "Generic.AbsSeries.inversion" begin
 
     # Exact ring
-    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+    R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
     for iter = 1:300
        f = R()
        while !is_unit(f)
@@ -739,7 +739,7 @@ end
 
     # Exact field
     for prec = 1:10
-       R, x = PowerSeriesRing(QQ, prec, "x"; model=:capped_absolute)
+       R, x = power_series_ring(QQ, prec, "x"; model=:capped_absolute)
        for iter = 1:30
           f = R()
           while valuation(f) != 0
@@ -751,7 +751,7 @@ end
     end
 
     # Inexact field
-    R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+    R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
     for iter = 1:300
        f = R()
        while coeff(f, 0) == 0
@@ -762,8 +762,8 @@ end
     end
 
     # Non-integral domain
-    T = ResidueRing(ZZ, 6)
-    R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+    T = residue_ring(ZZ, 6)
+    R, x = power_series_ring(T, 10, "x", model=:capped_absolute)
     for iter = 1:300
        f = R()
        while !is_unit(f)
@@ -776,7 +776,7 @@ end
 
 @testset "Generic.AbsSeries.compose" begin
     # Exact ring
-    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+    R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -789,7 +789,7 @@ end
         @test compose(R(), g) == R()
     end
 
-    S, y = PowerSeriesRing(ZZ, 10, "y", model=:capped_absolute)
+    S, y = power_series_ring(ZZ, 10, "y", model=:capped_absolute)
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -801,7 +801,7 @@ end
     end
 
     # Inexact field
-    R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+    R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -814,7 +814,7 @@ end
         @test isapprox(compose(R(), g), R())
     end
 
-    S, y = PowerSeriesRing(RealField, 10, "y", model=:capped_absolute)
+    S, y = power_series_ring(RealField, 10, "y", model=:capped_absolute)
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -825,8 +825,8 @@ end
     end
 
     # Non-integral domain
-    T = ResidueRing(ZZ, 6)
-    R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+    T = residue_ring(ZZ, 6)
+    R, x = power_series_ring(T, 10, "x", model=:capped_absolute)
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -839,7 +839,7 @@ end
         @test compose(R(), g) == R()
     end
 
-    S, y = PowerSeriesRing(T, 10, "y", model=:capped_absolute)
+    S, y = power_series_ring(T, 10, "y", model=:capped_absolute)
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
@@ -853,7 +853,7 @@ end
 
 @testset "Generic.AbsSeries.square_root" begin
     # Exact ring
-    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+    R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
     for iter = 1:300
        f = rand(R, 0:10, -10:10)
        g = f^2
@@ -880,7 +880,7 @@ end
     @test_throws ErrorException sqrt(f)
 
     # Inexact field
-    R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+    R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
     for iter = 1:300
        f = rand(R, 0:10, -1:1)
        g = f^2
@@ -905,9 +905,9 @@ end
 
     # Characteristic p field
     for p in [2, 7, 19, 65537, ZZ(2), ZZ(7), ZZ(19), ZZ(65537)]
-        R = ResidueField(ZZ, p)
+        R = residue_field(ZZ, p)
 
-        S, x = PowerSeriesRing(R, 10, "x", model=:capped_absolute)
+        S, x = power_series_ring(R, 10, "x", model=:capped_absolute)
 
         for iter = 1:10
             f = rand(S, 0:10, 0:Int(p))
@@ -934,10 +934,10 @@ end
         end
     end
 
-    R = ResidueField(ZZ, 2)
-    T, y = PolynomialRing(R, "x")
+    R = residue_field(ZZ, 2)
+    T, y = polynomial_ring(R, "x")
 
-    S, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+    S, x = power_series_ring(T, 10, "x", model=:capped_absolute)
 
     f = 1 + y^2*x^2 + (y^2 + y + 1)*x^4 + O(x^10)
 
@@ -954,7 +954,7 @@ end
 
 @testset "Generic.AbsSeries.exact_division" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
       s = rand(0:9)
       f = rand(R, s:s, -10:10)
@@ -970,7 +970,7 @@ end
    end
 
    # Exact field
-   R, x = PowerSeriesRing(QQ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 10, "x", model=:capped_absolute)
    for iter = 1:300
       s = rand(0:9)
       f = rand(R, s:s, -10:10)
@@ -986,7 +986,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
    for iter = 1:300
       s = rand(0:9)
       f = rand(R, s:s, -1:1)
@@ -1002,8 +1002,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x", model=:capped_absolute)
    for iter = 1:300
       s = rand(0:9)
       f = rand(R, s:s, 0:5)
@@ -1021,7 +1021,7 @@ end
 
 @testset "Generic.AbsSeries.adhoc_exact_division" begin
    # Exact field
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
       c = ZZ()
@@ -1033,7 +1033,7 @@ end
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       c = RealField()
@@ -1045,8 +1045,8 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
+   T = residue_ring(ZZ, 6)
+   R, x = power_series_ring(T, 10, "x", model=:capped_absolute)
    for iter = 1:300
       f = rand(R, 0:0, 0:5)
       c = T()
@@ -1060,7 +1060,7 @@ end
 
 @testset "Generic.AbsSeries.derivative_integral" begin
    # Exact field
-   S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
+   S, x = power_series_ring(QQ, 10, "x"; model=:capped_absolute)
 
    for iter = 1:100
       f = rand(S, 0:10, -10:10)
@@ -1072,7 +1072,7 @@ end
    end
 
    # Inexact field
-   S, x = PowerSeriesRing(RealField, 10, "x"; model=:capped_absolute)
+   S, x = power_series_ring(RealField, 10, "x"; model=:capped_absolute)
 
    for iter = 1:100
       f = rand(S, 0:10, -10:10)
@@ -1086,7 +1086,7 @@ end
 
 @testset "Generic.AbsSeries.special_functions" begin
    # Exact field
-   S, x = PowerSeriesRing(QQ, 10, "x", model=:capped_absolute)
+   S, x = power_series_ring(QQ, 10, "x", model=:capped_absolute)
 
    for iter = 1:100
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
@@ -1114,7 +1114,7 @@ end
    end
 
    # Inexact field
-   S, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
+   S, x = power_series_ring(RealField, 10, "x", model=:capped_absolute)
 
    for iter = 1:100
       @test isapprox(exp(x + O(x^iter)), exp(x + O(x^(iter - 1))))
@@ -1135,7 +1135,7 @@ end
       @test isapprox(log(exp(f)), f)
 
       while coeff(f, 0) <= 0
-	 f = rand(S, 0:0, -10:10)
+         f = rand(S, 0:0, -10:10)
       end
 
       @test isapprox(exp(log(f)), f)
@@ -1143,8 +1143,8 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 143)
-   S, x = PowerSeriesRing(R, 10, "x", model=:capped_absolute)
+   R = residue_ring(ZZ, 143)
+   S, x = power_series_ring(R, 10, "x", model=:capped_absolute)
 
    for iter = 1:10
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
@@ -1165,7 +1165,7 @@ end
 end
 
 @testset "Generic.AbsSeries.change_base_ring" begin
-   Zx, x = PowerSeriesRing(ZZ, 10, "x"; model=:capped_absolute)
+   Zx, x = power_series_ring(ZZ, 10, "x"; model=:capped_absolute)
    @test 1 == map_coefficients(sqrt, x^0)
    p = Zx([i for i in 1:10], 10, 11)
    q = Zx([i for i in 10:-1:1], 10, 11)
@@ -1190,13 +1190,13 @@ end
    end
 
    F = GF(11)
-   P, y = PowerSeriesRing(F, 10, "x"; model=:capped_absolute)
+   P, y = power_series_ring(F, 10, "x"; model=:capped_absolute)
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 end
 
 @testset "Generic.AbsSeries.unsafe_operators" begin
    # Exact ring
-   R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
    
    for iter = 1:300
       f = rand(R, 0:9, -10:10)

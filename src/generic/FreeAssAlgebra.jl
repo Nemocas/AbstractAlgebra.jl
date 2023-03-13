@@ -100,11 +100,9 @@ function is_gen(a::FreeAssAlgElem{T}) where T
     end
 end
 
-# BOGUS
-function is_unit(x::FreeAssAlgElem)
-   return x.length == 1 && isempty(x.exps[1]) && is_unit(x.coeffs[1])
+function is_constant(a::FreeAssAlgElem{T}) where T
+    return length(a) == 0 || (length(a) == 1 && isempty(a.exps[1]))
 end
-
 
 ###############################################################################
 #
@@ -233,6 +231,16 @@ end
 function Base.eltype(x::FreeAssAlgExponentWords{T}) where {S <: RingElement,
                                                            T <: FreeAssAlgElem{S}}
    return Vector{Int}
+end
+               
+###############################################################################
+#
+#   Canonicalisation
+#
+###############################################################################
+
+function canonical_unit(a::FreeAssAlgElem{T}) where T <: RingElement
+   return canonical_unit(leading_coefficient(a))
 end
 
 ###############################################################################
@@ -597,7 +605,7 @@ function AbstractAlgebra.divexact_left(f::FreeAssAlgElem{T}, g::FreeAssAlgElem{T
       qi = divexact(f.coeffs[1], g.coeffs[1])
       push!(qcoeffs, qi)
       push!(qexps, mr)
-      f = _sub_rest(f, mul_term(qi, ml, g, mr), 1) # enforce lt cancelation
+      f = _sub_rest(f, mul_term(qi, ml, g, mr), 1) # enforce lt cancellation
    end
    return FreeAssAlgElem{T}(R, qcoeffs, qexps, length(qcoeffs))
 end
@@ -612,7 +620,7 @@ function AbstractAlgebra.divexact_right(f::FreeAssAlgElem{T}, g::FreeAssAlgElem{
       qi = divexact(f.coeffs[1], g.coeffs[1])
       push!(qcoeffs, qi)
       push!(qexps, ml)
-      f = _sub_rest(f, mul_term(qi, ml, g, mr), 1) # enforce lt cancelation
+      f = _sub_rest(f, mul_term(qi, ml, g, mr), 1) # enforce lt cancellation
    end
    return FreeAssAlgElem{T}(R, qcoeffs, qexps, length(qcoeffs))
 end
@@ -633,13 +641,45 @@ function divexact(a::FreeAssAlgElem{T}, b::Integer; check::Bool = true) where T 
    return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
 end
 
+
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function _change_freeassalg_ring(R, Rx, cached)
+    P, _ = AbstractAlgebra.free_associative_algebra(R, symbols(Rx); cached=cached)
+    return P
+end
+
+function change_base_ring(R::Ring, a::FreeAssAlgElem{T}; cached=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(R, parent(a), cached)) where T <: RingElement
+    base_ring(parent) != R && error("Base rings do not match.")
+    return _map(R, a, parent)
+end
+
+function map_coefficients(f, a::FreeAssAlgElem{T}; cached=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(parent(f(zero(base_ring(a)))), parent(a), cached)) where T <: RingElement
+   return _map(f, a, parent)
+end
+
+function _map(g, a::FreeAssAlgElem{T}, Rx) where T <: RingElement
+    cvzip = zip(coefficients(a), exponent_words(a))
+    M = MPolyBuildCtx(Rx)
+    for (c, v) in cvzip
+        push_term!(M, g(c), v)
+    end
+
+    return finish(M)
+end
+
+
 ###############################################################################
 #
-#   FreeAssociativeAlgebra constructor
+#   free_associative_algebra constructor
 #
 ###############################################################################
 
-function FreeAssociativeAlgebra(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true)
+function free_associative_algebra(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true)
    parent_obj = FreeAssAlgebra{elem_type(R)}(R, s, cached)
    return (parent_obj, gens(parent_obj))
 end

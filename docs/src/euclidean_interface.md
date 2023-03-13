@@ -12,7 +12,7 @@ functions existing. An implementation must provide `divrem`, and the remaining
 are optional as generic fallbacks exist.
 
 ```@docs
-divrem
+Base.divrem(f::T, g::T) where T <: RingElem
 mod(f::T, g::T) where T <: RingElem
 Base.div(f::T, g::T) where T <: RingElem
 mulmod(f::T, g::T, m::T) where T <: RingElem
@@ -22,7 +22,15 @@ divides(f::T, g::T) where T <: RingElem
 remove(f::T, p::T) where T <: RingElem
 valuation(f::T, p::T) where T <: RingElem
 gcd(f::T, g::T) where T <: RingElem
+gcd(f::T, g::T, hs::T...) where T <: RingElem
+gcd(fs::AbstractArray{<:T}) where T <: RingElem
 lcm(f::T, g::T) where T <: RingElem
+lcm(f::T, g::T, hs::T...) where T <: RingElem
+lcm(fs::AbstractArray{<:T}) where T <: RingElem
 gcdx(f::T, g::T) where T <: RingElem
 gcdinv(f::T, g::T) where T <: RingElem
+crt(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+crt(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+crt_with_lcm(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+crt_with_lcm(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
 ```

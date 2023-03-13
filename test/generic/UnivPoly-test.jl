@@ -10,29 +10,29 @@
 
          x = gen(S, "x")
 
-         @test isa(x, UnivPolyElem)
+         @test isa(x, UniversalPolyRingElem)
 
          y, z = gens(S, ["y", "z"])
 
          @test elem_type(S) == Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}
-         @test elem_type(Generic.UnivPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}
-         @test parent_type(Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UnivPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}
+         @test elem_type(Generic.UniversalPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}
+         @test parent_type(Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UniversalPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}
 
          @test base_ring(S) === R
          @test coefficient_ring(S) === R
 
-         @test typeof(S) <: Generic.UnivPolyRing
+         @test typeof(S) <: Generic.UniversalPolyRing
 
-         @test isa(x, UnivPolyElem)
-         @test isa(y, UnivPolyElem)
-         @test isa(z, UnivPolyElem)
+         @test isa(x, UniversalPolyRingElem)
+         @test isa(y, UniversalPolyRingElem)
+         @test isa(z, UniversalPolyRingElem)
 
          f = rand(S, 0:5, 0:10, -10:10)
 
-         @test isa(f, UnivPolyElem)
-         @test isa(S(2), UnivPolyElem)
-         @test isa(S(R(2)), UnivPolyElem)
-         @test isa(S(f), UnivPolyElem)
+         @test isa(f, UniversalPolyRingElem)
+         @test isa(S(2), UniversalPolyRingElem)
+         @test isa(S(R(2)), UniversalPolyRingElem)
+         @test isa(S(f), UniversalPolyRingElem)
 
          V = [R(rand(-10:10)) for i in 1:5]
          nused = rand(0:3)
@@ -40,7 +40,7 @@
          
          f1 = S(V, W)
 
-         @test isa(f1, UnivPolyElem)
+         @test isa(f1, UniversalPolyRingElem)
 
          f2 = S()
          fit!(f2, 5)
@@ -120,6 +120,16 @@ end
          @test ordering(S) == ord
       end
    end
+end
+
+function test_elem(R::AbstractAlgebra.Generic.UniversalPolyRing{AbstractAlgebra.Generic.ResidueRingElem{BigInt}})
+    return rand(R, 0:4, 0:10, -10:10)
+end
+
+@testset "Generic.UnivPoly.conformance" begin
+   S = UniversalPolynomialRing(residue_ring(ZZ, ZZ(6)))
+   gen(S, "x")
+   test_Ring_interface(S)
 end
 
 @testset "Generic.UnivPoly.term_monomial" begin
@@ -217,6 +227,8 @@ end
          @test !is_unit(x)
          @test !is_unit(x2)
          @test is_unit(one(S))
+         @test is_zero_divisor(S())
+         @test !is_zero_divisor(x)
          @test is_gen(x)
          @test is_gen(x2)
          @test is_gen(y)
@@ -904,7 +916,7 @@ end
          y, z = gens(S, ["y", "z"])
          h = rand(S, 0:5, 0:10, -10:10)
 
-         U, w = PolynomialRing(R, "v")
+         U, w = polynomial_ring(R, "v")
 
          n = rand(1:3)
          V = [rand(-10:10) for v in 1:n]
@@ -947,6 +959,8 @@ end
          @test evaluate(h, [1], [V[1]]) == evaluate(h, [1], [ZZ(V[1])])
          @test evaluate(h, [1, 3], [V[1], V[2]]) == evaluate(h, [1, 3], [R(v) for v in V[1:2]])
          @test evaluate(h, [1, 3], [V[1], V[2]]) == evaluate(h, [1, 3], [ZZ(v) for v in V[1:2]])
+
+         @test evaluate(x, [1], [y]) == evaluate(z, [3], [y])
       end
    end
 end
@@ -991,7 +1005,7 @@ end
    for R in [ZZ, QQ]
       S = UniversalPolynomialRing(R; cached=false)
 
-      U, y = PolynomialRing(R, "y")
+      U, y = polynomial_ring(R, "y")
 
       x = gen(S, "x")
 
@@ -1024,7 +1038,7 @@ end
    for R in [ZZ, QQ]
       S = UniversalPolynomialRing(R; cached=false)
 
-      U, y = PolynomialRing(R, "y")
+      U, y = polynomial_ring(R, "y")
 
       x = gen(S, "x")
       y, z = gens(S, ["y", "z"])
@@ -1059,7 +1073,7 @@ end
    for R in [ZZ, QQ]
       S = UniversalPolynomialRing(R; cached=false)
 
-      U, y = PolynomialRing(R, "y")
+      U, y = polynomial_ring(R, "y")
 
       x = gen(S, "x")
       y, z = gens(S, ["y", "z"])

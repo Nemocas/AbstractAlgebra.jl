@@ -25,7 +25,7 @@ end
    @test string(S(3)) == "3"
    @test string(S()) == "0"
 
-   R, x = PolynomialRing(GF(13), "x")
+   R, x = polynomial_ring(GF(13), "x")
 
    @test string(x) == "x"
    @test !occursin("1", string(x^2+2*x))
@@ -48,6 +48,10 @@ end
    @test !is_unit(S())
    @test is_unit(R(3))
    @test is_unit(S(3))
+   @test is_zero_divisor(R())
+   @test is_zero_divisor(S())
+   @test !is_zero_divisor(R(3))
+   @test !is_zero_divisor(S(3))
 
    @test deepcopy(R(3)) == R(3)
    @test deepcopy(S(3)) == S(3)
@@ -327,7 +331,7 @@ end
    while !is_probable_prime(n)
       n = rand(ZZ(2)^9:ZZ(2)^10-1)
    end
-   R, x = PolynomialRing(GF(n), "x")
+   R, x = polynomial_ring(GF(n), "x")
    f = rand(R, 10:10)
    g = rand(R, 10:10)
    @test f*g == g*f

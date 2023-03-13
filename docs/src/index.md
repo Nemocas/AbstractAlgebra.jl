@@ -10,9 +10,9 @@ other interested contributors.
 
 AbstractAlgebra.jl grew out of the Nemo project after a number of requests from the
 community for the pure Julia part of Nemo to be split off into a separate project. See
-the Nemo website for more details about Nemo.
+the Nemo repository for more details about Nemo.
 
-- [Nemo website](https://nemocas.org)
+- [Nemo repository](https://github.com/Nemocas/Nemo.jl)
 
 ## Features
 
@@ -57,7 +57,7 @@ This example makes use of multivariate polynomials.
 ```julia
 using AbstractAlgebra
 
-R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
 
 f = x + y + z + 1
 
@@ -73,11 +73,11 @@ using AbstractAlgebra
 
 R = GF(7)
 
-S, y = PolynomialRing(R, "y")
+S, y = polynomial_ring(R, "y")
 
-T = ResidueRing(S, y^3 + 3y + 1)
+T = residue_ring(S, y^3 + 3y + 1)
 
-U, z = PolynomialRing(T, "z")
+U, z = polynomial_ring(T, "z")
 
 f = (3y^2 + y + 2)*z^2 + (2*y^2 + 1)*z + 4y + 3;
 
@@ -95,9 +95,9 @@ Here is an example using matrices.
 ```julia
 using AbstractAlgebra
 
-R, x = PolynomialRing(ZZ, "x")
+R, x = polynomial_ring(ZZ, "x")
 
-S = MatrixSpace(R, 10, 10)
+S = matrix_space(R, 10, 10)
 
 M = rand(S, 0:3, -10:10);
 
@@ -111,7 +111,7 @@ using AbstractAlgebra
 
 R, x = QQ["x"]
 
-S, t = PowerSeriesRing(R, 30, "t")
+S, t = power_series_ring(R, 30, "t")
 
 u = t + O(t^100)
 

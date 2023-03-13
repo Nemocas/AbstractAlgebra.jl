@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-function expressify(a::LaurentMPolyElem, x = symbols(parent(a)); context = nothing)
+function expressify(a::LaurentMPolyRingElem, x = symbols(parent(a)); context = nothing)
     sum = Expr(:call, :+)
     n = nvars(parent(a))
     for (c, v) in zip(coefficients(a), exponent_vectors(a))
@@ -30,13 +30,13 @@ function expressify(a::LaurentMPolyElem, x = symbols(parent(a)); context = nothi
     return sum
 end
 
-@enable_all_show_via_expressify LaurentMPolyElem
+@enable_all_show_via_expressify LaurentMPolyRingElem
 
 function expressify(a::LaurentMPolyRing; context = nothing)
-    return Expr(:sequence, Expr(:text, "Multivariate Laurent Polynomial Ring over "),
-                           expressify(base_ring(a); context = context),
-                           Expr(:text, " in "),
-                           Expr(:series, symbols(a)...))
+    return Expr(:sequence, Expr(:text, "Multivariate Laurent Polynomial Ring in "),
+                           Expr(:series, symbols(a)...),
+                           Expr(:text, " over "),
+                           expressify(base_ring(a); context = context))
 end
 
 @enable_all_show_via_expressify LaurentMPolyRing
@@ -51,10 +51,8 @@ function gens(R::LaurentMPolyRing)
     return [gen(R, i) for i in 1:nvars(R)]
 end
 
-# BOGUS
-function is_unit(a::LaurentMPolyElem)
-    return length(a) == 1 && is_unit(leading_coefficient(a))
-end
+coefficient_ring(a::LaurentMPolyRingElem) = coefficient_ring(parent(a))
+base_ring(a::LaurentMPolyRingElem) = base_ring(parent(a))
 
 ###############################################################################
 #
@@ -62,7 +60,7 @@ end
 #
 ###############################################################################
 
-function derivative(a::LaurentMPolyElem{T}, x::LaurentMPolyElem{T}) where T <: RingElement
+function derivative(a::LaurentMPolyRingElem{T}, x::LaurentMPolyRingElem{T}) where T <: RingElement
    check_parent(a, x)
    return derivative(a, var_index(x))
 end

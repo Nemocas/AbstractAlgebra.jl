@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-export MatrixAlgebra, divexact_left, divexact_right
-
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -63,6 +61,17 @@ one(a::MatAlgebra) = a(1)
 is_unit(a::MatAlgElem{T}) where T <: RingElement = is_unit(det(a))
 
 is_unit(a::MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
+
+# proof over a commutative ring: use adj(A)*A = det(A)*I = A*adj(A)
+is_zero_divisor(a::MatAlgElem{T}) where T <: RingElement = is_zero_divisor(det(a))
+
+is_zero_divisor(a::MatAlgElem{T}) where T <: FieldElement = rank(a) != degree(a)
+
+function is_zero_divisor_with_annihilator(a::MatAlgElem{T}) where T <: RingElement
+   f, b = is_zero_divisor_with_annihilator(det(a))
+   throw(NotImplementedError(:adj, A)) #return f, b*adj(A)
+end
+
 
 function characteristic(a::MatAlgebra)
    return characteristic(base_ring(a))

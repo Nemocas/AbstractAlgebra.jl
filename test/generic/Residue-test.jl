@@ -1,34 +1,34 @@
-function test_elem(R::AbstractAlgebra.Generic.ResRing{BigInt})
+function test_elem(R::AbstractAlgebra.Generic.ResidueRing{BigInt})
    return rand(R, 0:characteristic(R))
 end
 
-function test_elem(R::AbstractAlgebra.Generic.ResRing{AbstractAlgebra.Generic.Poly{T}}) where T
+function test_elem(R::AbstractAlgebra.Generic.ResidueRing{AbstractAlgebra.Generic.Poly{T}}) where T
    return rand(R, 0:100, -100:100)
 end
 
-@testset "Generic.Res.conformance_tests" begin
-   test_Ring_interface(ResidueRing(ZZ, 1))   # is_gen fails on polys
-   test_Ring_interface_recursive(ResidueRing(ZZ, -4))
+@testset "Generic.ResidueRingElem.conformance_tests" begin
+   test_Ring_interface(residue_ring(ZZ, 1))   # is_gen fails on polys
+   test_Ring_interface_recursive(residue_ring(ZZ, -4))
 
    #
-   R = ResidueRing(ZZ, 16453889)
+   R = residue_ring(ZZ, 16453889)
    test_Ring_interface_recursive(R)
 
    #
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
    test_Ring_interface_recursive(T)
 
    #
-   S, x = PolynomialRing(ZZ, "x")
-   T = ResidueRing(S, x^2 + 1)
+   S, x = polynomial_ring(ZZ, "x")
+   T = residue_ring(S, x^2 + 1)
    #test_Ring_interface_recursive(T)   # TODO: currently fails because `inv(one(T))` fails
 end
 
-@testset "Generic.Res.constructors" begin
+@testset "Generic.ResidueRingElem.constructors" begin
    B = ZZ
 
-   R = Generic.ResidueRing(B, 16453889)
+   R = Generic.residue_ring(B, 16453889)
 
    S, f1 = quo(B, 16453889)
    U, f2 = quo(B, 16453889; cached=false)
@@ -44,69 +44,69 @@ end
    @test f1(c1) == S(c1)
    @test f2(c1) == S(c1)
 
-   @test Generic.ResidueRing(B, 16453889, cached = true) === Generic.ResidueRing(B, 16453889, cached = true)
-   @test Generic.ResidueRing(B, 16453889, cached = false) !== Generic.ResidueRing(B, 16453889, cached = true)
+   @test Generic.residue_ring(B, 16453889, cached = true) === Generic.residue_ring(B, 16453889, cached = true)
+   @test Generic.residue_ring(B, 16453889, cached = false) !== Generic.residue_ring(B, 16453889, cached = true)
 
-   @test_throws DomainError Generic.ResidueRing(B, 0)
+   @test_throws DomainError Generic.residue_ring(B, 0)
 
-   @test elem_type(R) == Generic.Res{elem_type(B)}
-   @test elem_type(Generic.ResRing{elem_type(B)}) == Generic.Res{elem_type(B)}
-   @test parent_type(Generic.Res{elem_type(B)}) == Generic.ResRing{elem_type(B)}
+   @test elem_type(R) == Generic.ResidueRingElem{elem_type(B)}
+   @test elem_type(Generic.ResidueRing{elem_type(B)}) == Generic.ResidueRingElem{elem_type(B)}
+   @test parent_type(Generic.ResidueRingElem{elem_type(B)}) == Generic.ResidueRing{elem_type(B)}
 
-   @test isa(R, Generic.ResRing)
+   @test isa(R, Generic.ResidueRing)
 
    a = R(123)
 
-   @test isa(a, Generic.Res)
+   @test isa(a, Generic.ResidueRingElem)
 
    b = R(a)
 
-   @test isa(b, Generic.Res)
+   @test isa(b, Generic.ResidueRingElem)
 
    c = R(ZZ(12))
 
-   @test isa(c, Generic.Res)
+   @test isa(c, Generic.ResidueRingElem)
 
    d = R()
 
-   @test isa(d, Generic.Res)
+   @test isa(d, Generic.ResidueRingElem)
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
-   @test isa(T, Generic.ResRing)
+   @test isa(T, Generic.ResidueRing)
 
    f = T(x^4)
 
-   @test isa(f, Generic.Res)
+   @test isa(f, Generic.ResidueRingElem)
 
    g = T(f)
 
-   @test isa(g, Generic.Res)
+   @test isa(g, Generic.ResidueRingElem)
 
    # Poly modulus, invertible lc 
-   S, x = PolynomialRing(ZZ, "x")
-   T = ResidueRing(S, x^2 + 1)
+   S, x = polynomial_ring(ZZ, "x")
+   T = residue_ring(S, x^2 + 1)
 
-   @test isa(T, Generic.ResRing)
+   @test isa(T, Generic.ResidueRing)
 
    f = T(x^4)
 
-   @test isa(f, Generic.Res)
+   @test isa(f, Generic.ResidueRingElem)
 
    g = T(f)
 
-   @test isa(g, Generic.Res)
+   @test isa(g, Generic.ResidueRingElem)
 
    h = T()
 
-   @test isa(h, Generic.Res)
+   @test isa(h, Generic.ResidueRingElem)
 
    k = T(1)
 
-   @test isa(k, Generic.Res)
+   @test isa(k, Generic.ResidueRingElem)
 
-   S = Generic.ResidueRing(B, 164538890)
+   S = Generic.residue_ring(B, 164538890)
    x = R(1)
    y = S(1)
    @test x in [x, y]
@@ -117,22 +117,22 @@ end
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.Res.rand" begin
-   R = Generic.ResidueRing(ZZ, 49)
+@testset "Generic.ResidueRingElem.rand" begin
+   R = Generic.residue_ring(ZZ, 49)
 
    test_rand(R, 1:9) do f
       @test 1 <= f.data <= 9
    end
 
    # make with 3 arguments
-   P, x = PolynomialRing(RealField, "x")
-   R = Generic.ResidueRing(P, x^3)
+   P, x = polynomial_ring(RealField, "x")
+   R = Generic.residue_ring(P, x^3)
 
    test_rand(R, -1:9, -3:3)
 end
 
-@testset "Generic.Res.manipulation" begin
-   R = Generic.ResidueRing(ZZ, 16453889)
+@testset "Generic.ResidueRingElem.manipulation" begin
+   R = Generic.residue_ring(ZZ, 16453889)
 
    @test modulus(R) == 16453889
 
@@ -142,12 +142,15 @@ end
 
    @test modulus(g) == 16453889
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
    h = one(T)
 
    @test is_unit(h)
+
+   @test is_zero_divisor(T(x + 9223338))
+   @test !is_zero_divisor(T(x + 1))
 
    @test isone(h)
 
@@ -163,8 +166,8 @@ end
    @test characteristic(R) == 16453889
 
    # Poly modulus, invertible lc
-   S, x = PolynomialRing(ZZ, "x")
-   T = ResidueRing(S, x^2 + 1)
+   S, x = polynomial_ring(ZZ, "x")
+   T = residue_ring(S, x^2 + 1)
 
    @test isone(one(T))
    @test iszero(zero(T))
@@ -172,31 +175,31 @@ end
    @test canonical_unit(T(x)) == T(x)
    @test modulus(T) == x^2 + 1
 
-   S = ResidueRing(zz, 23)
+   S = residue_ring(zz, 23)
 
    @test lift(S(1)) == 1
    @test isa(lift(S(1)), BigInt)
 end
 
-@testset "Generic.Res.unary_ops" begin
-   R = Generic.ResidueRing(ZZ, 16453889)
+@testset "Generic.ResidueRingElem.unary_ops" begin
+   R = Generic.residue_ring(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
    @test -T(x^5 + 1) == T(x^2+16453880*x+16453885)
 
    # Poly modulus, invertible lc
-   S, x = PolynomialRing(ZZ, "x")
-   T = ResidueRing(S, x^2 + 1)
+   S, x = polynomial_ring(ZZ, "x")
+   T = residue_ring(S, x^2 + 1)
 
    @test -T(x + 1) == T(-x - 1)
 end
 
-@testset "Generic.Res.binary_ops" begin
-   R = Generic.ResidueRing(ZZ, 12)
+@testset "Generic.ResidueRingElem.binary_ops" begin
+   R = Generic.residue_ring(ZZ, 12)
 
    f = R(4)
    g = R(6)
@@ -207,9 +210,9 @@ end
 
    @test f*g == R(0)
 
-   Q = Generic.ResidueRing(ZZ, 7)
-   S, x = PolynomialRing(Q, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   Q = Generic.residue_ring(ZZ, 7)
+   S, x = polynomial_ring(Q, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
    n = T(x^5 + 1)
    p = T(x^2 + 2x + 1)
@@ -221,8 +224,8 @@ end
    @test n*p == T(3x^2 + 4x + 4)
 
    # Poly modulus, invertible lc
-   S, x = PolynomialRing(ZZ, "x")
-   T = ResidueRing(S, x^2 + 1)
+   S, x = polynomial_ring(ZZ, "x")
+   T = residue_ring(S, x^2 + 1)
 
    n = T(x^5 + 1)
    p = T(x^2 + 2x + 1)
@@ -234,17 +237,17 @@ end
    @test n*p == T(2x - 2)
 end
 
-@testset "Generic.Res.gcd" begin
-   R = Generic.ResidueRing(ZZ, 12)
+@testset "Generic.ResidueRingElem.gcd" begin
+   R = Generic.residue_ring(ZZ, 12)
 
    f = R(4)
    g = R(6)
 
    @test gcd(f, g) == R(2)
 
-   Q = Generic.ResidueRing(ZZ, 7)
-   S, x = PolynomialRing(Q, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   Q = Generic.residue_ring(ZZ, 7)
+   S, x = polynomial_ring(Q, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
    n = T(x^5 + 1)
    p = T(x^2 + 2x + 1)
@@ -252,18 +255,18 @@ end
    @test gcd(n, p) == 1
 
    # Poly modulus, invertible lc
-   S, x = PolynomialRing(ZZ, "x")
-   T = ResidueRing(S, x^2 + 2x + 1)
+   S, x = polynomial_ring(ZZ, "x")
+   T = residue_ring(S, x^2 + 2x + 1)
    
    @test gcd(T(x + 1), T(x + 1)) == T(x + 1)
 
-   T = ResidueRing(S, x^2 + 1)
+   T = residue_ring(S, x^2 + 1)
 
    @test gcd(T(x + 1), T(x + 1)) == T(1)
 end
 
-@testset "Generic.Res.adhoc_binary" begin
-   R = Generic.ResidueRing(ZZ, 7)
+@testset "Generic.ResidueRingElem.adhoc_binary" begin
+   R = Generic.residue_ring(ZZ, 7)
 
    a = R(3)
 
@@ -273,8 +276,8 @@ end
 
    @test 5a == R(1)
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
 
@@ -285,8 +288,8 @@ end
    @test f*5 == T(2*x^2+3*x+6)
 
    # Poly modulus, invertible lc
-   S, x = PolynomialRing(ZZ, "x")
-   T = ResidueRing(S, x^2 + 2x + 1)
+   S, x = polynomial_ring(ZZ, "x")
+   T = residue_ring(S, x^2 + 2x + 1)
 
    f = T(x + 1)
 
@@ -297,8 +300,8 @@ end
    @test f*5 == T(5x + 5)
 end
 
-@testset "Generic.Res.comparison" begin
-   R = Generic.ResidueRing(ZZ, 7)
+@testset "Generic.ResidueRingElem.comparison" begin
+   R = Generic.residue_ring(ZZ, 7)
 
    a = R(3)
    b = a
@@ -310,8 +313,8 @@ end
 
    @test c != a
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
    g = 8f
@@ -323,53 +326,53 @@ end
    @test isequal(f, g)
 
    # Poly modulus, invertible lc
-   S, x = PolynomialRing(ZZ, "x")
-   T = ResidueRing(S, x^2 + 1)
+   S, x = polynomial_ring(ZZ, "x")
+   T = residue_ring(S, x^2 + 1)
 
    @test T(x + 1) == T(x + 1)
    @test isequal(T(x + 2), T(x + 2))
 end
 
-@testset "Generic.Res.adhoc_comparison" begin
-   R = Generic.ResidueRing(ZZ, 7)
+@testset "Generic.ResidueRingElem.adhoc_comparison" begin
+   R = Generic.residue_ring(ZZ, 7)
 
    a = R(3)
 
    @test a == 3
    @test 4 != a
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
 
    @test f != 5
 
    # Poly modulus, invertible lc
-   S, x = PolynomialRing(ZZ, "x")
-   T = ResidueRing(S, x^2 + 1)
+   S, x = polynomial_ring(ZZ, "x")
+   T = residue_ring(S, x^2 + 1)
 
    @test T(2) == 2
    @test T(x) != 2
 end
 
-@testset "Generic.Res.powering" begin
-   R = Generic.ResidueRing(ZZ, 7)
+@testset "Generic.ResidueRingElem.powering" begin
+   R = Generic.residue_ring(ZZ, 7)
 
    a = R(3)
 
    @test a^5 == 5
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
 
    @test f^100 == T(x^2 + 2x + 1)
 
    # Poly modulus, invertible lc
-   S, x = PolynomialRing(ZZ, "x")
-   T = ResidueRing(S, x^2 + 1)
+   S, x = polynomial_ring(ZZ, "x")
+   T = residue_ring(S, x^2 + 1)
 
    @test T(x + 1)^0 == T(1)
    @test T(x + 1)^1 == T(x + 1)
@@ -377,7 +380,7 @@ end
    @test T(x + 1)^3 == T(2x - 2)
 
 
-   R = ResidueRing(ZZ, ZZ(4))
+   R = residue_ring(ZZ, ZZ(4))
    @test_throws NotInvertibleError R(4)^-1
    @test_throws NotInvertibleError R(2)^-1
    try
@@ -388,7 +391,7 @@ end
       @test modulus(e.mod) == 4
    end
 
-   R = ResidueRing(ZZ, 4)
+   R = residue_ring(ZZ, 4)
    @test_throws NotInvertibleError R(4)^-1
    @test_throws NotInvertibleError R(2)^-1
    try
@@ -399,40 +402,40 @@ end
       @test modulus(e.mod) == 4
    end
 
-   R = ResidueRing(ZZ, ZZ(5))
+   R = residue_ring(ZZ, ZZ(5))
    @test_throws NotInvertibleError R(5)^-1
 
-   R = ResidueRing(ZZ, 5)
+   R = residue_ring(ZZ, 5)
    @test_throws NotInvertibleError R(5)^-1
 end
 
-@testset "Generic.Res.inversion" begin
-   R = Generic.ResidueRing(ZZ, 49)
+@testset "Generic.ResidueRingElem.inversion" begin
+   R = Generic.residue_ring(ZZ, 49)
 
    a = R(5)
 
    @test inv(a) == 10
 
-   R = Generic.ResidueRing(ZZ, 41)
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   R = Generic.residue_ring(ZZ, 41)
+   S, x = polynomial_ring(R, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
 
    @test inv(f) == T(26*x^2+31*x+10)
 end
 
-@testset "Generic.Res.exact_division" begin
-   R = Generic.ResidueRing(ZZ, 49)
+@testset "Generic.ResidueRingElem.exact_division" begin
+   R = Generic.residue_ring(ZZ, 49)
 
    a = R(5)
    b = R(3)
 
    @test divexact(a, b) == 18
 
-   R = Generic.ResidueRing(ZZ, 41)
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
+   R = Generic.residue_ring(ZZ, 41)
+   S, x = polynomial_ring(R, "x")
+   T = residue_ring(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
    g = T(x^4 + x + 2)
@@ -441,7 +444,7 @@ end
 
    for i = 1:100
       n = rand(1:24)
-      R = ResidueRing(ZZ, n)
+      R = residue_ring(ZZ, n)
 
       for iter = 1:100
          a1 = rand(R, 0:n - 1)

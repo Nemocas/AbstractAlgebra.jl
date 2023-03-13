@@ -6,10 +6,21 @@ function test_elem(R::AbstractAlgebra.LaurentMPolyRing{BigInt})
     rand(R, 1:9, -n:n, -99:99)
 end
 
+function test_elem(R::AbstractAlgebra.Generic.LaurentMPolyWrapRing{AbstractAlgebra.Generic.ResidueRingElem{BigInt}})
+    n = rand(1:5)
+    # R: length between 1 and 9
+    # R: exponents between -n and n
+    # ZZ/6ZZ: coeffs between ??? <- TODO
+    rand(R, 1:4, -n:n, 1:10)
+end
+
 @testset "Generic.LaurentMPoly.conformance" begin
     L, (x, y) = LaurentPolynomialRing(ZZ, ["x", "y"])
     test_Ring_interface(L)
     test_Ring_interface_recursive(L)
+
+    L, (x, y) = LaurentPolynomialRing(residue_ring(ZZ, ZZ(6)), ["x", "y"])
+    test_Ring_interface(L)
 end
 
 @testset "Generic.LaurentMPoly.constructors" begin
@@ -17,16 +28,34 @@ end
     @test L != LaurentPolynomialRing(GF(5), 2, 'x', cached = false)[1]
     @test L == LaurentPolynomialRing(GF(5), 2, :x, cached = true)[1]
 
+    @test base_ring(L) == GF(5)
+    @test coefficient_ring(L) == GF(5)
+    @test base_ring(x) == GF(5)
+    @test coefficient_ring(x) == GF(5)
+
     L, (x, y) = LaurentPolynomialRing(GF(5), ["x", "y"])
     @test L == LaurentPolynomialRing(GF(5), ['x', 'y'])[1]
     @test L != LaurentPolynomialRing(GF(5), [:x, :y], cached = false)[1]
 
     # only works because of the caching
-    R, (X, Y) = PolynomialRing(coefficient_ring(L), symbols(L))
+    R, (X, Y) = polynomial_ring(coefficient_ring(L), symbols(L))
     @test one(L) == L(one(R))
     @test x == L(X)
     @test y == L(Y)
     @test X + x == 2*x
+end
+
+@testset "Generic.LaurentMPoly.is_unit" begin
+   R, (x,) = LaurentPolynomialRing(residue_ring(ZZ, 6), ["x"])
+
+   @test is_unit(x)
+   @test !is_unit(2*x)
+   try
+      res = is_unit(3 + 2*x)
+      @test res
+   catch e
+      @test e isa NotImplementedError
+   end
 end
 
 @testset "Generic.LaurentMPoly.derivative" begin

@@ -29,7 +29,7 @@ elements to `FPModuleElem{T}`.
 ## Constructors
 
 ```@docs
-DirectSum(::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
+direct_sum
 ```
 
 **Examples**
@@ -45,10 +45,8 @@ julia> m2 = F(BigInt[9, 7, -2, 2, -4])
 (9, 7, -2, 2, -4)
 
 julia> S1, f1 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 5 over Integers)
 
 julia> m1 = F(BigInt[3, 1, 7, 7, -7])
@@ -58,10 +56,8 @@ julia> m2 = F(BigInt[-8, 6, 10, -1, 1])
 (-8, 6, 10, -1, 1)
 
 julia> S2, f2 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 5 over Integers)
 
 julia> m1 = F(BigInt[2, 4, 2, -3, -10])
@@ -71,32 +67,24 @@ julia> m2 = F(BigInt[5, 7, -6, 9, -5])
 (5, 7, -6, 9, -5)
 
 julia> S3, f3 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 5 over Integers)
 
-julia> D, f = DirectSum(S1, S2, S3)
+julia> D, f = direct_sum(S1, S2, S3)
 (DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: DirectSumModule over Integers, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: DirectSumModule over Integers, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: DirectSumModule over Integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with
 Domain: DirectSumModule over Integers
-Codomain: Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+Codomain: Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: DirectSumModule over Integers
-Codomain: Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+Codomain: Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: DirectSumModule over Integers
-Codomain: Submodule over Integers with 2 generators and no relations
-])
+Codomain: Submodule over Integers with 2 generators and no relations])
 ```
 
 ## Functionality for direct sums
@@ -123,10 +111,8 @@ julia> m2 = F(BigInt[9, 7, -2, 2, -4])
 (9, 7, -2, 2, -4)
 
 julia> S1, f1 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 5 over Integers)
 
 julia> m1 = F(BigInt[3, 1, 7, 7, -7])
@@ -136,10 +122,8 @@ julia> m2 = F(BigInt[-8, 6, 10, -1, 1])
 (-8, 6, 10, -1, 1)
 
 julia> S2, f2 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 5 over Integers)
 
 julia> m1 = F(BigInt[2, 4, 2, -3, -10])
@@ -149,39 +133,29 @@ julia> m2 = F(BigInt[5, 7, -6, 9, -5])
 (5, 7, -6, 9, -5)
 
 julia> S3, f3 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+(Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: Free module of rank 5 over Integers)
 
-julia> D, f = DirectSum(S1, S2, S3)
+julia> D, f = direct_sum(S1, S2, S3)
 (DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: DirectSumModule over Integers, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: DirectSumModule over Integers, Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
-
 Codomain: DirectSumModule over Integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with
 Domain: DirectSumModule over Integers
-Codomain: Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+Codomain: Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: DirectSumModule over Integers
-Codomain: Submodule over Integers with 2 generators and no relations
-, Module homomorphism with
+Codomain: Submodule over Integers with 2 generators and no relations, Module homomorphism with
 Domain: DirectSumModule over Integers
-Codomain: Submodule over Integers with 2 generators and no relations
-])
+Codomain: Submodule over Integers with 2 generators and no relations])
 
 julia> summands(D)
 3-element Vector{AbstractAlgebra.Generic.Submodule{BigInt}}:
  Submodule over Integers with 2 generators and no relations
-
  Submodule over Integers with 2 generators and no relations
-
  Submodule over Integers with 2 generators and no relations
 ```
 
@@ -201,7 +175,7 @@ julia> N = FreeModule(QQ, 2);
 
 julia> M = FreeModule(QQ, 1);
 
-julia> D, _ = DirectSum(M, N, M);
+julia> D, _ = direct_sum(M, N, M);
 
 julia> D([gen(M, 1), gen(N, 1), gen(M, 2)])
 (1//1, 1//1, 0//1, 0//1)
@@ -239,7 +213,7 @@ $S$, construct the corresponding homomorphism.
 ```jldoctest
 julia> N = FreeModule(QQ, 2);
 
-julia> D, _ = DirectSum(N, N);
+julia> D, _ = direct_sum(N, N);
 
 julia> p = ModuleHomomorphism(N, N, [3,4] .* basis(N));
 

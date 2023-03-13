@@ -48,6 +48,8 @@ one(::Rationals{T}) where T <: Integer = Rational{T}(1)
 
 is_unit(a::Rational) = a != 0
 
+is_zero_divisor(a::Rational) = is_zero(a)
+
 canonical_unit(a::Rational)  = a
 
 function numerator(a::Rational, canonicalise::Bool=true)
@@ -376,8 +378,8 @@ end
 
 ###############################################################################
 #
-#   FractionField constructor
+#   fraction_field constructor
 #
 ###############################################################################
 
-FractionField(R::Integers{T}) where T <: Integer = Rationals{T}()
+fraction_field(R::Integers{T}) where T <: Integer = Rationals{T}()

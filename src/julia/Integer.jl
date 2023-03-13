@@ -41,6 +41,8 @@ one(::Integers{T}) where T <: Integer = T(1)
 
 is_unit(a::Integer) = a == 1 || a == -1
 
+is_zero_divisor(a::Integer) = is_zero(a)
+
 canonical_unit(a::T) where T <: Integer = a < 0 ? T(-1) : T(1)
 
 characteristic(::Integers{T}) where T <: Integer = 0

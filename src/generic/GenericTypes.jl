@@ -95,7 +95,7 @@ struct Partition{T} <: AbstractVector{T}
 
    function Partition(n::Integer, part::AbstractVector{T}, check::Bool=true) where T
       if check
-         all(i-> part[i] >= part[i-1], 2:length(part)) || sort!(part, rev=true)
+         issorted(part, rev=true) || sort!(part, rev=true)
          if length(part) > 0
             part[end] >= 1 || throw(ArgumentError("Found non-positive entry in partition: $(part[end])"))
          end
@@ -245,7 +245,7 @@ struct YoungTableau{T<:Integer} <: AbstractMatrix{T}
 
    function YoungTableau(part::Partition{T},
       fill::AbstractVector{<:Integer}=collect(T(1):sum(part))) where T
-      @boundscheck sum(part) == length(fill) || throw(ArgumentError("Can't fill Young digaram of $part with $fill: different number of elemnets."))
+      @boundscheck sum(part) == length(fill) || throw(ArgumentError("Can't fill Young digaram of $part with $fill: different number of elements."))
 
       return new{T}(part, fill)
    end
@@ -270,7 +270,7 @@ end
 
 const PolyID = CacheDictType{Tuple{Ring, Symbol}, Ring}()
 
-mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyElem{T}
+mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyRingElem{T}
    coeffs::Vector{T}
    length::Int
    parent::PolyRing{T}
@@ -305,7 +305,7 @@ end
 
 const NCPolyID = CacheDictType{Tuple{NCRing, Symbol}, NCRing}()
 
-mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyElem{T}
+mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyRingElem{T}
    coeffs::Vector{T}
    length::Int
    parent::NCPolyRing{T}
@@ -353,7 +353,7 @@ end
 
 const MPolyID = CacheDictType{Tuple{Ring, Vector{Symbol}, Symbol, Int}, Ring}()
 
-mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyElem{T}
+mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyRingElem{T}
    coeffs::Vector{T}
    exps::Matrix{UInt}
    length::Int
@@ -402,29 +402,29 @@ end
 
 ###############################################################################
 #
-#   UnivPolyRing / UnivPoly
+#   UniversalPolyRing / UnivPoly
 #
 ###############################################################################
 
-mutable struct UnivPolyRing{T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}} <: AbstractAlgebra.UnivPolyRing{T}
+mutable struct UniversalPolyRing{T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}} <: AbstractAlgebra.UniversalPolyRing{T}
    base_ring::Ring
    S::Vector{Symbol}
    ord::Symbol
    mpoly_ring::AbstractAlgebra.MPolyRing{T}
 
-   function UnivPolyRing{T, U}(R::Ring, ord::Symbol, cached::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyElem{T}}
+   function UniversalPolyRing{T, U}(R::Ring, ord::Symbol, cached::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
       return get_cached!(UnivPolyID, (R, ord, U), cached) do
          new{T, U}(R, Vector{Symbol}(undef, 0), ord,
-                      PolynomialRing(R, Vector{Symbol}(undef, 0); cached=cached, ordering=ord)[1])
-      end::UnivPolyRing{T, U}
+                      polynomial_ring(R, Vector{Symbol}(undef, 0); cached=cached, ordering=ord)[1])
+      end::UniversalPolyRing{T, U}
    end
 end
 
 const UnivPolyID = CacheDictType{Tuple{Ring, Symbol, DataType}, Ring}()
 
-mutable struct UnivPoly{T <: RingElement, U <: MPoly} <: AbstractAlgebra.UnivPolyElem{T}
+mutable struct UnivPoly{T <: RingElement, U <: MPoly} <: AbstractAlgebra.UniversalPolyRingElem{T}
    p::U
-   parent::UnivPolyRing{T}
+   parent::UniversalPolyRing{T}
 end
 
 struct UnivPolyCoeffs{T <: AbstractAlgebra.RingElem}
@@ -506,9 +506,9 @@ end
 const LaurentPolyWrapRingID = CacheDictType{Ring, LaurentPolyWrapRing}()
 
 mutable struct LaurentPolyWrap{T  <: RingElement,
-                               PE <: AbstractAlgebra.PolyElem{T},
+                               PE <: AbstractAlgebra.PolyRingElem{T},
                                LR <: LaurentPolyWrapRing{T}
-                              } <: AbstractAlgebra.LaurentPolyElem{T}
+                              } <: AbstractAlgebra.LaurentPolyRingElem{T}
    parent::LR
    poly::PE
    mindeg::Int
@@ -521,7 +521,7 @@ mutable struct LaurentPolyWrap{T  <: RingElement,
 
    function LaurentPolyWrap(parent::LR, poly::PE, mindeg::Int = 0) where {
                                              T  <: RingElement,
-                                             PE <: AbstractAlgebra.PolyElem{T},
+                                             PE <: AbstractAlgebra.PolyRingElem{T},
                                              LR <: LaurentPolyWrapRing{T}}
       new{T, PE, LR}(parent, poly, mindeg)
    end
@@ -551,9 +551,9 @@ end
 const LaurentMPolyWrapRingID = CacheDictType{Ring, LaurentMPolyWrapRing}()
 
 mutable struct LaurentMPolyWrap{T  <: RingElement,
-                                PE <: AbstractAlgebra.MPolyElem{T},
+                                PE <: AbstractAlgebra.MPolyRingElem{T},
                                 LR <: LaurentMPolyWrapRing{T}
-                               } <: AbstractAlgebra.LaurentMPolyElem{T}
+                               } <: AbstractAlgebra.LaurentMPolyRingElem{T}
    parent::LR
    mpoly::PE            # not necessarily owned by object
    mindegs::Vector{Int} # meaning ditto, vector not necessarily owned by object
@@ -561,7 +561,7 @@ mutable struct LaurentMPolyWrap{T  <: RingElement,
                              poly::PE,
                              mindegs::Vector{Int} = zeros(Int, nvars(parent))
                             ) where {T  <: RingElement,
-                                     PE <: AbstractAlgebra.MPolyElem{T},
+                                     PE <: AbstractAlgebra.MPolyRingElem{T},
                                      LR <: LaurentMPolyWrapRing{T}}
       new{T, PE, LR}(parent, poly, mindegs)
    end
@@ -569,15 +569,15 @@ end
 
 ###############################################################################
 #
-#   ResRing / Res
+#   ResidueRing / ResidueRingElem
 #
 ###############################################################################
 
-mutable struct ResRing{T <: RingElement} <: AbstractAlgebra.ResRing{T}
+mutable struct ResidueRing{T <: RingElement} <: AbstractAlgebra.ResidueRing{T}
    base_ring::Ring
    modulus::T
 
-   function ResRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
+   function ResidueRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
       c = canonical_unit(modulus)
       if !isone(c)
         modulus = divexact(modulus, c)
@@ -586,30 +586,30 @@ mutable struct ResRing{T <: RingElement} <: AbstractAlgebra.ResRing{T}
 
       return get_cached!(ModulusDict, (R, modulus), cached) do
          new{T}(R, modulus)
-      end::ResRing{T}
+      end::ResidueRing{T}
    end
 end
 
 const ModulusDict = CacheDictType{Tuple{Ring, RingElement}, Ring}()
 
-mutable struct Res{T <: RingElement} <: AbstractAlgebra.ResElem{T}
+mutable struct ResidueRingElem{T <: RingElement} <: AbstractAlgebra.ResElem{T}
    data::T
-   parent::ResRing{T}
+   parent::ResidueRing{T}
 
-   Res{T}(a::T) where T <: RingElement = new{T}(a)
+   ResidueRingElem{T}(a::T) where T <: RingElement = new{T}(a)
 end
 
 ###############################################################################
 #
-#   ResField / ResFieldElem
+#   ResidueField / ResFieldElem
 #
 ###############################################################################
 
-mutable struct ResField{T <: RingElement} <: AbstractAlgebra.ResField{T}
+mutable struct ResidueField{T <: RingElement} <: AbstractAlgebra.ResidueField{T}
    base_ring::Ring
    modulus::T
 
-   function ResField{T}(modulus::T, cached::Bool = true) where T <: RingElement
+   function ResidueField{T}(modulus::T, cached::Bool = true) where T <: RingElement
       c = canonical_unit(modulus)
       if !isone(c)
         modulus = divexact(modulus, c)
@@ -617,45 +617,45 @@ mutable struct ResField{T <: RingElement} <: AbstractAlgebra.ResField{T}
       R = parent(modulus)
       return get_cached!(ModulusFieldDict, (R, modulus), cached) do
          new{T}(R, modulus)
-      end::ResField{T}
+      end::ResidueField{T}
    end
 end
 
 const ModulusFieldDict = CacheDictType{Tuple{Ring, RingElement}, Field}()
 
-mutable struct ResF{T <: RingElement} <: AbstractAlgebra.ResFieldElem{T}
+mutable struct ResidueFieldElem{T <: RingElement} <: AbstractAlgebra.ResFieldElem{T}
    data::T
-   parent::ResField{T}
+   parent::ResidueField{T}
 
-   ResF{T}(a::T) where T <: RingElement = new{T}(a)
+   ResidueFieldElem{T}(a::T) where T <: RingElement = new{T}(a)
 end
 
 ###############################################################################
 #
-#   RelSeriesRing / RelSeries
+#   RelPowerSeriesRing / RelSeries
 #
 ###############################################################################
 
-mutable struct RelSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
+mutable struct RelPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function RelSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+   function RelPowerSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
       return get_cached!(RelSeriesID, (R, prec, s), cached) do
          new{T}(R, prec, s)
-      end::RelSeriesRing{T}
+      end::RelPowerSeriesRing{T}
    end
 end
 
 const RelSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
-mutable struct RelSeries{T <: RingElement} <: AbstractAlgebra.RelSeriesElem{T}
+mutable struct RelSeries{T <: RingElement} <: AbstractAlgebra.RelPowerSeriesRingElem{T}
    coeffs::Vector{T}
    length::Int
    prec::Int
    val::Int
-   parent::RelSeriesRing{T}
+   parent::RelPowerSeriesRing{T}
 
    function RelSeries{T}(a::Vector{T}, length::Int, prec::Int, val::Int) where T <: RingElement
       new{T}(a, length, prec, val)
@@ -666,29 +666,29 @@ end
 
 ###############################################################################
 #
-#   AbsSeriesRing / AbsSeries
+#   AbsPowerSeriesRing / AbsSeries
 #
 ###############################################################################
 
-mutable struct AbsSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
+mutable struct AbsPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function AbsSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+   function AbsPowerSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
       return get_cached!(AbsSeriesID, (R, prec, s), cached) do
          new{T}(R, prec, s)
-      end::AbsSeriesRing{T}
+      end::AbsPowerSeriesRing{T}
    end
 end
 
 const AbsSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
-mutable struct AbsSeries{T <: RingElement} <: AbstractAlgebra.AbsSeriesElem{T}
+mutable struct AbsSeries{T <: RingElement} <: AbstractAlgebra.AbsPowerSeriesRingElem{T}
    coeffs::Vector{T}
    length::Int
    prec::Int
-   parent::AbsSeriesRing{T}
+   parent::AbsPowerSeriesRing{T}
 
    AbsSeries{T}(a::Vector{T}, length::Int, prec::Int) where T <: RingElement = new{T}(a, length, prec)
    AbsSeries{T}(a::AbsSeries{T}) where T <: RingElement = a
@@ -827,21 +827,31 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
 mutable struct AbsMSeriesRing{T <: RingElement, S} <:
                                                  AbstractAlgebra.MSeriesRing{T}
    poly_ring::AbstractAlgebra.MPolyRing{T}
-   prec_max::Vector{Int}
-   sym::Vector{Symbol}
+   prec_max::Vector{Int} # used for weights in weighted mode
+   sym::Vector{Symbol} # -1 if not weighted
+   weighted_prec::Int
 
    function AbsMSeriesRing{T, S}(poly_ring::AbstractAlgebra.MPolyRing{T},
             prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where
-                          {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
+                          {T <: RingElement, S <: AbstractAlgebra.MPolyRingElem{T}}
       U = elem_type(poly_ring)
-      return get_cached!(AbsMSeriesID, (poly_ring, prec, s), cached) do
-         new{T, U}(poly_ring, prec, s)
+      return get_cached!(AbsMSeriesID, (poly_ring, prec, s, -1), cached) do
+         new{T, U}(poly_ring, prec, s, -1)
+      end::AbsMSeriesRing{T, S}
+   end
+
+   function AbsMSeriesRing{T, S}(poly_ring::AbstractAlgebra.MPolyRing{T},
+      weights::Vector{Int}, prec::Int, s::Vector{Symbol}, cached::Bool = true) where
+                    {T <: RingElement, S <: AbstractAlgebra.MPolyRingElem{T}}
+      U = elem_type(poly_ring)
+      return get_cached!(AbsMSeriesID, (poly_ring, weights, s, prec), cached) do
+         new{T, U}(poly_ring, weights, s, prec)
       end::AbsMSeriesRing{T, S}
    end
 end
-
+ 
 const AbsMSeriesID = CacheDictType{Tuple{Ring,
-                                          Vector{Int}, Vector{Symbol}}, Ring}()
+                                       Vector{Int}, Vector{Symbol}, Int}, Ring}()
 
 mutable struct AbsMSeries{T <: RingElement, S} <:
                                               AbstractAlgebra.AbsMSeriesElem{T}
@@ -851,7 +861,7 @@ mutable struct AbsMSeries{T <: RingElement, S} <:
 
    function AbsMSeries{T, S}(R::AbsMSeriesRing{T},
                       pol::S, prec::Vector{Int}) where
-                          {T <: RingElement, S <: AbstractAlgebra.MPolyElem{T}}
+                          {T <: RingElement, S <: AbstractAlgebra.MPolyRingElem{T}}
       return new{T, S}(pol, prec, R)
    end
 end
@@ -880,6 +890,32 @@ mutable struct Frac{T <: RingElem} <: AbstractAlgebra.FracElem{T}
    parent::FracField{T}
 
    Frac{T}(num::T, den::T) where T <: RingElem = new{T}(num, den)
+end
+
+###############################################################################
+#
+#   TotFracRing / TotFrac
+#
+###############################################################################
+
+mutable struct TotFracRing{T <: RingElem} <: AbstractAlgebra.Ring
+   base_ring::Ring
+
+   function TotFracRing{T}(R::Ring, cached::Bool = true) where T <: RingElem
+      return get_cached!(TotFracDict, R, cached) do
+         new{T}(R)
+      end::TotFracRing{T}
+   end
+end
+
+const TotFracDict = CacheDictType{Ring, Ring}()
+
+mutable struct TotFrac{T <: RingElem} <: AbstractAlgebra.RingElem
+   num::T
+   den::T
+   parent::TotFracRing{T}
+
+   TotFrac{T}(num::T, den::T) where T <: RingElem = new{T}(num, den)
 end
 
 ###############################################################################
@@ -921,26 +957,26 @@ end
 #
 ###############################################################################
 
-mutable struct RationalFunctionField{T <: FieldElement} <: AbstractAlgebra.Field
-   S::Symbol
-   fraction_field::FracField{<:PolyElem{T}}
+mutable struct RationalFunctionField{T <: FieldElement, U <: Union{PolyRingElem{T}, MPolyRingElem{T}}} <: AbstractAlgebra.Field
+   S::Union{Symbol, Vector{Symbol}}
+   fraction_field::FracField{U}
    base_ring::Field
 
-   function RationalFunctionField{T}(k::Field, frac_field::FracField{<:PolyElem{T}}, sym::Symbol, cached::Bool = true) where T <: FieldElement
+   function RationalFunctionField{T, U}(k::Field, frac_field::FracField{U}, sym::Union{Symbol, Vector{Symbol}}, cached::Bool = true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
       return get_cached!(RationalFunctionFieldDict, (k, sym), cached) do
-         U = elem_type(k)
-         new{U}(sym, frac_field, k)
-      end::RationalFunctionField{T}
+         T1 = elem_type(k)
+         new{T1, U}(sym, frac_field, k)
+      end::RationalFunctionField{T, U}
    end
 end
 
-const RationalFunctionFieldDict = CacheDictType{Tuple{Field, Symbol}, Field}()
+const RationalFunctionFieldDict = CacheDictType{Tuple{Field, Union{Symbol, Vector{Symbol}}}, Field}()
 
-mutable struct Rat{T <: FieldElement} <: AbstractAlgebra.FieldElem
-   d::Frac{<:PolyElem{T}}
-   parent::RationalFunctionField{T}
+mutable struct RationalFunctionFieldElem{T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} <: AbstractAlgebra.FieldElem
+   d::Frac{U}
+   parent::RationalFunctionField{T, U}
 
-   Rat{T}(f::Frac{<:PolyElem{T}}) where T <: FieldElement = new{T}(f)
+   RationalFunctionFieldElem{T, U}(f::Frac{U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = new{T, U}(f)
 end
 
 ###############################################################################
@@ -950,19 +986,19 @@ end
 ###############################################################################
 
 mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
-   num::Poly{<:PolyElem{T}}
-   den::PolyElem{T}
+   num::Poly{<:PolyRingElem{T}}
+   den::PolyRingElem{T}
    S::Symbol
-   powers::Vector{Poly{<:PolyElem{T}}}
-   powers_den::Vector{<:PolyElem{T}}
-   traces::Vector{<:PolyElem{T}}
-   traces_den::PolyElem{T}
+   powers::Vector{Poly{<:PolyRingElem{T}}}
+   powers_den::Vector{<:PolyRingElem{T}}
+   traces::Vector{<:PolyRingElem{T}}
+   traces_den::PolyRingElem{T}
    monic::Bool
-   pol::Poly{Rat{T}}
-   base_ring::RationalFunctionField{T}
+   pol::Poly{RationalFunctionFieldElem{T, U}} where U <: PolyRingElem{T}
+   base_ring::RationalFunctionField{T, U} where U <: PolyRingElem{T}
 
-   function FunctionField{T}(num::Poly{<:PolyElem{T}},
-             den::PolyElem{T}, s::Symbol, cached::Bool = true) where
+   function FunctionField{T}(num::Poly{<:PolyRingElem{T}},
+             den::PolyRingElem{T}, s::Symbol, cached::Bool = true) where
                                                           T <: FieldElement
       return get_cached!(FunctionFieldDict, (num, den, s), cached) do
          new{T}(num, den, s)
@@ -970,14 +1006,14 @@ mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
    end
 end
 
-const FunctionFieldDict = CacheDictType{Tuple{Poly, PolyElem, Symbol}, Field}()
+const FunctionFieldDict = CacheDictType{Tuple{Poly, PolyRingElem, Symbol}, Field}()
 
 mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
-   num::Poly{<:PolyElem{T}}
-   den::PolyElem{T}
+   num::Poly{<:PolyRingElem{T}}
+   den::PolyRingElem{T}
    parent::FunctionField{T}
 
-   function FunctionFieldElem{T}(R::FunctionField{T}, num::Poly{S}, den::S) where {T <: FieldElement, S <: PolyElem{T}}
+   function FunctionFieldElem{T}(R::FunctionField{T}, num::Poly{S}, den::S) where {T <: FieldElement, S <: PolyRingElem{T}}
       return new{T}(num, den, R)
    end
 end
@@ -1102,11 +1138,11 @@ const FreeAssAlgID = CacheDictType{Tuple{Ring, Vector{Symbol}}, NCRing}()
 mutable struct FreeAssAlgElem{T <: RingElement} <: AbstractAlgebra.FreeAssAlgElem{T}
    parent::FreeAssAlgebra{T}
    coeffs::Vector{T}
-   exps::Vector{Vector{Int}}  # TODO: Int -> UInt8 for nvars < 256, ect
+   exps::Vector{Vector{Int}}  # TODO: Int -> UInt8 for nvars < 256, etc
    length::Int
 end
 
-# the iterators for coeffs, terms, ect. are shared with MPoly. Just this remains
+# the iterators for coeffs, terms, etc. are shared with MPoly. Just this remains
 struct FreeAssAlgExponentWords{T <: AbstractAlgebra.NCRingElem}
    poly::T
 end

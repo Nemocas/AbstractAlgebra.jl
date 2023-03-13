@@ -1,10 +1,24 @@
 include("julia/Integers-test.jl")
 
+# artificially low cutoffs for testing purposes
+function AbstractAlgebra.hgcd_prefers_basecase(a::T, b::T) where T <: PolyRingElem
+   return degree(b) < 5
+end
+
+function AbstractAlgebra.mat22_mul_prefers_classical(
+   a11::T, a12::T, a21::T, a22::T,
+   b11::T, b12::T, b21::T, b22::T
+) where T <: PolyRingElem
+
+   return degree(a11) + degree(a22) < 4 || degree(b11) + degree(b22) < 4
+end
+
 include("generic/Poly-test.jl")
 include("generic/SparsePoly-test.jl")
 include("generic/LaurentPoly-test.jl")
 include("generic/Residue-test.jl")
 include("generic/ResidueField-test.jl")
+include("generic/TotalFraction-test.jl")
 include("generic/RelSeries-test.jl")
 include("generic/AbsSeries-test.jl")
 include("generic/LaurentSeries-test.jl")
@@ -14,6 +28,7 @@ include("generic/Matrix-test.jl")
 include("generic/MPoly-test.jl")
 include("generic/LaurentMPoly-test.jl")
 include("generic/UnivPoly-test.jl")
+include("algorithms/MPolyEvaluate-test.jl")
 include("algorithms/MPolyFactor-test.jl")
 include("algorithms/DensePoly-test.jl")
 include("algorithms/GenericFunctions-test.jl")

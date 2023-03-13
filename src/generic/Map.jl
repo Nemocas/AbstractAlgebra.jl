@@ -66,6 +66,8 @@ function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}, g::A
    return g
 end
 
+Base.inv(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap)) = f
+
 ################################################################################
 #
 #  FunctionalMap

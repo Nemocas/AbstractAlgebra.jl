@@ -10,9 +10,9 @@
 #
 ###############################################################################
 
-parent_type(::Type{AbsSeries{T}}) where T <: RingElement = AbsSeriesRing{T}
+parent_type(::Type{AbsSeries{T}}) where T <: RingElement = AbsPowerSeriesRing{T}
 
-elem_type(::Type{AbsSeriesRing{T}}) where T <: RingElement = AbsSeries{T}
+elem_type(::Type{AbsPowerSeriesRing{T}}) where T <: RingElement = AbsSeries{T}
 
 @doc Markdown.doc"""
     abs_series_type(::Type{T}) where T <: RingElement
@@ -28,23 +28,23 @@ abs_series_type(::Type{T}) where T <: RingElement = AbsSeries{T}
 ###############################################################################
 
 @doc Markdown.doc"""
-    gen(R::AbsSeriesRing{T}) where T <: RingElement
+    gen(R::AbsPowerSeriesRing{T}) where T <: RingElement
 
 Return the generator of the power series ring, i.e. $x + O(x^n)$ where
 $n$ is the precision of the power series ring $R$.
 """
-function gen(R::AbsSeriesRing{T}) where T <: RingElement
+function gen(R::AbsPowerSeriesRing{T}) where T <: RingElement
    S = base_ring(R)
    return R([S(0), S(1)], 2, max_precision(R))
 end
 
 @doc Markdown.doc"""
-    max_precision(R::AbsSeriesRing)
+    max_precision(R::AbsPowerSeriesRing)
 
 Return the maximum absolute precision of power series in the given power
 series ring.
 """
-max_precision(R::AbsSeriesRing) = R.prec_max
+max_precision(R::AbsPowerSeriesRing) = R.prec_max
 
 function normalise(a::AbsSeries, len::Int)
    while len > 0 && iszero(a.coeffs[len])
@@ -68,7 +68,7 @@ function deepcopy_internal(a::AbsSeries{T}, dict::IdDict) where T <: RingElement
    return parent(a)(coeffs, length(a), precision(a))
 end
 
-function characteristic(a::AbsSeriesRing{T}) where T <: RingElement
+function characteristic(a::AbsPowerSeriesRing{T}) where T <: RingElement
    return characteristic(base_ring(a))
 end
 
@@ -294,17 +294,17 @@ end
 #
 ###############################################################################
 
-function (a::AbsSeriesRing{T} where T <: RingElement)(b::RingElement)
+function (a::AbsPowerSeriesRing{T} where T <: RingElement)(b::RingElement)
    return a(base_ring(a)(b))
 end
 
-function (a::AbsSeriesRing{T})() where T <: RingElement
+function (a::AbsPowerSeriesRing{T})() where T <: RingElement
    z = AbsSeries{T}(Array{T}(undef, 0), 0, a.prec_max)
    z.parent = a
    return z
 end
 
-function (a::AbsSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (a::AbsPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
    if b == 0
       z = AbsSeries{T}(Array{T}(undef, 0), 0, a.prec_max)
    else
@@ -314,7 +314,7 @@ function (a::AbsSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where
    return z
 end
 
-function (a::AbsSeriesRing{T})(b::T) where {T <: RingElem}
+function (a::AbsPowerSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if iszero(b)
       z = AbsSeries{T}(Array{T}(undef, 0), 0, a.prec_max)
@@ -325,12 +325,12 @@ function (a::AbsSeriesRing{T})(b::T) where {T <: RingElem}
    return z
 end
 
-function (a::AbsSeriesRing{T})(b::AbsSeriesElem{T}) where T <: RingElement
+function (a::AbsPowerSeriesRing{T})(b::AbsPowerSeriesRingElem{T}) where T <: RingElement
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function (a::AbsSeriesRing{T})(b::Vector{T}, len::Int, prec::Int) where T <: RingElement
+function (a::AbsPowerSeriesRing{T})(b::Vector{T}, len::Int, prec::Int) where T <: RingElement
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
    end
@@ -339,7 +339,7 @@ function (a::AbsSeriesRing{T})(b::Vector{T}, len::Int, prec::Int) where T <: Rin
    return z
 end
 
-function (a::AbsSeriesRing{T})(b::Vector{S}, len::Int, prec::Int) where {S <: RingElement, T <: RingElement}
+function (a::AbsPowerSeriesRing{T})(b::Vector{S}, len::Int, prec::Int) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    lenb = length(b)
    entries = Array{T}(undef, lenb)

@@ -4,24 +4,13 @@
 #
 ###############################################################################
 
-function Ideal(R::Ring, V::Vector)
-   return Generic.Ideal(R, V)
+function ideal
 end
 
-function Ideal(R::Ring, v::T...) where T <: RingElement
-   return Generic.Ideal(R, v...)
+function *(x::RingElement, R::Ring)
+  return ideal(R, x)
 end
 
-function Ideal(R::Ring)
-   return Generic.Ideal(R, [])
-end
-
-###############################################################################
-#
-#   IdealSet constructor
-#
-###############################################################################
-
-function IdealSet(R::Ring)
-   return Generic.IdealSet(R)
+function *(R::Ring, x::RingElement)
+  return ideal(R, x)
 end

@@ -39,7 +39,8 @@ function Base.denominator(a::Frac, canonicalise::Bool=true)
 end
 
 function deepcopy_internal(a::Frac{T}, dict::IdDict) where {T <: RingElem}
-   v = Frac{T}(deepcopy(numerator(a, false)), deepcopy(denominator(a, false)))
+   v = Frac{T}(deepcopy_internal(numerator(a, false), dict),
+               deepcopy_internal(denominator(a, false), dict))
    v.parent = parent(a)
    return v
 end
@@ -88,7 +89,7 @@ function (a::FracField{T})(b::T, c::T) where {T <: RingElement}
    return z
 end
 
-function (a::FracField{T})(b::T, c::T) where {U <: FieldElem, T <: PolyElem{U}}
+function (a::FracField{T})(b::T, c::T) where {U <: FieldElem, T <: PolyRingElem{U}}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
    u = canonical_unit(c)
@@ -108,7 +109,7 @@ function (a::FracField{T})(b::T, c::Union{Integer, Rational, AbstractFloat}) whe
    return z
 end
 
-function (a::FracField{T})(b::T, c::Rational) where {U <: FieldElem, T <: PolyElem{U}}
+function (a::FracField{T})(b::T, c::Rational) where {U <: FieldElem, T <: PolyRingElem{U}}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    b *= inv(c)
    z = Frac{T}(b, one(base_ring(a)))
@@ -123,7 +124,7 @@ function (a::FracField{T})(b::Union{Integer, Rational, AbstractFloat}, c::T) whe
    return z
 end
 
-function (a::FracField{T})(b::Union{Integer, Rational}, c::T) where {U <: FieldElem, T <: PolyElem{U}}
+function (a::FracField{T})(b::Union{Integer, Rational}, c::T) where {U <: FieldElem, T <: PolyRingElem{U}}
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
    b = base_ring(a)(b)
    u = canonical_unit(c)
@@ -136,8 +137,15 @@ function (a::FracField{T})(b::Union{Integer, Rational}, c::T) where {U <: FieldE
    return z
 end
 
-function (a::FracField{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (a::FracField{T})(b::Union{Integer, AbstractFloat}) where {T <: RingElement}
    z = Frac{T}(base_ring(a)(b), one(base_ring(a)))
+   z.parent = a
+   return z
+end
+
+function (a::FracField{T})(b::Rational) where {T <: RingElement}
+   z = Frac{T}(base_ring(a)(numerator(b, false)),
+               base_ring(a)(denominator(b, false)))
    z.parent = a
    return z
 end
@@ -155,12 +163,11 @@ end
 
 ###############################################################################
 #
-#   FractionField constructor
+#   fraction_field constructor
 #
 ###############################################################################
 
-function FractionField(R::AbstractAlgebra.Ring; cached=true)
-   R2 = R
+function fraction_field(R::AbstractAlgebra.Ring; cached=true)
    T = elem_type(R)
 
    return FracField{T}(R, cached)

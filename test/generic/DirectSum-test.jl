@@ -5,7 +5,7 @@ using Random
       for iter = 1:100
          num = rand(1:5)
          M = [rand_module(R, -10:10) for i in 1:num]
-         D, f, g = DirectSum(M)
+         D, f, g = direct_sum(M)
 
          @test isa(D, Generic.DirectSumModule)
       end
@@ -16,18 +16,13 @@ using Random
    n = F(BigInt[0, 1])
    S, f = sub(F, [m, n])
    Q, g = quo(F, S)
-   D, h = DirectSum(Q)
-   m = D([])
-
-   @test isa(m, Generic.DirectSumModuleElem)
-
    D, h = direct_sum(Q)
    m = D([])
 
    @test isa(m, Generic.DirectSumModuleElem)
 
    F = FreeModule(QQ,2)
-   D, inj, pro = DirectSum(F, F)
+   D, inj, pro = direct_sum(F, F)
    f = D([gen(F, 1), gen(F,2)])
    @test isa(f, Generic.DirectSumModuleElem)
    @test f == inj[1](gen(F,1)) + inj[2](gen(F, 2))
@@ -39,10 +34,6 @@ end
       for iter = 1:100
          num = rand(1:5)
          M = [rand_module(R, -10:10) for i in 1:num]
-
-         D, f, g = DirectSum(M...)
-
-         @test summands(D) == M
 
          D, f, g = direct_sum(M...)
 
@@ -57,7 +48,7 @@ end
          num = rand(1:5)
          M = [rand_module(R, -10:10) for i in 1:num]
 
-         D, f, g = DirectSum(M)
+         D, f, g = direct_sum(M)
 
          m = [rand(M[i], -10:10) for i in 1:num]
 
@@ -68,7 +59,7 @@ end
    end
 
    F = FreeModule(QQ, 2)
-   D, _ = DirectSum(F, F)
+   D, _ = direct_sum(F, F)
    p = ModuleHomomorphism(F, F, [1, 2] .* gens(F))
    q = ModuleHomomorphism(F, F, [3, 4] .* gens(F))
    phi = ModuleHomomorphism(D, D, [p 0; q q])
@@ -86,9 +77,9 @@ end
          num = rand(1:5)
          M = [rand_module(R, -10:10) for i in 1:num]
 
-         D1, f, g = DirectSum(M)
+         D1, f, g = direct_sum(M)
 
-         D2, f, g = DirectSum(shuffle(M))
+         D2, f, g = direct_sum(shuffle(M))
 
          @test is_isomorphic(D1, D2)
       end

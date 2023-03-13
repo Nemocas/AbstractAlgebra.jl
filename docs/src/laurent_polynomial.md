@@ -15,7 +15,7 @@ and form a ring denoted by $R[x, x^{-1}]$ where `R` is the coefficient ring.
 AbstractAlgebra.jl provides a generic implementation of Laurent polynomials,
 built in terms of regular polynomials in the file `src/generic/LaurentPoly.jl`.
 
-The type `LaurentPolyWrap{T, ...} <: LaurentPolyElem{T}` implements generic Laurent
+The type `LaurentPolyWrap{T, ...} <: LaurentPolyRingElem{T}` implements generic Laurent
 polynomials by wrapping regular polynomials: a Laurent polynomial `l` wraps a
 polynomial `p` and an integer `n` such that $l = x^{-n} * p$.
 
@@ -23,7 +23,7 @@ The corresponding parent type is `LaurentPolyWrapRing{T, ...} <: LaurentPolynomi
 
 ## Abstract types
 
-Two abstract types `LaurentPolyElem{T}` and `LaurentPolynomialRing{T}`
+Two abstract types `LaurentPolyRingElem{T}` and `LaurentPolynomialRing{T}`
 are defined to represent Laurent polynomials and rings thereof, parameterized
 on a base ring `T`.
 

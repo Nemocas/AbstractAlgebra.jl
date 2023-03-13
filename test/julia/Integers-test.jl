@@ -1,8 +1,3 @@
-function test_elem(R::AbstractAlgebra.Integers{BigInt})
-   n = big(2)^rand(1:100)
-   return rand(ZZ, -n:n)
-end
-
 @testset "Julia.Integers.conformance_tests" begin
    test_Ring_interface_recursive(ZZ)
    test_EuclideanRing_interface(ZZ)
@@ -16,6 +11,10 @@ end
    @test !is_unit(S(3))
    @test is_unit(R(-1))
    @test is_unit(S(-1))
+   @test is_zero_divisor(R(0))
+   @test is_zero_divisor(S(0))
+   @test !is_zero_divisor(R(3))
+   @test !is_zero_divisor(S(3))
 
    @test check_parent(S(1), S(1))
 end
@@ -135,6 +134,48 @@ end
       @test gS == gcd(s, modS)
       @test gS != 1 || mod(sS*s, modS) == 1
    end
+end
+
+@testset "Julia.Integers.crt" begin
+   function testit(r, m, check=true)
+      n = length(r)
+      if n == 2 && rand(Bool)
+         a = @inferred crt(r[1], m[1], r[2], m[2]; check=check)
+         b, l = @inferred crt_with_lcm(r[1], m[1], r[2], m[2]; check=check)
+      else
+         a = @inferred crt(r, m; check=check)
+         b, l = @inferred crt_with_lcm(r, m; check=check)
+      end
+      for i in 1:length(r)
+         @test is_divisible_by(l, m[i])
+         @test is_divisible_by(a - r[i], m[i])
+         @test is_divisible_by(b - r[i], m[i])
+      end
+   end
+
+   testit([ZZ(1)], [ZZ(4)])
+   testit([ZZ(1)], [ZZ(0)])
+
+   testit([ZZ(1), ZZ(2)], [ZZ(4), ZZ(5)])
+   testit([ZZ(1), ZZ(3)], [ZZ(4), ZZ(6)], false)
+   testit([ZZ(1), ZZ(3)], [ZZ(4), ZZ(6)], true)
+   testit([ZZ(-1), ZZ(2)], [ZZ(0), ZZ(3)])
+   testit([ZZ(-1), ZZ(2)], [ZZ(3), ZZ(0)])
+   @test_throws Exception crt([ZZ(1), ZZ(2)], [ZZ(0), ZZ(3)])
+   @test_throws Exception crt([ZZ(1), ZZ(2)], [ZZ(3), ZZ(0)])
+   @test_throws Exception crt([ZZ(1), ZZ(2)], [ZZ(4), ZZ(6)])
+   @test parent(crt([ZZ(1), ZZ(2)], [ZZ(4), ZZ(6)]; check=false)) == ZZ # junk but no throw
+
+   testit([ZZ(1), ZZ(2), ZZ(3)], [ZZ(4), ZZ(5), ZZ(7)])
+   testit([ZZ(1), ZZ(2), ZZ(3)], [ZZ(4), ZZ(5), ZZ(6)])
+   testit([ZZ(-1), ZZ(2), ZZ(-1)], [ZZ(0), ZZ(3), ZZ(0)])
+   @test_throws Exception crt([ZZ(1), ZZ(2), ZZ(2)], [ZZ(4), ZZ(5), ZZ(6)])
+   @test_throws Exception crt([ZZ(-1), ZZ(2), ZZ(2)], [ZZ(0), ZZ(3), ZZ(0)])
+   @test_throws Exception crt([ZZ(-1), ZZ(-1), ZZ(2)], [ZZ(0), ZZ(0), ZZ(4)])
+
+   testit(Int64[1, 1152921504606847008], Int64[2, 1152921504606847009])
+   testit(Int64[10, 100], Int64[1073741827, 536870923])
+   testit(Int64[2147483692, 2147483658], Int64[2147483693, 2147483659])
 end
 
 @testset "Julia.Integers.square_root" begin

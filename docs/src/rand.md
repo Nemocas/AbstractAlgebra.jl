@@ -28,7 +28,7 @@ julia> using Random
 
 julia> using RandomExtensions
 
-julia> S, x = PolynomialRing(ZZ, "x")
+julia> S, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> rand(Random.GLOBAL_RNG, make(S, 1:3, -10:10))
@@ -44,7 +44,7 @@ require creating a make instance or passing in the standard RNG.
 ```julia
 julia> using AbstractAlgebra
 
-julia> S, x = PolynomialRing(ZZ, "x")
+julia> S, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> rand(S, 1:3, -10:10)
@@ -131,7 +131,7 @@ For example, in AbstractAlgebra test code:
 ```julia
 using Test
 
-R, x = PolynomialRing(ZZ, "x")
+R, x = polynomial_ring(ZZ, "x")
 
 test_rand(R, -1:10, -10:10)
 ```

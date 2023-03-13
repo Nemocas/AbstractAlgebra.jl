@@ -234,7 +234,7 @@ function ==(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
     return x == y
 end
 
-function +(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T
+function +(a::FactoredFrac{T}, b::Rational) where T <: RingElem
    return a + parent(a)(b)
 end
 
@@ -242,7 +242,7 @@ function +(a::FactoredFrac{T}, b::T) where T <: RingElem
    return a + parent(a)(b)
 end
 
-function +(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T
+function +(b::Rational, a::FactoredFrac{T}) where T <: RingElem
    return parent(a)(b) + a
 end
 
@@ -255,7 +255,7 @@ function +(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
     return mul_by_base_elem(g, x + y)
 end
 
-function -(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T
+function -(a::FactoredFrac{T}, b::Rational) where T <: RingElem
    return a - parent(a)(b)
 end
 
@@ -263,7 +263,7 @@ function -(a::FactoredFrac{T}, b::T) where T <: RingElem
    return a - parent(a)(b)
 end
 
-function -(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T
+function -(b::Rational, a::FactoredFrac{T}) where T <: RingElem
    return parent(a)(b) - a
 end
 
@@ -307,7 +307,7 @@ function *(a::FactoredFrac{T}, b::T) where T <: RingElem
     return mul_by_base_elem(a, b)
 end
 
-function *(a::FactoredFrac{T}, b::Union{Integer, Rational}) where T <: RingElem
+function *(a::FactoredFrac{T}, b::Integer) where T <: RingElem
     return mul_by_base_elem(a, base_ring(a)(b))
 end
 
@@ -315,7 +315,7 @@ function *(b::T, a::FactoredFrac{T}) where T <: RingElem
    return mul_by_base_elem(a, b)
 end
 
-function *(b::Union{Integer, Rational}, a::FactoredFrac{T}) where T <: RingElem
+function *(b::Integer, a::FactoredFrac{T}) where T <: RingElem
    return mul_by_base_elem(a, base_ring(a)(b))
 end
 
@@ -332,7 +332,7 @@ function *(b::FactoredFrac{T}, c::FactoredFrac{T}) where T <: RingElement
     while i <= length(b)
         j = 1
         while j <= length(c)
-            (g, b[i].base, c[j].base) = _gcd_cofactors(b[i].base, c[j].base)
+            (g, b[i].base, c[j].base) = gcd_with_cofactors(b[i].base, c[j].base)
             if is_unit(g)
                 z.unit *= _pow(g, Base.checked_add(b[i].exp, c[j].exp))
             else
@@ -375,17 +375,27 @@ function Base.inv(a::FactoredFrac{T}) where T
     return FactoredFrac{T}(inv(a.unit), z, parent(a))
 end
 
-function divexact(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
+function divexact(a::FactoredFrac{T}, b::FactoredFrac{T}; check::Bool = true) where T
     return a*inv(b)
 end
 
-function divexact(a::Union{Integer, Rational}, b::FactoredFrac{T}) where T
-    return divexact(parent(b)(a), b)
+function divexact(a::Integer, b::FactoredFrac{T}; check::Bool = true) where T
+    return divexact(parent(b)(a), b, check = check)
 end
 
-function divexact(a::T, b::FactoredFrac{T}) where T <: RingElem
-    return divexact(parent(b)(a), b)
+function divexact(a::T, b::FactoredFrac{T}; check::Bool = true) where T <: RingElem
+    return divexact(parent(b)(a), b, check = check)
 end
+
+#=
+function divexact(a::FactoredFrac{T}, b::Rational; check::Bool = true) where T <: RingElem
+   return divexact(a, parent(a)(b), check = check)
+end
+
+function divexact(a::Rational, b::FactoredFrac{T}; check::Bool = true) where T <: RingElem
+   return divexact(parent(b)(a), b, check = check)
+end
+=#
 
 ###############################################################################
 #
@@ -432,7 +442,7 @@ end
 ##############################################################################
 
 # Return the derivative with respect to the `i`-th variable.
-function derivative(a::FactoredFrac{T}, i::Int) where {T <: MPolyElem}
+function derivative(a::FactoredFrac{T}, i::Int) where {T <: MPolyRingElem}
     z = FactoredFrac{T}(one(base_ring(a)), FactoredFracTerm{T}[], parent(a))
     p = unit(a)
     for (b, e) in a
@@ -509,7 +519,7 @@ function normalise(a::FactoredFrac{T}) where T
     z = FactoredFrac{T}(a.unit, FactoredFracTerm{T}[], parent(a))
     if !iszero(z.unit)
         for i in a.terms
-			_append_pow_normalise!(z, i.base, i.exp, 1)
+            _append_pow_normalise!(z, i.base, i.exp, 1)
         end
     end
     return z
@@ -522,12 +532,6 @@ function _pow(a::T, e::Int) where T <: RingElement
     else
         return a^e
     end
-end
-
-function _gcd_cofactors(a::T, b::T) where T
-    g = gcd(a, b)
-    iszero(g) && return (g, a, b)
-    return (g, divexact(a, g), divexact(b, g))
 end
 
 function copy(a::FactoredFracTerm{T}) where T
@@ -596,7 +600,7 @@ function _append_pow_normalise!(z::FactoredFrac{T}, a::T, e::Int, i::Int) where 
     input_is_good = _bases_are_coprime(z)
     l = z.terms
     while i <= length(l) && !is_unit(a)
-        (g, lbar, abar) = _gcd_cofactors(l[i].base, a)
+        (g, lbar, abar) = gcd_with_cofactors(l[i].base, a)
         # (g*lbar)^l[i].exp * (g*abar)^e
         # (lbar)^l[i].exp * (g)^(l[i].exp+e) * (abar)^e
         if is_unit(g)
@@ -661,7 +665,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
     while i <= length(b)
         j = 1
         while j <= length(c)
-            (g, b[i].base, c[j].base) = _gcd_cofactors(b[i].base, c[j].base)
+            (g, b[i].base, c[j].base) = gcd_with_cofactors(b[i].base, c[j].base)
             if !is_unit(g)
                 e = Base.checked_sub(b[i].exp, c[j].exp)
                 if e >= 0
@@ -693,7 +697,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
     i = 1
     while i <= length(b)
         if b[i].exp < 0
-			_append_pow_normalise!(z, b[i].base, b[i].exp, 1)
+            _append_pow_normalise!(z, b[i].base, b[i].exp, 1)
             cbar *= b[i].base^Base.checked_neg(b[i].exp)
         else
             bbar *= b[i].base^b[i].exp
@@ -703,7 +707,7 @@ function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
     j = 1
     while j <= length(c)
         if c[j].exp < 0
-			_append_pow_normalise!(z, c[j].base, c[j].exp, 1)
+            _append_pow_normalise!(z, c[j].base, c[j].exp, 1)
             bbar *= c[j].base^Base.checked_neg(c[j].exp)
         else
             cbar *= c[j].base^c[j].exp

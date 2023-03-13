@@ -1,7 +1,7 @@
-@testset "Generic.ResF.constructors" begin
+@testset "Generic.ResidueFieldElem.constructors" begin
    B = ZZ
 
-   R = Generic.ResidueField(B, 16453889)
+   R = Generic.residue_field(B, 16453889)
 
    S, f1 = quo(Field, B, 16453889)
    U, f2 = quo(Field, B, 16453889; cached=false)
@@ -17,45 +17,45 @@
    @test f1(c1) == S(c1)
    @test f2(c1) == S(c1)
 
-   @test Generic.ResidueField(B, 16453889, cached = true) === Generic.ResidueField(B, 16453889, cached = true)
-   @test Generic.ResidueField(B, 16453889, cached = true) !== Generic.ResidueField(B, 16453889, cached = false)
+   @test Generic.residue_field(B, 16453889, cached = true) === Generic.residue_field(B, 16453889, cached = true)
+   @test Generic.residue_field(B, 16453889, cached = true) !== Generic.residue_field(B, 16453889, cached = false)
 
-   @test elem_type(R) == Generic.ResF{elem_type(B)}
-   @test elem_type(Generic.ResField{elem_type(B)}) == Generic.ResF{elem_type(B)}
-   @test parent_type(Generic.ResF{elem_type(B)}) == Generic.ResField{elem_type(B)}
+   @test elem_type(R) == Generic.ResidueFieldElem{elem_type(B)}
+   @test elem_type(Generic.ResidueField{elem_type(B)}) == Generic.ResidueFieldElem{elem_type(B)}
+   @test parent_type(Generic.ResidueFieldElem{elem_type(B)}) == Generic.ResidueField{elem_type(B)}
 
-   @test isa(R, Generic.ResField)
+   @test isa(R, Generic.ResidueField)
 
    a = R(123)
 
-   @test isa(a, Generic.ResF)
+   @test isa(a, Generic.ResidueFieldElem)
 
    b = R(a)
 
-   @test isa(b, Generic.ResF)
+   @test isa(b, Generic.ResidueFieldElem)
 
    c = R(ZZ(12))
 
-   @test isa(c, Generic.ResF)
+   @test isa(c, Generic.ResidueFieldElem)
 
    d = R()
 
-   @test isa(d, Generic.ResF)
+   @test isa(d, Generic.ResidueFieldElem)
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
-   @test isa(T, Generic.ResField)
+   @test isa(T, Generic.ResidueField)
 
    f = T(x^4)
 
-   @test isa(f, Generic.ResF)
+   @test isa(f, Generic.ResidueFieldElem)
 
    g = T(f)
 
-   @test isa(g, Generic.ResF)
+   @test isa(g, Generic.ResidueFieldElem)
 
-   S = Generic.ResidueRing(B, 2)
+   S = Generic.residue_ring(B, 2)
    x = R(1)
    y = S(1)
    @test x in [x, y]
@@ -66,13 +66,13 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.ResF.printing" begin
-   R = Generic.ResidueField(ZZ, 16453889)
+@testset "Generic.ResidueFieldElem.printing" begin
+   R = Generic.residue_field(ZZ, 16453889)
 
    @test string(zero(R)) == "0"
    @test string(one(R)) == "1"
 
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    @test string(zero(S)) == "0"
    @test string(one(S)) == "1"
@@ -80,16 +80,16 @@ end
    @test string(5*x^5+3*x^3+2*x^2+x+1) == "5*x^5 + 3*x^3 + 2*x^2 + x + 1"
 end
 
-@testset "Generic.ResF.rand" begin
-   R = Generic.ResidueField(ZZ, 16453889)
+@testset "Generic.ResidueFieldElem.rand" begin
+   R = Generic.residue_field(ZZ, 16453889)
 
    test_rand(R, 1:9) do f
       @test 1 <= f.data <= 9
    end
 end
 
-@testset "Generic.ResF.manipulation" begin
-   R = Generic.ResidueField(ZZ, 16453889)
+@testset "Generic.ResidueFieldElem.manipulation" begin
+   R = Generic.residue_field(ZZ, 16453889)
 
    @test modulus(R) == 16453889
 
@@ -99,12 +99,13 @@ end
 
    @test modulus(g) == 16453889
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
    h = one(T)
 
    @test is_unit(h)
+   @test !is_zero_divisor(h)
 
    @test isone(h)
 
@@ -118,25 +119,25 @@ end
 
    @test deepcopy(h) == h
 
-   S = ResidueField(zz, 23)
+   S = residue_field(zz, 23)
 
    @test lift(S(1)) == 1
    @test isa(lift(S(1)), BigInt)
 end
 
-@testset "Generic.ResF.unary_ops" begin
-   R = Generic.ResidueField(ZZ, 16453889)
+@testset "Generic.ResidueFieldElem.unary_ops" begin
+   R = Generic.residue_field(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
    @test -T(x^5 + 1) == T(x^2+16453880*x+16453885)
 end
 
-@testset "Generic.ResF.binary_ops" begin
-   R = Generic.ResidueField(ZZ, 13)
+@testset "Generic.ResidueFieldElem.binary_ops" begin
+   R = Generic.residue_field(ZZ, 13)
 
    f = R(4)
    g = R(6)
@@ -147,9 +148,9 @@ end
 
    @test f*g == R(11)
 
-   Q = Generic.ResidueField(ZZ, 7)
-   S, x = PolynomialRing(Q, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   Q = Generic.residue_field(ZZ, 7)
+   S, x = polynomial_ring(Q, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
    n = T(x^5 + 1)
    p = T(x^2 + 2x + 1)
@@ -161,17 +162,17 @@ end
    @test n*p == T(3x^2 + 4x + 4)
 end
 
-@testset "Generic.ResF.gcd" begin
-   R = Generic.ResidueField(ZZ, 13)
+@testset "Generic.ResidueFieldElem.gcd" begin
+   R = Generic.residue_field(ZZ, 13)
 
    f = R(4)
    g = R(6)
 
    @test gcd(f, g) == R(1)
 
-   Q = Generic.ResidueField(ZZ, 7)
-   S, x = PolynomialRing(Q, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   Q = Generic.residue_field(ZZ, 7)
+   S, x = polynomial_ring(Q, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
    n = T(x^5 + 1)
    p = T(x^2 + 2x + 1)
@@ -179,8 +180,8 @@ end
    @test gcd(n, p) == 1
 end
 
-@testset "Generic.ResF.adhoc_binary" begin
-   R = Generic.ResidueField(ZZ, 7)
+@testset "Generic.ResidueFieldElem.adhoc_binary" begin
+   R = Generic.residue_field(ZZ, 7)
 
    a = R(3)
 
@@ -190,8 +191,8 @@ end
 
    @test 5a == R(1)
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
 
@@ -202,8 +203,8 @@ end
    @test f*5 == T(2*x^2+3*x+6)
 end
 
-@testset "Generic.ResF.comparison" begin
-   R = Generic.ResidueField(ZZ, 7)
+@testset "Generic.ResidueFieldElem.comparison" begin
+   R = Generic.residue_field(ZZ, 7)
 
    a = R(3)
    b = a
@@ -215,8 +216,8 @@ end
 
    @test c != a
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
    g = 8f
@@ -228,64 +229,64 @@ end
    @test isequal(f, g)
 end
 
-@testset "Generic.ResF.adhoc_comparison" begin
-   R = Generic.ResidueField(ZZ, 7)
+@testset "Generic.ResidueFieldElem.adhoc_comparison" begin
+   R = Generic.residue_field(ZZ, 7)
 
    a = R(3)
 
    @test a == 3
    @test 4 != a
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
 
    @test f != 5
 end
 
-@testset "Generic.ResF.powering" begin
-   R = Generic.ResidueField(ZZ, 7)
+@testset "Generic.ResidueFieldElem.powering" begin
+   R = Generic.residue_field(ZZ, 7)
 
    a = R(3)
 
    @test a^5 == 5
 
-   S, x = PolynomialRing(R, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   S, x = polynomial_ring(R, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
 
    @test f^100 == T(x^2 + 2x + 1)
 end
 
-@testset "Generic.ResF.inversion" begin
-   R = Generic.ResidueField(ZZ, 47)
+@testset "Generic.ResidueFieldElem.inversion" begin
+   R = Generic.residue_field(ZZ, 47)
 
    a = R(5)
 
    @test inv(a) == 19
 
-   R = Generic.ResidueField(ZZ, 41)
-   S, x = PolynomialRing(R, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   R = Generic.residue_field(ZZ, 41)
+   S, x = polynomial_ring(R, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
 
    @test inv(f) == T(26*x^2+31*x+10)
 end
 
-@testset "Generic.ResF.exact_division" begin
-   R = Generic.ResidueField(ZZ, 47)
+@testset "Generic.ResidueFieldElem.exact_division" begin
+   R = Generic.residue_field(ZZ, 47)
 
    a = R(5)
    b = R(3)
 
    @test divexact(a, b) == 33
 
-   R = Generic.ResidueField(ZZ, 41)
-   S, x = PolynomialRing(R, "x")
-   T = ResidueField(S, x^3 + 3x + 1)
+   R = Generic.residue_field(ZZ, 41)
+   S, x = polynomial_ring(R, "x")
+   T = residue_field(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
    g = T(x^4 + x + 2)
@@ -293,9 +294,9 @@ end
    @test divexact(f, g) == T(7*x^2+25*x+26)
 end
 
-@testset "Generic.ResF.square_root" begin
+@testset "Generic.ResidueFieldElem.square_root" begin
    for p in [3, 47, 733, 13913, 168937, 3980299, 57586577]
-       R = Generic.ResidueField(ZZ, p)
+       R = Generic.residue_field(ZZ, p)
 
        for i = 1:10
           a = rand(R, 0:p - 1)^2
@@ -315,7 +316,7 @@ end
    end
 
    for p in [ZZ(3), ZZ(53), ZZ(727), ZZ(8893), ZZ(191339), ZZ(2369093), ZZ(52694921)]
-       R = Generic.ResidueField(ZZ, p)
+       R = Generic.residue_field(ZZ, p)
 
        for i = 1:10
           a = rand(R, 0:Int(p - 1))^2

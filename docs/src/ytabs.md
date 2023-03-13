@@ -9,7 +9,7 @@ DocTestFilters = r"[0-9\.]+ seconds \(.*\)"
 # Partitions and Young tableaux
 
 AbstractAlgebra.jl provides basic support for computations with Young tableaux, skew diagrams and the characters of permutation groups (implemented `src/generic/YoungTabs.jl`).
-All functionality of permutations is accesible in the `Generic` submodule.
+All functionality of permutations is accessible in the `Generic` submodule.
 
 ## Partitions
 
@@ -55,7 +55,7 @@ conj(::Generic.Partition, v::Vector)
 
 ## Young Diagrams and Young Tableaux
 
-Mathematicaly speaking Young diagram is a diagram which consists of rows of square boxes such that the number of boxes in each row is no less than the number of boxes in the previous row.
+Mathematically speaking Young diagram is a diagram which consists of rows of square boxes such that the number of boxes in each row is no less than the number of boxes in the previous row.
 For example partition $4_1 3_2 1$ represents the following diagram.
 ```
 ┌───┬───┬───┬───┐

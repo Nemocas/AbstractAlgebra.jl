@@ -36,7 +36,7 @@ end
 
 ###############################################################################
 #
-# Euclidean interface has 13 functions, 12 of which follow from divrem
+# The whole Euclidean interface can be derived from divrem if it is available.
 #
 ###############################################################################
 
@@ -46,7 +46,9 @@ end
 Return a pair `q, r` consisting of the Euclidean quotient and remainder of $f$
 by $g$. A `DivideError` should be thrown if $g$ is zero.
 """
-function divrem end
+function Base.divrem(a::T, b::T) where T <: RingElem
+  throw(NotImplementedError(:divrem, a, b))
+end
 
 @doc Markdown.doc"""
     mod(f::T, g::T) where T <: RingElem
@@ -83,6 +85,10 @@ Return `mod(f*g, m)` but possibly computed more efficiently.
 """
 function mulmod(a::T, b::T, m::T) where T <: RingElement
    return mod(a*b, m)
+end
+
+function mulmod(a::T, b::T, m::T) where T <: Integer
+   return mod(widen(a)*b, m) % T
 end
 
 function internal_powermod(a, n, m)
@@ -165,7 +171,7 @@ function remove(a::T, b::T) where T <: Union{RingElem, Number}
       throw(ArgumentError("Second argument must be a non-zero non-unit"))
    end
    if iszero(a)
-      return (0, zero(parent(a))) # questionable case, consistent with fmpz
+      return (0, zero(parent(a))) # questionable case, consistent with ZZRingElem
    end
    v = 0
    while begin; (ok, q) = divides(a, b); ok; end
@@ -187,11 +193,11 @@ function valuation(a::T, b::T) where T <: Union{RingElem, Number}
 end
 
 @doc Markdown.doc"""
-    gcd(f::T, g::T) where T <: RingElem
+    gcd(a::T, b::T) where T <: RingElem
 
-Return a greatest common divisor of $f$ and $g$, i.e., an element $d$
-which is a common divisor of $f$ and $g$, and with the property that
-any other common divisor of $f$ and $g$ divides $d$.
+Return a greatest common divisor of $a$ and $b$, i.e., an element $g$
+which is a common divisor of $a$ and $b$, and with the property that
+any other common divisor of $a$ and $b$ divides $g$.
 
 !!! note
     For best compatibility with the internal assumptions made by
@@ -207,6 +213,41 @@ function gcd(a::T, b::T) where T <: RingElem
 end
 
 @doc Markdown.doc"""
+    gcd(fs::AbstractArray{<:T}) where T <: RingElem
+
+Return a greatest common divisor of the elements in `fs`.
+Requires that `fs` is not empty.
+"""
+function gcd(fs::AbstractArray{<:T}) where T <: RingElem
+   length(fs) > 0 || error("Empty collection")
+   return reduce(gcd, fs)
+end
+
+@doc Markdown.doc"""
+    gcd(f::T, g::T, hs::T...) where T <: RingElem
+
+Return a greatest common divisor of $f$, $g$ and the elements in `hs`.
+"""
+function gcd(f::T, g::T, hs::T...) where T <: RingElem
+   return gcd(f, gcd(g, hs...))
+end
+
+@doc Markdown.doc"""
+    gcd_with_cofactors(a::T, b::T) where T <: RingElem
+
+Return a tuple `(g, abar, bbar)` consisting of `g = gcd(a, b)` and cofactors
+`abar` and `bbar` with `a = g*abar` and `b = g*bbar`.
+"""
+function gcd_with_cofactors(a::T, b::T) where T <: RingElement
+   g = gcd(a, b)
+   if iszero(g) || isone(g)
+      return (g, a, b)
+   else
+      return (g, divexact(a, g), divexact(b, g))
+   end
+end
+
+@doc Markdown.doc"""
     lcm(f::T, g::T) where T <: RingElem
 
 Return a least common multiple of $f$ and $g$, i.e., an element $d$
@@ -217,6 +258,26 @@ function lcm(a::T, b::T) where T <: RingElem
    g = gcd(a, b)
    iszero(g) && return g
    return a*divexact(b, g)
+end
+
+@doc Markdown.doc"""
+    lcm(fs::AbstractArray{<:T}) where T <: RingElem
+
+Return a least common multiple of the elements in `fs`.
+Requires that `fs` is not empty.
+"""
+function lcm(fs::AbstractArray{<:T}) where T <: RingElem
+   length(fs) > 0 || error("Empty collection")
+   return reduce(lcm, fs)
+end
+
+@doc Markdown.doc"""
+    lcm(f::T, g::T, hs::T...) where T <: RingElem
+
+Return a least common multiple of $f$, $g$ and the elements in `hs`.
+"""
+function lcm(f::T, g::T, hs::T...) where T <: RingElem
+   return lcm(f, lcm(g, hs...))
 end
 
 @doc Markdown.doc"""
@@ -261,44 +322,163 @@ function gcdinv(a::T, b::T) where T <: RingElem
    return (g, s)
 end
 
+# TODO: Move from CRT from Hecke/src/Misc
 
-# TODO: Move from CRT from Hecke to AbstractAlgebra?
-# Currently no implementation, only example on how the arbitrary inputs `crt`
-# should look like.
-# @doc Markdown.doc"""
-#     crt(r::AbstractVector{T}, m::AbstractVector{T}) where T
-#     crt(r::T, m::T...) where T
+function _crt_with_lcm_stub(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+   diff = r2 - r1
+   if iszero(m1)
+      check && !is_divisible_by(diff, m2) && error("no crt solution")
+      return (r1, m1)
+   elseif iszero(m2)
+      check && !is_divisible_by(diff, m1) && error("no crt solution")
+      return (r2, m2)
+   end
+   # eliminating one cofactor computation with g, s = gcdinv(m1, m2) should be
+   # sufficient, but almost all of Nemo's implementations of gcdinv are
+   # non-conforming (i.e. they throw or return a wrong gcd)
+   g, s, _ = gcdx(m1, m2)
+   if isone(g)
+      return (r1 + mulmod(diff, s, m2)*m1, m1*m2)
+   elseif !check
+      m1og = divexact(m1, g; check=false)
+      return (r1 + mulmod(diff, s, m2)*m1og, m1og*m2)
+   else
+      m2og = divexact(m2, g; check=false)
+      diff = divexact(diff, g; check=check)
+      return (r1 + mulmod(diff, s, m2og)*m1, m1*m2og)
+   end
+end
 
-# Return $x$ in the Euclidean domain $T$ such that $x \equiv r_i \mod m_i$
-# for all $i$.
-# """
-function crt end
+function _crt_stub(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+    return _crt_with_lcm_stub(r1, m1, r2, m2; check=check)[1]
+end
+
+@doc Markdown.doc"""
+    crt(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+
+Return an element congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$.
+If `check = true` and no solution exists, an error is thrown.
+
+If `T` is a fixed precision integer type (like `Int`), the result will be
+correct if `abs(ri) <= abs(mi)` and `abs(m1 * m2) < typemax(T)`.
+"""
+function crt(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+   return _crt_stub(r1, m1, r2, m2; check=check)
+end
+
+@doc Markdown.doc"""
+    crt_with_lcm(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+
+Return a tuple consisting of an element congruent to $r_1$ modulo $m_1$ and
+$r_2$ modulo $m_2$ and the least common multiple of $m_1$ and $m_2$.
+If `check = true` and no solution exists, an error is thrown.
+"""
+function crt_with_lcm(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
+   return _crt_with_lcm_stub(r1, m1, r2, m2; check=check)
+end
+
+function _crt_with_lcm_stub(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+   n = length(r)
+   @assert n == length(m)
+   @assert n > 0
+   n < 2 && return (r[1], m[1])
+   n == 2 && return crt_with_lcm(r[1], m[1], r[2], m[2]; check=check)
+   return reduce((a, b) -> crt_with_lcm(a[1], a[2], b[1], b[2]; check=check),
+                 ((r[i], m[i]) for i in 1:n))
+end
+
+function _crt_stub(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+    return _crt_with_lcm_stub(r, m; check=check)[1]
+end
+
+@doc Markdown.doc"""
+    crt(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+
+Return an element congruent to $r_i$ modulo $m_i$ for each $i$.
+"""
+function crt(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+   return _crt_stub(r, m; check=check)
+end
+
+@doc Markdown.doc"""
+    crt_with_lcm(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+
+Return a tuple consisting of an element congruent to $r_i$ modulo $m_i$ for
+each $i$ and the least common multiple of the $m_i$.
+"""
+function crt_with_lcm(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+   return _crt_with_lcm_stub(r, m; check=check)
+end
+
+###############################################################################
+#
+# Functions that can't really be implemented generically
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    is_zero_divisor(a::T) where T <: RingElement
+
+Return `true` if there exists a nonzero $b$ such that $a b = 0$ and
+`false` otherwise.
+"""
+function is_zero_divisor(a::T) where T <: RingElement
+   if !is_domain_type(T)
+      throw(NotImplementedError(:is_zero_divisor, a))
+   end
+   return is_zero(a) && !is_zero(one(parent(a)))
+end
+
+@doc Markdown.doc"""
+    is_zero_divisor_with_annihilator(a::T) where T <: RingElement
+
+Return `(true, b)` if there exists a nonzero $b$ such that $a b = 0$ and
+`(false, junk)` otherwise.
+"""
+function is_zero_divisor_with_annihilator(a::T) where T <: RingElement
+   if !is_domain_type(T)
+      if is_zero_divisor(a)
+         throw(NotImplementedError(:is_zero_divisor_with_annihilator, a))
+      end
+      return (false, parent(a)())
+   end
+   theone = one(parent(a))
+   return (is_zero(a) && !is_zero(theone), theone)
+end
 
 @doc Markdown.doc"""
     factor(a::T)
 
 Return a factorization of the element $a$ as a `Fac{T}`.
 """
-function factor end
+function factor(a)
+   throw(NotImplementedError(:factor, a))
+end
 
 @doc Markdown.doc"""
     factor_squarefree(a::T)
 
 Return a squarefree factorization of the element $a$ as a `Fac{T}`.
 """
-function factor_squarefree end
+function factor_squarefree(a)
+   throw(NotImplementedError(:factor_squarefree, a))
+end
 
 @doc Markdown.doc"""
     is_irreducible(a)
 
 Return `true` if $a$ is irreducible, else return `false`.
 """
-function is_irreducible end
+function is_irreducible(a)
+   throw(NotImplementedError(:is_irreducible, a))
+end
 
 @doc Markdown.doc"""
     is_squarefree(a)
 
 Return `true` if $a$ is squarefree, else return `false`.
 """
-function is_squarefree end
+function is_squarefree(a)
+   throw(NotImplementedError(:is_squarefree, a))
+end
 

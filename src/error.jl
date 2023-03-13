@@ -4,6 +4,27 @@
 #
 ###############################################################################
 
+mutable struct NotImplementedError <: Exception
+  head::Symbol
+  args::Tuple
+end
+
+function NotImplementedError(h::Symbol, args...)
+  return NotImplementedError(h, args)
+end
+
+function Base.showerror(io::IO, e::NotImplementedError)
+  print(io, "function ")
+  print(io, e.head)
+  println(io, " is not implemented for argument" * "s"^(length(e.args) != 1))
+  for a in e.args
+    print(io, typeof(a))
+    print(io, ": ")
+    println(io, a)
+  end
+end
+
+
 mutable struct NotInvertibleError{T, S} <: Exception
   data::T   # element that could not be inverted
   mod::S    # ring or modulus with respect to which it could not be inverted

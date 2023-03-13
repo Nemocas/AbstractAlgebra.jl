@@ -95,11 +95,13 @@ iszero(a::NCRingElement)
 isone(a::NCRingElement)
 ```
 
-In addition, the following is implemented where it is
+In addition, the following are implemented where it is
 mathematically/algorithmically viable to do so.
 
 ```julia
 is_unit(a::NCRingElement)
+is_zero_divisor(a::NCRingElement)
+is_zero_divisor_with_annihilator(a::NCRingElement)
 ```
 
 The following standard Julia functions are also implemented for all ring

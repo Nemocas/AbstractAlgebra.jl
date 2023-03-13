@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-export exponent_words, FreeAssociativeAlgebra, leading_exponent_word
-
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -76,7 +74,7 @@ end
 
 ###############################################################################
 #
-#   Coeffs, Terms, etc.
+#   Basic Manipulation
 #
 ###############################################################################
 
@@ -100,6 +98,18 @@ retrieve an array of the exponent words, use `collect(exponent_words(a))`.
 """
 function exponent_words(a::AbstractAlgebra.FreeAssAlgElem{T}) where T <: RingElement
    return Generic.FreeAssAlgExponentWords(a)
+end
+
+function is_unit(a::FreeAssAlgElem{T}) where T
+   if is_constant(a)
+      return is_unit(leading_coefficient(a))
+   elseif is_domain_type(elem_type(coefficient_ring(a)))
+      return false
+   elseif length(a) == 1
+      return false
+   else
+      throw(NotImplementedError(:is_unit, a))
+   end
 end
 
 ###############################################################################
@@ -168,44 +178,44 @@ end
 
 ###############################################################################
 #
-#   FreeAssociativeAlgebra constructor
+#   free_associative_algebra constructor
 #
 ###############################################################################
 
-function FreeAssociativeAlgebra(
+function free_associative_algebra(
    R::AbstractAlgebra.Ring,
    s::Union{AbstractVector{<:AbstractString}, AbstractVector{Symbol}, AbstractVector{Char}};
    cached::Bool = true)
 
    S = [Symbol(v) for v in s]
-   return Generic.FreeAssociativeAlgebra(R, S, cached=cached)
+   return Generic.free_associative_algebra(R, S, cached=cached)
 end
 
-function FreeAssociativeAlgebra(
+function free_associative_algebra(
    R::AbstractAlgebra.Ring,
    s::Vector{Symbol};
    cached::Bool = true)
 
-   return Generic.FreeAssociativeAlgebra(R, s, cached=cached)
+   return Generic.free_associative_algebra(R, s, cached=cached)
 end
 
-function FreeAssociativeAlgebra(
+function free_associative_algebra(
    R::AbstractAlgebra.Ring,
    n::Int,
    s::Union{AbstractString, Symbol, Char};
    cached::Bool = false)
 
    S = [Symbol(s, i) for i in 1:n]
-   return Generic.FreeAssociativeAlgebra(R, S; cached=cached)
+   return Generic.free_associative_algebra(R, S; cached=cached)
 end
 
-function FreeAssociativeAlgebra(
+function free_associative_algebra(
    R::AbstractAlgebra.Ring,
    n::Int,
    s::Symbol=:x;
    cached::Bool = false)
 
    S = [Symbol(s, i) for i in 1:n]
-   return Generic.FreeAssociativeAlgebra(R, S; cached=cached)
+   return Generic.free_associative_algebra(R, S; cached=cached)
 end
 

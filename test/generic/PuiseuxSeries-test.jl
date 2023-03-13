@@ -19,7 +19,7 @@
 @testset "Generic.PuiseuxSeries.constructors" begin
    R, x = PuiseuxSeriesRing(ZZ, 30, "x")
 
-   S, t = PolynomialRing(QQ, "t")
+   S, t = polynomial_ring(QQ, "t")
    T, y = PuiseuxSeriesRing(S, 30, "y")
 
    @test PuiseuxSeriesRing(S, 30, "y", cached = true)[1] === PuiseuxSeriesRing(S, 30, "y", cached = true)[1]
@@ -113,7 +113,7 @@ end
 end
 
 @testset "Generic.PuiseuxSeries.manipulation" begin
-   R, t = PolynomialRing(QQ, "t")
+   R, t = polynomial_ring(QQ, "t")
    S, x = PuiseuxSeriesRing(R, 30, "x")
 
    @test max_precision(S) == 30
@@ -145,7 +145,7 @@ end
 
    @test characteristic(S) == 0
 
-   T = ResidueRing(ZZ, 7)
+   T = residue_ring(ZZ, 7)
    U, y = PuiseuxSeriesRing(T, 10, "y")
 
    @test modulus(T) == 7
@@ -174,7 +174,7 @@ end
 end
 
 @testset "Generic.PuiseuxSeries.change_base_ring" begin
-   Zx, x = LaurentSeriesRing(ZZ, 10, "x")
+   Zx, x = laurent_series_ring(ZZ, 10, "x")
    @test 1 == map_coefficients(sqrt, x^0)
    lp = Zx(BigInt[i for i in 1:10], 10, 11, 5, 1)
    lq = Zx(BigInt[i for i in 10:-1:1], 10, 11, 5, 1)
@@ -227,7 +227,7 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
+   T = residue_ring(ZZ, 6)
    R, x = PuiseuxSeriesRing(T, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, 0:5)
@@ -270,7 +270,7 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
+   T = residue_ring(ZZ, 6)
    R, x = PuiseuxSeriesRing(T, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, 1:6, 0:5)
@@ -339,7 +339,7 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
+   R = residue_ring(ZZ, 6)
    S, x = PuiseuxSeriesRing(R, 10, "x")
    for iter = 1:500
       f = rand(S, -12:12, 1:6, 0:5)
@@ -421,7 +421,7 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
+   R = residue_ring(ZZ, 6)
    S, x = PuiseuxSeriesRing(R, 10, "x")
    for iter = 1:500
       f = rand(S, -12:12, 1:6, 0:5)
@@ -484,7 +484,7 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 6)
+   R = residue_ring(ZZ, 6)
    S, x = PuiseuxSeriesRing(R, 10, "x")
    for iter = 1:500
       f = S()
@@ -572,7 +572,7 @@ end
    for iter = 1:100
       n = rand(2:26)
 
-      Zn = ResidueRing(ZZ, n)
+      Zn = residue_ring(ZZ, n)
       R, x = PuiseuxSeriesRing(Zn, 10, "x")
 
       f = rand(R, -12:12, 1:6, 0:n - 1)
@@ -612,7 +612,7 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
+   T = residue_ring(ZZ, 6)
    R, x = PuiseuxSeriesRing(T, 10, "x")
    for iter = 1:300
       f = R()
@@ -666,7 +666,7 @@ end
 
    # Characteristic p field
    for p in [2, 7, 19, 65537, ZZ(7), ZZ(19), ZZ(65537)]
-      R = ResidueField(ZZ, p)
+      R = residue_field(ZZ, p)
 
       S, x = PuiseuxSeriesField(R, 10, "x")
 
@@ -691,8 +691,8 @@ end
       end
    end
 
-   R = ResidueField(ZZ, 2)
-   T, y = PolynomialRing(R, "x")
+   R = residue_field(ZZ, 2)
+   T, y = polynomial_ring(R, "x")
 
    S, x = PuiseuxSeriesRing(T, 10, "x")
 
@@ -732,7 +732,7 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
+   T = residue_ring(ZZ, 6)
    R, x = PuiseuxSeriesRing(T, 10, "x")
    for iter = 1:300
       s = rand(0:12)
@@ -772,7 +772,7 @@ end
    end
 
    # Non-integral domain
-   T = ResidueRing(ZZ, 6)
+   T = residue_ring(ZZ, 6)
    R, x = PuiseuxSeriesRing(T, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, 0:5)
@@ -811,7 +811,7 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 143)
+   R = residue_ring(ZZ, 143)
    S, x = PuiseuxSeriesRing(R, 5, "x")
 
    for iter = 1:100
@@ -882,7 +882,7 @@ end
    end
 
    # Non-integral domain
-   R = ResidueRing(ZZ, 143)
+   R = residue_ring(ZZ, 143)
    S, x = PuiseuxSeriesRing(R, 5, "x")
 
    for iter = 1:10
