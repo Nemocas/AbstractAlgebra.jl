@@ -136,17 +136,30 @@ Return the array `[s]` where `s` is a `Symbol` representing the variable of the 
 polynomial ring. This is provided for uniformity with the multivariate interface, where
 there is more than one variable and hence an array of symbols.
 
-Custom polynomial types over a given ring should define the following function
-which returns the type of a polynomial object over that ring.
-
 ```julia
 dense_poly_type(::Type{T}) where T <: RingElement
 ```
 
-Return the type of a polynomial whose coefficients have the given type.
+Return the type of a polynomial whose coefficients have the given type. In our
+example `MyPoly{T}`.
 
 This function is defined for generic polynomials and only needs to be defined for
 custom polynomial rings, e.g. ones defined by a C implementation.
+
+```@docs
+polynomial_ring_only(R::Ring, s::Symbol; cached::Bool=true)
+```
+
+The default implementation figures out the appropriate polynomial ring type via
+`dense_poly_type` and calls its constructor with `R, s, cached` as arguments.
+In our example, this would be
+
+```julia
+MyPolyRing{T}(R, s, cached)
+```
+
+Accordingly, `polynomial_ring_only` only needs to be defined, if such a
+constructor does not exist or other behaviour is wanted.
 
 ### Basic manipulation of rings and elements
 

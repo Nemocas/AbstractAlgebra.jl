@@ -691,6 +691,16 @@ polynomial ring $S = R[x]$ and the generator $x$ of the ring.
 
 By default the parent object `S` depends only on `R` and `x` and will be cached.
 Setting the optional argument `cached` to `false` will prevent the parent object `S` from being cached.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> S, y = polynomial_ring(R, :y)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+```
 """
 polynomial_ring(R::NCRing, s::Union{Symbol, AbstractString, Char}; kw...)
 
@@ -702,9 +712,9 @@ function polynomial_ring(R::NCRing, s::Symbol; kw...)
 end
 
 @doc md"""
-    polynomial_ring_only(R::Ring, s::Symbol; cached::Bool=true)
+    polynomial_ring_only(R::NCRing, s::Symbol; cached::Bool=true)
 
-Like [`polynomial_ring(R::Ring, s::Symbol)`](@ref) but return only the
+Like [`polynomial_ring(R::NCRing, s::Symbol)`](@ref) but return only the
 polynomial ring.
 """
 polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
