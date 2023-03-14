@@ -615,12 +615,14 @@ import .Generic: finish
 import .Generic: fit!
 import .Generic: gcd
 import .Generic: gcdx
+import .Generic: groebner_basis
 import .Generic: has_bottom_neighbor
 import .Generic: has_left_neighbor
 import .Generic: hash
 import .Generic: hooklength
 import .Generic: image_fn
 import .Generic: image_map
+import .Generic: interreduce!
 import .Generic: intersection
 import .Generic: inv!
 import .Generic: inverse_fn

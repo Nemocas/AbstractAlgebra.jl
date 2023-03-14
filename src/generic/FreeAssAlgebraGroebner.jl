@@ -3,7 +3,7 @@
 #   FreeAssAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groebner basis
 #
 ###############################################################################
-export groebner_basis, interreduce!, gb_divides_leftmost_aho_corasick, normal_form
+export groebner_basis, interreduce!, normal_form
 
 using DataStructures
 
@@ -47,7 +47,7 @@ function _leading_word(a::FreeAssAlgElem{T}) where T
    return a.exps[1]
 end
 
-function gb_divides_leftmost_aho_corasick(a::Word, aut::AhoCorasickAutomaton)
+function gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
     match = search(aut, a)
     if isnothing(match)
         return (false, [], [], -1)
@@ -65,7 +65,7 @@ function normal_form(
     rexps = Vector{Int}[]
     rcoeffs = T[]
     while length(f) > 0
-        ok, left, right, match_index = gb_divides_leftmost_aho_corasick(f.exps[1], aut)
+        ok, left, right, match_index = gb_divides_leftmost(f.exps[1], aut)
         if ok
             qi = divexact(f.coeffs[1], g[match_index].coeffs[1])
             f = _sub_rest(f, mul_term(qi, left, g[match_index], right), 1)

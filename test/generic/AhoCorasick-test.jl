@@ -1,4 +1,5 @@
-@testset "Generic.FreeAssAhoCorasick" begin
+using AbstractAlgebra.Generic: AhoCorasickAutomaton, search, AhoCorasickMatch
+@testset "Generic.AhoCorasick" begin
     keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]]
     aut = AhoCorasickAutomaton(keywords)
     @test search(aut, [10, 4, 1, 2, 3, 4]) == AhoCorasickMatch(6, 1, [1, 2, 3, 4])

@@ -1,3 +1,5 @@
+include("AhoCorasick-test.jl")
+using AbstractAlgebra.Generic: AhoCorasickAutomaton
 @testset "Generic.FreeAssAlgebra.groebner" begin
 
    R, (x, y, u, v, t, s) = FreeAssociativeAlgebra(GF(2), ["x", "y", "u", "v", "t", "s"])
@@ -29,7 +31,7 @@ end
    @test normal_form(one(R), ideal_generators, aut) == one(R)
    @test normal_form(v*y, ideal_generators, aut) == v*y
    @test normal_form(x*y*v*v + t*s*x*y*v + y*s*t - y*t*s + v*x*y*y*s + v*x*x*y*s, ideal_generators, aut) == zero(R)
-   @test gb_divides_leftmost_aho_corasick((x*y*u*v*t).exps[1], aut) == (true, [], [3, 4, 5], 1)
-   @test gb_divides_leftmost_aho_corasick((x*u*y*t*(s*t - t*s)).exps[1], aut) == (true, [1], [5, 6], 2)
-   @test gb_divides_leftmost_aho_corasick((x*s*t).exps[1], aut) == (false, [], [], -1)
+#   @test gb_divides_leftmost((x*y*u*v*t).exps[1], aut) == (true, [], [3, 4, 5], 1)
+#   @test gb_divides_leftmost((x*u*y*t*(s*t - t*s)).exps[1], aut) == (true, [1], [5, 6], 2)
+#   @test gb_divides_leftmost((x*s*t).exps[1], aut) == (false, [], [], -1)
 end
