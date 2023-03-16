@@ -30,6 +30,10 @@ divexact_left(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x,
 
 divexact_right(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x, y; check=check)
 
+Base.:/(x::ModuleElem, y::RingElement) = divexact(x, y; check=true)
+Base.:/(x::RingElem, y::RingElement) = divexact(x, y; check=true)
+Base.:/(x::Union{Integer, Rational, AbstractFloat}, y::RingElem) = divexact(x, y; check=true)
+
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 
 function is_divisible_by(x::T, y::T) where T <: RingElem
