@@ -90,9 +90,9 @@ function ==(x::NCRingElem, y::NCRingElem)
    end
  end
  
- ==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)
- 
- ==(x::NCRingElement, y::NCRingElem) = parent(y)(x) == y
+==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)
+
+==(x::NCRingElement, y::NCRingElem) = parent(y)(x) == y
 
 function divexact_left(x::NCRingElem, y::NCRingElem; check::Bool = true)
    return divexact_left(promote(x, y)...)
@@ -117,6 +117,14 @@ function divexact_right(
 
    return divexact_right(x, parent(x)(y); check = check)
 end
+
+#Base.:/(x::ModuleElem, y::RingElement) = divexact_right(x, y; check=true)
+Base.:/(x::NCRingElem, y::NCRingElement) = divexact_right(x, y; check=true)
+Base.:/(x::Union{Integer, Rational, AbstractFloat}, y::NCRingElem) = divexact_right(x, y; check=true)
+
+#Base.:\(y::RingElement, x::ModuleElem) = divexact_left(x, y; check=true)
+Base.:\(y::NCRingElement, x::NCRingElem) = divexact_left(x, y; check=true)
+Base.:\(y::NCRingElem, x::Union{Integer, Rational, AbstractFloat}) = divexact_left(x, y; check=true)
 
 Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 
