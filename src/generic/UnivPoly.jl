@@ -35,7 +35,7 @@ parent_type(::Type{UnivPoly{T, U}}) where {T <: RingElement, U <: AbstractAlgebr
    UniversalPolyRing{T, U}
 
 function mpoly_ring(S::UniversalPolyRing{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
-   return S.mpoly_ring::parent_type(mpoly_type(T))
+   return S.mpoly_ring::Generic.MPolyRing{T}
 end
 
 nvars(S::UniversalPolyRing) = length(S.S)
@@ -1126,7 +1126,7 @@ end
 
 function UniversalPolynomialRing(R::Ring; ordering=:lex, cached=true)
    T = elem_type(R)
-   U = mpoly_type(T)
+   U = Generic.MPoly{T}
 
    return UniversalPolyRing{T, U}(R, ordering, cached)
 end
