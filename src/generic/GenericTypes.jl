@@ -422,7 +422,7 @@ end
 
 const UnivPolyID = CacheDictType{Tuple{Ring, Symbol, DataType}, Ring}()
 
-mutable struct UnivPoly{T <: RingElement, U <: MPoly} <: AbstractAlgebra.UniversalPolyRingElem{T}
+mutable struct UnivPoly{T <: RingElement, U <: MPolyRingElem{T}} <: AbstractAlgebra.UniversalPolyRingElem{T}
    p::U
    parent::UniversalPolyRing{T}
 end
