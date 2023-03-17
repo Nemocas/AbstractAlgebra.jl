@@ -255,7 +255,7 @@ julia> normal_form(u*(x*y)^3*s*t + u*(x*y)^2*s*t +u*s*t + v*s*t, g)
 
  If one has to compute the normal forms of many elements with respect to the same groebner basis, 
  this can be quite resource heavy. There is a more efficient 
- variant using [Aho-Corasicks string matching algorithm][https://doi.org/10.1145%2F360825.360855].
+ variant using [Aho-Corasicks string matching algorithm](https://doi.org/10.1145%2F360825.360855).
  An `AhoCorasickAutomaton` can be easily constructed by calling it with a vector of keywords, 
  where a keyword is just a `Vector{Int}`.
 
