@@ -35,4 +35,3 @@ end
 function UniversalPolynomialRing(R::Ring; ordering=:lex, cached=true)
    return Generic.UniversalPolynomialRing(R; ordering=ordering, cached=cached)
 end
-
