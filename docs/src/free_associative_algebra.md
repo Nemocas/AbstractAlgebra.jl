@@ -233,8 +233,7 @@ julia> R, (x, y, u, v, t, s) = FreeAssociativeAlgebra(GF(2), ["x", "y", "u", "v"
 (Free associative algebra over Finite field F_2 on x, y, u, v, t, s, 
 AbstractAlgebra.Generic.FreeAssAlgElem{AbstractAlgebra.GFElem{Int64}}[x, y, u, v, t, s])
 
-julia> g = groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v,
-                                      (y*x)^3*t + (y*x)^2*t + t + s])
+julia> g = groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v, (y*x)^3*t + (y*x)^2*t + t + s])
 5-element Vector{AbstractAlgebra.Generic.FreeAssAlgElem{AbstractAlgebra.GFElem{Int64}}}:
  u*x*y*x*y*x*y + u*x*y*x*y + u + v
  y*x*y*x*y*x*t + y*x*y*x*t + t + s
@@ -247,8 +246,7 @@ julia> g = groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v,
  basis `g`, one can compute its normal form.
 ```jldoctest; setup = :(using AbstractAlgebra.Generic, AbstractAlgebra)
 julia> R, (x, y, u, v, t, s) = FreeAssociativeAlgebra(GF(2), ["x", "y", "u", "v", "t", "s"])
-julia> g = groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v,
-                                      (y*x)^3*t + (y*x)^2*t + t + s])
+julia> g = groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v, (y*x)^3*t + (y*x)^2*t + t + s])
 julia> normal_form(u*(x*y)^3*s*t + u*(x*y)^2*s*t +u*s*t + v*s*t, g)
 0
  ```
