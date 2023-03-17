@@ -7,7 +7,7 @@
 
 export search, AhoCorasickAutomaton, insert_keyword!, aho_corasick_automaton, AhoCorasickMatch#, Word
 
-using DataStructures
+import DataStructures.Queue
 
 const Word = Vector{Int}
 
@@ -18,7 +18,7 @@ An Aho-Corasick automaton, which can be used to efficiently search for a fixed l
 arbitrary lists of integers
 
 # Examples:
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = :(using AbstractAlgebra.Generic)
 julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]]
 julia> aut = AhoCorasickAutomaton(keywords)
 julia> search(aut, [10, 4, 1, 2, 3, 4]) 
@@ -38,6 +38,33 @@ the one with the smallest index is stored
     output::Vector{Tuple{Int, Word}}
 end
 
+Markdown.@doc doc"""
+AhoCorasickMatch(last_position::Int, keyword_index::Int, keyword::Vector{Int})
+
+The return value of searching in a given word with an AhoCorasickAutomaton. Contains the position of the last letter in 
+the word that matches a keyword in the automaton, an index of the keyword that was matched and the keyword itself.
+
+# Examples:
+```jldoctest; setup = :(using AbstractAlgebra.Generic)
+julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]]
+julia> aut = AhoCorasickAutomaton(keywords)
+julia> search(aut, [10, 4, 1, 2, 3, 4]) 
+AhoCorasickMatch(6, 1, [1, 2, 3, 4])
+
+julia> search(aut, [10, 4, 1, 2, 3, 4]).last_position
+6
+
+julia> search(aut, [10, 4, 1, 2, 3, 4]).keyword_index
+1
+
+julia> search(aut, [10, 4, 1, 2, 3, 4]).keyword
+4-element Vector{Int64}:
+ 1
+ 2
+ 3
+ 4
+
+"""
 struct AhoCorasickMatch
     last_position::Int
     keyword_index::Int

@@ -6,7 +6,8 @@
 
 export groebner_basis, interreduce!, normal_form
 
-using DataStructures
+#using DataStructures
+import DataStructures.PriorityQueue
 
 const groebner_debug_level = 0
 const Monomial = Vector{Int}
@@ -95,8 +96,7 @@ end
 # normal form with leftmost word divisions
 function normal_form(
    f::FreeAssAlgElem{T},
-   g::Vector{FreeAssAlgElem{T}},
-   suffix_match_vectors::Vector{Vector{Int}}
+   g::Vector{FreeAssAlgElem{T}}
 ) where T <: FieldElement
    R = parent(f)
    s = length(g)
@@ -105,7 +105,7 @@ function normal_form(
    while length(f) > 0
       i = 1
    @label again
-        ok, ml, mr = word_divides_leftmost(f.exps[1], g[i].exps[1], suffix_match_vectors[i])
+        ok, ml, mr = word_divides_leftmost(f.exps[1], g[i].exps[1])
         if !ok && i < s
          i += 1
          @goto again
