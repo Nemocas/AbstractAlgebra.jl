@@ -17,11 +17,13 @@ The alias also gets a special docstring that points out that it is an alias
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> foo(x::Int) = x
+foo (generic function with 1 method)
 
 julia> @alias bar foo
 
 julia> foo === bar
 true
+```
 """
 macro alias(alias_name::Symbol, real_name::Symbol)
     result = quote

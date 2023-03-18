@@ -152,7 +152,7 @@ julia> Generic.partitions(5)
  4₁1₁
  3₁2₁
  5₁
-
+```
 """
 partitions(n::Integer) = [Partition(n, copy(p), false) for p in AllParts(n)]
 partitions!(n::Integer) = (Partition(n, p, false) for p in AllParts(n))
