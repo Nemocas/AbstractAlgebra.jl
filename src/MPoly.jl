@@ -1335,7 +1335,7 @@ polynomial_ring_only(R::T, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Boo
 @doc Markdown.doc"""
     polynomial_ring(R::Ring, n::Int, s::T = :x; cached, ordering) where T<:Union{Symbol, AbstractString, Char}
 
-Given a symbol/string `s` and a number of variables `n` will
+Given a symbol, string or character `s` and a number of variables `n` will
 do the same as the first constructor except that the variables will be
 automatically numbered. For example if `s` is the string `x` and `n = 3` then
 the variables will print as `x1`, `x2`, `x3`.
