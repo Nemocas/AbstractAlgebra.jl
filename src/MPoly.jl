@@ -16,6 +16,32 @@ coefficient_ring(a::MPolyRingElem) = base_ring(a)
 
 coefficient_ring(R::MPolyRing) = base_ring(R)
 
+@doc md"""
+    mpoly_type(::Type{T}) where T<:RingElement
+
+The type of multivariate polynomials with coefficients of type `T`.
+Falls back to `Generic.MPoly{T}`.
+
+# Examples
+```julia
+mpoly_type(typeof(ZZ()))
+```
+"""
+mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
+
+@doc md"""
+    mpoly_ring_type(::Type{T}) where T<:Ring
+
+The type of multivariate polynomial rings with coefficients of type `T`.
+Implemented via [`mpoly_type`](@ref).
+
+# Examples
+```julia
+mpoly_ring_type(typeof(ZZ))
+```
+"""
+mpoly_ring_type(::Type{T}) where T<:Ring = parent_type(mpoly_type(elem_type(T)))
+
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyRingElem{S}}
    return is_domain_type(S)
 end
@@ -1271,69 +1297,57 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{T}; cached::Bool = true, ordering::Symbol = :lex) where T <: Union{String, Char, Symbol}
+    polynomial_ring(R::Ring, s::Vector{T}; cached::Bool = true, ordering::Symbol = :lex) where T <: Union{Symbol, AbstractString, Char}
 
-Given a base ring `R` and an array of strings `s` specifying how the
-generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
-representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
-$x1, x2, ...$ of the polynomial ring. By default the parent object `T` will
-depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional
-argument `cached` to `false` will prevent the parent object `T` from being
-cached. `S` is a symbol corresponding to the ordering of the polynomial and
-can be one of `:lex`, `:deglex` or `:degrevlex`.
+Given a base ring `R` and a vector `s` of variable names $x1, x2, \dots$ specifying
+how the generators (variables) should be printed, return a tuple `S, [x1, x2, ...]`
+representing the new polynomial ring $S = R[x1, x2, ...]$ and the generators
+$x1, x2, \dots$ of the polynomial ring.
+
+Mathematically the object `S` depends only on `R` and `x1, x2, ...` and by
+default it will be cached, i.e., if `polynomial_ring` is invoked again with the
+same arguments, the same (*identical*) ring is returned. Setting the optional
+argument `cached` to `false` ensures a distinct new ring is returned, and will
+also prevent it from being cached.
+
+The `ordering` of the polynomial ring can be one of `:lex`, `:deglex` or `:degrevlex`.
 """
-function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{String};
-                                   cached::Bool = true, ordering::Symbol = :lex)
-   return polynomial_ring(R, [Symbol(v) for v in s];
-                                   cached=cached, ordering=ordering)
+polynomial_ring(R::Ring, s::Union{Tuple{Vararg{T}}, AbstractVector{T}}; kw...) where
+      T<:Union{Symbol, AbstractString, Char} =
+   polynomial_ring(R, Symbol[Symbol(x) for x in s]; kw...)
+
+function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
+   S = polynomial_ring_only(R, s; kw...)
+   (S, gens(S))
 end
 
-function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{Char};
-                                   cached::Bool = true, ordering::Symbol = :lex)
-   return polynomial_ring(R, [Symbol(v) for v in s];
-                                   cached=cached, ordering=ordering)
-end
+@doc md"""
+    polynomial_ring_only(R::Ring, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Bool=true)
 
-function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{Symbol};
-                                   cached::Bool = true, ordering::Symbol = :lex)
-   return Generic.polynomial_ring(R, s; cached=cached, ordering=ordering)
-end
+Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the
+multivariate polynomial ring.
+"""
+polynomial_ring_only(R::T, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
+   mpoly_ring_type(T)(R, s, ordering, cached)
+
+# Alternative constructors
 
 @doc Markdown.doc"""
-    polynomial_ring(R::Ring, n::Int, s::String; cached::Bool = false, ordering::Symbol = :lex)
+    polynomial_ring(R::Ring, n::Int, s::T = :x; cached, ordering) where T<:Union{Symbol, AbstractString, Char}
 
-Given a string `s` and a number of variables `n` will
+Given a symbol, string or character `s` and a number of variables `n` will
 do the same as the first constructor except that the variables will be
 automatically numbered. For example if `s` is the string `x` and `n = 3` then
 the variables will print as `x1`, `x2`, `x3`.
-
-By default the parent object `S` will depend only on `R` and  `(x, ...)` and
-will be cached. Setting the optional argument `cached` to `false` will prevent
-the parent object `S` from being cached.
-
-The optional named argument `ordering` can be used to specify an ordering. The
-currently supported options are `:lex`, `:deglex` and `:degrevlex`.
 """
-function polynomial_ring(R::AbstractAlgebra.Ring, n::Int, s::String;
-                                  cached::Bool = false, ordering::Symbol = :lex)
-   return polynomial_ring(R, n, Symbol(s); cached=cached, ordering=ordering)
-end
+polynomial_ring(R::Ring, n::Int, s::Union{AbstractString, Char}; kw...) =
+   polynomial_ring(R, n, Symbol(s); kw...)
 
-function polynomial_ring(R::AbstractAlgebra.Ring, n::Int, s::Char;
-                                  cached::Bool = false, ordering::Symbol = :lex)
-   return polynomial_ring(R, n, Symbol(s); cached=cached, ordering=ordering)
-end
+polynomial_ring(R::Ring, n::Int, s::Symbol=:x; kw...) =
+   polynomial_ring(R, Symbol.(s, 1:n); kw...)
 
-function polynomial_ring(R::AbstractAlgebra.Ring, n::Int, s::Symbol=:x;
-                                  cached::Bool = false, ordering::Symbol = :lex)
-   return polynomial_ring(R, [Symbol(s, i) for i=1:n], cached = cached,
-         ordering = ordering)
-end
-
-function MPolyRing(R::Ring, n::Int)
-   T = elem_type(R)
-   return Generic.MPolyRing{T}(R, [Symbol("x$i") for i in 1:n], :lex, n, false)
-end
+MPolyRing(R::Ring, n::Int) =
+   polynomial_ring_only(R, Symbol.(:x, 1:n); cached=false)
 
 ################################################################################
 #

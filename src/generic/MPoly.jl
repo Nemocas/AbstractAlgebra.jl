@@ -16,14 +16,6 @@ parent_type(::Type{MPoly{T}}) where T <: RingElement = MPolyRing{T}
 
 elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
-@doc Markdown.doc"""
-    mpoly_type(::Type{T}) where T <: RingElement
-
-Return the type of a multivariate polynomial whose coefficients have the given
-type.
-"""
-mpoly_type(::Type{T}) where T <: RingElement = MPoly{T}
-
 base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 @doc Markdown.doc"""
@@ -4128,22 +4120,3 @@ function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: Rin
    z = combine_like_terms!(z)
    return z
 end
-
-###############################################################################
-#
-#   polynomial_ring constructor
-#
-###############################################################################
-
-function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
-   T = elem_type(R)
-   N = (ordering == :deglex || ordering == :degrevlex) ? length(s) + 1 : length(s)
-   parent_obj = MPolyRing{T}(R, s, ordering, N, cached)
-
-   return tuple(parent_obj, gens(parent_obj))
-end
-
-function polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
-   return polynomial_ring(R, [Symbol(v) for v in s]; cached=cached, ordering=ordering)
-end
-

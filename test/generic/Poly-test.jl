@@ -2968,12 +2968,6 @@ end
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 end
 
-@testset "Generic.Poly.printing" begin
-   M = MatrixAlgebra(ZZ, 3)
-   _, x = M['x']
-   @test string(M(-1)*x) isa String
-end
-
 @testset "Generic.Poly.polynomial_to_power_sums" begin
    R, x = polynomial_ring(QQ, "x")
 

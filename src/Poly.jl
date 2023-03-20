@@ -20,6 +20,8 @@ coefficient_ring(a::PolynomialElem) = base_ring(a)
 
 parent(a::PolynomialElem) = a.parent
 
+dense_poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
+
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}}
    return is_domain_type(S)
 end
@@ -3426,39 +3428,4 @@ function subst(f::PolyRingElem{T}, a::U) where {T <: RingElement, U}
       end
    end
    return s
-end
-
-###############################################################################
-#
-#   polynomial_ring constructor
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    polynomial_ring(R::Ring, s::Union{String, Char, Symbol}; cached::Bool = true)
-
-Given a base ring `R` and string `s` specifying how the generator (variable)
-should be printed, return a tuple `S, x` representing the new polynomial
-ring $S = R[x]$ and the generator $x$ of the ring. By default the parent
-object `S` will depend only on `R` and `x` and will be cached. Setting the
-optional argument `cached` to `false` will prevent the parent object `S` from
-being cached.
-"""
-polynomial_ring(R::Ring, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
-
-function polynomial_ring(R::Ring, s::Symbol; cached::Bool = true)
-   return Generic.polynomial_ring(R, s; cached=cached)
-end
-
-function polynomial_ring(R::Ring, s::AbstractString; cached::Bool = true)
-   return polynomial_ring(R, Symbol(s); cached=cached)
-end
-
-function polynomial_ring(R::Ring, s::Char; cached::Bool = true)
-   return polynomial_ring(R, Symbol(s); cached=cached)
-end
-
-function PolyRing(R::Ring)
-   T = elem_type(R)
-   return Generic.PolyRing{T}(R, :x, false)
 end

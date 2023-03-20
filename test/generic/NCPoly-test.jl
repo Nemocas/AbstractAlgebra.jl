@@ -423,3 +423,9 @@ end
       @test derivative(g*f) == derivative(g)*f + g*derivative(f)
    end
 end
+
+@testset "Generic.NCPoly.printing" begin
+   M = MatrixAlgebra(ZZ, 3)
+   _, x = M['x']
+   @test string(M(-1)*x) isa String
+end

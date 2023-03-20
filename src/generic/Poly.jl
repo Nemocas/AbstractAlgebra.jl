@@ -14,13 +14,6 @@ parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 
 elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
-@doc Markdown.doc"""
-    dense_poly_type(::Type{T}) where T <: RingElement
-
-Return the type of a polynomial whose coefficients have the given type.
-"""
-dense_poly_type(::Type{T}) where T <: RingElement = Poly{T}
-
 ###############################################################################
 #
 #   Basic manipulation
@@ -413,17 +406,4 @@ function (a::PolyRing{T})(b::T) where {T <: Integer}
    z = Poly{T}(b)
    z.parent = a
    return z
-end
-
-###############################################################################
-#
-#   polynomial_ring constructor
-#
-###############################################################################
-
-function polynomial_ring(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
-   T = elem_type(R)
-   parent_obj = PolyRing{T}(R, s, cached)
-
-   return parent_obj, parent_obj([R(0), R(1)])
 end
