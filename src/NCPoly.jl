@@ -20,6 +20,7 @@ end
 
 @doc md"""
     dense_poly_type(::Type{T}) where T<:NCRingElement
+    dense_poly_type(::T) where T<:NCRingElement
 
 The type of multivariate polynomials with coefficients of type `T`.
 Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
@@ -30,9 +31,12 @@ dense_poly_type(typeof(ZZ()))
 ```
 """
 dense_poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
+dense_poly_type(::Type{T}) where T = ArgumentError("Type `$T` must be subtype of `NCRingElement`.")
+dense_poly_type(x) = dense_poly_type(typeof(x))
 
 @doc md"""
     poly_ring_type(::Type{T}) where T<:NCRing
+    poly_ring_type(::T) where T<:NCRing
 
 The type of polynomial rings with coefficients of type `T`.
 Implemented via [`dense_poly_type`](@ref).
@@ -42,7 +46,7 @@ Implemented via [`dense_poly_type`](@ref).
 poly_ring_type(typeof(ZZ))
 ```
 """
-poly_ring_type(::Type{T}) where T<:NCRing = parent_type(dense_poly_type(elem_type(T)))
+poly_ring_type(x) = parent_type(dense_poly_type(elem_type(x)))
 
 @doc Markdown.doc"""
     var(a::NCPolyRing)

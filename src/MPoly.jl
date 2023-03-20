@@ -18,6 +18,7 @@ coefficient_ring(R::MPolyRing) = base_ring(R)
 
 @doc md"""
     mpoly_type(::Type{T}) where T<:RingElement
+    mpoly_type(::T) where T<:RingElement
 
 The type of multivariate polynomials with coefficients of type `T`.
 Falls back to `Generic.MPoly{T}`.
@@ -28,9 +29,12 @@ mpoly_type(typeof(ZZ()))
 ```
 """
 mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
+mpoly_type(::Type{T}) where T = ArgumentError("Type `$T` must be subtype of `RingElement`.")
+mpoly_type(x) = mpoly_type(typeof(x))
 
 @doc md"""
     mpoly_ring_type(::Type{T}) where T<:Ring
+    mpoly_ring_type(::T) where T<:Ring
 
 The type of multivariate polynomial rings with coefficients of type `T`.
 Implemented via [`mpoly_type`](@ref).
@@ -40,7 +44,7 @@ Implemented via [`mpoly_type`](@ref).
 mpoly_ring_type(typeof(ZZ))
 ```
 """
-mpoly_ring_type(::Type{T}) where T<:Ring = parent_type(mpoly_type(elem_type(T)))
+mpoly_ring_type(x) = parent_type(mpoly_type(elem_type(x)))
 
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyRingElem{S}}
    return is_domain_type(S)
