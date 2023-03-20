@@ -333,7 +333,7 @@ end
 # :deglex
 # :degrevlex
 #
-# T is an Int which is the number of variables
+# N is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
 mutable struct MPolyRing{T <: RingElement} <: AbstractAlgebra.MPolyRing{T}
@@ -349,6 +349,13 @@ mutable struct MPolyRing{T <: RingElement} <: AbstractAlgebra.MPolyRing{T}
          new{T}(R, s, ord, length(s), N)
       end::MPolyRing{T}
    end
+end
+
+function MPolyRing{T}(R::Ring, s::Vector{Symbol}, ordering::Symbol=:lex, cached::Bool=true) where T <: RingElement
+   @assert T == elem_type(R)
+   N = length(s)
+   ordering in (:deglex, :degrevlex) && (N+=1)
+   return MPolyRing{T}(R, s, ordering, N, cached)
 end
 
 const MPolyID = CacheDictType{Tuple{Ring, Vector{Symbol}, Symbol, Int}, Ring}()

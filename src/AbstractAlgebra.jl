@@ -602,7 +602,6 @@ import .Generic: cycles
 import .Generic: defining_polynomial
 import .Generic: degrees
 import .Generic: dense_matrix_type
-import .Generic: dense_poly_type
 import .Generic: dim
 import .Generic: disable_cache!
 import .Generic: downscale
@@ -659,7 +658,6 @@ import .Generic: monomial_iszero
 import .Generic: monomial_set!
 import .Generic: monomial!
 import .Generic: monomials
-import .Generic: mpoly_type
 import .Generic: MPolyBuildCtx
 import .Generic: mullow_karatsuba
 import .Generic: ngens
@@ -955,6 +953,7 @@ export monomial_to_newton!
 export monomial!
 export monomials
 export mpoly_type
+export mpoly_ring_type
 export MPolyBuildCtx
 export mul_classical
 export mul_karatsuba
@@ -996,6 +995,7 @@ export pol_length
 export polcoeff
 export poly
 export poly_ring
+export poly_ring_type
 export PolyCoeffs
 export polynomial
 export polynomial_ring
@@ -1205,12 +1205,12 @@ export Generic
 #
 ###############################################################################
 
-getindex(R::NCRing, s::Union{String, Char, Symbol}) = polynomial_ring(R, s)
-getindex(R::NCRing, s::Union{String, Char, Symbol}, ss::Union{String, Char}...) =
-   polynomial_ring(R, [s, ss...])
+getindex(R::NCRing, s::Union{Symbol, AbstractString, Char}) = polynomial_ring(R, s)
+getindex(R::NCRing, s::Union{Symbol, AbstractString, Char}, ss::Union{Symbol, AbstractString, Char}...) =
+   polynomial_ring(R, [Symbol(x) for x in (s, ss...)])
 
-# syntax x = R["x"]["y"]
-getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyRingElem, NCPolyRingElem}}, s::Union{String, Char, Symbol}) = polynomial_ring(R[1], s)
+# syntax: Rxy, y = R[:x][:y]
+getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingElem}}, s::Union{Symbol, AbstractString, Char}) = polynomial_ring(R[1], s)
 
 ###############################################################################
 #

@@ -48,21 +48,15 @@ can accept any AbstractAlgebra polynomial type.
 In order to construct polynomials in AbstractAlgebra.jl, one must first construct the
 polynomial ring itself. This is accomplished with the following constructor.
 
-```julia
-polynomial_ring(R::Ring, s::AbstractString; cached::Bool = true)
+```@docs
+polynomial_ring(R::Ring, s::Symbol; cached::Bool = true)
 ```
-
-Given a base ring `R` and string `s` specifying how the generator (variable) should be
-printed, return a tuple `S, x` representing the new polynomial ring $S = R[x]$ and the
-generator $x$ of the ring. By default the parent object `S` will depend only on `R` and
-`x` and will be cached. Setting the optional argument `cached` to `false` will prevent
-the parent object `S` from being cached.
 
 A shorthand version of this function is provided: given a base ring `R`, we abbreviate
 the constructor as follows.
 
 ```julia
-R["x"]
+R[:x]
 ```
 
 It is also possible to create a polynomial ring with default symbol as follows.
@@ -84,12 +78,6 @@ generators.
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
-
-julia> S, y = polynomial_ring(R, "y")
-(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
-
 julia> T, z = QQ["z"]
 (Univariate Polynomial Ring in z over Rationals, z)
 

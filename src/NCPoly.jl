@@ -18,6 +18,32 @@ function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S
    return is_exact_type(S)
 end
 
+@doc md"""
+    dense_poly_type(::Type{T}) where T<:NCRingElement
+
+The type of multivariate polynomials with coefficients of type `T`.
+Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
+
+# Examples
+```julia
+dense_poly_type(typeof(ZZ()))
+```
+"""
+dense_poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
+
+@doc md"""
+    poly_ring_type(::Type{T}) where T<:NCRing
+
+The type of polynomial rings with coefficients of type `T`.
+Implemented via [`dense_poly_type`](@ref).
+
+# Examples
+```julia
+poly_ring_type(typeof(ZZ))
+```
+"""
+poly_ring_type(::Type{T}) where T<:NCRing = parent_type(dense_poly_type(elem_type(T)))
+
 @doc Markdown.doc"""
     var(a::NCPolyRing)
 
@@ -657,25 +683,43 @@ rand(S::NCPolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v..
 ###############################################################################
 
 @doc Markdown.doc"""
-    polynomial_ring(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
+    polynomial_ring(R::NCRing, s::Union{Symbol, AbstractString, Char}; cached::Bool = true)
 
-Given a base ring `R` and string `s` specifying how the generator (variable)
-should be printed, return a tuple `S, x` representing the new polynomial
-ring $S = R[x]$ and the generator $x$ of the ring. By default the parent
-object `S` will depend only on `R` and `x` and will be cached. Setting the
-optional argument `cached` to `false` will prevent the parent object `S` from
-being cached.
+Given a base ring `R` and symbol/string `s` specifying how the generator
+(variable) should be printed, return a tuple `S, x` representing the new
+polynomial ring $S = R[x]$ and the generator $x$ of the ring.
+
+By default the parent object `S` depends only on `R` and `x` and will be cached.
+Setting the optional argument `cached` to `false` will prevent the parent object `S` from being cached.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate Polynomial Ring in x over Integers, x)
+
+julia> S, y = polynomial_ring(R, :y)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+```
 """
-polynomial_ring(R::NCRing, s::Union{AbstractString, Char, Symbol}; cached::Bool = true)
+polynomial_ring(R::NCRing, s::Union{Symbol, AbstractString, Char}; kw...)
 
-function polynomial_ring(R::NCRing, s::Symbol; cached::Bool = true)
-   return Generic.polynomial_ring(R, s, cached=cached)
+polynomial_ring(R::NCRing, s::Union{AbstractString, Char}; kw...) = polynomial_ring(R, Symbol(s); kw...)
+
+function polynomial_ring(R::NCRing, s::Symbol; kw...)
+   S = polynomial_ring_only(R, s; kw...)
+   (S, gen(S))
 end
 
-function polynomial_ring(R::NCRing, s::AbstractString; cached::Bool = true)
-   return Generic.polynomial_ring(R, Symbol(s), cached=cached)
-end
+@doc md"""
+    polynomial_ring_only(R::NCRing, s::Symbol; cached::Bool=true)
 
-function polynomial_ring(R::NCRing, s::Char; cached::Bool = true)
-   return Generic.polynomial_ring(R, Symbol(s); cached=cached)
-end
+Like [`polynomial_ring(R::NCRing, s::Symbol)`](@ref) but return only the
+polynomial ring.
+"""
+polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
+   poly_ring_type(T)(R, s, cached)
+
+# Simplified constructor
+
+PolyRing(R::NCRing) = polynomial_ring_only(R, :x; cached=false)
