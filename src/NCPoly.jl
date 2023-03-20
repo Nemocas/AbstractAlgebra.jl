@@ -694,7 +694,7 @@ Setting the optional argument `cached` to `false` will prevent the parent object
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate Polynomial Ring in x over Integers, x)
 
