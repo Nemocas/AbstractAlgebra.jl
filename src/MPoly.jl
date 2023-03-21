@@ -24,8 +24,12 @@ The type of multivariate polynomials with coefficients of type `T`.
 Falls back to `Generic.MPoly{T}`.
 
 # Examples
-```julia
-mpoly_type(typeof(ZZ()))
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> mpoly_type(elem_type(ZZ))
+AbstractAlgebra.Generic.MPoly{BigInt}
+
+julia> mpoly_type(ZZ(1))
+AbstractAlgebra.Generic.MPoly{BigInt}
 ```
 """
 mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
@@ -40,8 +44,12 @@ The type of multivariate polynomial rings with coefficients of type `T`.
 Implemented via [`mpoly_type`](@ref).
 
 # Examples
-```julia
-mpoly_ring_type(typeof(ZZ))
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> mpoly_ring_type(typeof(ZZ))
+AbstractAlgebra.Generic.MPolyRing{BigInt}
+
+julia> mpoly_ring_type(ZZ)
+AbstractAlgebra.Generic.MPolyRing{BigInt}
 ```
 """
 mpoly_ring_type(x) = parent_type(mpoly_type(elem_type(x)))
