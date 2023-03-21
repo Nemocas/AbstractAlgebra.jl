@@ -276,6 +276,7 @@ export SimpleNumFieldElem
 export sub!
 export UniversalPolyRing
 export UniversalPolyRingElem
+export VarName
 export zero!
 export zeros
 export zz

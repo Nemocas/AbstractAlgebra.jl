@@ -213,7 +213,7 @@ function power_series_ring(R::Ring, prec::Vector{Int},
 end
 
 function power_series_ring(R::Ring, weights::Vector{Int}, prec::Int,
-   s::AbstractVector{<:VarName}; cached=true, model=:capped_absolute) where
+   s::AbstractVector{<:VarName}; cached=true, model=:capped_absolute)
    sym = [Symbol(v) for v in s]
    return power_series_ring(R, weights, prec, sym; cached=cached, model=model)
 end

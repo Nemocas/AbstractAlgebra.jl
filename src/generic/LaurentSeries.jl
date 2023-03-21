@@ -380,7 +380,7 @@ end
 ###############################################################################
 
 function similar(x::LaurentSeriesElem, R::Ring, max_prec::Int,
-   s::Symbol=var(parent(x)); cached::Bool=true)
+      s::Symbol; cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.LaurentSeriesRingElem{TT}(V, 0, max_prec, max_prec, 1)
@@ -397,7 +397,7 @@ function similar(x::LaurentSeriesElem, R::Ring, max_prec::Int,
 end
 
 function similar(x::LaurentSeriesElem, R::Field, max_prec::Int,
-   s::Symbol; cached::Bool=true)
+      s::Symbol; cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.LaurentSeriesFieldElem{TT}(V, 0, max_prec, max_prec, 1)
