@@ -194,6 +194,10 @@ function similar(x::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
    return p
 end
 
+similar(x::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
+                                   var::VarName=var(parent(x)); cached::Bool=true) =
+   similar(x, R, max_prec, Symbol(var); cached)
+
 similar(x::RelPowerSeriesRingElem, R::Ring,
                                    var::VarName=var(parent(x)); cached::Bool=true) =
    similar(x, R, max_precision(parent(x)), Symbol(var); cached)
