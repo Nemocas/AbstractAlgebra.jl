@@ -184,7 +184,7 @@ end
 
 function free_associative_algebra(
    R::AbstractAlgebra.Ring,
-   s::Union{AbstractVector{<:AbstractString}, AbstractVector{Symbol}, AbstractVector{Char}};
+   s::AbstractVector{<:VarName};
    cached::Bool = true)
 
    S = [Symbol(v) for v in s]
@@ -202,7 +202,7 @@ end
 function free_associative_algebra(
    R::AbstractAlgebra.Ring,
    n::Int,
-   s::Union{AbstractString, Symbol, Char};
+   s::VarName;
    cached::Bool = false)
 
    S = [Symbol(s, i) for i in 1:n]

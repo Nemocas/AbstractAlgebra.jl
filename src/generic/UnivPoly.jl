@@ -260,11 +260,11 @@ function gen(S::UniversalPolyRing{T, U}, s::Symbol) where {T <: RingElement, U <
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
 end
 
-gen(S::UniversalPolyRing, s::Union{Char, String}) = gen(S, Symbol(s))
+gen(S::UniversalPolyRing, s::VarNameNonSymbol) = gen(S, Symbol(s))
 
 gens(S::UniversalPolyRing, v::Vector{Symbol}) = tuple([gen(S, s) for s in v]...)
 
-gens(S::UniversalPolyRing, v::Vector{T}) where T <: Union{Char, String} = gens(S, [Symbol(s) for s in v])
+gens(S::UniversalPolyRing, v::Vector{T}) where T <: VarNameNonSymbol = gens(S, [Symbol(s) for s in v])
 
 function gen(S::UniversalPolyRing{T, U}, i::Int) where {T, U}
    i > nvars(S) && error("Variable index out of range")

@@ -178,7 +178,7 @@ end
 ###############################################################################
 
 function similar(x::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
-                                   s::Symbol=var(parent(x)); cached::Bool=true)
+                                   s::Symbol; cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.RelSeries{TT}(V, 0, max_prec, max_prec)
@@ -194,72 +194,37 @@ function similar(x::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
    return p
 end
 
-function similar(x::RelPowerSeriesRingElem, R::Ring,
-                                 var::Symbol=var(parent(x)); cached::Bool=true)
-   return similar(x, R, max_precision(parent(x)), var; cached = cached)
-end
+similar(x::RelPowerSeriesRingElem, R::Ring,
+                                   var::VarName=var(parent(x)); cached::Bool=true) =
+   similar(x, R, max_precision(parent(x)), Symbol(var); cached)
 
-function similar(x::RelPowerSeriesRingElem, max_prec::Int,
-                                 var::Symbol=var(parent(x)); cached::Bool=true)
-   return similar(x, base_ring(x), max_prec, var; cached=cached)
-end
 
-function similar(x::RelPowerSeriesRingElem,
-                                 var::Symbol=var(parent(x)); cached::Bool=true)
-   return similar(x, base_ring(x),
-                  max_precision(parent(x)), var; cached=cached)
-end
+similar(x::RelPowerSeriesRingElem, max_prec::Int,
+                                   var::VarName=var(parent(x)); cached::Bool=true) =
+   similar(x, base_ring(x), max_prec, Symbol(var); cached)
 
-function similar(x::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
-                                                var::String; cached::Bool=true)
-   return similar(x, R, max_prec, Symbol(var); cached=cached)
-end
 
-function similar(x::RelPowerSeriesRingElem, R::Ring, var::String; cached::Bool=true)
-   return similar(x, R, max_precision(parent(x)), Symbol(var); cached=cached)
-end
+similar(x::RelPowerSeriesRingElem, var::VarName=var(parent(x)); cached::Bool=true) =
+   similar(x, base_ring(x), max_precision(parent(x)), Symbol(var); cached)
 
-function similar(x::RelPowerSeriesRingElem, max_prec::Int,
-                                                var::String; cached::Bool=true)
-   return similar(x, base_ring(x), max_prec, Symbol(var); cached=cached)
-end
 
-function similar(x::RelPowerSeriesRingElem, var::String; cached::Bool=true)
-   return similar(x, base_ring(x), max_precision(parent(x)),
-                  Symbol(var); cached=cached)
-end
+zero(a::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
+                                   var::VarName=var(parent(a)); cached::Bool=true) =
+   similar(a, R, max_prec, Symbol(var); cached=cached)
 
-function zero(a::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
-                                 var::Symbol=var(parent(a)); cached::Bool=true)
-   return similar(a, R, max_prec, var; cached=cached)
-end
 
-function zero(a::RelPowerSeriesRingElem, R::Ring,
-                                 var::Symbol=var(parent(a)); cached::Bool=true)
-   return similar(a, R, max_precision(parent(a)), var; cached=cached)
-end
+zero(a::RelPowerSeriesRingElem, R::Ring,
+                                   var::VarName=var(parent(a)); cached::Bool=true) =
+   similar(a, R, Symbol(var); cached)
 
-function zero(a::RelPowerSeriesRingElem, max_prec::Int,
-                                 var::Symbol=var(parent(a)); cached::Bool=true)
-   return similar(a, base_ring(a), max_prec, var; cached=cached)
-end
 
-zero(a::RelPowerSeriesRingElem, var::Symbol=var(parent(a)); cached::Bool=true) =
-   similar(a, base_ring(a), max_precision(parent(a)), var; cached=cached)
+zero(a::RelPowerSeriesRingElem, max_prec::Int,
+                                   var::VarName=var(parent(a)); cached::Bool=true) =
+   similar(a, max_prec, Symbol(var); cached)
 
-function zero(a::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
-                                                var::String; cached::Bool=true)
-   return zero(a, R, max_prec, Symbol(var); cached=cached)
-end
 
-zero(a::RelPowerSeriesRingElem, R::Ring, var::String; cached::Bool=true) =
-   zero(a, R, max_precision(parent(a)), Symbol(var); cached=cached)
-
-zero(a::RelPowerSeriesRingElem, max_prec::Int, var::String; cached::Bool=true) =
-   zero(a, base_ring(a), max_prec, Symbol(var); cached=cached)
-
-zero(a::RelPowerSeriesRingElem, var::String; cached::Bool=true) =
-   zero(a, base_ring(a), max_precision(parent(a)), Symbol(var); cached=cached)
+zero(a::RelPowerSeriesRingElem,     var::Symbol=var(parent(a)); cached::Bool=true) =
+   similar(a, Symbol(var); cached)
 
 ###############################################################################
 #
@@ -267,7 +232,7 @@ zero(a::RelPowerSeriesRingElem, var::String; cached::Bool=true) =
 #
 ###############################################################################
 
-function rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+function rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    prec < len + val && error("Precision too small for given data")
    TT = elem_type(R)
    coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
@@ -1426,7 +1391,7 @@ rand(S::SeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val_range, v..
 ###############################################################################
 
 @doc Markdown.doc"""
-    power_series_ring(R::Ring, prec::Int, s::Union{AbstractString, char, Symbol}; cached=true, model=:capped_relative)
+    power_series_ring(R::Ring, prec::Int, s::VarName; cached=true, model=:capped_relative)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a power series
 ring over the given base ring and a generator `x` for the power series ring.
@@ -1439,19 +1404,8 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-power_series_ring(R::Ring, prec::Int, s::Union{AbstractString, Char, Symbol}; cached=true, model=:capped_relative)
-
-function power_series_ring(R::Ring, prec::Int, s::Symbol; cached=true, model=:capped_relative)
-   return Generic.power_series_ring(R, prec, s; cached=cached, model=model)
-end
-
-function power_series_ring(R::Ring, prec::Int, s::Char; cached=true, model=:capped_relative)
-   return power_series_ring(R, prec, Symbol(s); cached=cached, model=model)
-end
-
-function power_series_ring(R::Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
-   return power_series_ring(R, prec, Symbol(s); cached=cached, model=model)
-end
+power_series_ring(R::Ring, prec::Int, s::VarName; cached=true, model=:capped_relative) =
+   Generic.power_series_ring(R, prec, Symbol(s); cached, model)
 
 function AbsPowerSeriesRing(R::Ring, prec::Int)
    T = elem_type(R)
