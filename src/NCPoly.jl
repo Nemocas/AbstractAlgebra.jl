@@ -27,10 +27,10 @@ Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> dense_poly_type(elem_type(ZZ))
+julia> dense_poly_type(elem_type(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.Poly{BigInt}
 
-julia> dense_poly_type(ZZ(1))
+julia> dense_poly_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.Poly{BigInt}
 ```
 """
@@ -47,10 +47,10 @@ Implemented via [`dense_poly_type`](@ref).
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> poly_ring_type(typeof(ZZ))
+julia> poly_ring_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
-julia> poly_ring_type(ZZ)
+julia> poly_ring_type(AbstractAlgebra.ZZ)
 AbstractAlgebra.Generic.PolyRing{BigInt}
 ```
 """

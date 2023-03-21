@@ -25,10 +25,10 @@ Falls back to `Generic.MPoly{T}`.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> mpoly_type(elem_type(ZZ))
+julia> mpoly_type(elem_type(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.MPoly{BigInt}
 
-julia> mpoly_type(ZZ(1))
+julia> mpoly_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.MPoly{BigInt}
 ```
 """
@@ -45,10 +45,10 @@ Implemented via [`mpoly_type`](@ref).
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> mpoly_ring_type(typeof(ZZ))
+julia> mpoly_ring_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.MPolyRing{BigInt}
 
-julia> mpoly_ring_type(ZZ)
+julia> mpoly_ring_type(AbstractAlgebra.ZZ)
 AbstractAlgebra.Generic.MPolyRing{BigInt}
 ```
 """
