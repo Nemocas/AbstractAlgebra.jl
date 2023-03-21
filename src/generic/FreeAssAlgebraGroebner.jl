@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export groebner_basis, interreduce!, normal_form
+export groebner_basis, interreduce!, normal_form, normal_form_weak
 
 #using DataStructures
 import DataStructures.PriorityQueue
