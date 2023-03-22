@@ -60,46 +60,63 @@ end
 
    @test typeof(T) <: Generic.PolyRing
 
-   @test isa(z, PolyRingElem)
+   @testset "Generic.Poly.constructors.elements" begin
+      @test isa(z, PolyRingElem)
 
-   f = x^2 + y^3 + z + 1
+      f = x^2 + y^3 + z + 1
 
-   @test isa(f, PolyRingElem)
+      @test isa(f, PolyRingElem)
 
-   g = S(2)
+      g = S(2)
 
-   @test isa(g, PolyRingElem)
+      @test isa(g, PolyRingElem)
 
-   h = S(x^2 + 2x + 1)
+      h = S(x^2 + 2x + 1)
 
-   @test isa(h, PolyRingElem)
+      @test isa(h, PolyRingElem)
 
-   j = T(x + 2)
+      j = T(x + 2)
 
-   @test isa(j, PolyRingElem)
+      @test isa(j, PolyRingElem)
 
-   k = S([x, x + 2, x^2 + 3x + 1])
+      k = S([x, x + 2, x^2 + 3x + 1])
 
-   @test isa(k, PolyRingElem)
+      @test isa(k, PolyRingElem)
 
-   l = S(k)
+      l = S(k)
 
-   @test isa(l, PolyRingElem)
+      @test isa(l, PolyRingElem)
 
-   m = S([1, 2, 3])
+      m = S([1, 2, 3])
 
-   @test isa(m, PolyRingElem)
+      @test isa(m, PolyRingElem)
 
-   n = S([ZZ(1), ZZ(2), ZZ(3)])
+      n = S([ZZ(1), ZZ(2), ZZ(3)])
 
-   @test isa(n, PolyRingElem)
+      @test isa(n, PolyRingElem)
 
-   @test x in [x, y]
-   @test x in [y, x]
-   @test !(x in [y])
+      @test x in [x, y]
+      @test x in [y, x]
+      @test !(x in [y])
 
-   @test x in keys(Dict(x => 1))
-   @test !(y in keys(Dict(x => 1)))
+      @test x in keys(Dict(x => 1))
+      @test !(y in keys(Dict(x => 1)))
+   end
+
+   @testset "Generic.Poly.constructors.varname" begin
+      Rx1 = polynomial_ring(ZZ, :x)
+      Rx2 = polynomial_ring(ZZ, 'x')
+      Rx3 = polynomial_ring(ZZ, "x")
+      Rx4 = polynomial_ring(ZZ, GenericString("x"))
+      Rx5 = ZZ[:x]
+      Rx6 = ZZ[GenericString("x")]
+
+      @test Rx1 == Rx2
+      @test Rx1 == Rx3
+      @test Rx1 == Rx4
+      @test Rx1 == Rx5
+      @test Rx1 == Rx6
+   end
 end
 
 @testset "Generic.Poly.iterators" begin
