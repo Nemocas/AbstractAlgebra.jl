@@ -99,7 +99,7 @@ function gen(a::FreeAssAlgebra{T}, i::Int) where {T}
 end
 
 function gens(a::FreeAssAlgebra{T}) where {T<:RingElement}
-    return [gen(a, i) for i = 1:nvars(a)]
+    return [gen(a, i) for i = 1:ngens(a)]
 end
 
 function is_gen(a::FreeAssAlgElem{T}) where {T}

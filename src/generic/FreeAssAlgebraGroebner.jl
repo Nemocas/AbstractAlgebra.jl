@@ -223,7 +223,6 @@ end
 # the return vector is of the form [(w_2, w_1^'), ...]
 # if w_1^' or w_2 is empty, the corresponding obstruction is not returned
 function right_obstructions(a::Vector{Int}, b::Vector{Int})
-
     return left_obstructions(b, a)
 end
 
@@ -374,12 +373,10 @@ function has_overlap(g1, g2, w1, w2, u1, u2)
     return length(w2) < length(lw2) + length(u2)
 end
 
-
 function has_overlap(g2, w2, u2)
     lw2 = _leading_word(g2)
     return length(w2) < length(lw2) + length(u2)
 end
-
 
 function has_overlap(obs::ObstructionTriple{T}) where {T}
     return has_overlap(obs.second_poly, obs.pre_and_suffixes[2], obs.pre_and_suffixes[4])
@@ -620,4 +617,3 @@ function groebner_basis(
 ) where {T<:FieldElement}
     return groebner_basis_buchberger(g, reduction_bound)
 end
-

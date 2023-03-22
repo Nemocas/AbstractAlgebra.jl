@@ -6,7 +6,6 @@
 
 export search,
     AhoCorasickAutomaton, insert_keyword!, aho_corasick_automaton, AhoCorasickMatch#, Word
-
 import DataStructures.Queue, DataStructures.enqueue!, DataStructures.dequeue!
 
 const Word = Vector{Int}
