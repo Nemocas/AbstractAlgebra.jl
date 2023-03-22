@@ -33,8 +33,8 @@ AbstractAlgebra.Generic.MPoly{BigInt}
 ```
 """
 mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
-mpoly_type(::Type{T}) where T = ArgumentError("Type `$T` must be subtype of `RingElement`.")
-mpoly_type(x) = mpoly_type(typeof(x))
+mpoly_type(x) = mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
+mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
 
 @doc md"""
     mpoly_ring_type(::Type{T}) where T<:Ring

@@ -35,8 +35,8 @@ AbstractAlgebra.Generic.Poly{BigInt}
 ```
 """
 dense_poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
-dense_poly_type(::Type{T}) where T = ArgumentError("Type `$T` must be subtype of `NCRingElement`.")
-dense_poly_type(x) = dense_poly_type(typeof(x))
+dense_poly_type(x) = dense_poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
+dense_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
 
 @doc md"""
     poly_ring_type(::Type{T}) where T<:NCRing
