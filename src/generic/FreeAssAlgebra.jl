@@ -81,6 +81,10 @@ function isone(a::FreeAssAlgElem{T}) where T
    end
 end
 
+function ngens(a::FreeAssAlgebra{T}) where T
+   return nvars(a)
+end
+
 function gen(a::FreeAssAlgebra{T}, i::Int) where T
    0 < i <= nvars(a) || error("variable index out of range")
    c = one(base_ring(a))
@@ -89,7 +93,7 @@ function gen(a::FreeAssAlgebra{T}, i::Int) where T
 end
 
 function gens(a::FreeAssAlgebra{T}) where {T <: RingElement}
-   return [gen(a, i) for i in 1:nvars(a)]
+   return [gen(a, i) for i in 1:ngens(a)]
 end
 
 function is_gen(a::FreeAssAlgElem{T}) where T
