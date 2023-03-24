@@ -87,6 +87,10 @@ function isone(a::FreeAssAlgElem{T}) where {T}
     end
 end
 
+function ngens(a::FreeAssAlgebra{T}) where {T}
+   return nvars(a)
+end
+
 function gen(a::FreeAssAlgebra{T}, i::Int) where {T}
     0 < i <= nvars(a) || error("variable index out of range")
     c = one(base_ring(a))
