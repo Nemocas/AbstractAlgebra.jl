@@ -149,7 +149,7 @@ end
     @test get_attribute!(x, :bar13) == nothing
     @test get_attribute(x, :bar13) == nothing
     @test get_attribute!(x, :bar14, :defaultsymbol) == :defaultsymbol
-    @test get_attribute(x, :bar14) == :defailtsymbol
+    @test get_attribute(x, :bar14) == :defaultsymbol
 end
 
 
