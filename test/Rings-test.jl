@@ -53,4 +53,11 @@ end
    @test isone(p) && q == zero(Qx)
 end
 
+@testset "properties" begin
+  @test is_perfect(QQ)
+  @test is_perfect(GF(2))
+  @test is_finite(GF(2))
+  @test !is_finite(QQ)
+end
+
 include("julia/Integers-test.jl")

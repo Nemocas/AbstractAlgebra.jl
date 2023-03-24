@@ -169,6 +169,19 @@ end
 
 ###############################################################################
 #
+#   Ring properties
+#
+###############################################################################
+
+is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
+                                                 throw(NotImplementedError(:is_perfect, F))
+
+is_finite(F::FinField) = true
+
+is_finite(F::Field) = characteristic(F) != 0 && throw(NotImplementedError(:is_finite, F))
+
+###############################################################################
+#
 #   Generic and specific rings and fields
 #
 ###############################################################################
