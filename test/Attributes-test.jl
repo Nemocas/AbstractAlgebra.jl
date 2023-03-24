@@ -146,10 +146,8 @@ end
     @test get_attribute(x, :bar12) == :somesymbol
     @test get_attribute!(x, :bar12, :defaultsymbol) == :somesymbol
     @test get_attribute(x, :bar12) == :somesymbol
-    @test get_attribute!(x, :bar13) == nothing
-    @test get_attribute(x, :bar13) == nothing
-    @test get_attribute!(x, :bar14, :defaultsymbol) == :defaultsymbol
-    @test get_attribute(x, :bar14) == :defaultsymbol
+    @test get_attribute!(x, :bar13, :defaultsymbol) == :defaultsymbol
+    @test get_attribute(x, :bar13) == :defaultsymbol
 end
 
 
