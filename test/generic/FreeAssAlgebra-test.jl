@@ -16,6 +16,7 @@
       @test parent_type(Generic.FreeAssAlgElem{elem_type(R)}) == Generic.FreeAssAlgebra{elem_type(R)}
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test ngens(S) == length(gens(S))
 
       @test typeof(S) <: Generic.FreeAssAlgebra
 
