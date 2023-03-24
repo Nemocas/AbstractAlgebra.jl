@@ -203,7 +203,7 @@ function get_attribute(G::Any, attr::Symbol, default::Any = nothing)
 end
 
 # unambiguous version
-function get_attribute(G::Any, attr::Symbol, default::Union{Symbol, Nothing} = nothing)
+function get_attribute(G::Any, attr::Symbol, default::Symbol)
    D = _get_attributes(G)
    D isa Dict && return get(D, attr, default)
    return default
@@ -240,7 +240,7 @@ function get_attribute!(G::Any, attr::Symbol, default::Any)
    return Base.get!(D, attr, default)
 end
 
-function get_attribute!(G::Any, attr::Symbol, default::Union{Symbol, Nothing} = nothing)
+function get_attribute!(G::Any, attr::Symbol, default::Symbol)
    D = _get_attributes!(G)
    return Base.get!(D, attr, default)
 end
