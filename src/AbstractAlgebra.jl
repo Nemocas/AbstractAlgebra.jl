@@ -240,6 +240,7 @@ export IdealSet
 export IdentityMap
 export is_irreducible
 export is_squarefree
+export is_perfect
 export Map
 export MatAlgebra
 export MatAlgElem
