@@ -108,6 +108,12 @@ end
     @test get_attribute(() -> 42, x, :bar9) == 0
     @test get_attribute(x, :bar9) == 0
 
+    # test get_attribute with symbol entries
+    set_attribute!(x, :bar10 => :somesymbol)
+    @test get_attribute(x, :bar10) == :somesymbol
+    @test get_attribute(x, :bar11) == nothing
+    @test get_attribute(x, :bar11, :defaultsymbol) == :defaultsymbol
+
     # test get_attribute! with default value for new entry
     @test get_attribute(x, :bar4) == nothing
     @test get_attribute!(x, :bar4, 42) == 42
@@ -135,6 +141,15 @@ end
     @test get_attribute!(Vector{Int}, x, :bar8) isa Vector{Int}
     @test get_attribute(x, :bar8) == []
 
+    # test get_attribute with symbol entries
+    set_attribute!(x, :bar12 => :somesymbol)
+    @test get_attribute(x, :bar12) == :somesymbol
+    @test get_attribute!(x, :bar12) == :somesymbol
+    @test get_attribute(x, :bar12) == :somesymbol
+    @test get_attribute!(x, :bar13) == nothing
+    @test get_attribute(x, :bar13) == nothing
+    @test get_attribute!(x, :bar14, :defaultsymbol) == :defaultsymbol
+    @test get_attribute(x, :bar14) == :defailtsymbol
 end
 
 
