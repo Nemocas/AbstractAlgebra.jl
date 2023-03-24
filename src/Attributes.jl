@@ -202,6 +202,13 @@ function get_attribute(G::Any, attr::Symbol, default::Any = nothing)
    return default
 end
 
+# unambiguous version
+function get_attribute(G::Any, attr::Symbol, default::Union{Symbol, Nothing} = nothing)
+   D = _get_attributes(G)
+   D isa Dict && return get(D, attr, default)
+   return default
+end
+
 """
     get_attribute!(f::Function, G::Any, attr::Symbol)
 
@@ -229,6 +236,11 @@ Return the value stored for the attribute `attr` of `G`, or if no value has been
 store `key => default`, and return `default`.
 """
 function get_attribute!(G::Any, attr::Symbol, default::Any)
+   D = _get_attributes!(G)
+   return Base.get!(D, attr, default)
+end
+
+function get_attribute!(G::Any, attr::Symbol, default::Union{Symbol, Nothing} = nothing)
    D = _get_attributes!(G)
    return Base.get!(D, attr, default)
 end
