@@ -380,7 +380,7 @@ end
 ###############################################################################
 
 function similar(x::LaurentSeriesElem, R::Ring, max_prec::Int,
-   s::Symbol=var(parent(x)); cached::Bool=true)
+      s::Symbol; cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.LaurentSeriesRingElem{TT}(V, 0, max_prec, max_prec, 1)
@@ -397,7 +397,7 @@ function similar(x::LaurentSeriesElem, R::Ring, max_prec::Int,
 end
 
 function similar(x::LaurentSeriesElem, R::Field, max_prec::Int,
-   s::Symbol=var(parent(x)); cached::Bool=true)
+      s::Symbol; cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.LaurentSeriesFieldElem{TT}(V, 0, max_prec, max_prec, 1)
@@ -413,72 +413,35 @@ function similar(x::LaurentSeriesElem, R::Field, max_prec::Int,
    return p
 end
 
-function similar(x::LaurentSeriesElem, R::Ring,
-                       var::Symbol=var(parent(x)); cached::Bool=true)
-   return similar(x, R, max_precision(parent(x)), var; cached = cached)
-end
+similar(x::LaurentSeriesElem, R::Ring, max_prec::Int,
+                              var::VarName=var(parent(x)); cached::Bool=true) =
+   similar(x, R, max_prec, Symbol(var); cached)
 
-function similar(x::LaurentSeriesElem, max_prec::Int,
-                       var::Symbol=var(parent(x)); cached::Bool=true)
-   return similar(x, base_ring(x), max_prec, var; cached=cached)
-end
+similar(x::LaurentSeriesElem, R::Ring,
+                              var::VarName=var(parent(x)); cached::Bool=true) =
+   similar(x, R, max_precision(parent(x)), Symbol(var); cached)
 
-function similar(x::LaurentSeriesElem,
-                       var::Symbol=var(parent(x)); cached::Bool=true)
-   return similar(x, base_ring(x),
-                      max_precision(parent(x)), var; cached=cached)
-end
+similar(x::LaurentSeriesElem, max_prec::Int,
+                              var::VarName=var(parent(x)); cached::Bool=true) =
+   similar(x, base_ring(x), max_prec, Symbol(var); cached)
 
-function similar(x::LaurentSeriesElem, R::Ring, max_prec::Int,
-                                      var::String; cached::Bool=true)
-   return similar(x, R, max_prec, Symbol(var); cached=cached)
-end
+similar(x::LaurentSeriesElem, var::VarName=var(parent(x)); cached::Bool=true) =
+   similar(x, base_ring(x), max_precision(parent(x)), Symbol(var); cached)
 
-function similar(x::LaurentSeriesElem, R::Ring, var::String; cached::Bool=true)
-   return similar(x, R, max_precision(parent(x)), Symbol(var); cached=cached)
-end
+zero(a::LaurentSeriesElem, R::Ring, max_prec::Int,
+                              var::VarName=var(parent(a)); cached::Bool=true) =
+   similar(a, R, max_prec, Symbol(var); cached)
 
-function similar(x::LaurentSeriesElem, max_prec::Int,
-                                   var::String; cached::Bool=true)
-   return similar(x, base_ring(x), max_prec, Symbol(var); cached=cached)
-end
+zero(a::LaurentSeriesElem, R::Ring,
+                              var::VarName=var(parent(a)); cached::Bool=true) =
+   similar(a, R, Symbol(var); cached)
 
-function similar(x::LaurentSeriesElem, var::String; cached::Bool=true)
-   return similar(x, base_ring(x), max_precision(parent(x)),
-                                             Symbol(var); cached=cached)
-end
+zero(a::LaurentSeriesElem, max_prec::Int,
+                              var::VarName=var(parent(a)); cached::Bool=true) =
+   similar(a, max_prec, Symbol(var); cached)
 
-function zero(a::LaurentSeriesElem, R::Ring, max_prec::Int,
-                          var::Symbol=var(parent(a)); cached::Bool=true)
-   return similar(a, R, max_prec, var; cached=cached)
-end
-
-function zero(a::LaurentSeriesElem, R::Ring,
-                          var::Symbol=var(parent(a)); cached::Bool=true)
-   return similar(a, R, max_precision(parent(a)), var; cached=cached)
-end
-
-function zero(a::LaurentSeriesElem, max_prec::Int,
-                          var::Symbol=var(parent(a)); cached::Bool=true)
-   return similar(a, base_ring(a), max_prec, var; cached=cached)
-end
-
-zero(a::LaurentSeriesElem, var::Symbol=var(parent(a)); cached::Bool=true) =
-   similar(a, base_ring(a), max_precision(parent(a)), var; cached=cached)
-
-function zero(a::LaurentSeriesElem, R::Ring, max_prec::Int,
-                                        var::String; cached::Bool=true)
-   return zero(a, R, max_prec, Symbol(var); cached=cached)
-end
-
-zero(a::LaurentSeriesElem, R::Ring, var::String; cached::Bool=true) =
-   zero(a, R, max_precision(parent(a)), Symbol(var); cached=cached)
-
-zero(a::LaurentSeriesElem, max_prec::Int, var::String; cached::Bool=true) =
-   zero(a, base_ring(a), max_prec, Symbol(var); cached=cached)
-
-zero(a::LaurentSeriesElem, var::String; cached::Bool=true) =
-   zero(a, base_ring(a), max_precision(parent(a)), Symbol(var); cached=cached)
+zero(a::LaurentSeriesElem,    var::VarName=var(parent(a)); cached::Bool=true) =
+   similar(a, Symbol(var); cached)
 
 ###############################################################################
 #
@@ -486,7 +449,7 @@ zero(a::LaurentSeriesElem, var::String; cached::Bool=true) =
 #
 ###############################################################################
 
-function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")
    TT = elem_type(R)
@@ -497,7 +460,7 @@ function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, 
    return p
 end
 
-function laurent_series(R::Field, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+function laurent_series(R::Field, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")
    TT = elem_type(R)

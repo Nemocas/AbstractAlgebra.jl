@@ -196,41 +196,35 @@ end
 #
 ###############################################################################
 
-function power_series_ring(R::Ring, prec::Vector{Int},
-                  s::Vector{T}; cached=true, model=:capped_absolute) where
-                                                                    T <: Symbol
-   return Generic.power_series_ring(R, prec, s; cached=cached, model=model)
-end
-
-function power_series_ring(R::Ring, prec::Vector{Int},
-   s::Vector{T}; cached=true, model=:capped_absolute) where
-                                               T <: Union{Char, AbstractString}
-   sym = [Symbol(v) for v in s]
-   return Generic.power_series_ring(R, prec, sym; cached=cached, model=model)
-end
-
 function power_series_ring(R::Ring, weights::Vector{Int}, prec::Int,
-                  s::Vector{T}; cached=true, model=:capped_absolute) where
-                                                                    T <: Symbol
+      s::Vector{Symbol}; cached=true, model=:capped_absolute)
    return Generic.power_series_ring(R, weights, prec, s; cached=cached, model=model)
 end
 
-function power_series_ring(R::Ring, weights::Vector{Int}, prec::Int,
-   s::Vector{T}; cached=true, model=:capped_absolute) where
-                                               T <: Union{Char, AbstractString}
+function power_series_ring(R::Ring, prec::Vector{Int},
+      s::Vector{Symbol}; cached=true, model=:capped_absolute)
+   return Generic.power_series_ring(R, prec, s; cached=cached, model=model)
+end
+
+function power_series_ring(R::Ring, prec::Vector{Int},
+      s::AbstractVector{<:VarName}; cached=true, model=:capped_absolute)
    sym = [Symbol(v) for v in s]
-   return Generic.power_series_ring(R, weights, prec, sym; cached=cached, model=model)
+   return power_series_ring(R, prec, sym; cached=cached, model=model)
+end
+
+function power_series_ring(R::Ring, weights::Vector{Int}, prec::Int,
+   s::AbstractVector{<:VarName}; cached=true, model=:capped_absolute)
+   sym = [Symbol(v) for v in s]
+   return power_series_ring(R, weights, prec, sym; cached=cached, model=model)
 end
 
 function power_series_ring(R::Ring, prec::Int,
-                  s::Vector{T}; cached=true, model=:capped_absolute) where
-                                                                    T <: Symbol
+      s::Vector{Symbol}; cached=true, model=:capped_absolute)
    return Generic.power_series_ring(R, prec, s; cached=cached, model=model)
 end
 
 function power_series_ring(R::Ring, prec::Int,
-   s::Vector{T}; cached=true, model=:capped_absolute) where
-                                               T <: Union{Char, AbstractString}
+      s::AbstractVector{<:VarName}; cached=true, model=:capped_absolute)
    sym = [Symbol(v) for v in s]
-   return Generic.power_series_ring(R, prec, sym; cached=cached, model=model)
+   return power_series_ring(R, prec, sym; cached=cached, model=model)
 end

@@ -277,6 +277,7 @@ export SimpleNumFieldElem
 export sub!
 export UniversalPolyRing
 export UniversalPolyRingElem
+export VarName
 export zero!
 export zeros
 export zz
@@ -1156,27 +1157,11 @@ function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.
    Generic.YoungTableau(part, fill)
 end
 
-function number_field(a::Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+function number_field(a::Generic.Poly{Rational{BigInt}}, s::VarName, t = "\$"; cached = true)
    return Generic.number_field(a, Symbol(s), t; cached=cached)
 end
 
-function number_field(a::Generic.Poly{Rational{BigInt}}, s::Char, t = "\$"; cached = true)
-   return Generic.number_field(a, Symbol(s), t; cached=cached)
-end
-
-function number_field(a::Generic.Poly{Rational{BigInt}}, s::Symbol, t = "\$"; cached = true)
-   return Generic.number_field(a, s, t; cached=cached)
-end
-
-function FunctionField(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   return Generic.FunctionField(p, s; cached=cached)
-end
-
-function FunctionField(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   return Generic.FunctionField(p, Symbol(s); cached=cached)
-end
-
-function FunctionField(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::Char; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
+function FunctionField(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
@@ -1203,12 +1188,12 @@ export Generic
 #
 ###############################################################################
 
-getindex(R::NCRing, s::Union{Symbol, AbstractString, Char}) = polynomial_ring(R, s)
-getindex(R::NCRing, s::Union{Symbol, AbstractString, Char}, ss::Union{Symbol, AbstractString, Char}...) =
+getindex(R::NCRing, s::VarName) = polynomial_ring(R, s)
+getindex(R::NCRing, s::VarName, ss::VarName...) =
    polynomial_ring(R, [Symbol(x) for x in (s, ss...)])
 
 # syntax: Rxy, y = R[:x][:y]
-getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingElem}}, s::Union{Symbol, AbstractString, Char}) = polynomial_ring(R[1], s)
+getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingElem}}, s::VarName) = polynomial_ring(R[1], s)
 
 ###############################################################################
 #

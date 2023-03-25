@@ -11,7 +11,7 @@
 ###############################################################################
 
 @doc doc"""
-    LaurentPolynomialRing(R::Ring, s::Union{AbstractString, Char, Symbol})
+    LaurentPolynomialRing(R::Ring, s::VarName)
 
 Given a base ring `R` and string `s` specifying how the generator (variable)
 should be printed, return a tuple `S, x` representing the new Laurent polynomial
@@ -29,17 +29,5 @@ julia> rand(R, -3:3, -9:9)
 -3*x^2 - 8*x + 4 + 3*x^-1 - 6*x^-2 + 9*x^-3
 ```
 """
-LaurentPolynomialRing(R::Ring, s::Union{AbstractString, Char, Symbol})
-
-function LaurentPolynomialRing(R::Ring, s::Symbol; cached::Bool = true)
-   return Generic.LaurentPolynomialRing(R, s, cached = cached)
-end
-
-function LaurentPolynomialRing(R::Ring, s::Char; cached::Bool = true)
-   return Generic.LaurentPolynomialRing(R, Symbol(s), cached = cached)
-end
-
-function LaurentPolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
-   return Generic.LaurentPolynomialRing(R, Symbol(s), cached = cached)
-end
-
+LaurentPolynomialRing(R::Ring, s::VarName; cached::Bool = true) =
+   Generic.LaurentPolynomialRing(R, Symbol(s); cached)
