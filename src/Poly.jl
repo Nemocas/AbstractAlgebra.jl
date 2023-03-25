@@ -338,7 +338,7 @@ end
 #
 ###############################################################################
 
-function similar(x::PolyRingElem, R::Ring, s::Symbol=var(parent(x)); cached::Bool=true)
+function similar(x::PolyRingElem, R::Ring, s::Symbol; cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.Poly{TT}(V)
@@ -353,29 +353,17 @@ function similar(x::PolyRingElem, R::Ring, s::Symbol=var(parent(x)); cached::Boo
    return p
 end
 
-function similar(x::PolyRingElem, var::Symbol=var(parent(x)); cached::Bool=true)
-   return similar(x, base_ring(x), var; cached=cached)
-end
+similar(x::PolyRingElem, R::Ring, var::VarName=var(parent(x)); cached::Bool=true) =
+   similar(x, R, Symbol(var); cached)
 
-function similar(x::PolyRingElem, R::Ring, var::String; cached::Bool=true)
-   return similar(x, R, Symbol(var); cached=cached)
-end
+similar(x::PolyRingElem, var::VarName=var(parent(x)); cached::Bool=true) =
+   similar(x, base_ring(x), Symbol(var); cached)
 
-function similar(x::PolyRingElem, var::String; cached::Bool=true)
-   return similar(x, base_ring(x), Symbol(var); cached=cached)
-end
-
-zero(p::PolyRingElem, R::Ring, var::Symbol=var(parent(p)); cached::Bool=true) =
+zero(p::PolyRingElem, R::Ring, var::VarName=var(parent(p)); cached::Bool=true) =
    similar(p, R, var; cached=cached)
 
-zero(p::PolyRingElem, var::Symbol=var(parent(p)); cached::Bool=true) =
+zero(p::PolyRingElem, var::VarName=var(parent(p)); cached::Bool=true) =
    similar(p, base_ring(p), var; cached=cached)
-
-zero(p::PolyRingElem, R::Ring, var::String; cached::Bool=true) =
-   zero(p, R, Symbol(var); cached=cached)
-
-zero(p::PolyRingElem, var::String; cached::Bool=true) =
-   zero(p, base_ring(p), Symbol(var); cached=cached)
 
 ###############################################################################
 #
@@ -383,7 +371,7 @@ zero(p::PolyRingElem, var::String; cached::Bool=true) =
 #
 ###############################################################################
 
-function polynomial(R::Ring, arr::Vector{T}, var::AbstractString="x"; cached::Bool=true) where T
+function polynomial(R::Ring, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    TT = elem_type(R)
    coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.Poly{TT}(coeffs)

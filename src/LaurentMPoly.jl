@@ -123,7 +123,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{T}; cached::Bool = true) where T <: Union{String, Char, Symbol}
+    LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{T}; cached::Bool = true) where T <: VarName
 
 Given a base ring `R` and an array of strings `s` specifying how the
 generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
@@ -133,11 +133,7 @@ depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional
 argument `cached` to `false` will prevent the parent object `T` from being
 cached.
 """
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true)
-   return Generic.LaurentPolynomialRing(R, [Symbol(v) for v in s], cached=cached)
-end
-
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Char}; cached::Bool = true)
+function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::AbstractVector{<:VarName}; cached::Bool = true)
    return Generic.LaurentPolynomialRing(R, [Symbol(v) for v in s], cached=cached)
 end
 
@@ -145,15 +141,6 @@ function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cache
    return Generic.LaurentPolynomialRing(R, s; cached=cached)
 end
 
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::String; cached::Bool = false)
+function LaurentPolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::VarName=:x; cached::Bool = false)
    return Generic.LaurentPolynomialRing(R, [Symbol(s, i) for i=1:n]; cached=cached)
 end
-
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::Char; cached::Bool = false)
-   return Generic.LaurentPolynomialRing(R, [Symbol(s, i) for i=1:n]; cached=cached)
-end
-
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::Symbol=:x; cached::Bool = false)
-   return Generic.LaurentPolynomialRing(R, [Symbol(s, i) for i=1:n], cached = cached)
-end
-
