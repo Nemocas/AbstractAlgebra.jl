@@ -1576,3 +1576,9 @@ end
     R, _ = polynomial_ring(ZZ, Symbol[])
     @test R(1) != R(2)
 end
+
+@testset "Generic.MPoly.exceptions" begin
+   @test_throws MethodError polynomial_ring(Char, [:x])
+   @test_throws Exception mpoly_ring_type(Char)
+   @test_throws ArgumentError mpoly_type(Char)
+end

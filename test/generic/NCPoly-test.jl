@@ -429,3 +429,9 @@ end
    _, x = M['x']
    @test string(M(-1)*x) isa String
 end
+
+@testset "Generic.NCPoly.exceptions" begin
+   @test_throws MethodError polynomial_ring(Char, :x)
+   @test_throws Exception poly_ring_type(Char)
+   @test_throws ArgumentError dense_poly_type(Char)
+end
