@@ -20,29 +20,41 @@ end
 
 @doc md"""
     dense_poly_type(::Type{T}) where T<:NCRingElement
+    dense_poly_type(::T) where T<:NCRingElement
 
 The type of multivariate polynomials with coefficients of type `T`.
 Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
 
 # Examples
-```julia
-dense_poly_type(typeof(ZZ()))
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> dense_poly_type(elem_type(AbstractAlgebra.ZZ))
+AbstractAlgebra.Generic.Poly{BigInt}
+
+julia> dense_poly_type(AbstractAlgebra.ZZ(1))
+AbstractAlgebra.Generic.Poly{BigInt}
 ```
 """
 dense_poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
+dense_poly_type(x) = dense_poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
+dense_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
 
 @doc md"""
     poly_ring_type(::Type{T}) where T<:NCRing
+    poly_ring_type(::T) where T<:NCRing
 
 The type of polynomial rings with coefficients of type `T`.
 Implemented via [`dense_poly_type`](@ref).
 
 # Examples
-```julia
-poly_ring_type(typeof(ZZ))
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> poly_ring_type(typeof(AbstractAlgebra.ZZ))
+AbstractAlgebra.Generic.PolyRing{BigInt}
+
+julia> poly_ring_type(AbstractAlgebra.ZZ)
+AbstractAlgebra.Generic.PolyRing{BigInt}
 ```
 """
-poly_ring_type(::Type{T}) where T<:NCRing = parent_type(dense_poly_type(elem_type(T)))
+poly_ring_type(x) = parent_type(dense_poly_type(elem_type(x)))
 
 @doc Markdown.doc"""
     var(a::NCPolyRing)
