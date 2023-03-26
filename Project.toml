@@ -1,6 +1,6 @@
 name = "AbstractAlgebra"
 uuid = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
-version = "0.28.4"
+version = "0.28.5-DEV"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
