@@ -1543,7 +1543,7 @@ end
 
        c = rand(R, -10:10)
        while rank(c) != 2
-           c = rand(R, -10:10)
+          c = rand(R, -10:10)
        end
 
        @test divexact_left(c*M, c) == M
