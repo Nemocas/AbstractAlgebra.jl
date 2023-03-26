@@ -777,6 +777,7 @@ export deflation
 export degree
 export degrees
 export dense_matrix_type
+export dense_poly_ring_type
 export dense_poly_type
 export derivative
 export det
@@ -997,7 +998,6 @@ export pol_length
 export polcoeff
 export poly
 export poly_ring
-export poly_ring_type
 export PolyCoeffs
 export polynomial
 export polynomial_ring
