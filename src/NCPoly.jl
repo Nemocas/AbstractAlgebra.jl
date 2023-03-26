@@ -25,6 +25,8 @@ end
 The type of multivariate polynomials with coefficients of type `T`.
 Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
 
+See also [`dense_poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
+
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> dense_poly_type(elem_type(AbstractAlgebra.ZZ))
@@ -44,6 +46,8 @@ dense_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subt
 
 The type of polynomial rings with coefficients of type `T`.
 Implemented via [`dense_poly_type`](@ref).
+
+See also [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
