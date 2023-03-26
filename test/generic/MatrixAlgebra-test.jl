@@ -491,23 +491,28 @@ end
    S = MatrixAlgebra(R, 2)
    T = MatrixAlgebra(U, 2)
 
-   M = rand(S, -10:10)
+   for i = 1:50
+       M = rand(S, -10:10)
 
-   @test divexact(5*M, 5) == M
+       @test divexact(5*M, 5) == M
 
-   c = rand(R, 1:10)  # create a regular matrix
-   while rank(c) < nrows(c)
-      c = rand(R, 1:10)
+       c = rand(R, 1:10)  # create a regular matrix
+       while rank(c) < nrows(c)
+          c = rand(R, 1:10)
+       end
+
+       @test divexact_left(c*M, c) == M
+       @test divexact_right(M*c, c) == M
+
+       N = rand(T, 0:5, -10:10)
+       d = rand(U, 0:5, -10:10)
+       while iszero(d) || rank(leading_coefficient(d)) != 2
+          d = rand(U, 0:5, -10:10)
+       end
+
+       @test divexact_left(d*N, d) == N
+       @test divexact_right(N*d, d) == N
    end
-
-   @test divexact_left(c*M, c) == M
-   @test divexact_right(M*c, c) == M
-
-   N = rand(T, 0:5, -10:10)
-   d = rand(U, 0:5, -10:10)
-
-   @test divexact_left(d*N, d) == N
-   @test divexact_right(N*d, d) == N
 end
 
 @testset "Generic.MatAlg.transpose" begin
