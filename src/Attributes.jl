@@ -202,7 +202,8 @@ function get_attribute(G::Any, attr::Symbol, default::Any = nothing)
    return default
 end
 
-# unambiguous version
+# the following method is necessary to disambiguate between the above
+# methods when the default value is a Symbol
 function get_attribute(G::Any, attr::Symbol, default::Symbol)
    D = _get_attributes(G)
    D isa Dict && return get(D, attr, default)
@@ -240,6 +241,8 @@ function get_attribute!(G::Any, attr::Symbol, default::Any)
    return Base.get!(D, attr, default)
 end
 
+# the following method is necessary to disambiguate between the above
+# methods when the default value is a Symbol
 function get_attribute!(G::Any, attr::Symbol, default::Symbol)
    D = _get_attributes!(G)
    return Base.get!(D, attr, default)
