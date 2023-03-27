@@ -19,44 +19,61 @@ coefficient_ring(R::MPolyRing) = base_ring(R)
 @doc md"""
     mpoly_type(::Type{T}) where T<:RingElement
     mpoly_type(::T) where T<:RingElement
+    mpoly_type(::Type{S}) where S<:Ring
+    mpoly_type(::S) where S<:Ring
 
-The type of multivariate polynomials with coefficients of type `T`.
+The type of multivariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
 Falls back to `Generic.MPoly{T}`.
 
 See also [`mpoly_ring_type`](@ref), [`dense_poly_type`](@ref) and [`dense_poly_ring_type`](@ref).
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
+julia> mpoly_type(AbstractAlgebra.ZZ(1))
+AbstractAlgebra.Generic.MPoly{BigInt}
+
 julia> mpoly_type(elem_type(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.MPoly{BigInt}
 
-julia> mpoly_type(AbstractAlgebra.ZZ(1))
+julia> mpoly_type(AbstractAlgebra.ZZ)
+AbstractAlgebra.Generic.MPoly{BigInt}
+
+julia> mpoly_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.MPoly{BigInt}
 ```
 """
 mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
+mpoly_type(::Type{S}) where S<:Ring = mpoly_type(elem_type(S))
 mpoly_type(x) = mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
 
 @doc md"""
-    mpoly_ring_type(::Type{T}) where T<:Ring
-    mpoly_ring_type(::T) where T<:Ring
+    mpoly_ring_type(::Type{T}) where T<:RingElement
+    mpoly_ring_type(::T) where T<:RingElement
+    mpoly_ring_type(::Type{S}) where S<:Ring
+    mpoly_ring_type(::S) where S<:Ring
 
-The type of multivariate polynomial rings with coefficients of type `T`.
-Implemented via [`mpoly_type`](@ref).
+The type of multivariate polynomial rings with coefficients of type `T`
+respectively `elem_type(S)`. Implemented via [`mpoly_type`](@ref).
 
 See also [`dense_poly_type`](@ref) and [`dense_poly_ring_type`](@ref).
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> mpoly_ring_type(typeof(AbstractAlgebra.ZZ))
+julia> mpoly_ring_type(AbstractAlgebra.ZZ(1))
+AbstractAlgebra.Generic.MPolyRing{BigInt}
+
+julia> mpoly_ring_type(elem_type(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.MPolyRing{BigInt}
 
 julia> mpoly_ring_type(AbstractAlgebra.ZZ)
 AbstractAlgebra.Generic.MPolyRing{BigInt}
+
+julia> mpoly_ring_type(typeof(AbstractAlgebra.ZZ))
+AbstractAlgebra.Generic.MPolyRing{BigInt}
 ```
 """
-mpoly_ring_type(x) = parent_type(mpoly_type(elem_type(x)))
+mpoly_ring_type(x) = parent_type(mpoly_type(x))
 
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyRingElem{S}}
    return is_domain_type(S)
