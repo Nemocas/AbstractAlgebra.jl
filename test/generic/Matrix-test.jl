@@ -328,6 +328,9 @@ end
    @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
 
    @test dense_matrix_type(R) == elem_type(S)
+   @test dense_matrix_type(R(1)) == elem_type(S)
+   @test dense_matrix_type(typeof(R)) == elem_type(S)
+   @test dense_matrix_type(typeof(R(1))) == elem_type(S)
 
    @test isa(S(), MatElem)
    @test isa(S(ZZ(1)), MatElem)
