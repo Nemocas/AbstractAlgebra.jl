@@ -4,9 +4,15 @@
 #
 ###############################################################################
 
-export groebner_basis, interreduce!, normal_form, normal_form_weak
+export groebner_basis
 
-import DataStructures.PriorityQueue, DataStructures.enqueue!, DataStructures.dequeue!
+export interreduce!
+
+export normal_form
+
+export normal_form_weak
+
+import DataStructures: PriorityQueue, enqueue!, dequeue!
 
 const groebner_debug_level = 0
 const Monomial = Vector{Int}
@@ -15,7 +21,6 @@ abstract type Obstruction{T} end
 """
 represents the overlap of the leading term of two polynomials
 """
-
 struct ObstructionTriple{T} <: Obstruction{T}
     first_poly::FreeAssAlgElem{T}
     second_poly::FreeAssAlgElem{T}
@@ -57,13 +62,14 @@ function _leading_word(a::FreeAssAlgElem{T}) where {T}
     return a.exps[1]
 end
 
-Markdown.@doc doc"""
+@doc Markdown.doc"""
 gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
 
 If an element of the Groebner basis that is stored in `aut` divides `a`,
 return (true, a1, a2, keyword_index), where `keyword_index` is the index of the
 keyword that divides `a` such that `a = a1 aut[keyword_index] a2`.
-""" function gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
+""" 
+function gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
     match = search(aut, a)
     if isnothing(match)
         return (false, [], [], -1)
@@ -77,12 +83,13 @@ keyword that divides `a` such that `a = a1 aut[keyword_index] a2`.
 end
 
 # implementation of the normal form function using aho corasick to check for all groebner basis elements in parallel
-Markdown.@doc doc"""
+@doc Markdown.doc"""
     normal_form(f::FreeAssAlgElem{T}, g::Vector{FreeAssAlgElem{T}}, aut::AhoCorasickAutomaton)
 
 Assuming `g` is a groebner basis and `aut` an Aho-Corasick automaton for the elements of `g`,
 compute the normal form of `f` with respect to `g`
-""" function normal_form(
+""" 
+function normal_form(
     f::FreeAssAlgElem{T},
     g::Vector{FreeAssAlgElem{T}},
     aut::AhoCorasickAutomaton,
@@ -159,13 +166,14 @@ function normal_form_weak(
     return f
 end
 
-Markdown.@doc doc"""
+@doc Markdown.doc"""
     interreduce!(g::Vector{FreeAssAlgElem{T}})
 
 Interreduce a given Groebner basis with itself, i.e. compute the normal form of each
 element of `g` with respect to the rest of the elements and discard elements with
 normal form $0$ and duplicates.
-""" function interreduce!(g::Vector{FreeAssAlgElem{T}}) where {T}
+""" 
+function interreduce!(g::Vector{FreeAssAlgElem{T}}) where {T}
     i = 1
     while length(g) > 1 && length(g) >= i
         aut = AhoCorasickAutomaton([g_j.exps[1] for g_j in g[1:end .!= i]])
@@ -604,7 +612,7 @@ function groebner_basis_buchberger(
     return g
 end
 
-Markdown.@doc doc"""
+@doc Markdown.doc"""
     groebner_basis(g::Vector{FreeAssAlgElem{T}}, reduction_bound = typemax(Int)::Int)
 
 Compute a groebner basis for the ideal spanned by g. Stop when `reduction_bound` many

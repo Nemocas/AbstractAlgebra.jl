@@ -4,26 +4,39 @@
 #
 ###############################################################################
 
-export search,
-    AhoCorasickAutomaton, insert_keyword!, aho_corasick_automaton, AhoCorasickMatch#, Word
-import DataStructures.Queue, DataStructures.enqueue!, DataStructures.dequeue!
+export aho_corasick_automaton
+
+export AhoCorasickAutomaton
+
+export AhoCorasickMatch
+
+export insert_keyword!
+
+export search
+
+#export Word
+#
+import DataStructures: Queue, enqueue!, dequeue!
 
 const Word = Vector{Int}
 
-Markdown.@doc doc"""
+@doc Markdown.doc"""
     AhoCorasickAutomaton
 
 An Aho-Corasick automaton, which can be used to efficiently search for a fixed list of keywords (vectors of Ints) in
 arbitrary lists of integers
 
 # Examples:
-```jldoctest; setup = :(using AbstractAlgebra.Generic)
-julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]]
-julia> aut = aho_corasick_automaton(keywords)
-julia> search(aut, [10, 4, 1, 2, 3, 4])
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]];
+
+julia> aut = Generic.aho_corasick_automaton(keywords);
+
+julia> Generic.search(aut, [10, 4, 1, 2, 3, 4])
 AhoCorasickMatch(6, 1, [1, 2, 3, 4])
 ```
-""" mutable struct AhoCorasickAutomaton
+""" 
+mutable struct AhoCorasickAutomaton
     goto::Vector{Dict{Int,Int}}
     fail::Vector{Int}
     """
@@ -34,33 +47,36 @@ AhoCorasickMatch(6, 1, [1, 2, 3, 4])
     output::Vector{Tuple{Int,Word}}
 end
 
-Markdown.@doc doc"""
+@doc Markdown.doc"""
     AhoCorasickMatch(last_position::Int, keyword_index::Int, keyword::Vector{Int})
 
 The return value of searching in a given word with an AhoCorasickAutomaton. Contains the position of the last letter in
 the word that matches a keyword in the automaton, an index of the keyword that was matched and the keyword itself.
 
 # Examples:
-```jldoctest; setup = :(using AbstractAlgebra.Generic)
-julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]]
-julia> aut = aho_corasick_automaton(keywords)
-julia> search(aut, [10, 4, 1, 2, 3, 4])
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]];
+
+julia> aut = Generic.aho_corasick_automaton(keywords);
+
+julia> Generic.search(aut, [10, 4, 1, 2, 3, 4]);
 AhoCorasickMatch(6, 1, [1, 2, 3, 4])
 
-julia> search(aut, [10, 4, 1, 2, 3, 4]).last_position
+julia> Generic.search(aut, [10, 4, 1, 2, 3, 4]).last_position
 6
 
-julia> search(aut, [10, 4, 1, 2, 3, 4]).keyword_index
+julia> Generic.search(aut, [10, 4, 1, 2, 3, 4]).keyword_index
 1
 
-julia> search(aut, [10, 4, 1, 2, 3, 4]).keyword
+julia> Generic.search(aut, [10, 4, 1, 2, 3, 4]).keyword
 4-element Vector{Int64}:
  1
  2
  3
  4
 
-""" struct AhoCorasickMatch
+""" 
+struct AhoCorasickMatch
     last_position::Int
     keyword_index::Int
     keyword::Word
@@ -112,10 +128,9 @@ end
 function enter!(automaton::AhoCorasickAutomaton, keyword::Word, current_index)
     current_state = 1
     for c in keyword
-        new_state = get!(automaton.goto[current_state], c) do
+        current_state = get!(automaton.goto[current_state], c) do
             new_state!(automaton)
         end
-        current_state = new_state
     end
     if automaton.output[current_state][1] > current_index
         automaton.output[current_state] = (current_index, keyword)
@@ -153,22 +168,24 @@ function construct_fail!(automaton::AhoCorasickAutomaton)
     end
 end
 
-Markdown.@doc doc"""
+@doc Markdown.doc"""
     insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
 
 Insert a new keyword into a given Aho-Corasick automaton to avoid having to rebuild the entire
 automaton.
-""" function insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
+""" 
+function insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
     enter!(aut, keyword, index)
     aut.fail = ones(Int, length(aut.goto))
     construct_fail!(aut)
 end
 
-Markdown.@doc doc"""
+@doc Markdown.doc"""
     search(automaton::AhoCorasickAutomaton, word)
 
 Search for the first occurrence of a keyword that is stored in `automaton` in the given `word`.
-""" function search(automaton::AhoCorasickAutomaton, word)
+""" 
+function search(automaton::AhoCorasickAutomaton, word)
     current_state = 1
     result = AhoCorasickMatch(typemax(Int), typemax(Int), [])
     for i = 1:length(word)
