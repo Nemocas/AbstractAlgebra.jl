@@ -1161,13 +1161,11 @@ end
 ###############################################################################
 
 mutable struct CompositeMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.SetMap, CompositeMap}
-   domain::D
-   codomain::C
    map1::AbstractAlgebra.Map
    map2::AbstractAlgebra.Map
 
    function CompositeMap(map1, map2)
-     return new{typeof(domain(map1)), typeof(codomain(map2))}(domain(map1), codomain(map2), map1, map2)
+     return new{typeof(domain(map1)), typeof(codomain(map2))}(map1, map2)
    end
 end
 
@@ -1200,14 +1198,12 @@ end
 ###############################################################################
 
 mutable struct FunctionalCompositeMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.FunctionalMap, FunctionalCompositeMap}
-   domain::D
-   codomain::C
    map1::AbstractAlgebra.Map
    map2::AbstractAlgebra.Map
    fn_cache::Function
 
    function FunctionalCompositeMap(map1::Map(AbstractAlgebra.FunctionalMap){D, U}, map2::Map(AbstractAlgebra.FunctionalMap){U, C}) where {D, U, C}
-      return new{D, C}(domain(map1), codomain(map2), map1, map2)
+      return new{D, C}(map1, map2)
    end
 end
 
