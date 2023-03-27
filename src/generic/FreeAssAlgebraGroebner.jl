@@ -6,8 +6,7 @@
 
 export groebner_basis, interreduce!, normal_form, normal_form_weak
 
-#using DataStructures
-import DataStructures.PriorityQueue
+import DataStructures.PriorityQueue, DataStructures.enqueue!, DataStructures.dequeue!
 
 const groebner_debug_level = 0
 const Monomial = Vector{Int}
