@@ -3,6 +3,9 @@
 
    f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
 
+   @test domain(f) == M
+   @test codomain(f) == M
+
    @test isa(f, Generic.Map(FunctionalMap))
 
    m = M([ZZ(1), ZZ(2)])
@@ -119,6 +122,8 @@ end
       N = randmat_with_rank(S, n, -10:10)
       f = ModuleIsomorphism(M, M, N)
 
+      @test domain(f) == M
+      @test codomain(f) == M
       @test mat(f) == N
       @test N*inverse_mat(f) == 1
 

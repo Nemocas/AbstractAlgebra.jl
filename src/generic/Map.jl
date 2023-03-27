@@ -41,7 +41,8 @@ end
 
 (f::IdentityMap)(a) = a
 
-codomain(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, C}) where {D, C} = domain(f)
+domain(f::IdentityMap) = f.domain
+codomain(f::IdentityMap) = f.domain
 
 function show(io::IO, M::IdentityMap)
    println(io, "Identity map with")
@@ -74,7 +75,9 @@ Base.inv(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap)) = f
 #
 ################################################################################
 
-image_fn(f::AbstractAlgebra.Map(AbstractAlgebra.FunctionalMap)) = get_field(f, :image_fn)
+domain(f::FunctionalMap) = f.domain
+codomain(f::FunctionalMap) = f.codomain
+image_fn(f::FunctionalMap) = f.image_fn
 
 function (f::FunctionalMap{D, C})(a) where {D, C}
    parent(a) != domain(f) && throw(DomainError(f))
@@ -98,6 +101,9 @@ end
 #  FunctionalCompositeMap
 #
 ################################################################################
+
+domain(f::FunctionalCompositeMap) = domain(f.map1)
+codomain(f::FunctionalCompositeMap) = codomain(f.map2)
 
 # This is a device to prevent Julia trying to compute
 # the types of a very long composition of closures
