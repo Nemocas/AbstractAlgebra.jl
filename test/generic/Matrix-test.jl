@@ -119,8 +119,7 @@ end
 
    S = matrix_space(R, 3, 3)
 
-   @test matrix_space(R, 3, 3, cached = false) !== matrix_space(R, 3, 3, cached = false)
-   @test matrix_space(R, 3, 3, cached = true) === matrix_space(R, 3, 3, cached = true)
+   @test S === matrix_space(R, 3, 3)
 
    @test elem_type(S) == Generic.MatSpaceElem{elem_type(R)}
    @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}

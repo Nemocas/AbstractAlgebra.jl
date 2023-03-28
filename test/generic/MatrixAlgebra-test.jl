@@ -18,8 +18,7 @@ end
    R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
-   @test MatrixAlgebra(R, 3, cached = false) !== MatrixAlgebra(R, 3, cached = false)
-   @test MatrixAlgebra(R, 3, cached = true) === MatrixAlgebra(R, 3, cached = true)
+   @test S === MatrixAlgebra(R, 3)
 
    @test elem_type(S) == Generic.MatAlgElem{elem_type(R)}
    @test elem_type(Generic.MatAlgebra{elem_type(R)}) == Generic.MatAlgElem{elem_type(R)}

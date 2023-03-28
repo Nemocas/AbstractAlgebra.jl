@@ -15,12 +15,11 @@ parent_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = MatAlgebra{T}
 elem_type(::Type{MatAlgebra{T}}) where {T <: NCRingElement} = MatAlgElem{T}
 
 @doc Markdown.doc"""
-    parent(a::MatAlgElem{T}, cached::Bool = true) where T <: NCRingElement
+    parent(a::MatAlgElem{T}) where T <: NCRingElement
 
 Return the parent object of the given matrix.
 """
-parent(a::MatAlgElem{T}, cached::Bool = true) where T <: NCRingElement =
-    MatAlgebra{T}(a.base_ring, size(a.entries)[1], cached)
+parent(a::MatAlgElem{T}) where T <: NCRingElement = MatAlgebra{T}(a.base_ring, size(a.entries)[1])
 
 is_exact_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = is_exact_type(T)
 
@@ -214,8 +213,10 @@ end
 ###############################################################################
 
 function MatrixAlgebra(R::AbstractAlgebra.NCRing, n::Int; cached::Bool = true)
+   # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
+   # (and perhaps future compatibility, in case we need it again)
    T = elem_type(R)
-   return MatAlgebra{T}(R, n, cached)
+   return MatAlgebra{T}(R, n)
 end
 
 

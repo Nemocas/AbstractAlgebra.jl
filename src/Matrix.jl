@@ -7001,15 +7001,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
+    matrix_space(R::NCRing, r::Int, c::Int)
 
 Return parent object corresponding to the space of $r\times c$ matrices over
-the ring $R$. If `cached == true` (the default), the returned parent object
-is cached so that it can returned by future calls to the constructor with the
-same dimensions and base ring.
+the ring $R$.
 """
-function matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
-   return Generic.matrix_space(R, r, c, cached=cached)
+function matrix_space(R::NCRing, r::Int, c::Int)
+   return Generic.matrix_space(R, r, c)
 end
 
 ###############################################################################

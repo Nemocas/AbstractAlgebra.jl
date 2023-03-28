@@ -61,12 +61,10 @@ In order to construct matrices in AbstractAlgebra.jl, one must construct the
 matrix algebra itself. This is accomplished with the following constructor.
 
 ```julia
-MatrixAlgebra(R::Ring, degree::Int; cache::Bool=true)
+MatrixAlgebra(R::Ring, degree::Int)
 ```
 
-Construct the algebra of matrices with the given degree over the given base ring. By
-default such matrix spaces are cached based on the base ring and degree. If the
-optional named parameter `cached` is set to false, no caching occurs.
+Construct the algebra of matrices with the given degree over the given base ring.
 
 Here are some examples of creating matrix algebras and making use of the
 resulting parent objects to coerce various elements into the matrix algebra.

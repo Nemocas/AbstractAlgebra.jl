@@ -66,13 +66,11 @@ creation of matrix algebras separately in a dedicated section elsewhere in the
 documentation.
 
 ```julia
-matrix_space(R::Ring, rows::Int, cols::Int; cache::Bool=true)
+matrix_space(R::Ring, rows::Int, cols::Int)
 ```
 
 Construct the space of matrices with the given number of rows and columns over the
-given base ring. By default such matrix spaces are cached based on the base ring and
-numbers of rows and columns. If the optional named parameter `cached` is set to false,
-no caching occurs.
+given base ring.
 
 Here are some examples of creating matrix spaces and making use of the
 resulting parent objects to coerce various elements into the matrix space.
