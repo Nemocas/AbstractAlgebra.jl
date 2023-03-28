@@ -1,5 +1,6 @@
 include("AhoCorasick-test.jl")
 using AbstractAlgebra.Generic: AhoCorasickAutomaton
+import AbstractAlgebra.Generic: normal_form_weak
 @testset "Generic.FreeAssAlgebra.groebner" begin
  
     R, (x, y, u, v, t, s) = FreeAssociativeAlgebra(GF(2), ["x", "y", "u", "v", "t", "s"])
