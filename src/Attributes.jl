@@ -285,7 +285,7 @@ The name of the function is used as name for the underlying attribute.
 
 Effectively, this turns code like this:
 ```julia
-@attr function RetType myattr(obj::Foo)
+@attr RetType function myattr(obj::Foo)
    # ... expensive computation
    return result
 end
