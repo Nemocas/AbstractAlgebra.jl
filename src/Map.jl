@@ -17,11 +17,6 @@ function domain end
 function codomain end
 function image_fn end
 
-domain(f::Map) = f.domain # fallback, FIXME: to be removed eventually
-codomain(f::Map) = f.codomain # fallback, FIXME: to be removed eventually
-image_fn(f::Map) = f.image_fn # fallback, FIXME: to be removed eventually
-
-
 function check_composable(a::Map, b::Map)
    codomain(a) != domain(b) && error("Incompatible maps")
 end
