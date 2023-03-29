@@ -1360,8 +1360,9 @@ end
 Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the
 multivariate polynomial ring.
 """
-polynomial_ring_only(R::T, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
-   mpoly_ring_type(T)(R, s, ordering, cached)
+polynomial_ring_only(R::T, s::Vector{Symbol};
+      ordering::Symbol=:lex, cached::Bool=true, generic::Bool=false) where T<:Ring =
+   (generic ? Generic : AbstractAlgebra).mpoly_ring_type(T)(R, s, ordering, cached)
 
 # Alternative constructors
 

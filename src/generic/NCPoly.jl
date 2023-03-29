@@ -14,6 +14,8 @@ parent_type(::Type{NCPoly{T}}) where T <: NCRingElem = NCPolyRing{T}
 
 elem_type(::Type{NCPolyRing{T}}) where T <: NCRingElem = NCPoly{T}
 
+dense_poly_ring_type(::Type{T}) where T <: NCRing = NCPolyRing{elem_type(T)}
+
 ###############################################################################
 #
 #   Basic manipulation

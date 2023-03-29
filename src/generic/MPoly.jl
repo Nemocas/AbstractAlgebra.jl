@@ -18,6 +18,8 @@ elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
 base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
+mpoly_ring_type(::Type{T}) where T <: Ring = MPolyRing{elem_type(T)}
+
 @doc Markdown.doc"""
     symbols(a::MPolyRing)
 
@@ -4120,3 +4122,5 @@ function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: Rin
    z = combine_like_terms!(z)
    return z
 end
+
+polynomial_ring(args...; kw...) = AbstractAlgebra.polynomial_ring(args...; kw..., generic=true)

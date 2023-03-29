@@ -750,8 +750,8 @@ end
 Like [`polynomial_ring(R::NCRing, s::Symbol)`](@ref) but return only the
 polynomial ring.
 """
-polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
-   dense_poly_ring_type(T)(R, s, cached)
+polynomial_ring_only(R::T, s::Symbol; cached::Bool=true, generic::Bool=false) where T<:NCRing =
+   (generic ? Generic : AbstractAlgebra).dense_poly_ring_type(T)(R, s, cached)
 
 # Simplified constructor
 

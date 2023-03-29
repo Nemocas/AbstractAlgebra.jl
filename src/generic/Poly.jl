@@ -14,6 +14,8 @@ parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 
 elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
+dense_poly_ring_type(::Type{T}) where T <: Ring = PolyRing{elem_type(T)}
+
 ###############################################################################
 #
 #   Basic manipulation
