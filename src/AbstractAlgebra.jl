@@ -266,6 +266,7 @@ export RealField
 export RelPowerSeriesRingElem
 export ResElem
 export ResidueRing
+export Ring
 export RingElem
 export RingElement
 export SeriesElem
