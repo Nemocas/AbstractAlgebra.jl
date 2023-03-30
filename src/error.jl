@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-mutable struct NotImplementedError <: Exception
+struct NotImplementedError <: Exception
   head::Symbol
   args::Tuple
 end
@@ -25,7 +25,7 @@ function Base.showerror(io::IO, e::NotImplementedError)
 end
 
 
-mutable struct NotInvertibleError{T, S} <: Exception
+struct NotInvertibleError{T, S} <: Exception
   data::T   # element that could not be inverted
   mod::S    # ring or modulus with respect to which it could not be inverted
 end
@@ -51,7 +51,7 @@ function Base.showerror(io::IO, e::NotInvertibleError)
 end
 
 
-mutable struct ErrorConstrDimMismatch <: Exception
+struct ErrorConstrDimMismatch <: Exception
   expect_r::Int
   expect_c::Int
   get_r::Int
