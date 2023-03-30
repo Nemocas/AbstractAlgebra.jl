@@ -254,7 +254,7 @@ function gen(S::UniversalPolyRing{T, U}, s::Symbol) where {T <: RingElement, U <
    i = findfirst(x->x==s, S.S)
    if typeof(i) == Nothing
       push!(S.S, s)
-      S.mpoly_ring = polynomial_ring(base_ring(S), S.S; cached=true, ordering=S.ord)[1]
+      S.mpoly_ring = MPolyRing{T}(S.base_ring, S.S, S.ord, false)
       i = length(S.S)
    end
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
