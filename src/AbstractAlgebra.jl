@@ -24,7 +24,7 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
                   :inv, :log, :exp, :sqrt, :div, :divrem,
                   :numerator, :denominator,
                   :promote_rule,
-                  :Set, :Module, :Ring, :Group, :Field]
+                  :Set, :Module, :Group]
 
 # If you want to add methods to functions in LinearAlgebra they should be
 # imported here and in Generic.jl, and exported below.
