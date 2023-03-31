@@ -15,12 +15,11 @@ parent_type(::Type{S}) where {T <: NCRingElement, S <: Mat{T}} = MatSpace{T}
 elem_type(::Type{MatSpace{T}}) where {T <: NCRingElement} = MatSpaceElem{T}
 
 @doc Markdown.doc"""
-    parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: NCRingElement
+    parent(a::AbstractAlgebra.MatElem{T}) where T <: NCRingElement
 
 Return the parent object of the given matrix.
 """
-parent(a::Mat{T}, cached::Bool = true) where T <: NCRingElement =
-    MatSpace{T}(a.base_ring, size(a.entries)..., cached)
+parent(a::Mat{T}) where T <: NCRingElement = MatSpace{T}(a.base_ring, size(a.entries)...)
 
 dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 
@@ -223,6 +222,8 @@ end
 ###############################################################################
 
 function matrix_space(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
+   # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
+   # (and perhaps future compatibility, in case we need it again)
    T = elem_type(R)
-   return MatSpace{T}(R, r, c, cached)
+   return MatSpace{T}(R, r, c)
 end

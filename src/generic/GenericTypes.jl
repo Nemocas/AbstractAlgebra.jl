@@ -1038,19 +1038,16 @@ const NCRingElement = Union{NCRingElem, RingElement}
 abstract type Mat{T} <: MatElem{T} end
 
 # not really a mathematical ring
-mutable struct MatSpace{T <: NCRingElement} <: AbstractAlgebra.MatSpace{T}
+struct MatSpace{T <: NCRingElement} <: AbstractAlgebra.MatSpace{T}
    nrows::Int
    ncols::Int
    base_ring::NCRing
 
    function MatSpace{T}(R::NCRing, r::Int, c::Int, cached::Bool = true) where T <: NCRingElement
-      return get_cached!(MatDict, (R, r, c), cached) do
-         new{T}(r, c, R)
-      end::MatSpace{T}
+       # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+       new{T}(r, c, R)
    end
 end
-
-const MatDict = CacheDictType{Tuple{NCRing, Int, Int}, MatSpace}()
 
 mutable struct MatSpaceElem{T <: NCRingElement} <: Mat{T}
    entries::Matrix{T}
@@ -1086,18 +1083,14 @@ end
 #
 ###############################################################################
 
-mutable struct MatAlgebra{T <: NCRingElement} <: AbstractAlgebra.MatAlgebra{T}
+struct MatAlgebra{T <: NCRingElement} <: AbstractAlgebra.MatAlgebra{T}
    n::Int
    base_ring::NCRing
 
-   function MatAlgebra{T}(R::NCRing, n::Int, cached::Bool = true) where T <: NCRingElement
-      return get_cached!(MatAlgDict, (R, n), cached) do
-         new{T}(n, R)
-      end::MatAlgebra{T}
+   function MatAlgebra{T}(R::NCRing, n::Int) where T <: NCRingElement
+      new{T}(n, R)
    end
 end
-
-const MatAlgDict = CacheDictType{Tuple{NCRing, Int}, NCRing}()
 
 mutable struct MatAlgElem{T <: NCRingElement} <: AbstractAlgebra.MatAlgElem{T}
    entries::Matrix{T}

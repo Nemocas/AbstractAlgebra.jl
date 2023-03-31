@@ -427,13 +427,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    MatrixAlgebra(R::Ring, n::Int, cached::Bool = true)
+    MatrixAlgebra(R::Ring, n::Int)
 
 Return parent object corresponding to the ring of $n\times n$ matrices over
-the ring $R$. If `cached == true` (the default), the returned parent object
-is cached so that it can returned by future calls to the constructor with the
-same degree and base ring.
+the ring $R$.
 """
-function MatrixAlgebra(R::NCRing, n::Int; cached::Bool = true)
-   Generic.MatrixAlgebra(R, n, cached = cached)
+function MatrixAlgebra(R::NCRing, n::Int)
+   Generic.MatrixAlgebra(R, n)
 end
