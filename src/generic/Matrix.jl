@@ -21,14 +21,21 @@ Return the parent object of the given matrix.
 """
 parent(a::Mat{T}) where T <: NCRingElement = MatSpace{T}(a.base_ring, size(a.entries)...)
 
-dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
-
 @doc Markdown.doc"""
-    dense_matrix_type(R::Ring)
-    
-Return the type of matrices over the given ring.
+    dense_matrix_type(::Type{T}) where T<:NCRingElement
+    dense_matrix_type(::T) where T<:NCRingElement
+    dense_matrix_type(::Type{S}) where S<:NCRing
+    dense_matrix_type(::S) where S<:NCRing
+
+Return the type of matrices with coefficients of type `T` respectively
+`elem_type(S)`.
 """
-dense_matrix_type(R::NCRing) = dense_matrix_type(elem_type(R))
+dense_matrix_type(::T) where T <: NCRing = dense_matrix_type(elem_type(T))
+dense_matrix_type(::T) where T <: NCRingElement = dense_matrix_type(T)
+dense_matrix_type(::Type{T}) where T <: NCRing = dense_matrix_type(elem_type(T))
+
+# default: MatSpaceElem
+dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 
 ###############################################################################
 #
