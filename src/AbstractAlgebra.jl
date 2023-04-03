@@ -8,8 +8,6 @@ module AbstractAlgebra
 using Random: SamplerTrivial, GLOBAL_RNG
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 
-using Markdown
-
 using InteractiveUtils
 
 using Test # for "interface-conformance" functions

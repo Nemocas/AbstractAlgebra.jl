@@ -1,7 +1,5 @@
 module PrettyPrinting
 
-using Markdown
-
 import ..AbstractAlgebra: RingElem, NCRingElem, MatrixElem
 
 using ..AbstractAlgebra
