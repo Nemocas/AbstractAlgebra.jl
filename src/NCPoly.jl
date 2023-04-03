@@ -18,7 +18,7 @@ function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S
    return is_exact_type(S)
 end
 
-@doc md"""
+@doc raw"""
     dense_poly_type(::Type{T}) where T<:NCRingElement
     dense_poly_type(::T) where T<:NCRingElement
     dense_poly_type(::Type{S}) where S<:NCRing
@@ -49,7 +49,7 @@ dense_poly_type(::Type{S}) where S<:NCRing = dense_poly_type(elem_type(S))
 dense_poly_type(x) = dense_poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 dense_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
 
-@doc md"""
+@doc raw"""
     dense_poly_ring_type(::Type{T}) where T<:NCRingElement
     dense_poly_ring_type(::T) where T<:NCRingElement
     dense_poly_ring_type(::Type{S}) where S<:NCRing
@@ -744,7 +744,7 @@ function polynomial_ring(R::NCRing, s::Symbol; kw...)
    (S, gen(S))
 end
 
-@doc md"""
+@doc raw"""
     polynomial_ring_only(R::NCRing, s::Symbol; cached::Bool=true)
 
 Like [`polynomial_ring(R::NCRing, s::Symbol)`](@ref) but return only the

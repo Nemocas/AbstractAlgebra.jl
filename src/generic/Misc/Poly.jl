@@ -48,7 +48,7 @@ end
 #
 ################################################################################
 
-@doc doc"""
+@doc raw"""
     roots(f::PolyRingElem)
 
 Returns the roots of the polynomial `f` in the base ring of `f` as an array.
@@ -64,7 +64,7 @@ function roots(f::PolyRingElem)
     return rts
 end
 
-@doc doc"""
+@doc raw"""
     roots(f::PolyRingElem, R::Field)
 
 Returns the roots of the polynomial `f` in the field `R` as an array.

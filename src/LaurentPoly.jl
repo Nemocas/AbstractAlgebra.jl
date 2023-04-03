@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc doc"""
+@doc raw"""
     LaurentPolynomialRing(R::Ring, s::VarName)
 
 Given a base ring `R` and string `s` specifying how the generator (variable)

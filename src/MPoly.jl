@@ -16,7 +16,7 @@ coefficient_ring(a::MPolyRingElem) = base_ring(a)
 
 coefficient_ring(R::MPolyRing) = base_ring(R)
 
-@doc md"""
+@doc raw"""
     mpoly_type(::Type{T}) where T<:RingElement
     mpoly_type(::T) where T<:RingElement
     mpoly_type(::Type{S}) where S<:Ring
@@ -47,7 +47,7 @@ mpoly_type(::Type{S}) where S<:Ring = mpoly_type(elem_type(S))
 mpoly_type(x) = mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
 
-@doc md"""
+@doc raw"""
     mpoly_ring_type(::Type{T}) where T<:RingElement
     mpoly_ring_type(::T) where T<:RingElement
     mpoly_ring_type(::Type{S}) where S<:Ring
@@ -1354,7 +1354,7 @@ function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
    (S, gens(S))
 end
 
-@doc md"""
+@doc raw"""
     polynomial_ring_only(R::Ring, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Bool=true)
 
 Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the
