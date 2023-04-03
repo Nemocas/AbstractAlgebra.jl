@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     SymmetricGroup{T<:Integer}
 
 The full symmetric group singleton type.
@@ -42,7 +42,7 @@ end
 
 SymmetricGroup(n::Integer) = SymmetricGroup{typeof(n)}(n)
 
-@doc Markdown.doc"""
+@doc raw"""
     AllPerms(n::T) where T
 
 Return an iterator over arrays representing all permutations of `1:n`.
@@ -64,7 +64,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Partition(part::Vector{<:Integer}[, check::Bool=true]) <: AbstractVector{Int}
 
 Represent integer partition in the non-increasing order.
@@ -105,7 +105,7 @@ struct Partition{T} <: AbstractVector{T}
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     AllParts(n::Integer)
 
 Return an iterator over all integer Partitions of `n`.
@@ -156,7 +156,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     SkewDiagram(lambda::Partition, mu::Partition) <: AbstractMatrix{Int}
 
 Implements a skew diagram, i.e. a difference of two Young diagrams
@@ -203,7 +203,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractMatrix{Int}
 
 Return the Young tableaux of partition `part`, filled linearly

@@ -403,7 +403,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_square(a::RationalFunctionFieldElem)
 
 Return `true` if $a$ is a square.
@@ -412,7 +412,7 @@ function is_square(a::RationalFunctionFieldElem)
    return is_square(data(a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.sqrt(a::RationalFunctionFieldElem; check::Bool=true)
 
 Return the square root of $a$. By default the function will throw an exception
@@ -429,7 +429,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
 
 Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define

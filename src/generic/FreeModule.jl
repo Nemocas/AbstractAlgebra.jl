@@ -29,14 +29,14 @@ function check_parent(m1::FreeModuleElem{T}, m2::FreeModuleElem{T}) where T <: U
     parent(m1) !== parent(m2) && error("Incompatible free modules")
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
 
 Return the rank of the given free module.
 """
 rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
 
-@doc Markdown.doc"""
+@doc raw"""
     dim(M::FreeModule{T}) where T <: FieldElement
 
 Return the dimension of the given vector space.

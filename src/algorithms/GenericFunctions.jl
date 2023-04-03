@@ -40,7 +40,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     divrem(f::T, g::T) where T <: RingElem
 
 Return a pair `q, r` consisting of the Euclidean quotient and remainder of $f$
@@ -50,7 +50,7 @@ function Base.divrem(a::T, b::T) where T <: RingElem
   throw(NotImplementedError(:divrem, a, b))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     mod(f::T, g::T) where T <: RingElem
 
 Return the Euclidean remainder of $f$ by $g$. A `DivideError` should be thrown
@@ -68,7 +68,7 @@ function mod(a::T, b::T) where T <: RingElem
    return divrem(a, b)[2]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     div(f::T, g::T) where T <: RingElem
 
 Return the Euclidean quotient of $f$ by $g$. A `DivideError` should be thrown
@@ -78,7 +78,7 @@ function Base.div(a::T, b::T) where T <: RingElem
    return divrem(a, b)[1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     mulmod(f::T, g::T, m::T) where T <: RingElem
 
 Return `mod(f*g, m)` but possibly computed more efficiently.
@@ -107,7 +107,7 @@ function internal_powermod(a, n, m)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     powermod(f::T, e::Int, m::T) where T <: RingElem
 
 Return `mod(f^e, m)` but possibly computed more efficiently.
@@ -127,7 +127,7 @@ function powermod(a::T, n::Integer, m::T) where T <: RingElem
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     invmod(f::T, m::T) where T <: RingElem
 
 Return an inverse of $f$ modulo $m$, meaning that `isone(mod(invmod(f,m)*f,m))`
@@ -141,7 +141,7 @@ function invmod(a::T, m::T) where T <: RingElem
    return mod(s, m)  # gcdinv has no canonicity requirement on s
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     divides(f::T, g::T) where T <: RingElem
 
 Return a pair, `flag, q`, where `flag` is set to `true` if $g$ divides $f$, in which
@@ -157,7 +157,7 @@ function divides(a::T, b::T) where T <: RingElem
    return iszero(r), q
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     remove(f::T, p::T) where T <: RingElem
 
 Return a pair `v, q` where $p^v$ is the highest power of $p$ dividing $f$ and $q$ is
@@ -181,7 +181,7 @@ function remove(a::T, b::T) where T <: Union{RingElem, Number}
    return v, a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     valuation(f::T, p::T) where T <: RingElem
 
 Return `v` where $p^v$ is the highest power of $p$ dividing $f$.
@@ -192,7 +192,7 @@ function valuation(a::T, b::T) where T <: Union{RingElem, Number}
    return remove(a, b)[1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(a::T, b::T) where T <: RingElem
 
 Return a greatest common divisor of $a$ and $b$, i.e., an element $g$
@@ -212,7 +212,7 @@ function gcd(a::T, b::T) where T <: RingElem
    return iszero(a) ? a : divexact(a, canonical_unit(a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(fs::AbstractArray{<:T}) where T <: RingElem
 
 Return a greatest common divisor of the elements in `fs`.
@@ -223,7 +223,7 @@ function gcd(fs::AbstractArray{<:T}) where T <: RingElem
    return reduce(gcd, fs)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(f::T, g::T, hs::T...) where T <: RingElem
 
 Return a greatest common divisor of $f$, $g$ and the elements in `hs`.
@@ -232,7 +232,7 @@ function gcd(f::T, g::T, hs::T...) where T <: RingElem
    return gcd(f, gcd(g, hs...))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd_with_cofactors(a::T, b::T) where T <: RingElem
 
 Return a tuple `(g, abar, bbar)` consisting of `g = gcd(a, b)` and cofactors
@@ -247,7 +247,7 @@ function gcd_with_cofactors(a::T, b::T) where T <: RingElement
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lcm(f::T, g::T) where T <: RingElem
 
 Return a least common multiple of $f$ and $g$, i.e., an element $d$
@@ -260,7 +260,7 @@ function lcm(a::T, b::T) where T <: RingElem
    return a*divexact(b, g)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lcm(fs::AbstractArray{<:T}) where T <: RingElem
 
 Return a least common multiple of the elements in `fs`.
@@ -271,7 +271,7 @@ function lcm(fs::AbstractArray{<:T}) where T <: RingElem
    return reduce(lcm, fs)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lcm(f::T, g::T, hs::T...) where T <: RingElem
 
 Return a least common multiple of $f$, $g$ and the elements in `hs`.
@@ -280,7 +280,7 @@ function lcm(f::T, g::T, hs::T...) where T <: RingElem
    return lcm(f, lcm(g, hs...))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gcdx(f::T, g::T) where T <: RingElem
 
 Return a triple `d, s, t` such that $d = gcd(f, g)$ and $d = sf + tg$, with $s$
@@ -311,7 +311,7 @@ function gcdx(a::T, b::T) where T <: RingElem
    return divexact(a, t), divexact(m11, t), divexact(m21, t)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gcdinv(f::T, g::T) where T <: RingElem
 
 Return a tuple `d, s` such that $d = gcd(f, g)$ and $s = (f/d)^{-1} \pmod{g/d}$. Note
@@ -353,7 +353,7 @@ function _crt_stub(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: Ring
     return _crt_with_lcm_stub(r1, m1, r2, m2; check=check)[1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     crt(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
 
 Return an element congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$.
@@ -366,7 +366,7 @@ function crt(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElemen
    return _crt_stub(r1, m1, r2, m2; check=check)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     crt_with_lcm(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
 
 Return a tuple consisting of an element congruent to $r_1$ modulo $m_1$ and
@@ -391,7 +391,7 @@ function _crt_stub(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: Ring
     return _crt_with_lcm_stub(r, m; check=check)[1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     crt(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
 
 Return an element congruent to $r_i$ modulo $m_i$ for each $i$.
@@ -400,7 +400,7 @@ function crt(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElemen
    return _crt_stub(r, m; check=check)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     crt_with_lcm(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
 
 Return a tuple consisting of an element congruent to $r_i$ modulo $m_i$ for
@@ -416,7 +416,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_zero_divisor(a::T) where T <: RingElement
 
 Return `true` if there exists a nonzero $b$ such that $a b = 0$ and
@@ -429,7 +429,7 @@ function is_zero_divisor(a::T) where T <: RingElement
    return is_zero(a) && !is_zero(one(parent(a)))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_zero_divisor_with_annihilator(a::T) where T <: RingElement
 
 Return `(true, b)` if there exists a nonzero $b$ such that $a b = 0$ and
@@ -446,7 +446,7 @@ function is_zero_divisor_with_annihilator(a::T) where T <: RingElement
    return (is_zero(a) && !is_zero(theone), theone)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     factor(a::T)
 
 Return a factorization of the element $a$ as a `Fac{T}`.
@@ -455,7 +455,7 @@ function factor(a)
    throw(NotImplementedError(:factor, a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     factor_squarefree(a::T)
 
 Return a squarefree factorization of the element $a$ as a `Fac{T}`.
@@ -464,7 +464,7 @@ function factor_squarefree(a)
    throw(NotImplementedError(:factor_squarefree, a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_irreducible(a)
 
 Return `true` if $a$ is irreducible, else return `false`.
@@ -473,7 +473,7 @@ function is_irreducible(a)
    throw(NotImplementedError(:is_irreducible, a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_squarefree(a)
 
 Return `true` if $a$ is squarefree, else return `false`.

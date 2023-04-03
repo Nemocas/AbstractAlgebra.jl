@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     total_ring_of_fractions(R::Ring; cached=true)
 
 Return the parent object of the total ring of fractions over the given base

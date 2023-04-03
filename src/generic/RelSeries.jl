@@ -14,7 +14,7 @@ parent_type(::Type{RelSeries{T}}) where T <: RingElement = RelPowerSeriesRing{T}
 
 elem_type(::Type{RelPowerSeriesRing{T}}) where T <: RingElement = RelSeries{T}
 
-@doc Markdown.doc"""
+@doc raw"""
     rel_series_type(::Type{T}) where T <: RingElement
 
 Return the type of a relative series whose coefficients have the given type.
@@ -39,7 +39,7 @@ function polcoeff(a::RelSeries, n::Int)
    return n >= pol_length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(R::RelPowerSeriesRing)
 
 Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where

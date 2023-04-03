@@ -24,7 +24,7 @@ function is_exact_type(a::Type{T}) where {S <: RingElement, T <: FracElem{S}}
    return is_exact_type(S)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     characteristic(R::FracField{T}) where T <: RingElem
 
 Return the characteristic of the given field.
@@ -386,7 +386,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
@@ -405,7 +405,7 @@ function ==(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
            denominator(x, false)*numerator(y, false))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
 
 Return `true` if $x == y$ exactly, otherwise return `false`. This function is
@@ -427,7 +427,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::FracElem, y::Union{Integer, Rational, AbstractFloat})
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -445,14 +445,14 @@ function ==(x::FracElem, y::Rational)
             denominator(x, false)*numerator(y, false))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::FracElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::Union{Integer, Rational, AbstractFloat}, y::FracElem) = y == x
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::FracElem{T}, y::T) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -463,7 +463,7 @@ function ==(x::FracElem{T}, y::T) where {T <: RingElem}
           (numerator(x, false) == denominator(x, false)*y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::T, y::FracElem{T}) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -476,7 +476,7 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.inv(a::FracElem)
 
 Return the inverse of the fraction $a$.
@@ -657,7 +657,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_square(a::FracElem{T}) where T <: RingElem
 
 Return `true` if $a$ is a square.
@@ -666,7 +666,7 @@ function is_square(a::FracElem{T}) where T <: RingElem
    return is_square(numerator(a)) && is_square(denominator(a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.sqrt(a::FracElem{T}; check::Bool=true) where T <: RingElem
 
 Return the square root of $a$. By default the function will throw an
@@ -695,7 +695,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
 
 Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
@@ -722,7 +722,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     remove(z::FracElem{T}, p::T) where {T <: RingElem}
 
 Return the tuple $n, x$ such that $z = p^nx$ where $x$ has valuation $0$ at
@@ -736,7 +736,7 @@ function remove(z::FracElem{T}, p) where {T}
    return w-v, parent(z)(deepcopy(n), deepcopy(d))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     valuation(z::FracElem{T}, p::T) where {T <: RingElem}
 
 Return the valuation of $z$ at $p$.
@@ -942,7 +942,7 @@ rand(S::FracField, v...) = rand(GLOBAL_RNG, S, v...)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     fraction_field(R::Ring; cached=true)
 
 Return the parent object of the fraction field over the given base ring $R$.
@@ -954,7 +954,7 @@ function fraction_field(R::Ring; cached=true)
    return Generic.fraction_field(R; cached=cached)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     FactoredFractionField(R::Ring; cached=true)
 
 Return the parent object of the fraction field over the given base ring $R$,

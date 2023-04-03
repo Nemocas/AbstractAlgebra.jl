@@ -111,7 +111,7 @@ function divides(a::Integer, b::Integer)
    return r == 0, q
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_divisible_by(a::Integer, b::Integer)
 
 Return `true` if $a$ is divisible by $b$, i.e. if there exists $c$ such that
@@ -244,7 +244,7 @@ end
 sqrt_moduli = [3, 5, 7, 8]
 sqrt_residues = [[0, 1], [0, 1, 4], [0, 1, 2, 4], [0, 1, 4]]
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrt(a::T; check::Bool=true) where T <: Integer
 
 Return the square root of $a$. By default the function will throw an exception
@@ -256,7 +256,7 @@ function sqrt(a::T; check::Bool=true) where T <: Integer
    return s
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_square_with_sqrt(a::T) where T <: Integer
 
 Return `(true, s)` if $a$ is a perfect square, where $s^2 = a$. Otherwise
@@ -295,7 +295,7 @@ function is_square_with_sqrt(a::BigInt)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_square(a::T) where T <: Integer
 
 Return true if $a$ is a square.
@@ -333,7 +333,7 @@ function root(a::BigInt, n::Int; check::Bool=true)
     return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     root(a::T, n::Int; check::Bool=true) where T <: Integer
 
 Return the $n$-th root of $a$. If `check=true` the function will test if the
@@ -393,7 +393,7 @@ function ispower_moduli(a::Integer, n::Int)
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_power_with_root(a::T, n::Int) where T <: Integer
 
 Return `true, q` if $a$ is a perfect $n$-th power with $a = q^n$. Otherwise
@@ -418,7 +418,7 @@ function is_power_with_root(a::T, n::Int) where T <: Integer
    return iszero(r) ? (true, T(q)) : (false, zero(T))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_power(a::T, n::Int) where T <: Integer
 
 Return `true` if $a$ is a perfect $n$-th power, i.e. if there is a $b$
@@ -454,7 +454,7 @@ function iroot(a::BigInt, n::Int)
     return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     iroot(a::T, n::Int) where T <: Integer
 
 Return the truncated integer part of the $n$-th root of $a$ (round towards
@@ -475,7 +475,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     exp(a::T) where T <: Integer
 
 Return $1$ if $a = 0$, otherwise throw an exception. This function is not
@@ -486,7 +486,7 @@ function exp(a::T) where T <: Integer
     return T(1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     log(a::T) where T <: Integer
 
 Return $0$ if $a = 1$, otherwise throw an exception. This function is not
@@ -508,7 +508,7 @@ end
 # c*n = a or c = gcd(a, b^infty), n = div(a, c).
 # This is used in various Euclidean domains for Chinese remaindering.
 
-@doc Markdown.doc"""
+@doc raw"""
     ppio(a::T, b::T)
 
 Split $a$ into $c*d$ where $c = gcd(a, b^\infty)$.

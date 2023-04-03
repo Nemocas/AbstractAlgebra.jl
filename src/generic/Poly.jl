@@ -119,7 +119,7 @@ function use_karamul(a::Poly{GFElem{BigInt}}, b::Poly{GFElem{BigInt}})
    return minlen^2*bits > 2000
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where T <: RingElement
 
 Return $a \times b$ using the Karatsuba algorithm recursively for problems of
@@ -138,7 +138,7 @@ function mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where T <: RingEleme
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     mullow_karatsuba(a::Poly{T}, b::Poly{T}, n::Int, cutoff::Int) where T <: RingElement
 
 Return $a \times b$ truncated to $n$ terms using the Karatsuba algorithm

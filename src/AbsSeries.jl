@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     O(a::AbsPowerSeriesRingElem{T}) where T <: RingElement
 
 Return $0 + O(x^\mathrm{deg}(a))$. Usually this function is called with $x^n$
@@ -43,7 +43,7 @@ function isone(a::AbsPowerSeriesRingElem)
    return (length(a) == 1 && isone(coeff(a, 0))) || precision(a) == 0
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::AbsPowerSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to the
@@ -57,7 +57,7 @@ end
 
 is_unit(a::AbsPowerSeriesRingElem) = valuation(a) == 0 && is_unit(coeff(a, 0))
 
-@doc Markdown.doc"""
+@doc raw"""
     valuation(a::AbsPowerSeriesRingElem)
 
 Return the valuation of the given power series, i.e. the degree of the first
@@ -344,7 +344,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     shift_left(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
@@ -374,7 +374,7 @@ function shift_left(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     shift_right(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted right by $n$ terms, i.e. divided by
@@ -403,7 +403,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     truncate(a::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return $a$ truncated to $n$ terms.
@@ -433,7 +433,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ^(a::AbsPowerSeriesRingElem{T}, b::Int) where T <: RingElement
 
 Return $a^b$. We require $b \geq 0$.
@@ -478,7 +478,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
@@ -515,7 +515,7 @@ function ==(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T 
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
@@ -562,7 +562,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::AbsPowerSeriesRingElem{T}, y::T) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -570,14 +570,14 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 ==(x::AbsPowerSeriesRingElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
       ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem} = y == x
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat})
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -585,7 +585,7 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 ==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::AbsPowerSeriesRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -683,7 +683,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.inv(a::AbsPowerSeriesRingElem)
 
 Return the inverse of the power series $a$, i.e. $1/a$.
@@ -748,7 +748,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     compose(a::AbsPowerSeriesRingElem, b::AbsPowerSeriesRingElem)
 
 Compose the series $a$ with the series $b$ and return the result,
@@ -869,7 +869,7 @@ function sqrt_classical(a::AbsPowerSeriesRingElem; check::Bool=true)
    return true, asqrt
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrt(a::AbsPowerSeriesRingElem; check::Bool=true)
 
 Return the square root of the power series $a$. By default the function will
@@ -899,7 +899,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     derivative(f::AbsPowerSeriesRingElem{T})
 
 Return the derivative of the power series $f$.
@@ -916,7 +916,7 @@ function derivative(f::AbsPowerSeriesRingElem{T}) where T <: RingElement
    return g
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     integral(f::AbsPowerSeriesRingElem{T})
 
 Return the integral of the power series $f$.
@@ -942,7 +942,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     exp(a::AbsPowerSeriesRingElem)
 
 Return the exponential of the power series $a$.
@@ -1024,7 +1024,7 @@ function _make_parent(g, p::AbsPowerSeriesRingElem, cached::Bool)
    return power_series_ring(R, max_prec, sym; model=:capped_absolute, cached=cached)[1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     map_coefficients(f, p::SeriesElem{<: RingElement}; cached::Bool=true, parent::PolyRing)
 
 Transform the series `p` by applying `f` on each non-zero coefficient.
@@ -1060,7 +1060,7 @@ function _change_abs_series_ring(R, Rx, cached)
    return P
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     change_base_ring(R::Ring, p::SeriesElem{<: RingElement}; parent::PolyRing)
 
 Return the series obtained by coercing the non-zero coefficients of `p`

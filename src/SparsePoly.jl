@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     SparsePolynomialRing(R::Ring, s::VarName cached::Bool = true)
 
 Given a base ring `R` and a string `s` specifying how the generator

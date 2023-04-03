@@ -130,7 +130,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrt(a::FieldElem)
 
 Return the square root of the element `a`. By default the function will

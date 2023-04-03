@@ -350,7 +350,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.inv(a::TotFrac)
 
 Return the inverse of the fraction $a$ if it exists, otherwise raise an
@@ -602,7 +602,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     total_ring_of_fractions(R::Ring; cached=true)
 
 Return the parent object of the total ring of fractions over the given base

@@ -14,7 +14,7 @@ parent_type(::Type{AbsSeries{T}}) where T <: RingElement = AbsPowerSeriesRing{T}
 
 elem_type(::Type{AbsPowerSeriesRing{T}}) where T <: RingElement = AbsSeries{T}
 
-@doc Markdown.doc"""
+@doc raw"""
     abs_series_type(::Type{T}) where T <: RingElement
 
 Return the type of an absolute series whose coefficients have the given type.
@@ -27,7 +27,7 @@ abs_series_type(::Type{T}) where T <: RingElement = AbsSeries{T}
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(R::AbsPowerSeriesRing{T}) where T <: RingElement
 
 Return the generator of the power series ring, i.e. $x + O(x^n)$ where
@@ -38,7 +38,7 @@ function gen(R::AbsPowerSeriesRing{T}) where T <: RingElement
    return R([S(0), S(1)], 2, max_precision(R))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     max_precision(R::AbsPowerSeriesRing)
 
 Return the maximum absolute precision of power series in the given power

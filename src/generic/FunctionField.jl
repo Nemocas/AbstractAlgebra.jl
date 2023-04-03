@@ -535,7 +535,7 @@ end
 base_ring(R::FunctionFieldElem) = base_ring(parent(R))
 
 # For consistency with number fields in Hecke.jl
-@doc Markdown.doc"""
+@doc raw"""
     base_field(R::FunctionField)
 
 Return the rational function field that the field `R` is an extension of.
@@ -549,7 +549,7 @@ function is_exact_type(a::Type{T}) where {S <: FieldElement, T <: FunctionFieldE
    return is_exact_type(S)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     var(R::FunctionField)
 
 Return the variable name of the generator of the function field `R` as a
@@ -563,7 +563,7 @@ function check_parent(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}, throw::B
    return !fl
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     characteristic(R::FunctionField)
 
 Return the characteristic of the underlying rational function field.
@@ -576,7 +576,7 @@ characteristic(R::FunctionField) = characteristic(base_ring(R))
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     defining_polynomial(R::FunctionField)
     modulus(R::FunctionField)
 
@@ -602,7 +602,7 @@ function trace_precomp_den(R::FunctionField{T}) where T <: FieldElement
    return R.traces_den::dense_poly_type(T)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.numerator(R::FunctionField{T}, canonicalise::Bool=true) where T <: FieldElement
     Base.denominator(R::FunctionField{T}, canonicalise::Bool=true) where T <: FieldElement
 
@@ -625,7 +625,7 @@ function Base.denominator(R::FunctionField{T},
    return R.den::dense_poly_type(T)
 end                 
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.numerator(a::FunctionFieldElem{T}, canonicalise::Bool=true) where T <: FieldElement
     Base.denominator(a::FunctionFieldElem{T}, canonicalise::Bool=true) where T <: FieldElement
 
@@ -657,7 +657,7 @@ function Base.denominator(a::FunctionFieldElem{T},
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(S::FunctionField)
 
 Return the degree of the defining polynomial of the function field, i.e. the
@@ -670,7 +670,7 @@ zero(S::FunctionField) = S()
 
 one(S::FunctionField) = S(1)
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(S::FunctionField{T}) where T <: FieldElement
 
 Return the generator of the function field returned by the function field
@@ -691,7 +691,7 @@ isone(a::FunctionFieldElem) = numerator(a, false) == denominator(a, false)
 
 is_unit(a::FunctionFieldElem) = !iszero(a)
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::FunctionFieldElem)
 
 Return `true` if `a` is the generator of the function field returned by the
@@ -707,7 +707,7 @@ function is_gen(a::FunctionFieldElem)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     coeff(a::FunctionFieldElem, n::Int)
 
 Return the degree `n` coefficient of the element `a` in its polynomial
@@ -722,7 +722,7 @@ function coeff(a::FunctionFieldElem, n::Int)
    return R(n//d)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     num_coeff(a::FunctionFieldElem, n::Int)
 
 Return the degree `n` coefficient of the numerator of the element `a` (in its
@@ -1042,7 +1042,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     norm(a::FunctionFieldElem)
 
 Return the absolute norm of `a` as an element of the underlying rational
@@ -1076,7 +1076,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     tr(a::FunctionFieldElem)
 
 Return the absolute trace of `a` as an element of the underlying rational

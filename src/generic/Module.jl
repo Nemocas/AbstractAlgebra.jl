@@ -16,7 +16,7 @@
   return (v.v)::dense_matrix_type(T)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 Return a vector of all the relations between generators of the given
@@ -25,7 +25,7 @@ whose rows are the returned relations will be in reduced form (hnf/rref).
 """
 rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels::Vector{dense_matrix_type(T)}
 
-@doc Markdown.doc"""
+@doc raw"""
     is_compatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 Return `true, P` if the given modules are compatible, i.e. that they are
@@ -54,7 +54,7 @@ function is_compatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModu
    return false, M
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_submodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 Return `true` if $N$ was constructed as a submodule of $M$. The relation

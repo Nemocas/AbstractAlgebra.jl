@@ -47,7 +47,7 @@ function Base.hash(a::ResFieldElem, h::UInt)
    return xor(b, xor(hash(data(a), h), h))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modulus(S::ResidueField)
 
 Return the modulus $a$ of the given residue ring $S = R/(a)$.
@@ -56,7 +56,7 @@ function modulus(S::ResidueField)
    return S.modulus
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modulus(r::ResFieldElem)
 
 Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
@@ -66,7 +66,7 @@ function modulus(r::ResFieldElem)
    return modulus(parent(r))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     characteristic(R::ResidueField)
 
 Return the characteristic of the residue field.
@@ -75,7 +75,7 @@ function characteristic(R::ResidueField)
    return characteristic(base_ring(R))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     characteristic(r::ResidueField{T}) where T <: Integer
 
 Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
@@ -212,7 +212,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`. Recall
@@ -225,7 +225,7 @@ function ==(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
    return data(a) == data(b)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
 
 Return `true` if $a == b$ exactly, otherwise return `false`. This function is
@@ -244,7 +244,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
@@ -254,7 +254,7 @@ function ==(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
    return data(a) == mod(z, modulus(a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem)
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
@@ -264,7 +264,7 @@ function ==(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem)
    return data(b) == mod(z, modulus(b))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(a::ResFieldElem{T}, b::T) where {T <: RingElem}
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
@@ -274,7 +274,7 @@ function ==(a::ResFieldElem{T}, b::T) where {T <: RingElem}
    return data(a) == mod(z, modulus(a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(a::T, b::ResFieldElem{T}) where {T <: RingElem}
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
@@ -290,7 +290,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     inv(a::ResFieldElem)
 
 Return the inverse of the element $a$ in the residue ring. If an impossible
@@ -328,7 +328,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
 
 Return a greatest common divisor of $a$ and $b$ if one exists. This is done
@@ -346,7 +346,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_square(a::ResFieldElem{T}) where T <: Integer
 
 Return `true` if $a$ is a square.
@@ -360,7 +360,7 @@ function is_square(a::ResFieldElem{T}) where T <: Integer
    return isone(a^pm1div2)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
 
 Return the square root of $a$. By default the function will throw an exception
@@ -479,7 +479,7 @@ rand(S::ResidueField, v...) = rand(Random.GLOBAL_RNG, S, v...)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     residue_field(R::Ring, a::RingElement; cached::Bool = true)
 
 Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
@@ -494,7 +494,7 @@ function residue_field(R::Ring, a::RingElement; cached::Bool = true)
    return Generic.ResidueField{T}(R(a), cached)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
 
 Returns `S, f` where `S = residue_field(R, a)` and `f` is the 
