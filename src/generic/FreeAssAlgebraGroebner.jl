@@ -443,6 +443,8 @@ function is_proper_multiple(
         @assert obs1.pre_and_suffixes[2] == vcat(obs2.pre_and_suffixes[2], w2)
         return obs1.pre_and_suffixes[3] == vcat(w, obs2.pre_and_suffixes[3]) &&
                obs1.pre_and_suffixes[4] == vcat(obs2.pre_and_suffixes[4], w2)
+    else
+        return false
     end
 end
 
@@ -579,6 +581,7 @@ end
 function groebner_basis_buchberger(
     g::Vector{FreeAssAlgElem{T}},
     reduction_bound = typemax(Int)::Int,
+    remove_redundancies = false
 ) where {T<:FieldElement}
     g = copy(g)
     #   interreduce!(g) # on some small examples, this increases running time, so it might not be optimal to use this here
@@ -608,6 +611,9 @@ function groebner_basis_buchberger(
             return g
         end
         add_obstructions!(obstruction_queue, g)
+        if remove_redundancies
+            remove_redundancies!(obstruction_queue, length(g), g[length(g)])
+        end
     end
     return g
 end
@@ -621,6 +627,7 @@ non-zero entries have been added to the groebner basis.
 function groebner_basis(
     g::Vector{FreeAssAlgElem{T}},
     reduction_bound = typemax(Int)::Int,
+    remove_redundancies = false
 ) where {T<:FieldElement}
-    return groebner_basis_buchberger(g, reduction_bound)
+    return groebner_basis_buchberger(g, reduction_bound, remove_redundancies)
 end
