@@ -40,14 +40,14 @@ end
 nrows(a::MatAlgebra) = a.n
 ncols(a::MatAlgebra) = nrows(a)
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(a::MatAlgebra)
 
 Return the degree $n$ of the given matrix algebra.
 """
 degree(a::MatAlgebra) = nrows(a)
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(a::MatAlgElem{T}) where T <: RingElement
 
 Return the degree $n$ of the given matrix algebra.
@@ -83,7 +83,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     similar(x::Generic.MatrixElem, R::NCRing=base_ring(x))
     similar(x::Generic.MatrixElem, R::NCRing, r::Int, c::Int)
     similar(x::Generic.MatrixElem, r::Int, c::Int)
@@ -106,7 +106,7 @@ end
 
 similar(x::MatAlgElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
 
-@doc Markdown.doc"""
+@doc raw"""
     zero(x::MatrixElem, R::NCRing=base_ring(x))
     zero(x::MatrixElem, R::NCRing, r::Int, c::Int)
     zero(x::MatrixElem, r::Int, c::Int)
@@ -265,7 +265,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gram(x::MatAlgElem)
 
 Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
@@ -410,7 +410,7 @@ function identity_matrix(M::MatAlgElem{T}, n::Int) where T <: NCRingElement
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     identity_matrix(M::MatAlgElem{T}) where T <: RingElement
 
 Return the identity matrix over the same base ring as $M$ and with the
@@ -426,7 +426,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     MatrixAlgebra(R::Ring, n::Int)
 
 Return parent object corresponding to the ring of $n\times n$ matrices over

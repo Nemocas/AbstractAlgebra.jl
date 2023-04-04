@@ -31,7 +31,7 @@ parent_type(::Type{Ideal{S}}) where S <: RingElement = IdealSet{S}
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gens(I::Ideal{T}) where T <: RingElement
 
 Return a list of generators of the ideal `I` in reduced form and canonicalised.
@@ -2072,7 +2072,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyRingElem{T}, AbstractAlgebra.MPolyRingElem{T}}}
 
 Return the normal form of the polynomial `p` with respect to the ideal `I`.
@@ -2097,7 +2097,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.contains(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
 
 Return `true` if the ideal `J` is contained in the ideal `I`.
@@ -2130,7 +2130,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     intersection(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
 
 Return the intersection of the ideals `I` and `J`.

@@ -12,7 +12,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     parent(a)
 
 Return parent object of given element $a$.
@@ -35,7 +35,7 @@ true
 function parent end
 
 # TODO: Give example
-@doc Markdown.doc"""
+@doc raw"""
     elem_type(parent)
     elem_type(parent_type)
 
@@ -53,7 +53,7 @@ true
 elem_type(x)  = elem_type(typeof(x))
 elem_type(T::DataType) = throw(MethodError(elem_type, (T,)))
 
-@doc Markdown.doc"""
+@doc raw"""
     parent_type(element)
     parent_type(element_type)
 
@@ -76,7 +76,7 @@ true
 parent_type(x) = parent_type(typeof(x))
 parent_type(T::DataType) = throw(MethodError(parent_type, (T,)))
 
-@doc Markdown.doc"""
+@doc raw"""
     base_ring(a)
 
 Return base ring $R$ of given element or parent $a$.
@@ -104,7 +104,7 @@ function base_ring end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     one(a)
 
 Return the multiplicative identity in the algebraic structure of $a$, which can
@@ -134,7 +134,7 @@ julia> one(G)
 """
 function one end
 
-@doc Markdown.doc"""
+@doc raw"""
     zero(a)
 
 Return the additive identity in the algebraic structure of $a$, which can be
@@ -164,7 +164,7 @@ function zero end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     isone(a)
 
 Return true if $a$ is the multiplicative identity, else return false.
@@ -191,7 +191,7 @@ julia> isone(x), isone(T(1))
 """
 function isone end
 
-@doc Markdown.doc"""
+@doc raw"""
     iszero(a)
 
 Return true if $a$ is the additative identity, else return false.
@@ -216,7 +216,7 @@ function iszero end
 #
 ###############################################################################
 
-# @doc Markdown.doc"""
+# @doc raw"""
 #     gen(a)
 
 # Return element generating parent $a$.
@@ -232,7 +232,7 @@ function iszero end
 # """
 function gen end
 
-# @doc Markdown.doc"""
+# @doc raw"""
 #     gens(a)
 
 # Return elements generating parent $a$ in an array.
@@ -264,35 +264,35 @@ const VarNameNonSymbol = Union{AbstractString, Char}
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     zero!(a)
 
 Return the zero of `parent(a)`, possibly modifying the object `a` in the process.
 """
 function zero! end
 
-@doc Markdown.doc"""
+@doc raw"""
     add!(a, b, c)
 
 Return `b + c`, possibly modifying the object `a` in the process.
 """
 function add! end
 
-@doc Markdown.doc"""
+@doc raw"""
     addeq!(a, b)
 
 Return `a + b`, possibly modifying the object `a` in the process.
 """
 function addeq! end
 
-@doc Markdown.doc"""
+@doc raw"""
     sub!(a, b, c)
 
 Return `b - c`, possibly modifying the object `a` in the process.
 """
 function sub! end
 
-@doc Markdown.doc"""
+@doc raw"""
     mul!(a, b, c)
 
 Return `b*c`, possibly modifying the object `a` in the process.

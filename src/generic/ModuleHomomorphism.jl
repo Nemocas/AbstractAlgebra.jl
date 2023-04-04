@@ -56,7 +56,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.inv(f::Map(ModuleIsomorphism))
 
 Return the inverse map of the given module isomorphism. This is computed

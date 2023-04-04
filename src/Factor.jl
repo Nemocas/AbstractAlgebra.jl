@@ -10,7 +10,7 @@
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Fac{T <: RingElement}
 
 Type for factored ring elements. The structure holds a unit of type `T` and is
@@ -34,7 +34,7 @@ function Fac(u::T, d::Dict{T, Int}) where {T}
    return f
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     unit(a::Fac{T}) -> T
 
 Return the unit of the factorization.
@@ -43,7 +43,7 @@ unit(a::Fac) = a.unit
 
 #primes(a::Fac) = collect(keys(a.fac))
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate(a::Fac{T}) -> T
 
 Multiply out the factorization into a single element.
@@ -62,7 +62,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     in(a, b::Fac)
 
 Test whether $a$ is a factor of $b$.
@@ -73,7 +73,7 @@ function Base.in(a, b::Fac{T}) where {T}
    convert(T, a) in keys(b.fac)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     getindex(a::Fac, b) -> Int
 
 If $b$ is a factor of $a$, the corresponding exponent is returned. Otherwise
@@ -88,7 +88,7 @@ function getindex(a::Fac{T}, b) where {T}
   end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     setindex!(a::Fac{T}, c::Int, b::T)
 
 If $b$ is a factor of $a$, the corresponding entry is set to $c$.
@@ -140,7 +140,7 @@ Base.iterate(a::Fac, b) = Base.iterate(a.fac, b)
 
 Base.eltype(::Type{Fac{T}}) where {T} = Base.eltype(Dict{T, Int})
 
-@doc Markdown.doc"""
+@doc raw"""
     length(a::Fac) -> Int
 
 Return the number of factors of $a$, not including the unit.

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     CycleDec{T}(ccycles, cptrs, n) where T
 
 Cycle decomposition of a permutation.
@@ -18,7 +18,7 @@ struct CycleDec{T<:Integer}
    n::T
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     Perm{T<:Integer}
    
 The type of permutations.

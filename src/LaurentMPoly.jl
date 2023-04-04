@@ -122,7 +122,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{T}; cached::Bool = true) where T <: VarName
 
 Given a base ring `R` and an array of strings `s` specifying how the

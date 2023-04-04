@@ -14,7 +14,7 @@ parent_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = MatAlgebra{T}
 
 elem_type(::Type{MatAlgebra{T}}) where {T <: NCRingElement} = MatAlgElem{T}
 
-@doc Markdown.doc"""
+@doc raw"""
     parent(a::MatAlgElem{T}) where T <: NCRingElement
 
 Return the parent object of the given matrix.
@@ -76,7 +76,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
 
 Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$

@@ -222,7 +222,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     exp(a::Rational{T}) where T <: Integer
 
 Return $1$ if $a = 0$, otherwise throw an exception.
@@ -232,7 +232,7 @@ function exp(a::Rational{T}) where T <: Integer
    return Rational{T}(1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     log(a::Rational{T}) where T <: Integer
 
 Return $0$ if $a = 1$, otherwise throw an exception.

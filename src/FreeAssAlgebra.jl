@@ -90,7 +90,7 @@ function monomials(a::AbstractAlgebra.FreeAssAlgElem)
    return Generic.MPolyMonomials(a)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exponent_words(a::AbstractAlgebra.FreeAssAlgElem{T}) where T <: RingElement
 
 Return an iterator for the exponent words of the given polynomial. To

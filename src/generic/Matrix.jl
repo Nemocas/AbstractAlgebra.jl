@@ -14,14 +14,14 @@ parent_type(::Type{S}) where {T <: NCRingElement, S <: Mat{T}} = MatSpace{T}
 
 elem_type(::Type{MatSpace{T}}) where {T <: NCRingElement} = MatSpaceElem{T}
 
-@doc Markdown.doc"""
+@doc raw"""
     parent(a::AbstractAlgebra.MatElem{T}) where T <: NCRingElement
 
 Return the parent object of the given matrix.
 """
 parent(a::Mat{T}) where T <: NCRingElement = MatSpace{T}(a.base_ring, size(a.entries)...)
 
-@doc Markdown.doc"""
+@doc raw"""
     dense_matrix_type(::Type{T}) where T<:NCRingElement
     dense_matrix_type(::T) where T<:NCRingElement
     dense_matrix_type(::Type{S}) where S<:NCRing
@@ -43,14 +43,14 @@ dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     nrows(a::MatSpace)
 
 Return the number of rows of the given matrix space.
 """
 nrows(a::MatSpace) = a.nrows
 
-@doc Markdown.doc"""
+@doc raw"""
     ncols(a::MatSpace)
 
 Return the number of columns of the given matrix space.

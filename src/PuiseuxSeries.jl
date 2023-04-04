@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     PuiseuxSeriesRing(R::Ring, prec::Int, s::VarName; cached=true)
     PuiseuxSeriesField(R::Field, prec::Int, s::VarName; cached = true)
 

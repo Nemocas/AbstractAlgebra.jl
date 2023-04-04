@@ -32,7 +32,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     symbols(R::MSeriesRing)
 
 Return a vector of symbols, one for each of the variables of the series ring
@@ -48,7 +48,7 @@ end
 
 base_ring(a::MSeriesElem) = base_ring(parent(a))
 
-@doc Markdown.doc"""
+@doc raw"""
     characteristic(a::MSeriesRing)
 
 Return the characteristic of the base ring of the series `a`. If the
@@ -177,7 +177,7 @@ function rand(rng::AbstractRNG, S::MSeriesRing,
    rand(rng, make(S, term_range, v...))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rand(S::MSeriesRing, term_range, v...)
 
 Return a random element of the series ring $S$ with number of terms in the

@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     direct_sum(m::Vector{<:FPModule{T}}) where T <: RingElement
     direct_sum(vals::FPModule{T}...) where T <: RingElement
     

@@ -29,7 +29,7 @@ function gen(N::DirectSumModule{T}, i::Int) where T <: RingElement
    return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     summands(M::DirectSumModule{T}) where T <: RingElement
 
 Return the modules that this module is a direct sum of.

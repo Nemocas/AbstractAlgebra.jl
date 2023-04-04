@@ -11,7 +11,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     laurent_series_ring(R::Ring, prec::Int, s::VarName; cached=true)
     laurent_series_field(R::Field, prec::Int, s::Union{Char, AbstractString; cached=true)
 

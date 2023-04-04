@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     quo(m::FPModule{T}, subm::FPModule{T}) where T <: RingElement
 
 Return the quotient `M` of the module `m` by the module `subm` (which must

@@ -11,7 +11,7 @@ import LinearAlgebra: nullspace
 import LinearAlgebra: rank
 import LinearAlgebra: tr
 
-using Markdown, Random, InteractiveUtils
+using Random, InteractiveUtils
 
 using Random: SamplerTrivial, GLOBAL_RNG
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4

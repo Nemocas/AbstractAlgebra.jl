@@ -141,7 +141,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     snf(m::FPModule{T}) where T <: RingElement
 
 Return a pair `M, f` consisting of the invariant factor decomposition $M$ of

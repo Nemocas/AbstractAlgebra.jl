@@ -166,7 +166,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_unit(a::T) where {T <: NCRingElem}
 
 Return true if $a$ is invertible, else return false.
@@ -233,7 +233,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     powers(a::Union{NCRingElement, MatElem}, d::Int)
 
 Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$.

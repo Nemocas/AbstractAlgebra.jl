@@ -1,7 +1,5 @@
 module PrettyPrinting
 
-using Markdown
-
 import ..AbstractAlgebra: RingElem, NCRingElem, MatrixElem
 
 using ..AbstractAlgebra
@@ -95,14 +93,14 @@ end
 
 global _html_as_latex = Ref(false)
 
-@doc doc"""
+@doc raw"""
     get_html_as_latex()
 
 Returns whether MIME type `text/html` is printed as `text/latex`.
 """
 get_html_as_latex() = _html_as_latex[]
 
-@doc doc"""
+@doc raw"""
     set_html_as_latex(fl::Bool)
 
 Toggles whether MIME type `text/html` should be printed as `text/latex`. Note

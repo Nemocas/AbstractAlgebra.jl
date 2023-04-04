@@ -18,7 +18,7 @@ elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
 base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-@doc Markdown.doc"""
+@doc raw"""
     symbols(a::MPolyRing)
 
 Return an array of symbols representing the variable names for the given
@@ -26,7 +26,7 @@ polynomial ring.
 """
 symbols(a::MPolyRing) = a.S
 
-@doc Markdown.doc"""
+@doc raw"""
     nvars(x::MPolyRing)
 
 Return the number of variables of the polynomial ring.
@@ -51,7 +51,7 @@ function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:degrevlex}}) where {T <: RingE
             for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gens(a::MPolyRing{T}) where {T <: RingElement}
 
 Return an array of all the generators (variables) of the given polynomial
@@ -62,7 +62,7 @@ function gens(a::MPolyRing{T}) where {T <: RingElement}
    return [gen(a, i, Val{a.ord}) for i in 1:n]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
 
 Return the $i$-th generator (variable) of the given polynomial
@@ -96,7 +96,7 @@ function vars(p::MPoly{T}) where {T <: RingElement}
    return(vars_in_p)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering(a::MPolyRing{T}) where {T <: RingElement}
 
 Return the ordering of the given polynomial ring as a symbol. The options are
@@ -148,7 +148,7 @@ function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:degrevlex}}) where T 
    return Int(a.exps[j, i])
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
 
 Return a vector of exponents, corresponding to the exponent vector of the
@@ -160,7 +160,7 @@ function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
    return exponent_vector(a, i, Val{parent(a).ord})
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
 
 Return exponent of the j-th variable in the i-th term of the polynomial.
@@ -203,7 +203,7 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
 
 Set the i-th exponent vector to the supplied vector, where the entries
@@ -214,7 +214,7 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <:
    return set_exponent_vector!(a, i, exps, Val{parent(a).ord})
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
 
 Return the coefficient of the term with the given exponent vector, or zero
@@ -252,7 +252,7 @@ function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
    return base_ring(a)()
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
 
 Set the coefficient of the term with the given exponent vector to the given
@@ -318,7 +318,7 @@ function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sort_terms!(a::MPoly{T}) where {T <: RingElement}
 
 Sort the terms of the given polynomial according to the polynomial ring
@@ -619,7 +619,7 @@ function is_gen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
     return x.exps[N, 1] == UInt(1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(x::MPoly{T}) where {T <: RingElement}
 
 Return `true` if the given polynomial is a generator (variable) of the
@@ -635,7 +635,7 @@ function is_gen(x::MPoly{T}) where {T <: RingElement}
    return is_gen(x, Val{parent(x).ord})
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_homogeneous(x::MPoly{T}) where {T <: RingElement}
 
 Return `true` if the given polynomial is homogeneous with respect to the standard grading and `false` otherwise.
@@ -660,7 +660,7 @@ function is_homogeneous(x::MPoly{T}) where {T <: RingElement}
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     coeff(x::MPoly, i::Int)
 
 Return the coefficient of the $i$-th term of the polynomial.
@@ -677,7 +677,7 @@ function trailing_coefficient(p::MPoly{T}) where T <: RingElement
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     monomial(x::MPoly, i::Int)
 
 Return the monomial of the $i$-th term of the polynomial (as a polynomial
@@ -691,7 +691,7 @@ function monomial(x::MPoly, i::Int)
    return parent(x)([one(R)], exps)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     monomial!(m::Mpoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
 
 Set $m$ to the monomial of the $i$-th term of the polynomial (as a
@@ -706,7 +706,7 @@ function monomial!(m::MPoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
    return m
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     term(x::MPoly, i::Int)
 
 Return the $i$-th nonzero term of the polynomial $x$ (as a polynomial).
@@ -719,7 +719,7 @@ function term(x::MPoly, i::Int)
    return parent(x)([deepcopy(x.coeffs[i])], exps)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     max_fields(f::MPoly{T}) where {T <: RingElement}
 
 Return a tuple `(degs, biggest)` consisting of an array `degs` of the maximum
@@ -800,7 +800,7 @@ function degree(f::MPoly{T}, i::Int) where T <: RingElement
    return degree(f, i, Val{parent(f).ord})
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     total_degree(f::MPoly{T}) where {T <: RingElement}
 
 Return the total degree of `f`.
@@ -832,7 +832,7 @@ function total_degree(f::MPoly{T}) where {T <: RingElement}
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     length(x::MPoly)
 
 Return the number of terms of the polynomial.
@@ -2044,7 +2044,7 @@ function ==(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
 
 Return `true` if the monomial $a$ is less than the monomial $b$ with respect
@@ -3234,7 +3234,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Vector{MPoly{T}}, bits::Int) wher
    return flag, [parent(a)(Qc[i], Qe[i]) for i in 1:len], parent(a)(Rc, Re)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
 
 Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
@@ -3313,7 +3313,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate(a::MPoly{T}, A::Vector{T}) where {T <: RingElement}
 
 Evaluate the polynomial expression by substituting in the array of values for
@@ -3361,7 +3361,7 @@ function (a::MPoly{T})(vals::U...) where {T <: RingElement, U <: Union{Integer, 
    return evaluate(a, [vals...])
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
 
 Evaluate the polynomial at the supplied values, which may be any ring elements,
@@ -3418,7 +3418,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(a::MPoly{T}, a::MPoly{T}) where {T <: RingElement}
 
 Return the greatest common divisor of a and b in parent(a).
@@ -3528,7 +3528,7 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return inflate(r, shiftr, deflr)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lcm(a::AbstractAlgebra.MPolyRingElem{T}, a::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
 
 Return the least common multiple of a and b in parent(a).
@@ -3830,7 +3830,7 @@ end
 # We use Ring instead of MPolyRing to support other multivariate objects
 # e.g. Series, non-commutative rings in Singular, etc.
 
-@doc Markdown.doc"""
+@doc raw"""
     MPolyBuildCtx(R::MPolyRing)
 
 Return a build context for creating polynomials in the given ring.
@@ -3844,7 +3844,7 @@ function show(io::IO, M::MPolyBuildCtx)
    print(iocomp, "Builder for an element of ", parent(M.poly))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     push_term!(M::MPolyBuildCtx, c::RingElem, v::Vector{Int})
 
 Add the term with coefficient `c` and exponent vector `v` to the polynomial under
@@ -3867,7 +3867,7 @@ function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
    return M
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     finish(M::MPolyBuildCtx)
 
 Finish construction of the polynomial, sort the terms, remove duplicate and
@@ -3940,7 +3940,7 @@ function zero!(a::MPoly{T}) where {T <: RingElement}
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
 
 Set the coefficient of the i-th term of the polynomial to $c$.
@@ -3960,7 +3960,7 @@ for T in [RingElem, Integer, Rational, AbstractFloat]
   end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
 
 Set the coefficient of the i-th term of the polynomial to the integer $c$.
@@ -3969,7 +3969,7 @@ function setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Inte
     return setcoeff!(a, i, base_ring(a)(c))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     combine_like_terms!(a::MPoly{T}) where T <: RingElement
 
 Remove zero terms and combine adjacent terms if they have the same
@@ -4028,7 +4028,7 @@ function (a::MPolyRing{T})(b::RingElement) where {T <: RingElement}
    return a(base_ring(a)(b))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     (a::MPolyRing{T})() where {T <: RingElement}
 
 Construct the zero polynomial in the given polynomial ring.
@@ -4038,7 +4038,7 @@ function (a::MPolyRing{T})() where {T <: RingElement}
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     (a::MPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
 
 Construct the constant polynomial `b` in the given polynomial ring.
@@ -4053,7 +4053,7 @@ function (a::MPolyRing{T})(b::T) where {T <: Union{Integer, Rational, AbstractFl
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     (a::MPolyRing{T})(b::T) where {T <: RingElement}
 
 Construct the constant polynomial `b` in the given polynomial ring.
