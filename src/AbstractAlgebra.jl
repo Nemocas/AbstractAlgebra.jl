@@ -593,7 +593,6 @@ include("Generic.jl")
 
 # Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
 # as we have our own
-
 import .Generic: @perm_str
 import .Generic: abs_series_type
 import .Generic: base_field
@@ -716,7 +715,6 @@ import .Generic: localization
 import .Generic: LocElem
 import .Generic: roots
 import .Generic: sturm_sequence
-
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export _check_dim

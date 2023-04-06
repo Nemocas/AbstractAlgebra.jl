@@ -228,7 +228,6 @@ to the function, to only compute a partial Groebner basis.
 **Examples**
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-
 julia> R, (x, y, u, v, t, s) = free_associative_algebra(GF(2), ["x", "y", "u", "v", "t", "s"])
 (Free associative algebra over Finite field F_2 on x, y, u, v, t, s, 
 AbstractAlgebra.Generic.FreeAssAlgElem{AbstractAlgebra.GFElem{Int64}}[x, y, u, v, t, s])
