@@ -644,10 +644,22 @@ function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: NCRi
    end
 end
 
+function show(io::IO, ::MIME"text/plain", a::MatSpace)
+  print(io, "Matrix Space of ")
+  print(io, nrows(a), " rows and ", ncols(a), " columns")
+  println(io)
+  print(io, "  over ")
+  print(IOContext(io, :supercompact => true), base_ring(a))
+end
+
 function show(io::IO, a::MatSpace)
-   print(io, "Matrix Space of ")
-   print(io, a.nrows, " rows and ", a.ncols, " columns over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+   if get(io, :supercompact, false)
+      print(io, "Matrix Space")
+   else
+      print(io, "Matrix Space of ")
+      print(io, nrows(a), " rows and ", ncols(a), " columns over ")
+      print(IOContext(io, :supercompact => true), base_ring(a))
+   end
 end
 
 ###############################################################################

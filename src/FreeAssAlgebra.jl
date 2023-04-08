@@ -63,14 +63,31 @@ end
 
 @enable_all_show_via_expressify FreeAssAlgElem
 
-function expressify(a::FreeAssAlgebra; context = nothing)
-   return Expr(:sequence, Expr(:text, "Free associative algebra over "),
-                          expressify(base_ring(a); context = context),
-                          Expr(:text, " on "),
-                          Expr(:series, symbols(a)...))
+function show(io::IO, ::MIME"text/plain", a::FreeAssAlgebra)
+  max_vars = 5 # largest number of variables to print
+  print(io, "Free associative algebra")
+  vars = symbols(a)
+  n = length(vars)
+  print(io, " on $(nvars(a)) ", nvars(a) > 1 ? "indeterminates" : "indeterminate", " ")
+   for i = 1:min(n - 1, max_vars - 1)
+      print(io, string(vars[i]), ", ")
+   end
+   if n > max_vars
+      print(io, "..., ")
+   end
+   println(io, string(vars[n]))
+   print(io, "  over ", base_ring(a))
 end
 
-@enable_all_show_via_expressify FreeAssAlgebra
+function show(io::IO, a::FreeAssAlgebra)
+  max_vars = 5 # largest number of variables to print
+  if get(io, :supercompact, false)
+    print(io, "Free associative algebra")
+  else
+    print(io, "Free associative algebra on $(nvars(a)) ", nvars(a) > 1 ? "indeterminantes" : "indeterminate", " over ")
+    print(IOContext(io, :supercompact => true), base_ring(a))
+  end
+end
 
 ###############################################################################
 #

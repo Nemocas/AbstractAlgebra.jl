@@ -57,6 +57,8 @@ end
 
    @test string((x+y)//z) == "(x + y)//z"
    @test string(x//y//z) == "x//(y*z)"
+
+   @test !occursin("\n", sprint(show, fraction_field(S)))
 end
 
 

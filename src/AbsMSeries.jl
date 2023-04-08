@@ -113,10 +113,30 @@ end
 
 @enable_all_show_via_expressify MSeriesElem
 
-function show(io::IO, a::MSeriesRing)
-   v = join(symbols(a), ", ")
-   print(io, "Multivariate power series ring in ", v, " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+function show(io::IO, ::MIME"text/plain", p::MSeriesRing)
+   max_vars = 5 # largest number of variables to print
+   n = nvars(p)
+   print(io, "Multivariate power series ring")
+   print(io, "in $(nvars(p)) ", nvars(p) > 1 ? "variables" : "variable", " ")
+   for i = 1:min(n - 1, max_vars - 1)
+     print(io, string(symbols(p)[i]), ", ")
+   end
+   if n > max_vars
+      print(io, "..., ")
+   end
+   println(io, string(symbols(p)[n]))
+   print(io, "  over ", base_ring(p))
+end
+
+function show(io::IO, p::MSeriesRing)
+  if get(io, :supercompact, false)
+    # no nested printing
+    print(io, "Multivariate power series ring")
+  else
+    # nested printing allowed, preferably supercompact
+    print(io, "Multivariate power series ring in $(nvars(p)) ", nvars(p) > 1 ? "variables" : "variable")
+    print(IOContext(io, :supercompact => true), " over ", base_ring(p))
+  end
 end
 
 ###############################################################################

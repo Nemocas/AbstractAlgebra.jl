@@ -19,6 +19,8 @@
    m2 = N([ZZ(4)])
 
    @test g(m2) == N([ZZ(12)])
+
+   @test !occursin("\n", sprint(show, g))
 end
 
 @testset "Generic.ModuleHomomorphism.kernel" begin

@@ -45,6 +45,11 @@ end
     @test X + x == 2*x
 end
 
+@testset "Generic.LaurentMPoly.printing" begin
+   R, (x,) = LaurentPolynomialRing(residue_ring(ZZ, 6), ["x"])
+   @test !occursin("\n", sprint(show, R))
+end
+
 @testset "Generic.LaurentMPoly.is_unit" begin
    R, (x,) = LaurentPolynomialRing(residue_ring(ZZ, 6), ["x"])
 

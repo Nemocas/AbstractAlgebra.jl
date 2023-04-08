@@ -159,10 +159,22 @@ is_square(a::MatAlgElem) = true
 #
 ###############################################################################
 
+function show(io::IO, ::MIME"text/plain", a::MatAlgebra)
+  print(io, "Matrix Algebra of")
+  print(io, " degree ", a.n)
+  println(io)
+  print(io, "  over ")
+  print(io, base_ring(a))
+end
+
 function show(io::IO, a::MatAlgebra)
-   print(io, "Matrix Algebra of degree ")
-   print(io, a.n, " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+   if get(io, :supercompact, false)
+      print(io, "Matrix Algebra")
+   else
+      print(io, "Matrix Algebra of ")
+      print(io, "degree ", a.n, " over ")
+      print(IOContext(io, :supercompact => true), base_ring(a))
+   end
 end
 
 ###############################################################################
