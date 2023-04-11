@@ -121,8 +121,8 @@ It is also possible to create series directly without having to create the
 corresponding series ring.
 
 ```julia
-abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
-rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
 ```
 
 Create the power series over the given base ring `R` with coefficients
@@ -139,7 +139,7 @@ relative series one must have `prec >= len + val`.
 By default the series are created in a ring with variable `x` and
 `max_precision` equal to `prec`, however one may specify these directly to
 override the defaults. Note that series are only compatible if they have the
-same coefficient ring `R`, `max_precision` and variable string `var`.
+same coefficient ring `R`, `max_precision` and variable name `var`.
 
 Also by default any parent ring created is cached. If this behaviour is not
 desired, set `cached=false`. However, this means that subsequent series created
@@ -319,17 +319,17 @@ its parent ring as given by `max_prec`.
 similar(x::MySeries, R::Ring, var::Symbol=var(parent(x)); cached::Bool=true)
 similar(x::MySeries, max_prec::Int, var::Symbol=var(parent(x)); cached::Bool=true)
 similar(x::MySeries, var::Symbol=var(parent(x)); cached::Bool=true)
-similar(x::MySeries, R::Ring, max_prec::Int, var::String; cached::Bool=true)
-similar(x::MySeries, R::Ring, var::String; cached::Bool=true)
-similar(x::MySeries, max_prec::Int, var::String; cached::Bool=true)
-similar(x::MySeries, var::String; cached::Bool=true)
+similar(x::MySeries, R::Ring, max_prec::Int, var::VarName; cached::Bool=true)
+similar(x::MySeries, R::Ring, var::VarName; cached::Bool=true)
+similar(x::MySeries, max_prec::Int, var::VarName; cached::Bool=true)
+similar(x::MySeries, var::VarName; cached::Bool=true)
 zero(x::MySeries, R::Ring, var::Symbol=var(parent(x)); cached::Bool=true)
 zero(x::MySeries, max_prec::Int, var::Symbol=var(parent(x)); cached::Bool=true)
 zero(x::MySeries, var::Symbol=var(parent(x)); cached::Bool=true)
-zero(x::MySeries, R::Ring, max_prec::Int, var::String; cached::Bool=true)
-zero(x::MySeries, R::Ring, var::String; cached::Bool=true)
-zero(x::MySeries, max_prec::Int, var::String; cached::Bool=true)
-zero(x::MySeries, var::String; cached::Bool=true)
+zero(x::MySeries, R::Ring, max_prec::Int, var::VarName; cached::Bool=true)
+zero(x::MySeries, R::Ring, var::VarName; cached::Bool=true)
+zero(x::MySeries, max_prec::Int, var::VarName; cached::Bool=true)
+zero(x::MySeries, var::VarName; cached::Bool=true)
 ```
 
 As above, but use the precision cap of the parent ring of `x` and the

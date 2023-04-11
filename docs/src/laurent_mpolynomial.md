@@ -45,8 +45,8 @@ individual terms *in some order*. This order currently cannot be specified in
 the constructor.
 
 ```julia
-LaurentPolynomialRing(R::Ring, S::Vector{String}; cached::Bool = true)
-LaurentPolynomialRing(R::Ring, n::Int, s::String="x"; cached::Bool = false)
+LaurentPolynomialRing(R::Ring, S::Vector{<:VarName}; cached::Bool = true)
+LaurentPolynomialRing(R::Ring, n::Int, s::VarName; cached::Bool = false)
 ```
 
 ```julia
