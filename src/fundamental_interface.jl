@@ -251,13 +251,6 @@ function gens end
 
 const VarName = Union{Symbol, AbstractString, Char}
 
-# Constructors which use `VarName` in their argument list often are implemented
-# by first converting all such inputs to use `Symbol` everywhere. For disambiguation
-# and to avoid infinite recursion, it then is sometimes necessary to have methods
-# in pairs, one using `Symbol`, and one using "`VarName` except for `Symbol`".
-# The latter is what `VarNameNonSymbol` is for.
-const VarNameNonSymbol = Union{AbstractString, Char}
-
 ###############################################################################
 #
 #   Unsafe functions
