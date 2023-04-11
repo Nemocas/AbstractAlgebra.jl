@@ -25,15 +25,15 @@ end
    S1 = PolyRing(ZZ)
    S2 = PolyRing(ZZ)
 
-   @test S1 !== S2
+   @test S1 === S2
    @test isa(S1, Generic.PolyRing)
 
    R, x = ZZ["x"]
    S1 = R["y"]
    S2 = ZZ["x"]["y"]
 
-   @test polynomial_ring(R, "y", cached = true)[1] === polynomial_ring(R, "y", cached = true)[1]
-   @test polynomial_ring(R, "y", cached = true)[1] !== polynomial_ring(R, "y", cached = false)[1]
+   @test polynomial_ring(R, "y")[1] === S1[1]
+   @test S1[1] === S2[1]
 
    for (S, y) in (S1, S2)
       @test base_ring(S) === R
@@ -211,13 +211,10 @@ end
       @test parent(k) === parent(f)
 
       p = similar(f, cached=false)
-      q = similar(f, "z", cached=false)
-      r = similar(f, "z", cached=false)
+      @test parent(p) === parent(f)
+
       s = similar(f)
       t = similar(f)
-
-      @test parent(p) === parent(f)
-      @test parent(q) !== parent(r)
       @test parent(s) === parent(t)
    end
 end
@@ -240,11 +237,8 @@ end
    @test parent(g).S == :x
 
    h = polynomial(ZZ, [1, 2, 3])
-   k = polynomial(ZZ, [1, 2, 3], cached=false)
-   m = polynomial(ZZ, [1, 2, 3], cached=false)
 
    @test parent(h) === parent(g)
-   @test parent(k) !== parent(m)
 
    p = polynomial(ZZ, BigInt[])
    q = polynomial(ZZ, [])
@@ -283,13 +277,10 @@ end
    @test parent(k) === parent(f)
 
    p = zero(f, cached=false)
-   q = zero(f, "z", cached=false)
-   r = zero(f, "z", cached=false)
+   @test parent(p) === parent(f)
+
    s = zero(f)
    t = zero(f)
-
-   @test parent(p) === parent(f)
-   @test parent(q) !== parent(r)
    @test parent(s) === parent(t)
 end
 

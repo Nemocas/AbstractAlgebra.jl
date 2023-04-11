@@ -22,8 +22,7 @@
    S, t = polynomial_ring(QQ, "t")
    T, y = PuiseuxSeriesRing(S, 30, "y")
 
-   @test PuiseuxSeriesRing(S, 30, "y", cached = true)[1] === PuiseuxSeriesRing(S, 30, "y", cached = true)[1]
-   @test PuiseuxSeriesRing(S, 30, "y", cached = false)[1] !== PuiseuxSeriesRing(S, 30, "y", cached = true)[1]
+   @test PuiseuxSeriesRing(S, 30, "y")[1] === T
 
    U, z = PuiseuxSeriesField(QQ, 30, "z")
 

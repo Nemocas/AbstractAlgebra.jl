@@ -186,8 +186,7 @@ end
     S, x = polynomial_ring(ZZ, "x")
     T = FactoredFractionField(S)
 
-    @test FactoredFractionField(S, cached = true) === FactoredFractionField(S, cached = true)
-    @test FactoredFractionField(S, cached = false) !== FactoredFractionField(S, cached = true)
+    @test FactoredFractionField(S) === T
 
     @test elem_type(T) == Generic.FactoredFrac{elem_type(S)}
     @test elem_type(Generic.FactoredFracField{elem_type(S)}) == Generic.FactoredFrac{elem_type(S)}

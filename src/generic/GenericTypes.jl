@@ -257,18 +257,15 @@ end
 #
 ###############################################################################
 
-mutable struct PolyRing{T <: RingElement} <: AbstractAlgebra.PolyRing{T}
+struct PolyRing{T <: RingElement} <: AbstractAlgebra.PolyRing{T}
    base_ring::Ring
    S::Symbol
 
    function PolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
-      return get_cached!(PolyID, (R, s), cached) do
-         new{T}(R, s)
-      end::PolyRing{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R, s)
    end
 end
-
-const PolyID = CacheDictType{Tuple{Ring, Symbol}, Ring}()
 
 mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyRingElem{T}
    coeffs::Vector{T}
@@ -292,18 +289,15 @@ end
 #
 ###############################################################################
 
-mutable struct NCPolyRing{T <: NCRingElem} <: AbstractAlgebra.NCPolyRing{T}
+struct NCPolyRing{T <: NCRingElem} <: AbstractAlgebra.NCPolyRing{T}
    base_ring::NCRing
    S::Symbol
 
    function NCPolyRing{T}(R::NCRing, s::Symbol, cached::Bool = true) where T <: NCRingElem
-      return get_cached!(NCPolyID, (R, s), cached) do
-         new{T}(R, s)
-      end::NCPolyRing{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R, s)
    end
 end
-
-const NCPolyID = CacheDictType{Tuple{NCRing, Symbol}, NCRing}()
 
 mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyRingElem{T}
    coeffs::Vector{T}
@@ -459,19 +453,15 @@ end
 
 # Q: Why is SparsePolyRing not a subtype of AbstractAlgebra.PolyRing{T} ?
 
-mutable struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
+struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring
    S::Symbol
-   num_vars::Int
 
    function SparsePolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
-      return get_cached!(SparsePolyID, (R, s), cached) do
-         new{T}(R, s)
-      end::SparsePolyRing{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R, s)
    end
 end
-
-const SparsePolyID = CacheDictType{Tuple{Ring, Symbol}, SparsePolyRing}()
 
 mutable struct SparsePoly{T <: RingElement} <: AbstractAlgebra.RingElem
    coeffs::Vector{T}
@@ -496,7 +486,7 @@ end
 
 abstract type LaurentPolynomialRing{T} <: AbstractAlgebra.LaurentPolynomialRing{T} end
 
-mutable struct LaurentPolyWrapRing{T  <: RingElement,
+struct LaurentPolyWrapRing{T  <: RingElement,
                                    PR <: AbstractAlgebra.PolyRing{T}
                                   } <: LaurentPolynomialRing{T}
    polyring::PR
@@ -504,14 +494,10 @@ mutable struct LaurentPolyWrapRing{T  <: RingElement,
    function LaurentPolyWrapRing(pr::PR, cached::Bool = true) where {
                                              T <: RingElement,
                                              PR <: AbstractAlgebra.PolyRing{T}}
-
-      return get_cached!(LaurentPolyWrapRingID, pr, cached) do
-         new{T, PR}(pr)
-      end::LaurentPolyWrapRing{T, PR}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T, PR}(pr)
    end
 end
-
-const LaurentPolyWrapRingID = CacheDictType{Ring, LaurentPolyWrapRing}()
 
 mutable struct LaurentPolyWrap{T  <: RingElement,
                                PE <: AbstractAlgebra.PolyRingElem{T},
@@ -644,19 +630,16 @@ end
 #
 ###############################################################################
 
-mutable struct RelPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
+struct RelPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
    function RelPowerSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
-      return get_cached!(RelSeriesID, (R, prec, s), cached) do
-         new{T}(R, prec, s)
-      end::RelPowerSeriesRing{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R, prec, s)
    end
 end
-
-const RelSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
 mutable struct RelSeries{T <: RingElement} <: AbstractAlgebra.RelPowerSeriesRingElem{T}
    coeffs::Vector{T}
@@ -678,19 +661,16 @@ end
 #
 ###############################################################################
 
-mutable struct AbsPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
+struct AbsPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
    function AbsPowerSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
-      return get_cached!(AbsSeriesID, (R, prec, s), cached) do
-         new{T}(R, prec, s)
-      end::AbsPowerSeriesRing{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R, prec, s)
    end
 end
-
-const AbsSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
 mutable struct AbsSeries{T <: RingElement} <: AbstractAlgebra.AbsPowerSeriesRingElem{T}
    coeffs::Vector{T}
@@ -708,19 +688,16 @@ end
 #
 ###############################################################################
 
-mutable struct LaurentSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
+struct LaurentSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
    function LaurentSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
-      return get_cached!(LaurentSeriesID, (R, prec, s), cached) do
-         new{T}(R, prec, s)
-      end::LaurentSeriesRing{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R, prec, s)
    end
 end
-
-const LaurentSeriesID = CacheDictType{Tuple{Ring, Int, Symbol}, Ring}()
 
 mutable struct LaurentSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingElem
    coeffs::Vector{T}
@@ -741,15 +718,14 @@ end
 #
 ###############################################################################
 
-mutable struct LaurentSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
+struct LaurentSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    base_ring::Field
    prec_max::Int
    S::Symbol
 
    function LaurentSeriesField{T}(R::Field, prec::Int, s::Symbol, cached::Bool = true) where T <: FieldElement
-      return get_cached!(LaurentSeriesID, (R, prec, s), cached) do
-         new{T}(R, prec, s)
-      end::LaurentSeriesField{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R, prec, s)
    end
 end
 
@@ -774,17 +750,14 @@ const LaurentSeriesElem{T} = Union{LaurentSeriesRingElem{T}, LaurentSeriesFieldE
 #
 ###############################################################################
 
-mutable struct PuiseuxSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
+struct PuiseuxSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    laurent_ring::Ring
 
    function PuiseuxSeriesRing{T}(R::LaurentSeriesRing{T}, cached::Bool = true) where T <: RingElement
-      return get_cached!(PuiseuxSeriesID, R, cached) do
-         new{T}(R)
-      end::PuiseuxSeriesRing{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R)
    end
 end
-
-const PuiseuxSeriesID = CacheDictType{Ring, Ring}()
 
 mutable struct PuiseuxSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingElem
    data::LaurentSeriesRingElem{T}
@@ -802,17 +775,14 @@ end
 #
 ###############################################################################
 
-mutable struct PuiseuxSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
+struct PuiseuxSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    laurent_ring::Field
 
    function PuiseuxSeriesField{T}(R::LaurentSeriesField{T}, cached::Bool = true) where T <: FieldElement
-      return get_cached!(PuiseuxSeriesFieldID, R, cached) do
-         new{T}(R)
-      end::PuiseuxSeriesField{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R)
    end
 end
-
-const PuiseuxSeriesFieldID = CacheDictType{Ring, Field}()
 
 mutable struct PuiseuxSeriesFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
    data::LaurentSeriesFieldElem{T}
@@ -880,17 +850,14 @@ end
 #
 ###############################################################################
 
-mutable struct FracField{T <: RingElem} <: AbstractAlgebra.FracField{T}
+struct FracField{T <: RingElem} <: AbstractAlgebra.FracField{T}
    base_ring::Ring
 
    function FracField{T}(R::Ring, cached::Bool = true) where T <: RingElem
-      return get_cached!(FracDict, R, cached) do
-         new{T}(R)
-      end::FracField{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R)
    end
 end
-
-const FracDict = CacheDictType{Ring, Ring}()
 
 mutable struct Frac{T <: RingElem} <: AbstractAlgebra.FracElem{T}
    num::T
@@ -906,17 +873,14 @@ end
 #
 ###############################################################################
 
-mutable struct TotFracRing{T <: RingElem} <: AbstractAlgebra.Ring
+struct TotFracRing{T <: RingElem} <: AbstractAlgebra.Ring
    base_ring::Ring
 
    function TotFracRing{T}(R::Ring, cached::Bool = true) where T <: RingElem
-      return get_cached!(TotFracDict, R, cached) do
-         new{T}(R)
-      end::TotFracRing{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R)
    end
 end
-
-const TotFracDict = CacheDictType{Ring, Ring}()
 
 mutable struct TotFrac{T <: RingElem} <: AbstractAlgebra.RingElem
    num::T
@@ -932,17 +896,14 @@ end
 #
 ###############################################################################
 
-mutable struct FactoredFracField{T <: RingElement} <: AbstractAlgebra.FracField{T}
+struct FactoredFracField{T <: RingElement} <: AbstractAlgebra.FracField{T}
    base_ring::AbstractAlgebra.Ring
 
    function FactoredFracField{T}(R::Ring, cached::Bool = true) where T <: RingElement
-      return get_cached!(FactoredFracDict, R, cached) do
-         new{T}(R)
-      end::FactoredFracField{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R)
    end
 end
-
-const FactoredFracDict = CacheDictType{Ring, Ring}()
 
 mutable struct FactoredFracTerm{T <: RingElement}
    base::T
@@ -1286,12 +1247,12 @@ end
 
 const FreeModuleDict = CacheDictType{Tuple{NCRing, Int}, FreeModule}()
 
-mutable struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
-    v::AbstractAlgebra.MatElem{T}
+struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
     parent::FreeModule{T}
+    v::AbstractAlgebra.MatElem{T}
 
     function FreeModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
-       z = new{T}(v, m)
+       z = new{T}(m, v)
     end
 end
 
@@ -1453,17 +1414,14 @@ end
 #
 ###############################################################################
 
-mutable struct IdealSet{T <: RingElement} <: AbstractAlgebra.Set
+struct IdealSet{T <: RingElement} <: AbstractAlgebra.Set
    base_ring::Ring
 
    function IdealSet{T}(R::Ring, cached::Bool = true) where T <: RingElement
-      return get_cached!(IdealSetDict, R, cached) do
-         new{T}(R)
-      end::IdealSet{T}
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      new{T}(R)
    end
 end
-
-const IdealSetDict = CacheDictType{Ring, IdealSet}()
 
 mutable struct Ideal{T <: RingElement} <: AbstractAlgebra.Ideal{T}
     gens::Vector{T}

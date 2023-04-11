@@ -2,8 +2,7 @@
    S = residue_ring(ZZ, 12)
    T = total_ring_of_fractions(S)
 
-   @test total_ring_of_fractions(S, cached = true) === total_ring_of_fractions(S, cached = true)
-   @test total_ring_of_fractions(S, cached = false) !== total_ring_of_fractions(S, cached = true)
+   @test total_ring_of_fractions(S) === T
 
    @test elem_type(T) == Generic.TotFrac{elem_type(S)}
    @test elem_type(Generic.TotFracRing{elem_type(S)}) == Generic.TotFrac{elem_type(S)}

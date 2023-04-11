@@ -21,19 +21,11 @@ end
          P, _ = polynomial_ring(R, "x0")
          L, y = LaurentPolynomialRing(R, "y")
 
-         @test LaurentPolynomialRing(R, "y", cached = true)[1] ===
-               LaurentPolynomialRing(R, "y", cached = true)[1]
+         @test LaurentPolynomialRing(R, "y")[1] === L
 
-         @test LaurentPolynomialRing(R, "y", cached = true)[1] !==
-               LaurentPolynomialRing(R, "y", cached = false)[1]
+         P2, _ = polynomial_ring(R, "x0")
 
-         P2, _ = polynomial_ring(R, "x0", cached = false)
-
-         @test LaurentPolynomialRing(P, "y")[1] ===
-               LaurentPolynomialRing(P, "y")[1]
-
-         @test LaurentPolynomialRing(P2, "y")[1] !==
-               LaurentPolynomialRing(P, "y")[1]
+         @test LaurentPolynomialRing(P, "y")[1] === LaurentPolynomialRing(P, "y")[1]
 
          x = y.poly
 

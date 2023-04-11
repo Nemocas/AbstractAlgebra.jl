@@ -25,7 +25,7 @@ end
    S1 = RelPowerSeriesRing(ZZ, 10)
    S2 = RelPowerSeriesRing(ZZ, 10)
 
-   @test S1 !== S2
+   @test S1 === S2
    @test isa(S1, Generic.RelPowerSeriesRing)
 
    R, x = power_series_ring(ZZ, 30, "x")
@@ -33,8 +33,7 @@ end
    S, t = polynomial_ring(QQ, "t")
    T, y = power_series_ring(S, 30, "y")
 
-   @test power_series_ring(S, 30, "y", cached = true)[1] === power_series_ring(S, 30, "y", cached = true)[1]
-   @test power_series_ring(S, 30, "y", cached = false)[1] !== power_series_ring(S, 30, "y", cached = true)[1]
+   @test power_series_ring(S, 30, "y")[1] === T
 
    @test elem_type(R) == Generic.RelSeries{BigInt}
    @test elem_type(Generic.RelPowerSeriesRing{BigInt}) == Generic.RelSeries{BigInt}
@@ -186,13 +185,10 @@ end
       @test parent(n) !== parent(f)
 
       p = similar(f, cached=false)
-      q = similar(f, "z", cached=false)
-      r = similar(f, "z", cached=false)
+      @test parent(p) === parent(f)
+
       s = similar(f)
       t = similar(f)
-
-      @test parent(p) === parent(f)
-      @test parent(q) !== parent(r)
       @test parent(s) === parent(t)
    end
 end

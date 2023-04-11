@@ -25,7 +25,7 @@ end
    S1 = AbsPowerSeriesRing(ZZ, 10)
    S2 = AbsPowerSeriesRing(ZZ, 10)
 
-   @test S1 !== S2
+   @test S1 === S2
    @test isa(S1, Generic.AbsPowerSeriesRing)
 
    R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
@@ -95,8 +95,6 @@ end
    R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
    S, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
    @test R === S
-   S, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute, cached = false)
-   @test R !== S
 end
 
 @testset "Generic.AbsSeries.manipulation" begin
@@ -182,13 +180,10 @@ end
       @test parent(n) !== parent(f)
 
       p = similar(f, cached=false)
-      q = similar(f, "z", cached=false)
-      r = similar(f, "z", cached=false)
+      @test parent(p) === parent(f)
+
       s = similar(f)
       t = similar(f)
-
-      @test parent(p) === parent(f)
-      @test parent(q) !== parent(r)
       @test parent(s) === parent(t)
    end
 end

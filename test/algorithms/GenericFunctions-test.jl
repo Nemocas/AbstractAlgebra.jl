@@ -19,17 +19,13 @@ import ..test_Ring_interface
 import ..test_EuclideanRing_interface
 import ..test_elem
 
-mutable struct ConstPolyRing{T <: RingElement} <: Ring
+struct ConstPolyRing{T <: RingElement} <: Ring
    base_ring::Ring
 
-   function ConstPolyRing{T}(R::Ring, cached::Bool) where T <: RingElement
-      return get_cached!(ConstPolyID, R, cached) do
-         new{T}(R)
-      end::ConstPolyRing{T}
+   function ConstPolyRing{T}(R::Ring) where T <: RingElement
+      new{T}(R)
    end
 end
-
-const ConstPolyID = AbstractAlgebra.CacheDictType{Ring, ConstPolyRing}()
    
 mutable struct ConstPoly{T <: RingElement} <: RingElem
    c::T
@@ -237,9 +233,9 @@ end
 
 # Parent constructor
 
-function ConstantPolynomialRing(R::Ring, cached::Bool=true)
+function ConstantPolynomialRing(R::Ring)
    T = elem_type(R)
-   return ConstPolyRing{T}(R, cached)
+   return ConstPolyRing{T}(R)
 end
 
 # we need only divrem to satsify the

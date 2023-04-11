@@ -2,8 +2,7 @@
    S, x = polynomial_ring(ZZ, "x")
    T = fraction_field(S)
 
-   @test fraction_field(S, cached = true) === fraction_field(S, cached = true)
-   @test fraction_field(S, cached = false) !== fraction_field(S, cached = true)
+   @test fraction_field(S) === T
 
    @test elem_type(T) == Generic.Frac{elem_type(S)}
    @test elem_type(Generic.FracField{elem_type(S)}) == Generic.Frac{elem_type(S)}

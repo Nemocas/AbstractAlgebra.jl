@@ -19,8 +19,7 @@
 @testset "Generic.LaurentSeries.constructors" begin
    R, x = laurent_series_ring(ZZ, 30, "x")
 
-   @test laurent_series_ring(ZZ, 30, "x", cached = true)[1] === laurent_series_ring(ZZ, 30, "x", cached = true)[1]
-   @test laurent_series_ring(ZZ, 30, "x", cached = false)[1] !== laurent_series_ring(ZZ, 30, "x", cached = true)[1]
+   @test laurent_series_ring(ZZ, 30, "x")[1] === R
 
    S, t = polynomial_ring(QQ, "t")
    T, y = laurent_series_ring(S, 30, "y")
@@ -104,8 +103,6 @@
    R, x = laurent_series_ring(ZZ, 30, "x")
    RR, x = laurent_series_ring(ZZ, 30, "x")
    @test R === RR
-   RR, x = laurent_series_ring(ZZ, 30, "x", cached = false)
-   @test R !== RR
 end
 
 @testset "Generic.LaurentSeries.rand" begin
@@ -207,13 +204,10 @@ end
       @test parent(n) !== parent(f)
 
       p = similar(f, cached=false)
-      q = similar(f, "z", cached=false)
-      r = similar(f, "z", cached=false)
+      @test parent(p) === parent(f)
+
       s = similar(f)
       t = similar(f)
-
-      @test parent(p) === parent(f)
-      @test parent(q) !== parent(r)
       @test parent(s) === parent(t)
 
       g = zero(f, QQ, "y")

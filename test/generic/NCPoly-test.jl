@@ -3,8 +3,7 @@
    S1 = polynomial_ring(R, "y")
    S2 = R["y"]
 
-   @test polynomial_ring(R, "y", cached = true)[1] === polynomial_ring(R, "y", cached = true)[1]
-   @test polynomial_ring(R, "y", cached = true)[1] !== polynomial_ring(R, "y", cached = false)[1]
+   @test polynomial_ring(R, "y")[1] === S2[1]
 
    for (S, y) in (S1, S2)
       @test base_ring(S) === R
