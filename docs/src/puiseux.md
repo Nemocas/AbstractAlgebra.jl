@@ -49,15 +49,15 @@ In order to construct Puiseux series in AbstractAlgebra.jl, one must first const
 ring itself. This is accomplished with any of the following constructors.
 
 ```julia
-PuiseuxSeriesRing(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
+PuiseuxSeriesRing(R::Ring, prec_max::Int, s::VarName; cached::Bool = true)
 ```
 
 ```julia
-PuiseuxSeriesRing(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
+PuiseuxSeriesRing(R::Field, prec_max::Int, s::VarName; cached::Bool = true)
 ```
 
 ```julia
-PuiseuxSeriesField(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
+PuiseuxSeriesField(R::Field, prec_max::Int, s::VarName; cached::Bool = true)
 ```
 
 Given a base ring `R`, a maximum relative precision and a string `s` specifying how the

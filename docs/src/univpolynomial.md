@@ -60,8 +60,8 @@ Universal Polynomial Ring over Integers
 There are two ways to add variables to a universal polynomial ring `S`.
 
 ```julia
-gen(S::UniversalPolyRing, var::T) where T <: Union{Char, Symbol, String}
-gens(S::UniversalPolyRing, vars::Vector{T}) where T <: Union{Char, Symbol, String}
+gen(S::UniversalPolyRing, var::VarName)
+gens(S::UniversalPolyRing, vars::Vector{VarName})
 ```
 
 **Examples**

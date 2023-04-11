@@ -33,8 +33,8 @@ characteristic(R::FreeAssAlgebra)
 ## Free algebra constructors
 
 ```julia
-free_associative_algebra(R::Ring, s::Union{AbstractVector{<:AbstractString}, AbstractVector{Symbol}, AbstractVector{Char}}; cached::Bool = true)
-free_associative_algebra(R::Ring, n::Int, s::Union{String, Char, Symbol}; cached::Bool = false)
+free_associative_algebra(R::Ring, s::AbstractVector{<:VarName}; cached::Bool = true)
+free_associative_algebra(R::Ring, n::Int, s::VarName; cached::Bool = false)
 ```
 
 The first constructor, given a base ring `R` and an array `s` of variables,

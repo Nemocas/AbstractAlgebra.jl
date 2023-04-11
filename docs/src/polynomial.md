@@ -126,7 +126,7 @@ A third way of constructing polynomials is to construct them directly without
 creating the polynomial ring.
 
 ```julia
-polynomial(R::Ring, arr::Vector{T}, var::String="x"; cached::Bool=true)
+polynomial(R::Ring, arr::Vector{T}, var::VarName=:x; cached::Bool=true)
 ```
 
 Given an array of coefficients construct the polynomial with those coefficients
@@ -193,10 +193,10 @@ with coefficients in the given ring. Both functions behave the same way for
 polynomials.
 
 ```julia
-similar(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: RingElem
-similar(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: RingElem
-zero(x::MyPoly{T}, R::Ring, var::String=String(var(parent(x)))) where T <: RingElem
-zero(x::MyPoly{T}, var::String=String(var(parent(x)))) where T <: RingElem
+similar(x::MyPoly{T}, R::Ring, var::VarName=var(parent(x))) where T <: RingElem
+similar(x::MyPoly{T}, var::VarName=var(parent(x))) where T <: RingElem
+zero(x::MyPoly{T}, R::Ring, var::VarName=var(parent(x))) where T <: RingElem
+zero(x::MyPoly{T}, var::VarName=var(parent(x))) where T <: RingElem
 ```
 
 Construct the zero polynomial with the given variable and coefficients in the

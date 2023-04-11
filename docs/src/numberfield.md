@@ -23,7 +23,7 @@ In order to construct number fields in AbstractAlgebra.jl, one must first constr
 field itself. This is accomplished with the following constructor.
 
 ```julia
-number_field(f::Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+number_field(f::Generic.Poly{Rational{BigInt}}, s::VarName, t = "\$"; cached::Bool = true)
 ```
 
 Given an irreducible defining polynomial $f$ in $\mathbb{Q}[x]$, return a tuple $(K, x)$

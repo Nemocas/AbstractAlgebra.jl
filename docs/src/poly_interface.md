@@ -104,7 +104,7 @@ It is also possible to create polynomials directly without first creating the
 corresponding polynomial ring.
 
 ```julia
-polynomial(R::Ring, arr::Vector{T}, var::String="x"; cached::Bool=true)
+polynomial(R::Ring, arr::Vector{T}, var::VarName=:x; cached::Bool=true)
 ```
 
 Given an array of coefficients construct the polynomial with those coefficients
@@ -256,7 +256,7 @@ The `similar` function is available for all univariate polynomial types, but
 new polynomial rings can define a specialised version of it if required.
 
 ```julia
-similar(x::MyPoly{T}, R::Ring=base_ring(x), var::String=String(var(parent(x)))) where T <: RingElem
+similar(x::MyPoly{T}, R::Ring=base_ring(x), var::VarName=var(parent(x))) where T <: RingElem
 ```
 
 Construct the zero polynomial with the given variable and coefficients in the

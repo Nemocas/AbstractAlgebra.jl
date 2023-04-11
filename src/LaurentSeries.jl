@@ -13,7 +13,7 @@
 
 @doc raw"""
     laurent_series_ring(R::Ring, prec::Int, s::VarName; cached=true)
-    laurent_series_field(R::Field, prec::Int, s::Union{Char, AbstractString; cached=true)
+    laurent_series_field(R::Field, prec::Int, s::VarName; cached=true)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a Laurent series
 ring over the given base ring and a generator `x` for the Laurent series ring.

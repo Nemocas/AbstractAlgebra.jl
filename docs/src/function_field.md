@@ -34,8 +34,8 @@ construct the function field itself. This is accomplished with one of the
 following constructors.
 
 ```julia
-RationalFunctionField(k::Field, s::AbstractString; cached::Bool = true)
-RationalFunctionField(k::Field, s::Vector{String}; cached::Bool = true)
+RationalFunctionField(k::Field, s::VarName; cached::Bool = true)
+RationalFunctionField(k::Field, s::Vector{<:VarName}; cached::Bool = true)
 ```
 
 Given a coefficient field `k` return a tuple `(S, x)` consisting of the parent

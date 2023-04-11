@@ -64,7 +64,7 @@ constructors.
 For the unweighted case:
 
 ```julia
-power_series_ring(R::Ring, prec::Vector{Int}, s::Vector{U}; cached::Bool = true) where U <: AbstractString
+power_series_ring(R::Ring, prec::Vector{Int}, s::AbstractVector{<:VarName}; cached::Bool = true)
 ```
 
 Given a base ring `R` and a vector of strings `s` specifying how the generators
@@ -78,7 +78,7 @@ object `S` will depend on `R`, the precision vector and the variable names
 In the weighted case:
 
 ```
-power_series_ring(R::Ring, weights::Vector{Int}, s::Vector{U}, prec::Int; cached::Bool = true) where U <: AbstractString
+power_series_ring(R::Ring, weights::Vector{Int}, s::AbstractVector{<:VarName}, prec::Int; cached::Bool = true)
 ```
 
 Given a base ring `R` and a vector of strings `s` specifying how the generators

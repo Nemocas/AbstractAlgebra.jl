@@ -50,8 +50,8 @@ construct the polynomial ring itself. This is accomplished with one of the follo
 constructors.
 
 ```@docs
-polynomial_ring(R::Ring, S::Vector{String}; cached::Bool = true, ordering::Symbol=:lex)
-polynomial_ring(R::Ring, n::Int, s::String; cached::Bool = false, ordering::Symbol = :lex)
+polynomial_ring(R::Ring, S::Vector{VarName}; cached::Bool = true, ordering::Symbol=:lex)
+polynomial_ring(R::Ring, n::Int, s::VarName; cached::Bool = false, ordering::Symbol = :lex)
 ```
 
 Like for univariate polynomials, a shorthand constructor is

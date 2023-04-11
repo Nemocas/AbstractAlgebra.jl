@@ -68,15 +68,15 @@ In order to construct series in AbstractAlgebra.jl, one must first construct the
 itself. This is accomplished with any of the following constructors.
 
 ```julia
-power_series_ring(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true, model=:capped_relative)
+power_series_ring(R::Ring, prec_max::Int, s::VarName; cached::Bool = true, model=:capped_relative)
 ```
 
 ```julia
-laurent_series_ring(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
+laurent_series_ring(R::Ring, prec_max::Int, s::VarName; cached::Bool = true)
 ```
 
 ```julia
-laurent_series_ring(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
+laurent_series_ring(R::Field, prec_max::Int, s::VarName; cached::Bool = true)
 ```
 
 Given a base ring `R`, a maximum precision (relative or absolute, depending on the
@@ -175,9 +175,9 @@ It is also possible to create series directly without having to create the
 corresponding series ring.
 
 ```julia
-abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
-rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
-laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::AbstractString="x"; max_precision::Int=prec, cached::Bool=true) where T
+abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
 ```
 
 **Examples**
