@@ -1019,7 +1019,7 @@ end
 function _make_parent(g, p::AbsPowerSeriesRingElem, cached::Bool)
    R = parent(g(zero(base_ring(p))))
    S = parent(p)
-   sym = String(var(S))
+   sym = var(S)
    max_prec = max_precision(S)
    return power_series_ring(R, max_prec, sym; model=:capped_absolute, cached=cached)[1]
 end
@@ -1056,7 +1056,7 @@ end
 
 function _change_abs_series_ring(R, Rx, cached)
    P, _ = power_series_ring(R, max_precision(Rx),
-                       string(var(Rx)), cached = cached, model=:capped_absolute)
+                       var(Rx), cached = cached, model=:capped_absolute)
    return P
 end
 

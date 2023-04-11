@@ -713,12 +713,10 @@ end
 ###############################################################################
 
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
-                  s::Vector{T}; cached=true, model=:capped_absolute) where
-                                                                    T <: Symbol
-    str = [String(a) for a in s]
+                  s::Vector{Symbol}; cached=true, model=:capped_absolute)
     U = elem_type(R)
  
-    S, _ = AbstractAlgebra.polynomial_ring(R, str)
+    S, _ = AbstractAlgebra.polynomial_ring(R, s)
     V = elem_type(S)
 
     if model == :capped_absolute
@@ -731,12 +729,10 @@ function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
 end
 
 function power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::Int,
-   s::Vector{T}; cached=true, model=:capped_absolute) where
-                                                     T <: Symbol
-   str = [String(a) for a in s]
+   s::Vector{Symbol}; cached=true, model=:capped_absolute)
    U = elem_type(R)
 
-   S, _ = AbstractAlgebra.polynomial_ring(R, str)
+   S, _ = AbstractAlgebra.polynomial_ring(R, s)
    V = elem_type(S)
 
    if model == :capped_absolute
@@ -749,8 +745,7 @@ function power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::
 end
 
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Int,
-                  s::Vector{T}; cached=true, model=:capped_absolute) where
-                                                                    T <: Symbol
+                  s::Vector{Symbol}; cached=true, model=:capped_absolute)
     prec_vec = [prec for v in s]
     return power_series_ring(R, prec_vec, s; cached=cached, model=model)
 end

@@ -114,7 +114,7 @@ end
 @enable_all_show_via_expressify MSeriesElem
 
 function show(io::IO, a::MSeriesRing)
-   v = join([String(s) for s in symbols(a)], ", ")
+   v = join(symbols(a), ", ")
    print(io, "Multivariate power series ring in ", v, " over ")
    print(IOContext(io, :compact => true), base_ring(a))
 end
