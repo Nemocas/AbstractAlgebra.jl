@@ -405,8 +405,7 @@ function identity_matrix(M::MatAlgElem{T}, n::Int) where T <: NCRingElement
          arr[i, j] = i == j ? one(R) : zero(R)
       end
    end
-   z = Generic.MatAlgElem{T}(arr)
-   z.base_ring = R
+   z = Generic.MatAlgElem{T}(R, arr)
    return z
 end
 

@@ -1049,30 +1049,35 @@ struct MatSpace{T <: NCRingElement} <: AbstractAlgebra.MatSpace{T}
    end
 end
 
-mutable struct MatSpaceElem{T <: NCRingElement} <: Mat{T}
-   entries::Matrix{T}
+struct MatSpaceElem{T <: NCRingElement} <: Mat{T}
    base_ring::NCRing
+   entries::Matrix{T}
 
-   function MatSpaceElem{T}(A::Matrix{T}) where T <: NCRingElement
-      return new{T}(A)
+   function MatSpaceElem{T}(R::NCRing, A::Matrix{T}) where T <: NCRingElement
+      @assert elem_type(R) === T
+      return new{T}(R, A)
     end
-
-   function MatSpaceElem{T}(A::AbstractMatrix{T}) where T <: NCRingElement
-      return new{T}(Array(A))
-   end
-
-   function MatSpaceElem{T}(r::Int, c::Int, A::Vector{T}) where T <: NCRingElement
-      t = Array{T}(undef, r, c)
-      for i = 1:r
-         for j = 1:c
-            t[i, j] = A[(i - 1) * c + j]
-         end
-      end
-      return new{T}(t)
-   end
 end
 
-mutable struct MatSpaceView{T <: NCRingElement, V, W} <: Mat{T}
+function MatSpaceElem{T}(R::NCRing, A::AbstractMatrix{T}) where T <: NCRingElement
+   return MatSpaceElem{T}(R, Matrix(A))
+end
+
+function MatSpaceElem{T}(R::NCRing, r::Int, c::Int, A::Vector{T}) where T <: NCRingElement
+   t = Matrix{T}(undef, r, c)
+   for i = 1:r, j = 1:c
+      t[i, j] = A[(i - 1) * c + j]
+   end
+   return MatSpaceElem{T}(R, t)
+end
+
+# construct zero matrix
+function MatSpaceElem{T}(R::NCRing, r::Int, c::Int) where T <: NCRingElement
+   entries = fill(zero(R), r, c)
+   return MatSpaceElem{T}(R, entries)
+end
+
+struct MatSpaceView{T <: NCRingElement, V, W} <: Mat{T}
    entries::SubArray{T, 2, Matrix{T}, V, W}
    base_ring::NCRing
 end
@@ -1092,23 +1097,23 @@ struct MatAlgebra{T <: NCRingElement} <: AbstractAlgebra.MatAlgebra{T}
    end
 end
 
-mutable struct MatAlgElem{T <: NCRingElement} <: AbstractAlgebra.MatAlgElem{T}
-   entries::Matrix{T}
+struct MatAlgElem{T <: NCRingElement} <: AbstractAlgebra.MatAlgElem{T}
    base_ring::NCRing
+   entries::Matrix{T}
 
-   function MatAlgElem{T}(A::Matrix{T}) where T <: NCRingElement
-      return new{T}(A)
+   function MatAlgElem{T}(R::NCRing, A::Matrix{T}) where T <: NCRingElement
+      @assert elem_type(R) === T
+      return new{T}(R, A)
    end
+end
 
-   function MatAlgElem{T}(n::Int, A::Vector{T}) where T <: NCRingElement
-      t = Array{T}(undef, n, n)
-      for i = 1:n
-         for j = 1:n
-            t[i, j] = A[(i - 1) * c + j]
-         end
-      end
-      return new{T}(t)
+function MatAlgElem{T}(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
+   @assert elem_type(R) === T
+   t = Matrix{T}(undef, n, n)
+   for i = 1:n, j = 1:n
+      t[i, j] = A[(i - 1) * c + j]
    end
+   return MatAlgElem{T}(R, t)
 end
 
 ###############################################################################
