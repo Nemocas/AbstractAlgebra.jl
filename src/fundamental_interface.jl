@@ -41,7 +41,7 @@ function parent end
 
 Given a parent object (or its type), return the type of its elements.
 
-# Example
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S, x = power_series_ring(QQ, 2, "x")
 (Univariate power series ring in x over Rationals, x + O(x^3))
@@ -59,7 +59,7 @@ elem_type(T::DataType) = throw(MethodError(elem_type, (T,)))
 
 Given an element (or its type), return the type of its parent object.
 
-# Example
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)

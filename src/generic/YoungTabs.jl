@@ -11,7 +11,7 @@ using SparseArrays
 
 Return the size of the vector which represents the partition.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Partition([4,3,1]); size(p)
 (3,)
@@ -141,7 +141,7 @@ end
 Return the vector of all permutations of `n`. For an unsafe generator version
 see `partitions!`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> Generic.partitions(5)
 7-element Vector{AbstractAlgebra.Generic.Partition{Int64}}:
@@ -163,7 +163,7 @@ partitions!(n::Integer) = (Partition(n, p, false) for p in AllParts(n))
 Return the conjugated partition of `part`, i.e. the partition corresponding
 to the Young diagram of `part` reflected through the main diagonal.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Partition([4,2,1,1,1])
 4₁2₁1₃
@@ -318,7 +318,7 @@ YoungTableau(p::Vector{T}, fill=collect(1:sum(p))) where T<:Integer = YoungTable
 Return `size` of the smallest array containing `Y`, i.e. the tuple of the
 number of rows and the number of columns of `Y`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1]); size(y)
 (3, 4)
@@ -341,7 +341,7 @@ end
 Return the column-major linear index into the `size(Y)`-array. If a box is
 outside of the array return `0`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
@@ -486,7 +486,7 @@ as string). This can be either
 
 The difference is purely esthetical.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> Generic.setyoungtabstyle(:array)
 :array
@@ -534,7 +534,7 @@ end
 
 Construct sparse integer matrix representing the tableau.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1]);
 
@@ -562,7 +562,7 @@ end
 Replace the fill vector `Y.fill` by `V`. No check if the resulting tableau is
 standard (i.e. increasing along rows and columns) is performed.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
