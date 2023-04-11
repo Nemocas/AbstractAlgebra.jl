@@ -118,13 +118,13 @@ function show(io::IO, ::MIME"text/plain", p::MSeriesRing)
    n = nvars(p)
    print(io, "Multivariate power series ring")
    print(io, "in $(nvars(p)) ", nvars(p) > 1 ? "variables" : "variable", " ")
-   for i = 1:min(n - 1, max_vars - 1)
-     print(io, string(symbols(p)[i]), ", ")
-   end
    if n > max_vars
-      print(io, "..., ")
+     join(io, symbols(p)[1:max_vars - 1], ", ")
+     println(io, "..., ", symbols(p)[n])
+   else
+     join(io, symbols(p), ", ")
+     println(io)
    end
-   println(io, string(symbols(p)[n]))
    print(io, "  over ", base_ring(p))
 end
 
