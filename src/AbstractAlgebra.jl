@@ -239,6 +239,7 @@ export IdentityMap
 export is_irreducible
 export is_squarefree
 export is_perfect
+export ItemQuantity
 export Map
 export MatAlgebra
 export MatAlgElem
@@ -255,6 +256,7 @@ export NotInvertibleError
 export NumField
 export NumFieldElem
 export parent_type
+export pluralize
 export PolyRing
 export PolyRingElem
 export qq
@@ -284,6 +286,7 @@ export ZZ
 
 include("Attributes.jl")
 include("AliasMacro.jl")
+include("Pluralize.jl")
 
 # alternative names for some functions from Base
 export is_empty, is_equal, is_finite, is_inf, is_integer, is_less, is_one, is_real, is_subset, is_valid, is_zero

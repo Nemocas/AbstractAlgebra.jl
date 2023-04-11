@@ -54,12 +54,7 @@ supermodule(M::QuotientModule{T}) where T <: RingElement = M.m
 ###############################################################################
 
 function show_gens_rels(io::IO, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
-   print(io, " with ", ngens(N), " generator")
-   if ngens(N) == 1
-      print(io, " and ")
-   else
-      print(io, "s and ")
-   end
+   print(io, " with ", ItemQuantity(ngens(N), "generator"), " and ")
    if length(rels(N)) == 0
       print(io, "no relations")
    else
