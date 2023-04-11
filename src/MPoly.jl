@@ -1243,7 +1243,7 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function map_coefficients(f, p::MPolyRingElem; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
+function map_coefficients(f, p::MPolyRingElem; parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
    return _map(f, p, parent)
 end
 
