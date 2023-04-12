@@ -136,9 +136,7 @@ is_square(a::MatElem) = (nrows(a) == ncols(a))
 ###############################################################################
 
 function transpose(x::Mat{T}) where T <: NCRingElement
-   y = MatSpaceElem{eltype(x)}(permutedims(x.entries))
-   y.base_ring = x.base_ring
-   y
+   MatSpaceElem{eltype(x)}(base_ring(x), permutedims(x.entries))
 end
 
 ###############################################################################
@@ -167,8 +165,7 @@ function (a::MatSpace{T})() where {T <: NCRingElement}
          entries[i, j] = zero(R)
       end
    end
-   z = MatSpaceElem{T}(entries)
-   z.base_ring = R
+   z = MatSpaceElem{T}(R, entries)
    return z
 end
 
@@ -185,8 +182,7 @@ function (a::MatSpace{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
          end
       end
    end
-   z = MatSpaceElem{T}(entries)
-   z.base_ring = R
+   z = MatSpaceElem{T}(R, entries)
    return z
 end
 
@@ -196,8 +192,7 @@ function (a::MatSpace{T})(b::Matrix{T}) where T <: NCRingElement
    if !isempty(b)
       R != parent(b[1, 1]) && error("Unable to coerce matrix")
    end
-   z = MatSpaceElem{T}(b)
-   z.base_ring = R
+   z = MatSpaceElem{T}(R, b)
    return z
 end
 
@@ -210,8 +205,7 @@ function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: NCRingElement, T <: 
          entries[i, j] = R(b[i, j])
       end
    end
-   z = MatSpaceElem{T}(entries)
-   z.base_ring = R
+   z = MatSpaceElem{T}(R, entries)
    return z
 end
 

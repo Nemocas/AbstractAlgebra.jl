@@ -97,15 +97,13 @@ function AbstractAlgebra.zero_matrix(R::F2, r::Int, c::Int)
    for i=1:r, j=1:c
       mat[i, j] = zero(R)
    end
-   z = Generic.MatSpaceElem{F2Elem}(mat)
-   z.base_ring = R
+   z = Generic.MatSpaceElem{F2Elem}(R, mat)
    return F2Matrix(z)
 end
 
 function AbstractAlgebra.matrix(R::F2, mat::AbstractMatrix{F2Elem})
    mat = convert(Matrix, mat)
-   z = Generic.MatSpaceElem{F2Elem}(mat)
-   z.base_ring = R
+   z = Generic.MatSpaceElem{F2Elem}(R, mat)
    return F2Matrix(z)
 end
 

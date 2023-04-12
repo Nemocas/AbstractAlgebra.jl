@@ -332,8 +332,7 @@ end
 function _similar(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
    TT = elem_type(R)
    M = Matrix{TT}(undef, (r, c))
-   z = x isa MatElem ? Generic.MatSpaceElem{TT}(M) : Generic.MatAlgElem{TT}(M)
-   z.base_ring = R
+   z = x isa MatElem ? Generic.MatSpaceElem{TT}(R, M) : Generic.MatAlgElem{TT}(R, M)
    return z
 end
 
@@ -6710,8 +6709,7 @@ Constructs the matrix over $R$ with entries as in `arr`.
 """
 function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
    if elem_type(R) === T
-      z = Generic.MatSpaceElem{elem_type(R)}(arr)
-      z.base_ring = R
+      z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
       return z
    else
       arr_coerce = convert(Matrix{elem_type(R)}, map(R, arr))::Matrix{elem_type(R)}
@@ -6729,8 +6727,7 @@ function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
    _check_dim(r, c, arr)
    ndims(arr) == 2 && return matrix(R, arr)
    if elem_type(R) === T
-     z = Generic.MatSpaceElem{elem_type(R)}(r, c, arr)
-     z.base_ring = R
+     z = Generic.MatSpaceElem{elem_type(R)}(R, r, c, arr)
      return z
    else
      arr_coerce = convert(Vector{elem_type(R)}, map(R, arr))::Vector{elem_type(R)}
@@ -6756,8 +6753,7 @@ function zero_matrix(R::NCRing, r::Int, c::Int)
          arr[i, j] = zero(R)
       end
    end
-   z = Generic.MatSpaceElem{elem_type(R)}(arr)
-   z.base_ring = R
+   z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
    return z
 end
 
