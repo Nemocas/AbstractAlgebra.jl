@@ -646,7 +646,7 @@ end
 
 function show(io::IO, ::MIME"text/plain", a::MatSpace)
   print(io, "Matrix Space of ")
-  print(io, nrows(a), " rows and ", ncols(a), " columns")
+  print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
   println(io)
   print(io, "  over ")
   print(IOContext(io, :supercompact => true), base_ring(a))
@@ -657,7 +657,7 @@ function show(io::IO, a::MatSpace)
       print(io, "Matrix Space")
    else
       print(io, "Matrix Space of ")
-      print(io, nrows(a), " rows and ", ncols(a), " columns over ")
+      print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
       print(IOContext(io, :supercompact => true), base_ring(a))
    end
 end

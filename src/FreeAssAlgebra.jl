@@ -65,27 +65,27 @@ end
 
 function show(io::IO, ::MIME"text/plain", a::FreeAssAlgebra)
   max_vars = 5 # largest number of variables to print
+  n = nvars(a)
   print(io, "Free associative algebra")
-  vars = symbols(a)
-  n = length(vars)
-  print(io, " on $(nvars(a)) ", nvars(a) > 1 ? "indeterminates" : "indeterminate", " ")
-   for i = 1:min(n - 1, max_vars - 1)
-      print(io, string(vars[i]), ", ")
-   end
-   if n > max_vars
-      print(io, "..., ")
-   end
-   println(io, string(vars[n]))
-   print(io, "  over ", base_ring(a))
+  print(io, " on ", ItemQuantity(nvars(a), "indeterminate"), " ")
+  if n > max_vars
+    join(io, symbols(a)[1:max_vars - 1], ", ")
+    println(io, "..., ", symbols(a)[n])
+  else
+    join(io, symbols(a), ", ")
+    println(io)
+  end
+  print(io, "  over ", base_ring(a))
 end
 
 function show(io::IO, a::FreeAssAlgebra)
-  max_vars = 5 # largest number of variables to print
   if get(io, :supercompact, false)
+    # no nested printing
     print(io, "Free associative algebra")
   else
-    print(io, "Free associative algebra on $(nvars(a)) ", nvars(a) > 1 ? "indeterminantes" : "indeterminate", " over ")
-    print(IOContext(io, :supercompact => true), base_ring(a))
+    # nested printing allowed, preferably supercompact
+    print(io, "Free associative algebra on ", ItemQuantity(nvars(a), "indeterminate"))
+    print(IOContext(io, :supercompact => true), " over ", base_ring(a))
   end
 end
 

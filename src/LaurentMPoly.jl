@@ -33,18 +33,18 @@ end
 @enable_all_show_via_expressify LaurentMPolyRingElem
 
 function show(io::IO, ::MIME"text/plain", p::LaurentMPolyRing)
-   max_vars = 5 # largest number of variables to print
-   n = nvars(p)
-   print(io, "Multivariate Laurent polynomial ring")
-   print(io, " in $(nvars(p)) ", nvars(p) > 1 ? "variables" : "variable", " ")
-   for i = 1:min(n - 1, max_vars - 1)
-      print(io, string(symbols(p)[i]), ", ")
-   end
-   if n > max_vars
-      print(io, "..., ")
-   end
-   println(io, string(symbols(p)[n]))
-   print(io, "  over ", base_ring(p))
+  max_vars = 5 # largest number of variables to print
+  n = nvars(p)
+  print(io, "Multivariate Laurent polynomial ring")
+  print(io, "in ", ItemQuantity(nvars(p), "variable"), " ")
+  if n > max_vars
+    join(io, symbols(p)[1:max_vars - 1], ", ")
+    println(io, "..., ", symbols(p)[n])
+  else
+    join(io, symbols(p), ", ")
+    println(io)
+  end
+  print(io, "  over ", base_ring(p))
 end
 
 function show(io::IO, p::LaurentMPolyRing)
@@ -53,7 +53,7 @@ function show(io::IO, p::LaurentMPolyRing)
     print(io, "Multivariate Laurent polynomial ring")
   else
     # nested printing allowed, preferably supercompact
-    print(io, "Multivariate Laurent polynomial ring in $(nvars(p)) ", nvars(p) > 1 ? "variables" : "variable")
+    print(io, "Multivariate Laurent polynomial ring in ", ItemQuantity(nvars(p), "variable"))
     print(IOContext(io, :supercompact => true), " over ", base_ring(p))
   end
 end

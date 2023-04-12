@@ -128,9 +128,7 @@ is_term(a::T) where T <: NCRingElem = true
 ###############################################################################
 
 function show(io::IO, p::NCPolyRing)
-   print(io, "Univariate Polynomial Ring in ")
-   print(io, string(var(p)))
-   print(io, " over ")
+   print(io, "Univariate Polynomial Ring in ", var(p), " over ")
    print(IOContext(io, :compact => true), base_ring(p))
 end
 

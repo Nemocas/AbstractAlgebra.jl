@@ -486,9 +486,7 @@ function show(io::IO, p::PolyRing)
    if get(io, :supercompact, false)
       print(io, "Univariate polynomial ring")
    else
-      print(io, "Univariate Polynomial Ring in ")
-      print(io, string(var(p)))
-      print(io, " over ")
+      print(io, "Univariate Polynomial Ring in ", var(p), " over ")
       print(IOContext(io, :supercompact => true), base_ring(p))
    end
 end
