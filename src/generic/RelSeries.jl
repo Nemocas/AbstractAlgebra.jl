@@ -399,13 +399,13 @@ end
 #
 ###############################################################################
 
-function power_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached::Bool=true, model=:capped_relative)
+function power_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::VarName; cached::Bool=true, model=:capped_relative)
    T = elem_type(R)
 
    if model == :capped_relative
-      parent_obj = RelPowerSeriesRing{T}(R, prec, s, cached)
+      parent_obj = RelPowerSeriesRing{T}(R, prec, Symbol(s), cached)
    elseif model == :capped_absolute
-      parent_obj = AbsPowerSeriesRing{T}(R, prec, s, cached)
+      parent_obj = AbsPowerSeriesRing{T}(R, prec, Symbol(s), cached)
    else
       error("Unknown model")
    end

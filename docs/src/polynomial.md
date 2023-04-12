@@ -49,7 +49,7 @@ In order to construct polynomials in AbstractAlgebra.jl, one must first construc
 polynomial ring itself. This is accomplished with the following constructor.
 
 ```@docs
-polynomial_ring(R::Ring, s::Symbol; cached::Bool = true)
+polynomial_ring(R::Ring, s::VarName; cached::Bool = true)
 ```
 
 A shorthand version of this function is provided: given a base ring `R`, we abbreviate
