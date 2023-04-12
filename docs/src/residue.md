@@ -83,7 +83,7 @@ julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> f = S()
 0
@@ -98,7 +98,7 @@ julia> k = S(x + 1)
 x + 1
 
 julia> U, f = quo(R, x^3 + 3x + 1)
-(Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, Map with section with the following data
+(Residue ring of Univariate polynomial ring modulo x^3 + 3*x + 1, Map with section with the following data
 
 Domain:
 =======
@@ -106,7 +106,7 @@ Univariate Polynomial Ring in x over Rationals
 
 Codomain:
 ========
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1)
+Residue ring of Univariate polynomial ring modulo x^3 + 3*x + 1)
 
 julia> U === S
 true
@@ -194,7 +194,7 @@ julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
 x + 1
@@ -227,7 +227,7 @@ julia> V = base_ring(f)
 Univariate Polynomial Ring in x over Rationals
 
 julia> T = parent(f)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> f == deepcopy(f)
 true
@@ -249,7 +249,7 @@ julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
 x + 1
@@ -272,7 +272,7 @@ julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
 x + 1

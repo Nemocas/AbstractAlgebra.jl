@@ -226,14 +226,10 @@ julia> m2 = rand(M, -10:10)
 (4, 4, -7)
 
 julia> S, f = sub(M, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Module homomorphism with
-Domain: Submodule over Integers with 2 generators and no relations
-Codomain: Free module of rank 3 over Integers)
+(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over Integers)
 
 julia> I, g = image(f)
-(Submodule over Integers with 2 generators and no relations, Module homomorphism with
-Domain: Submodule over Integers with 2 generators and no relations
-Codomain: Free module of rank 3 over Integers)
+(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over Integers)
 
 julia> is_isomorphic(S, I)
 true
@@ -265,16 +261,12 @@ julia> m2 = rand(M, -10:10)
 (4, 4, -7)
 
 julia> S, f = sub(M, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Module homomorphism with
-Domain: Submodule over Integers with 2 generators and no relations
-Codomain: Free module of rank 3 over Integers)
+(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over Integers)
 
 julia> Q, g = quo(M, S)
 (Quotient module over Integers with 2 generators and relations:
-[16 -21], Module homomorphism with
-Domain: Free module of rank 3 over Integers
-Codomain: Quotient module over Integers with 2 generators and relations:
-[16 -21])
+[50 -52], Hom: Free module of rank 3 over Integers -> Quotient module over Integers with 2 generators and relations:
+[50 -52])
 
 julia> I, f = snf(Q)
 (Invariant factor decomposed module over Integers with invariant factors BigInt[0], Module isomorphism with

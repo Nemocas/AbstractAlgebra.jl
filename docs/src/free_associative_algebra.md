@@ -53,7 +53,7 @@ the parent object `S` from being cached.
 
 ```jldoctest
 julia> R, (x, y) = free_associative_algebra(ZZ, ["x", "y"])
-(Free associative algebra over Integers on x, y, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y])
+(Free associative algebra on 2 indeterminates over Integers, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y])
 
 julia> (x + y + 1)^2
 x^2 + x*y + y*x + y^2 + 2*x + 2*y + 1
@@ -74,10 +74,10 @@ with coefficients and monomial words and not exponent vectors.
 
 ```jldoctest
 julia> R, (x, y, z) = free_associative_algebra(ZZ, ["x", "y", "z"])
-(Free associative algebra over Integers on x, y, z, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y, z])
+(Free associative algebra on 3 indeterminates over Integers, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y, z])
 
 julia> B = MPolyBuildCtx(R)
-Builder for an element of Free associative algebra over Integers on x, y, z
+Builder for an element of Free associative algebra on 3 indeterminates over Integers
 
 julia> push_term!(B, ZZ(1), [1,2,3,1]); push_term!(B, ZZ(2), [3,3,1]); finish(B)
 x*y*z*x + 2*z^2*x
@@ -142,7 +142,7 @@ exponent_word(a::Generic.FreeAssAlgElem{T}, i::Int) where T <: RingElement
 
 ```jldoctest
 julia> R, (x, y, z) = free_associative_algebra(ZZ, ["x", "y", "z"])
-(Free associative algebra over Integers on x, y, z, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y, z])
+(Free associative algebra on 3 indeterminates over Integers, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y, z])
 
 julia> map(total_degree, (R(0), R(1), -x^2*y^2*z^2*x + z*y))
 (-1, 0, 7)
@@ -187,7 +187,7 @@ exponent_words(a::FreeAssAlgElem{T}) where T <: RingElement
 
 ```jldoctest
 julia> R, (a, b, c) = free_associative_algebra(ZZ, ["a", "b", "c"])
-(Free associative algebra over Integers on a, b, c, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[a, b, c])
+(Free associative algebra on 3 indeterminates over Integers, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[a, b, c])
 
 julia> collect(terms(3*b*a*c - b + c + 2))
 4-element Vector{Any}:

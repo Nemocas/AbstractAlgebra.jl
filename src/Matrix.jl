@@ -1293,7 +1293,8 @@ julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1352,7 +1353,8 @@ julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1398,7 +1400,8 @@ julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1438,7 +1441,8 @@ julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1481,7 +1485,8 @@ julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> G = SymmetricGroup(3)
 Full symmetric group over 3 elements
@@ -2185,7 +2190,8 @@ julia> K, a = number_field(x^3 + 3x + 1, "a")
 (Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
 
 julia> S = matrix_space(K, 3, 3)
-Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Matrix Space of 3 rows and 3 columns
+  over Residue field of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -2560,7 +2566,8 @@ julia> K, a = number_field(x^3 + 3x + 1, "a")
 (Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
 
 julia> S = matrix_space(K, 3, 3)
-Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Matrix Space of 3 rows and 3 columns
+  over Residue field of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -3701,7 +3708,8 @@ julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> S = matrix_space(R, 4, 4)
-Matrix Space of 4 rows and 4 columns over Univariate Polynomial Ring in x over Integers
+Matrix Space of 4 rows and 4 columns
+  over Univariate polynomial ring
 
 julia> M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
               -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;
@@ -4218,10 +4226,11 @@ julia> R = residue_ring(ZZ, 7)
 Residue ring of Integers modulo 7
 
 julia> S = matrix_space(R, 4, 4)
-Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
+Matrix Space of 4 rows and 4 columns
+  over Residue ring
 
 julia> T, x = polynomial_ring(R, "x")
-(Univariate Polynomial Ring in x over Residue ring of Integers modulo 7, x)
+(Univariate Polynomial Ring in x over Residue ring, x)
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
@@ -6002,7 +6011,8 @@ julia> R = residue_ring(ZZ, 7)
 Residue ring of Integers modulo 7
 
 julia> S = matrix_space(R, 4, 4)
-Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
+Matrix Space of 4 rows and 4 columns
+  over Residue ring
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])

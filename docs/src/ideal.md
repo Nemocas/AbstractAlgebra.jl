@@ -61,7 +61,7 @@ contain duplicates, zero entries or be empty.
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+(Multivariate polynomial ring in 2 variables over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
 2-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
@@ -69,7 +69,7 @@ julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
  9*x^2*y + 7*x*y
 
 julia> I = Generic.Ideal(R, V)
-AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.MPoly{BigInt}}(AbstractAlgebra.Generic.MPoly{BigInt}[7*x*y + 9*y^2, 243*y^3 - 147*y^2, x*y^2 + 36*y^3 - 21*y^2, x^2*y + 162*y^3 - 99*y^2], Multivariate Polynomial Ring in x, y over Integers)
+AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.MPoly{BigInt}}(AbstractAlgebra.Generic.MPoly{BigInt}[7*x*y + 9*y^2, 243*y^3 - 147*y^2, x*y^2 + 36*y^3 - 21*y^2, x^2*y + 162*y^3 - 99*y^2], Multivariate polynomial ring in 2 variables over Integers)
 
 julia> W = map(ZZ, [2, 5, 7])
 3-element Vector{BigInt}:
@@ -171,7 +171,7 @@ normal_form(::U, ::Generic.Ideal{U}) where {T <: RingElement, U <: Union{PolyRin
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
-(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+(Multivariate polynomial ring in 2 variables over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
 2-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
@@ -179,7 +179,7 @@ julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
  9*x^2*y + 7*x*y
 
 julia> I = Generic.Ideal(R, V)
-AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.MPoly{BigInt}}(AbstractAlgebra.Generic.MPoly{BigInt}[7*x*y + 9*y^2, 243*y^3 - 147*y^2, x*y^2 + 36*y^3 - 21*y^2, x^2*y + 162*y^3 - 99*y^2], Multivariate Polynomial Ring in x, y over Integers)
+AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.MPoly{BigInt}}(AbstractAlgebra.Generic.MPoly{BigInt}[7*x*y + 9*y^2, 243*y^3 - 147*y^2, x*y^2 + 36*y^3 - 21*y^2, x^2*y + 162*y^3 - 99*y^2], Multivariate polynomial ring in 2 variables over Integers)
 
 
 julia> normal_form(30x^5*y + 2x + 1, I)

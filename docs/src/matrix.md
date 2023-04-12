@@ -82,7 +82,8 @@ julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> A = S()
 [0   0   0]
@@ -144,10 +145,12 @@ Also see the Matrix interface for a list of other ways to create matrices.
 
 ```jldoctest
 julia> S = matrix_space(QQ, 2, 3)
-Matrix Space of 2 rows and 3 columns over Rationals
+Matrix Space of 2 rows and 3 columns
+  over Rationals
 
 julia> T = MatrixAlgebra(QQ, 2)
-Matrix Algebra of degree 2 over Rationals
+Matrix Algebra of degree 2
+  over Rationals
 
 julia> M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
 [2//1   3//1   1//1]
@@ -177,7 +180,8 @@ julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> M = R[t + 1 1; t^2 0]
 [t + 1   1]
@@ -236,7 +240,8 @@ julia> P = zero_matrix(ZZ, 3, 2)
 [0   0]
 
 julia> R = MatrixAlgebra(ZZ, 2)
-Matrix Algebra of degree 2 over Integers
+Matrix Algebra of degree 2
+  over Integers
 
 julia> M = R()
 [0   0]
@@ -445,7 +450,8 @@ julia> R, t = polynomial_ring(QQ, "t")
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -790,7 +796,8 @@ julia> K, a = number_field(x^3 + 3x + 1, "a")
 (Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
 
 julia> S = matrix_space(K, 3, 3)
-Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Matrix Space of 3 rows and 3 columns
+  over Residue field of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
 [      0   2*x + 3   x^2 + 1]
@@ -827,7 +834,8 @@ julia> K, a = number_field(x^3 + 3x + 1, "a")
 (Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
 
 julia> S = matrix_space(K, 3, 3)
-Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Matrix Space of 3 rows and 3 columns
+  over Residue field of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -844,7 +852,8 @@ julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in x over Integers
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -893,7 +902,7 @@ pfaffians(::MatElem, ::Int)
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, ["x$i" for i in 1:6])
-(Multivariate Polynomial Ring in 6 variables x1, x2, x3, x4, ..., x6 over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x1, x2, x3, x4, x5, x6])
+(Multivariate polynomial ring in 6 variables over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x1, x2, x3, x4, x5, x6])
 
 julia> M = R[0 x[1] x[2] x[3]; -x[1] 0 x[4] x[5]; -x[2] -x[4] 0 x[6]; -x[3] -x[5] -x[6] 0]
 [  0    x1    x2   x3]
@@ -955,10 +964,12 @@ julia> K, a = number_field(x^3 + 3x + 1, "a")
 (Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
 
 julia> S = matrix_space(K, 3, 3)
-Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Matrix Space of 3 rows and 3 columns
+  over Residue field of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> U = matrix_space(K, 3, 1)
-Matrix Space of 3 rows and 1 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Matrix Space of 3 rows and 1 column
+  over Residue field of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -1015,10 +1026,12 @@ julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in x over Integers
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> U = matrix_space(R, 3, 2)
-Matrix Space of 3 rows and 2 columns over Univariate Polynomial Ring in x over Integers
+Matrix Space of 3 rows and 2 columns
+  over Univariate polynomial ring
 
 julia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -1034,10 +1047,12 @@ julia> x, d = solve_rational(A, bbb)
 ([3*x^4-10*x^3-8*x^2-11*x-4 -x^5+3*x^4+x^3-2*x^2+3*x-1; -2*x^5-x^4+6*x^3+2*x+1 x^6+x^5+4*x^4+9*x^3+8*x^2+5*x+2; 6*x^4+12*x^3+15*x^2+6*x-3 -2*x^5-4*x^4-6*x^3-9*x^2-4*x+1], x^5 + 2*x^4 + 15*x^3 + 18*x^2 + 8*x + 7)
 
 julia> S = matrix_space(ZZ, 3, 3)
-Matrix Space of 3 rows and 3 columns over Integers
+Matrix Space of 3 rows and 3 columns
+  over Integers
 
 julia> T = matrix_space(ZZ, 3, 1)
-Matrix Space of 3 rows and 1 columns over Integers
+Matrix Space of 3 rows and 1 column
+  over Integers
 
 julia> A = S([BigInt(2) 3 5; 1 4 7; 9 2 2])
 [2   3   5]
@@ -1074,7 +1089,8 @@ julia> K, a = number_field(x^3 + 3x + 1, "a")
 (Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
 
 julia> S = matrix_space(K, 3, 3)
-Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Matrix Space of 3 rows and 3 columns
+  over Residue field of Univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -1096,7 +1112,8 @@ julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in x over Integers
+Matrix Space of 3 rows and 3 columns
+  over Univariate polynomial ring
 
 julia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -1126,7 +1143,8 @@ right_kernel{T <: RingElem}(::MatElem{T})
 
 ```jldoctest
 julia> S = matrix_space(ZZ, 4, 4)
-Matrix Space of 4 rows and 4 columns over Integers
+Matrix Space of 4 rows and 4 columns
+  over Integers
 
 julia> M = S([1 2 0 4;
               2 0 1 1;
@@ -1162,7 +1180,8 @@ julia> R = residue_ring(ZZ, 7)
 Residue ring of Integers modulo 7
 
 julia> S = matrix_space(R, 4, 4)
-Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
+Matrix Space of 4 rows and 4 columns
+  over Residue ring
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
