@@ -713,7 +713,7 @@ end
 ###############################################################################
 
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
-                  s::Vector{Symbol}; cached=true, model=:capped_absolute)
+                  s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
     U = elem_type(R)
  
     S, _ = AbstractAlgebra.polynomial_ring(R, s)
@@ -729,7 +729,7 @@ function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
 end
 
 function power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::Int,
-   s::Vector{Symbol}; cached=true, model=:capped_absolute)
+   s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
    U = elem_type(R)
 
    S, _ = AbstractAlgebra.polynomial_ring(R, s)
@@ -745,7 +745,7 @@ function power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::
 end
 
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Int,
-                  s::Vector{Symbol}; cached=true, model=:capped_absolute)
+                  s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
     prec_vec = [prec for v in s]
     return power_series_ring(R, prec_vec, s; cached=cached, model=model)
 end

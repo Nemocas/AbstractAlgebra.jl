@@ -1154,7 +1154,7 @@ function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.
    Generic.YoungTableau(part, fill)
 end
 
-function number_field(a::Generic.Poly{Rational{BigInt}}, s::VarName, t = "\$"; cached = true)
+function number_field(a::Generic.Poly{Rational{BigInt}}, s::VarName, t = "\$"; cached::Bool=true)
    return Generic.number_field(a, Symbol(s), t; cached=cached)
 end
 

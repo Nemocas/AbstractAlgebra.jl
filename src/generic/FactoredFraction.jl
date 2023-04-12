@@ -723,7 +723,7 @@ end
 #
 ###############################################################################
 
-function FactoredFractionField(R::AbstractAlgebra.Ring; cached = true)
+function FactoredFractionField(R::AbstractAlgebra.Ring; cached::Bool=true)
    return FactoredFracField{AbstractAlgebra.elem_type(R)}(R, cached)
-end
+end 
 

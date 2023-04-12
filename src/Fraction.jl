@@ -943,24 +943,24 @@ rand(S::FracField, v...) = rand(GLOBAL_RNG, S, v...)
 ###############################################################################
 
 @doc raw"""
-    fraction_field(R::Ring; cached=true)
+    fraction_field(R::Ring; cached::Bool=true)
 
 Return the parent object of the fraction field over the given base ring $R$.
 If `cached == true` (the default), the returned parent object is cached so
 that it will always be returned by a call to the constructor when the same
 base ring $R$ is supplied.
 """
-function fraction_field(R::Ring; cached=true)
+function fraction_field(R::Ring; cached::Bool=true)
    return Generic.fraction_field(R; cached=cached)
 end
 
 @doc raw"""
-    FactoredFractionField(R::Ring; cached=true)
+    FactoredFractionField(R::Ring; cached::Bool=true)
 
 Return the parent object of the fraction field over the given base ring $R$,
 where the elements are maintained in factored form as much as possible.
 """
-function FactoredFractionField(R::Ring; cached=true)
+function FactoredFractionField(R::Ring; cached::Bool=true)
    return Generic.FactoredFractionField(R; cached=cached)
 end
 
