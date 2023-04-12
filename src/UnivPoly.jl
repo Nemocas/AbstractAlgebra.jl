@@ -32,6 +32,6 @@ end
 #
 ###############################################################################
 
-function UniversalPolynomialRing(R::Ring; ordering=:lex, cached=true)
+function UniversalPolynomialRing(R::Ring; ordering=:lex, cached::Bool=true)
    return Generic.UniversalPolynomialRing(R; ordering=ordering, cached=cached)
 end

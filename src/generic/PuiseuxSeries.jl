@@ -867,7 +867,7 @@ end
 ###############################################################################
 
 
-function PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached=true)
+function PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached::Bool=true)
    S, x = AbstractAlgebra.laurent_series_ring(R, prec, s; cached=cached)
    T = elem_type(R)
 
@@ -876,7 +876,7 @@ function PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached
    return parent_obj, gen(parent_obj)
 end
 
-function PuiseuxSeriesRing(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached= true)
+function PuiseuxSeriesRing(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached::Bool=true)
    S, x = AbstractAlgebra.laurent_series_field(R, prec, s; cached=cached)
    T = elem_type(R)
 
@@ -885,7 +885,7 @@ function PuiseuxSeriesRing(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cache
    return parent_obj, gen(parent_obj)
 end
 
-function PuiseuxSeriesField(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached = true)
+function PuiseuxSeriesField(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached::Bool=true)
    S, x = AbstractAlgebra.laurent_series_field(R, prec, s; cached=cached)
    T = elem_type(R)
 

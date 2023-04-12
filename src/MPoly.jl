@@ -1200,7 +1200,7 @@ function _change_mpoly_ring(R, Rx, cached)
 end
 
 @doc raw"""
-    change_base_ring(R::Ring, p::MPolyRingElem{<: RingElement}; parent::MPolyRing, cached::Bool)
+    change_base_ring(R::Ring, p::MPolyRingElem{<: RingElement}; parent::MPolyRing, cached::Bool=true)
 
 Return the polynomial obtained by coercing the non-zero coefficients of `p`
 into `R`.
@@ -1209,13 +1209,13 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function change_base_ring(R::Ring, p::MPolyRingElem{T}; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
+function change_base_ring(R::Ring, p::MPolyRingElem{T}; cached::Bool=true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
    base_ring(parent) != R && error("Base rings do not match.")
    return _map(R, p, parent)
 end
 
 @doc raw"""
-    change_coefficient_ring(R::Ring, p::MPolyRingElem{<: RingElement}; parent::MPolyRing, cached::Bool)
+    change_coefficient_ring(R::Ring, p::MPolyRingElem{<: RingElement}; parent::MPolyRing, cached::Bool=true)
 
 Return the polynomial obtained by coercing the non-zero coefficients of `p`
 into `R`.
@@ -1224,7 +1224,7 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function change_coefficient_ring(R::Ring, p::MPolyRingElem{T}; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
+function change_coefficient_ring(R::Ring, p::MPolyRingElem{T}; cached::Bool=true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
   return change_base_ring(R, p, cached = cached, parent = parent)
 end
 

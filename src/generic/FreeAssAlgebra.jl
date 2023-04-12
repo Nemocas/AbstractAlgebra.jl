@@ -587,12 +587,12 @@ function _change_freeassalg_ring(R, Rx, cached)
     return P
 end
 
-function change_base_ring(R::Ring, a::FreeAssAlgElem{T}; cached=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(R, parent(a), cached)) where T <: RingElement
+function change_base_ring(R::Ring, a::FreeAssAlgElem{T}; cached::Bool=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(R, parent(a), cached)) where T <: RingElement
     base_ring(parent) != R && error("Base rings do not match.")
     return _map(R, a, parent)
 end
 
-function map_coefficients(f, a::FreeAssAlgElem{T}; cached=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(parent(f(zero(base_ring(a)))), parent(a), cached)) where T <: RingElement
+function map_coefficients(f, a::FreeAssAlgElem{T}; cached::Bool=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(parent(f(zero(base_ring(a)))), parent(a), cached)) where T <: RingElement
    return _map(f, a, parent)
 end
 
