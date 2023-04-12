@@ -3120,7 +3120,7 @@ end
 ################################################################################
 
 function _change_poly_ring(R, Rx, cached)
-   P, _ = polynomial_ring(R, string(var(Rx)), cached = cached)
+   P, _ = polynomial_ring(R, var(Rx), cached = cached)
    return P
 end
 

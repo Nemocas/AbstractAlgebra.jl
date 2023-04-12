@@ -986,7 +986,7 @@ function lcc_kaltofen_step!(
   R = parent(Af.unit)
   r = length(Au)
   @assert r == length(divs)
-  Kx, _ = polynomial_ring(base_ring(R), string(gen(R,v)))
+  Kx, _ = polynomial_ring(base_ring(R), gen(R,v))
 
   Auf = [collect(factor_squarefree(to_univar(Au[i], v, Kx)).fac) for i in 1:r]
 

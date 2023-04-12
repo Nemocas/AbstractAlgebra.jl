@@ -333,7 +333,7 @@ end
 function _make_parent(g, p::PuiseuxSeriesElem, cached::Bool)
    R = parent(g(zero(base_ring(p))))
    S = parent(p)
-   sym = String(var(S))
+   sym = var(S)
    max_prec = max_precision(S)
    return AbstractAlgebra.PuiseuxSeriesRing(R, max_prec, sym; cached=cached)[1]
 end
@@ -359,7 +359,7 @@ end
 
 function _change_puiseux_series_ring(R, Rx, cached)
    P, _ = AbstractAlgebra.PuiseuxSeriesRing(R, max_precision(Rx),
-                                               string(var(Rx)), cached = cached)
+                                               var(Rx), cached = cached)
    return P
 end
 

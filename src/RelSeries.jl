@@ -1314,7 +1314,7 @@ end
 function _make_parent(g, p::RelPowerSeriesRingElem, cached::Bool)
    R = parent(g(zero(base_ring(p))))
    S = parent(p)
-   sym = String(var(S))
+   sym = var(S)
    max_prec = max_precision(S)
    return power_series_ring(R, max_prec, sym; cached=cached)[1]
 end
@@ -1343,8 +1343,7 @@ end
 ################################################################################
 
 function _change_rel_series_ring(R, Rx, cached)
-   P, _ = power_series_ring(R, max_precision(Rx),
-                                               string(var(Rx)), cached = cached)
+   P, _ = power_series_ring(R, max_precision(Rx), var(Rx), cached = cached)
    return P
 end
 
