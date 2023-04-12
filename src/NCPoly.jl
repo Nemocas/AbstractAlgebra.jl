@@ -735,12 +735,8 @@ julia> S, y = polynomial_ring(R, :y)
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
 ```
 """
-polynomial_ring(R::NCRing, s::VarName; kw...)
-
-polynomial_ring(R::NCRing, s::VarNameNonSymbol; kw...) = polynomial_ring(R, Symbol(s); kw...)
-
-function polynomial_ring(R::NCRing, s::Symbol; kw...)
-   S = polynomial_ring_only(R, s; kw...)
+function polynomial_ring(R::NCRing, s::VarName; kw...)
+   S = polynomial_ring_only(R, Symbol(s); kw...)
    (S, gen(S))
 end
 

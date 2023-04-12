@@ -250,21 +250,17 @@ total_degree(p::UnivPoly) = total_degree(p.p)
 
 length(p::UnivPoly) = length(p.p)
 
-function gen(S::UniversalPolyRing{T, U}, s::Symbol) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
-   i = findfirst(x->x==s, S.S)
+function gen(S::UniversalPolyRing{T, U}, s::VarName) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
+   i = findfirst(==(Symbol(s)), S.S)
    if typeof(i) == Nothing
-      push!(S.S, s)
+      push!(S.S, Symbol(s))
       S.mpoly_ring = MPolyRing{T}(S.base_ring, S.S, S.ord, false)
       i = length(S.S)
    end
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
 end
 
-gen(S::UniversalPolyRing, s::AbstractAlgebra.VarNameNonSymbol) = gen(S, Symbol(s))
-
-gens(S::UniversalPolyRing, v::Vector{Symbol}) = tuple([gen(S, s) for s in v]...)
-
-gens(S::UniversalPolyRing, v::Vector{T}) where T <: AbstractAlgebra.VarNameNonSymbol = gens(S, [Symbol(s) for s in v])
+gens(S::UniversalPolyRing, v::Vector{<:VarName}) = tuple([gen(S, s) for s in v]...)
 
 function gen(S::UniversalPolyRing{T, U}, i::Int) where {T, U}
    i > nvars(S) && error("Variable index out of range")

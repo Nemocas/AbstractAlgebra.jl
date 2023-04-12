@@ -1373,10 +1373,7 @@ do the same as the first constructor except that the variables will be
 automatically numbered. For example if `s` is the string `x` and `n = 3` then
 the variables will print as `x1`, `x2`, `x3`.
 """
-polynomial_ring(R::Ring, n::Int, s::VarNameNonSymbol; kw...) =
-   polynomial_ring(R, n, Symbol(s); kw...)
-
-polynomial_ring(R::Ring, n::Int, s::Symbol=:x; kw...) =
+polynomial_ring(R::Ring, n::Int, s::VarName=:x; kw...) =
    polynomial_ring(R, Symbol.(s, 1:n); kw...)
 
 MPolyRing(R::Ring, n::Int) =
