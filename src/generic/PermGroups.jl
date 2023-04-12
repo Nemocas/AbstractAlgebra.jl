@@ -71,7 +71,7 @@ cycle decomposition of `g` if already available, but will not compute
 it on demand. Since cycle structure is cached in `g` you may call
 `cycles(g)` before calling `parity`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = Perm([3,4,1,2,5])
 (1,3)(2,4)
@@ -115,7 +115,7 @@ Return the sign of a permutation.
 the homomorphism from the permutation group to the unit group of $\mathbb{Z}$
 whose kernel is the alternating group.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = Perm([3,4,1,2,5])
 (1,3)(2,4)
@@ -183,7 +183,7 @@ computed up to a cyclic permutation.
 The cycle decomposition is cached in `g` and used in future computation of
 `permtype`, `parity`, `sign`, `order` and `^` (powering).
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
@@ -244,7 +244,7 @@ decomposition of `g`.
 The lengths are sorted in decreasing order by default. `permtype(g)` fully
 determines the conjugacy class of `g`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
@@ -299,7 +299,7 @@ as strings). This can be either
 
 The difference is purely esthetical.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> setpermstyle(:array)
 :array
@@ -367,7 +367,7 @@ Return `true` if permutations are equal, otherwise return `false`.
 Permutations parametrized by different integer types are considered equal if
 they define the same permutation in the abstract permutation group.
 
-# Examples:
+# Examples
 ```
 julia> g = Perm(Int8[2,3,1])
 (1,2,3)
@@ -389,7 +389,7 @@ Return `true` if permutation groups are equal, otherwise return `false`.
 Permutation groups on the same number of letters, but parametrized
 by different integer types are considered different.
 
-# Examples:
+# Examples
 ```
 julia> G = SymmetricGroup(UInt(5))
 Permutation group over 5 elements
@@ -429,7 +429,7 @@ This corresponds to the action of permutation group on the set `[1..n]`
 If `g` and `h` are parametrized by different types, the result is promoted
 accordingly.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> Perm([2,3,1,4])*Perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 (1,3)(2,4)
@@ -449,7 +449,7 @@ may or may not be faster, depending on the particular case. Due to caching of
 the cycle structure, repeated powering of `g` will be faster with the default
 method.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = Perm([2,3,4,5,1])
 (1,2,3,4,5)
@@ -592,7 +592,7 @@ is allocated and then modified in-place using the non-recursive
 Note: you need to explicitly copy permutations intended to be stored or
 modified.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> elts = Generic.elements!(SymmetricGroup(5));
 
@@ -676,7 +676,7 @@ order(::Type{T}, g::Perm) where {T} =
 Return the permutation matrix as a sparse matrix representing `a` via natural
 embedding of the permutation group into the general linear group over $\mathbb{Z}$.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Perm([2,3,1])
 (1,2,3)
@@ -704,7 +704,7 @@ Embed permutation `p` into permutation `result` on the indices given by `V`.
 This corresponds to the natural embedding of $S_k$ into $S_n$ as the
 subgroup permuting points indexed by `V`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Perm([2,1,4,3])
 (1,2)(3,4)
@@ -724,7 +724,7 @@ end
 Return the natural embedding of a permutation group into `G` as the
 subgroup permuting points indexed by `V`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Perm([2,3,1])
 (1,2,3)
@@ -861,7 +861,7 @@ Cycles of length $1$ are not necessary, but can be included. A permutation
 of the minimal support is constructed, i.e. the maximal $n$ in the
 decomposition determines the parent group $S_n$.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = perm"(1,3)(2,4)"
 (1,3)(2,4)

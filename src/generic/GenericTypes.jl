@@ -16,7 +16,7 @@
 The full symmetric group singleton type.
 `SymmetricGroup(n)` constructs the full symmetric group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> G = SymmetricGroup(5)
 Full symmetric group over 5 elements
@@ -77,7 +77,7 @@ Fieldnames:
  * `n::Int` - the partitioned number
  * `part::Vector{Int}` - a non-increasing sequence of summands of `n`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Partition([4,2,1,1,1])
 4₁2₁1₃
@@ -213,7 +213,7 @@ Fields:
 * `part` - the partition defining Young diagram
 * `fill` - the row-major fill vector: the entries of the diagram.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Partition([4,3,1]); y = YoungTableau(p)
 ┌───┬───┬───┬───┐

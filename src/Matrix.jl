@@ -6047,8 +6047,7 @@ end
 Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 row are swapped.
 
-**Examples**
-
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
@@ -6079,8 +6078,7 @@ end
 Swap the $i$th and $j$th row of $a$ in place. The function returns the mutated
 matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 
-**Examples**
-
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
