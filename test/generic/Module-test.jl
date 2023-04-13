@@ -114,6 +114,9 @@ end
             m2 = sum(m1[i]*gen(M, i) for i in 1:ngens(M))
          end
 
+         @test_throws ArgumentError gen(M, 0)
+         @test_throws ArgumentError gen(M, ngens(M) + 1)
+
          @test m1 == m2
       end
    end

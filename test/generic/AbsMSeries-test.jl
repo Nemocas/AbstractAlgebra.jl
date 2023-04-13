@@ -146,6 +146,8 @@ end
 
    @test is_gen(gen(R, 1))
    @test is_gen(gen(R, 2))
+   @test_throws ArgumentError gen(R, 0)
+   @test_throws ArgumentError gen(R, 5)
    @test !is_gen(x^2)
    @test !is_gen(R(1))
 
@@ -195,14 +197,16 @@ end
    @test zero(R) == 0
    @test one(R) == 1
 
-   @test isunit(1 + y + x)
-   @test !isunit(x)
-   @test !isunit(2 + x)
+   @test is_unit(1 + y + x)
+   @test !is_unit(x)
+   @test !is_unit(2 + x)
 
-   @test isgen(gen(R, 1))
-   @test isgen(gen(R, 2))
-   @test !isgen(x^2)
-   @test !isgen(R(1))
+   @test is_gen(gen(R, 1))
+   @test is_gen(gen(R, 2))
+   @test_throws ArgumentError gen(R, 0)
+   @test_throws ArgumentError gen(R, 5)
+   @test !is_gen(x^2)
+   @test !is_gen(R(1))
 
    @test gens(R) == [x, y]
 

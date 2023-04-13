@@ -34,19 +34,22 @@ Return the number of variables of the polynomial ring.
 nvars(a::MPolyRing) = a.num_vars
 
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:lex}}) where {T <: RingElement}
-    n = a.num_vars
+    n = nvars(a)
+    @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape([UInt(j == n - i + 1)
             for j = 1:n], n, 1))
 end
 
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:deglex}}) where {T <: RingElement}
-    n = a.num_vars
+    n = nvars(a)
+    @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape([[UInt(j == n - i + 1)
             for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:degrevlex}}) where {T <: RingElement}
-    n = a.num_vars
+    n = nvars(a)
+    @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape([[UInt(j == i)
             for j in 1:n]..., UInt(1)], n + 1, 1))
 end

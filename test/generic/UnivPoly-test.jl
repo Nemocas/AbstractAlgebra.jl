@@ -4,11 +4,14 @@
          ord = rand_ordering()
 
          @test UniversalPolynomialRing(R; ordering=ord, cached = true) === UniversalPolynomialRing(R; ordering=ord, cached = true)
-         UniversalPolynomialRing(R; ordering=ord, cached = true) !== UniversalPolynomialRing(R; ordering=ord, cached = true)
+         @test UniversalPolynomialRing(R; ordering=ord, cached = false) !== UniversalPolynomialRing(R; ordering=ord, cached = false)
 
          S = UniversalPolynomialRing(R; ordering=ord)
 
          x = gen(S, "x")
+
+         @test_throws ArgumentError gen(S, 0)
+         @test_throws ArgumentError gen(S, nvars(S) + 1)
 
          @test isa(x, UniversalPolyRingElem)
 

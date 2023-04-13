@@ -25,6 +25,7 @@ ngens(N::Submodule{T}) where T <: RingElement = length(N.gen_cols)
 gens(N::Submodule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
 function gen(N::Submodule{T}, i::Int) where T <: RingElement
+   @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
    R = base_ring(N)
    return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
 end

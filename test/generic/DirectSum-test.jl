@@ -26,6 +26,9 @@ using Random
    f = D([gen(F, 1), gen(F,2)])
    @test isa(f, Generic.DirectSumModuleElem)
    @test f == inj[1](gen(F,1)) + inj[2](gen(F, 2))
+
+   @test_throws ArgumentError gen(D, 0)
+   @test_throws ArgumentError gen(D, ngens(D) + 1)
 end
 
 @testset "Generic.DirectSum.basic_manipulation" begin

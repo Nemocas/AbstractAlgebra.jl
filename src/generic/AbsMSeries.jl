@@ -169,6 +169,7 @@ Return the $i$-th generator (variable) of the series ring $R$. Numbering starts
 from $1$ for the most significant variable.
 """
 function gen(R::AbsMSeriesRing, i::Int)
+   @boundscheck 1 <= i <= nvars(R) || throw(ArgumentError("variable index out of range"))
    S = poly_ring(R)
    if R.weighted_prec == -1
       prec = [R.prec_max[ind] for ind in 1:nvars(R)]

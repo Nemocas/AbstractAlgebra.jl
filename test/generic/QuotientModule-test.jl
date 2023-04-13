@@ -86,6 +86,9 @@ end
       @test gen(Q, i) == G[i]
    end
 
+   @test_throws ArgumentError gen(Q, 0)
+   @test_throws ArgumentError gen(Q, ngens(Q) + 1)
+
    @test supermodule(Q) == M
 
    for iter in 1:20
