@@ -191,9 +191,9 @@ end
 
 Return the zero polynomial in the given polynomial ring.
 """
-zero(R::PolyRing) = R(0)
+zero(R::PolyRing) = R(zero(base_ring(R)))
 
-one(R::PolyRing) = R(1)
+one(R::PolyRing) = R(one(base_ring(R)))
 
 @doc raw"""
     gen(R::PolyRing)
