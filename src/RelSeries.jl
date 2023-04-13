@@ -178,25 +178,21 @@ end
 ###############################################################################
 
 function similar(x::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
-                                   s::Symbol; cached::Bool=true)
+                                   s::VarName=var(parent(x)); cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.RelSeries{TT}(V, 0, max_prec, max_prec)
    # Default similar is supposed to return a Generic series
-   if base_ring(x) === R && s == var(parent(x)) &&
+   if base_ring(x) === R && Symbol(s) == var(parent(x)) &&
             typeof(x) === Generic.RelSeries{TT} &&
             max_precision(parent(x)) == max_prec
        # steal parent in case it is not cached
        p.parent = parent(x)
    else
-       p.parent = Generic.RelPowerSeriesRing{TT}(R, max_prec, s, cached)
+       p.parent = Generic.RelPowerSeriesRing{TT}(R, max_prec, Symbol(s), cached)
    end
    return p
 end
-
-similar(x::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
-                                   var::VarName=var(parent(x)); cached::Bool=true) =
-   similar(x, R, max_prec, Symbol(var); cached)
 
 similar(x::RelPowerSeriesRingElem, R::Ring,
                                    var::VarName=var(parent(x)); cached::Bool=true) =
@@ -227,7 +223,7 @@ zero(a::RelPowerSeriesRingElem, max_prec::Int,
    similar(a, max_prec, Symbol(var); cached)
 
 
-zero(a::RelPowerSeriesRingElem,     var::Symbol=var(parent(a)); cached::Bool=true) =
+zero(a::RelPowerSeriesRingElem, var::VarName=var(parent(a)); cached::Bool=true) =
    similar(a, Symbol(var); cached)
 
 ###############################################################################

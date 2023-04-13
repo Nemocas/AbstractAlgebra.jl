@@ -1899,26 +1899,26 @@ end
 #
 ###############################################################################
 
-function laurent_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached::Bool=true)
+function laurent_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::VarName; cached::Bool=true)
    T = elem_type(R)
 
-   parent_obj = LaurentSeriesRing{T}(R, prec, s, cached)
+   parent_obj = LaurentSeriesRing{T}(R, prec, Symbol(s), cached)
 
    return parent_obj, gen(parent_obj)
 end
 
-function laurent_series_ring(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached::Bool=true)
+function laurent_series_ring(R::AbstractAlgebra.Field, prec::Int, s::VarName; cached::Bool=true)
    T = elem_type(R)
 
-   parent_obj = LaurentSeriesField{T}(R, prec, s, cached)
+   parent_obj = LaurentSeriesField{T}(R, prec, Symbol(s), cached)
 
    return parent_obj, gen(parent_obj)
 end
 
-function laurent_series_field(R::AbstractAlgebra.Field, prec::Int, s::Symbol; cached::Bool=true)
+function laurent_series_field(R::AbstractAlgebra.Field, prec::Int, s::VarName; cached::Bool=true)
    T = elem_type(R)
 
-   parent_obj = LaurentSeriesField{T}(R, prec, s, cached)
+   parent_obj = LaurentSeriesField{T}(R, prec, Symbol(s), cached)
 
    return parent_obj, gen(parent_obj)
 end
