@@ -98,6 +98,7 @@
       @test !is_gen(one(S))
       for i in 1:num_vars
          g = gen(S, i)
+         @test g == S[i]
          @test is_gen(g)
          @test !is_gen(g + 1)
          @test leading_exponent_word(g) == [i]

@@ -9,10 +9,12 @@
          S = UniversalPolynomialRing(R; ordering=ord)
 
          x = gen(S, "x")
+         @test x == S[1]
 
          @test isa(x, UniversalPolyRingElem)
 
          y, z = gens(S, ["y", "z"])
+         @test y == S[2]
 
          @test elem_type(S) == Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}
          @test elem_type(Generic.UniversalPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}

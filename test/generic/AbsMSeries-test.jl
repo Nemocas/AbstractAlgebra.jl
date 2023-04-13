@@ -149,6 +149,8 @@ end
    @test !is_gen(x^2)
    @test !is_gen(R(1))
 
+   @test gen(R,1) == R[1]
+
    @test gens(R) == [x, y]
 
    @test parent(x) == R
@@ -203,6 +205,8 @@ end
    @test isgen(gen(R, 2))
    @test !isgen(x^2)
    @test !isgen(R(1))
+
+   @test gen(R,1) == R[1]
 
    @test gens(R) == [x, y]
 
