@@ -1291,13 +1291,13 @@ end
 
 const FreeModuleDict = CacheDictType{Tuple{NCRing, Int}, FreeModule}()
 
-mutable struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
-    v::AbstractAlgebra.MatElem{T}
-    parent::FreeModule{T}
+struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
+   parent::FreeModule{T}
+   v::MatElem{T}
 
-    function FreeModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
-       z = new{T}(v, m)
-    end
+   function FreeModuleElem{T}(m::FreeModule{T}, v::MatElem{T}) where T <: Union{RingElement, NCRingElem}
+      new{T}(m, v)
+   end
 end
 
 ###############################################################################
