@@ -171,14 +171,14 @@ element in $D$.
 **Examples**
 
 ```jldoctest
-julia> N = FreeModule(QQ, 2);
+julia> N = FreeModule(QQ, 1);
 
-julia> M = FreeModule(QQ, 1);
+julia> M = FreeModule(QQ, 2);
 
 julia> D, _ = direct_sum(M, N, M);
 
 julia> D([gen(M, 1), gen(N, 1), gen(M, 2)])
-(1//1, 1//1, 0//1, 0//1)
+(1//1, 0//1, 1//1, 0//1, 1//1)
 ```
 ### Special Homomorphisms
 

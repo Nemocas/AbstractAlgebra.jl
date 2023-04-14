@@ -263,7 +263,7 @@ end
 gens(S::UniversalPolyRing, v::Vector{<:VarName}) = tuple([gen(S, s) for s in v]...)
 
 function gen(S::UniversalPolyRing{T, U}, i::Int) where {T, U}
-   i > nvars(S) && error("Variable index out of range")
+   @boundscheck 1 <= i <= nvars(S) || throw(ArgumentError("generator index out of range"))
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
 end
 

@@ -27,6 +27,7 @@ ngens(N::QuotientModule{T}) where T <: RingElement = length(N.gen_cols)
 gens(N::QuotientModule{T}) where T <: RingElement = elem_type(N)[gen(N, i) for i = 1:ngens(N)]
 
 function gen(N::QuotientModule{T}, i::Int) where T <: RingElement
+   @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
    R = base_ring(N)
    mat = matrix(R, 1, ngens(N),
                 [(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])

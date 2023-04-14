@@ -25,6 +25,7 @@ ngens(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m)
 gens(N::DirectSumModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
 function gen(N::DirectSumModule{T}, i::Int) where T <: RingElement
+   @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index is out of range"))
    R = base_ring(N)
    return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
 end

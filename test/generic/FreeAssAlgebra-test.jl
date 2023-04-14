@@ -103,6 +103,9 @@
          @test leading_exponent_word(g) == [i]
       end
 
+      @test_throws ArgumentError gen(S, 0)
+      @test_throws ArgumentError gen(S, num_vars + 1)
+
       @test_throws ArgumentError leading_term(zero(S))
       @test_throws ArgumentError leading_monomial(zero(S))
       @test_throws ArgumentError leading_exponent_word(zero(S))

@@ -86,7 +86,7 @@ function ngens(a::FreeAssAlgebra{T}) where T
 end
 
 function gen(a::FreeAssAlgebra{T}, i::Int) where T
-   0 < i <= nvars(a) || error("variable index out of range")
+   @boundscheck 1 <= i <= ngens(a) || throw(ArgumentError("variable index out of range"))
    c = one(base_ring(a))
    iszero(c) && return zero(a)
    return FreeAssAlgElem{T}(a, T[c], [Int[i]], 1)
@@ -148,7 +148,7 @@ end
 
 function (a::FreeAssAlgebra{T})(c::Vector{T}, e::Vector{Vector{Int}}) where T
    for ei in e
-      all(i -> (i <= nvars(a)), ei) || error("variable index out of range")
+      @boundscheck all(i -> (1 <= i <= nvars(a)), ei) || throw(ArgumentError("variable index out of range"))
    end
    n = length(c)
    n == length(e) || error("coefficient array and exponent array should have the same length")
@@ -163,18 +163,18 @@ end
 ###############################################################################
 
 function coeff(a::FreeAssAlgElem, i::Int)
-   0 < i <= length(a) || error("index out of range")
+   @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
    return a.coeffs[i]
 end
 
 function term(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
-   0 < i <= length(a) || error("index out of range")
+   @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
    R = parent(a)
    return FreeAssAlgElem{T}(R, [a.coeffs[i]], [a.exps[i]], 1)
 end
 
 function monomial(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
-   0 < i <= length(a) || error("index out of range")
+   @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
    R = parent(a)
    return FreeAssAlgElem{T}(R, T[one(base_ring(R))], [a.exps[i]], 1)
 end
@@ -187,7 +187,7 @@ $i$-th term of $a$. Term numbering begins at $1$, and the variable
 indices are given in the order of the variables for the ring.
 """
 function exponent_word(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
-   0 < i <= length(a) || error("index out of range")
+   @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
    return a.exps[i]
 end
 
@@ -278,7 +278,7 @@ end
 
 function set_exponent_word!(a::FreeAssAlgElem{T}, i::Int, w::Vector{Int}) where T <: RingElement
    n = nvars(parent(a))
-   all(x -> 0 < x <= n, w) || error("variable index out of range")
+   @boundscheck all(x -> 1 <= x <= n, w) || throw(ArgumentError("variable index out of range"))
    fit!(a, i)
    a.exps[i] = w
    if i > length(a)
