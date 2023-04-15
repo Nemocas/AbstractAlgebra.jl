@@ -10,16 +10,16 @@
 #
 ###############################################################################
 
-parent_type(::Type{S}) where {T <: NCRingElement, S <: Mat{T}} = MatSpace{T}
+parent_type(::Type{<:MatElem{T}}) where {T <: NCRingElement} = MatSpace{T}
 
-elem_type(::Type{MatSpace{T}}) where {T <: NCRingElement} = MatSpaceElem{T}
+elem_type(::Type{MatSpace{T}}) where {T <: NCRingElement} = dense_matrix_type(T)
 
 @doc raw"""
-    parent(a::AbstractAlgebra.MatElem{T}) where T <: NCRingElement
+    parent(a::AbstractAlgebra.MatElem)
 
 Return the parent object of the given matrix.
 """
-parent(a::Mat{T}) where T <: NCRingElement = MatSpace{T}(a.base_ring, size(a.entries)...)
+parent(a::MatElem) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 @doc raw"""
     dense_matrix_type(::Type{T}) where T<:NCRingElement
@@ -148,63 +148,44 @@ end
 #
 ###############################################################################
 
+# create a zero matrix
 function (a::MatSpace{T})() where {T <: NCRingElement}
-   R = base_ring(a)
-   entries = Matrix{T}(undef, a.nrows, a.ncols)
-   for i = 1:a.nrows
-      for j = 1:a.ncols
-         entries[i, j] = zero(R)
-      end
-   end
-   z = MatSpaceElem{T}(R, entries)
-   return z
+   return zero_matrix(base_ring(a), nrows(a), ncols(a))::dense_matrix_type(T)
 end
 
-function (a::MatSpace{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
+# create a matrix with b on the diagonal
+function (a::AbstractAlgebra.Generic.MatSpace)(b::NCRingElement)
+   M = a()  # zero matrix
    R = base_ring(a)
-   entries = Matrix{T}(undef, a.nrows, a.ncols)
    rb = R(b)
-   for i = 1:a.nrows
-      for j = 1:a.ncols
-         if i != j
-            entries[i, j] = zero(R)
-         else
-            entries[i, j] = rb
-         end
-      end
+   for i in 1:min(nrows(a), ncols(a))
+      M[i, i] = rb
    end
-   z = MatSpaceElem{T}(R, entries)
-   return z
+   return M
 end
 
-function (a::MatSpace{T})(b::Matrix{T}) where T <: NCRingElement
+# convert a Julia matrix
+function (a::MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
+   _check_dim(nrows(a), ncols(a), b)
    R = base_ring(a)
-   _check_dim(a.nrows, a.ncols, b)
-   if !isempty(b)
-      R != parent(b[1, 1]) && error("Unable to coerce matrix")
+
+   # minor optimization for MatSpaceElem
+   if S === T && dense_matrix_type(T) === MatSpaceElem{T} && all(x -> R === parent(x), b)
+      return MatSpaceElem{T}(R, b)
    end
-   z = MatSpaceElem{T}(R, b)
-   return z
+
+   # generic code
+   M = a()  # zero matrix
+   for i = 1:nrows(a), j = 1:ncols(a)
+      M[i, j] = R(b[i, j])
+   end
+   return M
 end
 
-function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: NCRingElement, T <: NCRingElement}
-   R = base_ring(a)
-   _check_dim(a.nrows, a.ncols, b)
-   entries = Matrix{T}(undef, a.nrows, a.ncols)
-   for i = 1:a.nrows
-      for j = 1:a.ncols
-         entries[i, j] = R(b[i, j])
-      end
-   end
-   z = MatSpaceElem{T}(R, entries)
-   return z
-end
-
-function (a::MatSpace{T})(b::AbstractVector{S}) where {S <: NCRingElement, T <: NCRingElement}
-   _check_dim(a.nrows, a.ncols, b)
-   b = Matrix{S}(transpose(reshape(b, a.ncols, a.nrows)))
-   z = a(b)
-   return z
+# convert a Julia vector
+function (a::MatSpace{T})(b::AbstractVector) where T <: NCRingElement
+   _check_dim(nrows(a), ncols(a), b)
+   return a(transpose(reshape(b, a.ncols, a.nrows)))
 end
 
 ###############################################################################
