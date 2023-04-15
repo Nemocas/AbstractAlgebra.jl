@@ -412,7 +412,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
             @test a == Rx(collect(coefficients(a)))
 
             B = MPolyBuildCtx(Rx)   # TODO rename to BuildCtx
-            for (c, e) in zip(coefficients(a), exponent_vectors(a))
+            for (c, e) in zip(AbstractAlgebra.coefficients(a), AbstractAlgebra.exponent_vectors(a))
                push_term!(B, c, e)
             end
             @test finish(B) == a
