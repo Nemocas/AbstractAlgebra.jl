@@ -352,7 +352,7 @@ function heapinsert!(heap::Vector{lmnode{U, V, N}}, node::lmnode{U, V, N}) where
       n >>= 1
    end
    heap[i] = node
-   return Nothing
+   return nothing
 end
    
 function heappop!(heap::Vector{lmnode{U, V, N}}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N}

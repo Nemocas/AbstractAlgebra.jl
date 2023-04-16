@@ -252,7 +252,7 @@ length(p::UnivPoly) = length(p.p)
 
 function gen(S::UniversalPolyRing{T, U}, s::VarName) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
    i = findfirst(==(Symbol(s)), S.S)
-   if typeof(i) == Nothing
+   if i === nothing
       push!(S.S, Symbol(s))
       S.mpoly_ring = MPolyRing{T}(S.base_ring, S.S, S.ord, false)
       i = length(S.S)
