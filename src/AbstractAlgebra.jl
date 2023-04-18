@@ -544,6 +544,11 @@ import .PrettyPrinting: set_html_as_latex
 import .PrettyPrinting: show_obj
 import .PrettyPrinting: show_via_expressify
 import .PrettyPrinting: with_unicode
+import .PrettyPrinting: pretty
+import .PrettyPrinting: Uppercase
+import .PrettyPrinting: Lowercase
+import .PrettyPrinting: Indent
+import .PrettyPrinting: Dedent
 
 export @enable_all_show_via_expressify
 

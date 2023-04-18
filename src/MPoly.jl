@@ -559,8 +559,7 @@ end
 function show(io::IO, ::MIME"text/plain", p::MPolyRing)
   max_vars = 5 # largest number of variables to print
   n = nvars(p)
-  adj = get(io, :capitalize, true) ? identity : lowercasefirst
-  print(io, adj("Multivariate polynomial ring"))
+  print(io, "Multivariate polynomial ring")
   print(io, "in ", ItemQuantity(nvars(p), "variable"), " ")
   if n > max_vars
     join(io, symbols(p)[1:max_vars - 1], ", ")
@@ -569,18 +568,19 @@ function show(io::IO, ::MIME"text/plain", p::MPolyRing)
     join(io, symbols(p), ", ")
     println(io)
   end
-  print(IOContext(io, :capitalize => false), "  over ", base_ring(p))
+  io = pretty(io) # we need this to allow indented and lowercase printing
+  print(io, Indent(), "over ", Lowercase(), base_ring(p))
 end
 
 function show(io::IO, p::MPolyRing)
-  adj = get(io, :capitalize, true) ? identity : lowercasefirst
   if get(io, :supercompact, false)
     # no nested printing
-    print(io, adj("Multivariate polynomial ring"))
+    print(io, "Multivariate polynomial ring")
   else
+    io = pretty(io) # we need this to allow printing lowercase
     # nested printing allowed, preferably supercompact
-    print(io, adj("Multivariate polynomial ring in "), ItemQuantity(nvars(p), "variable"))
-    print(IOContext(io, :supercompact => true, :capitalize => false), " over ", base_ring(p))
+    print(io, "Multivariate polynomial ring in ", ItemQuantity(nvars(p), "variable"))
+    print(IOContext(io, :supercompact => true), " over ", Lowercase(), base_ring(p))
   end
 end
 

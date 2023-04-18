@@ -2,6 +2,8 @@ module PrettyPrinting
 
 import ..AbstractAlgebra: RingElem, NCRingElem, MatrixElem
 
+import Base: displaysize
+
 using ..AbstractAlgebra
 
 using Preferences
@@ -1400,5 +1402,166 @@ function with_unicode(f::Function)
   f()
   allow_unicode(old_allow_unicode);
 end
+
+################################################################################
+#
+#  IO context with indendation and lowercasing
+#
+################################################################################
+
+import Base: convert, show, pipe_reader, pipe_writer, lock, unlock, write,
+             getindex, in, haskey, get, print, unwrapcontext
+
+export IOCustom, Indent, Dedent, Align, Dealign, indent_string!, alignment_char!
+
+struct Indent end
+struct Dedent end
+
+struct Lowercase end
+struct Uppercase end
+
+struct Align end
+struct Dealign end
+
+Base.show(io::IO, ::Union{Indent, Dedent, Align, Dealign}) = nothing
+
+mutable struct IOCustom{IO_t <: IO} <: Base.AbstractPipe
+    io::IO_t
+    indent_level::Int
+    aligns::Vector{Int}
+    offset::Int
+    indented_line::Bool
+    indent_str::String
+    align_char::Char
+    printed::Int
+    lowercasefirst::Bool
+
+    function IOCustom{IO_t}(io::IO_t, indent_level::Int, aligns::Vector{Int},
+                            offset::Int, indented_line::Bool, indent_str::String,
+                            align_char::Char, printed::Int, lowercasefirst::Bool) where IO_t <: IO
+        @assert(!(IO_t <: IOCustom))
+        return new(io, indent_level, aligns, offset, indented_line, indent_str, align_char, printed, lowercasefirst)
+    end
+end
+
+_unwrap(io::IOCustom) = io
+
+_unwrap(io::IOContext) = io.io
+
+indent_string!(io::IO, str::String) = (_unwrap(io).indent_str = str; io)
+alignment_char!(io::IO, chr::Char) = (_unwrap(io).align_char = chr; io)
+
+IOCustom(io::IO) = IOCustom{typeof(io)}(io, 0, Int[], 0, false, "  ", ' ', 0, false)
+
+IOCustom(io::IOCustom) = io
+
+convert(::Type{IOCustom}, io::IOCustom) = io
+
+in(key_value::Pair, io::IOCustom) = in(key_value, io.io, ===)
+haskey(io::IOCustom, key) = haskey(io.io, key)
+getindex(io::IOCustom, key) = getindex(io.io, key)
+get(io::IOCustom, key, default) = get(io.io, key, default)
+
+function show(_io::IO, io::IOCustom)
+    ioi = IOCustom(_io)
+    print(ioi, "IOCustom:", Indent())
+    print(ioi, "\nIO: "); show(ioi, io.io)
+    print(ioi, "\nIndent string: \"", io.indent_str, "\"")
+    print(ioi, "\nAlign char: \"", io.align_char, "\"")
+    print(ioi, "\nIndent: ", io.indent_level)
+    print(ioi, "\nAligns: ", join(io.aligns, ","))
+end
+
+pipe_reader(io::IOCustom) = io.io
+pipe_writer(io::IOCustom) = io.io
+lock(io::IOCustom) = lock(io.io)
+unlock(io::IOCustom) = unlock(io.io)
+
+Base.displaysize(io::IOCustom) = displaysize(io.io)
+
+write(io::IO, ::Indent) = (_unwrap(io).indent_level += 1; 0)
+print(io::IO, ::Indent) = write(io, Indent())
+write(io::IO, ::Dedent) = (_unwrap(io).indent_level = max(0, io.indent_level - 1); 0)
+print(io::IO, ::Dedent) = write(io, Dedent())
+write(io::IO, ::Lowercase) = (_unwrap(io).lowercasefirst = true; 0)
+print(io::IO, ::Lowercase) = write(io, Lowercase())
+write(io::IO, ::Uppercase) = (_unwrap(io).lowercasefirst = false; 0)
+print(io::IO, ::Uppercase) = write(io, Uppercase())
+
+_align_length(io) = length(io.aligns) == 0 ? 0 : io.aligns[end]
+write(io::IO, ::Align) = (push!(_unwrap(io).aligns, io.offset + _align_length(io)); 0)
+print(io::IO, ::Align) = write(io, Align())
+write(io::IO, ::Dealign) = (length(_unwrap(io).aligns) > 0 && pop!(io.aligns); 0)
+print(io::IO, ::Dealign) = write(io, Dealign())
+
+write_indent(io::IO) = write(_unwrap(io).io, io.indent_str^io.indent_level)
+write_offset(io::IO) = write(_unwrap(io).io, string(io.align_char)^_align_length(io))
+
+write(io::IOCustom, chr::Char) = write(io, string(chr)) # Need to catch writing a '\n'
+
+function _write_line(io::IOCustom, str::AbstractString)
+  written = 0
+  c = displaysize(io)[2]
+  ind = io.indent_level * textwidth(io.indent_str)
+  # there might be already something written
+  if c - ind - io.printed < 0
+    spaceleft = mod(c - ind - io.printed, c)
+  else
+    spaceleft = c - ind - io.printed
+  end
+  #@show spaceleft
+  firstlen = min(spaceleft, length(str))
+  firststr = str[1:firstlen]
+  if io.lowercasefirst
+    written += write(io.io, lowercasefirst(firststr))
+  else
+    written += write(io.io, firststr)
+    io.lowercasefirst = false
+  end
+  io.printed += textwidth(firststr)
+  reststr = str[firstlen + 1:end]
+  it = Iterators.partition(1:textwidth(reststr), c - ind > 0 ? c - ind : mod(c - ind, c))
+  for i in it
+    written += write(io.io, "\n")
+    written += write_indent(io)
+    written += write(io.io, reststr[i])
+    io.printed = textwidth(reststr[i])
+  end
+  return written
+end
+
+function write(io::IOCustom, str::String)
+  written = 0
+  if str == "\n"
+    written = write(io.io, str)
+    io.indented_line = false
+    return written
+  end
+
+  for (i, line) in enumerate(split(str, "\n"))
+    if i != 1
+      written += write(io.io, "\n")
+      io.indented_line = false
+    end
+
+    if !io.indented_line
+      written += write_indent(io)
+      io.indented_line = true
+    end
+    written += _write_line(io, line)
+  end
+  if !isempty(str) && last(str) == '\n'
+    io.indented_line = false
+  else
+    io.indented_line = true
+  end
+  return written
+end
+
+Base.write(io::IOContext{<: IOCustom}, s::Union{SubString{String}, String}) = Base.write(Base.unwrapcontext(io)[1], s)
+
+pretty(io::IO) = IOCustom(io)
+
+export pretty, LowerCase, Uppercase, Indent, Dedent
 
 end # PrettyPrinting
