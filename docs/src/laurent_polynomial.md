@@ -42,7 +42,7 @@ from the polynomial interface, for example:
 
 ```jldoctest
 julia> R, x = LaurentPolynomialRing(ZZ, "x")
-(Univariate Laurent polynomial Ring in x over integers, x)
+(Univariate Laurent polynomial ring in x over integers, x)
 
 julia> var(R)
 :x
