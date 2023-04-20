@@ -4,6 +4,8 @@ import ..AbstractAlgebra: RingElem, NCRingElem, MatrixElem
 
 using ..AbstractAlgebra
 
+using Preferences
+
 # printing is done with respect to the following precedences
 # There is no point in using the julia values because we add our own ops
 const prec_lowest      = 0
@@ -1376,5 +1378,27 @@ function print_obj(S::printer, mi::MIME, obj, left::Int, right::Int)
    push(S, "[??? unknown object ???]")
 end
 
-end # PrettyPrinting
+################################################################################
+#
+#  Unicode printing
+#
+################################################################################
 
+# A non-compiletime preference
+function allow_unicode(flag::Bool)
+  old_flag = is_unicode_allowed()
+  @set_preferences!("unicode" => flag)
+  return old_flag
+end
+
+function is_unicode_allowed()
+  return @load_preference("unicode", default = false)
+end
+
+function with_unicode(f::Function)
+  old_allow_unicode = allow_unicode(true);
+  f()
+  allow_unicode(old_allow_unicode);
+end
+
+end # PrettyPrinting
