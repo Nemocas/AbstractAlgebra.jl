@@ -122,16 +122,18 @@ end
 
 function show(io::IO, ::MIME"text/plain", a::FracField)
   println(io, "Fraction field")
-  print(io, "  of ", base_ring(a))
+  io = pretty(io)
+  print(io, Indent(), "of ", Lowercase(), base_ring(a))
 end
 
 function show(io::IO, a::FracField)
-   if get(io, :supercompact, false)
-      print(io, "Fraction field")
-   else
-      print(io, "Fraction field of ")
-      print(IOContext(io, :supercompact => true), base_ring(a))
-   end
+  if get(io, :supercompact, false)
+    print(io, "Fraction field")
+  else
+    io = pretty(io)
+    print(io, "Fraction field of ")
+    print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+  end
 end
 
 ###############################################################################

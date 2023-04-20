@@ -111,10 +111,10 @@ various elements into those rings.
 
 ```jldoctest
 julia> R, x = power_series_ring(ZZ, 10, "x")
-(Univariate power series ring over Integers, x + O(x^11))
+(Univariate power series ring over integers, x + O(x^11))
 
 julia> S, y = power_series_ring(ZZ, 10, "y"; model=:capped_absolute)
-(Univariate power series ring over Integers, y + O(y^10))
+(Univariate power series ring over integers, y + O(y^10))
 
 julia> T, z = laurent_series_ring(ZZ, 10, "z")
 (Laurent series ring in z over Integers, z + O(z^11))
@@ -136,7 +136,7 @@ julia> k = T(z + 1)
 
 julia> V = AbsPowerSeriesRing(ZZ, 10)
 Univariate power series ring in x with precision 10
-  over Integers
+  over integers
 ```
 
 ## Power series constructors
@@ -185,7 +185,7 @@ laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::In
 
 ```jldoctest
 julia> S, x = power_series_ring(QQ, 10, "x"; model=:capped_absolute)
-(Univariate power series ring over Rationals, x + O(x^10))
+(Univariate power series ring over rationals, x + O(x^10))
 
 julia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
 2*x + 3*x^2 + x^3 + O(x^6)
@@ -225,7 +225,7 @@ O(x::SeriesElem)
 
 ```jldoctest
 julia> R, x = power_series_ring(ZZ, 10, "x")
-(Univariate power series ring over Integers, x + O(x^11))
+(Univariate power series ring over integers, x + O(x^11))
 
 julia> S, y = laurent_series_ring(ZZ, 10, "y")
 (Laurent series ring in y over Integers, y + O(y^11))
@@ -426,7 +426,7 @@ is_gen(::RelPowerSeriesRingElem)
 
 ```jldoctest
 julia> S, x = power_series_ring(ZZ, 10, "x")
-(Univariate power series ring over Integers, x + O(x^11))
+(Univariate power series ring over integers, x + O(x^11))
 
 julia> f = 1 + 3x + x^3 + O(x^10)
 1 + 3*x + x^3 + O(x^10)
@@ -463,7 +463,7 @@ true
 
 julia> T = parent(x + 1)
 Univariate power series ring in x with precision 10
-  over Integers
+  over integers
 
 julia> g == deepcopy(g)
 true
@@ -475,10 +475,10 @@ julia> p = precision(f)
 10
 
 julia> R, t = power_series_ring(QQ, 10, "t")
-(Univariate power series ring over Rationals, t + O(t^11))
+(Univariate power series ring over rationals, t + O(t^11))
 
 julia> S, x = power_series_ring(R, 30, "x")
-(Univariate power series ring over Univariate power series ring, x + O(x^31))
+(Univariate power series ring over univariate power series ring, x + O(x^31))
 
 julia> a = O(x^4)
 O(x^4)
@@ -502,7 +502,7 @@ julia> c = coeff(b, 2)
 1 + t^2 + O(t^10)
 
 julia> S, x = power_series_ring(ZZ, 10, "x")
-(Univariate power series ring over Integers, x + O(x^11))
+(Univariate power series ring over integers, x + O(x^11))
 
 julia> f = 1 + 3x + x^3 + O(x^5)
 1 + 3*x + x^3 + O(x^5)
@@ -532,7 +532,7 @@ change_base_ring(::Ring, ::AbsPowerSeriesRingElem{<:RingElem})
 
 ```jldoctest
 julia> R, x = power_series_ring(ZZ, 10, "x")
-(Univariate power series ring over Integers, x + O(x^11))
+(Univariate power series ring over integers, x + O(x^11))
 
 julia> f = 4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
 4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
@@ -558,10 +558,10 @@ shift_right{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = power_series_ring(R, 30, "x")
-(Univariate power series ring over Univariate polynomial ring, x + O(x^31))
+(Univariate power series ring over univariate polynomial ring, x + O(x^31))
 
 julia> a = 2x + x^3
 2*x + x^3 + O(x^31)
@@ -599,10 +599,10 @@ truncate{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = power_series_ring(R, 30, "x")
-(Univariate power series ring over Univariate polynomial ring, x + O(x^31))
+(Univariate power series ring over univariate polynomial ring, x + O(x^31))
 
 julia> a = 2x + x^3
 2*x + x^3 + O(x^31)
@@ -640,10 +640,10 @@ Base.inv(::RelPowerSeriesRingElem)
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = power_series_ring(R, 30, "x")
-(Univariate power series ring over Univariate polynomial ring, x + O(x^31))
+(Univariate power series ring over univariate polynomial ring, x + O(x^31))
 
 julia> a = 1 + x + 2x^2 + O(x^5)
 1 + x + 2*x^2 + O(x^5)
@@ -697,13 +697,13 @@ Base.sqrt(a::RelPowerSeriesRingElem)
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = power_series_ring(R, 30, "x")
-(Univariate power series ring over Univariate polynomial ring, x + O(x^31))
+(Univariate power series ring over univariate polynomial ring, x + O(x^31))
 
 julia> T, z = power_series_ring(QQ, 30, "z")
-(Univariate power series ring over Rationals, z + O(z^31))
+(Univariate power series ring over rationals, z + O(z^31))
 
 julia> a = 1 + z + 3z^2 + O(z^5)
 1 + z + 3*z^2 + O(z^5)
@@ -742,7 +742,7 @@ rand(R::SeriesRing, val_range::UnitRange{Int}, v...)
 
 ```jldoctest; setup = :(import Random; Random.seed!(42))
 julia> R, x = power_series_ring(ZZ, 10, "x")
-(Univariate power series ring over Integers, x + O(x^11))
+(Univariate power series ring over integers, x + O(x^11))
 
 julia> f = rand(R, 3:5, -10:10)
 3*x^4 - x^5 + 4*x^7 + 4*x^8 - 7*x^9 + 2*x^10 + 4*x^11 - x^12 - 4*x^13 + O(x^14)

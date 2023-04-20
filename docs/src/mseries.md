@@ -114,7 +114,7 @@ precisions can be replaced by a single integer in the constructor.
 
 ```jldoctest
 julia> R, (x, y) = power_series_ring(ZZ, [2, 3], ["x", "y"])
-(Multivariate power series ring in 2 variables over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^2), y + O(y^3) + O(x^2)])
+(Multivariate power series ring in 2 variables over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^2), y + O(y^3) + O(x^2)])
 
 julia> f = R()
 O(y^3) + O(x^2)
@@ -132,13 +132,13 @@ julia> m = x + y + O(y^2)
 y + x + O(y^2) + O(x^2)
 
 julia> R, (x, y) = power_series_ring(ZZ, 3, ["x", "y"])
-(Multivariate power series ring in 2 variables over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^3), y + O(y^3) + O(x^3)])
+(Multivariate power series ring in 2 variables over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^3), y + O(y^3) + O(x^3)])
 
 julia> n = x + y + O(R, 2)
 y + x + O(y^2) + O(x^2)
 
 julia> R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
-(Multivariate power series ring in 2 variables over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(10), y + O(10)])
+(Multivariate power series ring in 2 variables over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(10), y + O(10)])
 
 julia> R()
 O(10)
@@ -169,7 +169,7 @@ We give some examples of such functionality.
 
 ```jldoctest
 julia> R, (x,) = power_series_ring(ZZ, [5], ["x"])
-(Multivariate power series ring in 1 variable over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(x^5)])
+(Multivariate power series ring in 1 variable over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(x^5)])
 
 julia> f = x^3 + 3x + 21
 21 + 3*x + x^3 + O(x^5)
@@ -198,7 +198,7 @@ julia> v = symbols(R)
 
 julia> T = parent(x + 1)
 Multivariate power series ringin 1 variable x
-  over Integers
+  over integers
 
 julia> f == deepcopy(f)
 true
@@ -207,7 +207,7 @@ julia> t = divexact(f*x, 1 + x)
 21*x - 18*x^2 + 18*x^3 - 17*x^4 + O(x^5)
 
 julia> R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
-(Multivariate power series ring in 2 variables over Integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(10), y + O(10)])
+(Multivariate power series ring in 2 variables over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(10), y + O(10)])
 
 julia> f = 3x^2*y + 1
 1 + 3*y*x^2 + O(10)

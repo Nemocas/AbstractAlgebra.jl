@@ -1560,6 +1560,10 @@ end
 
 Base.write(io::IOContext{<: IOCustom}, s::Union{SubString{String}, String}) = Base.write(Base.unwrapcontext(io)[1], s)
 
+# println(io) redirects to print(io, '\n')
+Base.write(io::IOContext{<: IOCustom}, s::Char) = Base.write(Base.unwrapcontext(io)[1], s)
+
+
 pretty(io::IO) = IOCustom(io)
 
 export pretty, LowerCase, Uppercase, Indent, Dedent

@@ -44,8 +44,13 @@ summands(M::DirectSumModule{T}) where T <: RingElement = M.m
 ###############################################################################
 
 function show(io::IO, N::DirectSumModule{T}) where T <: RingElement
-   print(io, "DirectSumModule over ")
-   print(IOContext(io, :compact => true), base_ring(N))
+   if get(io, :supercompact, false)
+     io = pretty(io)
+     print(io, Uppercase(), "DirectSumModule")
+   else
+     io = pretty(io)
+     print(io, Uppercase(), "DirectSumModule over ", Lowercase(), base_ring(N))
+   end
 end
 
 function show(io::IO, v::DirectSumModuleElem)

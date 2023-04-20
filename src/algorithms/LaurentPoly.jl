@@ -207,8 +207,20 @@ canonical_unit(x::LaurentPolyRingElem) = canonical_unit(leading_coefficient(x))
 #
 ###############################################################################
 
+function show(io::IO, ::MIME"text/plain", p::LaurentPolynomialRing)
+  print(io, "Univariate Laurent polynomial ring in ", var(p))
+  println(io)
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), base_ring(p))
+end
+
 function show(io::IO, p::LaurentPolynomialRing)
-   print(io, "Univariate Laurent Polynomial Ring in ", var(p), " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+  if get(io, :supercompact, false)
+    print(io, "Univariate Laurent polynomial ring")
+  else
+    io = pretty(io)
+    print(io, "Univariate Laurent polynomial Ring in ", var(p), " over ")
+    print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+  end
 end
 

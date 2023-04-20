@@ -45,8 +45,8 @@ Free module of rank 2 over Integers
 
 julia> f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
 Module homomorphism
-from Free module of rank 2 over Integers
-to Free module of rank 2 over Integers
+  from free module of rank 2 over integers
+  to free module of rank 2 over integers
 
 julia> m = M([ZZ(1), ZZ(2)])
 (1, 2)

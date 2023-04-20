@@ -645,20 +645,22 @@ function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: NCRi
 end
 
 function show(io::IO, ::MIME"text/plain", a::MatSpace)
-  print(io, "Matrix Space of ")
+  print(io, "Matrix space of ")
   print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
   println(io)
-  print(io, "  over ")
-  print(IOContext(io, :supercompact => true), base_ring(a))
+  io = pretty(io)
+  print(io, Indent(), "over ")
+  print(io, Lowercase(), base_ring(a))
 end
 
 function show(io::IO, a::MatSpace)
    if get(io, :supercompact, false)
-      print(io, "Matrix Space")
+      print(io, "Matrix space")
    else
-      print(io, "Matrix Space of ")
+      io = pretty(io)
+      print(io, "Matrix space of ")
       print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
-      print(IOContext(io, :supercompact => true), base_ring(a))
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
    end
 end
 
@@ -1290,11 +1292,11 @@ Return the transpose of the given matrix.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns
-  over Univariate polynomial ring
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1350,11 +1352,11 @@ $i$-th and $j$-th rows, respectively.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns
-  over Univariate polynomial ring
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1397,11 +1399,11 @@ require the matrix to be square.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns
-  over Univariate polynomial ring
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1438,11 +1440,11 @@ its entries, assuming it exists.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns
-  over Univariate polynomial ring
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1482,11 +1484,11 @@ Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns
-  over Univariate polynomial ring
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
 
 julia> G = SymmetricGroup(3)
 Full symmetric group over 3 elements
@@ -2184,14 +2186,14 @@ Return the determinant of the matrix $M$. We assume $M$ is square.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
+(Residue field of Univariate polynomial ring in x over rationals modulo x^3 + 3*x + 1, x)
 
 julia> S = matrix_space(K, 3, 3)
-Matrix Space of 3 rows and 3 columns
-  over Residue field of Univariate polynomial ring modulo x^3 + 3*x + 1
+Matrix space of 3 rows and 3 columns
+  over residue field of Univariate polynomial ring in x over rationals modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -2560,14 +2562,14 @@ Return the rank of the matrix $M$.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
+(Residue field of Univariate polynomial ring in x over rationals modulo x^3 + 3*x + 1, x)
 
 julia> S = matrix_space(K, 3, 3)
-Matrix Space of 3 rows and 3 columns
-  over Residue field of Univariate polynomial ring modulo x^3 + 3*x + 1
+Matrix space of 3 rows and 3 columns
+  over residue field of Univariate polynomial ring in x over rationals modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -3705,11 +3707,11 @@ function to compute an integral kernel.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> S = matrix_space(R, 4, 4)
-Matrix Space of 4 rows and 4 columns
-  over Univariate polynomial ring
+Matrix space of 4 rows and 4 columns
+  over univariate polynomial ring in x over integers
 
 julia> M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
               -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;
@@ -4223,14 +4225,14 @@ and the matrix is assumed to be square.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R = residue_ring(ZZ, 7)
-Residue ring of Integers modulo 7
+Residue ring of integers modulo 7
 
 julia> S = matrix_space(R, 4, 4)
-Matrix Space of 4 rows and 4 columns
-  over Residue ring
+Matrix space of 4 rows and 4 columns
+  over residue ring of integers modulo 7
 
 julia> T, x = polynomial_ring(R, "x")
-(Univariate Polynomial Ring in x over Residue ring, x)
+(Univariate polynomial ring in x over residue ring, x)
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
@@ -4422,7 +4424,7 @@ julia> R = GF(13)
 Finite field F_13
 
 julia> T, y = polynomial_ring(R, "y")
-(Univariate Polynomial Ring in y over Finite field F_13, y)
+(Univariate polynomial ring in y over finite field F_13, y)
 
 julia> M = R[7 6 1;
              7 7 5;
@@ -6008,11 +6010,11 @@ preserves the minimal and characteristic polynomials of a matrix.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R = residue_ring(ZZ, 7)
-Residue ring of Integers modulo 7
+Residue ring of integers modulo 7
 
 julia> S = matrix_space(R, 4, 4)
-Matrix Space of 4 rows and 4 columns
-  over Residue ring
+Matrix space of 4 rows and 4 columns
+  over residue ring of integers modulo 7
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])

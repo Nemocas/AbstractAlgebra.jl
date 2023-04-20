@@ -278,15 +278,17 @@ end
 function show(io::IO, ::MIME"text/plain", a::SeriesRing)
   print(io, "Univariate power series ring in ", var(a), " with precision ", a.prec_max)
   println(io)
-  print(io, "  over ",  base_ring(a))
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), base_ring(a))
 end
 
 function show(io::IO, a::SeriesRing)
   if get(io, :supercompact, false)
     print(io, "Univariate power series ring")
   else
+    io = pretty(io)
     print(io, "Univariate power series ring over " )
-    print(IOContext(io, :supercompact => true), base_ring(a))
+    print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
   end
 end
 ###############################################################################

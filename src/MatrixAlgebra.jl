@@ -163,17 +163,19 @@ function show(io::IO, ::MIME"text/plain", a::MatAlgebra)
   print(io, "Matrix Algebra of")
   print(io, " degree ", a.n)
   println(io)
-  print(io, "  over ")
-  print(io, base_ring(a))
+  io = pretty(io)
+  print(io, Indent(), "over ")
+  print(io, Lowercase(), base_ring(a))
 end
 
 function show(io::IO, a::MatAlgebra)
    if get(io, :supercompact, false)
       print(io, "Matrix Algebra")
    else
+      io = pretty(io)
       print(io, "Matrix Algebra of ")
       print(io, "degree ", a.n, " over ")
-      print(IOContext(io, :supercompact => true), base_ring(a))
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
    end
 end
 

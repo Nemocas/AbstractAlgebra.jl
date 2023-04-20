@@ -265,8 +265,8 @@ julia> S, f = sub(M, [m1, m2])
 
 julia> Q, g = quo(M, S)
 (Quotient module over Integers with 2 generators and relations:
-[50 -52], Hom: Free module of rank 3 over Integers -> Quotient module over Integers with 2 generators and relations:
-[50 -52])
+[16 -21], Hom: Free module of rank 3 over Integers -> Quotient module over Integers with 2 generators and relations:
+[16 -21])
 
 julia> I, f = snf(Q)
 (Invariant factor decomposed module over Integers with invariant factors BigInt[0], Module isomorphism with

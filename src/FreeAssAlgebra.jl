@@ -75,7 +75,8 @@ function show(io::IO, ::MIME"text/plain", a::FreeAssAlgebra)
     join(io, symbols(a), ", ")
     println(io)
   end
-  print(io, "  over ", base_ring(a))
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), base_ring(a))
 end
 
 function show(io::IO, a::FreeAssAlgebra)
@@ -84,8 +85,9 @@ function show(io::IO, a::FreeAssAlgebra)
     print(io, "Free associative algebra")
   else
     # nested printing allowed, preferably supercompact
+    io = pretty(io)
     print(io, "Free associative algebra on ", ItemQuantity(nvars(a), "indeterminate"))
-    print(IOContext(io, :supercompact => true), " over ", base_ring(a))
+    print(IOContext(io, :supercompact => true), " over ", Lowercase(), base_ring(a))
   end
 end
 

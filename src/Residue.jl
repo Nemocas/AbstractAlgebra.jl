@@ -145,8 +145,9 @@ function show(io::IO, a::ResidueRing)
    if get(io, :supercompact, false)
      print(io, "Residue ring")
    else
+     io = pretty(io)
      print(io, "Residue ring of ",)
-     print(IOContext(io, :supercompact => true), base_ring(a))
+     print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
      print(io, " modulo ", modulus(a))
    end
 end

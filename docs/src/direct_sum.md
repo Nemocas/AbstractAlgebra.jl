@@ -66,7 +66,7 @@ julia> S3, f3 = sub(F, [m1, m2])
 (Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 5 over Integers)
 
 julia> D, f = direct_sum(S1, S2, S3)
-(DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule over Integers, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule over Integers, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule over Integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: DirectSumModule over Integers -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule over Integers -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule over Integers -> Submodule over Integers with 2 generators and no relations])
+(DirectSumModule over integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations])
 ```
 
 ## Functionality for direct sums
@@ -114,7 +114,7 @@ julia> S3, f3 = sub(F, [m1, m2])
 (Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 5 over Integers)
 
 julia> D, f = direct_sum(S1, S2, S3)
-(DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule over Integers, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule over Integers, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule over Integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: DirectSumModule over Integers -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule over Integers -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule over Integers -> Submodule over Integers with 2 generators and no relations])
+(DirectSumModule over integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations])
 
 julia> summands(D)
 3-element Vector{AbstractAlgebra.Generic.Submodule{BigInt}}:
@@ -185,16 +185,17 @@ julia> q = ModuleHomomorphism(N, N, [5,7] .* basis(N));
 
 julia> phi = ModuleHomomorphism(D, D, [p 0; 0 q])
 Module homomorphism
-from DirectSumModule over Rationals
-to DirectSumModule over Rationals
+  from DirectSumModule over rationals
+  to DirectSumModule over rationals
 
 julia> r = ModuleHomomorphism(N, D, [2,3] .* gens(D)[1:2])
 Module homomorphism
-from Vector space of dimension 2 over Rationals
-to DirectSumModule over Rationals
+  from vector space of dimension 2 over rationals
+  to DirectSumModule over rationa
+  ls
 
 julia> psi = ModuleHomomorphism(D, D, [r, r])
 Module homomorphism
-from DirectSumModule over Rationals
-to DirectSumModule over Rationals
+  from DirectSumModule over rationals
+  to DirectSumModule over rationals
 ```

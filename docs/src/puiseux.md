@@ -339,10 +339,10 @@ Base.sqrt(a::Generic.PuiseuxSeriesElem)
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = PuiseuxSeriesRing(R, 30, "x")
-(Puiseux series ring in x over Univariate Polynomial Ring in t over Rationals, x + O(x^31))
+(Puiseux series ring in x over Univariate polynomial ring in t over rationals, x + O(x^31))
 
 julia> T, z = PuiseuxSeriesRing(QQ, 30, "z")
 (Puiseux series field in z over Rationals, z + O(z^31))

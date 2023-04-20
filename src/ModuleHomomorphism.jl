@@ -20,8 +20,10 @@ mat(f::Map(FPModuleHomomorphism)) = f.matrix
 
 function show(io::IO, ::MIME"text/plain", f::Map(FPModuleHomomorphism))
    println(io, "Module homomorphism")
-   println(io, "from ", domain(f))
-   print(io, "to ", codomain(f))
+   io = pretty(io)
+   print(io, Indent(), "from ", Lowercase(), domain(f))
+   println(io)
+   print(io, "to ", Lowercase(), codomain(f))
 end
 
 function show(io::IO, f::Map(FPModuleHomomorphism))

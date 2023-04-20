@@ -44,7 +44,8 @@ function show(io::IO, ::MIME"text/plain", p::LaurentMPolyRing)
     join(io, symbols(p), ", ")
     println(io)
   end
-  print(io, "  over ", base_ring(p))
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), base_ring(p))
 end
 
 function show(io::IO, p::LaurentMPolyRing)
@@ -53,8 +54,9 @@ function show(io::IO, p::LaurentMPolyRing)
     print(io, "Multivariate Laurent polynomial ring")
   else
     # nested printing allowed, preferably supercompact
+    io = pretty(io)
     print(io, "Multivariate Laurent polynomial ring in ", ItemQuantity(nvars(p), "variable"))
-    print(IOContext(io, :supercompact => true), " over ", base_ring(p))
+    print(IOContext(io, :supercompact => true), " over ", Lowercase(), base_ring(p))
   end
 end
 
