@@ -940,11 +940,11 @@ julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 (Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = rand(R, -1:2, 3:5, -10:10)
-4*x^4*y^4
+-6*x^3*y^4
 
 julia> S, (s, t) = polynomial_ring(GF(7), ["x", "y"])
 (Multivariate polynomial ring in 2 variables over finite field F_7, AbstractAlgebra.Generic.MPoly{AbstractAlgebra.GFElem{Int64}}[x, y])
 
 julia> g = rand(S, -1:2, 3:5)
-4*x^3*y^4
+0
 ```

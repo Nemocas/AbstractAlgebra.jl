@@ -40,7 +40,7 @@ julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
 
 julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of Univariate polynomial ring in x over rationals modulo x^3 + 3*x + 1, x)
+(Residue field of univariate polynomial ring modulo x^3 + 3*x + 1, x)
 
 julia> f = a^2 + 2a + 7
 x^2 + 2*x + 7

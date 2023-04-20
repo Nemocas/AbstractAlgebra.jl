@@ -132,7 +132,14 @@ end
 @enable_all_show_via_expressify ResFieldElem
 
 function show(io::IO, a::ResidueField)
-   print(IOContext(io, :compact => true), "Residue field of ", base_ring(a), " modulo ", modulus(a))
+   if get(io, :supercompact, false)
+     print(io, "Residue field")
+   else
+     io = pretty(io)
+     print(io, "Residue field of ",)
+     print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+     print(io, " modulo ", modulus(a))
+   end
 end
 
 ###############################################################################

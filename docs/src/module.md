@@ -220,10 +220,10 @@ julia> M = FreeModule(ZZ, 3)
 Free module of rank 3 over Integers
 
 julia> m1 = rand(M, -10:10)
-(3, -1, 0)
+(5, -5, 2)
 
 julia> m2 = rand(M, -10:10)
-(4, 4, -7)
+(-6, -4, 8)
 
 julia> S, f = sub(M, [m1, m2])
 (Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over Integers)
@@ -255,27 +255,28 @@ julia> M = FreeModule(ZZ, 3)
 Free module of rank 3 over Integers
 
 julia> m1 = rand(M, -10:10)
-(3, -1, 0)
+(5, -5, 2)
 
 julia> m2 = rand(M, -10:10)
-(4, 4, -7)
+(-6, -4, 8)
 
 julia> S, f = sub(M, [m1, m2])
 (Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over Integers)
 
 julia> Q, g = quo(M, S)
 (Quotient module over Integers with 2 generators and relations:
-[16 -21], Hom: Free module of rank 3 over Integers -> Quotient module over Integers with 2 generators and relations:
-[16 -21])
+[50 -52], Hom: Free module of rank 3 over Integers -> Quotient module over Integers with 2 generators and relations:
+[50 -52])
 
 julia> I, f = snf(Q)
-(Invariant factor decomposed module over Integers with invariant factors BigInt[0], Module isomorphism with
-Domain: Invariant factor decomposed module over Integers with invariant factors BigInt[0]
+(Invariant factor decomposed module over Integers with invariant factors BigInt[2, 0], Module isomorphism with
+Domain: Invariant factor decomposed module over Integers with invariant factors BigInt[2, 0]
 Codomain: Quotient module over Integers with 2 generators and relations:
-[16 -21])
+[50 -52])
 
 julia> invs = invariant_factors(Q)
-1-element Vector{BigInt}:
+2-element Vector{BigInt}:
+ 2
  0
 
 ```
