@@ -395,16 +395,10 @@ function _to_indices(x, rows, cols)
    (rows, cols)
 end
 
-function Base.view(M::MatElem{T}, rows::Colon, cols::UnitRange{Int}) where T <: NCRingElement
-   return view(M, 1:nrows(M), cols)
-end
-
-function Base.view(M::MatElem{T}, rows::UnitRange{Int}, cols::Colon) where T <: NCRingElement
-   return view(M, rows, 1:ncols(M))
-end
-
-function Base.view(M::MatElem{T}, rows::Colon, cols::Colon) where T <: NCRingElement
-   return view(M, 1:nrows(M), 1:ncols(M))
+function Base.view(M::MatElem,
+         rows::Union{Int,Colon,AbstractVector{Int}},
+         cols::Union{Int,Colon,AbstractVector{Int}})
+   return view(M, _to_indices(M, rows, cols)...)
 end
 
 Base.firstindex(M::MatrixElem{T}, i::Int) where T <: NCRingElement = 1
