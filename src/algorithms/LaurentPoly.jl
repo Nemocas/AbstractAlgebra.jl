@@ -219,7 +219,7 @@ function show(io::IO, p::LaurentPolynomialRing)
     print(io, "Univariate Laurent polynomial ring")
   else
     io = pretty(io)
-    print(io, "Univariate Laurent polynomial Ring in ", var(p), " over ")
+    print(io, "Univariate Laurent polynomial ring in ", var(p), " over ")
     print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
   end
 end

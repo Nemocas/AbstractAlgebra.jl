@@ -1412,7 +1412,7 @@ end
 import Base: convert, show, pipe_reader, pipe_writer, lock, unlock, write,
              getindex, in, haskey, get, print, unwrapcontext
 
-export IOCustom, Indent, Dedent, Align, Dealign, indent_string!, alignment_char!
+export IOCustom, Indent, Dedent, indent_string!
 
 struct Indent end
 struct Dedent end
@@ -1420,10 +1420,7 @@ struct Dedent end
 struct Lowercase end
 struct Uppercase end
 
-struct Align end
-struct Dealign end
-
-Base.show(io::IO, ::Union{Indent, Dedent, Align, Dealign}) = nothing
+Base.show(io::IO, ::Union{Indent, Dedent}) = nothing
 
 mutable struct IOCustom{IO_t <: IO} <: Base.AbstractPipe
     io::IO_t
@@ -1449,7 +1446,6 @@ _unwrap(io::IOCustom) = io
 _unwrap(io::IOContext) = io.io
 
 indent_string!(io::IO, str::String) = (_unwrap(io).indent_str = str; io)
-alignment_char!(io::IO, chr::Char) = (_unwrap(io).align_char = chr; io)
 
 IOCustom(io::IO) = IOCustom{typeof(io)}(io, 0, Int[], 0, false, "  ", ' ', 0, false)
 
@@ -1467,9 +1463,7 @@ function show(_io::IO, io::IOCustom)
     print(ioi, "IOCustom:", Indent())
     print(ioi, "\nIO: "); show(ioi, io.io)
     print(ioi, "\nIndent string: \"", io.indent_str, "\"")
-    print(ioi, "\nAlign char: \"", io.align_char, "\"")
     print(ioi, "\nIndent: ", io.indent_level)
-    print(ioi, "\nAligns: ", join(io.aligns, ","))
 end
 
 pipe_reader(io::IOCustom) = io.io
@@ -1489,13 +1483,8 @@ write(io::IO, ::Uppercase) = (_unwrap(io).lowercasefirst = false; 0)
 print(io::IO, ::Uppercase) = write(io, Uppercase())
 
 _align_length(io) = length(io.aligns) == 0 ? 0 : io.aligns[end]
-write(io::IO, ::Align) = (push!(_unwrap(io).aligns, io.offset + _align_length(io)); 0)
-print(io::IO, ::Align) = write(io, Align())
-write(io::IO, ::Dealign) = (length(_unwrap(io).aligns) > 0 && pop!(io.aligns); 0)
-print(io::IO, ::Dealign) = write(io, Dealign())
 
 write_indent(io::IO) = write(_unwrap(io).io, io.indent_str^io.indent_level)
-write_offset(io::IO) = write(_unwrap(io).io, string(io.align_char)^_align_length(io))
 
 write(io::IOCustom, chr::Char) = write(io, string(chr)) # Need to catch writing a '\n'
 

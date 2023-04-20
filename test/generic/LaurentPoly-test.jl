@@ -482,7 +482,7 @@ end
    @testset "printing" begin
       L, y = LaurentPolynomialRing(ZZ, "y")
       @test sprint(show, "text/plain", y) == "y"
-      @test sprint(show, "text/plain", L) == "Univariate Laurent Polynomial Ring in y over Integers"
+      @test sprint(show, "text/plain", L) == "Univariate Laurent polynomial ring in y\n  over integers"
       p = y^1; p.mindeg = -3
       @test sprint(show, "text/plain", p) == "y^-2"
       R, z = polynomial_ring(L, "z")
