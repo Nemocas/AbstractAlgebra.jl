@@ -10,6 +10,8 @@ using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 
 using InteractiveUtils
 
+using Preferences
+
 using Test # for "interface-conformance" functions
 
 import GroupsCore
@@ -22,7 +24,10 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
                   :inv, :log, :exp, :sqrt, :div, :divrem,
                   :numerator, :denominator,
                   :promote_rule,
-                  :Set, :Module, :Group]
+                  :Set, :Module, :Group,
+                  # remove the following, once they land in OSCAR
+                  :allow_unicode, :with_unicode,
+                 ]
 
 # If you want to add methods to functions in LinearAlgebra they should be
 # imported here and in Generic.jl, and exported below.
@@ -520,6 +525,7 @@ include("fundamental_interface.jl")
 include("PrettyPrinting.jl")
 
 import .PrettyPrinting: @enable_all_show_via_expressify
+import .PrettyPrinting: allow_unicode
 import .PrettyPrinting: canonicalize
 import .PrettyPrinting: expr_to_latex_string
 import .PrettyPrinting: expr_to_string
@@ -528,6 +534,7 @@ import .PrettyPrinting: get_html_as_latex
 import .PrettyPrinting: get_syntactic_sign_abs
 import .PrettyPrinting: is_syntactic_one
 import .PrettyPrinting: is_syntactic_zero
+import .PrettyPrinting: is_unicode_allowed
 import .PrettyPrinting: obj_to_latex_string
 import .PrettyPrinting: obj_to_string
 import .PrettyPrinting: obj_to_string_wrt_times
@@ -537,6 +544,7 @@ import .PrettyPrinting: printer
 import .PrettyPrinting: set_html_as_latex
 import .PrettyPrinting: show_obj
 import .PrettyPrinting: show_via_expressify
+import .PrettyPrinting: with_unicode
 
 export @enable_all_show_via_expressify
 
@@ -735,6 +743,7 @@ export addmul_delayed_reduction!
 export addmul!
 export AllParts
 export AllPerms
+export allow_unicode
 export base_field
 export base_ring
 export basis
@@ -1120,6 +1129,7 @@ export var_index
 export vars
 export vector_space
 export VectorSpace
+export with_unicode
 export weak_popov
 export weak_popov_with_transform
 export weights
