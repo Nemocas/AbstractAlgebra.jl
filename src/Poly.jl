@@ -1582,7 +1582,7 @@ function remove(z::PolyRingElem{T}, p::PolyRingElem{T}) where T <: RingElement
  check_parent(z, p)
  !is_exact_type(T) && error("remove requires an exact ring")
  iszero(z) && error("Not yet implemented")
- (is_unit(p) || iszero(p)) && throw(error("Second argument must be a non-zero non-unit"))
+ (is_unit(p) || iszero(p)) && error("Second argument must be a non-zero non-unit")
  flag, q = divides(z, p)
  if !flag
    return 0, z
@@ -1601,7 +1601,7 @@ function remove(z::PolyRingElem{T}, p::PolyRingElem{T}) where T <: Union{ResElem
  check_parent(z, p)
  !is_exact_type(T) && error("remove requires an exact ring")
  iszero(z) && error("Not yet implemented")
- (is_unit(p) || iszero(p)) && throw(error("Second argument must be a non-zero non-unit"))
+ (is_unit(p) || iszero(p)) && error("Second argument must be a non-zero non-unit")
  q, r = divrem(z, p)
  if !iszero(r)
    return 0, z

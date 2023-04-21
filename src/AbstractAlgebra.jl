@@ -446,10 +446,9 @@ end
 #
 function force_coerce(a, b, throw_error::Type{Val{T}} = Val{true}) where {T}
   if throw_error === Val{true}
-    throw(error("coercion not possible"))
-  else
-    return nothing
+    error("coercion not possible")
   end
+  return nothing
 end
 
 #to allow +(a::T, b::T) where a, b have different parents, but
@@ -458,7 +457,7 @@ end
 # content in Hecke/Oscar
 function force_op(op::Function, throw_error::Type{Val{T}}, a...) where {T}
   if throw_error === Val{true}
-    throw(error("no common overstructure for the arguments found"))
+    error("no common overstructure for the arguments found")
   end
   return false
 end
