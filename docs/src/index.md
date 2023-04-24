@@ -45,7 +45,7 @@ how to obtain Julia for your system.
 At the Julia prompt simply type
 
 ```
-julia> Pkg.add("AbstractAlgebra")
+julia> using Pkg; Pkg.add("AbstractAlgebra")
 ```
 
 ## Quick start
