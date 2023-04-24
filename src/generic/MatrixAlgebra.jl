@@ -143,7 +143,7 @@ end
 
 function (a::MatAlgebra{T})() where {T <: NCRingElement}
    R = base_ring(a)
-   entries = Array{T}(undef, a.n, a.n)
+   entries = Matrix{T}(undef, a.n, a.n)
    for i = 1:a.n
       for j = 1:a.n
          entries[i, j] = zero(R)
@@ -155,7 +155,7 @@ end
 
 function (a::MatAlgebra{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
-   entries = Array{T}(undef, a.n, a.n)
+   entries = Matrix{T}(undef, a.n, a.n)
    rb = R(b)
    for i = 1:a.n
       for j = 1:a.n
@@ -178,7 +178,7 @@ end
 function (a::MatAlgebra{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(a.n, a.n, b)
-   entries = Array{T}(undef, a.n, a.n)
+   entries = Matrix{T}(undef, a.n, a.n)
    for i = 1:a.n
       for j = 1:a.n
          entries[i, j] = R(b[i, j])

@@ -196,7 +196,7 @@ function *(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
    end
    t = base_ring(a)()
    lenz = lena + lenb - 1
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:lena
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -412,7 +412,7 @@ function mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: N
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, n)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -453,7 +453,7 @@ function divexact_right(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
-   d = Array{T}(undef, lenq)
+   d = Vector{T}(undef, lenq)
    for i = 1:lenq
       d[i] = zero(base_ring(f))
    end
@@ -486,7 +486,7 @@ function divexact_left(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=t
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
-   d = Array{T}(undef, lenq)
+   d = Vector{T}(undef, lenq)
    for i = 1:lenq
       d[i] = zero(base_ring(f))
    end

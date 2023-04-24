@@ -258,7 +258,7 @@ julia> A = powers(M, 4)
 function powers(a::T, d::Int) where {T <: Union{NCRingElement, MatElem}}
    d < 0 && throw(DomainError(d, "the second argument must be nonnegative"))
    a isa MatElem && !is_square(a) && throw(DomainError(a, "matrix must be square"))
-   M = Array{T}(undef, d + 1)
+   M = Vector{T}(undef, d + 1)
    M[1] = one(a)
    if d > 0
       M[2] = a

@@ -820,7 +820,7 @@ end
       for iter = 1:10
          num = rand(1:5)
 
-         V = Array{elem_type(S)}(undef, num)
+         V = Vector{elem_type(S)}(undef, num)
 
          for i = 1:num
             V[i] = S(0)

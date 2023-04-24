@@ -93,7 +93,7 @@ Base.setindex!(a::F2Matrix, x::F2Elem, r::Int64, c::Int64) = a.m[r, c] = x
 Base.similar(x::F2Matrix, R::F2, r::Int, c::Int) = F2Matrix(similar(x.m, r, c))
 
 function AbstractAlgebra.zero_matrix(R::F2, r::Int, c::Int)
-   mat = Array{F2Elem}(undef, r, c)
+   mat = Matrix{F2Elem}(undef, r, c)
    for i=1:r, j=1:c
       mat[i, j] = zero(R)
    end

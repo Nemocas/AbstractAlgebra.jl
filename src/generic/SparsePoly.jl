@@ -68,7 +68,7 @@ parent(a::SparsePoly) = a.parent
 
 function Base.deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingElement}
    Re = Base.deepcopy_internal(a.exps, dict)
-   Rc = Array{T}(undef, a.length)
+   Rc = Vector{T}(undef, a.length)
    for i = 1:a.length
       Rc[i] = Base.deepcopy_internal(a.coeffs[i], dict)
    end
@@ -295,17 +295,17 @@ function mul_johnson(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement
    if m == 0 || n == 0
       return par()
    end
-   H = Array{heap_sr}(undef, 0)
-   I = Array{heap_t}(undef, 0)
+   H = Vector{heap_sr}(undef, 0)
+   I = Vector{heap_t}(undef, 0)
    # set up heap
    push!(H, heap_sr(a.exps[1] + b.exps[1], 1))
    push!(I, heap_t(1, 1, 0))
    r_alloc = max(m, n) + n
-   Rc = Array{T}(undef, r_alloc)
-   Re = Array{UInt}(undef, r_alloc)
+   Rc = Vector{T}(undef, r_alloc)
+   Re = Vector{UInt}(undef, r_alloc)
    k = 0
    c = R()
-   Q = Array{Int}(undef, 0)
+   Q = Vector{Int}(undef, 0)
    while !isempty(H)
       exp = H[1].exp
       k += 1
@@ -393,17 +393,17 @@ function divrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    if a.exps[m] < b.exps[n]
       return par(), a
    end
-   H = Array{heap_sr}(undef, 0)
-   I = Array{heap_t}(undef, 0)
+   H = Vector{heap_sr}(undef, 0)
+   I = Vector{heap_t}(undef, 0)
    # set up heap
    push!(H, heap_sr(maxn - a.exps[m], 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
    r_alloc = n
-   Qc = Array{T}(undef, q_alloc)
-   Qe = Array{UInt}(undef, q_alloc)
-   Rc = Array{T}(undef, r_alloc)
-   Re = Array{UInt}(undef, r_alloc)
+   Qc = Vector{T}(undef, q_alloc)
+   Qe = Vector{UInt}(undef, q_alloc)
+   Rc = Vector{T}(undef, r_alloc)
+   Re = Vector{UInt}(undef, r_alloc)
    k = 0
    l = 0
    s = n
@@ -411,8 +411,8 @@ function divrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    qc = R()
    m1 = -one(R)
    mb = -b.coeffs[n]
-   Q = Array{Int}(undef, 0)
-   reuse = Array{Int}(undef, 0)
+   Q = Vector{Int}(undef, 0)
+   reuse = Vector{Int}(undef, 0)
    while !isempty(H)
       exp = H[1].exp
       k += 1
@@ -621,17 +621,17 @@ function pow_fps(f::SparsePoly{T}, k::Int) where {T <: RingElement}
    par = parent(f)
    R = base_ring(par)
    m = length(f)
-   H = Array{heap_sr}(undef, 0) # heap
-   I = Array{heap_t}(undef, 0) # auxiliary data for heap nodes
+   H = Vector{heap_sr}(undef, 0) # heap
+   I = Vector{heap_t}(undef, 0) # auxiliary data for heap nodes
    # set up output poly coeffs and exponents (corresponds to h in paper)
    r_alloc = k*(m - 1) + 1
-   Rc = Array{T}(undef, r_alloc)
-   Re = Array{UInt}(undef, r_alloc)
+   Rc = Vector{T}(undef, r_alloc)
+   Re = Vector{UInt}(undef, r_alloc)
    rnext = 1
    # set up g coeffs and exponents (corresponds to g in paper)
    g_alloc = k*(m - 1) + 1
-   gc = Array{T}(undef, g_alloc)
-   ge = Array{UInt}(undef, g_alloc)
+   gc = Vector{T}(undef, g_alloc)
+   ge = Vector{UInt}(undef, g_alloc)
    gnext = 1
    # set up heap
    gc[1] = f.coeffs[1]^(k-1)
@@ -640,18 +640,18 @@ function pow_fps(f::SparsePoly{T}, k::Int) where {T <: RingElement}
    Re[1] = f.exps[1]*k
    push!(H, heap_sr(f.exps[2] + ge[1], 1))
    push!(I, heap_t(2, 1, 0))
-   Q = Array{Int}(undef, 0) # corresponds to Q in paper
+   Q = Vector{Int}(undef, 0) # corresponds to Q in paper
    topbit = -1 << (sizeof(Int)*8 - 1)
    mask = ~topbit
    largest = fill(topbit, m) # largest j s.t. (i, j) has been in heap
    largest[2] = 1
    # precompute some values
-   fik = Array{T}(undef, m)
+   fik = Vector{T}(undef, m)
    for i = 1:m
       fik[i] = from_exp(R, f.exps[i])*(k - 1)
    end
    kp1f1 = k*from_exp(R, f.exps[1])
-   gi = Array{T}(undef, 1)
+   gi = Vector{T}(undef, 1)
    gi[1] = -from_exp(R, ge[1])
    finalexp = f.exps[m]*(k - 1) + f.exps[1]
    # temporary space
@@ -793,22 +793,22 @@ function divides_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: 
    if m == 0
       return true, par()
    end
-   H = Array{heap_sr}(undef, 0)
-   I = Array{heap_t}(undef, 0)
+   H = Vector{heap_sr}(undef, 0)
+   I = Vector{heap_t}(undef, 0)
    # set up heap
    push!(H, heap_sr(a.exps[1], 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
-   Qc = Array{T}(undef, q_alloc)
-   Qe = Array{UInt}(undef, q_alloc)
+   Qc = Vector{T}(undef, q_alloc)
+   Qe = Vector{UInt}(undef, q_alloc)
    k = 0
    s = n
    c = R()
    qc = R()
    m1 = -one(R)
    mb = -b.coeffs[1]
-   Q = Array{Int}(undef, 0)
-   reuse = Array{Int}(undef, 0)
+   Q = Vector{Int}(undef, 0)
+   reuse = Vector{Int}(undef, 0)
    while !isempty(H)
       exp = H[1].exp
       k += 1
@@ -896,8 +896,8 @@ function divides(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    d1 = a.exps[a.length]
    d2 = b.exps[b.length] - b.exps[1]
    q_alloc = b.length
-   Qe = Array{UInt}(undef, q_alloc)
-   Qc = Array{T}(undef, q_alloc)
+   Qe = Vector{UInt}(undef, q_alloc)
+   Qc = Vector{T}(undef, q_alloc)
    r = a
    k = 0
    while length(r) > 0
@@ -943,7 +943,7 @@ end
 
 function divides(a::SparsePoly{T}, b::T) where {T <: RingElem}
    len = a.length
-   Qc = Array{T}(undef, len)
+   Qc = Vector{T}(undef, len)
    for i = 1:len
       flag, Qc[i] = divides(a.coeffs[i], b)
       if !flag
@@ -983,20 +983,20 @@ function pseudodivrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElemen
    if a.exps[m] < b.exps[n]
       return par(), a
    end
-   H = Array{heap_sr}(undef, 0)
-   I = Array{heap_t}(undef, 0)
+   H = Vector{heap_sr}(undef, 0)
+   I = Vector{heap_t}(undef, 0)
    # set up heap
    push!(H, heap_sr(maxn - a.exps[m], 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n + 1, n)
    r_alloc = n
    p_alloc = max(m - n + 1, 1)
-   Qc = Array{T}(undef, q_alloc)
-   Qe = Array{UInt}(undef, q_alloc)
-   Qpow = Array{Int}(undef, q_alloc)
-   Rc = Array{T}(undef, r_alloc)
-   Re = Array{UInt}(undef, r_alloc)
-   Pc = Array{T}(undef, p_alloc)
+   Qc = Vector{T}(undef, q_alloc)
+   Qe = Vector{UInt}(undef, q_alloc)
+   Qpow = Vector{Int}(undef, q_alloc)
+   Rc = Vector{T}(undef, r_alloc)
+   Re = Vector{UInt}(undef, r_alloc)
+   Pc = Vector{T}(undef, p_alloc)
    Pc[1] = b.coeffs[n]
    p = -1 # current power of leading_coefficient(b)
    p_max = 1
@@ -1006,8 +1006,8 @@ function pseudodivrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElemen
    c = R()
    m1 = -one(R)
    mb = -b.coeffs[n]
-   Q = Array{Int}(undef, 0)
-   reuse = Array{Int}(undef, 0)
+   Q = Vector{Int}(undef, 0)
+   reuse = Vector{Int}(undef, 0)
    while !isempty(H)
       exp = H[1].exp
       qc = R()
@@ -1159,20 +1159,20 @@ function pseudorem_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <
    if a.exps[m] < b.exps[n]
       return a
    end
-   H = Array{heap_sr}(undef, 0)
-   I = Array{heap_t}(undef, 0)
+   H = Vector{heap_sr}(undef, 0)
+   I = Vector{heap_t}(undef, 0)
    # set up heap
    push!(H, heap_sr(maxn - a.exps[m], 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n + 1, n)
    r_alloc = n
    p_alloc = max(m - n + 1, 1)
-   Qc = Array{T}(undef, q_alloc)
-   Qe = Array{UInt}(undef, q_alloc)
-   Qpow = Array{Int}(undef, q_alloc)
-   Rc = Array{T}(undef, r_alloc)
-   Re = Array{UInt}(undef, r_alloc)
-   Pc = Array{T}(undef, p_alloc)
+   Qc = Vector{T}(undef, q_alloc)
+   Qe = Vector{UInt}(undef, q_alloc)
+   Qpow = Vector{Int}(undef, q_alloc)
+   Rc = Vector{T}(undef, r_alloc)
+   Re = Vector{UInt}(undef, r_alloc)
+   Pc = Vector{T}(undef, p_alloc)
    Pc[1] = b.coeffs[n]
    p = -1 # current power of leading_coefficient(b)
    p_max = 1
@@ -1182,8 +1182,8 @@ function pseudorem_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <
    c = R()
    m1 = -one(R)
    mb = -b.coeffs[n]
-   Q = Array{Int}(undef, 0)
-   reuse = Array{Int}(undef, 0)
+   Q = Vector{Int}(undef, 0)
+   reuse = Vector{Int}(undef, 0)
    while !isempty(H)
       exp = H[1].exp
       qc = R()
@@ -1445,7 +1445,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       h = gcd(f, g)
       # convert back to sparse polys
       nonzero = 0
-      Ac = Array{T}(undef, 0)
+      Ac = Vector{T}(undef, 0)
       Ae = zeros(UInt, 0)
       for i = 1:length(h)
          ci = coeff(h, i - 1)

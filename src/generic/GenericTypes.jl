@@ -275,7 +275,7 @@ mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyRingElem{T}
    length::Int
    parent::PolyRing{T}
 
-   Poly{T}() where T <: RingElement = new{T}(Array{T}(undef, 0), 0)
+   Poly{T}() where T <: RingElement = new{T}(Vector{T}(undef, 0), 0)
 
    function Poly{T}(b::Vector{T}) where T <: RingElement
       z = new{T}(b)
@@ -283,7 +283,7 @@ mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyRingElem{T}
       return z
    end
 
-   Poly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(undef, 0), 0) : new{T}([a], 1)
+   Poly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Vector{T}(undef, 0), 0) : new{T}([a], 1)
 end
 
 ###############################################################################
@@ -310,7 +310,7 @@ mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyRingElem{T}
    length::Int
    parent::NCPolyRing{T}
 
-   NCPoly{T}() where T <: NCRingElem = new{T}(Array{T}(undef, 0), 0)
+   NCPoly{T}() where T <: NCRingElem = new{T}(Vector{T}(undef, 0), 0)
 
    function NCPoly{T}(b::Vector{T}) where T <: NCRingElem
       z = new{T}(b)
@@ -318,7 +318,7 @@ mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyRingElem{T}
       return z
    end
 
-   NCPoly{T}(a::T) where T <: NCRingElem = iszero(a) ? new{T}(Array{T}(undef, 0), 0) : new{T}([a], 1)
+   NCPoly{T}(a::T) where T <: NCRingElem = iszero(a) ? new{T}(Vector{T}(undef, 0), 0) : new{T}([a], 1)
 end
 
 ###############################################################################
@@ -368,14 +368,14 @@ mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyRingElem{T}
 
    function MPoly{T}(R::MPolyRing) where T <: RingElement
       N = R.N
-      return new{T}(Array{T}(undef, 0), Array{UInt}(undef, N, 0), 0, R)
+      return new{T}(Vector{T}(undef, 0), Matrix{UInt}(undef, N, 0), 0, R)
    end
 
    MPoly{T}(R::MPolyRing, a::Vector{T}, b::Matrix{UInt}) where T <: RingElement = new{T}(a, b, length(a), R)
 
    function MPoly{T}(R::MPolyRing, a::T) where T <: RingElement
       N = R.N
-      return iszero(a) ? new{T}(Array{T}(undef, 0), Array{UInt}(undef, N, 0), 0, R) :
+      return iszero(a) ? new{T}(Vector{T}(undef, 0), Matrix{UInt}(undef, N, 0), 0, R) :
                                           new{T}([a], zeros(UInt, N, 1), 1, R)
    end
 end
@@ -475,15 +475,15 @@ const SparsePolyID = CacheDictType{Tuple{Ring, Symbol}, SparsePolyRing}()
 
 mutable struct SparsePoly{T <: RingElement} <: AbstractAlgebra.RingElem
    coeffs::Vector{T}
-   exps::Array{UInt}
+   exps::Vector{UInt}
    length::Int
    parent::SparsePolyRing{T}
 
-   SparsePoly{T}() where T <: RingElement = new{T}(Array{T}(undef, 0), Array{UInt}(undef, 0), 0)
+   SparsePoly{T}() where T <: RingElement = new{T}(Vector{T}(undef, 0), Vector{UInt}(undef, 0), 0)
 
    SparsePoly{T}(a::Vector{T}, b::Vector{UInt}) where T <: RingElement = new{T}(a, b, length(a))
 
-   SparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(undef, 0), Array{UInt}(undef, 0), 0) :
+   SparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Vector{T}(undef, 0), Vector{UInt}(undef, 0), 0) :
                                                new{T}([a], [UInt(0)], 1)
 end
 

@@ -1991,7 +1991,7 @@ end
 # that A is chambered on the right. Otherwise the entries can all be set to
 # the number of columns of A. The entries of L must be monotonic increasing.
 
-function reduce_row!(A::MatrixElem{T}, P::Array{Int}, L::Array{Int}, m::Int) where {T <: FieldElement}
+function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) where {T <: FieldElement}
    R = base_ring(A)
    n = ncols(A)
    t = R()
@@ -2027,7 +2027,7 @@ function reduce_row!(A::MatrixElem{T}, P::Array{Int}, L::Array{Int}, m::Int) whe
    return 0
 end
 
-function reduce_row!(A::MatrixElem{T}, P::Array{Int}, L::Array{Int}, m::Int) where {T <: RingElement}
+function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) where {T <: RingElement}
    R = base_ring(A)
    n = ncols(A)
    t = R()
@@ -2084,8 +2084,8 @@ function det_clow(M::MatrixElem{T}) where {T <: RingElement}
    if n == 0
       return one(R)
    end
-   A = Array{T}(undef, n, n)
-   B = Array{T}(undef, n, n)
+   A = Matrix{T}(undef, n, n)
+   B = Matrix{T}(undef, n, n)
    C = R()
    for i = 1:n
       for j = 1:n
@@ -2215,8 +2215,8 @@ function det_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
       return R()
    end
    bound = n*(maxlen - 1) + 1
-   x = Array{elem_type(base_ring(R))}(undef, bound)
-   d = Array{elem_type(base_ring(R))}(undef, bound)
+   x = Vector{elem_type(base_ring(R))}(undef, bound)
+   d = Vector{elem_type(base_ring(R))}(undef, bound)
    X = zero_matrix(base_ring(R), n, n)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
@@ -2936,10 +2936,10 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
    # bound from xd = (M*)b where d is the det
    bound = (maxlen - 1)*(max(m, c) - 1) + max(maxlenb, maxlen)
    tmat = matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
-   V = Array{typeof(tmat)}(undef, bound)
-   d = Array{elem_type(base_ring(R))}(undef, bound)
-   y = Array{elem_type(base_ring(R))}(undef, bound)
-   bj = Array{elem_type(base_ring(R))}(undef, bound)
+   V = Vector{typeof(tmat)}(undef, bound)
+   d = Vector{elem_type(base_ring(R))}(undef, bound)
+   y = Vector{elem_type(base_ring(R))}(undef, bound)
+   bj = Vector{elem_type(base_ring(R))}(undef, bound)
    X = similar(tmat, m, c)
    Y = similar(tmat, m, h)
    x = similar(b, c, h)
@@ -3337,8 +3337,8 @@ function solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <
    m = ncols(b)
    R = base_ring(U)
    X = zero(b)
-   Tinv = Array{elem_type(R)}(undef, n)
-   tmp = Array{elem_type(R)}(undef, n)
+   Tinv = Vector{elem_type(R)}(undef, n)
+   tmp = Vector{elem_type(R)}(undef, n)
    if unit == false
       for i = 1:n
          Tinv[i] = inv(U[i, i])
@@ -3962,7 +3962,7 @@ function charpoly_hessenberg!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
       return gen(S) - A[1, 1]
    end
    hessenberg!(A)
-   P = Array{elem_type(S)}(undef, n + 1)
+   P = Vector{elem_type(S)}(undef, n + 1)
    P[1] = one(S)
    x = gen(S)
    for m = 1:n
@@ -3989,8 +3989,8 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
    end
    d = one(R)
    t = R()
-   V = Array{T}(undef, n)
-   W = Array{T}(undef, n)
+   V = Vector{T}(undef, n)
+   W = Vector{T}(undef, n)
    pol = one(S)
    i = 1
    while i < n
@@ -4106,8 +4106,8 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
       return gen(S) - A[1, 1]
    end
    t = R()
-   V = Array{T}(undef, n)
-   W = Array{T}(undef, n)
+   V = Vector{T}(undef, n)
+   W = Vector{T}(undef, n)
    pol = one(S)
    i = 1
    while i < n
@@ -4231,9 +4231,9 @@ function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
    if n == 0
       return one(V)
    end
-   F = Array{elem_type(R)}(undef, n)
-   A = Array{elem_type(R)}(undef, n)
-   M = Array{elem_type(R)}(undef, n - 1, n)
+   F = Vector{elem_type(R)}(undef, n)
+   A = Vector{elem_type(R)}(undef, n)
+   M = Matrix{elem_type(R)}(undef, n - 1, n)
    F[1] = -Y[1, 1]
    for i = 2:n
       F[i] = R()
@@ -5509,7 +5509,7 @@ end
 function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
    last_row == 0 ? m = nrows(P) : m = last_row
    last_col == 0 ? n = ncols(P) : n = last_col
-   pivots = Array{Vector{Int}}(undef, n)
+   pivots = Vector{Vector{Int}}(undef, n)
    for i = 1:n
       pivots[i] = zeros(Int, 0)
    end
@@ -5532,7 +5532,7 @@ end
 The weak Popov form is defined by T. Mulders and A. Storjohann in
 "On lattice reduction for polynomial matrices"
 =#
-function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}},
+function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pivots::Vector{Vector{Int}},
                                                    extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
    last_row == 0 ? m = nrows(P) : m = last_row
    last_col == 0 ? n = ncols(P) : n = last_col
@@ -5600,7 +5600,7 @@ function rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
    V = U
    r = 0
    rank_profile = Vector{Int}(undef, 0)
-   pivots = Array{Vector{Int}}(undef, n)
+   pivots = Vector{Vector{Int}}(undef, n)
    for i = 1:n
       pivots[i] = zeros(Int, 0)
    end
@@ -5725,7 +5725,7 @@ function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: Pol
    end
 end
 
-function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}}, with_trafo::Bool) where {T <: PolyRingElem}
+function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Vector{Vector{Int}}, with_trafo::Bool) where {T <: PolyRingElem}
    m = nrows(P)
    n = ncols(P)
    pivots2 = Vector{NTuple{3,Int}}(undef, m)
@@ -5860,7 +5860,7 @@ function _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {
    end
 end
 
-function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, r::Int, with_trafo::Bool) where {T <: PolyRingElem}
+function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Vector{Int}, r::Int, with_trafo::Bool) where {T <: PolyRingElem}
    n = ncols(H)
    t = base_ring(H)()
    for c = 1:n
@@ -5883,7 +5883,7 @@ function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite:
    return nothing
 end
 
-function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, c::Int, with_trafo::Bool) where {T <: PolyRingElem}
+function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Vector{Int}, c::Int, with_trafo::Bool) where {T <: PolyRingElem}
    m = nrows(H)
    n = ncols(H)
    t = base_ring(H)()
@@ -6741,7 +6741,7 @@ end
 Return the $r \times c$ zero matrix over $R$.
 """
 function zero_matrix(R::NCRing, r::Int, c::Int)
-   arr = Array{elem_type(R)}(undef, r, c)
+   arr = Matrix{elem_type(R)}(undef, r, c)
    for i in 1:r
       for j in 1:c
          arr[i, j] = zero(R)

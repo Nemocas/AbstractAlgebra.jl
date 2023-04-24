@@ -58,7 +58,7 @@ end
 coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 function deepcopy_internal(a::Poly{T}, dict::IdDict) where T <: RingElement
-   coeffs = Array{T}(undef, length(a))
+   coeffs = Vector{T}(undef, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(a.coeffs[i])
    end
@@ -377,7 +377,7 @@ end
 function (a::PolyRing{T})(b::Vector{S}) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    len = length(b)
-   entries = Array{T}(undef, len)
+   entries = Vector{T}(undef, len)
    for i = 1:length(b)
       entries[i] = R(b[i])
    end
