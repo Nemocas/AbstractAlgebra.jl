@@ -184,7 +184,7 @@ function similar(x::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
    p = Generic.RelSeries{TT}(V, 0, max_prec, max_prec)
    # Default similar is supposed to return a Generic series
    if base_ring(x) === R && Symbol(s) == var(parent(x)) &&
-            typeof(x) === Generic.RelSeries{TT} &&
+            x isa Generic.RelSeries{TT} &&
             max_precision(parent(x)) == max_prec
        # steal parent in case it is not cached
        p.parent = parent(x)

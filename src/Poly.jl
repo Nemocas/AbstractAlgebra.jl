@@ -343,7 +343,7 @@ function similar(x::PolyRingElem, R::Ring, s::VarName=var(parent(x)); cached::Bo
    V = Vector{TT}(undef, 0)
    p = Generic.Poly{TT}(V)
    # Default similar is supposed to return a polynomial
-   if base_ring(x) === R && Symbol(s) == var(parent(x)) && typeof(x) === Generic.Poly{TT}
+   if base_ring(x) === R && Symbol(s) == var(parent(x)) && x isa Generic.Poly{TT}
       # steal parent in case it is not cached
       p.parent = parent(x)
    else

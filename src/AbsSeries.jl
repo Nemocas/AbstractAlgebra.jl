@@ -93,7 +93,7 @@ function similar(x::AbsPowerSeriesRingElem, R::Ring, max_prec::Int, s::VarName=v
    p = Generic.AbsSeries{TT}(V, 0, max_prec)
    # Default similar is supposed to return a Generic series
    if base_ring(x) === R && Symbol(s) == var(parent(x)) &&
-            typeof(x) === Generic.AbsSeries{TT} &&
+            x isa Generic.AbsSeries{TT} &&
             max_precision(parent(x)) == max_prec
       # steal parent in case it is not cached
       p.parent = parent(x)
