@@ -84,6 +84,7 @@ end
    G = gens(Q)
    for i = 1:ngens(Q)
       @test gen(Q, i) == G[i]
+      @test gen(Q, i) == Q[i]
    end
 
    @test_throws ArgumentError gen(Q, 0)

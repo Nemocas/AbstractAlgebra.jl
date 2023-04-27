@@ -112,6 +112,7 @@ end
 
          if ngens(M) != 0
             m2 = sum(m1[i]*gen(M, i) for i in 1:ngens(M))
+            @test gen(M, 1) == M[1]
          end
 
          @test_throws ArgumentError gen(M, 0)

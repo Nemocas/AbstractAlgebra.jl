@@ -193,6 +193,7 @@ end
          @test is_gen(g[i])
          @test !is_gen(g[i] + 1)
          @test gen(S, i) == g[i]
+         @test gen(S, i) == S[i]
          @test var_index(gen(S, i)) == i
       end
 

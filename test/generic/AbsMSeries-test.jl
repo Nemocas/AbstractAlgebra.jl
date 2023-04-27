@@ -151,6 +151,8 @@ end
    @test !is_gen(x^2)
    @test !is_gen(R(1))
 
+   @test gen(R,1) == R[1]
+
    @test gens(R) == [x, y]
 
    @test parent(x) == R
@@ -207,6 +209,8 @@ end
    @test_throws ArgumentError gen(R, 5)
    @test !is_gen(x^2)
    @test !is_gen(R(1))
+
+   @test gen(R,1) == R[1]
 
    @test gens(R) == [x, y]
 

@@ -1206,6 +1206,17 @@ getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingEle
 
 ###############################################################################
 #
+#   Syntax S[i] for all parents S as a shortcut for gen(S, i)
+#
+################################################################################
+
+# Unfortunately `Group` is not a subtype of Set because we derive it from the
+# GroupsCore package (oh, if only Julia allowed inheritance from multiple
+# abstract types...)
+getindex(S::Union{Set, Group}, i::Int) = gen(S, i)
+
+###############################################################################
+#
 #   Matrix M = R[...] syntax
 #
 ################################################################################
