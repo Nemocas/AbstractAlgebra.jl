@@ -20,7 +20,7 @@ can be used to set the precision of a power series when constructing it.
 """
 function O(a::LaurentSeriesElem{T}) where T <: RingElement
    val = valuation(a)
-   return parent(a)(Array{T}(undef, 0), 0, val, val, 1)
+   return parent(a)(Vector{T}(undef, 0), 0, val, val, 1)
 end
 
 parent_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRingElem{S}} = LaurentSeriesRing{S}
@@ -237,7 +237,7 @@ function downscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
    end
    R = base_ring(a)
    lenz = (lena - 1)*n + 1
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    j = 0
    pn = 0
    for i = 0:lenz - 1
@@ -270,7 +270,7 @@ function upscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
    end
    R = base_ring(a)
    lenz = div(lena - 1, n) + 1
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    j = 0
    for i = 1:lenz
       d[i] = polcoeff(a, j)
@@ -339,7 +339,7 @@ Return the modulus of the coefficients of the given power series.
 modulus(a::LaurentSeriesElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
 function deepcopy_internal(a::LaurentSeriesElem{T}, dict::IdDict) where {T <: RingElement}
-   coeffs = Array{T}(undef, pol_length(a))
+   coeffs = Vector{T}(undef, pol_length(a))
    for i = 1:pol_length(a)
       coeffs[i] = deepcopy(polcoeff(a, i - 1))
    end
@@ -733,7 +733,7 @@ function *(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    lena = min(lena*sa, prec)
    lenb = min(lenb*sb, prec)
    if lena == 0 || lenb == 0
-      return parent(a)(Array{T}(undef, 0), 0, prec + zval, zval, 1)
+      return parent(a)(Vector{T}(undef, 0), 0, prec + zval, zval, 1)
    end
    t = base_ring(a)()
    da = div(sa, sz)
@@ -743,7 +743,7 @@ function *(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    lena = pol_length(a)
    lenb = pol_length(b)
    lenz = min(lena + lenb - 1, div(prec + sz - 1, sz))
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = polcoeff(a, i - 1)*polcoeff(b, 0)
    end
@@ -901,7 +901,7 @@ function mullow(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}, n::Int) where 
    prec = min(precision(a), precision(b))
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, div(n + s - 1, s))
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = polcoeff(a, i - 1)*polcoeff(b, 0)
    end
@@ -1806,20 +1806,20 @@ function (R::LaurentSeriesField{T})(b::RingElement) where {T <: FieldElement}
 end
 
 function (R::LaurentSeriesRing{T})() where {T <: RingElement}
-   z = LaurentSeriesRingElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+   z = LaurentSeriesRingElem{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    z.parent = R
    return z
 end
 
 function (R::LaurentSeriesField{T})() where {T <: FieldElement}
-   z = LaurentSeriesFieldElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+   z = LaurentSeriesFieldElem{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    z.parent = R
    return z
 end
 
 function (R::LaurentSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    if b == 0
-      z = LaurentSeriesRingElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+      z = LaurentSeriesRingElem{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
       z = LaurentSeriesRingElem{T}([base_ring(R)(b)], 1, R.prec_max, 0, 1)
    end
@@ -1829,7 +1829,7 @@ end
 
 function (R::LaurentSeriesField{T})(b::Union{Rational, AbstractFloat}) where {T <: FieldElement}
    if b == 0
-      z = LaurentSeriesFieldElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+      z = LaurentSeriesFieldElem{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
       z = LaurentSeriesFieldElem{T}([base_ring(R)(b)], 1, R.prec_max, 0, 1)
    end
@@ -1840,7 +1840,7 @@ end
 function (R::LaurentSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
-      z = LaurentSeriesRingElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+      z = LaurentSeriesRingElem{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
       z = LaurentSeriesRingElem{T}([b], 1, R.prec_max, 0, 1)
    end
@@ -1851,7 +1851,7 @@ end
 function (R::LaurentSeriesField{T})(b::T) where {T <: FieldElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
-      z = LaurentSeriesFieldElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+      z = LaurentSeriesFieldElem{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
       z = LaurentSeriesFieldElem{T}([b], 1, R.prec_max, 0, 1)
    end

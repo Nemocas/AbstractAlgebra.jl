@@ -22,7 +22,7 @@ function O(a::AbsPowerSeriesRingElem{T}) where T <: RingElement
       return deepcopy(a)    # 0 + O(x^n)
    end
    prec = length(a) - 1
-   return parent(a)(Array{T}(undef, 0), 0, prec)
+   return parent(a)(Vector{T}(undef, 0), 0, prec)
 end
 
 ###############################################################################
@@ -274,11 +274,11 @@ function *(a::AbsPowerSeriesRingElem{T}, b::AbsPowerSeriesRingElem{T}) where T <
    lenb = min(lenb, prec)
 
    if lena == 0 || lenb == 0
-      return parent(a)(Array{T}(undef, 0), 0, prec)
+      return parent(a)(Vector{T}(undef, 0), 0, prec)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, prec)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end

@@ -911,7 +911,7 @@ end
   a and b are both factorizations. Make the bases coprime without changing
   the values of factorizations. TODO this is probably done somewhere else.
 =#
-function make_bases_coprime!(a::Array{Pair{E, Int}}, b::Array{Pair{E, Int}}) where E
+function make_bases_coprime!(a::Vector{Pair{E, Int}}, b::Vector{Pair{E, Int}}) where E
   lena = length(a)
   lenb = length(b)
   for i in 1:lena

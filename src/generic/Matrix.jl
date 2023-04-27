@@ -159,7 +159,7 @@ end
 
 function (a::MatSpace{T})() where {T <: NCRingElement}
    R = base_ring(a)
-   entries = Array{T}(undef, a.nrows, a.ncols)
+   entries = Matrix{T}(undef, a.nrows, a.ncols)
    for i = 1:a.nrows
       for j = 1:a.ncols
          entries[i, j] = zero(R)
@@ -171,7 +171,7 @@ end
 
 function (a::MatSpace{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
-   entries = Array{T}(undef, a.nrows, a.ncols)
+   entries = Matrix{T}(undef, a.nrows, a.ncols)
    rb = R(b)
    for i = 1:a.nrows
       for j = 1:a.ncols
@@ -199,7 +199,7 @@ end
 function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
-   entries = Array{T}(undef, a.nrows, a.ncols)
+   entries = Matrix{T}(undef, a.nrows, a.ncols)
    for i = 1:a.nrows
       for j = 1:a.ncols
          entries[i, j] = R(b[i, j])

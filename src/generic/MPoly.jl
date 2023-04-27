@@ -76,7 +76,7 @@ function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
 end
 
 function vars(p::MPoly{T}) where {T <: RingElement}
-   vars_in_p = Array{MPoly{T}}(undef, 0)
+   vars_in_p = Vector{MPoly{T}}(undef, 0)
    n = nvars(p.parent)
    exps = p.exps
    size_exps = size(exps)
@@ -848,7 +848,7 @@ is_constant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exp
 
 function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    Re = deepcopy_internal(a.exps, dict)
-   Rc = Array{T}(undef, a.length)
+   Rc = Vector{T}(undef, a.length)
    for i = 1:a.length
       Rc[i] = deepcopy(a.coeffs[i])
    end
@@ -1175,8 +1175,8 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    end
    a_alloc = max(m, n) + n
    b_alloc = max(m, n) + n
-   Ac = Array{T}(undef, a_alloc)
-   Bc = Array{T}(undef, b_alloc)
+   Ac = Vector{T}(undef, a_alloc)
+   Bc = Vector{T}(undef, b_alloc)
    N = parent(a).N
    Ae = zeros(UInt, N, a_alloc)
    Be = zeros(UInt, N, b_alloc)
@@ -1483,8 +1483,8 @@ function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElemen
    end
    drmask = monomial_drmask(par, bits)
    N = size(a.exps, 1)
-   H = Array{heap_s}(undef, 0)
-   I = Array{heap_t}(undef, 0)
+   H = Vector{heap_s}(undef, 0)
+   I = Vector{heap_t}(undef, 0)
    Exps = zeros(UInt, N, m + 1)
    Viewn = [i for i in 1:m + 1]
    viewc = m + 1
@@ -1495,7 +1495,7 @@ function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElemen
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(1, 1, 0))
    r_alloc = max(m, n) + n
-   Rc = Array{T}(undef, r_alloc)
+   Rc = Vector{T}(undef, r_alloc)
    Re = zeros(UInt, N, r_alloc)
    k = 0
    c = R()
@@ -1676,7 +1676,7 @@ function sqrt_classical_char2(a::MPoly{T}; check::Bool=true) where {T <: RingEle
    bits = sizeof(Int)*8
    mask = UInt(1) << (bits - 1)
    # alloc arrays for result coeffs/exps
-   Qc = Array{T}(undef, m)
+   Qc = Vector{T}(undef, m)
    Qe = zeros(UInt, N, m)
    # compute square root
    for i = 1:m
@@ -1710,8 +1710,8 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
    # number of words in (possibly packed) exponent
    N = size(a.exps, 1)
    # Initialise heap
-   H = Array{heap_s}(undef, 0)
-   I = Array{heap_t}(undef, 0)
+   H = Vector{heap_s}(undef, 0)
+   I = Vector{heap_t}(undef, 0)
    viewc = 1
    Viewn = [1, 2]
    viewalloc = 2
@@ -1728,7 +1728,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
    k = 1
    # alloc arrays for result coeffs/exps
    q_alloc = Int(floor(Base.sqrt(m)) + 1)
-   Qc = Array{T}(undef, q_alloc)
+   Qc = Vector{T}(undef, q_alloc)
    Qe = zeros(UInt, N, q_alloc)
    # temporary for addmul
    c = R()
@@ -2126,16 +2126,16 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    m = length(f)
    N = parent(f).N
    drmask = monomial_drmask(par, bits)
-   H = Array{heap_s}(undef, 0) # heap
-   I = Array{heap_t}(undef, 0) # auxiliary data for heap nodes
+   H = Vector{heap_s}(undef, 0) # heap
+   I = Vector{heap_t}(undef, 0) # auxiliary data for heap nodes
    # set up output poly coeffs and exponents (corresponds to h in paper)
    r_alloc = k*(m - 1) + 1
-   Rc = Array{T}(undef, r_alloc)
+   Rc = Vector{T}(undef, r_alloc)
    Re = zeros(UInt, N, r_alloc)
    rnext = 1
    # set up g coeffs and exponents (corresponds to g in paper)
    g_alloc = k*(m - 1) + 1
-   gc = Array{T}(undef, g_alloc)
+   gc = Vector{T}(undef, g_alloc)
    ge = zeros(UInt, N, g_alloc)
    gnext = 1
    # set up heap
@@ -2158,12 +2158,12 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    largest = fill(topbit, m) # largest j s.t. (i, j) has been in heap
    largest[2] = 1
    # precompute some values
-   fik = Array{T}(undef, m)
+   fik = Vector{T}(undef, m)
    for i = 1:m
       fik[i] = from_exp(R, f.exps, i, N)*(k - 1)
    end
    kp1f1 = k*from_exp(R, f.exps, 1, N)
-   gi = Array{T}(undef, 1)
+   gi = Vector{T}(undef, 1)
    gi[1] = -from_exp(R, ge, 1, N)
    final_exp = zeros(UInt, N, 1)
    exp_copy = zeros(UInt, N, 1)
@@ -2449,8 +2449,8 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
       mask = (mask << bits) + mask1
    end
    N = parent(a).N
-   H = Array{heap_s}(undef, 0)
-   I = Array{heap_t}(undef, 0)
+   H = Vector{heap_s}(undef, 0)
+   I = Vector{heap_t}(undef, 0)
    Exps = zeros(UInt, N, n + 1)
    Viewn = [i for i in 1:n + 1]
    viewc = n + 1
@@ -2461,7 +2461,7 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
-   Qc = Array{T}(undef, q_alloc)
+   Qc = Vector{T}(undef, q_alloc)
    Qe = zeros(UInt, N, q_alloc)
    k = 0
    s = n
@@ -2637,8 +2637,8 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
       mask = (mask << bits) + mask1
    end
    N = size(a.exps, 1)
-   H = Array{heap_s}(undef, 0)
-   I = Array{heap_t}(undef, 0)
+   H = Vector{heap_s}(undef, 0)
+   I = Vector{heap_t}(undef, 0)
    Exps = zeros(UInt, N, n + 1)
    Viewn = [i for i in 1:n + 1]
    viewc = n + 1
@@ -2649,7 +2649,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
-   Qc = Array{T}(undef, q_alloc)
+   Qc = Vector{T}(undef, q_alloc)
    Qe = zeros(UInt, N, q_alloc)
    k = 0
    s = n
@@ -2849,8 +2849,8 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
       mask = (mask << bits) + mask1
    end
    N = size(a.exps, 1)
-   H = Array{heap_s}(undef, 0)
-   I = Array{heap_t}(undef, 0)
+   H = Vector{heap_s}(undef, 0)
+   I = Vector{heap_t}(undef, 0)
    Exps = zeros(UInt, N, n + 1)
    Viewn = [i for i in 1:n + 1]
    viewc = n + 1
@@ -2862,9 +2862,9 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
    r_alloc = n
-   Qc = Array{T}(undef, q_alloc)
+   Qc = Vector{T}(undef, q_alloc)
    Qe = zeros(UInt, N, q_alloc)
-   Rc = Array{T}(undef, r_alloc)
+   Rc = Vector{T}(undef, r_alloc)
    Re = zeros(UInt, N, r_alloc)
    k = 0
    l = 0
@@ -3081,8 +3081,8 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Vector{MPoly{T}}, bits::Int) wher
       mask = (mask << bits) + mask1
    end
    N = size(a.exps, 1)
-   H = Array{heap_s}(undef, 0)
-   I = Array{nheap_t}(undef, 0)
+   H = Vector{heap_s}(undef, 0)
+   I = Vector{nheap_t}(undef, 0)
    heapn = 0
    for i = 1:len
       heapn += n[i]
@@ -3098,9 +3098,9 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Vector{MPoly{T}}, bits::Int) wher
    push!(I, nheap_t(0, 1, 0, 0))
    q_alloc = [max(m - n[i], n[i]) for i in 1:len]
    r_alloc = n[1]
-   Qc = [Array{T}(undef, q_alloc[i]) for i in 1:len]
+   Qc = [Vector{T}(undef, q_alloc[i]) for i in 1:len]
    Qe = [zeros(UInt, N, q_alloc[i]) for i in 1:len]
-   Rc = Array{T}(undef, r_alloc)
+   Rc = Vector{T}(undef, r_alloc)
    Re = zeros(UInt, N, r_alloc)
    k = [0 for i in 1:len]
    l = 0
@@ -3552,7 +3552,7 @@ function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    ord = parent(a).ord
    N = parent(a).N
    Ce = zeros(UInt, N, 1)
-   Cc = Array{T}(undef, 1)
+   Cc = Vector{T}(undef, 1)
    monomial_set!(Ce, 1, a.exps, 1, N)
    monomial_vecmin!(Ce, 1, b.exps, 1, N)
    if ord == :deglex || ord == :degrevlex
@@ -3573,7 +3573,7 @@ function term_content(a::MPoly{T}) where {T <: RingElement}
    ord = parent(a).ord
    N = parent(a).N
    Ce = zeros(UInt, N, 1)
-   Cc = Array{T}(undef, 1)
+   Cc = Vector{T}(undef, 1)
    monomial_set!(Ce, 1, a.exps, 1, N)
    for i = 2:a.length
       monomial_vecmin!(Ce, 1, a.exps, i, N)
@@ -3637,7 +3637,7 @@ function main_variable_coefficient_lex(a::MPoly{T}, k0::Int, n::Int) where {T <:
    N = parent(a).N
    Ae = zeros(UInt, N, 0)
    a_alloc = 0
-   Ac = Array{T}(undef, 0)
+   Ac = Vector{T}(undef, 0)
    l = 0
    for i = n:a.length
       if a.exps[k0, i] != exp
@@ -3672,7 +3672,7 @@ function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T
    N = parent(a).N
    Ae = zeros(UInt, N, 0)
    a_alloc = 0
-   Ac = Array{T}(undef, 0)
+   Ac = Vector{T}(undef, 0)
    l = 0
    for i = n:a.length
       if a.exps[k0, i] != exp
@@ -3727,7 +3727,7 @@ function main_variable_extract(R::SparsePolyRing, a::MPoly{T}, k::Int) where {T 
    a2 = parent(a)(Rc, Re)
    A = main_variable_terms(a2, k)
    Pe = zeros(UInt, length(A))
-   Pc = Array{MPoly{T}}(undef, length(A))
+   Pc = Vector{MPoly{T}}(undef, length(A))
    ord = parent(a).ord
    for i = 1:length(A)
       Pe[i] = a2.exps[k, A[i]]

@@ -61,7 +61,7 @@ end
 polcoeff(a::AbsSeries, n::Int) = coeff(a, n)
 
 function deepcopy_internal(a::AbsSeries{T}, dict::IdDict) where T <: RingElement
-   coeffs = Array{T}(undef, length(a))
+   coeffs = Vector{T}(undef, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
    end
@@ -146,10 +146,10 @@ function *(a::AbsSeries{T}, b::AbsSeries{T}) where T <: RingElement
    lenb = min(lenb, prec)
 
    if lena == 0 || lenb == 0
-      return parent(a)(Array{T}(undef, 0), 0, prec)
+      return parent(a)(Vector{T}(undef, 0), 0, prec)
    end
    lenz = min(lena + lenb - 1, prec)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    cutoff = mullow_fast_cutoff(a, b)
    AbstractAlgebra.DensePoly.mullow_fast!(d, lenz,
                           a.coeffs, lena, b.coeffs, lenb, base_ring(a), cutoff)
@@ -299,14 +299,14 @@ function (a::AbsPowerSeriesRing{T} where T <: RingElement)(b::RingElement)
 end
 
 function (a::AbsPowerSeriesRing{T})() where T <: RingElement
-   z = AbsSeries{T}(Array{T}(undef, 0), 0, a.prec_max)
+   z = AbsSeries{T}(Vector{T}(undef, 0), 0, a.prec_max)
    z.parent = a
    return z
 end
 
 function (a::AbsPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
    if b == 0
-      z = AbsSeries{T}(Array{T}(undef, 0), 0, a.prec_max)
+      z = AbsSeries{T}(Vector{T}(undef, 0), 0, a.prec_max)
    else
       z = AbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
    end
@@ -317,7 +317,7 @@ end
 function (a::AbsPowerSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if iszero(b)
-      z = AbsSeries{T}(Array{T}(undef, 0), 0, a.prec_max)
+      z = AbsSeries{T}(Vector{T}(undef, 0), 0, a.prec_max)
    else
       z = AbsSeries{T}([b], 1, a.prec_max)
    end
@@ -342,7 +342,7 @@ end
 function (a::AbsPowerSeriesRing{T})(b::Vector{S}, len::Int, prec::Int) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    lenb = length(b)
-   entries = Array{T}(undef, lenb)
+   entries = Vector{T}(undef, lenb)
    for i = 1:lenb
       entries[i] = R(b[i])
    end

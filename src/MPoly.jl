@@ -90,7 +90,7 @@ Return the variables actually occurring in $p$.
 """
 function vars(p::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
    U = typeof(p)
-   vars_in_p = Array{U}(undef, 0)
+   vars_in_p = Vector{U}(undef, 0)
    n = nvars(p.parent)
    gen_list = gens(p.parent)
    biggest = [0 for i in 1:n]
@@ -1156,7 +1156,7 @@ as an array in ascending order.
 function coefficients_of_univariate(p::AbstractAlgebra.MPolyRingElem,
                                     check_univariate::Bool=true)
 
-   coeffs = Array{elem_type(coefficient_ring(p))}(undef, 0)
+   coeffs = Vector{elem_type(coefficient_ring(p))}(undef, 0)
    var_index = -1
    for (c, v) in zip(coefficients(p), exponent_vectors(p))
       e = 0

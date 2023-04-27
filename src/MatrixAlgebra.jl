@@ -399,7 +399,7 @@ randmat_with_rank(S::MatAlgebra{T}, rank::Int, v...) where {T <: RingElement} =
 
 function identity_matrix(M::MatAlgElem{T}, n::Int) where T <: NCRingElement
    R = base_ring(M)
-   arr = Array{T}(undef, n, n)
+   arr = Matrix{T}(undef, n, n)
    for i in 1:n
       for j in 1:n
          arr[i, j] = i == j ? one(R) : zero(R)

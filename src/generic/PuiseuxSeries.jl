@@ -35,7 +35,7 @@ constructing it.
 function O(a::PuiseuxSeriesElem{T}) where T <: RingElement
    val = valuation(a)
    par = parent(a)
-   laur = laurent_ring(par)(Array{T}(undef, 0), 0, numerator(val), numerator(val), 1)
+   laur = laurent_ring(par)(Vector{T}(undef, 0), 0, numerator(val), numerator(val), 1)
    return parent(a)(laur, denominator(val))
 end
 

@@ -20,7 +20,7 @@ can be used to set the precision of a power series when constructing it.
 function O(a::RelPowerSeriesRingElem{T}) where T <: RingElement
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError(a, "pol_length(a) + valuation(a) must be >= 1"))
-   return parent(a)(Array{T}(undef, 0), 0, val, val)
+   return parent(a)(Vector{T}(undef, 0), 0, val, val)
 end
 
 parent(a::SeriesElem) = a.parent
@@ -423,11 +423,11 @@ function *(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}) where T <
    lena = min(lena, prec)
    lenb = min(lenb, prec)
    if lena == 0 || lenb == 0
-      return parent(a)(Array{T}(undef, 0), 0, prec + zval, zval)
+      return parent(a)(Vector{T}(undef, 0), 0, prec + zval, zval)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, prec)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = polcoeff(a, i - 1)*polcoeff(b, 0)
    end
@@ -593,7 +593,7 @@ function mullow(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}, n::I
    prec = min(precision(a), precision(b))
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, n)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end

@@ -51,7 +51,7 @@ function gen(R::RelPowerSeriesRing)
 end
 
 function deepcopy_internal(a::RelSeries{T}, dict::IdDict) where T <: RingElement
-   coeffs = Array{T}(undef, pol_length(a))
+   coeffs = Vector{T}(undef, pol_length(a))
    for i = 1:pol_length(a)
       coeffs[i] = deepcopy(polcoeff(a, i - 1))
    end
@@ -132,11 +132,11 @@ function *(a::RelSeries{T}, b::RelSeries{T}) where T <: RingElement
    lena = min(lena, prec)
    lenb = min(lenb, prec)
    if lena == 0 || lenb == 0
-      return parent(a)(Array{T}(undef, 0), 0, prec + zval, zval)
+      return parent(a)(Vector{T}(undef, 0), 0, prec + zval, zval)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, prec)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    cutoff = mullow_fast_cutoff(a, b)
    AbstractAlgebra.DensePoly.mullow_fast!(d, lenz,
                           a.coeffs, lena, b.coeffs, lenb, base_ring(a), cutoff)
@@ -341,14 +341,14 @@ function (R::RelPowerSeriesRing{T})(b::RingElement) where T <: RingElement
 end
 
 function (R::RelPowerSeriesRing{T})() where T <: RingElement
-   z = RelSeries{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max)
+   z = RelSeries{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max)
    z.parent = R
    return z
 end
 
 function (R::RelPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
    if b == 0
-      z = RelSeries{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max)
+      z = RelSeries{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max)
    else
       z = RelSeries{T}([base_ring(R)(b)], 1, R.prec_max, 0)
    end
@@ -359,7 +359,7 @@ end
 function (R::RelPowerSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
-      z = RelSeries{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max)
+      z = RelSeries{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max)
    else
       z = RelSeries{T}([b], 1, R.prec_max, 0)
    end
@@ -384,7 +384,7 @@ end
 function (R::RelPowerSeriesRing{T})(b::Vector{S}, len::Int, prec::Int, val::Int) where {S <: RingElement, T <: RingElement}
    R0 = base_ring(R)
    lenb = length(b)
-   entries = Array{T}(undef, lenb)
+   entries = Vector{T}(undef, lenb)
    for i = 1:lenb
       entries[i] = R0(b[i])
    end

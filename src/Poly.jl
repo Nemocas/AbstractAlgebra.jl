@@ -646,7 +646,7 @@ function mul_ks(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: PolyRingElem
    end
    m = maxa + maxb - 1
    z = base_ring(base_ring(a))()
-   A1 = Array{elem_type(base_ring(base_ring(a)))}(undef, m*lena)
+   A1 = Vector{elem_type(base_ring(base_ring(a)))}(undef, m*lena)
    for i = 1:lena
       c = coeff(a, i - 1)
       for j = 1:length(c)
@@ -658,7 +658,7 @@ function mul_ks(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: PolyRingElem
    end
    ksa = base_ring(a)(A1)
    if a !== b
-      A2 = Array{elem_type(base_ring(base_ring(a)))}(undef, m*lenb)
+      A2 = Vector{elem_type(base_ring(base_ring(a)))}(undef, m*lenb)
       for i = 1:lenb
          c = coeff(b, i - 1)
          for j = 1:length(c)
@@ -697,7 +697,7 @@ function mul_classical(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingEl
    R = base_ring(a)
    t = R()
    lenz = lena + lenb - 1
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:lena
       d[i] = mul_red!(R(), coeff(a, i - 1), coeff(b, 0), false)
    end
@@ -774,7 +774,7 @@ function pow_multinomial(a::PolyRingElem{T}, e::Int) where T <: RingElement
    e < 0 && throw(DomainError(e, "exponent must be >= 0"))
    lena = length(a)
    lenz = (lena - 1) * e + 1
-   res = Array{T}(undef, lenz)
+   res = Vector{T}(undef, lenz)
    for k = 1:lenz
       res[k] = base_ring(a)()
    end
@@ -1019,7 +1019,7 @@ function mullow(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where T <: RingE
    R = base_ring(a)
    t = R()
    lenz = min(lena + lenb - 1, n)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = mul_red!(R(), coeff(a, i - 1), coeff(b, 0), false)
    end
@@ -1381,7 +1381,7 @@ function divexact(f::PolyRingElem{T}, g::PolyRingElem{T}; check::Bool=true) wher
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
-   d = Array{T}(undef, lenq)
+   d = Vector{T}(undef, lenq)
    for i = 1:lenq
       d[i] = zero(base_ring(f))
    end
@@ -1693,7 +1693,7 @@ function sqrt_classical_char2(f::PolyRingElem{T}; check::Bool=true) where T <: R
       end
    end
    lenq = div(m + 1, 2)
-   d = Array{T}(undef, lenq)
+   d = Vector{T}(undef, lenq)
    for i = 1:lenq
       c = coeff(f, 2*i - 2)
       if check && !is_square(c)
@@ -1723,7 +1723,7 @@ function sqrt_classical(f::PolyRingElem{T}; check::Bool=true) where T <: RingEle
       return false, S()
    end
    lenq = div(m + 1, 2)
-   d = Array{T}(undef, lenq)
+   d = Vector{T}(undef, lenq)
    d[lenq] = sqrt(coeff(f, m - 1))
    b = -2*d[lenq]
    k = 1
@@ -3064,7 +3064,7 @@ function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingEle
    end
    R = base_ring(S)
    parent(y[1]) != R && error("Polynomial ring does not match inputs")
-   P = Array{T}(undef, n)
+   P = Vector{T}(undef, n)
    for i = 1:n
       P[i] = deepcopy(y[i])
    end
@@ -3092,7 +3092,7 @@ function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where {T <: ResEle
    end
    R = base_ring(S)
    parent(y[1]) != R && error("Polynomial ring does not match inputs")
-   P = Array{T}(undef, n)
+   P = Vector{T}(undef, n)
    for i = 1:n
       P[i] = deepcopy(y[i])
    end
