@@ -272,7 +272,7 @@ julia> K = total_ring_of_fractions(R)
 Total ring of fractions of Residue ring of Integers modulo 12
 
 julia> f = rand(K, 0:11)
-8//7
+7//5
 
 julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
@@ -281,5 +281,5 @@ julia> S = total_ring_of_fractions(R)
 Total ring of fractions of Univariate Polynomial Ring in x over Integers
 
 julia> g = rand(S, -1:3, -10:10)
--4//(-6*x^3 + 10*x^2 + 7*x - 10)
+(4*x + 4)//(-4*x^2 - x + 4)
 ```
