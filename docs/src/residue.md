@@ -327,7 +327,7 @@ julia> R = residue_ring(ZZ, 7)
 Residue ring of Integers modulo 7
 
 julia> f = rand(R, 0:6)
-5
+4
 
 julia> S, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
@@ -336,5 +336,5 @@ julia> U = residue_field(S, x^3 + 3x + 1)
 Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
 
 julia> g = rand(S, 2:2, -10:10)
--7//10*x^2 - 2*x - 3
+-1//4*x^2 - 2//7*x + 1
 ```

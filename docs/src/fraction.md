@@ -373,7 +373,7 @@ julia> K = fraction_field(ZZ)
 Rationals
 
 julia> f = rand(K, -10:10)
--1//1
+-1//3
 
 julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integers, x)
@@ -382,7 +382,7 @@ julia> S = fraction_field(R)
 Fraction field of Univariate Polynomial Ring in x over Integers
 
 julia> g = rand(S, -1:3, -10:10)
-(-8*x^2 + 4*x + 6)//(8*x^3 - 5*x^2 + 6*x - 10)
+(-4*x - 4)//(4*x^2 + x - 4)
 ```
 
 ### Extra functionality for factored fractions

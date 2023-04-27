@@ -743,5 +743,5 @@ julia> R, x = power_series_ring(ZZ, 10, "x")
 (Univariate power series ring in x over Integers, x + O(x^11))
 
 julia> f = rand(R, 3:5, -10:10)
-5*x^5 - 5*x^6 + 2*x^7 - 6*x^8 - 4*x^9 + 8*x^10 - 10*x^11 + 7*x^12 + 10*x^13 - 6*x^14 + O(x^15)
+3*x^4 - x^5 + 4*x^7 + 4*x^8 - 7*x^9 + 2*x^10 + 4*x^11 - x^12 - 4*x^13 + O(x^14)
 ```
