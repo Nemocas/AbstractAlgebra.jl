@@ -386,7 +386,7 @@ function similar(x::LaurentSeriesElem, R::Ring, max_prec::Int,
    p = Generic.LaurentSeriesRingElem{TT}(V, 0, max_prec, max_prec, 1)
    # Default similar is supposed to return a Generic series
    if base_ring(x) === R && s == var(parent(x)) &&
-         typeof(x) === Generic.LaurentSeriesRingElem{TT} &&
+         x isa Generic.LaurentSeriesRingElem{TT} &&
       max_precision(parent(x)) == max_prec
       # steal parent in case it is not cached
       p.parent = parent(x)
@@ -403,7 +403,7 @@ function similar(x::LaurentSeriesElem, R::Field, max_prec::Int,
    p = Generic.LaurentSeriesFieldElem{TT}(V, 0, max_prec, max_prec, 1)
    # Default similar is supposed to return a Generic series
    if base_ring(x) === R && s == var(parent(x)) &&
-         typeof(x) === Generic.LaurentSeriesFieldElem{TT} &&
+         x isa Generic.LaurentSeriesFieldElem{TT} &&
       max_precision(parent(x)) == max_prec
       # steal parent in case it is not cached
       p.parent = parent(x)

@@ -2199,7 +2199,7 @@ end
 
 function det_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
    n = nrows(M)
-   !is_domain_type(elem_type(typeof(base_ring(base_ring(M))))) &&
+   !is_domain_type(elem_type(base_ring(base_ring(M)))) &&
           error("Generic interpolation requires a domain type")
    R = base_ring(M)
    if n == 0
