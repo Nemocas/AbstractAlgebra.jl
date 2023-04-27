@@ -46,10 +46,10 @@ summands(M::DirectSumModule{T}) where T <: RingElement = M.m
 function show(io::IO, N::DirectSumModule{T}) where T <: RingElement
    if get(io, :supercompact, false)
      io = pretty(io)
-     print(io, Uppercase(), "DirectSumModule")
+     print(io, LowercaseOff(), "DirectSumModule")
    else
      io = pretty(io)
-     print(io, Uppercase(), "DirectSumModule over ", Lowercase(), base_ring(N))
+     print(io, LowercaseOff(), "DirectSumModule over ", Lowercase(), base_ring(N))
    end
 end
 

@@ -191,8 +191,7 @@ Module homomorphism
 julia> r = ModuleHomomorphism(N, D, [2,3] .* gens(D)[1:2])
 Module homomorphism
   from vector space of dimension 2 over rationals
-  to DirectSumModule over rationa
-  ls
+  to DirectSumModule over rationals
 
 julia> psi = ModuleHomomorphism(D, D, [r, r])
 Module homomorphism

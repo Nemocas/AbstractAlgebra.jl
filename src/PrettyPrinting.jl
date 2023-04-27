@@ -1409,35 +1409,96 @@ end
 #
 ################################################################################
 
+# The following piece of code draws inspiration from
+#   https://github.com/KristofferC/IOIndents.jl
+# But we do the indentation differently (and more correctly for multiline
+# printing)
+
 import Base: convert, show, pipe_reader, pipe_writer, lock, unlock, write,
              getindex, in, haskey, get, print, unwrapcontext
 
 export IOCustom, Indent, Dedent, indent_string!
 
+"""
+    Indent
+
+When printed to an `IOCustom` object, increases the indendation level by one.
+
+# Examples
+
+```repl
+julia> io = AbstractAlgebra.pretty(stdout);
+
+julia> print(io, AbstractAlgebra.Indent(), "This is indented")
+  This is indented
+```
+"""
 struct Indent end
+
+"""
+    Dedent
+
+When printed to an `IOCustom` object, decreases the indendation level by one.
+
+# Examples
+
+```repl
+julia> io = AbstractAlgebra.pretty(stdout);
+
+julia> print(io, AbstractAlgebra.Indent(), AbstractAlgebra.Dedent(), "This is indented")
+This is indented
+```
+"""
 struct Dedent end
 
-struct Lowercase end
-struct Uppercase end
+"""
+    Lowercase
 
-Base.show(io::IO, ::Union{Indent, Dedent}) = nothing
+When printed to an `IOCustom` object, the next letter printed will be lowercase.
+
+# Examples
+
+```repl
+julia> io = AbstractAlgebra.pretty(stdout);
+
+julia> print(io, AbstractAlgebra.Lowercase(), "Foo")
+foo
+```
+"""
+struct Lowercase end
+
+"""
+    LowercaseOff
+
+When printed to an `IOCustom` object, the case of the next letter will not be
+changed when printed.
+
+# Examples
+
+```repl
+julia> io = AbstractAlgebra.pretty(stdout);
+
+julia> print(io, AbstractAlgebra.Lowercase(), AbstractAlgebra.LowercaseOff(), "Foo")
+Foo
+```
+"""
+struct LowercaseOff end
+
+Base.show(io::IO, ::Union{Lowercase, LowercaseOff, Indent, Dedent}) = nothing
 
 mutable struct IOCustom{IO_t <: IO} <: Base.AbstractPipe
     io::IO_t
     indent_level::Int
-    aligns::Vector{Int}
-    offset::Int
     indented_line::Bool
     indent_str::String
-    align_char::Char
     printed::Int
     lowercasefirst::Bool
 
-    function IOCustom{IO_t}(io::IO_t, indent_level::Int, aligns::Vector{Int},
-                            offset::Int, indented_line::Bool, indent_str::String,
-                            align_char::Char, printed::Int, lowercasefirst::Bool) where IO_t <: IO
+    function IOCustom{IO_t}(io::IO_t, indent_level::Int,
+                            indented_line::Bool, indent_str::String,
+                            printed::Int, lowercasefirst::Bool) where IO_t <: IO
         @assert(!(IO_t <: IOCustom))
-        return new(io, indent_level, aligns, offset, indented_line, indent_str, align_char, printed, lowercasefirst)
+        return new(io, indent_level, indented_line, indent_str, printed, lowercasefirst)
     end
 end
 
@@ -1447,7 +1508,7 @@ _unwrap(io::IOContext) = io.io
 
 indent_string!(io::IO, str::String) = (_unwrap(io).indent_str = str; io)
 
-IOCustom(io::IO) = IOCustom{typeof(io)}(io, 0, Int[], 0, false, "  ", ' ', 0, false)
+IOCustom(io::IO) = IOCustom{typeof(io)}(io, 0, false, "  ", 0, false)
 
 IOCustom(io::IOCustom) = io
 
@@ -1479,10 +1540,8 @@ write(io::IO, ::Dedent) = (_unwrap(io).indent_level = max(0, io.indent_level - 1
 print(io::IO, ::Dedent) = write(io, Dedent())
 write(io::IO, ::Lowercase) = (_unwrap(io).lowercasefirst = true; 0)
 print(io::IO, ::Lowercase) = write(io, Lowercase())
-write(io::IO, ::Uppercase) = (_unwrap(io).lowercasefirst = false; 0)
-print(io::IO, ::Uppercase) = write(io, Uppercase())
-
-_align_length(io) = length(io.aligns) == 0 ? 0 : io.aligns[end]
+write(io::IO, ::LowercaseOff) = (_unwrap(io).lowercasefirst = false; 0)
+print(io::IO, ::LowercaseOff) = write(io, LowercaseOff())
 
 write_indent(io::IO) = write(_unwrap(io).io, io.indent_str^io.indent_level)
 
@@ -1509,7 +1568,7 @@ function _write_line(io::IOCustom, str::AbstractString)
   end
   io.printed += textwidth(firststr)
   reststr = str[firstlen + 1:end]
-  it = Iterators.partition(1:textwidth(reststr), c - ind > 0 ? c - ind : mod(c - ind, c))
+  it = Iterators.partition(1:textwidth(reststr), c - ind > 0 ? c - ind : c)
   for i in it
     written += write(io.io, "\n")
     written += write_indent(io)
@@ -1524,6 +1583,7 @@ function write(io::IOCustom, str::String)
   if str == "\n"
     written = write(io.io, str)
     io.indented_line = false
+    io.printed = 0
     return written
   end
 
@@ -1547,14 +1607,27 @@ function write(io::IOCustom, str::String)
   return written
 end
 
+# Base.write on an IOContext does not call Base.write on the unwrapped context ...
 Base.write(io::IOContext{<: IOCustom}, s::Union{SubString{String}, String}) = Base.write(Base.unwrapcontext(io)[1], s)
 
 # println(io) redirects to print(io, '\n')
 Base.write(io::IOContext{<: IOCustom}, s::Char) = Base.write(Base.unwrapcontext(io)[1], s)
 
+Base.take!(io::IOCustom) = take!(io.io)
 
+"""
+    pretty(io::IO) -> IOCustom
+
+Wrap `io` into an `IOCustom` object.
+
+# Examples
+
+```repl
+julia> io = AbstractAlgebra.pretty(stdout);
+```
+"""
 pretty(io::IO) = IOCustom(io)
 
-export pretty, LowerCase, Uppercase, Indent, Dedent
+export pretty, Lowercase, LowercaseOff, Indent, Dedent
 
 end # PrettyPrinting

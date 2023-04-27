@@ -545,7 +545,7 @@ import .PrettyPrinting: show_obj
 import .PrettyPrinting: show_via_expressify
 import .PrettyPrinting: with_unicode
 import .PrettyPrinting: pretty
-import .PrettyPrinting: Uppercase
+import .PrettyPrinting: LowercaseOff
 import .PrettyPrinting: Lowercase
 import .PrettyPrinting: Indent
 import .PrettyPrinting: Dedent

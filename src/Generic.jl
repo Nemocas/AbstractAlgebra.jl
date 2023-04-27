@@ -241,7 +241,7 @@ import ..AbstractAlgebra: terms
 import ..AbstractAlgebra: terms_degrees
 import ..AbstractAlgebra: to_univariate
 import ..AbstractAlgebra: trailing_coefficient
-import ..AbstractAlgebra: Uppercase
+import ..AbstractAlgebra: LowercaseOff
 import ..AbstractAlgebra: use_karamul
 import ..AbstractAlgebra: valuation
 import ..AbstractAlgebra: var
