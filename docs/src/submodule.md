@@ -170,5 +170,5 @@ julia> N2 = sub(M, [m])
 (Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 2 over Integers)
 
 julia> I = intersect(N1, N2)
-Union{AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}, AbstractAlgebra.Generic.Submodule{BigInt}}[]
+Any[]
 ```
