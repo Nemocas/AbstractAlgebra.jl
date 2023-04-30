@@ -96,6 +96,8 @@ end
    @test !(y in keys(Dict(x => 1)))
 
    @test_throws DomainError O(0+O(x^0))
+
+   @test !occursin("\n", sprint(show, T))
 end
 
 @testset "Generic.RelSeries.rand" begin

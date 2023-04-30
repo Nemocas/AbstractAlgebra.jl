@@ -84,7 +84,7 @@ various relations between the objects and types.
 julia> using AbstractAlgebra
 
 julia> R, x = ZZ["x"]
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> f = x^2 + 3x + 1
 x^2 + 3*x + 1

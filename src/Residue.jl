@@ -142,7 +142,14 @@ end
 @enable_all_show_via_expressify ResElem
 
 function show(io::IO, a::ResidueRing)
-   print(IOContext(io, :compact => true), "Residue ring of ", base_ring(a), " modulo ", modulus(a))
+   if get(io, :supercompact, false)
+     print(io, "Residue ring")
+   else
+     io = pretty(io)
+     print(io, "Residue ring of ",)
+     print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+     print(io, " modulo ", modulus(a))
+   end
 end
 
 ###############################################################################

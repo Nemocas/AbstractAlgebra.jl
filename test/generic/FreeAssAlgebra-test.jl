@@ -124,6 +124,12 @@
    end
 end
 
+@testset "Generic.FreeAssAlgebra.printing" begin
+   R, x = ZZ["y"]
+   S = free_associative_algebra(R, 5)
+   @test !occursin("\n", sprint(show, R))
+end
+
 function test_elem(R::Generic.FreeAssAlgebra{elem_type(ZZ)})
    return rand(R, 0:4, 0:5, -10:10)
 end

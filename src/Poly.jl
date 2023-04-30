@@ -483,10 +483,13 @@ end
 @enable_all_show_via_expressify Union{PolynomialElem, NCPolyRingElem}
 
 function show(io::IO, p::PolyRing)
-   print(io, "Univariate Polynomial Ring in ")
-   print(io, string(var(p)))
-   print(io, " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+   if get(io, :supercompact, false)
+      print(io, "Univariate polynomial ring")
+   else
+      io = pretty(io)
+      print(io, "Univariate polynomial ring in ", var(p), " over ")
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+   end
 end
 
 ###############################################################################

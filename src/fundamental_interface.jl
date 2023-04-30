@@ -44,7 +44,7 @@ Given a parent object (or its type), return the type of its elements.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S, x = power_series_ring(QQ, 2, "x")
-(Univariate power series ring in x over Rationals, x + O(x^3))
+(Univariate power series ring over rationals, x + O(x^3))
 
 julia> elem_type(S) == typeof(x)
 true
@@ -62,10 +62,11 @@ Given an element (or its type), return the type of its parent object.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> S = matrix_space(R, 2, 2)
-Matrix Space of 2 rows and 2 columns over Univariate Polynomial Ring in x over Integers
+Matrix space of 2 rows and 2 columns
+  over univariate polynomial ring in x over integers
 
 julia> a = rand(S, 0:1, 0:1);
 
@@ -84,7 +85,7 @@ Return base ring $R$ of given element or parent $a$.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> base_ring(S) == QQ
 true
@@ -113,7 +114,8 @@ be either an element or parent.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S = matrix_space(ZZ, 2, 2)
-Matrix Space of 2 rows and 2 columns over Integers
+Matrix space of 2 rows and 2 columns
+  over integers
 
 julia> one(S)
 [1   0]
@@ -143,14 +145,15 @@ either an element or parent.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S = MatrixAlgebra(QQ, 2)
-Matrix Algebra of degree 2 over Rationals
+Matrix Algebra of degree 2
+  over rationals
 
 julia> zero(S)
 [0//1   0//1]
 [0//1   0//1]
 
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> zero(x^3 + 2)
 0

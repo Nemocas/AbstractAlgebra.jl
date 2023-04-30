@@ -310,3 +310,54 @@
    @test AbstractAlgebra.obj_to_string_wrt_times(x + y) == "(x + y)"
 end
 
+let
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io)
+  @test io isa AbstractAlgebra.PrettyPrinting.IOCustom
+  @test io === AbstractAlgebra.pretty(io)
+  print(io, AbstractAlgebra.Indent(), "test")
+  println(io, " test")
+  print(io, "test")
+  println(io, AbstractAlgebra.Indent())
+  print(io, "test")
+  println(io, AbstractAlgebra.Dedent())
+  print(io, "test")
+  @test String(take!(io)) == "  test test\n" *
+                             "  test\n" *
+                             "    test\n" *
+                             "  test"
+
+  # Test string longer than width
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io)
+  _, c = displaysize(io)
+  print(io, AbstractAlgebra.Indent())
+  println(io, "t"^c)
+  println(io, "aa", "t"^c)
+  print(io, AbstractAlgebra.Indent())
+  print(io, "aa", "t"^c)
+  @test String(take!(io)) == "  " * "t"^(c - 2) * "\n" *
+                             "  tt\n" * 
+                             "  aa" * "t"^(c - 4) * "\n" *
+                             "  tttt\n" *
+                             "    aa" * "t"^(c - 6) * "\n" *
+                             "    tttttt"
+
+  # Test too much indentation
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io)
+  _, c = displaysize(io)
+  for i in 1:c
+    print(io, AbstractAlgebra.Indent())
+  end
+  print(io, "test")
+  @test String(take!(io)) isa String
+
+  # Lowercase/LowercaseOff
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io)
+  print(io, AbstractAlgebra.Lowercase(), "Test")
+  @test String(take!(io)) == "test"
+  print(io, AbstractAlgebra.Lowercase(), AbstractAlgebra.LowercaseOff(), "Test")
+  @test String(take!(io)) == "Test"
+end

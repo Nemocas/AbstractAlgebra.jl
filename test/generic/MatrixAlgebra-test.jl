@@ -86,6 +86,12 @@ end
    @test parent(S()) == S
 end
 
+@testset "Generic.MatAlg.printing" begin
+   R, t = polynomial_ring(QQ, "t")
+   S = MatrixAlgebra(R, 3)
+   @test !occursin("\n", sprint(show, S))
+end
+
 @testset "Generic.MatAlg.manipulation" begin
    R, t = polynomial_ring(QQ, "t")
    S = MatrixAlgebra(R, 3)

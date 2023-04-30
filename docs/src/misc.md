@@ -78,3 +78,58 @@ instead of the object.
 Note: if the object is stored in several variable, the first one will be used. Also
 the name, once used for printing, is stored in the object - hence will not change
 anymore.
+
+## Advanced printing
+
+To facilitate printing of nested mathematical structures, we provide a modified
+`IOCustom` object, that supports indendation and decapitalization.
+
+### Example
+
+We illustrate this with an example
+
+```
+struct A{T}
+  x::T
+end
+
+function Base.show(io::IO, a::A)
+  io = AbstractAlgebra.pretty(io)
+  println(io, "Something of type A")
+  print(io, AbstractAlgebra.Indent(), "over ", AbstractAlgebra.Lowercase(), a.x)
+end
+
+struct B
+end
+
+function Base.show(io::IO, b::B)
+  io = AbstractAlgebra.pretty(io)
+  print(io, LowercaseOff(), "Hilbert thing")
+end
+```
+
+At the REPL, this will then be printed as follows:
+```
+julia> A(2)
+Something of type A
+  over 2
+
+julia> A(A(2))
+Something of type A
+  over something of type A
+    over 2
+
+julia> A(B())
+Something of type A
+  over Hilbert thing
+```
+
+### Documentation
+
+```@docs
+AbstractAlgebra.pretty
+AbstractAlgebra.Indent
+AbstractAlgebra.Dedent
+AbstractAlgebra.Lowercase
+AbstractAlgebra.LowercaseOff
+```

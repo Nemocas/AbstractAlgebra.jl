@@ -128,10 +128,9 @@ is_term(a::T) where T <: NCRingElem = true
 ###############################################################################
 
 function show(io::IO, p::NCPolyRing)
-   print(io, "Univariate Polynomial Ring in ")
-   print(io, string(var(p)))
-   print(io, " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+   io = pretty(io)
+   print(io, "Univariate polynomial ring in ", var(p), " over ")
+   print(IOContext(io, :compact => true), Lowercase(), base_ring(p))
 end
 
 ###############################################################################
@@ -729,10 +728,10 @@ Setting the optional argument `cached` to `false` will prevent the parent object
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring, y)
 ```
 """
 function polynomial_ring(R::NCRing, s::VarName; kw...)

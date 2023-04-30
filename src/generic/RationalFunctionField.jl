@@ -145,8 +145,21 @@ function show(io::IO, a::RationalFunctionFieldElem)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
+function show(io::IO, ::MIME"text/plain", a::RationalFunctionField)
+  println(io, "Rational function field")
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), base_ring(a))
+end
+
 function show(io::IO, a::RationalFunctionField)
-   print(IOContext(io, :compact => true), "Rational function field over ", base_ring(a))
+  if get(io, :supercompact, false)
+    # no nested printing
+    print(io, "Rational function field")
+  else
+    io = pretty(io) # we need this to allow printing lowercase
+    print(IOContext(io, :supercompact => true),
+          "Rational function field over ", Lowercase(), base_ring(a))
+  end
 end
 
 ###############################################################################

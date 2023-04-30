@@ -120,8 +120,20 @@ end
 
 @enable_all_show_via_expressify FracElem
 
+function show(io::IO, ::MIME"text/plain", a::FracField)
+  println(io, "Fraction field")
+  io = pretty(io)
+  print(io, Indent(), "of ", Lowercase(), base_ring(a))
+end
+
 function show(io::IO, a::FracField)
-   print(IOContext(io, :compact => true), "Fraction field of ", base_ring(a))
+  if get(io, :supercompact, false)
+    print(io, "Fraction field")
+  else
+    io = pretty(io)
+    print(io, "Fraction field of ")
+    print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+  end
 end
 
 ###############################################################################

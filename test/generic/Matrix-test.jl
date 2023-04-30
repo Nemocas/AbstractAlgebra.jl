@@ -4161,6 +4161,8 @@ end
 
    @test sprint(show, "text/plain", matrix(R, [-x-1 -x; x+1 -1])) ==
                                                        "[-x - 1   -x]\n[ x + 1   -1]"
+
+   @test !occursin("\n", sprint(show, matrix_space(R, 3, 4)))
 end
 
 @testset "Generic.Mat.array_conversion" begin

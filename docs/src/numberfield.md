@@ -37,10 +37,10 @@ $\mathbb{Q}[x]$.
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
+(Residue field of univariate polynomial ring modulo x^3 + 3*x + 1, x)
 
 julia> f = a^2 + 2a + 7
 x^2 + 2*x + 7

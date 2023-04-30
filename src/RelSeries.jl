@@ -275,11 +275,22 @@ end
 
 @enable_all_show_via_expressify SeriesElem
 
-function show(io::IO, a::SeriesRing)
-   print(io, "Univariate power series ring in ", var(a), " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+function show(io::IO, ::MIME"text/plain", a::SeriesRing)
+  print(io, "Univariate power series ring in ", var(a), " with precision ", a.prec_max)
+  println(io)
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), base_ring(a))
 end
 
+function show(io::IO, a::SeriesRing)
+  if get(io, :supercompact, false)
+    print(io, "Univariate power series ring")
+  else
+    io = pretty(io)
+    print(io, "Univariate power series ring over " )
+    print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+  end
+end
 ###############################################################################
 #
 #   Unary operators

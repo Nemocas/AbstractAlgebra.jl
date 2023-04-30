@@ -44,9 +44,9 @@ julia> M = FreeModule(ZZ, 2)
 Free module of rank 2 over Integers
 
 julia> f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
-Module homomorphism with
-Domain: Free module of rank 2 over Integers
-Codomain: Free module of rank 2 over Integers
+Module homomorphism
+  from free module of rank 2 over integers
+  to free module of rank 2 over integers
 
 julia> m = M([ZZ(1), ZZ(2)])
 (1, 2)
@@ -77,19 +77,13 @@ julia> m = M([ZZ(1), ZZ(2), ZZ(3)])
 (1, 2, 3)
 
 julia> S, f = sub(M, [m])
-(Submodule over Integers with 1 generator and no relations, Module homomorphism with
-Domain: Submodule over Integers with 1 generator and no relations
-Codomain: Free module of rank 3 over Integers)
+(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 3 over Integers)
 
 julia> Q, g = quo(M, S)
-(Quotient module over Integers with 2 generators and no relations, Module homomorphism with
-Domain: Free module of rank 3 over Integers
-Codomain: Quotient module over Integers with 2 generators and no relations)
+(Quotient module over Integers with 2 generators and no relations, Hom: Free module of rank 3 over Integers -> Quotient module over Integers with 2 generators and no relations)
 
 julia> kernel(g)
-(Submodule over Integers with 1 generator and no relations, Module homomorphism with
-Domain: Submodule over Integers with 1 generator and no relations
-Codomain: Free module of rank 3 over Integers)
+(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 3 over Integers)
 
 ```
 

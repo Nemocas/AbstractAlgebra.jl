@@ -51,7 +51,7 @@ resulting parent objects to coerce various elements into the function field.
 
 ```jldoctest
 julia> S, x = RationalFunctionField(QQ, "x")
-(Rational function field over Rationals, x)
+(Rational function field over rationals, x)
 
 julia> f = S()
 0
@@ -69,7 +69,7 @@ julia> m = S(numerator(x + 1, false), numerator(x + 2, false))
 (x + 1)//(x + 2)
 
 julia> R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
-(Rational function field over Rationals, AbstractAlgebra.Generic.RationalFunctionFieldElem{Rational{BigInt}, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[x, y])
+(Rational function field over rationals, AbstractAlgebra.Generic.RationalFunctionFieldElem{Rational{BigInt}, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[x, y])
 
 julia> (x + y)//y^2
 (x + y)//y^2
@@ -86,7 +86,7 @@ We give some examples of such functionality.
 
 ```jldoctest
 julia> S, x = RationalFunctionField(QQ, "x")
-(Rational function field over Rationals, x)
+(Rational function field over rationals, x)
 
 julia> f = S(x + 1)
 x + 1
@@ -116,7 +116,8 @@ julia> V = base_ring(f)
 Rationals
 
 julia> T = parent(f)
-Rational function field over Rationals
+Rational function field
+  over rationals
 
 julia> r = deepcopy(f)
 x + 1
@@ -147,7 +148,7 @@ gcd(::Generic.RationalFunctionFieldElem{T, U}, ::Generic.RationalFunctionFieldEl
 
 ```jldoctest
 julia> R, x = RationalFunctionField(QQ, "x")
-(Rational function field over Rationals, x)
+(Rational function field over rationals, x)
 
 julia> f = (x + 1)//(x^3 + 3x + 1)
 (x + 1)//(x^3 + 3*x + 1)
@@ -174,7 +175,7 @@ Base.sqrt(::Generic.RationalFunctionFieldElem{T, U}) where {T <: FieldElem, U <:
 
 ```jldoctest
 julia> R, x = RationalFunctionField(QQ, "x")
-(Rational function field over Rationals, x)
+(Rational function field over rationals, x)
 
 julia> a = (21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
 (21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
@@ -232,10 +233,10 @@ resulting parent objects to coerce various elements into the function field.
 
 ```jldoctest
 julia> R1, x1 = RationalFunctionField(QQ, "x1") # characteristic 0
-(Rational function field over Rationals, x1)
+(Rational function field over rationals, x1)
 
 julia> U1, z1 = R1["z1"]
-(Univariate Polynomial Ring in z1 over Rational function field over Rationals, z1)
+(Univariate polynomial ring in z1 over rational function field, z1)
 
 julia> f = (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
 (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
@@ -253,10 +254,10 @@ julia> c = S1(1//3)
 1//3
 
 julia> R2, x2 = RationalFunctionField(GF(23), "x1") # characteristic p
-(Rational function field over Finite field F_23, x1)
+(Rational function field over finite field F_23, x1)
 
 julia> U2, z2 = R2["z2"]
-(Univariate Polynomial Ring in z2 over Rational function field over Finite field F_23, z2)
+(Univariate polynomial ring in z2 over rational function field, z2)
 
 julia> g = z2^2 + 3z2 + 1
 z2^2 + 3*z2 + 1
@@ -281,10 +282,10 @@ examples of such functionality.
 
 ```jldoctest
 julia> R, x = RationalFunctionField(GF(23), "x") # characteristic p
-(Rational function field over Finite field F_23, x)
+(Rational function field over finite field F_23, x)
 
 julia> U, z = R["z"]
-(Univariate Polynomial Ring in z over Rational function field over Finite field F_23, z)
+(Univariate polynomial ring in z over rational function field, z)
 
 julia> g = z^2 + 3z + 1
 z^2 + 3*z + 1
@@ -296,7 +297,8 @@ julia> f = (x + 1)*y + 1
 (x + 1)*y + 1
 
 julia> base_ring(f)
-Rational function field over Finite field F_23
+Rational function field
+  over finite field F_23
 
 julia> f^2
 (20*x^2 + 19*x + 22)*y + 22*x^2 + 21*x
@@ -356,10 +358,10 @@ num_coeff(::Generic.FunctionFieldElem, ::Int)
 
 ```jldoctest
 julia> R, x = RationalFunctionField(QQ, "x")
-(Rational function field over Rationals, x)
+(Rational function field over rationals, x)
 
 julia> U, z = R["z"]
-(Univariate Polynomial Ring in z over Rational function field over Rationals, z)
+(Univariate polynomial ring in z over rational function field, z)
 
 julia> g = z^2 + 3*(x + 1)//(x + 2)*z + 1
 z^2 + (3*x + 3)//(x + 2)*z + 1
@@ -368,7 +370,8 @@ julia> S, y = FunctionField(g, "y")
 (Function Field over Rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
 
 julia> base_field(S)
-Rational function field over Rationals
+Rational function field
+  over rationals
 
 julia> var(S)
 :y
@@ -418,10 +421,10 @@ norm(::Generic.FunctionFieldElem)
 
 ```jldoctest
 julia> R, x = RationalFunctionField(QQ, "x")
-(Rational function field over Rationals, x)
+(Rational function field over rationals, x)
 
 julia> U, z = R["z"]
-(Univariate Polynomial Ring in z over Rational function field over Rationals, z)
+(Univariate polynomial ring in z over rational function field, z)
 
 julia> g = z^2 + 3*(x + 1)//(x + 2)*z + 1
 z^2 + (3*x + 3)//(x + 2)*z + 1

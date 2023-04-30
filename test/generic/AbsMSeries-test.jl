@@ -101,6 +101,8 @@ end
    @test string(x) == "x + O(10)"
    @test string(y) == "y + O(10)"
    @test string(x^2 - y) == "-y + x^2 + O(10)"
+
+   @test !occursin("\n", sprint(show, R))
 end
 
 @testset "Generic.AbsMSeries.manipulation" begin

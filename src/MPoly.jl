@@ -556,24 +556,32 @@ end
 
 @enable_all_show_via_expressify MPolyRingElem
 
+function show(io::IO, ::MIME"text/plain", p::MPolyRing)
+  max_vars = 5 # largest number of variables to print
+  n = nvars(p)
+  print(io, "Multivariate polynomial ring")
+  print(io, "in ", ItemQuantity(nvars(p), "variable"), " ")
+  if n > max_vars
+    join(io, symbols(p)[1:max_vars - 1], ", ")
+    println(io, "..., ", symbols(p)[n])
+  else
+    join(io, symbols(p), ", ")
+    println(io)
+  end
+  io = pretty(io) # we need this to allow indented and lowercase printing
+  print(io, Indent(), "over ", Lowercase(), base_ring(p))
+end
 
 function show(io::IO, p::MPolyRing)
-   local max_vars = 5 # largest number of variables to print
-   n = p.num_vars
-   print(io, "Multivariate Polynomial Ring in ")
-   if n > max_vars
-      print(io, p.num_vars)
-      print(io, " variables ")
-   end
-   for i = 1:min(n - 1, max_vars - 1)
-      print(io, string(p.S[i]), ", ")
-   end
-   if n > max_vars
-      print(io, "..., ")
-   end
-   print(io, string(p.S[n]))
-   print(io, " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+  if get(io, :supercompact, false)
+    # no nested printing
+    print(io, "Multivariate polynomial ring")
+  else
+    io = pretty(io) # we need this to allow printing lowercase
+    # nested printing allowed, preferably supercompact
+    print(io, "Multivariate polynomial ring in ", ItemQuantity(nvars(p), "variable"))
+    print(IOContext(io, :supercompact => true), " over ", Lowercase(), base_ring(p))
+  end
 end
 
 function canonical_unit(x::AbstractAlgebra.MPolyRingElem)
