@@ -1471,10 +1471,14 @@ end
 const IdealSetDict = CacheDictType{Ring, IdealSet}()
 
 mutable struct Ideal{T <: RingElement} <: AbstractAlgebra.Ideal{T}
-    gens::Vector{T}
     base_ring::Ring
+    gens::Vector{T}
 
-    function Ideal{T}(R::Ring, gens::Vector{T}) where T <: RingElement
-       z = new{T}(gens, R)
+    function Ideal{T}(R::Ring, gens::Vector) where T <: RingElement
+       if eltype(gens) === T
+         return new{T}(R, gens)
+       else
+         return new{T}(R, convert(Vector{T}, map(R, gens)))
+       end
     end
 end
