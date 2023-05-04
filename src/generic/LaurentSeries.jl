@@ -514,14 +514,24 @@ function Base.show(io::IO, a::LaurentSeriesElem)
   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-function show(io::IO, a::LaurentSeriesRing)
-   print(io, "Laurent series ring in ", var(a), " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+function show(io::IO, p::LaurentSeriesRing)
+   if get(io, :supercompact, false)
+      print(io, "Laurent series ring")
+   else
+      io = pretty(io)
+      print(io, "Laurent series ring in ", var(p), " over ")
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+   end
 end
 
-function show(io::IO, a::LaurentSeriesField)
-   print(io, "Laurent series field in ", var(a), " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+function show(io::IO, p::LaurentSeriesField)
+   if get(io, :supercompact, false)
+      print(io, "Laurent series field")
+   else
+      io = pretty(io)
+      print(io, "Laurent series field in ", var(p), " over ")
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+   end
 end
 
 ###############################################################################

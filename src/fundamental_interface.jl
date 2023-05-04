@@ -26,7 +26,7 @@ julia> parent(g) == G
 true
 
 julia> S, x = laurent_series_ring(ZZ, 3, "x")
-(Laurent series ring in x over Integers, x + O(x^4))
+(Laurent series ring in x over integers, x + O(x^4))
 
 julia> parent(x) == S
 true
@@ -122,7 +122,7 @@ julia> one(S)
 [0   1]
 
 julia> R, x = PuiseuxSeriesField(QQ, 4, "x")
-(Puiseux series field in x over Rationals, x + O(x^5))
+(Puiseux series field in x over rationals, x + O(x^5))
 
 julia> one(x)
 1 + O(x^4)
@@ -186,7 +186,7 @@ julia> isone(U([1 0; 0 1; 0 0]))
 false
 
 julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
-(Puiseux series field in x over Rationals, x + O(x^11))
+(Puiseux series field in x over rationals, x + O(x^11))
 
 julia> isone(x), isone(T(1))
 (false, true)
@@ -202,7 +202,7 @@ Return true if $a$ is the additative identity, else return false.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
-(Puiseux series field in x over Rationals, x + O(x^11))
+(Puiseux series field in x over rationals, x + O(x^11))
 
 julia> a = T(0)
 O(x^10)
