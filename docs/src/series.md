@@ -117,10 +117,10 @@ julia> S, y = power_series_ring(ZZ, 10, "y"; model=:capped_absolute)
 (Univariate power series ring over integers, y + O(y^10))
 
 julia> T, z = laurent_series_ring(ZZ, 10, "z")
-(Laurent series ring in z over Integers, z + O(z^11))
+(Laurent series ring in z over integers, z + O(z^11))
 
 julia> U, w = laurent_series_field(QQ, 10, "w")
-(Laurent series field in w over Rationals, w + O(w^11))
+(Laurent series field in w over rationals, w + O(w^11))
 
 julia> f = R()
 O(x^10)
@@ -228,7 +228,7 @@ julia> R, x = power_series_ring(ZZ, 10, "x")
 (Univariate power series ring over integers, x + O(x^11))
 
 julia> S, y = laurent_series_ring(ZZ, 10, "y")
-(Laurent series ring in y over Integers, y + O(y^11))
+(Laurent series ring in y over integers, y + O(y^11))
 
 julia> f = 1 + 2x + O(x^5)
 1 + 2*x + O(x^5)

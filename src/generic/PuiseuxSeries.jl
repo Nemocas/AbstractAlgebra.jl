@@ -314,14 +314,24 @@ function Base.show(io::IO, a::PuiseuxSeriesElem)
   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-function show(io::IO, a::PuiseuxSeriesRing)
-   print(io, "Puiseux series ring in ", var(laurent_ring(a)), " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+function show(io::IO, p::PuiseuxSeriesRing)
+   if get(io, :supercompact, false)
+      print(io, "Puiseux series ring")
+   else
+      io = pretty(io)
+      print(io, "Puiseux series ring in ", var(laurent_ring(p)), " over ")
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+   end
 end
 
-function show(io::IO, a::PuiseuxSeriesField)
-   print(io, "Puiseux series field in ", var(laurent_ring(a)), " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+function show(io::IO, p::PuiseuxSeriesField)
+   if get(io, :supercompact, false)
+      print(io, "Puiseux series field")
+   else
+      io = pretty(io)
+      print(io, "Puiseux series field in ", var(laurent_ring(p)), " over ")
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+   end
 end
 
 ###############################################################################
