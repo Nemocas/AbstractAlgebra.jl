@@ -517,13 +517,9 @@ trylock(f, wvh::WeakValueDict) = Base.trylock(f, wvh.lock)
 function Base.setindex!(wvh::WeakValueDict{K}, v, key) where K
     lock(wvh) do
         _cleanup_locked(wvh)
-        k = getkey(wvh.ht, key, nothing)
         # The object gets the finalizer no matter if the key is already there or not.
         finalizer(wvh.finalizer, v)
-        if k === nothing
-            k = key
-        end
-        wvh.ht[k] = WeakRef(v)
+        wvh.ht[key] = WeakRef(v)
     end
     return wvh
 end
