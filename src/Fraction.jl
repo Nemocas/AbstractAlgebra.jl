@@ -124,6 +124,7 @@ function show(io::IO, ::MIME"text/plain", a::FracField)
   println(io, "Fraction field")
   io = pretty(io)
   print(io, Indent(), "of ", Lowercase(), base_ring(a))
+  print(io, Dedent())
 end
 
 function show(io::IO, a::FracField)

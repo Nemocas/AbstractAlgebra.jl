@@ -97,6 +97,7 @@ function Base.show(io::IO, a::A)
   io = AbstractAlgebra.pretty(io)
   println(io, "Something of type A")
   print(io, AbstractAlgebra.Indent(), "over ", AbstractAlgebra.Lowercase(), a.x)
+  print(io, AbstractAlgebra.Dedent()) # don't forget to undo the indentation!
 end
 
 struct B

@@ -651,6 +651,7 @@ function show(io::IO, ::MIME"text/plain", a::MatSpace)
   io = pretty(io)
   print(io, Indent(), "over ")
   print(io, Lowercase(), base_ring(a))
+  print(io, Dedent())
 end
 
 function show(io::IO, a::MatSpace)
