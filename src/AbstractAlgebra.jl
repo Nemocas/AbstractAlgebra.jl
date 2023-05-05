@@ -383,18 +383,28 @@ macro show_name(io, O)
   end )
 end
 
-function find_name(A, M = Main)
+CurrentModule = Main
+function set_current_module(m)
+  global CurrentModule = m
+end
+function get_current_module()
+  global CurrentModule
+  return CurrentModule
+end
+
+function find_name(A, M = Main; all::Bool = false)
   # in Documenter, the examples are not run in the REPL.
   # in the REPL: A = ... adds A to the global name space (Main....)
   # in Documenter (doctests) all examples are run in their own module
   # which is stored in CurrentModule, hence we need to search there as well
-  if M === Main && isdefined(Main, :CurrentModule)
-    a = find_name(A, Main.CurrentModule)
+  #furthermore, they are not exported, hence the "all" option
+  if M === Main && AbstractAlgebra.get_current_module() != Main
+    a = find_name(A, AbstractAlgebra.get_current_module(), all = true)
     if a !== nothing
       return a
     end
   end
-  for a = names(M)
+  for a = names(M, all = all)
     a === :ans && continue
     if isdefined(M, a) && getfield(M, a) === A
         return a
