@@ -222,9 +222,16 @@ function isone(a::MatrixElem{T}) where T <: NCRingElement
             end
          end
       end
-  end
-  return true
+   end
+   return true
 end
+
+@doc raw"""
+    is_zero_entry(M::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+
+Return `true` if $M_{i,j}$ is zero.
+"""
+@inline is_zero_entry(M::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement = iszero(M[i,j])
 
 @doc raw"""
     is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
@@ -233,7 +240,7 @@ Return `true` if the $i$-th row of the matrix $M$ is zero.
 """
 function is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
   for j in 1:ncols(M)
-    if !iszero(M[i, j])
+    if !is_zero_entry(M, i, j)
       return false
     end
   end
@@ -241,13 +248,13 @@ function is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    is_zero_column(M::MatrixElem{T}, i::Int) where T <: NCRingElement
+    is_zero_column(M::MatrixElem{T}, j::Int) where T <: NCRingElement
 
-Return `true` if the $i$-th column of the matrix $M$ is zero.
+Return `true` if the $j$-th column of the matrix $M$ is zero.
 """
-function is_zero_column(M::MatrixElem{T}, i::Int) where T <: NCRingElement
-  for j in 1:nrows(M)
-    if !iszero(M[j, i])
+function is_zero_column(M::MatrixElem{T}, j::Int) where T <: NCRingElement
+  for i in 1:nrows(M)
+    if !is_zero_entry(M, i, j)
       return false
     end
   end
