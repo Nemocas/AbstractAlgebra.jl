@@ -280,6 +280,7 @@ function show(io::IO, ::MIME"text/plain", a::SeriesRing)
   println(io)
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), base_ring(a))
+  print(io, Dedent())
 end
 
 function show(io::IO, a::SeriesRing)

@@ -141,6 +141,7 @@ import ..AbstractAlgebra: constant_coefficient
 import ..AbstractAlgebra: content
 import ..AbstractAlgebra: CycleDec
 import ..AbstractAlgebra: data
+import ..AbstractAlgebra: Dedent
 import ..AbstractAlgebra: deflate
 import ..AbstractAlgebra: deflation
 import ..AbstractAlgebra: degree

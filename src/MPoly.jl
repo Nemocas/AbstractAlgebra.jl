@@ -570,6 +570,7 @@ function show(io::IO, ::MIME"text/plain", p::MPolyRing)
   end
   io = pretty(io) # we need this to allow indented and lowercase printing
   print(io, Indent(), "over ", Lowercase(), base_ring(p))
+  print(io, Dedent())
 end
 
 function show(io::IO, p::MPolyRing)

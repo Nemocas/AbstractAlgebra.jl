@@ -149,6 +149,7 @@ function show(io::IO, ::MIME"text/plain", a::RationalFunctionField)
   println(io, "Rational function field")
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), base_ring(a))
+  print(io, Dedent())
 end
 
 function show(io::IO, a::RationalFunctionField)
