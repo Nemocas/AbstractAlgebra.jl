@@ -50,7 +50,7 @@ coincides with `lift` except where the internal data ids a machine integer.
 data(a::GFElem) = a.d
 
 @doc raw"""
-    data(R::GFElem)
+    lift(R::GFElem)
 
 Lift the finite field element to the integers. The result will be a
 multiprecision integer regardless of how the field element is represented
