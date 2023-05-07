@@ -59,8 +59,8 @@ function hash(f::ConstPoly, h::UInt)
    return xor(r, hash(f.c, h))
 end
 
-function deepcopy_internal(f::ConstPoly{T}, d::IdDict) where T <: RingElement
-   r = ConstPoly{T}(deepcopy_internal(f.c, d))
+function deepcopy_internal(f::ConstPoly{T}, dict::IdDict) where T <: RingElement
+   r = ConstPoly{T}(deepcopy_internal(f.c, dict))
    r.parent = f.parent # parent should not be deepcopied
    return r
 end

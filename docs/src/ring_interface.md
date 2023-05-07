@@ -207,7 +207,7 @@ that objects that are the same arithmetically (or that have the same components)
 have different types (or structures), are unlikely to hash to the same value.
 
 ```julia
-deepcopy_internal(f::MyElem, dict::ObjectIdDict)
+deepcopy_internal(f::MyElem, dict::IdDict)
 ```
 
 Return a copy of the given element, recursively copying all components of the object.
@@ -852,8 +852,8 @@ function hash(f::ConstPoly, h::UInt)
    return xor(r, hash(f.c, h))
 end
 
-function deepcopy_internal(f::ConstPoly{T}, d::IdDict) where T <: RingElement
-   r = ConstPoly{T}(deepcopy_internal(f.c, d))
+function deepcopy_internal(f::ConstPoly{T}, dict::IdDict) where T <: RingElement
+   r = ConstPoly{T}(deepcopy_internal(f.c, dict))
    r.parent = f.parent # parent should not be deepcopied
    return r
 end

@@ -90,14 +90,14 @@ function deepcopy_internal(d::MatSpaceElem{T}, dict::IdDict) where T <: NCRingEl
    z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
-         z[i, j] = deepcopy(d[i, j])
+         z[i, j] = deepcopy_internal(d[i, j], dict)
       end
    end
    return z
 end
 
 function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: NCRingElement
-   return MatSpaceView(deepcopy(d.entries), d.base_ring)
+   return MatSpaceView(deepcopy_internal(d.entries, dict), d.base_ring)
 end
 
 ###############################################################################

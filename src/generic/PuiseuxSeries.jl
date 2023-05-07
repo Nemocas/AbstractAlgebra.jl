@@ -260,7 +260,7 @@ function rescale!(a::PuiseuxSeriesElem)
 end
 
 function deepcopy_internal(a::PuiseuxSeriesElem{T}, dict::IdDict) where {T <: RingElement}
-    return parent(a)(deepcopy(a.data), a.scale)
+    return parent(a)(deepcopy_internal(a.data, dict), a.scale)
 end
 
 function characteristic(a::PuiseuxSeriesRing{T}) where T <: RingElement

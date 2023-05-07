@@ -97,7 +97,7 @@ function is_zero_divisor_with_annihilator(a::ResElem)
 end
 
 deepcopy_internal(a::ResElem, dict::IdDict) =
-   parent(a)(deepcopy(data(a)))
+   parent(a)(deepcopy_internal(data(a), dict))
 
 function characteristic(a::ResidueRing{T}) where T <: Integer
    return modulus(a)

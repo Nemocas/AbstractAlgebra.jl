@@ -110,7 +110,7 @@ end
 
 function deepcopy_internal(a::GFElem{T}, dict::IdDict) where T <: Integer
    R = parent(a)
-   return GFElem{T}(deepcopy(a.d), R)
+   return GFElem{T}(deepcopy_internal(a.d, dict), R)
 end
 
 ###############################################################################

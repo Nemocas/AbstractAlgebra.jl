@@ -299,7 +299,7 @@ function Base.hash(p::UnivPoly, h::UInt)
 end
 
 function deepcopy_internal(p::UnivPoly{T, U}, dict::IdDict) where {T, U}
-   return UnivPoly{T, U}(deepcopy(p.p), p.parent)
+   return UnivPoly{T, U}(deepcopy_internal(p.p, dict), p.parent)
 end
 
 ###############################################################################

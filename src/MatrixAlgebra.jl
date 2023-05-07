@@ -139,7 +139,7 @@ function deepcopy_internal(d::MatAlgElem{T}, dict::IdDict) where T <: NCRingElem
    z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
-         z[i, j] = deepcopy(d[i, j])
+         z[i, j] = deepcopy_internal(d[i, j], dict)
       end
    end
    return z
