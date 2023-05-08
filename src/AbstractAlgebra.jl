@@ -383,13 +383,14 @@ macro show_name(io, O)
   end )
 end
 
-CurrentModule = Main
+const CurrentModule = Ref(Main)
+
 function set_current_module(m)
-  global CurrentModule = m
+  CurrentModule[] = m
 end
+
 function get_current_module()
-  global CurrentModule
-  return CurrentModule
+  return CurrentModule[]
 end
 
 function find_name(A, M = Main; all::Bool = false)
