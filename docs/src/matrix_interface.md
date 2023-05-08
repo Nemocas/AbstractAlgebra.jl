@@ -262,6 +262,17 @@ vcat(M::MyMat{T}, N::MyMat{T}) where T <: RingElem
 Return the vertical concatenation of $M$ and $N$. It is assumed that the number of
 columns of $M$ and $N$ are the same.
 
+### Optional zero tests
+
+The following functions are available for matrices in both matrix algebras and matrix
+spaces.
+
+```julia
+is_zero_entry(M::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
+is_zero_column(M::MatrixElem{T}, j::Int) where T <: NCRingElement
+```
+
 ### Optional similar and zero
 
 The following functions are available for matrices in both matrix algebras and matrix

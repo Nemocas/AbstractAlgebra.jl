@@ -920,6 +920,7 @@ export is_weak_popov
 export is_zero_column
 export is_zero_divisor
 export is_zero_divisor_with_annihilator
+export is_zero_entry
 export is_zero_row
 export kernel
 export kronecker_product

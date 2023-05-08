@@ -502,6 +502,8 @@ end
 
    C = S([t + 1 R(0) R(1); t^2 R(0) t; R(0) R(0) R(0)])
 
+   @test is_zero_entry(C, 1, 2)
+   @test !is_zero_entry(C, 1, 1)
    @test is_zero_row(C, 3)
    @test !is_zero_row(C, 1)
    @test is_zero_column(C, 2)
