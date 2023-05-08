@@ -53,7 +53,7 @@ end
 function deepcopy_internal(a::RelSeries{T}, dict::IdDict) where T <: RingElement
    coeffs = Vector{T}(undef, pol_length(a))
    for i = 1:pol_length(a)
-      coeffs[i] = deepcopy(polcoeff(a, i - 1))
+      coeffs[i] = deepcopy_internal(polcoeff(a, i - 1), dict)
    end
    return parent(a)(coeffs, pol_length(a), precision(a), valuation(a))
 end

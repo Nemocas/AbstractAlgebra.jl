@@ -60,7 +60,7 @@ coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 function deepcopy_internal(a::Poly{T}, dict::IdDict) where T <: RingElement
    coeffs = Vector{T}(undef, length(a))
    for i = 1:length(a)
-      coeffs[i] = deepcopy(a.coeffs[i])
+      coeffs[i] = deepcopy_internal(a.coeffs[i], dict)
    end
    return parent(a)(coeffs)
 end

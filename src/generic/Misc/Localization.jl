@@ -156,7 +156,7 @@ function is_unit(a::LocElem{T})  where {T <: RingElem}
   return isin(inv(a.data), parent(a))
 end
 
-deepcopy_internal(a::LocElem, dict::IdDict) = parent(a)(deepcopy(data(a)))
+deepcopy_internal(a::LocElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
 
 ###############################################################################
 #

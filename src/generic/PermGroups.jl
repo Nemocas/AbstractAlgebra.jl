@@ -28,8 +28,8 @@ check_parent(g::Perm, h::Perm) = length(g.d) == length(h.d) ||
 Base.hash(g::Perm, h::UInt) = foldl((h, x) -> hash(x, h), g.d,
                                     init = hash(0x0d9939c64ab650ca, h))
 
-Base.deepcopy_internal(g::Perm, stackdict::IdDict) =
-   Perm(Base.deepcopy_internal(g.d, stackdict), false)
+Base.deepcopy_internal(g::Perm, dict::IdDict) =
+   Perm(Base.deepcopy_internal(g.d, dict), false)
 
 function getindex(g::Perm, n::Integer)
    return g.d[n]
