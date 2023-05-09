@@ -406,9 +406,9 @@ function is_power_with_root(a::T, n::Int) where T <: Integer
    elseif a == -1
       return isodd(n) ? (true, a) : (false, zero(T))
    elseif mod(n, 2) == 0 && a < 0
-      return false, zero(BigInt)
+      return false, zero(T)
    elseif !ispower_moduli(a, n)
-      return (false, zero(BigInt))
+      return (false, zero(T))
    end
       
    q = BigInt()
