@@ -1278,6 +1278,7 @@ _matrix(R::NCRing, a::AbstractMatrix) = matrix(R, a)
 
 include("misc/ProductIterator.jl")
 include("misc/Evaluate.jl")
+include("misc/VarNames.jl")
 
 ###############################################################################
 #
