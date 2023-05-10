@@ -275,3 +275,14 @@ macro add_varname_interface(e::Expr)
         end
     end
 end
+
+@add_varname_interface SparsePolynomialRing(R, s)
+@add_varnames_interface LaurentPolynomialRing(R, s)
+@add_varnames_interface power_series_ring(R, prec, s)
+@add_varnames_interface free_associative_algebra(R, s)
+@add_varnames_interface polynomial_ring(R, s)
+@add_varname_interface polynomial_ring(R, s)
+@add_varname_interface laurent_series_ring(R, prec, s)
+@add_varname_interface laurent_series_field(R, prec, s)
+@add_varname_interface number_field(p, s) # TODO what about strange `t` parameter
+@add_varname_interface FunctionField(p, s)
