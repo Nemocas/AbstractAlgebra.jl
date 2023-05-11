@@ -176,6 +176,13 @@ julia> y
 
 julia> z
  "z"
+
+julia> v = [1,4,1];
+
+julia> @f "variable dims show case" x[v...]; x
+1×4×1 Array{String, 3}:
+[:, :, 1] =
+ "y[1,1,1]"  "y[1,2,1]"  "y[1,3,1]"  "y[1,4,1]"
 ```
 """
 macro add_varnames_interface(e::Expr)
