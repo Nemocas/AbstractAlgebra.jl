@@ -65,8 +65,7 @@ variable_names(a) = Symbol[Symbol(s, suffix) for (s, shape) in _pairs(a) for suf
 
 _variable_suffix(::Missing) = [""]
 _variable_suffix(n::Int) = ["[$i]" for i in Base.OneTo(n)]
-_variable_suffix(dims::Tuple{Vararg{Int}}) =
-    ["[$(join(is, ','))]" for is in Iterators.product(Base.OneTo.(dims)...)]
+_variable_suffix(dims) = ["[$(join(is, ','))]" for is in Iterators.product(Base.OneTo.(dims)...)]
 
 """
     _pairs(a)
@@ -76,7 +75,6 @@ Return iterator of pairs, if possible, otherwise keep `a`.
 _pairs(a::Pair{<:VarName}) = [a]
 _pairs(a::Dict{<:VarName}) = pairs(a)
 _pairs(a::NamedTuple) = pairs(a)
-
 _pairs(a::Vector) = _pair.(a)
 _pair(a::Pair{<:VarName}) = a
 _pair(s::VarName) = s => missing
@@ -120,8 +118,7 @@ reshape_to_varnames(iter::Iterators.Stateful, a::Vector) =
 
 _reshape(iter, ::Missing) = popfirst!(iter)
 _reshape(iter, n::Int) = collect(Iterators.take(iter, n))
-_reshape(iter, dims::Tuple{Vararg{Int}}) =
-    reshape(collect(Iterators.take(iter, prod(dims))), dims)
+_reshape(iter, dims) = reshape(collect(Iterators.take(iter, prod(dims))), Tuple(dims))
 
 __reshape(iter, s::VarName) = popfirst!(iter)
 __reshape(iter, (_, a)::Pair) = _reshape(iter, a)
@@ -210,7 +207,7 @@ end
 _expr_pairs(a::Tuple{Vararg{Union{Expr, Symbol}}}) = _expr_pair.(a)
 # for `@f args... (varnames...)` variant:
 _expr_pairs((a,)::Tuple{Expr}) = Base.isexpr(a, :tuple) ? _expr_pair.(a.args) : (_expr_pair(a),)
-_expr_pair(e::Expr) = (@assert Base.isexpr(e, :ref) "$(e.head) ≠ :ref"; e.args[1] => Tuple{Vararg{Int}}(e.args[2:end]))
+_expr_pair(e::Expr) = (@assert Base.isexpr(e, :ref) "$(e.head) ≠ :ref"; e.args[1] => Expr(:tuple, :($(esc.(e.args[2:end])...))))
 _expr_pair(s::Symbol) = s => missing
 
 """
