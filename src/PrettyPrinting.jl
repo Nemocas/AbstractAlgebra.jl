@@ -1549,6 +1549,21 @@ write(io::IOCustom, chr::Char) = write(io, string(chr)) # Need to catch writing 
 
 function _write_line(io::IOCustom, str::AbstractString)
   written = 0
+
+  # We handle io.indent_level == 0 differently for the following reason
+  # $(s) will call print(io, s)
+  # but if print(io, s) does io = pretty(io), we would insert new lines
+  # after some random width (80?), which is no desirable.
+  # So we do not insert newlines at all.
+  if io.indent_level == 0
+    if io.lowercasefirst
+      written += write(io.io, lowercasefirst(str))
+    else
+      written += write(io.io, str)
+    end
+    return written
+  end
+
   c = displaysize(io)[2]
   ind = io.indent_level * textwidth(io.indent_str)
   # there might be already something written
