@@ -99,7 +99,7 @@ function gen(a::FreeAssAlgebra{T}, i::Int) where {T}
 end
 
 function gens(a::FreeAssAlgebra{T}) where {T<:RingElement}
-    return [gen(a, i) for i = 1:ngens(a)]
+    return [gen(a, i) for i in 1:ngens(a)]
 end
 
 function is_gen(a::FreeAssAlgElem{T}) where {T}
@@ -325,7 +325,7 @@ function word_cmp(a::Vector{Int}, b::Vector{Int})
         return -1
     else
         # deglex
-        for i = 1:length(a)
+        for i in 1:length(a)
             if a[i] > b[i]
                 return -1
             elseif a[i] < b[i]
@@ -344,8 +344,8 @@ function sort_terms!(z::FreeAssAlgElem{T}) where {T}
     n = length(z)
     if n > 1
         p = sortperm(view(z.exps, 1:n), lt = word_gt)
-        z.coeffs = [z.coeffs[p[i]] for i = 1:n]
-        z.exps = [z.exps[p[i]] for i = 1:n]
+        z.coeffs = [z.coeffs[p[i]] for i in 1:n]
+        z.exps = [z.exps[p[i]] for i in 1:n]
     end
     return z
 end
@@ -380,7 +380,7 @@ function isless(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where {T}
     end
     sort_terms!(p)
     sort_terms!(q)
-    for i = 1:l
+    for i in 1:l
         if word_gt(q.exps[i], p.exps[i])
             return true
         elseif word_gt(p.exps[i], q.exps[i])
@@ -409,14 +409,14 @@ end
 function -(a::FreeAssAlgElem{T}) where {T<:RingElement}
     n = length(a)
     R = parent(a)
-    zcoeffs = T[-a.coeffs[i] for i = 1:n]
+    zcoeffs = T[-a.coeffs[i] for i in 1:n]
     return FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n)
 end
 
 function *(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where {T<:RingElement}
     zcoeffs = T[]
     zexps = Vector{Int}[]
-    for i = 1:a.length, j = 1:b.length
+    for i in 1:a.length, j = 1:b.length
         push!(zcoeffs, a.coeffs[i] * b.coeffs[j])
         push!(zexps, vcat(a.exps[i], b.exps[j]))
     end
@@ -517,7 +517,7 @@ function ^(a::FreeAssAlgElem{T}, b::Integer) where {T<:RingElement}
             e = [Int[]]
         else
             b < 0 && throw(NotInvertibleError(a))
-            e = Vector{Int}[reduce(vcat, [a.exps[1] for i = 1:b])]
+            e = Vector{Int}[reduce(vcat, [a.exps[1] for i in 1:b])]
         end
         return FreeAssAlgElem{T}(parent(a), [a.coeffs[1]^b], e, 1)
     else
@@ -535,8 +535,8 @@ end
 # return c*w*a*wp
 function mul_term(c::T, w::Vector{Int}, a::FreeAssAlgElem{T}, wp::Vector{Int}) where {T}
     zcoeffs =
-        isone(c) ? T[a.coeffs[i] for i = 1:a.length] : T[c * a.coeffs[i] for i = 1:a.length]
-    zexps = Vector{Int}[vcat(w, a.exps[i], wp) for i = 1:a.length]
+        isone(c) ? T[a.coeffs[i] for i in 1:a.length] : T[c * a.coeffs[i] for i in 1:a.length]
+    zexps = Vector{Int}[vcat(w, a.exps[i], wp) for i in 1:a.length]
     return FreeAssAlgElem{T}(parent(a), zcoeffs, zexps, a.length)
 end
 
@@ -544,16 +544,16 @@ end
 #     or (false, junk, junk) if a is not two-sided divisible by b
 function word_divides_leftmost(a::Vector{Int}, b::Vector{Int})
     n = length(b)
-    for i = 0:length(a)-n
+    for i in 0:length(a)-n
         match = true
-        for j = 1:n
+        for j in 1:n
             if b[j] != a[i+j]
                 match = false
                 break
             end
         end
         if match
-            return (true, Int[a[k] for k = 1:i], Int[a[k] for k = 1+i+n:length(a)])
+            return (true, Int[a[k] for k in 1:i], Int[a[k] for k in 1+i+n:length(a)])
         end
     end
     return (false, Int[], Int[])
@@ -563,16 +563,16 @@ end
 #     or (false, junk, junk) if a is not two-sided divisible by b
 function word_divides_rightmost(a::Vector{Int}, b::Vector{Int})
     n = length(b)
-    for i = length(a)-n:-1:0
+    for i in length(a)-n:-1:0
         match = true
-        for j = 1:n
+        for j in 1:n
             if b[j] != a[i+j]
                 match = false
                 break
             end
         end
         if match
-            return (true, Int[a[k] for k = 1:i], Int[a[k] for k = 1+i+n:length(a)])
+            return (true, Int[a[k] for k in 1:i], Int[a[k] for k in 1+i+n:length(a)])
         end
     end
     return (false, Int[], Int[])
@@ -633,7 +633,7 @@ function divexact(
     n = length(a)
     R = parent(a)
     b = base_ring(R)(b)
-    zcoeffs = T[divexact(a.coeffs[i], b, check = check) for i = 1:n]
+    zcoeffs = T[divexact(a.coeffs[i], b, check = check) for i in 1:n]
     return combine_like_terms!(FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n))
 end
 

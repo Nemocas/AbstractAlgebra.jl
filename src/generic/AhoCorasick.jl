@@ -33,7 +33,7 @@ julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]];
 julia> aut = Generic.aho_corasick_automaton(keywords);
 
 julia> Generic.search(aut, [10, 4, 1, 2, 3, 4])
-AhoCorasickMatch(6, 1, [1, 2, 3, 4])
+AbstractAlgebra.Generic.AhoCorasickMatch(6, 1, [1, 2, 3, 4])
 ```
 """ 
 mutable struct AhoCorasickAutomaton
@@ -86,8 +86,8 @@ function aho_corasick_match(last_position::Int, keyword_index::Int, keyword::Wor
     return AhoCorasickMatch(last_position, keyword_index, keyword)
 end
 
-Base.hash(m::AhoCorasickMatch) =
-    hash(m.last_position, hash(m.keyword_index, hash(m.keyword)))
+Base.hash(m::AhoCorasickMatch) = hash(m.last_position, hash(m.keyword_index, 
+                                                            hash(m.keyword)))
 function ==(m1::AhoCorasickMatch, m2::AhoCorasickMatch)
     return m1.last_position == m2.last_position &&
            m1.keyword_index == m2.keyword_index &&
@@ -188,7 +188,7 @@ Search for the first occurrence of a keyword that is stored in `automaton` in th
 function search(automaton::AhoCorasickAutomaton, word)
     current_state = 1
     result = AhoCorasickMatch(typemax(Int), typemax(Int), [])
-    for i = 1:length(word)
+    for i in 1:length(word)
         c = word[i]
         while true
             next_state = lookup(automaton, current_state, c)
