@@ -190,7 +190,7 @@ function monomial(a::FreeAssAlgElem{T}, i::Int) where {T<:RingElement}
     return FreeAssAlgElem{T}(R, T[one(base_ring(R))], [a.exps[i]], 1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exponent_word(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
 
 Return a vector of variable indices corresponding to the monomial of the

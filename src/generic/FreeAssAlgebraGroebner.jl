@@ -62,7 +62,7 @@ function _leading_word(a::FreeAssAlgElem{T}) where {T}
     return a.exps[1]
 end
 
-@doc Markdown.doc"""
+@doc """
 gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
 
 If an element of the Groebner basis that is stored in `aut` divides `a`,
@@ -83,7 +83,7 @@ function gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
 end
 
 # implementation of the normal form function using aho corasick to check for all groebner basis elements in parallel
-@doc Markdown.doc"""
+@doc """
     normal_form(f::FreeAssAlgElem{T}, g::Vector{FreeAssAlgElem{T}}, aut::AhoCorasickAutomaton)
 
 Assuming `g` is a groebner basis and `aut` an Aho-Corasick automaton for the elements of `g`,
@@ -166,7 +166,7 @@ function normal_form_weak(
     return f
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     interreduce!(g::Vector{FreeAssAlgElem{T}})
 
 Interreduce a given Groebner basis with itself, i.e. compute the normal form of each
@@ -612,7 +612,7 @@ function groebner_basis_buchberger(
     return g
 end
 
-@doc Markdown.doc"""
+@doc """
     groebner_basis(g::Vector{FreeAssAlgElem{T}}, reduction_bound = typemax(Int)::Int)
 
 Compute a groebner basis for the ideal spanned by g. Stop when `reduction_bound` many

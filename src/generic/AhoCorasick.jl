@@ -20,7 +20,7 @@ import DataStructures: Queue, enqueue!, dequeue!
 
 const Word = Vector{Int}
 
-@doc Markdown.doc"""
+@doc """
     AhoCorasickAutomaton
 
 An Aho-Corasick automaton, which can be used to efficiently search for a fixed list of keywords (vectors of Ints) in
@@ -47,7 +47,7 @@ mutable struct AhoCorasickAutomaton
     output::Vector{Tuple{Int,Word}}
 end
 
-@doc Markdown.doc"""
+@doc """
     AhoCorasickMatch(last_position::Int, keyword_index::Int, keyword::Vector{Int})
 
 The return value of searching in a given word with an AhoCorasickAutomaton. Contains the position of the last letter in
@@ -168,7 +168,7 @@ function construct_fail!(automaton::AhoCorasickAutomaton)
     end
 end
 
-@doc Markdown.doc"""
+@doc """
     insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
 
 Insert a new keyword into a given Aho-Corasick automaton to avoid having to rebuild the entire
@@ -180,7 +180,7 @@ function insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
     construct_fail!(aut)
 end
 
-@doc Markdown.doc"""
+@doc """
     search(automaton::AhoCorasickAutomaton, word)
 
 Search for the first occurrence of a keyword that is stored in `automaton` in the given `word`.
