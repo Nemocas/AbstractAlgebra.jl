@@ -2960,7 +2960,7 @@ function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T})
     r = -integral(s)
     r1 = exp(r)
     @assert iszero(valuation(r1))
-    return Rx([polcoeff(r1, d - i) for i = 0:d])
+    return Rx(T[polcoeff(r1, d - i) for i = 0:d])
 end
 
 function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T}) where T <: RingElement
