@@ -27,6 +27,7 @@ ngens(N::SNFModule{T}) where T <: RingElement = length(N.invariant_factors)
 gens(N::SNFModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
 function gen(N::SNFModule{T}, i::Int) where T <: RingElement
+   @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
    R = base_ring(N)
    return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
 end
@@ -141,7 +142,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     snf(m::FPModule{T}) where T <: RingElement
 
 Return a pair `M, f` consisting of the invariant factor decomposition $M$ of

@@ -10,13 +10,13 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     SymmetricGroup{T<:Integer}
 
 The full symmetric group singleton type.
 `SymmetricGroup(n)` constructs the full symmetric group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> G = SymmetricGroup(5)
 Full symmetric group over 5 elements
@@ -42,7 +42,7 @@ end
 
 SymmetricGroup(n::Integer) = SymmetricGroup{typeof(n)}(n)
 
-@doc Markdown.doc"""
+@doc raw"""
     AllPerms(n::T) where T
 
 Return an iterator over arrays representing all permutations of `1:n`.
@@ -64,7 +64,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Partition(part::Vector{<:Integer}[, check::Bool=true]) <: AbstractVector{Int}
 
 Represent integer partition in the non-increasing order.
@@ -77,7 +77,7 @@ Fieldnames:
  * `n::Int` - the partitioned number
  * `part::Vector{Int}` - a non-increasing sequence of summands of `n`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Partition([4,2,1,1,1])
 4₁2₁1₃
@@ -105,7 +105,7 @@ struct Partition{T} <: AbstractVector{T}
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     AllParts(n::Integer)
 
 Return an iterator over all integer Partitions of `n`.
@@ -156,7 +156,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     SkewDiagram(lambda::Partition, mu::Partition) <: AbstractMatrix{Int}
 
 Implements a skew diagram, i.e. a difference of two Young diagrams
@@ -203,7 +203,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractMatrix{Int}
 
 Return the Young tableaux of partition `part`, filled linearly
@@ -213,7 +213,7 @@ Fields:
 * `part` - the partition defining Young diagram
 * `fill` - the row-major fill vector: the entries of the diagram.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Partition([4,3,1]); y = YoungTableau(p)
 ┌───┬───┬───┬───┐
@@ -275,7 +275,7 @@ mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyRingElem{T}
    length::Int
    parent::PolyRing{T}
 
-   Poly{T}() where T <: RingElement = new{T}(Array{T}(undef, 0), 0)
+   Poly{T}() where T <: RingElement = new{T}(Vector{T}(undef, 0), 0)
 
    function Poly{T}(b::Vector{T}) where T <: RingElement
       z = new{T}(b)
@@ -283,7 +283,7 @@ mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyRingElem{T}
       return z
    end
 
-   Poly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(undef, 0), 0) : new{T}([a], 1)
+   Poly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Vector{T}(undef, 0), 0) : new{T}([a], 1)
 end
 
 ###############################################################################
@@ -310,7 +310,7 @@ mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyRingElem{T}
    length::Int
    parent::NCPolyRing{T}
 
-   NCPoly{T}() where T <: NCRingElem = new{T}(Array{T}(undef, 0), 0)
+   NCPoly{T}() where T <: NCRingElem = new{T}(Vector{T}(undef, 0), 0)
 
    function NCPoly{T}(b::Vector{T}) where T <: NCRingElem
       z = new{T}(b)
@@ -318,7 +318,7 @@ mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyRingElem{T}
       return z
    end
 
-   NCPoly{T}(a::T) where T <: NCRingElem = iszero(a) ? new{T}(Array{T}(undef, 0), 0) : new{T}([a], 1)
+   NCPoly{T}(a::T) where T <: NCRingElem = iszero(a) ? new{T}(Vector{T}(undef, 0), 0) : new{T}([a], 1)
 end
 
 ###############################################################################
@@ -368,14 +368,14 @@ mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyRingElem{T}
 
    function MPoly{T}(R::MPolyRing) where T <: RingElement
       N = R.N
-      return new{T}(Array{T}(undef, 0), Array{UInt}(undef, N, 0), 0, R)
+      return new{T}(Vector{T}(undef, 0), Matrix{UInt}(undef, N, 0), 0, R)
    end
 
    MPoly{T}(R::MPolyRing, a::Vector{T}, b::Matrix{UInt}) where T <: RingElement = new{T}(a, b, length(a), R)
 
    function MPoly{T}(R::MPolyRing, a::T) where T <: RingElement
       N = R.N
-      return iszero(a) ? new{T}(Array{T}(undef, 0), Array{UInt}(undef, N, 0), 0, R) :
+      return iszero(a) ? new{T}(Vector{T}(undef, 0), Matrix{UInt}(undef, N, 0), 0, R) :
                                           new{T}([a], zeros(UInt, N, 1), 1, R)
    end
 end
@@ -422,7 +422,8 @@ mutable struct UniversalPolyRing{T <: RingElement, U <: AbstractAlgebra.MPolyRin
    function UniversalPolyRing{T, U}(R::Ring, ord::Symbol, cached::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
       return get_cached!(UnivPolyID, (R, ord, U), cached) do
          new{T, U}(R, Vector{Symbol}(undef, 0), ord,
-                      polynomial_ring(R, Vector{Symbol}(undef, 0); cached=cached, ordering=ord)[1])
+                   MPolyRing{T}(R, Vector{Symbol}(), ord, cached)
+                      )
       end::UniversalPolyRing{T, U}
    end
 end
@@ -474,15 +475,15 @@ const SparsePolyID = CacheDictType{Tuple{Ring, Symbol}, SparsePolyRing}()
 
 mutable struct SparsePoly{T <: RingElement} <: AbstractAlgebra.RingElem
    coeffs::Vector{T}
-   exps::Array{UInt}
+   exps::Vector{UInt}
    length::Int
    parent::SparsePolyRing{T}
 
-   SparsePoly{T}() where T <: RingElement = new{T}(Array{T}(undef, 0), Array{UInt}(undef, 0), 0)
+   SparsePoly{T}() where T <: RingElement = new{T}(Vector{T}(undef, 0), Vector{UInt}(undef, 0), 0)
 
    SparsePoly{T}(a::Vector{T}, b::Vector{UInt}) where T <: RingElement = new{T}(a, b, length(a))
 
-   SparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(undef, 0), Array{UInt}(undef, 0), 0) :
+   SparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Vector{T}(undef, 0), Vector{UInt}(undef, 0), 0) :
                                                new{T}([a], [UInt(0)], 1)
 end
 
@@ -1037,44 +1038,46 @@ const NCRingElement = Union{NCRingElem, RingElement}
 abstract type Mat{T} <: MatElem{T} end
 
 # not really a mathematical ring
-mutable struct MatSpace{T <: NCRingElement} <: AbstractAlgebra.MatSpace{T}
+struct MatSpace{T <: NCRingElement} <: AbstractAlgebra.MatSpace{T}
    nrows::Int
    ncols::Int
    base_ring::NCRing
 
    function MatSpace{T}(R::NCRing, r::Int, c::Int, cached::Bool = true) where T <: NCRingElement
-      return get_cached!(MatDict, (R, r, c), cached) do
-         new{T}(r, c, R)
-      end::MatSpace{T}
+       # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+       new{T}(r, c, R)
    end
 end
 
-const MatDict = CacheDictType{Tuple{NCRing, Int, Int}, MatSpace}()
-
-mutable struct MatSpaceElem{T <: NCRingElement} <: Mat{T}
-   entries::Matrix{T}
+struct MatSpaceElem{T <: NCRingElement} <: Mat{T}
    base_ring::NCRing
+   entries::Matrix{T}
 
-   function MatSpaceElem{T}(A::Matrix{T}) where T <: NCRingElement
-      return new{T}(A)
+   function MatSpaceElem{T}(R::NCRing, A::Matrix{T}) where T <: NCRingElement
+      @assert elem_type(R) === T
+      return new{T}(R, A)
     end
-
-   function MatSpaceElem{T}(A::AbstractMatrix{T}) where T <: NCRingElement
-      return new{T}(Array(A))
-   end
-
-   function MatSpaceElem{T}(r::Int, c::Int, A::Vector{T}) where T <: NCRingElement
-      t = Array{T}(undef, r, c)
-      for i = 1:r
-         for j = 1:c
-            t[i, j] = A[(i - 1) * c + j]
-         end
-      end
-      return new{T}(t)
-   end
 end
 
-mutable struct MatSpaceView{T <: NCRingElement, V, W} <: Mat{T}
+function MatSpaceElem{T}(R::NCRing, A::AbstractMatrix{T}) where T <: NCRingElement
+   return MatSpaceElem{T}(R, Matrix(A))
+end
+
+function MatSpaceElem{T}(R::NCRing, r::Int, c::Int, A::Vector{T}) where T <: NCRingElement
+   t = Matrix{T}(undef, r, c)
+   for i = 1:r, j = 1:c
+      t[i, j] = A[(i - 1) * c + j]
+   end
+   return MatSpaceElem{T}(R, t)
+end
+
+# construct zero matrix
+function MatSpaceElem{T}(R::NCRing, r::Int, c::Int) where T <: NCRingElement
+   entries = fill(zero(R), r, c)
+   return MatSpaceElem{T}(R, entries)
+end
+
+struct MatSpaceView{T <: NCRingElement, V, W} <: Mat{T}
    entries::SubArray{T, 2, Matrix{T}, V, W}
    base_ring::NCRing
 end
@@ -1085,36 +1088,32 @@ end
 #
 ###############################################################################
 
-mutable struct MatAlgebra{T <: NCRingElement} <: AbstractAlgebra.MatAlgebra{T}
+struct MatAlgebra{T <: NCRingElement} <: AbstractAlgebra.MatAlgebra{T}
    n::Int
    base_ring::NCRing
 
-   function MatAlgebra{T}(R::NCRing, n::Int, cached::Bool = true) where T <: NCRingElement
-      return get_cached!(MatAlgDict, (R, n), cached) do
-         new{T}(n, R)
-      end::MatAlgebra{T}
+   function MatAlgebra{T}(R::NCRing, n::Int) where T <: NCRingElement
+      new{T}(n, R)
    end
 end
 
-const MatAlgDict = CacheDictType{Tuple{NCRing, Int}, NCRing}()
-
-mutable struct MatAlgElem{T <: NCRingElement} <: AbstractAlgebra.MatAlgElem{T}
-   entries::Matrix{T}
+struct MatAlgElem{T <: NCRingElement} <: AbstractAlgebra.MatAlgElem{T}
    base_ring::NCRing
+   entries::Matrix{T}
 
-   function MatAlgElem{T}(A::Matrix{T}) where T <: NCRingElement
-      return new{T}(A)
+   function MatAlgElem{T}(R::NCRing, A::Matrix{T}) where T <: NCRingElement
+      @assert elem_type(R) === T
+      return new{T}(R, A)
    end
+end
 
-   function MatAlgElem{T}(n::Int, A::Vector{T}) where T <: NCRingElement
-      t = Array{T}(undef, n, n)
-      for i = 1:n
-         for j = 1:n
-            t[i, j] = A[(i - 1) * c + j]
-         end
-      end
-      return new{T}(t)
+function MatAlgElem{T}(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
+   @assert elem_type(R) === T
+   t = Matrix{T}(undef, n, n)
+   for i = 1:n, j = 1:n
+      t[i, j] = A[(i - 1) * c + j]
    end
+   return MatAlgElem{T}(R, t)
 end
 
 ###############################################################################
@@ -1292,13 +1291,13 @@ end
 
 const FreeModuleDict = CacheDictType{Tuple{NCRing, Int}, FreeModule}()
 
-mutable struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
-    v::AbstractAlgebra.MatElem{T}
-    parent::FreeModule{T}
+struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
+   parent::FreeModule{T}
+   v::MatElem{T}
 
-    function FreeModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
-       z = new{T}(v, m)
-    end
+   function FreeModuleElem{T}(m::FreeModule{T}, v::MatElem{T}) where T <: Union{RingElement, NCRingElem}
+      new{T}(m, v)
+   end
 end
 
 ###############################################################################
@@ -1472,10 +1471,14 @@ end
 const IdealSetDict = CacheDictType{Ring, IdealSet}()
 
 mutable struct Ideal{T <: RingElement} <: AbstractAlgebra.Ideal{T}
-    gens::Vector{T}
     base_ring::Ring
+    gens::Vector{T}
 
-    function Ideal{T}(R::Ring, gens::Vector{T}) where T <: RingElement
-       z = new{T}(gens, R)
+    function Ideal{T}(R::Ring, gens::Vector) where T <: RingElement
+       if eltype(gens) === T
+         return new{T}(R, gens)
+       else
+         return new{T}(R, convert(Vector{T}, map(R, gens)))
+       end
     end
 end

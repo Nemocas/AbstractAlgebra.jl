@@ -84,7 +84,11 @@ end
    G = gens(Q)
    for i = 1:ngens(Q)
       @test gen(Q, i) == G[i]
+      @test gen(Q, i) == Q[i]
    end
+
+   @test_throws ArgumentError gen(Q, 0)
+   @test_throws ArgumentError gen(Q, ngens(Q) + 1)
 
    @test supermodule(Q) == M
 

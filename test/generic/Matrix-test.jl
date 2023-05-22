@@ -93,19 +93,17 @@ Base.setindex!(a::F2Matrix, x::F2Elem, r::Int64, c::Int64) = a.m[r, c] = x
 Base.similar(x::F2Matrix, R::F2, r::Int, c::Int) = F2Matrix(similar(x.m, r, c))
 
 function AbstractAlgebra.zero_matrix(R::F2, r::Int, c::Int)
-   mat = Array{F2Elem}(undef, r, c)
+   mat = Matrix{F2Elem}(undef, r, c)
    for i=1:r, j=1:c
       mat[i, j] = zero(R)
    end
-   z = Generic.MatSpaceElem{F2Elem}(mat)
-   z.base_ring = R
+   z = Generic.MatSpaceElem{F2Elem}(R, mat)
    return F2Matrix(z)
 end
 
 function AbstractAlgebra.matrix(R::F2, mat::AbstractMatrix{F2Elem})
    mat = convert(Matrix, mat)
-   z = Generic.MatSpaceElem{F2Elem}(mat)
-   z.base_ring = R
+   z = Generic.MatSpaceElem{F2Elem}(R, mat)
    return F2Matrix(z)
 end
 
@@ -119,8 +117,7 @@ end
 
    S = matrix_space(R, 3, 3)
 
-   @test matrix_space(R, 3, 3, cached = false) !== matrix_space(R, 3, 3, cached = false)
-   @test matrix_space(R, 3, 3, cached = true) === matrix_space(R, 3, 3, cached = true)
+   @test S === matrix_space(R, 3, 3)
 
    @test elem_type(S) == Generic.MatSpaceElem{elem_type(R)}
    @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
@@ -329,6 +326,9 @@ end
    @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
 
    @test dense_matrix_type(R) == elem_type(S)
+   @test dense_matrix_type(R(1)) == elem_type(S)
+   @test dense_matrix_type(typeof(R)) == elem_type(S)
+   @test dense_matrix_type(typeof(R(1))) == elem_type(S)
 
    @test isa(S(), MatElem)
    @test isa(S(ZZ(1)), MatElem)
@@ -502,6 +502,8 @@ end
 
    C = S([t + 1 R(0) R(1); t^2 R(0) t; R(0) R(0) R(0)])
 
+   @test is_zero_entry(C, 1, 2)
+   @test !is_zero_entry(C, 1, 1)
    @test is_zero_row(C, 3)
    @test !is_zero_row(C, 1)
    @test is_zero_column(C, 2)
@@ -3983,6 +3985,12 @@ end
    @test fflu(N3) == fflu(M) # tests that deepcopy is correct
    @test M2 == M
 
+   for i in [ 1, 1:2, : ], j in [ 1, 1:2, : ]
+     v = @view M[i,j]
+     @test v isa Generic.MatSpaceView
+     @test M[i,j] == v
+   end
+
    # Test views over noncommutative ring
    R = MatrixAlgebra(ZZ, 2)
    
@@ -3990,13 +3998,11 @@ end
    
    M = rand(S, -10:10)
 
-   N1 = @view M[:,1:2]
-   N2 = @view M[1:2, :]
-   N3 = @view M[:,:]
-
-   @test isa(N1, Generic.MatSpaceView)
-   @test isa(N2, Generic.MatSpaceView)
-   @test isa(N3, Generic.MatSpaceView)
+   for i in [ 1, 1:2, : ], j in [ 1, 1:2, : ]
+     v = @view M[i,j]
+     @test v isa Generic.MatSpaceView
+     @test M[i,j] == v
+   end
 end
 
 @testset "Generic.Mat.change_base_ring" begin
@@ -4157,6 +4163,8 @@ end
 
    @test sprint(show, "text/plain", matrix(R, [-x-1 -x; x+1 -1])) ==
                                                        "[-x - 1   -x]\n[ x + 1   -1]"
+
+   @test !occursin("\n", sprint(show, matrix_space(R, 3, 4)))
 end
 
 @testset "Generic.Mat.array_conversion" begin

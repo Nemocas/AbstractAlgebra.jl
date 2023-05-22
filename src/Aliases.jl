@@ -48,7 +48,6 @@
 # Deprecated in 0.27.*
 
 @alias MatrixSpace matrix_space
-#@deprecate MatrixSpace(R::Ring, rows::Int, cols::Int; cache::Bool=true) matrix_space(R, rows, cols; cache)
 
 @alias PolynomialRing polynomial_ring
 @alias PowerSeriesRing power_series_ring

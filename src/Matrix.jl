@@ -86,14 +86,14 @@ check_square(S::MatAlgebra) = S
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     nrows(a::MatSpace)
 
 Return the number of rows of the given matrix space.
 """
 nrows(a::MatSpace) = a.nrows
 
-@doc Markdown.doc"""
+@doc raw"""
     ncols(a::MatSpace)
 
 Return the number of columns of the given matrix space.
@@ -111,28 +111,28 @@ function Base.hash(a::MatElem, h::UInt)
    return b
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     nrows(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of rows of the given matrix.
 """
 nrows(a::MatrixElem{T}) where T <: NCRingElement
 
-@doc Markdown.doc"""
+@doc raw"""
     ncols(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of columns of the given matrix.
 """
 ncols(a::MatrixElem{T}) where T <: NCRingElement
 
-@doc Markdown.doc"""
+@doc raw"""
     length(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of entries in the given matrix.
 """
 length(a::MatrixElem{T}) where T <: NCRingElement = nrows(a) * ncols(a)
 
-@doc Markdown.doc"""
+@doc raw"""
     isempty(a::MatrixElem{T}) where T <: NCRingElement
 
 Return `true` if `a` does not contain any entry (i.e. `length(a) == 0`), and `false` otherwise.
@@ -154,14 +154,14 @@ function Base.isassigned(a::MatrixElem{T}, i, j) where T <: NCRingElement
     end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     zero(a::MatSpace)
 
 Return the zero matrix in the given matrix space.
 """
 zero(a::MatSpace) = a()
 
-@doc Markdown.doc"""
+@doc raw"""
     zero(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
     zero(x::MatrixElem{T}, R::NCRing=base_ring(x)) where T <: NCRingElement
     zero(x::MatrixElem{T}, r::Int, c::Int) where T <: NCRingElement
@@ -181,7 +181,7 @@ function zero!(x::MatrixElem{T}) where T <: NCRingElement
    x
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     one(a::MatSpace)
 
 Return the identity matrix of given matrix space. The matrix space must contain
@@ -189,7 +189,7 @@ square matrices or else an error is thrown.
 """
 one(a::MatSpace) = check_square(a)(1)
 
-@doc Markdown.doc"""
+@doc raw"""
     one(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the identity matrix in the same matrix space as $a$. If the space does
@@ -222,32 +222,39 @@ function isone(a::MatrixElem{T}) where T <: NCRingElement
             end
          end
       end
-  end
-  return true
+   end
+   return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
+    is_zero_entry(M::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+
+Return `true` if $M_{i,j}$ is zero.
+"""
+@inline is_zero_entry(M::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement = iszero(M[i,j])
+
+@doc raw"""
     is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
 
 Return `true` if the $i$-th row of the matrix $M$ is zero.
 """
 function is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
   for j in 1:ncols(M)
-    if !iszero(M[i, j])
+    if !is_zero_entry(M, i, j)
       return false
     end
   end
   return true
 end
 
-@doc Markdown.doc"""
-    is_zero_column(M::MatrixElem{T}, i::Int) where T <: NCRingElement
+@doc raw"""
+    is_zero_column(M::MatrixElem{T}, j::Int) where T <: NCRingElement
 
-Return `true` if the $i$-th column of the matrix $M$ is zero.
+Return `true` if the $j$-th column of the matrix $M$ is zero.
 """
-function is_zero_column(M::MatrixElem{T}, i::Int) where T <: NCRingElement
-  for j in 1:nrows(M)
-    if !iszero(M[j, i])
+function is_zero_column(M::MatrixElem{T}, j::Int) where T <: NCRingElement
+  for i in 1:nrows(M)
+    if !is_zero_entry(M, i, j)
       return false
     end
   end
@@ -260,7 +267,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
 
 Create the block diagonal matrix whose blocks are given by the matrices in `V`.
@@ -294,7 +301,7 @@ function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
    return M
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
 
 Create the block diagonal matrix over the ring `R` whose blocks are given
@@ -332,8 +339,7 @@ end
 function _similar(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
    TT = elem_type(R)
    M = Matrix{TT}(undef, (r, c))
-   z = x isa MatElem ? Generic.MatSpaceElem{TT}(M) : Generic.MatAlgElem{TT}(M)
-   z.base_ring = R
+   z = x isa MatElem ? Generic.MatSpaceElem{TT}(R, M) : Generic.MatAlgElem{TT}(R, M)
    return z
 end
 
@@ -357,7 +363,7 @@ canonical_unit(a::MatrixElem{T}) where T <: NCRingElement = canonical_unit(a[1, 
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.getindex(M::MatElem, rows, cols)
 
 When `rows` and `cols` are specified as an `AbstractVector{Int}`, return a copy of
@@ -396,16 +402,10 @@ function _to_indices(x, rows, cols)
    (rows, cols)
 end
 
-function Base.view(M::MatElem{T}, rows::Colon, cols::UnitRange{Int}) where T <: NCRingElement
-   return view(M, 1:nrows(M), cols)
-end
-
-function Base.view(M::MatElem{T}, rows::UnitRange{Int}, cols::Colon) where T <: NCRingElement
-   return view(M, rows, 1:ncols(M))
-end
-
-function Base.view(M::MatElem{T}, rows::Colon, cols::Colon) where T <: NCRingElement
-   return view(M, 1:nrows(M), 1:ncols(M))
+function Base.view(M::MatElem,
+         rows::Union{Int,Colon,AbstractVector{Int}},
+         cols::Union{Int,Colon,AbstractVector{Int}})
+   return view(M, _to_indices(M, rows, cols)...)
 end
 
 Base.firstindex(M::MatrixElem{T}, i::Int) where T <: NCRingElement = 1
@@ -651,10 +651,25 @@ function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: NCRi
    end
 end
 
+function show(io::IO, ::MIME"text/plain", a::MatSpace)
+  print(io, "Matrix space of ")
+  print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
+  println(io)
+  io = pretty(io)
+  print(io, Indent(), "over ")
+  print(io, Lowercase(), base_ring(a))
+  print(io, Dedent())
+end
+
 function show(io::IO, a::MatSpace)
-   print(io, "Matrix Space of ")
-   print(io, a.nrows, " rows and ", a.ncols, " columns over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+   if get(io, :supercompact, false)
+      print(io, "Matrix space")
+   else
+      io = pretty(io)
+      print(io, "Matrix space of ")
+      print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+   end
 end
 
 ###############################################################################
@@ -763,7 +778,7 @@ function *(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
 
 Return $S(x) + y$ where $S$ is the parent of $y$.
@@ -783,14 +798,14 @@ function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     +(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
 
 Return $x + S(y)$ where $S$ is the parent of $x$.
 """
 +(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement = y + x
 
-@doc Markdown.doc"""
+@doc raw"""
     +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 
 Return $S(x) + y$ where $S$ is the parent of $y$.
@@ -809,14 +824,14 @@ function +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     +(x::Generic.MatrixElem{T}, y::T) where {T <: RingElem}
 
 Return $x + S(y)$ where $S$ is the parent of $x$.
 """
 +(x::MatrixElem{T}, y::T) where {T <: NCRingElem} = y + x
 
-@doc Markdown.doc"""
+@doc raw"""
     -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
 
 Return $S(x) - y$ where $S$ is the parent of $y$.
@@ -836,7 +851,7 @@ function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
 
 Return $x - S(y)$, where $S$ is the parent of $x$.
@@ -856,7 +871,7 @@ function -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 
 Return $S(x) - y$ where $S$ is the parent of $y$.
@@ -876,7 +891,7 @@ function -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     -(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
 
 Return $x - S(y)$, where $S$ is the parent of $a$.
@@ -1035,7 +1050,7 @@ divexact_right(x::MatElem, y::NCRingElem; check::Bool = true) =
 
 Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: NCRingElement, T <: MatrixElem{U}} = x^p
 
-@doc Markdown.doc"""
+@doc raw"""
     ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
 
 Return $a^b$. We require that the matrix $a$ is square.
@@ -1074,7 +1089,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
@@ -1094,7 +1109,7 @@ function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ exactly, otherwise return `false`. This function is
@@ -1121,7 +1136,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
 
 Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
@@ -1143,7 +1158,7 @@ function ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where 
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: RingElement
 
 Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
@@ -1151,7 +1166,7 @@ otherwise return `false`.
 """
 ==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement = y == x
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
 
 Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
@@ -1173,7 +1188,7 @@ function ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 
 Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
@@ -1276,7 +1291,7 @@ function is_symmetric(a::MatrixElem{T}) where T <: NCRingElement
 end
 
 
-@doc Markdown.doc"""
+@doc raw"""
     transpose(x::MatrixElem{T}) where T <: RingElement
 
 Return the transpose of the given matrix.
@@ -1285,10 +1300,11 @@ Return the transpose of the given matrix.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1333,7 +1349,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gram(x::MatElem)
 
 Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
@@ -1344,10 +1360,11 @@ $i$-th and $j$-th rows, respectively.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1380,7 +1397,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     tr(x::MatrixElem{T}) where T <: RingElement
 
 Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
@@ -1390,10 +1407,11 @@ require the matrix to be square.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1420,7 +1438,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     content(x::MatrixElem{T}) where T <: RingElement
 
 Return the content of the matrix $a$, i.e. the greatest common divisor of all
@@ -1430,10 +1448,11 @@ its entries, assuming it exists.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
@@ -1464,7 +1483,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     *(P::perm, x::MatrixElem{T}) where T <: RingElement
 
 Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
@@ -1473,10 +1492,11 @@ Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
-Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
 
 julia> G = SymmetricGroup(3)
 Full symmetric group over 3 elements
@@ -1570,7 +1590,7 @@ function lu!(P::Perm, A::MatrixElem{T}) where {T <: FieldElement}
    return rank
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
 
 Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
@@ -1720,7 +1740,7 @@ function fflu!(P::Perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResEle
    return rank, d2
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
 
 Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
@@ -1838,7 +1858,7 @@ function rref_rational!(A::MatrixElem{T}) where {T <: RingElement}
    return rank, d
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rref_rational(M::MatrixElem{T}) where {T <: RingElement}
 
 Return a tuple $(r, A, d)$ consisting of the rank $r$ of $M$ and a
@@ -1912,7 +1932,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
    return rnk
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rref(M::MatrixElem{T}) where {T <: FieldElement}
 
 Return a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a reduced row
@@ -1924,7 +1944,7 @@ function rref(M::MatrixElem{T}) where {T <: FieldElement}
    return r, A
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_rref(M::MatrixElem{T}) where {T <: RingElement}
 
 Return `true` if $M$ is in reduced row echelon form, otherwise return
@@ -1954,7 +1974,7 @@ function is_rref(M::MatrixElem{T}) where {T <: RingElement}
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_rref(M::MatrixElem{T}) where {T <: FieldElement}
 
 Return `true` if $M$ is in reduced row echelon form, otherwise return
@@ -1998,7 +2018,7 @@ end
 # that A is chambered on the right. Otherwise the entries can all be set to
 # the number of columns of A. The entries of L must be monotonic increasing.
 
-function reduce_row!(A::MatrixElem{T}, P::Array{Int}, L::Array{Int}, m::Int) where {T <: FieldElement}
+function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) where {T <: FieldElement}
    R = base_ring(A)
    n = ncols(A)
    t = R()
@@ -2034,7 +2054,7 @@ function reduce_row!(A::MatrixElem{T}, P::Array{Int}, L::Array{Int}, m::Int) whe
    return 0
 end
 
-function reduce_row!(A::MatrixElem{T}, P::Array{Int}, L::Array{Int}, m::Int) where {T <: RingElement}
+function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) where {T <: RingElement}
    R = base_ring(A)
    n = ncols(A)
    t = R()
@@ -2091,8 +2111,8 @@ function det_clow(M::MatrixElem{T}) where {T <: RingElement}
    if n == 0
       return one(R)
    end
-   A = Array{T}(undef, n, n)
-   B = Array{T}(undef, n, n)
+   A = Matrix{T}(undef, n, n)
+   B = Matrix{T}(undef, n, n)
    C = R()
    for i = 1:n
       for j = 1:n
@@ -2165,7 +2185,7 @@ function det(M::MatrixElem{T}) where {T <: FieldElement}
    return det_fflu(M)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     det(M::MatrixElem{T}) where {T <: RingElement}
 
 Return the determinant of the matrix $M$. We assume $M$ is square.
@@ -2174,13 +2194,14 @@ Return the determinant of the matrix $M$. We assume $M$ is square.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
+(Residue field of univariate polynomial ring modulo x^3 + 3*x + 1, x)
 
 julia> S = matrix_space(K, 3, 3)
-Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Matrix space of 3 rows and 3 columns
+  over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -2206,7 +2227,7 @@ end
 
 function det_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
    n = nrows(M)
-   !is_domain_type(elem_type(typeof(base_ring(base_ring(M))))) &&
+   !is_domain_type(elem_type(base_ring(base_ring(M)))) &&
           error("Generic interpolation requires a domain type")
    R = base_ring(M)
    if n == 0
@@ -2222,8 +2243,8 @@ function det_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
       return R()
    end
    bound = n*(maxlen - 1) + 1
-   x = Array{elem_type(base_ring(R))}(undef, bound)
-   d = Array{elem_type(base_ring(R))}(undef, bound)
+   x = Vector{elem_type(base_ring(R))}(undef, bound)
+   d = Vector{elem_type(base_ring(R))}(undef, bound)
    X = zero_matrix(base_ring(R), n, n)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
@@ -2268,14 +2289,14 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     combinations(n::Int, k::Int)
 
 Return an array consisting of k-combinations of {1,...,n} as arrays.
 """
 combinations(n::Int, k::Int) = combinations(1:n, k)
 
-@doc Markdown.doc"""
+@doc raw"""
     combinations(v::AbstractVector, k::Int)
 
 Return an array consisting of k-combinations of a given vector v as arrays.
@@ -2295,7 +2316,7 @@ function _combinations_dfs!(ans::Vector{Vector{T}}, comb::Vector{T}, v::Abstract
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     minors(A::MatElem, k::Int)
 
 Return an array consisting of the `k`-minors of `A`.
@@ -2327,7 +2348,7 @@ function minors(A::MatElem, k::Int)
    return(mins)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exterior_power(A::MatElem, k::Int) -> MatElem
 
 Return the `k`-th exterior power of `A`.
@@ -2393,7 +2414,7 @@ function check_skew_symmetric(M::MatElem)
    return M
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     pfaffian(M::MatElem)
 
 Return the Pfaffian of a skew-symmetric matrix `M`.
@@ -2411,7 +2432,7 @@ function pfaffian(M::MatElem)
    return pfaffian_r(M)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     pfaffians(M::MatElem, k::Int)
 
 Return a vector consisting of the `k`-Pfaffians of a skew-symmetric matrix `M`.
@@ -2540,7 +2561,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     rank(M::MatrixElem{T}) where {T <: RingElement}
 
 Return the rank of the matrix $M$.
@@ -2549,13 +2570,14 @@ Return the rank of the matrix $M$.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, x)
+(Residue field of univariate polynomial ring modulo x^3 + 3*x + 1, x)
 
 julia> S = matrix_space(K, 3, 3)
-Matrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Matrix space of 3 rows and 3 columns
+  over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -2943,10 +2965,10 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
    # bound from xd = (M*)b where d is the det
    bound = (maxlen - 1)*(max(m, c) - 1) + max(maxlenb, maxlen)
    tmat = matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
-   V = Array{typeof(tmat)}(undef, bound)
-   d = Array{elem_type(base_ring(R))}(undef, bound)
-   y = Array{elem_type(base_ring(R))}(undef, bound)
-   bj = Array{elem_type(base_ring(R))}(undef, bound)
+   V = Vector{typeof(tmat)}(undef, bound)
+   d = Vector{elem_type(base_ring(R))}(undef, bound)
+   y = Vector{elem_type(base_ring(R))}(undef, bound)
+   bj = Vector{elem_type(base_ring(R))}(undef, bound)
    X = similar(tmat, m, c)
    Y = similar(tmat, m, h)
    x = similar(b, c, h)
@@ -3071,7 +3093,7 @@ function can_solve_with_solution_interpolation(M::MatElem{T}, b::MatElem{T}) whe
    return flag, x, d
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     solve_rational(M::MatElem{T}, b::MatElem{T}) where T <: RingElement
 
 Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
@@ -3107,7 +3129,7 @@ function solve_rational(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     solve(a::MatElem{S}, b::MatElem{S}) where {S <: RingElement}
 
 Given an $m\times r$ matrix $a$ over a ring and an $m\times n$ matrix $b$
@@ -3122,7 +3144,7 @@ function solve(a::MatElem{S}, b::MatElem{S}
    return X
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     solve_left(a::MatElem{S}, b::MatElem{S}) where S <: RingElement
 
 Given an $r\times n$ matrix $a$ over a ring and an $m\times n$ matrix $b$
@@ -3223,7 +3245,7 @@ function _can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: FieldEl
   return true, sol, X
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: RingElement
 
 If $Ax = B$ is soluble, returns `true, S, K` where `S` is a particular solution
@@ -3304,7 +3326,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_upper_triangular(A::MatrixElem{T}) where T <: RingElement
 
 Return `true` if $A$ is an upper triangular matrix.
@@ -3330,7 +3352,7 @@ function is_upper_triangular(A::MatrixElem{T}) where T <: RingElement
 end
 
 
-@doc Markdown.doc"""
+@doc raw"""
     solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <: FieldElement}
 
 Given a non-singular $n\times n$ matrix over a field which is upper
@@ -3344,8 +3366,8 @@ function solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <
    m = ncols(b)
    R = base_ring(U)
    X = zero(b)
-   Tinv = Array{elem_type(R)}(undef, n)
-   tmp = Array{elem_type(R)}(undef, n)
+   Tinv = Vector{elem_type(R)}(undef, n)
+   tmp = Vector{elem_type(R)}(undef, n)
    if unit == false
       for i = 1:n
          Tinv[i] = inv(U[i, i])
@@ -3381,7 +3403,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     can_solve_left_reduced_triu(r::MatElem{T},
                           M::MatElem{T}) where T <: RingElement
 Return a tuple `flag, x` where `flag` is set to true if $xM = r$ has a
@@ -3495,7 +3517,7 @@ function can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :r
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: RingElement
 
 Given two matrices $a$ and $b$ over the same ring, try to solve $ax = b$
@@ -3579,7 +3601,7 @@ function can_solve_with_solution(A::MatElem{T}, B::MatElem{T}; side::Symbol = :r
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     can_solve(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: RingElement
 
 Given two matrices $a$ and $b$ over the same ring, check the solubility
@@ -3598,7 +3620,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix $M$ over a ring return a tuple $X, d$
@@ -3621,7 +3643,7 @@ function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
    return A
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     inv(M::MatrixElem{T}) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix over a ring, return an
@@ -3642,7 +3664,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
 
 Given an $n\times m$ matrix $A$ over a ring, return a tuple `(flag, B)`.
@@ -3662,7 +3684,7 @@ function is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) wher
    return can_solve_with_solution(A, I; side = side)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_invertible(A::MatrixElem{T}) where {T <: RingElement}
 
 Return true if a given square matrix is invertible, false otherwise. If
@@ -3678,7 +3700,7 @@ is_invertible(A::MatrixElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     nullspace(M::MatElem{T}) where {T <: RingElement}
 
 Return a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
@@ -3693,10 +3715,11 @@ function to compute an integral kernel.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> S = matrix_space(R, 4, 4)
-Matrix Space of 4 rows and 4 columns over Univariate Polynomial Ring in x over Integers
+Matrix space of 4 rows and 4 columns
+  over univariate polynomial ring in x over integers
 
 julia> M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
               -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;
@@ -3750,7 +3773,7 @@ function nullspace(M::MatElem{T}) where {T <: RingElement}
    return nullity, U
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     nullspace(M::MatElem{T}) where {T <: FieldElement}
 
 Return a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
@@ -3803,7 +3826,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     left_kernel(a::MatElem{T}) where T <: RingElement
 
 Return a tuple `n, M` where $M$ is a matrix whose rows generate the kernel
@@ -3833,7 +3856,7 @@ function left_kernel(M::MatElem{T}) where T <: FieldElement
   return n, transpose(N)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     right_kernel(a::MatElem{T}) where T <: RingElement
 
 Return a tuple `n, M` where $M$ is a matrix whose columns generate the
@@ -3848,7 +3871,7 @@ function right_kernel(M::MatElem{T}) where T <: FieldElement
    return nullspace(M)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     kernel(a::MatElem{T}; side::Symbol = :right) where T <: RingElement
 
 Return a tuple $(n, M)$, where n is the rank of the kernel and $M$ is a
@@ -3916,7 +3939,7 @@ function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hessenberg(A::MatrixElem{T}) where {T <: RingElement}
 
 Return the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
@@ -3931,7 +3954,7 @@ function hessenberg(A::MatrixElem{T}) where {T <: RingElement}
    return M
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_hessenberg(A::MatrixElem{T}) where {T <: RingElement}
 
 Return `true` if $M$ is in Hessenberg form, otherwise returns `false`.
@@ -3969,7 +3992,7 @@ function charpoly_hessenberg!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
       return gen(S) - A[1, 1]
    end
    hessenberg!(A)
-   P = Array{elem_type(S)}(undef, n + 1)
+   P = Vector{elem_type(S)}(undef, n + 1)
    P[1] = one(S)
    x = gen(S)
    for m = 1:n
@@ -3996,8 +4019,8 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
    end
    d = one(R)
    t = R()
-   V = Array{T}(undef, n)
-   W = Array{T}(undef, n)
+   V = Vector{T}(undef, n)
+   W = Vector{T}(undef, n)
    pol = one(S)
    i = 1
    while i < n
@@ -4113,8 +4136,8 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
       return gen(S) - A[1, 1]
    end
    t = R()
-   V = Array{T}(undef, n)
-   W = Array{T}(undef, n)
+   V = Vector{T}(undef, n)
+   W = Vector{T}(undef, n)
    pol = one(S)
    i = 1
    while i < n
@@ -4199,7 +4222,7 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
    return pol*b
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
 
 Return the characteristic polynomial $p$ of the matrix $M$. The
@@ -4210,13 +4233,14 @@ and the matrix is assumed to be square.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R = residue_ring(ZZ, 7)
-Residue ring of Integers modulo 7
+Residue ring of integers modulo 7
 
 julia> S = matrix_space(R, 4, 4)
-Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
+Matrix space of 4 rows and 4 columns
+  over residue ring of integers modulo 7
 
 julia> T, x = polynomial_ring(R, "x")
-(Univariate Polynomial Ring in x over Residue ring of Integers modulo 7, x)
+(Univariate polynomial ring in x over residue ring, x)
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
@@ -4238,9 +4262,9 @@ function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
    if n == 0
       return one(V)
    end
-   F = Array{elem_type(R)}(undef, n)
-   A = Array{elem_type(R)}(undef, n)
-   M = Array{elem_type(R)}(undef, n - 1, n)
+   F = Vector{elem_type(R)}(undef, n)
+   A = Vector{elem_type(R)}(undef, n)
+   M = Matrix{elem_type(R)}(undef, n - 1, n)
    F[1] = -Y[1, 1]
    for i = 2:n
       F[i] = R()
@@ -4395,7 +4419,7 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
    return p
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
 
 Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
@@ -4408,7 +4432,7 @@ julia> R = GF(13)
 Finite field F_13
 
 julia> T, y = polynomial_ring(R, "y")
-(Univariate Polynomial Ring in y over Finite field F_13, y)
+(Univariate polynomial ring in y over finite field F_13, y)
 
 julia> M = R[7 6 1;
              7 7 5;
@@ -4614,7 +4638,7 @@ end
 #  the Smith and Hermite normal forms of an integer matrix", Siam J. Comput.,
 #  Vol. 8, No. 4, pp. 499-507.
 
-@doc Markdown.doc"""
+@doc raw"""
     hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form of $A$ using the algorithm of
@@ -4626,7 +4650,7 @@ function hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
    return H
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hnf_minors_with_transform(A::MatrixElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
@@ -4880,7 +4904,7 @@ end
 #  Hermite normal form for arbitrary matrices via a modification of the
 #  Kannan-Bachem algorithm
 
-@doc Markdown.doc"""
+@doc raw"""
     hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form of $A$ using a modification
@@ -4890,7 +4914,7 @@ function hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val{false})
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hnf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
@@ -5098,7 +5122,7 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
    return nothing
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hnf(A::MatrixElem{T}) where {T <: RingElement}
 
 Return the upper right row Hermite normal form of $A$.
@@ -5107,7 +5131,7 @@ function hnf(A::MatrixElem{T}) where {T <: RingElement}
   return hnf_kb(A)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hnf_with_transform(A)
 
 Return the tuple $H, U$ consisting of the upper right row Hermite normal
@@ -5117,7 +5141,7 @@ function hnf_with_transform(A)
   return hnf_kb_with_transform(A)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_hnf(M::MatrixElem{T}) where T <: RingElement
 
 Return `true` if the matrix is in Hermite normal form.
@@ -5171,7 +5195,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_snf(A::MatrixElem{T}) where T <: RingElement
 
 Return `true` if $A$ is in Smith Normal Form.
@@ -5321,7 +5345,7 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
    return nothing
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     snf(A::MatrixElem{T}) where {T <: RingElement}
 
 Return the Smith normal form of $A$.
@@ -5330,7 +5354,7 @@ function snf(a::MatrixElem{T}) where {T <: RingElement}
   return snf_kb(a)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     snf_with_transform(A)
 
 Return the tuple $S, T, U$ consisting of the Smith normal form $S$ of $A$
@@ -5346,7 +5370,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
 
 Return `true` if $P$ is a matrix in weak Popov form of the given rank.
@@ -5372,7 +5396,7 @@ function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
 
 Return `true` if $P$ is a matrix in Popov form with the given rank.
@@ -5429,7 +5453,7 @@ function is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return the weak Popov form of $A$.
@@ -5438,7 +5462,7 @@ function weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
    return _weak_popov(A, Val{false})
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 
 Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
@@ -5463,7 +5487,7 @@ function _weak_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
 
 Compute the weak Popov form $P$ of $A$ by applying simple row transformations
@@ -5474,7 +5498,7 @@ function extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingE
    return _extended_weak_popov(A, V, Val{false})
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
 
 Compute the weak Popov form $P$ of $A$ by applying simple row transformations
@@ -5516,7 +5540,7 @@ end
 function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
    last_row == 0 ? m = nrows(P) : m = last_row
    last_col == 0 ? n = ncols(P) : n = last_col
-   pivots = Array{Vector{Int}}(undef, n)
+   pivots = Vector{Vector{Int}}(undef, n)
    for i = 1:n
       pivots[i] = zeros(Int, 0)
    end
@@ -5539,7 +5563,7 @@ end
 The weak Popov form is defined by T. Mulders and A. Storjohann in
 "On lattice reduction for polynomial matrices"
 =#
-function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}},
+function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pivots::Vector{Vector{Int}},
                                                    extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
    last_row == 0 ? m = nrows(P) : m = last_row
    last_col == 0 ? n = ncols(P) : n = last_col
@@ -5593,7 +5617,7 @@ function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pi
    return nothing
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return an array of $r$ row indices such that these rows of $A$ are linearly
@@ -5607,7 +5631,7 @@ function rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
    V = U
    r = 0
    rank_profile = Vector{Int}(undef, 0)
-   pivots = Array{Vector{Int}}(undef, n)
+   pivots = Vector{Vector{Int}}(undef, n)
    for i = 1:n
       pivots[i] = zeros(Int, 0)
    end
@@ -5699,7 +5723,7 @@ function det_popov(A::MatElem{T}) where {T <: PolyRingElem}
    return det
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return the Popov form of $A$.
@@ -5708,7 +5732,7 @@ function popov(A::MatElem{T}) where {T <: PolyRingElem}
    return _popov(A, Val{false})
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 
 Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
@@ -5732,7 +5756,7 @@ function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: Pol
    end
 end
 
-function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Array{Vector{Int}}, with_trafo::Bool) where {T <: PolyRingElem}
+function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Vector{Vector{Int}}, with_trafo::Bool) where {T <: PolyRingElem}
    m = nrows(P)
    n = ncols(P)
    pivots2 = Vector{NTuple{3,Int}}(undef, m)
@@ -5867,7 +5891,7 @@ function _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {
    end
 end
 
-function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, r::Int, with_trafo::Bool) where {T <: PolyRingElem}
+function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Vector{Int}, r::Int, with_trafo::Bool) where {T <: PolyRingElem}
    n = ncols(H)
    t = base_ring(H)()
    for c = 1:n
@@ -5890,7 +5914,7 @@ function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite:
    return nothing
 end
 
-function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Array{Int}, c::Int, with_trafo::Bool) where {T <: PolyRingElem}
+function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Vector{Int}, c::Int, with_trafo::Bool) where {T <: PolyRingElem}
    m = nrows(H)
    n = ncols(H)
    t = base_ring(H)()
@@ -5981,7 +6005,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
 
 Applies a similarity transform to the $n\times n$ matrix $M$ in-place. Let
@@ -5994,10 +6018,11 @@ preserves the minimal and characteristic polynomials of a matrix.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R = residue_ring(ZZ, 7)
-Residue ring of Integers modulo 7
+Residue ring of integers modulo 7
 
 julia> S = matrix_space(R, 4, 4)
-Matrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7
+Matrix space of 4 rows and 4 columns
+  over residue ring of integers modulo 7
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
@@ -6041,14 +6066,13 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
 Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 row are swapped.
 
-**Examples**
-
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
@@ -6073,14 +6097,13 @@ function swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    return b
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
 Swap the $i$th and $j$th row of $a$ in place. The function returns the mutated
 matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 
-**Examples**
-
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
@@ -6110,7 +6133,7 @@ function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
 Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
@@ -6123,7 +6146,7 @@ function swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    return b
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
 
 Swap the $i$th and $j$th column of $a$ in place. The function returns the mutated
@@ -6140,7 +6163,7 @@ function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     reverse_rows!(a::MatrixElem{T}) where T <: RingElement
 
 Swap the $i$th and $r - i$th row of $a$ for $1 \leq i \leq r/2$,
@@ -6154,7 +6177,7 @@ function reverse_rows!(a::MatrixElem{T}) where T <: RingElement
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     reverse_rows(a::MatrixElem{T}) where T <: RingElement
 
 Return a matrix $b$ with the entries of $a$, where the $i$th and $r - i$th
@@ -6166,7 +6189,7 @@ function reverse_rows(a::MatrixElem{T}) where T <: RingElement
    return reverse_rows!(b)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     reverse_cols!(a::MatrixElem{T}) where T <: RingElement
 
 Swap the $i$th and $r - i$th column of $a$ for $1 \leq i \leq c/2$,
@@ -6180,7 +6203,7 @@ function reverse_cols!(a::MatrixElem{T}) where T <: RingElement
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     reverse_cols(a::MatrixElem{T}) where T <: RingElement
 
 Return a matrix $b$ with the entries of $a$, where the $i$th and $r - i$th
@@ -6198,7 +6221,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     add_column!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
 
 Add $s$ times the $i$-th row to the $j$-th row of $a$.
@@ -6219,7 +6242,7 @@ function add_column!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     add_column(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
 
 Create a copy of $a$ and add $s$ times the $i$-th row to the $j$-th row of $a$.
@@ -6233,7 +6256,7 @@ function add_column(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:n
    return add_column!(b, s, i, j, rows)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     add_row!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
 
 Add $s$ times the $i$-th row to the $j$-th row of $a$.
@@ -6254,7 +6277,7 @@ function add_row!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:nco
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     add_row(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
 
 Create a copy of $a$ and add $s$ times the $i$-th row to the $j$-th row of $a$.
@@ -6269,7 +6292,7 @@ end
 
 # Multiply column
 
-@doc Markdown.doc"""
+@doc raw"""
     multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
 
 Multiply the $i$th column of $a$ with $s$.
@@ -6288,7 +6311,7 @@ function multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nro
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     multiply_column(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
 
 Create a copy of $a$ and multiply the $i$th column of $a$ with $s$.
@@ -6303,7 +6326,7 @@ end
 
 # Multiply row
 
-@doc Markdown.doc"""
+@doc raw"""
     multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
 
 Multiply the $i$th row of $a$ with $s$.
@@ -6322,7 +6345,7 @@ function multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     multiply_row(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
 
 Create a copy of $a$ and multiply  the $i$th row of $a$ with $s$.
@@ -6341,7 +6364,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     hcat(a::MatElem, b::MatElem)
 
 Return the horizontal concatenation of $a$ and $b$. Assumes that the
@@ -6362,7 +6385,7 @@ function hcat(a::MatElem, b::MatElem)
    return c
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     vcat(a::MatElem, b::MatElem)
 
 Return the vertical concatenation of $a$ and $b$. Assumes that the
@@ -6385,7 +6408,7 @@ function vcat(a::MatElem, b::MatElem)
    return c
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     vcat(A::MatrixElem{T}...) where T <: NCRingElement -> MatrixElem
 
 Return the horizontal concatenation of the matrices $A$.
@@ -6423,7 +6446,7 @@ function _vcat(A)
   return M
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hcat(A::MatrixElem{T}...) where T <: NCRingElement -> MatrixElem
 
 Return the horizontal concatenating of the matrices $A$.
@@ -6527,7 +6550,7 @@ end
 _change_base_ring(R::NCRing, a::MatElem) = zero_matrix(R, nrows(a), ncols(a))
 _change_base_ring(R::NCRing, a::MatAlgElem) = MatrixAlgebra(R, nrows(a))()
 
-@doc Markdown.doc"""
+@doc raw"""
     change_base_ring(R::NCRing, M::MatrixElem{T}) where T <: NCRingElement
 
 Return the matrix obtained by coercing each entry into `R`.
@@ -6546,7 +6569,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     map_entries!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement}
 
 Like `map_entries`, but stores the result in `dst` rather than a new matrix.
@@ -6558,7 +6581,7 @@ function map_entries!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCR
    dst
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement}
 
 Like `map`, but stores the result in `dst` rather than a new matrix.
@@ -6566,7 +6589,7 @@ This is equivalent to `map_entries!(f, dst, src)`.
 """
 Base.map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
 
-@doc Markdown.doc"""
+@doc raw"""
     map_entries(f, a::MatrixElem{T}) where T <: NCRingElement
 
 Transform matrix `a` by applying `f` on each element.
@@ -6583,7 +6606,7 @@ function map_entries(f, a::MatrixElem{T}) where T <: NCRingElement
    b
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     map(f, a::MatrixElem{T}) where T <: NCRingElement
 
 Transform matrix `a` by applying `f` on each element.
@@ -6705,15 +6728,14 @@ randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     matrix(R::Ring, arr::AbstractMatrix{T}) where {T}
 
 Constructs the matrix over $R$ with entries as in `arr`.
 """
 function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
    if elem_type(R) === T
-      z = Generic.MatSpaceElem{elem_type(R)}(arr)
-      z.base_ring = R
+      z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
       return z
    else
       arr_coerce = convert(Matrix{elem_type(R)}, map(R, arr))::Matrix{elem_type(R)}
@@ -6721,7 +6743,7 @@ function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     matrix(R::Ring, r::Int, c::Int, arr::AbstractVector{T}) where {T}
 
 Constructs the $r \times c$ matrix over $R$, where the entries are taken
@@ -6731,8 +6753,7 @@ function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
    _check_dim(r, c, arr)
    ndims(arr) == 2 && return matrix(R, arr)
    if elem_type(R) === T
-     z = Generic.MatSpaceElem{elem_type(R)}(r, c, arr)
-     z.base_ring = R
+     z = Generic.MatSpaceElem{elem_type(R)}(R, r, c, arr)
      return z
    else
      arr_coerce = convert(Vector{elem_type(R)}, map(R, arr))::Vector{elem_type(R)}
@@ -6746,20 +6767,19 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     zero_matrix(R::Ring, r::Int, c::Int)
 
 Return the $r \times c$ zero matrix over $R$.
 """
 function zero_matrix(R::NCRing, r::Int, c::Int)
-   arr = Array{elem_type(R)}(undef, r, c)
+   arr = Matrix{elem_type(R)}(undef, r, c)
    for i in 1:r
       for j in 1:c
          arr[i, j] = zero(R)
       end
    end
-   z = Generic.MatSpaceElem{elem_type(R)}(arr)
-   z.base_ring = R
+   z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
    return z
 end
 
@@ -6769,7 +6789,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     identity_matrix(R::NCRing, n::Int)
 
 Return the $n \times n$ identity matrix over $R$.
@@ -6782,7 +6802,7 @@ identity_matrix(R::NCRing, n::Int) = diagonal_matrix(one(R), n)
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     identity_matrix(M::MatElem{T}) where T <: NCRingElement
 
 Construct the identity matrix in the same matrix space as `M`, i.e.
@@ -6808,7 +6828,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     diagonal_matrix(x::RingElement, m::Int, [n::Int])
 
 Return the $m \times n$ matrix over $R$ with `x` along the main diagonal and
@@ -6842,7 +6862,7 @@ diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 
 Return the $n$ by $n$ matrix whose entries on and below the main diagonal are
@@ -6881,7 +6901,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 
 Return the $n$ by $n$ matrix whose entries on and above the main diagonal are
@@ -6920,7 +6940,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 
 Return the $n$ by $n$ matrix whose entries below the main diagonal are
@@ -6960,7 +6980,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 
 Return the $n$ by $n$ matrix whose entries above the main diagonal are
@@ -7000,16 +7020,14 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
+@doc raw"""
+    matrix_space(R::NCRing, r::Int, c::Int)
 
 Return parent object corresponding to the space of $r\times c$ matrices over
-the ring $R$. If `cached == true` (the default), the returned parent object
-is cached so that it can returned by future calls to the constructor with the
-same dimensions and base ring.
+the ring $R$.
 """
-function matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
-   return Generic.matrix_space(R, r, c, cached=cached)
+function matrix_space(R::NCRing, r::Int, c::Int)
+   return Generic.matrix_space(R, r, c)
 end
 
 ###############################################################################

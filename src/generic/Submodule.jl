@@ -25,11 +25,12 @@ ngens(N::Submodule{T}) where T <: RingElement = length(N.gen_cols)
 gens(N::Submodule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
 function gen(N::Submodule{T}, i::Int) where T <: RingElement
+   @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
    R = base_ring(N)
    return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     dim(N::Submodule{T}) where T <: FieldElement
 
 Return the dimension of the given vector subspace.
@@ -39,7 +40,7 @@ dim(N::Submodule{T}) where T <: FieldElement = length(N.gen_cols)
 # Generators as elements of supermodule. Used internally.
 generators(N::Submodule{T}) where T <: RingElement = N.gens::Vector{elem_type(N.m)}
 
-@doc Markdown.doc"""
+@doc raw"""
     supermodule(M::Submodule{T}) where T <: RingElement
 
 Return the module that this module is a submodule of.

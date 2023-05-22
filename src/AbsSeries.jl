@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     O(a::AbsPowerSeriesRingElem{T}) where T <: RingElement
 
 Return $0 + O(x^\mathrm{deg}(a))$. Usually this function is called with $x^n$
@@ -22,7 +22,7 @@ function O(a::AbsPowerSeriesRingElem{T}) where T <: RingElement
       return deepcopy(a)    # 0 + O(x^n)
    end
    prec = length(a) - 1
-   return parent(a)(Array{T}(undef, 0), 0, prec)
+   return parent(a)(Vector{T}(undef, 0), 0, prec)
 end
 
 ###############################################################################
@@ -43,7 +43,7 @@ function isone(a::AbsPowerSeriesRingElem)
    return (length(a) == 1 && isone(coeff(a, 0))) || precision(a) == 0
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::AbsPowerSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to the
@@ -57,7 +57,7 @@ end
 
 is_unit(a::AbsPowerSeriesRingElem) = valuation(a) == 0 && is_unit(coeff(a, 0))
 
-@doc Markdown.doc"""
+@doc raw"""
     valuation(a::AbsPowerSeriesRingElem)
 
 Return the valuation of the given power series, i.e. the degree of the first
@@ -87,25 +87,21 @@ end
 #
 ###############################################################################
 
-function similar(x::AbsPowerSeriesRingElem, R::Ring, max_prec::Int, s::Symbol; cached::Bool=true)
+function similar(x::AbsPowerSeriesRingElem, R::Ring, max_prec::Int, s::VarName=var(parent(x)); cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.AbsSeries{TT}(V, 0, max_prec)
    # Default similar is supposed to return a Generic series
-   if base_ring(x) === R && s == var(parent(x)) &&
-            typeof(x) === Generic.AbsSeries{TT} &&
+   if base_ring(x) === R && Symbol(s) == var(parent(x)) &&
+            x isa Generic.AbsSeries{TT} &&
             max_precision(parent(x)) == max_prec
       # steal parent in case it is not cached
       p.parent = parent(x)
    else
-      p.parent = Generic.AbsPowerSeriesRing{TT}(R, max_prec, s, cached)
+      p.parent = Generic.AbsPowerSeriesRing{TT}(R, max_prec, Symbol(s), cached)
    end
    return p
 end
-
-similar(x::AbsPowerSeriesRingElem, R::Ring, max_prec::Int,
-                                   var::VarName=var(parent(x)); cached::Bool=true) =
-   similar(x, R, max_prec, Symbol(var); cached)
 
 similar(x::AbsPowerSeriesRingElem, R::Ring,
                                    var::VarName=var(parent(x)); cached::Bool=true) =
@@ -278,11 +274,11 @@ function *(a::AbsPowerSeriesRingElem{T}, b::AbsPowerSeriesRingElem{T}) where T <
    lenb = min(lenb, prec)
 
    if lena == 0 || lenb == 0
-      return parent(a)(Array{T}(undef, 0), 0, prec)
+      return parent(a)(Vector{T}(undef, 0), 0, prec)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, prec)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -344,7 +340,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     shift_left(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
@@ -374,7 +370,7 @@ function shift_left(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     shift_right(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted right by $n$ terms, i.e. divided by
@@ -403,7 +399,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     truncate(a::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return $a$ truncated to $n$ terms.
@@ -433,7 +429,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ^(a::AbsPowerSeriesRingElem{T}, b::Int) where T <: RingElement
 
 Return $a^b$. We require $b \geq 0$.
@@ -478,7 +474,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
@@ -515,7 +511,7 @@ function ==(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T 
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
@@ -562,7 +558,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::AbsPowerSeriesRingElem{T}, y::T) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -570,14 +566,14 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 ==(x::AbsPowerSeriesRingElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
       ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem} = y == x
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat})
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -585,7 +581,7 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 ==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::AbsPowerSeriesRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -683,7 +679,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.inv(a::AbsPowerSeriesRingElem)
 
 Return the inverse of the power series $a$, i.e. $1/a$.
@@ -748,7 +744,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     compose(a::AbsPowerSeriesRingElem, b::AbsPowerSeriesRingElem)
 
 Compose the series $a$ with the series $b$ and return the result,
@@ -869,7 +865,7 @@ function sqrt_classical(a::AbsPowerSeriesRingElem; check::Bool=true)
    return true, asqrt
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrt(a::AbsPowerSeriesRingElem; check::Bool=true)
 
 Return the square root of the power series $a$. By default the function will
@@ -899,7 +895,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     derivative(f::AbsPowerSeriesRingElem{T})
 
 Return the derivative of the power series $f$.
@@ -916,7 +912,7 @@ function derivative(f::AbsPowerSeriesRingElem{T}) where T <: RingElement
    return g
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     integral(f::AbsPowerSeriesRingElem{T})
 
 Return the integral of the power series $f$.
@@ -942,7 +938,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     exp(a::AbsPowerSeriesRingElem)
 
 Return the exponential of the power series $a$.
@@ -1019,12 +1015,12 @@ end
 function _make_parent(g, p::AbsPowerSeriesRingElem, cached::Bool)
    R = parent(g(zero(base_ring(p))))
    S = parent(p)
-   sym = String(var(S))
+   sym = var(S)
    max_prec = max_precision(S)
    return power_series_ring(R, max_prec, sym; model=:capped_absolute, cached=cached)[1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     map_coefficients(f, p::SeriesElem{<: RingElement}; cached::Bool=true, parent::PolyRing)
 
 Transform the series `p` by applying `f` on each non-zero coefficient.
@@ -1056,11 +1052,11 @@ end
 
 function _change_abs_series_ring(R, Rx, cached)
    P, _ = power_series_ring(R, max_precision(Rx),
-                       string(var(Rx)), cached = cached, model=:capped_absolute)
+                       var(Rx), cached = cached, model=:capped_absolute)
    return P
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     change_base_ring(R::Ring, p::SeriesElem{<: RingElement}; parent::PolyRing)
 
 Return the series obtained by coercing the non-zero coefficients of `p`

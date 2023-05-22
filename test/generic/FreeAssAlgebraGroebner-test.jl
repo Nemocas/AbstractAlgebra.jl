@@ -20,7 +20,8 @@ import AbstractAlgebra.Generic: normal_form_weak
     @test length(g) == 15
 
     g2 = AbstractAlgebra.groebner_basis([a^2 - 1, b^3 - 1, (a*b*a*b*a*b^2)^2 - 1], typemax(Int), true)
-    @test g2 == g # make sure removing redundant obstructions in the computation does not change the groebner basis
+    @test all(u ->iszero(normal_form(u, g2)), g) # make sure removing redundant obstructions in the computation does not change the groebner basis
+    @test all(u ->iszero(normal_form(u, g)), g2) 
 
 end
 

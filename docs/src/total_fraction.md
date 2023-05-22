@@ -76,10 +76,10 @@ the resulting parent objects to coerce various elements into the ring.
 
 ```jldoctest
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> S = total_ring_of_fractions(R)
-Total ring of fractions of Univariate Polynomial Ring in x over Integers
+Total ring of fractions of Univariate polynomial ring in x over integers
 
 julia> f = S()
 0
@@ -116,10 +116,10 @@ total ring of fractions in question.
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> S = total_ring_of_fractions(R)
-Total ring of fractions of Univariate Polynomial Ring in x over Rationals
+Total ring of fractions of Univariate polynomial ring in x over rationals
 
 julia> f = S(x + 1)
 x + 1
@@ -165,22 +165,22 @@ the characteristic is not known an exception is raised.
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> S = total_ring_of_fractions(R)
-Total ring of fractions of Univariate Polynomial Ring in x over Rationals
+Total ring of fractions of Univariate polynomial ring in x over rationals
 
 julia> f = S(x + 1)
 x + 1
 
 julia> U = base_ring(S)
-Univariate Polynomial Ring in x over Rationals
+Univariate polynomial ring in x over rationals
 
 julia> V = base_ring(f)
-Univariate Polynomial Ring in x over Rationals
+Univariate polynomial ring in x over rationals
 
 julia> T = parent(f)
-Total ring of fractions of Univariate Polynomial Ring in x over Rationals
+Total ring of fractions of Univariate polynomial ring in x over rationals
 
 julia> m = characteristic(S)
 0
@@ -219,10 +219,10 @@ denominator(a::TotFrac)
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> S = total_ring_of_fractions(R)
-Total ring of fractions of Univariate Polynomial Ring in x over Rationals
+Total ring of fractions of Univariate polynomial ring in x over rationals
 
 julia> f = S(x + 1)
 x + 1
@@ -266,20 +266,20 @@ rand(R::TotFracRing, v...)
 
 ```jldoctest; setup = :(import Random; Random.seed!(42))
 julia> R = residue_ring(ZZ, 12)
-Residue ring of Integers modulo 12
+Residue ring of integers modulo 12
 
 julia> K = total_ring_of_fractions(R)
-Total ring of fractions of Residue ring of Integers modulo 12
+Total ring of fractions of Residue ring of integers modulo 12
 
 julia> f = rand(K, 0:11)
-8//7
+7//5
 
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> S = total_ring_of_fractions(R)
-Total ring of fractions of Univariate Polynomial Ring in x over Integers
+Total ring of fractions of Univariate polynomial ring in x over integers
 
 julia> g = rand(S, -1:3, -10:10)
--4//(-6*x^3 + 10*x^2 + 7*x - 10)
+(4*x + 4)//(-4*x^2 - x + 4)
 ```

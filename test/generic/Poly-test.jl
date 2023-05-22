@@ -160,6 +160,8 @@ end
    @test string(one(S)) == "1"
    @test string(y) == "y"
    @test string(x+y+1) == "y + x + 1"
+
+   @test !occursin("\n", sprint(show, S))
 end
 
 @testset "Generic.Poly.rand" begin

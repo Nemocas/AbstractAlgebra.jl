@@ -1,9 +1,4 @@
-doc/abstractalgebra.aux
-doc/abstractalgebra.log
-doc/abstractalgebra.out
-doc/abstractalgebra.pdf
-doc/abstractalgebra.toc
-doc/build/assets
-doc/site
-temp
-*~
+/docs/build/
+Manifest.toml
+.DS_Store
+

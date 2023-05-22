@@ -145,8 +145,22 @@ function show(io::IO, a::RationalFunctionFieldElem)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
+function show(io::IO, ::MIME"text/plain", a::RationalFunctionField)
+  println(io, "Rational function field")
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), base_ring(a))
+  print(io, Dedent())
+end
+
 function show(io::IO, a::RationalFunctionField)
-   print(IOContext(io, :compact => true), "Rational function field over ", base_ring(a))
+  if get(io, :supercompact, false)
+    # no nested printing
+    print(io, "Rational function field")
+  else
+    io = pretty(io) # we need this to allow printing lowercase
+    print(IOContext(io, :supercompact => true),
+          "Rational function field over ", Lowercase(), base_ring(a))
+  end
 end
 
 ###############################################################################
@@ -403,7 +417,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_square(a::RationalFunctionFieldElem)
 
 Return `true` if $a$ is a square.
@@ -412,7 +426,7 @@ function is_square(a::RationalFunctionFieldElem)
    return is_square(data(a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.sqrt(a::RationalFunctionFieldElem; check::Bool=true)
 
 Return the square root of $a$. By default the function will throw an exception
@@ -429,7 +443,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
 
 Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
@@ -581,7 +595,7 @@ end
 #
 ###############################################################################
 
-function RationalFunctionField(k::Field, s::Symbol; cached=true)
+function RationalFunctionField(k::Field, s::Symbol; cached::Bool=true)
    T = elem_type(k)
 
    R, x = AbstractAlgebra.polynomial_ring(k, s, cached=cached)
@@ -599,7 +613,7 @@ function RationalFunctionField(k::Field, s::Symbol; cached=true)
    return par_object, t
 end
 
-function RationalFunctionField(k::Field, s::Vector{Symbol}; cached=true)
+function RationalFunctionField(k::Field, s::Vector{Symbol}; cached::Bool=true)
    T = elem_type(k)
 
    R, x = AbstractAlgebra.polynomial_ring(k, s, cached=cached)

@@ -130,7 +130,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrt(a::FieldElem)
 
 Return the square root of the element `a`. By default the function will
@@ -146,7 +146,7 @@ function Base.sqrt(a::FieldElem; check::Bool=true)
       return -divexact(coeff(p, 0), coeff(p, 1); check=check)
     end
   end
-  throw(error("Element $a does not have a square root"))
+  error("Element $a does not have a square root")
 end
 
 # assumes the existence of sqrt without check argument for input

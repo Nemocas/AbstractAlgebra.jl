@@ -18,7 +18,7 @@ function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S
    return is_exact_type(S)
 end
 
-@doc md"""
+@doc raw"""
     dense_poly_type(::Type{T}) where T<:NCRingElement
     dense_poly_type(::T) where T<:NCRingElement
     dense_poly_type(::Type{S}) where S<:NCRing
@@ -49,7 +49,7 @@ dense_poly_type(::Type{S}) where S<:NCRing = dense_poly_type(elem_type(S))
 dense_poly_type(x) = dense_poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 dense_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
 
-@doc md"""
+@doc raw"""
     dense_poly_ring_type(::Type{T}) where T<:NCRingElement
     dense_poly_ring_type(::T) where T<:NCRingElement
     dense_poly_ring_type(::Type{S}) where S<:NCRing
@@ -77,7 +77,7 @@ AbstractAlgebra.Generic.PolyRing{BigInt}
 """
 dense_poly_ring_type(x) = parent_type(dense_poly_type(x))
 
-@doc Markdown.doc"""
+@doc raw"""
     var(a::NCPolyRing)
 
 Return the internal name of the generator of the polynomial ring. Note that
@@ -85,7 +85,7 @@ this is returned as a `Symbol` not a `String`.
 """
 var(a::NCPolyRing) = a.S
 
-@doc Markdown.doc"""
+@doc raw"""
     symbols(a::NCPolyRing)
 
 Return an array of the variable names for the polynomial ring. Note that
@@ -112,7 +112,7 @@ zero(R::NCPolyRing) = R(0)
 
 one(R::NCPolyRing) = R(1)
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(R::NCPolyRing)
 
 Return the generator of the given polynomial ring.
@@ -128,10 +128,9 @@ is_term(a::T) where T <: NCRingElem = true
 ###############################################################################
 
 function show(io::IO, p::NCPolyRing)
-   print(io, "Univariate Polynomial Ring in ")
-   print(io, string(var(p)))
-   print(io, " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+   io = pretty(io)
+   print(io, "Univariate polynomial ring in ", var(p), " over ")
+   print(IOContext(io, :compact => true), Lowercase(), base_ring(p))
 end
 
 ###############################################################################
@@ -196,7 +195,7 @@ function *(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
    end
    t = base_ring(a)()
    lenz = lena + lenb - 1
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:lena
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -266,7 +265,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ^(a::NCPolyRingElem{T}, b::Int) where T <: NCRingElem
 
 Return $a^b$. We require $b \geq 0$.
@@ -316,7 +315,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
@@ -338,7 +337,7 @@ function ==(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
 
 Return `true` if $x == y$ exactly, otherwise return `false`. This function is
@@ -367,7 +366,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::NCPolyRingElem{T}, y::T) where T <: NCRingElem
 
 Return `true` if $x == y$.
@@ -375,14 +374,14 @@ Return `true` if $x == y$.
 ==(x::NCPolyRingElem{T}, y::T) where T <: NCRingElem = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::T, y::NCPolyRingElem{T}) where T <: NCRingElem
 
 Return `true` if $x = y$.
 """
 ==(x::T, y::NCPolyRingElem{T}) where T <: NCRingElem = y == x
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::NCPolyRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -395,7 +394,7 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: NCRingElem
 
 Return $a\times b$ truncated to $n$ terms.
@@ -412,7 +411,7 @@ function mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: N
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, n)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -440,7 +439,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     divexact_right(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=true) where T <: NCRingElem
 
 Assuming $f = qg$, return $q$. By default if the division is not exact an
@@ -453,7 +452,7 @@ function divexact_right(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
-   d = Array{T}(undef, lenq)
+   d = Vector{T}(undef, lenq)
    for i = 1:lenq
       d[i] = zero(base_ring(f))
    end
@@ -473,7 +472,7 @@ function divexact_right(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=
    return q
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     divexact_left(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=true) where T <: NCRingElem
 
 Assuming $f = gq$, return $q$. By default if the division is not exact an
@@ -486,7 +485,7 @@ function divexact_left(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=t
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
-   d = Array{T}(undef, lenq)
+   d = Vector{T}(undef, lenq)
    for i = 1:lenq
       d[i] = zero(base_ring(f))
    end
@@ -512,7 +511,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     divexact_right(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: NCRingElem
 
 Assuming $a = qb$, return $q$. By default if the division is not exact an
@@ -529,7 +528,7 @@ function divexact_right(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <:
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     divexact_left(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: NCRingElem
 
 Assuming $a = bq$, return $q$. By default if the division is not exact an
@@ -546,7 +545,7 @@ function divexact_left(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: 
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     divexact_right(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
 
 Assuming $a = qb$, return $q$. By default if the division is not exact an
@@ -563,7 +562,7 @@ function divexact_right(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractF
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     divexact_left(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
 
 Assuming $a = bq$, return $q$. By default if the division is not exact an
@@ -579,7 +578,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate(a::NCPolyRingElem, b::T) where T <: NCRingElem
 
 Evaluate the polynomial $a$ at the value $b$ and return the result.
@@ -599,7 +598,7 @@ function evaluate(a::NCPolyRingElem, b::T) where T <: NCRingElem
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat})
 
 Evaluate the polynomial $a$ at the value $b$ and return the result.
@@ -715,7 +714,7 @@ rand(S::NCPolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v..
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     polynomial_ring(R::NCRing, s::VarName; cached::Bool = true)
 
 Given a base ring `R` and symbol/string `s` specifying how the generator
@@ -729,22 +728,18 @@ Setting the optional argument `cached` to `false` will prevent the parent object
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring, y)
 ```
 """
-polynomial_ring(R::NCRing, s::VarName; kw...)
-
-polynomial_ring(R::NCRing, s::VarNameNonSymbol; kw...) = polynomial_ring(R, Symbol(s); kw...)
-
-function polynomial_ring(R::NCRing, s::Symbol; kw...)
-   S = polynomial_ring_only(R, s; kw...)
+function polynomial_ring(R::NCRing, s::VarName; kw...)
+   S = polynomial_ring_only(R, Symbol(s); kw...)
    (S, gen(S))
 end
 
-@doc md"""
+@doc raw"""
     polynomial_ring_only(R::NCRing, s::Symbol; cached::Bool=true)
 
 Like [`polynomial_ring(R::NCRing, s::Symbol)`](@ref) but return only the

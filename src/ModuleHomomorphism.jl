@@ -18,13 +18,21 @@ mat(f::Map(FPModuleHomomorphism)) = f.matrix
 #
 ###############################################################################
 
+function show(io::IO, ::MIME"text/plain", f::Map(FPModuleHomomorphism))
+   println(io, "Module homomorphism")
+   io = pretty(io)
+   print(io, Indent(), "from ", Lowercase(), domain(f))
+   println(io)
+   print(io, "to ", Lowercase(), codomain(f))
+end
+
 function show(io::IO, f::Map(FPModuleHomomorphism))
-   println(io, "Module homomorphism with")
-   print(io, "Domain: ")
-   print(IOContext(io, :compact => true), domain(f))
-   println(io, "")
-   print(io, "Codomain: ")
-   print(IOContext(io, :compact => true), codomain(f))
+  if get(io, :supercompact, false)
+    println(io, "Module homomorphism")
+  else
+    print(io, "Hom: ")
+    print(IOContext(io, :supercompact => true), domain(f), " -> ", codomain(f))
+  end
 end
 
 ###############################################################################
@@ -44,7 +52,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     kernel(f::ModuleHomomorphism{T}) where T <: RingElement
 
 Return a pair `K, g` consisting of the kernel object $K$ of the given module
@@ -89,7 +97,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     image(f::Map(FPModuleHomomorphism))
 
 Return a pair `I, g` consisting of the image object $I$ of the given module
@@ -111,7 +119,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     preimage(f::Map(FPModuleHomomorphism),
              v::FPModuleElem{T}) where T <: RingElement
 Return a preimage of $v$ under the homomorphism $f$, i.e. an element of the
@@ -164,7 +172,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ModuleHomomorphism(M1::FPModule{T},
                        M2::FPModule{T}, m::MatElem{T}) where T <: RingElement
 Create the homomorphism $f : M_1 \to M_2$ represented by the matrix $m$.
@@ -188,7 +196,7 @@ function module_homomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Mod
    Generic.ModuleHomomorphism(M1, M2, m)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ModuleIsomorphism(M1::FPModule{T}, M2::FPModule{T}, M::MatElem{T},
                       minv::MatElem{T}) where T <: RingElement
 Create the isomorphism $f : M_1 \to M_2$ represented by the matrix $M$. The

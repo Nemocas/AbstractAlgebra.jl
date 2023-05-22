@@ -14,7 +14,7 @@ parent_type(::Type{RelSeries{T}}) where T <: RingElement = RelPowerSeriesRing{T}
 
 elem_type(::Type{RelPowerSeriesRing{T}}) where T <: RingElement = RelSeries{T}
 
-@doc Markdown.doc"""
+@doc raw"""
     rel_series_type(::Type{T}) where T <: RingElement
 
 Return the type of a relative series whose coefficients have the given type.
@@ -39,7 +39,7 @@ function polcoeff(a::RelSeries, n::Int)
    return n >= pol_length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(R::RelPowerSeriesRing)
 
 Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
@@ -51,9 +51,9 @@ function gen(R::RelPowerSeriesRing)
 end
 
 function deepcopy_internal(a::RelSeries{T}, dict::IdDict) where T <: RingElement
-   coeffs = Array{T}(undef, pol_length(a))
+   coeffs = Vector{T}(undef, pol_length(a))
    for i = 1:pol_length(a)
-      coeffs[i] = deepcopy(polcoeff(a, i - 1))
+      coeffs[i] = deepcopy_internal(polcoeff(a, i - 1), dict)
    end
    return parent(a)(coeffs, pol_length(a), precision(a), valuation(a))
 end
@@ -132,11 +132,11 @@ function *(a::RelSeries{T}, b::RelSeries{T}) where T <: RingElement
    lena = min(lena, prec)
    lenb = min(lenb, prec)
    if lena == 0 || lenb == 0
-      return parent(a)(Array{T}(undef, 0), 0, prec + zval, zval)
+      return parent(a)(Vector{T}(undef, 0), 0, prec + zval, zval)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, prec)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    cutoff = mullow_fast_cutoff(a, b)
    AbstractAlgebra.DensePoly.mullow_fast!(d, lenz,
                           a.coeffs, lena, b.coeffs, lenb, base_ring(a), cutoff)
@@ -341,14 +341,14 @@ function (R::RelPowerSeriesRing{T})(b::RingElement) where T <: RingElement
 end
 
 function (R::RelPowerSeriesRing{T})() where T <: RingElement
-   z = RelSeries{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max)
+   z = RelSeries{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max)
    z.parent = R
    return z
 end
 
 function (R::RelPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
    if b == 0
-      z = RelSeries{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max)
+      z = RelSeries{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max)
    else
       z = RelSeries{T}([base_ring(R)(b)], 1, R.prec_max, 0)
    end
@@ -359,7 +359,7 @@ end
 function (R::RelPowerSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
-      z = RelSeries{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max)
+      z = RelSeries{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max)
    else
       z = RelSeries{T}([b], 1, R.prec_max, 0)
    end
@@ -384,7 +384,7 @@ end
 function (R::RelPowerSeriesRing{T})(b::Vector{S}, len::Int, prec::Int, val::Int) where {S <: RingElement, T <: RingElement}
    R0 = base_ring(R)
    lenb = length(b)
-   entries = Array{T}(undef, lenb)
+   entries = Vector{T}(undef, lenb)
    for i = 1:lenb
       entries[i] = R0(b[i])
    end
@@ -399,13 +399,13 @@ end
 #
 ###############################################################################
 
-function power_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::Symbol; cached=true, model=:capped_relative)
+function power_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::VarName; cached::Bool=true, model=:capped_relative)
    T = elem_type(R)
 
    if model == :capped_relative
-      parent_obj = RelPowerSeriesRing{T}(R, prec, s, cached)
+      parent_obj = RelPowerSeriesRing{T}(R, prec, Symbol(s), cached)
    elseif model == :capped_absolute
-      parent_obj = AbsPowerSeriesRing{T}(R, prec, s, cached)
+      parent_obj = AbsPowerSeriesRing{T}(R, prec, Symbol(s), cached)
    else
       error("Unknown model")
    end

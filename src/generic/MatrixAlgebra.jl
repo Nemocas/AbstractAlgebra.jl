@@ -14,13 +14,12 @@ parent_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = MatAlgebra{T}
 
 elem_type(::Type{MatAlgebra{T}}) where {T <: NCRingElement} = MatAlgElem{T}
 
-@doc Markdown.doc"""
-    parent(a::MatAlgElem{T}, cached::Bool = true) where T <: NCRingElement
+@doc raw"""
+    parent(a::MatAlgElem{T}) where T <: NCRingElement
 
 Return the parent object of the given matrix.
 """
-parent(a::MatAlgElem{T}, cached::Bool = true) where T <: NCRingElement =
-    MatAlgebra{T}(a.base_ring, size(a.entries)[1], cached)
+parent(a::MatAlgElem{T}) where T <: NCRingElement = MatAlgebra{T}(base_ring(a), size(a.entries)[1])
 
 is_exact_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = is_exact_type(T)
 
@@ -34,8 +33,7 @@ is_domain_type(::Type{MatAlgElem{T}}) where T <: NCRingElement = false
 
 function transpose(x::MatAlgElem{T}) where T <: NCRingElement
    arr = permutedims(x.entries, [2, 1])
-   z = MatAlgElem{T}(arr)
-   z.base_ring = base_ring(x)
+   z = MatAlgElem{T}(base_ring(x), arr)
    return z
 end
 
@@ -48,26 +46,20 @@ end
 function can_solve_with_solution_lu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
-   MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
-   MS.base_ring = R
-   BS = MatSpaceElem{T}(B.entries)
-   BS.base_ring = R
+   MS = MatSpaceElem{T}(R, M.entries) # convert to ordinary matrix
+   BS = MatSpaceElem{T}(R, B.entries)
    flag, S = can_solve_with_solution_lu(MS, BS)
-   SA = MatAlgElem{T}(S.entries)
-   SA.base_ring = R
+   SA = MatAlgElem{T}(R, S.entries)
    return flag, SA
 end
 
 function can_solve_with_solution_fflu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
-   MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
-   MS.base_ring = R
-   BS = MatSpaceElem{T}(B.entries)
-   BS.base_ring = R
+   MS = MatSpaceElem{T}(R, M.entries) # convert to ordinary matrix
+   BS = MatSpaceElem{T}(R, B.entries)
    flag, S, d = can_solve_with_solution_fflu(MS, BS)
-   SA = MatAlgElem{T}(S.entries)
-   SA.base_ring = R
+   SA = MatAlgElem{T}(R, S.entries)
    return flag, SA, d
 end
 
@@ -77,15 +69,14 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
 
 Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
-   MS.base_ring = base_ring(M)
+   MS = MatSpaceElem{T}(base_ring(M), M.entries) # convert to ordinary matrix
    return minpoly(S, MS, charpoly_only)
 end
 
@@ -152,20 +143,19 @@ end
 
 function (a::MatAlgebra{T})() where {T <: NCRingElement}
    R = base_ring(a)
-   entries = Array{T}(undef, a.n, a.n)
+   entries = Matrix{T}(undef, a.n, a.n)
    for i = 1:a.n
       for j = 1:a.n
          entries[i, j] = zero(R)
       end
    end
-   z = MatAlgElem{T}(entries)
-   z.base_ring = R
+   z = MatAlgElem{T}(R, entries)
    return z
 end
 
 function (a::MatAlgebra{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
-   entries = Array{T}(undef, a.n, a.n)
+   entries = Matrix{T}(undef, a.n, a.n)
    rb = R(b)
    for i = 1:a.n
       for j = 1:a.n
@@ -176,8 +166,7 @@ function (a::MatAlgebra{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
          end
       end
    end
-   z = MatAlgElem{T}(entries)
-   z.base_ring = R
+   z = MatAlgElem{T}(R, entries)
    return z
 end
 
@@ -189,14 +178,13 @@ end
 function (a::MatAlgebra{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(a.n, a.n, b)
-   entries = Array{T}(undef, a.n, a.n)
+   entries = Matrix{T}(undef, a.n, a.n)
    for i = 1:a.n
       for j = 1:a.n
          entries[i, j] = R(b[i, j])
       end
    end
-   z = MatAlgElem{T}(entries)
-   z.base_ring = R
+   z = MatAlgElem{T}(R, entries)
    return z
 end
 
@@ -214,8 +202,10 @@ end
 ###############################################################################
 
 function MatrixAlgebra(R::AbstractAlgebra.NCRing, n::Int; cached::Bool = true)
+   # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
+   # (and perhaps future compatibility, in case we need it again)
    T = elem_type(R)
-   return MatAlgebra{T}(R, n, cached)
+   return MatAlgebra{T}(R, n)
 end
 
 

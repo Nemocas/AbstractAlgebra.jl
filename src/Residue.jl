@@ -48,7 +48,7 @@ function Base.hash(a::ResElem, h::UInt)
    return xor(b, xor(hash(data(a), h), h))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modulus(R::ResidueRing)
 
 Return the modulus $a$ of the given residue ring $S = R/(a)$.
@@ -57,7 +57,7 @@ function modulus(S::ResidueRing)
    return S.modulus
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modulus(R::ResElem)
 
 Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
@@ -97,7 +97,7 @@ function is_zero_divisor_with_annihilator(a::ResElem)
 end
 
 deepcopy_internal(a::ResElem, dict::IdDict) =
-   parent(a)(deepcopy(data(a)))
+   parent(a)(deepcopy_internal(data(a), dict))
 
 function characteristic(a::ResidueRing{T}) where T <: Integer
    return modulus(a)
@@ -142,7 +142,14 @@ end
 @enable_all_show_via_expressify ResElem
 
 function show(io::IO, a::ResidueRing)
-   print(IOContext(io, :compact => true), "Residue ring of ", base_ring(a), " modulo ", modulus(a))
+   if get(io, :supercompact, false)
+     print(io, "Residue ring")
+   else
+     io = pretty(io)
+     print(io, "Residue ring of ",)
+     print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+     print(io, " modulo ", modulus(a))
+   end
 end
 
 ###############################################################################
@@ -227,7 +234,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`. Recall
@@ -240,7 +247,7 @@ function ==(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
    return data(a) == data(b)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
 
 Return `true` if $a == b$ exactly, otherwise return `false`. This function is
@@ -260,7 +267,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(a::ResElem, b::Union{Integer, Rational, AbstractFloat})
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
@@ -270,7 +277,7 @@ function ==(a::ResElem, b::Union{Integer, Rational, AbstractFloat})
    return data(a) == mod(z, modulus(a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(a::Union{Integer, Rational, AbstractFloat}, b::ResElem)
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
@@ -280,7 +287,7 @@ function ==(a::Union{Integer, Rational, AbstractFloat}, b::ResElem)
    return data(b) == mod(z, modulus(b))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(a::ResElem{T}, b::T) where {T <: RingElem}
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
@@ -290,7 +297,7 @@ function ==(a::ResElem{T}, b::T) where {T <: RingElem}
    return data(a) == mod(z, modulus(a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(a::T, b::ResElem{T}) where {T <: RingElem}
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
@@ -306,7 +313,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.inv(a::ResElem)
 
 Return the inverse of the element $a$ in the residue ring. If an impossible
@@ -358,7 +365,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
 
 Return a greatest common divisor of $a$ and $b$ if one exists. This is done
@@ -432,7 +439,7 @@ rand(S::ResidueRing, v...) = rand(Random.GLOBAL_RNG, S, v...)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     residue_ring(R::Ring, a::RingElement; cached::Bool=true)
 
 Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
@@ -458,7 +465,7 @@ function residue_ring(R::PolyRing, a::RingElement; cached::Bool = true)
    return Generic.ResidueRing{T}(R(a), cached)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     quo(R::Ring, a::RingElement; cached::Bool = true)
 
 Returns `S, f` where `S = residue_ring(R, a)` and `f` is the 

@@ -44,7 +44,7 @@ function poly_ring(R::AbsMSeriesRing{T, S}) where {T <: RingElement, S}
    return R.poly_ring::parent_type(S) 
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     weights(R::AbsMSeriesRing)
 
 Return a vector of weights which the variables are weighted with.
@@ -54,21 +54,21 @@ function weights(R::AbsMSeriesRing)
    return R.prec_max # prec doubles as weights in weighted mode
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     length(a::AbsMSeries)
 
 Return the number of nonzero terms in the series $a$.
 """
 length(a::AbsMSeries) = length(poly(a))
 
-@doc Markdown.doc"""
+@doc raw"""
     nvars(R::AbsMSeriesRing)
 
 Return the number of variables in the series ring.
 """
 nvars(R::AbsMSeriesRing) = nvars(poly_ring(R))
 
-@doc Markdown.doc"""
+@doc raw"""
     precision(a::AbsMSeries)
 
 Return a vector of precisions, one for each variable in the series ring.
@@ -83,7 +83,7 @@ function precision(a::AbsMSeries)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     set_precision!(a::AbsMSeries, prec::Vector{Int})
 
 Set the precisions of the variables in the given series to the values in the
@@ -101,7 +101,7 @@ function set_precision!(a::AbsMSeries, prec::Vector{Int})
     return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     max_precision(R::AbsMSeriesRing)
 
 Return a vector of precision caps, one for each variable in the ring.
@@ -113,7 +113,7 @@ function max_precision(R::AbsMSeriesRing)
    return R.prec_max
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     valuation(a::AbsMSeries)
 
 Return the valuation of $a$ as a vector of integers, one for each variable.
@@ -133,7 +133,7 @@ function valuation(a::AbsMSeries)
     return val
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     coeff(a::AbsMSeries, n::Int)
 
 Return the coefficient of the $n$-th nonzero term of the series (or zero if
@@ -154,7 +154,7 @@ zero(R::AbsMSeriesRing) = R(0)
 
 one(R::AbsMSeriesRing) = R(1)
 
-@doc Markdown.doc"""
+@doc raw"""
     is_unit(a::AbsMSeries)
 
 Return `true` if the series is a unit in its series ring, i.e. if its constant
@@ -162,13 +162,14 @@ term is a unit in the base ring.
 """
 is_unit(a::AbsMSeries) = is_unit(constant_coefficient(poly(a)))
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(R::AbsMSeriesRing, i::Int)
 
 Return the $i$-th generator (variable) of the series ring $R$. Numbering starts
 from $1$ for the most significant variable.
 """
 function gen(R::AbsMSeriesRing, i::Int)
+   @boundscheck 1 <= i <= nvars(R) || throw(ArgumentError("variable index out of range"))
    S = poly_ring(R)
    if R.weighted_prec == -1
       prec = [R.prec_max[ind] for ind in 1:nvars(R)]
@@ -181,7 +182,7 @@ function gen(R::AbsMSeriesRing, i::Int)
    return R(x, prec)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gens(R::AbsMSeriesRing)
 
 Return a vector of the generators (variables) of the series ring $R$, starting
@@ -190,7 +191,7 @@ with the most significant.
 gens(R::AbsMSeriesRing) = [gen(R, i) for i in 1:nvars(R)]
 
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::AbsMSeries)
 
 Return true if the series $a$ is a generator of its parent series ring.
@@ -218,7 +219,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     coefficients(a::AbsMSeries)
 
 Return an array of the nonzero coefficients of the series, in the order they
@@ -228,7 +229,7 @@ function coefficients(a::AbsMSeries)
     return reverse!(collect(coefficients(poly(a))))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exponent_vectors(a::AbsMSeries)
 
 Return an array of the exponent vectors of the nonzero terms of the series, in
@@ -309,7 +310,7 @@ function truncate_poly(a::MPolyRingElem, prec::Vector{Int}, weighted_prec::Int=-
     return finish(ctx)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     truncate(a::AbstractAlgebra.AbsMSeries, prec::Vector{Int})
 
 Return $a$ truncated to (absolute) precisions given by the vector `prec`.
@@ -329,7 +330,7 @@ function truncate(a::AbsMSeries, prec::Vector{Int})
     end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     truncate(a::AbstractAlgebra.AbsMSeries, prec::Int)
 
 Return $a$ truncated to precision `prec`. This either truncates by weight in
@@ -546,7 +547,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     divexact(x::AbsMSeries{T}, y::AbsMSeries{T}; check::Bool=true) where T <: RingElement
 
 Return the exact quotient of the series $x$ by the series $y$. This function
@@ -563,7 +564,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate(a::U, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
 
 Evaluate the series expression by substituting in the supplied values in
@@ -592,7 +593,7 @@ function evaluate(a::U, vars::Vector{Int}, vals::Vector{U}) where
     return AbstractAlgebra._evaluate(a, S, R, vars, vals)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate(a::U, vars::Vector{U}, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
 
 Evaluate the series expression by substituting in the supplied values in
@@ -605,7 +606,7 @@ function evaluate(a::U, vars::Vector{U}, vals::Vector{U}) where
     return evaluate(a, varidx, vals)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate(a::U, vals::Vector{U}) where {T <: RingElement, U <: AbsMSeries{T}}
 
 Evaluate the series expression by substituting in the supplied values in
@@ -713,12 +714,10 @@ end
 ###############################################################################
 
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
-                  s::Vector{T}; cached=true, model=:capped_absolute) where
-                                                                    T <: Symbol
-    str = [String(a) for a in s]
+                  s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
     U = elem_type(R)
  
-    S, _ = AbstractAlgebra.polynomial_ring(R, str)
+    S, _ = AbstractAlgebra.polynomial_ring(R, s)
     V = elem_type(S)
 
     if model == :capped_absolute
@@ -731,12 +730,10 @@ function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
 end
 
 function power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::Int,
-   s::Vector{T}; cached=true, model=:capped_absolute) where
-                                                     T <: Symbol
-   str = [String(a) for a in s]
+   s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
    U = elem_type(R)
 
-   S, _ = AbstractAlgebra.polynomial_ring(R, str)
+   S, _ = AbstractAlgebra.polynomial_ring(R, s)
    V = elem_type(S)
 
    if model == :capped_absolute
@@ -749,8 +746,7 @@ function power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::
 end
 
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Int,
-                  s::Vector{T}; cached=true, model=:capped_absolute) where
-                                                                    T <: Symbol
+                  s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
     prec_vec = [prec for v in s]
     return power_series_ring(R, prec_vec, s; cached=cached, model=model)
 end

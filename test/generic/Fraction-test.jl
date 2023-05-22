@@ -57,6 +57,8 @@ end
 
    @test string((x+y)//z) == "(x + y)//z"
    @test string(x//y//z) == "x//(y*z)"
+
+   @test !occursin("\n", sprint(show, fraction_field(S)))
 end
 
 
@@ -335,4 +337,14 @@ end
    F = fraction_field(S)
    T = elem_type(F)
    @test AbstractAlgebra.promote_rule(T, T) == T
+end
+
+@testset "Generic.Frac.factor" begin
+   S, x = polynomial_ring(QQ, "x")
+   F = fraction_field(S)
+   a = (x + 1)//(x + 2)
+   f = factor(a)
+   @test length(f) == 0
+   @test unit(f) == a
+   @test_throws ArgumentError factor(zero(F))
 end

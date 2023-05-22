@@ -1,4 +1,4 @@
-@doc Markdown.doc"""
+@doc raw"""
  AbstractAlgebra is a pure Julia package for computational abstract algebra.
 
  For more information see https://github.com/Nemocas/AbstractAlgebra.jl
@@ -8,9 +8,9 @@ module AbstractAlgebra
 using Random: SamplerTrivial, GLOBAL_RNG
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 
-using Markdown
-
 using InteractiveUtils
+
+using Preferences
 
 using Test # for "interface-conformance" functions
 
@@ -24,7 +24,10 @@ import_exclude = [:import_exclude, :QQ, :ZZ,
                   :inv, :log, :exp, :sqrt, :div, :divrem,
                   :numerator, :denominator,
                   :promote_rule,
-                  :Set, :Module, :Ring, :Group, :Field]
+                  :Set, :Module, :Group,
+                  # remove the following, once they land in OSCAR
+                  :allow_unicode, :with_unicode,
+                 ]
 
 # If you want to add methods to functions in LinearAlgebra they should be
 # imported here and in Generic.jl, and exported below.
@@ -241,6 +244,7 @@ export IdentityMap
 export is_irreducible
 export is_squarefree
 export is_perfect
+export ItemQuantity
 export Map
 export MatAlgebra
 export MatAlgElem
@@ -257,6 +261,7 @@ export NotInvertibleError
 export NumField
 export NumFieldElem
 export parent_type
+export pluralize
 export PolyRing
 export PolyRingElem
 export qq
@@ -266,6 +271,7 @@ export RealField
 export RelPowerSeriesRingElem
 export ResElem
 export ResidueRing
+export Ring
 export RingElem
 export RingElement
 export SeriesElem
@@ -285,6 +291,7 @@ export ZZ
 
 include("Attributes.jl")
 include("AliasMacro.jl")
+include("Pluralize.jl")
 
 # alternative names for some functions from Base
 export is_empty, is_equal, is_finite, is_inf, is_integer, is_less, is_one, is_real, is_subset, is_valid, is_zero
@@ -376,18 +383,29 @@ macro show_name(io, O)
   end )
 end
 
-function find_name(A, M = Main)
+const CurrentModule = Ref(Main)
+
+function set_current_module(m)
+  CurrentModule[] = m
+end
+
+function get_current_module()
+  return CurrentModule[]
+end
+
+function find_name(A, M = Main; all::Bool = false)
   # in Documenter, the examples are not run in the REPL.
   # in the REPL: A = ... adds A to the global name space (Main....)
   # in Documenter (doctests) all examples are run in their own module
   # which is stored in CurrentModule, hence we need to search there as well
-  if M === Main && isdefined(Main, :CurrentModule)
-    a = find_name(A, Main.CurrentModule)
+  #furthermore, they are not exported, hence the "all" option
+  if M === Main && AbstractAlgebra.get_current_module() != Main
+    a = find_name(A, AbstractAlgebra.get_current_module(), all = true)
     if a !== nothing
       return a
     end
   end
-  for a = names(M)
+  for a = names(M, all = all)
     a === :ans && continue
     if isdefined(M, a) && getfield(M, a) === A
         return a
@@ -439,10 +457,9 @@ end
 #
 function force_coerce(a, b, throw_error::Type{Val{T}} = Val{true}) where {T}
   if throw_error === Val{true}
-    throw(error("coercion not possible"))
-  else
-    return nothing
+    error("coercion not possible")
   end
+  return nothing
 end
 
 #to allow +(a::T, b::T) where a, b have different parents, but
@@ -451,7 +468,7 @@ end
 # content in Hecke/Oscar
 function force_op(op::Function, throw_error::Type{Val{T}}, a...) where {T}
   if throw_error === Val{true}
-    throw(error("no common overstructure for the arguments found"))
+    error("no common overstructure for the arguments found")
   end
   return false
 end
@@ -518,6 +535,7 @@ include("fundamental_interface.jl")
 include("PrettyPrinting.jl")
 
 import .PrettyPrinting: @enable_all_show_via_expressify
+import .PrettyPrinting: allow_unicode
 import .PrettyPrinting: canonicalize
 import .PrettyPrinting: expr_to_latex_string
 import .PrettyPrinting: expr_to_string
@@ -526,6 +544,7 @@ import .PrettyPrinting: get_html_as_latex
 import .PrettyPrinting: get_syntactic_sign_abs
 import .PrettyPrinting: is_syntactic_one
 import .PrettyPrinting: is_syntactic_zero
+import .PrettyPrinting: is_unicode_allowed
 import .PrettyPrinting: obj_to_latex_string
 import .PrettyPrinting: obj_to_string
 import .PrettyPrinting: obj_to_string_wrt_times
@@ -535,6 +554,12 @@ import .PrettyPrinting: printer
 import .PrettyPrinting: set_html_as_latex
 import .PrettyPrinting: show_obj
 import .PrettyPrinting: show_via_expressify
+import .PrettyPrinting: with_unicode
+import .PrettyPrinting: pretty
+import .PrettyPrinting: LowercaseOff
+import .PrettyPrinting: Lowercase
+import .PrettyPrinting: Indent
+import .PrettyPrinting: Dedent
 
 export @enable_all_show_via_expressify
 
@@ -735,6 +760,7 @@ export addmul_delayed_reduction!
 export addmul!
 export AllParts
 export AllPerms
+export allow_unicode
 export base_field
 export base_ring
 export basis
@@ -896,6 +922,7 @@ export is_weak_popov
 export is_zero_column
 export is_zero_divisor
 export is_zero_divisor_with_annihilator
+export is_zero_entry
 export is_zero_row
 export kernel
 export kronecker_product
@@ -1120,6 +1147,7 @@ export var_index
 export vars
 export vector_space
 export VectorSpace
+export with_unicode
 export weak_popov
 export weak_popov_with_transform
 export weights
@@ -1157,7 +1185,7 @@ function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.
    Generic.YoungTableau(part, fill)
 end
 
-function number_field(a::Generic.Poly{Rational{BigInt}}, s::VarName, t = "\$"; cached = true)
+function number_field(a::Generic.Poly{Rational{BigInt}}, s::VarName, t = "\$"; cached::Bool=true)
    return Generic.number_field(a, Symbol(s), t; cached=cached)
 end
 
@@ -1165,7 +1193,7 @@ function FunctionField(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}},
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sub(m::Module{T}, subs::Vector{<:Generic.Submodule{T}}) where T <: RingElement
 
 Return the submodule `S` of the module `m` generated by the union of the given
@@ -1197,6 +1225,17 @@ getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingEle
 
 ###############################################################################
 #
+#   Syntax S[i] for all parents S as a shortcut for gen(S, i)
+#
+################################################################################
+
+# Unfortunately `Group` is not a subtype of Set because we derive it from the
+# GroupsCore package (oh, if only Julia allowed inheritance from multiple
+# abstract types...)
+getindex(S::Union{Set, Group}, i::Int) = gen(S, i)
+
+###############################################################################
+#
 #   Matrix M = R[...] syntax
 #
 ################################################################################
@@ -1212,6 +1251,7 @@ typed_vcat(R::Ring, d...) = matrix(R, length(d), 1, vcat(d...))
 ###############################################################################
 
 include("misc/ProductIterator.jl")
+include("misc/Evaluate.jl")
 
 ###############################################################################
 #

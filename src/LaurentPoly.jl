@@ -10,14 +10,14 @@
 #
 ###############################################################################
 
-@doc doc"""
+@doc raw"""
     LaurentPolynomialRing(R::Ring, s::VarName)
 
 Given a base ring `R` and string `s` specifying how the generator (variable)
 should be printed, return a tuple `S, x` representing the new Laurent polynomial
 ring $S = R[x, 1/x]$ and the generator $x$ of the ring.
 
-## Examples
+# Examples
 ```julia
 julia> R, x = LaurentPolynomialRing(ZZ, "x")
 (Univariate Laurent Polynomial Ring in x over Integers, x)

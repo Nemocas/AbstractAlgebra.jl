@@ -106,7 +106,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.intersect(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
 
 Return the intersection of the modules $M$ as a submodule of $M$. Note that
@@ -173,7 +173,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
 
 Return `true` if the modules are (constructed to be) the same module
@@ -249,7 +249,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_isomorphic(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
 
 Return `true` if the modules $M$ and $N$ are isomorphic.
@@ -264,7 +264,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     getindex(v::FPModuleElem{T}, i::Int) where T <: RingElement
 
 Return the $i$-th coefficient of the module element $v$.

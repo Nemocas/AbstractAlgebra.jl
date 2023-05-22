@@ -40,9 +40,9 @@ end
 coeff(a::NCPoly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 function deepcopy_internal(a::NCPoly{T}, dict::IdDict) where T <: NCRingElem
-   coeffs = Array{T}(undef, length(a))
+   coeffs = Vector{T}(undef, length(a))
    for i = 1:length(a)
-      coeffs[i] = deepcopy(a.coeffs[i])
+      coeffs[i] = deepcopy_internal(a.coeffs[i], dict)
    end
    return parent(a)(coeffs)
 end
@@ -216,7 +216,7 @@ end
 function (a::NCPolyRing{T})(b::Vector{S}) where {S <: RingElement, T <: NCRingElem}
    R = base_ring(a)
    len = length(b)
-   entries = Array{T}(undef, len)
+   entries = Vector{T}(undef, len)
    for i = 1:length(b)
       entries[i] = R(b[i])
    end
@@ -228,7 +228,7 @@ end
 function (a::NCPolyRing{T})(b::Vector{S}) where {S <: NCRingElem, T <: NCRingElem}
    R = base_ring(a)
    len = length(b)
-   entries = Array{T}(undef, len)
+   entries = Vector{T}(undef, len)
    for i = 1:length(b)
       entries[i] = R(b[i])
    end

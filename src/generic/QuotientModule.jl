@@ -27,20 +27,21 @@ ngens(N::QuotientModule{T}) where T <: RingElement = length(N.gen_cols)
 gens(N::QuotientModule{T}) where T <: RingElement = elem_type(N)[gen(N, i) for i = 1:ngens(N)]
 
 function gen(N::QuotientModule{T}, i::Int) where T <: RingElement
+   @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
    R = base_ring(N)
    mat = matrix(R, 1, ngens(N),
                 [(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
    return QuotientModuleElem{T}(N, mat)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     dim(N::QuotientModule{T}) where T <: FieldElement
 
 Return the dimension of the given vector quotient space.
 """
 dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
 
-@doc Markdown.doc"""
+@doc raw"""
     supermodule(M::QuotientModule{T}) where T <: RingElement
 
 Return the module that this module is a quotient of.
@@ -54,12 +55,7 @@ supermodule(M::QuotientModule{T}) where T <: RingElement = M.m
 ###############################################################################
 
 function show_gens_rels(io::IO, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
-   print(io, " with ", ngens(N), " generator")
-   if ngens(N) == 1
-      print(io, " and ")
-   else
-      print(io, "s and ")
-   end
+   print(io, " with ", ItemQuantity(ngens(N), "generator"), " and ")
    if length(rels(N)) == 0
       print(io, "no relations")
    else

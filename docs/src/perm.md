@@ -83,7 +83,7 @@ constructions over permutation groups. Any custom permutation group
 implementation in AbstractAlgebra.jl should provide the group element
 arithmetic and comparison.
 
-A custom implementation also needs to implement `hash(::Perm, ::UInt)` and (possibly) `deepcopy_internal(::Perm, ::ObjectIdDict)`.
+A custom implementation also needs to implement `hash(::Perm, ::UInt)` and (possibly) `deepcopy_internal(::Perm, ::IdDict)`.
 
 !!! note
 

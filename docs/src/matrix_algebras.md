@@ -61,12 +61,10 @@ In order to construct matrices in AbstractAlgebra.jl, one must construct the
 matrix algebra itself. This is accomplished with the following constructor.
 
 ```julia
-MatrixAlgebra(R::Ring, degree::Int; cache::Bool=true)
+MatrixAlgebra(R::Ring, degree::Int)
 ```
 
-Construct the algebra of matrices with the given degree over the given base ring. By
-default such matrix spaces are cached based on the base ring and degree. If the
-optional named parameter `cached` is set to false, no caching occurs.
+Construct the algebra of matrices with the given degree over the given base ring.
 
 Here are some examples of creating matrix algebras and making use of the
 resulting parent objects to coerce various elements into the matrix algebra.
@@ -75,10 +73,11 @@ resulting parent objects to coerce various elements into the matrix algebra.
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = MatrixAlgebra(R, 3)
-Matrix Algebra of degree 3 over Univariate Polynomial Ring in t over Rationals
+Matrix Algebra of degree 3
+  over univariate polynomial ring in t over rationals
 
 julia> A = S()
 [0   0   0]
@@ -142,10 +141,11 @@ degree(::Generic.MatAlgElem)
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S = MatrixAlgebra(R, 3)
-Matrix Algebra of degree 3 over Univariate Polynomial Ring in t over Rationals
+Matrix Algebra of degree 3
+  over univariate polynomial ring in t over rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]

@@ -28,8 +28,8 @@ check_parent(g::Perm, h::Perm) = length(g.d) == length(h.d) ||
 Base.hash(g::Perm, h::UInt) = foldl((h, x) -> hash(x, h), g.d,
                                     init = hash(0x0d9939c64ab650ca, h))
 
-Base.deepcopy_internal(g::Perm, stackdict::IdDict) =
-   Perm(Base.deepcopy_internal(g.d, stackdict), false)
+Base.deepcopy_internal(g::Perm, dict::IdDict) =
+   Perm(Base.deepcopy_internal(g.d, dict), false)
 
 function getindex(g::Perm, n::Integer)
    return g.d[n]
@@ -60,7 +60,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     parity(g::Perm)
 
 Return the parity of the given permutation, i.e. the parity of the number of
@@ -71,7 +71,7 @@ cycle decomposition of `g` if already available, but will not compute
 it on demand. Since cycle structure is cached in `g` you may call
 `cycles(g)` before calling `parity`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = Perm([3,4,1,2,5])
 (1,3)(2,4)
@@ -106,7 +106,7 @@ function parity(g::Perm{T}) where T
    return T(parity)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sign(g::Perm)
 
 Return the sign of a permutation.
@@ -115,7 +115,7 @@ Return the sign of a permutation.
 the homomorphism from the permutation group to the unit group of $\mathbb{Z}$
 whose kernel is the alternating group.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = Perm([3,4,1,2,5])
 (1,3)(2,4)
@@ -172,7 +172,7 @@ function Base.show(io::IO, cd::CycleDec)
    print(io, "Cycle Decomposition: ("*join(a, ")(")*")")
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cycles(g::Perm)
 
 Decompose permutation `g` into disjoint cycles.
@@ -183,7 +183,7 @@ computed up to a cyclic permutation.
 The cycle decomposition is cached in `g` and used in future computation of
 `permtype`, `parity`, `sign`, `order` and `^` (powering).
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
@@ -235,7 +235,7 @@ function cycledec(v::Vector{T}) where T<:Integer
    return ccycles, cptrs
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     permtype(g::Perm)
 
 Return the type of permutation `g`, i.e. lengths of disjoint cycles in cycle
@@ -244,7 +244,7 @@ decomposition of `g`.
 The lengths are sorted in decreasing order by default. `permtype(g)` fully
 determines the conjugacy class of `g`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
@@ -286,7 +286,7 @@ end
 
 const _permdisplaystyle = PermDisplayStyle(:cycles)
 
-@doc Markdown.doc"""
+@doc raw"""
     setpermstyle(format::Symbol)
 
 Select the style in which permutations are displayed (in the REPL or in general
@@ -299,7 +299,7 @@ as strings). This can be either
 
 The difference is purely esthetical.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> setpermstyle(:array)
 :array
@@ -359,7 +359,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(g::Perm, h::Perm)
 
 Return `true` if permutations are equal, otherwise return `false`.
@@ -367,7 +367,7 @@ Return `true` if permutations are equal, otherwise return `false`.
 Permutations parametrized by different integer types are considered equal if
 they define the same permutation in the abstract permutation group.
 
-# Examples:
+# Examples
 ```
 julia> g = Perm(Int8[2,3,1])
 (1,2,3)
@@ -381,7 +381,7 @@ true
 """
 ==(g::Perm, h::Perm) = g.d == h.d
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(G::SymmetricGroup, H::SymmetricGroup)
 
 Return `true` if permutation groups are equal, otherwise return `false`.
@@ -389,7 +389,7 @@ Return `true` if permutation groups are equal, otherwise return `false`.
 Permutation groups on the same number of letters, but parametrized
 by different integer types are considered different.
 
-# Examples:
+# Examples
 ```
 julia> G = SymmetricGroup(UInt(5))
 Permutation group over 5 elements
@@ -418,7 +418,7 @@ function mul!(out::Perm, g::Perm, h::Perm)
    return out
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     *(g::Perm, h::Perm)
 
 Return the composition ``h ∘ g`` of two permutations.
@@ -429,7 +429,7 @@ This corresponds to the action of permutation group on the set `[1..n]`
 If `g` and `h` are parametrized by different types, the result is promoted
 accordingly.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> Perm([2,3,1,4])*Perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 (1,3)(2,4)
@@ -438,7 +438,7 @@ julia> Perm([2,3,1,4])*Perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 *(g::Perm{T}, h::Perm{T}) where T = mul!(similar(g), g, h)
 *(g::Perm{S}, h::Perm{T}) where {S,T} = *(promote(g,h)...)
 
-@doc Markdown.doc"""
+@doc raw"""
     ^(g::Perm, n::Integer)
 
 Return the $n$-th power of a permutation `g`.
@@ -449,7 +449,7 @@ may or may not be faster, depending on the particular case. Due to caching of
 the cycle structure, repeated powering of `g` will be faster with the default
 method.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = Perm([2,3,4,5,1])
 (1,2,3,4,5)
@@ -525,7 +525,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.inv(g::Perm)
 
 Return the inverse of the given permutation, i.e. the permutation $g^{-1}$
@@ -582,7 +582,7 @@ Base.eltype(::Type{AllPerms{T}}) where T<:Integer = Perm{T}
 
 Base.length(A::AllPerms) = A.all
 
-@doc Markdown.doc"""
+@doc raw"""
     Generic.elements!(G::SymmetricGroup)
 
 Return an unsafe iterator over all permutations in `G`. Only one permutation
@@ -592,7 +592,7 @@ is allocated and then modified in-place using the non-recursive
 Note: you need to explicitly copy permutations intended to be stored or
 modified.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> elts = Generic.elements!(SymmetricGroup(5));
 
@@ -670,13 +670,13 @@ order(::Type{T}, G::SymmetricGroup) where {T} = convert(T, factorial(T(G.n)))
 order(::Type{T}, g::Perm) where {T} =
    convert(T, foldl(lcm, length(c) for c in cycles(g)))
 
-@doc Markdown.doc"""
+@doc raw"""
     matrix_repr(a::Perm)
 
 Return the permutation matrix as a sparse matrix representing `a` via natural
 embedding of the permutation group into the general linear group over $\mathbb{Z}$.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Perm([2,3,1])
 (1,2,3)
@@ -696,7 +696,7 @@ julia> Array(ans)
 """
 matrix_repr(a::Perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
 
-@doc Markdown.doc"""
+@doc raw"""
     emb!(result::Perm, p::Perm, V)
 
 Embed permutation `p` into permutation `result` on the indices given by `V`.
@@ -704,7 +704,7 @@ Embed permutation `p` into permutation `result` on the indices given by `V`.
 This corresponds to the natural embedding of $S_k$ into $S_n$ as the
 subgroup permuting points indexed by `V`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Perm([2,1,4,3])
 (1,2)(3,4)
@@ -718,13 +718,13 @@ function emb!(result::Perm, p::Perm, V)
    return result
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
 
 Return the natural embedding of a permutation group into `G` as the
 subgroup permuting points indexed by `V`.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Perm([2,3,1])
 (1,2,3)
@@ -744,7 +744,7 @@ function emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
    return p -> Generic.emb!(one(G), p, V)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rand([rng=GLOBAL_RNG,] G::SymmetricGroup)
 
 Return a random permutation from `G`.
@@ -851,7 +851,7 @@ function cycledec(ccycles::Vector{Int}, cptrs::Vector{Int}, n::T,
    return CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     perm"..."
 
 String macro to parse disjoint cycles into `Perm{Int}`.
@@ -861,7 +861,7 @@ Cycles of length $1$ are not necessary, but can be included. A permutation
 of the minimal support is constructed, i.e. the maximal $n$ in the
 decomposition determines the parent group $S_n$.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = perm"(1,3)(2,4)"
 (1,3)(2,4)
@@ -907,7 +907,7 @@ end
 const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, Int}()
 const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 
-@doc Markdown.doc"""
+@doc raw"""
     character(lambda::Partition)
 
 Return the $\lambda$-th irreducible character of permutation group on
@@ -955,7 +955,7 @@ function character(lambda::Partition)
    return char
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     character(lambda::Partition, p::Perm, check::Bool=true) -> BigInt
 
 Return the value of `lambda`-th irreducible character of the permutation
@@ -972,7 +972,7 @@ function character(::Type{T}, lambda::Partition, p::Perm) where T <: Integer
    return character(T, lambda, Partition(permtype(p)))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     character(lambda::Partition, mu::Partition, check::Bool=true) -> BigInt
 
 Return the value of `lambda-th` irreducible character on the conjugacy class

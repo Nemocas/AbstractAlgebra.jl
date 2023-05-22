@@ -25,11 +25,12 @@ ngens(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m)
 gens(N::DirectSumModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
 function gen(N::DirectSumModule{T}, i::Int) where T <: RingElement
+   @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index is out of range"))
    R = base_ring(N)
    return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     summands(M::DirectSumModule{T}) where T <: RingElement
 
 Return the modules that this module is a direct sum of.
@@ -43,8 +44,13 @@ summands(M::DirectSumModule{T}) where T <: RingElement = M.m
 ###############################################################################
 
 function show(io::IO, N::DirectSumModule{T}) where T <: RingElement
-   print(io, "DirectSumModule over ")
-   print(IOContext(io, :compact => true), base_ring(N))
+   if get(io, :supercompact, false)
+     io = pretty(io)
+     print(io, LowercaseOff(), "DirectSumModule")
+   else
+     io = pretty(io)
+     print(io, LowercaseOff(), "DirectSumModule over ", Lowercase(), base_ring(N))
+   end
 end
 
 function show(io::IO, v::DirectSumModuleElem)

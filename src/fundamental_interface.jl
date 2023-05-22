@@ -12,7 +12,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     parent(a)
 
 Return parent object of given element $a$.
@@ -26,7 +26,7 @@ julia> parent(g) == G
 true
 
 julia> S, x = laurent_series_ring(ZZ, 3, "x")
-(Laurent series ring in x over Integers, x + O(x^4))
+(Laurent series ring in x over integers, x + O(x^4))
 
 julia> parent(x) == S
 true
@@ -35,16 +35,16 @@ true
 function parent end
 
 # TODO: Give example
-@doc Markdown.doc"""
+@doc raw"""
     elem_type(parent)
     elem_type(parent_type)
 
 Given a parent object (or its type), return the type of its elements.
 
-# Example
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S, x = power_series_ring(QQ, 2, "x")
-(Univariate power series ring in x over Rationals, x + O(x^3))
+(Univariate power series ring over rationals, x + O(x^3))
 
 julia> elem_type(S) == typeof(x)
 true
@@ -53,19 +53,20 @@ true
 elem_type(x)  = elem_type(typeof(x))
 elem_type(T::DataType) = throw(MethodError(elem_type, (T,)))
 
-@doc Markdown.doc"""
+@doc raw"""
     parent_type(element)
     parent_type(element_type)
 
 Given an element (or its type), return the type of its parent object.
 
-# Example
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> S = matrix_space(R, 2, 2)
-Matrix Space of 2 rows and 2 columns over Univariate Polynomial Ring in x over Integers
+Matrix space of 2 rows and 2 columns
+  over univariate polynomial ring in x over integers
 
 julia> a = rand(S, 0:1, 0:1);
 
@@ -76,7 +77,7 @@ true
 parent_type(x) = parent_type(typeof(x))
 parent_type(T::DataType) = throw(MethodError(parent_type, (T,)))
 
-@doc Markdown.doc"""
+@doc raw"""
     base_ring(a)
 
 Return base ring $R$ of given element or parent $a$.
@@ -84,7 +85,7 @@ Return base ring $R$ of given element or parent $a$.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> base_ring(S) == QQ
 true
@@ -104,7 +105,7 @@ function base_ring end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     one(a)
 
 Return the multiplicative identity in the algebraic structure of $a$, which can
@@ -113,14 +114,15 @@ be either an element or parent.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S = matrix_space(ZZ, 2, 2)
-Matrix Space of 2 rows and 2 columns over Integers
+Matrix space of 2 rows and 2 columns
+  over integers
 
 julia> one(S)
 [1   0]
 [0   1]
 
 julia> R, x = PuiseuxSeriesField(QQ, 4, "x")
-(Puiseux series field in x over Rationals, x + O(x^5))
+(Puiseux series field in x over rationals, x + O(x^5))
 
 julia> one(x)
 1 + O(x^4)
@@ -134,7 +136,7 @@ julia> one(G)
 """
 function one end
 
-@doc Markdown.doc"""
+@doc raw"""
     zero(a)
 
 Return the additive identity in the algebraic structure of $a$, which can be
@@ -143,14 +145,15 @@ either an element or parent.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S = MatrixAlgebra(QQ, 2)
-Matrix Algebra of degree 2 over Rationals
+Matrix Algebra of degree 2
+  over rationals
 
 julia> zero(S)
 [0//1   0//1]
 [0//1   0//1]
 
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integers, x)
+(Univariate polynomial ring in x over integers, x)
 
 julia> zero(x^3 + 2)
 0
@@ -164,7 +167,7 @@ function zero end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     isone(a)
 
 Return true if $a$ is the multiplicative identity, else return false.
@@ -183,7 +186,7 @@ julia> isone(U([1 0; 0 1; 0 0]))
 false
 
 julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
-(Puiseux series field in x over Rationals, x + O(x^11))
+(Puiseux series field in x over rationals, x + O(x^11))
 
 julia> isone(x), isone(T(1))
 (false, true)
@@ -191,7 +194,7 @@ julia> isone(x), isone(T(1))
 """
 function isone end
 
-@doc Markdown.doc"""
+@doc raw"""
     iszero(a)
 
 Return true if $a$ is the additative identity, else return false.
@@ -199,7 +202,7 @@ Return true if $a$ is the additative identity, else return false.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
-(Puiseux series field in x over Rationals, x + O(x^11))
+(Puiseux series field in x over rationals, x + O(x^11))
 
 julia> a = T(0)
 O(x^10)
@@ -216,7 +219,7 @@ function iszero end
 #
 ###############################################################################
 
-# @doc Markdown.doc"""
+# @doc raw"""
 #     gen(a)
 
 # Return element generating parent $a$.
@@ -232,7 +235,7 @@ function iszero end
 # """
 function gen end
 
-# @doc Markdown.doc"""
+# @doc raw"""
 #     gens(a)
 
 # Return elements generating parent $a$ in an array.
@@ -251,48 +254,41 @@ function gens end
 
 const VarName = Union{Symbol, AbstractString, Char}
 
-# Constructors which use `VarName` in their argument list often are implemented
-# by first converting all such inputs to use `Symbol` everywhere. For disambiguation
-# and to avoid infinite recursion, it then is sometimes necessary to have methods
-# in pairs, one using `Symbol`, and one using "`VarName` except for `Symbol`".
-# The latter is what `VarNameNonSymbol` is for.
-const VarNameNonSymbol = Union{AbstractString, Char}
-
 ###############################################################################
 #
 #   Unsafe functions
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     zero!(a)
 
 Return the zero of `parent(a)`, possibly modifying the object `a` in the process.
 """
 function zero! end
 
-@doc Markdown.doc"""
+@doc raw"""
     add!(a, b, c)
 
 Return `b + c`, possibly modifying the object `a` in the process.
 """
 function add! end
 
-@doc Markdown.doc"""
+@doc raw"""
     addeq!(a, b)
 
 Return `a + b`, possibly modifying the object `a` in the process.
 """
 function addeq! end
 
-@doc Markdown.doc"""
+@doc raw"""
     sub!(a, b, c)
 
 Return `b - c`, possibly modifying the object `a` in the process.
 """
 function sub! end
 
-@doc Markdown.doc"""
+@doc raw"""
     mul!(a, b, c)
 
 Return `b*c`, possibly modifying the object `a` in the process.

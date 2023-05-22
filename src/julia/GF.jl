@@ -41,7 +41,7 @@ function Base.hash(a::GFElem, h::UInt)
    return xor(xor(hash(a.d), h), b)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     data(R::GFElem)
 
 Return the internal data used to represent the finite field element. This
@@ -49,8 +49,8 @@ coincides with `lift` except where the internal data ids a machine integer.
 """
 data(a::GFElem) = a.d
 
-@doc Markdown.doc"""
-    data(R::GFElem)
+@doc raw"""
+    lift(R::GFElem)
 
 Lift the finite field element to the integers. The result will be a
 multiprecision integer regardless of how the field element is represented
@@ -66,7 +66,7 @@ function one(R::GFField{T}) where T <: Integer
       return GFElem{T}(T(1), R)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(R::GFField{T}) where T <: Integer
 
 Return a generator of the field. Currently this returns 1.
@@ -81,7 +81,7 @@ isone(a::GFElem{T}) where T <: Integer = a.d == 1
 
 is_unit(a::GFElem) = a.d != 0
 
-@doc Markdown.doc"""
+@doc raw"""
     characteristic(R::GFField)
 
 Return the characteristic of the given finite field.
@@ -90,7 +90,7 @@ function characteristic(R::GFField)
    return R.p
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     order(R::GFField)
 
 Return the order, i.e. the number of element in the given finite field.
@@ -99,7 +99,7 @@ function order(R::GFField)
    return R.p
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(R::GFField)
 
 Return the degree of the given finite field.
@@ -110,7 +110,7 @@ end
 
 function deepcopy_internal(a::GFElem{T}, dict::IdDict) where T <: Integer
    R = parent(a)
-   return GFElem{T}(deepcopy(a.d), R)
+   return GFElem{T}(deepcopy_internal(a.d, dict), R)
 end
 
 ###############################################################################
@@ -461,7 +461,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     GF(p::T; check::Bool=true) where T <: Integer
 
 Return the finite field $\mathbb{F}_p$, where $p$ is a prime.

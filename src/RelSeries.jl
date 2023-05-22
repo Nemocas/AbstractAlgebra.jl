@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     O(a::RelPowerSeriesRingElem{T}) where T <: RingElement
 
 Return $0 + O(x^\mathrm{deg}(a))$. Usually this function is called with $x^n$
@@ -20,7 +20,7 @@ can be used to set the precision of a power series when constructing it.
 function O(a::RelPowerSeriesRingElem{T}) where T <: RingElement
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError(a, "pol_length(a) + valuation(a) must be >= 1"))
-   return parent(a)(Array{T}(undef, 0), 0, val, val)
+   return parent(a)(Vector{T}(undef, 0), 0, val, val)
 end
 
 parent(a::SeriesElem) = a.parent
@@ -35,7 +35,7 @@ end
 
 is_exact_type(a::Type{T}) where T <: SeriesElem = false
 
-@doc Markdown.doc"""
+@doc raw"""
     var(a::SeriesRing)
 
 Return the internal name of the generator of the power series ring. Note that
@@ -64,7 +64,7 @@ function Base.hash(a::RelPowerSeriesRingElem, h::UInt)
    return b
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     pol_length(a::RelPowerSeriesRingElem)
 
 Return the length of the polynomial underlying the given power series. This
@@ -72,7 +72,7 @@ will be zero if the power series has no nonzero terms.
 """
 pol_length(a::RelPowerSeriesRingElem) = a.length
 
-@doc Markdown.doc"""
+@doc raw"""
     precision(a::RelPowerSeriesRingElem)
 
 Return the precision of the given power series in absolute terms. This will
@@ -80,7 +80,7 @@ be the sum of the valuation and the length of the underlying polynomial.
 """
 precision(a::RelPowerSeriesRingElem) = a.prec
 
-@doc Markdown.doc"""
+@doc raw"""
     valuation(a::RelPowerSeriesRingElem)
 
 Return the valuation of the given power series, i.e. the degree of the first
@@ -88,7 +88,7 @@ nonzero term (or the precision if it is arithmetically zero).
 """
 valuation(a::RelPowerSeriesRingElem) = a.val
 
-@doc Markdown.doc"""
+@doc raw"""
     max_precision(R::SeriesRing)
 
 Return the maximum relative precision of power series in the given power
@@ -129,7 +129,7 @@ function isone(a::RelPowerSeriesRingElem)
    return valuation(a) == 0 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::RelPowerSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to the
@@ -142,7 +142,7 @@ end
 
 is_unit(a::RelPowerSeriesRingElem) = valuation(a) == 0 && is_unit(polcoeff(a, 0))
 
-@doc Markdown.doc"""
+@doc raw"""
     modulus(a::SeriesElem{T}) where {T <: ResElem}
 
 Return the modulus of the coefficients of the given power series.
@@ -178,25 +178,21 @@ end
 ###############################################################################
 
 function similar(x::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
-                                   s::Symbol; cached::Bool=true)
+                                   s::VarName=var(parent(x)); cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.RelSeries{TT}(V, 0, max_prec, max_prec)
    # Default similar is supposed to return a Generic series
-   if base_ring(x) === R && s == var(parent(x)) &&
-            typeof(x) === Generic.RelSeries{TT} &&
+   if base_ring(x) === R && Symbol(s) == var(parent(x)) &&
+            x isa Generic.RelSeries{TT} &&
             max_precision(parent(x)) == max_prec
        # steal parent in case it is not cached
        p.parent = parent(x)
    else
-       p.parent = Generic.RelPowerSeriesRing{TT}(R, max_prec, s, cached)
+       p.parent = Generic.RelPowerSeriesRing{TT}(R, max_prec, Symbol(s), cached)
    end
    return p
 end
-
-similar(x::RelPowerSeriesRingElem, R::Ring, max_prec::Int,
-                                   var::VarName=var(parent(x)); cached::Bool=true) =
-   similar(x, R, max_prec, Symbol(var); cached)
 
 similar(x::RelPowerSeriesRingElem, R::Ring,
                                    var::VarName=var(parent(x)); cached::Bool=true) =
@@ -227,7 +223,7 @@ zero(a::RelPowerSeriesRingElem, max_prec::Int,
    similar(a, max_prec, Symbol(var); cached)
 
 
-zero(a::RelPowerSeriesRingElem,     var::Symbol=var(parent(a)); cached::Bool=true) =
+zero(a::RelPowerSeriesRingElem, var::VarName=var(parent(a)); cached::Bool=true) =
    similar(a, Symbol(var); cached)
 
 ###############################################################################
@@ -279,11 +275,23 @@ end
 
 @enable_all_show_via_expressify SeriesElem
 
-function show(io::IO, a::SeriesRing)
-   print(io, "Univariate power series ring in ", var(a), " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+function show(io::IO, ::MIME"text/plain", a::SeriesRing)
+  print(io, "Univariate power series ring in ", var(a), " with precision ", a.prec_max)
+  println(io)
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), base_ring(a))
+  print(io, Dedent())
 end
 
+function show(io::IO, a::SeriesRing)
+  if get(io, :supercompact, false)
+    print(io, "Univariate power series ring")
+  else
+    io = pretty(io)
+    print(io, "Univariate power series ring over " )
+    print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+  end
+end
 ###############################################################################
 #
 #   Unary operators
@@ -427,11 +435,11 @@ function *(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}) where T <
    lena = min(lena, prec)
    lenb = min(lenb, prec)
    if lena == 0 || lenb == 0
-      return parent(a)(Array{T}(undef, 0), 0, prec + zval, zval)
+      return parent(a)(Vector{T}(undef, 0), 0, prec + zval, zval)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, prec)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = polcoeff(a, i - 1)*polcoeff(b, 0)
    end
@@ -498,7 +506,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     shift_left(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
@@ -523,7 +531,7 @@ function shift_left(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     shift_right(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted right by $n$ terms, i.e. divided by
@@ -557,7 +565,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     truncate(a::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return $a$ truncated to (absolute) precision $n$.
@@ -597,7 +605,7 @@ function mullow(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}, n::I
    prec = min(precision(a), precision(b))
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, n)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -625,7 +633,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ^(a::RelPowerSeriesRingElem{T}, b::Int) where T <: RingElement
 
 Return $a^b$. We require $b \geq 0$.
@@ -688,7 +696,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
@@ -723,7 +731,7 @@ function ==(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}) where T 
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
@@ -752,7 +760,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::RelPowerSeriesRingElem{T}, y::T) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -761,14 +769,14 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::T, y::RelPowerSeriesRingElem{T}) where {T <: RingElem}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::T, y::RelPowerSeriesRingElem{T}) where {T <: RingElem} = y == x
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::RelPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat})
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -777,7 +785,7 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::RelPowerSeriesRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -897,7 +905,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.inv(a::RelPowerSeriesRingElem)
 
 Return the inverse of the power series $a$, i.e. $1/a$.
@@ -963,7 +971,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     compose(a::RelPowerSeriesRingElem, b::RelPowerSeriesRingElem)
 
 Compose the series $a$ with the series $b$ and return the result,
@@ -1106,7 +1114,7 @@ function sqrt_classical(a::RelPowerSeriesRingElem; check::Bool=true)
    return true, asqrt
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrt(a::RelPowerSeriesRingElem)
 
 Return the square root of the power series $a$. By default the function raises
@@ -1136,7 +1144,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     derivative(f::RelPowerSeriesRingElem{T})
 
 Return the derivative of the power series $f$.
@@ -1173,7 +1181,7 @@ function derivative(f::RelPowerSeriesRingElem{T}) where T <: RingElement
    return g
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     integral(f::RelPowerSeriesRingElem{T})
 
 Return the integral of the power series $f$.
@@ -1212,7 +1220,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     log(a::SeriesElem{T}) where T <: FieldElement
 
 Return the logarithm of the power series $a$.
@@ -1230,7 +1238,7 @@ function Base.log(a::SeriesElem{T}) where T <: FieldElement
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exp(a::RelPowerSeriesRingElem)
 
 Return the exponential of the power series $a$.
@@ -1314,7 +1322,7 @@ end
 function _make_parent(g, p::RelPowerSeriesRingElem, cached::Bool)
    R = parent(g(zero(base_ring(p))))
    S = parent(p)
-   sym = String(var(S))
+   sym = var(S)
    max_prec = max_precision(S)
    return power_series_ring(R, max_prec, sym; cached=cached)[1]
 end
@@ -1343,8 +1351,7 @@ end
 ################################################################################
 
 function _change_rel_series_ring(R, Rx, cached)
-   P, _ = power_series_ring(R, max_precision(Rx),
-                                               string(var(Rx)), cached = cached)
+   P, _ = power_series_ring(R, max_precision(Rx), var(Rx), cached = cached)
    return P
 end
 
@@ -1394,8 +1401,8 @@ rand(S::SeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val_range, v..
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    power_series_ring(R::Ring, prec::Int, s::VarName; cached=true, model=:capped_relative)
+@doc raw"""
+    power_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true, model=:capped_relative)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a power series
 ring over the given base ring and a generator `x` for the power series ring.
@@ -1408,7 +1415,7 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-power_series_ring(R::Ring, prec::Int, s::VarName; cached=true, model=:capped_relative) =
+power_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true, model=:capped_relative) =
    Generic.power_series_ring(R, prec, Symbol(s); cached, model)
 
 function AbsPowerSeriesRing(R::Ring, prec::Int)

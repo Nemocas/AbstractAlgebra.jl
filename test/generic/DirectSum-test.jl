@@ -24,8 +24,12 @@ using Random
    F = FreeModule(QQ,2)
    D, inj, pro = direct_sum(F, F)
    f = D([gen(F, 1), gen(F,2)])
+   @test gen(D, 1) == D[1]
    @test isa(f, Generic.DirectSumModuleElem)
    @test f == inj[1](gen(F,1)) + inj[2](gen(F, 2))
+
+   @test_throws ArgumentError gen(D, 0)
+   @test_throws ArgumentError gen(D, ngens(D) + 1)
 end
 
 @testset "Generic.DirectSum.basic_manipulation" begin

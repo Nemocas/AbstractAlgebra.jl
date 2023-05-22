@@ -109,7 +109,7 @@ elements.
 
 ```julia
 hash(f::RingElement, h::UInt)
-deepcopy_internal(a::RingElement, dict::ObjectIdDict)
+deepcopy_internal(a::RingElement, dict::IdDict)
 show(io::IO, R::NCRing)
 show(io::IO, a::NCRingElement)
 ```

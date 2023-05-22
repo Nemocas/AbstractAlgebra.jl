@@ -193,8 +193,12 @@ end
          @test is_gen(g[i])
          @test !is_gen(g[i] + 1)
          @test gen(S, i) == g[i]
+         @test gen(S, i) == S[i]
          @test var_index(gen(S, i)) == i
       end
+
+      @test_throws ArgumentError gen(S, 0)
+      @test_throws ArgumentError gen(S, num_vars + 1)
 
       nv = rand(1:num_vars)
       f = S(2)
@@ -816,7 +820,7 @@ end
       for iter = 1:10
          num = rand(1:5)
 
-         V = Array{elem_type(S)}(undef, num)
+         V = Vector{elem_type(S)}(undef, num)
 
          for i = 1:num
             V[i] = S(0)

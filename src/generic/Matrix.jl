@@ -14,22 +14,28 @@ parent_type(::Type{S}) where {T <: NCRingElement, S <: Mat{T}} = MatSpace{T}
 
 elem_type(::Type{MatSpace{T}}) where {T <: NCRingElement} = MatSpaceElem{T}
 
-@doc Markdown.doc"""
-    parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: NCRingElement
+@doc raw"""
+    parent(a::AbstractAlgebra.MatElem{T}) where T <: NCRingElement
 
 Return the parent object of the given matrix.
 """
-parent(a::Mat{T}, cached::Bool = true) where T <: NCRingElement =
-    MatSpace{T}(a.base_ring, size(a.entries)..., cached)
+parent(a::Mat{T}) where T <: NCRingElement = MatSpace{T}(a.base_ring, size(a.entries)...)
 
-dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
+@doc raw"""
+    dense_matrix_type(::Type{T}) where T<:NCRingElement
+    dense_matrix_type(::T) where T<:NCRingElement
+    dense_matrix_type(::Type{S}) where S<:NCRing
+    dense_matrix_type(::S) where S<:NCRing
 
-@doc Markdown.doc"""
-    dense_matrix_type(R::Ring)
-    
-Return the type of matrices over the given ring.
+Return the type of matrices with coefficients of type `T` respectively
+`elem_type(S)`.
 """
-dense_matrix_type(R::NCRing) = dense_matrix_type(elem_type(R))
+dense_matrix_type(::T) where T <: NCRing = dense_matrix_type(elem_type(T))
+dense_matrix_type(::T) where T <: NCRingElement = dense_matrix_type(T)
+dense_matrix_type(::Type{T}) where T <: NCRing = dense_matrix_type(elem_type(T))
+
+# default: MatSpaceElem
+dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 
 ###############################################################################
 #
@@ -37,14 +43,14 @@ dense_matrix_type(R::NCRing) = dense_matrix_type(elem_type(R))
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     nrows(a::MatSpace)
 
 Return the number of rows of the given matrix space.
 """
 nrows(a::MatSpace) = a.nrows
 
-@doc Markdown.doc"""
+@doc raw"""
     ncols(a::MatSpace)
 
 Return the number of columns of the given matrix space.
@@ -84,14 +90,14 @@ function deepcopy_internal(d::MatSpaceElem{T}, dict::IdDict) where T <: NCRingEl
    z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
-         z[i, j] = deepcopy(d[i, j])
+         z[i, j] = deepcopy_internal(d[i, j], dict)
       end
    end
    return z
 end
 
 function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: NCRingElement
-   return MatSpaceView(deepcopy(d.entries), d.base_ring)
+   return MatSpaceView(deepcopy_internal(d.entries, dict), d.base_ring)
 end
 
 ###############################################################################
@@ -130,9 +136,7 @@ is_square(a::MatElem) = (nrows(a) == ncols(a))
 ###############################################################################
 
 function transpose(x::Mat{T}) where T <: NCRingElement
-   y = MatSpaceElem{eltype(x)}(permutedims(x.entries))
-   y.base_ring = x.base_ring
-   y
+   MatSpaceElem{eltype(x)}(base_ring(x), permutedims(x.entries))
 end
 
 ###############################################################################
@@ -155,20 +159,19 @@ end
 
 function (a::MatSpace{T})() where {T <: NCRingElement}
    R = base_ring(a)
-   entries = Array{T}(undef, a.nrows, a.ncols)
+   entries = Matrix{T}(undef, a.nrows, a.ncols)
    for i = 1:a.nrows
       for j = 1:a.ncols
          entries[i, j] = zero(R)
       end
    end
-   z = MatSpaceElem{T}(entries)
-   z.base_ring = R
+   z = MatSpaceElem{T}(R, entries)
    return z
 end
 
 function (a::MatSpace{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
-   entries = Array{T}(undef, a.nrows, a.ncols)
+   entries = Matrix{T}(undef, a.nrows, a.ncols)
    rb = R(b)
    for i = 1:a.nrows
       for j = 1:a.ncols
@@ -179,8 +182,7 @@ function (a::MatSpace{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
          end
       end
    end
-   z = MatSpaceElem{T}(entries)
-   z.base_ring = R
+   z = MatSpaceElem{T}(R, entries)
    return z
 end
 
@@ -190,22 +192,20 @@ function (a::MatSpace{T})(b::Matrix{T}) where T <: NCRingElement
    if !isempty(b)
       R != parent(b[1, 1]) && error("Unable to coerce matrix")
    end
-   z = MatSpaceElem{T}(b)
-   z.base_ring = R
+   z = MatSpaceElem{T}(R, b)
    return z
 end
 
 function (a::MatSpace{T})(b::AbstractMatrix{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
-   entries = Array{T}(undef, a.nrows, a.ncols)
+   entries = Matrix{T}(undef, a.nrows, a.ncols)
    for i = 1:a.nrows
       for j = 1:a.ncols
          entries[i, j] = R(b[i, j])
       end
    end
-   z = MatSpaceElem{T}(entries)
-   z.base_ring = R
+   z = MatSpaceElem{T}(R, entries)
    return z
 end
 
@@ -223,6 +223,8 @@ end
 ###############################################################################
 
 function matrix_space(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
+   # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
+   # (and perhaps future compatibility, in case we need it again)
    T = elem_type(R)
-   return MatSpace{T}(R, r, c, cached)
+   return MatSpace{T}(R, r, c)
 end

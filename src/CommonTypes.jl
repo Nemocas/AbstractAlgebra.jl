@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     CycleDec{T}(ccycles, cptrs, n) where T
 
 Cycle decomposition of a permutation.
@@ -18,7 +18,7 @@ struct CycleDec{T<:Integer}
    n::T
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     Perm{T<:Integer}
    
 The type of permutations.
@@ -39,7 +39,7 @@ There are two inner constructors of `Perm`:
   represented by `v`. By default `Perm` constructor checks if the vector
   constitutes a valid permutation. To skip the check call `Perm(v, false)`.
    
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> Perm([1,2,3])
 ()

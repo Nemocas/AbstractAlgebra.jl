@@ -80,16 +80,21 @@ Here is some code which constructs a polynomial ring over the integers, a
 polynomial in that ring and then does some introspection to illustrate the
 various relations between the objects and types.
 
-```julia
-using AbstractAlgebra
+```jldoctest
+julia> using AbstractAlgebra
 
-R, x = ZZ["x"]
+julia> R, x = ZZ["x"]
+(Univariate polynomial ring in x over integers, x)
 
-f = x^2 + 3x + 1
+julia> f = x^2 + 3x + 1
+x^2 + 3*x + 1
 
-typeof(R) <: PolyRing
+julia> R isa PolyRing
+true
 
-typeof(f) <: PolyRingElem
+julia> f isa PolyRingElem
+true
 
-parent(f) == R
+julia> parent(f) == R
+true
 ```

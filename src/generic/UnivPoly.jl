@@ -250,24 +250,20 @@ total_degree(p::UnivPoly) = total_degree(p.p)
 
 length(p::UnivPoly) = length(p.p)
 
-function gen(S::UniversalPolyRing{T, U}, s::Symbol) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
-   i = findfirst(x->x==s, S.S)
-   if typeof(i) == Nothing
-      push!(S.S, s)
-      S.mpoly_ring = polynomial_ring(base_ring(S), S.S; cached=true, ordering=S.ord)[1]
+function gen(S::UniversalPolyRing{T, U}, s::VarName) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
+   i = findfirst(==(Symbol(s)), S.S)
+   if i === nothing
+      push!(S.S, Symbol(s))
+      S.mpoly_ring = MPolyRing{T}(S.base_ring, S.S, S.ord, false)
       i = length(S.S)
    end
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
 end
 
-gen(S::UniversalPolyRing, s::AbstractAlgebra.VarNameNonSymbol) = gen(S, Symbol(s))
-
-gens(S::UniversalPolyRing, v::Vector{Symbol}) = tuple([gen(S, s) for s in v]...)
-
-gens(S::UniversalPolyRing, v::Vector{T}) where T <: AbstractAlgebra.VarNameNonSymbol = gens(S, [Symbol(s) for s in v])
+gens(S::UniversalPolyRing, v::Vector{<:VarName}) = tuple([gen(S, s) for s in v]...)
 
 function gen(S::UniversalPolyRing{T, U}, i::Int) where {T, U}
-   i > nvars(S) && error("Variable index out of range")
+   @boundscheck 1 <= i <= nvars(S) || throw(ArgumentError("generator index out of range"))
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
 end
 
@@ -303,7 +299,7 @@ function Base.hash(p::UnivPoly, h::UInt)
 end
 
 function deepcopy_internal(p::UnivPoly{T, U}, dict::IdDict) where {T, U}
-   return UnivPoly{T, U}(deepcopy(p.p), p.parent)
+   return UnivPoly{T, U}(deepcopy_internal(p.p, dict), p.parent)
 end
 
 ###############################################################################
@@ -907,7 +903,7 @@ end
 #
 ################################################################################
 
-function _change_univ_poly_ring(R, Rx, cached)
+function _change_univ_poly_ring(R, Rx, cached::Bool)
    P, _ = AbstractAlgebra.polynomial_ring(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
    S = AbstractAlgebra.UniversalPolynomialRing(R; ordering=ordering(Rx), cached=cached)
    S.S = deepcopy(symbols(Rx))
@@ -915,12 +911,12 @@ function _change_univ_poly_ring(R, Rx, cached)
    return S
 end
 
-function change_base_ring(R::Ring, p::UnivPoly{T, U}; cached = true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement, U}
+function change_base_ring(R::Ring, p::UnivPoly{T, U}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement, U}
    base_ring(parent) != R && error("Base rings do not match.")
    return _map(R, p, parent)
 end
 
-function change_coefficient_ring(R::Ring, p::UnivPoly{T, U}; cached = true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement, U}
+function change_coefficient_ring(R::Ring, p::UnivPoly{T, U}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement, U}
   return change_base_ring(R, p, cached = cached, parent = parent)
 end
 
@@ -930,7 +926,7 @@ end
 #
 ################################################################################
 
-function map_coefficients(f, p::UnivPoly; cached = true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(base_ring(p)))), parent(p), cached))
+function map_coefficients(f, p::UnivPoly; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(base_ring(p)))), parent(p), cached))
    return _map(f, p, parent)
 end
 
@@ -1124,7 +1120,7 @@ end
 #
 ###############################################################################
 
-function UniversalPolynomialRing(R::Ring; ordering=:lex, cached=true)
+function UniversalPolynomialRing(R::Ring; ordering=:lex, cached::Bool=true)
    T = elem_type(R)
    U = Generic.MPoly{T}
 

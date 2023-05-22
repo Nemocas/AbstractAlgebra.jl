@@ -58,9 +58,9 @@ end
 coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 function deepcopy_internal(a::Poly{T}, dict::IdDict) where T <: RingElement
-   coeffs = Array{T}(undef, length(a))
+   coeffs = Vector{T}(undef, length(a))
    for i = 1:length(a)
-      coeffs[i] = deepcopy(a.coeffs[i])
+      coeffs[i] = deepcopy_internal(a.coeffs[i], dict)
    end
    return parent(a)(coeffs)
 end
@@ -119,7 +119,7 @@ function use_karamul(a::Poly{GFElem{BigInt}}, b::Poly{GFElem{BigInt}})
    return minlen^2*bits > 2000
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where T <: RingElement
 
 Return $a \times b$ using the Karatsuba algorithm recursively for problems of
@@ -138,7 +138,7 @@ function mul_karatsuba(a::Poly{T}, b::Poly{T}, cutoff::Int) where T <: RingEleme
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     mullow_karatsuba(a::Poly{T}, b::Poly{T}, n::Int, cutoff::Int) where T <: RingElement
 
 Return $a \times b$ truncated to $n$ terms using the Karatsuba algorithm
@@ -377,7 +377,7 @@ end
 function (a::PolyRing{T})(b::Vector{S}) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    len = length(b)
-   entries = Array{T}(undef, len)
+   entries = Vector{T}(undef, len)
    for i = 1:length(b)
       entries[i] = R(b[i])
    end

@@ -72,7 +72,11 @@ end
    G = gens(N)
    for i = 1:ngens(N)
       @test gen(N, i) == G[i]
+      @test gen(N, i) == N[i]
    end
+
+   @test_throws ArgumentError gen(N, 0)
+   @test_throws ArgumentError gen(N, ngens(N) + 1)
 
    @test supermodule(N) == M
 

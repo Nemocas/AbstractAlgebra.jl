@@ -32,14 +32,34 @@ end
 
 @enable_all_show_via_expressify LaurentMPolyRingElem
 
-function expressify(a::LaurentMPolyRing; context = nothing)
-    return Expr(:sequence, Expr(:text, "Multivariate Laurent Polynomial Ring in "),
-                           Expr(:series, symbols(a)...),
-                           Expr(:text, " over "),
-                           expressify(base_ring(a); context = context))
+function show(io::IO, ::MIME"text/plain", p::LaurentMPolyRing)
+  max_vars = 5 # largest number of variables to print
+  n = nvars(p)
+  print(io, "Multivariate Laurent polynomial ring")
+  print(io, "in ", ItemQuantity(nvars(p), "variable"), " ")
+  if n > max_vars
+    join(io, symbols(p)[1:max_vars - 1], ", ")
+    println(io, "..., ", symbols(p)[n])
+  else
+    join(io, symbols(p), ", ")
+    println(io)
+  end
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), base_ring(p))
+  print(io, Dedent())
 end
 
-@enable_all_show_via_expressify LaurentMPolyRing
+function show(io::IO, p::LaurentMPolyRing)
+  if get(io, :supercompact, false)
+    # no nested printing
+    print(io, "Multivariate Laurent polynomial ring")
+  else
+    # nested printing allowed, preferably supercompact
+    io = pretty(io)
+    print(io, "Multivariate Laurent polynomial ring in ", ItemQuantity(nvars(p), "variable"))
+    print(IOContext(io, :supercompact => true), " over ", Lowercase(), base_ring(p))
+  end
+end
 
 ###############################################################################
 #
@@ -122,7 +142,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{T}; cached::Bool = true) where T <: VarName
 
 Given a base ring `R` and an array of strings `s` specifying how the

@@ -40,14 +40,14 @@ end
 nrows(a::MatAlgebra) = a.n
 ncols(a::MatAlgebra) = nrows(a)
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(a::MatAlgebra)
 
 Return the degree $n$ of the given matrix algebra.
 """
 degree(a::MatAlgebra) = nrows(a)
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(a::MatAlgElem{T}) where T <: RingElement
 
 Return the degree $n$ of the given matrix algebra.
@@ -83,7 +83,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     similar(x::Generic.MatrixElem, R::NCRing=base_ring(x))
     similar(x::Generic.MatrixElem, R::NCRing, r::Int, c::Int)
     similar(x::Generic.MatrixElem, r::Int, c::Int)
@@ -106,7 +106,7 @@ end
 
 similar(x::MatAlgElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
 
-@doc Markdown.doc"""
+@doc raw"""
     zero(x::MatrixElem, R::NCRing=base_ring(x))
     zero(x::MatrixElem, R::NCRing, r::Int, c::Int)
     zero(x::MatrixElem, r::Int, c::Int)
@@ -139,7 +139,7 @@ function deepcopy_internal(d::MatAlgElem{T}, dict::IdDict) where T <: NCRingElem
    z = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
-         z[i, j] = deepcopy(d[i, j])
+         z[i, j] = deepcopy_internal(d[i, j], dict)
       end
    end
    return z
@@ -159,10 +159,24 @@ is_square(a::MatAlgElem) = true
 #
 ###############################################################################
 
+function show(io::IO, ::MIME"text/plain", a::MatAlgebra)
+  print(io, "Matrix Algebra of")
+  print(io, " degree ", a.n)
+  println(io)
+  io = pretty(io)
+  print(io, Indent(), "over ")
+  print(io, Lowercase(), base_ring(a))
+end
+
 function show(io::IO, a::MatAlgebra)
-   print(io, "Matrix Algebra of degree ")
-   print(io, a.n, " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+   if get(io, :supercompact, false)
+      print(io, "Matrix Algebra")
+   else
+      io = pretty(io)
+      print(io, "Matrix Algebra of ")
+      print(io, "degree ", a.n, " over ")
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+   end
 end
 
 ###############################################################################
@@ -265,7 +279,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gram(x::MatAlgElem)
 
 Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
@@ -399,18 +413,17 @@ randmat_with_rank(S::MatAlgebra{T}, rank::Int, v...) where {T <: RingElement} =
 
 function identity_matrix(M::MatAlgElem{T}, n::Int) where T <: NCRingElement
    R = base_ring(M)
-   arr = Array{T}(undef, n, n)
+   arr = Matrix{T}(undef, n, n)
    for i in 1:n
       for j in 1:n
          arr[i, j] = i == j ? one(R) : zero(R)
       end
    end
-   z = Generic.MatAlgElem{T}(arr)
-   z.base_ring = R
+   z = Generic.MatAlgElem{T}(R, arr)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     identity_matrix(M::MatAlgElem{T}) where T <: RingElement
 
 Return the identity matrix over the same base ring as $M$ and with the
@@ -426,14 +439,12 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    MatrixAlgebra(R::Ring, n::Int, cached::Bool = true)
+@doc raw"""
+    MatrixAlgebra(R::Ring, n::Int)
 
 Return parent object corresponding to the ring of $n\times n$ matrices over
-the ring $R$. If `cached == true` (the default), the returned parent object
-is cached so that it can returned by future calls to the constructor with the
-same degree and base ring.
+the ring $R$.
 """
-function MatrixAlgebra(R::NCRing, n::Int; cached::Bool = true)
-   Generic.MatrixAlgebra(R, n, cached = cached)
+function MatrixAlgebra(R::NCRing, n::Int)
+   Generic.MatrixAlgebra(R, n)
 end

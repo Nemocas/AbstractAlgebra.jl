@@ -32,7 +32,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     symbols(R::MSeriesRing)
 
 Return a vector of symbols, one for each of the variables of the series ring
@@ -48,7 +48,7 @@ end
 
 base_ring(a::MSeriesElem) = base_ring(parent(a))
 
-@doc Markdown.doc"""
+@doc raw"""
     characteristic(a::MSeriesRing)
 
 Return the characteristic of the base ring of the series `a`. If the
@@ -113,10 +113,33 @@ end
 
 @enable_all_show_via_expressify MSeriesElem
 
-function show(io::IO, a::MSeriesRing)
-   v = join([String(s) for s in symbols(a)], ", ")
-   print(io, "Multivariate power series ring in ", v, " over ")
-   print(IOContext(io, :compact => true), base_ring(a))
+function show(io::IO, ::MIME"text/plain", p::MSeriesRing)
+  max_vars = 5 # largest number of variables to print
+  n = nvars(p)
+  print(io, "Multivariate power series ring")
+  print(io, "in ", ItemQuantity(nvars(p), "variable"), " ")
+  if n > max_vars
+    join(io, symbols(p)[1:max_vars - 1], ", ")
+    println(io, "..., ", symbols(p)[n])
+  else
+    join(io, symbols(p), ", ")
+    println(io)
+  end
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), base_ring(p))
+  print(io, Dedent())
+end
+
+function show(io::IO, p::MSeriesRing)
+  if get(io, :supercompact, false)
+    # no nested printing
+    print(io, "Multivariate power series ring")
+  else
+    # nested printing allowed, preferably supercompact
+    io = pretty(io)
+    print(io, "Multivariate power series ring in ", ItemQuantity(nvars(p), "variable"))
+    print(IOContext(io, :supercompact => true), " over ", Lowercase(), base_ring(p))
+  end
 end
 
 ###############################################################################
@@ -177,7 +200,7 @@ function rand(rng::AbstractRNG, S::MSeriesRing,
    rand(rng, make(S, term_range, v...))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rand(S::MSeriesRing, term_range, v...)
 
 Return a random element of the series ring $S$ with number of terms in the
@@ -197,34 +220,34 @@ end
 ###############################################################################
 
 function power_series_ring(R::Ring, weights::Vector{Int}, prec::Int,
-      s::Vector{Symbol}; cached=true, model=:capped_absolute)
+      s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
    return Generic.power_series_ring(R, weights, prec, s; cached=cached, model=model)
 end
 
 function power_series_ring(R::Ring, prec::Vector{Int},
-      s::Vector{Symbol}; cached=true, model=:capped_absolute)
+      s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
    return Generic.power_series_ring(R, prec, s; cached=cached, model=model)
 end
 
 function power_series_ring(R::Ring, prec::Vector{Int},
-      s::AbstractVector{<:VarName}; cached=true, model=:capped_absolute)
+      s::AbstractVector{<:VarName}; cached::Bool=true, model=:capped_absolute)
    sym = [Symbol(v) for v in s]
    return power_series_ring(R, prec, sym; cached=cached, model=model)
 end
 
 function power_series_ring(R::Ring, weights::Vector{Int}, prec::Int,
-   s::AbstractVector{<:VarName}; cached=true, model=:capped_absolute)
+   s::AbstractVector{<:VarName}; cached::Bool=true, model=:capped_absolute)
    sym = [Symbol(v) for v in s]
    return power_series_ring(R, weights, prec, sym; cached=cached, model=model)
 end
 
 function power_series_ring(R::Ring, prec::Int,
-      s::Vector{Symbol}; cached=true, model=:capped_absolute)
+      s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
    return Generic.power_series_ring(R, prec, s; cached=cached, model=model)
 end
 
 function power_series_ring(R::Ring, prec::Int,
-      s::AbstractVector{<:VarName}; cached=true, model=:capped_absolute)
+      s::AbstractVector{<:VarName}; cached::Bool=true, model=:capped_absolute)
    sym = [Symbol(v) for v in s]
    return power_series_ring(R, prec, sym; cached=cached, model=model)
 end

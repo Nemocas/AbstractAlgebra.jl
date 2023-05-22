@@ -30,7 +30,7 @@ function is_exact_type(a::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}
    return is_exact_type(S)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     var(a::PolyRing)
 
 Return the internal name of the generator of the polynomial ring. Note that
@@ -38,7 +38,7 @@ this is returned as a `Symbol` not a `String`.
 """
 var(a::PolyRing) = a.S
 
-@doc Markdown.doc"""
+@doc raw"""
     symbols(a::PolyRing)
 
 Return an array of the variable names for the polynomial ring. Note that
@@ -46,7 +46,7 @@ this is returned as an array of `Symbol` not `String`.
 """
 symbols(a::PolyRing) = [a.S]
 
-@doc Markdown.doc"""
+@doc raw"""
     nvars(a::PolyRing)
 
 Return the number of variables of the polynomial ring, which is 1.
@@ -76,7 +76,7 @@ function Base.hash(a::PolyRingElem, h::UInt)
    return b
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     length(a::PolynomialElem)
 
 Return the length of the polynomial. The length of a univariate polynomial is
@@ -87,7 +87,7 @@ additionally for nonzero polynomials the length is one more than the degree.
 """
 length(a::PolynomialElem) = a.length
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(a::PolynomialElem)
 
 Return the degree of the given polynomial. This is defined to be one less
@@ -96,7 +96,7 @@ than the length, even for constant polynomials.
 degree(a::PolynomialElem) = length(a) - 1
 
 
-@doc Markdown.doc"""
+@doc raw"""
     is_constant(a::PolynomialElem)
 
 Return `true` if `a` is a degree zero polynomial or the zero polynomial, i.e.
@@ -106,14 +106,14 @@ function is_constant(a::PolynomialElem)
    return length(a) <= 1
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modulus(a::PolyRingElem{T}) where {T <: ResElem}
 
 Return the modulus of the coefficients of the given polynomial.
 """
 modulus(a::PolyRingElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
-@doc Markdown.doc"""
+@doc raw"""
     leading_coefficient(a::PolynomialElem)
 
 Return the leading coefficient of the given polynomial. This will be the
@@ -124,7 +124,7 @@ function leading_coefficient(a::PolynomialElem)
    return length(a) == 0 ? zero(base_ring(a)) : coeff(a, length(a) - 1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     trailing_coefficient(a::PolynomialElem)
 
 Return the trailing coefficient of the given polynomial. This will be the
@@ -145,7 +145,7 @@ function trailing_coefficient(a::PolynomialElem)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     constant_coefficient(a::PolynomialElem)
 
 Return the constant coefficient of the given polynomial. If the polynomial is
@@ -158,7 +158,7 @@ function constant_coefficient(a::PolynomialElem)
    return coeff(a, 0)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     tail(a::PolynomialElem)
 
 Return the tail of the given polynomial, i.e. the polynomial without its
@@ -168,7 +168,7 @@ function tail(a::PolynomialElem)
    return iszero(a) ? zero(parent(a)) : truncate(a, length(a) - 1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     set_coefficient!(c::PolynomialElem{T}, n::Int, a::T) where T <: RingElement
     set_coefficient!(c::PolynomialElem{T}, n::Int, a::U) where {T <: RingElement, U <: Integer}
 
@@ -186,23 +186,23 @@ function set_coefficient!(c::PolynomialElem{T}, n::Int, a::T) where T <: Integer
    return setcoeff!(c, n, a) # merely acts as generic fallback
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     zero(R::PolyRing)
 
 Return the zero polynomial in the given polynomial ring.
 """
-zero(R::PolyRing) = R(0)
+zero(R::PolyRing) = R(zero(base_ring(R)))
 
-one(R::PolyRing) = R(1)
+one(R::PolyRing) = R(one(base_ring(R)))
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(R::PolyRing)
 
 Return the generator of the given polynomial ring.
 """
 gen(R::PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
-@doc Markdown.doc"""
+@doc raw"""
     gens(R::PolyRing)
 
 Return an array containing the generator of the given polynomial ring.
@@ -213,7 +213,7 @@ iszero(a::PolynomialElem) = length(a) == 0
 
 isone(a::PolynomialElem) = length(a) == 1 && isone(coeff(a, 0))
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::PolynomialElem)
 
 Return `true` if the given polynomial is the constant generator of its
@@ -223,7 +223,7 @@ function is_gen(a::PolynomialElem)
     return length(a) <= 2 && isone(coeff(a, 1)) && iszero(coeff(a, 0))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_monic(a::PolynomialElem)
 
 Return `true` if the given polynomial is monic, i.e. has leading coefficient
@@ -258,7 +258,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_term(a::PolynomialElem)
 
 Return `true` if the given polynomial has one term.
@@ -277,7 +277,7 @@ end
 
 is_term_recursive(a::T) where T <: RingElement = true
 
-@doc Markdown.doc"""
+@doc raw"""
     is_term_recursive(a::PolynomialElem)
 
 Return `true` if the given polynomial has one term. This function is
@@ -295,7 +295,7 @@ function is_term_recursive(a::PolynomialElem)
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_monomial(a::PolynomialElem)
 
 Return `true` if the given polynomial is a monomial.
@@ -314,7 +314,7 @@ end
 
 is_monomial_recursive(a::T) where T <: RingElement = isone(a)
 
-@doc Markdown.doc"""
+@doc raw"""
     is_monomial_recursive(a::PolynomialElem)
 
 Return `true` if the given polynomial is a monomial. This function is
@@ -338,23 +338,20 @@ end
 #
 ###############################################################################
 
-function similar(x::PolyRingElem, R::Ring, s::Symbol; cached::Bool=true)
+function similar(x::PolyRingElem, R::Ring, s::VarName=var(parent(x)); cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
    p = Generic.Poly{TT}(V)
    # Default similar is supposed to return a polynomial
-   if base_ring(x) === R && s == var(parent(x)) && typeof(x) === Generic.Poly{TT}
+   if base_ring(x) === R && Symbol(s) == var(parent(x)) && x isa Generic.Poly{TT}
       # steal parent in case it is not cached
       p.parent = parent(x)
    else
-      p.parent = Generic.PolyRing{TT}(R, s, cached)
+      p.parent = Generic.PolyRing{TT}(R, Symbol(s), cached)
    end
    p = set_length!(p, 0)
    return p
 end
-
-similar(x::PolyRingElem, R::Ring, var::VarName=var(parent(x)); cached::Bool=true) =
-   similar(x, R, Symbol(var); cached)
 
 similar(x::PolyRingElem, var::VarName=var(parent(x)); cached::Bool=true) =
    similar(x, base_ring(x), Symbol(var); cached)
@@ -386,7 +383,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     exponent_vectors(a::AbstractAlgebra.PolyRingElem)
 
 Return an iterator for the exponent vectors of the given polynomial. The
@@ -486,10 +483,13 @@ end
 @enable_all_show_via_expressify Union{PolynomialElem, NCPolyRingElem}
 
 function show(io::IO, p::PolyRing)
-   print(io, "Univariate Polynomial Ring in ")
-   print(io, string(var(p)))
-   print(io, " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+   if get(io, :supercompact, false)
+      print(io, "Univariate polynomial ring")
+   else
+      io = pretty(io)
+      print(io, "Univariate polynomial ring in ", var(p), " over ")
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+   end
 end
 
 ###############################################################################
@@ -563,7 +563,7 @@ function -(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     mul_karatsuba(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
 
 Return $a \times b$ using the Karatsuba algorithm.
@@ -649,7 +649,7 @@ function mul_ks(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: PolyRingElem
    end
    m = maxa + maxb - 1
    z = base_ring(base_ring(a))()
-   A1 = Array{elem_type(base_ring(base_ring(a)))}(undef, m*lena)
+   A1 = Vector{elem_type(base_ring(base_ring(a)))}(undef, m*lena)
    for i = 1:lena
       c = coeff(a, i - 1)
       for j = 1:length(c)
@@ -661,7 +661,7 @@ function mul_ks(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: PolyRingElem
    end
    ksa = base_ring(a)(A1)
    if a !== b
-      A2 = Array{elem_type(base_ring(base_ring(a)))}(undef, m*lenb)
+      A2 = Vector{elem_type(base_ring(base_ring(a)))}(undef, m*lenb)
       for i = 1:lenb
          c = coeff(b, i - 1)
          for j = 1:length(c)
@@ -700,7 +700,7 @@ function mul_classical(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingEl
    R = base_ring(a)
    t = R()
    lenz = lena + lenb - 1
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:lena
       d[i] = mul_red!(R(), coeff(a, i - 1), coeff(b, 0), false)
    end
@@ -777,7 +777,7 @@ function pow_multinomial(a::PolyRingElem{T}, e::Int) where T <: RingElement
    e < 0 && throw(DomainError(e, "exponent must be >= 0"))
    lena = length(a)
    lenz = (lena - 1) * e + 1
-   res = Array{T}(undef, lenz)
+   res = Vector{T}(undef, lenz)
    for k = 1:lenz
       res[k] = base_ring(a)()
    end
@@ -798,7 +798,7 @@ function pow_multinomial(a::PolyRingElem{T}, e::Int) where T <: RingElement
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ^(a::PolyRingElem{T}, b::Int) where T <: RingElement
 
 Return $a^b$. We require $b \geq 0$.
@@ -858,7 +858,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
@@ -880,7 +880,7 @@ function ==(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
 
 Return `true` if $x == y$ exactly, otherwise return `false`. This function is
@@ -909,7 +909,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::PolyRingElem{T}, y::T) where {T <: RingElem}
 
 Return `true` if $x == y$.
@@ -917,7 +917,7 @@ Return `true` if $x == y$.
 ==(x::PolyRingElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat})
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -925,14 +925,14 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 ==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat}) = ((length(x) == 0 && iszero(base_ring(x)(y)))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::T, y::PolyRingElem{T}) where T <: RingElem = y == x
 
 Return `true` if $x = y$.
 """
 ==(x::T, y::PolyRingElem{T}) where T <: RingElem = y == x
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::PolyRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
@@ -984,7 +984,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     truncate(a::PolynomialElem, n::Int)
 
 Return $a$ truncated to $n$ terms, i.e. the remainder upon division by $x^n$.
@@ -1004,7 +1004,7 @@ function truncate(a::PolynomialElem, n::Int)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     mullow(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where T <: RingElement
 
 Return $a\times b$ truncated to $n$ terms.
@@ -1022,7 +1022,7 @@ function mullow(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where T <: RingE
    R = base_ring(a)
    t = R()
    lenz = min(lena + lenb - 1, n)
-   d = Array{T}(undef, lenz)
+   d = Vector{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = mul_red!(R(), coeff(a, i - 1), coeff(b, 0), false)
    end
@@ -1134,7 +1134,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     reverse(x::PolynomialElem, len::Int)
 
 Return the reverse of the polynomial $x$, thought of as a polynomial of
@@ -1154,7 +1154,7 @@ function reverse(x::PolynomialElem, len::Int)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     reverse(x::PolynomialElem)
 
 Return the reverse of the polynomial $x$, i.e. the leading coefficient
@@ -1171,7 +1171,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     shift_left(f::PolynomialElem, n::Int)
 
 Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
@@ -1194,7 +1194,7 @@ function shift_left(f::PolynomialElem, n::Int)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     shift_right(f::PolynomialElem, n::Int)
 
 Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by
@@ -1223,7 +1223,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     deflation(p::PolyRingElem)
 
 Return a tuple `(shift, defl)` where `shift` is the exponent of the trailing
@@ -1253,7 +1253,7 @@ function deflation(p::PolyRingElem)
    return shift, defl
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     inflate(f::PolyRingElem, shift::Int64, n::Int64) -> PolyRingElem
 
 Given a polynomial $f$ in $x$, return $f(x^n)*x^j$, i.e. multiply
@@ -1267,7 +1267,7 @@ function inflate(f::PolyRingElem, j::Int64, n::Int64)
     return y
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     inflate(f::PolyRingElem, n::Int64) -> PolyRingElem
 
 Given a polynomial $f$ in $x$, return $f(x^n)$, i.e. multiply
@@ -1275,7 +1275,7 @@ all exponents by $n$.
 """
 inflate(f::PolyRingElem, n::Int64) = inflate(f, 0, n)
 
-@doc Markdown.doc"""
+@doc raw"""
     deflate(f::PolyRingElem, shift::Int64, n::Int64) -> PolyRingElem
 
 Given a polynomial $g$ in $x^n$ such that `f = g(x)*x^{shift}`, write $f$ as
@@ -1289,7 +1289,7 @@ function deflate(f::PolyRingElem, j::Int64, n::Int64)
     return y
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     deflate(f::PolyRingElem, n::Int64) -> PolyRingElem
 
 Given a polynomial $f$ in $x^n$, write it as a polynomial in $x$, i.e. divide
@@ -1297,7 +1297,7 @@ all exponents by $n$.
 """
 deflate(f::PolyRingElem, n::Int64) = deflate(f, 0, n)
 
-@doc Markdown.doc"""
+@doc raw"""
     deflate(x::PolyRingElem) -> PolyRingElem, Int
 
 Deflate the polynomial $f$ maximally, i.e. find the largest $n$ s.th.
@@ -1384,7 +1384,7 @@ function divexact(f::PolyRingElem{T}, g::PolyRingElem{T}; check::Bool=true) wher
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
-   d = Array{T}(undef, lenq)
+   d = Vector{T}(undef, lenq)
    for i = 1:lenq
       d[i] = zero(base_ring(f))
    end
@@ -1517,7 +1517,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     pseudorem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
 
 Return the pseudoremainder of $f$ divided by $g$. If $g = 0$ we throw a
@@ -1539,7 +1539,7 @@ function pseudorem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElemen
   return f*b^k
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     pseudodivrem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
 
 Return a tuple $(q, r)$ consisting of the pseudoquotient and pseudoremainder
@@ -1585,7 +1585,7 @@ function remove(z::PolyRingElem{T}, p::PolyRingElem{T}) where T <: RingElement
  check_parent(z, p)
  !is_exact_type(T) && error("remove requires an exact ring")
  iszero(z) && error("Not yet implemented")
- (is_unit(p) || iszero(p)) && throw(error("Second argument must be a non-zero non-unit"))
+ (is_unit(p) || iszero(p)) && error("Second argument must be a non-zero non-unit")
  flag, q = divides(z, p)
  if !flag
    return 0, z
@@ -1604,7 +1604,7 @@ function remove(z::PolyRingElem{T}, p::PolyRingElem{T}) where T <: Union{ResElem
  check_parent(z, p)
  !is_exact_type(T) && error("remove requires an exact ring")
  iszero(z) && error("Not yet implemented")
- (is_unit(p) || iszero(p)) && throw(error("Second argument must be a non-zero non-unit"))
+ (is_unit(p) || iszero(p)) && error("Second argument must be a non-zero non-unit")
  q, r = divrem(z, p)
  if !iszero(r)
    return 0, z
@@ -1696,7 +1696,7 @@ function sqrt_classical_char2(f::PolyRingElem{T}; check::Bool=true) where T <: R
       end
    end
    lenq = div(m + 1, 2)
-   d = Array{T}(undef, lenq)
+   d = Vector{T}(undef, lenq)
    for i = 1:lenq
       c = coeff(f, 2*i - 2)
       if check && !is_square(c)
@@ -1726,7 +1726,7 @@ function sqrt_classical(f::PolyRingElem{T}; check::Bool=true) where T <: RingEle
       return false, S()
    end
    lenq = div(m + 1, 2)
-   d = Array{T}(undef, lenq)
+   d = Vector{T}(undef, lenq)
    d[lenq] = sqrt(coeff(f, m - 1))
    b = -2*d[lenq]
    k = 1
@@ -1763,7 +1763,7 @@ function sqrt_classical(f::PolyRingElem{T}; check::Bool=true) where T <: RingEle
    return true, q
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.sqrt(f::PolyRingElem{T}; check::Bool=true) where T <: RingElement
 
 Return the square root of $f$. By default the function checks the input is
@@ -1775,7 +1775,7 @@ function Base.sqrt(f::PolyRingElem{T}; check::Bool=true) where T <: RingElement
    return q
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_square(f::PolyRingElem{T}) where T <: RingElement
 
 Return `true` if $f$ is a perfect square.
@@ -1967,7 +1967,7 @@ function lcm(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
    return a*divexact(b, g)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     content(a::PolyRingElem)
 
 Return the content of $a$, i.e. the greatest common divisor of its
@@ -1981,7 +1981,7 @@ function content(a::PolyRingElem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     primpart(a::PolyRingElem)
 
 Return the primitive part of $a$, i.e. the polynomial divided by its content.
@@ -2144,7 +2144,7 @@ function hgcd_recursive(
    return A, B, Q11, Q12, Q21, Q22, Qs
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hgcd(a::PolyRingElem{T}, b::PolyRingElem{T}) where T
 
 Returns the half-GCD of `a` and `b`, that is, a tuple
@@ -2178,7 +2178,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate(a::PolyRingElem, b::T) where T <: RingElement
 
 Evaluate the polynomial expression $a$ at the value $b$ and return the result.
@@ -2202,7 +2202,7 @@ function evaluate(a::PolyRingElem, b::T) where T <: RingElement
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     compose(a::PolyRingElem, b::PolyRingElem)
 
 Compose the polynomial $a$ with the polynomial $b$ and return the result,
@@ -2232,7 +2232,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     derivative(a::PolynomialElem)
 
 Return the derivative of the polynomial $a$.
@@ -2257,7 +2257,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     integral(x::PolyRingElem{T}) where {T <: Union{ResElem, FieldElement}}
 
 Return the integral of the polynomial $x$.
@@ -2337,7 +2337,7 @@ function subresultant_ducos(A::PolyRingElem{T}, Sd1::PolyRingElem{T}, Se0::PolyR
    return iseven(d1 - e1) ? -r : r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     resultant_ducos(p::PolyRingElem{T}, q::PolyRingElem{T}) where T <: RingElement
 
 Return the resultant of the $p$ and $q$.
@@ -2520,7 +2520,7 @@ function resultant_lehmer(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: Un
    return c1^(lB - 1)*c2^(lA - 1)*s*sgn
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sylvester_matrix(p::PolyRingElem, q::PolyRingElem)
 
 Return the sylvester matrix of the given polynomials.
@@ -2556,7 +2556,7 @@ function resultant_sylvester(p::PolyRingElem{T}, q::PolyRingElem{T}) where T <: 
    return det_df(sylvester_matrix(p, q))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     resultant(p::PolyRingElem{T}, q::PolyRingElem{T}) where T <: RingElement
 
 Return the resultant of the given polynomials.
@@ -2628,7 +2628,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     discriminant(a::PolyRingElem)
 
 Return the discriminant of the given polynomial.
@@ -2651,7 +2651,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     resx(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
 
 Return a tuple $(r, s, t)$ such that $r$ is the resultant of $a$ and $b$ and
@@ -2902,7 +2902,7 @@ function polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T 
     return s
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T <: RingElement -> Vector{T}
 
 Uses Newton (or Newton-Girard) formulas to compute the first $n$
@@ -2937,7 +2937,7 @@ function polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T 
     return P
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     power_sums_to_polynomial(P::Vector{T};
                      parent::AbstractAlgebra.PolyRing{T}=
    AbstractAlgebra.PolyRing(parent(P[1])) where T <: RingElement -> PolyRingElem{T}
@@ -2960,7 +2960,7 @@ function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T})
     r = -integral(s)
     r1 = exp(r)
     @assert iszero(valuation(r1))
-    return Rx([polcoeff(r1, d - i) for i = 0:d])
+    return Rx(T[polcoeff(r1, d - i) for i = 0:d])
 end
 
 function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T}) where T <: RingElement
@@ -2990,7 +2990,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     monomial_to_newton!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
 
 Converts a polynomial $p$, given as an array of coefficients, in-place
@@ -3015,7 +3015,7 @@ function monomial_to_newton!(P::Vector{T}, roots::Vector{T}) where T <: RingElem
    return
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     newton_to_monomial!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
 
 Converts a polynomial $p$, given as an array of coefficients, in-place
@@ -3047,7 +3047,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingElement
 
 Given two arrays of values $xs$ and $ys$ of the same length $n$, find
@@ -3067,7 +3067,7 @@ function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingEle
    end
    R = base_ring(S)
    parent(y[1]) != R && error("Polynomial ring does not match inputs")
-   P = Array{T}(undef, n)
+   P = Vector{T}(undef, n)
    for i = 1:n
       P[i] = deepcopy(y[i])
    end
@@ -3095,7 +3095,7 @@ function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where {T <: ResEle
    end
    R = base_ring(S)
    parent(y[1]) != R && error("Polynomial ring does not match inputs")
-   P = Array{T}(undef, n)
+   P = Vector{T}(undef, n)
    for i = 1:n
       P[i] = deepcopy(y[i])
    end
@@ -3120,11 +3120,11 @@ end
 ################################################################################
 
 function _change_poly_ring(R, Rx, cached)
-   P, _ = polynomial_ring(R, string(var(Rx)), cached = cached)
+   P, _ = polynomial_ring(R, var(Rx), cached = cached)
    return P
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     change_base_ring(R::Ring, p::PolyRingElem{<: RingElement}; parent::PolyRing)
 
 Return the polynomial obtained by coercing the non-zero coefficients of `p`
@@ -3138,7 +3138,7 @@ function change_base_ring(R::Ring, p::PolyRingElem{T}; cached::Bool = true, pare
    return _map(R, p, parent)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     change_coefficient_ring(R::Ring, p::PolyRingElem{<: RingElement}; parent::PolyRing)
 
 Return the polynomial obtained by coercing the non-zero coefficients of `p`
@@ -3162,7 +3162,7 @@ _make_parent(g, p::PolyRingElem, cached::Bool) =
    _change_poly_ring(parent(g(zero(base_ring(p)))),
                      parent(p), cached)
 
-@doc Markdown.doc"""
+@doc raw"""
     map_coefficients(f, p::PolyRingElem{<: RingElement}; cached::Bool=true, parent::PolyRing)
 
 Transform the polynomial `p` by applying `f` on each non-zero coefficient.
@@ -3208,7 +3208,7 @@ function chebyshev_t_pair(n::Int, x::PolyRingElem)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     chebyshev_t(n::Int, x::PolyRingElem)
 
 Return the Chebyshev polynomial of the first kind $T_n(x)$, defined by
@@ -3249,7 +3249,7 @@ function chebyshev_u_pair(n::Int, x::PolyRingElem)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     chebyshev_u(n::Int, x::PolyRingElem)
 
 Return the Chebyshev polynomial of the first kind $U_n(x)$, defined by
@@ -3365,7 +3365,7 @@ rand(S::PolyRing, degs, v...) = rand(Random.GLOBAL_RNG, S, degs, v...)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     subst(f::PolyRingElem{T}, a::Any) where T <: RingElement
 
 Evaluate the polynomial $f$ at $a$. Note that $a$ can be anything, whether

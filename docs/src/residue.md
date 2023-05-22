@@ -80,10 +80,10 @@ resulting parent objects to coerce various elements into the residue ring.
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> f = S()
 0
@@ -98,15 +98,15 @@ julia> k = S(x + 1)
 x + 1
 
 julia> U, f = quo(R, x^3 + 3x + 1)
-(Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1, Map with section with the following data
+(Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1, Map with section with the following data
 
 Domain:
 =======
-Univariate Polynomial Ring in x over Rationals
+Univariate polynomial ring in x over rationals
 
 Codomain:
 ========
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1)
+Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1)
 
 julia> U === S
 true
@@ -191,10 +191,10 @@ modulus(::ResElem)
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
 x + 1
@@ -221,19 +221,19 @@ julia> d = data(f)
 x + 1
 
 julia> U = base_ring(S)
-Univariate Polynomial Ring in x over Rationals
+Univariate polynomial ring in x over rationals
 
 julia> V = base_ring(f)
-Univariate Polynomial Ring in x over Rationals
+Univariate polynomial ring in x over rationals
 
 julia> T = parent(f)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> f == deepcopy(f)
 true
 
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 ```
 
 ### Inversion
@@ -246,10 +246,10 @@ Base.inv(::ResElem)
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
 x + 1
@@ -269,10 +269,10 @@ gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> f = S(x + 1)
 x + 1
@@ -324,17 +324,17 @@ rand(R::ResidueRing, v...)
 
 ```jldoctest; setup = :(import Random; Random.seed!(42))
 julia> R = residue_ring(ZZ, 7)
-Residue ring of Integers modulo 7
+Residue ring of integers modulo 7
 
 julia> f = rand(R, 0:6)
-5
+4
 
 julia> S, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> U = residue_field(S, x^3 + 3x + 1)
-Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3 + 3*x + 1
+Residue field of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> g = rand(S, 2:2, -10:10)
--7//10*x^2 - 2*x - 3
+-1//4*x^2 - 2//7*x + 1
 ```

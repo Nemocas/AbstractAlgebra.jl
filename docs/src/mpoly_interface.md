@@ -80,7 +80,7 @@ and floating point types.
 To construct a multivariate polynomial ring, there is the following constructor.
 
 ```julia
-polynomial_ring(R::Ring, s::Vector{AbstractString}; ordering=:lex, cached=true)
+polynomial_ring(R::Ring, s::Vector{<:VarName}; ordering=:lex, cached::Bool=true)
 ```
 
 Return a tuple, `S, vars` consisting of a polynomial ring $S$ and an array of

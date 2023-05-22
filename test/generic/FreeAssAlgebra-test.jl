@@ -98,10 +98,14 @@
       @test !is_gen(one(S))
       for i in 1:num_vars
          g = gen(S, i)
+         @test g == S[i]
          @test is_gen(g)
          @test !is_gen(g + 1)
          @test leading_exponent_word(g) == [i]
       end
+
+      @test_throws ArgumentError gen(S, 0)
+      @test_throws ArgumentError gen(S, num_vars + 1)
 
       @test_throws ArgumentError leading_term(zero(S))
       @test_throws ArgumentError leading_monomial(zero(S))
@@ -118,6 +122,12 @@
       @test x in keys(Dict(x => 1))
       @test !(y in keys(Dict(x => 1)))
    end
+end
+
+@testset "Generic.FreeAssAlgebra.printing" begin
+   R, x = ZZ["y"]
+   S = free_associative_algebra(R, 5)
+   @test !occursin("\n", sprint(show, R))
 end
 
 function test_elem(R::Generic.FreeAssAlgebra{elem_type(ZZ)})

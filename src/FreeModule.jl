@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     FreeModule(R::NCRing, rank::Int; cached::Bool = true)
 
 Return the free module over the ring $R$ with the given rank.
@@ -29,7 +29,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     VectorSpace(R::Field, dim::Int; cached::Bool = true)
 
 Return the vector space over the field $R$ with the given dimension.

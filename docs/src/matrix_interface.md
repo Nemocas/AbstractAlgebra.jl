@@ -157,11 +157,16 @@ applied to a view, rather than another view.
 ### Basic manipulation of matrices
 
 ```julia
-dense_matrix_type(::Type{T}) where T <: RingElem
+dense_matrix_type(::Type{T}) where T<:NCRingElement
+dense_matrix_type(::T) where T<:NCRingElement
+dense_matrix_type(::Type{S}) where S<:NCRing
+dense_matrix_type(::S) where S<:NCRing
 ```
 
-Return the type of dense matrices whose entries have the given type. E.g.
-in Nemo, which depends on AbstractAlgebra, we define
+Return the type of dense matrices whose entries have type `T` respectively
+`elem_type(S)`. It suffices to provide a method with the first signature.
+For the other three signatures, the default methods dispatch to the first.
+E.g. in Nemo, which depends on AbstractAlgebra, we define
 `dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix`.
 
 ```julia
@@ -256,6 +261,17 @@ vcat(M::MyMat{T}, N::MyMat{T}) where T <: RingElem
 
 Return the vertical concatenation of $M$ and $N$. It is assumed that the number of
 columns of $M$ and $N$ are the same.
+
+### Optional zero tests
+
+The following functions are available for matrices in both matrix algebras and matrix
+spaces.
+
+```julia
+is_zero_entry(M::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
+is_zero_column(M::MatrixElem{T}, j::Int) where T <: NCRingElement
+```
 
 ### Optional similar and zero
 

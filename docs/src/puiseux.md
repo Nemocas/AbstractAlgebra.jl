@@ -49,15 +49,15 @@ In order to construct Puiseux series in AbstractAlgebra.jl, one must first const
 ring itself. This is accomplished with any of the following constructors.
 
 ```julia
-PuiseuxSeriesRing(R::Ring, prec_max::Int, s::AbstractString; cached::Bool = true)
+PuiseuxSeriesRing(R::Ring, prec_max::Int, s::VarName; cached::Bool = true)
 ```
 
 ```julia
-PuiseuxSeriesRing(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
+PuiseuxSeriesRing(R::Field, prec_max::Int, s::VarName; cached::Bool = true)
 ```
 
 ```julia
-PuiseuxSeriesField(R::Field, prec_max::Int, s::AbstractString; cached::Bool = true)
+PuiseuxSeriesField(R::Field, prec_max::Int, s::VarName; cached::Bool = true)
 ```
 
 Given a base ring `R`, a maximum relative precision and a string `s` specifying how the
@@ -74,10 +74,10 @@ various elements into those rings.
 
 ```jldoctest
 julia> R, x = PuiseuxSeriesRing(ZZ, 10, "x")
-(Puiseux series ring in x over Integers, x + O(x^11))
+(Puiseux series ring in x over integers, x + O(x^11))
 
 julia> S, y = PuiseuxSeriesField(QQ, 10, "y")
-(Puiseux series field in y over Rationals, y + O(y^11))
+(Puiseux series field in y over rationals, y + O(y^11))
 
 julia> f = R()
 O(x^10)
@@ -106,7 +106,7 @@ O(x::SeriesElem)
 
 ```jldoctest
 julia> R, x = PuiseuxSeriesRing(ZZ, 10, "x")
-(Puiseux series ring in x over Integers, x + O(x^11))
+(Puiseux series ring in x over integers, x + O(x^11))
 
 julia> f = 1 + 2x + O(x^5)
 1 + 2*x + O(x^5)
@@ -168,7 +168,7 @@ rational exponent.
 
 ```jldoctest
 julia> S, x = PuiseuxSeriesRing(ZZ, 10, "x")
-(Puiseux series ring in x over Integers, x + O(x^11))
+(Puiseux series ring in x over integers, x + O(x^11))
 
 julia> f = 1 + 3x + x^3 + O(x^10)
 1 + 3*x + x^3 + O(x^10)
@@ -198,7 +198,7 @@ julia> v = var(S)
 :x
 
 julia> T = parent(x + 1)
-Puiseux series ring in x over Integers
+Puiseux series ring in x over integers
 
 julia> g == deepcopy(g)
 true
@@ -245,10 +245,10 @@ is_gen(::Generic.PuiseuxSeriesElem)
 
 ```jldoctest
 julia> R, t = PuiseuxSeriesRing(QQ, 10, "t")
-(Puiseux series field in t over Rationals, t + O(t^11))
+(Puiseux series field in t over rationals, t + O(t^11))
 
 julia> S, x = PuiseuxSeriesRing(R, 30, "x")
-(Puiseux series field in x over Puiseux series field in t over Rationals, x + O(x^31))
+(Puiseux series field in x over puiseux series field, x + O(x^31))
 
 julia> a = O(x^4)
 O(x^4)
@@ -283,7 +283,7 @@ Base.inv(::Generic.PuiseuxSeriesElem)
 
 ```jldoctest
 julia> R, x = PuiseuxSeriesRing(QQ, 30, "x")
-(Puiseux series field in x over Rationals, x + O(x^31))
+(Puiseux series field in x over rationals, x + O(x^31))
 
 julia> a = 1 + x + 2x^2 + O(x^5)
 1 + x + 2*x^2 + O(x^5)
@@ -311,7 +311,7 @@ integral(a::Generic.PuiseuxSeriesElem)
 
 ```jldoctest
 julia> R, x = PuiseuxSeriesRing(QQ, 10, "x")
-(Puiseux series field in x over Rationals, x + O(x^11))
+(Puiseux series field in x over rationals, x + O(x^11))
 
 julia> f = x^(5//3) + x^(7//3) + x^(11//3)
 x^(5//3) + x^(7//3) + x^(11//3) + O(x^5)
@@ -339,13 +339,13 @@ Base.sqrt(a::Generic.PuiseuxSeriesElem)
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, "t")
-(Univariate Polynomial Ring in t over Rationals, t)
+(Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = PuiseuxSeriesRing(R, 30, "x")
-(Puiseux series ring in x over Univariate Polynomial Ring in t over Rationals, x + O(x^31))
+(Puiseux series ring in x over univariate polynomial ring, x + O(x^31))
 
 julia> T, z = PuiseuxSeriesRing(QQ, 30, "z")
-(Puiseux series field in z over Rationals, z + O(z^31))
+(Puiseux series field in z over rationals, z + O(z^31))
 
 julia> a = 1 + z + 3z^2 + O(z^5)
 1 + z + 3*z^2 + O(z^5)

@@ -11,7 +11,7 @@ import LinearAlgebra: nullspace
 import LinearAlgebra: rank
 import LinearAlgebra: tr
 
-using Markdown, Random, InteractiveUtils
+using Random, InteractiveUtils
 
 using Random: SamplerTrivial, GLOBAL_RNG
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
@@ -141,6 +141,7 @@ import ..AbstractAlgebra: constant_coefficient
 import ..AbstractAlgebra: content
 import ..AbstractAlgebra: CycleDec
 import ..AbstractAlgebra: data
+import ..AbstractAlgebra: Dedent
 import ..AbstractAlgebra: deflate
 import ..AbstractAlgebra: deflation
 import ..AbstractAlgebra: degree
@@ -169,6 +170,7 @@ import ..AbstractAlgebra: GFElem
 import ..AbstractAlgebra: identity_matrix
 import ..AbstractAlgebra: image_fn
 import ..AbstractAlgebra: inflate
+import ..AbstractAlgebra: Indent
 import ..AbstractAlgebra: Integers
 import ..AbstractAlgebra: integral
 import ..AbstractAlgebra: inv
@@ -189,6 +191,7 @@ import ..AbstractAlgebra: leading_coefficient
 import ..AbstractAlgebra: leading_exponent_vector
 import ..AbstractAlgebra: leading_monomial
 import ..AbstractAlgebra: leading_term
+import ..AbstractAlgebra: Lowercase
 import ..AbstractAlgebra: log
 import ..AbstractAlgebra: Map
 import ..AbstractAlgebra: map_coefficients
@@ -212,6 +215,7 @@ import ..AbstractAlgebra: order
 import ..AbstractAlgebra: parent_type
 import ..AbstractAlgebra: Perm
 import ..AbstractAlgebra: pol_length
+import ..AbstractAlgebra: pretty
 import ..AbstractAlgebra: primpart
 import ..AbstractAlgebra: promote_rule
 import ..AbstractAlgebra: pseudodivrem
@@ -238,6 +242,7 @@ import ..AbstractAlgebra: terms
 import ..AbstractAlgebra: terms_degrees
 import ..AbstractAlgebra: to_univariate
 import ..AbstractAlgebra: trailing_coefficient
+import ..AbstractAlgebra: LowercaseOff
 import ..AbstractAlgebra: use_karamul
 import ..AbstractAlgebra: valuation
 import ..AbstractAlgebra: var

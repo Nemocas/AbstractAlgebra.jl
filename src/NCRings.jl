@@ -166,7 +166,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_unit(a::T) where {T <: NCRingElem}
 
 Return true if $a$ is invertible, else return false.
@@ -174,7 +174,7 @@ Return true if $a$ is invertible, else return false.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rationals, x)
+(Univariate polynomial ring in x over rationals, x)
 
 julia> is_unit(x), is_unit(S(1)), is_unit(S(4))
 (false, true, true)
@@ -233,7 +233,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     powers(a::Union{NCRingElement, MatElem}, d::Int)
 
 Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$.
@@ -258,7 +258,7 @@ julia> A = powers(M, 4)
 function powers(a::T, d::Int) where {T <: Union{NCRingElement, MatElem}}
    d < 0 && throw(DomainError(d, "the second argument must be nonnegative"))
    a isa MatElem && !is_square(a) && throw(DomainError(a, "matrix must be square"))
-   M = Array{T}(undef, d + 1)
+   M = Vector{T}(undef, d + 1)
    M[1] = one(a)
    if d > 0
       M[2] = a
