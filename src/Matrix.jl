@@ -6484,26 +6484,22 @@ function _hcat(A)
   return M
 end
 
-function Base.cat(A::MatrixElem{T}...;dims) where T <: NCRingElement
+function Base.cat(A::MatrixElem{T}, As::MatrixElem{T}...; dims) where T <: NCRingElement
   @assert dims == (1,2) || isa(dims, Int)
 
   if isa(dims, Int)
     if dims == 1
-      return hcat(A...)
+      return hcat(A, As...)
     elseif dims == 2
-      return vcat(A...)
+      return vcat(A, As...)
     else
       error("dims must be 1, 2, or (1,2)")
     end
   end
 
-  local X
-  for i in 1:length(A)
-    if i == 1
-      X = hcat(A[1], zero(A[1], nrows(A[1]), sum(Int[ncols(A[j]) for j=2:length(A)])))
-    else
-      X = vcat(X, hcat(zero(A[1], nrows(A[i]), sum(ncols(A[j]) for j=1:i-1)), A[i], zero(A[1], nrows(A[i]), sum(Int[ncols(A[j]) for j in (i+1):length(A)]))))
-    end
+  X = hcat(A, zero(A, nrows(A), sum(Int[ncols(As[j]) for j=1:length(As)])))
+  for i in 1:length(As)
+    X = vcat(X, hcat(zero(A, nrows(As[i]), ncols(A) + sum(Int[ncols(As[j]) for j=1:i-1])), As[i], zero(A, nrows(As[i]), sum(Int[ncols(As[j]) for j in i+1:length(As)]))))
   end
   return X
 end

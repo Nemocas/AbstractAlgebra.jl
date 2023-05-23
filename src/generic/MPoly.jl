@@ -3354,14 +3354,19 @@ function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
    end
 end
 
+function (a::MPoly{T})() where T <: RingElement
+   nvars(parent(a)) != 0 && error("Number of variables does not match number of values")
+   return evaluate(a, T[])
+end
+
 function (a::MPoly{T})(vals::T...) where T <: RingElement
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])
 end
 
-function (a::MPoly{T})(vals::U...) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
-   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-   return evaluate(a, [vals...])
+function (a::MPoly{T})(val::U, vals::U...) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
+   length(vals) + 1 != nvars(parent(a)) && error("Number of variables does not match number of values")
+   return evaluate(a, [val, vals...])
 end
 
 @doc raw"""

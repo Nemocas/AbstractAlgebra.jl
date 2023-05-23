@@ -810,12 +810,16 @@ function evaluate(a::UnivPoly{T, U}, A::Vector{V}) where {T <: RingElement, U, V
    return evaluate(a.p, A)
 end
 
+function (a::UnivPoly{T, U})() where {T <: RingElement, U}
+   return evaluate(a, T[])
+end
+
 function (a::UnivPoly{T, U})(vals::T...) where {T <: RingElement, U}
    return evaluate(a, [vals...])
 end
 
-function (a::UnivPoly{T, U})(vals::V...) where {T <: RingElement, U, V <: Union{Integer, Rational, AbstractFloat}}
-   return evaluate(a, [vals...])
+function (a::UnivPoly{T, U})(val::V, vals::V...) where {T <: RingElement, U, V <: Union{Integer, Rational, AbstractFloat}}
+   return evaluate(a, [val, vals...])
 end
 
 function (a::UnivPoly{T, U})(vals::Union{NCRingElem, RingElement}...) where {T <: RingElement, U}

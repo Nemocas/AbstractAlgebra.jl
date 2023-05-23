@@ -2307,11 +2307,12 @@ function Ideal(R::Ring, V::Vector{T}) where T <: RingElement
    return reduce_gens(I)
 end
 
-function Ideal(R::Ring, v::T...) where T <: RingElement
-   I = Ideal(R, filter(!iszero, [map(R, v)...]))
+function Ideal(R::Ring, v::T, vs::T...) where T <: RingElement
+   I = Ideal(R, filter(!iszero, [R(v), map(R, vs)...]))
    return reduce_gens(I)
 end
 
+Ideal(R::Ring) = Ideal(R, elem_type(R)[])
 Ideal(R::Ring, V::Vector{Any}) = Ideal(R, elem_type(R)[R(v) for v in V])
 
 ###############################################################################
