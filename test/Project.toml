@@ -1,0 +1,5 @@
+[deps]
+GroupsCore = "d5909c97-4eac-4ecc-a3dc-fdd0858a4120"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
