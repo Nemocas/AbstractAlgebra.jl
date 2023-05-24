@@ -3859,7 +3859,7 @@ end
 @doc raw"""
     right_kernel(a::MatElem{T}) where T <: RingElement
 
-Return a tuple `n, M` where $M$ is a matrix whose columns generate the
+Return a tuple `n, M` where $a$ is a matrix whose columns generate the
 kernel of $M$ and $n$ is the rank of the kernel.
 """
 function right_kernel(x::MatElem{T}) where T <: RingElement
@@ -3874,10 +3874,10 @@ end
 @doc raw"""
     kernel(a::MatElem{T}; side::Symbol = :right) where T <: RingElement
 
-Return a tuple $(n, M)$, where n is the rank of the kernel and $M$ is a
-basis for it. If side is $:right$ or not specified, the right kernel is
+Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $a$ and $M$ is a
+basis for it. If side is `:right` or not specified, the right kernel is
 computed, i.e. the matrix of columns whose span gives the right kernel
-space. If side is $:left$, the left kernel is computed, i.e. the matrix
+space. If side is `:left`, the left kernel is computed, i.e. the matrix
 of rows whose span is the left kernel space.
 """
 function kernel(A::MatElem{T}; side::Symbol = :right) where T <: RingElement
