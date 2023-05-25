@@ -72,7 +72,8 @@ function show(io::IO, M::FreeModule{T}) where T <: Union{RingElement, NCRingElem
    print(io, "Free module of rank ")
    print(io, rank(M))
    print(io, " over ")
-   show(IOContext(io, :compact => true), base_ring(M))
+   io = pretty(io)
+   print(IOContext(io, :compact => true), Lowercase(), base_ring(M))
 end
 
 function show(io::IO, M::FreeModule{T}) where T <: FieldElement
@@ -82,7 +83,8 @@ function show(io::IO, M::FreeModule{T}) where T <: FieldElement
    print(io, "Vector space of dimension ")
    print(io, dim(M))
    print(io, " over ")
-   show(IOContext(io, :compact => true), base_ring(M))
+   io = pretty(io)
+   print(IOContext(io, :compact => true), Lowercase(), base_ring(M))
 end
 
 function show(io::IO, a::FreeModuleElem)

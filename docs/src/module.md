@@ -75,7 +75,7 @@ relation is given as an AbstractAlgebra row matrix.
 
 ```jldoctest
 julia> M = FreeModule(QQ, 2)
-Vector space of dimension 2 over Rationals
+Vector space of dimension 2 over rationals
 
 julia> n = ngens(M)
 2
@@ -95,7 +95,7 @@ julia> !iszero(g1)
 true
 
 julia> M = FreeModule(QQ, 2)
-Vector space of dimension 2 over Rationals
+Vector space of dimension 2 over rationals
 
 julia> z = zero(M)
 (0//1, 0//1)
@@ -158,7 +158,7 @@ zero(M::FPModule)
 
 ```jldoctest
 julia> M = FreeModule(QQ, 2)
-Vector space of dimension 2 over Rationals
+Vector space of dimension 2 over rationals
 
 julia> z = zero(M)
 (0//1, 0//1)
@@ -174,7 +174,7 @@ Base.getindex(m::FPModuleElem{T}) where T <: RingElement
 
 ```jldoctest
 julia> F = FreeModule(ZZ, 3)
-Free module of rank 3 over Integers
+Free module of rank 3 over integers
 
 julia> m = F(BigInt[2, -5, 4])
 (2, -5, 4)
@@ -193,7 +193,7 @@ julia> m[1]
 
 ```jldoctest
 julia> M = FreeModule(QQ, 2)
-Vector space of dimension 2 over Rationals
+Vector space of dimension 2 over rationals
 
 julia> M == M
 true
@@ -217,7 +217,7 @@ is_isomorphic(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 
 ```jldoctest; setup = :(import Random; Random.seed!(42))
 julia> M = FreeModule(ZZ, 3)
-Free module of rank 3 over Integers
+Free module of rank 3 over integers
 
 julia> m1 = rand(M, -10:10)
 (3, -1, 0)
@@ -226,10 +226,10 @@ julia> m2 = rand(M, -10:10)
 (4, 4, -7)
 
 julia> S, f = sub(M, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over Integers)
+(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over integers)
 
 julia> I, g = image(f)
-(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over Integers)
+(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over integers)
 
 julia> is_isomorphic(S, I)
 true
@@ -252,7 +252,7 @@ invariant_factors(::FPModule{T}) where T <: RingElement
 
 ```jldoctest; setup = :(import Random; Random.seed!(42))
 julia> M = FreeModule(ZZ, 3)
-Free module of rank 3 over Integers
+Free module of rank 3 over integers
 
 julia> m1 = rand(M, -10:10)
 (3, -1, 0)
@@ -261,11 +261,11 @@ julia> m2 = rand(M, -10:10)
 (4, 4, -7)
 
 julia> S, f = sub(M, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over Integers)
+(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 3 over integers)
 
 julia> Q, g = quo(M, S)
 (Quotient module over Integers with 2 generators and relations:
-[16 -21], Hom: Free module of rank 3 over Integers -> Quotient module over Integers with 2 generators and relations:
+[16 -21], Hom: Free module of rank 3 over integers -> Quotient module over Integers with 2 generators and relations:
 [16 -21])
 
 julia> I, f = snf(Q)

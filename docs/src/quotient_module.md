@@ -42,16 +42,16 @@ properties.
 
 ```jldoctest
 julia> M = FreeModule(ZZ, 2)
-Free module of rank 2 over Integers
+Free module of rank 2 over integers
 
 julia> m = M([ZZ(1), ZZ(2)])
 (1, 2)
 
 julia> N, f = sub(M, [m])
-(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 2 over Integers)
+(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 2 over integers)
 
 julia> Q, g = quo(M, N)
-(Quotient module over Integers with 1 generator and no relations, Hom: Free module of rank 2 over Integers -> Quotient module over Integers with 1 generator and no relations)
+(Quotient module over Integers with 1 generator and no relations, Hom: Free module of rank 2 over integers -> Quotient module over Integers with 1 generator and no relations)
 
 julia> p = M([ZZ(3), ZZ(1)])
 (3, 1)
@@ -60,17 +60,17 @@ julia> v2 = g(p)
 (-5)
 
 julia> V = VectorSpace(QQ, 2)
-Vector space of dimension 2 over Rationals
+Vector space of dimension 2 over rationals
 
 julia> m = V([QQ(1), QQ(2)])
 (1//1, 2//1)
 
 julia> N, f = sub(V, [m])
-(Subspace over Rationals with 1 generator and no relations, Hom: Subspace over Rationals with 1 generator and no relations -> Vector space of dimension 2 over Rationals)
+(Subspace over Rationals with 1 generator and no relations, Hom: Subspace over Rationals with 1 generator and no relations -> Vector space of dimension 2 over rationals)
 
 julia> Q, g = quo(V, N)
 (Quotient space over:
-Rationals with 1 generator and no relations, Hom: Vector space of dimension 2 over Rationals -> Quotient space over:
+Rationals with 1 generator and no relations, Hom: Vector space of dimension 2 over rationals -> Quotient space over:
 Rationals with 1 generator and no relations)
 
 ```
@@ -92,34 +92,34 @@ dim(N::Generic.QuotientModule{T}) where T <: FieldElement
 
 ```jldoctest
 julia> M = FreeModule(ZZ, 2)
-Free module of rank 2 over Integers
+Free module of rank 2 over integers
 
 julia> m = M([ZZ(2), ZZ(3)])
 (2, 3)
 
 julia> N, g = sub(M, [m])
-(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 2 over Integers)
+(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 2 over integers)
 
 julia> Q, h = quo(M, N)
 (Quotient module over Integers with 2 generators and relations:
-[2 3], Hom: Free module of rank 2 over Integers -> Quotient module over Integers with 2 generators and relations:
+[2 3], Hom: Free module of rank 2 over integers -> Quotient module over Integers with 2 generators and relations:
 [2 3])
 
 julia> supermodule(Q) == M
 true
 
 julia> V = VectorSpace(QQ, 2)
-Vector space of dimension 2 over Rationals
+Vector space of dimension 2 over rationals
 
 julia> m = V([QQ(1), QQ(2)])
 (1//1, 2//1)
 
 julia> N, f = sub(V, [m])
-(Subspace over Rationals with 1 generator and no relations, Hom: Subspace over Rationals with 1 generator and no relations -> Vector space of dimension 2 over Rationals)
+(Subspace over Rationals with 1 generator and no relations, Hom: Subspace over Rationals with 1 generator and no relations -> Vector space of dimension 2 over rationals)
 
 julia> Q, g = quo(V, N)
 (Quotient space over:
-Rationals with 1 generator and no relations, Hom: Vector space of dimension 2 over Rationals -> Quotient space over:
+Rationals with 1 generator and no relations, Hom: Vector space of dimension 2 over rationals -> Quotient space over:
 Rationals with 1 generator and no relations)
 
 julia> dim(V)

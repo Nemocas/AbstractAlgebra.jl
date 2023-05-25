@@ -55,10 +55,10 @@ Construct the free module/vector space of given rank/dimension.
 
 ```jldoctest
 julia> M = FreeModule(ZZ, 3)
-Free module of rank 3 over Integers
+Free module of rank 3 over integers
 
 julia> V = VectorSpace(QQ, 2)
-Vector space of dimension 2 over Rationals
+Vector space of dimension 2 over rationals
 
 ```
 
@@ -74,10 +74,10 @@ basis(V::Generic.FreeModule{T}) where T <: FieldElem
 
 ```jldoctest
 julia> M = FreeModule(ZZ, 3)
-Free module of rank 3 over Integers
+Free module of rank 3 over integers
 
 julia> V = VectorSpace(QQ, 2)
-Vector space of dimension 2 over Rationals
+Vector space of dimension 2 over rationals
 
 julia> rank(M)
 3

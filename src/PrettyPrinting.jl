@@ -1558,6 +1558,7 @@ function _write_line(io::IOCustom, str::AbstractString)
   if io.indent_level == 0
     if io.lowercasefirst
       written += write(io.io, lowercasefirst(str))
+      io.lowercasefirst = false
     else
       written += write(io.io, str)
     end
@@ -1577,6 +1578,7 @@ function _write_line(io::IOCustom, str::AbstractString)
   firststr = str[1:firstlen]
   if io.lowercasefirst
     written += write(io.io, lowercasefirst(firststr))
+    io.lowercasefirst = false
   else
     written += write(io.io, firststr)
     io.lowercasefirst = false
