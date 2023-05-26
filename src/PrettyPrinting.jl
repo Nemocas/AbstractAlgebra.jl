@@ -1405,7 +1405,7 @@ end
 
 ################################################################################
 #
-#  IO context with indendation and lowercasing
+#  IO context with indentation and lowercasing
 #
 ################################################################################
 
@@ -1422,7 +1422,7 @@ export IOCustom, Indent, Dedent, indent_string!
 """
     Indent
 
-When printed to an `IOCustom` object, increases the indendation level by one.
+When printed to an `IOCustom` object, increases the indentation level by one.
 
 # Examples
 
@@ -1438,7 +1438,7 @@ struct Indent end
 """
     Dedent
 
-When printed to an `IOCustom` object, decreases the indendation level by one.
+When printed to an `IOCustom` object, decreases the indentation level by one.
 
 # Examples
 

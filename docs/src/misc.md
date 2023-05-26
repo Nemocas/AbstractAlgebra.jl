@@ -82,7 +82,7 @@ anymore.
 ## Advanced printing
 
 To facilitate printing of nested mathematical structures, we provide a modified
-`IOCustom` object, that supports indendation and decapitalization.
+`IOCustom` object, that supports indentation and decapitalization.
 
 ### Example
 
