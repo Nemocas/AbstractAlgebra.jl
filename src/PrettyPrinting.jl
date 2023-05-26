@@ -1493,12 +1493,13 @@ mutable struct IOCustom{IO_t <: IO} <: Base.AbstractPipe
     indent_str::String
     printed::Int
     lowercasefirst::Bool
+    force_newlines::Bool
 
     function IOCustom{IO_t}(io::IO_t, indent_level::Int,
                             indented_line::Bool, indent_str::String,
-                            printed::Int, lowercasefirst::Bool) where IO_t <: IO
+                            printed::Int, lowercasefirst::Bool, force_newlines::Bool) where IO_t <: IO
         @assert(!(IO_t <: IOCustom))
-        return new(io, indent_level, indented_line, indent_str, printed, lowercasefirst)
+        return new(io, indent_level, indented_line, indent_str, printed, lowercasefirst, force_newlines)
     end
 end
 
@@ -1508,9 +1509,9 @@ _unwrap(io::IOContext) = io.io
 
 indent_string!(io::IO, str::String) = (_unwrap(io).indent_str = str; io)
 
-IOCustom(io::IO) = IOCustom{typeof(io)}(io, 0, false, "  ", 0, false)
+IOCustom(io::IO, force_newlines = false) = IOCustom{typeof(io)}(io, 0, false, "  ", 0, false, force_newlines)
 
-IOCustom(io::IOCustom) = io
+IOCustom(io::IOCustom, force_newlines = false) = begin io.force_newlines = force_newlines; io; end
 
 convert(::Type{IOCustom}, io::IOCustom) = io
 
@@ -1547,6 +1548,11 @@ write_indent(io::IO) = write(_unwrap(io).io, io.indent_str^io.indent_level)
 
 write(io::IOCustom, chr::Char) = write(io, string(chr)) # Need to catch writing a '\n'
 
+_isbuffer(io::IOBuffer) = true
+_isbuffer(io::IO) = false
+_isbuffer(io::IOContext) = _isbuffer(io.io)
+_isbuffer(io::IOCustom) = _isbuffer(io.io)
+
 function _write_line(io::IOCustom, str::AbstractString)
   written = 0
 
@@ -1565,7 +1571,12 @@ function _write_line(io::IOCustom, str::AbstractString)
     return written
   end
 
-  c = displaysize(io)[2]
+  # If we are writing to an IOBuffer, don't insert
+  # artificial newlines
+  #
+  # Main application are doctests, since they are
+  # printed to an IOBuffer for comparisons
+  c = _isbuffer(io) && !io.force_newlines ? typemax(Int) : displaysize(io)[2]
   ind = io.indent_level * textwidth(io.indent_str)
   # there might be already something written
   if c - ind - io.printed < 0
@@ -1643,7 +1654,9 @@ Wrap `io` into an `IOCustom` object.
 julia> io = AbstractAlgebra.pretty(stdout);
 ```
 """
-pretty(io::IO) = IOCustom(io)
+pretty(io::IO; force_newlines = false) = IOCustom(io, force_newlines)
+
+pretty(io::IOContext; force_newlines = false) = io.io isa IOCustom ? io : IOCustom(io, force_newlines)
 
 pretty(io::IOContext) = io.io isa IOCustom ? io : IOCustom(io)
 
