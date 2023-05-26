@@ -76,7 +76,7 @@ julia> R, t = polynomial_ring(QQ, "t")
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = MatrixAlgebra(R, 3)
-Matrix Algebra of degree 3
+Matrix algebra of degree 3
   over univariate polynomial ring in t over rationals
 
 julia> A = S()
@@ -144,7 +144,7 @@ julia> R, t = polynomial_ring(QQ, "t")
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = MatrixAlgebra(R, 3)
-Matrix Algebra of degree 3
+Matrix algebra of degree 3
   over univariate polynomial ring in t over rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])

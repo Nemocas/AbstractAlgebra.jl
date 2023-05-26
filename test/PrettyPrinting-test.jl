@@ -360,4 +360,12 @@ let
   @test String(take!(io)) == "test"
   print(io, AbstractAlgebra.Lowercase(), AbstractAlgebra.LowercaseOff(), "Test")
   @test String(take!(io)) == "Test"
+
+  # Fix bug for pretty(IOCustom(pretty(io))) forgetting everything
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io)
+  print(io, AbstractAlgebra.Lowercase())
+  io = AbstractAlgebra.pretty(IOContext(io))
+  print(io, "A")
+  @test String(take!(io.io)) == "a"
 end

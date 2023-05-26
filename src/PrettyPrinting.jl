@@ -1645,6 +1645,8 @@ julia> io = AbstractAlgebra.pretty(stdout);
 """
 pretty(io::IO) = IOCustom(io)
 
+pretty(io::IOContext) = io.io isa IOCustom ? io : IOCustom(io)
+
 export pretty, Lowercase, LowercaseOff, Indent, Dedent
 
 end # PrettyPrinting
