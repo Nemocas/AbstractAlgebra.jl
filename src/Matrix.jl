@@ -3859,8 +3859,8 @@ end
 @doc raw"""
     right_kernel(a::MatElem{T}) where T <: RingElement
 
-Return a tuple `n, M` where $a$ is a matrix whose columns generate the
-kernel of $M$ and $n$ is the rank of the kernel.
+Return a tuple `n, M` where $M$ is a matrix whose columns generate the
+kernel of $a$ and $n$ is the rank of the kernel.
 """
 function right_kernel(x::MatElem{T}) where T <: RingElement
    n, M = left_kernel(transpose(x))
