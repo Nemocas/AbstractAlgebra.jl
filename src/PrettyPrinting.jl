@@ -1658,8 +1658,6 @@ pretty(io::IO; force_newlines = false) = IOCustom(io, force_newlines)
 
 pretty(io::IOContext; force_newlines = false) = io.io isa IOCustom ? io : IOCustom(io, force_newlines)
 
-pretty(io::IOContext) = io.io isa IOCustom ? io : IOCustom(io)
-
 export pretty, Lowercase, LowercaseOff, Indent, Dedent
 
 end # PrettyPrinting
