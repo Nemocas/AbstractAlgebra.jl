@@ -22,13 +22,13 @@ end
 #
 ################################################################################
 
-function factor(f::PolyRingElem, R::Field)
+function factor(R::Field, f::PolyRingElem)
     Rt = AbstractAlgebra.PolyRing(R)
-    f1 = change_base_ring(R, f, parent = Rt)
+    f1 = change_base_ring(R, f; parent = Rt)
     return factor(f1)
 end
 
-function factor(f::FracElem, R::Ring)
+function factor(R::Ring, f::FracElem)
     fn = factor(R(numerator(f)))
     fd = factor(R(denominator(f)))
     fn.unit = divexact(fn.unit, fd.unit)
