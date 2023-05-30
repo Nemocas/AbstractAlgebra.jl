@@ -241,9 +241,7 @@ export hgcd
 export Ideal
 export IdealSet
 export IdentityMap
-export is_even
 export is_irreducible
-export is_odd
 export is_squarefree
 export is_perfect
 export ItemQuantity
