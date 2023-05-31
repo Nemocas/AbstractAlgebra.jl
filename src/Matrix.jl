@@ -463,7 +463,7 @@ Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default
 #
 ###############################################################################
 
-function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::UnitRange{Int}, c::UnitRange{Int}) where T <: RingElement
+function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: RingElement
     _checkbounds(a, r, c)
     size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
     startr = first(r)
@@ -475,7 +475,7 @@ function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::UnitRange{
     end
 end
 
-function setindex!(a::MatrixElem{T}, b::Vector, r::UnitRange{Int}, c::UnitRange{Int}) where T <: RingElement
+function setindex!(a::MatrixElem{T}, b::Vector, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: RingElement
     _checkbounds(a, r, c)
     if !((length(r) == 1 && length(c) == length(b)) || length(c) == 1 && length(r) == length(b))
       throw(DimensionMismatch("tried to assign vector of length $(length(b)) to a $(length(r))x$(length(c)) destination"))
@@ -489,20 +489,20 @@ function setindex!(a::MatrixElem{T}, b::Vector, r::UnitRange{Int}, c::UnitRange{
     end
 end
 
-# UnitRange{Int}, Colon
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, ::Colon) where T <: RingElement = setindex!(a, b, r, 1:ncols(a))
+# AbstractUnitRange{Int}, Colon
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::AbstractUnitRange{Int}, ::Colon) where T <: RingElement = setindex!(a, b, r, 1:ncols(a))
 
-# Colon, UnitRange{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::UnitRange{Int}) where T <: RingElement = setindex!(a, b, 1:nrows(a), c)
+# Colon, AbstractUnitRange{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::AbstractUnitRange{Int}) where T <: RingElement = setindex!(a, b, 1:nrows(a), c)
 
 # Colon, Colon
 setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, ::Colon) where T <: RingElement = setindex!(a, b, 1:nrows(a), 1:ncols(a))
 
-# Int, UnitRange{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, c::UnitRange{Int}) where T <: RingElement = setindex!(a, b, r:r, c)
+# Int, AbstractUnitRange{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, c::AbstractUnitRange{Int}) where T <: RingElement = setindex!(a, b, r:r, c)
 
-# UnitRange{Int}, Int
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, c::Int) where T <: RingElement = setindex!(a, b, r, c:c)
+# AbstractUnitRange{Int}, Int
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::AbstractUnitRange{Int}, c::Int) where T <: RingElement = setindex!(a, b, r, c:c)
 
 # Int, Colon
 setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, ::Colon) where T <: RingElement = setindex!(a, b, r:r, 1:ncols(a))
@@ -529,11 +529,11 @@ end
 # Vector{Int}, Vector{Int}
 setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::Vector{Int}) where T <: RingElement = _setindex!(a, b, r, c)
 
-# Vector{Int}, UnitRange{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::UnitRange{Int}) where T <: RingElement = _setindex!(a, b, r, c)
+# Vector{Int}, AbstractUnitRange{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::AbstractUnitRange{Int}) where T <: RingElement = _setindex!(a, b, r, c)
 
-# UnitRange{Int}, Vector{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, c::Vector{Int}) where T <: RingElement = _setindex!(a, b, r, c)
+# AbstractUnitRange{Int}, Vector{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::AbstractUnitRange{Int}, c::Vector{Int}) where T <: RingElement = _setindex!(a, b, r, c)
 
 # Vector{Int}, Colon
 setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, ::Colon) where T <: RingElement = _setindex!(a, b, r, 1:ncols(a))

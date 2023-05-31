@@ -938,8 +938,11 @@ end
          push!(ccs, cc)
       end
 
-      for r in [rand(1:n), Colon(), rrs, startr:endr]
-         for c in [rand(1:m), Colon(), ccs, startc:endc]
+      a[axes(b)...] = b
+      @test _test_block_replacement(a, b, axes(b)...)
+
+      for r in [rand(1:n), Colon(), rrs, startr:endr, Base.OneTo(rand(1:n))]
+         for c in [rand(1:m), Colon(), ccs, startc:endc, Base.OneTo(rand(1:m))]
             if c isa Int && r isa Int
                continue
             end
