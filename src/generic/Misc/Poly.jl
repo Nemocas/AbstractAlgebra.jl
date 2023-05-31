@@ -65,11 +65,11 @@ function roots(f::PolyRingElem)
 end
 
 @doc raw"""
-    roots(f::PolyRingElem, R::Field)
+    roots(R::Field, f::PolyRingElem)
 
 Returns the roots of the polynomial `f` in the field `R` as an array.
 """
-function roots(f::PolyRingElem, R::Field)
+function roots(R::Field, f::PolyRingElem)
     Rt = AbstractAlgebra.PolyRing(R)
     f1 = change_base_ring(R, f, parent = Rt)
     return roots(f1)

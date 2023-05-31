@@ -19,3 +19,5 @@ end
 @deprecate factor(f::FracElem, R::Ring) factor(R, f)
 
 @deprecate factor(f::PolyRingElem, R::Field) factor(R, f)
+
+@deprecate roots(f::PolyRingElem, R::Field) roots(R, f)
