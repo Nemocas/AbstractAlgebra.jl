@@ -6730,7 +6730,7 @@ randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
 Constructs the matrix over $R$ with entries as in `arr`.
 """
 function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
-   if elem_type(R) === T
+   if elem_type(R) === T && all(e -> parent(e) === R, arr)
       z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
       return z
    else
@@ -6748,7 +6748,7 @@ row-wise from `arr`.
 function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
    _check_dim(r, c, arr)
    ndims(arr) == 2 && return matrix(R, arr)
-   if elem_type(R) === T
+   if elem_type(R) === T && all(e -> parent(e) === R, arr)
      z = Generic.MatSpaceElem{elem_type(R)}(R, r, c, arr)
      return z
    else
