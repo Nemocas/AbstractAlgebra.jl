@@ -1161,6 +1161,8 @@ end
    @test f(x + y, 2y - x) ==
                2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
 
+   @test evaluate(f, [x, 0]) == 3x + 1 # see https://github.com/oscar-system/Oscar.jl/issues/2331
+
    S, z = polynomial_ring(R, "z")
 
    @test evaluate(f, [z + 1, z - 1]) == 2*z^4 - 4*z^2 + 4*z + 5
