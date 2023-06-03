@@ -842,6 +842,10 @@ end
 #
 ###############################################################################
 
+function evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
+   return evaluate(a, parent(a).(vals))
+end
+
 @doc raw"""
     evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
 
