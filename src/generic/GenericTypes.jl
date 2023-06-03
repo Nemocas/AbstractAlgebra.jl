@@ -541,9 +541,9 @@ end
 #
 ###############################################################################
 
-mutable struct LaurentMPolyWrapRing{T  <: RingElement,
-                                    PR <: AbstractAlgebra.MPolyRing{T}
-                                   } <: AbstractAlgebra.LaurentMPolyRing{T}
+@attributes mutable struct LaurentMPolyWrapRing{T  <: RingElement,
+                                                PR <: AbstractAlgebra.MPolyRing{T}
+                                               } <: AbstractAlgebra.LaurentMPolyRing{T}
    mpolyring::PR
 
    function LaurentMPolyWrapRing(pr::PR, cached::Bool = true) where {
