@@ -255,6 +255,7 @@ export MPolyRing
 export MPolyRingElem
 export mul!
 export NCPolyRingElem
+export NCRing
 export NCRingElem
 export NotImplementedError
 export NotInvertibleError
