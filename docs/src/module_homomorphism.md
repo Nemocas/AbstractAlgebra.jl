@@ -41,7 +41,7 @@ ModuleIsomorphism(M1::FPModule{T}, M2::FPModule{T}, m::MatElem{T}) where T <: Ri
 
 ```jldoctest
 julia> M = FreeModule(ZZ, 2)
-Free module of rank 2 over Integers
+Free module of rank 2 over integers
 
 julia> f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
 Module homomorphism
@@ -71,19 +71,19 @@ kernel(f::Map(FPModuleHomomorphism))
 
 ```jldoctest
 julia> M = FreeModule(ZZ, 3)
-Free module of rank 3 over Integers
+Free module of rank 3 over integers
 
 julia> m = M([ZZ(1), ZZ(2), ZZ(3)])
 (1, 2, 3)
 
 julia> S, f = sub(M, [m])
-(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 3 over Integers)
+(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 3 over integers)
 
 julia> Q, g = quo(M, S)
-(Quotient module over Integers with 2 generators and no relations, Hom: Free module of rank 3 over Integers -> Quotient module over Integers with 2 generators and no relations)
+(Quotient module over Integers with 2 generators and no relations, Hom: Free module of rank 3 over integers -> Quotient module over Integers with 2 generators and no relations)
 
 julia> kernel(g)
-(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 3 over Integers)
+(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 3 over integers)
 
 ```
 

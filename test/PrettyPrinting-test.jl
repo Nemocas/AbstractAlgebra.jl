@@ -312,7 +312,7 @@ end
 
 let
   io = IOBuffer()
-  io = AbstractAlgebra.pretty(io)
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
   @test io isa AbstractAlgebra.PrettyPrinting.IOCustom
   @test io === AbstractAlgebra.pretty(io)
   print(io, AbstractAlgebra.Indent(), "test")
@@ -329,7 +329,7 @@ let
 
   # Test string longer than width
   io = IOBuffer()
-  io = AbstractAlgebra.pretty(io)
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
   _, c = displaysize(io)
   print(io, AbstractAlgebra.Indent())
   println(io, "t"^c)
@@ -345,7 +345,7 @@ let
 
   # Test too much indentation
   io = IOBuffer()
-  io = AbstractAlgebra.pretty(io)
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
   _, c = displaysize(io)
   for i in 1:c
     print(io, AbstractAlgebra.Indent())
@@ -355,9 +355,23 @@ let
 
   # Lowercase/LowercaseOff
   io = IOBuffer()
-  io = AbstractAlgebra.pretty(io)
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
   print(io, AbstractAlgebra.Lowercase(), "Test")
   @test String(take!(io)) == "test"
   print(io, AbstractAlgebra.Lowercase(), AbstractAlgebra.LowercaseOff(), "Test")
   @test String(take!(io)) == "Test"
+
+  # Fix bug for pretty(IOCustom(pretty(io))) forgetting everything
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  print(io, AbstractAlgebra.Lowercase())
+  io = AbstractAlgebra.pretty(IOContext(io), force_newlines = true)
+  print(io, "A")
+  @test String(take!(io.io)) == "a"
+
+  # Check that printing to IOBuffer does not introduce newlines
+  io = AbstractAlgebra.pretty(IOBuffer())
+  _, c = displaysize(io)
+  print(io, AbstractAlgebra.Indent(), "a"^(c + 1))
+  @test String(take!(io.io)) == "  " * "a"^(c + 1)
 end

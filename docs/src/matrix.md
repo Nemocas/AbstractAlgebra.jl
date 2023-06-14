@@ -149,7 +149,7 @@ Matrix space of 2 rows and 3 columns
   over rationals
 
 julia> T = MatrixAlgebra(QQ, 2)
-Matrix Algebra of degree 2
+Matrix algebra of degree 2
   over rationals
 
 julia> M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
@@ -240,7 +240,7 @@ julia> P = zero_matrix(ZZ, 3, 2)
 [0   0]
 
 julia> R = MatrixAlgebra(ZZ, 2)
-Matrix Algebra of degree 2
+Matrix algebra of degree 2
   over integers
 
 julia> M = R()

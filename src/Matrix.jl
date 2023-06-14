@@ -463,7 +463,7 @@ Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default
 #
 ###############################################################################
 
-function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::UnitRange{Int}, c::UnitRange{Int}) where T <: RingElement
+function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: RingElement
     _checkbounds(a, r, c)
     size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
     startr = first(r)
@@ -475,7 +475,7 @@ function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::UnitRange{
     end
 end
 
-function setindex!(a::MatrixElem{T}, b::Vector, r::UnitRange{Int}, c::UnitRange{Int}) where T <: RingElement
+function setindex!(a::MatrixElem{T}, b::Vector, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: RingElement
     _checkbounds(a, r, c)
     if !((length(r) == 1 && length(c) == length(b)) || length(c) == 1 && length(r) == length(b))
       throw(DimensionMismatch("tried to assign vector of length $(length(b)) to a $(length(r))x$(length(c)) destination"))
@@ -489,20 +489,20 @@ function setindex!(a::MatrixElem{T}, b::Vector, r::UnitRange{Int}, c::UnitRange{
     end
 end
 
-# UnitRange{Int}, Colon
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, ::Colon) where T <: RingElement = setindex!(a, b, r, 1:ncols(a))
+# AbstractUnitRange{Int}, Colon
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::AbstractUnitRange{Int}, ::Colon) where T <: RingElement = setindex!(a, b, r, 1:ncols(a))
 
-# Colon, UnitRange{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::UnitRange{Int}) where T <: RingElement = setindex!(a, b, 1:nrows(a), c)
+# Colon, AbstractUnitRange{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::AbstractUnitRange{Int}) where T <: RingElement = setindex!(a, b, 1:nrows(a), c)
 
 # Colon, Colon
 setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, ::Colon) where T <: RingElement = setindex!(a, b, 1:nrows(a), 1:ncols(a))
 
-# Int, UnitRange{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, c::UnitRange{Int}) where T <: RingElement = setindex!(a, b, r:r, c)
+# Int, AbstractUnitRange{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, c::AbstractUnitRange{Int}) where T <: RingElement = setindex!(a, b, r:r, c)
 
-# UnitRange{Int}, Int
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, c::Int) where T <: RingElement = setindex!(a, b, r, c:c)
+# AbstractUnitRange{Int}, Int
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::AbstractUnitRange{Int}, c::Int) where T <: RingElement = setindex!(a, b, r, c:c)
 
 # Int, Colon
 setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, ::Colon) where T <: RingElement = setindex!(a, b, r:r, 1:ncols(a))
@@ -529,11 +529,11 @@ end
 # Vector{Int}, Vector{Int}
 setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::Vector{Int}) where T <: RingElement = _setindex!(a, b, r, c)
 
-# Vector{Int}, UnitRange{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::UnitRange{Int}) where T <: RingElement = _setindex!(a, b, r, c)
+# Vector{Int}, AbstractUnitRange{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, c::AbstractUnitRange{Int}) where T <: RingElement = _setindex!(a, b, r, c)
 
-# UnitRange{Int}, Vector{Int}
-setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::UnitRange{Int}, c::Vector{Int}) where T <: RingElement = _setindex!(a, b, r, c)
+# AbstractUnitRange{Int}, Vector{Int}
+setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::AbstractUnitRange{Int}, c::Vector{Int}) where T <: RingElement = _setindex!(a, b, r, c)
 
 # Vector{Int}, Colon
 setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Vector{Int}, ::Colon) where T <: RingElement = _setindex!(a, b, r, 1:ncols(a))
@@ -3860,7 +3860,7 @@ end
     right_kernel(a::MatElem{T}) where T <: RingElement
 
 Return a tuple `n, M` where $M$ is a matrix whose columns generate the
-kernel of $M$ and $n$ is the rank of the kernel.
+kernel of $a$ and $n$ is the rank of the kernel.
 """
 function right_kernel(x::MatElem{T}) where T <: RingElement
    n, M = left_kernel(transpose(x))
@@ -3874,10 +3874,10 @@ end
 @doc raw"""
     kernel(a::MatElem{T}; side::Symbol = :right) where T <: RingElement
 
-Return a tuple $(n, M)$, where n is the rank of the kernel and $M$ is a
-basis for it. If side is $:right$ or not specified, the right kernel is
+Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $a$ and $M$ is a
+basis for it. If side is `:right` or not specified, the right kernel is
 computed, i.e. the matrix of columns whose span gives the right kernel
-space. If side is $:left$, the left kernel is computed, i.e. the matrix
+space. If side is `:left`, the left kernel is computed, i.e. the matrix
 of rows whose span is the left kernel space.
 """
 function kernel(A::MatElem{T}; side::Symbol = :right) where T <: RingElement
@@ -6484,26 +6484,22 @@ function _hcat(A)
   return M
 end
 
-function Base.cat(A::MatrixElem{T}...;dims) where T <: NCRingElement
+function Base.cat(A::MatrixElem{T}, As::MatrixElem{T}...; dims) where T <: NCRingElement
   @assert dims == (1,2) || isa(dims, Int)
 
   if isa(dims, Int)
     if dims == 1
-      return hcat(A...)
+      return hcat(A, As...)
     elseif dims == 2
-      return vcat(A...)
+      return vcat(A, As...)
     else
       error("dims must be 1, 2, or (1,2)")
     end
   end
 
-  local X
-  for i in 1:length(A)
-    if i == 1
-      X = hcat(A[1], zero(A[1], nrows(A[1]), sum(Int[ncols(A[j]) for j=2:length(A)])))
-    else
-      X = vcat(X, hcat(zero(A[1], nrows(A[i]), sum(ncols(A[j]) for j=1:i-1)), A[i], zero(A[1], nrows(A[i]), sum(Int[ncols(A[j]) for j in (i+1):length(A)]))))
-    end
+  X = hcat(A, zero(A, nrows(A), sum(Int[ncols(As[j]) for j=1:length(As)])))
+  for i in 1:length(As)
+    X = vcat(X, hcat(zero(A, nrows(As[i]), ncols(A) + sum(Int[ncols(As[j]) for j=1:i-1])), As[i], zero(A, nrows(As[i]), sum(Int[ncols(As[j]) for j in i+1:length(As)]))))
   end
   return X
 end
@@ -6734,7 +6730,7 @@ randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
 Constructs the matrix over $R$ with entries as in `arr`.
 """
 function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
-   if elem_type(R) === T
+   if elem_type(R) === T && all(e -> parent(e) === R, arr)
       z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
       return z
    else
@@ -6752,7 +6748,7 @@ row-wise from `arr`.
 function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
    _check_dim(r, c, arr)
    ndims(arr) == 2 && return matrix(R, arr)
-   if elem_type(R) === T
+   if elem_type(R) === T && all(e -> parent(e) === R, arr)
      z = Generic.MatSpaceElem{elem_type(R)}(R, r, c, arr)
      return z
    else

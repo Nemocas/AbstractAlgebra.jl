@@ -255,6 +255,7 @@ export MPolyRing
 export MPolyRingElem
 export mul!
 export NCPolyRingElem
+export NCRing
 export NCRingElem
 export NotImplementedError
 export NotInvertibleError
@@ -294,14 +295,16 @@ include("AliasMacro.jl")
 include("Pluralize.jl")
 
 # alternative names for some functions from Base
-export is_empty, is_equal, is_finite, is_inf, is_integer, is_less, is_one, is_real, is_subset, is_valid, is_zero
+export is_empty, is_even, is_equal, is_finite, is_inf, is_integer, is_less, is_odd, is_one, is_real, is_subset, is_valid, is_zero
 
 @alias is_empty isempty
+@alias is_even iseven
 @alias is_equal isequal
 @alias is_finite isfinite
 @alias is_inf isinf
 @alias is_integer isinteger
 @alias is_less isless
+@alias is_odd isodd
 @alias is_one isone
 @alias is_real isreal
 @alias is_subset issubset

@@ -160,7 +160,7 @@ is_square(a::MatAlgElem) = true
 ###############################################################################
 
 function show(io::IO, ::MIME"text/plain", a::MatAlgebra)
-  print(io, "Matrix Algebra of")
+  print(io, "Matrix algebra of")
   print(io, " degree ", a.n)
   println(io)
   io = pretty(io)
@@ -170,10 +170,10 @@ end
 
 function show(io::IO, a::MatAlgebra)
    if get(io, :supercompact, false)
-      print(io, "Matrix Algebra")
+      print(io, "Matrix algebra")
    else
       io = pretty(io)
-      print(io, "Matrix Algebra of ")
+      print(io, "Matrix algebra of ")
       print(io, "degree ", a.n, " over ")
       print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
    end

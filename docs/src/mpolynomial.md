@@ -791,7 +791,7 @@ julia> evaluate(f, [1, 2], [x + z, x - z])
 x^4 - 2*x^2*z^2 + 5*x*z + z^4 - z^2 + z + 1
 
 julia> S = MatrixAlgebra(ZZ, 2)
-Matrix Algebra of degree 2
+Matrix algebra of degree 2
   over integers
 
 julia> M1 = S([1 2; 3 4])
