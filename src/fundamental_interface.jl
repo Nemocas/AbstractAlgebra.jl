@@ -145,7 +145,7 @@ either an element or parent.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S = MatrixAlgebra(QQ, 2)
-Matrix Algebra of degree 2
+Matrix algebra of degree 2
   over rationals
 
 julia> zero(S)

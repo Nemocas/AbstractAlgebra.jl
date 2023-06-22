@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export exponent_word, set_exponent_word, calc_suffix_match_vector
+export exponent_word, set_exponent_word!
 
 ###############################################################################
 #

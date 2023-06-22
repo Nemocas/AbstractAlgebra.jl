@@ -842,6 +842,10 @@ end
 #
 ###############################################################################
 
+function evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
+   return evaluate(a, parent(a).(vals))
+end
+
 @doc raw"""
     evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
 
@@ -1354,9 +1358,14 @@ also prevent it from being cached.
 
 The `ordering` of the polynomial ring can be one of `:lex`, `:deglex` or `:degrevlex`.
 """
-polynomial_ring(R::Ring, s::Union{Tuple{Vararg{T}}, AbstractVector{T}}; kw...) where
-      T<:VarName =
+polynomial_ring(R::Ring, s::AbstractVector{T}; kw...) where T<:VarName =
    polynomial_ring(R, Symbol[Symbol(x) for x in s]; kw...)
+
+polynomial_ring(R::Ring, s::Tuple{VarName,Vararg{VarName}}; kw...) =
+   polynomial_ring(R, Symbol[Symbol(x) for x in s]; kw...)
+
+polynomial_ring(R::Ring, s::Tuple{}; kw...) = 
+   polynomial_ring(R, Symbol[]; kw...)
 
 function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
    S = polynomial_ring_only(R, s; kw...)

@@ -4,7 +4,7 @@
     evaluate(E::Expr, R::PolyRing)
 
 Given an rational multivariate expression, evaluate the expression
-by replacing the occuring symbols using the dictionary `vars` or
+by replacing the occurring symbols using the dictionary `vars` or
 the variables from the polynomial ring `R`.
 
 # Examples

@@ -5,8 +5,8 @@ module GenericTest
 
 using AbstractAlgebra, Test
 
-using Random: Random, SamplerTrivial, GLOBAL_RNG
-using RandomExtensions: RandomExtensions, Make2, AbstractRNG
+using ..Random: Random, SamplerTrivial, GLOBAL_RNG
+using ..RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
 import AbstractAlgebra: parent_type, elem_type, base_ring, parent, is_domain_type,
        is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
