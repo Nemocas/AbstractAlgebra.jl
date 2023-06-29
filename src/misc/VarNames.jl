@@ -10,120 +10,77 @@ using Base.Iterators
 #     Vector{Union{<:VarName, Pair{<:VarName, <:VarShape}}}
 # }
 
-"""
-    variable_names(a) -> Vector{Symbol}
+raw"""
+    variable_names(a...) -> Vector{Symbol}
+    variable_names(a::Tuple) -> Vector{Symbol}
 
 Create proper variable names from `a`.
 
 #Examples
 
 ```jldoctest
-julia> variable_names([:x, :y])
-2-element Vector{String}:
- "x"
- "y"
+julia> variable_names(:x, :y)
+[:x, :y]
 
-julia> variable_names(:x => 3)
-3-element Vector{String}:
- "x[1]"
- "x[2]"
- "x[3]"
+julia> variable_names(:x => (1, 2), :y => 2, :z)
+[Symbol("x[1,1]"), Symbol("x[1,2]"), Symbol("y[1]"), Symbol("y[2]"), :z]
 
-julia> x = variable_names(:x => (3, 2))
-6-element Vector{String}:
- "x[1,1]"
- "x[2,1]"
- "x[3,1]"
- "x[1,2]"
- "x[2,2]"
- "x[3,2]"
+julia> variable_names(["x$i$j" for i in 0:2, j in 0:1], 'y')
+[:x00, :x10, :x20, :x01, :x11, :x21, :y]
 
-julia> x == variable_names(:x => [3, 2])
-true
-
-julia> vars = variable_names((x = (1, 2), y = 2, z = missing))
-5-element Vector{String}:
- "x[1,1]"
- "x[1,2]"
- "y[1]"
- "y[2]"
- "z"
-
-julia> vars == variable_names([:x => (1, 2), :y => 2, :z])
-true
-
-julia> variable_names(Dict(:x => (1, 2), :y => 2, :z => missing))
-5-element Vector{String}:
- "y[1]"
- "y[2]"
- "z"
- "x[1,1]"
- "x[1,2]"
 ```
 """
-variable_names(a) = Symbol[Symbol(s, suffix) for (s, shape) in _pairs(a) for suffix in _variable_suffix(shape)]::Vector{Symbol}
+variable_names(as...) = variable_names(as)
+variable_names(as::Tuple) = [x for a in as for x in _variable_names(a)]::Vector{Symbol}
 
-_variable_suffix(::Missing) = [""]
-_variable_suffix(n::Int) = ["[$i]" for i in Base.OneTo(n)]
-_variable_suffix(dims) = ["[$(join(is, ','))]" for is in Iterators.product(Base.OneTo.(dims)...)]
+_variable_names(a::AbstractArray{<:VarName}) = Symbol.(a)
+_variable_names(s::VarName) = [Symbol(s)]
+_variable_names((s, n)::Pair{<:VarName, Int}) = Symbol.(s, '[', Base.OneTo(n), ']')
+_variable_names((s, dims)::Pair{<:VarName, <:Tuple{Vararg{Int}}}) = Symbol.(s, '[', join.(Tuple.(CartesianIndices(dims)), ','), ']')
+_variable_names((s, _)::Pair{<:VarName, Missing}) = [Symbol(s)]
 
-"""
-    _pairs(a)
-
-Return iterator of pairs, if possible, otherwise keep `a`.
-"""
-_pairs(a::Pair{<:VarName}) = [a]
-_pairs(a::Dict{<:VarName}) = pairs(a)
-_pairs(a::NamedTuple) = pairs(a)
-_pairs(a::Vector) = _pair.(a)
-_pair(a::Pair{<:VarName}) = a
-_pair(s::VarName) = s => missing
-
-_pairs(a::T) where T = hasmethod(pairs, Tuple{T}) ? pairs(a) : _pair.(a)
-
-"""
-    reshape_to_varnames(vec::Vector, varnames)
+raw"""
+    reshape_to_varnames(vec::Vector{T}, varnames...) :: Tuple{Array{<:Any, T}}
+    reshape_to_varnames(vec::Vector{T}, varnames::Tuple) :: Tuple{Array{<:Any, T}}
 
 Turn `vec` into the shape of `varnames`. Reverse flattening from [`variable_names`](@ref).
-
-It holds `reshape_to_varnames(a, variable_names(a)) == a`.
 
 # Examples
 
 ```jldoctest
-julia> R, vec = polynomial_ring(ZZ, variable_names((x=(1,2), y=2, z=missing)))
-(Multivariate Polynomial Ring in x[1,1], x[1,2], y[1], y[2], z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1], x[1,2], y[1], y[2], z])
+julia> s = ([:a, :b], :x => (1, 2), :y => 2, :z);
 
-julia> x, y, z = reshape_to_varnames(vec, (x=(1,2), y=2, z=missing))
-(x = AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1] x[1,2]], y = AbstractAlgebra.Generic.MPoly{BigInt}[y[1], y[2]], z = z)
+julia> reshape_to_varnames(variable_names(s...), s...)
+([:a, :b], [Symbol("x[1,1]"), Symbol("x[1,2]")], [Symbol("y[1]"), Symbol("y[2]")], :z)
+
+julia> R, vec = polynomial_ring(ZZ, variable_names(s...))
+(Multivariate Polynomial Ring in a, b, x[1,1], x[1,2], y[1], y[2], z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b, x[1,1], x[1,2], y[1], y[2], z])
+
+julia> (a, b), x, y, z = reshape_to_varnames(vec, s...)
+(AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1] x[1,2]], AbstractAlgebra.Generic.MPoly{BigInt}[y[1], y[2]], z)
+
+julia> R, (a, b), x, y, z = polynomial_ring(ZZ, s...)
+(Multivariate Polynomial Ring in a, b, x[1,1], x[1,2], y[1], y[2], z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1] x[1,2]], AbstractAlgebra.Generic.MPoly{BigInt}[y[1], y[2]], z)
+
+```
 """
-function reshape_to_varnames(vec::Vector, varnames)
+reshape_to_varnames(vec::Vector, varnames...) = reshape_to_varnames(vec, varnames)
+function reshape_to_varnames(vec::Vector, varnames::Tuple)
     iter = Iterators.Stateful(vec)
-    result = reshape_to_varnames(iter, varnames)
+    result = Tuple(_reshape_to_varnames(iter, x) for x in varnames)
     @assert isempty(iter)
     return result
 end
 
-reshape_to_varnames(iter::Iterators.Stateful, (s, shape)::Pair) =
-    s => _reshape(iter, shape)
+_reshape_to_varnames(iter::Iterators.Stateful, ::VarName) = popfirst!(iter)
+_reshape_to_varnames(iter::Iterators.Stateful, (_, shape)::Pair) = _reshape(iter, shape)
+_reshape_to_varnames(iter::Iterators.Stateful, a::AbstractArray{<:VarName}) = _reshape(iter, size(a))
 
-reshape_to_varnames(iter::Iterators.Stateful, a::Dict) =
-    Dict(s => _reshape(iter, shape) for (s, shape) in a)
-
-reshape_to_varnames(iter::Iterators.Stateful, a::NamedTuple) =
-    NamedTuple(s => _reshape(iter, shape) for (s, shape) in pairs(a))
-
-reshape_to_varnames(iter::Iterators.Stateful, a::Vector) =
-    [__reshape(iter, s) for s in a]
-
-_reshape(iter, ::Missing) = popfirst!(iter)
 _reshape(iter, n::Int) = collect(Iterators.take(iter, n))
 _reshape(iter, dims) = reshape(collect(Iterators.take(iter, prod(dims))), Tuple(dims))
+_reshape(iter, ::Missing) = popfirst!(iter)
 
-__reshape(iter, s::VarName) = popfirst!(iter)
-__reshape(iter, (_, a)::Pair) = _reshape(iter, a)
-
-"""
+raw"""
     @add_varnames_interface f(args..., varnames)
 
 Add method `X, vars = f(args..., varnames)` and macro `X = @f args... varnames...` to current scope. Read on.
@@ -136,7 +93,7 @@ This underlying method is assumed to exist. The existence is currently not teste
 
 ---
 
-    X, vars = f(args..., varnames)
+    X, vars... = f(args..., varnames...)
 
 Compute `X` and `gens` by the underlying `f` method. Then reshape `gens` into the shape defined by `varnames`.
 
@@ -159,8 +116,14 @@ julia> @add_varnames_interface f(a, s::Vector{Symbol})
 julia> f
 f (generic function with 2 methods)
 
-julia> f("hello", (x = (1, 2), y = 2, z = missing))
-("hello", (x = ["x[1,1]" "x[1,2]"], y = ["y[1]", "y[2]"], z = "z"))
+julia> f("hello", :x => (1, 2), :y => 2, :z)
+("hello", ["x[1,1]" "x[1,2]"], ["y[1]", "y[2]"], "z")
+
+julia> f("projective", ["x$i$j" for i in 0:1, j in 0:1], [:y0, :y1], :z)
+("projective", ["x00" "x01"; "x10" "x11"], ["y0", "y1"], "z")
+
+julia> f("fun inputs", 'a':'g', Symbol.('x':'z', [0 1])
+("fun inputs", ["a", "b", "c", "d", "e", "f", "g"], ["x0" "x1"; "y0" "y1"; "z0" "z1"])
 
 julia> @f "hello" x[1, 2] y[2] z
 "hello"
@@ -177,13 +140,17 @@ julia> y
 julia> z
  "z"
 
-julia> v = [1,4,1];
-
-julia> @f "variable dims show case" x[v...]; x
+julia> v = [1,4,1]; @f "variable dims" x[v...]; x
 1×4×1 Array{String, 3}:
 [:, :, 1] =
  "y[1,1,1]"  "y[1,2,1]"  "y[1,3,1]"  "y[1,4,1]"
+
 ```
+
+# Caveats
+
+For the macro variant, all to be introduced names have to be given explicitly.
+`@add_varnames_interface` can only be called with unqualified names.
 """
 macro add_varnames_interface(e::Expr)
     @assert Base.isexpr(e, :call)
@@ -194,30 +161,29 @@ macro add_varnames_interface(e::Expr)
     # TODO cope with `where` clause and keyvalues
     return quote
         # TODO assert existence of underlying method
-        function $f($(args...), $s; $kv...)
+        function $f($(args...), $s...; $kv...)
             X, gens = $f($(args...), variable_names($s); $kv...)
-            return X, reshape_to_varnames(gens, $s)
+            return X, reshape_to_varnames(gens, $s)...
         end
 
         macro $f($(args...), $s...)
             xs = _expr_pairs($s)
-            varnames = Expr(:tuple, (:($k = $v) for (k, v) in xs)...)
-            return Expr(:block,
-                :((X, gens) = $$f($$(args...), $varnames)),
-                (:($(esc(x)) = gens.$x) for (x, _) in xs)...,
-                :(X)
-            )
+            gens = esc.(first.(xs))
+            varnames = (:($(QuoteNode(k)) => $v) for (k, v) in xs)
+            return quote
+                X, $(gens...) = $$f($(esc.($(args...))), $(varnames...))
+                X
+            end
         end
     end
 end
 
 _expr_pairs(a::Tuple{Vararg{Union{Expr, Symbol}}}) = _expr_pair.(a)
-# for `@f args... (varnames...)` variant:
-_expr_pairs((a,)::Tuple{Expr}) = Base.isexpr(a, :tuple) ? _expr_pair.(a.args) : (_expr_pair(a),)
-_expr_pair(e::Expr) = (@assert Base.isexpr(e, :ref) "$(e.head) ≠ :ref"; e.args[1] => Expr(:tuple, :($(esc.(e.args[2:end])...))))
+_expr_pairs((a,)::Tuple{Expr}) = Base.isexpr(a, :tuple) ? _expr_pair.(a.args) : (_expr_pair(a),) # for `@f args... (varnames...)` variant
+_expr_pair(e::Expr) = (@assert Base.isexpr(e, :ref) "$(e.head) ≠ :ref"; e.args[1] => Expr(:tuple, esc.(e.args[2:end])...))
 _expr_pair(s::Symbol) = s => missing
 
-"""
+raw"""
     @add_varname_interface f(args0..., varname::VarName, args1...)
 
 Add method `X, vars = f(args0..., varname::VarName, args1...)` and macro `X = @f args0... varname::Symbol, args1...` to current scope. Read on.
@@ -264,7 +230,7 @@ macro add_varname_interface(e::Expr)
     @assert Base.isexpr(e, :call)
     f = esc(e.args[1])
     args = e.args[2:end-1]
-    s = gensym("varnames")
+    s = gensym("varname")
     kv = gensym("kv")
     return quote
         $f($(args...), $s::Union{AbstractString, Char}; $kv...) =
@@ -272,7 +238,7 @@ macro add_varname_interface(e::Expr)
 
         macro $f($(args...), $s::Symbol)
             quote
-                X, gen = $$f($$(args...), $(QuoteNode($s)))
+                X, gen = $$f($(esc.($(args...))), $(QuoteNode($s)))
                 $(esc($s)) = gen
                 X
             end
