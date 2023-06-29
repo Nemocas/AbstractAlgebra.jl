@@ -12,11 +12,11 @@ export exponent_word, set_exponent_word!
 #
 ###############################################################################
 
-function parent_type(::Type{FreeAssAlgElem{T}}) where {T<:RingElement}
+function parent_type(::Type{FreeAssAlgElem{T}}) where T<:RingElement
     return FreeAssAlgebra{T}
 end
 
-function elem_type(::Type{FreeAssAlgebra{T}}) where {T<:RingElement}
+function elem_type(::Type{FreeAssAlgebra{T}}) where T<:RingElement
     return FreeAssAlgElem{T}
 end
 
@@ -44,7 +44,7 @@ function check_parent(
     a::FreeAssAlgElem{T},
     b::FreeAssAlgElem{T},
     throw::Bool = true,
-) where {T<:RingElement}
+) where T<:RingElement
     b = parent(a) != parent(b)
     b & throw && error("Incompatible rings in operation")
     return !b
@@ -56,7 +56,7 @@ end
 #
 ###############################################################################
 
-function Base.deepcopy_internal(a::FreeAssAlgElem{T}, dict::IdDict) where {T<:RingElement}
+function Base.deepcopy_internal(a::FreeAssAlgElem{T}, dict::IdDict) where T<:RingElement
     return FreeAssAlgElem{T}(
         a.parent,
         deepcopy_internal(a.coeffs, dict),
@@ -65,17 +65,17 @@ function Base.deepcopy_internal(a::FreeAssAlgElem{T}, dict::IdDict) where {T<:Ri
     )
 end
 
-function zero(a::FreeAssAlgebra{T}) where {T}
+function zero(a::FreeAssAlgebra{T}) where T
     return FreeAssAlgElem{T}(a, T[], Vector{Int}[], 0)
 end
 
-function one(a::FreeAssAlgebra{T}) where {T}
+function one(a::FreeAssAlgebra{T}) where T
     c = one(base_ring(a))
     !iszero(c) || return zero(a)
     return FreeAssAlgElem{T}(a, [c], [Int[]], 1)
 end
 
-function iszero(a::FreeAssAlgElem{T}) where {T}
+function iszero(a::FreeAssAlgElem{T}) where T
     return length(a) == 0
 end
 
@@ -98,7 +98,7 @@ function gen(a::FreeAssAlgebra{T}, i::Int) where T
    return FreeAssAlgElem{T}(a, T[c], [Int[i]], 1)
 end
 
-function gens(a::FreeAssAlgebra{T}) where {T <: RingElement}
+function gens(a::FreeAssAlgebra{T}) where T <: RingElement
    return [gen(a, i) for i in 1:ngens(a)]
 end
 
@@ -110,7 +110,7 @@ function is_gen(a::FreeAssAlgElem{T}) where T
     end
 end
 
-function is_constant(a::FreeAssAlgElem{T}) where {T}
+function is_constant(a::FreeAssAlgElem{T}) where T
     return length(a) == 0 || (length(a) == 1 && isempty(a.exps[1]))
 end
 
@@ -120,7 +120,7 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{FreeAssAlgElem{T}}, ::Type{FreeAssAlgElem{T}}) where {T<:RingElement} =
+promote_rule(::Type{FreeAssAlgElem{T}}, ::Type{FreeAssAlgElem{T}}) where T<:RingElement =
     FreeAssAlgElem{T}
 
 function promote_rule(
@@ -136,22 +136,22 @@ end
 #
 ###############################################################################
 
-function (a::FreeAssAlgebra{T})() where {T}
+function (a::FreeAssAlgebra{T})() where T
     return zero(a)
 end
 
-function (a::FreeAssAlgebra{T})(b::T) where {T}
+function (a::FreeAssAlgebra{T})(b::T) where T
     iszero(b) && return zero(a)
     return FreeAssAlgElem{T}(a, T[b], [Int[]], 1)
 end
 
-function (a::FreeAssAlgebra{T})(b::Integer) where {T}
+function (a::FreeAssAlgebra{T})(b::Integer) where T
     iszero(b) && return zero(a)
     R = base_ring(a)
     return FreeAssAlgElem{T}(a, T[R(b)], [Int[]], 1)
 end
 
-function (a::FreeAssAlgebra{T})(b::FreeAssAlgElem{T}) where {T<:RingElement}
+function (a::FreeAssAlgebra{T})(b::FreeAssAlgElem{T}) where T<:RingElement
     parent(b) != a && error("Unable to coerce element")
     return b
 end
@@ -208,32 +208,32 @@ function Base.iterate(a::FreeAssAlgExponentWords, state = 0)
     return exponent_word(a.poly, state), state
 end
 
-function leading_coefficient(a::FreeAssAlgElem{T}) where {T}
+function leading_coefficient(a::FreeAssAlgElem{T}) where T
     return a.length > 0 ? coeff(a, 1) : zero(base_ring(a))
 end
 
-function leading_monomial(a::FreeAssAlgElem{T}) where {T}
+function leading_monomial(a::FreeAssAlgElem{T}) where T
     if length(a) < 1
         throw(ArgumentError("Zero polynomial does not have a leading monomial"))
     end
     return monomial(a, 1)
 end
 
-function leading_term(a::FreeAssAlgElem{T}) where {T}
+function leading_term(a::FreeAssAlgElem{T}) where T
     if length(a) < 1
         throw(ArgumentError("Zero polynomial does not have a leading term"))
     end
     return term(a, 1)
 end
 
-function leading_exponent_word(a::FreeAssAlgElem{T}) where {T}
+function leading_exponent_word(a::FreeAssAlgElem{T}) where T
     if length(a) < 1
         throw(ArgumentError("Zero polynomial does not have a leading exponent word"))
     end
     return exponent_word(a, 1)
 end
 
-function total_degree(a::FreeAssAlgElem{T}) where {T}
+function total_degree(a::FreeAssAlgElem{T}) where T
     # currently stored in dexlex
     return length(a) > 0 ? length(a.exps[1]) : -1
 end
@@ -256,7 +256,7 @@ end
 #
 ###############################################################################
 
-function canonical_unit(a::FreeAssAlgElem{T}) where {T<:RingElement}
+function canonical_unit(a::FreeAssAlgElem{T}) where T<:RingElement
     return canonical_unit(leading_coefficient(a))
 end
 
@@ -266,7 +266,7 @@ end
 #
 ###############################################################################
 
-function fit!(a::FreeAssAlgElem{T}, n::Int) where {T<:RingElement}
+function fit!(a::FreeAssAlgElem{T}, n::Int) where T<:RingElement
     if length(a.coeffs) < n
         resize!(a.coeffs, n)
     end
@@ -278,7 +278,7 @@ end
 
 for T in [RingElem, Integer, Rational, AbstractFloat]
     @eval begin
-        function setcoeff!(a::FreeAssAlgElem{S}, i::Int, c::S) where {S<:$T}
+        function setcoeff!(a::FreeAssAlgElem{S}, i::Int, c::S) where S<:$T
             fit!(a, i)
             a.coeffs[i] = c
             if i > length(a)
@@ -307,7 +307,7 @@ end
 #
 ###############################################################################
 
-function ==(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where {T}
+function ==(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T
     fl = check_parent(a, b, false)
     !fl && return false
     return a.length == b.length &&
@@ -337,7 +337,7 @@ function word_gt(a::Vector{Int}, b::Vector{Int})
     return word_cmp(a, b) > 0
 end
 
-function sort_terms!(z::FreeAssAlgElem{T}) where {T}
+function sort_terms!(z::FreeAssAlgElem{T}) where T
     n = length(z)
     if n > 1
         p = sortperm(view(z.exps, 1:n), lt = word_gt)
@@ -347,7 +347,7 @@ function sort_terms!(z::FreeAssAlgElem{T}) where {T}
     return z
 end
 
-function combine_like_terms!(z::FreeAssAlgElem{T}) where {T}
+function combine_like_terms!(z::FreeAssAlgElem{T}) where T
     o = 0
     i = 1
     while i <= z.length
@@ -365,7 +365,7 @@ function combine_like_terms!(z::FreeAssAlgElem{T}) where {T}
     return z
 end
 
-function isless(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where {T}
+function isless(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where T
     if p == q
         return false
     end
@@ -393,7 +393,7 @@ function isless(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where {T}
     end
 end
 
-function <(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where {T}
+function <(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where T
     return isless(p, q)
 end
 
@@ -403,14 +403,14 @@ end
 #
 ###############################################################################
 
-function -(a::FreeAssAlgElem{T}) where {T<:RingElement}
+function -(a::FreeAssAlgElem{T}) where T<:RingElement
     n = length(a)
     R = parent(a)
     zcoeffs = T[-a.coeffs[i] for i in 1:n]
     return FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n)
 end
 
-function *(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where {T<:RingElement}
+function *(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T<:RingElement
     zcoeffs = T[]
     zexps = Vector{Int}[]
     for i in 1:a.length, j = 1:b.length
@@ -421,7 +421,7 @@ function *(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where {T<:RingElement}
     return combine_like_terms!(sort_terms!(z))
 end
 
-function +(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where {T<:RingElement}
+function +(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T<:RingElement
     zcoeffs = T[]
     zexps = Vector{Int}[]
     i = j = 1
@@ -463,7 +463,7 @@ function _sub_rest(
     a::FreeAssAlgElem{T},
     b::FreeAssAlgElem{T},
     start::Int,
-) where {T<:RingElement}
+) where T<:RingElement
     zcoeffs = T[]
     zexps = Vector{Int}[]
     i = j = start + 1
@@ -500,11 +500,11 @@ function _sub_rest(
     return FreeAssAlgElem{T}(parent(a), zcoeffs, zexps, length(zcoeffs))
 end
 
-function -(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where {T<:RingElement}
+function -(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T<:RingElement
     return _sub_rest(a, b, 0)
 end
 
-function ^(a::FreeAssAlgElem{T}, b::Integer) where {T<:RingElement}
+function ^(a::FreeAssAlgElem{T}, b::Integer) where T<:RingElement
     if b == 0
         return one(parent(a))
     elseif b == 1
@@ -530,7 +530,7 @@ end
 ###############################################################################
 
 # return c*w*a*wp
-function mul_term(c::T, w::Vector{Int}, a::FreeAssAlgElem{T}, wp::Vector{Int}) where {T}
+function mul_term(c::T, w::Vector{Int}, a::FreeAssAlgElem{T}, wp::Vector{Int}) where T
     zcoeffs =
         isone(c) ? T[a.coeffs[i] for i in 1:a.length] : T[c * a.coeffs[i] for i in 1:a.length]
     zexps = Vector{Int}[vcat(w, a.exps[i], wp) for i in 1:a.length]
@@ -580,7 +580,7 @@ function AbstractAlgebra.divexact_left(
     f::FreeAssAlgElem{T},
     g::FreeAssAlgElem{T};
     check::Bool = true,
-) where {T}
+) where T
     R = parent(f)
     qcoeffs = T[]
     qexps = Vector{Int}[]
@@ -599,7 +599,7 @@ function AbstractAlgebra.divexact_right(
     f::FreeAssAlgElem{T},
     g::FreeAssAlgElem{T};
     check::Bool = true,
-) where {T}
+) where T
     R = parent(f)
     qcoeffs = T[]
     qexps = Vector{Int}[]
@@ -625,7 +625,7 @@ function divexact(
     a::FreeAssAlgElem{T},
     b::Integer;
     check::Bool = true,
-) where {T<:RingElement}
+) where T<:RingElement
 
     n = length(a)
     R = parent(a)
@@ -656,7 +656,7 @@ function map_coefficients(f, a::FreeAssAlgElem{T}; cached::Bool=true, parent::Ab
    return _map(f, a, parent)
 end
 
-function _map(g, a::FreeAssAlgElem{T}, Rx) where {T<:RingElement}
+function _map(g, a::FreeAssAlgElem{T}, Rx) where T<:RingElement
     cvzip = zip(coefficients(a), exponent_words(a))
     M = MPolyBuildCtx(Rx)
     for (c, v) in cvzip

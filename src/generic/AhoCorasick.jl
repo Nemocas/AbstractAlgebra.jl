@@ -26,7 +26,7 @@ const Word = Vector{Int}
 An Aho-Corasick automaton, which can be used to efficiently search for a fixed list of keywords (vectors of Ints) in
 arbitrary lists of integers
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]];
 
@@ -53,7 +53,7 @@ end
 The return value of searching in a given word with an AhoCorasickAutomaton. Contains the position of the last letter in
 the word that matches a keyword in the automaton, an index of the keyword that was matched and the keyword itself.
 
-# Examples:
+# Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]];
 
