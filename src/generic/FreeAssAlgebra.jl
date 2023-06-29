@@ -12,11 +12,11 @@ export exponent_word, set_exponent_word!
 #
 ###############################################################################
 
-function parent_type(::Type{FreeAssAlgElem{T}}) where T<:RingElement
+function parent_type(::Type{FreeAssAlgElem{T}}) where T <: RingElement
     return FreeAssAlgebra{T}
 end
 
-function elem_type(::Type{FreeAssAlgebra{T}}) where T<:RingElement
+function elem_type(::Type{FreeAssAlgebra{T}}) where T <: RingElement
     return FreeAssAlgElem{T}
 end
 
@@ -44,7 +44,7 @@ function check_parent(
     a::FreeAssAlgElem{T},
     b::FreeAssAlgElem{T},
     throw::Bool = true,
-) where T<:RingElement
+) where T <: RingElement
     b = parent(a) != parent(b)
     b & throw && error("Incompatible rings in operation")
     return !b
@@ -56,7 +56,7 @@ end
 #
 ###############################################################################
 
-function Base.deepcopy_internal(a::FreeAssAlgElem{T}, dict::IdDict) where T<:RingElement
+function Base.deepcopy_internal(a::FreeAssAlgElem{T}, dict::IdDict) where T <: RingElement
     return FreeAssAlgElem{T}(
         a.parent,
         deepcopy_internal(a.coeffs, dict),
@@ -80,26 +80,26 @@ function iszero(a::FreeAssAlgElem{T}) where T
 end
 
 function isone(a::FreeAssAlgElem{T}) where T
-   if length(a) < 1
-      return isone(zero(base_ring(a)))
-   else
-      return a.length == 1 && isone(a.coeffs[1]) && isempty(a.exps[1])
-   end
+    if length(a) < 1
+        return isone(zero(base_ring(a)))
+    else
+        return a.length == 1 && isone(a.coeffs[1]) && isempty(a.exps[1])
+    end
 end
 
 function ngens(a::FreeAssAlgebra{T}) where T
-   return nvars(a)
+    return nvars(a)
 end
 
 function gen(a::FreeAssAlgebra{T}, i::Int) where T
-   @boundscheck 1 <= i <= ngens(a) || throw(ArgumentError("variable index out of range"))
-   c = one(base_ring(a))
-   iszero(c) && return zero(a)
-   return FreeAssAlgElem{T}(a, T[c], [Int[i]], 1)
+    @boundscheck 1 <= i <= ngens(a) || throw(ArgumentError("variable index out of range"))
+    c = one(base_ring(a))
+    iszero(c) && return zero(a)
+    return FreeAssAlgElem{T}(a, T[c], [Int[i]], 1)
 end
 
 function gens(a::FreeAssAlgebra{T}) where T <: RingElement
-   return [gen(a, i) for i in 1:ngens(a)]
+    return [gen(a, i) for i in 1:ngens(a)]
 end
 
 function is_gen(a::FreeAssAlgElem{T}) where T
@@ -120,13 +120,13 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{FreeAssAlgElem{T}}, ::Type{FreeAssAlgElem{T}}) where T<:RingElement =
+promote_rule(::Type{FreeAssAlgElem{T}}, ::Type{FreeAssAlgElem{T}}) where T <: RingElement =
     FreeAssAlgElem{T}
 
 function promote_rule(
     ::Type{FreeAssAlgElem{T}},
     ::Type{U},
-) where {T<:RingElement,U<:RingElement}
+) where {T <: RingElement, U <: RingElement}
     promote_rule(T, U) == T ? FreeAssAlgElem{T} : Union{}
 end
 
@@ -151,19 +151,21 @@ function (a::FreeAssAlgebra{T})(b::Integer) where T
     return FreeAssAlgElem{T}(a, T[R(b)], [Int[]], 1)
 end
 
-function (a::FreeAssAlgebra{T})(b::FreeAssAlgElem{T}) where T<:RingElement
+function (a::FreeAssAlgebra{T})(b::FreeAssAlgElem{T}) where T <: RingElement
     parent(b) != a && error("Unable to coerce element")
     return b
 end
 
 function (a::FreeAssAlgebra{T})(c::Vector{T}, e::Vector{Vector{Int}}) where T
-   for ei in e
-      @boundscheck all(i -> (1 <= i <= nvars(a)), ei) || throw(ArgumentError("variable index out of range"))
-   end
-   n = length(c)
-   n == length(e) || error("coefficient array and exponent array should have the same length")
-   z = FreeAssAlgElem{T}(a, copy(c), copy(e), n)
-   return combine_like_terms!(sort_terms!(z))
+    for ei in e
+        @boundscheck all(i -> (1 <= i <= nvars(a)), ei) ||
+                     throw(ArgumentError("variable index out of range"))
+    end
+    n = length(c)
+    n == length(e) ||
+        error("coefficient array and exponent array should have the same length")
+    z = FreeAssAlgElem{T}(a, copy(c), copy(e), n)
+    return combine_like_terms!(sort_terms!(z))
 end
 
 ###############################################################################
@@ -173,20 +175,20 @@ end
 ###############################################################################
 
 function coeff(a::FreeAssAlgElem, i::Int)
-   @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
-   return a.coeffs[i]
+    @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
+    return a.coeffs[i]
 end
 
 function term(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
-   @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
-   R = parent(a)
-   return FreeAssAlgElem{T}(R, [a.coeffs[i]], [a.exps[i]], 1)
+    @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
+    R = parent(a)
+    return FreeAssAlgElem{T}(R, [a.coeffs[i]], [a.exps[i]], 1)
 end
 
 function monomial(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
-   @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
-   R = parent(a)
-   return FreeAssAlgElem{T}(R, T[one(base_ring(R))], [a.exps[i]], 1)
+    @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
+    R = parent(a)
+    return FreeAssAlgElem{T}(R, T[one(base_ring(R))], [a.exps[i]], 1)
 end
 
 @doc raw"""
@@ -198,8 +200,8 @@ indices are given in the order of the variables for the ring.
 """
 
 function exponent_word(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
-   @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
-   return a.exps[i]
+    @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
+    return a.exps[i]
 end
 
 function Base.iterate(a::FreeAssAlgExponentWords, state = 0)
@@ -240,13 +242,13 @@ end
 
 function Base.length(
     x::FreeAssAlgExponentWords{T},
-) where {S<:RingElement,T<:FreeAssAlgElem{S}}
+) where {S <: RingElement, T <: FreeAssAlgElem{S}}
     return length(x.poly)
 end
 
 function Base.eltype(
     x::FreeAssAlgExponentWords{T},
-) where {S<:RingElement,T<:FreeAssAlgElem{S}}
+) where {S <: RingElement, T <: FreeAssAlgElem{S}}
     return Vector{Int}
 end
 
@@ -256,7 +258,7 @@ end
 #
 ###############################################################################
 
-function canonical_unit(a::FreeAssAlgElem{T}) where T<:RingElement
+function canonical_unit(a::FreeAssAlgElem{T}) where T <: RingElement
     return canonical_unit(leading_coefficient(a))
 end
 
@@ -266,7 +268,7 @@ end
 #
 ###############################################################################
 
-function fit!(a::FreeAssAlgElem{T}, n::Int) where T<:RingElement
+function fit!(a::FreeAssAlgElem{T}, n::Int) where T <: RingElement
     if length(a.coeffs) < n
         resize!(a.coeffs, n)
     end
@@ -278,7 +280,7 @@ end
 
 for T in [RingElem, Integer, Rational, AbstractFloat]
     @eval begin
-        function setcoeff!(a::FreeAssAlgElem{S}, i::Int, c::S) where S<:$T
+        function setcoeff!(a::FreeAssAlgElem{S}, i::Int, c::S) where S <: $T
             fit!(a, i)
             a.coeffs[i] = c
             if i > length(a)
@@ -290,15 +292,20 @@ for T in [RingElem, Integer, Rational, AbstractFloat]
 end
 
 
-function set_exponent_word!(a::FreeAssAlgElem{T}, i::Int, w::Vector{Int}) where T <: RingElement
-   n = nvars(parent(a))
-   @boundscheck all(x -> 1 <= x <= n, w) || throw(ArgumentError("variable index out of range"))
-   fit!(a, i)
-   a.exps[i] = w
-   if i > length(a)
-      a.length = i
-   end
-   return a
+function set_exponent_word!(
+    a::FreeAssAlgElem{T},
+    i::Int,
+    w::Vector{Int},
+) where T <: RingElement
+    n = nvars(parent(a))
+    @boundscheck all(x -> 1 <= x <= n, w) ||
+                 throw(ArgumentError("variable index out of range"))
+    fit!(a, i)
+    a.exps[i] = w
+    if i > length(a)
+        a.length = i
+    end
+    return a
 end
 
 ###############################################################################
@@ -403,17 +410,17 @@ end
 #
 ###############################################################################
 
-function -(a::FreeAssAlgElem{T}) where T<:RingElement
+function -(a::FreeAssAlgElem{T}) where T <: RingElement
     n = length(a)
     R = parent(a)
     zcoeffs = T[-a.coeffs[i] for i in 1:n]
     return FreeAssAlgElem{T}(R, zcoeffs, copy(a.exps), n)
 end
 
-function *(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T<:RingElement
+function *(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T <: RingElement
     zcoeffs = T[]
     zexps = Vector{Int}[]
-    for i in 1:a.length, j = 1:b.length
+    for i in 1:a.length, j in 1:b.length
         push!(zcoeffs, a.coeffs[i] * b.coeffs[j])
         push!(zexps, vcat(a.exps[i], b.exps[j]))
     end
@@ -421,7 +428,7 @@ function *(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T<:RingElement
     return combine_like_terms!(sort_terms!(z))
 end
 
-function +(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T<:RingElement
+function +(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T <: RingElement
     zcoeffs = T[]
     zexps = Vector{Int}[]
     i = j = 1
@@ -463,7 +470,7 @@ function _sub_rest(
     a::FreeAssAlgElem{T},
     b::FreeAssAlgElem{T},
     start::Int,
-) where T<:RingElement
+) where T <: RingElement
     zcoeffs = T[]
     zexps = Vector{Int}[]
     i = j = start + 1
@@ -500,11 +507,11 @@ function _sub_rest(
     return FreeAssAlgElem{T}(parent(a), zcoeffs, zexps, length(zcoeffs))
 end
 
-function -(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T<:RingElement
+function -(a::FreeAssAlgElem{T}, b::FreeAssAlgElem{T}) where T <: RingElement
     return _sub_rest(a, b, 0)
 end
 
-function ^(a::FreeAssAlgElem{T}, b::Integer) where T<:RingElement
+function ^(a::FreeAssAlgElem{T}, b::Integer) where T <: RingElement
     if b == 0
         return one(parent(a))
     elseif b == 1
@@ -532,7 +539,8 @@ end
 # return c*w*a*wp
 function mul_term(c::T, w::Vector{Int}, a::FreeAssAlgElem{T}, wp::Vector{Int}) where T
     zcoeffs =
-        isone(c) ? T[a.coeffs[i] for i in 1:a.length] : T[c * a.coeffs[i] for i in 1:a.length]
+        isone(c) ? T[a.coeffs[i] for i in 1:a.length] :
+        T[c * a.coeffs[i] for i in 1:a.length]
     zexps = Vector{Int}[vcat(w, a.exps[i], wp) for i in 1:a.length]
     return FreeAssAlgElem{T}(parent(a), zcoeffs, zexps, a.length)
 end
@@ -625,7 +633,7 @@ function divexact(
     a::FreeAssAlgElem{T},
     b::Integer;
     check::Bool = true,
-) where T<:RingElement
+) where T <: RingElement
 
     n = length(a)
     R = parent(a)
@@ -647,16 +655,30 @@ function _change_freeassalg_ring(R, Rx, cached)
 end
 
 
-function change_base_ring(R::Ring, a::FreeAssAlgElem{T}; cached::Bool=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(R, parent(a), cached)) where T <: RingElement
+function change_base_ring(
+    R::Ring,
+    a::FreeAssAlgElem{T};
+    cached::Bool = true,
+    parent::AbstractAlgebra.FreeAssAlgebra = _change_freeassalg_ring(R, parent(a), cached),
+) where T <: RingElement
     base_ring(parent) != R && error("Base rings do not match.")
     return _map(R, a, parent)
 end
 
-function map_coefficients(f, a::FreeAssAlgElem{T}; cached::Bool=true, parent::AbstractAlgebra.FreeAssAlgebra=_change_freeassalg_ring(parent(f(zero(base_ring(a)))), parent(a), cached)) where T <: RingElement
-   return _map(f, a, parent)
+function map_coefficients(
+    f,
+    a::FreeAssAlgElem{T};
+    cached::Bool = true,
+    parent::AbstractAlgebra.FreeAssAlgebra = _change_freeassalg_ring(
+        parent(f(zero(base_ring(a)))),
+        parent(a),
+        cached,
+    ),
+) where T <: RingElement
+    return _map(f, a, parent)
 end
 
-function _map(g, a::FreeAssAlgElem{T}, Rx) where T<:RingElement
+function _map(g, a::FreeAssAlgElem{T}, Rx) where T <: RingElement
     cvzip = zip(coefficients(a), exponent_words(a))
     M = MPolyBuildCtx(Rx)
     for (c, v) in cvzip
