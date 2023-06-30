@@ -317,5 +317,5 @@ end
 @varname_interface polynomial_ring(R::NCRing, s)
 @varnames_interface polynomial_ring(R::Ring, s)
 # With `Ring <: NCRing`, we need to resolve ambiguities of `polynomial_ring(::Ring, s...)`
-polynomial_ring(R::Ring, s::Symbol) = invoke(polynomial_ring, Tuple{NCRing, Symbol}, R, s)
-polynomial_ring(R::Ring, s::Union{AbstractString, Char}) = polynomial_ring(R, Symbol(s))
+polynomial_ring(R::Ring, s::Symbol; kv...) = invoke(polynomial_ring, Tuple{NCRing, Symbol}, R, s; kv...)
+polynomial_ring(R::Ring, s::Union{AbstractString, Char}; kv...) = polynomial_ring(R, Symbol(s); kv...)
