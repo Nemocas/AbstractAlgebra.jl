@@ -102,7 +102,7 @@ Each `varnames` argument can be either an Array of `VarName`s, or `s::VarName =>
 
     X, x::Vector{T} = f(args..., n::Int, s::VarName = :x)
 
-Shorthand for `X, x = f(args..., Symbol(s) => n)`.
+Shorthand for `X, x = f(args..., ["$s$i" for i in 1:n])`.
 
 ---
 
@@ -172,13 +172,15 @@ macro varnames_interface(e::Expr, options...)
 
     opts = parse_options(options, Dict(:n => :n, :macros => :(:all)), Dict(:macros => QuoteNode.([:no, :tuple, :all])))
     en = n = opts[:n]
-    if n isa Expr
+    if n isa Symbol
+        en = :(Base.OneTo($n))
+    elseif n isa Expr
         req(n.head === :call, "Value to option `n` can be `n`, `n+1`, or similar, not `$n`")
         n = only(x -> x isa Symbol, n.args[2:end])
     end
 
     n isa Symbol || return :($base; $fancy_method)
-    fancy_n_method = :($f($(args...), $n::Int, s::VarName=:x; kv...) = $f($(argnames...), Symbol(s) => $en; kv...))
+    fancy_n_method = :($f($(args...), $n::Int, s::VarName=:x; kv...) = $f($(argnames...), Symbol.(s, $en); kv...))
 
     opts[:macros] === :(:no) && return :($base; $fancy_method; $fancy_n_method)
     ss, xs = opts[:macros] === :(:all) ? (:(s::Union{Expr, Symbol}...), :(_expr_pairs(s))) :
@@ -317,3 +319,4 @@ polynomial_ring(R::Ring, s::Symbol; kv...) = invoke(polynomial_ring, Tuple{NCRin
 polynomial_ring(R::Ring, s::Union{AbstractString, Char}; kv...) = polynomial_ring(R, Symbol(s); kv...)
 
 # TODO: weights in `graded_polynomial_ring` and `power_series_ring`
+# TODO: Cope with Julia 1.6 not having `isexpr`. Maybe use MacroTools.
