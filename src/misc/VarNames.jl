@@ -182,7 +182,7 @@ macro varnames_interface(e::Expr, options...)
     end
     base = f == callf ?
         :(req(hasmethod($f, $argtypes), "base method $($f)($($argtypes)) missing")) :
-        :($f($(args...), $s::Vector{Symbol}) = $callf($(argnames...), $s))
+        :($f($(args...), $s::Vector{Symbol}; $kv...) = $callf($(argnames...), $s; $kv...))
     fancy_method = quote
         function $f($(args...), $s...; $kv...)
             X, gens = $f($(argnames...), variable_names($s...); $kv...)
@@ -285,7 +285,7 @@ macro varname_interface(e::Expr)
     kv = gensym("kv")
     base = f == callf ?
         :(req(hasmethod($f, $argtypes), "base method $($f)($($argtypes)) missing")) :
-        :($f($(args...), $s::Symbol) = $callf($(argnames...), $s))
+        :($f($(args...), $s::Symbol; $kv...) = $callf($(argnames...), $s; $kv...))
     fancy_method = :($f($(args...), $s::Union{AbstractString, Char}; $kv...) = $f($(argnames...), Symbol($s); $kv...))
     fancy_macro = :(
         macro $f($(argnames...), $s::Symbol)
