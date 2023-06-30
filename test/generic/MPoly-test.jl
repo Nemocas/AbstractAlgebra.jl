@@ -120,7 +120,7 @@
    ZZxyz5_ = ZZ["x", 'y', :z]
    ZZxyz6 = @polynomial_ring ZZ x y z
 
-   @test ZZxyz isa Generic.MPolyRing
+   @test ZZxyz_[1] isa Generic.MPolyRing
    @test ZZxyz_ == ZZxyz2, xyz2
    @test ZZxyz_ == ZZxyz3, xyz3
    @test ZZxyz_ == ZZxyz4_
