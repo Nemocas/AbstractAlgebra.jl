@@ -1241,7 +1241,7 @@ getindex(S::Union{Set, Group}, i::Int) = gen(S, i)
 #
 ################################################################################
 
-Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...))
+VERSION >= v"1.7" && (Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...)))
 Base.typed_hvcat(R::NCRing, args...) = _matrix(R, hvcat(args...))
 Base.typed_hcat(R::NCRing, args...) = _matrix(R, hcat(args...))
 Base.typed_vcat(R::NCRing, args...) = _matrix(R, vcat(args...))
