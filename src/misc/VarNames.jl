@@ -102,9 +102,9 @@ Each `varnames` argument can be either an Array of `VarName`s, or `s::VarName =>
 
 ---
 
-    X, x::Vector{T} = f(args..., n::Int, s::Symbol = :x)
+    X, x::Vector{T} = f(args..., n::Int, s::VarName = :x)
 
-Shorthand for `X, x = f(args..., s => n)`.
+Shorthand for `X, x = f(args..., Symbol(s) => n)`.
 
 ---
 
@@ -190,7 +190,7 @@ macro varnames_interface(e::Expr, options...)
         end
     end
     n isa Symbol || return :($base; $fancy_method)
-    fancy_n_method = :($f($(args...), $n::Int, $s::Symbol=:x; $kv...) = $f($(argnames...), $s => $en; $kv...))
+    fancy_n_method = :($f($(args...), $n::Int, $s::VarName=:x; $kv...) = $f($(argnames...), Symbol($s) => $en; $kv...))
     opts[:macros] === :(:no) && return :($base; $fancy_method; $fancy_n_method)
     ss, xs = opts[:macros] === :(:all) ? (:($s...), :(_expr_pairs($s))) : (s, :((req(Base.isexpr($s, :tuple), "the last macro argument must be a tuple"); _expr_pair.($s.args))))
     fancy_macro = quote
