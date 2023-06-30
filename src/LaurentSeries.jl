@@ -11,7 +11,7 @@
 #
 ###############################################################################
 
-@doc raw"""
+_laurent_series_ring_doc = raw"""
     laurent_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true)
     laurent_series_field(R::Field, prec::Int, s::VarName; cached::Bool=true)
 
@@ -24,9 +24,9 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-laurent_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true) =
-   Generic.laurent_series_ring(R, prec, Symbol(s); cached)
 
-laurent_series_field(R::Field, prec::Int, s::VarName; cached::Bool=true) =
-   Generic.laurent_series_field(R, prec, Symbol(s); cached)
+@doc _laurent_series_ring_doc
+laurent_series_ring(R::Ring, prec::Int, s::VarName)
 
+@doc _laurent_series_ring_doc
+laurent_series_field(R::Field, prec::Int, s::VarName)

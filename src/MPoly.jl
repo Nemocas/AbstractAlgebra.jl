@@ -1350,10 +1350,10 @@ end
 ###############################################################################
 
 @doc raw"""
-    polynomial_ring(R::Ring, s::Vector{T}; cached::Bool = true, ordering::Symbol = :lex) where T <: VarName
+    polynomial_ring(R::Ring, varnames...; cached::Bool = true, ordering::Symbol = :lex)
 
-Given a base ring `R` and a vector `s` of variable names $x1, x2, \dots$ specifying
-how the generators (variables) should be printed, return a tuple `S, [x1, x2, ...]`
+Given a base ring `R` and variable names $x1, x2, \dots$ specifying
+how the generators (variables) should be printed, return a tuple `S, x1, x2, ...`
 representing the new polynomial ring $S = R[x1, x2, ...]$ and the generators
 $x1, x2, \dots$ of the polynomial ring.
 
@@ -1365,15 +1365,6 @@ also prevent it from being cached.
 
 The `ordering` of the polynomial ring can be one of `:lex`, `:deglex` or `:degrevlex`.
 """
-polynomial_ring(R::Ring, s::AbstractVector{T}; kw...) where T<:VarName =
-   polynomial_ring(R, Symbol[Symbol(x) for x in s]; kw...)
-
-polynomial_ring(R::Ring, s::Tuple{VarName,Vararg{VarName}}; kw...) =
-   polynomial_ring(R, Symbol[Symbol(x) for x in s]; kw...)
-
-polynomial_ring(R::Ring, s::Tuple{}; kw...) = 
-   polynomial_ring(R, Symbol[]; kw...)
-
 function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
    S = polynomial_ring_only(R, s; kw...)
    (S, gens(S))
@@ -1389,17 +1380,6 @@ polynomial_ring_only(R::T, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Boo
    mpoly_ring_type(T)(R, s, ordering, cached)
 
 # Alternative constructors
-
-@doc raw"""
-    polynomial_ring(R::Ring, n::Int, s::VarName = :x; cached, ordering)
-
-Given a symbol, string or character `s` and a number of variables `n` will
-do the same as the first constructor except that the variables will be
-automatically numbered. For example if `s` is the string `x` and `n = 3` then
-the variables will print as `x1`, `x2`, `x3`.
-"""
-polynomial_ring(R::Ring, n::Int, s::VarName=:x; kw...) =
-   polynomial_ring(R, Symbol.(s, 1:n); kw...)
 
 MPolyRing(R::Ring, n::Int) =
    polynomial_ring_only(R, Symbol.(:x, 1:n); cached=false)

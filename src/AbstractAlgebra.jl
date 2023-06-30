@@ -1208,14 +1208,6 @@ function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.
    Generic.YoungTableau(part, fill)
 end
 
-function number_field(a::Generic.Poly{Rational{BigInt}}, s::VarName, t = "\$"; cached::Bool=true)
-   return Generic.number_field(a, Symbol(s), t; cached=cached)
-end
-
-function function_field(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   return Generic.FunctionField(p, Symbol(s); cached=cached)
-end
-
 @doc raw"""
     sub(m::Module{T}, subs::Vector{<:Generic.Submodule{T}}) where T <: RingElement
 
