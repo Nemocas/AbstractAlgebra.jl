@@ -174,7 +174,8 @@ julia> v = [1,4,1]; @f "variable dims" x[v...]; x
 macro varnames_interface(e::Expr, options...)
     f, args, argnames, base = _varname_interface(e, :(Vector{Symbol}))
     fancy_method = quote
-        function $f($(args...), s::VarNames...; kv...)
+        $f($(args...), s::VarNames...; kv...) = $f($(args...), s; kv...)
+        function $f($(args...), s::Tuple{Vararg{VarNames}}; kv...)
             X, gens = $f($(argnames...), variable_names(s...); kv...)
             return X, reshape_to_varnames(gens, s...)...
         end

@@ -1227,13 +1227,26 @@ export Generic
 
 ###############################################################################
 #
-#   Polynomial Ring S, x = R["x"] syntax
+#   misc
+#
+###############################################################################
+
+include("misc/ProductIterator.jl")
+include("misc/Evaluate.jl")
+include("misc/VarNames.jl")
+
+###############################################################################
+#
+#   Polynomial Ring S, x = R[:x] syntax
 #
 ###############################################################################
 
 getindex(R::NCRing, s::VarName) = polynomial_ring(R, s)
-getindex(R::NCRing, s::VarName, ss::VarName...) =
-   polynomial_ring(R, [Symbol(x) for x in (s, ss...)])
+# For compatibility `R[:x, :y]` returns `S, [x, y]` instead of `S, x, y`
+getindex(R::Ring, s::VarNames...) = ((S, x...) = polynomial_ring(R, s...); (S, collect(x)))
+getindex(R::Ring, s::Tuple{Vararg{VarNames}}) = ((S, x...) = polynomial_ring(R, s); (S, collect(x)))
+# Resolve ambiguity
+getindex(R::Ring, s::VarName) = polynomial_ring(R, s)
 
 # syntax: Rxy, y = R[:x][:y]
 getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingElem}}, s::VarName) = polynomial_ring(R[1], s)
@@ -1261,16 +1274,6 @@ Base.typed_hcat(R::NCRing, args...) = _matrix(R, hcat(args...))
 Base.typed_vcat(R::NCRing, args...) = _matrix(R, vcat(args...))
 _matrix(R::NCRing, a::AbstractVector) = matrix(R, length(a), isempty(a) ? 0 : 1, a)
 _matrix(R::NCRing, a::AbstractMatrix) = matrix(R, a)
-
-###############################################################################
-#
-#   misc
-#
-###############################################################################
-
-include("misc/ProductIterator.jl")
-include("misc/Evaluate.jl")
-include("misc/VarNames.jl")
 
 ###############################################################################
 #
