@@ -1,14 +1,12 @@
 using Base.Iterators
 
-# const VarName = Union{Symbol, AbstractString, Char}
-# const VarShape = Union{Missing, Int, Tuple{Vararg{Int}}}
-# const VarNames = Union{
-#     Pair{<:VarName, <:VarShape},
-#     Dict{<:VarName, <:VarShape},
-#     NamedTuple{<:Any, Tuple{Vararg{VarShape}}},
-#     VarNamesVector
-#     Vector{Union{<:VarName, Pair{<:VarName, <:VarShape}}}
-# }
+@assert VarName === Union{Symbol, AbstractString, Char}
+const VarShape = Union{Missing, Int, Tuple{Vararg{Int}}}
+const VarNames = Union{
+    VarName,
+    AbstractArray{<:VarName},
+    Pair{<:VarName, <:VarShape},
+}
 
 req(cond, msg) = cond || throw(ArgumentError(msg))
 
@@ -32,14 +30,14 @@ julia> variable_names(["x$i$j" for i in 0:2, j in 0:1], 'y')
 
 ```
 """
-variable_names(as...) = variable_names(as)
-variable_names(as::Tuple) = Symbol[x for a in as for x in _variable_names(a)]
+variable_names(as::VarNames...) = variable_names(as)
+variable_names(as::Tuple{Vararg{VarNames}}) = Symbol[x for a in as for x in _variable_names(a)]
 
 _variable_names(a::AbstractArray{<:VarName}) = Symbol.(a)
 _variable_names(s::VarName) = [Symbol(s)]
+_variable_names((s, _)::Pair{<:VarName, Missing}) = [Symbol(s)]
 _variable_names((s, n)::Pair{<:VarName, Int}) = Symbol.(s, '[', Base.OneTo(n), ']')
 _variable_names((s, dims)::Pair{<:VarName, <:Tuple{Vararg{Int}}}) = Symbol.(s, '[', join.(Tuple.(CartesianIndices(dims)), ','), ']')
-_variable_names((s, _)::Pair{<:VarName, Missing}) = [Symbol(s)]
 
 @doc raw"""
     reshape_to_varnames(vec::Vector{T}, varnames...) :: Tuple{Array{<:Any, T}}
@@ -66,8 +64,8 @@ julia> R, (a, b), x, y, z = polynomial_ring(ZZ, s...)
 
 ```
 """
-reshape_to_varnames(vec::Vector, varnames...) = reshape_to_varnames(vec, varnames)
-function reshape_to_varnames(vec::Vector, varnames::Tuple)
+reshape_to_varnames(vec::Vector, varnames::VarNames...) = reshape_to_varnames(vec, varnames)
+function reshape_to_varnames(vec::Vector, varnames::Tuple{Vararg{VarNames}})
     iter = Iterators.Stateful(vec)
     result = Tuple(_reshape_to_varnames(iter, x) for x in varnames)
     @assert isempty(iter)
@@ -75,12 +73,12 @@ function reshape_to_varnames(vec::Vector, varnames::Tuple)
 end
 
 _reshape_to_varnames(iter::Iterators.Stateful, ::VarName) = popfirst!(iter)
-_reshape_to_varnames(iter::Iterators.Stateful, (_, shape)::Pair) = _reshape(iter, shape)
+_reshape_to_varnames(iter::Iterators.Stateful, (_, shape)::Pair{<:VarName, <:VarShape}) = _reshape(iter, shape)
 _reshape_to_varnames(iter::Iterators.Stateful, a::AbstractArray{<:VarName}) = _reshape(iter, size(a))
 
-_reshape(iter, n::Int) = collect(Iterators.take(iter, n))
-_reshape(iter, dims) = reshape(collect(Iterators.take(iter, prod(dims))), Tuple(dims))
 _reshape(iter, ::Missing) = popfirst!(iter)
+_reshape(iter, n::Int) = collect(Iterators.take(iter, n))
+_reshape(iter, dims::Tuple{Vararg{Int}}) = reshape(collect(Iterators.take(iter, prod(dims))), dims)
 
 @doc raw"""
     @varnames_interface [M.]f(args..., varnames)
@@ -220,11 +218,11 @@ function parse_options(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol}, valid::D
 end
 
 unqualified(a::Symbol) = a
-unqualified(e::Expr) = (req(Base.isexpr(e, :., 2), "Not a name: `$e`"); e.args[2].value)
+unqualified(e::Expr) = (req(Base.isexpr(e, :., 2), "Not a name: `$e`"); e.args[2].value) :: Symbol
 argname(a::Symbol) = a
-argname(e::Expr) = (req(Base.isexpr(e, :(::), 2), "Not a (possibly type asserted) Symbol: `$e`"); e.args[1])::Symbol
+argname(e::Expr) = (req(Base.isexpr(e, :(::), 2), "Not a (possibly type asserted) Symbol: `$e`"); e.args[1]) :: Symbol
 argtype(a::Symbol) = :Any
-argtype(e::Expr) = (req(Base.isexpr(e, :(::)), "Not a type assertion or Symbol: `$e`"); e.args[end])
+argtype(e::Expr) = (req(Base.isexpr(e, :(::)), "Not a type assertion or Symbol: `$e`"); e.args[end]) :: Union{Expr, Symbol}
 
 _expr_pairs(a::Tuple{Vararg{Union{Expr, Symbol}}}) = _expr_pair.(a)
 _expr_pairs((a,)::Tuple{Expr}) = Base.isexpr(a, :tuple) ? _expr_pair.(a.args) : (_expr_pair(a),) # for `@f args... (varnames...)` variant
