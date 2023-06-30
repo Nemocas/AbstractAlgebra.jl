@@ -18,14 +18,14 @@ Create proper variable names from `a`.
 
 #Examples
 
-```jldoctest
-julia> variable_names(:x, :y)
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> AbstractAlgebra.variable_names(:x, :y)
 [:x, :y]
 
-julia> variable_names(:x => (1, 2), :y => 2, :z)
+julia> AbstractAlgebra.variable_names(:x => (1, 2), :y => 2, :z)
 [Symbol("x[1,1]"), Symbol("x[1,2]"), Symbol("y[1]"), Symbol("y[2]"), :z]
 
-julia> variable_names(["x$i$j" for i in 0:2, j in 0:1], 'y')
+julia> AbstractAlgebra.variable_names(["x$i$j" for i in 0:2, j in 0:1], 'y')
 [:x00, :x10, :x20, :x01, :x11, :x21, :y]
 
 ```
@@ -47,16 +47,16 @@ Turn `vec` into the shape of `varnames`. Reverse flattening from [`variable_name
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> s = ([:a, :b], :x => (1, 2), :y => 2, :z);
 
-julia> reshape_to_varnames(variable_names(s...), s...)
+julia> AbstractAlgebra.reshape_to_varnames(AbstractAlgebra.variable_names(s...), s...)
 ([:a, :b], [Symbol("x[1,1]"), Symbol("x[1,2]")], [Symbol("y[1]"), Symbol("y[2]")], :z)
 
-julia> R, vec = polynomial_ring(ZZ, variable_names(s...))
+julia> R, vec = polynomial_ring(ZZ, AbstractAlgebra.variable_names(s...))
 (Multivariate Polynomial Ring in a, b, x[1,1], x[1,2], y[1], y[2], z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b, x[1,1], x[1,2], y[1], y[2], z])
 
-julia> (a, b), x, y, z = reshape_to_varnames(vec, s...)
+julia> (a, b), x, y, z = AbstractAlgebra.reshape_to_varnames(vec, s...)
 (AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1] x[1,2]], AbstractAlgebra.Generic.MPoly{BigInt}[y[1], y[2]], z)
 
 julia> R, (a, b), x, y, z = polynomial_ring(ZZ, s...)
@@ -113,11 +113,11 @@ As `f(args..., varnames...)`, and also introduce the `varnames` into the current
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> f(a, s::Vector{Symbol}) = a, String.(s)
 f (generic function with 1 method)
 
-julia> @varnames_interface f(a, s)
+julia> AbstractAlgebra.@varnames_interface f(a, s)
 @f (macro with 1 method)
 
 julia> f
@@ -156,10 +156,6 @@ julia> v = [1,4,1]; @f "variable dims" x[v...]; x
  "y[1,1,1]"  "y[1,2,1]"  "y[1,3,1]"  "y[1,4,1]"
 
 ```
-
-# Caveats
-
-For the macro variant, all to be introduced names have to be given explicitly.
 """
 macro varnames_interface(e::Expr, options...)
     f, args, argnames, base = _varname_interface(e, :(Vector{Symbol}))
@@ -262,11 +258,11 @@ As `f(args..., varname)`, and also introduce `varname` into the current scope.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> f(a, s::Symbol) = a, s
 f (generic function with 1 method)
 
-julia> @varname_interface f(a, s)
+julia> AbstractAlgebra.@varname_interface f(a, s)
 @f (macro with 1 method)
 
 julia> f
