@@ -10,7 +10,9 @@ using Base.Iterators
 #     Vector{Union{<:VarName, Pair{<:VarName, <:VarShape}}}
 # }
 
-raw"""
+req(cond, msg) = cond || throw(ArgumentError(msg))
+
+@doc raw"""
     variable_names(a...) -> Vector{Symbol}
     variable_names(a::Tuple) -> Vector{Symbol}
 
@@ -31,7 +33,7 @@ julia> variable_names(["x$i$j" for i in 0:2, j in 0:1], 'y')
 ```
 """
 variable_names(as...) = variable_names(as)
-variable_names(as::Tuple) = [x for a in as for x in _variable_names(a)]::Vector{Symbol}
+variable_names(as::Tuple) = Symbol[x for a in as for x in _variable_names(a)]
 
 _variable_names(a::AbstractArray{<:VarName}) = Symbol.(a)
 _variable_names(s::VarName) = [Symbol(s)]
@@ -39,7 +41,7 @@ _variable_names((s, n)::Pair{<:VarName, Int}) = Symbol.(s, '[', Base.OneTo(n), '
 _variable_names((s, dims)::Pair{<:VarName, <:Tuple{Vararg{Int}}}) = Symbol.(s, '[', join.(Tuple.(CartesianIndices(dims)), ','), ']')
 _variable_names((s, _)::Pair{<:VarName, Missing}) = [Symbol(s)]
 
-raw"""
+@doc raw"""
     reshape_to_varnames(vec::Vector{T}, varnames...) :: Tuple{Array{<:Any, T}}
     reshape_to_varnames(vec::Vector{T}, varnames::Tuple) :: Tuple{Array{<:Any, T}}
 
@@ -80,29 +82,36 @@ _reshape(iter, n::Int) = collect(Iterators.take(iter, n))
 _reshape(iter, dims) = reshape(collect(Iterators.take(iter, prod(dims))), Tuple(dims))
 _reshape(iter, ::Missing) = popfirst!(iter)
 
-raw"""
-    @add_varnames_interface f(args..., varnames)
+@doc raw"""
+    @varnames_interface [M.]f(args..., varnames)
 
-Add method `X, vars = f(args..., varnames)` and macro `X = @f args... varnames...` to current scope. Read on.
+Add method `X, vars = f(args..., varnames...)` and macro `X = @f args... varnames...` to current scope. Read on.
 
 ---
 
-    X, gens::Vector{T} = f(args..., vars::Vector{Symbol})
+    X, gens::Vector{T} = f(args..., varnames::Vector{Symbol})
 
-This underlying method is assumed to exist. The existence is currently not tested.
+Base method. If `M` is given, this calls `M.f`, otherwise, it has to exist already.
 
 ---
 
     X, vars... = f(args..., varnames...)
 
-Compute `X` and `gens` by the underlying `f` method. Then reshape `gens` into the shape defined by `varnames`.
+Compute `X` and `gens` via the base method. Then reshape `gens` into the shape defined by `varnames`.
+Each `varnames` argument can be either an Array of `VarName`s, or `s::VarName => dims`. The latter means an `Array` of size `dims`.
+
+---
+
+    X, x::Vector{T} = f(args..., n::Int, s::Symbol = :x)
+
+Shorthand for `X, x = f(args..., s => n)`.
 
 ---
 
     X = @f args... varnames...
     X = @f args... (varnames...)
 
-Compute `X` and `gens` by the underlying `f` method. Then introduce the `varnames` into the current scope.
+As `f(args..., varnames...)`, and also introduce the `varnames` into the current scope.
 
 # Examples
 
@@ -110,11 +119,14 @@ Compute `X` and `gens` by the underlying `f` method. Then introduce the `varname
 julia> f(a, s::Vector{Symbol}) = a, String.(s)
 f (generic function with 1 method)
 
-julia> @add_varnames_interface f(a, s::Vector{Symbol})
+julia> @varnames_interface f(a, s)
 @f (macro with 1 method)
 
 julia> f
 f (generic function with 2 methods)
+
+julia> f("hello", :x, :y, :z)
+("hello", "x", "y", "z")
 
 julia> f("hello", :x => (1, 2), :y => 2, :z)
 ("hello", ["x[1,1]" "x[1,2]"], ["y[1]", "y[2]"], "z")
@@ -150,59 +162,95 @@ julia> v = [1,4,1]; @f "variable dims" x[v...]; x
 # Caveats
 
 For the macro variant, all to be introduced names have to be given explicitly.
-`@add_varnames_interface` can only be called with unqualified names.
 """
-macro add_varnames_interface(e::Expr)
-    @assert Base.isexpr(e, :call)
-    f = esc(e.args[1])
+macro varnames_interface(e::Expr, options...)
+    req(Base.isexpr(e, :call), "Argument `$e` must be a function call")
+    callf = esc(e.args[1])
+    f = esc(unqualified(e.args[1]))
+    # TODO cope with `where` clause, (and perhaps with optional arguments and keyvalues)
     args = e.args[2:end-1]
-    s = gensym("varnames")
+    argnames = argname.(args)
+    argtypes = Expr(:curly, :Tuple, argtype.(args)..., :(Vector{Symbol}))
+    s = e.args[end]
     kv = gensym("kv")
-    # TODO cope with `where` clause and keyvalues
-    return quote
-        # TODO assert existence of underlying method
+    opts = parse_options(options, Dict(:n => gensym("n"), :macros => :(:all)),
+        Dict(:macros => QuoteNode.([:no, :one, :all])))
+    en = n = opts[:n]
+    if n isa Expr
+        req(n.head === :call, "Value to option `n` can be `n`, `n+1`, or similar, not `$n`")
+        n = only(x -> x isa Symbol, n.args[2:end])
+    end
+    base = f == callf ?
+        :(req(hasmethod($f, $argtypes), "base method $($f)($($argtypes)) missing")) :
+        :($f($(args...), $s::Vector{Symbol}) = $callf($(argnames...), $s))
+    fancy_method = quote
         function $f($(args...), $s...; $kv...)
-            X, gens = $f($(args...), variable_names($s); $kv...)
-            return X, reshape_to_varnames(gens, $s)...
+            X, gens = $f($(argnames...), variable_names($s...); $kv...)
+            return X, reshape_to_varnames(gens, $s...)...
         end
-
-        macro $f($(args...), $s...)
-            xs = _expr_pairs($s)
+    end
+    n isa Symbol || return :($base; $fancy_method)
+    fancy_n_method = :($f($(args...), $n::Int, $s::Symbol=:x; $kv...) = $f($(argnames...), $s => $en; $kv...))
+    opts[:macros] === :(:no) && return :($base; $fancy_method; $fancy_n_method)
+    ss, xs = opts[:macros] === :(:all) ? (:($s...), :(_expr_pairs($s))) : (s, :((req(Base.isexpr($s, :tuple), "the last macro argument must be a tuple"); _expr_pair.($s.args))))
+    fancy_macro = quote
+        macro $f($(argnames...), $ss)
+            xs = $xs
             gens = esc.(first.(xs))
             varnames = (:($(QuoteNode(k)) => $v) for (k, v) in xs)
             return quote
-                X, $(gens...) = $$f($(esc.($(args...))), $(varnames...))
+                X, $(gens...) = $$f($(esc.($(argnames...))), $(varnames...))
                 X
             end
         end
     end
+    return :($base; $fancy_method; $fancy_n_method; $fancy_macro)
 end
+
+function parse_options(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol}, valid::Dict{Symbol, <:Vector} = Dict{Symbol, Vector{Any}}())
+    result = Dict{Symbol, Any}(default)
+    for o in kvs
+        req(Base.isexpr(o, :(=), 2), "only key value options allowed")
+        k, v = o.args
+        req(k in keys(result), "invalid key value option key `$k`")
+        k in keys(valid) && req(v in valid[k], "invalid option `$v` to key `$k`")
+        result[k] = v
+    end
+    return result
+end
+
+unqualified(a::Symbol) = a
+unqualified(e::Expr) = (req(Base.isexpr(e, :., 2), "Not a name: `$e`"); e.args[2].value)
+argname(a::Symbol) = a
+argname(e::Expr) = (req(Base.isexpr(e, :(::), 2), "Not a (possibly type asserted) Symbol: `$e`"); e.args[1])::Symbol
+argtype(a::Symbol) = :Any
+argtype(e::Expr) = (req(Base.isexpr(e, :(::)), "Not a type assertion or Symbol: `$e`"); e.args[end])
 
 _expr_pairs(a::Tuple{Vararg{Union{Expr, Symbol}}}) = _expr_pair.(a)
 _expr_pairs((a,)::Tuple{Expr}) = Base.isexpr(a, :tuple) ? _expr_pair.(a.args) : (_expr_pair(a),) # for `@f args... (varnames...)` variant
-_expr_pair(e::Expr) = (@assert Base.isexpr(e, :ref) "$(e.head) ≠ :ref"; e.args[1] => Expr(:tuple, esc.(e.args[2:end])...))
+_expr_pair(e::Expr) = (req(Base.isexpr(e, :ref), "variable name must be like `x` or `x[...]`, not `$e`"); e.args[1] => Expr(:tuple, esc.(e.args[2:end])...))
 _expr_pair(s::Symbol) = s => missing
 
-raw"""
-    @add_varname_interface f(args0..., varname::VarName, args1...)
+@doc raw"""
+    @varname_interface [M.]f(args..., varname)
 
-Add method `X, vars = f(args0..., varname::VarName, args1...)` and macro `X = @f args0... varname::Symbol, args1...` to current scope. Read on.
-
----
-
-    X, gen::T = f(args0..., var::Symbol, args1...)
-
-This underlying method is assumed to exist. The existence is currently not tested.
+Add method `X, vars = f(args..., varname::VarName)` and macro `X = @f args... varname::Symbol` to current scope. Read on.
 
 ---
 
-    X, gen = f(args0..., varname::VarName, args1...) = f(args0..., Symbol(varname), args1...)
+    X, gen::T = f(args..., varname::Symbol)
+
+Base method. If `M` is given, this calls `M.f`, otherwise, it has to exist already.
 
 ---
 
-    X = @f args0... varname::Symbol args1...
+    f(args..., varname::VarName) = f(args..., Symbol(varname))
 
-Compute `X` and `gen` by the underlying `f` method. Then introduce `varname = gen` into the current scope.
+---
+
+    X = @f args... varname::Symbol
+
+As `f(args..., varname)`, and also introduce `varname` into the current scope.
 
 # Examples
 
@@ -210,8 +258,8 @@ Compute `X` and `gen` by the underlying `f` method. Then introduce `varname = ge
 julia> f(a, s::Symbol) = a, s
 f (generic function with 1 method)
 
-julia> @add_varname_interface f(a, s::Vector{Symbol})
-@f (macro with 2 methods)
+julia> @varname_interface f(a, s)
+@f (macro with 1 method)
 
 julia> f
 f (generic function with 2 methods)
@@ -226,33 +274,48 @@ julia> x
 :x
 ```
 """
-macro add_varname_interface(e::Expr)
-    @assert Base.isexpr(e, :call)
-    f = esc(e.args[1])
+macro varname_interface(e::Expr)
+    req(Base.isexpr(e, :call), "Argument `$e` must be a function call")
+    callf = esc(e.args[1])
+    f = esc(unqualified(e.args[1]))
     args = e.args[2:end-1]
-    s = gensym("varname")
+    argnames = argname.(args)
+    argtypes = Expr(:curly, :Tuple, argtype.(args)..., :Symbol)
+    s = e.args[end]
     kv = gensym("kv")
-    return quote
-        $f($(args...), $s::Union{AbstractString, Char}; $kv...) =
-            $f($(args...), Symbol($s); $kv...)
-
-        macro $f($(args...), $s::Symbol)
+    base = f == callf ?
+        :(req(hasmethod($f, $argtypes), "base method $($f)($($argtypes)) missing")) :
+        :($f($(args...), $s::Symbol) = $callf($(argnames...), $s))
+    fancy_method = :($f($(args...), $s::Union{AbstractString, Char}; $kv...) = $f($(argnames...), Symbol($s); $kv...))
+    fancy_macro = :(
+        macro $f($(argnames...), $s::Symbol)
             quote
-                X, gen = $$f($(esc.($(args...))), $(QuoteNode($s)))
-                $(esc($s)) = gen
+                X, $(esc($s)) = $$f($(esc.($(argnames...))), $(QuoteNode($s)))
                 X
             end
         end
-    end
+        )
+    return :($base; $fancy_method; $fancy_macro)
 end
 
-@add_varname_interface SparsePolynomialRing(R, s)
-@add_varnames_interface LaurentPolynomialRing(R, s)
-@add_varnames_interface power_series_ring(R, prec, s)
-@add_varnames_interface free_associative_algebra(R, s)
-@add_varnames_interface polynomial_ring(R, s)
-@add_varname_interface polynomial_ring(R, s)
-@add_varname_interface laurent_series_ring(R, prec, s)
-@add_varname_interface laurent_series_field(R, prec, s)
-@add_varname_interface number_field(p, s) # TODO what about strange `t` parameter
-@add_varname_interface FunctionField(p, s)
+
+@varname_interface Generic.SparsePolynomialRing(R::Ring, s)
+@varname_interface Generic.laurent_series_ring(R::Ring, prec::Int, s)
+@varname_interface Generic.laurent_series_field(R::Field, prec::Int, s)
+@varname_interface Generic.number_field(p::PolyRingElem, s)
+@varname_interface Generic.FunctionField(p::PolyRingElem, s)
+
+@varnames_interface Generic.free_associative_algebra(R::Ring, s)
+@varnames_interface Generic.LaurentPolynomialRing(R::Ring, s)
+
+# The various optional arguments would result in ambiguities
+@varname_interface Generic.power_series_ring(R::Ring, prec::Int, s)
+@varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s) macros=:one
+@varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s)
+@varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=0 macros=:no
+
+@varname_interface polynomial_ring(R::NCRing, s)
+@varnames_interface polynomial_ring(R::Ring, s)
+# With `Ring <: NCRing`, we need to resolve ambiguities of `polynomial_ring(::Ring, s...)`
+polynomial_ring(R::Ring, s::Symbol) = invoke(polynomial_ring, Tuple{NCRing, Symbol}, R, s)
+polynomial_ring(R::Ring, s::Union{AbstractString, Char}) = polynomial_ring(R, Symbol(s))
