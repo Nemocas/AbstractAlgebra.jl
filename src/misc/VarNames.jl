@@ -20,13 +20,27 @@ Create proper variable names from `a`.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> AbstractAlgebra.variable_names(:x, :y)
-[:x, :y]
+2-element Vector{Symbol}:
+ :x
+ :y
 
 julia> AbstractAlgebra.variable_names(:x => (1, 2), :y => 2, :z)
-[Symbol("x[1,1]"), Symbol("x[1,2]"), Symbol("y[1]"), Symbol("y[2]"), :z]
+5-element Vector{Symbol}:
+ Symbol("x[1,1]")
+ Symbol("x[1,2]")
+ Symbol("y[1]")
+ Symbol("y[2]")
+ :z
 
 julia> AbstractAlgebra.variable_names(["x$i$j" for i in 0:2, j in 0:1], 'y')
-[:x00, :x10, :x20, :x01, :x11, :x21, :y]
+7-element Vector{Symbol}:
+ :x00
+ :x10
+ :x20
+ :x01
+ :x11
+ :x21
+ :y
 
 ```
 """
@@ -51,16 +65,16 @@ Turn `vec` into the shape of `varnames`. Reverse flattening from [`variable_name
 julia> s = ([:a, :b], :x => (1, 2), :y => 2, :z);
 
 julia> AbstractAlgebra.reshape_to_varnames(AbstractAlgebra.variable_names(s...), s...)
-([:a, :b], [Symbol("x[1,1]"), Symbol("x[1,2]")], [Symbol("y[1]"), Symbol("y[2]")], :z)
+([:a, :b], [Symbol("x[1,1]") Symbol("x[1,2]")], [Symbol("y[1]"), Symbol("y[2]")], :z)
 
 julia> R, vec = polynomial_ring(ZZ, AbstractAlgebra.variable_names(s...))
-(Multivariate Polynomial Ring in a, b, x[1,1], x[1,2], y[1], y[2], z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b, x[1,1], x[1,2], y[1], y[2], z])
+(Multivariate Polynomial Ring in 7 variables over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b, x[1,1], x[1,2], y[1], y[2], z])
 
 julia> (a, b), x, y, z = AbstractAlgebra.reshape_to_varnames(vec, s...)
 (AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1] x[1,2]], AbstractAlgebra.Generic.MPoly{BigInt}[y[1], y[2]], z)
 
 julia> R, (a, b), x, y, z = polynomial_ring(ZZ, s...)
-(Multivariate Polynomial Ring in a, b, x[1,1], x[1,2], y[1], y[2], z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1] x[1,2]], AbstractAlgebra.Generic.MPoly{BigInt}[y[1], y[2]], z)
+(Multivariate Polynomial Ring in 7 variables over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1] x[1,2]], AbstractAlgebra.Generic.MPoly{BigInt}[y[1], y[2]], z)
 
 ```
 """
@@ -121,7 +135,7 @@ julia> AbstractAlgebra.@varnames_interface f(a, s)
 @f (macro with 1 method)
 
 julia> f
-f (generic function with 2 methods)
+f (generic function with 4 methods)
 
 julia> f("hello", :x, :y, :z)
 ("hello", "x", "y", "z")
@@ -132,7 +146,7 @@ julia> f("hello", :x => (1, 2), :y => 2, :z)
 julia> f("projective", ["x$i$j" for i in 0:1, j in 0:1], [:y0, :y1], :z)
 ("projective", ["x00" "x01"; "x10" "x11"], ["y0", "y1"], "z")
 
-julia> f("fun inputs", 'a':'g', Symbol.('x':'z', [0 1])
+julia> f("fun inputs", 'a':'g', Symbol.('x':'z', [0 1]))
 ("fun inputs", ["a", "b", "c", "d", "e", "f", "g"], ["x0" "x1"; "y0" "y1"; "z0" "z1"])
 
 julia> @f "hello" x[1, 2] y[2] z
@@ -148,12 +162,12 @@ julia> y
  "y[2]"
 
 julia> z
- "z"
+"z"
 
 julia> v = [1,4,1]; @f "variable dims" x[v...]; x
 1×4×1 Array{String, 3}:
 [:, :, 1] =
- "y[1,1,1]"  "y[1,2,1]"  "y[1,3,1]"  "y[1,4,1]"
+ "x[1,1,1]"  "x[1,2,1]"  "x[1,3,1]"  "x[1,4,1]"
 
 ```
 """
