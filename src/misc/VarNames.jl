@@ -68,13 +68,13 @@ julia> AbstractAlgebra.reshape_to_varnames(AbstractAlgebra.variable_names(s...),
 ([:a, :b], [Symbol("x[1,1]") Symbol("x[1,2]")], [Symbol("y[1]"), Symbol("y[2]")], :z)
 
 julia> R, vec = polynomial_ring(ZZ, AbstractAlgebra.variable_names(s...))
-(Multivariate Polynomial Ring in 7 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b, x[1,1], x[1,2], y[1], y[2], z])
+(Multivariate polynomial ring in 7 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b, x[1,1], x[1,2], y[1], y[2], z])
 
 julia> (a, b), x, y, z = AbstractAlgebra.reshape_to_varnames(vec, s...)
 (AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1] x[1,2]], AbstractAlgebra.Generic.MPoly{BigInt}[y[1], y[2]], z)
 
 julia> R, (a, b), x, y, z = polynomial_ring(ZZ, s...)
-(Multivariate Polynomial Ring in 7 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1] x[1,2]], AbstractAlgebra.Generic.MPoly{BigInt}[y[1], y[2]], z)
+(Multivariate polynomial ring in 7 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x[1,1] x[1,2]], AbstractAlgebra.Generic.MPoly{BigInt}[y[1], y[2]], z)
 
 ```
 """
