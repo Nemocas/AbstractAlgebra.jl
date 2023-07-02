@@ -1241,9 +1241,12 @@ getindex(S::Union{Set, Group}, i::Int) = gen(S, i)
 #
 ################################################################################
 
-typed_hvcat(R::Ring, dims::Dims, d...) = matrix(R, length(dims), dims[1], hvcat(dims, d...))
-typed_hcat(R::Ring, d...) = matrix(R, 1, length(d), hcat(d...))
-typed_vcat(R::Ring, d...) = matrix(R, length(d), 1, vcat(d...))
+VERSION >= v"1.7" && (Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...)))
+Base.typed_hvcat(R::NCRing, args...) = _matrix(R, hvcat(args...))
+Base.typed_hcat(R::NCRing, args...) = _matrix(R, hcat(args...))
+Base.typed_vcat(R::NCRing, args...) = _matrix(R, vcat(args...))
+_matrix(R::NCRing, a::AbstractVector) = matrix(R, length(a), isempty(a) ? 0 : 1, a)
+_matrix(R::NCRing, a::AbstractMatrix) = matrix(R, a)
 
 ###############################################################################
 #
