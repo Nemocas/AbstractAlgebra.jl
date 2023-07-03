@@ -13,7 +13,6 @@
 @alias isinvertible_with_inverse is_invertible_with_inverse
 @alias isirreducible is_irreducible
 @alias isisomorphic is_isomorphic
-@alias islower_triangular is_lower_triangular
 @alias ismonic is_monic
 @alias ismonomial is_monomial
 @alias ismonomial_recursive is_monomial_recursive
@@ -34,11 +33,9 @@
 @alias isterm_recursive is_term_recursive
 @alias isunit is_unit
 @alias isunivariate is_univariate
-@alias isupper_triangular is_upper_triangular
 @alias isweak_popov is_weak_popov
 @alias iszero_column is_zero_column
 @alias iszero_row is_zero_row
-@alias setprecision! set_precision!
 @alias Localization localization
 
 #
