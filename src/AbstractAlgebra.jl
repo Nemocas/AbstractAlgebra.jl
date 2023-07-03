@@ -295,7 +295,7 @@ include("AliasMacro.jl")
 include("Pluralize.jl")
 
 # alternative names for some functions from Base
-export is_empty, is_even, is_equal, is_finite, is_inf, is_integer, is_less, is_odd, is_one, is_real, is_subset, is_valid, is_zero
+export is_empty, is_even, is_equal, is_finite, is_inf, is_integer, is_less, is_odd, is_one, is_real, is_subset, is_valid, is_zero, set_precision
 
 @alias is_empty isempty
 @alias is_even iseven
@@ -310,6 +310,7 @@ export is_empty, is_even, is_equal, is_finite, is_inf, is_integer, is_less, is_o
 @alias is_subset issubset
 @alias is_valid isvalid
 @alias is_zero iszero
+@alias set_precision setprecision
 
 # alternative names for some functions from GroupsCore
 export is_trivial
@@ -819,6 +820,7 @@ export divexact_low
 export divexact_right
 export divhigh
 export divides
+export divisible
 export domain
 export downscale
 export elem_type
@@ -901,6 +903,7 @@ export is_homogeneous
 export is_invertible
 export is_invertible_with_inverse
 export is_isomorphic
+export is_lower_triangular
 export is_monic
 export is_monomial
 export is_monomial_recursive
@@ -1324,6 +1327,14 @@ const RealField = JuliaRealField
 include("algorithms/MPolyEvaluate.jl")
 include("algorithms/MPolyFactor.jl")
 include("algorithms/DensePoly.jl")
+
+###############################################################################
+#
+#  Has to be loaded last, but before Aliases. To be tidied up
+#
+###############################################################################
+
+include("HeckeNemoStuff.jl")
 
 ###############################################################################
 #
