@@ -372,24 +372,52 @@ function combine_like_terms!(z::FreeAssAlgElem{T}) where T
     return z
 end
 
+
+@doc """
+    isless(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where T
+
+Implements the degree lexicographic ordering on terms, i.e.
+first, the degrees of the largest monomials are compared, and if they
+are the same, they are compared lexicographically and if they are still the same,
+the coefficients are compared. 
+If everything is still the same, the next largest monomial is compared
+and lastly the number of monomials is compared.
+Since the coefficients are also compared, this only works when the 
+coefficient Ring implements isless.
+
+The order of letters is the reverse of the order given when initialising the algebra.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, (x, y) = free_associative_algebra(QQ, ["x", "y"]);
+
+julia> x < y^2
+true
+
+julia> x^2 < x^2 + y
+true
+
+julia> y < x
+true
+
+julia> x^2 < 2*x^2
+true
+```
+"""
 function isless(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where T
     if p == q
         return false
     end
-    l = 0
-    if length(p.exps) < length(q.exps)
-        l = length(p.exps)
-    else
-        l = length(q.exps)
-    end
+    l = min(length(p.exps), length(q.exps))
     sort_terms!(p)
     sort_terms!(q)
     for i in 1:l
-        if word_gt(q.exps[i], p.exps[i])
+        c = word_cmp(q.exps[i], p.exps[i])
+        if c > 0
             return true
-        elseif word_gt(p.exps[i], q.exps[i])
+        elseif c < 0
             return false
-        elseif p.coeffs[i] == q.coeffs[i]
+        elseif p.coeffs[i] != q.coeffs[i]
             return p.coeffs[i] < q.coeffs[i]
         end
     end
@@ -398,10 +426,6 @@ function isless(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where T
     else
         return false
     end
-end
-
-function <(p::FreeAssAlgElem{T}, q::FreeAssAlgElem{T}) where T
-    return isless(p, q)
 end
 
 ###############################################################################

@@ -59,22 +59,22 @@ julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]];
 
 julia> aut = Generic.aho_corasick_automaton(keywords);
 
-julia> Generic.search(aut, [10, 4, 1, 2, 3, 4]);
+julia> result = Generic.search(aut, [10, 4, 1, 2, 3, 4]);
 AhoCorasickMatch(6, 1, [1, 2, 3, 4])
 
-julia> Generic.search(aut, [10, 4, 1, 2, 3, 4]).last_position
+julia> last_position(result)
 6
 
-julia> Generic.search(aut, [10, 4, 1, 2, 3, 4]).keyword_index
+julia> keyword_index(result)
 1
 
-julia> Generic.search(aut, [10, 4, 1, 2, 3, 4]).keyword
+julia> keyword(result)
 4-element Vector{Int64}:
  1
  2
  3
  4
-
+```
 """ 
 struct AhoCorasickMatch
     last_position::Int
@@ -82,12 +82,33 @@ struct AhoCorasickMatch
     keyword::Word
 end
 
+"""
+returns the last position of the match in the word that was searched
+"""
+function last_position(match::AhoCorasickMatch)
+    return match.last_position
+end
+
+"""
+returns the index of the keyword in the corresponding aho corasick automaton
+"""
+function keyword_index(match::AhoCorasickMatch)
+    return match.keyword_index
+end
+
+"""
+returns the keyword corresponding to the match
+"""
+function keyword(match::AhoCorasickMatch)
+    return match.keyword
+end
+
 function aho_corasick_match(last_position::Int, keyword_index::Int, keyword::Word)
     return AhoCorasickMatch(last_position, keyword_index, keyword)
 end
 
-Base.hash(m::AhoCorasickMatch) = hash(m.last_position, hash(m.keyword_index, 
-                                                            hash(m.keyword)))
+Base.hash(m::AhoCorasickMatch, h::UInt) = hash(m.last_position, hash(m.keyword_index, 
+                                                            hash(m.keyword, h)))
 function ==(m1::AhoCorasickMatch, m2::AhoCorasickMatch)
     return m1.last_position == m2.last_position &&
            m1.keyword_index == m2.keyword_index &&
