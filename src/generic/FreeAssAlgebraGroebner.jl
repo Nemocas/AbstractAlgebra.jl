@@ -14,7 +14,6 @@ export normal_form_weak
 
 import DataStructures: PriorityQueue, enqueue!, dequeue!
 
-const groebner_debug_level = 0
 const Monomial = Vector{Int}
 
 abstract type Obstruction{T} end
@@ -23,18 +22,30 @@ Represents the overlap of the leading term of the two polynomials
 `first_poly` and `second_poly`. Here, `first_index` and `second_index`
 are the indices of `first_poly` and `second_poly` respectively
 in the Groebner basis.
-The `pre_and_suffixes` are of the form
-[w_i, w_i'; w_j, w_j']
-where `i = first_index`, `j = second_index` and satisfy that
-w_i g_i w_i' = w_j g_j w_j'
+The first and second prefix and suffix satisfy
+first_prefix g_i first_suffix = second_prefix g_j second_suffix
 where `g_i` is `first_poly` and `g_j` is `second_poly`.
 """
 struct ObstructionTriple{T} <: Obstruction{T}
     first_poly::FreeAssAlgElem{T}
     second_poly::FreeAssAlgElem{T}
-    pre_and_suffixes::NTuple{4,Monomial}
+    first_prefix::Monomial
+    first_suffix::Monomial
+    second_prefix::Monomial
+    second_suffix::Monomial
     first_index::Int
     second_index::Int
+end
+
+function ObstructionTriple{T}(first_poly::FreeAssAlgElem{T},
+                              second_poly::FreeAssAlgElem{T},
+                              pre_and_suffixes::NTuple{4, Monomial},
+                              first_index::Int,
+                              second_index::Int
+                            ) where T
+    return ObstructionTriple{T}(first_poly, second_poly, pre_and_suffixes[1], 
+                                pre_and_suffixes[2], pre_and_suffixes[3], 
+                                pre_and_suffixes[4], first_index, second_index)
 end
 
 function FreeAssAlgElem{T}(R::FreeAssAlgebra{T}, mon::Monomial) where {T}
@@ -47,20 +58,20 @@ of the leading terms of p and q defined by o
 TODO documentation
 """
 function common_multiple_leading_term(ot::ObstructionTriple{T}) where {T}
-    return FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[1]) *
+    return FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_prefix) *
            FreeAssAlgElem{T}(parent(ot.first_poly), _leading_word(ot.first_poly)) *
-           FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[2])
+           FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_suffix)
 end
 
 function s_polynomial(ot::ObstructionTriple{T}) where {T}
     first_term =
-        FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[1]) *
+        FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_prefix) *
         ot.first_poly *
-        FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[2])
+        FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_suffix)
     second_term =
-        FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[3]) *
+        FreeAssAlgElem{T}(parent(ot.first_poly), ot.second_prefix) *
         ot.second_poly *
-        FreeAssAlgElem{T}(parent(ot.first_poly), ot.pre_and_suffixes[4])
+        FreeAssAlgElem{T}(parent(ot.first_poly), ot.second_suffix)
     return inv(leading_coefficient(ot.first_poly)) * first_term -
            inv(leading_coefficient(ot.second_poly)) * second_term
 end
@@ -71,7 +82,7 @@ function _leading_word(a::FreeAssAlgElem{T}) where {T}
 end
 
 @doc """
-gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
+    gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
 
 If an element of the Groebner basis that is stored in `aut` divides `a`,
 return (true, a1, a2, keyword_index), where `keyword_index` is the index of the
@@ -103,7 +114,7 @@ function normal_form(
     aut::AhoCorasickAutomaton,
 ) where {T}
     R = parent(f)
-    rexps = Vector{Int}[]
+    rexps = Monomial[]
     rcoeffs = T[]
     while length(f) > 0
         ok, left, right, match_index = gb_divides_leftmost(f.exps[1], aut)
@@ -127,7 +138,7 @@ function normal_form(
     R = parent(f)
     s = length(g)
     rcoeffs = T[]
-    rexps = Vector{Int}[]
+    rexps = Monomial[]
     while length(f) > 0
         i = 1
         @label again
@@ -200,11 +211,11 @@ end
 
 ## checks whether there is an overlap between a and b at position i of b
 #  such that b[i:length(b)] = a[1:length(b)-i]
-function check_left_overlap(a::Vector{Int}, b::Vector{Int}, i::Int)
+function check_left_overlap(a::Monomial, b::Monomial, i::Int)
+    if length(b) - i >= length(a)
+        return false # this is a not a left overlap but might be a center overlap
+    end
     for j in 0:(length(b) - i)
-        if j >= length(a)
-            return false # this is a center overlap
-        end
         if b[i + j] != a[j + 1]
             return false
         end
@@ -218,8 +229,8 @@ end
 # where length(w_1) < length(b) and length(w_2^') < length(a)
 # the return vector is of the form [(w_1, w_2^'), ...]
 # if w_1 or w_2^' is empty, the corresponding obstruction is not returned
-function left_obstructions(a::Vector{Int}, b::Vector{Int})
-    v = Tuple{Vector{Int},Vector{Int}}[]
+function left_obstructions(a::Monomial, b::Monomial)
+    v = Tuple{Monomial,Monomial}[]
     for i in 2:length(b)
         if check_left_overlap(a, b, i)
             if length(b) - i + 2 <= length(a) # w_2^' should not be empty!
@@ -237,27 +248,22 @@ end
 # where length(w_1^') < length(b) and length(w_2) < length(a)
 # the return vector is of the form [(w_2, w_1^'), ...]
 # if w_1^' or w_2 is empty, the corresponding obstruction is not returned
-function right_obstructions(a::Vector{Int}, b::Vector{Int})
+function right_obstructions(a::Monomial, b::Monomial)
     return left_obstructions(b, a)
 end
 
 ###
-# check, whether a is a true subword of b at index i
+# check whether a is a subword of b starting at index i
+# a == b is also allowed
 function check_center_overlap(a::Vector{Int}, b::Vector{Int}, i::Int)
-    for j in 1:length(a)
-        if i + j - 1 > length(b)
-            return false
-        end
-        if a[j] != b[i + j - 1]
-            return false
-        end
-    end
-    return true
+    i + length(a) - 1 <= length(b) || return false
+    return all(j -> a[j] == b[i + j - 1], 1:length(a))
 end
 
-function center_obstructions_first_in_second(a::Vector{Int}, b::Vector{Int})
-    v = Tuple{Vector{Int},Vector{Int}}[]
-    for i in 1:length(b)
+
+function center_obstructions_first_in_second(a::Monomial, b::Monomial)
+    v = Tuple{Monomial,Monomial}[]
+    for i in 1:length(b)-length(a) + 1
         if check_center_overlap(a, b, i)
             push!(v, (b[1:(i - 1)], b[(i + length(a)):length(b)]))
         end
@@ -272,7 +278,7 @@ end
 # or
 # w_i b w_i^' = a
 # either or both of w_i and w_i^' can be empty
-function center_obstructions(a::Vector{Int}, b::Vector{Int})
+function center_obstructions(a::Monomial, b::Monomial)
     if length(a) > length(b)
         return center_obstructions_first_in_second(b, a)
     else
@@ -281,9 +287,9 @@ function center_obstructions(a::Vector{Int}, b::Vector{Int})
 end
 
 # all non-trivial ones
-function obstructions(a::Vector{Int}, b::Vector{Int})
+function obstructions(a::Monomial, b::Monomial)
     one = Int[] # the empty word
-    res = Tuple{Vector{Int},Vector{Int},Vector{Int},Vector{Int}}[]
+    res = Tuple{Monomial,Monomial,Monomial,Monomial}[]
     for x in center_obstructions_first_in_second(b, a)
         push!(res, (one, one, x[1], x[2]))
     end
@@ -303,9 +309,9 @@ function obstructions(a::Vector{Int}, b::Vector{Int})
 end
 
 # all non-trivial self obstructions
-function obstructions(a::Vector{Int})
+function obstructions(a::Monomial)
     one = Int[] # the empty word
-    res = Tuple{Vector{Int},Vector{Int},Vector{Int},Vector{Int}}[]
+    res = Tuple{Monomial,Monomial,Monomial,Monomial}[]
     for x in left_obstructions(a, a)
         push!(res, (one, x[2], x[1], one))
     end
@@ -317,7 +323,7 @@ end
 
 
 # check whether w_2 = v w_1 for some word v
-function is_subword_right(w_1::Vector{Int}, w_2::Vector{Int})
+function is_subword_right(w_1::Monomial, w_2::Monomial)
     if length(w_1) > length(w_2)
         return false
     end
@@ -331,7 +337,7 @@ end
 
 
 # check whether w_2 = w_1 v for some word v
-function is_subword_left(w_1::Vector{Int}, w_2::Vector{Int})
+function is_subword_left(w_1::Monomial, w_2::Monomial)
     if length(w_1) > length(w_2)
         return false
     end
@@ -345,35 +351,32 @@ end
 
 
 ###
-# check if for obs1 = (w_i, w_i^'; u_j, u_j^') and obs2 = (w_k, w_k^'; v_l, v_l^')
+# check if obs2 is a subobstructon of obs1, i.e. if 
+# the second pre-and suffix of obs2 are right- respectively left subwords of the second pre-and suffix of obs1.
+# In other words, check if for obs1 = (w_i, w_i^'; u_j, u_j^') and obs2 = (w_k, w_k^'; v_l, v_l^')
 # it holds that u_j == w v_l and u_j^' = v_l^' w^' for some w, w^'
-# i.e. if obs2 is a subobstruction of obs1
 # both w and w^' might be empty
-function is_subobstruction(obs1::NTuple{4,Vector{Int}}, obs2::NTuple{4,Vector{Int}})
-    if is_subword_right(obs2[3], obs1[3]) && is_subword_left(obs2[4], obs1[4])
-        return true
-    else
-        return false
-    end
+function is_subobstruction(obs1_second_prefix::Monomial, obs1_second_suffix::Monomial, 
+        obs2_second_prefix::Monomial, obs2_second_suffix)
+    return is_subword_right(obs2_second_prefix, obs1_second_prefix) && is_subword_left(obs2_second_suffix, obs1_second_suffix)
 end
 
 function is_subobstruction(obs1::ObstructionTriple{T}, obs2::ObstructionTriple{T}) where {T}
-    return is_subobstruction(obs1.pre_and_suffixes, obs2.pre_and_suffixes)
-
+    return is_subobstruction(obs1.second_prefix, obs1.second_suffix, obs2.second_prefix, obs2.second_suffix)
 end
 
 """
 if obs2 is a subobstruction of obs1, i.e. obs1[3] = w obs2[3] and obs1[4] = obs2[4]w',
 returns length(ww')
-thus, if it returns 0 and obs2 is a subobstruction of obs1, they are equal (? is that true?)
+thus, if it returns 0 and obs2 is a subobstruction of obs1, they are equal
 if obs2 is not a subobstruction of obs1 the return value is useless
 """
 function get_diff_length_for_subobstruction(
     obs1::ObstructionTriple{T},
     obs2::ObstructionTriple{T},
 ) where {T}
-    return length(obs1.pre_and_suffixes[3]) - length(obs2.pre_and_suffixes[3]) +
-           length(obs1.pre_and_suffixes[4]) - length(obs2.pre_and_suffixes[4])
+    return length(obs1.second_prefix) - length(obs2.second_prefix) +
+           length(obs1.second_suffix) - length(obs2.second_suffix)
 end
 
 # check whether there exists a (possibly empty) w^'' such that
@@ -394,7 +397,7 @@ function has_overlap(g2, w2, u2)
 end
 
 function has_overlap(obs::ObstructionTriple{T}) where {T}
-    return has_overlap(obs.second_poly, obs.pre_and_suffixes[2], obs.pre_and_suffixes[4])
+    return has_overlap(obs.second_poly, obs.first_suffix, obs.second_suffix)
 end
 
 function is_redundant(
@@ -414,7 +417,7 @@ function is_redundant(
                     return true
                 elseif obs.first_index == o.first_index &&
                        get_diff_length_for_subobstruction(obs, o) == 0 &&
-                       word_gt(obs.pre_and_suffixes[1], o.pre_and_suffixes[1])
+                       word_gt(obs.first_prefix, o.first_prefix)
                     return true
                 end
             end
@@ -434,23 +437,23 @@ function is_proper_multiple(
     if obs1.first_poly != obs2.first_poly || obs1.second_poly != obs2.second_poly #TODO compare indices instead?
         return false
     end
-    if is_subword_right(obs2.pre_and_suffixes[1], obs1.pre_and_suffixes[1]) &&
-       is_subword_left(obs2.pre_and_suffixes[2], obs1.pre_and_suffixes[2])
-        w = copy(obs1.pre_and_suffixes[1])
-        w2 = copy(obs1.pre_and_suffixes[2])
-        for _ in 1:length(obs2.pre_and_suffixes[1])
+    if is_subword_right(obs2.first_prefix, obs1.first_prefix) &&
+       is_subword_left(obs2.first_suffix, obs1.first_suffix)
+        w = copy(obs1.first_prefix)
+        w2 = copy(obs1.first_suffix)
+        for _ in 1:length(obs2.first_prefix)
             pop!(w)
         end
-        for _ in 1:length(obs2.pre_and_suffixes[2])
+        for _ in 1:length(obs2.first_suffix)
             popfirst!(w2)
         end
         if length(w) + length(w2) == 0
             return false
         end
-        @assert obs1.pre_and_suffixes[1] == vcat(w, obs2.pre_and_suffixes[1])
-        @assert obs1.pre_and_suffixes[2] == vcat(obs2.pre_and_suffixes[2], w2)
-        return obs1.pre_and_suffixes[3] == vcat(w, obs2.pre_and_suffixes[3]) &&
-               obs1.pre_and_suffixes[4] == vcat(obs2.pre_and_suffixes[4], w2)
+        @assert obs1.first_prefix == vcat(w, obs2.first_prefix)
+        @assert obs1.first_suffix == vcat(obs2.first_suffix, w2)
+        return obs1.second_prefix == vcat(w, obs2.second_prefix) &&
+               obs1.second_suffix == vcat(obs2.second_suffix, w2)
     else
         return false
     end
@@ -482,7 +485,7 @@ function is_redundant(
     w2 = []
     for i in 1:length(obs.second_poly.exps[1])
         word_to_check =
-            vcat(obs.pre_and_suffixes[3], obs.second_poly.exps[1], obs.pre_and_suffixes[4])
+            vcat(obs.second_prefix, obs.second_poly.exps[1], obs.second_suffix)
         if check_center_overlap(newest_element.exps[1], word_to_check, i)
             w1 = word_to_check[1:(i - 1)]
             w2 = word_to_check[(i + length(newest_element.exps[1])):end]
@@ -495,14 +498,14 @@ function is_redundant(
     obs1 = ObstructionTriple{T}(
         obs.first_poly,
         newest_element,
-        (obs.pre_and_suffixes[1], obs.pre_and_suffixes[2], w1, w2),
+        obs.first_prefix, obs.first_suffix, w1, w2,
         obs.first_index,
         newest_index,
     )
     obs2 = ObstructionTriple{T}(
         obs.second_poly,
         newest_element,
-        (obs.pre_and_suffixes[3], obs.pre_and_suffixes[4], w1, w2),
+        obs.second_prefix, obs.second_suffix, w1, w2,
         obs.second_index,
         newest_index,
     )
@@ -588,12 +591,11 @@ end
 
 function groebner_basis_buchberger(
     g::Vector{FreeAssAlgElem{T}},
-    reduction_bound = typemax(Int)::Int,
-    remove_redundancies = false
+    reduction_bound::Int = typemax(Int),
+    remove_redundancies::Bool = false
 ) where {T<:FieldElement}
     g = copy(g)
     #   interreduce!(g) # on some small examples, this increases running time, so it might not be optimal to use this here
-    checked_obstructions = 0
     nonzero_reductions = 0
     # compute the aho corasick automaton
     # to make normal form computation more efficient
@@ -612,9 +614,6 @@ function groebner_basis_buchberger(
         # step4
         push!(g, Sp)
         insert_keyword!(aut, Sp.exps[1], length(g))
-        if groebner_debug_level > 0
-            println("adding new obstructions! checked $checked_obstructions so far")
-        end
         if nonzero_reductions >= reduction_bound
             return g
         end
@@ -627,15 +626,15 @@ function groebner_basis_buchberger(
 end
 
 @doc """
-    groebner_basis(g::Vector{FreeAssAlgElem{T}}, reduction_bound = typemax(Int)::Int)
+    groebner_basis(g::Vector{FreeAssAlgElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false)
 
 Compute a groebner basis for the ideal spanned by g. Stop when `reduction_bound` many
 non-zero entries have been added to the groebner basis.
 """ 
 function groebner_basis(
     g::Vector{FreeAssAlgElem{T}},
-    reduction_bound = typemax(Int)::Int,
-    remove_redundancies = false
+    reduction_bound::Int = typemax(Int),
+    remove_redundancies::Bool = false
 ) where {T<:FieldElement}
     return groebner_basis_buchberger(g, reduction_bound, remove_redundancies)
 end
