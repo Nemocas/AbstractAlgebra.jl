@@ -51,3 +51,37 @@ end
 #   @test gb_divides_leftmost((x*s*t).exps[1], aut) == (false, [], [], -1)
 end
 
+@testset "Generic.FreeAssociativeAlgebra.groebner.overlaps_and_obstructions" begin
+    w1 = [1, 1, 2, 1, 3]
+    w2 = [2, 1, 3, 4, 3, 4]
+    w3 = [1, 3, 4]
+    w4 = [1, 1, 2, 1]
+    w5 = [5, 1, 3, 4, 4, 2, 1]
+    @test AbstractAlgebra.Generic.check_left_overlap(w2, w1, 3)
+    @test !AbstractAlgebra.Generic.check_left_overlap(w1, w2, 3)
+    @test AbstractAlgebra.Generic.check_center_overlap(w3, w2, 2)
+    @test AbstractAlgebra.Generic.check_center_overlap(w4, w1, 1)
+    @test !AbstractAlgebra.Generic.check_left_overlap(w4, w1, 1)
+    R, (x, y, z) = FreeAssociativeAlgebra(QQ, ["x", "y", "z"])
+    poly1 = x*y*x*x*z
+    poly2 = y*x*x*z*y*y
+    poly3 = x*y*x*y
+    poly4 = y*x*y*z
+    poly5 = x*y
+    poly6 = x*y*x*y*z*x*y
+    lw1 = AbstractAlgebra.Generic._leading_word(poly1)
+    lw2 = AbstractAlgebra.Generic._leading_word(poly2)
+    lw3 = AbstractAlgebra.Generic._leading_word(poly3)
+    lw4 = AbstractAlgebra.Generic._leading_word(poly4)
+    lw5 = AbstractAlgebra.Generic._leading_word(poly5)
+    lw6 = AbstractAlgebra.Generic._leading_word(poly6)
+    ot = AbstractAlgebra.Generic.ObstructionTriple{Rational{BigInt}}( poly1, poly2, [], [2, 2], [1], [], 1, 2)
+
+    @test AbstractAlgebra.Generic.has_overlap(ot)
+    @test length(AbstractAlgebra.Generic.left_obstructions(lw2, lw1)) == 1
+    @test isempty(AbstractAlgebra.Generic.left_obstructions(lw1, lw2))
+    @test length(AbstractAlgebra.Generic.right_obstructions(lw3, lw4)) == 2
+    @test isempty(AbstractAlgebra.Generic.left_obstructions(lw3, lw4))
+    @test length(AbstractAlgebra.Generic.center_obstructions(lw5, lw6)) == 3
+    @test length(AbstractAlgebra.Generic.get_obstructions([poly1, poly2])) == 2
+end

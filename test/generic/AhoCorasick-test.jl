@@ -4,7 +4,7 @@ using AbstractAlgebra.Generic: AhoCorasickAutomaton, search, AhoCorasickMatch, a
     aut = aho_corasick_automaton(keywords)
     @test search(aut, [10, 4, 1, 2, 3, 4]) == AhoCorasickMatch(6, 1, [1, 2, 3, 4])
     @test hash(search(aut, [10, 4, 1, 2, 3, 4])) == hash(AhoCorasickMatch(6, 1, [1, 2, 3, 4]))
-    @test isnothing(search(aut, []))
+    @test isnothing(search(aut, Int[]))
     @test search(aut, [1, 5, 4, 1, 1, 1, 4, 4]) == AhoCorasickMatch(3, 2, [1, 5, 4])
     @test search(aut, [1, 2, 3, 1, 4, 1, 2, 1, 4, 1, 2]) == AhoCorasickMatch(7, 3, [4, 1, 2])
     @test search(aut, [2, 1, 2, 3, 1]) == AhoCorasickMatch(3, 4, [1, 2])
