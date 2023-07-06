@@ -966,7 +966,7 @@ julia> newton_to_monomial!(g.coeffs, roots)
 
 ```@docs
 roots(f::PolyRingElem)
-roots(f::PolyRingElem, R::Field)
+roots(R::Field, f::PolyRingElem)
 ```
 
 ### Interpolation
