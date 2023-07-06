@@ -202,11 +202,11 @@ function insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
 end
 
 @doc """
-    search(automaton::AhoCorasickAutomaton, word)
+    search(automaton::AhoCorasickAutomaton, word::Word)
 
 Search for the first occurrence of a keyword that is stored in `automaton` in the given `word`.
 """ 
-function search(automaton::AhoCorasickAutomaton, word)
+function search(automaton::AhoCorasickAutomaton, word::Word)
     current_state = 1
     result = AhoCorasickMatch(typemax(Int), typemax(Int), [])
     for i in 1:length(word)
@@ -228,7 +228,7 @@ function search(automaton::AhoCorasickAutomaton, word)
             )
         end
     end
-    if result.keyword == []
+    if isempty(result.keyword)
         return nothing
     end
     return result
