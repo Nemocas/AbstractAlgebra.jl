@@ -1237,6 +1237,17 @@ getindex(S::Union{Set, Group}, i::Int) = gen(S, i)
 
 ###############################################################################
 #
+#   Syntactic sugar gen(R, :x) and R.x for generator named x of R
+#
+###############################################################################
+
+
+const SymbolsTypes = Union{FreeAssAlgebra, LaurentMPolyRing, LaurentPolynomialRing, MPolyRing, MSeriesRing, NCPolyRing, PolyRing, UniversalPolyRing}
+gen(R::SymbolsTypes, x::VarName) = only(gens(R)[symbols(R) .== Symbol(x)])
+Base.getproperty(R::T, x::Symbol) where T<:SymbolsTypes = hasfield(T, x) ? getfield(R, x) : gen(R, x)
+
+###############################################################################
+#
 #   Matrix M = R[...] syntax
 #
 ################################################################################
