@@ -677,9 +677,9 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(S::NCPolyRing, dr::UnitRange{Int}, _) = elem_type(S)
+RandomExtensions.maketype(S::NCPolyRing, dr::AbstractUnitRange{Int}, _) = elem_type(S)
 
-function RandomExtensions.make(S::NCPolyRing, deg_range::UnitRange{Int}, vs...)
+function RandomExtensions.make(S::NCPolyRing, deg_range::AbstractUnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, deg_range, vs[1]) # forward to default Make constructor
@@ -691,7 +691,7 @@ end
 function rand(rng::AbstractRNG,
               sp::SamplerTrivial{<:Make3{<:NCPolyRingElem,
                                          <:NCPolyRing,
-                                         UnitRange{Int}}})
+                                         <:AbstractUnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
    R = base_ring(S)
    f = S()
@@ -702,7 +702,7 @@ function rand(rng::AbstractRNG,
    return f
 end
 
-rand(rng::AbstractRNG, S::NCPolyRing, deg_range::UnitRange{Int}, v...) =
+rand(rng::AbstractRNG, S::NCPolyRing, deg_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, deg_range, v...))
 
 rand(S::NCPolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v...)

@@ -983,9 +983,9 @@ RandomExtensions.maketype(R::ConstPolyRing, _) = elem_type(R)
 rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{ConstPoly,ConstPolyRing}}) =
         sp[][1](rand(rng, sp[][2]))
 
-rand(rng::AbstractRNG, R::ConstPolyRing, n::UnitRange{Int}) = R(rand(rng, n))
+rand(rng::AbstractRNG, R::ConstPolyRing, n::AbstractUnitRange{Int}) = R(rand(rng, n))
 
-rand(R::ConstPolyRing, n::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, n)
+rand(R::ConstPolyRing, n::AbstractUnitRange{Int}) = rand(Random.GLOBAL_RNG, R, n)
 
 # Promotion rules
 

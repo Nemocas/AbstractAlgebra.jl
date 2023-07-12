@@ -96,7 +96,7 @@ derivative(p::LaurentMPolyRingElem, i::Int)
 ```
 
 ```julia
-rand(R::LaurentMPolyRingElem, length_range::UnitRange{Int}, exp_range::UnitRange{Int}, v...)
+rand(R::LaurentMPolyRingElem, length_range::AbstractUnitRange{Int}, exp_range::AbstractUnitRange{Int}, v...)
 ```
 
 The choice of canonical unit for Laurent polynomials includes the product

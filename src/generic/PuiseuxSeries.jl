@@ -707,23 +707,23 @@ end
 
 const PuiseuxSeriesRingOrField = Union{PuiseuxSeriesRing,PuiseuxSeriesField}
 
-RandomExtensions.maketype(S::PuiseuxSeriesRingOrField, ::UnitRange{Int}, _) = elem_type(S)
+RandomExtensions.maketype(S::PuiseuxSeriesRingOrField, ::AbstractUnitRange{Int}, _) = elem_type(S)
 
-RandomExtensions.make(S::PuiseuxSeriesRingOrField, val_range::UnitRange{Int},
-                      scale_range::UnitRange{Int}, vs...) =
+RandomExtensions.make(S::PuiseuxSeriesRingOrField, val_range::AbstractUnitRange{Int},
+                      scale_range::AbstractUnitRange{Int}, vs...) =
      make(S, scale_range, make(laurent_ring(S), val_range, vs...))
 
 function rand(rng::AbstractRNG,
               sp::SamplerTrivial{<:Make3{<:RingElement,
                                          <:PuiseuxSeriesRingOrField,
-                                         UnitRange{Int}}})
+                                         <:AbstractUnitRange{Int}}})
    S, scale_range, v = sp[][1:end]
    (first(scale_range) <= 0 || last(scale_range) <= 0) && error("Scale must be positive")
    return S(rand(rng, v), rand(rng, scale_range))
 end
 
-rand(rng::AbstractRNG, S::PuiseuxSeriesRingOrField, val_range::UnitRange{Int},
-     scale_range::UnitRange{Int}, v...) =
+rand(rng::AbstractRNG, S::PuiseuxSeriesRingOrField, val_range::AbstractUnitRange{Int},
+     scale_range::AbstractUnitRange{Int}, v...) =
         rand(rng, make(S, val_range, scale_range, v...))
 
 rand(S::PuiseuxSeriesRingOrField, val_range, scale_range, v...) =

@@ -1300,8 +1300,8 @@ end
 
 RandomExtensions.maketype(S::AbstractAlgebra.MPolyRing, _, _, _) = elem_type(S)
 
-function RandomExtensions.make(S::AbstractAlgebra.MPolyRing, term_range::UnitRange{Int},
-                               exp_bound::UnitRange{Int}, vs...)
+function RandomExtensions.make(S::AbstractAlgebra.MPolyRing, term_range::AbstractUnitRange{Int},
+                               exp_bound::AbstractUnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, term_range, exp_bound, vs[1])
@@ -1311,7 +1311,7 @@ function RandomExtensions.make(S::AbstractAlgebra.MPolyRing, term_range::UnitRan
 end
 
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
-                 <:RingElement,<:AbstractAlgebra.MPolyRing,UnitRange{Int},UnitRange{Int}}})
+                 <:RingElement, <:AbstractAlgebra.MPolyRing, <:AbstractUnitRange{Int}, <:AbstractUnitRange{Int}}})
    S, term_range, exp_bound, v = sp[][1:end]
    f = S()
    g = gens(S)
@@ -1328,7 +1328,7 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
 end
 
 function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
-              term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
+              term_range::AbstractUnitRange{Int}, exp_bound::AbstractUnitRange{Int}, v...)
    rand(rng, make(S, term_range, exp_bound, v...))
 end
 
