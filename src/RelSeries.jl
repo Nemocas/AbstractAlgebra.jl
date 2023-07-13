@@ -1367,9 +1367,9 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(S::SeriesRing, ::UnitRange{Int}, _) = elem_type(S)
+RandomExtensions.maketype(S::SeriesRing, ::AbstractUnitRange{Int}, _) = elem_type(S)
 
-function RandomExtensions.make(S::SeriesRing, val_range::UnitRange{Int}, vs...)
+function RandomExtensions.make(S::SeriesRing, val_range::AbstractUnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, val_range, vs[1]) # forward to default Make constructor
@@ -1379,7 +1379,7 @@ function RandomExtensions.make(S::SeriesRing, val_range::UnitRange{Int}, vs...)
 end
 
 function rand(rng::AbstractRNG,
-              sp::SamplerTrivial{<:Make3{<:RingElement, <:SeriesRing, UnitRange{Int}}})
+              sp::SamplerTrivial{<:Make3{<:RingElement, <:SeriesRing, <:AbstractUnitRange{Int}}})
    S, val_range, v = sp[][1:end]
    R = base_ring(S)
    f = S()
@@ -1390,7 +1390,7 @@ function rand(rng::AbstractRNG,
    return shift_left(f, rand(rng, val_range))
 end
 
-rand(rng::AbstractRNG, S::SeriesRing, val_range::UnitRange{Int}, v...) =
+rand(rng::AbstractRNG, S::SeriesRing, val_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, val_range, v...))
 
 rand(S::SeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val_range, v...)

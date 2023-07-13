@@ -117,7 +117,7 @@ Base.@propagate_inbounds function getindex(M::MatElem, x::Integer)
    end
 end
 
-function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: NCRingElement
+function Base.view(M::Mat{T}, rows::AbstractUnitRange{Int}, cols::AbstractUnitRange{Int}) where T <: NCRingElement
    return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
 end
 

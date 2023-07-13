@@ -151,7 +151,7 @@ end
 RandomExtensions.maketype(S::MSeriesRing, _, _) = elem_type(S)
 
 function RandomExtensions.make(S::MSeriesRing,
-                                      term_range::UnitRange{Int}, vs...)
+                                      term_range::AbstractUnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, term_range, vs[1])
@@ -161,7 +161,7 @@ function RandomExtensions.make(S::MSeriesRing,
 end
 
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{
-                  <:RingElement,<:MSeriesRing,UnitRange{Int}}})
+                  <:RingElement, <:MSeriesRing, <:AbstractUnitRange{Int}}})
    S, term_range, v = sp[][1:end]
    f = S()
    g = gens(S)
@@ -196,7 +196,7 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{
 end
 
 function rand(rng::AbstractRNG, S::MSeriesRing,
-                                             term_range::UnitRange{Int}, v...)
+                                             term_range::AbstractUnitRange{Int}, v...)
    rand(rng, make(S, term_range, v...))
 end
 

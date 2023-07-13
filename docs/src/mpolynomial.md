@@ -930,7 +930,7 @@ Note that zero coefficients may currently be generated, leading to less than
 the requested number of terms.
 
 ```julia
-rand(R::MPolyRing, exp_range::UnitRange{Int}, term_range::UnitRange{Int}, v...)
+rand(R::MPolyRing, exp_range::AbstractUnitRange{Int}, term_range::AbstractUnitRange{Int}, v...)
 ```
 
 **Examples**

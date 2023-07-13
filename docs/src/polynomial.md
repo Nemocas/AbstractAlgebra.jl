@@ -1071,7 +1071,7 @@ parameters are used to construct coefficients as elements of the coefficient
 ring.
 
 ```julia
-rand(R::PolyRing, deg_range::UnitRange{Int}, v...)
+rand(R::PolyRing, deg_range::AbstractUnitRange{Int}, v...)
 rand(R::PolyRing, deg::Int, v...)
 ```
 
