@@ -14,6 +14,12 @@ export insert_keyword!
 
 export search
 
+export last_position
+
+export keyword_index
+
+export keyword
+
 #export Word
 #
 import DataStructures: Queue, enqueue!, dequeue!
@@ -62,13 +68,13 @@ julia> aut = Generic.aho_corasick_automaton(keywords);
 julia> result = Generic.search(aut, [10, 4, 1, 2, 3, 4])
 AhoCorasickMatch(6, 1, [1, 2, 3, 4])
 
-julia> last_position(result)
+julia> Generic.last_position(result)
 6
 
-julia> keyword_index(result)
+julia> Generic.keyword_index(result)
 1
 
-julia> keyword(result)
+julia> Generic.keyword(result)
 4-element Vector{Int64}:
  1
  2
