@@ -59,7 +59,7 @@ For example, here is the implementation of `make` for polynomial rings such as
 the above:
 
 ```julia
-function RandomExtensions.make(S::PolyRing, deg_range::UnitRange{Int}, vs...)
+function RandomExtensions.make(S::PolyRing, deg_range::AbstractUnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, deg_range, vs[1]) # forward to default Make constructor
@@ -81,14 +81,14 @@ To help `make` we tell it the type of object we are hoping to randomly
 generate.
 
 ```julia
-RandomExtensions.maketype(S::PolyRing, dr::UnitRange{Int}, _) = elem_type(S)
+RandomExtensions.maketype(S::PolyRing, dr::AbstractUnitRange{Int}, _) = elem_type(S)
 ```
 
 Finally we implement the actual random generation itself.
 
 ```julia
 # define rand for make(S, deg_range, v)
-function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{<:RingElement,<:PolyRing,UnitRange{Int}}})
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{<:RingElement, <:PolyRing, <:AbstractUnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
    R = base_ring(S)
    f = S()
@@ -118,7 +118,7 @@ As mentioned above, we define a simplified random generator that saves the user
 having to create make instances.
 
 ```julia
-rand(rng::AbstractRNG, S::PolyRing, deg_range::UnitRange{Int}, v...) =
+rand(rng::AbstractRNG, S::PolyRing, deg_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, deg_range, v...))
 
 rand(S::PolyRing, degs, v...) = rand(Random.GLOBAL_RNG, S, degs, v...)

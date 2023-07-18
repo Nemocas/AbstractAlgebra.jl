@@ -46,8 +46,6 @@ Base.promote_rule(::Type{Perm{I}}, ::Type{Perm{J}}) where {I,J} =
 
 convert(::Type{Perm{T}}, p::Perm) where T = Perm(convert(Vector{T}, p.d), false)
 
-convert(::Type{Vector{T}}, p::Perm{T}) where {T} = Vector{T}(p)
-
 Vector{T}(p::Perm{T}) where {T} = p.d
 
 function Base.similar(p::Perm{T}, ::Type{S}=T) where {T, S<:Integer}

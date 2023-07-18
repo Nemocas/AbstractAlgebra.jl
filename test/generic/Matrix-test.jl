@@ -194,6 +194,24 @@ end
       @test m[3, 1] == T(5)
       @test m[3, 2] == T(6)
 
+      @test T[1;] == matrix(T, 1, 1, [1])
+      @test T[[1 2; 3 4];] == matrix(T, [1 2; 3 4])
+      @test T[[1 2]; 3 4] == matrix(T, [1 2; 3 4])
+      @test T[1:4;] == matrix(T, 4, 1, 1:4)
+      @test T[[];] == matrix(T, 0, 0, [])
+      @test T[[] ()...] == matrix(T, 0, 1, [])
+      @test T[[] []] == matrix(T, 0, 2, [])
+      if VERSION >= v"1.7"
+         # @test T[;] == matrix(T, 0, 0, []) # stalls Julia 1.6 parser
+         # @test T[;;] == matrix(T, 0, 0, []) # stalls Julia 1.6 parser
+         @test T[1;;] == matrix(T, 1, 1, [1])
+         @test T[[1 2; 3 4];;] == matrix(T, [1 2; 3 4])
+         @test T[[1; 3];; 2; 4] == matrix(T, [1 2; 3 4])
+         @test T[1:4;; 5:8] == matrix(T, [1 5; 2 6; 3 7; 4 8])
+         # @test_throws MethodError T[;;;] # stalls Julia 1.6 parser
+         @test_throws MethodError T[1;;;]
+      end
+
       @test_throws ArgumentError T[1; 2 3]
    end
 

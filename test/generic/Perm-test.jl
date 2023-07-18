@@ -55,7 +55,6 @@ end
    @test parent(g) == G
    @test parent(g) == SymmetricGroup(T(10))
 
-   @test convert(Vector{T}, G(z)) == z
    @test Vector{T}(G(z)) == z
 
    if T != Int

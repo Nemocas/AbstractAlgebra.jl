@@ -13,3 +13,11 @@ function ResidueField(R::Ring, a::RingElement; cached::Bool = true)
     "'residue_field(R::Ring, a::RingElement; cached::Bool = true)' instead.", :ResidueField)
     return residue_field(R, a; cached)
 end
+
+# Deprecated in 0.30.*
+
+@deprecate factor(f::FracElem, R::Ring) factor(R, f)
+
+@deprecate factor(f::PolyRingElem, R::Field) factor(R, f)
+
+@deprecate roots(f::PolyRingElem, R::Field) roots(R, f)

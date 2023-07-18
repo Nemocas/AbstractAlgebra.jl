@@ -735,7 +735,7 @@ valuations is provided. The maximum precision of the ring is used as a bound on
 the precision. Other parameters are used to construct random coefficients.
 
 ```julia
-rand(R::SeriesRing, val_range::UnitRange{Int}, v...)
+rand(R::SeriesRing, val_range::AbstractUnitRange{Int}, v...)
 ```
 
 **Examples**

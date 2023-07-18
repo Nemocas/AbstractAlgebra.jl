@@ -966,7 +966,7 @@ julia> newton_to_monomial!(g.coeffs, roots)
 
 ```@docs
 roots(f::PolyRingElem)
-roots(f::PolyRingElem, R::Field)
+roots(R::Field, f::PolyRingElem)
 ```
 
 ### Interpolation
@@ -1071,7 +1071,7 @@ parameters are used to construct coefficients as elements of the coefficient
 ring.
 
 ```julia
-rand(R::PolyRing, deg_range::UnitRange{Int}, v...)
+rand(R::PolyRing, deg_range::AbstractUnitRange{Int}, v...)
 rand(R::PolyRing, deg::Int, v...)
 ```
 

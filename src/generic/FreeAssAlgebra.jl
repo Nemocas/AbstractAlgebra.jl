@@ -291,7 +291,6 @@ for T in [RingElem, Integer, Rational, AbstractFloat]
     end
 end
 
-
 function set_exponent_word!(
     a::FreeAssAlgElem{T},
     i::Int,
@@ -677,7 +676,6 @@ function _change_freeassalg_ring(R, Rx, cached)
     P, _ = AbstractAlgebra.free_associative_algebra(R, symbols(Rx); cached = cached)
     return P
 end
-
 
 function change_base_ring(
     R::Ring,
