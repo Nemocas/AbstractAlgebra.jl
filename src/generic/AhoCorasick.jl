@@ -59,7 +59,7 @@ julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]];
 
 julia> aut = Generic.aho_corasick_automaton(keywords);
 
-julia> result = Generic.search(aut, [10, 4, 1, 2, 3, 4]);
+julia> result = Generic.search(aut, [10, 4, 1, 2, 3, 4])
 AhoCorasickMatch(6, 1, [1, 2, 3, 4])
 
 julia> last_position(result)
