@@ -48,7 +48,7 @@ function ObstructionTriple{T}(first_poly::FreeAssAlgElem{T},
                                 pre_and_suffixes[4], first_index, second_index)
 end
 
-function FreeAssAlgElem{T}(R::FreeAssAlgebra{T}, mon::Monomial) where {T}
+function FreeAssAlgElem{T}(R::FreeAssAlgebra{T}, mon::Monomial) where T
     return FreeAssAlgElem{T}(R, [one(base_ring(R))], [mon], 1)
 end
 
@@ -57,13 +57,13 @@ takes an obstruction triple (p, q, o) and returns the common multiple
 of the leading terms of p and q defined by o
 TODO documentation
 """
-function common_multiple_leading_term(ot::ObstructionTriple{T}) where {T}
+function common_multiple_leading_term(ot::ObstructionTriple{T}) where T
     return FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_prefix) *
            FreeAssAlgElem{T}(parent(ot.first_poly), _leading_word(ot.first_poly)) *
            FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_suffix)
 end
 
-function s_polynomial(ot::ObstructionTriple{T}) where {T}
+function s_polynomial(ot::ObstructionTriple{T}) where T
     first_term =
         FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_prefix) *
         ot.first_poly *
@@ -77,7 +77,7 @@ function s_polynomial(ot::ObstructionTriple{T}) where {T}
 end
 
 # skip all of the extra length-checking
-function _leading_word(a::FreeAssAlgElem{T}) where {T}
+function _leading_word(a::FreeAssAlgElem{T}) where T
     return a.exps[1]
 end
 
@@ -112,7 +112,7 @@ function normal_form(
     f::FreeAssAlgElem{T},
     g::Vector{FreeAssAlgElem{T}},
     aut::AhoCorasickAutomaton,
-) where {T}
+) where T
     R = parent(f)
     rexps = Monomial[]
     rcoeffs = T[]
@@ -134,7 +134,7 @@ end
 function normal_form(
     f::FreeAssAlgElem{T},
     g::Vector{FreeAssAlgElem{T}},
-) where {T<:FieldElement}
+) where T<:FieldElement
     R = parent(f)
     s = length(g)
     rcoeffs = T[]
@@ -164,7 +164,7 @@ end
 function normal_form_weak(
     f::FreeAssAlgElem{T},
     g::Vector{FreeAssAlgElem{T}},
-) where {T<:FieldElement}
+) where T<:FieldElement
     R = parent(f)
     s = length(g)
     while length(f) > 0
@@ -186,13 +186,13 @@ function normal_form_weak(
 end
 
 @doc raw"""
-    interreduce!(g::Vector{FreeAssAlgElem{T}})
+    interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
 
 Interreduce a given Groebner basis with itself, i.e. compute the normal form of each
 element of `g` with respect to the rest of the elements and discard elements with
 normal form $0$ and duplicates.
 """ 
-function interreduce!(g::Vector{FreeAssAlgElem{T}}) where {T}
+function interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
     i = 1
     while length(g) > 1 && length(g) >= i
         aut = AhoCorasickAutomaton([g_j.exps[1] for g_j in g[1:end .!= i]])
@@ -361,7 +361,7 @@ function is_subobstruction(obs1_second_prefix::Monomial, obs1_second_suffix::Mon
     return is_subword_right(obs2_second_prefix, obs1_second_prefix) && is_subword_left(obs2_second_suffix, obs1_second_suffix)
 end
 
-function is_subobstruction(obs1::ObstructionTriple{T}, obs2::ObstructionTriple{T}) where {T}
+function is_subobstruction(obs1::ObstructionTriple{T}, obs2::ObstructionTriple{T}) where T
     return is_subobstruction(obs1.second_prefix, obs1.second_suffix, obs2.second_prefix, obs2.second_suffix)
 end
 
@@ -374,7 +374,7 @@ if obs2 is not a subobstruction of obs1 the return value is useless
 function get_diff_length_for_subobstruction(
     obs1::ObstructionTriple{T},
     obs2::ObstructionTriple{T},
-) where {T}
+) where T
     return length(obs1.second_prefix) - length(obs2.second_prefix) +
            length(obs1.second_suffix) - length(obs2.second_suffix)
 end
@@ -396,14 +396,14 @@ function has_overlap(g2, w2, u2)
     return length(w2) < length(lw2) + length(u2)
 end
 
-function has_overlap(obs::ObstructionTriple{T}) where {T}
+function has_overlap(obs::ObstructionTriple{T}) where T
     return has_overlap(obs.second_poly, obs.first_suffix, obs.second_suffix)
 end
 
 function is_redundant(
     obs::ObstructionTriple{T},
     new_obstructions::PriorityQueue{Obstruction{T},FreeAssAlgElem{T}},
-) where {T}
+) where T
     # cases 4b + 4c
     for obstruction_pair in new_obstructions
         o = obstruction_pair[1]
@@ -433,7 +433,7 @@ obs1 = [w w_i, w_i' w'; w w_j, w_j' w'] and obs2 = [w_i, w_i'; w_j, w_j']
 function is_proper_multiple(
     obs1::ObstructionTriple{T},
     obs2::ObstructionTriple{T},
-) where {T}
+) where T
     if obs1.first_poly != obs2.first_poly || obs1.second_poly != obs2.second_poly #TODO compare indices instead?
         return false
     end
@@ -465,7 +465,7 @@ check, whether obs is a proper multiple of any of the obstructions in the priori
 function is_proper_multiple(
     obs::ObstructionTriple{T},
     obstructions::PriorityQueue{Obstruction{T},FreeAssAlgElem{T}},
-) where {T}
+) where T
     for obspair in obstructions
         obs2 = obspair[1]
         if is_proper_multiple(obs, obs2)
@@ -480,7 +480,7 @@ function is_redundant(
     new_obstructions::PriorityQueue{Obstruction{T},FreeAssAlgElem{T}},
     newest_element::FreeAssAlgElem{T},
     newest_index::Int,
-) where {T}
+) where T
     w1 = []
     w2 = []
     for i in 1:length(obs.second_poly.exps[1])
@@ -519,7 +519,7 @@ function remove_redundancies!(
     all_obstructions::PriorityQueue{Obstruction{T},FreeAssAlgElem{T}},
     newest_index::Int,
     newest_element::FreeAssAlgElem{T},
-) where {T}
+) where T
     del_counter = 0
     new_obstructions = PriorityQueue{Obstruction{T},FreeAssAlgElem{T}}()
     old_obstructions = PriorityQueue{Obstruction{T},FreeAssAlgElem{T}}()
@@ -550,7 +550,7 @@ function remove_redundancies!(
     # TODO case 4e from Thm 4.1 in Kreuzer Xiu
 end
 
-function get_obstructions(g::Vector{FreeAssAlgElem{T}}) where {T}
+function get_obstructions(g::Vector{FreeAssAlgElem{T}}) where T
     s = length(g)
     result = PriorityQueue{Obstruction{T},FreeAssAlgElem{T}}()
     for i in 1:s, j in 1:i
@@ -572,7 +572,7 @@ end
 function add_obstructions!(
     obstruction_queue::PriorityQueue{Obstruction{T},FreeAssAlgElem{T}},
     g::Vector{FreeAssAlgElem{T}},
-) where {T}
+) where T
     s = length(g)
     for i in 1:s
         if i == s
@@ -593,7 +593,7 @@ function groebner_basis_buchberger(
     g::Vector{FreeAssAlgElem{T}},
     reduction_bound::Int = typemax(Int),
     remove_redundancies::Bool = false
-) where {T<:FieldElement}
+) where T<:FieldElement
     g = copy(g)
     #   interreduce!(g) # on some small examples, this increases running time, so it might not be optimal to use this here
     nonzero_reductions = 0
@@ -635,6 +635,6 @@ function groebner_basis(
     g::Vector{FreeAssAlgElem{T}},
     reduction_bound::Int = typemax(Int),
     remove_redundancies::Bool = false
-) where {T<:FieldElement}
+) where T<:FieldElement
     return groebner_basis_buchberger(g, reduction_bound, remove_redundancies)
 end
