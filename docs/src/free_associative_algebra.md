@@ -1,5 +1,5 @@
 ```@meta
-CurrentModule = AbstractAlgebra
+CurrentModule = AbstractAlgebra.Generic
 DocTestSetup = quote
     using AbstractAlgebra
 end

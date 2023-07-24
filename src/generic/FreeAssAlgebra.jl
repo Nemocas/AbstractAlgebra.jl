@@ -198,7 +198,6 @@ Return a vector of variable indices corresponding to the monomial of the
 $i$-th term of $a$. Term numbering begins at $1$, and the variable
 indices are given in the order of the variables for the ring.
 """
-
 function exponent_word(a::FreeAssAlgElem{T}, i::Int) where T <: RingElement
     @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
     return a.exps[i]
