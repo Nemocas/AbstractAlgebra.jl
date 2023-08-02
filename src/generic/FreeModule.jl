@@ -52,7 +52,9 @@ end
 function gen(N::FreeModule{T}, i::Int) where T <: Union{RingElement, NCRingElem}
    @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
    R = base_ring(N)
-   return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
+   m = zero_matrix(R, 1, ngens(N))
+   m[1, i] = one(R)
+   return N(m)
 end
 
 basis(N::FreeModule) = gens(N)
