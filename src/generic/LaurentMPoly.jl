@@ -38,6 +38,10 @@ function deepcopy_internal(a::LaurentMPolyWrap, dict::IdDict)
                                      deepcopy_internal(a.mindegs, dict))
 end
 
+function Base.copy(a::LaurentMPolyWrap)
+  return LaurentMPolyWrap(a.parent, copy(a.mpoly), copy(a.mindegs))
+end
+
 function Base.hash(a::LaurentMPolyWrap, h::UInt)
     (ap, ad) = _normalize(a)
     h = hash(ap, h)

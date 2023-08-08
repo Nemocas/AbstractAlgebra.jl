@@ -134,3 +134,8 @@ end
     p = inv(inv(x))
     @test constant_coefficient(p) == 0
 end
+
+@testset "copies of elements" begin
+  R, x = LaurentPolynomialRing(QQ, ["x", "y"])
+  @test x[1] !== copy(x[1])
+end

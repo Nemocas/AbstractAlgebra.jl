@@ -855,6 +855,10 @@ function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingEleme
    return parent(a)(Rc, Re)
 end
 
+function Base.copy(a::MPoly{T}) where {T}
+  return MPoly{T}(a.parent, copy(a.coeffs), copy(a.exps))
+end
+
 ###############################################################################
 #
 #   Iterators
