@@ -1,5 +1,3 @@
-import AbstractAlgebra: pluralize, ItemQuantity
-
 @testset "pluralize" begin
   @test pluralize("basis") == "bases"
   @test pluralize("child") == "children"
