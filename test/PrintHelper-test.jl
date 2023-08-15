@@ -20,3 +20,27 @@ end
   @test string(ItemQuantity(1, "ox", "oxen")) == "1 ox"
   @test string(ItemQuantity(2, "ox", "oxen")) == "2 oxen"
 end
+
+@testset "ordinal_number_string" begin
+  @test ordinal_number_string(0) == "0th"
+  @test ordinal_number_string(1) == "1st"
+  @test ordinal_number_string(2) == "2nd"
+  @test ordinal_number_string(3) == "3rd"
+  @test ordinal_number_string(4) == "4th"
+  @test ordinal_number_string(5) == "5th"
+  @test ordinal_number_string(10) == "10th"
+  @test ordinal_number_string(11) == "11th"
+  @test ordinal_number_string(12) == "12th"
+  @test ordinal_number_string(13) == "13th"
+  @test ordinal_number_string(14) == "14th"
+  @test ordinal_number_string(20) == "20th"
+  @test ordinal_number_string(21) == "21st"
+  @test ordinal_number_string(22) == "22nd"
+  @test ordinal_number_string(23) == "23rd"
+  @test ordinal_number_string(24) == "24th"
+  @test ordinal_number_string(100) == "100th"
+  @test ordinal_number_string(101) == "101st"
+  @test ordinal_number_string(102) == "102nd"
+  @test ordinal_number_string(103) == "103rd"
+  @test ordinal_number_string(104) == "104th"
+end

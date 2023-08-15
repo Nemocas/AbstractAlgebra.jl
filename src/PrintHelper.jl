@@ -109,3 +109,40 @@ function Base.show(io::IO, quantity::ItemQuantity)
         print(io, pluralize(quantity.noun))
     end
 end
+
+"""
+    ordinal_number_string(number::Int)
+
+A helper function which returns `number` as a string in ordinal form.
+
+# Examples
+```julia
+julia> ordinal_number_string(1)
+"1st"
+
+julia> ordinal_number_string(2)
+"2nd"
+
+julia> ordinal_number_string(3)
+"3rd"
+
+julia> ordinal_number_string(4)
+"4rd"
+```
+"""
+function ordinal_number_string(number::Int)
+    number >= 0 || error("number must be non-negative")
+    mod100 = mod(number, 100)
+    mod10 = mod(number, 10)
+    if mod100 in 11:13
+        return "$(number)th"
+    elseif mod10 == 1
+        return "$(number)st"
+    elseif mod10 == 2
+        return "$(number)nd"
+    elseif mod10 == 3
+        return "$(number)rd"
+    else
+        return "$(number)th"
+    end
+end

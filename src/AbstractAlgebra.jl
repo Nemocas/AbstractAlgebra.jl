@@ -261,6 +261,7 @@ export NotImplementedError
 export NotInvertibleError
 export NumField
 export NumFieldElem
+export ordinal_number_string
 export parent_type
 export pluralize
 export PolyRing
