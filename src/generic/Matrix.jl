@@ -100,23 +100,6 @@ function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: NCRingEl
    return MatSpaceView(deepcopy_internal(d.entries, dict), d.base_ring)
 end
 
-###############################################################################
-#
-#   getindex
-#
-###############################################################################
-
-# linear indexing for row- or column- vectors
-Base.@propagate_inbounds function getindex(M::MatElem, x::Integer)
-   if nrows(M) == 1
-      M[1, x]
-   elseif ncols(M) == 1
-      M[x, 1]
-   else
-      throw(ArgumentError("linear indexing not supported for non-vector matrices"))
-   end
-end
-
 function Base.view(M::Mat{T}, rows::AbstractUnitRange{Int}, cols::AbstractUnitRange{Int}) where T <: NCRingElement
    return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
 end
