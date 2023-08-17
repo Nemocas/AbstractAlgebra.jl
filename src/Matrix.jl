@@ -441,7 +441,7 @@ Base.@propagate_inbounds function Base.setindex!(a::MatrixElem{T}, x, I::Cartesi
 end
 
 # linear indexing for row- or column- vectors
-Base.@propagate_inbounds function getindex(M::MatElem, i::Integer)
+Base.@propagate_inbounds function getindex(M::MatrixElem, i::Integer)
    if nrows(M) == 1
       M[1, i]
    elseif ncols(M) == 1
@@ -451,7 +451,7 @@ Base.@propagate_inbounds function getindex(M::MatElem, i::Integer)
    end
 end
 
-Base.@propagate_inbounds function setindex!(M::MatElem, x, i::Integer)
+Base.@propagate_inbounds function setindex!(M::MatrixElem, x, i::Integer)
    if nrows(M) == 1
       M[1, i] = x
       return M
