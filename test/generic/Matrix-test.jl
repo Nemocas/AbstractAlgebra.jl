@@ -747,6 +747,20 @@ end
       elseif length(A) >= 1
          @test_throws ArgumentError A[1]
       end
+      A = deepcopy(A)
+      if nr == 1
+         c = rand(1:nc)
+         d = rand(1:nc)
+         A[c] = A[d]
+         @test A[c] == A[1, d]
+      elseif nc == 1
+         r = rand(1:nr)
+         s = rand(1:nr)
+         A[r] = A[s]
+         @test A[r] == A[s, 1]
+      elseif length(A) >= 1
+         @test_throws ArgumentError (A[1] = zero(base_ring(A)))
+      end
    end
 
    for (_, (R, rand_params)) in RINGS

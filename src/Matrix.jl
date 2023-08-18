@@ -440,6 +440,29 @@ Base.@propagate_inbounds function Base.setindex!(a::MatrixElem{T}, x, I::Cartesi
    a
 end
 
+# linear indexing for row- or column- vectors
+Base.@propagate_inbounds function getindex(M::MatrixElem, i::Integer)
+   if nrows(M) == 1
+      M[1, i]
+   elseif ncols(M) == 1
+      M[i, 1]
+   else
+      throw(ArgumentError("linear indexing not supported for non-vector matrices"))
+   end
+end
+
+Base.@propagate_inbounds function setindex!(M::MatrixElem, x, i::Integer)
+   if nrows(M) == 1
+      M[1, i] = x
+      return M
+   elseif ncols(M) == 1
+      M[i, 1] = x
+      return M
+   else
+      throw(ArgumentError("linear indexing not supported for non-vector matrices"))
+   end
+end
+
 # iteration
 
 function Base.iterate(a::MatrixElem{T}, ij=(0, 1)) where T <: NCRingElement
