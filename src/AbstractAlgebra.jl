@@ -261,6 +261,7 @@ export NotImplementedError
 export NotInvertibleError
 export NumField
 export NumFieldElem
+export ordinal_number_string
 export parent_type
 export pluralize
 export PolyRing
@@ -292,7 +293,7 @@ export ZZ
 
 include("Attributes.jl")
 include("AliasMacro.jl")
-include("Pluralize.jl")
+include("PrintHelper.jl")
 
 # alternative names for some functions from Base
 export is_empty, is_even, is_equal, is_finite, is_inf, is_integer, is_less, is_odd, is_one, is_real, is_subset, is_valid, is_zero
