@@ -128,42 +128,6 @@ end
 
 ###############################################################################
 #
-#   GCD
-#
-###############################################################################
-
-function gcd(p::Rational{T}, q::Rational{T}) where T <: Integer
-   a = p.num*q.den
-   b = p.den*q.num
-   n = gcd(a, b)
-   d = p.den*q.den
-   if d != 1 && n != 0
-      g = gcd(n, d)
-      n = divexact(n, g)
-      d = divexact(d, g)
-   end
-   if n == 0
-      return Rational{T}(n, T(1))
-   else
-      return Rational{T}(n, d)
-   end
-end
-
-function gcdx(p::Rational{T}, q::Rational{T}) where {T <: Integer}
-   g = gcd(p, q)
-   if !iszero(p)
-      return (g, g//p, zero(q))
-   elseif !iszero(q)
-      return (g, zero(p), g//q)
-   else
-      @assert iszero(g)
-      return (g, zero(p), zero(p))
-   end
-end
-
-
-###############################################################################
-#
 #   Square root
 #
 ###############################################################################
