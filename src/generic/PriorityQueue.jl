@@ -5,6 +5,8 @@
 # PriorityQueue
 # -------------
 
+export PriorityQueue
+
 using Base: Ordering, ForwardOrdering, Forward, ReverseOrdering, Reverse, lt
 
 # Binary heap indexing
