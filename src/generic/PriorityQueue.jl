@@ -35,9 +35,9 @@ Parameters
 `ord::Base.Ordering` Priority queue ordering
 
 # Examples
-```jldoctest
-julia> PriorityQueue(Base.Order.Forward, "a" => 2, "b" => 3, "c" => 1)
-PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> Generic.PriorityQueue(Base.Order.Forward, "a" => 2, "b" => 3, "c" => 1)
+AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
   "c" => 1
   "a" => 2
   "b" => 3
@@ -154,9 +154,9 @@ Verify if priority queue `pq` has `key` in its keys.
 
 # Example
 
-```jldoctest
-julia> pq = PriorityQueue("a" => 1, "b" => 2, "c" => 3)
-PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> pq = Generic.PriorityQueue("a" => 1, "b" => 2, "c" => 3)
+AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
   "a" => 1
   "b" => 2
   "c" => 3
@@ -268,16 +268,16 @@ Insert the a key `k` into a priority queue `pq` with priority `v`.
 
 # Examples 
 
-```jldoctest
-julia> a = PriorityQueue("a" => 1, "b" => 2, "c" => 3, "e" => 5)
-PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 4 entries:
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> a = Generic.PriorityQueue("a" => 1, "b" => 2, "c" => 3, "e" => 5)
+AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 4 entries:
   "a" => 1
   "b" => 2
   "c" => 3
   "e" => 5
 
 julia> push!(a, "d" => 4)
-PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 5 entries:
+AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 5 entries:
   "a" => 1
   "b" => 2
   "c" => 3
@@ -306,9 +306,9 @@ Remove and return the lowest priority key and value from a priority queue `pq` a
 
 # Examples
 
-```jldoctest
-julia> a = PriorityQueue(Base.Order.Forward, "a" => 2, "b" => 3, "c" => 1)
-PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> a = Generic.PriorityQueue(Base.Order.Forward, "a" => 2, "b" => 3, "c" => 1)
+AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
   "c" => 1
   "a" => 2
   "b" => 3
@@ -317,7 +317,7 @@ julia> popfirst!(a)
 "c" => 1
 
 julia> a
-PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 2 entries:
+AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 2 entries:
   "a" => 2
   "b" => 3
 ```
@@ -351,14 +351,14 @@ Delete the mapping for the given `key` in a priority queue `pq` and return the p
 
 # Examples
 
-```jldoctest
-julia> q = PriorityQueue(Base.Order.Forward, "a" => 2, "b" => 3, "c" => 1)
-PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> q = Generic.PriorityQueue(Base.Order.Forward, "a" => 2, "b" => 3, "c" => 1)
+AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
   "c" => 1
   "a" => 2
   "b" => 3
 julia> delete!(q, "b")
-PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 2 entries:
+AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 2 entries:
   "c" => 1
   "a" => 2
 ```
