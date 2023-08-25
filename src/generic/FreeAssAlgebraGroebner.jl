@@ -12,7 +12,7 @@ export normal_form
 
 export normal_form_weak
 
-import DataStructures: PriorityQueue, enqueue!, dequeue!
+include("PriorityQueue.jl")
 
 const Monomial = Vector{Int}
 
@@ -561,7 +561,7 @@ function get_obstructions(g::Vector{FreeAssAlgElem{T}}) where T
         end
         for o in obs
             triple = ObstructionTriple{T}(g[i], g[j], o, i, j)
-            enqueue!(result, triple, common_multiple_leading_term(triple))
+            push!(result, triple => common_multiple_leading_term(triple))
         end
     end
     # TODO maybe here some redundancies can be removed too, check Kreuzer Xiu
@@ -582,7 +582,7 @@ function add_obstructions!(
         end
         for o in obs
             triple = ObstructionTriple{T}(g[i], g[s], o, i, s)
-            enqueue!(obstruction_queue, triple, common_multiple_leading_term(triple))
+            push!(obstruction_queue, triple => common_multiple_leading_term(triple))
         end
     end
     #remove_redundancies!(obstruction_queue, s, g[s]) #TODO too slow in practice
@@ -603,7 +603,7 @@ function groebner_basis_buchberger(
     # step 1
     obstruction_queue = get_obstructions(g)
     while !isempty(obstruction_queue)
-        obstruction = dequeue!(obstruction_queue)
+        obstruction = popfirst!(obstruction_queue)[1]
         # step3
         S = s_polynomial(obstruction)
         Sp = normal_form(S, g, aut) # or normal_form_weak
