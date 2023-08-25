@@ -21,10 +21,24 @@ export keyword_index
 export keyword
 
 #export Word
-#
-import DataStructures: Queue, enqueue!, dequeue!
 
 const Word = Vector{Int}
+
+struct Queue{T}
+  data::Vector{T}
+end
+
+function Queue{T}() where T
+    return Queue{T}(T[])
+end
+
+function enqueue!(q::Queue{T}, val::T) where T
+  push!(q.data, val)
+end
+function dequeue!(q::Queue)
+  return popfirst!(q.data)
+end
+isempty(q::Queue) = isempty(q.data)
 
 @doc """
     AhoCorasickAutomaton
@@ -188,7 +202,7 @@ function construct_fail!(automaton::AhoCorasickAutomaton)
             automaton.fail[new_state] = lookup(automaton, state, k)
             if automaton.output[new_state][1] >
                automaton.output[automaton.fail[new_state]][1]
-                automaton.output[new_state] = automaton.output[automaton.fail[new_state]] # TODO check if this is the correct way to update output
+               automaton.output[new_state] = automaton.output[automaton.fail[new_state]] 
             end
 
         end
