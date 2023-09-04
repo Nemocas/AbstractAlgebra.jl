@@ -193,13 +193,15 @@ function identity_matrix(::Type{MatElem}, R::Ring, n::Int)
 end
 
 function is_zero_row(M::Matrix, i::Int)
-    for j = 1:Base.size(M, 2)
+    for j = 1:ncols(M)
         if !iszero(M[i, j])
             return false
         end
     end
     return true
 end
+
+# TODO: add `is_zero_column(M::Matrix{T}, i::Int) where {T<:Integer}` and specialized functions in Nemo
 
 dense_matrix_type(::Type{T}) where {T} = Generic.MatSpaceElem{T}
 
@@ -351,7 +353,7 @@ end
 ################################################################################
 
 @doc raw"""
-kernel(a::MatrixElem{T}, R::Ring; side::Symbol = :right) -> n, MatElem{elem_type(R)}
+    kernel(a::MatrixElem{T}, R::Ring; side::Symbol = :right) -> n, MatElem{elem_type(R)}
 
 It returns a tuple $(n, M)$, where $n$ is the rank of the kernel over $R$ and $M$ is a basis for it. If side is $:right$ or not
 specified, the right kernel is computed. If side is $:left$, the left kernel is computed.
