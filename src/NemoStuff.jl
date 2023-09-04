@@ -1,5 +1,7 @@
 export neg!
 
+sub!(z::T, x::T, y::T) where {T} = x - y
+
 sub!(z::Rational{Int}, x::Rational{Int}, y::Int) = x - y
 
 neg!(z::Rational{Int}, x::Rational{Int}) = -x
@@ -7,6 +9,35 @@ neg!(z::Rational{Int}, x::Rational{Int}) = -x
 add!(z::Rational{Int}, x::Rational{Int}, y::Int) = x + y
 
 mul!(z::Rational{Int}, x::Rational{Int}, y::Int) = x * y
+
+is_negative(x::Rational) = x.num < 0
+
+function matrix(a::Vector{Vector{T}}) where {T}
+    return matrix(permutedims(reduce(hcat, a), (2, 1)))
+end
+
+################################################################################
+#
+#  Create a matrix from rows
+#
+################################################################################
+
+function matrix(K::Ring, R::Vector{<:Vector})
+    if length(R) == 0
+        return zero_matrix(K, 0, 0)
+    else
+        n = length(R)
+        m = length(R[1])
+        z = zero_matrix(K, n, m)
+        for i in 1:n
+            @assert length(R[i]) == m
+            for j in 1:m
+                z[i, j] = R[i][j]
+            end
+        end
+        return z
+    end
+end
 
 ################################################################################
 #
@@ -86,7 +117,128 @@ function is_symmetric(M::MatElem)
     return true
 end
 
+################################################################################
+#
+#  Zero matrix constructors
+#
+################################################################################
+
 zero_matrix(::Type{Int}, r, c) = zeros(Int, r, c)
+
+function zero_matrix(::Type{MatElem}, R::Ring, n::Int)
+    return zero_matrix(R, n)
+end
+
+function zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
+    return zero_matrix(R, n, m)
+end
+
+function matrix(A::Matrix{T}) where {T<:RingElem}
+    r, c = size(A)
+    (r < 0 || c < 0) && error("Array must be non-empty")
+    m = matrix(parent(A[1, 1]), A)
+    return m
+end
+
+function matrix(A::Vector{T}) where {T<:RingElem}
+    return matrix(reshape(A, length(A), 1))
+end
+
+export scalar_matrix
+
+function scalar_matrix(R::Ring, n::Int, a::RingElement)
+    b = R(a)
+    z = zero_matrix(R, n, n)
+    for i in 1:n
+        z[i, i] = b
+    end
+    return z
+end
+
+function identity_matrix(::Type{MatElem}, R::Ring, n::Int)
+    return identity_matrix(R, n)
+end
+
+function is_zero_row(M::Matrix{T}, i::Int) where {T<:Integer}
+    for j = 1:Base.size(M, 2)
+        if !iszero(M[i, j])
+            return false
+        end
+    end
+    return true
+end
+
+################################################################################
+#
+#  Unsafe functions for generic matrices
+#
+################################################################################
+
+#function zero!(a::MatElem)
+#  for i in 1:nrows(a)
+#    for j in 1:ncols(a)
+#      a[i, j] = zero!(a[i, j])
+#    end
+#  end
+#  return a
+#end
+
+function mul!(c::MatElem, a::MatElem, b::MatElem)
+    ncols(a) != nrows(b) && error("Incompatible matrix dimensions")
+    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
+    ncols(c) != ncols(b) && error("Incompatible matrix dimensions")
+
+    if c === a || c === b
+        d = parent(a)()
+        return mul!(d, a, b)
+    end
+
+    t = base_ring(a)()
+    for i = 1:nrows(a)
+        for j = 1:ncols(b)
+            c[i, j] = zero!(c[i, j])
+            for k = 1:ncols(a)
+                c[i, j] = addmul_delayed_reduction!(c[i, j], a[i, k], b[k, j], t)
+            end
+            c[i, j] = reduce!(c[i, j])
+        end
+    end
+    return c
+end
+
+function mul!(c::MatElem, a::MatElem, b::RingElement)
+    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
+
+    if c === a || c === b
+        d = parent(a)()
+        return mul!(d, a, b)
+    end
+
+    t = base_ring(a)()
+    for i = 1:nrows(a)
+        for j = 1:ncols(a)
+            c[i, j] = mul!(c[i, j], a[i, j], b)
+        end
+    end
+    return c
+end
+
+function add!(c::MatElem, a::MatElem, b::MatElem)
+    parent(a) != parent(b) && error("Parents don't match.")
+    parent(c) != parent(b) && error("Parents don't match.")
+    for i = 1:nrows(c)
+        for j = 1:ncols(c)
+            c[i, j] = add!(c[i, j], a[i, j], b[i, j])
+        end
+    end
+    return c
+end
+
+function addmul!(z::T, x::T, y::T) where {T<:RingElement}
+    zz = parent(z)()
+    zz = mul!(zz, x, y)
+    return addeq!(z, zz)
+end
 
 #TODO: should be done in Nemo/AbstractAlgebra s.w.
 #      needed by ^ (the generic power in Base using square and multiply)
@@ -137,7 +289,29 @@ function sub(M::MatElem{T}, r::AbstractUnitRange{<:Integer}, c::AbstractUnitRang
     return z
 end
 
-#trivia to make life easier
+right_kernel(M::MatElem) = nullspace(M)
+
+function left_kernel(M::MatElem)
+    rk, M1 = nullspace(transpose(M))
+    return rk, transpose(M1)
+end
+
+################################################################################
+#
+#  Kernel over different rings
+#
+################################################################################
+
+@doc raw"""
+kernel(a::MatrixElem{T}, R::Ring; side::Symbol = :right) -> n, MatElem{elem_type(R)}
+
+It returns a tuple $(n, M)$, where $n$ is the rank of the kernel over $R$ and $M$ is a basis for it. If side is $:right$ or not
+specified, the right kernel is computed. If side is $:left$, the left kernel is computed.
+"""
+function kernel(M::MatrixElem, R::Ring; side::Symbol=:right)
+    MP = change_base_ring(R, M)
+    return kernel(MP, side=side)
+end
 
 gens(L::SimpleNumField{T}) where {T} = [gen(L)]
 
@@ -161,3 +335,49 @@ ngens(L::SimpleNumField{T}) where {T} = 1
 is_unit(a::NumFieldElem) = !iszero(a)
 
 canonical_unit(a::NumFieldElem) = a
+
+"""
+The coefficients of `f` when viewed as a univariate polynomial in the `i`-th
+variable.
+"""
+function coefficients(f::MPolyRingElem, i::Int)
+    d = degree(f, i)
+    cf = [MPolyBuildCtx(parent(f)) for j = 0:d]
+    for (c, e) = zip(coefficients(f), exponent_vectors(f))
+        a = e[i]
+        e[i] = 0
+        push_term!(cf[a+1], c, e)
+    end
+    return map(finish, cf)
+end
+
+function polynomial_ring(R::Ring; cached::Bool=false)
+    return polynomial_ring(R, "x", cached=cached)
+end
+
+function content(a::PolyRingElem{<:FieldElem})
+    return one(base_ring(a))
+end
+
+function canonical_unit(a::SeriesElem)
+    iszero(a) && return one(parent(a))
+    v = valuation(a)
+    v == 0 && return a
+    v > 0 && return shift_right(a, v)
+    return shift_left(a, -v)
+end
+
+#TODO: this is for rings, not for fields, maybe different types?
+function Base.gcd(a::T, b::T) where {T<:SeriesElem}
+    iszero(a) && iszero(b) && return a
+    iszero(a) && return gen(parent(a))^valuation(b)
+    iszero(b) && return gen(parent(a))^valuation(a)
+    return gen(parent(a))^min(valuation(a), valuation(b))
+end
+
+function Base.lcm(a::T, b::T) where {T<:SeriesElem}
+    iszero(a) && iszero(b) && return a
+    iszero(a) && return a
+    iszero(b) && return b
+    return gen(parent(a))^max(valuation(a), valuation(b))
+end
