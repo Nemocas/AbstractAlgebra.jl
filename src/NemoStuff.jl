@@ -28,33 +28,11 @@ is_positive(n::Integer) = cmp(n, 0) > 0
 #
 # TODO: what happens to z = 0???
 
-function remove(z::T, p::T) where {T<:Integer}
-    z == 0 && return (0, z)
-    v = 0
-    @assert p > 1
-    while mod(z, p) == 0
-        z = Base.div(z, p)
-        v += 1
-    end
-    return (v, z)
-end
-
 function remove(z::Rational{T}, p::T) where {T<:Integer}
     z == 0 && return (0, z)
     v, d = remove(denominator(z), p)
     w, n = remove(numerator(z), p)
     return w - v, n // d
-end
-
-function valuation(z::T, p::T) where {T<:Integer}
-    iszero(z) && error("Not yet implemented")
-    v = 0
-    @assert p > 1
-    while mod(z, p) == 0
-        z = Base.div(z, p)
-        v += 1
-    end
-    return v
 end
 
 function valuation(z::Rational{T}, p::T) where {T<:Integer}
