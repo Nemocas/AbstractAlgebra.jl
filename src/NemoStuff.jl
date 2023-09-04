@@ -2,6 +2,10 @@ Base.:(:)(x::Int, y::Nothing) = 1:0
 
 export neg!
 
+function neg!(w::Vector{Int})
+    w .*= -1
+end
+
 sub!(z::T, x::T, y::T) where {T} = x - y
 
 sub!(z::Rational{Int}, x::Rational{Int}, y::Int) = x - y
@@ -13,6 +17,52 @@ add!(z::Rational{Int}, x::Rational{Int}, y::Int) = x + y
 mul!(z::Rational{Int}, x::Rational{Int}, y::Int) = x * y
 
 is_negative(x::Rational) = x.num < 0
+
+is_negative(n::Integer) = cmp(n, 0) < 0
+is_positive(n::Integer) = cmp(n, 0) > 0
+
+# TODO (CF):
+# should be Bernstein'ed: this is slow for large valuations
+# returns the maximal v s.th. z mod p^v == 0 and z div p^v
+#   also useful if p is not prime....
+#
+# TODO: what happens to z = 0???
+
+function remove(z::T, p::T) where {T<:Integer}
+    z == 0 && return (0, z)
+    v = 0
+    @assert p > 1
+    while mod(z, p) == 0
+        z = Base.div(z, p)
+        v += 1
+    end
+    return (v, z)
+end
+
+function remove(z::Rational{T}, p::T) where {T<:Integer}
+    z == 0 && return (0, z)
+    v, d = remove(denominator(z), p)
+    w, n = remove(numerator(z), p)
+    return w - v, n // d
+end
+
+function valuation(z::T, p::T) where {T<:Integer}
+    iszero(z) && error("Not yet implemented")
+    v = 0
+    @assert p > 1
+    while mod(z, p) == 0
+        z = Base.div(z, p)
+        v += 1
+    end
+    return v
+end
+
+function valuation(z::Rational{T}, p::T) where {T<:Integer}
+    z == 0 && error("Not yet implemented")
+    v = valuation(denominator(z), p)
+    w = valuation(numerator(z), p)
+    return w - v
+end
 
 function matrix(a::Vector{Vector{T}}) where {T}
     return matrix(permutedims(reduce(hcat, a), (2, 1)))
@@ -119,6 +169,9 @@ function is_symmetric(M::MatElem)
     return true
 end
 
+nrows(A::Matrix{T}) where {T} = size(A)[1]
+ncols(A::Matrix{T}) where {T} = size(A)[2]
+
 ################################################################################
 #
 #  Zero matrix constructors
@@ -169,6 +222,8 @@ function is_zero_row(M::Matrix, i::Int)
     end
     return true
 end
+
+dense_matrix_type(::Type{T}) where {T} = Generic.MatSpaceElem{T}
 
 ################################################################################
 #
@@ -288,6 +343,17 @@ function sub(M::MatElem{T}, r::AbstractUnitRange{<:Integer}, c::AbstractUnitRang
     for i in 1:length(r)
         for j in 1:length(c)
             z[i, j] = M[r[i], c[j]]
+        end
+    end
+    return z
+end
+
+function sub(M::Generic.Mat, rows::AbstractUnitRange{Int}, cols::AbstractUnitRange{Int})
+    @assert step(rows) == 1 && step(cols) == 1
+    z = zero_matrix(base_ring(M), length(rows), length(cols))
+    for i in rows
+        for j in cols
+            z[i-first(rows)+1, j-first(cols)+1] = M[i, j]
         end
     end
     return z
@@ -514,6 +580,18 @@ function polynomial_ring(R::Ring; cached::Bool=false)
     return polynomial_ring(R, "x", cached=cached)
 end
 
+function leading_monomial(f::Generic.MPoly)
+    R = parent(f)
+    l = length(f)
+    if l == 0
+        return f
+    end
+    A = f.exps
+    r, c = size(A)
+    e = A[1:r, 1:1]
+    return R([one(base_ring(R))], e)
+end
+
 """
 `content` as a polynomial in the variable `i`, i.e. the gcd of all the
 coefficients when viewed as univariate polynomial in `i`.
@@ -532,6 +610,46 @@ function canonical_unit(a::SeriesElem)
     v == 0 && return a
     v > 0 && return shift_right(a, v)
     return shift_left(a, -v)
+end
+
+# should be Nemo/AA
+# TODO: symbols vs strings
+#       lift(PolyRing, Series)
+#       lift(FracField, Series)
+#       (to be in line with lift(ZZ, padic) and lift(QQ, padic)
+#TODO: some of this would only work for Abs, not Rel, however, this should be fine here
+function map_coefficients(f, a::RelPowerSeriesRingElem; parent::SeriesRing)
+    c = typeof(f(coeff(a, 0)))[]
+    for i = 0:pol_length(a)-1
+        push!(c, f(polcoeff(a, i)))
+    end
+    b = parent(c, length(c), precision(a), valuation(a))
+    return b
+end
+
+#=
+function map_coefficients(f, a::RelPowerSeriesRingElem)
+  d = f(coeff(a, 0))
+  T = parent(a)
+  if parent(d) == base_ring(T)
+    S = T
+  else
+    S = power_series_ring(parent(d), max_precision(T), string(var(T)), cached = false)[1]
+  end
+  c = typeof(d)[d]
+  for i=1:pol_length(a)-1
+    push!(c, f(polcoeff(a, i)))
+  end
+  b = S(c, length(c), precision(a), valuation(a))
+  return b
+end
+=#
+function lift(R::PolyRing{S}, s::SeriesElem{S}) where {S}
+    t = R()
+    for x = 0:pol_length(s)
+        setcoeff!(t, x, polcoeff(s, x))
+    end
+    return shift_left(t, valuation(s))
 end
 
 #TODO: this is for rings, not for fields, maybe different types?
@@ -565,6 +683,15 @@ function size(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T
     return size(base_ring(base_ring(R)))^degree(R.modulus)
 end
 
+function rand(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyRingElem}
+    r = rand(base_ring(base_ring(R)))
+    g = gen(R)
+    for i = 1:degree(R.modulus)
+        r = r * g + rand(base_ring(base_ring(R)))
+    end
+    return r
+end
+
 function lift(a::Generic.ResidueRingElem)
     return a.data
 end
@@ -572,3 +699,134 @@ end
 function lift(a::Generic.ResidueFieldElem)
     return a.data
 end
+
+function gens(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyRingElem} ## probably needs more cases
+    ## as the other residue functions
+    g = gen(R)
+    r = Vector{typeof(g)}()
+    push!(r, one(R))
+    if degree(R.modulus) == 1
+        return r
+    end
+    push!(r, g)
+    for i = 2:degree(R.modulus)-1
+        push!(r, r[end] * g)
+    end
+    return r
+end
+
+AbstractAlgebra.promote_rule(::Type{LocElem{T}}, ::Type{T}) where {T} = LocElem{T}
+
+AbstractAlgebra.promote_rule(::Type{T}, ::Type{S}) where {S<:NumFieldElem,T<:Integer} = S
+
+AbstractAlgebra.promote_rule(::Type{S}, ::Type{T}) where {S<:NumFieldElem,T<:Integer} = S
+
+function mulmod(a::S, b::S, mod::Vector{S}) where {S<:MPolyRingElem{T}} where {T<:RingElem}
+    return Base.divrem(a * b, mod)[2]
+end
+
+\(f::Map, x) = preimage(f, x)
+
+function preimage(f::AbstractAlgebra.Generic.CompositeMap, a)
+    return preimage(f.map1, preimage(f.map2, a))
+end
+
+export set_precision, set_precision!
+
+function set_precision(f::PolyRingElem{T}, n::Int) where {T<:SeriesElem}
+    g = parent(f)()
+    for i = 0:length(f)
+        setcoeff!(g, i, set_precision(coeff(f, i), n))
+    end
+    return g
+end
+
+function set_precision!(f::PolyRingElem{T}, n::Int) where {T<:SeriesElem}
+    for i = 0:length(f)
+        setcoeff!(f, i, set_precision!(coeff(f, i), n))
+    end
+    return f
+end
+
+function Base.minimum(::typeof(precision), a::Vector{<:SeriesElem})
+    return minimum(map(precision, a))
+end
+
+function Base.maximum(::typeof(precision), a::Vector{<:SeriesElem})
+    return maximum(map(precision, a))
+end
+
+#TODO: in Nemo, rename to setprecision
+#      fix/report series add for different length
+function set_precision(a::SeriesElem, i::Int)
+    b = deepcopy(a)
+    set_precision!(b, i)
+    return b
+end
+
+ngens(R::MPolyRing) = nvars(R)
+
+Random.gentype(::Type{T}) where {T<:FinField} = elem_type(T)
+
+import LinearAlgebra
+LinearAlgebra.dot(a::RingElem, b::RingElem) = a * b
+
+function is_upper_triangular(M::MatElem)
+    n = nrows(M)
+    for i = 2:n
+        for j = 1:min(i - 1, ncols(M))
+            if !iszero(M[i, j])
+                return false
+            end
+        end
+    end
+    return true
+end
+
+transpose!(A::MatrixElem) = transpose(A)
+
+function Base.div(f::PolyRingElem, g::PolyRingElem)
+    q, r = divrem(f, g)
+    return q
+end
+
+function Base.rem(f::PolyRingElem, g::PolyRingElem)
+    return mod(f, g)
+end
+
+###############################################################################
+#
+#   Random functions
+#
+###############################################################################
+
+Random.Sampler(::Type{RNG}, K::FinField, n::Random.Repetition) where {RNG<:AbstractRNG} =
+    Random.SamplerSimple(K, Random.Sampler(RNG, BigInt(0):BigInt(characteristic(K) - 1), n))
+
+function rand(rng::AbstractRNG, Ksp::Random.SamplerSimple{<:FinField})
+    K = Ksp[]
+    r = degree(K)
+    alpha = gen(K)
+    res = zero(K)
+    for i = 0:(r-1)
+        c = rand(rng, Ksp.data)
+        res += c * alpha^i
+    end
+    return res
+end
+
+function (R::Generic.PolyRing{T})(x::AbstractAlgebra.Generic.RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
+    @assert isone(denominator(x))
+    @assert parent(numerator(x)) === R
+    return numerator(x)
+end
+function (R::PolyRing{T})(x::AbstractAlgebra.Generic.RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
+    @assert isone(denominator(x))
+    @assert parent(numerator(x)) === R
+    return numerator(x)
+end
+
+export base_ring_type
+
+base_ring_type(::Type{AbstractAlgebra.Generic.PolyRing{T}}) where {T} = parent_type(T)
+
