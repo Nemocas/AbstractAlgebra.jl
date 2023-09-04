@@ -8,7 +8,7 @@ obtain the correct pluralization. But it works well enough in the
 vast majority of cases.
 
 # Examples
-```julia
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> pluralize("generator")
 generators
 
@@ -67,7 +67,7 @@ have. Ideally, though, please instead improve `pluralize` to handle your needs
 correctly.
 
 # Examples
-```julia
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> ItemQuantity(0, "generator")
 0 generators
 
@@ -79,7 +79,7 @@ julia> ItemQuantity(2, "generator")
 ```
 
 Here is an example with a custom plural form.
-```julia
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> ItemQuantity(0, "ox", "oxen")
 0 oxen
 
@@ -116,7 +116,7 @@ end
 A helper function which returns `number` as a string in ordinal form.
 
 # Examples
-```julia
+```jldoctest; setup = :(using AbstractAlgebra; ordinal_number_string=AbstractAlgebra.ordinal_number_string)
 julia> ordinal_number_string(1)
 "1st"
 
