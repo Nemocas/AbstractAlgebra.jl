@@ -76,24 +76,24 @@ end
 ################################################################################
 
 @doc raw"""
-    diagonal_matrix(x::T...) where T <: RingElem -> MatElem{T}
-    diagonal_matrix(x::Vector{T}) where T <: RingElem -> MatElem{T}
-    diagonal_matrix(Q, x::Vector{T}) where T <: RingElem -> MatElem{T}
+    diagonal_matrix(x::T...) where T <: RingElement -> MatElem{T}
+    diagonal_matrix(x::Vector{T}) where T <: RingElement -> MatElem{T}
+    diagonal_matrix(Q, x::Vector{T}) where T <: RingElement -> MatElem{T}
 
 Returns a diagonal matrix whose diagonal entries are the elements of $x$.
 
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> diagonal_matrix(QQ(1), QQ(2))
+julia> diagonal_matrix(ZZ(1), ZZ(2))
 [1   0]
 [0   2]
 
-julia> diagonal_matrix([QQ(3), QQ(4)])
+julia> diagonal_matrix([ZZ(3), ZZ(4)])
 [3   0]
 [0   4]
 
-julia> diagonal_matrix(QQ, [5, 6])
+julia> diagonal_matrix(ZZ, [5, 6])
 [5   0]
 [0   6]
 ```
@@ -107,7 +107,7 @@ function diagonal_matrix(R::Ring, x::Vector{<:RingElement})
     return M
 end
 
-function diagonal_matrix(x::T, xs::T...) where {T<:RingElem}
+function diagonal_matrix(x::T, xs::T...) where {T<:RingElement}
     return diagonal_matrix(collect((x, xs...)))
 end
 
@@ -670,14 +670,6 @@ function rand(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T
     return r
 end
 
-function lift(a::Generic.ResidueRingElem)
-    return a.data
-end
-
-function lift(a::Generic.ResidueFieldElem)
-    return a.data
-end
-
 function gens(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyRingElem} ## probably needs more cases
     ## as the other residue functions
     g = gen(R)
@@ -703,7 +695,7 @@ function mulmod(a::S, b::S, mod::Vector{S}) where {S<:MPolyRingElem{T}} where {T
     return Base.divrem(a * b, mod)[2]
 end
 
-\(f::Map, x) = preimage(f, x)
+Base.:\(f::Map, x) = preimage(f, x)
 
 function preimage(f::AbstractAlgebra.Generic.CompositeMap, a)
     return preimage(f.map1, preimage(f.map2, a))
