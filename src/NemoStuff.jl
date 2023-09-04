@@ -106,7 +106,7 @@ Returns a diagonal matrix whose diagonal entries are the elements of $x$.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> diagonal_matrix(QQ(1), QQ(2))
 [1   0]
 [0   2]
