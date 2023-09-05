@@ -127,7 +127,7 @@ julia> ordinal_number_string(3)
 "3rd"
 
 julia> ordinal_number_string(4)
-"4rd"
+"4th"
 ```
 """
 function ordinal_number_string(number::Int)

@@ -1819,7 +1819,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
       end
       # put next items into heap by processing Q
       @inbounds while !isempty(Q)
-         # get iterm from Q
+         # get item from Q
          xn = pop!(Q)
          v = I[xn]
          if v.i == 0 # term from original poly
