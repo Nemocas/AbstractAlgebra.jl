@@ -310,6 +310,110 @@
    @test AbstractAlgebra.obj_to_string_wrt_times(x + y) == "(x + y)"
 end
 
+# Test various examples from the Oscar manual
+@testset "PrettyPrinting examples" begin
+
+  function detailed(x)
+    io = IOBuffer()
+    show(io, MIME"text/plain"(), x)
+    return String(take!(io))
+  end
+
+  function oneline(x)
+    io = IOBuffer()
+    print(io, x)
+    return String(take!(io))
+  end
+
+  function supercompact(x)
+      io = IOBuffer()
+      print(IOContext(io, :supercompact => true), x)
+      return String(take!(io))
+  end
+
+  #
+  #
+  #
+  struct NewRing
+    base_ring
+  end
+
+  base_ring(R::NewRing) = R.base_ring
+
+  function Base.show(io::IO, ::MIME"text/plain", R::NewRing)
+    println(io, "I am a new ring")  # at least one new line is needed
+    println(io, "I print with newlines")
+    print(io, base_ring(R)) # the last print statement must not add a new line
+  end
+
+  function Base.show(io::IO, R::NewRing)
+    if get(io, :supercompact, false)
+      # no nested printing
+      print(io, "supercompact printing of newring ")
+    else
+      # nested printing allowed, preferably supercompact
+      print(io, "one line printing of newring with ")
+      print(IOContext(io, :supercompact => true), "supercompact ", base_ring(R))
+    end
+  end
+
+  R = NewRing(QQ)
+  @test detailed(R) ==
+        """I am a new ring
+           I print with newlines
+           Rationals"""
+  @test oneline(R) == "one line printing of newring with supercompact Rationals"
+  @test supercompact(R) == "supercompact printing of newring "
+
+  #
+  #
+  #
+  struct A{T}
+    x::T
+  end
+
+  function Base.show(io::IO, a::A)
+    io = AbstractAlgebra.pretty(io)
+    println(io, "Something of type A")
+    print(io, AbstractAlgebra.Indent(), "over ", AbstractAlgebra.Lowercase(), a.x)
+    print(io, AbstractAlgebra.Dedent()) # don't forget to undo the indentation!
+  end
+
+  struct B
+  end
+
+  function Base.show(io::IO, b::B)
+    io = AbstractAlgebra.pretty(io)
+    print(io, AbstractAlgebra.LowercaseOff(), "Hilbert thing")
+  end
+
+  x = A(2)
+  y = """
+      Something of type A
+        over 2"""
+  @test detailed(x) == y
+  @test oneline(x) == y
+  @test supercompact(x) == y
+
+  x = A(A(2))
+  y = """
+      Something of type A
+        over something of type A
+          over 2"""
+  @test detailed(x) == y
+  @test oneline(x) == y
+  @test supercompact(x) == y
+
+  x = A(B())
+  y = """
+      Something of type A
+        over Hilbert thing"""
+  @test detailed(x) == y
+  @test oneline(x) == y
+  @test supercompact(x) == y
+
+end
+
 let
   io = IOBuffer()
   io = AbstractAlgebra.pretty(io, force_newlines = true)
