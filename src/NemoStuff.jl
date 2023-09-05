@@ -536,10 +536,6 @@ function change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<
     return finish(M)::elem_type(new_polynomial_ring)
 end
 
-function leading_coefficient(f::Generic.MPoly)
-    return f.coeffs[1]
-end
-
 #check with Nemo/ Dan if there are better solutions
 #the block is also not used here I think
 #functionality to view mpoly as upoly in variable `i`, so the
@@ -558,18 +554,6 @@ end
 
 function polynomial_ring(R::Ring; cached::Bool=false)
     return polynomial_ring(R, "x", cached=cached)
-end
-
-function leading_monomial(f::Generic.MPoly)
-    R = parent(f)
-    l = length(f)
-    if l == 0
-        return f
-    end
-    A = f.exps
-    r, c = size(A)
-    e = A[1:r, 1:1]
-    return R([one(base_ring(R))], e)
 end
 
 """
