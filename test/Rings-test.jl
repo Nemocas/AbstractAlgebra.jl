@@ -59,5 +59,3 @@ end
   @test is_finite(GF(2))
   @test !is_finite(QQ)
 end
-
-include("julia/Integers-test.jl")
