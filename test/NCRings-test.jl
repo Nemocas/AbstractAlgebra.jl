@@ -1,6 +1,7 @@
 include("generic/MatrixAlgebra-test.jl")
 include("generic/NCPoly-test.jl")
 include("generic/FreeAssAlgebra-test.jl")
+include("generic/FreeAssAlgebraGroebner-test.jl")
 
 @testset "NCRings.oftype" begin
    F = GF(3)

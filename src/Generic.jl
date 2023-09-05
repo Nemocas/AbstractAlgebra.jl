@@ -327,6 +327,10 @@ include("generic/MapCache.jl")
 
 include("generic/Ideal.jl")
 
+include("generic/AhoCorasick.jl")
+
+include("generic/FreeAssAlgebraGroebner.jl")
+
 ###############################################################################
 #
 #   Temporary miscellaneous files being moved from Hecke.jl
