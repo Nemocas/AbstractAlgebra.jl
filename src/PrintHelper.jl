@@ -10,10 +10,10 @@ vast majority of cases.
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> pluralize("generator")
-generators
+"generators"
 
 julia> pluralize("variety")
-varieties
+"varieties"
 ```
 """
 function pluralize(noun::String)
