@@ -501,9 +501,9 @@ RandomExtensions.maketype(R::TotFracRing, _) = elem_type(R)
 function RandomExtensions.make(S::TotFracRing, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      RandomExtensions.Make(S, vs[1]) # forward to default Make constructor
+      Make(S, vs[1]) # forward to default Make constructor
    else
-      make(S, make(R, vs...))
+      Make(S, make(R, vs...))
    end
 end
 

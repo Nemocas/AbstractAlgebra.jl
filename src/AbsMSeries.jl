@@ -156,7 +156,7 @@ function RandomExtensions.make(S::MSeriesRing,
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, term_range, vs[1])
    else
-      make(S, term_range, make(R, vs...))
+      Make(S, term_range, make(R, vs...))
    end
 end
 

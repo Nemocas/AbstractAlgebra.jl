@@ -1756,9 +1756,9 @@ RandomExtensions.maketype(S::LaurentSeriesRingOrField, ::AbstractUnitRange{Int},
 function RandomExtensions.make(S::LaurentSeriesRingOrField, val_range::AbstractUnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-     Make(S, val_range, vs[1]) # forward to default Make constructor
+      Make(S, val_range, vs[1]) # forward to default Make constructor
    else
-      make(S, val_range, make(R, vs...))
+      Make(S, val_range, make(R, vs...))
    end
 end
 

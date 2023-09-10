@@ -6646,7 +6646,7 @@ function RandomExtensions.make(S::MatSpace, vs...)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, vs[1]) # forward to default Make constructor
    else
-      make(S, make(R, vs...))
+      Make(S, make(R, vs...))
    end
 end
 

@@ -1306,7 +1306,7 @@ function RandomExtensions.make(S::AbstractAlgebra.MPolyRing, term_range::Abstrac
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, term_range, exp_bound, vs[1])
    else
-      make(S, term_range, exp_bound, make(R, vs...))
+      Make(S, term_range, exp_bound, make(R, vs...))
    end
 end
 

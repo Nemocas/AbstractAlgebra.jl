@@ -1374,7 +1374,7 @@ function RandomExtensions.make(S::SeriesRing, val_range::AbstractUnitRange{Int},
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, val_range, vs[1]) # forward to default Make constructor
    else
-      make(S, val_range, make(R, vs...))
+      Make(S, val_range, make(R, vs...))
    end
 end
 

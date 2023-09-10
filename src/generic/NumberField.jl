@@ -26,7 +26,7 @@ function RandomExtensions.make(S::ResidueField{Generic.Poly{Rational{BigInt}}}, 
       Make(S, vs[1])
    else
       n = degree(S.modulus)
-      make(S, make(base_ring(S), n - 1:n - 1, vs...))
+      Make(S, make(base_ring(S), n - 1:n - 1, vs...))
    end
 end
 
