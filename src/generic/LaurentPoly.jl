@@ -431,12 +431,12 @@ RandomExtensions.maketype(S::LaurentPolyWrapRing, _, _) = elem_type(S)
 function RandomExtensions.make(S::LaurentPolyWrapRing, v1, vs...)
    R = S.polyring
    if length(vs) == 1 && vs[1] isa Integer && elem_type(R) == Random.gentype(v1)
-     Make(S, v1, vs[1]) # forward to default Make constructor
+      Make(S, v1, vs[1]) # forward to default Make constructor
    else
       degrees_range = v1
       m = minimum(degrees_range)
       degrees_range = degrees_range .- m
-      make(S, make(R, degrees_range, vs...), m)
+      Make(S, make(R, degrees_range, vs...), m)
    end
 end
 

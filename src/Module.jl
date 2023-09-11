@@ -286,7 +286,7 @@ function RandomExtensions.make(M::FPModule, vs...)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(M, vs[1]) # forward to default Make constructor
    else
-      make(M, make(R, vs...))
+      Make(M, make(R, vs...))
    end
 end
 

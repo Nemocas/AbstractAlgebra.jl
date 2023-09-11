@@ -472,7 +472,7 @@ function RandomExtensions.make(S::ResidueField, vs...)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, vs[1])
    else
-      make(S, make(base_ring(S), vs...))
+      Make(S, make(base_ring(S), vs...))
    end
 end
 

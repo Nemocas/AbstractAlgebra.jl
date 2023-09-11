@@ -1206,7 +1206,7 @@ function RandomExtensions.make(S::FunctionField, vs...)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, vs[1]) # forward to default Make constructor
    else
-      make(S, make(R, (n-1):(n-1), vs...))
+      Make(S, make(R, (n-1):(n-1), vs...))
    end
 end
 

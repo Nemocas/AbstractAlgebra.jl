@@ -3300,7 +3300,7 @@ function RandomExtensions.make(S::PolyRing, deg_range::AbstractUnitRange{Int}, v
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, deg_range, vs[1]) # forward to default Make constructor
    else
-      make(S, deg_range, make(R, vs...))
+      Make(S, deg_range, make(R, vs...))
    end
 end
 
@@ -3309,7 +3309,7 @@ function RandomExtensions.make(S::PolyRing, deg::Int, vs...)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, deg, vs[1]) # forward to default Make constructor
    else
-      make(S, deg, make(R, vs...))
+      Make(S, deg, make(R, vs...))
    end
 end
 
