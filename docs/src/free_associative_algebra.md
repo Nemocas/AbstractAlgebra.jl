@@ -167,6 +167,10 @@ julia> exponent_word(-x^2*y^2*z^2*x + z*y, 1)
  1
 ```
 
+```@docs
+evaluate(a::AbstractAlgebra.FreeAssAlgElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+```
+
 ### Iterators
 
 The following iterators are provided for elements of a free associative algebra,

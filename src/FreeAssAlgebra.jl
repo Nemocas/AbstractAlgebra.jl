@@ -151,6 +151,66 @@ end
 
 ###############################################################################
 #
+#   Evaluation
+#
+###############################################################################
+
+@doc raw"""
+    evaluate(a::AbstractAlgebra.FreeAssAlgElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+
+Evaluate `a` by substituting in the array of values for each of the variables.
+The evaluation will succeed if multiplication is defined between elements of
+the coefficient ring of `a` and elements of `vals`.
+
+The syntax `a(vals...)` is also supported.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, (x, y) = free_associative_algebra(ZZ, ["x", "y"]);
+
+julia> f = x*y - y*x
+x*y - y*x
+
+julia> S = MatrixAlgebra(ZZ, 2);
+
+julia> m1 = S([1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> m2 = S([0 1; 1 0])
+[0   1]
+[1   0]
+
+julia> evaluate(f, [m1, m2])
+[-1   -3]
+[ 3    1]
+
+julia> m1*m2 - m2*m1 == evaluate(f, [m1, m2])
+true
+
+julia> m1*m2 - m2*m1 == f(m1, m2)
+true
+```
+"""
+function evaluate(a::AbstractAlgebra.FreeAssAlgElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
+   R = base_ring(parent(a))
+   S = parent(one(R)*one(parent(vals[1])))
+   r = zero(S)
+   o = one(S)
+   for (c, v) in zip(coefficients(a), exponent_words(a))
+      r = addeq!(r, c*prod((vals[i] for i in v), init = o))
+   end
+   return r
+end
+
+function (a::AbstractAlgebra.FreeAssAlgElem{T})(val::U, vals::U...) where {T <: RingElement, U <: NCRingElem}
+   return evaluate(a, [val, vals...])
+end
+
+###############################################################################
+#
 #   Random elements
 #
 ###############################################################################
