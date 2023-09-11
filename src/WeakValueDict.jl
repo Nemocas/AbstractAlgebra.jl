@@ -508,11 +508,11 @@ end
 Base.sizehint!(d::WeakValueDict, newsz) = sizehint!(d.ht, newsz)
 empty(d::WeakValueDict, ::Type{K}, ::Type{V}) where {K, V} = WeakValueDict{K, V}()
 
-IteratorSize(::Type{<:WeakValueDict}) = SizeUnknown()
+Base.IteratorSize(::Type{<:WeakValueDict}) = Base.SizeUnknown()
 
-islocked(wvh::WeakValueDict) = Base.islocked(wvh.lock)
-lock(f, wvh::WeakValueDict) = Base.lock(f, wvh.lock)
-trylock(f, wvh::WeakValueDict) = Base.trylock(f, wvh.lock)
+Base.islocked(wvh::WeakValueDict) = Base.islocked(wvh.lock)
+Base.lock(f, wvh::WeakValueDict) = Base.lock(f, wvh.lock)
+Base.trylock(f, wvh::WeakValueDict) = Base.trylock(f, wvh.lock)
 
 function Base.setindex!(wvh::WeakValueDict{K}, v, key) where K
     lock(wvh) do
@@ -523,7 +523,7 @@ function Base.setindex!(wvh::WeakValueDict{K}, v, key) where K
     end
     return wvh
 end
-function get!(wvh::WeakValueDict{K, V}, key, default) where {K, V}
+function Base.get!(wvh::WeakValueDict{K, V}, key, default) where {K, V}
     v = lock(wvh) do
         if haskey(wvh.ht, key)
             x = wvh.ht[key].value
