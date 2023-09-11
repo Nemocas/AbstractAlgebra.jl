@@ -205,8 +205,8 @@ function evaluate(a::AbstractAlgebra.FreeAssAlgElem{T}, vals::Vector{U}) where {
    return r
 end
 
-function (a::AbstractAlgebra.FreeAssAlgElem{T})(vals::U...) where {T <: RingElement, U <: NCRingElem}
-   return evaluate(a, [vals...])
+function (a::AbstractAlgebra.FreeAssAlgElem{T})(val::U, vals::U...) where {T <: RingElement, U <: NCRingElem}
+   return evaluate(a, [val, vals...])
 end
 
 ###############################################################################
