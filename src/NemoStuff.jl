@@ -725,7 +725,7 @@ ngens(R::MPolyRing) = nvars(R)
 Random.gentype(::Type{T}) where {T<:FinField} = elem_type(T)
 
 import LinearAlgebra
-LinearAlgebra.dot(a::RingElem, b::RingElem) = a * b
+LinearAlgebra.dot(a::NCRingElem, b::NCRingElem) = a * b
 
 function is_upper_triangular(M::MatElem)
     n = nrows(M)
