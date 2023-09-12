@@ -16,10 +16,8 @@ add!(z::Rational{Int}, x::Rational{Int}, y::Int) = x + y
 
 mul!(z::Rational{Int}, x::Rational{Int}, y::Int) = x * y
 
-is_negative(x::Rational) = x.num < 0
-
-is_negative(n::Integer) = cmp(n, 0) < 0
-is_positive(n::Integer) = cmp(n, 0) > 0
+is_negative(n::T) where T<:Real = n < zero(T)
+is_positive(n::T) where T<:Real = n > zero(T)
 
 # TODO (CF):
 # should be Bernstein'ed: this is slow for large valuations
