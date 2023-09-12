@@ -22,8 +22,10 @@ function elem_type(::Type{FactoredFracField{T}}) where {T <: RingElement}
     return FactoredFrac{T}
 end
 
+base_ring_type(::Type{FactoredFracField{T}}) where T <: NCRingElement = parent_type(T)
+
 function base_ring(F::FactoredFracField{T}) where T <: RingElement
-    return F.base_ring::AbstractAlgebra.parent_type(T)
+    return F.base_ring::parent_type(T)
 end
 
 function base_ring(a::FactoredFrac{T}) where T <: RingElement

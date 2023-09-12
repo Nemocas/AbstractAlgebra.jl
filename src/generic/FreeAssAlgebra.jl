@@ -24,8 +24,10 @@ function parent(a::FreeAssAlgElem)
     return a.parent
 end
 
-function base_ring(a::FreeAssAlgebra)
-    return a.base_ring
+base_ring_type(::Type{FreeAssAlgebra{T}}) where T <: RingElement = parent_type(T)
+
+function base_ring(a::FreeAssAlgebra{T}) where T <: RingElement
+    return a.base_ring::parent_type(T)
 end
 
 function symbols(a::FreeAssAlgebra)

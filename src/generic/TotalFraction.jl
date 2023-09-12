@@ -22,6 +22,8 @@ elem_type(::Type{TotFracRing{T}}) where {T <: RingElem} = TotFrac{T}
 #
 ###############################################################################
 
+base_ring_type(::Type{TotFracRing{T}}) where T <: RingElem = parent_type(T)
+
 base_ring(a::TotFracRing{T}) where T <: RingElem = a.base_ring::parent_type(T)
 
 base_ring(a::TotFrac) = base_ring(parent(a))

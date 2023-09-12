@@ -10,6 +10,8 @@
 #
 ###############################################################################
 
+base_ring_type(::Type{FracField{T}}) where T <: RingElem = parent_type(T)
+
 base_ring(a::FracField{T}) where T <: RingElem = a.base_ring::parent_type(T)
 
 base_ring(a::FracElem) = base_ring(parent(a))

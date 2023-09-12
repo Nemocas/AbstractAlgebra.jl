@@ -60,9 +60,11 @@ function normalise(a::SparsePoly, n::Int)
    return n
 end
 
-base_ring(a::SparsePoly) = base_ring(parent(a))
+base_ring_type(::Type{SparsePolyRing{T}}) where T <: RingElement = parent_type(T)
 
 base_ring(R::SparsePolyRing{T}) where {T <: RingElement} = R.base_ring::parent_type(T)
+
+base_ring(a::SparsePoly) = base_ring(parent(a))
 
 parent(a::SparsePoly) = a.parent
 
