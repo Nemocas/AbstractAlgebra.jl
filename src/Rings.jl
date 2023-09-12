@@ -49,11 +49,11 @@ end
 #
 ###############################################################################
 
-function evaluate(x::AbstractAlgebra.PolyRingElem{T}, y::Integer) where T <: RingElem
+function evaluate(x::PolyRingElem{T}, y::Integer) where T <: RingElem
    return evaluate(x, base_ring(x)(y))
 end
 
-function evaluate(x::AbstractAlgebra.MPolyRingElem{T}, y::Integer) where T <: RingElem
+function evaluate(x::MPolyRingElem{T}, y::Integer) where T <: RingElem
    return evaluate(x, base_ring(x)(y))
 end
 

@@ -98,25 +98,25 @@ end
 #
 ###############################################################################
 
-function coefficients(a::AbstractAlgebra.FreeAssAlgElem)
+function coefficients(a::FreeAssAlgElem)
    return Generic.MPolyCoeffs(a)
 end
 
-function terms(a::AbstractAlgebra.FreeAssAlgElem)
+function terms(a::FreeAssAlgElem)
    return Generic.MPolyTerms(a)
 end
 
-function monomials(a::AbstractAlgebra.FreeAssAlgElem)
+function monomials(a::FreeAssAlgElem)
    return Generic.MPolyMonomials(a)
 end
 
 @doc raw"""
-    exponent_words(a::AbstractAlgebra.FreeAssAlgElem{T}) where T <: RingElement
+    exponent_words(a::FreeAssAlgElem{T}) where T <: RingElement
 
 Return an iterator for the exponent words of the given polynomial. To
 retrieve an array of the exponent words, use `collect(exponent_words(a))`.
 """
-function exponent_words(a::AbstractAlgebra.FreeAssAlgElem{T}) where T <: RingElement
+function exponent_words(a::FreeAssAlgElem{T}) where T <: RingElement
    return Generic.FreeAssAlgExponentWords(a)
 end
 
@@ -156,7 +156,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    evaluate(a::AbstractAlgebra.FreeAssAlgElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+    evaluate(a::FreeAssAlgElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
 
 Evaluate `a` by substituting in the array of values for each of the variables.
 The evaluation will succeed if multiplication is defined between elements of
@@ -193,7 +193,7 @@ julia> m1*m2 - m2*m1 == f(m1, m2)
 true
 ```
 """
-function evaluate(a::AbstractAlgebra.FreeAssAlgElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+function evaluate(a::FreeAssAlgElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    R = base_ring(parent(a))
    S = parent(one(R)*one(parent(vals[1])))
@@ -205,7 +205,7 @@ function evaluate(a::AbstractAlgebra.FreeAssAlgElem{T}, vals::Vector{U}) where {
    return r
 end
 
-function (a::AbstractAlgebra.FreeAssAlgElem{T})(val::U, vals::U...) where {T <: RingElement, U <: NCRingElem}
+function (a::FreeAssAlgElem{T})(val::U, vals::U...) where {T <: RingElement, U <: NCRingElem}
    return evaluate(a, [val, vals...])
 end
 
@@ -215,9 +215,9 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(S::AbstractAlgebra.FreeAssAlgebra, _, _, _) = elem_type(S)
+RandomExtensions.maketype(S::FreeAssAlgebra, _, _, _) = elem_type(S)
 
-function RandomExtensions.make(S::AbstractAlgebra.FreeAssAlgebra,
+function RandomExtensions.make(S::FreeAssAlgebra,
                                term_range::AbstractUnitRange{Int},
                                exp_bound::AbstractUnitRange{Int}, vs...)
    R = base_ring(S)
@@ -229,7 +229,7 @@ function RandomExtensions.make(S::AbstractAlgebra.FreeAssAlgebra,
 end
 
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
-                 <:NCRingElement, <:AbstractAlgebra.FreeAssAlgebra, <:AbstractUnitRange{Int}, <:AbstractUnitRange{Int}}})
+                 <:NCRingElement, <:FreeAssAlgebra, <:AbstractUnitRange{Int}, <:AbstractUnitRange{Int}}})
    S, term_range, exp_bound, v = sp[][1:end]
    f = S()
    g = gens(S)
@@ -246,13 +246,13 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
    return f
 end
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.FreeAssAlgebra,
+function rand(rng::AbstractRNG, S::FreeAssAlgebra,
               term_range::AbstractUnitRange{Int}, exp_bound::AbstractUnitRange{Int}, v...)
    m = make(S, term_range, exp_bound, v...)
    rand(rng, m)
 end
 
-function rand(S::AbstractAlgebra.FreeAssAlgebra, term_range, exp_bound, v...)
+function rand(S::FreeAssAlgebra, term_range, exp_bound, v...)
    rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
 end
 
@@ -263,7 +263,7 @@ end
 ###############################################################################
 
 function free_associative_algebra(
-   R::AbstractAlgebra.Ring,
+   R::Ring,
    s::AbstractVector{<:VarName};
    cached::Bool = true)
 
@@ -272,7 +272,7 @@ function free_associative_algebra(
 end
 
 function free_associative_algebra(
-   R::AbstractAlgebra.Ring,
+   R::Ring,
    s::Vector{Symbol};
    cached::Bool = true)
 
@@ -280,7 +280,7 @@ function free_associative_algebra(
 end
 
 function free_associative_algebra(
-   R::AbstractAlgebra.Ring,
+   R::Ring,
    n::Int,
    s::VarName;
    cached::Bool = false)
@@ -290,7 +290,7 @@ function free_associative_algebra(
 end
 
 function free_associative_algebra(
-   R::AbstractAlgebra.Ring,
+   R::Ring,
    n::Int,
    s::Symbol=:x;
    cached::Bool = false)

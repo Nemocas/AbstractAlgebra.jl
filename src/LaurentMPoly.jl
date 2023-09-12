@@ -91,11 +91,11 @@ end
 #
 ###############################################################################
 
-function RandomExtensions.maketype(S::AbstractAlgebra.LaurentMPolyRing, _, _, _)
+function RandomExtensions.maketype(S::LaurentMPolyRing, _, _, _)
     return elem_type(S)
 end
 
-function RandomExtensions.make(S::AbstractAlgebra.LaurentMPolyRing,
+function RandomExtensions.make(S::LaurentMPolyRing,
                                term_range::AbstractUnitRange{Int},
                                exp_bound::AbstractUnitRange{Int},
                                vs...)
@@ -109,7 +109,7 @@ end
 
 function rand(rng::AbstractRNG,
               sp::SamplerTrivial{<:Make4{<:RingElement,
-                                         <:AbstractAlgebra.LaurentMPolyRing,
+                                         <:LaurentMPolyRing,
                                          <:AbstractUnitRange{Int},
                                          <:AbstractUnitRange{Int}}})
    S, term_range, exp_bound, v = sp[][1:end]
@@ -127,12 +127,12 @@ function rand(rng::AbstractRNG,
    return f
 end
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.LaurentMPolyRing,
+function rand(rng::AbstractRNG, S::LaurentMPolyRing,
               term_range::AbstractUnitRange{Int}, exp_bound::AbstractUnitRange{Int}, v...)
    rand(rng, make(S, term_range, exp_bound, v...))
 end
 
-function rand(S::AbstractAlgebra.LaurentMPolyRing, term_range, exp_bound, v...)
+function rand(S::LaurentMPolyRing, term_range, exp_bound, v...)
    rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
 end
 
@@ -143,7 +143,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{T}; cached::Bool = true) where T <: VarName
+    LaurentPolynomialRing(R::Ring, s::Vector{T}; cached::Bool = true) where T <: VarName
 
 Given a base ring `R` and an array of strings `s` specifying how the
 generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
@@ -153,14 +153,14 @@ depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional
 argument `cached` to `false` will prevent the parent object `T` from being
 cached.
 """
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::AbstractVector{<:VarName}; cached::Bool = true)
+function LaurentPolynomialRing(R::Ring, s::AbstractVector{<:VarName}; cached::Bool = true)
    return Generic.LaurentPolynomialRing(R, [Symbol(v) for v in s], cached=cached)
 end
 
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true)
+function LaurentPolynomialRing(R::Ring, s::Vector{Symbol}; cached::Bool = true)
    return Generic.LaurentPolynomialRing(R, s; cached=cached)
 end
 
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, n::Int, s::VarName=:x; cached::Bool = false)
+function LaurentPolynomialRing(R::Ring, n::Int, s::VarName=:x; cached::Bool = false)
    return Generic.LaurentPolynomialRing(R, [Symbol(s, i) for i=1:n]; cached=cached)
 end

@@ -75,20 +75,20 @@ AbstractAlgebra.Generic.MPolyRing{BigInt}
 """
 mpoly_ring_type(x) = parent_type(mpoly_type(x))
 
-function is_domain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyRingElem{S}}
+function is_domain_type(::Type{T}) where {S <: RingElement, T <: MPolyRingElem{S}}
    return is_domain_type(S)
 end
 
-function is_exact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyRingElem{S}}
+function is_exact_type(a::Type{T}) where {S <: RingElement, T <: MPolyRingElem{S}}
    return is_exact_type(S)
 end
 
 @doc raw"""
-    vars(p::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
+    vars(p::MPolyRingElem{T}) where {T <: RingElement}
 
 Return the variables actually occurring in $p$.
 """
-function vars(p::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
+function vars(p::MPolyRingElem{T}) where {T <: RingElement}
    U = typeof(p)
    vars_in_p = Vector{U}(undef, 0)
    n = nvars(p.parent)
@@ -110,12 +110,12 @@ function vars(p::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    var_index(p::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
+    var_index(p::MPolyRingElem{T}) where {T <: RingElement}
 
 Return the index of the given variable $x$. If $x$ is not a variable
 in a multivariate polynomial ring, an exception is raised.
 """
-function var_index(x::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
+function var_index(x::MPolyRingElem{T}) where {T <: RingElement}
    !is_monomial(x) && error("Not a variable in var_index")
    exps = first(exponent_vectors(x))
    count = 0
@@ -144,7 +144,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    coeff(a::AbstractAlgebra.MPolyRingElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
+    coeff(a::MPolyRingElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
 
 Return the "coefficient" of $a$ (as a multivariate polynomial in the same
 ring) of the monomial consisting of the product of the variables of the given
@@ -153,7 +153,7 @@ appear and the exponents can be zero). E.g. `coeff(f, [1, 3], [0, 2])` returns
 the coefficient of $x^0*z^2$ in the polynomial $f$ (assuming variables
 $x, y, z$ in that order).
 """
-function coeff(a::AbstractAlgebra.MPolyRingElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
+function coeff(a::MPolyRingElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
    unique(vars) != vars && error("Variables not unique")
    length(vars) != length(exps) &&
        error("Number of variables does not match number of exponents")
@@ -186,7 +186,7 @@ function coeff(a::AbstractAlgebra.MPolyRingElem{T}, vars::Vector{Int}, exps::Vec
 end
 
 @doc raw"""
-    coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyRingElem
+    coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: MPolyRingElem
 
 Return the "coefficient" of $a$ (as a multivariate polynomial in the same
 ring) of the monomial consisting of the product of the given variables
@@ -194,7 +194,7 @@ to the given exponents (note that not all variables need to appear and the
 exponents can be zero). E.g. `coeff(f, [x, z], [0, 2])` returns the
 coefficient of $x^0*z^2$ in the polynomial $f$.
 """
-function coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyRingElem
+function coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: MPolyRingElem
    varidx = [var_index(x) for x in vars]
    return coeff(a, varidx, exps)
 end
@@ -233,12 +233,12 @@ Return `true` if the given symbol represents a reverse ordering (degrevlex).
 is_reverse(s::Symbol) = s == :degrevlex
 
 @doc raw"""
-    coeff(f::AbstractAlgebra.MPolyRingElem{T}, m::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+    coeff(f::MPolyRingElem{T}, m::MPolyRingElem{T}) where T <: RingElement
 
 Return the coefficient of the monomial $m$ of the polynomial $f$. If there
 is no such monomial, zero is returned.
 """
-function coeff(f::AbstractAlgebra.MPolyRingElem{T}, m::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function coeff(f::MPolyRingElem{T}, m::MPolyRingElem{T}) where T <: RingElement
     !is_monomial(m) && error("Not a monomial in coeff")
     v1 = first(exponent_vectors(m))
     cvzip = zip(coefficients(f), exponent_vectors(f))
@@ -269,7 +269,7 @@ end
 Return the trailing coefficient of the polynomial $p$, i.e. the coefficient of
 the last nonzero term, or zero if the polynomial is zero.
 """
-function trailing_coefficient(p::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function trailing_coefficient(p::MPolyRingElem{T}) where T <: RingElement
    coeff = zero(base_ring(p))
    for c in coefficients(p)
       coeff = c
@@ -362,11 +362,11 @@ function leading_term(p::MPolyRingElem{T}) where T <: RingElement
 end
 
 @doc raw"""
-    degree(f::AbstractAlgebra.MPolyRingElem{T}, i::Int) where T <: RingElement
+    degree(f::MPolyRingElem{T}, i::Int) where T <: RingElement
 
 Return the degree of the polynomial $f$ in terms of the i-th variable.
 """
-function degree(f::AbstractAlgebra.MPolyRingElem{T}, i::Int) where T <: RingElement
+function degree(f::MPolyRingElem{T}, i::Int) where T <: RingElement
    biggest = -1
    if length(f) != 0
       R = parent(f)
@@ -384,20 +384,20 @@ function degree(f::AbstractAlgebra.MPolyRingElem{T}, i::Int) where T <: RingElem
 end
 
 @doc raw"""
-    degree(f::AbstractAlgebra.MPolyRingElem{T}, x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+    degree(f::MPolyRingElem{T}, x::MPolyRingElem{T}) where T <: RingElement
 
 Return the degree of the polynomial $f$ in terms of the variable $x$.
 """
-function degree(f::AbstractAlgebra.MPolyRingElem{T}, x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function degree(f::MPolyRingElem{T}, x::MPolyRingElem{T}) where T <: RingElement
    return degree(f, var_index(x))
 end
 
 @doc raw"""
-    degrees(f::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+    degrees(f::MPolyRingElem{T}) where T <: RingElement
 
 Return an array of the degrees of the polynomial $f$ in terms of each variable.
 """
-function degrees(f::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function degrees(f::MPolyRingElem{T}) where T <: RingElement
    R = parent(f)
    if nvars(R) == 1 && ordering(R) == :lex && length(f) > 0
       return first(exponent_vectors(f))
@@ -418,14 +418,14 @@ one(R::MPolyRing) = R(1)
 
 zero(R::MPolyRing) = R(0)
 
-function isone(x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function isone(x::MPolyRingElem{T}) where T <: RingElement
    return length(x) == 1 && iszero(first(exponent_vectors(x))) &&
           first(coefficients(x)) == 1
 end
 
-iszero(x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement = length(x) == 0
+iszero(x::MPolyRingElem{T}) where T <: RingElement = length(x) == 0
 
-function is_unit(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function is_unit(a::MPolyRingElem{T}) where T <: RingElement
    if is_constant(a)
       return is_unit(leading_coefficient(a))
    elseif is_domain_type(elem_type(coefficient_ring(a)))
@@ -437,7 +437,7 @@ function is_unit(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
    end
 end
 
-function content(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function content(a::MPolyRingElem{T}) where T <: RingElement
    z = zero(coefficient_ring(a))
    for c in coefficients(a)
       z = gcd(z, c)
@@ -445,39 +445,39 @@ function content(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
    return z
 end
 
-function is_zero_divisor(x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function is_zero_divisor(x::MPolyRingElem{T}) where T <: RingElement
    return is_zero_divisor(content(x))
 end
 
-function is_zero_divisor_with_annihilator(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function is_zero_divisor_with_annihilator(a::MPolyRingElem{T}) where T <: RingElement
    f, b = is_zero_divisor_with_annihilator(content(a))
    return f, parent(a)(b)
 end
 
 @doc raw"""
-    is_constant(x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+    is_constant(x::MPolyRingElem{T}) where T <: RingElement
 
 Return `true` if `x` is a degree zero polynomial or the zero polynomial, i.e.
 a constant polynomial.
 """
-function is_constant(x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function is_constant(x::MPolyRingElem{T}) where T <: RingElement
     return length(x) == 0 || (length(x) == 1 &&
                         iszero(first(exponent_vectors(x))))
 end
 
 @doc raw"""
-    is_term(x::MPoly)
+    is_term(x::MPolyRingElem)
 
 Return `true` if the given polynomial has precisely one term.
 """
-is_term(x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement = length(x) == 1
+is_term(x::MPolyRingElem{T}) where T <: RingElement = length(x) == 1
 
 @doc raw"""
-    is_monomial(x::AbstractAlgebra.MPolyRingElem)
+    is_monomial(x::MPolyRingElem)
 
 Return `true` if the given polynomial has precisely one term whose coefficient is one.
 """
-function is_monomial(x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function is_monomial(x::MPolyRingElem{T}) where T <: RingElement
    return length(x) == 1 && isone(first(coefficients(x)))
 end
 
@@ -488,43 +488,43 @@ end
 ###############################################################################
 
 @doc raw"""
-    coefficients(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+    coefficients(a::MPolyRingElem{T}) where T <: RingElement
 
 Return an iterator for the coefficients of the given polynomial. To retrieve
 an array of the coefficients, use `collect(coefficients(a))`.
 """
-function coefficients(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function coefficients(a::MPolyRingElem{T}) where T <: RingElement
    return Generic.MPolyCoeffs(a)
 end
 
 @doc raw"""
-    exponent_vectors(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+    exponent_vectors(a::MPolyRingElem{T}) where T <: RingElement
 
 Return an iterator for the exponent vectors of the given polynomial. To
 retrieve an array of the exponent vectors, use
 `collect(exponent_vectors(a))`.
 """
-function exponent_vectors(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function exponent_vectors(a::MPolyRingElem{T}) where T <: RingElement
    return Generic.MPolyExponentVectors(a)
 end
 
 @doc raw"""
-    monomials(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+    monomials(a::MPolyRingElem{T}) where T <: RingElement
 
 Return an iterator for the monomials of the given polynomial. To retrieve
 an array of the monomials, use `collect(monomials(a))`.
 """
-function monomials(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function monomials(a::MPolyRingElem{T}) where T <: RingElement
    return Generic.MPolyMonomials(a)
 end
 
 @doc raw"""
-    terms(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+    terms(a::MPolyRingElem{T}) where T <: RingElement
 
 Return an iterator for the terms of the given polynomial. To retrieve
 an array of the terms, use `collect(terms(a))`.
 """
-function terms(a::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function terms(a::MPolyRingElem{T}) where T <: RingElement
    return Generic.MPolyTerms(a)
 end
 
@@ -585,7 +585,7 @@ function show(io::IO, p::MPolyRing)
   end
 end
 
-function canonical_unit(x::AbstractAlgebra.MPolyRingElem)
+function canonical_unit(x::MPolyRingElem)
    if length(x) == 0
       return base_ring(x)()
    else
@@ -600,7 +600,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    deflation(f::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+    deflation(f::MPolyRingElem{T}) where T <: RingElement
 
 Compute deflation parameters for the exponents of the polynomial $f$. This
 is a pair of arrays of integers, the first array of which (the shift) gives
@@ -609,7 +609,7 @@ which (the deflation) gives the gcds of all the exponents after subtracting
 the shift, again per variable. This functionality is used by gcd (and can be
 used by factorisation algorithms).
 """
-function deflation(f::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function deflation(f::MPolyRingElem{T}) where T <: RingElement
    N = nvars(parent(f))
    if length(f) == 0
       return [0 for i in 1:N], [0 for i in 1:N]
@@ -631,7 +631,7 @@ function deflation(f::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
 end
 
 @doc raw"""
-    deflate(f::AbstractAlgebra.MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+    deflate(f::MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
 
 Return a polynomial with the same coefficients as $f$ but whose exponents
 have been reduced by the given shifts (supplied as an array of shifts,
@@ -640,7 +640,7 @@ one for each variable), then deflated (divided) by the given exponents
 The algorithm automatically replaces a deflation of $0$ by $1$, to avoid
 division by $0$.
 """
-function deflate(f::AbstractAlgebra.MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+function deflate(f::MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    S = parent(f)
    N = nvars(S)
    for i = 1:N
@@ -660,7 +660,7 @@ function deflate(f::AbstractAlgebra.MPolyRingElem{T}, shift::Vector{Int}, defl::
 end
 
 @doc raw"""
-    deflate(f::AbstractAlgebra.MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
+    deflate(f::MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
 
 Return a polynomial with the same coefficients as $f$ but whose exponents have
 been deflated (divided) by the given exponents (supplied as an array of
@@ -669,24 +669,24 @@ deflation factors, one for each variable).
 The algorithm automatically replaces a deflation of $0$ by $1$, to avoid
 division by $0$.
 """
-function deflate(f::AbstractAlgebra.MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
+function deflate(f::MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
    return deflate(f, [0 for i in 1:nvars(parent(f))], defl)
 end
 
 @doc raw"""
-    deflate(f::AbstractAlgebra.MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
+    deflate(f::MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
 
 Return a polynomial with the same coefficients as $f$ but whose exponents have
 been deflated maximally, i.e. with each exponent divide by the largest integer
 which divides the degrees of all exponents of that variable in $f$.
 """
-function deflate(f::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function deflate(f::MPolyRingElem{T}) where T <: RingElement
    shift, defl = deflation(f)
    defl = gcd.(shift, defl)
    return deflate(f, defl), defl
 end
 
-function inflate_deflate_vectors(R::AbstractAlgebra.MPolyRing, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})::Tuple{Vector{Int},Vector{Int}}
+function inflate_deflate_vectors(R::MPolyRing, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})::Tuple{Vector{Int},Vector{Int}}
    unique(vars) != vars && error("Variables not unique")
    !(length(vars) == length(shift) == length(defl)) && error("Number of variables does not match lengths of shift and deflation vectors")
    shift1 = zeros(Int, nvars(R))
@@ -700,7 +700,7 @@ function inflate_deflate_vectors(R::AbstractAlgebra.MPolyRing, vars::Vector{Int}
 end
 
 @doc raw"""
-    deflate(f::AbstractAlgebra.MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+    deflate(f::MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
 
 Return a polynomial with the same coefficients as $f$ but where exponents of
 some variables (supplied as an array of variable indices) have been reduced by
@@ -709,13 +709,13 @@ the given exponents (again supplied as an array of deflation factors). The
 algorithm automatically replaces a deflation of $0$ by $1$, to avoid division by
 $0$.
 """
-function deflate(f::AbstractAlgebra.MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+function deflate(f::MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
    (shift1, defl1) = inflate_deflate_vectors(parent(f), vars, shift, defl)
    return deflate(f, shift1, defl1)
 end
 
 @doc raw"""
-    deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: AbstractAlgebra.MPolyRingElem
+    deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyRingElem
 
 Return a polynomial with the same coefficients as $f$ but where the exponents of
 the given variables have been reduced by the given shifts (supplied as an array
@@ -723,14 +723,14 @@ of shifts), then deflated (divided) by the given exponents (again supplied as an
 array of deflation factors). The algorithm automatically replaces a deflation of
 $0$ by $1$, to avoid division by $0$.
 """
-function deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: AbstractAlgebra.MPolyRingElem
+function deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyRingElem
    varidx = [var_index(x) for x in vars]
    return deflate(f, varidx, shift, defl)
 end
 
 
 @doc raw"""
-    inflate(f::AbstractAlgebra.MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+    inflate(f::MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
 
 Return a polynomial with the same coefficients as $f$ but whose exponents
 have been inflated (multiplied) by the given deflation exponents (supplied
@@ -738,7 +738,7 @@ as an array of inflation factors, one for each variable) and then increased
 by the given shifts (again supplied as an array of shifts, one for each
 variable).
 """
-function inflate(f::AbstractAlgebra.MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+function inflate(f::MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    S = parent(f)
    N = nvars(S)
    M = Generic.MPolyBuildCtx(S)
@@ -753,18 +753,18 @@ function inflate(f::AbstractAlgebra.MPolyRingElem{T}, shift::Vector{Int}, defl::
 end
 
 @doc raw"""
-    inflate(f::AbstractAlgebra.MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
+    inflate(f::MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
 
 Return a polynomial with the same coefficients as $f$ but whose exponents
 have been inflated (multiplied) by the given deflation exponents (supplied
 as an array of inflation factors, one for each variable).
 """
-function inflate(f::AbstractAlgebra.MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
+function inflate(f::MPolyRingElem{T}, defl::Vector{Int}) where T <: RingElement
    return inflate(f, [0 for i in 1:nvars(parent(f))], defl)
 end
 
 @doc raw"""
-    inflate(f::AbstractAlgebra.MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+    inflate(f::MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
 
 Return a polynomial with the same coefficients as $f$ but where exponents of
 some variables (supplied as an array of variable indices) have been inflated
@@ -772,20 +772,20 @@ some variables (supplied as an array of variable indices) have been inflated
 factors) and then increased by the given shifts (again supplied as an array of
 shifts).
 """
-function inflate(f::AbstractAlgebra.MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
+function inflate(f::MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})
    (shift1, defl1) = inflate_deflate_vectors(parent(f), vars, shift, defl)
    return inflate(f, shift1, defl1)
 end
 
 @doc raw"""
-    inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: AbstractAlgebra.MPolyRingElem
+    inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyRingElem
 
 Return a polynomial with the same coefficients as $f$ but where the exponents of
 the given variables have been inflated (multiplied) by the given deflation
 exponents (supplied as an array of inflation factors) and then increased by the
 given shifts (again supplied as an array of shifts).
 """
-function inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: AbstractAlgebra.MPolyRingElem
+function inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyRingElem
    varidx = [var_index(x) for x in vars]
    return inflate(f, varidx, shift, defl)
 end
@@ -842,19 +842,19 @@ end
 #
 ###############################################################################
 
-function evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
+function evaluate(a::MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
    return evaluate(a, parent(a).(vals))
 end
 
 @doc raw"""
-    evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
 
 Evaluate the polynomial expression by substituting in the array of values for
 each of the variables. The evaluation will succeed if multiplication is
 defined between elements of the coefficient ring of $a$ and elements of the
 supplied vector.
 """
-function evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    length(vals) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
    R = base_ring(a)
    if (U <: Integer && U != BigInt) ||
@@ -909,14 +909,14 @@ function evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vals::Vector{U}) where {T
 end
 
 @doc raw"""
-    evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+    evaluate(a::MPolyRingElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
 
 Evaluate the polynomial expression by substituting in the supplied values in
 the array `vals` for the corresponding variables with indices given by the
 array `vars`. The evaluation will succeed if multiplication is defined between
 elements of the coefficient ring of $a$ and elements of `vals`.
 """
-function evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(a::MPolyRingElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    unique(vars) != vars && error("Variables not unique")
    length(vars) != length(vals) &&
       error("Number of variables does not match number of values")
@@ -1036,20 +1036,20 @@ function __evaluate(a, vars, vals, powers)
 end
 
 @doc raw"""
-    evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAlgebra.MPolyRingElem{T}, U <: RingElement} where T <: RingElement
+    evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: MPolyRingElem{T}, U <: RingElement} where T <: RingElement
 
 Evaluate the polynomial expression by substituting in the supplied values in
 the array `vals` for the corresponding variables (supplied as polynomials)
 given by the array `vars`. The evaluation will succeed if multiplication is
 defined between elements of the coefficient ring of $a$ and elements of `vals`.
 """
-function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAlgebra.MPolyRingElem{T}, U <: RingElement} where T <: RingElement
+function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: MPolyRingElem{T}, U <: RingElement} where T <: RingElement
    varidx = Int[var_index(x) for x in vars]
    return evaluate(a, varidx, vals)
 end
 
 @doc raw"""
-    evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
 
 Evaluate the polynomial expression at the supplied values, which may be any
 ring elements, commutative or non-commutative, but in the same ring. Evaluation
@@ -1057,7 +1057,7 @@ always proceeds in the order of the variables as supplied when creating the
 polynomial ring to which $a$ belongs. The evaluation will succeed if a product
 of a coefficient of the polynomial by one of the values is defined.
 """
-function evaluate(a::AbstractAlgebra.MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
    return a(vals...)
 end
 
@@ -1068,12 +1068,12 @@ end
 ################################################################################
 
 @doc raw"""
-    derivative(f::AbstractAlgebra.MPolyRingElem{T}, j::Int) where {T <: RingElement}
+    derivative(f::MPolyRingElem{T}, j::Int) where {T <: RingElement}
 
 Return the partial derivative of `f` with respect to $j$-th variable
 of the polynomial ring.
 """
-function derivative(f::AbstractAlgebra.MPolyRingElem{T}, j::Int) where T <: RingElement
+function derivative(f::MPolyRingElem{T}, j::Int) where T <: RingElement
    R = parent(f)
    iterz = zip(coefficients(f), exponent_vectors(f))
    Ctx = Generic.MPolyBuildCtx(R)
@@ -1088,12 +1088,12 @@ function derivative(f::AbstractAlgebra.MPolyRingElem{T}, j::Int) where T <: Ring
 end
 
 @doc raw"""
-    derivative(f::AbstractAlgebra.MPolyRingElem{T}, x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+    derivative(f::MPolyRingElem{T}, x::MPolyRingElem{T}) where T <: RingElement
 
 Return the partial derivative of `f` with respect to `x`. The value `x` must
 be a generator of the polynomial ring of `f`.
 """
-function derivative(f::AbstractAlgebra.MPolyRingElem{T}, x::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function derivative(f::MPolyRingElem{T}, x::MPolyRingElem{T}) where T <: RingElement
    return derivative(f, var_index(x))
 end
 
@@ -1105,14 +1105,14 @@ end
 ###############################################################################
 
 @doc raw"""
-    to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyRingElem{T}) where T <: AbstractAlgebra.RingElement
+    to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
 
 Assuming the polynomial $p$ is actually a univariate polynomial, convert the
 polynomial to a univariate polynomial in the given univariate polynomial ring
 $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
 """
-function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyRingElem{T}) where T <: AbstractAlgebra.RingElement
+function to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
    if !is_univariate(p)
       error("Can only convert univariate polynomials of type MPoly.")
    end
@@ -1123,14 +1123,14 @@ function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyR
 end
 
 @doc raw"""
-    is_univariate(p::AbstractAlgebra.MPolyRingElem)
+    is_univariate(p::MPolyRingElem)
 
 Returns `true` if $p$ is a univariate polynomial, i.e. involves at most one
 variable (thus constant polynomials are considered univariate), and `false`
 otherwise. The result depends on the terms of the polynomial, not simply on
 the number of variables in the polynomial ring.
 """
-function is_univariate(p::AbstractAlgebra.MPolyRingElem{T}) where T <: RingElement
+function is_univariate(p::MPolyRingElem{T}) where T <: RingElement
    if is_constant(p)
       return true
    end
@@ -1151,12 +1151,12 @@ function is_univariate(p::AbstractAlgebra.MPolyRingElem{T}) where T <: RingEleme
 end
 
 @doc raw"""
-    is_univariate(R::AbstractAlgebra.MPolyRing)
+    is_univariate(R::MPolyRing)
 
 Returns `true` if $R$ is a univariate polynomial ring, i.e. has exactly one
 variable, and `false` otherwise.
 """
-function is_univariate(R::AbstractAlgebra.MPolyRing{T}) where T <: RingElement
+function is_univariate(R::MPolyRing{T}) where T <: RingElement
    return nvars(R) == 1
 end
 
@@ -1166,7 +1166,7 @@ end
 Return the coefficients of p, which is assumed to be univariate,
 as an array in ascending order.
 """
-function coefficients_of_univariate(p::AbstractAlgebra.MPolyRingElem,
+function coefficients_of_univariate(p::MPolyRingElem,
                                     check_univariate::Bool=true)
 
    coeffs = Vector{elem_type(coefficient_ring(p))}(undef, 0)
@@ -1208,7 +1208,7 @@ end
 ################################################################################
 
 function _change_mpoly_ring(R, Rx, cached)
-   P, _ = AbstractAlgebra.polynomial_ring(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
+   P, _ = polynomial_ring(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
    return P
 end
 
@@ -1222,7 +1222,7 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function change_base_ring(R::Ring, p::MPolyRingElem{T}; cached::Bool=true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
+function change_base_ring(R::Ring, p::MPolyRingElem{T}; cached::Bool=true, parent::MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
    base_ring(parent) != R && error("Base rings do not match.")
    return _map(R, p, parent)
 end
@@ -1237,7 +1237,7 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function change_coefficient_ring(R::Ring, p::MPolyRingElem{T}; cached::Bool=true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
+function change_coefficient_ring(R::Ring, p::MPolyRingElem{T}; cached::Bool=true, parent::MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
   return change_base_ring(R, p, cached = cached, parent = parent)
 end
 
@@ -1256,7 +1256,7 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function map_coefficients(f, p::MPolyRingElem; cached = true, parent::AbstractAlgebra.MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
+function map_coefficients(f, p::MPolyRingElem; cached = true, parent::MPolyRing = _change_mpoly_ring(parent(f(zero(base_ring(p)))), parent(p), cached))
    return _map(f, p, parent)
 end
 
@@ -1298,10 +1298,10 @@ function rand_ordering(rng::AbstractRNG=Random.GLOBAL_RNG)
    end
 end
 
-RandomExtensions.maketype(S::AbstractAlgebra.MPolyRing, _, _, _) = elem_type(S)
+RandomExtensions.maketype(S::MPolyRing, _, _, _) = elem_type(S)
 
-function RandomExtensions.make(S::AbstractAlgebra.MPolyRing, term_range::AbstractUnitRange{Int},
-                               exp_bound::AbstractUnitRange{Int}, vs...)
+function RandomExtensions.make(S::MPolyRing, term_range::UnitRange{Int},
+                               exp_bound::UnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, term_range, exp_bound, vs[1])
@@ -1311,7 +1311,7 @@ function RandomExtensions.make(S::AbstractAlgebra.MPolyRing, term_range::Abstrac
 end
 
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
-                 <:RingElement, <:AbstractAlgebra.MPolyRing, <:AbstractUnitRange{Int}, <:AbstractUnitRange{Int}}})
+                 <:RingElement,<:MPolyRing,UnitRange{Int},UnitRange{Int}}})
    S, term_range, exp_bound, v = sp[][1:end]
    f = S()
    g = gens(S)
@@ -1327,12 +1327,12 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
    return f
 end
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
-              term_range::AbstractUnitRange{Int}, exp_bound::AbstractUnitRange{Int}, v...)
+function rand(rng::AbstractRNG, S::MPolyRing,
+              term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
    rand(rng, make(S, term_range, exp_bound, v...))
 end
 
-function rand(S::AbstractAlgebra.MPolyRing, term_range, exp_bound, v...)
+function rand(S::MPolyRing, term_range, exp_bound, v...)
    rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
 end
 
@@ -1444,7 +1444,7 @@ macro polynomial_ring(R, args...)
    ring1 = gensym()
    ring2 = gensym()
    push!(exprs, :($(Expr(:tuple, esc(ring1), esc(ring2))) =
-                 AbstractAlgebra.polynomial_ring($(esc(R)), $(esc(all_names)))))
+                 polynomial_ring($(esc(R)), $(esc(all_names)))))
    vars = Symbol[]
    k = gensym()
    push!(exprs, :($(esc(k)) = 0))

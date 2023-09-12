@@ -10,19 +10,19 @@
 #
 ###############################################################################
 
-function coefficients(a::AbstractAlgebra.UniversalPolyRingElem)
+function coefficients(a::UniversalPolyRingElem)
    return Generic.UnivPolyCoeffs(a)
 end
 
-function exponent_vectors(a::AbstractAlgebra.UniversalPolyRingElem)
+function exponent_vectors(a::UniversalPolyRingElem)
    return Generic.UnivPolyExponentVectors(a)
 end
 
-function monomials(a::AbstractAlgebra.UniversalPolyRingElem)
+function monomials(a::UniversalPolyRingElem)
    return Generic.UnivPolyMonomials(a)
 end
 
-function terms(a::AbstractAlgebra.UniversalPolyRingElem)
+function terms(a::UniversalPolyRingElem)
    return Generic.UnivPolyTerms(a)
 end
 

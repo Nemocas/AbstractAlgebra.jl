@@ -51,7 +51,7 @@ julia> typeof(g)
 Perm{Int32}
 ```
 """
-mutable struct Perm{T<:Integer} <: AbstractAlgebra.AbstractPerm
+mutable struct Perm{T<:Integer} <: AbstractPerm
    d::Vector{T}
    modified::Bool
    cycles::CycleDec{T}

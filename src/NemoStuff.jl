@@ -671,11 +671,11 @@ function gens(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T
     return r
 end
 
-AbstractAlgebra.promote_rule(::Type{LocElem{T}}, ::Type{T}) where {T} = LocElem{T}
+promote_rule(::Type{LocElem{T}}, ::Type{T}) where {T} = LocElem{T}
 
-AbstractAlgebra.promote_rule(::Type{T}, ::Type{S}) where {S<:NumFieldElem,T<:Integer} = S
+promote_rule(::Type{T}, ::Type{S}) where {S<:NumFieldElem,T<:Integer} = S
 
-AbstractAlgebra.promote_rule(::Type{S}, ::Type{T}) where {S<:NumFieldElem,T<:Integer} = S
+promote_rule(::Type{S}, ::Type{T}) where {S<:NumFieldElem,T<:Integer} = S
 
 function mulmod(a::S, b::S, mod::Vector{S}) where {S<:MPolyRingElem{T}} where {T<:RingElem}
     return Base.divrem(a * b, mod)[2]
@@ -683,7 +683,7 @@ end
 
 Base.:\(f::Map, x) = preimage(f, x)
 
-function preimage(f::AbstractAlgebra.Generic.CompositeMap, a)
+function preimage(f::Generic.CompositeMap, a)
     return preimage(f.map1, preimage(f.map2, a))
 end
 
@@ -771,12 +771,12 @@ function rand(rng::AbstractRNG, Ksp::Random.SamplerSimple{<:FinField})
     return res
 end
 
-function (R::Generic.PolyRing{T})(x::AbstractAlgebra.Generic.RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
+function (R::Generic.PolyRing{T})(x::Generic.RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
     @assert isone(denominator(x))
     @assert parent(numerator(x)) === R
     return numerator(x)
 end
-function (R::PolyRing{T})(x::AbstractAlgebra.Generic.RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
+function (R::PolyRing{T})(x::Generic.RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
     @assert isone(denominator(x))
     @assert parent(numerator(x)) === R
     return numerator(x)

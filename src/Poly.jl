@@ -384,13 +384,13 @@ end
 ###############################################################################
 
 @doc raw"""
-    exponent_vectors(a::AbstractAlgebra.PolyRingElem)
+    exponent_vectors(a::PolyRingElem)
 
 Return an iterator for the exponent vectors of the given polynomial. The
 exponent vectors will have length 1 and may correspond to terms with zero
 coefficient but will not give exponents higher than the degree.
 """
-function exponent_vectors(a::AbstractAlgebra.PolyRingElem)
+function exponent_vectors(a::PolyRingElem)
    return Generic.MPolyExponentVectors(a)
 end
 
@@ -2939,8 +2939,7 @@ end
 
 @doc raw"""
     power_sums_to_polynomial(P::Vector{T};
-                     parent::AbstractAlgebra.PolyRing{T}=
-   AbstractAlgebra.PolyRing(parent(P[1])) where T <: RingElement -> PolyRingElem{T}
+                     parent::PolyRing{T}=PolyRing(parent(P[1])) where T <: RingElement -> PolyRingElem{T}
 
 Uses the Newton (or Newton-Girard) identities to obtain the polynomial
 with given sums of powers of roots. The list must be nonempty and contain
@@ -2948,12 +2947,11 @@ with given sums of powers of roots. The list must be nonempty and contain
 must start with the sum of first powers of the roots.
 """
 function power_sums_to_polynomial(P::Vector{T}; 
-                           parent::AbstractAlgebra.PolyRing{T}=
-             AbstractAlgebra.PolyRing(parent(P[1]))) where T <: RingElement
+                           parent::PolyRing{T}=PolyRing(parent(P[1]))) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
 
-function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T}) where T <: FieldElement
+function power_sums_to_polynomial(P::Vector{T}, Rx::PolyRing{T}) where T <: FieldElement
     d = length(P)
     R = base_ring(Rx)
     s = rel_series(R, P, d, d, 0)
@@ -2963,7 +2961,7 @@ function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T})
     return Rx(T[polcoeff(r1, d - i) for i = 0:d])
 end
 
-function power_sums_to_polynomial(P::Vector{T}, Rx::AbstractAlgebra.PolyRing{T}) where T <: RingElement
+function power_sums_to_polynomial(P::Vector{T}, Rx::PolyRing{T}) where T <: RingElement
     E = T[one(parent(P[1]))]
     R = parent(P[1])
     last_non_zero = 0
