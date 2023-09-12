@@ -284,3 +284,11 @@ Base.oftype(x::NCRingElem, y::AbstractFloat) = parent(x)(y)
 Base.oftype(x::NCRingElem, y::Integer) = parent(x)(y)
 
 Base.oftype(x::NCRingElem, y::Rational) = parent(x)(y)
+
+###############################################################################
+#
+#   Scalar for broadcasting
+#
+###############################################################################
+
+Base.broadcastable(x::NCRingElem) = Ref(x)
