@@ -84,16 +84,26 @@ function (f::FunctionalMap{D, C})(a) where {D, C}
    return image_fn(f)(a)::elem_type(C)
 end
 
-function show(io::IO, M::FunctionalMap)
-   println(io, "Map with the following data")
-   println(io, "")
-   println(io, "Domain:")
-   println(io, "=======")
-   println(io, domain(M))
-   println(io, "")
-   println(io, "Codomain:")
-   println(io, "========")
-   print(io, codomain(M))
+
+
+function Base.show(io::IO, ::MIME"text/plain", M::FunctionalMap)
+   io = pretty(io)
+   println(io, "Map defined by a Julia function")
+   println(io, Indent(), "from ", Lowercase(), domain(M))
+   print(io, "to ", Lowercase(), codomain(M))
+end
+
+function Base.show(io::IO, M::FunctionalMap)
+   io = pretty(io)
+   if get(io, :supercompact, false)
+      # no nested printing
+      print(io, "Map")
+   else
+      # nested printing allowed, preferably supercompact
+      print(io, "Map: ")
+      print(IOContext(io, :supercompact => true), Lowercase(), domain(M), " -> ")
+      print(IOContext(io, :supercompact => true), Lowercase(), codomain(M))
+   end
 end
 
 ################################################################################

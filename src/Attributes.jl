@@ -45,6 +45,7 @@ julia> @attributes mutable struct MyGroup
 julia> G = MyGroup(5)
 MyGroup(5, #undef)
 
+
 julia> set_attribute!(G, :isfinite, :true)
 
 julia> get_attribute(G, :isfinite)
@@ -63,6 +64,7 @@ julia> @attributes MyOtherGroup
 
 julia> G = MyOtherGroup(5)
 MyOtherGroup(5)
+
 
 julia> set_attribute!(G, :isfinite, :true)
 
