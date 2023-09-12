@@ -19,19 +19,34 @@ function (f::CompositeMap{D, C})(a) where {D, C}
    return f.map2(f.map1(a))::elem_type(C)
 end
 
-function show_short(io::IO, M::CompositeMap)
-   show_short(io, M.map1)
-   println(io, "then")
-   print(io, M.map2)
+function show(io::IO, ::MIME"text/plain", M::CompositeMap)
+   io = pretty(io)
+   println(io, "Composite map")
+   println(io, Indent(), "first ", Lowercase(), map1(M))
+   h = map2(M)
+   while h isa FunctionalCompositeMap || h isa CompositeMap
+     println(io, "next ", Lowercase(), h)
+     h = map2(h)
+   end
+   print(io, "next ", Lowercase(), h, Dedent())
 end
 
 function show(io::IO, M::CompositeMap)
-   println(io, "Composite map consisting of the following")
-   println(io, "")
-   show_short(io, M.map1)
-   println(io, "then")
-   show_short(io, M.map2)
+   io = pretty(io)
+   if get(io, :supercompact, false)
+      # no nested printing
+      print(io, "Composite map")
+   else
+      print(io, "Map: ", Lowercase(), domain(M))
+      h = map2(m)
+      while h isa FunctionalCompositeMap || h isa CompositeMap
+        print(io, " -> ", Lowercase(), domain(h))
+        h = map2(h)
+      end
+      print(io, " -> ", Lowercase(), codomain(M))
+   end
 end
+
 
 ################################################################################
 #
@@ -44,13 +59,25 @@ end
 domain(f::IdentityMap) = f.domain
 codomain(f::IdentityMap) = f.domain
 
-function show(io::IO, M::IdentityMap)
-   println(io, "Identity map with")
-   println(io, "")
-   println(io, "Domain:")
-   println(io, "=======")
-   print(io, domain(M))
+
+function show(io::IO, ::MIME"text/plain", M::IdentityMap)
+   io = pretty(io)
+   println("Identity map")
+   print(io, Indent(), "of ", Lowercase())
+   show(io, MIME("text/plain"), domain(M))
+   print(io, Dedent())
 end
+
+function show(io::IO, M::IdentityMap)
+   io = pretty(io)
+   if get(io, :supercompact, false)
+      # no nested printing
+      print(io, "Identity map")
+   else
+      print(io, "Identity map of ", Lowercase(), domain(M))
+   end
+end
+
 
 function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}, g::AbstractAlgebra.Map{D, C}) where {D, C}
    check_composable(f, g)
@@ -90,10 +117,10 @@ function Base.show(io::IO, ::MIME"text/plain", M::FunctionalMap)
    io = pretty(io)
    println(io, "Map defined by a Julia function")
    println(io, Indent(), "from ", Lowercase(), domain(M))
-   print(io, "to ", Lowercase(), codomain(M))
+   print(io, "to ", Lowercase(), codomain(M), Dedent())
 end
 
-function Base.show(io::IO, M::FunctionalMap)
+function Base.show(io::IO, M::AbstractAlgebra.Map)
    io = pretty(io)
    if get(io, :supercompact, false)
       # no nested printing
@@ -150,23 +177,31 @@ function (f::FunctionalCompositeMap{D, C})(a) where {D, C}
    return image_fn(f)(a)::elem_type(C)
 end
 
-function show_short(io::IO, M::AbstractAlgebra.Map)
-   println(IOContext(io, :compact => true), domain(M), " -> ", codomain(M))
-end
-
-function show_short(io::IO, M::FunctionalCompositeMap)
-   show_short(io, M.map1)
-   println(io, "then")
-   print(io, M.map2)
+function show(io::IO, ::MIME"text/plain", M::FunctionalCompositeMap)
+   io = pretty(io)
+   println(io, "Functional composite map")
+   println(io, Indent(), "first ", Lowercase(), map1(M))
+   h = map2(M)
+   while h isa FunctionalCompositeMap
+     println(io, "next ", Lowercase(), h)
+     h = map2(h)
+   end
+   print(io, "next ", Lowercase(), h, Dedent())
 end
 
 function show(io::IO, M::FunctionalCompositeMap)
-   println(io, "Composite map consisting of the following")
-   println(io, "")
-   show_short(io, M.map1)
-   println(io, "then")
-   show_short(io, M.map2)
+   io = pretty(io)
+   if get(io, :supercompact, false)
+      # no nested printing
+      print(io, "Composite map")
+   else
+      print(io, "Map: ", Lowercase(), domain(M))
+      h = map2(M)
+      while h isa FunctionalCompositeMap
+        print(io, " -> ", Lowercase(), domain(h))
+        h = map2(h)
+      end
+      print(io, " -> ", Lowercase(), codomain(M))
+   end
 end
-
-
 
