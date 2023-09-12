@@ -727,18 +727,6 @@ Random.gentype(::Type{T}) where {T<:FinField} = elem_type(T)
 import LinearAlgebra
 LinearAlgebra.dot(a::NCRingElem, b::NCRingElem) = a * b
 
-function is_upper_triangular(M::MatElem)
-    n = nrows(M)
-    for i = 2:n
-        for j = 1:min(i - 1, ncols(M))
-            if !iszero(M[i, j])
-                return false
-            end
-        end
-    end
-    return true
-end
-
 transpose!(A::MatrixElem) = transpose(A)
 
 function Base.div(f::PolyRingElem, g::PolyRingElem)

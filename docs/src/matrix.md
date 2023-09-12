@@ -428,7 +428,11 @@ strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 ```
 
 ```@docs
-is_upper_triangular(::MatrixElem{T}) where T <: RingElement
+is_lower_triangular(::MatrixElem)
+```
+
+```@docs
+is_upper_triangular(::MatrixElem)
 ```
 
 ```@docs

@@ -3350,30 +3350,23 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_upper_triangular(A::MatrixElem{T}) where T <: RingElement
+    is_upper_triangular(A::MatrixElem)
 
 Return `true` if $A$ is an upper triangular matrix.
 
 Alias for `LinearAlgebra.istriu`.
 """
-function is_upper_triangular(A::MatrixElem{T}) where T <: RingElement
-   m = nrows(A)
-   n = ncols(A)
-   d = 0
-   for c = 1:n
-      for r = m:-1:1
-         if !iszero(A[r, c])
-            if r < d
-               return false
+function is_upper_triangular(M::MatrixElem)
+    m = ncols(M)
+    for i = 2:nrows(M)
+        for j = 1:min(i - 1, m)
+            if !iszero(M[i, j])
+                return false
             end
-            d = r
-            break
-         end
-      end
-   end
-   return true
+        end
+    end
+    return true
 end
-
 
 @doc raw"""
     solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <: FieldElement}
@@ -3418,6 +3411,30 @@ function solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <
       end
    end
    return X
+end
+
+###############################################################################
+#
+#
+#
+###############################################################################
+
+@doc raw"""
+    is_lower_triangular(A::MatrixElem)
+
+Return `true` if $A$ is an lower triangular matrix.
+
+Alias for `LinearAlgebra.istril`.
+"""
+function is_lower_triangular(M::MatrixElem)
+    for i = 1:nrows(M)
+        for j = i+1:ncols(M)
+            if !iszero(M[i, j])
+                return false
+            end
+        end
+    end
+    return true
 end
 
 ###############################################################################
