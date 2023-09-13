@@ -6876,11 +6876,13 @@ end
 diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
 
 @doc raw"""
-    diagonal_matrix(x::T...) where T <: RingElement -> MatElem{T}
-    diagonal_matrix(x::Vector{T}) where T <: RingElement -> MatElem{T}
-    diagonal_matrix(Q, x::Vector{T}) where T <: RingElement -> MatElem{T}
+    diagonal_matrix(x::T...) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(x::Vector{T}) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(R::NCRing, x::Vector{T}) where T <: NCRingElement -> MatElem{T}
 
 Returns a diagonal matrix whose diagonal entries are the elements of $x$.
+If a ring $R$ is given then it is used a parent for the entries of the created
+matrix. Otherwise the parent is inferred from the vector $x$.
 
 # Examples
 
@@ -6898,7 +6900,7 @@ julia> diagonal_matrix(ZZ, [5, 6])
 [0   6]
 ```
 """
-function diagonal_matrix(R::Ring, x::Vector{<:RingElement})
+function diagonal_matrix(R::NCRing, x::Vector{<:NCRingElement})
     x = R.(x)
     M = zero_matrix(R, length(x), length(x))
     for i = 1:length(x)
@@ -6907,11 +6909,11 @@ function diagonal_matrix(R::Ring, x::Vector{<:RingElement})
     return M
 end
 
-function diagonal_matrix(x::T, xs::T...) where {T<:RingElement}
+function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
     return diagonal_matrix(collect((x, xs...)))
 end
 
-diagonal_matrix(x::Vector{<:RingElement}) = diagonal_matrix(parent(x[1]), x)
+diagonal_matrix(x::Vector{<:NCRingElement}) = diagonal_matrix(parent(x[1]), x)
 
 @doc raw"""
     diagonal_matrix(x::Vector{T}) where T <: MatElem -> MatElem
@@ -6926,7 +6928,7 @@ function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
     return cat(x, xs..., dims=(1, 2))::T
 end
 
-function diagonal_matrix(R::Ring, x::Vector{<:MatElem})
+function diagonal_matrix(R::NCRing, x::Vector{<:MatElem})
     if length(x) == 0
         return zero_matrix(R, 0, 0)
     end
