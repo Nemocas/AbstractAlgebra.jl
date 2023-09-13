@@ -775,6 +775,7 @@ export AllPerms
 export allow_unicode
 export base_field
 export base_ring
+export base_ring_type
 export basis
 export block_diagonal_matrix
 export cached

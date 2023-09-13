@@ -33,6 +33,10 @@ elem_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRing{S}} = Laure
 
 elem_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesField{S}} = LaurentSeriesFieldElem{S}
 
+base_ring_type(::Type{LaurentSeriesRing{T}}) where T <: RingElement = parent_type(T)
+
+base_ring_type(::Type{LaurentSeriesField{T}}) where T <: FieldElement = parent_type(T)
+
 base_ring(R::LaurentSeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 base_ring(R::LaurentSeriesField{T}) where T <: FieldElement = R.base_ring::parent_type(T)

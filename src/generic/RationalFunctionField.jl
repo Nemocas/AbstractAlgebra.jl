@@ -16,6 +16,8 @@ parent_type(::Type{RationalFunctionFieldElem{T, U}}) where {T <: FieldElement, U
 
 elem_type(::Type{RationalFunctionField{T, U}}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = RationalFunctionFieldElem{T, U}
 
+base_ring_type(::Type{RationalFunctionField{T, U}}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = parent_type(T)
+
 base_ring(a::RationalFunctionField{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = a.base_ring::parent_type(T)
 
 base_ring(a::RationalFunctionFieldElem) = base_ring(parent(a))

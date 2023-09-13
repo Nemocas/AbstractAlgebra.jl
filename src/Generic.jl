@@ -124,6 +124,7 @@ import ..AbstractAlgebra: add!
 import ..AbstractAlgebra: addeq!
 import ..AbstractAlgebra: addmul!
 import ..AbstractAlgebra: base_ring
+import ..AbstractAlgebra: base_ring_type
 import ..AbstractAlgebra: CacheDictType
 import ..AbstractAlgebra: can_solve_with_solution_fflu
 import ..AbstractAlgebra: can_solve_with_solution_lu

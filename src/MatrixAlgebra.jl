@@ -10,6 +10,8 @@
 #
 ###############################################################################
 
+base_ring_type(::Type{MatAlgebra{T}}) where T <: NCRingElement = parent_type(T)
+
 function base_ring(a::MatAlgebra{T}) where {T <: NCRingElement}
    a.base_ring::parent_type(T)
 end

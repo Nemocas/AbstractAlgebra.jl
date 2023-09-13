@@ -10,6 +10,8 @@
 #
 ###############################################################################
 
+base_ring_type(::Type{ResidueField{T}}) where T <: RingElement = parent_type(T)
+
 base_ring(S::ResidueField{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
 base_ring(r::ResFieldElem) = base_ring(parent(r))

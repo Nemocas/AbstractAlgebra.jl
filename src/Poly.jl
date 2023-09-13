@@ -10,6 +10,8 @@
 #
 ###############################################################################
 
+base_ring_type(::Type{PolyRing{T}}) where {T} = parent_type(T)
+
 base_ring(R::PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 base_ring(a::PolynomialElem) = base_ring(parent(a))

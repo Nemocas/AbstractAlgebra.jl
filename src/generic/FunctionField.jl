@@ -527,6 +527,11 @@ parent_type(::Type{FunctionFieldElem{T}}) where T <: FieldElement = FunctionFiel
 
 elem_type(::Type{FunctionField{T}}) where T <: FieldElement = FunctionFieldElem{T}
 
+function base_ring_type(::Type{FunctionField{T}}) where T <: FieldElement
+   U = dense_poly_type(T)
+   return RationalFunctionField{T, U}
+end
+
 function base_ring(R::FunctionField{T}) where T <: FieldElement
    U = dense_poly_type(T)
    return R.base_ring::RationalFunctionField{T, U}

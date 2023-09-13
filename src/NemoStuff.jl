@@ -770,8 +770,3 @@ function (R::PolyRing{T})(x::Generic.RationalFunctionFieldElem{T,U}) where {T<:R
     @assert parent(numerator(x)) === R
     return numerator(x)
 end
-
-export base_ring_type
-
-base_ring_type(::Type{AbstractAlgebra.Generic.PolyRing{T}}) where {T} = parent_type(T)
-

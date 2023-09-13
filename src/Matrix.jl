@@ -10,6 +10,8 @@
 #
 ###############################################################################
 
+base_ring_type(::Type{MatSpace{T}}) where T <: NCRingElement = parent_type(T)
+
 base_ring(a::MatSpace{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T)
 
 base_ring(a::MatrixElem{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T)
