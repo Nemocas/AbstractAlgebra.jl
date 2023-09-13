@@ -3927,6 +3927,26 @@ function kernel(A::MatElem{T}; side::Symbol = :right) where T <: RingElement
    end
 end
 
+################################################################################
+#
+#  Kernel over different rings
+#
+################################################################################
+
+@doc raw"""
+    kernel(a::MatElem{T}; R::Ring, side::Symbol = :right) where T <: RingElement
+
+Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $a$ over $R$ and $M$ is a
+basis for it. If side is `:right` or not specified, the right kernel is
+computed, i.e. the matrix of columns whose span gives the right kernel
+space. If side is `:left`, the left kernel is computed, i.e. the matrix
+of rows whose span is the left kernel space.
+"""
+function kernel(M::MatElem{T}, R::Ring; side::Symbol=:right) where T <: RingElement
+    MP = change_base_ring(R, M)
+    return kernel(MP; side)
+end
+
 ###############################################################################
 #
 #   Hessenberg form

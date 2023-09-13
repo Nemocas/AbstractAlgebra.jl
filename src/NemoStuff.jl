@@ -247,23 +247,6 @@ end
 
 ################################################################################
 #
-#  Kernel over different rings
-#
-################################################################################
-
-@doc raw"""
-    kernel(a::MatrixElem{T}, R::Ring; side::Symbol = :right) -> n, MatElem{elem_type(R)}
-
-It returns a tuple $(n, M)$, where $n$ is the rank of the kernel over $R$ and $M$ is a basis for it. If side is $:right$ or not
-specified, the right kernel is computed. If side is $:left$, the left kernel is computed.
-"""
-function kernel(M::MatrixElem, R::Ring; side::Symbol=:right)
-    MP = change_base_ring(R, M)
-    return kernel(MP, side=side)
-end
-
-################################################################################
-#
 #  Concatenation of matrices
 #
 ################################################################################
