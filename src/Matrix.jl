@@ -4376,7 +4376,7 @@ end
 # charpoly iff it has degree n. Otherwise it is meaningless (but it is
 # extremely fast to compute over some fields).
 
-function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
+function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
    !is_square(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
@@ -4467,10 +4467,12 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
 end
 
 @doc raw"""
-    minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+    minpoly(M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+    minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
 
-Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
-of the resulting polynomial must be supplied and the matrix must be square.
+Return the minimal polynomial $p$ of the square matrix $M$.
+If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
+the resulting polynomial is an element of it.
 
 # Examples
 
@@ -4478,7 +4480,7 @@ of the resulting polynomial must be supplied and the matrix must be square.
 julia> R = GF(13)
 Finite field F_13
 
-julia> T, y = polynomial_ring(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate polynomial ring in y over finite field F_13, y)
 
 julia> M = R[7 6 1;
@@ -4488,12 +4490,15 @@ julia> M = R[7 6 1;
 [7    7   5]
 [8   12   5]
 
-julia> A = minpoly(T, M)
+julia> A = minpoly(S, M)
 y^2 + 10*y
+
+julia> A = minpoly(M)
+x^2 + 10*x
 
 ```
 """
-function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
    !is_square(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
@@ -4591,6 +4596,12 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
       first_poly = false
    end
    return divexact(p, canonical_unit(p))
+end
+
+function minpoly(M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+   R = base_ring(M)
+   Rx, x = polynomial_ring(R; cached=false)
+   return minpoly(Rx, M, charpoly_only)
 end
 
 ###############################################################################

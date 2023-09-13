@@ -208,18 +208,6 @@ Base.copy(f::Generic.Poly) = deepcopy(f)
 Base.copy(a::PolyRingElem) = deepcopy(a)
 Base.copy(a::SeriesElem) = deepcopy(a)
 
-################################################################################
-#
-#  Minpoly
-#
-################################################################################
-
-function minpoly(M::MatElem)
-    k = base_ring(M)
-    kx, x = polynomial_ring(k, cached=false)
-    return minpoly(kx, M)
-end
-
 ###############################################################################
 #
 #  Sub
