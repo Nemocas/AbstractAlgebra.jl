@@ -6872,6 +6872,68 @@ end
 
 diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
 
+@doc raw"""
+    diagonal_matrix(x::T...) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(x::Vector{T}) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(R::NCRing, x::Vector{T}) where T <: NCRingElement -> MatElem{T}
+
+Returns a diagonal matrix whose diagonal entries are the elements of $x$.
+If a ring $R$ is given then it is used a parent for the entries of the created
+matrix. Otherwise the parent is inferred from the vector $x$.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> diagonal_matrix(ZZ(1), ZZ(2))
+[1   0]
+[0   2]
+
+julia> diagonal_matrix([ZZ(3), ZZ(4)])
+[3   0]
+[0   4]
+
+julia> diagonal_matrix(ZZ, [5, 6])
+[5   0]
+[0   6]
+```
+"""
+function diagonal_matrix(R::NCRing, x::Vector{<:NCRingElement})
+    x = R.(x)
+    M = zero_matrix(R, length(x), length(x))
+    for i = 1:length(x)
+        M[i, i] = x[i]
+    end
+    return M
+end
+
+function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
+    return diagonal_matrix(collect((x, xs...)))
+end
+
+diagonal_matrix(x::Vector{<:NCRingElement}) = diagonal_matrix(parent(x[1]), x)
+
+@doc raw"""
+    diagonal_matrix(x::Vector{T}) where T <: MatElem -> MatElem
+
+Returns a block diagonal matrix whose diagonal blocks are the matrices in $x$.
+"""
+function diagonal_matrix(x::Vector{T}) where {T<:MatElem}
+    return cat(x..., dims=(1, 2))::T
+end
+
+function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
+    return cat(x, xs..., dims=(1, 2))::T
+end
+
+function diagonal_matrix(R::NCRing, x::Vector{<:MatElem})
+    if length(x) == 0
+        return zero_matrix(R, 0, 0)
+    end
+    x = [change_base_ring(R, i) for i in x]
+    return diagonal_matrix(x)
+end
+
+
 ###############################################################################
 #
 #   Lower triangular matrix
