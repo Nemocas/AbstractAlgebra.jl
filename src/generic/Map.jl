@@ -32,11 +32,11 @@ function show(io::IO, ::MIME"text/plain", M::CompositeMap)
 end
 
 function show(io::IO, M::CompositeMap)
-   io = pretty(io)
    if get(io, :supercompact, false)
       # no nested printing
       print(io, "Composite map")
    else
+     io = pretty(io)
       print(io, "Map: ", Lowercase(), domain(M))
       h = map2(m)
       while h isa FunctionalCompositeMap || h isa CompositeMap
