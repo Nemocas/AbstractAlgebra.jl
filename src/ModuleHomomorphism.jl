@@ -188,11 +188,11 @@ function ModuleHomomorphism(M1::FPModule{T},
    return Generic.ModuleHomomorphism(M1, M2, v)
 end
 
-function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, A...)
+function ModuleHomomorphism(M1::Module, M2::Module, A...)
    Generic.ModuleHomomorphism(M1, M2, A...)
 end
 
-function module_homomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
+function module_homomorphism(M1::Module, M2::Module, m::MatElem)
    Generic.ModuleHomomorphism(M1, M2, m)
 end
 
@@ -207,10 +207,10 @@ function ModuleIsomorphism(M1::FPModule{T},
    return Generic.ModuleIsomorphism(M1, M2, M)
 end
 
-function ModuleIsomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
+function ModuleIsomorphism(M1::Module, M2::Module, m::MatElem)
    Generic.ModuleIsomorphism(M1, M2, m)
 end
 
-function module_isomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
+function module_isomorphism(M1::Module, M2::Module, m::MatElem)
    Generic.ModuleIsomorphism(M1, M2, m)
 end
