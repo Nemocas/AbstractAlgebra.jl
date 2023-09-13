@@ -1,6 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
-DocTestSetup = :(using AbstractAlgebra)
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Map Interface
@@ -166,7 +168,7 @@ map are identity maps on the same domain.
 To construct an identity map for a given domain, specified by a parent object `R`, say,
 we have the following function.
 
-```julia
+```@docs
 identity_map(R::Set)
 ```
 
@@ -189,11 +191,9 @@ should be applied.
 
 To construct a composition map from two existing maps, we have the following function:
 
-```julia
-compose(f::Map{D, U}, g::Map{U, C}) where {D, U, C}
+```@docs
+compose(f::Map, g::Map)
 ```
-
-Compose the two maps $f$ and $g$, i.e. return the map $h$ such that $h(x) = g(f(x))$.
 
 As a shortcut for this function we have the following operator:
 

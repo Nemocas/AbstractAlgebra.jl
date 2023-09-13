@@ -62,7 +62,7 @@ codomain(f::IdentityMap) = f.domain
 
 function show(io::IO, ::MIME"text/plain", M::IdentityMap)
    io = pretty(io)
-   println("Identity map")
+   println(io, "Identity map")
    print(io, Indent(), "of ", Lowercase())
    show(io, MIME("text/plain"), domain(M))
    print(io, Dedent())
