@@ -919,6 +919,7 @@ export is_monomial
 export is_monomial_recursive
 export is_negative
 export is_popov
+export is_positive
 export is_reverse
 export is_rimhook
 export is_rref
@@ -1351,8 +1352,6 @@ include("algorithms/DensePoly.jl")
 #  For backwards compatibility
 #
 ###############################################################################
-
-function is_negative end
 
 include("Aliases.jl")
 
