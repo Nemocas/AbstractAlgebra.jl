@@ -478,4 +478,13 @@ let
   _, c = displaysize(io)
   print(io, AbstractAlgebra.Indent(), "a"^(c + 1))
   @test String(take!(io.io)) == "  " * "a"^(c + 1)
+
+  # Fix #1435
+  io = IOContext(AbstractAlgebra.pretty(IOBuffer()))
+  print(io, AbstractAlgebra.Indent(), sin)
+  @test String(take!(io.io)) == "  sin"
+  f = x-> 2*x
+  io = IOContext(AbstractAlgebra.pretty(IOBuffer()))
+  print(io, AbstractAlgebra.Indent(), f)
+  @test startswith(String(take!(io.io)), "  ")
 end
