@@ -1,5 +1,3 @@
-Base.:(:)(x::Int, y::Nothing) = 1:0
-
 export neg!
 
 function neg!(w::Vector{Int})
