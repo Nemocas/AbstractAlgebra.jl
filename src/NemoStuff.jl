@@ -245,13 +245,6 @@ function sub(M::Generic.Mat, rows::AbstractUnitRange{Int}, cols::AbstractUnitRan
     return z
 end
 
-right_kernel(M::MatElem) = nullspace(M)
-
-function left_kernel(M::MatElem)
-    rk, M1 = nullspace(transpose(M))
-    return rk, transpose(M1)
-end
-
 ################################################################################
 #
 #  Kernel over different rings
