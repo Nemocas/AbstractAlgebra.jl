@@ -88,5 +88,3 @@ function Base.showerror(io::IO, e::ErrorConstrDimMismatch)
     print(io, "got $(e.get_l)")
   end
 end
-
-const error_dim_negative = ErrorException("Dimensions must be non-negative")

@@ -223,7 +223,6 @@ export AdditiveGroupElem
 export crt
 export crt_with_lcm
 export elem_type
-export error_dim_negative
 export ErrorConstrDimMismatch
 export factor
 export factor_squarefree
