@@ -1546,6 +1546,8 @@ write_indent(io::IO) = write(_unwrap(io).io, io.indent_str^io.indent_level)
 
 write(io::IOCustom, chr::Char) = write(io, string(chr)) # Need to catch writing a '\n'
 
+write(io::IOCustom, chr::Symbol) = write(io, string(chr))
+
 _isbuffer(io::IOBuffer) = true
 _isbuffer(io::IO) = false
 _isbuffer(io::IOContext) = _isbuffer(io.io)
@@ -1638,6 +1640,8 @@ Base.write(io::IOContext{<: IOCustom}, s::Union{SubString{String}, String}) = Ba
 
 # println(io) redirects to print(io, '\n')
 Base.write(io::IOContext{<: IOCustom}, s::Char) = Base.write(Base.unwrapcontext(io)[1], s)
+
+Base.write(io::IOContext{<: IOCustom}, s::Symbol) = Base.write(Base.unwrapcontext(io)[1], s)
 
 Base.take!(io::IOCustom) = take!(io.io)
 
