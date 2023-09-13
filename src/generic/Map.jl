@@ -38,7 +38,7 @@ function show(io::IO, M::CompositeMap)
    else
      io = pretty(io)
       print(io, "Map: ", Lowercase(), domain(M))
-      h = map2(m)
+      h = map2(M)
       while h isa FunctionalCompositeMap || h isa CompositeMap
         print(io, " -> ", Lowercase(), domain(h))
         h = map2(h)
@@ -69,11 +69,11 @@ function show(io::IO, ::MIME"text/plain", M::IdentityMap)
 end
 
 function show(io::IO, M::IdentityMap)
-   io = pretty(io)
    if get(io, :supercompact, false)
       # no nested printing
       print(io, "Identity map")
    else
+      io = pretty(io)
       print(io, "Identity map of ", Lowercase(), domain(M))
    end
 end
@@ -121,12 +121,12 @@ function Base.show(io::IO, ::MIME"text/plain", M::FunctionalMap)
 end
 
 function Base.show(io::IO, M::AbstractAlgebra.Map)
-   io = pretty(io)
    if get(io, :supercompact, false)
       # no nested printing
       print(io, "Map")
    else
       # nested printing allowed, preferably supercompact
+      io = pretty(io)
       print(io, "Map: ")
       print(IOContext(io, :supercompact => true), Lowercase(), domain(M), " -> ")
       print(IOContext(io, :supercompact => true), Lowercase(), codomain(M))
@@ -190,11 +190,11 @@ function show(io::IO, ::MIME"text/plain", M::FunctionalCompositeMap)
 end
 
 function show(io::IO, M::FunctionalCompositeMap)
-   io = pretty(io)
    if get(io, :supercompact, false)
       # no nested printing
       print(io, "Composite map")
    else
+      io = pretty(io)
       print(io, "Map: ", Lowercase(), domain(M))
       h = map2(M)
       while h isa FunctionalCompositeMap

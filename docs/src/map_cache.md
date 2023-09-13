@@ -48,15 +48,9 @@ Caches can also be turned on and off at run time (see below).
 
 ```jldoctest
 julia> f = map_from_func(x -> x + 1, ZZ, ZZ)
-Map with the following data
-
-Domain:
-=======
-Integers
-
-Codomain:
-========
-Integers
+Map defined by a Julia function
+  from integers
+  to integers
 
 julia> g = cached(f);
 
