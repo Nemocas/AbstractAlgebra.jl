@@ -739,11 +739,11 @@ Rationals
 ### Symmetry testing
 
 ```@docs
-is_symmetric(a::MatrixElem{T}) where T <: RingElement
+is_symmetric(::MatrixElem)
 ```
 
 ```@docs
-is_skew_symmetric(::MatElem)
+is_skew_symmetric(::MatrixElem)
 ```
 
 ### Powering

@@ -136,17 +136,6 @@ end
 
 base_ring(::Vector{Int}) = Int
 
-function is_symmetric(M::MatElem)
-    for i in 1:nrows(M)
-        for j in i:ncols(M)
-            if M[i, j] != M[j, i]
-                return false
-            end
-        end
-    end
-    return true
-end
-
 nrows(A::Matrix{T}) where {T} = size(A)[1]
 ncols(A::Matrix{T}) where {T} = size(A)[2]
 

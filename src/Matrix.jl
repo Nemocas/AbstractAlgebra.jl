@@ -1272,10 +1272,10 @@ end
 ###############################################################################
 
 """
-    is_symmetric(a::MatrixElem{T}) where T <: RingElement
+    is_symmetric(M::MatrixElem)
 
 Return `true` if the given matrix is symmetric with respect to its main
-diagonal, i.e., `tr(M) == M`, otherwise return `false`.
+diagonal, i.e., `transpose(M) == M`, otherwise return `false`.
 
 Alias for `LinearAlgebra.issymmetric`.
 
@@ -1299,18 +1299,13 @@ julia> is_symmetric(N)
 false
 ```
 """
-function is_symmetric(a::MatrixElem{T}) where T <: NCRingElement
-    if !is_square(a)
-        return false
-    end
-    for row in 2:nrows(a)
-        for col in 1:(row - 1)
-            if a[row, col] != a[col, row]
-                return false
-            end
-        end
-    end
-    return true
+function is_symmetric(M::MatrixElem)
+   n = nrows(M)
+   n == ncols(M) || return false
+   for i in 2:n, j in 1:i-1
+      M[i, j] == M[j, i] || return false
+   end
+   return true
 end
 
 
@@ -2406,10 +2401,10 @@ end
 ###############################################################################
 
 """
-    is_skew_symmetric(M::MatElem)
+    is_skew_symmetric(M::MatrixElem)
 
 Return `true` if the given matrix is skew symmetric with respect to its main
-diagonal, i.e., `tr(M) == -M`, otherwise return `false`.
+diagonal, i.e., `transpose(M) == -M`, otherwise return `false`.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -2423,7 +2418,7 @@ true
 
 ```
 """
-function is_skew_symmetric(M::MatElem)
+function is_skew_symmetric(M::MatrixElem)
    n = nrows(M)
    n == ncols(M) || return false
    for i in 1:n, j in 1:i
