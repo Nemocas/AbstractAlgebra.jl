@@ -3864,17 +3864,17 @@ end
 ###############################################################################
 
 @doc raw"""
-    left_kernel(a::MatElem{T}) where T <: RingElement
+    left_kernel(A::MatElem{T}) where T <: RingElement
 
-Return a tuple `n, M` where $M$ is a matrix whose rows generate the kernel
-of $M$ and $n$ is the rank of the kernel. The transpose of the output of this
+Return a tuple $(n, M)$ where $M$ is a matrix whose rows generate the kernel
+of $A$ and $n$ is the rank of the kernel. The transpose of the output of this
 function is guaranteed to be in flipped upper triangular format (i.e. upper
 triangular format if columns and rows are reversed).
 """
-function left_kernel(x::MatElem{T}) where T <: RingElement
-   !is_domain_type(elem_type(base_ring(x))) && error("Not implemented")
-   R = base_ring(x)
-   H, U = hnf_with_transform(x)
+function left_kernel(A::MatElem{T}) where T <: RingElement
+   !is_domain_type(elem_type(base_ring(A))) && error("Not implemented")
+   R = base_ring(A)
+   H, U = hnf_with_transform(A)
    i = nrows(H)
    zero_rows = false
    while i > 0 && is_zero_row(H, i)
@@ -3888,30 +3888,30 @@ function left_kernel(x::MatElem{T}) where T <: RingElement
    end
 end
 
-function left_kernel(M::MatElem{T}) where T <: FieldElement
-  n, N = nullspace(transpose(M))
-  return n, transpose(N)
+function left_kernel(A::MatElem{T}) where T <: FieldElement
+  n, M = nullspace(transpose(A))
+  return n, transpose(M)
 end
 
 @doc raw"""
-    right_kernel(a::MatElem{T}) where T <: RingElement
+    right_kernel(A::MatElem{T}) where T <: RingElement
 
-Return a tuple `n, M` where $M$ is a matrix whose columns generate the
-kernel of $a$ and $n$ is the rank of the kernel.
+Return a tuple $(n, M)$ where $M$ is a matrix whose columns generate the
+kernel of $A$ and $n$ is the rank of the kernel.
 """
-function right_kernel(x::MatElem{T}) where T <: RingElement
-   n, M = left_kernel(transpose(x))
+function right_kernel(A::MatElem{T}) where T <: RingElement
+   n, M = left_kernel(transpose(A))
    return n, transpose(M)
 end
 
-function right_kernel(M::MatElem{T}) where T <: FieldElement
-   return nullspace(M)
+function right_kernel(A::MatElem{T}) where T <: FieldElement
+   return nullspace(A)
 end
 
 @doc raw"""
-    kernel(a::MatElem{T}; side::Symbol = :right) where T <: RingElement
+    kernel(A::MatElem{T}; side::Symbol = :right) where T <: RingElement
 
-Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $a$ and $M$ is a
+Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $A$ and $M$ is a
 basis for it. If side is `:right` or not specified, the right kernel is
 computed, i.e. the matrix of columns whose span gives the right kernel
 space. If side is `:left`, the left kernel is computed, i.e. the matrix
@@ -3934,17 +3934,17 @@ end
 ################################################################################
 
 @doc raw"""
-    kernel(a::MatElem{T}; R::Ring, side::Symbol = :right) where T <: RingElement
+    kernel(A::MatElem{T}; R::Ring, side::Symbol = :right) where T <: RingElement
 
-Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $a$ over $R$ and $M$ is a
+Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $A$ over $R$ and $M$ is a
 basis for it. If side is `:right` or not specified, the right kernel is
 computed, i.e. the matrix of columns whose span gives the right kernel
 space. If side is `:left`, the left kernel is computed, i.e. the matrix
 of rows whose span is the left kernel space.
 """
-function kernel(M::MatElem{T}, R::Ring; side::Symbol=:right) where T <: RingElement
-    MP = change_base_ring(R, M)
-    return kernel(MP; side)
+function kernel(A::MatElem{T}, R::Ring; side::Symbol=:right) where T <: RingElement
+    AR = change_base_ring(R, A)
+    return kernel(AR; side)
 end
 
 ###############################################################################
