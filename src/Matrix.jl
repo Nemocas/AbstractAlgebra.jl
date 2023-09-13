@@ -4260,11 +4260,12 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
 end
 
 @doc raw"""
-    charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
+    charpoly(Y::MatrixElem{T}) where {T <: RingElement}
+    charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
 
-Return the characteristic polynomial $p$ of the matrix $M$. The
-polynomial ring $R$ of the resulting polynomial must be supplied
-and the matrix is assumed to be square.
+Return the characteristic polynomial $p$ of the square matrix $Y$.
+If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
+the resulting polynomial is an element of it.
 
 # Examples
 
@@ -4276,8 +4277,8 @@ julia> S = matrix_space(R, 4, 4)
 Matrix space of 4 rows and 4 columns
   over residue ring of integers modulo 7
 
-julia> T, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over residue ring, x)
+julia> T, y = polynomial_ring(R, "y")
+(Univariate polynomial ring in y over residue ring, y)
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
@@ -4287,17 +4288,20 @@ julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
 [1   1   3   5]
 
 julia> A = charpoly(T, M)
+y^4 + 2*y^2 + 6*y + 2
+
+julia> A = charpoly(M)
 x^4 + 2*x^2 + 6*x + 2
 
 ```
 """
-function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
+function charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
    !is_square(Y) && error("Dimensions don't match in charpoly")
    R = base_ring(Y)
-   base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
+   base_ring(S) != base_ring(Y) && error("Cannot coerce into polynomial ring")
    n = nrows(Y)
    if n == 0
-      return one(V)
+      return one(S)
    end
    F = Vector{elem_type(R)}(undef, n)
    A = Vector{elem_type(R)}(undef, n)
@@ -4336,12 +4340,18 @@ function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
          F[j] = -s - A[j]
      end
    end
-   z = gen(V)
+   z = gen(S)
    f = z^n
    for i = 1:n
       f = setcoeff!(f, n - i, F[i])
    end
    return f
+end
+
+function charpoly(Y::MatrixElem)
+   R = base_ring(Y)
+   Rx, x = polynomial_ring(R; cached=false)
+   return charpoly(Rx, Y)
 end
 
 ###############################################################################

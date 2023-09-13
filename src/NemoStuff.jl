@@ -210,7 +210,7 @@ Base.copy(a::SeriesElem) = deepcopy(a)
 
 ################################################################################
 #
-#  Minpoly and Charpoly
+#  Minpoly
 #
 ################################################################################
 
@@ -218,12 +218,6 @@ function minpoly(M::MatElem)
     k = base_ring(M)
     kx, x = polynomial_ring(k, cached=false)
     return minpoly(kx, M)
-end
-
-function charpoly(M::MatElem)
-    k = base_ring(M)
-    kx, x = polynomial_ring(k, cached=false)
-    return charpoly(kx, M)
 end
 
 ###############################################################################
