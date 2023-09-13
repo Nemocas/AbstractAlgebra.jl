@@ -204,24 +204,6 @@ Base.copy(f::Generic.Poly) = deepcopy(f)
 Base.copy(a::PolyRingElem) = deepcopy(a)
 Base.copy(a::SeriesElem) = deepcopy(a)
 
-################################################################################
-#
-#  Minpoly and Charpoly
-#
-################################################################################
-
-function minpoly(M::MatElem)
-    k = base_ring(M)
-    kx, x = polynomial_ring(k, cached=false)
-    return minpoly(kx, M)
-end
-
-function charpoly(M::MatElem)
-    k = base_ring(M)
-    kx, x = polynomial_ring(k, cached=false)
-    return charpoly(kx, M)
-end
-
 ###############################################################################
 #
 #  Sub
@@ -257,30 +239,6 @@ function sub(M::Generic.Mat, rows::AbstractUnitRange{Int}, cols::AbstractUnitRan
         end
     end
     return z
-end
-
-right_kernel(M::MatElem) = nullspace(M)
-
-function left_kernel(M::MatElem)
-    rk, M1 = nullspace(transpose(M))
-    return rk, transpose(M1)
-end
-
-################################################################################
-#
-#  Kernel over different rings
-#
-################################################################################
-
-@doc raw"""
-    kernel(a::MatrixElem{T}, R::Ring; side::Symbol = :right) -> n, MatElem{elem_type(R)}
-
-It returns a tuple $(n, M)$, where $n$ is the rank of the kernel over $R$ and $M$ is a basis for it. If side is $:right$ or not
-specified, the right kernel is computed. If side is $:left$, the left kernel is computed.
-"""
-function kernel(M::MatrixElem, R::Ring; side::Symbol=:right)
-    MP = change_base_ring(R, M)
-    return kernel(MP, side=side)
 end
 
 ################################################################################

@@ -3864,17 +3864,17 @@ end
 ###############################################################################
 
 @doc raw"""
-    left_kernel(a::MatElem{T}) where T <: RingElement
+    left_kernel(A::MatElem{T}) where T <: RingElement
 
-Return a tuple `n, M` where $M$ is a matrix whose rows generate the kernel
-of $M$ and $n$ is the rank of the kernel. The transpose of the output of this
+Return a tuple $(n, M)$ where $M$ is a matrix whose rows generate the kernel
+of $A$ and $n$ is the rank of the kernel. The transpose of the output of this
 function is guaranteed to be in flipped upper triangular format (i.e. upper
 triangular format if columns and rows are reversed).
 """
-function left_kernel(x::MatElem{T}) where T <: RingElement
-   !is_domain_type(elem_type(base_ring(x))) && error("Not implemented")
-   R = base_ring(x)
-   H, U = hnf_with_transform(x)
+function left_kernel(A::MatElem{T}) where T <: RingElement
+   !is_domain_type(elem_type(base_ring(A))) && error("Not implemented")
+   R = base_ring(A)
+   H, U = hnf_with_transform(A)
    i = nrows(H)
    zero_rows = false
    while i > 0 && is_zero_row(H, i)
@@ -3888,30 +3888,30 @@ function left_kernel(x::MatElem{T}) where T <: RingElement
    end
 end
 
-function left_kernel(M::MatElem{T}) where T <: FieldElement
-  n, N = nullspace(transpose(M))
-  return n, transpose(N)
+function left_kernel(A::MatElem{T}) where T <: FieldElement
+  n, M = nullspace(transpose(A))
+  return n, transpose(M)
 end
 
 @doc raw"""
-    right_kernel(a::MatElem{T}) where T <: RingElement
+    right_kernel(A::MatElem{T}) where T <: RingElement
 
-Return a tuple `n, M` where $M$ is a matrix whose columns generate the
-kernel of $a$ and $n$ is the rank of the kernel.
+Return a tuple $(n, M)$ where $M$ is a matrix whose columns generate the
+kernel of $A$ and $n$ is the rank of the kernel.
 """
-function right_kernel(x::MatElem{T}) where T <: RingElement
-   n, M = left_kernel(transpose(x))
+function right_kernel(A::MatElem{T}) where T <: RingElement
+   n, M = left_kernel(transpose(A))
    return n, transpose(M)
 end
 
-function right_kernel(M::MatElem{T}) where T <: FieldElement
-   return nullspace(M)
+function right_kernel(A::MatElem{T}) where T <: FieldElement
+   return nullspace(A)
 end
 
 @doc raw"""
-    kernel(a::MatElem{T}; side::Symbol = :right) where T <: RingElement
+    kernel(A::MatElem{T}; side::Symbol = :right) where T <: RingElement
 
-Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $a$ and $M$ is a
+Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $A$ and $M$ is a
 basis for it. If side is `:right` or not specified, the right kernel is
 computed, i.e. the matrix of columns whose span gives the right kernel
 space. If side is `:left`, the left kernel is computed, i.e. the matrix
@@ -3925,6 +3925,26 @@ function kernel(A::MatElem{T}; side::Symbol = :right) where T <: RingElement
    else
       error("Unsupported argument: :$side for side: must be :left or :right")
    end
+end
+
+################################################################################
+#
+#  Kernel over different rings
+#
+################################################################################
+
+@doc raw"""
+    kernel(A::MatElem{T}; R::Ring, side::Symbol = :right) where T <: RingElement
+
+Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $A$ over $R$ and $M$ is a
+basis for it. If side is `:right` or not specified, the right kernel is
+computed, i.e. the matrix of columns whose span gives the right kernel
+space. If side is `:left`, the left kernel is computed, i.e. the matrix
+of rows whose span is the left kernel space.
+"""
+function kernel(A::MatElem{T}, R::Ring; side::Symbol=:right) where T <: RingElement
+    AR = change_base_ring(R, A)
+    return kernel(AR; side)
 end
 
 ###############################################################################
@@ -4260,11 +4280,12 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
 end
 
 @doc raw"""
-    charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
+    charpoly(Y::MatrixElem{T}) where {T <: RingElement}
+    charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
 
-Return the characteristic polynomial $p$ of the matrix $M$. The
-polynomial ring $R$ of the resulting polynomial must be supplied
-and the matrix is assumed to be square.
+Return the characteristic polynomial $p$ of the square matrix $Y$.
+If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
+the resulting polynomial is an element of it.
 
 # Examples
 
@@ -4276,8 +4297,8 @@ julia> S = matrix_space(R, 4, 4)
 Matrix space of 4 rows and 4 columns
   over residue ring of integers modulo 7
 
-julia> T, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over residue ring, x)
+julia> T, y = polynomial_ring(R, "y")
+(Univariate polynomial ring in y over residue ring, y)
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
@@ -4287,17 +4308,20 @@ julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
 [1   1   3   5]
 
 julia> A = charpoly(T, M)
+y^4 + 2*y^2 + 6*y + 2
+
+julia> A = charpoly(M)
 x^4 + 2*x^2 + 6*x + 2
 
 ```
 """
-function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
+function charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
    !is_square(Y) && error("Dimensions don't match in charpoly")
    R = base_ring(Y)
-   base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
+   base_ring(S) != base_ring(Y) && error("Cannot coerce into polynomial ring")
    n = nrows(Y)
    if n == 0
-      return one(V)
+      return one(S)
    end
    F = Vector{elem_type(R)}(undef, n)
    A = Vector{elem_type(R)}(undef, n)
@@ -4336,12 +4360,18 @@ function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
          F[j] = -s - A[j]
      end
    end
-   z = gen(V)
+   z = gen(S)
    f = z^n
    for i = 1:n
       f = setcoeff!(f, n - i, F[i])
    end
    return f
+end
+
+function charpoly(Y::MatrixElem)
+   R = base_ring(Y)
+   Rx, x = polynomial_ring(R; cached=false)
+   return charpoly(Rx, Y)
 end
 
 ###############################################################################
@@ -4366,7 +4396,7 @@ end
 # charpoly iff it has degree n. Otherwise it is meaningless (but it is
 # extremely fast to compute over some fields).
 
-function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
+function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
    !is_square(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
@@ -4457,10 +4487,12 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
 end
 
 @doc raw"""
-    minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+    minpoly(M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+    minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
 
-Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
-of the resulting polynomial must be supplied and the matrix must be square.
+Return the minimal polynomial $p$ of the square matrix $M$.
+If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
+the resulting polynomial is an element of it.
 
 # Examples
 
@@ -4468,7 +4500,7 @@ of the resulting polynomial must be supplied and the matrix must be square.
 julia> R = GF(13)
 Finite field F_13
 
-julia> T, y = polynomial_ring(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate polynomial ring in y over finite field F_13, y)
 
 julia> M = R[7 6 1;
@@ -4478,12 +4510,15 @@ julia> M = R[7 6 1;
 [7    7   5]
 [8   12   5]
 
-julia> A = minpoly(T, M)
+julia> A = minpoly(S, M)
 y^2 + 10*y
+
+julia> A = minpoly(M)
+x^2 + 10*x
 
 ```
 """
-function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
    !is_square(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
@@ -4581,6 +4616,12 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
       first_poly = false
    end
    return divexact(p, canonical_unit(p))
+end
+
+function minpoly(M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+   R = base_ring(M)
+   Rx, x = polynomial_ring(R; cached=false)
+   return minpoly(Rx, M, charpoly_only)
 end
 
 ###############################################################################

@@ -1208,13 +1208,13 @@ true
 ### Characteristic polynomial
 
 ```@docs
-charpoly{T <: RingElem}(::Ring, ::MatElem{T})
+charpoly{T <: RingElem}(::PolyRing{T}, ::MatrixElem{T})
 ```
 
 ### Minimal polynomial
 
 ```@docs
-minpoly{T <: RingElem}(::Ring, ::MatElem{T}, ::Bool)
+minpoly{T <: RingElem}(::PolyRing{T}, ::MatElem{T}, ::Bool)
 ```
 
 ### Transforms
