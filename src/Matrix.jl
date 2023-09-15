@@ -7000,30 +7000,26 @@ function diagonal_matrix(R::NCRing, x::Vector{<:NCRingElement})
 end
 
 function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
-    return diagonal_matrix(collect((x, xs...)))
+    return diagonal_matrix([x, xs...])
 end
 
 diagonal_matrix(x::Vector{<:NCRingElement}) = diagonal_matrix(parent(x[1]), x)
 
 @doc raw"""
-    diagonal_matrix(x::Vector{T}) where T <: MatElem -> MatElem
+    diagonal_matrix(V::Vector{T}) where T <: MatElem -> MatElem
 
 Returns a block diagonal matrix whose diagonal blocks are the matrices in $x$.
 """
-function diagonal_matrix(x::Vector{T}) where {T<:MatElem}
-    return cat(x..., dims=(1, 2))::T
+function diagonal_matrix(V::Vector{T}) where {T<:MatElem}
+    return block_diagonal_matrix(V)
 end
 
 function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
-    return cat(x, xs..., dims=(1, 2))::T
+    return block_diagonal_matrix([x, xs...])
 end
 
-function diagonal_matrix(R::NCRing, x::Vector{<:MatElem})
-    if length(x) == 0
-        return zero_matrix(R, 0, 0)
-    end
-    x = [change_base_ring(R, i) for i in x]
-    return diagonal_matrix(x)
+function diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
+    return block_diagonal_matrix(R, V)
 end
 
 
