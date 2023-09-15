@@ -21,3 +21,11 @@ end
 @deprecate factor(f::PolyRingElem, R::Field) factor(R, f)
 
 @deprecate roots(f::PolyRingElem, R::Field) roots(R, f)
+
+# Deprecated in 0.32.*
+
+@deprecate zero_matrix(::Type{MatElem}, R::Ring, n::Int) zero_matrix(R, n)
+
+@deprecate zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) zero_matrix(R, n, m)
+
+@deprecate identity_matrix(::Type{MatElem}, R::Ring, n::Int) identity_matrix(R, n)

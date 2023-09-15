@@ -78,14 +78,6 @@ ncols(A::Matrix{T}) where {T} = size(A)[2]
 
 zero_matrix(::Type{Int}, r, c) = zeros(Int, r, c)
 
-function zero_matrix(::Type{MatElem}, R::Ring, n::Int)
-    return zero_matrix(R, n)
-end
-
-function zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
-    return zero_matrix(R, n, m)
-end
-
 function matrix(A::Matrix{T}) where {T<:RingElem}
     r, c = size(A)
     (r < 0 || c < 0) && error("Array must be non-empty")
@@ -106,10 +98,6 @@ function scalar_matrix(R::Ring, n::Int, a::RingElement)
         z[i, i] = b
     end
     return z
-end
-
-function identity_matrix(::Type{MatElem}, R::Ring, n::Int)
-    return identity_matrix(R, n)
 end
 
 function is_zero_row(M::Matrix, i::Int)
