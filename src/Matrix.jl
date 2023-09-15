@@ -6882,12 +6882,6 @@ Return the $n \times n$ identity matrix over $R$.
 """
 identity_matrix(R::NCRing, n::Int) = diagonal_matrix(one(R), n)
 
-################################################################################
-#
-#   Identity matrix
-#
-################################################################################
-
 @doc raw"""
     identity_matrix(M::MatElem{T}) where T <: NCRingElement
 
@@ -6906,6 +6900,29 @@ function identity_matrix(M::MatElem{T}, n::Int) where T <: NCRingElement
       z[i, i] = one(R)
    end
    z
+end
+
+################################################################################
+#
+#   Scalar matrix
+#
+################################################################################
+
+export scalar_matrix
+
+@doc raw"""
+    scalar_matrix(R::Ring, n::Int, a::RingElement)
+    scalar_matrix(n::Int, a::RingElement)
+
+Return the $n \times n$ matrix over `R` with `a` along the main diagonal and
+zeroes elsewhere. If `R` is not specified, it defaults to `parent(a)`.
+"""
+function scalar_matrix(R::Ring, n::Int, a::RingElement)
+   return diagonal_matrix(R(a), n)
+end
+
+function scalar_matrix(n::Int, a::RingElement)
+   return diagonal_matrix(a, n)
 end
 
 ################################################################################

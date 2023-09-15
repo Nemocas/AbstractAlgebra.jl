@@ -81,17 +81,6 @@ function zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
     return zero_matrix(R, n, m)
 end
 
-export scalar_matrix
-
-function scalar_matrix(R::Ring, n::Int, a::RingElement)
-    b = R(a)
-    z = zero_matrix(R, n, n)
-    for i in 1:n
-        z[i, i] = b
-    end
-    return z
-end
-
 function identity_matrix(::Type{MatElem}, R::Ring, n::Int)
     return identity_matrix(R, n)
 end
