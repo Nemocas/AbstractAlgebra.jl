@@ -598,8 +598,6 @@ function set_precision(a::SeriesElem, i::Int)
     return b
 end
 
-ngens(R::MPolyRing) = nvars(R)
-
 Random.gentype(::Type{T}) where {T<:FinField} = elem_type(T)
 
 import LinearAlgebra
