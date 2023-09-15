@@ -6817,7 +6817,7 @@ function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
    end
 end
 
-function matrix(arr::AbstractMatrix{T}) where {T<:RingElem}
+function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElem}
    r, c = size(arr)
    (r < 0 || c < 0) && error("Array must be non-empty")
    R = parent(arr[1, 1])
@@ -6825,8 +6825,16 @@ function matrix(arr::AbstractMatrix{T}) where {T<:RingElem}
    return matrix(R, arr)
 end
 
-function matrix(arr::AbstractVector{T}) where {T<:RingElem}
+function matrix(arr::AbstractVector{T}) where {T<:NCRingElem}
    return matrix(reshape(arr, length(arr), 1))
+end
+
+function matrix(arr::Vector{Vector{T}}) where {T<:NCRingElem}
+    return matrix(permutedims(reduce(hcat, arr), (2, 1)))
+end
+
+function matrix(R::NCRing, arr::Vector{<:Vector})
+   return matrix(R, permutedims(reduce(hcat, arr), (2, 1)))
 end
 
 @doc raw"""
@@ -6911,17 +6919,17 @@ end
 export scalar_matrix
 
 @doc raw"""
-    scalar_matrix(R::Ring, n::Int, a::RingElement)
-    scalar_matrix(n::Int, a::RingElement)
+    scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
+    scalar_matrix(n::Int, a::NCRingElement)
 
 Return the $n \times n$ matrix over `R` with `a` along the main diagonal and
 zeroes elsewhere. If `R` is not specified, it defaults to `parent(a)`.
 """
-function scalar_matrix(R::Ring, n::Int, a::RingElement)
+function scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
    return diagonal_matrix(R(a), n)
 end
 
-function scalar_matrix(n::Int, a::RingElement)
+function scalar_matrix(n::Int, a::NCRingElement)
    return diagonal_matrix(a, n)
 end
 
@@ -6932,7 +6940,7 @@ end
 ################################################################################
 
 @doc raw"""
-    diagonal_matrix(x::RingElement, m::Int, [n::Int])
+    diagonal_matrix(x::NCRingElement, m::Int, [n::Int])
 
 Return the $m \times n$ matrix over $R$ with `x` along the main diagonal and
 zeroes elsewhere. If `n` is not specified, it defaults to `m`.

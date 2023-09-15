@@ -38,33 +38,6 @@ function valuation(z::Rational{T}, p::T) where {T<:Integer}
     return w - v
 end
 
-function matrix(a::Vector{Vector{T}}) where {T}
-    return matrix(permutedims(reduce(hcat, a), (2, 1)))
-end
-
-################################################################################
-#
-#  Create a matrix from rows
-#
-################################################################################
-
-function matrix(K::Ring, R::Vector{<:Vector})
-    if length(R) == 0
-        return zero_matrix(K, 0, 0)
-    else
-        n = length(R)
-        m = length(R[1])
-        z = zero_matrix(K, n, m)
-        for i in 1:n
-            @assert length(R[i]) == m
-            for j in 1:m
-                z[i, j] = R[i][j]
-            end
-        end
-        return z
-    end
-end
-
 base_ring(::Vector{Int}) = Int
 
 ################################################################################
