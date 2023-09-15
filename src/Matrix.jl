@@ -6817,6 +6817,18 @@ function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
    end
 end
 
+function matrix(arr::AbstractMatrix{T}) where {T<:RingElem}
+   r, c = size(arr)
+   (r < 0 || c < 0) && error("Array must be non-empty")
+   R = parent(arr[1, 1])
+   all(e -> parent(e) === R, arr) || errpr("Non-compatible elements")
+   return matrix(R, arr)
+end
+
+function matrix(arr::AbstractVector{T}) where {T<:RingElem}
+   return matrix(reshape(arr, length(arr), 1))
+end
+
 @doc raw"""
     matrix(R::Ring, r::Int, c::Int, arr::AbstractVector{T}) where {T}
 

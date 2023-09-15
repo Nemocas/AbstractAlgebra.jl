@@ -81,17 +81,6 @@ function zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
     return zero_matrix(R, n, m)
 end
 
-function matrix(A::Matrix{T}) where {T<:RingElem}
-    r, c = size(A)
-    (r < 0 || c < 0) && error("Array must be non-empty")
-    m = matrix(parent(A[1, 1]), A)
-    return m
-end
-
-function matrix(A::Vector{T}) where {T<:RingElem}
-    return matrix(reshape(A, length(A), 1))
-end
-
 export scalar_matrix
 
 function scalar_matrix(R::Ring, n::Int, a::RingElement)
