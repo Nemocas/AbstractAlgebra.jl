@@ -6821,7 +6821,7 @@ function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElem}
    r, c = size(arr)
    (r < 0 || c < 0) && error("Array must be non-empty")
    R = parent(arr[1, 1])
-   all(e -> parent(e) === R, arr) || errpr("Non-compatible elements")
+   all(e -> parent(e) === R, arr) || error("Non-compatible elements")
    return matrix(R, arr)
 end
 
