@@ -285,6 +285,7 @@ end
       @test ord == ordering(S)
 
       @test nvars(parent(f)) == num_vars
+      @test ngens(parent(f)) == num_vars
 
       @test isone(one(S))
 
