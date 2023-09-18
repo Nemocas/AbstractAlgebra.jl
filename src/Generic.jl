@@ -216,6 +216,7 @@ import ..AbstractAlgebra: order
 import ..AbstractAlgebra: parent_type
 import ..AbstractAlgebra: Perm
 import ..AbstractAlgebra: pol_length
+import ..AbstractAlgebra: preimage
 import ..AbstractAlgebra: pretty
 import ..AbstractAlgebra: primpart
 import ..AbstractAlgebra: promote_rule
