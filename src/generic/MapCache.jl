@@ -9,7 +9,7 @@ codomain(M::MapCache{D, C}) where {D, C} = codomain(M.map)::C
 image_fn(M::MapCache{D, C}) where {D, C} = image_fn(M.map)
 
 function set_limit!(M::MapCache, limit::Int)
-   limit < 0 && error("Limit must be nonnegative")
+   limit < 0 && error("Limit must be non-negative")
    M.limit = limit
 end
 

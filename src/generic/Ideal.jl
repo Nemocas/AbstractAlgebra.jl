@@ -1576,7 +1576,7 @@ function reduce_tail(f::T, V::AbstractVector{T}, res::U) where {U <: RingElement
             i -= 1
          end
          if i != 0 && !iszero(c)
-            h = leading_coefficient(V[i]) # should be nonnegative
+            h = leading_coefficient(V[i]) # should be non-negative
             q, r = AbstractAlgebra.divrem(c, h)
             u = shift_left(V[i], n - length(V[i]))
             p -= q*u
@@ -1608,7 +1608,7 @@ function normal_form(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractA
             i -= 1
          end
          if i != 0 && !iszero(c)
-            h = leading_coefficient(V[i]) # should be nonnegative
+            h = leading_coefficient(V[i]) # should be non-negative
             q, r = AbstractAlgebra.divrem(c, h)
             u = shift_left(V[i], n - length(V[i]))
             p -= q*u       

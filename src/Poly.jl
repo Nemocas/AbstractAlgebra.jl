@@ -2890,7 +2890,7 @@ function polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T 
     degree(f) < 1 && error("Polynomial has no roots")
     !is_monic(f) && error("Requires monic polynomial")
     iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
-    n < 0 && throw(DomainError(n, "number of terms must be nonnegative"))
+    n < 0 && throw(DomainError(n, "number of terms must be non-negative"))
     d = degree(f)
     R = base_ring(f)
     # Beware: converting to power series and derivative do not commute
@@ -2917,7 +2917,7 @@ function polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T 
     degree(f) < 1 && error("Polynomial has no roots")
     !is_monic(f) && error("Requires monic polynomial")
     iszero(constant_coefficient(f)) && error("Requires nonzero constant coefficient")
-    n < 0 && throw(DomainError(n, "number of terms must be nonnegative"))
+    n < 0 && throw(DomainError(n, "number of terms must be non-negative"))
     d = degree(f)
     R = base_ring(f)
     if n == 0
