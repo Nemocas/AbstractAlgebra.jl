@@ -6916,8 +6916,6 @@ end
 #
 ################################################################################
 
-export scalar_matrix
-
 @doc raw"""
     scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
     scalar_matrix(n::Int, a::NCRingElement)
