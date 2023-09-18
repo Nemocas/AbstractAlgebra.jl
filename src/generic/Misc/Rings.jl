@@ -28,3 +28,59 @@ function root(a::RingElem, n::Int)
     return b
 end
 
+@doc raw"""
+    rising_factorial(x::RingElement, n::Integer)
+
+Return the rising factorial of $x$, i.e. $x(x + 1)(x + 2)\cdots (x + n - 1)$.
+If $n < 0$ we throw a `DomainError()`.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, x = ZZ[:x];
+
+julia> rising_factorial(x, 1)
+x
+
+julia> rising_factorial(x, 2)
+x^2 + x
+
+julia> rising_factorial(4, 2)
+20
+```
+"""
+function rising_factorial(x::RingElement, n::Integer)
+  n < 0 && throw(DomainError(n, "Argument must be non-negative"))
+  n == 0 && return one(x)
+  return prod(x+i-1 for i in 1:Int(n))
+end
+
+@doc raw"""
+    rising_factorial2(x::RingElement, n::Integer)
+
+Return a tuple containing the rising factorial $x(x + 1)\cdots (x + n - 1)$
+and its derivative.
+If $n < 0$ we throw a `DomainError()`.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, x = ZZ[:x];
+
+julia> rising_factorial2(x, 1)
+(x, 1)
+
+julia> rising_factorial2(x, 2)
+(x^2 + x, 2*x + 1)
+
+julia> rising_factorial2(4,2)
+(20, 9)
+```
+"""
+function rising_factorial2(x::RingElement, n::Integer)
+  n < 0 && throw(DomainError(n, "Argument must be non-negative"))
+  n == 0 && return (one(x), zero(x))
+  f, F = rising_factorial2(x, Int(n)-1)
+  # use product rule:  [(x+n-1)*f(x)]' = (x+n-1)'*f(x) + (x+n-1)*f'(x)
+  return (x+n-1)*f,  f + (x+n-1)*F
+end

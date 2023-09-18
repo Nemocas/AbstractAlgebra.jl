@@ -725,6 +725,8 @@ import .Generic: rels
 import .Generic: rescale!
 import .Generic: retraction_map
 import .Generic: reverse
+import .Generic: rising_factorial
+import .Generic: rising_factorial2
 import .Generic: rowlength
 import .Generic: section_map
 import .Generic: set_exponent_vector!
@@ -1093,6 +1095,8 @@ export reverse_cols!
 export reverse_rows
 export reverse_rows!
 export right_kernel
+export rising_factorial
+export rising_factorial2
 export rowlength
 export rref
 export rref_rational
