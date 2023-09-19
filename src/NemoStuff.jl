@@ -561,10 +561,6 @@ end
 
 Base.:\(f::Map, x) = preimage(f, x)
 
-function preimage(f::Generic.CompositeMap, a)
-    return preimage(f.map1, preimage(f.map2, a))
-end
-
 export set_precision, set_precision!
 
 function set_precision(f::PolyRingElem{T}, n::Int) where {T<:SeriesElem}
@@ -597,8 +593,6 @@ function set_precision(a::SeriesElem, i::Int)
     set_precision!(b, i)
     return b
 end
-
-ngens(R::MPolyRing) = nvars(R)
 
 Random.gentype(::Type{T}) where {T<:FinField} = elem_type(T)
 
