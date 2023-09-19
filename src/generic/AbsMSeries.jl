@@ -13,7 +13,7 @@
 
 function O(R::AbsMSeriesRing{T}, prec::Int) where T <: RingElement
     R.weighted_prec != -1 && error("Operation not possible in weighted rings")
-    prec < 0 && error("Precision must be nonnegative")
+    prec < 0 && error("Precision must be non-negative")
     return R(poly_ring(R)(), fill(prec, nvars(R)))
 end
 
