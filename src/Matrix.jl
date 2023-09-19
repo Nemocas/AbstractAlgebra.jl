@@ -6999,7 +6999,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+    lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
 Return the $n$ by $n$ matrix whose entries on and below the main diagonal are
 the elements of `L`, and which has zeroes elsewhere.
@@ -7015,7 +7015,7 @@ julia> lower_triangular_matrix([1, 2, 3])
 [2   3]
 ```
 """
-function lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+function lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
    l = length(L)
    l == 0 && throw(ArgumentError("Input vector must be nonempty"))
    (flag, m) = is_square_with_sqrt(8*l+1)
@@ -7038,7 +7038,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+    upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
 Return the $n$ by $n$ matrix whose entries on and above the main diagonal are
 the elements of `L`, and which has zeroes elsewhere.
@@ -7054,7 +7054,7 @@ julia> upper_triangular_matrix([1, 2, 3])
 [0   3]
 ```
 """
-function upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+function upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
    l = length(L)
    l == 0 && throw(ArgumentError("Input vector must be nonempty"))
    (flag, m) = is_square_with_sqrt(8*l+1)
@@ -7077,7 +7077,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+    strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
 Return the $n$ by $n$ matrix whose entries below the main diagonal are
 the elements of `L`, and which has zeroes elsewhere.
@@ -7094,7 +7094,7 @@ julia> strictly_lower_triangular_matrix([1, 2, 3])
 [2   3   0]
 ```
 """
-function strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+function strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
    l = length(L)
    l == 0 && throw(ArgumentError("Input vector must be nonempty"))
    (flag, m) = is_square_with_sqrt(8*l+1)
@@ -7117,7 +7117,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+    strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
 Return the $n$ by $n$ matrix whose entries above the main diagonal are
 the elements of `L`, and which has zeroes elsewhere.
@@ -7134,7 +7134,7 @@ julia> strictly_upper_triangular_matrix([1, 2, 3])
 [0   0   0]
 ```
 """
-function strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
+function strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
    l = length(L)
    l == 0 && throw(ArgumentError("Input vector must be nonempty"))
    (flag, m) = is_square_with_sqrt(8*l+1)
@@ -7173,7 +7173,7 @@ end
 ###############################################################################
 
 """
-    Matrix(A::MatrixElem{T}) where T <: RingElement
+    Matrix(A::MatrixElem{T}) where T <: NCRingElement
 
 Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
 
@@ -7189,10 +7189,10 @@ julia> Matrix(A)
  4  5  6
 ```
 """
-Matrix(M::MatrixElem{T}) where T <: RingElement = eltype(M)[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
+Matrix(M::MatrixElem{T}) where T <: NCRingElement = eltype(M)[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
 
 """
-    Array(A::MatrixElem{T}) where T <: RingElement
+    Array(A::MatrixElem{T}) where T <: NCRingElement
 
 Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
 
@@ -7208,4 +7208,4 @@ julia> Array(A)
  x^2  x^3
 ```
 """
-Array(M::MatrixElem{T}) where T <: RingElement = Matrix(M)
+Array(M::MatrixElem{T}) where T <: NCRingElement = Matrix(M)
