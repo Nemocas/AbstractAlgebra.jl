@@ -257,6 +257,7 @@ export mul!
 export NCPolyRingElem
 export NCRing
 export NCRingElem
+export NCRingElement
 export NotImplementedError
 export NotInvertibleError
 export NumField
