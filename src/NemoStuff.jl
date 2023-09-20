@@ -38,45 +38,13 @@ function valuation(z::Rational{T}, p::T) where {T<:Integer}
     return w - v
 end
 
-function matrix(a::Vector{Vector{T}}) where {T}
-    return matrix(permutedims(reduce(hcat, a), (2, 1)))
-end
-
-################################################################################
-#
-#  Create a matrix from rows
-#
-################################################################################
-
-function matrix(K::Ring, R::Vector{<:Vector})
-    if length(R) == 0
-        return zero_matrix(K, 0, 0)
-    else
-        n = length(R)
-        m = length(R[1])
-        z = zero_matrix(K, n, m)
-        for i in 1:n
-            @assert length(R[i]) == m
-            for j in 1:m
-                z[i, j] = R[i][j]
-            end
-        end
-        return z
-    end
-end
-
 base_ring(::Vector{Int}) = Int
-
-nrows(A::Matrix{T}) where {T} = size(A)[1]
-ncols(A::Matrix{T}) where {T} = size(A)[2]
 
 ################################################################################
 #
 #  Zero matrix constructors
 #
 ################################################################################
-
-zero_matrix(::Type{Int}, r, c) = zeros(Int, r, c)
 
 function zero_matrix(::Type{MatElem}, R::Ring, n::Int)
     return zero_matrix(R, n)
@@ -86,42 +54,9 @@ function zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
     return zero_matrix(R, n, m)
 end
 
-function matrix(A::Matrix{T}) where {T<:RingElem}
-    r, c = size(A)
-    (r < 0 || c < 0) && error("Array must be non-empty")
-    m = matrix(parent(A[1, 1]), A)
-    return m
-end
-
-function matrix(A::Vector{T}) where {T<:RingElem}
-    return matrix(reshape(A, length(A), 1))
-end
-
-export scalar_matrix
-
-function scalar_matrix(R::Ring, n::Int, a::RingElement)
-    b = R(a)
-    z = zero_matrix(R, n, n)
-    for i in 1:n
-        z[i, i] = b
-    end
-    return z
-end
-
 function identity_matrix(::Type{MatElem}, R::Ring, n::Int)
     return identity_matrix(R, n)
 end
-
-function is_zero_row(M::Matrix, i::Int)
-    for j = 1:ncols(M)
-        if !iszero(M[i, j])
-            return false
-        end
-    end
-    return true
-end
-
-# TODO: add `is_zero_column(M::Matrix{T}, i::Int) where {T<:Integer}` and specialized functions in Nemo
 
 dense_matrix_type(::Type{T}) where {T} = Generic.MatSpaceElem{T}
 

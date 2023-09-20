@@ -1103,6 +1103,7 @@ export rref
 export rref_rational
 export rref_rational!
 export rref!
+export scalar_matrix
 export section_map
 export set_attribute!
 export set_coefficient!
@@ -1291,6 +1292,14 @@ include("error.jl")
 ###############################################################################
 
 include("Groups.jl")
+
+################################################################################
+#
+#   Further functionality for Julia matrices
+#
+################################################################################
+
+include("julia/Matrix.jl")
 
 ################################################################################
 #

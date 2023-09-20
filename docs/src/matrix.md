@@ -398,6 +398,10 @@ identity_matrix(::MatElem{T}) where T <: RingElement
 ```
 
 ```@docs
+scalar_matrix(R::Ring, n::Int, a::RingElement)
+```
+
+```@docs
 diagonal_matrix(::RingElement, ::Int, ::Int)
 ```
 

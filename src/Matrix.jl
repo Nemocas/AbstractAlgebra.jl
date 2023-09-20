@@ -6817,6 +6817,26 @@ function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
    end
 end
 
+function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElem}
+   r, c = size(arr)
+   (r < 0 || c < 0) && error("Array must be non-empty")
+   R = parent(arr[1, 1])
+   all(e -> parent(e) === R, arr) || error("Non-compatible elements")
+   return matrix(R, arr)
+end
+
+function matrix(arr::AbstractVector{T}) where {T<:NCRingElem}
+   return matrix(reshape(arr, length(arr), 1))
+end
+
+function matrix(arr::Vector{Vector{T}}) where {T<:NCRingElem}
+    return matrix(permutedims(reduce(hcat, arr), (2, 1)))
+end
+
+function matrix(R::NCRing, arr::Vector{<:Vector})
+   return matrix(R, permutedims(reduce(hcat, arr), (2, 1)))
+end
+
 @doc raw"""
     matrix(R::Ring, r::Int, c::Int, arr::AbstractVector{T}) where {T}
 
@@ -6870,12 +6890,6 @@ Return the $n \times n$ identity matrix over $R$.
 """
 identity_matrix(R::NCRing, n::Int) = diagonal_matrix(one(R), n)
 
-################################################################################
-#
-#   Identity matrix
-#
-################################################################################
-
 @doc raw"""
     identity_matrix(M::MatElem{T}) where T <: NCRingElement
 
@@ -6898,12 +6912,33 @@ end
 
 ################################################################################
 #
+#   Scalar matrix
+#
+################################################################################
+
+@doc raw"""
+    scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
+    scalar_matrix(n::Int, a::NCRingElement)
+
+Return the $n \times n$ matrix over `R` with `a` along the main diagonal and
+zeroes elsewhere. If `R` is not specified, it defaults to `parent(a)`.
+"""
+function scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
+   return diagonal_matrix(R(a), n)
+end
+
+function scalar_matrix(n::Int, a::NCRingElement)
+   return diagonal_matrix(a, n)
+end
+
+################################################################################
+#
 #   Diagonal matrix
 #
 ################################################################################
 
 @doc raw"""
-    diagonal_matrix(x::RingElement, m::Int, [n::Int])
+    diagonal_matrix(x::NCRingElement, m::Int, [n::Int])
 
 Return the $m \times n$ matrix over $R$ with `x` along the main diagonal and
 zeroes elsewhere. If `n` is not specified, it defaults to `m`.
@@ -7165,47 +7200,3 @@ the ring $R$.
 function matrix_space(R::NCRing, r::Int, c::Int)
    return Generic.matrix_space(R, r, c)
 end
-
-###############################################################################
-#
-#   Conversion to Array
-#
-###############################################################################
-
-"""
-    Matrix(A::MatrixElem{T}) where T <: NCRingElement
-
-Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
-
-# Examples
-```jldoctest; setup = :(using AbstractAlgebra)
-julia> A = ZZ[1 2 3; 4 5 6]
-[1   2   3]
-[4   5   6]
-
-julia> Matrix(A)
-2×3 Matrix{BigInt}:
- 1  2  3
- 4  5  6
-```
-"""
-Matrix(M::MatrixElem{T}) where T <: NCRingElement = eltype(M)[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
-
-"""
-    Array(A::MatrixElem{T}) where T <: NCRingElement
-
-Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
-
-# Examples
-```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, x = ZZ["x"]; A = R[x^0 x^1; x^2 x^3]
-[  1     x]
-[x^2   x^3]
-
-julia> Array(A)
-2×2 Matrix{AbstractAlgebra.Generic.Poly{BigInt}}:
- 1    x
- x^2  x^3
-```
-"""
-Array(M::MatrixElem{T}) where T <: NCRingElement = Matrix(M)
