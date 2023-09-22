@@ -1535,14 +1535,14 @@ Base.displaysize(io::IOCustom) = displaysize(io.io)
 
 write(io::IO, ::Indent) = (_unwrap(io).indent_level += 1; nothing)
 print(io::IO, ::Indent) = write(io, Indent())
-write(io::IO, ::Dedent) = (_unwrap(io).indent_level = max(0, io.indent_level - 1); nothing)
+write(io::IO, ::Dedent) = (_unwrap(io).indent_level = max(0, _unwrap(io).indent_level - 1); nothing)
 print(io::IO, ::Dedent) = write(io, Dedent())
 write(io::IO, ::Lowercase) = (_unwrap(io).lowercasefirst = true; nothing)
 print(io::IO, ::Lowercase) = write(io, Lowercase())
 write(io::IO, ::LowercaseOff) = (_unwrap(io).lowercasefirst = false; nothing)
 print(io::IO, ::LowercaseOff) = write(io, LowercaseOff())
 
-write_indent(io::IO) = write(_unwrap(io).io, io.indent_str^io.indent_level)
+write_indent(io::IOCustom) = write(io.io, io.indent_str^io.indent_level)
 
 write(io::IOCustom, chr::Char) = write(io, string(chr)) # Need to catch writing a '\n'
 
