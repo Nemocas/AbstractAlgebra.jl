@@ -7019,7 +7019,7 @@ function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
 end
 
 function diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
-    return block_diagonal_matrix(R, V)
+    return block_diagonal_matrix(map(x -> change_base_ring(R, x), V))
 end
 
 
