@@ -77,13 +77,13 @@ julia> m = M([ZZ(1), ZZ(2), ZZ(3)])
 (1, 2, 3)
 
 julia> S, f = sub(M, [m])
-(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 3 over integers)
+(Submodule over Integers with 1 generator and no relations, Hom: submodule over Integers with 1 generator and no relations -> free module of rank 3 over integers)
 
 julia> Q, g = quo(M, S)
-(Quotient module over Integers with 2 generators and no relations, Hom: Free module of rank 3 over integers -> Quotient module over Integers with 2 generators and no relations)
+(Quotient module over Integers with 2 generators and no relations, Hom: free module of rank 3 over integers -> quotient module over Integers with 2 generators and no relations)
 
 julia> kernel(g)
-(Submodule over Integers with 1 generator and no relations, Hom: Submodule over Integers with 1 generator and no relations -> Free module of rank 3 over integers)
+(Submodule over Integers with 1 generator and no relations, Hom: submodule over Integers with 1 generator and no relations -> free module of rank 3 over integers)
 
 ```
 

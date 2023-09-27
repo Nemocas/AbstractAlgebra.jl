@@ -22,11 +22,17 @@ section_map(f::MapWithSection) = f.section
 (f::MapWithSection{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
 
 
-function Base.show(io::IO, ::MIME"text/plain", M::MapWithSection)
-   io = pretty(io)
-   println(io, "Map with section")
-   println(io, Indent(), "from ", Lowercase(), domain(M))
-   print(io, "to ", Lowercase(), codomain(M), Dedent())
+function Base.show(io::IO, M::MapWithSection)
+   if get(io, :supercompact, false)
+      # no nested printing
+      print(io, "Map with section")
+   else
+      # nested printing allowed, preferably supercompact
+      io = pretty(io)
+      print(io, "Map: ")
+      print(IOContext(io, :supercompact => true), Lowercase(), domain(M), " -> ")
+      print(IOContext(io, :supercompact => true), Lowercase(), codomain(M))
+   end
 end
 
 function compose(f::MapWithSection{U, C}, g::MapWithSection{D, U}) where {D, U, C}
@@ -61,11 +67,17 @@ retraction_map(f::MapCache) = retraction_map(f.map)
 
 (f::MapWithRetraction{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
 
-function Base.show(io::IO, ::MIME"text/plain", M::MapWithRetraction)
-   io = pretty(io)
-   println(io, "Map with retraction")
-   println(io, Indent(), "from ", Lowercase(), domain(M))
-   print(io, "to ", Lowercase(), codomain(M), Dedent())
+function Base.show(io::IO, M::MapWithRetraction)
+   if get(io, :supercompact, false)
+      # no nested printing
+      print(io, "Map with retraction")
+   else
+      # nested printing allowed, preferably supercompact
+      io = pretty(io)
+      print(io, "Map: ")
+      print(IOContext(io, :supercompact => true), Lowercase(), domain(M), " -> ")
+      print(IOContext(io, :supercompact => true), Lowercase(), codomain(M))
+   end
 end
 
 function compose(f::MapWithRetraction{U, C}, g::MapWithRetraction{D, U}) where {D, U, C}

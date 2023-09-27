@@ -45,7 +45,7 @@ julia> m2 = F(BigInt[9, 7, -2, 2, -4])
 (9, 7, -2, 2, -4)
 
 julia> S1, f1 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 5 over integers)
+(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 5 over integers)
 
 julia> m1 = F(BigInt[3, 1, 7, 7, -7])
 (3, 1, 7, 7, -7)
@@ -54,7 +54,7 @@ julia> m2 = F(BigInt[-8, 6, 10, -1, 1])
 (-8, 6, 10, -1, 1)
 
 julia> S2, f2 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 5 over integers)
+(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 5 over integers)
 
 julia> m1 = F(BigInt[2, 4, 2, -3, -10])
 (2, 4, 2, -3, -10)
@@ -63,10 +63,10 @@ julia> m2 = F(BigInt[5, 7, -6, 9, -5])
 (5, 7, -6, 9, -5)
 
 julia> S3, f3 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 5 over integers)
+(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 5 over integers)
 
 julia> D, f = direct_sum(S1, S2, S3)
-(DirectSumModule over integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations])
+(DirectSumModule over integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: submodule over Integers with 2 generators and no relations -> DirectSumModule over integers, Hom: submodule over Integers with 2 generators and no relations -> DirectSumModule over integers, Hom: submodule over Integers with 2 generators and no relations -> DirectSumModule over integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: DirectSumModule over integers -> submodule over Integers with 2 generators and no relations, Hom: DirectSumModule over integers -> submodule over Integers with 2 generators and no relations, Hom: DirectSumModule over integers -> submodule over Integers with 2 generators and no relations])
 ```
 
 ## Functionality for direct sums
@@ -93,7 +93,7 @@ julia> m2 = F(BigInt[9, 7, -2, 2, -4])
 (9, 7, -2, 2, -4)
 
 julia> S1, f1 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 5 over integers)
+(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 5 over integers)
 
 julia> m1 = F(BigInt[3, 1, 7, 7, -7])
 (3, 1, 7, 7, -7)
@@ -102,7 +102,7 @@ julia> m2 = F(BigInt[-8, 6, 10, -1, 1])
 (-8, 6, 10, -1, 1)
 
 julia> S2, f2 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 5 over integers)
+(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 5 over integers)
 
 julia> m1 = F(BigInt[2, 4, 2, -3, -10])
 (2, 4, 2, -3, -10)
@@ -111,10 +111,10 @@ julia> m2 = F(BigInt[5, 7, -6, 9, -5])
 (5, 7, -6, 9, -5)
 
 julia> S3, f3 = sub(F, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Hom: Submodule over Integers with 2 generators and no relations -> Free module of rank 5 over integers)
+(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 5 over integers)
 
 julia> D, f = direct_sum(S1, S2, S3)
-(DirectSumModule over integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule, Hom: Submodule over Integers with 2 generators and no relations -> DirectSumModule], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations, Hom: DirectSumModule -> Submodule over Integers with 2 generators and no relations])
+(DirectSumModule over integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: submodule over Integers with 2 generators and no relations -> DirectSumModule over integers, Hom: submodule over Integers with 2 generators and no relations -> DirectSumModule over integers, Hom: submodule over Integers with 2 generators and no relations -> DirectSumModule over integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: DirectSumModule over integers -> submodule over Integers with 2 generators and no relations, Hom: DirectSumModule over integers -> submodule over Integers with 2 generators and no relations, Hom: DirectSumModule over integers -> submodule over Integers with 2 generators and no relations])
 
 julia> summands(D)
 3-element Vector{AbstractAlgebra.Generic.Submodule{BigInt}}:

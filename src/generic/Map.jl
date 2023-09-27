@@ -23,16 +23,11 @@ function preimage(f::Generic.CompositeMap{D, C}, a) where {D, C}
    return preimage(f.map1, preimage(f.map2, a))
 end
 
-function show(io::IO, ::MIME"text/plain", M::CompositeMap)
-   io = pretty(io)
-   println(io, "Composite map")
-   println(io, Indent(), "first ", Lowercase(), map1(M))
-   h = map2(M)
-   while h isa FunctionalCompositeMap || h isa CompositeMap
-     println(io, "next ", Lowercase(), h)
-     h = map2(h)
-   end
-   print(io, "next ", Lowercase(), h, Dedent())
+function AbstractAlgebra.show_map_data(io::IO, M::Union{CompositeMap, FunctionalCompositeMap})
+  println(io)
+  println(io, "which is the composite of", Indent())
+  println(io, map1(M))
+  print(io, map2(M))
 end
 
 function show(io::IO, M::CompositeMap)
@@ -40,13 +35,9 @@ function show(io::IO, M::CompositeMap)
       # no nested printing
       print(io, "Composite map")
    else
-     io = pretty(io)
+      io = pretty(io)
       print(io, "Map: ", Lowercase(), domain(M))
-      h = map2(M)
-      while h isa FunctionalCompositeMap || h isa CompositeMap
-        print(io, " -> ", Lowercase(), domain(h))
-        h = map2(h)
-      end
+      print(io, " -> ", Lowercase(), domain(map2(M)))
       print(io, " -> ", Lowercase(), codomain(M))
    end
 end
@@ -116,18 +107,10 @@ function (f::FunctionalMap{D, C})(a) where {D, C}
 end
 
 
-
-function Base.show(io::IO, ::MIME"text/plain", M::FunctionalMap)
-   io = pretty(io)
-   println(io, "Map defined by a Julia function")
-   println(io, Indent(), "from ", Lowercase(), domain(M))
-   print(io, "to ", Lowercase(), codomain(M), Dedent())
-end
-
-function Base.show(io::IO, M::AbstractAlgebra.Map)
+function Base.show(io::IO, M::FunctionalMap)
    if get(io, :supercompact, false)
       # no nested printing
-      print(io, "Map")
+      print(io, "Map defined by a Julia function")
    else
       # nested printing allowed, preferably supercompact
       io = pretty(io)
@@ -181,30 +164,14 @@ function (f::FunctionalCompositeMap{D, C})(a) where {D, C}
    return image_fn(f)(a)::elem_type(C)
 end
 
-function show(io::IO, ::MIME"text/plain", M::FunctionalCompositeMap)
-   io = pretty(io)
-   println(io, "Functional composite map")
-   println(io, Indent(), "first ", Lowercase(), map1(M))
-   h = map2(M)
-   while h isa FunctionalCompositeMap
-     println(io, "next ", Lowercase(), h)
-     h = map2(h)
-   end
-   print(io, "next ", Lowercase(), h, Dedent())
-end
-
 function show(io::IO, M::FunctionalCompositeMap)
    if get(io, :supercompact, false)
       # no nested printing
-      print(io, "Composite map")
+      print(io, "Functional composite map")
    else
       io = pretty(io)
       print(io, "Map: ", Lowercase(), domain(M))
-      h = map2(M)
-      while h isa FunctionalCompositeMap
-        print(io, " -> ", Lowercase(), domain(h))
-        h = map2(h)
-      end
+      print(io, " -> ", Lowercase(), domain(map2(M)))
       print(io, " -> ", Lowercase(), codomain(M))
    end
 end

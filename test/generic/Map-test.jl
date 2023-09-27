@@ -1,13 +1,18 @@
-mutable struct MyMap <: Map{AbstractAlgebra.Integers{BigInt}, AbstractAlgebra.Integers{BigInt}, SetMap, MyMap}
-   a::Int
+import AbstractAlgebra.PrettyPrinting
+
+module MyMapMod
+   using AbstractAlgebra
+   mutable struct MyMap <: Map{AbstractAlgebra.Integers{BigInt}, AbstractAlgebra.Integers{BigInt}, SetMap, MyMap}
+      a::Int
+   end
+
+   Generic.domain(f::MyMap) = AbstractAlgebra.JuliaZZ
+   Generic.codomain(f::MyMap) = AbstractAlgebra.JuliaZZ
+
+   a(f::MyMap) = f.a
+
+   (f::MyMap)(x) =  a(f)*(x + 1)
 end
-
-Generic.domain(f::MyMap) = AbstractAlgebra.JuliaZZ
-Generic.codomain(f::MyMap) = AbstractAlgebra.JuliaZZ
-
-a(f::MyMap) = f.a
-
-(f::MyMap)(x) =  a(f)*(x + 1)
 
 @testset "Generic.Map.FunctionalMap" begin
    f = map_from_func(x -> x + 1, ZZ, ZZ)
@@ -52,7 +57,7 @@ end
 @testset "Generic.Map.CompositeMap" begin
    f = map_from_func(x -> x + 1, ZZ, ZZ)
 
-   s = MyMap(2)
+   s = MyMapMod.MyMap(2)
 
    t = compose(f, s)
 
@@ -102,4 +107,52 @@ end
 
    @test inv(g) === g
    @test inv(h) === h
+end
+
+@testset "Generic.Map.printing" begin
+  id = identity_map(ZZ)
+  str = """
+        Identity map
+          of integers"""
+  @test PrettyPrinting.detailed(id) == str
+  @test PrettyPrinting.oneline(id) == "Identity map of integers"
+  @test PrettyPrinting.supercompact(id) == "Identity map"
+
+  u = map_from_func(x -> QQ(x + 1), ZZ, QQ)
+  str = """
+        Map defined by a Julia function
+          from integers
+          to rationals"""
+  @test PrettyPrinting.detailed(u) == str
+  @test PrettyPrinting.oneline(u) == "Map: integers -> rationals"
+  @test PrettyPrinting.supercompact(u) == "Map defined by a Julia function"
+
+  f = map_from_func(x -> x + 1, ZZ, ZZ)
+  g = map_from_func(x -> QQ(x), ZZ, QQ)
+  v = compose(f, g)
+  str = """
+        Functional composite map
+          from integers
+          to rationals
+        which is the composite of
+          Map: integers -> integers
+          Map: integers -> rationals"""
+  @test PrettyPrinting.detailed(v) == str
+  @test PrettyPrinting.oneline(v) == "Map: integers -> integers -> rationals"
+  @test PrettyPrinting.supercompact(v) == "Functional composite map"
+
+  f = map_from_func(x -> x + 1, ZZ, ZZ)
+  s = MyMapMod.MyMap(2)
+  t = compose(f, s)
+  str = """
+        Composite map
+          from integers
+          to integers
+        which is the composite of
+          Map: integers -> integers
+          Map: integers -> integers"""
+  @test PrettyPrinting.detailed(t) == str
+  @test PrettyPrinting.oneline(t) == "Map: integers -> integers -> integers"
+  @test PrettyPrinting.supercompact(t) == "Composite map"
+
 end
