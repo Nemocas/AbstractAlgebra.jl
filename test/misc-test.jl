@@ -13,3 +13,9 @@
   @test_throws ErrorException evaluate(:(x + x^2 + f(x)), Dict(:x => 1))
   @test_throws ErrorException evaluate((Expr(:x)), Dict(:y => 1))
 end
+
+@testset "rising_factorial" begin
+
+  @test_throws OverflowError rising_factorial(10,30)
+  @test_throws OverflowError rising_factorial2(10,30)
+end
