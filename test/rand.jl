@@ -1,7 +1,11 @@
 using AbstractAlgebra.Random: Random, AbstractRNG, MersenneTwister, randsubseq, shuffle
 using AbstractAlgebra.RandomExtensions: RandomExtensions, make
 
-const rng = MersenneTwister()
+# initialize RNGs to a fixed initial state, to improve reproducibility
+# of this test suite.
+Random.seed!(42)
+const rng = MersenneTwister(42)
+
 
 # test if rand(rng, R, args...) gives reproducible results
 # also check that the Random API works as expected
