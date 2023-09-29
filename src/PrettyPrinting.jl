@@ -1504,8 +1504,11 @@ mutable struct IOCustom{IO_t <: IO} <: Base.AbstractPipe
 end
 
 _unwrap(io::IOCustom) = io
-
 _unwrap(io::IOContext) = io.io
+
+_supports_io_custom(io::IOCustom) = true
+_supports_io_custom(io::IOContext) = _supports_io_custom(io.io)
+_supports_io_custom(io::Any) = false
 
 indent_string!(io::IO, str::String) = (_unwrap(io).indent_str = str; io)
 
