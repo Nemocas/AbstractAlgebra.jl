@@ -1665,4 +1665,23 @@ pretty(io::IOContext; force_newlines = false) = io.io isa IOCustom ? io : IOCust
 
 export pretty, Lowercase, LowercaseOff, Indent, Dedent
 
+# helpers for testing the pretty printing
+function detailed(x)
+  io = IOBuffer()
+  show(io, MIME"text/plain"(), x)
+  return String(take!(io))
+end
+
+function oneline(x)
+  io = IOBuffer()
+  print(io, x)
+  return String(take!(io))
+end
+
+function supercompact(x)
+  io = IOBuffer()
+  print(IOContext(io, :supercompact => true), x)
+  return String(take!(io))
+end
+
 end # PrettyPrinting

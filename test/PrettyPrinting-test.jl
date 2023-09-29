@@ -1,3 +1,5 @@
+import AbstractAlgebra.PrettyPrinting
+
 @testset "PrettyPrinting" begin
 
    function just_string(x)
@@ -313,24 +315,6 @@ end
 # Test various examples from the Oscar manual
 @testset "PrettyPrinting examples" begin
 
-  function detailed(x)
-    io = IOBuffer()
-    show(io, MIME"text/plain"(), x)
-    return String(take!(io))
-  end
-
-  function oneline(x)
-    io = IOBuffer()
-    print(io, x)
-    return String(take!(io))
-  end
-
-  function supercompact(x)
-      io = IOBuffer()
-      print(IOContext(io, :supercompact => true), x)
-      return String(take!(io))
-  end
-
   #
   #
   #
@@ -358,12 +342,12 @@ end
   end
 
   R = NewRing(QQ)
-  @test detailed(R) ==
+  @test PrettyPrinting.detailed(R) ==
         """I am a new ring
            I print with newlines
            Rationals"""
-  @test oneline(R) == "one line printing of newring with supercompact Rationals"
-  @test supercompact(R) == "supercompact printing of newring "
+  @test PrettyPrinting.oneline(R) == "one line printing of newring with supercompact Rationals"
+  @test PrettyPrinting.supercompact(R) == "supercompact printing of newring "
 
   #
   #
@@ -391,26 +375,26 @@ end
   y = """
       Something of type A
         over 2"""
-  @test detailed(x) == y
-  @test oneline(x) == y
-  @test supercompact(x) == y
+  @test PrettyPrinting.detailed(x) == y
+  @test PrettyPrinting.oneline(x) == y
+  @test PrettyPrinting.supercompact(x) == y
 
   x = A(A(2))
   y = """
       Something of type A
         over something of type A
           over 2"""
-  @test detailed(x) == y
-  @test oneline(x) == y
-  @test supercompact(x) == y
+  @test PrettyPrinting.detailed(x) == y
+  @test PrettyPrinting.oneline(x) == y
+  @test PrettyPrinting.supercompact(x) == y
 
   x = A(B())
   y = """
       Something of type A
         over Hilbert thing"""
-  @test detailed(x) == y
-  @test oneline(x) == y
-  @test supercompact(x) == y
+  @test PrettyPrinting.detailed(x) == y
+  @test PrettyPrinting.oneline(x) == y
+  @test PrettyPrinting.supercompact(x) == y
 
 end
 
