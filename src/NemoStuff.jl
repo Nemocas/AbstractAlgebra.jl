@@ -183,7 +183,7 @@ end
 ################################################################################
 
 @doc raw"""
-vcat(A::Vector{Mat}) -> Mat
+    vcat(A::Vector{Mat}) -> Mat
 
 Forms a big matrix by vertically concatenating the matrices in $A$.
 All component matrices need to have the same number of columns.
@@ -363,10 +363,6 @@ function leading_coefficient(f::MPolyRingElem, i::Int)
         end
     end
     return finish(g)
-end
-
-function polynomial_ring(R::Ring; cached::Bool=false)
-    return polynomial_ring(R, "x", cached=cached)
 end
 
 """
