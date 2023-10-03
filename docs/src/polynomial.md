@@ -898,8 +898,8 @@ julia> g = 6(x + 1)*y + (x^3 + 2x + 2)
 
 julia> S = sylvester_matrix(f, g)
 [    3*x           x + 1               3]
-[6*x + 6   x^3 + 2*x + 2               0]
-[      0         6*x + 6   x^3 + 2*x + 2]
+[6*x + 6   x^3 + 2*x + 2               .]
+[      .         6*x + 6   x^3 + 2*x + 2]
 
 julia> h = resultant(f, g)
 3*x^7 + 6*x^5 - 6*x^3 + 96*x^2 + 192*x + 96

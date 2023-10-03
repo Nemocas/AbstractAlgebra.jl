@@ -4211,8 +4211,8 @@ end
 
 @testset "Generic.Mat.printing" begin
    # this is the REPL printing
-   @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3   1   2]\n[2   0   1]"
-   @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3   1   2]\n[2   0   1]"
+   @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3   1   2]\n[2   .   1]"
+   @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3   1   2]\n[2   .   1]"
    @test sprint(show, "text/plain", matrix(ZZ, 2, 0, [])) == "2 by 0 empty matrix"
    @test sprint(show, "text/plain", matrix(ZZ, 0, 3, [])) == "0 by 3 empty matrix"
    S = matrix_ring(QQ, 3)
