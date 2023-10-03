@@ -741,6 +741,8 @@ function polynomial_ring(R::NCRing, s::VarName; kw...)
    (S, gen(S))
 end
 
+polynomial_ring(R::NCRing; kw...) = polynomial_ring(R, :x; kw...)
+
 @doc raw"""
     polynomial_ring_only(R::NCRing, s::Symbol; cached::Bool=true)
 

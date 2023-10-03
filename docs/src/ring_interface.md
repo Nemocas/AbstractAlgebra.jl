@@ -85,7 +85,7 @@ algorithmically to identify two rings if they were constructed from identical da
 
 If a global cache is provided, it must be optionally possible to construct the parent
 objects without caching. This is done by passing a boolean value `cached` to the inner
-constructor of the parent object. See `generic/GenericTypes.jl` for examples of how to
+constructor of the parent object. See `src/generic/GenericTypes.jl` for examples of how to
 construct and handle such caches.
 
 ## Required functions for all rings
