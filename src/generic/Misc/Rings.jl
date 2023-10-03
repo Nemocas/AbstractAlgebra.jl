@@ -52,6 +52,10 @@ julia> rising_factorial(4, 2)
 function rising_factorial(x::RingElement, n::Integer)
   n < 0 && throw(DomainError(n, "Argument must be non-negative"))
   n == 0 && return one(x)
+  n == 1 && return x
+  if x isa Integer
+      return reduce(Base.checked_mul, x+i-1 for i in 1:Int(n))
+  end
   return prod(x+i-1 for i in 1:Int(n))
 end
 
@@ -73,14 +77,18 @@ julia> rising_factorial2(x, 1)
 julia> rising_factorial2(x, 2)
 (x^2 + x, 2*x + 1)
 
-julia> rising_factorial2(4,2)
+julia> rising_factorial2(4, 2)
 (20, 9)
 ```
 """
 function rising_factorial2(x::RingElement, n::Integer)
   n < 0 && throw(DomainError(n, "Argument must be non-negative"))
   n == 0 && return (one(x), zero(x))
+  n == 1 && return (x, one(x))
   f, F = rising_factorial2(x, Int(n)-1)
   # use product rule:  [(x+n-1)*f(x)]' = (x+n-1)'*f(x) + (x+n-1)*f'(x)
+  if x isa Integer
+      return Base.checked_mul(x+n-1, f),  f + Base.checked_mul(x+n-1, F)
+  end
   return (x+n-1)*f,  f + (x+n-1)*F
 end
