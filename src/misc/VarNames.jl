@@ -1,11 +1,10 @@
 import MacroTools as MT
 
 @assert VarName === Union{Symbol, AbstractString, Char}
-const VarShape = Union{Missing, Int, Tuple{Vararg{Int}}}
 const VarNames = Union{
     VarName,
     AbstractArray{<:VarName},
-    Pair{<:VarName, <:VarShape},
+    Pair{<:VarName},
 }
 
 req(cond, msg) = cond || throw(ArgumentError(msg))
@@ -47,11 +46,30 @@ julia> AbstractAlgebra.variable_names(["x$i$j" for i in 0:2, j in 0:1], 'y')
 variable_names(as::VarNames...) = variable_names(as)
 variable_names(as::Tuple{Vararg{VarNames}}) = Symbol[x for a in as for x in _variable_names(a)]
 
-_variable_names(a::AbstractArray{<:VarName}) = Symbol.(a)
+# note: additionally `:x => missing` is equivalent to `:x`, so that we can use the `:symbol => multiplicity` syntax throughout. This simplifies the macro implementation.
+
 _variable_names(s::VarName) = [Symbol(s)]
+_variable_names(a::AbstractArray{<:VarName}) = Symbol.(a)
 _variable_names((s, _)::Pair{<:VarName, Missing}) = [Symbol(s)]
-_variable_names((s, n)::Pair{<:VarName, Int}) = Symbol.(s, '[', Base.OneTo(n), ']')
-_variable_names((s, dims)::Pair{<:VarName, <:Tuple{Vararg{Int}}}) = Symbol.(s, '[', join.(Tuple.(CartesianIndices(dims)), ','), ']')
+_variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, '[', join.(Iterators.product(_to_axe.(axes)...), ','), ']')
+_variable_names((s, axe)::Pair{<:VarName}) = Symbol.(s, '[', _to_axe(axe), ']')
+
+# `Int` only syntax
+# currently reserved for the commented out usage
+_to_axe(a) = a
+_to_axe(n::Int) = error("A single Int is intentionally unsupported for specifying a variable name array dimension.
+Use `[$n]`, `Ref($n)`, `1:$n` or `Base.OneTo($n)` depending on your use case.")
+# _to_axe(a::Int) = Base.OneTo(a)
+_variable_names((s, n)::Pair{<:VarName, Int}) = _int_axe_error(s, n)
+_int_axe_error(s, n) = error("""The syntax `$(sprint(show,s)) => $n` is unsupported.
+Consider using a plain `"$s$n"` or `"$s[$n]"` or perhaps `["$s$n"]` or `Ref("$s$n")` or maybe `["$s\$i" for i in 1:$n]` instead.
+Alternatively replace `$n` by any one of `[$n]`, `Ref($n)`, `1:$n` or `Base.OneTo($n)` depending on your use case.""")
+# _variable_names((s, n)::Pair{<:VarName, Int}) = Symbol.(s, '[', Base.OneTo(n), ']')
+
+# Alternative notation
+# Please choose one notation here
+# _variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, join.(Iterators.product(_to_axe.(axes)...), '_'))
+# _variable_names((s, axe)::Pair{<:VarName}) = Symbol.(s, _to_axe(axe))
 
 @doc raw"""
     reshape_to_varnames(vec::Vector{T}, varnames...) :: Tuple{Array{<:Any, T}}
@@ -62,7 +80,7 @@ Turn `vec` into the shape of `varnames`. Reverse flattening from [`variable_name
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> s = ([:a, :b], :x => (1, 2), :y => 2, :z);
+julia> s = ([:a, :b], :x => (1:1, 1:2), :y => 1:2, :z);
 
 julia> AbstractAlgebra.reshape_to_varnames(AbstractAlgebra.variable_names(s...), s...)
 ([:a, :b], [Symbol("x[1,1]") Symbol("x[1,2]")], [Symbol("y[1]"), Symbol("y[2]")], :z)
@@ -87,12 +105,17 @@ function reshape_to_varnames(vec::Vector, varnames::Tuple{Vararg{VarNames}})
 end
 
 _reshape_to_varnames(iter::Iterators.Stateful, ::VarName) = popfirst!(iter)
-_reshape_to_varnames(iter::Iterators.Stateful, (_, shape)::Pair{<:VarName, <:VarShape}) = _reshape(iter, shape)
 _reshape_to_varnames(iter::Iterators.Stateful, a::AbstractArray{<:VarName}) = _reshape(iter, size(a))
+_reshape_to_varnames(iter::Iterators.Stateful, (_, shape)::Pair{<:VarName}) = __reshape(iter, shape)
 
-_reshape(iter, ::Missing) = popfirst!(iter)
-_reshape(iter, n::Int) = collect(Iterators.take(iter, n))
-_reshape(iter, dims::Tuple{Vararg{Int}}) = reshape(collect(Iterators.take(iter, prod(dims))), dims)
+_reshape(iter, dims) = reshape(collect(Iterators.take(iter, prod(dims))), Tuple(dims))
+__reshape(iter, ::Missing) = popfirst!(iter)
+__reshape(iter, axes::Tuple) = _reshape(iter, Int[d for axe in axes for d in size(_to_axe(axe))])
+__reshape(iter, axe) = _reshape(iter, size(_to_axe(axe)))
+
+# `Int` only syntax
+_reshape(_, n::Int) = _int_axe_error(:s, n)
+# _reshape(iter, n::Int) = collect(Iterators.take(iter, n))
 
 function _varname_interface(e::Expr, @nospecialize s::Union{Expr, Symbol})
     ex = MT.isexpr(e, :(=), :function) ? e : Expr(:(=), e, :())
@@ -125,20 +148,20 @@ end
 @doc raw"""
     @varnames_interface [M.]f(args..., varnames)
 
-Add method `X, vars = f(args..., varnames...)` and macro `X = @f args... varnames...` to current scope. Read on.
+Add methods `X, vars = f(args..., varnames...)` and macro `X = @f args... varnames...` to current scope. Read on.
 
 ---
 
     X, gens::Vector{T} = f(args..., varnames::Vector{Symbol})
 
-Base method. If `M` is given, this calls `M.f`, otherwise, it has to exist already.
+Base method. If `M` is given, this calls `M.f`. Otherwise, it has to exist already.
 
 ---
 
     X, vars... = f(args..., varnames...)
 
 Compute `X` and `gens` via the base method. Then reshape `gens` into the shape defined by `varnames`.
-Each `varnames` argument can be either an Array of `VarName`s, or `s::VarName => dims`. The latter means an `Array` of size `dims`.
+Each `varnames` argument can be either an Array of `VarName`s, or `s::VarName => axes`. The latter means an `Array` where the entries are symbols indexed by the product of `axes`.
 
 ---
 
@@ -168,7 +191,7 @@ f (generic function with 5 methods)
 julia> f("hello", :x, :y, :z)
 ("hello", "x", "y", "z")
 
-julia> f("hello", :x => (1, 2), :y => 2, :z)
+julia> f("hello", :x => (1:1, 1:2), :y => 1:2, :z)
 ("hello", ["x[1,1]" "x[1,2]"], ["y[1]", "y[2]"], "z")
 
 julia> f("projective", ["x$i$j" for i in 0:1, j in 0:1], [:y0, :y1], :z)
@@ -177,7 +200,7 @@ julia> f("projective", ["x$i$j" for i in 0:1, j in 0:1], [:y0, :y1], :z)
 julia> f("fun inputs", 'a':'g', Symbol.('x':'z', [0 1]))
 ("fun inputs", ["a", "b", "c", "d", "e", "f", "g"], ["x0" "x1"; "y0" "y1"; "z0" "z1"])
 
-julia> @f "hello" x[1, 2] y[2] z
+julia> @f "hello" x[1:1, 1:2] y[1:2] z
 "hello"
 
 julia> x
@@ -192,7 +215,7 @@ julia> y
 julia> z
 "z"
 
-julia> v = [1,4,1]; @f "variable dims" x[v...]; x
+julia> v = [1:1,1:4,1:1]; @f "variable dims" x[v...]; x
 1×4×1 Array{String, 3}:
 [:, :, 1] =
  "x[1,1,1]"  "x[1,2,1]"  "x[1,3,1]"  "x[1,4,1]"

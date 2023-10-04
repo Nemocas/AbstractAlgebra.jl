@@ -127,13 +127,23 @@
    @test ZZxyz_ == ZZxyz5_
    @test ZZxyz_ == (ZZxyz6, [x, y, z])
 
-   ZZxxx_ = polynomial_ring(ZZ, :x=>3)
-   ZZxxx2, (xxx2,) = ZZ[:x=>3]
-   ZZxxx3 = @polynomial_ring ZZ x[3]
+   ZZxxx0_ = polynomial_ring(ZZ, :x=>Base.OneTo(3))
+   ZZxxx_ = polynomial_ring(ZZ, :x=>1:3)
+   ZZxxx2, (xxx2,) = ZZ[:x=>1:3]
+   ZZxxx3 = @polynomial_ring ZZ x[1:3]
 
    @test ZZxxx_[1] isa Generic.MPolyRing
+   @test ZZxxx_ == ZZxxx0_
    @test ZZxxx_ == (ZZxxx2, xxx2)
    @test ZZxxx_ == (ZZxxx3, x)
+
+   ZZxy_ = polynomial_ring(ZZ, :x => (1:2,1:2), :y => 0:3)
+   ZZxy2_ = polynomial_ring(ZZ, :x => ["1,1" "1,2"; "2,1" "2,2"], :y => (0:3,))
+   ZZxy3 = @polynomial_ring ZZ x[1:2,1:2] y[0:3]
+
+   @test ZZxy_[1] isa Generic.MPolyRing
+   @test ZZxy_ == ZZxy2_
+   @test ZZxy_ == (ZZxy3, x, y)
 end
 
 @testset "Generic.MPoly.printing" begin
