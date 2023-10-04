@@ -5,6 +5,7 @@
   @test pluralize("indeterminate") == "indeterminates"
   @test pluralize("matrix") == "matrices"
   @test pluralize("maximum") == "maxima"
+  @test pluralize("patch") == "patches"
   @test pluralize("polyhedron") == "polyhedra"
   @test pluralize("tetrahedron") == "tetrahedra"
   @test pluralize("variable") == "variables"
