@@ -48,8 +48,8 @@ can accept any AbstractAlgebra polynomial type.
 In order to construct polynomials in AbstractAlgebra.jl, one must first construct the
 polynomial ring itself. This is accomplished with the following constructor.
 
-```@docs
-polynomial_ring(R::Ring, s::VarName; cached::Bool = true)
+```@docs; canonical=false
+polynomial_ring(R::NCRing, s::Symbol)
 ```
 
 A shorthand version of this function is provided: given a base ring `R`, we abbreviate

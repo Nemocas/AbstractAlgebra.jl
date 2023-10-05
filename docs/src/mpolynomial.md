@@ -46,12 +46,11 @@ and the polynomial ring types belong to the abstract type `MPolyRing{T}`.
 ## Polynomial ring constructors
 
 In order to construct multivariate polynomials in AbstractAlgebra.jl, one must first
-construct the polynomial ring itself. This is accomplished with one of the following
-constructors.
+construct the polynomial ring itself. This is accomplished with the following
+constructor or any one derived from it via [`@varname_interface`](@ref).
 
 ```@docs
-polynomial_ring(R::Ring, S::Vector{VarName}; cached::Bool = true, ordering::Symbol=:lex)
-polynomial_ring(R::Ring, n::Int, s::VarName; cached::Bool = false, ordering::Symbol = :lex)
+polynomial_ring(R::Ring, s::Vector{Symbol})
 ```
 
 Like for univariate polynomials, a shorthand constructor is
