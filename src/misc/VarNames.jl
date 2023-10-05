@@ -247,16 +247,16 @@ macro varnames_interface(e::Expr, options...)
     opts[:macros] === :(:no) && return :($base; $fancy_method; $fancy_n_method)
     if opts[:macros] === :(:all)
         ss = :(s::Union{Expr, Symbol}...)
-        xs = :(_eval_shapes(s))
+        xs = :(_eval_shapes(Main, s...)) # `Main` should probably be `__module__` but that does not work, see https://github.com/JuliaLang/julia/issues/51602.
     else
         ss = :(s::Expr)
-        xs = quote req(s.head === :tuple, "the final macro argument must be a tuple"); _eval_shape.(s.args) end
+        xs = quote req(s.head === :tuple, "the final macro argument must be a tuple"); _eval_shape.((Main,), s.args) end # For `Main` see above.
     end
     fancy_macro = quote
         macro $f($(argnames...), $ss)
+            gens = variable_names($xs)
             return quote
-                gens = variable_names($($xs...))
-                X, ($(gens...),) = $$f($$(argnames...), $gens)
+                X, ($(esc.(gens)...),) = $$f($$(argnames...), $gens)
                 X
             end
         end
@@ -276,10 +276,24 @@ function parse_options(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol}, valid::D
     return result
 end
 
-_eval_shapes(es::Tuple{Vararg{Union{Expr, Symbol}}})::Tuple{Vararg{Expr}} = _eval_shape.(es)
-_eval_shapes((e,)::Tuple{Expr})::Tuple{Vararg{Expr}} = MT.@capture(e, (es__,)) ? _eval_shape.((es...,)) : (_eval_shape(e),) # for `@f args... (varnames...,)` variant
-_eval_shape(e::Expr)::Expr = MT.@capture(e, x_[a__]) ? :("$($x)#" => ($(esc(eval.(a))...,))) : error("variable name must be like `x` or `x[...]`, not `$e`")
-_eval_shape(s::Symbol)::Expr = :("$($s)")
+_eval_shapes(m::Core.Module, es::Union{Expr, Symbol}...) :: Tuple{Vararg{Union{<:Pair{String, Tuple}, Symbol}}} = _eval_shape.((m,), es)
+_eval_shapes(m::Core.Module, e::Expr) :: Tuple{Vararg{Union{<:Pair{String, Tuple}, Symbol}}} =
+    MT.@capture(e, (es__,)) ? # Are we in the case of the `@f args... (varnames...,)` variant?
+    _eval_shape.((m,), (es...,)) : # Yes, we are, `es` is like `(x[0:5], y)`.
+    (_eval_shape(m, e),) # No, we are in the ordinary case and have only one varname, `es` is like `x[0:5]`.
+_eval_shape(m::Core.Module, e::Expr) :: Pair{String, Tuple} = MT.@capture(e, x_[a__]) ? "$x#" => (_eval.((m,), a)...,) : error("variable name must be like `x` or `x[...]`, not `$e`")
+_eval_shape(::Core.Module, s::Symbol) = "$s"
+
+function _eval(m::Core.Module, e::Expr)
+    try
+        Base.eval(m, e)
+    catch err
+        if isa(err, UndefVarError)
+            @error "Inconveniently, you may only use literals and variables from `Main`s global scope when using fancy variable name macros"
+        end
+        rethrow()
+    end
+end
 
 @doc raw"""
     @varname_interface [M.]f(args..., varname)
