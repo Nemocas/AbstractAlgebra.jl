@@ -62,7 +62,9 @@ function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
     else
         indices = [_replace_bad_chars.(i) for i in indices]
         if c == 1
-            names = [Symbol(replace(s, '#' => join(i, '_'))) for i in indices]
+            index_length = maximum(i->maximum(length, i), indices)
+            delim = index_length > 1 ? "_" : ""
+            names = [Symbol(replace(s, '#' => join(i, delim))) for i in indices]
         else
             req(c == length(axes), """In "$s" there occurs a '#' $c times, but only 0, 1, or $(length(axes)) (=number of indices) times is allowed.""")
             parts = split(s, '#')
