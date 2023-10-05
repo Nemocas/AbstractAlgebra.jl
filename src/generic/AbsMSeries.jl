@@ -746,6 +746,6 @@ function power_series_ring(R::AbstractAlgebra.Ring, prec::Int,
     return parent_obj, gens(parent_obj)
 end
 
-@deprecate power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int},
+power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int},
     prec::Int, s::Vector{Symbol}; kw...
-    ) power_series_ring(R, prec, s; weights, kw...)
+    ) = power_series_ring(R, prec, s; weights, kw...)
