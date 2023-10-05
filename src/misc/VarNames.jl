@@ -118,6 +118,7 @@ function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
         if c == 0
             Symbol.(s, '[', join.(indices, ','), ']')
         else
+            massage = c_massage > 0
             x = massage ? '#' : '@'
             if massage
                 indices = [_replace_bad_chars.(i) for i in indices]
