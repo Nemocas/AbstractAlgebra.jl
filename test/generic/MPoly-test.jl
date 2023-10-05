@@ -130,20 +130,36 @@
    ZZxxx0_ = polynomial_ring(ZZ, :x=>Base.OneTo(3))
    ZZxxx_ = polynomial_ring(ZZ, :x=>1:3)
    ZZxxx2, (xxx2,) = ZZ[:x=>1:3]
-   ZZxxx3 = @polynomial_ring ZZ x[1:3]
+   ZZxxx3_ = polynomial_ring(ZZ, "x[%]"=>1:3)
 
    @test ZZxxx_[1] isa Generic.MPolyRing
    @test ZZxxx_ == ZZxxx0_
    @test ZZxxx_ == (ZZxxx2, xxx2)
-   @test ZZxxx_ == (ZZxxx3, x)
 
-   ZZxy_ = polynomial_ring(ZZ, :x => (1:2,1:2), :y => 0:3)
+   QQxxx_ = polynomial_ring(QQ, "x#" => 1:3)
+   QQxxx2 = @polynomial_ring QQ x[1:3]
+
+   @test QQxxx_[1] isa Generic.MPolyRing
+   @test QQxxx_ == (QQxxx2, [x1, x2, x3])
+
+   ZZxy_ = polynomial_ring(ZZ, :x => (1:2, 1:2), :y => 0:3)
    ZZxy2_ = polynomial_ring(ZZ, :x => ["1,1" "1,2"; "2,1" "2,2"], :y => (0:3,))
-   ZZxy3 = @polynomial_ring ZZ x[1:2,1:2] y[0:3]
+   ZZxy3_ = polynomial_ring(ZZ, "x[%]" => ["1,1" "1,2"; "2,1" "2,2"], "y" => 0:3)
+   ZZxy4_ = polynomial_ring(ZZ, "x[%,%]" => (1:2, 1:2), "y[#]" => 0:3)
 
    @test ZZxy_[1] isa Generic.MPolyRing
    @test ZZxy_ == ZZxy2_
-   @test ZZxy_ == (ZZxy3, x, y)
+   @test ZZxy_ == ZZxy3_
+   @test ZZxy_ == ZZxy4_
+
+   QQxy_ = polynomial_ring(QQ, "x#" => (1:2, 1:2), Symbol.(:y, 0:3))
+   QQxy2 = @polynomial_ring QQ x[1:2,1:2] y[0:3]
+
+   @test QQxy_[1] isa Generic.MPolyRing
+   @test QQxy_ == (QQxy2, [x11 x12; x21 x22], [y0, y1, y2, y3])
+
+   @test_throws ArgumentError polynomial_ring(QQ, "x#%" => (1:2,3:4))
+   @test_throws ArgumentError polynomial_ring(QQ, "x###" => (1:2,3:4))
 end
 
 @testset "Generic.MPoly.printing" begin

@@ -322,7 +322,7 @@ _eval_shapes(m::Core.Module, e::Expr) :: Tuple{Vararg{Union{<:Pair{String, Tuple
     _eval_shape.((m,), (es...,)) : # Yes, we are, `es` is like `(x[0:5], y)`.
     (_eval_shape(m, e),) # No, we are in the ordinary case and have only one varname, `es` is like `x[0:5]`.
 _eval_shape(m::Core.Module, e::Expr) :: Pair{String, Tuple} = MT.@capture(e, x_[a__]) ? "$x#" => (_eval.((m,), a)...,) : error("variable name must be like `x` or `x[...]`, not `$e`")
-_eval_shape(::Core.Module, s::Symbol) = "$s"
+_eval_shape(::Core.Module, s::Symbol) = s
 
 function _eval(m::Core.Module, e::Expr)
     try
