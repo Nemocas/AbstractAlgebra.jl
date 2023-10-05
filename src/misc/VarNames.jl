@@ -245,8 +245,13 @@ macro varnames_interface(e::Expr, options...)
     fancy_n_method = :($f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} = $f($(argnames...), Symbol.(s, $en); kv...))
 
     opts[:macros] === :(:no) && return :($base; $fancy_method; $fancy_n_method)
-    ss, xs = opts[:macros] === :(:all) ? (:(s::Union{Expr, Symbol}...), :(_expr_pairs(s))) :
-        (:(s::Expr), :((req(s.head === :tuple, "the final macro argument must be a tuple"); _expr_pair.(s.args))))
+    if opts[:macros] === :(:all)
+        ss = :(s::Union{Expr, Symbol}...)
+        xs = :(_expr_pairs(s))
+    else
+        ss = :(s::Expr)
+        xs = quote req(s.head === :tuple, "the final macro argument must be a tuple"); _expr_pair.(s.args) end
+    end
     fancy_macro = quote
         macro $f($(argnames...), $ss)
             xs = $xs
