@@ -199,7 +199,7 @@ function _varname_interface(e::Expr, @nospecialize s::Union{Expr, Symbol})
 end
 
 @doc raw"""
-    @varnames_interface [M.]f(args..., varnames)
+    @varnames_interface [M.]f(args..., varnames) macros=:all n=1:n
 
 Add methods `X, vars = f(args..., varnames...)` and macro `X = @f args... varnames...` to current scope.
 
@@ -219,7 +219,7 @@ Compute `X` and `gens` via the base method. Then reshape `gens` into the shape d
 
     X, x::Vector{T} = f(args..., n::Int, s::VarName = :x)
 
-Shorthand for `X, x = f(args..., "$s#", 1:n)`.
+Shorthand for `X, x = f(args..., "$s#", 1:n)`. Can be changed via the `n` option. Setting `n=:no` disables creation of this method.
 
 ---
 
@@ -227,8 +227,7 @@ Shorthand for `X, x = f(args..., "$s#", 1:n)`.
     X = @f args... (varname[axes...] ...)
 
 As `f(args..., "varname#" => axes, ...)`, and also introduce the indexed `varname` into the current scope.
-
----
+Can be disabled via `macros=:no`.
 
 # Examples
 
@@ -272,29 +271,28 @@ macro varnames_interface(e::Expr, options...)
         end
     end
 
-    opts = parse_options(options, Dict(:n => :n, :macros => :(:all)), Dict(:macros => QuoteNode.([:no, :tuple, :all])))
-    en = n = opts[:n]
-    if n isa Symbol
-        en = :(Base.OneTo($n))
-    elseif n isa Expr
-        req(n.head === :call, "Value to option `n` can be `n`, `n+1`, or similar, not `$n`")
-        n = only(x -> x isa Symbol, n.args[2:end])
+    opts = parse_options(options, Dict(:n => :n, :macros => :(:all)), Dict(:macros => QuoteNode.([:no, :all])))
+    one_to_n = n = opts[:n]
+    fancy_n_method = if n === :(:no)
+        :()
+    else
+        req(n isa Symbol or Base.isexpr(n, :call), "Value to option `n` must be `:no`, an alternative name like `m` or some expression like `0:n`, not `$n`")
+        if n isa Symbol
+            one_to_n = :(Base.OneTo($n))
+        elseif n isa Expr
+            n = only(x -> x isa Symbol, n.args[2:end])
+        end
+        @assert n isa Symbol
+        quote
+            $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
+                $f($(argnames...), Symbol.(s, $one_to_n); kv...)
+        end
     end
-
-    n isa Symbol || return :($base; $fancy_method)
-    fancy_n_method = :($f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} = $f($(argnames...), Symbol.(s, $en); kv...))
 
     opts[:macros] === :(:no) && return :($base; $fancy_method; $fancy_n_method)
-    if opts[:macros] === :(:all)
-        ss = :(s::Union{Expr, Symbol}...)
-        xs = :(_eval_shapes(Main, s...)) # `Main` should probably be `__module__` but that does not work, see https://github.com/JuliaLang/julia/issues/51602.
-    else
-        ss = :(s::Expr)
-        xs = quote req(s.head === :tuple, "the final macro argument must be a tuple"); _eval_shape.((Main,), s.args) end # For `Main` see above.
-    end
     fancy_macro = quote
-        macro $f($(argnames...), $ss)
-            gens = variable_names($xs)
+        macro $f($(argnames...), s::Union{Expr, Symbol}...)
+            gens = variable_names(_eval_shapes(Main, s...))
             return quote
                 X, ($(esc.(gens)...),) = $$f($$(argnames...), $gens)
                 X
@@ -404,9 +402,9 @@ end
 
 # The various optional arguments would result in ambiguities
 @varname_interface Generic.power_series_ring(R::Ring, prec::Int, s)
-@varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s) macros=:tuple
-@varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s)
-@varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=0 macros=:no
+@varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s)
+@varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s) macros=:no
+@varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no
 
 @varname_interface polynomial_ring(R::NCRing, s)
 @varnames_interface polynomial_ring(R::Ring, s)
