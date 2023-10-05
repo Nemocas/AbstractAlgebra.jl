@@ -276,7 +276,7 @@ macro varnames_interface(e::Expr, options...)
     fancy_n_method = if n === :(:no)
         :()
     else
-        req(n isa Symbol or Base.isexpr(n, :call), "Value to option `n` must be `:no`, an alternative name like `m` or some expression like `0:n`, not `$n`")
+        req(n isa Symbol || Base.isexpr(n, :call), "Value to option `n` must be `:no`, an alternative name like `m` or some expression like `0:n`, not `$n`")
         if n isa Symbol
             one_to_n = :(Base.OneTo($n))
         elseif n isa Expr
