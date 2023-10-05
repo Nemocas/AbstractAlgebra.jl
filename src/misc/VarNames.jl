@@ -1,4 +1,5 @@
 import MacroTools as MT
+import Printf
 
 @assert VarName === Union{Symbol, AbstractString, Char}
 const VarNames = Union{
@@ -16,10 +17,12 @@ req(cond, msg) = cond || throw(ArgumentError(msg))
 Create proper variable names from `a`.
 Each argument can be either an Array of `VarName`s, or `s::VarName => axes`.
 The latter means an `Array` where the entries are symbols indexed by the product of `axes`.
+
 By default `:x => axes` and `"x" => axes` create variables like `x[1,1]`.
 By using `"x#" => axes` instead, `x[1,1]` becomes `x11`, `x[10,10]` becomes `x10_10`, and `x[-1]` becomes `xm1`.
-If one does not want to replace the chars "-./" by "mpq", use '%' instead of '#'.
-Using multiple '#' or multiple '%' as in "x#y#", one gets variables like `x1y1`.
+If one does not want to replace the chars "-./" by "mpq", use '@' instead of '#'.
+Using multiple '#' or multiple '@' as in "x#y#", one gets variables like `x1y1`.
+By including a '%' one gets `printf` formatting.
 
 # Examples
 
@@ -58,24 +61,30 @@ julia> AbstractAlgebra.variable_names("x#y#" => (0:0, [-1,3,10]))
  :x0y3
  :x0y10
 
-julia> AbstractAlgebra.variable_names("x_{%}" => (0:0, [-1,3,10]))
+julia> AbstractAlgebra.variable_names("x_{@}" => (0:0, [-1,3,10]))
 3-element Vector{Symbol}:
  Symbol("x_{0,-1}")
  Symbol("x_{0,3}")
  Symbol("x_{0,10}")
 
-julia> AbstractAlgebra.variable_names("x^{(%)}_{%}" => (0:0, [-1,3,10]))
+julia> AbstractAlgebra.variable_names("x^{(@)}_{@}" => (0:0, [-1,3,10]))
 3-element Vector{Symbol}:
  Symbol("x^{(0)}_{-1}")
  Symbol("x^{(0)}_{3}")
  Symbol("x^{(0)}_{10}")
 
-julia> AbstractAlgebra.variable_names(["x$(string(i; pad=2))_$(string(j; pad=2))" for i in 9:10, j in 9:10])
+julia> AbstractAlgebra.variable_names("x%02d_%02d" => (9:10,9:10))
 4-element Vector{Symbol}:
  :x09_09
  :x10_09
  :x09_10
  :x10_10
+
+julia> AbstractAlgebra.variable_names(["x$i$i" for i in 1:3])
+3-element Vector{Symbol}:
+ :x11
+ :x22
+ :x33
 
 julia> AbstractAlgebra.variable_names('a':'c', 'z')
 4-element Vector{Symbol}:
@@ -98,26 +107,29 @@ _variable_names((s, axe)::Pair{<:VarName}) = Symbol.(s, '[', axe, ']')
 _variable_names((s, axe)::Pair{<:AbstractString}) = _variable_names(s => (axe,))
 _variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
 function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
-    c_massage = count('#', s)
-    c_no_massage = count('%', s)
-    req(c_massage == 0 || c_no_massage == 0, """In "$s" both '#' and '%' occur. If you need both, please make up an issue.""")
-    c = c_massage | c_no_massage
     indices = Iterators.product(axes...)
-    return if c == 0
-        Symbol.(s, '[', join.(indices, ','), ']')
+    return if '%' in s
+        [Symbol(Printf.format(Printf.Format(s), i...)) for i in indices]
     else
-        massage = c_massage > 0
-        x = massage ? '#' : '%'
-        if massage
-            indices = [_replace_bad_chars.(i) for i in indices]
-        end
-        if c == 1
-            delim = !massage ? "," : maximum(i->maximum(length, i), indices) > 1 ? "_" : ""
-            [Symbol(replace(s, x => join(i, delim))) for i in indices]
+        c_massage = count('#', s)
+        c_no_massage = count('@', s)
+        req(c_massage == 0 || c_no_massage == 0, """In "$s" both '#' and '@' occur. If you need both, please make up an issue.""")
+        c = c_massage | c_no_massage
+        if c == 0
+            Symbol.(s, '[', join.(indices, ','), ']')
         else
-            req(c == length(axes), """In "$s" there occurs a '$x' $c times, but only 0, 1, or $(length(axes)) (= number of indices) times is allowed.""")
-            parts = split(s, x)
-            [Symbol(Iterators.flatten(zip(parts, i))..., parts[end]) for i in indices]
+            x = massage ? '#' : '@'
+            if massage
+                indices = [_replace_bad_chars.(i) for i in indices]
+            end
+            if c == 1
+                delim = !massage ? "," : maximum(i->maximum(length, i), indices) > 1 ? "_" : ""
+                [Symbol(replace(s, x => join(i, delim))) for i in indices]
+            else
+                req(c == length(axes), """In "$s" there occurs a '$x' $c times, but only 0, 1, or $(length(axes)) (= number of indices) times is allowed.""")
+                parts = split(s, x)
+                [Symbol(Iterators.flatten(zip(parts, i))..., parts[end]) for i in indices]
+            end
         end
     end
 end
