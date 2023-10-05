@@ -262,11 +262,6 @@ julia> y
 julia> z
 "z"
 
-julia> v = [1:1,1:4,1:1]; @f "variable dims" x[v...]; x
-1×4×1 Array{String, 3}:
-[:, :, 1] =
- "x[1,1,1]"  "x[1,2,1]"  "x[1,3,1]"  "x[1,4,1]"
-
 ```
 """
 macro varnames_interface(e::Expr, options...)
