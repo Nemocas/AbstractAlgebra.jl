@@ -35,6 +35,9 @@ function pluralize(noun::String)
   # maximum -> maxima
   endswith(noun, "um") && return noun[1:end-2] * "a"
 
+  # patch -> patches
+  endswith(noun, "tch") && return noun * "es"
+
   # family -> families
   # variety -> varieties
   endswith(noun, "y") && !(noun[end-1] in "aeiouy") && return noun[1:end-1] * "ies"
