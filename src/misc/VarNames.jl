@@ -51,25 +51,28 @@ variable_names(as::Tuple{Vararg{VarNames}}) = Symbol[x for a in as for x in _var
 _variable_names(s::VarName) = [Symbol(s)]
 _variable_names(a::AbstractArray{<:VarName}) = Symbol.(a)
 _variable_names((s, _)::Pair{<:VarName, Missing}) = [Symbol(s)]
-_variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, '[', join.(Iterators.product(_to_axe.(axes)...), ','), ']')
-_variable_names((s, axe)::Pair{<:VarName}) = Symbol.(s, '[', _to_axe(axe), ']')
+_variable_names((s, axe)::Pair{<:VarName}) = Symbol.(s, '[', axe, ']')
+_variable_names((s, axe)::Pair{<:AbstractString}) = _variable_names(s => (axe,))
+_variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
+function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
+    c = count('#', s)
+    indices = Iterators.product(axes...)
+    if c == 0
+        names = Symbol.(s, '[', join.(indices, ','), ']')
+    else
+        indices = [_replace_bad_chars.(i) for i in indices]
+        if c == 1
+            names = [Symbol(replace(s, '#' => join(i, '_'))) for i in indices]
+        else
+            req(c == length(axes), """In "$s" there occurs a '#' $c times, but only 0, 1, or $(length(axes)) (=number of indices) times is allowed.""")
+            parts = split(s, '#')
+            names = [Symbol(Iterators.flatten(zip(parts, i))..., parts[end]) for i in indices]
+        end
+    end
+    return names
+end
 
-# `Int` only syntax
-# currently reserved for the commented out usage
-_to_axe(a) = a
-_to_axe(n::Int) = error("A single Int is intentionally unsupported for specifying a variable name array dimension.
-Use `[$n]`, `Ref($n)`, `1:$n` or `Base.OneTo($n)` depending on your use case.")
-# _to_axe(a::Int) = Base.OneTo(a)
-_variable_names((s, n)::Pair{<:VarName, Int}) = _int_axe_error(s, n)
-_int_axe_error(s, n) = error("""The syntax `$(sprint(show,s)) => $n` is unsupported.
-Consider using a plain `"$s$n"` or `"$s[$n]"` or perhaps `["$s$n"]` or `Ref("$s$n")` or maybe `["$s\$i" for i in 1:$n]` instead.
-Alternatively replace `$n` by any one of `[$n]`, `Ref($n)`, `1:$n` or `Base.OneTo($n)` depending on your use case.""")
-# _variable_names((s, n)::Pair{<:VarName, Int}) = Symbol.(s, '[', Base.OneTo(n), ']')
-
-# Alternative notation
-# Please choose one notation here
-# _variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, join.(Iterators.product(_to_axe.(axes)...), '_'))
-# _variable_names((s, axe)::Pair{<:VarName}) = Symbol.(s, _to_axe(axe))
+_replace_bad_chars(s) = replace(string(s), '-' => 'm', '.' => 'p', r"/+" => 'q')
 
 @doc raw"""
     reshape_to_varnames(vec::Vector{T}, varnames...) :: Tuple{Array{<:Any, T}}
@@ -110,8 +113,8 @@ _reshape_to_varnames(iter::Iterators.Stateful, (_, shape)::Pair{<:VarName}) = __
 
 _reshape(iter, dims) = reshape(collect(Iterators.take(iter, prod(dims))), Tuple(dims))
 __reshape(iter, ::Missing) = popfirst!(iter)
-__reshape(iter, axes::Tuple) = _reshape(iter, Int[d for axe in axes for d in size(_to_axe(axe))])
-__reshape(iter, axe) = _reshape(iter, size(_to_axe(axe)))
+__reshape(iter, axes::Tuple) = _reshape(iter, Int[d for axe in axes for d in size(axe)])
+__reshape(iter, axe) = _reshape(iter, size(axe))
 
 # `Int` only syntax
 _reshape(_, n::Int) = _int_axe_error(:s, n)
