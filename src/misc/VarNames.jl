@@ -14,6 +14,12 @@ req(cond, msg) = cond || throw(ArgumentError(msg))
     variable_names(a::Tuple) -> Vector{Symbol}
 
 Create proper variable names from `a`.
+Each argument can be either an Array of `VarName`s, or `s::VarName => axes`.
+The latter means an `Array` where the entries are symbols indexed by the product of `axes`.
+By default `:x => axes` and `"x" => axes` create variables like `x[1,1]`.
+By using `"x#" => axes` instead, `x[1,1]` becomes `x11`, `x[10,10]` becomes `x10_10`, and `x[-1]` becomes `xm1`.
+If one does not want to replace the chars "-./" by "mpq", use '%' instead of '#'.
+Using multiple '#' or multiple '%' as in "x#y#", one gets variables like `x1y1`.
 
 # Examples
 
@@ -195,9 +201,9 @@ end
 @doc raw"""
     @varnames_interface [M.]f(args..., varnames)
 
-Add methods `X, vars = f(args..., varnames...)` and macro `X = @f args... varnames...` to current scope. Read on.
+Add methods `X, vars = f(args..., varnames...)` and macro `X = @f args... varnames...` to current scope.
 
----
+# Created methods
 
     X, gens::Vector{T} = f(args..., varnames::Vector{Symbol})
 
@@ -207,21 +213,22 @@ Base method. If `M` is given, this calls `M.f`. Otherwise, it has to exist alrea
 
     X, vars... = f(args..., varnames...)
 
-Compute `X` and `gens` via the base method. Then reshape `gens` into the shape defined by `varnames`.
-Each `varnames` argument can be either an Array of `VarName`s, or `s::VarName => axes`. The latter means an `Array` where the entries are symbols indexed by the product of `axes`.
+Compute `X` and `gens` via the base method. Then reshape `gens` into the shape defined by `varnames` according to [`variable_names`](@ref).
 
 ---
 
     X, x::Vector{T} = f(args..., n::Int, s::VarName = :x)
 
-Shorthand for `X, x = f(args..., ["$s$i" for i in 1:n])`.
+Shorthand for `X, x = f(args..., "$s#", 1:n)`.
 
 ---
 
-    X = @f args... varnames...
-    X = @f args... (varnames...)
+    X = @f args... varname[axes...] ...
+    X = @f args... (varname[axes...] ...)
 
-As `f(args..., varnames...)`, and also introduce the `varnames` into the current scope.
+As `f(args..., "varname#" => axes, ...)`, and also introduce the indexed `varname` into the current scope.
+
+---
 
 # Examples
 
@@ -250,17 +257,8 @@ julia> f("fun inputs", 'a':'g', Symbol.('x':'z', [0 1]))
 julia> @f "hello" x[1:1, 1:2] y[1:2] z
 "hello"
 
-julia> x
-1×2 Matrix{String}:
- "x[1,1]"  "x[1,2]"
-
-julia> y
-2-element Vector{String}:
- "y[1]"
- "y[2]"
-
-julia> z
-"z"
+julia> (x11, x12, y1, y2, z)
+("x11", "x12", "y1", "y2", "z")
 
 ```
 """
