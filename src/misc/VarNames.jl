@@ -247,18 +247,16 @@ macro varnames_interface(e::Expr, options...)
     opts[:macros] === :(:no) && return :($base; $fancy_method; $fancy_n_method)
     if opts[:macros] === :(:all)
         ss = :(s::Union{Expr, Symbol}...)
-        xs = :(_expr_pairs(s))
+        xs = :(_eval_shapes(s))
     else
         ss = :(s::Expr)
-        xs = quote req(s.head === :tuple, "the final macro argument must be a tuple"); _expr_pair.(s.args) end
+        xs = quote req(s.head === :tuple, "the final macro argument must be a tuple"); _eval_shape.(s.args) end
     end
     fancy_macro = quote
         macro $f($(argnames...), $ss)
-            xs = $xs
-            gens = esc.(first.(xs))
-            varnames = (:($(QuoteNode(k)) => $v) for (k, v) in xs)
             return quote
-                X, $(gens...) = $$f($$(argnames...), $(varnames...))
+                gens = variable_names($($xs...))
+                X, ($(gens...),) = $$f($$(argnames...), $gens)
                 X
             end
         end
@@ -278,10 +276,10 @@ function parse_options(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol}, valid::D
     return result
 end
 
-_expr_pairs(es::Tuple{Vararg{Union{Expr, Symbol}}}) = _expr_pair.(es)
-_expr_pairs((e,)::Tuple{Expr}) = MT.@capture(e, (es__,)) ? _expr_pair.(es) : (_expr_pair(e),) # for `@f args... (varnames...,)` variant
-_expr_pair(e::Expr) = MT.@capture(e, x_[a__]) ? x => :($(esc.(a)...),) : error("variable name must be like `x` or `x[...]`, not `$e`")
-_expr_pair(s::Symbol) = s => missing
+_eval_shapes(es::Tuple{Vararg{Union{Expr, Symbol}}})::Tuple{Vararg{Expr}} = _eval_shape.(es)
+_eval_shapes((e,)::Tuple{Expr})::Tuple{Vararg{Expr}} = MT.@capture(e, (es__,)) ? _eval_shape.((es...,)) : (_eval_shape(e),) # for `@f args... (varnames...,)` variant
+_eval_shape(e::Expr)::Expr = MT.@capture(e, x_[a__]) ? :("$($x)#" => ($(esc(eval.(a))...,))) : error("variable name must be like `x` or `x[...]`, not `$e`")
+_eval_shape(s::Symbol)::Expr = :("$($s)")
 
 @doc raw"""
     @varname_interface [M.]f(args..., varname)
