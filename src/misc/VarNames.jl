@@ -15,7 +15,7 @@ req(cond, msg) = cond || throw(ArgumentError(msg))
 
 Create proper variable names from `a`.
 
-#Examples
+# Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> AbstractAlgebra.variable_names(:x, :y)
@@ -23,23 +23,60 @@ julia> AbstractAlgebra.variable_names(:x, :y)
  :x
  :y
 
-julia> AbstractAlgebra.variable_names(:x => (1, 2), :y => 2, :z)
+julia> AbstractAlgebra.variable_names(:x => (0:0, 0:1), :y => 0:1, :z)
 5-element Vector{Symbol}:
- Symbol("x[1,1]")
- Symbol("x[1,2]")
+ Symbol("x[0,0]")
+ Symbol("x[0,1]")
+ Symbol("y[0]")
  Symbol("y[1]")
- Symbol("y[2]")
  :z
 
-julia> AbstractAlgebra.variable_names(["x$i$j" for i in 0:2, j in 0:1], 'y')
-7-element Vector{Symbol}:
+julia> AbstractAlgebra.variable_names("x#" => (0:0, 0:1), "y#" => 0:1)
+4-element Vector{Symbol}:
  :x00
- :x10
- :x20
  :x01
- :x11
- :x21
- :y
+ :y0
+ :y1
+
+julia> AbstractAlgebra.variable_names("x#" => (0:0, [-1,3,10]), "y#" => [-1,1])
+5-element Vector{Symbol}:
+ :x0_m1
+ :x0_3
+ :x0_10
+ :ym1
+ :y1
+
+julia> AbstractAlgebra.variable_names("x#y#" => (0:0, [-1,3,10]))
+3-element Vector{Symbol}:
+ :x0ym1
+ :x0y3
+ :x0y10
+
+julia> AbstractAlgebra.variable_names("x_{%}" => (0:0, [-1,3,10]))
+3-element Vector{Symbol}:
+ Symbol("x_{0,-1}")
+ Symbol("x_{0,3}")
+ Symbol("x_{0,10}")
+
+julia> AbstractAlgebra.variable_names("x^{(%)}_{%}" => (0:0, [-1,3,10]))
+3-element Vector{Symbol}:
+ Symbol("x^{(0)}_{-1}")
+ Symbol("x^{(0)}_{3}")
+ Symbol("x^{(0)}_{10}")
+
+julia> AbstractAlgebra.variable_names(["x$(string(i; pad=2)_$(string(j; pad=2)" for i in 9:10, j in 9:10])
+4-element Vector{Symbol}:
+ :x09_09
+ :x10_09
+ :x09_10
+ :x10_10
+
+julia> AbstractAlgebra.variable_names('a':'c', 'z')
+4-element Vector{Symbol}:
+ :a
+ :b
+ :c
+ :z
 
 ```
 """
@@ -55,23 +92,28 @@ _variable_names((s, axe)::Pair{<:VarName}) = Symbol.(s, '[', axe, ']')
 _variable_names((s, axe)::Pair{<:AbstractString}) = _variable_names(s => (axe,))
 _variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
 function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
-    c = count('#', s)
+    c_massage = count('#', s)
+    c_no_massage = count('%', s)
+    req(c_massage == 0 || c_no_massage == 0, """In "$s" both '#' and '%' occur. If you need both, please make up an issue.""")
+    c = c_massage | c_no_massage
     indices = Iterators.product(axes...)
-    if c == 0
-        names = Symbol.(s, '[', join.(indices, ','), ']')
+    return if c == 0
+        Symbol.(s, '[', join.(indices, ','), ']')
     else
-        indices = [_replace_bad_chars.(i) for i in indices]
+        massage = c_massage > 0
+        x = massage ? '#' : '%'
+        if massage
+            indices = [_replace_bad_chars.(i) for i in indices]
+        end
         if c == 1
-            index_length = maximum(i->maximum(length, i), indices)
-            delim = index_length > 1 ? "_" : ""
-            names = [Symbol(replace(s, '#' => join(i, delim))) for i in indices]
+            delim = !massage ? "," : maximum(i->maximum(length, i), indices) > 1 ? "_" : ""
+            [Symbol(replace(s, x => join(i, delim))) for i in indices]
         else
-            req(c == length(axes), """In "$s" there occurs a '#' $c times, but only 0, 1, or $(length(axes)) (=number of indices) times is allowed.""")
-            parts = split(s, '#')
-            names = [Symbol(Iterators.flatten(zip(parts, i))..., parts[end]) for i in indices]
+            req(c == length(axes), """In "$s" there occurs a '$x' $c times, but only 0, 1, or $(length(axes)) (= number of indices) times is allowed.""")
+            parts = split(s, x)
+            [Symbol(Iterators.flatten(zip(parts, i))..., parts[end]) for i in indices]
         end
     end
-    return names
 end
 
 _replace_bad_chars(s) = replace(string(s), '-' => 'm', '.' => 'p', r"/+" => 'q')
