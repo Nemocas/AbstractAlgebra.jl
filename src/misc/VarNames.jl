@@ -70,7 +70,7 @@ julia> AbstractAlgebra.variable_names("x^{(%)}_{%}" => (0:0, [-1,3,10]))
  Symbol("x^{(0)}_{3}")
  Symbol("x^{(0)}_{10}")
 
-julia> AbstractAlgebra.variable_names(["x$(string(i; pad=2)_$(string(j; pad=2)" for i in 9:10, j in 9:10])
+julia> AbstractAlgebra.variable_names(["x$(string(i; pad=2))_$(string(j; pad=2))" for i in 9:10, j in 9:10])
 4-element Vector{Symbol}:
  :x09_09
  :x10_09
