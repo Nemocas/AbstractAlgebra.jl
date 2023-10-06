@@ -9,6 +9,8 @@ const VarNames = Union{
 }
 
 req(cond, msg) = cond || throw(ArgumentError(msg))
+# The macro version will only evaluate `msg` if needed
+macro req(cond, msg) :($cond || throw(ArgumentError($msg))) end
 
 @doc raw"""
     variable_names(a...) -> Vector{Symbol}
@@ -431,8 +433,8 @@ macro varname_interface(e::Expr, options::Expr...)
     fancy_macro = :(
         macro $f($(argnames...), s::Symbol, options::Expr...)
             rest, kv = extract_options(options)
-            req(isempty(rest), "The univariate macro `@$f` accepts only one Symbol and following `option=value` pairs, but `$(first(rest))` given." *
-                "If you intended to use a multivariate version of `@$f`, check that `@varname_interface f(...)` is followed by `macros=:no`.")
+            @req(isempty(rest), "The univariate macro `@$($f)` accepts only one Symbol and following `option=value` pairs, but `$(first(rest))` given." *
+                "If you intended to use a multivariate version of `@$($f)`, check that `@varname_interface $($f)(...)` is followed by `macros=:no`.")
             quote
                 X, $(esc(s)) = $$f($$(argnames...), $(QuoteNode(s)); $(esc.(kv)...))
                 X
