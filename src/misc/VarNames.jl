@@ -225,8 +225,13 @@ Base method. If `M` is given, this calls `M.f`. Otherwise, it has to exist alrea
 ---
 
     X, vars... = f(args..., varnames...)
+    X, vars... = f(args..., varnames::Tuple)
 
 Compute `X` and `gens` via the base method. Then reshape `gens` into the shape defined by `varnames` according to [`variable_names`](@ref).
+
+The vararg `varnames...` method needs at least one argument to avoid confusion.
+Moreover a single `VarName` argument will be dispatched to use a univariate method of `f` if it exists (e.g. `polynomial_ring(R, :x)`).
+If you need those cases, use the `Tuple` method.
 
 ---
 
@@ -236,11 +241,15 @@ Shorthand for `X, x = f(args..., "$s#", 1:n)`. Can be changed via the `n` option
 
 ---
 
-    X = @f args... varname[axes...] ...
-    X = @f args... (varname[axes...] ...)
+    X = @f args... varname[iter...] ...
+    X = @f args... (varname[iter...] ...)
 
-As `f(args..., "varname#" => axes, ...)`, and also introduce the indexed `varname` into the current scope.
+As `f(args..., "varname#" => iter, ...)`, and also introduce the indexed `varname` into the current scope.
+Giving `[iter...]` is optional. A `varname` without that stands for a single symbol.
 Can be disabled via `macros=:no`.
+As for the `f(args..., varnames...)` method above, we require at least one `varname`,
+and if there is only one `varname` argument and this is a `Symbol` the univariate method of the macro will be used if it exists (e.g. `@polynomial_ring R x`).
+The `Tuple` version works in all the cases.
 
 # Examples
 
@@ -277,7 +286,7 @@ julia> (x11, x12, y1, y2, z)
 macro varnames_interface(e::Expr, options...)
     f, args, argnames, wheres, base = _varname_interface(e, :(Vector{Symbol}))
     fancy_method = quote
-        $f($(args...), s::VarNames...; kv...) where {$(wheres...)} = $f($(argnames...), s; kv...)
+        $f($(args...), s1::VarNames, s::VarNames...; kv...) where {$(wheres...)} = $f($(argnames...), (s1, s...); kv...)
         function $f($(args...), s::Tuple{Vararg{VarNames}}; kv...) where {$(wheres...)}
             X, gens = $f($(argnames...), variable_names(s...); kv...)
             return X, reshape_to_varnames(gens, s...)...
@@ -304,8 +313,8 @@ macro varnames_interface(e::Expr, options...)
 
     opts[:macros] === :(:no) && return :($base; $fancy_method; $fancy_n_method)
     fancy_macro = quote
-        macro $f($(argnames...), s::Union{Expr, Symbol}...)
-            gens = variable_names(_eval_shapes(Main, s...))
+        macro $f($(argnames...), s1::Union{Expr, Symbol}, s::Union{Expr, Symbol}...)
+            gens = variable_names(_eval_shapes(Main, s1, s...))
             return quote
                 X, ($(esc.(gens)...),) = $$f($$(argnames...), $gens)
                 X
