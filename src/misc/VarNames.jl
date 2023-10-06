@@ -113,7 +113,7 @@ function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
     return if '%' in s
         [Symbol(Printf.format(Printf.Format(s), i...)) for i in indices]
     else
-        c_massage = count("#", s) # From v"1.7" on, we could use a `Char` instead.
+        c_massage = count("#", s) # From julia 1.7 on, we could use a `Char` instead.
         c_no_massage = count("@", s)
         req(c_massage == 0 || c_no_massage == 0, """In "$s" both '#' and '@' occur. If you need both, please make up an issue.""")
         c = c_massage | c_no_massage
@@ -137,7 +137,7 @@ function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
     end
 end
 
-_replace_bad_chars(s) = replace(replace(replace(string(s), '-' => 'm'), '.' => 'p'), r"/+" => 'q')
+_replace_bad_chars(s) = replace(replace(replace(string(s), '-' => 'm'), '.' => 'p'), r"/+" => 'q') # becomes simpler with julia 1.7
 
 @doc raw"""
     reshape_to_varnames(vec::Vector{T}, varnames...) :: Tuple{Array{<:Any, T}}
@@ -180,10 +180,6 @@ _reshape(iter, dims) = reshape(collect(Iterators.take(iter, prod(dims))), Tuple(
 __reshape(iter, ::Missing) = popfirst!(iter)
 __reshape(iter, axes::Tuple) = _reshape(iter, Int[d for axe in axes for d in size(axe)])
 __reshape(iter, axe) = _reshape(iter, size(axe))
-
-# `Int` only syntax
-_reshape(_, n::Int) = _int_axe_error(:s, n)
-# _reshape(iter, n::Int) = collect(Iterators.take(iter, n))
 
 function _varname_interface(e::Expr, @nospecialize s::Union{Expr, Symbol})
     ex = Meta.isexpr(e, (:(=), :function)) ? e : Expr(:(=), e, :())
