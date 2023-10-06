@@ -137,7 +137,7 @@ function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
     end
 end
 
-_replace_bad_chars(s) = replace(string(s), '-' => 'm', '.' => 'p', r"/+" => 'q')
+_replace_bad_chars(s) = replace(replace(replace(string(s), '-' => 'm'), '.' => 'p'), r"/+" => 'q')
 
 @doc raw"""
     reshape_to_varnames(vec::Vector{T}, varnames...) :: Tuple{Array{<:Any, T}}
@@ -186,7 +186,7 @@ _reshape(_, n::Int) = _int_axe_error(:s, n)
 # _reshape(iter, n::Int) = collect(Iterators.take(iter, n))
 
 function _varname_interface(e::Expr, @nospecialize s::Union{Expr, Symbol})
-    ex = MT.isexpr(e, :(=), :function) ? e : Expr(:(=), e, :())
+    ex = Meta.isexpr(e, (:(=), :function)) ? e : Expr(:(=), e, :())
     d = MT.splitdef(ex)
 
     callf = esc(d[:name])
@@ -306,7 +306,7 @@ macro varnames_interface(e::Expr, options::Expr...)
     fancy_n_method = if n === :(:no)
         :()
     else
-        req(n isa Symbol || MT.isexpr(n, :call), "Value to option `n` must be `:no`, an alternative name like `m` or some expression like `0:n`, not `$n`")
+        req(n isa Symbol || Meta.isexpr(n, :call), "Value to option `n` must be `:no`, an alternative name like `m` or some expression like `0:n`, not `$n`")
         if n isa Symbol
             one_to_n = :(Base.OneTo($n))
         elseif n isa Expr
@@ -355,7 +355,7 @@ function parse_options(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol}, valid::D
 end
 
 function extract_options(es) # -> args, options
-    options_start = findfirst(e -> MT.isexpr(e, :(=)), es)
+    options_start = findfirst(e -> Meta.isexpr(e, :(=)), es)
     options_start === nothing && return es, es[end+1:end]
     args = es[begin:options_start-1]
     options = map(e -> (req(MT.@capture(e, k_ = v_), "The argument `$e` comes after an option, so it also must be of the form `option=value`"); :($(QuoteNode(k::Symbol)) => $v)), es[options_start:end])
