@@ -212,7 +212,7 @@ function _varname_interface(e::Expr, @nospecialize s::Union{Expr, Symbol})
 end
 
 @doc raw"""
-    @varnames_interface [M.]f(args..., varnames) macros=:all n=1:n
+    @varnames_interface [M.]f(args..., varnames) macros=:yes n=1:n
 
 Add methods `X, vars = f(args..., varnames...)` and macro `X = @f args... varnames...` to current scope.
 
@@ -224,8 +224,8 @@ Base method. If `M` is given, this calls `M.f`. Otherwise, it has to exist alrea
 
 ---
 
-    X, vars... = f(args..., varnames...)
-    X, vars... = f(args..., varnames::Tuple)
+    X, vars... = f(args..., varnames...; kv...)
+    X, vars... = f(args..., varnames::Tuple; kv...)
 
 Compute `X` and `gens` via the base method. Then reshape `gens` into the shape defined by `varnames` according to [`variable_names`](@ref).
 
@@ -233,23 +233,29 @@ The vararg `varnames...` method needs at least one argument to avoid confusion.
 Moreover a single `VarName` argument will be dispatched to use a univariate method of `f` if it exists (e.g. `polynomial_ring(R, :x)`).
 If you need those cases, use the `Tuple` method.
 
+Keyword arguments are passed on to the base method.
+
 ---
 
-    X, x::Vector{T} = f(args..., n::Int, s::VarName = :x)
+    X, x::Vector{T} = f(args..., n::Int, s::VarName = :x; kv...)
 
 Shorthand for `X, x = f(args..., "$s#", 1:n)`. Can be changed via the `n` option. Setting `n=:no` disables creation of this method.
 
+Keyword arguments are passed on to the base method.
+
 ---
 
-    X = @f args... varname[iter...] ...
-    X = @f args... (varname[iter...] ...)
+    X = @f args... varname[iter...] ... option=value ...
+    X = @f args... (varname[iter...] ...) option=value ...
 
 As `f(args..., "varname#" => iter, ...)`, and also introduce the indexed `varname` into the current scope.
 Giving `[iter...]` is optional. A `varname` without that stands for a single symbol.
 Can be disabled via `macros=:no`.
-As for the `f(args..., varnames...)` method above, we require at least one `varname`,
-and if there is only one `varname` argument and this is a `Symbol` the univariate method of the macro will be used if it exists (e.g. `@polynomial_ring R x`).
-The `Tuple` version works in all the cases.
+As for the `f(args..., varnames...)` method above, we require at least one `varname`.
+If there is only one `varname` argument and this is a `Symbol` the univariate method base method will be called if it exists (e.g. `polynomial_ring(R, x)`).
+You can still use the `Tuple` version for such edge cases.
+
+Any `option=value` pairs at the end of the macro are passed on as keyword arguments.
 
 # Examples
 
@@ -283,7 +289,7 @@ julia> (x11, x12, y1, y2, z)
 
 ```
 """
-macro varnames_interface(e::Expr, options...)
+macro varnames_interface(e::Expr, options::Expr...)
     f, args, argnames, wheres, base = _varname_interface(e, :(Vector{Symbol}))
     fancy_method = quote
         $f($(args...), s1::VarNames, s::VarNames...; kv...) where {$(wheres...)} = $f($(argnames...), (s1, s...); kv...)
@@ -293,7 +299,7 @@ macro varnames_interface(e::Expr, options...)
         end
     end
 
-    opts = parse_options(options, Dict(:n => :n, :macros => :(:all)), Dict(:macros => QuoteNode.([:no, :all])))
+    opts = parse_options(options, Dict(:n => :n, :macros => :(:yes)), Dict(:macros => QuoteNode.([:no, :yes])))
     one_to_n = n = opts[:n]
     fancy_n_method = if n === :(:no)
         :()
@@ -314,10 +320,20 @@ macro varnames_interface(e::Expr, options...)
     opts[:macros] === :(:no) && return :($base; $fancy_method; $fancy_n_method)
     fancy_macro = quote
         macro $f($(argnames...), s1::Union{Expr, Symbol}, s::Union{Expr, Symbol}...)
-            gens = variable_names(_eval_shapes(Main, s1, s...))
-            return quote
-                X, ($(esc.(gens)...),) = $$f($$(argnames...), $gens)
-                X
+            s, kv = extract_options(s)
+            return if isempty(s) && s1 isa Symbol
+                # use vararg method respectively the univariate method if it exists
+                quote
+                    X, $(esc(s1)) = $$f($$(argnames...), $(QuoteNode(s1)))
+                    X
+                end
+            else
+                # use base method directly
+                gens = variable_names(_eval_shapes(Main, s1, s...))
+                quote
+                    X, ($(esc.(gens)...),) = $$f($$(argnames...), $gens; $(esc.(kv)...)) # the need for `esc` is probably a bug in julia
+                    X
+                end
             end
         end
     end
@@ -325,15 +341,23 @@ macro varnames_interface(e::Expr, options...)
     return :($base; $fancy_method; $fancy_n_method; $fancy_macro)
 end
 
-function parse_options(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol}, valid::Dict{Symbol, <:Vector} = Dict{Symbol, Vector{Any}}())
+function parse_options(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol}, valid::Dict{Symbol, <:Vector} = Dict{Symbol, Vector{Any}}()) :: Dict{Symbol}
     result = Dict{Symbol, Any}(default)
     for o in kvs
-        MT.@capture(o, k_ = v_) || error("only key value options allowed")
-        req(k in keys(result), "invalid key value option key `$k`")
-        k in keys(valid) && req(v in valid[k], "invalid option `$v` to key `$k`")
+        req(MT.@capture(o, k_ = v_), "Only key value options allowed")
+        req(k in keys(result), "Invalid key value option key `$k`")
+        k in keys(valid) && req(v in valid[k], "Invalid option `$v` to key `$k`")
         result[k] = v
     end
     return result
+end
+
+function extract_options(es) # -> args, options
+    options_start = findfirst(e -> Base.isexpr(e, :(=)), es)
+    options_start === nothing && return es, es[end+1:end]
+    args = es[begin:options_start-1]
+    options = map(e -> (req(MT.@capture(e, k_ = v_), "The argument `$e` comes after an option, so it also must be of the form `option=value`"); :($(QuoteNode(k::Symbol)) => $v)), es[options_start:end])
+    return args, options
 end
 
 _eval_shapes(m::Core.Module, es::Union{Expr, Symbol}...) :: Tuple{Vararg{Union{<:Pair{String, Tuple}, Symbol}}} = _eval_shape.((m,), es)
@@ -341,7 +365,7 @@ _eval_shapes(m::Core.Module, e::Expr) :: Tuple{Vararg{Union{<:Pair{String, Tuple
     MT.@capture(e, (es__,)) ? # Are we in the case of the `@f args... (varnames...,)` variant?
     _eval_shape.((m,), (es...,)) : # Yes, we are, `es` is like `(x[0:5], y)`.
     (_eval_shape(m, e),) # No, we are in the ordinary case and have only one varname, `es` is like `x[0:5]`.
-_eval_shape(m::Core.Module, e::Expr) :: Pair{String, Tuple} = MT.@capture(e, x_[a__]) ? "$x#" => (_eval.((m,), a)...,) : error("variable name must be like `x` or `x[...]`, not `$e`")
+_eval_shape(m::Core.Module, e::Expr) :: Pair{String, Tuple} = (req(MT.@capture(e, x_[a__]), "Variable name must be like `x` or `x[...]`, not `$e`"); "$x#" => (_eval.((m,), a)...,))
 _eval_shape(::Core.Module, s::Symbol) = s
 
 function _eval(m::Core.Module, e::Expr)
@@ -356,11 +380,11 @@ function _eval(m::Core.Module, e::Expr)
 end
 
 @doc raw"""
-    @varname_interface [M.]f(args..., varname)
+    @varname_interface [M.]f(args..., varname) macros=:yes
 
-Add method `X, vars = f(args..., varname::VarName)` and macro `X = @f args... varname::Symbol` to current scope. Read on.
+Add method `X, vars = f(args..., varname::VarName)` and macro `X = @f args... varname::Symbol` to current scope.
 
----
+# Created methods
 
     X, gen::T = f(args..., varname::Symbol)
 
@@ -375,6 +399,7 @@ Base method. If `M` is given, this calls `M.f`, otherwise, it has to exist alrea
     X = @f args... varname::Symbol
 
 As `f(args..., varname)`, and also introduce `varname` into the current scope.
+Must be disabled via `macros=:no` option, when also using the multivariate `@varnames_interface f`.
 
 # Examples
 
@@ -398,13 +423,18 @@ julia> x
 :x
 ```
 """
-macro varname_interface(e::Expr)
+macro varname_interface(e::Expr, options::Expr...)
     f, args, argnames, wheres, base = _varname_interface(e, :Symbol)
     fancy_method = :($f($(args...), s::Union{AbstractString, Char}; kv...) where {$(wheres...)} = $f($(argnames...), Symbol(s); kv...))
+    opts = parse_options(options, Dict(:macros => :(:yes)), Dict(:macros => QuoteNode.([:no, :yes])))
+    opts[:macros] == :(:yes) || return :($base; $fancy_method)
     fancy_macro = :(
-        macro $f($(argnames...), s::Symbol)
+        macro $f($(argnames...), s::Symbol, options::Expr...)
+            rest, kv = extract_options(options)
+            req(isempty(rest), "The univariate macro `@$f` accepts only one Symbol and following `option=value` pairs, but `$(first(rest))` given.\
+                If you intended to use a multivariate version of `@$f`, check that `@varname_interface f(...)` is followed by `macros=:no`.")
             quote
-                X, $(esc(s)) = $$f($$(argnames...), $(QuoteNode(s)))
+                X, $(esc(s)) = $$f($$(argnames...), $(QuoteNode(s)); $(esc.(kv)...))
                 X
             end
         end
@@ -422,16 +452,16 @@ end
 @varnames_interface Generic.free_associative_algebra(R::Ring, s)
 @varnames_interface Generic.LaurentPolynomialRing(R::Ring, s)
 
-# The various optional arguments would result in ambiguities
-@varname_interface Generic.power_series_ring(R::Ring, prec::Int, s)
+@varname_interface Generic.power_series_ring(R::Ring, prec::Int, s) macros=:no
 @varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s)
-@varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s) macros=:no
-@varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no
+@varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s) macros=:no # use keyword `weights=...` instead
+@varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no # `n` variant would clash with line above; macro would be the same as for `prec::Int`
 
-@varname_interface polynomial_ring(R::NCRing, s)
+@varname_interface polynomial_ring(R::NCRing, s) macros=:no
 @varnames_interface polynomial_ring(R::Ring, s)
 # With `Ring <: NCRing`, we need to resolve ambiguities of `polynomial_ring(::Ring, s...)`
 polynomial_ring(R::Ring, s::Symbol; kv...) = invoke(polynomial_ring, Tuple{NCRing, Symbol}, R, s; kv...)
 polynomial_ring(R::Ring, s::Union{AbstractString, Char}; kv...) = polynomial_ring(R, Symbol(s); kv...)
 
 # TODO: weights in `graded_polynomial_ring` and `power_series_ring`
+# → TODO: accept keywords in macros
