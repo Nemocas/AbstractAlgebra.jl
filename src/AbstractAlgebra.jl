@@ -950,7 +950,7 @@ export laurent_ring
 export laurent_series
 export laurent_series_field
 export laurent_series_ring
-export LaurentPolynomialRing
+export laurent_polynomial_ring
 export lcm
 export leading_coefficient
 export leading_exponent_vector

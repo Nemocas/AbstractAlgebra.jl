@@ -15,27 +15,27 @@ function test_elem(R::AbstractAlgebra.Generic.LaurentMPolyWrapRing{AbstractAlgeb
 end
 
 @testset "Generic.LaurentMPoly.conformance" begin
-    L, (x, y) = LaurentPolynomialRing(ZZ, ["x", "y"])
+    L, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"])
     test_Ring_interface(L)
     test_Ring_interface_recursive(L)
 
-    L, (x, y) = LaurentPolynomialRing(residue_ring(ZZ, ZZ(6)), ["x", "y"])
+    L, (x, y) = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6)), ["x", "y"])
     test_Ring_interface(L)
 end
 
 @testset "Generic.LaurentMPoly.constructors" begin
-    L, (x, y) = LaurentPolynomialRing(GF(5), 2, "x", cached = true)
-    @test L != LaurentPolynomialRing(GF(5), 2, 'x', cached = false)[1]
-    @test L == LaurentPolynomialRing(GF(5), 2, :x, cached = true)[1]
+    L, (x, y) = laurent_polynomial_ring(GF(5), 2, "x", cached = true)
+    @test L != laurent_polynomial_ring(GF(5), 2, 'x', cached = false)[1]
+    @test L == laurent_polynomial_ring(GF(5), 2, :x, cached = true)[1]
 
     @test base_ring(L) == GF(5)
     @test coefficient_ring(L) == GF(5)
     @test base_ring(x) == GF(5)
     @test coefficient_ring(x) == GF(5)
 
-    L, (x, y) = LaurentPolynomialRing(GF(5), ["x", "y"])
-    @test L == LaurentPolynomialRing(GF(5), ['x', 'y'])[1]
-    @test L != LaurentPolynomialRing(GF(5), [:x, :y], cached = false)[1]
+    L, (x, y) = laurent_polynomial_ring(GF(5), ["x", "y"])
+    @test L == laurent_polynomial_ring(GF(5), ['x', 'y'])[1]
+    @test L != laurent_polynomial_ring(GF(5), [:x, :y], cached = false)[1]
 
     # only works because of the caching
     R, (X, Y) = polynomial_ring(coefficient_ring(L), symbols(L))
@@ -46,12 +46,12 @@ end
 end
 
 @testset "Generic.LaurentMPoly.printing" begin
-   R, (x,) = LaurentPolynomialRing(residue_ring(ZZ, 6), ["x"])
+   R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6), ["x"])
    @test !occursin("\n", sprint(show, R))
 end
 
 @testset "Generic.LaurentMPoly.is_unit" begin
-   R, (x,) = LaurentPolynomialRing(residue_ring(ZZ, 6), ["x"])
+   R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6), ["x"])
 
    @test is_unit(x)
    @test !is_unit(2*x)
@@ -64,7 +64,7 @@ end
 end
 
 @testset "Generic.LaurentMPoly.derivative" begin
-    L, (x, y) = LaurentPolynomialRing(ZZ, ["x", "y"])
+    L, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"])
 
     @test derivative(x, x) == 1
     @test derivative(y, x) == 0
@@ -74,14 +74,14 @@ end
 end
 
 @testset "Generic.LaurentMPoly.euclidean" begin
-    L, (x, y) = LaurentPolynomialRing(ZZ, ["x", "y"])
+    L, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"])
     @test isone(gcd(x, y))
     @test isone(gcd(inv(x), inv(y)))
     @test_throws Exception divrem(x, y)
 end
 
 @testset "Generic.LaurentMPoly.mpoly" begin
-    L, (x, y) = LaurentPolynomialRing(ZZ, ["x", "y"])
+    L, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"])
 
     @test is_gen(x)
     @test is_gen(y)
@@ -121,7 +121,7 @@ end
 
     @test map_coefficients(x->x^2, a) == 4*x^-2*y + 9*x*y^-3
 
-    Q, (X, Y) = LaurentPolynomialRing(QQ, ["x", "y"])
+    Q, (X, Y) = laurent_polynomial_ring(QQ, ["x", "y"])
     @test change_base_ring(QQ, a) == 2*X^-2*Y + 3*X*Y^-3
 
     b = MPolyBuildCtx(L)

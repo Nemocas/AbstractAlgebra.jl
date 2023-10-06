@@ -494,11 +494,11 @@ end
 #
 ###############################################################################
 
-abstract type LaurentPolynomialRing{T} <: AbstractAlgebra.LaurentPolynomialRing{T} end
+abstract type LaurentPolyRing{T} <: AbstractAlgebra.LaurentPolyRing{T} end
 
 mutable struct LaurentPolyWrapRing{T  <: RingElement,
                                    PR <: AbstractAlgebra.PolyRing{T}
-                                  } <: LaurentPolynomialRing{T}
+                                  } <: LaurentPolyRing{T}
    polyring::PR
 
    function LaurentPolyWrapRing(pr::PR, cached::Bool = true) where {
