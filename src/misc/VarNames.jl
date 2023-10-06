@@ -111,8 +111,8 @@ function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
     return if '%' in s
         [Symbol(Printf.format(Printf.Format(s), i...)) for i in indices]
     else
-        c_massage = count('#', s)
-        c_no_massage = count('@', s)
+        c_massage = count("#", s) # From v"1.7" on, we could use a `Char` instead.
+        c_no_massage = count("@", s)
         req(c_massage == 0 || c_no_massage == 0, """In "$s" both '#' and '@' occur. If you need both, please make up an issue.""")
         c = c_massage | c_no_massage
         if c == 0
