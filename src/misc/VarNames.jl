@@ -466,5 +466,3 @@ end
 # With `Ring <: NCRing`, we need to resolve ambiguities of `polynomial_ring(::Ring, s...)`
 polynomial_ring(R::Ring, s::Symbol; kv...) = invoke(polynomial_ring, Tuple{NCRing, Symbol}, R, s; kv...)
 polynomial_ring(R::Ring, s::Union{AbstractString, Char}; kv...) = polynomial_ring(R, Symbol(s); kv...)
-
-# TODO: weights in `graded_polynomial_ring` and `power_series_ring`
