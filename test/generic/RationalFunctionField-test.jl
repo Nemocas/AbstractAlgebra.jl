@@ -1,10 +1,10 @@
 @testset "Generic.RationalFunctionField.constructors" begin
    # Univariate
 
-   T, x = RationalFunctionField(QQ, "x")
+   T, x = rational_function_field(QQ, "x")
 
-   @test RationalFunctionField(QQ, "x", cached = true)[1] === RationalFunctionField(QQ, "x", cached = true)[1]
-   @test RationalFunctionField(QQ, "x", cached = false)[1] !== RationalFunctionField(QQ, "x", cached = false)[1]
+   @test rational_function_field(QQ, "x", cached = true)[1] === rational_function_field(QQ, "x", cached = true)[1]
+   @test rational_function_field(QQ, "x", cached = false)[1] !== rational_function_field(QQ, "x", cached = false)[1]
 
    @test elem_type(T) == Generic.RationalFunctionFieldElem{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
    @test elem_type(Generic.RationalFunctionField{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}) == Generic.RationalFunctionFieldElem{Rational{BigInt}, Generic.Poly{Rational{BigInt}}}
@@ -30,7 +30,7 @@
 
    @test isa(((x + 1)//(x + 2))//((x + 3)//(x + 4)), Generic.RationalFunctionFieldElem)
 
-   TT, x = RationalFunctionField(QQ, "x")
+   TT, x = rational_function_field(QQ, "x")
    a = TT(1)
    b = T(2)
 
@@ -42,10 +42,10 @@
 
    # Multivariate
 
-   T, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   T, (x, y) = rational_function_field(QQ, ["x", "y"])
 
-   @test RationalFunctionField(QQ, ["x", "y"], cached = true)[1] === RationalFunctionField(QQ, ["x", "y"], cached = true)[1]
-   @test RationalFunctionField(QQ, ["x", "y"], cached = false)[1] !== RationalFunctionField(QQ, ["x", "y"], cached = false)[1]
+   @test rational_function_field(QQ, ["x", "y"], cached = true)[1] === rational_function_field(QQ, ["x", "y"], cached = true)[1]
+   @test rational_function_field(QQ, ["x", "y"], cached = false)[1] !== rational_function_field(QQ, ["x", "y"], cached = false)[1]
 
    @test elem_type(T) == Generic.RationalFunctionFieldElem{Rational{BigInt}, Generic.MPoly{Rational{BigInt}}}
 
@@ -74,13 +74,13 @@ end
 
 @testset "Generic.RationalFunctionField.printing" begin
    # Univariate
-   S, x = RationalFunctionField(QQ, "x")
+   S, x = rational_function_field(QQ, "x")
 
    @test string((x+1)//x) == "(x + 1)//x"
    @test string(x//x//x) == "1//x"
 
    # Multivariate
-   S, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   S, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    @test string((x+1)//y) == "(x + 1)//y"
    @test string(y//x//y) == "1//x"
@@ -88,19 +88,19 @@ end
 
 @testset "Generic.RationalFunctionField.rand" begin
    # Univariate
-   K, x = RationalFunctionField(QQ, "x")
+   K, x = rational_function_field(QQ, "x")
 
    test_rand(K, 0:3, -3:3)
 
    # Multivariate
-   K, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   K, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    test_rand(K, 0:3, 0:3, -3:3)
 end
 
 @testset "Generic.RationalFunctionField.manipulation" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    @test denominator((x + 1)//(-x^2 + 1)) == numerator(x - 1)
 
@@ -121,7 +121,7 @@ end
    @test characteristic(R) == 0
 
    # Multivariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    @test denominator((y + 1)//(x*y + x - y - 1)) == numerator(x - 1)
 
@@ -142,18 +142,18 @@ end
 
 @testset "Generic.RationalFunctionField.unary_ops" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    @test -((x + 1)//(-x^2 + 1)) == 1//(x - 1)
 
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    @test -((y + 1)//(x*y + x - y - 1)) == -1//(x - 1)
 end
 
 @testset "Generic.RationalFunctionField.binary_ops" begin
    # Univariate
-   K, x = RationalFunctionField(QQ, "x")
+   K, x = rational_function_field(QQ, "x")
 
    for iter = 1:100
       a = rand(K, 0:3, -3:3)
@@ -167,7 +167,7 @@ end
    end
 
    # Multivariate
-   K, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   K, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    for iter = 1:100
       a = rand(K, 0:3, 0:3, -3:3)
@@ -183,7 +183,7 @@ end
 
 @testset "Generic.RationalFunctionField.adhoc_binary" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    a = (-x + 1)//(2x^2 + 3)
    b = (x + 1)//(-x^2 + 1)
@@ -204,7 +204,7 @@ end
    @test denominator(a) + a == a + denominator(a)
 
    # Multivariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    a = (-x + 1)//(2x^2 + 3)
    b = (y + 1)//(-x*y - x + y + 1)
@@ -227,7 +227,7 @@ end
 
 @testset "Generic.RationalFunctionField.comparison" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    a = -((x + 1)//(-x^2 + 1))
 
@@ -236,7 +236,7 @@ end
    @test isequal(a, 1//(x - 1))
 
    # Multivariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    a = -((y + 1)//(-x*y - x + y + 1))
 
@@ -247,7 +247,7 @@ end
 
 @testset "Generic.RationalFunctionField.adhoc_comparison" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    a = 1//(x - 1)
 
@@ -262,7 +262,7 @@ end
    @test R(x + 1) == x + 1
 
    # Univariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    a = 1//(x - 1)
 
@@ -279,7 +279,7 @@ end
 
 @testset "Generic.RationalFunctionField.powering" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    a = (x + 1)//(-x^2 + 1)
 
@@ -298,7 +298,7 @@ end
    end
 
    # Multivariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    a = (x + 1)//(-y^2 + 1)
 
@@ -319,7 +319,7 @@ end
 
 @testset "Generic.RationalFunctionField.inversion" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    a = (x + 1)//(-x^2 + 1)
 
@@ -327,7 +327,7 @@ end
    @test_throws NotInvertibleError inv(R())
 
    # Multivariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    a = (y + 1)//(-x*y - x + y + 1)
 
@@ -337,7 +337,7 @@ end
 
 @testset "Generic.RationalFunctionField.exact_division" begin
    # Univariate
-   K, x = RationalFunctionField(QQ, "x")
+   K, x = rational_function_field(QQ, "x")
 
    for iter = 1:100
       a = K()
@@ -359,7 +359,7 @@ end
    end
 
    # Multivariate
-   K, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   K, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    for iter = 1:100
       a = K()
@@ -383,7 +383,7 @@ end
 
 @testset "Generic.RationalFunctionField.adhoc_exact_division" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    a = (-x + 1)//(2x^2 + 3)
    b = (x + 1)//(-x^2 + 1)
@@ -397,7 +397,7 @@ end
    @test 5//a == (-10*x^2-15)//(x-1)
 
    # Multivariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    a = (-x + 1)//(2x^2 + 3)
    b = (y + 1)//(-x*y - x + y + 1)
@@ -413,7 +413,7 @@ end
 
 @testset "Generic.RationalFunctionField.divides" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    for i in 1:100
      a = rand(R, 1:5, -10:10)
@@ -427,7 +427,7 @@ end
    end
 
    # Univariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    for i in 1:100
      a = rand(R, 1:5, 0:3, -10:10)
@@ -461,14 +461,14 @@ end
 
 @testset "Generic.RationalFunctionField.derivative" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    f = (x^2 + 1)//2x
 
    @test derivative(f) == (x^2 - 1)//2x^2
 
    # Multivariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    f = (x^2 + 1)//2y
 
@@ -477,7 +477,7 @@ end
 
 @testset "Generic.RationalFunctionField.square_root" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    for i = 1:100
       a = rand(R, 1:5, -10:10)
@@ -488,7 +488,7 @@ end
    end
 
    # Multivariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    for i = 1:100
       a = rand(R, 1:5, 0:3, -10:10)
@@ -501,14 +501,14 @@ end
 
 @testset "Generic.RationalFunctionField.gcd" begin
    # Univariate
-   R, x = RationalFunctionField(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    a = (x + 1)//(-x^2 + 1) - x//(2x + 1)
 
    @test gcd(a, (x + 1)//(x - 1)) == 1//(x^2-1//2*x-1//2)
 
    # Multivariate
-   R, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    a = (x + 1)//(y + 1) - y//(2x + 1)
 
@@ -517,14 +517,14 @@ end
 
 @testset "Generic.RationalFunctionField.promotion" begin
    # Univariate
-   K, x = RationalFunctionField(QQ, "x")
+   K, x = rational_function_field(QQ, "x")
    
    T = elem_type(K)
    
    @test AbstractAlgebra.promote_rule(T, T) == T
 
    # Multivariate
-   K, (x, y) = RationalFunctionField(QQ, ["x", "y"])
+   K, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    T = elem_type(K)
 

@@ -1,10 +1,10 @@
-R1, x1 = RationalFunctionField(QQ, "x1")
+R1, x1 = rational_function_field(QQ, "x1")
 U1, z1 = R1["z1"]
 
 P1 = [(x1 + 1)*z1 + (x1 + 2), z1 + (x1 + 1)//(x1 + 2), z1^2 + 3z1 + 1,
      (x1^2 + 1)//(x1 + 1)*z1^5 + 4z1^4 + (x1 + 2)*z1^3 + x1//(x1 + 1)*z1 + 1//(x1 + 1)]
 
-R2, x2 = RationalFunctionField(GF(23), "x2")
+R2, x2 = rational_function_field(GF(23), "x2")
 
 U2, z2 = R2["z2"]
 
@@ -12,10 +12,10 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
      (x2^2 + 1)//(x2 + 1)*z2^5 + 4z2^4 + (x2 + 2)*z2^3 + x2//(x2 + 1)*z2 + 1//(x2 + 1)]
 
 @testset "Generic.FunctionField.constructors" begin 
-   @test FunctionField(P1[1], "y")[1] === FunctionField(P1[1], "y", cached=true)[1]
-   @test FunctionField(P1[1], "y", cached=true)[1] !== FunctionField(P1[1], "y", cached=false)[1]
+   @test function_field(P1[1], "y")[1] === function_field(P1[1], "y", cached=true)[1]
+   @test function_field(P1[1], "y", cached=true)[1] !== function_field(P1[1], "y", cached=false)[1]
 
-   for (S, y) in  [FunctionField(P1[3], "y"), FunctionField(P2[3], "y")]
+   for (S, y) in  [function_field(P1[3], "y"), function_field(P2[3], "y")]
       R = base_ring(base_ring(S))
       
       @test elem_type(S) == Generic.FunctionFieldElem{elem_type(R)}
@@ -40,8 +40,8 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
       @test isa(c, Generic.FunctionFieldElem)
    end
 
-   S1, y1 = FunctionField(P1[3], "y1")
-   S2, y2 = FunctionField(P2[3], "y2")
+   S1, y1 = function_field(P1[3], "y1")
+   S2, y2 = function_field(P2[3], "y2")
 
    d = S1(QQ(2, 3))
 
@@ -76,7 +76,7 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
 end
 
 @testset "Generic.FunctionField.printing" begin
-   S, y = FunctionField(P1[4], "y")
+   S, y = function_field(P1[4], "y")
 
    @test string(zero(S)) == "0"
    @test string(one(S)) == "1"
@@ -85,7 +85,7 @@ end
    @test string((x1 + 1)//(x1 + 2)*y^2 - 1//(x1 + 2)*y + 3) ==
                            "((x1 + 1)*y^2 - y + 3*x1 + 6)//(x1 + 2)"
 
-   S, y = FunctionField(P2[4], "y")
+   S, y = function_field(P2[4], "y")
 
    @test string(zero(S)) == "0"
    @test string(one(S)) == "1"
@@ -95,14 +95,14 @@ end
 
 @testset "Generic.FunctionField.rand" begin
    for f in P1
-      S, y = FunctionField(f, "y")
+      S, y = function_field(f, "y")
 
       # TODO: test more than just the result type
       test_rand(S, 1:10, -10:10)
    end
    
    for f in P2
-      S, y = FunctionField(f, "y")
+      S, y = function_field(f, "y")
 
       # TODO: test more than just the result type
       test_rand(S, 1:10)
@@ -111,7 +111,7 @@ end
 
 @testset "Generic.FunctionField.manipulation" begin
    for f in union(P1, P2)
-      S, y = FunctionField(f, "y")
+      S, y = function_field(f, "y")
 
       @test iszero(zero(S))
 
@@ -140,7 +140,7 @@ end
    end
 
    # characteristic 0
-   S, y = FunctionField(P1[4], "y")
+   S, y = function_field(P1[4], "y")
 
    h = x1*y^2 + (x1 + 1)//(x1 + 2)*y + 3
 
@@ -157,7 +157,7 @@ end
    end
 
    # characteristic p
-   S, y = FunctionField(P2[4], "y")
+   S, y = function_field(P2[4], "y")
 
    h = x2*y^2 + (x2 + 1)//(x2 + 2)*y + 3
 
@@ -177,7 +177,7 @@ end
 @testset "Generic.FunctionField.unary_ops" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:10
          f = rand(S, 1:5, -10:10)
@@ -187,7 +187,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iters = 1:10
          f = rand(S, 1:5)
@@ -201,7 +201,7 @@ end
 @testset "Generic.FunctionField.binary_ops" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:10
          f = rand(S, 1:5, -10:10)
@@ -218,7 +218,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iters = 1:10
          f = rand(S, 1:5)
@@ -239,7 +239,7 @@ end
 @testset "Generic.FunctionField.adhoc_binary" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:10
          f = rand(S, 1:5, -10:10)
@@ -311,7 +311,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iters = 1:10
          f = rand(S, 1:5)
@@ -375,7 +375,7 @@ end
 @testset "Generic.FunctionField.comparison" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:10
          f = rand(S, 1:5, -10:10)
@@ -391,7 +391,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iters = 1:10
          f = rand(S, 1:5)
@@ -411,7 +411,7 @@ end
 @testset "Generic.FunctionField.adhoc_comparison" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:10
          f = S()
@@ -461,7 +461,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iters = 1:10
          f = S()
@@ -508,7 +508,7 @@ end
 @testset "Generic.FunctionField.powering" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:2
          f = rand(S, 1:2, -1:1)
@@ -524,7 +524,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
       for iters = 1:10
          f = rand(S, 1:5)
          r2 = one(S)
@@ -543,7 +543,7 @@ end
 @testset "Generic.FunctionField.inverse" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:5
          f = S()
@@ -555,7 +555,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iters = 1:5
          f = S()
@@ -571,7 +571,7 @@ end
 @testset "Generic.FunctionField.exact_division" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:5
          f = S()
@@ -584,7 +584,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iters = 1:10
          f = S()
@@ -601,7 +601,7 @@ end
 @testset "Generic.FunctionField.adhoc_exact_division" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:10
          f = 0 # Int
@@ -654,7 +654,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iters = 1:10
          f = 0 # Int
@@ -691,7 +691,7 @@ end
 @testset "Generic.FunctionField.norm" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:3
          f = rand(S, 1:3, -2:2)
@@ -701,7 +701,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iters = 1:5
          f = rand(S, 1:3)
@@ -715,7 +715,7 @@ end
 @testset "Generic.FunctionField.trace" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iters = 1:5
          f = rand(S, 1:3, -10:10)
@@ -725,7 +725,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iters = 1:5
          f = rand(S, 1:3)
@@ -739,7 +739,7 @@ end
 @testset "Generic.FunctionField.unsafe_operators" begin
    for i = 1:length(P1)
       # characteristic 0
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       for iter = 1:10
          f = rand(S, 1:5, -10:10)
@@ -791,7 +791,7 @@ end
       end
 
       # characteristic p
-      S, y = FunctionField(P2[i], "y")
+      S, y = function_field(P2[i], "y")
 
       for iter = 1:10
          f = rand(S, 1:5)
@@ -846,7 +846,7 @@ end
 
 @testset "Generic.FunctionField.polynomial_ring" begin
    for i = 1:length(P1)
-      S, y = FunctionField(P1[i], "y")
+      S, y = function_field(P1[i], "y")
 
       St, t = polynomial_ring(S, "t", cached = false)
       @test t + y == y + t
