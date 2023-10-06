@@ -394,14 +394,16 @@ Base method. If `M` is given, this calls `M.f`, otherwise, it has to exist alrea
 
 ---
 
-    f(args..., varname::VarName) = f(args..., Symbol(varname))
+    f(args..., varname::VarName)
+
+Call `f(args..., Symbol(varname))`.
 
 ---
 
     X = @f args... varname::Symbol
 
 As `f(args..., varname)`, and also introduce `varname` into the current scope.
-Must be disabled via `macros=:no` option, when also using the multivariate `@varnames_interface f`.
+Must be disabled via `macros=:no` option, when also using the multivariate `@varnames_interface [M.]f(args..., varnames)`.
 
 # Examples
 
