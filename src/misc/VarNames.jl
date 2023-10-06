@@ -15,8 +15,8 @@ req(cond, msg) = cond || throw(ArgumentError(msg))
     variable_names(a::Tuple) -> Vector{Symbol}
 
 Create proper variable names from `a`.
-Each argument can be either an Array of `VarName`s, or `s::VarName => axes`.
-The latter means an `Array` where the entries are symbols indexed by the product of `axes`.
+Each argument can be either an Array of `VarName`s, `s::VarName => (iter...)`, or `s::VarName => iter`.
+The `iter` version is equivalent to `["s[$i]" for i in iter]`; the `(iter...)` version is the same for multiple indices.
 
 By default `:x => axes` and `"x" => axes` create variables like `x[1,1]`.
 By using `"x#" => axes` instead, `x[1,1]` becomes `x11`, `x[10,10]` becomes `x10_10`, and `x[-1]` becomes `xm1`.
