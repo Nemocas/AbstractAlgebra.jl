@@ -431,8 +431,8 @@ macro varname_interface(e::Expr, options::Expr...)
     fancy_macro = :(
         macro $f($(argnames...), s::Symbol, options::Expr...)
             rest, kv = extract_options(options)
-            req(isempty(rest), "The univariate macro `@$f` accepts only one Symbol and following `option=value` pairs, but `$(first(rest))` given.\
-                If you intended to use a multivariate version of `@$f`, check that `@varname_interface f(...)` is followed by `macros=:no`.")
+            req(isempty(rest), "The univariate macro `@$f` accepts only one Symbol and following `option=value` pairs, but `$(first(rest))` given." *
+                "If you intended to use a multivariate version of `@$f`, check that `@varname_interface f(...)` is followed by `macros=:no`.")
             quote
                 X, $(esc(s)) = $$f($$(argnames...), $(QuoteNode(s)); $(esc.(kv)...))
                 X
@@ -464,4 +464,3 @@ polynomial_ring(R::Ring, s::Symbol; kv...) = invoke(polynomial_ring, Tuple{NCRin
 polynomial_ring(R::Ring, s::Union{AbstractString, Char}; kv...) = polynomial_ring(R, Symbol(s); kv...)
 
 # TODO: weights in `graded_polynomial_ring` and `power_series_ring`
-# → TODO: accept keywords in macros
