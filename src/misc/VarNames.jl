@@ -210,7 +210,7 @@ function _varname_interface(e::Expr, @nospecialize s::Union{Expr, Symbol})
 end
 
 @doc raw"""
-    @varnames_interface [M.]f(args..., varnames) macros=:yes n=1:n
+    @varnames_interface [M.]f(args..., varnames) macros=:yes n=n range=1:n
 
 Add methods `X, vars = f(args..., varnames...)` and macro `X = @f args... varnames...` to current scope.
 
@@ -237,7 +237,9 @@ Keyword arguments are passed on to the base method.
 
     X, x::Vector{T} = f(args..., n::Int, s::VarName = :x; kv...)
 
-Shorthand for `X, x = f(args..., "$s#", 1:n)`. Can be changed via the `n` option. Setting `n=:no` disables creation of this method.
+Shorthand for `X, x = f(args..., "$s#", 1:n)`.
+The name `n` can be changed via the `n` option. The range `1:n` is given via the `range` option.
+Setting `n=:no` disables creation of this method.
 
 Keyword arguments are passed on to the base method.
 
@@ -297,21 +299,15 @@ macro varnames_interface(e::Expr, options::Expr...)
         end
     end
 
-    opts = parse_options(options, Dict(:n => :n, :macros => :(:yes)), Dict(:macros => QuoteNode.([:no, :yes])))
+    opts = parse_options(options, Dict(:n => :n, :range => :(1:n), :macros => :(:yes)), Dict(:macros => QuoteNode.([:no, :yes])))
     one_to_n = n = opts[:n]
     fancy_n_method = if n === :(:no)
         :()
     else
-        req(n isa Symbol || Meta.isexpr(n, :call), "Value to option `n` must be `:no`, an alternative name like `m` or some expression like `0:n`, not `$n`")
-        if n isa Symbol
-            one_to_n = :(Base.OneTo($n))
-        elseif n isa Expr
-            n = only(x -> x isa Symbol, n.args[2:end])
-        end
-        @assert n isa Symbol
+        req(n isa Symbol, "Value to option `n` must be `:no` or an alternative name like `m`, not `$n`")
         quote
             $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
-                $f($(argnames...), Symbol.(s, $one_to_n); kv...)
+                $f($(argnames...), Symbol.(s, $range); kv...)
         end
     end
 
