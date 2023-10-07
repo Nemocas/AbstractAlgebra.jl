@@ -318,14 +318,14 @@ macro varnames_interface(e::Expr, options::Expr...)
             return if isempty(s) && s1 isa Symbol
                 # use vararg method respectively the univariate method if it exists
                 quote
-                    X, $(esc(s1)) = $$f($$(argnames...), $(QuoteNode(s1)))
+                    X, $(esc(s1)) = $$f($$(argnames...), $(QuoteNode(s1)); $(esc.(kv)...)) # the need for `esc` around `kv` is a bug in julia (#51602)
                     X
                 end
             else
                 # use base method directly
                 gens = variable_names(_eval_shapes(Main, s1, s...))
                 quote
-                    X, ($(esc.(gens)...),) = $$f($$(argnames...), $gens; $(esc.(kv)...)) # the need for `esc` is probably a bug in julia
+                    X, ($(esc.(gens)...),) = $$f($$(argnames...), $gens; $(esc.(kv)...))
                     X
                 end
             end
