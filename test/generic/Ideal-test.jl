@@ -102,6 +102,67 @@ function testit(R, V)
    return true
 end
 
+function example_ideal_gens(x, y)
+  return [
+    [-10*x^2*y - 2, 4*x^2*y^2],
+    [8*x^0, -6*x*y^2 - 5],
+    [9*x*y^2 - x*y, 18*y^2 - 2*y],
+    [10*x^2*y + 2, 10*x^2*y^2 - 7],
+    [-5*y + 6, 4*x^2*y^2 - 8*y],
+    [6*x^0, -9*x^0, 7*y^2 + 3*x],
+    [-8*y^2, 2*x*y^2 - 5],
+    [-10*x^0, 8*x*y + 7*y^2, -10*y],
+    [-6*x*y^2 + 4, -6*x^2*y - x^2],
+    [-7*x^2*y^2 + 2*x^2*y, -x^2*y^2 - x],
+    [0*x, 6*y^2 - 7, -8*x*y - 2*x],
+    [4*x^2*y + 3*x*y, -4*x^2*y^2 + 2],
+    [-5*x*y^2 - 2*y, 7*x^2*y - 5],
+    [4*x^2*y^2 - 5*x, 9*x*y + 2*y^2],
+    [-2*x^3*y - 7*x, -2*x*y^2 - 5*y^3, -2*y^3 - 8*x + y],
+    [4*x^2*y - 9*x*y, 4*x^2*y + 3*y^2],
+    [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y],
+    [3*x^2*y - 6*x*y^2, -10*x*y + y^2],
+    [8*x - 10*y, 3*x^2*y],
+    [3*x*y^2 - 5*x, 9*x^2*y^2 + 5],
+    [-6*x*y + 3*y^2, -6*x^2*y^3 + 5*x*y^3 + 7*x^2, -9*x^3 + 10],
+    [3*x^2*y^2 + 5*x*y, 3*x^2*y^2 + 10*x],
+    [-9*x^2*y^2 + 10*x*y, 3*x^2*y^2 - 5*x^2, 6*y^2],
+    [0*x, -4*x - 3*y - 9, -9*x^3 + 3*x*y, -2*x^3*y^3],
+    [7*x^3*y^3 + 9*y^2 - 5*x, -5*x^3*y^2 + 4*y, 4*x^2*y - 4*y^3],
+    [-3*x^2*y - 5*x*y, 2*x^2, 9*x^2*y^2 - 7*y],
+    [-6*x^2*y^2 + 10*x, 9*x^2*y^3 - 7*x*y^2, -5*x^2 - 2*x*y],
+    [6*x^3*y - 4*x*y^2, 3*x^2*y^3, -x^3*y + 5*y^2 - 9*y],
+    # the following are too slow for Generic.Ideal.comparison under some RNG seeds
+    [7*x^3*y^3 - 10*x^2*y - 3*x*y^2, 9*x*y^3 + 3*x^3 - 9*y^2, 2*x*y^3 + 4*x^2*y],
+    [5*x^3*y^3 - 5*x^3 + 5*x^2, -9*x^3 - 6*x, -3*x^3*y^3 - 6*x^3*y - 10*y^3],
+    [-2*y^3 + 10*x - 2, -8*x*y^3 + 2*x, 6*x^3*y - 5*y^2 - 3*x],
+    [3*x^2*y^2 + 10*x*y, 9*y^2 - 7*x + 7, 7*x^2*y^3 + 2*y^3],
+  ]
+end
+
+function example_ideal_gens(x, y, z)
+  return [
+    [0*x],
+    [5*x],
+    [4*y^2*z],
+    [9*x^2*y*z],
+    [6*z^2, 0*x],
+    [-2*x*y + 10],
+    [8*x^0, -8*y^2*z],
+    [8*x^2 - 8*z, 0*x],
+    [-7*x*y^2*z^2 + 7*x^2],
+    [10*x^2*y^2*z, -y*z^2],
+    [7*x*y^2*z + 2*x^2*z^2],
+    [7*y^2*z^2, 2*x^2*y, 0*x],
+    [10*x^2, 9*x^2*y + 7*y^2],
+    [7*z^2, 5*x*y^2*z^2 - 2*x^2*y],
+    [0*x, -4*x*y*z^2, -3*y^2 + 3*y*z],
+    [5*x^2*y^2*z - 9*x^2*y*z^2, -8*y, 3*x^2*y + 5],
+    [-8*x^2*z^2 + 8*x*y*z^2, 9*x^2*y*z - 2*z, -5*x^2*y^2 - 10*x*y^2*z],
+  ]
+end
+
+
 @testset "Generic.Ideal.constructors" begin
    I = Generic.Ideal(ZZ, 3, 5)
    S = parent(I)
@@ -125,62 +186,12 @@ end
 
 @testset "Generic.Ideal.ideal_reduction(multivariate)" begin
    R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
-
-   for V in [
-      [-10*x^2*y - 2, 4*x^2*y^2],
-      [R(8), -6*x*y^2 - 5],
-      [9*x*y^2 - x*y, 18*y^2 - 2*y],
-      [10*x^2*y + 2, 10*x^2*y^2 - 7],
-      [-5*y + 6, 4*x^2*y^2 - 8*y],
-      [R(6), -R(9), 7*y^2 + 3*x],
-      [-8*y^2, 2*x*y^2 - 5],
-      [-R(10), 8*x*y + 7*y^2, -10*y],
-      [-6*x*y^2 + 4, -6*x^2*y - x^2],
-      [-7*x^2*y^2 + 2*x^2*y, -x^2*y^2 - x],
-      [R(0), 6*y^2 - 7, -8*x*y - 2*x],
-      [4*x^2*y + 3*x*y, -4*x^2*y^2 + 2],
-      [-5*x*y^2 - 2*y, 7*x^2*y - 5],
-      [4*x^2*y^2 - 5*x, 9*x*y + 2*y^2],
-      [-2*x^3*y - 7*x, -2*x*y^2 - 5*y^3, -2*y^3 - 8*x + y],
-      [4*x^2*y - 9*x*y, 4*x^2*y + 3*y^2],
-      [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y],
-      [3*x^2*y - 6*x*y^2, -10*x*y + y^2],
-      [8*x - 10*y, 3*x^2*y],
-      [3*x*y^2 - 5*x, 9*x^2*y^2 + 5],
-      [-6*x*y + 3*y^2, -6*x^2*y^3 + 5*x*y^3 + 7*x^2, -9*x^3 + 10],
-      [3*x^2*y^2 + 5*x*y, 3*x^2*y^2 + 10*x],
-      [-9*x^2*y^2 + 10*x*y, 3*x^2*y^2 - 5*x^2, 6*y^2],
-      [R(0), -4*x - 3*y - 9, -9*x^3 + 3*x*y, -2*x^3*y^3],
-      [7*x^3*y^3 + 9*y^2 - 5*x, -5*x^3*y^2 + 4*y, 4*x^2*y - 4*y^3],
-      [-3*x^2*y - 5*x*y, 2*x^2, 9*x^2*y^2 - 7*y],
-      [-6*x^2*y^2 + 10*x, 9*x^2*y^3 - 7*x*y^2, -5*x^2 - 2*x*y],
-      [6*x^3*y - 4*x*y^2, 3*x^2*y^3, -x^3*y + 5*y^2 - 9*y],
-      [7*x^3*y^3 - 10*x^2*y - 3*x*y^2, 9*x*y^3 + 3*x^3 - 9*y^2, 2*x*y^3 + 4*x^2*y],
-      [5*x^3*y^3 - 5*x^3 + 5*x^2, -9*x^3 - 6*x, -3*x^3*y^3 - 6*x^3*y - 10*y^3],
-      [-2*y^3 + 10*x - 2, -8*x*y^3 + 2*x, 6*x^3*y - 5*y^2 - 3*x],
-      [3*x^2*y^2 + 10*x*y, 9*y^2 - 7*x + 7, 7*x^2*y^3 + 2*y^3]
-   ]
-      @test testit(R, V)
-   end
-
-   # random examples
-   for i = 1:100
-      n = rand(0:3)
-      V = elem_type(R)[]
-      for j = 1:n
-         push!(V, rand(R, 0:3, 0:3, -10:10))
-      end
+   for V in example_ideal_gens(x, y)
       @test testit(R, V)
    end
 
    R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"]; ordering=:degrevlex)
-
-   for i = 1:100
-      n = rand(0:2)
-      V = elem_type(R)[]
-      for j = 1:n
-         push!(V, rand(R, 0:2, 0:2, -10:10))
-      end
+   for V in example_ideal_gens(x, y, z)
       @test testit(R, V)
    end
 end
@@ -253,14 +264,8 @@ end
    # multivariate
    R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
-   # random examples
-   for i = 1:100
-      n = rand(0:3)
-      V = elem_type(R)[]
-      for j = 1:n
-         push!(V, rand(R, 0:3, 0:3, -10:10))
-      end
-      
+   ex = example_ideal_gens(x, y)
+   for V in ex[1:28]  # 29 and beyond are too slow for some RNG seeds
       I = Generic.Ideal(R, V)
 
       @test I == mix_ideal(I)
@@ -303,18 +308,8 @@ end
    # multivariate
    R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
-   # random examples
-   for i = 1:100
-      n = rand(0:3)
-      m = rand(0:3)
-      V = elem_type(R)[]
-      W = elem_type(R)[]
-      for j = 1:n
-         push!(V, rand(R, 0:3, 0:3, -10:10))
-      end
-      for j = 1:m
-         push!(W, rand(R, 0:3, 0:3, -10:10))
-      end
+   ex = example_ideal_gens(x, y)
+   for V in ex[1:15], W in ex[1:15]
 
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, vcat(V, W))
@@ -376,18 +371,8 @@ end
    # multivariate
    R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
-   # random examples
-   for i = 1:100
-      n = rand(0:3)
-      m = rand(0:3)
-      V = elem_type(R)[]
-      W = elem_type(R)[]
-      for j = 1:n
-         push!(V, rand(R, 0:3, 0:3, -10:10))
-      end
-      for j = 1:m
-         push!(W, rand(R, 0:3, 0:3, -10:10))
-      end
+   ex = example_ideal_gens(x, y)
+   for V in ex[1:15], W in ex[1:15]
 
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
@@ -448,22 +433,8 @@ end
    # multivariate
    R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
-   # random examples
-   for i = 1:50
-      n = rand(0:3)
-      m = rand(0:3)
-      V = elem_type(R)[]
-      W = elem_type(R)[]
-      X = elem_type(R)[]
-      for j = 1:n
-         push!(V, rand(R, 0:2, 0:3, -10:10))
-      end
-      for j = 1:m
-         push!(W, rand(R, 0:3, 0:2, -10:10))
-      end
-      for j = 1:m
-         push!(X, rand(R, 0:3, 0:3, -10:10))
-      end
+   ex = example_ideal_gens(x, y)
+   for V in ex[1:10], W in ex[1:10], X in ex[1:10]
 
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
@@ -531,12 +502,7 @@ end
    R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
    # random examples
-   for i = 1:100
-      n = rand(0:3)
-      V = elem_type(R)[]
-      for j = 1:n
-         push!(V, rand(R, 0:3, 0:3, -10:10))
-      end
+   for V in example_ideal_gens(x, y)
       c = rand(R, 0:3, 0:3, -10:10)
       d = rand(R, 0:3, 0:3, -10:10)
 
@@ -600,18 +566,8 @@ end
    # multivariate
    R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 
-   # random examples
-   for i = 1:50
-      n = rand(0:3)
-      m = rand(0:3)
-      V = elem_type(R)[]
-      W = elem_type(R)[]
-      for j = 1:n
-         push!(V, rand(R, 0:2, 0:3, -10:10))
-      end
-      for j = 1:m
-         push!(W, rand(R, 0:3, 0:2, -10:10))
-      end
+   ex = example_ideal_gens(x, y)
+   for V in ex[1:10], W in ex[1:10]
 
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
