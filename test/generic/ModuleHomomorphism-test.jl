@@ -1,3 +1,5 @@
+import AbstractAlgebra.PrettyPrinting
+
 @testset "Generic.ModuleHomomorphism.constructors" begin
    M = FreeModule(ZZ, 2)
 
@@ -112,6 +114,18 @@ end
    end
 end
 
+@testset "Generic.ModuleHomomorphism.printing" begin
+  M = FreeModule(ZZ, 2)
+  f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
+  str = """
+        Module homomorphism
+          from free module of rank 2 over integers
+          to free module of rank 2 over integers"""
+  @test PrettyPrinting.detailed(f) == str
+  @test PrettyPrinting.oneline(f) == "Hom: free module of rank 2 over integers -> free module of rank 2 over integers"
+  @test PrettyPrinting.supercompact(f) == "Module homomorphism"
+end
+
 @testset "Generic.ModuleIsomorphism" begin
    R = AbstractAlgebra.JuliaQQ
    for iter = 1:100
@@ -136,4 +150,16 @@ end
       @test isa(image_fn(f), Function)
       @test isa(inverse_image_fn(f), Function)
    end
+end
+
+@testset "Generic.ModuleIsomorphism.printing" begin
+  M = FreeModule(ZZ, 2)
+  f = ModuleIsomorphism(M, M, matrix(ZZ, 2, 2, [1, 0, 0, 1]))
+  str = """
+        Module isomorphism
+          from free module of rank 2 over integers
+          to free module of rank 2 over integers"""
+  @test PrettyPrinting.detailed(f) == str
+  @test PrettyPrinting.oneline(f) == "Hom: free module of rank 2 over integers -> free module of rank 2 over integers"
+  @test PrettyPrinting.supercompact(f) == "Module isomorphism"
 end

@@ -106,8 +106,11 @@ Map with section
 
 julia> h = f*g
 Composite map
-  first map: integers -> integers
-  next map: integers -> integers
+  from integers
+  to integers
+which is the composite of
+  Map: integers -> integers
+  Map: integers -> integers
 
 julia> a = h(ZZ(1))
 1

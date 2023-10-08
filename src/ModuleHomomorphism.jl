@@ -18,20 +18,13 @@ mat(f::Map(FPModuleHomomorphism)) = f.matrix
 #
 ###############################################################################
 
-function show(io::IO, ::MIME"text/plain", f::Map(FPModuleHomomorphism))
-   println(io, "Module homomorphism")
-   io = pretty(io)
-   print(io, Indent(), "from ", Lowercase(), domain(f))
-   println(io)
-   print(io, "to ", Lowercase(), codomain(f))
-end
-
 function show(io::IO, f::Map(FPModuleHomomorphism))
   if get(io, :supercompact, false)
-    println(io, "Module homomorphism")
+    print(io, "Module homomorphism")
   else
-    print(io, "Hom: ")
-    print(IOContext(io, :supercompact => true), domain(f), " -> ", codomain(f))
+    io = pretty(io)
+    print(io, "Hom: ", Lowercase(), domain(f))
+    print(io, " -> ", Lowercase(), codomain(f))
   end
 end
 

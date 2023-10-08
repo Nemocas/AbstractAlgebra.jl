@@ -21,6 +21,33 @@ function check_composable(a::Map, b::Map)
    codomain(a) != domain(b) && error("Incompatible maps")
 end
 
+function Base.show(io::IO, ::MIME"text/plain", M::AbstractAlgebra.Map)
+   # the "header" is identical to the supercompact output; this
+   # allows other map types to reuse this method
+   println(IOContext(io, :supercompact => true), M)
+   io = pretty(io)
+   println(io, Indent(), "from ", Lowercase(), domain(M))
+   print(io, "to ", Lowercase(), codomain(M), Dedent())
+   show_map_data(io, M)
+end
+
+function show_map_data(io::IO, M::AbstractAlgebra.Map)
+   # no extra data by default; specific Map subtypes can overload this
+end
+
+function Base.show(io::IO, M::AbstractAlgebra.Map)
+   if get(io, :supercompact, false)
+      # no nested printing
+      print(io, "Map")
+   else
+      # nested printing allowed, preferably supercompact
+      io = pretty(io)
+      print(io, "Map: ")
+      print(IOContext(io, :supercompact => true), Lowercase(), domain(M), " -> ")
+      print(IOContext(io, :supercompact => true), Lowercase(), codomain(M))
+   end
+end
+
 ###############################################################################
 #
 #   CompositeMap
@@ -40,8 +67,11 @@ julia> g = map_from_func(x -> QQ(x), ZZ, QQ);
 
 julia> h = compose(f, g)
 Functional composite map
-  first map: integers -> integers
-  next map: integers -> rationals
+  from integers
+  to rationals
+which is the composite of
+  Map: integers -> integers
+  Map: integers -> rationals
 ```
 """
 function compose(f::Map, g::Map)

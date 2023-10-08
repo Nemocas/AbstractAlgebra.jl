@@ -1,3 +1,5 @@
+import AbstractAlgebra.PrettyPrinting
+
 @testset "Generic.MapWithInverse.constructors" begin
    f = map_from_func(x -> x + 1, ZZ, ZZ)
    g = map_from_func(x -> x - 1, ZZ, ZZ)
@@ -85,4 +87,25 @@ end
 
    @test v(ZZ(1)) == -2
    @test w(ZZ(1)) == 0
+end
+
+@testset "Generic.MapWithInverse.printing" begin
+  F = GF(5)
+  u = map_with_section_from_func(x -> F(x + 1), x -> lift(x - 1), ZZ, F)
+  str = """
+        Map with section
+          from integers
+          to finite field F_5"""
+  @test PrettyPrinting.detailed(u) == str
+  @test PrettyPrinting.oneline(u) == "Map: integers -> finite field F_5"
+  @test PrettyPrinting.supercompact(u) == "Map with section"
+
+  v = map_with_retraction_from_func(x -> QQ(x + 1), x -> ZZ(x - 1), ZZ, QQ)
+  str = """
+        Map with retraction
+          from integers
+          to rationals"""
+  @test PrettyPrinting.detailed(v) == str
+  @test PrettyPrinting.oneline(v) == "Map: integers -> rationals"
+  @test PrettyPrinting.supercompact(v) == "Map with retraction"
 end
