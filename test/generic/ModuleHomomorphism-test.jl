@@ -140,7 +140,7 @@ end
 
       @test domain(f) == M
       @test codomain(f) == M
-      @test mat(f) == N
+      @test matrix(f) == N
       @test N*inverse_mat(f) == 1
 
       m = rand(M, -10:10)

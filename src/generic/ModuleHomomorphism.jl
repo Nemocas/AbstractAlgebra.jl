@@ -65,7 +65,7 @@ cheaply.
 """
 function Base.inv(f::Map(ModuleIsomorphism))
    T = elem_type(base_ring(domain(f)))
-   return ModuleIsomorphism{T}(codomain(f), domain(f), inverse_mat(f), mat(f))
+   return ModuleIsomorphism{T}(codomain(f), domain(f), inverse_mat(f), matrix(f))
 end
 
 ###############################################################################

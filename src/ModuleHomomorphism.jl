@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-mat(f::Map(FPModuleHomomorphism)) = f.matrix
+matrix(f::Map(FPModuleHomomorphism)) = f.matrix
 
 ###############################################################################
 #
@@ -57,7 +57,7 @@ function kernel(f::Map(FPModuleHomomorphism))
    C = codomain(f)
    R = base_ring(D)
    crels = rels(C)
-   M = mat(f)
+   M = matrix(f)
    # put domain relations and M in a big matrix
    # swap rows so we can get upper triangular wrt original data
    nr = nrows(M) + length(crels)
@@ -128,7 +128,7 @@ function preimage(f::Map(FPModuleHomomorphism), v::FPModuleElem{T}) where
    C = codomain(f)
    R = base_ring(C)
    parent(v) !== C && error("Incompatible element")
-   M = mat(f)
+   M = matrix(f)
    trels = rels(C)
    # Put rows of M and target relations into a matrix
    q = length(trels)
