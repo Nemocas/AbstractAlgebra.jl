@@ -862,7 +862,7 @@ export fraction_field
 export free_associative_algebra
 export free_module
 export FreeModule
-export FunctionField
+export function_field
 export gcd
 export gcd_with_cofactors
 export gcdinv
@@ -1073,7 +1073,7 @@ export randmat_triu
 export randmat_with_rank
 export rank
 export rank_profile_popov
-export RationalFunctionField
+export rational_function_field
 export reduce!
 export rel_series
 export rel_series_type
@@ -1212,7 +1212,7 @@ function number_field(a::Generic.Poly{Rational{BigInt}}, s::VarName, t = "\$"; c
    return Generic.number_field(a, Symbol(s), t; cached=cached)
 end
 
-function FunctionField(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
+function function_field(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 

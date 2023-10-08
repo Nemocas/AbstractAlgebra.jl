@@ -57,6 +57,9 @@
 @alias FractionField fraction_field
 @alias NumberField number_field
 
+@alias FunctionField function_field
+@alias RationalFunctionField rational_function_field
+
 @alias PolyElem PolyRingElem
 @alias NCPolyElem NCPolyRingElem
 @alias MPolyElem MPolyRingElem
