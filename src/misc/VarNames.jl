@@ -164,7 +164,8 @@ julia> R, (a, b), x, y, z = polynomial_ring(ZZ, s...)
 
 ```
 """
-reshape_to_varnames(vec::Vector, varnames::VarNames...) = reshape_to_varnames(vec, varnames)
+reshape_to_varnames(vec::Vector, varnames::VarNames...) =
+    reshape_to_varnames(vec, varnames)
 function reshape_to_varnames(vec::Vector, varnames::Tuple{Vararg{VarNames}})
     iter = Iterators.Stateful(vec)
     result = Tuple(_reshape_to_varnames(iter, x) for x in varnames)
@@ -173,13 +174,80 @@ function reshape_to_varnames(vec::Vector, varnames::Tuple{Vararg{VarNames}})
 end
 
 _reshape_to_varnames(iter::Iterators.Stateful, ::VarName) = popfirst!(iter)
-_reshape_to_varnames(iter::Iterators.Stateful, a::AbstractArray{<:VarName}) = _reshape(iter, size(a))
-_reshape_to_varnames(iter::Iterators.Stateful, (_, shape)::Pair{<:VarName}) = __reshape(iter, shape)
+_reshape_to_varnames(iter::Iterators.Stateful, a::AbstractArray{<:VarName}) =
+    _reshape(iter, size(a))
+_reshape_to_varnames(iter::Iterators.Stateful, (_, shape)::Pair{<:VarName}) =
+    __reshape(iter, shape)
 
-_reshape(iter, dims) = reshape(collect(Iterators.take(iter, prod(dims))), Tuple(dims))
 __reshape(iter, ::Missing) = popfirst!(iter)
 __reshape(iter, axes::Tuple) = _reshape(iter, Int[d for axe in axes for d in size(axe)])
 __reshape(iter, axe) = _reshape(iter, size(axe))
+
+_reshape(iter, dims) = reshape(collect(Iterators.take(iter, prod(dims))), Tuple(dims))
+
+"""
+    keyword_arguments((kvs::Expr...), default::Dict, [valid::Dict]) :: Dict
+
+Mimic usual keyword arguments for usage in macros.
+
+* `kvs`: tuple of Expr of form :(k = v)
+* `default`: dictionary providing the allowed keys and their default values
+* `valid`: optional `Dict{Symbol, <:AbstractVector}` constraining the valid values for some keys
+
+Return a copy of `default` with the key value pairs from `kvs` applied.
+
+# Example
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> keyword_arguments((:(a=1), :(b=:no)),
+    Dict(:a=>0, b=>:yes, c=>0),
+    Dict(:b => [:(:yes), :(:no)]))
+Dict{Symbol, Any} with 3 entries:
+  :a => 1
+  :b => :(:yes)
+  :c => 0
+```
+"""
+function keyword_arguments(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol},
+        valid::Dict{Symbol, <:AbstractVector} = Dict{Symbol, Vector{Any}}()) ::
+        Dict{Symbol}
+    result = Dict{Symbol, Any}(default)
+    for o in kvs
+        req(MT.@capture(o, k_ = v_), "Only key value options allowed")
+        req(k in keys(result), "Invalid key value option key `$k`")
+        k in keys(valid) && req(v in valid[k], "Invalid option `$v` to key `$k`")
+        result[k] = v
+    end
+    return result
+end
+
+"""
+    extract_options(expressions) -> arguments, keyword_arguments
+
+Split macro arguments in usual arguments and keyword arguments.
+
+# Example
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> args, options = extract_options((:a, :(a+b), :(x=1), :(y=z)));
+
+julia> args
+(:a, :(a + b))
+
+julia> options == (esc(:(:x => 1)), esc(:(:y => 2)))
+true
+```
+"""
+function extract_options(es) # -> args, options
+    options_start = findfirst(e -> Meta.isexpr(e, :(=)), es)
+    options_start === nothing && return es, es[end+1:end]
+    args = es[begin:options_start-1]
+    options = map(es[options_start:end]) do e
+        req(MT.@capture(e, k_ = v_), "The argument `$e` comes after an option, " *
+            "so it also must be of the form `option=value`")
+        :($(QuoteNode(k::Symbol)) => $v)
+    end
+    VERSION > v"9999" || (options = esc.(options)) # julia issue #51602
+    return args, options
+end
 
 # `e` is :([M.]f(args..., s) where {wheres} [ = ... ])
 # `s_type` is `:Symbol` or `:Vector{Symbol}`
@@ -213,6 +281,120 @@ unqualified_name(name::QuoteNode) = name.value
 function unqualified_name(name::Expr)
     req(Meta.isexpr(name, :., 2), "Expected a binding, but `$name` given")
     unqualified_name(name.args[2])
+end
+
+function base_method(d::Dict{Symbol},
+        @nospecialize s_type::Union{Symbol, Expr})
+    f, base_f, wheres = d[:f], d[:base_f], d[:wheres]
+    if f == base_f
+        argtypes = :(Tuple{$(d[:argtypes]...), $s_type} where {$(wheres...)})
+        :(req(hasmethod($f, $argtypes),
+              "base method of `$($f)` for $($argtypes) missing"))
+    else
+        :($f($(d[:args]...), s::$s_type; kv...) where {$(wheres...)} =
+            $base_f($(d[:argnames]...), s; kv...))
+    end
+end
+
+function varname_method(d::Dict{Symbol})
+    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
+    quote
+        $f($(args...), s::Union{AbstractString, Char}; kv...) where {$(wheres...)} =
+            $f($(argnames...), Symbol(s); kv...)
+    end
+end
+
+function varnames_method(d::Dict{Symbol})
+    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
+    quote
+        $f($(args...), s1::VarNames, s::VarNames...; kv...) where {$(wheres...)} =
+            $f($(argnames...), (s1, s...); kv...)
+        function $f($(args...), s::Tuple{Vararg{VarNames}}; kv...) where {$(wheres...)}
+            X, gens = $f($(argnames...), variable_names(s...); kv...)
+            return X, reshape_to_varnames(gens, s...)...
+        end
+    end
+end
+
+function n_vars_method(d::Dict{Symbol}, n, range)
+    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
+    n === :(:no) && return :()
+    req(n isa Symbol, "Value to option `n` must be `:no` or " *
+        "an alternative name like `m`, not `$n`")
+    quote
+        $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
+            $f($(argnames...), Symbol.(s, $range); kv...)
+    end
+end
+
+function varname_macro(f, argnames, macros)
+    macros === :(:yes) || return :()
+    quote
+        macro $f($(argnames...), s::Symbol, options::Expr...)
+            rest, kv = extract_options(options)
+            @req(isempty(rest), "The univariate macro `@$($f)` accepts only one Symbol " *
+                "and following `option=value` pairs, but `$(first(rest))` given. " *
+                "If you intended to use a multivariate version of `@$($f)`, check that " *
+                "`@varname_interface $($f)(...)` is followed by `macros=:no`.")
+            varname_macro_code($f, ($(argnames...),), s, kv)
+        end
+    end
+end
+
+function varnames_macro(f, argnames, macros)
+    macros === :(:yes) || return :()
+    quote
+        macro $f($(argnames...), s1::Union{Expr, Symbol}, s::Union{Expr, Symbol}...)
+            s, kv = extract_options(s)
+            m = VERSION > v"9999" ? __module__ : $(esc(:__module__)) # julia issue #51602
+            # in case of `@f args... s` use same code as in @varname_interface
+            isempty(s) && s1 isa Symbol ?
+                varname_macro_code($f, ($(argnames...),), s1, kv) :
+                varnames_macro_code(m, $f, ($(argnames...),), (s1, s...), kv)
+        end
+    end
+end
+
+function varname_macro_code(f, argnames, s::Symbol, kv)
+    quote
+        X, $(esc(s)) = $f($(argnames...), $(QuoteNode(s)); $(kv...))
+        X
+    end
+end
+
+function varnames_macro_code(m::Core.Module, f, argnames, s::Tuple, kv)
+    gens = variable_names(_eval_shapes(m, s...))
+    quote
+        X, ($(esc.(gens)...),) = $f($(argnames...), $gens; $(kv...))
+        X
+    end
+end
+
+_eval_shapes(m::Core.Module, shapes::Union{Expr, Symbol}...)= __eval_shapes(m,
+    # Specially treat the `@f args... (varnames...,)` variant:
+    MT.@capture(shapes, ((es__,),)) ? tuple(es...) : shapes)
+__eval_shapes(m::Core.Module, shapes::Tuple{Vararg{Union{Expr, Symbol}}}) ::
+    Tuple{Vararg{Union{<:Pair{String, Tuple}, Symbol}}} =
+    _eval_shape.((m,), shapes)
+
+function _eval_shape(m::Core.Module, shape::Expr) :: Pair{String, Tuple}
+    req(MT.@capture(shape, x_[a__]),
+        "Variable name must be like `x` or `x[...]`, not `$shape`")
+    "$x#" => (_eval.((m,), a)...,)
+end
+_eval_shape(::Core.Module, s::Symbol) = s
+
+function _eval(m::Core.Module, e::Expr)
+    try
+        Base.eval(m, e)
+    catch err
+        if isa(err, UndefVarError)
+            @error "Inconveniently, you may only use literals and variables " *
+                "from the global scope of the current module (`$m`) " *
+                "when using variable name constructor macros"
+        end
+        rethrow()
+    end
 end
 
 @doc raw"""
@@ -298,7 +480,7 @@ julia> (x11, x12, y1, y2, z)
 macro varnames_interface(e::Expr, options::Expr...)
     d = _splitdef(e)
 
-    opts = parse_options(options,
+    opts = keyword_arguments(options,
         Dict(:n => :n, :range => :(1:n), :macros => :(:yes)),
         Dict(:macros => QuoteNode.([:no, :yes])))
 
@@ -307,122 +489,6 @@ macro varnames_interface(e::Expr, options::Expr...)
         $(varnames_method(d))
         $(n_vars_method(d, opts[:n], opts[:range]))
         $(varnames_macro(d[:f], d[:argnames], opts[:macros]))
-    end
-end
-
-function base_method(d::Dict{Symbol},
-        @nospecialize s_type::Union{Symbol, Expr})
-    f, base_f, wheres = d[:f], d[:base_f], d[:wheres]
-    if f == base_f
-        argtypes = :(Tuple{$(d[:argtypes]...), $s_type} where {$(wheres...)})
-        :(req(hasmethod($f, $argtypes),
-              "base method of `$($f)` for $($argtypes) missing"))
-    else
-        :($f($(d[:args]...), s::$s_type; kv...) where {$(wheres...)} =
-            $base_f($(d[:argnames]...), s; kv...))
-    end
-end
-
-function varnames_method(d::Dict{Symbol})
-    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
-    quote
-        $f($(args...), s1::VarNames, s::VarNames...; kv...) where {$(wheres...)} =
-            $f($(argnames...), (s1, s...); kv...)
-        function $f($(args...), s::Tuple{Vararg{VarNames}}; kv...) where {$(wheres...)}
-            X, gens = $f($(argnames...), variable_names(s...); kv...)
-            return X, reshape_to_varnames(gens, s...)...
-        end
-    end
-end
-
-function n_vars_method(d::Dict{Symbol}, n, range)
-    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
-    n === :(:no) && return :()
-    req(n isa Symbol, "Value to option `n` must be `:no` or " *
-        "an alternative name like `m`, not `$n`")
-    quote
-        $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
-            $f($(argnames...), Symbol.(s, $range); kv...)
-    end
-end
-
-function varnames_macro(f, argnames, macros)
-    macros === :(:yes) || return :()
-    quote
-        macro $f($(argnames...), s1::Union{Expr, Symbol}, s::Union{Expr, Symbol}...)
-            s, kv = extract_options(s)
-            m = VERSION > v"9999" ? __module__ : $(esc(:__module__)) # julia issue #51602
-            # in case of `@f args... s` use same code as in @varname_interface
-            isempty(s) && s1 isa Symbol ?
-                varname_macro_code($f, ($(argnames...),), s1, kv) :
-                varnames_macro_code(m, $f, ($(argnames...),), (s1, s...), kv)
-        end
-    end
-end
-
-function varname_macro_code(f, argnames, s::Symbol, kv)
-    quote
-        X, $(esc(s)) = $f($(argnames...), $(QuoteNode(s)); $(kv...))
-        X
-    end
-end
-
-function varnames_macro_code(m::Core.Module, f, argnames, s::Tuple, kv)
-    gens = variable_names(_eval_shapes(m, s...))
-    quote
-        X, ($(esc.(gens)...),) = $f($(argnames...), $gens; $(kv...))
-        X
-    end
-end
-
-function parse_options(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol}, valid::Dict{Symbol, <:Vector} = Dict{Symbol, Vector{Any}}()) :: Dict{Symbol}
-    result = Dict{Symbol, Any}(default)
-    for o in kvs
-        req(MT.@capture(o, k_ = v_), "Only key value options allowed")
-        req(k in keys(result), "Invalid key value option key `$k`")
-        k in keys(valid) && req(v in valid[k], "Invalid option `$v` to key `$k`")
-        result[k] = v
-    end
-    return result
-end
-
-function extract_options(es) # -> args, options
-    options_start = findfirst(e -> Meta.isexpr(e, :(=)), es)
-    options_start === nothing && return es, es[end+1:end]
-    args = es[begin:options_start-1]
-    options = map(es[options_start:end]) do e
-        req(MT.@capture(e, k_ = v_), "The argument `$e` comes after an option, " *
-            "so it also must be of the form `option=value`")
-        :($(QuoteNode(k::Symbol)) => $v)
-    end
-    VERSION > v"9999" || (options = esc.(options)) # see julia issue #51602
-    return args, options
-end
-
-_eval_shapes(m::Core.Module, shapes::Union{Expr, Symbol}...)= __eval_shapes(m,
-    # Special case the `@f args... (varnames...,)` variant:
-    MT.@capture(shapes, ((es__,),)) ? tuple(es...) : shapes)
-__eval_shapes(m::Core.Module, shapes::Tuple{Vararg{Union{Expr, Symbol}}}) ::
-    Tuple{Vararg{Union{<:Pair{String, Tuple}, Symbol}}} =
-    _eval_shape.((m,), shapes)
-
-function _eval_shape(m::Core.Module, shape::Expr) :: Pair{String, Tuple}
-    req(MT.@capture(shape, x_[a__]),
-        "Variable name must be like `x` or `x[...]`, not `$shape`")
-    "$x#" => (_eval.((m,), a)...,)
-end
-_eval_shape(::Core.Module, s::Symbol) = s
-
-function _eval(m::Core.Module, e::Expr)
-    try
-        Base.eval(m, e)
-    catch err
-        if isa(err, UndefVarError)
-            @error "Inconveniently, you may only use literals and variables " *
-                "from the global scope of the current module (`$m`) " *
-                "when using fancy variable name macros"
-        end
-        rethrow()
     end
 end
 
@@ -475,33 +541,13 @@ julia> x
 macro varname_interface(e::Expr, options::Expr...)
     d = _splitdef(e)
 
-    opts = parse_options(options, Dict(:macros => :(:yes)),
+    opts = keyword_arguments(options, Dict(:macros => :(:yes)),
         Dict(:macros => QuoteNode.([:no, :yes])))
 
     quote
         $(base_method(d, :Symbol))
         $(varname_method(d))
         $(varname_macro(d[:f], d[:argnames], opts[:macros]))
-    end
-end
-
-function varname_method(d::Dict{Symbol})
-    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
-    :($f($(args...), s::Union{AbstractString, Char}; kv...)
-        where {$(wheres...)} = $f($(argnames...), Symbol(s); kv...))
-end
-
-function varname_macro(f, argnames, macros)
-    macros === :(:yes) || return :()
-    quote
-        macro $f($(argnames...), s::Symbol, options::Expr...)
-            rest, kv = extract_options(options)
-            @req(isempty(rest), "The univariate macro `@$($f)` accepts only one Symbol " *
-                "and following `option=value` pairs, but `$(first(rest))` given. " *
-                "If you intended to use a multivariate version of `@$($f)`, check that " *
-                "`@varname_interface $($f)(...)` is followed by `macros=:no`.")
-            return varname_macro_code($f, $argnames, s, kv)
-        end
     end
 end
 
