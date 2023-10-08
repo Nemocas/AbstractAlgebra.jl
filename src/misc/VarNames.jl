@@ -249,8 +249,7 @@ function extract_options(es) # -> args, options
     return args, options
 end
 
-# `e` is :([M.]f(args..., s) where {wheres} [ = ... ])
-# `s_type` is `:Symbol` or `:Vector{Symbol}`
+# input is :([M.]f(args..., s) where {wheres} [ = ... ])
 function _splitdef(e::Expr)
     Meta.isexpr(e, (:(=), :function)) || (e = Expr(:(=), e, :()))
     d = MT.splitdef(e)
