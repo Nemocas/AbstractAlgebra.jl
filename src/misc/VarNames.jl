@@ -181,32 +181,38 @@ __reshape(iter, ::Missing) = popfirst!(iter)
 __reshape(iter, axes::Tuple) = _reshape(iter, Int[d for axe in axes for d in size(axe)])
 __reshape(iter, axe) = _reshape(iter, size(axe))
 
-function _varname_interface(e::Expr, @nospecialize s::Union{Expr, Symbol})
-    ex = Meta.isexpr(e, (:(=), :function)) ? e : Expr(:(=), e, :())
-    d = MT.splitdef(ex)
+# `e` is :([M.]f(args..., s) where {wheres} [ = ... ])
+# `s_type` is `:Symbol` or `:Vector{Symbol}`
+function _splitdef(e::Expr)
+    Meta.isexpr(e, (:(=), :function)) || (e = Expr(:(=), e, :()))
+    d = MT.splitdef(e)
 
-    callf = esc(d[:name])
-    f = esc(MT.postwalk(x -> MT.@capture(x, a_.b_) ? b : x, d[:name]))
-    wheres = esc.(d[:whereparams])
+    req(isempty(d[:kwargs]), "Keyword arguments currently not supported")
 
-    args = d[:args][begin:end-1]
-    splitargs = MacroTools.splitarg.(args)
-    args = esc.(args)
+    args = d[:args][begin:end-1] # the last argument is just a placeholder
+    splitargs = MT.splitarg.(args)
     req(all(((_, _, slurp, default),) -> (slurp, default) === (false, nothing), splitargs),
         "Default and slurp arguments currently not supported")
-    req(isempty(d[:kwargs]), "Keyword arguments currently not supported")
+
     argnames = first.(splitargs)
     req(all(!isnothing, argnames), "Nameless arguments currently not supported")
-    argnames = esc.(argnames)
 
-    s = esc(s)
-    argtypes = esc.(a[2] for a in splitargs)
-    argtypes = :(Tuple{$(argtypes...), $s} where {$(wheres...)})
-    base = f == callf ?
-        :(req(hasmethod($f, $argtypes), "base method of `$($f)` for $($argtypes) missing")) :
-        :($f($(args...), s::$s; kv...) where {$(wheres...)} = $callf($(argnames...), s; kv...))
+    base_f = d[:name]
+    return Dict{Symbol, Any}(
+        :base_f => esc(base_f),
+        :f => esc(unqualified_name(base_f)),
+        :wheres => esc.(d[:whereparams]),
+        :args => esc.(args),
+        :argnames => esc.(argnames),
+        :argtypes => (esc(a[2]) for a in splitargs),
+    )
+end
 
-    return f, args, argnames, wheres, base
+unqualified_name(name::Symbol) = name
+unqualified_name(name::QuoteNode) = name.value
+function unqualified_name(name::Expr)
+    req(Meta.isexpr(name, :., 2), "Expected a binding, but `$name` given")
+    unqualified_name(name.args[2])
 end
 
 @doc raw"""
@@ -290,49 +296,83 @@ julia> (x11, x12, y1, y2, z)
 ```
 """
 macro varnames_interface(e::Expr, options::Expr...)
-    f, args, argnames, wheres, base = _varname_interface(e, :(Vector{Symbol}))
-    fancy_method = quote
-        $f($(args...), s1::VarNames, s::VarNames...; kv...) where {$(wheres...)} = $f($(argnames...), (s1, s...); kv...)
+    d = _splitdef(e)
+
+    opts = parse_options(options,
+        Dict(:n => :n, :range => :(1:n), :macros => :(:yes)),
+        Dict(:macros => QuoteNode.([:no, :yes])))
+
+    quote
+        $(base_method(d, :(Vector{Symbol})))
+        $(varnames_method(d))
+        $(n_vars_method(d, opts[:n], opts[:range]))
+        $(varnames_macro(d[:f], d[:argnames], opts[:macros]))
+    end
+end
+
+function base_method(d::Dict{Symbol},
+        @nospecialize s_type::Union{Symbol, Expr})
+    f, base_f, wheres = d[:f], d[:base_f], d[:wheres]
+    if f == base_f
+        argtypes = :(Tuple{$(d[:argtypes]...), $s_type} where {$(wheres...)})
+        :(req(hasmethod($f, $argtypes),
+              "base method of `$($f)` for $($argtypes) missing"))
+    else
+        :($f($(d[:args]...), s::$s_type; kv...) where {$(wheres...)} =
+            $base_f($(d[:argnames]...), s; kv...))
+    end
+end
+
+function varnames_method(d::Dict{Symbol})
+    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
+    quote
+        $f($(args...), s1::VarNames, s::VarNames...; kv...) where {$(wheres...)} =
+            $f($(argnames...), (s1, s...); kv...)
         function $f($(args...), s::Tuple{Vararg{VarNames}}; kv...) where {$(wheres...)}
             X, gens = $f($(argnames...), variable_names(s...); kv...)
             return X, reshape_to_varnames(gens, s...)...
         end
     end
+end
 
-    opts = parse_options(options, Dict(:n => :n, :range => :(1:n), :macros => :(:yes)), Dict(:macros => QuoteNode.([:no, :yes])))
-    one_to_n = n = opts[:n]
-    fancy_n_method = if n === :(:no)
-        :()
-    else
-        req(n isa Symbol, "Value to option `n` must be `:no` or an alternative name like `m`, not `$n`")
-        quote
-            $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
-                $f($(argnames...), Symbol.(s, $range); kv...)
-        end
+function n_vars_method(d::Dict{Symbol}, n, range)
+    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
+    n === :(:no) && return :()
+    req(n isa Symbol, "Value to option `n` must be `:no` or " *
+        "an alternative name like `m`, not `$n`")
+    quote
+        $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
+            $f($(argnames...), Symbol.(s, $range); kv...)
     end
+end
 
-    opts[:macros] === :(:no) && return :($base; $fancy_method; $fancy_n_method)
-    fancy_macro = quote
+function varnames_macro(f, argnames, macros)
+    macros === :(:yes) || return :()
+    quote
         macro $f($(argnames...), s1::Union{Expr, Symbol}, s::Union{Expr, Symbol}...)
             s, kv = extract_options(s)
-            return if isempty(s) && s1 isa Symbol
-                # use vararg method respectively the univariate method if it exists
-                quote
-                    X, $(esc(s1)) = $$f($$(argnames...), $(QuoteNode(s1)); $(esc.(kv)...)) # the need for `esc` around `kv` is a bug in julia (#51602)
-                    X
-                end
-            else
-                # use base method directly
-                gens = variable_names(_eval_shapes(Main, s1, s...))
-                quote
-                    X, ($(esc.(gens)...),) = $$f($$(argnames...), $gens; $(esc.(kv)...))
-                    X
-                end
-            end
+            m = VERSION > v"9999" ? __module__ : $(esc(:__module__)) # julia issue #51602
+            # in case of `@f args... s` use same code as in @varname_interface
+            isempty(s) && s1 isa Symbol ?
+                varname_macro_code($f, ($(argnames...),), s1, kv) :
+                varnames_macro_code(m, $f, ($(argnames...),), (s1, s...), kv)
         end
     end
+end
 
-    return :($base; $fancy_method; $fancy_n_method; $fancy_macro)
+function varname_macro_code(f, argnames, s::Symbol, kv)
+    quote
+        X, $(esc(s)) = $f($(argnames...), $(QuoteNode(s)); $(kv...))
+        X
+    end
+end
+
+function varnames_macro_code(m::Core.Module, f, argnames, s::Tuple, kv)
+    gens = variable_names(_eval_shapes(m, s...))
+    quote
+        X, ($(esc.(gens)...),) = $f($(argnames...), $gens; $(kv...))
+        X
+    end
 end
 
 function parse_options(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol}, valid::Dict{Symbol, <:Vector} = Dict{Symbol, Vector{Any}}()) :: Dict{Symbol}
@@ -350,16 +390,27 @@ function extract_options(es) # -> args, options
     options_start = findfirst(e -> Meta.isexpr(e, :(=)), es)
     options_start === nothing && return es, es[end+1:end]
     args = es[begin:options_start-1]
-    options = map(e -> (req(MT.@capture(e, k_ = v_), "The argument `$e` comes after an option, so it also must be of the form `option=value`"); :($(QuoteNode(k::Symbol)) => $v)), es[options_start:end])
+    options = map(es[options_start:end]) do e
+        req(MT.@capture(e, k_ = v_), "The argument `$e` comes after an option, " *
+            "so it also must be of the form `option=value`")
+        :($(QuoteNode(k::Symbol)) => $v)
+    end
+    VERSION > v"9999" || (options = esc.(options)) # see julia issue #51602
     return args, options
 end
 
-_eval_shapes(m::Core.Module, es::Union{Expr, Symbol}...) :: Tuple{Vararg{Union{<:Pair{String, Tuple}, Symbol}}} = _eval_shape.((m,), es)
-_eval_shapes(m::Core.Module, e::Expr) :: Tuple{Vararg{Union{<:Pair{String, Tuple}, Symbol}}} =
-    MT.@capture(e, (es__,)) ? # Are we in the case of the `@f args... (varnames...,)` variant?
-    _eval_shape.((m,), (es...,)) : # Yes, we are, `es` is like `(x[0:5], y)`.
-    (_eval_shape(m, e),) # No, we are in the ordinary case and have only one varname, `es` is like `x[0:5]`.
-_eval_shape(m::Core.Module, e::Expr) :: Pair{String, Tuple} = (req(MT.@capture(e, x_[a__]), "Variable name must be like `x` or `x[...]`, not `$e`"); "$x#" => (_eval.((m,), a)...,))
+_eval_shapes(m::Core.Module, shapes::Union{Expr, Symbol}...)= __eval_shapes(m,
+    # Special case the `@f args... (varnames...,)` variant:
+    MT.@capture(shapes, ((es__,),)) ? tuple(es...) : shapes)
+__eval_shapes(m::Core.Module, shapes::Tuple{Vararg{Union{Expr, Symbol}}}) ::
+    Tuple{Vararg{Union{<:Pair{String, Tuple}, Symbol}}} =
+    _eval_shape.((m,), shapes)
+
+function _eval_shape(m::Core.Module, shape::Expr) :: Pair{String, Tuple}
+    req(MT.@capture(shape, x_[a__]),
+        "Variable name must be like `x` or `x[...]`, not `$shape`")
+    "$x#" => (_eval.((m,), a)...,)
+end
 _eval_shape(::Core.Module, s::Symbol) = s
 
 function _eval(m::Core.Module, e::Expr)
@@ -367,7 +418,9 @@ function _eval(m::Core.Module, e::Expr)
         Base.eval(m, e)
     catch err
         if isa(err, UndefVarError)
-            @error "Inconveniently, you may only use literals and variables from `Main`s global scope when using fancy variable name macros"
+            @error "Inconveniently, you may only use literals and variables " *
+                "from the global scope of the current module (`$m`) " *
+                "when using fancy variable name macros"
         end
         rethrow()
     end
@@ -420,24 +473,37 @@ julia> x
 ```
 """
 macro varname_interface(e::Expr, options::Expr...)
-    f, args, argnames, wheres, base = _varname_interface(e, :Symbol)
-    fancy_method = :($f($(args...), s::Union{AbstractString, Char}; kv...) where {$(wheres...)} = $f($(argnames...), Symbol(s); kv...))
-    opts = parse_options(options, Dict(:macros => :(:yes)), Dict(:macros => QuoteNode.([:no, :yes])))
-    opts[:macros] == :(:yes) || return :($base; $fancy_method)
-    fancy_macro = :(
-        macro $f($(argnames...), s::Symbol, options::Expr...)
-            rest, kv = extract_options(options)
-            @req(isempty(rest), "The univariate macro `@$($f)` accepts only one Symbol and following `option=value` pairs, but `$(first(rest))` given." *
-                "If you intended to use a multivariate version of `@$($f)`, check that `@varname_interface $($f)(...)` is followed by `macros=:no`.")
-            quote
-                X, $(esc(s)) = $$f($$(argnames...), $(QuoteNode(s)); $(esc.(kv)...))
-                X
-            end
-        end
-        )
-    return :($base; $fancy_method; $fancy_macro)
+    d = _splitdef(e)
+
+    opts = parse_options(options, Dict(:macros => :(:yes)),
+        Dict(:macros => QuoteNode.([:no, :yes])))
+
+    quote
+        $(base_method(d, :Symbol))
+        $(varname_method(d))
+        $(varname_macro(d[:f], d[:argnames], opts[:macros]))
+    end
 end
 
+function varname_method(d::Dict{Symbol})
+    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
+    :($f($(args...), s::Union{AbstractString, Char}; kv...)
+        where {$(wheres...)} = $f($(argnames...), Symbol(s); kv...))
+end
+
+function varname_macro(f, argnames, macros)
+    macros === :(:yes) || return :()
+    quote
+        macro $f($(argnames...), s::Symbol, options::Expr...)
+            rest, kv = extract_options(options)
+            @req(isempty(rest), "The univariate macro `@$($f)` accepts only one Symbol " *
+                "and following `option=value` pairs, but `$(first(rest))` given. " *
+                "If you intended to use a multivariate version of `@$($f)`, check that " *
+                "`@varname_interface $($f)(...)` is followed by `macros=:no`.")
+            return varname_macro_code($f, $argnames, s, kv)
+        end
+    end
+end
 
 @varname_interface Generic.SparsePolynomialRing(R::Ring, s)
 @varname_interface Generic.number_field(p::PolyRingElem, s)
