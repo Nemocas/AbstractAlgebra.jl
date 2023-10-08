@@ -17,14 +17,17 @@ macro req(cond, msg) :($cond || throw(ArgumentError($msg))) end
     variable_names(a::Tuple) -> Vector{Symbol}
 
 Create proper variable names from `a`.
-Each argument can be either an Array of `VarName`s, `s::VarName => (iter...)`, or `s::VarName => iter`.
-The `iter` version is equivalent to `["s[$i]" for i in iter]`; the `(iter...)` version is the same for multiple indices.
+Each argument can be either an Array of `VarName`s,
+or of the form `s::VarName => iter`, or of the form `s::VarName => (iter...)`.
+Here `iter` is supposed to be any iterable, typically a range like `1:5`.
+The `:s => iter` specification is shorthand for `["s[$i]" for i in iter]`.
+Similarly `:s => (iter1, iter2)` is shorthand for `["s[$i,$j]" for i in iter1, j in iter2]`,
+and likewise for three and more iterables.
 
-By default `:x => axes` and `"x" => axes` create variables like `x[1,1]`.
-By using `"x#" => axes` instead, `x[1,1]` becomes `x11`, `x[10,10]` becomes `x10_10`, and `x[-1]` becomes `xm1`.
-If one does not want to replace the chars "-./" by "mpq", use '@' instead of '#'.
-Using multiple '#' or multiple '@' as in "x#y#", one gets variables like `x1y1`.
-By including a '%' one gets `printf` formatting.
+As an alternative `"s#" => iter` is shorthand for `["s$i" for i in iter]`.
+This also works for multiple iterators in that`"s#" => (iter1, iter2)`
+is shorthand for `["s$i$j" for i in iter1, j in iter2]`.
+If you need anything else, feel free to open an issue with AbstractAlgebra.
 
 # Examples
 
@@ -49,38 +52,11 @@ julia> AbstractAlgebra.variable_names("x#" => (0:0, 0:1), "y#" => 0:1)
  :y0
  :y1
 
-julia> AbstractAlgebra.variable_names("x#" => (0:0, [-1,3,10]), "y#" => [-1,1])
-5-element Vector{Symbol}:
- :x0_m1
- :x0_3
- :x0_10
- :ym1
- :y1
-
-julia> AbstractAlgebra.variable_names("x#y#" => (0:0, [-1,3,10]))
+julia> AbstractAlgebra.variable_names("x#" => 9:11)
 3-element Vector{Symbol}:
- :x0ym1
- :x0y3
- :x0y10
-
-julia> AbstractAlgebra.variable_names("x_{@}" => (0:0, [-1,3,10]))
-3-element Vector{Symbol}:
- Symbol("x_{0,-1}")
- Symbol("x_{0,3}")
- Symbol("x_{0,10}")
-
-julia> AbstractAlgebra.variable_names("x^{(@)}_{@}" => (0:0, [-1,3,10]))
-3-element Vector{Symbol}:
- Symbol("x^{(0)}_{-1}")
- Symbol("x^{(0)}_{3}")
- Symbol("x^{(0)}_{10}")
-
-julia> AbstractAlgebra.variable_names("x%02d_%02d" => (9:10,9:10))
-4-element Vector{Symbol}:
- :x09_09
- :x10_09
- :x09_10
- :x10_10
+ :x9
+ :x10
+ :x11
 
 julia> AbstractAlgebra.variable_names(["x$i$i" for i in 1:3])
 3-element Vector{Symbol}:
@@ -110,31 +86,10 @@ _variable_names((s, axe)::Pair{<:AbstractString}) = _variable_names(s => (axe,))
 _variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
 function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
     indices = Iterators.product(axes...)
-    return if '%' in s
-        [Symbol(Printf.format(Printf.Format(s), i...)) for i in indices]
-    else
-        c_massage = count("#", s) # From julia 1.7 on, we could use a `Char` instead.
-        c_no_massage = count("@", s)
-        req(c_massage == 0 || c_no_massage == 0, """In "$s" both '#' and '@' occur. If you need both, please make up an issue.""")
-        c = c_massage | c_no_massage
-        if c == 0
-            Symbol.(s, '[', join.(indices, ','), ']')
-        else
-            massage = c_massage > 0
-            x = massage ? '#' : '@'
-            if massage
-                indices = [_replace_bad_chars.(i) for i in indices]
-            end
-            if c == 1
-                delim = !massage ? "," : maximum(i->maximum(length, i), indices) > 1 ? "_" : ""
-                [Symbol(replace(s, x => join(i, delim))) for i in indices]
-            else
-                req(c == length(axes), """In "$s" there occurs a '$x' $c times, but only 0, 1, or $(length(axes)) (= number of indices) times is allowed.""")
-                parts = split(s, x)
-                [Symbol(Iterators.flatten(zip(parts, i))..., parts[end]) for i in indices]
-            end
-        end
-    end
+    c = count("#", s)
+    c <= 1 || req("""Only a single '#' allowed, but "$s" contains $c of them.""")
+    return c == 0 ? Symbol.(s, '[', join.(indices, ','), ']') :
+        [Symbol(replace(s, x => join(i))) for i in indices]
 end
 
 _replace_bad_chars(s) = replace(replace(replace(string(s), '-' => 'm'), '.' => 'p'), r"/+" => 'q') # becomes simpler with julia 1.7
