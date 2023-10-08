@@ -1242,7 +1242,7 @@ include("misc/VarNames.jl")
 
 getindex(R::NCRing, s::VarName) = polynomial_ring(R, s)
 # For compatibility `R[:x, :y]` returns `S, [x, y]` instead of `S, x, y`
-getindex(R::Ring, s::VarNames...) = ((S, x...) = polynomial_ring(R, s...); (S, collect(x)))
+getindex(R::Ring, s1::VarNames, s::VarNames...) = ((S, x...) = polynomial_ring(R, s1, s...); (S, collect(x)))
 getindex(R::Ring, s::Tuple{Vararg{VarNames}}) = ((S, x...) = polynomial_ring(R, s); (S, collect(x)))
 # Resolve ambiguity
 getindex(R::Ring, s::VarName) = polynomial_ring(R, s)
