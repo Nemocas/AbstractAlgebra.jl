@@ -15,25 +15,25 @@ end
 
 @testset "Generic.LaurentPoly" begin
    @testset "constructors" begin
-      L0, y0 = LaurentPolynomialRing(zz, "y0")
+      L0, y0 = laurent_polynomial_ring(zz, "y0")
 
       for R in (ZZ, GF(5))
          P, _ = polynomial_ring(R, "x0")
-         L, y = LaurentPolynomialRing(R, "y")
+         L, y = laurent_polynomial_ring(R, "y")
 
-         @test LaurentPolynomialRing(R, "y", cached = true)[1] ===
-               LaurentPolynomialRing(R, "y", cached = true)[1]
+         @test laurent_polynomial_ring(R, "y", cached = true)[1] ===
+               laurent_polynomial_ring(R, "y", cached = true)[1]
 
-         @test LaurentPolynomialRing(R, "y", cached = true)[1] !==
-               LaurentPolynomialRing(R, "y", cached = false)[1]
+         @test laurent_polynomial_ring(R, "y", cached = true)[1] !==
+               laurent_polynomial_ring(R, "y", cached = false)[1]
 
          P2, _ = polynomial_ring(R, "x0", cached = false)
 
-         @test LaurentPolynomialRing(P, "y")[1] ===
-               LaurentPolynomialRing(P, "y")[1]
+         @test laurent_polynomial_ring(P, "y")[1] ===
+               laurent_polynomial_ring(P, "y")[1]
 
-         @test LaurentPolynomialRing(P2, "y")[1] !==
-               LaurentPolynomialRing(P, "y")[1]
+         @test laurent_polynomial_ring(P2, "y")[1] !==
+               laurent_polynomial_ring(P, "y")[1]
 
          x = y.poly
 
@@ -74,16 +74,16 @@ end
          @test is_domain_type(typeof(y))
          @test is_exact_type(typeof(y))
 
-         R, r = LaurentPolynomialRing(RDF, "r")
+         R, r = laurent_polynomial_ring(RDF, "r")
          @test !is_exact_type(typeof(r))
       end
    end
 
    @testset "basic manipulation" begin
-      L, y = LaurentPolynomialRing(ZZ, "y")
+      L, y = laurent_polynomial_ring(ZZ, "y")
       x = y.poly
-      Z, z = LaurentPolynomialRing(L, "z")
-      T, t = LaurentPolynomialRing(L.polyring, "t")
+      Z, z = laurent_polynomial_ring(L, "z")
+      T, t = laurent_polynomial_ring(L.polyring, "t")
 
       @test terms_degrees(y) == 0:1
       @test terms_degrees(y^3) == 0:3
@@ -123,7 +123,7 @@ end
       @test !is_monomial(x^2*t^-3)
       @test !is_monomial_recursive((x+x^2)*t)
 
-      @test !is_unit(LaurentPolynomialRing(ZZ, "x")[1](2))
+      @test !is_unit(laurent_polynomial_ring(ZZ, "x")[1](2))
       @test !is_unit(zero(L))
 
       for e = -5:5
@@ -233,7 +233,7 @@ end
    end
 
    @testset "Generic.LaurentMPoly.is_unit" begin
-      R, x = LaurentPolynomialRing(residue_ring(ZZ, 6), "x")
+      R, x = laurent_polynomial_ring(residue_ring(ZZ, 6), "x")
 
       @test is_unit(x)
       @test !is_unit(2*x)
@@ -247,13 +247,13 @@ end
 
    @testset "coercion" begin
       R, x = polynomial_ring(ZZ, "x")
-      L, x1 = LaurentPolynomialRing(ZZ, "x")
+      L, x1 = laurent_polynomial_ring(ZZ, "x")
       @test L(x) == x1
       @test L(x+x^2) == x1+x1^2
    end
 
    @testset "comparisons" begin
-      L, y = LaurentPolynomialRing(ZZ, "y")
+      L, y = laurent_polynomial_ring(ZZ, "y")
       x = y.poly
 
       @test y == y
@@ -269,7 +269,7 @@ end
    end
 
    @testset "unary & binary & adhoc arithmetic operations" begin
-      L, y = LaurentPolynomialRing(ZZ, "y")
+      L, y = laurent_polynomial_ring(ZZ, "y")
       x = y.poly
 
       @test -(-y) == y
@@ -293,24 +293,24 @@ end
 
       # with polynomials as base ring
       P, x = polynomial_ring(ZZ, "x")
-      L, y = LaurentPolynomialRing(P, "y")
+      L, y = laurent_polynomial_ring(P, "y")
       @test parent(x*y) == L
       @test parent(y*x) == L
 
       # with Laurent polynomials as base ring
-      P, x = LaurentPolynomialRing(ZZ, "x")
-      L, y = LaurentPolynomialRing(P, "y")
+      P, x = laurent_polynomial_ring(ZZ, "x")
+      L, y = laurent_polynomial_ring(P, "y")
       @test parent(x*y) == L
       @test parent(y*x) == L
 
       # as base ring of polynomials
-      L, y = LaurentPolynomialRing(ZZ, "y")
+      L, y = laurent_polynomial_ring(ZZ, "y")
       P, x = polynomial_ring(L, "x")
       @test parent(x*y) == P
       @test parent(y*x) == P
 
       # Inexact field
-      R, x = LaurentPolynomialRing(RealField, "x")
+      R, x = laurent_polynomial_ring(RealField, "x")
       for iter = 1:100
          f = rand(R, 0:10, -1:1)
          g = rand(R, 0:10, -1:1)
@@ -337,7 +337,7 @@ end
    end
 
    @testset "powering" begin
-      L, y = LaurentPolynomialRing(ZZ, "y")
+      L, y = laurent_polynomial_ring(ZZ, "y")
       x = y.poly
 
       @test 2y^-2 + 3y^-1 + 4y^0 + 5y + 6y^2 == L(2 + 3x + 4x^2 + 5x^3 + 6x^4, -2)
@@ -359,7 +359,7 @@ end
       @test_throws DomainError (y + y^2)^-1
       @test_throws DomainError (y-y)^-1
 
-      LQ, z = LaurentPolynomialRing(QQ, "z")
+      LQ, z = laurent_polynomial_ring(QQ, "z")
 
       @test (2z)^-1 == 1//2 * z^-1
       @test (3z^-1)^(-2) == 1//9 * z^2
@@ -368,7 +368,7 @@ end
    end
 
    @testset "evaluate" begin
-      L, y = LaurentPolynomialRing(ZZ, "y")
+      L, y = laurent_polynomial_ring(ZZ, "y")
       p = 2y+3y^4
       @assert p.mindeg == 0
       for a = Any[-3:3; -10.0:3.3:10;]
@@ -384,7 +384,7 @@ end
 
    @testset "derivative" begin
       for R in (ZZ, QQ, GF(5))
-         L, x = LaurentPolynomialRing(R, "x")
+         L, x = laurent_polynomial_ring(R, "x")
          @test derivative(zero(L)) == zero(L)
          @test derivative(one(L)) == zero(L)
          @test derivative(x) == one(L)
@@ -395,7 +395,7 @@ end
    end
 
    @testset "unsafe functions" begin
-      L, y = LaurentPolynomialRing(ZZ, "y")
+      L, y = laurent_polynomial_ring(ZZ, "y")
 
       # zero!
       p = y^-2 + 3y + y^3
@@ -440,7 +440,7 @@ end
    end
 
    @testset "shifting" begin
-      L, y = LaurentPolynomialRing(ZZ, "y")
+      L, y = laurent_polynomial_ring(ZZ, "y")
 
       p = 2y - 3y^-2
       @test shift_left(p, 0) == p
@@ -453,7 +453,7 @@ end
    end
 
    @testset "rand" begin
-      L, y = LaurentPolynomialRing(ZZ, "y")
+      L, y = laurent_polynomial_ring(ZZ, "y")
 
       test_rand(L, -5:5, -10:10) do f
          @test AbstractAlgebra.degrees_range(f) ⊆ -5:5
@@ -464,8 +464,8 @@ end
    end
 
    @testset "change_base_ring & map_coefficients" begin
-      Z, z = LaurentPolynomialRing(ZZ, "z")
-      Q, q = LaurentPolynomialRing(QQ, "q")
+      Z, z = laurent_polynomial_ring(ZZ, "z")
+      Q, q = laurent_polynomial_ring(QQ, "q")
 
       fz = z^2 - z - 2z^-2
 
@@ -480,7 +480,7 @@ end
    end
 
    @testset "printing" begin
-      L, y = LaurentPolynomialRing(ZZ, "y")
+      L, y = laurent_polynomial_ring(ZZ, "y")
       @test sprint(show, "text/plain", y) == "y"
       @test sprint(show, "text/plain", L) == "Univariate Laurent polynomial ring in y\n  over integers"
       p = y^1; p.mindeg = -3
@@ -493,12 +493,12 @@ end
    end
 
    @testset "conformance" begin
-      L, y = LaurentPolynomialRing(QQ, "y")
+      L, y = laurent_polynomial_ring(QQ, "y")
       test_Ring_interface(L)
       test_EuclideanRing_interface(L)
       test_Ring_interface_recursive(L)
 
-      L, y = LaurentPolynomialRing(residue_ring(ZZ, ZZ(6)), "y")
+      L, y = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6)), "y")
       test_Ring_interface(L)
    end
 end

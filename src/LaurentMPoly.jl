@@ -138,12 +138,12 @@ end
 
 ###############################################################################
 #
-#   LaurentPolynomialRing constructor
+#   laurent_polynomial_ring constructor
 #
 ###############################################################################
 
 @doc raw"""
-    LaurentPolynomialRing(R::Ring, s::Vector{T}; cached::Bool = true) where T <: VarName
+    laurent_polynomial_ring(R::Ring, s::Vector{T}; cached::Bool = true) where T <: VarName
 
 Given a base ring `R` and an array of strings `s` specifying how the
 generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
@@ -153,14 +153,14 @@ depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional
 argument `cached` to `false` will prevent the parent object `T` from being
 cached.
 """
-function LaurentPolynomialRing(R::Ring, s::AbstractVector{<:VarName}; cached::Bool = true)
-   return Generic.LaurentPolynomialRing(R, [Symbol(v) for v in s], cached=cached)
+function laurent_polynomial_ring(R::Ring, s::AbstractVector{<:VarName}; cached::Bool = true)
+   return Generic.laurent_polynomial_ring(R, [Symbol(v) for v in s], cached=cached)
 end
 
-function LaurentPolynomialRing(R::Ring, s::Vector{Symbol}; cached::Bool = true)
-   return Generic.LaurentPolynomialRing(R, s; cached=cached)
+function laurent_polynomial_ring(R::Ring, s::Vector{Symbol}; cached::Bool = true)
+   return Generic.laurent_polynomial_ring(R, s; cached=cached)
 end
 
-function LaurentPolynomialRing(R::Ring, n::Int, s::VarName=:x; cached::Bool = false)
-   return Generic.LaurentPolynomialRing(R, [Symbol(s, i) for i=1:n]; cached=cached)
+function laurent_polynomial_ring(R::Ring, n::Int, s::VarName=:x; cached::Bool = false)
+   return Generic.laurent_polynomial_ring(R, [Symbol(s, i) for i=1:n]; cached=cached)
 end

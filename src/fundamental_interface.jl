@@ -226,7 +226,7 @@ function iszero end
 
 # # Examples
 # ```jldoctest; setup = :(using AbstractAlgebra)
-# julia> S, x = LaurentPolynomialRing(QQ, "x")
+# julia> S, x = laurent_polynomial_ring(QQ, "x")
 # (Univariate Laurent Polynomial Ring in x over Rationals, x)
 
 # julia> gen(S)

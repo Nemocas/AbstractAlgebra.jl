@@ -19,11 +19,11 @@ The type `LaurentPolyWrap{T, ...} <: LaurentPolyRingElem{T}` implements generic 
 polynomials by wrapping regular polynomials: a Laurent polynomial `l` wraps a
 polynomial `p` and an integer `n` such that $l = x^{-n} * p$.
 
-The corresponding parent type is `LaurentPolyWrapRing{T, ...} <: LaurentPolynomialRing{T}`.
+The corresponding parent type is `LaurentPolyWrapRing{T, ...} <: LaurentPolyRing{T}`.
 
 ## Abstract types
 
-Two abstract types `LaurentPolyRingElem{T}` and `LaurentPolynomialRing{T}`
+Two abstract types `LaurentPolyRingElem{T}` and `LaurentPolyRing{T}`
 are defined to represent Laurent polynomials and rings thereof, parameterized
 on a base ring `T`.
 
@@ -32,7 +32,7 @@ on a base ring `T`.
 In order to instantiate Laurent polynomials, one must first construct the parent ring:
 
 ```@docs
-LaurentPolynomialRing
+laurent_polynomial_ring
 ```
 
 ## Basic functionality
@@ -41,7 +41,7 @@ Laurent polynomials implement the ring interface, and some methods
 from the polynomial interface, for example:
 
 ```jldoctest
-julia> R, x = LaurentPolynomialRing(ZZ, "x")
+julia> R, x = laurent_polynomial_ring(ZZ, "x")
 (Univariate Laurent polynomial ring in x over integers, x)
 
 julia> var(R)

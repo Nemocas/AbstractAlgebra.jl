@@ -79,7 +79,7 @@ abstract type MPolyRing{T} <: Ring end
 
 abstract type UniversalPolyRing{T} <: Ring end
 
-abstract type LaurentPolynomialRing{T} <: Ring end
+abstract type LaurentPolyRing{T} <: Ring end
 
 abstract type LaurentMPolyRing{T} <: Ring end
 

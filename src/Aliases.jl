@@ -51,6 +51,7 @@
 
 @alias PolynomialRing polynomial_ring
 @alias PowerSeriesRing power_series_ring
+@alias LaurentPolynomialRing laurent_polynomial_ring
 @alias LaurentSeriesRing laurent_series_ring
 @alias LaurentSeriesField laurent_series_field
 @alias FractionField fraction_field

@@ -45,8 +45,8 @@ individual terms *in some order*. This order currently cannot be specified in
 the constructor.
 
 ```julia
-LaurentPolynomialRing(R::Ring, S::Vector{<:VarName}; cached::Bool = true)
-LaurentPolynomialRing(R::Ring, n::Int, s::VarName; cached::Bool = false)
+laurent_polynomial_ring(R::Ring, S::Vector{<:VarName}; cached::Bool = true)
+laurent_polynomial_ring(R::Ring, n::Int, s::VarName; cached::Bool = false)
 ```
 
 ```julia
@@ -104,7 +104,7 @@ $\prod_i x_i^{n_i}$ from the normalized representation. In particular,
 this means that the output of `gcd` will not have any negative exponents.
 
 ```jldoctest
-julia> R, (x, y) = LaurentPolynomialRing(ZZ, ["x", "y"]);
+julia> R, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"]);
 
 julia> canonical_unit(2*x^-5 - 3*x + 4*y^-4 + 5*y^2)
 -x^-5*y^-4

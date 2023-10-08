@@ -509,11 +509,11 @@ end
 
 ###############################################################################
 #
-#   LaurentPolynomialRing constructor
+#   Laurent polynomial ring constructor
 #
 ###############################################################################
 
-function LaurentPolynomialRing(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
+function laurent_polynomial_ring(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
    P, x = AbstractAlgebra.polynomial_ring(R, s, cached = cached)
    R = LaurentPolyWrapRing(P, cached)
    R, LaurentPolyWrap(R, x)
