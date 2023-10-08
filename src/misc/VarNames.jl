@@ -198,8 +198,8 @@ Return a copy of `default` with the key value pairs from `kvs` applied.
 
 # Example
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> AbstractAlgebra.keyword_arguments((:(a=1), :(b=:no)),
-       Dict(:a=>0, b=>:yes, c=>0),
+julia> AbstractAlgebra.keyword_arguments((:(a=1), :(b=:yes)),
+       Dict(:a=>0, :b=>:no, :c=>0),
        Dict(:b => [:(:yes), :(:no)]))
 Dict{Symbol, Any} with 3 entries:
   :a => 1
@@ -232,7 +232,7 @@ julia> args, options = AbstractAlgebra.extract_options((:a, :(a+b), :(x=1), :(y=
 julia> args
 (:a, :(a + b))
 
-julia> options == (esc(:(:x => 1)), esc(:(:y => 2)))
+julia> options == (esc(:(:x => 1)), esc(:(:y => z)))
 true
 ```
 """
