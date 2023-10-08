@@ -23,6 +23,9 @@ end
     test_Ring_interface(L)
 end
 
+# HACK: for GC to workaround bug
+GC.gc()
+
 @testset "Generic.LaurentMPoly.constructors" begin
     L, (x, y) = laurent_polynomial_ring(GF(5), 2, "x", cached = true)
     @test L != laurent_polynomial_ring(GF(5), 2, 'x', cached = false)[1]
