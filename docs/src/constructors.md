@@ -66,15 +66,15 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 | $S = R[x]$                           | `S, x = polynomial_ring(R, :x)`                       |
 | $S = R[x, y]$                        | `S, (x, y) = polynomial_ring(R, [:x, :y])`            |
 | $S = R\langle x, y\rangle$           | `S, (x, y) = free_associative_algebra(R, [:x, :y])`   |
-| $S = K(x)$                           | `S, x = RationalFunctionField(K, :x)`                 |
-| $S = K(x, y)$                        | `S, (x, y) = RationalFunctionField(K, [:x, :y])`      |
+| $S = K(x)$                           | `S, x = rational_functionField(K, :x)`                |
+| $S = K(x, y)$                        | `S, (x, y) = rational_functionField(K, [:x, :y])`     |
 | $S = R[[x]]$ (to precision $n$)      | `S, x = power_series_ring(R, n, :x)`                  |
 | $S = R[[x, y]]$ (to precision $n$)   | `S, (x, y) = power_series_ring(R, n, [:x, :y])`       |
 | $S = R((x))$ (to precision $n$)      | `S, x = laurent_series_ring(R, n, :x)`                |
 | $S = K((x))$ (to precision $n$)      | `S, x = laurent_series_field(K, n, :x)`               |
 | $S = R((x, y))$ (to precision $n$)   | `S, (x, y) = laurent_polynomial_ring(R, n, [:x, :y])` |
 | Puiseux series ring to precision $n$ | `S, x = PuiseuxSeriesRing(R, n, :x)`                  |
-| $S = K(x)(y)/(f)$                    | `S, y = FunctionField(f, :y)` with $f\in K(x)[t]$     |
+| $S = K(x)(y)/(f)$                    | `S, y = function_field(f, :y)` with $f\in K(x)[t]$    |
 | $S = \mathrm{Frac}_R$                | `S = fraction_field(R)`                               |
 | $S = R/(f)$                          | `S = residue_ring(R, f)`                              |
 | $S = R/(f)$ (with $(f)$ maximal)     | `S = residue_field(R, f)`                             |
