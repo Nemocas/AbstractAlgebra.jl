@@ -464,21 +464,21 @@ end
 
 @varname_interface Generic.SparsePolynomialRing(R::Ring, s)
 @varname_interface Generic.number_field(p::PolyRingElem, s)
-@varname_interface Generic.FunctionField(p::PolyRingElem, s)
+@varname_interface Generic.function_field(p::PolyRingElem, s)
 @varname_interface Generic.laurent_series_ring(R::Ring, prec::Int, s)
 @varname_interface Generic.laurent_series_field(K::Field, prec::Int, s)
 @varname_interface Generic.PuiseuxSeriesRing(R::Ring, prec::Int, s)
 
 @varnames_interface Generic.free_associative_algebra(R::Ring, s)
-@varnames_interface Generic.LaurentPolynomialRing(R::Ring, s)
+@varnames_interface Generic.laurent_polynomial_ring(R::Ring, s)
 
 @varname_interface Generic.power_series_ring(R::Ring, prec::Int, s) macros=:no
 @varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s)
 @varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s) macros=:no # use keyword `weights=...` instead
 @varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no # `n` variant would clash with line above; macro would be the same as for `prec::Int`
 
-@varname_interface Generic.RationalFunctionField(K::Field, s) macros=:no
-@varnames_interface Generic.RationalFunctionField(K::Field, s)
+@varname_interface Generic.rational_function_field(K::Field, s) macros=:no
+@varnames_interface Generic.rational_function_field(K::Field, s)
 
 @varname_interface polynomial_ring(R::NCRing, s) macros=:no
 @varnames_interface polynomial_ring(R::Ring, s)
