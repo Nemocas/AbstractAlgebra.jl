@@ -87,9 +87,9 @@ _variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, '[', join.(Ite
 function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
     indices = Iterators.product(axes...)
     c = count("#", s)
-    c <= 1 || req("""Only a single '#' allowed, but "$s" contains $c of them.""")
+    req(c <= 1, """Only a single '#' allowed, but "$s" contains $c of them.""")
     return c == 0 ? Symbol.(s, '[', join.(indices, ','), ']') :
-        [Symbol(replace(s, x => join(i))) for i in indices]
+        [Symbol(replace(s, '#' => join(i))) for i in indices]
 end
 
 _replace_bad_chars(s) = replace(replace(replace(string(s), '-' => 'm'), '.' => 'p'), r"/+" => 'q') # becomes simpler with julia 1.7
@@ -175,33 +175,17 @@ function keyword_arguments(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol},
     return result
 end
 
-"""
-    extract_options(expressions) -> arguments, keyword_arguments
-
-Split macro arguments in usual arguments and keyword arguments.
-
-# Example
-```jldoctest; setup = :(using AbstractAlgebra)
-julia> args, options = AbstractAlgebra.extract_options((:a, :(a+b), :(x=1), :(y=z)));
-
-julia> args
-(:a, :(a + b))
-
-julia> options == (esc(:(:x => 1)), esc(:(:y => z)))
-true
-```
-"""
-function extract_options(es) # -> args, options
-    options_start = findfirst(e -> Meta.isexpr(e, :(=)), es)
-    options_start === nothing && return es, es[end+1:end]
-    args = es[begin:options_start-1]
-    options = map(es[options_start:end]) do e
-        req(MT.@capture(e, k_ = v_), "The argument `$e` comes after an option, " *
-            "so it also must be of the form `option=value`")
-        :($(QuoteNode(k::Symbol)) => $v)
+function _eval(m::Core.Module, e::Expr)
+    try
+        Base.eval(m, e)
+    catch err
+        if isa(err, UndefVarError)
+            @error "Inconveniently, you may only use literals and variables " *
+                "from the global scope of the current module (`$m`) " *
+                "when using variable name constructor macros"
+        end
+        rethrow()
     end
-    VERSION > v"9999" || (options = esc.(options)) # julia issue #51602
-    return args, options
 end
 
 # input is :([M.]f(args..., s) where {wheres} [ = ... ])
@@ -281,73 +265,45 @@ function n_vars_method(d::Dict{Symbol}, n, range)
     end
 end
 
-function varname_macro(f, argnames, macros)
-    macros === :(:yes) || return :()
+function varnames_macro(f, args_count, opt_in)
+    opt_in === :(:yes) || return :()
     quote
-        macro $f($(argnames...), s::Symbol, options::Expr...)
-            rest, kv = extract_options(options)
-            @req(isempty(rest), "The univariate macro `@$($f)` accepts only one Symbol " *
-                "and following `option=value` pairs, but `$(first(rest))` given. " *
-                "If you intended to use a multivariate version of `@$($f)`, check that " *
-                "`@varname_interface $($f)(...)` is followed by `macros=:no`.")
-            varname_macro_code($f, ($(argnames...),), s, kv)
-        end
-    end
-end
+        macro $f(args...)
+            # Keyword arguments after `;` end up in `kv`.
+            # Those without previous `;` get evaluated and end up in `kv2`.
+            # Note: one could work around evaluating the latter if necessary.
+            kv = Meta.isexpr(first(args), :parameters) ?
+                popfirst!(args).args : Expr(:parameters)
 
-function varnames_macro(f, argnames, macros)
-    macros === :(:yes) || return :()
-    quote
-        macro $f($(argnames...), s1::Union{Expr, Symbol}, s::Union{Expr, Symbol}...)
-            s, kv = extract_options(s)
+            req(length(args) >= $args_count+1, "Not enough arguments")
+            base_args = args[1:$args_count]
+
             m = VERSION > v"9999" ? __module__ : $(esc(:__module__)) # julia issue #51602
-            # in case of `@f args... s` use same code as in @varname_interface
-            isempty(s) && s1 isa Symbol ?
-                varname_macro_code($f, ($(argnames...),), s1, kv) :
-                varnames_macro_code(m, $f, ($(argnames...),), (s1, s...), kv)
+            s, kv2 = _eval(m, :($$_varnames_macro($(args[$args_count+1:end]...))))
+
+            append!(kv.args, (Expr(:kw, k, v) for (k, v) in kv2))
+            kv = isempty(kv.args) ? () : (kv,)
+
+            varnames_macro_code($f, base_args, s, kv)
         end
     end
 end
+const varname_macro = varnames_macro
 
-function varname_macro_code(f, argnames, s::Symbol, kv)
+_varnames_macro(arg::VarName; kv...) = Symbol(arg), kv
+_varnames_macro(args::VarNames...; kv...) = variable_names(args...), kv
+
+function varnames_macro_code(f, base_args, s::Symbol, kv)
     quote
-        X, $(esc(s)) = $f($(argnames...), $(QuoteNode(s)); $(kv...))
+        X, $(esc(s)) = $f($(kv...), $(base_args...), $(QuoteNode(s)))
         X
     end
 end
 
-function varnames_macro_code(m::Core.Module, f, argnames, s::Tuple, kv)
-    gens = variable_names(_eval_shapes(m, s...))
+function varnames_macro_code(f, base_args, s::Vector{Symbol}, kv)
     quote
-        X, ($(esc.(gens)...),) = $f($(argnames...), $gens; $(kv...))
+        X, ($(esc.(s)...),) = $f($(kv...), $(base_args...), $s)
         X
-    end
-end
-
-_eval_shapes(m::Core.Module, shapes::Union{Expr, Symbol}...)= __eval_shapes(m,
-    # Specially treat the `@f args... (varnames...,)` variant:
-    MT.@capture(shapes, ((es__,),)) ? tuple(es...) : shapes)
-__eval_shapes(m::Core.Module, shapes::Tuple{Vararg{Union{Expr, Symbol}}}) ::
-    Tuple{Vararg{Union{<:Pair{String, Tuple}, Symbol}}} =
-    _eval_shape.((m,), shapes)
-
-function _eval_shape(m::Core.Module, shape::Expr) :: Pair{String, Tuple}
-    req(MT.@capture(shape, x_[a__]),
-        "Variable name must be like `x` or `x[...]`, not `$shape`")
-    "$x#" => (_eval.((m,), a)...,)
-end
-_eval_shape(::Core.Module, s::Symbol) = s
-
-function _eval(m::Core.Module, e::Expr)
-    try
-        Base.eval(m, e)
-    catch err
-        if isa(err, UndefVarError)
-            @error "Inconveniently, you may only use literals and variables " *
-                "from the global scope of the current module (`$m`) " *
-                "when using variable name constructor macros"
-        end
-        rethrow()
     end
 end
 
@@ -379,25 +335,26 @@ Keyword arguments are passed on to the base method.
 
     X, x::Vector{T} = f(args..., n::Int, s::VarName = :x; kv...)
 
-Shorthand for `X, x = f(args..., "$s#", 1:n)`.
+Shorthand for `X, x = f(args..., "$s#", 1:n; kv...)`.
 The name `n` can be changed via the `n` option. The range `1:n` is given via the `range` option.
-Setting `n=:no` disables creation of this method.
 
-Keyword arguments are passed on to the base method.
+Setting `n=:no` disables creation of this method.
 
 ---
 
-    X = @f args... varname[iter...] ... option=value ...
-    X = @f args... (varname[iter...] ...) option=value ...
+    X = @f(args..., varnames...; kv...)
+    X = @f(args..., varnames::Tuple; kv...)
+    X = @f(args..., varname::VarName; kv...)
 
-As `f(args..., "varname#" => iter, ...)`, and also introduce the indexed `varname` into the current scope.
-Giving `[iter...]` is optional. A `varname` without that stands for a single symbol.
-Can be disabled via `macros=:no`.
-As for the `f(args..., varnames...)` method above, we require at least one `varname`.
-If there is only one `varname` argument and this is a `Symbol` the univariate method base method will be called if it exists (e.g. `polynomial_ring(R, x)`).
-You can still use the `Tuple` version for such edge cases.
+As `f(args..., varnames; kv...)` and also introduce the indexed `varnames` into the current scope.
+The first version needs at least one `varnames` argument.
+The third version calls the univariate method base method if it exists (e.g. `polynomial_ring(R, varname)`).
 
-Any `option=value` pairs at the end of the macro are passed on as keyword arguments.
+Setting `macros=:no` disables macro creation.
+
+!!! warning
+    Turning `varnames` into a vector of symbols happens by evaluating `variable_names(varnames)` in the global scope of the current module.
+    For interactive usage in the REPL this is fine, but in general you have no access to local variables and should not use any side effects in `varnames`.
 
 # Examples
 
@@ -423,7 +380,7 @@ julia> f("projective", ["x$i$j" for i in 0:1, j in 0:1], [:y0, :y1], :z)
 julia> f("fun inputs", 'a':'g', Symbol.('x':'z', [0 1]))
 ("fun inputs", ["a", "b", "c", "d", "e", "f", "g"], ["x0" "x1"; "y0" "y1"; "z0" "z1"])
 
-julia> @f "hello" x[1:1, 1:2] y[1:2] z
+julia> @f("hello", "x#" => (1:1, 1:2), "y#" => (1:2), :z)
 "hello"
 
 julia> (x11, x12, y1, y2, z)
@@ -442,7 +399,7 @@ macro varnames_interface(e::Expr, options::Expr...)
         $(base_method(d, :(Vector{Symbol})))
         $(varnames_method(d))
         $(n_vars_method(d, opts[:n], opts[:range]))
-        $(varnames_macro(d[:f], d[:argnames], opts[:macros]))
+        $(varnames_macro(d[:f], length(d[:argnames]), opts[:macros]))
     end
 end
 
@@ -459,16 +416,16 @@ Base method. If `M` is given, this calls `M.f`, otherwise, it has to exist alrea
 
 ---
 
-    f(args..., varname::VarName)
+    f(args..., varname::VarName; kv...)
 
-Call `f(args..., Symbol(varname))`.
+Call `f(args..., Symbol(varname); kv...)`.
 
 ---
 
-    X = @f args... varname::Symbol
+    X = @f(args..., varname::VarName; kv...)
 
-As `f(args..., varname)`, and also introduce `varname` into the current scope.
-Must be disabled via `macros=:no` option, when also using the multivariate `@varnames_interface [M.]f(args..., varnames)`.
+As `f(args..., varname; kv...)`, and also introduce `varname` into the current scope.
+Can be disabled via `macros=:no` option.
 
 # Examples
 
@@ -485,7 +442,7 @@ f (generic function with 2 methods)
 julia> f("hello", "x")
 ("hello", :x)
 
-julia> @f "hello" x
+julia> @f("hello", :x)
 "hello"
 
 julia> x
@@ -501,7 +458,7 @@ macro varname_interface(e::Expr, options::Expr...)
     quote
         $(base_method(d, :Symbol))
         $(varname_method(d))
-        $(varname_macro(d[:f], d[:argnames], opts[:macros]))
+        $(varname_macro(d[:f], length(d[:argnames]), opts[:macros]))
     end
 end
 
