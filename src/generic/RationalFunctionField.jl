@@ -597,7 +597,7 @@ end
 #
 ###############################################################################
 
-function RationalFunctionField(k::Field, s::Symbol; cached::Bool=true)
+function rational_function_field(k::Field, s::Symbol; cached::Bool=true)
    T = elem_type(k)
 
    R, x = AbstractAlgebra.polynomial_ring(k, s, cached=cached)
@@ -615,7 +615,7 @@ function RationalFunctionField(k::Field, s::Symbol; cached::Bool=true)
    return par_object, t
 end
 
-function RationalFunctionField(k::Field, s::Vector{Symbol}; cached::Bool=true)
+function rational_function_field(k::Field, s::Vector{Symbol}; cached::Bool=true)
    T = elem_type(k)
 
    R, x = AbstractAlgebra.polynomial_ring(k, s, cached=cached)
