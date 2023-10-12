@@ -1350,27 +1350,109 @@ end
 ###############################################################################
 
 @doc raw"""
-    polynomial_ring(R::Ring, varnames...; cached::Bool = true, ordering::Symbol = :lex)
+    polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached=true, ordering=:lex)
 
-Given a base ring `R` and variable names $x1, x2, \dots$ specifying
-how the generators (variables) should be printed, return a tuple `S, x1, x2, ...`
-representing the new polynomial ring $S = R[x1, x2, ...]$ and the generators
-$x1, x2, \dots$ of the polynomial ring.
+Given a coefficient ring `R` and variable names, say `varnames = [:x1, :x2, ...]`,
+return a tuple `S, [x1, x2, ...]` of the polynomial ring $S = R[x1, x2, \dots]`
+and its generators $x1, x2, \dots$.
 
-Mathematically the object `S` depends only on `R` and `x1, x2, ...` and by
-default it will be cached, i.e., if `polynomial_ring` is invoked again with the
-same arguments, the same (*identical*) ring is returned. Setting the optional
-argument `cached` to `false` ensures a distinct new ring is returned, and will
-also prevent it from being cached.
+By default (`cached=true`), the output `S` will be cached, i.e. if
+`polynomial_ring` is invoked again with the same arguments, the same
+(*identical*) ring is returned. Setting `cached` to `false` ensures a distinct
+new ring is returned, and will also prevent it from being cached.
 
 The `ordering` of the polynomial ring can be one of `:lex`, `:deglex` or `:degrevlex`.
+
+See also: [`polynomial_ring(::Ring, ::Vararg)`](@ref), [`@polynomial_ring`](@ref).
+
+# Example
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S, generators = polynomial_ring(ZZ, [:x, :y, :z])
+(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
+```
 """
 function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
    S = polynomial_ring_only(R, s; kw...)
    (S, gens(S))
 end
 
+"""
+    polynomial_ring(R::Ring, varnames...; cached=true, ordering=:lex)
+    polynomial_ring(R::Ring, varnames::Tuple; cached=true, ordering=:lex)
+
+Like [`polynomial_ring(::Ring, ::Vector{Symbol})`](@ref) with more ways to give
+`varnames` as specified in [`variable_names`](@ref).
+
+Return a tuple `S, generators...` with `generators[i]` corresponding to `varnames[i]`.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S, a, b, c = polynomial_ring(ZZ, :a, :b, :c)
+(Multivariate polynomial ring in 3 variables over integers, x, y, z)
+
+julia> polynomial_ring(ZZ, :a, :b, :c) == polynomial_ring(ZZ, (:a, :b, :c))
+true
+
+julia> S, x, y = polynomial_ring(R, :x => (1:2, 1:2), :y => 1:3);
+
+julia> S
+Multivariate polynomial ring in 7 variables over integers
+
+julia> x
+2×2 Matrix{AbstractAlgebra.Generic.MPoly{BigInt}}:
+ x[1,1]  x[1,2]
+ x[2,1]  x[2,2]
+
+julia> y
+3-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
+ y[1]
+ y[2]
+ y[3]
+```
+"""
+polynomial_ring(R::Ring, varnames...)
+
 @doc raw"""
+    polynomial_ring(R::Ring, n::Int, s::Symbol=:x; cached=true, ordering=:lex)
+
+Same as [`polynomial_ring(::Ring, ["s$i" for i in 1:n])`](@ref `polynomial_ring(::Ring, ::Vector{Symbol})`).
+
+# Example
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S, x = polynomial_ring(ZZ, 3)
+(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x1, x2, x3])
+```
+"""
+polynomial_ring(R::Ring, n::Int, s::Symbol=:x)
+
+"""
+    @polynomial_ring(R::Ring, varnames...; cached=true, ordering=:lex)
+
+Return polynomial ring from [`polynomial_ring(::Ring, ::Vararg)`](@ref) and
+introduce the generators into the current scope.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S = @polynomial_ring(R, "x#" => (1:2, 1:2), "y#" => 1:3)
+Multivariate polynomial ring in 7 variables over integers
+
+julia> x11, x21, x12, x22
+(x11, x21, x12, x22)
+
+julia> y1, y2, y3
+(y1, y2, y3)
+
+julia> S, [x11 x12; x21 x22], [y1, y2, y3] == polynomial_ring(R, "x#" => (1:2, 1:2), "y#" => 1:3)
+true
+```
+"""
+:(@polynomial_ring)
+
+"""
     polynomial_ring_only(R::Ring, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Bool=true)
 
 Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the

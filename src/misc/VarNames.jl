@@ -16,7 +16,8 @@ macro req(cond, msg) :($cond || throw(ArgumentError($msg))) end
     variable_names(a...) -> Vector{Symbol}
     variable_names(a::Tuple) -> Vector{Symbol}
 
-Create proper variable names from `a`.
+Create a vector of variable names from a variable name specification.
+
 Each argument can be either an Array of `VarName`s,
 or of the form `s::VarName => iter`, or of the form `s::VarName => (iter...)`.
 Here `iter` is supposed to be any iterable, typically a range like `1:5`.
