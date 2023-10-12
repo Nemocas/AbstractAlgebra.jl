@@ -1390,12 +1390,12 @@ Return a tuple `S, generators...` with `generators[i]` corresponding to `varname
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S, a, b, c = polynomial_ring(ZZ, :a, :b, :c)
-(Multivariate polynomial ring in 3 variables over integers, x, y, z)
+(Multivariate polynomial ring in 3 variables over integers, a, b, c)
 
 julia> polynomial_ring(ZZ, :a, :b, :c) == polynomial_ring(ZZ, (:a, :b, :c))
 true
 
-julia> S, x, y = polynomial_ring(R, :x => (1:2, 1:2), :y => 1:3);
+julia> S, x, y = polynomial_ring(ZZ, :x => (1:2, 1:2), :y => 1:3);
 
 julia> S
 Multivariate polynomial ring in 7 variables over integers
@@ -1437,7 +1437,7 @@ introduce the generators into the current scope.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S = @polynomial_ring(R, "x#" => (1:2, 1:2), "y#" => 1:3)
+julia> S = @polynomial_ring(ZZ, "x#" => (1:2, 1:2), "y#" => 1:3)
 Multivariate polynomial ring in 7 variables over integers
 
 julia> x11, x21, x12, x22
@@ -1446,7 +1446,7 @@ julia> x11, x21, x12, x22
 julia> y1, y2, y3
 (y1, y2, y3)
 
-julia> S, [x11 x12; x21 x22], [y1, y2, y3] == polynomial_ring(R, "x#" => (1:2, 1:2), "y#" => 1:3)
+julia> S, [x11 x12; x21 x22], [y1, y2, y3] == polynomial_ring(ZZ, "x#" => (1:2, 1:2), "y#" => 1:3)
 true
 ```
 """
