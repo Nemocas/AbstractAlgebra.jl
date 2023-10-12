@@ -1418,7 +1418,7 @@ polynomial_ring(R::Ring, varnames...)
 @doc raw"""
     polynomial_ring(R::Ring, n::Int, s::Symbol=:x; cached=true, ordering=:lex)
 
-Same as [`polynomial_ring(::Ring, ["s$i" for i in 1:n])`](@ref `polynomial_ring(::Ring, ::Vector{Symbol})`).
+Same as [`polynomial_ring(::Ring, ["s$i" for i in 1:n])`](@ref polynomial_ring(::Ring, ::Vector{Symbol})).
 
 # Example
 
