@@ -1,4 +1,4 @@
-export Localization, LocElem, Loc, prime
+export LocElem, Loc, prime
 
 ###############################################################################
 
