@@ -1,5 +1,4 @@
 import MacroTools as MT
-import Printf
 
 @assert VarName === Union{Symbol, AbstractString, Char}
 const VarNames = Union{
