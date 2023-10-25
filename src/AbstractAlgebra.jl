@@ -37,6 +37,7 @@ import LinearAlgebra: det
 import LinearAlgebra: hessenberg
 import LinearAlgebra: ishermitian
 import LinearAlgebra: issymmetric
+import LinearAlgebra: isdiag
 import LinearAlgebra: istril
 import LinearAlgebra: istriu
 import LinearAlgebra: lu
@@ -319,8 +320,9 @@ export is_trivial
 @alias is_trivial istrivial
 
 # alternative names for some functions from LinearAlgebra
-export is_hermitian, is_symmetric, is_upper_triangular, is_lower_triangular
+export is_diagonal, is_hermitian, is_symmetric, is_upper_triangular, is_lower_triangular
 
+@alias is_diagonal isdiag
 @alias is_hermitian ishermitian
 @alias is_symmetric issymmetric
 @alias is_lower_triangular istril
@@ -909,6 +911,7 @@ export invmod
 export is_compatible
 export is_constant
 export is_degree
+export is_diagonal
 export is_divisible_by
 export is_domain_type
 export is_exact_type

@@ -440,6 +440,10 @@ is_upper_triangular(::MatrixElem)
 ```
 
 ```@docs
+is_diagonal(::MatrixElem)
+```
+
+```@docs
 change_base_ring(::Ring, ::MatElem{T}) where T <: RingElement
 ```
 
