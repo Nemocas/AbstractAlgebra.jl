@@ -115,7 +115,7 @@ function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:Abstract
    t1 = R()
    for k = 1:length(vrels) # for each relation
       rel = vrels[k]
-      while iszero(rel[1, i])
+      while is_zero_entry(rel, 1, i)
          i += 1
       end
       q, v[1, start + i - 1] = divrem(v[1, start + i - 1], rel[1, i])

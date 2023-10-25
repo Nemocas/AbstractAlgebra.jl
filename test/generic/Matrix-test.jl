@@ -280,7 +280,7 @@ end
          if i == j
             @test D3[i, j] == pol
          else
-            @test iszero(D3[i, j])
+            @test is_zero_entry(D3, i, j)
          end
       end
    end
