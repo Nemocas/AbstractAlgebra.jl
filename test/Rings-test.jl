@@ -51,6 +51,12 @@ end
    Qx, x = QQ["x"]
    p, q = @inferred ppio(zero(Qx), x)
    @test isone(p) && q == zero(Qx)
+
+   @testset "ppio($a,$b) for $T" for a in -25:25, b in -25:25, T in [Int, BigInt, Float64]
+     c, d = ppio(T(a),T(b))
+     @test a == c * d
+     @test a == 0 || c == gcd(T(a), T(b)^5)
+   end
 end
 
 @testset "properties" begin
