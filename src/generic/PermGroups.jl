@@ -93,8 +93,9 @@ function parity(g::Perm{T}) where T
    to_visit = trues(size(g.d))
    parity = false
    k = 1
-   @inbounds while any(to_visit)
+   @inbounds while true
       k = findnext(to_visit, k)
+      k !== nothing || break
       to_visit[k] = false
       next = g[k]
       while next != k
@@ -217,8 +218,9 @@ function cycledec(v::Vector{T}) where T<:Integer
    k = 1
    i = 1
 
-   while any(to_visit)
+   while true
       k = findnext(to_visit, k)
+      k !== nothing || break
       to_visit[k] = false
       next = v[k]
 
@@ -331,7 +333,7 @@ function Base.show(io::IO, g::Perm)
    end
 end
 
-function _print_perm(io::IO, p::Perm, width::Integer=last(displaysize(io)))
+function _print_perm(io::IO, p::Perm, width::Int=last(displaysize(io)))
    @assert width > 3
    if isone(p)
       return print(io, "()")
@@ -339,7 +341,7 @@ function _print_perm(io::IO, p::Perm, width::Integer=last(displaysize(io)))
       cum_length = 0
       for c in cycles(p)
          length(c) == 1 && continue
-         cyc = join(c, ",")
+         cyc = join(c, ",")::String
 
          if width - cum_length >= length(cyc)+2
             print(io, "(", cyc, ")")
@@ -492,7 +494,7 @@ function power_by_squaring(g::Perm{I}, n::Integer) where {I}
    if n < 0
       return inv(g)^-n
    elseif n == 0
-      return Perm(T(length(g.d)))
+      return Perm(I(length(g.d)))
    elseif n == 1
       return deepcopy(g)
    elseif n == 2

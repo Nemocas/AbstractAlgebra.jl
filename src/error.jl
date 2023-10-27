@@ -30,11 +30,11 @@ struct NotInvertibleError{T, S} <: Exception
   mod::S    # ring or modulus with respect to which it could not be inverted
 end
 
-function NotInvertibleError(x::T, y::S) where {T <: RingElement, S}
+function NotInvertibleError(x::T, y::S) where {T <: NCRingElement, S}
   return NotInvertibleError{T, S}(x, y)
 end
 
-function NotInvertibleError(x::RingElement)
+function NotInvertibleError(x::NCRingElement)
   return NotInvertibleError(x, parent(x))
 end
 
