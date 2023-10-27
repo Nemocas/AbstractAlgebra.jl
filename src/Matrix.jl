@@ -3434,6 +3434,24 @@ function is_lower_triangular(M::MatrixElem)
     return true
 end
 
+@doc raw"""
+    is_diagonal(A::MatrixElem)
+
+Return `true` if $A$ is a diagonal matrix.
+
+Alias for `LinearAlgebra.isdiag`.
+"""
+function is_diagonal(A::MatrixElem)
+    for i = 1:ncols(A)
+        for j = 1:nrows(A)
+            if i != j && !is_zero_entry(A, j, i)
+                return false
+            end
+        end
+    end
+    return true
+end
+
 ###############################################################################
 #
 #   Can solve
