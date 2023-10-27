@@ -46,10 +46,6 @@ base_ring(::Vector{Int}) = Int
 #
 ################################################################################
 
-function zero_matrix(::Type{MatElem}, R::Ring, n::Int)
-    return zero_matrix(R, n)
-end
-
 function zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
     return zero_matrix(R, n, m)
 end

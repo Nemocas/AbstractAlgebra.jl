@@ -95,15 +95,7 @@ PriorityQueue{K,V}(o::Ord, ps::Pair...) where {K,V,Ord<:Ordering} = PriorityQueu
 # e.g., PriorityQueue{Int,Float64}([1=>1, 2=>2.0])
 PriorityQueue{K,V}(kv) where {K,V} = PriorityQueue{K,V}(Forward, kv)
 function PriorityQueue{K,V}(o::Ord, kv) where {K,V,Ord<:Ordering}
-    try
-        PriorityQueue{K,V,Ord}(o, kv)
-    catch e
-        if not_iterator_of_pairs(kv)
-            throw(ArgumentError("PriorityQueue(kv): kv needs to be an iterator of tuples or pairs"))
-        else
-            rethrow(e)
-        end
-    end
+    PriorityQueue{K,V,Ord}(o, kv)
 end
 
 # Construction inferring Key/Value types from input
@@ -112,15 +104,7 @@ end
 PriorityQueue(o1::Ordering, o2::Ordering) = throw(ArgumentError("PriorityQueue with two parameters must be called with an Ordering and an iterable of pairs"))
 PriorityQueue(kv, o::Ordering=Forward) = PriorityQueue(o, kv)
 function PriorityQueue(o::Ordering, kv)
-    try
-        _priority_queue_with_eltype(o, kv, eltype(kv))
-    catch e
-        if not_iterator_of_pairs(kv)
-            throw(ArgumentError("PriorityQueue(kv): kv needs to be an iterator of tuples or pairs"))
-        else
-            rethrow(e)
-        end
-    end
+    _priority_queue_with_eltype(o, kv, eltype(kv))
 end
 
 _priority_queue_with_eltype(o::Ord, ps, ::Type{Pair{K,V}} ) where {K,V,Ord} = PriorityQueue{  K,  V,Ord}(o, ps)
