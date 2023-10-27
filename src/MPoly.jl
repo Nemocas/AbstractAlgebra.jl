@@ -570,7 +570,7 @@ function show(io::IO, ::MIME"text/plain", p::MPolyRing)
   print(io, " in ", ItemQuantity(nvars(p), "variable"), " ")
   if n > max_vars
     join(io, symbols(p)[1:max_vars - 1], ", ")
-    println(io, "..., ", symbols(p)[n])
+    println(io, ", ..., ", symbols(p)[n])
   else
     join(io, symbols(p), ", ")
     println(io)
