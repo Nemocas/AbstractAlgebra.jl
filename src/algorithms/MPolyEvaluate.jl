@@ -412,7 +412,7 @@ function evaluate_horner(B::MPolyRingElem, C::Vector{<:RingElement})
   ctxC = parent(C[1])
   Bcoeffs = collect(coefficients(B))
   ctxA = parent(one(coefficient_ring(B)) * one(ctxC))
-  Bexps = collect(exponent_vectors(B))
+  Bexps = collect(exponent_vectors(B))::Vector{Vector{Int}}
   return _evaluate_horner_non_rec(ctxA, Bcoeffs, Bexps, C, ctxC)
 end
 

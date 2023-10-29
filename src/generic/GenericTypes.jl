@@ -860,7 +860,7 @@ end
 const AbsMSeriesID = CacheDictType{Tuple{Ring,
                                        Vector{Int}, Vector{Symbol}, Int}, Ring}()
 
-mutable struct AbsMSeries{T <: RingElement, S} <:
+mutable struct AbsMSeries{T <: RingElement, S <: AbstractAlgebra.MPolyRingElem{T}} <:
                                               AbstractAlgebra.AbsMSeriesElem{T}
    poly::S
    prec::Vector{Int}

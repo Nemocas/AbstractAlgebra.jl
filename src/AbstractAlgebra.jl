@@ -1203,11 +1203,7 @@ function SkewDiagram(lambda::Generic.Partition, mu::Generic.Partition)
   Generic.SkewDiagram(lambda, mu)
 end
 
-function YoungTableau(part::Generic.Partition, tab::Matrix{Int})
-   Generic.YoungTableau(part, tab)
-end
-
-function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.n))
+function YoungTableau(part::Generic.Partition, fill::Vector{T}=collect(1:part.n)) where T <: Integer
    Generic.YoungTableau(part, fill)
 end
 

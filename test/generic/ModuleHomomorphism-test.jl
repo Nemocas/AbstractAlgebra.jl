@@ -47,6 +47,9 @@ end
          end
 
          @test k2 == M1
+
+         Q, g = quo(M, M)
+         @test all(x -> iszero(g(x)), gens(Q))
       end
    end
 
@@ -92,6 +95,9 @@ end
       T, t = sub(Q, elem_type(Q)[])
 
       @test I == T
+
+      Q, g = quo(M, M)
+      @test all(x -> iszero(g(x)), gens(Q))
    end
 
    S = AbstractAlgebra.JuliaQQ
@@ -111,6 +117,9 @@ end
       T, t = sub(Q, elem_type(Q)[])
 
       @test I == T
+
+      Q, g = quo(N, N)
+      @test all(x -> iszero(g(x)), gens(Q))
    end
 end
 
