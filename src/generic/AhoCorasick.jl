@@ -192,14 +192,13 @@ function construct_fail!(automaton::AhoCorasickAutomaton)
     end
     while !isempty(q)
         current_state = dequeue!(q)
-        for k in keys(automaton.goto[current_state])
-            new_state = lookup(automaton, current_state, k)
+        for (k, new_state) in automaton.goto[current_state]
             enqueue!(q, new_state)
             state = automaton.fail[current_state]
-            while isnothing(lookup(automaton, state, k))
+            while (s = lookup(automaton, state, k)) === nothing
                 state = automaton.fail[state]
             end
-            automaton.fail[new_state] = lookup(automaton, state, k)
+            automaton.fail[new_state] = s
             if automaton.output[new_state][1] >
                automaton.output[automaton.fail[new_state]][1]
                automaton.output[new_state] = automaton.output[automaton.fail[new_state]] 
@@ -233,7 +232,7 @@ function search(automaton::AhoCorasickAutomaton, word::Word)
         c = word[i]
         while true
             next_state = lookup(automaton, current_state, c)
-            if !isnothing(next_state)
+            if next_state !== nothing
                 current_state = next_state
                 break
             else
