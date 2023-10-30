@@ -8,8 +8,6 @@ const VarNames = Union{
 }
 
 req(cond, msg) = cond || throw(ArgumentError(msg))
-# The macro version will only evaluate `msg` if needed
-macro req(cond, msg) :($cond || throw(ArgumentError($msg))) end
 
 @doc raw"""
     variable_names(a...) -> Vector{Symbol}
