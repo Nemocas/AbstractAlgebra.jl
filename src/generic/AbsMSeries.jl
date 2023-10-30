@@ -92,9 +92,9 @@ truncated to the new precisions. The mutated series is returned.
 """
 function set_precision!(a::AbsMSeries, prec::Vector{Int})
     parent(a).weighted_prec != -1 && error("Operation not possible in weighted rings")
-    length(prec) != length(precision(a)) &&
+    length(prec) != length(a.prec) &&
                          error("Array length not equal to number of variables")
-    if !exponents_lt(precision(a), prec)
+    if !exponents_lt(a.prec, prec)
         a.poly = truncate_poly(a.poly, prec)
     end
     a.prec = prec
@@ -121,7 +121,7 @@ Return the valuation of $a$ as a vector of integers, one for each variable.
 function valuation(a::AbsMSeries)
    parent(a).weighted_prec != -1 && error("Operation not possible in weighted rings")
    p = poly(a)
-    prec = precision(a)
+    prec = a.prec
     val = prec
     for v in exponent_vectors(p)
         if iszero(v)
@@ -320,7 +320,7 @@ function truncate(a::AbsMSeries, prec::Vector{Int})
     R.weighted_prec != -1 && error("Operation not permitted")
     length(prec) != nvars(R) &&
              error("Array length not equal to number of variables in truncate")
-    p = precision(a)
+    p = a.prec
     prec = min.(prec, p)
     if prec == p
         # no truncation needed
@@ -369,7 +369,7 @@ function +(a::AbsMSeries, b::AbsMSeries)
     check_parent(a, b)
     R = parent(a)
     if R.weighted_prec == -1
-        prec = min.(precision(a), precision(b))
+        prec = min.(a.prec, b.prec)
         z = truncate_poly(poly(a) + poly(b), prec)
     else
         z = poly(a) + poly(b)
@@ -382,7 +382,7 @@ function -(a::AbsMSeries, b::AbsMSeries)
     check_parent(a, b)
     R = parent(a)
     if R.weighted_prec == -1
-        prec = min.(precision(a), precision(b))
+        prec = min.(a.prec, b.prec)
         z = truncate_poly(poly(a) - poly(b), prec)
     else
         z = poly(a) - poly(b)
@@ -395,7 +395,7 @@ function *(a::AbsMSeries, b::AbsMSeries)
     check_parent(a, b)
     R = parent(a)
     if R.weighted_prec == -1
-        prec = min.(precision(a) .+ valuation(b), precision(b) .+ valuation(a))
+        prec = min.(a.prec .+ valuation(b), b.prec .+ valuation(a))
         prec = min.(prec, max_precision(R))
         z = truncate_poly(poly(a)*poly(b), prec)
     else
@@ -434,11 +434,10 @@ end
 function ^(a::AbsMSeries, b::Int)
     b < 0 && throw(DomainError(b, "Can't take negative power"))
     R = parent(a)
-    prec = precision(a)
     if b == 0
         p = one(poly_ring(R))
         if R.weighted_prec == -1
-            p = truncate_poly(p, prec)
+            p = truncate_poly(p, a.prec)
         end
         return R(p, a.prec)
     elseif is_constant(poly(a))
@@ -472,7 +471,7 @@ function ==(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     check_parent(x, y)
     R = parent(x)
     if R.weighted_prec == -1
-        prec = min.(precision(x), precision(y))
+        prec = min.(x.prec, y.prec)
         p1 = truncate_poly(poly(x), prec)
         p2 = truncate_poly(poly(y), prec)
     else
@@ -486,8 +485,8 @@ function isequal(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     check_parent(x, y)
     R = parent(x)
     if R.weighted_prec == -1
-        prec = precision(x)
-        prec == precision(y) || return false
+        prec = x.prec
+        prec == y.prec || return false
         return truncate_poly(poly(x), prec) == truncate_poly(poly(y), prec)
     else
         return x == y
@@ -640,7 +639,7 @@ function mul!(c::AbsMSeries{T}, a::AbsMSeries{T}, b::AbsMSeries{T}) where
                                                             T <: RingElement
     R = parent(a)
     if R.weighted_prec == -1
-        prec = min.(precision(a) .+ valuation(b), precision(b) .+ valuation(a))
+        prec = min.(a.prec .+ valuation(b), b.prec .+ valuation(a))
         prec = min.(prec, max_precision(R))
         c.poly = mul!(c.poly, a.poly, b.poly)
         c.poly = truncate_poly(c.poly, prec)
