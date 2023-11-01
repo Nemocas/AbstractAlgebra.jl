@@ -603,6 +603,11 @@ end
       # characteristic 0
       S, y = function_field(P1[i], "y")
 
+      @test divexact(2, y) * y == 2
+      @test divexact(big(2), y) * y == 2
+      @test divexact(1//2, y) * y == 1//2
+      @test divexact(big(1)//2, y) * y == 1//2
+
       for iters = 1:10
          f = 0 # Int
          while iszero(f)
