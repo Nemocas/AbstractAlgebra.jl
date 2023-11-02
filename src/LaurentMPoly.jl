@@ -143,14 +143,18 @@ end
 ###############################################################################
 
 @doc raw"""
-    laurent_polynomial_ring(R::Ring, s...; cached::Bool = true)
+    laurent_polynomial_ring(R::Ring, varnames...; cached::Bool = true)
 
-Given a base ring `R` and variable names `s` specifying how the
-generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
-representing the new ring $T = R[x1, 1/x1, x2, 1/x2, ...]$ and the generators
-$x1, x2, ...$ of the  ring. By default the parent object `T` will
-depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional
-argument `cached` to `false` will prevent the parent object `T` from being
-cached.
+Given a base ring `R` and variable names `varnames...`, say `:x, :y, :z`, return
+a tuple `S, x, y, z` representing the new ring $S = R[x, 1/x, y, 1/y, z, 1/z]$
+and the generators $x, y, z$ of the ring.
+
+By default (`cached=true`), the output `S` will be cached, i.e. if
+`polynomial_ring` is invoked again with the same arguments, the same
+(*identical*) ring is returned. Setting `cached` to `false` ensures a distinct
+new ring is returned, and will also prevent it from being cached.
+
+For ways to give `varnames...` refer to [`polynomial_ring`](@ref) or the
+specification in [`AbstractAlgebra.@varnames_interface`](@ref).
 """
 laurent_polynomial_ring(R::Ring, s::Vector{Symbol})
