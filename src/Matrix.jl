@@ -202,7 +202,7 @@ one(a::MatrixElem{T}) where T <: NCRingElement = identity_matrix(a)
 function iszero(a::MatrixElem{T}) where T <: NCRingElement
    for i = 1:nrows(a)
       for j = 1:ncols(a)
-         if !iszero(a[i, j])
+         if !is_zero_entry(a, i, j)
             return false
          end
       end
@@ -219,7 +219,7 @@ function isone(a::MatrixElem{T}) where T <: NCRingElement
                return false
             end
          else
-            if !iszero(a[i, j])
+            if !is_zero_entry(a, i, j)
                return false
             end
          end
@@ -1175,7 +1175,7 @@ function ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where 
    end
    for i = 1:nrows(x)
       for j = 1:ncols(x)
-         if i != j && !iszero(x[i, j])
+         if i != j && !is_zero_entry(x, i, j)
             return false
          end
       end
@@ -1205,7 +1205,7 @@ function ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
    end
    for i = 1:nrows(x)
       for j = 1:ncols(x)
-         if i != j && !iszero(x[i, j])
+         if i != j && !is_zero_entry(x, i, j)
             return false
          end
       end
@@ -1569,10 +1569,10 @@ function lu!(P::Perm, A::MatrixElem{T}) where {T <: FieldElement}
             A[i, c] = reduce!(A[i, c])
          end
       end
-      if iszero(A[r, c])
+      if is_zero_entry(A, r, c)
          i = r + 1
          while i <= m
-            if !iszero(A[i, c])
+            if !is_zero_entry(A, i, c)
                for j = 1:n
                   A[i, j], A[r, j] = A[r, j], A[i, j]
                end
@@ -1664,10 +1664,10 @@ function fflu!(P::Perm, A::MatrixElem{T}) where {T <: RingElement}
    end
    t = R()
    while r <= m && c <= n
-      if iszero(A[r, c])
+      if is_zero_entry(A, r, c)
          i = r + 1
          while i <= m
-            if !iszero(A[i, c])
+            if !is_zero_entry(A, i, c)
                for j = 1:n
                   A[i, j], A[r, j] = A[r, j], A[i, j]
                end
@@ -1719,10 +1719,10 @@ function fflu!(P::Perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResEle
    end
    t = R()
    while r <= m && c <= n
-      if iszero(A[r, c])
+      if is_zero_entry(A, r, c)
          i = r + 1
          while i <= m
-            if !iszero(A[i, c])
+            if !is_zero_entry(A, i, c)
                for j = 1:n
                   A[i, j], A[r, j] = A[r, j], A[i, j]
                end
@@ -1787,7 +1787,7 @@ function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingEl
    j = 1
    k = 1
    while i <= m && j <= n
-      if !iszero(U[i, j])
+      if !is_zero_entry(U, i, j)
          L[i, k] = U[i, j]
          for l = 1:i - 1
             L[l, k] = 0
@@ -1841,7 +1841,7 @@ function rref_rational!(A::MatrixElem{T}) where {T <: RingElement}
       np = rank
       j = k = 1
       for i = 1:rank
-         while iszero(A[i, j])
+         while is_zero_entry(A, i, j)
             pivots[np + k] = j
             j += 1
             k += 1
@@ -1912,7 +1912,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
    np = rnk
    j = k = 1
    for i = 1:rnk
-      while iszero(A[i, j])
+      while is_zero_entry(A, i, j)
          pivots[np + k] = j
          j += 1
          k += 1
@@ -1976,16 +1976,16 @@ function is_rref(M::MatrixElem{T}) where {T <: RingElement}
    c = 1
    for r = 1:m
       for i = 1:c - 1
-         if !iszero(M[r, i])
+         if !is_zero_entry(M, r, i)
             return false
          end
       end
-      while c <= n && iszero(M[r, c])
+      while c <= n && is_zero_entry(M, r, c)
          c += 1
       end
       if c <= n
          for i = 1:r - 1
-            if !iszero(M[i, c])
+            if !is_zero_entry(M, i, c)
                return false
             end
          end
@@ -2006,11 +2006,11 @@ function is_rref(M::MatrixElem{T}) where {T <: FieldElement}
    c = 1
    for r = 1:m
       for i = 1:c - 1
-         if !iszero(M[r, i])
+         if !is_zero_entry(M, r, i)
             return false
          end
       end
-      while c <= n && iszero(M[r, c])
+      while c <= n && is_zero_entry(M, r, c)
          c += 1
       end
       if c <= n
@@ -2018,7 +2018,7 @@ function is_rref(M::MatrixElem{T}) where {T <: FieldElement}
             return false
          end
          for i = 1:r - 1
-            if !iszero(M[i, c])
+            if !is_zero_entry(M, i, c)
                return false
             end
          end
@@ -2047,7 +2047,7 @@ function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) w
       if i != 1
          A[m, i] = reduce!(A[m, i])
       end
-      if !iszero(A[m, i])
+      if !is_zero_entry(A, m, i)
          h = -A[m, i]
          r = P[i]
          if r != 0
@@ -2081,7 +2081,7 @@ function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) w
    c = one(R)
    c1 = 0
    for i = 1:n
-      if !iszero(A[m, i])
+      if !is_zero_entry(A, m, i)
          h = -A[m, i]
          r = P[i]
          if r != 0
@@ -2686,7 +2686,7 @@ function solve_fflu_precomp(p::Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <
    l = 0
    for i = 1:n
       l += 1
-      while l <= c && iszero(FFLU[i, l])
+      while l <= c && is_zero_entry(FFLU, i, l)
          l += 1
       end
       piv[i] = l
@@ -2814,7 +2814,7 @@ function solve_lu_precomp(p::Perm, LU::MatElem{T}, b::MatElem{T}) where {T <: Fi
    rnk = 0
    for i = 1:n
       l += 1
-      while l <= c && iszero(LU[i, l])
+      while l <= c && is_zero_entry(LU, i, l)
          l += 1
       end
       piv[i] = l
@@ -2895,7 +2895,7 @@ function can_solve_with_solution_with_det(M::MatElem{T}, b::MatElem{T}) where {T
    c = 1
    for r = 1:nrows(M)
       while c <= ncols(M)
-         if !iszero(FFLU[r, c])
+         if !is_zero_entry(FFLU, r, c)
             pivots[r] = c
             c += 1
             break
@@ -3007,7 +3007,7 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
       for j = 1:m
          for k = 1:c
             X[j, k] = evaluate(M[j, k], y[l])
-            if iszero(X[j, k]) && !iszero(M[j, k])
+            if is_zero_entry(X, j, k) && !is_zero_entry(M, j, k)
                bad_evaluation = true
                break
             end
@@ -3017,7 +3017,7 @@ function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T
          end
          for k = 1:h
             Y[j, k] = evaluate(b[j, k], y[l])
-            if iszero(Y[j, k]) && !iszero(b[j, k])
+            if is_zero_entry(Y, j, k) && !is_zero_entry(b, j, k)
                bad_evaluation = true
                break
             end
@@ -3188,7 +3188,7 @@ function find_pivot(A::MatElem{T}) where T <: RingElement
     if j > ncols(A)
       return p
     end
-    while iszero(A[i, j])
+    while is_zero_entry(A, i, j)
       j += 1
       if j > ncols(A)
         return p
@@ -3243,7 +3243,7 @@ function _can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: FieldEl
   np = rk
   j = k = 1
   for i = 1:rk
-    while iszero(mu[i, j])
+    while is_zero_entry(mu, i, j)
       pivots[np + k] = j
       j += 1
       k += 1
@@ -3301,7 +3301,7 @@ function _can_solve_with_kernel(a::MatElem{S}, b::MatElem{S}) where S <: RingEle
   for i = 1:ncols(b)
     for j = 1:l
       k = 1
-      while k <= ncols(H) && iszero(H[j, k])
+      while k <= ncols(H) && is_zero_entry(H, j, k)
         k += 1
       end
       if k > ncols(H)
@@ -3322,7 +3322,7 @@ function _can_solve_with_kernel(a::MatElem{S}, b::MatElem{S}) where S <: RingEle
   end
   for i = nrows(H):-1:1
     for j = 1:ncols(H)
-      if !iszero(H[i, j])
+      if !is_zero_entry(H, i, j)
         N = zero_matrix(base_ring(a), nrows(a), nrows(H) - i)
         for k = 1:nrows(N)
           for l = 1:ncols(N)
@@ -3357,7 +3357,7 @@ function is_upper_triangular(M::MatrixElem)
     m = ncols(M)
     for i = 2:nrows(M)
         for j = 1:min(i - 1, m)
-            if !iszero(M[i, j])
+            if !is_zero_entry(M, i, j)
                 return false
             end
         end
@@ -3426,7 +3426,7 @@ Alias for `LinearAlgebra.istril`.
 function is_lower_triangular(M::MatrixElem)
     for i = 1:nrows(M)
         for j = i+1:ncols(M)
-            if !iszero(M[i, j])
+            if !is_zero_entry(M, i, j)
                 return false
             end
         end
@@ -3482,11 +3482,11 @@ function can_solve_left_reduced_triu(r::MatElem{T},
    k = 1 # column in M
    t = R()
    for i = 1:m # column in r
-      if iszero(r[1, i])
+      if is_zero_entry(r, 1, i)
          continue
       end
       while k <= i && j <= n
-         if iszero(M[j, k])
+         if is_zero_entry(M, j, k)
             k += 1
          elseif k < i
             j += 1
@@ -3498,7 +3498,7 @@ function can_solve_left_reduced_triu(r::MatElem{T},
          return false, x
       end
       x[1, j], r[1, i] = divrem(r[1, i], M[j, k])
-      if !iszero(r[1, i])
+      if !is_zero_entry(r, 1, i)
          return false, x
       end
       q = -x[1, j]
@@ -3596,7 +3596,7 @@ function can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :r
       for i = 1:nrows(b)
          for j = 1:l
             k = 1
-            while k <= ncols(H) && iszero(H[j, k])
+            while k <= ncols(H) && is_zero_entry(H, j, k)
                k += 1
             end
             if k > ncols(H)
@@ -3804,7 +3804,7 @@ function nullspace(M::MatElem{T}) where {T <: RingElement}
       nonpivots = zeros(Int, nullity)
       j = k = 1
       for i = 1:rank
-         while iszero(A[i, j])
+         while is_zero_entry(A, i, j)
             nonpivots[k] = j
             j += 1
             k += 1
@@ -3852,7 +3852,7 @@ function nullspace(M::MatElem{T}) where {T <: FieldElement}
       np = rank
       j = k = 1
       for i = 1:rank
-         while iszero(A[i, j])
+         while is_zero_entry(A, i, j)
             pivots[np + k] = j
             j += 1
             k += 1
@@ -3979,11 +3979,11 @@ function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
    t = R()
    for m = 2:n - 1
       i = m + 1
-      while i <= n && iszero(A[i, m - 1])
+      while i <= n && is_zero_entry(A, i, m - 1)
          i += 1
       end
       if i != n + 1
-         if !iszero(A[m, m - 1])
+         if !is_zero_entry(A, m, m - 1)
             i = m
          end
          h = -inv(A[i, m - 1])
@@ -3996,7 +3996,7 @@ function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
             end
          end
          for i = m + 1:n
-            if !iszero(A[i, m - 1])
+            if !is_zero_entry(A, i, m - 1)
                u = mul!(u, A[i, m - 1], h)
                for j = m:n
                   t = mul!(t, u, A[m, j])
@@ -4041,7 +4041,7 @@ function is_hessenberg(A::MatrixElem{T}) where {T <: RingElement}
    n = nrows(A)
    for i = 3:n
       for j = 1:i - 2
-         if !iszero(A[i, j])
+         if !is_zero_entry(A, i, j)
             return false
          end
       end
@@ -4102,7 +4102,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
       h = A[n - i + 1, n - i]
       while iszero(h)
          k = 1
-         while k < n - i && iszero(A[n - i + 1, n - i - k])
+         while k < n - i && is_zero_entry(A, n - i + 1, n - i - k)
             k += 1
          end
          if k == n - i
@@ -4219,7 +4219,7 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
       h = A[n - i + 1, n - i]
       while iszero(h)
          k = 1
-         while k < n - i && iszero(A[n - i + 1, n - i - k])
+         while k < n - i && is_zero_entry(A, n - i + 1, n - i - k)
             k += 1
          end
          if k == n - i
@@ -4671,7 +4671,7 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
    t2 = base_ring(H)()
    for i = 1:l
       for j = k + 1:m
-         if iszero(H[j, i])
+         if is_zero_entry(H, j, i)
             continue
          end
          d, u, v = gcdx(H[k, i], H[j, i])
@@ -4700,7 +4700,7 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
             U[k, c] = reduce!(U[k, c])
          end
       end
-      if iszero(H[k, i])
+      if is_zero_entry(H, k, i)
          continue
       end
       cu = canonical_unit(H[k, i])
@@ -4793,7 +4793,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
 
    while k <= n - 1
       k = k + 1
-      if k == 1 && !iszero(H[k, k])
+      if k == 1 && !is_zero_entry(H, k, k)
          for j2 in 1:n
             H[k, j2] = deepcopy(H[k, j2])
          end
@@ -4815,7 +4815,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
          end
 
          # Shortcuts
-         if iszero(H[k, j])
+         if is_zero_entry(H, k, j)
             continue
          end
 
@@ -4866,7 +4866,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
          end
       end
 
-      if iszero(H[k, k])
+      if is_zero_entry(H, k, k)
          swap_rows!(H, k, l)
          if with_trafo
             swap_rows!(U, k, l)
@@ -4927,7 +4927,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
          end
 
          # We do the same shortcuts as above
-         if iszero(H[k, j])
+         if is_zero_entry(H, k, j)
             continue
          end
 
@@ -5038,7 +5038,7 @@ end
 function kb_search_first_pivot(H, start_element::Int = 1)
    for r = start_element:nrows(H)
       for c = start_element:ncols(H)
-         if !iszero(H[r,c])
+         if !is_zero_entry(H, r, c)
             return r, c
          end
       end
@@ -5067,7 +5067,7 @@ function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int
          continue
       end
       # So, the pivot in row p is in a column left of c.
-      if iszero(H[p, c])
+      if is_zero_entry(H, p, c)
          continue
       end
       q = -div(H[p, c], H[r, c])
@@ -5156,7 +5156,7 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
    for i = row1 + 1:m
       new_pivot = false
       for j = start_element:n
-         if iszero(H[i, j])
+         if is_zero_entry(H, i, j)
             continue
          end
          if pivot[j] == 0
@@ -5312,7 +5312,7 @@ function is_snf(A::MatrixElem{T}) where T <: RingElement
          if i == j
             continue
          end
-         if !iszero(A[j, i])
+         if !is_zero_entry(A, j, i)
             return false
          end
       end
@@ -5352,7 +5352,7 @@ function kb_clear_row!(S::MatrixElem{T}, K::MatrixElem{T}, i::Int, with_trafo::B
    t1 = base_ring(S)()
    t2 = base_ring(S)()
    for j = i+1:n
-      if iszero(S[i, j])
+      if is_zero_entry(S, i, j)
          continue
       end
       d, u, v = gcdx(S[i, i], S[i, j])
@@ -5394,7 +5394,7 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
       kb_clear_row!(S, K, i, with_trafo)
       hnf_kb!(S, U, with_trafo, i)
       c = i + 1
-      while c <= n && iszero(S[i, c])
+      while c <= n && is_zero_entry(S, i, c)
          c += 1
       end
       if c != n + 1
@@ -5407,7 +5407,7 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
          if isone(S[i, i])
            break
          end
-         if iszero(S[i, i]) && iszero(S[j, j])
+         if is_zero_entry(S, i, i) && is_zero_entry(S, j, j)
             continue
          end
          d, u, v = gcdx(S[i, i], S[j, j])
@@ -5643,7 +5643,7 @@ function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) 
    # pivots[i] contains the indices of the rows in which the pivot element is in the ith column.
    for r = 1:m
       pivot = find_pivot_popov(P, r, last_col)
-      !iszero(P[r,pivot]) ? push!(pivots[pivot], r) : nothing
+      !is_zero_entry(P, r, pivot) ? push!(pivots[pivot], r) : nothing
    end
    return pivots
 end
@@ -5706,7 +5706,9 @@ function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pi
                continue
             end
             p = find_pivot_popov(P, old_pivots[j], last_col)
-            !iszero(P[old_pivots[j],p]) ? push!(pivots[p], old_pivots[j]) : nothing
+            if !is_zero_entry(P, old_pivots[j], p)
+               push!(pivots[p], old_pivots[j])
+            end
          end
       end
    end
@@ -5732,14 +5734,14 @@ function rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
       pivots[i] = zeros(Int, 0)
    end
    p = find_pivot_popov(B, 1)
-   if !iszero(B[1,p])
+   if !is_zero_entry(B, 1, p)
       push!(pivots[p], 1)
       r = 1
       push!(rank_profile, 1)
    end
    for i = 2:m
       p = find_pivot_popov(B, i)
-      !iszero(B[i,p]) ? push!(pivots[p], i) : nothing
+      !is_zero_entry(B, i, p) ? push!(pivots[p], i) : nothing
       weak_popov_with_pivots!(B, V, U, pivots, false, false, i)
       s = 0
       for j = 1:n
@@ -5782,7 +5784,7 @@ function det_popov(A::MatElem{T}) where {T <: PolyRingElem}
       r1 = pivots[i+1]
       c = find_pivot_popov(B, r1, i)
       # If the pivot B[r1, c] is zero then the row is zero.
-      while !iszero(B[r1, c])
+      while !is_zero_entry(B, r1, c)
          r2 = pivots[c]
          if degree(B[r2, c]) > degree(B[r1,c])
             r1, r2 = r2, r1
@@ -5795,7 +5797,7 @@ function det_popov(A::MatElem{T}) where {T <: PolyRingElem}
          end
          c = find_pivot_popov(B, r1, i)
       end
-      if iszero(B[r1, i+1])
+      if is_zero_entry(B, r1, i+1)
          return zero(R)
       end
       diag_elems[i+1] = r1
@@ -6061,7 +6063,7 @@ function hnf_via_popov!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) 
       c = find_pivot_popov(H, r1, i)
       new_pivot = true
       # If the pivot H[r1, c] is zero then the row is zero.
-      while !iszero(H[r1, c])
+      while !is_zero_entry(H, r1, c)
          r2 = pivots_popov[c]
          if degree(H[r2, c]) > degree(H[r1,c])
             r1, r2 = r2, r1
@@ -6764,7 +6766,7 @@ function randmat_triu(rng::AbstractRNG, S::MatSpace, v...)
       for j = i:ncols(M)
          M[i, j] = rand(rng, R, v...)
       end
-      while iszero(M[i, i])
+      while is_zero_entry(M, i, i)
          M[i, i] = rand(rng, R, v...)
       end
    end
@@ -6784,7 +6786,7 @@ function randmat_with_rank(rng::AbstractRNG, S::MatSpace{T}, rank::Int, v...) wh
          M[i, j] = R()
       end
       M[i, i] = rand(rng, R, v...)
-      while iszero(M[i, i])
+      while is_zero_entry(M, i, i)
          M[i, i] = rand(rng, R, v...)
       end
       for j = i + 1:ncols(M)
