@@ -667,7 +667,7 @@ function compare_op_string(mi::MIME, op)
    if op === :(==)
       return "="
    else
-      return string(op)
+      return string(op)::String
    end
 end
 
@@ -681,7 +681,7 @@ function compare_op_string(mi::MIME"text/latex", op)
    elseif op === :(!=)
       return "\\neq"
    else
-      return string(op)
+      return string(op)::String
    end
 end
 

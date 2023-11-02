@@ -52,7 +52,7 @@ function taylor_set_coeff!(t::Vector{E}, i::Int, c::E) where E
   end
   t[1 + i] = c
   while length(t) > 0 && iszero(t[end])
-    popback!(t)
+    pop!(t)
   end
 end
 

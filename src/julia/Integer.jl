@@ -511,9 +511,11 @@ end
 @doc raw"""
     ppio(a::T, b::T)
 
-Split $a$ into $c*d$ where $c = gcd(a, b^\infty)$.
+Return a pair $(c,d)$ such that $a=c*d$ and $c = gcd(a, b^\infty)$ if $a\neq 0$,
+and $c=b$, $d=0$ if $a=0$.
 """
 function ppio(a::T, b::T) where T <: Integer
+   a == 0 && return (b,T(0))
    c = gcd(a, b)
    n = div(a, c)
    g = gcd(c, n)

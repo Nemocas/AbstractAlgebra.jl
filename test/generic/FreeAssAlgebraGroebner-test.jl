@@ -3,13 +3,13 @@ using AbstractAlgebra.Generic: AhoCorasickAutomaton
 import AbstractAlgebra.Generic: normal_form_weak
 @testset "Generic.FreeAssAlgebra.groebner" begin
  
-    R, (x, y, u, v, t, s) = FreeAssociativeAlgebra(GF(2), ["x", "y", "u", "v", "t", "s"])
+    R, (x, y, u, v, t, s) = free_associative_algebra(GF(2), ["x", "y", "u", "v", "t", "s"])
     g = AbstractAlgebra.groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v,
                                        (y*x)^3*t + (y*x)^2*t + t + s])
     @test length(g) >= 5
  
     # Example 6.1 Kreuzer & Xiu
-    R, (a, b) = FreeAssociativeAlgebra(QQ, ["a", "b"])
+    R, (a, b) = free_associative_algebra(QQ, ["a", "b"])
  
     g = AbstractAlgebra.groebner_basis([a^2 - 1, b^3 - 1, (a*b*a*b^2)^2 - 1])
     AbstractAlgebra.interreduce!(g)
@@ -25,8 +25,8 @@ import AbstractAlgebra.Generic: normal_form_weak
 
 end
 
-@testset "Generic.FreeAssociativeAlgebra.groebner.normal_form" begin
-   R, (x, y, u, v, t, s) = FreeAssociativeAlgebra(QQ, ["x", "y", "u", "v", "t", "s"]) # x > y > ... > s
+@testset "Generic.free_associative_algebra.groebner.normal_form" begin
+   R, (x, y, u, v, t, s) = free_associative_algebra(QQ, ["x", "y", "u", "v", "t", "s"]) # x > y > ... > s
    ideal_generators = [x*y, u*y*t, s*t - t*s, x*y*y + x*x*y - one(R)]
    aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in ideal_generators])
    @test normal_form(x*y, ideal_generators, aut) == zero(R)
@@ -51,7 +51,7 @@ end
 #   @test gb_divides_leftmost((x*s*t).exps[1], aut) == (false, [], [], -1)
 end
 
-@testset "Generic.FreeAssociativeAlgebra.groebner.overlaps_and_obstructions" begin
+@testset "Generic.free_associative_algebra.groebner.overlaps_and_obstructions" begin
     w1 = [1, 1, 2, 1, 3]
     w2 = [2, 1, 3, 4, 3, 4]
     w3 = [1, 3, 4]
@@ -62,7 +62,7 @@ end
     @test AbstractAlgebra.Generic.check_center_overlap(w3, w2, 2)
     @test AbstractAlgebra.Generic.check_center_overlap(w4, w1, 1)
     @test !AbstractAlgebra.Generic.check_left_overlap(w4, w1, 1)
-    R, (x, y, z) = FreeAssociativeAlgebra(QQ, ["x", "y", "z"])
+    R, (x, y, z) = free_associative_algebra(QQ, ["x", "y", "z"])
     poly1 = x*y*x*x*z
     poly2 = y*x*x*z*y*y
     poly3 = x*y*x*y

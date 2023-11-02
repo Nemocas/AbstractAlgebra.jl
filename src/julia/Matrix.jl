@@ -27,9 +27,11 @@ zero_matrix(::Type{Int}, r, c) = zeros(Int, r, c)
 ###############################################################################
 
 """
-    Matrix(A::MatrixElem{T}) where T <: NCRingElement
+    Matrix(A::MatrixElem{T}) where {T<:NCRingElement}
+    Matrix{U}(A::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement}
 
-Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
+Convert `A` to a Julia `Matrix{U}` of the same dimensions with the same elements.
+If `U` is omitted then `eltype(M)` is used in its place.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -41,9 +43,16 @@ julia> Matrix(A)
 2×3 Matrix{BigInt}:
  1  2  3
  4  5  6
+
+julia> Matrix{Int}(A)
+2×3 Matrix{Int64}:
+ 1  2  3
+ 4  5  6
 ```
 """
-Matrix(M::MatrixElem{T}) where {T<:NCRingElement} = eltype(M)[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
+Matrix(M::MatrixElem{T}) where {T<:NCRingElement} = Matrix{eltype(M)}(M)
+Matrix{U}(M::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement} = U[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
+
 
 """
     Array(A::MatrixElem{T}) where T <: NCRingElement

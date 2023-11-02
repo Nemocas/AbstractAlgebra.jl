@@ -462,7 +462,6 @@ end
 mutable struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring
    S::Symbol
-   num_vars::Int
 
    function SparsePolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
       return get_cached!(SparsePolyID, (R, s), cached) do
@@ -1111,7 +1110,7 @@ function MatAlgElem{T}(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
    @assert elem_type(R) === T
    t = Matrix{T}(undef, n, n)
    for i = 1:n, j = 1:n
-      t[i, j] = A[(i - 1) * c + j]
+      t[i, j] = A[(i - 1) * n + j]
    end
    return MatAlgElem{T}(R, t)
 end
