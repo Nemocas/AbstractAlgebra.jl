@@ -835,8 +835,8 @@ mutable struct AbsMSeriesRing{T <: RingElement, S} <:
                                                  AbstractAlgebra.MSeriesRing{T}
    poly_ring::AbstractAlgebra.MPolyRing{T}
    prec_max::Vector{Int} # used for weights in weighted mode
-   sym::Vector{Symbol}
-   weighted_prec::Int # -1 if not weighted
+   sym::Vector{Symbol} # -1 if not weighted
+   weighted_prec::Int
 
    function AbsMSeriesRing{T, S}(poly_ring::AbstractAlgebra.MPolyRing{T},
             prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where
@@ -856,7 +856,7 @@ mutable struct AbsMSeriesRing{T <: RingElement, S} <:
       end::AbsMSeriesRing{T, S}
    end
 end
-
+ 
 const AbsMSeriesID = CacheDictType{Tuple{Ring,
                                        Vector{Int}, Vector{Symbol}, Int}, Ring}()
 

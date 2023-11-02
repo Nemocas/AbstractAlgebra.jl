@@ -717,7 +717,7 @@ rand(S::NCPolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v..
 ###############################################################################
 
 @doc raw"""
-    polynomial_ring(R::NCRing, s::VarName = :x; cached::Bool = true)
+    polynomial_ring(R::NCRing, s::VarName; cached::Bool = true)
 
 Given a base ring `R` and symbol/string `s` specifying how the generator
 (variable) should be printed, return a tuple `S, x` representing the new
@@ -736,10 +736,12 @@ julia> S, y = polynomial_ring(R, :y)
 (Univariate polynomial ring in y over univariate polynomial ring, y)
 ```
 """
-function polynomial_ring(R::NCRing, s::VarName = :x; kw...)
+function polynomial_ring(R::NCRing, s::VarName; kw...)
    S = polynomial_ring_only(R, Symbol(s); kw...)
    (S, gen(S))
 end
+
+polynomial_ring(R::NCRing; kw...) = polynomial_ring(R, :x; kw...)
 
 @doc raw"""
     polynomial_ring_only(R::NCRing, s::Symbol; cached::Bool=true)
