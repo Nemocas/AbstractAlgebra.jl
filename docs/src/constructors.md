@@ -66,8 +66,8 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 | $S = R[x]$                           | `S, x = polynomial_ring(R, :x)`                       |
 | $S = R[x, y]$                        | `S, (x, y) = polynomial_ring(R, [:x, :y])`            |
 | $S = R\langle x, y\rangle$           | `S, (x, y) = free_associative_algebra(R, [:x, :y])`   |
-| $S = K(x)$                           | `S, x = rational_functionField(K, :x)`                |
-| $S = K(x, y)$                        | `S, (x, y) = rational_functionField(K, [:x, :y])`     |
+| $S = K(x)$                           | `S, x = rational_function_field(K, :x)`               |
+| $S = K(x, y)$                        | `S, (x, y) = rational_function_field(K, [:x, :y])`    |
 | $S = R[[x]]$ (to precision $n$)      | `S, x = power_series_ring(R, n, :x)`                  |
 | $S = R[[x, y]]$ (to precision $n$)   | `S, (x, y) = power_series_ring(R, n, [:x, :y])`       |
 | $S = R((x))$ (to precision $n$)      | `S, x = laurent_series_ring(R, n, :x)`                |
@@ -83,11 +83,10 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 
 ## Parent objects with variable names
 
-For the multivariate parent object constructors (`polynomial_ring`, `power_series_ring`, `free_associative_algebra`, and `laurent_polynomial_ring`) we provide several alternative ways to give the variables ...
+The multivariate parent object constructors (`polynomial_ring`, `power_series_ring`, `free_associative_algebra`, `laurent_polynomial_ring`, and `rational_function_field`) share a common interface for specifying the variable names, which is provided by `@varnames_interface`.
 
 ```@docs
 AbstractAlgebra.@varnames_interface
-AbstractAlgebra.@varname_interface
 AbstractAlgebra.variable_names
 AbstractAlgebra.reshape_to_varnames
 ```

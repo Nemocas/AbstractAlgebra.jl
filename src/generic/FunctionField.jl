@@ -1360,8 +1360,9 @@ function traces_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
    return P, Pden
 end
 
-function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
+function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
    length(p) < 2 && error("Polynomial must have degree at least 1")
+   s = Symbol(s)
    pol, den = _rat_poly(p, s)
    
    par = FunctionField{T}(pol, den, s, cached)

@@ -1,6 +1,6 @@
 import MacroTools as MT
 
-@assert VarName === Union{Symbol, AbstractString, Char}
+@assert Symbol <: VarName
 const VarNames = Union{
     VarName,
     AbstractArray{<:VarName},
@@ -232,14 +232,6 @@ function base_method(d::Dict{Symbol},
     end
 end
 
-function varname_method(d::Dict{Symbol})
-    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
-    quote
-        $f($(args...), s::Union{AbstractString, Char}; kv...) where {$(wheres...)} =
-            $f($(argnames...), Symbol(s); kv...)
-    end
-end
-
 function varnames_method(d::Dict{Symbol})
     f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
     quote
@@ -286,7 +278,6 @@ function varnames_macro(f, args_count, opt_in)
         end
     end
 end
-const varname_macro = varnames_macro
 
 _varnames_macro(arg::VarName; kv...) = Symbol(arg), kv
 _varnames_macro(args::VarNames...; kv...) = variable_names(args...), kv
@@ -401,84 +392,14 @@ macro varnames_interface(e::Expr, options::Expr...)
     end
 end
 
-@doc raw"""
-    @varname_interface [M.]f(args..., varname) macros=:yes
-
-Add method `X, vars = f(args..., varname::VarName)` and macro `X = @f args... varname::Symbol` to current scope.
-
-# Created methods
-
-    X, gen::T = f(args..., varname::Symbol)
-
-Base method. If `M` is given, this calls `M.f`, otherwise, it has to exist already.
-
----
-
-    f(args..., varname::VarName; kv...)
-
-Call `f(args..., Symbol(varname); kv...)`.
-
----
-
-    X = @f(args..., varname::VarName; kv...)
-
-As `f(args..., varname; kv...)`, and also introduce `varname` into the current scope.
-Can be disabled via `macros=:no` option.
-
-# Examples
-
-```jldoctest; setup = :(using AbstractAlgebra)
-julia> f(a, s::Symbol) = a, s
-f (generic function with 1 method)
-
-julia> AbstractAlgebra.@varname_interface f(a, s)
-@f (macro with 1 method)
-
-julia> f
-f (generic function with 2 methods)
-
-julia> f("hello", "x")
-("hello", :x)
-
-julia> @f("hello", :x)
-"hello"
-
-julia> x
-:x
-```
-"""
-macro varname_interface(e::Expr, options::Expr...)
-    d = _splitdef(e)
-
-    opts = keyword_arguments(options, Dict(:macros => :(:yes)),
-        Dict(:macros => QuoteNode.([:no, :yes])))
-
-    quote
-        $(base_method(d, :Symbol))
-        $(varname_method(d))
-        $(varname_macro(d[:f], length(d[:argnames]), opts[:macros]))
-    end
-end
-
-@varname_interface Generic.SparsePolynomialRing(R::Ring, s)
-@varname_interface Generic.number_field(p::PolyRingElem, s)
-@varname_interface Generic.function_field(p::PolyRingElem, s)
-@varname_interface Generic.laurent_series_ring(R::Ring, prec::Int, s)
-@varname_interface Generic.laurent_series_field(K::Field, prec::Int, s)
-@varname_interface Generic.PuiseuxSeriesRing(R::Ring, prec::Int, s)
-
 @varnames_interface Generic.free_associative_algebra(R::Ring, s)
 @varnames_interface Generic.laurent_polynomial_ring(R::Ring, s)
+@varnames_interface Generic.rational_function_field(K::Field, s)
 
-@varname_interface Generic.power_series_ring(R::Ring, prec::Int, s) macros=:no
 @varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s)
 @varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s) macros=:no # use keyword `weights=...` instead
 @varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no # `n` variant would clash with line above; macro would be the same as for `prec::Int`
 
-@varname_interface Generic.rational_function_field(K::Field, s) macros=:no
-@varnames_interface Generic.rational_function_field(K::Field, s)
-
-@varname_interface polynomial_ring(R::NCRing, s) macros=:no
 @varnames_interface polynomial_ring(R::Ring, s)
 # With `Ring <: NCRing`, we need to resolve ambiguities of `polynomial_ring(::Ring, s...)`
 polynomial_ring(R::Ring, s::Symbol; kv...) = invoke(polynomial_ring, Tuple{NCRing, Symbol}, R, s; kv...)

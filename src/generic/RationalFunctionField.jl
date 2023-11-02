@@ -597,10 +597,10 @@ end
 #
 ###############################################################################
 
-function rational_function_field(k::Field, s::Symbol; cached::Bool=true)
+function rational_function_field(k::Field, s::VarName; cached::Bool=true)
    T = elem_type(k)
 
-   R, x = AbstractAlgebra.polynomial_ring(k, s, cached=cached)
+   R, x = AbstractAlgebra.polynomial_ring(k, Symbol(s); cached)
 
    U = elem_type(R)
 
@@ -608,7 +608,7 @@ function rational_function_field(k::Field, s::Symbol; cached::Bool=true)
    g = S(x)
    t = RationalFunctionFieldElem{T, U}(g)
 
-   par_object = RationalFunctionField{T, U}(k, parent(g), s, cached)
+   par_object = RationalFunctionField{T, U}(k, parent(g), Symbol(s), cached)
 
    t.parent = par_object
 
