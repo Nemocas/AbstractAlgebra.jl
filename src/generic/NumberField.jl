@@ -38,7 +38,7 @@ end
 #
 ###############################################################################
 
-function number_field(a::Poly{Rational{BigInt}}, ::Symbol; cached::Bool=true)
+function number_field(a::Poly{Rational{BigInt}}, ::VarName; cached::Bool=true)
    S = parent(a)
    R = residue_field(S, a, cached=cached)
    x = gen(S)
