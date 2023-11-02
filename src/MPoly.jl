@@ -1398,7 +1398,7 @@ true
 julia> S, x, y = polynomial_ring(ZZ, :x => (1:2, 1:2), :y => 1:3);
 
 julia> S
-Multivariate polynomial ring in 7 variables x[1,1], x[2,1], x[1,2], x[2,2]..., y[3]
+Multivariate polynomial ring in 7 variables x[1,1], x[2,1], x[1,2], x[2,2], ..., y[3]
   over integers
 
 julia> x
@@ -1439,7 +1439,7 @@ introduce the generators into the current scope.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> S = @polynomial_ring(ZZ, "x#" => (1:2, 1:2), "y#" => 1:3)
-Multivariate polynomial ring in 7 variables x11, x21, x12, x22..., y3
+Multivariate polynomial ring in 7 variables x11, x21, x12, x22, ..., y3
   over integers
 
 julia> x11, x21, x12, x22
