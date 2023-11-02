@@ -657,6 +657,7 @@ import .Generic: exponent_vector
 import .Generic: exponent_word
 import .Generic: finish
 import .Generic: fit!
+import .Generic: function_field
 import .Generic: gcd
 import .Generic: gcdx
 import .Generic: groebner_basis
@@ -710,6 +711,7 @@ import .Generic: norm
 import .Generic: normal_form
 import .Generic: normalise
 import .Generic: num_coeff
+import .Generic: number_field
 import .Generic: one
 import .Generic: order
 import .Generic: ordering
@@ -1209,14 +1211,6 @@ end
 
 function YoungTableau(part::Generic.Partition, fill::Vector{Int}=collect(1:part.n))
    Generic.YoungTableau(part, fill)
-end
-
-function number_field(a::Generic.Poly{Rational{BigInt}}, s::VarName, t = "\$"; cached::Bool=true)
-   return Generic.number_field(a, Symbol(s), t; cached=cached)
-end
-
-function function_field(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   return Generic.FunctionField(p, Symbol(s); cached=cached)
 end
 
 @doc raw"""
