@@ -36,10 +36,10 @@ function show(io::IO, ::MIME"text/plain", p::LaurentMPolyRing)
   max_vars = 5 # largest number of variables to print
   n = nvars(p)
   print(io, "Multivariate Laurent polynomial ring")
-  print(io, " in ", ItemQuantity(nvars(p), "variable"), " ")
+  print(io, "in ", ItemQuantity(nvars(p), "variable"), " ")
   if n > max_vars
     join(io, symbols(p)[1:max_vars - 1], ", ")
-    println(io, ", ..., ", symbols(a)[n])
+    println(io, "..., ", symbols(p)[n])
   else
     join(io, symbols(p), ", ")
     println(io)
