@@ -91,7 +91,7 @@ function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple}, val::Val)
     req(c <= 1, """Only a single '#' allowed, but "$s" contains $c of them.
         Please communicate your use case to the Oscar community.""")
     return c == 0 ? _variable_names(Symbol(s) => axes, val) :
-        check_names([Symbol(replace(s, '#' => join(i))) for i in Iterators.product(axes...)])
+        _check_names([Symbol(replace(s, '#' => join(i))) for i in Iterators.product(axes...)], val)
 end
 
 """
@@ -108,6 +108,8 @@ function check_names(names)
     end
     return names
 end
+_check_names(x, ::Val{true}) = x
+_check_names(x, ::Val{false}) = check_names(x)
 
 function _multi_index_strings(axes)
     for axe in axes _warn_unless_onto(axe) end
