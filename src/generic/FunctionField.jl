@@ -5,7 +5,7 @@
 #
 ###############################################################################
 
-export FunctionField, base_field
+export function_field, base_field
 
 ###############################################################################
 #
@@ -1360,15 +1360,19 @@ function traces_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
    return P, Pden
 end
 
-function FunctionField(p::Poly{RationalFunctionFieldElem{T, U}}, s::Symbol; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
+function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
    length(p) < 2 && error("Polynomial must have degree at least 1")
-   pol, den = _rat_poly(p, s)
-   
-   par = FunctionField{T}(pol, den, s, cached)
+   pol, den = _rat_poly(p, Symbol(s))
+
+   par = FunctionField{T}(pol, den, Symbol(s), cached)
    par.monic, par.powers, par.powers_den = powers_precompute(pol, den)
    par.traces, par.traces_den = traces_precompute(pol, den)
    par.base_ring = base_ring(p)
    par.pol = p
 
    return par, gen(par)
+end
+
+function function_field(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: MPolyRingElem}
+   return Generic.FunctionField(p, Symbol(s); cached)
 end
