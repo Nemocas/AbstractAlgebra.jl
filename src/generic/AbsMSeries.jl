@@ -716,37 +716,36 @@ end
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
                   s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
     U = elem_type(R)
- 
+
     S, _ = AbstractAlgebra.polynomial_ring(R, s)
     V = elem_type(S)
 
-    if model == :capped_absolute
-       parent_obj = AbsMSeriesRing{U, V}(S, prec, s, cached)
-    else
-       error("Unknown model")
-    end
- 
-    return tuple(parent_obj, gens(parent_obj))
-end
+    model === :capped_absolute || error("Unknown model")
 
-function power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int}, prec::Int,
-   s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
-   U = elem_type(R)
+    parent_obj = AbsMSeriesRing{U, V}(S, prec, s, cached)
 
-   S, _ = AbstractAlgebra.polynomial_ring(R, s)
-   V = elem_type(S)
-
-   if model == :capped_absolute
-      parent_obj = AbsMSeriesRing{U, V}(S, weights, prec, s, cached)
-   else
-      error("Unknown model")
-   end
-
-   return tuple(parent_obj, gens(parent_obj))
+    return parent_obj, gens(parent_obj)
 end
 
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Int,
-                  s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
-    prec_vec = [prec for v in s]
-    return power_series_ring(R, prec_vec, s; cached=cached, model=model)
+        s::Vector{Symbol}; weights::Union{Vector{Int}, Nothing}=nothing,
+        cached::Bool=true, model=:capped_absolute)
+    U = elem_type(R)
+
+    S, _ = AbstractAlgebra.polynomial_ring(R, s)
+    V = elem_type(S)
+
+    model === :capped_absolute || error("Unknown model")
+
+    if weights === nothing
+        parent_obj = AbsMSeriesRing{U, V}(S, [prec for _ in s], s, cached)
+    else
+        parent_obj = AbsMSeriesRing{U, V}(S, weights, prec, s, cached)
+    end
+
+    return parent_obj, gens(parent_obj)
 end
+
+power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int},
+    prec::Int, s::Vector{Symbol}; kw...
+    ) = power_series_ring(R, prec, s; weights, kw...)
