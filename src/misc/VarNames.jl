@@ -79,21 +79,30 @@ variable_names(as::Tuple{Vararg{VarNames}}, brackets = Val(true)) =
 _variable_names(s::VarName, ::Any) = [Symbol(s)]
 _variable_names(a::AbstractArray{<:VarName}, ::Any) = Symbol.(a)
 _variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, '[', axe, ']')
-_variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{false}) = Symbol.(s, axe)
+_variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{false}) = check_names(Symbol.(s, axe))
 _variable_names((s, axe)::Pair{<:AbstractString}, val::Val) = _variable_names(s => (axe,), val)
 _variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{true}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
-_variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{false}) = Symbol.(s, join.(Iterators.product(axes...)))
+_variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{false}) = check_names(Symbol.(s, join.(Iterators.product(axes...))))
 function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple}, val)
     c = count("#", s)
     req(c <= 1, """Only a single '#' allowed, but "$s" contains $c of them.""")
-    c == 0 && return _variable_names(Symbol(s) => axes, val)
-    varnames = [Symbol(replace(s, '#' => join(i))) for i in Iterators.product(axes...)]
-    if !all(Meta.isidentifier, varnames)
-        badname = repr(string(varnames[findfirst(!Meta.isidentifier, varnames)]))
-        @warn "The constructed variable name $badname is no identifier." *
-            "You can still access it as `var$badname`."
+    return c == 0 ? _variable_names(Symbol(s) => axes, val) :
+        check_names([Symbol(replace(s, '#' => join(i))) for i in Iterators.product(axes...)])
+end
+
+"""
+    check_names(names) -> names
+
+Warn, if any of the `names` is no valid Julia identifier. Return `names`.
+"""
+function check_names(names)
+    if !all(Meta.isidentifier, names)
+        badname = first(x for x in names if !Meta.isidentifier(x))
+        badstring = repr(string(badname))
+        @warn "The variable name $badstring sadly is no Julia identifier." *
+            "You can still access it as `var$badstring`."
     end
-    return varnames
+    return names
 end
 
 _replace_bad_chars(s) = replace(replace(replace(string(s), '-' => 'm'), '.' => 'p'), r"/+" => 'q') # becomes simpler with julia 1.7
