@@ -165,7 +165,7 @@ end
 #        Expr(:hcat, a, b)       => a b
 
 
-function expressify(@nospecialize(a); context = nothing)::String
+function expressify(@nospecialize(a); context = nothing)
    return sprint(print, a; context = context)::String
 end
 
