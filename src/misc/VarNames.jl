@@ -125,7 +125,11 @@ function check_axe(axe)
     end
     return axe
 end
-_first_not_oneto(axe) = first((string(i), string(x)) for (i, x) in enumerate(axe) if i != x && string(i) != string(x))
+_first_not_oneto(axe) = _first(((i,x),) -> i != x && string(i) != string(x), enumerate(axe))
+function _first(f, a)
+    i = iterate(Iterators.filter(f, a))
+    return i === nothing ? nothing : first(i)
+end
 
 @doc raw"""
     reshape_to_varnames(vec::Vector{T}, varnames...) :: Tuple{Array{<:Any, T}}
