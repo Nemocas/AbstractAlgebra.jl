@@ -72,28 +72,28 @@ julia> AbstractAlgebra.variable_names('a':'c', 'z')
 ```
 """
 variable_names(as::VarNames...) = variable_names(as)
-variable_names(as::Tuple{Vararg{VarNames}}) = Symbol[x for a in as for x in _variable_names(a)]
+# brackets = Val(false) effectively replaces `:x` and `"x"` by `"x#"`, used by macro
+variable_names(as::Tuple{Vararg{VarNames}}, brackets = Val(true)) =
+    Symbol[x for a in as for x in _variable_names(a, brackets)]
 
-_variable_names(s::VarName) = [Symbol(s)]
-_variable_names(a::AbstractArray{<:VarName}) = Symbol.(a)
-_variable_names((s, axe)::Pair{<:VarName}) = Symbol.(s, '[', axe, ']')
-_variable_names((s, axe)::Pair{<:AbstractString}) = _variable_names(s => (axe,))
-_variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
-function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
-    indices = Iterators.product(axes...)
+_variable_names(s::VarName, ::Any) = [Symbol(s)]
+_variable_names(a::AbstractArray{<:VarName}, ::Any) = Symbol.(a)
+_variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, '[', axe, ']')
+_variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{false}) = Symbol.(s, axe)
+_variable_names((s, axe)::Pair{<:AbstractString}, val::Val) = _variable_names(s => (axe,), val)
+_variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{true}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
+_variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{false}) = Symbol.(s, join.(Iterators.product(axes...)))
+function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple}, val)
     c = count("#", s)
     req(c <= 1, """Only a single '#' allowed, but "$s" contains $c of them.""")
-    return if c == 0
-        Symbol.(s, '[', join.(indices, ','), ']')
-    else
-        varnames = [Symbol(replace(s, '#' => join(i))) for i in indices]
-        if !all(Meta.isidentifier, varnames)
-            badname = repr(string(varnames[findfirst(!Meta.isidentifier, varnames)]))
-            @warn "The constructed variable name $badname is no identifier." *
-                "You can still access it as `var$badname`."
-        end
-        varnames
+    c == 0 && return _variable_names(Symbol(s) => axes, val)
+    varnames = [Symbol(replace(s, '#' => join(i))) for i in Iterators.product(axes...)]
+    if !all(Meta.isidentifier, varnames)
+        badname = repr(string(varnames[findfirst(!Meta.isidentifier, varnames)]))
+        @warn "The constructed variable name $badname is no identifier." *
+            "You can still access it as `var$badname`."
     end
+    return varnames
 end
 
 _replace_bad_chars(s) = replace(replace(replace(string(s), '-' => 'm'), '.' => 'p'), r"/+" => 'q') # becomes simpler with julia 1.7
@@ -285,7 +285,7 @@ function varnames_macro(f, args_count, opt_in)
 end
 
 _varnames_macro(arg::VarName; kv...) = Symbol(arg), kv
-_varnames_macro(args::VarNames...; kv...) = variable_names(args...), kv
+_varnames_macro(args::VarNames...; kv...) = variable_names(args, Val(false)), kv
 
 function varnames_macro_code(f, base_args, s::Symbol, kv)
     quote
