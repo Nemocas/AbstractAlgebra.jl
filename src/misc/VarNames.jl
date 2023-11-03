@@ -73,7 +73,7 @@ julia> AbstractAlgebra.variable_names('a':'c', 'z')
 """
 variable_names(as::VarNames...) = variable_names(as)
 # brackets = Val(false) effectively replaces `:x` and `"x"` by `"x#"`, used by macro
-variable_names(as::Tuple{Vararg{VarNames}}, brackets = Val(true)) =
+variable_names(as::Tuple{Vararg{VarNames}}, brackets::Val = Val(true)) =
     Symbol[x for a in as for x in _variable_names(a, brackets)]
 
 _variable_names(s::VarName, ::Any) = [Symbol(s)]
@@ -86,9 +86,10 @@ _variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{true}) = 
 _variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{false}) = check_names(Symbol.(s, join.(Iterators.product(axes...))))
 
 _variable_names((s, axe)::Pair{<:AbstractString}, val::Val) = _variable_names(s => (axe,), val)
-function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple}, val)
+function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple}, val::Val)
     c = count("#", s)
-    req(c <= 1, """Only a single '#' allowed, but "$s" contains $c of them.""")
+    req(c <= 1, """Only a single '#' allowed, but "$s" contains $c of them.
+        Please communicate your use case to the Oscar community.""")
     return c == 0 ? _variable_names(Symbol(s) => axes, val) :
         check_names([Symbol(replace(s, '#' => join(i))) for i in Iterators.product(axes...)])
 end
