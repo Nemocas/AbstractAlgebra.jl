@@ -86,8 +86,17 @@ function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple})
     indices = Iterators.product(axes...)
     c = count("#", s)
     req(c <= 1, """Only a single '#' allowed, but "$s" contains $c of them.""")
-    return c == 0 ? Symbol.(s, '[', join.(indices, ','), ']') :
-        [Symbol(replace(s, '#' => join(i))) for i in indices]
+    return if c == 0
+        Symbol.(s, '[', join.(indices, ','), ']')
+    else
+        varnames = [Symbol(replace(s, '#' => join(i))) for i in indices]
+        if !all(Meta.isidentifier, varnames)
+            badname = repr(string(varnames[findfirst(!Meta.isidentifier, varnames)]))
+            @warn "The constructed variable name $badname is no identifier." *
+                "You can still access it as `var$badname`."
+        end
+        varnames
+    end
 end
 
 _replace_bad_chars(s) = replace(replace(replace(string(s), '-' => 'm'), '.' => 'p'), r"/+" => 'q') # becomes simpler with julia 1.7
