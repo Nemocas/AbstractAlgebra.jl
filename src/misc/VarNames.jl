@@ -78,11 +78,14 @@ variable_names(as::Tuple{Vararg{VarNames}}, brackets = Val(true)) =
 
 _variable_names(s::VarName, ::Any) = [Symbol(s)]
 _variable_names(a::AbstractArray{<:VarName}, ::Any) = Symbol.(a)
-_variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, '[', axe, ']')
+
+_variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, '[', _index_strings(axe), ']')
 _variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{false}) = check_names(Symbol.(s, axe))
-_variable_names((s, axe)::Pair{<:AbstractString}, val::Val) = _variable_names(s => (axe,), val)
-_variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{true}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
+
+_variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{true}) = Symbol.(s, '[', _multi_index_strings(axes), ']')
 _variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{false}) = check_names(Symbol.(s, join.(Iterators.product(axes...))))
+
+_variable_names((s, axe)::Pair{<:AbstractString}, val::Val) = _variable_names(s => (axe,), val)
 function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple}, val)
     c = count("#", s)
     req(c <= 1, """Only a single '#' allowed, but "$s" contains $c of them.""")
@@ -104,6 +107,26 @@ function check_names(names)
     end
     return names
 end
+
+function _index_strings(axe)
+    is_oneto(axe) || _warn_non_onto(axe)
+    return axe
+end
+function _multi_index_strings(axes)
+    if !all(is_oneto, axes)
+        badaxe = first(x for x in axes if !is_one_to(x))
+        _warn_non_onto(badaxe)
+    end
+    return join.(Iterators.product(axes...), ',')
+end
+
+is_oneto(axe) = axe == Base.oneto(length(axe))
+function _warn_non_onto(axe)
+    i, x = _first_not_oneto(axe)
+    @warn "Indexing with $axe can lead to confusion, since the entry at index $i gets printed as being at index $x.\n" *
+        """Consider using `"x#" => axes` syntax or communicating your use case to the Oscar community."""
+end
+_first_not_oneto(axe) = first((i,x) for (i,x) in enumerate(axe) if i != x)
 
 @doc raw"""
     reshape_to_varnames(vec::Vector{T}, varnames...) :: Tuple{Array{<:Any, T}}
