@@ -24,3 +24,7 @@ end
 
 # deprecated in 0.32.x
 @deprecate mat(f::Map(FPModuleHomomorphism)) matrix(f::Map(FPModuleHomomorphism))
+
+# deprecated in 0.34.x
+@deprecate power_series_ring(R::AbstractAlgebra.Ring, weights::Vector{Int},
+    prec::Int, s::Vector{Symbol}; kw...) power_series_ring(R, prec, s; weights, kw...)

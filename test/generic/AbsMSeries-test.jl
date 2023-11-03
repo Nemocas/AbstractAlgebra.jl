@@ -50,7 +50,7 @@
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:40)
-      R, gens = power_series_ring(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(QQ, prec, "x#" => 1:nvars; weights)
    
       f = rand(R, 0:10, -10:10)
 
@@ -75,7 +75,7 @@
 
       @test R(p, [0 for i in 1:nvars]) isa Generic.AbsMSeries
 
-      R, gens = power_series_ring(S, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(S, prec, "x#" => 1:nvars; weights)
      
       @test R(ZZ(2)) isa Generic.AbsMSeries
 
@@ -84,7 +84,7 @@
 end
 
 @testset "Generic.AbsMSeries.printing" begin
-   R, (x, y) = power_series_ring(ZZ, [5, 3], ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, ["x", "y"]; weights=[5, 3])
 
    @test string(zero(R)) == "O(y^3) + O(x^5)"
    @test string(one(R)) == "1 + O(y^3) + O(x^5)"
@@ -94,7 +94,7 @@ end
 
    # weighted 
 
-   R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, 10, ["x", "y"]; weights=[2, 3])
 
    @test string(zero(R)) == "O(10)"
    @test string(one(R)) == "1 + O(10)"
@@ -106,7 +106,7 @@ end
 end
 
 @testset "Generic.AbsMSeries.manipulation" begin
-   R, (x, y) = power_series_ring(ZZ, [5, 3], ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, ["x", "y"]; weights=[5, 3])
 
    f = x^2 + 2x*y + y + 1 + O(x^3) + O(y^2)
 
@@ -171,13 +171,13 @@ end
    @test characteristic(R) == 0
 
    S = residue_ring(ZZ, 7)
-   R, (x, y) = power_series_ring(S, [2, 3], ["x", "y"])
+   R, (x, y) = power_series_ring(S, ["x", "y"]; weights=[2, 3])
 
    @test characteristic(R) == 7
 
    # weighted
 
-   R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, 10, ["x", "y"]; weights=[2, 3])
 
    f = x^2 + 2x*y + y + 1
 
@@ -230,7 +230,7 @@ end
    @test characteristic(R) == 0
 
    S = residue_ring(ZZ, 7)
-   R, (x, y) = power_series_ring(S, [2, 3], 10, ["x", "y"])
+   R, (x, y) = power_series_ring(S, 10, ["x", "y"]; weights=[2, 3])
 
    @test characteristic(R) == 7
 end
@@ -274,7 +274,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars]; weights)
 
       for iters = 1:100
          f = rand(R, 0:10, -10:10)
@@ -311,7 +311,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars]; weights)
 
       for iters = 1:100
          f = rand(R, 0:12, -10:10)
@@ -379,7 +379,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars]; weights)
 
       for iters = 1:100
          f = rand(R, 0:12, -10:10)
@@ -401,7 +401,7 @@ end
    
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = power_series_ring(S, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(S, prec, ["x$(i)" for i in 1:nvars]; weights)
 
       for iters = 1:100
          f = rand(R, 0:12, -1:2, -10:10)
@@ -444,7 +444,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars]; weights)
       
       for iter = 1:100
          f = rand(R, 0:12, -10:10)
@@ -485,7 +485,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars]; weights)
 
       for iter = 1:100
          f = rand(R, 0:12, -10:10)
@@ -519,7 +519,7 @@ end
    for nvars in 1:5
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars]; weights)
 
       for iter = 1:100
          c = rand(ZZ, -10:10)
@@ -553,7 +553,7 @@ end
    for nvars in 1:4
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = power_series_ring(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(QQ, prec, ["x$(i)" for i in 1:nvars]; weights)
       for iter = 1:20*nvars
          f = rand(R, 0:8, -10:10)
          if is_unit(f)
@@ -582,7 +582,7 @@ end
    for nvars in 1:4
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
-      R, gens = power_series_ring(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
+      R, gens = power_series_ring(QQ, prec, ["x$(i)" for i in 1:nvars]; weights)
 
       for iter = 1:20*nvars
          f = rand(R, 0:8, -10:10)
@@ -595,7 +595,7 @@ end
 end
 
 @testset "Generic.AbsMSeries.evaluation" begin
-   R, (x, y) = power_series_ring(ZZ, [10, 10], ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, ["x", "y"]; weights=[10, 10])
 
    f = x^2 + y
 
@@ -617,7 +617,7 @@ end
 
    # weighted
 
-   R, (x, y) = power_series_ring(ZZ, [2, 3], 30, ["x", "y"])
+   R, (x, y) = power_series_ring(ZZ, 30, ["x", "y"]; weights=[2, 3])
 
    f = x^2 + y
 
