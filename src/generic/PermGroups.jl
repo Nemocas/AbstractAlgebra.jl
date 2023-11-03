@@ -169,7 +169,7 @@ Base.lastindex(cd::CycleDec) = cd.n
 Base.eltype(::Type{CycleDec{T}}) where T = Vector{T}
 
 function Base.show(io::IO, cd::CycleDec)
-   a = [join(c, ",") for c in cd]
+   a = [join(c, ",") for c in cd]::Vector{String}
    print(io, "Cycle Decomposition: ("*join(a, ")(")*")")
 end
 

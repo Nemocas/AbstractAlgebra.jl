@@ -738,7 +738,7 @@ rand(S::PuiseuxSeriesRingOrField, val_range, scale_range, v...) =
 
 function zero!(a::PuiseuxSeriesElem{T}) where T <: RingElement
    zero!(a.data)
-   a = set_scale(a, 1)
+   a.scale = 1
    return a
 end
 

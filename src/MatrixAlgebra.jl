@@ -71,7 +71,7 @@ is_zero_divisor(a::MatAlgElem{T}) where T <: FieldElement = rank(a) != degree(a)
 
 function is_zero_divisor_with_annihilator(a::MatAlgElem{T}) where T <: RingElement
    f, b = is_zero_divisor_with_annihilator(det(a))
-   throw(NotImplementedError(:adj, A)) #return f, b*adj(A)
+   throw(NotImplementedError(:adj, a)) #return f, b*adj(A)
 end
 
 

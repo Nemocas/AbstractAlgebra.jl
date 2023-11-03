@@ -115,7 +115,7 @@ similar(x::AbsPowerSeriesRingElem, var::VarName=var(parent(x)); cached::Bool=tru
    similar(x, base_ring(x),
                   max_precision(parent(x)), Symbol(var); cached)
 
-zero(a::AbsPowerSeriesRingElem, R::Ring, max_prec::Int, var::VarName=var(parent(x)); cached::Bool=true) =
+zero(a::AbsPowerSeriesRingElem, R::Ring, max_prec::Int, var::VarName=var(parent(a)); cached::Bool=true) =
    similar(a, R, max_prec, var; cached)
 
 

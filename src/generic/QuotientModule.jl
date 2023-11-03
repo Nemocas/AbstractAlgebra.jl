@@ -300,6 +300,7 @@ function quo(m::AbstractAlgebra.FPModule{T}, subm::AbstractAlgebra.FPModule{T}) 
    srels = dense_matrix_type(T)[_matrix(v) for v in gens(subm)]
    combined_rels = compute_combined_rels(m, srels)
    M = QuotientModule{T}(m, combined_rels)
+   R = base_ring(m)
    f = ModuleHomomorphism(m, M, matrix(R, ngens(m), 0, []))
    M.map = f
    return M, f   
