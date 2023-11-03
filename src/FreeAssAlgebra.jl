@@ -70,7 +70,7 @@ function show(io::IO, ::MIME"text/plain", a::FreeAssAlgebra)
   print(io, " on ", ItemQuantity(nvars(a), "indeterminate"), " ")
   if n > max_vars
     join(io, symbols(a)[1:max_vars - 1], ", ")
-    println(io, ", ..., ", symbols(a)[n])
+    println(io, "..., ", symbols(a)[n])
   else
     join(io, symbols(a), ", ")
     println(io)

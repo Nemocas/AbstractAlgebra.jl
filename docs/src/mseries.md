@@ -197,7 +197,7 @@ julia> v = symbols(R)
  :x
 
 julia> T = parent(x + 1)
-Multivariate power series ring in 1 variable x
+Multivariate power series ringin 1 variable x
   over integers
 
 julia> f == deepcopy(f)

@@ -96,10 +96,6 @@ julia> derivative(k, 1)
 julia> derivative(k, 2)
 0
 
-julia> R, x = polynomial_ring(ZZ, 10); R
-Multivariate polynomial ring in 10 variables x1, x2, x3, x4, ..., x10
-  over integers
-
 ```
 
 ## Polynomial constructors
