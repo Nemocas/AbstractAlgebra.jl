@@ -74,11 +74,8 @@ julia> AbstractAlgebra.variable_names('a':'c', 'z')
 variable_names(as::VarNames...) = variable_names(as)
 variable_names(as::Tuple{Vararg{VarNames}}) = Symbol[x for a in as for x in _variable_names(a)]
 
-# note: additionally `:x => missing` is equivalent to `:x`, so that we can use the `:symbol => multiplicity` syntax throughout. This simplifies the macro implementation.
-
 _variable_names(s::VarName) = [Symbol(s)]
 _variable_names(a::AbstractArray{<:VarName}) = Symbol.(a)
-_variable_names((s, _)::Pair{<:VarName, Missing}) = [Symbol(s)]
 _variable_names((s, axe)::Pair{<:VarName}) = Symbol.(s, '[', axe, ']')
 _variable_names((s, axe)::Pair{<:AbstractString}) = _variable_names(s => (axe,))
 _variable_names((s, axes)::Pair{<:VarName, <:Tuple}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
@@ -141,7 +138,6 @@ _reshape_to_varnames(iter::Iterators.Stateful, a::AbstractArray{<:VarName}) =
 _reshape_to_varnames(iter::Iterators.Stateful, (_, shape)::Pair{<:VarName}) =
     __reshape(iter, shape)
 
-__reshape(iter, ::Missing) = popfirst!(iter)
 __reshape(iter, axes::Tuple) = _reshape(iter, Int[d for axe in axes for d in size(axe)])
 __reshape(iter, axe) = _reshape(iter, size(axe))
 
