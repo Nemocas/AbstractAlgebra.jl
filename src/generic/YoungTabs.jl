@@ -72,13 +72,10 @@ function _numpart(n::Integer)
    if n < 0
       return 0
    elseif n < 395
-      n = Int(n)
-      lookuptable = _numPartsTable
+      return _numpart(Int(n), _numPartsTable)
    else
-      n = BigInt(n)
-      lookuptable = _numPartsTableBig
+      return _numpart(BigInt(n), _numPartsTableBig)
    end
-   return _numpart(n, lookuptable)
 end
 
 function _numpart(n::T, lookuptable::Dict{Int, T}) where T<:Integer
