@@ -3369,9 +3369,9 @@ end
 @doc raw"""
     solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <: FieldElement}
 
-Given a non-singular $n\times n$ matrix over a field which is upper
-triangular, and an $n\times m$ matrix over the same field, return an
-$n\times m$ matrix $x$ such that $Ax = b$. If $A$ is singular an exception
+Given a non-singular $n\times n$ matrix $U$ over a field which is upper
+triangular, and an $n\times m$ matrix $b$ over the same field, return an
+$n\times m$ matrix $x$ such that $Ux = b$. If $U$ is singular an exception
 is raised. If unit is true then $U$ is assumed to have ones on its
 diagonal, and the diagonal will not be read.
 """
@@ -3406,6 +3406,79 @@ function solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <
       end
       for j = 1:n
          X[j, i] = tmp[j]
+      end
+   end
+   return X
+end
+
+@doc raw"""
+    solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+
+Given a non-singular $n\times n$ matrix $U$ over a field which is upper
+triangular, and an $n\times m$ matrix $b$ over the same ring, return an
+$n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
+will be raised.
+
+See also [`AbstractAlgebra.solve_triu_left`](@ref)
+"""
+function solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+   n = nrows(U)
+   m = ncols(b)
+   R = base_ring(U)
+   X = zero(b)
+   tmp = Vector{elem_type(R)}(undef, n)
+   t = R()
+   for i = 1:m
+      for j = 1:n
+         tmp[j] = X[j, i]
+      end
+      for j = n:-1:1
+         for k = j + 1:n
+#            s = addmul!(s, U[j, k], tmp[k], t)
+            s = s + U[j, k] * tmp[k]
+         end
+         s = b[j, i] - s
+         tmp[j] = divexact(s, U[j,j])
+      end
+      for j = 1:n
+         X[j, i] = tmp[j]
+      end
+   end
+   return X
+end
+
+@doc raw"""
+    solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
+
+Given a non-singular $n\times n$ matrix $U$ over a field which is upper
+triangular, and an $m\times n$ matrix $b$ over the same ring, return an
+$m\times n$ matrix $x$ such that $xU = b$. If this is not possible, an error
+will be raised.
+
+See also [`solve_triu`](@ref) or [`can_solve_left_reduced_triu`](@ref) when
+$U$ is not square or not of full rank.
+"""
+function solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
+   n = ncols(U)
+   m = nrows(b)
+   R = base_ring(U)
+   X = zero(b)
+   tmp = Vector{elem_type(R)}(undef, n)
+   t = R()
+   for i = 1:m
+      for j = 1:n
+         tmp[j] = X[i, j]
+      end
+      for j = 1:n
+         s = R()
+         for k = 1:j-1
+            s = addmul!(s, U[k, j], tmp[k], t)
+         end
+         s = b[i, j] - s
+         tmp[j] = divexact(s, U[j,j])
+      end
+      for j = 1:n
+         X[i, j] = tmp[j]
       end
    end
    return X
@@ -3465,8 +3538,8 @@ end
 Return a tuple `flag, x` where `flag` is set to true if $xM = r$ has a
 solution, where $M$ is an $m\times n$ matrix in (upper triangular) Hermite
 normal form or reduced row echelon form and $r$ and $x$ are row vectors with
-$m$ columns. If there is no solution, flag is set to `false` and $x$ is set
-to the zero row.
+$m$ columns (i.e. $1 \times m$ matrices). If there is no solution, flag is set
+to `false` and $x$ is set to zero.
 """
 function can_solve_left_reduced_triu(r::MatElem{T},
                           M::MatElem{T}) where T <: RingElement
