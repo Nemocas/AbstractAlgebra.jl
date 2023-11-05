@@ -14,3 +14,5 @@ end
 function *(R::Ring, x::RingElement)
   return ideal(R, x)
 end
+
+iszero(I::Ideal) = all(iszero, gens(I))

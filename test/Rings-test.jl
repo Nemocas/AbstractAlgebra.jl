@@ -30,6 +30,7 @@ include("generic/LaurentMPoly-test.jl")
 include("generic/UnivPoly-test.jl")
 include("algorithms/MPolyEvaluate-test.jl")
 include("algorithms/MPolyFactor-test.jl")
+include("algorithms/MPolyNested-test.jl")
 include("algorithms/DensePoly-test.jl")
 include("algorithms/GenericFunctions-test.jl")
 
