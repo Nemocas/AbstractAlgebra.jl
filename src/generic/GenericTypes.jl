@@ -336,7 +336,7 @@ end
 # N is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
-mutable struct MPolyRing{T <: RingElement} <: AbstractAlgebra.MPolyRing{T}
+@attributes mutable struct MPolyRing{T <: RingElement} <: AbstractAlgebra.MPolyRing{T}
    base_ring::Ring
    S::Vector{Symbol}
    ord::Symbol
