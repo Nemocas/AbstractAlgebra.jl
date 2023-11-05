@@ -1027,12 +1027,22 @@ function divexact(a::FunctionFieldElem, b::RingElem; check::Bool=true)
 end
 
 function divexact(a::Union{Rational, Integer},
-                                       b::FunctionFieldElem; check::Bool=true)
+            b::FunctionFieldElem{T}; check::Bool=true) where T <: FieldElement
    return a*inv(b)
 end
 
 function divexact(a::T,
-            b::FunctionFieldElem{T}; check::Bool=true) where T <: FieldElement
+            b::FunctionFieldElem{T}; check::Bool=true) where T <: Integer
+   return a*inv(b)
+end
+
+function divexact(a::T,
+            b::FunctionFieldElem{T}; check::Bool=true) where T <: Rational
+   return a*inv(b)
+end
+
+function divexact(a::T,
+            b::FunctionFieldElem{T}; check::Bool=true) where T <: FieldElem
    return a*inv(b)
 end
 
