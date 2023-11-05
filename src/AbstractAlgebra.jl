@@ -824,6 +824,7 @@ export deflate
 export deflation
 export degree
 export degrees
+export denest
 export dense_matrix_type
 export dense_poly_ring_type
 export dense_poly_type
@@ -1085,6 +1086,7 @@ export rel_series_type
 export RelPowerSeriesRing
 export rels
 export remove
+export renest
 export renormalize!
 export rescale!
 export residue_field
@@ -1357,6 +1359,7 @@ const RealField = JuliaRealField
 
 include("algorithms/MPolyEvaluate.jl")
 include("algorithms/MPolyFactor.jl")
+include("algorithms/MPolyNested.jl")
 include("algorithms/DensePoly.jl")
 
 ###############################################################################
