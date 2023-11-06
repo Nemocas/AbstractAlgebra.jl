@@ -1398,9 +1398,12 @@ function is_unicode_allowed()
 end
 
 function with_unicode(f::Function)
-  old_allow_unicode = allow_unicode(true);
-  f()
-  allow_unicode(old_allow_unicode);
+  old_allow_unicode = allow_unicode(true)
+  try
+    f()
+  finally
+    allow_unicode(old_allow_unicode)
+  end
 end
 
 ################################################################################
