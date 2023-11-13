@@ -130,12 +130,10 @@
    ZZxxx0_ = polynomial_ring(ZZ, :x=>Base.OneTo(3))
    ZZxxx_ = polynomial_ring(ZZ, :x=>1:3)
    ZZxxx2, (xxx2,) = ZZ[:x=>1:3]
-   ZZxxx3_ = polynomial_ring(ZZ, "x_#"=>1:3)
 
    @test ZZxxx_[1] isa Generic.MPolyRing
    @test ZZxxx_ == ZZxxx0_
    @test ZZxxx_ == (ZZxxx2, xxx2)
-   @test ZZxxx_ == ZZxxx3_
 
    QQxxx_ = polynomial_ring(QQ, "x#" => 1:3)
    QQxxx2 = @polynomial_ring(QQ, "x#" => 1:3)

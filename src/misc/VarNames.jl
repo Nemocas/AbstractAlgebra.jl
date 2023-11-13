@@ -79,7 +79,7 @@ variable_names(as::Tuple{Vararg{VarNames}}, brackets::Val = Val(true)) =
 _variable_names(s::VarName, ::Any) = [Symbol(s)]
 _variable_names(a::AbstractArray{<:VarName}, ::Any) = Symbol.(a)
 
-_variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, '[', check_axe(axe), ']')
+_variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, '[', axe, ']')
 _variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{false}) = check_names(Symbol.(s, axe))
 
 _variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{true}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
