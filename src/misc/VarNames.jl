@@ -37,10 +37,10 @@ julia> AbstractAlgebra.variable_names(:x, :y)
 
 julia> AbstractAlgebra.variable_names(:x => (0:0, 0:1), :y => 0:1, :z)
 5-element Vector{Symbol}:
- Symbol("x_{0,0}")
- Symbol("x_{0,1}")
- :y_0
- :y_1
+ Symbol("x[0,0]")
+ Symbol("x[0,1]")
+ Symbol("y[0]")
+ Symbol("y[1]")
  :z
 
 julia> AbstractAlgebra.variable_names("x#" => (0:0, 0:1), "y#" => 0:1)
@@ -79,10 +79,10 @@ variable_names(as::Tuple{Vararg{VarNames}}, brackets::Val = Val(true)) =
 _variable_names(s::VarName, ::Any) = [Symbol(s)]
 _variable_names(a::AbstractArray{<:VarName}, ::Any) = Symbol.(a)
 
-_variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, _indices(axe))
+_variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, '[', check_axe(axe), ']')
 _variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{false}) = check_names(Symbol.(s, axe))
 
-_variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{true}) = Symbol.(s, _indices(axes...))
+_variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{true}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
 _variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{false}) = check_names(Symbol.(s, join.(Iterators.product(axes...))))
 
 _variable_names((s, axe)::Pair{<:AbstractString}, val::Val) = _variable_names(s => (axe,), val)
@@ -93,12 +93,6 @@ function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple}, val::Val)
     return c == 0 ? _variable_names(Symbol(s) => axes, val) :
         _check_names([Symbol(replace(s, '#' => join(i))) for i in Iterators.product(axes...)], val)
 end
-
-_indices(axe) = '_' .* _wrap_curly.(axe)
-_wrap_curly(s::String) = length(s) == 1 ? s : '{' * s * '}'
-_wrap_curly(s) = _wrap_curly(string(s))
-
-_indices(axes...) = "_{" .* join.(Iterators.product(axes...), ',') .* '}'
 
 """
     check_names(names) -> names
@@ -391,7 +385,7 @@ julia> f("hello", :x, :y, :z)
 ("hello", "x", "y", "z")
 
 julia> f("hello", :x => (1:1, 1:2), :y => 1:2, :z)
-("hello", ["x_{1,1}" "x_{1,2}"], ["y_1", "y_2"], "z")
+("hello", ["x[1,1]" "x[1,2]"], ["y[1]", "y[2]"], "z")
 
 julia> f("projective", ["x$i$j" for i in 0:1, j in 0:1], [:y0, :y1], :z)
 ("projective", ["x00" "x01"; "x10" "x11"], ["y0", "y1"], "z")
