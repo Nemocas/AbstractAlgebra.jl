@@ -39,8 +39,8 @@ julia> AbstractAlgebra.variable_names(:x => (0:0, 0:1), :y => 0:1, :z)
 5-element Vector{Symbol}:
  Symbol("x_{0,0}")
  Symbol("x_{0,1}")
- Symbol("y_0")
- Symbol("y_1")
+ :y_0
+ :y_1
  :z
 
 julia> AbstractAlgebra.variable_names("x#" => (0:0, 0:1), "y#" => 0:1)
