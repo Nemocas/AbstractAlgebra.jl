@@ -100,7 +100,8 @@ end
 Warn, if any of the `names` is no valid Julia identifier. Return `names`.
 """
 function check_names(names)
-    if !all(Meta.isidentifier, names)
+    badname = _first(!Meta.isidentifier, names)
+    if badname !== nothing
         badname = first(x for x in names if !Meta.isidentifier(x))
         badstring = repr(string(badname))
         @warn "The variable name $badstring sadly is no Julia identifier." *
