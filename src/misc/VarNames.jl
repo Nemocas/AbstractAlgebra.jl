@@ -112,7 +112,7 @@ _check_names(x, ::Val{true}) = x
 _check_names(x, ::Val{false}) = check_names(x)
 
 function _multi_index_strings(axes)
-    for axe in axes _warn_unless_onto(axe) end
+    for axe in axes check_axe(axe) end
     return join.(Iterators.product(axes...), ',')
 end
 
