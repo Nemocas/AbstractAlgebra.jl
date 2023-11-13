@@ -150,11 +150,11 @@ a tuple `S, x, y, z` representing the new ring $S = R[x, 1/x, y, 1/y, z, 1/z]$
 and the generators $x, y, z$ of the ring.
 
 By default (`cached=true`), the output `S` will be cached, i.e. if
-`polynomial_ring` is invoked again with the same arguments, the same
+`laurent_polynomial_ring ` is invoked again with the same arguments, the same
 (*identical*) ring is returned. Setting `cached` to `false` ensures a distinct
 new ring is returned, and will also prevent it from being cached.
 
-For ways to give `varnames...` refer to [`polynomial_ring`](@ref) or the
+For information about the many ways to specify `varnames...` refer to [`polynomial_ring`](@ref) or the
 specification in [`AbstractAlgebra.@varnames_interface`](@ref).
 """
 laurent_polynomial_ring(R::Ring, s::Vector{Symbol})
