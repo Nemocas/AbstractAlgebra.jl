@@ -1403,14 +1403,14 @@ Multivariate polynomial ring in 7 variables x[1,1], x[2,1], x[1,2], x[2,2], ...,
 
 julia> x
 2×2 Matrix{AbstractAlgebra.Generic.MPoly{BigInt}}:
- x[1,1]  x[1,2]
- x[2,1]  x[2,2]
+ x_{1,1}  x_{1,2}
+ x_{2,1}  x_{2,2}
 
 julia> y
 3-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
- y[1]
- y[2]
- y[3]
+ y_1
+ y_2
+ y_3
 ```
 """
 polynomial_ring(R::Ring, varnames...)
