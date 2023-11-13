@@ -79,16 +79,9 @@ and floating point types.
 
 To construct a multivariate polynomial ring, there is the following constructor.
 
-```julia
-polynomial_ring(R::Ring, s::Vector{<:VarName}; ordering=:lex, cached::Bool=true)
+```@docs; canonical=false
+polynomial_ring(R::Ring, s::Vector{Symbol})
 ```
-
-Return a tuple, `S, vars` consisting of a polynomial ring $S$ and an array of
-generators (variables) which print according to the strings in the supplied
-vector $s$. The ordering can at present be `:lex`, `:deglex` or `:degrevlex`.
-By default, the polynomial ring is cached, and creating a polynomial ring with
-the same data will return the same ring object $S$. If this caching is not
-desired, it can be switched off by setting `cached=false`.
 
 Polynomials in a given ring can be constructed using the generators and basic
 polynomial arithmetic. However, this is inefficient and the following build

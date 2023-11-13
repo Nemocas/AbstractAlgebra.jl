@@ -1353,7 +1353,7 @@ end
     polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached=true, ordering=:lex)
 
 Given a coefficient ring `R` and variable names, say `varnames = [:x1, :x2, ...]`,
-return a tuple `S, [x1, x2, ...]` of the polynomial ring $S = R[x1, x2, \dots]`
+return a tuple `S, [x1, x2, ...]` of the polynomial ring $S = R[x1, x2, \dots]$
 and its generators $x1, x2, \dots$.
 
 By default (`cached=true`), the output `S` will be cached, i.e. if
@@ -1385,6 +1385,11 @@ Like [`polynomial_ring(::Ring, ::Vector{Symbol})`](@ref) with more ways to give
 `varnames` as specified in [`variable_names`](@ref).
 
 Return a tuple `S, generators...` with `generators[i]` corresponding to `varnames[i]`.
+
+!!! note
+    In the first method, `varnames` must not be empty, and if it consists of
+    only one name, the univariate [`polynomial_ring(R::NCRing, s::VarName)`](@ref)
+    method is called instead.
 
 # Examples
 
