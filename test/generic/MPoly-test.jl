@@ -159,8 +159,12 @@
    QQxy3 = @polynomial_ring(QQ, :x => (1:2, 1:2), :y => 0:3)
    @test QQxy_ == (QQxy3, [x11 x12; x21 x22], [y0, y1, y2, y3])
 
-   @test_throws ArgumentError polynomial_ring(QQ, "x###" => (1:2,3:4))
-   @test_logs (:warn,) @macroexpand @polynomial_ring(QQ, :x => -1:1)
+   # Errors
+   @test_throws ArgumentError polynomial_ring(QQ, "x###" => (1:2, 3:4))
+   @test_logs (:warn, """The variable name "x-1" sadly is no Julia identifier. You can still access it as `var"x-1"`."""
+      ) @macroexpand @polynomial_ring(QQ, :x => -1:1)
+   @test_logs (:error, "Inconveniently, you may only use literals and variables from the global scope of the current module (`Main`) when using variable name constructor macros"
+      ) @test_throws UndefVarError let local_name = 3; @macroexpand @polynomial_ring(QQ, :x => 1:local_name) end
 end
 
 @testset "Generic.MPoly.printing" begin
