@@ -141,6 +141,9 @@
    @test QQxxx_[1] isa Generic.MPolyRing
    @test QQxxx_ == (QQxxx2, [x1, x2, x3])
 
+   QQxxx3 = @polynomial_ring(QQ, :x=>1:3)
+   @test QQxxx_ == (QQxxx3, [x1, x2, x3])
+
    ZZxy_ = polynomial_ring(ZZ, :x => (1:2, 1:2), :y => 0:3)
    ZZxy2_ = polynomial_ring(ZZ, :x => ["1,1" "1,2"; "2,1" "2,2"], :y => (0:3,))
 
@@ -153,7 +156,11 @@
    @test QQxy_[1] isa Generic.MPolyRing
    @test QQxy_ == (QQxy2, [x11 x12; x21 x22], [y0, y1, y2, y3])
 
+   QQxy3 = @polynomial_ring(QQ, :x => (1:2, 1:2), :y => 0:3)
+   @test QQxy_ == (QQxy3, [x11 x12; x21 x22], [y0, y1, y2, y3])
+
    @test_throws ArgumentError polynomial_ring(QQ, "x###" => (1:2,3:4))
+   @test_logs (:warn,) @macroexpand @polynomial_ring(QQ, :x => -1:1)
 end
 
 @testset "Generic.MPoly.printing" begin
