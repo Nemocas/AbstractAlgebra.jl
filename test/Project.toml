@@ -4,6 +4,6 @@ GroupsCore = "d5909c97-4eac-4ecc-a3dc-fdd0858a4120"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-Aqua = "0.8.1"
+Aqua = "0.8.2"
 GroupsCore = "0.4.0"
 Test = "1.6"
