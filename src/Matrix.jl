@@ -6517,6 +6517,7 @@ function Base.vcat(A::MatrixElem{T}...) where T <: NCRingElement
   return _vcat(A)
 end
 
+# this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
 Base.reduce(::typeof(vcat), A::AbstractVector{<:MatrixElem}) = _vcat(A)
 
 function _vcat(A)
@@ -6555,6 +6556,7 @@ function Base.hcat(A::MatrixElem{T}...) where T <: NCRingElement
   return _hcat(A)
 end
 
+# this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
 Base.reduce(::typeof(hcat), A::AbstractVector{<:MatrixElem}) = _hcat(A)
 
 function _hcat(A)
