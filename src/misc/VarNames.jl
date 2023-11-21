@@ -323,18 +323,20 @@ end
 @doc raw"""
     @varnames_interface [M.]f(args..., varnames) macros=:yes n=n range=1:n
 
-Add methods `X, vars = f(args..., varnames...)` and macro `X = @f args... varnames...` to current scope.
+Add methods `X, vars = f(args..., varnames...)` and macro `X = @f(args..., varnames...`) to current scope.
 
 # Created methods
 
     X, gens::Vector{T} = f(args..., varnames::Vector{Symbol})
 
-Base method. If `M` is given, this calls `M.f`. Otherwise, it has to exist already.
+Base method, called by everything else defined below. If a module `M` is
+specified, this is implemented as a call to `M.f`. Otherwise, a method `f` with
+this signature must already exist.
 
 ---
 
-    X, vars... = f(args..., varnames...; kv...)
-    X, vars... = f(args..., varnames::Tuple; kv...)
+    X, gens... = f(args..., varnames...; kv...)
+    X, gens... = f(args..., varnames::Tuple; kv...)
 
 Compute `X` and `gens` via the base method. Then reshape `gens` into the shape defined by `varnames` according to [`variable_names`](@ref).
 
@@ -348,18 +350,18 @@ Keyword arguments are passed on to the base method.
 
     X, x::Vector{T} = f(args..., n::Int, s::VarName = :x; kv...)
 
-Shorthand for `X, x = f(args..., "$s#", 1:n; kv...)`.
-The name `n` can be changed via the `n` option. The range `1:n` is given via the `range` option.
+Shorthand for `X, x = f(args..., "$s#" => 1:n; kv...)`.
+The name of the argument `n` can be changed via the `n` option. The range `1:n` is given via the `range` option.
 
 Setting `n=:no` disables creation of this method.
-
+ 
 ---
 
     X = @f(args..., varnames...; kv...)
     X = @f(args..., varnames::Tuple; kv...)
     X = @f(args..., varname::VarName; kv...)
 
-As `f(args..., varnames; kv...)` and also introduce the indexed `varnames` into the current scope.
+These macros behave like their `f(args..., varnames; kv...)` counterparts but also introduce the indexed `varnames` into the current scope.
 The first version needs at least one `varnames` argument.
 The third version calls the univariate method base method if it exists (e.g. `polynomial_ring(R, varname)`).
 
@@ -425,6 +427,7 @@ end
 @varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no # `n` variant would clash with line above; macro would be the same as for `prec::Int`
 
 @varnames_interface polynomial_ring(R::Ring, s)
+
 # With `Ring <: NCRing`, we need to resolve ambiguities of `polynomial_ring(::Ring, s...)`
 polynomial_ring(R::Ring, s::Symbol; kv...) = invoke(polynomial_ring, Tuple{NCRing, Symbol}, R, s; kv...)
 polynomial_ring(R::Ring, s::Union{AbstractString, Char}; kv...) = polynomial_ring(R, Symbol(s); kv...)
