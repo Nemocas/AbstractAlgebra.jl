@@ -769,8 +769,12 @@ export _checkbounds
 export @alias
 export @attr
 export @attributes
+export @free_associative_algebra
+export @laurent_polynomial_ring
 export @perm_str
 export @polynomial_ring
+export @power_series_ring
+export @rational_function_field
 export abs_series
 export abs_series_type
 export AbsPowerSeriesRing
