@@ -25,8 +25,6 @@ const import_exclude = [:import_exclude, :QQ, :ZZ,
                   :numerator, :denominator,
                   :promote_rule,
                   :Set, :Module, :Group,
-                  # remove the following, once they land in OSCAR
-                  :allow_unicode, :with_unicode,
                  ]
 
 # If you want to add methods to functions in LinearAlgebra they should be
@@ -941,6 +939,7 @@ export is_submodule
 export is_symmetric
 export is_term
 export is_term_recursive
+export is_unicode_allowed
 export is_unit
 export is_univariate
 export is_upper_triangular
