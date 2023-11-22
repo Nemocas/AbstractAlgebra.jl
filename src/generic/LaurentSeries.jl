@@ -41,8 +41,6 @@ base_ring(R::LaurentSeriesRing{T}) where T <: RingElement = R.base_ring::parent_
 
 base_ring(R::LaurentSeriesField{T}) where T <: FieldElement = R.base_ring::parent_type(T)
 
-base_ring(a::LaurentSeriesElem) = base_ring(parent(a))
-
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesElem{S}}
    return is_domain_type(S)
 end

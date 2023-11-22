@@ -10,10 +10,6 @@
 #
 ###############################################################################
 
-base_ring(a::FreeAssAlgElem{T}) where T <: RingElement = base_ring(parent(a))
-
-coefficient_ring(a::FreeAssAlgElem{T}) where T <: RingElement = base_ring(a)
-
 coefficient_ring(R::FreeAssAlgebra{T}) where T <: RingElement = base_ring(R)
 
 function is_domain_type(::Type{S}) where {T <: RingElement, S <: FreeAssAlgElem{T}}

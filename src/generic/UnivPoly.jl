@@ -12,11 +12,7 @@
 
 base_ring(S::UniversalPolyRing) = S.base_ring
 
-base_ring(p::UnivPoly) = base_ring(parent(p))
-
 coefficient_ring(S::UniversalPolyRing) = base_ring(S)
-
-coefficient_ring(p::UnivPoly) = base_ring(p)
 
 function is_domain_type(::Type{T}) where {S <: RingElement, U <: MPolyRingElem{S}, T <: UnivPoly{S, U}}
    return is_domain_type(S)

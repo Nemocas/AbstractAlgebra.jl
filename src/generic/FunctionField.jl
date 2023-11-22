@@ -537,8 +537,6 @@ function base_ring(R::FunctionField{T}) where T <: FieldElement
    return R.base_ring::RationalFunctionField{T, U}
 end
 
-base_ring(R::FunctionFieldElem) = base_ring(parent(R))
-
 # For consistency with number fields in Hecke.jl
 @doc raw"""
     base_field(R::FunctionField)

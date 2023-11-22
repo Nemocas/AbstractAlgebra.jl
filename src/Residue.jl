@@ -14,8 +14,6 @@ base_ring_type(::Type{ResidueRing{T}}) where T <: RingElement = parent_type(T)
 
 base_ring(S::ResidueRing{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
-base_ring(r::ResElem) = base_ring(parent(r))
-
 parent(a::ResElem) = a.parent
 
 is_domain_type(a::Type{T}) where T <: ResElem = false

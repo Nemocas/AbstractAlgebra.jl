@@ -48,8 +48,6 @@ function base_ring(R::MSeriesRing{T}) where T <: RingElement
     return base_ring(poly_ring(R))::parent_type(T)
 end
 
-base_ring(a::MSeriesElem) = base_ring(parent(a))
-
 @doc raw"""
     characteristic(a::MSeriesRing)
 

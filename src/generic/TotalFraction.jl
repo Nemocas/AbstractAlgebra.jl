@@ -26,8 +26,6 @@ base_ring_type(::Type{TotFracRing{T}}) where T <: RingElem = parent_type(T)
 
 base_ring(a::TotFracRing{T}) where T <: RingElem = a.base_ring::parent_type(T)
 
-base_ring(a::TotFrac) = base_ring(parent(a))
-
 parent(a::TotFrac) = a.parent
 
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: TotFrac{S}}

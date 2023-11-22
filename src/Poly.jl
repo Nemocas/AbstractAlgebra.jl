@@ -14,11 +14,7 @@ base_ring_type(::Type{PolyRing{T}}) where {T} = parent_type(T)
 
 base_ring(R::PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-base_ring(a::PolynomialElem) = base_ring(parent(a))
-
 coefficient_ring(R::PolyRing) = base_ring(R)
-
-coefficient_ring(a::PolynomialElem) = base_ring(a)
 
 parent(a::PolynomialElem) = a.parent
 
