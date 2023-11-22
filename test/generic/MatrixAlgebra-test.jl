@@ -1191,6 +1191,10 @@ end
    p2 = charpoly(U, M)
 
    @test p1 == p2
+
+   p3 = charpoly(M)
+
+   @test p1 == evaluate(p3, gen(U))
 end
 
 @testset "Generic.MatAlg.minpoly" begin
@@ -1301,6 +1305,10 @@ end
    p2 = minpoly(U, M)
 
    @test p1 == p2
+
+   p3 = minpoly(M)
+
+   @test p1 == evaluate(p3, gen(U))
 end
 
 @testset "Generic.MatAlg.row_swapping" begin
