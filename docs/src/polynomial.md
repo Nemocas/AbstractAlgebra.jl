@@ -781,8 +781,7 @@ p = primpart(k*(x^2 + 1))
 ### Evaluation, composition and substitution
 
 ```@docs
-evaluate{T <: RingElem}(::PolyRingElem{T}, ::T)
-evaluate(::PolyRingElem, ::Integer)
+evaluate(::PolyRingElem, b::T) where T <: RingElement
 ```
 
 ```@docs
