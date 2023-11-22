@@ -767,8 +767,12 @@ export _checkbounds
 export @alias
 export @attr
 export @attributes
+export @free_associative_algebra
+export @laurent_polynomial_ring
 export @perm_str
 export @polynomial_ring
+export @power_series_ring
+export @rational_function_field
 export abs_series
 export abs_series_type
 export AbsPowerSeriesRing
@@ -1229,11 +1233,22 @@ export Generic
 
 ###############################################################################
 #
-#   Polynomial Ring S, x = R["x"] syntax
+#   misc
+#
+###############################################################################
+
+include("misc/ProductIterator.jl")
+include("misc/Evaluate.jl")
+include("misc/VarNames.jl")
+
+###############################################################################
+#
+#   Polynomial Ring S, x = R[:x] syntax
 #
 ###############################################################################
 
 getindex(R::NCRing, s::VarName) = polynomial_ring(R, s)
+# `R[:x, :y]` returns `S, [x, y]` instead of `S, x, y`
 getindex(R::NCRing, s::VarName, ss::VarName...) =
    polynomial_ring(R, [Symbol(x) for x in (s, ss...)])
 
@@ -1263,15 +1278,6 @@ Base.typed_hcat(R::NCRing, args...) = _matrix(R, hcat(args...))
 Base.typed_vcat(R::NCRing, args...) = _matrix(R, vcat(args...))
 _matrix(R::NCRing, a::AbstractVector) = matrix(R, length(a), isempty(a) ? 0 : 1, a)
 _matrix(R::NCRing, a::AbstractMatrix) = matrix(R, a)
-
-###############################################################################
-#
-#   misc
-#
-###############################################################################
-
-include("misc/ProductIterator.jl")
-include("misc/Evaluate.jl")
 
 ###############################################################################
 #

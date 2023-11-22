@@ -1350,36 +1350,116 @@ end
 ###############################################################################
 
 @doc raw"""
-    polynomial_ring(R::Ring, s::Vector{T}; cached::Bool = true, ordering::Symbol = :lex) where T <: VarName
+    polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached=true, ordering=:lex)
 
-Given a base ring `R` and a vector `s` of variable names $x1, x2, \dots$ specifying
-how the generators (variables) should be printed, return a tuple `S, [x1, x2, ...]`
-representing the new polynomial ring $S = R[x1, x2, ...]$ and the generators
-$x1, x2, \dots$ of the polynomial ring.
+Given a coefficient ring `R` and variable names, say `varnames = [:x1, :x2, ...]`,
+return a tuple `S, [x1, x2, ...]` of the polynomial ring $S = R[x1, x2, \dots]$
+and its generators $x1, x2, \dots$.
 
-Mathematically the object `S` depends only on `R` and `x1, x2, ...` and by
-default it will be cached, i.e., if `polynomial_ring` is invoked again with the
-same arguments, the same (*identical*) ring is returned. Setting the optional
-argument `cached` to `false` ensures a distinct new ring is returned, and will
-also prevent it from being cached.
+By default (`cached=true`), the output `S` will be cached, i.e. if
+`polynomial_ring` is invoked again with the same arguments, the same
+(*identical*) ring is returned. Setting `cached` to `false` ensures a distinct
+new ring is returned, and will also prevent it from being cached.
 
 The `ordering` of the polynomial ring can be one of `:lex`, `:deglex` or `:degrevlex`.
+
+See also: [`polynomial_ring(::Ring, ::Vararg)`](@ref), [`@polynomial_ring`](@ref).
+
+# Example
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S, generators = polynomial_ring(ZZ, [:x, :y, :z])
+(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
+```
 """
-polynomial_ring(R::Ring, s::AbstractVector{T}; kw...) where T<:VarName =
-   polynomial_ring(R, Symbol[Symbol(x) for x in s]; kw...)
-
-polynomial_ring(R::Ring, s::Tuple{VarName,Vararg{VarName}}; kw...) =
-   polynomial_ring(R, Symbol[Symbol(x) for x in s]; kw...)
-
-polynomial_ring(R::Ring, s::Tuple{}; kw...) = 
-   polynomial_ring(R, Symbol[]; kw...)
-
 function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
    S = polynomial_ring_only(R, s; kw...)
    (S, gens(S))
 end
 
+"""
+    polynomial_ring(R::Ring, varnames...; cached=true, ordering=:lex)
+    polynomial_ring(R::Ring, varnames::Tuple; cached=true, ordering=:lex)
+
+Like [`polynomial_ring(::Ring, ::Vector{Symbol})`](@ref) with more ways to give
+`varnames` as specified in [`variable_names`](@ref).
+
+Return a tuple `S, generators...` with `generators[i]` corresponding to `varnames[i]`.
+
+!!! note
+    In the first method, `varnames` must not be empty, and if it consists of
+    only one name, the univariate [`polynomial_ring(R::NCRing, s::VarName)`](@ref)
+    method is called instead.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S, a, b, c = polynomial_ring(ZZ, :a, :b, :c)
+(Multivariate polynomial ring in 3 variables over integers, a, b, c)
+
+julia> polynomial_ring(ZZ, :a, :b, :c) == polynomial_ring(ZZ, (:a, :b, :c))
+true
+
+julia> S, x, y = polynomial_ring(ZZ, :x => (1:2, 1:2), :y => 1:3);
+
+julia> S
+Multivariate polynomial ring in 7 variables x[1,1], x[2,1], x[1,2], x[2,2], ..., y[3]
+  over integers
+
+julia> x
+2×2 Matrix{AbstractAlgebra.Generic.MPoly{BigInt}}:
+ x[1,1]  x[1,2]
+ x[2,1]  x[2,2]
+
+julia> y
+3-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
+ y[1]
+ y[2]
+ y[3]
+```
+"""
+polynomial_ring(R::Ring, varnames...)
+
 @doc raw"""
+    polynomial_ring(R::Ring, n::Int, s::Symbol=:x; cached=true, ordering=:lex)
+
+Same as [`polynomial_ring(::Ring, ["s$i" for i in 1:n])`](@ref polynomial_ring(::Ring, ::Vector{Symbol})).
+
+# Example
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S, x = polynomial_ring(ZZ, 3)
+(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x1, x2, x3])
+```
+"""
+polynomial_ring(R::Ring, n::Int, s::Symbol=:x)
+
+"""
+    @polynomial_ring(R::Ring, varnames...; cached=true, ordering=:lex)
+
+Return polynomial ring from [`polynomial_ring(::Ring, ::Vararg)`](@ref) and
+introduce the generators into the current scope.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> S = @polynomial_ring(ZZ, "x#" => (1:2, 1:2), "y#" => 1:3)
+Multivariate polynomial ring in 7 variables x11, x21, x12, x22, ..., y3
+  over integers
+
+julia> x11, x21, x12, x22
+(x11, x21, x12, x22)
+
+julia> y1, y2, y3
+(y1, y2, y3)
+
+julia> (S, [x11 x12; x21 x22], [y1, y2, y3]) == polynomial_ring(ZZ, "x#" => (1:2, 1:2), "y#" => 1:3)
+true
+```
+"""
+:(@polynomial_ring)
+
+"""
     polynomial_ring_only(R::Ring, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Bool=true)
 
 Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the
@@ -1390,81 +1470,5 @@ polynomial_ring_only(R::T, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Boo
 
 # Alternative constructors
 
-@doc raw"""
-    polynomial_ring(R::Ring, n::Int, s::VarName = :x; cached, ordering)
-
-Given a symbol, string or character `s` and a number of variables `n` will
-do the same as the first constructor except that the variables will be
-automatically numbered. For example if `s` is the string `x` and `n = 3` then
-the variables will print as `x1`, `x2`, `x3`.
-"""
-polynomial_ring(R::Ring, n::Int, s::VarName=:x; kw...) =
-   polynomial_ring(R, Symbol.(s, 1:n); kw...)
-
 MPolyRing(R::Ring, n::Int) =
    polynomial_ring_only(R, Symbol.(:x, 1:n); cached=false)
-
-################################################################################
-#
-#  Fancy macro
-#
-################################################################################
-
-function build_names(prefix, indices...)
-   map(i -> "$(prefix)[$(join(i, ","))]", Iterators.product(indices...))
-end
-
-function build_variable(arg::Symbol)
-   t = gensym()
-   return t, :($(esc(t)) = String[$"$arg"])
-end
-
-function build_variable(arg::Expr)
-   isa(arg, Expr) || error("Expected $arg to be a variable name")
-   Base.Meta.isexpr(arg, :ref) || error("Expected $arg to be of the form varname[idxset]")
-   (2 ≤ length(arg.args)) || error("Expected $arg to have at least one index set")
-   varname = arg.args[1]
-   prefix = string(varname)
-   t = gensym()
-   return t, :($(esc(t)) = build_names($prefix, $(esc.(arg.args[2:end])...)))
-end
-
-function build_variables_strings(args)
-   names = Symbol[]
-   exprs = Expr[]
-   for arg in args
-     name_var, define_names = build_variable(arg)
-     push!(exprs, define_names)
-     #push!(exprs, :(print($(esc(name_var)))))
-     push!(names, name_var)
-   end
-   return names, exprs
-end
-
-macro polynomial_ring(R, args...)
-   names, exprs = build_variables_strings(args)
-   all_names = gensym()
-   push!(exprs, :($(esc(all_names)) = String[]))
-   for t in names
-      push!(exprs, :(append!($(esc(all_names)), reshape($(esc(t)), length($(esc(t)))))))
-   end
-   ring1 = gensym()
-   ring2 = gensym()
-   push!(exprs, :($(Expr(:tuple, esc(ring1), esc(ring2))) =
-                 polynomial_ring($(esc(R)), $(esc(all_names)))))
-   vars = Symbol[]
-   k = gensym()
-   push!(exprs, :($(esc(k)) = 0))
-   for (i, t) in enumerate(names)
-      var_sym = gensym()
-      if args[i] isa Symbol
-         push!(exprs, :($(esc(var_sym)) = ($(esc(ring2)))[$(esc(k)) + 1]))
-      else
-         push!(exprs, :($(esc(var_sym)) = elem_type($(esc(ring1)))[($(esc(ring2)))[$(esc(k)) + i] for (i,_) in enumerate($(esc(t)))]))
-      end
-      push!(vars, var_sym)
-      push!(exprs, :($(esc(k)) = $(esc(k)) + length($(esc(t)))))
-   end
-   res = :($(foldl((x,y) -> :($x; $y), exprs, init=:())); $(Expr(:tuple, esc(ring1), esc.(vars)...)))
-   return res
-end

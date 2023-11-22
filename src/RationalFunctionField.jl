@@ -11,9 +11,5 @@
 ###############################################################################
 
 function rational_function_field(k::Field, s::VarName; cached::Bool=true)
-   return Generic.RationalFunctionField(k, Symbol(s); cached=cached)
-end
-
-function rational_function_field(k::Field, s::AbstractVector{<:VarName}; cached::Bool=true)
-   return Generic.RationalFunctionField(k, [Symbol(si) for si in s]; cached=cached)
+   return Generic.rational_function_field(k, Symbol(s); cached=cached)
 end

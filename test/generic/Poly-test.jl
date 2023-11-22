@@ -110,12 +110,15 @@ end
       Rx4 = polynomial_ring(ZZ, GenericString("x"))
       Rx5 = ZZ[:x]
       Rx6 = ZZ[GenericString("x")]
+      x = nothing
+      Rx7 = @polynomial_ring(ZZ, :x)
 
       @test Rx1 == Rx2
       @test Rx1 == Rx3
       @test Rx1 == Rx4
       @test Rx1 == Rx5
       @test Rx1 == Rx6
+      @test Rx1 == (Rx7, x)
    end
 end
 
