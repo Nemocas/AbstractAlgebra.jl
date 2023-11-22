@@ -80,6 +80,12 @@ function minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {
    return minpoly(S, MS, charpoly_only)
 end
 
+function minpoly(M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+   R = base_ring(M)
+   Rx, x = polynomial_ring(R; cached=false)
+   return minpoly(Rx, M, charpoly_only)
+end
+
 ###############################################################################
 #
 #   Unsafe operators
