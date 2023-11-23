@@ -121,8 +121,6 @@ parent_type(::Type{LocElem{T}}) where {T} = Loc{T}
 
 base_ring(L::Loc) = L.base_ring
 
-base_ring(a::LocElem) = base_ring(parent(a))
-
 parent(a::LocElem) = a.parent
 
 function check_parent(a::LocElem{T}, b::LocElem{T})  where {T <: RingElem}

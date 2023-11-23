@@ -29,8 +29,6 @@ base_ring_type(::Type{SeriesRing{T}}) where T <: RingElement = parent_type(T)
 
 base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-base_ring(a::SeriesElem) = base_ring(parent(a))
-
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: SeriesElem{S}}
    return is_domain_type(S)
 end

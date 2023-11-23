@@ -10,10 +10,6 @@
 #
 ###############################################################################
 
-base_ring(a::MPolyRingElem{T}) where T <: RingElement = base_ring(parent(a))
-
-coefficient_ring(a::MPolyRingElem) = base_ring(a)
-
 coefficient_ring(R::MPolyRing) = base_ring(R)
 
 @doc raw"""

@@ -98,6 +98,11 @@ Union{}
 ```
 """
 function base_ring end
+base_ring(x::ModuleElem) = base_ring(parent(x))
+base_ring(x::NCRingElement) = base_ring(parent(x))
+
+# generic coefficient_ring method
+coefficient_ring(x::NCRingElement) = coefficient_ring(parent(x))
 
 ###############################################################################
 #

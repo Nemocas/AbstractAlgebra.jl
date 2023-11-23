@@ -26,9 +26,7 @@ end
 
 base_ring_type(::Type{FreeAssAlgebra{T}}) where T <: RingElement = parent_type(T)
 
-function base_ring(a::FreeAssAlgebra{T}) where T <: RingElement
-    return a.base_ring::parent_type(T)
-end
+base_ring(a::FreeAssAlgebra{T}) where T <: RingElement = a.base_ring::parent_type(T)
 
 function symbols(a::FreeAssAlgebra)
     return a.S
