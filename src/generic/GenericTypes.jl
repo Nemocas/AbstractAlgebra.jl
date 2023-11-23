@@ -927,7 +927,7 @@ end
 
 ###############################################################################
 #
-#   FactoredFracField / FactoredFrac
+#   FactoredFracField / FactoredFracFieldElem
 #
 ###############################################################################
 
@@ -952,7 +952,7 @@ end
 # the object owns the .terms vector but not necessarily its entries, so mutating
 # the vector is allowed when mutating the object but be aware before mutating
 # any entry of the vector
-mutable struct FactoredFrac{T <: RingElement} <: AbstractAlgebra.FracElem{T}
+mutable struct FactoredFracFieldElem{T <: RingElement} <: AbstractAlgebra.FracElem{T}
    unit::T
    terms::Vector{FactoredFracTerm{T}}
    parent::FactoredFracField{T}

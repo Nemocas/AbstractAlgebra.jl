@@ -21,7 +21,7 @@ Parent objects of such fraction elements have type `Generic.FracField{T}`.
 
 ## Factored fraction types
 
-AbstractAlgebra.jl also implements a fraction type `Generic.FactoredFrac{T}`
+AbstractAlgebra.jl also implements a fraction type `Generic.FactoredFracFieldElem{T}`
 with parent objects of such fractions having type `Generic.FactoredFracField{T}`.
 As opposed to the fractions of type `Generic.FracFieldElem{T}`, which are just a
 numerator and denominator, these fractions are maintained in factored form as
@@ -394,7 +394,7 @@ julia> g = rand(S, -1:3, -10:10)
 
 ### Extra functionality for factored fractions
 
-The `Generic.FactoredFrac{T}` type implements an interface similar to that of
+The `Generic.FactoredFracFieldElem{T}` type implements an interface similar to that of
 the `Fac{T}` type for iterating over the terms in the factorisation. There is
 also the function `push_term!(a, b, e)` for efficiently performing `a *= b^e`,
 and the function `normalise` returns relatively prime terms.
