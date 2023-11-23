@@ -80,8 +80,8 @@ end
 
 
 function gcd(
-  a::MPolyRingElem{Generic.Frac{T}},
-  b::MPolyRingElem{Generic.Frac{T}}
+  a::MPolyRingElem{Generic.FracFieldElem{T}},
+  b::MPolyRingElem{Generic.FracFieldElem{T}}
 ) where T <: Union{PolyRingElem, MPolyRingElem}
 
   R = parent(a)                   # Q(t1, t2)[x1, x2]
@@ -94,8 +94,8 @@ function gcd(
 end
 
 function gcd(
-  a::PolyRingElem{Generic.Frac{T}},
-  b::PolyRingElem{Generic.Frac{T}}
+  a::PolyRingElem{Generic.FracFieldElem{T}},
+  b::PolyRingElem{Generic.FracFieldElem{T}}
 ) where T <: Union{PolyRingElem, MPolyRingElem}
 
   R = parent(a)                   # Q(t1, t2)[x1, x2]
@@ -122,8 +122,8 @@ function _convert_frac_fac(R, u, fac)
 end
 
 function factor(
-  a::Union{MPolyRingElem{Generic.Frac{T}},
-           PolyRingElem{Generic.Frac{T}}}
+  a::Union{MPolyRingElem{Generic.FracFieldElem{T}},
+           PolyRingElem{Generic.FracFieldElem{T}}}
 ) where T <: Union{PolyRingElem, MPolyRingElem}
 
   R = parent(a)                   # Q(t1, t2)[x1, x2]
@@ -134,8 +134,8 @@ function factor(
 end
 
 function factor_squarefree(
-  a::Union{MPolyRingElem{Generic.Frac{T}},
-           PolyRingElem{Generic.Frac{T}}}
+  a::Union{MPolyRingElem{Generic.FracFieldElem{T}},
+           PolyRingElem{Generic.FracFieldElem{T}}}
 ) where T <: Union{PolyRingElem, MPolyRingElem}
 
   R = parent(a)                   # Q(t1, t2)[x1, x2]

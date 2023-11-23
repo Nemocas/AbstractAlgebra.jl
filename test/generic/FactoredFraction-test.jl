@@ -206,7 +206,7 @@ end
     @test isa(T(), Generic.FactoredFrac)
     @test isa(T(x + 3)//(x^2 + 2), Generic.FactoredFrac)
     @test isa(T(x + 3)//12, Generic.FactoredFrac)
-    @test isa(12//(x + 2), Generic.Frac)
+    @test isa(12//(x + 2), Generic.FracFieldElem)
     @test isa(12//(T(x) + 2), Generic.FactoredFrac)
     @test isa((x + 1)//T(x + 2, x + 1), Generic.FactoredFrac)
     @test isa(T(x + 2, x + 1)//(x + 1), Generic.FactoredFrac)

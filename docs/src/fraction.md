@@ -13,7 +13,7 @@ abstract type hierarchy.
 
 ## Generic fraction types
 
-AbstractAlgebra.jl implements a generic fraction type `Generic.Frac{T}`
+AbstractAlgebra.jl implements a generic fraction type `Generic.FracFieldElem{T}`
 where `T` is the type of elements of the base ring. See the file
 `src/generic/GenericTypes.jl` for details.
 
@@ -23,7 +23,7 @@ Parent objects of such fraction elements have type `Generic.FracField{T}`.
 
 AbstractAlgebra.jl also implements a fraction type `Generic.FactoredFrac{T}`
 with parent objects of such fractions having type `Generic.FactoredFracField{T}`.
-As opposed to the fractions of type `Generic.Frac{T}`, which are just a
+As opposed to the fractions of type `Generic.FracFieldElem{T}`, which are just a
 numerator and denominator, these fractions are maintained in factored form as
 much as possible.
 

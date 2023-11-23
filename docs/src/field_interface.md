@@ -15,7 +15,7 @@ For example, the generic fraction field type in AbstractAlgebra.jl provides two
 types in `generic/GenericTypes.jl`: 
 
   - `Generic.FracField{T}` for the parent objects
-  - `Generic.Frac{T}` for the actual fractions
+  - `Generic.FracFieldElem{T}` for the actual fractions
 
 The parent type must belong to `Field` and the element type must belong
 to `FieldElem`. Of course, the types may belong to these abstract types

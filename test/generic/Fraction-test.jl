@@ -1,45 +1,45 @@
-@testset "Generic.Frac.constructors" begin
+@testset "Generic.FracFieldElem.constructors" begin
    S, x = polynomial_ring(ZZ, "x")
    T = fraction_field(S)
 
    @test fraction_field(S, cached = true) === fraction_field(S, cached = true)
    @test fraction_field(S, cached = false) !== fraction_field(S, cached = true)
 
-   @test elem_type(T) == Generic.Frac{elem_type(S)}
-   @test elem_type(Generic.FracField{elem_type(S)}) == Generic.Frac{elem_type(S)}
-   @test parent_type(Generic.Frac{elem_type(S)}) == Generic.FracField{elem_type(S)}
+   @test elem_type(T) == Generic.FracFieldElem{elem_type(S)}
+   @test elem_type(Generic.FracField{elem_type(S)}) == Generic.FracFieldElem{elem_type(S)}
+   @test parent_type(Generic.FracFieldElem{elem_type(S)}) == Generic.FracField{elem_type(S)}
 
    @test isa(T, Generic.FracField)
 
-   @test isa(T(3), Generic.Frac)
+   @test isa(T(3), Generic.FracFieldElem)
 
-   @test isa(T(BigInt(7)), Generic.Frac)
+   @test isa(T(BigInt(7)), Generic.FracFieldElem)
 
-   @test isa(T(x + 2), Generic.Frac)
+   @test isa(T(x + 2), Generic.FracFieldElem)
 
-   @test isa(T(3, 7), Generic.Frac)
+   @test isa(T(3, 7), Generic.FracFieldElem)
 
-   @test isa(T(x + 2, x + 1), Generic.Frac)
+   @test isa(T(x + 2, x + 1), Generic.FracFieldElem)
 
-   @test isa(T(x + 2, 4), Generic.Frac)
+   @test isa(T(x + 2, 4), Generic.FracFieldElem)
 
-   @test isa(T(3, x + 1), Generic.Frac)
+   @test isa(T(3, x + 1), Generic.FracFieldElem)
 
-   @test isa(T(T(x + 2)), Generic.Frac)
+   @test isa(T(T(x + 2)), Generic.FracFieldElem)
 
-   @test isa(T(), Generic.Frac)
+   @test isa(T(), Generic.FracFieldElem)
 
-   @test isa((x + 3)//(x^2 + 2), Generic.Frac)
+   @test isa((x + 3)//(x^2 + 2), Generic.FracFieldElem)
 
-   @test isa((x + 3)//12, Generic.Frac)
+   @test isa((x + 3)//12, Generic.FracFieldElem)
 
-   @test isa(12//(x + 2), Generic.Frac)
+   @test isa(12//(x + 2), Generic.FracFieldElem)
 
-   @test isa((x + 1)//T(x + 2, x + 1), Generic.Frac)
+   @test isa((x + 1)//T(x + 2, x + 1), Generic.FracFieldElem)
 
-   @test isa(T(x + 2, x + 1)//(x + 1), Generic.Frac)
+   @test isa(T(x + 2, x + 1)//(x + 1), Generic.FracFieldElem)
 
-   @test isa(T(x + 2, x + 1)//T(x, x + 2), Generic.Frac)
+   @test isa(T(x + 2, x + 1)//T(x, x + 2), Generic.FracFieldElem)
 
    TT = fraction_field(polynomial_ring(QQ, "x")[1])
    a = TT(1)
@@ -52,7 +52,7 @@
    @test !(b in keys(Dict(a => 1)))
 end
 
-@testset "Generic.Frac.printing" begin
+@testset "Generic.FracFieldElem.printing" begin
    S, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 
    @test string((x+y)//z) == "(x + y)//z"
@@ -62,14 +62,14 @@ end
 end
 
 
-@testset "Generic.Frac.rand" begin
+@testset "Generic.FracFieldElem.rand" begin
    S, x = polynomial_ring(ZZ, "x")
    K = fraction_field(S)
 
    test_rand(K, -1:3, -3:3)
 end
 
-@testset "Generic.Frac.manipulation" begin
+@testset "Generic.FracFieldElem.manipulation" begin
    R = fraction_field(ZZ)
    S, x = polynomial_ring(ZZ, "x")
 
@@ -92,13 +92,13 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "Generic.Frac.unary_ops" begin
+@testset "Generic.FracFieldElem.unary_ops" begin
    S, x = polynomial_ring(ZZ, "x")
 
    @test -((x + 1)//(-x^2 + 1)) == 1//(x - 1)
 end
 
-@testset "Generic.Frac.binary_ops" begin
+@testset "Generic.FracFieldElem.binary_ops" begin
    S, x = polynomial_ring(ZZ, "x")
    K = fraction_field(S)
 
@@ -114,7 +114,7 @@ end
    end
 end
 
-@testset "Generic.Frac.adhoc_binary" begin
+@testset "Generic.FracFieldElem.adhoc_binary" begin
    S, x = polynomial_ring(ZZ, "x")
 
    a = (-x + 1)//(2x^2 + 3)
@@ -145,7 +145,7 @@ end
    @test (2//3)*a == (-2*x + 2)//(6*x^2 + 9)
 end
 
-@testset "Generic.Frac.comparison" begin
+@testset "Generic.FracFieldElem.comparison" begin
    S, x = polynomial_ring(ZZ, "x")
 
    a = -((x + 1)//(-x^2 + 1))
@@ -155,7 +155,7 @@ end
    @test isequal(a, 1//(x - 1))
 end
 
-@testset "Generic.Frac.adhoc_comparison" begin
+@testset "Generic.FracFieldElem.adhoc_comparison" begin
    S, x = polynomial_ring(ZZ, "x")
 
    a = 1//(x - 1)
@@ -173,7 +173,7 @@ end
    @test 2//3 == S(2)//3
 end
 
-@testset "Generic.Frac.powering" begin
+@testset "Generic.FracFieldElem.powering" begin
    S, x = polynomial_ring(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1)
@@ -181,7 +181,7 @@ end
    @test a^-12 == x^12-12*x^11+66*x^10-220*x^9+495*x^8-792*x^7+924*x^6-792*x^5+495*x^4-220*x^3+66*x^2-12*x+1
 end
 
-@testset "Generic.Frac.inversion" begin
+@testset "Generic.FracFieldElem.inversion" begin
    S, x = polynomial_ring(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1)
@@ -189,7 +189,7 @@ end
    @test inv(a) == -x + 1
 end
 
-@testset "Generic.Frac.exact_division" begin
+@testset "Generic.FracFieldElem.exact_division" begin
    S, x = polynomial_ring(ZZ, "x")
    K = fraction_field(S)
 
@@ -211,7 +211,7 @@ end
    end
 end
 
-@testset "Generic.Frac.adhoc_exact_division" begin
+@testset "Generic.FracFieldElem.adhoc_exact_division" begin
    S, x = polynomial_ring(ZZ, "x")
 
    a = (-x + 1)//(2x^2 + 3)
@@ -226,7 +226,7 @@ end
    @test 5//a == (-10*x^2-15)//(x-1)
 end
 
-@testset "Generic.Frac.divides" begin
+@testset "Generic.FracFieldElem.divides" begin
    R, x = polynomial_ring(ZZ, "x")
    S = fraction_field(R)
 
@@ -242,7 +242,7 @@ end
    end
 end
 
-@testset "Generic.Frac.evaluate" begin
+@testset "Generic.FracFieldElem.evaluate" begin
    R = residue_ring(ZZ, 5)
    S, x = polynomial_ring(R, "x")
 
@@ -259,7 +259,7 @@ end
    @test evaluate(f, [ZZ(1), ZZ(2)]) == ZZ(3)//ZZ(4)
 end
 
-@testset "Generic.Frac.derivative" begin
+@testset "Generic.FracFieldElem.derivative" begin
    R, x = polynomial_ring(QQ, "x")
 
    f = (x^2 + 1)//2x
@@ -281,7 +281,7 @@ end
    @test derivative(f, 2) == (2x*y + y^2)//(x^2 + 2x*y + y^2)
 end
 
-@testset "Generic.Frac.square_root" begin
+@testset "Generic.FracFieldElem.square_root" begin
    R, x = polynomial_ring(QQ, "x")
    S = fraction_field(R)
 
@@ -312,7 +312,7 @@ end
    @test !f2   
 end
 
-@testset "Generic.Frac.gcd" begin
+@testset "Generic.FracFieldElem.gcd" begin
    S, x = polynomial_ring(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1) - x//(2x + 1)
@@ -321,7 +321,7 @@ end
 end
 
 if @isdefined QQFieldElem
-    @testset "Generic.Frac.remove_valuation" begin
+    @testset "Generic.FracFieldElem.remove_valuation" begin
         a = QQFieldElem(2, 3)
 
         @test remove(a, BigInt(2)) == (1, QQFieldElem(1, 3))
@@ -332,14 +332,14 @@ if @isdefined QQFieldElem
     end
 end
 
-@testset "Generic.Frac.promotion" begin
+@testset "Generic.FracFieldElem.promotion" begin
    S, x = polynomial_ring(QQ, "x")
    F = fraction_field(S)
    T = elem_type(F)
    @test AbstractAlgebra.promote_rule(T, T) == T
 end
 
-@testset "Generic.Frac.factor" begin
+@testset "Generic.FracFieldElem.factor" begin
    S, x = polynomial_ring(QQ, "x")
    F = fraction_field(S)
    a = (x + 1)//(x + 2)
