@@ -28,10 +28,6 @@ function base_ring(F::FactoredFracField{T}) where T <: RingElement
     return F.base_ring::parent_type(T)
 end
 
-function base_ring(a::FactoredFracFieldElem{T}) where T <: RingElement
-    return base_ring(parent(a))
-end
-
 function characteristic(F::FactoredFracField{T}) where T <: RingElement
    return characteristic(base_ring(F))
 end

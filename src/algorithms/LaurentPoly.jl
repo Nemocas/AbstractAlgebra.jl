@@ -13,10 +13,6 @@
 #
 ###############################################################################
 
-coefficient_ring(p::LaurentPolyRingElem) = coefficient_ring(parent(p))
-
-base_ring(p::LaurentPolyRingElem) = base_ring(parent(p))
-
 is_domain_type(::Type{<:LaurentPolyRingElem{T}}) where {T} = is_domain_type(T)
 
 is_exact_type(::Type{<:LaurentPolyRingElem{T}}) where {T} = is_exact_type(T)

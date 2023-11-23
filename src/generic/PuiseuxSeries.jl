@@ -53,8 +53,6 @@ base_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = base_ring(laurent_ri
 
 base_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = base_ring(laurent_ring(R))
 
-base_ring(a::PuiseuxSeriesElem) = base_ring(parent(a))
-
 @doc raw"""
     max_precision(R::PuiseuxSeriesRing{T}) where T <: RingElement
 

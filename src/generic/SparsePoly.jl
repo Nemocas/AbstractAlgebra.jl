@@ -64,8 +64,6 @@ base_ring_type(::Type{SparsePolyRing{T}}) where T <: RingElement = parent_type(T
 
 base_ring(R::SparsePolyRing{T}) where {T <: RingElement} = R.base_ring::parent_type(T)
 
-base_ring(a::SparsePoly) = base_ring(parent(a))
-
 parent(a::SparsePoly) = a.parent
 
 function Base.deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingElement}
