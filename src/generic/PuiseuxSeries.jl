@@ -343,7 +343,7 @@ function _make_parent(g, p::PuiseuxSeriesElem, cached::Bool)
    S = parent(p)
    sym = var(S)
    max_prec = max_precision(S)
-   return AbstractAlgebra.PuiseuxSeriesRing(R, max_prec, sym; cached=cached)[1]
+   return AbstractAlgebra.puiseux_series_ring(R, max_prec, sym; cached=cached)[1]
 end
 
 function map_coefficients(g, p::PuiseuxSeriesElem{<:RingElement};
@@ -366,7 +366,7 @@ end
 ################################################################################
 
 function _change_puiseux_series_ring(R, Rx, cached)
-   P, _ = AbstractAlgebra.PuiseuxSeriesRing(R, max_precision(Rx),
+   P, _ = AbstractAlgebra.puiseux_series_ring(R, max_precision(Rx),
                                                var(Rx), cached = cached)
    return P
 end
