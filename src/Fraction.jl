@@ -49,7 +49,7 @@ function //(x::T, y::T) where {T <: RingElem}
    R = parent(x)
    iszero(y) && throw(DivideError())
    g = gcd(x, y)
-   z = Generic.Frac{T}(divexact(x, g), divexact(y, g))
+   z = Generic.FracFieldElem{T}(divexact(x, g), divexact(y, g))
    try
       z.parent = Generic.FracDict[R]
    catch

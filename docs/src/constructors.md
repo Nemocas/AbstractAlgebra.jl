@@ -73,7 +73,8 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 | $S = R((x))$ (to precision $n$)      | `S, x = laurent_series_ring(R, n, :x)`                |
 | $S = K((x))$ (to precision $n$)      | `S, x = laurent_series_field(K, n, :x)`               |
 | $S = R((x, y))$ (to precision $n$)   | `S, (x, y) = laurent_polynomial_ring(R, n, [:x, :y])` |
-| Puiseux series ring to precision $n$ | `S, x = PuiseuxSeriesRing(R, n, :x)`                  |
+| Puiseux series ring to precision $n$ | `S, x = puiseux_series_ring(R, n, :x)`                |
+| Puiseux series field to precision $n$| `S, x = puiseux_series_field(R, n, :x)`               |
 | $S = K(x)(y)/(f)$                    | `S, y = function_field(f, :y)` with $f\in K(x)[t]$    |
 | $S = \mathrm{Frac}_R$                | `S = fraction_field(R)`                               |
 | $S = R/(f)$                          | `S = residue_ring(R, f)`                              |

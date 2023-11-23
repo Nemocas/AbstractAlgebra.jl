@@ -875,7 +875,7 @@ end
 
 ###############################################################################
 #
-#   FracField / Frac
+#   FracField / FracFieldElem
 #
 ###############################################################################
 
@@ -891,12 +891,12 @@ end
 
 const FracDict = CacheDictType{Ring, Ring}()
 
-mutable struct Frac{T <: RingElem} <: AbstractAlgebra.FracElem{T}
+mutable struct FracFieldElem{T <: RingElem} <: AbstractAlgebra.FracElem{T}
    num::T
    den::T
    parent::FracField{T}
 
-   Frac{T}(num::T, den::T) where T <: RingElem = new{T}(num, den)
+   FracFieldElem{T}(num::T, den::T) where T <: RingElem = new{T}(num, den)
 end
 
 ###############################################################################
@@ -927,7 +927,7 @@ end
 
 ###############################################################################
 #
-#   FactoredFracField / FactoredFrac
+#   FactoredFracField / FactoredFracFieldElem
 #
 ###############################################################################
 
@@ -952,7 +952,7 @@ end
 # the object owns the .terms vector but not necessarily its entries, so mutating
 # the vector is allowed when mutating the object but be aware before mutating
 # any entry of the vector
-mutable struct FactoredFrac{T <: RingElement} <: AbstractAlgebra.FracElem{T}
+mutable struct FactoredFracFieldElem{T <: RingElement} <: AbstractAlgebra.FracElem{T}
    unit::T
    terms::Vector{FactoredFracTerm{T}}
    parent::FactoredFracField{T}
@@ -980,10 +980,10 @@ end
 const RationalFunctionFieldDict = CacheDictType{Tuple{Field, Union{Symbol, Vector{Symbol}}}, Field}()
 
 mutable struct RationalFunctionFieldElem{T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} <: AbstractAlgebra.FieldElem
-   d::Frac{U}
+   d::FracFieldElem{U}
    parent::RationalFunctionField{T, U}
 
-   RationalFunctionFieldElem{T, U}(f::Frac{U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = new{T, U}(f)
+   RationalFunctionFieldElem{T, U}(f::FracFieldElem{U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = new{T, U}(f)
 end
 
 ###############################################################################

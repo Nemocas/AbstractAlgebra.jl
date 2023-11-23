@@ -10,16 +10,16 @@
 #
 ###############################################################################
 
-function parent(a::FactoredFrac{T}) where T <: RingElement
+function parent(a::FactoredFracFieldElem{T}) where T <: RingElement
     return a.parent
 end
 
-function parent_type(::Type{FactoredFrac{T}}) where {T <: RingElement}
+function parent_type(::Type{FactoredFracFieldElem{T}}) where {T <: RingElement}
     return FactoredFracField{T}
 end
 
 function elem_type(::Type{FactoredFracField{T}}) where {T <: RingElement}
-    return FactoredFrac{T}
+    return FactoredFracFieldElem{T}
 end
 
 base_ring_type(::Type{FactoredFracField{T}}) where T <: NCRingElement = parent_type(T)
@@ -63,12 +63,12 @@ function (F::FactoredFracField{T})(a::Rational) where T <: RingElem
     return F(numerator(a), denominator(a))
 end
 
-function (F::FactoredFracField{T})(a::AbstractAlgebra.Generic.Frac{T}) where T <: RingElement
+function (F::FactoredFracField{T})(a::AbstractAlgebra.Generic.FracFieldElem{T}) where T <: RingElement
     base_ring(F) == base_ring(a) || error("Could not coerce into $F")
     return _append_pow!(_make_base_elem(F, numerator(a)), denominator(a), -1)
 end
 
-function (F::FactoredFracField{T})(a::FactoredFrac{T}) where T
+function (F::FactoredFracField{T})(a::FactoredFracFieldElem{T}) where T
     F == parent(a) || error("Could not coerce into $F")
     return a
 end
@@ -86,8 +86,8 @@ end
 #
 ###############################################################################
 
-function Base.deepcopy_internal(a::FactoredFrac{T}, dict::IdDict) where T <: RingElement
-   return FactoredFrac{T}(deepcopy_internal(a.unit, dict),
+function Base.deepcopy_internal(a::FactoredFracFieldElem{T}, dict::IdDict) where T <: RingElement
+   return FactoredFracFieldElem{T}(deepcopy_internal(a.unit, dict),
                           deepcopy_internal(a.terms, dict),
                           a.parent)
 end
@@ -95,7 +95,7 @@ end
 # the non-expanding hash function would have to normalise the bases, and then
 # either sort the bases or combine the hashes of the bases in a commutative way
 
-function Base.numerator(a::FactoredFrac, canonicalise::Bool=true)
+function Base.numerator(a::FactoredFracFieldElem, canonicalise::Bool=true)
     z = unit(a)
     for (b, e) in a
         if canonicalise
@@ -110,7 +110,7 @@ function Base.numerator(a::FactoredFrac, canonicalise::Bool=true)
     return z
 end
 
-function Base.denominator(a::FactoredFrac, canonicalise::Bool=true)
+function Base.denominator(a::FactoredFracFieldElem, canonicalise::Bool=true)
     z = one(base_ring(a))
     for (b, e) in a
         if e < 0
@@ -125,22 +125,22 @@ function Base.denominator(a::FactoredFrac, canonicalise::Bool=true)
 end
 
 function one(F::FactoredFracField{T}) where T
-    FactoredFrac{T}(one(base_ring(F)), FactoredFracTerm{T}[], F)
+    FactoredFracFieldElem{T}(one(base_ring(F)), FactoredFracTerm{T}[], F)
 end
 
 function zero(F::FactoredFracField{T}) where T
-    FactoredFrac{T}(zero(base_ring(F)), FactoredFracTerm{T}[], F)
+    FactoredFracFieldElem{T}(zero(base_ring(F)), FactoredFracTerm{T}[], F)
 end
 
-function is_unit(a::FactoredFrac{T}) where T
+function is_unit(a::FactoredFracFieldElem{T}) where T
     return !iszero(a)
 end
 
-function iszero(a::FactoredFrac{T}) where T
+function iszero(a::FactoredFracFieldElem{T}) where T
     return iszero(a.unit)
 end
 
-function isone(a::FactoredFrac{T}) where T
+function isone(a::FactoredFracFieldElem{T}) where T
     iszero(a.unit) && false
     for i in a.terms
         # if some base appears to a non-zero power and is not a unit and is
@@ -163,35 +163,35 @@ end
 #
 ###############################################################################
 
-function unit(a::FactoredFrac)
+function unit(a::FactoredFracFieldElem)
     return a.unit
 end
 
-function Base.iterate(a::FactoredFrac)
+function Base.iterate(a::FactoredFracFieldElem)
     t = Base.iterate(a.terms)
     return isnothing(t) ? t : ((t[1].base, t[1].exp), t[2])
 end
 
-function Base.iterate(a::FactoredFrac, b)
+function Base.iterate(a::FactoredFracFieldElem, b)
     t = Base.iterate(a.terms, b)
     return isnothing(t) ? t : ((t[1].base, t[1].exp), t[2])
 end
 
-function Base.eltype(::Type{FactoredFrac{T}}) where T
+function Base.eltype(::Type{FactoredFracFieldElem{T}}) where T
     return Tuple{T, Int}
 end
 
-function Base.length(a::FactoredFrac)
+function Base.length(a::FactoredFracFieldElem)
     Base.length(a.terms)
 end
 
-function push_term!(a::FactoredFrac{T}, b::T, e::Int) where T <: RingElement
+function push_term!(a::FactoredFracFieldElem{T}, b::T, e::Int) where T <: RingElement
     parent(b) == base_ring(a) || error("Incompatible parents")
     push!(a.terms, FactoredFracTerm{T}(b, e))
     return a
 end
 
-function push_term!(a::FactoredFrac{T}, b, e::Int) where T <: RingElement
+function push_term!(a::FactoredFracFieldElem{T}, b, e::Int) where T <: RingElement
     return push_term!(a, base_ring(a)(b), e)
 end
 
@@ -201,7 +201,7 @@ end
 #
 ###############################################################################
 
-function expressify(a::FactoredFrac; context = nothing)
+function expressify(a::FactoredFracFieldElem; context = nothing)
     n = Expr(:call, :*, expressify(a.unit, context = context))
     d = Expr(:call, :*)
     for t in a.terms
@@ -212,7 +212,7 @@ function expressify(a::FactoredFrac; context = nothing)
     return length(d.args) < 2 ? n : Expr(:call, :/, n, d)
 end
 
-@enable_all_show_via_expressify FactoredFrac
+@enable_all_show_via_expressify FactoredFracFieldElem
 
 function expressify(a::FactoredFracField; context = nothing)
     return Expr(:sequence, Expr(:text, "Factored fraction field of "),
@@ -227,58 +227,58 @@ end
 #
 ###############################################################################
 
-function ==(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
+function ==(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T
     (g, x, y) = _gcdhelper(a, b)
     return x == y
 end
 
-function +(a::FactoredFrac{T}, b::Rational) where T <: RingElem
+function +(a::FactoredFracFieldElem{T}, b::Rational) where T <: RingElem
    return a + parent(a)(b)
 end
 
-function +(a::FactoredFrac{T}, b::T) where T <: RingElem
+function +(a::FactoredFracFieldElem{T}, b::T) where T <: RingElem
    return a + parent(a)(b)
 end
 
-function +(b::Rational, a::FactoredFrac{T}) where T <: RingElem
+function +(b::Rational, a::FactoredFracFieldElem{T}) where T <: RingElem
    return parent(a)(b) + a
 end
 
-function +(b::T, a::FactoredFrac{T}) where T <: RingElem
+function +(b::T, a::FactoredFracFieldElem{T}) where T <: RingElem
    return parent(a)(b) + a
 end
 
-function +(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
+function +(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T
     (g, x, y) = _gcdhelper(a, b)
     return mul_by_base_elem(g, x + y)
 end
 
-function -(a::FactoredFrac{T}, b::Rational) where T <: RingElem
+function -(a::FactoredFracFieldElem{T}, b::Rational) where T <: RingElem
    return a - parent(a)(b)
 end
 
-function -(a::FactoredFrac{T}, b::T) where T <: RingElem
+function -(a::FactoredFracFieldElem{T}, b::T) where T <: RingElem
    return a - parent(a)(b)
 end
 
-function -(b::Rational, a::FactoredFrac{T}) where T <: RingElem
+function -(b::Rational, a::FactoredFracFieldElem{T}) where T <: RingElem
    return parent(a)(b) - a
 end
 
-function -(b::T, a::FactoredFrac{T}) where T <: RingElem
+function -(b::T, a::FactoredFracFieldElem{T}) where T <: RingElem
    return parent(a)(b) - a
 end
 
-function -(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
+function -(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T
     (g, x, y) = _gcdhelper(a, b)
     return mul_by_base_elem(g, x - y)
 end
 
-function -(a::FactoredFrac{T}) where T
-    return FactoredFrac{T}(-a.unit, a.terms, a.parent)
+function -(a::FactoredFracFieldElem{T}) where T
+    return FactoredFracFieldElem{T}(-a.unit, a.terms, a.parent)
 end
 
-function gcd(a::FactoredFrac{T}, b::FactoredFrac{T}) where T
+function gcd(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T
     (g, x, y) = _gcdhelper(a, b)
     return mul_by_base_elem(g, gcd(x, y))
 end
@@ -289,38 +289,38 @@ end
 #
 ###############################################################################
 
-function mul_by_base_elem(a::FactoredFrac{T}, b::T) where T <: RingElement
+function mul_by_base_elem(a::FactoredFracFieldElem{T}, b::T) where T <: RingElement
     F = parent(a)
     if iszero(b)
         return zero(F)
     else
-        z = FactoredFrac{T}(a.unit, map(copy, a.terms), F)
+        z = FactoredFracFieldElem{T}(a.unit, map(copy, a.terms), F)
         _append_pow_normalise!(z, b, 1, 1)
         return z
     end
 end
 
-function *(a::FactoredFrac{T}, b::T) where T <: RingElem
+function *(a::FactoredFracFieldElem{T}, b::T) where T <: RingElem
     parent(b) == base_ring(a) || error("Incompatible rings")
     return mul_by_base_elem(a, b)
 end
 
-function *(a::FactoredFrac{T}, b::Integer) where T <: RingElem
+function *(a::FactoredFracFieldElem{T}, b::Integer) where T <: RingElem
     return mul_by_base_elem(a, base_ring(a)(b))
 end
 
-function *(b::T, a::FactoredFrac{T}) where T <: RingElem
+function *(b::T, a::FactoredFracFieldElem{T}) where T <: RingElem
    return mul_by_base_elem(a, b)
 end
 
-function *(b::Integer, a::FactoredFrac{T}) where T <: RingElem
+function *(b::Integer, a::FactoredFracFieldElem{T}) where T <: RingElem
    return mul_by_base_elem(a, base_ring(a)(b))
 end
 
-function *(b::FactoredFrac{T}, c::FactoredFrac{T}) where T <: RingElement
+function *(b::FactoredFracFieldElem{T}, c::FactoredFracFieldElem{T}) where T <: RingElement
     parent(b) == parent(c) || error("Incompatible rings")
     input_is_good = _bases_are_coprime(b) && _bases_are_coprime(b)
-    z = FactoredFrac{T}(b.unit*c.unit, FactoredFracTerm{T}[], parent(b))
+    z = FactoredFracFieldElem{T}(b.unit*c.unit, FactoredFracTerm{T}[], parent(b))
     if iszero(z.unit)
         return z
     end
@@ -365,32 +365,32 @@ end
 #
 ###############################################################################
 
-function Base.inv(a::FactoredFrac{T}) where T
+function Base.inv(a::FactoredFracFieldElem{T}) where T
     z = FactoredFracTerm{T}[]
     for i in a.terms
         push!(z, FactoredFracTerm{T}(i.base, Base.checked_neg(i.exp)))
     end
-    return FactoredFrac{T}(inv(a.unit), z, parent(a))
+    return FactoredFracFieldElem{T}(inv(a.unit), z, parent(a))
 end
 
-function divexact(a::FactoredFrac{T}, b::FactoredFrac{T}; check::Bool = true) where T
+function divexact(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}; check::Bool = true) where T
     return a*inv(b)
 end
 
-function divexact(a::Integer, b::FactoredFrac{T}; check::Bool = true) where T
+function divexact(a::Integer, b::FactoredFracFieldElem{T}; check::Bool = true) where T
     return divexact(parent(b)(a), b, check = check)
 end
 
-function divexact(a::T, b::FactoredFrac{T}; check::Bool = true) where T <: RingElem
+function divexact(a::T, b::FactoredFracFieldElem{T}; check::Bool = true) where T <: RingElem
     return divexact(parent(b)(a), b, check = check)
 end
 
 #=
-function divexact(a::FactoredFrac{T}, b::Rational; check::Bool = true) where T <: RingElem
+function divexact(a::FactoredFracFieldElem{T}, b::Rational; check::Bool = true) where T <: RingElem
    return divexact(a, parent(a)(b), check = check)
 end
 
-function divexact(a::Rational, b::FactoredFrac{T}; check::Bool = true) where T <: RingElem
+function divexact(a::Rational, b::FactoredFracFieldElem{T}; check::Bool = true) where T <: RingElem
    return divexact(parent(b)(a), b, check = check)
 end
 =#
@@ -401,14 +401,14 @@ end
 #
 ###############################################################################
 
-function ^(a::FactoredFrac{T}, b::Int) where T
+function ^(a::FactoredFracFieldElem{T}, b::Int) where T
     z = FactoredFracTerm{T}[]
     if !iszero(b)
         for t in a.terms
             push!(z, FactoredFracTerm(t.base, Base.checked_mul(b, t.exp)))
         end
     end
-    return FactoredFrac{T}(_pow(a.unit, b), z, parent(a))
+    return FactoredFracFieldElem{T}(_pow(a.unit, b), z, parent(a))
 end
 
 ##############################################################################
@@ -417,7 +417,7 @@ end
 #
 ##############################################################################
 
-function evaluate(f::FactoredFrac{T}, v::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FactoredFracFieldElem{T}, v::Vector{U}) where {T <: RingElement, U <: RingElement}
     z = evaluate(unit(f), v)
     for (b, e) in f
         z *= evaluate(b, v)^e
@@ -425,7 +425,7 @@ function evaluate(f::FactoredFrac{T}, v::Vector{U}) where {T <: RingElement, U <
     return z
 end
 
-function evaluate(f::FactoredFrac{T}, v::U) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FactoredFracFieldElem{T}, v::U) where {T <: RingElement, U <: RingElement}
     z = evaluate(unit(f), v)
     for (b, e) in f
         z *= evaluate(b, v)^e
@@ -440,8 +440,8 @@ end
 ##############################################################################
 
 # Return the derivative with respect to the `i`-th variable.
-function derivative(a::FactoredFrac{T}, i::Int) where {T <: MPolyRingElem}
-    z = FactoredFrac{T}(one(base_ring(a)), FactoredFracTerm{T}[], parent(a))
+function derivative(a::FactoredFracFieldElem{T}, i::Int) where {T <: MPolyRingElem}
+    z = FactoredFracFieldElem{T}(one(base_ring(a)), FactoredFracTerm{T}[], parent(a))
     p = unit(a)
     for (b, e) in a
         p *= b
@@ -462,8 +462,8 @@ end
 #
 ################################################################################
 
-function remove(a::FactoredFrac{T}, p::T) where T <: RingElement
-    z = FactoredFrac{T}(unit(a), FactoredFracTerm{T}[], parent(a))
+function remove(a::FactoredFracFieldElem{T}, p::T) where T <: RingElement
+    z = FactoredFracFieldElem{T}(unit(a), FactoredFracTerm{T}[], parent(a))
     v = 0
     for (b, e) in a
         v1, b1 = remove(b, p)
@@ -480,21 +480,21 @@ end
 #
 ###############################################################################
 
-function zero!(c::FactoredFrac)
+function zero!(c::FactoredFracFieldElem)
     c.unit = zero!(c.unit)
     empty!(c.terms)
     return c
 end
 
-function mul!(c::FactoredFrac{T}, a::FactoredFrac{T}, b::FactoredFrac{T}) where T <: RingElement
+function mul!(c::FactoredFracFieldElem{T}, a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement
     return a*b
 end
 
-function addeq!(a::FactoredFrac{T}, b::FactoredFrac{T}) where T <: RingElement
+function addeq!(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement
     return a + b
 end
 
-function add!(c::FactoredFrac{T}, a::FactoredFrac{T}, b::FactoredFrac{T}) where T <: RingElement
+function add!(c::FactoredFracFieldElem{T}, a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement
     return a + b
 end
 
@@ -506,15 +506,15 @@ end
 
 function _make_base_elem(F::FactoredFracField{T}, a::T) where T <: RingElement
     if iszero(a) || is_unit(a)
-        return FactoredFrac{T}(a, FactoredFracTerm{T}[], F)
+        return FactoredFracFieldElem{T}(a, FactoredFracTerm{T}[], F)
     else
-        return FactoredFrac{T}(one(base_ring(F)), [FactoredFracTerm{T}(a, 1)], F)
+        return FactoredFracFieldElem{T}(one(base_ring(F)), [FactoredFracTerm{T}(a, 1)], F)
     end
 end
 
 # return a version of a with coprime bases
-function normalise(a::FactoredFrac{T}) where T
-    z = FactoredFrac{T}(a.unit, FactoredFracTerm{T}[], parent(a))
+function normalise(a::FactoredFracFieldElem{T}) where T
+    z = FactoredFracFieldElem{T}(a.unit, FactoredFracTerm{T}[], parent(a))
     if !iszero(z.unit)
         for i in a.terms
             _append_pow_normalise!(z, i.base, i.exp, 1)
@@ -536,7 +536,7 @@ function copy(a::FactoredFracTerm{T}) where T
     return FactoredFracTerm{T}(a.base, a.exp)
 end
 
-function _bases_are_coprime(a::FactoredFrac{T}) where T
+function _bases_are_coprime(a::FactoredFracFieldElem{T}) where T
     a = a.terms
     i = 1
     while i <= length(a)
@@ -553,7 +553,7 @@ function _bases_are_coprime(a::FactoredFrac{T}) where T
 end
 
 # bases are coprime and none are units
-function _bases_are_nice(a::FactoredFrac{T}) where T
+function _bases_are_nice(a::FactoredFracFieldElem{T}) where T
     if !_bases_are_coprime(a)
         return false
     end
@@ -566,7 +566,7 @@ function _bases_are_nice(a::FactoredFrac{T}) where T
 end
 
 # z *= f^e with no extra normalization
-function _append_pow!(z::FactoredFrac{T}, f::Vector{FactoredFracTerm{T}}, e::Int) where T
+function _append_pow!(z::FactoredFracFieldElem{T}, f::Vector{FactoredFracTerm{T}}, e::Int) where T
     for i in f
         ie = Base.checked_mul(i.exp, e)
         if !iszero(ie)
@@ -576,7 +576,7 @@ function _append_pow!(z::FactoredFrac{T}, f::Vector{FactoredFracTerm{T}}, e::Int
     return z
 end
 
-function _append_pow!(z::FactoredFrac{T}, f::T, e::Int) where T
+function _append_pow!(z::FactoredFracFieldElem{T}, f::T, e::Int) where T
     if !iszero(e)
         if is_unit(f)
             z.unit *= _pow(f, e)
@@ -588,7 +588,7 @@ function _append_pow!(z::FactoredFrac{T}, f::T, e::Int) where T
 end
 
 # z *= a^e with normalization
-function _append_pow_normalise!(z::FactoredFrac{T}, a::T, e::Int, i::Int) where T
+function _append_pow_normalise!(z::FactoredFracFieldElem{T}, a::T, e::Int, i::Int) where T
     iszero(e) && return z
     if iszero(a)
         z.unit = a
@@ -636,7 +636,7 @@ end
 
 # multiply l by p^e and return a such that
 # p*a = b*g and gcd(a, g) == 1
-function _append_coprimefac!(l::FactoredFrac{T}, b::T, e::Int, g::T) where T
+function _append_coprimefac!(l::FactoredFracFieldElem{T}, b::T, e::Int, g::T) where T
     @assert !iszero(b)
     _append_pow_normalise!(l, g, e, 1)
     a = b
@@ -652,9 +652,9 @@ end
 
 # pull out some common factor b = z*bbar, c = z*cbar
 # where bbar and cbar are elements of the base ring.
-function _gcdhelper(b::FactoredFrac{T}, c::FactoredFrac{T}) where T
+function _gcdhelper(b::FactoredFracFieldElem{T}, c::FactoredFracFieldElem{T}) where T
     F = parent(b)
-    z = FactoredFrac(one(base_ring(F)), FactoredFracTerm{T}[], F)   # gcd(b,c)
+    z = FactoredFracFieldElem(one(base_ring(F)), FactoredFracTerm{T}[], F)   # gcd(b,c)
     bbar = b.unit                       # expanded form of eventual b/gcd(b,c)
     cbar = c.unit                       # expanded form of eventual c/gcd(b,c)
     b = map(copy, b.terms)

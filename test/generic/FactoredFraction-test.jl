@@ -9,12 +9,12 @@ function test_elem(FF::Generic.FactoredFracField{BigInt})
     return t
 end
 
-@testset "Generic.FactoredFrac.ZZ.conformance" begin
+@testset "Generic.FactoredFracFieldElem.ZZ.conformance" begin
     FF = FactoredFractionField(ZZ)
     test_Field_interface(FF)
 end
 
-@testset "Generic.FactoredFrac.ZZ.adhoc" begin
+@testset "Generic.FactoredFracFieldElem.ZZ.adhoc" begin
     FF = FactoredFractionField(ZZ)
 
     @test FF(2//3) == FF(2, 3)
@@ -55,7 +55,7 @@ end
     @test divexact(1//2, 1//2 * a) == inv(a)
 end
 
-@testset "Generic.FactoredFrac.ZZ.evaluate" begin
+@testset "Generic.FactoredFracFieldElem.ZZ.evaluate" begin
     Zx, x = polynomial_ring(ZZ, "x")
     F = FactoredFractionField(Zx)
     x = F(x)
@@ -67,7 +67,7 @@ end
     @test evaluate(x//(x+y)^2, [1//3, 1//2]) == 12//25
 end
 
-@testset "Generic.FactoredFrac.ZZ.valuation" begin
+@testset "Generic.FactoredFracFieldElem.ZZ.valuation" begin
     Zxy, (x, y) = polynomial_ring(ZZ, ["x", "y"])
     F = FactoredFractionField(Zxy)
     (X, Y) = (F(x), F(y))
@@ -76,7 +76,7 @@ end
     @test remove(X//(X+Y)^2, x-y) == (0, X//(X+Y)^2)
 end
 
-@testset "Generic.FactoredFrac.ZZ._bases_are_nice" begin
+@testset "Generic.FactoredFracFieldElem.ZZ._bases_are_nice" begin
     FF = FactoredFractionField(ZZ)
     test_reps = 20
 
@@ -127,7 +127,7 @@ end
     end
 end
 
-@testset "Generic.FactoredFrac.ZZ.normalise" begin
+@testset "Generic.FactoredFracFieldElem.ZZ.normalise" begin
     FF = FactoredFractionField(ZZ)
 
     a = one(FF)
@@ -164,7 +164,7 @@ end
     @test length(a) == 0
 end
 
-@testset "Generic.FactoredFrac.ZZx" begin
+@testset "Generic.FactoredFracFieldElem.ZZx" begin
     Zx, x = polynomial_ring(ZZ, "x")
     F = FactoredFractionField(Zx)
     x = F(x)
@@ -174,7 +174,7 @@ end
     @test F(2//gen(Zx)) == F(2, gen(Zx))
 end
 
-@testset "Generic.FactoredFrac.ZZxyz" begin
+@testset "Generic.FactoredFracFieldElem.ZZxyz" begin
     Zxyz, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
     F = FactoredFractionField(Zxyz)
     (x, y, z) = (F(x), F(y), F(z))
@@ -182,35 +182,35 @@ end
     @test det(matrix(F, [x y z; x^2 y^2 z^2; x^3 y^3 z^3])) == -x*y*z*(y - z)*(x - y)*(x - z)
 end
 
-@testset "Generic.FactoredFrac.constructors" begin
+@testset "Generic.FactoredFracFieldElem.constructors" begin
     S, x = polynomial_ring(ZZ, "x")
     T = FactoredFractionField(S)
 
     @test FactoredFractionField(S, cached = true) === FactoredFractionField(S, cached = true)
     @test FactoredFractionField(S, cached = false) !== FactoredFractionField(S, cached = true)
 
-    @test elem_type(T) == Generic.FactoredFrac{elem_type(S)}
-    @test elem_type(Generic.FactoredFracField{elem_type(S)}) == Generic.FactoredFrac{elem_type(S)}
-    @test parent_type(Generic.FactoredFrac{elem_type(S)}) == Generic.FactoredFracField{elem_type(S)}
+    @test elem_type(T) == Generic.FactoredFracFieldElem{elem_type(S)}
+    @test elem_type(Generic.FactoredFracField{elem_type(S)}) == Generic.FactoredFracFieldElem{elem_type(S)}
+    @test parent_type(Generic.FactoredFracFieldElem{elem_type(S)}) == Generic.FactoredFracField{elem_type(S)}
 
     @test isa(T, Generic.FactoredFracField)
-    @test isa(T(3), Generic.FactoredFrac)
-    @test isa(T(BigInt(7)), Generic.FactoredFrac)
-    @test isa(T(x + 2), Generic.FactoredFrac)
-    @test isa(T(3, 7), Generic.FactoredFrac)
-    @test isa(T(x + 2, x + 1), Generic.FactoredFrac)
+    @test isa(T(3), Generic.FactoredFracFieldElem)
+    @test isa(T(BigInt(7)), Generic.FactoredFracFieldElem)
+    @test isa(T(x + 2), Generic.FactoredFracFieldElem)
+    @test isa(T(3, 7), Generic.FactoredFracFieldElem)
+    @test isa(T(x + 2, x + 1), Generic.FactoredFracFieldElem)
     @test T(x + 2, x + 1)*T(x + 1) == T(x + 2)
-    @test isa(T(x + 2, 4), Generic.FactoredFrac)
-    @test isa(T(3, x + 1), Generic.FactoredFrac)
-    @test isa(T(T(x + 2)), Generic.FactoredFrac)
-    @test isa(T(), Generic.FactoredFrac)
-    @test isa(T(x + 3)//(x^2 + 2), Generic.FactoredFrac)
-    @test isa(T(x + 3)//12, Generic.FactoredFrac)
-    @test isa(12//(x + 2), Generic.Frac)
-    @test isa(12//(T(x) + 2), Generic.FactoredFrac)
-    @test isa((x + 1)//T(x + 2, x + 1), Generic.FactoredFrac)
-    @test isa(T(x + 2, x + 1)//(x + 1), Generic.FactoredFrac)
-    @test isa(T(x + 2, x + 1)//T(x, x + 2), Generic.FactoredFrac)
+    @test isa(T(x + 2, 4), Generic.FactoredFracFieldElem)
+    @test isa(T(3, x + 1), Generic.FactoredFracFieldElem)
+    @test isa(T(T(x + 2)), Generic.FactoredFracFieldElem)
+    @test isa(T(), Generic.FactoredFracFieldElem)
+    @test isa(T(x + 3)//(x^2 + 2), Generic.FactoredFracFieldElem)
+    @test isa(T(x + 3)//12, Generic.FactoredFracFieldElem)
+    @test isa(12//(x + 2), Generic.FracFieldElem)
+    @test isa(12//(T(x) + 2), Generic.FactoredFracFieldElem)
+    @test isa((x + 1)//T(x + 2, x + 1), Generic.FactoredFracFieldElem)
+    @test isa(T(x + 2, x + 1)//(x + 1), Generic.FactoredFracFieldElem)
+    @test isa(T(x + 2, x + 1)//T(x, x + 2), Generic.FactoredFracFieldElem)
 
     @test characteristic(T) == 0
 
@@ -225,7 +225,7 @@ end
     @test !(b in keys(Dict(a => 1)))
 end
 
-@testset "Generic.FactoredFrac.printing" begin
+@testset "Generic.FactoredFracFieldElem.printing" begin
     S, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
     F = FactoredFractionField(S)
     (x, y, z) = (F(x), F(y), F(z))
@@ -239,7 +239,7 @@ end
     @test length(string(F)) > 3
 end
 
-@testset "Generic.FactoredFrac.derivative" begin
+@testset "Generic.FactoredFracFieldElem.derivative" begin
     S, (x, y) = polynomial_ring(ZZ, ["x", "y"])
     F = FactoredFractionField(S)
     (X, Y) = (F(x), F(y))

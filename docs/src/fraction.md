@@ -13,7 +13,7 @@ abstract type hierarchy.
 
 ## Generic fraction types
 
-AbstractAlgebra.jl implements a generic fraction type `Generic.Frac{T}`
+AbstractAlgebra.jl implements a generic fraction type `Generic.FracFieldElem{T}`
 where `T` is the type of elements of the base ring. See the file
 `src/generic/GenericTypes.jl` for details.
 
@@ -21,9 +21,9 @@ Parent objects of such fraction elements have type `Generic.FracField{T}`.
 
 ## Factored fraction types
 
-AbstractAlgebra.jl also implements a fraction type `Generic.FactoredFrac{T}`
+AbstractAlgebra.jl also implements a fraction type `Generic.FactoredFracFieldElem{T}`
 with parent objects of such fractions having type `Generic.FactoredFracField{T}`.
-As opposed to the fractions of type `Generic.Frac{T}`, which are just a
+As opposed to the fractions of type `Generic.FracFieldElem{T}`, which are just a
 numerator and denominator, these fractions are maintained in factored form as
 much as possible.
 
@@ -394,7 +394,7 @@ julia> g = rand(S, -1:3, -10:10)
 
 ### Extra functionality for factored fractions
 
-The `Generic.FactoredFrac{T}` type implements an interface similar to that of
+The `Generic.FactoredFracFieldElem{T}` type implements an interface similar to that of
 the `Fac{T}` type for iterating over the terms in the factorisation. There is
 also the function `push_term!(a, b, e)` for efficiently performing `a *= b^e`,
 and the function `normalise` returns relatively prime terms.

@@ -357,4 +357,8 @@ import ..AbstractAlgebra: @alias
 @alias RelSeriesRing RelPowerSeriesRing
 @alias RelSeriesElem RelPowerSeriesRingElem
 
+# Deprecated in 0.34.*
+@alias Frac FracFieldElem
+@alias FactoredFrac FactoredFracFieldElem
+
 end # generic

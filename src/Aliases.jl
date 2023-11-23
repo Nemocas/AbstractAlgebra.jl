@@ -79,3 +79,7 @@
 @alias TotalRingOfFractions total_ring_of_fractions
 
 @alias DirectSum direct_sum
+
+# Deprecated in 0.34.*
+@alias PuiseuxSeriesField puiseux_series_field
+@alias PuiseuxSeriesRing puiseux_series_ring

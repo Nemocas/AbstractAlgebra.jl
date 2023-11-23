@@ -22,7 +22,7 @@ base_ring(a::RationalFunctionField{T, U}) where {T <: FieldElement, U <: Union{P
 
 parent(a::RationalFunctionFieldElem) = a.parent
 
-data(x::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = x.d::Union{Frac{U}}
+data(x::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = x.d::FracFieldElem{U}
 
 function fraction_field(a::RationalFunctionField{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    return a.fraction_field::Union{FracField{U}}
@@ -526,7 +526,7 @@ promote_rule(::Type{RationalFunctionFieldElem{T, U}}, ::Type{RationalFunctionFie
 promote_rule(::Type{RationalFunctionFieldElem{T, U}}, ::Type{RationalFunctionFieldElem{T, U}}) where {T <: FieldElem, U <: Union{PolyRingElem, MPolyRingElem}} = RationalFunctionFieldElem{T, U}
 
 function promote_rule(::Type{RationalFunctionFieldElem{T, U}}, ::Type{V}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}, V <: RingElem}
-   promote_rule(Frac{U}, V) === Frac{U} ? RationalFunctionFieldElem{T, U} : Union{}
+   promote_rule(FracFieldElem{U}, V) === FracFieldElem{U} ? RationalFunctionFieldElem{T, U} : Union{}
 end
 
 ###############################################################################
@@ -542,7 +542,7 @@ function (a::RationalFunctionField{T, U})() where {T <: FieldElement, U <: Union
    return z
 end
 
-function (a::RationalFunctionField{T, U})(b::Frac{U}) where {T <: FieldElement, U <: Union{PolyRingElem{T}, MPolyRingElem{T}}}
+function (a::RationalFunctionField{T, U})(b::FracFieldElem{U}) where {T <: FieldElement, U <: Union{PolyRingElem{T}, MPolyRingElem{T}}}
    K = fraction_field(a)
    parent(b) != K && error("Unable to coerce rational function")
    z = RationalFunctionFieldElem{T, U}(b)
@@ -557,7 +557,7 @@ function (a::RationalFunctionField{T, U})(n::U, d::U) where {T <: FieldElement, 
       n = divexact(n, g)
       d = divexact(d, g)
    end
-   r = Frac{U}(n, d)
+   r = FracFieldElem{U}(n, d)
    try
       r.parent = FracDict[R]
    catch

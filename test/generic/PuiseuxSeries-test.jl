@@ -17,15 +17,15 @@
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
 @testset "Generic.PuiseuxSeries.constructors" begin
-   R, x = PuiseuxSeriesRing(ZZ, 30, "x")
+   R, x = puiseux_series_ring(ZZ, 30, "x")
 
    S, t = polynomial_ring(QQ, "t")
-   T, y = PuiseuxSeriesRing(S, 30, "y")
+   T, y = puiseux_series_ring(S, 30, "y")
 
-   @test PuiseuxSeriesRing(S, 30, "y", cached = true)[1] === PuiseuxSeriesRing(S, 30, "y", cached = true)[1]
-   @test PuiseuxSeriesRing(S, 30, "y", cached = false)[1] !== PuiseuxSeriesRing(S, 30, "y", cached = true)[1]
+   @test puiseux_series_ring(S, 30, "y", cached = true)[1] === puiseux_series_ring(S, 30, "y", cached = true)[1]
+   @test puiseux_series_ring(S, 30, "y", cached = false)[1] !== puiseux_series_ring(S, 30, "y", cached = true)[1]
 
-   U, z = PuiseuxSeriesField(QQ, 30, "z")
+   U, z = puiseux_series_field(QQ, 30, "z")
 
    @test elem_type(R) == Generic.PuiseuxSeriesRingElem{BigInt}
    @test elem_type(Generic.PuiseuxSeriesRing{BigInt}) == Generic.PuiseuxSeriesRingElem{BigInt}
@@ -95,18 +95,18 @@
 end
 
 @testset "Generic.PuiseuxSeries.printing" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
 
    @test occursin("O", string(x^(-1//2) + 1 - x + x^2 + x^5))
 end
 
 @testset "Generic.PuiseuxSeries.rand" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
 
    test_rand(R, -12:12, 1:6, -10:10)
    test_rand(R, -12:12, 1:6, make(ZZ, -10:10))
 
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
 
    test_rand(R, -12:12, 1:6, -1:1)
    test_rand(R, -12:12, 1:6, make(RealField, -1:1))
@@ -114,7 +114,7 @@ end
 
 @testset "Generic.PuiseuxSeries.manipulation" begin
    R, t = polynomial_ring(QQ, "t")
-   S, x = PuiseuxSeriesRing(R, 30, "x")
+   S, x = puiseux_series_ring(R, 30, "x")
 
    @test max_precision(S) == 30
 
@@ -146,11 +146,11 @@ end
    @test characteristic(S) == 0
 
    T = residue_ring(ZZ, 7)
-   U, y = PuiseuxSeriesRing(T, 10, "y")
+   U, y = puiseux_series_ring(T, 10, "y")
 
    @test modulus(T) == 7
 
-   R, x = PuiseuxSeriesRing(QQ, 10, "x")
+   R, x = puiseux_series_ring(QQ, 10, "x")
 
    for iter = 1:100
       f = rand(R, -10:10, 1:6, -10:10)
@@ -178,7 +178,7 @@ end
    @test 1 == map_coefficients(sqrt, x^0)
    lp = Zx(BigInt[i for i in 1:10], 10, 11, 5, 1)
    lq = Zx(BigInt[i for i in 10:-1:1], 10, 11, 5, 1)
-   Zxx, xx = PuiseuxSeriesRing(ZZ, 10, "x")
+   Zxx, xx = puiseux_series_ring(ZZ, 10, "x")
    p = Zxx(lp, 1)
    q = Zxx(lp, 1)
    pq = p * q
@@ -203,13 +203,13 @@ end
    end
 
    F = GF(11)
-   P, y = PuiseuxSeriesRing(F, 10, "x")
+   P, y = puiseux_series_ring(F, 10, "x")
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 end
 
 @testset "Generic.PuiseuxSeries.unary_ops" begin
    #  Exact ring
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
 
@@ -218,7 +218,7 @@ end
    end
 
    #  Inexact field
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6,-1:1)
 
@@ -228,7 +228,7 @@ end
 
    # Non-integral domain
    T = residue_ring(ZZ, 6)
-   R, x = PuiseuxSeriesRing(T, 10, "x")
+   R, x = puiseux_series_ring(T, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, 0:5)
 
@@ -239,7 +239,7 @@ end
 
 @testset "Generic.PuiseuxSeries.binary_ops" begin
    #  Exact ring
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, 1:6, -10:10)
       g = rand(R, -12:12, 1:6, -10:10)
@@ -255,7 +255,7 @@ end
    end
 
    #  Inexact field
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, 1:6, -1:1)
       g = rand(R, -12:12, 1:6, -1:1)
@@ -271,7 +271,7 @@ end
 
    # Non-integral domain
    T = residue_ring(ZZ, 6)
-   R, x = PuiseuxSeriesRing(T, 10, "x")
+   R, x = puiseux_series_ring(T, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, 1:6, 0:5)
       g = rand(R, -12:12, 1:6, 0:5)
@@ -286,7 +286,7 @@ end
    end
 
    # Regression test for Nemo issue 319
-   R, x = PuiseuxSeriesRing(ZZ, 4, "x")
+   R, x = puiseux_series_ring(ZZ, 4, "x")
    cs = [one(ZZ), zero(ZZ), one(ZZ), zero(ZZ)]
    f = R(R.laurent_ring(cs, 4, 4, 0, 1, false), 2)
    f = deepcopy(f) # triggers rescale
@@ -299,7 +299,7 @@ end
 
 @testset "Generic.PuiseuxSeries.adhoc_binary_ops" begin
    # Exact ring
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, 1:6, -10:10)
       c1 = rand(ZZ, -10:10)
@@ -319,7 +319,7 @@ end
    end
 
    # Inexact field
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, 1:6, -1:1)
       c1 = rand(ZZ, -10:10)
@@ -340,7 +340,7 @@ end
 
    # Non-integral domain
    R = residue_ring(ZZ, 6)
-   S, x = PuiseuxSeriesRing(R, 10, "x")
+   S, x = puiseux_series_ring(R, 10, "x")
    for iter = 1:500
       f = rand(S, -12:12, 1:6, 0:5)
       c1 = rand(ZZ, -10:10)
@@ -367,7 +367,7 @@ end
 
    # Generic tower
    R, x = ZZ["x"]
-   S, y = PuiseuxSeriesRing(R, 10, "y")
+   S, y = puiseux_series_ring(R, 10, "y")
    for iter = 1:100
       f = rand(S, -12:12, 1:6, 0:5, -10:10)
       c1 = rand(ZZ, -10:10)
@@ -389,7 +389,7 @@ end
 
 @testset "Generic.PuiseuxSeries.comparison" begin
    # Exact ring
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, 1:6, -10:10)
       g = deepcopy(f)
@@ -405,7 +405,7 @@ end
    end
 
    # Inexact field
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, 1:6, -1:1)
       g = deepcopy(f)
@@ -422,7 +422,7 @@ end
 
    # Non-integral domain
    R = residue_ring(ZZ, 6)
-   S, x = PuiseuxSeriesRing(R, 10, "x")
+   S, x = puiseux_series_ring(R, 10, "x")
    for iter = 1:500
       f = rand(S, -12:12, 1:6, 0:5)
       g = deepcopy(f)
@@ -440,7 +440,7 @@ end
 
 @testset "Generic.PuiseuxSeries.adhoc_comparison" begin
    # Exact ring
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = R()
       while f == 0
@@ -462,7 +462,7 @@ end
    end
 
    # Inexact field
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
    for iter = 1:500
       f = R()
       while isapprox(f, R())
@@ -485,7 +485,7 @@ end
 
    # Non-integral domain
    R = residue_ring(ZZ, 6)
-   S, x = PuiseuxSeriesRing(R, 10, "x")
+   S, x = puiseux_series_ring(R, 10, "x")
    for iter = 1:500
       f = S()
       while f == 0
@@ -513,7 +513,7 @@ end
 
    # Generic tower
    R, x = ZZ["x"]
-   S, y = PuiseuxSeriesRing(R, 10, "y")
+   S, y = puiseux_series_ring(R, 10, "y")
    for iter = 1:100
       f = S()
       while f == 0
@@ -537,7 +537,7 @@ end
 
 @testset "Generic.PuiseuxSeries.powering" begin
    # Exact ring
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
 
    for iter = 1:100
       f = rand(R, -12:12, 1:6, -10:10)
@@ -553,7 +553,7 @@ end
    end
 
    # Inexact field
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
 
    for iter = 1:100
       f = rand(R, -12:12, 1:6, -1:1)
@@ -573,7 +573,7 @@ end
       n = rand(2:26)
 
       Zn = residue_ring(ZZ, n)
-      R, x = PuiseuxSeriesRing(Zn, 10, "x")
+      R, x = puiseux_series_ring(Zn, 10, "x")
 
       f = rand(R, -12:12, 1:6, 0:n - 1)
       r2 = R(1)
@@ -590,7 +590,7 @@ end
 
 @testset "Generic.PuiseuxSeries.inversion" begin
    # Exact ring
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = R()
       while iszero(f) || !is_unit(coeff(f, valuation(f)))
@@ -601,7 +601,7 @@ end
    end
 
    # Inexact field
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
    for iter = 1:300
       f = R()
       while iszero(f)
@@ -613,7 +613,7 @@ end
 
    # Non-integral domain
    T = residue_ring(ZZ, 6)
-   R, x = PuiseuxSeriesRing(T, 10, "x")
+   R, x = puiseux_series_ring(T, 10, "x")
    for iter = 1:300
       f = R()
       while iszero(f) || !is_unit(coeff(f, valuation(f)))
@@ -626,7 +626,7 @@ end
 
 @testset "Generic.PuiseuxSeries.square_root" begin
    # Exact ring
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
       g = f^2
@@ -641,7 +641,7 @@ end
    end
 
    # Inexact field
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -1:1)
       g = f^2
@@ -668,7 +668,7 @@ end
    for p in [2, 7, 19, 65537, ZZ(7), ZZ(19), ZZ(65537)]
       R = residue_field(ZZ, p)
 
-      S, x = PuiseuxSeriesField(R, 10, "x")
+      S, x = puiseux_series_field(R, 10, "x")
 
       for iter = 1:10
           f = rand(S, -12:12, 1:6, 0:Int(p))
@@ -694,7 +694,7 @@ end
    R = residue_field(ZZ, 2)
    T, y = polynomial_ring(R, "x")
 
-   S, x = PuiseuxSeriesRing(T, 10, "x")
+   S, x = puiseux_series_ring(T, 10, "x")
 
    f = x + x^(3//2) + x^2 + x^(5//2) +O(x^6)
 
@@ -707,7 +707,7 @@ end
 
 @testset "Generic.PuiseuxSeries.exact_division" begin
    # Exact ring
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
       g = rand(R, -12:12, 1:6, -10:10)
@@ -719,7 +719,7 @@ end
    end
 
    # Inexact field
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, -12:12, 1:6, -1:1)
@@ -733,7 +733,7 @@ end
 
    # Non-integral domain
    T = residue_ring(ZZ, 6)
-   R, x = PuiseuxSeriesRing(T, 10, "x")
+   R, x = puiseux_series_ring(T, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, -12:12, 1:6, 0:5)
@@ -748,7 +748,7 @@ end
 
 @testset "Generic.PuiseuxSeries.adhoc_exact_division" begin
    # Exact field
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
       c = ZZ()
@@ -760,7 +760,7 @@ end
    end
 
    # Inexact field
-   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   R, x = puiseux_series_field(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -1:1)
       c = RealField()
@@ -773,7 +773,7 @@ end
 
    # Non-integral domain
    T = residue_ring(ZZ, 6)
-   R, x = PuiseuxSeriesRing(T, 10, "x")
+   R, x = puiseux_series_ring(T, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, 0:5)
       c = T()
@@ -787,7 +787,7 @@ end
 
 @testset "Generic.PuiseuxSeries.derivative_integral" begin
    # Exact field
-   S, x = PuiseuxSeriesRing(QQ, 10, "x")
+   S, x = puiseux_series_ring(QQ, 10, "x")
 
    for iter = 1:100
       f = rand(S, -10:10, 1:10, -10:10)
@@ -799,7 +799,7 @@ end
    end
  
    # Inexact field
-   S, x = PuiseuxSeriesField(RealField, 10, "x")
+   S, x = puiseux_series_field(RealField, 10, "x")
 
    for iter = 1:100
       f = rand(S, -10:10, 1:10, -10:10)
@@ -812,7 +812,7 @@ end
 
    # Non-integral domain
    R = residue_ring(ZZ, 143)
-   S, x = PuiseuxSeriesRing(R, 5, "x")
+   S, x = puiseux_series_ring(R, 5, "x")
 
    for iter = 1:100
       f = rand(S, -5:5, 1:10, -10:10)
@@ -826,7 +826,7 @@ end
 
 @testset "Generic.PuiseuxSeries.special_functions" begin
    # Exact field
-   S, x = PuiseuxSeriesRing(QQ, 10, "x")
+   S, x = puiseux_series_ring(QQ, 10, "x")
 
    for iter = 1:100
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
@@ -854,7 +854,7 @@ end
    end
 
    # Inexact field
-   S, x = PuiseuxSeriesField(RealField, 10, "x")
+   S, x = puiseux_series_field(RealField, 10, "x")
 
    for iter = 1:100
       @test isapprox(exp(x + O(x^iter)), exp(x + O(x^(iter - 1))))
@@ -883,7 +883,7 @@ end
 
    # Non-integral domain
    R = residue_ring(ZZ, 143)
-   S, x = PuiseuxSeriesRing(R, 5, "x")
+   S, x = puiseux_series_ring(R, 5, "x")
 
    for iter = 1:10
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))

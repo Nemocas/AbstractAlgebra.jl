@@ -126,7 +126,7 @@ julia> one(S)
 [1   0]
 [0   1]
 
-julia> R, x = PuiseuxSeriesField(QQ, 4, "x")
+julia> R, x = puiseux_series_field(QQ, 4, "x")
 (Puiseux series field in x over rationals, x + O(x^5))
 
 julia> one(x)
@@ -190,7 +190,7 @@ false
 julia> isone(U([1 0; 0 1; 0 0]))
 false
 
-julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
+julia> T, x = puiseux_series_field(QQ, 10, "x")
 (Puiseux series field in x over rationals, x + O(x^11))
 
 julia> isone(x), isone(T(1))
@@ -206,7 +206,7 @@ Return true if $a$ is the additative identity, else return false.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> T, x = PuiseuxSeriesField(QQ, 10, "x")
+julia> T, x = puiseux_series_field(QQ, 10, "x")
 (Puiseux series field in x over rationals, x + O(x^11))
 
 julia> a = T(0)
