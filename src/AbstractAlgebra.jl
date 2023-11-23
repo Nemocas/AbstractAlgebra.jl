@@ -1073,8 +1073,8 @@ export primpart
 export pseudo_inv
 export pseudodivrem
 export pseudorem
-export PuiseuxSeriesField
-export PuiseuxSeriesRing
+export puiseux_series_field
+export puiseux_series_ring
 export push_term!
 export quo
 export rand_ordering
