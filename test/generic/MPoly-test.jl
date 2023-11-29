@@ -114,15 +114,13 @@
    @test z isa Generic.MPoly{Generic.Poly{BigInt}}
 
    ZZxyz_ = polynomial_ring(ZZ, 'x':'z')
-   ZZxyz2, xyz2... = polynomial_ring(ZZ, (:x, 'y', GenericString("z")))
-   ZZxyz3, xyz3... = polynomial_ring(ZZ, :x, 'y', GenericString("z"))
+   ZZxyz2, xyz2 = polynomial_ring(ZZ, VarName[:x, 'y', GenericString("z")])
    ZZxyz4_ = polynomial_ring(ZZ, Union{String,Char,Symbol}["x", 'y', :z])
    ZZxyz5_ = ZZ["x", 'y', :z]
-   ZZxyz6 = @polynomial_ring(ZZ, :x, :y, :z)
+   ZZxyz6 = @polynomial_ring(ZZ, [:x, :y, :z])
 
    @test ZZxyz_[1] isa Generic.MPolyRing
-   @test ZZxyz_ == (ZZxyz2, collect(xyz2))
-   @test ZZxyz_ == (ZZxyz3, collect(xyz3))
+   @test ZZxyz_ == (ZZxyz2, xyz2)
    @test ZZxyz_ == ZZxyz4_
    @test ZZxyz_ == ZZxyz5_
    @test ZZxyz_ == (ZZxyz6, [x, y, z])
