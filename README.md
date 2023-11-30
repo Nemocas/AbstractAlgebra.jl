@@ -7,8 +7,9 @@
 
 AbstractAlgebra is a pure Julia package for computational abstract algebra. It grew out of the Nemo project and provides all of the abstract types and generic implementations that Nemo relies on.
 
-It is currently developed by William Hart, Tommy Hofmann, Fredrik Johansson,
-Claus Fieker with contributions from others.
+It was originally developed by William Hart, Tommy Hofmann, Fredrik Johansson and
+Claus Fieker with contributions from others. Current maintainers are Claus Fieker,
+Tommy Hofmann and Max Horn.
 
 AbstractAlgebra currently provides:
 
