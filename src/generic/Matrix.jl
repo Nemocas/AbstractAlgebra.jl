@@ -211,3 +211,18 @@ function matrix_space(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = 
    T = elem_type(R)
    return MatSpace{T}(R, r, c)
 end
+
+function AbstractAlgebra.sub!(A::MatElem{T}, B::MatElem{T}, C::MatElem{T}) where T
+  A.entries.= B.entries .- C.entries
+end
+
+#since type(view(MatElem{T})) != MatElem{T} which breaks
+# sub!(A::T, B::T, C::T) where T  in AA 
+function AbstractAlgebra.mul!(A::MatElem{T}, B::MatElem{T}, C::MatElem{T}, f::Bool = false) where T
+  if f
+    A.entries .+= (B * C).entries
+  else
+    A.entries .= (B * C).entries
+  end
+end
+
