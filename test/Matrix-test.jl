@@ -98,3 +98,18 @@ end
     T = scalar_matrix(QQ, 3, 42)
     @test T == matrix(QQ, [42 0 0; 0 42 0; 0 0 42])
 end
+
+@testset "Strassen" begin
+   S = matrix(QQ, rand(-10:10, 100, 100))
+   T = S*S
+   TT = Strassen.mul(S, S; cutoff = 50)
+   @test T == TT
+
+   P1 = Pern(100)
+   S1 = deepcopy(S)
+   r1 = lu!(P1, S1)
+   P = Perm(100)
+   r2 = Strassen.lu!(P, S; cutoff = 50)
+   @test r1 == r2
+   @test S1 == S
+end
