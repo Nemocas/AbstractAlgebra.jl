@@ -3433,6 +3433,7 @@ function solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
          tmp[j] = X[j, i]
       end
       for j = n:-1:1
+         s = R(0)
          for k = j + 1:n
 #            s = addmul!(s, U[j, k], tmp[k], t)
             s = s + U[j, k] * tmp[k]
@@ -3482,6 +3483,35 @@ function solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
       end
    end
    return X
+end
+
+#solves A x = B for A intended to be lower triangular
+#only the lower part is used. if f is true, then the diagonal is assumed to be 1
+#used to use lu!
+#can be combined with Strassen.solve_tril!
+function solve_tril!(A::MatElem{T}, B::MatElem{T}, C::MatElem{T}, f::Int = 0) where T
+
+  # a       x   u      ax = u
+  # b c   * y = v      bx + cy = v
+  # d e f   z   w      ....
+
+  @assert ncols(A) == ncols(C)
+  s = base_ring(A)(0)
+  for i=1:ncols(A)
+    for j = 1:nrows(A)
+      t = C[j, i]
+      for k = 1:j-1
+        mul_red!(s, A[k, i], B[j, k], false)
+        sub!(t, t, s)
+      end
+      reduce!(t)
+      if f == 1
+        A[j,i] = t
+      else
+        A[j,i] = divexact(t, B[j, j])
+      end
+    end
+  end
 end
 
 ###############################################################################
