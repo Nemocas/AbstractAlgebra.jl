@@ -105,7 +105,7 @@ end
    TT = Strassen.mul(S, S; cutoff = 50)
    @test T == TT
 
-   P1 = Pern(100)
+   P1 = Perm(100)
    S1 = deepcopy(S)
    r1 = lu!(P1, S1)
    P = Perm(100)
