@@ -593,6 +593,7 @@ include("CommonTypes.jl") # types needed by AbstractAlgebra and Generic
 include("Poly.jl")
 include("NCPoly.jl")
 include("Matrix.jl")
+include("Matrix-Strassen.jl")
 include("MatrixAlgebra.jl")
 include("AbsSeries.jl")
 include("RelSeries.jl")
@@ -1145,6 +1146,7 @@ export solve_triu
 export solve_with_det
 export sort_terms!
 export SparsePolynomialRing
+export Strassen
 export strictly_lower_triangular_matrix
 export strictly_upper_triangular_matrix
 export sub
