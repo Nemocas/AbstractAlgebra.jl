@@ -1390,11 +1390,8 @@ Return a tuple `S, generators...` with `generators[i]` corresponding to `varname
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S, a, b, c = polynomial_ring(ZZ, :a, :b, :c)
-(Multivariate polynomial ring in 3 variables over integers, a, b, c)
-
-julia> polynomial_ring(ZZ, :a, :b, :c) == polynomial_ring(ZZ, (:a, :b, :c))
-true
+julia> S, (a, b, c) = polynomial_ring(ZZ, [:a, :b, :c])
+(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b, c])
 
 julia> S, x, y = polynomial_ring(ZZ, :x => (1:2, 1:2), :y => 1:3);
 

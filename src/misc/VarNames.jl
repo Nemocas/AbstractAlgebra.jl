@@ -2,7 +2,6 @@ import MacroTools as MT
 
 @assert Symbol <: VarName
 const VarNames = Union{
-    VarName,
     AbstractArray{<:VarName},
     Pair{<:VarName},
 }
@@ -25,17 +24,16 @@ and likewise for three and more iterables.
 As an alternative `"s#" => iter` is shorthand for `["s$i" for i in iter]`.
 This also works for multiple iterators in that`"s#" => (iter1, iter2)`
 is shorthand for `["s$i$j" for i in iter1, j in iter2]`.
-If you need anything else, feel free to open an issue with AbstractAlgebra.
 
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> AbstractAlgebra.variable_names(:x, :y)
+julia> AbstractAlgebra.variable_names([:x, :y])
 2-element Vector{Symbol}:
  :x
  :y
 
-julia> AbstractAlgebra.variable_names(:x => (0:0, 0:1), :y => 0:1, :z)
+julia> AbstractAlgebra.variable_names(:x => (0:0, 0:1), :y => 0:1, [:z])
 5-element Vector{Symbol}:
  Symbol("x[0,0]")
  Symbol("x[0,1]")
@@ -62,13 +60,12 @@ julia> AbstractAlgebra.variable_names(["x$i$i" for i in 1:3])
  :x22
  :x33
 
-julia> AbstractAlgebra.variable_names('a':'c', 'z')
+julia> AbstractAlgebra.variable_names('a':'c', ['z'])
 4-element Vector{Symbol}:
  :a
  :b
  :c
  :z
-
 ```
 """
 variable_names(as::VarNames...) = variable_names(as)
@@ -126,20 +123,19 @@ Turn `vec` into the shape of `varnames`. Reverse flattening from [`variable_name
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> s = ([:a, :b], "x#" => (1:1, 1:2), "y#" => 1:2, :z);
+julia> s = ([:a, :b], "x#" => (1:1, 1:2), "y#" => 1:2, [:z]);
 
 julia> AbstractAlgebra.reshape_to_varnames(AbstractAlgebra.variable_names(s...), s...)
-([:a, :b], [:x11 :x12], [:y1, :y2], :z)
+([:a, :b], [:x11 :x12], [:y1, :y2], [:z])
 
-julia> R, vec = polynomial_ring(ZZ, AbstractAlgebra.variable_names(s...))
+julia> R, v = polynomial_ring(ZZ, AbstractAlgebra.variable_names(s...))
 (Multivariate polynomial ring in 7 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b, x11, x12, y1, y2, z])
 
-julia> (a, b), x, y, z = AbstractAlgebra.reshape_to_varnames(vec, s...)
-(AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x11 x12], AbstractAlgebra.Generic.MPoly{BigInt}[y1, y2], z)
+julia> (a, b), x, y, z = AbstractAlgebra.reshape_to_varnames(v, s...)
+(AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x11 x12], AbstractAlgebra.Generic.MPoly{BigInt}[y1, y2], AbstractAlgebra.Generic.MPoly{BigInt}[z])
 
 julia> R, (a, b), x, y, z = polynomial_ring(ZZ, s...)
-(Multivariate polynomial ring in 7 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x11 x12], AbstractAlgebra.Generic.MPoly{BigInt}[y1, y2], z)
-
+(Multivariate polynomial ring in 7 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b], AbstractAlgebra.Generic.MPoly{BigInt}[x11 x12], AbstractAlgebra.Generic.MPoly{BigInt}[y1, y2], AbstractAlgebra.Generic.MPoly{BigInt}[z])
 ```
 """
 reshape_to_varnames(vec::Vector, varnames::VarNames...) =
@@ -383,24 +379,23 @@ julia> AbstractAlgebra.@varnames_interface f(a, s)
 julia> f
 f (generic function with 5 methods)
 
-julia> f("hello", :x, :y, :z)
-("hello", "x", "y", "z")
+julia> f("hello", [:x, :y, :z])
+("hello", ["x", "y", "z"])
 
-julia> f("hello", :x => (1:1, 1:2), :y => 1:2, :z)
-("hello", ["x[1,1]" "x[1,2]"], ["y[1]", "y[2]"], "z")
+julia> f("hello", :x => (1:1, 1:2), :y => 1:2, [:z])
+("hello", ["x[1,1]" "x[1,2]"], ["y[1]", "y[2]"], ["z"])
 
-julia> f("projective", ["x$i$j" for i in 0:1, j in 0:1], [:y0, :y1], :z)
-("projective", ["x00" "x01"; "x10" "x11"], ["y0", "y1"], "z")
+julia> f("projective", ["x$i$j" for i in 0:1, j in 0:1], [:y0, :y1], [:z])
+("projective", ["x00" "x01"; "x10" "x11"], ["y0", "y1"], ["z"])
 
 julia> f("fun inputs", 'a':'g', Symbol.('x':'z', [0 1]))
 ("fun inputs", ["a", "b", "c", "d", "e", "f", "g"], ["x0" "x1"; "y0" "y1"; "z0" "z1"])
 
-julia> @f("hello", "x#" => (1:1, 1:2), "y#" => (1:2), :z)
+julia> @f("hello", "x#" => (1:1, 1:2), "y#" => (1:2), [:z])
 "hello"
 
 julia> (x11, x12, y1, y2, z)
 ("x11", "x12", "y1", "y2", "z")
-
 ```
 """
 macro varnames_interface(e::Expr, options::Expr...)
@@ -427,7 +422,3 @@ end
 @varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no # `n` variant would clash with line above; macro would be the same as for `prec::Int`
 
 @varnames_interface polynomial_ring(R::Ring, s)
-
-# With `Ring <: NCRing`, we need to resolve ambiguities of `polynomial_ring(::Ring, s...)`
-polynomial_ring(R::Ring, s::Symbol; kv...) = invoke(polynomial_ring, Tuple{NCRing, Symbol}, R, s; kv...)
-polynomial_ring(R::Ring, s::Union{AbstractString, Char}; kv...) = polynomial_ring(R, Symbol(s); kv...)
