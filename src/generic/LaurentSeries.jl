@@ -23,9 +23,9 @@ function O(a::LaurentSeriesElem{T}) where T <: RingElement
    return parent(a)(Vector{T}(undef, 0), 0, val, val, 1)
 end
 
-parent_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRingElem{S}} = LaurentSeriesRing{S}
+parent_type(::Type{LaurentSeriesRingElem{T}}) where T <: RingElement = LaurentSeriesRing{T}
 
-parent_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesFieldElem{S}} = LaurentSeriesField{S}
+parent_type(::Type{LaurentSeriesFieldElem{T}}) where T <: FieldElement = LaurentSeriesField{T}
 
 parent(a::LaurentSeriesElem) = a.parent
 

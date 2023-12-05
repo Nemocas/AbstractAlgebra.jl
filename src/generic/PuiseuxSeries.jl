@@ -39,9 +39,9 @@ function O(a::PuiseuxSeriesElem{T}) where T <: RingElement
    return parent(a)(laur, denominator(val))
 end
 
-parent_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesRingElem{S}} = PuiseuxSeriesRing{S}
+parent_type(::Type{PuiseuxSeriesRingElem{T}}) where T <: RingElement = PuiseuxSeriesRing{T}
 
-parent_type(::Type{T}) where {S <: FieldElement, T <: PuiseuxSeriesFieldElem{S}} = PuiseuxSeriesField{S}
+parent_type(::Type{PuiseuxSeriesFieldElem{T}}) where T <: FieldElement = PuiseuxSeriesField{T}
 
 parent(a::PuiseuxSeriesElem) = a.parent
 
