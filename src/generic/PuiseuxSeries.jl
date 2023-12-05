@@ -45,9 +45,9 @@ parent_type(::Type{T}) where {S <: FieldElement, T <: PuiseuxSeriesFieldElem{S}}
 
 parent(a::PuiseuxSeriesElem) = a.parent
 
-elem_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesRing{S}} = PuiseuxSeriesRingElem{S}
+elem_type(::Type{PuiseuxSeriesRing{T}}) where T <: RingElement = PuiseuxSeriesRingElem{T}
 
-elem_type(::Type{T}) where {S <: FieldElement, T <: PuiseuxSeriesField{S}} = PuiseuxSeriesFieldElem{S}
+elem_type(::Type{PuiseuxSeriesField{T}}) where T <: FieldElement = PuiseuxSeriesFieldElem{T}
 
 base_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = base_ring(laurent_ring(R))
 

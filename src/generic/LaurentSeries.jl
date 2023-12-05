@@ -29,9 +29,9 @@ parent_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesFieldElem{S}}
 
 parent(a::LaurentSeriesElem) = a.parent
 
-elem_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRing{S}} = LaurentSeriesRingElem{S}
+elem_type(::Type{LaurentSeriesRing{T}}) where T <: RingElement = LaurentSeriesRingElem{T}
 
-elem_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesField{S}} = LaurentSeriesFieldElem{S}
+elem_type(::Type{LaurentSeriesField{T}}) where T <: FieldElement = LaurentSeriesFieldElem{T}
 
 base_ring_type(::Type{LaurentSeriesRing{T}}) where T <: RingElement = parent_type(T)
 
