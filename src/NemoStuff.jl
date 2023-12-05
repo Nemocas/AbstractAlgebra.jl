@@ -54,8 +54,6 @@ function identity_matrix(::Type{MatElem}, R::Ring, n::Int)
     return identity_matrix(R, n)
 end
 
-dense_matrix_type(::Type{T}) where {T} = Generic.MatSpaceElem{T}
-
 ################################################################################
 #
 #  Unsafe functions for generic matrices
