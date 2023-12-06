@@ -113,10 +113,10 @@
    @test y isa Generic.MPoly{Generic.Poly{BigInt}}
    @test z isa Generic.MPoly{Generic.Poly{BigInt}}
 
-   ZZxyz_ = polynomial_ring(ZZ, 'x':'z')
-   ZZxyz2, xyz2 = polynomial_ring(ZZ, VarName[:x, 'y', GenericString("z")])
-   ZZxyz4_ = polynomial_ring(ZZ, Union{String,Char,Symbol}["x", 'y', :z])
-   ZZxyz5_ = ZZ["x", 'y', :z]
+   ZZxyz_ = @inferred polynomial_ring(ZZ, 'x':'z')
+   ZZxyz2, xyz2 = @inferred polynomial_ring(ZZ, VarName[:x, 'y', GenericString("z")])
+   ZZxyz4_ = @inferred polynomial_ring(ZZ, Union{String,Char,Symbol}["x", 'y', :z])
+   ZZxyz5_ = @inferred ZZ["x", 'y', :z]
    ZZxyz6 = @polynomial_ring(ZZ, [:x, :y, :z])
 
    @test ZZxyz_[1] isa Generic.MPolyRing
@@ -125,13 +125,13 @@
    @test ZZxyz_ == ZZxyz5_
    @test ZZxyz_ == (ZZxyz6, [x, y, z])
 
-   ZZxxx0_ = polynomial_ring(ZZ, :x=>Base.OneTo(3))
-   ZZxxx_ = polynomial_ring(ZZ, :x=>1:3)
+   ZZxxx0_ = @inferred polynomial_ring(ZZ, :x=>Base.OneTo(3))
+   ZZxxx_ = @inferred polynomial_ring(ZZ, :x=>1:3)
 
    @test ZZxxx_[1] isa Generic.MPolyRing
    @test ZZxxx_ == ZZxxx0_
 
-   QQxxx_ = polynomial_ring(QQ, "x#" => 1:3)
+   QQxxx_ = @inferred polynomial_ring(QQ, "x#" => 1:3)
    QQxxx2 = @polynomial_ring(QQ, "x#" => 1:3)
 
    @test QQxxx_[1] isa Generic.MPolyRing
@@ -140,13 +140,13 @@
    QQxxx3 = @polynomial_ring(QQ, :x=>1:3)
    @test QQxxx_ == (QQxxx3, [x1, x2, x3])
 
-   ZZxy_ = polynomial_ring(ZZ, :x => (1:2, 1:2), :y => 0:3)
-   ZZxy2_ = polynomial_ring(ZZ, :x => ["1,1" "1,2"; "2,1" "2,2"], :y => (0:3,))
+   ZZxy_ = @inferred polynomial_ring(ZZ, :x => (1:2, 1:2), :y => 0:3)
+   ZZxy2_ = @inferred polynomial_ring(ZZ, :x => ["1,1" "1,2"; "2,1" "2,2"], :y => (0:3,))
 
    @test ZZxy_[1] isa Generic.MPolyRing
    @test ZZxy_ == ZZxy2_
 
-   QQxy_ = polynomial_ring(QQ, "x#" => (1:2, 1:2), Symbol.(:y, 0:3))
+   QQxy_ = @inferred polynomial_ring(QQ, "x#" => (1:2, 1:2), Symbol.(:y, 0:3))
    QQxy2 = @polynomial_ring(QQ, "x#" => (1:2, 1:2), Symbol.(:y, 0:3))
 
    @test QQxy_[1] isa Generic.MPolyRing
