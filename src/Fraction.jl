@@ -51,7 +51,7 @@ function vars(a::FracElem{S}) where {S <: MPolyRingElem{<: RingElement}}
    n_vars = vars(n)
    d_vars = vars(d)
    nd_vars = union!(n_vars, d_vars)
-   return(nd_vars)
+   return nd_vars
 end
 
 ###############################################################################
