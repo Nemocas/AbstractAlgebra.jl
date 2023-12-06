@@ -142,10 +142,16 @@ reshape_to_varnames(vec::Vector, varnames::VarNames...) =
     reshape_to_varnames(vec, varnames)
 function reshape_to_varnames(vec::Vector, varnames::Tuple{Vararg{VarNames}})
     iter = Iterators.Stateful(vec)
-    result = Tuple(_reshape_to_varnames(iter, x) for x in varnames)
+    result = Tuple{(_reshape_to_varnames_type(eltype(vec), typeof(x)) for x in varnames)...}(_reshape_to_varnames(iter, x) for x in varnames)
     @assert isempty(iter)
     return result
 end
+
+_reshape_to_varnames_type(T::Type, ::Type{VarName}) = T
+_reshape_to_varnames_type(T::Type, ::Type{<:AbstractArray{<:VarName, N}}) where N = Array{T, N}
+_reshape_to_varnames_type(T::Type, ::Type{<:Pair{<:VarName}}) = Vector{T}
+_reshape_to_varnames_type(T::Type, ::Type{<:Pair{<:VarName, <:AbstractArray{<:VarName, N}}}) where N = Array{T, N}
+_reshape_to_varnames_type(T::Type, ::Type{<:Pair{<:VarName, <:NTuple{N, Any}}}) where N = Array{T, N}
 
 _reshape_to_varnames(iter::Iterators.Stateful, ::VarName) = popfirst!(iter)
 _reshape_to_varnames(iter::Iterators.Stateful, a::AbstractArray{<:VarName}) =
