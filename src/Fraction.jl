@@ -39,6 +39,21 @@ function check_parent(a::FracElem, b::FracElem, throw::Bool = true)
    return !fl
 end
 
+@doc raw"""
+    vars(a::FracElem{S}) where {S <: MPolyRingElem{<: RingElement}}
+
+Return the variables actually occurring in $a$. Returned variables are elements
+of `base_ring(a)`. The variables from the numerator go first.
+"""
+function vars(a::FracElem{S}) where {S <: MPolyRingElem{<: RingElement}}
+   n = numerator(a, false)
+   d = denominator(a, false)
+   n_vars = vars(n)
+   d_vars = vars(d)
+   nd_vars = union!(n_vars, d_vars)
+   return(nd_vars)
+end
+
 ###############################################################################
 #
 #   Constructors
