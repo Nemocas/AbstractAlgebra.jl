@@ -61,6 +61,18 @@ end
    @test !occursin("\n", sprint(show, fraction_field(S)))
 end
 
+@testset "Generic.FracFieldElem.vars" begin
+   S, (x,y,z) = polynomial_ring(QQ, ["x", "y", "z"])
+   K = fraction_field(S)
+
+   a = K(zero(S), one(S))
+   res = vars(a)
+   @test isempty(res) && eltype(res) == elem_type(S)
+   
+   @test parent(first(vars(1 // z))) == base_ring(a)
+   @test vars((2y) // 3one(S)) == [y]
+   @test vars((y + z) // (x + y)) == [y, z, x]
+end
 
 @testset "Generic.FracFieldElem.rand" begin
    S, x = polynomial_ring(ZZ, "x")
