@@ -141,7 +141,8 @@
    @test QQxxx_ == (QQxxx3, [x1, x2, x3])
 
    ZZxy_ = @inferred polynomial_ring(ZZ, :x => (1:2, 1:2), :y => 0:3)
-   ZZxy2_ = @inferred polynomial_ring(ZZ, :x => ["1, 1" "1, 2"; "2, 1" "2,2 "], :y => (0:3,))
+
+   ZZxy2_ = @inferred polynomial_ring(ZZ, :x => ["1, 1" "1, 2"; "2, 1" "2, 2"], :y => (0:3,))
 
    @test ZZxy_[1] isa Generic.MPolyRing
    @test ZZxy_ == ZZxy2_
