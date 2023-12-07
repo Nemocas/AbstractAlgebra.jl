@@ -35,8 +35,8 @@ julia> AbstractAlgebra.variable_names([:x, :y])
 
 julia> AbstractAlgebra.variable_names(:x => (0:0, 0:1), :y => 0:1, [:z])
 5-element Vector{Symbol}:
- Symbol("x[0,0]")
- Symbol("x[0,1]")
+ Symbol("x[0, 0]")
+ Symbol("x[0, 1]")
  Symbol("y[0]")
  Symbol("y[1]")
  :z
@@ -79,7 +79,7 @@ _variable_names(a::AbstractArray{<:VarName}, ::Any) = Symbol.(a)
 _variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, '[', axe, ']')
 _variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{false}) = check_names(Symbol.(s, axe))
 
-_variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{true}) = Symbol.(s, '[', join.(Iterators.product(axes...), ','), ']')
+_variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{true}) = Symbol.(s, '[', join.(Iterators.product(axes...), ", "), ']')
 _variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{false}) = check_names(Symbol.(s, join.(Iterators.product(axes...))))
 
 _variable_names((s, axe)::Pair{<:AbstractString}, val::Val) = _variable_names(s => (axe,), val)
@@ -391,7 +391,7 @@ julia> f("hello", [:x, :y, :z])
 ("hello", ["x", "y", "z"])
 
 julia> f("hello", :x => (1:1, 1:2), :y => 1:2, [:z])
-("hello", ["x[1,1]" "x[1,2]"], ["y[1]", "y[2]"], ["z"])
+("hello", ["x[1, 1]" "x[1, 2]"], ["y[1]", "y[2]"], ["z"])
 
 julia> f("projective", ["x$i$j" for i in 0:1, j in 0:1], [:y0, :y1], [:z])
 ("projective", ["x00" "x01"; "x10" "x11"], ["y0", "y1"], ["z"])
