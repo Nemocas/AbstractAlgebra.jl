@@ -68,6 +68,8 @@ Return the number of variables in the series ring.
 """
 nvars(R::AbsMSeriesRing) = nvars(poly_ring(R))
 
+ngens(R::AbsMSeriesRing) = ngens(poly_ring(R))
+
 @doc raw"""
     precision(a::AbsMSeries)
 

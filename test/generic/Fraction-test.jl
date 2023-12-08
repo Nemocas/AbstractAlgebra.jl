@@ -68,10 +68,35 @@ end
    a = K(zero(S), one(S))
    res = vars(a)
    @test isempty(res) && eltype(res) == elem_type(S)
-   
+
    @test parent(first(vars(1 // z))) == base_ring(a)
    @test vars((2y) // 3one(S)) == [y]
    @test vars((y + z) // (x + y)) == [y, z, x]
+end
+
+@testset "Generic.FracFieldElem.gens" begin
+   # Univariate
+   S, t = polynomial_ring(QQ, :t)
+   K = fraction_field(S)
+
+   @test gen(K) == K(t)
+
+   # Multivariate
+   S, (x,y) = polynomial_ring(QQ, ["x", "y"])
+   K = fraction_field(S)
+
+   @test ngens(S) == 2
+   @test gens(K) == K.(gens(S))
+
+   @test gens(K)[1] == gen(K,1)
+   @test gens(K)[2] == gen(K,2)
+   @test_throws ArgumentError gen(K,0)
+   @test_throws ArgumentError gen(K,3)
+
+   @test K[1] == gen(K,1)
+   @test K[2] == gen(K,2)
+   @test_throws ArgumentError K[0]
+   @test_throws ArgumentError K[3]
 end
 
 @testset "Generic.FracFieldElem.rand" begin

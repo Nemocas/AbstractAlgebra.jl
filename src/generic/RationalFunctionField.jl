@@ -111,7 +111,11 @@ is_unit(a::RationalFunctionFieldElem) = is_unit(data(a))
 
 gen(R::RationalFunctionField) = R(gen(base_ring(R.fraction_field)))
 
-gens(R::RationalFunctionField) = [R(g) for g in gens(base_ring(R.fraction_field))]
+gen(R::RationalFunctionField, i::Int) = R(gen(base_ring(R.fraction_field), i))
+
+gens(R::RationalFunctionField) = R.(gens(base_ring(R.fraction_field)))
+
+ngens(R::RationalFunctionField) = ngens(base_ring(R.fraction_field))
 
 function deepcopy_internal(a::RationalFunctionFieldElem, dict::IdDict)
    R = parent(a)

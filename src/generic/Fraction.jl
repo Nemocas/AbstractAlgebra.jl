@@ -45,6 +45,15 @@ function deepcopy_internal(a::FracFieldElem{T}, dict::IdDict) where {T <: RingEl
    return v
 end
 
+ngens(F::FracField) = ngens(base_ring(F))
+
+gen(F::FracField) = F(gen(base_ring(F)))
+
+gen(F::FracField, i::Int) = F(gen(base_ring(F), i))
+
+gens(F::FracField) = F.(gens(base_ring(F)))
+
+
 ###############################################################################
 #
 #   Promotion rules
