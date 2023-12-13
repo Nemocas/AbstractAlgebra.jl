@@ -447,38 +447,49 @@ function is_zero_divisor_with_annihilator(a::T) where T <: RingElement
 end
 
 @doc raw"""
-    factor(a::T)
+    factor(a::T) where T <: RingElement -> Fac{T}
 
-Return a factorization of the element $a$ as a `Fac{T}`.
+Return a factorization of $a$ into irreducible elements, as a `Fac{T}`.
+The irreducible elements in the factorization are pairwise coprime.
 """
 function factor(a)
    throw(NotImplementedError(:factor, a))
 end
 
 @doc raw"""
-    factor_squarefree(a::T)
+    factor_squarefree(a::T) where T <: RingElement -> Fac{T}
 
-Return a squarefree factorization of the element $a$ as a `Fac{T}`.
+Return a factorization of $a$ into squarefree elements, as a `Fac{T}`.
+The squarefree elements in the factorization are pairwise coprime.
 """
 function factor_squarefree(a)
    throw(NotImplementedError(:factor_squarefree, a))
 end
 
 @doc raw"""
-    is_irreducible(a)
+    is_irreducible(a::RingElement)
 
 Return `true` if $a$ is irreducible, else return `false`.
+Zero and units are by definition never irreducible.
 """
 function is_irreducible(a)
-   throw(NotImplementedError(:is_irreducible, a))
+   is_zero(a) && return false
+   is_unit(a) && return false
+   af = factor(a)
+   return length(af) == 1 && all(isone, values(af.fac))
 end
 
 @doc raw"""
-    is_squarefree(a)
+    is_squarefree(a::RingElement)
 
 Return `true` if $a$ is squarefree, else return `false`.
+An element is squarefree if it it is not divisible by any squares
+except the squares of units.
 """
 function is_squarefree(a)
-   throw(NotImplementedError(:is_squarefree, a))
+   iszero(a) && return false
+   is_unit(a) && return true
+   af = factor_squarefree(a)
+   return all(isone, values(af.fac))
 end
 
