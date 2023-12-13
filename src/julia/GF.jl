@@ -18,8 +18,6 @@ elem_type(::Type{GFField{T}}) where T <: Integer = GFElem{T}
 
 base_ring(a::GFField) = Union{}
 
-base_ring(a::GFElem) = Union{}
-
 parent(a::GFElem) = a.parent
 
 is_exact_type(::Type{GFElem{T}}) where T <: Integer = true
