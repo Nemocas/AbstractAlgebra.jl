@@ -594,12 +594,21 @@ axes(t::MatrixElem{T}, d::Integer) where T <: NCRingElement = Base.OneTo(size(t,
 
 function Base.iterate(M::MatSpace)
    R = base_ring(M)
-   p = ProductIterator(fill(R, nrows(M) * ncols(M)); inplace=true)
-   a, st = iterate(p) # R is presumably not empty
+   d = nrows(M) * ncols(M)
+   p = ProductIterator(fill(R, d); inplace=true)
+   if d == 0
+      # handle this carefully to preserve type stability
+      a = elem_type(R)[]
+      state_type = typeof(iterate(R)[2])
+      st = (elem_type(R)[], state_type[])
+   else
+      a, st = iterate(p) # R is presumably not empty
+   end
    M(a), (p, st)
 end
 
 function Base.iterate(M::MatSpace, (p, st))
+   nrows(M) * ncols(M) == 0 && return nothing
    a_st = iterate(p, st)
    a_st === nothing && return nothing
    M(first(a_st)), (p, last(a_st))

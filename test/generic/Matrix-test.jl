@@ -4235,6 +4235,9 @@ end
           [0 0; 1 1], [1 0; 1 1], [0 1; 1 1], [1 1; 1 1] ]
    @test xs == M.(ys)
 
+   M = matrix_space(F, 0, 2)
+   @test collect(M) == [ M() ]
+
    F = GF(5)
    M = matrix_space(F, 3, 4)
    xs = collect(Iterators.take(M, 10))
@@ -4245,6 +4248,9 @@ end
           [3 1 0 0; 0 0 0 0; 0 0 0 0], [4 1 0 0; 0 0 0 0; 0 0 0 0] ]
    @test xs == M.(ys)
    @test M([3 2 0 0; 0 0 0 0; 0 0 0 0]) in M
+
+   M = matrix_space(F, 1, 0)
+   @test collect(M) == [ M() ]
 end
 
 @testset "Generic.Mat.promotion" begin
