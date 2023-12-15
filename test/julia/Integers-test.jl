@@ -263,16 +263,14 @@ end
          if T == BigInt || ndigits(p; base=2) < ndigits(typemax(T); base=2)
             p = T(p)
 
-            @test is_power(p, n)
-
-            flag, q = is_power_with_root(p, n)
+            flag, q = is_power(p, n)
 
             @test flag && q == a
          end
       end
 
       @test_throws DomainError is_power(T(5), -1)
-      @test_throws DomainError is_power_with_root(T(5), 0)
+      @test_throws DomainError is_power(T(5), 0)
    end
 end
 
