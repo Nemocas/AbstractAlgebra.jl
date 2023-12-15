@@ -175,16 +175,14 @@ end
             p = T(p)
             q = T(q)
 
-            @test is_power(p//q, n)
-
-            flag, r = is_power_with_root(p//q, n)
+            flag, r = is_power(p//q, n)
 
             @test flag && r == a//b
          end
       end
 
       @test_throws DomainError is_power(Rational{T}(5//3), -1)
-      @test_throws DomainError is_power_with_root(Rational{T}(5//3), 0)
+      @test_throws DomainError is_power(Rational{T}(5//3), 0)
    end
 end
 
