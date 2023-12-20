@@ -244,6 +244,10 @@ export is_irreducible
 export is_squarefree
 export is_perfect
 export ItemQuantity
+export LaurentMPolyRing
+export LaurentMPolyRingElem
+export LaurentPolyRing
+export LaurentPolyRingElem
 export Map
 export MatAlgebra
 export MatAlgElem
