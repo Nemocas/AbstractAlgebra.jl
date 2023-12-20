@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export iroot, is_power, root, is_square_with_sqrt,
+export iroot, is_power, is_power_with_root, root, is_square_with_sqrt,
        is_probable_prime
 
 ###############################################################################
@@ -394,12 +394,12 @@ function ispower_moduli(a::Integer, n::Int)
 end
 
 @doc raw"""
-    is_power(a::T, n::Int) where T <: Integer
+    is_power_with_root(a::T, n::Int) where T <: Integer
 
 Return `true, q` if $a$ is a perfect $n$-th power with $a = q^n$. Otherwise
 return `false, 0`. We require $n > 0$.
 """
-function is_power(a::T, n::Int) where T <: Integer
+function is_power_with_root(a::T, n::Int) where T <: Integer
    n <= 0 && throw(DomainError(n, "exponent n must be positive"))
    if n == 1 || a == 0 || a == 1
       return (true, a)
@@ -416,6 +416,32 @@ function is_power(a::T, n::Int) where T <: Integer
    ccall((:__gmpz_rootrem, :libgmp), Nothing,
                      (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Int), q, r, a, n)
    return iszero(r) ? (true, T(q)) : (false, zero(T))
+end
+
+@doc raw"""
+    is_power(a::T, n::Int) where T <: Integer
+
+Return `true` if $a$ is a perfect $n$-th power, i.e. if there is a $b$
+such that $a = b^n$. We require $n > 0$.
+"""
+function is_power(a::T, n::Int) where T <: Integer
+   n <= 0 && throw(DomainError(n, "n is not positive"))
+   if n == 1 || a == 0 || a == 1
+      return true
+   elseif a == -1
+      return isodd(n) ? true : false
+   elseif mod(n, 2) == 0 && a < 0
+      return false
+   elseif !ispower_moduli(a, n)
+      return false
+   end
+   
+   q = BigInt()
+   r = BigInt()
+   ccall((:__gmpz_rootrem, :libgmp), Nothing,
+                     (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Int), q, r, BigInt(a), n)
+
+   return r == 0
 end
 
 function iroot(a::BigInt, n::Int)

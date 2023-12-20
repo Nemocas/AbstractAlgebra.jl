@@ -676,7 +676,6 @@ import .Generic: invmod
 import .Generic: is_compatible
 import .Generic: is_divisible_by
 import .Generic: is_homogeneous
-import .Generic: is_power
 import .Generic: is_rimhook
 import .Generic: is_submodule
 import .Generic: is_unit

@@ -165,11 +165,15 @@ function root(a::Rational{T}, n::Int; check::Bool=true) where T <: Integer
 end
 
 function is_power(a::Rational{T}, n::Int) where T <: Integer
-   f1, r1 = is_power(numerator(a), n)
+   return is_power(numerator(a), n) && is_power(denominator(a), n)
+end
+
+function is_power_with_root(a::Rational{T}, n::Int) where T <: Integer
+   f1, r1 = is_power_with_root(numerator(a), n)
    if !f1
       return false, zero(T)
    end
-   f2, r2 = is_power(denominator(a), n)
+   f2, r2 = is_power_with_root(denominator(a), n)
    if !f2
       return false, zero(T)
    end
