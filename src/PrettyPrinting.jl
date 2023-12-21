@@ -1,37 +1,35 @@
 module PrettyPrinting
 
-import ..AbstractAlgebra: RingElem
-import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: MatrixElem
+import ..AbstractAlgebra: NCRingElem
+import ..AbstractAlgebra: RingElem
 
-import Base: displaysize
 import Base: convert
-import Base: show
+import Base: displaysize
+import Base: get
+import Base: getindex
+import Base: haskey
+import Base: in
+import Base: lock
 import Base: pipe_reader
 import Base: pipe_writer
-import Base: lock
-import Base: unlock
-import Base: write
-import Base: getindex
-import Base: in
-import Base: haskey
-import Base: get
 import Base: print
+import Base: show
+import Base: unlock
 import Base: unwrapcontext
+import Base: write
 
 using ..AbstractAlgebra
 
 using Preferences
 
-export IOCustom
-export Indent
 export Dedent
+export Indent
 export indent_string!
-export pretty
+export IOCustom
 export Lowercase
 export LowercaseOff
-export Indent
-export Dedent
+export pretty
 
 # printing is done with respect to the following precedences
 # There is no point in using the julia values because we add our own ops
