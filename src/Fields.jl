@@ -4,8 +4,6 @@
 #
 ################################################################################
 
-include("julia/GF.jl")
-
 is_domain_type(::Type{T}) where {T <: FieldElem} = true
 
 is_zero_divisor(a::T) where T <: FieldElem = is_zero(a)
