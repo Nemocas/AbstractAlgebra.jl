@@ -3359,9 +3359,26 @@ end
 @doc raw"""
     is_upper_triangular(A::MatrixElem)
 
-Return `true` if $A$ is an upper triangular matrix.
+Return `true` if $A$ is an upper triangular matrix, that is,
+all entries below the main diagonal are zero. Note that this
+definition also applies to non-square matrices.
 
 Alias for `LinearAlgebra.istriu`.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> is_upper_triangular(QQ[1 2 ; 0 4])
+true
+
+julia> is_upper_triangular(QQ[1 0 ; 3 4])
+false
+
+julia> is_upper_triangular(QQ[1 2 ;])
+true
+
+julia> is_upper_triangular(QQ[1 ; 2])
+false
+```
 """
 function is_upper_triangular(M::MatrixElem)
     m = ncols(M)
@@ -3532,9 +3549,26 @@ end
 @doc raw"""
     is_lower_triangular(A::MatrixElem)
 
-Return `true` if $A$ is an lower triangular matrix.
+Return `true` if $A$ is an lower triangular matrix, that is,
+all entries above the main diagonal are zero. Note that this
+definition also applies to non-square matrices.
 
 Alias for `LinearAlgebra.istril`.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> is_lower_triangular(QQ[1 2 ; 0 4])
+false
+
+julia> is_lower_triangular(QQ[1 0 ; 3 4])
+true
+
+julia> is_lower_triangular(QQ[1 2 ;])
+false
+
+julia> is_lower_triangular(QQ[1 ; 2])
+true
+```
 """
 function is_lower_triangular(M::MatrixElem)
     for i = 1:nrows(M)
@@ -3550,9 +3584,23 @@ end
 @doc raw"""
     is_diagonal(A::MatrixElem)
 
-Return `true` if $A$ is a diagonal matrix.
+Return `true` if $A$ is a diagonal matrix, that is,
+all entries off the main diagonal are zero. Note that this
+definition also applies to non-square matrices.
 
 Alias for `LinearAlgebra.isdiag`.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> is_diagonal(QQ[1 0 ; 0 4])
+true
+
+julia> is_diagonal(QQ[1 2 ; 3 4])
+false
+
+julia> is_diagonal(QQ[1 0 ;])
+true
+```
 """
 function is_diagonal(A::MatrixElem)
     for i = 1:ncols(A)

@@ -318,13 +318,15 @@ export is_trivial
 @alias is_trivial istrivial
 
 # alternative names for some functions from LinearAlgebra
+# we don't use the `@alias` macro here because we provide custom
+# docstrings for these aliases
 export is_diagonal, is_hermitian, is_symmetric, is_upper_triangular, is_lower_triangular
 
-@alias is_diagonal isdiag
-@alias is_hermitian ishermitian
-@alias is_symmetric issymmetric
-@alias is_lower_triangular istril
-@alias is_upper_triangular istriu
+const is_diagonal = isdiag
+const is_hermitian = ishermitian
+const is_symmetric = issymmetric
+const is_lower_triangular = istril
+const is_upper_triangular = istriu
 
 ###############################################################################
 # Macros for fancy printing. to use, enable attribute storage for your struct,
