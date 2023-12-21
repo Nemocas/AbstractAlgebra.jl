@@ -343,6 +343,41 @@ include("generic/Misc/Poly.jl")
 include("generic/Misc/Rings.jl")
 include("generic/Misc/Localization.jl")
 
+# Exports; TODO: merge with imports in AbstractAlgebra.jl
+export aho_corasick_automaton
+export AhoCorasickAutomaton
+export AhoCorasickMatch
+export insert_keyword!
+export search
+export last_position
+export keyword_index
+export keyword
+export exponent_word
+export set_exponent_word!
+export groebner_basis
+export interreduce!
+export normal_form
+export normal_form_weak
+export function_field
+export base_field
+export normal_form
+export contains
+export intersection
+export SNFModule
+export SNFModuleElem
+export invariant_factors
+export number_field
+export PriorityQueue
+export QuotientModule
+export QuotientModuleElem
+export quo
+export RationalFunctionField
+export norm
+export total_ring_of_fractions
+export LocElem
+export Loc
+export prime
+
 # TODO/FIXME: deprecate aliases, remove in the future
 import ..AbstractAlgebra: @alias
 Base.@deprecate_binding ResF ResidueFieldElem

@@ -1,7 +1,3 @@
-export LocElem
-export Loc
-export prime
-
 ###############################################################################
 
 #   Declaration types

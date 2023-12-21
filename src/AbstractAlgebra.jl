@@ -1228,6 +1228,17 @@ export PolyCoeffs
 export roots
 export sturm_sequence
 
+export neg!
+export set_precision
+export set_precision!
+export GF
+export iroot
+export is_power
+export is_power_with_root
+export root
+export is_square_with_sqrt
+export is_probable_prime
+
 ################################################################################
 #
 #   Parent constructors

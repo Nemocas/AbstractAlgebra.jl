@@ -5,9 +5,6 @@
 #
 ###############################################################################
 
-export function_field
-export base_field
-
 ###############################################################################
 #
 #   Rational arithmetic : equivalent of _fmpq in Flint for k(x)

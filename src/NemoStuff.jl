@@ -1,7 +1,3 @@
-export neg!
-export set_precision
-export set_precision!
-
 function neg!(w::Vector{Int})
     w .*= -1
 end
