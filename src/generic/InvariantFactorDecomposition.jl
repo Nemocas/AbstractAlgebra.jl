@@ -4,7 +4,9 @@
 #
 ###############################################################################
 
-export SNFModule, SNFModuleElem, invariant_factors
+export SNFModule
+export SNFModuleElem
+export invariant_factors
 
 ###############################################################################
 #

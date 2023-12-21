@@ -15,7 +15,11 @@ using Preferences
 using Test # for "interface-conformance" functions
 
 import GroupsCore
-import GroupsCore: gens, ngens, order, mul!, istrivial
+import GroupsCore: gens
+import GroupsCore: ngens
+import GroupsCore: order
+import GroupsCore: mul!
+import GroupsCore: istrivial
 
 # A list of all symbols external packages should not import from AbstractAlgebra
 const import_exclude = [:import_exclude, :QQ, :ZZ,
@@ -300,7 +304,19 @@ include("AliasMacro.jl")
 include("PrintHelper.jl")
 
 # alternative names for some functions from Base
-export is_empty, is_even, is_equal, is_finite, is_inf, is_integer, is_less, is_odd, is_one, is_real, is_subset, is_valid, is_zero
+export is_empty
+export is_even
+export is_equal
+export is_finite
+export is_inf
+export is_integer
+export is_less
+export is_odd
+export is_one
+export is_real
+export is_subset
+export is_valid
+export is_zero
 
 @alias is_empty isempty
 @alias is_even iseven
@@ -324,7 +340,11 @@ export is_trivial
 # alternative names for some functions from LinearAlgebra
 # we don't use the `@alias` macro here because we provide custom
 # docstrings for these aliases
-export is_diagonal, is_hermitian, is_symmetric, is_upper_triangular, is_lower_triangular
+export is_diagonal
+export is_hermitian
+export is_symmetric
+export is_upper_triangular
+export is_lower_triangular
 
 const is_diagonal = isdiag
 const is_hermitian = ishermitian

@@ -1,4 +1,6 @@
-export LocElem, Loc, prime
+export LocElem
+export Loc
+export prime
 
 ###############################################################################
 

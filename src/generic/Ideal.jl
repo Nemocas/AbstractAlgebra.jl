@@ -4,7 +4,9 @@
 #
 ###############################################################################
 
-export normal_form, contains, intersection
+export normal_form
+export contains
+export intersection
 
 ###############################################################################
 #

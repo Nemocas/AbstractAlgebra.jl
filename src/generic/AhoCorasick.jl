@@ -5,19 +5,12 @@
 ###############################################################################
 
 export aho_corasick_automaton
-
 export AhoCorasickAutomaton
-
 export AhoCorasickMatch
-
 export insert_keyword!
-
 export search
-
 export last_position
-
 export keyword_index
-
 export keyword
 
 #export Word

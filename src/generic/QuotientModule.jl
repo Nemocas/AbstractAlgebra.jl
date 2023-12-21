@@ -4,7 +4,9 @@
 #
 ###############################################################################
 
-export QuotientModule, QuotientModuleElem, quo
+export QuotientModule
+export QuotientModuleElem
+export quo
 
 ###############################################################################
 #

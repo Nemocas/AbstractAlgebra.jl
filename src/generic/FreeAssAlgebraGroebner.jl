@@ -5,11 +5,8 @@
 ###############################################################################
 
 export groebner_basis
-
 export interreduce!
-
 export normal_form
-
 export normal_form_weak
 
 include("PriorityQueue.jl")

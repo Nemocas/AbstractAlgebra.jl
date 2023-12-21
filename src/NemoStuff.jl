@@ -1,4 +1,6 @@
 export neg!
+export set_precision
+export set_precision!
 
 function neg!(w::Vector{Int})
     w .*= -1
@@ -362,8 +364,6 @@ function mulmod(a::S, b::S, mod::Vector{S}) where {S<:MPolyRingElem{T}} where {T
 end
 
 Base.:\(f::Map, x) = preimage(f, x)
-
-export set_precision, set_precision!
 
 function set_precision(f::PolyRingElem{T}, n::Int) where {T<:SeriesElem}
     g = parent(f)()
