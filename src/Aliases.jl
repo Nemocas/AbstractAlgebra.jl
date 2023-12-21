@@ -19,6 +19,7 @@ Base.@deprecate_binding ismonomial_recursive is_monomial_recursive
 Base.@deprecate_binding isnegative is_negative
 Base.@deprecate_binding ispopov is_popov
 Base.@deprecate_binding ispower is_power
+Base.@deprecate_binding ispower_with_root is_power_with_root
 Base.@deprecate_binding isprobable_prime is_probable_prime
 Base.@deprecate_binding isreverse is_reverse
 Base.@deprecate_binding isrimhook is_rimhook

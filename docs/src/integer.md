@@ -173,7 +173,8 @@ iroot(a::BigInt)
 ```
 
 ```@docs
-is_power(a::T, n::Int) where T <: Integer
+is_power(a::BigInt)
+is_power_with_root(a::BigInt)
 ```
 
 ```@docs

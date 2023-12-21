@@ -144,7 +144,7 @@ The functionality below supplements that provided by Julia itself for its
 ### Square and n-th root
 
 The functions `sqrt`, `is_square`, `is_square_with_sqrt` are all provided, as are
-`root` and `is_power`.
+`root`, `is_power` and `is_power_with_root`.
 
 **Examples**
 
