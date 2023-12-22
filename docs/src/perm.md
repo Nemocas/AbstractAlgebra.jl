@@ -145,7 +145,6 @@ sign(::Perm)
 permtype(::Perm)
 ```
 
-Additionally [`GroupsCore.jl`](https://github.com/kalmarek/GroupsCore.jl) package provides more functionality, notably functions `gens` and `order`. You may consult its [documentation](https://kalmarek.github.io/GroupsCore.jl/stable/).
 Note that even an `Int64` can be easily overflowed when computing with symmetric groups.
 Thus, by default, `order` returns (always correct) `BigInt`s.
 If you are sure that the computation will not overflow, you may use `order(::Type{T}, ...)` to perform computations with machine integers.
