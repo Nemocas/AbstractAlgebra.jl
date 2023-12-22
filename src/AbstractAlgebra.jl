@@ -19,7 +19,7 @@ import GroupsCore: gens, ngens, order, mul!, istrivial
 
 # A list of all symbols external packages should not import from AbstractAlgebra
 const import_exclude = [:import_exclude, :QQ, :ZZ,
-                  :RealField, :number_field,
+                  :RealField, :number_field, :NumberField, :GF,
                   :AbstractAlgebra,
                   :inv, :log, :exp, :sqrt, :div, :divrem,
                   :numerator, :denominator,
