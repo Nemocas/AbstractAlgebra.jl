@@ -1302,6 +1302,21 @@ include("error.jl")
 ###############################################################################
 
 include("Groups.jl")
+include("Rings.jl")
+
+# Generic and specific rings and fields
+include("julia/Integer.jl")
+include("julia/Rational.jl")
+include("julia/Float.jl")
+include("julia/GF.jl")
+
+include("Fields.jl")
+include("Factor.jl")
+
+# Generic functions to be defined after all rings
+include("polysubst.jl")
+
+include("NCRings.jl")
 
 ################################################################################
 #
