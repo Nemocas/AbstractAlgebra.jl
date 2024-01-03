@@ -1,4 +1,5 @@
 include("julia/Integers-test.jl")
+include("broadcasting-test.jl")
 
 # artificially low cutoffs for testing purposes
 function AbstractAlgebra.hgcd_prefers_basecase(a::T, b::T) where T <: PolyRingElem

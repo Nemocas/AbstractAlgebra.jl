@@ -1318,6 +1318,8 @@ include("polysubst.jl")
 
 include("NCRings.jl")
 
+include("broadcasting.jl")
+
 ################################################################################
 #
 #   Further functionality for Julia matrices
