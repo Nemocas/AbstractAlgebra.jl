@@ -286,7 +286,7 @@ julia> block_diagonal_matrix([M, N])
 [0   0   7   8   9]
 ```
 
-## Conversion to Julia matrices and iteration
+## Conversion to Julia matrices, iteration and broacasting
 
 While `AbstractAlgebra` matrices are not instances of `AbstractArray`,
 they are closely related to Julia matrices. For convenience, a `Matrix`
@@ -319,6 +319,29 @@ Set{BigInt} with 6 elements:
   2
   3
   1
+```
+
+Matrices also support broadcasting, which amounts to elementwise application
+of functions to matrices:
+
+```jldoctest
+julia> k = GF(5);
+
+julia> A = ZZ[1 2; 3 4];
+
+julia> k.(A)
+[1   2]
+[3   4]
+
+julia> 3 .* A .+ 2
+[ 5    8]
+[11   14]
+
+julia> B = ZZ[3 4; 5 6];
+
+julia> ((x, y) -> x^2 + y^2).(A, B)
+[10   20]
+[34   52]
 ```
 
 ### Views
