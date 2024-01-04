@@ -1247,3 +1247,23 @@ end
       @test isequal(h, R())
    end
 end
+
+@testset "Generic.AbsSeries.euclidean" begin
+   R, x = power_series_ring(QQ, 20, "x", model = :capped_absolute)
+   S, y = power_series_ring(GF(5), 20, "y", model = :capped_absolute)
+
+   T, z = power_series_ring(GF(7), 20, "z", model = :capped_absolute)
+   @test_throws ErrorException divrem(y, z)
+
+   for (T, t) in [ (R, x), (S, y) ]
+      @test divrem(t^2, t) == (t, zero(T))
+      @test divrem(t + 1, t) == (zero(T), t + 1)
+      @test_throws DivideError divrem(t, zero(T))
+
+      @test gcd(t^2*(t - 1), t^2) == t^2
+      @test gcd((t + 1)*(t - 1), t + 1) == one(T)
+      @test gcdx(t^2*(t - 1), t^2) == (t^2, zero(T), one(T))
+      g, u, v = gcdx((t + 1)*(t - 1), t + 1)
+      @test u*(t + 1)*(t - 1) + v*(t + 1) == g
+   end
+ end
