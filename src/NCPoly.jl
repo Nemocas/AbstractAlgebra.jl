@@ -643,17 +643,17 @@ end
 #
 ################################################################################
 
-_make_parent(g, p::NCPolyRingElem, cached::Bool) =
+_make_parent(g::T, p::NCPolyRingElem, cached::Bool) where {T} =
    _change_poly_ring(parent(g(zero(base_ring(p)))),
                      parent(p), cached)
 
-function map_coefficients(g, p::NCPolyRingElem{<:NCRingElement};
+function map_coefficients(g::T, p::NCPolyRingElem{<:NCRingElement};
                     cached::Bool = true,
-                    parent::NCPolyRing = _make_parent(g, p, cached))
+		    parent::NCPolyRing = _make_parent(g, p, cached)) where {T}
    return _map(g, p, parent)
 end
 
-function _map(g, p::NCPolyRingElem, Rx)
+function _map(g::T, p::NCPolyRingElem, Rx) where {T}
    R = base_ring(Rx)
    new_coefficients = elem_type(R)[let c = coeff(p, i)
                                      iszero(c) ? zero(R) : R(g(c))

@@ -926,11 +926,11 @@ end
 #
 ################################################################################
 
-function map_coefficients(f, p::UnivPoly; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(base_ring(p)))), parent(p), cached))
+function map_coefficients(f::T, p::UnivPoly; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(base_ring(p)))), parent(p), cached)) where T
    return _map(f, p, parent)
 end
 
-function _map(g, p::UnivPoly, Rx)
+function _map(g::T, p::UnivPoly, Rx) where T
    cvzip = zip(coefficients(p), exponent_vectors(p))
    M = MPolyBuildCtx(Rx)
    for (c, v) in cvzip

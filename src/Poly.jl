@@ -3154,7 +3154,7 @@ end
 #
 ################################################################################
 
-_make_parent(g, p::PolyRingElem, cached::Bool) =
+_make_parent(g::T, p::PolyRingElem, cached::Bool) where T =
    _change_poly_ring(parent(g(zero(base_ring(p)))),
                      parent(p), cached)
 
@@ -3167,13 +3167,13 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function map_coefficients(g, p::PolyRingElem{<:RingElement};
+function map_coefficients(g::T, p::PolyRingElem{<:RingElement};
                     cached::Bool = true,
-                    parent::PolyRing = _make_parent(g, p, cached))
+                    parent::PolyRing = _make_parent(g, p, cached)) where T
    return _map(g, p, parent)
 end
 
-function _map(g, p::PolyRingElem, Rx)
+function _map(g::T, p::PolyRingElem, Rx) where T
    R = base_ring(Rx)
    new_coefficients = elem_type(R)[let c = coeff(p, i)
                                      iszero(c) ? zero(R) : R(g(c))

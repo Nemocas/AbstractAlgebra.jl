@@ -6831,7 +6831,7 @@ end
 
 Like `map_entries`, but stores the result in `dst` rather than a new matrix.
 """
-function map_entries!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement}
+function map_entries!(f::S, dst::MatrixElem{T}, src::MatrixElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
    for i = 1:nrows(src), j = 1:ncols(src)
       dst[i, j] = f(src[i, j])
    end
@@ -6844,14 +6844,14 @@ end
 Like `map`, but stores the result in `dst` rather than a new matrix.
 This is equivalent to `map_entries!(f, dst, src)`.
 """
-Base.map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
+Base.map!(f::S, dst::MatrixElem{T}, src::MatrixElem{U}) where {S, T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
 
 @doc raw"""
     map_entries(f, a::MatrixElem{T}) where T <: NCRingElement
 
 Transform matrix `a` by applying `f` on each element.
 """
-function map_entries(f, a::MatrixElem{T}) where T <: NCRingElement
+function map_entries(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement}
    isempty(a) && return _change_base_ring(parent(f(zero(base_ring(a)))), a)
    b11 = f(a[1, 1])
    b = _change_base_ring(parent(b11), a)
@@ -6869,7 +6869,7 @@ end
 Transform matrix `a` by applying `f` on each element.
 This is equivalent to `map_entries(f, a)`.
 """
-Base.map(f, a::MatrixElem{T}) where T <: NCRingElement = map_entries(f, a)
+Base.map(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement} = map_entries(f, a)
 
 ###############################################################################
 #
