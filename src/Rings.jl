@@ -172,3 +172,5 @@ is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
 is_finite(F::FinField) = true
 
 is_finite(F::Field) = characteristic(F) != 0 && throw(NotImplementedError(:is_finite, F))
+
+characteristic(F::NumField) = 0
