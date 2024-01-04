@@ -86,6 +86,29 @@ end
    @test string(y//x//y) == "1//x"
 end
 
+@testset "Generic.RationalFunctionField.gens" begin
+   # Univariate
+   K, x = rational_function_field(QQ, "x")
+
+   @test gen(K) == x
+
+   # Multivariate
+   K, (x, y) = rational_function_field(QQ, ["x", "y"])
+
+   @test ngens(K) == 2
+   @test gens(K) == [x, y]
+
+   @test gen(K,1) == x
+   @test gen(K,2) == y
+   @test_throws ArgumentError gen(K,0)
+   @test_throws ArgumentError gen(K,3)
+
+   @test K[1] == x
+   @test K[2] == y
+   @test_throws ArgumentError K[0]
+   @test_throws ArgumentError K[3]
+end
+
 @testset "Generic.RationalFunctionField.rand" begin
    # Univariate
    K, x = rational_function_field(QQ, "x")

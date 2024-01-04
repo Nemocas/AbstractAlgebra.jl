@@ -35,6 +35,8 @@ Return the number of variables of the polynomial ring.
 """
 nvars(a::MPolyRing) = a.num_vars
 
+ngens(a::MPolyRing) = a.num_vars
+
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:lex}}) where {T <: RingElement}
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
