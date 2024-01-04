@@ -15,7 +15,11 @@ using Preferences
 using Test # for "interface-conformance" functions
 
 import GroupsCore
-import GroupsCore: gens, ngens, order, mul!, istrivial
+import GroupsCore: gens
+import GroupsCore: ngens
+import GroupsCore: order
+import GroupsCore: mul!
+import GroupsCore: istrivial
 
 # A list of all symbols external packages should not import from AbstractAlgebra
 const import_exclude = [:import_exclude, :QQ, :ZZ,
@@ -241,8 +245,8 @@ export Ideal
 export IdealSet
 export IdentityMap
 export is_irreducible
-export is_squarefree
 export is_perfect
+export is_squarefree
 export ItemQuantity
 export LaurentMPolyRing
 export LaurentMPolyRingElem
@@ -300,11 +304,23 @@ include("AliasMacro.jl")
 include("PrintHelper.jl")
 
 # alternative names for some functions from Base
-export is_empty, is_even, is_equal, is_finite, is_inf, is_integer, is_less, is_odd, is_one, is_real, is_subset, is_valid, is_zero
+export is_empty
+export is_equal
+export is_even
+export is_finite
+export is_inf
+export is_integer
+export is_less
+export is_odd
+export is_one
+export is_real
+export is_subset
+export is_valid
+export is_zero
 
 @alias is_empty isempty
-@alias is_even iseven
 @alias is_equal isequal
+@alias is_even iseven
 @alias is_finite isfinite
 @alias is_inf isinf
 @alias is_integer isinteger
@@ -324,7 +340,11 @@ export is_trivial
 # alternative names for some functions from LinearAlgebra
 # we don't use the `@alias` macro here because we provide custom
 # docstrings for these aliases
-export is_diagonal, is_hermitian, is_symmetric, is_upper_triangular, is_lower_triangular
+export is_diagonal
+export is_hermitian
+export is_symmetric
+export is_upper_triangular
+export is_lower_triangular
 
 const is_diagonal = isdiag
 const is_hermitian = ishermitian
@@ -696,6 +716,9 @@ import .Generic: leading_monomial
 import .Generic: leading_term
 import .Generic: leglength
 import .Generic: length
+import .Generic: Loc
+import .Generic: localization
+import .Generic: LocElem
 import .Generic: main_variable
 import .Generic: main_variable_extract
 import .Generic: main_variable_insert
@@ -739,6 +762,7 @@ import .Generic: retraction_map
 import .Generic: reverse
 import .Generic: rising_factorial
 import .Generic: rising_factorial2
+import .Generic: roots
 import .Generic: rowlength
 import .Generic: section_map
 import .Generic: set_exponent_vector!
@@ -748,6 +772,7 @@ import .Generic: setcoeff!
 import .Generic: setpermstyle
 import .Generic: size
 import .Generic: sort_terms!
+import .Generic: sturm_sequence
 import .Generic: summands
 import .Generic: supermodule
 import .Generic: term
@@ -760,13 +785,6 @@ import .Generic: unit
 import .Generic: upscale
 import .Generic: weights
 import .Generic: zero
-
-# Moved from Hecke into Misc
-import .Generic: Loc
-import .Generic: localization
-import .Generic: LocElem
-import .Generic: roots
-import .Generic: sturm_sequence
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export _check_dim
@@ -789,9 +807,9 @@ export add_row
 export add_row!
 export addmul_delayed_reduction!
 export addmul!
+export allow_unicode
 export AllParts
 export AllPerms
-export allow_unicode
 export base_field
 export base_ring
 export base_ring_type
@@ -848,7 +866,9 @@ export discriminant
 export divexact
 export divexact_left
 export divexact_low
+export divexact_low
 export divexact_right
+export divhigh
 export divhigh
 export divides
 export domain
@@ -885,6 +905,7 @@ export gen
 export gens
 export get_attribute
 export get_attribute!
+export GF
 export gram
 export has_attribute
 export has_bottom_neighbor
@@ -920,6 +941,7 @@ export inverse_fn
 export inverse_image_fn
 export inverse_mat
 export invmod
+export iroot
 export is_compatible
 export is_constant
 export is_degree
@@ -935,17 +957,22 @@ export is_invertible
 export is_invertible_with_inverse
 export is_isomorphic
 export is_monic
+export is_monic
 export is_monomial
 export is_monomial_recursive
 export is_negative
 export is_popov
 export is_positive
+export is_power
+export is_power_with_root
+export is_probable_prime
 export is_reverse
 export is_rimhook
 export is_rref
 export is_skew_symmetric
 export is_snf
 export is_square
+export is_square_with_sqrt
 export is_submodule
 export is_symmetric
 export is_term
@@ -962,11 +989,11 @@ export is_zero_entry
 export is_zero_row
 export kernel
 export kronecker_product
+export laurent_polynomial_ring
 export laurent_ring
 export laurent_series
 export laurent_series_field
 export laurent_series_ring
-export laurent_polynomial_ring
 export lcm
 export leading_coefficient
 export leading_exponent_vector
@@ -977,6 +1004,9 @@ export left_kernel
 export leglength
 export length
 export lift
+export Loc
+export localization
+export LocElem
 export lower_triangular_matrix
 export lu
 export lu!
@@ -1016,13 +1046,14 @@ export monomial_set!
 export monomial_to_newton!
 export monomial!
 export monomials
-export mpoly_type
 export mpoly_ring_type
+export mpoly_type
 export MPolyBuildCtx
 export mul_classical
 export mul_karatsuba
 export mul_ks
 export mul_red!
+export mulhigh_n
 export mulhigh_n
 export mullow
 export mullow_karatsuba
@@ -1032,6 +1063,7 @@ export multiply_column!
 export multiply_row
 export multiply_row!
 export ncols
+export neg!
 export newton_to_monomial!
 export ngens
 export norm
@@ -1059,6 +1091,7 @@ export pol_length
 export polcoeff
 export poly
 export poly_ring
+export PolyCoeffs
 export PolyCoeffs
 export polynomial
 export polynomial_ring
@@ -1117,6 +1150,8 @@ export reverse_rows!
 export right_kernel
 export rising_factorial
 export rising_factorial2
+export root
+export roots
 export rowlength
 export rref
 export rref_rational
@@ -1130,6 +1165,8 @@ export set_exponent_vector!
 export set_exponent_word!
 export set_length!
 export set_limit!
+export set_precision
+export set_precision!
 export set_precision!
 export set_valuation!
 export setcoeff!
@@ -1155,6 +1192,7 @@ export SparsePolynomialRing
 export Strassen
 export strictly_lower_triangular_matrix
 export strictly_upper_triangular_matrix
+export sturm_sequence
 export sub
 export subst
 export summands
@@ -1188,25 +1226,13 @@ export var_index
 export vars
 export vector_space
 export VectorSpace
-export with_unicode
 export weak_popov
 export weak_popov_with_transform
 export weights
+export with_unicode
 export YoungTableau
 export zero
 export zero_matrix
-
-# Moved from Hecke into Misc
-export divexact_low
-export divhigh
-export is_monic
-export Loc
-export localization
-export LocElem
-export mulhigh_n
-export PolyCoeffs
-export roots
-export sturm_sequence
 
 ################################################################################
 #

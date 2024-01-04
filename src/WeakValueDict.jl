@@ -2,8 +2,17 @@
 # Most notably, length(d) cannot be assumed to match the length of an iteration
 # over d.
 
-import Base: isempty, setindex!, getkey, length, iterate, empty, delete!, pop!,
-       get, sizehint!, copy
+import Base: isempty
+import Base: setindex!
+import Base: getkey
+import Base: length
+import Base: iterate
+import Base: empty
+import Base: delete!
+import Base: pop!
+import Base: get
+import Base: sizehint!
+import Base: copy
 
 #=
 A typical mutable object has a life like

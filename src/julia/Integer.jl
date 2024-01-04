@@ -4,9 +4,6 @@
 #
 ###############################################################################
 
-export iroot, is_power, is_power_with_root, root, is_square_with_sqrt,
-       is_probable_prime
-
 ###############################################################################
 #
 #   Data type and parent object methods
