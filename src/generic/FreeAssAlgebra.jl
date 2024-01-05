@@ -687,7 +687,7 @@ function change_base_ring(
 end
 
 function map_coefficients(
-    f,
+    f::S,
     a::FreeAssAlgElem{T};
     cached::Bool = true,
     parent::AbstractAlgebra.FreeAssAlgebra = _change_freeassalg_ring(
@@ -695,11 +695,11 @@ function map_coefficients(
         parent(a),
         cached,
     ),
-) where T <: RingElement
+) where {S, T <: RingElement}
     return _map(f, a, parent)
 end
 
-function _map(g, a::FreeAssAlgElem{T}, Rx) where T <: RingElement
+function _map(g::S, a::FreeAssAlgElem{T}, Rx) where {S, T <: RingElement}
     cvzip = zip(coefficients(a), exponent_words(a))
     M = MPolyBuildCtx(Rx)
     for (c, v) in cvzip

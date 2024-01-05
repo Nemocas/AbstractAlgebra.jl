@@ -1012,7 +1012,7 @@ end
 #
 ################################################################################
 
-function _make_parent(g, p::AbsPowerSeriesRingElem, cached::Bool)
+function _make_parent(g::T, p::AbsPowerSeriesRingElem, cached::Bool) where T
    R = parent(g(zero(base_ring(p))))
    S = parent(p)
    sym = var(S)
@@ -1029,13 +1029,13 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function map_coefficients(g, p::AbsPowerSeriesRingElem{<:RingElement};
+function map_coefficients(g::T, p::AbsPowerSeriesRingElem{<:RingElement};
                     cached::Bool = true,
-                    parent::Ring = _make_parent(g, p, cached))
+		    parent::Ring = _make_parent(g, p, cached)) where {T}
    return _map(g, p, parent)
 end
 
-function _map(g, p::AbsPowerSeriesRingElem, Rx)
+function _map(g::T, p::AbsPowerSeriesRingElem, Rx) where {T}
    R = base_ring(Rx)
    new_coefficients = elem_type(R)[let c = coeff(p, i)
                                      iszero(c) ? zero(R) : R(g(c))

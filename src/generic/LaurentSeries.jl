@@ -542,7 +542,7 @@ end
 #
 ###############################################################################
 
-function _make_parent(g, p::LaurentSeriesElem, cached::Bool)
+function _make_parent(g::T, p::LaurentSeriesElem, cached::Bool) where T
    R = parent(g(zero(base_ring(p))))
    S = parent(p)
    sym = var(S)
@@ -550,13 +550,13 @@ function _make_parent(g, p::LaurentSeriesElem, cached::Bool)
    return AbstractAlgebra.laurent_series_ring(R, max_prec, sym; cached=cached)[1]
 end
 
-function map_coefficients(g, p::LaurentSeriesElem{<:RingElement};
+function map_coefficients(g::T, p::LaurentSeriesElem{<:RingElement};
                     cached::Bool = true,
-                    parent::Ring = _make_parent(g, p, cached))
+		    parent::Ring = _make_parent(g, p, cached)) where {T}
    return _map(g, p, parent)
 end
 
-function _map(g, p::LaurentSeriesElem, Rx)
+function _map(g::T, p::LaurentSeriesElem, Rx) where T
    R = base_ring(Rx)
    new_coefficients = elem_type(R)[let c = polcoeff(p, i)
                                      iszero(c) ? zero(R) : R(g(c))

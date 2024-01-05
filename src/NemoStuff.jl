@@ -262,7 +262,7 @@ end
 #       lift(FracField, Series)
 #       (to be in line with lift(ZZ, padic) and lift(QQ, padic)
 #TODO: some of this would only work for Abs, not Rel, however, this should be fine here
-function map_coefficients(f, a::RelPowerSeriesRingElem; parent::SeriesRing)
+function map_coefficients(f::T, a::RelPowerSeriesRingElem; parent::SeriesRing) where T
     c = typeof(f(coeff(a, 0)))[]
     for i = 0:pol_length(a)-1
         push!(c, f(polcoeff(a, i)))
