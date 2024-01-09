@@ -1247,3 +1247,37 @@ end
       @test isequal(h, R())
    end
 end
+
+@testset "Generic.AbsSeries.euclidean" begin
+   R, x = power_series_ring(QQ, 20, "x", model = :capped_absolute)
+   S, y = power_series_ring(GF(5), 20, "y", model = :capped_absolute)
+
+   T, z = power_series_ring(GF(7), 20, "z", model = :capped_absolute)
+   @test_throws ErrorException divrem(y, z)
+
+   for (T, t) in [ (R, x), (S, y) ]
+      @test divrem(t^2, t) == (t, zero(T))
+      @test divrem(t + 1, t) == (zero(T), t + 1)
+      @test_throws DivideError divrem(t, zero(T))
+
+      @test gcd(t^2*(t - 1), t^2) == t^2
+      @test gcd((t + 1)*(t - 1), t + 1) == one(T)
+      @test gcdx(t^2*(t - 1), t^2) == (t^2, zero(T), one(T))
+      g, u, v = gcdx((t + 1)*(t - 1), t + 1)
+      @test u*(t + 1)*(t - 1) + v*(t + 1) == g
+
+      M = matrix(T, 4, 3, [ 0 0 0; t^3 + 1 t^2 0; 0 t^2 t^5; t^4 + 1 t^2 t^5 + t^3 ])
+      @test is_hnf(hnf(M))
+      H, U = hnf_with_transform(M)
+      @test is_hnf(H)
+      @test U*M == H
+      @test is_unit(det(U))
+
+      @test is_snf(snf(M))
+      S, U, V = snf_with_transform(M)
+      @test is_snf(S)
+      @test U*M*V == S
+      @test is_unit(det(U))
+      @test is_unit(det(V))
+   end
+ end

@@ -740,6 +740,25 @@ end
 
 ###############################################################################
 #
+#   Division with remainder
+#
+###############################################################################
+
+function Base.divrem(a::AbsPowerSeriesRingElem{T}, b::AbsPowerSeriesRingElem{T}) where {T <: FieldElement}
+   check_parent(a, b)
+   if length(b) == 0
+      throw(DivideError())
+   end
+   if valuation(a) < valuation(b)
+      return zero(parent(a)), a
+   end
+   # valuation(a) >= valuation(b), so the exact division works
+   q = divexact(a, b)
+   return q, a - q*b
+end
+
+###############################################################################
+#
 #   Composition
 #
 ###############################################################################
