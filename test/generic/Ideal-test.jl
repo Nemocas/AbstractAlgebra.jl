@@ -572,7 +572,7 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
       
-      K = intersection(I, J)
+      K = intersect(I, J)
 
       @test contains(I, K)
       @test contains(J, K)
@@ -590,7 +590,7 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
 
-      K = intersection(I, J)
+      K = intersect(I, J)
 
       @test contains(I, K)
       @test contains(J, K)
@@ -609,7 +609,7 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
 
-      K = intersection(I, J)
+      K = intersect(I, J)
 
       @test contains(I, K)
       @test contains(J, K)
@@ -625,7 +625,7 @@ end
       I = Generic.Ideal(ZZ, V)
       J = Generic.Ideal(ZZ, W)
       
-      K = intersection(I, J)
+      K = intersect(I, J)
 
       @test contains(I, K)
       @test contains(J, K)

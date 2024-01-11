@@ -147,7 +147,7 @@ julia> dim(N)
 ### Intersection
 
 ```@docs
-Base.intersect(M::FPModule{T}, N::FPModule{T}) where
+intersect(M::FPModule{T}, N::FPModule{T}) where
 T <: RingElement
 ```
 
