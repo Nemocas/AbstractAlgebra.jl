@@ -68,7 +68,7 @@ end
 # Tries to solve Ax = b (side == :right) or xA = b (side == :left) possibly with kernel.
 # Always returns a tuple (Bool, MatElem, MatElem).
 # task may be:
-# * :only_check -> It is only tested whether there is a solution, the two MatElem's
+# * :only_check -> It is only tested whether there is a solution, the two MatElem's are
 #   "dummies"
 # * :with_solution -> A solution is computed, the last MatElem is a "dummy"
 # * :with_kernel -> A solution and the kernel is computed
@@ -166,13 +166,18 @@ function _can_solve_internal(A::MatElem{T}, b::Vector{T}, task::Symbol; side::Sy
   if side !== :right && side !== :left
     throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
   end
-  if side === :right
+
+  isright = side === :right
+
+  if isright
+    nrows(A) != length(b) && error("Incompatible matrices")
     B = matrix(base_ring(A), nrows(A), 1, b)
   else # side == :left
+    ncols(A) != length(b) && error("Incompatible matrices")
     B = matrix(base_ring(A), 1, ncols(A), b)
   end
   fl, sol, K = _can_solve_internal(A, B, task, side = side)
-  if side === :right
+  if isright
     x = eltype(b)[ sol[i, 1] for i in 1:nrows(sol) ]
   else # side == :left
     x = eltype(b)[ sol[1, i] for i in 1:ncols(sol) ]
