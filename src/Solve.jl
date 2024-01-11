@@ -100,8 +100,8 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
   end
 
   rk = rref!(mu)
-  p = AbstractAlgebra.find_pivot(mu)
-  if any(i -> i > ncolsA, p)
+  p = pivot_and_non_pivot_cols(mu, rk)
+  if any(i -> i > ncolsA, p[1:rk])
     return false, zero_matrix(R, 0, 0), zero_matrix(R, 0, 0)
   end
   if task === :only_check
@@ -110,7 +110,7 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
 
   # Compute a solution
   sol = isright ? zero_matrix(R, ncols(A), ncols(b)) : zero_matrix(R, nrows(b), nrows(A))
-  for i = 1:length(p)
+  for i = 1:rk
     for j = 1:ncolsb
       if isright
         sol[p[i], j] = mu[i, ncols(A) + j]
@@ -123,40 +123,20 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
     return true, sol, zero_matrix(R, 0, 0)
   end
 
-  # Search for pivots (again), but also collect the non-pivot columns
-  nullity = ncolsA - length(p)
-  pivots = zeros(Int, max(nrows(A), ncols(A)))
-  np = rk
-  j = k = 1
-  for i = 1:rk
-    while is_zero_entry(mu, i, j)
-      pivots[np + k] = j
-      j += 1
-      k += 1
-    end
-    pivots[i] = j
-    j += 1
-  end
-  while k <= nullity
-    pivots[np + k] = j
-    j += 1
-    k += 1
-  end
-
   # Build the kernel
   X = isright ? zero_matrix(R, ncols(A), nullity) : zero_matrix(R, nullity, nrows(A))
   for i = 1:nullity
     for j = 1:rk
       if isright
-        X[pivots[j], i] = -mu[j, pivots[np + i]]
+        X[p[j], i] = -mu[j, p[rk + i]]
       else
-        X[i, pivots[j]] = -mu[j, pivots[np + i]]
+        X[i, p[j]] = -mu[j, p[rk + i]]
       end
     end
     if isright
-      X[pivots[np + i], i] = one(R)
+      X[p[rk + i], i] = one(R)
     else
-      X[i, pivots[np + i]] = one(R)
+      X[i, p[rk + i]] = one(R)
     end
   end
   return true, sol, X
@@ -198,6 +178,31 @@ function _hcat_transposed(A::MatElem{T}, B::MatElem{T}) where T
     end
   end
   return C
+end
+
+# A is supposed to be in rref of rank r
+# Return a Vector of length ncols(A) with the first r entries the pivot columns
+# of A and the following entries the non-pivot columns (in ascending order).
+function pivot_and_non_pivot_cols(A::MatElem, r::Int)
+  p = zeros(Int, ncols(A))
+  j = 1
+  k = 1
+  for i = 1:r
+    while is_zero_entry(A, i, j)
+      p[r + k] = j
+      j += 1
+      k += 1
+    end
+    p[i] = j
+    j += 1
+  end
+  while k <= ncols(A) - r
+    p[r + k] = j
+    j += 1
+    k += 1
+  end
+
+  return p
 end
 
 end
