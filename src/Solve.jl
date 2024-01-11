@@ -124,6 +124,7 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
   end
 
   # Build the kernel
+  nullity = ncolsA - rk
   X = isright ? zero_matrix(R, ncols(A), nullity) : zero_matrix(R, nullity, nrows(A))
   for i = 1:nullity
     for j = 1:rk
