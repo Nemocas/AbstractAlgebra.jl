@@ -2,6 +2,44 @@ module Solve
 
 using AbstractAlgebra
 
+import AbstractAlgebra: base_ring, nrows, ncols
+
+################################################################################
+#
+#  "Lazy" transpose of a matrix (very experimental)
+#
+################################################################################
+
+mutable struct LazyTransposeMatElem{T} <: MatElem{T}
+  M::MatElem{T}
+end
+
+data(M::LazyTransposeMatElem) = M.M
+
+# The entries of M and the result are SHARED, so e.g. a setindex! will modify
+# 'both' matrices. But this is the point: we don't want to actually transpose
+# the matrix.
+lazy_transpose(M::MatElem) = LazyTransposeMatElem(M)
+lazy_transpose(M::LazyTransposeMatElem) = data(M)
+
+# Change the order of rows and columns in nrows, ncols, getindex and setindex!
+AbstractAlgebra.nrows(M::LazyTransposeMatElem) = ncols(data(M))
+AbstractAlgebra.ncols(M::LazyTransposeMatElem) = nrows(data(M))
+
+Base.getindex(M::LazyTransposeMatElem, r::Int, c::Int) = data(M)[c, r]
+function Base.setindex!(M::LazyTransposeMatElem{T}, d::T, r::Int, c::Int) where T
+  setindex!(M.M, d, c, r)
+  return M
+end
+
+AbstractAlgebra.base_ring(M::LazyTransposeMatElem) = base_ring(data(M))
+
+################################################################################
+#
+#  User facing functions for linear solving
+#
+################################################################################
+
 @doc raw"""
     solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T <: FieldElement
     solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T <: FieldElement
@@ -65,6 +103,12 @@ function can_solve_with_solution_and_kernel(A::MatElem{T}, b::Union{Vector{T}, M
   return _can_solve_internal(A, b, :with_kernel; side = side)
 end
 
+################################################################################
+#
+#  Internal functionality
+#
+################################################################################
+
 # Tries to solve Ax = b (side == :right) or xA = b (side == :left) possibly with kernel.
 # Always returns a tuple (Bool, MatElem, MatElem).
 # task may be:
@@ -81,27 +125,22 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
     throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
   end
 
-  isright = side === :right
+  isleft = side === :left
 
   R = base_ring(A)
 
-  # Build [ A | b ] and compute rref
-  if isright
-    nrows(A) != nrows(b) && error("Incompatible matrices")
-    mu = hcat(A, b)
-    ncolsA = ncols(A)
-    ncolsb = ncols(b)
-  else
-    ncols(A) != ncols(b) && error("Incompatible matrices")
-    mu = _hcat_transposed(A, b)
-    # For side == :left we pretend that A and b are transposed!
-    ncolsA = nrows(A)
-    ncolsb = nrows(b)
+  if isleft
+    # For side == :left, we pretend that A and b are transposed
+    A = lazy_transpose(A)
+    b = lazy_transpose(b)
   end
+
+  nrows(A) != nrows(b) && error("Incompatible matrices")
+  mu = hcat(A, b)
 
   rk = rref!(mu)
   p = pivot_and_non_pivot_cols(mu, rk)
-  if any(i -> i > ncolsA, p[1:rk])
+  if any(i -> i > ncols(A), p[1:rk])
     return false, zero_matrix(R, 0, 0), zero_matrix(R, 0, 0)
   end
   if task === :only_check
@@ -109,37 +148,44 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
   end
 
   # Compute a solution
-  sol = isright ? zero_matrix(R, ncols(A), ncols(b)) : zero_matrix(R, nrows(b), nrows(A))
+  if !isleft
+    sol = zero_matrix(R, ncols(A), ncols(b))
+  else
+    # Pretend again that sol is transposed, so that we can use the same code to
+    # fill it
+    sol = lazy_transpose(zero_matrix(R, ncols(b), ncols(A)))
+  end
   for i = 1:rk
-    for j = 1:ncolsb
-      if isright
-        sol[p[i], j] = mu[i, ncols(A) + j]
-      else
-        sol[j, p[i]] = mu[i, nrows(A) + j]
-      end
+    for j = 1:ncols(b)
+      sol[p[i], j] = mu[i, ncols(A) + j]
     end
+  end
+  if isleft
+    # Transpose back
+    sol = data(sol)
   end
   if task === :with_solution
     return true, sol, zero_matrix(R, 0, 0)
   end
 
   # Build the kernel
-  nullity = ncolsA - rk
-  X = isright ? zero_matrix(R, ncols(A), nullity) : zero_matrix(R, nullity, nrows(A))
+  nullity = ncols(A) - rk
+  if !isleft
+    X = zero_matrix(R, ncols(A), nullity)
+  else
+    X = lazy_transpose(zero_matrix(R, nullity, ncols(A)))
+  end
   for i = 1:nullity
     for j = 1:rk
-      if isright
-        X[p[j], i] = -mu[j, p[rk + i]]
-      else
-        X[i, p[j]] = -mu[j, p[rk + i]]
-      end
+      X[p[j], i] = -mu[j, p[rk + i]]
     end
-    if isright
-      X[p[rk + i], i] = one(R)
-    else
-      X[i, p[rk + i]] = one(R)
-    end
+    X[p[rk + i], i] = one(R)
   end
+  if isleft
+    # Transpose back
+    X = data(X)
+  end
+
   return true, sol, X
 end
 
@@ -164,21 +210,6 @@ function _can_solve_internal(A::MatElem{T}, b::Vector{T}, task::Symbol; side::Sy
     x = eltype(b)[ sol[1, i] for i in 1:ncols(sol) ]
   end
   return fl, x, K
-end
-
-# Builds the matrix hcat(transpose(A), transpose(B))
-function _hcat_transposed(A::MatElem{T}, B::MatElem{T}) where T
-  @assert ncols(A) == ncols(B)
-  C = zero_matrix(base_ring(A), ncols(A), nrows(A) + nrows(B))
-  for i = 1:ncols(A)
-    for j = 1:nrows(A)
-      C[i, j] = A[j, i]
-    end
-    for j = 1:nrows(B)
-      C[i, nrows(A) + j] = B[j, i]
-    end
-  end
-  return C
 end
 
 # A is supposed to be in rref of rank r
