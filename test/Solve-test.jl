@@ -73,8 +73,8 @@ end
   M = matrix(QQ, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   MT = AbstractAlgebra.Solve.lazy_transpose(M)
 
-  @test @inferred AbstractAlgebra.Solve.data(MT) === M
-  @test @inferred AbstractAlgebra.Solve.lazy_transpose(MT) === M
+  @test M === @inferred AbstractAlgebra.Solve.data(MT)
+  @test M === @inferred AbstractAlgebra.Solve.lazy_transpose(MT)
   @test transpose(M) == MT
 
   @test nrows(MT) == 5
