@@ -345,10 +345,10 @@ include("generic/Misc/Localization.jl")
 
 # TODO/FIXME: deprecate aliases, remove in the future
 import ..AbstractAlgebra: @alias
-Base.@deprecate_binding ResF ResidueFieldElem
-Base.@deprecate_binding ResField ResidueField
-Base.@deprecate_binding Res ResidueRingElem
-Base.@deprecate_binding ResRing ResidueRing
+Base.@deprecate_binding ResF EuclideanRingResidueFieldElem
+Base.@deprecate_binding ResField EuclideanRingResidueField
+Base.@deprecate_binding Res EuclideanRingResidueRingElem
+Base.@deprecate_binding ResRing EuclideanRingResidueRing
 
 Base.@deprecate_binding Rat RationalFunctionFieldElem
 
@@ -360,5 +360,11 @@ Base.@deprecate_binding RelSeriesElem RelPowerSeriesRingElem
 # Deprecated in 0.34.*
 @alias Frac FracFieldElem
 @alias FactoredFrac FactoredFracFieldElem
+
+# Deprecated in 0.35.*
+Base.@deprecate_binding ResidueField EuclideanRingResidueField
+Base.@deprecate_binding ResidueFieldElem EuclideanRingResidueFieldElem
+Base.@deprecate_binding ResidueRing EuclideanRingResidueRing
+Base.@deprecate_binding ResidueRingElem EuclideanRingResidueRingElem
 
 end # generic

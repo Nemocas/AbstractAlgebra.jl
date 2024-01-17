@@ -498,7 +498,7 @@ function residue_field(R::Ring, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DivideError())
    T = elem_type(R)
 
-   return Generic.ResidueField{T}(R(a), cached)
+   return Generic.EuclideanRingResidueField{T}(R(a), cached)
 end
 
 @doc raw"""
