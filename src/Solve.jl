@@ -34,6 +34,12 @@ end
 
 AbstractAlgebra.base_ring(M::LazyTransposeMatElem) = base_ring(data(M))
 
+Base.zero(M::LazyTransposeMatElem) = lazy_transpose(zero(data(M)))
+Base.zero(M::LazyTransposeMatElem, i::Int, j::Int) = lazy_transpose(zero(data(M), j, i))
+
+Base.similar(M::LazyTransposeMatElem) = lazy_transpose(similar(data(M)))
+Base.similar(M::LazyTransposeMatElem, i::Int, j::Int) = lazy_transpose(similar(data(M), j, i))
+
 ################################################################################
 #
 #  User facing functions for linear solving
@@ -125,14 +131,12 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
     throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
   end
 
-  isleft = side === :left
-
   R = base_ring(A)
 
-  if isleft
+  if side === :left
     # For side == :left, we pretend that A and b are transposed
-    A = lazy_transpose(A)
-    b = lazy_transpose(b)
+    fl, sol, K = _can_solve_internal(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    return fl, data(sol), data(K)
   end
 
   nrows(A) != nrows(b) && error("Incompatible matrices")
@@ -141,49 +145,31 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
   rk = rref!(mu)
   p = pivot_and_non_pivot_cols(mu, rk)
   if any(i -> i > ncols(A), p[1:rk])
-    return false, zero_matrix(R, 0, 0), zero_matrix(R, 0, 0)
+    return false, zero(A, 0, 0), zero(A, 0, 0)
   end
   if task === :only_check
-    return true, zero_matrix(R, 0, 0), zero_matrix(R, 0, 0)
+    return true, zero(A, 0, 0), zero(A, 0, 0)
   end
 
   # Compute a solution
-  if !isleft
-    sol = zero_matrix(R, ncols(A), ncols(b))
-  else
-    # Pretend again that sol is transposed, so that we can use the same code to
-    # fill it
-    sol = lazy_transpose(zero_matrix(R, ncols(b), ncols(A)))
-  end
+  sol = zero(A, ncols(A), ncols(b))
   for i = 1:rk
     for j = 1:ncols(b)
       sol[p[i], j] = mu[i, ncols(A) + j]
     end
   end
-  if isleft
-    # Transpose back
-    sol = data(sol)
-  end
   if task === :with_solution
-    return true, sol, zero_matrix(R, 0, 0)
+    return true, sol, zero(A, 0, 0)
   end
 
   # Build the kernel
   nullity = ncols(A) - rk
-  if !isleft
-    X = zero_matrix(R, ncols(A), nullity)
-  else
-    X = lazy_transpose(zero_matrix(R, nullity, ncols(A)))
-  end
+  X = zero(A, ncols(A), nullity)
   for i = 1:nullity
     for j = 1:rk
       X[p[j], i] = -mu[j, p[rk + i]]
     end
     X[p[rk + i], i] = one(R)
-  end
-  if isleft
-    # Transpose back
-    X = data(X)
   end
 
   return true, sol, X
