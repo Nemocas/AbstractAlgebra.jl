@@ -47,8 +47,8 @@ Base.similar(M::LazyTransposeMatElem, i::Int, j::Int) = lazy_transpose(similar(d
 ################################################################################
 
 @doc raw"""
-    solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T <: FieldElement
-    solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T <: FieldElement
+    solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
+    solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return $x$ of same type as $b$ solving the linear system $Ax = b$, if `side == :right`
 (default), or $xA = b$, if `side == :left`.
@@ -57,28 +57,28 @@ If no solution exists, an error is raised.
 
 See also [`can_solve_with_solution`](@ref).
 """
-function solve(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T <: FieldElement
+function solve(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
   fl, x = can_solve_with_solution(A, b, side = side)
   fl || throw(ArgumentError("Unable to solve linear system"))
   return x
 end
 
 @doc raw"""
-    can_solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T <: FieldElement
-    can_solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T <: FieldElement
+    can_solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
+    can_solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return `true` if the linear system $Ax = b$ or $xA = b$ with `side == :right`
 (default) or `side == :left`, respectively, has a solution and `false` otherwise.
 
 See also [`can_solve_with_solution`](@ref).
 """
-function can_solve(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T <: FieldElement
+function can_solve(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
   return _can_solve_internal(A, b, :only_check; side = side)[1]
 end
 
 @doc raw"""
-    can_solve_with_solution(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T <: FieldElement
-    can_solve_with_solution(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T <: FieldElement
+    can_solve_with_solution(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
+    can_solve_with_solution(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return `true` and $x$ of same type as $b$ solving the linear system $Ax = b$, if
 such a solution exists. Return `false` and an empty vector or matrix, if the
@@ -88,13 +88,13 @@ If `side == :left`, the system $xA = b$ is solved.
 
 See also [`solve`](@ref).
 """
-function can_solve_with_solution(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T <: FieldElement
+function can_solve_with_solution(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
   return _can_solve_internal(A, b, :with_solution; side = side)[1:2]
 end
 
 @doc raw"""
-    can_solve_with_solution_and_kernel(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T <: FieldElement
-    can_solve_with_solution_and_kernel(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T <: FieldElement
+    can_solve_with_solution_and_kernel(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
+    can_solve_with_solution_and_kernel(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return `true`, $x$ of same type as $b$ solving the linear system $Ax = b$,
 together with a matrix $K$ giving the kernel of $A$ (i.e. $AK = 0$), if such
@@ -105,7 +105,7 @@ If `side == :left`, the system $xA = b$ is solved.
 
 See also [`solve`](@ref) and [`kernel`](@ref).
 """
-function can_solve_with_solution_and_kernel(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T <: FieldElement
+function can_solve_with_solution_and_kernel(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
   return _can_solve_internal(A, b, :with_kernel; side = side)
 end
 
@@ -175,7 +175,82 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
   return true, sol, X
 end
 
-function _can_solve_internal(A::MatElem{T}, b::Vector{T}, task::Symbol; side::Symbol = :right) where T <: FieldElement
+# Tries to solve Ax = b (side == :right) or xA = b (side == :left) possibly with kernel.
+# Always returns a tuple (Bool, MatElem, MatElem).
+# task may be:
+# * :only_check -> It is only tested whether there is a solution, the two MatElem's are
+#   "dummies"
+# * :with_solution -> A solution is computed, the last MatElem is a "dummy"
+# * :with_kernel -> A solution and the kernel is computed
+function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
+  if task !== :only_check && task !== :with_solution && task !== :with_kernel
+    error("task $(task) not recognized")
+  end
+
+  if side !== :right && side !== :left
+    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+  end
+
+  R = base_ring(A)
+
+  if side === :left
+    # For side == :left, we pretend that A and b are transposed
+    fl, sol, K = _can_solve_internal(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    return fl, data(sol), data(K)
+  end
+
+  nrows(A) != nrows(b) && error("Incompatible matrices")
+
+  H, S = hnf_with_transform(lazy_transpose(A))
+  sol = lazy_transpose(zero(A, ncols(A), ncols(b)))
+  l = min(nrows(A), ncols(A))
+  b = deepcopy(b)
+  for i = 1:ncols(b)
+    for j = 1:l
+      k = 1
+      while k <= ncols(H) && is_zero_entry(H, j, k)
+        k += 1
+      end
+      if k > ncols(H)
+        continue
+      end
+      q, r = divrem(b[k, i], H[j, k])
+      if !iszero(r)
+        return false, zero(A, 0, 0), zero(A, 0, 0)
+      end
+      for h = k:ncols(H)
+        b[h, i] -= q*H[j, h]
+      end
+      sol[i, j] = q
+    end
+  end
+  if !is_zero(b)
+    return false, zero(A, 0, 0), zero(A, 0, 0)
+  end
+  if task === :only_check
+    return true, zero(A, 0, 0), zero(A, 0, 0)
+  end
+  if task === :with_solution
+    return true, lazy_transpose(S)*lazy_transpose(sol), zero(A, 0, 0)
+  end
+
+  nullity = ncols(A)
+  for i = nrows(H):-1:1
+    if !is_zero_row(H, i)
+      nullity = ncols(A) - i
+      break
+    end
+  end
+  N = zero(A, ncols(A), nullity)
+  for i = 1:nrows(N)
+    for j = 1:ncols(N)
+      N[i, j] = S[nrows(S) - j + 1, i]
+    end
+  end
+  return true, lazy_transpose(S)*lazy_transpose(sol), N
+end
+
+function _can_solve_internal(A::MatElem{T}, b::Vector{T}, task::Symbol; side::Symbol = :right) where T
   if side !== :right && side !== :left
     throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
   end
