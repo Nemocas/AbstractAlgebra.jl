@@ -22,6 +22,8 @@ All of these take the same set of arguments, namely:
 * a keyword argument `side` which can be either `:right` (default) or `:left`.
 
 If `side` is `:right`, the system $Ax = B$ is solved, otherwise the system $xA = B$ is solved.
+For matrices defined over a field, the functions internally rely on `rref`.
+If the matrices are defined over a ring, the function `hnf_with_transform` is required internally.
 
 The functionality of the functions can be summarized as follows.
 * `solve`: return a solution, if it exists, otherwise throw an error.
