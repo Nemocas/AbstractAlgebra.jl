@@ -24,3 +24,6 @@ end
 
 # deprecated in 0.32.x
 @deprecate mat(f::Map(FPModuleHomomorphism)) matrix(f::Map(FPModuleHomomorphism))
+
+# deprecated in 0.35.x
+Base.@deprecate_binding intersection intersect

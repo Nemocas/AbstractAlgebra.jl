@@ -122,7 +122,7 @@ contains(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
 ```
 
 ```@docs
-intersection(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
+intersect(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
 ```
 
 **Examples**

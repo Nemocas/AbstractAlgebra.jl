@@ -673,7 +673,6 @@ import .Generic: hooklength
 import .Generic: image_fn
 import .Generic: image_map
 import .Generic: interreduce!
-import .Generic: intersection
 import .Generic: inv!
 import .Generic: inverse_fn
 import .Generic: inverse_image_fn
@@ -914,7 +913,6 @@ export image_map
 export inflate
 export integral
 export interpolate
-export intersection
 export inv!
 export invariant_factors
 export inverse_fn
