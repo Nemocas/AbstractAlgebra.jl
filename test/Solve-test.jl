@@ -11,13 +11,13 @@
     for b in [ [ R(1), R(2), R(3) ],
                matrix(R, 3, 1, [ R(1), R(2), R(3) ]),
                matrix(R, 3, 2, [ R(1), R(2), R(3), R(4), R(5), R(6) ]) ]
-      @test AbstractAlgebra.Solve.can_solve(M, b)
-      x = AbstractAlgebra.Solve.solve(M, b)
+      @test @inferred AbstractAlgebra.Solve.can_solve(M, b)
+      x = @inferred AbstractAlgebra.Solve.solve(M, b)
       @test M*x == b
-      fl, x = AbstractAlgebra.Solve.can_solve_with_solution(M, b)
+      fl, x = @inferred AbstractAlgebra.Solve.can_solve_with_solution(M, b)
       @test fl
       @test M*x == b
-      fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(M, b)
+      fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(M, b)
       @test fl
       @test M*x == b
       @test is_zero(M*K)
@@ -29,10 +29,10 @@
                matrix(R, 2, 5, [ R(1), R(1), R(1), R(1), R(1),
                                  R(1), R(1), R(1), R(1), R(1) ]) ]
       @test_throws ArgumentError AbstractAlgebra.Solve.solve(M, b, side = :left)
-      @test !AbstractAlgebra.Solve.can_solve(M, b, side = :left)
-      fl, x = AbstractAlgebra.Solve.can_solve_with_solution(M, b, side = :left)
+      @test @inferred !AbstractAlgebra.Solve.can_solve(M, b, side = :left)
+      fl, x = @inferred AbstractAlgebra.Solve.can_solve_with_solution(M, b, side = :left)
       @test !fl
-      fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(M, b, side = :left)
+      fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(M, b, side = :left)
       @test !fl
     end
 
@@ -40,18 +40,32 @@
                matrix(R, 1, 5, [ R(1), R(2), R(3), R(4), R(5)]),
                matrix(R, 2, 5, [ R(1), R(2), R(3), R(4), R(5),
                                  R(0), R(0), R(8), R(9), R(10) ]) ]
-      @test AbstractAlgebra.Solve.can_solve(M, b, side = :left)
-      x = AbstractAlgebra.Solve.solve(M, b, side = :left)
+      @test @inferred AbstractAlgebra.Solve.can_solve(M, b, side = :left)
+      x = @inferred AbstractAlgebra.Solve.solve(M, b, side = :left)
       @test x*M == b
-      fl, x = AbstractAlgebra.Solve.can_solve_with_solution(M, b, side = :left)
+      fl, x = @inferred AbstractAlgebra.Solve.can_solve_with_solution(M, b, side = :left)
       @test fl
       @test x*M == b
-      fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(M, b, side = :left)
+      fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(M, b, side = :left)
       @test fl
       @test x*M == b
       @test is_zero(K*M)
       @test nrows(K) == 0
     end
+
+    N = zero_matrix(R, 2, 1)
+    b = zeros(R, 2)
+    fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(N, b)
+    @test fl
+    @test N*x == b
+    @test K == identity_matrix(R, 1)
+
+    N = zero_matrix(R, 1, 2)
+    b = zeros(R, 1)
+    fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(N, b)
+    @test fl
+    @test N*x == b
+    @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
   end
 end
 
