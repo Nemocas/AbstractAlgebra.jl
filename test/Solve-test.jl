@@ -52,3 +52,37 @@
     @test nrows(K) == 0
   end
 end
+
+@testset "Lazy transpose" begin
+  M = matrix(QQ, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
+  MT = AbstractAlgebra.Solve.lazy_transpose(M)
+
+  @test AbstractAlgebra.Solve.data(MT) === M
+  @test AbstractAlgebra.Solve.lazy_transpose(MT) === M
+  @test transpose(M) == MT
+
+  @test nrows(MT) == 5
+  @test ncols(MT) == 3
+
+  @test MT[2, 1] == QQ(2)
+  MT[2, 1] = QQ(100)
+  @test MT[2, 1] == QQ(100)
+  @test M[1, 2] == QQ(100)
+
+  @test base_ring(MT) == QQ
+
+  @test zero(MT) == AbstractAlgebra.Solve.lazy_transpose(zero_matrix(QQ, 3, 5))
+  @test zero(MT, 2, 3) == AbstractAlgebra.Solve.lazy_transpose(zero_matrix(QQ, 3, 2))
+
+  S = similar(MT)
+  @test S isa AbstractAlgebra.Solve.LazyTransposeMatElem
+  @test nrows(S) == 5
+  @test ncols(S) == 3
+  @test base_ring(S) == QQ
+
+  S = similar(MT, 2, 3)
+  @test S isa AbstractAlgebra.Solve.LazyTransposeMatElem
+  @test nrows(S) == 2
+  @test ncols(S) == 3
+  @test base_ring(S) == QQ
+end
