@@ -67,7 +67,6 @@ import Base: length
 import Base: log1p
 import Base: Matrix
 import Base: mod
-import Base: ndigits
 import Base: oct
 import Base: one
 import Base: parent
@@ -206,6 +205,7 @@ import ..AbstractAlgebra: mul_karatsuba
 import ..AbstractAlgebra: mul!
 import ..AbstractAlgebra: mullow
 import ..AbstractAlgebra: number_of_columns
+import ..AbstractAlgebra: number_of_digits
 import ..AbstractAlgebra: NCRing
 import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: ngens

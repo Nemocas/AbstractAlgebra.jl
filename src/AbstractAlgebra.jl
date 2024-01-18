@@ -312,6 +312,7 @@ export is_real
 export is_subset
 export is_valid
 export is_zero
+export number_of_digits
 
 @alias is_empty isempty
 @alias is_even iseven
@@ -326,6 +327,7 @@ export is_zero
 @alias is_subset issubset
 @alias is_valid isvalid
 @alias is_zero iszero
+@alias number_of_digits ndigits
 
 function order end
 
