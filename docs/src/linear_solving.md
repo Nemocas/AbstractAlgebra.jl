@@ -31,6 +31,15 @@ The functionality of the functions can be summarized as follows.
 * `can_solve_with_solution`: return `true` and a solution, if this exists, and `false` and an empty vector or matrix otherwise.
 * `can_solve_with_solution_and_kernel`: like `can_solve_with_solution` and additionally return a matrix whose columns (respectively rows) give a basis of the kernel of $A$.
 
+## Solving with several right hand sides
+
+Systems $Ax = b_1,\dots, Ax = b_k$ with the same matrix $A$, but several right hand sides $b_i$ can be solved more efficiently, by first initializing a "context object" `C` of type `SolveCtx`.
+```@docs
+solve_init
+```
+Now the functions `solve`, `can_solve`, etc. can be used with `C` in place of $A$.
+This way the time-consuming part of the solving (i.e. computing a reduced form of $A$) is only done once and the result cached in `C` to be reused.
+
 ## Detailed documentation
 
 ```@docs
