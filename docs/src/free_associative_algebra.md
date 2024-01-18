@@ -100,7 +100,7 @@ multivariate polynomial interface are provided.
 
 ```julia
 symbols(S::FreeAssAlgebra)
-nvars(f::FreeAssAlgebra)
+number_of_variables(f::FreeAssAlgebra)
 gens(S::FreeAssAlgebra)
 gen(S::FreeAssAlgebra, i::Int)
 is_gen(x::FreeAssAlgElem)

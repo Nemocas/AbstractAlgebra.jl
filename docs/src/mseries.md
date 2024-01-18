@@ -226,7 +226,7 @@ for absolute series over any commutative ring.
 The following are provided for weighted and unweighted series:
 
 ```@docs
-nvars(::Generic.AbsMSeriesRing)
+number_of_variables(::Generic.AbsMSeriesRing)
 ```
 
 ```@docs

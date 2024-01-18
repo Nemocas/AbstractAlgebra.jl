@@ -344,12 +344,15 @@ const is_upper_triangular = istriu
 function number_of_columns end
 function number_of_generators end
 function number_of_rows end
+function number_of_variables end
 export number_of_columns
 export number_of_generators
 export number_of_rows
+export number_of_variables
 @alias ncols number_of_columns
 @alias ngens number_of_generators
 @alias nrows number_of_rows
+@alias nvars number_of_variables
 
 ###############################################################################
 # Macros for fancy printing. to use, enable attribute storage for your struct,
@@ -1069,7 +1072,6 @@ export normalise
 export nullspace
 export num_coeff
 export number_field
-export nvars
 export O
 export one
 export order

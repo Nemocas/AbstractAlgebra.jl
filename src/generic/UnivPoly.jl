@@ -34,7 +34,7 @@ function mpoly_ring(S::UniversalPolyRing{T, U}) where {T <: RingElement, U <: Ab
    return S.mpoly_ring::Generic.MPolyRing{T}
 end
 
-nvars(S::UniversalPolyRing) = length(S.S)
+number_of_variables(S::UniversalPolyRing) = length(S.S)
 
 symbols(S::UniversalPolyRing) = S.S
 

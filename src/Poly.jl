@@ -45,11 +45,11 @@ this is returned as an array of `Symbol` not `String`.
 symbols(a::PolyRing) = [a.S]
 
 @doc raw"""
-    nvars(a::PolyRing)
+    number_of_variables(a::PolyRing)
 
 Return the number of variables of the polynomial ring, which is 1.
 """
-nvars(a::PolyRing) = 1
+number_of_variables(a::PolyRing) = 1
 
 function check_parent(a::PolynomialElem, b::PolynomialElem, throw::Bool = true)
    c = parent(a) != parent(b)

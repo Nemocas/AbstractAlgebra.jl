@@ -30,7 +30,7 @@ function symbols(a::FreeAssAlgebra)
     return a.S
 end
 
-function nvars(a::FreeAssAlgebra)
+function number_of_variables(a::FreeAssAlgebra)
     return length(a.S)
 end
 
@@ -86,7 +86,7 @@ function isone(a::FreeAssAlgElem{T}) where T
 end
 
 function number_of_generators(a::FreeAssAlgebra{T}) where T
-    return nvars(a)
+    return number_of_variables(a)
 end
 
 function gen(a::FreeAssAlgebra{T}, i::Int) where T

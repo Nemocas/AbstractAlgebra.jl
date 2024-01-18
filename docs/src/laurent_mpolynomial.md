@@ -61,7 +61,7 @@ finish(M::LaurentMPolyBuildCtx)
 
 ```julia
 symbols(S::LaurentMPolyRing)
-nvars(f::LaurentMPolyRing)
+number_of_variables(f::LaurentMPolyRing)
 gens(S::LaurentMPolyRing)
 gen(S::LaurentMPolyRing, i::Int)
 is_gen(x::LaurentMPolyRingElem)

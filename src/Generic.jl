@@ -211,7 +211,7 @@ import ..AbstractAlgebra: NCRing
 import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: number_of_rows
 import ..AbstractAlgebra: numerator
-import ..AbstractAlgebra: nvars
+import ..AbstractAlgebra: number_of_variables
 import ..AbstractAlgebra: O
 import ..AbstractAlgebra: order
 import ..AbstractAlgebra: parent_type

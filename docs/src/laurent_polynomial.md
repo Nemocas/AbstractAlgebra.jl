@@ -51,7 +51,7 @@ julia> symbols(R)
 1-element Vector{Symbol}:
  :x
 
-julia> nvars(R)
+julia> number_of_variables(R)
 1
 
 julia> f = x^-2 + 2x

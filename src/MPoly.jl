@@ -84,7 +84,7 @@ end
 
 Return the number of variables in `R`.
 """
-number_of_generators(R::MPolyRing) = nvars(R)
+number_of_generators(R::MPolyRing) = number_of_variables(R)
 
 @doc raw"""
     vars(p::MPolyRingElem{T}) where {T <: RingElement}
