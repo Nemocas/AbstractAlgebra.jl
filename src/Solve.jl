@@ -2,11 +2,11 @@ module Solve
 
 using AbstractAlgebra
 
-import AbstractAlgebra: base_ring, nrows, ncols
+import AbstractAlgebra: base_ring, nrows, ncols, kernel, matrix, rank
 
 ################################################################################
 #
-#  "Lazy" transpose of a matrix (very experimental)
+#  "Lazy" transpose of a matrix
 #
 ################################################################################
 
@@ -42,6 +42,127 @@ Base.similar(M::LazyTransposeMatElem, i::Int, j::Int) = lazy_transpose(similar(d
 
 ################################################################################
 #
+#  Linear solving context object
+#
+################################################################################
+
+mutable struct SolveCtx{T, MatT}
+  A::MatT # matrix giving the linear system
+  red_right::MatT # rref or HNF used to solve Ax = b
+  red_left::LazyTransposeMatElem{T, MatT} # rref or HNF used to solve xA = b
+  trafo_right::MatT # transformation: trafo_right*A == red_right
+  trafo_left::LazyTransposeMatElem{T, MatT} # transformation: trafo_left*A == red_left
+
+  rank::Int # rank of A
+  pivots_right::Vector{Int} # pivot and non-pivot columns of red_right
+  pivots_left::Vector{Int} # pivot and non-pivot columns of red_left
+
+  function SolveCtx(A::MatElem{T}) where T
+    z = new{T, typeof(A)}()
+    z.A = A
+    z.rank = -1 # not known yet
+    return z
+  end
+end
+
+@doc raw"""
+    solve_init(A::MatElem)
+
+Return a context object `C` that allows to efficiently solve linear systems
+$Ax = b$ or $xA = b$ for different $b$.
+"""
+function solve_init(A::MatElem)
+  return SolveCtx(A)
+end
+
+matrix(C::SolveCtx) = C.A
+
+function _init_right(C::SolveCtx{<:FieldElement})
+  if isdefined(C, :red_right) && isdefined(C, :trafo_right)
+    return nothing
+  end
+
+  r, R, U = _rref_with_transformation(matrix(C))
+  set_rank!(C, r)
+  C.red_right = R
+  C.trafo_right = U
+
+  return nothing
+end
+
+function _init_left(C::SolveCtx{<:FieldElement})
+  if isdefined(C, :red_left) && isdefined(C, :trafo_left)
+    return nothing
+  end
+
+  r, R, U = _rref_with_transformation(lazy_transpose(matrix(C)))
+  set_rank!(C, r)
+  C.red_left = R
+  C.trafo_left = U
+  return nothing
+end
+
+function reduced_matrix_right(C::SolveCtx)
+  _init_right(C)
+  return C.red_right
+end
+
+function reduced_matrix_left(C::SolveCtx)
+  _init_left(C)
+  return C.red_left
+end
+
+function transformation_matrix_right(C::SolveCtx)
+  _init_right(C)
+  return C.trafo_right
+end
+
+function transformation_matrix_left(C::SolveCtx)
+  _init_left(C)
+  return C.trafo_left
+end
+
+function set_rank!(C::SolveCtx, r::Int)
+  if C.rank >= 0
+    @assert C.rank == r
+  end
+  C.rank = r
+  return nothing
+end
+
+function AbstractAlgebra.rank(C::SolveCtx)
+  if C.rank < 0
+    _init_right(C)
+  end
+  return C.rank
+end
+
+AbstractAlgebra.nrows(C::SolveCtx) = nrows(matrix(C))
+AbstractAlgebra.ncols(C::SolveCtx) = ncols(matrix(C))
+AbstractAlgebra.base_ring(C::SolveCtx) = base_ring(matrix(C))
+
+function pivot_and_non_pivot_cols(C::SolveCtx; side::Symbol = :right)
+  if side === :right
+    if !isdefined(C, :pivots_right)
+      R = reduced_matrix_right(C)
+      r = rank(C)
+      C.pivots_right = pivot_and_non_pivot_cols(R, r)
+    end
+    return C.pivots_right
+  elseif side === :left
+    if !isdefined(C, :pivots_left)
+      R = reduced_matrix_left(C)
+      r = rank(C)
+      C.pivots_left = pivot_and_non_pivot_cols(R, r)
+    end
+    return C.pivots_left
+  else
+    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+  end
+end
+
+################################################################################
+#
 #  User facing functions for linear solving
 #
 ################################################################################
@@ -49,15 +170,19 @@ Base.similar(M::LazyTransposeMatElem, i::Int, j::Int) = lazy_transpose(similar(d
 @doc raw"""
     solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
     solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
+    solve(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
+    solve(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return $x$ of same type as $b$ solving the linear system $Ax = b$, if `side == :right`
 (default), or $xA = b$, if `side == :left`.
 
 If no solution exists, an error is raised.
 
+If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
+
 See also [`can_solve_with_solution`](@ref).
 """
-function solve(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
+function solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
   fl, x = can_solve_with_solution(A, b, side = side)
   fl || throw(ArgumentError("Unable to solve linear system"))
   return x
@@ -66,19 +191,25 @@ end
 @doc raw"""
     can_solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
     can_solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
+    can_solve(A::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
+    can_solve(A::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return `true` if the linear system $Ax = b$ or $xA = b$ with `side == :right`
 (default) or `side == :left`, respectively, has a solution and `false` otherwise.
 
+If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
+
 See also [`can_solve_with_solution`](@ref).
 """
-function can_solve(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
+function can_solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
   return _can_solve_internal(A, b, :only_check; side = side)[1]
 end
 
 @doc raw"""
     can_solve_with_solution(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
     can_solve_with_solution(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
+    can_solve_with_solution(A::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
+    can_solve_with_solution(A::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return `true` and $x$ of same type as $b$ solving the linear system $Ax = b$, if
 such a solution exists. Return `false` and an empty vector or matrix, if the
@@ -86,15 +217,19 @@ system has no solution.
 
 If `side == :left`, the system $xA = b$ is solved.
 
+If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
+
 See also [`solve`](@ref).
 """
-function can_solve_with_solution(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
+function can_solve_with_solution(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
   return _can_solve_internal(A, b, :with_solution; side = side)[1:2]
 end
 
 @doc raw"""
     can_solve_with_solution_and_kernel(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
     can_solve_with_solution_and_kernel(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
+    can_solve_with_solution_and_kernel(A::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
+    can_solve_with_solution_and_kernel(A::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return `true`, $x$ of same type as $b$ solving the linear system $Ax = b$,
 together with a matrix $K$ giving the kernel of $A$ (i.e. $AK = 0$), if such
@@ -103,10 +238,26 @@ if the system has no solution.
 
 If `side == :left`, the system $xA = b$ is solved.
 
+If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
+
 See also [`solve`](@ref) and [`kernel`](@ref).
 """
-function can_solve_with_solution_and_kernel(A::MatElem{T}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
+function can_solve_with_solution_and_kernel(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
   return _can_solve_internal(A, b, :with_kernel; side = side)
+end
+
+function AbstractAlgebra.kernel(C::SolveCtx; side::Symbol = :right)
+  if side !== :right && side !== :left
+    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+  end
+
+  if side === :right
+    return _kernel_with_rref(reduced_matrix_right(C), rank(C), pivot_and_non_pivot_cols(C, side = :right))
+  else
+    nullity, X = _kernel_with_rref(reduced_matrix_left(C), rank(C), pivot_and_non_pivot_cols(C, side = :left))
+    # X is of type LazyTransposeMatElem
+    return nullity, data(X)
+  end
 end
 
 ################################################################################
@@ -250,7 +401,7 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
   return true, lazy_transpose(S)*lazy_transpose(sol), N
 end
 
-function _can_solve_internal(A::MatElem{T}, b::Vector{T}, task::Symbol; side::Symbol = :right) where T
+function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::Vector{T}, task::Symbol; side::Symbol = :right) where T
   if side !== :right && side !== :left
     throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
   end
@@ -296,6 +447,92 @@ function pivot_and_non_pivot_cols(A::MatElem, r::Int)
   end
 
   return p
+end
+
+# Tries to solve Ax = b (side == :right) or xA = b (side == :left) possibly with kernel.
+# Always returns a tuple (Bool, MatElem, MatElem).
+# task may be:
+# * :only_check -> It is only tested whether there is a solution, the two MatElem's are
+#   "dummies"
+# * :with_solution -> A solution is computed, the last MatElem is a "dummy"
+# * :with_kernel -> A solution and the kernel is computed
+function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: FieldElement
+  if task !== :only_check && task !== :with_solution && task !== :with_kernel
+    error("task $(task) not recognized")
+  end
+
+  if side !== :right && side !== :left
+    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+  end
+
+  if side === :right
+    fl, sol = _can_solve_with_rref(b, transformation_matrix_right(C), rank(C), pivot_and_non_pivot_cols(C, side = side), task)
+  else
+    fl, sol = _can_solve_with_rref(lazy_transpose(b), transformation_matrix_left(C), rank(C), pivot_and_non_pivot_cols(C, side = side), task)
+    sol = data(sol)
+  end
+  if !fl || task !== :with_kernel
+    return fl, sol, zero(b, 0, 0)
+  end
+
+  return true, sol, kernel(C, side = side)[2]
+end
+
+# Solve Ax = b with U*A in rref of rank r.
+# pivots must be of length ncols(A) and contain the pivot columns of U*A in the
+# first r entries.
+# Takes same options for `task` as _can_solve_internal but only returns (flag, solution)
+# and no kernel.
+function _can_solve_with_rref(b::MatElem{T}, U::MatElem{T}, r::Int, pivots::Vector{Int}, task::Symbol) where T <: FieldElement
+  if task !== :only_check && task !== :with_solution && task !== :with_kernel
+    error("task $(task) not recognized")
+  end
+
+  nrows(U) != nrows(b) && error("Incompatible matrices")
+
+  bU = U*b
+  if any(i -> !is_zero_row(bU, i), r + 1:nrows(bU))
+    return false, zero(b, 0, 0)
+  end
+  if task === :only_check
+    return true, zero(b, 0, 0)
+  end
+
+  # Compute a solution
+  sol = zero(b, length(pivots), ncols(b))
+  for i = 1:r
+    for j = 1:ncols(b)
+      sol[pivots[i], j] = bU[i, j]
+    end
+  end
+  return true, sol
+end
+
+# Compute a matrix N with RN == 0 where the columns of N give a basis for the kernel.
+# R must be in rref of rank r and pivots must be of length ncols(R) with the pivot
+# columns in the first r entries and the non-pivot columns in the remaining entries.
+function _kernel_with_rref(R::MatElem{T}, r::Int, pivots::Vector{Int}) where T <: FieldElement
+  @assert length(pivots) == ncols(R)
+  nullity = ncols(R) - r
+  X = zero(R, ncols(R), nullity)
+  for i = 1:nullity
+    for j = 1:r
+      X[pivots[j], i] = -R[j, pivots[r + i]]
+    end
+    X[pivots[r + i], i] = one(base_ring(R))
+  end
+  return nullity, X
+end
+
+# Copied from Hecke, to be replaced with echelon_form_with_transformation eventually
+function _rref_with_transformation(M::MatElem{T}) where T <: FieldElement
+  n = hcat(M, identity_matrix(base_ring(M), nrows(M)))
+  rref!(n)
+  s = nrows(n)
+  while s > 0 && iszero(sub(n, s:s, 1:ncols(M)))
+    s -= 1
+  end
+  return s, sub(n, 1:nrows(M), 1:ncols(M)), sub(n, 1:nrows(M), ncols(M)+1:ncols(n))
 end
 
 end
