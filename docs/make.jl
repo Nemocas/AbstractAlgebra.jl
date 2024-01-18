@@ -92,6 +92,7 @@ makedocs(
                  "matrix_interface.md",
                  "map_interface.md",
                  "rand.md",
+                 "linear_solving.md",
              ],
          ]
 )

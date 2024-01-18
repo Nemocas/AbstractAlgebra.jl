@@ -768,6 +768,14 @@ import .Generic: LocElem
 import .Generic: roots
 import .Generic: sturm_sequence
 
+###############################################################################
+#
+#   Linear solving submodule
+#
+###############################################################################
+
+include("Solve.jl")
+
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export _check_dim
 export _checkbounds
