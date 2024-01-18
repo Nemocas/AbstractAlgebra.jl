@@ -70,8 +70,7 @@
 end
 
 @testset "Linear solving context" begin
-  #for R in [ QQ, ZZ ]
-    R = QQ
+  for R in [ QQ, ZZ ]
     M = matrix(R, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
     C = AbstractAlgebra.Solve.solve_init(M)
 
@@ -141,7 +140,7 @@ end
     @test fl
     @test N*x == b
     @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
-  #end
+  end
 end
 
 @testset "Lazy transpose" begin

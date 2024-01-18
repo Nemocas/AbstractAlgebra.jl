@@ -86,7 +86,17 @@ function _init_reduce(C::SolveCtx{<:FieldElement})
   set_rank!(C, r)
   C.red = R
   C.trafo = U
+  return nothing
+end
 
+function _init_reduce(C::SolveCtx{<:RingElement})
+  if isdefined(C, :red) && isdefined(C, :trafo)
+    return nothing
+  end
+
+  R, U = hnf_with_transform(matrix(C))
+  C.red = R
+  C.trafo = U
   return nothing
 end
 
@@ -97,6 +107,17 @@ function _init_reduce_transpose(C::SolveCtx{<:FieldElement})
 
   r, R, U = _rref_with_transformation(lazy_transpose(matrix(C)))
   set_rank!(C, r)
+  C.red_transp = R
+  C.trafo_transp = U
+  return nothing
+end
+
+function _init_reduce_transpose(C::SolveCtx{<:RingElement})
+  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
+    return nothing
+  end
+
+  R, U = hnf_with_transform(lazy_transpose(matrix(C)))
   C.red_transp = R
   C.trafo_transp = U
   return nothing
@@ -130,7 +151,7 @@ function set_rank!(C::SolveCtx, r::Int)
   return nothing
 end
 
-function AbstractAlgebra.rank(C::SolveCtx)
+function AbstractAlgebra.rank(C::SolveCtx{<:FieldElement})
   if C.rank < 0
     _init_reduce(C)
   end
@@ -141,7 +162,7 @@ AbstractAlgebra.nrows(C::SolveCtx) = nrows(matrix(C))
 AbstractAlgebra.ncols(C::SolveCtx) = ncols(matrix(C))
 AbstractAlgebra.base_ring(C::SolveCtx) = base_ring(matrix(C))
 
-function pivot_and_non_pivot_cols(C::SolveCtx)
+function pivot_and_non_pivot_cols(C::SolveCtx{<:FieldElement})
   if !isdefined(C, :pivots)
     R = reduced_matrix(C)
     r = rank(C)
@@ -150,7 +171,7 @@ function pivot_and_non_pivot_cols(C::SolveCtx)
   return C.pivots
 end
 
-function pivot_and_non_pivot_cols_of_transpose(C::SolveCtx)
+function pivot_and_non_pivot_cols_of_transpose(C::SolveCtx{<:FieldElement})
   if !isdefined(C, :pivots_transp)
     R = reduced_matrix_of_transpose(C)
     r = rank(C)
@@ -244,15 +265,29 @@ function can_solve_with_solution_and_kernel(A::Union{MatElem{T}, SolveCtx{T}}, b
   return _can_solve_internal(A, b, :with_kernel; side = side)
 end
 
-function AbstractAlgebra.kernel(C::SolveCtx; side::Symbol = :right)
+function AbstractAlgebra.kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :right)
   if side !== :right && side !== :left
     throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
   end
 
   if side === :right
-    return _kernel_with_rref(reduced_matrix(C), rank(C), pivot_and_non_pivot_cols(C))
+    return _kernel_of_rref(reduced_matrix(C), rank(C), pivot_and_non_pivot_cols(C))
   else
-    nullity, X = _kernel_with_rref(reduced_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C))
+    nullity, X = _kernel_of_rref(reduced_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C))
+    # X is of type LazyTransposeMatElem
+    return nullity, data(X)
+  end
+end
+
+function AbstractAlgebra.kernel(C::SolveCtx{<:RingElement}; side::Symbol = :right)
+  if side !== :right && side !== :left
+    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+  end
+
+  if side === :right
+    return _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))
+  else
+    nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
     # X is of type LazyTransposeMatElem
     return nullity, data(X)
   end
@@ -509,7 +544,7 @@ end
 # Compute a matrix N with RN == 0 where the columns of N give a basis for the kernel.
 # R must be in rref of rank r and pivots must be of length ncols(R) with the pivot
 # columns in the first r entries and the non-pivot columns in the remaining entries.
-function _kernel_with_rref(R::MatElem{T}, r::Int, pivots::Vector{Int}) where T <: FieldElement
+function _kernel_of_rref(R::MatElem{T}, r::Int, pivots::Vector{Int}) where T <: FieldElement
   @assert length(pivots) == ncols(R)
   nullity = ncols(R) - r
   X = zero(R, ncols(R), nullity)
@@ -520,6 +555,89 @@ function _kernel_with_rref(R::MatElem{T}, r::Int, pivots::Vector{Int}) where T <
     X[pivots[r + i], i] = one(base_ring(R))
   end
   return nullity, X
+end
+
+function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
+  if task !== :only_check && task !== :with_solution && task !== :with_kernel
+    error("task $(task) not recognized")
+  end
+
+  if side !== :right && side !== :left
+    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+  end
+
+  if side === :right
+    fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
+  else
+    fl, sol = _can_solve_with_hnf(lazy_transpose(b), reduced_matrix(C), transformation_matrix(C), task)
+    sol = data(sol)
+  end
+  if !fl || task !== :with_kernel
+    return fl, sol, zero(b, 0, 0)
+  end
+
+  return true, sol, kernel(C, side = side)[2]
+end
+
+# Solve Ax = b where H = U*transpose(A) is in HNF.
+# Takes same options for `task` as _can_solve_internal but only returns (flag, solution)
+# and no kernel.
+function _can_solve_with_hnf(b::MatElem{T}, H::MatElem{T}, U::MatElem{T}, task::Symbol) where T <: RingElement
+  if task !== :only_check && task !== :with_solution && task !== :with_kernel
+    error("task $(task) not recognized")
+  end
+
+  ncols(H) != nrows(b) && error("Incompatible matrices")
+
+  sol = lazy_transpose(zero(b, nrows(H), ncols(b)))
+  l = min(nrows(H), ncols(H))
+  b = deepcopy(b)
+  for i = 1:ncols(b)
+    for j = 1:l
+      k = 1
+      while k <= ncols(H) && is_zero_entry(H, j, k)
+        k += 1
+      end
+      if k > ncols(H)
+        continue
+      end
+      q, r = divrem(b[k, i], H[j, k])
+      if !iszero(r)
+        return false, zero(b, 0, 0)
+      end
+      for h = k:ncols(H)
+        b[h, i] -= q*H[j, h]
+      end
+      sol[i, j] = q
+    end
+  end
+  if !is_zero(b)
+    return false, zero(b, 0, 0)
+  end
+  if task === :only_check
+    return true, zero(b, 0, 0)
+  end
+  return true, lazy_transpose(U)*lazy_transpose(sol)
+end
+
+# Compute a matrix N with AN == 0 where the columns of N give a basis for the kernel
+# and H = U*transpose(A) is in HNF.
+# The matrix A is only needed to get the return type right (MatElem vs LazyTransposeMatElem)
+function _kernel_of_hnf(A::MatElem{T}, H::MatElem{T}, U::MatElem{T}) where T <: RingElement
+  nullity = nrows(H)
+  for i = nrows(H):-1:1
+    if !is_zero_row(H, i)
+      nullity = nrows(H) - i
+      break
+    end
+  end
+  N = zero(A, nrows(H), nullity)
+  for i = 1:nrows(N)
+    for j = 1:ncols(N)
+      N[i, j] = U[nrows(U) - j + 1, i]
+    end
+  end
+  return nullity, N
 end
 
 # Copied from Hecke, to be replaced with echelon_form_with_transformation eventually
