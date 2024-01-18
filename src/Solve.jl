@@ -48,14 +48,14 @@ Base.similar(M::LazyTransposeMatElem, i::Int, j::Int) = lazy_transpose(similar(d
 
 mutable struct SolveCtx{T, MatT}
   A::MatT # matrix giving the linear system
-  red_right::MatT # rref or HNF used to solve Ax = b
-  red_left::LazyTransposeMatElem{T, MatT} # rref or HNF used to solve xA = b
-  trafo_right::MatT # transformation: trafo_right*A == red_right
-  trafo_left::LazyTransposeMatElem{T, MatT} # transformation: trafo_left*A == red_left
+  red::MatT # rref or HNF of A
+  red_transp::LazyTransposeMatElem{T, MatT} # rref or HNF of transpose(A)
+  trafo::MatT # transformation: trafo*A == red
+  trafo_transp::LazyTransposeMatElem{T, MatT} # transformation: trafo_transp*transpose(A) == red_transp
 
   rank::Int # rank of A
-  pivots_right::Vector{Int} # pivot and non-pivot columns of red_right
-  pivots_left::Vector{Int} # pivot and non-pivot columns of red_left
+  pivots::Vector{Int} # pivot and non-pivot columns of red
+  pivots_transp::Vector{Int} # pivot and non-pivot columns of red_transp
 
   function SolveCtx(A::MatElem{T}) where T
     z = new{T, typeof(A)}()
@@ -77,49 +77,49 @@ end
 
 matrix(C::SolveCtx) = C.A
 
-function _init_right(C::SolveCtx{<:FieldElement})
-  if isdefined(C, :red_right) && isdefined(C, :trafo_right)
+function _init_reduce(C::SolveCtx{<:FieldElement})
+  if isdefined(C, :red) && isdefined(C, :trafo)
     return nothing
   end
 
   r, R, U = _rref_with_transformation(matrix(C))
   set_rank!(C, r)
-  C.red_right = R
-  C.trafo_right = U
+  C.red = R
+  C.trafo = U
 
   return nothing
 end
 
-function _init_left(C::SolveCtx{<:FieldElement})
-  if isdefined(C, :red_left) && isdefined(C, :trafo_left)
+function _init_reduce_transpose(C::SolveCtx{<:FieldElement})
+  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
     return nothing
   end
 
   r, R, U = _rref_with_transformation(lazy_transpose(matrix(C)))
   set_rank!(C, r)
-  C.red_left = R
-  C.trafo_left = U
+  C.red_transp = R
+  C.trafo_transp = U
   return nothing
 end
 
-function reduced_matrix_right(C::SolveCtx)
-  _init_right(C)
-  return C.red_right
+function reduced_matrix(C::SolveCtx)
+  _init_reduce(C)
+  return C.red
 end
 
-function reduced_matrix_left(C::SolveCtx)
-  _init_left(C)
-  return C.red_left
+function reduced_matrix_of_transpose(C::SolveCtx)
+  _init_reduce_transpose(C)
+  return C.red_transp
 end
 
-function transformation_matrix_right(C::SolveCtx)
-  _init_right(C)
-  return C.trafo_right
+function transformation_matrix(C::SolveCtx)
+  _init_reduce(C)
+  return C.trafo
 end
 
-function transformation_matrix_left(C::SolveCtx)
-  _init_left(C)
-  return C.trafo_left
+function transformation_matrix_of_transpose(C::SolveCtx)
+  _init_reduce_transpose(C)
+  return C.trafo_transp
 end
 
 function set_rank!(C::SolveCtx, r::Int)
@@ -132,7 +132,7 @@ end
 
 function AbstractAlgebra.rank(C::SolveCtx)
   if C.rank < 0
-    _init_right(C)
+    _init_reduce(C)
   end
   return C.rank
 end
@@ -141,24 +141,22 @@ AbstractAlgebra.nrows(C::SolveCtx) = nrows(matrix(C))
 AbstractAlgebra.ncols(C::SolveCtx) = ncols(matrix(C))
 AbstractAlgebra.base_ring(C::SolveCtx) = base_ring(matrix(C))
 
-function pivot_and_non_pivot_cols(C::SolveCtx; side::Symbol = :right)
-  if side === :right
-    if !isdefined(C, :pivots_right)
-      R = reduced_matrix_right(C)
-      r = rank(C)
-      C.pivots_right = pivot_and_non_pivot_cols(R, r)
-    end
-    return C.pivots_right
-  elseif side === :left
-    if !isdefined(C, :pivots_left)
-      R = reduced_matrix_left(C)
-      r = rank(C)
-      C.pivots_left = pivot_and_non_pivot_cols(R, r)
-    end
-    return C.pivots_left
-  else
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+function pivot_and_non_pivot_cols(C::SolveCtx)
+  if !isdefined(C, :pivots)
+    R = reduced_matrix(C)
+    r = rank(C)
+    C.pivots = pivot_and_non_pivot_cols(R, r)
   end
+  return C.pivots
+end
+
+function pivot_and_non_pivot_cols_of_transpose(C::SolveCtx)
+  if !isdefined(C, :pivots_transp)
+    R = reduced_matrix_of_transpose(C)
+    r = rank(C)
+    C.pivots_transp = pivot_and_non_pivot_cols(R, r)
+  end
+  return C.pivots_transp
 end
 
 ################################################################################
@@ -252,9 +250,9 @@ function AbstractAlgebra.kernel(C::SolveCtx; side::Symbol = :right)
   end
 
   if side === :right
-    return _kernel_with_rref(reduced_matrix_right(C), rank(C), pivot_and_non_pivot_cols(C, side = :right))
+    return _kernel_with_rref(reduced_matrix(C), rank(C), pivot_and_non_pivot_cols(C))
   else
-    nullity, X = _kernel_with_rref(reduced_matrix_left(C), rank(C), pivot_and_non_pivot_cols(C, side = :left))
+    nullity, X = _kernel_with_rref(reduced_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C))
     # X is of type LazyTransposeMatElem
     return nullity, data(X)
   end
@@ -466,9 +464,9 @@ function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::
   end
 
   if side === :right
-    fl, sol = _can_solve_with_rref(b, transformation_matrix_right(C), rank(C), pivot_and_non_pivot_cols(C, side = side), task)
+    fl, sol = _can_solve_with_rref(b, transformation_matrix(C), rank(C), pivot_and_non_pivot_cols(C), task)
   else
-    fl, sol = _can_solve_with_rref(lazy_transpose(b), transformation_matrix_left(C), rank(C), pivot_and_non_pivot_cols(C, side = side), task)
+    fl, sol = _can_solve_with_rref(lazy_transpose(b), transformation_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C), task)
     sol = data(sol)
   end
   if !fl || task !== :with_kernel
