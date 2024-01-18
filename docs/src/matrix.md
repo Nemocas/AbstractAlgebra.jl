@@ -396,12 +396,12 @@ dense_matrix_type(::Ring)
 
 ```@docs
 nrows(::MatSpace)
-ncols(::MatSpace)
+number_of_columns(::MatSpace)
 ```
 
 ```@docs
 nrows(::MatrixElem{T}) where T <: RingElement
-ncols(::MatrixElem{T}) where T <: RingElement
+number_of_columns(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -504,7 +504,7 @@ AbstractAlgebra.Generic.MatSpaceElem{AbstractAlgebra.Generic.Poly{Rational{BigIn
 julia> r = nrows(B)
 3
 
-julia> c = ncols(B)
+julia> c = number_of_columns(B)
 3
 
 julia> length(B)

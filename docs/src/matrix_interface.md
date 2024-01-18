@@ -177,8 +177,8 @@ nrows(M::MyMatAlgebra{T}) where T <: RingElem
 Return the number of rows of matrices in the matrix space.
 
 ```julia
-ncols(M:MyMatSpace{T}) where T <: RingElem
-ncols(M:MyMatAlgebra{T}) where T <: RingElem
+number_of_columns(M:MyMatSpace{T}) where T <: RingElem
+number_of_columns(M:MyMatAlgebra{T}) where T <: RingElem
 ```
 
 Return the number of columns of matrices in the matrix space.
@@ -190,7 +190,7 @@ nrows(f::MyMat{T}) where T <: RingElem
 Return the number of rows of the given matrix.
 
 ```julia
-ncols(f::MyMat{T}) where T <: RingElem
+number_of_columns(f::MyMat{T}) where T <: RingElem
 ```
 
 Return the number of columns of the given matrix.

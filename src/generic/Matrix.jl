@@ -51,15 +51,15 @@ Return the number of rows of the given matrix space.
 nrows(a::MatSpace) = a.nrows
 
 @doc raw"""
-    ncols(a::MatSpace)
+    number_of_columns(a::MatSpace)
 
 Return the number of columns of the given matrix space.
 """
-ncols(a::MatSpace) = a.ncols
+number_of_columns(a::MatSpace) = a.ncols
 
 nrows(a::Union{Mat, MatAlgElem}) = size(a.entries, 1)
 
-ncols(a::Union{Mat, MatAlgElem}) = size(a.entries, 2)
+number_of_columns(a::Union{Mat,MatAlgElem}) = size(a.entries, 2)
 
 Base.@propagate_inbounds getindex(a::Union{Mat, MatAlgElem}, r::Int, c::Int) = a.entries[r, c]
 

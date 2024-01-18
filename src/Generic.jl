@@ -205,7 +205,7 @@ import ..AbstractAlgebra: mul_classical
 import ..AbstractAlgebra: mul_karatsuba
 import ..AbstractAlgebra: mul!
 import ..AbstractAlgebra: mullow
-import ..AbstractAlgebra: ncols
+import ..AbstractAlgebra: number_of_columns
 import ..AbstractAlgebra: NCRing
 import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: ngens

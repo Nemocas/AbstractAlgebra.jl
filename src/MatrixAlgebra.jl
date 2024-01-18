@@ -40,7 +40,7 @@ function Base.hash(a::MatAlgElem, h::UInt)
 end
 
 nrows(a::MatAlgebra) = a.n
-ncols(a::MatAlgebra) = nrows(a)
+number_of_columns(a::MatAlgebra) = nrows(a)
 
 @doc raw"""
     degree(a::MatAlgebra)

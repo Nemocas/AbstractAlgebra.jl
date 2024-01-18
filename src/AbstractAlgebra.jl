@@ -338,6 +338,11 @@ const is_symmetric = issymmetric
 const is_lower_triangular = istril
 const is_upper_triangular = istriu
 
+# alternative names for some of our own functions
+function number_of_columns end
+export number_of_columns
+@alias ncols number_of_columns
+
 ###############################################################################
 # Macros for fancy printing. to use, enable attribute storage for your struct,
 # i.e.m change
@@ -1050,7 +1055,6 @@ export multiply_column
 export multiply_column!
 export multiply_row
 export multiply_row!
-export ncols
 export newton_to_monomial!
 export ngens
 export norm
