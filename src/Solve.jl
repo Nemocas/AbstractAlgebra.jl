@@ -299,6 +299,56 @@ end
 #
 ################################################################################
 
+# A is supposed to be in rref of rank r
+# Return a Vector of length ncols(A) with the first r entries the pivot columns
+# of A and the following entries the non-pivot columns (in ascending order).
+function pivot_and_non_pivot_cols(A::MatElem, r::Int)
+  p = zeros(Int, ncols(A))
+  j = 1
+  k = 1
+  for i = 1:r
+    while is_zero_entry(A, i, j)
+      p[r + k] = j
+      j += 1
+      k += 1
+    end
+    p[i] = j
+    j += 1
+  end
+  while k <= ncols(A) - r
+    p[r + k] = j
+    j += 1
+    k += 1
+  end
+
+  return p
+end
+
+# Transform a right hand side of type Vector into a MatElem
+function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::Vector{T}, task::Symbol; side::Symbol = :right) where T
+  if side !== :right && side !== :left
+    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+  end
+
+  isright = side === :right
+
+  if isright
+    nrows(A) != length(b) && error("Incompatible matrices")
+    B = matrix(base_ring(A), nrows(A), 1, b)
+  else # side == :left
+    ncols(A) != length(b) && error("Incompatible matrices")
+    B = matrix(base_ring(A), 1, ncols(A), b)
+  end
+  fl, sol, K = _can_solve_internal(A, B, task, side = side)
+  if isright
+    x = eltype(b)[ sol[i, 1] for i in 1:nrows(sol) ]
+  else # side == :left
+    x = eltype(b)[ sol[1, i] for i in 1:ncols(sol) ]
+  end
+  return fl, x, K
+end
+
+## _can_solve_internal over FIELDS
 # Tries to solve Ax = b (side == :right) or xA = b (side == :left) possibly with kernel.
 # Always returns a tuple (Bool, MatElem, MatElem).
 # task may be:
@@ -359,13 +409,8 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
   return true, sol, X
 end
 
-# Tries to solve Ax = b (side == :right) or xA = b (side == :left) possibly with kernel.
-# Always returns a tuple (Bool, MatElem, MatElem).
-# task may be:
-# * :only_check -> It is only tested whether there is a solution, the two MatElem's are
-#   "dummies"
-# * :with_solution -> A solution is computed, the last MatElem is a "dummy"
-# * :with_kernel -> A solution and the kernel is computed
+## _can_solve_internal over RINGS
+# See _can_solve_internal over fields for more explanation on the arguments and output
 function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
   if task !== :only_check && task !== :with_solution && task !== :with_kernel
     error("task $(task) not recognized")
@@ -386,109 +431,17 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
   nrows(A) != nrows(b) && error("Incompatible matrices")
 
   H, S = hnf_with_transform(lazy_transpose(A))
-  sol = lazy_transpose(zero(A, ncols(A), ncols(b)))
-  l = min(nrows(A), ncols(A))
-  b = deepcopy(b)
-  for i = 1:ncols(b)
-    for j = 1:l
-      k = 1
-      while k <= ncols(H) && is_zero_entry(H, j, k)
-        k += 1
-      end
-      if k > ncols(H)
-        continue
-      end
-      q, r = divrem(b[k, i], H[j, k])
-      if !iszero(r)
-        return false, zero(A, 0, 0), zero(A, 0, 0)
-      end
-      for h = k:ncols(H)
-        b[h, i] -= q*H[j, h]
-      end
-      sol[i, j] = q
-    end
-  end
-  if !is_zero(b)
-    return false, zero(A, 0, 0), zero(A, 0, 0)
-  end
-  if task === :only_check
-    return true, zero(A, 0, 0), zero(A, 0, 0)
-  end
-  if task === :with_solution
-    return true, lazy_transpose(S)*lazy_transpose(sol), zero(A, 0, 0)
+  fl, sol = _can_solve_with_hnf(b, H, S, task)
+  if !fl || task !== :with_kernel
+    return fl, sol, zero(A, 0, 0)
   end
 
-  nullity = ncols(A)
-  for i = nrows(H):-1:1
-    if !is_zero_row(H, i)
-      nullity = ncols(A) - i
-      break
-    end
-  end
-  N = zero(A, ncols(A), nullity)
-  for i = 1:nrows(N)
-    for j = 1:ncols(N)
-      N[i, j] = S[nrows(S) - j + 1, i]
-    end
-  end
-  return true, lazy_transpose(S)*lazy_transpose(sol), N
+  n, N = _kernel_of_hnf(A, H, S)
+  return true, sol, N
 end
 
-function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::Vector{T}, task::Symbol; side::Symbol = :right) where T
-  if side !== :right && side !== :left
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-  end
-
-  isright = side === :right
-
-  if isright
-    nrows(A) != length(b) && error("Incompatible matrices")
-    B = matrix(base_ring(A), nrows(A), 1, b)
-  else # side == :left
-    ncols(A) != length(b) && error("Incompatible matrices")
-    B = matrix(base_ring(A), 1, ncols(A), b)
-  end
-  fl, sol, K = _can_solve_internal(A, B, task, side = side)
-  if isright
-    x = eltype(b)[ sol[i, 1] for i in 1:nrows(sol) ]
-  else # side == :left
-    x = eltype(b)[ sol[1, i] for i in 1:ncols(sol) ]
-  end
-  return fl, x, K
-end
-
-# A is supposed to be in rref of rank r
-# Return a Vector of length ncols(A) with the first r entries the pivot columns
-# of A and the following entries the non-pivot columns (in ascending order).
-function pivot_and_non_pivot_cols(A::MatElem, r::Int)
-  p = zeros(Int, ncols(A))
-  j = 1
-  k = 1
-  for i = 1:r
-    while is_zero_entry(A, i, j)
-      p[r + k] = j
-      j += 1
-      k += 1
-    end
-    p[i] = j
-    j += 1
-  end
-  while k <= ncols(A) - r
-    p[r + k] = j
-    j += 1
-    k += 1
-  end
-
-  return p
-end
-
-# Tries to solve Ax = b (side == :right) or xA = b (side == :left) possibly with kernel.
-# Always returns a tuple (Bool, MatElem, MatElem).
-# task may be:
-# * :only_check -> It is only tested whether there is a solution, the two MatElem's are
-#   "dummies"
-# * :with_solution -> A solution is computed, the last MatElem is a "dummy"
-# * :with_kernel -> A solution and the kernel is computed
+## _can_solve_internal over FIELDS with SOLVE CONTEXT
+# See _can_solve_internal over fields for more explanation on the arguments and output
 function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: FieldElement
   if task !== :only_check && task !== :with_solution && task !== :with_kernel
     error("task $(task) not recognized")
@@ -510,6 +463,36 @@ function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::
 
   return true, sol, kernel(C, side = side)[2]
 end
+
+## _can_solve_internal over RINGS with SOLVE CONTEXT
+# See _can_solve_internal over fields for more explanation on the arguments and output
+function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
+  if task !== :only_check && task !== :with_solution && task !== :with_kernel
+    error("task $(task) not recognized")
+  end
+
+  if side !== :right && side !== :left
+    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+  end
+
+  if side === :right
+    fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
+  else
+    fl, sol = _can_solve_with_hnf(lazy_transpose(b), reduced_matrix(C), transformation_matrix(C), task)
+    sol = data(sol)
+  end
+  if !fl || task !== :with_kernel
+    return fl, sol, zero(b, 0, 0)
+  end
+
+  return true, sol, kernel(C, side = side)[2]
+end
+
+################################################################################
+#
+#  Internals for solving of row reduced matrices
+#
+################################################################################
 
 # Solve Ax = b with U*A in rref of rank r.
 # pivots must be of length ncols(A) and contain the pivot columns of U*A in the
@@ -555,28 +538,6 @@ function _kernel_of_rref(R::MatElem{T}, r::Int, pivots::Vector{Int}) where T <: 
     X[pivots[r + i], i] = one(base_ring(R))
   end
   return nullity, X
-end
-
-function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
-  if task !== :only_check && task !== :with_solution && task !== :with_kernel
-    error("task $(task) not recognized")
-  end
-
-  if side !== :right && side !== :left
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-  end
-
-  if side === :right
-    fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
-  else
-    fl, sol = _can_solve_with_hnf(lazy_transpose(b), reduced_matrix(C), transformation_matrix(C), task)
-    sol = data(sol)
-  end
-  if !fl || task !== :with_kernel
-    return fl, sol, zero(b, 0, 0)
-  end
-
-  return true, sol, kernel(C, side = side)[2]
 end
 
 # Solve Ax = b where H = U*transpose(A) is in HNF.
