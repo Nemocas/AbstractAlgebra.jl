@@ -44,11 +44,11 @@ dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 ###############################################################################
 
 @doc raw"""
-    nrows(a::MatSpace)
+    number_of_rows(a::MatSpace)
 
 Return the number of rows of the given matrix space.
 """
-nrows(a::MatSpace) = a.nrows
+number_of_rows(a::MatSpace) = a.nrows
 
 @doc raw"""
     number_of_columns(a::MatSpace)
@@ -57,7 +57,7 @@ Return the number of columns of the given matrix space.
 """
 number_of_columns(a::MatSpace) = a.ncols
 
-nrows(a::Union{Mat, MatAlgElem}) = size(a.entries, 1)
+number_of_rows(a::Union{Mat, MatAlgElem}) = size(a.entries, 1)
 
 number_of_columns(a::Union{Mat,MatAlgElem}) = size(a.entries, 2)
 

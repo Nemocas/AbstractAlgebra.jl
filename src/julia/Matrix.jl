@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-nrows(A::Matrix{T}) where {T} = size(A)[1]
+number_of_rows(A::Matrix{T}) where {T} = size(A)[1]
 number_of_columns(A::Matrix{T}) where {T} = size(A)[2]
 
 function is_zero_row(M::Matrix, i::Int)

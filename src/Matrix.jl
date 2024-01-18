@@ -89,11 +89,11 @@ check_square(S::MatAlgebra) = S
 ###############################################################################
 
 @doc raw"""
-    nrows(a::MatSpace)
+    number_of_rows(a::MatSpace)
 
 Return the number of rows of the given matrix space.
 """
-nrows(a::MatSpace) = a.nrows
+number_of_rows(a::MatSpace) = a.nrows
 
 @doc raw"""
     number_of_columns(a::MatSpace)
@@ -114,11 +114,11 @@ function Base.hash(a::MatElem, h::UInt)
 end
 
 @doc raw"""
-    nrows(a::MatrixElem{T}) where T <: NCRingElement
+    number_of_rows(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of rows of the given matrix.
 """
-nrows(a::MatrixElem{T}) where T <: NCRingElement
+number_of_rows(a::MatrixElem{T}) where T <: NCRingElement
 
 @doc raw"""
     number_of_columns(a::MatrixElem{T}) where T <: NCRingElement
@@ -373,7 +373,7 @@ the submatrix $A$ of $M$ defined by `A[i,j] = M[rows[i], cols[j]]`
 for `i=1,...,length(rows)` and `j=1,...,length(cols)`.
 Instead of a vector, `rows` and `cols` can also be:
 * an integer `i`, which is  interpreted as `i:i`, or
-* `:`, which is interpreted as `1:nrows(M)` or `1:ncols(M)` respectively.
+* `:`, which is interpreted as `1:number_of_rows(M)` or `1:number_of_columns(M)` respectively.
 """
 function getindex(M::MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
    _checkbounds(M, rows, cols)

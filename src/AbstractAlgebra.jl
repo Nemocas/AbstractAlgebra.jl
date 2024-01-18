@@ -343,10 +343,13 @@ const is_upper_triangular = istriu
 # alternative names for some of our own functions
 function number_of_columns end
 function number_of_generators end
+function number_of_rows end
 export number_of_columns
 export number_of_generators
+export number_of_rows
 @alias ncols number_of_columns
 @alias ngens number_of_generators
+@alias nrows number_of_rows
 
 ###############################################################################
 # Macros for fancy printing. to use, enable attribute storage for your struct,
@@ -1063,7 +1066,6 @@ export newton_to_monomial!
 export norm
 export normal_form
 export normalise
-export nrows
 export nullspace
 export num_coeff
 export number_field

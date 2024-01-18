@@ -209,7 +209,7 @@ import ..AbstractAlgebra: number_of_digits
 import ..AbstractAlgebra: number_of_generators
 import ..AbstractAlgebra: NCRing
 import ..AbstractAlgebra: NCRingElem
-import ..AbstractAlgebra: nrows
+import ..AbstractAlgebra: number_of_rows
 import ..AbstractAlgebra: numerator
 import ..AbstractAlgebra: nvars
 import ..AbstractAlgebra: O
