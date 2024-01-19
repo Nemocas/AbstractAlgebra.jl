@@ -12,7 +12,7 @@ export number_field
 #
 ###############################################################################
 
-function  gen(R::ResidueField{PolyRingElem{Rational{BigInt}}})
+function gen(R::EuclideanRingResidueField{PolyRingElem{Rational{BigInt}}})
    return R(gen(base_ring(R)))
 end
 
@@ -22,7 +22,7 @@ end
 #
 ###############################################################################
 
-function RandomExtensions.make(S::ResidueField{Generic.Poly{Rational{BigInt}}}, vs...)
+function RandomExtensions.make(S::EuclideanRingResidueField{Generic.Poly{Rational{BigInt}}}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, vs[1])

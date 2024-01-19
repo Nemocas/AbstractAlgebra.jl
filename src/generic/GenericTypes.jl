@@ -576,15 +576,15 @@ end
 
 ###############################################################################
 #
-#   ResidueRing / ResidueRingElem
+#   EuclideanRingResidueRing / EuclideanRingResidueRingElem
 #
 ###############################################################################
 
-mutable struct ResidueRing{T <: RingElement} <: AbstractAlgebra.ResidueRing{T}
+mutable struct EuclideanRingResidueRing{T <: RingElement} <: AbstractAlgebra.ResidueRing{T}
    base_ring::Ring
    modulus::T
 
-   function ResidueRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
+   function EuclideanRingResidueRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
       c = canonical_unit(modulus)
       if !isone(c)
         modulus = divexact(modulus, c)
@@ -593,30 +593,30 @@ mutable struct ResidueRing{T <: RingElement} <: AbstractAlgebra.ResidueRing{T}
 
       return get_cached!(ModulusDict, (R, modulus), cached) do
          new{T}(R, modulus)
-      end::ResidueRing{T}
+      end::EuclideanRingResidueRing{T}
    end
 end
 
 const ModulusDict = CacheDictType{Tuple{Ring, RingElement}, Ring}()
 
-mutable struct ResidueRingElem{T <: RingElement} <: AbstractAlgebra.ResElem{T}
+mutable struct EuclideanRingResidueRingElem{T <: RingElement} <: AbstractAlgebra.ResElem{T}
    data::T
-   parent::ResidueRing{T}
+   parent::EuclideanRingResidueRing{T}
 
-   ResidueRingElem{T}(a::T) where T <: RingElement = new{T}(a)
+   EuclideanRingResidueRingElem{T}(a::T) where T <: RingElement = new{T}(a)
 end
 
 ###############################################################################
 #
-#   ResidueField / ResFieldElem
+#   EuclideanRingResidueField / ResFieldElem
 #
 ###############################################################################
 
-mutable struct ResidueField{T <: RingElement} <: AbstractAlgebra.ResidueField{T}
+mutable struct EuclideanRingResidueField{T <: RingElement} <: AbstractAlgebra.ResidueField{T}
    base_ring::Ring
    modulus::T
 
-   function ResidueField{T}(modulus::T, cached::Bool = true) where T <: RingElement
+   function EuclideanRingResidueField{T}(modulus::T, cached::Bool = true) where T <: RingElement
       c = canonical_unit(modulus)
       if !isone(c)
         modulus = divexact(modulus, c)
@@ -624,17 +624,17 @@ mutable struct ResidueField{T <: RingElement} <: AbstractAlgebra.ResidueField{T}
       R = parent(modulus)
       return get_cached!(ModulusFieldDict, (R, modulus), cached) do
          new{T}(R, modulus)
-      end::ResidueField{T}
+      end::EuclideanRingResidueField{T}
    end
 end
 
 const ModulusFieldDict = CacheDictType{Tuple{Ring, RingElement}, Field}()
 
-mutable struct ResidueFieldElem{T <: RingElement} <: AbstractAlgebra.ResFieldElem{T}
+mutable struct EuclideanRingResidueFieldElem{T <: RingElement} <: AbstractAlgebra.ResFieldElem{T}
    data::T
-   parent::ResidueField{T}
+   parent::EuclideanRingResidueField{T}
 
-   ResidueFieldElem{T}(a::T) where T <: RingElement = new{T}(a)
+   EuclideanRingResidueFieldElem{T}(a::T) where T <: RingElement = new{T}(a)
 end
 
 ###############################################################################

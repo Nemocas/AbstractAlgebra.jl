@@ -311,23 +311,23 @@ function Base.lcm(a::T, b::T) where {T<:SeriesElem}
     return gen(parent(a))^max(valuation(a), valuation(b))
 end
 
-function gen(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyRingElem}
+function gen(R::Union{Generic.EuclideanRingResidueRing{T},Generic.EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
     return R(gen(base_ring(R)))
 end
 
-function characteristic(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyRingElem}
+function characteristic(R::Union{Generic.EuclideanRingResidueRing{T},Generic.EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
     return characteristic(base_ring(base_ring(R)))
 end
 
-function size(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:ResElem}
+function size(R::Union{Generic.EuclideanRingResidueRing{T},Generic.EuclideanRingResidueField{T}}) where {T<:ResElem}
     return size(base_ring(base_ring(R)))^degree(modulus(R))
 end
 
-function size(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyRingElem}
+function size(R::Union{Generic.EuclideanRingResidueRing{T},Generic.EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
     return size(base_ring(base_ring(R)))^degree(R.modulus)
 end
 
-function rand(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyRingElem}
+function rand(R::Union{Generic.EuclideanRingResidueRing{T},Generic.EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
     r = rand(base_ring(base_ring(R)))
     g = gen(R)
     for i = 1:degree(R.modulus)
@@ -336,7 +336,7 @@ function rand(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T
     return r
 end
 
-function gens(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyRingElem} ## probably needs more cases
+function gens(R::Union{Generic.EuclideanRingResidueRing{T},Generic.EuclideanRingResidueField{T}}) where {T<:PolyRingElem} ## probably needs more cases
     ## as the other residue functions
     g = gen(R)
     r = Vector{typeof(g)}()

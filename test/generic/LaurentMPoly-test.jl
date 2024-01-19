@@ -6,7 +6,7 @@ function test_elem(R::AbstractAlgebra.LaurentMPolyRing{BigInt})
     rand(R, 1:9, -n:n, -99:99)
 end
 
-function test_elem(R::AbstractAlgebra.Generic.LaurentMPolyWrapRing{AbstractAlgebra.Generic.ResidueRingElem{BigInt}})
+function test_elem(R::AbstractAlgebra.Generic.LaurentMPolyWrapRing{AbstractAlgebra.Generic.EuclideanRingResidueRingElem{BigInt}})
     n = rand(1:5)
     # R: length between 1 and 9
     # R: exponents between -n and n

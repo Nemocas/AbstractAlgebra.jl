@@ -454,7 +454,7 @@ function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    T = elem_type(R)
 
-   return Generic.ResidueRing{T}(R(a), cached)
+   return Generic.EuclideanRingResidueRing{T}(R(a), cached)
 end
 
 function residue_ring(R::PolyRing, a::RingElement; cached::Bool = true)
@@ -462,7 +462,7 @@ function residue_ring(R::PolyRing, a::RingElement; cached::Bool = true)
    !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
    T = elem_type(R)
 
-   return Generic.ResidueRing{T}(R(a), cached)
+   return Generic.EuclideanRingResidueRing{T}(R(a), cached)
 end
 
 @doc raw"""

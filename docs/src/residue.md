@@ -15,13 +15,13 @@ AbstractAlgebra.jl abstract type hierarchy.
 
 ## Generic residue types
 
-AbstractAlgebra.jl implements generic residue rings with type `Generic.ResidueRingElem{T}`
-or in the case of residue rings that are known to be fields, `Generic.ResidueFieldElem{T}`,
+AbstractAlgebra.jl implements generic residue rings of Euclidean rings with type `Generic.EuclideanRingResidueRingelem{T}`
+or in the case of residue rings that are known to be fields, `Generic.EuclideanRingResidueField{T}`,
 where `T` is the type of elements of the base ring. See the file
 `src/generic/GenericTypes.jl` for details.
 
-Parent objects of generic residue ring elements have type `Generic.ResidueRing{T}`
-and those of residue fields have type `GenericResField{T}`.
+Parent objects of generic residue ring elements have type `Generic.EuclideanRingResidueRing{T}`
+and those of residue fields have type `Generic.EuclideanRingResidueField{T}`.
 
 The defining modulus of the residue ring is stored in the parent object.
 
@@ -32,17 +32,6 @@ or `ResFieldElem{T}` in the case of residue fields, and the
 residue ring types belong to the abstract type `ResidueRing{T}` or `ResidueField{T}`
 respectively. This enables one to write generic functions that can accept any
 AbstractAlgebra residue type.
-
-
-!!! note
-
-    Note that both the generic residue ring type `Generic.ResidueRing{T}` and the
-    abstract type it belongs to, `ResidueRing{T}` are both called `ResidueRing`, and
-    similarly for the residue field types. In each case, the  former is a
-    (parameterised) concrete type for a residue ring over a given base ring whose
-    elements have type `T`. The latter is an abstract type representing all
-    residue ring types in AbstractAlgebra.jl, whether generic or very specialised
-    (e.g. supplied by a C library).
 
 ## Residue ring constructors
 
