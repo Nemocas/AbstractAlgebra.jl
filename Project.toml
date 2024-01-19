@@ -1,6 +1,6 @@
 name = "AbstractAlgebra"
 uuid = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
-version = "0.35.3"
+version = "0.36.0-DEV"
 
 [deps]
 GroupsCore = "d5909c97-4eac-4ecc-a3dc-fdd0858a4120"
