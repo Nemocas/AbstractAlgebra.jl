@@ -57,7 +57,7 @@ function _compute_target_size_nonrec(a::NCRingElement)
   return ()
 end
 
-function _compute_target_size_nonrec(a::Ref{<:NCRingElement})
+function _compute_target_size_nonrec(a::Ref)
   return ()
 end
 
@@ -93,7 +93,7 @@ function _compute_elements_nonrec(a::NCRingElement)
   return a
 end
 
-function _compute_elements_nonrec(a::Ref{<:NCRingElement})
+function _compute_elements_nonrec(a::Ref)
   return a.x
 end
 
@@ -121,7 +121,7 @@ end
 # So we end up with a nice expression tree and our aim is to find
 # the shape and coefficient ring of the final output matrix
 function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{BroadcastDummy}}, ::Type{ElType}) where ElType
-  dest =  _promote_dest_func(bc.f, bc.args)
+  dest = _promote_dest_func(bc.f, bc.args)
   return similar(dest, (length.(axes(bc)))...)
 end
 
