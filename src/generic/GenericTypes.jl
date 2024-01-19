@@ -637,6 +637,21 @@ mutable struct EuclideanRingResidueFieldElem{T <: RingElement} <: AbstractAlgebr
    EuclideanRingResidueFieldElem{T}(a::T) where T <: RingElement = new{T}(a)
 end
 
+################################################################################
+#
+#  Residue ring/field map
+#
+################################################################################
+
+mutable struct EuclideanRingResidueMap{S, T} <: AbstractAlgebra.Map{S, T, AbstractAlgebra.SetMap, EuclideanRingResidueMap}
+  domain::S
+  codomain::T
+
+  function EuclideanRingResidueMap(domain::S, codomain::T) where {S, T}
+    return new{S, T}(domain, codomain)
+  end
+end
+
 ###############################################################################
 #
 #   RelPowerSeriesRing / RelSeries

@@ -265,8 +265,6 @@ include("generic/Residue.jl")
 
 include("generic/ResidueField.jl")
 
-include("generic/NumberField.jl")
-
 include("generic/Poly.jl")
 
 include("generic/NCPoly.jl")

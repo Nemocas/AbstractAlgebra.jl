@@ -19,7 +19,7 @@ import GroupsCore: gens, ngens, order, mul!, istrivial
 
 # A list of all symbols external packages should not import from AbstractAlgebra
 const import_exclude = [:import_exclude, :QQ, :ZZ,
-                  :RealField, :number_field, :NumberField, :GF,
+                  :RealField, :GF,
                   :AbstractAlgebra,
                   :inv, :log, :exp, :sqrt, :div, :divrem,
                   :numerator, :denominator,
@@ -655,6 +655,8 @@ import .Generic: dense_matrix_type
 import .Generic: dim
 import .Generic: disable_cache!
 import .Generic: downscale
+import .Generic: EuclideanRingResidueField
+import .Generic: EuclideanRingResidueRing
 import .Generic: enable_cache!
 import .Generic: exp_gcd
 import .Generic: exponent
@@ -716,7 +718,6 @@ import .Generic: norm
 import .Generic: normal_form
 import .Generic: normalise
 import .Generic: num_coeff
-import .Generic: number_field
 import .Generic: one
 import .Generic: order
 import .Generic: ordering
@@ -861,6 +862,8 @@ export divhigh
 export divides
 export domain
 export downscale
+export EuclideanRingResidueField
+export EuclideanRingResidueRing
 export elem_type
 export enable_cache!
 export evaluate
@@ -1047,7 +1050,6 @@ export normalise
 export nrows
 export nullspace
 export num_coeff
-export number_field
 export nvars
 export O
 export one

@@ -54,7 +54,6 @@ Base.@deprecate_binding LaurentPolynomialRing laurent_polynomial_ring
 Base.@deprecate_binding LaurentSeriesRing laurent_series_ring
 Base.@deprecate_binding LaurentSeriesField laurent_series_field
 Base.@deprecate_binding FractionField fraction_field
-Base.@deprecate_binding NumberField number_field
 
 Base.@deprecate_binding FunctionField function_field
 Base.@deprecate_binding RationalFunctionField rational_function_field
