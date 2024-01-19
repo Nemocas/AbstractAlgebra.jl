@@ -14,3 +14,9 @@
   @test_throws ErrorException A .* 2 .* 2 .* [1, 2]
 end
 
+@testset "broadcasting evaluate" begin
+  Qa, (k1, k2, k3, k4) = rational_function_field(QQ, ["k1", "k2", "k3", "k4"])
+  A = matrix(Qa, [k1 k2; k3 k4])
+  @test evaluate.(A, Ref([1, 2, 3, 4])) == QQ[1 2; 3 4]
+end
+
