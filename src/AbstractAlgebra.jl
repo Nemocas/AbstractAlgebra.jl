@@ -862,6 +862,8 @@ export divhigh
 export divides
 export domain
 export downscale
+export echelon_form
+export echelon_form_with_transformation
 export elem_type
 export enable_cache!
 export evaluate
@@ -899,6 +901,8 @@ export has_attribute
 export has_bottom_neighbor
 export has_left_neighbor
 export hash
+export hermite_form
+export hermite_form_with_transformation
 export hessenberg
 export hessenberg!
 export hnf
