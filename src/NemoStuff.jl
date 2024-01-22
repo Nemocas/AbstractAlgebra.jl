@@ -187,7 +187,7 @@ function Base.getindex(L::SimpleNumField{T}, i::Int) where {T}
     end
 end
 
-ngens(L::SimpleNumField{T}) where {T} = 1
+number_of_generators(L::SimpleNumField{T}) where {T} = 1
 
 is_unit(a::NumFieldElem) = !iszero(a)
 

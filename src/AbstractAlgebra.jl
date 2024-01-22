@@ -342,8 +342,11 @@ const is_upper_triangular = istriu
 
 # alternative names for some of our own functions
 function number_of_columns end
+function number_of_generators end
 export number_of_columns
+export number_of_generators
 @alias ncols number_of_columns
+@alias ngens number_of_generators
 
 ###############################################################################
 # Macros for fancy printing. to use, enable attribute storage for your struct,
@@ -724,7 +727,6 @@ import .Generic: monomial!
 import .Generic: monomials
 import .Generic: MPolyBuildCtx
 import .Generic: mullow_karatsuba
-import .Generic: ngens
 import .Generic: norm
 import .Generic: normal_form
 import .Generic: normalise
@@ -1058,7 +1060,6 @@ export multiply_column!
 export multiply_row
 export multiply_row!
 export newton_to_monomial!
-export ngens
 export norm
 export normal_form
 export normalise

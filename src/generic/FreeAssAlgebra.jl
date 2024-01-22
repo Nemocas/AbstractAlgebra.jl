@@ -85,7 +85,7 @@ function isone(a::FreeAssAlgElem{T}) where T
     end
 end
 
-function ngens(a::FreeAssAlgebra{T}) where T
+function number_of_generators(a::FreeAssAlgebra{T}) where T
     return nvars(a)
 end
 

@@ -206,9 +206,9 @@ import ..AbstractAlgebra: mul!
 import ..AbstractAlgebra: mullow
 import ..AbstractAlgebra: number_of_columns
 import ..AbstractAlgebra: number_of_digits
+import ..AbstractAlgebra: number_of_generators
 import ..AbstractAlgebra: NCRing
 import ..AbstractAlgebra: NCRingElem
-import ..AbstractAlgebra: ngens
 import ..AbstractAlgebra: nrows
 import ..AbstractAlgebra: numerator
 import ..AbstractAlgebra: nvars

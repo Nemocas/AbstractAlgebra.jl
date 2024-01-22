@@ -25,7 +25,7 @@ symbols(R::LaurentMPolyWrapRing) = symbols(R.mpolyring)
 
 nvars(R::LaurentMPolyWrapRing) = nvars(R.mpolyring)
 
-ngens(R::LaurentMPolyWrapRing) = nvars(R.mpolyring)
+number_of_generators(R::LaurentMPolyWrapRing) = nvars(R.mpolyring)
 
 characteristic(R::LaurentMPolyWrapRing) = characteristic(R.mpolyring)
 

@@ -20,7 +20,7 @@ base_ring(N::SNFModule{T}) where T <: RingElement = N.base_ring
 
 base_ring(v::SNFModuleElem{T}) where T <: RingElement = base_ring(v.parent)
 
-ngens(N::SNFModule{T}) where T <: RingElement = length(N.invariant_factors)
+number_of_generators(N::SNFModule{T}) where T <: RingElement = length(N.invariant_factors)
 
 gens(N::SNFModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 

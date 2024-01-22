@@ -671,7 +671,7 @@ end
 
 gen(G::SymmetricGroup, i::Int) = gens(G)[i]
 
-ngens(G::SymmetricGroup) = G.n == 1 ? 0 : G.n == 2 ? 1 : 2
+number_of_generators(G::SymmetricGroup) = G.n == 1 ? 0 : G.n == 2 ? 1 : 2
 
 is_finite(G::SymmetricGroup) = true
 

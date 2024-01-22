@@ -71,7 +71,7 @@ iszero(m::MyModuleElem{T}) where T <: RingElement
 Return `true` if the given module element is zero.
 
 ```julia
-ngens(M::MyModule{T}) where T <: RingElement
+number_of_generators(M::MyModule{T}) where T <: RingElement
 ```
 
 Return the number of generators of the module $M$ in its current representation.
