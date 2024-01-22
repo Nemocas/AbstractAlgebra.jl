@@ -178,6 +178,7 @@ import ..AbstractAlgebra: inv
 import ..AbstractAlgebra: is_constant
 import ..AbstractAlgebra: is_domain_type
 import ..AbstractAlgebra: is_exact_type
+import ..AbstractAlgebra: is_finite
 import ..AbstractAlgebra: is_gen
 import ..AbstractAlgebra: is_monomial
 import ..AbstractAlgebra: is_square

@@ -1,9 +1,7 @@
 [deps]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
-GroupsCore = "d5909c97-4eac-4ecc-a3dc-fdd0858a4120"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 Aqua = "0.8.2"
-GroupsCore = "0.4.0"
 Test = "1.6"

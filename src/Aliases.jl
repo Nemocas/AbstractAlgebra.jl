@@ -82,3 +82,4 @@ Base.@deprecate_binding DirectSum direct_sum
 # Deprecated in 0.34.*
 Base.@deprecate_binding PuiseuxSeriesField puiseux_series_field
 Base.@deprecate_binding PuiseuxSeriesRing puiseux_series_ring
+Base.@deprecate_binding istrivial is_trivial
