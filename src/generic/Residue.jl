@@ -71,6 +71,7 @@ domain(f::EuclideanRingResidueMap) = f.domain
 codomain(f::EuclideanRingResidueMap) = f.codomain
 
 function image(f::EuclideanRingResidueMap, a)
+  parent(a) !== domain(f) && error("Not an element of the domain")
   return codomain(f)(a)
 end
 
@@ -78,5 +79,5 @@ end
 
 function preimage(f::EuclideanRingResidueMap, a)
   parent(a) != codomain(f) && error("Not an element of the codomain")
-  return data(a)
+  return lift(a)
 end
