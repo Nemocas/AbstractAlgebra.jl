@@ -381,7 +381,7 @@ end
 end
 
 @testset "Generic.Poly.is_unit" begin
-   R, x = polynomial_ring(residue_ring(ZZ, 4), "x")
+  R, x = polynomial_ring(residue_ring(ZZ, 4)[1], "x")
 
    @test !is_unit(x)
    @test !is_unit(2*x)
@@ -433,7 +433,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
    for iter = 1:100
@@ -464,7 +464,7 @@ end
    end
 
    # Non-integral domain
-   T = residue_ring(ZZ, 6)
+   T, = residue_ring(ZZ, 6)
    R, x = T["x"]
    for iter = 1:100
       f = rand(R, -1:10, 0:5)
@@ -502,7 +502,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
    for iter = 1:500
@@ -544,7 +544,7 @@ end
    end
 
    # Non-integral domain
-   R = residue_ring(ZZ, 6)
+   R, = residue_ring(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
       f = rand(S, -1:10, 0:5)
@@ -607,7 +607,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
    for iter = 1:500
@@ -633,7 +633,7 @@ end
    end
 
    # Non-integral domain
-   R = residue_ring(ZZ, 6)
+   R,  = residue_ring(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
       f = rand(S, -1:10, 0:5)
@@ -667,7 +667,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
    for iter = 1:500
@@ -705,7 +705,7 @@ end
    end
 
    # Non-integral domain
-   R = residue_ring(ZZ, 6)
+   R, = residue_ring(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
       f = rand(S, 0:10, 0:5)
@@ -760,7 +760,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
    for iter = 1:300
@@ -780,7 +780,7 @@ end
    end
 
    # Non-integral domain
-   T = residue_ring(ZZ, 6)
+   T, = residue_ring(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, -1:10, 0:5)
@@ -855,7 +855,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
    for iter = 1:300
@@ -878,7 +878,7 @@ end
    end
 
    # Non-integral domain
-   T = residue_ring(ZZ, 6)
+   T, = residue_ring(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, -1:10, 0:5)
@@ -919,7 +919,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
    for iter = 1:300
@@ -967,7 +967,7 @@ end
    @test_throws DomainError reverse(f, -rand(2:100))
 
    #  Non-integral domain
-   T = residue_ring(ZZ, 6)
+   T, = residue_ring(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, -1:10, 0:5)
@@ -1012,7 +1012,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
    for iter = 1:300
@@ -1050,7 +1050,7 @@ end
    @test_throws DomainError shift_left(f, -rand(2:100))
 
    # Non-integral domain
-   T = residue_ring(ZZ, 6)
+   T, = residue_ring(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, -1:10, 0:5)
@@ -1094,7 +1094,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
 
@@ -1143,7 +1143,7 @@ end
    for iter = 1:10
       n = rand(2:26)
 
-      Zn = residue_ring(ZZ, n)
+      Zn, = residue_ring(ZZ, n)
       R, x = polynomial_ring(Zn, "x")
 
       f = rand(R, -1:10, 0:n - 1)
@@ -1168,7 +1168,7 @@ end
 if false
    @testset "Generic.Poly.modular_arithmetic" begin
       # Exact ring
-      R = residue_ring(ZZ, 23)
+      R, = residue_ring(ZZ, 23)
       S, x = polynomial_ring(R, "x")
 
       for iter = 1:100
@@ -1207,7 +1207,7 @@ if false
 
       # Fake finite field of char 7, degree 2
       R, y = polynomial_ring(GF(7), "y")
-      F = residue_field(R, y^2 + 6y + 3)
+      F, = residue_field(R, y^2 + 6y + 3)
       a = F(y)
       S, x = polynomial_ring(F, "x")
 
@@ -1337,7 +1337,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
 
@@ -1360,7 +1360,7 @@ end
 
    # Characteristic p ring
    n = 23
-   Zn = residue_ring(ZZ, n)
+   Zn, = residue_ring(ZZ, n)
    R, x = polynomial_ring(Zn, "x")
 
    for iter = 1:100
@@ -1396,7 +1396,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
 
@@ -1439,7 +1439,7 @@ end
 
    # Characteristic p ring
    n = 23
-   Zn = residue_ring(ZZ, n)
+   Zn, = residue_ring(ZZ, n)
    R, x = polynomial_ring(Zn, "x")
 
    for iter = 1:100
@@ -1477,7 +1477,7 @@ end
 
 @testset "Generic.Poly.euclidean_division" begin
    # Exact ring
-   R = residue_ring(ZZ, 23)
+   R, = residue_ring(ZZ, 23)
    S, x = polynomial_ring(R, "x")
 
    for iter = 1:100
@@ -1500,7 +1500,7 @@ end
 
    # Fake finite field of char 7, degree 2
    R, y = polynomial_ring(GF(7), "y")
-   F = residue_field(R, y^2 + 6y + 3)
+   F, = residue_field(R, y^2 + 6y + 3)
    a = F(y)
    S, x = polynomial_ring(F, "x")
 
@@ -1593,7 +1593,7 @@ end
    end
 
    # Residue ring
-   S = residue_ring(ZZ, 23)
+   S, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(S, "x")
 
    for iter = 1:100
@@ -1627,7 +1627,7 @@ end
    end
 
    # Characteristic p ring
-   Zn = residue_ring(ZZ, 23)
+   Zn, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(Zn, "x")
 
    for iter = 1:100
@@ -1713,7 +1713,7 @@ end
    end
 
    # Characteristic p ring
-   R = residue_ring(ZZ, 23)
+   R, = residue_ring(ZZ, 23)
    S, x = polynomial_ring(R, "x")
 
    for iter = 1:100
@@ -1816,7 +1816,7 @@ end
    end
 
    # Non-integral domain
-   Zn = residue_ring(ZZ, 23)
+   Zn, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
@@ -1862,7 +1862,7 @@ end
    end
 
    # Non-integral domain
-   Zn = residue_ring(ZZ, 6)
+   Zn, = residue_ring(ZZ, 6)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
@@ -1900,7 +1900,7 @@ end
    end
 
    # Non-integral domain
-   Zn = residue_ring(ZZ, 6)
+   Zn, = residue_ring(ZZ, 6)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
@@ -1929,7 +1929,7 @@ end
    end
 
    # Characteristic p ring
-   Zn = residue_ring(ZZ, 23)
+   Zn, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
@@ -2015,7 +2015,7 @@ end
    end
 
    # Characteristic p ring
-   Zn = residue_ring(ZZ, 23)
+   Zn, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
@@ -2060,7 +2060,7 @@ end
    end
 
    # Non-integral domain
-   Zn = residue_ring(ZZ, 6)
+   Zn, = residue_ring(ZZ, 6)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
@@ -2102,7 +2102,7 @@ end
 
 #   TODO: Fix issue #291
 #   # Non-integral domain
-#   Zn = residue_ring(ZZ, 6)
+#   Zn, = residue_ring(ZZ, 6)
 #   R, x = polynomial_ring(Zn, "x")
 #
 #   for iter = 1:100
@@ -2172,7 +2172,7 @@ end
    end
 
    # Characteristic p ring
-   Zn = residue_ring(ZZ, 23)
+   Zn, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:100
@@ -2210,7 +2210,7 @@ end
 #   Test will cause impossible inverse in the mean time
 #
 #   # Non-integral domain
-#   Zn = residue_ring(ZZ, 6)
+#   Zn, = residue_ring(ZZ, 6)
 #   R, x = polynomial_ring(Zn, "x")
 #
 #   for iter in 1:100
@@ -2253,7 +2253,7 @@ end
    end
 
    # Characteristic p ring
-   Zn = residue_ring(ZZ, 23)
+   Zn, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:100
@@ -2289,7 +2289,7 @@ end
 
    # Fake finite field of char 7, degree 2
    S, y = polynomial_ring(GF(7), "y")
-   F = residue_field(S, y^2 + 6y + 3)
+   F, = residue_field(S, y^2 + 6y + 3)
    a = F(y)
    R, x = polynomial_ring(F, "x")
 
@@ -2311,7 +2311,7 @@ end
 @testset "Generic.Poly.gcd_gcdx_gcdinv_nonfield" begin
 
    for n in (6, 101*103)
-      Zn = residue_ring(ZZ, n)
+      Zn, = residue_ring(ZZ, n)
       R, x = polynomial_ring(Zn, "x")
 
       for iter in 1:100
@@ -2393,7 +2393,7 @@ end
    end
 
    # Characteristic p ring
-   Zn = residue_ring(ZZ, 23)
+   Zn, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
@@ -2423,7 +2423,7 @@ end
    end
 
    # Non-integral domain
-   Zn = residue_ring(ZZ, 6)
+   Zn, = residue_ring(ZZ, 6)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
@@ -2482,7 +2482,7 @@ end
    end
 
    # Characteristic p ring
-   Zn = residue_ring(ZZ, 23)
+   Zn, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(Zn, "x")
 
    for iter in 1:10
@@ -2513,7 +2513,7 @@ end
 
 #   TODO: Fix issue #294 (if possible)
 #   # Non-integral domain
-#   Zn = residue_ring(ZZ, 6)
+#   Zn, = residue_ring(ZZ, 6)
 #   R, x = polynomial_ring(Zn, "x")
 #
 #   for iter in 1:10
@@ -2590,7 +2590,7 @@ end
    end
 
    # Characteristic p ring
-   Zn = residue_ring(ZZ, 23)
+   Zn, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(Zn, "x")
 
    for n in 10:20
@@ -2629,7 +2629,7 @@ end
    end
 
    # Non-integral domain
-   Zn = residue_ring(ZZ, 6)
+   Zn, = residue_ring(ZZ, 6)
    R, x = polynomial_ring(Zn, "x")
 
    for n in 10:20
@@ -2766,7 +2766,7 @@ end
    end
 
    # Characteristic p ring
-   Zn = residue_ring(ZZ, 23)
+   Zn, = residue_ring(ZZ, 23)
    R, x = polynomial_ring(Zn, "x")
 
    for iter = 1:10
@@ -2906,7 +2906,7 @@ end
 
    # Characteristic p field
    for p in [2, 7, 19, 65537, ZZ(2), ZZ(7), ZZ(19), ZZ(65537)]
-      R = residue_field(ZZ, p)
+      R, = residue_field(ZZ, p)
 
       S, x = polynomial_ring(R, "x")
 

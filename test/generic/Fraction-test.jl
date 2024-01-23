@@ -280,7 +280,7 @@ end
 end
 
 @testset "Generic.FracFieldElem.evaluate" begin
-   R = residue_ring(ZZ, 5)
+   R, = residue_ring(ZZ, 5)
    S, x = polynomial_ring(R, "x")
 
    f = (x^2 + 2)//(x + 1)

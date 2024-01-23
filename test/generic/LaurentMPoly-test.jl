@@ -19,7 +19,7 @@ end
     test_Ring_interface(L)
     test_Ring_interface_recursive(L)
 
-    L, (x, y) = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6)), ["x", "y"])
+    L, (x, y) = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], ["x", "y"])
     test_Ring_interface(L)
 end
 
@@ -46,12 +46,12 @@ end
 end
 
 @testset "Generic.LaurentMPoly.printing" begin
-   R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6), ["x"])
+   R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], ["x"])
    @test !occursin("\n", sprint(show, R))
 end
 
 @testset "Generic.LaurentMPoly.is_unit" begin
-   R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6), ["x"])
+   R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], ["x"])
 
    @test is_unit(x)
    @test !is_unit(2*x)

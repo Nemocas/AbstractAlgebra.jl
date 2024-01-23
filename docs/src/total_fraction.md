@@ -265,8 +265,7 @@ rand(R::TotFracRing, v...)
 **Examples**
 
 ```jldoctest; setup = :(import Random; Random.seed!(42))
-julia> R = residue_ring(ZZ, 12)
-Residue ring of integers modulo 12
+julia> R, = residue_ring(ZZ, 12);
 
 julia> K = total_ring_of_fractions(R)
 Total ring of fractions of Residue ring of integers modulo 12

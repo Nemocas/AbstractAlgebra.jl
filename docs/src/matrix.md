@@ -827,8 +827,7 @@ fflu{T <: RingElem}(::MatElem{T}, ::SymmetricGroup)
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
 
-julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of univariate polynomial ring modulo x^3 + 3*x + 1, x)
+julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
 
 julia> S = matrix_space(K, 3, 3)
 Matrix space of 3 rows and 3 columns
@@ -865,8 +864,7 @@ is_rref{T <: FieldElem}(::MatElem{T})
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
 
-julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of univariate polynomial ring modulo x^3 + 3*x + 1, x)
+julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
 
 julia> S = matrix_space(K, 3, 3)
 Matrix space of 3 rows and 3 columns
@@ -995,8 +993,7 @@ can_solve_left_reduced_triu{T <: RingElement}(::MatElem{T}, ::MatElem{T})
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
 
-julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of univariate polynomial ring modulo x^3 + 3*x + 1, x)
+julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
 
 julia> S = matrix_space(K, 3, 3)
 Matrix space of 3 rows and 3 columns
@@ -1120,8 +1117,7 @@ is_invertible{T <: RingElement}(::MatrixElem{T})
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
 
-julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of univariate polynomial ring modulo x^3 + 3*x + 1, x)
+julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
 
 julia> S = matrix_space(K, 3, 3)
 Matrix space of 3 rows and 3 columns
@@ -1211,8 +1207,7 @@ is_hessenberg{T <: RingElem}(::MatElem{T})
 **Examples**
 
 ```jldoctest
-julia> R = residue_ring(ZZ, 7)
-Residue ring of integers modulo 7
+julia> R, = residue_ring(ZZ, 7);
 
 julia> S = matrix_space(R, 4, 4)
 Matrix space of 4 rows and 4 columns

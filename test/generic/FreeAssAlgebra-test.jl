@@ -135,7 +135,7 @@ function test_elem(R::Generic.FreeAssAlgebra{elem_type(ZZ)})
 end
 
 @testset "Generic.FreeAssAlgebra.change_base_ring" begin
-   F5 = residue_ring(ZZ, 5)
+   F5, = residue_ring(ZZ, 5)
    R, varsR = polynomial_ring(F5, ["x"])
    S, varsS = free_associative_algebra(R, ["y"])
    f = x -> x^2 + F5(3)
@@ -198,7 +198,7 @@ end
 end
 
 @testset "Generic.FreeAssAlgebra.is_unit" begin
-   R, (x,) = free_associative_algebra(residue_ring(ZZ, 4), ["x"])
+   R, (x,) = free_associative_algebra(residue_ring(ZZ, 4)[1], ["x"])
 
    @test !is_unit(x)
    @test !is_unit(2*x)

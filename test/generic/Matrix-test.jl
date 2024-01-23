@@ -3,7 +3,7 @@ const RINGS = Dict(
    "exact field"         => (GF(7),              ()),
    "inexact ring"        => (RealField["t"][1],  (0:200, -1000:1000)),
    "inexact field"       => (RealField,          (-1000:1000,)),
-   "non-integral domain" => (residue_ring(ZZ, 6), (0:5,)),
+   "non-integral domain" => (residue_ring(ZZ, 6)[1], (0:5,)),
    "fraction field"      => (QQ,                 (-1000:1000,)),
 )
 
@@ -153,8 +153,8 @@ end
    SZ = matrix_space(ZZ, 3, 3)
    @test_throws Exception SZ(k)
 
-   R2 = residue_ring(ZZ, 2)
-   R3 = residue_ring(ZZ, 3)
+   R2, = residue_ring(ZZ, 2)
+   R3, = residue_ring(ZZ, 3)
    R2_1x2 = matrix_space(R2, 1, 2)
    R3_1x2 = matrix_space(R3, 1, 2)
    m2 = R2_1x2([0, 1])
@@ -660,7 +660,7 @@ end
    @test -A == S(-A.entries)
 
    # Non-integral domain
-   S = matrix_space(residue_ring(ZZ, 6), rand(0:9), rand(0:9))
+   S = matrix_space(residue_ring(ZZ, 6)[1], rand(0:9), rand(0:9))
    A = rand(S, 0:5)
 
    @test iszero(A + (-A))
@@ -844,7 +844,7 @@ end
    @test A[rows, cols] == matrix(R, A.entries[rows, cols])
 
    # Non-integral domain
-   R = residue_ring(ZZ, 6)
+   R, = residue_ring(ZZ, 6)
    S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, 0:5)
@@ -1118,7 +1118,7 @@ end
    end
 
    # Non-integral domain
-   R = residue_ring(ZZ, 6)
+   R, = residue_ring(ZZ, 6)
 
    for S in (matrix_space(R, rand(1:9), rand(1:9)),
              let n = rand(1:9)
@@ -1286,7 +1286,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    _test_matrix_vector_prod(R, -1000:1000)
 
    # Non-integral domain
-   R = residue_ring(ZZ, 6)
+   R, = residue_ring(ZZ, 6)
    S = matrix_space(R, rand(1:9), rand(1:9))
 
    A = rand(S, 0:5)
@@ -1355,7 +1355,7 @@ end
 
 @testset "Generic.Mat.promotion" begin
    m = [1 2; 3 4]
-   F = residue_field(ZZ, 3)
+   F, = residue_field(ZZ, 3)
    R, t = polynomial_ring(F, "t")
    A = matrix(R, m)
    B = matrix(F, m)
@@ -1385,7 +1385,7 @@ end
 
    # vector * matrix
    m = [1 2; 3 4]
-   F = residue_field(ZZ, 3)
+   F, = residue_field(ZZ, 3)
    R, t = polynomial_ring(F, "t")
    A = matrix(R, m)
    B = matrix(F, m)
@@ -1715,7 +1715,8 @@ end
    # Extra tests
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
    S = matrix_space(K, 3, 3)
 
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
@@ -1788,7 +1789,8 @@ end
  # Other tests
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
    S = matrix_space(K, 3, 3)
 
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
@@ -1840,7 +1842,7 @@ end
 end
 
 @testset "Generic.Mat.det" begin
-   S, x = polynomial_ring(residue_ring(ZZ, 1009*2003), "x")
+   S, x = polynomial_ring(residue_ring(ZZ, 1009*2003)[1], "x")
 
    for dim = 0:5
       R = matrix_space(S, dim, dim)
@@ -1861,7 +1863,8 @@ end
    end
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
 
    for dim = 0:7
       S = matrix_space(K, dim, dim)
@@ -1951,7 +1954,7 @@ end
 end
 
 @testset "Generic.Mat.rank" begin
-   S = residue_ring(ZZ, 20011*10007)
+   S, = residue_ring(ZZ, 20011*10007)
    R = matrix_space(S, 5, 5)
 
    for i = 0:5
@@ -1989,7 +1992,8 @@ end
    end
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
    S = matrix_space(K, 3, 3)
 
    M = S([a a^2 + 2*a - 1 2*a^2 - 1*a; 2*a+2 2*a^2 + 2*a (-2*a^2 - 2*a); (-a) (-a^2) a^2])
@@ -2214,7 +2218,7 @@ end
       @test A*X == B*d
    end
 
-   S = residue_ring(ZZ, 20011*10007)
+   S, = residue_ring(ZZ, 20011*10007)
 
    for dim = 0:5
       R = matrix_space(S, dim, dim)
@@ -2261,7 +2265,8 @@ end
    end
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
 
    for dim = 0:5
       S = matrix_space(K, dim, dim)
@@ -2298,8 +2303,10 @@ end
       @test M*x == d*b
    end
 
-   R, t = polynomial_ring(AbstractAlgebra.JuliaQQ, "t")
-   K, a = number_field(t^3 + 3t + 1, "a")
+   R, x = polynomial_ring(AbstractAlgebra.JuliaQQ, "t")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
+
    S, y = polynomial_ring(K, "y")
    T = matrix_space(S, 3, 3)
    U = matrix_space(S, 3, 1)
@@ -2581,7 +2588,7 @@ end
 end
 
 @testset "Generic.Mat.can_solve_with_solution_interpolation" begin
-   R1 = residue_ring(ZZ, 65537)
+   R1, = residue_ring(ZZ, 65537)
    R, x = polynomial_ring(R1, "x")
    RZ, x = polynomial_ring(ZZ, "x")
 
@@ -2616,7 +2623,8 @@ end
 
 @testset "Generic.Mat.solve_triu" begin
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
 
    for dim = 0:10
       S = matrix_space(K, dim, dim)
@@ -2652,7 +2660,7 @@ end
 @testset "Generic.Mat.rref" begin
    # Non-integral domain
 
-   S = residue_ring(ZZ, 20011*10007)
+   S, = residue_ring(ZZ, 20011*10007)
    R = matrix_space(S, 5, 5)
 
    for i = 0:5
@@ -2715,7 +2723,8 @@ end
    # Exact field
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
    S = matrix_space(K, 5, 5)
 
    for i = 0:5
@@ -2842,7 +2851,7 @@ end
 end
 
 @testset "Generic.Mat.nullspace" begin
-   S = residue_ring(ZZ, 20011*10007)
+   S, = residue_ring(ZZ, 20011*10007)
    R = matrix_space(S, 5, 5)
 
    for i = 0:5
@@ -2884,7 +2893,8 @@ end
    end
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
    S = matrix_space(K, 5, 5)
 
    for i = 0:5
@@ -2932,7 +2942,8 @@ end
    end
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
    S = matrix_space(K, 5, 5)
 
    for i = 0:5
@@ -3051,7 +3062,7 @@ end
       @test M*NN == NN*M == cc*R(1)
    end
 
-   S = residue_ring(ZZ, 20011*10007)
+   S, = residue_ring(ZZ, 20011*10007)
 
    for dim = 1:5
       R = matrix_space(S, dim, dim)
@@ -3089,7 +3100,8 @@ end
    end
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, = residue_field(R, x^3 + 3x + 1)
+   a = K(x)
 
    for dim = 1:5
       S = matrix_space(K, dim, dim)
@@ -3121,7 +3133,7 @@ end
 end
 
 @testset "Generic.Mat.hessenberg" begin
-   R = residue_ring(ZZ, 18446744073709551629)
+   R, = residue_ring(ZZ, 18446744073709551629)
 
    for dim = 0:5
       S = matrix_space(R, dim, dim)
@@ -3143,7 +3155,7 @@ end
 end
 
 @testset "Generic.Mat.kronecker_product" begin
-   R = residue_ring(ZZ, 18446744073709551629)
+   R, = residue_ring(ZZ, 18446744073709551629)
    S = matrix_space(R, 2, 3)
    S2 = matrix_space(R, 2, 2)
    S3 = matrix_space(R, 3, 3)
@@ -3157,7 +3169,7 @@ end
 end
 
 @testset "Generic.Mat.charpoly" begin
-   R = residue_ring(ZZ, 18446744073709551629)
+   R, = residue_ring(ZZ, 18446744073709551629)
 
    for dim = 0:5
       S = matrix_space(R, dim, dim)
@@ -3577,7 +3589,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
@@ -3620,7 +3632,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
@@ -3678,7 +3690,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
@@ -3713,7 +3725,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
@@ -3749,7 +3761,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
@@ -3809,7 +3821,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
@@ -3888,7 +3900,7 @@ end
       @test is_unit(det(U))
    end
 
-   R = residue_field(ZZ, randprime(100))
+   R, = residue_field(ZZ, randprime(100))
 
    M = matrix_space(polynomial_ring(R, "x")[1], rand(1:5), rand(1:5))
 
@@ -3975,7 +3987,7 @@ end
       @test is_unit(det(U))
    end
 
-   R = residue_field(ZZ, randprime(100))
+   R, = residue_field(ZZ, randprime(100))
 
    M = matrix_space(polynomial_ring(R, "x")[1], rand(1:5), rand(1:5))
 

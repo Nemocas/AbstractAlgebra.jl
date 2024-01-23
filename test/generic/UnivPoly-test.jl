@@ -132,7 +132,7 @@ function test_elem(R::AbstractAlgebra.Generic.UniversalPolyRing{AbstractAlgebra.
 end
 
 @testset "Generic.UnivPoly.conformance" begin
-   S = UniversalPolynomialRing(residue_ring(ZZ, ZZ(6)))
+   S = UniversalPolynomialRing(residue_ring(ZZ, ZZ(6))[1])
    gen(S, "x")
    test_Ring_interface(S)
 end

@@ -170,7 +170,7 @@ end
 
    @test characteristic(R) == 0
 
-   S = residue_ring(ZZ, 7)
+   S, = residue_ring(ZZ, 7)
    R, (x, y) = power_series_ring(S, [2, 3], ["x", "y"])
 
    @test characteristic(R) == 7
@@ -229,7 +229,7 @@ end
 
    @test characteristic(R) == 0
 
-   S = residue_ring(ZZ, 7)
+   S, = residue_ring(ZZ, 7)
    R, (x, y) = power_series_ring(S, [2, 3], 10, ["x", "y"])
 
    @test characteristic(R) == 7

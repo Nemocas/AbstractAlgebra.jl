@@ -151,7 +151,7 @@ end
    @test degree(A) == 3
 
    # Tests over residue ring
-   S = MatrixAlgebra(residue_ring(ZZ, 6), 2)
+   S = MatrixAlgebra(residue_ring(ZZ, 6)[1], 2)
    A = S([1 2; 3 4])
    B = S([0 0; 3 3])
    @test is_zero(A*B)
@@ -326,7 +326,7 @@ end
 
 @testset "Generic.MatAlg.promotion" begin
    m = [1 2; 3 4]
-   F = residue_field(ZZ, 3)
+   F, = residue_field(ZZ, 3)
    R, t = polynomial_ring(F, "t")
    A = MatrixAlgebra(R, 2)(m)
    B = MatrixAlgebra(F, 2)(m)
@@ -356,7 +356,7 @@ end
 
    # vector * matrix
    m = [1 2; 3 4]
-   F = residue_field(ZZ, 3)
+   F, = residue_field(ZZ, 3)
    R, t = polynomial_ring(F, "t")
    A = MatrixAlgebra(R, 2)(m)
    B = MatrixAlgebra(F, 2)(m)
@@ -567,7 +567,8 @@ end
 
 @testset "Generic.MatAlg.lu" begin
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, f = residue_field(R, x^3 + 3x + 1)
+   a = f(x)
    S = MatrixAlgebra(K, 3)
 
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
@@ -605,7 +606,8 @@ end
 
 @testset "Generic.MatAlg.fflu" begin
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, f = residue_field(R, x^3 + 3x + 1)
+   a = f(x)
    S = MatrixAlgebra(K, 3)
 
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
@@ -658,7 +660,7 @@ end
 end
 
 @testset "Generic.MatAlg.det" begin
-   S, x = polynomial_ring(residue_ring(ZZ, 1009*2003), "x")
+   S, x = polynomial_ring(residue_ring(ZZ, 1009*2003)[1], "x")
 
    for dim = 0:5
       R = MatrixAlgebra(S, dim)
@@ -679,7 +681,8 @@ end
    end
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, f = residue_field(R, x^3 + 3x + 1)
+   a = f(x)
 
    for dim = 0:7
       S = MatrixAlgebra(K, dim)
@@ -810,7 +813,7 @@ end
 end
 
 @testset "Generic.MatAlg.rank" begin
-   S = residue_ring(ZZ, 20011*10007)
+   S, = residue_ring(ZZ, 20011*10007)
    R = MatrixAlgebra(S, 5)
 
    for i = 0:5
@@ -849,7 +852,9 @@ end
    end
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, f = residue_field(R, x^3 + 3x + 1)
+   a = f(x)
+
    S = MatrixAlgebra(K, 3)
 
    M = S([a a^2 + 2*a - 1 2*a^2 - 1*a; 2*a+2 2*a^2 + 2*a (-2*a^2 - 2*a); (-a) (-a^2) a^2])
@@ -919,7 +924,7 @@ end
 end
 
 @testset "Generic.MatAlg.rref" begin
-   S = residue_ring(ZZ, 20011*10007)
+   S, = residue_ring(ZZ, 20011*10007)
    R = MatrixAlgebra(S, 5)
 
    for i = 0:5
@@ -956,7 +961,8 @@ end
    end
 
    R, x = polynomial_ring(QQ, "x")
-   K, a = number_field(x^3 + 3x + 1, "a")
+   K, f = residue_field(R, x^3 + 3x + 1)
+   a = f(x)
    S = MatrixAlgebra(K, 5)
 
    for i = 0:5
@@ -1021,7 +1027,7 @@ end
    end
 
    @testset "Matrix Algebra over residue_ring" begin
-   S = residue_ring(ZZ, 20011*10007)
+   S, = residue_ring(ZZ, 20011*10007)
 
    for dim = 1:5
       R = MatrixAlgebra(S, dim)
@@ -1072,7 +1078,8 @@ end
 
    @testset "Matrix Algebra over number_field over QQ" begin
    R, x = polynomial_ring(QQ, "x")
-   S, a = number_field(x^3 + 3x + 1, "a")
+   S, f = residue_field(R, x^3 + 3x + 1)
+   a = f(x)
 
    for dim = 1:5
       R = MatrixAlgebra(S, dim)
@@ -1120,7 +1127,7 @@ end
 end # of @testset "Generic.MatAlg.inversion"
 
 @testset "Generic.MatAlg.hessenberg" begin
-   R = residue_ring(ZZ, 18446744073709551629)
+   R, = residue_ring(ZZ, 18446744073709551629)
 
    for dim = 0:5
       S = MatrixAlgebra(R, dim)
@@ -1136,7 +1143,7 @@ end # of @testset "Generic.MatAlg.inversion"
 end
 
 @testset "Generic.MatAlg.charpoly" begin
-   R = residue_ring(ZZ, 18446744073709551629)
+   R, = residue_ring(ZZ, 18446744073709551629)
 
    for dim = 0:5
       S = matrix_space(R, dim, dim)
@@ -1342,7 +1349,7 @@ if false # see bug 160
 
         # Fake up finite field of char 7, degree 2
         R, x = polynomial_ring(GF(7), "x")
-        F = residue_field(R, x^2 + 6x + 3)
+        F, = residue_field(R, x^2 + 6x + 3)
         a = F(x)
 
         S, y = polynomial_ring(F, "y")
@@ -1378,7 +1385,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
@@ -1413,7 +1420,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
@@ -1448,7 +1455,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
@@ -1484,7 +1491,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
@@ -1521,7 +1528,7 @@ end
 
    # Fake up finite field of char 7, degree 2
    R, x = polynomial_ring(GF(7), "x")
-   F = residue_field(R, x^2 + 6x + 3)
+   F, = residue_field(R, x^2 + 6x + 3)
    a = F(x)
 
    S, y = polynomial_ring(F, "y")
