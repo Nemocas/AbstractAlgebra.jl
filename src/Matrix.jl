@@ -373,7 +373,7 @@ the submatrix $A$ of $M$ defined by `A[i,j] = M[rows[i], cols[j]]`
 for `i=1,...,length(rows)` and `j=1,...,length(cols)`.
 Instead of a vector, `rows` and `cols` can also be:
 * an integer `i`, which is  interpreted as `i:i`, or
-* `:`, which is interpreted as `1:number_of_rows(M)` or `1:number_of_columns(M)` respectively.
+* `:`, which is interpreted as `1:nrows(M)` or `1:ncols(M)` respectively.
 """
 function getindex(M::MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
    _checkbounds(M, rows, cols)
