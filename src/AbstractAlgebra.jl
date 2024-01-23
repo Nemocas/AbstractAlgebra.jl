@@ -679,7 +679,9 @@ import .Generic: dim
 import .Generic: disable_cache!
 import .Generic: downscale
 import .Generic: EuclideanRingResidueField
+import .Generic: EuclideanRingResidueFieldElem
 import .Generic: EuclideanRingResidueRing
+import .Generic: EuclideanRingResidueRingElem
 import .Generic: enable_cache!
 import .Generic: exp_gcd
 import .Generic: exponent
@@ -890,7 +892,9 @@ export echelon_form_with_transformation
 export elem_type
 export enable_cache!
 export EuclideanRingResidueField
+export EuclideanRingResidueFieldElem
 export EuclideanRingResidueRing
+export EuclideanRingResidueRingElem
 export evaluate
 export exp_gcd
 export exponent
