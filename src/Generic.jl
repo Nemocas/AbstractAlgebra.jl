@@ -67,7 +67,6 @@ import Base: length
 import Base: log1p
 import Base: Matrix
 import Base: mod
-import Base: ndigits
 import Base: oct
 import Base: one
 import Base: parent
@@ -205,13 +204,14 @@ import ..AbstractAlgebra: mul_classical
 import ..AbstractAlgebra: mul_karatsuba
 import ..AbstractAlgebra: mul!
 import ..AbstractAlgebra: mullow
-import ..AbstractAlgebra: ncols
+import ..AbstractAlgebra: number_of_columns
+import ..AbstractAlgebra: number_of_digits
+import ..AbstractAlgebra: number_of_generators
 import ..AbstractAlgebra: NCRing
 import ..AbstractAlgebra: NCRingElem
-import ..AbstractAlgebra: ngens
-import ..AbstractAlgebra: nrows
+import ..AbstractAlgebra: number_of_rows
 import ..AbstractAlgebra: numerator
-import ..AbstractAlgebra: nvars
+import ..AbstractAlgebra: number_of_variables
 import ..AbstractAlgebra: O
 import ..AbstractAlgebra: order
 import ..AbstractAlgebra: parent_type

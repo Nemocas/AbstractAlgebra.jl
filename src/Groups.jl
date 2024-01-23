@@ -138,7 +138,7 @@ The default implementation returns `true`.
 has_gens(G::Group) = true
 
 gens(G::Group) = throw(NotImplementedError(:gens, G))
-ngens(G::Group) = throw(NotImplementedError(:ngens, G))
+number_of_generators(G::Group) = throw(NotImplementedError(:number_of_generators, G))
 
 ###############################################################################
 #

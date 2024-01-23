@@ -62,13 +62,13 @@ Return the number of nonzero terms in the series $a$.
 length(a::AbsMSeries) = length(poly(a))
 
 @doc raw"""
-    nvars(R::AbsMSeriesRing)
+    number_of_variables(R::AbsMSeriesRing)
 
 Return the number of variables in the series ring.
 """
-nvars(R::AbsMSeriesRing) = nvars(poly_ring(R))
+number_of_variables(R::AbsMSeriesRing) = number_of_variables(poly_ring(R))
 
-ngens(R::AbsMSeriesRing) = ngens(poly_ring(R))
+number_of_generators(R::AbsMSeriesRing) = number_of_generators(poly_ring(R))
 
 @doc raw"""
     precision(a::AbsMSeries)

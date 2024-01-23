@@ -20,7 +20,7 @@ base_ring(N::Submodule{T}) where T <: RingElement = N.base_ring
 
 base_ring(v::SubmoduleElem{T}) where T <: RingElement = base_ring(v.parent)
 
-ngens(N::Submodule{T}) where T <: RingElement = length(N.gen_cols)
+number_of_generators(N::Submodule{T}) where T <: RingElement = length(N.gen_cols)
 
 gens(N::Submodule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 

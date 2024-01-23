@@ -89,18 +89,18 @@ check_square(S::MatAlgebra) = S
 ###############################################################################
 
 @doc raw"""
-    nrows(a::MatSpace)
+    number_of_rows(a::MatSpace)
 
 Return the number of rows of the given matrix space.
 """
-nrows(a::MatSpace) = a.nrows
+number_of_rows(a::MatSpace) = a.nrows
 
 @doc raw"""
-    ncols(a::MatSpace)
+    number_of_columns(a::MatSpace)
 
 Return the number of columns of the given matrix space.
 """
-ncols(a::MatSpace) = a.ncols
+number_of_columns(a::MatSpace) = a.ncols
 
 function Base.hash(a::MatElem, h::UInt)
    b = 0x3e4ea81eb31d94f4%UInt
@@ -114,18 +114,18 @@ function Base.hash(a::MatElem, h::UInt)
 end
 
 @doc raw"""
-    nrows(a::MatrixElem{T}) where T <: NCRingElement
+    number_of_rows(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of rows of the given matrix.
 """
-nrows(a::MatrixElem{T}) where T <: NCRingElement
+number_of_rows(a::MatrixElem{T}) where T <: NCRingElement
 
 @doc raw"""
-    ncols(a::MatrixElem{T}) where T <: NCRingElement
+    number_of_columns(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of columns of the given matrix.
 """
-ncols(a::MatrixElem{T}) where T <: NCRingElement
+number_of_columns(a::MatrixElem{T}) where {T<:NCRingElement}
 
 @doc raw"""
     length(a::MatrixElem{T}) where T <: NCRingElement

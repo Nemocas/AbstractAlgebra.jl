@@ -23,9 +23,9 @@ coefficient_ring(R::LaurentMPolyWrapRing) = coefficient_ring(R.mpolyring)
 
 symbols(R::LaurentMPolyWrapRing) = symbols(R.mpolyring)
 
-nvars(R::LaurentMPolyWrapRing) = nvars(R.mpolyring)
+number_of_variables(R::LaurentMPolyWrapRing) = number_of_variables(R.mpolyring)
 
-ngens(R::LaurentMPolyWrapRing) = nvars(R.mpolyring)
+number_of_generators(R::LaurentMPolyWrapRing) = number_of_variables(R.mpolyring)
 
 characteristic(R::LaurentMPolyWrapRing) = characteristic(R.mpolyring)
 

@@ -20,7 +20,7 @@ base_ring(N::QuotientModule{T}) where T <: RingElement = N.base_ring
 
 base_ring(v::QuotientModuleElem{T}) where T <: RingElement = base_ring(v.parent)
 
-ngens(N::QuotientModule{T}) where T <: RingElement = length(N.gen_cols)
+number_of_generators(N::QuotientModule{T}) where T <: RingElement = length(N.gen_cols)
 
 gens(N::QuotientModule{T}) where T <: RingElement = elem_type(N)[gen(N, i) for i = 1:ngens(N)]
 

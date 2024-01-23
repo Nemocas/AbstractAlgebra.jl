@@ -80,11 +80,11 @@ function is_exact_type(a::Type{T}) where {S <: RingElement, T <: MPolyRingElem{S
 end
 
 @doc raw"""
-    ngens(R::MPolyRing)
+    number_of_generators(R::MPolyRing)
 
 Return the number of variables in `R`.
 """
-ngens(R::MPolyRing) = nvars(R)
+number_of_generators(R::MPolyRing) = number_of_variables(R)
 
 @doc raw"""
     vars(p::MPolyRingElem{T}) where {T <: RingElement}

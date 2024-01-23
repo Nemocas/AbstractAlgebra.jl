@@ -39,8 +39,8 @@ function Base.hash(a::MatAlgElem, h::UInt)
    return b
 end
 
-nrows(a::MatAlgebra) = a.n
-ncols(a::MatAlgebra) = nrows(a)
+number_of_rows(a::MatAlgebra) = a.n
+number_of_columns(a::MatAlgebra) = number_of_rows(a)
 
 @doc raw"""
     degree(a::MatAlgebra)

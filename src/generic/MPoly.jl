@@ -29,13 +29,13 @@ polynomial ring.
 symbols(a::MPolyRing) = a.S
 
 @doc raw"""
-    nvars(x::MPolyRing)
+    number_of_variables(x::MPolyRing)
 
 Return the number of variables of the polynomial ring.
 """
-nvars(a::MPolyRing) = a.num_vars
+number_of_variables(a::MPolyRing) = a.num_vars
 
-ngens(a::MPolyRing) = a.num_vars
+number_of_generators(a::MPolyRing) = a.num_vars
 
 function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:lex}}) where {T <: RingElement}
     n = nvars(a)

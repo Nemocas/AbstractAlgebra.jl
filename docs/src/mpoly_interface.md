@@ -120,7 +120,7 @@ ring. Note that these are `Symbol`s not `String`s, though their string values wi
 usually be used when printing polynomials.
 
 ```julia
-nvars(f::MyMPolyRing{T}) where T <: RingElem
+number_of_variables(f::MyMPolyRing{T}) where T <: RingElem
 ```
 
 Return the number of variables of the polynomial ring.

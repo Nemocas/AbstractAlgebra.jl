@@ -395,13 +395,13 @@ dense_matrix_type(::Ring)
 ```
 
 ```@docs
-nrows(::MatSpace)
-ncols(::MatSpace)
+number_of_rows(::MatSpace)
+number_of_columns(::MatSpace)
 ```
 
 ```@docs
-nrows(::MatrixElem{T}) where T <: RingElement
-ncols(::MatrixElem{T}) where T <: RingElement
+number_of_rows(::MatrixElem{T}) where T <: RingElement
+number_of_columns(::MatrixElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -501,10 +501,10 @@ julia> B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
 julia> T = dense_matrix_type(R)
 AbstractAlgebra.Generic.MatSpaceElem{AbstractAlgebra.Generic.Poly{Rational{BigInt}}}
 
-julia> r = nrows(B)
+julia> r = number_of_rows(B)
 3
 
-julia> c = ncols(B)
+julia> c = number_of_columns(B)
 3
 
 julia> length(B)

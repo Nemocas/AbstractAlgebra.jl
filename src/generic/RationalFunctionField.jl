@@ -113,7 +113,7 @@ gen(R::RationalFunctionField, i::Int) = R(gen(base_ring(R.fraction_field), i))
 
 gens(R::RationalFunctionField) = R.(gens(base_ring(R.fraction_field)))
 
-ngens(R::RationalFunctionField) = ngens(base_ring(R.fraction_field))
+number_of_generators(R::RationalFunctionField) = number_of_generators(base_ring(R.fraction_field))
 
 function deepcopy_internal(a::RationalFunctionFieldElem, dict::IdDict)
    R = parent(a)

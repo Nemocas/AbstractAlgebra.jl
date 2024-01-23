@@ -84,8 +84,8 @@ AbstractAlgebra.dense_matrix_type(::Type{F2}) = F2Matrix
 AbstractAlgebra.parent(a::F2Matrix) = F2MatSpace(nrows(a), ncols(a))
 AbstractAlgebra.matrix_space(::F2, r::Int, c::Int) = F2MatSpace(r, c)
 
-AbstractAlgebra.nrows(a::F2Matrix) = nrows(a.m)
-AbstractAlgebra.ncols(a::F2Matrix) = ncols(a.m)
+AbstractAlgebra.number_of_rows(a::F2Matrix) = nrows(a.m)
+AbstractAlgebra.number_of_columns(a::F2Matrix) = ncols(a.m)
 AbstractAlgebra.base_ring(::F2Matrix) = F2()
 
 Base.getindex(a::F2Matrix, r::Int64, c::Int64) = a.m[r, c]

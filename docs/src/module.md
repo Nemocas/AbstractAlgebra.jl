@@ -47,7 +47,7 @@ iszero(m::FPModuleElem{T}) where T <: RingElement
 Return `true` if the given module element is zero.
 
 ```julia
-ngens(M::FPModule{T}) where T <: RingElement
+number_of_generators(M::FPModule{T}) where T <: RingElement
 ```
 
 Return the number of generators of the module $M$ in its current representation.
@@ -77,7 +77,7 @@ relation is given as an AbstractAlgebra row matrix.
 julia> M = FreeModule(QQ, 2)
 Vector space of dimension 2 over rationals
 
-julia> n = ngens(M)
+julia> n = number_of_generators(M)
 2
 
 julia> G = gens(M)

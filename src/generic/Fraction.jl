@@ -45,7 +45,7 @@ function deepcopy_internal(a::FracFieldElem{T}, dict::IdDict) where {T <: RingEl
    return v
 end
 
-ngens(F::FracField) = ngens(base_ring(F))
+number_of_generators(F::FracField) = number_of_generators(base_ring(F))
 
 gen(F::FracField) = F(gen(base_ring(F)))
 

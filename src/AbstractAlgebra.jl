@@ -312,6 +312,7 @@ export is_real
 export is_subset
 export is_valid
 export is_zero
+export number_of_digits
 
 @alias is_empty isempty
 @alias is_even iseven
@@ -326,6 +327,7 @@ export is_zero
 @alias is_subset issubset
 @alias is_valid isvalid
 @alias is_zero iszero
+@alias number_of_digits ndigits
 
 function order end
 
@@ -337,6 +339,20 @@ const is_hermitian = ishermitian
 const is_symmetric = issymmetric
 const is_lower_triangular = istril
 const is_upper_triangular = istriu
+
+# alternative names for some of our own functions
+function number_of_columns end
+function number_of_generators end
+function number_of_rows end
+function number_of_variables end
+export number_of_columns
+export number_of_generators
+export number_of_rows
+export number_of_variables
+@alias ncols number_of_columns
+@alias ngens number_of_generators
+@alias nrows number_of_rows
+@alias nvars number_of_variables
 
 ###############################################################################
 # Macros for fancy printing. to use, enable attribute storage for your struct,
@@ -720,7 +736,6 @@ import .Generic: monomial!
 import .Generic: monomials
 import .Generic: MPolyBuildCtx
 import .Generic: mullow_karatsuba
-import .Generic: ngens
 import .Generic: norm
 import .Generic: normal_form
 import .Generic: normalise
@@ -1058,16 +1073,12 @@ export multiply_column
 export multiply_column!
 export multiply_row
 export multiply_row!
-export ncols
 export newton_to_monomial!
-export ngens
 export norm
 export normal_form
 export normalise
-export nrows
 export nullspace
 export num_coeff
-export nvars
 export O
 export one
 export order

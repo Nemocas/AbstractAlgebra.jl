@@ -225,7 +225,7 @@ All basic functions from the Multivariate Polynomial interface are provided.
 
 ```julia
 symbols(S::MPolyRing)
-nvars(f::MPolyRing)
+number_of_variables(f::MPolyRing)
 gens(S::MPolyRing)
 gen(S::MPolyRing, i::Int)
 ```
@@ -458,7 +458,7 @@ julia> n = length(f)
 julia> is_gen(y)
 true
 
-julia> nvars(S) == 2
+julia> number_of_variables(S) == 2
 true
 
 julia> d = total_degree(f)
