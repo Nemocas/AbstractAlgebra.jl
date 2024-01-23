@@ -15,13 +15,13 @@ AbstractAlgebra.jl abstract type hierarchy.
 
 ## Generic residue types
 
-AbstractAlgebra.jl implements generic residue rings with type `Generic.ResidueRingElem{T}`
-or in the case of residue rings that are known to be fields, `Generic.ResidueFieldElem{T}`,
+AbstractAlgebra.jl implements generic residue rings of Euclidean rings with type `Generic.EuclideanRingResidueRingelem{T}`
+or in the case of residue rings that are known to be fields, `Generic.EuclideanRingResidueField{T}`,
 where `T` is the type of elements of the base ring. See the file
 `src/generic/GenericTypes.jl` for details.
 
-Parent objects of generic residue ring elements have type `Generic.ResidueRing{T}`
-and those of residue fields have type `GenericResField{T}`.
+Parent objects of generic residue ring elements have type `Generic.EuclideanRingResidueRing{T}`
+and those of residue fields have type `Generic.EuclideanRingResidueField{T}`.
 
 The defining modulus of the residue ring is stored in the parent object.
 
@@ -32,17 +32,6 @@ or `ResFieldElem{T}` in the case of residue fields, and the
 residue ring types belong to the abstract type `ResidueRing{T}` or `ResidueField{T}`
 respectively. This enables one to write generic functions that can accept any
 AbstractAlgebra residue type.
-
-
-!!! note
-
-    Note that both the generic residue ring type `Generic.ResidueRing{T}` and the
-    abstract type it belongs to, `ResidueRing{T}` are both called `ResidueRing`, and
-    similarly for the residue field types. In each case, the  former is a
-    (parameterised) concrete type for a residue ring over a given base ring whose
-    elements have type `T`. The latter is an abstract type representing all
-    residue ring types in AbstractAlgebra.jl, whether generic or very specialised
-    (e.g. supplied by a C library).
 
 ## Residue ring constructors
 
@@ -57,8 +46,9 @@ residue_field(R::Ring, m::RingElem; cached::Bool = true)
 ```
 
 Given a base ring `R` and residue $m$ contained in this ring, return the parent object
-of the residue ring $R/(m)$. By default the parent object `S` will depend only on `R`
-and `m` and will be cached. Setting the optional argument `cached` to `false` will
+of the residue ring $R/(m)$ together with the canonical projection. By default
+the parent object `S` will depend only on `R` and `m` and will be cached.
+Setting the optional argument `cached` to `false` will
 prevent the parent object `S` from being cached.
 
 The `residue_field` constructor does the same thing as the `residue_ring` constructor,
@@ -82,8 +72,7 @@ resulting parent objects to coerce various elements into the residue ring.
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
 
-julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
+julia> S, = residue_ring(R, x^3 + 3x + 1);
 
 julia> f = S()
 0
@@ -185,8 +174,7 @@ modulus(::ResElem)
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
 
-julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
+julia> S, = residue_ring(R, x^3 + 3x + 1);
 
 julia> f = S(x + 1)
 x + 1
@@ -240,8 +228,7 @@ Base.inv(::ResElem)
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
 
-julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
+julia> S, = residue_ring(R, x^3 + 3x + 1);
 
 julia> f = S(x + 1)
 x + 1
@@ -263,8 +250,7 @@ gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
 
-julia> S = residue_ring(R, x^3 + 3x + 1)
-Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
+julia> S, = residue_ring(R, x^3 + 3x + 1);
 
 julia> f = S(x + 1)
 x + 1
@@ -315,17 +301,13 @@ rand(R::ResidueRing, v...)
 **Examples**
 
 ```jldoctest; setup = :(import Random; Random.seed!(42))
-julia> R = residue_ring(ZZ, 7)
-Residue ring of integers modulo 7
+julia> R, = residue_ring(ZZ, 7);
 
 julia> f = rand(R, 0:6)
 4
 
 julia> S, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
-
-julia> U = residue_field(S, x^3 + 3x + 1)
-Residue field of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> g = rand(S, 2:2, -10:10)
 -1//4*x^2 - 2//7*x + 1

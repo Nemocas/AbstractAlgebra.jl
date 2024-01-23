@@ -75,7 +75,7 @@ R = GF(7)
 
 S, y = polynomial_ring(R, "y")
 
-T = residue_ring(S, y^3 + 3y + 1)
+T, = residue_ring(S, y^3 + 3y + 1)
 
 U, z = polynomial_ring(T, "z")
 

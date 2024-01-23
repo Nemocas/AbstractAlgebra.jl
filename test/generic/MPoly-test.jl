@@ -387,7 +387,7 @@ end
 end
 
 @testset "Generic.MPoly.is_unit" begin
-   R, (x,) = polynomial_ring(residue_ring(ZZ, 4), ["x"])
+   R, (x,) = polynomial_ring(residue_ring(ZZ, 4)[1], ["x"])
 
    @test !is_unit(x)
    @test !is_unit(2*x)
@@ -755,7 +755,7 @@ end
 
    # Field of characteristic p
    for p in [2, 7, 13, 65537, ZZ(2), ZZ(7), ZZ(37), ZZ(65537)]
-      R = residue_field(ZZ, p)
+      R, = residue_field(ZZ, p)
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
@@ -1314,7 +1314,7 @@ end
 end
 
 @testset "Generic.MPoly.change_base_ring" begin
-   F2 = residue_ring(ZZ, 2)
+   F2, = residue_ring(ZZ, 2)
    R, varsR = polynomial_ring(F2, ["x"])
    S, varsS = polynomial_ring(R, ["y"])
    f = x -> x^2

@@ -127,12 +127,12 @@ end
    end
 end
 
-function test_elem(R::AbstractAlgebra.Generic.UniversalPolyRing{AbstractAlgebra.Generic.ResidueRingElem{BigInt}})
+function test_elem(R::AbstractAlgebra.Generic.UniversalPolyRing{AbstractAlgebra.Generic.EuclideanRingResidueRingElem{BigInt}})
     return rand(R, 0:4, 0:10, -10:10)
 end
 
 @testset "Generic.UnivPoly.conformance" begin
-   S = UniversalPolynomialRing(residue_ring(ZZ, ZZ(6)))
+   S = UniversalPolynomialRing(residue_ring(ZZ, ZZ(6))[1])
    gen(S, "x")
    test_Ring_interface(S)
 end

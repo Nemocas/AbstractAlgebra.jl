@@ -62,7 +62,7 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 | $R = \mathbb{Z}$                     | `R = ZZ`                                              |
 | $R = \mathbb{Q}$                     | `R = QQ`                                              |
 | $R = \mathbb{F}_{p}$                 | `R = GF(p)`                                           |
-| $R = \mathbb{Z}/n\mathbb{Z}$         | `R = residue_ring(ZZ, n)`                             |
+| $R = \mathbb{Z}/n\mathbb{Z}$         | `R, = residue_ring(ZZ, n)`                             |
 | $S = R[x]$                           | `S, x = polynomial_ring(R, :x)`                       |
 | $S = R[x, y]$                        | `S, (x, y) = polynomial_ring(R, [:x, :y])`            |
 | $S = R\langle x, y\rangle$           | `S, (x, y) = free_associative_algebra(R, [:x, :y])`   |
@@ -77,10 +77,9 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 | Puiseux series field to precision $n$| `S, x = puiseux_series_field(R, n, :x)`               |
 | $S = K(x)(y)/(f)$                    | `S, y = function_field(f, :y)` with $f\in K(x)[t]$    |
 | $S = \mathrm{Frac}_R$                | `S = fraction_field(R)`                               |
-| $S = R/(f)$                          | `S = residue_ring(R, f)`                              |
-| $S = R/(f)$ (with $(f)$ maximal)     | `S = residue_field(R, f)`                             |
+| $S = R/(f)$                          | `S, = residue_ring(R, f)`                              |
+| $S = R/(f)$ (with $(f)$ maximal)     | `S, = residue_field(R, f)`                             |
 | $S = \mathrm{Mat}_{m\times n}(R)$    | `S = matrix_space(R, m, n)`                           |
-| $S = \mathbb{Q}[x]/(f)$              | `S, a = number_field(f, :a)`                          |
 
 ## Parent objects with variable names
 

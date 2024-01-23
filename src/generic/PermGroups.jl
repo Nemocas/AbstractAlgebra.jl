@@ -646,6 +646,8 @@ end
 
 Base.eltype(::Type{SymmetricGroup{T}}) where T = Perm{T}
 
+elem_type(::Type{SymmetricGroup{T}}) where T = Perm{T}
+
 Base.length(G::SymmetricGroup) = order(Int, G)
 
 ###############################################################################
@@ -654,7 +656,7 @@ Base.length(G::SymmetricGroup) = order(Int, G)
 #
 ###############################################################################
 
-function gens(G::SymmetricGroup{I}) where {I}
+function gens(G::SymmetricGroup)
    G.n == 1 && return eltype(G)[]
    if G.n == 2
       a = one(G)
@@ -666,6 +668,12 @@ function gens(G::SymmetricGroup{I}) where {I}
    b[1], b[2] = 2, 1
    return [a, b]
 end
+
+gen(G::SymmetricGroup, i::Int) = gens(G)[i]
+
+ngens(G::SymmetricGroup) = G.n == 1 ? 0 : G.n == 2 ? 1 : 2
+
+is_finite(G::SymmetricGroup) = true
 
 order(::Type{T}, G::SymmetricGroup) where {T} = convert(T, factorial(T(G.n)))
 

@@ -34,7 +34,7 @@ corresponding to the ring $\mathbb{Z}/7\mathbb{Z}$. We then create a new element
 of this ring by calling the parent object `R`.
 
 ```julia
-R = residue_ring(ZZ, 7)
+R, = residue_ring(ZZ, 7)
 a = R(3)
 ```
 

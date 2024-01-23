@@ -14,12 +14,9 @@ using Preferences
 
 using Test # for "interface-conformance" functions
 
-import GroupsCore
-import GroupsCore: gens, ngens, order, mul!, istrivial
-
 # A list of all symbols external packages should not import from AbstractAlgebra
 const import_exclude = [:import_exclude, :QQ, :ZZ,
-                  :RealField, :number_field, :NumberField, :GF,
+                  :RealField, :GF,
                   :AbstractAlgebra,
                   :inv, :log, :exp, :sqrt, :div, :divrem,
                   :numerator, :denominator,
@@ -235,11 +232,13 @@ export FracField
 export FreeAssAlgebra
 export FreeAssAlgElem
 export FunctionalMap
+export Group
 export GroupElem
 export hgcd
 export Ideal
 export IdealSet
 export IdentityMap
+export InfiniteOrderError
 export is_irreducible
 export is_squarefree
 export is_perfect
@@ -300,7 +299,19 @@ include("AliasMacro.jl")
 include("PrintHelper.jl")
 
 # alternative names for some functions from Base
-export is_empty, is_even, is_equal, is_finite, is_inf, is_integer, is_less, is_odd, is_one, is_real, is_subset, is_valid, is_zero
+export is_empty
+export is_equal
+export is_even
+export is_finite
+export is_inf
+export is_integer
+export is_less
+export is_odd
+export is_one
+export is_real
+export is_subset
+export is_valid
+export is_zero
 
 @alias is_empty isempty
 @alias is_even iseven
@@ -316,16 +327,11 @@ export is_empty, is_even, is_equal, is_finite, is_inf, is_integer, is_less, is_o
 @alias is_valid isvalid
 @alias is_zero iszero
 
-# alternative names for some functions from GroupsCore
-export is_trivial
-
-@alias is_trivial istrivial
+function order end
 
 # alternative names for some functions from LinearAlgebra
 # we don't use the `@alias` macro here because we provide custom
 # docstrings for these aliases
-export is_diagonal, is_hermitian, is_symmetric, is_upper_triangular, is_lower_triangular
-
 const is_diagonal = isdiag
 const is_hermitian = ishermitian
 const is_symmetric = issymmetric
@@ -656,6 +662,8 @@ import .Generic: dense_matrix_type
 import .Generic: dim
 import .Generic: disable_cache!
 import .Generic: downscale
+import .Generic: EuclideanRingResidueField
+import .Generic: EuclideanRingResidueRing
 import .Generic: enable_cache!
 import .Generic: exp_gcd
 import .Generic: exponent
@@ -717,7 +725,6 @@ import .Generic: norm
 import .Generic: normal_form
 import .Generic: normalise
 import .Generic: num_coeff
-import .Generic: number_field
 import .Generic: one
 import .Generic: order
 import .Generic: ordering
@@ -832,6 +839,7 @@ export coefficients
 export coefficients_of_univariate
 export collength
 export combine_like_terms!
+export comm
 export compose
 export constant_coefficient
 export content
@@ -866,6 +874,8 @@ export echelon_form
 export echelon_form_with_transformation
 export elem_type
 export enable_cache!
+export EuclideanRingResidueField
+export EuclideanRingResidueRing
 export evaluate
 export exp_gcd
 export exponent
@@ -899,6 +909,7 @@ export get_attribute!
 export gram
 export has_attribute
 export has_bottom_neighbor
+export has_gens
 export has_left_neighbor
 export hash
 export hermite_form
@@ -939,13 +950,16 @@ export is_diagonal
 export is_divisible_by
 export is_domain_type
 export is_exact_type
+export is_finiteorder
 export is_gen
+export is_hermitian
 export is_hessenberg
 export is_hnf
 export is_homogeneous
 export is_invertible
 export is_invertible_with_inverse
 export is_isomorphic
+export is_lower_triangular
 export is_monic
 export is_monomial
 export is_monomial_recursive
@@ -962,6 +976,7 @@ export is_submodule
 export is_symmetric
 export is_term
 export is_term_recursive
+export is_trivial
 export is_unicode_allowed
 export is_unit
 export is_univariate
@@ -1052,7 +1067,6 @@ export normalise
 export nrows
 export nullspace
 export num_coeff
-export number_field
 export nvars
 export O
 export one
@@ -1281,10 +1295,7 @@ getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingEle
 #
 ################################################################################
 
-# Unfortunately `Group` is not a subtype of Set because we derive it from the
-# GroupsCore package (oh, if only Julia allowed inheritance from multiple
-# abstract types...)
-getindex(S::Union{Set, Group}, i::Int) = gen(S, i)
+getindex(S::Set, i::Int) = gen(S, i)
 
 ###############################################################################
 #

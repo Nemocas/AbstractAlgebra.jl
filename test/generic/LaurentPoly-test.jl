@@ -233,7 +233,7 @@ end
    end
 
    @testset "Generic.LaurentMPoly.is_unit" begin
-      R, x = laurent_polynomial_ring(residue_ring(ZZ, 6), "x")
+      R, x = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], "x")
 
       @test is_unit(x)
       @test !is_unit(2*x)
@@ -498,7 +498,7 @@ end
       test_EuclideanRing_interface(L)
       test_Ring_interface_recursive(L)
 
-      L, y = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6)), "y")
+      L, y = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], "y")
       test_Ring_interface(L)
    end
 end

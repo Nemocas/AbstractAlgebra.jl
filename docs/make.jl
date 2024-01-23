@@ -46,7 +46,6 @@ makedocs(
                  "function_field.md",
                  "finfield.md",
                  "real.md",
-                 "numberfield.md",
              ],
              "Groups" => [
                  "perm.md",
