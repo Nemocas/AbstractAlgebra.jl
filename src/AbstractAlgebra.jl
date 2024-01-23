@@ -636,6 +636,7 @@ include("MPoly.jl")
 include("UnivPoly.jl")
 include("FreeAssAlgebra.jl")
 include("LaurentMPoly.jl")
+include("MatrixNormalForms.jl")
 
 ###############################################################################
 #
@@ -869,10 +870,12 @@ export divhigh
 export divides
 export domain
 export downscale
-export EuclideanRingResidueField
-export EuclideanRingResidueRing
+export echelon_form
+export echelon_form_with_transformation
 export elem_type
 export enable_cache!
+export EuclideanRingResidueField
+export EuclideanRingResidueRing
 export evaluate
 export exp_gcd
 export exponent
@@ -909,6 +912,8 @@ export has_bottom_neighbor
 export has_gens
 export has_left_neighbor
 export hash
+export hermite_form
+export hermite_form_with_transformation
 export hessenberg
 export hessenberg!
 export hnf
