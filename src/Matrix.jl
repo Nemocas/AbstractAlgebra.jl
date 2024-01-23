@@ -2226,21 +2226,10 @@ Return the determinant of the matrix $M$. We assume $M$ is square.
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over rationals, x)
 
-julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of univariate polynomial ring modulo x^3 + 3*x + 1, x)
-
-julia> S = matrix_space(K, 3, 3)
-Matrix space of 3 rows and 3 columns
-  over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
-
-julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
-[            0   2*x + 3   x^2 + 1]
-[      x^2 - 2     x - 1       2*x]
-[x^2 + 3*x + 1       2*x         1]
+julia> A = R[x 1; 1 x^2];
 
 julia> d = det(A)
-11*x^2 - 30*x - 5
-
+x^3 - 1
 ```
 """
 function det(M::MatrixElem{T}) where {T <: RingElement}
@@ -2599,24 +2588,10 @@ Return the rank of the matrix $M$.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, x = polynomial_ring(QQ, "x")
-(Univariate polynomial ring in x over rationals, x)
-
-julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Residue field of univariate polynomial ring modulo x^3 + 3*x + 1, x)
-
-julia> S = matrix_space(K, 3, 3)
-Matrix space of 3 rows and 3 columns
-  over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
-
-julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
-[            0   2*x + 3   x^2 + 1]
-[      x^2 - 2     x - 1       2*x]
-[x^2 + 3*x + 1       2*x         1]
+julia> A = QQ[1 2; 3 4];
 
 julia> d = rank(A)
-3
-
+2
 ```
 """
 function rank(M::MatrixElem{T}) where {T <: RingElement}
@@ -4469,8 +4444,7 @@ the resulting polynomial is an element of it.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R = residue_ring(ZZ, 7)
-Residue ring of integers modulo 7
+julia> R, = residue_ring(ZZ, 7);
 
 julia> S = matrix_space(R, 4, 4)
 Matrix space of 4 rows and 4 columns
@@ -6276,8 +6250,7 @@ preserves the minimal and characteristic polynomials of a matrix.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R = residue_ring(ZZ, 7)
-Residue ring of integers modulo 7
+julia> R, = residue_ring(ZZ, 7);
 
 julia> S = matrix_space(R, 4, 4)
 Matrix space of 4 rows and 4 columns

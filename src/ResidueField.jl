@@ -497,8 +497,8 @@ to the constructor with the same base ring $R$ and element $a$.
 function residue_field(R::Ring, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DivideError())
    T = elem_type(R)
-
-   return Generic.EuclideanRingResidueField{T}(R(a), cached)
+   S = Generic.EuclideanRingResidueField{T}(R(a), cached)
+   return S, Generic.EuclideanRingResidueMap(R, S)
 end
 
 @doc raw"""
@@ -510,7 +510,6 @@ where the section is the lift of an element of the residue field back
 to the ring `R`.
 """
 function quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
-   S = residue_field(R, a; cached=cached)
-   f = map_with_section_from_func(x->S(x), x->lift(x), R, S)
+   S, f = residue_field(R, a; cached = cached)
    return S, f
 end

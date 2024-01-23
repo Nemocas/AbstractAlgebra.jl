@@ -59,3 +59,19 @@ function (a::EuclideanRingResidueField{T})(b::AbstractAlgebra.ResFieldElem{T}) w
    a != parent(b) && error("Operation on incompatible objects")
    return b
 end
+
+################################################################################
+#
+#  Random random functionality
+#
+################################################################################
+
+function RandomExtensions.make(S::EuclideanRingResidueField{Generic.Poly{Rational{BigInt}}}, vs...)
+   R = base_ring(S)
+   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+      Make(S, vs[1])
+   else
+      n = degree(S.modulus)
+      Make(S, make(base_ring(S), n - 1:n - 1, vs...))
+   end
+end

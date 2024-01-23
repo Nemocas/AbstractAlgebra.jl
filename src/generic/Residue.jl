@@ -60,3 +60,23 @@ function (a::EuclideanRingResidueRing{T})(b::AbstractAlgebra.ResElem{T}) where {
    return b
 end
 
+################################################################################
+#
+#  Map
+#
+################################################################################
+
+domain(f::EuclideanRingResidueMap) = f.domain
+
+codomain(f::EuclideanRingResidueMap) = f.codomain
+
+function image(f::EuclideanRingResidueMap, a)
+  return codomain(f)(a)
+end
+
+(f::EuclideanRingResidueMap)(a) = image(f, a)
+
+function preimage(f::EuclideanRingResidueMap, a)
+  parent(a) != codomain(f) && error("Not an element of the codomain")
+  return data(a)
+end

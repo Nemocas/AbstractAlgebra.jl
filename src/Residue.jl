@@ -453,16 +453,16 @@ function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
    # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    T = elem_type(R)
-
-   return Generic.EuclideanRingResidueRing{T}(R(a), cached)
+   S = Generic.EuclideanRingResidueRing{T}(R(a), cached)
+   return S, Generic.EuclideanRingResidueMap(R, S)
 end
 
 function residue_ring(R::PolyRing, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
    T = elem_type(R)
-
-   return Generic.EuclideanRingResidueRing{T}(R(a), cached)
+   S = Generic.EuclideanRingResidueRing{T}(R(a), cached)
+   return S, Generic.EuclideanRingResidueMap(R, S)
 end
 
 @doc raw"""
@@ -474,8 +474,7 @@ where the section is the lift of an element of the residue field back
 to the ring `R`.
 """
 function quo(R::Ring, a::RingElement; cached::Bool = true)
-   S = residue_ring(R, a; cached=cached)
-   f = map_with_section_from_func(x->S(x), x->lift(x), R, S)
+   S, f = residue_ring(R, a; cached = cached)
    return S, f
 end
 
