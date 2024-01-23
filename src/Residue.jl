@@ -453,7 +453,7 @@ function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
    # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    T = elem_type(R)
-   S = Generic.EuclideanRingResidueRing{T}(R(a), cached)
+   S = EuclideanRingResidueRing{T}(R(a), cached)
    return S, Generic.EuclideanRingResidueMap(R, S)
 end
 
@@ -461,7 +461,7 @@ function residue_ring(R::PolyRing, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
    T = elem_type(R)
-   S = Generic.EuclideanRingResidueRing{T}(R(a), cached)
+   S = EuclideanRingResidueRing{T}(R(a), cached)
    return S, Generic.EuclideanRingResidueMap(R, S)
 end
 

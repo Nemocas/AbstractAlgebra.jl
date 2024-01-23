@@ -497,7 +497,7 @@ to the constructor with the same base ring $R$ and element $a$.
 function residue_field(R::Ring, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DivideError())
    T = elem_type(R)
-   S = Generic.EuclideanRingResidueField{T}(R(a), cached)
+   S = EuclideanRingResidueField{T}(R(a), cached)
    return S, Generic.EuclideanRingResidueMap(R, S)
 end
 
