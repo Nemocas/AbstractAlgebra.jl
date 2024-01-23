@@ -1,12 +1,12 @@
-function test_elem(R::AbstractAlgebra.Generic.EuclideanRingResidueRing{BigInt})
+function test_elem(R::AbstractAlgebra.EuclideanRingResidueRing{BigInt})
    return rand(R, 0:characteristic(R))
 end
 
-function test_elem(R::AbstractAlgebra.Generic.EuclideanRingResidueRing{AbstractAlgebra.Generic.Poly{T}}) where T
+function test_elem(R::AbstractAlgebra.EuclideanRingResidueRing{AbstractAlgebra.Generic.Poly{T}}) where T
    return rand(R, 0:100, -100:100)
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.conformance_tests" begin
+@testset "EuclideanRingResidueRingElem.conformance_tests" begin
    test_Ring_interface(residue_ring(ZZ, 1)[1])   # is_gen fails on polys
    test_Ring_interface_recursive(residue_ring(ZZ, -4)[1])
 
@@ -27,7 +27,7 @@ end
    @test !occursin("\n", sprint(show, T))
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.constructors" begin
+@testset "EuclideanRingResidueRingElem.constructors" begin
    B = ZZ
 
    R, f = Generic.residue_ring(B, 16453889)
@@ -53,62 +53,62 @@ end
 
    @test_throws DomainError Generic.residue_ring(B, 0)
 
-   @test elem_type(R) == Generic.EuclideanRingResidueRingElem{elem_type(B)}
-   @test elem_type(Generic.EuclideanRingResidueRing{elem_type(B)}) == Generic.EuclideanRingResidueRingElem{elem_type(B)}
-   @test parent_type(Generic.EuclideanRingResidueRingElem{elem_type(B)}) == Generic.EuclideanRingResidueRing{elem_type(B)}
+   @test elem_type(R) == EuclideanRingResidueRingElem{elem_type(B)}
+   @test elem_type(EuclideanRingResidueRing{elem_type(B)}) == EuclideanRingResidueRingElem{elem_type(B)}
+   @test parent_type(EuclideanRingResidueRingElem{elem_type(B)}) == EuclideanRingResidueRing{elem_type(B)}
 
-   @test isa(R, Generic.EuclideanRingResidueRing)
+   @test isa(R, EuclideanRingResidueRing)
 
    a = R(123)
 
-   @test isa(a, Generic.EuclideanRingResidueRingElem)
+   @test isa(a, EuclideanRingResidueRingElem)
 
    b = R(a)
 
-   @test isa(b, Generic.EuclideanRingResidueRingElem)
+   @test isa(b, EuclideanRingResidueRingElem)
 
    c = R(ZZ(12))
 
-   @test isa(c, Generic.EuclideanRingResidueRingElem)
+   @test isa(c, EuclideanRingResidueRingElem)
 
    d = R()
 
-   @test isa(d, Generic.EuclideanRingResidueRingElem)
+   @test isa(d, EuclideanRingResidueRingElem)
 
    S, x = polynomial_ring(R, "x")
    T, = residue_ring(S, x^3 + 3x + 1)
 
-   @test isa(T, Generic.EuclideanRingResidueRing)
+   @test isa(T, EuclideanRingResidueRing)
 
    f = T(x^4)
 
-   @test isa(f, Generic.EuclideanRingResidueRingElem)
+   @test isa(f, EuclideanRingResidueRingElem)
 
    g = T(f)
 
-   @test isa(g, Generic.EuclideanRingResidueRingElem)
+   @test isa(g, EuclideanRingResidueRingElem)
 
    # Poly modulus, invertible lc 
    S, x = polynomial_ring(ZZ, "x")
    T, = residue_ring(S, x^2 + 1)
 
-   @test isa(T, Generic.EuclideanRingResidueRing)
+   @test isa(T, EuclideanRingResidueRing)
 
    f = T(x^4)
 
-   @test isa(f, Generic.EuclideanRingResidueRingElem)
+   @test isa(f, EuclideanRingResidueRingElem)
 
    g = T(f)
 
-   @test isa(g, Generic.EuclideanRingResidueRingElem)
+   @test isa(g, EuclideanRingResidueRingElem)
 
    h = T()
 
-   @test isa(h, Generic.EuclideanRingResidueRingElem)
+   @test isa(h, EuclideanRingResidueRingElem)
 
    k = T(1)
 
-   @test isa(k, Generic.EuclideanRingResidueRingElem)
+   @test isa(k, EuclideanRingResidueRingElem)
 
    S, = Generic.residue_ring(B, 164538890)
    x = R(1)
@@ -121,7 +121,7 @@ end
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.rand" begin
+@testset "EuclideanRingResidueRingElem.rand" begin
    R, = Generic.residue_ring(ZZ, 49)
 
    test_rand(R, 1:9) do f
@@ -135,7 +135,7 @@ end
    test_rand(R, -1:9, -3:3)
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.manipulation" begin
+@testset "EuclideanRingmanipulation" begin
    R, = Generic.residue_ring(ZZ, 16453889)
 
    @test modulus(R) == 16453889
@@ -185,7 +185,7 @@ end
    @test isa(lift(S(1)), BigInt)
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.unary_ops" begin
+@testset "EuclideanRingResidueRingElem.unary_ops" begin
    R, = Generic.residue_ring(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
@@ -202,7 +202,7 @@ end
    @test -T(x + 1) == T(-x - 1)
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.binary_ops" begin
+@testset "EuclideanRingResidueRingElem.binary_ops" begin
    R, = Generic.residue_ring(ZZ, 12)
 
    f = R(4)
@@ -241,7 +241,7 @@ end
    @test n*p == T(2x - 2)
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.gcd" begin
+@testset "EuclideanRingResidueRingElem.gcd" begin
    R, = Generic.residue_ring(ZZ, 12)
 
    f = R(4)
@@ -269,7 +269,7 @@ end
    @test gcd(T(x + 1), T(x + 1)) == T(1)
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.adhoc_binary" begin
+@testset "EuclideanRingResidueRingElem.adhoc_binary" begin
    R, = Generic.residue_ring(ZZ, 7)
 
    a = R(3)
@@ -304,7 +304,7 @@ end
    @test f*5 == T(5x + 5)
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.comparison" begin
+@testset "EuclideanRingResidueRingElem.comparison" begin
    R, = Generic.residue_ring(ZZ, 7)
 
    a = R(3)
@@ -337,7 +337,7 @@ end
    @test isequal(T(x + 2), T(x + 2))
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.adhoc_comparison" begin
+@testset "EuclideanRingResidueRingElem.adhoc_comparison" begin
    R, = Generic.residue_ring(ZZ, 7)
 
    a = R(3)
@@ -360,7 +360,7 @@ end
    @test T(x) != 2
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.powering" begin
+@testset "EuclideanRingResidueRingElem.powering" begin
    R, = Generic.residue_ring(ZZ, 7)
 
    a = R(3)
@@ -413,7 +413,7 @@ end
    @test_throws NotInvertibleError R(5)^-1
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.inversion" begin
+@testset "EuclideanRingResidueRingElem.inversion" begin
    R, = Generic.residue_ring(ZZ, 49)
 
    a = R(5)
@@ -429,7 +429,7 @@ end
    @test inv(f) == T(26*x^2+31*x+10)
 end
 
-@testset "Generic.EuclideanRingResidueRingElem.exact_division" begin
+@testset "EuclideanRingResidueRingElem.exact_division" begin
    R, = Generic.residue_ring(ZZ, 49)
 
    a = R(5)

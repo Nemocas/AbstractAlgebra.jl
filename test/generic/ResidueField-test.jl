@@ -1,4 +1,4 @@
-@testset "Generic.EuclideanRingResidueFieldElem.constructors" begin
+@testset "EuclideanRingResidueFieldElem.constructors" begin
    B = ZZ
 
    R, = Generic.residue_field(B, 16453889)
@@ -23,40 +23,40 @@
    @test Generic.residue_field(B, 16453889, cached = true)[1] === Generic.residue_field(B, 16453889, cached = true)[1]
    @test Generic.residue_field(B, 16453889, cached = true)[1] !== Generic.residue_field(B, 16453889, cached = false)[1]
 
-   @test elem_type(R) == Generic.EuclideanRingResidueFieldElem{elem_type(B)}
-   @test elem_type(Generic.EuclideanRingResidueField{elem_type(B)}) == Generic.EuclideanRingResidueFieldElem{elem_type(B)}
-   @test parent_type(Generic.EuclideanRingResidueFieldElem{elem_type(B)}) == Generic.EuclideanRingResidueField{elem_type(B)}
+   @test elem_type(R) == EuclideanRingResidueFieldElem{elem_type(B)}
+   @test elem_type(EuclideanRingResidueField{elem_type(B)}) == EuclideanRingResidueFieldElem{elem_type(B)}
+   @test parent_type(EuclideanRingResidueFieldElem{elem_type(B)}) == EuclideanRingResidueField{elem_type(B)}
 
-   @test isa(R, Generic.EuclideanRingResidueField)
+   @test isa(R, EuclideanRingResidueField)
 
    a = R(123)
 
-   @test isa(a, Generic.EuclideanRingResidueFieldElem)
+   @test isa(a, EuclideanRingResidueFieldElem)
 
    b = R(a)
 
-   @test isa(b, Generic.EuclideanRingResidueFieldElem)
+   @test isa(b, EuclideanRingResidueFieldElem)
 
    c = R(ZZ(12))
 
-   @test isa(c, Generic.EuclideanRingResidueFieldElem)
+   @test isa(c, EuclideanRingResidueFieldElem)
 
    d = R()
 
-   @test isa(d, Generic.EuclideanRingResidueFieldElem)
+   @test isa(d, EuclideanRingResidueFieldElem)
 
    S, x = polynomial_ring(R, "x")
    T, = residue_field(S, x^3 + 3x + 1)
 
-   @test isa(T, Generic.EuclideanRingResidueField)
+   @test isa(T, EuclideanRingResidueField)
 
    f = T(x^4)
 
-   @test isa(f, Generic.EuclideanRingResidueFieldElem)
+   @test isa(f, EuclideanRingResidueFieldElem)
 
    g = T(f)
 
-   @test isa(g, Generic.EuclideanRingResidueFieldElem)
+   @test isa(g, EuclideanRingResidueFieldElem)
 
    S, = Generic.residue_ring(B, 2)
    x = R(1)
@@ -69,7 +69,7 @@
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.printing" begin
+@testset "EuclideanRingResidueFieldElem.printing" begin
    R, = Generic.residue_field(ZZ, 16453889)
 
    @test string(zero(R)) == "0"
@@ -83,7 +83,7 @@ end
    @test string(5*x^5+3*x^3+2*x^2+x+1) == "5*x^5 + 3*x^3 + 2*x^2 + x + 1"
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.rand" begin
+@testset "EuclideanRingResidueFieldElem.rand" begin
    R, = Generic.residue_field(ZZ, 16453889)
 
    test_rand(R, 1:9) do f
@@ -91,7 +91,7 @@ end
    end
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.manipulation" begin
+@testset "EuclideanRingResidueFieldElem.manipulation" begin
    R, = Generic.residue_field(ZZ, 16453889)
 
    @test modulus(R) == 16453889
@@ -128,7 +128,7 @@ end
    @test isa(lift(S(1)), BigInt)
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.unary_ops" begin
+@testset "EuclideanRingResidueFieldElem.unary_ops" begin
    R, = Generic.residue_field(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
@@ -139,7 +139,7 @@ end
    @test -T(x^5 + 1) == T(x^2+16453880*x+16453885)
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.binary_ops" begin
+@testset "EuclideanRingResidueFieldElem.binary_ops" begin
    R, = Generic.residue_field(ZZ, 13)
 
    f = R(4)
@@ -165,7 +165,7 @@ end
    @test n*p == T(3x^2 + 4x + 4)
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.gcd" begin
+@testset "EuclideanRingResidueFieldElem.gcd" begin
    R, = Generic.residue_field(ZZ, 13)
 
    f = R(4)
@@ -183,7 +183,7 @@ end
    @test gcd(n, p) == 1
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.adhoc_binary" begin
+@testset "EuclideanRingResidueFieldElem.adhoc_binary" begin
    R, = Generic.residue_field(ZZ, 7)
 
    a = R(3)
@@ -206,7 +206,7 @@ end
    @test f*5 == T(2*x^2+3*x+6)
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.comparison" begin
+@testset "EuclideanRingResidueFieldElem.comparison" begin
    R, = Generic.residue_field(ZZ, 7)
 
    a = R(3)
@@ -232,7 +232,7 @@ end
    @test isequal(f, g)
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.adhoc_comparison" begin
+@testset "EuclideanRingResidueFieldElem.adhoc_comparison" begin
    R, = Generic.residue_field(ZZ, 7)
 
    a = R(3)
@@ -248,7 +248,7 @@ end
    @test f != 5
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.powering" begin
+@testset "EuclideanRingResidueFieldElem.powering" begin
    R, = Generic.residue_field(ZZ, 7)
 
    a = R(3)
@@ -263,7 +263,7 @@ end
    @test f^100 == T(x^2 + 2x + 1)
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.inversion" begin
+@testset "EuclideanRingResidueFieldElem.inversion" begin
    R, = Generic.residue_field(ZZ, 47)
 
    a = R(5)
@@ -279,7 +279,7 @@ end
    @test inv(f) == T(26*x^2+31*x+10)
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.exact_division" begin
+@testset "EuclideanRingResidueFieldElem.exact_division" begin
    R, = Generic.residue_field(ZZ, 47)
 
    a = R(5)
@@ -297,7 +297,7 @@ end
    @test divexact(f, g) == T(7*x^2+25*x+26)
 end
 
-@testset "Generic.EuclideanRingResidueFieldElem.square_root" begin
+@testset "EuclideanRingResidueFieldElem.square_root" begin
    for p in [3, 47, 733, 13913, 168937, 3980299, 57586577]
        R, = Generic.residue_field(ZZ, p)
 
