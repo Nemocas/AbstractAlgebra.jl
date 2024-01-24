@@ -57,7 +57,9 @@ end
 
 _checkbounds(i::Int, j::Int) = 1 <= j <= i
 
-function _checkbounds(A, i::Int, j::Int)
+_checkbounds(i::Int, j::AbstractVector{Int}) = all(jj -> 1 <= jj <= i, j)
+
+function _checkbounds(A, i::Union{Int, AbstractVector{Int}}, j::Union{Int, AbstractVector{Int}})
   (_checkbounds(nrows(A), i) && _checkbounds(ncols(A), j)) ||
             Base.throw_boundserror(A, (i, j))
 end
@@ -386,18 +388,36 @@ function getindex(M::MatElem, rows::AbstractVector{Int}, cols::AbstractVector{In
    return A
 end
 
+function getindex(M::MatElem, i::Int, cols::AbstractVector{Int})
+   _checkbounds(M, i, cols)
+   A = Vector{elem_type(base_ring(M))}(undef, length(cols))
+   for j in eachindex(cols)
+     A[j] = deepcopy(M[i, cols[j]])
+   end
+   return A
+end
+
+function getindex(M::MatElem, rows::AbstractVector{Int}, j::Int)
+   _checkbounds(M, rows, j)
+   A = Vector{elem_type(base_ring(M))}(undef, length(rows))
+   for i in eachindex(rows)
+     A[i] = deepcopy(M[rows[i], j])
+   end
+   return A
+ end
+
 getindex(M::MatElem,
          rows::Union{Int,Colon,AbstractVector{Int}},
          cols::Union{Int,Colon,AbstractVector{Int}}) = M[_to_indices(M, rows, cols)...]
 
 function _to_indices(x, rows, cols)
    if rows isa Integer
-      rows = rows:rows
+      rows = rows
    elseif rows isa Colon
       rows = 1:nrows(x)
    end
    if cols isa Integer
-      cols = cols:cols
+      cols = cols
    elseif cols isa Colon
       cols = 1:ncols(x)
    end
@@ -2519,7 +2539,7 @@ function trace_of_prod(M::MatElem, N::MatElem)
    is_square(M) && is_square(N) || error("Not a square matrix in trace")
    d = zero(base_ring(M))
    for i = 1:nrows(M)
-      d += (M[i, :] * N[:, i])[1, 1]
+      d += (M[i:i, :] * N[:, i:i])[1, 1]
    end
    return d
 end
