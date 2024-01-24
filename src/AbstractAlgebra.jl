@@ -879,6 +879,8 @@ export dim
 export direct_sum
 export disable_cache!
 export discriminant
+export div_left
+export div_right
 export divexact
 export divexact_left
 export divexact_low
