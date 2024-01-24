@@ -2,7 +2,7 @@ module Solve
 
 using AbstractAlgebra
 
-import AbstractAlgebra: base_ring, nrows, ncols, kernel, matrix, rank
+import AbstractAlgebra: base_ring, nrows, ncols, matrix, rank
 
 ################################################################################
 #
@@ -210,8 +210,8 @@ end
 @doc raw"""
     can_solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
     can_solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
-    can_solve(A::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
-    can_solve(A::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
+    can_solve(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
+    can_solve(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return `true` if the linear system $Ax = b$ or $xA = b$ with `side == :right`
 (default) or `side == :left`, respectively, has a solution and `false` otherwise.
@@ -227,8 +227,8 @@ end
 @doc raw"""
     can_solve_with_solution(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
     can_solve_with_solution(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
-    can_solve_with_solution(A::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
-    can_solve_with_solution(A::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
+    can_solve_with_solution(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
+    can_solve_with_solution(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return `true` and $x$ of same type as $b$ solving the linear system $Ax = b$, if
 such a solution exists. Return `false` and an empty vector or matrix, if the
@@ -247,8 +247,8 @@ end
 @doc raw"""
     can_solve_with_solution_and_kernel(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
     can_solve_with_solution_and_kernel(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
-    can_solve_with_solution_and_kernel(A::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
-    can_solve_with_solution_and_kernel(A::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
+    can_solve_with_solution_and_kernel(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
+    can_solve_with_solution_and_kernel(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
 
 Return `true`, $x$ of same type as $b$ solving the linear system $Ax = b$,
 together with a matrix $K$ giving the kernel of $A$ (i.e. $AK = 0$), if such
@@ -265,31 +265,61 @@ function can_solve_with_solution_and_kernel(A::Union{MatElem{T}, SolveCtx{T}}, b
   return _can_solve_internal(A, b, :with_kernel; side = side)
 end
 
-function AbstractAlgebra.kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :right)
+@doc raw"""
+    kernel(A::MatElem; side::Symbol = :right)
+    kernel(C::SolveCtx; side::Symbol = :right)
+
+Return a matrix $K$ whose columns give a basis for the right kernel of $A$, that
+is, $AK$ is the zero matrix.
+
+If `side == :left`, the rows of $K$ give a basis for the left kernel of $A$, that
+is, $KA$ is the zero matrix.
+
+If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
+"""
+function kernel(A::MatElem; side::Symbol = :right)
+  if side !== :right && side !== :left
+    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+  end
+
+  if side === :left
+    K = kernel(lazy_transpose(A))
+    return lazy_transpose(K)
+  end
+
+  n, K = AbstractAlgebra.nullspace(A)
+  if ncols(K) > n
+    # For compatibility with `nullspace` methods in Nemo which add zero columns
+    K = sub(K, 1:nrows(K), 1:n)
+  end
+  return K
+end
+
+function kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :right)
   if side !== :right && side !== :left
     throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
   end
 
   if side === :right
-    return _kernel_of_rref(reduced_matrix(C), rank(C), pivot_and_non_pivot_cols(C))
+    return _kernel_of_rref(reduced_matrix(C), rank(C), pivot_and_non_pivot_cols(C))[2]
   else
     nullity, X = _kernel_of_rref(reduced_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C))
     # X is of type LazyTransposeMatElem
-    return nullity, data(X)
+    return data(X)
   end
 end
 
-function AbstractAlgebra.kernel(C::SolveCtx{<:RingElement}; side::Symbol = :right)
+function kernel(C::SolveCtx{<:RingElement}; side::Symbol = :right)
   if side !== :right && side !== :left
     throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
   end
 
   if side === :right
-    return _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))
+    return _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))[2]
   else
     nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
     # X is of type LazyTransposeMatElem
-    return nullity, data(X)
+    return data(X)
   end
 end
 
@@ -461,7 +491,7 @@ function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::
     return fl, sol, zero(b, 0, 0)
   end
 
-  return true, sol, kernel(C, side = side)[2]
+  return true, sol, kernel(C, side = side)
 end
 
 ## _can_solve_internal over RINGS with SOLVE CONTEXT
@@ -485,7 +515,7 @@ function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::
     return fl, sol, zero(b, 0, 0)
   end
 
-  return true, sol, kernel(C, side = side)[2]
+  return true, sol, kernel(C, side = side)
 end
 
 ################################################################################

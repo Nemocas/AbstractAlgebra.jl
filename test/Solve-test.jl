@@ -22,6 +22,9 @@
       @test M*x == b
       @test is_zero(M*K)
       @test ncols(K) == 2
+      K = @inferred AbstractAlgebra.Solve.kernel(M)
+      @test is_zero(M*K)
+      @test ncols(K) == 2
     end
 
     for b in [ [ R(1), R(1), R(1), R(1), R(1) ],
@@ -51,6 +54,9 @@
       @test x*M == b
       @test is_zero(K*M)
       @test nrows(K) == 0
+      K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+      @test is_zero(K*M)
+      @test nrows(K) == 0
     end
 
     N = zero_matrix(R, 2, 1)
@@ -59,12 +65,16 @@
     @test fl
     @test N*x == b
     @test K == identity_matrix(R, 1)
+    K = @inferred AbstractAlgebra.Solve.kernel(N)
+    @test K == identity_matrix(R, 1)
 
     N = zero_matrix(R, 1, 2)
     b = zeros(R, 1)
     fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(N, b)
     @test fl
     @test N*x == b
+    @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
+    K = @inferred AbstractAlgebra.Solve.kernel(N)
     @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
   end
 end
@@ -92,6 +102,9 @@ end
       fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b)
       @test fl
       @test M*x == b
+      @test is_zero(M*K)
+      @test ncols(K) == 2
+      K = @inferred AbstractAlgebra.Solve.kernel(C)
       @test is_zero(M*K)
       @test ncols(K) == 2
     end
@@ -123,6 +136,9 @@ end
       @test x*M == b
       @test is_zero(K*M)
       @test nrows(K) == 0
+      K = @inferred AbstractAlgebra.Solve.kernel(C, side = :left)
+      @test is_zero(K*M)
+      @test nrows(K) == 0
     end
 
     N = zero_matrix(R, 2, 1)
@@ -132,6 +148,8 @@ end
     @test fl
     @test N*x == b
     @test K == identity_matrix(R, 1)
+    K = @inferred AbstractAlgebra.Solve.kernel(C)
+    @test K == identity_matrix(R, 1)
 
     N = zero_matrix(R, 1, 2)
     C = AbstractAlgebra.Solve.solve_init(N)
@@ -139,6 +157,8 @@ end
     fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b)
     @test fl
     @test N*x == b
+    @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
+    K = @inferred AbstractAlgebra.Solve.kernel(C)
     @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
   end
 end
