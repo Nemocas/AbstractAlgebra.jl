@@ -57,7 +57,9 @@ end
 
 _checkbounds(i::Int, j::Int) = 1 <= j <= i
 
-function _checkbounds(A, i::Int, j::Int)
+_checkbounds(i::Int, j::AbstractVector{Int}) = all(jj -> 1 <= jj <= i, j)
+
+function _checkbounds(A, i::Union{Int, AbstractVector{Int}}, j::Union{Int, AbstractVector{Int}})
   (_checkbounds(nrows(A), i) && _checkbounds(ncols(A), j)) ||
             Base.throw_boundserror(A, (i, j))
 end
@@ -386,18 +388,36 @@ function getindex(M::MatElem, rows::AbstractVector{Int}, cols::AbstractVector{In
    return A
 end
 
+function getindex(M::MatElem, i::Int, cols::AbstractVector{Int})
+   _checkbounds(M, i, cols)
+   A = Vector{elem_type(base_ring(M))}(undef, length(cols))
+   for j in eachindex(cols)
+     A[j] = deepcopy(M[i, cols[j]])
+   end
+   return A
+end
+
+function getindex(M::MatElem, rows::AbstractVector{Int}, j::Int)
+   _checkbounds(M, rows, j)
+   A = Vector{elem_type(base_ring(M))}(undef, length(rows))
+   for i in eachindex(rows)
+     A[i] = deepcopy(M[rows[i], j])
+   end
+   return A
+ end
+
 getindex(M::MatElem,
          rows::Union{Int,Colon,AbstractVector{Int}},
          cols::Union{Int,Colon,AbstractVector{Int}}) = M[_to_indices(M, rows, cols)...]
 
 function _to_indices(x, rows, cols)
    if rows isa Integer
-      rows = rows:rows
+      rows = rows
    elseif rows isa Colon
       rows = 1:nrows(x)
    end
    if cols isa Integer
-      cols = cols:cols
+      cols = cols
    elseif cols isa Colon
       cols = 1:ncols(x)
    end
@@ -422,6 +442,52 @@ function Base.lastindex(M::MatrixElem{T}, i::Int) where T <: NCRingElement
    end
 end
 
+##
+
+struct RowMajorIndices{T}
+  C::T
+end
+
+Base.length(t::RowMajorIndices) = Base.length(t.C)
+
+function Base.iterate(c::RowMajorIndices, s)
+  y = iterate(c.C, s)
+  if y === nothing
+    return nothing
+  end
+  return CartesianIndex(y[2][2], y[2][1]), y[1]
+end
+
+function Base.iterate(c::RowMajorIndices)
+  y = iterate(c.C)
+  if y === nothing
+    return nothing
+  end
+  return CartesianIndex(y[2][2], y[2][1]), y[1]
+end
+
+function Base.getindex(c::RowMajorIndices, i::Int)
+  r = c.C[i]
+  return CartesianIndex(r[2], r[1])
+end
+
+Base.IteratorSize(::Type{<:RowMajorIndices}) = Base.HasShape{2}()
+
+Base.eltype(::Type{<:RowMajorIndices}) = CartesianIndex
+
+Base.size(c::RowMajorIndices, dim) = size(c.C, dim == 1 ? 2 : 1)
+
+Base.size(c::RowMajorIndices) = (size(c.C, 2), size(c.C, 1))
+
+Base.CartesianIndices(a::MatrixElem) = RowMajorIndices(CartesianIndices((ncols(a), nrows(a))))
+
+Base.LinearIndices(c::RowMajorIndices) = LinearIndices(c.C)'
+
+# To make collect work
+function Base.copyto!(dest::AbstractArray, src::RowMajorIndices)
+  return Base.copyto!(dest, CartesianIndices((size(src, 1), size(src, 2))))
+end
+
 ###############################################################################
 #
 #   Array interface
@@ -432,7 +498,7 @@ Base.ndims(::MatrixElem{T}) where T <: NCRingElement = 2
 
 # Cartesian indexing
 
-Base.eachindex(a::MatrixElem{T}) where T <: NCRingElement = CartesianIndices((nrows(a), ncols(a)))
+Base.eachindex(a::MatrixElem{T}) where T <: NCRingElement = RowMajorIndices(CartesianIndices((ncols(a), nrows(a))))
 
 Base.@propagate_inbounds Base.getindex(a::MatrixElem{T}, I::CartesianIndex) where T <: NCRingElement =
    a[I[1], I[2]]
@@ -465,22 +531,86 @@ Base.@propagate_inbounds function setindex!(M::MatrixElem, x, i::Integer)
    end
 end
 
-# iteration
+# iteration 
 
-function Base.iterate(a::MatrixElem{T}, ij=(0, 1)) where T <: NCRingElement
+Base.eltype(::Type{<:MatrixElem{T}}) where {T} = T
+
+Base.length(c::MatrixElem) = length(c)
+
+function Base.iterate(a::MatrixElem, ij=(1, 0))
    i, j = ij
-   i += 1
-   if i > nrows(a)
-      iszero(nrows(a)) && return nothing
-      i = 1
-      j += 1
+   j += 1
+   if j > Base.size(a, 2)
+      iszero(size(a, 1)) && return nothing
+      j = 1
+      i += 1
    end
-   j > ncols(a) && return nothing
+   i > size(a, 1) && return nothing
    a[i, j], (i, j)
 end
 
-Base.IteratorSize(::Type{<:MatrixElem}) = Base.HasShape{2}()
-Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default
+# iteration
+
+struct _RowMajorIterator{T}
+  a::T
+end
+
+Base.eltype(::Type{_RowMajorIterator{<:MatrixElem{T}}}) where {T} = T
+
+Base.length(c::_RowMajorIterator{T}) where {T} = length(c.a)
+
+function Base.iterate(a::_RowMajorIterator, ij=(1, 0))
+   i, j = ij
+   j += 1
+   if j > Base.size(a.a, 2)
+      iszero(size(a.a, 1)) && return nothing
+      j = 1
+      i += 1
+   end
+   i > size(a.a, 1) && return nothing
+   a.a[i, j], (i, j)
+end
+
+#Base.IteratorSize(::Type{<:MatrixElem}) = Base.HasShape{2}()
+#Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default
+
+struct _ColumnMajorIterator{T}
+  a::T
+end
+
+function Base.iterate(a::_ColumnMajorIterator, ij=(0, 1))
+   i, j = ij
+   i += 1
+   if i > Base.size(a.a, 1)
+      iszero(size(a.a, 1)) && return nothing
+      i = 1
+      j += 1
+   end
+   j > size(a.a, 2) && return nothing
+   a.a[i, j], (i, j)
+end
+
+Base.IteratorEltype(::Type{<:_ColumnMajorIterator}) = Base.HasEltype() # default
+
+Base.eltype(::Type{_ColumnMajorIterator{<:MatrixElem{T}}}) where {T} = T
+
+Base.length(c::_ColumnMajorIterator{T}) where {T} = length(c.a)
+
+# the following is implemented to make collect(::MatrixElem) work
+# function Base.copyto!(dest::AbstractArray, src::MatrixElem)
+#   # this breaks if dest is itself a MatrixElem
+#   # if this ever happens, we need to adjust the iteration
+#   @assert !(dest isa MatrixElem)
+#   destiter = eachindex(dest)
+#   y = iterate(destiter)
+#   for x in src#_ColumnMajorIterator(src)
+#     y === nothing &&
+#       throw(ArgumentError("destination has fewer elements than required"))
+#     dest[y[1]] = x
+#     y = iterate(destiter, y[2])
+#   end
+#   return dest
+# end
 
 ###############################################################################
 #
@@ -2519,7 +2649,7 @@ function trace_of_prod(M::MatElem, N::MatElem)
    is_square(M) && is_square(N) || error("Not a square matrix in trace")
    d = zero(base_ring(M))
    for i = 1:nrows(M)
-      d += (M[i, :] * N[:, i])[1, 1]
+      d += (M[i:i, :] * N[:, i:i])[1, 1]
    end
    return d
 end

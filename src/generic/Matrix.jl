@@ -100,8 +100,16 @@ function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: NCRingEl
    return MatSpaceView(deepcopy_internal(d.entries, dict), d.base_ring)
 end
 
-function Base.view(M::Mat{T}, rows::AbstractUnitRange{Int}, cols::AbstractUnitRange{Int}) where T <: NCRingElement
+function Base.view(M::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
    return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
+end
+
+function Base.view(M::Mat{T}, rows::Int, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
+   return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
+end
+
+function Base.view(M::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Int) where T <: NCRingElement
+   return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
 end
 
 ################################################################################
@@ -228,3 +236,12 @@ function AbstractAlgebra.mul!(A::Mat{T}, B::Mat{T}, C::Mat{T}, f::Bool = false) 
   return A
 end
 
+Base.length(V::MatSpaceVecView) = length(V.entries)
+
+Base.getindex(V::MatSpaceVecView, i::Int) = V.entries[i]
+
+Base.setindex!(V::MatSpaceVecView{T}, z::T, i::Int) where {T} = (V.entries[i] = z)
+
+Base.setindex!(V::MatSpaceVecView, z::RingElement, i::Int) = setindex!(V.entries, V.base_ring(z), i)
+
+Base.size(V::MatSpaceVecView) = (length(V.entries), )
