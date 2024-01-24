@@ -47,4 +47,5 @@ solve
 can_solve
 can_solve_with_solution
 can_solve_with_solution_and_kernel
+kernel
 ```
