@@ -278,9 +278,7 @@ is, $KA$ is the zero matrix.
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 """
 function kernel(A::MatElem; side::Symbol = :right)
-  if side !== :right && side !== :left
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-  end
+  check_option(side, [:right, :left], "side")
 
   if side === :left
     K = kernel(lazy_transpose(A))
@@ -296,9 +294,7 @@ function kernel(A::MatElem; side::Symbol = :right)
 end
 
 function kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :right)
-  if side !== :right && side !== :left
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-  end
+  check_option(side, [:right, :left], "side")
 
   if side === :right
     return _kernel_of_rref(reduced_matrix(C), rank(C), pivot_and_non_pivot_cols(C))[2]
@@ -310,9 +306,7 @@ function kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :right)
 end
 
 function kernel(C::SolveCtx{<:RingElement}; side::Symbol = :right)
-  if side !== :right && side !== :left
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-  end
+  check_option(side, [:right, :left], "side")
 
   if side === :right
     return _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))[2]
@@ -328,6 +322,27 @@ end
 #  Internal functionality
 #
 ################################################################################
+
+###
+# General concept:
+# `_can_solve_internal` checks the sanity of the input and then calls
+# `_can_solve_internal_no_check` . Only the latter function needs to be
+# implemented for a given type of matrices. Specifically one needs to implement
+# the signature(s)
+#   _can_solve_internal_no_check(A::MatrixType, b::MatrixType, task::Symbol, side::Symbol)
+#   _can_solve_internal_no_check(C::SolveCtx, b::MatrixType, task::Symbol, side::Symbol)
+# Inside these functions one can assume that A (resp. C) and b have compatible
+# dimensions and that `task` and `side` are set to a "legal" option.
+# These functions should then (try to) solve Ax = b (side == :right) or xA = b
+# (side == :left) possibly with kernel.
+# They must always return a tuple (Bool, MatrixType, MatrixType).
+# task may be:
+# * :only_check -> It is only tested whether there is a solution, the second
+#   and third return value are only for type stability
+# * :with_solution -> A solution is computed, the last return value is only
+#   for type stability
+# * :with_kernel -> A solution and the kernel is computed
+###
 
 # A is supposed to be in rref of rank r
 # Return a Vector of length ncols(A) with the first r entries the pivot columns
@@ -354,22 +369,21 @@ function pivot_and_non_pivot_cols(A::MatElem, r::Int)
   return p
 end
 
-# Transform a right hand side of type Vector into a MatElem
+# Transform a right hand side of type Vector into a MatElem and do sanity checks
 function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::Vector{T}, task::Symbol; side::Symbol = :right) where T
-  if side !== :right && side !== :left
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-  end
+  check_option(task, [:only_check, :with_solution, :with_kernel], "task")
+  check_option(side, [:right, :left], "side")
 
   isright = side === :right
 
   if isright
-    nrows(A) != length(b) && error("Incompatible matrices")
+    check_linear_system_dim_right(A, b)
     B = matrix(base_ring(A), nrows(A), 1, b)
   else # side == :left
-    ncols(A) != length(b) && error("Incompatible matrices")
+    check_linear_system_dim_left(A, b)
     B = matrix(base_ring(A), 1, ncols(A), b)
   end
-  fl, sol, K = _can_solve_internal(A, B, task, side = side)
+  fl, sol, K = _can_solve_internal_no_check(A, B, task, side = side)
   if isright
     x = eltype(b)[ sol[i, 1] for i in 1:nrows(sol) ]
   else # side == :left
@@ -378,32 +392,29 @@ function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::Vector{T}, ta
   return fl, x, K
 end
 
-## _can_solve_internal over FIELDS
-# Tries to solve Ax = b (side == :right) or xA = b (side == :left) possibly with kernel.
-# Always returns a tuple (Bool, MatElem, MatElem).
-# task may be:
-# * :only_check -> It is only tested whether there is a solution, the two MatElem's are
-#   "dummies"
-# * :with_solution -> A solution is computed, the last MatElem is a "dummy"
-# * :with_kernel -> A solution and the kernel is computed
-function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: FieldElement
-  if task !== :only_check && task !== :with_solution && task !== :with_kernel
-    error("task $(task) not recognized")
+# Do sanity checks and call _can_solve_internal_no_check
+function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T
+  check_option(task, [:only_check, :with_solution, :with_kernel], "task")
+  check_option(side, [:right, :left], "side")
+  if side === :right
+    check_linear_system_dim_right(A, b)
+  else
+    check_linear_system_dim_left(A, b)
   end
+  return _can_solve_internal_no_check(A, b, task, side = side)
+end
 
-  if side !== :right && side !== :left
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-  end
+# _can_solve_internal_no_check over FIELDS
+function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: FieldElement
 
   R = base_ring(A)
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, sol, K = _can_solve_internal(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, sol, K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
     return fl, data(sol), data(K)
   end
 
-  nrows(A) != nrows(b) && error("Incompatible matrices")
   mu = hcat(A, b)
 
   rk = rref!(mu)
@@ -439,26 +450,16 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
   return true, sol, X
 end
 
-## _can_solve_internal over RINGS
-# See _can_solve_internal over fields for more explanation on the arguments and output
-function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
-  if task !== :only_check && task !== :with_solution && task !== :with_kernel
-    error("task $(task) not recognized")
-  end
-
-  if side !== :right && side !== :left
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-  end
+# _can_solve_internal_no_check over RINGS
+function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
 
   R = base_ring(A)
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, sol, K = _can_solve_internal(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, sol, K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
     return fl, data(sol), data(K)
   end
-
-  nrows(A) != nrows(b) && error("Incompatible matrices")
 
   H, S = hnf_with_transform(lazy_transpose(A))
   fl, sol = _can_solve_with_hnf(b, H, S, task)
@@ -470,17 +471,8 @@ function _can_solve_internal(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::S
   return true, sol, N
 end
 
-## _can_solve_internal over FIELDS with SOLVE CONTEXT
-# See _can_solve_internal over fields for more explanation on the arguments and output
-function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: FieldElement
-  if task !== :only_check && task !== :with_solution && task !== :with_kernel
-    error("task $(task) not recognized")
-  end
-
-  if side !== :right && side !== :left
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-  end
-
+# _can_solve_internal_no_check over FIELDS with SOLVE CONTEXT
+function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: FieldElement
   if side === :right
     fl, sol = _can_solve_with_rref(b, transformation_matrix(C), rank(C), pivot_and_non_pivot_cols(C), task)
   else
@@ -494,17 +486,8 @@ function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::
   return true, sol, kernel(C, side = side)
 end
 
-## _can_solve_internal over RINGS with SOLVE CONTEXT
-# See _can_solve_internal over fields for more explanation on the arguments and output
-function _can_solve_internal(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
-  if task !== :only_check && task !== :with_solution && task !== :with_kernel
-    error("task $(task) not recognized")
-  end
-
-  if side !== :right && side !== :left
-    throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-  end
-
+# _can_solve_internal_no_check over RINGS with SOLVE CONTEXT
+function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
   if side === :right
     fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
   else
@@ -530,12 +513,6 @@ end
 # Takes same options for `task` as _can_solve_internal but only returns (flag, solution)
 # and no kernel.
 function _can_solve_with_rref(b::MatElem{T}, U::MatElem{T}, r::Int, pivots::Vector{Int}, task::Symbol) where T <: FieldElement
-  if task !== :only_check && task !== :with_solution && task !== :with_kernel
-    error("task $(task) not recognized")
-  end
-
-  nrows(U) != nrows(b) && error("Incompatible matrices")
-
   bU = U*b
   if any(i -> !is_zero_row(bU, i), r + 1:nrows(bU))
     return false, zero(b, 0, 0)
@@ -574,12 +551,6 @@ end
 # Takes same options for `task` as _can_solve_internal but only returns (flag, solution)
 # and no kernel.
 function _can_solve_with_hnf(b::MatElem{T}, H::MatElem{T}, U::MatElem{T}, task::Symbol) where T <: RingElement
-  if task !== :only_check && task !== :with_solution && task !== :with_kernel
-    error("task $(task) not recognized")
-  end
-
-  ncols(H) != nrows(b) && error("Incompatible matrices")
-
   sol = lazy_transpose(zero(b, nrows(H), ncols(b)))
   l = min(nrows(H), ncols(H))
   b = deepcopy(b)
@@ -640,6 +611,57 @@ function _rref_with_transformation(M::MatElem{T}) where T <: FieldElement
     s -= 1
   end
   return s, sub(n, 1:nrows(M), 1:ncols(M)), sub(n, 1:nrows(M), ncols(M)+1:ncols(n))
+end
+
+################################################################################
+#
+#  Checks
+#
+################################################################################
+
+function check_option(x::Symbol, options::Vector{Symbol}, option_name::String, msg::String = "", throw_error::Bool = true)
+  if msg == ""
+    msg = "Unsupported argument $x for $option_name"
+  end
+  fl = (x in options)
+  if !fl && throw_error
+    throw(ArgumentError(msg))
+  end
+  return fl
+end
+
+# Checks whether A and b have the same number of rows
+function check_linear_system_dim_right(A::Union{MatElem, SolveCtx}, b::MatElem, throw_error::Bool = true)
+  fl = nrows(A) == nrows(b)
+  if !fl && throw_error
+    error("Incompatible number of rows in linear system (use `side = :left` to switch to an action from the left)")
+  end
+  return fl
+end
+
+function check_linear_system_dim_right(A::Union{MatElem, SolveCtx}, b::Vector, throw_error::Bool = true)
+  fl = nrows(A) == length(b)
+  if !fl && throw_error
+    error("Incompatible number of rows in linear system (use `side = :left` to switch to an action from the left)")
+  end
+  return fl
+end
+
+# Checks whether A and b have the same number of columns
+function check_linear_system_dim_left(A::Union{MatElem, SolveCtx}, b::MatElem, throw_error::Bool = true)
+  fl = ncols(A) == ncols(b)
+  if !fl && throw_error
+    error("Incompatible number of columns in linear system (use `side = :right` to switch to an action from the right)")
+  end
+  return fl
+end
+
+function check_linear_system_dim_left(A::Union{MatElem, SolveCtx}, b::Vector, throw_error::Bool = true)
+  fl = ncols(A) == length(b)
+  if !fl && throw_error
+    error("Incompatible number of columns in linear system (use `side = :right` to switch to an action from the right)")
+  end
+  return fl
 end
 
 end
