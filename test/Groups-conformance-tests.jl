@@ -164,7 +164,7 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
             @test g \ h == inv(g) * h
             @test (g, h) == (old_g, old_h)
 
-            @test div_left(g, h) == inv(g) * h
+            @test div_left(g, h) == inv(h) * g
             @test (g, h) == (old_g, old_h)
         end
 
