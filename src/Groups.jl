@@ -26,8 +26,8 @@ Base.inv(g::GroupElem) = throw(NotImplementedError(:inv, g))
 # ... and many more of course (among those below and beyond), such as
 #   gens(::Group)
 #   ngens(::Group)
-#   order(::Group)
-#   order(::GroupElem)
+#   order(::Type{T}, ::Group)
+#   order(::Type{T}, ::GroupElem)
 
 
 ###############################################################################
