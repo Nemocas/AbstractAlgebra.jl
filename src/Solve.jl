@@ -2,7 +2,7 @@ module Solve
 
 using AbstractAlgebra
 
-import AbstractAlgebra: base_ring, nrows, ncols, matrix, rank
+import AbstractAlgebra: base_ring, nrows, ncols, matrix, rank, Generic
 
 ################################################################################
 #
@@ -46,22 +46,29 @@ Base.similar(M::LazyTransposeMatElem, i::Int, j::Int) = lazy_transpose(similar(d
 #
 ################################################################################
 
-mutable struct SolveCtx{T, MatT}
+mutable struct SolveCtx{T, MatT, TranspMatT}
   A::MatT # matrix giving the linear system
-  red::MatT # rref or HNF of A
-  red_transp::LazyTransposeMatElem{T, MatT} # rref or HNF of transpose(A)
-  trafo::MatT # transformation: trafo*A == red
-  trafo_transp::LazyTransposeMatElem{T, MatT} # transformation: trafo_transp*transpose(A) == red_transp
+  red::MatT # reduced/canonical form of A (rref, hnf, lu)
+  red_transp::TranspMatT # reduced/canonical form of transpose(A)
+  trafo::MatT # transformation: trafo*A == red (not used for lu)
+  trafo_transp::TranspMatT # transformation: trafo_transp*transpose(A) == red_transp
+                           # (not used for lu)
+  lu_perm::Generic.Perm # permutation used for the lu factorization of A
+  lu_perm_transp::Generic.Perm # permutation used for the lu factorization of transpose(A)
 
   rank::Int # rank of A
   pivots::Vector{Int} # pivot and non-pivot columns of red
   pivots_transp::Vector{Int} # pivot and non-pivot columns of red_transp
 
-  function SolveCtx(A::MatElem{T}) where T
-    z = new{T, typeof(A)}()
+  function SolveCtx{T, MatT, TranspMatT}(A::MatT) where {T, MatT <: MatElem{T}, TranspMatT <: MatElem{T}}
+    z = new{T, MatT, TranspMatT}()
     z.A = A
     z.rank = -1 # not known yet
     return z
+  end
+
+  function SolveCtx(A::MatElem{T}) where T
+    return SolveCtx{T, typeof(A), LazyTransposeMatElem{T, typeof(A)}}(A)
   end
 end
 
@@ -131,6 +138,16 @@ end
 function reduced_matrix_of_transpose(C::SolveCtx)
   _init_reduce_transpose(C)
   return C.red_transp
+end
+
+function lu_permutation(C::SolveCtx)
+  _init_reduce(C)
+  return C.lu_perm
+end
+
+function lu_permutation_of_transpose(C::SolveCtx)
+  _init_reduce_transpose(C)
+  return C.lu_perm_transp
 end
 
 function transformation_matrix(C::SolveCtx)
