@@ -26,8 +26,8 @@ Base.inv(g::GroupElem) = throw(NotImplementedError(:inv, g))
 # ... and many more of course (among those below and beyond), such as
 #   gens(::Group)
 #   ngens(::Group)
-#   order(::Group)
-#   order(::GroupElem)
+#   order(::Type{T}, ::Group)
+#   order(::Type{T}, ::GroupElem)
 
 
 ###############################################################################
@@ -166,6 +166,20 @@ Alias for [`conj`](@ref conj).
 Base.:(^)(g::T, h::T) where {T<:GroupElem} = conj(g, h)
 
 """
+    /(g::T, h::T) where {T <: GroupElem}
+
+Alias for [`div_right`](@ref div_right).
+"""
+Base.:/(g::T, h::T) where {T<:GroupElem} = div_right(g, h)
+
+"""
+    \\(g::T, h::T) where {T <: GroupElem}
+
+Alias for [`div_left`](@ref div_left).
+"""
+Base.:\(g::T, h::T) where {T<:GroupElem} = div_left(g, h)
+
+"""
     comm(g::T, h::T, k::T...) where {T <: GroupElem}
 
 Return the left associative iterated commutator ``[[g, h], ...]``, where
@@ -179,11 +193,21 @@ function comm(g::T, h::T, k::T...) where {T<:GroupElem}
     return res
 end
 
-function Base.:(/)(g::T, h::T) where {T<:GroupElem}
+"""
+    div_right(g::T, h::T) where {T<:GroupElem}
+
+Return `g*inv(h)`.
+"""
+function div_right(g::T, h::T) where {T<:GroupElem}
     return g*inv(h)
 end
 
-function Base.:(\)(g::T, h::T) where {T<:GroupElem}
+"""
+    div_left(g::T, h::T) where {T<:GroupElem}
+
+Return `inv(g)*h`.
+"""
+function div_left(g::T, h::T) where {T<:GroupElem}
     return inv(g)*h
 end
 
