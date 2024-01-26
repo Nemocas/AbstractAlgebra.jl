@@ -123,6 +123,7 @@ import Base: ceil
 import Base: checkbounds
 import Base: cmp
 import Base: conj
+import Base: conj!
 import Base: convert
 import Base: cos
 import Base: cosh
@@ -857,7 +858,9 @@ export coefficients_of_univariate
 export collength
 export combine_like_terms!
 export comm
+export comm!
 export compose
+export conj!
 export constant_coefficient
 export content
 export cycles
@@ -880,7 +883,9 @@ export direct_sum
 export disable_cache!
 export discriminant
 export div_left
+export div_left!
 export div_right
+export div_right!
 export divexact
 export divexact_left
 export divexact_low
@@ -1087,6 +1092,7 @@ export nullspace
 export num_coeff
 export O
 export one
+export one!
 export order
 export ordering
 export parent_type

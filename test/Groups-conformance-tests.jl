@@ -194,16 +194,6 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
             @test similar(g) isa typeof(g)
         end
 
-        one!, inv!, mul!, conj!, comm!, div_left!, div_right! = (
-            AbstractAlgebra.one!,
-            AbstractAlgebra.inv!,
-            AbstractAlgebra.mul!,
-            AbstractAlgebra.conj!,
-            AbstractAlgebra.comm!,
-            AbstractAlgebra.div_left!,
-            AbstractAlgebra.div_right!,
-        )
-
         @testset "In-place operations" begin
             old_g, old_h = deepcopy(g), deepcopy(h)
             out = similar(g)
