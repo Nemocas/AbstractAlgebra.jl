@@ -168,16 +168,16 @@ Base.:(^)(g::T, h::T) where {T<:GroupElem} = conj(g, h)
 """
     /(g::T, h::T) where {T <: GroupElem}
 
-Alias for [`div_right`](@ref div_right).
+Alias for [`div_right(g, h)`](@ref div_right).
 """
 Base.:/(g::T, h::T) where {T<:GroupElem} = div_right(g, h)
 
 """
     \\(g::T, h::T) where {T <: GroupElem}
 
-Alias for [`div_left`](@ref div_left).
+Alias for [`div_left(h, g)`](@ref div_left).
 """
-Base.:\(g::T, h::T) where {T<:GroupElem} = div_left(g, h)
+Base.:\(g::T, h::T) where {T<:GroupElem} = div_left(h, g)
 
 """
     comm(g::T, h::T, k::T...) where {T <: GroupElem}
@@ -205,10 +205,10 @@ end
 """
     div_left(g::T, h::T) where {T<:GroupElem}
 
-Return `inv(g)*h`.
+Return `inv(h)*g`.
 """
 function div_left(g::T, h::T) where {T<:GroupElem}
-    return inv(g)*h
+    return inv(h)*g
 end
 
 
