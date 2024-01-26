@@ -77,8 +77,10 @@ function order(::Type{T}, g::GroupElem) where T
 end
 
 # if no return type has been specified, default to `BigInt`
-order(G::Group) = order(BigInt, G)
-order(g::GroupElem) = order(BigInt, g)
+# the unexported function _order allows to change the default return type in Nemo
+order(G::Group) = _order(G)
+order(g::GroupElem) = _order(g)
+_order(G) = order(BigInt, G)
 
 """
     is_finiteorder(g::GroupElem)
