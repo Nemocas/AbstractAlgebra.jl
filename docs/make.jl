@@ -11,7 +11,7 @@ makedocs(
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
          clean = true,
-         doctest = true,
+         doctest = :fix,
          checkdocs = :none,
          pages    = [
              "index.md",

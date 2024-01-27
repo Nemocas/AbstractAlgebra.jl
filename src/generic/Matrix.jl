@@ -57,18 +57,18 @@ Return the number of columns of the given matrix space.
 """
 number_of_columns(a::MatSpace) = a.ncols
 
-number_of_rows(a::Union{Mat, MatAlgElem}) = size(a.entries, 1)
+number_of_rows(a::Union{Mat, MatRingElem}) = size(a.entries, 1)
 
-number_of_columns(a::Union{Mat,MatAlgElem}) = size(a.entries, 2)
+number_of_columns(a::Union{Mat,MatRingElem}) = size(a.entries, 2)
 
-Base.@propagate_inbounds getindex(a::Union{Mat, MatAlgElem}, r::Int, c::Int) = a.entries[r, c]
+Base.@propagate_inbounds getindex(a::Union{Mat, MatRingElem}, r::Int, c::Int) = a.entries[r, c]
 
-Base.@propagate_inbounds function setindex!(a::Union{Mat, MatAlgElem}, d::NCRingElement,
+Base.@propagate_inbounds function setindex!(a::Union{Mat, MatRingElem}, d::NCRingElement,
                                             r::Int, c::Int)
     a.entries[r, c] = base_ring(a)(d)
 end
 
-Base.isassigned(a::Union{Mat,MatAlgElem}, i, j) = isassigned(a.entries, i, j)
+Base.isassigned(a::Union{Mat,MatRingElem}, i, j) = isassigned(a.entries, i, j)
 
 ################################################################################
 #

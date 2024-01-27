@@ -1098,36 +1098,36 @@ end
 
 ###############################################################################
 #
-#   MatAlgebra / MatAlgElem
+#   MatRing / MatRingElem
 #
 ###############################################################################
 
-struct MatAlgebra{T <: NCRingElement} <: AbstractAlgebra.MatAlgebra{T}
+struct MatRing{T <: NCRingElement} <: AbstractAlgebra.MatRing{T}
    n::Int
    base_ring::NCRing
 
-   function MatAlgebra{T}(R::NCRing, n::Int) where T <: NCRingElement
+   function MatRing{T}(R::NCRing, n::Int) where T <: NCRingElement
       new{T}(n, R)
    end
 end
 
-struct MatAlgElem{T <: NCRingElement} <: AbstractAlgebra.MatAlgElem{T}
+struct MatRingElem{T <: NCRingElement} <: AbstractAlgebra.MatRingElem{T}
    base_ring::NCRing
    entries::Matrix{T}
 
-   function MatAlgElem{T}(R::NCRing, A::Matrix{T}) where T <: NCRingElement
+   function MatRingElem{T}(R::NCRing, A::Matrix{T}) where T <: NCRingElement
       @assert elem_type(R) === T
       return new{T}(R, A)
    end
 end
 
-function MatAlgElem{T}(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
+function MatRingElem{T}(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
    @assert elem_type(R) === T
    t = Matrix{T}(undef, n, n)
    for i = 1:n, j = 1:n
       t[i, j] = A[(i - 1) * n + j]
    end
-   return MatAlgElem{T}(R, t)
+   return MatRingElem{T}(R, t)
 end
 
 ###############################################################################

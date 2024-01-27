@@ -1122,7 +1122,7 @@ end
    end
 
    R = ZZ
-   T = MatrixAlgebra(R, 2)
+   T = matrix_ring(R, 2)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -1233,7 +1233,7 @@ end
    @test evaluate(f1, [1, 3], [2, 4]) == 4*y1^2 + 12*y1 + 21
    @test evaluate(f1, [x1, z1], [2, 4]) == 4*y1^2 + 12*y1 + 21
 
-   S = MatrixAlgebra(ZZ, 2)
+   S = matrix_ring(ZZ, 2)
 
    M1 = S([1 2; 3 4])
    M2 = S([2 3; 1 -1])

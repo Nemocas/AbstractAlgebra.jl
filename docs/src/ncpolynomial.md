@@ -64,18 +64,18 @@ resulting parent objects to coerce various elements into the polynomial ring.
 **Examples**
 
 ```jldoctest
-julia> R = MatrixAlgebra(ZZ, 2)
-Matrix algebra of degree 2
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix algebra of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix algebra of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
 
 julia> U, z = R["z"]
-(Univariate polynomial ring in z over matrix algebra of degree 2 over integers, z)
+(Univariate polynomial ring in z over matrix ring of degree 2 over integers, z)
 
 julia> f = S()
 0
@@ -118,15 +118,15 @@ We give some examples of such functionality.
 **Examples**
 
 ```jldoctest
-julia> R = MatrixAlgebra(ZZ, 2)
-Matrix algebra of degree 2
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix algebra of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix algebra of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
 
 julia> f = x^3 + 3x + 21
 x^3 + [3 0; 0 3]*x + [21 0; 0 21]
@@ -150,16 +150,16 @@ julia> n = length(g)
 3
 
 julia> U = base_ring(T)
-Univariate polynomial ring in x over matrix algebra of degree 2 over integers
+Univariate polynomial ring in x over matrix ring of degree 2 over integers
 
 julia> V = base_ring(y + 1)
-Univariate polynomial ring in x over matrix algebra of degree 2 over integers
+Univariate polynomial ring in x over matrix ring of degree 2 over integers
 
 julia> v = var(T)
 :y
 
 julia> U = parent(y + 1)
-Univariate polynomial ring in y over univariate polynomial ring in x over matrix algebra of degree 2 over integers
+Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers
 
 julia> g == deepcopy(g)
 true
@@ -205,15 +205,15 @@ is_term(::NCPolyRingElem)
 **Examples**
 
 ```jldoctest
-julia> R = MatrixAlgebra(ZZ, 2)
-Matrix algebra of degree 2
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix algebra of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix algebra of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
 
 julia> a = zero(T)
 0
@@ -263,15 +263,15 @@ mullow(::NCPolyRingElem{T}, ::NCPolyRingElem{T}, ::Int) where T <: NCRingElem
 **Examples**
 
 ```jldoctest
-julia> R = MatrixAlgebra(ZZ, 2)
-Matrix algebra of degree 2
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix algebra of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix algebra of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
@@ -297,15 +297,15 @@ reverse(::NCPolyRingElem)
 **Examples**
 
 ```jldoctest
-julia> R = MatrixAlgebra(ZZ, 2)
-Matrix algebra of degree 2
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix algebra of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix algebra of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
@@ -331,15 +331,15 @@ shift_right(::NCPolyRingElem, ::Int)
 **Examples**
 
 ```jldoctest
-julia> R = MatrixAlgebra(ZZ, 2)
-Matrix algebra of degree 2
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix algebra of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix algebra of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
@@ -365,15 +365,15 @@ evaluated at $a$ by writing $f(a)$.
 **Examples**
 
 ```jldoctest
-julia> R = MatrixAlgebra(ZZ, 2)
-Matrix algebra of degree 2
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix algebra of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix algebra of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
 
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -399,15 +399,15 @@ derivative(::NCPolyRingElem)
 **Examples**
 
 ```jldoctest
-julia> R = MatrixAlgebra(ZZ, 2)
-Matrix algebra of degree 2
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix algebra of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix algebra of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
