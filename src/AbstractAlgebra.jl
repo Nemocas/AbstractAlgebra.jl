@@ -788,7 +788,7 @@ import .Generic: weights
 import .Generic: zero
 
 # Moved from Hecke into Misc
-import .Generic: Loc
+import .Generic: LocalizedEuclideanRing
 import .Generic: localization
 import .Generic: LocalizedEuclideanRingElem
 import .Generic: roots
@@ -1249,7 +1249,7 @@ export zero_matrix
 export divexact_low
 export divhigh
 export is_monic
-export Loc
+export LocalizedEuclideanRing
 export localization
 export LocalizedEuclideanRingElem
 export mulhigh_n

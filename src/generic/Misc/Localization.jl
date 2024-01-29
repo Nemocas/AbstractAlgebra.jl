@@ -2,22 +2,22 @@
 ###############################################################################
 
 #   Declaration types
-#   Loc / LocalizedEuclideanRingElem
+#   LocalizedEuclideanRing / LocalizedEuclideanRingElem
 #
 ###############################################################################
 
 # prime might be product of several primes if localized at several primes, those primes are in array primes
-mutable struct Loc{T} <: AbstractAlgebra.Ring
+mutable struct LocalizedEuclideanRing{T} <: AbstractAlgebra.Ring
    base_ring::AbstractAlgebra.Ring
    prime::T
    primes::Vector{T}  # in general, not set.
    comp::Bool  # false: den has to be coprime to prime
                # true:  den can ONLY use prime (and powers)
 
-   function Loc{T}(prime::T, primes::Vector{T}, cached::Bool = true, comp::Bool = false) where {T <: RingElem}
+   function LocalizedEuclideanRing{T}(prime::T, primes::Vector{T}, cached::Bool = true, comp::Bool = false) where {T <: RingElem}
       length(primes) == 0 && error("No element to localize at since array of primes is empty")
       if cached && haskey(LocDict, (parent(prime), prime, comp))
-         return LocDict[parent(prime), prime, comp]::Loc{T}
+         return LocDict[parent(prime), prime, comp]::LocalizedEuclideanRing{T}
       else
          z = new(parent(prime), prime, primes, comp)
          if cached
@@ -26,10 +26,10 @@ mutable struct Loc{T} <: AbstractAlgebra.Ring
          return z
       end
    end
-   function Loc{T}(prime::T, cached::Bool = true, comp::Bool = false) where {T <: RingElem}
+   function LocalizedEuclideanRing{T}(prime::T, cached::Bool = true, comp::Bool = false) where {T <: RingElem}
      is_unit(prime) && error("no-point")
      if cached && haskey(LocDict, (parent(prime), prime, comp))
-       return LocDict[parent(prime), prime, comp]::Loc{T}
+       return LocDict[parent(prime), prime, comp]::LocalizedEuclideanRing{T}
      else
        r = new()
        r.base_ring = parent(prime)
@@ -46,7 +46,7 @@ end
 
 const LocDict = Dict{Tuple{AbstractAlgebra.Ring, RingElement, Bool}, AbstractAlgebra.Ring}()
 
-function isin(a, L::Loc{T}) where {T <: RingElem}
+function isin(a, L::LocalizedEuclideanRing{T}) where {T <: RingElem}
   iszero(a) && return true
   L.comp || (!isone(gcd(denominator(a), prime(L))) && return false)
   L.comp && ppio(denominator(a), prime(L))[1] != denominator(a) && return false
@@ -55,8 +55,8 @@ end
 
 mutable struct LocalizedEuclideanRingElem{T} <: AbstractAlgebra.RingElem
    data::FieldElem
-   parent::Loc{T}
-   function LocalizedEuclideanRingElem{T}(data::FracElem{T}, par::Loc, checked::Bool = true) where {T <: RingElem}
+   parent::LocalizedEuclideanRing{T}
+   function LocalizedEuclideanRingElem{T}(data::FracElem{T}, par::LocalizedEuclideanRing, checked::Bool = true) where {T <: RingElem}
      checked && (isin(data, par) || error("illegal elt"))
      return new{T}(data,par)
    end
@@ -114,11 +114,11 @@ addeq!(a::LocalizedEuclideanRingElem, b::LocalizedEuclideanRingElem) = a + b
 #
 ###############################################################################
 
-elem_type(::Type{Loc{T}}) where {T} = LocalizedEuclideanRingElem{T}
+elem_type(::Type{LocalizedEuclideanRing{T}}) where {T} = LocalizedEuclideanRingElem{T}
 
-parent_type(::Type{LocalizedEuclideanRingElem{T}}) where {T} = Loc{T}
+parent_type(::Type{LocalizedEuclideanRingElem{T}}) where {T} = LocalizedEuclideanRing{T}
 
-base_ring(L::Loc) = L.base_ring
+base_ring(L::LocalizedEuclideanRing) = L.base_ring
 
 parent(a::LocalizedEuclideanRingElem) = a.parent
 
@@ -139,11 +139,11 @@ Base.numerator(a::LocalizedEuclideanRingElem{T}, canonicalise::Bool=true) where 
 
 Base.denominator(a::LocalizedEuclideanRingElem{T}, canonicalise::Bool=true) where {T <: RingElement} = denominator(data(a), canonicalise)
 
-prime(L::Loc) = L.prime
+prime(L::LocalizedEuclideanRing) = L.prime
 
-zero(L::Loc) = L(0)
+zero(L::LocalizedEuclideanRing) = L(0)
 
-one(L::Loc) = L(1)
+one(L::LocalizedEuclideanRing) = L(1)
 
 iszero(a::LocalizedEuclideanRingElem) = iszero(data(a))
 
@@ -165,7 +165,7 @@ function show(io::IO, a::LocalizedEuclideanRingElem)
    print(io, data(a))
 end
 
-function show(io::IO, L::Loc)
+function show(io::IO, L::LocalizedEuclideanRing)
    if L.comp
      print(io, "Localization of ", base_ring(L), " at complement of ", prime(L))
    else
@@ -361,23 +361,23 @@ promote_rule(::Type{LocalizedEuclideanRingElem{T}}, ::Type{LocalizedEuclideanRin
 #
 ###############################################################################
 
-(L::Loc{T})() where {T} = L(zero(base_ring(L)))
+(L::LocalizedEuclideanRing{T})() where {T} = L(zero(base_ring(L)))
 
-(L::Loc{T})(a::Integer)  where {T} = L(base_ring(L)(a))
+(L::LocalizedEuclideanRing{T})(a::Integer)  where {T} = L(base_ring(L)(a))
 
-function (L::Loc{T})(data::FracElem{T}, checked::Bool = true) where {T <: RingElem}
+function (L::LocalizedEuclideanRing{T})(data::FracElem{T}, checked::Bool = true) where {T <: RingElem}
    return LocalizedEuclideanRingElem{T}(data,L,checked)
 end
 
-function (L::Loc{T})(data::Rational{<: Integer}, checked::Bool = true) where {T}
+function (L::LocalizedEuclideanRing{T})(data::Rational{<: Integer}, checked::Bool = true) where {T}
    return LocalizedEuclideanRingElem{T}(base_ring(L)(numerator(data)) // base_ring(L)(denominator(data)),L,checked)
 end
 
-function (L::Loc{T})(data::T, checked::Bool = false) where {T <: RingElem}
+function (L::LocalizedEuclideanRing{T})(data::T, checked::Bool = false) where {T <: RingElem}
    return LocalizedEuclideanRingElem{T}(data // parent(data)(1),L,checked)
 end
 
-function (L::Loc{T})(a::LocalizedEuclideanRingElem{T}) where {T <: RingElement}
+function (L::LocalizedEuclideanRing{T})(a::LocalizedEuclideanRingElem{T}) where {T <: RingElement}
    L != parent(a) && error("No element of $L")
    return a
 end
@@ -431,7 +431,7 @@ localization parent object is cached and returned for any subsequent calls
 to the constructor with the same base ring $R$ and element $prime$.
 """
 function localization(R::AbstractAlgebra.Ring, prime::T; cached::Bool=true, comp::Bool = false) where {T <: RingElement}
-   return Loc{elem_type(R)}(R(prime), cached, comp)
+   return LocalizedEuclideanRing{elem_type(R)}(R(prime), cached, comp)
 end
 
 @doc raw"""
@@ -444,5 +444,5 @@ to the constructor with the same base ring $R$ and elements $primes$.
 """
 function localization(R::AbstractAlgebra.Ring, primes::Vector{T}; cached::Bool=true) where {T <: RingElement}
    prime = R(prod(primes))
-   return Loc{elem_type(R)}(prime, Vector{elem_type(R)}(primes), cached)
+   return LocalizedEuclideanRing{elem_type(R)}(prime, Vector{elem_type(R)}(primes), cached)
 end
