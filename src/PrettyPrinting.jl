@@ -1591,11 +1591,12 @@ function _write_line(io::IOCustom, str::AbstractString)
     spaceleft = c - ind - io.printed
   end
   #@show spaceleft
-  firstlen = min(spaceleft, length(str))
+  normalised_str = Base.Unicode.normalize(str)
+  firstlen = min(spaceleft, length(normalised_str))
   # make an iterator over valid indices
-  firstiter = Base.Iterators.take(eachindex(str), firstlen)
-  restiter = Base.Iterators.drop(eachindex(str), firstlen)
-  firststr = str[collect(firstiter)]
+  firstiter = Base.Iterators.take(eachindex(normalised_str), firstlen)
+  restiter = Base.Iterators.drop(eachindex(normalised_str), firstlen)
+  firststr = normalised_str[collect(firstiter)]
   if io.lowercasefirst
     written += write(io.io, lowercasefirst(firststr))
     io.lowercasefirst = false
@@ -1604,14 +1605,14 @@ function _write_line(io::IOCustom, str::AbstractString)
     io.lowercasefirst = false
   end
   io.printed += textwidth(firststr)
-  reststr = str[collect(restiter)]
+  reststr = normalised_str[collect(restiter)]
   it = Iterators.partition(1:textwidth(reststr), c - ind > 0 ? c - ind : c)
   for i in it
     # partitions of the spillover text
     written += write(io.io, "\n")
     written += write_indent(io)
-    for j in Base.Iterators.drop(Base.Iterators.take(str,i[end]), i[begin]-1)
-      # j is str[i[begin]:i[end]], constructed via iterators
+    for j in Base.Iterators.drop(Base.Iterators.take(normalised_str,i[end]), i[begin]-1)
+      # j is noramlised_str[i[begin]:i[end]], constructed via iterators
       written += write(io.io, j)
       io.printed = textwidth(j)
     end
