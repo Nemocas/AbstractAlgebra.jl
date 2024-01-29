@@ -1607,9 +1607,11 @@ function _write_line(io::IOCustom, str::AbstractString)
   reststr = str[collect(restiter)]
   it = Iterators.partition(1:textwidth(reststr), c - ind > 0 ? c - ind : c)
   for i in it
+    # partitions of the spillover text
     written += write(io.io, "\n")
     written += write_indent(io)
     for j in Base.Iterators.drop(Base.Iterators.take(str,i[end]), i[begin]-1)
+      # j is str[i[begin]:i[end]], constructed via iterators
       written += write(io.io, j)
       io.printed = textwidth(j)
     end
