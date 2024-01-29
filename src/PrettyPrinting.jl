@@ -1595,11 +1595,7 @@ function _write_line(io::IOCustom, str::AbstractString)
   # make an iterator over valid indices
   firstiter = Base.Iterators.take(eachindex(str), firstlen)
   restiter = Base.Iterators.drop(eachindex(str), firstlen)
-  firststr = ""
-  reststr = ""
-  for index in firstiter
-   firststr *= str[index]
-  end
+  firststr = str[collect(firstiter)]
   if io.lowercasefirst
     written += write(io.io, lowercasefirst(firststr))
     io.lowercasefirst = false
@@ -1608,9 +1604,7 @@ function _write_line(io::IOCustom, str::AbstractString)
     io.lowercasefirst = false
   end
   io.printed += textwidth(firststr)
-  for index in restiter
-   reststr *= str[index]
-  end
+  reststr = str[collect(restiter)]
   it = Iterators.partition(1:textwidth(reststr), c - ind > 0 ? c - ind : c)
   for i in it
     written += write(io.io, "\n")
