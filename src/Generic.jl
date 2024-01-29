@@ -292,7 +292,7 @@ include("generic/PuiseuxSeries.jl")
 
 include("generic/Matrix.jl")
 
-include("generic/MatrixAlgebra.jl")
+include("generic/MatRing.jl")
 
 include("generic/FreeAssAlgebra.jl")
 

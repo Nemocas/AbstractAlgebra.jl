@@ -12,7 +12,7 @@ matrices over any ring belonging to the AbstractAlgebra abstract type
 hierarchy. This functionality will work for any matrix type which
 follows the Matrix interface.
 
-Similarly, AbstractAlgebra.jl provides a module in `src/MatrixAlgebra.jl` for
+Similarly, AbstractAlgebra.jl provides a module in `src/MatRing.jl` for
 matrix algebras over a ring.
 
 ## Generic matrix types
@@ -21,8 +21,8 @@ AbstractAlgebra.jl allows the creation of dense matrices over any computable
 ring $R$. Generic matrices over a ring are implemented in
 `src/generic/Matrix.jl`.
 
-Generic matrix algebras of $m\times m$ matrices are implemented in
-`src/generic/MatrixAlgebra.jl`.
+Generic matrix rings of $m\times m$ matrices are implemented in
+`src/generic/MatRing.jl`.
 
 Generic matrices in AbstractAlgebra.jl have type `Generic.MatSpaceElem{T}` for matrices
 in a matrix space, or `Generic.MatRingElem{T}` for matrices in a matrix algebra, where

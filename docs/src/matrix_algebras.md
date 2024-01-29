@@ -11,7 +11,7 @@ AbstractAlgebra.jl allows the creation of an algebra (ring) of $m\times m$ matri
 a computable, commutative ring.
 
 Functions specific to generic matrix algebras of $m\times m$ matrices are implemented in
-`src/generic/MatrixAlgebra.jl`. The remaining functionality is in the file
+`src/generic/MatRing.jl`. The remaining functionality is in the file
 `src/generic/Matrix.jl`.
 
 As well as implementing the entire Matrix interface, including the optional
