@@ -14,7 +14,7 @@ end
 @testset "NCRings.powers" begin
    
    # non-commutative rings
-   A = MatrixAlgebra(ZZ, rand(1:9))
+   A = matrix_ring(ZZ, rand(1:9))
    a = rand(A, 1:9)
 
    B, _ = polynomial_ring(A, "y")

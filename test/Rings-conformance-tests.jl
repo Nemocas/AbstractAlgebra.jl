@@ -474,7 +474,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
 end
 
 function test_elem(S::Union{AbstractAlgebra.MatSpace,
-                            AbstractAlgebra.MatAlgebra})
+                            AbstractAlgebra.MatRing})
    R = base_ring(S)
    return S(elem_type(R)[test_elem(R) for i in 1:nrows(S), j in 1:ncols(S)])
 end
@@ -527,7 +527,7 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
    return nothing
 end
 
-function test_MatAlgebra_interface(S::MatAlgebra; reps = 20)
+function test_MatAlgebra_interface(S::MatRing; reps = 20)
 
    ST = elem_type(S)
    R = base_ring(S)
@@ -535,7 +535,7 @@ function test_MatAlgebra_interface(S::MatAlgebra; reps = 20)
 
    @test nrows(S) == ncols(S)
 
-   @testset "MatAlgebra interface for $(S) of type $(typeof(S))" begin
+   @testset "MatRing interface for $(S) of type $(typeof(S))" begin
 
       test_NCRing_interface(S, reps = reps)
 
@@ -583,7 +583,7 @@ function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
    test_Ring_interface(R; reps = reps)
    Rx, _ = polynomial_ring(R, "x")
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
-   S = MatrixAlgebra(R, rand(0:3))
+   S = matrix_ring(R, rand(0:3))
    test_MatAlgebra_interface(S, reps = 2 + fld(reps, 2))
    S = matrix_space(R, rand(0:3), rand(0:3))
    test_MatSpace_interface(S, reps = 2 + fld(reps, 2))

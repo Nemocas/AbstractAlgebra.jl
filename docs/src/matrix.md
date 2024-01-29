@@ -25,7 +25,7 @@ Generic matrix algebras of $m\times m$ matrices are implemented in
 `src/generic/MatrixAlgebra.jl`.
 
 Generic matrices in AbstractAlgebra.jl have type `Generic.MatSpaceElem{T}` for matrices
-in a matrix space, or `Generic.MatAlgElem{T}` for matrices in a matrix algebra, where
+in a matrix space, or `Generic.MatRingElem{T}` for matrices in a matrix algebra, where
 `T` is the type of elements of the matrix. Internally, generic matrices are implemented
 using an object wrapping a Julia two dimensional array, though they are not themselves
 Julia arrays. See the file `src/generic/GenericTypes.jl` for details.
@@ -35,7 +35,7 @@ but with an abstract type called `Generic.Mat` which includes `MatSpaceElem` and
 thereof.
 
 Parents of generic matrices (matrix spaces) have type `Generic.MatSpace{T}`. Parents of
-matrices in a matrix algebra have type `Generic.MatAlgebra{T}`.
+matrices in a matrix algebra have type `Generic.MatRing{T}`.
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent object,
 however to allow creation of matrices without first creating the matrix space parent,
@@ -49,8 +49,8 @@ demand.
 The generic matrix types (matrix spaces) belong to the abstract type
 `MatElem{T}` and the matrix space parent types belong to
 `MatSpace{T}`. Similarly the generic matrix algebra matrix types belong
-to the abstract type `MatAlgElem{T}` and the parent types belong to
- `MatAlgebra{T}` Note that both
+to the abstract type `MatRingElem{T}` and the parent types belong to
+ `MatRing{T}` Note that both
 the concrete type of a matrix space parent object and the abstract class it belongs to
 have the name `MatElem`, therefore disambiguation is required to specify which is
 intended. The same is true for the abstract types for matrix spaces and their elements.
@@ -111,7 +111,7 @@ This can be done with either two or one dimensional arrays.
 
 ```julia
 (S::MatSpace{T})(A::Matrix{S}) where {S <: RingElement, T <: RingElement}
-(S::MatAlgebra{T})(A::Matrix{S}) where {S <: RingElement, T <: RingElement}
+(S::MatRing{T})(A::Matrix{S}) where {S <: RingElement, T <: RingElement}
 ```
 
 Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`,
@@ -148,8 +148,8 @@ julia> S = matrix_space(QQ, 2, 3)
 Matrix space of 2 rows and 3 columns
   over rationals
 
-julia> T = MatrixAlgebra(QQ, 2)
-Matrix algebra of degree 2
+julia> T = matrix_ring(QQ, 2)
+Matrix ring of degree 2
   over rationals
 
 julia> M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
@@ -239,8 +239,8 @@ julia> P = zero_matrix(ZZ, 3, 2)
 [0   0]
 [0   0]
 
-julia> R = MatrixAlgebra(ZZ, 2)
-Matrix algebra of degree 2
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
   over integers
 
 julia> M = R()

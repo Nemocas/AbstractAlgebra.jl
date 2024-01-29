@@ -80,7 +80,7 @@ function check_square(S::MatSpace)
    S
 end
 
-check_square(S::MatAlgebra) = S
+check_square(S::MatRing) = S
 
 ###############################################################################
 #
@@ -341,7 +341,7 @@ end
 function _similar(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
    TT = elem_type(R)
    M = Matrix{TT}(undef, (r, c))
-   z = x isa MatElem ? Generic.MatSpaceElem{TT}(R, M) : Generic.MatAlgElem{TT}(R, M)
+   z = x isa MatElem ? Generic.MatSpaceElem{TT}(R, M) : Generic.MatRingElem{TT}(R, M)
    return z
 end
 
@@ -6778,7 +6778,7 @@ end
 # like change_base_ring, but without initializing the entries
 # this function exists until a better API is implemented
 _change_base_ring(R::NCRing, a::MatElem) = zero_matrix(R, nrows(a), ncols(a))
-_change_base_ring(R::NCRing, a::MatAlgElem) = MatrixAlgebra(R, nrows(a))()
+_change_base_ring(R::NCRing, a::MatRingElem) = matrix_ring(R, nrows(a))()
 
 @doc raw"""
     change_base_ring(R::NCRing, M::MatrixElem{T}) where T <: NCRingElement

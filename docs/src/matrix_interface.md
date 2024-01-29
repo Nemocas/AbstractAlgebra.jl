@@ -38,8 +38,8 @@ AbstractAlgebra provides two abstract types for matrix spaces and their elements
 
 It also provides two abstract types for matrix algebras and their elements:
 
-  * `MatAlgebra{T}` is the abstract type for matrix algebra parent types
-  * `MatAlgElem{T}` is the abstract type for matrix types belonging to a matrix algebra
+  * `MatRing{T}` is the abstract type for matrix algebra parent types
+  * `MatRingElem{T}` is the abstract type for matrix types belonging to a matrix algebra
 
 Note that these abstract types are parameterised. The type `T` should usually be the
 type of elements of the matrices.
@@ -301,7 +301,7 @@ also possible to specify only one `Int` as the order (e.g. `similar(x, n)`).
 
 Custom matrices and rings may choose which specific matrix type is best-suited to return for the
 given ring and dimensionality. If they do not specialize these functions, the default is a
-`Generic.MatSpaceElem` matrix, or `Generic.MatAlgElem` for matrix algebras.
+`Generic.MatSpaceElem` matrix, or `Generic.MatRingElem` for matrix algebras.
 The default implementation of `zero` calls out to `similar`, so it's generally
 sufficient to specialize only `similar`.
 For both `similar` and `zero`, only the most general method has to be implemented

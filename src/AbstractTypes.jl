@@ -95,7 +95,7 @@ abstract type FracField{T} <: Field end
 
 abstract type MatSpace{T} <: Module{T} end
 
-abstract type MatAlgebra{T} <: NCRing end
+abstract type MatRing{T} <: NCRing end
 
 abstract type FreeAssAlgebra{T} <: NCRing end
 
@@ -142,7 +142,7 @@ abstract type AbsMSeriesElem{T} <: MSeriesElem{T} end
 
 abstract type MatElem{T} <: ModuleElem{T} end
 
-abstract type MatAlgElem{T} <: NCRingElem end
+abstract type MatRingElem{T} <: NCRingElem end
 
 abstract type FreeAssAlgElem{T} <: NCRingElem end
 

@@ -249,8 +249,8 @@ export LaurentMPolyRingElem
 export LaurentPolyRing
 export LaurentPolyRingElem
 export Map
-export MatAlgebra
-export MatAlgElem
+export MatRing
+export MatRingElem
 export MatElem
 export MatSpace
 export ModuleElem
@@ -553,7 +553,7 @@ end
 include("AbstractTypes.jl")
 
 const PolynomialElem{T} = Union{PolyRingElem{T}, NCPolyRingElem{T}}
-const MatrixElem{T} = Union{MatElem{T}, MatAlgElem{T}}
+const MatrixElem{T} = Union{MatElem{T}, MatRingElem{T}}
 
 ###############################################################################
 #
@@ -1050,8 +1050,8 @@ export map2
 export mat
 export matrix
 export matrix_repr
+export matrix_ring
 export matrix_space
-export MatrixAlgebra
 export MatrixElem
 export max_fields
 export max_precision

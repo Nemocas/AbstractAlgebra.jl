@@ -168,7 +168,7 @@ julia> R, (x, y) = free_associative_algebra(ZZ, ["x", "y"]);
 julia> f = x*y - y*x
 x*y - y*x
 
-julia> S = MatrixAlgebra(ZZ, 2);
+julia> S = matrix_ring(ZZ, 2);
 
 julia> m1 = S([1 2; 3 4])
 [1   2]

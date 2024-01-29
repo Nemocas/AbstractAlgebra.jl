@@ -23,7 +23,7 @@ skinparam RoundCorner 15
 
 ' Non-commutative rings
 "Set" -down-> "NCRing"
-"NCRing" -down--> "MatAlgebra{T}"
+"NCRing" -down--> "MatRing{T}"
 "NCRing" -down--> "NCPolyRing{T}"
 "NCRing" -down-> "Ring"
 
@@ -79,7 +79,7 @@ skinparam RoundCorner 15
 
 ' Non-commutative rings
 "SetElem" -down-> "NCRingElem"
-"NCRingElem" -down--> "MatAlgElem{T}"
+"NCRingElem" -down--> "MatRingElem{T}"
 "NCRingElem" -down--> "NCPolyRingElem{T}"
 "NCRingElem" -down-> "RingElem"
 

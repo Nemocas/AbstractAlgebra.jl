@@ -1,5 +1,5 @@
 @testset "Generic.NCPoly.constructors" begin
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S1 = polynomial_ring(R, "y")
    S2 = R["y"]
 
@@ -19,8 +19,8 @@
    end
 
    S3, _ = R["x"]["y"]
-   @test elem_type(S3) == Generic.NCPoly{Generic.NCPoly{Generic.MatAlgElem{BigInt}}}
-   @test typeof(S3) == Generic.NCPolyRing{Generic.NCPoly{Generic.MatAlgElem{BigInt}}}
+   @test elem_type(S3) == Generic.NCPoly{Generic.NCPoly{Generic.MatRingElem{BigInt}}}
+   @test typeof(S3) == Generic.NCPolyRing{Generic.NCPoly{Generic.MatRingElem{BigInt}}}
 
    S, y = S1
    T, z = polynomial_ring(S, "z")
@@ -63,7 +63,7 @@
 end
 
 @testset "Generic.NCPoly.manipulation" begin
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
 
    @test iszero(zero(S))
@@ -105,7 +105,7 @@ end
 end
 
 @testset "Generic.NCPoly.rand" begin
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
 
    test_rand(S, -1:10, -10:10)
@@ -113,7 +113,7 @@ end
 
 @testset "Generic.NCPoly.binary_ops" begin
    #  Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
 
    for iter = 1:100
@@ -131,7 +131,7 @@ end
 
 @testset "Generic.NCPoly.adhoc_binary" begin
    # Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
    for iter = 1:500
       f = rand(S, -1:10, -10:10)
@@ -146,7 +146,7 @@ end
    end
 
    # Generic tower
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
    T, z = polynomial_ring(S, "z")
    for iter = 1:100
@@ -177,7 +177,7 @@ end
 
 @testset "Generic.NCPoly.comparison" begin
    # Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
    for iter = 1:500
       f = rand(S, -1:10, -10:10)
@@ -192,7 +192,7 @@ end
 
 @testset "Generic.NCPoly.adhoc_comparison" begin
    # Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
    for iter = 1:500
       f = rand(S, 0:10, -10:10)
@@ -213,7 +213,7 @@ end
    end
 
    # Generic tower
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
    T, z = polynomial_ring(S, "z")
    for iter = 1:100
@@ -235,7 +235,7 @@ end
 
 @testset "Generic.NCPoly.unary_ops" begin
    #  Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
    for iter = 1:300
       f = rand(S, -1:10, -10:10)
@@ -247,7 +247,7 @@ end
 
 @testset "Generic.NCPoly.truncation" begin
    #  Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
    for iter = 1:300
       f = rand(S, -1:10, -10:10)
@@ -260,7 +260,7 @@ end
 
 @testset "Generic.NCPoly.reverse" begin
    #  Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
    for iter = 1:300
       f = rand(S, -1:10, -10:10)
@@ -282,7 +282,7 @@ end
 
 @testset "Generic.NCPoly.shift" begin
    # Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
    for iter = 1:300
       f = rand(S, -1:10, -10:10)
@@ -297,7 +297,7 @@ end
 
 @testset "Generic.NCPoly.powering" begin
    # Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
 
    for iter = 1:10
@@ -322,7 +322,7 @@ end
 
 @testset "Generic.NCPoly.exact_division" begin
    # Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
 
    for iter = 1:100
@@ -339,7 +339,7 @@ end
 
 @testset "Generic.NCPoly.adhoc_exact_division" begin
    # Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
 
    for iter = 1:100
@@ -362,7 +362,7 @@ end
    end
 
    # Generic tower
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
    T, z = polynomial_ring(S, "z")
 
@@ -388,7 +388,7 @@ end
 
 @testset "Generic.NCPoly.evaluation" begin
    # Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
 
    for iter in 1:10
@@ -411,7 +411,7 @@ end
 
 @testset "Generic.NCPoly.derivative" begin
    # Exact ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S, y = polynomial_ring(R, "y")
 
    for iter in 1:10
@@ -425,7 +425,7 @@ end
 end
 
 @testset "Generic.NCPoly.printing" begin
-   M = MatrixAlgebra(ZZ, 3)
+   M = matrix_ring(ZZ, 3)
    _, x = M['x']
    @test string(M(-1)*x) isa String
 end

@@ -331,7 +331,7 @@ end
    @test block_diagonal_matrix(ZZ, [K1]) == block_diagonal_matrix([K])
 
    # Test constructors over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
 
@@ -458,7 +458,7 @@ end
    @test !is_square(B)
 
    # test over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
 
@@ -546,7 +546,7 @@ end
       @test isempty(n)
    end
 
-   M3 = MatrixAlgebra(R, 3)
+   M3 = matrix_ring(R, 3)
    for m3 in [rand(M3, -1:9, -9:9),
               rand(rng, M3, -1:9, -9:9),
               randmat_triu(M3, -1:9, -9:9),
@@ -560,11 +560,11 @@ end
       @test elem_type(base_ring(m3)) == ET
       @test !isempty(m3)
       @test !iszero(m3)
-      @test m3 isa Generic.MatAlgElem
+      @test m3 isa Generic.MatRingElem
       @test parent(m3) == M3
    end
 
-   M0 = MatrixAlgebra(R, 0)
+   M0 = matrix_ring(R, 0)
    m0 = rand(M0, -1:9, -9:9)
    @test length(m0) == 0
    @test isempty(m0)
@@ -592,7 +592,7 @@ end
    end
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
 
@@ -672,7 +672,7 @@ end
    @test -z.m isa Generic.MatSpaceElem{F2Elem}
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
 
@@ -1156,7 +1156,7 @@ end
    end
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
    
@@ -1213,7 +1213,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
       v = elem_type(R)[rand(R, randargs...) for i in 1:3]
       @test v*A == [v[1]*A[1,i] + v[2]*A[2,i] + v[3]*A[3,i] for i in 1:ncols(A)]
 
-      A = rand(MatrixAlgebra(R, 2), randargs...)
+      A = rand(matrix_ring(R, 2), randargs...)
       v = elem_type(R)[rand(R, randargs...) for i in 1:2]
       @test A*v == [A[i,1]*v[1] + A[i,2]*v[2] for i in 1:nrows(A)]
       v = elem_type(R)[rand(R, randargs...) for i in 1:2]
@@ -1320,7 +1320,7 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
    _test_matrix_vector_prod(R, -1000:1000)
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
    
@@ -1469,7 +1469,7 @@ end
    end
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
    
@@ -1502,7 +1502,7 @@ end
    @test one(S) == one(S)
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
    
@@ -1534,7 +1534,7 @@ end
    @test A^-1 == inv(A)
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
    
@@ -1567,7 +1567,7 @@ end
    @test divexact_right(Qxy[2 0; 0 2], Qx(2), check = false) == identity_matrix(Qxy, 2)
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    U, x = polynomial_ring(R, "x")
 
    S = matrix_space(R, 2, 2)
@@ -1602,12 +1602,12 @@ end
    @test !is_symmetric(matrix(R, [t + 1 t R(1); t^2 t t]))
    @test is_symmetric(matrix(R, [t + 1 t R(1); t t^2 t; R(1) t R(5)]))
    @test !is_symmetric(matrix(R, [t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
-   S = MatrixAlgebra(R, 3)
+   S = matrix_ring(R, 3)
    @test is_symmetric(S([t + 1 t R(1); t t^2 t; R(1) t R(5)]))
    @test !is_symmetric(S([t + 1 t R(1); t + 1 t^2 t; R(1) t R(5)]))
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
    
@@ -1626,7 +1626,7 @@ end
    end
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    S = matrix_space(R, 2, 2)
    M = rand(S, -10:10)
 
@@ -3560,7 +3560,7 @@ end
                                     0 1 0 1 2;])
 
    # Test constructors over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 2, 2)
 
@@ -4029,7 +4029,7 @@ end
    end
 
    # Test views over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    
    S = matrix_space(R, 4, 4)
    
@@ -4044,7 +4044,7 @@ end
 
 @testset "Generic.Mat.change_base_ring" begin
    for (P, Q, T) in ((matrix_space(ZZ, 2, 3), matrix_space(ZZ, 3, 2), MatElem),
-                     (MatrixAlgebra(ZZ, 3), MatrixAlgebra(ZZ, 3), MatAlgElem))
+                     (matrix_ring(ZZ, 3), matrix_ring(ZZ, 3), MatRingElem))
       M = rand(P, -10:10)
       N = rand(Q, -10:10)
       for R in [QQ, ZZ, GF(2), GF(5)]
@@ -4066,7 +4066,7 @@ end
    @test change_base_ring(F2(), z.m) isa F2Matrix
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    U, x = polynomial_ring(R, "x")
    S = matrix_space(R, 2, 2)
    
@@ -4082,7 +4082,7 @@ end
    for (mat, algebra) = ((rand(1:9, u, v), false),
                          (rand(1:9, u, u), true))
       for R = [QQ, ZZ, GF(2), GF(7), polynomial_ring(GF(5), 'x')[1]]
-         M = algebra ? MatrixAlgebra(R, u) : matrix_space(R, u, v)
+         M = algebra ? matrix_ring(R, u) : matrix_space(R, u, v)
          m0 = M(mat)
          for f0 = (x -> x + 1, x -> x*2, x -> one(R), x -> zero(R))
             for f = (f0, map_from_func(f0, R, R))
@@ -4098,7 +4098,7 @@ end
             end
          end
       end
-      m0 = algebra ? MatrixAlgebra(ZZ, u)(mat) : matrix_space(ZZ, u, v)(mat)
+      m0 = algebra ? matrix_ring(ZZ, u)(mat) : matrix_space(ZZ, u, v)(mat)
       m = deepcopy(m0)
       for S = [QQ, ZZ, GF(2), GF(7), polynomial_ring(GF(5), 'x')[1]]
          for f0 = (x -> S(x), x -> S(x + 1))
@@ -4106,11 +4106,11 @@ end
                n = map_entries(f, m)
                @test n !== m
                @test m == m0 # map's input must not be mutated
-               M = algebra ? MatrixAlgebra(S, u) : matrix_space(S, u, v)
+               M = algebra ? matrix_ring(S, u) : matrix_space(S, u, v)
                if !isempty(mat)
                   @test n == M(map(f isa Function ? f : f.image_fn, mat))
                end
-               @test n isa (algebra ? MatAlgElem : MatElem)
+               @test n isa (algebra ? MatRingElem : MatElem)
             end
          end
       end
@@ -4121,7 +4121,7 @@ end
    @test map(identity, z.m) isa F2Matrix
 
    # Tests over noncommutative ring
-   R = MatrixAlgebra(ZZ, 2)
+   R = matrix_ring(ZZ, 2)
    U, x = polynomial_ring(R, "x")
    S = matrix_space(R, 2, 2)
    T = matrix_space(U, 2, 2)
@@ -4185,10 +4185,10 @@ end
    @test sprint(show, "text/plain", matrix(ZZ, [3 1 2; 2 0 1])) == "[3   1   2]\n[2   0   1]"
    @test sprint(show, "text/plain", matrix(ZZ, 2, 0, [])) == "2 by 0 empty matrix"
    @test sprint(show, "text/plain", matrix(ZZ, 0, 3, [])) == "0 by 3 empty matrix"
-   S = MatrixAlgebra(QQ, 3)
+   S = matrix_ring(QQ, 3)
    @test sprint(show, "text/plain", S([1 2 3; 4 5 6; 7 8 9])) ==
       "[1//1   2//1   3//1]\n[4//1   5//1   6//1]\n[7//1   8//1   9//1]"
-   @test sprint(show, "text/plain", MatrixAlgebra(QQ, 0)()) == "0 by 0 empty matrix"
+   @test sprint(show, "text/plain", matrix_ring(QQ, 0)()) == "0 by 0 empty matrix"
    @test sprint(show, "text/plain", similar(matrix(ZZ, [3 1 2; 2 0 1]))) ==
       "[#undef   #undef   #undef]\n[#undef   #undef   #undef]"
 
