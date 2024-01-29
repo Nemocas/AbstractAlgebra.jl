@@ -1613,10 +1613,13 @@ function _write_line(io::IOCustom, str::AbstractString)
   end
   it = Iterators.partition(1:textwidth(reststr), c - ind > 0 ? c - ind : c)
   for i in it
-    written += write(io.io, "\n")
-    written += write_indent(io)
-    written += write(io.io, reststr[i])
-    io.printed = textwidth(reststr[i])
+   written += write(io.io, "\n")
+   written += write_indent(io)
+   for j in Base.Iterators.drop(Base.Iterators.take(str,i[end]), i[begin]-1)
+      written += write(io.io, j)
+      io.printed = textwidth(j)
+   end
+   println()
   end
   return written
 end

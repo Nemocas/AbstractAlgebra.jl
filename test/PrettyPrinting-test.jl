@@ -438,6 +438,22 @@ let
                              "    aa" * "t"^(c - 6) * "\n" *
                              "    tttttt"
 
+  # Test unicode string longer than width
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  _, c = displaysize(io)
+  print(io, AbstractAlgebra.Indent())
+  println(io, "Ŏ"^c)
+  println(io, "aa", "Ś"^c)
+  print(io, AbstractAlgebra.Indent())
+  print(io, "aa", "Ŗ"^c)
+  @test String(take!(io)) == "  " * "Ŏ"^(c-2) * "\n" *
+                             "  ŎŎ" * "\n" *
+                             "  aa" * "Ś"^(c-4) * "\n" *
+                             "  ŚŚŚŚ" * "\n" *
+                             "    aa" * "Ŗ"^(c-6) * "\n" *
+                             "    ŖŖŖŖŖŖ"
+
   # Test too much indentation
   io = IOBuffer()
   io = AbstractAlgebra.pretty(io, force_newlines = true)
