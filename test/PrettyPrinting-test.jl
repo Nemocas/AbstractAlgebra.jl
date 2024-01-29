@@ -415,6 +415,13 @@ let
                              "    test\n" *
                              "  test"
 
+  # Test unicode
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  println(io, "testing unicode")
+  print(io, AbstractAlgebra.Indent(), "ŎŚĊĂŖ")
+  @test String(take!(io)) == "testing unicode\n" *
+                             "  ŎŚĊĂŖ"
   # Test string longer than width
   io = IOBuffer()
   io = AbstractAlgebra.pretty(io, force_newlines = true)
