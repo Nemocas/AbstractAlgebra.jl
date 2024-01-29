@@ -260,7 +260,7 @@ end
 # TODO: symbols vs strings
 #       lift(PolyRing, Series)
 #       lift(FracField, Series)
-#       (to be in line with lift(ZZ, padic) and lift(QQ, padic)
+#       (to be in line with lift(ZZ, PadicFieldElem) and lift(QQ, PadicFieldElem)
 #TODO: some of this would only work for Abs, not Rel, however, this should be fine here
 function map_coefficients(f::T, a::RelPowerSeriesRingElem; parent::SeriesRing) where T
     c = typeof(f(coeff(a, 0)))[]
