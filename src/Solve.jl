@@ -651,7 +651,7 @@ end
 function check_linear_system_dim_right(A::Union{MatElem, SolveCtx}, b::MatElem, throw_error::Bool = true)
   fl = nrows(A) == nrows(b)
   if !fl && throw_error
-    error("Incompatible number of rows in linear system (use `side = :left` to switch to an action from the left)")
+    error("Incompatible number of rows in linear system (use `side = :left` for a system with the indeterminate on the left)")
   end
   return fl
 end
@@ -659,7 +659,7 @@ end
 function check_linear_system_dim_right(A::Union{MatElem, SolveCtx}, b::Vector, throw_error::Bool = true)
   fl = nrows(A) == length(b)
   if !fl && throw_error
-    error("Incompatible number of rows in linear system (use `side = :left` to switch to an action from the left)")
+    error("Incompatible number of rows in linear system (use `side = :left` for a system with the indeterminate on the left)")
   end
   return fl
 end
@@ -668,7 +668,7 @@ end
 function check_linear_system_dim_left(A::Union{MatElem, SolveCtx}, b::MatElem, throw_error::Bool = true)
   fl = ncols(A) == ncols(b)
   if !fl && throw_error
-    error("Incompatible number of columns in linear system (use `side = :right` to switch to an action from the right)")
+    error("Incompatible number of columns in linear system (use `side = :right` for a system with the indeterminate on the right)")
   end
   return fl
 end
@@ -676,7 +676,7 @@ end
 function check_linear_system_dim_left(A::Union{MatElem, SolveCtx}, b::Vector, throw_error::Bool = true)
   fl = ncols(A) == length(b)
   if !fl && throw_error
-    error("Incompatible number of columns in linear system (use `side = :right` to switch to an action from the right)")
+    error("Incompatible number of columns in linear system (use `side = :right` for a system with the indeterminate on the right)")
   end
   return fl
 end
