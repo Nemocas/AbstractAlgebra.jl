@@ -410,7 +410,7 @@ macro show_name(io, O)
         set_name!(o, s)
       end
     end
-    if get(i, :compact, false) && s !== nothing
+    if s !== nothing && (get(i, :supercompact, false) || get(i, :compact, false))
       if AbstractAlgebra.PrettyPrinting._supports_io_custom(i)
         print(i, LowercaseOff())
       end
