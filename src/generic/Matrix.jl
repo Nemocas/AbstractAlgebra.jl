@@ -161,7 +161,7 @@ function (a::MatSpace{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
          if i != j
             entries[i, j] = zero(R)
          else
-            entries[i, j] = rb
+            entries[i, j] = i == 1 ? rb : deepcopy(rb)
          end
       end
    end
