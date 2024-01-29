@@ -462,6 +462,19 @@ macro show_special(io, O)
   end )
 end
 
+macro show_special(io, mime, O)
+  return :( begin
+    local i = $(esc(io))
+    local m = $(esc(mime))
+    local o = $(esc(O))
+    s = get_attribute(o, :show)
+    if s !== nothing
+      s(i, m, o)
+      return
+    end
+  end )
+end
+
 macro show_special_elem(io, e)
   return :( begin
     local i = $(esc(io))
@@ -470,6 +483,20 @@ macro show_special_elem(io, e)
     s = get_attribute(o, :show_elem)
     if s !== nothing
       s(i, a)
+      return
+    end
+  end )
+end
+
+macro show_special_elem(io, mime, e)
+  return :( begin
+    local i = $(esc(io))
+    local m = $(esc(mime))
+    local a = $(esc(e))
+    local o = parent(a)
+    s = get_attribute(o, :show_elem)
+    if s !== nothing
+      s(i, m, a)
       return
     end
   end )
