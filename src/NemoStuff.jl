@@ -351,7 +351,7 @@ function gens(R::Union{EuclideanRingResidueRing{T},EuclideanRingResidueField{T}}
     return r
 end
 
-promote_rule(::Type{LocElem{T}}, ::Type{T}) where {T} = LocElem{T}
+promote_rule(::Type{LocalizedEuclideanRingElem{T}}, ::Type{T}) where {T} = LocalizedEuclideanRingElem{T}
 
 promote_rule(::Type{T}, ::Type{S}) where {S<:NumFieldElem,T<:Integer} = S
 

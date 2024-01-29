@@ -790,7 +790,7 @@ import .Generic: zero
 # Moved from Hecke into Misc
 import .Generic: Loc
 import .Generic: localization
-import .Generic: LocElem
+import .Generic: LocalizedEuclideanRingElem
 import .Generic: roots
 import .Generic: sturm_sequence
 
@@ -1251,7 +1251,7 @@ export divhigh
 export is_monic
 export Loc
 export localization
-export LocElem
+export LocalizedEuclideanRingElem
 export mulhigh_n
 export PolyCoeffs
 export roots
