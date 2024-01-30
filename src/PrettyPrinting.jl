@@ -1397,8 +1397,8 @@ function is_unicode_allowed()
   return @load_preference("unicode", default = false)
 end
 
-function with_unicode(f::Function)
-  old_allow_unicode = allow_unicode(true)
+function with_unicode(f::Function, flag::Bool=true)
+  old_allow_unicode = allow_unicode(flag)
   try
     f()
   finally
