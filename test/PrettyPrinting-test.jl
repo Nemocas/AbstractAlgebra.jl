@@ -422,6 +422,23 @@ let
   print(io, AbstractAlgebra.Indent(), "ŎŚĊĂŖ")
   @test String(take!(io)) == "testing unicode\n" *
                              "  ŎŚĊĂŖ"
+
+  # Test evil unicodes
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  _, c = displaysize(io)
+  print(io, AbstractAlgebra.Indent())
+  ellipses = String([0xe2, 0x80, 0xa6])
+  wedge = String([0xe2, 0x88, 0xa7])
+  iacute = String([0xc3, 0xad])
+  str = wedge ^25 * ellipses^25 * iacute^50
+  print(io, "aa", str)
+  @test String(take!(io)) == "  aa∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧" *
+                             "…………………………………………………………………" *
+                             "íííííííííííííííííííííííííí\n" *
+                             "  íííííííííííííííííííííííí"
+
+
   # Test string longer than width
   io = IOBuffer()
   io = AbstractAlgebra.pretty(io, force_newlines = true)
@@ -453,6 +470,34 @@ let
                              "  ŚŚŚŚ" * "\n" *
                              "    aa" * "Ŗ"^(c-6) * "\n" *
                              "    ŖŖŖŖŖŖ"
+
+  # Test evil unicode string much longer than width
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  _, c = displaysize(io)
+  ellipses = String([0xe2, 0x80, 0xa6])
+  wedge = String([0xe2, 0x88, 0xa7])
+  iacute = String([0xc3, 0xad])
+  print(io, AbstractAlgebra.Indent())
+  println(io, "Ŏ"^c)
+  println(io, ellipses^c)
+  println(io, "aa", "Ś"^c)
+  println(io, "bb", wedge^c)
+  print(io, AbstractAlgebra.Indent())
+  println(io, "aa", "Ŗ"^c)
+  print(io, iacute^c)
+  @test String(take!(io)) == "  " * "Ŏ"^(c-2) * "\n" *
+                              "  ŎŎ" * "\n" *
+                              "  " * ellipses^(c-2) * "\n" *
+                              "  " * ellipses^2 * "\n" *
+                              "  aa" * "Ś"^(c-4) * "\n" *
+                              "  ŚŚŚŚ" * "\n" *
+                              "  bb" * wedge^(c-4) * "\n" *
+                              "  " * wedge^4 * "\n" *
+                              "    aa" * "Ŗ"^(c-6) * "\n" *
+                              "    ŖŖŖŖŖŖ" * "\n" *
+                              "    " * iacute^(c-4) * "\n" *
+                              "    " * iacute^4
 
   # Test too much indentation
   io = IOBuffer()
