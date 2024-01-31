@@ -1386,24 +1386,62 @@ end
 #
 ################################################################################
 
-# A non-compiletime preference
-function allow_unicode(flag::Bool)
-  old_flag = is_unicode_allowed()
-  @set_preferences!("unicode" => flag)
-  return old_flag
+ALLOW_UNICODE_OVERRIDE_VALUE::Union{Bool,Nothing} = nothing
+
+@doc """
+    allow_unicode(flag::Bool; temporary::Bool=false) -> Bool
+
+Set whether unicode characters are allowed in pretty printing and returns the
+previous value.
+If `temporary` is `true`, then the change is only active for the current worker and session.
+Otherwise, the change is permanently saved in the preferences.
+A permanent change will always override a temporary change.
+
+This function may behave arbitrarily, if called from within an argument to
+`with_unicode`.
+"""
+function allow_unicode(flag::Bool; temporary::Bool=false)
+   global ALLOW_UNICODE_OVERRIDE_VALUE
+   if temporary
+      old_flag = is_unicode_allowed()
+      ALLOW_UNICODE_OVERRIDE_VALUE = flag
+      return old_flag
+   else
+      old_flag = is_unicode_allowed()
+      @set_preferences!("unicode" => flag)
+      ALLOW_UNICODE_OVERRIDE_VALUE = nothing
+      return old_flag
+   end
 end
 
+@doc """
+    is_unicode_allowed() -> Bool
+
+Return whether unicode characters are allowed in pretty printing.
+"""
 function is_unicode_allowed()
-  return @load_preference("unicode", default = false)
+   global ALLOW_UNICODE_OVERRIDE_VALUE
+   value = ALLOW_UNICODE_OVERRIDE_VALUE
+   !isnothing(value) && return value
+   return @load_preference("unicode", default = false)::Bool
 end
 
+@doc """
+    with_unicode(f::Function, flag::Bool=true)
+
+Temporarily set whether unicode characters are allowed in pretty printing
+during the execution of `f`.
+"""
 function with_unicode(f::Function, flag::Bool=true)
-  old_allow_unicode = allow_unicode(flag)
-  try
-    f()
-  finally
-    allow_unicode(old_allow_unicode)
-  end
+   global ALLOW_UNICODE_OVERRIDE_VALUE
+   previous = ALLOW_UNICODE_OVERRIDE_VALUE
+   ALLOW_UNICODE_OVERRIDE_VALUE = flag
+   try
+      f()
+   finally
+      @assert ALLOW_UNICODE_OVERRIDE_VALUE == flag
+      ALLOW_UNICODE_OVERRIDE_VALUE = previous
+   end
 end
 
 ################################################################################
