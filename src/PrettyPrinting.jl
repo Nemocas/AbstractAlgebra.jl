@@ -1386,7 +1386,11 @@ end
 #
 ################################################################################
 
-ALLOW_UNICODE_OVERRIDE_VALUE::Union{Bool,Nothing} = nothing
+@static if VERSION < v"1.8.0-DEV.1465"
+   ALLOW_UNICODE_OVERRIDE_VALUE = nothing
+else
+   ALLOW_UNICODE_OVERRIDE_VALUE::Union{Bool,Nothing} = nothing
+end
 
 @doc """
     allow_unicode(flag::Bool; temporary::Bool=false) -> Bool
