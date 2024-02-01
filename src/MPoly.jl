@@ -560,6 +560,8 @@ end
 @enable_all_show_via_expressify MPolyRingElem
 
 function show(io::IO, ::MIME"text/plain", p::MPolyRing)
+  @show_name(io, p)
+  @show_special(io, MIME"text/plain"(), p)
   max_vars = 5 # largest number of variables to print
   n = nvars(p)
   print(io, "Multivariate polynomial ring")
@@ -577,6 +579,8 @@ function show(io::IO, ::MIME"text/plain", p::MPolyRing)
 end
 
 function show(io::IO, p::MPolyRing)
+  @show_name(io, p)
+  @show_special(io, p)
   if get(io, :supercompact, false)
     # no nested printing
     print(io, "Multivariate polynomial ring")
