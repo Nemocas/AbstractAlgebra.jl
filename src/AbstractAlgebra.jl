@@ -355,152 +355,6 @@ export number_of_variables
 @alias nrows number_of_rows
 @alias nvars number_of_variables
 
-###############################################################################
-# Macros for fancy printing. to use, enable attribute storage for your struct,
-# i.e.m change
-#
-#   mutable struct bla..
-#   ...
-#   end
-#
-# to
-#
-#   @attributes mutable struct bla ..
-#   ...
-#   end
-#
-# Then, in the `show` method, start with
-#   @show_name(io, obj)
-# If the user assigned a name to the object (in the REPL mainly) by doing
-# A = bla...
-# then, in the compact printing only the name "A" is printed
-# also adding
-# @show_special(io, obj)
-# allows, if present to call a different printing function for this instance
-# See FreeModule for an example
-#
-###############################################################################
-
-function set_name!(G::Any, name::String)
-   set_attribute!(G, :name => name)
-end
-
-function set_name!(G)
-   s = get_attribute(G, :name)
-   s === nothing || return
-   sy = find_name(G)
-   sy === nothing && return
-   set_name!(G, string(sy))
-end
-
-extra_name(G) = nothing
-
-macro show_name(io, O)
-  return :( begin
-    local i = $(esc(io))
-    local o = $(esc(O))
-    s = get_attribute(o, :name)
-    if s === nothing
-      sy = find_name(o)
-      if sy === nothing
-        sy = extra_name(o)
-      end
-      if sy !== nothing
-        s = string(sy)
-        set_name!(o, s)
-      end
-    end
-    if s !== nothing && (get(i, :supercompact, false) || get(i, :compact, false))
-      if AbstractAlgebra.PrettyPrinting._supports_io_custom(i)
-        print(i, LowercaseOff())
-      end
-      print(i, s)
-      return
-    end
-  end )
-end
-
-const CurrentModule = Ref(Main)
-
-function set_current_module(m)
-  CurrentModule[] = m
-end
-
-function get_current_module()
-  return CurrentModule[]
-end
-
-function find_name(A, M = Main; all::Bool = false)
-  # in Documenter, the examples are not run in the REPL.
-  # in the REPL: A = ... adds A to the global name space (Main....)
-  # in Documenter (doctests) all examples are run in their own module
-  # which is stored in CurrentModule, hence we need to search there as well
-  #furthermore, they are not exported, hence the "all" option
-  if M === Main && AbstractAlgebra.get_current_module() != Main
-    a = find_name(A, AbstractAlgebra.get_current_module(), all = true)
-    if a !== nothing
-      return a
-    end
-  end
-  for a = names(M, all = all)
-    a === :ans && continue
-    if isdefined(M, a) && getfield(M, a) === A
-        return a
-    end
-  end
-end
-
-macro show_special(io, O)
-  return :( begin
-    local i = $(esc(io))
-    local o = $(esc(O))
-    s = get_attribute(o, :show)
-    if s !== nothing
-      s(i, o)
-      return
-    end
-  end )
-end
-
-macro show_special(io, mime, O)
-  return :( begin
-    local i = $(esc(io))
-    local m = $(esc(mime))
-    local o = $(esc(O))
-    s = get_attribute(o, :show)
-    if s !== nothing
-      s(i, m, o)
-      return
-    end
-  end )
-end
-
-macro show_special_elem(io, e)
-  return :( begin
-    local i = $(esc(io))
-    local a = $(esc(e))
-    local o = parent(a)
-    s = get_attribute(o, :show_elem)
-    if s !== nothing
-      s(i, a)
-      return
-    end
-  end )
-end
-
-macro show_special_elem(io, mime, e)
-  return :( begin
-    local i = $(esc(io))
-    local m = $(esc(mime))
-    local a = $(esc(e))
-    local o = parent(a)
-    s = get_attribute(o, :show_elem)
-    if s !== nothing
-      s(i, m, a)
-      return
-    end
-  end )
-end
 
 ###############################################################################
 # generic fall back if no immediate coercion is possible
@@ -607,11 +461,17 @@ include("fundamental_interface.jl")
 include("PrettyPrinting.jl")
 
 import .PrettyPrinting: @enable_all_show_via_expressify
+import .PrettyPrinting: @show_name
+import .PrettyPrinting: @show_special
+import .PrettyPrinting: @show_special_elem
 import .PrettyPrinting: allow_unicode
 import .PrettyPrinting: canonicalize
 import .PrettyPrinting: expr_to_latex_string
 import .PrettyPrinting: expr_to_string
 import .PrettyPrinting: expressify
+import .PrettyPrinting: extra_name
+import .PrettyPrinting: find_name
+import .PrettyPrinting: get_current_module
 import .PrettyPrinting: get_html_as_latex
 import .PrettyPrinting: get_syntactic_sign_abs
 import .PrettyPrinting: is_syntactic_one
@@ -623,6 +483,8 @@ import .PrettyPrinting: obj_to_string_wrt_times
 import .PrettyPrinting: print_integer_string
 import .PrettyPrinting: print_obj
 import .PrettyPrinting: printer
+import .PrettyPrinting: set_current_module
+import .PrettyPrinting: set_name!
 import .PrettyPrinting: set_html_as_latex
 import .PrettyPrinting: show_obj
 import .PrettyPrinting: show_via_expressify
