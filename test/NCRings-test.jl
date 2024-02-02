@@ -56,3 +56,22 @@ end
    M = matrix_space(ZZ, 2, rand(3:9))
    @test_throws DomainError powers(rand(M, 1:9), rand(1:9))
 end
+
+@testset "dot" begin
+  dot = AbstractAlgebra.LinearAlgebra.dot
+
+  Qx, x  = QQ["x"]
+  @test dot([x, x^2], [1, 1]) == x + x^2
+  @test dot([x, x^2], Rational{BigInt}[1, 1]) == x + x^2
+  @test dot([1, 1], [x, x^2]) == x + x^2
+  @test dot(Rational{BigInt}[1, 1], [x, x^2]) == x + x^2
+  @test dot([x], [x^2]) == x^3
+
+  R = matrix_ring(QQ, 2)
+  x = R([1 2; 3 4])
+  @test dot([x, x^2], [1, 1]) == x + x^2
+  @test dot([x, x^2], Rational{BigInt}[1, 1]) == x + x^2
+  @test dot([1, 1], [x, x^2]) == x + x^2
+  @test dot(Rational{BigInt}[1, 1], [x, x^2]) == x + x^2
+  @test dot([x], [x^2]) == x^3
+end

@@ -398,9 +398,6 @@ end
 
 Random.gentype(::Type{T}) where {T<:FinField} = elem_type(T)
 
-import LinearAlgebra
-LinearAlgebra.dot(a::NCRingElem, b::NCRingElem) = a * b
-
 transpose!(A::MatrixElem) = transpose(A)
 
 function Base.div(f::PolyRingElem, g::PolyRingElem)

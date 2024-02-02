@@ -290,3 +290,15 @@ Base.oftype(x::NCRingElem, y::Rational) = parent(x)(y)
 ###############################################################################
 
 Base.broadcastable(x::NCRingElem) = Ref(x)
+
+################################################################################
+#
+#   Dot
+#
+################################################################################
+
+dot(x::NCRingElem, y::NCRingElem) = x * y
+
+dot(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}) = x * y
+
+dot(x::Union{Integer, Rational, AbstractFloat}, y::NCRingElem) = x * y
