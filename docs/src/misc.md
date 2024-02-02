@@ -67,7 +67,7 @@ function show(io::IO, A::MyObj)
    ... usual stuff
 ```  
 
-`@show_special` checks if an attribute `:show_special` is present. If so, it has to be
+`@show_special` checks if an attribute `:show` is present. If so, it has to be
 a function taking `IO` and the object. This is then called instead of the usual
 `show` function.
 
