@@ -54,37 +54,59 @@ get_attribute!
 set_attribute!
 ```
 
-The attributes system can be utilized to change the way certain objects are printed.
-We provide macros `@show_special` and `@show_name` for this purpose, both are
-called with the same argument
-as `show`: an `IO`-object and the object itself. Both are supposed to be
-used within the usual `show` function:
-```
+## Advanced printing
+
+### Self-given names
+
+We provide macros `@show_name`, `@show_special` and `@show_special_elem` to 
+change the way certain objects are printed.
+
+In compact and supercompact printing mode, `@show_name` tries to determine
+a suitable name to print instead of the object (see [`AbstractAlgebra.get_name`](@ref)).
+
+`@show_special` checks if an attribute `:show` is present. If so, it has to be
+a function taking `IO`, optionally a MIME-type, and the object.
+This is then called instead of the usual `show` function.
+
+Similarly, `@show_special_elem` checks if an attribute `:show_elem` is present in the object's
+parent. The semantics are the same as for `@show_special`.
+
+All are supposed to be used within the usual `show` function, where `@show_special_elem`
+is only relevant for element types of algebraic structures.
+```julia
 function show(io::IO, A::MyObj)
    @show_name(io, A)
    @show_special(io, A)
 
-   ... usual stuff
-```  
+   # ... usual stuff
+end
 
-`@show_special` checks if an attribute `:show` is present. If so, it has to be
-a function taking `IO` and the object. This is then called instead of the usual
-`show` function.
+function show(io::IO, ::MIME"text/plain", A::MyObj)
+   @show_name(io, A)
+   @show_special(io, MIME"text/plain"(), A)
 
-`@show_name` will check if there is a variable in global (`Main` module) namespace
-with value bound to the object. In compact printing mode, the name is then shown
-instead of the object.
+   # ... usual stuff
+end
+```
 
-Note: if the object is stored in several variable, the first one will be used. Also
-the name, once used for printing, is stored in the object - hence will not change
-anymore.
+#### Documentation
 
-## Advanced printing
+```@docs
+AbstractAlgebra.@show_special
+AbstractAlgebra.@show_special_elem
+AbstractAlgebra.@show_name
+AbstractAlgebra.get_name
+AbstractAlgebra.set_name!
+AbstractAlgebra.extra_name
+AbstractAlgebra.find_name
+```
+
+### Indentation and Decapitalization
 
 To facilitate printing of nested mathematical structures, we provide a modified
 `IOCustom` object, that supports indentation and decapitalization.
 
-### Example
+#### Example
 
 We illustrate this with an example
 
@@ -125,7 +147,7 @@ Something of type A
   over Hilbert thing
 ```
 
-### Documentation
+#### Documentation
 
 ```@docs
 AbstractAlgebra.pretty

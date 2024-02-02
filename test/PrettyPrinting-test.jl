@@ -1,6 +1,6 @@
 import AbstractAlgebra.PrettyPrinting
 
-@testset "PrettyPrinting" begin
+@testset "PrettyPrinting: Expression to string" begin
 
    function just_string(x)
       return AbstractAlgebra.expr_to_string(x)
@@ -312,8 +312,19 @@ import AbstractAlgebra.PrettyPrinting
    @test AbstractAlgebra.obj_to_string_wrt_times(x + y) == "(x + y)"
 end
 
-# Test various examples from the Oscar manual
-@testset "PrettyPrinting examples" begin
+@testset "PrettyPrinting: Special printing macros" begin
+  # TODO
+
+end
+
+  
+@testset "PrettyPrinting: Unicode preferences" begin
+  # TODO
+
+end
+
+@testset "PrettyPrinting: Three print modes" begin
+  # Test various examples from the Oscar manual
 
   #
   #
@@ -398,7 +409,7 @@ end
 
 end
 
-let
+@testset "PrettyPrinting: Intendation and Decapitalization" begin
   io = IOBuffer()
   io = AbstractAlgebra.pretty(io, force_newlines = true)
   @test io isa AbstractAlgebra.PrettyPrinting.IOCustom
