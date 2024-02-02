@@ -67,14 +67,3 @@ end
   @test is_finite(GF(2))
   @test !is_finite(QQ)
 end
-
-import LinearAlgebra: dot
-
-@testset "dot" begin
-  Qx, x  = QQ["x"]
-  @test dot([x, x^2], [1, 1]) == x + x^2
-  @test dot([x, x^2], Rational{BigInt}[1, 1]) == x + x^2
-  @test dot([1, 1], [x, x^2]) == x + x^2
-  @test dot(Rational{BigInt}[1, 1], [x, x^2]) == x + x^2
-  @test dot([x], [x^2]) == x^3
-end

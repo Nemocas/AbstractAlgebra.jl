@@ -28,6 +28,8 @@ const import_exclude = [:import_exclude, :QQ, :ZZ,
 # imported here and in Generic.jl, and exported below.
 # They should not be imported/exported anywhere else.
 
+import LinearAlgebra
+
 import LinearAlgebra: det
 import LinearAlgebra: dot
 import LinearAlgebra: hessenberg
