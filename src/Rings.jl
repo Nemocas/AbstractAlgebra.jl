@@ -174,3 +174,15 @@ is_finite(F::FinField) = true
 is_finite(F::Field) = characteristic(F) != 0 && throw(NotImplementedError(:is_finite, F))
 
 characteristic(F::NumField) = 0
+
+################################################################################
+#
+#   Dot
+#
+################################################################################
+
+dot(x::RingElem, y::RingElem) = x * y
+
+dot(x::RingElem, y::Union{Integer, Rational, AbstractFloat}) = x * y
+
+dot(x::Union{Integer, Rational, AbstractFloat}, y::RingElem) = x * y

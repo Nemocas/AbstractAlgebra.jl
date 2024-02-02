@@ -29,6 +29,7 @@ const import_exclude = [:import_exclude, :QQ, :ZZ,
 # They should not be imported/exported anywhere else.
 
 import LinearAlgebra: det
+import LinearAlgebra: dot
 import LinearAlgebra: hessenberg
 import LinearAlgebra: ishermitian
 import LinearAlgebra: issymmetric
