@@ -1591,8 +1591,6 @@ function _write_line(io::IOCustom, str::AbstractString)
     spaceleft = c - ind - io.printed
   end
   #@show spaceleft
-  # maybe rewrite using https://docs.julialang.org/en/v1/stdlib/Unicode/#Unicode.graphemes
-  # once minimum supported version for package is Julia 1.9
   _graphemes = Base.Unicode.graphemes(str)
   firstlen = min(spaceleft, length(_graphemes))
   # make an iterator over valid indices
