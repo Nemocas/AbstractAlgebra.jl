@@ -1593,12 +1593,12 @@ function _write_line(io::IOCustom, str::AbstractString)
   #@show spaceleft
   # maybe rewrite using https://docs.julialang.org/en/v1/stdlib/Unicode/#Unicode.graphemes
   # once minimum supported version for package is Julia 1.9
-  normalised_str = Base.Unicode.normalize(str)
-  firstlen = min(spaceleft, length(normalised_str))
+  _graphemes = Base.Unicode.graphemes(str)
+  firstlen = min(spaceleft, length(_graphemes))
   # make an iterator over valid indices
-  firstiter = Base.Iterators.take(eachindex(normalised_str), firstlen)
-  restiter = Base.Iterators.drop(eachindex(normalised_str), firstlen)
-  firststr = normalised_str[collect(firstiter)]
+  firstiter = Base.Iterators.take(_graphemes, firstlen)
+  restiter = Base.Iterators.drop(_graphemes, firstlen)
+  firststr = join(firstiter)
   if io.lowercasefirst
     written += write(io.io, lowercasefirst(firststr))
     io.lowercasefirst = false
@@ -1607,17 +1607,14 @@ function _write_line(io::IOCustom, str::AbstractString)
     io.lowercasefirst = false
   end
   io.printed += textwidth(firststr)
-  reststr = normalised_str[collect(restiter)]
+  reststr = join(restiter)
   it = Iterators.partition(1:textwidth(reststr), c - ind > 0 ? c - ind : c)
   for i in it
     # partitions of the spillover text
     written += write(io.io, "\n")
     written += write_indent(io)
-    for j in Base.Iterators.drop(Base.Iterators.take(reststr,i[end]), i[begin]-1)
-      # j is reststr[i[begin]:i[end]], constructed via iterators
-      written += write(io.io, j)
-      io.printed = textwidth(j)
-    end
+    written += write(io.io, join(collect(restiter)[i]))
+    io.printed = length(i)
     println()
   end
   return written
