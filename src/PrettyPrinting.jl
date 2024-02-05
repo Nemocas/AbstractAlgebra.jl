@@ -1444,7 +1444,8 @@ or `nothing` if no such variable exists.
 If `all` is `true`, private and non-exported variables are also searched.
 
 !!! note
-    If the object is stored in several variable, the first one will be used.
+    If the object is stored in several variables, the first one will be used,
+    but a name returned once is kept until the variable no longer contains this object.
 
 For this to work in doctests, one should call
 `AbstractAlgebra.set_current_module(@__MODULE__)` in the `value` argument of 
@@ -1454,6 +1455,26 @@ For this to work in doctests, one should call
     This function should not be used directly, but rather through [`AbstractAlgebra.get_name`](@ref).
 """
 function find_name(obj, M=Main; all::Bool=false)
+  AbstractAlgebra._is_attribute_storing_type(typeof(obj)) || return find_new_name(obj, M; all)
+
+  cached_name = get_attribute(obj, :cached_name)
+  if !isnothing(cached_name)
+   cached_name_sy = Symbol(cached_name)
+    if M === Main && get_current_module() != Main
+      if isdefined(get_current_module(), cached_name_sy) && getproperty(get_current_module(), cached_name_sy) === obj
+        return cached_name
+      end
+    end
+    if isdefined(M, cached_name_sy) && getproperty(M, cached_name_sy) === obj
+      return cached_name
+    end
+  end
+  name = find_new_name(obj, M; all)
+  set_attribute!(obj, :cached_name => name)
+  return name
+end
+
+function find_new_name(obj, M=Main; all::Bool=false)
   # in Documenter, the examples are not run in the REPL.
   # in the REPL: A = ... adds A to the global name space (Main....)
   # in Documenter (doctests) all examples are run in their own module
@@ -1471,6 +1492,7 @@ function find_name(obj, M=Main; all::Bool=false)
       return string(a)
     end
   end
+  return nothing
 end
 
 """

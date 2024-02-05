@@ -495,7 +495,7 @@ import .PrettyPrinting: Lowercase
 import .PrettyPrinting: Indent
 import .PrettyPrinting: Dedent
 
-import .PrettyPrinting: find_name # remove once all call-sites use get_name instead
+import .PrettyPrinting: find_new_name as find_name # remove once all call-sites use get_name instead
 
 export @enable_all_show_via_expressify
 
