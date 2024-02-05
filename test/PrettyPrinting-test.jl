@@ -478,6 +478,7 @@ let
   ellipses = String([0xe2, 0x80, 0xa6])
   wedge = String([0xe2, 0x88, 0xa7])
   iacute = String([0xc3, 0xad])
+  evil_a = String([0x61, 0xcc, 0x81, 0xcc, 0xa7, 0xcc, 0xa7])
   print(io, AbstractAlgebra.Indent())
   println(io, "Ŏ"^c)
   println(io, ellipses^c)
@@ -486,6 +487,8 @@ let
   print(io, AbstractAlgebra.Indent())
   println(io, "aa", "Ŗ"^c)
   print(io, iacute^c)
+  println(io, evil_a^c)
+  print(io, evil_a^c)
   @test String(take!(io)) == "  " * "Ŏ"^(c-2) * "\n" *
                               "  ŎŎ" * "\n" *
                               "  " * ellipses^(c-2) * "\n" *
@@ -497,7 +500,10 @@ let
                               "    aa" * "Ŗ"^(c-6) * "\n" *
                               "    ŖŖŖŖŖŖ" * "\n" *
                               "    " * iacute^(c-4) * "\n" *
-                              "    " * iacute^4
+                              "    " * iacute^4 * evil_a^(c-8) * "\n" *
+                              "    " * evil_a^(8) * "\n" *
+                              "    " * evil_a^(c-4) * "\n" *
+                              "    " * evil_a^4
 
   # Test too much indentation
   io = IOBuffer()
