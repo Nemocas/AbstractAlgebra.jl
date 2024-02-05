@@ -1429,15 +1429,15 @@ function set_name!(obj; override::Bool=true)
 end
 
 """
-    extra_name(obj) = nothing
+    extra_name(obj) -> Union{String,Nothing}
 
 May be overloaded to provide a fallback name for the object `obj` in [`AbstractAlgebra.get_name`](@ref).
-This function is expected to return a string or `nothing`.
+The default implementation returns `nothing`.
 """
 extra_name(obj) = nothing
 
 """
-    find_name(obj, M = Main; all::Bool = false)
+    find_name(obj, M = Main; all::Bool = false) -> Union{String,Nothing}
 
 Return name of a variable in `M`'s namespace with value bound to the object `obj`,
 or `nothing` if no such variable exists.
@@ -1474,7 +1474,7 @@ function find_name(obj, M=Main; all::Bool=false)
 end
 
 """
-   get_name(obj)
+   get_name(obj) -> Union{String,Nothing}
 
 Returns the name of the object `obj` if it is set, or `nothing` otherwise.
 This function tries to find a name in the following order:
@@ -1483,33 +1483,29 @@ This function tries to find a name in the following order:
 3. The name returned by [`AbstractAlgebra.extra_name`](@ref).
 """
 function get_name(obj)
-  name = nothing
   if AbstractAlgebra._is_attribute_storing_type(typeof(obj))
-   name = get_attribute(obj, :name)
+    name = get_attribute(obj, :name)
+    isnothing(name) || return name
   end
-  if isnothing(name)
-    sy = find_name(obj)
-    if !isnothing(sy)
-      name = string(sy)
-    end
-  end
-  if isnothing(name)
-    name_maybe = extra_name(obj)::Union{String,Nothing}
-    if !isnothing(name_maybe)
-      name = name_maybe
-    end
-  end
-  return name
+
+  sy = find_name(obj)
+  isnothing(sy) || return string(sy)
+
+  name_maybe = extra_name(obj)::Union{String,Nothing}
+  isnothing(name_maybe) || return name_maybe
+
+  return nothing
 end
 
 """
-    @show_name(io, obj)
+    @show_name(io::IO, obj)
 
-If compact or supercompact printing is enabled,
-prints the name [`get_name(obj)`](@ref AbstractAlgebra.get_name) of the object `obj` to the `io` stream.
+If either property `:compact` or `:supercompact` is set to `true` for `io`
+(see [`IOContext`](https://docs.julialang.org/en/v1/base/io-network/#Base.IOContext)),
+print the name [`get_name(obj)`](@ref AbstractAlgebra.get_name) of the object `obj` to the `io` stream.
 This macro either prints the name and returns from the current scope, or does nothing.
 
-It is expected to be used in the `show` method of a type shown in the documentation.
+It is supposed to be used at the start of `show` methods as shown in the documentation.
 ```
 """
 macro show_name(io, obj)
@@ -1532,12 +1528,12 @@ macro show_name(io, obj)
 end
 
 """
-    @show_special(io, obj)
+    @show_special(io::IO, obj)
 
 If the `obj` has a `show` attribute, this gets called with `io` and `obj` and
 returns from the current scope. Otherwise, does nothing.
 
-It is expected to be used in the `show` method of a type shown in the documentation.
+It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
 macro show_special(io, obj)
   return :(
@@ -1554,12 +1550,12 @@ macro show_special(io, obj)
 end
 
 """
-    @show_special(io, mime, obj)
+    @show_special(io::IO, mime, obj)
 
 If the `obj` has a `show` attribute, this gets called with `io`, `mime` and `obj` and
 returns from the current scope. Otherwise, does nothing.
 
-It is expected to be used in the `show` method of a type shown in the documentation.
+It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
 macro show_special(io, mime, obj)
   return :(
@@ -1577,12 +1573,12 @@ macro show_special(io, mime, obj)
 end
 
 """
-    @show_special(io, obj)
+    @show_special_elem(io::IO, obj)
 
 If the `parent` of `obj` has a `show_special_elem` attribute, this gets called with `io` and `obj` and
 returns from the current scope. Otherwise, does nothing.
 
-It is expected to be used in the `show` method of a type shown in the documentation.
+It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
 macro show_special_elem(io, obj)
   return :(
@@ -1600,12 +1596,12 @@ macro show_special_elem(io, obj)
 end
 
 """
-    @show_special(io, mime, obj)
+    @show_special_elem(io::IO, mime, obj)
 
 If the `parent` of `obj` has a `show` attribute, this gets called with `io`, `mime` and `obj` and
 returns from the current scope. Otherwise, does nothing.
 
-It is expected to be used in the `show` method of a type shown in the documentation.
+It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
 macro show_special_elem(io, mime, obj)
   return :(
