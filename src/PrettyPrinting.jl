@@ -1535,24 +1535,67 @@ end
 #
 ################################################################################
 
-# A non-compiletime preference
-function allow_unicode(flag::Bool)
-  old_flag = is_unicode_allowed()
-  @set_preferences!("unicode" => flag)
-  return old_flag
+const ALLOW_UNICODE_OVERRIDE_VALUE = Ref{Union{Bool,Nothing}}(nothing)
+
+@doc """
+    allow_unicode(allowed::Bool; temporary::Bool=false) -> Bool
+
+Set whether unicode characters are allowed in pretty printing and returns the
+previous value.
+If `temporary` is `true`, then the change is only active for the current worker and session.
+Otherwise, the change is permanently saved in the preferences.
+A permanent change will always override a temporary change.
+
+This function may behave arbitrarily if called from within the scope of a
+`with_unicode` do-block.
+"""
+function allow_unicode(allowed::Bool; temporary::Bool=false)
+   if temporary
+      old_allowed = is_unicode_allowed()
+      ALLOW_UNICODE_OVERRIDE_VALUE[] = allowed
+      return old_allowed
+   else
+      old_allowed = is_unicode_allowed()
+      @set_preferences!("unicode" => allowed)
+      ALLOW_UNICODE_OVERRIDE_VALUE[] = nothing
+      return old_allowed
+   end
 end
 
+@doc """
+    is_unicode_allowed() -> Bool
+
+Return whether unicode characters are allowed in pretty printing.
+"""
 function is_unicode_allowed()
-  return @load_preference("unicode", default = false)
+   override = ALLOW_UNICODE_OVERRIDE_VALUE[]
+   !isnothing(override) && return override
+   return @load_preference("unicode", default = false)::Bool
 end
 
-function with_unicode(f::Function)
-  old_allow_unicode = allow_unicode(true)
-  try
-    f()
-  finally
-    allow_unicode(old_allow_unicode)
-  end
+@doc """
+    with_unicode(f::Function, allowed::Bool=true)
+
+Temporarily set whether unicode characters are allowed in pretty printing
+during the execution of `f`.
+This is useful for e.g. running doctests independently on the user preference.
+
+`with_unicode` is expected to be called in the following way:
+```julia
+with_unicode([allowed]) do
+   # code that should be executed with unicode allowed/disallowed
+end
+```
+"""
+function with_unicode(f::Function, allowed::Bool=true)
+   previous = ALLOW_UNICODE_OVERRIDE_VALUE[]
+   ALLOW_UNICODE_OVERRIDE_VALUE[] = allowed
+   try
+      f()
+   finally
+      @assert ALLOW_UNICODE_OVERRIDE_VALUE[] == allowed
+      ALLOW_UNICODE_OVERRIDE_VALUE[] = previous
+   end
 end
 
 ################################################################################
