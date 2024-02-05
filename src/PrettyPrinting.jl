@@ -1386,11 +1386,7 @@ end
 #
 ################################################################################
 
-@static if VERSION < v"1.8.0-DEV.1465"
-   ALLOW_UNICODE_OVERRIDE_VALUE = nothing
-else
-   ALLOW_UNICODE_OVERRIDE_VALUE::Union{Bool,Nothing} = nothing
-end
+const ALLOW_UNICODE_OVERRIDE_VALUE = Ref{Union{Bool,Nothing}}(nothing)
 
 @doc """
     allow_unicode(allowed::Bool; temporary::Bool=false) -> Bool
@@ -1405,15 +1401,14 @@ This function may behave arbitrarily if called from within the scope of a
 `with_unicode` do-block.
 """
 function allow_unicode(allowed::Bool; temporary::Bool=false)
-   global ALLOW_UNICODE_OVERRIDE_VALUE
    if temporary
       old_allowed = is_unicode_allowed()
-      ALLOW_UNICODE_OVERRIDE_VALUE = allowed
+      ALLOW_UNICODE_OVERRIDE_VALUE[] = allowed
       return old_allowed
    else
       old_allowed = is_unicode_allowed()
       @set_preferences!("unicode" => allowed)
-      ALLOW_UNICODE_OVERRIDE_VALUE = nothing
+      ALLOW_UNICODE_OVERRIDE_VALUE[] = nothing
       return old_allowed
    end
 end
@@ -1424,8 +1419,7 @@ end
 Return whether unicode characters are allowed in pretty printing.
 """
 function is_unicode_allowed()
-   global ALLOW_UNICODE_OVERRIDE_VALUE
-   override = ALLOW_UNICODE_OVERRIDE_VALUE
+   override = ALLOW_UNICODE_OVERRIDE_VALUE[]
    !isnothing(override) && return override
    return @load_preference("unicode", default = false)::Bool
 end
@@ -1445,14 +1439,13 @@ end
 ```
 """
 function with_unicode(f::Function, allowed::Bool=true)
-   global ALLOW_UNICODE_OVERRIDE_VALUE
-   previous = ALLOW_UNICODE_OVERRIDE_VALUE
-   ALLOW_UNICODE_OVERRIDE_VALUE = allowed
+   previous = ALLOW_UNICODE_OVERRIDE_VALUE[]
+   ALLOW_UNICODE_OVERRIDE_VALUE[] = allowed
    try
       f()
    finally
-      @assert ALLOW_UNICODE_OVERRIDE_VALUE == allowed
-      ALLOW_UNICODE_OVERRIDE_VALUE = previous
+      @assert ALLOW_UNICODE_OVERRIDE_VALUE[] == allowed
+      ALLOW_UNICODE_OVERRIDE_VALUE[] = previous
    end
 end
 
