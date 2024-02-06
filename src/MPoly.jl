@@ -1357,7 +1357,8 @@ By default (`cached=true`), the output `S` will be cached, i.e. if
 (*identical*) ring is returned. Setting `cached` to `false` ensures a distinct
 new ring is returned, and will also prevent it from being cached.
 
-The `internal_ordering` of the polynomial ring can be one of `:lex`, `:deglex` or `:degrevlex`.
+The monomial ordering used for the internal storage of polynomials in `S` can be
+set with `internal_ordering` and must be one of `:lex`, `:deglex` or `:degrevlex`.
 
 See also: [`polynomial_ring(::Ring, ::Vararg)`](@ref), [`@polynomial_ring`](@ref).
 
