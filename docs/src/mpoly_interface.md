@@ -143,7 +143,7 @@ Return the $i$-th generator (variable) of the given polynomial ring (as a
 polynomial).
 
 ```julia
-ordering(S::MyMPolyRing{T})
+internal_ordering(S::MyMPolyRing{T})
 ```
 
 Return the ordering of the given polynomial ring as a symbol. Supported values currently

@@ -351,11 +351,11 @@ end
    end
 end
 
-function MPolyRing{T}(R::Ring, s::Vector{Symbol}, ordering::Symbol=:lex, cached::Bool=true) where T <: RingElement
+function MPolyRing{T}(R::Ring, s::Vector{Symbol}, internal_ordering::Symbol=:lex, cached::Bool=true) where T <: RingElement
    @assert T == elem_type(R)
    N = length(s)
-   ordering in (:deglex, :degrevlex) && (N+=1)
-   return MPolyRing{T}(R, s, ordering, N, cached)
+   internal_ordering in (:deglex, :degrevlex) && (N+=1)
+   return MPolyRing{T}(R, s, internal_ordering, N, cached)
 end
 
 const MPolyID = CacheDictType{Tuple{Ring, Vector{Symbol}, Symbol, Int}, Ring}()

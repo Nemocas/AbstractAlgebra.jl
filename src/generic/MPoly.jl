@@ -104,12 +104,12 @@ function vars(p::MPoly{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    ordering(a::MPolyRing{T}) where {T <: RingElement}
+    internal_ordering(a::MPolyRing{T}) where {T <: RingElement}
 
 Return the ordering of the given polynomial ring as a symbol. The options are
 `:lex`, `:deglex` and `:degrevlex`.
 """
-function ordering(a::MPolyRing{T}) where {T <: RingElement}
+function internal_ordering(a::MPolyRing{T}) where {T <: RingElement}
    return a.ord
 end
 
@@ -815,7 +815,7 @@ Return the total degree of `f`.
 function total_degree(f::MPoly{T}) where {T <: RingElement}
    A = f.exps
    N = size(A, 1)
-   ord = ordering(parent(f))
+   ord = internal_ordering(parent(f))
    if ord == :lex
       if N == 1
          return length(f) == 0 ? -1 : Int(A[1, N])
@@ -4102,7 +4102,7 @@ function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: Rin
    end
 
    N = a.N
-   ord = ordering(a)
+   ord = internal_ordering(a)
    Pe = Matrix{UInt}(undef, N, length(m))
 
    if ord == :lex

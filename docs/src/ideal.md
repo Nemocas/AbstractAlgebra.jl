@@ -60,7 +60,7 @@ contain duplicates, zero entries or be empty.
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
 (Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
@@ -170,7 +170,7 @@ normal_form(::U, ::Generic.Ideal{U}) where {T <: RingElement, U <: Union{PolyRin
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
 (Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]

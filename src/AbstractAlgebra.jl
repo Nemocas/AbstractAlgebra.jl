@@ -639,7 +639,7 @@ import .Generic: normalise
 import .Generic: num_coeff
 import .Generic: one
 import .Generic: order
-import .Generic: ordering
+import .Generic: internal_ordering
 import .Generic: parity
 import .Generic: partitionseq
 import .Generic: perm
@@ -990,7 +990,7 @@ export O
 export one
 export one!
 export order
-export ordering
+export internal_ordering
 export parent_type
 export parity
 export Partition

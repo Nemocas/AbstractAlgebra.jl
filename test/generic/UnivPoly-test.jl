@@ -3,10 +3,10 @@
       for iters = 1:5
          ord = rand_ordering()
 
-         @test UniversalPolynomialRing(R; ordering=ord, cached = true) === UniversalPolynomialRing(R; ordering=ord, cached = true)
-         @test UniversalPolynomialRing(R; ordering=ord, cached = false) !== UniversalPolynomialRing(R; ordering=ord, cached = false)
+         @test UniversalPolynomialRing(R; internal_ordering=ord, cached = true) === UniversalPolynomialRing(R; internal_ordering=ord, cached = true)
+         @test UniversalPolynomialRing(R; internal_ordering=ord, cached = false) !== UniversalPolynomialRing(R; internal_ordering=ord, cached = false)
 
-         S = UniversalPolynomialRing(R; ordering=ord)
+         S = UniversalPolynomialRing(R; internal_ordering=ord)
 
          x = gen(S, "x")
          @test x == S[1]
@@ -85,7 +85,7 @@ end
       for iters = 1:100
          ord = rand_ordering()
 
-         S = UniversalPolynomialRing(R; ordering=ord, cached=false)
+         S = UniversalPolynomialRing(R; internal_ordering=ord, cached=false)
 
          @test symbols(S) == Symbol[]
          @test nvars(S) == 0
@@ -122,7 +122,7 @@ end
          @test vars(x*y + 1) == [x, y]
          @test vars(x*y + z) == [x, y, z]
 
-         @test ordering(S) == ord
+         @test internal_ordering(S) == ord
       end
    end
 end
@@ -142,7 +142,7 @@ end
       for iters = 1:100
          ord = rand_ordering()
 
-         S = UniversalPolynomialRing(R; ordering=ord, cached=false)
+         S = UniversalPolynomialRing(R; internal_ordering=ord, cached=false)
 
          x = gen(S, "x")
          y, z = gens(S, ["y", "z"])

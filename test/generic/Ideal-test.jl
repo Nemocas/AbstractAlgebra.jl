@@ -185,12 +185,12 @@ end
 end
 
 @testset "Generic.Ideal.ideal_reduction(multivariate)" begin
-   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
    for V in example_ideal_gens(x, y)
       @test testit(R, V)
    end
 
-   R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"]; ordering=:degrevlex)
+   R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"]; internal_ordering=:degrevlex)
    for V in example_ideal_gens(x, y, z)
       @test testit(R, V)
    end
@@ -262,7 +262,7 @@ end
 
 @testset "Generic.Ideal.comparison" begin
    # multivariate
-   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
 
    ex = example_ideal_gens(x, y)
    for V in ex[1:28]  # 29 and beyond are too slow for some RNG seeds
@@ -306,7 +306,7 @@ end
 
 @testset "Generic.Ideal.containment" begin
    # multivariate
-   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
 
    ex = example_ideal_gens(x, y)
    for V in ex[1:15], W in ex[1:15]
@@ -369,7 +369,7 @@ end
 
 @testset "Generic.Ideal.addition" begin
    # multivariate
-   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
 
    ex = example_ideal_gens(x, y)
    for V in ex[1:15], W in ex[1:15]
@@ -431,7 +431,7 @@ end
 
 @testset "Generic.Ideal.multiplication" begin
    # multivariate
-   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
 
    ex = example_ideal_gens(x, y)
    for V in ex[1:10], W in ex[1:10], X in ex[1:10]
@@ -499,7 +499,7 @@ end
 
 @testset "Generic.Ideal.adhoc_multiplication" begin
    # multivariate
-   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
 
    # random examples
    for V in example_ideal_gens(x, y)
@@ -564,7 +564,7 @@ end
 
 @testset "Generic.Ideal.intersect" begin
    # multivariate
-   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
 
    ex = example_ideal_gens(x, y)
    for V in ex[1:10], W in ex[1:10]
