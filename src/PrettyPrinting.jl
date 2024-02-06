@@ -1382,69 +1382,10 @@ end
 
 
 ###############################################################################
-# Macros for fancy printing. to use, enable attribute storage for your struct,
-# i.e.m change
 #
-#   mutable struct bla..
-#   ...
-#   end
-#
-# to
-#
-#   @attributes mutable struct bla ..
-#   ...
-#   end
-#
-# Then, in the `show` method, start with
-#   @show_name(io, obj)
-# If the user assigned a name to the object (in the REPL mainly) by doing
-# A = bla...
-# then, in the compact printing only the name "A" is printed
-# also adding
-# @show_special(io, obj)
-# allows, if present to call a different printing function for this instance
-# See FreeModule for an example
+#  Macros for fancy printing. 
 #
 ###############################################################################
-
-function set_name!(G::Any, name::String)
-   set_attribute!(G, :name => name)
-end
-
-function set_name!(G)
-   s = get_attribute(G, :name)
-   s === nothing || return
-   sy = find_name(G)
-   sy === nothing && return
-   set_name!(G, string(sy))
-end
-
-extra_name(G) = nothing
-
-macro show_name(io, O)
-  return :( begin
-    local i = $(esc(io))
-    local o = $(esc(O))
-    s = get_attribute(o, :name)
-    if s === nothing
-      sy = find_name(o)
-      if sy === nothing
-        sy = extra_name(o)
-      end
-      if sy !== nothing
-        s = string(sy)
-        set_name!(o, s)
-      end
-    end
-    if s !== nothing && (get(i, :supercompact, false) || get(i, :compact, false))
-      if AbstractAlgebra.PrettyPrinting._supports_io_custom(i)
-        print(i, LowercaseOff())
-      end
-      print(i, s)
-      return
-    end
-  end )
-end
 
 const CurrentModule = Ref(Main)
 
@@ -1456,76 +1397,248 @@ function get_current_module()
   return CurrentModule[]
 end
 
-function find_name(A, M = Main; all::Bool = false)
+"""
+    set_name!(obj, name::String; override::Bool=true)
+
+Sets the name of the object `obj` to `name`.
+This name is used for printing using [`AbstractAlgebra.@show_name`](@ref).
+If `override` is `false`, the name is only set if there is no name already set.
+
+This function errors if `obj` does not support attribute storage.
+"""
+function set_name!(obj, name::String; override::Bool=true)
+  override || isnothing(get_attribute(obj, :name)) || return
+  set_attribute!(obj, :name => name)
+end
+
+"""
+    set_name!(obj; override::Bool=true)
+
+Sets the name of the object `obj` to the name of a variable in global (`Main` module) namespace
+with value bound to the object `obj`, if such a variable exists (see [`AbstractAlgebra.find_name`](@ref)).
+This name is used for printing using [`AbstractAlgebra.@show_name`](@ref).
+If `override` is `false`, the name is only set if there is no name already set.
+
+This function errors if `obj` does not support attribute storage.
+"""
+function set_name!(obj; override::Bool=true)
+  override || isnothing(get_attribute(obj, :name)) || return
+  sy = find_name(obj)
+  isnothing(sy) && return
+  set_name!(obj, string(sy); override=true)
+end
+
+"""
+    extra_name(obj) -> Union{String,Nothing}
+
+May be overloaded to provide a fallback name for the object `obj` in [`AbstractAlgebra.get_name`](@ref).
+The default implementation returns `nothing`.
+"""
+extra_name(obj) = nothing
+
+"""
+    find_name(obj, M = Main; all::Bool = false) -> Union{String,Nothing}
+
+Return name of a variable in `M`'s namespace with value bound to the object `obj`,
+or `nothing` if no such variable exists.
+If `all` is `true`, private and non-exported variables are also searched.
+
+!!! note
+    If the object is stored in several variables, the first one will be used,
+    but a name returned once is kept until the variable no longer contains this object.
+
+For this to work in doctests, one should call
+`AbstractAlgebra.set_current_module(@__MODULE__)` in the `value` argument of 
+`Documenter.DocMeta.setdocmeta!` and keep the default value of `M = Main` here.
+
+!!! warning
+    This function should not be used directly, but rather through [`AbstractAlgebra.get_name`](@ref).
+"""
+function find_name(obj, M=Main; all::Bool=false)
+  AbstractAlgebra._is_attribute_storing_type(typeof(obj)) || return find_new_name(obj, M; all)
+
+  cached_name = get_attribute(obj, :cached_name)
+  if !isnothing(cached_name)
+   cached_name_sy = Symbol(cached_name)
+    if M === Main && get_current_module() != Main
+      if isdefined(get_current_module(), cached_name_sy) && getproperty(get_current_module(), cached_name_sy) === obj
+        return cached_name
+      end
+    end
+    if isdefined(M, cached_name_sy) && getproperty(M, cached_name_sy) === obj
+      return cached_name
+    end
+  end
+  name = find_new_name(obj, M; all)
+  set_attribute!(obj, :cached_name => name)
+  return name
+end
+
+function find_new_name(obj, M=Main; all::Bool=false)
   # in Documenter, the examples are not run in the REPL.
   # in the REPL: A = ... adds A to the global name space (Main....)
   # in Documenter (doctests) all examples are run in their own module
   # which is stored in CurrentModule, hence we need to search there as well
   #furthermore, they are not exported, hence the "all" option
-  if M === Main && AbstractAlgebra.get_current_module() != Main
-    a = find_name(A, AbstractAlgebra.get_current_module(), all = true)
-    if a !== nothing
+  if M === Main && get_current_module() != Main
+    a = find_name(obj, get_current_module(), all=true)
+    if !isnothing(a)
       return a
     end
   end
-  for a = names(M, all = all)
+  for a = names(M; all=all)
     a === :ans && continue
-    if isdefined(M, a) && getfield(M, a) === A
-        return a
+    if isdefined(M, a) && getfield(M, a) === obj
+      return string(a)
     end
   end
+  return nothing
 end
 
-macro show_special(io, O)
-  return :( begin
-    local i = $(esc(io))
-    local o = $(esc(O))
-    s = get_attribute(o, :show)
-    if s !== nothing
-      s(i, o)
-      return
-    end
-  end )
+"""
+   get_name(obj) -> Union{String,Nothing}
+
+Returns the name of the object `obj` if it is set, or `nothing` otherwise.
+This function tries to find a name in the following order:
+1. The name set by [`AbstractAlgebra.set_name!`](@ref).
+2. The name of a variable in global (`Main` module) namespace with value bound to the object `obj` (see [`AbstractAlgebra.find_name`](@ref)).
+3. The name returned by [`AbstractAlgebra.extra_name`](@ref).
+"""
+function get_name(obj)
+  if AbstractAlgebra._is_attribute_storing_type(typeof(obj))
+    name = get_attribute(obj, :name)
+    isnothing(name) || return name
+  end
+
+  sy = find_name(obj)
+  isnothing(sy) || return string(sy)
+
+  name_maybe = extra_name(obj)::Union{String,Nothing}
+  isnothing(name_maybe) || return name_maybe
+
+  return nothing
 end
 
-macro show_special(io, mime, O)
-  return :( begin
-    local i = $(esc(io))
-    local m = $(esc(mime))
-    local o = $(esc(O))
-    s = get_attribute(o, :show)
-    if s !== nothing
-      s(i, m, o)
-      return
+"""
+    @show_name(io::IO, obj)
+
+If either property `:compact` or `:supercompact` is set to `true` for `io`
+(see [`IOContext`](https://docs.julialang.org/en/v1/base/io-network/#Base.IOContext)),
+print the name [`get_name(obj)`](@ref AbstractAlgebra.get_name) of the object `obj` to the `io` stream.
+This macro either prints the name and returns from the current scope, or does nothing.
+
+It is supposed to be used at the start of `show` methods as shown in the documentation.
+```
+"""
+macro show_name(io, obj)
+  return :(
+    begin
+      local i = $(esc(io))
+      local o = $(esc(obj))
+      if get(i, :supercompact, false) || get(i, :compact, false)
+        name = get_name(o)
+        if !isnothing(name)
+          if AbstractAlgebra.PrettyPrinting._supports_io_custom(i)
+            print(i, LowercaseOff())
+          end
+          print(i, name)
+          return
+        end
+      end
     end
-  end )
+  )
 end
 
-macro show_special_elem(io, e)
-  return :( begin
-    local i = $(esc(io))
-    local a = $(esc(e))
-    local o = parent(a)
-    s = get_attribute(o, :show_elem)
-    if s !== nothing
-      s(i, a)
-      return
+"""
+    @show_special(io::IO, obj)
+
+If the `obj` has a `show` attribute, this gets called with `io` and `obj` and
+returns from the current scope. Otherwise, does nothing.
+
+It is supposed to be used at the start of `show` methods as shown in the documentation.
+"""
+macro show_special(io, obj)
+  return :(
+    begin
+      local i = $(esc(io))
+      local o = $(esc(obj))
+      s = get_attribute(o, :show)
+      if s !== nothing
+        s(i, o)
+        return
+      end
     end
-  end )
+  )
 end
 
-macro show_special_elem(io, mime, e)
-  return :( begin
-    local i = $(esc(io))
-    local m = $(esc(mime))
-    local a = $(esc(e))
-    local o = parent(a)
-    s = get_attribute(o, :show_elem)
-    if s !== nothing
-      s(i, m, a)
-      return
+"""
+    @show_special(io::IO, mime, obj)
+
+If the `obj` has a `show` attribute, this gets called with `io`, `mime` and `obj` and
+returns from the current scope. Otherwise, does nothing.
+
+It is supposed to be used at the start of `show` methods as shown in the documentation.
+"""
+macro show_special(io, mime, obj)
+  return :(
+    begin
+      local i = $(esc(io))
+      local m = $(esc(mime))
+      local o = $(esc(obj))
+      s = get_attribute(o, :show)
+      if s !== nothing
+        s(i, m, o)
+        return
+      end
     end
-  end )
+  )
+end
+
+"""
+    @show_special_elem(io::IO, obj)
+
+If the `parent` of `obj` has a `show_special_elem` attribute, this gets called with `io` and `obj` and
+returns from the current scope. Otherwise, does nothing.
+
+It is supposed to be used at the start of `show` methods as shown in the documentation.
+"""
+macro show_special_elem(io, obj)
+  return :(
+    begin
+      local i = $(esc(io))
+      local o = $(esc(obj))
+      local p = parent(o)
+      s = get_attribute(p, :show_elem)
+      if s !== nothing
+        s(i, o)
+        return
+      end
+    end
+  )
+end
+
+"""
+    @show_special_elem(io::IO, mime, obj)
+
+If the `parent` of `obj` has a `show` attribute, this gets called with `io`, `mime` and `obj` and
+returns from the current scope. Otherwise, does nothing.
+
+It is supposed to be used at the start of `show` methods as shown in the documentation.
+"""
+macro show_special_elem(io, mime, obj)
+  return :(
+    begin
+      local i = $(esc(io))
+      local m = $(esc(mime))
+      local o = $(esc(obj))
+      local p = parent(o)
+      s = get_attribute(p, :show_elem)
+      if s !== nothing
+        s(i, m, o)
+        return
+      end
+    end
+  )
 end
 
 

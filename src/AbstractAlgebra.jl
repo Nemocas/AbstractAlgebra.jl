@@ -473,9 +473,9 @@ import .PrettyPrinting: expr_to_latex_string
 import .PrettyPrinting: expr_to_string
 import .PrettyPrinting: expressify
 import .PrettyPrinting: extra_name
-import .PrettyPrinting: find_name
 import .PrettyPrinting: get_current_module
 import .PrettyPrinting: get_html_as_latex
+import .PrettyPrinting: get_name
 import .PrettyPrinting: get_syntactic_sign_abs
 import .PrettyPrinting: is_syntactic_one
 import .PrettyPrinting: is_syntactic_zero
@@ -497,6 +497,8 @@ import .PrettyPrinting: LowercaseOff
 import .PrettyPrinting: Lowercase
 import .PrettyPrinting: Indent
 import .PrettyPrinting: Dedent
+
+import .PrettyPrinting: find_new_name as find_name # remove once all call-sites use get_name instead
 
 export @enable_all_show_via_expressify
 
