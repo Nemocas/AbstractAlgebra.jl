@@ -1,2 +1,2 @@
 # deprecated in 0.40.x
-Base.@deprecate_binding ordering internal_ordering
+@deprecate ordering(R::MPolyRing) internal_ordering(R::MPolyRing)

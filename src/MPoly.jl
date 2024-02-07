@@ -1211,7 +1211,7 @@ end
 ################################################################################
 
 function _change_mpoly_ring(R, Rx, cached)
-   P, _ = polynomial_ring(R, map(string, symbols(Rx)), internal_ordering = internal_ordering(Rx), cached = cached)
+   P, _ = polynomial_ring(R, map(string, symbols(Rx)); internal_ordering = internal_ordering(Rx), cached = cached)
    return P
 end
 
