@@ -294,7 +294,7 @@ is, $KA$ is the zero matrix.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 """
-function kernel(A::MatElem; side::Symbol = :right)
+function kernel(A::MatElem{<:FieldElement}; side::Symbol = :right)
   check_option(side, [:right, :left], "side")
 
   if side === :left
@@ -308,6 +308,20 @@ function kernel(A::MatElem; side::Symbol = :right)
     K = sub(K, 1:nrows(K), 1:n)
   end
   return K
+end
+
+function kernel(A::MatElem{<:RingElement}; side::Symbol = :right)
+  check_option(side, [:right, :left], "side")
+
+  if side === :right
+    H, U = hnf_with_transform(lazy_transpose(A))
+    return _kernel_of_hnf(A, H, U)[2]
+  else
+    H, U = hnf_with_transform(A)
+    _, X = _kernel_of_hnf(lazy_transpose(A), H, U)
+    # X is of type LazyTransposeMatElem
+    return data(X)
+  end
 end
 
 function kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :right)
@@ -432,7 +446,7 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
     return fl, data(sol), data(K)
   end
 
-  mu = hcat(A, b)
+  mu = hcat(deepcopy(A), deepcopy(b))
 
   rk = rref!(mu)
   p = pivot_and_non_pivot_cols(mu, rk)
@@ -621,7 +635,7 @@ end
 
 # Copied from Hecke, to be replaced with echelon_form_with_transformation eventually
 function _rref_with_transformation(M::MatElem{T}) where T <: FieldElement
-  n = hcat(M, identity_matrix(base_ring(M), nrows(M)))
+  n = hcat(deepcopy(M), identity_matrix(base_ring(M), nrows(M)))
   rref!(n)
   s = nrows(n)
   while s > 0 && iszero(sub(n, s:s, 1:ncols(M)))
