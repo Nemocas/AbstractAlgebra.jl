@@ -283,7 +283,7 @@ function can_solve_with_solution_and_kernel(A::Union{MatElem{T}, SolveCtx{T}}, b
 end
 
 @doc raw"""
-    kernel(A::MatElem; side::Symbol = :right)
+    kernel([R::Ring], A::MatElem; side::Symbol = :right)
     kernel(C::SolveCtx; side::Symbol = :right)
 
 Return a matrix $K$ whose columns give a basis for the right kernel of $A$, that
@@ -291,6 +291,8 @@ is, $AK$ is the zero matrix.
 
 If `side == :left`, the rows of $K$ give a basis for the left kernel of $A$, that
 is, $KA$ is the zero matrix.
+
+If a ring $R$ is supplied as a first argument, the kernel is computed over $R$.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 """
@@ -346,6 +348,11 @@ function kernel(C::SolveCtx{<:RingElement}; side::Symbol = :right)
     # X is of type LazyTransposeMatElem
     return data(X)
   end
+end
+
+function kernel(R::Ring, A::MatElem; side::Symbol = :right)
+   AR = change_base_ring(R, A)
+   return kernel(AR; side)
 end
 
 ################################################################################
