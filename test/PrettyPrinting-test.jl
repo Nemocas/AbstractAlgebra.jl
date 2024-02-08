@@ -490,20 +490,20 @@ let
   println(io, evil_a^c)
   print(io, evil_a^c)
   @test String(take!(io)) == "  " * "Ŏ"^(c-2) * "\n" *
-                              "  ŎŎ" * "\n" *
-                              "  " * ellipses^(c-2) * "\n" *
-                              "  " * ellipses^2 * "\n" *
-                              "  aa" * "Ś"^(c-4) * "\n" *
-                              "  ŚŚŚŚ" * "\n" *
-                              "  bb" * wedge^(c-4) * "\n" *
-                              "  " * wedge^4 * "\n" *
-                              "    aa" * "Ŗ"^(c-6) * "\n" *
-                              "    ŖŖŖŖŖŖ" * "\n" *
-                              "    " * iacute^(c-4) * "\n" *
-                              "    " * iacute^4 * evil_a^(c-8) * "\n" *
-                              "    " * evil_a^(8) * "\n" *
-                              "    " * evil_a^(c-4) * "\n" *
-                              "    " * evil_a^4
+                             "  ŎŎ" * "\n" *
+                             "  " * ellipses^(c-2) * "\n" *
+                             "  " * ellipses^2 * "\n" *
+                             "  aa" * "Ś"^(c-4) * "\n" *
+                             "  ŚŚŚŚ" * "\n" *
+                             "  bb" * wedge^(c-4) * "\n" *
+                             "  " * wedge^4 * "\n" *
+                             "    aa" * "Ŗ"^(c-6) * "\n" *
+                             "    ŖŖŖŖŖŖ" * "\n" *
+                             "    " * iacute^(c-4) * "\n" *
+                             "    " * iacute^4 * evil_a^(c-8) * "\n" *
+                             "    " * evil_a^(8) * "\n" *
+                             "    " * evil_a^(c-4) * "\n" *
+                             "    " * evil_a^4
 
   # Test too much indentation
   io = IOBuffer()
