@@ -1605,8 +1605,7 @@ function _write_line(io::IOCustom, str::AbstractString)
     io.lowercasefirst = false
   end
   io.printed += textwidth(firststr)
-  reststr = join(restiter)
-  it = Iterators.partition(1:length(reststr), c - ind > 0 ? c - ind : c)
+  it = Iterators.partition(1:length(restiter), c - ind > 0 ? c - ind : c)
   for i in it
     # partitions of the spillover text
     written += write(io.io, "\n")
