@@ -617,17 +617,15 @@ end
 # and H = U*transpose(A) is in HNF.
 # The matrix A is only needed to get the return type right (MatElem vs LazyTransposeMatElem)
 function _kernel_of_hnf(A::MatElem{T}, H::MatElem{T}, U::MatElem{T}) where T <: RingElement
-  nullity = nrows(H)
-  for i = nrows(H):-1:1
-    if !is_zero_row(H, i)
-      nullity = nrows(H) - i
-      break
-    end
+  r = nrows(H)
+  while r > 0 && is_zero_row(H, r)
+    r -= 1
   end
+  nullity = nrows(H) - r
   N = zero(A, nrows(H), nullity)
   for i = 1:nrows(N)
     for j = 1:ncols(N)
-      N[i, j] = U[nrows(U) - j + 1, i]
+      N[i, j] = U[r + j, i]
     end
   end
   return nullity, N
