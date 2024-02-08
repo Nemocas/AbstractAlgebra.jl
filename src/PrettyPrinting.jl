@@ -1648,7 +1648,6 @@ function _write_line(io::IOCustom, str::AbstractString)
       written += write_indent(io)
       written += write(io.io, partstr)
       io.printed = textwidth(partstr)
-      println()
     else
       # width is more than the number of graphemes
       # we can only ever get double length lines (assuming non standard width can only be 2...)
@@ -1666,13 +1665,11 @@ function _write_line(io::IOCustom, str::AbstractString)
       written += write_indent(io)
       written += write(io.io, printstr)
       io.printed = textwidth(printstr)
-      println()
       printstr = join(partcollect[j+1:end])
       written += write(io.io, "\n")
       written += write_indent(io)
       written += write(io.io, printstr)
       io.printed = textwidth(printstr)
-      println()
     end
   end
   return written
