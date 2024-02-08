@@ -1597,22 +1597,83 @@ function _write_line(io::IOCustom, str::AbstractString)
   firstiter = Base.Iterators.take(_graphemes, firstlen)
   restiter = Base.Iterators.drop(_graphemes, firstlen)
   firststr = join(firstiter)
-  if io.lowercasefirst
-    written += write(io.io, lowercasefirst(firststr))
-    io.lowercasefirst = false
+  if length(firstiter) == textwidth(firststr)
+    if io.lowercasefirst
+      written += write(io.io, lowercasefirst(firststr))
+      io.lowercasefirst = false
+    else
+      written += write(io.io, firststr)
+      io.lowercasefirst = false
+    end
+    io.printed += textwidth(firststr)
   else
-    written += write(io.io, firststr)
-    io.lowercasefirst = false
+    #firstline is wider than number of graphemes
+    partcollect = collect(firstiter)
+    printstr = ""
+    j = 1
+    while textwidth(printstr) < (c - ind > 0 ? c - ind : c)
+      printstr *= partcollect[j]
+      j += 1
+      if j > length(partcollect)
+        break
+      end
+    end
+    if io.lowercasefirst
+      written += write(io.io, lowercasefirst(printstr))
+    else
+      written += write(io.io, printstr)
+    end
+    io.printed += textwidth(printstr)
+
+    #the spillover string
+    written += write(io.io, "\n")
+    written += write_indent(io)
+    printstr = join(collect(firstiter)[j:end])
+    if io.lowercasefirst
+      written += write(io.io, lowercasefirst(printstr))
+      io.lowercasefirst = false
+    else
+      written += write(io.io, printstr)
+      io.lowercasefirst = false
+    end
+    io.printed += textwidth(printstr)
   end
-  io.printed += textwidth(firststr)
   it = Iterators.partition(1:length(restiter), c - ind > 0 ? c - ind : c)
   for i in it
     # partitions of the spillover text
-    written += write(io.io, "\n")
-    written += write_indent(io)
-    written += write(io.io, join(collect(restiter)[i]))
-    io.printed = textwidth(join(collect(restiter)[i]))
-    println()
+    partcollect = collect(restiter)[i]
+    partstr = join(collect(restiter)[i])
+    if (textwidth(partstr) < (c - ind > 0 ? c - ind : c)) || length(i) == textwidth(partstr)
+      written += write(io.io, "\n")
+      written += write_indent(io)
+      written += write(io.io, partstr)
+      io.printed = textwidth(partstr)
+      println()
+    else
+      # width is more than the number of graphemes
+      # we can only ever get double length lines (assuming non standard width can only be 2...)
+      # bad assumption to make ?
+      printstr = ""
+      j = 1
+      while textwidth(printstr) < (c - ind > 0 ? c - ind : c)
+         printstr *= partcollect[j]
+         j += 1
+         if j > length(partcollect)
+            break
+         end
+      end
+      written += write(io.io, "\n")
+      written += write_indent(io)
+      written += write(io.io, printstr)
+      io.printed = textwidth(printstr)
+      println()
+      printstr = join(partcollect[j+1:end])
+      written += write(io.io, "\n")
+      written += write_indent(io)
+      written += write(io.io, printstr)
+      io.printed = textwidth(printstr)
+      println()
+    end
   end
   return written
 end
