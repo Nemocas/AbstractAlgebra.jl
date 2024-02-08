@@ -1596,17 +1596,19 @@ function _write_line(io::IOCustom, str::AbstractString)
   _graphemes = Base.Unicode.graphemes(str)
   firstlen = min(spaceleft, length(_graphemes))
   # make an iterator over valid indices
-  firstiter = Base.Iterators.take(_graphemes, firstlen)
+  if io.lowercasefirst
+    firstiter = Base.Iterators.take(_graphemes, firstlen)
+    firstiter = join(firstiter)
+    firstiter = Base.Unicode.graphemes(lowercasefirst(firstiter))
+    io.lowercasefirst = false
+  else
+    firstiter = Base.Iterators.take(_graphemes, firstlen)
+    io.lowercasefirst = false
+  end
   restiter = Base.Iterators.drop(_graphemes, firstlen)
   firststr = join(firstiter)
   if length(firstiter) == textwidth(firststr)
-    if io.lowercasefirst
-      written += write(io.io, lowercasefirst(firststr))
-      io.lowercasefirst = false
-    else
-      written += write(io.io, firststr)
-      io.lowercasefirst = false
-    end
+    written += write(io.io, firststr)
     io.printed += textwidth(firststr)
   else
     #firstline is wider than number of graphemes
@@ -1620,24 +1622,14 @@ function _write_line(io::IOCustom, str::AbstractString)
         break
       end
     end
-    if io.lowercasefirst
-      written += write(io.io, lowercasefirst(printstr))
-    else
-      written += write(io.io, printstr)
-    end
+    written += write(io.io, printstr)
     io.printed += textwidth(printstr)
 
     #the spillover string
     written += write(io.io, "\n")
     written += write_indent(io)
     printstr = join(collect(firstiter)[j:end])
-    if io.lowercasefirst
-      written += write(io.io, lowercasefirst(printstr))
-      io.lowercasefirst = false
-    else
-      written += write(io.io, printstr)
-      io.lowercasefirst = false
-    end
+    written += write(io.io, printstr)
     io.printed += textwidth(printstr)
   end
   it = Iterators.partition(1:length(restiter), c - ind > 0 ? c - ind : c)
