@@ -1591,6 +1591,8 @@ function _write_line(io::IOCustom, str::AbstractString)
     spaceleft = c - ind - io.printed
   end
   #@show spaceleft
+  # The following code deals with line wrapping of Unicode text, including
+  # double-width symbols and more.
   _graphemes = Base.Unicode.graphemes(str)
   firstlen = min(spaceleft, length(_graphemes))
   # make an iterator over valid indices
