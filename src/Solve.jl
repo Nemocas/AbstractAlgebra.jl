@@ -289,7 +289,7 @@ end
 Return a matrix $K$ whose rows give a basis for the left kernel of $A$, that
 is, $KA$ is the zero matrix.
 
-If `side == :right`, the rows of $K$ give a basis for the right kernel of $A$, that
+If `side == :right`, the columns of $K$ give a basis for the right kernel of $A$, that
 is, $AK$ is the zero matrix.
 
 If a ring $R$ is supplied as a first argument, the kernel is computed over $R$.
