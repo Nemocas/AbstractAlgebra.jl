@@ -286,7 +286,7 @@ end
     kernel([R::Ring], A::MatElem; side::Symbol = :left)
     kernel(C::SolveCtx; side::Symbol = :left)
 
-Return a matrix $K$ whose columns give a basis for the left kernel of $A$, that
+Return a matrix $K$ whose rows give a basis for the left kernel of $A$, that
 is, $KA$ is the zero matrix.
 
 If `side == :right`, the rows of $K$ give a basis for the right kernel of $A$, that
