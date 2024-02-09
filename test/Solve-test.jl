@@ -78,6 +78,17 @@
     K = @inferred AbstractAlgebra.Solve.kernel(N)
     @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
   end
+
+  M = matrix(ZZ, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
+  K = @inferred AbstractAlgebra.Solve.kernel(QQ, M)
+  @test base_ring(K) === QQ
+  @test is_zero(M*K)
+  @test ncols(K) == 2
+
+  K = @inferred AbstractAlgebra.Solve.kernel(QQ, M, side = :left)
+  @test base_ring(K) === QQ
+  @test is_zero(K*M)
+  @test nrows(K) == 0
 end
 
 @testset "Linear solving context" begin
