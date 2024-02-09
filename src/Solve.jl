@@ -204,13 +204,13 @@ end
 ################################################################################
 
 @doc raw"""
-    solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
-    solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
-    solve(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
-    solve(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
+    solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
+    solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
+    solve(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :left) where T
+    solve(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :left) where T
 
-Return $x$ of same type as $b$ solving the linear system $Ax = b$, if `side == :right`
-(default), or $xA = b$, if `side == :left`.
+Return $x$ of same type as $b$ solving the linear system $xA = b$, if `side == :left`
+(default), or $Ax = b$, if `side == :right`.
 
 If no solution exists, an error is raised.
 
@@ -218,87 +218,89 @@ If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
 See also [`can_solve_with_solution`](@ref).
 """
-function solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
+function solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   fl, x = can_solve_with_solution(A, b, side = side)
   fl || throw(ArgumentError("Unable to solve linear system"))
   return x
 end
 
 @doc raw"""
-    can_solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
-    can_solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
-    can_solve(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
-    can_solve(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
+    can_solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
+    can_solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
+    can_solve(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :left) where T
+    can_solve(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :left) where T
 
-Return `true` if the linear system $Ax = b$ or $xA = b$ with `side == :right`
-(default) or `side == :left`, respectively, has a solution and `false` otherwise.
+Return `true` if the linear system $xA = b$ or $Ax = b$ with `side == :left`
+(default) or `side == :right`, respectively, has a solution and `false` otherwise.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
 See also [`can_solve_with_solution`](@ref).
 """
-function can_solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
+function can_solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return _can_solve_internal(A, b, :only_check; side = side)[1]
 end
 
 @doc raw"""
-    can_solve_with_solution(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
-    can_solve_with_solution(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
-    can_solve_with_solution(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
-    can_solve_with_solution(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
+    can_solve_with_solution(A::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
+    can_solve_with_solution(A::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
+    can_solve_with_solution(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :left) where T
+    can_solve_with_solution(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :left) where T
 
-Return `true` and $x$ of same type as $b$ solving the linear system $Ax = b$, if
+Return `true` and $x$ of same type as $b$ solving the linear system $xA = b$, if
 such a solution exists. Return `false` and an empty vector or matrix, if the
 system has no solution.
 
-If `side == :left`, the system $xA = b$ is solved.
+If `side == :right`, the system $Ax = b$ is solved.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
 See also [`solve`](@ref).
 """
-function can_solve_with_solution(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
+function can_solve_with_solution(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return _can_solve_internal(A, b, :with_solution; side = side)[1:2]
 end
 
 @doc raw"""
-    can_solve_with_solution_and_kernel(A::MatElem{T}, b::Vector{T}; side::Symbol = :right) where T
-    can_solve_with_solution_and_kernel(A::MatElem{T}, b::MatElem{T}; side::Symbol = :right) where T
-    can_solve_with_solution_and_kernel(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :right) where T
-    can_solve_with_solution_and_kernel(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :right) where T
+    can_solve_with_solution_and_kernel(A::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
+    can_solve_with_solution_and_kernel(A::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
+    can_solve_with_solution_and_kernel(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :left) where T
+    can_solve_with_solution_and_kernel(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :left) where T
 
-Return `true`, $x$ of same type as $b$ solving the linear system $Ax = b$,
-together with a matrix $K$ giving the kernel of $A$ (i.e. $AK = 0$), if such
+Return `true`, $x$ of same type as $b$ solving the linear system $xA = b$,
+together with a matrix $K$ giving the kernel of $A$ (i.e. $KA = 0$), if such
 a solution exists. Return `false`, an empty vector or matrix and an empty matrix,
 if the system has no solution.
 
-If `side == :left`, the system $xA = b$ is solved.
+If `side == :right`, the system $Ax = b$ is solved.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
 See also [`solve`](@ref) and [`kernel`](@ref).
 """
-function can_solve_with_solution_and_kernel(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :right) where T
+function can_solve_with_solution_and_kernel(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return _can_solve_internal(A, b, :with_kernel; side = side)
 end
 
 @doc raw"""
-    kernel(A::MatElem; side::Symbol = :right)
-    kernel(C::SolveCtx; side::Symbol = :right)
+    kernel([R::Ring], A::MatElem; side::Symbol = :left)
+    kernel(C::SolveCtx; side::Symbol = :left)
 
-Return a matrix $K$ whose columns give a basis for the right kernel of $A$, that
+Return a matrix $K$ whose rows give a basis for the left kernel of $A$, that
+is, $KA$ is the zero matrix.
+
+If `side == :right`, the columns of $K$ give a basis for the right kernel of $A$, that
 is, $AK$ is the zero matrix.
 
-If `side == :left`, the rows of $K$ give a basis for the left kernel of $A$, that
-is, $KA$ is the zero matrix.
+If a ring $R$ is supplied as a first argument, the kernel is computed over $R$.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 """
-function kernel(A::MatElem; side::Symbol = :right)
+function kernel(A::MatElem{<:FieldElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   if side === :left
-    K = kernel(lazy_transpose(A))
+    K = kernel(lazy_transpose(A), side = :right)
     return lazy_transpose(K)
   end
 
@@ -310,7 +312,21 @@ function kernel(A::MatElem; side::Symbol = :right)
   return K
 end
 
-function kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :right)
+function kernel(A::MatElem{<:RingElement}; side::Symbol = :left)
+  check_option(side, [:right, :left], "side")
+
+  if side === :right
+    H, U = hnf_with_transform(lazy_transpose(A))
+    return _kernel_of_hnf(A, H, U)[2]
+  else
+    H, U = hnf_with_transform(A)
+    _, X = _kernel_of_hnf(lazy_transpose(A), H, U)
+    # X is of type LazyTransposeMatElem
+    return data(X)
+  end
+end
+
+function kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   if side === :right
@@ -322,7 +338,7 @@ function kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :right)
   end
 end
 
-function kernel(C::SolveCtx{<:RingElement}; side::Symbol = :right)
+function kernel(C::SolveCtx{<:RingElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   if side === :right
@@ -332,6 +348,11 @@ function kernel(C::SolveCtx{<:RingElement}; side::Symbol = :right)
     # X is of type LazyTransposeMatElem
     return data(X)
   end
+end
+
+function kernel(R::Ring, A::MatElem; side::Symbol = :left)
+   AR = change_base_ring(R, A)
+   return kernel(AR; side)
 end
 
 ################################################################################
@@ -387,7 +408,7 @@ function pivot_and_non_pivot_cols(A::MatElem, r::Int)
 end
 
 # Transform a right hand side of type Vector into a MatElem and do sanity checks
-function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::Vector{T}, task::Symbol; side::Symbol = :right) where T
+function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::Vector{T}, task::Symbol; side::Symbol = :left) where T
   check_option(task, [:only_check, :with_solution, :with_kernel], "task")
   check_option(side, [:right, :left], "side")
 
@@ -410,7 +431,7 @@ function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::Vector{T}, ta
 end
 
 # Do sanity checks and call _can_solve_internal_no_check
-function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T
+function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
   check_option(task, [:only_check, :with_solution, :with_kernel], "task")
   check_option(side, [:right, :left], "side")
   if side === :right
@@ -422,7 +443,7 @@ function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::MatElem{T}, t
 end
 
 # _can_solve_internal_no_check over FIELDS
-function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: FieldElement
+function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
 
   R = base_ring(A)
 
@@ -432,7 +453,7 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
     return fl, data(sol), data(K)
   end
 
-  mu = hcat(A, b)
+  mu = hcat(deepcopy(A), deepcopy(b))
 
   rk = rref!(mu)
   p = pivot_and_non_pivot_cols(mu, rk)
@@ -468,7 +489,7 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
 end
 
 # _can_solve_internal_no_check over RINGS
-function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
+function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: RingElement
 
   R = base_ring(A)
 
@@ -489,7 +510,7 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
 end
 
 # _can_solve_internal_no_check over FIELDS with SOLVE CONTEXT
-function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: FieldElement
+function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
   if side === :right
     fl, sol = _can_solve_with_rref(b, transformation_matrix(C), rank(C), pivot_and_non_pivot_cols(C), task)
   else
@@ -504,7 +525,7 @@ function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbo
 end
 
 # _can_solve_internal_no_check over RINGS with SOLVE CONTEXT
-function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :right) where T <: RingElement
+function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: RingElement
   if side === :right
     fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
   else
@@ -603,17 +624,15 @@ end
 # and H = U*transpose(A) is in HNF.
 # The matrix A is only needed to get the return type right (MatElem vs LazyTransposeMatElem)
 function _kernel_of_hnf(A::MatElem{T}, H::MatElem{T}, U::MatElem{T}) where T <: RingElement
-  nullity = nrows(H)
-  for i = nrows(H):-1:1
-    if !is_zero_row(H, i)
-      nullity = nrows(H) - i
-      break
-    end
+  r = nrows(H)
+  while r > 0 && is_zero_row(H, r)
+    r -= 1
   end
+  nullity = nrows(H) - r
   N = zero(A, nrows(H), nullity)
   for i = 1:nrows(N)
     for j = 1:ncols(N)
-      N[i, j] = U[nrows(U) - j + 1, i]
+      N[i, j] = U[r + j, i]
     end
   end
   return nullity, N
@@ -621,7 +640,7 @@ end
 
 # Copied from Hecke, to be replaced with echelon_form_with_transformation eventually
 function _rref_with_transformation(M::MatElem{T}) where T <: FieldElement
-  n = hcat(M, identity_matrix(base_ring(M), nrows(M)))
+  n = hcat(deepcopy(M), identity_matrix(base_ring(M), nrows(M)))
   rref!(n)
   s = nrows(n)
   while s > 0 && iszero(sub(n, s:s, 1:ncols(M)))

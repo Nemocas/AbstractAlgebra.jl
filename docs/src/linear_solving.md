@@ -19,9 +19,9 @@ The module `AbstractAlgebra.Solve` provides the following four functions for sol
 All of these take the same set of arguments, namely:
 * a matrix $A$ of type `MatElem{T}`;
 * a vector or matrix $B$ of type `Vector{T}` or `MatElem{T}`;
-* a keyword argument `side` which can be either `:right` (default) or `:left`.
+* a keyword argument `side` which can be either `:left` (default) or `:right`.
 
-If `side` is `:right`, the system $Ax = B$ is solved, otherwise the system $xA = B$ is solved.
+If `side` is `:left`, the system $xA = B$ is solved, otherwise the system $Ax = B$ is solved.
 For matrices defined over a field, the functions internally rely on `rref`.
 If the matrices are defined over a ring, the function `hnf_with_transform` is required internally.
 
