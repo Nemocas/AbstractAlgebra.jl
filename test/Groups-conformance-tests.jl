@@ -57,8 +57,13 @@ function test_Group_interface(G::Group)
 
         @testset "order, rand" begin
             if is_finite(G)
-                @test order(Int16, G) isa Int16
-                @test order(BigInt, G) isa BigInt
+                ord = order(BigInt, G)
+                @test ord isa BigInt
+                if ord < typemax(Int16)
+                    @test order(Int16, G) isa Int16
+                else
+                    @test_throws InexactError order(Int16, G)
+                end
                 @test order(G) >= 1
                 @test is_trivial(G) == (order(G) == 1)
             else
