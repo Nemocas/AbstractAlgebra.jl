@@ -1,0 +1,10 @@
+title = "metadata for Nemo CI run"
+
+[env]
+# os = [ "ubuntu-latest" ]
+# julia-version = [ "~1.6.0-0" ]
+# branches = [ "<matching>", "release" ]
+
+[pkgs]
+  [pkgs.Nemo]
+  test = true
