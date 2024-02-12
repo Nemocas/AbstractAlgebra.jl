@@ -188,7 +188,7 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
       end
    end
    # Rewrite old relations in terms of generators of new submodule
-   num_rels, K = left_kernel(new_mat)
+   num_rels, K = _left_kernel(new_mat)
    new_rels = zero_matrix(base_ring(m), num_rels, num)
    # we flip rows and columns so that input is in terms of original data and
    # in upper triangular form, to save time in reduced_form below

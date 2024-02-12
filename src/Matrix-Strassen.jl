@@ -1,9 +1,9 @@
 """
 Provides generic asymptotically fast matrix methods:
   - mul and mul! using the Strassen scheme
-  - solve_tril!
+  - _solve_tril!
   - lu!
-  - solve_triu
+  - _solve_triu
 
 Just prefix the function by "Strassen." all 4 functions support a keyword
 argument "cutoff" to indicate when the base case should be used.
@@ -171,9 +171,9 @@ end
 # B C    Y    V
 # => X = solve(A, U)
 # Y = solve(C, V - B*X)
-function solve_tril!(A::MatElem{T}, B::MatElem{T}, C::MatElem{T}, f::Int = 0; cutoff::Int = 2) where T
+function _solve_tril!(A::MatElem{T}, B::MatElem{T}, C::MatElem{T}, f::Int = 0; cutoff::Int = 2) where T
   if nrows(A) < cutoff || ncols(A) < cutoff
-    return AbstractAlgebra.solve_tril!(A, B, C, f)
+    return AbstractAlgebra._solve_tril!(A, B, C, f)
   end
   n = nrows(B)
   n2 = div(n, 2)
@@ -184,10 +184,10 @@ function solve_tril!(A::MatElem{T}, B::MatElem{T}, C::MatElem{T}, f::Int = 0; cu
   X2 = view(A, n2+1:n, 1:ncols(A))
   C1 = view(C, 1:n2, 1:ncols(A))
   C2 = view(C, n2+1:n, 1:ncols(A))
-  solve_tril!(X1, B11, C1, f; cutoff)
+  _solve_tril!(X1, B11, C1, f; cutoff)
   x = B21 * X1  # strassen...
   sub!(X2, C2, x)
-  solve_tril!(X2, B22, X2, f; cutoff)
+  _solve_tril!(X2, B22, X2, f; cutoff)
 end
 
 function apply!(A::MatElem, P::Perm{Int}; offset::Int = 0)
@@ -249,8 +249,8 @@ function lu!(P::Perm{Int}, A; cutoff::Int = 300)
   if r1 > 0
     #Note: A00 is a view of A0 thus a view of A
     # A0 is lu!, thus implicitly two triangular matrices giving the
-    # lu decomosition. solve_tril! looks ONLY at the lower part of A00
-    solve_tril!(A01, A00, A01, 1)
+    # lu decomosition. _solve_tril! looks ONLY at the lower part of A00
+    _solve_tril!(A01, A00, A01, 1)
     X = A10 * A01
     sub!(A11, A11, X)
   end
@@ -271,11 +271,11 @@ function lu!(P::Perm{Int}, A; cutoff::Int = 300)
   return r1 + r2
 end
 
-function solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff)
+function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff)
   #b*inv(T), thus solves Tx = b for T upper triangular
   n = ncols(T)
   if n <= cutoff
-    R = AbstractAlgebra.solve_triu(T, b)
+    R = AbstractAlgebra._solve_triu(T, b)
     return R
   end
 
@@ -292,16 +292,16 @@ function solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff)
   B = view(T, 1:n2, 1+n2:n)
   C = view(T, 1+n2:n, 1+n2:n)
 
-  S = solve_triu(A, U; cutoff)
-  R = solve_triu(A, X; cutoff)
+  S = _solve_triu(A, U; cutoff)
+  R = _solve_triu(A, X; cutoff)
 
   SS = mul(S, B; cutoff)
   sub!(SS, V, SS)
-  SS = solve_triu(C, SS; cutoff)
+  SS = _solve_triu(C, SS; cutoff)
 
   RR = mul(R, B; cutoff)
   sub!(RR, Y, RR)
-  RR = solve_triu(C, RR; cutoff)
+  RR = _solve_triu(C, RR; cutoff)
 
   return [S SS; R RR]
 end

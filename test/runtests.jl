@@ -3,7 +3,8 @@ using AbstractAlgebra
 using Test
 
 
-if VERSION >= v"1.8.0"
+# disable until we encounter GC problems again
+if false VERSION >= v"1.8.0"
   GC.enable_logging(true)
 
   # print gc settings

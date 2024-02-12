@@ -73,7 +73,7 @@ function kernel(f::Map(FPModuleHomomorphism))
       end
    end
    # compute the kernel
-   num_gens, K = left_kernel(N)
+   num_gens, K = AbstractAlgebra._left_kernel(N)
    # Construct generators of kernel submodule, reversing rows
    # and columns so they're correct wrt to original data and
    # in upper triangular form
@@ -151,7 +151,7 @@ function preimage(f::Map(FPModuleHomomorphism), v::FPModuleElem{T}) where
          end
       end
       # Find left inverse of mat
-      x = solve_left(matr, Generic._matrix(v))
+      x = AbstractAlgebra._solve_left(matr, Generic._matrix(v))
       if q != 0
          x = matrix(R, 1, m, T[x[1, i] for i in 1:m])
       end

@@ -2,11 +2,7 @@
 CurrentModule = AbstractAlgebra.Solve
 ```
 
-# Linear solving
-
-!!! note
-
-    This functionality is experimental and subject to change.
+# [Linear solving](@id solving_chapter)
 
 ## Overview of the functionality
 
@@ -17,23 +13,21 @@ The module `AbstractAlgebra.Solve` provides the following four functions for sol
 * `can_solve_with_solution_and_kernel`
 
 All of these take the same set of arguments, namely:
-* a matrix $A$ of type `MatElem{T}`;
-* a vector or matrix $B$ of type `Vector{T}` or `MatElem{T}`;
+* a matrix $A$ of type `MatElem`;
+* a vector or matrix $B$ of type `Vector` or `MatElem`;
 * a keyword argument `side` which can be either `:left` (default) or `:right`.
 
 If `side` is `:left`, the system $xA = B$ is solved, otherwise the system $Ax = B$ is solved.
-For matrices defined over a field, the functions internally rely on `rref`.
-If the matrices are defined over a ring, the function `hnf_with_transform` is required internally.
 
 The functionality of the functions can be summarized as follows.
 * `solve`: return a solution, if it exists, otherwise throw an error.
 * `can_solve`: return `true`, if a solution exists, `false` otherwise.
 * `can_solve_with_solution`: return `true` and a solution, if this exists, and `false` and an empty vector or matrix otherwise.
-* `can_solve_with_solution_and_kernel`: like `can_solve_with_solution` and additionally return a matrix whose columns (respectively rows) give a basis of the kernel of $A$.
+* `can_solve_with_solution_and_kernel`: like `can_solve_with_solution` and additionally return a matrix whose rows (respectively columns) give a basis of the kernel of $A$.
 
 ## Solving with several right hand sides
 
-Systems $Ax = b_1,\dots, Ax = b_k$ with the same matrix $A$, but several right hand sides $b_i$ can be solved more efficiently, by first initializing a "context object" `C` of type `SolveCtx`.
+Systems $xA = b_1,\dots, xA = b_k$ with the same matrix $A$, but several right hand sides $b_i$ can be solved more efficiently, by first initializing a "context object" `C`.
 ```@docs
 solve_init
 ```
