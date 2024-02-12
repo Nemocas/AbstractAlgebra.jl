@@ -700,6 +700,7 @@ import ..Solve: solve
 import ..Solve: solve_init
 import ..Solve: can_solve
 import ..Solve: can_solve_with_solution
+import ..Solve: can_solve_with_solution_and_kernel
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export _check_dim
@@ -733,6 +734,7 @@ export block_diagonal_matrix
 export cached
 export can_solve
 export can_solve_with_solution
+export can_solve_with_solution_and_kernel
 export canonical_unit
 export change_base_ring
 export change_coefficient_ring
@@ -1088,6 +1090,7 @@ export snf_kb_with_transform
 export snf_kb!
 export snf_with_transform
 export solve
+export solve_init
 export sort_terms!
 export SparsePolynomialRing
 export Strassen
