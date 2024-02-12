@@ -86,19 +86,19 @@ Matrix space of 3 rows and 3 columns
   over univariate polynomial ring in t over rationals
 
 julia> A = S()
-[0   0   0]
-[0   0   0]
-[0   0   0]
+[.   .   .]
+[.   .   .]
+[.   .   .]
 
 julia> B = S(12)
-[12    0    0]
-[ 0   12    0]
-[ 0    0   12]
+[12    .    .]
+[ .   12    .]
+[ .    .   12]
 
 julia> C = S(R(11))
-[11    0    0]
-[ 0   11    0]
-[ 0    0   11]
+[11    .    .]
+[ .   11    .]
+[ .    .   11]
 
 ```
 
@@ -154,23 +154,23 @@ Matrix ring of degree 2
 
 julia> M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
 [2//1   3//1   1//1]
-[1//1   0//1   4//1]
+[1//1      .   4//1]
 
 julia> M2 = S(BigInt[2 3 1; 1 0 4])
 [2//1   3//1   1//1]
-[1//1   0//1   4//1]
+[1//1      .   4//1]
 
 julia> M3 = S(BigInt[2, 3, 1, 1, 0, 4])
 [2//1   3//1   1//1]
-[1//1   0//1   4//1]
+[1//1      .   4//1]
 
 julia> N1 = T(Rational{BigInt}[2 3; 1 0])
 [2//1   3//1]
-[1//1   0//1]
+[1//1      .]
 
 julia> N2 = T(BigInt[2 3; 1 0])
 [2//1   3//1]
-[1//1   0//1]
+[1//1      .]
 
 julia> N3 = T(BigInt[2, 3, 1, 1])
 [2//1   3//1]
@@ -185,7 +185,7 @@ Matrix space of 3 rows and 3 columns
 
 julia> M = R[t + 1 1; t^2 0]
 [t + 1   1]
-[  t^2   0]
+[  t^2   .]
 
 julia> N = R[t + 1 2 t] # create a row vector
 [t + 1   2   t]
@@ -227,25 +227,25 @@ Construct the $r\times c$ AbstractAlgebra.jl zero matrix over the ring `R`.
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
 [3   1   2]
-[2   0   1]
+[2   .   1]
 
 julia> N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
 [3   1]
 [2   2]
-[0   1]
+[.   1]
 
 julia> P = zero_matrix(ZZ, 3, 2)
-[0   0]
-[0   0]
-[0   0]
+[.   .]
+[.   .]
+[.   .]
 
 julia> R = matrix_ring(ZZ, 2)
 Matrix ring of degree 2
   over integers
 
 julia> M = R()
-[0   0]
-[0   0]
+[.   .]
+[.   .]
 ```
 
 ## Block diagonal matrix constructors
@@ -266,10 +266,10 @@ block_diagonal_matrix(::Ring, ::Vector{<:Matrix{T}}) where T <: RingElement
 
 ```jldoctest
 julia> block_diagonal_matrix(ZZ, [[1 2; 3 4], [4 5 6; 7 8 9]])
-[1   2   0   0   0]
-[3   4   0   0   0]
-[0   0   4   5   6]
-[0   0   7   8   9]
+[1   2   .   .   .]
+[3   4   .   .   .]
+[.   .   4   5   6]
+[.   .   7   8   9]
 
 julia> M = matrix(ZZ, [1 2; 3 4])
 [1   2]
@@ -280,10 +280,10 @@ julia> N = matrix(ZZ, [4 5 6; 7 8 9])
 [7   8   9]
 
 julia> block_diagonal_matrix([M, N])
-[1   2   0   0   0]
-[3   4   0   0   0]
-[0   0   4   5   6]
-[0   0   7   8   9]
+[1   2   .   .   .]
+[3   4   .   .   .]
+[.   .   4   5   6]
+[.   .   7   8   9]
 ```
 
 ## Conversion to Julia matrices, iteration and broacasting
@@ -549,7 +549,7 @@ julia> Z = divexact(2*A, 2)
 [   -2   t + 2   t^2 + t + 1]
 
 julia> M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
-[2   3   0]
+[2   3   .]
 [1   1   1]
 
 julia> M[1, 2] = BigInt(4)
@@ -680,22 +680,22 @@ julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
 [3   4   5]
 
 julia> N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
-[1   0   1]
-[0   1   0]
-[1   0   1]
+[1   .   1]
+[.   1   .]
+[1   .   1]
 
 julia> P = hcat(M, N)
-[1   2   3   1   0   1]
-[2   3   4   0   1   0]
-[3   4   5   1   0   1]
+[1   2   3   1   .   1]
+[2   3   4   .   1   .]
+[3   4   5   1   .   1]
 
 julia> Q = vcat(M, N)
 [1   2   3]
 [2   3   4]
 [3   4   5]
-[1   0   1]
-[0   1   0]
-[1   0   1]
+[1   .   1]
+[.   1   .]
+[1   .   1]
 
 ```
 
@@ -735,7 +735,7 @@ Test whether the given matrix has a value associated with indices `i` and `j`.
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
 [3   1   2]
-[2   0   1]
+[2   .   1]
 
 julia> isassigned(M, 1, 2)
 true
@@ -751,8 +751,8 @@ julia> isassigned(A, 1, 2)
 false
 
 julia> B = zero(M)
-[0   0   0]
-[0   0   0]
+[.   .   .]
+[.   .   .]
 
 julia> C = similar(M, 4, 5)
 [#undef   #undef   #undef   #undef   #undef]
@@ -764,8 +764,8 @@ julia> base_ring(B)
 Integers
 
 julia> D = zero(M, QQ, 2, 2)
-[0//1   0//1]
-[0//1   0//1]
+[.   .]
+[.   .]
 
 julia> base_ring(D)
 Rationals
@@ -834,7 +834,7 @@ Matrix space of 3 rows and 3 columns
   over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
-[      0   2*x + 3   x^2 + 1]
+[      .   2*x + 3   x^2 + 1]
 [x^2 - 2     x - 1       2*x]
 [x^2 - 2     x - 1       2*x]
 
@@ -871,7 +871,7 @@ Matrix space of 3 rows and 3 columns
   over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
-[            0   2*x + 3   x^2 + 1]
+[            .   2*x + 3   x^2 + 1]
 [      x^2 - 2     x - 1       2*x]
 [x^2 + 3*x + 1       2*x         1]
 
@@ -889,7 +889,7 @@ Matrix space of 3 rows and 3 columns
   over univariate polynomial ring in x over integers
 
 julia> M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
-[            0   2*x + 3   x^2 + 1]
+[            .   2*x + 3   x^2 + 1]
 [      x^2 - 2     x - 1       2*x]
 [x^2 + 3*x + 1       2*x         1]
 
@@ -938,10 +938,10 @@ julia> R, x = polynomial_ring(QQ, ["x$i" for i in 1:6])
 (Multivariate polynomial ring in 6 variables over rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x1, x2, x3, x4, x5, x6])
 
 julia> M = R[0 x[1] x[2] x[3]; -x[1] 0 x[4] x[5]; -x[2] -x[4] 0 x[6]; -x[3] -x[5] -x[6] 0]
-[  0    x1    x2   x3]
-[-x1     0    x4   x5]
-[-x2   -x4     0   x6]
-[-x3   -x5   -x6    0]
+[  .    x1    x2   x3]
+[-x1     .    x4   x5]
+[-x2   -x4     .   x6]
+[-x3   -x5   -x6    .]
 
 julia> pfaffian(M)
 x1*x6 - x2*x5 + x3*x4
@@ -1004,7 +1004,7 @@ Matrix space of 3 rows and 1 column
   over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
-[            0   2*x + 3   x^2 + 1]
+[            .   2*x + 3   x^2 + 1]
 [      x^2 - 2     x - 1       2*x]
 [x^2 + 3*x + 1       2*x         1]
 
@@ -1020,7 +1020,7 @@ julia> x = solve(A, b)
 
 julia> A = matrix(ZZ, 2, 2, [1, 2, 0, 2])
 [1   2]
-[0   2]
+[.   2]
 
 julia> b = matrix(ZZ, 2, 1, [2, 1])
 [2]
@@ -1041,8 +1041,8 @@ julia> can_solve_with_solution(A, b; side = :left)
 
 julia> A = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])
 [x + 1   2*x + 3   x^2 + 1]
-[    0   x^2 - 1       2*x]
-[    0         0         x]
+[    .   x^2 - 1       2*x]
+[    .         .         x]
 
 julia> bb = U([2a, a + 1, (-a - 1)])
 [   2*x]
@@ -1066,7 +1066,7 @@ Matrix space of 3 rows and 2 columns
   over univariate polynomial ring in x over integers
 
 julia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
-[            0   2*x + 3   x^2 + 1]
+[            .   2*x + 3   x^2 + 1]
 [      x^2 - 2     x - 1       2*x]
 [x^2 + 3*x + 1       2*x         1]
 
@@ -1124,7 +1124,7 @@ Matrix space of 3 rows and 3 columns
   over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
-[            0   2*x + 3   x^2 + 1]
+[            .   2*x + 3   x^2 + 1]
 [      x^2 - 2     x - 1       2*x]
 [x^2 + 3*x + 1       2*x         1]
 
@@ -1147,7 +1147,7 @@ Matrix space of 3 rows and 3 columns
   over univariate polynomial ring in x over integers
 
 julia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
-[            0   2*x + 3   x^2 + 1]
+[            .   2*x + 3   x^2 + 1]
 [      x^2 - 2     x - 1       2*x]
 [x^2 + 3*x + 1       2*x         1]
 
@@ -1181,10 +1181,10 @@ julia> M = S([1 2 0 4;
               2 0 1 1;
               0 1 1 -1;
               2 -1 0 2])
-[1    2   0    4]
-[2    0   1    1]
-[0    1   1   -1]
-[2   -1   0    2]
+[1    2   .    4]
+[2    .   1    1]
+[.    1   1   -1]
+[2   -1   .    2]
 
 julia> nr, Nr = kernel(M)
 (1, [-8; -6; 11; 5])
@@ -1216,15 +1216,15 @@ Matrix space of 4 rows and 4 columns
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
 [1   2   4   3]
-[2   5   1   0]
+[2   5   1   .]
 [6   1   3   2]
 [1   1   3   5]
 
 julia> A = hessenberg(M)
 [1   5   5   3]
-[2   1   1   0]
-[0   1   3   2]
-[0   0   2   2]
+[2   1   1   .]
+[.   1   3   2]
+[.   .   2   2]
 
 julia> is_hessenberg(A)
 true
@@ -1269,9 +1269,9 @@ julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
 [11   1   12]
 
 julia> H = hnf(A)
-[1   0   255]
-[0   1    17]
-[0   0   281]
+[1   .   255]
+[.   1    17]
+[.   .   281]
 
 julia> is_hnf(H)
 true
@@ -1280,9 +1280,9 @@ julia> H, U = hnf_with_transform(A)
 ([1 0 255; 0 1 17; 0 0 281], [-47 28 1; -3 2 0; -52 31 1])
 
 julia> U*A
-[1   0   255]
-[0   1    17]
-[0   0   281]
+[1   .   255]
+[.   1    17]
+[.   .   281]
 ```
 
 ### Smith normal form
@@ -1305,17 +1305,17 @@ julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
 [11   1   12]
 
 julia> S = snf(A)
-[1   0     0]
-[0   1     0]
-[0   0   281]
+[1   .     .]
+[.   1     .]
+[.   .   281]
 
 julia> S, T, U = snf_with_transform(A)
 ([1 0 0; 0 1 0; 0 0 281], [1 0 0; 7 1 0; 229 31 1], [0 -3 26; 0 2 -17; -1 0 1])
 
 julia> T*A*U
-[1   0     0]
-[0   1     0]
-[0   0   281]
+[1   .     .]
+[.   1     .]
+[.   .   281]
 ```
 
 ### (Weak) Popov form
@@ -1346,7 +1346,7 @@ julia> A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+
 
 julia> P = weak_popov(A)
 [   1                        2                    3   x]
-[   0                        0                    0   0]
+[   .                        .                    .   .]
 [-x^3   -2*x^3 + x^2 - 2*x + 1   -2*x^3 + x^2 - 3*x   1]
 
 julia> P, U = weak_popov_with_transform(A)
@@ -1354,6 +1354,6 @@ julia> P, U = weak_popov_with_transform(A)
 
 julia> U*A
 [   1                        2                    3   x]
-[   0                        0                    0   0]
+[   .                        .                    .   .]
 [-x^3   -2*x^3 + x^2 - 2*x + 1   -2*x^3 + x^2 - 3*x   1]
 ```
