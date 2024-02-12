@@ -529,17 +529,17 @@ let
   wedge = String([0xe2, 0x88, 0xa7])
   iacute = String([0xc3, 0xad])
   evil_a = String([0x61, 0xcc, 0x81, 0xcc, 0xa7, 0xcc, 0xa7])
-  wide_boat = String([0xe2, 0x9b, 0xb5])
+  boat = String([0xe2, 0x9b, 0xb5])
   family = String([0xf0, 0x9f, 0x91, 0xaa])
   print(io, AbstractAlgebra.Indent())
   println(io, "Ŏ"^c)
   println(io, ellipses^c)
   println(io, "aa", "Ś"^c)
-  println(io, wide_boat^80)
+  println(io, boat^(3*c))
   println(io, "bb", wedge^c)
   print(io, AbstractAlgebra.Indent())
   println(io, "aa", "Ŗ"^c)
-  println(io, family^c)
+  println(io, family^(3*c))
   println(io, iacute^c)
   println(io, evil_a^c)
   print(io, evil_a^c)
@@ -551,14 +551,22 @@ let
                              "  ŚŚŚŚ" * "\n" *
                              "  " * boat^39 * "\n" *
                              "  " * boat^39 * "\n" *
-                             "  " * boat^2 * "\n" *
+                             "  " * boat^39 * "\n" *
+                             "  " * boat^39 * "\n" *
+                             "  " * boat^39 * "\n" *
+                             "  " * boat^39 * "\n" *
+                             "  " * boat^6 * "\n" *
                              "  bb" * wedge^(c-4) * "\n" *
                              "  " * wedge^4 * "\n" *
                              "    aa" * "Ŗ"^(c-6) * "\n" *
                              "    ŖŖŖŖŖŖ" * "\n" *
                              "    " * family^38 * "\n" *
                              "    " * family^38 * "\n" *
-                             "    " * family^4 * "\n" *
+                             "    " * family^38 * "\n" *
+                             "    " * family^38 * "\n" *
+                             "    " * family^38 * "\n" *
+                             "    " * family^38 * "\n" *
+                             "    " * family^12 * "\n" *
                              "    " * iacute^(c-4) * "\n" *
                              "    " * iacute^4 *"\n" * 
                              "    " * evil_a^(c-4) * "\n" *
