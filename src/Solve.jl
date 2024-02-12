@@ -2,7 +2,7 @@ module Solve
 
 using AbstractAlgebra
 
-import AbstractAlgebra: base_ring, nrows, ncols, matrix, rank, Generic
+import AbstractAlgebra: base_ring, nrows, ncols, matrix, rank, Generic, kernel
 
 ################################################################################
 #
@@ -286,11 +286,14 @@ end
     kernel([R::Ring], A::MatElem; side::Symbol = :left)
     kernel(C::SolveCtx; side::Symbol = :left)
 
-Return a matrix $K$ whose rows give a basis for the left kernel of $A$, that
+Return a matrix $K$ whose rows generate the left kernel of $A$, that
 is, $KA$ is the zero matrix.
 
-If `side == :right`, the columns of $K$ give a basis for the right kernel of $A$, that
+If `side == :right`, the columns of $K$ generate the right kernel of $A$, that
 is, $AK$ is the zero matrix.
+
+If the base ring is a principal ideal domain, the rows or columns respectively of $K$
+are a basis of the respective kernel.
 
 If a ring $R$ is supplied as a first argument, the kernel is computed over $R$.
 

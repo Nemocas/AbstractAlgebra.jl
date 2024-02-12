@@ -696,6 +696,11 @@ import .Generic: sturm_sequence
 
 include("Solve.jl")
 
+import ..Solve: solve
+import ..Solve: solve_init
+import ..Solve: can_solve
+import ..Solve: can_solve_with_solution
+
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export _check_dim
 export _checkbounds
@@ -727,10 +732,7 @@ export basis
 export block_diagonal_matrix
 export cached
 export can_solve
-export can_solve_left_reduced_triu
-export can_solve_with_kernel
 export can_solve_with_solution
-export can_solve_with_solution_interpolation
 export canonical_unit
 export change_base_ring
 export change_coefficient_ring
@@ -920,7 +922,6 @@ export leading_exponent_vector
 export leading_exponent_word
 export leading_monomial
 export leading_term
-export left_kernel
 export leglength
 export length
 export lift
@@ -1057,7 +1058,6 @@ export reverse_cols
 export reverse_cols!
 export reverse_rows
 export reverse_rows!
-export right_kernel
 export rising_factorial
 export rising_factorial2
 export rowlength
@@ -1088,11 +1088,6 @@ export snf_kb_with_transform
 export snf_kb!
 export snf_with_transform
 export solve
-export solve_ff
-export solve_left
-export solve_rational
-export solve_triu
-export solve_with_det
 export sort_terms!
 export SparsePolynomialRing
 export Strassen

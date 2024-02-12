@@ -43,22 +43,22 @@ end
 #
 ###############################################################################
 
-function can_solve_with_solution_lu(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
+function _can_solve_with_solution_lu(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
    MS = MatSpaceElem{T}(R, M.entries) # convert to ordinary matrix
    BS = MatSpaceElem{T}(R, B.entries)
-   flag, S = can_solve_with_solution_lu(MS, BS)
+   flag, S = _can_solve_with_solution_lu(MS, BS)
    SA = MatRingElem{T}(R, S.entries)
    return flag, SA
 end
 
-function can_solve_with_solution_fflu(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
+function _can_solve_with_solution_fflu(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
    MS = MatSpaceElem{T}(R, M.entries) # convert to ordinary matrix
    BS = MatSpaceElem{T}(R, B.entries)
-   flag, S, d = can_solve_with_solution_fflu(MS, BS)
+   flag, S, d = _can_solve_with_solution_fflu(MS, BS)
    SA = MatRingElem{T}(R, S.entries)
    return flag, SA, d
 end

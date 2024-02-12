@@ -116,7 +116,9 @@ import Base: //
 import Base: /
 import Base: !=
 
-# The type and helper function for the dictionaries for hashing
+import ..AbstractAlgebra: _can_solve_with_solution_fflu
+import ..AbstractAlgebra: _can_solve_with_solution_lu
+import ..AbstractAlgebra: _left_kernel
 import ..AbstractAlgebra: @attributes
 import ..AbstractAlgebra: @enable_all_show_via_expressify
 import ..AbstractAlgebra: add!
@@ -125,8 +127,6 @@ import ..AbstractAlgebra: addmul!
 import ..AbstractAlgebra: base_ring
 import ..AbstractAlgebra: base_ring_type
 import ..AbstractAlgebra: CacheDictType
-import ..AbstractAlgebra: can_solve_with_solution_fflu
-import ..AbstractAlgebra: can_solve_with_solution_lu
 import ..AbstractAlgebra: canonical_unit
 import ..AbstractAlgebra: change_base_ring
 import ..AbstractAlgebra: characteristic

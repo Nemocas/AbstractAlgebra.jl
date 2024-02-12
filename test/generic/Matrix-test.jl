@@ -2027,7 +2027,7 @@ end
    end
 end
 
-@testset "Generic.Mat.can_solve_with_solution_fflu" begin
+@testset "Generic.Mat._can_solve_with_solution_fflu" begin
    R = ZZ
 
    # Test random soluble systems
@@ -2053,10 +2053,10 @@ end
          d2 = rand(R, -20:20)
       end
       A *= d2
-      flag, X, d = Generic.can_solve_with_solution_fflu(A, B)
+      flag, X, d = Generic._can_solve_with_solution_fflu(A, B)
       @test flag && A*X == B*d
       B = rand(T, -10:10)
-      flag, X, d = Generic.can_solve_with_solution_fflu(A, B)
+      flag, X, d = Generic._can_solve_with_solution_fflu(A, B)
       @test (flag && A*X == B*d) || !flag
    end
 
@@ -2071,10 +2071,10 @@ end
       U = matrix_space(R, n, k)
       A = randmat_with_rank(S, rank, -20:20)
       B = rand(T, -20:20)
-      flag1, X, d = Generic.can_solve_with_solution_fflu(A, B)
+      flag1, X, d = Generic._can_solve_with_solution_fflu(A, B)
       A2 = change_base_ring(QQ, A)
       B2 = change_base_ring(QQ, B)
-      flag2, X2 = can_solve_with_solution(A2, B2)
+      flag2, X2 = AbstractAlgebra._can_solve_with_solution(A2, B2)
       @test flag1 == flag2
    end
 end
@@ -2100,10 +2100,10 @@ end
       end
       X2 = rand(U)
       B = A*X2
-      flag, X = Generic.can_solve_with_solution_lu(A, B)
+      flag, X = Generic._can_solve_with_solution_lu(A, B)
       @test flag && A*X == B
       B = rand(T)
-      flag, X = Generic.can_solve_with_solution_lu(A, B)
+      flag, X = Generic._can_solve_with_solution_lu(A, B)
       @test (flag && A*X == B) || !flag
    end
 
@@ -2120,7 +2120,7 @@ end
        A = randmat_with_rank(S, rank, -20:20)
        X2 = rand(U, -20:20)
        B = A*X2
-       flag, X = Generic.can_solve_with_solution_lu(A, B)
+       flag, X = Generic._can_solve_with_solution_lu(A, B)
        @test flag && A*X == B
     end
 
@@ -2131,7 +2131,7 @@ end
       M = randmat_with_rank(S, dim, -100:100)
       b = rand(U, -100:100)
 
-      flag, x = Generic.can_solve_with_solution_lu(M, b)
+      flag, x = Generic._can_solve_with_solution_lu(M, b)
 
       @test flag && M*x == b
    end
@@ -2149,13 +2149,13 @@ end
       MK = matrix(K, elem_type(K)[ K(M[i, j]) for i in 1:nrows(M), j in 1:ncols(M) ])
       bK = matrix(K, elem_type(K)[ K(b[i, j]) for i in 1:nrows(b), j in 1:ncols(b) ])
 
-      flag, x = Generic.can_solve_with_solution_lu(MK, bK)
+      flag, x = Generic._can_solve_with_solution_lu(MK, bK)
 
       @test flag && MK*x == bK
    end
 end
 
-@testset "Generic.Mat.solve_ff" begin
+@testset "Generic.Mat._solve_ff" begin
    # Exact field
    R = QQ
 
@@ -2176,7 +2176,7 @@ end
       end
       B = divexact(B, d)
       @test A*divexact(X2, d) == B
-      X = Generic.solve_ff(A, B)
+      X = AbstractAlgebra._solve_ff(A, B)
       @test A*X == B
    end
 
@@ -2195,12 +2195,12 @@ end
       A = randmat_with_rank(S, rank, -20:20)
       X2 = rand(U, -20:20)
       B = A*X2
-      X, d = Generic.solve_ff(A, B)
+      X, d = AbstractAlgebra._solve_ff(A, B)
       @test A*X == B*d
    end
 end
 
-@testset "Generic.Mat.solve_rational" begin
+@testset "Generic.Mat._solve_rational" begin
    R = ZZ
 
    for i = 1:100
@@ -2214,7 +2214,7 @@ end
       A = randmat_with_rank(S, rank, -20:20)
       X2 = rand(U, -20:20)
       B = A*X2
-      X, d = solve_rational(A, B)
+      X, d = AbstractAlgebra._solve_rational(A, B)
       @test A*X == B*d
    end
 
@@ -2229,7 +2229,7 @@ end
 
       do_test = false
       try
-         x, d = solve_rational(M, b)
+         x, d = AbstractAlgebra._solve_rational(M, b)
          do_test = true
       catch e
          if !(e isa ErrorException)
@@ -2259,7 +2259,7 @@ end
       end
       M *= d2
       b = M*x2
-      x, d = solve_rational(M, b)
+      x, d = AbstractAlgebra._solve_rational(M, b)
 
       @test M*x == d*b
    end
@@ -2275,7 +2275,7 @@ end
       M = randmat_with_rank(S, dim, -100:100)
       b = rand(U, -100:100)
 
-      x = solve(M, b)
+      x = AbstractAlgebra._solve(M, b)
 
       @test M*x == b
    end
@@ -2298,7 +2298,7 @@ end
       end
       M *= d2
       b = M*x2
-      x, d = solve_rational(M, b)
+      x, d = AbstractAlgebra._solve_rational(M, b)
 
       @test M*x == d*b
    end
@@ -2314,7 +2314,7 @@ end
    M = T([3y*a^2 + (y + 1)*a + 2y (5y+1)*a^2 + 2a + y - 1 a^2 + (-a) + 2y; (y + 1)*a^2 + 2y - 4 3y*a^2 + (2y - 1)*a + y (4y - 1)*a^2 + (y - 1)*a + 5; 2a + y + 1 (2y + 2)*a^2 + 3y*a + 3y a^2 + (-y-1)*a + (-y - 3)])
    b = U(permutedims([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4], [2, 1]))
 
-   x, d = solve_rational(M, b)
+   x, d = AbstractAlgebra._solve_rational(M, b)
 
    @test M*x == d*b
 end
@@ -2334,7 +2334,7 @@ end
             M = rand(S, -20:20)
 
             B = M*X1
-            X = solve(M, B)
+            X = AbstractAlgebra._solve(M, B)
 
             @test M*X == B
          end
@@ -2355,14 +2355,14 @@ end
          M = rand(S, -1:2, -10:10)
 
          B = M*X1
-         X = solve(M, B)
+         X = AbstractAlgebra._solve(M, B)
 
          @test M*X == B
       end
    end
 end
 
-@testset "Generic.Mat.solve_left" begin
+@testset "Generic.Mat._solve_left" begin
    for R in [ZZ, QQ]
       for iter = 1:40
          for dim = 0:5
@@ -2377,7 +2377,7 @@ end
             M = rand(U, -20:20)
 
             B = X1*M
-            X = solve_left(M, X1*M)
+            X = AbstractAlgebra._solve_left(M, X1*M)
 
             @test X*M == B
          end
@@ -2399,7 +2399,7 @@ end
          M = rand(U, -1:2, -10:10)
 
          B = X1*M
-         X = solve_left(M, X1*M)
+         X = AbstractAlgebra._solve_left(M, X1*M)
 
          @test X*M == B
       end
@@ -2420,13 +2420,13 @@ end
       X2 = rand(U, -1:2, -10:10)
       b = M*X2
 
-      flag, X = Generic.can_solve_with_solution(M, b)
+      flag, X = AbstractAlgebra._can_solve_with_solution(M, b)
 
       @test flag && M*X == b
 
       b = X2*M
 
-      flag, X = Generic.can_solve_with_solution(M, b; side=:left)
+      flag, X = AbstractAlgebra._can_solve_with_solution(M, b; side=:left)
 
       @test flag && X*M == b
    end
@@ -2446,7 +2446,7 @@ end
       M = change_base_ring(S, M)
       b = change_base_ring(S, b)
 
-      flag, X = can_solve_with_solution(M, b)
+      flag, X = AbstractAlgebra._can_solve_with_solution(M, b)
 
       @test flag && M*X == b
 
@@ -2457,7 +2457,7 @@ end
       M = change_base_ring(S, M)
       b = change_base_ring(S, b)
 
-      flag, X = can_solve_with_solution(M, b; side=:left)
+      flag, X = AbstractAlgebra._can_solve_with_solution(M, b; side=:left)
 
       @test flag && X*M == b
    end
@@ -2477,9 +2477,9 @@ end
                M = rand(U, -20:20)
 
                B = M*X1
-               (flag, X) = can_solve_with_solution(M, M*X1)
+               (flag, X) = AbstractAlgebra._can_solve_with_solution(M, M*X1)
 
-               @test can_solve(M, B)
+               @test AbstractAlgebra._can_solve(M, B)
                @test flag && M*X == B
             end
 
@@ -2491,9 +2491,9 @@ end
                M = rand(U, -20:20)
 
                B = X1*M
-               (flag, X) = can_solve_with_solution(M, X1*M; side = :left)
+               (flag, X) = AbstractAlgebra._can_solve_with_solution(M, X1*M; side = :left)
 
-               @test can_solve(M, B; side = :left)
+               @test AbstractAlgebra._can_solve(M, B; side = :left)
                @test flag && X*M == B
             end
          end
@@ -2516,14 +2516,14 @@ end
             M = rand(U, -1:2, -10:10)
 
             B = M*X1
-            (flag, X) = can_solve_with_solution(M, M*X1)
+            (flag, X) = AbstractAlgebra._can_solve_with_solution(M, M*X1)
 
-            @test can_solve(M, B)
+            @test AbstractAlgebra._can_solve(M, B)
             @test flag && M*X == B
 
-            (flag, X) = can_solve_with_solution(M, M*X1; side = :right)
+            (flag, X) = AbstractAlgebra._can_solve_with_solution(M, M*X1; side = :right)
 
-            @test can_solve(M, B; side = :right)
+            @test AbstractAlgebra._can_solve(M, B; side = :right)
             @test flag && M*X == B
          end
 
@@ -2535,9 +2535,9 @@ end
             M = rand(U, -1:2, -10:10)
 
             B = X1*M
-            (flag, X) = can_solve_with_solution(M, X1*M; side = :left)
+            (flag, X) = AbstractAlgebra._can_solve_with_solution(M, X1*M; side = :left)
 
-            @test can_solve(M, B; side = :left)
+            @test AbstractAlgebra._can_solve(M, B; side = :left)
             @test flag && X*M == B
          end
       end
@@ -2547,12 +2547,12 @@ end
       M = matrix(R, 1, 1, [x])
       X = matrix(R, 1, 1, [1])
 
-      @assert !can_solve(M, X)
-      (flag, _) = can_solve_with_solution(M, X)
+      @assert !AbstractAlgebra._can_solve(M, X)
+      (flag, _) = AbstractAlgebra._can_solve_with_solution(M, X)
       @assert !flag
 
-      @assert !can_solve(M, X; side = :left)
-      (flag, _) = can_solve_with_solution(M, X; side = :left)
+      @assert !AbstractAlgebra._can_solve(M, X; side = :left)
+      (flag, _) = AbstractAlgebra._can_solve_with_solution(M, X; side = :left)
       @assert !flag
    end
 
@@ -2560,12 +2560,12 @@ end
       M = matrix(ZZ, 2, 2, [1, 1, 1, 1])
       X = matrix(ZZ, 2, 1, [1, 0])
 
-      @assert !can_solve(M, X)
-      (flag, _) = can_solve_with_solution(M, X)
+      @assert !AbstractAlgebra._can_solve(M, X)
+      (flag, _) = AbstractAlgebra._can_solve_with_solution(M, X)
       @assert !flag
 
-      @assert !can_solve(M, transpose(X); side = :left)
-      (flag, _) = can_solve_with_solution(M, transpose(X); side = :left)
+      @assert !AbstractAlgebra._can_solve(M, transpose(X); side = :left)
+      (flag, _) = AbstractAlgebra._can_solve_with_solution(M, transpose(X); side = :left)
       @assert !flag
    end
 
@@ -2573,18 +2573,18 @@ end
       M = matrix(ZZ, 3, 3, [2, 0, 0, 0, 1, 0, 0, 0, 1])
 
       X1 = matrix(ZZ, 3, 1, [1, 0, 0])
-      @assert !can_solve(M, X1)
-      (flag, X) = can_solve_with_solution(M, X1)
+      @assert !AbstractAlgebra._can_solve(M, X1)
+      (flag, X) = AbstractAlgebra._can_solve_with_solution(M, X1)
       @assert !flag
 
       X2 = matrix(ZZ, 2, 3, [1, 0, 0, 0, 1, 0])
-      @assert !can_solve(M, X2; side = :left)
-      (flag, _) = can_solve_with_solution(M, X2; side = :left)
+      @assert !AbstractAlgebra._can_solve(M, X2; side = :left)
+      (flag, _) = AbstractAlgebra._can_solve_with_solution(M, X2; side = :left)
       @assert !flag
    end
 
-   @test_throws Exception can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = :aaa)
-   @test_throws TypeError can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = "right")
+   @test_throws Exception AbstractAlgebra._can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = :aaa)
+   @test_throws TypeError AbstractAlgebra._can_solve_with_solution(matrix(ZZ, 2, 2, [1, 0, 0, 1]), matrix(ZZ, 2, 1, [2, 3]), side = "right")
 end
 
 @testset "Generic.Mat.can_solve_with_solution_interpolation" begin
@@ -2615,13 +2615,13 @@ end
       end
       M = M*d2
 
-      flag, X, d = Generic.can_solve_with_solution_interpolation(M, B)
+      flag, X, d = AbstractAlgebra._can_solve_with_solution_interpolation(M, B)
 
       @test flag && M*X == B*d
    end
 end
 
-@testset "Generic.Mat.solve_triu" begin
+@testset "Generic.Mat._solve_triu" begin
    R, x = polynomial_ring(QQ, "x")
    K, = residue_field(R, x^3 + 3x + 1)
    a = K(x)
@@ -2633,13 +2633,13 @@ end
       M = randmat_triu(S, -100:100)
       b = rand(U, -100:100)
 
-      x = solve_triu(M, b, false)
+      x = AbstractAlgebra._solve_triu(M, b, false)
 
       @test M*x == b
    end
 end
 
-@testset "Generic.Mat.solve_left_reduced_triu" begin
+@testset "Generic.Mat._solve_left_reduced_triu" begin
    for iter = 1:40
       n = rand(1:6)
       m = rand(1:n)
@@ -2651,7 +2651,7 @@ end
 
       M = hnf(M)
 
-      flag, x = can_solve_left_reduced_triu(r, M)
+      flag, x = AbstractAlgebra._can_solve_left_reduced_triu(r, M)
 
       @test flag == false || x*M == r
    end
@@ -2928,13 +2928,13 @@ end
    for i = 0:5
       M = randmat_with_rank(R, i, -20:20)
 
-      n, N = kernel(M)
+      n, N = AbstractAlgebra._kernel(M)
 
       @test n == 5 - i
       @test rank(N) == n
       @test iszero(M*N)
 
-      n, N = left_kernel(M)
+      n, N = AbstractAlgebra._left_kernel(M)
 
       @test n == 5 - i
       @test rank(N) == n
@@ -2949,13 +2949,13 @@ end
    for i = 0:5
       M = randmat_with_rank(S, i, -100:100)
 
-      n, N = kernel(M)
+      n, N = AbstractAlgebra._kernel(M)
 
       @test n == 5 - i
       @test rank(N) == n
       @test iszero(M*N)
 
-      n, N = left_kernel(M)
+      n, N = AbstractAlgebra._left_kernel(M)
 
       @test n == 5 - i
       @test rank(N) == n
@@ -2968,13 +2968,13 @@ end
    for i = 0:5
       M = randmat_with_rank(T, i, -1:2, -20:20)
 
-      n, N = kernel(M)
+      n, N = AbstractAlgebra._kernel(M)
 
       @test n == 5 - i
       @test rank(N) == n
       @test iszero(M*N)
 
-      n, N = left_kernel(M)
+      n, N = AbstractAlgebra._left_kernel(M)
 
       @test n == 5 - i
       @test rank(N) == n
@@ -3002,7 +3002,7 @@ end
 
          B = M*X
 
-         flag, Sol, K = can_solve_with_kernel(M, B)
+         flag, Sol, K = AbstractAlgebra._can_solve_with_kernel(M, B)
 
          @test iszero(M*K)
          @test flag && M*Sol == B
@@ -3010,15 +3010,15 @@ end
          # fully random
          B = rand(S, -20:20)
 
-         flag, Sol, K = can_solve_with_kernel(M, B)
-         flag2, Sol2 = can_solve_with_solution(M, B)
+         flag, Sol, K = AbstractAlgebra._can_solve_with_kernel(M, B)
+         flag2, Sol2 = AbstractAlgebra._can_solve_with_solution(M, B)
     
          @test flag == flag2
          if flag
             @test M*Sol == B
             @test iszero(M*K)
 
-            rk, N = kernel(M)
+            rk, N = AbstractAlgebra._kernel(M)
             @test nrows(N) == nrows(K)
             @test rk == ncols(K)
          end
@@ -3030,7 +3030,7 @@ end
 
          B = X*M
 
-         flag, Sol, K = can_solve_with_kernel(M, B; side=:left)
+         flag, Sol, K = AbstractAlgebra._can_solve_with_kernel(M, B; side=:left)
 
          @test iszero(K*M)
          @test flag && Sol*M == B

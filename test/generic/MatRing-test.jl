@@ -898,7 +898,7 @@ end
       M = randmat_with_rank(R, dim, -100:100)
       b = rand(U, -100:100)
 
-      flag, x = Generic.can_solve_with_solution_lu(M, b)
+      flag, x = Generic._can_solve_with_solution_lu(M, b)
 
       @test flag && M*x == b
    end
@@ -917,7 +917,7 @@ end
       MK = T(elem_type(K)[ K(M[i, j]) for i in 1:nrows(M), j in 1:ncols(M) ])
       bK = T(elem_type(K)[ K(b[i, j]) for i in 1:nrows(b), j in 1:ncols(b) ])
 
-      flag, x = Generic.can_solve_with_solution_lu(MK, bK)
+      flag, x = Generic._can_solve_with_solution_lu(MK, bK)
 
       @test flag && MK*x == bK
    end

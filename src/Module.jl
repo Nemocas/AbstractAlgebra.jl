@@ -158,7 +158,7 @@ function intersect(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
       end
    end
    # Find the left kernel space of the matrix
-   nc, K = left_kernel(mat)
+   nc, K = _left_kernel(mat)
    # Last r1 elements of a row correspond to a generators of intersection
    # We flip the rows of K so the input to Submodule is upper triangular
    # and the columns so that they correspond to the original order before
@@ -228,14 +228,14 @@ function ==(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
    mat2 = reduced_form(mat2)
    # Check containment of rewritten gens of M in row space of mat2
    for v in G1
-      flag, r = can_solve_left_reduced_triu(Generic._matrix(v), mat2)
+      flag, r = _can_solve_left_reduced_triu(Generic._matrix(v), mat2)
       if !flag
          return false
       end
    end
    # Check containment of rewritten gens of N in row space of mat1
    for v in G2
-      flag, r = can_solve_left_reduced_triu(Generic._matrix(v), mat1)
+      flag, r = _can_solve_left_reduced_triu(Generic._matrix(v), mat1)
       if !flag
          return false
       end
