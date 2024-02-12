@@ -1420,8 +1420,8 @@ end
       Q = inv(P)
 
       PA = P*A
-      @test PA == reduce(vcat, [A[Q[i], :] for i in 1:nrows(A)])
-      @test PA == reduce(vcat, A[Q[i], :] for i in 1:nrows(A))
+      @test PA == reduce(vcat, [A[Q[i]:Q[i], :] for i in 1:nrows(A)])
+      @test PA == reduce(vcat, A[Q[i]:Q[i], :] for i in 1:nrows(A))
       @test PA == S(reduce(vcat, A.entries[Q[i], :] for i in 1:nrows(A)))
       @test A == Q*(P*A)
    end
@@ -4022,11 +4022,25 @@ end
    @test fflu(N3) == fflu(M) # tests that deepcopy is correct
    @test M2 == M
 
-   for i in [ 1, 1:2, : ], j in [ 1, 1:2, : ]
+   for i in [ 1:1, 1:2, : ], j in [ 1:1, 1:2, : ]
      v = @view M[i,j]
      @test v isa Generic.MatSpaceView
      @test M[i,j] == v
    end
+
+   M2 = deepcopy(M)
+   M3 = @view M2[2, 1:2]
+   @test length(M3) == 2
+   @test M3 == [2, 3]
+   M3[2] = 5
+   @test M2 == ZZ[1 2 3; 2 5 4; 3 4 5]
+
+   M2 = deepcopy(M)
+   M3 = @view M2[1:3, 3]
+   @test length(M3) == 3
+   @test M3 == [3, 4, 5]
+   M3[1] = 10
+   @test M2 == ZZ[1 2 10; 2 3 4; 3 4 5]
 
    # Test views over noncommutative ring
    R = matrix_ring(ZZ, 2)
@@ -4035,7 +4049,7 @@ end
    
    M = rand(S, -10:10)
 
-   for i in [ 1, 1:2, : ], j in [ 1, 1:2, : ]
+   for i in [ 1:1, 1:2, : ], j in [ 1:1, 1:2, : ]
      v = @view M[i,j]
      @test v isa Generic.MatSpaceView
      @test M[i,j] == v
