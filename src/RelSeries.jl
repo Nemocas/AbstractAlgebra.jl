@@ -991,13 +991,29 @@ end
 ###############################################################################
 
 @doc raw"""
-    compose(a::RelPowerSeriesRingElem, b::RelPowerSeriesRingElem)
+    compose(f::RelPowerSeriesRingElem, g::RelPowerSeriesRingElem; inner)
 
-Compose the series $a$ with the series $b$ and return the result,
-i.e. return $a\circ b$. The two series do not need to be in the same ring,
-however the series $b$ must have positive valuation or an exception is raised.
+Compose the series $a$ with the series $b$ and return the result.
+- If `inner = :second`, then `f(g)` is returned and `g` must have positive valuation.
+- If `inner = :first`, then `g(f)` is returned and `f` must have positive valuation.
 """
-function compose(a::RelPowerSeriesRingElem, b::RelPowerSeriesRingElem)
+function compose(f::RelPowerSeriesRingElem, g::RelPowerSeriesRingElem; inner = nothing)
+  if inner === nothing
+    error("""compose(f, g) requires a keyword argument inner
+              - inner = :second yields f(g)
+              - inner = :first yields g(f)
+             Alternatively, use directly f(g) or g(f)
+             """)
+  end
+            
+  if inner == :second
+    return _compose_right(f, g)
+  else
+    return _compose_right(g, f)
+  end
+end
+
+function _compose_right(a::RelPowerSeriesRingElem, b::RelPowerSeriesRingElem)
    valuation(b) == 0 && error("Series being substituted must have positive valuation")
    i = pol_length(a)
    R = base_ring(a)
