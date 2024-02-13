@@ -562,7 +562,7 @@ end
    end
 end
 
-@testset "Generic.Ideal.intersection" begin
+@testset "Generic.Ideal.intersect" begin
    # multivariate
    R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:degrevlex)
 

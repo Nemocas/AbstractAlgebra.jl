@@ -154,7 +154,7 @@ false
 julia> contains(I, J)
 true
 
-julia> intersection(I, J) == J
+julia> intersect(I, J) == J
 true
 ```
 

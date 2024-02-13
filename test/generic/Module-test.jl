@@ -123,7 +123,7 @@ end
    end
 end
 
-@testset "Generic.Module.intersection" begin
+@testset "Generic.Module.intersect" begin
    for R in [ZZ, QQ]
       for iter = 1:100
          M = rand_module(R, -10:10)

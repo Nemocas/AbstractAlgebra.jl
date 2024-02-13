@@ -944,7 +944,6 @@ export map_with_section
 export map_with_section_from_func
 export map1
 export map2
-export mat
 export matrix
 export matrix_repr
 export matrix_ring
