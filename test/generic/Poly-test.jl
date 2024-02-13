@@ -1847,7 +1847,9 @@ end
       g = rand(R, -1:5, -10:10)
       h = rand(R, -1:5, -10:10)
 
-      @test compose(f, compose(g, h)) == compose(compose(f, g), h)
+      @test compose(f, compose(g, h; inner = :second); inner = :second) == compose(compose(f, g; inner = :second), h; inner = :second)
+      @test compose(f, g; inner = :first) == g(f)
+      @test compose(f, g; inner = :second) == f(g)
    end
 
    # Inexact field
@@ -1858,7 +1860,7 @@ end
       g = rand(R, -1:5, 0:1)
       h = rand(R, -1:5, 0:1)
 
-      @test isapprox(compose(f, compose(g, h)), compose(compose(f, g), h))
+      @test isapprox(compose(f, compose(g, h; inner = :second); inner = :second), compose(compose(f, g; inner = :second), h; inner = :second))
    end
 
    # Non-integral domain
@@ -1870,7 +1872,7 @@ end
       g = rand(R, -1:5, 0:5)
       h = rand(R, -1:5, 0:5)
 
-      @test compose(f, compose(g, h)) == compose(compose(f, g), h)
+      @test compose(f, compose(g, h; inner = :second); inner = :second) == compose(compose(f, g; inner = :second), h; inner = :second)
    end
 end
 

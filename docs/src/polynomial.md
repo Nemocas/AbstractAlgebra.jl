@@ -819,7 +819,7 @@ julia> k = evaluate(f, 3)
 julia> m = evaluate(f, x^2 + 2x + 1)
 x^5 + 4*x^4 + 7*x^3 + 7*x^2 + 4*x + 4
 
-julia> n = compose(f, g)
+julia> n = compose(f, g; inner = :second)
 (x^3 + 2*x^2 + x)*y^2 + (2*x^5 + 2*x^4 + 4*x^3 + 9*x^2 + 6*x + 1)*y + x^7 + 4*x^5 + 5*x^4 + 5*x^3 + 10*x^2 + 8*x + 5
 
 julia> p = subst(f, M)

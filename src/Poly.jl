@@ -2201,12 +2201,31 @@ function evaluate(a::PolyRingElem, b::T) where T <: RingElement
 end
 
 @doc raw"""
-    compose(a::PolyRingElem, b::PolyRingElem)
+    compose(f::PolyRingElem, g::PolyRingElem; inner)
 
-Compose the polynomial $a$ with the polynomial $b$ and return the result,
-i.e. return $a\circ b$.
+Compose the polynomial $a$ with the polynomial $b$ and return the result.
+- If `inner = :right`, then `f(g)` is returned.
+- If `inner = :left`, then `g(f)` is returned.
 """
-function compose(a::PolyRingElem, b::PolyRingElem)
+function compose(f::PolyRingElem, g::PolyRingElem; inner = nothing)
+  if inner === nothing
+    error("""compose(f, g) requires a keyword argument inner
+              - inner = :second yields f(g)
+              - inner = :first yields g(f)
+            Alternatively, use directly f(g) or g(f)
+             """)
+  end
+            
+  if inner == :second
+    return _compose_right(f, g)
+  elseif inner == :first
+    return _compose_right(g, f)
+  else
+    error("Keyword inner must be :first or :second")
+  end
+end
+
+function _compose_right(a::PolyRingElem, b::PolyRingElem)
    i = length(a)
    R = base_ring(a)
    S = parent(b)

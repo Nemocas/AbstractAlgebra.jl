@@ -783,10 +783,10 @@ end
      
         g = rand(R, 1:10, -10:10)
 
-        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
-        @test compose(x, g) == g
-        @test compose(x^2, g) == g^2
-        @test compose(R(), g) == R()
+        @test compose(f1 + f2, g; inner = :second) == compose(f1, g; inner = :second) + compose(f2, g; inner = :second)
+        @test compose(x, g; inner = :second) == g
+        @test compose(x^2, g; inner = :second) == g^2
+        @test compose(R(), g; inner = :second) == R()
     end
 
     S, y = power_series_ring(ZZ, 10, "y", model=:capped_absolute)
@@ -796,8 +796,8 @@ end
 
         g = rand(S, 1:10, -10:10)
 
-        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
-        @test compose(R(), g) == S()
+        @test compose(f1 + f2, g; inner = :second) == compose(f1, g; inner = :second) + compose(f2, g; inner = :second)
+        @test compose(R(), g; inner = :second) == S()
     end
 
     # Inexact field
@@ -808,10 +808,10 @@ end
 
         g = rand(R, 1:10, -10:10)
 
-        @test isapprox(compose(f1 + f2, g), compose(f1, g) + compose(f2, g))
-        @test isapprox(compose(x, g), g)
-        @test isapprox(compose(x^2, g), g^2)
-        @test isapprox(compose(R(), g), R())
+        @test isapprox(compose(f1 + f2, g; inner = :second), compose(f1, g; inner = :second) + compose(f2, g; inner = :second))
+        @test isapprox(compose(x, g; inner = :second), g)
+        @test isapprox(compose(x^2, g; inner = :second), g^2)
+        @test isapprox(compose(R(), g; inner = :second), R())
     end
 
     S, y = power_series_ring(RealField, 10, "y", model=:capped_absolute)
@@ -820,8 +820,8 @@ end
         f2 = rand(R, 0:10, -10:10)
 
         g = rand(S, 1:10, -10:10)
-        @test isapprox(compose(f1 + f2, g), compose(f1, g) + compose(f2, g))
-        @test isapprox(compose(R(), g), S())
+        @test isapprox(compose(f1 + f2, g; inner = :second), compose(f1, g; inner = :second) + compose(f2, g; inner = :second))
+        @test isapprox(compose(R(), g; inner = :second), S())
     end
 
     # Non-integral domain
@@ -833,10 +833,10 @@ end
 
         g = rand(R, 1:10, -10:10)
 
-        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
-        @test compose(x, g) == g
-        @test compose(x^2, g) == g^2
-        @test compose(R(), g) == R()
+        @test compose(f1 + f2, g; inner = :second) == compose(f1, g; inner = :second) + compose(f2, g; inner = :second)
+        @test compose(x, g; inner = :second) == g
+        @test compose(x^2, g; inner = :second) == g^2
+        @test compose(R(), g; inner = :second) == R()
     end
 
     S, y = power_series_ring(T, 10, "y", model=:capped_absolute)
@@ -846,8 +846,8 @@ end
 
         g = rand(S, 1:10, -10:10)
 
-        @test compose(f1 + f2, g) == compose(f1, g) + compose(f2, g)
-        @test compose(R(), g) == S()
+        @test compose(f1 + f2, g; inner = :second) == compose(f1, g; inner = :second) + compose(f2, g; inner = :second)
+        @test compose(R(), g; inner = :second) == S()
     end
 end
 
