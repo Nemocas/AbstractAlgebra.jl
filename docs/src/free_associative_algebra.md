@@ -253,4 +253,4 @@ julia> g = Generic.groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v, (y*x)^3*t + (y
 
 julia> normal_form(u*(x*y)^3*s*t + u*(x*y)^2*s*t +u*s*t + v*s*t, g)
 0
- ```
+```
