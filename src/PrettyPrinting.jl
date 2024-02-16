@@ -1592,20 +1592,16 @@ function _write_line(io::IOCustom, str::AbstractString)
     spaceleft = c - ind - io.printed
   end
   #@show spaceleft
+  if io.lowercasefirst
+   str = lowercasefirst(str)
+   io.lowercasefirst = false
+  end
   # The following code deals with line wrapping of Unicode text, including
   # double-width symbols and more.
   _graphemes = Base.Unicode.graphemes(str)
   firstlen = min(spaceleft, length(_graphemes))
   # make an iterator over valid indices
-  if io.lowercasefirst
-    firstiter = Base.Iterators.take(_graphemes, firstlen)
-    firstiter = join(firstiter)
-    firstiter = Base.Unicode.graphemes(lowercasefirst(firstiter))
-    io.lowercasefirst = false
-  else
-    firstiter = Base.Iterators.take(_graphemes, firstlen)
-    io.lowercasefirst = false
-  end
+  firstiter = Base.Iterators.take(_graphemes, firstlen)
   restiter = Base.Iterators.drop(_graphemes, firstlen)
   firststr = join(firstiter)
   width = textwidth(firststr)
