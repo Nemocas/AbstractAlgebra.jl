@@ -1415,7 +1415,7 @@ end
     set_name!(obj; override::Bool=true)
 
 Sets the name of the object `obj` to the name of a variable in global (`Main` module) namespace
-with value bound to the object `obj`, if such a variable exists (see [`AbstractAlgebra.find_name`](@ref)).
+with value bound to the object `obj`, if such a variable exists (see [`AbstractAlgebra.PrettyPrinting.find_name`](@ref)).
 This name is used for printing using [`AbstractAlgebra.@show_name`](@ref).
 If `override` is `false`, the name is only set if there is no name already set.
 
@@ -1501,7 +1501,7 @@ end
 Returns the name of the object `obj` if it is set, or `nothing` otherwise.
 This function tries to find a name in the following order:
 1. The name set by [`AbstractAlgebra.set_name!`](@ref).
-2. The name of a variable in global (`Main` module) namespace with value bound to the object `obj` (see [`AbstractAlgebra.find_name`](@ref)).
+2. The name of a variable in global (`Main` module) namespace with value bound to the object `obj` (see [`AbstractAlgebra.PrettyPrinting.find_name`](@ref)).
 3. The name returned by [`AbstractAlgebra.extra_name`](@ref).
 """
 function get_name(obj)

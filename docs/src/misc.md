@@ -98,7 +98,7 @@ AbstractAlgebra.@show_name
 AbstractAlgebra.get_name
 AbstractAlgebra.set_name!
 AbstractAlgebra.extra_name
-AbstractAlgebra.find_name
+AbstractAlgebra.PrettyPrinting.find_name
 ```
 
 ### Indentation and Decapitalization
