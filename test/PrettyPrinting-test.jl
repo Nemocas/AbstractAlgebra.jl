@@ -426,6 +426,30 @@ end
                              "    test\n" *
                              "  test"
 
+  # Test unicode
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  println(io, "testing unicode")
+  print(io, AbstractAlgebra.Indent(), "ŎŚĊĂŖ")
+  @test String(take!(io)) == "testing unicode\n" *
+                             "  ŎŚĊĂŖ"
+
+  # Test evil unicodes
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  _, c = displaysize(io)
+  print(io, AbstractAlgebra.Indent())
+  ellipses = String([0xe2, 0x80, 0xa6])
+  wedge = String([0xe2, 0x88, 0xa7])
+  iacute = String([0xc3, 0xad])
+  str = wedge ^25 * ellipses^25 * iacute^50
+  print(io, "aa", str)
+  @test String(take!(io)) == "  aa∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧" *
+                             "…………………………………………………………………" *
+                             "íííííííííííííííííííííííííí\n" *
+                             "  íííííííííííííííííííííííí"
+
+
   # Test string longer than width
   io = IOBuffer()
   io = AbstractAlgebra.pretty(io, force_newlines = true)
@@ -441,6 +465,125 @@ end
                              "  tttt\n" *
                              "    aa" * "t"^(c - 6) * "\n" *
                              "    tttttt"
+
+  # Test unicode string longer than width
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  _, c = displaysize(io)
+  print(io, AbstractAlgebra.Indent())
+  println(io, "Ŏ"^c)
+  println(io, "aa", "Ś"^c)
+  print(io, AbstractAlgebra.Indent())
+  print(io, "aa", "Ŗ"^c)
+  @test String(take!(io)) == "  " * "Ŏ"^(c-2) * "\n" *
+                             "  ŎŎ" * "\n" *
+                             "  aa" * "Ś"^(c-4) * "\n" *
+                             "  ŚŚŚŚ" * "\n" *
+                             "    aa" * "Ŗ"^(c-6) * "\n" *
+                             "    ŖŖŖŖŖŖ"
+
+  # Test evil unicode string much longer than width
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  _, c = displaysize(io)
+  ellipses = String([0xe2, 0x80, 0xa6])
+  wedge = String([0xe2, 0x88, 0xa7])
+  iacute = String([0xc3, 0xad])
+  evil_a = String([0x61, 0xcc, 0x81, 0xcc, 0xa7, 0xcc, 0xa7])
+  print(io, AbstractAlgebra.Indent())
+  println(io, "Ŏ"^c)
+  println(io, ellipses^c)
+  println(io, "aa", "Ś"^c)
+  println(io, "bb", wedge^c)
+  print(io, AbstractAlgebra.Indent())
+  println(io, "aa", "Ŗ"^c)
+  print(io, iacute^c)
+  println(io, evil_a^c)
+  print(io, evil_a^c)
+  @test String(take!(io)) == "  " * "Ŏ"^(c-2) * "\n" *
+                             "  ŎŎ" * "\n" *
+                             "  " * ellipses^(c-2) * "\n" *
+                             "  " * ellipses^2 * "\n" *
+                             "  aa" * "Ś"^(c-4) * "\n" *
+                             "  ŚŚŚŚ" * "\n" *
+                             "  bb" * wedge^(c-4) * "\n" *
+                             "  " * wedge^4 * "\n" *
+                             "    aa" * "Ŗ"^(c-6) * "\n" *
+                             "    ŖŖŖŖŖŖ" * "\n" *
+                             "    " * iacute^(c-4) * "\n" *
+                             "    " * iacute^4 * evil_a^(c-8) * "\n" *
+                             "    " * evil_a^(8) * "\n" *
+                             "    " * evil_a^(c-4) * "\n" *
+                             "    " * evil_a^4
+
+  # Test graphemes with non standard width
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  _, c = displaysize(io)
+  boat = String([0xe2, 0x9b, 0xb5])
+  family = String([0xf0, 0x9f, 0x91, 0xaa])
+  print(io, AbstractAlgebra.Indent())
+  println(io, (boat * family)^40)
+  print(io, (boat * family)^40)
+  @test String(take!(io)) == "  " * (boat*family)^19 * boat * "\n" *
+                             "  " * (family*boat)^19 * family * "\n" *
+                             "  " * boat * family * "\n" *
+                             "  " * (boat*family)^19 * boat * "\n" *
+                             "  " * (family*boat)^19 * family * "\n" *
+                             "  " * boat * family
+
+  # Test graphemes with standard and non standard width mixed in
+  io = IOBuffer()
+  io = AbstractAlgebra.pretty(io, force_newlines = true)
+  _, c = displaysize(io)
+  ellipses = String([0xe2, 0x80, 0xa6])
+  wedge = String([0xe2, 0x88, 0xa7])
+  iacute = String([0xc3, 0xad])
+  evil_a = String([0x61, 0xcc, 0x81, 0xcc, 0xa7, 0xcc, 0xa7])
+  boat = String([0xe2, 0x9b, 0xb5])
+  family = String([0xf0, 0x9f, 0x91, 0xaa])
+  print(io, AbstractAlgebra.Indent())
+  println(io, "Ŏ"^c)
+  println(io, ellipses^c)
+  println(io, "aa", "Ś"^c)
+  println(io, boat^(3*c))
+  println(io, "bb", wedge^c)
+  print(io, AbstractAlgebra.Indent())
+  println(io, "aa", "Ŗ"^c)
+  println(io, family^(3*c))
+  println(io, iacute^c)
+  println(io, evil_a^c)
+  print(io, evil_a^c)
+  @test String(take!(io)) == "  " * "Ŏ"^(c-2) * "\n" *
+                             "  ŎŎ" * "\n" *
+                             "  " * ellipses^(c-2) * "\n" *
+                             "  " * ellipses^2 * "\n" *
+                             "  aa" * "Ś"^(c-4) * "\n" *
+                             "  ŚŚŚŚ" * "\n" *
+                             "  " * boat^39 * "\n" *
+                             "  " * boat^39 * "\n" *
+                             "  " * boat^39 * "\n" *
+                             "  " * boat^39 * "\n" *
+                             "  " * boat^39 * "\n" *
+                             "  " * boat^39 * "\n" *
+                             "  " * boat^6 * "\n" *
+                             "  bb" * wedge^(c-4) * "\n" *
+                             "  " * wedge^4 * "\n" *
+                             "    aa" * "Ŗ"^(c-6) * "\n" *
+                             "    ŖŖŖŖŖŖ" * "\n" *
+                             "    " * family^38 * "\n" *
+                             "    " * family^38 * "\n" *
+                             "    " * family^38 * "\n" *
+                             "    " * family^38 * "\n" *
+                             "    " * family^38 * "\n" *
+                             "    " * family^38 * "\n" *
+                             "    " * family^12 * "\n" *
+                             "    " * iacute^(c-4) * "\n" *
+                             "    " * iacute^4 *"\n" * 
+                             "    " * evil_a^(c-4) * "\n" *
+                             "    " * evil_a^(4) * "\n" *
+                             "    " * evil_a^(c-4) * "\n" *
+                             "    " * evil_a^4
 
   # Test too much indentation
   io = IOBuffer()

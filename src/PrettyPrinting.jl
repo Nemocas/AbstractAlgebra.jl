@@ -1889,6 +1889,7 @@ function _write_line(io::IOCustom, str::AbstractString)
   # printed to an IOBuffer for comparisons
   c = _isbuffer(io) && !io.force_newlines ? typemax(Int) : displaysize(io)[2]
   ind = io.indent_level * textwidth(io.indent_str)
+  limit = c - ind > 0 ? c - ind : c
   # there might be already something written
   if c - ind - io.printed < 0
     spaceleft = mod(c - ind - io.printed, c)
@@ -1896,23 +1897,85 @@ function _write_line(io::IOCustom, str::AbstractString)
     spaceleft = c - ind - io.printed
   end
   #@show spaceleft
-  firstlen = min(spaceleft, length(str))
-  firststr = str[1:firstlen]
   if io.lowercasefirst
-    written += write(io.io, lowercasefirst(firststr))
-    io.lowercasefirst = false
-  else
-    written += write(io.io, firststr)
-    io.lowercasefirst = false
+   str = lowercasefirst(str)
+   io.lowercasefirst = false
   end
-  io.printed += textwidth(firststr)
-  reststr = str[firstlen + 1:end]
-  it = Iterators.partition(1:textwidth(reststr), c - ind > 0 ? c - ind : c)
-  for i in it
+  # The following code deals with line wrapping of Unicode text, including
+  # double-width symbols and more.
+  _graphemes = Base.Unicode.graphemes(str)
+  firstlen = min(spaceleft, length(_graphemes))
+  # make an iterator over valid indices
+  firstiter = Base.Iterators.take(_graphemes, firstlen)
+  restiter = Base.Iterators.drop(_graphemes, firstlen)
+  firststr = join(firstiter)
+  width = textwidth(firststr)
+  if length(firstiter) == width
+    written += write(io.io, firststr)
+    io.printed += width
+  else
+    #firstline is wider than number of graphemes
+    partcollect = collect(firstiter)
+    printstr = ""
+    j = 1
+    width = 0
+    while width < (limit)
+      printstr *= partcollect[j]
+      j += 1
+      width += textwidth(partcollect[j])
+      if j > length(partcollect)
+        break
+      end
+    end
+    written += write(io.io, printstr)
+    io.printed += width
+
+    #the spillover string
     written += write(io.io, "\n")
     written += write_indent(io)
-    written += write(io.io, reststr[i])
-    io.printed = textwidth(reststr[i])
+    printstr = join(collect(firstiter)[j:end])
+    written += write(io.io, printstr)
+    io.printed += textwidth(printstr)
+  end
+  it = Iterators.partition(1:length(restiter), limit)
+  restcollect = collect(restiter)
+  for i in it
+    # partitions of the spillover text
+    partcollect = restcollect[i]
+    partstr = join(partcollect)
+    width = textwidth(partstr)
+    if width < (limit) || length(i) == width
+      written += write(io.io, "\n")
+      written += write_indent(io)
+      written += write(io.io, partstr)
+      io.printed = width
+    else
+      # width is more than the number of graphemes
+      # we can only ever get double length lines
+      # (assuming non standard width can only be 2.)
+      # (see https://github.com/alacritty/alacritty/issues/265#issue-199665364 )
+      printstr = ""
+      j = 1
+      while textwidth(printstr) < (limit)
+         printstr *= partcollect[j]
+         j += 1
+         if j > length(partcollect)
+            break
+         end
+      end
+      written += write(io.io, "\n")
+      written += write_indent(io)
+      written += write(io.io, printstr)
+      io.printed = textwidth(printstr)
+      # print the second part
+      # there are at most two parts due to our assumption
+      # that no grapheme exceeds double width
+      printstr = join(partcollect[j:end])
+      written += write(io.io, "\n")
+      written += write_indent(io)
+      written += write(io.io, printstr)
+      io.printed = textwidth(printstr)
+    end
   end
   return written
 end
