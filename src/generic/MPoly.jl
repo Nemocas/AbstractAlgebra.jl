@@ -66,7 +66,7 @@ ring.
 """
 function gens(a::MPolyRing{T}) where {T <: RingElement}
    n = a.num_vars
-   return [gen(a, i, Val{a.ord}) for i in 1:n]
+   return elem_type(a)[gen(a, i, Val{a.ord})::elem_type(a) for i in 1:n]
 end
 
 @doc raw"""
