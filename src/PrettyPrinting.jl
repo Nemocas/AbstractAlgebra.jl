@@ -1607,9 +1607,10 @@ function _write_line(io::IOCustom, str::AbstractString)
   end
   restiter = Base.Iterators.drop(_graphemes, firstlen)
   firststr = join(firstiter)
-  if length(firstiter) == textwidth(firststr)
+  width = textwidth(firststr)
+  if length(firstiter) == width
     written += write(io.io, firststr)
-    io.printed += textwidth(firststr)
+    io.printed += width
   else
     #firstline is wider than number of graphemes
     partcollect = collect(firstiter)
