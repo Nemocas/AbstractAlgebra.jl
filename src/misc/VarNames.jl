@@ -367,7 +367,7 @@ Setting `n=:no` disables creation of this method.
 
 These macros behave like their `f(args..., varnames; kv...)` counterparts but also introduce the indexed `varnames` into the current scope.
 The first version needs at least one `varnames` argument.
-The third version calls the univariate method base method if it exists (e.g. `polynomial_ring(R, varname)`).
+The third version calls the univariate base method if it exists (e.g. `polynomial_ring(R, varname)`).
 
 Setting `macros=:no` disables macro creation.
 
