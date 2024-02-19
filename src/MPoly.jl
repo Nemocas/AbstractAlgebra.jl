@@ -373,7 +373,7 @@ function degree(f::MPolyRingElem{T}, i::Int) where T <: RingElement
    biggest = -1
    if length(f) != 0
       R = parent(f)
-      if ordering(R) == :lex && i == 1
+      if internal_ordering(R) == :lex && i == 1
          biggest = first(exponent_vectors(f))[1]
       else
          for v in exponent_vectors(f)
@@ -402,7 +402,7 @@ Return an array of the degrees of the polynomial $f$ in terms of each variable.
 """
 function degrees(f::MPolyRingElem{T}) where T <: RingElement
    R = parent(f)
-   if nvars(R) == 1 && ordering(R) == :lex && length(f) > 0
+   if nvars(R) == 1 && internal_ordering(R) == :lex && length(f) > 0
       return first(exponent_vectors(f))
    else
       biggest = [-1 for i = 1:nvars(R)]
@@ -1211,7 +1211,7 @@ end
 ################################################################################
 
 function _change_mpoly_ring(R, Rx, cached)
-   P, _ = polynomial_ring(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
+   P, _ = polynomial_ring(R, map(string, symbols(Rx)); internal_ordering = internal_ordering(Rx), cached = cached)
    return P
 end
 
@@ -1346,7 +1346,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached=true, ordering=:lex)
+    polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached=true, internal_ordering=:lex)
 
 Given a coefficient ring `R` and variable names, say `varnames = [:x1, :x2, ...]`,
 return a tuple `S, [x1, x2, ...]` of the polynomial ring $S = R[x1, x2, \dots]$
@@ -1357,7 +1357,8 @@ By default (`cached=true`), the output `S` will be cached, i.e. if
 (*identical*) ring is returned. Setting `cached` to `false` ensures a distinct
 new ring is returned, and will also prevent it from being cached.
 
-The `ordering` of the polynomial ring can be one of `:lex`, `:deglex` or `:degrevlex`.
+The monomial ordering used for the internal storage of polynomials in `S` can be
+set with `internal_ordering` and must be one of `:lex`, `:deglex` or `:degrevlex`.
 
 See also: [`polynomial_ring(::Ring, ::Vararg)`](@ref), [`@polynomial_ring`](@ref).
 
@@ -1374,8 +1375,8 @@ function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
 end
 
 """
-    polynomial_ring(R::Ring, varnames...; cached=true, ordering=:lex)
-    polynomial_ring(R::Ring, varnames::Tuple; cached=true, ordering=:lex)
+    polynomial_ring(R::Ring, varnames...; cached=true, internal_ordering=:lex)
+    polynomial_ring(R::Ring, varnames::Tuple; cached=true, internal_ordering=:lex)
 
 Like [`polynomial_ring(::Ring, ::Vector{Symbol})`](@ref) with more ways to give
 `varnames` as specified in [`variable_names`](@ref).
@@ -1414,7 +1415,7 @@ julia> y
 polynomial_ring(R::Ring, varnames...)
 
 @doc raw"""
-    polynomial_ring(R::Ring, n::Int, s::Symbol=:x; cached=true, ordering=:lex)
+    polynomial_ring(R::Ring, n::Int, s::Symbol=:x; cached=true, internal_ordering=:lex)
 
 Same as [`polynomial_ring(::Ring, ["s$i" for i in 1:n])`](@ref polynomial_ring(::Ring, ::Vector{Symbol})).
 
@@ -1428,7 +1429,7 @@ julia> S, x = polynomial_ring(ZZ, 3)
 polynomial_ring(R::Ring, n::Int, s::Symbol=:x)
 
 """
-    @polynomial_ring(R::Ring, varnames...; cached=true, ordering=:lex)
+    @polynomial_ring(R::Ring, varnames...; cached=true, internal_ordering=:lex)
 
 Return polynomial ring from [`polynomial_ring(::Ring, ::Vararg)`](@ref) and
 introduce the generators into the current scope.
@@ -1453,13 +1454,13 @@ true
 :(@polynomial_ring)
 
 """
-    polynomial_ring_only(R::Ring, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Bool=true)
+    polynomial_ring_only(R::Ring, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true)
 
 Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the
 multivariate polynomial ring.
 """
-polynomial_ring_only(R::T, s::Vector{Symbol}; ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
-   mpoly_ring_type(T)(R, s, ordering, cached)
+polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
+   mpoly_ring_type(T)(R, s, internal_ordering, cached)
 
 # Alternative constructors
 

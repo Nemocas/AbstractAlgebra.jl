@@ -5,12 +5,12 @@
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
-      @test polynomial_ring(R, var_names, ordering = ord, cached = true)[1] === polynomial_ring(R, var_names, ordering = ord, cached = true)[1]
-      @test polynomial_ring(R, var_names, ordering = ord, cached = false)[1] !== polynomial_ring(R, var_names, ordering = ord, cached = true)[1]
-      @test polynomial_ring(R, num_vars, "x", ordering = ord, cached = true)[1] === polynomial_ring(R, var_names, ordering = ord, cached = true)[1]
-      @test polynomial_ring(R, num_vars, ordering = ord, cached = true)[1] === polynomial_ring(R, var_names, ordering = ord, cached = true)[1]
+      @test polynomial_ring(R, var_names, internal_ordering = ord, cached = true)[1] === polynomial_ring(R, var_names, internal_ordering = ord, cached = true)[1]
+      @test polynomial_ring(R, var_names, internal_ordering = ord, cached = false)[1] !== polynomial_ring(R, var_names, internal_ordering = ord, cached = true)[1]
+      @test polynomial_ring(R, num_vars, "x", internal_ordering = ord, cached = true)[1] === polynomial_ring(R, var_names, internal_ordering = ord, cached = true)[1]
+      @test polynomial_ring(R, num_vars, internal_ordering = ord, cached = true)[1] === polynomial_ring(R, var_names, internal_ordering = ord, cached = true)[1]
 
       @test elem_type(S) == Generic.MPoly{elem_type(R)}
       @test elem_type(Generic.MPolyRing{elem_type(R)}) == Generic.MPoly{elem_type(R)}
@@ -187,7 +187,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
       g = gens(S)
 
       C = Generic.geobucket(S)
@@ -208,7 +208,7 @@ end
    ord = rand_ordering(rng)
    @test ord in [:lex, :deglex, :degrevlex]
 
-   S, varlist = polynomial_ring(R, var_names, ordering = ord)
+   S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
    test_rand(S, 0:5, 0:100, 0:0, -100:100)
 end
@@ -222,7 +222,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
       g = gens(S)
 
       @test !is_gen(S(1))
@@ -292,8 +292,8 @@ end
       end
 
       max_degs, biggest = max_fields(f)
-      deg = is_degree(ordering(S))
-      rev = is_reverse(ordering(S))
+      deg = is_degree(internal_ordering(S))
+      rev = is_reverse(internal_ordering(S))
 
       if deg
          @test max_degs[num_vars + 1] <= 100*num_vars
@@ -321,7 +321,7 @@ end
          @test max_degs[j] <= biggest
       end
 
-      @test ord == ordering(S)
+      @test ord == internal_ordering(S)
 
       @test nvars(parent(f)) == num_vars
       @test ngens(parent(f)) == num_vars
@@ -350,7 +350,7 @@ end
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
-      S, varlist = polynomial_ring(ZZ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(ZZ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          @test is_homogeneous(zero(S))
@@ -406,7 +406,7 @@ end
    for iter = 1:5
       ord = rand_ordering()
 
-      S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; ordering=ord)
+      S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; internal_ordering=ord)
 
       f = -8*x^5*y^3*z^5+9*x^5*y^2*z^3-8*x^4*y^5*z^4-10*x^4*y^3*z^2+8*x^3*y^2*z-10*x*y^3*
 z^4-4*x*y-10*x*z^2+8*y^2*z^5-9*y^2*z^3
@@ -426,7 +426,7 @@ end
       ord = rand_ordering()
       var_names = ["x$j" for j in 1:num_vars]
 
-      R, vars_R = polynomial_ring(ZZ, var_names; ordering=ord)
+      R, vars_R = polynomial_ring(ZZ, var_names; internal_ordering=ord)
 
       f = rand(R, 5:10, 1:10, -100:100)
       g = rand(R, 5:10, 1:10, -100:100)
@@ -449,7 +449,7 @@ end
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
-      S, varlist = polynomial_ring(ZZ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(ZZ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -470,7 +470,7 @@ end
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
-      S, varlist = polynomial_ring(ZZ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(ZZ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = zero(S)
@@ -523,7 +523,7 @@ end
          degrees = []
          for nord = 1:20
             ord = rand_ordering()
-            S, varlist = polynomial_ring(ZZ, var_names, ordering = ord)
+            S, varlist = polynomial_ring(ZZ, var_names, internal_ordering = ord)
             p = zero(S)
             for j = 1:nterms
                p += prod(varlist[i]^exps[i,j] for i = 1:nvars)
@@ -542,7 +542,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, 0:0, -100:100)
@@ -559,7 +559,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, 0:0, -100:100)
@@ -584,7 +584,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          f = rand(S, 0:5, 0:100, 0:0, -100:100)
@@ -625,7 +625,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          d = rand(-100:100)
@@ -648,7 +648,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, 0:0, -100:100)
@@ -691,7 +691,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -724,7 +724,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = polynomial_ring(ZZ, var_names, ordering = ord)
+         S, varlist = polynomial_ring(ZZ, var_names, internal_ordering = ord)
 
          for iter = 1:10
             f = rand(S, 0:5, 0:100, -100:100)
@@ -760,7 +760,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = polynomial_ring(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
          for iter = 1:10
             f = rand(S, 0:5, 0:100, 0:Int(p))
@@ -797,7 +797,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -825,7 +825,7 @@ end
 
       end
 
-      S, varlist = polynomial_ring(QQ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(QQ, var_names, internal_ordering = ord)
       v = varlist[1+Int(round(rand() * (num_vars-1)))]
       @test divrem(v, 2*v) == (1//2, 0)
    end
@@ -838,7 +838,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       @test divrem(varlist[1], elem_type(S)[]) == (elem_type(S)[], varlist[1])
 
@@ -886,7 +886,7 @@ end
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
-      S, varlist = polynomial_ring(ZZ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(ZZ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          p = rand(S, 0:4, 0:5, -10:10)
@@ -927,7 +927,7 @@ end
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
-      S, varlist = polynomial_ring(ZZ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(ZZ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -946,7 +946,7 @@ end
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
-      S, varlist = polynomial_ring(ZZ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(ZZ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -973,7 +973,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:50
          f = rand(S, 0:5, 0:100, 0:0, -100:100)
@@ -1012,7 +1012,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:50
          f = rand(S, 0:5, 0:100, 0:0, 0:0, -100:100)
@@ -1034,7 +1034,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          eval_num = rand(0:num_vars)
@@ -1128,7 +1128,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:50
          f = rand(S, 0:5, 0:100, -100:100)
@@ -1173,7 +1173,7 @@ end
    # Test ordering is correct, see issue #184
    for iter = 1:10
       ord = rand_ordering()
-      R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"], ordering = ord)
+      R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"], internal_ordering = ord)
 
       f = x*y^2*z^3
 
@@ -1257,7 +1257,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          f = S()
@@ -1293,7 +1293,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      R, vars = polynomial_ring(ZZ, var_names; ordering=ord)
+      R, vars = polynomial_ring(ZZ, var_names; internal_ordering=ord)
 
       j = 1
       for v in vars
@@ -1324,9 +1324,9 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      R, vars = polynomial_ring(ZZ, var_names; ordering=ord)
+      R, vars = polynomial_ring(ZZ, var_names; internal_ordering=ord)
 
-      F2x, varss = polynomial_ring(F2, var_names; ordering = ord)
+      F2x, varss = polynomial_ring(F2, var_names; internal_ordering = ord)
 
       @test typeof(AbstractAlgebra.Generic.change_base_ring(ZZ, R(1))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(1))}
       @test typeof(AbstractAlgebra.Generic.change_base_ring(ZZ, R(0))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(0))}
@@ -1335,7 +1335,7 @@ end
          f = rand(R, 5:10, 1:10, -100:100)
          @test evaluate(change_base_ring(R, f), [one(R) for i=1:num_vars]) == sum(f.coeffs[i] for i=1:f.length)
          @test evaluate(change_base_ring(R, f), vars) == f
-         @test ordering(parent(change_base_ring(R, f))) == ordering(parent(f))
+         @test internal_ordering(parent(change_base_ring(R, f))) == internal_ordering(parent(f))
 
          g = change_base_ring(F2, f, parent = F2x)
          @test base_ring(g) === F2
@@ -1352,7 +1352,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      R, vars_R = polynomial_ring(ZZ, var_names; ordering=ord)
+      R, vars_R = polynomial_ring(ZZ, var_names; internal_ordering=ord)
 
       for iter in 1:10
          f = rand(R, 5:10, 1:10, -100:100)
@@ -1366,7 +1366,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      R, vars_R = polynomial_ring(ZZ, var_names; ordering=ord)
+      R, vars_R = polynomial_ring(ZZ, var_names; internal_ordering=ord)
 
       for iter in 1:10
          f = R()
@@ -1400,7 +1400,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      R, vars_R = polynomial_ring(ZZ, var_names; ordering=ord)
+      R, vars_R = polynomial_ring(ZZ, var_names; internal_ordering=ord)
 
       for iter in 1:10
          f = R()
@@ -1472,7 +1472,7 @@ end
 
       var_names = ["x$j" for j in 1:num_vars]
 
-      R, vars_R = polynomial_ring(ZZ, var_names; ordering=ord)
+      R, vars_R = polynomial_ring(ZZ, var_names; internal_ordering=ord)
       x = rand(vars_R)
 
       R_univ, x_univ = polynomial_ring(ZZ, "x")
@@ -1498,7 +1498,7 @@ end
       ord = rand_ordering()
       var_names = ["x$j" for j in 1:num_vars]
 
-      R, vars_R = polynomial_ring(ZZ, var_names; ordering=ord)
+      R, vars_R = polynomial_ring(ZZ, var_names; internal_ordering=ord)
 
       @test length(AbstractAlgebra.Generic.coefficients_of_univariate(zero(R), true)) == 0
       @test length(AbstractAlgebra.Generic.coefficients_of_univariate(zero(R), false)) == 0
@@ -1528,7 +1528,7 @@ end
    maxdeg = 20
 
    # :deglex ordering
-   R, (x,y,z) = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, ["x", "y", "z"], ordering=:lex)
+   R, (x,y,z) = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, ["x", "y", "z"], internal_ordering=:lex)
    # Monomials of degree 2
    @test isless(z^2, y*z) == true
    @test isless(y*z, y^2) == true
@@ -1539,7 +1539,7 @@ end
    for n_vars = 1:maxdeg
       A = unique(sortslices(reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars)), dims=1),dims=1)
       var_names = ["x$j" for j in 1:n_vars]
-      R, varsR = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, var_names, ordering=:lex)
+      R, varsR = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, var_names, internal_ordering=:lex)
       for i in 1:size(A)[1]-1
          f = R([base_ring(R)(1)], [A[i,:]])
          g = R([base_ring(R)(1)], [A[i+1,:]])
@@ -1548,7 +1548,7 @@ end
    end
 
    # :deglex ordering
-   R, (x,y,z) = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, ["x", "y", "z"], ordering=:deglex)
+   R, (x,y,z) = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, ["x", "y", "z"], internal_ordering=:deglex)
 
    @test isless(z^2, y*z) == true
    @test isless(y*z, x*z) == true
@@ -1559,7 +1559,7 @@ end
    for n_vars=1:maxdeg
       A = reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars))
       var_names = ["x$j" for j in 1:n_vars]
-      R, varsR = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, var_names, ordering=:deglex)
+      R, varsR = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, var_names, internal_ordering=:deglex)
 
       for i in 1:size(A)[1]-1
          f = R([base_ring(R)(1)], [A[i,:]])
@@ -1583,7 +1583,7 @@ end
    end
 
    # :degrevlex ordering
-   R, (x,y,z) = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, ["x", "y", "z"], ordering=:degrevlex)
+   R, (x,y,z) = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, ["x", "y", "z"], internal_ordering=:degrevlex)
    # Monomials of degree 2
    @test isless(z^2, y*z) == true
    @test isless(y*z, x*z) == true
@@ -1593,7 +1593,7 @@ end
    for n_vars = 1:maxdeg
       A = reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars))
       var_names = ["x$j" for j in 1:n_vars]
-      R, varsR = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, var_names, ordering=:degrevlex)
+      R, varsR = AbstractAlgebra.Generic.polynomial_ring(AbstractAlgebra.Generic.ZZ, var_names, internal_ordering=:degrevlex)
       for i in 1:size(A)[1]-1
          f = R([base_ring(R)(1)], [A[i,:]])
          g = R([base_ring(R)(1)], [A[i+1,:]])

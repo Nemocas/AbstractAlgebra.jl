@@ -33,7 +33,7 @@ end
 end
 
 @testset "MPolyEvaluate.ZZ(QQ)" begin
-  R, (x, y, z, t) = polynomial_ring(ZZ, ["x", "y", "z", "t"], ordering = :degrevlex)
+  R, (x, y, z, t) = polynomial_ring(ZZ, ["x", "y", "z", "t"], internal_ordering = :degrevlex)
   test_evaluate(zero(R), [QQ(), QQ(), QQ(), QQ()])
   test_evaluate(one(R), [QQ(), QQ(), QQ(), QQ()])
   for i in 1:100

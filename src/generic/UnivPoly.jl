@@ -44,7 +44,7 @@ function vars(p::UnivPoly{T, U}) where {T, U}
    return [UnivPoly{T, U}(v, S) for v in V]
 end
 
-ordering(p::UniversalPolyRing) = ordering(mpoly_ring(p))
+internal_ordering(p::UniversalPolyRing) = internal_ordering(mpoly_ring(p))
 
 function check_parent(a::UnivPoly{T, U}, b::UnivPoly{T, U}, throw::Bool = true) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
    flag = parent(a) != parent(b)
@@ -904,8 +904,8 @@ end
 ################################################################################
 
 function _change_univ_poly_ring(R, Rx, cached::Bool)
-   P, _ = AbstractAlgebra.polynomial_ring(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
-   S = AbstractAlgebra.UniversalPolynomialRing(R; ordering=ordering(Rx), cached=cached)
+   P, _ = AbstractAlgebra.polynomial_ring(R, map(string, symbols(Rx)), internal_ordering = internal_ordering(Rx), cached = cached)
+   S = AbstractAlgebra.UniversalPolynomialRing(R; internal_ordering=internal_ordering(Rx), cached=cached)
    S.S = deepcopy(symbols(Rx))
    S.mpoly_ring = P
    return S
@@ -1120,10 +1120,10 @@ end
 #
 ###############################################################################
 
-function UniversalPolynomialRing(R::Ring; ordering=:lex, cached::Bool=true)
+function UniversalPolynomialRing(R::Ring; internal_ordering=:lex, cached::Bool=true)
    T = elem_type(R)
    U = Generic.MPoly{T}
 
-   return UniversalPolyRing{T, U}(R, ordering, cached)
+   return UniversalPolyRing{T, U}(R, internal_ordering, cached)
 end
 

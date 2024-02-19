@@ -1320,7 +1320,7 @@ function reduce_gens(I::Ideal{U}; complete_reduction::Bool=true) where {T <: Rin
    # nothing to be done if only one poly
    if length(B) > 1
       # make heap
-      V = ordering(parent(B[1]))
+      V = internal_ordering(parent(B[1]))
       N = nvars(base_ring(I))
       heap = Vector{lmnode{U, V, N}}()
       for v in B
@@ -2169,7 +2169,7 @@ function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Abstr
    R = base_ring(S) # coefficient ring
    # create ring with additional variable "t" with higher precedence
    tsym = gensym()
-   Sup, Supv = AbstractAlgebra.polynomial_ring(R, vcat(tsym, symbols(S)); cached=false, ordering=:degrevlex)
+   Sup, Supv = AbstractAlgebra.polynomial_ring(R, vcat(tsym, symbols(S)); cached=false, internal_ordering=:degrevlex)
    G1 = gens(I)
    G2 = gens(J)
    ISup = Ideal(Sup, elem_type(Sup)[f(Supv[2:end]...) for f in G1])
@@ -2192,7 +2192,7 @@ function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Abstr
    R = base_ring(S) # coefficient ring
    # create ring with additional variable "t" with higher precedence
    tsym = gensym()
-   Sup, Supv = AbstractAlgebra.polynomial_ring(R, vcat(tsym, symbols(S)); cached=false, ordering=ordering(S))
+   Sup, Supv = AbstractAlgebra.polynomial_ring(R, vcat(tsym, symbols(S)); cached=false, internal_ordering=internal_ordering(S))
    G1 = gens(I)
    G2 = gens(J)
    ISup = Ideal(Sup, elem_type(Sup)[f(Supv[2:end]...) for f in G1])

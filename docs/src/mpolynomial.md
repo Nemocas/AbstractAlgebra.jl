@@ -71,7 +71,7 @@ ring.
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:deglex)
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:deglex)
 (Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> T, (z, t) = QQ["z", "t"]
@@ -231,7 +231,7 @@ gen(S::MPolyRing, i::Int)
 ```
 
 ```julia
-ordering(S::MPolyRing{T})
+internal_ordering(S::MPolyRing{T})
 ```
 
 Note that the currently supported orderings are `:lex`, `:deglex` and
@@ -430,7 +430,7 @@ x^3*y
 julia> setcoeff!(f, [3, 1], 12)
 12*x^3*y + 3*x*y^2 + 1
 
-julia> S, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering=:deglex)
+julia> S, (x, y) = polynomial_ring(QQ, ["x", "y"]; internal_ordering=:deglex)
 (Multivariate polynomial ring in 2 variables over rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia> V = symbols(S)
@@ -443,7 +443,7 @@ julia> X = gens(S)
  x
  y
 
-julia> ord = ordering(S)
+julia> ord = internal_ordering(S)
 :deglex
 
 julia> S, (x, y) = polynomial_ring(ZZ, ["x", "y"])
@@ -836,7 +836,7 @@ tail(::MPolyRingElem{T}) where T <: RingElement
 
 ```julia
 using AbstractAlgebra
-R,(x,y) = polynomial_ring(ZZ, ["x", "y"], ordering=:deglex)
+R,(x,y) = polynomial_ring(ZZ, ["x", "y"], internal_ordering=:deglex)
 p = 2*x*y + 3*y^3 + 1
 leading_term(p)
 leading_monomial(p)

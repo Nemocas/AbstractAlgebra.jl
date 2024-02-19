@@ -592,6 +592,7 @@ import .Generic: hash
 import .Generic: hooklength
 import .Generic: image_fn
 import .Generic: image_map
+import .Generic: internal_ordering
 import .Generic: interreduce!
 import .Generic: inv!
 import .Generic: inverse_fn
@@ -637,7 +638,6 @@ import .Generic: normalise
 import .Generic: num_coeff
 import .Generic: one
 import .Generic: order
-import .Generic: ordering
 import .Generic: parity
 import .Generic: partitionseq
 import .Generic: perm
@@ -858,6 +858,7 @@ export image_fn
 export image_map
 export inflate
 export integral
+export internal_ordering
 export interpolate
 export inv!
 export invariant_factors
@@ -988,7 +989,6 @@ export O
 export one
 export one!
 export order
-export ordering
 export parent_type
 export parity
 export Partition
