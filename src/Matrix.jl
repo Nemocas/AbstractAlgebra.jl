@@ -6789,6 +6789,11 @@ function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem{T}...) where T <: NC
   return M
 end
 
+#to bypass the vec(collect(M)) which copies twice
+function Base.vec(M::Generic.Mat)
+  return vec(M.entries)
+end
+
 function Base.vec(M::MatElem)
    r = elem_type(base_ring(M))[]
    sizehint!(r, nrows(M) * ncols(M))
