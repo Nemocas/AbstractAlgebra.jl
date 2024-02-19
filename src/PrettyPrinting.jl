@@ -1407,22 +1407,22 @@ If `override` is `false`, the name is only set if there is no name already set.
 This function errors if `obj` does not support attribute storage.
 """
 function set_name!(obj, name::String; override::Bool=true)
-  override || isnothing(get_attribute(obj, :name)) || return
-  set_attribute!(obj, :name => name)
+  override || isnothing(get_attribute(obj, :_name)) || return
+  set_attribute!(obj, :_name => name)
 end
 
 """
     set_name!(obj; override::Bool=true)
 
 Sets the name of the object `obj` to the name of a variable in global (`Main` module) namespace
-with value bound to the object `obj`, if such a variable exists (see [`AbstractAlgebra.find_name`](@ref)).
+with value bound to the object `obj`, if such a variable exists (see [`AbstractAlgebra.PrettyPrinting.find_name`](@ref)).
 This name is used for printing using [`AbstractAlgebra.@show_name`](@ref).
 If `override` is `false`, the name is only set if there is no name already set.
 
 This function errors if `obj` does not support attribute storage.
 """
 function set_name!(obj; override::Bool=true)
-  override || isnothing(get_attribute(obj, :name)) || return
+  override || isnothing(get_attribute(obj, :_name)) || return
   sy = find_name(obj)
   isnothing(sy) && return
   set_name!(obj, string(sy); override=true)
@@ -1457,7 +1457,7 @@ For this to work in doctests, one should call
 function find_name(obj, M=Main; all::Bool=false)
   AbstractAlgebra._is_attribute_storing_type(typeof(obj)) || return find_new_name(obj, M; all)
 
-  cached_name = get_attribute(obj, :cached_name)
+  cached_name = get_attribute(obj, :_cached_name)
   if !isnothing(cached_name)
    cached_name_sy = Symbol(cached_name)
     if M === Main && get_current_module() != Main
@@ -1470,7 +1470,7 @@ function find_name(obj, M=Main; all::Bool=false)
     end
   end
   name = find_new_name(obj, M; all)
-  set_attribute!(obj, :cached_name => name)
+  set_attribute!(obj, :_cached_name => name)
   return name
 end
 
@@ -1501,12 +1501,12 @@ end
 Returns the name of the object `obj` if it is set, or `nothing` otherwise.
 This function tries to find a name in the following order:
 1. The name set by [`AbstractAlgebra.set_name!`](@ref).
-2. The name of a variable in global (`Main` module) namespace with value bound to the object `obj` (see [`AbstractAlgebra.find_name`](@ref)).
+2. The name of a variable in global (`Main` module) namespace with value bound to the object `obj` (see [`AbstractAlgebra.PrettyPrinting.find_name`](@ref)).
 3. The name returned by [`AbstractAlgebra.extra_name`](@ref).
 """
 function get_name(obj)
   if AbstractAlgebra._is_attribute_storing_type(typeof(obj))
-    name = get_attribute(obj, :name)
+    name = get_attribute(obj, :_name)
     isnothing(name) || return name
   end
 
