@@ -4108,7 +4108,7 @@ end
 ################################################################################
 
 @doc raw"""
-    kernel(A::MatElem{T}; R::Ring, side::Symbol = :right) where T <: RingElement
+    _kernel(A::MatElem{T}; R::Ring, side::Symbol = :right) where T <: RingElement
 
 Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $A$ over $R$ and $M$ is a
 basis for it. If side is `:right` or not specified, the right kernel is
@@ -4116,9 +4116,9 @@ computed, i.e. the matrix of columns whose span gives the right kernel
 space. If side is `:left`, the left kernel is computed, i.e. the matrix
 of rows whose span is the left kernel space.
 """
-function kernel(A::MatElem{T}, R::Ring; side::Symbol=:right) where T <: RingElement
+function _kernel(A::MatElem{T}, R::Ring; side::Symbol=:right) where T <: RingElement
     AR = change_base_ring(R, A)
-    return kernel(AR; side)
+    return _kernel(AR; side)
 end
 
 ###############################################################################
