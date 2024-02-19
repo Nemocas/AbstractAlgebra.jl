@@ -6789,6 +6789,17 @@ function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem{T}...) where T <: NC
   return M
 end
 
+function Base.vec(M::MatElem)
+   r = elem_type(base_ring(M))[]
+   sizehint!(r, nrows(M) * ncols(M))
+   for j=1:ncols(M)
+      for i=1:nrows(M)
+         push!(r, M[i, j])
+      end
+   end
+   return r
+end
+
 ###############################################################################
 #
 #   Change Base Ring
