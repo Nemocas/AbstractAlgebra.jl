@@ -735,6 +735,10 @@ export cached
 export can_solve
 export can_solve_with_solution
 export can_solve_with_solution_and_kernel
+export canonical_injection
+export canonical_injections
+export canonical_projection
+export canonical_projections
 export canonical_unit
 export change_base_ring
 export change_coefficient_ring
@@ -851,6 +855,7 @@ export hnf_minors_with_transform
 export hnf_via_popov
 export hnf_via_popov_with_transform
 export hnf_with_transform
+export hom
 export hooklength
 export ideal
 export identity_map
@@ -1162,6 +1167,12 @@ function YoungTableau(part::Generic.Partition, fill::Vector{T}=collect(1:part.n)
    Generic.YoungTableau(part, fill)
 end
 
+################################################################################
+#
+#   generic stubs for sub, quo, ...
+#
+################################################################################
+
 @doc raw"""
     sub(m::Module{T}, subs::Vector{<:Generic.Submodule{T}}) where T <: RingElement
 
@@ -1175,6 +1186,14 @@ end
 # Handles empty vector of submodules
 function sub(m::Module{T}, subs::Vector{<:Generic.Submodule{U}}) where {T <: RingElement, U <: Any}
    Generic.sub(m, subs)
+end
+
+function canonical_injections(D)
+  return [canonical_injection(D, i) for i=1:_number_of_direct_product_factors(D)]
+end
+
+function canonical_projections(D)
+  return [canonical_projections(D, i) for i=1:_number_of_direct_product_factors(D)]
 end
 
 export Generic
