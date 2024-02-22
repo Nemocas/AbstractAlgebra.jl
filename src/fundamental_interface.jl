@@ -304,3 +304,32 @@ function sub! end
 Return `b*c`, possibly modifying the object `a` in the process.
 """
 function mul! end
+
+@doc raw"""
+    canonical_injection(D, i)
+
+Return the i-th canonical injection into the direct sum or product objects `D`.
+"""
+function canonical_injection end
+
+@doc raw"""
+    canonical_projection(D, i)
+
+Return the i-th canonical projection into the direct sum or product objects `D`.
+"""
+function canonical_projection end
+
+@doc raw"""
+    _number_of_direct_product_factors(D)
+
+Return the number of factors/ summands in the direct product/ sum object `D`
+"""
+function _number_of_direct_product_factors end
+
+@doc raw"""
+    hom(D, C, data)
+
+Return the homomorphism from the domain `D` into the codomain `C` defined by the data.
+"""
+function hom end
+

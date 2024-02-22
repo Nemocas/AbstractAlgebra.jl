@@ -152,6 +152,13 @@ function direct_sum_injection(i::Int, D::DirectSumModule{T}, v::AbstractAlgebra.
    return DirectSumModuleElem{T}(D, matv)
 end
 
+function AbstractAlgebra.canonical_injection(A::DirectSumModule, i::Int)
+  B = summands(A)[i]
+  return hom(B, A, [direct_sum_injection(i, A, x) for x = gens(B)])
+end
+
+AbstractAlgebra._number_of_direct_product_factors(A::DirectSumModule) = length(summands(A))
+
 function direct_sum_projection(D::DirectSumModule{T}, i::Int, v::AbstractAlgebra.FPModuleElem{T}) where {T <: RingElement}
    # Find starting point of the given module in the large vectors
    S = summands(D)
@@ -162,6 +169,10 @@ function direct_sum_projection(D::DirectSumModule{T}, i::Int, v::AbstractAlgebra
    newv = T[v[j + start] for j in 1:ngens(m)]
    matv = matrix(R, 1, length(newv), newv)
    return elem_type(m)(m, matv)
+end
+
+function AbstractAlgebra.canonical_projection(A::DirectSumModule, i::Int)
+  return hom(A, summands(A)[i], [direct_sum_projection(A, i, x) for x = gens(A)])
 end
 
 function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
@@ -239,3 +250,16 @@ function ModuleHomomorphism(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Mat
 
    return ModuleHomomorphism(D, A, transpose(hvcat(Tuple([length(SD) for i = 1:length(SA)]), map(x->transpose(x.matrix), m)...)))
 end
+
+function AbstractAlgebra.hom(A::AbstractAlgebra.Generic.DirectSumModule{T}, B::AbstractAlgebra.Generic.DirectSumModule{T}, M::Matrix{<:Map{<:AbstractAlgebra.FPModule{T}, <:AbstractAlgebra.FPModule{T}}}) where {T}
+  pro = canonical_projections(A)
+  im = canonical_injections(B)
+  s = hom(A, B, [zero(B) for i = 1:dim(A)])
+  for i=1:length(pro)
+    for j=1:length(im)
+      s += pro[i]*M[i,j]*im[j]
+    end
+  end
+  return s
+end
+
