@@ -301,8 +301,8 @@ function kernel(A::MatElem{<:FieldElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   if side === :left
-    K = kernel(lazy_transpose(A), side = :right)
-    return lazy_transpose(K)
+    KK = kernel(lazy_transpose(A), side = :right)
+    return lazy_transpose(KK)::typeof(A)
   end
 
   n, K = AbstractAlgebra.nullspace(A)
@@ -317,8 +317,8 @@ function kernel(A::MatElem{<:RingElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   if side === :right
-    H, U = hnf_with_transform(lazy_transpose(A))
-    return _kernel_of_hnf(A, H, U)[2]
+    HH, UU = hnf_with_transform(lazy_transpose(A))
+    return _kernel_of_hnf(A, HH, UU)[2]
   else
     H, U = hnf_with_transform(A)
     _, X = _kernel_of_hnf(lazy_transpose(A), H, U)
@@ -445,8 +445,8 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, sol, K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
-    return fl, data(sol), data(K)
+    fl, _sol, _K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    return fl, data(_sol), data(_K)
   end
 
   mu = hcat(deepcopy(A), deepcopy(b))
@@ -491,8 +491,8 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, sol, K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
-    return fl, data(sol), data(K)
+    fl, _sol, _K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    return fl, data(_sol), data(_K)
   end
 
   H, S = hnf_with_transform(lazy_transpose(A))
@@ -510,8 +510,8 @@ function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbo
   if side === :right
     fl, sol = _can_solve_with_rref(b, transformation_matrix(C), rank(C), pivot_and_non_pivot_cols(C), task)
   else
-    fl, sol = _can_solve_with_rref(lazy_transpose(b), transformation_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C), task)
-    sol = data(sol)
+    fl, _sol = _can_solve_with_rref(lazy_transpose(b), transformation_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C), task)
+    sol = data(_sol)
   end
   if !fl || task !== :with_kernel
     return fl, sol, zero(b, 0, 0)
@@ -525,8 +525,8 @@ function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbo
   if side === :right
     fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
   else
-    fl, sol = _can_solve_with_hnf(lazy_transpose(b), reduced_matrix(C), transformation_matrix(C), task)
-    sol = data(sol)
+    fl, _sol = _can_solve_with_hnf(lazy_transpose(b), reduced_matrix(C), transformation_matrix(C), task)
+    sol = data(_sol)
   end
   if !fl || task !== :with_kernel
     return fl, sol, zero(b, 0, 0)
