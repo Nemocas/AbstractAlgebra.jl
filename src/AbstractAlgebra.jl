@@ -675,6 +675,7 @@ import .Generic: total_degree
 import .Generic: trailing_coefficient
 import .Generic: truncate
 import .Generic: unit
+import .Generic: universal_polynomial_ring
 import .Generic: upscale
 import .Generic: weights
 import .Generic: zero
@@ -1121,7 +1122,7 @@ export truncate
 export typed_hcat
 export typed_hvcat
 export unit
-export UniversalPolynomialRing
+export universal_polynomial_ring
 export upper_triangular_matrix
 export upscale
 export use_karamul

@@ -42,7 +42,7 @@ The universal polynomial ring over a given base ring `R` is constructed with
 one of the following constructor functions.
 
 ```julia
-UniversalPolynomialRing(R::Ring; cached::Bool = true, internal_ordering::Symbol=:lex)
+universal_polynomial_ring(R::Ring; cached::Bool = true, internal_ordering::Symbol=:lex)
 ```
 
 Given a base ring `R` and an array `S` of strings, return an object representing
@@ -51,7 +51,7 @@ the universal polynomial ring $S = R[\ldots]$ with no variables in it initially.
 **Examples**
 
 ```jldoctest
-julia> S = UniversalPolynomialRing(ZZ)
+julia> S = universal_polynomial_ring(ZZ)
 Universal Polynomial Ring over Integers
 ```
 
@@ -67,7 +67,7 @@ gens(S::UniversalPolyRing, vars::Vector{VarName})
 **Examples**
 
 ```jldoctest
-julia> S = UniversalPolynomialRing(ZZ)
+julia> S = universal_polynomial_ring(ZZ)
 Universal Polynomial Ring over Integers
 
 julia> x = gen(S, "x")

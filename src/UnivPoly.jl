@@ -25,13 +25,3 @@ end
 function terms(a::UniversalPolyRingElem)
    return Generic.UnivPolyTerms(a)
 end
-
-###############################################################################
-#
-#   UniversalPolynomialRing constructor
-#
-###############################################################################
-
-function UniversalPolynomialRing(R::Ring; internal_ordering=:lex, cached::Bool=true)
-   return Generic.UniversalPolynomialRing(R; internal_ordering=internal_ordering, cached=cached)
-end
