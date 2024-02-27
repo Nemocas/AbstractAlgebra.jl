@@ -11,10 +11,9 @@ import LinearAlgebra: nullspace
 import LinearAlgebra: rank
 import LinearAlgebra: tr
 
-using Random, InteractiveUtils
-
-using Random: SamplerTrivial, GLOBAL_RNG
+using Random: Random, AbstractRNG, GLOBAL_RNG, randperm!, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
+using SparseArrays: sparse, spzeros
 
 import Base: abs
 import Base: acos

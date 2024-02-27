@@ -5,10 +5,10 @@
 """
 module AbstractAlgebra
 
-using Random: SamplerTrivial, GLOBAL_RNG
+using Random: Random, AbstractRNG, GLOBAL_RNG, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 
-using InteractiveUtils
+using InteractiveUtils: InteractiveUtils, subtypes
 
 using Preferences
 
@@ -212,9 +212,6 @@ import Base: >
 import Base: //
 import Base: /
 import Base: !=
-
-using Random: Random, AbstractRNG, SamplerTrivial
-using RandomExtensions: RandomExtensions, make, Make2
 
 export AbsPowerSeriesRingElem
 export add!

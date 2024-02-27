@@ -1,5 +1,3 @@
-using SparseArrays
-
 ##############################################################################
 #
 #   Partition type, AbstractVector interface
