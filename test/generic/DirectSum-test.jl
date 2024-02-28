@@ -9,7 +9,7 @@
       end
    end
 
-   F = FreeModule(ZZ, 2)
+   F = free_module(ZZ, 2)
    m = F(BigInt[1, 0])
    n = F(BigInt[0, 1])
    S, f = sub(F, [m, n])
@@ -19,7 +19,7 @@
 
    @test isa(m, Generic.DirectSumModuleElem)
 
-   F = FreeModule(QQ,2)
+   F = free_module(QQ,2)
    D, inj, pro = direct_sum(F, F)
    f = D([gen(F, 1), gen(F,2)])
    @test gen(D, 1) == D[1]
@@ -60,7 +60,7 @@ end
       end
    end
 
-   F = FreeModule(QQ, 2)
+   F = free_module(QQ, 2)
    D, _ = direct_sum(F, F)
    p = ModuleHomomorphism(F, F, [1, 2] .* gens(F))
    q = ModuleHomomorphism(F, F, [3, 4] .* gens(F))

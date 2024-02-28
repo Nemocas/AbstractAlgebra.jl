@@ -35,7 +35,7 @@ direct_sum
 **Examples**
 
 ```jldoctest
-julia> F = FreeModule(ZZ, 5)
+julia> F = free_module(ZZ, 5)
 Free module of rank 5 over integers
 
 julia> m1 = F(BigInt[4, 7, 8, 2, 6])
@@ -83,7 +83,7 @@ summands(::Generic.DirectSumModule{T}) where T <: RingElement
 **Examples**
 
 ```jldoctest
-julia> F = FreeModule(ZZ, 5)
+julia> F = free_module(ZZ, 5)
 Free module of rank 5 over integers
 
 julia> m1 = F(BigInt[4, 7, 8, 2, 6])
@@ -135,9 +135,9 @@ element in $D$.
 **Examples**
 
 ```jldoctest
-julia> N = FreeModule(QQ, 1);
+julia> N = free_module(QQ, 1);
 
-julia> M = FreeModule(QQ, 2);
+julia> M = free_module(QQ, 2);
 
 julia> D, _ = direct_sum(M, N, M);
 
@@ -175,7 +175,7 @@ $S$, construct the corresponding homomorphism.
 **Examples**
 
 ```jldoctest
-julia> N = FreeModule(QQ, 2);
+julia> N = free_module(QQ, 2);
 
 julia> D, _ = direct_sum(N, N);
 

@@ -819,7 +819,6 @@ export fit!
 export fraction_field
 export free_associative_algebra
 export free_module
-export FreeModule
 export function_field
 export gcd
 export gcd_with_cofactors
@@ -1127,7 +1126,6 @@ export var
 export var_index
 export vars
 export vector_space
-export VectorSpace
 export with_unicode
 export weak_popov
 export weak_popov_with_transform

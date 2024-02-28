@@ -1,3 +1,5 @@
+# TODO: add acknowledgements for GroupsCore
+
 function test_Group_interface(G::Group)
     @testset "Group interface" begin
 #        @testset "Iteration protocol" begin
