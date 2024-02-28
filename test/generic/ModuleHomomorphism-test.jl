@@ -1,7 +1,7 @@
 import AbstractAlgebra.PrettyPrinting
 
 @testset "Generic.ModuleHomomorphism.constructors" begin
-   M = FreeModule(ZZ, 2)
+   M = free_module(ZZ, 2)
 
    f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
 
@@ -59,7 +59,7 @@ end
          M = rand_module(R, -10:10)
 
          m = rand(1:5)
-         F = FreeModule(R, m)
+         F = free_module(R, m)
 
          S = matrix_space(R, m, ngens(M))
          f = ModuleHomomorphism(F, M, rand(S, -10:10))
@@ -124,7 +124,7 @@ end
 end
 
 @testset "Generic.ModuleHomomorphism.printing" begin
-  M = FreeModule(ZZ, 2)
+  M = free_module(ZZ, 2)
   f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
   str = """
         Module homomorphism
@@ -162,7 +162,7 @@ end
 end
 
 @testset "Generic.ModuleIsomorphism.printing" begin
-  M = FreeModule(ZZ, 2)
+  M = free_module(ZZ, 2)
   f = ModuleIsomorphism(M, M, matrix(ZZ, 2, 2, [1, 0, 0, 1]))
   str = """
         Module isomorphism

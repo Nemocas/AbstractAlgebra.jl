@@ -40,7 +40,7 @@ ModuleIsomorphism(M1::FPModule{T}, M2::FPModule{T}, m::MatElem{T}) where T <: Ri
 **Examples**
 
 ```jldoctest
-julia> M = FreeModule(ZZ, 2)
+julia> M = free_module(ZZ, 2)
 Free module of rank 2 over integers
 
 julia> f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
@@ -70,7 +70,7 @@ kernel(f::Map(FPModuleHomomorphism))
 **Examples**
 
 ```jldoctest
-julia> M = FreeModule(ZZ, 3)
+julia> M = free_module(ZZ, 3)
 Free module of rank 3 over integers
 
 julia> m = M([ZZ(1), ZZ(2), ZZ(3)])
@@ -94,7 +94,7 @@ image(::Map(FPModuleHomomorphism))
 ```
 
 ```julia
-M = FreeModule(ZZ, 3)
+M = free_module(ZZ, 3)
 
 m = M([ZZ(1), ZZ(2), ZZ(3)])
 
@@ -112,7 +112,7 @@ preimage(::Map(FPModuleHomomorphism), ::FPModuleElem{T}) where T <: RingElement
 ```
 
 ```julia
-M = FreeModule(ZZ, 3)
+M = free_module(ZZ, 3)
 
 m = M([ZZ(1), ZZ(2), ZZ(3)])
 
@@ -134,7 +134,7 @@ Base.inv(::Map(Generic.ModuleIsomorphism))
 ```
 
 ```julia
-M = FreeModule(ZZ, 2)
+M = free_module(ZZ, 2)
 N = matrix(ZZ, 2, 2, BigInt[1, 0, 0, 1])
 f = ModuleIsomorphism(M, M, N)
 

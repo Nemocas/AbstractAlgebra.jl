@@ -45,8 +45,8 @@ following functionality.
 ### Constructors
 
 ```@docs
-FreeModule(R::Ring, rank::Int)
-VectorSpace(F::Field, dim::Int)
+free_module(R::Ring, rank::Int)
+vector_space(F::Field, dim::Int)
 ```
 
 Construct the free module/vector space of given rank/dimension.
@@ -54,10 +54,10 @@ Construct the free module/vector space of given rank/dimension.
 **Examples**
 
 ```jldoctest
-julia> M = FreeModule(ZZ, 3)
+julia> M = free_module(ZZ, 3)
 Free module of rank 3 over integers
 
-julia> V = VectorSpace(QQ, 2)
+julia> V = vector_space(QQ, 2)
 Vector space of dimension 2 over rationals
 
 ```
@@ -73,10 +73,10 @@ basis(V::Generic.FreeModule{T}) where T <: FieldElem
 **Examples**
 
 ```jldoctest
-julia> M = FreeModule(ZZ, 3)
+julia> M = free_module(ZZ, 3)
 Free module of rank 3 over integers
 
-julia> V = VectorSpace(QQ, 2)
+julia> V = vector_space(QQ, 2)
 Vector space of dimension 2 over rationals
 
 julia> rank(M)

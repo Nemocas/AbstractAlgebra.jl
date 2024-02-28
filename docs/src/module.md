@@ -74,7 +74,7 @@ relation is given as an AbstractAlgebra row matrix.
 **Examples**
 
 ```jldoctest
-julia> M = FreeModule(QQ, 2)
+julia> M = free_module(QQ, 2)
 Vector space of dimension 2 over rationals
 
 julia> n = number_of_generators(M)
@@ -94,7 +94,7 @@ julia> g1 = gen(M, 1)
 julia> !iszero(g1)
 true
 
-julia> M = FreeModule(QQ, 2)
+julia> M = free_module(QQ, 2)
 Vector space of dimension 2 over rationals
 
 julia> z = zero(M)
@@ -129,7 +129,7 @@ map. There must be a path from $N$ to $M$ along such maps.
 **Examples**
 
 ```julia
-F = FreeModule(ZZ, 3)
+F = free_module(ZZ, 3)
 
 S1, f = sub(F, [rand(F, -10:10)])
 
@@ -157,7 +157,7 @@ zero(M::FPModule)
 **Examples**
 
 ```jldoctest
-julia> M = FreeModule(QQ, 2)
+julia> M = free_module(QQ, 2)
 Vector space of dimension 2 over rationals
 
 julia> z = zero(M)
@@ -173,7 +173,7 @@ Base.getindex(m::FPModuleElem{T}) where T <: RingElement
 **Examples**
 
 ```jldoctest
-julia> F = FreeModule(ZZ, 3)
+julia> F = free_module(ZZ, 3)
 Free module of rank 3 over integers
 
 julia> m = F(BigInt[2, -5, 4])
@@ -192,7 +192,7 @@ julia> m[1]
 **Examples**
 
 ```jldoctest
-julia> M = FreeModule(QQ, 2)
+julia> M = free_module(QQ, 2)
 Vector space of dimension 2 over rationals
 
 julia> M == M
@@ -216,7 +216,7 @@ is_isomorphic(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 **Examples**
 
 ```jldoctest; setup = :(import Random; Random.seed!(42))
-julia> M = FreeModule(ZZ, 3)
+julia> M = free_module(ZZ, 3)
 Free module of rank 3 over integers
 
 julia> m1 = rand(M, -10:10)
@@ -251,7 +251,7 @@ invariant_factors(::FPModule{T}) where T <: RingElement
 **Examples**
 
 ```jldoctest; setup = :(import Random; Random.seed!(42))
-julia> M = FreeModule(ZZ, 3)
+julia> M = free_module(ZZ, 3)
 Free module of rank 3 over integers
 
 julia> m1 = rand(M, -10:10)

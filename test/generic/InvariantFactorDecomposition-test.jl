@@ -9,7 +9,7 @@
       end
    end
 
-   F = FreeModule(ZZ, 0)
+   F = free_module(ZZ, 0)
    D, f = snf(F)
    m = D([])
 
