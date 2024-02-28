@@ -1,9 +1,9 @@
 @testset "Generic.FreeModule.constructors" begin
    R, x = polynomial_ring(ZZ, "x")
-   M = FreeModule(R, 5)
+   M = free_module(R, 5)
 
-   @test FreeModule(R, 5, cached = true) === FreeModule(R, 5, cached = true)
-   @test FreeModule(R, 5, cached = true) !== FreeModule(R, 5, cached = false)
+   @test free_module(R, 5, cached = true) === free_module(R, 5, cached = true)
+   @test free_module(R, 5, cached = true) !== free_module(R, 5, cached = false)
 
    @test isa(M, Generic.FreeModule)
 
@@ -15,14 +15,14 @@
 
    @test isa(M([x, x, x, x, x]), Generic.FreeModuleElem)
 
-   F = FreeModule(ZZ, 0)
+   F = free_module(ZZ, 0)
 
    @test isa(F([]), Generic.FreeModuleElem)
 end
 
 @testset "Generic.FreeModule.manipulation" begin
    R, x = polynomial_ring(ZZ, "x")
-   M = FreeModule(R, 5)
+   M = free_module(R, 5)
 
    @test rank(M) == 5
 end
@@ -31,7 +31,7 @@ end
    R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:10
-      M = FreeModule(R, 3)
+      M = free_module(R, 3)
 
       v = [rand(R, -1:2, -10:10) for i in 1:3]
       w = [-c for c in v]
@@ -42,7 +42,7 @@ end
    R = QQ
 
    for iter = 1:10
-      M = FreeModule(R, 3)
+      M = free_module(R, 3)
 
       v = [rand(R, -10:10) for i in 1:3]
       w = [-c for c in v]
@@ -55,7 +55,7 @@ end
    R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:10
-      M = FreeModule(R, 3)
+      M = free_module(R, 3)
 
       m = rand(M, -1:2, -10:10)
       n = rand(M, -1:2, -10:10)
@@ -66,7 +66,7 @@ end
    R = QQ
 
    for iter = 1:10
-      M = FreeModule(R, 3)
+      M = free_module(R, 3)
 
       m = rand(M, -10:10)
       n = rand(M, -10:10)
@@ -79,7 +79,7 @@ end
    R, x = polynomial_ring(ZZ, "x")
 
    for iter = 1:10
-      M = FreeModule(R, 3)
+      M = free_module(R, 3)
       c = rand(1:10)
 
       m = rand(M, -1:2, -10:10)
@@ -96,7 +96,7 @@ end
    R = QQ
 
    for iter = 1:10
-      M = FreeModule(R, 3)
+      M = free_module(R, 3)
       c = rand(1:10)
 
       m = rand(M, -10:10)
@@ -108,7 +108,7 @@ end
 
 @testset "Generic.FreeModule.hash" begin
    R, x = polynomial_ring(ZZ, "x")
-   M = FreeModule(R, 5)
+   M = free_module(R, 5)
 
    # ensure hash works
    @test hash(zero(M)) isa UInt

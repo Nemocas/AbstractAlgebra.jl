@@ -2,7 +2,7 @@ function rand_homomorphism(M::AbstractAlgebra.FPModule{T}, vals...) where T <: R
    rk = rand(1:5)
    m = ngens(M)
    R = base_ring(M)
-   F = FreeModule(R, rk)
+   F = free_module(R, rk)
    S = matrix_space(R, rk, m)
    mat = rand(S, vals...)
    f = ModuleHomomorphism(F, M, mat)
@@ -14,7 +14,7 @@ function rand_homomorphism(M::AbstractAlgebra.FPModule{T}, vals...) where T <: R
 end
 
 @testset "Generic.Module.rand" begin
-   F = FreeModule(ZZ, 3)
+   F = free_module(ZZ, 3)
 
    test_rand(F, 1:9)
 end
@@ -22,7 +22,7 @@ end
 @testset "Generic.Module.manipulation" begin
    for R in [ZZ, QQ]
       for iter = 1:100
-         F = FreeModule(R, 3)
+         F = free_module(R, 3)
          M = rand_module(R, -10:10)
 
          ngens1 = rand(1:5)
@@ -83,7 +83,7 @@ end
    # doesn't doesn't reduce generators mod relations
    # and put in hnf
 
-   F = FreeModule(ZZ, 3)
+   F = free_module(ZZ, 3)
 
    m = F(BigInt[-10, -5, -1])
    n = F(BigInt[0, -2, -9])
@@ -103,7 +103,7 @@ end
 
    for R in [ZZ, QQ]
       for iter = 1:100
-         F = FreeModule(R, 3)
+         F = free_module(R, 3)
          M = rand_module(R, -10:10)
 
          m1 = rand(M, -10:10)

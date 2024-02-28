@@ -1,6 +1,6 @@
 @testset "Generic.Submodule.constructors" begin
    R = ZZ
-   M = FreeModule(R, 2)
+   M = free_module(R, 2)
    m = M([R(1), R(3)])
    n = M([R(2), R(-1)])
    N, f = sub(M, [m, n])
@@ -26,7 +26,7 @@
    @test !haskey(D, gN[2])
    @test !haskey(D, N(R.([0, 1])))
 
-   F = FreeModule(R, 5)
+   F = free_module(R, 5)
    nsubs = rand(0:5)
    subs = Generic.Submodule{elem_type(R)}[sub(F, [rand(F, -10:10)])[1] for i in 1:nsubs]
    N, h = sub(F, subs)
@@ -34,7 +34,7 @@
    @test isa(N, Generic.Submodule)
 
    R = QQ
-   M = VectorSpace(R, 2)
+   M = vector_space(R, 2)
    m = M([R(1), R(3)])
    n = M([R(2), R(-1)])
    N, f = sub(M, [m, n])
@@ -46,14 +46,14 @@
       @test parent(f(v)) == M
    end
 
-   M = VectorSpace(R, 5)
+   M = vector_space(R, 5)
    nsubs = rand(1:5)
    subs = [sub(M, [rand(M, -10:10)])[1] for i in 1:nsubs]
    N, h = sub(M, subs)
 
    @test isa(N, Generic.Submodule)
 
-   F = FreeModule(ZZ, 2)
+   F = free_module(ZZ, 2)
    S, f = sub(F, [])
    m = S([])
 
@@ -63,7 +63,7 @@ end
 
 @testset "Generic.Submodule.manipulation" begin
    R = ZZ
-   M = FreeModule(R, 2)
+   M = free_module(R, 2)
    m = M([R(1), R(3)])
    n = M([R(2), R(-1)])
    N, f = sub(M, [m, n])

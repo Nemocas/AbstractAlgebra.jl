@@ -1,6 +1,6 @@
 @testset "Generic.QuotientModule.constructors" begin
    R = ZZ
-   M = FreeModule(R, 2)
+   M = free_module(R, 2)
 
    m = M([R(1), R(2)])
 
@@ -21,7 +21,7 @@
    @test isa(Q([R(2)]), Generic.QuotientModuleElem)
 
    R = QQ
-   M = VectorSpace(R, 2)
+   M = vector_space(R, 2)
    m = M([R(1), R(3)])
    N, f = sub(M, [m])
    Q, g = quo(M, N)
@@ -53,7 +53,7 @@
       end
    end
 
-   F = FreeModule(ZZ, 2)
+   F = free_module(ZZ, 2)
    m = F(BigInt[1, 0])
    n = F(BigInt[0, 1])
    S, f = sub(F, [m, n])
@@ -62,7 +62,7 @@
 
    @test isa(m, Generic.QuotientModuleElem)
 
-   F = FreeModule(QQ, 3)
+   F = free_module(QQ, 3)
    m = F([1, 0, 0])
    n = F([0, 1, 0])
    S, f = sub(F, [m, n])
@@ -73,7 +73,7 @@ end
 
 @testset "Generic.QuotientModule.manipulation" begin
    R = ZZ
-   M = FreeModule(R, 2)
+   M = free_module(R, 2)
 
    m = M([R(1), R(2)])
 

@@ -44,7 +44,7 @@ canonical injection is injective, this is unique.
 **Examples**
 
 ```jldoctest
-julia> M = FreeModule(ZZ, 2)
+julia> M = free_module(ZZ, 2)
 Free module of rank 2 over integers
 
 julia> m = M([ZZ(1), ZZ(2)])
@@ -62,7 +62,7 @@ julia> v = N([ZZ(3), ZZ(4)])
 julia> v2 = f(v)
 (3, 26)
 
-julia> V = VectorSpace(QQ, 2)
+julia> V = vector_space(QQ, 2)
 Vector space of dimension 2 over rationals
 
 julia> m = V([QQ(1), QQ(2)])
@@ -102,7 +102,7 @@ dim(N::Generic.Submodule{T}) where T <: FieldElement
 **Examples**
 
 ```jldoctest
-julia> M = FreeModule(ZZ, 2)
+julia> M = free_module(ZZ, 2)
 Free module of rank 2 over integers
 
 julia> m = M([ZZ(2), ZZ(3)])
@@ -127,7 +127,7 @@ julia> is_submodule(N1, M)
 false
 
 
-julia> V = VectorSpace(QQ, 2)
+julia> V = vector_space(QQ, 2)
 Vector space of dimension 2 over rationals
 
 julia> m = V([QQ(2), QQ(3)])
@@ -154,7 +154,7 @@ T <: RingElement
 **Examples**
 
 ```jldoctest
-julia> M = FreeModule(ZZ, 2)
+julia> M = free_module(ZZ, 2)
 Free module of rank 2 over integers
 
 julia> m = M([ZZ(2), ZZ(3)])
