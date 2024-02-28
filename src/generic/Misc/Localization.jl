@@ -166,6 +166,8 @@ function show(io::IO, a::LocalizedEuclideanRingElem)
 end
 
 function show(io::IO, L::LocalizedEuclideanRing)
+   @show_name(io, L)
+   @show_special(io, L)
    io = pretty(io)
    if L.comp
      print(io, "Localization of ", Lowercase(), base_ring(L), " at complement of ", prime(L))

@@ -113,7 +113,10 @@ end
 
 @enable_all_show_via_expressify MSeriesElem
 
-function show(io::IO, ::MIME"text/plain", p::MSeriesRing)
+function show(io::IO, mime::MIME"text/plain", p::MSeriesRing)
+  @show_name(io, p)
+  @show_special(io, mime, p)
+
   max_vars = 5 # largest number of variables to print
   n = nvars(p)
   print(io, "Multivariate power series ring")
@@ -131,6 +134,8 @@ function show(io::IO, ::MIME"text/plain", p::MSeriesRing)
 end
 
 function show(io::IO, p::MSeriesRing)
+  @show_name(io, p)
+  @show_special(io, p)
   if is_terse(io)
     print(io, "Multivariate power series ring")
   else

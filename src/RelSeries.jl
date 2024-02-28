@@ -275,7 +275,10 @@ end
 
 @enable_all_show_via_expressify SeriesElem
 
-function show(io::IO, ::MIME"text/plain", a::SeriesRing)
+function show(io::IO, mime::MIME"text/plain", a::SeriesRing)
+  @show_name(io, a)
+  @show_special(io, mime, a)
+
   print(io, "Univariate power series ring in ", var(a), " with precision ", a.prec_max)
   println(io)
   io = pretty(io)
@@ -284,6 +287,8 @@ function show(io::IO, ::MIME"text/plain", a::SeriesRing)
 end
 
 function show(io::IO, a::SeriesRing)
+  @show_name(io, a)
+  @show_special(io, a)
   if is_terse(io)
     print(io, "Univariate power series ring")
   else

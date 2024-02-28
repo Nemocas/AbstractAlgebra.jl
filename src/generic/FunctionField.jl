@@ -772,6 +772,8 @@ end
 @enable_all_show_via_expressify FunctionFieldElem
 
 function show(io::IO, R::FunctionField)
+   @show_name(io, R)
+   @show_special(io, R)
    print(terse(pretty(io)), "Function Field over ", Lowercase(),
          base_ring(base_ring(R)), " with defining polynomial ",
          numerator(R))

@@ -131,7 +131,10 @@ end
 
 @enable_all_show_via_expressify FracElem
 
-function show(io::IO, ::MIME"text/plain", a::FracField)
+function show(io::IO, mime::MIME"text/plain", a::FracField)
+  @show_name(io, a)
+  @show_special(io, mime, a)
+
   println(io, "Fraction field")
   io = pretty(io)
   print(io, Indent(), "of ", Lowercase(), base_ring(a))
@@ -139,6 +142,8 @@ function show(io::IO, ::MIME"text/plain", a::FracField)
 end
 
 function show(io::IO, a::FracField)
+  @show_name(io, a)
+  @show_special(io, a)
   if is_terse(io)
     print(io, "Fraction field")
   else

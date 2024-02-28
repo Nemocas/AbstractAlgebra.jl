@@ -132,6 +132,8 @@ end
 @enable_all_show_via_expressify ResFieldElem
 
 function show(io::IO, a::ResidueField)
+   @show_name(io, a)
+   @show_special(io, a)
    if is_terse(io)
      print(io, "Residue field")
    else

@@ -517,6 +517,8 @@ function Base.show(io::IO, a::LaurentSeriesElem)
 end
 
 function show(io::IO, p::LaurentSeriesRing)
+   @show_name(io, p)
+   @show_special(io, p)
    if is_terse(io)
       print(io, "Laurent series ring")
    else
@@ -527,6 +529,8 @@ function show(io::IO, p::LaurentSeriesRing)
 end
 
 function show(io::IO, p::LaurentSeriesField)
+   @show_name(io, p)
+   @show_special(io, p)
    if is_terse(io)
       print(io, "Laurent series field")
    else

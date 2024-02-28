@@ -64,12 +64,16 @@ function show_gens_rels(io::IO, N::AbstractAlgebra.FPModule{T}) where T <: RingE
 end
 
 function show(io::IO, N::QuotientModule{T}) where T <: RingElement
+   @show_name(io, N)
+   @show_special(io, N)
    print(io, "Quotient module over ")
    print(terse(pretty(io)), Lowercase(), base_ring(N))
    show_gens_rels(io, N)
 end
 
 function show(io::IO, N::QuotientModule{T}) where T <: FieldElement
+   @show_name(io, N)
+   @show_special(io, N)
    print(io, "Quotient space over ")
    print(terse(pretty(io)), Lowercase(), base_ring(N))
    show_gens_rels(io, N)
