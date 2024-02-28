@@ -75,7 +75,7 @@ function show(io::IO, M::FreeModule{T}) where T <: Union{RingElement, NCRingElem
    print(io, rank(M))
    print(io, " over ")
    io = pretty(io)
-   print(IOContext(io, :compact => true), Lowercase(), base_ring(M))
+   print(IOContext(io, :compact => true, :supercompact => true), Lowercase(), base_ring(M))
 end
 
 function show(io::IO, M::FreeModule{T}) where T <: FieldElement
@@ -86,7 +86,7 @@ function show(io::IO, M::FreeModule{T}) where T <: FieldElement
    print(io, dim(M))
    print(io, " over ")
    io = pretty(io)
-   print(IOContext(io, :compact => true), Lowercase(), base_ring(M))
+   print(IOContext(io, :compact => true, :supercompact => true), Lowercase(), base_ring(M))
 end
 
 function show(io::IO, a::FreeModuleElem)
