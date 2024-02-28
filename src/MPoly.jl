@@ -577,6 +577,9 @@ function show(io::IO, ::MIME"text/plain", p::MPolyRing)
 end
 
 function show(io::IO, p::MPolyRing)
+  @show_name(io, p)
+  @show_special(io, p)
+
   if get(io, :supercompact, false)
     # no nested printing
     print(io, "Multivariate polynomial ring")
