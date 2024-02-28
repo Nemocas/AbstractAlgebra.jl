@@ -67,3 +67,19 @@ end
   @test is_finite(GF(2))
   @test !is_finite(QQ)
 end
+
+@testset "is_associated" begin
+   F = GF(13)
+   for x in F, y in F
+      @test is_associated(x, y) == (iszero(x) == iszero(y))
+   end
+
+   Fx, x = polynomial_ring(F)
+   f = x^3 + 4x + 3
+   @test is_associated(f, f)
+   @test is_associated(f, 6*f)
+   @test is_associated(7*f, f)
+   @test !is_associated(f, 0*f)
+   @test !is_associated(0*f, f)
+   @test !is_associated(f, 2x^2-x+2)
+end

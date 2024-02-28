@@ -149,6 +149,10 @@ function is_divisible_by(a::BigInt, b::UInt)
                                                     (Ref{BigInt}, UInt), a, b))
 end
 
+function is_associated(x::Integer, y::Integer)
+   return x == y || x == -y
+end
+
 ###############################################################################
 #
 #   Exact division

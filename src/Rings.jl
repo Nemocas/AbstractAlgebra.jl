@@ -44,6 +44,15 @@ function is_divisible_by(x::T, y::T) where T <: RingElem
    return divides(x, y)[1]
 end
 
+"""
+    is_associated(x::T, y::T) where T <: RingElem
+
+Check if `x` and `y` are associated, i.e. if `x` is a unit times `y`.
+"""
+function is_associated(x::T, y::T) where T <: RingElem
+   return is_divisible_by(x, y) && is_divisible_by(y, x)
+end
+
 ###############################################################################
 #
 #   Evaluation

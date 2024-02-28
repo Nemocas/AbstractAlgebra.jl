@@ -871,6 +871,7 @@ export inverse_fn
 export inverse_image_fn
 export inverse_mat
 export invmod
+export is_associated
 export is_compatible
 export is_constant
 export is_degree
