@@ -145,10 +145,10 @@
    @test QQxxx_ == (QQxxx4, [x1, x2, x3])
 
    QQxxx_deglex_ = @inferred polynomial_ring(QQ, "x#" => 1:3; internal_ordering=:deglex)
-   @test QQxxx_deglex_[1].ord == :deglex
+   @test internal_ordering(QQxxx_deglex_[1]) == :deglex
 
    QQxxx_deglex2 = @polynomial_ring(QQ, "x#" => 1:3; internal_ordering=:deglex)
-   @test QQxxx_deglex2.ord == :deglex
+   @test internal_ordering(QQxxx_deglex2) == :deglex
    @test QQxxx_deglex_ == (QQxxx_deglex2, [x1, x2, x3])
 
    ZZxy_ = @inferred polynomial_ring(ZZ, :x => (1:2, 1:2), :y => 0:3)
