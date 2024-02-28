@@ -2982,7 +2982,7 @@ end
    end
 end
 
-@testset "Generic.Mat.can_solve_with_kernel" begin
+@testset "Generic.Mat.can_solve_with_solution_and_kernel" begin
    # Exact Ring, Exact field
 
    for F in [ZZ, QQ]
@@ -3002,7 +3002,7 @@ end
 
          B = M*X
 
-         flag, Sol, K = AbstractAlgebra._can_solve_with_kernel(M, B)
+         flag, Sol, K = can_solve_with_solution_and_kernel(M, B, side = :right)
 
          @test iszero(M*K)
          @test flag && M*Sol == B
@@ -3010,9 +3010,9 @@ end
          # fully random
          B = rand(S, -20:20)
 
-         flag, Sol, K = AbstractAlgebra._can_solve_with_kernel(M, B)
+         flag, Sol, K = can_solve_with_solution_and_kernel(M, B, side = :right)
          flag2, Sol2 = AbstractAlgebra._can_solve_with_solution(M, B)
-    
+
          @test flag == flag2
          if flag
             @test M*Sol == B
@@ -3030,7 +3030,7 @@ end
 
          B = X*M
 
-         flag, Sol, K = AbstractAlgebra._can_solve_with_kernel(M, B; side=:left)
+         flag, Sol, K = can_solve_with_solution_and_kernel(M, B)
 
          @test iszero(K*M)
          @test flag && Sol*M == B
