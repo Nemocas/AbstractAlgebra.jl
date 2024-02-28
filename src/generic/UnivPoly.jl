@@ -904,8 +904,8 @@ end
 ################################################################################
 
 function _change_univ_poly_ring(R, Rx, cached::Bool)
-   P, _ = AbstractAlgebra.polynomial_ring(R, map(string, symbols(Rx)), internal_ordering = internal_ordering(Rx), cached = cached)
-   S = AbstractAlgebra.UniversalPolynomialRing(R; internal_ordering=internal_ordering(Rx), cached=cached)
+   P, _ = polynomial_ring(R, map(string, symbols(Rx)), internal_ordering=internal_ordering(Rx), cached=cached)
+   S = universal_polynomial_ring(R; internal_ordering=internal_ordering(Rx), cached=cached)
    S.S = deepcopy(symbols(Rx))
    S.mpoly_ring = P
    return S
@@ -1116,11 +1116,11 @@ end
 
 ###############################################################################
 #
-#   UniversalPolynomialRing constructor
+#   UniversalPolyRing constructor
 #
 ###############################################################################
 
-function UniversalPolynomialRing(R::Ring; internal_ordering=:lex, cached::Bool=true)
+function universal_polynomial_ring(R::Ring; internal_ordering=:lex, cached::Bool=true)
    T = elem_type(R)
    U = Generic.MPoly{T}
 

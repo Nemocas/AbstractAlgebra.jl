@@ -3,10 +3,10 @@
       for iters = 1:5
          ord = rand_ordering()
 
-         @test UniversalPolynomialRing(R; internal_ordering=ord, cached = true) === UniversalPolynomialRing(R; internal_ordering=ord, cached = true)
-         @test UniversalPolynomialRing(R; internal_ordering=ord, cached = false) !== UniversalPolynomialRing(R; internal_ordering=ord, cached = false)
+         @test universal_polynomial_ring(R; internal_ordering=ord, cached = true) === universal_polynomial_ring(R; internal_ordering=ord, cached = true)
+         @test universal_polynomial_ring(R; internal_ordering=ord, cached = false) !== universal_polynomial_ring(R; internal_ordering=ord, cached = false)
 
-         S = UniversalPolynomialRing(R; internal_ordering=ord)
+         S = universal_polynomial_ring(R; internal_ordering=ord)
 
          x = gen(S, "x")
          @test x == S[1]
@@ -85,7 +85,7 @@ end
       for iters = 1:100
          ord = rand_ordering()
 
-         S = UniversalPolynomialRing(R; internal_ordering=ord, cached=false)
+         S = universal_polynomial_ring(R; internal_ordering=ord, cached=false)
 
          @test symbols(S) == Symbol[]
          @test nvars(S) == 0
@@ -132,7 +132,7 @@ function test_elem(R::AbstractAlgebra.Generic.UniversalPolyRing{EuclideanRingRes
 end
 
 @testset "Generic.UnivPoly.conformance" begin
-   S = UniversalPolynomialRing(residue_ring(ZZ, ZZ(6))[1])
+   S = universal_polynomial_ring(residue_ring(ZZ, ZZ(6))[1])
    gen(S, "x")
    test_Ring_interface(S)
 end
@@ -142,7 +142,7 @@ end
       for iters = 1:100
          ord = rand_ordering()
 
-         S = UniversalPolynomialRing(R; internal_ordering=ord, cached=false)
+         S = universal_polynomial_ring(R; internal_ordering=ord, cached=false)
 
          x = gen(S, "x")
          y, z = gens(S, ["y", "z"])
@@ -202,7 +202,7 @@ end
 @testset "Generic.UnivPoly.basic_manipulation" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          @test iszero(zero(S))
          @test isone(one(S))
@@ -317,7 +317,7 @@ end
 @testset "Generic.UnivPoly.multivariate_coefficients" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          x = gen(S, "x")
          y, z = gens(S, ["y", "z"])
@@ -346,7 +346,7 @@ end
 @testset "Generic.UnivPoly.unary_operations" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -371,7 +371,7 @@ end
 @testset "Generic.UnivPoly.binary_operations" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -397,7 +397,7 @@ end
 @testset "Generic.UnivPoly.iterators" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          x = gen(S, "x")
 
@@ -426,7 +426,7 @@ end
 @testset "Generic.UnivPoly.square_root" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          x = gen(S, "x")
 
@@ -448,7 +448,7 @@ end
 @testset "Generic.UnivPoly.adhoc_binary_operations" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -504,7 +504,7 @@ end
 @testset "Generic.UnivPoly.comparison" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -544,7 +544,7 @@ end
 @testset "Generic.UnivPoly.adhoc_comparison" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -595,7 +595,7 @@ end
 @testset "Generic.UnivPoly.powering" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -623,7 +623,7 @@ end
 @testset "Generic.UnivPoly.inflation_deflation" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -668,7 +668,7 @@ end
 @testset "Generic.UnivPoly.exact_division" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -727,7 +727,7 @@ end
 @testset "Generic.UnivPoly.euclidean_division" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -780,7 +780,7 @@ end
 @testset "Generic.UnivPoly.derivative" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          x = gen(S, "x")
          y, z = gens(S, ["y", "z"])
@@ -809,7 +809,7 @@ end
 @testset "Generic.UnivPoly.remove_valuation" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -913,7 +913,7 @@ end
 @testset "Generic.UnivPoly.evaluation" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -973,7 +973,7 @@ end
 @testset "Generic.UnivPoly.gcd" begin
    for R in [ZZ, QQ]
       for iters = 1:100
-         S = UniversalPolynomialRing(R; cached=false)
+         S = universal_polynomial_ring(R; cached=false)
 
          f = rand(S, 0:5, 0:10, -10:10)
          x = gen(S, "x")
@@ -1008,7 +1008,7 @@ end
 
 @testset "Generic.UnivPoly.univariate_polynomials" begin
    for R in [ZZ, QQ]
-      S = UniversalPolynomialRing(R; cached=false)
+      S = universal_polynomial_ring(R; cached=false)
 
       U, y = polynomial_ring(R, "y")
 
@@ -1041,7 +1041,7 @@ end
 
 @testset "Generic.UnivPoly.map" begin
    for R in [ZZ, QQ]
-      S = UniversalPolynomialRing(R; cached=false)
+      S = universal_polynomial_ring(R; cached=false)
 
       U, y = polynomial_ring(R, "y")
 
@@ -1076,7 +1076,7 @@ end
 
 @testset "Generic.UnivPoly.unsafe_operators" begin
    for R in [ZZ, QQ]
-      S = UniversalPolynomialRing(R; cached=false)
+      S = universal_polynomial_ring(R; cached=false)
 
       U, y = polynomial_ring(R, "y")
 
