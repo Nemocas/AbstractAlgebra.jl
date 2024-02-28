@@ -3495,68 +3495,6 @@ function _can_solve_left_reduced_triu(r::MatElem{T},
    return true, x
 end
 
-function _can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: FracElem{T} where T <: PolyRingElem
-   if side == :left
-      (f, x) = _can_solve_with_solution(transpose(a), transpose(b); side=:right)
-      return (f, transpose(x))
-   elseif side == :right
-      d = numerator(one(base_ring(a)))
-      for i = 1:nrows(a)
-         for j = 1:ncols(a)
-            d = lcm(d, denominator(a[i, j]))
-         end
-      end
-      for i = 1:nrows(b)
-         for j = 1:ncols(b)
-            d = lcm(d, denominator(b[i, j]))
-         end
-      end
-      A = matrix(parent(d), nrows(a), ncols(a), [numerator(a[i, j]*d) for i in 1:nrows(a) for j in 1:ncols(a)])
-      B = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
-      flag = false
-      x = similar(A, ncols(A), nrows(B))
-      den = one(base_ring(a))
-      try
-         flag, x, den = _can_solve_with_solution_interpolation(A, B)
-      catch
-         flag, x, den = _can_solve_with_solution_fflu(A, B)
-      end
-      X = change_base_ring(base_ring(a), x)
-      X = divexact(X, base_ring(a)(den))
-      return flag, X
-   else
-      error("Unsupported argument :$side for side: Must be :left or :right.")
-   end
-end
- 
-# The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
-function _can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: Union{FracElem, Rational{BigInt}}
-   if side == :left
-      (f, x) = _can_solve_with_solution(transpose(a), transpose(b); side=:right)
-      return (f, transpose(x))
-   elseif side == :right
-      d = numerator(one(base_ring(a)))
-      for i = 1:nrows(a)
-         for j = 1:ncols(a)
-            d = lcm(d, denominator(a[i, j]))
-         end
-      end
-      for i = 1:nrows(b)
-         for j = 1:ncols(b)
-            d = lcm(d, denominator(b[i, j]))
-         end
-      end
-      A = matrix(parent(d), nrows(a), ncols(a), [numerator(a[i, j]*d) for i in 1:nrows(a) for j in 1:ncols(a)])
-      B = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
-      flag, x, den = _can_solve_with_solution_fflu(A, B)
-      X = change_base_ring(base_ring(a), x)
-      X = divexact(X, base_ring(a)(den))
-      return flag, X
-   else
-      error("Unsupported argument :$side for side: Must be :left or :right.")
-   end
-end
-
 ###############################################################################
 #
 #   Inverse

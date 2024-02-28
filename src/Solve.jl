@@ -2,7 +2,8 @@ module Solve
 
 using AbstractAlgebra
 
-import AbstractAlgebra: base_ring, nrows, ncols, matrix, rank, Generic, kernel
+import AbstractAlgebra: base_ring, nrows, ncols, matrix, rank, Generic, kernel,
+                        _can_solve_with_solution_fflu, _can_solve_with_solution_interpolation
 
 ################################################################################
 #
@@ -353,7 +354,7 @@ end
 
 ################################################################################
 #
-#  Internal functionality
+#  Generic internal functionality
 #
 ################################################################################
 
@@ -533,6 +534,83 @@ function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbo
   end
 
   return true, sol, kernel(C, side = side)
+end
+
+################################################################################
+#
+#  Special internal functonality
+#
+################################################################################
+
+# _can_solve_internal_no_check methods which only work or are efficient for
+# certain types
+
+function _common_denominator(A::MatElem{T}) where T <: Union{FracElem, Rational{BigInt}}
+  d = numerator(one(base_ring(A)))
+  @inbounds for j in 1:ncols(A)
+    for i in 1:nrows(A)
+      d = lcm(d, denominator(A[i, j]))
+    end
+  end
+  return d
+end
+
+# The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
+function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: Union{FracElem, Rational{BigInt}}
+
+  if side === :left
+    fl, _sol, _K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    # This does not return LazyTransposedMat for sol because the matrices are made integral
+    return fl, transpose(_sol), data(_K)
+  end
+
+  d = lcm(_common_denominator(A), _common_denominator(b))
+
+  Aint = matrix(parent(d), nrows(A), ncols(A), [numerator(A[i, j]*d) for i in 1:nrows(A) for j in 1:ncols(A)])
+  bint = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
+  flag, sol_int, den = _can_solve_with_solution_fflu(Aint, bint)
+  sol = change_base_ring(base_ring(A), sol_int)
+  sol = divexact(sol, base_ring(A)(den))
+
+  if task === :with_kernel
+    # I don't know how to compute the kernel using an (ff)lu factoring
+    return flag, sol, kernel(A, side = :right)
+  else
+    return flag, sol, zero(A, 0, 0)
+  end
+end
+
+function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FracElem{TT} where TT <: PolyRingElem
+
+  if side === :left
+    fl, _sol, _K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    # This does not return a LazyTransposedMat for sol because the matrices are made integral
+    return fl, transpose(_sol), data(_K)
+  end
+
+  d = lcm(_common_denominator(A), _common_denominator(b))
+
+  Aint = matrix(parent(d), nrows(A), ncols(A), [numerator(A[i, j]*d) for i in 1:nrows(A) for j in 1:ncols(A)])
+  bint = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
+
+  flag = false
+  sol_int = similar(Aint, ncols(Aint), nrows(bint))
+  den = one(base_ring(A))
+  try
+    flag, sol_int, den = _can_solve_with_solution_interpolation(Aint, bint)
+  catch
+    flag, sol_int, den = _can_solve_with_solution_fflu(Aint, bint)
+  end
+
+  sol = change_base_ring(base_ring(A), sol_int)
+  sol = divexact(sol, base_ring(A)(den))
+
+  if task === :with_kernel
+    # I don't know how to compute the kernel using an (ff)lu factoring
+    return flag, sol, kernel(A, side = :right)
+  else
+    return flag, sol, zero(A, 0, 0)
+  end
 end
 
 ################################################################################
