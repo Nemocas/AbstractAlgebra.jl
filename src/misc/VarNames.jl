@@ -290,8 +290,12 @@ function varnames_macro(f, args_count, opt_in)
             # Keyword arguments after `;` end up in `kv`.
             # Those without previous `;` get evaluated and end up in `kv2`.
             # Note: one could work around evaluating the latter if necessary.
-            kv = Meta.isexpr(first(args), :parameters) ?
-                popfirst!(args).args : Expr(:parameters)
+            if Meta.isexpr(first(args), :parameters)
+                kv = first(args)
+                args = args[2:end]
+            else
+                kv = Expr(:parameters)
+            end
 
             req(length(args) >= $args_count+1, "Not enough arguments")
             base_args = args[1:$args_count]
