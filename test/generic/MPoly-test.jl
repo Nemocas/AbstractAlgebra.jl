@@ -140,9 +140,12 @@
    QQxxx3 = @polynomial_ring(QQ, :x=>1:3)
    @test QQxxx_ == (QQxxx3, [x1, x2, x3])
 
-   # test support of kwargs
-   QQxxx4 = @polynomial_ring(QQ, "x#" => 1:3; internal_ordering=:lex)
+   # test support of kwargs (issue #1631)
+   ordering = :lex
+   QQxxx4 = @polynomial_ring(QQ, "x#" => 1:3; internal_ordering=ordering)
    @test QQxxx_ == (QQxxx4, [x1, x2, x3])
+   QQxxx5 = @polynomial_ring(QQ, "x#" => 1:3, internal_ordering=ordering)
+   @test QQxxx_ == (QQxxx5, [x1, x2, x3])
 
    QQxxx_deglex_ = @inferred polynomial_ring(QQ, "x#" => 1:3; internal_ordering=:deglex)
    @test internal_ordering(QQxxx_deglex_[1]) == :deglex
@@ -175,6 +178,51 @@
       ) @test_throws (VERSION <= v"1.7" ? LoadError : UndefVarError) let local_name = 3
          @macroexpand @polynomial_ring(QQ, :x => 1:local_name)
       end
+end
+
+# these variables need to be in global scope
+varname_demo = :a => 1:3
+varname_demo0 = "a#" => 1:3 # for use in function constructor
+varname_three = 3
+@testset "Generic.MPoly.constructors.macroscoping" begin
+   # test scoping of variables in macro constructor (issue #1630)
+   S = ZZ
+   Sx, x = polynomial_ring(S, :x)
+   Sx2 = @polynomial_ring(S, :x)
+   @test Sx == Sx2
+
+   Svars, _ = polynomial_ring(S, varname_demo0)
+   Svars1 = @polynomial_ring(S, varname_demo)
+   Svars2 = @polynomial_ring(S, varname_demo0)
+   Svars3 = @polynomial_ring(S, :a => 1:varname_three)
+   @test Svars == Svars1
+   @test Svars == Svars2
+   @test Svars == Svars3
+
+   K = QQ
+   Kxy, _ = polynomial_ring(K, [:x, :y])
+   Kxy2 = @polynomial_ring(K, [:x, :y])
+   @test Kxy == Kxy2
+
+   # some more tests for different ways to specify kwargs (issue #1631)
+   # combined with scoping of keyword and all other args
+   R = Kxy
+   cached = true
+   ordering = :deglex
+   kwargs = (; internal_ordering = ordering, cached)
+   Rvars, _ = polynomial_ring(R, varname_demo0; internal_ordering=ordering, cached)
+   Rvars1 = @polynomial_ring(R, varname_demo; internal_ordering=ordering, cached)
+   Rvars2 = @polynomial_ring(R, varname_demo, internal_ordering=ordering; cached)
+   Rvars3 = @polynomial_ring(R, varname_demo, internal_ordering=ordering, cached=cached)
+   Rvars4 = @polynomial_ring(R, varname_demo, cached=true; kwargs...)
+   Rvars5 = @polynomial_ring(R, varname_demo; kwargs...)
+   Rvars6 = @polynomial_ring(R, :a => 1:varname_three; kwargs...)
+   @test Rvars == Rvars1
+   @test Rvars == Rvars2
+   @test Rvars == Rvars3
+   @test Rvars == Rvars4
+   @test Rvars == Rvars5
+   @test Rvars == Rvars6
 end
 
 @testset "Generic.MPoly.printing" begin

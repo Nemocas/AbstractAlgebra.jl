@@ -201,6 +201,42 @@ function keyword_arguments(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol},
     return result
 end
 
+raw"""
+    normalise_keyword_arguments(args::Union{Tuple, Vector}) :: Vector
+
+Turn argument list like `(1, a=2; b=3).args` into `(1; a=2, b=3).args`.
+
+Intended to let a macro call `@m(1, a=2; b=3)` mimic a usual function call.
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> args = AbstractAlgebra.normalise_keyword_arguments(:(1, a=2; b=3).args); :($(args...),)
+:((1; a = 2, b = 3))
+
+julia> macro nka_test(args...) AbstractAlgebra.normalise_keyword_arguments(args) end
+@nka_test (macro with 1 method)
+
+julia> args = @nka_test(1, a=2; b=3); :($(args...),)
+:((1; a = 2, b = 3))
+
+julia> args = @nka_test(1+2, a=x; b=x^2, kw...); :($(args...),)
+:((1 + 2; a = x, b = x^2, kw...))
+```
+"""
+function normalise_keyword_arguments(args)
+    # Keyword arguments after `;`
+    if Meta.isexpr(first(args), :parameters)
+        kv = first(args)
+        args = args[2:end]
+    else
+        kv = Expr(:parameters)
+    end
+    # Keyword arguments without previous `;`
+    append!(kv.args, (Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))))
+    # normal arguments
+    args = (e for e in args if !Meta.isexpr(e, :(=)))
+    return [kv, args...]
+end
+
 function _eval(m::Core.Module, e::Expr)
     try
         Base.eval(m, e)
@@ -287,43 +323,31 @@ function varnames_macro(f, args_count, opt_in)
     opt_in === :(:yes) || return :()
     quote
         macro $f(args...)
-            # Keyword arguments after `;` end up in `kv`.
-            # Those without previous `;` get evaluated and end up in `kv2`.
-            # Note: one could work around evaluating the latter if necessary.
-            if Meta.isexpr(first(args), :parameters)
-                kv = first(args)
-                args = args[2:end]
-            else
-                kv = Expr(:parameters)
-            end
-
-            req(length(args) >= $args_count+1, "Not enough arguments")
-            base_args = args[1:$args_count]
+            args = normalise_keyword_arguments(args)
+            req(length(args) >= $args_count+2, "Not enough arguments")
+            base_args = args[1:$args_count+1] # includes keyword arguments
 
             m = VERSION > v"9999" ? __module__ : $(esc(:__module__)) # julia issue #51602
-            s, kv2 = _eval(m, :($$_varnames_macro($(args[$args_count+1:end]...))))
+            s = _eval(m, :($$_varnames_macro($(args[$args_count+2:end]...))))
 
-            append!(kv.args, (Expr(:kw, k, v) for (k, v) in kv2))
-            kv = isempty(kv.args) ? () : (kv,)
-
-            varnames_macro_code($f, base_args, s, kv)
+            varnames_macro_code($f, esc.(base_args), s)
         end
     end
 end
 
-_varnames_macro(arg::VarName; kv...) = Symbol(arg), kv
-_varnames_macro(args::VarNames...; kv...) = variable_names(args, Val(false)), kv
+_varnames_macro(arg::VarName) = Symbol(arg)
+_varnames_macro(args::VarNames...) = variable_names(args, Val(false))
 
-function varnames_macro_code(f, base_args, s::Symbol, kv)
+function varnames_macro_code(f, args, s::Symbol)
     quote
-        X, $(esc(s)) = $f($(kv...), $(base_args...), $(QuoteNode(s)))
+        X, $(esc(s)) = $f($(args...), $(QuoteNode(s)))
         X
     end
 end
 
-function varnames_macro_code(f, base_args, s::Vector{Symbol}, kv)
+function varnames_macro_code(f, args, s::Vector{Symbol})
     quote
-        X, ($(esc.(s)...),) = $f($(kv...), $(base_args...), $s)
+        X, ($(esc.(s)...),) = $f($(args...), $s)
         X
     end
 end
@@ -362,7 +386,7 @@ Shorthand for `X, x = f(args..., "$s#" => 1:n; kv...)`.
 The name of the argument `n` can be changed via the `n` option. The range `1:n` is given via the `range` option.
 
 Setting `n=:no` disables creation of this method.
- 
+
 ---
 
     X = @f(args..., varnames...; kv...)
@@ -408,6 +432,15 @@ julia> @f("hello", "x#" => (1:1, 1:2), "y#" => (1:2), [:z])
 
 julia> (x11, x12, y1, y2, z)
 ("x11", "x12", "y1", "y2", "z")
+
+julia> g(a, s::Vector{Symbol}; kv...) = (a, kv...), String.(s)
+g (generic function with 1 method)
+
+julia> AbstractAlgebra.@varnames_interface g(a, s)
+@g (macro with 1 method)
+
+julia> @g("parameters", [:x, :y], a=1, b=2; c=3)
+("parameters", :c => 3, :a => 1, :b => 2)
 ```
 """
 macro varnames_interface(e::Expr, options::Expr...)
