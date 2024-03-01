@@ -2,8 +2,19 @@ module Solve
 
 using AbstractAlgebra
 
-import AbstractAlgebra: base_ring, nrows, ncols, matrix, rank, Generic, kernel,
-                        _can_solve_with_solution_fflu, _can_solve_with_solution_interpolation
+import AbstractAlgebra:
+  base_ring,
+  _can_solve_with_solution_fflu,
+  _can_solve_with_solution_interpolation,
+  Generic,
+  kernel,
+  matrix,
+  nrows,
+  ncols,
+  PrettyPrinting,
+  rank
+
+import Base: show
 
 ################################################################################
 #
@@ -74,6 +85,20 @@ mutable struct SolveCtx{T, MatT, TranspMatT}
   function SolveCtx(A::MatElem{T}) where T
     return SolveCtx{T, typeof(A), LazyTransposeMatElem{T, typeof(A)}}(A)
   end
+end
+
+function Base.show(io::IO, ::MIME"text/plain", C::SolveCtx)
+  io = PrettyPrinting.pretty(io)
+  println(io, "Linear solving context object of matrix")
+  print(io, PrettyPrinting.Indent())
+  show(io, MIME"text/plain"(), matrix(C))
+  print(io, PrettyPrinting.Dedent())
+end
+
+function Base.show(io::IO, C::SolveCtx)
+  PrettyPrinting.@show_name(io, C)
+
+  print(io, "Linear solving context object")
 end
 
 @doc raw"""
