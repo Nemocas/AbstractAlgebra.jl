@@ -61,6 +61,9 @@ mutable struct SolveCtx{T, MatT, TranspMatT}
   pivots::Vector{Int} # pivot and non-pivot columns of red
   pivots_transp::Vector{Int} # pivot and non-pivot columns of red_transp
 
+  kernel_left::MatT
+  kernel_right::MatT
+
   function SolveCtx{T, MatT, TranspMatT}(A::MatT) where {T, MatT <: MatElem{T}, TranspMatT <: MatElem{T}}
     z = new{T, MatT, TranspMatT}()
     z.A = A
@@ -86,14 +89,16 @@ end
 matrix(C::SolveCtx) = C.A
 
 function _init_reduce(C::SolveCtx{<:FieldElement})
-  if isdefined(C, :red) && isdefined(C, :trafo)
+  if isdefined(C, :red) && isdefined(C, :lu_perm)
     return nothing
   end
 
-  r, R, U = _rref_with_transformation(matrix(C))
+  B = deepcopy(matrix(C))
+  p = one(SymmetricGroup(nrows(matrix(C))))
+  r = lu!(p, B)
   set_rank!(C, r)
-  C.red = R
-  C.trafo = U
+  C.red = B
+  C.lu_perm = p
   return nothing
 end
 
@@ -109,14 +114,16 @@ function _init_reduce(C::SolveCtx{<:RingElement})
 end
 
 function _init_reduce_transpose(C::SolveCtx{<:FieldElement})
-  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
+  if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
     return nothing
   end
 
-  r, R, U = _rref_with_transformation(lazy_transpose(matrix(C)))
+  B = lazy_transpose(deepcopy(matrix(C)))
+  p = one(SymmetricGroup(ncols(matrix(C))))
+  r = lu!(p, B)
   set_rank!(C, r)
-  C.red_transp = R
-  C.trafo_transp = U
+  C.red_transp = B
+  C.lu_perm_transp = p
   return nothing
 end
 
@@ -331,12 +338,18 @@ end
 function kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
+  # I don't know how to compute the kernel using a LU factoring, so we call the
+  # "usual" method
   if side === :right
-    return _kernel_of_rref(reduced_matrix(C), rank(C), pivot_and_non_pivot_cols(C))[2]
+    if !isdefined(C, :kernel_right)
+      C.kernel_right = kernel(matrix(C), side = :right)
+    end
+    return C.kernel_right
   else
-    nullity, X = _kernel_of_rref(reduced_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C))
-    # X is of type LazyTransposeMatElem
-    return data(X)
+    if !isdefined(C, :kernel_left)
+      C.kernel_left = kernel(matrix(C), side = :left)
+    end
+    return C.kernel_left
   end
 end
 
@@ -344,11 +357,16 @@ function kernel(C::SolveCtx{<:RingElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   if side === :right
-    return _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))[2]
+    if !isdefined(C, :kernel_right)
+      C.kernel_right = _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))[2]
+    end
+    return C.kernel_right
   else
-    nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
-    # X is of type LazyTransposeMatElem
-    return data(X)
+    if !isdefined(C, :kernel_left)
+      nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
+      C.kernel_left = data(X)
+    end
+    return C.kernel_left
   end
 end
 
@@ -509,9 +527,9 @@ end
 # _can_solve_internal_no_check over FIELDS with SOLVE CONTEXT
 function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
   if side === :right
-    fl, sol = _can_solve_with_rref(b, transformation_matrix(C), rank(C), pivot_and_non_pivot_cols(C), task)
+    fl, sol = _can_solve_with_lu(matrix(C), b, reduced_matrix(C), lu_permutation(C), rank(C))
   else
-    fl, _sol = _can_solve_with_rref(lazy_transpose(b), transformation_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C), task)
+    fl, _sol = _can_solve_with_lu(lazy_transpose(matrix(C)), lazy_transpose(b), reduced_matrix_of_transpose(C), lu_permutation_of_transpose(C), rank(C))
     sol = data(_sol)
   end
   if !fl || task !== :with_kernel
@@ -643,9 +661,29 @@ function _can_solve_with_rref(b::MatElem{T}, U::MatElem{T}, r::Int, pivots::Vect
   return true, sol
 end
 
+# Solve Ax = b with LU and p a LU decomposition of A of rank r.
+# Takes same options for `task` as _can_solve_internal but only returns (flag, solution)
+# and no kernel.
+function _can_solve_with_lu(A::MatElem{T}, b::MatElem{T}, LU::MatElem{T}, p::Generic.Perm, r::Int) where T <: FieldElement
+  y = AbstractAlgebra._solve_lu_precomp(p, LU, b)
+
+  # _solve_lu_precomp only takes care of the first r rows
+  # We now need to check whether the remaining rows are fine as well
+  n = nrows(A)
+  fl = true
+  if r < n
+    b2 = p*b
+    A2 = p*A
+    A3 = A2[r + 1:n, :]
+    fl = A3*y == b2[r + 1:n, :]
+  end
+  return fl, y
+end
+
 # Compute a matrix N with RN == 0 where the columns of N give a basis for the kernel.
 # R must be in rref of rank r and pivots must be of length ncols(R) with the pivot
 # columns in the first r entries and the non-pivot columns in the remaining entries.
+# Only used by Nemo
 function _kernel_of_rref(R::MatElem{T}, r::Int, pivots::Vector{Int}) where T <: FieldElement
   @assert length(pivots) == ncols(R)
   nullity = ncols(R) - r
@@ -713,6 +751,7 @@ function _kernel_of_hnf(A::MatElem{T}, H::MatElem{T}, U::MatElem{T}) where T <: 
 end
 
 # Copied from Hecke, to be replaced with echelon_form_with_transformation eventually
+# Only used by Nemo
 function _rref_with_transformation(M::MatElem{T}) where T <: FieldElement
   n = hcat(deepcopy(M), identity_matrix(base_ring(M), nrows(M)))
   rref!(n)
