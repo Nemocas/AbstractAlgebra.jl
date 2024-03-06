@@ -114,6 +114,29 @@ end
 matrix(C::SolveCtx) = C.A
 
 function _init_reduce(C::SolveCtx{<:FieldElement})
+  if isdefined(C, :red) && isdefined(C, :trafo)
+    return nothing
+  end
+
+  r, R, U = _rref_with_transformation(matrix(C))
+  set_rank!(C, r)
+  C.red = R
+  C.trafo = U
+  return nothing
+end
+
+# All matrices over fields in AbstractAlgebra use LU factoring, but Nemo needs
+# _init_reduce (and the calling functions) to do an rref.
+# Once we make a breaking release of AbstractAlgebra, we can rename
+# * _init_reduce_lu -> _init_reduce
+# * _init_reduce_transpose_lu -> _init_reduce_transpose
+# * reduced_matrix_lu -> reduced_matrix
+# * reduced_matrix_of_transpose_lu -> reduced_matrix_of_transpose
+# and then Nemo can have its own version of these functions.
+# (transformation_matrix and transformation_matrix_of_transpose should probably
+# throw an error for matrices over fields then.)
+
+function _init_reduce_lu(C::SolveCtx{<:FieldElement})
   if isdefined(C, :red) && isdefined(C, :lu_perm)
     return nothing
   end
@@ -139,6 +162,18 @@ function _init_reduce(C::SolveCtx{<:RingElement})
 end
 
 function _init_reduce_transpose(C::SolveCtx{<:FieldElement})
+  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
+    return nothing
+  end
+
+  r, R, U = _rref_with_transformation(lazy_transpose(matrix(C)))
+  set_rank!(C, r)
+  C.red_transp = R
+  C.trafo_transp = U
+  return nothing
+end
+
+function _init_reduce_transpose_lu(C::SolveCtx{<:FieldElement})
   if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
     return nothing
   end
@@ -173,13 +208,23 @@ function reduced_matrix_of_transpose(C::SolveCtx)
   return C.red_transp
 end
 
+function reduced_matrix_lu(C::SolveCtx)
+  _init_reduce_lu(C)
+  return C.red
+end
+
+function reduced_matrix_of_transpose_lu(C::SolveCtx)
+  _init_reduce_transpose_lu(C)
+  return C.red_transp
+end
+
 function lu_permutation(C::SolveCtx)
-  _init_reduce(C)
+  _init_reduce_lu(C)
   return C.lu_perm
 end
 
 function lu_permutation_of_transpose(C::SolveCtx)
-  _init_reduce_transpose(C)
+  _init_reduce_transpose_lu(C)
   return C.lu_perm_transp
 end
 
@@ -552,9 +597,9 @@ end
 # _can_solve_internal_no_check over FIELDS with SOLVE CONTEXT
 function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
   if side === :right
-    fl, sol = _can_solve_with_lu(matrix(C), b, reduced_matrix(C), lu_permutation(C), rank(C))
+    fl, sol = _can_solve_with_lu(matrix(C), b, reduced_matrix_lu(C), lu_permutation(C), rank(C))
   else
-    fl, _sol = _can_solve_with_lu(lazy_transpose(matrix(C)), lazy_transpose(b), reduced_matrix_of_transpose(C), lu_permutation_of_transpose(C), rank(C))
+    fl, _sol = _can_solve_with_lu(lazy_transpose(matrix(C)), lazy_transpose(b), reduced_matrix_of_transpose_lu(C), lu_permutation_of_transpose(C), rank(C))
     sol = data(_sol)
   end
   if !fl || task !== :with_kernel
