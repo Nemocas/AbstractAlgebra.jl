@@ -1935,7 +1935,7 @@ function _write_line(io::IOCustom, str::AbstractString)
     written += write_indent(io)
     printstr = join(collect(firstiter)[j:end])
     written += write(io.io, printstr)
-    io.printed += textwidth(printstr)
+    io.printed = textwidth(printstr)
   end
   it = Iterators.partition(1:length(restiter), limit)
   restcollect = collect(restiter)
@@ -1992,6 +1992,7 @@ function write(io::IOCustom, str::String)
   for (i, line) in enumerate(split(str, "\n"))
     if i != 1
       written += write(io.io, "\n")
+      io.printed = 0
       io.indented_line = false
     end
 
