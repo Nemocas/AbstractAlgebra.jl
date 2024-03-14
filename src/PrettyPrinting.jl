@@ -1919,13 +1919,10 @@ function _write_line(io::IOCustom, str::AbstractString)
     printstr = ""
     j = 1
     width = 0
-    while width < (limit)
+    while width < limit && j <= length(partcollect)
       printstr *= partcollect[j]
-      j += 1
       width += textwidth(partcollect[j])
-      if j > length(partcollect)
-        break
-      end
+      j += 1
     end
     written += write(io.io, printstr)
     io.printed += width
@@ -1935,7 +1932,7 @@ function _write_line(io::IOCustom, str::AbstractString)
     written += write_indent(io)
     printstr = join(collect(firstiter)[j:end])
     written += write(io.io, printstr)
-    io.printed += textwidth(printstr)
+    io.printed = textwidth(printstr)
   end
   it = Iterators.partition(1:length(restiter), limit)
   restcollect = collect(restiter)
@@ -1944,7 +1941,7 @@ function _write_line(io::IOCustom, str::AbstractString)
     partcollect = restcollect[i]
     partstr = join(partcollect)
     width = textwidth(partstr)
-    if width < (limit) || length(i) == width
+    if width < limit || length(i) == width
       written += write(io.io, "\n")
       written += write_indent(io)
       written += write(io.io, partstr)
@@ -1992,6 +1989,7 @@ function write(io::IOCustom, str::String)
   for (i, line) in enumerate(split(str, "\n"))
     if i != 1
       written += write(io.io, "\n")
+      io.printed = 0
       io.indented_line = false
     end
 
