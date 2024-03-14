@@ -653,14 +653,26 @@ function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::MatElem{T}, t
   return _can_solve_internal_no_check(A, b, task, side = side)
 end
 
+# The internal AbstractAlgebra functions are called _can_solve_internal_no_check_dr
+# (dr = done right), to allow other packages to overwrite
+# _can_solve_internal_no_check without creating any ambiguity.
+# Example: AbstractAlgebra defines
+#   _can_solve_internal_no_check(::SolveCtx{T}, ::MatElem{T}, ...) where {T <: FracElem}
+# and Nemo defines
+#   _can_solve_internal_no_check(::SolveCtx{T, MatT}, ::MatT, ...) where {MatT <: _FieldMatTypes}
+# This is ambiguous for T == QQFieldElem and MatT == QQMatrix.
+# Once we do a breaking release, we can remove any _dr (and resolve method ambiguities
+# in our own packages).
+_can_solve_internal_no_check(args...; kwargs...) = _can_solve_internal_no_check_dr(args...; kwargs...)
+
 # _can_solve_internal_no_check over FIELDS
-function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
+function _can_solve_internal_no_check_dr(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
 
   R = base_ring(A)
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, _sol, _K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check_dr(lazy_transpose(A), lazy_transpose(b), task, side = :right)
     return fl, data(_sol), data(_K)
   end
 
@@ -700,13 +712,13 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
 end
 
 # _can_solve_internal_no_check over RINGS
-function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: RingElement
+function _can_solve_internal_no_check_dr(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: RingElement
 
   R = base_ring(A)
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, _sol, _K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check_dr(lazy_transpose(A), lazy_transpose(b), task, side = :right)
     return fl, data(_sol), data(_K)
   end
 
@@ -721,7 +733,7 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
 end
 
 # _can_solve_internal_no_check over FIELDS with SOLVE CONTEXT
-function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
+function _can_solve_internal_no_check_dr(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
   if side === :right
     fl, sol = _can_solve_with_lu(matrix(C), b, reduced_matrix_lu(C), lu_permutation(C), rank(C))
   else
@@ -736,7 +748,7 @@ function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbo
 end
 
 # _can_solve_internal_no_check over RINGS with SOLVE CONTEXT
-function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: RingElement
+function _can_solve_internal_no_check_dr(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: RingElement
   if side === :right
     fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
   else
@@ -770,10 +782,10 @@ function _common_denominator(A::MatElem{T}) where T <: Union{FracElem, Rational{
 end
 
 # The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
-function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: Union{FracElem, Rational{BigInt}}
+function _can_solve_internal_no_check_dr(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: Union{FracElem, Rational{BigInt}}
 
   if side === :left
-    fl, _sol, _K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check_dr(lazy_transpose(A), lazy_transpose(b), task, side = :right)
     # This does not return LazyTransposedMat for sol because the matrices are made integral
     return fl, transpose(_sol), data(_K)
   end
@@ -794,7 +806,7 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
   end
 end
 
-function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: Union{FracElem, Rational{BigInt}}
+function _can_solve_internal_no_check_dr(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: Union{FracElem, Rational{BigInt}}
   # Split up in separate functions to make the compiler happy
   if side === :right
     return _can_solve_internal_no_check_right(C, b, task)
@@ -859,10 +871,10 @@ function _can_solve_internal_no_check_left(C::SolveCtx{T}, b::MatElem{T}, task::
   end
 end
 
-function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FracElem{TT} where TT <: PolyRingElem
+function _can_solve_internal_no_check_dr(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FracElem{TT} where TT <: PolyRingElem
 
   if side === :left
-    fl, _sol, _K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check_dr(lazy_transpose(A), lazy_transpose(b), task, side = :right)
     # This does not return a LazyTransposedMat for sol because the matrices are made integral
     return fl, transpose(_sol), data(_K)
   end
