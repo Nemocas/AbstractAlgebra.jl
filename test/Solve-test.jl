@@ -81,7 +81,8 @@
 end
 
 @testset "Linear solving context" begin
-  for R in [ QQ, ZZ, GF(101) ]
+  # QQ, ring, field, fraction field different from QQ to test different implementations
+  for R in [ QQ, ZZ, GF(101), fraction_field(QQ["x"][1]) ]
     M = matrix(R, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
     C = AbstractAlgebra.Solve.solve_init(M)
 
