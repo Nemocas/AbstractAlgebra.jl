@@ -98,7 +98,7 @@ end
 
 function Base.show(io::IO, ::MIME"text/plain", C::SolveCtx)
   io = PrettyPrinting.pretty(io)
-  println(io, "Linear solving context object of matrix")
+  println(io, "Linear solving context of matrix")
   print(io, PrettyPrinting.Indent())
   show(io, MIME"text/plain"(), matrix(C))
   print(io, PrettyPrinting.Dedent())
@@ -107,7 +107,7 @@ end
 function Base.show(io::IO, C::SolveCtx)
   PrettyPrinting.@show_name(io, C)
 
-  print(io, "Linear solving context object")
+  print(io, "Linear solving context")
 end
 
 @doc raw"""
