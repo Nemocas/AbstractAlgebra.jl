@@ -7,7 +7,10 @@ using Documenter, AbstractAlgebra
 # where `using AbstractAlgebra` is deliberately avoided.
 
 makedocs(
-         format = Documenter.HTML(),
+         format = Documenter.HTML(;
+            size_threshold_warn = 204800,
+            size_threshold = 409600,
+         ),
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
          clean = true,

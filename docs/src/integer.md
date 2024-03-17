@@ -143,7 +143,11 @@ true
 is_divisible_by(a::BigInt, b::BigInt)
 ```
 
-** Examples **
+```@docs
+is_associated(a::BigInt, b::BigInt)
+```
+
+**Examples**
 
 ```jldoctest
 julia> r = ZZ(6)

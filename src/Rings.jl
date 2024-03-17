@@ -37,11 +37,25 @@ Base.:/(x::Union{Integer, Rational, AbstractFloat}, y::RingElem) = divexact(x, y
 
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 
+@doc raw"""
+    is_divisible_by(x::T, y::T) where T <: RingElem
+
+Check if `x` is divisible by `y`, i.e. if $x = zy$ for some $z$.
+"""
 function is_divisible_by(x::T, y::T) where T <: RingElem
    if iszero(y)
       return iszero(x)
    end
    return divides(x, y)[1]
+end
+
+@doc raw"""
+    is_associated(x::T, y::T) where T <: RingElem
+
+Check if `x` and `y` are associated, i.e. if `x` is a unit times `y`.
+"""
+function is_associated(x::T, y::T) where T <: RingElem
+   return is_divisible_by(x, y) && is_divisible_by(y, x)
 end
 
 ###############################################################################

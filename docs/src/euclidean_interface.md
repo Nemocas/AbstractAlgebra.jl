@@ -19,6 +19,8 @@ mulmod(f::T, g::T, m::T) where T <: RingElem
 powermod(f::T, e::Int, m::T) where T <: RingElem
 invmod(f::T, m::T) where T <: RingElem
 divides(f::T, g::T) where T <: RingElem
+is_divisible_by(f::T, g::T) where T <: RingElem
+is_associated(f::T, g::T) where T <: RingElem
 remove(f::T, p::T) where T <: RingElem
 valuation(f::T, p::T) where T <: RingElem
 gcd(f::T, g::T) where T <: RingElem
