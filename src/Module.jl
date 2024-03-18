@@ -12,7 +12,7 @@
 
 function zero(M::FPModule{T}) where T <: RingElement
    R = base_ring(M)
-   return M(T[zero(R) for i in 1:ngens(M)])
+   return M(zero_matrix(R, 1, ngens(M))) #T[zero(R) for i in 1:ngens(M)])
 end
 
 function iszero(v::FPModuleElem{T}) where T <: RingElement
