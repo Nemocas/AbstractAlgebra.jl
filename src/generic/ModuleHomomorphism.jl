@@ -133,7 +133,7 @@ function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T},
       end
       # Find left inverse of mat
       N = identity_matrix(R, n)
-      X = AbstractAlgebra._solve_left(mat, N)
+      X = solve(mat, N)
       # Construct matrix of inverse homomorphism from first m columns of X
       M_inv = X[:, 1:m]
    end

@@ -2,7 +2,25 @@ module Solve
 
 using AbstractAlgebra
 
-import AbstractAlgebra: base_ring, nrows, ncols, matrix, rank, Generic, kernel
+import AbstractAlgebra:
+  @attributes,
+  _can_solve_with_solution_fflu,
+  _can_solve_with_solution_interpolation,
+  _solve_fflu_precomp,
+  base_ring,
+  fflu!,
+  Generic,
+  get_attribute,
+  has_attribute,
+  kernel,
+  matrix,
+  nrows,
+  ncols,
+  PrettyPrinting,
+  rank,
+  set_attribute!
+
+import Base: show
 
 ################################################################################
 #
@@ -46,19 +64,25 @@ Base.similar(M::LazyTransposeMatElem, i::Int, j::Int) = lazy_transpose(similar(d
 #
 ################################################################################
 
-mutable struct SolveCtx{T, MatT, TranspMatT}
+# attribute storage is enable so that the fraction field types can store integral
+# matrices. These don't go in `red` or `red_transp` because they don't have the
+# correct type. Changing the type parameters would be a breaking change.
+@attributes mutable struct SolveCtx{T, MatT, TranspMatT}
   A::MatT # matrix giving the linear system
   red::MatT # reduced/canonical form of A (rref, hnf, lu)
   red_transp::TranspMatT # reduced/canonical form of transpose(A)
   trafo::MatT # transformation: trafo*A == red (not used for lu)
   trafo_transp::TranspMatT # transformation: trafo_transp*transpose(A) == red_transp
                            # (not used for lu)
-  lu_perm::Generic.Perm # permutation used for the lu factorization of A
-  lu_perm_transp::Generic.Perm # permutation used for the lu factorization of transpose(A)
+  lu_perm::Generic.Perm{Int} # permutation used for the lu factorization of A
+  lu_perm_transp::Generic.Perm{Int} # permutation used for the lu factorization of transpose(A)
 
   rank::Int # rank of A
   pivots::Vector{Int} # pivot and non-pivot columns of red
   pivots_transp::Vector{Int} # pivot and non-pivot columns of red_transp
+
+  kernel_left::MatT
+  kernel_right::MatT
 
   function SolveCtx{T, MatT, TranspMatT}(A::MatT) where {T, MatT <: MatElem{T}, TranspMatT <: MatElem{T}}
     z = new{T, MatT, TranspMatT}()
@@ -72,11 +96,49 @@ mutable struct SolveCtx{T, MatT, TranspMatT}
   end
 end
 
+function Base.show(io::IO, ::MIME"text/plain", C::SolveCtx)
+  io = PrettyPrinting.pretty(io)
+  println(io, "Linear solving context of matrix")
+  print(io, PrettyPrinting.Indent())
+  show(io, MIME"text/plain"(), matrix(C))
+  print(io, PrettyPrinting.Dedent())
+end
+
+function Base.show(io::IO, C::SolveCtx)
+  PrettyPrinting.@show_name(io, C)
+
+  print(io, "Linear solving context")
+end
+
 @doc raw"""
     solve_init(A::MatElem)
 
 Return a context object `C` that allows to efficiently solve linear systems
 $Ax = b$ or $xA = b$ for different $b$.
+
+# Example
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> A = QQ[1 2 3; 0 3 0; 5 0 0];
+
+julia> C = solve_init(A)
+Linear solving context of matrix
+  [1//1   2//1   3//1]
+  [0//1   3//1   0//1]
+  [5//1   0//1   0//1]
+
+julia> solve(C, [QQ(1), QQ(1), QQ(1)], side = :left)
+3-element Vector{Rational{BigInt}}:
+ 1//3
+ 1//9
+ 2//15
+
+julia> solve(C, [QQ(1), QQ(1), QQ(1)], side = :right)
+3-element Vector{Rational{BigInt}}:
+ 1//5
+ 1//3
+ 2//45
+```
 """
 function solve_init(A::MatElem)
   return SolveCtx(A)
@@ -93,6 +155,56 @@ function _init_reduce(C::SolveCtx{<:FieldElement})
   set_rank!(C, r)
   C.red = R
   C.trafo = U
+  return nothing
+end
+
+# All matrices over fields in AbstractAlgebra use LU factoring, but Nemo needs
+# _init_reduce (and the calling functions) to do an rref.
+# Once we make a breaking release of AbstractAlgebra, we can rename
+# * _init_reduce_lu -> _init_reduce
+# * _init_reduce_transpose_lu -> _init_reduce_transpose
+# * reduced_matrix_lu -> reduced_matrix
+# * reduced_matrix_of_transpose_lu -> reduced_matrix_of_transpose
+# and then Nemo can have its own version of these functions.
+# (transformation_matrix and transformation_matrix_of_transpose should probably
+# throw an error for matrices over fields then.)
+
+function _init_reduce_lu(C::SolveCtx{<:FieldElement})
+  if isdefined(C, :red) && isdefined(C, :lu_perm)
+    return nothing
+  end
+
+  B = deepcopy(matrix(C))
+  p = one(SymmetricGroup(nrows(matrix(C))))
+  r = lu!(p, B)
+  set_rank!(C, r)
+  C.red = B
+  C.lu_perm = p
+  return nothing
+end
+
+function _init_reduce_fflu(C::SolveCtx{<:Union{FracElem, Rational{BigInt}}})
+  if has_attribute(C, :reduced_matrix_lu)
+    return nothing
+  end
+
+  A = matrix(C)
+  dA = _common_denominator(A)
+  Aint = matrix(parent(dA), nrows(A), ncols(A), [numerator(A[i, j]*dA) for i in 1:nrows(A) for j in 1:ncols(A)])
+  p = one(SymmetricGroup(nrows(A)))
+  r, dLU = fflu!(p, Aint)
+
+  set_rank!(C, r)
+  C.lu_perm = p
+  d = divexact(dA, base_ring(C)(dLU))
+  set_attribute!(C, :reduced_matrix_lu => Aint, :scaling_factor_fflu => d)
+  if r < nrows(A)
+    A2 = p*A
+    A3 = A2[r + 1:nrows(A), :]
+    set_attribute!(C, :permuted_matrix_fflu => A3)
+  else
+    set_attribute!(C, :permuted_matrix_fflu => zero(A, 0, ncols(A)))
+  end
   return nothing
 end
 
@@ -119,6 +231,46 @@ function _init_reduce_transpose(C::SolveCtx{<:FieldElement})
   return nothing
 end
 
+function _init_reduce_transpose_lu(C::SolveCtx{<:FieldElement})
+  if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
+    return nothing
+  end
+
+  B = lazy_transpose(deepcopy(matrix(C)))
+  p = one(SymmetricGroup(ncols(matrix(C))))
+  r = lu!(p, B)
+  set_rank!(C, r)
+  C.red_transp = B
+  C.lu_perm_transp = p
+  return nothing
+end
+
+function _init_reduce_transpose_fflu(C::SolveCtx{<:Union{FracElem, Rational{BigInt}}})
+  if has_attribute(C, :reduced_matrix_of_transpose_lu)
+    return nothing
+  end
+
+  A = matrix(C)
+  dA = _common_denominator(A)
+  # We transpose A at this point!
+  Aint = matrix(parent(dA), ncols(A), nrows(A), [numerator(A[i, j]*dA) for j in 1:ncols(A) for i in 1:nrows(A)])
+  p = one(SymmetricGroup(nrows(Aint)))
+  r, dLU = fflu!(p, Aint)
+
+  set_rank!(C, r)
+  C.lu_perm_transp = p
+  d = divexact(dA, base_ring(C)(dLU))
+  set_attribute!(C, :reduced_matrix_of_transpose_lu => Aint, :scaling_factor_of_transpose_fflu => d)
+  if r < ncols(A)
+    A2 = A*p
+    A3 = A2[:, r + 1:ncols(A)]
+    set_attribute!(C, :permuted_matrix_of_transpose_fflu => A3)
+  else
+    set_attribute!(C, :permuted_matrix_of_transpose_fflu => zero(A, nrows(A), 0))
+  end
+  return nothing
+end
+
 function _init_reduce_transpose(C::SolveCtx{<:RingElement})
   if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
     return nothing
@@ -140,13 +292,80 @@ function reduced_matrix_of_transpose(C::SolveCtx)
   return C.red_transp
 end
 
+function reduced_matrix_lu(C::SolveCtx)
+  _init_reduce_lu(C)
+  return C.red
+end
+
+function reduced_matrix_lu(C::SolveCtx{<:FracElem{T}}) where T
+  _init_reduce_fflu(C)
+  return get_attribute(C, :reduced_matrix_lu)::dense_matrix_type(T)
+end
+
+function reduced_matrix_lu(C::SolveCtx{<:Rational{BigInt}})
+  _init_reduce_fflu(C)
+  return get_attribute(C, :reduced_matrix_lu)::dense_matrix_type(BigInt)
+end
+
+function reduced_matrix_of_transpose_lu(C::SolveCtx)
+  _init_reduce_transpose_lu(C)
+  return C.red_transp
+end
+
+function reduced_matrix_of_transpose_lu(C::SolveCtx{<:FracElem{T}}) where T
+  _init_reduce_transpose_fflu(C)
+  return get_attribute(C, :reduced_matrix_of_transpose_lu)::dense_matrix_type(T)
+end
+
+function reduced_matrix_of_transpose_lu(C::SolveCtx{<:Rational{BigInt}})
+  _init_reduce_transpose_fflu(C)
+  return get_attribute(C, :reduced_matrix_of_transpose_lu)::dense_matrix_type(BigInt)
+end
+
+# Factor by which any solution needs to be multiplied.
+# This is the chosen denominator of matrix(C) divided by the denominator returned
+# by fflu!(matrix(C)).
+function scaling_factor_fflu(C::SolveCtx{T}) where {T <: Union{FracElem, Rational{BigInt}}}
+  _init_reduce_fflu(C)
+  return get_attribute(C, :scaling_factor_fflu)::T
+end
+
+function scaling_factor_of_transpose_fflu(C::SolveCtx{T}) where {T <: Union{FracElem, Rational{BigInt}}}
+  _init_reduce_transpose_fflu(C)
+  return get_attribute(C, :scaling_factor_of_transpose_fflu)::T
+end
+
+# Let A = matrix(C).
+# Return the matrix (p*A)[rank(A) + 1:nrows(A), :] where p is lu_permutation(C).
+function permuted_matrix_fflu(C::SolveCtx{FldT, MatT}) where {FldT <: Union{FracElem, Rational{BigInt}}, MatT}
+  _init_reduce_fflu(C)
+  return get_attribute(C, :permuted_matrix_fflu)::MatT
+end
+
+# Let A = matrix(C).
+# Return the matrix (A*p)[:, rank(A) + 1:ncols(A)] where p is lu_permutation_of_transpose(C).
+function permuted_matrix_of_transpose_fflu(C::SolveCtx{FldT, MatT}) where {FldT <: Union{FracElem, Rational{BigInt}}, MatT}
+  _init_reduce_transpose_fflu(C)
+  return get_attribute(C, :permuted_matrix_of_transpose_fflu)::MatT
+end
+
 function lu_permutation(C::SolveCtx)
-  _init_reduce(C)
+  _init_reduce_lu(C)
+  return C.lu_perm
+end
+
+function lu_permutation(C::SolveCtx{<:Union{FracElem, Rational{BigInt}}})
+  _init_reduce_fflu(C)
   return C.lu_perm
 end
 
 function lu_permutation_of_transpose(C::SolveCtx)
-  _init_reduce_transpose(C)
+  _init_reduce_transpose_lu(C)
+  return C.lu_perm_transp
+end
+
+function lu_permutation_of_transpose(C::SolveCtx{<:Union{FracElem, Rational{BigInt}}})
+  _init_reduce_transpose_fflu(C)
   return C.lu_perm_transp
 end
 
@@ -170,7 +389,16 @@ end
 
 function AbstractAlgebra.rank(C::SolveCtx{<:FieldElement})
   if C.rank < 0
+    # We should be calling _init_reduce_lu here, but can't because it has to stay
+    # compatible with Nemo.
     _init_reduce(C)
+  end
+  return C.rank
+end
+
+function AbstractAlgebra.rank(C::SolveCtx{<:Union{FracElem, Rational{BigInt}}})
+  if C.rank < 0
+    _init_reduce_fflu(C)
   end
   return C.rank
 end
@@ -330,12 +558,18 @@ end
 function kernel(C::SolveCtx{<:FieldElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
+  # I don't know how to compute the kernel using a LU factoring, so we call the
+  # "usual" method
   if side === :right
-    return _kernel_of_rref(reduced_matrix(C), rank(C), pivot_and_non_pivot_cols(C))[2]
+    if !isdefined(C, :kernel_right)
+      C.kernel_right = kernel(matrix(C), side = :right)
+    end
+    return C.kernel_right
   else
-    nullity, X = _kernel_of_rref(reduced_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C))
-    # X is of type LazyTransposeMatElem
-    return data(X)
+    if !isdefined(C, :kernel_left)
+      C.kernel_left = kernel(matrix(C), side = :left)
+    end
+    return C.kernel_left
   end
 end
 
@@ -343,17 +577,22 @@ function kernel(C::SolveCtx{<:RingElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   if side === :right
-    return _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))[2]
+    if !isdefined(C, :kernel_right)
+      C.kernel_right = _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))[2]
+    end
+    return C.kernel_right
   else
-    nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
-    # X is of type LazyTransposeMatElem
-    return data(X)
+    if !isdefined(C, :kernel_left)
+      nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
+      C.kernel_left = data(X)
+    end
+    return C.kernel_left
   end
 end
 
 ################################################################################
 #
-#  Internal functionality
+#  Generic internal functionality
 #
 ################################################################################
 
@@ -438,14 +677,26 @@ function _can_solve_internal(A::Union{MatElem{T}, SolveCtx{T}}, b::MatElem{T}, t
   return _can_solve_internal_no_check(A, b, task, side = side)
 end
 
+# The internal AbstractAlgebra functions are called _can_solve_internal_no_check_dr
+# (dr = done right), to allow other packages to overwrite
+# _can_solve_internal_no_check without creating any ambiguity.
+# Example: AbstractAlgebra defines
+#   _can_solve_internal_no_check(::SolveCtx{T}, ::MatElem{T}, ...) where {T <: FracElem}
+# and Nemo defines
+#   _can_solve_internal_no_check(::SolveCtx{T, MatT}, ::MatT, ...) where {MatT <: _FieldMatTypes}
+# This is ambiguous for T == QQFieldElem and MatT == QQMatrix.
+# Once we do a breaking release, we can remove any _dr (and resolve method ambiguities
+# in our own packages).
+_can_solve_internal_no_check(args...; kwargs...) = _can_solve_internal_no_check_dr(args...; kwargs...)
+
 # _can_solve_internal_no_check over FIELDS
-function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
+function _can_solve_internal_no_check_dr(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
 
   R = base_ring(A)
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, _sol, _K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check_dr(lazy_transpose(A), lazy_transpose(b), task, side = :right)
     return fl, data(_sol), data(_K)
   end
 
@@ -485,13 +736,13 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
 end
 
 # _can_solve_internal_no_check over RINGS
-function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: RingElement
+function _can_solve_internal_no_check_dr(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: RingElement
 
   R = base_ring(A)
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, _sol, _K = _can_solve_internal_no_check(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check_dr(lazy_transpose(A), lazy_transpose(b), task, side = :right)
     return fl, data(_sol), data(_K)
   end
 
@@ -506,11 +757,11 @@ function _can_solve_internal_no_check(A::MatElem{T}, b::MatElem{T}, task::Symbol
 end
 
 # _can_solve_internal_no_check over FIELDS with SOLVE CONTEXT
-function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
+function _can_solve_internal_no_check_dr(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FieldElement
   if side === :right
-    fl, sol = _can_solve_with_rref(b, transformation_matrix(C), rank(C), pivot_and_non_pivot_cols(C), task)
+    fl, sol = _can_solve_with_lu(matrix(C), b, reduced_matrix_lu(C), lu_permutation(C), rank(C))
   else
-    fl, _sol = _can_solve_with_rref(lazy_transpose(b), transformation_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C), task)
+    fl, _sol = _can_solve_with_lu(lazy_transpose(matrix(C)), lazy_transpose(b), reduced_matrix_of_transpose_lu(C), lu_permutation_of_transpose(C), rank(C))
     sol = data(_sol)
   end
   if !fl || task !== :with_kernel
@@ -521,7 +772,7 @@ function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbo
 end
 
 # _can_solve_internal_no_check over RINGS with SOLVE CONTEXT
-function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: RingElement
+function _can_solve_internal_no_check_dr(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: RingElement
   if side === :right
     fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
   else
@@ -533,6 +784,148 @@ function _can_solve_internal_no_check(C::SolveCtx{T}, b::MatElem{T}, task::Symbo
   end
 
   return true, sol, kernel(C, side = side)
+end
+
+################################################################################
+#
+#  Special internal functonality
+#
+################################################################################
+
+# _can_solve_internal_no_check methods which only work or are efficient for
+# certain types
+
+function _common_denominator(A::MatElem{T}) where T <: Union{FracElem, Rational{BigInt}}
+  d = numerator(one(base_ring(A)))
+  @inbounds for j in 1:ncols(A)
+    for i in 1:nrows(A)
+      d = lcm(d, denominator(A[i, j]))
+    end
+  end
+  return d
+end
+
+# The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
+function _can_solve_internal_no_check_dr(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: Union{FracElem, Rational{BigInt}}
+
+  if side === :left
+    fl, _sol, _K = _can_solve_internal_no_check_dr(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    # This does not return LazyTransposedMat for sol because the matrices are made integral
+    return fl, transpose(_sol), data(_K)
+  end
+
+  d = lcm(_common_denominator(A), _common_denominator(b))
+
+  Aint = matrix(parent(d), nrows(A), ncols(A), [numerator(A[i, j]*d) for i in 1:nrows(A) for j in 1:ncols(A)])
+  bint = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
+  flag, sol_int, den = _can_solve_with_solution_fflu(Aint, bint)
+  sol = change_base_ring(base_ring(A), sol_int)
+  sol = divexact(sol, base_ring(A)(den))
+
+  if task === :with_kernel
+    # I don't know how to compute the kernel using an (ff)lu factoring
+    return flag, sol, kernel(A, side = :right)
+  else
+    return flag, sol, zero(A, 0, 0)
+  end
+end
+
+function _can_solve_internal_no_check_dr(C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: Union{FracElem, Rational{BigInt}}
+  # Split up in separate functions to make the compiler happy
+  if side === :right
+    return _can_solve_internal_no_check_right(C, b, task)
+  else
+    return _can_solve_internal_no_check_left(C, b, task)
+  end
+end
+
+function _can_solve_internal_no_check_right(C::SolveCtx{T}, b::MatElem{T}, task::Symbol) where T <: Union{FracElem, Rational{BigInt}}
+  K = base_ring(C)
+  db = _common_denominator(b)
+  bint = matrix(parent(db), nrows(b), ncols(b), [numerator(b[i, j]*db) for i in 1:nrows(b) for j in 1:ncols(b)])
+  fl, y_int = _solve_fflu_precomp(lu_permutation(C), reduced_matrix_lu(C), bint)
+  if !fl
+    return fl, zero(b, 0, 0), zero(b, 0, 0)
+  end
+  # We have fl == true, but we still have to check whether this really is a solution
+  d = scaling_factor_fflu(C)
+  y = change_base_ring(K, y_int)
+  y = y*divexact(d, K(db))
+  if rank(C) < nrows(C)
+    # We have to check whether y is also a solution for the "lower part"
+    # of the system
+    pb = lu_permutation(C)*b
+    pA = permuted_matrix_fflu(C)
+    fl = pA*y == pb[rank(C) + 1:nrows(C), :]
+  end
+  if task === :with_kernel
+    # I don't know how to compute the kernel using an (ff)lu factoring
+    return fl, y, kernel(C, side = :right)
+  else
+    return fl, y, zero(b, 0, 0)
+  end
+end
+
+function _can_solve_internal_no_check_left(C::SolveCtx{T}, b::MatElem{T}, task::Symbol) where T <: Union{FracElem, Rational{BigInt}}
+  K = base_ring(C)
+  db = _common_denominator(b)
+  # bint == transpose(b)*db
+  bint = matrix(parent(db), ncols(b), nrows(b), [numerator(b[i, j]*db) for j in 1:ncols(b) for i in 1:nrows(b)])
+  fl, y_int = _solve_fflu_precomp(lu_permutation_of_transpose(C), reduced_matrix_of_transpose_lu(C), bint)
+  if !fl
+    return fl, zero(b, 0, 0), zero(b, 0, 0)
+  end
+  # We have fl == true, but we still have to check whether this really is a solution
+  d = scaling_factor_of_transpose_fflu(C)
+  # transpose y_int
+  y = matrix(K, ncols(y_int), nrows(y_int), [ K(y_int[i, j]) for j in 1:ncols(y_int) for i in 1:nrows(y_int)])
+  y = y*divexact(d, K(db))
+  if rank(C) < ncols(C)
+    # We have to check whether y is also a solution for the "right hand part"
+    # of the system
+    pb = b*lu_permutation_of_transpose(C)
+    pA = permuted_matrix_of_transpose_fflu(C)
+    fl = y*pA == pb[:, rank(C) + 1:ncols(C)]
+  end
+  if task === :with_kernel
+    # I don't know how to compute the kernel using an (ff)lu factoring
+    return fl, y, kernel(C, side = :left)
+  else
+    return fl, y, zero(b, 0, 0)
+  end
+end
+
+function _can_solve_internal_no_check_dr(A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T <: FracElem{TT} where TT <: PolyRingElem
+
+  if side === :left
+    fl, _sol, _K = _can_solve_internal_no_check_dr(lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    # This does not return a LazyTransposedMat for sol because the matrices are made integral
+    return fl, transpose(_sol), data(_K)
+  end
+
+  d = lcm(_common_denominator(A), _common_denominator(b))
+
+  Aint = matrix(parent(d), nrows(A), ncols(A), [numerator(A[i, j]*d) for i in 1:nrows(A) for j in 1:ncols(A)])
+  bint = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
+
+  flag = false
+  sol_int = similar(Aint, ncols(Aint), nrows(bint))
+  den = one(base_ring(A))
+  try
+    flag, sol_int, den = _can_solve_with_solution_interpolation(Aint, bint)
+  catch
+    flag, sol_int, den = _can_solve_with_solution_fflu(Aint, bint)
+  end
+
+  sol = change_base_ring(base_ring(A), sol_int)
+  sol = divexact(sol, base_ring(A)(den))
+
+  if task === :with_kernel
+    # I don't know how to compute the kernel using an (ff)lu factoring
+    return flag, sol, kernel(A, side = :right)
+  else
+    return flag, sol, zero(A, 0, 0)
+  end
 end
 
 ################################################################################
@@ -565,9 +958,29 @@ function _can_solve_with_rref(b::MatElem{T}, U::MatElem{T}, r::Int, pivots::Vect
   return true, sol
 end
 
+# Solve Ax = b with LU and p a LU decomposition of A of rank r.
+# Takes same options for `task` as _can_solve_internal but only returns (flag, solution)
+# and no kernel.
+function _can_solve_with_lu(A::MatElem{T}, b::MatElem{T}, LU::MatElem{T}, p::Generic.Perm, r::Int) where T <: FieldElement
+  y = AbstractAlgebra._solve_lu_precomp(p, LU, b)
+
+  # _solve_lu_precomp only takes care of the first r rows
+  # We now need to check whether the remaining rows are fine as well
+  n = nrows(A)
+  fl = true
+  if r < n
+    b2 = p*b
+    A2 = p*A
+    A3 = A2[r + 1:n, :]
+    fl = A3*y == b2[r + 1:n, :]
+  end
+  return fl, y
+end
+
 # Compute a matrix N with RN == 0 where the columns of N give a basis for the kernel.
 # R must be in rref of rank r and pivots must be of length ncols(R) with the pivot
 # columns in the first r entries and the non-pivot columns in the remaining entries.
+# Only used by Nemo
 function _kernel_of_rref(R::MatElem{T}, r::Int, pivots::Vector{Int}) where T <: FieldElement
   @assert length(pivots) == ncols(R)
   nullity = ncols(R) - r
@@ -635,6 +1048,7 @@ function _kernel_of_hnf(A::MatElem{T}, H::MatElem{T}, U::MatElem{T}) where T <: 
 end
 
 # Copied from Hecke, to be replaced with echelon_form_with_transformation eventually
+# Only used by Nemo
 function _rref_with_transformation(M::MatElem{T}) where T <: FieldElement
   n = hcat(deepcopy(M), identity_matrix(base_ring(M), nrows(M)))
   rref!(n)

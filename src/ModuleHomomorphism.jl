@@ -151,7 +151,7 @@ function preimage(f::Map(FPModuleHomomorphism), v::FPModuleElem{T}) where
          end
       end
       # Find left inverse of mat
-      x = AbstractAlgebra._solve_left(matr, Generic._matrix(v))
+      x = solve(matr, Generic._matrix(v))
       if q != 0
          x = matrix(R, 1, m, T[x[1, i] for i in 1:m])
       end

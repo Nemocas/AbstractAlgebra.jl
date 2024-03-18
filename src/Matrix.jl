@@ -1578,6 +1578,51 @@ function *(P::Perm, x::MatrixElem{T}) where T <: NCRingElement
    return z
 end
 
+@doc raw"""
+    *(x::MatrixElem{T}, P::Perm) where T <: NCRingElement
+
+Apply the pemutation $P$ to the columns of the matrix $x$ and return the result.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, t = polynomial_ring(QQ, "t")
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S = matrix_space(R, 3, 3)
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
+
+julia> G = SymmetricGroup(3)
+Full symmetric group over 3 elements
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> P = G([1, 3, 2])
+(2,3)
+
+julia> B = A*P
+[t + 1             1       t]
+[  t^2             t       t]
+[   -2   t^2 + t + 1   t + 2]
+
+```
+"""
+function *(x::MatrixElem{T}, P::Perm) where T <: NCRingElement
+   z = similar(x)
+   m = nrows(x)
+   n = ncols(x)
+   for i = 1:m
+      for j = 1:n
+         z[i, P[j]] = x[i, j]
+      end
+   end
+   return z
+end
+
 ###############################################################################
 #
 #   LU factorisation
@@ -3154,36 +3199,6 @@ function _solve_rational(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
    end
 end
 
-# @doc raw"""
-#     solve(a::MatElem{S}, b::MatElem{S}) where {S <: RingElement}
-# 
-# Given an $m\times r$ matrix $a$ over a ring and an $m\times n$ matrix $b$
-# over the same ring, return an $r\times n$ matrix $x$ such that $ax = b$. If
-# no such matrix exists, an exception is raised.
-# See also [`_solve_left`](@ref).
-# """
-function _solve(a::MatElem{S}, b::MatElem{S}
-               ) where S <: RingElement
-   can, X = _can_solve_with_solution(a, b, side = :right)
-   can || throw(ArgumentError("Unable to solve linear system"))
-   return X
-end
-
-@doc raw"""
-    _solve_left(a::MatElem{S}, b::MatElem{S}) where S <: RingElement
-
-Given an $r\times n$ matrix $a$ over a ring and an $m\times n$ matrix $b$
-over the same ring, return an $m\times r$ matrix $x$ such that $xa = b$. If
-no such matrix exists, an exception is raised.
-See also [`solve`](@ref).
-"""
-function _solve_left(a::MatElem{S}, b::MatElem{S}
-                    ) where S <: RingElement
-   (flag, x) = _can_solve_with_solution(a, b; side = :left)
-   flag || error("Unable to solve linear system")
-   return x
-end
-
 # Find the pivot columns of an rref matrix
 function find_pivot(A::MatElem{T}) where T <: RingElement
   p = Int[]
@@ -3202,147 +3217,6 @@ function find_pivot(A::MatElem{T}) where T <: RingElement
     push!(p, j)
   end
   return p
-end
-
-###############################################################################
-#
-#   Solving with kernel
-#
-###############################################################################
-
-function _can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}; side = :right) where T <: FieldElement
-  @assert base_ring(A) == base_ring(B)
-  if side === :right
-    @assert nrows(A) == nrows(B)
-    return __can_solve_with_kernel(A, B)
-  elseif side === :left
-    b, C, K = __can_solve_with_kernel(transpose(A), transpose(B))
-    @assert ncols(A) == ncols(B)
-    if b
-      return b, transpose(C), transpose(K)
-    else
-      return b, C, K
-    end
-  else
-    error("Unsupported argument :$side for side: Must be :left or :right")
-  end
-end
-
-function __can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: FieldElement
-  R = base_ring(A)
-  mu = [A B]
-  rk, mu = rref(mu)
-  p = find_pivot(mu)
-  if any(i -> i > ncols(A), p)
-    return false, B, B
-  end
-  sol = zero_matrix(R, ncols(A), ncols(B))
-  for i = 1:length(p)
-    for j = 1:ncols(B)
-      sol[p[i], j] = mu[i, ncols(A) + j]
-    end
-  end
-  nullity = ncols(A) - length(p)
-  X = zero(A, ncols(A), nullity)
-  pivots = zeros(Int, max(nrows(A), ncols(A)))
-  np = rk
-  j = k = 1
-  for i = 1:rk
-    while is_zero_entry(mu, i, j)
-      pivots[np + k] = j
-      j += 1
-      k += 1
-    end
-    pivots[i] = j
-    j += 1
-  end
-  while k <= nullity
-    pivots[np + k] = j
-    j += 1
-    k += 1
-  end
-  for i = 1:nullity
-    for j = 1:rk
-      X[pivots[j], i] = -mu[j, pivots[np + i]]
-    end
-    X[pivots[np + i], i] = one(R)
-  end
-  return true, sol, X
-end
-
-@doc raw"""
-    can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}) where T <: RingElement
-
-If $Ax = B$ is soluble, returns `true, S, K` where `S` is a particular solution
-and $K$ is the kernel. Otherwise returns `false, S, K` where $S$ and $K$ are
-undefined, though of the right type for type stability.
-Tries to solve $Ax = B$ for $x$ if `side = :right` or $xA = B$ if `side = :left`.
-"""
-function _can_solve_with_kernel(A::MatElem{T}, B::MatElem{T}; side = :right) where T <: RingElement
-  @assert base_ring(A) == base_ring(B)
-  if side === :right
-    @assert nrows(A) == nrows(B)
-    b, c, K = __can_solve_with_kernel(transpose(A), B)
-    return b, transpose(c), K
-  elseif side === :left
-    b, C, K = __can_solve_with_kernel(A, transpose(B))
-    @assert ncols(A) == ncols(B)
-    if b
-      return b, C, transpose(K)
-    else
-      return b, C, K
-    end
-  else
-    error("Unsupported argument :$side for side: Must be :left or :right")
-  end
-end
-
-# Note that _a_ must be supplied transposed and the solution is transposed
-function __can_solve_with_kernel(a::MatElem{S}, b::MatElem{S}) where S <: RingElement
-  H, T = hnf_with_transform(a)
-  z = zero_matrix(base_ring(a), ncols(b), nrows(a))
-  l = min(nrows(a), ncols(a))
-  b = deepcopy(b)
-  for i = 1:ncols(b)
-    for j = 1:l
-      k = 1
-      while k <= ncols(H) && is_zero_entry(H, j, k)
-        k += 1
-      end
-      if k > ncols(H)
-        continue
-      end
-      q, r = divrem(b[k, i], H[j, k])
-      if !iszero(r)
-        return false, b, b
-      end
-      for h = k:ncols(H)
-        b[h, i] -= q*H[j, h]
-      end
-      z[i, j] = q
-    end
-  end
-  if !iszero(b)
-    return false, b, b
-  end
-  for i = nrows(H):-1:1
-    for j = 1:ncols(H)
-      if !is_zero_entry(H, i, j)
-        N = zero_matrix(base_ring(a), nrows(a), nrows(H) - i)
-        for k = 1:nrows(N)
-          for l = 1:ncols(N)
-            N[k, l] = T[nrows(T) - l + 1, k]
-          end
-        end
-        return true, z*T, N
-      end
-    end
-  end
-  N = zero(a, nrows(a), nrows(H))
-  for i = 1:min(nrows(N), ncols(N))
-     N[i, i] = 1
-  end
-  return true, z*T, N
 end
 
 ###############################################################################
@@ -3664,165 +3538,6 @@ function _can_solve_left_reduced_triu(r::MatElem{T},
       end
    end
    return true, x
-end
-
-function _can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: FracElem{T} where T <: PolyRingElem
-   if side == :left
-      (f, x) = _can_solve_with_solution(transpose(a), transpose(b); side=:right)
-      return (f, transpose(x))
-   elseif side == :right
-      d = numerator(one(base_ring(a)))
-      for i = 1:nrows(a)
-         for j = 1:ncols(a)
-            d = lcm(d, denominator(a[i, j]))
-         end
-      end
-      for i = 1:nrows(b)
-         for j = 1:ncols(b)
-            d = lcm(d, denominator(b[i, j]))
-         end
-      end
-      A = matrix(parent(d), nrows(a), ncols(a), [numerator(a[i, j]*d) for i in 1:nrows(a) for j in 1:ncols(a)])
-      B = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
-      flag = false
-      x = similar(A, ncols(A), nrows(B))
-      den = one(base_ring(a))
-      try
-         flag, x, den = _can_solve_with_solution_interpolation(A, B)
-      catch
-         flag, x, den = _can_solve_with_solution_fflu(A, B)
-      end
-      X = change_base_ring(base_ring(a), x)
-      X = divexact(X, base_ring(a)(den))
-      return flag, X
-   else
-      error("Unsupported argument :$side for side: Must be :left or :right.")
-   end
-end
- 
-# The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
-function _can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: Union{FracElem, Rational{BigInt}}
-   if side == :left
-      (f, x) = _can_solve_with_solution(transpose(a), transpose(b); side=:right)
-      return (f, transpose(x))
-   elseif side == :right
-      d = numerator(one(base_ring(a)))
-      for i = 1:nrows(a)
-         for j = 1:ncols(a)
-            d = lcm(d, denominator(a[i, j]))
-         end
-      end
-      for i = 1:nrows(b)
-         for j = 1:ncols(b)
-            d = lcm(d, denominator(b[i, j]))
-         end
-      end
-      A = matrix(parent(d), nrows(a), ncols(a), [numerator(a[i, j]*d) for i in 1:nrows(a) for j in 1:ncols(a)])
-      B = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
-      flag, x, den = _can_solve_with_solution_fflu(A, B)
-      X = change_base_ring(base_ring(a), x)
-      X = divexact(X, base_ring(a)(den))
-      return flag, X
-   else
-      error("Unsupported argument :$side for side: Must be :left or :right.")
-   end
-end
- 
-@doc raw"""
-    _can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: RingElement
-
-Given two matrices $a$ and $b$ over the same ring, try to solve $ax = b$
-if `side` is `:right` or $xa = b$ if `side` is `:left`. In either case,
-return a tuple `(flag, x)`. If a solution exists, `flag` is set to true and
-`x` is a solution. If no solution exists, `flag` is set to false and `x`
-is arbitrary. If the dimensions of $a$ and $b$ are incompatible, an exception
-is raised.
-"""
-function _can_solve_with_solution(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: RingElement
-   if side == :right
-      (f, x) = _can_solve_with_solution(transpose(a), transpose(b); side=:left)
-      return (f, transpose(x))
-   elseif side == :left
-      @assert ncols(a) == ncols(b)
-      H, T = hnf_with_transform(a)
-      b = deepcopy(b)
-      z = zero(a, nrows(b), nrows(a))
-      l = min(ncols(a), nrows(a))
-      t = base_ring(a)()
-      for i = 1:nrows(b)
-         for j = 1:l
-            k = 1
-            while k <= ncols(H) && is_zero_entry(H, j, k)
-               k += 1
-            end
-            if k > ncols(H)
-               continue
-            end
-            q, r = divrem(b[i, k], H[j, k])
-            if r != 0
-               return (false, zero(a, 0, 0))
-            end
-            z[i, j] = q
-            q = -q
-            for h = k:ncols(H)
-               t = mul!(t, q, H[j, h])
-               b[i, h] = addeq!(b[i, h], t)
-            end
-         end
-      end
-      if b != 0
-         return (false, zero(a, 0, 0))
-      end
-      return (true, z*T)
-   else
-      error("Unsupported argument :$side for side: Must be :left or :right.")
-   end
-end
-
-function _can_solve_with_solution(A::MatElem{T}, B::MatElem{T}; side::Symbol = :right) where T <: FieldElement
-   if side == :right
-      (f, x) = _can_solve_with_solution(transpose(A), transpose(B), side = :left)
-      return (f, transpose(x))
-   elseif side == :left
-      R = base_ring(A)
-      ncols(A) != ncols(B) && error("Incompatible matrices")
-      mu = zero_matrix(R, ncols(A), nrows(A) + nrows(B))
-      for i = 1:ncols(A)
-         for j = 1:nrows(A)
-            mu[i, j] = A[j, i]
-         end
-         for j = 1:nrows(B)
-            mu[i, nrows(A) + j] = B[j, i]
-         end
-      end
-      rk, mu = rref(mu)
-      p = find_pivot(mu)
-      if any(i -> i > nrows(A), p)
-         return (false, zero(A, 0, 0))
-      end
-      sol = zero_matrix(R, nrows(B), nrows(A))
-      for i = 1:length(p)
-         for j = 1:nrows(B)
-            sol[j, p[i]] = mu[i, nrows(A) + j]
-         end
-      end
-      return (true, sol)
-   else
-      error("Unsupported argument :$side for side: Must be :left or :right.")
-   end
-end
- 
-@doc raw"""
-    _can_solve(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: RingElement
-
-Given two matrices $a$ and $b$ over the same ring, check the solubility
-of $ax = b$ if `side` is `:right` or $xa = b$ if `side` is `:left`.
-Return true if a solution exists, false otherwise. If the dimensions
-of $a$ and $b$ are incompatible, an exception is raised. If a solution
-should be computed as well, use `can_solve_with_solution` instead.
-"""
-function _can_solve(a::MatElem{S}, b::MatElem{S}; side::Symbol = :right) where S <: RingElement
-   return _can_solve_with_solution(a, b; side=side)[1]
 end
 
 ###############################################################################
