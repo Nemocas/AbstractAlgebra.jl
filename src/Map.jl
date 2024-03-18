@@ -18,6 +18,7 @@ function codomain end
 function image_fn end
 
 function check_composable(a::Map, b::Map)
+   return codomain(a) !== domain(b) && error("Incompatible maps")
    codomain(a) != domain(b) && error("Incompatible maps")
 end
 
