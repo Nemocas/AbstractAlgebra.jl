@@ -3379,7 +3379,6 @@ function __solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement
    return X
 end
 
-<<<<<<< HEAD
 #solves A x = B for A intended to be lower triangular
 #only the lower part is used. if f is true, then the diagonal is assumed to be 1
 #used to use lu!
@@ -3409,8 +3408,6 @@ function _solve_tril!(A::MatElem{T}, B::MatElem{T}, C::MatElem{T}, f::Int = 0) w
   end
 end
 
-=======
->>>>>>> 537591253 (add some triangular ring solver)
 ###############################################################################
 #
 #
