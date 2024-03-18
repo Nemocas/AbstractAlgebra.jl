@@ -154,6 +154,7 @@ end
 
 function AbstractAlgebra.canonical_injection(A::DirectSumModule, i::Int)
   B = summands(A)[i]
+  return hom(B, A, InjProjMat{elem_type(base_ring(A))}(base_ring(A), dim(B), dim(A), sum(dim(x) for x = summands(A)[1:i-1]; init = 0)+1))
   return hom(B, A, [direct_sum_injection(i, A, x) for x = gens(B)])
 end
 
@@ -172,6 +173,8 @@ function direct_sum_projection(D::DirectSumModule{T}, i::Int, v::AbstractAlgebra
 end
 
 function AbstractAlgebra.canonical_projection(A::DirectSumModule, i::Int)
+  B = summands(A)[i]
+  return hom(B, A, InjProjMat{elem_type(base_ring(A))}(base_ring(A), dim(A), dim(B), sum(dim(x) for x = summands(A)[1:i-1]; init = 0)+1))
   return hom(A, summands(A)[i], [direct_sum_projection(A, i, x) for x = gens(A)])
 end
 
@@ -207,13 +210,8 @@ function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingEle
    start = 0
    for i = 1:length(m)
       igens = ngens(m[i])
-      mat1 = zero_matrix(R, igens, n)
-      for j = 1:igens
-         mat1[j, start + j] = one(R)
-      end
-      inj[i] = ModuleHomomorphism(m[i], M, mat1)
-      mat2 = transpose(mat1)
-      pro[i] = ModuleHomomorphism(M, m[i], mat2)
+      inj[i] = ModuleHomomorphism(m[i], M, InjProjMat{T}(R, igens, n, start+1))
+      pro[i] = ModuleHomomorphism(M, m[i], InjProjMat{T}(R, n, igens, start+1))
       # Override image_fns with fast versions that don't do matrix-vector mul
       inj[i].image_fn  = x -> direct_sum_injection(i, M, x)
       pro[i].image_fn = x -> direct_sum_projection(M, i, x)
