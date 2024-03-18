@@ -61,25 +61,33 @@ function kernel(f::Map(FPModuleHomomorphism))
    # put domain relations and M in a big matrix
    # swap rows so we can get upper triangular wrt original data
    nr = nrows(M) + length(crels)
-   N = zero_matrix(R, nr, ncols(M))
-   for i = 1:nrows(M)
-      for j = 1:ncols(M)
-         N[nr - i + 1, j] = M[i, j]
-      end
-   end
-   for i = 1:length(crels)
-      for j = 1:ncols(M)
-         N[nr - i - nrows(M) + 1, j] = crels[i][1, j]
-      end
+   local N
+   if length(crels) == 0
+     N = M
+   else
+     N = zero_matrix(R, nr, ncols(M))
+     for i = 1:nrows(M)
+        N[nr - i + 1, :] = view(M, i:i, :)
+     end
+     for i = 1:length(crels)
+        N[nr - i - nrows(M) + 1, :] = crels[i]
+     end
    end
    # compute the kernel
    num_gens, K = AbstractAlgebra._left_kernel(N)
    # Construct generators of kernel submodule, reversing rows
    # and columns so they're correct wrt to original data and
    # in upper triangular form
+   #TODO use other primitives, don't ever use getindex, ...
    V = Vector{elem_type(D)}(undef, num_gens)
-   for j = 1:num_gens
-      V[j] = D([K[num_gens - j + 1, nr - k + 1] for k = 1:nrows(M)])
+   if length(crels) == 0
+     for j=1:num_gens
+       V[j] = D(view(K, j:j, :))
+     end
+   else
+     for j = 1:num_gens
+        V[j] = D([K[num_gens - j + 1, nr - k + 1] for k = 1:nrows(M)])
+     end
    end
    return sub(D, V)
 end
@@ -124,38 +132,40 @@ an exception is raised.
 """
 function preimage(f::Map(FPModuleHomomorphism), v::FPModuleElem{T}) where
                                                                T <: RingElement
+   return preimage(f, [v])[1]
+end
+
+function preimage(f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}) where
+                                                               T <: RingElement
    D = domain(f)
    C = codomain(f)
    R = base_ring(C)
-   parent(v) !== C && error("Incompatible element")
+   if length(v) == 0
+     return elem_type(domain(f))[]
+   end
+   parent(v[1]) !== C && error("Incompatible element")
    M = matrix(f)
    trels = rels(C)
    # Put rows of M and target relations into a matrix
    q = length(trels)
    m = nrows(M)
    n = ncols(M)
-   ncols(Generic._matrix(v)) != n && error("Incompatible element")
    if m == 0 || n == 0
-       return D(zero_matrix(R, 1, m))
+     return [D(zero_matrix(R, 1, m)) for x = v]
    else
       # Put matrix M and target relations in a matrix
       matr = zero_matrix(R, m + q, n)
-      for i = 1:m
-         for j = 1:n
-            matr[i, j] = M[i, j]
-         end
-      end
+      matr[1:m, 1:n] = M
       for i = 1:q
-         for j = 1:n
-            matr[m + i, j] = trels[i][1, j]
-         end
+        matr[m + i, :] = trels[i]
       end
       # Find left inverse of mat
-      x = solve(matr, Generic._matrix(v))
-      if q != 0
-         x = matrix(R, 1, m, T[x[1, i] for i in 1:m])
+      inmat = zero_matrix(R, length(v), n)
+      for i=1:length(v)
+        inmat[i, :] = Generic._matrix(v[i])
       end
-      return D(x)
+      x = solve(matr, inmat)
+      return [D(view(x, i:i,  1:m)) for i=1:length(v)]
    end
 end
 

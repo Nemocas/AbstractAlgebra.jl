@@ -239,15 +239,15 @@ function make_direct_sub(m::Submodule{T}, subm::Submodule{T}) where T <: RingEle
   while codomain(chain_m[p]) !== codomain(chain_s[end])
      p += 1
   end
-  gns = elem_type(m)[]
+  gns = elem_type(codomain(chain_s[end]))[]
   for g = gens(subm)
      for mp = chain_s
         g = mp(g)
      end
-     for mp = chain_m[p:-1:1]
-        g = preimage(mp, g)
-     end
      push!(gns, g)
+  end
+  for mp = chain_m[p:-1:1]
+      gns = preimage(mp, gns)
   end
   return sub(m, gns)
 end

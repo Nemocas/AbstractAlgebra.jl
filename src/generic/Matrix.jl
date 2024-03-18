@@ -245,3 +245,83 @@ Base.setindex!(V::MatSpaceVecView{T}, z::T, i::Int) where {T} = (V.entries[i] = 
 Base.setindex!(V::MatSpaceVecView, z::RingElement, i::Int) = setindex!(V.entries, V.base_ring(z), i)
 
 Base.size(V::MatSpaceVecView) = (length(V.entries), )
+
+###############################################################################
+#
+#   InjProjMat
+#
+###############################################################################
+
+AbstractAlgebra.nrows(K::InjProjMat) = K.n
+AbstractAlgebra.ncols(K::InjProjMat) = K.m
+AbstractAlgebra.base_ring(K::InjProjMat) = K.R
+
+function AbstractAlgebra.matrix(K::InjProjMat)
+  R = base_ring(K)
+  if K.n >= K.m
+    return [zero_matrix(R, K.s-1, ncols(K)) ; identity_matrix(R, ncols(K)) ; zero_matrix(R, K.n - K.s - K.m + 1, ncols(K))]
+  else
+    return [zero_matrix(R, nrows(K), K.s-1) identity_matrix(R, nrows(K)) zero_matrix(R, nrows(K), K.m-K.s-K.n + 1)]
+  end
+end
+
+function Base.getindex(K::InjProjMat{T}, i::Int, j::Int) where T
+  (1 <= i <= nrows(K) && 1 <= j <= ncols(K)) || error(BoundsError(K, (i,j)))
+  K.n >= K.m && i - K.s + 1 == j && return one(K.R)::T
+  K.n <= K.m && i == j - K.s + 1 && return one(K.R)::T
+  return zero(K.R)::T
+end
+
+function *(b::InjProjMat{T}, c::MatElem{T}) where {T <: NCRingElement}
+  @assert ncols(b) == nrows(c)
+  R = base_ring(b)
+  @assert base_ring(c) == R
+  if b.n >= b.m
+    z = zero_matrix(R, nrows(b), ncols(c))
+    z[b.s:b.s+nrows(c)-1, :] = c
+    return z
+#    return [zero_matrix(R, b.s-1, ncols(c)) ; c ; zero_matrix(R, b.n - b.m - b.s + 1, ncols(c))]
+  else
+    return c[b.s:b.s+b.m-1, :]
+  end
+end
+
+function *(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
+  @assert ncols(b) == nrows(c)
+  R = base_ring(b)
+  @assert base_ring(c) == R
+  if c.n >= c.m
+    #c = [0 I 0]^t
+    return b[:, c.s:c.s+c.m-1]
+  else
+    z = zero_matrix(R, nrows(b), ncols(c))
+    z[:, c.s:c.s+c.n-1] = b
+    return z
+    return [zero_matrix(R, nrows(b), c.s-1) b zero_matrix(R, nrows(b), c.m - c.n - c.s + 1)]
+  end
+end
+
+function +(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
+  @assert size(b) == size(c)
+  R = base_ring(b)
+  a = deepcopy(b)
+  if c.n >= c.m
+    for i=1:c.m
+      add_one!(a, c.s+i-1, i)
+    end
+  else
+    for i=1:c.n
+      add_one!(a, i, c.s+i-1)
+    end
+  end
+  return a
+end
++(c::InjProjMat{T}, b::MatElem{T}) where {T <: NCRingElement} = b+c
+
+function add_one!(a::MatElem, i::Int, j::Int)
+  a[i,j] += 1
+end
+
+
+
+ 
