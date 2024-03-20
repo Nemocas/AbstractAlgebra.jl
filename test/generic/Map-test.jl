@@ -156,3 +156,21 @@ end
   @test PrettyPrinting.supercompact(t) == "Composite map"
 
 end
+
+@testset "Generic.Map.broadcasting" begin
+   id = identity_map(ZZ)
+   @test id.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(1), ZZ(2), ZZ(3)]
+   @test [ZZ(1), ZZ(2), ZZ(3)] .|> id == [ZZ(1), ZZ(2), ZZ(3)]
+
+   f = map_from_func(x -> x + 1, ZZ, ZZ)
+   @test f.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(2), ZZ(3), ZZ(4)]
+   @test [ZZ(1), ZZ(2), ZZ(3)] .|> f == [ZZ(2), ZZ(3), ZZ(4)]
+
+   s = MyMapMod.MyMap(2)
+   @test s.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(4), ZZ(6), ZZ(8)]
+   @test [ZZ(1), ZZ(2), ZZ(3)] .|> s == [ZZ(4), ZZ(6), ZZ(8)]
+
+   t = compose(f, s)
+   @test t.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(6), ZZ(8), ZZ(10)]
+   @test [ZZ(1), ZZ(2), ZZ(3)] .|> t == [ZZ(6), ZZ(8), ZZ(10)]
+end
