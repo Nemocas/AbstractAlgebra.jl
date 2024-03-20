@@ -44,7 +44,8 @@ It also provides two abstract types for matrix algebras and their elements:
 Note that these abstract types are parameterised. The type `T` should usually be the
 type of elements of the matrices.
 
-Matrix spaces and matrix algebras should be made unique on the system by caching parent
+Matrix spaces and matrix algebras should be made unique on the system by either making
+them `struct` types, or by caching parent
 objects (unless an optional `cache` parameter is set to `false`). Matrix spaces and
 algebras should at least be distinguished based on their base (coefficient) ring and the
 dimensions of the matrices in the space.

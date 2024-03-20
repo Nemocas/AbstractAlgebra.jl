@@ -65,10 +65,7 @@ AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 Random.rand(rng::AbstractRNG, sp::Random.SamplerTrivial{F2}) = F2Elem(rand(rng, Bool))
 Random.gentype(::Type{F2}) = F2Elem
 
-struct F2MatSpace <: AbstractAlgebra.MatSpace{F2Elem}
-   nrows::Int
-   ncols::Int
-end
+const F2MatSpace = AbstractAlgebra.Generic.MatSpace{F2Elem}
 
 (S::F2MatSpace)() = zero_matrix(F2(), S.nrows, S.ncols)
 
@@ -81,8 +78,7 @@ AbstractAlgebra.parent_type(::Type{F2Matrix}) = F2MatSpace
 
 AbstractAlgebra.base_ring(::F2MatSpace) = F2()
 AbstractAlgebra.dense_matrix_type(::Type{F2}) = F2Matrix
-AbstractAlgebra.parent(a::F2Matrix) = F2MatSpace(nrows(a), ncols(a))
-AbstractAlgebra.matrix_space(::F2, r::Int, c::Int) = F2MatSpace(r, c)
+AbstractAlgebra.matrix_space(::F2, r::Int, c::Int) = F2MatSpace(F2(), r, c)
 
 AbstractAlgebra.number_of_rows(a::F2Matrix) = nrows(a.m)
 AbstractAlgebra.number_of_columns(a::F2Matrix) = ncols(a.m)
