@@ -48,6 +48,8 @@ function Base.show(io::IO, M::AbstractAlgebra.Map)
    end
 end
 
+Base.broadcastable(M::AbstractAlgebra.Map) = Ref(M)
+
 ###############################################################################
 #
 #   CompositeMap
