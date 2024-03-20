@@ -876,7 +876,7 @@ export is_diagonal
 export is_divisible_by
 export is_domain_type
 export is_exact_type
-export is_finiteorder
+export is_finite_order
 export is_gen
 export is_hermitian
 export is_hessenberg

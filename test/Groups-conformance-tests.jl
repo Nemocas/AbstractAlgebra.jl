@@ -180,9 +180,9 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
             @test isone(g) isa Bool
             @test isone(one(g))
 
-            @test is_finiteorder(g) isa Bool
+            @test is_finite_order(g) isa Bool
 
-            if is_finiteorder(g)
+            if is_finite_order(g)
                 @test order(Int16, g) isa Int16
                 @test order(BigInt, g) isa BigInt
                 @test order(g) >= 1
