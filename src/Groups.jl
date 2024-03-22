@@ -47,7 +47,7 @@ function Base.showerror(io::IO, err::InfiniteOrderError{T}) where T
     f = if T <: Group
         "is_finite(G)"
     elseif T <: GroupElem
-        "is_finiteorder(g)"
+        "is_finite_order(g)"
     end
     print(io, "You should check with `$f` first.")
 end
@@ -69,7 +69,7 @@ end
 
 Return the order of $g$ as an instance of `T`.
 If $g$ is of infinite order, an `InfiniteOrderError` exception will be thrown.
-Use `is_finiteorder(G)` to avoid this kind of exception.
+Use `is_finite_order(G)` to avoid this kind of exception.
 If the order does not fit into type `T`, an `InexactError` exception will be thrown.
 """
 function order(::Type{T}, g::GroupElem) where T
@@ -83,13 +83,13 @@ order(g::GroupElem) = _order(g)
 _order(G) = order(BigInt, G)
 
 """
-    is_finiteorder(g::GroupElem)
+    is_finite_order(g::GroupElem)
 
 Return `true` if `g` is of finite order, possibly without computing it.
 """
-function is_finiteorder(g::GroupElem)
+function is_finite_order(g::GroupElem)
     is_finite(parent(g)) && return true
-    throw(NotImplementedError(:is_finiteorder, g))
+    throw(NotImplementedError(:is_finite_order, g))
 end
 
 
