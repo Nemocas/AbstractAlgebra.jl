@@ -4871,6 +4871,48 @@ function hnf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val{true})
 end
 
+
+#when applying the HNF/ SNF to pAdic matrices, precision is complicated.
+#Easiest example is a row
+#  (a b) where a has low precision and b has high prec.
+#then canonical_unit(a) will have low precision (same as a), so
+#scaling by the unit will remove the precision of b
+#to combat that, one should/ could call make_exact on the unit
+#scaling a will still be the same low prec. result (as the precision
+#is limited by a), the unit is still a unit, but b will be better off.
+#
+# the same reasoning applies to
+#  q = div(a, b) to then use q to add q*rows to a row
+#  the Bezout coeffs in gcdx
+#  the 4 coeffs in xxgcd
+#
+#  ultimately in the precision of the trafo matrix.
+
+@doc raw"""
+    xxgcd(a::T, b::T) where T <: RingElement
+
+Returns the gcd as well as 4 elements (x y; u v) such that the
+matrix has determinant $\pm 1$, (x, y) are the Bezout coefficients,
+so $ax+by = gcd$ and
+(u, v) are chosen so that the linear combination gives $0 = au+bv$
+
+In integral domains, usually $u = -b/g$ and $v = a/g$, but in the
+precense of zero divisors, the division is non-unique.
+"""
+function xxgcd(a::T, b::T) where T <: RingElement
+  g, e, f = gcdx(a, b)
+  return g, e, f, -divexact(b, g), divexact(a, g)
+end
+
+@doc """
+    make_exact(a::RingElement)
+
+In imprecise rings (p-adic), return an element with higher precision.
+"""
+function make_exact(a::RingElement)
+  return a
+end
+
 function _hnf_kb(A, trafo::Type{Val{T}} = Val{false}) where T
    H = deepcopy(A)
    m = nrows(H)
@@ -4921,6 +4963,7 @@ function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int
          continue
       end
       q = -div(H[p, c], H[r, c])
+      q = make_exact(q)
       for j = c:ncols(H)
          t = mul!(t, q, H[r, j])
          H[p, j] += t
@@ -4938,6 +4981,7 @@ end
 # Multiplies row r by a unit such that the entry H[r, c] is "canonical"
 function kb_canonical_row!(H, U, r::Int, c::Int, with_trafo::Bool)
    cu = canonical_unit(H[r, c])
+   cu = make_exact(cu)
    if !isone(cu)
       for j = c:ncols(H)
          H[r, j] = divexact(H[r, j], cu)
@@ -4999,6 +5043,7 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
    end
    pivot[col1] = row1
    kb_canonical_row!(H, U, row1, col1, with_trafo)
+
    pivot_max = col1
    t = base_ring(H)()
    t1 = base_ring(H)()
@@ -5018,9 +5063,13 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
          else
             # We have a pivot for this column: Use it to write 0 in H[i, j]
             p = pivot[j]
-            d, u, v = gcdx(H[p, j], H[i, j])
-            a = divexact(H[p, j], d)
-            b = -divexact(H[i, j], d)
+            d, u, v, b, a,  = xxgcd(H[p, j], H[i, j])
+            u = make_exact(u)
+            v = make_exact(v)
+            a = make_exact(a)
+            b = make_exact(b)
+#            @assert d == u*H[p, j] + v*H[i, j]
+#            @assert iszero(b*H[p, j] + a*H[i, j])
             for c = j:n
                t = deepcopy(H[i, c])
                t1 = mul_red!(t1, a, H[i, c], false)
