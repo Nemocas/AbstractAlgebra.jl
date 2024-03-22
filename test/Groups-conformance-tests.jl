@@ -1,4 +1,20 @@
-# TODO: add acknowledgements for GroupsCore
+###############################################################################
+#
+#  Conformance tests for the group and group element interfaces.
+#
+#
+#  The code in this file is based on v0.4 of the GroupsCore.jl package, which
+#  is copyright (c) 2021 Marek Kaluba <kalmar@amu.edu.pl> and contributors,
+#  and licensed under the MIT license <https://spdx.org/licenses/MIT.html>.
+#
+#  The interfaces have since then diverged, with several breaking changes.
+#  Function and type names differ (e.g. `istrivial` vs. `is_trivial`), and
+#  also semantics (e.g. definition of equality for group elements in
+#  GroupsCore allows returning false for mathematically equal elements when it
+#  is "too hard" to prove equality; we don't).
+#
+###############################################################################
+
 
 function test_Group_interface(G::Group)
     @testset "Group interface" begin
