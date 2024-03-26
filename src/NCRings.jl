@@ -61,6 +61,8 @@ end
 #
 ###############################################################################
 
++(x::NCRingElem) = x
+
 +(x::NCRingElem, y::NCRingElem) = +(promote(x, y)...)
 
 +(x::NCRingElem, y::NCRingElement) = x + parent(x)(y)
@@ -72,6 +74,8 @@ end
 -(x::NCRingElem, y::NCRingElement) = x - parent(x)(y)
 
 -(x::NCRingElement, y::NCRingElem) = parent(y)(x) - y
+
+*(x::NCRingElem) = x
 
 *(x::NCRingElem, y::NCRingElem) = *(promote(x, y)...)
 
