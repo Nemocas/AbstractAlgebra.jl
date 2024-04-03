@@ -363,7 +363,8 @@ end
 
 Base.:\(f::Map, x) = preimage(f, x)
 
-export set_precision, set_precision!
+export set_precision
+export set_precision!
 
 function set_precision(f::PolyRingElem{T}, n::Int) where {T<:SeriesElem}
     g = parent(f)()

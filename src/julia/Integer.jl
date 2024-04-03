@@ -4,8 +4,11 @@
 #
 ###############################################################################
 
-export iroot, is_power, root, is_square_with_sqrt,
-       is_probable_prime
+export iroot
+export is_power
+export root
+export is_square_with_sqrt
+export is_probable_prime
 
 ###############################################################################
 #
