@@ -2,17 +2,6 @@
 # Most notably, length(d) cannot be assumed to match the length of an iteration
 # over d.
 
-import Base: isempty
-import Base: setindex!
-import Base: getkey
-import Base: length
-import Base: iterate
-import Base: empty
-import Base: delete!
-import Base: pop!
-import Base: get
-import Base: sizehint!
-import Base: copy
 
 #=
 A typical mutable object has a life like
@@ -305,7 +294,7 @@ end
 
 ### delete! ####
 
-function delete!(h::WeakValueCache, key)
+function Base.delete!(h::WeakValueCache, key)
    index = ht_keyindex(h, key)
    if index > 0
       _deleteindex!(h, index)
@@ -315,7 +304,7 @@ end
 
 ### pop! ####
 
-function pop!(h::WeakValueCache, key)
+function Base.pop!(h::WeakValueCache, key)
    index = ht_keyindex(h, key)
    if index > 0
       x = h.vals[index].value
@@ -327,7 +316,7 @@ function pop!(h::WeakValueCache, key)
    throw(KeyError(key))
 end
 
-function pop!(h::WeakValueCache, key, default)
+function Base.pop!(h::WeakValueCache, key, default)
    index = ht_keyindex(h, key)
    if index > 0
       x = h.vals[index].value
@@ -369,7 +358,7 @@ function Base.get(h::WeakValueCache{K, V}, key, default) where {K, V}
    return default
 end
 
-function get(default::Union{Function, Type}, h::WeakValueCache{K, V}, key) where {K, V}
+function Base.get(default::Union{Function, Type}, h::WeakValueCache{K, V}, key) where {K, V}
    index = ht_keyindex(h, key)
    if index > 0
       x = h.vals[index].value
@@ -412,13 +401,13 @@ end
 
 ### setindex! ####
 
-function setindex!(h::WeakValueCache{K, V}, v0, key0) where {K, V}
+function Base.setindex!(h::WeakValueCache{K, V}, v0, key0) where {K, V}
    key = convert(K, key0)
    isequal(key, key0) || throw(ArgumentError("$key0 is not a valid key for type $K"))
    setindex!(h, v0, key)
 end
 
-function setindex!(h::WeakValueCache{K, V}, v0, key::K) where {K, V}
+function Base.setindex!(h::WeakValueCache{K, V}, v0, key::K) where {K, V}
    x = convert(V, v0)
    index = ht_keyindex2!(h, key)
    _setindex!(h, WeakRef(x), key, abs(index))
@@ -515,7 +504,7 @@ function _cleanup_locked(h::WeakValueDict)
 end
 
 Base.sizehint!(d::WeakValueDict, newsz) = sizehint!(d.ht, newsz)
-empty(d::WeakValueDict, ::Type{K}, ::Type{V}) where {K, V} = WeakValueDict{K, V}()
+Base.empty(d::WeakValueDict, ::Type{K}, ::Type{V}) where {K, V} = WeakValueDict{K, V}()
 
 Base.IteratorSize(::Type{<:WeakValueDict}) = Base.SizeUnknown()
 
@@ -574,7 +563,7 @@ function Base.getkey(wvh::WeakValueDict{K}, kk, default) where K
     return k === nothing ? default : k::K
 end
 
-map!(f, iter::Base.ValueIterator{<:WeakValueDict})= map!(f, values(iter.dict.ht))
+Base.map!(f, iter::Base.ValueIterator{<:WeakValueDict})= map!(f, values(iter.dict.ht))
 
 function Base.get(wvh::WeakValueDict{K, V}, key, default) where {K, V}
     lock(wvh) do
@@ -683,4 +672,4 @@ function Base.iterate(t::WeakValueDict{K,V}, state...) where {K, V}
     end
 end
 
-filter!(f, d::WeakValueDict) = Base.filter_in_one_pass!(f, d)
+Base.filter!(f, d::WeakValueDict) = Base.filter_in_one_pass!(f, d)
