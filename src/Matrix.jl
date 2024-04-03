@@ -3351,8 +3351,7 @@ triangular, and an $m\times n$ matrix $b$ over the same ring, return an
 $m\times n$ matrix $x$ such that $xU = b$. If this is not possible, an error
 will be raised.
 
-See also [`_solve_triu`](@ref) or [`can__solve_left_reduced_triu`](@ref) when
-$U$ is not square or not of full rank.
+See also [`_solve_triu`](@ref) when $U$ is not square or not of full rank.
 """
 function __solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
    n = ncols(U)
@@ -3480,64 +3479,6 @@ function is_diagonal(A::MatrixElem)
         end
     end
     return true
-end
-
-###############################################################################
-#
-#   Can solve
-#
-###############################################################################
-
-@doc raw"""
-    can_solve_left_reduced_triu(r::MatElem{T},
-                          M::MatElem{T}) where T <: RingElement
-Return a tuple `flag, x` where `flag` is set to true if $xM = r$ has a
-solution, where $M$ is an $m\times n$ matrix in (upper triangular) Hermite
-normal form or reduced row echelon form and $r$ and $x$ are row vectors with
-$m$ columns (i.e. $1 \times m$ matrices). If there is no solution, flag is set
-to `false` and $x$ is set to zero.
-"""
-function _can_solve_left_reduced_triu(r::MatElem{T},
-                          M::MatElem{T}) where T <: RingElement
-   ncols(r) != ncols(M) && error("Incompatible matrices")
-   r = deepcopy(r) # do not destroy input
-   m = ncols(r)
-   n = nrows(M)
-   if n == 0
-      return true, r
-   end
-   R = base_ring(r)
-   x = zero_matrix(R, 1, n)
-   j = 1 # row in M
-   k = 1 # column in M
-   t = R()
-   for i = 1:m # column in r
-      if is_zero_entry(r, 1, i)
-         continue
-      end
-      while k <= i && j <= n
-         if is_zero_entry(M, j, k)
-            k += 1
-         elseif k < i
-            j += 1
-         else
-            break
-         end
-      end
-      if k != i
-         return false, x
-      end
-      x[1, j], r[1, i] = divrem(r[1, i], M[j, k])
-      if !is_zero_entry(r, 1, i)
-         return false, x
-      end
-      q = -x[1, j]
-      for l = i + 1:m
-         t = mul!(t, q, M[j, l])
-         r[1, l] = addeq!(r[1, l], t)
-      end
-   end
-   return true, x
 end
 
 ###############################################################################
