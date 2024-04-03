@@ -701,11 +701,7 @@ import .Generic: sturm_sequence
 
 include("Solve.jl")
 
-import ..Solve: solve
-import ..Solve: solve_init
-import ..Solve: can_solve
-import ..Solve: can_solve_with_solution
-import ..Solve: can_solve_with_solution_and_kernel
+using .Solve
 
 # Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
 export _check_dim

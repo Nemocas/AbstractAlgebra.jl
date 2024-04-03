@@ -21,6 +21,12 @@ import AbstractAlgebra: set_attribute!
 
 import Base: show
 
+export solve
+export solve_init
+export can_solve
+export can_solve_with_solution
+export can_solve_with_solution_and_kernel
+
 ################################################################################
 #
 #  "Lazy" transpose of a matrix
@@ -1109,4 +1115,4 @@ function check_linear_system_dim_left(A::Union{MatElem, SolveCtx}, b::Vector, th
   return fl
 end
 
-end
+end # module Solve
