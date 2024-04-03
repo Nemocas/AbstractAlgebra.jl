@@ -173,12 +173,15 @@ import ..AbstractAlgebra: Indent
 import ..AbstractAlgebra: Integers
 import ..AbstractAlgebra: integral
 import ..AbstractAlgebra: inv
+import ..AbstractAlgebra: inv!
 import ..AbstractAlgebra: is_constant
+import ..AbstractAlgebra: is_divisible_by
 import ..AbstractAlgebra: is_domain_type
 import ..AbstractAlgebra: is_exact_type
 import ..AbstractAlgebra: is_finite
 import ..AbstractAlgebra: is_gen
 import ..AbstractAlgebra: is_monomial
+import ..AbstractAlgebra: is_power
 import ..AbstractAlgebra: is_square
 import ..AbstractAlgebra: is_square_with_sqrt
 import ..AbstractAlgebra: is_term
@@ -223,6 +226,7 @@ import ..AbstractAlgebra: promote_rule
 import ..AbstractAlgebra: pseudodivrem
 import ..AbstractAlgebra: pseudorem
 import ..AbstractAlgebra: Rationals
+import ..AbstractAlgebra: reduce!
 import ..AbstractAlgebra: reduced_form
 import ..AbstractAlgebra: remove
 import ..AbstractAlgebra: renormalize!
@@ -245,6 +249,7 @@ import ..AbstractAlgebra: terms_degrees
 import ..AbstractAlgebra: to_univariate
 import ..AbstractAlgebra: trailing_coefficient
 import ..AbstractAlgebra: LowercaseOff
+import ..AbstractAlgebra: unit
 import ..AbstractAlgebra: use_karamul
 import ..AbstractAlgebra: valuation
 import ..AbstractAlgebra: var

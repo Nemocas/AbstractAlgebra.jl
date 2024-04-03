@@ -441,6 +441,20 @@ include("FreeAssAlgebra.jl")
 include("LaurentMPoly.jl")
 include("MatrixNormalForms.jl")
 
+
+include("Groups.jl")
+include("Rings.jl")
+include("NCRings.jl")
+
+# Generic and specific rings and fields
+include("julia/Integer.jl")
+include("julia/Rational.jl")
+include("julia/Float.jl")
+include("julia/GF.jl")
+
+include("Fields.jl")
+include("Factor.jl")
+
 ###############################################################################
 #
 #   Generic submodule
@@ -449,136 +463,7 @@ include("MatrixNormalForms.jl")
 
 include("Generic.jl")
 
-
-import .Generic: @perm_str
-import .Generic: abs_series_type
-import .Generic: base_field
-import .Generic: basis
-import .Generic: character
-import .Generic: collength
-import .Generic: combine_like_terms!
-import .Generic: cycles
-import .Generic: defining_polynomial
-import .Generic: degrees
-import .Generic: dense_matrix_type
-import .Generic: dim
-import .Generic: disable_cache!
-import .Generic: downscale
-import .Generic: EuclideanRingResidueField
-import .Generic: EuclideanRingResidueFieldElem
-import .Generic: EuclideanRingResidueRing
-import .Generic: EuclideanRingResidueRingElem
-import .Generic: enable_cache!
-import .Generic: exp_gcd
-import .Generic: exponent
-import .Generic: exponent_vector
-import .Generic: exponent_word
-import .Generic: finish
-import .Generic: fit!
-import .Generic: function_field
-import .Generic: gcd
-import .Generic: gcdx
-import .Generic: groebner_basis
-import .Generic: has_bottom_neighbor
-import .Generic: has_left_neighbor
-import .Generic: hash
-import .Generic: hooklength
-import .Generic: image_fn
-import .Generic: image_map
-import .Generic: internal_ordering
-import .Generic: interreduce!
-import .Generic: inv!
-import .Generic: inverse_fn
-import .Generic: inverse_image_fn
-import .Generic: inverse_mat
-import .Generic: invmod
-import .Generic: is_compatible
-import .Generic: is_divisible_by
-import .Generic: is_homogeneous
-import .Generic: is_power
-import .Generic: is_rimhook
-import .Generic: is_submodule
-import .Generic: is_unit
-import .Generic: isone
-import .Generic: laurent_ring
-import .Generic: laurent_series
-import .Generic: lcm
-import .Generic: leading_coefficient
-import .Generic: leading_exponent_vector
-import .Generic: leading_exponent_word
-import .Generic: leading_monomial
-import .Generic: leading_term
-import .Generic: leglength
-import .Generic: length
-import .Generic: main_variable
-import .Generic: main_variable_extract
-import .Generic: main_variable_insert
-import .Generic: map1
-import .Generic: map2
-import .Generic: matrix_repr
-import .Generic: max_fields
-import .Generic: mod
-import .Generic: monomial
-import .Generic: monomial_iszero
-import .Generic: monomial_set!
-import .Generic: monomial!
-import .Generic: monomials
-import .Generic: MPolyBuildCtx
-import .Generic: mullow_karatsuba
-import .Generic: norm
-import .Generic: normal_form
-import .Generic: normalise
-import .Generic: num_coeff
-import .Generic: one
-import .Generic: order
-import .Generic: parity
-import .Generic: partitionseq
-import .Generic: perm
-import .Generic: permtype
-import .Generic: polcoeff
-import .Generic: poly
-import .Generic: poly_ring
-import .Generic: precision
-import .Generic: preimage_map
-import .Generic: prime
-import .Generic: push_term!
-import .Generic: reduce!
-import .Generic: rel_series_type
-import .Generic: rels
-import .Generic: rescale!
-import .Generic: retraction_map
-import .Generic: reverse
-import .Generic: rising_factorial
-import .Generic: rising_factorial2
-import .Generic: rowlength
-import .Generic: section_map
-import .Generic: set_exponent_vector!
-import .Generic: set_exponent_word!
-import .Generic: set_limit!
-import .Generic: setcoeff!
-import .Generic: setpermstyle
-import .Generic: size
-import .Generic: sort_terms!
-import .Generic: summands
-import .Generic: supermodule
-import .Generic: term
-import .Generic: terms
-import .Generic: to_univariate
-import .Generic: total_degree
-import .Generic: trailing_coefficient
-import .Generic: truncate
-import .Generic: unit
-import .Generic: universal_polynomial_ring
-import .Generic: upscale
-import .Generic: weights
-import .Generic: zero
-
-# Moved from Hecke into Misc
-import .Generic: LocalizedEuclideanRing
-import .Generic: localization
-import .Generic: LocalizedEuclideanRingElem
-import .Generic: roots
-import .Generic: sturm_sequence
+using .Generic
 
 ###############################################################################
 #
@@ -692,22 +577,9 @@ include("error.jl")
 #
 ###############################################################################
 
-include("Groups.jl")
-include("Rings.jl")
-
-# Generic and specific rings and fields
-include("julia/Integer.jl")
-include("julia/Rational.jl")
-include("julia/Float.jl")
-include("julia/GF.jl")
-
-include("Fields.jl")
-include("Factor.jl")
 
 # Generic functions to be defined after all rings
 include("polysubst.jl")
-
-include("NCRings.jl")
 
 include("broadcasting.jl")
 
