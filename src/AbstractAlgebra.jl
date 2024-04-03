@@ -469,42 +469,9 @@ include("fundamental_interface.jl")
 
 include("PrettyPrinting.jl")
 
-import .PrettyPrinting: @enable_all_show_via_expressify
-import .PrettyPrinting: @show_name
-import .PrettyPrinting: @show_special
-import .PrettyPrinting: @show_special_elem
-import .PrettyPrinting: allow_unicode
-import .PrettyPrinting: canonicalize
-import .PrettyPrinting: expr_to_latex_string
-import .PrettyPrinting: expr_to_string
-import .PrettyPrinting: expressify
-import .PrettyPrinting: extra_name
-import .PrettyPrinting: get_current_module
-import .PrettyPrinting: get_html_as_latex
-import .PrettyPrinting: get_name
-import .PrettyPrinting: get_syntactic_sign_abs
-import .PrettyPrinting: is_syntactic_one
-import .PrettyPrinting: is_syntactic_zero
-import .PrettyPrinting: is_unicode_allowed
-import .PrettyPrinting: obj_to_latex_string
-import .PrettyPrinting: obj_to_string
-import .PrettyPrinting: obj_to_string_wrt_times
-import .PrettyPrinting: print_integer_string
-import .PrettyPrinting: print_obj
-import .PrettyPrinting: printer
-import .PrettyPrinting: set_current_module
-import .PrettyPrinting: set_name!
-import .PrettyPrinting: set_html_as_latex
-import .PrettyPrinting: show_obj
-import .PrettyPrinting: show_via_expressify
-import .PrettyPrinting: with_unicode
-import .PrettyPrinting: pretty
-import .PrettyPrinting: LowercaseOff
-import .PrettyPrinting: Lowercase
-import .PrettyPrinting: Indent
-import .PrettyPrinting: Dedent
+using .PrettyPrinting
 
-export @enable_all_show_via_expressify
+import .PrettyPrinting: expressify
 
 ###############################################################################
 #
@@ -1162,6 +1129,7 @@ export mulhigh_n
 export PolyCoeffs
 export roots
 export sturm_sequence
+export @enable_all_show_via_expressify
 
 ################################################################################
 #
