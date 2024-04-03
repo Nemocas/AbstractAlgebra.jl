@@ -128,6 +128,7 @@ import Base: cmp
 import Base: conj
 import Base: conj!
 import Base: convert
+import Base: copy
 import Base: cos
 import Base: cosh
 import Base: cospi
@@ -136,19 +137,24 @@ import Base: coth
 import Base: dec
 import Base: deepcopy
 import Base: deepcopy_internal
+import Base: delete!
+import Base: empty
 import Base: expm1
 import Base: exponent
 import Base: fill
 import Base: floor
 import Base: gcd
 import Base: gcdx
+import Base: get
 import Base: getindex
+import Base: getkey
 import Base: hash
 import Base: hcat
 import Base: hex
 import Base: hypot
 import Base: intersect
 import Base: invmod
+import Base: isempty
 import Base: isequal
 import Base: isfinite
 import Base: isless
@@ -156,6 +162,7 @@ import Base: isone
 import Base: isqrt
 import Base: isreal
 import Base: iszero
+import Base: iterate
 import Base: lcm
 import Base: ldexp
 import Base: length
@@ -166,6 +173,7 @@ import Base: oct
 import Base: one
 import Base: parent
 import Base: parse
+import Base: pop!
 import Base: powermod
 import Base: precision
 import Base: rand
@@ -181,6 +189,7 @@ import Base: sincos
 import Base: sinh
 import Base: sinpi
 import Base: size
+import Base: sizehint!
 import Base: string
 import Base: tan
 import Base: tanh
@@ -1135,6 +1144,16 @@ export weights
 export YoungTableau
 export zero
 export zero_matrix
+
+export iroot
+export is_power
+export root
+export is_square_with_sqrt
+export is_probable_prime
+export neg!
+export set_precision
+export set_precision!
+export GF
 
 # Moved from Hecke into Misc
 export divexact_low

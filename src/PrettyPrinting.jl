@@ -1,12 +1,35 @@
 module PrettyPrinting
 
+using ..AbstractAlgebra
+
 import ..AbstractAlgebra: RingElem
 import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: MatrixElem
 
 import Base: displaysize
+import Base: convert
+import Base: show
+import Base: pipe_reader
+import Base: pipe_writer
+import Base: lock
+import Base: unlock
+import Base: write
+import Base: getindex
+import Base: in
+import Base: haskey
+import Base: get
+import Base: print
+import Base: unwrapcontext
 
-using ..AbstractAlgebra
+export IOCustom
+export Indent
+export Dedent
+export indent_string!
+export pretty
+export Lowercase
+export LowercaseOff
+export Indent
+export Dedent
 
 using Preferences
 
@@ -1724,25 +1747,6 @@ end
 # But we do the indentation differently (and more correctly for multiline
 # printing)
 
-import Base: convert
-import Base: show
-import Base: pipe_reader
-import Base: pipe_writer
-import Base: lock
-import Base: unlock
-import Base: write
-import Base: getindex
-import Base: in
-import Base: haskey
-import Base: get
-import Base: print
-import Base: unwrapcontext
-
-export IOCustom
-export Indent
-export Dedent
-export indent_string!
-
 """
     Indent
 
@@ -2047,12 +2051,6 @@ julia> io = AbstractAlgebra.pretty(stdout);
 pretty(io::IO; force_newlines = false) = IOCustom(io, force_newlines)
 
 pretty(io::IOContext; force_newlines = false) = io.io isa IOCustom ? io : IOCustom(io, force_newlines)
-
-export pretty
-export Lowercase
-export LowercaseOff
-export Indent
-export Dedent
 
 # helpers for testing the pretty printing
 function detailed(x)
