@@ -2639,24 +2639,6 @@ end
    end
 end
 
-@testset "Generic.Mat._solve_left_reduced_triu" begin
-   for iter = 1:40
-      n = rand(1:6)
-      m = rand(1:n)
-      S = matrix_space(ZZ, m, n)
-      U = matrix_space(ZZ, 1, n)
-
-      M = randmat_with_rank(S, rand(1:m), -20:20)
-      r = rand(U, -20:20)
-
-      M = hnf(M)
-
-      flag, x = AbstractAlgebra._can_solve_left_reduced_triu(r, M)
-
-      @test flag == false || x*M == r
-   end
-end
-
 @testset "Generic.Mat.rref" begin
    # Non-integral domain
 

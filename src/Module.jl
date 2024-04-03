@@ -223,20 +223,17 @@ function ==(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
          mat2[i + r2, j] = prels[i][1, j]
       end
    end
-   # Put the matrices into reduced form
-   mat1 = reduced_form(mat1)
-   mat2 = reduced_form(mat2)
+   sol_ctx1 = solve_init(mat1)
+   sol_ctx2 = solve_init(mat2)
    # Check containment of rewritten gens of M in row space of mat2
    for v in G1
-      flag, r = _can_solve_left_reduced_triu(Generic._matrix(v), mat2)
-      if !flag
+      if !can_solve(sol_ctx2, Generic._matrix(v))
          return false
       end
    end
    # Check containment of rewritten gens of N in row space of mat1
    for v in G2
-      flag, r = _can_solve_left_reduced_triu(Generic._matrix(v), mat1)
-      if !flag
+      if !can_solve(sol_ctx1, Generic._matrix(v))
          return false
       end
    end
