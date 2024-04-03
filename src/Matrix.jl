@@ -6361,8 +6361,8 @@ end
 Return the horizontal concatenation of the matrices $A$.
 All component matrices need to have the same base ring and number of columns.
 """
-function Base.vcat(A::MatrixElem{T}...) where T <: NCRingElement
-  return _vcat(A)
+function Base.vcat(A0::MatrixElem{T}, A::MatrixElem{T}...) where T <: NCRingElement
+  return _vcat((A0, A...))
 end
 
 # this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
@@ -6400,8 +6400,8 @@ end
 Return the horizontal concatenating of the matrices $A$.
 All component matrices need to have the same base ring and number of rows.
 """
-function Base.hcat(A::MatrixElem{T}...) where T <: NCRingElement
-  return _hcat(A)
+function Base.hcat(A0::MatrixElem{T}, A::MatrixElem{T}...) where T <: NCRingElement
+  return _hcat((A0, A...))
 end
 
 # this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
