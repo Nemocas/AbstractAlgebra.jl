@@ -566,6 +566,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
          @test !is_gen(a)
          @test !is_unit(a)
          @test is_nilpotent(a)
+         @test is_homogeneous(a)
          @test length(a) == 0
          @test total_degree(a) < 0
          @test all(is_negative, degrees(a))
@@ -577,6 +578,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
          @test !is_gen(a)
          @test is_unit(a)
          @test !is_nilpotent(a)
+         @test is_homogeneous(a)
          @test length(a) == 1
          @test total_degree(a) == 0
          @test degrees(a) == [0, 0]
@@ -588,6 +590,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
          @test is_gen(a)
          @test !is_unit(a)
          @test !is_nilpotent(a)
+         @test is_homogeneous(a)
          @test length(a) == 1
          @test total_degree(a) == 1
          @test degrees(a) == [1, 0]
@@ -599,6 +602,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
          @test !is_gen(a)
          @test !is_unit(a)
          @test !is_nilpotent(a)
+         @test is_homogeneous(a)
          @test length(a) == 1
          @test total_degree(a) == 2
          @test degrees(a) == [2, 0]
@@ -623,6 +627,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
          @test !is_gen(a)
          @test !is_unit(a)
          @test !is_nilpotent(a)
+         @test !is_homogeneous(a)
          @test length(a) == 2
          @test total_degree(a) == 4
          @test degrees(a) == [3, 4]

@@ -918,10 +918,8 @@ x + 1
 
 ### Homogeneous polynomials
 
-It is possible to test whether a polynomial is homogeneous with respect to the standard grading using the function
-
 ```@docs
-is_homogeneous(x::MPolyRingElem{T}) where T <: RingElement
+is_homogeneous(x::MPolyRingElem)
 ```
 
 ## Random generation
