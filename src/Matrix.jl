@@ -1534,7 +1534,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    *(P::perm, x::MatrixElem{T}) where T <: NCRingElement
+    *(P::Perm, x::MatrixElem{T}) where T <: NCRingElement
 
 Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 
