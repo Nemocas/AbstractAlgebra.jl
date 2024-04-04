@@ -3,9 +3,7 @@ using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 
 using InteractiveUtils: InteractiveUtils, subtypes
 
-using Preferences
-
-using Test # for "interface-conformance" functions
+using Test: @test # for "interface-conformance" functions
 
 import LinearAlgebra
 

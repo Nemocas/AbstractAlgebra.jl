@@ -6,7 +6,7 @@ import ..AbstractAlgebra: MatrixElem
 import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: RingElem
 
-using Preferences
+using Preferences: Preferences, @load_preference, @set_preferences!
 
 import Base: displaysize
 import Base: get
