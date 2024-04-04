@@ -59,37 +59,15 @@ function kernel(f::Map(FPModuleHomomorphism))
    crels = rels(C)
    M = matrix(f)
    # put domain relations and M in a big matrix
-   # swap rows so we can get upper triangular wrt original data
    nr = nrows(M) + length(crels)
-   local N
-   if length(crels) == 0
-     N = M
-   else
-     N = zero_matrix(R, nr, ncols(M))
-     for i = 1:nrows(M)
-        N[nr - i + 1, :] = view(M, i:i, :)
-     end
-     for i = 1:length(crels)
-        N[nr - i - nrows(M) + 1, :] = crels[i]
-     end
+   N = M
+   if length(crels) != 0
+      NN = reduce(vcat, crels)
+      N = vcat(N, NN)
    end
    # compute the kernel
    K = AbstractAlgebra.kernel(N)
-   num_gens = nrows(K)
-   # Construct generators of kernel submodule, reversing rows
-   # and columns so they're correct wrt to original data and
-   # in upper triangular form
-   #TODO use other primitives, don't ever use getindex, ...
-   V = Vector{elem_type(D)}(undef, num_gens)
-   if length(crels) == 0
-     for j=1:num_gens
-       V[j] = D(view(K, j:j, :))
-     end
-   else
-     for j = 1:num_gens
-        V[j] = D([K[num_gens - j + 1, nr - k + 1] for k = 1:nrows(M)])
-     end
-   end
+   V = [D(K[j:j, 1:nrows(M)]) for j in 1:nrows(K)]
    return sub(D, V)
 end
 
@@ -142,7 +120,7 @@ function preimage(f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}) wh
    C = codomain(f)
    R = base_ring(C)
    if length(v) == 0
-     return elem_type(domain(f))[]
+      return elem_type(domain(f))[]
    end
    parent(v[1]) !== C && error("Incompatible element")
    M = matrix(f)
@@ -152,7 +130,7 @@ function preimage(f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}) wh
    m = nrows(M)
    n = ncols(M)
    if m == 0 || n == 0
-     return [D(zero_matrix(R, 1, m)) for x = v]
+      return [D(zero_matrix(R, 1, m)) for x in v]
    else
       # Put matrix M and target relations in a matrix
       matr = zero_matrix(R, m + q, n)
@@ -161,12 +139,9 @@ function preimage(f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}) wh
         matr[m + i, :] = trels[i]
       end
       # Find left inverse of mat
-      inmat = zero_matrix(R, length(v), n)
-      for i=1:length(v)
-        inmat[i, :] = Generic._matrix(v[i])
-      end
+      inmat = reduce(vcat, Generic._matrix.(v))
       x = solve(matr, inmat)
-      return [D(view(x, i:i,  1:m)) for i=1:length(v)]
+      return [D(x[i:i, 1:m]) for i in 1:length(v)]
    end
 end
 
