@@ -2,22 +2,15 @@ module Solve
 
 using AbstractAlgebra
 
-import AbstractAlgebra: @attributes
-import AbstractAlgebra: Generic
-import AbstractAlgebra: PrettyPrinting
-import AbstractAlgebra: _can_solve_with_solution_fflu
-import AbstractAlgebra: _can_solve_with_solution_interpolation
-import AbstractAlgebra: _solve_fflu_precomp
-import AbstractAlgebra: base_ring
-import AbstractAlgebra: fflu!
-import AbstractAlgebra: get_attribute
-import AbstractAlgebra: has_attribute
+using AbstractAlgebra.PrettyPrinting: @show_name
+using AbstractAlgebra.PrettyPrinting: Dedent
+using AbstractAlgebra.PrettyPrinting: Indent
+using AbstractAlgebra.PrettyPrinting: pretty
+using AbstractAlgebra: _can_solve_with_solution_fflu
+using AbstractAlgebra: _can_solve_with_solution_interpolation
+using AbstractAlgebra: _solve_fflu_precomp
 import AbstractAlgebra: kernel
 import AbstractAlgebra: matrix
-import AbstractAlgebra: ncols
-import AbstractAlgebra: nrows
-import AbstractAlgebra: rank
-import AbstractAlgebra: set_attribute!
 
 import Base: show
 
@@ -102,15 +95,15 @@ Base.similar(M::LazyTransposeMatElem, i::Int, j::Int) = lazy_transpose(similar(d
 end
 
 function Base.show(io::IO, ::MIME"text/plain", C::SolveCtx)
-  io = PrettyPrinting.pretty(io)
+  io = pretty(io)
   println(io, "Linear solving context of matrix")
-  print(io, PrettyPrinting.Indent())
+  print(io, Indent())
   show(io, MIME"text/plain"(), matrix(C))
-  print(io, PrettyPrinting.Dedent())
+  print(io, Dedent())
 end
 
 function Base.show(io::IO, C::SolveCtx)
-  PrettyPrinting.@show_name(io, C)
+  @show_name(io, C)
 
   print(io, "Linear solving context")
 end
