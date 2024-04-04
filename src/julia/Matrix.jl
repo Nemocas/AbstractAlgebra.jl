@@ -72,3 +72,21 @@ julia> Array(A)
 ```
 """
 Array(M::MatrixElem{T}) where {T<:NCRingElement} = Matrix(M)
+
+
+###############################################################################
+#
+#   Array creation functions
+#
+###############################################################################
+
+Array(R::NCRing, r::Int...) = Array{elem_type(R)}(undef, r)
+
+function zeros(R::NCRing, r::Int...)
+   T = elem_type(R)
+   A = Array{T}(undef, r)
+   for i in eachindex(A)
+      A[i] = R()
+   end
+   return A
+end

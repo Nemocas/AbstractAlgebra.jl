@@ -1,12 +1,65 @@
 module PrettyPrinting
 
-import ..AbstractAlgebra: RingElem, NCRingElem, MatrixElem
-
-import Base: displaysize
-
 using ..AbstractAlgebra
 
+import ..AbstractAlgebra: MatrixElem
+import ..AbstractAlgebra: NCRingElem
+import ..AbstractAlgebra: RingElem
+
 using Preferences
+
+import Base: convert
+import Base: displaysize
+import Base: get
+import Base: getindex
+import Base: haskey
+import Base: in
+import Base: lock
+import Base: pipe_reader
+import Base: pipe_writer
+import Base: print
+import Base: show
+import Base: unlock
+import Base: unwrapcontext
+import Base: write
+
+export @enable_all_show_via_expressify
+export @show_name
+export @show_special
+export @show_special_elem
+export Dedent
+export IOCustom
+export Indent
+export Lowercase
+export LowercaseOff
+export allow_unicode
+export canonicalize
+export expr_to_latex_string
+export expr_to_string
+export expressify
+export extra_name
+export get_current_module
+export get_html_as_latex
+export get_name
+export get_syntactic_sign_abs
+export indent_string!
+export is_syntactic_one
+export is_syntactic_zero
+export is_unicode_allowed
+export obj_to_latex_string
+export obj_to_string
+export obj_to_string_wrt_times
+export pretty
+export print_integer_string
+export print_obj
+export printer
+export set_current_module
+export set_html_as_latex
+export set_name!
+export show_obj
+export show_via_expressify
+export with_unicode
+
 
 # printing is done with respect to the following precedences
 # There is no point in using the julia values because we add our own ops
@@ -1722,11 +1775,6 @@ end
 # But we do the indentation differently (and more correctly for multiline
 # printing)
 
-import Base: convert, show, pipe_reader, pipe_writer, lock, unlock, write,
-             getindex, in, haskey, get, print, unwrapcontext
-
-export IOCustom, Indent, Dedent, indent_string!
-
 """
     Indent
 
@@ -2031,8 +2079,6 @@ julia> io = AbstractAlgebra.pretty(stdout);
 pretty(io::IO; force_newlines = false) = IOCustom(io, force_newlines)
 
 pretty(io::IOContext; force_newlines = false) = io.io isa IOCustom ? io : IOCustom(io, force_newlines)
-
-export pretty, Lowercase, LowercaseOff, Indent, Dedent
 
 # helpers for testing the pretty printing
 function detailed(x)

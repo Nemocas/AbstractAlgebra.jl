@@ -3432,3 +3432,17 @@ function subst(f::PolyRingElem{T}, a::U) where {T <: RingElement, U}
    end
    return s
 end
+
+###############################################################################
+#
+#   Polynomial Ring S, x = R[:x] syntax
+#
+###############################################################################
+
+getindex(R::NCRing, s::VarName) = polynomial_ring(R, s)
+# `R[:x, :y]` returns `S, [x, y]` instead of `S, x, y`
+getindex(R::NCRing, s::VarName, ss::VarName...) =
+   polynomial_ring(R, [Symbol(x) for x in (s, ss...)])
+
+# syntax: Rxy, y = R[:x][:y]
+getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingElem}}, s::VarName) = polynomial_ring(R[1], s)

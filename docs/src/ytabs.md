@@ -166,8 +166,8 @@ character(::Type{Int}, lambda::Partition, mu::Partition[, check::Bool=true])
 The dimension $\dim \lambda$ of the irreducible module corresponding to partition $\lambda$ can be computed using [Hook length formula](https://en.wikipedia.org/wiki/Hook_length_formula)
 
 ```@docs
-Generic.rowlength
-Generic.collength
+rowlength
+collength
 hooklength
 dim(::Generic.YoungTableau)
 ```
@@ -208,7 +208,7 @@ The implementation follows
 implementing the following functions. For precise definitions and meaning please consult the paper cited.
 
 ```@docs
-Generic.partitionseq
+partitionseq
 is_rimhook(::BitVector, ::Int, ::Int)
 Generic.MN1inner
 ```

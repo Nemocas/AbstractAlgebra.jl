@@ -51,14 +51,3 @@ struct GFElem{T <: Integer} <: FinFieldElem
    d::T
    parent::GFField{T}
 end
-
-###############################################################################
-#
-#   Unions of AbstactAlgebra abstract types and Julia types
-#
-###############################################################################
-
-const RingElement   = Union{RingElem,   Integer, Rational, AbstractFloat}
-const NCRingElement = Union{NCRingElem, Integer, Rational, AbstractFloat}
-
-const FieldElement = Union{FieldElem, Rational, AbstractFloat}

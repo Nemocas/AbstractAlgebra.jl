@@ -8,12 +8,40 @@ using AbstractAlgebra, Test
 using ..Random: Random, SamplerTrivial, GLOBAL_RNG
 using ..RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
-import AbstractAlgebra: parent_type, elem_type, base_ring, parent, is_domain_type,
-       is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
-       get_cached!, is_unit, characteristic, Ring, RingElem, expressify
+import AbstractAlgebra: Ring
+import AbstractAlgebra: RingElem
+import AbstractAlgebra: add!
+import AbstractAlgebra: addeq!
+import AbstractAlgebra: base_ring
+import AbstractAlgebra: canonical_unit
+import AbstractAlgebra: characteristic
+import AbstractAlgebra: divexact
+import AbstractAlgebra: elem_type
+import AbstractAlgebra: expressify
+import AbstractAlgebra: get_cached!
+import AbstractAlgebra: is_domain_type
+import AbstractAlgebra: is_exact_type
+import AbstractAlgebra: is_unit
+import AbstractAlgebra: isequal
+import AbstractAlgebra: mul!
+import AbstractAlgebra: parent
+import AbstractAlgebra: parent_type
+import AbstractAlgebra: zero!
 
-import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
-             deepcopy_internal, hash
+import Base: *
+import Base: +
+import Base: -
+import Base: ==
+import Base: ^
+import Base: deepcopy_internal
+import Base: hash
+import Base: inv
+import Base: isone
+import Base: iszero
+import Base: one
+import Base: rand
+import Base: show
+import Base: zero
 
 import ..test_Ring_interface
 import ..test_EuclideanRing_interface

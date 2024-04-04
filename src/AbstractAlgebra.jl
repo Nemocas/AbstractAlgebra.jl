@@ -5,14 +5,7 @@
 """
 module AbstractAlgebra
 
-using Random: Random, AbstractRNG, GLOBAL_RNG, SamplerTrivial
-using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
-
-using InteractiveUtils: InteractiveUtils, subtypes
-
-using Preferences
-
-using Test # for "interface-conformance" functions
+include("imports.jl")
 
 # A list of all symbols external packages should not import from AbstractAlgebra
 const import_exclude = [:import_exclude, :QQ, :ZZ,
@@ -24,26 +17,6 @@ const import_exclude = [:import_exclude, :QQ, :ZZ,
                   :Set, :Module, :Group,
                  ]
 
-# If you want to add methods to functions in LinearAlgebra they should be
-# imported here and in Generic.jl, and exported below.
-# They should not be imported/exported anywhere else.
-
-import LinearAlgebra
-
-import LinearAlgebra: det
-import LinearAlgebra: dot
-import LinearAlgebra: hessenberg
-import LinearAlgebra: ishermitian
-import LinearAlgebra: issymmetric
-import LinearAlgebra: isdiag
-import LinearAlgebra: istril
-import LinearAlgebra: istriu
-import LinearAlgebra: lu
-import LinearAlgebra: lu!
-import LinearAlgebra: norm
-import LinearAlgebra: nullspace
-import LinearAlgebra: rank
-import LinearAlgebra: tr
 
 ################################################################################
 #
@@ -108,253 +81,13 @@ function denominator(a::T, canonicalise::Bool=true) where T
   return Base.denominator(a, canonicalise)
 end
 
-# If you want to add methods to functions in Base they should be imported here
-# and in Generic.jl.
-# They should not be imported/exported anywhere else.
 
-import Base: abs
-import Base: acos
-import Base: acosh
-import Base: Array
-import Base: asin
-import Base: asinh
-import Base: atan
-import Base: atanh
-import Base: axes
-import Base: bin
-import Base: ceil
-import Base: checkbounds
-import Base: cmp
-import Base: conj
-import Base: conj!
-import Base: convert
-import Base: cos
-import Base: cosh
-import Base: cospi
-import Base: cot
-import Base: coth
-import Base: dec
-import Base: deepcopy
-import Base: deepcopy_internal
-import Base: expm1
-import Base: exponent
-import Base: fill
-import Base: floor
-import Base: gcd
-import Base: gcdx
-import Base: getindex
-import Base: hash
-import Base: hcat
-import Base: hex
-import Base: hypot
-import Base: intersect
-import Base: invmod
-import Base: isequal
-import Base: isfinite
-import Base: isless
-import Base: isone
-import Base: isqrt
-import Base: isreal
-import Base: iszero
-import Base: lcm
-import Base: ldexp
-import Base: length
-import Base: log1p
-import Base: mod
-import Base: ndigits
-import Base: oct
-import Base: one
-import Base: parent
-import Base: parse
-import Base: powermod
-import Base: precision
-import Base: rand
-import Base: Rational
-import Base: rem
-import Base: reverse
-import Base: setindex!
-import Base: show
-import Base: sign
-import Base: similar
-import Base: sin
-import Base: sincos
-import Base: sinh
-import Base: sinpi
-import Base: size
-import Base: string
-import Base: tan
-import Base: tanh
-import Base: trailing_zeros
-import Base: transpose
-import Base: truncate
-import Base: typed_hcat
-import Base: typed_hvcat
-import Base: typed_vcat
-import Base: vcat
-import Base: xor
-import Base: zero
-import Base: zeros
-
-import Base: +
-import Base: -
-import Base: *
-import Base: ==
-import Base: ^
-import Base: &
-import Base: |
-import Base: <<
-import Base: >>
-import Base: ~
-import Base: <=
-import Base: >=
-import Base: <
-import Base: >
-import Base: //
-import Base: /
-import Base: !=
-
-export AbsPowerSeriesRingElem
-export add!
-export addeq!
-export AdditiveGroupElem
-export crt
-export crt_with_lcm
-export elem_type
-export ErrorConstrDimMismatch
-export factor
-export factor_squarefree
-export Field
-export FieldElem
-export FieldElement
-export FinField
-export FinFieldElem
-export FracElem
-export FracField
-export FreeAssAlgebra
-export FreeAssAlgElem
-export FunctionalMap
-export Group
-export GroupElem
-export hgcd
-export Ideal
-export IdealSet
-export IdentityMap
-export InfiniteOrderError
-export is_irreducible
-export is_squarefree
-export is_perfect
-export ItemQuantity
-export LaurentMPolyRing
-export LaurentMPolyRingElem
-export LaurentPolyRing
-export LaurentPolyRingElem
-export Map
-export MatRing
-export MatRingElem
-export MatElem
-export MatSpace
-export ModuleElem
-export MPolyRing
-export MPolyRingElem
-export mul!
-export NCPolyRingElem
-export NCRing
-export NCRingElem
-export NCRingElement
-export NotImplementedError
-export NotInvertibleError
-export NumField
-export NumFieldElem
-export ordinal_number_string
-export parent_type
-export pluralize
-export PolyRing
-export PolyRingElem
-export qq
-export QQ
-export RDF
-export RealField
-export RelPowerSeriesRingElem
-export ResElem
-export ResidueRing
-export Ring
-export RingElem
-export RingElement
-export SeriesElem
-export SeriesRing
-export SetElem
-export SetMap
-export SimpleNumField
-export SimpleNumFieldElem
-export sub!
-export UniversalPolyRing
-export UniversalPolyRingElem
-export VarName
-export zero!
-export zeros
-export zz
-export ZZ
+include("exports.jl")
+include("AliasMacro.jl")
+include("Aliases.jl") # needs to be included after AliasMacro.jl
 
 include("Attributes.jl")
-include("AliasMacro.jl")
 include("PrintHelper.jl")
-
-# alternative names for some functions from Base
-export is_empty
-export is_equal
-export is_even
-export is_finite
-export is_inf
-export is_integer
-export is_less
-export is_odd
-export is_one
-export is_real
-export is_subset
-export is_valid
-export is_zero
-export number_of_digits
-
-@alias is_empty isempty
-@alias is_even iseven
-@alias is_equal isequal
-@alias is_finite isfinite
-@alias is_inf isinf
-@alias is_integer isinteger
-@alias is_less isless
-@alias is_odd isodd
-@alias is_one isone
-@alias is_real isreal
-@alias is_subset issubset
-@alias is_valid isvalid
-@alias is_zero iszero
-@alias number_of_digits ndigits
-
-function order end
-
-# alternative names for some functions from LinearAlgebra
-# we don't use the `@alias` macro here because we provide custom
-# docstrings for these aliases
-const is_diagonal = isdiag
-const is_hermitian = ishermitian
-const is_symmetric = issymmetric
-const is_lower_triangular = istril
-const is_upper_triangular = istriu
-
-# alternative names for some of our own functions
-function number_of_columns end
-function number_of_generators end
-function number_of_rows end
-function number_of_variables end
-export number_of_columns
-export number_of_generators
-export number_of_rows
-export number_of_variables
-@alias ncols number_of_columns
-@alias ngens number_of_generators
-@alias nrows number_of_rows
-@alias nvars number_of_variables
-
 
 ###############################################################################
 # generic fall back if no immediate coercion is possible
@@ -436,13 +169,13 @@ include("AbstractTypes.jl")
 const PolynomialElem{T} = Union{PolyRingElem{T}, NCPolyRingElem{T}}
 const MatrixElem{T} = Union{MatElem{T}, MatRingElem{T}}
 
-###############################################################################
-#
-#   Julia types
-#
-###############################################################################
-
 include("julia/JuliaTypes.jl")
+
+# Unions of AbstactAlgebra abstract types and Julia types
+const RingElement   = Union{RingElem,   Integer, Rational, AbstractFloat}
+const NCRingElement = Union{NCRingElem, Integer, Rational, AbstractFloat}
+
+const FieldElement = Union{FieldElem, Rational, AbstractFloat}
 
 ###############################################################################
 #
@@ -460,42 +193,9 @@ include("fundamental_interface.jl")
 
 include("PrettyPrinting.jl")
 
-import .PrettyPrinting: @enable_all_show_via_expressify
-import .PrettyPrinting: @show_name
-import .PrettyPrinting: @show_special
-import .PrettyPrinting: @show_special_elem
-import .PrettyPrinting: allow_unicode
-import .PrettyPrinting: canonicalize
-import .PrettyPrinting: expr_to_latex_string
-import .PrettyPrinting: expr_to_string
-import .PrettyPrinting: expressify
-import .PrettyPrinting: extra_name
-import .PrettyPrinting: get_current_module
-import .PrettyPrinting: get_html_as_latex
-import .PrettyPrinting: get_name
-import .PrettyPrinting: get_syntactic_sign_abs
-import .PrettyPrinting: is_syntactic_one
-import .PrettyPrinting: is_syntactic_zero
-import .PrettyPrinting: is_unicode_allowed
-import .PrettyPrinting: obj_to_latex_string
-import .PrettyPrinting: obj_to_string
-import .PrettyPrinting: obj_to_string_wrt_times
-import .PrettyPrinting: print_integer_string
-import .PrettyPrinting: print_obj
-import .PrettyPrinting: printer
-import .PrettyPrinting: set_current_module
-import .PrettyPrinting: set_name!
-import .PrettyPrinting: set_html_as_latex
-import .PrettyPrinting: show_obj
-import .PrettyPrinting: show_via_expressify
-import .PrettyPrinting: with_unicode
-import .PrettyPrinting: pretty
-import .PrettyPrinting: LowercaseOff
-import .PrettyPrinting: Lowercase
-import .PrettyPrinting: Indent
-import .PrettyPrinting: Dedent
+using .PrettyPrinting
 
-export @enable_all_show_via_expressify
+import .PrettyPrinting: expressify
 
 ###############################################################################
 #
@@ -544,6 +244,20 @@ include("FreeAssAlgebra.jl")
 include("LaurentMPoly.jl")
 include("MatrixNormalForms.jl")
 
+
+include("Groups.jl")
+include("Rings.jl")
+include("NCRings.jl")
+include("Fields.jl")
+include("Factor.jl")
+
+# More functionality for Julia types
+include("julia/Integer.jl")
+include("julia/Rational.jl")
+include("julia/Float.jl")
+include("julia/GF.jl")
+include("julia/Matrix.jl")
+
 ###############################################################################
 #
 #   Generic submodule
@@ -552,137 +266,7 @@ include("MatrixNormalForms.jl")
 
 include("Generic.jl")
 
-# Do not import div, divrem, exp, inv, log, sqrt, numerator and denominator
-# as we have our own
-import .Generic: @perm_str
-import .Generic: abs_series_type
-import .Generic: base_field
-import .Generic: basis
-import .Generic: character
-import .Generic: collength
-import .Generic: combine_like_terms!
-import .Generic: cycles
-import .Generic: defining_polynomial
-import .Generic: degrees
-import .Generic: dense_matrix_type
-import .Generic: dim
-import .Generic: disable_cache!
-import .Generic: downscale
-import .Generic: EuclideanRingResidueField
-import .Generic: EuclideanRingResidueFieldElem
-import .Generic: EuclideanRingResidueRing
-import .Generic: EuclideanRingResidueRingElem
-import .Generic: enable_cache!
-import .Generic: exp_gcd
-import .Generic: exponent
-import .Generic: exponent_vector
-import .Generic: exponent_word
-import .Generic: finish
-import .Generic: fit!
-import .Generic: function_field
-import .Generic: gcd
-import .Generic: gcdx
-import .Generic: groebner_basis
-import .Generic: has_bottom_neighbor
-import .Generic: has_left_neighbor
-import .Generic: hash
-import .Generic: hooklength
-import .Generic: image_fn
-import .Generic: image_map
-import .Generic: internal_ordering
-import .Generic: interreduce!
-import .Generic: inv!
-import .Generic: inverse_fn
-import .Generic: inverse_image_fn
-import .Generic: inverse_mat
-import .Generic: invmod
-import .Generic: is_compatible
-import .Generic: is_divisible_by
-import .Generic: is_homogeneous
-import .Generic: is_power
-import .Generic: is_rimhook
-import .Generic: is_submodule
-import .Generic: is_unit
-import .Generic: isone
-import .Generic: laurent_ring
-import .Generic: laurent_series
-import .Generic: lcm
-import .Generic: leading_coefficient
-import .Generic: leading_exponent_vector
-import .Generic: leading_exponent_word
-import .Generic: leading_monomial
-import .Generic: leading_term
-import .Generic: leglength
-import .Generic: length
-import .Generic: main_variable
-import .Generic: main_variable_extract
-import .Generic: main_variable_insert
-import .Generic: map1
-import .Generic: map2
-import .Generic: matrix_repr
-import .Generic: max_fields
-import .Generic: mod
-import .Generic: monomial
-import .Generic: monomial_iszero
-import .Generic: monomial_set!
-import .Generic: monomial!
-import .Generic: monomials
-import .Generic: MPolyBuildCtx
-import .Generic: mullow_karatsuba
-import .Generic: norm
-import .Generic: normal_form
-import .Generic: normalise
-import .Generic: num_coeff
-import .Generic: one
-import .Generic: order
-import .Generic: parity
-import .Generic: partitionseq
-import .Generic: perm
-import .Generic: permtype
-import .Generic: polcoeff
-import .Generic: poly
-import .Generic: poly_ring
-import .Generic: precision
-import .Generic: preimage_map
-import .Generic: prime
-import .Generic: push_term!
-import .Generic: reduce!
-import .Generic: rel_series_type
-import .Generic: rels
-import .Generic: rescale!
-import .Generic: retraction_map
-import .Generic: reverse
-import .Generic: rising_factorial
-import .Generic: rising_factorial2
-import .Generic: rowlength
-import .Generic: section_map
-import .Generic: set_exponent_vector!
-import .Generic: set_exponent_word!
-import .Generic: set_limit!
-import .Generic: setcoeff!
-import .Generic: setpermstyle
-import .Generic: size
-import .Generic: sort_terms!
-import .Generic: summands
-import .Generic: supermodule
-import .Generic: term
-import .Generic: terms
-import .Generic: to_univariate
-import .Generic: total_degree
-import .Generic: trailing_coefficient
-import .Generic: truncate
-import .Generic: unit
-import .Generic: universal_polynomial_ring
-import .Generic: upscale
-import .Generic: weights
-import .Generic: zero
-
-# Moved from Hecke into Misc
-import .Generic: LocalizedEuclideanRing
-import .Generic: localization
-import .Generic: LocalizedEuclideanRingElem
-import .Generic: roots
-import .Generic: sturm_sequence
+using .Generic
 
 ###############################################################################
 #
@@ -692,461 +276,15 @@ import .Generic: sturm_sequence
 
 include("Solve.jl")
 
-import ..Solve: solve
-import ..Solve: solve_init
-import ..Solve: can_solve
-import ..Solve: can_solve_with_solution
-import ..Solve: can_solve_with_solution_and_kernel
+using .Solve
 
-# Do not export inv, div, divrem, exp, log, sqrt, numerator and denominator as we define our own
-export _check_dim
-export _checkbounds
-export @alias
-export @attr
-export @attributes
-export @free_associative_algebra
-export @laurent_polynomial_ring
-export @perm_str
-export @polynomial_ring
-export @power_series_ring
-export @rational_function_field
-export abs_series
-export abs_series_type
-export AbsPowerSeriesRing
-export add_column
-export add_column!
-export add_row
-export add_row!
-export addmul_delayed_reduction!
-export addmul!
-export AllParts
-export AllPerms
-export allow_unicode
-export base_field
-export base_ring
-export base_ring_type
-export basis
-export block_diagonal_matrix
-export cached
-export can_solve
-export can_solve_with_solution
-export can_solve_with_solution_and_kernel
-export canonical_injection
-export canonical_injections
-export canonical_projection
-export canonical_projections
-export canonical_unit
-export change_base_ring
-export change_coefficient_ring
-export character
-export characteristic
-export charpoly
-export charpoly_danilevsky_ff!
-export charpoly_danilevsky!
-export charpoly_hessenberg!
-export chebyshev_t
-export chebyshev_u
-export check_composable
-export check_parent
-export codomain
-export coeff
-export coefficient_ring
-export coefficients
-export coefficients_of_univariate
-export collength
-export combine_like_terms!
-export comm
-export comm!
-export compose
-export conj!
-export constant_coefficient
-export content
-export cycles
-export data
-export defining_polynomial
-export deflate
-export deflation
-export degree
-export degrees
-export denest
-export dense_matrix_type
-export dense_poly_ring_type
-export dense_poly_type
-export derivative
-export det
-export det_popov
-export diagonal_matrix
-export dim
-export direct_sum
-export disable_cache!
-export discriminant
-export div_left
-export div_left!
-export div_right
-export div_right!
-export divexact
-export divexact_left
-export divexact_low
-export divexact_right
-export divhigh
-export divides
-export domain
-export downscale
-export echelon_form
-export echelon_form_with_transformation
-export elem_type
-export enable_cache!
-export EuclideanRingResidueField
-export EuclideanRingResidueFieldElem
-export EuclideanRingResidueRing
-export EuclideanRingResidueRingElem
-export evaluate
-export exp_gcd
-export exponent
-export exponent_vector
-export exponent_vectors
-export exponent_word
-export exponent_words
-export extended_weak_popov
-export extended_weak_popov_with_transform
-export exterior_power
-export Fac
-export FactoredFractionField
-export fflu
-export fflu!
-export find_pivot_popov
-export finish
-export fit!
-export fraction_field
-export free_associative_algebra
-export free_module
-export function_field
-export gcd
-export gcd_with_cofactors
-export gcdinv
-export gcdx
-export gen
-export gens
-export get_attribute
-export get_attribute!
-export gram
-export has_attribute
-export has_bottom_neighbor
-export has_gens
-export has_left_neighbor
-export hash
-export hermite_form
-export hermite_form_with_transformation
-export hessenberg
-export hessenberg!
-export hnf
-export hnf_cohen
-export hnf_cohen_with_transform
-export hnf_kb
-export hnf_kb_with_transform
-export hnf_kb!
-export hnf_minors
-export hnf_minors_with_transform
-export hnf_via_popov
-export hnf_via_popov_with_transform
-export hnf_with_transform
-export hom
-export hooklength
-export ideal
-export identity_map
-export identity_matrix
-export image
-export image_fn
-export image_map
-export inflate
-export integral
-export internal_ordering
-export interpolate
-export inv!
-export invariant_factors
-export inverse_fn
-export inverse_image_fn
-export inverse_mat
-export invmod
-export is_associated
-export is_compatible
-export is_constant
-export is_degree
-export is_diagonal
-export is_divisible_by
-export is_domain_type
-export is_exact_type
-export is_finite_order
-export is_gen
-export is_hermitian
-export is_hessenberg
-export is_hnf
-export is_homogeneous
-export is_invertible
-export is_invertible_with_inverse
-export is_isomorphic
-export is_lower_triangular
-export is_monic
-export is_monomial
-export is_monomial_recursive
-export is_negative
-export is_popov
-export is_positive
-export is_reverse
-export is_rimhook
-export is_rref
-export is_skew_symmetric
-export is_snf
-export is_square
-export is_submodule
-export is_symmetric
-export is_term
-export is_term_recursive
-export is_trivial
-export is_unicode_allowed
-export is_unit
-export is_univariate
-export is_upper_triangular
-export is_weak_popov
-export is_zero_column
-export is_zero_divisor
-export is_zero_divisor_with_annihilator
-export is_zero_entry
-export is_zero_row
-export kernel
-export kronecker_product
-export laurent_ring
-export laurent_series
-export laurent_series_field
-export laurent_series_ring
-export laurent_polynomial_ring
-export lcm
-export leading_coefficient
-export leading_exponent_vector
-export leading_exponent_word
-export leading_monomial
-export leading_term
-export leglength
-export length
-export lift
-export lower_triangular_matrix
-export lu
-export lu!
-export main_variable
-export main_variable_extract
-export main_variable_insert
-export map_coefficients
-export map_entries
-export map_entries!
-export map_from_func
-export map_with_preimage_from_func
-export map_with_retraction
-export map_with_retraction_from_func
-export map_with_section
-export map_with_section_from_func
-export map1
-export map2
-export matrix
-export matrix_repr
-export matrix_ring
-export matrix_space
-export MatrixElem
-export max_fields
-export max_precision
-export minors
-export minpoly
-export mod
-export module_homomorphism
-export module_isomorphism
-export ModuleHomomorphism
-export ModuleIsomorphism
-export modulus
-export monomial
-export monomial_iszero
-export monomial_set!
-export monomial_to_newton!
-export monomial!
-export monomials
-export mpoly_type
-export mpoly_ring_type
-export MPolyBuildCtx
-export mul_classical
-export mul_karatsuba
-export mul_ks
-export mul_red!
-export mulhigh_n
-export mullow
-export mullow_karatsuba
-export mulmod
-export multiply_column
-export multiply_column!
-export multiply_row
-export multiply_row!
-export newton_to_monomial!
-export norm
-export normal_form
-export normalise
-export nullspace
-export num_coeff
-export O
-export one
-export one!
-export order
-export parent_type
-export parity
-export Partition
-export partitionseq
-export perm
-export Perm
-export permtype
-export pfaffian
-export pfaffians
-export pol_length
-export polcoeff
-export poly
-export poly_ring
-export PolyCoeffs
-export polynomial
-export polynomial_ring
-export polynomial_to_power_sums
-export PolynomialElem
-export PolyRing
-export popov
-export popov_with_transform
-export pow_multinomial
-export power_series_ring
-export power_sums_to_polynomial
-export powers
-export ppio
-export precision
-export preimage
-export preimage_map
-export prime
-export primpart
-export pseudo_inv
-export pseudodivrem
-export pseudorem
-export puiseux_series_field
-export puiseux_series_ring
-export push_term!
-export quo
-export rand_ordering
-export randmat_triu
-export randmat_with_rank
-export rank
-export rank_profile_popov
-export rational_function_field
-export reduce!
-export rel_series
-export rel_series_type
-export RelPowerSeriesRing
-export rels
-export remove
-export renest
-export renormalize!
-export rescale!
-export residue_field
-export residue_ring
-export resultant
-export resultant_ducos
-export resultant_euclidean
-export resultant_lehmer
-export resultant_subresultant
-export resultant_sylvester
-export resx
-export retraction_map
-export reverse
-export reverse_cols
-export reverse_cols!
-export reverse_rows
-export reverse_rows!
-export rising_factorial
-export rising_factorial2
-export rowlength
-export rref
-export rref_rational
-export rref_rational!
-export rref!
-export scalar_matrix
-export section_map
-export set_attribute!
-export set_coefficient!
-export set_exponent_vector!
-export set_exponent_word!
-export set_length!
-export set_limit!
-export set_precision!
-export set_valuation!
-export setcoeff!
-export setpermstyle
-export shift_left
-export shift_right
-export similarity!
-export size
-export SkewDiagram
-export snf
-export snf_kb
-export snf_kb_with_transform
-export snf_kb!
-export snf_with_transform
-export solve
-export solve_init
-export sort_terms!
-export SparsePolynomialRing
-export Strassen
-export strictly_lower_triangular_matrix
-export strictly_upper_triangular_matrix
-export sub
-export subst
-export summands
-export supermodule
-export swap_cols
-export swap_cols!
-export swap_rows
-export swap_rows!
-export sylvester_matrix
-export symbols
-export SymmetricGroup
-export tail
-export term
-export terms
-export to_univariate
-export total_degree
-export total_ring_of_fractions
-export tr
-export trailing_coefficient
-export truncate
-export typed_hcat
-export typed_hvcat
-export unit
-export universal_polynomial_ring
-export upper_triangular_matrix
-export upscale
-export use_karamul
-export valuation
-export var
-export var_index
-export vars
-export vector_space
-export with_unicode
-export weak_popov
-export weak_popov_with_transform
-export weights
-export YoungTableau
-export zero
-export zero_matrix
+################################################################################
+#
+#   Stuff moved from Nemo (to be cleaned up eventually)
+#
+################################################################################
 
-# Moved from Hecke into Misc
-export divexact_low
-export divhigh
-export is_monic
-export LocalizedEuclideanRing
-export localization
-export LocalizedEuclideanRingElem
-export mulhigh_n
-export PolyCoeffs
-export roots
-export sturm_sequence
+include("NemoStuff.jl")
 
 ################################################################################
 #
@@ -1191,8 +329,6 @@ function canonical_projections(D)
   return [canonical_projections(D, i) for i=1:_number_of_direct_product_factors(D)]
 end
 
-export Generic
-
 ###############################################################################
 #
 #   misc
@@ -1205,38 +341,11 @@ include("misc/VarNames.jl")
 
 ###############################################################################
 #
-#   Polynomial Ring S, x = R[:x] syntax
-#
-###############################################################################
-
-getindex(R::NCRing, s::VarName) = polynomial_ring(R, s)
-# `R[:x, :y]` returns `S, [x, y]` instead of `S, x, y`
-getindex(R::NCRing, s::VarName, ss::VarName...) =
-   polynomial_ring(R, [Symbol(x) for x in (s, ss...)])
-
-# syntax: Rxy, y = R[:x][:y]
-getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingElem}}, s::VarName) = polynomial_ring(R[1], s)
-
-###############################################################################
-#
 #   Syntax S[i] for all parents S as a shortcut for gen(S, i)
 #
 ################################################################################
 
 getindex(S::Set, i::Int) = gen(S, i)
-
-###############################################################################
-#
-#   Matrix M = R[...] syntax
-#
-################################################################################
-
-VERSION >= v"1.7" && (Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...)))
-Base.typed_hvcat(R::NCRing, args...) = _matrix(R, hvcat(args...))
-Base.typed_hcat(R::NCRing, args...) = _matrix(R, hcat(args...))
-Base.typed_vcat(R::NCRing, args...) = _matrix(R, vcat(args...))
-_matrix(R::NCRing, a::AbstractVector) = matrix(R, length(a), isempty(a) ? 0 : 1, a)
-_matrix(R::NCRing, a::AbstractMatrix) = matrix(R, a)
 
 ###############################################################################
 #
@@ -1252,32 +361,11 @@ include("error.jl")
 #
 ###############################################################################
 
-include("Groups.jl")
-include("Rings.jl")
-
-# Generic and specific rings and fields
-include("julia/Integer.jl")
-include("julia/Rational.jl")
-include("julia/Float.jl")
-include("julia/GF.jl")
-
-include("Fields.jl")
-include("Factor.jl")
 
 # Generic functions to be defined after all rings
 include("polysubst.jl")
 
-include("NCRings.jl")
-
 include("broadcasting.jl")
-
-################################################################################
-#
-#   Further functionality for Julia matrices
-#
-################################################################################
-
-include("julia/Matrix.jl")
 
 ################################################################################
 #
@@ -1287,30 +375,6 @@ include("julia/Matrix.jl")
 
 include("Deprecations.jl")
 
-################################################################################
-#
-#   Stuff moved from Nemo
-#
-################################################################################
-
-include("NemoStuff.jl")
-
-###############################################################################
-#
-#   Array creation functions
-#
-###############################################################################
-
-Array(R::NCRing, r::Int...) = Array{elem_type(R)}(undef, r)
-
-function zeros(R::NCRing, r::Int...)
-   T = elem_type(R)
-   A = Array{T}(undef, r)
-   for i in eachindex(A)
-      A[i] = R()
-   end
-   return A
-end
 
 ###############################################################################
 #
@@ -1339,14 +403,6 @@ include("algorithms/MPolyEvaluate.jl")
 include("algorithms/MPolyFactor.jl")
 include("algorithms/MPolyNested.jl")
 include("algorithms/DensePoly.jl")
-
-###############################################################################
-#
-#  For backwards compatibility
-#
-###############################################################################
-
-include("Aliases.jl")
 
 ###############################################################################
 #

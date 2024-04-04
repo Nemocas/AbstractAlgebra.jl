@@ -27,7 +27,7 @@ julia> Strassen.mul!(n, m, m; cutoff = 100);
 """
 module Strassen
 using AbstractAlgebra
-import AbstractAlgebra:Perm
+import AbstractAlgebra: Perm
 
 const cutoff = 1500
 

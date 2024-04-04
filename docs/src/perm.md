@@ -21,7 +21,7 @@ In practice this may result in decreased memory footprint (when storing multiple
 All the permutation group types belong to the `Group` abstract type and the corresponding permutation element types belong to the `GroupElem` abstract type.
 
 ```@docs
-Generic.setpermstyle
+setpermstyle
 ```
 
 ## Permutations constructors
@@ -231,7 +231,7 @@ Each of the methods perform basic sanity checks on the input which can be switch
 ## Misc
 ```@docs
 rand(::Generic.SymmetricGroup)
-Generic.matrix_repr(::Perm)
+matrix_repr(::Perm)
 Generic.emb(::Generic.SymmetricGroup, ::Vector{Int}, ::Bool)
 Generic.emb!(::Perm, ::Perm, V)
 ```

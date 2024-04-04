@@ -2,25 +2,30 @@ module Solve
 
 using AbstractAlgebra
 
-import AbstractAlgebra:
-  @attributes,
-  _can_solve_with_solution_fflu,
-  _can_solve_with_solution_interpolation,
-  _solve_fflu_precomp,
-  base_ring,
-  fflu!,
-  Generic,
-  get_attribute,
-  has_attribute,
-  kernel,
-  matrix,
-  nrows,
-  ncols,
-  PrettyPrinting,
-  rank,
-  set_attribute!
+import AbstractAlgebra: @attributes
+import AbstractAlgebra: Generic
+import AbstractAlgebra: PrettyPrinting
+import AbstractAlgebra: _can_solve_with_solution_fflu
+import AbstractAlgebra: _can_solve_with_solution_interpolation
+import AbstractAlgebra: _solve_fflu_precomp
+import AbstractAlgebra: base_ring
+import AbstractAlgebra: fflu!
+import AbstractAlgebra: get_attribute
+import AbstractAlgebra: has_attribute
+import AbstractAlgebra: kernel
+import AbstractAlgebra: matrix
+import AbstractAlgebra: ncols
+import AbstractAlgebra: nrows
+import AbstractAlgebra: rank
+import AbstractAlgebra: set_attribute!
 
 import Base: show
+
+export solve
+export solve_init
+export can_solve
+export can_solve_with_solution
+export can_solve_with_solution_and_kernel
 
 ################################################################################
 #
@@ -1110,4 +1115,4 @@ function check_linear_system_dim_left(A::Union{MatElem, SolveCtx}, b::Vector, th
   return fl
 end
 
-end
+end # module Solve

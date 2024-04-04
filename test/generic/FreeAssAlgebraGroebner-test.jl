@@ -1,6 +1,5 @@
 include("AhoCorasick-test.jl")
-using AbstractAlgebra.Generic: AhoCorasickAutomaton
-import AbstractAlgebra.Generic: normal_form_weak
+
 @testset "Generic.FreeAssAlgebra.groebner" begin
  
     R, (x, y, u, v, t, s) = free_associative_algebra(GF(2), ["x", "y", "u", "v", "t", "s"])
@@ -28,7 +27,7 @@ end
 @testset "Generic.free_associative_algebra.groebner.normal_form" begin
    R, (x, y, u, v, t, s) = free_associative_algebra(QQ, ["x", "y", "u", "v", "t", "s"]) # x > y > ... > s
    ideal_generators = [x*y, u*y*t, s*t - t*s, x*y*y + x*x*y - one(R)]
-   aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in ideal_generators])
+   aut = AbstractAlgebra.Generic.AhoCorasickAutomaton([g_i.exps[1] for g_i in ideal_generators])
    @test normal_form(x*y, ideal_generators, aut) == zero(R)
    @test normal_form(u*y*t, ideal_generators, aut) == zero(R)
    @test normal_form(s*t - t*s, ideal_generators, aut) == zero(R)
@@ -43,8 +42,8 @@ end
    @test normal_form(one(R), ideal_generators) == one(R)
    @test normal_form(v*y, ideal_generators) == v*y
    @test normal_form(x*y*v*v + t*s*x*y*v + y*s*t - y*t*s + v*x*y*y*s + v*x*x*y*s, ideal_generators, aut) == zero(R)
-   @test normal_form_weak(x*y*v*v + t*s*x*y*v + y*s*t - y*t*s + v*x*y*y*s + v*x*x*y*s, ideal_generators) == zero(R)
-   @test normal_form_weak(x*y + u*y, ideal_generators) <= x*y + u*y
+   @test AbstractAlgebra.Generic.normal_form_weak(x*y*v*v + t*s*x*y*v + y*s*t - y*t*s + v*x*y*y*s + v*x*x*y*s, ideal_generators) == zero(R)
+   @test AbstractAlgebra.Generic.normal_form_weak(x*y + u*y, ideal_generators) <= x*y + u*y
 
 #   @test gb_divides_leftmost((x*y*u*v*t).exps[1], aut) == (true, [], [3, 4, 5], 1)
 #   @test gb_divides_leftmost((x*u*y*t*(s*t - t*s)).exps[1], aut) == (true, [1], [5, 6], 2)

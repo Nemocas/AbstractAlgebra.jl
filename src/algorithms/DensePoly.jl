@@ -7,7 +7,11 @@
 
 module DensePoly
 
-import AbstractAlgebra: Ring, elem_type, mul_red!, reduce!, addeq!
+import AbstractAlgebra: Ring
+import AbstractAlgebra: elem_type
+import AbstractAlgebra: mul_red!
+import AbstractAlgebra: reduce!
+import AbstractAlgebra: addeq!
 
 # usual polynomial mullow with the "fast" techniques depending on cutoffs
 # write the lower Alen coefficients of
