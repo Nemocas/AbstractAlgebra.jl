@@ -83,67 +83,11 @@ end
 
 
 include("exports.jl")
+include("AliasMacro.jl")
+include("Aliases.jl") # needs to be included after AliasMacro.jl
 
 include("Attributes.jl")
-include("AliasMacro.jl")
 include("PrintHelper.jl")
-
-# alternative names for some functions from Base
-export is_empty
-export is_equal
-export is_even
-export is_finite
-export is_inf
-export is_integer
-export is_less
-export is_odd
-export is_one
-export is_real
-export is_subset
-export is_valid
-export is_zero
-export number_of_digits
-
-@alias is_empty isempty
-@alias is_even iseven
-@alias is_equal isequal
-@alias is_finite isfinite
-@alias is_inf isinf
-@alias is_integer isinteger
-@alias is_less isless
-@alias is_odd isodd
-@alias is_one isone
-@alias is_real isreal
-@alias is_subset issubset
-@alias is_valid isvalid
-@alias is_zero iszero
-@alias number_of_digits ndigits
-
-function order end
-
-# alternative names for some functions from LinearAlgebra
-# we don't use the `@alias` macro here because we provide custom
-# docstrings for these aliases
-const is_diagonal = isdiag
-const is_hermitian = ishermitian
-const is_symmetric = issymmetric
-const is_lower_triangular = istril
-const is_upper_triangular = istriu
-
-# alternative names for some of our own functions
-function number_of_columns end
-function number_of_generators end
-function number_of_rows end
-function number_of_variables end
-export number_of_columns
-export number_of_generators
-export number_of_rows
-export number_of_variables
-@alias ncols number_of_columns
-@alias ngens number_of_generators
-@alias nrows number_of_rows
-@alias nvars number_of_variables
-
 
 ###############################################################################
 # generic fall back if no immediate coercion is possible
@@ -459,14 +403,6 @@ include("algorithms/MPolyEvaluate.jl")
 include("algorithms/MPolyFactor.jl")
 include("algorithms/MPolyNested.jl")
 include("algorithms/DensePoly.jl")
-
-###############################################################################
-#
-#  For backwards compatibility
-#
-###############################################################################
-
-include("Aliases.jl")
 
 ###############################################################################
 #

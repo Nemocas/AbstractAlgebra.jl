@@ -542,3 +542,22 @@ export sturm_sequence
 
 export @enable_all_show_via_expressify
 export Generic
+
+export is_empty
+export is_equal
+export is_even
+export is_finite
+export is_inf
+export is_integer
+export is_less
+export is_odd
+export is_one
+export is_real
+export is_subset
+export is_valid
+export is_zero
+export number_of_digits
+export number_of_columns
+export number_of_generators
+export number_of_rows
+export number_of_variables
