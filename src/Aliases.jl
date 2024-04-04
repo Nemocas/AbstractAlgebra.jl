@@ -1,7 +1,7 @@
 # alternative names for some functions from Base
 @alias is_empty isempty
-@alias is_even iseven
 @alias is_equal isequal
+@alias is_even iseven
 @alias is_finite isfinite
 @alias is_inf isinf
 @alias is_integer isinteger

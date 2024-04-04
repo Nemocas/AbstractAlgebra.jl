@@ -1,4 +1,13 @@
+# Entries are sorted with uppercase before lowercase. To resort it,
+# execute:  LC_COLLATE=C sort < src/exports.jl > dummy ; mv dummy src/exports.jl
 export @perm_str
+export EuclideanRingResidueField
+export EuclideanRingResidueFieldElem
+export EuclideanRingResidueRing
+export EuclideanRingResidueRingElem
+export LocalizedEuclideanRing
+export LocalizedEuclideanRingElem
+export MPolyBuildCtx
 export abs_series_type
 export base_field
 export basis
@@ -12,10 +21,6 @@ export dense_matrix_type
 export dim
 export disable_cache!
 export downscale
-export EuclideanRingResidueField
-export EuclideanRingResidueFieldElem
-export EuclideanRingResidueRing
-export EuclideanRingResidueRingElem
 export enable_cache!
 export exp_gcd
 export exponent
@@ -58,6 +63,7 @@ export leading_monomial
 export leading_term
 export leglength
 export length
+export localization
 export main_variable
 export main_variable_extract
 export main_variable_insert
@@ -67,11 +73,10 @@ export matrix_repr
 export max_fields
 export mod
 export monomial
+export monomial!
 export monomial_iszero
 export monomial_set!
-export monomial!
 export monomials
-export MPolyBuildCtx
 export mullow_karatsuba
 export norm
 export normal_form
@@ -98,6 +103,7 @@ export retraction_map
 export reverse
 export rising_factorial
 export rising_factorial2
+export roots
 export rowlength
 export section_map
 export set_exponent_vector!
@@ -107,6 +113,7 @@ export setcoeff!
 export setpermstyle
 export size
 export sort_terms!
+export sturm_sequence
 export summands
 export supermodule
 export term
@@ -120,10 +127,3 @@ export universal_polynomial_ring
 export upscale
 export weights
 export zero
-
-# Moved from Hecke into Misc
-export LocalizedEuclideanRing
-export localization
-export LocalizedEuclideanRingElem
-export roots
-export sturm_sequence

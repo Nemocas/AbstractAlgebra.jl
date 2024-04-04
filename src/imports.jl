@@ -12,9 +12,9 @@ import LinearAlgebra
 import LinearAlgebra: det
 import LinearAlgebra: dot
 import LinearAlgebra: hessenberg
+import LinearAlgebra: isdiag
 import LinearAlgebra: ishermitian
 import LinearAlgebra: issymmetric
-import LinearAlgebra: isdiag
 import LinearAlgebra: istril
 import LinearAlgebra: istriu
 import LinearAlgebra: lu
@@ -26,10 +26,26 @@ import LinearAlgebra: tr
 
 
 # Do not import elements of `Base_import_exclude` as we have our own
+import Base: !=
+import Base: &
+import Base: *
+import Base: +
+import Base: -
+import Base: /
+import Base: //
+import Base: <
+import Base: <<
+import Base: <=
+import Base: ==
+import Base: >
+import Base: >=
+import Base: >>
+import Base: Array
+import Base: Rational
+import Base: ^
 import Base: abs
 import Base: acos
 import Base: acosh
-import Base: Array
 import Base: asin
 import Base: asinh
 import Base: atan
@@ -91,7 +107,6 @@ import Base: pop!
 import Base: powermod
 import Base: precision
 import Base: rand
-import Base: Rational
 import Base: rem
 import Base: reverse
 import Base: setindex!
@@ -117,21 +132,5 @@ import Base: vcat
 import Base: xor
 import Base: zero
 import Base: zeros
-
-import Base: +
-import Base: -
-import Base: *
-import Base: ==
-import Base: ^
-import Base: &
 import Base: |
-import Base: <<
-import Base: >>
 import Base: ~
-import Base: <=
-import Base: >=
-import Base: <
-import Base: >
-import Base: //
-import Base: /
-import Base: !=

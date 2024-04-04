@@ -3,19 +3,19 @@ module Solve
 using AbstractAlgebra
 
 import AbstractAlgebra: @attributes
+import AbstractAlgebra: Generic
+import AbstractAlgebra: PrettyPrinting
 import AbstractAlgebra: _can_solve_with_solution_fflu
 import AbstractAlgebra: _can_solve_with_solution_interpolation
 import AbstractAlgebra: _solve_fflu_precomp
 import AbstractAlgebra: base_ring
 import AbstractAlgebra: fflu!
-import AbstractAlgebra: Generic
 import AbstractAlgebra: get_attribute
 import AbstractAlgebra: has_attribute
 import AbstractAlgebra: kernel
 import AbstractAlgebra: matrix
-import AbstractAlgebra: nrows
 import AbstractAlgebra: ncols
-import AbstractAlgebra: PrettyPrinting
+import AbstractAlgebra: nrows
 import AbstractAlgebra: rank
 import AbstractAlgebra: set_attribute!
 

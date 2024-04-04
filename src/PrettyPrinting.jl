@@ -2,40 +2,36 @@ module PrettyPrinting
 
 using ..AbstractAlgebra
 
-import ..AbstractAlgebra: RingElem
-import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: MatrixElem
+import ..AbstractAlgebra: NCRingElem
+import ..AbstractAlgebra: RingElem
 
 using Preferences
 
-import Base: displaysize
 import Base: convert
-import Base: show
+import Base: displaysize
+import Base: get
+import Base: getindex
+import Base: haskey
+import Base: in
+import Base: lock
 import Base: pipe_reader
 import Base: pipe_writer
-import Base: lock
-import Base: unlock
-import Base: write
-import Base: getindex
-import Base: in
-import Base: haskey
-import Base: get
 import Base: print
+import Base: show
+import Base: unlock
 import Base: unwrapcontext
+import Base: write
 
-export IOCustom
-export Indent
-export Dedent
-export indent_string!
-export pretty
-export Lowercase
-export LowercaseOff
-export Indent
-export Dedent
 export @enable_all_show_via_expressify
 export @show_name
 export @show_special
 export @show_special_elem
+export Dedent
+export IOCustom
+export Indent
+export Lowercase
+export LowercaseOff
 export allow_unicode
 export canonicalize
 export expr_to_latex_string
@@ -46,26 +42,23 @@ export get_current_module
 export get_html_as_latex
 export get_name
 export get_syntactic_sign_abs
+export indent_string!
 export is_syntactic_one
 export is_syntactic_zero
 export is_unicode_allowed
 export obj_to_latex_string
 export obj_to_string
 export obj_to_string_wrt_times
+export pretty
 export print_integer_string
 export print_obj
 export printer
 export set_current_module
-export set_name!
 export set_html_as_latex
+export set_name!
 export show_obj
 export show_via_expressify
 export with_unicode
-export pretty
-export LowercaseOff
-export Lowercase
-export Indent
-export Dedent
 
 
 # printing is done with respect to the following precedences
