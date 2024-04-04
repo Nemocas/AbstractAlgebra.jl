@@ -7071,3 +7071,16 @@ the ring $R$.
 function matrix_space(R::NCRing, r::Int, c::Int)
    return Generic.matrix_space(R, r, c)
 end
+
+###############################################################################
+#
+#   Matrix M = R[...] syntax
+#
+################################################################################
+
+VERSION >= v"1.7" && (Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...)))
+Base.typed_hvcat(R::NCRing, args...) = _matrix(R, hvcat(args...))
+Base.typed_hcat(R::NCRing, args...) = _matrix(R, hcat(args...))
+Base.typed_vcat(R::NCRing, args...) = _matrix(R, vcat(args...))
+_matrix(R::NCRing, a::AbstractVector) = matrix(R, length(a), isempty(a) ? 0 : 1, a)
+_matrix(R::NCRing, a::AbstractMatrix) = matrix(R, a)

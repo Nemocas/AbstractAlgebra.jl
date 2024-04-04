@@ -366,13 +366,13 @@ include("AbstractTypes.jl")
 const PolynomialElem{T} = Union{PolyRingElem{T}, NCPolyRingElem{T}}
 const MatrixElem{T} = Union{MatElem{T}, MatRingElem{T}}
 
-###############################################################################
-#
-#   Julia types
-#
-###############################################################################
-
 include("julia/JuliaTypes.jl")
+
+# Unions of AbstactAlgebra abstract types and Julia types
+const RingElement   = Union{RingElem,   Integer, Rational, AbstractFloat}
+const NCRingElement = Union{NCRingElem, Integer, Rational, AbstractFloat}
+
+const FieldElement = Union{FieldElem, Rational, AbstractFloat}
 
 ###############################################################################
 #
@@ -445,15 +445,15 @@ include("MatrixNormalForms.jl")
 include("Groups.jl")
 include("Rings.jl")
 include("NCRings.jl")
+include("Fields.jl")
+include("Factor.jl")
 
-# Generic and specific rings and fields
+# More functionality for Julia types
 include("julia/Integer.jl")
 include("julia/Rational.jl")
 include("julia/Float.jl")
 include("julia/GF.jl")
-
-include("Fields.jl")
-include("Factor.jl")
+include("julia/Matrix.jl")
 
 ###############################################################################
 #
@@ -474,6 +474,14 @@ using .Generic
 include("Solve.jl")
 
 using .Solve
+
+################################################################################
+#
+#   Stuff moved from Nemo (to be cleaned up eventually)
+#
+################################################################################
+
+include("NemoStuff.jl")
 
 ################################################################################
 #
@@ -530,38 +538,11 @@ include("misc/VarNames.jl")
 
 ###############################################################################
 #
-#   Polynomial Ring S, x = R[:x] syntax
-#
-###############################################################################
-
-getindex(R::NCRing, s::VarName) = polynomial_ring(R, s)
-# `R[:x, :y]` returns `S, [x, y]` instead of `S, x, y`
-getindex(R::NCRing, s::VarName, ss::VarName...) =
-   polynomial_ring(R, [Symbol(x) for x in (s, ss...)])
-
-# syntax: Rxy, y = R[:x][:y]
-getindex(R::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, NCPolyRingElem}}, s::VarName) = polynomial_ring(R[1], s)
-
-###############################################################################
-#
 #   Syntax S[i] for all parents S as a shortcut for gen(S, i)
 #
 ################################################################################
 
 getindex(S::Set, i::Int) = gen(S, i)
-
-###############################################################################
-#
-#   Matrix M = R[...] syntax
-#
-################################################################################
-
-VERSION >= v"1.7" && (Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...)))
-Base.typed_hvcat(R::NCRing, args...) = _matrix(R, hvcat(args...))
-Base.typed_hcat(R::NCRing, args...) = _matrix(R, hcat(args...))
-Base.typed_vcat(R::NCRing, args...) = _matrix(R, vcat(args...))
-_matrix(R::NCRing, a::AbstractVector) = matrix(R, length(a), isempty(a) ? 0 : 1, a)
-_matrix(R::NCRing, a::AbstractMatrix) = matrix(R, a)
 
 ###############################################################################
 #
@@ -585,44 +566,12 @@ include("broadcasting.jl")
 
 ################################################################################
 #
-#   Further functionality for Julia matrices
-#
-################################################################################
-
-include("julia/Matrix.jl")
-
-################################################################################
-#
 #   Deprecations
 #
 ################################################################################
 
 include("Deprecations.jl")
 
-################################################################################
-#
-#   Stuff moved from Nemo
-#
-################################################################################
-
-include("NemoStuff.jl")
-
-###############################################################################
-#
-#   Array creation functions
-#
-###############################################################################
-
-Array(R::NCRing, r::Int...) = Array{elem_type(R)}(undef, r)
-
-function zeros(R::NCRing, r::Int...)
-   T = elem_type(R)
-   A = Array{T}(undef, r)
-   for i in eachindex(A)
-      A[i] = R()
-   end
-   return A
-end
 
 ###############################################################################
 #
