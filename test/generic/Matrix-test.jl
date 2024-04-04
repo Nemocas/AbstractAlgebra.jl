@@ -2910,16 +2910,16 @@ end
    for i = 0:5
       M = randmat_with_rank(R, i, -20:20)
 
-      n, N = AbstractAlgebra._kernel(M)
+      N = AbstractAlgebra.kernel(M, side = :right)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test ncols(N) == 5 - i
+      @test rank(N) == ncols(N)
       @test iszero(M*N)
 
-      n, N = AbstractAlgebra._left_kernel(M)
+      N = AbstractAlgebra.kernel(M)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test nrows(N) == 5 - i
+      @test rank(N) == nrows(N)
       @test iszero(N*M)
    end
 
@@ -2931,16 +2931,16 @@ end
    for i = 0:5
       M = randmat_with_rank(S, i, -100:100)
 
-      n, N = AbstractAlgebra._kernel(M)
+      N = AbstractAlgebra.kernel(M, side = :right)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test ncols(N) == 5 - i
+      @test rank(N) == ncols(N)
       @test iszero(M*N)
 
-      n, N = AbstractAlgebra._left_kernel(M)
+      N = AbstractAlgebra.kernel(M)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test nrows(N) == 5 - i
+      @test rank(N) == nrows(N)
       @test iszero(N*M)
    end
 
@@ -2950,16 +2950,16 @@ end
    for i = 0:5
       M = randmat_with_rank(T, i, -1:2, -20:20)
 
-      n, N = AbstractAlgebra._kernel(M)
+      N = AbstractAlgebra.kernel(M, side = :right)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test ncols(N) == 5 - i
+      @test rank(N) == ncols(N)
       @test iszero(M*N)
 
-      n, N = AbstractAlgebra._left_kernel(M)
+      N = AbstractAlgebra.kernel(M)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test nrows(N) == 5 - i
+      @test rank(N) == nrows(N)
       @test iszero(N*M)
    end
 end
@@ -3000,9 +3000,9 @@ end
             @test M*Sol == B
             @test iszero(M*K)
 
-            rk, N = AbstractAlgebra._kernel(M)
+            N = AbstractAlgebra.kernel(M, side = :right)
             @test nrows(N) == nrows(K)
-            @test rk == ncols(K)
+            @test ncols(N) == ncols(K)
          end
 
          # left kernel, random with solution

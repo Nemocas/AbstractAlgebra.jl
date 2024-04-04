@@ -50,7 +50,7 @@ end
 
 Return a pair `K, g` consisting of the kernel object $K$ of the given module
 homomorphism $f$ (as a submodule of its domain) and the canonical injection
-from the kernel into the domain of $f$
+from the kernel into the domain of $f$.
 """
 function kernel(f::Map(FPModuleHomomorphism))
    D = domain(f)
@@ -74,7 +74,8 @@ function kernel(f::Map(FPModuleHomomorphism))
      end
    end
    # compute the kernel
-   num_gens, K = AbstractAlgebra._left_kernel(N)
+   K = AbstractAlgebra.kernel(N)
+   num_gens = nrows(K)
    # Construct generators of kernel submodule, reversing rows
    # and columns so they're correct wrt to original data and
    # in upper triangular form

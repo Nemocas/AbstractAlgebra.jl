@@ -158,7 +158,8 @@ function intersect(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
       end
    end
    # Find the left kernel space of the matrix
-   nc, K = _left_kernel(mat)
+   K = kernel(mat)
+   nc = nrows(K)
    # Last r1 elements of a row correspond to a generators of intersection
    # We flip the rows of K so the input to Submodule is upper triangular
    # and the columns so that they correspond to the original order before

@@ -93,7 +93,6 @@ import ..AbstractAlgebra: RingElem
 import ..AbstractAlgebra: RingElement
 import ..AbstractAlgebra: _can_solve_with_solution_fflu
 import ..AbstractAlgebra: _can_solve_with_solution_lu
-import ..AbstractAlgebra: _left_kernel
 import ..AbstractAlgebra: add!
 import ..AbstractAlgebra: addeq!
 import ..AbstractAlgebra: addmul!
