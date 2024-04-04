@@ -1320,21 +1320,24 @@ struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FP
 end
 
 """
-  an n x m matrix over R, all zero but
-  if n>m: s is a row where an identity matrix is inserted
-  if n<m: s is a col where the identity is inserted
-  
-  so this is a typical matrix to represent an projection from 
-  a direct sum into a summand
+   an n x m matrix over R, all zero but
+   if n>m: s is a row starting from which an identity matrix is inserted
+   if n<m: s is a column starting from which an identity matrix is inserted
 
-  or an injection into the sum
+   Example: n = 2, m = 5, s = 3 gives the matrix
+    [0   0   1   0   0]
+    [0   0   0   1   0]
+
+   So this is a typical matrix to represent an projection from
+   a direct sum into a summand or an injection into the sum.
 """
 struct InjProjMat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
-  R
-  n::Int #Rows
-  m::Int #Cols
-  s::Int 
+   R
+   n::Int #Rows
+   m::Int #Cols
+   s::Int
 end
+
 ###############################################################################
 #
 #   ModuleHomomorphism
