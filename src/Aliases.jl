@@ -14,8 +14,9 @@
 @alias is_zero iszero
 @alias number_of_digits ndigits
 
+# TODO: next breaking release: remove the if guard around the block
+if @__MODULE__() == AbstractAlgebra
 
-if @__MODULE__() == AbstractAlgebra # keep this guard as long as Oscar includes this file
     # alternative names for some functions from LinearAlgebra
     # we don't use the `@alias` macro here because we provide custom
     # docstrings for these aliases
