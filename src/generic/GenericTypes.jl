@@ -1330,7 +1330,7 @@ a direct sum into a summand or an injection into the sum.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> inj_proj_mat(ZZ, 2, 5, 3)
+julia> Generic.inj_proj_mat(ZZ, 2, 5, 3)
 [0   0   1   0   0]
 [0   0   0   1   0]
 ```

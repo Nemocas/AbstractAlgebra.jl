@@ -4323,13 +4323,15 @@ end
    M = Generic.inj_proj_mat(QQ, 4, 2, 2)
    @test nrows(M) == 4
    @test ncols(M) == 2
-   @test @inferred base_ring(M) === QQ
+   R = @inferred base_ring(M)
+   @test R === QQ
 
    # getindex
    N = QQ[0 0; 1 0; 0 1; 0 0]
    for i in 1:4
       for j in 1:2
-         @test @inferred M[i, j] == N[i, j]
+         x = @inferred M[i, j]
+         @test x == N[i, j]
       end
    end
 
