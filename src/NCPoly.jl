@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-base_ring_type(::Type{NCPolyRing{T}}) where T <: NCRingElem = parent_type(T)
+base_ring_type(::Type{<:NCPolyRing{T}}) where T<:NCRingElement = parent_type(T)
 
 coefficient_ring(R::NCPolyRing) = base_ring(R)
 

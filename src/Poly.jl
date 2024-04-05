@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-base_ring_type(::Type{PolyRing{T}}) where T<:RingElement = parent_type(T)
+base_ring_type(::Type{<:PolyRing{T}}) where T<:RingElement = parent_type(T)
 
 coefficient_ring(R::PolyRing) = base_ring(R)
 

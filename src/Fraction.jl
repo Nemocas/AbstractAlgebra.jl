@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-base_ring_type(::Type{FracField{T}}) where T <: RingElem = parent_type(T)
+base_ring_type(::Type{<:FracField{T}}) where T<:RingElement = parent_type(T)
 
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: FracElem{S}}
    return is_domain_type(S)
