@@ -5,8 +5,6 @@
 # PriorityQueue
 # -------------
 
-using Base: Ordering, ForwardOrdering, Forward, ReverseOrdering, Reverse, lt
-
 # Binary heap indexing
 heapleft(i::Integer) = 2i
 heapright(i::Integer) = 2i + 1
@@ -30,7 +28,7 @@ Parameters
 
 `V::Type` Data type for the values/priorities
 
-`ord::Base.Ordering` Priority queue ordering
+`ord::Base.Order.Ordering` Priority queue ordering
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -41,7 +39,7 @@ AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering}
   "b" => 3
 ```
 """
-struct PriorityQueue{K,V,O<:Ordering} <: AbstractDict{K,V}
+struct PriorityQueue{K,V,O<:Base.Order.Ordering} <: AbstractDict{K,V}
     # Binary heap of (element, priority) pairs.
     xs::Vector{Pair{K,V}}
     o::O
@@ -49,13 +47,13 @@ struct PriorityQueue{K,V,O<:Ordering} <: AbstractDict{K,V}
     # Map elements to their index in xs
     index::Dict{K, Int}
 
-    function PriorityQueue{K,V,O}(o::O) where {K,V,O<:Ordering}
+    function PriorityQueue{K,V,O}(o::O) where {K,V,O<:Base.Order.Ordering}
         new{K,V,O}(Vector{Pair{K,V}}(), o, Dict{K, Int}())
     end
 
-    PriorityQueue{K, V, O}(xs::Vector{Pair{K,V}}, o::O, index::Dict{K, Int}) where {K,V,O<:Ordering} = new(xs, o, index)
+    PriorityQueue{K, V, O}(xs::Vector{Pair{K,V}}, o::O, index::Dict{K, Int}) where {K,V,O<:Base.Order.Ordering} = new(xs, o, index)
 
-    function PriorityQueue{K,V,O}(o::O, itr) where {K,V,O<:Ordering}
+    function PriorityQueue{K,V,O}(o::O, itr) where {K,V,O<:Base.Order.Ordering}
         xs = Vector{Pair{K,V}}(undef, length(itr))
         index = Dict{K, Int}()
         for (i, (k, v)) in enumerate(itr)
@@ -77,31 +75,31 @@ struct PriorityQueue{K,V,O<:Ordering} <: AbstractDict{K,V}
 end
 
 # A copy constructor
-PriorityQueue(xs::Vector{Pair{K,V}}, o::O, index::Dict{K, Int}) where {K,V,O<:Ordering} =
+PriorityQueue(xs::Vector{Pair{K,V}}, o::O, index::Dict{K, Int}) where {K,V,O<:Base.Order.Ordering} =
     PriorityQueue{K,V,O}(xs, o, index)
 
 # Any-Any constructors
-PriorityQueue(o::Ordering=Forward) = PriorityQueue{Any,Any,typeof(o)}(o)
+PriorityQueue(o::Base.Order.Ordering=Base.Order.Forward) = PriorityQueue{Any,Any,typeof(o)}(o)
 
 # Construction from Pairs
-PriorityQueue(ps::Pair...) = PriorityQueue(Forward, ps)
-PriorityQueue(o::Ordering, ps::Pair...) = PriorityQueue(o, ps)
-PriorityQueue{K,V}(ps::Pair...) where {K,V} = PriorityQueue{K,V,ForwardOrdering}(Forward, ps)
-PriorityQueue{K,V}(o::Ord, ps::Pair...) where {K,V,Ord<:Ordering} = PriorityQueue{K,V,Ord}(o, ps)
+PriorityQueue(ps::Pair...) = PriorityQueue(Base.Order.Forward, ps)
+PriorityQueue(o::Base.Order.Ordering, ps::Pair...) = PriorityQueue(o, ps)
+PriorityQueue{K,V}(ps::Pair...) where {K,V} = PriorityQueue{K,V,Base.Order.ForwardOrdering}(Base.Order.Forward, ps)
+PriorityQueue{K,V}(o::Ord, ps::Pair...) where {K,V,Ord<:Base.Order.Ordering} = PriorityQueue{K,V,Ord}(o, ps)
 
 # Construction specifying Key/Value types
 # e.g., PriorityQueue{Int,Float64}([1=>1, 2=>2.0])
-PriorityQueue{K,V}(kv) where {K,V} = PriorityQueue{K,V}(Forward, kv)
-function PriorityQueue{K,V}(o::Ord, kv) where {K,V,Ord<:Ordering}
+PriorityQueue{K,V}(kv) where {K,V} = PriorityQueue{K,V}(Base.Order.Forward, kv)
+function PriorityQueue{K,V}(o::Ord, kv) where {K,V,Ord<:Base.Order.Ordering}
     PriorityQueue{K,V,Ord}(o, kv)
 end
 
 # Construction inferring Key/Value types from input
 # e.g. PriorityQueue{}
 
-PriorityQueue(o1::Ordering, o2::Ordering) = throw(ArgumentError("PriorityQueue with two parameters must be called with an Ordering and an iterable of pairs"))
-PriorityQueue(kv, o::Ordering=Forward) = PriorityQueue(o, kv)
-function PriorityQueue(o::Ordering, kv)
+PriorityQueue(o1::Base.Order.Ordering, o2::Base.Order.Ordering) = throw(ArgumentError("PriorityQueue with two parameters must be called with an Ordering and an iterable of pairs"))
+PriorityQueue(kv, o::Base.Order.Ordering=Base.Order.Forward) = PriorityQueue(o, kv)
+function PriorityQueue(o::Base.Order.Ordering, kv)
     _priority_queue_with_eltype(o, kv, eltype(kv))
 end
 
@@ -164,9 +162,9 @@ function percolate_down!(pq::PriorityQueue, i::Integer)
     x = pq.xs[i]
     @inbounds while (l = heapleft(i)) <= length(pq)
         r = heapright(i)
-        j = r > length(pq) || lt(pq.o, pq.xs[l].second, pq.xs[r].second) ? l : r
+        j = r > length(pq) || Base.lt(pq.o, pq.xs[l].second, pq.xs[r].second) ? l : r
         xj = pq.xs[j]
-        if lt(pq.o, xj.second, x.second)
+        if Base.lt(pq.o, xj.second, x.second)
             pq.index[xj.first] = i
             pq.xs[i] = xj
             i = j
@@ -184,7 +182,7 @@ function percolate_up!(pq::PriorityQueue, i::Integer)
     @inbounds while i > 1
         j = heapparent(i)
         xj = pq.xs[j]
-        if lt(pq.o, x.second, xj.second)
+        if Base.lt(pq.o, x.second, xj.second)
             pq.index[xj.first] = i
             pq.xs[i] = xj
             i = j
@@ -232,7 +230,7 @@ function Base.setindex!(pq::PriorityQueue{K, V}, value, key) where {K,V}
     if i != 0
         @inbounds oldvalue = pq.xs[i].second
         pq.xs[i] = Pair{K,V}(key, value)
-        if lt(pq.o, oldvalue, value)
+        if Base.lt(pq.o, oldvalue, value)
             percolate_down!(pq, i)
         else
             percolate_up!(pq, i)
@@ -386,12 +384,12 @@ function Base.merge!(combine::Function, d::AbstractDict, other::PriorityQueue)
 end
 
 # Opaque not to be exported.
-mutable struct _PQIteratorState{K, V, O <: Ordering}
+mutable struct _PQIteratorState{K, V, O <: Base.Order.Ordering}
     pq::PriorityQueue{K, V, O}
-    _PQIteratorState{K, V, O}(pq::PriorityQueue{K, V, O}) where {K, V, O <: Ordering} = new(pq)
+    _PQIteratorState{K, V, O}(pq::PriorityQueue{K, V, O}) where {K, V, O <: Base.Order.Ordering} = new(pq)
 end
 
-_PQIteratorState(pq::PriorityQueue{K, V, O}) where {K, V, O <: Ordering} = _PQIteratorState{K, V, O}(pq)
+_PQIteratorState(pq::PriorityQueue{K, V, O}) where {K, V, O <: Base.Order.Ordering} = _PQIteratorState{K, V, O}(pq)
 
 # Unordered iteration through key value pairs in a PriorityQueue
 # O(n) iteration.

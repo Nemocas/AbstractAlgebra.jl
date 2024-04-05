@@ -6,9 +6,8 @@ import ..AbstractAlgebra: MatrixElem
 import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: RingElem
 
-using Preferences
+using Preferences: Preferences, @load_preference, @set_preferences!
 
-import Base: convert
 import Base: displaysize
 import Base: get
 import Base: getindex
@@ -20,7 +19,6 @@ import Base: pipe_writer
 import Base: print
 import Base: show
 import Base: unlock
-import Base: unwrapcontext
 import Base: write
 
 export @enable_all_show_via_expressify

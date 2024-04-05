@@ -102,8 +102,6 @@ include("generic/Misc/Poly.jl")
 include("generic/Misc/Rings.jl")
 include("generic/Misc/Localization.jl")
 
-# TODO/FIXME: deprecate aliases, remove in the future
-import ..AbstractAlgebra: @alias
 # Deprecated in 0.35.*
 Base.@deprecate_binding ResF EuclideanRingResidueFieldElem
 Base.@deprecate_binding ResField EuclideanRingResidueField
