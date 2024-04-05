@@ -130,7 +130,7 @@ function preimage(f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}) wh
    m = nrows(M)
    n = ncols(M)
    if m == 0 || n == 0
-      return [D(zero_matrix(R, 1, m)) for x in v]
+      return elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
    else
       # Put matrix M and target relations in a matrix
       matr = zero_matrix(R, m + q, n)
@@ -141,7 +141,7 @@ function preimage(f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}) wh
       # Find left inverse of mat
       inmat = reduce(vcat, Generic._matrix.(v))
       x = solve(matr, inmat)
-      return [D(x[i:i, 1:m]) for i in 1:length(v)]
+      return elem_type(D)[D(x[i:i, 1:m]) for i in 1:length(v)]
    end
 end
 

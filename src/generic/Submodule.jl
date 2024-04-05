@@ -16,7 +16,7 @@ elem_type(::Type{Submodule{T}}) where T <: RingElement = SubmoduleElem{T}
 
 parent(v::SubmoduleElem) = v.parent
 
-base_ring(N::Submodule{T}) where T <: RingElement = N.base_ring
+base_ring(N::Submodule{T}) where T <: RingElement = N.base_ring::parent_type(T)
 
 base_ring(v::SubmoduleElem{T}) where T <: RingElement = base_ring(v.parent)
 

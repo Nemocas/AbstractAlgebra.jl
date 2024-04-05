@@ -123,6 +123,30 @@ end
    end
 end
 
+@testset "Generic.ModuleHomomorphism.preimage" begin
+   for R in [ZZ, QQ]
+      for iter = 1:5
+         N = rand_module(R, -10:10)
+
+         ngens1 = rand(1:5)
+         gens1 = [rand(N, -10:10) for j in 1:ngens1]
+         M, f = sub(N, gens1)
+
+         m = rand(M, -10:10)
+         n = f(m)
+         x = preimage(f, n)
+         @test x == m
+
+         for i in 0:5
+            m = elem_type(M)[ rand(M, -10:10) for j in 1:i ]
+            n = elem_type(N)[ f(mm) for mm in m ]
+            x = preimage(f, n)
+            @test x == m
+         end
+      end
+   end
+end
+
 @testset "Generic.ModuleHomomorphism.printing" begin
   M = free_module(ZZ, 2)
   f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
