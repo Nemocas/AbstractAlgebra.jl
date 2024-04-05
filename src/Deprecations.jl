@@ -32,6 +32,8 @@ macro include_deprecated_bindings()
     end)
 end
 
+@include_deprecated_bindings()
+
 ###############################################################################
 #
 #   Deprecations
