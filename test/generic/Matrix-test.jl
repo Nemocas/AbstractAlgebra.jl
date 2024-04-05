@@ -4343,6 +4343,30 @@ end
 
       X = matrix(QQ, d, 4, [ rand(QQ, -10:10) for _ in 1:4*d ])
       @test X*M == X*N
+
+      d = rand(2:10)
+      s = rand(1:d - 1)
+      X = Generic.inj_proj_mat(QQ, 2, d, s)
+      @test M*X == N*matrix(X)
+   end
+
+   # Catch all cases
+   for iter in 1:10
+      M1 = Generic.inj_proj_mat(QQ, 5, 3, rand(1:3))
+      M2 = Generic.inj_proj_mat(QQ, 3, 2, rand(1:2))
+      @test M1*M2 == matrix(M1)*matrix(M2)
+
+      M1 = Generic.inj_proj_mat(QQ, 5, 3, rand(1:3))
+      M2 = Generic.inj_proj_mat(QQ, 3, 4, rand(1:2))
+      @test M1*M2 == matrix(M1)*matrix(M2)
+
+      M1 = Generic.inj_proj_mat(QQ, 3, 5, rand(1:3))
+      M2 = Generic.inj_proj_mat(QQ, 5, 2, rand(1:4))
+      @test M1*M2 == matrix(M1)*matrix(M2)
+
+      M1 = Generic.inj_proj_mat(QQ, 3, 5, rand(1:3))
+      M2 = Generic.inj_proj_mat(QQ, 5, 7, rand(1:3))
+      @test M1*M2 == matrix(M1)*matrix(M2)
    end
 
    # Addition
@@ -4352,5 +4376,9 @@ end
       X = matrix(QQ, 4, 2, [ rand(QQ, -10:10) for _ in 1:4*2 ])
       @test M + X == N + X
       @test X + M == X + N
+
+      s = rand(1:3)
+      X = Generic.inj_proj_mat(QQ, 4, 2, s)
+      @test M + X == N + matrix(X)
    end
 end

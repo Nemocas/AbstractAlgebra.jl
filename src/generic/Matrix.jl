@@ -310,6 +310,40 @@ function *(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
   end
 end
 
+function *(a::InjProjMat, b::InjProjMat)
+   @assert base_ring(a) === base_ring(b)
+   R = base_ring(a)
+   @assert ncols(a) == nrows(b)
+   m = nrows(a)
+   n = ncols(a)
+   k = ncols(b)
+   s = a.s
+   t = b.s
+
+   # Easy cases
+   if m >= n
+      return reduce(vcat, [zero_matrix(R, s - 1, k), matrix(b), zero_matrix(R, m - n - s + 1, k)])
+   end
+   if m < n && n < k
+      return reduce(hcat, [zero_matrix(R, m, t - 1), matrix(a), zero_matrix(R, m, k - n - t + 1)])
+   end
+
+   # Annoying case: m < n && n >= k
+   c = zero_matrix(R, m, k)
+   if s <= t
+      offset = t - s
+      for i in 1:min(m - offset, k)
+         c[i + offset, i] = one(R)
+      end
+   else
+      offset = s - t
+      for i in 1:min(m, k - offset)
+         c[i, i + offset] = one(R)
+      end
+   end
+   return c
+end
+
 function +(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
   @assert size(b) == size(c)
   R = base_ring(b)
@@ -327,6 +361,7 @@ function +(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
   return a
 end
 +(c::InjProjMat{T}, b::MatElem{T}) where {T <: NCRingElement} = b+c
++(c::InjProjMat{T}, b::InjProjMat{T}) where {T <: NCRingElement} = matrix(b) + c
 
 function add_one!(a::MatElem, i::Int, j::Int)
   a[i, j] += 1
