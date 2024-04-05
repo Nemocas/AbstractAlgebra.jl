@@ -4321,6 +4321,7 @@ end
 
    # Getters
    M = Generic.inj_proj_mat(QQ, 4, 2, 2)
+   Mt = Generic.inj_proj_mat(QQ, 2, 4, 2)
    @test nrows(M) == 4
    @test ncols(M) == 2
    R = @inferred base_ring(M)
@@ -4328,6 +4329,8 @@ end
 
    # getindex
    N = QQ[0 0; 1 0; 0 1; 0 0]
+   Nt = transpose(N)
+   @test matrix(Mt) == Nt
    for i in 1:4
       for j in 1:2
          x = @inferred M[i, j]
@@ -4342,9 +4345,11 @@ end
       d = rand(1:10)
       X = matrix(QQ, 2, d, [ rand(QQ, -10:10) for _ in 1:2*d ])
       @test M*X == N*X
+      @test transpose(X)*Mt == transpose(X)*Nt
 
       X = matrix(QQ, d, 4, [ rand(QQ, -10:10) for _ in 1:4*d ])
       @test X*M == X*N
+      @test Mt*transpose(X) == Nt*transpose(X)
 
       d = rand(2:10)
       s = rand(1:d - 1)
@@ -4377,6 +4382,7 @@ end
    for iter in 1:10
       X = matrix(QQ, 4, 2, [ rand(QQ, -10:10) for _ in 1:4*2 ])
       @test M + X == N + X
+      @test Mt + transpose(X) == Nt + transpose(X)
       @test X + M == X + N
 
       s = rand(1:3)

@@ -292,7 +292,7 @@ function *(b::InjProjMat{T}, c::MatElem{T}) where {T <: NCRingElement}
     z[b.s:b.s+nrows(c)-1, :] = c
     return z
   else
-    return c[b.s:b.s+ncols(b)-1, :]
+    return c[b.s:b.s+nrows(b)-1, :]
   end
 end
 
