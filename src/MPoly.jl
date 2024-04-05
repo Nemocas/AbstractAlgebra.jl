@@ -94,8 +94,8 @@ Return the variables actually occurring in $p$.
 function vars(p::MPolyRingElem{T}) where {T <: RingElement}
    U = typeof(p)
    vars_in_p = Vector{U}(undef, 0)
-   n = nvars(p.parent)
-   gen_list = gens(p.parent)
+   n = nvars(parent(p))
+   gen_list = gens(parent(p))
    biggest = [0 for i in 1:n]
    for v in exponent_vectors(p)
       for j = 1:n
