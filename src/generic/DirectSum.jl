@@ -154,7 +154,7 @@ end
 
 function AbstractAlgebra.canonical_injection(A::DirectSumModule, i::Int)
   B = summands(A)[i]
-  return hom(B, A, inj_proj_mat(base_ring(A), dim(B), dim(A), sum(dim(x) for x = summands(A)[1:i-1]; init = 0)+1))
+  return ModuleHomomorphism(B, A, inj_proj_mat(base_ring(A), ngens(B), ngens(A), sum(ngens(x) for x = summands(A)[1:i-1]; init = 0)+1))
 end
 
 AbstractAlgebra._number_of_direct_product_factors(A::DirectSumModule) = length(summands(A))
@@ -173,7 +173,7 @@ end
 
 function AbstractAlgebra.canonical_projection(A::DirectSumModule, i::Int)
   B = summands(A)[i]
-  return hom(B, A, inj_proj_mat(base_ring(A), dim(A), dim(B), sum(dim(x) for x = summands(A)[1:i-1]; init = 0)+1))
+  return ModuleHomomorphism(A, B, inj_proj_mat(base_ring(A), ngens(A), ngens(B), sum(ngens(x) for x = summands(A)[1:i-1]; init = 0)+1))
 end
 
 function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
