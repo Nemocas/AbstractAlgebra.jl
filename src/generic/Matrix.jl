@@ -253,7 +253,7 @@ Base.size(V::MatSpaceVecView) = (length(V.entries), )
 ###############################################################################
 
 function inj_proj_mat(R::NCRing, r::Int, c::Int, s::Int)
-   @assert r >= 0 && c >= 0 && s >= 0
+   @assert r >= 0 && c >= 0 && s > 0
    # Check whether there is space for a full identity matrix
    if r <= c
       @assert s + r - 1 <= c

@@ -4307,3 +4307,50 @@ end
   @test base_ring(L) === QQ
   @test L == N * change_base_ring(QQ, M)
 end
+
+@testset "Generic.Mat.InjProjMat" begin
+   # Construction
+   @test matrix(Generic.inj_proj_mat(QQ, 3, 2, 1)) == QQ[1 0; 0 1; 0 0]
+   @test matrix(Generic.inj_proj_mat(QQ, 2, 3, 1)) == QQ[1 0 0; 0 1 0]
+   @test matrix(Generic.inj_proj_mat(QQ, 3, 2, 2)) == QQ[0 0; 1 0; 0 1]
+   @test matrix(Generic.inj_proj_mat(QQ, 2, 3, 2)) == QQ[0 1 0; 0 0 1]
+
+   @test_throws AssertionError Generic.inj_proj_mat(QQ, 3, 2, 0)
+   @test_throws AssertionError Generic.inj_proj_mat(QQ, 3, 2, 3)
+   @test_throws AssertionError Generic.inj_proj_mat(QQ, 2, 3, 3)
+
+   # Getters
+   M = Generic.inj_proj_mat(QQ, 4, 2, 2)
+   @test nrows(M) == 4
+   @test ncols(M) == 2
+   @test @inferred base_ring(M) === QQ
+
+   # getindex
+   N = QQ[0 0; 1 0; 0 1; 0 0]
+   for i in 1:4
+      for j in 1:2
+         @test @inferred M[i, j] == N[i, j]
+      end
+   end
+
+   # Multiplication
+   @test_throws AssertionError M*identity_matrix(QQ, 1)
+   @test_throws AssertionError identity_matrix(QQ, 1)*M
+   for iter in 1:10
+      d = rand(1:10)
+      X = matrix(QQ, 2, d, [ rand(QQ, -10:10) for _ in 1:2*d ])
+      @test M*X == N*X
+
+      X = matrix(QQ, d, 4, [ rand(QQ, -10:10) for _ in 1:4*d ])
+      @test X*M == X*N
+   end
+
+   # Addition
+   @test_throws AssertionError M + zero_matrix(QQ, 4, 1)
+   @test_throws AssertionError zero_matrix(QQ, 4, 1) + M
+   for iter in 1:10
+      X = matrix(QQ, 4, 2, [ rand(QQ, -10:10) for _ in 1:4*2 ])
+      @test M + X == N + X
+      @test X + M == X + N
+   end
+end
