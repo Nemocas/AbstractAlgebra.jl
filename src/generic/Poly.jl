@@ -14,11 +14,19 @@ parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 
 elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
+base_ring(R::PolyRing{T}) where T <: RingElement = R.base_ring::base_ring_type(typeof(R))
+
+parent(a::Poly) = a.parent
+
+var(a::PolyRing) = a.S
+
 ###############################################################################
 #
 #   Basic manipulation
 #
 ###############################################################################
+
+length(a::Poly) = a.length
 
 function setcoeff!(c::Poly{T}, n::Int, a::S) where {T <: RingElement, S <: RingElement}
    if !iszero(a) || n + 1 <= length(c)

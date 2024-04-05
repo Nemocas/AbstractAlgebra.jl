@@ -14,11 +14,19 @@ parent_type(::Type{NCPoly{T}}) where T <: NCRingElem = NCPolyRing{T}
 
 elem_type(::Type{NCPolyRing{T}}) where T <: NCRingElem = NCPoly{T}
 
+base_ring(R::NCPolyRing{T}) where T <: NCRingElem = R.base_ring::base_ring_type(typeof(R))
+
+parent(a::NCPoly) = a.parent
+
+var(a::NCPolyRing) = a.S
+
 ###############################################################################
 #
 #   Basic manipulation
 #
 ###############################################################################
+
+length(a::NCPoly) = a.length
 
 function setcoeff!(c::NCPoly{T}, n::Int, a::T) where T <: NCRingElem
    if !iszero(a) || n + 1 <= length(c)

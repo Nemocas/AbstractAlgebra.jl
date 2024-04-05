@@ -10,13 +10,9 @@
 #
 ###############################################################################
 
-base_ring_type(::Type{PolyRing{T}}) where {T} = parent_type(T)
-
-base_ring(R::PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
+base_ring_type(::Type{PolyRing{T}}) where T<:RingElement = parent_type(T)
 
 coefficient_ring(R::PolyRing) = base_ring(R)
-
-parent(a::PolynomialElem) = a.parent
 
 dense_poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
 
@@ -34,7 +30,7 @@ end
 Return the internal name of the generator of the polynomial ring. Note that
 this is returned as a `Symbol` not a `String`.
 """
-var(a::PolyRing) = a.S
+var(a::PolyRing)
 
 @doc raw"""
     symbols(a::PolyRing)
@@ -42,7 +38,7 @@ var(a::PolyRing) = a.S
 Return an array of the variable names for the polynomial ring. Note that
 this is returned as an array of `Symbol` not `String`.
 """
-symbols(a::PolyRing) = [a.S]
+symbols(a::PolyRing) = [var(a)]
 
 @doc raw"""
     number_of_variables(a::PolyRing)
@@ -51,13 +47,13 @@ Return the number of variables of the polynomial ring, which is 1.
 """
 number_of_variables(a::PolyRing) = 1
 
-function check_parent(a::PolynomialElem, b::PolynomialElem, throw::Bool = true)
+characteristic(a::PolyRing) = characteristic(base_ring(a))
+
+function check_parent(a::PolyRingElem{T}, b::PolyRingElem{T}, throw::Bool = true) where T<:RingElement
    c = parent(a) != parent(b)
    c && throw && error("Incompatible polynomial rings in polynomial operation")
    return !c
 end
-
-characteristic(a::PolyRing) = characteristic(base_ring(a))
 
 ###############################################################################
 #
@@ -83,7 +79,7 @@ zero coefficients. Thus naturally the zero polynomial has length zero and
 additionally for nonzero polynomials the length is one more than the degree.
 (Note that the leading coefficient will always be nonzero.)
 """
-length(a::PolynomialElem) = a.length
+length(a::PolynomialElem)
 
 @doc raw"""
     degree(a::PolynomialElem)
@@ -184,11 +180,6 @@ function set_coefficient!(c::PolynomialElem{T}, n::Int, a::T) where T <: Integer
    return setcoeff!(c, n, a) # merely acts as generic fallback
 end
 
-@doc raw"""
-    zero(R::PolyRing)
-
-Return the zero polynomial in the given polynomial ring.
-"""
 zero(R::PolyRing) = R(zero(base_ring(R)))
 
 one(R::PolyRing) = R(one(base_ring(R)))
@@ -206,6 +197,8 @@ gen(R::PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 Return an array containing the generator of the given polynomial ring.
 """
 gens(R::PolyRing) = [gen(R)]
+
+number_of_generators(R::PolyRing) = 1
 
 iszero(a::PolynomialElem) = length(a) == 0
 
@@ -299,15 +292,7 @@ end
 Return `true` if the given polynomial is a monomial.
 """
 function is_monomial(a::PolynomialElem)
-   if !isone(leading_coefficient(a))
-      return false
-   end
-   for i = 1:length(a) - 1
-      if !iszero(coeff(a, i - 1))
-         return false
-      end
-   end
-   return true
+   return is_one(leading_coefficient(a)) && is_term(a)
 end
 
 is_monomial_recursive(a::T) where T <: RingElement = isone(a)

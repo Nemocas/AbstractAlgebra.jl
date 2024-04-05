@@ -12,8 +12,6 @@
 
 base_ring_type(::Type{NCPolyRing{T}}) where T <: NCRingElem = parent_type(T)
 
-base_ring(R::NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)
-
 coefficient_ring(R::NCPolyRing) = base_ring(R)
 
 function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S}}
@@ -85,7 +83,7 @@ dense_poly_ring_type(x) = parent_type(dense_poly_type(x))
 Return the internal name of the generator of the polynomial ring. Note that
 this is returned as a `Symbol` not a `String`.
 """
-var(a::NCPolyRing) = a.S
+var(a::NCPolyRing)
 
 @doc raw"""
     symbols(a::NCPolyRing)
@@ -93,7 +91,22 @@ var(a::NCPolyRing) = a.S
 Return an array of the variable names for the polynomial ring. Note that
 this is returned as an array of `Symbol` not `String`.
 """
-symbols(a::NCPolyRing) = [a.S]
+symbols(a::NCPolyRing) = [var(a)]
+
+@doc raw"""
+    number_of_variables(a::NCPolyRing)
+
+Return the number of variables of the polynomial ring, which is 1.
+"""
+number_of_variables(a::NCPolyRing) = 1
+
+characteristic(a::NCPolyRing) = characteristic(base_ring(a))
+
+function check_parent(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, throw::Bool = true) where T<:RingElement
+   c = parent(a) != parent(b)
+   c && throw && error("Incompatible polynomial rings in polynomial operation")
+   return !c
+end
 
 ###############################################################################
 #
@@ -110,9 +123,9 @@ function Base.hash(a::NCPolyRingElem, h::UInt)
    return b
 end
 
-zero(R::NCPolyRing) = R(0)
+zero(R::NCPolyRing) = R(zero(base_ring(R)))
 
-one(R::NCPolyRing) = R(1)
+one(R::NCPolyRing) = R(one(base_ring(R)))
 
 @doc raw"""
     gen(R::NCPolyRing)
@@ -121,7 +134,14 @@ Return the generator of the given polynomial ring.
 """
 gen(R::NCPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
-is_term(a::T) where T <: NCRingElem = true
+@doc raw"""
+    gens(R::NCPolyRing)
+
+Return an array containing the generator of the given polynomial ring.
+"""
+gens(R::NCPolyRing) = [gen(R)]
+
+number_of_generators(R::NCPolyRing) = 1
 
 ###############################################################################
 #
@@ -202,11 +222,11 @@ function *(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
    for i = 2:lenb
-      d[lena + i - 1] = a.coeffs[lena]*coeff(b, i - 1)
+      d[lena + i - 1] = coeff(a,lena-1)*coeff(b, i - 1)
    end
    for i = 1:lena - 1
       for j = 2:lenb
-         t = mul!(t, coeff(a, i - 1), b.coeffs[j])
+         t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
          d[i + j - 1] = addeq!(d[i + j - 1], t)
       end
    end
