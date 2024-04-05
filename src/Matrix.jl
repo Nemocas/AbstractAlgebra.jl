@@ -3314,7 +3314,7 @@ triangular, and an $n\times m$ matrix $b$ over the same ring, return an
 $n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
 will be raised.
 
-See also [`AbstractAlgebra.__solve_triu_left`](@ref)
+See also [`_solve_triu_left`](@ref).
 """
 function _solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    n = nrows(U)
@@ -3331,7 +3331,6 @@ function _solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
          s = R(0)
          for k = j + 1:n
             s = addmul!(s, U[j, k], tmp[k], t)
-#            s = s + U[j, k] * tmp[k]
          end
          s = b[j, i] - s
          tmp[j] = divexact(s, U[j,j])
@@ -3344,16 +3343,16 @@ function _solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    __solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
+    _solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix $U$ over a field which is upper
 triangular, and an $m\times n$ matrix $b$ over the same ring, return an
 $m\times n$ matrix $x$ such that $xU = b$. If this is not possible, an error
 will be raised.
 
-See also [`_solve_triu`](@ref) when $U$ is not square or not of full rank.
+See also [`_solve_triu`](@ref).
 """
-function __solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
+function _solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
    n = ncols(U)
    m = nrows(b)
    R = base_ring(U)
