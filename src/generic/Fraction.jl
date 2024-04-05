@@ -16,9 +16,7 @@ parent_type(::Type{FracFieldElem{T}}) where T <: RingElem = FracField{T}
 
 elem_type(::Type{FracField{T}}) where {T <: RingElem} = FracFieldElem{T}
 
-base_ring_type(::Type{FracField{T}}) where T <: RingElem = parent_type(T)
-
-base_ring(a::FracField{T}) where T <: RingElem = a.base_ring::parent_type(T)
+base_ring(a::FracField{T}) where T <: RingElem = a.base_ring::base_ring_type(typeof(a))
 
 ###############################################################################
 #
