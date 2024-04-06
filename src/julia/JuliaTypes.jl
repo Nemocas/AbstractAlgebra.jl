@@ -35,19 +35,13 @@ mutable struct GFField{T <: Integer} <: FinField
    p::T
 
    function GFField{T}(p::T; cached::Bool = true) where T <: Integer
-      if cached && haskey(GFFieldID, (T, p))
-         z = GFFieldID[T, p]::GFField{T}
-      else
-         z = new{T}(p)
-         if cached
-           GFFieldID[T, p] = z
-         end
-      end
-      return z
+      return get_cached!(GFFieldID, (T, p), cached) do
+         new{T}(p)
+      end::GFField{T}
    end
 end
 
-const GFFieldID = Dict{Tuple{DataType, Integer}, Field}()
+const GFFieldID = CacheDictType{Tuple{DataType, Integer}, Field}()
 
 struct GFElem{T <: Integer} <: FinFieldElem
    d::T
