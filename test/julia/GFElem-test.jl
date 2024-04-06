@@ -10,6 +10,8 @@ end
 end
 
 @testset "Julia.GFElem.constructors" begin
+   @test GF(2, cached = false) !== GF(2, cached = false)
+   @test GF(2) === GF(2)
    @test_throws DomainError GF(4)
    @test_throws DomainError GF(4, check=true)
    F = GF(4, check=false)

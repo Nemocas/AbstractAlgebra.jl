@@ -34,12 +34,14 @@ end
 mutable struct GFField{T <: Integer} <: FinField
    p::T
 
-   function GFField{T}(p::T) where T <: Integer
-      if haskey(GFFieldID, (T, p))
+   function GFField{T}(p::T; cached::Bool = true) where T <: Integer
+      if cached && haskey(GFFieldID, (T, p))
          z = GFFieldID[T, p]::GFField{T}
       else
          z = new{T}(p)
-         GFFieldID[T, p] = z
+         if cached
+           GFFieldID[T, p] = z
+         end
       end
       return z
    end

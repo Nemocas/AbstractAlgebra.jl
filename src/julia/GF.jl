@@ -465,7 +465,7 @@ By default, the integer $p$ is checked with a probabilistic algorithm for primal
 When `check == false`, no check is made, but the behaviour of the resulting object
 is undefined if $p$ is composite.
 """
-function GF(p::T; check::Bool=true) where T <: Integer
+function GF(p::T; cached::Bool = true, check::Bool=true) where T <: Integer
    check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic is not prime in GF(p)"))
-   return GFField{T}(p)
+   return GFField{T}(p; cached = cached)
 end
