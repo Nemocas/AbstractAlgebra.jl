@@ -20,5 +20,3 @@ function should_show_banner()
         Base.JLOptions().banner != 0
     return show_banner
 end
-
-export should_show_banner
