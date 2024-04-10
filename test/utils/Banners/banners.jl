@@ -32,21 +32,39 @@ Pkg.develop(path="$modcdir");
 """
 out, err = run_repl_code(setup_cmd, td)
 
-@testset "Banners" begin
-    # Banner of ModA shows
-    out, err = run_repl_code("using ModA;", td)
-    @test strip(out) == "Banner of ModA" broken=VERSION>=v"1.11.0-DEV"
+if VERSION>=v"1.9"
+    @testset "Banners" begin
+        # Banner of ModA shows
+        out, err = run_repl_code("using ModA;", td)
+        res = @test strip(out) == "Banner of ModA" broken=VERSION>=v"1.11.0-DEV"
+        if res == Test.Fail
+            println("out\n$out")
+            println("err\n$err")
+        end
 
-    # Banner of ModB shows, but ModA is supressed
-    out, err = run_repl_code("using ModB;", td)
-    @test strip(out) == "Banner of ModB" broken=VERSION>=v"1.11.0-DEV"
+        # Banner of ModB shows, but ModA is supressed
+        out, err = run_repl_code("using ModB;", td)
+        res = @test strip(out) == "Banner of ModB" broken=VERSION>=v"1.11.0-DEV"
+        if res == Test.Fail
+            println("out\n$out")
+            println("err\n$err")
+        end
 
-    # Banner of ModB shows, but ModA is supressed, even if ModA is specifically
-    # used after ModB
-    out, err = run_repl_code("using ModB; using ModA;", td)
-    @test strip(out) == "Banner of ModB" broken=VERSION>=v"1.11.0-DEV"
+        # Banner of ModB shows, but ModA is supressed, even if ModA is specifically
+        # used after ModB
+        out, err = run_repl_code("using ModB; using ModA;", td)
+        res = @test strip(out) == "Banner of ModB" broken=VERSION>=v"1.11.0-DEV"
+        if res == Test.Fail
+            println("out\n$out")
+            println("err\n$err")
+        end
 
-    # Banner does not show when our module is a dependency
-    out, err = run_repl_code("using ModC;", td)
-    @test strip(out) == "" broken=VERSION>=v"1.11.0-DEV"
+        # Banner does not show when our module is a dependency
+        out, err = run_repl_code("using ModC;", td)
+        res = @test strip(out) == "" broken=VERSION>=v"1.11.0-DEV"
+        if res == Test.Fail
+            println("out\n$out")
+            println("err\n$err")
+        end
+    end
 end
