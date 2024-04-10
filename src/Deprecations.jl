@@ -40,4 +40,5 @@ end
 #
 ###############################################################################
 
-#= currently none =#
+# deprecated during 0.40.*
+@deprecate force_coerce(a, b, throw_error::Type{Val{T}}) where {T} force_coerce(a, b, Val(T))

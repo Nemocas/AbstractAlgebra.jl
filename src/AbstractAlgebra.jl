@@ -106,8 +106,8 @@ include("PrintHelper.jl")
 #   parent(b) == a && return a
 #   return force_coerce(a, b)
 #
-function force_coerce(a, b, throw_error::Type{Val{T}} = Val{true}) where {T}
-  if throw_error === Val{true}
+function force_coerce(a, b, throw_error::Val{T} = Val(true)) where {T}
+  if throw_error isa Val{true}
     error("coercion not possible")
   end
   return nothing
