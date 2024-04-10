@@ -37,7 +37,7 @@ if VERSION>=v"1.9"
         # Banner of ModA shows
         out, err = run_repl_code("using ModA;", td)
         res = @test strip(out) == "Banner of ModA" broken=VERSION>=v"1.11.0-DEV"
-        if res == Test.Fail
+        if res isa Test.Fail
             println("out\n$out")
             println("err\n$err")
         end
@@ -45,7 +45,7 @@ if VERSION>=v"1.9"
         # Banner of ModB shows, but ModA is supressed
         out, err = run_repl_code("using ModB;", td)
         res = @test strip(out) == "Banner of ModB" broken=VERSION>=v"1.11.0-DEV"
-        if res == Test.Fail
+        if res isa Test.Fail
             println("out\n$out")
             println("err\n$err")
         end
@@ -54,7 +54,7 @@ if VERSION>=v"1.9"
         # used after ModB
         out, err = run_repl_code("using ModB; using ModA;", td)
         res = @test strip(out) == "Banner of ModB" broken=VERSION>=v"1.11.0-DEV"
-        if res == Test.Fail
+        if res isa Test.Fail
             println("out\n$out")
             println("err\n$err")
         end
@@ -62,7 +62,7 @@ if VERSION>=v"1.9"
         # Banner does not show when our module is a dependency
         out, err = run_repl_code("using ModC;", td)
         res = @test strip(out) == "" broken=VERSION>=v"1.11.0-DEV"
-        if res == Test.Fail
+        if res isa Test.Fail
             println("out\n$out")
             println("err\n$err")
         end
