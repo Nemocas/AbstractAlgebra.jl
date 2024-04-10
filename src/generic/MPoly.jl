@@ -37,21 +37,21 @@ number_of_variables(a::MPolyRing) = a.num_vars
 
 number_of_generators(a::MPolyRing) = a.num_vars
 
-function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:lex}}) where {T <: RingElement}
+function gen(a::MPolyRing{T}, i::Int, ::Val{:lex}) where {T <: RingElement}
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape([UInt(j == n - i + 1)
             for j = 1:n], n, 1))
 end
 
-function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:deglex}}) where {T <: RingElement}
+function gen(a::MPolyRing{T}, i::Int, ::Val{:deglex}) where {T <: RingElement}
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape([[UInt(j == n - i + 1)
             for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
-function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function gen(a::MPolyRing{T}, i::Int, ::Val{:degrevlex}) where {T <: RingElement}
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape([[UInt(j == i)
@@ -66,7 +66,7 @@ ring.
 """
 function gens(a::MPolyRing{T}) where {T <: RingElement}
    n = a.num_vars
-   return elem_type(a)[gen(a, i, Val{a.ord})::elem_type(a) for i in 1:n]
+   return elem_type(a)[gen(a, i, Val(internal_ordering(a))) for i in 1:n]
 end
 
 @doc raw"""
@@ -76,7 +76,7 @@ Return the $i$-th generator (variable) of the given polynomial
 ring.
 """
 function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
-   return gen(a, i, Val{a.ord})
+   return gen(a, i, Val(a.ord))
 end
 
 function vars(p::MPoly{T}) where {T <: RingElement}
