@@ -5273,7 +5273,7 @@ end
 Return the weak Popov form of $A$.
 """
 function weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _weak_popov(A, Val{false})
+   return _weak_popov(A, Val(false))
 end
 
 @doc raw"""
@@ -5283,14 +5283,14 @@ Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
 is a transformation matrix so that $P = UA$.
 """
 function weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _weak_popov(A, Val{true})
+   return _weak_popov(A, Val(true))
 end
 
-function _weak_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
+function _weak_popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
    P = deepcopy(A)
    m = nrows(P)
    W = similar(A, 0, 0)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A, m)
       weak_popov!(P, W, U, false, true)
       return P, U
