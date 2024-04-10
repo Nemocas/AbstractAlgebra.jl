@@ -6116,15 +6116,8 @@ number of rows is the same in $a$ and $b$.
 function hcat(a::MatElem, b::MatElem)
    nrows(a) != nrows(b) && error("Incompatible number of nrows in hcat")
    c = similar(a, nrows(a), ncols(a) + ncols(b))
-   n = ncols(a)
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         c[i, j] = a[i, j]
-      end
-      for j = 1:ncols(b)
-         c[i, n + j] = b[i, j]
-      end
-   end
+   c[:, 1:ncols(a)] = a
+   c[:, ncols(a) + 1:ncols(c)] = b
    return c
 end
 
@@ -6137,17 +6130,8 @@ number of columns is the same in $a$ and $b$.
 function vcat(a::MatElem, b::MatElem)
    ncols(a) != ncols(b) && error("Incompatible number of columns in vcat")
    c = similar(a, nrows(a) + nrows(b), ncols(a))
-   n = nrows(a)
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         c[i, j] = a[i, j]
-      end
-   end
-   for i = 1:nrows(b)
-      for j = 1:ncols(a)
-         c[n + i, j] = b[i, j]
-      end
-   end
+   c[1:nrows(a), :] = a
+   c[nrows(a) + 1:nrows(c), :] = b
    return c
 end
 
@@ -6258,14 +6242,10 @@ function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem{T}...) where T <: NC
     s = 0
     for i in 1:rows[j]
       N = A[mat_offset + i]
-      for l in 1:ncols(N)
-        for k in 1:nrows(N)
-          M[row_offset + k, s + l] = N[k, l]
-        end
-      end
+      M[row_offset + 1:row_offset + nrows(N), s + 1:s + ncols(N)] = N
       s += ncols(N)
     end
-    row_offset += nrows(A[1+ mat_offset])
+    row_offset += nrows(A[1 + mat_offset])
     mat_offset += rows[j]
   end
 
