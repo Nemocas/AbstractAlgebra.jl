@@ -178,7 +178,7 @@ function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
    return exponent(a, i, j, Val(internal_ordering(parent(a))))
 end
 
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:lex}}) where T <: RingElement
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Val{:lex}) where T <: RingElement
    fit!(a, i)
    A = a.exps
    A[:, i] = exps[end:-1:1]
@@ -188,7 +188,7 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val
    return a
 end
 
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:deglex}}) where T <: RingElement
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Val{:deglex}) where T <: RingElement
    fit!(a, i)
    A = a.exps
    A[1:end - 1, i] = exps[end:-1:1]
@@ -199,7 +199,7 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val
    return a
 end
 
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:degrevlex}}) where T <: RingElement
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Val{:degrevlex}) where T <: RingElement
    fit!(a, i)
    A = a.exps
    A[1:end - 1, i] = exps
@@ -218,7 +218,7 @@ correspond to the exponents of the variables in the order supplied when
 the ring was created. The modified polynomial is returned.
 """
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
-   return set_exponent_vector!(a, i, exps, Val{parent(a).ord})
+   return set_exponent_vector!(a, i, exps, Val(internal_ordering(parent(a))))
 end
 
 @doc raw"""
