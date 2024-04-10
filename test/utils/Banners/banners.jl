@@ -32,6 +32,7 @@ if VERSION>=v"1.9"
          Pkg.develop(path=raw"$modadir");
          Pkg.develop(path=raw"$modbdir");
          Pkg.develop(path=raw"$modcdir");
+         Pkg.precompile();
       """
       out,err,exitcode = run_repl_code(code, td)
       res = @test exitcode == 0
