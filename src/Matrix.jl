@@ -5545,7 +5545,7 @@ end
 Return the Popov form of $A$.
 """
 function popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _popov(A, Val{false})
+   return _popov(A, Val(false))
 end
 
 @doc raw"""
@@ -5555,13 +5555,13 @@ Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
 is a transformation matrix so that $P = UA$.
 """
 function popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _popov(A, Val{true})
+   return _popov(A, Val(true))
 end
 
-function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
+function _popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
    P = deepcopy(A)
    m = nrows(P)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A, m)
       popov!(P, U, true)
       return P, U
