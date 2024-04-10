@@ -5309,7 +5309,7 @@ on $A$ and a vector $W$ by applying the same transformations on the vector $V$.
 Return the tuple $(P, W)$.
 """
 function extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
-   return _extended_weak_popov(A, V, Val{false})
+   return _extended_weak_popov(A, V, Val(false))
 end
 
 @doc raw"""
@@ -5321,15 +5321,15 @@ and a transformation matrix $U$ so that $P = UA$.
 Return the tuple $(P, W, U)$.
 """
 function extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
-   return _extended_weak_popov(A, V, Val{true})
+   return _extended_weak_popov(A, V, Val(true))
 end
 
-function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
+function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
    @assert nrows(V) == nrows(A) && ncols(V) == 1
    P = deepcopy(A)
    W = deepcopy(V)
    m = nrows(P)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A)
       weak_popov!(P, W, U, true, true)
       return P, W, U

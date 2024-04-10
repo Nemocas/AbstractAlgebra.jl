@@ -47,3 +47,4 @@ end
 @deprecate _hnf_kb(A, trafo::Type{Val{T}} = Val{false}) where T _hnf_kb(A, Val(T))
 @deprecate _snf_kb(A::MatrixElem{T}, trafo::Type{Val{V}} = Val{false}) where {V, T <: RingElement} _snf_kb(A, Val(V))
 @deprecate _weak_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S} _weak_popov(A, Val(S))
+@deprecate _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S} _extended_weak_popov(A, V, Val(S))
