@@ -3670,7 +3670,7 @@ function main_variable_coefficient_lex(a::MPoly{T}, k0::Int, n::Int) where {T <:
    return parent(a)(Ac, Ae)
 end
 
-function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:lex}}) where {T <: RingElement}
+function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Val{:lex}) where {T <: RingElement}
    return main_variable_coefficient_lex(a, k, n)
 end
 
@@ -3707,11 +3707,11 @@ function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T
    return parent(a)(Ac, Ae)
 end
 
-function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:deglex}}) where {T <: RingElement}
+function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Val{:deglex}) where {T <: RingElement}
    return main_variable_coefficient_deglex(a, k, n)
 end
 
-function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Val{:degrevlex}) where {T <: RingElement}
    return main_variable_coefficient_deglex(a, k, n)
 end
 
@@ -3737,10 +3737,10 @@ function main_variable_extract(R::SparsePolyRing, a::MPoly{T}, k::Int) where {T 
    A = main_variable_terms(a2, k)
    Pe = zeros(UInt, length(A))
    Pc = Vector{MPoly{T}}(undef, length(A))
-   ord = parent(a).ord
+   ord = internal_ordering(parent(a))
    for i = 1:length(A)
       Pe[i] = a2.exps[k, A[i]]
-      Pc[i] = main_variable_coefficient(a2, k, A[i], Val{ord})
+      Pc[i] = main_variable_coefficient(a2, k, A[i], Val(ord))
    end
    return R(Pc, Pe)
 end
