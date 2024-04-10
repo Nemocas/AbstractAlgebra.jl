@@ -2637,6 +2637,29 @@ end
 
       @test M*x == b
    end
+
+   for dim = 0:10
+      S = matrix_space(R, dim, dim)
+      U = matrix_space(R, dim, rand(1:5))
+
+      M = randmat_triu(S, 3, -10:10)
+      b = rand(U, 3, -10:10)
+      c = M*b
+
+      x = AbstractAlgebra._solve_triu(M, c)
+
+      @test M*x == c
+
+      V = matrix_space(R, rand(1:5), dim)
+
+      M = randmat_triu(S, 3, -10:10)
+      b = rand(V, 3, -10:10)
+      c = b*M
+
+      x = AbstractAlgebra._solve_triu_left(c, M)
+
+      @test x*M == c
+   end
 end
 
 @testset "Generic.Mat.rref" begin
@@ -2910,16 +2933,16 @@ end
    for i = 0:5
       M = randmat_with_rank(R, i, -20:20)
 
-      n, N = AbstractAlgebra._kernel(M)
+      N = AbstractAlgebra.kernel(M, side = :right)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test ncols(N) == 5 - i
+      @test rank(N) == ncols(N)
       @test iszero(M*N)
 
-      n, N = AbstractAlgebra._left_kernel(M)
+      N = AbstractAlgebra.kernel(M)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test nrows(N) == 5 - i
+      @test rank(N) == nrows(N)
       @test iszero(N*M)
    end
 
@@ -2931,16 +2954,16 @@ end
    for i = 0:5
       M = randmat_with_rank(S, i, -100:100)
 
-      n, N = AbstractAlgebra._kernel(M)
+      N = AbstractAlgebra.kernel(M, side = :right)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test ncols(N) == 5 - i
+      @test rank(N) == ncols(N)
       @test iszero(M*N)
 
-      n, N = AbstractAlgebra._left_kernel(M)
+      N = AbstractAlgebra.kernel(M)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test nrows(N) == 5 - i
+      @test rank(N) == nrows(N)
       @test iszero(N*M)
    end
 
@@ -2950,16 +2973,16 @@ end
    for i = 0:5
       M = randmat_with_rank(T, i, -1:2, -20:20)
 
-      n, N = AbstractAlgebra._kernel(M)
+      N = AbstractAlgebra.kernel(M, side = :right)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test ncols(N) == 5 - i
+      @test rank(N) == ncols(N)
       @test iszero(M*N)
 
-      n, N = AbstractAlgebra._left_kernel(M)
+      N = AbstractAlgebra.kernel(M)
 
-      @test n == 5 - i
-      @test rank(N) == n
+      @test nrows(N) == 5 - i
+      @test rank(N) == nrows(N)
       @test iszero(N*M)
    end
 end
@@ -3000,9 +3023,9 @@ end
             @test M*Sol == B
             @test iszero(M*K)
 
-            rk, N = AbstractAlgebra._kernel(M)
+            N = AbstractAlgebra.kernel(M, side = :right)
             @test nrows(N) == nrows(K)
-            @test rk == ncols(K)
+            @test ncols(N) == ncols(K)
          end
 
          # left kernel, random with solution
@@ -4283,4 +4306,87 @@ end
   L = @inferred N * M
   @test base_ring(L) === QQ
   @test L == N * change_base_ring(QQ, M)
+end
+
+@testset "Generic.Mat.InjProjMat" begin
+   # Construction
+   @test matrix(Generic.inj_proj_mat(QQ, 3, 2, 1)) == QQ[1 0; 0 1; 0 0]
+   @test matrix(Generic.inj_proj_mat(QQ, 2, 3, 1)) == QQ[1 0 0; 0 1 0]
+   @test matrix(Generic.inj_proj_mat(QQ, 3, 2, 2)) == QQ[0 0; 1 0; 0 1]
+   @test matrix(Generic.inj_proj_mat(QQ, 2, 3, 2)) == QQ[0 1 0; 0 0 1]
+
+   @test_throws AssertionError Generic.inj_proj_mat(QQ, 3, 2, 0)
+   @test_throws AssertionError Generic.inj_proj_mat(QQ, 3, 2, 3)
+   @test_throws AssertionError Generic.inj_proj_mat(QQ, 2, 3, 3)
+
+   # Getters
+   M = Generic.inj_proj_mat(QQ, 4, 2, 2)
+   Mt = Generic.inj_proj_mat(QQ, 2, 4, 2)
+   @test nrows(M) == 4
+   @test ncols(M) == 2
+   R = @inferred base_ring(M)
+   @test R === QQ
+
+   # getindex
+   N = QQ[0 0; 1 0; 0 1; 0 0]
+   Nt = transpose(N)
+   @test matrix(Mt) == Nt
+   for i in 1:4
+      for j in 1:2
+         x = @inferred M[i, j]
+         @test x == N[i, j]
+      end
+   end
+
+   # Multiplication
+   @test_throws AssertionError M*identity_matrix(QQ, 1)
+   @test_throws AssertionError identity_matrix(QQ, 1)*M
+   for iter in 1:10
+      d = rand(1:10)
+      X = matrix(QQ, 2, d, [ rand(QQ, -10:10) for _ in 1:2*d ])
+      @test M*X == N*X
+      @test transpose(X)*Mt == transpose(X)*Nt
+
+      X = matrix(QQ, d, 4, [ rand(QQ, -10:10) for _ in 1:4*d ])
+      @test X*M == X*N
+      @test Mt*transpose(X) == Nt*transpose(X)
+
+      d = rand(2:10)
+      s = rand(1:d - 1)
+      X = Generic.inj_proj_mat(QQ, 2, d, s)
+      @test M*X == N*matrix(X)
+   end
+
+   # Catch all cases
+   for iter in 1:10
+      M1 = Generic.inj_proj_mat(QQ, 5, 3, rand(1:3))
+      M2 = Generic.inj_proj_mat(QQ, 3, 2, rand(1:2))
+      @test M1*M2 == matrix(M1)*matrix(M2)
+
+      M1 = Generic.inj_proj_mat(QQ, 5, 3, rand(1:3))
+      M2 = Generic.inj_proj_mat(QQ, 3, 4, rand(1:2))
+      @test M1*M2 == matrix(M1)*matrix(M2)
+
+      M1 = Generic.inj_proj_mat(QQ, 3, 5, rand(1:3))
+      M2 = Generic.inj_proj_mat(QQ, 5, 2, rand(1:4))
+      @test M1*M2 == matrix(M1)*matrix(M2)
+
+      M1 = Generic.inj_proj_mat(QQ, 3, 5, rand(1:3))
+      M2 = Generic.inj_proj_mat(QQ, 5, 7, rand(1:3))
+      @test M1*M2 == matrix(M1)*matrix(M2)
+   end
+
+   # Addition
+   @test_throws AssertionError M + zero_matrix(QQ, 4, 1)
+   @test_throws AssertionError zero_matrix(QQ, 4, 1) + M
+   for iter in 1:10
+      X = matrix(QQ, 4, 2, [ rand(QQ, -10:10) for _ in 1:4*2 ])
+      @test M + X == N + X
+      @test Mt + transpose(X) == Nt + transpose(X)
+      @test X + M == X + N
+
+      s = rand(1:3)
+      X = Generic.inj_proj_mat(QQ, 4, 2, s)
+      @test M + X == N + matrix(X)
+   end
 end

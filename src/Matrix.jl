@@ -3314,7 +3314,7 @@ triangular, and an $n\times m$ matrix $b$ over the same ring, return an
 $n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
 will be raised.
 
-See also [`AbstractAlgebra.__solve_triu_left`](@ref)
+See also [`_solve_triu_left`](@ref).
 """
 function _solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    n = nrows(U)
@@ -3330,8 +3330,7 @@ function _solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
       for j = n:-1:1
          s = R(0)
          for k = j + 1:n
-#            s = addmul!(s, U[j, k], tmp[k], t)
-            s = s + U[j, k] * tmp[k]
+            s = addmul!(s, U[j, k], tmp[k], t)
          end
          s = b[j, i] - s
          tmp[j] = divexact(s, U[j,j])
@@ -3344,16 +3343,16 @@ function _solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    __solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
+    _solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix $U$ over a field which is upper
 triangular, and an $m\times n$ matrix $b$ over the same ring, return an
 $m\times n$ matrix $x$ such that $xU = b$. If this is not possible, an error
 will be raised.
 
-See also [`_solve_triu`](@ref) when $U$ is not square or not of full rank.
+See also [`_solve_triu`](@ref).
 """
-function __solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
+function _solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
    n = ncols(U)
    m = nrows(b)
    R = base_ring(U)
@@ -3687,76 +3686,6 @@ function nullspace(M::MatElem{T}) where {T <: FieldElement}
    return nullity, X
 end
 
-###############################################################################
-#
-#   Kernel
-#
-###############################################################################
-
-@doc raw"""
-    _left_kernel(A::MatElem{T}) where T <: RingElement
-
-Return a tuple $(n, M)$ where $M$ is a matrix whose rows generate the kernel
-of $A$ and $n$ is the rank of the kernel. The transpose of the output of this
-function is guaranteed to be in flipped upper triangular format (i.e. upper
-triangular format if columns and rows are reversed).
-"""
-function _left_kernel(A::MatElem{T}) where T <: RingElement
-   !is_domain_type(elem_type(base_ring(A))) && error("Not implemented")
-   R = base_ring(A)
-   H, U = hnf_with_transform(A)
-   i = nrows(H)
-   zero_rows = false
-   while i > 0 && is_zero_row(H, i)
-      zero_rows = true
-      i -= 1
-   end
-   if zero_rows
-      return nrows(U) - i, U[i + 1:nrows(U), 1:ncols(U)]
-   else
-      return 0, zero_matrix(R, 0, ncols(U))
-   end
-end
-
-function _left_kernel(A::MatElem{T}) where T <: FieldElement
-  n, M = nullspace(transpose(A))
-  return n, transpose(M)
-end
-
-@doc raw"""
-    _right_kernel(A::MatElem{T}) where T <: RingElement
-
-Return a tuple $(n, M)$ where $M$ is a matrix whose columns generate the
-kernel of $A$ and $n$ is the rank of the kernel.
-"""
-function _right_kernel(A::MatElem{T}) where T <: RingElement
-   n, M = _left_kernel(transpose(A))
-   return n, transpose(M)
-end
-
-function _right_kernel(A::MatElem{T}) where T <: FieldElement
-   return nullspace(A)
-end
-
-@doc raw"""
-    _kernel(A::MatElem{T}; side::Symbol = :right) where T <: RingElement
-
-Return a tuple $(n, M)$, where $n$ is the rank of the kernel of $A$ and $M$ is a
-basis for it. If side is `:right` or not specified, the right kernel is
-computed, i.e. the matrix of columns whose span gives the right kernel
-space. If side is `:left`, the left kernel is computed, i.e. the matrix
-of rows whose span is the left kernel space.
-"""
-function _kernel(A::MatElem{T}; side::Symbol = :right) where T <: RingElement
-   if side == :right
-      return _right_kernel(A)
-   elseif side == :left
-      return _left_kernel(A)
-   else
-      error("Unsupported argument: :$side for side: must be :left or :right")
-   end
-end
- 
 ###############################################################################
 #
 #   Hessenberg form

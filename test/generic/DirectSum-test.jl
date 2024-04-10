@@ -56,6 +56,7 @@ end
 
          for i = 1:num
             @test g[i](f[i](m[i])) == m[i]
+            @test canonical_projection(D, i)(canonical_injection(D, i)(m[i])) == m[i]
          end
       end
    end

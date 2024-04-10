@@ -245,3 +245,125 @@ Base.setindex!(V::MatSpaceVecView{T}, z::T, i::Int) where {T} = (V.entries[i] = 
 Base.setindex!(V::MatSpaceVecView, z::RingElement, i::Int) = setindex!(V.entries, V.base_ring(z), i)
 
 Base.size(V::MatSpaceVecView) = (length(V.entries), )
+
+###############################################################################
+#
+#   InjProjMat
+#
+###############################################################################
+
+function inj_proj_mat(R::NCRing, r::Int, c::Int, s::Int)
+   @assert r >= 0 && c >= 0 && s > 0
+   # Check whether there is space for a full identity matrix
+   if r <= c
+      @assert s + r - 1 <= c
+   else
+      @assert s + c - 1 <= r
+   end
+   return InjProjMat{elem_type(R)}(R, r, c, s)
+end
+
+AbstractAlgebra.nrows(K::InjProjMat) = K.n
+AbstractAlgebra.ncols(K::InjProjMat) = K.m
+AbstractAlgebra.base_ring(K::InjProjMat{T}) where T = K.R::parent_type(T)
+
+function AbstractAlgebra.matrix(K::InjProjMat)
+  R = base_ring(K)
+  if nrows(K) >= ncols(K)
+    return [zero_matrix(R, K.s-1, ncols(K)) ; identity_matrix(R, ncols(K)) ; zero_matrix(R, nrows(K) - K.s - ncols(K) + 1, ncols(K))]
+  else
+    return [zero_matrix(R, nrows(K), K.s-1) identity_matrix(R, nrows(K)) zero_matrix(R, nrows(K), ncols(K)-K.s-nrows(K) + 1)]
+  end
+end
+
+function Base.getindex(K::InjProjMat{T}, i::Int, j::Int) where T
+  (1 <= i <= nrows(K) && 1 <= j <= ncols(K)) || error(BoundsError(K, (i, j)))
+  nrows(K) >= ncols(K) && i - K.s + 1 == j && return one(base_ring(K))::T
+  nrows(K) <= ncols(K) && i == j - K.s + 1 && return one(base_ring(K))::T
+  return zero(base_ring(K))::T
+end
+
+function *(b::InjProjMat{T}, c::MatElem{T}) where {T <: NCRingElement}
+  @assert ncols(b) == nrows(c)
+  R = base_ring(b)
+  @assert base_ring(c) === R
+  if nrows(b) >= ncols(b)
+    z = zero_matrix(R, nrows(b), ncols(c))
+    z[b.s:b.s+nrows(c)-1, :] = c
+    return z
+  else
+    return c[b.s:b.s+nrows(b)-1, :]
+  end
+end
+
+function *(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
+  @assert ncols(b) == nrows(c)
+  R = base_ring(b)
+  @assert base_ring(c) === R
+  if nrows(c) >= ncols(c)
+    #c = [0 I 0]^t
+    return b[:, c.s:c.s+ncols(c)-1]
+  else
+    z = zero_matrix(R, nrows(b), ncols(c))
+    z[:, c.s:c.s+nrows(c)-1] = b
+    return z
+  end
+end
+
+function *(a::InjProjMat, b::InjProjMat)
+   @assert base_ring(a) === base_ring(b)
+   R = base_ring(a)
+   @assert ncols(a) == nrows(b)
+   m = nrows(a)
+   n = ncols(a)
+   k = ncols(b)
+   s = a.s
+   t = b.s
+
+   # Easy cases
+   if m >= n
+      return reduce(vcat, [zero_matrix(R, s - 1, k), matrix(b), zero_matrix(R, m - n - s + 1, k)])
+   end
+   if m < n && n < k
+      return reduce(hcat, [zero_matrix(R, m, t - 1), matrix(a), zero_matrix(R, m, k - n - t + 1)])
+   end
+
+   # Annoying case: m < n && n >= k
+   c = zero_matrix(R, m, k)
+   if s <= t
+      offset = t - s
+      for i in 1:min(m - offset, k)
+         c[i + offset, i] = one(R)
+      end
+   else
+      offset = s - t
+      for i in 1:min(m, k - offset)
+         c[i, i + offset] = one(R)
+      end
+   end
+   return c
+end
+
+function +(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
+  @assert size(b) == size(c)
+  R = base_ring(b)
+  @assert base_ring(c) === R
+  a = deepcopy(b)
+  if nrows(c) >= ncols(c)
+    for i in 1:ncols(c)
+      add_one!(a, c.s+i-1, i)
+    end
+  else
+    for i in 1:nrows(c)
+      add_one!(a, i, c.s+i-1)
+    end
+  end
+  return a
+end
++(c::InjProjMat{T}, b::MatElem{T}) where {T <: NCRingElement} = b+c
++(c::InjProjMat{T}, b::InjProjMat{T}) where {T <: NCRingElement} = matrix(b) + c
+
+function add_one!(a::MatElem, i::Int, j::Int)
+  a[i, j] += 1
+  return a
+end

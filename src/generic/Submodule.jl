@@ -16,7 +16,7 @@ elem_type(::Type{Submodule{T}}) where T <: RingElement = SubmoduleElem{T}
 
 parent(v::SubmoduleElem) = v.parent
 
-base_ring(N::Submodule{T}) where T <: RingElement = N.base_ring
+base_ring(N::Submodule{T}) where T <: RingElement = N.base_ring::parent_type(T)
 
 base_ring(v::SubmoduleElem{T}) where T <: RingElement = base_ring(v.parent)
 
@@ -188,7 +188,8 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
       end
    end
    # Rewrite old relations in terms of generators of new submodule
-   num_rels, K = _left_kernel(new_mat)
+   K = kernel(new_mat)
+   num_rels = nrows(K)
    new_rels = zero_matrix(base_ring(m), num_rels, num)
    # we flip rows and columns so that input is in terms of original data and
    # in upper triangular form, to save time in reduced_form below

@@ -1319,6 +1319,29 @@ struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FP
    end
 end
 
+@doc raw"""
+    InjProjMat{T<:RingElement}
+
+An `n` x `m` matrix over a ring `R`, all zero but:
+If `n > m`: `s` is a row starting from which an identity matrix is inserted.
+If `n < m`: `s` is a column starting from which an identity matrix is inserted.
+So this is a typical matrix to represent an projection from
+a direct sum into a summand or an injection into the sum.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> Generic.inj_proj_mat(ZZ, 2, 5, 3)
+[0   0   1   0   0]
+[0   0   0   1   0]
+```
+"""
+struct InjProjMat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
+   R
+   n::Int #Rows
+   m::Int #Cols
+   s::Int
+end
+
 ###############################################################################
 #
 #   ModuleHomomorphism
