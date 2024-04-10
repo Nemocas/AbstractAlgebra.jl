@@ -5039,18 +5039,18 @@ function is_snf(A::MatrixElem{T}) where T <: RingElement
 end
 
 function snf_kb(A::MatrixElem{T}) where {T <: RingElement}
-   return _snf_kb(A, Val{false})
+   return _snf_kb(A, Val(false))
 end
 
 function snf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   return _snf_kb(A, Val{true})
+   return _snf_kb(A, Val(true))
 end
 
-function _snf_kb(A::MatrixElem{T}, trafo::Type{Val{V}} = Val{false}) where {V, T <: RingElement}
+function _snf_kb(A::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
    S = deepcopy(A)
    m = nrows(S)
    n = ncols(S)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A, m)
       K = identity_matrix(A, n)
       snf_kb!(S, U, K, true)
