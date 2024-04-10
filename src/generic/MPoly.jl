@@ -596,7 +596,7 @@ function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
    return b
 end
 
-function is_gen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
+function is_gen(x::MPoly{T}, ::Val{:lex}) where {T <: RingElement}
    exps = x.exps
    N = size(exps, 1)
    for k = 1:N
@@ -616,12 +616,12 @@ function is_gen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
    return false
 end
 
-function is_gen(x::MPoly{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
+function is_gen(x::MPoly{T}, ::Val{:deglex}) where {T <: RingElement}
    N = size(x.exps, 1)
    return x.exps[N, 1] == UInt(1)
 end
 
-function is_gen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function is_gen(x::MPoly{T}, ::Val{:degrevlex}) where {T <: RingElement}
     N = size(x.exps, 1)
     return x.exps[N, 1] == UInt(1)
 end
@@ -639,7 +639,7 @@ function is_gen(x::MPoly{T}) where {T <: RingElement}
    if !isone(coeff(x, 1))
       return false
    end
-   return is_gen(x, Val{parent(x).ord})
+   return is_gen(x, Val(internal_ordering(parent(x))))
 end
 
 @doc raw"""
