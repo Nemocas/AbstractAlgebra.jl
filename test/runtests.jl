@@ -25,8 +25,8 @@ if false VERSION >= v"1.8.0"
 =#
 end
 
+include("utils/Banners/banners.jl")
+
 include("Aqua.jl")
 include("rand.jl")
 include("AbstractAlgebra-test.jl")
-
-include("utils/Banners/banners.jl")
