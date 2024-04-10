@@ -760,7 +760,7 @@ function max_fields(f::MPoly{T}) where {T <: RingElement}
    return biggest, b
 end
 
-function degree(f::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
+function degree(f::MPoly{T}, i::Int, ::Val{:lex}) where T <: RingElement
    A = f.exps
    N = size(A, 1)
    if i == 1
@@ -777,7 +777,7 @@ function degree(f::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
    end
 end
 
-function degree(f::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
+function degree(f::MPoly{T}, i::Int, ::Val{:deglex}) where T <: RingElement
    A = f.exps
    N = size(A, 1)
    biggest = -1
@@ -790,7 +790,7 @@ function degree(f::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElemen
    return biggest
 end
 
-function degree(f::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+function degree(f::MPoly{T}, i::Int, ::Val{:degrevlex}) where T <: RingElement
    A = f.exps
    N = size(A, 1)
    biggest = -1
@@ -804,7 +804,7 @@ function degree(f::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingEle
 end
 
 function degree(f::MPoly{T}, i::Int) where T <: RingElement
-   return degree(f, i, Val{parent(f).ord})
+   return degree(f, i, Val(internal_ordering(parent(f))))
 end
 
 @doc raw"""

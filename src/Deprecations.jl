@@ -55,3 +55,4 @@ import .Generic: exponent_vector; @deprecate exponent_vector(a::Generic.MPoly{T}
 import .Generic: exponent; @deprecate exponent(a::Generic.MPoly{T}, i::Int, j::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} exponent(a, i, j, Val(ord))
 import .Generic: set_exponent_vector!; @deprecate set_exponent_vector!(a::Generic.MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{ord}}) where {T <: RingElement, ord} set_exponent_vector!(a, i, exps, Val(ord))
 import .Generic: is_gen; @deprecate is_gen(x::Generic.MPoly{T}, ::Type{Val{ord}}) where {T <: RingElement, ord} is_gen(x, Val(ord))
+import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} degree(f, i, Val(ord))
