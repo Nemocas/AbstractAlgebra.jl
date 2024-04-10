@@ -4725,7 +4725,7 @@ Compute the upper right row Hermite normal form of $A$ using a modification
 of the algorithm of Kannan-Bachem.
 """
 function hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
-   return _hnf_kb(A, Val{false})
+   return _hnf_kb(A, Val(false))
 end
 
 @doc raw"""
@@ -4736,13 +4736,13 @@ matrix $U$ with $UA = H$ using a modification of the algorithm of
 Kannan-Bachem.
 """
 function hnf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   return _hnf_kb(A, Val{true})
+   return _hnf_kb(A, Val(true))
 end
 
-function _hnf_kb(A, trafo::Type{Val{T}} = Val{false}) where T
+function _hnf_kb(A, ::Val{with_transform} = Val(false)) where {with_transform}
    H = deepcopy(A)
    m = nrows(H)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A, m)
       hnf_kb!(H, U, true)
       return H, U
