@@ -28,10 +28,10 @@ if VERSION>=v"1.9"
       td = mktempdir()
       code = """
          using Pkg;
-         Pkg.develop(path="$aadir");
-         Pkg.develop(path="$modadir");
-         Pkg.develop(path="$modbdir");
-         Pkg.develop(path="$modcdir");
+         Pkg.develop(path=raw"$aadir");
+         Pkg.develop(path=raw"$modadir");
+         Pkg.develop(path=raw"$modbdir");
+         Pkg.develop(path=raw"$modcdir");
       """
       out,err,exitcode = run_repl_code(code, td)
       res = @test exitcode == 0
@@ -42,7 +42,7 @@ if VERSION>=v"1.9"
 
       # Banner of ModA shows
       out, err = run_repl_code("using ModA;", td)
-      res = @test strip(out) == "Banner of ModA" broken=VERSION>=v"1.11.0-DEV"
+      res = @test strip(out) == "Banner of ModA"
       if res isa Test.Fail
          println("out\n$out")
          println("err\n$err")
