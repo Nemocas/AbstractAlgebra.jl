@@ -5686,17 +5686,17 @@ function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T
 end
 
 function hnf_via_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _hnf_via_popov(A, Val{false})
+   return _hnf_via_popov(A, Val(false))
 end
 
 function hnf_via_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _hnf_via_popov(A, Val{true})
+   return _hnf_via_popov(A, Val(true))
 end
 
-function _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
+function _hnf_via_popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
    H = deepcopy(A)
    m = nrows(H)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A, m)
       hnf_via_popov!(H, U, true)
       return H, U
