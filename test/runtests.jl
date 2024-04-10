@@ -28,3 +28,5 @@ end
 include("Aqua.jl")
 include("rand.jl")
 include("AbstractAlgebra-test.jl")
+
+include("utils/Banners/banners.jl")
