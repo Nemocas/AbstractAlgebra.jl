@@ -6178,14 +6178,10 @@ function _vcat(A)
   end
 
   M = similar(A[1], sum(nrows, A), ncols(A[1]))
-  s = 0
-  for N in A
-    for j in 1:nrows(N)
-      for k in 1:ncols(N)
-        M[s+j, k] = N[j,k]
-      end
-    end
-    s += nrows(N)
+  i = 1
+  for j in 1:length(A)
+    M[i:i + nrows(A[j]) - 1, :] = A[j]
+    i += nrows(A[j])
   end
   return M
 end
@@ -6217,14 +6213,10 @@ function _hcat(A)
   end
 
   M = similar(A[1], nrows(A[1]), sum(ncols, A))
-  s = 0
-  for N in A
-    for j in 1:ncols(N)
-      for k in 1:nrows(N)
-        M[k, s + j] = N[k, j]
-      end
-    end
-    s += ncols(N)
+  i = 1
+  for j in 1:length(A)
+    M[:, i:i + ncols(A[j]) - 1] = A[j]
+    i += ncols(A[j])
   end
   return M
 end
