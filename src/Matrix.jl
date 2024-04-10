@@ -4462,7 +4462,7 @@ Kannan-Bachem. The input must have full column rank.
 """
 function hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
    H = deepcopy(A)
-   _hnf_minors!(H, similar(A, 0, 0), Val{false})
+   _hnf_minors!(H, similar(A, 0, 0), Val(false))
    return H
 end
 
@@ -4476,11 +4476,11 @@ have full column rank.
 function hnf_minors_with_transform(A::MatrixElem{T}) where {T <: RingElement}
    H = deepcopy(A)
    U = similar(A, nrows(A), nrows(A))
-   _hnf_minors!(H, U, Val{true})
+   _hnf_minors!(H, U, Val(true))
    return H, U
 end
 
-function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{Val{S}} = Val{false}) where {T <: RingElement, S}
+function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
    m = nrows(H)
    n = ncols(H)
 
@@ -4489,9 +4489,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
 
    R = base_ring(H)
 
-   with_trafo = with_transform == Val{true} ? true : false
-
-   if with_trafo
+   if with_transform
       for i in 1:m
          for j in 1:m
             if j == i
@@ -4546,7 +4544,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
                t = mul!(t, q, H[j, j2])
                H[k, j2] = add!(H[k, j2], H[k, j2], t)
             end
-            if with_trafo
+            if with_transform
                for j2 in 1:m
                   t = mul!(t, q, U[j, j2])
                   U[k, j2] = add!(U[k, j2], U[k, j2], t)
@@ -4572,7 +4570,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
             H[k, j2] = reduce!(H[k, j2])
             H[j, j2] = reduce!(H[j, j2])
          end
-         if with_trafo
+         if with_transform
             for j2 in 1:m
                b = mul_red!(b, u, U[j, j2], false)
                t2 = mul_red!(t2, v, U[k, j2], false)
@@ -4588,7 +4586,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
 
       if is_zero_entry(H, k, k)
          swap_rows!(H, k, l)
-         if with_trafo
+         if with_transform
             swap_rows!(U, k, l)
          end
          l = l - 1
@@ -4602,7 +4600,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
          for j in k:n
             H[k, j] = mul!(H[k, j], H[k, j], u)
          end
-         if with_trafo
+         if with_transform
             for j in 1:m
                U[k, j] = mul!(U[k, j], U[k, j], u)
             end
@@ -4620,7 +4618,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
                t = mul!(t, q, H[j, j2])
                H[i, j2] = add!(H[i, j2], H[i, j2], t)
             end
-            if with_trafo
+            if with_transform
                for j2 in 1:m
                   t = mul!(t, q, U[j, j2])
                   U[i, j2] = add!(U[i, j2], U[i, j2], t)
@@ -4658,7 +4656,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
                t = mul!(t, q, H[j, j2])
                H[k, j2] = add!(H[k, j2], H[k, j2], t)
             end
-            if with_trafo
+            if with_transform
                for j2 in 1:m
                   t = mul!(t, q, U[j, j2])
                   U[k, j2] = add!(U[k, j2], U[k, j2], t)
@@ -4681,7 +4679,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
             H[k, j2] = reduce!(H[k, j2])
             H[j, j2] = reduce!(H[j, j2])
          end
-         if with_trafo
+         if with_transform
             for j2 in 1:m
                b = mul_red!(b, u, U[j, j2], false)
                t2 = mul_red!(t2, v, U[k, j2], false)
@@ -4705,7 +4703,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
                t = mul!(t, q, H[j, j2])
                H[i, j2] = add!(H[i, j2], H[i, j2], t)
             end
-            if with_trafo
+            if with_transform
                for j2 in 1:m
                   t = mul!(t, q, U[j, j2])
                   U[i, j2] = add!(U[i, j2], U[i, j2], t)
