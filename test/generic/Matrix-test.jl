@@ -3584,10 +3584,10 @@ end
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
-   H = hnf_minors(A)
+   H = @inferred hnf_minors(A)
    @test is_hnf(H)
 
-   H, U = hnf_minors_with_transform(A)
+   H, U = @inferred hnf_minors_with_transform(A)
    @test is_hnf(H)
    @test is_unit(det(U))
    @test U*A == H
@@ -3603,10 +3603,10 @@ end
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
 
-   H = hnf_minors(B)
+   H = @inferred hnf_minors(B)
    @test is_hnf(H)
 
-   H, U = hnf_minors_with_transform(B)
+   H, U = @inferred hnf_minors_with_transform(B)
    @test is_hnf(H)
    @test is_unit(det(U))
    @test U*B == H
@@ -3615,7 +3615,7 @@ end
 @testset "Generic.Mat.hnf_kb" begin
    M = matrix(ZZ, BigInt[4 6 2; 0 0 10; 0 5 3])
 
-   H, U = AbstractAlgebra.hnf_kb_with_transform(M)
+   H, U = @inferred AbstractAlgebra.hnf_kb_with_transform(M)
 
    @test H == matrix(ZZ, BigInt[4 1 9; 0 5 3; 0 0 10])
    @test is_unit(det(U))
@@ -3627,10 +3627,10 @@ end
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
-   H = AbstractAlgebra.hnf_kb(A)
+   H = @inferred AbstractAlgebra.hnf_kb(A)
    @test is_hnf(H)
 
-   H, U = AbstractAlgebra.hnf_kb_with_transform(A)
+   H, U = @inferred AbstractAlgebra.hnf_kb_with_transform(A)
    @test is_hnf(H)
    @test is_unit(det(U))
    @test U*A == H
@@ -3646,10 +3646,10 @@ end
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
-   H = AbstractAlgebra.hnf_kb(B)
+   H = @inferred AbstractAlgebra.hnf_kb(B)
    @test is_hnf(H)
 
-   H, U = AbstractAlgebra.hnf_kb_with_transform(B)
+   H, U = @inferred AbstractAlgebra.hnf_kb_with_transform(B)
    @test is_hnf(H)
    @test is_unit(det(U))
    @test U*B == H
@@ -3755,10 +3755,10 @@ end
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
-   T = AbstractAlgebra.snf_kb(A)
+   T = @inferred AbstractAlgebra.snf_kb(A)
    @test is_snf(T)
 
-   T, U, K = AbstractAlgebra.snf_kb_with_transform(A)
+   T, U, K = @inferred AbstractAlgebra.snf_kb_with_transform(A)
    @test is_snf(T)
    @test is_unit(det(U))
    @test is_unit(det(K))
@@ -3775,10 +3775,10 @@ end
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
-   T = AbstractAlgebra.snf_kb(B)
+   T = @inferred AbstractAlgebra.snf_kb(B)
    @test is_snf(T)
 
-   T, U, K = AbstractAlgebra.snf_kb_with_transform(B)
+   T, U, K = @inferred AbstractAlgebra.snf_kb_with_transform(B)
    @test is_snf(T)
    @test is_unit(det(U))
    @test is_unit(det(K))
@@ -3851,10 +3851,10 @@ end
    A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
    r = 2 # == rank(A)
 
-   P = weak_popov(A)
+   P = @inferred weak_popov(A)
    @test is_weak_popov(P, r)
 
-   P, U = weak_popov_with_transform(A)
+   P, U = @inferred weak_popov_with_transform(A)
    @test is_weak_popov(P, r)
    @test U*A == P
    @test is_unit(det(U))
@@ -3866,10 +3866,10 @@ end
    B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
    s = 2 # == rank(B)
 
-   P = weak_popov(B)
+   P = @inferred weak_popov(B)
    @test is_weak_popov(P, s)
 
-   P, U = weak_popov_with_transform(B)
+   P, U = @inferred weak_popov_with_transform(B)
    @test is_weak_popov(P, s)
    @test U*B == P
    @test is_unit(det(U))
@@ -3880,10 +3880,10 @@ end
       M = matrix_space(polynomial_ring(QQ, "x")[1], rand(1:5), rand(1:5))
       A = rand(M, -1:5, -5:5)
       r = rank(A)
-      P = weak_popov(A)
+      P = @inferred weak_popov(A)
       @test is_weak_popov(P, r)
 
-      P, U = weak_popov_with_transform(A)
+      P, U = @inferred weak_popov_with_transform(A)
       @test is_weak_popov(P, r)
       @test U*A == P
       @test is_unit(det(U))
@@ -3896,10 +3896,10 @@ end
    for i in 1:2
       A = rand(M, 1:5)
       r = rank(A)
-      P = weak_popov(A)
+      P = @inferred weak_popov(A)
       @test is_weak_popov(P, r)
 
-      P, U = weak_popov_with_transform(A)
+      P, U = @inferred weak_popov_with_transform(A)
       @test is_weak_popov(P, r)
       @test U*A == P
       @test is_unit(det(U))
@@ -3912,10 +3912,10 @@ end
    for i in 1:2
       A = rand(M, -1:5, 0:100)
       r = rank(A)
-      P = weak_popov(A)
+      P = @inferred weak_popov(A)
       @test is_weak_popov(P, r)
 
-      P, U = weak_popov_with_transform(A)
+      P, U = @inferred weak_popov_with_transform(A)
       @test is_weak_popov(P, r)
       @test U*A == P
       @test is_unit(det(U))
@@ -3928,20 +3928,20 @@ end
    A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
    r = 2 # == rank(A)
 
-   P = popov(A)
+   P = @inferred popov(A)
    @test is_popov(P, r)
 
-   P, U = popov_with_transform(A)
+   P, U = @inferred popov_with_transform(A)
    @test is_popov(P, r)
    @test U*A == P
    @test is_unit(det(U))
 
    A = matrix(R, 3, 3, [ x^4, 0, 0, x^3, x^4, x^3, x^3, x^5, x^5 ])
    r = 3 # == rank(A)
-   P = popov(A)
+   P = @inferred popov(A)
    @test is_popov(P, r)
 
-   P, U = popov_with_transform(A)
+   P, U = @inferred popov_with_transform(A)
    @test is_popov(P, r)
    @test U*A == P
    @test is_unit(det(U))
@@ -3953,10 +3953,10 @@ end
    B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
    s = 2 # == rank(B)
 
-   P = popov(B)
+   P = @inferred popov(B)
    @test is_popov(P, s)
 
-   P, U = popov_with_transform(B)
+   P, U = @inferred popov_with_transform(B)
    @test is_popov(P, s)
    @test U*B == P
    @test is_unit(det(U))
@@ -3967,10 +3967,10 @@ end
       M = matrix_space(polynomial_ring(QQ, "x")[1], rand(1:5), rand(1:5))
       A = rand(M, -1:5, -5:5)
       r = rank(A)
-      P = popov(A)
+      P = @inferred popov(A)
       @test is_popov(P, r)
 
-      P, U = popov_with_transform(A)
+      P, U = @inferred popov_with_transform(A)
       @test is_popov(P, r)
       @test U*A == P
       @test is_unit(det(U))
@@ -3983,10 +3983,10 @@ end
    for i in 1:2
       A = rand(M, 1:5)
       r = rank(A)
-      P = popov(A)
+      P = @inferred popov(A)
       @test is_popov(P, r)
 
-      P, U = popov_with_transform(A)
+      P, U = @inferred popov_with_transform(A)
       @test is_popov(P, r)
       @test U*A == P
       @test is_unit(det(U))
@@ -3999,10 +3999,10 @@ end
    for i in 1:2
       A = rand(M, -1:5, 0:100)
       r = rank(A)
-      P = popov(A)
+      P = @inferred popov(A)
       @test is_popov(P, r)
 
-      P, U = popov_with_transform(A)
+      P, U = @inferred popov_with_transform(A)
       @test is_popov(P, r)
       @test U*A == P
       @test is_unit(det(U))

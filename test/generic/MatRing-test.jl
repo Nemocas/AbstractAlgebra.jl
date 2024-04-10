@@ -1339,10 +1339,10 @@ if false # see bug 160
 
         A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
-        H = hnf_minors(A)
+        H = @inferred hnf_minors(A)
         @test is_upper_triangular(H)
 
-        H, U = hnf_minors_with_transform(A)
+        H, U = @inferred hnf_minors_with_transform(A)
         @test is_upper_triangular(H)
         @test is_unit(det(U))
         @test U*A == H
@@ -1358,10 +1358,10 @@ if false # see bug 160
 
         B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
 
-        H = hnf_minors(B)
+        H = @inferred hnf_minors(B)
         @test is_upper_triangular(H)
 
-        H, U = hnf_minors_with_transform(B)
+        H, U = @inferred hnf_minors_with_transform(B)
         @test is_upper_triangular(H)
         @test is_unit(det(U))
         @test U*B == H
@@ -1375,10 +1375,10 @@ end
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
-   H = AbstractAlgebra.hnf_kb(A)
+   H = @inferred AbstractAlgebra.hnf_kb(A)
    @test is_upper_triangular(H)
 
-   H, U = AbstractAlgebra.hnf_kb_with_transform(A)
+   H, U = @inferred AbstractAlgebra.hnf_kb_with_transform(A)
    @test is_upper_triangular(H)
    @test is_unit(det(U))
    @test U*A == H
@@ -1394,10 +1394,10 @@ end
 
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
-   H = AbstractAlgebra.hnf_kb(B)
+   H = @inferred AbstractAlgebra.hnf_kb(B)
    @test is_upper_triangular(H)
 
-   H, U = AbstractAlgebra.hnf_kb_with_transform(B)
+   H, U = @inferred AbstractAlgebra.hnf_kb_with_transform(B)
    @test is_upper_triangular(H)
    @test is_unit(det(U))
    @test U*B == H
@@ -1480,10 +1480,10 @@ end
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
-   T = AbstractAlgebra.snf_kb(A)
+   T = @inferred AbstractAlgebra.snf_kb(A)
    @test is_snf(T)
 
-   T, U, K = AbstractAlgebra.snf_kb_with_transform(A)
+   T, U, K = @inferred AbstractAlgebra.snf_kb_with_transform(A)
    @test is_snf(T)
    @test is_unit(det(U))
    @test is_unit(det(K))
@@ -1500,10 +1500,10 @@ end
 
    B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
-   T = AbstractAlgebra.snf_kb(B)
+   T = @inferred AbstractAlgebra.snf_kb(B)
    @test is_snf(T)
 
-   T, U, K = AbstractAlgebra.snf_kb_with_transform(B)
+   T, U, K = @inferred AbstractAlgebra.snf_kb_with_transform(B)
    @test is_snf(T)
    @test is_unit(det(U))
    @test is_unit(det(K))
