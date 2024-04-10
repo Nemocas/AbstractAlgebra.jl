@@ -125,7 +125,7 @@ end
 #
 ###############################################################################
 
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
+function exponent_vector(a::MPoly{T}, i::Int, ::Val{:lex}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
    return [Int(A[j, i]) for j in N:-1:1]
@@ -135,7 +135,7 @@ function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:lex}}) where T <: Rin
    return Int(a.exps[size(a.exps, 1) + 1 - j, i])
 end
 
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
+function exponent_vector(a::MPoly{T}, i::Int, ::Val{:deglex}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
    return [Int(A[j, i]) for j in N - 1:-1:1]
@@ -145,7 +145,7 @@ function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:deglex}}) where T <: 
    return Int(a.exps[size(a.exps, 1) - j, i])
 end
 
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+function exponent_vector(a::MPoly{T}, i::Int, ::Val{:degrevlex}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
    return [Int(A[j, i]) for j in 1:N - 1]
@@ -164,7 +164,7 @@ are given in the order of the variables for the ring, as supplied when the
 ring was created.
 """
 function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
-   return exponent_vector(a, i, Val{parent(a).ord})
+   return exponent_vector(a, i, Val(internal_ordering(parent(a))))
 end
 
 @doc raw"""
