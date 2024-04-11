@@ -1641,7 +1641,7 @@ macro show_special(io, mime, obj)
       local o = $(esc(obj))
       s = get_attribute(o, :show)
       if s !== nothing
-        if applicable(s, (i, m, o))
+        if applicable(s, i, m, o)
           s(i, m, o)
         else
           s(i, o)
@@ -1696,7 +1696,7 @@ macro show_special_elem(io, mime, obj)
       local p = parent(o)
       s = get_attribute(p, :show_elem)
       if s !== nothing
-        if applicable(s, (i, m, o))
+        if applicable(s, i, m, o)
           s(i, m, o)
         else
           s(i, o)
