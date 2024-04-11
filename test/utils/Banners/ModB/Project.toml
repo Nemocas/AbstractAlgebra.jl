@@ -1,0 +1,7 @@
+name = "ModB"
+uuid = "1f443fa9-d801-49d7-85a0-b381b1f56192"
+version = "0.1.0"
+
+[deps]
+AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
+ModA = "a32e2e01-01a9-418d-9b94-b3b59314d0cc"

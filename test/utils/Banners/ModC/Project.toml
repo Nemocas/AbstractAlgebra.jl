@@ -1,0 +1,6 @@
+name = "ModC"
+uuid = "df9190fa-7efd-4656-b7a4-f08ddd3526a5"
+version = "0.1.0"
+
+[deps]
+ModB = "1f443fa9-d801-49d7-85a0-b381b1f56192"
