@@ -125,6 +125,11 @@ function force_op(op::Function, throw_error::Val{T}, a...) where {T}
 end
 
 function force_op(op::Function, a...)
+  ### TODO: remove in the next breaking release, and fix downstream packages instead
+  if applicable(force_op, op, Val{true}, a...) && !endswith(functionloc(force_op, (typeof(op), Type{Val{true}}, typeof.(a)...))[1], joinpath("base", "deprecated.jl"))
+    return force_op(op, Val{true}, a...)
+  end
+  ###
   return force_op(op, Val(true), a...)
 end
 
