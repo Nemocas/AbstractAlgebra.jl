@@ -1579,7 +1579,6 @@ print the name [`get_name(obj)`](@ref AbstractAlgebra.get_name) of the object `o
 This macro either prints the name and returns from the current scope, or does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
-```
 """
 macro show_name(io, obj)
   return :(
@@ -1606,6 +1605,8 @@ end
 If the `obj` has a `show` attribute, this gets called with `io` and `obj` and
 returns from the current scope. Otherwise, does nothing.
 
+`obj` is required to have attribute storage available.
+
 It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
 macro show_special(io, obj)
@@ -1625,8 +1626,10 @@ end
 """
     @show_special(io::IO, mime, obj)
 
-If the `obj` has a `show` attribute, this gets called with `io`, `mime` and `obj` and
-returns from the current scope. Otherwise, does nothing.
+If the `obj` has a `show` attribute, this gets called with `io`, `mime` and `obj` (if applicable)
+and `io` and `obj` otherwise, and returns from the current scope. Otherwise, does nothing.
+
+`obj` is required to have attribute storage available.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
@@ -1638,7 +1641,11 @@ macro show_special(io, mime, obj)
       local o = $(esc(obj))
       s = get_attribute(o, :show)
       if s !== nothing
-        s(i, m, o)
+        if applicable(s, i, m, o)
+          s(i, m, o)
+        else
+          s(i, o)
+        end
         return
       end
     end
@@ -1648,8 +1655,10 @@ end
 """
     @show_special_elem(io::IO, obj)
 
-If the `parent` of `obj` has a `show_special_elem` attribute, this gets called with `io` and `obj` and
+If the `parent` of `obj` has a `show_elem` attribute, this gets called with `io` and `obj` and
 returns from the current scope. Otherwise, does nothing.
+
+`parent(obj)` is required to have attribute storage available.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
@@ -1671,8 +1680,10 @@ end
 """
     @show_special_elem(io::IO, mime, obj)
 
-If the `parent` of `obj` has a `show` attribute, this gets called with `io`, `mime` and `obj` and
-returns from the current scope. Otherwise, does nothing.
+If the `parent` of `obj` has a `show_elem` attribute, this gets called with `io`, `mime` and `obj` (if applicable)
+and `io` and `obj` otherwise, and returns from the current scope. Otherwise, does nothing.
+
+`parent(obj)` is required to have attribute storage available.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
@@ -1685,7 +1696,11 @@ macro show_special_elem(io, mime, obj)
       local p = parent(o)
       s = get_attribute(p, :show_elem)
       if s !== nothing
-        s(i, m, o)
+        if applicable(s, i, m, o)
+          s(i, m, o)
+        else
+          s(i, o)
+        end
         return
       end
     end

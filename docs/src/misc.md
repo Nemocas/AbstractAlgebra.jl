@@ -74,6 +74,8 @@ parent. The semantics are the same as for `@show_special`.
 All are supposed to be used within the usual `show` function, where `@show_special_elem`
 is only relevant for element types of algebraic structures.
 ```julia
+@attributes MyObj
+
 function show(io::IO, A::MyObj)
    @show_name(io, A)
    @show_special(io, A)
@@ -81,9 +83,23 @@ function show(io::IO, A::MyObj)
    # ... usual stuff
 end
 
-function show(io::IO, ::MIME"text/plain", A::MyObj)
+function show(io::IO, mime::MIME"text/plain", A::MyObj)
    @show_name(io, A)
-   @show_special(io, MIME"text/plain"(), A)
+   @show_special(io, mime, A)
+
+   # ... usual stuff
+end
+
+function show(io::IO, A::MyObjElem)
+   @show_name(io, A)
+   @show_special_elem(io, A)
+
+   # ... usual stuff
+end
+
+function show(io::IO, mime::MIME"text/plain", A::MyObjElem)
+   @show_name(io, A)
+   @show_special_elem(io, mime, A)
 
    # ... usual stuff
 end
