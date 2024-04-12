@@ -106,8 +106,8 @@ include("PrintHelper.jl")
 #   parent(b) == a && return a
 #   return force_coerce(a, b)
 #
-function force_coerce(a, b, throw_error::Type{Val{T}} = Val{true}) where {T}
-  if throw_error === Val{true}
+function force_coerce(a, b, ::Val{throw_error} = Val(true)) where {throw_error}
+  if throw_error
     error("coercion not possible")
   end
   return nothing
@@ -117,15 +117,20 @@ end
 # a common over structure
 # designed(?) to be minimally invasive in AA and Nemo, but filled with
 # content in Hecke/Oscar
-function force_op(op::Function, throw_error::Type{Val{T}}, a...) where {T}
-  if throw_error === Val{true}
+function force_op(op::Function, ::Val{throw_error}, a...) where {throw_error}
+  if throw_error
     error("no common overstructure for the arguments found")
   end
   return false
 end
 
 function force_op(op::Function, a...)
-  return force_op(op, Val{true}, a...)
+  ### TODO: remove in the next breaking release, and fix downstream packages instead
+  if applicable(force_op, op, Val{true}, a...) && !endswith(functionloc(force_op, (typeof(op), Type{Val{true}}, typeof.(a)...))[1], joinpath("base", "deprecated.jl"))
+    return force_op(op, Val{true}, a...)
+  end
+  ###
+  return force_op(op, Val(true), a...)
 end
 
 ###############################################################################

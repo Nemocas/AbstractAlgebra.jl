@@ -37,21 +37,21 @@ number_of_variables(a::MPolyRing) = a.num_vars
 
 number_of_generators(a::MPolyRing) = a.num_vars
 
-function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:lex}}) where {T <: RingElement}
+function gen(a::MPolyRing{T}, i::Int, ::Val{:lex}) where {T <: RingElement}
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape([UInt(j == n - i + 1)
             for j = 1:n], n, 1))
 end
 
-function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:deglex}}) where {T <: RingElement}
+function gen(a::MPolyRing{T}, i::Int, ::Val{:deglex}) where {T <: RingElement}
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape([[UInt(j == n - i + 1)
             for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
-function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function gen(a::MPolyRing{T}, i::Int, ::Val{:degrevlex}) where {T <: RingElement}
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape([[UInt(j == i)
@@ -66,7 +66,7 @@ ring.
 """
 function gens(a::MPolyRing{T}) where {T <: RingElement}
    n = a.num_vars
-   return elem_type(a)[gen(a, i, Val{a.ord})::elem_type(a) for i in 1:n]
+   return elem_type(a)[gen(a, i, Val(internal_ordering(a))) for i in 1:n]
 end
 
 @doc raw"""
@@ -76,7 +76,7 @@ Return the $i$-th generator (variable) of the given polynomial
 ring.
 """
 function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
-   return gen(a, i, Val{a.ord})
+   return gen(a, i, Val(a.ord))
 end
 
 function vars(p::MPoly{T}) where {T <: RingElement}
@@ -125,33 +125,33 @@ end
 #
 ###############################################################################
 
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
+function exponent_vector(a::MPoly{T}, i::Int, ::Val{:lex}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
    return [Int(A[j, i]) for j in N:-1:1]
 end
 
-function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:lex}}) where T <: RingElement
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Val{:lex}) where T <: RingElement
    return Int(a.exps[size(a.exps, 1) + 1 - j, i])
 end
 
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
+function exponent_vector(a::MPoly{T}, i::Int, ::Val{:deglex}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
    return [Int(A[j, i]) for j in N - 1:-1:1]
 end
 
-function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:deglex}}) where T <: RingElement
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Val{:deglex}) where T <: RingElement
    return Int(a.exps[size(a.exps, 1) - j, i])
 end
 
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+function exponent_vector(a::MPoly{T}, i::Int, ::Val{:degrevlex}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
    return [Int(A[j, i]) for j in 1:N - 1]
 end
 
-function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Val{:degrevlex}) where T <: RingElement
    return Int(a.exps[j, i])
 end
 
@@ -164,7 +164,7 @@ are given in the order of the variables for the ring, as supplied when the
 ring was created.
 """
 function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
-   return exponent_vector(a, i, Val{parent(a).ord})
+   return exponent_vector(a, i, Val(internal_ordering(parent(a))))
 end
 
 @doc raw"""
@@ -175,10 +175,10 @@ Term and variable numbering begins at $1$ and variables are ordered as
 during the creation of the ring.
 """
 function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
-   return exponent(a, i, j, Val{parent(a).ord})
+   return exponent(a, i, j, Val(internal_ordering(parent(a))))
 end
 
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:lex}}) where T <: RingElement
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Val{:lex}) where T <: RingElement
    fit!(a, i)
    A = a.exps
    A[:, i] = exps[end:-1:1]
@@ -188,7 +188,7 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val
    return a
 end
 
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:deglex}}) where T <: RingElement
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Val{:deglex}) where T <: RingElement
    fit!(a, i)
    A = a.exps
    A[1:end - 1, i] = exps[end:-1:1]
@@ -199,7 +199,7 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val
    return a
 end
 
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:degrevlex}}) where T <: RingElement
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Val{:degrevlex}) where T <: RingElement
    fit!(a, i)
    A = a.exps
    A[1:end - 1, i] = exps
@@ -218,7 +218,7 @@ correspond to the exponents of the variables in the order supplied when
 the ring was created. The modified polynomial is returned.
 """
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
-   return set_exponent_vector!(a, i, exps, Val{parent(a).ord})
+   return set_exponent_vector!(a, i, exps, Val(internal_ordering(parent(a))))
 end
 
 @doc raw"""
@@ -596,7 +596,7 @@ function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
    return b
 end
 
-function is_gen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
+function is_gen(x::MPoly{T}, ::Val{:lex}) where {T <: RingElement}
    exps = x.exps
    N = size(exps, 1)
    for k = 1:N
@@ -616,12 +616,12 @@ function is_gen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
    return false
 end
 
-function is_gen(x::MPoly{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
+function is_gen(x::MPoly{T}, ::Val{:deglex}) where {T <: RingElement}
    N = size(x.exps, 1)
    return x.exps[N, 1] == UInt(1)
 end
 
-function is_gen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function is_gen(x::MPoly{T}, ::Val{:degrevlex}) where {T <: RingElement}
     N = size(x.exps, 1)
     return x.exps[N, 1] == UInt(1)
 end
@@ -639,7 +639,7 @@ function is_gen(x::MPoly{T}) where {T <: RingElement}
    if !isone(coeff(x, 1))
       return false
    end
-   return is_gen(x, Val{parent(x).ord})
+   return is_gen(x, Val(internal_ordering(parent(x))))
 end
 
 @doc raw"""
@@ -760,7 +760,7 @@ function max_fields(f::MPoly{T}) where {T <: RingElement}
    return biggest, b
 end
 
-function degree(f::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
+function degree(f::MPoly{T}, i::Int, ::Val{:lex}) where T <: RingElement
    A = f.exps
    N = size(A, 1)
    if i == 1
@@ -777,7 +777,7 @@ function degree(f::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
    end
 end
 
-function degree(f::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
+function degree(f::MPoly{T}, i::Int, ::Val{:deglex}) where T <: RingElement
    A = f.exps
    N = size(A, 1)
    biggest = -1
@@ -790,7 +790,7 @@ function degree(f::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElemen
    return biggest
 end
 
-function degree(f::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+function degree(f::MPoly{T}, i::Int, ::Val{:degrevlex}) where T <: RingElement
    A = f.exps
    N = size(A, 1)
    biggest = -1
@@ -804,7 +804,7 @@ function degree(f::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingEle
 end
 
 function degree(f::MPoly{T}, i::Int) where T <: RingElement
-   return degree(f, i, Val{parent(f).ord})
+   return degree(f, i, Val(internal_ordering(parent(f))))
 end
 
 @doc raw"""
@@ -3670,7 +3670,7 @@ function main_variable_coefficient_lex(a::MPoly{T}, k0::Int, n::Int) where {T <:
    return parent(a)(Ac, Ae)
 end
 
-function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:lex}}) where {T <: RingElement}
+function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Val{:lex}) where {T <: RingElement}
    return main_variable_coefficient_lex(a, k, n)
 end
 
@@ -3707,11 +3707,11 @@ function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T
    return parent(a)(Ac, Ae)
 end
 
-function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:deglex}}) where {T <: RingElement}
+function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Val{:deglex}) where {T <: RingElement}
    return main_variable_coefficient_deglex(a, k, n)
 end
 
-function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Val{:degrevlex}) where {T <: RingElement}
    return main_variable_coefficient_deglex(a, k, n)
 end
 
@@ -3737,10 +3737,10 @@ function main_variable_extract(R::SparsePolyRing, a::MPoly{T}, k::Int) where {T 
    A = main_variable_terms(a2, k)
    Pe = zeros(UInt, length(A))
    Pc = Vector{MPoly{T}}(undef, length(A))
-   ord = parent(a).ord
+   ord = internal_ordering(parent(a))
    for i = 1:length(A)
       Pe[i] = a2.exps[k, A[i]]
-      Pc[i] = main_variable_coefficient(a2, k, A[i], Val{ord})
+      Pc[i] = main_variable_coefficient(a2, k, A[i], Val(ord))
    end
    return R(Pc, Pe)
 end

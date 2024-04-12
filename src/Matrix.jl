@@ -4462,7 +4462,7 @@ Kannan-Bachem. The input must have full column rank.
 """
 function hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
    H = deepcopy(A)
-   _hnf_minors!(H, similar(A, 0, 0), Val{false})
+   _hnf_minors!(H, similar(A, 0, 0), Val(false))
    return H
 end
 
@@ -4476,11 +4476,11 @@ have full column rank.
 function hnf_minors_with_transform(A::MatrixElem{T}) where {T <: RingElement}
    H = deepcopy(A)
    U = similar(A, nrows(A), nrows(A))
-   _hnf_minors!(H, U, Val{true})
+   _hnf_minors!(H, U, Val(true))
    return H, U
 end
 
-function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{Val{S}} = Val{false}) where {T <: RingElement, S}
+function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
    m = nrows(H)
    n = ncols(H)
 
@@ -4489,9 +4489,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
 
    R = base_ring(H)
 
-   with_trafo = with_transform == Val{true} ? true : false
-
-   if with_trafo
+   if with_transform
       for i in 1:m
          for j in 1:m
             if j == i
@@ -4546,7 +4544,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
                t = mul!(t, q, H[j, j2])
                H[k, j2] = add!(H[k, j2], H[k, j2], t)
             end
-            if with_trafo
+            if with_transform
                for j2 in 1:m
                   t = mul!(t, q, U[j, j2])
                   U[k, j2] = add!(U[k, j2], U[k, j2], t)
@@ -4572,7 +4570,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
             H[k, j2] = reduce!(H[k, j2])
             H[j, j2] = reduce!(H[j, j2])
          end
-         if with_trafo
+         if with_transform
             for j2 in 1:m
                b = mul_red!(b, u, U[j, j2], false)
                t2 = mul_red!(t2, v, U[k, j2], false)
@@ -4588,7 +4586,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
 
       if is_zero_entry(H, k, k)
          swap_rows!(H, k, l)
-         if with_trafo
+         if with_transform
             swap_rows!(U, k, l)
          end
          l = l - 1
@@ -4602,7 +4600,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
          for j in k:n
             H[k, j] = mul!(H[k, j], H[k, j], u)
          end
-         if with_trafo
+         if with_transform
             for j in 1:m
                U[k, j] = mul!(U[k, j], U[k, j], u)
             end
@@ -4620,7 +4618,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
                t = mul!(t, q, H[j, j2])
                H[i, j2] = add!(H[i, j2], H[i, j2], t)
             end
-            if with_trafo
+            if with_transform
                for j2 in 1:m
                   t = mul!(t, q, U[j, j2])
                   U[i, j2] = add!(U[i, j2], U[i, j2], t)
@@ -4658,7 +4656,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
                t = mul!(t, q, H[j, j2])
                H[k, j2] = add!(H[k, j2], H[k, j2], t)
             end
-            if with_trafo
+            if with_transform
                for j2 in 1:m
                   t = mul!(t, q, U[j, j2])
                   U[k, j2] = add!(U[k, j2], U[k, j2], t)
@@ -4681,7 +4679,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
             H[k, j2] = reduce!(H[k, j2])
             H[j, j2] = reduce!(H[j, j2])
          end
-         if with_trafo
+         if with_transform
             for j2 in 1:m
                b = mul_red!(b, u, U[j, j2], false)
                t2 = mul_red!(t2, v, U[k, j2], false)
@@ -4705,7 +4703,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
                t = mul!(t, q, H[j, j2])
                H[i, j2] = add!(H[i, j2], H[i, j2], t)
             end
-            if with_trafo
+            if with_transform
                for j2 in 1:m
                   t = mul!(t, q, U[j, j2])
                   U[i, j2] = add!(U[i, j2], U[i, j2], t)
@@ -4727,7 +4725,7 @@ Compute the upper right row Hermite normal form of $A$ using a modification
 of the algorithm of Kannan-Bachem.
 """
 function hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
-   return _hnf_kb(A, Val{false})
+   return _hnf_kb(A, Val(false))
 end
 
 @doc raw"""
@@ -4738,13 +4736,13 @@ matrix $U$ with $UA = H$ using a modification of the algorithm of
 Kannan-Bachem.
 """
 function hnf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   return _hnf_kb(A, Val{true})
+   return _hnf_kb(A, Val(true))
 end
 
-function _hnf_kb(A, trafo::Type{Val{T}} = Val{false}) where T
+function _hnf_kb(A, ::Val{with_transform} = Val(false)) where {with_transform}
    H = deepcopy(A)
    m = nrows(H)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A, m)
       hnf_kb!(H, U, true)
       return H, U
@@ -5041,18 +5039,18 @@ function is_snf(A::MatrixElem{T}) where T <: RingElement
 end
 
 function snf_kb(A::MatrixElem{T}) where {T <: RingElement}
-   return _snf_kb(A, Val{false})
+   return _snf_kb(A, Val(false))
 end
 
 function snf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   return _snf_kb(A, Val{true})
+   return _snf_kb(A, Val(true))
 end
 
-function _snf_kb(A::MatrixElem{T}, trafo::Type{Val{V}} = Val{false}) where {V, T <: RingElement}
+function _snf_kb(A::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
    S = deepcopy(A)
    m = nrows(S)
    n = ncols(S)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A, m)
       K = identity_matrix(A, n)
       snf_kb!(S, U, K, true)
@@ -5275,7 +5273,7 @@ end
 Return the weak Popov form of $A$.
 """
 function weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _weak_popov(A, Val{false})
+   return _weak_popov(A, Val(false))
 end
 
 @doc raw"""
@@ -5285,14 +5283,14 @@ Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
 is a transformation matrix so that $P = UA$.
 """
 function weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _weak_popov(A, Val{true})
+   return _weak_popov(A, Val(true))
 end
 
-function _weak_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
+function _weak_popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
    P = deepcopy(A)
    m = nrows(P)
    W = similar(A, 0, 0)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A, m)
       weak_popov!(P, W, U, false, true)
       return P, U
@@ -5311,7 +5309,7 @@ on $A$ and a vector $W$ by applying the same transformations on the vector $V$.
 Return the tuple $(P, W)$.
 """
 function extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
-   return _extended_weak_popov(A, V, Val{false})
+   return _extended_weak_popov(A, V, Val(false))
 end
 
 @doc raw"""
@@ -5323,15 +5321,15 @@ and a transformation matrix $U$ so that $P = UA$.
 Return the tuple $(P, W, U)$.
 """
 function extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
-   return _extended_weak_popov(A, V, Val{true})
+   return _extended_weak_popov(A, V, Val(true))
 end
 
-function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
+function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
    @assert nrows(V) == nrows(A) && ncols(V) == 1
    P = deepcopy(A)
    W = deepcopy(V)
    m = nrows(P)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A)
       weak_popov!(P, W, U, true, true)
       return P, W, U
@@ -5547,7 +5545,7 @@ end
 Return the Popov form of $A$.
 """
 function popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _popov(A, Val{false})
+   return _popov(A, Val(false))
 end
 
 @doc raw"""
@@ -5557,13 +5555,13 @@ Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
 is a transformation matrix so that $P = UA$.
 """
 function popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _popov(A, Val{true})
+   return _popov(A, Val(true))
 end
 
-function _popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
+function _popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
    P = deepcopy(A)
    m = nrows(P)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A, m)
       popov!(P, U, true)
       return P, U
@@ -5688,17 +5686,17 @@ function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T
 end
 
 function hnf_via_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _hnf_via_popov(A, Val{false})
+   return _hnf_via_popov(A, Val(false))
 end
 
 function hnf_via_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _hnf_via_popov(A, Val{true})
+   return _hnf_via_popov(A, Val(true))
 end
 
-function _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}} = Val{false}) where {T <: PolyRingElem, S}
+function _hnf_via_popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
    H = deepcopy(A)
    m = nrows(H)
-   if trafo == Val{true}
+   if with_transform
       U = identity_matrix(A, m)
       hnf_via_popov!(H, U, true)
       return H, U
