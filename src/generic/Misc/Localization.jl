@@ -7,7 +7,7 @@
 ###############################################################################
 
 # prime might be product of several primes if localized at several primes, those primes are in array primes
-mutable struct LocalizedEuclideanRing{T} <: AbstractAlgebra.Ring
+@attributes mutable struct LocalizedEuclideanRing{T} <: AbstractAlgebra.Ring
    base_ring::AbstractAlgebra.Ring
    prime::T
    primes::Vector{T}  # in general, not set.

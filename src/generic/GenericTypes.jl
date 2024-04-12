@@ -257,7 +257,7 @@ end
 #
 ###############################################################################
 
-mutable struct PolyRing{T <: RingElement} <: AbstractAlgebra.PolyRing{T}
+@attributes mutable struct PolyRing{T <: RingElement} <: AbstractAlgebra.PolyRing{T}
    base_ring::Ring
    S::Symbol
 
@@ -292,7 +292,7 @@ end
 #
 ###############################################################################
 
-mutable struct NCPolyRing{T <: NCRingElem} <: AbstractAlgebra.NCPolyRing{T}
+@attributes mutable struct NCPolyRing{T <: NCRingElem} <: AbstractAlgebra.NCPolyRing{T}
    base_ring::NCRing
    S::Symbol
 
@@ -413,7 +413,7 @@ end
 #
 ###############################################################################
 
-mutable struct UniversalPolyRing{T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}} <: AbstractAlgebra.UniversalPolyRing{T}
+@attributes mutable struct UniversalPolyRing{T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}} <: AbstractAlgebra.UniversalPolyRing{T}
    base_ring::Ring
    S::Vector{Symbol}
    ord::Symbol
@@ -459,7 +459,7 @@ end
 
 # Q: Why is SparsePolyRing not a subtype of AbstractAlgebra.PolyRing{T} ?
 
-mutable struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
+@attributes mutable struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring
    S::Symbol
 
@@ -580,7 +580,7 @@ end
 #
 ###############################################################################
 
-mutable struct EuclideanRingResidueRing{T <: RingElement} <: AbstractAlgebra.ResidueRing{T}
+@attributes mutable struct EuclideanRingResidueRing{T <: RingElement} <: AbstractAlgebra.ResidueRing{T}
    base_ring::Ring
    modulus::T
 
@@ -658,7 +658,7 @@ end
 #
 ###############################################################################
 
-mutable struct RelPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
+@attributes mutable struct RelPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -692,7 +692,7 @@ end
 #
 ###############################################################################
 
-mutable struct AbsPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
+@attributes mutable struct AbsPowerSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -722,7 +722,7 @@ end
 #
 ###############################################################################
 
-mutable struct LaurentSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
+@attributes mutable struct LaurentSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -788,7 +788,7 @@ const LaurentSeriesElem{T} = Union{LaurentSeriesRingElem{T}, LaurentSeriesFieldE
 #
 ###############################################################################
 
-mutable struct PuiseuxSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
+@attributes mutable struct PuiseuxSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    laurent_ring::Ring
 
    function PuiseuxSeriesRing{T}(R::LaurentSeriesRing{T}, cached::Bool = true) where T <: RingElement
@@ -920,7 +920,7 @@ end
 #
 ###############################################################################
 
-mutable struct TotFracRing{T <: RingElem} <: AbstractAlgebra.Ring
+@attributes mutable struct TotFracRing{T <: RingElem} <: AbstractAlgebra.Ring
    base_ring::Ring
 
    function TotFracRing{T}(R::Ring, cached::Bool = true) where T <: RingElem
