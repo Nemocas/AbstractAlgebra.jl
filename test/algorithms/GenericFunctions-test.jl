@@ -47,7 +47,7 @@ import ..test_Ring_interface
 import ..test_EuclideanRing_interface
 import ..test_elem
 
-mutable struct ConstPolyRing{T <: RingElement} <: Ring
+@attributes mutable struct ConstPolyRing{T <: RingElement} <: Ring
    base_ring::Ring
 
    function ConstPolyRing{T}(R::Ring, cached::Bool) where T <: RingElement
