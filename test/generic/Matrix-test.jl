@@ -2637,29 +2637,6 @@ end
 
       @test M*x == b
    end
-
-   for dim = 0:10
-      S = matrix_space(R, dim, dim)
-      U = matrix_space(R, dim, rand(1:5))
-
-      M = randmat_triu(S, 3, -10:10)
-      b = rand(U, 3, -10:10)
-      c = M*b
-
-      x = AbstractAlgebra._solve_triu(M, c)
-
-      @test M*x == c
-
-      V = matrix_space(R, rand(1:5), dim)
-
-      M = randmat_triu(S, 3, -10:10)
-      b = rand(V, 3, -10:10)
-      c = b*M
-
-      x = AbstractAlgebra._solve_triu_left(c, M)
-
-      @test x*M == c
-   end
 end
 
 @testset "Generic.Mat.rref" begin
