@@ -144,10 +144,10 @@ end
    @test sprint(show, -1 + x^2 - 2x + 1) == "x^2 - 2*x"
 
    S, y = polynomial_ring(R, "y")
-   @test_broken sprint(show, (x+1)*y) == "(x + 1)*y"
+   @test sprint(show, (x+1)*y) == "(x + 1)*y"
 
    z = gen(R, "z")
-   @test_broken sprint(show, x*y*(z-1)) == "(x*z - x)*y"
+   @test sprint(show, x*y*(z-1)) == "(x*z - x)*y"
 end
 
 @testset "Generic.UnivPoly.term_monomial" begin

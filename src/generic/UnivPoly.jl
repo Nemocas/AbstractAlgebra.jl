@@ -338,13 +338,11 @@ function show(io::IO, R::UniversalPolyRing)
    show(io, base_ring(R))
 end
 
-function Base.show(io::IO, ::MIME"text/plain", a::UnivPoly)
-   print(io, AbstractAlgebra.obj_to_string(a.p, context = io))
+function expressify(a::UnivPoly, x = symbols(parent(a)); context = nothing)
+   return expressify(a.p, x, context = context)
 end
 
-function Base.show(io::IO, a::UnivPoly)
-   print(io, AbstractAlgebra.obj_to_string(a.p, context = io))
-end
+@enable_all_show_via_expressify UnivPoly
 
 ###############################################################################
 #
