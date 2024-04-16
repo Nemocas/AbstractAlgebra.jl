@@ -6107,6 +6107,11 @@ end
 #
 ###############################################################################
 
+# TODO: `hcat(::MatElem, ::MatElem)` and `vcat(::MatElem, ::MatElem)`
+# are only called if the matrices do not have the same base ring, in which case
+# the behaviour is random.
+# These two functions should be removed; removing `vcat` would break OSCAR 1.0.0
+# though.
 @doc raw"""
     hcat(a::MatElem, b::MatElem)
 
@@ -6116,15 +6121,8 @@ number of rows is the same in $a$ and $b$.
 function hcat(a::MatElem, b::MatElem)
    nrows(a) != nrows(b) && error("Incompatible number of nrows in hcat")
    c = similar(a, nrows(a), ncols(a) + ncols(b))
-   n = ncols(a)
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         c[i, j] = a[i, j]
-      end
-      for j = 1:ncols(b)
-         c[i, n + j] = b[i, j]
-      end
-   end
+   c[:, 1:ncols(a)] = a
+   c[:, ncols(a) + 1:ncols(c)] = b
    return c
 end
 
@@ -6137,17 +6135,8 @@ number of columns is the same in $a$ and $b$.
 function vcat(a::MatElem, b::MatElem)
    ncols(a) != ncols(b) && error("Incompatible number of columns in vcat")
    c = similar(a, nrows(a) + nrows(b), ncols(a))
-   n = nrows(a)
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         c[i, j] = a[i, j]
-      end
-   end
-   for i = 1:nrows(b)
-      for j = 1:ncols(a)
-         c[n + i, j] = b[i, j]
-      end
-   end
+   c[1:nrows(a), :] = a
+   c[nrows(a) + 1:nrows(c), :] = b
    return c
 end
 
@@ -6178,14 +6167,10 @@ function _vcat(A)
   end
 
   M = similar(A[1], sum(nrows, A), ncols(A[1]))
-  s = 0
-  for N in A
-    for j in 1:nrows(N)
-      for k in 1:ncols(N)
-        M[s+j, k] = N[j,k]
-      end
-    end
-    s += nrows(N)
+  i = 1
+  for j in 1:length(A)
+    M[i:i + nrows(A[j]) - 1, :] = A[j]
+    i += nrows(A[j])
   end
   return M
 end
@@ -6217,14 +6202,10 @@ function _hcat(A)
   end
 
   M = similar(A[1], nrows(A[1]), sum(ncols, A))
-  s = 0
-  for N in A
-    for j in 1:ncols(N)
-      for k in 1:nrows(N)
-        M[k, s + j] = N[k, j]
-      end
-    end
-    s += ncols(N)
+  i = 1
+  for j in 1:length(A)
+    M[:, i:i + ncols(A[j]) - 1] = A[j]
+    i += ncols(A[j])
   end
   return M
 end
@@ -6266,14 +6247,10 @@ function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem{T}...) where T <: NC
     s = 0
     for i in 1:rows[j]
       N = A[mat_offset + i]
-      for l in 1:ncols(N)
-        for k in 1:nrows(N)
-          M[row_offset + k, s + l] = N[k, l]
-        end
-      end
+      M[row_offset + 1:row_offset + nrows(N), s + 1:s + ncols(N)] = N
       s += ncols(N)
     end
-    row_offset += nrows(A[1+ mat_offset])
+    row_offset += nrows(A[1 + mat_offset])
     mat_offset += rows[j]
   end
 
