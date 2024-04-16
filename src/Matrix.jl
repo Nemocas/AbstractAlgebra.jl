@@ -6113,8 +6113,11 @@ end
 Return the horizontal concatenation of the matrices $A$.
 All component matrices need to have the same base ring and number of columns.
 """
-function Base.vcat(A0::MatrixElem{T}, A::MatrixElem{T}...) where T <: NCRingElement
-  return _vcat((A0, A...))
+function Base.vcat(A::MatrixElem...)
+  # We don't add a type parameter T <: NCRingElement, so that this function is
+  # called for e.g. vcat(QQ[1 0; 0 1], ZZ[1 0; 0 1]) and ERRORS instead of
+  # producing an array of the arguments.
+  return _vcat(A)
 end
 
 # this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
@@ -6129,7 +6132,7 @@ function _vcat(A)
     error("Matrices must have the same number of columns")
   end
 
-  if any(x -> base_ring(x) != base_ring(A[1]), A)
+  if any(x -> base_ring(x) !== base_ring(A[1]), A)
     error("Matrices must have the same base ring")
   end
 
@@ -6148,8 +6151,11 @@ end
 Return the horizontal concatenating of the matrices $A$.
 All component matrices need to have the same base ring and number of rows.
 """
-function Base.hcat(A0::MatrixElem{T}, A::MatrixElem{T}...) where T <: NCRingElement
-  return _hcat((A0, A...))
+function Base.hcat(A::MatrixElem...)
+  # We don't add a type parameter T <: NCRingElement, so that this function is
+  # called for e.g. vcat(QQ[1 0; 0 1], ZZ[1 0; 0 1]) and ERRORS instead of
+  # producing an array of the arguments.
+  return _hcat(A)
 end
 
 # this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
@@ -6164,7 +6170,7 @@ function _hcat(A)
     error("Matrices must have the same number of rows")
   end
 
-  if any(x -> base_ring(x) != base_ring(A[1]), A)
+  if any(x -> base_ring(x) !== base_ring(A[1]), A)
     error("Matrices must have the same base ring")
   end
 
@@ -6177,7 +6183,7 @@ function _hcat(A)
   return M
 end
 
-function Base.cat(A::MatrixElem{T}, As::MatrixElem{T}...; dims) where T <: NCRingElement
+function Base.cat(A::MatrixElem, As::MatrixElem...; dims)
   @assert dims == (1,2) || isa(dims, Int)
 
   if isa(dims, Int)
@@ -6197,7 +6203,11 @@ function Base.cat(A::MatrixElem{T}, As::MatrixElem{T}...; dims) where T <: NCRin
   return X
 end
 
-function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem{T}...) where T <: NCRingElement
+function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem...)
+  if any(x -> base_ring(x) !== base_ring(A[1]), A)
+    error("Matrices must have the same base ring")
+  end
+
   nr = 0
   k = 1
   for i in 1:length(rows)
