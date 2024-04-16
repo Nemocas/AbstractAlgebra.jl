@@ -6107,6 +6107,11 @@ end
 #
 ###############################################################################
 
+# TODO: `hcat(::MatElem, ::MatElem)` and `vcat(::MatElem, ::MatElem)`
+# are only called if the matrices do not have the same base ring, in which case
+# the behaviour is random.
+# These two functions should be removed; removing `vcat` would break OSCAR 1.0.0
+# though.
 @doc raw"""
     hcat(a::MatElem, b::MatElem)
 
