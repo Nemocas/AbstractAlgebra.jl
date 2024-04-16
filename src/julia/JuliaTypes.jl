@@ -31,7 +31,7 @@ end
 #
 ###############################################################################
 
-mutable struct GFField{T <: Integer} <: FinField
+@attributes mutable struct GFField{T <: Integer} <: FinField
    p::T
 
    function GFField{T}(p::T; cached::Bool = true) where T <: Integer

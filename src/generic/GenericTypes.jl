@@ -495,7 +495,7 @@ end
 
 abstract type LaurentPolyRing{T} <: AbstractAlgebra.LaurentPolyRing{T} end
 
-mutable struct LaurentPolyWrapRing{T  <: RingElement,
+@attributes mutable struct LaurentPolyWrapRing{T  <: RingElement,
                                    PR <: AbstractAlgebra.PolyRing{T}
                                   } <: LaurentPolyRing{T}
    polyring::PR
@@ -612,7 +612,7 @@ end
 #
 ###############################################################################
 
-mutable struct EuclideanRingResidueField{T <: RingElement} <: AbstractAlgebra.ResidueField{T}
+@attributes mutable struct EuclideanRingResidueField{T <: RingElement} <: AbstractAlgebra.ResidueField{T}
    base_ring::Ring
    modulus::T
 
@@ -755,7 +755,7 @@ end
 #
 ###############################################################################
 
-mutable struct LaurentSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
+@attributes mutable struct LaurentSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    base_ring::Field
    prec_max::Int
    S::Symbol
@@ -816,7 +816,7 @@ end
 #
 ###############################################################################
 
-mutable struct PuiseuxSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
+@attributes mutable struct PuiseuxSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    laurent_ring::Field
 
    function PuiseuxSeriesField{T}(R::LaurentSeriesField{T}, cached::Bool = true) where T <: FieldElement
@@ -846,7 +846,7 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
 #
 ###############################################################################
 
-mutable struct AbsMSeriesRing{T <: RingElement, S} <:
+@attributes mutable struct AbsMSeriesRing{T <: RingElement, S} <:
                                                  AbstractAlgebra.MSeriesRing{T}
    poly_ring::AbstractAlgebra.MPolyRing{T}
    prec_max::Vector{Int} # used for weights in weighted mode
@@ -894,7 +894,7 @@ end
 #
 ###############################################################################
 
-mutable struct FracField{T <: RingElem} <: AbstractAlgebra.FracField{T}
+@attributes mutable struct FracField{T <: RingElem} <: AbstractAlgebra.FracField{T}
    base_ring::Ring
 
    function FracField{T}(R::Ring, cached::Bool = true) where T <: RingElem
@@ -946,7 +946,7 @@ end
 #
 ###############################################################################
 
-mutable struct FactoredFracField{T <: RingElement} <: AbstractAlgebra.FracField{T}
+@attributes mutable struct FactoredFracField{T <: RingElement} <: AbstractAlgebra.FracField{T}
    base_ring::AbstractAlgebra.Ring
 
    function FactoredFracField{T}(R::Ring, cached::Bool = true) where T <: RingElement
@@ -979,7 +979,7 @@ end
 #
 ###############################################################################
 
-mutable struct RationalFunctionField{T <: FieldElement, U <: Union{PolyRingElem{T}, MPolyRingElem{T}}} <: AbstractAlgebra.Field
+@attributes mutable struct RationalFunctionField{T <: FieldElement, U <: Union{PolyRingElem{T}, MPolyRingElem{T}}} <: AbstractAlgebra.Field
    S::Union{Symbol, Vector{Symbol}}
    fraction_field::FracField{U}
    base_ring::Field
@@ -1007,7 +1007,7 @@ end
 #
 ###############################################################################
 
-mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
+@attributes mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
    num::Poly{<:PolyRingElem{T}}
    den::PolyRingElem{T}
    S::Symbol
@@ -1141,7 +1141,7 @@ end
 #
 ###############################################################################
 
-mutable struct FreeAssAlgebra{T <: RingElement} <: AbstractAlgebra.FreeAssAlgebra{T}
+@attributes mutable struct FreeAssAlgebra{T <: RingElement} <: AbstractAlgebra.FreeAssAlgebra{T}
    base_ring::Ring
    S::Vector{Symbol}
 
