@@ -137,6 +137,19 @@ end
    test_Ring_interface(S)
 end
 
+@testset "Generic.UnivPoly.printing" begin
+   R = universal_polynomial_ring(QQ)
+   x = gen(R, "x")
+   @test sprint(show, x+1) == "x + 1"
+   @test sprint(show, -1 + x^2 - 2x + 1) == "x^2 - 2*x"
+
+   S, y = polynomial_ring(R, "y")
+   @test sprint(show, (x+1)*y) == "(x + 1)*y"
+
+   z = gen(R, "z")
+   @test sprint(show, x*y*(z-1)) == "(x*z - x)*y"
+end
+
 @testset "Generic.UnivPoly.term_monomial" begin
    for R in [ZZ, QQ]
       for iters = 1:100
