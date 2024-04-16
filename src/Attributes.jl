@@ -113,7 +113,7 @@ macro attributes(expr)
    error("attributes can only be attached to mutable structs")
 end
 
-_is_attribute_storing_type(::Type{T}) where T = Base.issingletontype(T) || isstructtype(T) && ismutable(T) && hasfield(T, :__attrs)
+_is_attribute_storing_type(::Type{T}) where T = Base.issingletontype(T) || isstructtype(T) && AbstractAlgebra.ismutabletype(T) && hasfield(T, :__attrs)
 
 # storage for attributes of singletons
 const _singleton_attr_storage = Dict{Type, Dict{Symbol, Any}}()
