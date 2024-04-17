@@ -273,6 +273,7 @@ export is_even
 export is_exact_type
 export is_finite
 export is_finite_order
+export is_free
 export is_gen
 export is_hermitian
 export is_hessenberg
@@ -308,6 +309,7 @@ export is_square_with_sqrt
 export is_squarefree
 export is_submodule
 export is_subset
+export is_sub_with_data
 export is_symmetric
 export is_term
 export is_term_recursive

@@ -24,6 +24,44 @@ inverse_image_fn(f::Map(ModuleIsomorphism)) = f.inverse_image_fn
 
 ###############################################################################
 #
+#   Unary operators
+#
+###############################################################################
+
+Base.:-(a::ModuleHomomorphism) = hom(domain(a), codomain(a), -matrix(a))
+
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
+
+Base.:*(a::T, b::ModuleHomomorphism{T}) where {T} = hom(domain(b), codomain(b), a * matrix(b))
+Base.:*(a::T, b::ModuleIsomorphism{T}) where {T} = hom(domain(b), codomain(b), a * matrix(b))
+Base.:+(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) + matrix(b))
+Base.:-(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) - matrix(b))
+
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+function Base.:(==)(a::Union{ModuleHomomorphism, ModuleIsomorphism}, b::Union{ModuleHomomorphism, ModuleIsomorphism})
+  domain(a) === domain(b) || return false
+  codomain(a) === codomain(b) || return false
+  return matrix(a) == matrix(b)
+end
+
+function Base.hash(a::Union{ModuleHomomorphism, ModuleIsomorphism}, h::UInt)
+  h = hash(domain(a), h)
+  h = hash(codomain(a), h)
+  h = hash(matrix(a), h)
+  return h
+end
+
+###############################################################################
+#
 #   String I/O
 #
 ###############################################################################
@@ -66,6 +104,10 @@ cheaply.
 function Base.inv(f::Map(ModuleIsomorphism))
    T = elem_type(base_ring(domain(f)))
    return ModuleIsomorphism{T}(codomain(f), domain(f), inverse_mat(f), matrix(f))
+end
+
+function Base.inv(f::ModuleHomomorphism)
+  return hom(codomain(f), domain(f), inv(matrix(f)))
 end
 
 ###############################################################################
@@ -138,4 +180,15 @@ function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T},
       M_inv = X[:, 1:m]
    end
    return ModuleIsomorphism{T}(M1, M2, M, M_inv)
+end
+
+function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::Vector{<:ModuleElem}; check::Bool = true)
+  if ngens(V) == 0
+    return ModuleHomomorphism(V, W, zero_matrix(base_ring(V), ngens(V), ngens(W)))
+  end
+  return ModuleHomomorphism(V, W, reduce(vcat, [x.v for x = v]))
+end
+
+function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::MatElem; check::Bool = true)
+  return ModuleHomomorphism(V, W, v)
 end

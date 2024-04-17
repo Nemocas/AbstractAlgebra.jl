@@ -20,6 +20,10 @@ base_ring(N::DirectSumModule{T}) where T <: RingElement = base_ring(N.m[1])
 
 base_ring(v::DirectSumModuleElem{T}) where T <: RingElement = base_ring(v.parent)
 
+is_free(M::DirectSumModule) = all(is_free, M.m)
+
+dim(M::DirectSumModule{<:FieldElem}) = sum(dim(x) for x = M.m)
+
 number_of_generators(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m)
 
 gens(N::DirectSumModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
@@ -218,6 +222,11 @@ function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingEle
    M.inj = inj
    M.pro = pro
    return M, inj, pro
+end
+
+function direct_sum(M::DirectSumModule{T}, N::DirectSumModule{T}, mp::Vector{ModuleHomomorphism{T}}) where T
+  @assert length(M.m) == length(mp) == length(N.m)
+  return hom(M, N, cat(map(matrix, mp)..., dims = (1,2)))
 end
 
 function ModuleHomomorphism(D::DirectSumModule{T}, A::AbstractAlgebra.FPModule{T}, m::Vector{<:ModuleHomomorphism{T}}) where T <: RingElement

@@ -91,6 +91,8 @@ end
 
 Base.inv(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap)) = f
 
+matrix(phi::IdentityMap{<:AbstractAlgebra.FPModule}) = identity_matrix(base_ring(domain(phi)), dim(domain(phi)))
+
 ################################################################################
 #
 #  FunctionalMap

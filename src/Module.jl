@@ -10,6 +10,8 @@
 #
 ###############################################################################
 
+Base.eltype(M::FPModule{T}) where T <: FinFieldElem = elem_type(M)
+
 function zero(M::FPModule{T}) where T <: RingElement
    R = base_ring(M)
    return M(zero_matrix(R, 1, ngens(M)))
@@ -26,6 +28,23 @@ end
 function check_parent(M::FPModuleElem{T}, N::FPModuleElem{T}) where T <: RingElement
    parent(M) !== parent(N) && error("Incompatible modules")
 end
+
+gen(M::FPModule, i::Int) = M[i]
+
+is_finite(M::FPModule{<:FinFieldElem}) = true
+
+function is_sub_with_data(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
+  fl = is_submodule(N, M)
+  if fl
+    return fl, hom(M, N, elem_type(N)[N(m) for m = gens(M)])
+  else
+    return fl, hom(M, N, elem_type(N)[zero(N) for m = gens(M)])
+  end
+end
+
+Base.issubset(M::FPModule{T}, N::FPModule{T}) where T <: RingElement = is_submodule(M, N)
+
+order(M::FPModule{<:FinFieldElem}) = order(base_ring(M))^dim(M)
 
 ###############################################################################
 #
@@ -300,3 +319,33 @@ function rand(rng::AbstractRNG, M::FPModule{T}, vals...) where T <: RingElement
 end
 
 rand(M::FPModule, vals...) = rand(Random.GLOBAL_RNG, M, vals...)
+
+###############################################################################
+#
+#   Iteration
+#
+###############################################################################
+
+Base.length(M::FPModule{T}) where T <: FinFieldElem = Int(order(M))
+
+function Base.iterate(M::FPModule{T}) where T <: FinFieldElem
+  k = base_ring(M)
+  if dim(M) == 0
+    return zero(M), iterate([1])
+  end
+  p = Base.Iterators.ProductIterator(Tuple([k for i=1:dim(M)]))
+  f = iterate(p)
+  return M(elem_type(k)[f[1][i] for i=1:dim(M)]), (f[2], p)
+end
+
+function Base.iterate(M::FPModule{T}, st::Tuple{<:Tuple, <:Base.Iterators.ProductIterator}) where T <: FinFieldElem
+  n = iterate(st[2], st[1])
+  if n === nothing
+    return n
+  end
+  return M(elem_type(base_ring(M))[n[1][i] for i=1:dim(M)]), (n[2], st[2])
+end
+
+function Base.iterate(::FPModule{<:FinFieldElem}, ::Tuple{Int64, Int64})
+  return nothing
+end

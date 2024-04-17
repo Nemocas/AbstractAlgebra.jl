@@ -17,6 +17,10 @@ function domain end
 function codomain end
 function image_fn end
 
+function coimage(h::Map)
+  return quo(domain(h), kernel(h)[1])
+end
+
 function check_composable(a::Map, b::Map)
    codomain(a) !== domain(b) && error("Incompatible maps")
 end
