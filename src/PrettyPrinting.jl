@@ -1547,7 +1547,7 @@ function find_new_name(obj, M=Main; all::Bool=false)
 end
 
 """
-   get_name(obj) -> Union{String,Nothing}
+    get_name(obj) -> Union{String,Nothing}
 
 Returns the name of the object `obj` if it is set, or `nothing` otherwise.
 This function tries to find a name in the following order:
