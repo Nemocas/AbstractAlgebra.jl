@@ -1380,7 +1380,7 @@ end
 #
 ###############################################################################
 
-mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
+@attributes mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    m::AbstractAlgebra.FPModule{T}
    gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}
    rels::Vector{<:AbstractAlgebra.MatElem{T}}
@@ -1409,7 +1409,7 @@ end
 #
 ###############################################################################
 
-mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
+@attributes mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    m::AbstractAlgebra.FPModule{T}
    rels::Vector{<:AbstractAlgebra.MatElem{T}}
    gen_cols::Vector{Int} # which original columns correspond to gens of quotient
@@ -1447,7 +1447,7 @@ end
 #
 ###############################################################################
 
-mutable struct SNFModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
+@attributes mutable struct SNFModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    m::AbstractAlgebra.FPModule{T}
    gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}
    invariant_factors::Vector{T}
@@ -1474,7 +1474,7 @@ end
 #
 ###############################################################################
 
-mutable struct DirectSumModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
+@attributes mutable struct DirectSumModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    m::Vector{<:AbstractAlgebra.FPModule{T}}
    rels::Vector{<:AbstractAlgebra.MatElem{T}}
    inj::Vector{<:ModuleHomomorphism{T}}
@@ -1500,7 +1500,7 @@ end
 #
 ###############################################################################
 
-mutable struct IdealSet{T <: RingElement} <: AbstractAlgebra.Set
+@attributes mutable struct IdealSet{T <: RingElement} <: AbstractAlgebra.Set
    base_ring::Ring
 
    function IdealSet{T}(R::Ring, cached::Bool = true) where T <: RingElement
