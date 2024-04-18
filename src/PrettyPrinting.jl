@@ -1587,7 +1587,7 @@ macro show_name(io, obj)
     begin
       local i = $(esc(io))
       local o = $(esc(obj))
-      if get(i, :supercompact, false) || get(i, :compact, false)
+      if is_terse(i) || get(i, :compact, false)
         name = get_name(o)
         if !isnothing(name)
           if AbstractAlgebra.PrettyPrinting._supports_io_custom(i)
