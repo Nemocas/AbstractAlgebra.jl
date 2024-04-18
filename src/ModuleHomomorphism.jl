@@ -19,7 +19,7 @@ matrix(f::Map(FPModuleHomomorphism)) = f.matrix
 ###############################################################################
 
 function show(io::IO, f::Map(FPModuleHomomorphism))
-  if get(io, :supercompact, false)
+  if is_terse(io)
     print(io, "Module homomorphism")
   else
     io = pretty(io)

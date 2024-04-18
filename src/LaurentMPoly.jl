@@ -50,14 +50,14 @@ function show(io::IO, ::MIME"text/plain", p::LaurentMPolyRing)
 end
 
 function show(io::IO, p::LaurentMPolyRing)
-  if get(io, :supercompact, false)
+  if is_terse(io)
     # no nested printing
     print(io, "Multivariate Laurent polynomial ring")
   else
     # nested printing allowed, preferably supercompact
     io = pretty(io)
     print(io, "Multivariate Laurent polynomial ring in ", ItemQuantity(nvars(p), "variable"))
-    print(IOContext(io, :supercompact => true), " over ", Lowercase(), base_ring(p))
+    print(terse(io), " over ", Lowercase(), base_ring(p))
   end
 end
 

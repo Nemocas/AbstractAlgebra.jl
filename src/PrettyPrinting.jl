@@ -2110,7 +2110,7 @@ end
 
 function supercompact(x)
   io = IOBuffer()
-  print(IOContext(io, :supercompact => true), x)
+  print(terse(io), x)
   return String(take!(io))
 end
 

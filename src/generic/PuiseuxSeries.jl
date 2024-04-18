@@ -313,22 +313,22 @@ function Base.show(io::IO, a::PuiseuxSeriesElem)
 end
 
 function show(io::IO, p::PuiseuxSeriesRing)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       print(io, "Puiseux series ring")
    else
       io = pretty(io)
       print(io, "Puiseux series ring in ", var(laurent_ring(p)), " over ")
-      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+      print(terse(io), Lowercase(), base_ring(p))
    end
 end
 
 function show(io::IO, p::PuiseuxSeriesField)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       print(io, "Puiseux series field")
    else
       io = pretty(io)
       print(io, "Puiseux series field in ", var(laurent_ring(p)), " over ")
-      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+      print(terse(io), Lowercase(), base_ring(p))
    end
 end
 

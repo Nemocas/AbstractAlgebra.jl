@@ -284,12 +284,12 @@ function show(io::IO, ::MIME"text/plain", a::SeriesRing)
 end
 
 function show(io::IO, a::SeriesRing)
-  if get(io, :supercompact, false)
+  if is_terse(io)
     print(io, "Univariate power series ring")
   else
     io = pretty(io)
     print(io, "Univariate power series ring over " )
-    print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+    print(terse(io), Lowercase(), base_ring(a))
   end
 end
 ###############################################################################

@@ -716,13 +716,13 @@ function show(io::IO, ::MIME"text/plain", a::MatSpace)
 end
 
 function show(io::IO, a::MatSpace)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       print(io, "Matrix space")
    else
       io = pretty(io)
       print(io, "Matrix space of ")
       print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
-      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+      print(terse(io), Lowercase(), base_ring(a))
    end
 end
 

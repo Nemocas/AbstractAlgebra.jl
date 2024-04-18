@@ -24,7 +24,7 @@ end
 function Base.show(io::IO, ::MIME"text/plain", M::AbstractAlgebra.Map)
    # the "header" is identical to the supercompact output; this
    # allows other map types to reuse this method
-   println(IOContext(io, :supercompact => true), M)
+   println(terse(io), M)
    io = pretty(io)
    println(io, Indent(), "from ", Lowercase(), domain(M))
    print(io, "to ", Lowercase(), codomain(M), Dedent())
@@ -36,15 +36,15 @@ function show_map_data(io::IO, M::AbstractAlgebra.Map)
 end
 
 function Base.show(io::IO, M::AbstractAlgebra.Map)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       # no nested printing
       print(io, "Map")
    else
       # nested printing allowed, preferably supercompact
       io = pretty(io)
       print(io, "Map: ")
-      print(IOContext(io, :supercompact => true), Lowercase(), domain(M), " -> ")
-      print(IOContext(io, :supercompact => true), Lowercase(), codomain(M))
+      print(terse(io), Lowercase(), domain(M), " -> ")
+      print(terse(io), Lowercase(), codomain(M))
    end
 end
 

@@ -342,13 +342,13 @@ end
   end
 
   function Base.show(io::IO, R::NewRing)
-    if get(io, :supercompact, false)
+    if is_terse(io)
       # no nested printing
       print(io, "supercompact printing of newring ")
     else
       # nested printing allowed, preferably supercompact
       print(io, "one line printing of newring with ")
-      print(IOContext(io, :supercompact => true), "supercompact ", base_ring(R))
+      print(terse(io), "supercompact ", base_ring(R))
     end
   end
 
