@@ -2127,7 +2127,7 @@ for details.
 
 # Examples
 
-```repl
+```jldoctest
 julia> AbstractAlgebra.is_terse(stdout)
 false
 
@@ -2150,7 +2150,7 @@ for details.
 
 # Examples
 
-```repl
+```jldoctest
 julia> AbstractAlgebra.is_terse(stdout)
 false
 
