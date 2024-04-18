@@ -78,10 +78,8 @@ end
 
 function show(io::IO, a::FreeAssAlgebra)
   if is_terse(io)
-    # no nested printing
     print(io, "Free associative algebra")
   else
-    # nested printing allowed, preferably supercompact
     io = pretty(io)
     print(io, "Free associative algebra on ", ItemQuantity(nvars(a), "indeterminate"))
     print(terse(io), " over ", Lowercase(), base_ring(a))

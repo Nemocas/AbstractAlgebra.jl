@@ -109,10 +109,8 @@ end
 
 function Base.show(io::IO, M::FunctionalMap)
    if is_terse(io)
-      # no nested printing
       print(io, "Map defined by a Julia function")
    else
-      # nested printing allowed, preferably supercompact
       io = pretty(io)
       print(io, "Map: ")
       print(terse(io), Lowercase(), domain(M), " -> ")

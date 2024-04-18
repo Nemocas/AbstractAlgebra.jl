@@ -578,10 +578,8 @@ end
 
 function show(io::IO, p::MPolyRing)
   if is_terse(io)
-    # no nested printing
     print(io, "Multivariate polynomial ring")
   else
-    # nested printing allowed, preferably supercompact
     io = pretty(io)
     print(io, "Multivariate polynomial ring in ", ItemQuantity(nvars(p), "variable"))
     print(terse(io), " over ", Lowercase(), base_ring(p))

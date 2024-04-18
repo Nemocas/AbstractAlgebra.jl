@@ -37,10 +37,8 @@ end
 
 function Base.show(io::IO, M::AbstractAlgebra.Map)
    if is_terse(io)
-      # no nested printing
       print(io, "Map")
    else
-      # nested printing allowed, preferably supercompact
       io = pretty(io)
       print(io, "Map: ")
       print(terse(io), Lowercase(), domain(M), " -> ")

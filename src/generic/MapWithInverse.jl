@@ -24,10 +24,8 @@ section_map(f::MapWithSection) = f.section
 
 function Base.show(io::IO, M::MapWithSection)
    if is_terse(io)
-      # no nested printing
       print(io, "Map with section")
    else
-      # nested printing allowed, preferably supercompact
       io = pretty(io)
       print(io, "Map: ")
       print(terse(io), Lowercase(), domain(M), " -> ")
@@ -69,10 +67,8 @@ retraction_map(f::MapCache) = retraction_map(f.map)
 
 function Base.show(io::IO, M::MapWithRetraction)
    if is_terse(io)
-      # no nested printing
       print(io, "Map with retraction")
    else
-      # nested printing allowed, preferably supercompact
       io = pretty(io)
       print(io, "Map: ")
       print(terse(io), Lowercase(), domain(M), " -> ")
