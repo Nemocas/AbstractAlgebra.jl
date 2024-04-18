@@ -124,9 +124,10 @@ julia> base_ring_type(typeof(zero(R))) == typeof(base_ring(zero(R)))
 true
 ```
 """
-base_ring_type(x::NCRing) = base_ring_type(typeof(x))
-base_ring_type(x::NCRingElement) = base_ring_type(parent_type(x))
+base_ring_type(x) = base_ring_type(typeof(x))
 base_ring_type(x::Type{<:NCRingElement}) = base_ring_type(parent_type(x))
+base_ring_type(x::Type{<:ModuleElem}) = base_ring_type(parent_type(x))
+base_ring_type(x::Type{<:Ideal}) = base_ring_type(parent_type(x))
 base_ring_type(T::DataType) = throw(MethodError(base_ring_type, (T,)))
 
 # generic coefficient_ring method

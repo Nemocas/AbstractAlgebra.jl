@@ -121,6 +121,13 @@ This is the inverse of the `parent_type` function, i.e. `elem_type(Generic.PolyR
 will return `Generic.Poly{T}`.
 
 ```julia
+base_ring_type(::Type{MyParent})
+```
+
+Return the type of the of base rings for parent objects with the given parent type.
+For example, `base_ring_type(Generic.PolyRing{T})` will return `parent_type(T)`.
+
+```julia
 base_ring(R::MyParent)
 ```
 
@@ -839,7 +846,9 @@ parent_type(::Type{ConstPoly{T}}) where T <: RingElement = ConstPolyRing{T}
 
 elem_type(::Type{ConstPolyRing{T}}) where T <: RingElement = ConstPoly{T}
 
-base_ring(R::ConstPolyRing) = R.base_ring
+base_ring_type(::Type{ConstPoly{T}}) where T <: RingElement = parent_type(T)
+
+base_ring(R::ConstPolyRing) = R.base_ring::base_ring_type(R)
 
 parent(f::ConstPoly) = f.parent
 
