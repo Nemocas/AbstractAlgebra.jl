@@ -553,6 +553,8 @@ end
 mutable struct printer
    io::IO
    array::Vector{String}
+
+   # if terse_level is positive we print a+b instead of a + b
    terse_level::Int
    size_limit_stack::Vector{Int}  # >= 0 for loosely-defined limit before ...
                                   # < 0 for unrestricted output
@@ -576,19 +578,6 @@ end
 
 function leaf_count(S::printer, obj)
    return 1
-end
-
-# terse means a+b instead of a + b
-function _is_terse(S::printer)
-   return S.terse_level > 0
-end
-
-function _set_terse(S::printer)
-   S.terse_level = max(1, S.terse_level + 1)
-end
-
-function _restore_terse(S::printer)
-   S.terse_level = S.terse_level - 1
 end
 
 # size_limit is a rough limit on the number of leaves printed
@@ -740,7 +729,7 @@ function print_comparison(S::printer, mi::MIME, obj::Expr,
                            left::Int, right::Int, prec::Int)
    n = length(obj.args)
    @assert isodd(n) && n > 1
-   sep = _is_terse(S) ? "" : " "
+   sep = S.terse_level > 0 ? "" : " "
 
    needp = prec <= left || prec <= right
    if needp
@@ -847,11 +836,11 @@ function printPlusArg(S::printer, mi::MIME, obj::Expr, i::Int,
    else
       arg = obj.args[i + 1]
       if isaExprOp(arg, :-, 1)
-         push(S, _is_terse(S) ? "-" : " - ")
+         push(S, S.terse_level > 0 ? "-" : " - ")
          arg = arg.args[2]
          left_prec = prec_inf_Minus
       else
-         push(S, _is_terse(S) ? "+" : " + ")
+         push(S, S.terse_level > 0 ? "+" : " + ")
          left_prec = prec_inf_Plus
       end
       right_prec = i + 2 > n ? right :
@@ -898,7 +887,7 @@ function printPlus(S::printer, mi::MIME, obj::Expr,
             set_size_limit(S, b[n - i + 1])
          else
             if !wrote_elision
-               i == 1 || push(S, _is_terse(S) ? "+" : " + ")
+               i == 1 || push(S, S.terse_level > 0 ? "+" : " + ")
                push_elision(S, mi)
             end
             wrote_elision = true
@@ -924,7 +913,7 @@ function printMinus(S::printer, mi::MIME, obj::Expr,
    elseif n == 2
       printGenericPrefix(S, mi, obj, left, right, "-", prec_pre_Minus)
    else
-      op = _is_terse(S) ? "-" : " - "
+      op = S.terse_level > 0 ? "-" : " - "
       printGenericInfix(S, mi, obj, left, right, op, prec_inf_Minus, 1)
    end
 end
@@ -1013,7 +1002,7 @@ function print_call_or_ref(S::printer, mi::MIME, obj::Expr,
       print_obj(S, mi, obj.args[1], left, prec)
       obj.head === :call ? push_left_parenthesis(S, mi) : push_left_bracket(S, mi)
       for i in 2:n
-         i == 2 || push(S, _is_terse(S) ? "," : ", ")
+         i == 2 || push(S, S.terse_level > 0 ? "," : ", ")
          print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
       end
       obj.head === :call ? push_right_parenthesis(S, mi) : push_right_bracket(S, mi)
@@ -1037,13 +1026,13 @@ function print_call_or_ref(S::printer, mi::MIME, obj::Expr,
             set_size_limit(S, b[n - i + 1])
          else
             if !wrote_elision
-               i == 2 || push(S, _is_terse(S) ? "," : ", ")
+               i == 2 || push(S, S.terse_level > 0 ? "," : ", ")
                push_elision(S, mi)
             end
             wrote_elision = true
             continue
          end
-         i == 2 || push(S, _is_terse(S) ? "," : ", ")
+         i == 2 || push(S, S.terse_level > 0 ? "," : ", ")
          print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
          restore_size_limit(S)
       end
@@ -1059,7 +1048,7 @@ function print_tuple_etc(S::printer, mi::MIME, obj::Expr, left::Int, right::Int)
    n = length(obj.args)
 
    needp = prec_lowest < left || prec_lowest < right
-   sep = _is_terse(S) ? "," : ", "
+   sep = S.terse_level > 0 ? "," : ", "
    if obj.head === :vcat
       needp = false
       sep = "; "
@@ -1087,7 +1076,8 @@ function print_tuple_etc(S::printer, mi::MIME, obj::Expr, left::Int, right::Int)
    elseif obj.head === :tuple
       push_left_parenthesis(S, mi)
    elseif obj.head === :row || obj.head === :hcat
-      _set_terse(S)
+      @assert S.terse_level >= 0
+      S.terse_level += 1
    end
 
    if size_limit(S) < 0
@@ -1126,7 +1116,8 @@ function print_tuple_etc(S::printer, mi::MIME, obj::Expr, left::Int, right::Int)
    elseif obj.head === :tuple
       push_right_parenthesis(S, mi)
    elseif obj.head === :row || obj.head === :hcat
-      _restore_terse(S)
+      S.terse_level -= 1
+      @assert S.terse_level >= 0
    end
 
    needp && push_right_parenthesis(S, mi)
@@ -1337,7 +1328,7 @@ function print_obj(S::printer, mi::MIME, obj::Expr,
              obj.args[1] === :(>=) || obj.args[1] === :(>) ||
              obj.args[1] === :(<=) || obj.args[1] === :(<)
          o = compare_op_string(mi, obj.args[1])
-         o = _is_terse(S) ? o : " "*o*" "
+         o = S.terse_level > 0 ? o : " "*o*" "
          printGenericInfix(S, mi, obj, left, right, o, prec_inf_Equal, 0)
       else
          print_call_or_ref(S, mi, obj, left, right)
@@ -1387,7 +1378,7 @@ function print_obj(S::printer, mi::MIME"text/latex", obj::Expr,
              obj.args[1] === :(>=) || obj.args[1] === :(>) ||
              obj.args[1] === :(<=) || obj.args[1] === :(<)
          o = compare_op_string(mi, obj.args[1])
-         o = _is_terse(S) ? o : " "*o*" "
+         o = S.terse_level > 0 ? o : " "*o*" "
          printGenericInfix(S, mi, obj, left, right, o, prec_inf_Equal, 0)
       elseif obj.args[1] === :sqrt && length(obj.args) == 2
          needp = prec_inf_Power <= right # courtesy
