@@ -224,11 +224,6 @@ function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingEle
    return M, inj, pro
 end
 
-function direct_sum(M::DirectSumModule{T}, N::DirectSumModule{T}, mp::Vector{ModuleHomomorphism{T}}) where T
-  @assert length(M.m) == length(mp) == length(N.m)
-  return hom(M, N, cat(map(matrix, mp)..., dims = (1,2)))
-end
-
 function ModuleHomomorphism(D::DirectSumModule{T}, A::AbstractAlgebra.FPModule{T}, m::Vector{<:ModuleHomomorphism{T}}) where T <: RingElement
    S = summands(D)
    length(S) == length(m) || error("map array has wrong length")
@@ -254,6 +249,11 @@ function ModuleHomomorphism(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Mat
    end
 
    return ModuleHomomorphism(D, A, transpose(hvcat(Tuple([length(SD) for i = 1:length(SA)]), map(x->transpose(x.matrix), m)...)))
+end
+
+function AbstractAlgebra.hom(M::DirectSumModule{T}, N::DirectSumModule{T}, mp::Vector{ModuleHomomorphism{T}}) where T
+  @assert length(M.m) == length(mp) == length(N.m)
+  return hom(M, N, cat(map(matrix, mp)..., dims = (1,2)))
 end
 
 function AbstractAlgebra.hom(A::AbstractAlgebra.Generic.DirectSumModule{T}, B::AbstractAlgebra.Generic.DirectSumModule{T}, M::Matrix{<:Map{<:AbstractAlgebra.FPModule{T}, <:AbstractAlgebra.FPModule{T}}}) where {T}
