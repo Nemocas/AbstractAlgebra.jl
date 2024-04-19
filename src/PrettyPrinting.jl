@@ -559,7 +559,7 @@ mutable struct printer
 end
 
 function printer(io::IO)
-   terse_level = get(io, :terse, false) ? 1 : 0
+   terse_level = get(io, :terse_level, 0)
    size_limit = get(io, :size_limit, -1)
    return printer(io, String[], terse_level, Int[size_limit])
 end

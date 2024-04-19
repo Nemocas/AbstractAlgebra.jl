@@ -267,7 +267,7 @@ import AbstractAlgebra.PrettyPrinting
    p = a + b^2 + c^3
    @test sprint(show, p) == "a + b^2 + c^3"
    @test sprint(show, p, context = :compact => true) == "a + b^2 + c^3"
-   @test sprint(show, p, context = :terse => true) == "a+b^2+c^3"
+   @test sprint(show, p, context = :terse_level => 1) == "a+b^2+c^3"
 
    Qx, x = QQ["x"]
    AbstractAlgebra.set_html_as_latex(true)
