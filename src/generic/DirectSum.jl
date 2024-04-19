@@ -44,7 +44,7 @@ summands(M::DirectSumModule{T}) where T <: RingElement = M.m
 ###############################################################################
 
 function show(io::IO, N::DirectSumModule{T}) where T <: RingElement
-   if get(io, :supercompact, false)
+   if is_terse(io)
      io = pretty(io)
      print(io, LowercaseOff(), "DirectSumModule")
    else

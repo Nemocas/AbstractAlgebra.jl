@@ -29,7 +29,7 @@ inverse_image_fn(f::Map(ModuleIsomorphism)) = f.inverse_image_fn
 ###############################################################################
 
 function show(io::IO, f::Map(ModuleIsomorphism))
-  if get(io, :supercompact, false)
+  if is_terse(io)
     print(io, "Module isomorphism")
   else
     io = pretty(io)

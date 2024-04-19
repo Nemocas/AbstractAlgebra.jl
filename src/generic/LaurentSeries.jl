@@ -517,22 +517,22 @@ function Base.show(io::IO, a::LaurentSeriesElem)
 end
 
 function show(io::IO, p::LaurentSeriesRing)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       print(io, "Laurent series ring")
    else
       io = pretty(io)
       print(io, "Laurent series ring in ", var(p), " over ")
-      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+      print(terse(io), Lowercase(), base_ring(p))
    end
 end
 
 function show(io::IO, p::LaurentSeriesField)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       print(io, "Laurent series field")
    else
       io = pretty(io)
       print(io, "Laurent series field in ", var(p), " over ")
-      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+      print(terse(io), Lowercase(), base_ring(p))
    end
 end
 

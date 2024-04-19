@@ -155,12 +155,12 @@ function show(io::IO, ::MIME"text/plain", a::RationalFunctionField)
 end
 
 function show(io::IO, a::RationalFunctionField)
-  if get(io, :supercompact, false)
+  if is_terse(io)
     # no nested printing
     print(io, "Rational function field")
   else
     io = pretty(io) # we need this to allow printing lowercase
-    print(IOContext(io, :supercompact => true),
+    print(terse(io),
           "Rational function field over ", Lowercase(), base_ring(a))
   end
 end

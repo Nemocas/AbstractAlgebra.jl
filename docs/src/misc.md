@@ -172,3 +172,8 @@ AbstractAlgebra.Dedent
 AbstractAlgebra.Lowercase
 AbstractAlgebra.LowercaseOff
 ```
+
+```@docs
+AbstractAlgebra.terse
+AbstractAlgebra.is_terse
+```

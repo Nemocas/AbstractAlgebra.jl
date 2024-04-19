@@ -212,12 +212,12 @@ function show(io::IO, ::MIME"text/plain", p::LaurentPolyRing)
 end
 
 function show(io::IO, p::LaurentPolyRing)
-  if get(io, :supercompact, false)
+  if is_terse(io)
     print(io, "Univariate Laurent polynomial ring")
   else
     io = pretty(io)
     print(io, "Univariate Laurent polynomial ring in ", var(p), " over ")
-    print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+    print(terse(io), Lowercase(), base_ring(p))
   end
 end
 

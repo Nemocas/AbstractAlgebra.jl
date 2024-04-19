@@ -77,14 +77,12 @@ function show(io::IO, ::MIME"text/plain", a::FreeAssAlgebra)
 end
 
 function show(io::IO, a::FreeAssAlgebra)
-  if get(io, :supercompact, false)
-    # no nested printing
+  if is_terse(io)
     print(io, "Free associative algebra")
   else
-    # nested printing allowed, preferably supercompact
     io = pretty(io)
     print(io, "Free associative algebra on ", ItemQuantity(nvars(a), "indeterminate"))
-    print(IOContext(io, :supercompact => true), " over ", Lowercase(), base_ring(a))
+    print(terse(io), " over ", Lowercase(), base_ring(a))
   end
 end
 

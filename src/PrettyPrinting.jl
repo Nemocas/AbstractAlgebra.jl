@@ -43,6 +43,7 @@ export get_syntactic_sign_abs
 export indent_string!
 export is_syntactic_one
 export is_syntactic_zero
+export is_terse
 export is_unicode_allowed
 export obj_to_latex_string
 export obj_to_string
@@ -56,6 +57,7 @@ export set_html_as_latex
 export set_name!
 export show_obj
 export show_via_expressify
+export terse
 export with_unicode
 
 
@@ -1576,7 +1578,7 @@ macro show_name(io, obj)
     begin
       local i = $(esc(io))
       local o = $(esc(obj))
-      if get(i, :supercompact, false) || get(i, :compact, false)
+      if is_terse(i) || get(i, :compact, false)
         name = get_name(o)
         if !isnothing(name)
           if AbstractAlgebra.PrettyPrinting._supports_io_custom(i)
@@ -2099,8 +2101,57 @@ end
 
 function supercompact(x)
   io = IOBuffer()
-  print(IOContext(io, :supercompact => true), x)
+  print(terse(io), x)
   return String(take!(io))
 end
+
+
+#
+"""
+    terse(io::IO) -> IO
+
+Return a new IO objects derived from `io` for which "supercompact" printing
+mode has been enabled.
+
+See <https://docs.oscar-system.org/stable/DeveloperDocumentation/printing_details/>
+for details.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> AbstractAlgebra.is_terse(stdout)
+false
+
+julia> io = AbstractAlgebra.terse(stdout);
+
+julia> AbstractAlgebra.is_terse(io)
+true
+```
+"""
+terse(io::IO) = IOContext(io, :supercompact => true)
+
+
+"""
+    is_terse(io::IO) -> Bool
+
+Test whether "supercompact" printing mode is enabled for `io`.
+
+See <https://docs.oscar-system.org/stable/DeveloperDocumentation/printing_details/>
+for details.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> AbstractAlgebra.is_terse(stdout)
+false
+
+julia> io = AbstractAlgebra.terse(stdout);
+
+julia> AbstractAlgebra.is_terse(io)
+true
+```
+"""
+is_terse(io::IO) = get(io, :supercompact, false)::Bool
+
 
 end # PrettyPrinting

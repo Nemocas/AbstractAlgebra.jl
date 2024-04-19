@@ -31,7 +31,7 @@ function AbstractAlgebra.show_map_data(io::IO, M::Union{CompositeMap, Functional
 end
 
 function show(io::IO, M::CompositeMap)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       # no nested printing
       print(io, "Composite map")
    else
@@ -64,7 +64,7 @@ function show(io::IO, ::MIME"text/plain", M::IdentityMap)
 end
 
 function show(io::IO, M::IdentityMap)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       # no nested printing
       print(io, "Identity map")
    else
@@ -108,15 +108,13 @@ end
 
 
 function Base.show(io::IO, M::FunctionalMap)
-   if get(io, :supercompact, false)
-      # no nested printing
+   if is_terse(io)
       print(io, "Map defined by a Julia function")
    else
-      # nested printing allowed, preferably supercompact
       io = pretty(io)
       print(io, "Map: ")
-      print(IOContext(io, :supercompact => true), Lowercase(), domain(M), " -> ")
-      print(IOContext(io, :supercompact => true), Lowercase(), codomain(M))
+      print(terse(io), Lowercase(), domain(M), " -> ")
+      print(terse(io), Lowercase(), codomain(M))
    end
 end
 
@@ -165,7 +163,7 @@ function (f::FunctionalCompositeMap{D, C})(a) where {D, C}
 end
 
 function show(io::IO, M::FunctionalCompositeMap)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       # no nested printing
       print(io, "Functional composite map")
    else

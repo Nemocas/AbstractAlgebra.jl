@@ -466,12 +466,12 @@ end
 @enable_all_show_via_expressify Union{PolynomialElem, NCPolyRingElem}
 
 function show(io::IO, p::PolyRing)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       print(io, "Univariate polynomial ring")
    else
       io = pretty(io)
       print(io, "Univariate polynomial ring in ", var(p), " over ")
-      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+      print(terse(io), Lowercase(), base_ring(p))
    end
 end
 

@@ -150,6 +150,7 @@ import ..AbstractAlgebra: is_power
 import ..AbstractAlgebra: is_square
 import ..AbstractAlgebra: is_square_with_sqrt
 import ..AbstractAlgebra: is_term
+import ..AbstractAlgebra: is_terse
 import ..AbstractAlgebra: is_unit
 import ..AbstractAlgebra: is_univariate
 import ..AbstractAlgebra: is_zero_divisor
@@ -199,6 +200,7 @@ import ..AbstractAlgebra: tail
 import ..AbstractAlgebra: term_degree
 import ..AbstractAlgebra: terms
 import ..AbstractAlgebra: terms_degrees
+import ..AbstractAlgebra: terse
 import ..AbstractAlgebra: to_univariate
 import ..AbstractAlgebra: trailing_coefficient
 import ..AbstractAlgebra: unit

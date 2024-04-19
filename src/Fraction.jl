@@ -139,12 +139,12 @@ function show(io::IO, ::MIME"text/plain", a::FracField)
 end
 
 function show(io::IO, a::FracField)
-  if get(io, :supercompact, false)
+  if is_terse(io)
     print(io, "Fraction field")
   else
     io = pretty(io)
     print(io, "Fraction field of ")
-    print(IOContext(io, :supercompact => true), Lowercase(), base_ring(a))
+    print(terse(io), Lowercase(), base_ring(a))
   end
 end
 
