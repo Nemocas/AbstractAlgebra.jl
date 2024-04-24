@@ -226,10 +226,10 @@ julia> m2 = rand(M, -10:10)
 (4, 4, -7)
 
 julia> S, f = sub(M, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 3 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 3 over integers)
 
 julia> I, g = image(f)
-(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 3 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 3 over integers)
 
 julia> is_isomorphic(S, I)
 true
@@ -261,15 +261,15 @@ julia> m2 = rand(M, -10:10)
 (4, 4, -7)
 
 julia> S, f = sub(M, [m1, m2])
-(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 3 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 3 over integers)
 
 julia> Q, g = quo(M, S)
-(Quotient module over Integers with 2 generators and relations:
-[16 -21], Hom: free module of rank 3 over integers -> quotient module over Integers with 2 generators and relations:
+(Quotient module over integers with 2 generators and relations:
+[16 -21], Hom: free module of rank 3 over integers -> quotient module over integers with 2 generators and relations:
 [16 -21])
 
 julia> I, f = snf(Q)
-(Invariant factor decomposed module over Integers with invariant factors BigInt[0], Hom: invariant factor decomposed module over Integers with invariant factors BigInt[0] -> quotient module over Integers with 2 generators and relations:
+(Invariant factor decomposed module over integers with invariant factors BigInt[0], Hom: invariant factor decomposed module over integers with invariant factors BigInt[0] -> quotient module over integers with 2 generators and relations:
 [16 -21])
 
 julia> invs = invariant_factors(Q)

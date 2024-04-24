@@ -77,7 +77,7 @@ julia> R, (x, y, z) = free_associative_algebra(ZZ, ["x", "y", "z"])
 (Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y, z])
 
 julia> B = MPolyBuildCtx(R)
-Builder for an element of Free associative algebra on 3 indeterminates over integers
+Builder for an element of free associative algebra
 
 julia> push_term!(B, ZZ(1), [1,2,3,1]); push_term!(B, ZZ(2), [3,3,1]); finish(B)
 x*y*z*x + 2*z^2*x

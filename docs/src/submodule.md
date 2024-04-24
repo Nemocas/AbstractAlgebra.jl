@@ -54,7 +54,7 @@ julia> n = M([ZZ(2), ZZ(-1)])
 (2, -1)
 
 julia> N, f = sub(M, [m, n])
-(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 2 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 2 over integers)
 
 julia> v = N([ZZ(3), ZZ(4)])
 (3, 4)
@@ -72,7 +72,7 @@ julia> n = V([QQ(2), QQ(-1)])
 (2//1, -1//1)
 
 julia> N, f = sub(V, [m, n])
-(Subspace over Rationals with 2 generators and no relations, Hom: subspace over Rationals with 2 generators and no relations -> vector space of dimension 2 over rationals)
+(Subspace over rationals with 2 generators and no relations, Hom: subspace over rationals with 2 generators and no relations -> vector space of dimension 2 over rationals)
 
 ```
 
@@ -112,10 +112,10 @@ julia> n = M([ZZ(1), ZZ(4)])
 (1, 4)
 
 julia> N1, = sub(M, [m, n])
-(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 2 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 2 over integers)
 
 julia> N2, = sub(M, [m])
-(Submodule over Integers with 1 generator and no relations, Hom: submodule over Integers with 1 generator and no relations -> free module of rank 2 over integers)
+(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> free module of rank 2 over integers)
 
 julia> supermodule(N1) == M
 true
@@ -134,7 +134,7 @@ julia> m = V([QQ(2), QQ(3)])
 (2//1, 3//1)
 
 julia> N, = sub(V, [m])
-(Subspace over Rationals with 1 generator and no relations, Hom: subspace over Rationals with 1 generator and no relations -> vector space of dimension 2 over rationals)
+(Subspace over rationals with 1 generator and no relations, Hom: subspace over rationals with 1 generator and no relations -> vector space of dimension 2 over rationals)
 
 julia> dim(V)
 2
@@ -164,10 +164,10 @@ julia> n = M([ZZ(1), ZZ(4)])
 (1, 4)
 
 julia> N1 = sub(M, [m, n])
-(Submodule over Integers with 2 generators and no relations, Hom: submodule over Integers with 2 generators and no relations -> free module of rank 2 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 2 over integers)
 
 julia> N2 = sub(M, [m])
-(Submodule over Integers with 1 generator and no relations, Hom: submodule over Integers with 1 generator and no relations -> free module of rank 2 over integers)
+(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> free module of rank 2 over integers)
 
 julia> I = intersect(N1, N2)
 Any[]

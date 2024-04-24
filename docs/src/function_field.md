@@ -242,7 +242,7 @@ julia> f = (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
 (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
 
 julia> S1, y1 = function_field(f, "y1")
-(Function Field over Rationals with defining polynomial (x1^2 + 1)*y1^3 + (4*x1 + 4)*y1 + 1, y1)
+(Function Field over rationals with defining polynomial (x1^2 + 1)*y1^3 + (4*x1 + 4)*y1 + 1, y1)
 
 julia> a = S1()
 0
@@ -263,7 +263,7 @@ julia> g = z2^2 + 3z2 + 1
 z2^2 + 3*z2 + 1
 
 julia> S2, y2 = function_field(g, "y2")
-(Function Field over Finite field F_23 with defining polynomial y2^2 + 3*y2 + 1, y2)
+(Function Field over finite field F_23 with defining polynomial y2^2 + 3*y2 + 1, y2)
 
 julia> d = S2(R2(5))
 5
@@ -291,7 +291,7 @@ julia> g = z^2 + 3z + 1
 z^2 + 3*z + 1
 
 julia> S, y = function_field(g, "y")
-(Function Field over Finite field F_23 with defining polynomial y^2 + 3*y + 1, y)
+(Function Field over finite field F_23 with defining polynomial y^2 + 3*y + 1, y)
 
 julia> f = (x + 1)*y + 1
 (x + 1)*y + 1
@@ -367,7 +367,7 @@ julia> g = z^2 + 3*(x + 1)//(x + 2)*z + 1
 z^2 + (3*x + 3)//(x + 2)*z + 1
 
 julia> S, y = function_field(g, "y")
-(Function Field over Rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
+(Function Field over rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
 
 julia> base_field(S)
 Rational function field
@@ -430,7 +430,7 @@ julia> g = z^2 + 3*(x + 1)//(x + 2)*z + 1
 z^2 + (3*x + 3)//(x + 2)*z + 1
 
 julia> S, y = function_field(g, "y")
-(Function Field over Rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
+(Function Field over rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
 
 julia> f = (-3*x - 5//3)//(x - 2)*y + (x^3 + 1//9*x^2 + 5)//(x - 2)
 ((-3*x - 5//3)*y + x^3 + 1//9*x^2 + 5)//(x - 2)

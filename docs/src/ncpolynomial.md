@@ -69,13 +69,13 @@ Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
 
 julia> U, z = R["z"]
-(Univariate polynomial ring in z over matrix ring of degree 2 over integers, z)
+(Univariate polynomial ring in z over matrix ring, z)
 
 julia> f = S()
 0
@@ -123,10 +123,10 @@ Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
 
 julia> f = x^3 + 3x + 21
 x^3 + [3 0; 0 3]*x + [21 0; 0 21]
@@ -150,16 +150,16 @@ julia> n = length(g)
 3
 
 julia> U = base_ring(T)
-Univariate polynomial ring in x over matrix ring of degree 2 over integers
+Univariate polynomial ring in x over matrix ring
 
 julia> V = base_ring(y + 1)
-Univariate polynomial ring in x over matrix ring of degree 2 over integers
+Univariate polynomial ring in x over matrix ring
 
 julia> v = var(T)
 :y
 
 julia> U = parent(y + 1)
-Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers
+Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring
 
 julia> g == deepcopy(g)
 true
@@ -210,10 +210,10 @@ Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
 
 julia> a = zero(T)
 0
@@ -268,10 +268,10 @@ Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
@@ -302,10 +302,10 @@ Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
@@ -336,10 +336,10 @@ Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
@@ -370,10 +370,10 @@ Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
 
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -404,10 +404,10 @@ Matrix ring of degree 2
   over integers
 
 julia> S, x = polynomial_ring(R, "x")
-(Univariate polynomial ring in x over matrix ring of degree 2 over integers, x)
+(Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, "y")
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring of degree 2 over integers, y)
+(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
