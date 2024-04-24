@@ -14,18 +14,15 @@
 @alias is_zero iszero
 @alias number_of_digits ndigits
 
-# TODO: next breaking release: remove the if guard around the block
-if @__MODULE__() == AbstractAlgebra
 
-    # alternative names for some functions from LinearAlgebra
-    # we don't use the `@alias` macro here because we provide custom
-    # docstrings for these aliases
-    const is_diagonal = isdiag
-    const is_hermitian = ishermitian
-    const is_symmetric = issymmetric
-    const is_lower_triangular = istril
-    const is_upper_triangular = istriu
-end
+# alternative names for some functions from LinearAlgebra
+# we don't use the `@alias` macro here because we provide custom
+# docstrings for these aliases
+const is_diagonal = isdiag
+const is_hermitian = ishermitian
+const is_symmetric = issymmetric
+const is_lower_triangular = istril
+const is_upper_triangular = istriu
 
 
 # predeclare some functions to allow defining aliases for some of our own functions
