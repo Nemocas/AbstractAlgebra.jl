@@ -137,7 +137,8 @@ end
 @enable_all_show_via_expressify TotFrac
 
 function show(io::IO, a::TotFracRing)
-   print(IOContext(io, :compact => true), "Total ring of fractions of ", base_ring(a))
+   print(io, "Total ring of fractions of ")
+   print(terse(pretty(io)), Lowercase(), base_ring(a))
 end
 
 ###############################################################################

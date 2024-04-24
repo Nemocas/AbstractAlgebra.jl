@@ -109,10 +109,10 @@ function Base.show(io::IO, a::SparsePoly)
 end
 
 function show(io::IO, p::SparsePolyRing)
-   print(io, "Sparse Univariate Polynomial Ring in ")
+   print(io, "Sparse univariate polynomial ring in ")
    print(io, string(p.S))
    print(io, " over ")
-   print(IOContext(io, :compact => true), base_ring(p))
+   print(terse(pretty(io)), Lowercase(), base_ring(p))
 end
 
 ###############################################################################

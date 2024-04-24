@@ -49,7 +49,8 @@ function show(io::IO, N::DirectSumModule{T}) where T <: RingElement
      print(io, LowercaseOff(), "DirectSumModule")
    else
      io = pretty(io)
-     print(io, LowercaseOff(), "DirectSumModule over ", Lowercase(), base_ring(N))
+     print(io, LowercaseOff(), "DirectSumModule over ")
+     print(terse(io), Lowercase(), base_ring(N))
    end
 end
 

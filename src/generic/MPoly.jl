@@ -3852,8 +3852,8 @@ function MPolyBuildCtx(R::AbstractAlgebra.NCRing)
 end
 
 function show(io::IO, M::MPolyBuildCtx)
-   iocomp = IOContext(io, :compact => true)
-   print(iocomp, "Builder for an element of ", parent(M.poly))
+   print(io, "Builder for an element of ")
+   print(terse(pretty(io)), Lowercase(), parent(M.poly))
 end
 
 @doc raw"""

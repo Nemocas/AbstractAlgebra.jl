@@ -150,9 +150,8 @@ number_of_generators(R::NCPolyRing) = 1
 ###############################################################################
 
 function show(io::IO, p::NCPolyRing)
-   io = pretty(io)
    print(io, "Univariate polynomial ring in ", var(p), " over ")
-   print(IOContext(io, :compact => true), Lowercase(), base_ring(p))
+   print(terse(pretty(io)), Lowercase(), base_ring(p))
 end
 
 ###############################################################################
