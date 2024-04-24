@@ -216,6 +216,7 @@ end
 function matrix_space(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
    # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
    # (and perhaps future compatibility, in case we need it again)
+   (r < 0 || c < 0) && error("Dimensions must be non-negative")
    T = elem_type(R)
    return MatSpace{T}(R, r, c)
 end
