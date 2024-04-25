@@ -115,6 +115,10 @@ end
 @testset "Generic.Mat.constructors" begin
    R, t = polynomial_ring(QQ, "t")
 
+   @test_throws ErrorException matrix_space(R, -1, 5)
+   @test_throws ErrorException matrix_space(R, 0, -2)
+   @test_throws ErrorException matrix_space(R, -3, -4)
+
    S = matrix_space(R, 3, 3)
 
    @test S === matrix_space(R, 3, 3)
