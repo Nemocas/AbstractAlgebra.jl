@@ -75,6 +75,11 @@ function roots(R::Field, f::PolyRingElem)
     return roots(f1)
 end
 
+function roots(a::FinFieldElem, i::Int)
+  _, x = polynomial_ring(parent(a), cached = false)
+  return roots(x^i-a)
+end
+
 function sturm_sequence(f::PolyRingElem{<:FieldElem})
     g = f
     h = derivative(g)

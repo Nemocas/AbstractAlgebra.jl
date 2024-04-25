@@ -29,6 +29,8 @@ function check_parent(m1::FreeModuleElem{T}, m2::FreeModuleElem{T}) where T <: U
     parent(m1) !== parent(m2) && error("Incompatible free modules")
 end
 
+is_free(M::FreeModule) = true
+
 @doc raw"""
     rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
 

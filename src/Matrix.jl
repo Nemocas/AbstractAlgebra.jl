@@ -502,6 +502,9 @@ end
 Base.IteratorSize(::Type{<:MatrixElem}) = Base.HasShape{2}()
 Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default
 
+Base.pairs(M::MatElem) = Base.pairs(IndexCartesian(), M)
+Base.pairs(::IndexCartesian, M::MatElem) = Base.Iterators.Pairs(M, CartesianIndices(axes(M)))
+
 ###############################################################################
 #
 #   Block replacement
