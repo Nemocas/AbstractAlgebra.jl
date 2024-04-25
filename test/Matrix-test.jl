@@ -89,7 +89,13 @@ end
         @test cat(A, A; dims=1) == hcat(A, A)
         @test cat(A, A; dims=2) == vcat(A, A)
         @test_throws ErrorException cat(A, A; dims=3)
+        @test hvcat((2, 3), A, B, C, C, C) == vcat(hcat(A, B), hcat(C, C, C))
     end
+
+    @test_throws ErrorException vcat(ZZ[1 0; 0 1], QQ[1 0; 0 1])
+    @test_throws ErrorException hcat(ZZ[1 0; 0 1], QQ[1 0; 0 1])
+    @test_throws ErrorException cat(ZZ[1 0; 0 1], QQ[1 0; 0 1], dims=2)
+    @test_throws ErrorException hvcat(2, ZZ[1 0; 0 1], QQ[1 0; 0 1])
 end
 
 @testset "Matrix.scalar_matrix" begin

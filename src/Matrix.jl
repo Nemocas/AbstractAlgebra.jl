@@ -6107,47 +6107,17 @@ end
 #
 ###############################################################################
 
-# TODO: `hcat(::MatElem, ::MatElem)` and `vcat(::MatElem, ::MatElem)`
-# are only called if the matrices do not have the same base ring, in which case
-# the behaviour is random.
-# These two functions should be removed; removing `vcat` would break OSCAR 1.0.0
-# though.
-@doc raw"""
-    hcat(a::MatElem, b::MatElem)
-
-Return the horizontal concatenation of $a$ and $b$. Assumes that the
-number of rows is the same in $a$ and $b$.
-"""
-function hcat(a::MatElem, b::MatElem)
-   nrows(a) != nrows(b) && error("Incompatible number of nrows in hcat")
-   c = similar(a, nrows(a), ncols(a) + ncols(b))
-   c[:, 1:ncols(a)] = a
-   c[:, ncols(a) + 1:ncols(c)] = b
-   return c
-end
-
-@doc raw"""
-    vcat(a::MatElem, b::MatElem)
-
-Return the vertical concatenation of $a$ and $b$. Assumes that the
-number of columns is the same in $a$ and $b$.
-"""
-function vcat(a::MatElem, b::MatElem)
-   ncols(a) != ncols(b) && error("Incompatible number of columns in vcat")
-   c = similar(a, nrows(a) + nrows(b), ncols(a))
-   c[1:nrows(a), :] = a
-   c[nrows(a) + 1:nrows(c), :] = b
-   return c
-end
-
 @doc raw"""
     vcat(A::MatrixElem{T}...) where T <: NCRingElement -> MatrixElem
 
 Return the horizontal concatenation of the matrices $A$.
 All component matrices need to have the same base ring and number of columns.
 """
-function Base.vcat(A0::MatrixElem{T}, A::MatrixElem{T}...) where T <: NCRingElement
-  return _vcat((A0, A...))
+function Base.vcat(A::MatrixElem...)
+  # We don't add a type parameter T <: NCRingElement, so that this function is
+  # called for e.g. vcat(QQ[1 0; 0 1], ZZ[1 0; 0 1]) and ERRORS instead of
+  # producing an array of the arguments.
+  return _vcat(A)
 end
 
 # this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
@@ -6162,7 +6132,7 @@ function _vcat(A)
     error("Matrices must have the same number of columns")
   end
 
-  if any(x -> base_ring(x) != base_ring(A[1]), A)
+  if any(x -> base_ring(x) !== base_ring(A[1]), A)
     error("Matrices must have the same base ring")
   end
 
@@ -6181,8 +6151,11 @@ end
 Return the horizontal concatenating of the matrices $A$.
 All component matrices need to have the same base ring and number of rows.
 """
-function Base.hcat(A0::MatrixElem{T}, A::MatrixElem{T}...) where T <: NCRingElement
-  return _hcat((A0, A...))
+function Base.hcat(A::MatrixElem...)
+  # We don't add a type parameter T <: NCRingElement, so that this function is
+  # called for e.g. vcat(QQ[1 0; 0 1], ZZ[1 0; 0 1]) and ERRORS instead of
+  # producing an array of the arguments.
+  return _hcat(A)
 end
 
 # this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
@@ -6197,7 +6170,7 @@ function _hcat(A)
     error("Matrices must have the same number of rows")
   end
 
-  if any(x -> base_ring(x) != base_ring(A[1]), A)
+  if any(x -> base_ring(x) !== base_ring(A[1]), A)
     error("Matrices must have the same base ring")
   end
 
@@ -6210,7 +6183,7 @@ function _hcat(A)
   return M
 end
 
-function Base.cat(A::MatrixElem{T}, As::MatrixElem{T}...; dims) where T <: NCRingElement
+function Base.cat(A::MatrixElem, As::MatrixElem...; dims)
   @assert dims == (1,2) || isa(dims, Int)
 
   if isa(dims, Int)
@@ -6230,7 +6203,11 @@ function Base.cat(A::MatrixElem{T}, As::MatrixElem{T}...; dims) where T <: NCRin
   return X
 end
 
-function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem{T}...) where T <: NCRingElement
+function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem...)
+  if any(x -> base_ring(x) !== base_ring(A[1]), A)
+    error("Matrices must have the same base ring")
+  end
+
   nr = 0
   k = 1
   for i in 1:length(rows)
