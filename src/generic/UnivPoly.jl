@@ -334,6 +334,8 @@ end
 ###############################################################################
 
 function show(io::IO, R::UniversalPolyRing)
+   @show_name(io, R)
+   @show_special(io, R)
    print(io, "Universal Polynomial Ring over ")
    show(io, base_ring(R))
 end

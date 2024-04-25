@@ -132,6 +132,8 @@ function show(io::IO, x::GFElem)
 end
 
 function show(io::IO, R::GFField)
+   @show_name(io, R)
+   @show_special(io, R)
    print(io, "Finite field F_", R.p)
 end
 

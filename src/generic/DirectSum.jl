@@ -46,6 +46,8 @@ summands(M::DirectSumModule{T}) where T <: RingElement = M.m
 ###############################################################################
 
 function show(io::IO, N::DirectSumModule{T}) where T <: RingElement
+   @show_name(io, N)
+   @show_special(io, N)
    if is_terse(io)
      io = pretty(io)
      print(io, LowercaseOff(), "DirectSumModule")

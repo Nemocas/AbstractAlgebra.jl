@@ -25,7 +25,7 @@ function check_composable(a::Map, b::Map)
    codomain(a) !== domain(b) && error("Incompatible maps")
 end
 
-function Base.show(io::IO, ::MIME"text/plain", M::AbstractAlgebra.Map)
+function Base.show(io::IO, mime::MIME"text/plain", M::AbstractAlgebra.Map)
    # the "header" is identical to the supercompact output; this
    # allows other map types to reuse this method
    println(terse(io), M)

@@ -73,6 +73,8 @@ using ..AbstractAlgebra
 
 import ..AbstractAlgebra: @attributes
 import ..AbstractAlgebra: @enable_all_show_via_expressify
+import ..AbstractAlgebra: @show_name
+import ..AbstractAlgebra: @show_special
 import ..AbstractAlgebra: CacheDictType
 import ..AbstractAlgebra: CycleDec
 import ..AbstractAlgebra: Dedent

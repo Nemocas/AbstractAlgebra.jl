@@ -203,7 +203,9 @@ canonical_unit(x::LaurentPolyRingElem) = canonical_unit(leading_coefficient(x))
 #
 ###############################################################################
 
-function show(io::IO, ::MIME"text/plain", p::LaurentPolyRing)
+function show(io::IO, mime::MIME"text/plain", p::LaurentPolyRing)
+  @show_name(io, p)
+  @show_special(io, mime, p)
   print(io, "Univariate Laurent polynomial ring in ", var(p))
   println(io)
   io = pretty(io)
@@ -212,6 +214,8 @@ function show(io::IO, ::MIME"text/plain", p::LaurentPolyRing)
 end
 
 function show(io::IO, p::LaurentPolyRing)
+  @show_name(io, p)
+  @show_special(io, p)
   if is_terse(io)
     print(io, "Univariate Laurent polynomial ring")
   else

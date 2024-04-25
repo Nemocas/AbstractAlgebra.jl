@@ -142,6 +142,8 @@ end
 @enable_all_show_via_expressify ResElem
 
 function show(io::IO, a::ResidueRing)
+   @show_name(io, a)
+   @show_special(io, a)
    if is_terse(io)
      print(io, "Residue ring")
    else

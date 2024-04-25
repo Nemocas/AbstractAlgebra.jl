@@ -150,6 +150,8 @@ number_of_generators(R::NCPolyRing) = 1
 ###############################################################################
 
 function show(io::IO, p::NCPolyRing)
+   @show_name(io, p)
+   @show_special(io, p)
    print(io, "Univariate polynomial ring in ", var(p), " over ")
    print(terse(pretty(io)), Lowercase(), base_ring(p))
 end

@@ -161,7 +161,7 @@ is_square(a::MatRingElem) = true
 #
 ###############################################################################
 
-function show(io::IO, ::MIME"text/plain", a::MatRing)
+function show(io::IO, mime::MIME"text/plain", a::MatRing)
   print(io, "Matrix ring of")
   print(io, " degree ", a.n)
   println(io)

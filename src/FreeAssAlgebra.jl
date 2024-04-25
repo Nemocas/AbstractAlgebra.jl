@@ -59,7 +59,10 @@ end
 
 @enable_all_show_via_expressify FreeAssAlgElem
 
-function show(io::IO, ::MIME"text/plain", a::FreeAssAlgebra)
+function show(io::IO, mime::MIME"text/plain", a::FreeAssAlgebra)
+  @show_name(io, a)
+  @show_special(io, mime, a)
+
   max_vars = 5 # largest number of variables to print
   n = nvars(a)
   print(io, "Free associative algebra")
@@ -77,6 +80,8 @@ function show(io::IO, ::MIME"text/plain", a::FreeAssAlgebra)
 end
 
 function show(io::IO, a::FreeAssAlgebra)
+  @show_name(io, a)
+  @show_special(io, a)
   if is_terse(io)
     print(io, "Free associative algebra")
   else

@@ -32,7 +32,10 @@ end
 
 @enable_all_show_via_expressify LaurentMPolyRingElem
 
-function show(io::IO, ::MIME"text/plain", p::LaurentMPolyRing)
+function show(io::IO, mime::MIME"text/plain", p::LaurentMPolyRing)
+  @show_name(io, p)
+  @show_special(io, mime, p)
+
   max_vars = 5 # largest number of variables to print
   n = nvars(p)
   print(io, "Multivariate Laurent polynomial ring")
@@ -50,6 +53,8 @@ function show(io::IO, ::MIME"text/plain", p::LaurentMPolyRing)
 end
 
 function show(io::IO, p::LaurentMPolyRing)
+  @show_name(io, p)
+  @show_special(io, p)
   if is_terse(io)
     print(io, "Multivariate Laurent polynomial ring")
   else

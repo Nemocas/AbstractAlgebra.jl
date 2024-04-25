@@ -109,6 +109,8 @@ function Base.show(io::IO, a::SparsePoly)
 end
 
 function show(io::IO, p::SparsePolyRing)
+   @show_name(io, p)
+   @show_special(io, p)
    print(io, "Sparse univariate polynomial ring in ")
    print(io, string(p.S))
    print(io, " over ")

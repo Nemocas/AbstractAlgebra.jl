@@ -313,6 +313,8 @@ function Base.show(io::IO, a::PuiseuxSeriesElem)
 end
 
 function show(io::IO, p::PuiseuxSeriesRing)
+   @show_name(io, p)
+   @show_special(io, p)
    if is_terse(io)
       print(io, "Puiseux series ring")
    else
@@ -323,6 +325,8 @@ function show(io::IO, p::PuiseuxSeriesRing)
 end
 
 function show(io::IO, p::PuiseuxSeriesField)
+   @show_name(io, p)
+   @show_special(io, p)
    if is_terse(io)
       print(io, "Puiseux series field")
    else

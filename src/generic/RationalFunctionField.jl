@@ -155,6 +155,8 @@ function show(io::IO, ::MIME"text/plain", a::RationalFunctionField)
 end
 
 function show(io::IO, a::RationalFunctionField)
+  @show_name(io, a)
+  @show_special(io, a)
   if is_terse(io)
     # no nested printing
     print(io, "Rational function field")
