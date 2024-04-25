@@ -101,6 +101,34 @@ function base_ring end
 base_ring(x::ModuleElem) = base_ring(parent(x))
 base_ring(x::NCRingElement) = base_ring(parent(x))
 
+@doc raw"""
+    base_ring_type(a)
+
+Return the type of the base ring of the given element, element type, parent or parent type $a$.
+
+# Examples
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R, x = polynomial_ring(ZZ, "x")
+(Univariate polynomial ring in x over integers, x)
+
+julia> base_ring_type(R) == typeof(base_ring(R))
+true
+
+julia> base_ring_type(zero(R)) == typeof(base_ring(zero(R)))
+true
+
+julia> base_ring_type(typeof(R)) == typeof(base_ring(R))
+true
+
+julia> base_ring_type(typeof(zero(R))) == typeof(base_ring(zero(R)))
+true
+```
+"""
+base_ring_type(x::NCRing) = base_ring_type(typeof(x))
+base_ring_type(x::NCRingElement) = base_ring_type(parent_type(x))
+base_ring_type(x::Type{<:NCRingElement}) = base_ring_type(parent_type(x))
+base_ring_type(T::DataType) = throw(MethodError(base_ring_type, (T,)))
+
 # generic coefficient_ring method
 coefficient_ring(x::NCRingElement) = coefficient_ring(parent(x))
 
