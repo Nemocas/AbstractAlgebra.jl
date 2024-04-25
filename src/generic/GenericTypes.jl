@@ -1500,7 +1500,7 @@ end
 #
 ###############################################################################
 
-@attributes mutable struct IdealSet{T <: RingElement} <: AbstractAlgebra.Set
+@attributes mutable struct IdealSet{T <: RingElement} <: AbstractAlgebra.IdealSet{T}
    base_ring::Ring
 
    function IdealSet{T}(R::Ring, cached::Bool = true) where T <: RingElement
