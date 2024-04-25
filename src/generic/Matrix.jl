@@ -266,6 +266,7 @@ end
 
 AbstractAlgebra.nrows(K::InjProjMat) = K.n
 AbstractAlgebra.ncols(K::InjProjMat) = K.m
+AbstractAlgebra.base_ring_type(::Type{InjProjMat{T}}) where T = parent_type(T)
 AbstractAlgebra.base_ring(K::InjProjMat{T}) where T = K.R::parent_type(T)
 
 function AbstractAlgebra.matrix(K::InjProjMat)

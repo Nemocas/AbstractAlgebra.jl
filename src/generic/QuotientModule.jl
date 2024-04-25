@@ -16,9 +16,9 @@ elem_type(::Type{QuotientModule{T}}) where T <: RingElement = QuotientModuleElem
 
 parent(v::QuotientModuleElem) = v.parent
 
-base_ring(N::QuotientModule{T}) where T <: RingElement = N.base_ring
+base_ring_type(::Type{QuotientModule{T}}) where T <: RingElement = parent_type(T)
 
-base_ring(v::QuotientModuleElem{T}) where T <: RingElement = base_ring(v.parent)
+base_ring(N::QuotientModule{T}) where T <: RingElement = N.base_ring::parent_type(T)
 
 number_of_generators(N::QuotientModule{T}) where T <: RingElement = length(N.gen_cols)
 

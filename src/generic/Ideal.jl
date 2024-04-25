@@ -10,9 +10,9 @@
 #
 ###############################################################################
 
-base_ring(S::IdealSet) = S.base_ring
+base_ring(S::IdealSet) = S.base_ring::base_ring_type(S)
 
-base_ring(I::Ideal) = I.base_ring
+base_ring(I::Ideal) = I.base_ring::base_ring_type(I)
 
 function parent(I::Ideal)
    R = base_ring(I)

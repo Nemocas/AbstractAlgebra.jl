@@ -14,6 +14,8 @@ parent_type(::Type{MatRingElem{T}}) where T <: NCRingElement = MatRing{T}
 
 elem_type(::Type{MatRing{T}}) where {T <: NCRingElement} = MatRingElem{T}
 
+base_ring(a::MatRing{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T)
+
 @doc raw"""
     parent(a::MatRingElem{T}) where T <: NCRingElement
 

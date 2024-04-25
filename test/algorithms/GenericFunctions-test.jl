@@ -13,6 +13,7 @@ import AbstractAlgebra: RingElem
 import AbstractAlgebra: add!
 import AbstractAlgebra: addeq!
 import AbstractAlgebra: base_ring
+import AbstractAlgebra: base_ring_type
 import AbstractAlgebra: canonical_unit
 import AbstractAlgebra: characteristic
 import AbstractAlgebra: divexact
@@ -74,7 +75,9 @@ parent_type(::Type{ConstPoly{T}}) where T <: RingElement = ConstPolyRing{T}
 
 elem_type(::Type{ConstPolyRing{T}}) where T <: RingElement = ConstPoly{T}
 
-base_ring(R::ConstPolyRing) = R.base_ring
+base_ring_type(::Type{ConstPolyRing{T}}) where T <: RingElement = parent_type(T)
+
+base_ring(R::ConstPolyRing) = R.base_ring::base_ring_type(R)
 
 parent(f::ConstPoly) = f.parent
 

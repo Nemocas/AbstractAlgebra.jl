@@ -20,17 +20,9 @@ elem_type(::Type{Rationals{T}}) where T <: Integer = Rational{T}
 
 parent_type(::Type{Rational{T}}) where T <: Integer = Rationals{T}
 
-base_ring(a::Rational{Int}) = zz
-
-base_ring(a::Rational{BigInt}) = JuliaZZ
-
-base_ring(a::Rationals{Int}) = zz
-
-base_ring(a::Rationals{BigInt}) = JuliaZZ
+base_ring_type(::Type{Rationals{T}}) where T <: Integer = Integers{T}
 
 base_ring(a::Rationals{T}) where T <: Integer = Integers{T}()
-
-base_ring(a::Rational{T}) where T <: Integer = Integers{T}()
 
 is_exact_type(::Type{Rational{T}}) where T <: Integer = true
 

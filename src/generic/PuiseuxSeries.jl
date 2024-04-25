@@ -49,6 +49,10 @@ elem_type(::Type{PuiseuxSeriesRing{T}}) where T <: RingElement = PuiseuxSeriesRi
 
 elem_type(::Type{PuiseuxSeriesField{T}}) where T <: FieldElement = PuiseuxSeriesFieldElem{T}
 
+base_ring_type(::Type{PuiseuxSeriesRing{T}}) where T <: RingElement = parent_type(T)
+
+base_ring_type(::Type{PuiseuxSeriesField{T}}) where T <: RingElement = parent_type(T)
+
 base_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = base_ring(laurent_ring(R))
 
 base_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = base_ring(laurent_ring(R))

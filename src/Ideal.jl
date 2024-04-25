@@ -16,3 +16,5 @@ function *(R::Ring, x::RingElement)
 end
 
 iszero(I::Ideal) = all(iszero, gens(I))
+
+base_ring_type(::Type{<:IdealSet{T}}) where T <: RingElement = parent_type(T)

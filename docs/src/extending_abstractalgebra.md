@@ -21,6 +21,7 @@ $\mathbb{Z}[x]$, then one should implement
 
 ```@docs
 base_ring
+base_ring_type
 ```
 
 ## Special elements

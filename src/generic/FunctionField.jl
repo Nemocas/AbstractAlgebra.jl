@@ -530,10 +530,7 @@ function base_ring_type(::Type{FunctionField{T}}) where T <: FieldElement
    return RationalFunctionField{T, U}
 end
 
-function base_ring(R::FunctionField{T}) where T <: FieldElement
-   U = dense_poly_type(T)
-   return R.base_ring::RationalFunctionField{T, U}
-end
+base_ring(R::FunctionField{T}) where T <: FieldElement = R.base_ring::base_ring_type(R)
 
 # For consistency with number fields in Hecke.jl
 @doc raw"""

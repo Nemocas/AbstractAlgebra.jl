@@ -40,6 +40,11 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          @test is_domain_type(T) isa Bool
          @test is_exact_type(T) isa Bool
 
+         @test base_ring_type(R) == typeof(base_ring(R))
+         @test base_ring_type(zero(R)) == typeof(base_ring(zero(R)))
+         @test base_ring_type(typeof(R)) == typeof(base_ring(R))
+         @test base_ring_type(T) == typeof(base_ring(zero(R)))
+
          # some rings don't support characteristic and raise an exception (see issue #993)
          try ch = characteristic(R)
             @test iszero(R(characteristic(R)))

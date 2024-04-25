@@ -19,7 +19,9 @@ parent(p::LaurentPolyWrap) = p.parent
 
 coefficient_ring(R::LaurentPolyWrapRing) = coefficient_ring(R.polyring)
 
-base_ring(R::LaurentPolyWrapRing) = base_ring(R.polyring)
+base_ring_type(::Type{<:LaurentPolyWrapRing{T}}) where {T} = parent_type(T)
+
+base_ring(R::LaurentPolyWrapRing) = base_ring(R.polyring)::base_ring_type(R)
 
 var(R::LaurentPolyWrapRing) = var(R.polyring)
 

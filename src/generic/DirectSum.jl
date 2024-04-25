@@ -16,9 +16,9 @@ elem_type(::Type{DirectSumModule{T}}) where T <: RingElement = DirectSumModuleEl
 
 parent(v::DirectSumModuleElem) = v.parent
 
-base_ring(N::DirectSumModule{T}) where T <: RingElement = base_ring(N.m[1])
+base_ring_type(::Type{DirectSumModule{T}}) where T <: RingElement = parent_type(T)
 
-base_ring(v::DirectSumModuleElem{T}) where T <: RingElement = base_ring(v.parent)
+base_ring(N::DirectSumModule{T}) where T <: RingElement = base_ring(N.m[1])::base_ring_type(N)
 
 dim(M::DirectSumModule{<:FieldElem}) = sum(dim(x) for x = M.m)
 

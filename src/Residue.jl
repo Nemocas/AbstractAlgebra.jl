@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-base_ring_type(::Type{ResidueRing{T}}) where T <: RingElement = parent_type(T)
+base_ring_type(::Type{<:ResidueRing{T}}) where T <: RingElement = parent_type(T)
 
 base_ring(S::ResidueRing{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
