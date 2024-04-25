@@ -16,9 +16,9 @@ elem_type(::Type{SNFModule{T}}) where T <: RingElement = SNFModuleElem{T}
 
 parent(v::SNFModuleElem) = v.parent
 
-base_ring(N::SNFModule{T}) where T <: RingElement = N.base_ring
+base_ring_type(::Type{SNFModule{T}}) where T <: RingElement = parent_type(T)
 
-base_ring(v::SNFModuleElem{T}) where T <: RingElement = base_ring(v.parent)
+base_ring(N::SNFModule{T}) where T <: RingElement = N.base_ring::base_ring_type(N)
 
 number_of_generators(N::SNFModule{T}) where T <: RingElement = length(N.invariant_factors)
 

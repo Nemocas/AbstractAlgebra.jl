@@ -10,7 +10,9 @@
 #
 ###############################################################################
 
-base_ring(S::UniversalPolyRing) = S.base_ring
+base_ring_type(::Type{<:UniversalPolyRing{T}}) where T = parent_type(T)
+
+base_ring(S::UniversalPolyRing) = S.base_ring::base_ring_type(S)
 
 coefficient_ring(S::UniversalPolyRing) = base_ring(S)
 

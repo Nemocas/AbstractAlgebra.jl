@@ -10,11 +10,7 @@
 #
 ###############################################################################
 
-base_ring_type(::Type{MatRing{T}}) where T <: NCRingElement = parent_type(T)
-
-function base_ring(a::MatRing{T}) where {T <: NCRingElement}
-   a.base_ring::parent_type(T)
-end
+base_ring_type(::Type{<:MatRing{T}}) where T <: NCRingElement = parent_type(T)
 
 function check_parent(a::MatRingElem{T}, b::MatRingElem{T}, throw::Bool = true) where T <: NCRingElement
   fl = (base_ring(a) != base_ring(b) || degree(a) != degree(b))

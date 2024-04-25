@@ -10,27 +10,17 @@
 #
 ###############################################################################
 
-function parent(a::FactoredFracFieldElem{T}) where T <: RingElement
-    return a.parent
-end
+parent(a::FactoredFracFieldElem{T}) where T <: RingElement = a.parent
 
-function parent_type(::Type{FactoredFracFieldElem{T}}) where {T <: RingElement}
-    return FactoredFracField{T}
-end
+parent_type(::Type{FactoredFracFieldElem{T}}) where {T <: RingElement} = FactoredFracField{T}
 
-function elem_type(::Type{FactoredFracField{T}}) where {T <: RingElement}
-    return FactoredFracFieldElem{T}
-end
+elem_type(::Type{FactoredFracField{T}}) where {T <: RingElement} = FactoredFracFieldElem{T}
 
 base_ring_type(::Type{FactoredFracField{T}}) where T <: NCRingElement = parent_type(T)
 
-function base_ring(F::FactoredFracField{T}) where T <: RingElement
-    return F.base_ring::parent_type(T)
-end
+base_ring(F::FactoredFracField{T}) where T <: RingElement = F.base_ring::parent_type(T)
 
-function characteristic(F::FactoredFracField{T}) where T <: RingElement
-   return characteristic(base_ring(F))
-end
+characteristic(F::FactoredFracField{T}) where T <: RingElement = characteristic(base_ring(F))
 
 ###############################################################################
 #
