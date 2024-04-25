@@ -70,7 +70,7 @@ function show(io::IO, N::QuotientModule{T}) where T <: RingElement
 end
 
 function show(io::IO, N::QuotientModule{T}) where T <: FieldElement
-   println(io, "Quotient space over:")
+   print(io, "Quotient space over ")
    print(terse(pretty(io)), Lowercase(), base_ring(N))
    show_gens_rels(io, N)
 end
