@@ -55,13 +55,13 @@ supermodule(M::Submodule{T}) where T <: RingElement = M.m
 
 function show(io::IO, N::Submodule{T}) where T <: RingElement
    print(io, "Submodule over ")
-   print(IOContext(io, :compact => true), base_ring(N))
+   print(terse(pretty(io)), Lowercase(), base_ring(N))
    show_gens_rels(io, N)
 end
 
 function show(io::IO, N::Submodule{T}) where T <: FieldElement
    print(io, "Subspace over ")
-   print(IOContext(io, :compact => true), base_ring(N))
+   print(terse(pretty(io)), Lowercase(), base_ring(N))
    show_gens_rels(io, N)
 end
 

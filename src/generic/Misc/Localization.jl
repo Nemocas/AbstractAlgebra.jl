@@ -166,10 +166,11 @@ function show(io::IO, a::LocalizedEuclideanRingElem)
 end
 
 function show(io::IO, L::LocalizedEuclideanRing)
+   io = pretty(io)
    if L.comp
-     print(io, "Localization of ", base_ring(L), " at complement of ", prime(L))
+     print(io, "Localization of ", Lowercase(), base_ring(L), " at complement of ", prime(L))
    else
-     print(io, "Localization of ", base_ring(L), " at ", prime(L))
+     print(io, "Localization of ", Lowercase(), base_ring(L), " at ", prime(L))
    end
 end
 

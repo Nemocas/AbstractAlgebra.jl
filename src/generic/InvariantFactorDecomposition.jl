@@ -57,14 +57,14 @@ end
 
 function show(io::IO, N::SNFModule{T}) where T <: RingElement
    print(io, "Invariant factor decomposed module over ")
-   print(IOContext(io, :compact => true), base_ring(N))
+   print(terse(pretty(io)), Lowercase(), base_ring(N))
    print(io, " with invariant factors ")
    print(IOContext(io, :compact => true), invariant_factors(N))
 end
 
 function show(io::IO, N::SNFModule{T}) where T <: FieldElement
    print(io, "Vector space over ")
-   print(IOContext(io, :compact => true), base_ring(N))
+   print(terse(pretty(io)), Lowercase(), base_ring(N))
    print(io, " with dimension ")
    print(io, ngens(N))
 end
