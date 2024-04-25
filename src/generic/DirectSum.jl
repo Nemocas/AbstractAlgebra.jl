@@ -20,8 +20,6 @@ base_ring(N::DirectSumModule{T}) where T <: RingElement = base_ring(N.m[1])
 
 base_ring(v::DirectSumModuleElem{T}) where T <: RingElement = base_ring(v.parent)
 
-is_free(M::DirectSumModule) = all(is_free, M.m)
-
 dim(M::DirectSumModule{<:FieldElem}) = sum(dim(x) for x = M.m)
 
 number_of_generators(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m)

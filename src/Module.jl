@@ -29,8 +29,6 @@ function check_parent(M::FPModuleElem{T}, N::FPModuleElem{T}) where T <: RingEle
    parent(M) !== parent(N) && error("Incompatible modules")
 end
 
-gen(M::FPModule, i::Int) = M[i]
-
 is_finite(M::FPModule{<:FinFieldElem}) = true
 
 function is_sub_with_data(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
