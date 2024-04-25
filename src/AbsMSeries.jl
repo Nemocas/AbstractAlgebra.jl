@@ -42,7 +42,7 @@ symbols(R::MSeriesRing) = R.sym
 
 parent(a::MSeriesElem) = a.parent
 
-base_ring_type(::Type{MSeriesRing{T}}) where T <: RingElement = parent_type(T)
+base_ring_type(::Type{<:MSeriesRing{T}}) where T <: RingElement = parent_type(T)
 
 function base_ring(R::MSeriesRing{T}) where T <: RingElement
     return base_ring(poly_ring(R))::parent_type(T)
