@@ -118,7 +118,7 @@ elem_type(::Type{LocalizedEuclideanRing{T}}) where {T} = LocalizedEuclideanRingE
 
 parent_type(::Type{LocalizedEuclideanRingElem{T}}) where {T} = LocalizedEuclideanRing{T}
 
-base_ring_type(::Type{LocalizedEuclideanRingElem{T}}) where {T} = parent_type(T)
+base_ring_type(::Type{LocalizedEuclideanRing{T}}) where {T} = parent_type(T)
 
 base_ring(L::LocalizedEuclideanRing) = L.base_ring::base_ring_type(L)
 
