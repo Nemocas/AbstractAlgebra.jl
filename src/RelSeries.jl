@@ -25,7 +25,7 @@ end
 
 parent(a::SeriesElem) = a.parent
 
-base_ring_type(::Type{SeriesRing{T}}) where T <: RingElement = parent_type(T)
+base_ring_type(::Type{<:SeriesRing{T}}) where T <: RingElement = parent_type(T)
 
 base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
