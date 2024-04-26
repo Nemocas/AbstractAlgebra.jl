@@ -34,6 +34,14 @@ end
 #
 ###############################################################################
 
+function Base.hash(a::SparsePoly, h::UInt)
+  b = 0x679c879b67bb8385%UInt
+  for i in 1:length(a)
+     b = xor(b, hash(a.exps[i], hash(a.coeffs[i], h)))
+  end
+  return b
+end
+
 function coeff(x::SparsePoly, i::Int)
    i < 0 && throw(DomainError(i, "cannot get the i-th coefficient with i < 0"))
    return x.coeffs[i + 1]
