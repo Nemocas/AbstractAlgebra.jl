@@ -1,16 +1,6 @@
-# FIXME/TODO: get these conformance tests to work and pass
-#function test_elem(Rx::AbstractAlgebra.Generic.SparsePolyRing)
-#   R = base_ring(Rx)
-#   x = gen(Rx)
-#   return sum(x^(5*i) * test_elem(R) for i in 1:rand(0:6); init=zero(Rx))
-#end
-#
-#@testset "Generic.SparsePoly.conformance" begin
-#   R, x = SparsePolynomialRing(ZZ, "x")
-#   test_Ring_interface(R)
-#end
-
 @testset "Generic.SparsePoly.constructors" begin
+   SparsePolynomialRing = AbstractAlgebra.SparsePolynomialRing
+
    R, x = SparsePolynomialRing(ZZ, "x")
    S, y = SparsePolynomialRing(R, "y")
 
@@ -25,6 +15,8 @@
 end
 
 @testset "Generic.SparsePoly.printing" begin
+   SparsePolynomialRing = AbstractAlgebra.SparsePolynomialRing
+
    R, x = SparsePolynomialRing(ZZ, "x")
 
    @test string(zero(R)) == "0"

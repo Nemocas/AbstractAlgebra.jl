@@ -34,6 +34,14 @@ end
 #
 ###############################################################################
 
+function Base.hash(a::SparsePoly, h::UInt)
+  b = 0x679c879b67bb8385%UInt
+  for i in 1:length(a)
+     b = xor(b, hash(a.exps[i], hash(a.coeffs[i], h)))
+  end
+  return b
+end
+
 function coeff(x::SparsePoly, i::Int)
    i < 0 && throw(DomainError(i, "cannot get the i-th coefficient with i < 0"))
    return x.coeffs[i + 1]
@@ -358,6 +366,8 @@ end
 ###############################################################################
 
 function divides(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
+   iszero(a) && return true, zero(parent(a))
+   iszero(b) && return false, parent(a)()
    d1 = a.exps[a.length]
    d2 = b.exps[b.length] - b.exps[1]
    q_alloc = b.length
@@ -809,6 +819,28 @@ function (a::SparsePolyRing{T})(b::Vector{T}, m::Vector{UInt}) where {T <: RingE
    z = SparsePoly{T}(b, m)
    z.parent = a
    return z
+end
+
+# Functions to remove ambiguities
+function (a::SparsePolyRing{T})(b::T) where {T <: Integer}
+  parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+  z = SparsePoly{T}(b)
+  z.parent = a
+  return z
+end
+
+function (a::SparsePolyRing{T})(b::T) where {T <: Rational}
+  parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+  z = SparsePoly{T}(b)
+  z.parent = a
+  return z
+end
+
+function (a::SparsePolyRing{T})(b::T) where {T <: AbstractFloat}
+  parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+  z = SparsePoly{T}(b)
+  z.parent = a
+  return z
 end
 
 ###############################################################################
