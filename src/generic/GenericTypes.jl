@@ -458,6 +458,7 @@ end
 ###############################################################################
 
 # Q: Why is SparsePolyRing not a subtype of AbstractAlgebra.PolyRing{T} ?
+# A: It is purely internal, and implementing the interface would make it slower.
 
 @attributes mutable struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring
