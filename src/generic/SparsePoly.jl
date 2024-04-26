@@ -366,6 +366,8 @@ end
 ###############################################################################
 
 function divides(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
+   iszero(a) && return true, zero(parent(a))
+   iszero(b) && return false, parent(a)()
    d1 = a.exps[a.length]
    d2 = b.exps[b.length] - b.exps[1]
    q_alloc = b.length
