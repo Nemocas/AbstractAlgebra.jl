@@ -821,6 +821,28 @@ function (a::SparsePolyRing{T})(b::Vector{T}, m::Vector{UInt}) where {T <: RingE
    return z
 end
 
+# Functions to remove ambiguities
+function (a::SparsePolyRing{T})(b::T) where {T <: Integer}
+  parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+  z = SparsePoly{T}(b)
+  z.parent = a
+  return z
+end
+
+function (a::SparsePolyRing{T})(b::T) where {T <: Rational}
+  parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+  z = SparsePoly{T}(b)
+  z.parent = a
+  return z
+end
+
+function (a::SparsePolyRing{T})(b::T) where {T <: AbstractFloat}
+  parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+  z = SparsePoly{T}(b)
+  z.parent = a
+  return z
+end
+
 ###############################################################################
 #
 #   SparsePolynomialRing constructor
