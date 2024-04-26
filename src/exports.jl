@@ -93,7 +93,6 @@ export SetMap
 export SimpleNumField
 export SimpleNumFieldElem
 export SkewDiagram
-export SparsePolynomialRing
 export Strassen
 export SymmetricGroup
 export UniversalPolyRing

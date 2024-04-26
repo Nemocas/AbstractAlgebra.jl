@@ -11,6 +11,8 @@
 #end
 
 @testset "Generic.SparsePoly.constructors" begin
+   SparsePolynomialRing = AbstractAlgebra.SparsePolynomialRing
+
    R, x = SparsePolynomialRing(ZZ, "x")
    S, y = SparsePolynomialRing(R, "y")
 
@@ -25,6 +27,8 @@
 end
 
 @testset "Generic.SparsePoly.printing" begin
+   SparsePolynomialRing = AbstractAlgebra.SparsePolynomialRing
+
    R, x = SparsePolynomialRing(ZZ, "x")
 
    @test string(zero(R)) == "0"
