@@ -135,6 +135,7 @@ import ..AbstractAlgebra: factor_squarefree
 import ..AbstractAlgebra: gen
 import ..AbstractAlgebra: gens
 import ..AbstractAlgebra: get_cached!
+import ..AbstractAlgebra: hom
 import ..AbstractAlgebra: identity_matrix
 import ..AbstractAlgebra: image_fn
 import ..AbstractAlgebra: inflate
