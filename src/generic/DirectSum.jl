@@ -252,12 +252,12 @@ function ModuleHomomorphism(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Mat
    return ModuleHomomorphism(D, A, transpose(hvcat(Tuple([length(SD) for i = 1:length(SA)]), map(x->transpose(x.matrix), m)...)))
 end
 
-function hom(M::DirectSumModule{T}, N::DirectSumModule{T}, mp::Vector{ModuleHomomorphism{T}}) where T
+function hom_direct_sum(M::DirectSumModule{T}, N::DirectSumModule{T}, mp::Vector{ModuleHomomorphism{T}}) where T
   @assert length(M.m) == length(mp) == length(N.m)
   return hom(M, N, cat(map(matrix, mp)..., dims = (1,2)))
 end
 
-function hom(A::DirectSumModule{T}, B::DirectSumModule{T}, M::Matrix{<:Map{<:AbstractAlgebra.FPModule{T}, <:AbstractAlgebra.FPModule{T}}}) where {T}
+function hom_direct_sum(A::DirectSumModule{T}, B::DirectSumModule{T}, M::Matrix{<:Map{<:AbstractAlgebra.FPModule{T}, <:AbstractAlgebra.FPModule{T}}}) where {T}
   pro = canonical_projections(A)
   im = canonical_injections(B)
   s = hom(A, B, [zero(B) for i = 1:dim(A)])

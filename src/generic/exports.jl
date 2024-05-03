@@ -35,6 +35,7 @@ export groebner_basis
 export has_bottom_neighbor
 export has_left_neighbor
 export hash
+export hom_direct_sum
 export hooklength
 export image_fn
 export image_map
