@@ -241,6 +241,7 @@ export hnf_via_popov
 export hnf_via_popov_with_transform
 export hnf_with_transform
 export hom
+export hom_direct_sum
 export hooklength
 export ideal
 export identity_map
