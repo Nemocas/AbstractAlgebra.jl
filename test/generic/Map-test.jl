@@ -114,18 +114,18 @@ end
   str = """
         Identity map
           of integers"""
-  @test PrettyPrinting.detailed(id) == str
-  @test PrettyPrinting.oneline(id) == "Identity map of integers"
-  @test PrettyPrinting.supercompact(id) == "Identity map"
+  @test PrettyPrinting.repr_detailed(id) == str
+  @test PrettyPrinting.repr_oneline(id) == "Identity map of integers"
+  @test PrettyPrinting.repr_terse(id) == "Identity map"
 
   u = map_from_func(x -> QQ(x + 1), ZZ, QQ)
   str = """
         Map defined by a Julia function
           from integers
           to rationals"""
-  @test PrettyPrinting.detailed(u) == str
-  @test PrettyPrinting.oneline(u) == "Map: integers -> rationals"
-  @test PrettyPrinting.supercompact(u) == "Map defined by a Julia function"
+  @test PrettyPrinting.repr_detailed(u) == str
+  @test PrettyPrinting.repr_oneline(u) == "Map: integers -> rationals"
+  @test PrettyPrinting.repr_terse(u) == "Map defined by a Julia function"
 
   f = map_from_func(x -> x + 1, ZZ, ZZ)
   g = map_from_func(x -> QQ(x), ZZ, QQ)
@@ -137,9 +137,9 @@ end
         which is the composite of
           Map: integers -> integers
           Map: integers -> rationals"""
-  @test PrettyPrinting.detailed(v) == str
-  @test PrettyPrinting.oneline(v) == "Map: integers -> integers -> rationals"
-  @test PrettyPrinting.supercompact(v) == "Functional composite map"
+  @test PrettyPrinting.repr_detailed(v) == str
+  @test PrettyPrinting.repr_oneline(v) == "Map: integers -> integers -> rationals"
+  @test PrettyPrinting.repr_terse(v) == "Functional composite map"
 
   f = map_from_func(x -> x + 1, ZZ, ZZ)
   s = MyMapMod.MyMap(2)
@@ -151,9 +151,9 @@ end
         which is the composite of
           Map: integers -> integers
           Map: integers -> integers"""
-  @test PrettyPrinting.detailed(t) == str
-  @test PrettyPrinting.oneline(t) == "Map: integers -> integers -> integers"
-  @test PrettyPrinting.supercompact(t) == "Composite map"
+  @test PrettyPrinting.repr_detailed(t) == str
+  @test PrettyPrinting.repr_oneline(t) == "Map: integers -> integers -> integers"
+  @test PrettyPrinting.repr_terse(t) == "Composite map"
 
 end
 

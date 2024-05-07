@@ -1566,10 +1566,10 @@ end
 """
     @show_name(io::IO, obj)
 
-If either property `:compact` or `:supercompact` is set to `true` for `io`
+If either `is_terse(io)` is true or property `:compact` is set to `true` for `io`
 (see [`IOContext`](https://docs.julialang.org/en/v1/base/io-network/#Base.IOContext)),
-print the name [`get_name(obj)`](@ref AbstractAlgebra.get_name) of the object `obj` to the `io` stream.
-This macro either prints the name and returns from the current scope, or does nothing.
+print the name [`get_name(obj)`](@ref AbstractAlgebra.get_name) of the object `obj` to
+the `io` stream, then return from the current scope. Otherwise, do nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
@@ -2086,31 +2086,23 @@ pretty(io::IO; force_newlines = false) = IOCustom(io, force_newlines)
 
 pretty(io::IOContext; force_newlines = false) = io.io isa IOCustom ? io : IOCustom(io, force_newlines)
 
-# helpers for testing the pretty printing
-function detailed(x)
-  io = IOBuffer()
-  show(io, MIME"text/plain"(), x)
-  return String(take!(io))
-end
+# helpers for testing the pretty printing modes
+repr_detailed(x) = repr(MIME"text/plain"(), x)
+repr_oneline(x) = repr(x)
+repr_terse(x) = repr(x, context = :supercompact => true)
 
-function oneline(x)
-  io = IOBuffer()
-  print(io, x)
-  return String(take!(io))
-end
-
-function supercompact(x)
-  io = IOBuffer()
-  print(terse(io), x)
-  return String(take!(io))
-end
+# for backwards compatibility
+# FIXME/TODO: remove these again
+detailed(x) = repr_detailed(x)
+oneline(x) = repr_oneline(x)
+supercompact(x) = repr_terse(x)
 
 
 #
 """
     terse(io::IO) -> IO
 
-Return a new IO objects derived from `io` for which "supercompact" printing
+Return a new IO objects derived from `io` for which "terse" printing
 mode has been enabled.
 
 See <https://docs.oscar-system.org/stable/DeveloperDocumentation/printing_details/>
@@ -2134,7 +2126,7 @@ terse(io::IO) = IOContext(io, :supercompact => true)
 """
     is_terse(io::IO) -> Bool
 
-Test whether "supercompact" printing mode is enabled for `io`.
+Test whether "terse" printing mode is enabled for `io`.
 
 See <https://docs.oscar-system.org/stable/DeveloperDocumentation/printing_details/>
 for details.

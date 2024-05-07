@@ -154,9 +154,9 @@ end
         Module homomorphism
           from free module of rank 2 over integers
           to free module of rank 2 over integers"""
-  @test PrettyPrinting.detailed(f) == str
-  @test PrettyPrinting.oneline(f) == "Hom: free module of rank 2 over integers -> free module of rank 2 over integers"
-  @test PrettyPrinting.supercompact(f) == "Module homomorphism"
+  @test PrettyPrinting.repr_detailed(f) == str
+  @test PrettyPrinting.repr_oneline(f) == "Hom: free module of rank 2 over integers -> free module of rank 2 over integers"
+  @test PrettyPrinting.repr_terse(f) == "Module homomorphism"
 end
 
 @testset "Generic.ModuleIsomorphism" begin
@@ -192,7 +192,7 @@ end
         Module isomorphism
           from free module of rank 2 over integers
           to free module of rank 2 over integers"""
-  @test PrettyPrinting.detailed(f) == str
-  @test PrettyPrinting.oneline(f) == "Hom: free module of rank 2 over integers -> free module of rank 2 over integers"
-  @test PrettyPrinting.supercompact(f) == "Module isomorphism"
+  @test PrettyPrinting.repr_detailed(f) == str
+  @test PrettyPrinting.repr_oneline(f) == "Hom: free module of rank 2 over integers -> free module of rank 2 over integers"
+  @test PrettyPrinting.repr_terse(f) == "Module isomorphism"
 end

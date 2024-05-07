@@ -61,7 +61,7 @@ set_attribute!
 We provide macros `@show_name`, `@show_special` and `@show_special_elem` to 
 change the way certain objects are printed.
 
-In compact and supercompact printing mode, `@show_name` tries to determine
+In compact and terse printing mode, `@show_name` tries to determine
 a suitable name to print instead of the object (see [`AbstractAlgebra.get_name`](@ref)).
 
 `@show_special` checks if an attribute `:show` is present. If so, it has to be

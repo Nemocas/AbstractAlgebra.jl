@@ -26,8 +26,10 @@ function check_composable(a::Map, b::Map)
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", M::AbstractAlgebra.Map)
-   # the "header" is identical to the supercompact output; this
-   # allows other map types to reuse this method
+   # the "header" printed for most map types is identical: the terse output
+   # followed by "from DOMAIN" and "to CODOMAIN" lines.. We implement this
+   # generically here. If desired, map types can provide a custom
+   # show_map_data method to add additional data after this initial "header".
    println(terse(io), M)
    io = pretty(io)
    println(io, Indent(), "from ", Lowercase(), domain(M))
@@ -36,7 +38,7 @@ function Base.show(io::IO, mime::MIME"text/plain", M::AbstractAlgebra.Map)
 end
 
 function show_map_data(io::IO, M::AbstractAlgebra.Map)
-   # no extra data by default; specific Map subtypes can overload this
+   # no extra data by default; Map subtypes may overload this
 end
 
 function Base.show(io::IO, M::AbstractAlgebra.Map)

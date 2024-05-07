@@ -96,16 +96,16 @@ end
         Map with section
           from integers
           to finite field F_5"""
-  @test PrettyPrinting.detailed(u) == str
-  @test PrettyPrinting.oneline(u) == "Map: integers -> finite field F_5"
-  @test PrettyPrinting.supercompact(u) == "Map with section"
+  @test PrettyPrinting.repr_detailed(u) == str
+  @test PrettyPrinting.repr_oneline(u) == "Map: integers -> finite field F_5"
+  @test PrettyPrinting.repr_terse(u) == "Map with section"
 
   v = map_with_retraction_from_func(x -> QQ(x + 1), x -> ZZ(x - 1), ZZ, QQ)
   str = """
         Map with retraction
           from integers
           to rationals"""
-  @test PrettyPrinting.detailed(v) == str
-  @test PrettyPrinting.oneline(v) == "Map: integers -> rationals"
-  @test PrettyPrinting.supercompact(v) == "Map with retraction"
+  @test PrettyPrinting.repr_detailed(v) == str
+  @test PrettyPrinting.repr_oneline(v) == "Map: integers -> rationals"
+  @test PrettyPrinting.repr_terse(v) == "Map with retraction"
 end
