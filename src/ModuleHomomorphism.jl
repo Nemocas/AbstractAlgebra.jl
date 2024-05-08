@@ -23,6 +23,7 @@ function show(io::IO, f::Map(FPModuleHomomorphism))
     print(io, "Module homomorphism")
   else
     io = pretty(io)
+    io = terse(io)
     print(io, "Hom: ", Lowercase(), domain(f))
     print(io, " -> ", Lowercase(), codomain(f))
   end

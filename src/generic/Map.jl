@@ -36,6 +36,7 @@ function show(io::IO, M::CompositeMap)
       print(io, "Composite map")
    else
       io = pretty(io)
+      io = terse(io)
       print(io, "Map: ", Lowercase(), domain(M))
       print(io, " -> ", Lowercase(), domain(map2(M)))
       print(io, " -> ", Lowercase(), codomain(M))
@@ -69,6 +70,7 @@ function show(io::IO, M::IdentityMap)
       print(io, "Identity map")
    else
       io = pretty(io)
+      io = terse(io)
       print(io, "Identity map of ", Lowercase(), domain(M))
    end
 end
@@ -114,9 +116,10 @@ function Base.show(io::IO, M::FunctionalMap)
       print(io, "Map defined by a Julia function")
    else
       io = pretty(io)
+      io = terse(io)
       print(io, "Map: ")
-      print(terse(io), Lowercase(), domain(M), " -> ")
-      print(terse(io), Lowercase(), codomain(M))
+      print(io, Lowercase(), domain(M), " -> ")
+      print(io, Lowercase(), codomain(M))
    end
 end
 

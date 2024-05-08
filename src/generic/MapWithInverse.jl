@@ -27,9 +27,10 @@ function Base.show(io::IO, M::MapWithSection)
       print(io, "Map with section")
    else
       io = pretty(io)
+      io = terse(io)
       print(io, "Map: ")
-      print(terse(io), Lowercase(), domain(M), " -> ")
-      print(terse(io), Lowercase(), codomain(M))
+      print(io, Lowercase(), domain(M), " -> ")
+      print(io, Lowercase(), codomain(M))
    end
 end
 
@@ -70,9 +71,10 @@ function Base.show(io::IO, M::MapWithRetraction)
       print(io, "Map with retraction")
    else
       io = pretty(io)
+      io = terse(io)
       print(io, "Map: ")
-      print(terse(io), Lowercase(), domain(M), " -> ")
-      print(terse(io), Lowercase(), codomain(M))
+      print(io, Lowercase(), domain(M), " -> ")
+      print(io, Lowercase(), codomain(M))
    end
 end
 

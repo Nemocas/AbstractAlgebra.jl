@@ -46,9 +46,10 @@ function Base.show(io::IO, M::AbstractAlgebra.Map)
       print(io, "Map")
    else
       io = pretty(io)
+      io = terse(io)
       print(io, "Map: ")
-      print(terse(io), Lowercase(), domain(M), " -> ")
-      print(terse(io), Lowercase(), codomain(M))
+      print(io, Lowercase(), domain(M), " -> ")
+      print(io, Lowercase(), codomain(M))
    end
 end
 
