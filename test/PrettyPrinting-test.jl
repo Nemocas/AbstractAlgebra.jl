@@ -344,21 +344,21 @@ end
   function Base.show(io::IO, R::NewRing)
     if PrettyPrinting.is_terse(io)
       # no nested printing
-      print(io, "supercompact printing of newring ")
+      print(io, "terse printing of newring ")
     else
-      # nested printing allowed, preferably supercompact
+      # nested printing allowed, preferably terse
       print(io, "one line printing of newring with ")
-      print(PrettyPrinting.terse(io), "supercompact ", base_ring(R))
+      print(PrettyPrinting.terse(io), "terse ", base_ring(R))
     end
   end
 
   R = NewRing(QQ)
-  @test PrettyPrinting.detailed(R) ==
+  @test PrettyPrinting.repr_detailed(R) ==
         """I am a new ring
            I print with newlines
            Rationals"""
-  @test PrettyPrinting.oneline(R) == "one line printing of newring with supercompact Rationals"
-  @test PrettyPrinting.supercompact(R) == "supercompact printing of newring "
+  @test PrettyPrinting.repr_oneline(R) == "one line printing of newring with terse Rationals"
+  @test PrettyPrinting.repr_terse(R) == "terse printing of newring "
 
   #
   #
@@ -386,26 +386,26 @@ end
   y = """
       Something of type A
         over 2"""
-  @test PrettyPrinting.detailed(x) == y
-  @test PrettyPrinting.oneline(x) == y
-  @test PrettyPrinting.supercompact(x) == y
+  @test PrettyPrinting.repr_detailed(x) == y
+  @test PrettyPrinting.repr_oneline(x) == y
+  @test PrettyPrinting.repr_terse(x) == y
 
   x = A(A(2))
   y = """
       Something of type A
         over something of type A
           over 2"""
-  @test PrettyPrinting.detailed(x) == y
-  @test PrettyPrinting.oneline(x) == y
-  @test PrettyPrinting.supercompact(x) == y
+  @test PrettyPrinting.repr_detailed(x) == y
+  @test PrettyPrinting.repr_oneline(x) == y
+  @test PrettyPrinting.repr_terse(x) == y
 
   x = A(B())
   y = """
       Something of type A
         over Hilbert thing"""
-  @test PrettyPrinting.detailed(x) == y
-  @test PrettyPrinting.oneline(x) == y
-  @test PrettyPrinting.supercompact(x) == y
+  @test PrettyPrinting.repr_detailed(x) == y
+  @test PrettyPrinting.repr_oneline(x) == y
+  @test PrettyPrinting.repr_terse(x) == y
 
 end
 
