@@ -70,9 +70,8 @@ Base.hash(a::FreeModuleElem, h::UInt) = hash(a.v, h)
 ###############################################################################
 
 function show(io::IO, M::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
-   AbstractAlgebra.@show_name(io, M)
-   AbstractAlgebra.@show_special(io, M)
-
+   @show_name(io, M)
+   @show_special(io, M)
    print(io, "Free module of rank ")
    print(io, rank(M))
    print(io, " over ")
@@ -80,9 +79,8 @@ function show(io::IO, M::FreeModule{T}) where T <: Union{RingElement, NCRingElem
 end
 
 function show(io::IO, M::FreeModule{T}) where T <: FieldElement
-   AbstractAlgebra.@show_name(io, M)
-   AbstractAlgebra.@show_special(io, M)
-
+   @show_name(io, M)
+   @show_special(io, M)
    print(io, "Vector space of dimension ")
    print(io, dim(M))
    print(io, " over ")

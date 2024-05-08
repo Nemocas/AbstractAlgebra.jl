@@ -71,6 +71,7 @@ function show(io::IO, f::Map(ModuleIsomorphism))
     print(io, "Module isomorphism")
   else
     io = pretty(io)
+    io = terse(io)
     print(io, "Hom: ", Lowercase(), domain(f))
     print(io, " -> ", Lowercase(), codomain(f))
   end
