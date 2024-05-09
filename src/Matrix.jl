@@ -6821,8 +6821,8 @@ end
 Return parent object corresponding to the space of $r\times c$ matrices over
 the ring $R$.
 """
-function matrix_space(R::NCRing, r::Int, c::Int)
-   return Generic.matrix_space(R, r, c)
+function matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
+   return Generic.matrix_space(R, r, c; cached)
 end
 
 ###############################################################################

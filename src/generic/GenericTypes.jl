@@ -1054,13 +1054,15 @@ abstract type Mat{T} <: MatElem{T} end
 
 # not really a mathematical ring
 struct MatSpace{T <: NCRingElement} <: AbstractAlgebra.MatSpace{T}
+   base_ring::NCRing
    nrows::Int
    ncols::Int
-   base_ring::NCRing
 
    function MatSpace{T}(R::NCRing, r::Int, c::Int, cached::Bool = true) where T <: NCRingElement
-       # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-       new{T}(r, c, R)
+      # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+      @assert elem_type(R) === T
+      (r < 0 || c < 0) && error("Dimensions must be non-negative")
+      return new{T}(R, r, c)
    end
 end
 
