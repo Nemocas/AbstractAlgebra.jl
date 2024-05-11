@@ -1527,3 +1527,35 @@ mutable struct Ideal{T <: RingElement} <: AbstractAlgebra.Ideal{T}
        end
     end
 end
+
+################################################################################
+#
+#   R-algebra morphisms of R[x]
+#
+################################################################################
+
+@attributes mutable struct PolyRingAnyMap{
+    D <: AbstractAlgebra.PolyRing,
+    C <: NCRing,
+    U,
+    V} <: Map{D, C, Map, PolyRingAnyMap}
+
+  domain::D
+  codomain::C
+  coeff_map::U
+  img_gen::V
+  temp_ring           # temporary ring used when evaluating maps
+
+  function PolyRingAnyMap{D, C, U, V}(domain::D,
+                                codomain::C,
+                                coeff_map::U,
+                                img_gen::V) where {D, C, U, V}
+      @assert V === elem_type(C)
+      @assert parent(img_gen) === codomain
+    return new{D, C, U, V}(domain, codomain, coeff_map, img_gen)
+  end
+end
+
+function PolyRingAnyMap(d::D, c::C, cm::U, ig::V) where {D, C, U, V}
+  return PolyRingAnyMap{D, C, U, V}(d, c, cm, ig)
+end
