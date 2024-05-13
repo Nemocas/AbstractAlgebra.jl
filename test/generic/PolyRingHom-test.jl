@@ -6,6 +6,7 @@
   @test sprint(show, "text/plain", f) isa String
   @test f(x) == x
   @test f(x^2) == x^2
+  @test f(1) == 1
   f = hom(Qx, Qx, 1)
   @test AbstractAlgebra.Generic.morphism_type(Qx, Qx) === typeof(f)
   @test f(x) == 1

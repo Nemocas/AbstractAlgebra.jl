@@ -232,16 +232,12 @@ function _evaluate_plain(F::PolyRingAnyMap{<: PolyRing}, u)
 end
 
 function _evaluate_general(F::PolyRingAnyMap{<: PolyRing}, u)
-  if domain(F) === codomain(F) && _coefficient_map(F) === nothing
-    return (map_coefficients(_coefficient_map(F), u,
-                             parent = domain(F)))(F.img_gen)
+  @assert !(_coefficient_map(F) isa Nothing)
+  S = temp_ring(F)
+  if S !== nothing
+    return (map_coefficients(_coefficient_map(F), u, parent = S))(F.img_gen)
   else
-    S = temp_ring(F)
-    if S !== nothing
-      return (map_coefficients(_coefficient_map(F), u, parent = S))(F.img_gen)
-    else
-      return (map_coefficients(_coefficient_map(F), u))(F.img_gen)
-    end
+    return (map_coefficients(_coefficient_map(F), u))(F.img_gen)
   end
 end
 
@@ -251,7 +247,7 @@ function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, Nothing}, g)
   return _evaluate_plain(F, g)
 end
 
-function _evaluate_help(F::PolyRingAnyMap{<: PolyRing}, g)
+function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, <: Any}, g)
   return _evaluate_general(F, g)
 end
 
