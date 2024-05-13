@@ -1087,5 +1087,5 @@ h = rand(U, 3:3, -1:2, -10:10)
 ### Ring homomorphisms
 
 ```@docs
-hom(::PolyRing, ::PolyRing, ::Any, ::RingElem)
+hom(::PolyRing, ::NCRing, ::Any, ::RingElem)
 ```

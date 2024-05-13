@@ -8,7 +8,7 @@ domain(f::PolyRingAnyMap) = f.domain
 codomain(f::PolyRingAnyMap) = f.codomain
 
 # Not sure if we want to expose the following function to the user.
-# It might be `nothing`. We could return `identity in the `nothing` case.
+# It might be `nothing`. We could return `identity` in the `nothing` case.
 _coefficient_map(f::PolyRingAnyMap) = f.coeff_map
 
 _image(f::PolyRingAnyMap) = f.img_gen
@@ -213,11 +213,10 @@ function hom(R::PolyRing, S::NCRing, coeff_map, image)
   n = ngens(R)
   # Now coerce into S or throw an error if not possible
   img = _coerce(S, image)
-  return PolyRingAnyMap(R, S, coeff_map, img) # copy because of #655
+  return PolyRingAnyMap(R, S, coeff_map, img)
 end
 
 function hom(R::PolyRing, S::NCRing, image)
-  n = ngens(R)
   # Now coerce into S or throw an error if not possible
   img = _coerce(S, image)
   return PolyRingAnyMap(R, S, nothing, img)
@@ -259,11 +258,7 @@ end
 
 function (F::PolyRingAnyMap{<: PolyRing})(g)
   if g isa elem_type(domain(F))
-    if _coefficient_map(F) === nothing
-      return _evaluate_plain(F, g)
-    else 
-      return _evaluate_general(F, g)
-    end
+    _evaluate_help(F, g)
   else 
     gg = domain(F)(g)
     @assert parent(gg) === domain(F)
