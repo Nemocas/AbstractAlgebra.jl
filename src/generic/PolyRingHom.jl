@@ -210,7 +210,6 @@ julia> G(5*x + 1)
 ```
 """
 function hom(R::PolyRing, S::NCRing, coeff_map, image)
-  n = ngens(R)
   # Now coerce into S or throw an error if not possible
   img = _coerce(S, image)
   return PolyRingAnyMap(R, S, coeff_map, img)
