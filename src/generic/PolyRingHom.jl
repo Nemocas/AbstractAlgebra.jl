@@ -127,10 +127,8 @@ function compose(F::PolyRingAnyMap{D, C, <: Function}, G::PolyRingAnyMap{C, E, <
 end
 
 # Now compose with arbitrary maps
-
-# I technically cannot do the Nothing version
-
-# I can only do the Map version of the coefficient map has codomain C
+# For now we only properly do the Map version of the coefficient map has codomain C
+# Otherwise we bail out and return a generic CompositeMap
 function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where {D, C, S <: Map{C, <: Any}}
   codomain(F) === domain(G) || error("Incompatible (co)domain in composition")
   f = _coefficient_map(F)
@@ -142,6 +140,7 @@ function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where {D, C, S <
   end
 end
 
+# Special case for composing with the identity
 function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where {D, C, S <: Generic.IdentityMap{C}}
   codomain(F) === domain(G) || error("Incompatible (co)domain in composition")
   f = _coefficient_map(F)
@@ -223,11 +222,13 @@ end
 #
 ################################################################################
 
-function _evaluate_plain(F::PolyRingAnyMap{<: PolyRing}, u)
+# if the coefficient map is nothing
+function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, Nothing}, g)
   return u(F.img_gen)
 end
 
-function _evaluate_general(F::PolyRingAnyMap{<: PolyRing}, u)
+# general case
+function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, <: Any}, g)
   @assert !(_coefficient_map(F) isa Nothing)
   S = temp_ring(F)
   if S !== nothing
@@ -235,16 +236,6 @@ function _evaluate_general(F::PolyRingAnyMap{<: PolyRing}, u)
   else
     return (map_coefficients(_coefficient_map(F), u))(F.img_gen)
   end
-end
-
-# one more intermediate function
-
-function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, Nothing}, g)
-  return _evaluate_plain(F, g)
-end
-
-function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, <: Any}, g)
-  return _evaluate_general(F, g)
 end
 
 function (F::PolyRingAnyMap{<: PolyRing})(g)
