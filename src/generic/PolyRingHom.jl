@@ -224,7 +224,7 @@ end
 
 # if the coefficient map is nothing
 function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, Nothing}, g)
-  return u(F.img_gen)
+  return g(F.img_gen)
 end
 
 # general case
@@ -232,9 +232,9 @@ function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, <: Any}, g)
   @assert !(_coefficient_map(F) isa Nothing)
   S = temp_ring(F)
   if S !== nothing
-    return (map_coefficients(_coefficient_map(F), u, parent = S))(F.img_gen)
+    return (map_coefficients(_coefficient_map(F), g, parent = S))(F.img_gen)
   else
-    return (map_coefficients(_coefficient_map(F), u))(F.img_gen)
+    return (map_coefficients(_coefficient_map(F), g))(F.img_gen)
   end
 end
 
