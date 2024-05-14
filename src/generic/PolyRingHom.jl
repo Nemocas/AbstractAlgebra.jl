@@ -19,13 +19,9 @@ _image(f::PolyRingAnyMap) = f.img_gen
 #
 ################################################################################
 
-function Base.show(io::IO, ::MIME"text/plain", f::PolyRingAnyMap)
-  io = pretty(io)
-  println(terse(io), f)
-  print(io, Indent())
-  println(io, "from ", Lowercase(), domain(f))
-  println(io, "to ", Lowercase(), codomain(f))
-  println(io, Dedent(), "defined by", Indent())
+function AbstractAlgebra.show_map_data(io::IO, f::PolyRingAnyMap)
+  println(io, f)
+  println(io, "defined by", Indent())
   R = domain(f)
   g = gen(R)
   print(io, g, " -> ", f(g))
