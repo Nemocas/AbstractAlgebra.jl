@@ -92,6 +92,8 @@ include("generic/AhoCorasick.jl")
 
 include("generic/FreeAssAlgebraGroebner.jl")
 
+include("generic/PolyRingHom.jl")
+
 ###############################################################################
 #
 #   Temporary miscellaneous files being moved from Hecke.jl
