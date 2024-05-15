@@ -333,6 +333,7 @@ function Base.iterate(M::FPModule{T}) where T <: FinFieldElem
   end
   p = Base.Iterators.ProductIterator(Tuple([k for i=1:dim(M)]))
   f = iterate(p)
+  @assert f !== nothing
   return M(elem_type(k)[f[1][i] for i=1:dim(M)]), (f[2], p)
 end
 

@@ -128,7 +128,7 @@ end
 Base.copyto!(dest::MatElem, bc::Broadcast.Broadcasted) = Base.copyto!(dest, convert(Broadcast.Broadcasted{Nothing}, bc))
 
 function Base.copyto!(dest::MatElem, bc::Broadcast.Broadcasted{Nothing})
-  axes(dest) == axes(bc) || throwdm(axes(dest), axes(bc))
+  axes(dest) == axes(bc) || Broadcast.throwdm(axes(dest), axes(bc))
   # Performance optimization: broadcast!(identity, dest, A) is equivalent to copyto!(dest, A) if indices match
   if bc.f === identity && bc.args isa Tuple{AbstractArray} # only a single input argument to broadcast!
     A = bc.args[1]

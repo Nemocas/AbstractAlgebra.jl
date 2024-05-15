@@ -21,7 +21,7 @@
 #
 ###############################################################################
 
-Base.one(G::Group) = throw(NotImplementedError(:parent, g))
+Base.one(G::Group) = throw(NotImplementedError(:parent, G))
 
 Base.parent(g::GroupElem) = throw(NotImplementedError(:parent, g))
 

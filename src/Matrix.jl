@@ -627,7 +627,7 @@ function Base.iterate(M::MatSpace)
       state_type = typeof(iterate(R)[2])
       st = (elem_type(R)[], state_type[])
    else
-      a, st = iterate(p) # R is presumably not empty
+      a, st = iterate(p)::Tuple{Any, Any} # R is presumably not empty
    end
    M(a), (p, st)
 end

@@ -1387,10 +1387,6 @@ struct nheap_t
    next::Int
 end
 
-function ==(a::heap_s, b::heap_s)
-   return exps[a.exp] == exps[b.exp]
-end
-
 heapleft(i::Int) = 2i
 heapright(i::Int) = 2i + 1
 heapparent(i::Int) = div(i, 2)
