@@ -158,17 +158,17 @@ end
 #
 ################################################################################
 
-function morphism_type(::Type{D}, ::Type{C}) where {D <: PolyRing, C <: NCRing}
+function morphism_type(::Type{D}, ::Type{C}) where {D <: AbstractAlgebra.PolyRing, C <: NCRing}
   return PolyRingAnyMap{D, C, Nothing, elem_type(C)}
 end
 
-morphism_type(::D, ::C) where {D <: PolyRing, C <: NCRing} = morphism_type(D, C)
+morphism_type(::D, ::C) where {D <: AbstractAlgebra.PolyRing, C <: NCRing} = morphism_type(D, C)
 
-function morphism_type(::Type{D}, ::Type{C}, f::Type{F}) where {D <: PolyRing, C <: NCRing, F}
+function morphism_type(::Type{D}, ::Type{C}, f::Type{F}) where {D <: AbstractAlgebra.PolyRing, C <: NCRing, F}
   return PolyRingAnyMap{D, C, F, elem_type(C)}
 end
 
-morphism_type(::D, ::C, ::F) where {D <: PolyRing, C <: NCRing, F} = morphism_type(D, C, F)
+morphism_type(::D, ::C, ::F) where {D <: AbstractAlgebra.PolyRing, C <: NCRing, F} = morphism_type(D, C, F)
 
 ################################################################################
 #
@@ -177,7 +177,7 @@ morphism_type(::D, ::C, ::F) where {D <: PolyRing, C <: NCRing, F} = morphism_ty
 ################################################################################
 
 @doc raw"""
-    hom(R::PolyRing, S::NCRing, [coeff_map,] image)
+    hom(R::AbstractAlgebra.PolyRing, S::NCRing, [coeff_map,] image)
     
 Given a homomorphism `coeff_map` from `C` to `S`, where `C` is the 
 coefficient ring of `R`, and given an element `image` of `S`, return the
@@ -204,13 +204,13 @@ julia> G(5*x + 1)
 2*y^3 + 1
 ```
 """
-function hom(R::PolyRing, S::NCRing, coeff_map, image)
+function hom(R::AbstractAlgebra.PolyRing, S::NCRing, coeff_map, image)
   # Now coerce into S or throw an error if not possible
   img = _coerce(S, image)
   return PolyRingAnyMap(R, S, coeff_map, img)
 end
 
-function hom(R::PolyRing, S::NCRing, image)
+function hom(R::AbstractAlgebra.PolyRing, S::NCRing, image)
   # Now coerce into S or throw an error if not possible
   img = _coerce(S, image)
   return PolyRingAnyMap(R, S, nothing, img)
@@ -223,12 +223,12 @@ end
 ################################################################################
 
 # if the coefficient map is nothing
-function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, Nothing}, g)
+function _evaluate_help(F::PolyRingAnyMap{<: AbstractAlgebra.PolyRing, <: Any, Nothing}, g)
   return g(F.img_gen)
 end
 
 # general case
-function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, <: Any}, g)
+function _evaluate_help(F::PolyRingAnyMap{<: AbstractAlgebra.PolyRing, <: Any, <: Any}, g)
   @assert !(_coefficient_map(F) isa Nothing)
   S = temp_ring(F)
   if S !== nothing
@@ -238,7 +238,7 @@ function _evaluate_help(F::PolyRingAnyMap{<: PolyRing, <: Any, <: Any}, g)
   end
 end
 
-function (F::PolyRingAnyMap{<: PolyRing})(g)
+function (F::PolyRingAnyMap)(g)
   if g isa elem_type(domain(F))
     _evaluate_help(F, g)
   else 
