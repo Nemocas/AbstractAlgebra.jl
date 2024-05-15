@@ -48,19 +48,19 @@ Base.inv(g::GroupElem) = throw(NotImplementedError(:inv, g))
 ###############################################################################
 
 struct InfiniteOrderError{T} <: Exception
-    x::T
-    InfiniteOrderError(g::Union{GroupElem, Group}) = new{typeof(g)}(g)
+  x::T
+  InfiniteOrderError(g::Union{GroupElem, Group}) = new{typeof(g)}(g)
 end
 
 function Base.showerror(io::IO, err::InfiniteOrderError{T}) where T
-    println(io, "Infinite order exception with ", err.x)
-    print(io, "order will only return a value when it is finite. ")
-    f = if T <: Group
-        "is_finite(G)"
-    elseif T <: GroupElem
-        "is_finite_order(g)"
-    end
-    print(io, "You should check with `$f` first.")
+  println(io, "Infinite order exception with ", err.x)
+  print(io, "order will only return a value when it is finite. ")
+  f = if T <: Group
+    "is_finite(G)"
+  elseif T <: GroupElem
+    "is_finite_order(g)"
+  end
+  print(io, "You should check with `$f` first.")
 end
 
 @doc raw"""
@@ -72,7 +72,7 @@ Use `is_finite(G)` to avoid this kind of exception.
 If the order does not fit into type `T`, an `InexactError` exception will be thrown.
 """
 function order(::Type{T}, G::Group) where T
-    throw(NotImplementedError(:order, G))
+  throw(NotImplementedError(:order, G))
 end
 
 @doc raw"""
@@ -84,7 +84,7 @@ Use `is_finite_order(G)` to avoid this kind of exception.
 If the order does not fit into type `T`, an `InexactError` exception will be thrown.
 """
 function order(::Type{T}, g::GroupElem) where T
-    throw(NotImplementedError(:order, g))
+  throw(NotImplementedError(:order, g))
 end
 
 # if no return type has been specified, default to `BigInt`
@@ -99,8 +99,8 @@ _order(G) = order(BigInt, G)
 Return `true` if `g` is of finite order, possibly without computing it.
 """
 function is_finite_order(g::GroupElem)
-    is_finite(parent(g)) && return true
-    throw(NotImplementedError(:is_finite_order, g))
+  is_finite(parent(g)) && return true
+  throw(NotImplementedError(:is_finite_order, g))
 end
 
 
@@ -121,9 +121,9 @@ generators are the identity via `isone`. If no generators are available,
 it uses `is_finite` and `order`.
 """
 function is_trivial(G::Group)
-    has_gens(G) && return all(isone, gens(G))
-    is_finite(G) && return isone(order(G))
-    return false
+  has_gens(G) && return all(isone, gens(G))
+  is_finite(G) && return isone(order(G))
+  return false
 end
 
 ###############################################################################
@@ -199,11 +199,11 @@ Return the left associative iterated commutator ``[[g, h], ...]``, where
 ``[g, h] = g^{-1} h^{-1} g h``.
 """
 function comm(g::T, h::T, k::T...) where {T<:GroupElem}
-    res = comm!(similar(g), g, h)
-    for l in k
-        res = comm!(res, res, l)
-    end
-    return res
+  res = comm!(similar(g), g, h)
+  for l in k
+    res = comm!(res, res, l)
+  end
+  return res
 end
 
 """
@@ -212,7 +212,7 @@ end
 Return `g*inv(h)`.
 """
 function div_right(g::T, h::T) where {T<:GroupElem}
-    return g*inv(h)
+  return g*inv(h)
 end
 
 """
@@ -221,15 +221,15 @@ end
 Return `inv(h)*g`.
 """
 function div_left(g::T, h::T) where {T<:GroupElem}
-    return inv(h)*g
+  return inv(h)*g
 end
 
 
 Base.literal_pow(::typeof(^), g::GroupElem, ::Val{-1}) = inv(g)
 
 function Base.:(^)(g::GroupElem, n::Integer)
-    n < 0 && return inv(g)^-n
-    return Base.power_by_squaring(g, n)
+  n < 0 && return inv(g)^-n
+  return Base.power_by_squaring(g, n)
 end
 
 ################################################################################
@@ -266,8 +266,8 @@ Return `g*inv(h)`, possibly modifying `out`. Aliasing of `g` or `h` with `out`
 is allowed.
 """
 function div_right!(out::T, g::T, h::T) where {T<:GroupElem}
-    tmp = (out === g) ? inv(h) : inv!(out, h)
-    return mul!(out, g, tmp)
+  tmp = (out === g) ? inv(h) : inv!(out, h)
+  return mul!(out, g, tmp)
 end
 
 """
@@ -277,8 +277,8 @@ Return `inv(h)*g`, possibly modifying `out`. Aliasing of `g` or `h` with `out`
 is allowed.
 """
 function div_left!(out::T, g::T, h::T) where {T<:GroupElem}
-    tmp = (out === g) ? inv(h) : inv!(out, h)
-    return mul!(out, tmp, g)
+  tmp = (out === g) ? inv(h) : inv!(out, h)
+  return mul!(out, tmp, g)
 end
 
 """
@@ -288,9 +288,9 @@ Return `inv(h)*g*h`, possibly modifying `out`. Aliasing of `g` or `h` with
 `out` is allowed.
 """
 function conj!(out::T, g::T, h::T) where {T<:GroupElem}
-    tmp = (out === g || out === h) ? inv(h) : inv!(out, h)
-    tmp = (out === h) ? tmp * g : mul!(out, tmp, g)
-    return mul!(out, tmp, h)
+  tmp = (out === g || out === h) ? inv(h) : inv!(out, h)
+  tmp = (out === h) ? tmp * g : mul!(out, tmp, g)
+  return mul!(out, tmp, h)
 end
 
 """
@@ -300,7 +300,7 @@ Return `inv(g)*inv(h)*g*h`, possibly modifying `out`. Aliasing of `g` or `h`
 with `out` is allowed.
 """
 function comm!(out::T, g::T, h::T) where {T<:GroupElem}
-    # TODO: can we make comm! with 3 arguments without allocation??
-    tmp = (out === g) ? conj(g, h) : conj!(out, g, h)
-    return div_left!(out, tmp, g)
+  # TODO: can we make comm! with 3 arguments without allocation??
+  tmp = (out === g) ? conj(g, h) : conj!(out, g, h)
+  return div_left!(out, tmp, g)
 end

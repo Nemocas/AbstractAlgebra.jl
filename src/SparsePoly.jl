@@ -21,5 +21,5 @@ will be cached. Setting the optional argument `cached` to `false` will
 prevent the parent object `T` from being cached.
 """
 function SparsePolynomialRing(R::Ring, s::VarName; cached::Bool = true)
-   return Generic.SparsePolynomialRing(R, Symbol(s); cached=cached)
+  return Generic.SparsePolynomialRing(R, Symbol(s); cached=cached)
 end

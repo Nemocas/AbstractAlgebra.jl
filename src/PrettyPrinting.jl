@@ -89,63 +89,63 @@ const prec_post_SuperscriptBox = 51    # precedence for a^b in 2d form
 ################################################################################
 
 function expr_to_string(@nospecialize(obj))
-   return sprint(show_obj, MIME("text/plain"), obj)
+  return sprint(show_obj, MIME("text/plain"), obj)
 end
 
 function expr_to_latex_string(@nospecialize(obj))
-   return sprint(show_obj, MIME("text/latex"), obj)
+  return sprint(show_obj, MIME("text/latex"), obj)
 end
 
 function obj_to_string(@nospecialize(obj); context = nothing)
-   return sprint(show_via_expressify, MIME("text/plain"), obj, context = context)
+  return sprint(show_via_expressify, MIME("text/plain"), obj, context = context)
 end
 
 # parenthesize obj as if it were a term in a product
 function obj_to_string_wrt_times(@nospecialize(obj); context = nothing)
-   io = IOBuffer()
-   S = AbstractAlgebra.printer(io)
-   print_obj(S, MIME("text/plain"),
-             canonicalize(expressify(obj, context = context)),
-             prec_inf_Times, prec_inf_Times)
-   finish(S)
-   return String(take!(io))
+  io = IOBuffer()
+  S = AbstractAlgebra.printer(io)
+  print_obj(S, MIME("text/plain"),
+            canonicalize(expressify(obj, context = context)),
+            prec_inf_Times, prec_inf_Times)
+  finish(S)
+  return String(take!(io))
 end
 
 function obj_to_latex_string(@nospecialize(obj); context = nothing)
-   return sprint(show_via_expressify, MIME("text/latex"), obj, context = context)
+  return sprint(show_via_expressify, MIME("text/latex"), obj, context = context)
 end
 
 function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
-   if isdefined(Main, :IJulia) && Main.IJulia.inited
-      error("Dummy error for jupyter")
-   end
-   show_via_expressify(io, mi, x)
+  if isdefined(Main, :IJulia) && Main.IJulia.inited
+    error("Dummy error for jupyter")
+  end
+  show_via_expressify(io, mi, x)
 end
 
 function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
-   if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-         !AbstractAlgebra.get_html_as_latex()
-      error("Dummy error for jupyter")
-   end
-   if AbstractAlgebra.get_html_as_latex()
-      io = IOContext(io, :size_limit => 1000)
-   end
-   show_via_expressify(io, mi, x)
+  if isdefined(Main, :IJulia) && Main.IJulia.inited &&
+    !AbstractAlgebra.get_html_as_latex()
+    error("Dummy error for jupyter")
+  end
+  if AbstractAlgebra.get_html_as_latex()
+    io = IOContext(io, :size_limit => 1000)
+  end
+  show_via_expressify(io, mi, x)
 end
 
 function show_via_expressify(io::IO, @nospecialize(obj); context = nothing)
-   show_via_expressify(io::IO, MIME("text/plain"), obj, context = context)
+  show_via_expressify(io::IO, MIME("text/plain"), obj, context = context)
 end
 
 function show_via_expressify(io::IO, mi::MIME, @nospecialize(obj); context = nothing)
-   show_obj(io, mi, canonicalize(expressify(obj, context = context)))
+  show_obj(io, mi, canonicalize(expressify(obj, context = context)))
 end
 
 # the low-level workhorse
 function show_obj(io::IO, mi::MIME, obj)
-   S = printer(io)
-   print_obj(S, mi, obj, prec_lowest, prec_lowest)
-   finish(S)
+  S = printer(io)
+  print_obj(S, mi, obj, prec_lowest, prec_lowest)
+  finish(S)
 end
 
 global _html_as_latex = Ref(false)
@@ -170,15 +170,15 @@ function set_html_as_latex(fl::Bool)
 end
 
 function show_obj(io::IO, mi::MIME"text/html", obj)
-   if _html_as_latex[]
-      print(io, "\$")
-      show_obj(io, MIME("text/latex"), obj)
-      print(io, "\$")
-   else
-      #print(io, "<font face=\"mono\">")
-      show_obj(io, MIME("text/plain"), obj)
-      #print(io, "</font>")
-   end
+  if _html_as_latex[]
+    print(io, "\$")
+    show_obj(io, MIME("text/latex"), obj)
+    print(io, "\$")
+  else
+    #print(io, "<font face=\"mono\">")
+    show_obj(io, MIME("text/plain"), obj)
+    #print(io, "</font>")
+  end
 end
 
 ################################################################################
@@ -219,7 +219,7 @@ end
 
 
 function expressify(@nospecialize(a); context = nothing)
-   return sprint(print, a; context = context)::String
+  return sprint(print, a; context = context)::String
 end
 
 # Only when AbstractAlgebra.expressify(a::T; context = nothing) has been
@@ -255,26 +255,26 @@ end
 macro enable_all_show_via_expressify(T)
   return quote
     function Base.show(io::IO, x::$(esc(T)))
-       AbstractAlgebra.show_via_expressify(io, x)
+      AbstractAlgebra.show_via_expressify(io, x)
     end
 
     function Base.show(io::IO, mi::MIME"text/plain", x::$(esc(T)))
-       AbstractAlgebra.show_via_expressify(io, mi, x)
+      AbstractAlgebra.show_via_expressify(io, mi, x)
     end
 
     function Base.show(io::IO, mi::MIME"text/latex", x::$(esc(T)))
-       if isdefined(Main, :IJulia) && Main.IJulia.inited
-          error("Dummy error for jupyter")
-       end
-       return AbstractAlgebra.show_via_expressify(io, mi, x)
+      if isdefined(Main, :IJulia) && Main.IJulia.inited
+        error("Dummy error for jupyter")
+      end
+      return AbstractAlgebra.show_via_expressify(io, mi, x)
     end
 
     function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))
-       if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-             !AbstractAlgebra.get_html_as_latex()
-          error("Dummy error for jupyter")
-       end
-       return AbstractAlgebra.show_via_expressify(io, mi, x)
+      if isdefined(Main, :IJulia) && Main.IJulia.inited &&
+        !AbstractAlgebra.get_html_as_latex()
+        error("Dummy error for jupyter")
+      end
+      return AbstractAlgebra.show_via_expressify(io, mi, x)
     end
   end
 end
@@ -301,18 +301,18 @@ end
 
 # is obj a call to op with 1 or more arguments
 function isaExprOp(@nospecialize(obj), op::Symbol)
-   return isa(obj, Expr) &&
-          length(obj.args) > 1 &&
-          obj.head === :call &&
-          obj.args[1] === op
+  return isa(obj, Expr) &&
+  length(obj.args) > 1 &&
+  obj.head === :call &&
+  obj.args[1] === op
 end
 
 # is obj a call to op with len arguments
 function isaExprOp(@nospecialize(obj), op::Symbol, len::Int)
-   return isa(obj, Expr) &&
-          length(obj.args) == len + 1 &&
-          obj.head === :call &&
-          obj.args[1] === op
+  return isa(obj, Expr) &&
+  length(obj.args) == len + 1 &&
+  obj.head === :call &&
+  obj.args[1] === op
 end
 
 # syntactic zeros can be removed from sums and turn a product into 0
@@ -329,221 +329,221 @@ is_syntactic_one(obj) = false
 
 
 function get_syntactic_sign_abs(obj::Number)
-   return obj < 0 ? (-1, -obj) : (1, obj)
+  return obj < 0 ? (-1, -obj) : (1, obj)
 end
 
 function get_syntactic_sign_abs(obj::Expr)
-   if obj.head !== :call
+  if obj.head !== :call
+    return (1, obj)
+  end
+  if length(obj.args) == 2 && obj.args[1] === :-
+    # unary minus is negative
+    (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
+    return (-sgn, obj.args[2])
+  elseif length(obj.args) > 2 && obj.args[1] === :*
+    # product is negative if first term is
+    (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
+    if sgn > 0
       return (1, obj)
-   end
-   if length(obj.args) == 2 && obj.args[1] === :-
-      # unary minus is negative
-      (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
-      return (-sgn, obj.args[2])
-   elseif length(obj.args) > 2 && obj.args[1] === :*
-      # product is negative if first term is
-      (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
-      if sgn > 0
-         return (1, obj)
-      else
-         newobj = Expr(obj.head)
-         newobj.args = copy(obj.args)
-         newobj.args[2] = abs
-         if is_syntactic_one(newobj.args[2])
-            deleteat!(newobj.args, 2)
-         end
-         if length(newobj.args) == 2
-            return (sgn, newobj.args[2])
-         else
-            return (sgn, newobj)
-         end
+    else
+      newobj = Expr(obj.head)
+      newobj.args = copy(obj.args)
+      newobj.args[2] = abs
+      if is_syntactic_one(newobj.args[2])
+        deleteat!(newobj.args, 2)
       end
-   elseif length(obj.args) == 3 && (obj.args[1] === :/ || obj.args[1] === ://)
-      # quotient is negative if numerator is
-      (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
-      if sgn > 0
-         return (1, obj)
+      if length(newobj.args) == 2
+        return (sgn, newobj.args[2])
       else
-         newobj = Expr(obj.head)
-         newobj.args = copy(obj.args)
-         newobj.args[2] = abs
-         return (sgn, newobj)
+        return (sgn, newobj)
       end
-   else
+    end
+  elseif length(obj.args) == 3 && (obj.args[1] === :/ || obj.args[1] === ://)
+    # quotient is negative if numerator is
+    (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
+    if sgn > 0
       return (1, obj)
-   end
+    else
+      newobj = Expr(obj.head)
+      newobj.args = copy(obj.args)
+      newobj.args[2] = abs
+      return (sgn, newobj)
+    end
+  else
+    return (1, obj)
+  end
 end
 
 function get_syntactic_sign_abs(obj)
-   return (1, obj)
+  return (1, obj)
 end
 
 
 function syntactic_neg!(obj::Expr)
-   if isaExprOp(obj, :*) || isaExprOp(obj, :/) || isaExprOp(obj, ://)
-      obj.args[2] = syntactic_neg!(obj.args[2])
-      return obj
-   elseif isaExprOp(obj, :-, 1)
-      return obj.args[2]
-   else
-      return Expr(:call, :-, obj)
-   end
+  if isaExprOp(obj, :*) || isaExprOp(obj, :/) || isaExprOp(obj, ://)
+    obj.args[2] = syntactic_neg!(obj.args[2])
+    return obj
+  elseif isaExprOp(obj, :-, 1)
+    return obj.args[2]
+  else
+    return Expr(:call, :-, obj)
+  end
 end
 
 function syntactic_neg!(obj)
-   return Expr(:call, :-, obj)
+  return Expr(:call, :-, obj)
 end
 
 
 # not actually implemented recursively to avoid stack overflow
 function flatten_recursive!(ans::Expr, obj::Expr, op::Symbol)
-   stack = reverse(obj.args[2:end])
-   while !isempty(stack)
-      top = pop!(stack)
-      if isaExprOp(top, op)
-         for i in length(top.args):-1:2
-            push!(stack, top.args[i])
-         end
-      else
-         push!(ans.args, top)
+  stack = reverse(obj.args[2:end])
+  while !isempty(stack)
+    top = pop!(stack)
+    if isaExprOp(top, op)
+      for i in length(top.args):-1:2
+        push!(stack, top.args[i])
       end
-   end
+    else
+      push!(ans.args, top)
+    end
+  end
 end
 
 # op(op(a,b),op(c,d)) => op(a,b,c,d) etc
 function flatten_op(obj::Expr, op::Symbol)
-   if !isaExprOp(obj, op)
-      return obj
-   end
-   for i in 2:length(obj.args)
-      if isaExprOp(obj.args[i], op)
-         ans = Expr(:call, op)
-         flatten_recursive!(ans, obj, op)
-         return ans
-      end
-   end
-   return obj
+  if !isaExprOp(obj, op)
+    return obj
+  end
+  for i in 2:length(obj.args)
+    if isaExprOp(obj.args[i], op)
+      ans = Expr(:call, op)
+      flatten_recursive!(ans, obj, op)
+      return ans
+    end
+  end
+  return obj
 end
 
 function canonicalizePlusFinal!(obj::Expr)
-   @assert obj.head === :call && obj.args[1] === :+
-   if length(obj.args) < 2
-      return 0
-   elseif length(obj.args) == 2
-      return obj.args[2]
-   end
-   obj = flatten_op(obj, :+)
-   for i in 3:length(obj.args)
-      (sign, abs) = get_syntactic_sign_abs(obj.args[i])
-      if sign < 0
-         obj.args[i] = Expr(:call, :-, abs)
-      else
-         obj.args[i] = abs
-      end
-   end
-   return obj
+  @assert obj.head === :call && obj.args[1] === :+
+  if length(obj.args) < 2
+    return 0
+  elseif length(obj.args) == 2
+    return obj.args[2]
+  end
+  obj = flatten_op(obj, :+)
+  for i in 3:length(obj.args)
+    (sign, abs) = get_syntactic_sign_abs(obj.args[i])
+    if sign < 0
+      obj.args[i] = Expr(:call, :-, abs)
+    else
+      obj.args[i] = abs
+    end
+  end
+  return obj
 end
 
 function canonicalizePlus(obj::Expr)
-   @assert obj.head === :call && obj.args[1] === :+
-   if length(obj.args) < 2
-      return 0
-   elseif length(obj.args) == 2
-      return canonicalize(obj.args[2])
-   end
-   # this flatten is just to try to avoid stack overflows in canonicalize
-   obj = flatten_op(obj, :+)
-   newobj = Expr(:call, :+)
-   for i in 2:length(obj.args)
-      t = canonicalize(obj.args[i])
-      if !is_syntactic_zero(t)
-         push!(newobj.args, t)
-      end
-   end
-   # now do the real flatten
-   return canonicalizePlusFinal!(newobj)
+  @assert obj.head === :call && obj.args[1] === :+
+  if length(obj.args) < 2
+    return 0
+  elseif length(obj.args) == 2
+    return canonicalize(obj.args[2])
+  end
+  # this flatten is just to try to avoid stack overflows in canonicalize
+  obj = flatten_op(obj, :+)
+  newobj = Expr(:call, :+)
+  for i in 2:length(obj.args)
+    t = canonicalize(obj.args[i])
+    if !is_syntactic_zero(t)
+      push!(newobj.args, t)
+    end
+  end
+  # now do the real flatten
+  return canonicalizePlusFinal!(newobj)
 end
 
 function canonicalizeMinus(obj::Expr)
-   @assert obj.head === :call && obj.args[1] === :-
-   if length(obj.args) < 2
-      return 0
-   elseif length(obj.args) == 2
-      return syntactic_neg!(canonicalize(obj.args[2]))
-   end
-   newobj = Expr(:call, :+)
-   for i in 2:length(obj.args)
-      t = canonicalize(obj.args[i])
-      if !is_syntactic_zero(t)
-         push!(newobj.args, i > 2 ? syntactic_neg!(t) : t)
-      end
-   end
-   return canonicalizePlusFinal!(newobj)
+  @assert obj.head === :call && obj.args[1] === :-
+  if length(obj.args) < 2
+    return 0
+  elseif length(obj.args) == 2
+    return syntactic_neg!(canonicalize(obj.args[2]))
+  end
+  newobj = Expr(:call, :+)
+  for i in 2:length(obj.args)
+    t = canonicalize(obj.args[i])
+    if !is_syntactic_zero(t)
+      push!(newobj.args, i > 2 ? syntactic_neg!(t) : t)
+    end
+  end
+  return canonicalizePlusFinal!(newobj)
 end
 
 function canonicalizeTimes(obj::Expr)
-   op = obj.args[1]
-   @assert obj.head === :call && (op === :* || op === :cdot)
-   if length(obj.args) < 2
-      return 1
-   elseif length(obj.args) == 2
-      return canonicalize(obj.args[2])
-   end
-   if op === :cdot
-      return canonicalize_general_recursive(obj)
-   end
-   obj = flatten_op(obj, op)
-   newobj = Expr(:call, op)
-   newsign = 1
-   for i in 2:length(obj.args)
-      t = canonicalize(obj.args[i])
-      if is_syntactic_zero(t)
-         return 0
-      else
-         (sign, abs) = get_syntactic_sign_abs(t)
-         newsign *= sign
-         if !is_syntactic_one(abs)
-             push!(newobj.args, abs)
-         end
+  op = obj.args[1]
+  @assert obj.head === :call && (op === :* || op === :cdot)
+  if length(obj.args) < 2
+    return 1
+  elseif length(obj.args) == 2
+    return canonicalize(obj.args[2])
+  end
+  if op === :cdot
+    return canonicalize_general_recursive(obj)
+  end
+  obj = flatten_op(obj, op)
+  newobj = Expr(:call, op)
+  newsign = 1
+  for i in 2:length(obj.args)
+    t = canonicalize(obj.args[i])
+    if is_syntactic_zero(t)
+      return 0
+    else
+      (sign, abs) = get_syntactic_sign_abs(t)
+      newsign *= sign
+      if !is_syntactic_one(abs)
+        push!(newobj.args, abs)
       end
-   end
-   if length(newobj.args) < 2
-      newobj = 1
-   elseif length(newobj.args) == 2
-      newobj = newobj.args[2]
-   else
-      newobj = flatten_op(newobj, op)
-   end
-   if newsign < 0
-      newobj = syntactic_neg!(newobj)
-   end
-   return newobj
+    end
+  end
+  if length(newobj.args) < 2
+    newobj = 1
+  elseif length(newobj.args) == 2
+    newobj = newobj.args[2]
+  else
+    newobj = flatten_op(newobj, op)
+  end
+  if newsign < 0
+    newobj = syntactic_neg!(newobj)
+  end
+  return newobj
 end
 
 function canonicalize_general_recursive(obj::Expr)
-   newobj = Expr(obj.head)
-   for i in obj.args
-      push!(newobj.args, canonicalize(i))
-   end
-   return newobj
+  newobj = Expr(obj.head)
+  for i in obj.args
+    push!(newobj.args, canonicalize(i))
+  end
+  return newobj
 end
 
 function canonicalize(obj::Expr)
-   if obj.head === :call && !isempty(obj.args)
-      if obj.args[1] === :+
-         return canonicalizePlus(obj)
-      elseif obj.args[1] === :-
-         return canonicalizeMinus(obj)
-      elseif obj.args[1] === :* || obj.args[1] === :cdot
-         return canonicalizeTimes(obj)
-      end
-   end
-   return canonicalize_general_recursive(obj)
+  if obj.head === :call && !isempty(obj.args)
+    if obj.args[1] === :+
+      return canonicalizePlus(obj)
+    elseif obj.args[1] === :-
+      return canonicalizeMinus(obj)
+    elseif obj.args[1] === :* || obj.args[1] === :cdot
+      return canonicalizeTimes(obj)
+    end
+  end
+  return canonicalize_general_recursive(obj)
 end
 
 #fallback
 function canonicalize(obj)
-   return obj
+  return obj
 end
 
 ################################################################################
@@ -553,203 +553,203 @@ end
 ################################################################################
 
 mutable struct printer
-   io::IO
-   array::Vector{String}
+  io::IO
+  array::Vector{String}
 
-   # if terse_level is positive we print a+b instead of a + b
-   terse_level::Int
-   size_limit_stack::Vector{Int}  # >= 0 for loosely-defined limit before ...
-                                  # < 0 for unrestricted output
+  # if terse_level is positive we print a+b instead of a + b
+  terse_level::Int
+  size_limit_stack::Vector{Int}  # >= 0 for loosely-defined limit before ...
+  # < 0 for unrestricted output
 end
 
 function printer(io::IO)
-   terse_level = get(io, :terse_level, 0)
-   size_limit = get(io, :size_limit, -1)
-   return printer(io, String[], terse_level, Int[size_limit])
+  terse_level = get(io, :terse_level, 0)
+  size_limit = get(io, :size_limit, -1)
+  return printer(io, String[], terse_level, Int[size_limit])
 end
 
 # TODO since the subexpressions are not changing much, cache the leaf_count
 # so that subexpressions don't have bad quadratic behavior
 function leaf_count(S::printer, obj::Expr)
-   z = 0
-   for i in obj.args
-      z += leaf_count(S, i)
-   end
-   return z
+  z = 0
+  for i in obj.args
+    z += leaf_count(S, i)
+  end
+  return z
 end
 
 function leaf_count(S::printer, obj)
-   return 1
+  return 1
 end
 
 # size_limit is a rough limit on the number of leaves printed
 function size_limit(S::printer)
-   return S.size_limit_stack[end]
+  return S.size_limit_stack[end]
 end
 
 function set_size_limit(S::printer, l::Int)
-   push!(S.size_limit_stack, l)
+  push!(S.size_limit_stack, l)
 end
 
 function restore_size_limit(S::printer)
-   pop!(S.size_limit_stack)
+  pop!(S.size_limit_stack)
 end
 
 # maintain the last few printed things for token (un)mashing purposes
 function push(S::printer, s::String)
-   while length(S.array) > 3
-      print(S.io, popfirst!(S.array))
-   end
-   push!(S.array, s)
+  while length(S.array) > 3
+    print(S.io, popfirst!(S.array))
+  end
+  push!(S.array, s)
 end
 
 function push_left_parenthesis(S::printer, ::MIME)
-   push(S, "(")
+  push(S, "(")
 end
 
 function push_right_parenthesis(S::printer, ::MIME)
-   push(S, ")")
+  push(S, ")")
 end
 
 function push_left_parenthesis(S::printer, ::MIME"text/latex")
-   push(S, "\\left(")
+  push(S, "\\left(")
 end
 
 function push_right_parenthesis(S::printer, ::MIME"text/latex")
-   push(S, "\\right)")
+  push(S, "\\right)")
 end
 
 function push_left_bracket(S::printer, ::MIME)
-   push(S, "[")
+  push(S, "[")
 end
 
 function push_right_bracket(S::printer, ::MIME)
-   push(S, "]")
+  push(S, "]")
 end
 
 function push_left_bracket(S::printer, ::MIME"text/latex")
-   push(S, "\\left[")
+  push(S, "\\left[")
 end
 
 function push_right_bracket(S::printer, ::MIME"text/latex")
-   push(S, "\\right]")
+  push(S, "\\right]")
 end
 
 function push_left_curly(S::printer, ::MIME)
-   push(S, "{")
+  push(S, "{")
 end
 
 function push_right_curly(S::printer, ::MIME)
-   push(S, "}")
+  push(S, "}")
 end
 
 function push_left_curly(S::printer, ::MIME"text/latex")
-   push(S, "\\left{")
+  push(S, "\\left{")
 end
 
 function push_right_curly(S::printer, ::MIME"text/latex")
-   push(S, "\\right}")
+  push(S, "\\right}")
 end
 
 function push_elision(S, ::MIME)
-   push(S, "...")
+  push(S, "...")
 end
 
 function push_elision(S, ::MIME"text/latex")
-   push(S, "{\\ldots}")
+  push(S, "{\\ldots}")
 end
 
 function finish(S::printer)
-   while !isempty(S.array)
-      print(S.io, popfirst!(S.array))
-   end
+  while !isempty(S.array)
+    print(S.io, popfirst!(S.array))
+  end
 end
 
 # determine the limits for the subexpressions of a given expression
 # look at obj.args[offset + 1], ..., obj.args[offset + n]
 function child_limits(S::printer, obj::Expr, off::Int, n::Int)
-   l = max(1, size_limit(S))
+  l = max(1, size_limit(S))
 
-   if n > l
-      leaf_counts = Int[leaf_count(S, obj.args[off +
-                                 (2*i <= l + 1 ? i : i + n - l)]) for i in 1:l]
-      n = l
-   else
-      leaf_counts = Int[leaf_count(S, obj.args[off + i]) for i in 1:n]
-   end
+  if n > l
+    leaf_counts = Int[leaf_count(S, obj.args[off +
+                                             (2*i <= l + 1 ? i : i + n - l)]) for i in 1:l]
+    n = l
+  else
+    leaf_counts = Int[leaf_count(S, obj.args[off + i]) for i in 1:n]
+  end
 
-   total_leaf_count = sum(leaf_counts)
-   a = Int[] # will be limits for the terms from the start
-   b = Int[] # will be limits for the terms from the end
-   abtotal = 0
-   while length(a) + length(b) < n
-      ai = 1 + length(a)
-      bi = n - length(b)
-      if length(a) < length(b) || (length(a) == length(b) &&
-                                   leaf_counts[ai] <= leaf_counts[bi])
-         t = max(min(3, leaf_counts[ai]), div(leaf_counts[ai]*l, total_leaf_count))
-         if leaf_counts[ai] < l/32
-            t = max(t, leaf_counts[ai])
-         end
-         push!(a, min(t, l))
-      else
-         t = max(min(3, leaf_counts[bi]), div(leaf_counts[bi]*l, total_leaf_count))
-         if leaf_counts[bi] < l/32
-            t = max(t, leaf_counts[bi])
-         end
-         push!(b, min(t, l))
+  total_leaf_count = sum(leaf_counts)
+  a = Int[] # will be limits for the terms from the start
+  b = Int[] # will be limits for the terms from the end
+  abtotal = 0
+  while length(a) + length(b) < n
+    ai = 1 + length(a)
+    bi = n - length(b)
+    if length(a) < length(b) || (length(a) == length(b) &&
+                                 leaf_counts[ai] <= leaf_counts[bi])
+      t = max(min(3, leaf_counts[ai]), div(leaf_counts[ai]*l, total_leaf_count))
+      if leaf_counts[ai] < l/32
+        t = max(t, leaf_counts[ai])
       end
-      abtotal += t
-      abtotal < l || break
-   end
-   return a, b
+      push!(a, min(t, l))
+    else
+      t = max(min(3, leaf_counts[bi]), div(leaf_counts[bi]*l, total_leaf_count))
+      if leaf_counts[bi] < l/32
+        t = max(t, leaf_counts[bi])
+      end
+      push!(b, min(t, l))
+    end
+    abtotal += t
+    abtotal < l || break
+  end
+  return a, b
 end
 
 function compare_op_string(mi::MIME, op)
-   if op === :(==)
-      return "="
-   else
-      return string(op)::String
-   end
+  if op === :(==)
+    return "="
+  else
+    return string(op)::String
+  end
 end
 
 function compare_op_string(mi::MIME"text/latex", op)
-   if op === :(==)
-      return "="
-   elseif op === :(<=)
-      return "\\le"
-   elseif op === :(>=)
-      return "\\ge"
-   elseif op === :(!=)
-      return "\\neq"
-   else
-      return string(op)::String
-   end
+  if op === :(==)
+    return "="
+  elseif op === :(<=)
+    return "\\le"
+  elseif op === :(>=)
+    return "\\ge"
+  elseif op === :(!=)
+    return "\\neq"
+  else
+    return string(op)::String
+  end
 end
 
 function print_comparison(S::printer, mi::MIME, obj::Expr,
-                           left::Int, right::Int, prec::Int)
-   n = length(obj.args)
-   @assert isodd(n) && n > 1
-   sep = S.terse_level > 0 ? "" : " "
+    left::Int, right::Int, prec::Int)
+  n = length(obj.args)
+  @assert isodd(n) && n > 1
+  sep = S.terse_level > 0 ? "" : " "
 
-   needp = prec <= left || prec <= right
-   if needp
-      left = right = prec_lowest
-      push_left_parenthesis(S, mi)
-   end
+  needp = prec <= left || prec <= right
+  if needp
+    left = right = prec_lowest
+    push_left_parenthesis(S, mi)
+  end
 
-   print_obj(S, mi, obj.args[1], left, prec)
-   for i in 2:2:n-3
-      push(S, sep*compare_op_string(mi, obj.args[i])*sep)
-      print_obj(S, mi, obj.args[i+1], prec, prec)
-   end
-   push(S, sep*compare_op_string(mi, obj.args[n-1])*sep)
-   print_obj(S, mi, obj.args[n], prec, right)
+  print_obj(S, mi, obj.args[1], left, prec)
+  for i in 2:2:n-3
+    push(S, sep*compare_op_string(mi, obj.args[i])*sep)
+    print_obj(S, mi, obj.args[i+1], prec, prec)
+  end
+  push(S, sep*compare_op_string(mi, obj.args[n-1])*sep)
+  print_obj(S, mi, obj.args[n], prec, right)
 
-   if needp
-      push_right_parenthesis(S, mi)
-   end
+  if needp
+    push_right_parenthesis(S, mi)
+  end
 end
 
 
@@ -757,671 +757,671 @@ end
 # dir < 0 right associative: ^
 # dir = 0 non associative:
 function printGenericInfix(S::printer, mi::MIME, obj::Expr,
-                           left::Int, right::Int,
-                           op::String, prec::Int, dir::Int)
-   n = length(obj.args)
-   if n < 3
-      print_call_or_ref(S, mi, obj, left, right)
-      return
-   end
+    left::Int, right::Int,
+    op::String, prec::Int, dir::Int)
+  n = length(obj.args)
+  if n < 3
+    print_call_or_ref(S, mi, obj, left, right)
+    return
+  end
 
-   needp = prec <= left || prec <= right
-   if needp
-      left = right = prec_lowest
-      push_left_parenthesis(S, mi)
-   end
+  needp = prec <= left || prec <= right
+  if needp
+    left = right = prec_lowest
+    push_left_parenthesis(S, mi)
+  end
 
-   if size_limit(S) < 0
-      # printing with no restriction
-      print_obj(S, mi, obj.args[2], left, prec - (dir > 0))
-      for i in 3:(n - 1)
-         push(S, op)
-         print_obj(S, mi, obj.args[i], prec, prec)
-      end
+  if size_limit(S) < 0
+    # printing with no restriction
+    print_obj(S, mi, obj.args[2], left, prec - (dir > 0))
+    for i in 3:(n - 1)
       push(S, op)
-      print_obj(S, mi, obj.args[n], prec - (dir < 0), right)
-   elseif size_limit(S) == 0
-      # no space to print anything
-      push_elision(S, mi)
-   else
-      n -= 1
-      a, b = child_limits(S, obj, 1, n)
-      wrote_elision = false
-      for i in 1:n
+      print_obj(S, mi, obj.args[i], prec, prec)
+    end
+    push(S, op)
+    print_obj(S, mi, obj.args[n], prec - (dir < 0), right)
+  elseif size_limit(S) == 0
+    # no space to print anything
+    push_elision(S, mi)
+  else
+    n -= 1
+    a, b = child_limits(S, obj, 1, n)
+    wrote_elision = false
+    for i in 1:n
 
-         if i <= length(a)
-            set_size_limit(S, a[i])
-         elseif n - i + 1 <= length(b)
-            set_size_limit(S, b[n - i + 1])
-         else
-            if !wrote_elision
-               i == 1 || push(S, op)
-               push_elision(S, mi)
-            end
-            wrote_elision = true
-            continue
-         end
-         i == 1 || push(S, op)
-         print_obj(S, mi, obj.args[i + 1],
-                   i == 1 ? left : i == n ? prec - (dir < 0) : prec,
-                   i == 1 ? prec - (dir > 0) : i == n ? right : prec)
-         restore_size_limit(S)
+      if i <= length(a)
+        set_size_limit(S, a[i])
+      elseif n - i + 1 <= length(b)
+        set_size_limit(S, b[n - i + 1])
+      else
+        if !wrote_elision
+          i == 1 || push(S, op)
+          push_elision(S, mi)
+        end
+        wrote_elision = true
+        continue
       end
-   end
+      i == 1 || push(S, op)
+      print_obj(S, mi, obj.args[i + 1],
+                i == 1 ? left : i == n ? prec - (dir < 0) : prec,
+                i == 1 ? prec - (dir > 0) : i == n ? right : prec)
+      restore_size_limit(S)
+    end
+  end
 
-   if needp
-      push_right_parenthesis(S, mi)
-   end
+  if needp
+    push_right_parenthesis(S, mi)
+  end
 end
 
 function printGenericPrefix(S::printer, mi::MIME, obj::Expr,
-                            left::Int, right::Int,
-                            op::String, prec::Int)
-   @assert length(obj.args) == 2
-   needp = prec <= right
-   if needp
-      left = right = prec_lowest
-      push_left_parenthesis(S, mi)
-   end
-   push(S, op)
-   print_obj(S, mi, obj.args[2], prec, right)
-   if needp
-      push_right_parenthesis(S, mi)
-   end
+    left::Int, right::Int,
+    op::String, prec::Int)
+  @assert length(obj.args) == 2
+  needp = prec <= right
+  if needp
+    left = right = prec_lowest
+    push_left_parenthesis(S, mi)
+  end
+  push(S, op)
+  print_obj(S, mi, obj.args[2], prec, right)
+  if needp
+    push_right_parenthesis(S, mi)
+  end
 end
 
 function printPlusArg(S::printer, mi::MIME, obj::Expr, i::Int,
-                      left::Int, right::Int, prec::Int)
-   n = length(obj.args)
-   if i == 1
-      print_obj(S, mi, obj.args[2], left, prec - 1)
-   else
-      arg = obj.args[i + 1]
-      if isaExprOp(arg, :-, 1)
-         push(S, S.terse_level > 0 ? "-" : " - ")
-         arg = arg.args[2]
-         left_prec = prec_inf_Minus
-      else
-         push(S, S.terse_level > 0 ? "+" : " + ")
-         left_prec = prec_inf_Plus
-      end
-      right_prec = i + 2 > n ? right :
-                  isaExprOp(obj.args[i + 2], :-, 1) ? prec_inf_Minus :
-                                                      prec_inf_Plus
-      print_obj(S, mi, arg, left_prec, right_prec)
-   end
+    left::Int, right::Int, prec::Int)
+  n = length(obj.args)
+  if i == 1
+    print_obj(S, mi, obj.args[2], left, prec - 1)
+  else
+    arg = obj.args[i + 1]
+    if isaExprOp(arg, :-, 1)
+      push(S, S.terse_level > 0 ? "-" : " - ")
+      arg = arg.args[2]
+      left_prec = prec_inf_Minus
+    else
+      push(S, S.terse_level > 0 ? "+" : " + ")
+      left_prec = prec_inf_Plus
+    end
+    right_prec = i + 2 > n ? right :
+    isaExprOp(obj.args[i + 2], :-, 1) ? prec_inf_Minus :
+    prec_inf_Plus
+    print_obj(S, mi, arg, left_prec, right_prec)
+  end
 end
 
 # special override for plus which seeks the sign of its arguments 
 function printPlus(S::printer, mi::MIME, obj::Expr,
-                   left::Int, right::Int)
-   n = length(obj.args)
-   @assert n > 0 && obj.head === :call && obj.args[1] === :+
-   if n < 2
-      print_call_or_ref(S, mi, obj, left, right)
-      return
-   elseif n == 2
-      printGenericPrefix(S, mi, obj, left, right, "+", prec_pre_Plus)
-      return
-   end
+    left::Int, right::Int)
+  n = length(obj.args)
+  @assert n > 0 && obj.head === :call && obj.args[1] === :+
+  if n < 2
+    print_call_or_ref(S, mi, obj, left, right)
+    return
+  elseif n == 2
+    printGenericPrefix(S, mi, obj, left, right, "+", prec_pre_Plus)
+    return
+  end
 
-   prec = prec_inf_Plus
-   needp = prec <= left || prec <= right
-   if needp
-      left = right = prec_lowest
-      push_left_parenthesis(S, mi)
-   end
+  prec = prec_inf_Plus
+  needp = prec <= left || prec <= right
+  if needp
+    left = right = prec_lowest
+    push_left_parenthesis(S, mi)
+  end
 
-   n -= 1
-   if size_limit(S) < 0
-      for i in 1:n
-         printPlusArg(S, mi, obj, i, left, right, prec)
+  n -= 1
+  if size_limit(S) < 0
+    for i in 1:n
+      printPlusArg(S, mi, obj, i, left, right, prec)
+    end
+  elseif size_limit(S) == 0
+    push_elision(S, mi)
+  else
+    a, b = child_limits(S, obj, 1, n)
+    wrote_elision = false
+    for i in 1:n
+      if i <= length(a)
+        set_size_limit(S, a[i])
+      elseif n - i + 1 <= length(b)
+        set_size_limit(S, b[n - i + 1])
+      else
+        if !wrote_elision
+          i == 1 || push(S, S.terse_level > 0 ? "+" : " + ")
+          push_elision(S, mi)
+        end
+        wrote_elision = true
+        continue
       end
-   elseif size_limit(S) == 0
-      push_elision(S, mi)
-   else
-      a, b = child_limits(S, obj, 1, n)
-      wrote_elision = false
-      for i in 1:n
-         if i <= length(a)
-            set_size_limit(S, a[i])
-         elseif n - i + 1 <= length(b)
-            set_size_limit(S, b[n - i + 1])
-         else
-            if !wrote_elision
-               i == 1 || push(S, S.terse_level > 0 ? "+" : " + ")
-               push_elision(S, mi)
-            end
-            wrote_elision = true
-            continue
-         end
-         printPlusArg(S, mi, obj, i, left, right, prec)
-         restore_size_limit(S)
-      end
-   end
+      printPlusArg(S, mi, obj, i, left, right, prec)
+      restore_size_limit(S)
+    end
+  end
 
-   if needp
-      push_right_parenthesis(S, mi)
-   end
+  if needp
+    push_right_parenthesis(S, mi)
+  end
 end
 
 # special override for unary minus
 function printMinus(S::printer, mi::MIME, obj::Expr,
-                    left::Int, right::Int)
-   n = length(obj.args)
-   @assert n > 0 && obj.head === :call && obj.args[1] === :-
-   if n < 2
-      print_call_or_ref(S, mi, obj, left, right)
-   elseif n == 2
-      printGenericPrefix(S, mi, obj, left, right, "-", prec_pre_Minus)
-   else
-      op = S.terse_level > 0 ? "-" : " - "
-      printGenericInfix(S, mi, obj, left, right, op, prec_inf_Minus, 1)
-   end
+    left::Int, right::Int)
+  n = length(obj.args)
+  @assert n > 0 && obj.head === :call && obj.args[1] === :-
+  if n < 2
+    print_call_or_ref(S, mi, obj, left, right)
+  elseif n == 2
+    printGenericPrefix(S, mi, obj, left, right, "-", prec_pre_Minus)
+  else
+    op = S.terse_level > 0 ? "-" : " - "
+    printGenericInfix(S, mi, obj, left, right, op, prec_inf_Minus, 1)
+  end
 end
 
 function printFraction(S::printer, mi::MIME"text/latex",
-                       @nospecialize(num), @nospecialize(den),
-                       left::Int, right::Int)
-   prec = prec_post_FractionBox
-   needp = prec <= left || prec <= right
-   if needp
-      left = right = prec_lowest
-      push_left_parenthesis(S, mi)
-   end
-   push(S, "\\frac{")
-   print_obj(S, mi, num, prec_lowest, prec_lowest)
-   push(S, "}{")
-   print_obj(S, mi, den, prec_lowest, prec_lowest)
-   push(S, "}")
-   if needp
-      push_right_parenthesis(S, mi)
-   end
+    @nospecialize(num), @nospecialize(den),
+    left::Int, right::Int)
+  prec = prec_post_FractionBox
+  needp = prec <= left || prec <= right
+  if needp
+    left = right = prec_lowest
+    push_left_parenthesis(S, mi)
+  end
+  push(S, "\\frac{")
+  print_obj(S, mi, num, prec_lowest, prec_lowest)
+  push(S, "}{")
+  print_obj(S, mi, den, prec_lowest, prec_lowest)
+  push(S, "}")
+  if needp
+    push_right_parenthesis(S, mi)
+  end
 end
 
 function printDivides(S::printer, mi::MIME"text/latex", obj::Expr,
-                      left::Int, right::Int)
-   n = length(obj.args)
-   @assert n > 0 && obj.head === :call && obj.args[1] === ://
-   if n != 3
-      printGenericInfix(S, mi, obj, left, right, "//", prec_inf_Divide, +1)
-   else
-      (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
-      if sgn < 0
-         prec = prec_pre_Minus
-         needp = prec <= right
-         if needp
-            left = right = prec_lowest
-            push_left_parenthesis(S, mi)
-         end
-         push(S, "-")
-         printFraction(S, mi, abs, obj.args[3], prec, right)
-         if needp
-            push_right_parenthesis(S, mi)
-         end
-      else
-         printFraction(S, mi, abs, obj.args[3], left, right)
+    left::Int, right::Int)
+  n = length(obj.args)
+  @assert n > 0 && obj.head === :call && obj.args[1] === ://
+  if n != 3
+    printGenericInfix(S, mi, obj, left, right, "//", prec_inf_Divide, +1)
+  else
+    (sgn, abs) = get_syntactic_sign_abs(obj.args[2])
+    if sgn < 0
+      prec = prec_pre_Minus
+      needp = prec <= right
+      if needp
+        left = right = prec_lowest
+        push_left_parenthesis(S, mi)
       end
-   end
+      push(S, "-")
+      printFraction(S, mi, abs, obj.args[3], prec, right)
+      if needp
+        push_right_parenthesis(S, mi)
+      end
+    else
+      printFraction(S, mi, abs, obj.args[3], left, right)
+    end
+  end
 end
 
 function printPower(S::printer, mi::MIME"text/latex", obj::Expr,
-                    left::Int, right::Int)
-   n = length(obj.args)
-   @assert n > 0 && obj.head === :call && obj.args[1] === :(^)
-   if n != 3
-      printGenericInfix(S, mi, obj, left, right, "^", prec_inf_Power, +1)
-   else
-      prec = prec_post_SuperscriptBox
-      needp = prec <= left || prec <= right
-      if needp
-         left = right = prec_lowest
-         push_left_parenthesis(S, mi)
-      end
-      print_obj(S, mi, obj.args[2], left, prec)
-      push(S, "^{")
-      print_obj(S, mi, obj.args[3], prec_lowest, prec_lowest)
-      push(S, "}")
-      if needp
-         push_right_parenthesis(S, mi)
-      end
-   end
+    left::Int, right::Int)
+  n = length(obj.args)
+  @assert n > 0 && obj.head === :call && obj.args[1] === :(^)
+  if n != 3
+    printGenericInfix(S, mi, obj, left, right, "^", prec_inf_Power, +1)
+  else
+    prec = prec_post_SuperscriptBox
+    needp = prec <= left || prec <= right
+    if needp
+      left = right = prec_lowest
+      push_left_parenthesis(S, mi)
+    end
+    print_obj(S, mi, obj.args[2], left, prec)
+    push(S, "^{")
+    print_obj(S, mi, obj.args[3], prec_lowest, prec_lowest)
+    push(S, "}")
+    if needp
+      push_right_parenthesis(S, mi)
+    end
+  end
 end
 
 function print_call_or_ref(S::printer, mi::MIME, obj::Expr,
-                           left::Int, right::Int)
-   n = length(obj.args)
-   @assert n > 0 && (obj.head === :call || obj.head === :ref)
-   prec = obj.head === :call ? prec_post_call : prec_post_ref
+    left::Int, right::Int)
+  n = length(obj.args)
+  @assert n > 0 && (obj.head === :call || obj.head === :ref)
+  prec = obj.head === :call ? prec_post_call : prec_post_ref
 
-   needp = prec <= left
-   if needp
-      left = prec_lowest
-      push_left_parenthesis(S, mi)
-   end
+  needp = prec <= left
+  if needp
+    left = prec_lowest
+    push_left_parenthesis(S, mi)
+  end
 
-   if size_limit(S) < 0
+  if size_limit(S) < 0
+    print_obj(S, mi, obj.args[1], left, prec)
+    obj.head === :call ? push_left_parenthesis(S, mi) : push_left_bracket(S, mi)
+    for i in 2:n
+      i == 2 || push(S, S.terse_level > 0 ? "," : ", ")
+      print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
+    end
+    obj.head === :call ? push_right_parenthesis(S, mi) : push_right_bracket(S, mi)
+  elseif size_limit(S) == 0
+    push_elision(S, mi)
+  else
+    a, b = child_limits(S, obj, 0, n)
+    if 1 <= length(a)
+      set_size_limit(S, a[1])
       print_obj(S, mi, obj.args[1], left, prec)
-      obj.head === :call ? push_left_parenthesis(S, mi) : push_left_bracket(S, mi)
-      for i in 2:n
-         i == 2 || push(S, S.terse_level > 0 ? "," : ", ")
-         print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
-      end
-      obj.head === :call ? push_right_parenthesis(S, mi) : push_right_bracket(S, mi)
-   elseif size_limit(S) == 0
+      restore_size_limit(S)
+    else
       push_elision(S, mi)
-   else
-      a, b = child_limits(S, obj, 0, n)
-      if 1 <= length(a)
-         set_size_limit(S, a[1])
-         print_obj(S, mi, obj.args[1], left, prec)
-         restore_size_limit(S)
+    end
+    obj.head === :call ? push_left_parenthesis(S, mi) : push_left_bracket(S, mi)
+    wrote_elision = false
+    for i in 2:n
+      if i <= length(a)
+        set_size_limit(S, a[i])
+      elseif n - i + 1 <= length(b)
+        set_size_limit(S, b[n - i + 1])
       else
-         push_elision(S, mi)
+        if !wrote_elision
+          i == 2 || push(S, S.terse_level > 0 ? "," : ", ")
+          push_elision(S, mi)
+        end
+        wrote_elision = true
+        continue
       end
-      obj.head === :call ? push_left_parenthesis(S, mi) : push_left_bracket(S, mi)
-      wrote_elision = false
-      for i in 2:n
-         if i <= length(a)
-            set_size_limit(S, a[i])
-         elseif n - i + 1 <= length(b)
-            set_size_limit(S, b[n - i + 1])
-         else
-            if !wrote_elision
-               i == 2 || push(S, S.terse_level > 0 ? "," : ", ")
-               push_elision(S, mi)
-            end
-            wrote_elision = true
-            continue
-         end
-         i == 2 || push(S, S.terse_level > 0 ? "," : ", ")
-         print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
-         restore_size_limit(S)
-      end
-      obj.head === :call ? push_right_parenthesis(S, mi) : push_right_bracket(S, mi)
-   end
+      i == 2 || push(S, S.terse_level > 0 ? "," : ", ")
+      print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
+      restore_size_limit(S)
+    end
+    obj.head === :call ? push_right_parenthesis(S, mi) : push_right_bracket(S, mi)
+  end
 
-   if needp
-      push_right_parenthesis(S, mi)
-   end
+  if needp
+    push_right_parenthesis(S, mi)
+  end
 end
 
 function print_tuple_etc(S::printer, mi::MIME, obj::Expr, left::Int, right::Int)
-   n = length(obj.args)
+  n = length(obj.args)
 
-   needp = prec_lowest < left || prec_lowest < right
-   sep = S.terse_level > 0 ? "," : ", "
-   if obj.head === :vcat
-      needp = false
-      sep = "; "
-   elseif obj.head === :vect
-      needp = false
-   elseif obj.head === :tuple
-      needp = false
-   elseif obj.head === :list
-      needp = false
-   elseif obj.head === :series
-   elseif obj.head === :sequence
-      sep = ""
-   elseif obj.head === :row || obj.head === :hcat
-      sep = " "
-   else
-      error("invalid head")
-   end
+  needp = prec_lowest < left || prec_lowest < right
+  sep = S.terse_level > 0 ? "," : ", "
+  if obj.head === :vcat
+    needp = false
+    sep = "; "
+  elseif obj.head === :vect
+    needp = false
+  elseif obj.head === :tuple
+    needp = false
+  elseif obj.head === :list
+    needp = false
+  elseif obj.head === :series
+  elseif obj.head === :sequence
+    sep = ""
+  elseif obj.head === :row || obj.head === :hcat
+    sep = " "
+  else
+    error("invalid head")
+  end
 
-   needp && push_left_parenthesis(S, mi)
+  needp && push_left_parenthesis(S, mi)
 
-   if obj.head === :vcat || obj.head === :vect
-      push_left_bracket(S, mi)
-   elseif obj.head === :list
-      push_left_curly(S, mi)
-   elseif obj.head === :tuple
-      push_left_parenthesis(S, mi)
-   elseif obj.head === :row || obj.head === :hcat
-      @assert S.terse_level >= 0
-      S.terse_level += 1
-   end
+  if obj.head === :vcat || obj.head === :vect
+    push_left_bracket(S, mi)
+  elseif obj.head === :list
+    push_left_curly(S, mi)
+  elseif obj.head === :tuple
+    push_left_parenthesis(S, mi)
+  elseif obj.head === :row || obj.head === :hcat
+    @assert S.terse_level >= 0
+    S.terse_level += 1
+  end
 
-   if size_limit(S) < 0
-      for i in 1:n
-         i == 1 || push(S, sep)
-         print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
+  if size_limit(S) < 0
+    for i in 1:n
+      i == 1 || push(S, sep)
+      print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
+    end
+  elseif size_limit(S) == 0
+    push_elision(S, mi)
+  else
+    a, b = child_limits(S, obj, 0, n)
+    wrote_elision = false
+    for i in 1:n
+      if i <= length(a)
+        set_size_limit(S, a[i])
+      elseif n - i + 1 <= length(b)
+        set_size_limit(S, b[n - i + 1])
+      else
+        if !wrote_elision
+          i == 1 || push(S, sep)
+          push_elision(S, mi)
+        end
+        wrote_elision = true
+        continue
       end
-   elseif size_limit(S) == 0
-      push_elision(S, mi)
-   else
-      a, b = child_limits(S, obj, 0, n)
-      wrote_elision = false
-      for i in 1:n
-         if i <= length(a)
-            set_size_limit(S, a[i])
-         elseif n - i + 1 <= length(b)
-            set_size_limit(S, b[n - i + 1])
-         else
-            if !wrote_elision
-               i == 1 || push(S, sep)
-               push_elision(S, mi)
-            end
-            wrote_elision = true
-            continue
-         end
-         i == 1 || push(S, sep)
-         print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
-         restore_size_limit(S)
-      end
-   end
+      i == 1 || push(S, sep)
+      print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
+      restore_size_limit(S)
+    end
+  end
 
-   if obj.head === :vcat || obj.head === :vect
-      push_right_bracket(S, mi)
-   elseif obj.head === :list
-      push_right_curly(S, mi)
-   elseif obj.head === :tuple
-      push_right_parenthesis(S, mi)
-   elseif obj.head === :row || obj.head === :hcat
-      S.terse_level -= 1
-      @assert S.terse_level >= 0
-   end
+  if obj.head === :vcat || obj.head === :vect
+    push_right_bracket(S, mi)
+  elseif obj.head === :list
+    push_right_curly(S, mi)
+  elseif obj.head === :tuple
+    push_right_parenthesis(S, mi)
+  elseif obj.head === :row || obj.head === :hcat
+    S.terse_level -= 1
+    @assert S.terse_level >= 0
+  end
 
-   needp && push_right_parenthesis(S, mi)
+  needp && push_right_parenthesis(S, mi)
 end
 
 function print_vcat(S::printer, mi::MIME"text/latex", obj::Expr,
-                    left::Int, right::Int)
+    left::Int, right::Int)
 
-   nrows = length(obj.args)
-   if nrows < 1
-      push(S, "\\text{empty}")
-      return
-   end
+  nrows = length(obj.args)
+  if nrows < 1
+    push(S, "\\text{empty}")
+    return
+  end
 
-   l = size_limit(S)
-   if l == 0
-      push_elision(S, mi)
-      return
-   end
+  l = size_limit(S)
+  if l == 0
+    push_elision(S, mi)
+    return
+  end
 
-   # print row i iff i <= b || i > nrows - b
-   # print col j iff j <= a || j > ncols - a
-   if l < 0
-      # no limit on printing
-      ncols = 1
-      for i in 1:nrows
-         ei = obj.args[i]
-         if isa(ei, Expr) && (ei.head === :hcat || ei.head === :row)
-            ncols = max(ncols, length(ei.args))
-         end
-      end
-      b = nrows
-      a = ncols
-      entry_limit = l
-   else
-      ncols = 1
-      nleaves = 1
-      for i in 1:nrows
-         ei = obj.args[i]
-         if isa(ei, Expr) && (ei.head === :hcat || ei.head === :row)
-            ncols = max(ncols, length(ei.args))
-         end
-         nleaves += leaf_count(S, ei)
-      end
-      s = sqrt((l + 1)/(nleaves + 1))
-      a = max(1, round(Int, 0.5*s*ncols))
-      b = max(1, round(Int, 0.5*s*nrows))
-      entry_limit = cld(cld(l, min(2*a, ncols)), min(2*b, nrows))
-   end
-
-   # figure how many columns are actually going to be displayed
-   if 2*a + 1 < ncols
-      display_ncols = 2*a + 1
-      use_col_elision = true
-   else
-      display_ncols = ncols
-      use_col_elision = false
-      a = ncols   # just take a to the max
-   end
-
-   push(S, "\\begin{array}")
-   push(S, "{" * "c"^display_ncols * "}\n")
-
-   set_size_limit(S, entry_limit)
-   wrote_elision = false
-   for i in 1:nrows
+  # print row i iff i <= b || i > nrows - b
+  # print col j iff j <= a || j > ncols - a
+  if l < 0
+    # no limit on printing
+    ncols = 1
+    for i in 1:nrows
       ei = obj.args[i]
-      if i <= b || i > nrows - b
-         i == 1 || push(S, " \\\\\n")
-         if isa(ei, Expr) && (ei.head === :hcat || ei.head === :row)
-            eilen = length(ei.args)
-            for j in 1:min(a, eilen)
-               j == 1 || push(S, " & ")
-               print_obj(S, mi, ei.args[j], prec_lowest, prec_lowest)
-            end
-            if use_col_elision && eilen > a
-               push(S, " & \\cdots ")
-               for j in (eilen - a + 1):eilen
-                  push(S, " & ")
-                  print_obj(S, mi, ei.args[j], prec_lowest, prec_lowest)
-               end
-            end
-         else
-            print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
-         end
-      elseif !wrote_elision
-         i == 1 || push(S, " \\\\\n")
-         if use_col_elision
-            push(S, "\\vdots " * " & \\vdots "^(a - 1))
-            push(S, " & \\ddots ")
-            push(S, " & \\vdots "^a)
-         else
-            push(S, "\\vdots " * " & \\vdots "^(display_ncols - 1))
-         end
-         wrote_elision = true
+      if isa(ei, Expr) && (ei.head === :hcat || ei.head === :row)
+        ncols = max(ncols, length(ei.args))
       end
-   end
-   restore_size_limit(S)
+    end
+    b = nrows
+    a = ncols
+    entry_limit = l
+  else
+    ncols = 1
+    nleaves = 1
+    for i in 1:nrows
+      ei = obj.args[i]
+      if isa(ei, Expr) && (ei.head === :hcat || ei.head === :row)
+        ncols = max(ncols, length(ei.args))
+      end
+      nleaves += leaf_count(S, ei)
+    end
+    s = sqrt((l + 1)/(nleaves + 1))
+    a = max(1, round(Int, 0.5*s*ncols))
+    b = max(1, round(Int, 0.5*s*nrows))
+    entry_limit = cld(cld(l, min(2*a, ncols)), min(2*b, nrows))
+  end
 
-   push(S, "\n\\end{array}")
+  # figure how many columns are actually going to be displayed
+  if 2*a + 1 < ncols
+    display_ncols = 2*a + 1
+    use_col_elision = true
+  else
+    display_ncols = ncols
+    use_col_elision = false
+    a = ncols   # just take a to the max
+  end
+
+  push(S, "\\begin{array}")
+  push(S, "{" * "c"^display_ncols * "}\n")
+
+  set_size_limit(S, entry_limit)
+  wrote_elision = false
+  for i in 1:nrows
+    ei = obj.args[i]
+    if i <= b || i > nrows - b
+      i == 1 || push(S, " \\\\\n")
+      if isa(ei, Expr) && (ei.head === :hcat || ei.head === :row)
+        eilen = length(ei.args)
+        for j in 1:min(a, eilen)
+          j == 1 || push(S, " & ")
+          print_obj(S, mi, ei.args[j], prec_lowest, prec_lowest)
+        end
+        if use_col_elision && eilen > a
+          push(S, " & \\cdots ")
+          for j in (eilen - a + 1):eilen
+            push(S, " & ")
+            print_obj(S, mi, ei.args[j], prec_lowest, prec_lowest)
+          end
+        end
+      else
+        print_obj(S, mi, obj.args[i], prec_lowest, prec_lowest)
+      end
+    elseif !wrote_elision
+      i == 1 || push(S, " \\\\\n")
+      if use_col_elision
+        push(S, "\\vdots " * " & \\vdots "^(a - 1))
+        push(S, " & \\ddots ")
+        push(S, " & \\vdots "^a)
+      else
+        push(S, "\\vdots " * " & \\vdots "^(display_ncols - 1))
+      end
+      wrote_elision = true
+    end
+  end
+  restore_size_limit(S)
+
+  push(S, "\n\\end{array}")
 end
 
 # special case so that we don't have to negate integers
 function print_integer_string(S::printer, mi::MIME, obj::String,
-                              left::Int, right::Int)
-   needp = prec_pre_Minus <= right && obj[1] == '-'
-   if needp
-      push_left_parenthesis(S, mi)
-   end
-   push(S, obj)
-   if needp
-      push_right_parenthesis(S, mi)
-   end
+    left::Int, right::Int)
+  needp = prec_pre_Minus <= right && obj[1] == '-'
+  if needp
+    push_left_parenthesis(S, mi)
+  end
+  push(S, obj)
+  if needp
+    push_right_parenthesis(S, mi)
+  end
 end
 
 function print_obj(S::printer, mi::MIME, obj::Integer,
-                   left::Int, right::Int)
-   print_integer_string(S, mi, string(obj), left, right)
+    left::Int, right::Int)
+  print_integer_string(S, mi, string(obj), left, right)
 end
 
 
 const _latex_to_string = Dict{String, String}(
-  "Α" => "\\alpha", "α" => "\\alpha", "Β" => "\\Beta", "β" => "\\beta", "Γ" =>
-  "\\Gamma", "γ" => "\\gamma", "Δ" => "\\Delta", "δ" => "\\delta", "Ε" =>
-  "\\Epsilon", "ε" => "\\epsilon", "Ζ" => "\\Zeta", "ζ" => "\\zeta", "Η" =>
-  "\\Eta", "η" => "\\eta", "Θ" => "\\Theta", "θ" => "\\theta", "Ι" => "\\Iota",
-  "ι" => "\\iota", "Κ" => "\\Kappa", "κ" => "\\kappa", "Λ" => "\\Lambda", "λ"
-  => "\\lambda", "Μ" => "\\Mu", "μ" => "\\mu", "Ν" => "\\Nu", "ν" => "\\nu",
-  "Ξ" => "\\Xi", "ξ" => "\\xi", "Ο" => "\\Omicron", "ο" => "\\omicron", "Π" =>
-  "\\Pie", "π" => "\\pie", "Ρ" => "\\Rho", "ρ" => "\\rho", "Σ" => "\\Sigma",
-  "σ" => "\\sigma", "Τ" => "\\Tau", "τ" => "\\tau", "Υ" => "\\Upsilon", "υ" =>
-  "\\upsilon", "Φ" => "\\Phi", "φ" => "\\phi", "Χ" => "\\Chi", "χ" => "\\chi",
-  "Ψ" => "\\Psi", "ψ" => "\\psi", "Ω" => "\\Omega", "omega" => "\\omega")
+                                              "Α" => "\\alpha", "α" => "\\alpha", "Β" => "\\Beta", "β" => "\\beta", "Γ" =>
+                                              "\\Gamma", "γ" => "\\gamma", "Δ" => "\\Delta", "δ" => "\\delta", "Ε" =>
+                                              "\\Epsilon", "ε" => "\\epsilon", "Ζ" => "\\Zeta", "ζ" => "\\zeta", "Η" =>
+                                              "\\Eta", "η" => "\\eta", "Θ" => "\\Theta", "θ" => "\\theta", "Ι" => "\\Iota",
+                                              "ι" => "\\iota", "Κ" => "\\Kappa", "κ" => "\\kappa", "Λ" => "\\Lambda", "λ"
+                                              => "\\lambda", "Μ" => "\\Mu", "μ" => "\\mu", "Ν" => "\\Nu", "ν" => "\\nu",
+                                              "Ξ" => "\\Xi", "ξ" => "\\xi", "Ο" => "\\Omicron", "ο" => "\\omicron", "Π" =>
+                                              "\\Pie", "π" => "\\pie", "Ρ" => "\\Rho", "ρ" => "\\rho", "Σ" => "\\Sigma",
+                                              "σ" => "\\sigma", "Τ" => "\\Tau", "τ" => "\\tau", "Υ" => "\\Upsilon", "υ" =>
+                                              "\\upsilon", "Φ" => "\\Phi", "φ" => "\\phi", "Χ" => "\\Chi", "χ" => "\\chi",
+                                              "Ψ" => "\\Psi", "ψ" => "\\psi", "Ω" => "\\Omega", "omega" => "\\omega")
 
 function deunicodify(x::String)
-   z = ""
-   for i in eachindex(x)
-      c = string(x[i])
-      if haskey(_latex_to_string, c)
-         z *= "{" * _latex_to_string[c] * "}"
-      else
-         z *= c
-      end
-   end
-   return z
+  z = ""
+  for i in eachindex(x)
+    c = string(x[i])
+    if haskey(_latex_to_string, c)
+      z *= "{" * _latex_to_string[c] * "}"
+    else
+      z *= c
+    end
+  end
+  return z
 end
 
 function underscorify(x::String)
-   if length(x) == 1 || occursin(r"\{|\}", x)
-      return x
-   end
-   y = split(x, '_')
-   n = length(y)
-   while n > 1 && tryparse(Int, y[n]) != nothing
-      n -= 1
-   end
-   if n == 1 && length(y[1]) == 1
-      z = y[1]
-   else
-      # at this point we need operatorname and escaped underscores
-      z = "\\mathop{\\mathrm{" * join(y[1:n], "\\_") * "}}"
-   end
-   if n < length(y)
-      z = z * "_{" * join(y[n+1:end], ",") * "}"
-   end
-   return z
+  if length(x) == 1 || occursin(r"\{|\}", x)
+    return x
+  end
+  y = split(x, '_')
+  n = length(y)
+  while n > 1 && tryparse(Int, y[n]) != nothing
+    n -= 1
+  end
+  if n == 1 && length(y[1]) == 1
+    z = y[1]
+  else
+    # at this point we need operatorname and escaped underscores
+    z = "\\mathop{\\mathrm{" * join(y[1:n], "\\_") * "}}"
+  end
+  if n < length(y)
+    z = z * "_{" * join(y[n+1:end], ",") * "}"
+  end
+  return z
 end
 
 function print_obj(S::printer, ::MIME, obj::String,
-                   left::Int, right::Int)
-   push(S, obj)
+    left::Int, right::Int)
+  push(S, obj)
 end
 
 function print_obj(S::printer, ::MIME, obj::Symbol,
-                   left::Int, right::Int)
-   push(S, string(obj))
+    left::Int, right::Int)
+  push(S, string(obj))
 end
 
 function print_obj(S::printer, ::MIME"text/latex", obj::String,
-                   left::Int, right::Int)
-   push(S, deunicodify(obj))
+    left::Int, right::Int)
+  push(S, deunicodify(obj))
 end
 
 function print_obj(S::printer, ::MIME"text/latex", obj::Symbol,
-                   left::Int, right::Int)
-   push(S, deunicodify(underscorify(string(obj))))
+    left::Int, right::Int)
+  push(S, deunicodify(underscorify(string(obj))))
 end
 
 function print_obj(S::printer, mi::MIME, obj::Expr,
-                   left::Int, right::Int)
-   n = length(obj.args)
-   if obj.head === :call && n > 0
-      if obj.args[1] === :+
-         printPlus(S, mi, obj, left, right)
-      elseif obj.args[1] === :-
-         printMinus(S, mi, obj, left, right)
-      elseif obj.args[1] === :*
-         printGenericInfix(S, mi, obj, left, right, "*", prec_inf_Times, +1)
-      elseif obj.args[1] === :cdot
-         printGenericInfix(S, mi, obj, left, right, " * ", prec_inf_CenterDot, 0)
-      elseif obj.args[1] === :/
-         printGenericInfix(S, mi, obj, left, right, "/", prec_inf_Divide, +1)
-      elseif obj.args[1] === ://
-         printGenericInfix(S, mi, obj, left, right, "//", prec_inf_DoubleDivide, +1)
-      elseif obj.args[1] === :^
-         printGenericInfix(S, mi, obj, left, right, "^", prec_inf_Power, -1)
-      elseif obj.args[1] === :(==) || obj.args[1] === :(!=) ||
-             obj.args[1] === :(>=) || obj.args[1] === :(>) ||
-             obj.args[1] === :(<=) || obj.args[1] === :(<)
-         o = compare_op_string(mi, obj.args[1])
-         o = S.terse_level > 0 ? o : " "*o*" "
-         printGenericInfix(S, mi, obj, left, right, o, prec_inf_Equal, 0)
-      else
-         print_call_or_ref(S, mi, obj, left, right)
-      end
-   elseif obj.head === :(=) && n == 2
-      o = Expr(:call, :(=), obj.args[1], obj.args[2])
-      printGenericInfix(S, mi, o, left, right, " = ", prec_inf_Equal, -1)
-   elseif obj.head === :comparison && isodd(n) && n > 1
-      print_comparison(S, mi, obj, left, right, prec_inf_Equal)
-   elseif obj.head === :vcat || obj.head === :vect || obj.head === :tuple ||
-          obj.head === :list || obj.head === :series || obj.head === :sequence ||
-          obj.head === :row || obj.head === :hcat
-      print_tuple_etc(S, mi, obj, left, right)
-   elseif obj.head === :ref && n > 0
+    left::Int, right::Int)
+  n = length(obj.args)
+  if obj.head === :call && n > 0
+    if obj.args[1] === :+
+      printPlus(S, mi, obj, left, right)
+    elseif obj.args[1] === :-
+      printMinus(S, mi, obj, left, right)
+    elseif obj.args[1] === :*
+      printGenericInfix(S, mi, obj, left, right, "*", prec_inf_Times, +1)
+    elseif obj.args[1] === :cdot
+      printGenericInfix(S, mi, obj, left, right, " * ", prec_inf_CenterDot, 0)
+    elseif obj.args[1] === :/
+      printGenericInfix(S, mi, obj, left, right, "/", prec_inf_Divide, +1)
+    elseif obj.args[1] === ://
+      printGenericInfix(S, mi, obj, left, right, "//", prec_inf_DoubleDivide, +1)
+    elseif obj.args[1] === :^
+      printGenericInfix(S, mi, obj, left, right, "^", prec_inf_Power, -1)
+    elseif obj.args[1] === :(==) || obj.args[1] === :(!=) ||
+      obj.args[1] === :(>=) || obj.args[1] === :(>) ||
+      obj.args[1] === :(<=) || obj.args[1] === :(<)
+      o = compare_op_string(mi, obj.args[1])
+      o = S.terse_level > 0 ? o : " "*o*" "
+      printGenericInfix(S, mi, obj, left, right, o, prec_inf_Equal, 0)
+    else
       print_call_or_ref(S, mi, obj, left, right)
-   elseif obj.head === :text && n == 1
-      print_obj(S, mi, obj.args[1], left, right)
-   elseif obj.head === :latex_form && length(obj.args) >= 1
-      print_obj(S, mi, obj.args[1], left, right)
-   elseif obj.head === :matrix && n == 1
-      print_obj(S, mi, obj.args[1], left, right)
-   else
-      push(S, "[??? unknown Expr ???]")
-   end
+    end
+  elseif obj.head === :(=) && n == 2
+    o = Expr(:call, :(=), obj.args[1], obj.args[2])
+    printGenericInfix(S, mi, o, left, right, " = ", prec_inf_Equal, -1)
+  elseif obj.head === :comparison && isodd(n) && n > 1
+    print_comparison(S, mi, obj, left, right, prec_inf_Equal)
+  elseif obj.head === :vcat || obj.head === :vect || obj.head === :tuple ||
+    obj.head === :list || obj.head === :series || obj.head === :sequence ||
+    obj.head === :row || obj.head === :hcat
+    print_tuple_etc(S, mi, obj, left, right)
+  elseif obj.head === :ref && n > 0
+    print_call_or_ref(S, mi, obj, left, right)
+  elseif obj.head === :text && n == 1
+    print_obj(S, mi, obj.args[1], left, right)
+  elseif obj.head === :latex_form && length(obj.args) >= 1
+    print_obj(S, mi, obj.args[1], left, right)
+  elseif obj.head === :matrix && n == 1
+    print_obj(S, mi, obj.args[1], left, right)
+  else
+    push(S, "[??? unknown Expr ???]")
+  end
 end
 
 
 function print_obj(S::printer, mi::MIME"text/latex", obj::Expr,
-                   left::Int, right::Int)
-   n = length(obj.args)
-   if obj.head === :call && n > 0
-      if obj.args[1] === :+
-         printPlus(S, mi, obj, left, right)
-      elseif obj.args[1] === :-
-         printMinus(S, mi, obj, left, right)
-      elseif obj.args[1] === :*
-         printGenericInfix(S, mi, obj, left, right, " ", prec_inf_Times, +1)
-      elseif obj.args[1] === :cdot
-         printGenericInfix(S, mi, obj, left, right, " \\cdot ", prec_inf_CenterDot, 0)
-      elseif obj.args[1] === :/
-         printGenericInfix(S, mi, obj, left, right, "/", prec_inf_Divide, +1)
-      elseif obj.args[1] === ://
-         printDivides(S, mi, obj, left, right)
-      elseif obj.args[1] === :^
-         printPower(S, mi, obj, left, right)
-      elseif obj.args[1] === :(==) || obj.args[1] === :(!=) ||
-             obj.args[1] === :(>=) || obj.args[1] === :(>) ||
-             obj.args[1] === :(<=) || obj.args[1] === :(<)
-         o = compare_op_string(mi, obj.args[1])
-         o = S.terse_level > 0 ? o : " "*o*" "
-         printGenericInfix(S, mi, obj, left, right, o, prec_inf_Equal, 0)
-      elseif obj.args[1] === :sqrt && length(obj.args) == 2
-         needp = prec_inf_Power <= right # courtesy
-         needp && push_left_parenthesis(S, mi)
-         push(S, "\\sqrt{")
-         print_obj(S, mi, obj.args[2], prec_lowest, prec_lowest)
-         push(S, "}")
-         needp && push_right_parenthesis(S, mi)
-      else
-         print_call_or_ref(S, mi, obj, left, right)
-      end
-   elseif obj.head === :(=) && n == 2
-      o = Expr(:call, :(=), obj.args[1], obj.args[2])
-      printGenericInfix(S, mi, o, left, right, " = ", prec_inf_Equal, -1)
-   elseif obj.head === :comparison && isodd(n) && n > 1
-      print_comparison(S, mi, obj, left, right, prec_inf_Equal)
-   elseif obj.head === :vcat
-      print_vcat(S, mi, obj, left, right)
-   elseif obj.head === :vect || obj.head === :tuple ||
-          obj.head === :list || obj.head === :series || obj.head === :sequence ||
-          obj.head === :row || obj.head === :hcat
-      print_tuple_etc(S, mi, obj, left, right)
-   elseif obj.head === :ref && n > 0
-      print_call_or_ref(S, mi, obj, left, right)
-   elseif obj.head === :text && n == 1
-      push(S, "\\text{")
-      print_obj(S, mi, obj.args[1], left, right)
+    left::Int, right::Int)
+  n = length(obj.args)
+  if obj.head === :call && n > 0
+    if obj.args[1] === :+
+      printPlus(S, mi, obj, left, right)
+    elseif obj.args[1] === :-
+      printMinus(S, mi, obj, left, right)
+    elseif obj.args[1] === :*
+      printGenericInfix(S, mi, obj, left, right, " ", prec_inf_Times, +1)
+    elseif obj.args[1] === :cdot
+      printGenericInfix(S, mi, obj, left, right, " \\cdot ", prec_inf_CenterDot, 0)
+    elseif obj.args[1] === :/
+      printGenericInfix(S, mi, obj, left, right, "/", prec_inf_Divide, +1)
+    elseif obj.args[1] === ://
+      printDivides(S, mi, obj, left, right)
+    elseif obj.args[1] === :^
+      printPower(S, mi, obj, left, right)
+    elseif obj.args[1] === :(==) || obj.args[1] === :(!=) ||
+      obj.args[1] === :(>=) || obj.args[1] === :(>) ||
+      obj.args[1] === :(<=) || obj.args[1] === :(<)
+      o = compare_op_string(mi, obj.args[1])
+      o = S.terse_level > 0 ? o : " "*o*" "
+      printGenericInfix(S, mi, obj, left, right, o, prec_inf_Equal, 0)
+    elseif obj.args[1] === :sqrt && length(obj.args) == 2
+      needp = prec_inf_Power <= right # courtesy
+      needp && push_left_parenthesis(S, mi)
+      push(S, "\\sqrt{")
+      print_obj(S, mi, obj.args[2], prec_lowest, prec_lowest)
       push(S, "}")
-   elseif obj.head === :latex_form && n >= 2
-      print_obj(S, mi, obj.args[2], left, right)
-   elseif obj.head === :matrix && n == 1
-      push_left_parenthesis(S, mi)
-      print_obj(S, mi, obj.args[1], left, right)
-      push_right_parenthesis(S, mi)
-   else
-      push(S, "[??? unknown Expr ???]")
-   end
+      needp && push_right_parenthesis(S, mi)
+    else
+      print_call_or_ref(S, mi, obj, left, right)
+    end
+  elseif obj.head === :(=) && n == 2
+    o = Expr(:call, :(=), obj.args[1], obj.args[2])
+    printGenericInfix(S, mi, o, left, right, " = ", prec_inf_Equal, -1)
+  elseif obj.head === :comparison && isodd(n) && n > 1
+    print_comparison(S, mi, obj, left, right, prec_inf_Equal)
+  elseif obj.head === :vcat
+    print_vcat(S, mi, obj, left, right)
+  elseif obj.head === :vect || obj.head === :tuple ||
+    obj.head === :list || obj.head === :series || obj.head === :sequence ||
+    obj.head === :row || obj.head === :hcat
+    print_tuple_etc(S, mi, obj, left, right)
+  elseif obj.head === :ref && n > 0
+    print_call_or_ref(S, mi, obj, left, right)
+  elseif obj.head === :text && n == 1
+    push(S, "\\text{")
+    print_obj(S, mi, obj.args[1], left, right)
+    push(S, "}")
+  elseif obj.head === :latex_form && n >= 2
+    print_obj(S, mi, obj.args[2], left, right)
+  elseif obj.head === :matrix && n == 1
+    push_left_parenthesis(S, mi)
+    print_obj(S, mi, obj.args[1], left, right)
+    push_right_parenthesis(S, mi)
+  else
+    push(S, "[??? unknown Expr ???]")
+  end
 end
 
 function print_obj(S::printer, mi::MIME, obj, left::Int, right::Int)
-   push(S, "[??? unknown object ???]")
+  push(S, "[??? unknown object ???]")
 end
 
 
@@ -1503,7 +1503,7 @@ function find_name(obj, M=Main; all::Bool=false)
 
   cached_name = get_attribute(obj, :_cached_name)
   if !isnothing(cached_name)
-   cached_name_sy = Symbol(cached_name)
+    cached_name_sy = Symbol(cached_name)
     if M === Main && get_current_module() != Main
       if isdefined(get_current_module(), cached_name_sy) && getproperty(get_current_module(), cached_name_sy) === obj
         return cached_name
@@ -1575,21 +1575,21 @@ It is supposed to be used at the start of `show` methods as shown in the documen
 """
 macro show_name(io, obj)
   return :(
-    begin
-      local i = $(esc(io))
-      local o = $(esc(obj))
-      if is_terse(i) || get(i, :compact, false)
-        name = get_name(o)
-        if !isnothing(name)
-          if AbstractAlgebra.PrettyPrinting._supports_io_custom(i)
-            print(i, LowercaseOff())
-          end
-          print(i, name)
-          return
-        end
-      end
-    end
-  )
+           begin
+             local i = $(esc(io))
+             local o = $(esc(obj))
+             if is_terse(i) || get(i, :compact, false)
+               name = get_name(o)
+               if !isnothing(name)
+                 if AbstractAlgebra.PrettyPrinting._supports_io_custom(i)
+                   print(i, LowercaseOff())
+                 end
+                 print(i, name)
+                 return
+               end
+             end
+           end
+          )
 end
 
 """
@@ -1604,16 +1604,16 @@ It is supposed to be used at the start of `show` methods as shown in the documen
 """
 macro show_special(io, obj)
   return :(
-    begin
-      local i = $(esc(io))
-      local o = $(esc(obj))
-      s = get_attribute(o, :show)
-      if s !== nothing
-        s(i, o)
-        return
-      end
-    end
-  )
+           begin
+             local i = $(esc(io))
+             local o = $(esc(obj))
+             s = get_attribute(o, :show)
+             if s !== nothing
+               s(i, o)
+               return
+             end
+           end
+          )
 end
 
 """
@@ -1628,21 +1628,21 @@ It is supposed to be used at the start of `show` methods as shown in the documen
 """
 macro show_special(io, mime, obj)
   return :(
-    begin
-      local i = $(esc(io))
-      local m = $(esc(mime))
-      local o = $(esc(obj))
-      s = get_attribute(o, :show)
-      if s !== nothing
-        if applicable(s, i, m, o)
-          s(i, m, o)
-        else
-          s(i, o)
-        end
-        return
-      end
-    end
-  )
+           begin
+             local i = $(esc(io))
+             local m = $(esc(mime))
+             local o = $(esc(obj))
+             s = get_attribute(o, :show)
+             if s !== nothing
+               if applicable(s, i, m, o)
+                 s(i, m, o)
+               else
+                 s(i, o)
+               end
+               return
+             end
+           end
+          )
 end
 
 """
@@ -1657,17 +1657,17 @@ It is supposed to be used at the start of `show` methods as shown in the documen
 """
 macro show_special_elem(io, obj)
   return :(
-    begin
-      local i = $(esc(io))
-      local o = $(esc(obj))
-      local p = parent(o)
-      s = get_attribute(p, :show_elem)
-      if s !== nothing
-        s(i, o)
-        return
-      end
-    end
-  )
+           begin
+             local i = $(esc(io))
+             local o = $(esc(obj))
+             local p = parent(o)
+             s = get_attribute(p, :show_elem)
+             if s !== nothing
+               s(i, o)
+               return
+             end
+           end
+          )
 end
 
 """
@@ -1682,22 +1682,22 @@ It is supposed to be used at the start of `show` methods as shown in the documen
 """
 macro show_special_elem(io, mime, obj)
   return :(
-    begin
-      local i = $(esc(io))
-      local m = $(esc(mime))
-      local o = $(esc(obj))
-      local p = parent(o)
-      s = get_attribute(p, :show_elem)
-      if s !== nothing
-        if applicable(s, i, m, o)
-          s(i, m, o)
-        else
-          s(i, o)
-        end
-        return
-      end
-    end
-  )
+           begin
+             local i = $(esc(io))
+             local m = $(esc(mime))
+             local o = $(esc(obj))
+             local p = parent(o)
+             s = get_attribute(p, :show_elem)
+             if s !== nothing
+               if applicable(s, i, m, o)
+                 s(i, m, o)
+               else
+                 s(i, o)
+               end
+               return
+             end
+           end
+          )
 end
 
 
@@ -1722,16 +1722,16 @@ This function may behave arbitrarily if called from within the scope of a
 `with_unicode` do-block.
 """
 function allow_unicode(allowed::Bool; temporary::Bool=false)
-   if temporary
-      old_allowed = is_unicode_allowed()
-      ALLOW_UNICODE_OVERRIDE_VALUE[] = allowed
-      return old_allowed
-   else
-      old_allowed = is_unicode_allowed()
-      @set_preferences!("unicode" => allowed)
-      ALLOW_UNICODE_OVERRIDE_VALUE[] = nothing
-      return old_allowed
-   end
+  if temporary
+    old_allowed = is_unicode_allowed()
+    ALLOW_UNICODE_OVERRIDE_VALUE[] = allowed
+    return old_allowed
+  else
+    old_allowed = is_unicode_allowed()
+    @set_preferences!("unicode" => allowed)
+    ALLOW_UNICODE_OVERRIDE_VALUE[] = nothing
+    return old_allowed
+  end
 end
 
 @doc """
@@ -1740,9 +1740,9 @@ end
 Return whether unicode characters are allowed in pretty printing.
 """
 function is_unicode_allowed()
-   override = ALLOW_UNICODE_OVERRIDE_VALUE[]
-   !isnothing(override) && return override
-   return @load_preference("unicode", default = false)::Bool
+  override = ALLOW_UNICODE_OVERRIDE_VALUE[]
+  !isnothing(override) && return override
+  return @load_preference("unicode", default = false)::Bool
 end
 
 @doc """
@@ -1760,14 +1760,14 @@ end
 ```
 """
 function with_unicode(f::Function, allowed::Bool=true)
-   previous = ALLOW_UNICODE_OVERRIDE_VALUE[]
-   ALLOW_UNICODE_OVERRIDE_VALUE[] = allowed
-   try
-      f()
-   finally
-      @assert ALLOW_UNICODE_OVERRIDE_VALUE[] == allowed
-      ALLOW_UNICODE_OVERRIDE_VALUE[] = previous
-   end
+  previous = ALLOW_UNICODE_OVERRIDE_VALUE[]
+  ALLOW_UNICODE_OVERRIDE_VALUE[] = allowed
+  try
+    f()
+  finally
+    @assert ALLOW_UNICODE_OVERRIDE_VALUE[] == allowed
+    ALLOW_UNICODE_OVERRIDE_VALUE[] = previous
+  end
 end
 
 ################################################################################
@@ -1849,20 +1849,20 @@ struct LowercaseOff end
 Base.show(io::IO, ::Union{Lowercase, LowercaseOff, Indent, Dedent}) = nothing
 
 mutable struct IOCustom{IO_t <: IO} <: Base.AbstractPipe
-    io::IO_t
-    indent_level::Int
-    indented_line::Bool
-    indent_str::String
-    printed::Int
-    lowercasefirst::Bool
-    force_newlines::Bool
+  io::IO_t
+  indent_level::Int
+  indented_line::Bool
+  indent_str::String
+  printed::Int
+  lowercasefirst::Bool
+  force_newlines::Bool
 
-    function IOCustom{IO_t}(io::IO_t, indent_level::Int,
-                            indented_line::Bool, indent_str::String,
-                            printed::Int, lowercasefirst::Bool, force_newlines::Bool) where IO_t <: IO
-        @assert(!(IO_t <: IOCustom))
-        return new(io, indent_level, indented_line, indent_str, printed, lowercasefirst, force_newlines)
-    end
+  function IOCustom{IO_t}(io::IO_t, indent_level::Int,
+                          indented_line::Bool, indent_str::String,
+                          printed::Int, lowercasefirst::Bool, force_newlines::Bool) where IO_t <: IO
+    @assert(!(IO_t <: IOCustom))
+    return new(io, indent_level, indented_line, indent_str, printed, lowercasefirst, force_newlines)
+  end
 end
 
 _unwrap(io::IOCustom) = io
@@ -1884,11 +1884,11 @@ getindex(io::IOCustom, key) = getindex(io.io, key)
 get(io::IOCustom, key, default) = get(io.io, key, default)
 
 function show(_io::IO, io::IOCustom)
-    ioi = IOCustom(_io)
-    print(ioi, "IOCustom:", Indent())
-    print(ioi, "\nIO: "); show(ioi, io.io)
-    print(ioi, "\nIndent string: \"", io.indent_str, "\"")
-    print(ioi, "\nIndent: ", io.indent_level)
+  ioi = IOCustom(_io)
+  print(ioi, "IOCustom:", Indent())
+  print(ioi, "\nIO: "); show(ioi, io.io)
+  print(ioi, "\nIndent string: \"", io.indent_str, "\"")
+  print(ioi, "\nIndent: ", io.indent_level)
 end
 
 pipe_reader(io::IOCustom) = io.io
@@ -1952,8 +1952,8 @@ function _write_line(io::IOCustom, str::AbstractString)
   end
   #@show spaceleft
   if io.lowercasefirst
-   str = lowercasefirst(str)
-   io.lowercasefirst = false
+    str = lowercasefirst(str)
+    io.lowercasefirst = false
   end
   # The following code deals with line wrapping of Unicode text, including
   # double-width symbols and more.
@@ -2008,11 +2008,11 @@ function _write_line(io::IOCustom, str::AbstractString)
       printstr = ""
       j = 1
       while textwidth(printstr) < (limit)
-         printstr *= partcollect[j]
-         j += 1
-         if j > length(partcollect)
-            break
-         end
+        printstr *= partcollect[j]
+        j += 1
+        if j > length(partcollect)
+          break
+        end
       end
       written += write(io.io, "\n")
       written += write_indent(io)

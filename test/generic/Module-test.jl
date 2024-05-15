@@ -1,263 +1,263 @@
 function rand_homomorphism(M::AbstractAlgebra.FPModule{T}, vals...) where T <: RingElement
-   rk = rand(1:5)
-   m = ngens(M)
-   R = base_ring(M)
-   F = free_module(R, rk)
-   S = matrix_space(R, rk, m)
-   mat = rand(S, vals...)
-   f = ModuleHomomorphism(F, M, mat)
-   ngens1 = rand(1:3)
-   gens1 = [rand(F, vals...) for j in 1:ngens1]
-   S, g = sub(F, gens1)
-   hom1 = compose(g, f)
-   return S, hom1
+  rk = rand(1:5)
+  m = ngens(M)
+  R = base_ring(M)
+  F = free_module(R, rk)
+  S = matrix_space(R, rk, m)
+  mat = rand(S, vals...)
+  f = ModuleHomomorphism(F, M, mat)
+  ngens1 = rand(1:3)
+  gens1 = [rand(F, vals...) for j in 1:ngens1]
+  S, g = sub(F, gens1)
+  hom1 = compose(g, f)
+  return S, hom1
 end
 
 @testset "Generic.Module.rand" begin
-   F = free_module(ZZ, 3)
+  F = free_module(ZZ, 3)
 
-   test_rand(F, 1:9)
+  test_rand(F, 1:9)
 end
 
 @testset "Generic.Module.manipulation" begin
-   for R in [ZZ, QQ]
-      for iter = 1:100
-         F = free_module(R, 3)
-         M = rand_module(R, -10:10)
+  for R in [ZZ, QQ]
+    for iter = 1:100
+      F = free_module(R, 3)
+      M = rand_module(R, -10:10)
 
-         ngens1 = rand(1:5)
-         gens1 = [rand(M, -10:10) for j in 1:ngens1]
-         M1, f1 = sub(M, gens1)
+      ngens1 = rand(1:5)
+      gens1 = [rand(M, -10:10) for j in 1:ngens1]
+      M1, f1 = sub(M, gens1)
 
-         ngens2 = rand(1:5)
-         gens2 = [rand(M1, -10:10) for j in 1:ngens2]
-         M2, f2 = sub(M1, gens2)
+      ngens2 = rand(1:5)
+      gens2 = [rand(M1, -10:10) for j in 1:ngens2]
+      M2, f2 = sub(M1, gens2)
 
-         Q, g = quo(M, M1)
+      Q, g = quo(M, M1)
 
-         @test is_submodule(M, M)
-         @test is_submodule(M, M1)
-         @test is_submodule(M, M2)
-         @test !is_submodule(M, Q)
-         @test !is_submodule(M1, F)
-         @test !is_submodule(M1, M)
+      @test is_submodule(M, M)
+      @test is_submodule(M, M1)
+      @test is_submodule(M, M2)
+      @test !is_submodule(M, Q)
+      @test !is_submodule(M1, F)
+      @test !is_submodule(M1, M)
 
-         ngens3 = rand(1:5)
-         gens3 = [rand(M, -10:10) for j in 1:ngens3]
-         M3, f3 = sub(M, gens3)
+      ngens3 = rand(1:5)
+      gens3 = [rand(M, -10:10) for j in 1:ngens3]
+      M3, f3 = sub(M, gens3)
 
-         ngens4 = rand(1:5)
-         gens4 = [rand(M3, -10:10) for j in 1:ngens4]
-         M4, f4 = sub(M3, gens4)
+      ngens4 = rand(1:5)
+      gens4 = [rand(M3, -10:10) for j in 1:ngens4]
+      M4, f4 = sub(M3, gens4)
 
-         flag, U = is_compatible(M1, M3)
-         @test flag == true && U == M
+      flag, U = is_compatible(M1, M3)
+      @test flag == true && U == M
 
-         flag, U = is_compatible(M1, M4)
-         @test flag == true && U == M
+      flag, U = is_compatible(M1, M4)
+      @test flag == true && U == M
 
-         flag, U = is_compatible(M2, M3)
-         @test flag == true && U == M
+      flag, U = is_compatible(M2, M3)
+      @test flag == true && U == M
 
-         flag, U = is_compatible(M2, M4)
-         @test flag == true && U == M
+      flag, U = is_compatible(M2, M4)
+      @test flag == true && U == M
 
-         flag, U = is_compatible(M, M)
-         @test flag == true && U == M
+      flag, U = is_compatible(M, M)
+      @test flag == true && U == M
 
-         flag, U = is_compatible(M1, Q)
-         @test flag == false
+      flag, U = is_compatible(M1, Q)
+      @test flag == false
 
-         flag, U = is_compatible(M2, Q)
-         @test flag == false
+      flag, U = is_compatible(M2, Q)
+      @test flag == false
 
-         flag, U = is_compatible(Q, M1)
-         @test flag == false
+      flag, U = is_compatible(Q, M1)
+      @test flag == false
 
-         flag, U = is_compatible(Q, M2)
-         @test flag == false
-      end
-   end
+      flag, U = is_compatible(Q, M2)
+      @test flag == false
+    end
+  end
 
-   # Regression test: triggers crash if Submodule
-   # doesn't doesn't reduce generators mod relations
-   # and put in hnf
+  # Regression test: triggers crash if Submodule
+  # doesn't doesn't reduce generators mod relations
+  # and put in hnf
 
-   F = free_module(ZZ, 3)
+  F = free_module(ZZ, 3)
 
-   m = F(BigInt[-10, -5, -1])
-   n = F(BigInt[0, -2, -9])
-   S, f = sub(F, [m, n])
+  m = F(BigInt[-10, -5, -1])
+  n = F(BigInt[0, -2, -9])
+  S, f = sub(F, [m, n])
 
-   Q, g = quo(F, S)
+  Q, g = quo(F, S)
 
-   b = Q(BigInt[2, 0, 4])
-   c = Q(BigInt[7, 1, -59])
-   d = Q(BigInt[4, 0, 23])
-   T, h = sub(Q, [b, c, d])
+  b = Q(BigInt[2, 0, 4])
+  c = Q(BigInt[7, 1, -59])
+  d = Q(BigInt[4, 0, 23])
+  T, h = sub(Q, [b, c, d])
 
-   U, k = quo(Q, T)
+  U, k = quo(Q, T)
 end
 
 @testset "Generic.Module.elem_getindex" begin
 
-   for R in [ZZ, QQ]
-      for iter = 1:100
-         F = free_module(R, 3)
-         M = rand_module(R, -10:10)
+  for R in [ZZ, QQ]
+    for iter = 1:100
+      F = free_module(R, 3)
+      M = rand_module(R, -10:10)
 
-         m1 = rand(M, -10:10)
+      m1 = rand(M, -10:10)
 
-         m2 = zero(M)
+      m2 = zero(M)
 
-         if ngens(M) != 0
-            m2 = sum(m1[i]*gen(M, i) for i in 1:ngens(M))
-            @test gen(M, 1) == M[1]
-         end
-
-         @test_throws ArgumentError gen(M, 0)
-         @test_throws ArgumentError gen(M, ngens(M) + 1)
-
-         @test m1 == m2
+      if ngens(M) != 0
+        m2 = sum(m1[i]*gen(M, i) for i in 1:ngens(M))
+        @test gen(M, 1) == M[1]
       end
-   end
+
+      @test_throws ArgumentError gen(M, 0)
+      @test_throws ArgumentError gen(M, ngens(M) + 1)
+
+      @test m1 == m2
+    end
+  end
 end
 
 @testset "Generic.Module.intersect" begin
-   for R in [ZZ, QQ]
-      for iter = 1:100
-         M = rand_module(R, -10:10)
+  for R in [ZZ, QQ]
+    for iter = 1:100
+      M = rand_module(R, -10:10)
 
-         ngens1 = rand(1:5)
-         gens1 = [rand(M, -10:10) for j in 1:ngens1]
-         M1, f1 = sub(M, gens1)
+      ngens1 = rand(1:5)
+      gens1 = [rand(M, -10:10) for j in 1:ngens1]
+      M1, f1 = sub(M, gens1)
 
-         ngens2 = rand(1:5)
-         gens2 = [rand(M, -10:10) for j in 1:ngens2]
-         M2, f2 = sub(M, gens2)
+      ngens2 = rand(1:5)
+      gens2 = [rand(M, -10:10) for j in 1:ngens2]
+      M2, f2 = sub(M, gens2)
 
-         ngens3 = rand(1:5)
-         gens3 = [rand(M, -10:10) for j in 1:ngens3]
-         M3, f3 = sub(M, gens3)
+      ngens3 = rand(1:5)
+      gens3 = [rand(M, -10:10) for j in 1:ngens3]
+      M3, f3 = sub(M, gens3)
 
-         I1, g1 = intersect(M1, M2)
-         I2, g2 = intersect(I1, M3)
+      I1, g1 = intersect(M1, M2)
+      I2, g2 = intersect(I1, M3)
 
-         J1, h1 = intersect(M2, M3)
-         J2, h2 = intersect(M1, J1)
+      J1, h1 = intersect(M2, M3)
+      J2, h2 = intersect(M1, J1)
 
-         @test I2 == J2 # test associativity
+      @test I2 == J2 # test associativity
 
-         I3, g3 = intersect(M2, M1)
+      I3, g3 = intersect(M2, M1)
 
-         @test I1 == I3 # test commutativity
+      @test I1 == I3 # test commutativity
 
-         I4, g4 = intersect(M1, M1)
+      I4, g4 = intersect(M1, M1)
 
-         @test I4 == M1 # test reflexivity
+      @test I4 == M1 # test reflexivity
 
-         I5, g5 = intersect(I1, M2)
-         I6, g6 = intersect(I1, M1)
+      I5, g5 = intersect(I1, M2)
+      I6, g6 = intersect(I1, M1)
 
-         @test I1 == I5 # test absorption
-         @test I1 == I6
-      end
-   end
+      @test I1 == I5 # test absorption
+      @test I1 == I6
+    end
+  end
 end
 
 @testset "Generic.Module.is_isomorphic" begin
-   # Test the first isomorphism theorem
-   for R in [ZZ, QQ]
-      for iter = 1:100
-         M = rand_module(R, -10:10)
-         S, f = rand_homomorphism(M, -10:10)
+  # Test the first isomorphism theorem
+  for R in [ZZ, QQ]
+    for iter = 1:100
+      M = rand_module(R, -10:10)
+      S, f = rand_homomorphism(M, -10:10)
 
-         K, g = kernel(f)
-         Q, h = quo(S, K)
+      K, g = kernel(f)
+      Q, h = quo(S, K)
 
-         I, k = image(f)
+      I, k = image(f)
 
-         @test is_isomorphic(Q, I)
-      end
-   end
+      @test is_isomorphic(Q, I)
+    end
+  end
 
-   # Test submodules are isomorphic to their image
-   for R in [ZZ, QQ]
-      for iter = 1:100
-         M = rand_module(R, -10:10)
+  # Test submodules are isomorphic to their image
+  for R in [ZZ, QQ]
+    for iter = 1:100
+      M = rand_module(R, -10:10)
 
-         ngens1 = rand(1:5)
-         gens1 = [rand(M, -10:10) for j in 1:ngens1]
-         M1, f1 = sub(M, gens1)
+      ngens1 = rand(1:5)
+      gens1 = [rand(M, -10:10) for j in 1:ngens1]
+      M1, f1 = sub(M, gens1)
 
-         I, g = image(f1)
+      I, g = image(f1)
 
-         @test is_isomorphic(I, M1)
-      end
-   end
+      @test is_isomorphic(I, M1)
+    end
+  end
 end
 
 @testset "Generic.Module.coercions" begin
-   # Test the first isomorphism theorem
-   for R in [ZZ, QQ]
-      for iter = 1:20
-         M = rand_module(R, -10:10)
+  # Test the first isomorphism theorem
+  for R in [ZZ, QQ]
+    for iter = 1:20
+      M = rand_module(R, -10:10)
 
-         S2, f2 = sub(M, [rand(M, -10:10)])
-         S1, f1 = sub(S2, [rand(S2, -10:10)])
+      S2, f2 = sub(M, [rand(M, -10:10)])
+      S1, f1 = sub(S2, [rand(S2, -10:10)])
 
-         SQ1, g1 = sub(M, [rand(M, -10:10)])
-         Q1, h1 = quo(M, SQ1)
-         SQ2, g2 = sub(Q1, [rand(Q1, -10:10)])
-         Q2, h2 = quo(Q1, SQ2)
-         SQ3, g3 = sub(Q2, [rand(Q2, -10:10)])
-         Q3, h3 = quo(Q2, SQ3)
+      SQ1, g1 = sub(M, [rand(M, -10:10)])
+      Q1, h1 = quo(M, SQ1)
+      SQ2, g2 = sub(Q1, [rand(Q1, -10:10)])
+      Q2, h2 = quo(Q1, SQ2)
+      SQ3, g3 = sub(Q2, [rand(Q2, -10:10)])
+      Q3, h3 = quo(Q2, SQ3)
 
-         Sa, k1 = sub(Q2, [rand(Q2, -10:10)])
-         Sb, k2 = sub(Sa, [rand(Sa, -10:10)])
+      Sa, k1 = sub(Q2, [rand(Q2, -10:10)])
+      Sb, k2 = sub(Sa, [rand(Sa, -10:10)])
 
-         m1 = rand(M, -10:10)
-         @test parent(M(m1)) === M
-         @test parent(Q1(m1)) === Q1
-         @test parent(Q2(m1)) === Q2
+      m1 = rand(M, -10:10)
+      @test parent(M(m1)) === M
+      @test parent(Q1(m1)) === Q1
+      @test parent(Q2(m1)) === Q2
 
-         m2 = rand(Q1, -10:10)
-         @test parent(Q1(m2)) == Q1
-         @test parent(Q2(m2)) == Q2
+      m2 = rand(Q1, -10:10)
+      @test parent(Q1(m2)) == Q1
+      @test parent(Q2(m2)) == Q2
 
-         m3 = rand(S2, -10:10)
-         @test parent(M(m3)) === M
-         @test parent(Q1(m3)) === Q1
-         @test parent(Q2(m3)) === Q2
+      m3 = rand(S2, -10:10)
+      @test parent(M(m3)) === M
+      @test parent(Q1(m3)) === Q1
+      @test parent(Q2(m3)) === Q2
 
-         m4 = rand(S1, -10:10)
-         @test parent(M(m4)) === M
-         @test parent(Q1(m4)) === Q1
-         @test parent(Q2(m4)) === Q2
+      m4 = rand(S1, -10:10)
+      @test parent(M(m4)) === M
+      @test parent(Q1(m4)) === Q1
+      @test parent(Q2(m4)) === Q2
 
-         m5 = rand(Sa, -10:10)
-         @test parent(Sa(m5)) === Sa
-         @test parent(Q2(m5)) === Q2
-         @test parent(Q3(m5)) === Q3
+      m5 = rand(Sa, -10:10)
+      @test parent(Sa(m5)) === Sa
+      @test parent(Q2(m5)) === Q2
+      @test parent(Q3(m5)) === Q3
 
-         m6 = rand(Sb, -10:10)
-         @test parent(Sa(m6)) === Sa
-         @test parent(Q2(m6)) === Q2
-         @test parent(Q3(m6)) === Q3
+      m6 = rand(Sb, -10:10)
+      @test parent(Sa(m6)) === Sa
+      @test parent(Q2(m6)) === Q2
+      @test parent(Q3(m6)) === Q3
 
-         m7 = rand(S2, -10:10)
-         @test parent(M(m7)) === M
-         @test parent(Q1(m7)) === Q1
-         @test parent(Q2(m7)) === Q2
+      m7 = rand(S2, -10:10)
+      @test parent(M(m7)) === M
+      @test parent(Q1(m7)) === Q1
+      @test parent(Q2(m7)) === Q2
 
-         m8 = rand(S1, -10:10)
-         @test parent(M(m7)) === M
-         @test parent(Q1(m7)) === Q1
-         @test parent(Q2(m7)) === Q2
+      m8 = rand(S1, -10:10)
+      @test parent(M(m7)) === M
+      @test parent(Q1(m7)) === Q1
+      @test parent(Q2(m7)) === Q2
 
-         D, v = direct_sum(S1, Sa)
-         m9 = rand(D, -10:10)
-         @test parent(D(m9)) === D
-      end
-   end
+      D, v = direct_sum(S1, Sa)
+      m9 = rand(D, -10:10)
+      @test parent(D(m9)) === D
+    end
+  end
 end

@@ -22,35 +22,35 @@ function coimage(h::Map)
 end
 
 function check_composable(a::Map, b::Map)
-   codomain(a) !== domain(b) && error("Incompatible maps")
+  codomain(a) !== domain(b) && error("Incompatible maps")
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", M::AbstractAlgebra.Map)
-   # the "header" printed for most map types is identical: the terse output
-   # followed by "from DOMAIN" and "to CODOMAIN" lines.. We implement this
-   # generically here. If desired, map types can provide a custom
-   # show_map_data method to add additional data after this initial "header".
-   println(terse(io), M)
-   io = pretty(io)
-   println(io, Indent(), "from ", Lowercase(), domain(M))
-   print(io, "to ", Lowercase(), codomain(M), Dedent())
-   show_map_data(io, M)
+  # the "header" printed for most map types is identical: the terse output
+  # followed by "from DOMAIN" and "to CODOMAIN" lines.. We implement this
+  # generically here. If desired, map types can provide a custom
+  # show_map_data method to add additional data after this initial "header".
+  println(terse(io), M)
+  io = pretty(io)
+  println(io, Indent(), "from ", Lowercase(), domain(M))
+  print(io, "to ", Lowercase(), codomain(M), Dedent())
+  show_map_data(io, M)
 end
 
 function show_map_data(io::IO, M::AbstractAlgebra.Map)
-   # no extra data by default; Map subtypes may overload this
+  # no extra data by default; Map subtypes may overload this
 end
 
 function Base.show(io::IO, M::AbstractAlgebra.Map)
-   if is_terse(io)
-      print(io, "Map")
-   else
-      io = pretty(io)
-      io = terse(io)
-      print(io, "Map: ")
-      print(io, Lowercase(), domain(M), " -> ")
-      print(io, Lowercase(), codomain(M))
-   end
+  if is_terse(io)
+    print(io, "Map")
+  else
+    io = pretty(io)
+    io = terse(io)
+    print(io, "Map: ")
+    print(io, Lowercase(), domain(M), " -> ")
+    print(io, Lowercase(), codomain(M))
+  end
 end
 
 Base.broadcastable(M::AbstractAlgebra.Map) = Ref(M)
@@ -82,8 +82,8 @@ which is the composite of
 ```
 """
 function compose(f::Map, g::Map)
-   check_composable(f, g)
-   return Generic.CompositeMap(f, g)
+  check_composable(f, g)
+  return Generic.CompositeMap(f, g)
 end
 
 *(f::Map, g::Map) = compose(f, g)
@@ -138,7 +138,7 @@ julia> f(ZZ(2))
 ```
 """
 function map_from_func(image_fn::Function, domain, codomain)
-   return Generic.FunctionalMap(domain, codomain, image_fn)
+  return Generic.FunctionalMap(domain, codomain, image_fn)
 end
 
 ################################################################################
@@ -148,7 +148,7 @@ end
 ################################################################################
 
 function compose(f::Map(FunctionalMap){D, U}, g::Map(FunctionalMap){U, C}) where {D, U, C}
-   check_composable(f, g)
-   return Generic.FunctionalCompositeMap(f, g)
+  check_composable(f, g)
+  return Generic.FunctionalCompositeMap(f, g)
 end
 

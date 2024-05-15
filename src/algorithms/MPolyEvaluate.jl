@@ -48,14 +48,14 @@ end
 # The usual univariate horner rule. Since Bexps is in lex order,
 # recursion is easy, and the depth is bounded by nvars
 function _horner_lex_rec(
-  res::Vector,
-  ctxA::Ring,
-  Bcoeffs, Bexps::Vector{Vector{Int}},
-  Bstart::Int, Bstop::Int, # ignore all terms outside this interval [Bstart, Bstop]
-  var::Int, # ignore all variables of index < var
-  C::Vector,
-  ctxC::Ring,
-  ta, tc) # temps
+    res::Vector,
+    ctxA::Ring,
+    Bcoeffs, Bexps::Vector{Vector{Int}},
+    Bstart::Int, Bstop::Int, # ignore all terms outside this interval [Bstart, Bstop]
+    var::Int, # ignore all variables of index < var
+    C::Vector,
+    ctxC::Ring,
+    ta, tc) # temps
 
   @assert Bstart <= Bstop
   len = Bstop + 1 - Bstart
@@ -84,7 +84,7 @@ function _horner_lex_rec(
   e = Bexps[i][var]
   res[var] = zero!(res[var])
 
-@label next_term
+  @label next_term
 
   i += 1
   if i > Bstop
@@ -140,12 +140,12 @@ stack has depth proportional to the length of the input polynomial in the worst
 case. Therefore, the following iterative spaghetti ensues.
 
 HornerForm(f):
-  if f is simple to evaluate (choice in else branch doesn't exist)
-    return eval(f)
-  else
-    choose a variable v and the smallest nonzero exponent e appearing in f
-    write f = q * v^e + r  where r is independent of the variable v
-    return  HornerForm(q) * v^e + HornerForm(r)
+if f is simple to evaluate (choice in else branch doesn't exist)
+return eval(f)
+else
+choose a variable v and the smallest nonzero exponent e appearing in f
+write f = q * v^e + r  where r is independent of the variable v
+return  HornerForm(q) * v^e + HornerForm(r)
 
 TODO: change all zero-based indices into natural one-based indices
 
@@ -163,13 +163,13 @@ end
 
 # obtain a count of the number of terms containing each variable
 function _term_counts!(
-  counts::Vector{Int},  # modified
-  mdegs::Vector{Int},   # modified
-  nvars::Int,
-  f::Int,
-  Bexps::Vector{Vector{Int}},
-  Blist::Vector{Int}
-)
+    counts::Vector{Int},  # modified
+    mdegs::Vector{Int},   # modified
+    nvars::Int,
+    f::Int,
+    Bexps::Vector{Vector{Int}},
+    Blist::Vector{Int}
+  )
   for i in 0:nvars-1
     counts[1+i] = 0
     mdegs[1+i] = -1
@@ -203,14 +203,14 @@ end
 
 # split into q and r
 function _split_qr!(
-  counts::Vector{Int},
-  mdegs::Vector{Int},
-  nvars::Int,
-  f::Int,
-  Bexps::Vector{Vector{Int}}, # modified
-  Blist::Vector{Int},         # modified
-  maxcounts::Int
-)
+    counts::Vector{Int},
+    mdegs::Vector{Int},
+    nvars::Int,
+    f::Int,
+    Bexps::Vector{Vector{Int}}, # modified
+    Blist::Vector{Int},         # modified
+    maxcounts::Int
+  )
   # pick best power to pull out
   k = 0
   if maxcounts == 1
@@ -269,12 +269,12 @@ end
 # evaluate B at vars = C
 # arithmetic between ctxB and ctxC should be in ctxA
 function _evaluate_horner_non_rec(
-  ctxA::Ring,
-  Bcoeffs,
-  Bexps::Vector{Vector{Int}},
-  C::Vector,
-  ctxC::Ring
-)
+    ctxA::Ring,
+    Bcoeffs,
+    Bexps::Vector{Vector{Int}},
+    C::Vector,
+    ctxC::Ring
+  )
 
   Blen = length(Bcoeffs)
   if Blen < 1
@@ -310,7 +310,7 @@ function _evaluate_horner_non_rec(
   # start with f = B
   push!(stack, stack_entry(0, 0, 0, 0, 0))
 
-@label horner_form  # beginning of HornerForm(f)
+  @label horner_form  # beginning of HornerForm(f)
 
   f = stack[end].f
   @assert f != -1
@@ -347,7 +347,7 @@ function _evaluate_horner_non_rec(
   # convert the quotient
   push!(stack, stack_entry(f, 0, 0, 0, 1))
   @goto horner_form
-@label horner_form_ret_1
+  @label horner_form_ret_1
 
   # convert the remainder
   r = stack[end].r
@@ -357,7 +357,7 @@ function _evaluate_horner_non_rec(
     @assert 0 <= rp <= nvars
     push!(stack, stack_entry(r, 0, 0, 0, 2))
     @goto horner_form
-@label horner_form_ret_2
+    @label horner_form_ret_2
 
     if rtypes[1+rp-1] == -1 && rtypes[1+rp] == -1
       # both quotient and remainder are polynomials
@@ -387,7 +387,7 @@ function _evaluate_horner_non_rec(
   end
   rtypes[1+rp] = -1
 
-@label horner_form_return
+  @label horner_form_return
   # two possible recursive call sites
   ret = stack[end].ret
   pop!(stack)

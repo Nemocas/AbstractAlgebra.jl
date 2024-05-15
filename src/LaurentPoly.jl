@@ -30,4 +30,4 @@ julia> rand(R, -3:3, -9:9)
 ```
 """
 laurent_polynomial_ring(R::Ring, s::VarName; cached::Bool = true) =
-   Generic.laurent_polynomial_ring(R, Symbol(s); cached)
+Generic.laurent_polynomial_ring(R, Symbol(s); cached)

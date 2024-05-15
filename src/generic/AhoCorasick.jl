@@ -11,7 +11,7 @@ struct Queue{T}
 end
 
 function Queue{T}() where T
-    return Queue{T}(T[])
+  return Queue{T}(T[])
 end
 
 function enqueue!(q::Queue{T}, val::T) where T
@@ -39,14 +39,14 @@ AbstractAlgebra.Generic.AhoCorasickMatch(6, 1, [1, 2, 3, 4])
 ```
 """ 
 mutable struct AhoCorasickAutomaton
-    goto::Vector{Dict{Int,Int}}
-    fail::Vector{Int}
-    """
-    Output stores for each node a tuple (i, k), where i is the index of the keyword k in
-    the original list of keywords. If several keywords would be the output of the node, only
-    the one with the smallest index is stored
-    """
-    output::Vector{Tuple{Int,Word}}
+  goto::Vector{Dict{Int,Int}}
+  fail::Vector{Int}
+  """
+  Output stores for each node a tuple (i, k), where i is the index of the keyword k in
+  the original list of keywords. If several keywords would be the output of the node, only
+  the one with the smallest index is stored
+  """
+  output::Vector{Tuple{Int,Word}}
 end
 
 @doc """
@@ -79,115 +79,115 @@ julia> Generic.keyword(result)
 ```
 """ 
 struct AhoCorasickMatch
-    last_position::Int
-    keyword_index::Int
-    keyword::Word
+  last_position::Int
+  keyword_index::Int
+  keyword::Word
 end
 
 """
 returns the last position of the match in the word that was searched
 """
 function last_position(match::AhoCorasickMatch)
-    return match.last_position
+  return match.last_position
 end
 
 """
 returns the index of the keyword in the corresponding aho corasick automaton
 """
 function keyword_index(match::AhoCorasickMatch)
-    return match.keyword_index
+  return match.keyword_index
 end
 
 """
 returns the keyword corresponding to the match
 """
 function keyword(match::AhoCorasickMatch)
-    return match.keyword
+  return match.keyword
 end
 
 function aho_corasick_match(last_position::Int, keyword_index::Int, keyword::Word)
-    return AhoCorasickMatch(last_position, keyword_index, keyword)
+  return AhoCorasickMatch(last_position, keyword_index, keyword)
 end
 
 Base.hash(m::AhoCorasickMatch, h::UInt) = hash(m.last_position, hash(m.keyword_index, 
-                                                            hash(m.keyword, h)))
+                                                                     hash(m.keyword, h)))
 function ==(m1::AhoCorasickMatch, m2::AhoCorasickMatch)
-    return m1.last_position == m2.last_position &&
-           m1.keyword_index == m2.keyword_index &&
-           m1.keyword == m2.keyword
+  return m1.last_position == m2.last_position &&
+  m1.keyword_index == m2.keyword_index &&
+  m1.keyword == m2.keyword
 end
 
 function AhoCorasickAutomaton(keywords::Vector{Word})
-    automaton = AhoCorasickAutomaton([], [], [])
-    construct_goto!(automaton, keywords)
-    construct_fail!(automaton)
-    return automaton
+  automaton = AhoCorasickAutomaton([], [], [])
+  construct_goto!(automaton, keywords)
+  construct_fail!(automaton)
+  return automaton
 end
 
 function aho_corasick_automaton(keywords::Vector{Word})
-    return AhoCorasickAutomaton(keywords)
+  return AhoCorasickAutomaton(keywords)
 end
 
 function lookup(automaton::AhoCorasickAutomaton, current_state::Int, next_letter::Int)
-    ret_value = get(automaton.goto[current_state], next_letter, nothing)
-    if current_state == 1 && isnothing(ret_value)
-        return 1
-    end
-    return ret_value
+  ret_value = get(automaton.goto[current_state], next_letter, nothing)
+  if current_state == 1 && isnothing(ret_value)
+    return 1
+  end
+  return ret_value
 end
 
 
 function Base.length(automaton::AhoCorasickAutomaton)
-    return length(automaton.goto)
+  return length(automaton.goto)
 end
 
 function new_state!(automaton)
-    push!(automaton.goto, Dict{Int,Int}())
-    push!(automaton.output, (typemax(Int), []))
-    push!(automaton.fail, 1)
-    return length(automaton.goto)
+  push!(automaton.goto, Dict{Int,Int}())
+  push!(automaton.output, (typemax(Int), []))
+  push!(automaton.fail, 1)
+  return length(automaton.goto)
 end
 
 function enter!(automaton::AhoCorasickAutomaton, keyword::Word, current_index)
-    current_state = 1
-    for c in keyword
-        current_state = get!(automaton.goto[current_state], c) do
-            new_state!(automaton)
-        end
+  current_state = 1
+  for c in keyword
+    current_state = get!(automaton.goto[current_state], c) do
+      new_state!(automaton)
     end
-    if automaton.output[current_state][1] > current_index
-        automaton.output[current_state] = (current_index, keyword)
-    end
+  end
+  if automaton.output[current_state][1] > current_index
+    automaton.output[current_state] = (current_index, keyword)
+  end
 end
 
 function construct_goto!(automaton::AhoCorasickAutomaton, keywords::Vector{Word})
-    new_state!(automaton)
-    for (current_index, keyword) in enumerate(keywords)
-        enter!(automaton, keyword, current_index)
-    end
+  new_state!(automaton)
+  for (current_index, keyword) in enumerate(keywords)
+    enter!(automaton, keyword, current_index)
+  end
 end
 
 function construct_fail!(automaton::AhoCorasickAutomaton)
-    q = Queue{Int}()
-    for v in values(automaton.goto[1])
-        enqueue!(q, v)
-    end
-    while !isempty(q)
-        current_state = dequeue!(q)
-        for (k, new_state) in automaton.goto[current_state]
-            enqueue!(q, new_state)
-            state = automaton.fail[current_state]
-            while (s = lookup(automaton, state, k)) === nothing
-                state = automaton.fail[state]
-            end
-            automaton.fail[new_state] = s
-            if automaton.output[new_state][1] >
-               automaton.output[automaton.fail[new_state]][1]
-               automaton.output[new_state] = automaton.output[automaton.fail[new_state]] 
-            end
+  q = Queue{Int}()
+  for v in values(automaton.goto[1])
+    enqueue!(q, v)
+  end
+  while !isempty(q)
+    current_state = dequeue!(q)
+    for (k, new_state) in automaton.goto[current_state]
+      enqueue!(q, new_state)
+      state = automaton.fail[current_state]
+      while (s = lookup(automaton, state, k)) === nothing
+        state = automaton.fail[state]
+      end
+      automaton.fail[new_state] = s
+      if automaton.output[new_state][1] >
+        automaton.output[automaton.fail[new_state]][1]
+        automaton.output[new_state] = automaton.output[automaton.fail[new_state]] 
+      end
 
-        end
     end
+  end
 end
 
 @doc """
@@ -197,9 +197,9 @@ Insert a new keyword into a given Aho-Corasick automaton to avoid having to rebu
 automaton.
 """ 
 function insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
-    enter!(aut, keyword, index)
-    aut.fail = ones(Int, length(aut.goto))
-    construct_fail!(aut)
+  enter!(aut, keyword, index)
+  aut.fail = ones(Int, length(aut.goto))
+  construct_fail!(aut)
 end
 
 @doc """
@@ -208,29 +208,29 @@ end
 Search for the first occurrence of a keyword that is stored in `automaton` in the given `word`.
 """ 
 function search(automaton::AhoCorasickAutomaton, word::Word)
-    current_state = 1
-    result = AhoCorasickMatch(typemax(Int), typemax(Int), [])
-    for i in 1:length(word)
-        c = word[i]
-        while true
-            next_state = lookup(automaton, current_state, c)
-            if next_state !== nothing
-                current_state = next_state
-                break
-            else
-                current_state = automaton.fail[current_state]
-            end
-        end
-        if automaton.output[current_state][1] < result.keyword_index
-            result = AhoCorasickMatch(
-                i,
-                automaton.output[current_state][1],
-                automaton.output[current_state][2],
-            )
-        end
+  current_state = 1
+  result = AhoCorasickMatch(typemax(Int), typemax(Int), [])
+  for i in 1:length(word)
+    c = word[i]
+    while true
+      next_state = lookup(automaton, current_state, c)
+      if next_state !== nothing
+        current_state = next_state
+        break
+      else
+        current_state = automaton.fail[current_state]
+      end
     end
-    if isempty(result.keyword)
-        return nothing
+    if automaton.output[current_state][1] < result.keyword_index
+      result = AhoCorasickMatch(
+                                i,
+                                automaton.output[current_state][1],
+                                automaton.output[current_state][2],
+                               )
     end
-    return result
+  end
+  if isempty(result.keyword)
+    return nothing
+  end
+  return result
 end

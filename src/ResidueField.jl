@@ -19,21 +19,21 @@ parent(a::ResFieldElem) = a.parent
 is_domain_type(a::Type{T}) where T <: ResFieldElem = true
 
 function is_exact_type(a::Type{T}) where {S <: RingElement, T <: ResFieldElem{S}}
-   return is_exact_type(S)
+  return is_exact_type(S)
 end
 
 function check_parent_type(a::ResidueField{T}, b::ResidueField{T}) where {T <: RingElement}
-   # exists only to check types of parents agree
+  # exists only to check types of parents agree
 end
 
 function check_parent(a::ResFieldElem, b::ResFieldElem, throw::Bool = true)
-   if parent(a) != parent(b)
-      check_parent_type(parent(a), parent(b))
-      fl = modulus(parent(a)) != modulus(parent(b))
-      fl && throw && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
-      return !fl
-   end
-   return true
+  if parent(a) != parent(b)
+    check_parent_type(parent(a), parent(b))
+    fl = modulus(parent(a)) != modulus(parent(b))
+    fl && throw && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
+    return !fl
+  end
+  return true
 end
 
 ###############################################################################
@@ -43,8 +43,8 @@ end
 ###############################################################################
 
 function Base.hash(a::ResFieldElem, h::UInt)
-   b = 0x539c1c8715c1adc2%UInt
-   return xor(b, xor(hash(data(a), h), h))
+  b = 0x539c1c8715c1adc2%UInt
+  return xor(b, xor(hash(data(a), h), h))
 end
 
 @doc raw"""
@@ -53,7 +53,7 @@ end
 Return the modulus $a$ of the given residue ring $S = R/(a)$.
 """
 function modulus(S::ResidueField)
-   return S.modulus
+  return S.modulus
 end
 
 @doc raw"""
@@ -63,7 +63,7 @@ Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 residue $r$ belongs to.
 """
 function modulus(r::ResFieldElem)
-   return modulus(parent(r))
+  return modulus(parent(r))
 end
 
 @doc raw"""
@@ -72,7 +72,7 @@ end
 Return the characteristic of the residue field.
 """
 function characteristic(R::ResidueField)
-   return characteristic(base_ring(R))
+  return characteristic(base_ring(R))
 end
 
 @doc raw"""
@@ -82,7 +82,7 @@ Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 residue $r$ belongs to.
 """
 function characteristic(r::ResidueField{T}) where T <: Integer
-   return modulus(r)
+  return modulus(r)
 end
 
 data(a::ResFieldElem) = a.data
@@ -100,8 +100,8 @@ iszero(a::ResFieldElem) = iszero(data(a))
 isone(a::ResFieldElem) = isone(data(a))
 
 function is_unit(a::ResFieldElem)
-   g = gcd(data(a), modulus(a))
-   return isone(g)
+  g = gcd(data(a), modulus(a))
+  return isone(g)
 end
 
 deepcopy_internal(a::ResFieldElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
@@ -126,22 +126,22 @@ end
 ###############################################################################
 
 function expressify(@nospecialize(a::ResFieldElem); context = nothing)
-   return expressify(data(a), context = context)
+  return expressify(data(a), context = context)
 end
 
 @enable_all_show_via_expressify ResFieldElem
 
 function show(io::IO, a::ResidueField)
-   @show_name(io, a)
-   @show_special(io, a)
-   if is_terse(io)
-     print(io, "Residue field")
-   else
-     io = pretty(io)
-     print(io, "Residue field of ",)
-     print(terse(io), Lowercase(), base_ring(a))
-     print(io, " modulo ", modulus(a))
-   end
+  @show_name(io, a)
+  @show_special(io, a)
+  if is_terse(io)
+    print(io, "Residue field")
+  else
+    io = pretty(io)
+    print(io, "Residue field of ",)
+    print(terse(io), Lowercase(), base_ring(a))
+    print(io, " modulo ", modulus(a))
+  end
 end
 
 ###############################################################################
@@ -151,7 +151,7 @@ end
 ###############################################################################
 
 function -(a::ResFieldElem)
-   parent(a)(-data(a))
+  parent(a)(-data(a))
 end
 
 ###############################################################################
@@ -161,18 +161,18 @@ end
 ###############################################################################
 
 function +(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   return parent(a)(data(a) + data(b))
+  check_parent(a, b)
+  return parent(a)(data(a) + data(b))
 end
 
 function -(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   return parent(a)(data(a) - data(b))
+  check_parent(a, b)
+  return parent(a)(data(a) - data(b))
 end
 
 function *(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   return parent(a)(data(a) * data(b))
+  check_parent(a, b)
+  return parent(a)(data(a) * data(b))
 end
 
 ###############################################################################
@@ -212,7 +212,7 @@ end
 ###############################################################################
 
 function ^(a::ResFieldElem, b::Integer)
-   parent(a)(powermod(data(a), b, modulus(a)))
+  parent(a)(powermod(data(a), b, modulus(a)))
 end
 
 ###############################################################################
@@ -229,9 +229,9 @@ that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
 function ==(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   fl = check_parent(a, b, false)
-   !fl && return false
-   return data(a) == data(b)
+  fl = check_parent(a, b, false)
+  !fl && return false
+  return data(a) == data(b)
 end
 
 @doc raw"""
@@ -243,8 +243,8 @@ Only if the power series are precisely the same, to the same precision, are
 they declared equal by this function.
 """
 function isequal(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   return isequal(data(a), data(b))
+  check_parent(a, b)
+  return isequal(data(a), data(b))
 end
 
 ###############################################################################
@@ -259,8 +259,8 @@ end
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
-   z = base_ring(a)(b)
-   return data(a) == mod(z, modulus(a))
+  z = base_ring(a)(b)
+  return data(a) == mod(z, modulus(a))
 end
 
 @doc raw"""
@@ -269,8 +269,8 @@ end
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem)
-   z = base_ring(b)(a)
-   return data(b) == mod(z, modulus(b))
+  z = base_ring(b)(a)
+  return data(b) == mod(z, modulus(b))
 end
 
 @doc raw"""
@@ -279,8 +279,8 @@ end
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::ResFieldElem{T}, b::T) where {T <: RingElem}
-   z = base_ring(a)(b)
-   return data(a) == mod(z, modulus(a))
+  z = base_ring(a)(b)
+  return data(a) == mod(z, modulus(a))
 end
 
 @doc raw"""
@@ -289,8 +289,8 @@ end
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::T, b::ResFieldElem{T}) where {T <: RingElem}
-   z = base_ring(b)(a)
-   return data(b) == mod(z, modulus(b))
+  z = base_ring(b)(a)
+  return data(b) == mod(z, modulus(b))
 end
 
 ###############################################################################
@@ -306,11 +306,11 @@ Return the inverse of the element $a$ in the residue ring. If an impossible
 inverse is encountered, an exception is raised.
 """
 function Base.inv(a::ResFieldElem)
-   g, ainv = gcdinv(data(a), modulus(a))
-   if !isone(g)
-      error("Impossible inverse in inv")
-   end
-   return parent(a)(ainv)
+  g, ainv = gcdinv(data(a), modulus(a))
+  if !isone(g)
+    error("Impossible inverse in inv")
+  end
+  return parent(a)(ainv)
 end
 
 ###############################################################################
@@ -320,15 +320,15 @@ end
 ###############################################################################
 
 function divexact(a::ResFieldElem{T}, b::ResFieldElem{T}; check::Bool=true) where {T <: RingElement}
-   check_parent(a, b)
-   fl, q = divides(a, b)
-   return q
+  check_parent(a, b)
+  fl, q = divides(a, b)
+  return q
 end
 
 function divides(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   iszero(b) && error("Division by zero in divides")
-   return true, a*inv(b)
+  check_parent(a, b)
+  iszero(b) && error("Division by zero in divides")
+  return true, a*inv(b)
 end
 
 ###############################################################################
@@ -345,8 +345,8 @@ by taking the greatest common divisor of the data associated with the
 supplied residues and taking its greatest common divisor with the modulus.
 """
 function gcd(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   return parent(a)(gcd(gcd(data(a), modulus(a)), data(b)))
+  check_parent(a, b)
+  return parent(a)(gcd(gcd(data(a), modulus(a)), data(b)))
 end
 
 ###############################################################################
@@ -361,12 +361,12 @@ end
 Return `true` if $a$ is a square.
 """
 function is_square(a::ResFieldElem{T}) where T <: Integer
-   if iszero(a)
-      return true
-   end
-   p = modulus(a)
-   pm1div2 = div(p - 1, 2)
-   return isone(a^pm1div2)
+  if iszero(a)
+    return true
+  end
+  p = modulus(a)
+  pm1div2 = div(p - 1, 2)
+  return isone(a^pm1div2)
 end
 
 @doc raw"""
@@ -376,55 +376,55 @@ Return the square root of $a$. By default the function will throw an exception
 if the input is not square. If `check=false` this test is omitted.
 """
 function Base.sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
-   U = parent(a)
-   p = modulus(a)
-   if p == 2 # special case, cannot find a quadratic nonresidue mod 2
-      return deepcopy(a)
-   end
-   # Compute Q, S such that p - 1 = Q*2^S
-   Q = p - 1
-   S = 0 # power of 2 dividing p - 1
-   while iseven(Q)
-      Q >>= 1
-      S += 1
-   end
-   # find a quadratic nonresidue z mod p
-   z = U(rand(1:p - 1))
-   while is_square(z)
-      z = U(rand(1:p - 1))
-   end
-   # set up
-   M = S
-   c = z^Q
-   t = a^Q
-   R = a^div(Q + 1, 2)
-   # main loop
-   while true
-      if iszero(t)
-         return zero(U)
+  U = parent(a)
+  p = modulus(a)
+  if p == 2 # special case, cannot find a quadratic nonresidue mod 2
+    return deepcopy(a)
+  end
+  # Compute Q, S such that p - 1 = Q*2^S
+  Q = p - 1
+  S = 0 # power of 2 dividing p - 1
+  while iseven(Q)
+    Q >>= 1
+    S += 1
+  end
+  # find a quadratic nonresidue z mod p
+  z = U(rand(1:p - 1))
+  while is_square(z)
+    z = U(rand(1:p - 1))
+  end
+  # set up
+  M = S
+  c = z^Q
+  t = a^Q
+  R = a^div(Q + 1, 2)
+  # main loop
+  while true
+    if iszero(t)
+      return zero(U)
+    end
+    if isone(t)
+      return R
+    end
+    u = t
+    i = 0
+    while i < M
+      if isone(u)
+        break
       end
-      if isone(t)
-         return R
-      end
-      u = t
-      i = 0
-      while i < M
-         if isone(u)
-            break
-         end
-         u = u^2
-         i += 1
-      end
-      check && i == M && error("Not a square in sqrt")
-      b = c
-      for j = 1:M - i - 1
-         b = b^2
-      end
-      M = i
-      c = b^2
-      t *= c
-      R *= b
-   end
+      u = u^2
+      i += 1
+    end
+    check && i == M && error("Not a square in sqrt")
+    b = c
+    for j = 1:M - i - 1
+      b = b^2
+    end
+    M = i
+    c = b^2
+    t *= c
+    R *= b
+  end
 end
 
 ###############################################################################
@@ -434,23 +434,23 @@ end
 ###############################################################################
 
 function zero!(a::ResFieldElem{T}) where {T <: RingElement}
-   a.data = zero!(a.data)
-   return a
+  a.data = zero!(a.data)
+  return a
 end
 
 function mul!(c::ResFieldElem{T}, a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   c.data = mod(data(a)*data(b), modulus(a))
-   return c
+  c.data = mod(data(a)*data(b), modulus(a))
+  return c
 end
 
 function addeq!(c::ResFieldElem{T}, a::ResFieldElem{T}) where {T <: RingElement}
-   c.data = mod(data(c) + data(a), modulus(a))
-   return c
+  c.data = mod(data(c) + data(a), modulus(a))
+  return c
 end
 
 function add!(c::ResFieldElem{T}, a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   c.data = mod(data(a) + data(b), modulus(a))
-   return c
+  c.data = mod(data(a) + data(b), modulus(a))
+  return c
 end
 
 ###############################################################################
@@ -462,20 +462,20 @@ end
 RandomExtensions.maketype(R::ResidueField, _) = elem_type(R)
 
 function rand(rng::AbstractRNG,
-              sp::SamplerTrivial{<:Make2{<:ResFieldElem{T},
-                                         <:ResidueField{T}}}
-              ) where {T}
-   S, v = sp[][1:end]
-   S(rand(rng, v))
+    sp::SamplerTrivial{<:Make2{<:ResFieldElem{T},
+                               <:ResidueField{T}}}
+  ) where {T}
+  S, v = sp[][1:end]
+  S(rand(rng, v))
 end
 
 function RandomExtensions.make(S::ResidueField, vs...)
-   R = base_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, vs[1])
-   else
-      Make(S, make(base_ring(S), vs...))
-   end
+  R = base_ring(S)
+  if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+    Make(S, vs[1])
+  else
+    Make(S, make(base_ring(S), vs...))
+  end
 end
 
 rand(rng::AbstractRNG, S::ResidueField, v...) = rand(rng, make(S, v...))
@@ -497,10 +497,10 @@ residue ring parent object is cached and returned for any subsequent calls
 to the constructor with the same base ring $R$ and element $a$.
 """
 function residue_field(R::Ring, a::RingElement; cached::Bool = true)
-   iszero(a) && throw(DivideError())
-   T = elem_type(R)
-   S = EuclideanRingResidueField{T}(R(a), cached)
-   return S, Generic.EuclideanRingResidueMap(R, S)
+  iszero(a) && throw(DivideError())
+  T = elem_type(R)
+  S = EuclideanRingResidueField{T}(R(a), cached)
+  return S, Generic.EuclideanRingResidueMap(R, S)
 end
 
 @doc raw"""
@@ -512,6 +512,6 @@ where the section is the lift of an element of the residue field back
 to the ring `R`.
 """
 function quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
-   S, f = residue_field(R, a; cached = cached)
-   return S, f
+  S, f = residue_field(R, a; cached = cached)
+  return S, f
 end

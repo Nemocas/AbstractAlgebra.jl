@@ -2,14 +2,14 @@ R1, x1 = rational_function_field(QQ, "x1")
 U1, z1 = R1["z1"]
 
 P1 = [(x1 + 1)*z1 + (x1 + 2), z1 + (x1 + 1)//(x1 + 2), z1^2 + 3z1 + 1,
-     (x1^2 + 1)//(x1 + 1)*z1^5 + 4z1^4 + (x1 + 2)*z1^3 + x1//(x1 + 1)*z1 + 1//(x1 + 1)]
+      (x1^2 + 1)//(x1 + 1)*z1^5 + 4z1^4 + (x1 + 2)*z1^3 + x1//(x1 + 1)*z1 + 1//(x1 + 1)]
 
 R2, x2 = rational_function_field(GF(23), "x2")
 
 U2, z2 = R2["z2"]
 
 P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
-     (x2^2 + 1)//(x2 + 1)*z2^5 + 4z2^4 + (x2 + 2)*z2^3 + x2//(x2 + 1)*z2 + 1//(x2 + 1)]
+      (x2^2 + 1)//(x2 + 1)*z2^5 + 4z2^4 + (x2 + 2)*z2^3 + x2//(x2 + 1)*z2 + 1//(x2 + 1)]
 
 # FIXME/TODO: conformance tests run into infinite loop???
 #function test_elem(R::AbstractAlgebra.Generic.FunctionField{Rational{BigInt}})
@@ -22,856 +22,856 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
 #end
 
 @testset "Generic.FunctionField.constructors" begin 
-   @test function_field(P1[1], "y")[1] === function_field(P1[1], "y", cached=true)[1]
-   @test function_field(P1[1], "y", cached=true)[1] !== function_field(P1[1], "y", cached=false)[1]
+  @test function_field(P1[1], "y")[1] === function_field(P1[1], "y", cached=true)[1]
+  @test function_field(P1[1], "y", cached=true)[1] !== function_field(P1[1], "y", cached=false)[1]
 
-   for (S, y) in  [function_field(P1[3], "y"), function_field(P2[3], "y")]
-      R = base_ring(base_ring(S))
-      
-      @test elem_type(S) == Generic.FunctionFieldElem{elem_type(R)}
-      @test elem_type(Generic.FunctionField{elem_type(R)}) == Generic.FunctionFieldElem{elem_type(R)}
-      @test parent_type(Generic.FunctionFieldElem{elem_type(R)}) == Generic.FunctionField{elem_type(R)}
+  for (S, y) in  [function_field(P1[3], "y"), function_field(P2[3], "y")]
+    R = base_ring(base_ring(S))
 
-      @test typeof(S) <: Generic.FunctionField
+    @test elem_type(S) == Generic.FunctionFieldElem{elem_type(R)}
+    @test elem_type(Generic.FunctionField{elem_type(R)}) == Generic.FunctionFieldElem{elem_type(R)}
+    @test parent_type(Generic.FunctionFieldElem{elem_type(R)}) == Generic.FunctionField{elem_type(R)}
 
-      @test isa(y, Generic.FunctionFieldElem)
-      @test y isa FieldElem
+    @test typeof(S) <: Generic.FunctionField
 
-      a = S()
+    @test isa(y, Generic.FunctionFieldElem)
+    @test y isa FieldElem
 
-      @test isa(a, Generic.FunctionFieldElem)
+    a = S()
 
-      b = S(1)
+    @test isa(a, Generic.FunctionFieldElem)
 
-      @test isa(b, Generic.FunctionFieldElem)
+    b = S(1)
 
-      c = S(ZZ(2))
+    @test isa(b, Generic.FunctionFieldElem)
 
-      @test isa(c, Generic.FunctionFieldElem)
-   end
+    c = S(ZZ(2))
 
-   S1, y1 = function_field(P1[3], "y1")
-   S2, y2 = function_field(P2[3], "y2")
+    @test isa(c, Generic.FunctionFieldElem)
+  end
 
-   d = S1(QQ(2, 3))
+  S1, y1 = function_field(P1[3], "y1")
+  S2, y2 = function_field(P2[3], "y2")
 
-   @test isa(d, Generic.FunctionFieldElem)
+  d = S1(QQ(2, 3))
 
-   k = S1(x1)
+  @test isa(d, Generic.FunctionFieldElem)
 
-   @test isa(k, Generic.FunctionFieldElem)
+  k = S1(x1)
 
-   m = S1(y1)
+  @test isa(k, Generic.FunctionFieldElem)
 
-   @test isa(m, Generic.FunctionFieldElem)
+  m = S1(y1)
 
-   @test base_ring(S1) === R1
-   @test base_field(S1) === R1
+  @test isa(m, Generic.FunctionFieldElem)
 
-   @test parent(y1) === S1
+  @test base_ring(S1) === R1
+  @test base_field(S1) === R1
 
-   @test is_exact_type(typeof(y1)) == true
+  @test parent(y1) === S1
 
-   @test characteristic(S1) == 0
-   @test characteristic(S2) == 23
+  @test is_exact_type(typeof(y1)) == true
 
-   @test var(S1) == :y1
+  @test characteristic(S1) == 0
+  @test characteristic(S2) == 23
 
-   @test y1 in [y1, y2]
-   @test y1 in [y2, y1]
-   @test !(y1 in [y2])
+  @test var(S1) == :y1
 
-   @test y1 in keys(Dict(y1 => 1))
-   @test !(y2 in keys(Dict(y1 => 1)))
+  @test y1 in [y1, y2]
+  @test y1 in [y2, y1]
+  @test !(y1 in [y2])
+
+  @test y1 in keys(Dict(y1 => 1))
+  @test !(y2 in keys(Dict(y1 => 1)))
 end
 
 @testset "Generic.FunctionField.printing" begin
-   S, y = function_field(P1[4], "y")
+  S, y = function_field(P1[4], "y")
 
-   @test string(zero(S)) == "0"
-   @test string(one(S)) == "1"
-   @test string(y) == "y"
-   @test string(2*y^2 - y + 1) == "2*y^2 - y + 1"
-   @test string((x1 + 1)//(x1 + 2)*y^2 - 1//(x1 + 2)*y + 3) ==
-                           "((x1 + 1)*y^2 - y + 3*x1 + 6)//(x1 + 2)"
+  @test string(zero(S)) == "0"
+  @test string(one(S)) == "1"
+  @test string(y) == "y"
+  @test string(2*y^2 - y + 1) == "2*y^2 - y + 1"
+  @test string((x1 + 1)//(x1 + 2)*y^2 - 1//(x1 + 2)*y + 3) ==
+  "((x1 + 1)*y^2 - y + 3*x1 + 6)//(x1 + 2)"
 
-   S, y = function_field(P2[4], "y")
+  S, y = function_field(P2[4], "y")
 
-   @test string(zero(S)) == "0"
-   @test string(one(S)) == "1"
-   @test string(y) == "y"
-   @test string(x2 + y + 1) == "y + x2 + 1"
+  @test string(zero(S)) == "0"
+  @test string(one(S)) == "1"
+  @test string(y) == "y"
+  @test string(x2 + y + 1) == "y + x2 + 1"
 end
 
 @testset "Generic.FunctionField.rand" begin
-   for f in P1
-      S, y = function_field(f, "y")
+  for f in P1
+    S, y = function_field(f, "y")
 
-      # TODO: test more than just the result type
-      test_rand(S, 1:10, -10:10)
-   end
-   
-   for f in P2
-      S, y = function_field(f, "y")
+    # TODO: test more than just the result type
+    test_rand(S, 1:10, -10:10)
+  end
 
-      # TODO: test more than just the result type
-      test_rand(S, 1:10)
-   end
+  for f in P2
+    S, y = function_field(f, "y")
+
+    # TODO: test more than just the result type
+    test_rand(S, 1:10)
+  end
 end
 
 @testset "Generic.FunctionField.manipulation" begin
-   for f in union(P1, P2)
-      S, y = function_field(f, "y")
+  for f in union(P1, P2)
+    S, y = function_field(f, "y")
 
-      @test iszero(zero(S))
+    @test iszero(zero(S))
 
-      @test isone(one(S))
+    @test isone(one(S))
 
-      @test is_gen(gen(S))
+    @test is_gen(gen(S))
 
-      @test is_unit(one(S))
-      @test !is_unit(zero(S))
-      @test is_unit(gen(S))
+    @test is_unit(one(S))
+    @test !is_unit(zero(S))
+    @test is_unit(gen(S))
 
-      @test is_zero_divisor(zero(S))
-      @test !is_zero_divisor(one(S))
+    @test is_zero_divisor(zero(S))
+    @test !is_zero_divisor(one(S))
 
-      @test degree(S) == length(modulus(S)) - 1
+    @test degree(S) == length(modulus(S)) - 1
 
-      @test defining_polynomial(S) == modulus(S)
+    @test defining_polynomial(S) == modulus(S)
 
-      @test isa(numerator(S), PolyRingElem)
-      @test isa(denominator(S), PolyRingElem)
+    @test isa(numerator(S), PolyRingElem)
+    @test isa(denominator(S), PolyRingElem)
 
-      T = elem_type(base_ring(base_ring(S)))
+    T = elem_type(base_ring(base_ring(S)))
 
-      @test isa(numerator(y), Generic.Poly{<:PolyRingElem{T}})
-      @test isa(denominator(y), PolyRingElem{T})
-   end
+    @test isa(numerator(y), Generic.Poly{<:PolyRingElem{T}})
+    @test isa(denominator(y), PolyRingElem{T})
+  end
 
-   # characteristic 0
-   S, y = function_field(P1[4], "y")
+  # characteristic 0
+  S, y = function_field(P1[4], "y")
 
-   h = x1*y^2 + (x1 + 1)//(x1 + 2)*y + 3
+  h = x1*y^2 + (x1 + 1)//(x1 + 2)*y + 3
 
-   @test coeff(h, 2) == x1
-   @test coeff(h, 1) == (x1 + 1)//(x1 + 2)
-   @test num_coeff(h, 1) == x1 + 1
+  @test coeff(h, 2) == x1
+  @test coeff(h, 1) == (x1 + 1)//(x1 + 2)
+  @test num_coeff(h, 1) == x1 + 1
 
-   for i = 1:10
-      h = rand(S, 1:10, -10:10)
+  for i = 1:10
+    h = rand(S, 1:10, -10:10)
 
-      @test deepcopy(h) == h
+    @test deepcopy(h) == h
 
-      @test S(numerator(h), denominator(h)) == h
-   end
+    @test S(numerator(h), denominator(h)) == h
+  end
 
-   # characteristic p
-   S, y = function_field(P2[4], "y")
+  # characteristic p
+  S, y = function_field(P2[4], "y")
 
-   h = x2*y^2 + (x2 + 1)//(x2 + 2)*y + 3
+  h = x2*y^2 + (x2 + 1)//(x2 + 2)*y + 3
 
-   @test coeff(h, 2) == x2
-   @test coeff(h, 1) == (x2 + 1)//(x2 + 2)
-   @test num_coeff(h, 1) == x2 + 1
+  @test coeff(h, 2) == x2
+  @test coeff(h, 1) == (x2 + 1)//(x2 + 2)
+  @test num_coeff(h, 1) == x2 + 1
 
-   for i = 1:10
-      h = rand(S, 1:10)
+  for i = 1:10
+    h = rand(S, 1:10)
 
-      @test deepcopy(h) == h
+    @test deepcopy(h) == h
 
-      @test S(numerator(h), denominator(h)) == h
-   end
+    @test S(numerator(h), denominator(h)) == h
+  end
 end
 
 @testset "Generic.FunctionField.unary_ops" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iters = 1:10
-         f = rand(S, 1:5, -10:10)
+    for iters = 1:10
+      f = rand(S, 1:5, -10:10)
 
-         @test -(-f) == f
-         @test iszero(f + (-f))
-      end
+      @test -(-f) == f
+      @test iszero(f + (-f))
+    end
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+    # characteristic p
+    S, y = function_field(P2[i], "y")
 
-      for iters = 1:10
-         f = rand(S, 1:5)
+    for iters = 1:10
+      f = rand(S, 1:5)
 
-         @test -(-f) == f
-         @test iszero(f + (-f))
-      end
-   end
+      @test -(-f) == f
+      @test iszero(f + (-f))
+    end
+  end
 end
 
 @testset "Generic.FunctionField.binary_ops" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iters = 1:10
-         f = rand(S, 1:5, -10:10)
-         g = rand(S, 1:5, -10:10)
-         h = rand(S, 1:5, -10:10)
+    for iters = 1:10
+      f = rand(S, 1:5, -10:10)
+      g = rand(S, 1:5, -10:10)
+      h = rand(S, 1:5, -10:10)
 
-         @test f + g == g + f
-         @test f + (g + h) == (f + g) + h
-         @test f*g == g*f
-         @test f*(g + h) == f*g + f*h
-         @test (f - h) + (g + h) == f + g
-         @test (f + g)*(f - g) == f*f - g*g
-         @test f - g == -(g - f)
-      end
+      @test f + g == g + f
+      @test f + (g + h) == (f + g) + h
+      @test f*g == g*f
+      @test f*(g + h) == f*g + f*h
+      @test (f - h) + (g + h) == f + g
+      @test (f + g)*(f - g) == f*f - g*g
+      @test f - g == -(g - f)
+    end
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+    # characteristic p
+    S, y = function_field(P2[i], "y")
 
-      for iters = 1:10
-         f = rand(S, 1:5)
-         g = rand(S, 1:5)
-         h = rand(S, 1:5)
+    for iters = 1:10
+      f = rand(S, 1:5)
+      g = rand(S, 1:5)
+      h = rand(S, 1:5)
 
-         @test f + g == g + f
-         @test f + (g + h) == (f + g) + h
-         @test f*g == g*f
-         @test f*(g + h) == f*g + f*h
-         @test (f - h) + (g + h) == f + g
-         @test (f + g)*(f - g) == f*f - g*g
-         @test f - g == -(g - f)
-      end
-   end
+      @test f + g == g + f
+      @test f + (g + h) == (f + g) + h
+      @test f*g == g*f
+      @test f*(g + h) == f*g + f*h
+      @test (f - h) + (g + h) == f + g
+      @test (f + g)*(f - g) == f*f - g*g
+      @test f - g == -(g - f)
+    end
+  end
 end
 
 @testset "Generic.FunctionField.adhoc_binary" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iters = 1:10
-         f = rand(S, 1:5, -10:10)
+    for iters = 1:10
+      f = rand(S, 1:5, -10:10)
 
-         c1 = rand(-10:10)
-         c2 = rand(-10:10)
+      c1 = rand(-10:10)
+      c2 = rand(-10:10)
 
-         @test c1*f - c2*f == (c1 - c2)*f
-         @test c1*f + c2*f == (c1 + c2)*f
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
 
-         @test f*c1 - f*c2 == f*(c1 - c2)
-         @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
 
-         @test f - c1 == f + (-c1)
-         @test f + c1 == f - (-c1)
-         @test c1 + f == c1 + f
+      @test f - c1 == f + (-c1)
+      @test f + c1 == f - (-c1)
+      @test c1 + f == c1 + f
 
-         c1 = rand(-10:10)//rand(1:10)
-         c2 = rand(-10:10)//rand(1:10)
+      c1 = rand(-10:10)//rand(1:10)
+      c2 = rand(-10:10)//rand(1:10)
 
-         @test c1*f - c2*f == (c1 - c2)*f
-         @test c1*f + c2*f == (c1 + c2)*f
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
 
-         @test f*c1 - f*c2 == f*(c1 - c2)
-         @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
 
-         @test f - c1 == f + (-c1)
-         @test f + c1 == f - (-c1)
-         @test c1 + f == c1 + f
+      @test f - c1 == f + (-c1)
+      @test f + c1 == f - (-c1)
+      @test c1 + f == c1 + f
 
-         c1 = rand(ZZ, -10:10)
-         c2 = rand(ZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
 
-         @test c1*f - c2*f == (c1 - c2)*f
-         @test c1*f + c2*f == (c1 + c2)*f
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
 
-         @test f*c1 - f*c2 == f*(c1 - c2)
-         @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
 
-         @test f - c1 == f + (-c1)
-         @test f + c1 == f - (-c1)
-         @test c1 + f == c1 + f
+      @test f - c1 == f + (-c1)
+      @test f + c1 == f - (-c1)
+      @test c1 + f == c1 + f
 
-         c1 = rand(QQ, -10:10)
-         c2 = rand(QQ, -10:10)
+      c1 = rand(QQ, -10:10)
+      c2 = rand(QQ, -10:10)
 
-         @test c1*f - c2*f == (c1 - c2)*f
-         @test c1*f + c2*f == (c1 + c2)*f
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
 
-         @test f*c1 - f*c2 == f*(c1 - c2)
-         @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
 
-         @test f - c1 == f + (-c1)
-         @test f + c1 == f - (-c1)
-         @test c1 + f == c1 + f
+      @test f - c1 == f + (-c1)
+      @test f + c1 == f - (-c1)
+      @test c1 + f == c1 + f
 
-         c1 = rand(R1, 1:5, -10:10)
-         c2 = rand(R1, 1:5, -10:10)
+      c1 = rand(R1, 1:5, -10:10)
+      c2 = rand(R1, 1:5, -10:10)
 
-         @test c1*f - c2*f == (c1 - c2)*f
-         @test c1*f + c2*f == (c1 + c2)*f
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
 
-         @test f*c1 - f*c2 == f*(c1 - c2)
-         @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
 
-         @test f - c1 == f + (-c1)
-         @test f + c1 == f - (-c1)
-         @test c1 + f == c1 + f
-      end
+      @test f - c1 == f + (-c1)
+      @test f + c1 == f - (-c1)
+      @test c1 + f == c1 + f
+    end
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+    # characteristic p
+    S, y = function_field(P2[i], "y")
 
-      for iters = 1:10
-         f = rand(S, 1:5)
+    for iters = 1:10
+      f = rand(S, 1:5)
 
-         c1 = rand(-10:10)
-         c2 = rand(-10:10)
+      c1 = rand(-10:10)
+      c2 = rand(-10:10)
 
-         @test c1*f - c2*f == (c1 - c2)*f
-         @test c1*f + c2*f == (c1 + c2)*f
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
 
-         @test f*c1 - f*c2 == f*(c1 - c2)
-         @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
 
-         @test f - c1 == f + (-c1)
-         @test f + c1 == f - (-c1)
-         @test c1 + f == c1 + f
+      @test f - c1 == f + (-c1)
+      @test f + c1 == f - (-c1)
+      @test c1 + f == c1 + f
 
-         c1 = rand(ZZ, -10:10)
-         c2 = rand(ZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
 
-         @test c1*f - c2*f == (c1 - c2)*f
-         @test c1*f + c2*f == (c1 + c2)*f
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
 
-         @test f*c1 - f*c2 == f*(c1 - c2)
-         @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
 
-         @test f - c1 == f + (-c1)
-         @test f + c1 == f - (-c1)
-         @test c1 + f == c1 + f
+      @test f - c1 == f + (-c1)
+      @test f + c1 == f - (-c1)
+      @test c1 + f == c1 + f
 
-         k = base_ring(base_ring(S))
-         c1 = rand(k)
-         c2 = rand(k)
+      k = base_ring(base_ring(S))
+      c1 = rand(k)
+      c2 = rand(k)
 
-         @test c1*f - c2*f == (c1 - c2)*f
-         @test c1*f + c2*f == (c1 + c2)*f
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
 
-         @test f*c1 - f*c2 == f*(c1 - c2)
-         @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
 
-         @test f - c1 == f + (-c1)
-         @test f + c1 == f - (-c1)
-         @test c1 + f == c1 + f
+      @test f - c1 == f + (-c1)
+      @test f + c1 == f - (-c1)
+      @test c1 + f == c1 + f
 
-         c1 = rand(R2, 1:5)
-         c2 = rand(R2, 1:5)
+      c1 = rand(R2, 1:5)
+      c2 = rand(R2, 1:5)
 
-         @test c1*f - c2*f == (c1 - c2)*f
-         @test c1*f + c2*f == (c1 + c2)*f
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
 
-         @test f*c1 - f*c2 == f*(c1 - c2)
-         @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
 
-         @test f - c1 == f + (-c1)
-         @test f + c1 == f - (-c1)
-         @test c1 + f == c1 + f
-      end
-   end
+      @test f - c1 == f + (-c1)
+      @test f + c1 == f - (-c1)
+      @test c1 + f == c1 + f
+    end
+  end
 end
 
 @testset "Generic.FunctionField.comparison" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iters = 1:10
-         f = rand(S, 1:5, -10:10)
-         g = deepcopy(f)
-         h = S()
-         while iszero(h)
-            h = rand(S, 1:5, -10:10)
-         end
-
-         @test f == g
-         @test isequal(f, g)
-         @test f != g + h
+    for iters = 1:10
+      f = rand(S, 1:5, -10:10)
+      g = deepcopy(f)
+      h = S()
+      while iszero(h)
+        h = rand(S, 1:5, -10:10)
       end
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+      @test f == g
+      @test isequal(f, g)
+      @test f != g + h
+    end
 
-      for iters = 1:10
-         f = rand(S, 1:5)
-         g = deepcopy(f)
-         h = S()
-         while iszero(h)
-            h = rand(S, 1:4)
-         end
+    # characteristic p
+    S, y = function_field(P2[i], "y")
 
-         @test f == g
-         @test isequal(f, g)
-         @test f != g + h
+    for iters = 1:10
+      f = rand(S, 1:5)
+      g = deepcopy(f)
+      h = S()
+      while iszero(h)
+        h = rand(S, 1:4)
       end
-   end
+
+      @test f == g
+      @test isequal(f, g)
+      @test f != g + h
+    end
+  end
 end
 
 @testset "Generic.FunctionField.adhoc_comparison" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iters = 1:10
-         f = S()
-         while iszero(f)
-            f = rand(S, 1:5, -10:10)
-         end
-
-         c1 = rand(-10:10)
- 
-         @test S(c1) == c1
-         @test c1 == S(c1)
-
-         @test S(c1) != c1 + f
-         @test c1 != S(c1) + f
-
-         c1 = rand(-10:10)//rand(1:10)
- 
-         @test S(c1) == c1
-         @test c1 == S(c1)
-
-         @test S(c1) != c1 + f
-         @test c1 != S(c1) + f
-
-         c1 = rand(ZZ, -10:10)
- 
-         @test S(c1) == c1
-         @test c1 == S(c1)
-
-         @test S(c1) != c1 + f
-         @test c1 != S(c1) + f
-
-         c1 = rand(QQ, -10:10)
-
-         @test S(c1) == c1
-         @test c1 == S(c1)
-
-         @test S(c1) != c1 + f
-         @test c1 != S(c1) + f
-
-         c1 = rand(R1, 1:5, -10:10)
-
-         @test S(c1) == c1
-         @test c1 == S(c1)
-
-         @test S(c1) != c1 + f
-         @test c1 != S(c1) + f
+    for iters = 1:10
+      f = S()
+      while iszero(f)
+        f = rand(S, 1:5, -10:10)
       end
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+      c1 = rand(-10:10)
 
-      for iters = 1:10
-         f = S()
-         while iszero(f)
-            f = rand(S, 1:5)
-         end
+      @test S(c1) == c1
+      @test c1 == S(c1)
 
-         c1 = rand(-10:10)
- 
-         @test S(c1) == c1
-         @test c1 == S(c1)
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
 
-         @test S(c1) != c1 + f
-         @test c1 != S(c1) + f
+      c1 = rand(-10:10)//rand(1:10)
 
-         c1 = rand(ZZ, -10:10)
- 
-         @test S(c1) == c1
-         @test c1 == S(c1)
+      @test S(c1) == c1
+      @test c1 == S(c1)
 
-         @test S(c1) != c1 + f
-         @test c1 != S(c1) + f
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
 
-         k = base_ring(base_ring(S))
-         c1 = rand(k)
+      c1 = rand(ZZ, -10:10)
 
-         @test S(c1) == c1
-         @test c1 == S(c1)
+      @test S(c1) == c1
+      @test c1 == S(c1)
 
-         @test S(c1) != c1 + f
-         @test c1 != S(c1) + f
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
 
-         c1 = rand(R2, 1:5)
+      c1 = rand(QQ, -10:10)
 
-         @test S(c1) == c1
-         @test c1 == S(c1)
+      @test S(c1) == c1
+      @test c1 == S(c1)
 
-         @test S(c1) != c1 + f
-         @test c1 != S(c1) + f
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+
+      c1 = rand(R1, 1:5, -10:10)
+
+      @test S(c1) == c1
+      @test c1 == S(c1)
+
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+    end
+
+    # characteristic p
+    S, y = function_field(P2[i], "y")
+
+    for iters = 1:10
+      f = S()
+      while iszero(f)
+        f = rand(S, 1:5)
       end
-   end
+
+      c1 = rand(-10:10)
+
+      @test S(c1) == c1
+      @test c1 == S(c1)
+
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+
+      c1 = rand(ZZ, -10:10)
+
+      @test S(c1) == c1
+      @test c1 == S(c1)
+
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+
+      k = base_ring(base_ring(S))
+      c1 = rand(k)
+
+      @test S(c1) == c1
+      @test c1 == S(c1)
+
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+
+      c1 = rand(R2, 1:5)
+
+      @test S(c1) == c1
+      @test c1 == S(c1)
+
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+    end
+  end
 end
 
 @testset "Generic.FunctionField.powering" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iters = 1:2
-         f = rand(S, 1:2, -1:1)
-         r2 = one(S)
+    for iters = 1:2
+      f = rand(S, 1:2, -1:1)
+      r2 = one(S)
 
-         for expn = 0:2
-            r1 = f^expn
+      for expn = 0:2
+        r1 = f^expn
 
-            @test r1 == r2
+        @test r1 == r2
 
-            r2 *= f
-         end
+        r2 *= f
       end
+    end
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
-      for iters = 1:10
-         f = rand(S, 1:5)
-         r2 = one(S)
+    # characteristic p
+    S, y = function_field(P2[i], "y")
+    for iters = 1:10
+      f = rand(S, 1:5)
+      r2 = one(S)
 
-         for expn = 0:5
-            r1 = f^expn
+      for expn = 0:5
+        r1 = f^expn
 
-            @test r1 == r2
+        @test r1 == r2
 
-            r2 *= f
-         end
+        r2 *= f
       end
-   end
+    end
+  end
 end
 
 @testset "Generic.FunctionField.inverse" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iters = 1:5
-         f = S()
-         while iszero(f)
-            f = rand(S, 1:3, -10:10)
-         end
-
-         @test isone(f*inv(f))
+    for iters = 1:5
+      f = S()
+      while iszero(f)
+        f = rand(S, 1:3, -10:10)
       end
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+      @test isone(f*inv(f))
+    end
 
-      for iters = 1:5
-         f = S()
-         while iszero(f)
-            f = rand(S, 1:3)
-         end
+    # characteristic p
+    S, y = function_field(P2[i], "y")
 
-         @test isone(f*inv(f))
+    for iters = 1:5
+      f = S()
+      while iszero(f)
+        f = rand(S, 1:3)
       end
-   end
+
+      @test isone(f*inv(f))
+    end
+  end
 end
 
 @testset "Generic.FunctionField.exact_division" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iters = 1:5
-         f = S()
-         while iszero(f)
-            f = rand(S, 1:2, -1:1)
-         end
-         g = rand(S, 1:2, -1:1)
-
-         @test divexact(f*g, f) == g
+    for iters = 1:5
+      f = S()
+      while iszero(f)
+        f = rand(S, 1:2, -1:1)
       end
+      g = rand(S, 1:2, -1:1)
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+      @test divexact(f*g, f) == g
+    end
 
-      for iters = 1:10
-         f = S()
-         while iszero(f)
-            f = rand(S, 1:5)
-         end
-         g = rand(S, 1:5)
+    # characteristic p
+    S, y = function_field(P2[i], "y")
 
-         @test divexact(f*g, f) == g
+    for iters = 1:10
+      f = S()
+      while iszero(f)
+        f = rand(S, 1:5)
       end
-   end
+      g = rand(S, 1:5)
+
+      @test divexact(f*g, f) == g
+    end
+  end
 end
 
 @testset "Generic.FunctionField.adhoc_exact_division" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      @test divexact(2, y) * y == 2
-      @test divexact(big(2), y) * y == 2
-      @test divexact(1//2, y) * y == 1//2
-      @test divexact(big(1)//2, y) * y == 1//2
+    @test divexact(2, y) * y == 2
+    @test divexact(big(2), y) * y == 2
+    @test divexact(1//2, y) * y == 1//2
+    @test divexact(big(1)//2, y) * y == 1//2
 
-      for iters = 1:10
-         f = 0 # Int
-         while iszero(f)
-            f = rand(-10:10)
-         end
-         g = rand(S, 1:5, -10:10)
-
-         @test divexact(f*g, f) == g
+    for iters = 1:10
+      f = 0 # Int
+      while iszero(f)
+        f = rand(-10:10)
       end
+      g = rand(S, 1:5, -10:10)
 
-      for iters = 1:10
-         f = 0//1
-         while iszero(f)
-            f = rand(-10:10)//rand(1:10) # Rational{Int}
-         end
-         g = rand(S, 1:5, -10:10)
+      @test divexact(f*g, f) == g
+    end
 
-         @test divexact(f*g, f) == g
+    for iters = 1:10
+      f = 0//1
+      while iszero(f)
+        f = rand(-10:10)//rand(1:10) # Rational{Int}
       end
+      g = rand(S, 1:5, -10:10)
 
-      for iters = 1:10 # BigInt
-         f = ZZ()
-         while iszero(f)
-            f = rand(ZZ, -10:10)
-         end
-         g = rand(S, 1:5, -1:10)
+      @test divexact(f*g, f) == g
+    end
 
-         @test divexact(f*g, f) == g
+    for iters = 1:10 # BigInt
+      f = ZZ()
+      while iszero(f)
+        f = rand(ZZ, -10:10)
       end
+      g = rand(S, 1:5, -1:10)
 
-      for iters = 1:10 # BigInt
-         f = QQ()
-         while iszero(f)
-            f = rand(QQ, -10:10) # Rational BigInt
-         end
-         g = rand(S, 1:5, -10:10)
+      @test divexact(f*g, f) == g
+    end
 
-         @test divexact(f*g, f) == g
+    for iters = 1:10 # BigInt
+      f = QQ()
+      while iszero(f)
+        f = rand(QQ, -10:10) # Rational BigInt
       end
+      g = rand(S, 1:5, -10:10)
 
-      for iters = 1:10 # RationalFunctionFieldElem
-         f = R1()
-         while iszero(f)
-            f = rand(R1, 1:5, -10:10) # Rational BigInt
-         end
-         g = rand(S, 1:5, -10:10)
+      @test divexact(f*g, f) == g
+    end
 
-         @test divexact(f*g, f) == g
+    for iters = 1:10 # RationalFunctionFieldElem
+      f = R1()
+      while iszero(f)
+        f = rand(R1, 1:5, -10:10) # Rational BigInt
       end
+      g = rand(S, 1:5, -10:10)
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+      @test divexact(f*g, f) == g
+    end
 
-      for iters = 1:10
-         f = 0 # Int
-         while iszero(f)
-            f = rand(-10:10)
-         end
-         g = rand(S, 1:5)
+    # characteristic p
+    S, y = function_field(P2[i], "y")
 
-         @test divexact(f*g, f) == g
+    for iters = 1:10
+      f = 0 # Int
+      while iszero(f)
+        f = rand(-10:10)
       end
+      g = rand(S, 1:5)
 
-      for iters = 1:10 # BigInt
-         f = ZZ()
-         while iszero(f)
-            f = rand(ZZ, -10:10)
-         end
-         g = rand(S, 1:5)
+      @test divexact(f*g, f) == g
+    end
 
-         @test divexact(f*g, f) == g
+    for iters = 1:10 # BigInt
+      f = ZZ()
+      while iszero(f)
+        f = rand(ZZ, -10:10)
       end
+      g = rand(S, 1:5)
 
-      for iters = 1:10 # RationalFunctionFieldElem
-         f = R1()
-         while iszero(f)
-            f = rand(R2, 1:5) # Rational BigInt
-         end
-         g = rand(S, 1:5)
+      @test divexact(f*g, f) == g
+    end
 
-         @test divexact(f*g, f) == g
+    for iters = 1:10 # RationalFunctionFieldElem
+      f = R1()
+      while iszero(f)
+        f = rand(R2, 1:5) # Rational BigInt
       end
-   end
+      g = rand(S, 1:5)
+
+      @test divexact(f*g, f) == g
+    end
+  end
 end
 
 @testset "Generic.FunctionField.norm" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iters = 1:3
-         f = rand(S, 1:3, -2:2)
-         g = rand(S, 1:3, -2:2)
+    for iters = 1:3
+      f = rand(S, 1:3, -2:2)
+      g = rand(S, 1:3, -2:2)
 
-         @test norm(f)*norm(g) == norm(f*g)
-      end
+      @test norm(f)*norm(g) == norm(f*g)
+    end
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+    # characteristic p
+    S, y = function_field(P2[i], "y")
 
-      for iters = 1:5
-         f = rand(S, 1:3)
-         g = rand(S, 1:3)
+    for iters = 1:5
+      f = rand(S, 1:3)
+      g = rand(S, 1:3)
 
-         @test norm(f)*norm(g) == norm(f*g)
-      end
-   end
+      @test norm(f)*norm(g) == norm(f*g)
+    end
+  end
 end
 
 @testset "Generic.FunctionField.trace" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iters = 1:5
-         f = rand(S, 1:3, -10:10)
-         g = rand(S, 1:3, -10:10)
+    for iters = 1:5
+      f = rand(S, 1:3, -10:10)
+      g = rand(S, 1:3, -10:10)
 
-         @test tr(f) + tr(g) == tr(f + g)
-      end
+      @test tr(f) + tr(g) == tr(f + g)
+    end
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+    # characteristic p
+    S, y = function_field(P2[i], "y")
 
-      for iters = 1:5
-         f = rand(S, 1:3)
-         g = rand(S, 1:3)
+    for iters = 1:5
+      f = rand(S, 1:3)
+      g = rand(S, 1:3)
 
-         @test tr(f) + tr(g) == tr(f + g)
-      end
-   end
+      @test tr(f) + tr(g) == tr(f + g)
+    end
+  end
 end
 
 @testset "Generic.FunctionField.unsafe_operators" begin
-   for i = 1:length(P1)
-      # characteristic 0
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    # characteristic 0
+    S, y = function_field(P1[i], "y")
 
-      for iter = 1:10
-         f = rand(S, 1:5, -10:10)
-         g = rand(S, 1:5, -10:10)
-         f0 = deepcopy(f)
-         g0 = deepcopy(g)
+    for iter = 1:10
+      f = rand(S, 1:5, -10:10)
+      g = rand(S, 1:5, -10:10)
+      f0 = deepcopy(f)
+      g0 = deepcopy(g)
 
-         h = rand(S, 1:5, -10:10)
+      h = rand(S, 1:5, -10:10)
 
-         k = f + g
-         h = add!(h, f, g)
-         @test isequal(h, k)
-         @test isequal(f, f0)
-         @test isequal(g, g0)
+      k = f + g
+      h = add!(h, f, g)
+      @test isequal(h, k)
+      @test isequal(f, f0)
+      @test isequal(g, g0)
 
-         f1 = deepcopy(f)
-         f1 = add!(f1, f1, g)
-         @test isequal(f1, k)
-         @test isequal(g, g0)
+      f1 = deepcopy(f)
+      f1 = add!(f1, f1, g)
+      @test isequal(f1, k)
+      @test isequal(g, g0)
 
-         g1 = deepcopy(g)
-         g1 = add!(g1, f, g1)
-         @test isequal(g1, k)
-         @test isequal(f, f0)
+      g1 = deepcopy(g)
+      g1 = add!(g1, f, g1)
+      @test isequal(g1, k)
+      @test isequal(f, f0)
 
-         f1 = deepcopy(f)
-         f1 = addeq!(f1, g)
-         @test isequal(h, k)
-         @test isequal(g, g0)
+      f1 = deepcopy(f)
+      f1 = addeq!(f1, g)
+      @test isequal(h, k)
+      @test isequal(g, g0)
 
-         k = f*g
-         h = mul!(h, f, g)
-         @test isequal(h, k)
-         @test isequal(f, f0)
-         @test isequal(g, g0)
+      k = f*g
+      h = mul!(h, f, g)
+      @test isequal(h, k)
+      @test isequal(f, f0)
+      @test isequal(g, g0)
 
-         f1 = deepcopy(f)
-         f1 = mul!(f1, f1, g)
-         @test isequal(f1, k)
-         @test isequal(g, g0)
+      f1 = deepcopy(f)
+      f1 = mul!(f1, f1, g)
+      @test isequal(f1, k)
+      @test isequal(g, g0)
 
-         g1 = deepcopy(g)
-         g1 = mul!(g1, f, g1)
-         @test isequal(g1, k)
-         @test isequal(f, f0)
+      g1 = deepcopy(g)
+      g1 = mul!(g1, f, g1)
+      @test isequal(g1, k)
+      @test isequal(f, f0)
 
-         h = zero!(h)
-         @test isequal(h, S())
-      end
+      h = zero!(h)
+      @test isequal(h, S())
+    end
 
-      # characteristic p
-      S, y = function_field(P2[i], "y")
+    # characteristic p
+    S, y = function_field(P2[i], "y")
 
-      for iter = 1:10
-         f = rand(S, 1:5)
-         g = rand(S, 1:5)
-         f0 = deepcopy(f)
-         g0 = deepcopy(g)
+    for iter = 1:10
+      f = rand(S, 1:5)
+      g = rand(S, 1:5)
+      f0 = deepcopy(f)
+      g0 = deepcopy(g)
 
-         h = rand(S, 1:5)
+      h = rand(S, 1:5)
 
-         k = f + g
-         h = add!(h, f, g)
-         @test isequal(h, k)
-         @test isequal(f, f0)
-         @test isequal(g, g0)
+      k = f + g
+      h = add!(h, f, g)
+      @test isequal(h, k)
+      @test isequal(f, f0)
+      @test isequal(g, g0)
 
-         f1 = deepcopy(f)
-         f1 = add!(f1, f1, g)
-         @test isequal(f1, k)
-         @test isequal(g, g0)
+      f1 = deepcopy(f)
+      f1 = add!(f1, f1, g)
+      @test isequal(f1, k)
+      @test isequal(g, g0)
 
-         g1 = deepcopy(g)
-         g1 = add!(g1, f, g1)
-         @test isequal(g1, k)
-         @test isequal(f, f0)
+      g1 = deepcopy(g)
+      g1 = add!(g1, f, g1)
+      @test isequal(g1, k)
+      @test isequal(f, f0)
 
-         f1 = deepcopy(f)
-         f1 = addeq!(f1, g)
-         @test isequal(h, k)
-         @test isequal(g, g0)
+      f1 = deepcopy(f)
+      f1 = addeq!(f1, g)
+      @test isequal(h, k)
+      @test isequal(g, g0)
 
-         k = f*g
-         h = mul!(h, f, g)
-         @test isequal(h, k)
-         @test isequal(f, f0)
-         @test isequal(g, g0)
+      k = f*g
+      h = mul!(h, f, g)
+      @test isequal(h, k)
+      @test isequal(f, f0)
+      @test isequal(g, g0)
 
-         f1 = deepcopy(f)
-         f1 = mul!(f1, f1, g)
-         @test isequal(f1, k)
-         @test isequal(g, g0)
+      f1 = deepcopy(f)
+      f1 = mul!(f1, f1, g)
+      @test isequal(f1, k)
+      @test isequal(g, g0)
 
-         g1 = deepcopy(g)
-         g1 = mul!(g1, f, g1)
-         @test isequal(g1, k)
-         @test isequal(f, f0)
+      g1 = deepcopy(g)
+      g1 = mul!(g1, f, g1)
+      @test isequal(g1, k)
+      @test isequal(f, f0)
 
-         h = zero!(h)
-         @test isequal(h, S())
-      end
-   end  
+      h = zero!(h)
+      @test isequal(h, S())
+    end
+  end  
 end      
 
 @testset "Generic.FunctionField.polynomial_ring" begin
-   for i = 1:length(P1)
-      S, y = function_field(P1[i], "y")
+  for i = 1:length(P1)
+    S, y = function_field(P1[i], "y")
 
-      St, t = polynomial_ring(S, "t", cached = false)
-      @test t + y == y + t
-      @test t * y == y * t
-      @test t + 1 == 1 + t
-      @test t * 1 == 1 * t
-      @test t + BigInt(1) == BigInt(1) + t
-      @test t * BigInt(1) == BigInt(1) * t
-      @test t + one(R1) == one(R1) + t
-      @test t * one(R1) == one(R1) * t
-      @test divexact(t, one(S)) == t
-   end
+    St, t = polynomial_ring(S, "t", cached = false)
+    @test t + y == y + t
+    @test t * y == y * t
+    @test t + 1 == 1 + t
+    @test t * 1 == 1 * t
+    @test t + BigInt(1) == BigInt(1) + t
+    @test t * BigInt(1) == BigInt(1) * t
+    @test t + one(R1) == one(R1) + t
+    @test t * one(R1) == one(R1) * t
+    @test divexact(t, one(S)) == t
+  end
 end

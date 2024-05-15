@@ -5,11 +5,11 @@
 ##############################################################################
 
 function Partition(part::AbstractVector{T}, check::Bool=true) where T
-   Generic.Partition(part, check)
+  Generic.Partition(part, check)
 end
- 
+
 function AllParts(n::T) where T
-   Generic.AllParts(n)
+  Generic.AllParts(n)
 end
 
 ##############################################################################
@@ -19,7 +19,7 @@ end
 ##############################################################################
 
 function SkewDiagram(lambda::Vector{T}, mu::Vector{T}) where T
-   Generic.SkewDiagram(lambda, mu)
+  Generic.SkewDiagram(lambda, mu)
 end
 
 # Also see src/AbstractAlgebra.jl for an additional constructor
@@ -29,9 +29,9 @@ end
 #   YoungTableau constructor
 #
 ##############################################################################
- 
+
 function YoungTableau(p::Vector{Int})
-   Generic.YoungTableau(p)
+  Generic.YoungTableau(p)
 end
 
 # Also see src/AbstractAlgebra.jl for additional constructors

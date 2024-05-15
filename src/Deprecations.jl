@@ -26,10 +26,10 @@
 # Deprecated bindings don't get reexported automatically in Hecke/Oscar/etc.
 # By calling this macro from the respective packages, we can ensure that the deprecated bindings are available there.
 macro include_deprecated_bindings()
-    return esc(quote
-        #= currently none =#
+  return esc(quote
+               #= currently none =#
 
-    end)
+             end)
 end
 
 @include_deprecated_bindings()

@@ -36,15 +36,15 @@ hash(p::Partition, h::UInt) = hash(p.part, hash(Partition, h))
 ##############################################################################
 
 function subscriptify(n::Int)
-   subscript_0 = Int(0x2080) # Char(0x2080) -> subscript 0
-   return join([Char(subscript_0 + i) for i in reverse(digits(n))])
+  subscript_0 = Int(0x2080) # Char(0x2080) -> subscript 0
+  return join([Char(subscript_0 + i) for i in reverse(digits(n))])
 end
 
 function show(io::IO, p::Partition)
-   uniq = unique(p.part)
-   mults = [count(i -> i == u, p.part) for u in uniq]
-   str = join((string(u)*subscriptify(m) for (u,m) in zip(uniq, mults)))
-   print(io, str)
+  uniq = unique(p.part)
+  mults = [count(i -> i == u, p.part) for u in uniq]
+  str = join((string(u)*subscriptify(m) for (u,m) in zip(uniq, mults)))
+  print(io, str)
 end
 
 show(io::IO, ::MIME"text/plain", p::Partition) = show(io, p)
@@ -67,26 +67,26 @@ see OEIS sequence [A000041](https://oeis.org/A000041). Note that
 `_numpart(0) = 1` by convention.
 """
 function _numpart(n::Integer)
-   if n < 0
-      return 0
-   elseif n < 395
-      return _numpart(Int(n), _numPartsTable)
-   else
-      return _numpart(BigInt(n), _numPartsTableBig)
-   end
+  if n < 0
+    return 0
+  elseif n < 395
+    return _numpart(Int(n), _numPartsTable)
+  else
+    return _numpart(BigInt(n), _numPartsTableBig)
+  end
 end
 
 function _numpart(n::T, lookuptable::Dict{Int, T}) where T<:Integer
-   s = zero(T)
-   if !haskey(lookuptable, n)
-      for j in 1:floor(T, (1 + Base.sqrt(1 + 24n))/6)
-         p1 = _numpart(n - div(j*(3j - 1), 2))
-         p2 = _numpart(n - div(j*(3j + 1), 2))
-         s += (-1)^(j - 1)*(p1 + p2)
-      end
-      lookuptable[n] = s
-   end
-   return lookuptable[n]
+  s = zero(T)
+  if !haskey(lookuptable, n)
+    for j in 1:floor(T, (1 + Base.sqrt(1 + 24n))/6)
+      p1 = _numpart(n - div(j*(3j - 1), 2))
+      p2 = _numpart(n - div(j*(3j + 1), 2))
+      s += (-1)^(j - 1)*(p1 + p2)
+    end
+    lookuptable[n] = s
+  end
+  return lookuptable[n]
 end
 
 # Implemented following RuleAsc (Algorithm 3.1) from
@@ -94,41 +94,41 @@ end
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
 
 @inline function Base.iterate(A::AllParts)
-   resize!(A.part, A.n)
-   resize!(A.tmp, A.n)
-   A.tmp .= 1
-   A.part .= 1
+  resize!(A.part, A.n)
+  resize!(A.tmp, A.n)
+  A.tmp .= 1
+  A.part .= 1
 
-   return A.part, max(A.n, one(A.n))
+  return A.part, max(A.n, one(A.n))
 end
 
 @inline function Base.iterate(A::AllParts, k)
-   isone(k) && return nothing
-   k = @inbounds nextpart_asc!(A.tmp, k)
+  isone(k) && return nothing
+  k = @inbounds nextpart_asc!(A.tmp, k)
 
-   resize!(A.part, k)
-   for i in 1:k
-      A.part[i] = A.tmp[k-i+1]
-   end
+  resize!(A.part, k)
+  for i in 1:k
+    A.part[i] = A.tmp[k-i+1]
+  end
 
-   return A.part, k
+  return A.part, k
 end
 
 Base.length(A::AllParts) = _numpart(A.n)
 Base.eltype(::Type{AllParts{T}}) where T = Vector{T}
 
 @inline function nextpart_asc!(part, k)
-   iszero(k) && return one(k)
-   y = part[k] - one(k)
-   k -= one(k)
-   x = part[k] + one(k)
-   while x <= y
-      part[k] = x
-      y -= x
-      k += one(k)
-   end
-   part[k] = x + y
-   return k
+  iszero(k) && return one(k)
+  y = part[k] - one(k)
+  k -= one(k)
+  x = part[k] + one(k)
+  while x <= y
+    part[k] = x
+    y -= x
+    k += one(k)
+  end
+  part[k] = x + y
+  return k
 end
 
 @doc raw"""
@@ -168,16 +168,16 @@ julia> conj(p)
 ```
 """
 function Base.conj(part::Partition)
-   p = Vector{Int}(undef, maximum(part))
-   for i in 1:sum(part)
-      for j in length(part):-1:1
-         if part[j] >= i
-            p[i] = j
-            break
-         end
+  p = Vector{Int}(undef, maximum(part))
+  for i in 1:sum(part)
+    for j in length(part):-1:1
+      if part[j] >= i
+        p[i] = j
+        break
       end
-   end
-   return Partition(p, false)
+    end
+  end
+  return Partition(p, false)
 end
 
 @doc raw"""
@@ -186,25 +186,25 @@ end
 Return the conjugated partition of `part` together with permuted vector `v`.
 """
 function Base.conj(part::Partition, v::Vector)
-   w = zeros(eltype(part), size(v))
+  w = zeros(eltype(part), size(v))
 
-   acc = Vector{Int}(undef, length(part)+1)
-   acc[1] = 0
-   for i in 1:length(part)
-      acc[i+1] = acc[i] + part[i]
-   end
+  acc = Vector{Int}(undef, length(part)+1)
+  acc[1] = 0
+  for i in 1:length(part)
+    acc[i+1] = acc[i] + part[i]
+  end
 
-   new_idx = 1
-   cpart = conj(part)
+  new_idx = 1
+  cpart = conj(part)
 
-   for (i, p) in enumerate(cpart)
-      for j in 1:p
-         w[new_idx] = (v[acc[j]+i])
-         new_idx += 1
-      end
-   end
+  for (i, p) in enumerate(cpart)
+    for j in 1:p
+      w[new_idx] = (v[acc[j]+i])
+      new_idx += 1
+    end
+  end
 
-   return cpart, w
+  return cpart, w
 end
 
 ##############################################################################
@@ -223,14 +223,14 @@ Return a sequence (as `BitVector`) of `false`s and `true`s constructed from
 ends with `false`.
 """
 function partitionseq(lambda::Partition)
-   seq = trues(maximum(lambda) + length(lambda))
-   j = lambda[end]
-   for i in (length(lambda)-1):-1:1
-      seq[j+1] = false
-      j += lambda[i] - lambda[i+1] + 1
-   end
-   seq[j+1] = false
-   return seq
+  seq = trues(maximum(lambda) + length(lambda))
+  j = lambda[end]
+  for i in (length(lambda)-1):-1:1
+    seq[j+1] = false
+    j += lambda[i] - lambda[i+1] + 1
+  end
+  seq[j+1] = false
+  return seq
 end
 
 partitionseq(v::Vector{T}) where T<:Integer = partitionseq(Partition(v))
@@ -250,7 +250,7 @@ partitionseq(seq::BitVector) = seq[something(findfirst(isequal(true), seq), 0):s
 corresponding to `R` iff `R[idx] == true` and `R[idx+len] == false`.
 """
 function is_rimhook(R::BitVector, idx::Integer, len::Integer)
-   return (R[idx+len] == false) && (R[idx] == true)
+  return (R[idx+len] == false) && (R[idx] == true)
 end
 
 @doc raw"""
@@ -268,35 +268,35 @@ Murnaghan-Nakayama formula as described in
     _Journal of Symbolic Computation_, 37(6), 2004, p. 727-748.
 """
 function MN1inner(R::BitVector, mu::Partition, t::Integer, charvals)
-   if t > length(mu)
-      chi = 1
-   elseif mu[t] > length(R)
-      chi = 0
-   else
-      chi = 0
-      sgn = false
+  if t > length(mu)
+    chi = 1
+  elseif mu[t] > length(R)
+    chi = 0
+  else
+    chi = 0
+    sgn = false
 
-      for j in 1:mu[t]-1
-         if R[j] == false
-            sgn = !sgn
-         end
+    for j in 1:mu[t]-1
+      if R[j] == false
+        sgn = !sgn
       end
-      for i in 1:length(R)-mu[t]
-         if R[i] != R[i+mu[t]-1]
-            sgn = !sgn
-         end
-         if is_rimhook(R, i, mu[t])
-            R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
-            essR = (partitionseq(R), mu[t+1:end])
-            if !haskey(charvals, essR)
-               charvals[essR] = MN1inner(R, mu, t+1, charvals)
-            end
-            chi += (-1)^Int(sgn)*charvals[essR]
-            R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
-         end
+    end
+    for i in 1:length(R)-mu[t]
+      if R[i] != R[i+mu[t]-1]
+        sgn = !sgn
       end
-   end
-   return chi
+      if is_rimhook(R, i, mu[t])
+        R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
+        essR = (partitionseq(R), mu[t+1:end])
+        if !haskey(charvals, essR)
+          charvals[essR] = MN1inner(R, mu, t+1, charvals)
+        end
+        chi += (-1)^Int(sgn)*charvals[essR]
+        R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
+      end
+    end
+  end
+  return chi
 end
 
 ##############################################################################
@@ -324,10 +324,10 @@ size(Y::YoungTableau) = (length(Y.part), Y.part[1])
 Base.IndexStyle(::Type{<:YoungTableau}) = Base.IndexLinear()
 
 function inyoungtab(t::Tuple{Integer,Integer}, Y::YoungTableau)
-   i,j = t
-   i > length(Y.part) && return false
-   Y.part[i] < j && return false
-   return true
+  i,j = t
+  i > length(Y.part) && return false
+  Y.part[i] < j && return false
+  return true
 end
 
 @doc raw"""
@@ -361,23 +361,23 @@ julia> y[6]
 ```
 """
 function getindex(Y::YoungTableau, n::Integer)
-   if n < 1 #|| n > length(Y)
-      throw(BoundsError(Y.fill, n))
-   else
-     i, j = Tuple(CartesianIndices(Y)[n])
-      if inyoungtab((i,j), Y)
-         k = sum(Y.part[1:i-1]) + j
-         return Y.fill[k]
-      else
-         return 0
-      end
-   end
+  if n < 1 #|| n > length(Y)
+    throw(BoundsError(Y.fill, n))
+  else
+    i, j = Tuple(CartesianIndices(Y)[n])
+    if inyoungtab((i,j), Y)
+      k = sum(Y.part[1:i-1]) + j
+      return Y.fill[k]
+    else
+      return 0
+    end
+  end
 end
 
 function ==(Y1::YoungTableau,Y2::YoungTableau)
-   Y1.part == Y2.part || return false
-   Y1.fill == Y2.fill || return false
-   return true
+  Y1.part == Y2.part || return false
+  Y1.fill == Y2.fill || return false
+  return true
 end
 
 hash(Y::YoungTableau, h::UInt) = hash(Y.part, hash(Y.fill, hash(typeof(Y), h)))
@@ -391,82 +391,82 @@ Base.copy(Y::YoungTableau) = YoungTableau(Y.part, copy(Y.fill))
 ##############################################################################
 
 function Base.replace_in_print_matrix(Y::YoungTableau, i::Integer, j::Integer, s::AbstractString)
-   inyoungtab((i,j), Y) ? s : Base.replace_with_centered_mark(s, c=' ')
+  inyoungtab((i,j), Y) ? s : Base.replace_with_centered_mark(s, c=' ')
 end
 
 const _border = Dict{Symbol,String}(
-:vertical => "│",
-:horizontal => "─",
+                                    :vertical => "│",
+                                    :horizontal => "─",
 
-:topleft => "┌", # corners
-:topright => "┐",
-:bottomleft => "└",
-:bottomright => "┘",
+                                    :topleft => "┌", # corners
+                                    :topright => "┐",
+                                    :bottomleft => "└",
+                                    :bottomright => "┘",
 
-:downstem => "┬", #top edge
-:upstem => "┴", #bottom edge
+                                    :downstem => "┬", #top edge
+                                    :upstem => "┴", #bottom edge
 
-:rightstem => "├", # left edge
-:leftstem => "┤", # right edge
+                                    :rightstem => "├", # left edge
+                                    :leftstem => "┤", # right edge
 
-:cross => "┼")
+                                    :cross => "┼")
 
 function boxed_str(Y::YoungTableau, fill=Y.fill)
-   r,c = size(Y)
-   w = max(length(string(maximum(fill))), 3)
-   horizontal = repeat(_border[:horizontal], w)
+  r,c = size(Y)
+  w = max(length(string(maximum(fill))), 3)
+  horizontal = repeat(_border[:horizontal], w)
 
-   diagram = String[]
-   s = String("")
+  diagram = String[]
+  s = String("")
 
-   counter = 1
+  counter = 1
 
-   for i in 1:r
-      if i == 1 # top rule:
-         s =_border[:topleft]*
-            join(Iterators.repeated(horizontal, c), _border[:downstem])*
-            _border[:topright]
+  for i in 1:r
+    if i == 1 # top rule:
+      s =_border[:topleft]*
+      join(Iterators.repeated(horizontal, c), _border[:downstem])*
+      _border[:topright]
 
-      else # upper rule:
-         s = _border[:rightstem]
+    else # upper rule:
+      s = _border[:rightstem]
 
-         if Y.part[i-1] - Y.part[i] > 0
-            s *= join(Iterators.repeated(horizontal, Y.part[i]),
-               _border[:cross])
-            s *=_border[:cross]
+      if Y.part[i-1] - Y.part[i] > 0
+        s *= join(Iterators.repeated(horizontal, Y.part[i]),
+                  _border[:cross])
+        s *=_border[:cross]
 
-            s *= join(Iterators.repeated(horizontal,
-                  Y.part[i-1] - Y.part[i]),
-               _border[:upstem])
-            s *= _border[:bottomright]
-         else
-            s *= join(Iterators.repeated(horizontal, Y.part[i]),
-               _border[:cross])
-            s *= _border[:leftstem]
-         end
+        s *= join(Iterators.repeated(horizontal,
+                                     Y.part[i-1] - Y.part[i]),
+                  _border[:upstem])
+        s *= _border[:bottomright]
+      else
+        s *= join(Iterators.repeated(horizontal, Y.part[i]),
+                  _border[:cross])
+        s *= _border[:leftstem]
       end
-      push!(diagram, s)
+    end
+    push!(diagram, s)
 
-      # contents of each row:
-      s = _border[:vertical]
-      for j in 1:Y.part[i]
-         s *= rpad(lpad(fill[counter], div(w, 2) + 1), w) *_border[:vertical]
-         counter += 1
-      end
-      push!(diagram, s)
-   end
+    # contents of each row:
+    s = _border[:vertical]
+    for j in 1:Y.part[i]
+      s *= rpad(lpad(fill[counter], div(w, 2) + 1), w) *_border[:vertical]
+      counter += 1
+    end
+    push!(diagram, s)
+  end
 
-   # bottom rule
-   s = _border[:bottomleft]
-   s *= join(Iterators.repeated(horizontal, Y.part[r]), _border[:upstem])
-   s *= _border[:bottomright]
-   push!(diagram, s)
+  # bottom rule
+  s = _border[:bottomleft]
+  s *= join(Iterators.repeated(horizontal, Y.part[r]), _border[:upstem])
+  s *= _border[:bottomright]
+  push!(diagram, s)
 
-   return join(diagram, "\n")
+  return join(diagram, "\n")
 end
 
 mutable struct YoungTabDisplayStyle
-   format::Symbol
+  format::Symbol
 end
 
 const _youngtabstyle = YoungTabDisplayStyle(:diagram)
@@ -505,17 +505,17 @@ julia> YoungTableau(p)
 ```
 """
 function setyoungtabstyle(s::Symbol)
-   @assert s in (:diagram, :array)
-   _youngtabstyle.format = s
-   _youngtabstyle.format
+  @assert s in (:diagram, :array)
+  _youngtabstyle.format = s
+  _youngtabstyle.format
 end
 
 function Base.show(io::IO, ::MIME"text/plain", Y::YoungTableau)
-   if _youngtabstyle.format == :array
-      Base.print_matrix(io, Y)
-   elseif _youngtabstyle.format == :diagram
-      print(io, boxed_str(Y))
-   end
+  if _youngtabstyle.format == :array
+    Base.print_matrix(io, Y)
+  elseif _youngtabstyle.format == :diagram
+    print(io, boxed_str(Y))
+  end
 end
 
 ##############################################################################
@@ -542,13 +542,13 @@ julia> matrix_repr(y)
 ```
 """
 function matrix_repr(Y::YoungTableau{T}) where T
-   tab = spzeros(T, length(Y.part), Y.part[1])
-   k=1
-   for (idx, p) in enumerate(Y.part)
-      tab[idx, 1:p] = Y.fill[k:k+p-1]
-      k += p
-   end
-   return tab
+  tab = spzeros(T, length(Y.part), Y.part[1])
+  k=1
+  for (idx, p) in enumerate(Y.part)
+    tab[idx, 1:p] = Y.fill[k:k+p-1]
+    k += p
+  end
+  return tab
 end
 
 @doc raw"""
@@ -579,9 +579,9 @@ julia> fill!(y, [2:9...])
 ```
 """
 function Base.fill!(Y::YoungTableau, V::AbstractVector{<:Integer})
-   length(V) == sum(Y.part) || throw(ArgumentError("Length of fill vector must match the size of partition"))
-   Y.fill .= V
-   return Y
+  length(V) == sum(Y.part) || throw(ArgumentError("Length of fill vector must match the size of partition"))
+  Y.fill .= V
+  return Y
 end
 
 @doc raw"""
@@ -704,11 +704,11 @@ julia> hooklength(y, 2,4)
 ```
 """
 function hooklength(Y::YoungTableau, i::Integer, j::Integer)
-   if inyoungtab((i,j), Y)
-      return rowlength(Y, i, j) + collength(Y, i, j) + 1
-   else
-      return 0
-   end
+  if inyoungtab((i,j), Y)
+    return rowlength(Y, i, j) + collength(Y, i, j) + 1
+  else
+    return 0
+  end
 end
 
 @doc raw"""
@@ -732,10 +732,10 @@ julia> dim(YoungTableau([3,1])) # the regular representation of S_4
 dim(Y::YoungTableau) = dim(BigInt, Y)
 
 function dim(::Type{T}, Y::YoungTableau) where T<:Integer
-   n, m = size(Y)
-   num = factorial(T(sum(Y.part)))
-   den = reduce(*, (hooklength(Y,i,j) for i in 1:n, j in 1:m if j <= Y.part[i]), init=one(T))
-   return divexact(num, den)::T
+  n, m = size(Y)
+  num = factorial(T(sum(Y.part)))
+  den = reduce(*, (hooklength(Y,i,j) for i in 1:n, j in 1:m if j <= Y.part[i]), init=one(T))
+  return divexact(num, den)::T
 end
 
 ##############################################################################
@@ -763,16 +763,16 @@ Base.IndexStyle(::Type{<:SkewDiagram}) = Base.IndexLinear()
 Check if box at position `(i,j)` belongs to the skew diagram `xi`.
 """
 function Base.in(t::Tuple{Integer, Integer}, xi::SkewDiagram)
-   i,j = t
-   if i <= 0 || j <= 0
-      return false
-   elseif i > length(xi.lam) || j > xi.lam[1]
-      return false
-   elseif length(xi.mu) >= i
-      return xi.mu[i] < j <= xi.lam[i]
-   else
-      return j <= xi.lam[i]
-   end
+  i,j = t
+  if i <= 0 || j <= 0
+    return false
+  elseif i > length(xi.lam) || j > xi.lam[1]
+    return false
+  elseif length(xi.mu) >= i
+    return xi.mu[i] < j <= xi.lam[i]
+  else
+    return j <= xi.lam[i]
+  end
 end
 
 @doc raw"""
@@ -782,9 +782,9 @@ Return `1` if linear index `n` corresponds to (column-major) entry in
 `xi.lam` which is not contained in `xi.mu`. Otherwise return `0`.
 """
 function getindex(xi::SkewDiagram, n::Integer)
-   i, j = Tuple(CartesianIndices(xi)[n])
-   (i,j) in xi && return 1
-   return 0
+  i, j = Tuple(CartesianIndices(xi)[n])
+  (i,j) in xi && return 1
+  return 0
 end
 
 ==(xi::SkewDiagram, psi::SkewDiagram) = xi.lam == psi.lam && xi.mu == psi.mu
@@ -797,13 +797,13 @@ hash(xi::SkewDiagram, h::UInt) = hash(xi.lam, hash(xi.mu, hash(typeof(xi), h)))
 ###############################################################################
 
 function Base.replace_in_print_matrix(xi::SkewDiagram, i::Integer, j::Integer, s::AbstractString)
-   if j > xi.lam[i]
-      Base.replace_with_centered_mark(s, c=' ')
-   elseif i <= length(xi.mu)
-      j > xi.mu[i] ? s : Base.replace_with_centered_mark(s)
-   else
-      s
-   end
+  if j > xi.lam[i]
+    Base.replace_with_centered_mark(s, c=' ')
+  elseif i <= length(xi.mu)
+    j > xi.mu[i] ? s : Base.replace_with_centered_mark(s)
+  else
+    s
+  end
 end
 
 ##############################################################################
@@ -819,14 +819,14 @@ Return a sparse representation of the diagram `xi`, i.e. a sparse array `A`
 where `A[i,j] == 1` if and only if `(i,j)` is in `xi.lam` but not in `xi.mu`.
 """
 function matrix_repr(xi::SkewDiagram)
-   skdiag = spzeros(eltype(xi), size(xi)...)
-   for i in 1:length(xi.mu)
-      skdiag[i, xi.mu[i]+1:xi.lam[i]] .= 1
-   end
-   for i in length(xi.mu)+1:length(xi.lam)
-      skdiag[i,1:xi.lam[i]] .= 1
-   end
-   return skdiag
+  skdiag = spzeros(eltype(xi), size(xi)...)
+  for i in 1:length(xi.mu)
+    skdiag[i, xi.mu[i]+1:xi.lam[i]] .= 1
+  end
+  for i in length(xi.mu)+1:length(xi.lam)
+    skdiag[i,1:xi.lam[i]] .= 1
+  end
+  return skdiag
 end
 
 @doc raw"""
@@ -835,11 +835,11 @@ end
 Check if box at position `(i,j)` has neighbour in `xi` to the left.
 """
 function has_left_neighbor(xi::SkewDiagram, i::Integer, j::Integer)
-   if j == 1
-      return false
-   else
-      return (i,j) in xi && (i,j-1) in xi
-   end
+  if j == 1
+    return false
+  else
+    return (i,j) in xi && (i,j-1) in xi
+  end
 end
 
 @doc raw"""
@@ -848,11 +848,11 @@ end
 Check if box at position `(i,j)` has neighbour in `xi` below.
 """
 function has_bottom_neighbor(xi::SkewDiagram, i::Integer, j::Integer)
-   if i == length(xi.lam)
-      return false
-   else
-      return (i,j) in xi && (i+1,j) in xi
-   end
+  if i == length(xi.lam)
+    return false
+  else
+    return (i,j) in xi && (i+1,j) in xi
+  end
 end
 
 @doc raw"""
@@ -862,30 +862,30 @@ Check if `xi` represents a rim-hook diagram, i.e. its diagram is
 edge-connected and contains no $2\times 2$ squares.
 """
 function is_rimhook(xi::SkewDiagram{T}) where T
-   i = 1
-   j = xi.lam[1]
-   while i != length(xi.lam) && j != 1
-      left = has_left_neighbor(xi, i,j)
-      bottom = has_bottom_neighbor(xi, i,j)
-      if left && bottom # there is 2×2 square in xi
-         return false
-      elseif left
-         j -= 1
-      elseif bottom
-         i += 1
-      else
-         lam_tail = xi.lam[i+1:end]
-         mu_tail = zeros(T, length(lam_tail))
-         mu_tail[1:length(xi.mu)-i] = xi.mu[i+1:end]
+  i = 1
+  j = xi.lam[1]
+  while i != length(xi.lam) && j != 1
+    left = has_left_neighbor(xi, i,j)
+    bottom = has_bottom_neighbor(xi, i,j)
+    if left && bottom # there is 2×2 square in xi
+      return false
+    elseif left
+      j -= 1
+    elseif bottom
+      i += 1
+    else
+      lam_tail = xi.lam[i+1:end]
+      mu_tail = zeros(T, length(lam_tail))
+      mu_tail[1:length(xi.mu)-i] = xi.mu[i+1:end]
 
-         if any(lam_tail .- mu_tail .> 0)
-            return false # xi is disconnected
-         else
-            return true # we arrived at the end of xi
-         end
+      if any(lam_tail .- mu_tail .> 0)
+        return false # xi is disconnected
+      else
+        return true # we arrived at the end of xi
       end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 @doc raw"""
@@ -896,10 +896,10 @@ non-zero entries minus one. If `check` is `false` function will not check
 whether `xi` is actually a rim-hook.
 """
 function leglength(xi::SkewDiagram, check::Bool=true)
-   if check
-      is_rimhook(xi) || throw(ArgumentError("$xi is not a rimhook. leglength is defined only for rim hooks"))
-   end
-   m = zeros(length(xi.lam))
-   m[1:length(xi.mu)] = xi.mu
-   return sum((xi.lam .- m) .> 0) - 1
+  if check
+    is_rimhook(xi) || throw(ArgumentError("$xi is not a rimhook. leglength is defined only for rim hooks"))
+  end
+  m = zeros(length(xi.lam))
+  m[1:length(xi.mu)] = xi.mu
+  return sum((xi.lam .- m) .> 0) - 1
 end

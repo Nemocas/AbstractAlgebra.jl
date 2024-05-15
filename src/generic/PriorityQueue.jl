@@ -40,43 +40,43 @@ AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering}
 ```
 """
 struct PriorityQueue{K,V,O<:Base.Order.Ordering} <: AbstractDict{K,V}
-    # Binary heap of (element, priority) pairs.
-    xs::Vector{Pair{K,V}}
-    o::O
+  # Binary heap of (element, priority) pairs.
+  xs::Vector{Pair{K,V}}
+  o::O
 
-    # Map elements to their index in xs
-    index::Dict{K, Int}
+  # Map elements to their index in xs
+  index::Dict{K, Int}
 
-    function PriorityQueue{K,V,O}(o::O) where {K,V,O<:Base.Order.Ordering}
-        new{K,V,O}(Vector{Pair{K,V}}(), o, Dict{K, Int}())
+  function PriorityQueue{K,V,O}(o::O) where {K,V,O<:Base.Order.Ordering}
+    new{K,V,O}(Vector{Pair{K,V}}(), o, Dict{K, Int}())
+  end
+
+  PriorityQueue{K, V, O}(xs::Vector{Pair{K,V}}, o::O, index::Dict{K, Int}) where {K,V,O<:Base.Order.Ordering} = new(xs, o, index)
+
+  function PriorityQueue{K,V,O}(o::O, itr) where {K,V,O<:Base.Order.Ordering}
+    xs = Vector{Pair{K,V}}(undef, length(itr))
+    index = Dict{K, Int}()
+    for (i, (k, v)) in enumerate(itr)
+      xs[i] = Pair{K,V}(k, v)
+      if haskey(index, k)
+        throw(ArgumentError("PriorityQueue keys must be unique"))
+      end
+      index[k] = i
+    end
+    pq = new{K,V,O}(xs, o, index)
+
+    # heapify
+    for i in heapparent(length(pq.xs)):-1:1
+      percolate_down!(pq, i)
     end
 
-    PriorityQueue{K, V, O}(xs::Vector{Pair{K,V}}, o::O, index::Dict{K, Int}) where {K,V,O<:Base.Order.Ordering} = new(xs, o, index)
-
-    function PriorityQueue{K,V,O}(o::O, itr) where {K,V,O<:Base.Order.Ordering}
-        xs = Vector{Pair{K,V}}(undef, length(itr))
-        index = Dict{K, Int}()
-        for (i, (k, v)) in enumerate(itr)
-            xs[i] = Pair{K,V}(k, v)
-            if haskey(index, k)
-                throw(ArgumentError("PriorityQueue keys must be unique"))
-            end
-            index[k] = i
-        end
-        pq = new{K,V,O}(xs, o, index)
-
-        # heapify
-        for i in heapparent(length(pq.xs)):-1:1
-            percolate_down!(pq, i)
-        end
-
-        return pq
-    end
+    return pq
+  end
 end
 
 # A copy constructor
 PriorityQueue(xs::Vector{Pair{K,V}}, o::O, index::Dict{K, Int}) where {K,V,O<:Base.Order.Ordering} =
-    PriorityQueue{K,V,O}(xs, o, index)
+PriorityQueue{K,V,O}(xs, o, index)
 
 # Any-Any constructors
 PriorityQueue(o::Base.Order.Ordering=Base.Order.Forward) = PriorityQueue{Any,Any,typeof(o)}(o)
@@ -91,7 +91,7 @@ PriorityQueue{K,V}(o::Ord, ps::Pair...) where {K,V,Ord<:Base.Order.Ordering} = P
 # e.g., PriorityQueue{Int,Float64}([1=>1, 2=>2.0])
 PriorityQueue{K,V}(kv) where {K,V} = PriorityQueue{K,V}(Base.Order.Forward, kv)
 function PriorityQueue{K,V}(o::Ord, kv) where {K,V,Ord<:Base.Order.Ordering}
-    PriorityQueue{K,V,Ord}(o, kv)
+  PriorityQueue{K,V,Ord}(o, kv)
 end
 
 # Construction inferring Key/Value types from input
@@ -100,7 +100,7 @@ end
 PriorityQueue(o1::Base.Order.Ordering, o2::Base.Order.Ordering) = throw(ArgumentError("PriorityQueue with two parameters must be called with an Ordering and an iterable of pairs"))
 PriorityQueue(kv, o::Base.Order.Ordering=Base.Order.Forward) = PriorityQueue(o, kv)
 function PriorityQueue(o::Base.Order.Ordering, kv)
-    _priority_queue_with_eltype(o, kv, eltype(kv))
+  _priority_queue_with_eltype(o, kv, eltype(kv))
 end
 
 _priority_queue_with_eltype(o::Ord, ps, ::Type{Pair{K,V}} ) where {K,V,Ord} = PriorityQueue{  K,  V,Ord}(o, ps)
@@ -159,86 +159,86 @@ priority queue.
 Base.first(pq::PriorityQueue) = first(pq.xs)
 
 function percolate_down!(pq::PriorityQueue, i::Integer)
-    x = pq.xs[i]
-    @inbounds while (l = heapleft(i)) <= length(pq)
-        r = heapright(i)
-        j = r > length(pq) || Base.lt(pq.o, pq.xs[l].second, pq.xs[r].second) ? l : r
-        xj = pq.xs[j]
-        if Base.lt(pq.o, xj.second, x.second)
-            pq.index[xj.first] = i
-            pq.xs[i] = xj
-            i = j
-        else
-            break
-        end
+  x = pq.xs[i]
+  @inbounds while (l = heapleft(i)) <= length(pq)
+    r = heapright(i)
+    j = r > length(pq) || Base.lt(pq.o, pq.xs[l].second, pq.xs[r].second) ? l : r
+    xj = pq.xs[j]
+    if Base.lt(pq.o, xj.second, x.second)
+      pq.index[xj.first] = i
+      pq.xs[i] = xj
+      i = j
+    else
+      break
     end
-    pq.index[x.first] = i
-    pq.xs[i] = x
+  end
+  pq.index[x.first] = i
+  pq.xs[i] = x
 end
 
 
 function percolate_up!(pq::PriorityQueue, i::Integer)
-    x = pq.xs[i]
-    @inbounds while i > 1
-        j = heapparent(i)
-        xj = pq.xs[j]
-        if Base.lt(pq.o, x.second, xj.second)
-            pq.index[xj.first] = i
-            pq.xs[i] = xj
-            i = j
-        else
-            break
-        end
+  x = pq.xs[i]
+  @inbounds while i > 1
+    j = heapparent(i)
+    xj = pq.xs[j]
+    if Base.lt(pq.o, x.second, xj.second)
+      pq.index[xj.first] = i
+      pq.xs[i] = xj
+      i = j
+    else
+      break
     end
-    pq.index[x.first] = i
-    pq.xs[i] = x
+  end
+  pq.index[x.first] = i
+  pq.xs[i] = x
 end
 
 # Equivalent to percolate_up! with an element having lower priority than any other
 function force_up!(pq::PriorityQueue, i::Integer)
-    x = pq.xs[i]
-    @inbounds while i > 1
-        j = heapparent(i)
-        pq.index[pq.xs[j].first] = i
-        pq.xs[i] = pq.xs[j]
-        i = j
-    end
-    pq.index[x.first] = i
-    pq.xs[i] = x
+  x = pq.xs[i]
+  @inbounds while i > 1
+    j = heapparent(i)
+    pq.index[pq.xs[j].first] = i
+    pq.xs[i] = pq.xs[j]
+    i = j
+  end
+  pq.index[x.first] = i
+  pq.xs[i] = x
 end
 
 Base.getindex(pq::PriorityQueue, key) = pq.xs[pq.index[key]].second
 
 function Base.get(pq::PriorityQueue, key, default)
-    i = get(pq.index, key, 0)
-    i == 0 ? default : pq.xs[i].second
+  i = get(pq.index, key, 0)
+  i == 0 ? default : pq.xs[i].second
 end
 
 function Base.get!(pq::PriorityQueue, key, default)
-    i = get(pq.index, key, 0)
-    if i == 0
-        push!(pq, key=>default)
-        return default
-    else
-        return pq.xs[i].second
-    end
+  i = get(pq.index, key, 0)
+  if i == 0
+    push!(pq, key=>default)
+    return default
+  else
+    return pq.xs[i].second
+  end
 end
 
 # Change the priority of an existing element, or enqueue it if it isn't present.
 function Base.setindex!(pq::PriorityQueue{K, V}, value, key) where {K,V}
-    i = get(pq.index, key, 0)
-    if i != 0
-        @inbounds oldvalue = pq.xs[i].second
-        pq.xs[i] = Pair{K,V}(key, value)
-        if Base.lt(pq.o, oldvalue, value)
-            percolate_down!(pq, i)
-        else
-            percolate_up!(pq, i)
-        end
+  i = get(pq.index, key, 0)
+  if i != 0
+    @inbounds oldvalue = pq.xs[i].second
+    pq.xs[i] = Pair{K,V}(key, value)
+    if Base.lt(pq.o, oldvalue, value)
+      percolate_down!(pq, i)
     else
-        push!(pq, key=>value)
+      percolate_up!(pq, i)
     end
-    return value
+  else
+    push!(pq, key=>value)
+  end
+  return value
 end
 
 """
@@ -266,15 +266,15 @@ AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering}
 ```
 """
 function Base.push!(pq::PriorityQueue{K,V}, pair::Pair{K,V}) where {K,V}
-    key = pair.first
-    if haskey(pq, key)
-        throw(ArgumentError("PriorityQueue keys must be unique"))
-    end
-    push!(pq.xs, pair)
-    pq.index[key] = length(pq)
-    percolate_up!(pq, length(pq))
+  key = pair.first
+  if haskey(pq, key)
+    throw(ArgumentError("PriorityQueue keys must be unique"))
+  end
+  push!(pq.xs, pair)
+  pq.index[key] = length(pq)
+  percolate_up!(pq, length(pq))
 
-    return pq
+  return pq
 end
 
 Base.push!(pq::PriorityQueue{K,V}, kv::Pair) where {K,V} = push!(pq, Pair{K,V}(kv.first, kv.second))
@@ -303,25 +303,25 @@ AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering}
 ```
 """
 function Base.popfirst!(pq::PriorityQueue)
-    x = pq.xs[1]
-    y = pop!(pq.xs)
-    if !isempty(pq)
-        @inbounds pq.xs[1] = y
-        pq.index[y.first] = 1
-        percolate_down!(pq, 1)
-    end
-    delete!(pq.index, x.first)
-    return x
+  x = pq.xs[1]
+  y = pop!(pq.xs)
+  if !isempty(pq)
+    @inbounds pq.xs[1] = y
+    pq.index[y.first] = 1
+    percolate_down!(pq, 1)
+  end
+  delete!(pq.index, x.first)
+  return x
 end
 
 if isdefined(Base, :popat!)  # We will overload if it is defined, else we define on our own
-    import Base: popat!
+  import Base: popat!
 end
 
 function popat!(pq::PriorityQueue, key)
-    idx = pq.index[key]
-    force_up!(pq, idx)
-    popfirst!(pq)
+  idx = pq.index[key]
+  force_up!(pq, idx)
+  popfirst!(pq)
 end
 
 """
@@ -344,8 +344,8 @@ AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering}
 ```
 """
 function Base.delete!(pq::PriorityQueue, key)
-    popat!(pq, key)
-    return pq
+  popat!(pq, key)
+  return pq
 end
 
 """
@@ -354,9 +354,9 @@ end
 Reset priority queue `pq`.
 """
 function Base.empty!(pq::PriorityQueue)
-    empty!(pq.xs)
-    empty!(pq.index)
-    return pq
+  empty!(pq.xs)
+  empty!(pq.index)
+  return pq
 end
 
 Base.empty(pq::PriorityQueue) = PriorityQueue(empty(pq.xs), pq.o, empty(pq.index))
@@ -364,29 +364,29 @@ Base.empty(pq::PriorityQueue) = PriorityQueue(empty(pq.xs), pq.o, empty(pq.index
 #Base.merge!(d::SortedDict, other::PriorityQueue) = invoke(merge!, Tuple{AbstractDict, PriorityQueue}, d, other)
 
 function Base.merge!(d::AbstractDict, other::PriorityQueue)
-    next = iterate(other, false)
-    while next !== nothing
-        (k, v), state = next
-        d[k] = v
-        next = iterate(other, state)
-    end
-    return d
+  next = iterate(other, false)
+  while next !== nothing
+    (k, v), state = next
+    d[k] = v
+    next = iterate(other, state)
+  end
+  return d
 end
 
 function Base.merge!(combine::Function, d::AbstractDict, other::PriorityQueue)
-    next = iterate(other, false)
-    while next !== nothing
-        (k, v), state = next
-        d[k] = haskey(d, k) ? combine(d[k], v) : v
-        next = iterate(other, state)
-    end
-    return d
+  next = iterate(other, false)
+  while next !== nothing
+    (k, v), state = next
+    d[k] = haskey(d, k) ? combine(d[k], v) : v
+    next = iterate(other, state)
+  end
+  return d
 end
 
 # Opaque not to be exported.
 mutable struct _PQIteratorState{K, V, O <: Base.Order.Ordering}
-    pq::PriorityQueue{K, V, O}
-    _PQIteratorState{K, V, O}(pq::PriorityQueue{K, V, O}) where {K, V, O <: Base.Order.Ordering} = new(pq)
+  pq::PriorityQueue{K, V, O}
+  _PQIteratorState{K, V, O}(pq::PriorityQueue{K, V, O}) where {K, V, O <: Base.Order.Ordering} = new(pq)
 end
 
 _PQIteratorState(pq::PriorityQueue{K, V, O}) where {K, V, O <: Base.Order.Ordering} = _PQIteratorState{K, V, O}(pq)
@@ -394,26 +394,26 @@ _PQIteratorState(pq::PriorityQueue{K, V, O}) where {K, V, O <: Base.Order.Orderi
 # Unordered iteration through key value pairs in a PriorityQueue
 # O(n) iteration.
 function _iterate(pq::PriorityQueue, state)
-    (k, idx), i = state
-    return (pq.xs[idx], i)
+  (k, idx), i = state
+  return (pq.xs[idx], i)
 end
 _iterate(pq::PriorityQueue, ::Nothing) = nothing
 
 Base.iterate(pq::PriorityQueue, ::Nothing) = nothing
 
 function Base.iterate(pq::PriorityQueue, ordered::Bool=true)
-    if ordered
-        isempty(pq) && return nothing
-        state = _PQIteratorState(PriorityQueue(copy(pq.xs), pq.o, copy(pq.index)))
-        return popfirst!(state.pq), state
-    else
-        _iterate(pq, iterate(pq.index))
-    end
+  if ordered
+    isempty(pq) && return nothing
+    state = _PQIteratorState(PriorityQueue(copy(pq.xs), pq.o, copy(pq.index)))
+    return popfirst!(state.pq), state
+  else
+    _iterate(pq, iterate(pq.index))
+  end
 end
 
 function Base.iterate(pq::PriorityQueue, state::_PQIteratorState)
-    isempty(state.pq) && return nothing
-    return popfirst!(state.pq), state
+  isempty(state.pq) && return nothing
+  return popfirst!(state.pq), state
 end
 
 Base.iterate(pq::PriorityQueue, i) = _iterate(pq, iterate(pq.index, i))

@@ -19,21 +19,21 @@ an iterable collection of `T => Int` pairs for the factors and exponents.
 See [`unit(a::Fac)`](@ref), [`evaluate(a::Fac)`](@ref).
 """
 mutable struct Fac{T <: RingElement}
-   unit::T
-   fac::Dict{T, Int}
+  unit::T
+  fac::Dict{T, Int}
 
-   function Fac{T}() where {T}
-     f = new()
-     f.fac = Dict{T, Int}()
-     return f
-   end
+  function Fac{T}() where {T}
+    f = new()
+    f.fac = Dict{T, Int}()
+    return f
+  end
 end
 
 function Fac(u::T, d::Dict{T, Int}) where {T}
-   f = Fac{T}()
-   f.unit = u
-   f.fac = d
-   return f
+  f = Fac{T}()
+  f.unit = u
+  f.fac = d
+  return f
 end
 
 @doc raw"""
@@ -51,11 +51,11 @@ unit(a::Fac) = a.unit
 Multiply out the factorization into a single element.
 """
 function evaluate(a::Fac)
-   r = a.unit
-   for (p, e) in a
-      r *= p^e
-   end
-   return r
+  r = a.unit
+  for (p, e) in a
+    r *= p^e
+  end
+  return r
 end
 
 ################################################################################
@@ -70,9 +70,9 @@ end
 Test whether $a$ is a factor of $b$.
 """
 function Base.in(a, b::Fac{T}) where {T}
-   # convert is necessary when T == ZZRingElem, because hash on ZZRingElem
-   # doesn't coincide with hash on Integer
-   convert(T, a) in keys(b.fac)
+  # convert is necessary when T == ZZRingElem, because hash on ZZRingElem
+  # doesn't coincide with hash on Integer
+  convert(T, a) in keys(b.fac)
 end
 
 @doc raw"""
@@ -111,21 +111,21 @@ end
 ################################################################################
 
 function expressify(@nospecialize(a::Fac); context = nothing)
-   prod = Expr(:call, :cdot)
-   if isdefined(a, :unit)
-      push!(prod.args, expressify(a.unit, context = context))
-   else
-      push!(prod.args, Expr(:call, :*, "[unit not set]"))
-   end
-   for (p, i) in a.fac
-      ep = expressify(p, context = context)
-      if isone(i)
-         push!(prod.args, ep)
-      else
-         push!(prod.args, Expr(:call, :^, ep, i))
-      end
-   end
-   return prod
+  prod = Expr(:call, :cdot)
+  if isdefined(a, :unit)
+    push!(prod.args, expressify(a.unit, context = context))
+  else
+    push!(prod.args, Expr(:call, :*, "[unit not set]"))
+  end
+  for (p, i) in a.fac
+    ep = expressify(p, context = context)
+    if isone(i)
+      push!(prod.args, ep)
+    else
+      push!(prod.args, Expr(:call, :^, ep, i))
+    end
+  end
+  return prod
 end
 
 @enable_all_show_via_expressify Fac

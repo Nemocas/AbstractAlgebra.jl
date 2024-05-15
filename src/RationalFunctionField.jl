@@ -11,5 +11,5 @@
 ###############################################################################
 
 function rational_function_field(k::Field, s::VarName; cached::Bool=true)
-   return Generic.rational_function_field(k, Symbol(s); cached=cached)
+  return Generic.rational_function_field(k, Symbol(s); cached=cached)
 end

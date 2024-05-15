@@ -16,7 +16,7 @@
 Return the free module over the ring $R$ with the given rank.
 """
 function free_module(R::NCRing, rank::Int; cached::Bool = true)
-   return Generic.FreeModule(R, rank; cached=cached)
+  return Generic.FreeModule(R, rank; cached=cached)
 end
 
 ###############################################################################
@@ -31,5 +31,5 @@ end
 Return the vector space over the field $R$ with the given dimension.
 """
 function vector_space(R::Field, dim::Int; cached::Bool = true)
-   Generic.FreeModule(R, dim; cached=cached)
+  Generic.FreeModule(R, dim; cached=cached)
 end

@@ -11,23 +11,23 @@
 ###############################################################################
 
 function expressify(a::LaurentMPolyRingElem, x = symbols(parent(a)); context = nothing)
-    sum = Expr(:call, :+)
-    n = nvars(parent(a))
-    for (c, v) in zip(coefficients(a), exponent_vectors(a))
-        prod = Expr(:call, :*)
-        if !isone(c)
-            push!(prod.args, expressify(c, context = context))
-        end
-        for i in 1:n
-            if isone(v[i])
-                push!(prod.args, x[i])
-            elseif !iszero(v[i])
-                push!(prod.args, Expr(:call, :^, x[i], v[i]))
-            end
-        end
-        push!(sum.args, prod)
+  sum = Expr(:call, :+)
+  n = nvars(parent(a))
+  for (c, v) in zip(coefficients(a), exponent_vectors(a))
+    prod = Expr(:call, :*)
+    if !isone(c)
+      push!(prod.args, expressify(c, context = context))
     end
-    return sum
+    for i in 1:n
+      if isone(v[i])
+        push!(prod.args, x[i])
+      elseif !iszero(v[i])
+        push!(prod.args, Expr(:call, :^, x[i], v[i]))
+      end
+    end
+    push!(sum.args, prod)
+  end
+  return sum
 end
 
 @enable_all_show_via_expressify LaurentMPolyRingElem
@@ -71,7 +71,7 @@ end
 ###############################################################################
 
 function gens(R::LaurentMPolyRing)
-    return [gen(R, i) for i in 1:nvars(R)]
+  return [gen(R, i) for i in 1:nvars(R)]
 end
 
 ###############################################################################
@@ -81,8 +81,8 @@ end
 ###############################################################################
 
 function derivative(a::LaurentMPolyRingElem{T}, x::LaurentMPolyRingElem{T}) where T <: RingElement
-   check_parent(a, x)
-   return derivative(a, var_index(x))
+  check_parent(a, x)
+  return derivative(a, var_index(x))
 end
 
 ###############################################################################
@@ -92,48 +92,48 @@ end
 ###############################################################################
 
 function RandomExtensions.maketype(S::LaurentMPolyRing, _, _, _)
-    return elem_type(S)
+  return elem_type(S)
 end
 
 function RandomExtensions.make(S::LaurentMPolyRing,
-                               term_range::AbstractUnitRange{Int},
-                               exp_bound::AbstractUnitRange{Int},
-                               vs...)
-   R = base_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, term_range, exp_bound, vs[1])
-   else
-      Make(S, term_range, exp_bound, make(R, vs...))
-   end
+    term_range::AbstractUnitRange{Int},
+    exp_bound::AbstractUnitRange{Int},
+    vs...)
+  R = base_ring(S)
+  if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+    Make(S, term_range, exp_bound, vs[1])
+  else
+    Make(S, term_range, exp_bound, make(R, vs...))
+  end
 end
 
 function rand(rng::AbstractRNG,
-              sp::SamplerTrivial{<:Make4{<:RingElement,
-                                         <:LaurentMPolyRing,
-                                         <:AbstractUnitRange{Int},
-                                         <:AbstractUnitRange{Int}}})
-   S, term_range, exp_bound, v = sp[][1:end]
-   f = zero(S)
-   g = gens(S)
-   R = base_ring(S)
-   for i = 1:rand(rng, term_range)
-      term = one(S)
-      for j = 1:length(g)
-         term *= g[j]^rand(rng, exp_bound)
-      end
-      term *= rand(rng, v)
-      f += term
-   end
-   return f
+    sp::SamplerTrivial{<:Make4{<:RingElement,
+                               <:LaurentMPolyRing,
+                               <:AbstractUnitRange{Int},
+                               <:AbstractUnitRange{Int}}})
+  S, term_range, exp_bound, v = sp[][1:end]
+  f = zero(S)
+  g = gens(S)
+  R = base_ring(S)
+  for i = 1:rand(rng, term_range)
+    term = one(S)
+    for j = 1:length(g)
+      term *= g[j]^rand(rng, exp_bound)
+    end
+    term *= rand(rng, v)
+    f += term
+  end
+  return f
 end
 
 function rand(rng::AbstractRNG, S::LaurentMPolyRing,
-              term_range::AbstractUnitRange{Int}, exp_bound::AbstractUnitRange{Int}, v...)
-   rand(rng, make(S, term_range, exp_bound, v...))
+    term_range::AbstractUnitRange{Int}, exp_bound::AbstractUnitRange{Int}, v...)
+  rand(rng, make(S, term_range, exp_bound, v...))
 end
 
 function rand(S::LaurentMPolyRing, term_range, exp_bound, v...)
-   rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
+  rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
 end
 
 ###############################################################################

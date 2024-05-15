@@ -63,25 +63,25 @@ _checkbounds(i::Int, j::AbstractVector{Int}) = all(jj -> 1 <= jj <= i, j)
 
 function _checkbounds(A, i::Union{Int, AbstractVector{Int}}, j::Union{Int, AbstractVector{Int}})
   (_checkbounds(nrows(A), i) && _checkbounds(ncols(A), j)) ||
-            Base.throw_boundserror(A, (i, j))
+  Base.throw_boundserror(A, (i, j))
 end
 
 function _checkbounds(A, rows::AbstractArray{Int}, cols::AbstractArray{Int})
-   Base.has_offset_axes(rows, cols) && throw(ArgumentError("offset arrays are not supported"))
-   isempty(rows) || _checkbounds(nrows(A), first(rows)) && _checkbounds(nrows(A), last(rows)) ||
-      throw(BoundsError(A, rows))
-   isempty(cols) || _checkbounds(ncols(A), first(cols)) && _checkbounds(ncols(A), last(cols)) ||
-      throw(BoundsError(A, cols))
+  Base.has_offset_axes(rows, cols) && throw(ArgumentError("offset arrays are not supported"))
+  isempty(rows) || _checkbounds(nrows(A), first(rows)) && _checkbounds(nrows(A), last(rows)) ||
+  throw(BoundsError(A, rows))
+  isempty(cols) || _checkbounds(ncols(A), first(cols)) && _checkbounds(ncols(A), last(cols)) ||
+  throw(BoundsError(A, cols))
 end
 
 function check_square(A::MatrixElem{T}) where T <: NCRingElement
-   is_square(A) || throw(DomainError(A, "matrix must be square"))
-   A
+  is_square(A) || throw(DomainError(A, "matrix must be square"))
+  A
 end
 
 function check_square(S::MatSpace)
-   nrows(S) == ncols(S) || throw(DomainError(S, "matrices must be square"))
-   S
+  nrows(S) == ncols(S) || throw(DomainError(S, "matrices must be square"))
+  S
 end
 
 check_square(S::MatRing) = S
@@ -107,14 +107,14 @@ Return the number of columns of the given matrix space.
 number_of_columns(a::MatSpace) = a.ncols
 
 function Base.hash(a::MatElem, h::UInt)
-   b = 0x3e4ea81eb31d94f4%UInt
-   for i in 1:nrows(a)
-      for j in 1:ncols(a)
-         b = xor(b, xor(hash(a[i, j], h), h))
-         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
-      end
-   end
-   return b
+  b = 0x3e4ea81eb31d94f4%UInt
+  for i in 1:nrows(a)
+    for j in 1:ncols(a)
+      b = xor(b, xor(hash(a[i, j], h), h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+    end
+  end
+  return b
 end
 
 @doc raw"""
@@ -148,16 +148,16 @@ isempty(a::MatrixElem{T}) where T <: NCRingElement = (nrows(a) == 0) | (ncols(a)
 Base.eltype(::Type{<:MatrixElem{T}}) where {T <: NCRingElement} = T
 
 function Base.isassigned(a::MatrixElem{T}, i, j) where T <: NCRingElement
-    try
-        a[i, j]
-        true
-    catch e
-        if isa(e, BoundsError) || isa(e, UndefRefError)
-            return false
-        else
-            rethrow()
-        end
+  try
+    a[i, j]
+    true
+  catch e
+    if isa(e, BoundsError) || isa(e, UndefRefError)
+      return false
+    else
+      rethrow()
     end
+  end
 end
 
 @doc raw"""
@@ -180,11 +180,11 @@ zero(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement = zer
 zero(x::MatrixElem{T}, r::Int, c::Int) where T <: NCRingElement = zero(x, base_ring(x), r, c)
 
 function zero!(x::MatrixElem{T}) where T <: NCRingElement
-   R = base_ring(x)
-   for i = 1:nrows(x), j = 1:ncols(x)
-      x[i, j] = zero(R)
-   end
-   x
+  R = base_ring(x)
+  for i = 1:nrows(x), j = 1:ncols(x)
+    x[i, j] = zero(R)
+  end
+  x
 end
 
 @doc raw"""
@@ -204,32 +204,32 @@ not contain square matrices, an error is thrown.
 one(a::MatrixElem{T}) where T <: NCRingElement = identity_matrix(a)
 
 function iszero(a::MatrixElem{T}) where T <: NCRingElement
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if !is_zero_entry(a, i, j)
-            return false
-         end
+  for i = 1:nrows(a)
+    for j = 1:ncols(a)
+      if !is_zero_entry(a, i, j)
+        return false
       end
+    end
   end
   return true
 end
 
 function isone(a::MatrixElem{T}) where T <: NCRingElement
-   is_square(a) || return false
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i == j
-            if !isone(a[i, j])
-               return false
-            end
-         else
-            if !is_zero_entry(a, i, j)
-               return false
-            end
-         end
+  is_square(a) || return false
+  for i = 1:nrows(a)
+    for j = 1:ncols(a)
+      if i == j
+        if !isone(a[i, j])
+          return false
+        end
+      else
+        if !is_zero_entry(a, i, j)
+          return false
+        end
       end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 @doc raw"""
@@ -280,31 +280,31 @@ Create the block diagonal matrix whose blocks are given by the matrices in `V`.
 There must be at least one matrix in V.
 """
 function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
-   length(V) > 0 || error("At least one matrix is required")
-   rows = sum(nrows(N) for N in V)
-   cols = sum(ncols(N) for N in V)
-   R = base_ring(V[1])
-   M = similar(V[1], rows, cols)
-   start_row = 1
-   start_col = 1
-   for i = 1:length(V)
-      end_row = start_row + nrows(V[i]) - 1
-      end_col = start_col + ncols(V[i]) - 1
-      for j = start_row:end_row
-         for k = 1:start_col - 1
-            M[j, k] = zero(R)
-         end
-         for k = start_col:end_col
-            M[j, k] = V[i][j - start_row + 1, k - start_col + 1]
-         end
-         for k = end_col + 1:cols
-            M[j, k] = zero(R)
-         end
+  length(V) > 0 || error("At least one matrix is required")
+  rows = sum(nrows(N) for N in V)
+  cols = sum(ncols(N) for N in V)
+  R = base_ring(V[1])
+  M = similar(V[1], rows, cols)
+  start_row = 1
+  start_col = 1
+  for i = 1:length(V)
+    end_row = start_row + nrows(V[i]) - 1
+    end_col = start_col + ncols(V[i]) - 1
+    for j = start_row:end_row
+      for k = 1:start_col - 1
+        M[j, k] = zero(R)
       end
-      start_row = end_row + 1
-      start_col = end_col + 1
-   end
-   return M
+      for k = start_col:end_col
+        M[j, k] = V[i][j - start_row + 1, k - start_col + 1]
+      end
+      for k = end_col + 1:cols
+        M[j, k] = zero(R)
+      end
+    end
+    start_row = end_row + 1
+    start_col = end_col + 1
+  end
+  return M
 end
 
 @doc raw"""
@@ -314,26 +314,26 @@ Create the block diagonal matrix over the ring `R` whose blocks are given
 by the matrices in `V`. Entries are coerced into `R` upon creation.
 """
 function block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
-   if length(V) == 0
-      return zero_matrix(R, 0, 0)
-   end
-   rows = sum(size(N)[1] for N in V)
-   cols = sum(size(N)[2] for N in V)
-   M = zero_matrix(R, rows, cols)
-   start_row = 1
-   start_col = 1
-   for i = 1:length(V)
-      end_row = start_row + size(V[i])[1] - 1
-      end_col = start_col + size(V[i])[2] - 1
-      for j = start_row:end_row
-         for k = start_col:end_col
-            M[j, k] = R(V[i][j - start_row + 1, k - start_col + 1])
-         end
+  if length(V) == 0
+    return zero_matrix(R, 0, 0)
+  end
+  rows = sum(size(N)[1] for N in V)
+  cols = sum(size(N)[2] for N in V)
+  M = zero_matrix(R, rows, cols)
+  start_row = 1
+  start_col = 1
+  for i = 1:length(V)
+    end_row = start_row + size(V[i])[1] - 1
+    end_col = start_col + size(V[i])[2] - 1
+    for j = start_row:end_row
+      for k = start_col:end_col
+        M[j, k] = R(V[i][j - start_row + 1, k - start_col + 1])
       end
-      start_row = end_row + 1
-      start_col = end_col + 1
-   end
-   return M
+    end
+    start_row = end_row + 1
+    start_col = end_col + 1
+  end
+  return M
 end
 
 ###############################################################################
@@ -343,10 +343,10 @@ end
 ###############################################################################
 
 function _similar(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
-   TT = elem_type(R)
-   M = Matrix{TT}(undef, (r, c))
-   z = x isa MatElem ? Generic.MatSpaceElem{TT}(R, M) : Generic.MatRingElem{TT}(R, M)
-   return z
+  TT = elem_type(R)
+  M = Matrix{TT}(undef, (r, c))
+  z = x isa MatElem ? Generic.MatSpaceElem{TT}(R, M) : Generic.MatRingElem{TT}(R, M)
+  return z
 end
 
 similar(x::MatElem, R::NCRing, r::Int, c::Int) = _similar(x, R, r, c)
@@ -380,68 +380,68 @@ Instead of a vector, `rows` and `cols` can also be:
 * `:`, which is interpreted as `1:nrows(M)` or `1:ncols(M)` respectively.
 """
 function getindex(M::MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
-   _checkbounds(M, rows, cols)
-   A = similar(M, length(rows), length(cols))
-   for i in 1:length(rows)
-      for j in 1:length(cols)
-         A[i, j] = deepcopy(M[rows[i], cols[j]])
-      end
-   end
-   return A
+  _checkbounds(M, rows, cols)
+  A = similar(M, length(rows), length(cols))
+  for i in 1:length(rows)
+    for j in 1:length(cols)
+      A[i, j] = deepcopy(M[rows[i], cols[j]])
+    end
+  end
+  return A
 end
 
 function getindex(M::MatElem, i::Int, cols::AbstractVector{Int})
-   _checkbounds(M, i, cols)
-   A = Vector{elem_type(base_ring(M))}(undef, length(cols))
-   for j in eachindex(cols)
-     A[j] = deepcopy(M[i, cols[j]])
-   end
-   return A
+  _checkbounds(M, i, cols)
+  A = Vector{elem_type(base_ring(M))}(undef, length(cols))
+  for j in eachindex(cols)
+    A[j] = deepcopy(M[i, cols[j]])
+  end
+  return A
 end
 
 function getindex(M::MatElem, rows::AbstractVector{Int}, j::Int)
-   _checkbounds(M, rows, j)
-   A = Vector{elem_type(base_ring(M))}(undef, length(rows))
-   for i in eachindex(rows)
-     A[i] = deepcopy(M[rows[i], j])
-   end
-   return A
- end
+  _checkbounds(M, rows, j)
+  A = Vector{elem_type(base_ring(M))}(undef, length(rows))
+  for i in eachindex(rows)
+    A[i] = deepcopy(M[rows[i], j])
+  end
+  return A
+end
 
 getindex(M::MatElem,
          rows::Union{Int,Colon,AbstractVector{Int}},
          cols::Union{Int,Colon,AbstractVector{Int}}) = M[_to_indices(M, rows, cols)...]
 
 function _to_indices(x, rows, cols)
-   if rows isa Integer
-      rows = rows
-   elseif rows isa Colon
-      rows = 1:nrows(x)
-   end
-   if cols isa Integer
-      cols = cols
-   elseif cols isa Colon
-      cols = 1:ncols(x)
-   end
-   (rows, cols)
+  if rows isa Integer
+    rows = rows
+  elseif rows isa Colon
+    rows = 1:nrows(x)
+  end
+  if cols isa Integer
+    cols = cols
+  elseif cols isa Colon
+    cols = 1:ncols(x)
+  end
+  (rows, cols)
 end
 
 function Base.view(M::MatElem,
-         rows::Union{Int,Colon,AbstractVector{Int}},
-         cols::Union{Int,Colon,AbstractVector{Int}})
-   return view(M, _to_indices(M, rows, cols)...)
+    rows::Union{Int,Colon,AbstractVector{Int}},
+    cols::Union{Int,Colon,AbstractVector{Int}})
+  return view(M, _to_indices(M, rows, cols)...)
 end
 
 Base.firstindex(M::MatrixElem{T}, i::Int) where T <: NCRingElement = 1
 
 function Base.lastindex(M::MatrixElem{T}, i::Int) where T <: NCRingElement
-   if i == 1
-      return nrows(M)
-   elseif i == 2
-      return ncols(M)
-   else
-      error("Dimension in lastindex must be 1 or 2 (got $i)")
-   end
+  if i == 1
+    return nrows(M)
+  elseif i == 2
+    return ncols(M)
+  else
+    error("Dimension in lastindex must be 1 or 2 (got $i)")
+  end
 end
 
 ###############################################################################
@@ -457,48 +457,48 @@ Base.ndims(::MatrixElem{T}) where T <: NCRingElement = 2
 Base.eachindex(a::MatrixElem{T}) where T <: NCRingElement = CartesianIndices((nrows(a), ncols(a)))
 
 Base.@propagate_inbounds Base.getindex(a::MatrixElem{T}, I::CartesianIndex) where T <: NCRingElement =
-   a[I[1], I[2]]
+a[I[1], I[2]]
 
 Base.@propagate_inbounds function Base.setindex!(a::MatrixElem{T}, x, I::CartesianIndex) where T <: NCRingElement
-   a[I[1], I[2]] = x
-   a
+  a[I[1], I[2]] = x
+  a
 end
 
 # linear indexing for row- or column- vectors
 Base.@propagate_inbounds function getindex(M::MatrixElem, i::Integer)
-   if nrows(M) == 1
-      M[1, i]
-   elseif ncols(M) == 1
-      M[i, 1]
-   else
-      throw(ArgumentError("linear indexing not supported for non-vector matrices"))
-   end
+  if nrows(M) == 1
+    M[1, i]
+  elseif ncols(M) == 1
+    M[i, 1]
+  else
+    throw(ArgumentError("linear indexing not supported for non-vector matrices"))
+  end
 end
 
 Base.@propagate_inbounds function setindex!(M::MatrixElem, x, i::Integer)
-   if nrows(M) == 1
-      M[1, i] = x
-      return M
-   elseif ncols(M) == 1
-      M[i, 1] = x
-      return M
-   else
-      throw(ArgumentError("linear indexing not supported for non-vector matrices"))
-   end
+  if nrows(M) == 1
+    M[1, i] = x
+    return M
+  elseif ncols(M) == 1
+    M[i, 1] = x
+    return M
+  else
+    throw(ArgumentError("linear indexing not supported for non-vector matrices"))
+  end
 end
 
 # iteration
 
 function Base.iterate(a::MatrixElem{T}, ij=(0, 1)) where T <: NCRingElement
-   i, j = ij
-   i += 1
-   if i > nrows(a)
-      iszero(nrows(a)) && return nothing
-      i = 1
-      j += 1
-   end
-   j > ncols(a) && return nothing
-   a[i, j], (i, j)
+  i, j = ij
+  i += 1
+  if i > nrows(a)
+    iszero(nrows(a)) && return nothing
+    i = 1
+    j += 1
+  end
+  j > ncols(a) && return nothing
+  a[i, j], (i, j)
 end
 
 Base.IteratorSize(::Type{<:MatrixElem}) = Base.HasShape{2}()
@@ -514,29 +514,29 @@ Base.pairs(::IndexCartesian, M::MatElem) = Base.Iterators.Pairs(M, CartesianIndi
 ###############################################################################
 
 function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: NCRingElement
-    _checkbounds(a, r, c)
-    size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
-    startr = first(r)
-    startc = first(c)
-    for i in r
-        for j in c
-            a[i, j] = b[i - startr + 1, j - startc + 1]
-        end
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
+  startr = first(r)
+  startc = first(c)
+  for i in r
+    for j in c
+      a[i, j] = b[i - startr + 1, j - startc + 1]
     end
+  end
 end
 
 function setindex!(a::MatrixElem{T}, b::Vector, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: NCRingElement
-    _checkbounds(a, r, c)
-    if !((length(r) == 1 && length(c) == length(b)) || length(c) == 1 && length(r) == length(b))
-      throw(DimensionMismatch("tried to assign vector of length $(length(b)) to a $(length(r))x$(length(c)) destination"))
+  _checkbounds(a, r, c)
+  if !((length(r) == 1 && length(c) == length(b)) || length(c) == 1 && length(r) == length(b))
+    throw(DimensionMismatch("tried to assign vector of length $(length(b)) to a $(length(r))x$(length(c)) destination"))
+  end
+  startr = first(r)
+  startc = first(c)
+  for i in r
+    for j in c
+      a[i, j] = b[i - startr + 1 + j - startc]
     end
-    startr = first(r)
-    startc = first(c)
-    for i in r
-        for j in c
-            a[i, j] = b[i - startr + 1 + j - startc]
-        end
-    end
+  end
 end
 
 # AbstractUnitRange{Int}, Colon
@@ -561,19 +561,19 @@ setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, r::Int, ::Colo
 setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix, Vector}, ::Colon, c::Int) where T <: NCRingElement = setindex!(a, b, 1:nrows(a), c:c)
 
 function _setindex!(a::MatrixElem{T}, b, r, c) where T <: NCRingElement
-   for (i, i2) in enumerate(r)
-      for (j, j2) in enumerate(c)
-         a[i2, j2] = b[i, j]
-      end
-   end
+  for (i, i2) in enumerate(r)
+    for (j, j2) in enumerate(c)
+      a[i2, j2] = b[i, j]
+    end
+  end
 end
 
 function _setindex!(a::MatrixElem{T}, b::Vector, r, c) where T <: NCRingElement
-   for (i, i2) in enumerate(r)
-      for (j, j2) in enumerate(c)
-         a[i2, j2] = b[i + j - 1]
-      end
-   end
+  for (i, i2) in enumerate(r)
+    for (j, j2) in enumerate(c)
+      a[i2, j2] = b[i + j - 1]
+    end
+  end
 end
 
 # Vector{Int}, Vector{Int}
@@ -618,25 +618,25 @@ axes(t::MatrixElem{T}, d::Integer) where T <: NCRingElement = Base.OneTo(size(t,
 ###############################################################################
 
 function Base.iterate(M::MatSpace)
-   R = base_ring(M)
-   d = nrows(M) * ncols(M)
-   p = ProductIterator(fill(R, d); inplace=true)
-   if d == 0
-      # handle this carefully to preserve type stability
-      a = elem_type(R)[]
-      state_type = typeof(iterate(R)[2])
-      st = (elem_type(R)[], state_type[])
-   else
-      a, st = iterate(p) # R is presumably not empty
-   end
-   M(a), (p, st)
+  R = base_ring(M)
+  d = nrows(M) * ncols(M)
+  p = ProductIterator(fill(R, d); inplace=true)
+  if d == 0
+    # handle this carefully to preserve type stability
+    a = elem_type(R)[]
+    state_type = typeof(iterate(R)[2])
+    st = (elem_type(R)[], state_type[])
+  else
+    a, st = iterate(p) # R is presumably not empty
+  end
+  M(a), (p, st)
 end
 
 function Base.iterate(M::MatSpace, (p, st))
-   nrows(M) * ncols(M) == 0 && return nothing
-   a_st = iterate(p, st)
-   a_st === nothing && return nothing
-   M(first(a_st)), (p, last(a_st))
+  nrows(M) * ncols(M) == 0 && return nothing
+  a_st = iterate(p, st)
+  a_st === nothing && return nothing
+  M(first(a_st)), (p, last(a_st))
 end
 
 Base.eltype(::Type{M}) where {M<:MatSpace} = elem_type(M)
@@ -649,65 +649,65 @@ Base.length(M::MatSpace) = BigInt(length(base_ring(M)))^(nrows(M)*ncols(M))
 ###############################################################################
 
 function expressify(a::MatrixElem{T}; context = nothing) where T <: NCRingElement
-   r = nrows(a)
-   c = ncols(a)
-   isempty(a) && return "$r by $c empty matrix"
-   mat = Expr(:vcat)
-   for i in 1:r
-      row = Expr(:row)
-      for j in 1:c
-         if isassigned(a, i, j)
-            push!(row.args, expressify(a[i, j], context = context))
-         else
-            push!(row.args,Base.undef_ref_str)
-         end
+  r = nrows(a)
+  c = ncols(a)
+  isempty(a) && return "$r by $c empty matrix"
+  mat = Expr(:vcat)
+  for i in 1:r
+    row = Expr(:row)
+    for j in 1:c
+      if isassigned(a, i, j)
+        push!(row.args, expressify(a[i, j], context = context))
+      else
+        push!(row.args,Base.undef_ref_str)
       end
-      push!(mat.args, row)
-   end
-   return mat
+    end
+    push!(mat.args, row)
+  end
+  return mat
 end
 
 function Base.show(io::IO, a::MatrixElem{T}) where T <: NCRingElement
-   show_via_expressify(io, a)
+  show_via_expressify(io, a)
 end
 
 function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem{T}) where T <: NCRingElement
-   if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-         !AbstractAlgebra.get_html_as_latex()
-      error("Dummy error for jupyter")
-   end
-   show_via_expressify(io, mi, a)
+  if isdefined(Main, :IJulia) && Main.IJulia.inited &&
+    !AbstractAlgebra.get_html_as_latex()
+    error("Dummy error for jupyter")
+  end
+  show_via_expressify(io, mi, a)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: NCRingElement
-   r = nrows(a)
-   c = ncols(a)
+  r = nrows(a)
+  c = ncols(a)
 
-   if isempty(a)
-      print(io, "$r by $c empty matrix")
-      return
-   end
+  if isempty(a)
+    print(io, "$r by $c empty matrix")
+    return
+  end
 
-   # preprint each element to know the widths so as to align the columns
-   strings = String[sprint(print, isassigned(a, i, j) ? a[i, j] : Base.undef_ref_str,
-                           context = :compact => true) for i=1:r, j=1:c]
-   maxs = maximum(length, strings, dims=1)
+  # preprint each element to know the widths so as to align the columns
+  strings = String[sprint(print, isassigned(a, i, j) ? a[i, j] : Base.undef_ref_str,
+                          context = :compact => true) for i=1:r, j=1:c]
+  maxs = maximum(length, strings, dims=1)
 
-   for i = 1:r
-      print(io, "[")
-      for j = 1:c
-         s = strings[i, j]
-         s = ' '^(maxs[j] - length(s)) * s
-         print(io, s)
-         if j != c
-            print(io, "   ")
-         end
+  for i = 1:r
+    print(io, "[")
+    for j = 1:c
+      s = strings[i, j]
+      s = ' '^(maxs[j] - length(s)) * s
+      print(io, s)
+      if j != c
+        print(io, "   ")
       end
-      print(io, "]")
-      if i != r
-         println(io, "")
-      end
-   end
+    end
+    print(io, "]")
+    if i != r
+      println(io, "")
+    end
+  end
 end
 
 function show(io::IO, ::MIME"text/plain", a::MatSpace)
@@ -721,14 +721,14 @@ function show(io::IO, ::MIME"text/plain", a::MatSpace)
 end
 
 function show(io::IO, a::MatSpace)
-   if is_terse(io)
-      print(io, "Matrix space")
-   else
-      io = pretty(io)
-      print(io, "Matrix space of ")
-      print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
-      print(terse(io), Lowercase(), base_ring(a))
-   end
+  if is_terse(io)
+    print(io, "Matrix space")
+  else
+    io = pretty(io)
+    print(io, "Matrix space of ")
+    print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
+    print(terse(io), Lowercase(), base_ring(a))
+  end
 end
 
 ###############################################################################
@@ -738,13 +738,13 @@ end
 ###############################################################################
 
 function -(x::MatrixElem{T}) where T <: NCRingElement
-   z = similar(x)
-   for i in 1:nrows(x)
-      for j in 1:ncols(x)
-         z[i, j] = -x[i, j]
-      end
-   end
-   return z
+  z = similar(x)
+  for i in 1:nrows(x)
+    for j in 1:ncols(x)
+      z[i, j] = -x[i, j]
+    end
+  end
+  return z
 end
 
 ###############################################################################
@@ -754,41 +754,41 @@ end
 ###############################################################################
 
 function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
-   check_parent(x, y)
-   r = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         r[i, j] = x[i, j] + y[i, j]
-      end
-   end
-   return r
+  check_parent(x, y)
+  r = similar(x)
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      r[i, j] = x[i, j] + y[i, j]
+    end
+  end
+  return r
 end
 
 function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
-   check_parent(x, y)
-   r = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         r[i, j] = x[i, j] - y[i, j]
-      end
-   end
-   return r
+  check_parent(x, y)
+  r = similar(x)
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      r[i, j] = x[i, j] - y[i, j]
+    end
+  end
+  return r
 end
 
 function *(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
-   ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
-   A = similar(x, nrows(x), ncols(y))
-   C = base_ring(x)()
-   for i = 1:nrows(x)
-      for j = 1:ncols(y)
-         A[i, j] = base_ring(x)()
-         for k = 1:ncols(x)
-            A[i, j] = addmul_delayed_reduction!(A[i, j], x[i, k], y[k, j], C)
-         end
-         A[i, j] = reduce!(A[i, j])
+  ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
+  A = similar(x, nrows(x), ncols(y))
+  C = base_ring(x)()
+  for i = 1:nrows(x)
+    for j = 1:ncols(y)
+      A[i, j] = base_ring(x)()
+      for k = 1:ncols(x)
+        A[i, j] = addmul_delayed_reduction!(A[i, j], x[i, k], y[k, j], C)
       end
-   end
-   return A
+      A[i, j] = reduce!(A[i, j])
+    end
+  end
+  return A
 end
 
 ###############################################################################
@@ -798,43 +798,43 @@ end
 ###############################################################################
 
 function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
-   z = similar(y)
-   for i = 1:nrows(y)
-      for j = 1:ncols(y)
-         z[i, j] = x*y[i, j]
-      end
-   end
-   return z
+  z = similar(y)
+  for i = 1:nrows(y)
+    for j = 1:ncols(y)
+      z[i, j] = x*y[i, j]
+    end
+  end
+  return z
 end
 
 function *(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
-   z = similar(y)
-   for i = 1:nrows(y)
-      for j = 1:ncols(y)
-         z[i, j] = x*y[i, j]
-      end
-   end
-   return z
+  z = similar(y)
+  for i = 1:nrows(y)
+    for j = 1:ncols(y)
+      z[i, j] = x*y[i, j]
+    end
+  end
+  return z
 end
 
 function *(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
-   z = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         z[i, j] = x[i, j]*y
-      end
-   end
-   return z
+  z = similar(x)
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      z[i, j] = x[i, j]*y
+    end
+  end
+  return z
 end
 
 function *(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
-   z = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         z[i, j] = x[i, j]*y
-      end
-   end
-   return z
+  z = similar(x)
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      z[i, j] = x[i, j]*y
+    end
+  end
+  return z
 end
 
 @doc raw"""
@@ -843,18 +843,18 @@ end
 Return $S(x) + y$ where $S$ is the parent of $y$.
 """
 function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
-   z = similar(y)
-   R = base_ring(y)
-   for i = 1:nrows(y)
-      for j = 1:ncols(y)
-         if i != j
-            z[i, j] = deepcopy(y[i, j])
-         else
-            z[i, j] = y[i, j] + R(x)
-         end
+  z = similar(y)
+  R = base_ring(y)
+  for i = 1:nrows(y)
+    for j = 1:ncols(y)
+      if i != j
+        z[i, j] = deepcopy(y[i, j])
+      else
+        z[i, j] = y[i, j] + R(x)
       end
-   end
-   return z
+    end
+  end
+  return z
 end
 
 @doc raw"""
@@ -870,17 +870,17 @@ Return $x + S(y)$ where $S$ is the parent of $x$.
 Return $S(x) + y$ where $S$ is the parent of $y$.
 """
 function +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
-   z = similar(y)
-   for i = 1:nrows(y)
-      for j = 1:ncols(y)
-         if i != j
-            z[i, j] = deepcopy(y[i, j])
-         else
-            z[i, j] = y[i, j] + x
-         end
+  z = similar(y)
+  for i = 1:nrows(y)
+    for j = 1:ncols(y)
+      if i != j
+        z[i, j] = deepcopy(y[i, j])
+      else
+        z[i, j] = y[i, j] + x
       end
-   end
-   return z
+    end
+  end
+  return z
 end
 
 @doc raw"""
@@ -896,18 +896,18 @@ Return $x + S(y)$ where $S$ is the parent of $x$.
 Return $S(x) - y$ where $S$ is the parent of $y$.
 """
 function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
-   z = similar(y)
-   R = base_ring(y)
-   for i = 1:nrows(y)
-      for j = 1:ncols(y)
-         if i != j
-            z[i, j] = -y[i, j]
-         else
-            z[i, j] = R(x) - y[i, j]
-         end
+  z = similar(y)
+  R = base_ring(y)
+  for i = 1:nrows(y)
+    for j = 1:ncols(y)
+      if i != j
+        z[i, j] = -y[i, j]
+      else
+        z[i, j] = R(x) - y[i, j]
       end
-   end
-   return z
+    end
+  end
+  return z
 end
 
 @doc raw"""
@@ -916,18 +916,18 @@ end
 Return $x - S(y)$, where $S$ is the parent of $x$.
 """
 function -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
-   z = similar(x)
-   R = base_ring(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if i != j
-            z[i, j] = deepcopy(x[i, j])
-         else
-            z[i, j] = x[i, j] - R(y)
-         end
+  z = similar(x)
+  R = base_ring(x)
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      if i != j
+        z[i, j] = deepcopy(x[i, j])
+      else
+        z[i, j] = x[i, j] - R(y)
       end
-   end
-   return z
+    end
+  end
+  return z
 end
 
 @doc raw"""
@@ -936,18 +936,18 @@ end
 Return $S(x) - y$ where $S$ is the parent of $y$.
 """
 function -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
-   z = similar(y)
-   R = base_ring(y)
-   for i = 1:nrows(y)
-      for j = 1:ncols(y)
-         if i != j
-            z[i, j] = -y[i, j]
-         else
-            z[i, j] = x - y[i, j]
-         end
+  z = similar(y)
+  R = base_ring(y)
+  for i = 1:nrows(y)
+    for j = 1:ncols(y)
+      if i != j
+        z[i, j] = -y[i, j]
+      else
+        z[i, j] = x - y[i, j]
       end
-   end
-   return z
+    end
+  end
+  return z
 end
 
 @doc raw"""
@@ -956,62 +956,62 @@ end
 Return $x - S(y)$, where $S$ is the parent of $a$.
 """
 function -(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
-   z = similar(x)
-   R = base_ring(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if i != j
-            z[i, j] = deepcopy(x[i, j])
-         else
-            z[i, j] = x[i, j] - y
-         end
+  z = similar(x)
+  R = base_ring(x)
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      if i != j
+        z[i, j] = deepcopy(x[i, j])
+      else
+        z[i, j] = x[i, j] - y
       end
-   end
-   return z
+    end
+  end
+  return z
 end
 
 function mul!(z::Vector{T}, x::MatrixElem{T}, y::Vector{T}) where T <: NCRingElement
-   n = min(ncols(x), length(y))
-   tmp = base_ring(x)()
-   for i in 1:nrows(x)
-      if n > 0
-         z[i] = mul!(z[i], x[i, 1], y[1])
-         for j in 2:n
-            z[i] = addmul_delayed_reduction!(z[i], x[i, j], y[j], tmp)
-         end
-         z[i] = reduce!(z[i])
-      else
-         z[i] = zero!(z[i])
+  n = min(ncols(x), length(y))
+  tmp = base_ring(x)()
+  for i in 1:nrows(x)
+    if n > 0
+      z[i] = mul!(z[i], x[i, 1], y[1])
+      for j in 2:n
+        z[i] = addmul_delayed_reduction!(z[i], x[i, j], y[j], tmp)
       end
-   end
-   return z
+      z[i] = reduce!(z[i])
+    else
+      z[i] = zero!(z[i])
+    end
+  end
+  return z
 end
 
 function *(x::MatrixElem{T}, y::Vector{T}) where T <: NCRingElement
-   ncols(x) == length(y) || error("Incompatible dimensions")
-   return mul!(T[base_ring(x)() for i in 1:nrows(x)], x, y)
+  ncols(x) == length(y) || error("Incompatible dimensions")
+  return mul!(T[base_ring(x)() for i in 1:nrows(x)], x, y)
 end
 
 function mul!(z::Vector{T}, x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
-   m = min(length(x), nrows(y))
-   tmp = base_ring(y)()
-   for j in 1:ncols(y)
-      if m > 0
-         z[j] = mul!(z[j], x[1], y[1, j])
-         for i in 2:m
-            z[j] = addmul_delayed_reduction!(z[j], x[i], y[i, j], tmp)
-         end
-         z[j] = reduce!(z[j])
-      else
-         z[j] = zero!(z[j])
+  m = min(length(x), nrows(y))
+  tmp = base_ring(y)()
+  for j in 1:ncols(y)
+    if m > 0
+      z[j] = mul!(z[j], x[1], y[1, j])
+      for i in 2:m
+        z[j] = addmul_delayed_reduction!(z[j], x[i], y[i, j], tmp)
       end
-   end
-   return z
+      z[j] = reduce!(z[j])
+    else
+      z[j] = zero!(z[j])
+    end
+  end
+  return z
 end
 
 function *(x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
-   length(x) == nrows(y) || error("Incompatible dimensions")
-   return mul!(T[base_ring(y)() for j in 1:ncols(y)], x, y)
+  length(x) == nrows(y) || error("Incompatible dimensions")
+  return mul!(T[base_ring(y)() for j in 1:ncols(y)], x, y)
 end
 
 ################################################################################
@@ -1021,16 +1021,16 @@ end
 ################################################################################
 
 function Base.promote(x::MatrixElem{S},
-                      y::MatrixElem{T}) where {S <: NCRingElement,
-                                               T <: NCRingElement}
-   U = promote_rule_sym(S, T)
-   if U === S
-      return x, change_base_ring(base_ring(x), y)
-   elseif U === T
-      return change_base_ring(base_ring(y), x), y
-   else
-      error("Cannot promote to common type")
-   end
+    y::MatrixElem{T}) where {S <: NCRingElement,
+                             T <: NCRingElement}
+  U = promote_rule_sym(S, T)
+  if U === S
+    return x, change_base_ring(base_ring(x), y)
+  elseif U === T
+    return change_base_ring(base_ring(y), x), y
+  else
+    error("Cannot promote to common type")
+  end
 end
 
 *(x::MatElem, y::MatElem) = *(promote(x, y)...)
@@ -1043,23 +1043,23 @@ end
 
 # matrix * vec and vec * matrx
 function Base.promote(x::MatrixElem{S},
-                      y::Vector{T}) where {S <: NCRingElement,
-                                               T <: NCRingElement}
-   U = promote_rule_sym(S, T)
-   if U === S
-      return x, map(base_ring(x), y)
-   elseif U === T && length(y) != 0
-      return change_base_ring(parent(y[1]), x), y
-   else
-      error("Cannot promote to common type")
-   end
+    y::Vector{T}) where {S <: NCRingElement,
+                         T <: NCRingElement}
+  U = promote_rule_sym(S, T)
+  if U === S
+    return x, map(base_ring(x), y)
+  elseif U === T && length(y) != 0
+    return change_base_ring(parent(y[1]), x), y
+  else
+    error("Cannot promote to common type")
+  end
 end
 
 function Base.promote(x::Vector{S},
-                      y::MatrixElem{T}) where {S <: NCRingElement,
-                                               T <: NCRingElement}
-   yy, xx = promote(y, x)
-   return xx, yy
+    y::MatrixElem{T}) where {S <: NCRingElement,
+                             T <: NCRingElement}
+  yy, xx = promote(y, x)
+  return xx, yy
 end
 
 *(x::MatrixElem, y::Vector) = *(promote(x, y)...)
@@ -1067,17 +1067,17 @@ end
 *(x::Vector, y::MatrixElem) = *(promote(x, y)...)
 
 function Base.promote(x::MatElem{S}, y::T) where {S <: NCRingElement, T <: NCRingElement}
-   U = promote_rule_sym(S, T)
-   if U === S
-      return x, base_ring(x)(y)
-   else
-      error("Cannot promote to common type")
-   end
+  U = promote_rule_sym(S, T)
+  if U === S
+    return x, base_ring(x)(y)
+  else
+    error("Cannot promote to common type")
+  end
 end
 
 function Base.promote(x::S, y::MatElem{T}) where {S <: NCRingElement, T <: NCRingElement}
-   u, v = Base.promote(y, x)
-   return v, u
+  u, v = Base.promote(y, x)
+  return v, u
 end
 
 *(x::MatElem, y::NCRingElem) = *(promote(x, y)...)
@@ -1093,13 +1093,13 @@ end
 ==(x::NCRingElem, y::MatElem) = ==(promote(x, y)...)
 
 divexact(x::MatElem, y::NCRingElem; check::Bool = true) =
-    divexact(promote(x, y)...; check = check)
+divexact(promote(x, y)...; check = check)
 
 divexact_left(x::MatElem, y::NCRingElem; check::Bool = true) =
-    divexact_left(promote(x, y)...; check = check)
+divexact_left(promote(x, y)...; check = check)
 
 divexact_right(x::MatElem, y::NCRingElem; check::Bool = true) =
-    divexact_right(promote(x, y)...; check = check)
+divexact_right(promote(x, y)...; check = check)
 
 ###############################################################################
 #
@@ -1115,31 +1115,31 @@ Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: NCRingElement, T <:
 Return $a^b$. We require that the matrix $a$ is square.
 """
 function ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
-   !is_square(a) && error("Incompatible matrix dimensions in power")
-   if b < 0
-      return inv(a)^(-b)
-   end
-   # special case powers of x for constructing polynomials efficiently
-   if b == 0
-      return identity_matrix(a)
-   elseif b == 1
-      return deepcopy(a)
-   else
-      bit = ~((~UInt(0)) >> 1)
-      while (UInt(bit) & b) == 0
-         bit >>= 1
-      end
-      z = a
+  !is_square(a) && error("Incompatible matrix dimensions in power")
+  if b < 0
+    return inv(a)^(-b)
+  end
+  # special case powers of x for constructing polynomials efficiently
+  if b == 0
+    return identity_matrix(a)
+  elseif b == 1
+    return deepcopy(a)
+  else
+    bit = ~((~UInt(0)) >> 1)
+    while (UInt(bit) & b) == 0
       bit >>= 1
-      while bit != 0
-         z = z*z
-         if (UInt(bit) & b) != 0
-            z *= a
-         end
-         bit >>= 1
+    end
+    z = a
+    bit >>= 1
+    while bit != 0
+      z = z*z
+      if (UInt(bit) & b) != 0
+        z *= a
       end
-      return z
-   end
+      bit >>= 1
+    end
+    return z
+  end
 end
 
 ###############################################################################
@@ -1156,16 +1156,16 @@ that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
 function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
-   b = check_parent(x, y, false)
-   !b && return false
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if x[i, j] != y[i, j]
-            return false
-         end
+  b = check_parent(x, y, false)
+  !b && return false
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      if x[i, j] != y[i, j]
+        return false
       end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 @doc raw"""
@@ -1177,16 +1177,16 @@ series. Only if the power series are precisely the same, to the same precision,
 are they declared equal by this function.
 """
 function isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
-   b = check_parent(x, y, false)
-   !b && return false
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if !isequal(x[i, j], y[i, j])
-            return false
-         end
+  b = check_parent(x, y, false)
+  !b && return false
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      if !isequal(x[i, j], y[i, j])
+        return false
       end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 ###############################################################################
@@ -1202,19 +1202,19 @@ Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 otherwise return `false`.
 """
 function ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
-   for i = 1:min(nrows(x), ncols(x))
-      if x[i, i] != y
-         return false
+  for i = 1:min(nrows(x), ncols(x))
+    if x[i, i] != y
+      return false
+    end
+  end
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      if i != j && !is_zero_entry(x, i, j)
+        return false
       end
-   end
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if i != j && !is_zero_entry(x, i, j)
-            return false
-         end
-      end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 @doc raw"""
@@ -1232,19 +1232,19 @@ Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 otherwise return `false`.
 """
 function ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
-   for i = 1:min(nrows(x), ncols(x))
-      if x[i, i] != y
-         return false
+  for i = 1:min(nrows(x), ncols(x))
+    if x[i, i] != y
+      return false
+    end
+  end
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      if i != j && !is_zero_entry(x, i, j)
+        return false
       end
-   end
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if i != j && !is_zero_entry(x, i, j)
-            return false
-         end
-      end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 @doc raw"""
@@ -1262,43 +1262,43 @@ otherwise return `false`.
 ###############################################################################
 
 function divexact(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true) where T <: NCRingElement
-   z = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         z[i, j] = divexact(x[i, j], y; check=check)
-      end
-   end
-   return z
+  z = similar(x)
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      z[i, j] = divexact(x[i, j], y; check=check)
+    end
+  end
+  return z
 end
 
 function divexact(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: RingElem}
-   z = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         z[i, j] = divexact(x[i, j], y; check=check)
-      end
-   end
-   return z
+  z = similar(x)
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      z[i, j] = divexact(x[i, j], y; check=check)
+    end
+  end
+  return z
 end
 
 function divexact_left(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
-   z = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         z[i, j] = divexact_left(x[i, j], y; check=check)
-      end
-   end
-   return z
+  z = similar(x)
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      z[i, j] = divexact_left(x[i, j], y; check=check)
+    end
+  end
+  return z
 end
 
 function divexact_right(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
-   z = similar(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         z[i, j] = divexact_right(x[i, j], y; check=check)
-      end
-   end
-   return z
+  z = similar(x)
+  for i = 1:nrows(x)
+    for j = 1:ncols(x)
+      z[i, j] = divexact_right(x[i, j], y; check=check)
+    end
+  end
+  return z
 end
 
 ###############################################################################
@@ -1336,12 +1336,12 @@ false
 ```
 """
 function is_symmetric(M::MatrixElem)
-   n = nrows(M)
-   n == ncols(M) || return false
-   for i in 2:n, j in 1:i-1
-      M[i, j] == M[j, i] || return false
-   end
-   return true
+  n = nrows(M)
+  n == ncols(M) || return false
+  for i in 2:n, j in 1:i-1
+    M[i, j] == M[j, i] || return false
+  end
+  return true
 end
 
 
@@ -1382,20 +1382,20 @@ transpose(x::MatrixElem{T}) where T <: NCRingElement
 ###############################################################################
 
 function kronecker_product(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
-    base_ring(parent(x)) == base_ring(parent(y)) || error("Incompatible matrix spaces in matrix operation")
-    z = similar(x, nrows(x)*nrows(y), ncols(x)*ncols(y))
-    for ix in 1:nrows(x)
-       ixr = (ix - 1)*nrows(y)
-       for jx in 1:ncols(x)
-          jxc = (jx - 1)*ncols(y)
-          for iy in 1:nrows(y)
-             for jy in 1:ncols(y)
-               z[ixr + iy, jxc + jy] = x[ix, jx]*y[iy, jy]
-             end
-          end
-       end
+  base_ring(parent(x)) == base_ring(parent(y)) || error("Incompatible matrix spaces in matrix operation")
+  z = similar(x, nrows(x)*nrows(y), ncols(x)*ncols(y))
+  for ix in 1:nrows(x)
+    ixr = (ix - 1)*nrows(y)
+    for jx in 1:ncols(x)
+      jxc = (jx - 1)*ncols(y)
+      for iy in 1:nrows(y)
+        for jy in 1:ncols(y)
+          z[ixr + iy, jxc + jy] = x[ix, jx]*y[iy, jy]
+        end
+      end
     end
-    return z
+  end
+  return z
 end
 
 ###############################################################################
@@ -1434,16 +1434,16 @@ julia> B = gram(A)
 ```
 """
 function gram(x::MatElem)
-   z = similar(x, nrows(x), nrows(x))
-   for i = 1:nrows(x)
-      for j = 1:nrows(x)
-         z[i, j] = zero(base_ring(x))
-         for k = 1:ncols(x)
-            z[i, j] += x[i, k] * x[j, k]
-         end
+  z = similar(x, nrows(x), nrows(x))
+  for i = 1:nrows(x)
+    for j = 1:nrows(x)
+      z[i, j] = zero(base_ring(x))
+      for k = 1:ncols(x)
+        z[i, j] += x[i, k] * x[j, k]
       end
-   end
-   return z
+    end
+  end
+  return z
 end
 
 ###############################################################################
@@ -1479,12 +1479,12 @@ t^2 + 3*t + 2
 ```
 """
 function tr(x::MatrixElem{T}) where T <: NCRingElement
-   !is_square(x) && error("Not a square matrix in trace")
-   d = zero(base_ring(x))
-   for i = 1:nrows(x)
-      d = addeq!(d, x[i, i])
-   end
-   return d
+  !is_square(x) && error("Not a square matrix in trace")
+  d = zero(base_ring(x))
+  for i = 1:nrows(x)
+    d = addeq!(d, x[i, i])
+  end
+  return d
 end
 
 ###############################################################################
@@ -1522,12 +1522,12 @@ julia> b = content(A)
 function content(x::MatrixElem{T}) where T <: RingElement
   d = zero(base_ring(x))
   for i = 1:nrows(x)
-     for j = 1:ncols(x)
-        d = gcd(d, x[i, j])
-        if isone(d)
-           return d
-        end
-     end
+    for j = 1:ncols(x)
+      d = gcd(d, x[i, j])
+      if isone(d)
+        return d
+      end
+    end
   end
   return d
 end
@@ -1572,15 +1572,15 @@ julia> B = P*A
 ```
 """
 function *(P::Perm, x::MatrixElem{T}) where T <: NCRingElement
-   z = similar(x)
-   m = nrows(x)
-   n = ncols(x)
-   for i = 1:m
-      for j = 1:n
-         z[P[i], j] = x[i, j]
-      end
-   end
-   return z
+  z = similar(x)
+  m = nrows(x)
+  n = ncols(x)
+  for i = 1:m
+    for j = 1:n
+      z[P[i], j] = x[i, j]
+    end
+  end
+  return z
 end
 
 @doc raw"""
@@ -1617,15 +1617,15 @@ julia> B = A*P
 ```
 """
 function *(x::MatrixElem{T}, P::Perm) where T <: NCRingElement
-   z = similar(x)
-   m = nrows(x)
-   n = ncols(x)
-   for i = 1:m
-      for j = 1:n
-         z[i, P[j]] = x[i, j]
-      end
-   end
-   return z
+  z = similar(x)
+  m = nrows(x)
+  n = ncols(x)
+  for i = 1:m
+    for j = 1:n
+      z[i, P[j]] = x[i, j]
+    end
+  end
+  return z
 end
 
 ###############################################################################
@@ -1635,59 +1635,59 @@ end
 ###############################################################################
 
 function lu!(P::Perm, A::MatrixElem{T}) where {T <: FieldElement}
-   m = nrows(A)
-   n = ncols(A)
-   rank = 0
-   r = 1
-   c = 1
-   R = base_ring(A)
-   t = R()
-   while r <= m && c <= n
-      if c != 1
-         # reduction of lower right square was delayed, reduce left col now
-         for i = r:m
-            A[i, c] = reduce!(A[i, c])
-         end
+  m = nrows(A)
+  n = ncols(A)
+  rank = 0
+  r = 1
+  c = 1
+  R = base_ring(A)
+  t = R()
+  while r <= m && c <= n
+    if c != 1
+      # reduction of lower right square was delayed, reduce left col now
+      for i = r:m
+        A[i, c] = reduce!(A[i, c])
       end
-      if is_zero_entry(A, r, c)
-         i = r + 1
-         while i <= m
-            if !is_zero_entry(A, i, c)
-               for j = 1:n
-                  A[i, j], A[r, j] = A[r, j], A[i, j]
-               end
-               P[r], P[i] = P[i], P[r]
-               break
-            end
-            i += 1
-         end
-         if i > m
-            c += 1
-            continue
-         end
+    end
+    if is_zero_entry(A, r, c)
+      i = r + 1
+      while i <= m
+        if !is_zero_entry(A, i, c)
+          for j = 1:n
+            A[i, j], A[r, j] = A[r, j], A[i, j]
+          end
+          P[r], P[i] = P[i], P[r]
+          break
+        end
+        i += 1
       end
-      rank += 1
-      d = -inv(A[r, c])
-      # reduction of lower right square was delayed, reduce top row now
-      if c != 1
-         for j = c + 1:n
-            A[r, j] = reduce!(A[r, j])
-         end
+      if i > m
+        c += 1
+        continue
       end
-      for i = r + 1:m
-         q = A[i, c]*d
-         for j = c + 1:n
-            t = mul_red!(t, A[r, j], q, false)
-            A[i, j] = addeq!(A[i, j], t)
-         end
-         A[i, c] = R()
-         A[i, rank] = -q
+    end
+    rank += 1
+    d = -inv(A[r, c])
+    # reduction of lower right square was delayed, reduce top row now
+    if c != 1
+      for j = c + 1:n
+        A[r, j] = reduce!(A[r, j])
       end
-      r += 1
-      c += 1
-   end
-   inv!(P)
-   return rank
+    end
+    for i = r + 1:m
+      q = A[i, c]*d
+      for j = c + 1:n
+        t = mul_red!(t, A[r, j], q, false)
+        A[i, j] = addeq!(A[i, j], t)
+      end
+      A[i, c] = R()
+      A[i, rank] = -q
+    end
+    r += 1
+    c += 1
+  end
+  inv!(P)
+  return rank
 end
 
 @doc raw"""
@@ -1699,145 +1699,145 @@ triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
 matrix whose rows are the given permutation $p$ of the rows of $A$.
 """
 function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
-   m = nrows(A)
-   n = ncols(A)
-   P.n != m && error("Permutation does not match matrix")
-   p = one(P)
-   R = base_ring(A)
-   U = deepcopy(A)
-   L = similar(A, m, m)
-   rank = lu!(p, U)
-   for i = 1:m
-      for j = 1:n
-         if i > j
-            L[i, j] = U[i, j]
-            U[i, j] = R()
-         elseif i == j
-            L[i, j] = one(R)
-         elseif j <= m
-            L[i, j] = R()
-         end
+  m = nrows(A)
+  n = ncols(A)
+  P.n != m && error("Permutation does not match matrix")
+  p = one(P)
+  R = base_ring(A)
+  U = deepcopy(A)
+  L = similar(A, m, m)
+  rank = lu!(p, U)
+  for i = 1:m
+    for j = 1:n
+      if i > j
+        L[i, j] = U[i, j]
+        U[i, j] = R()
+      elseif i == j
+        L[i, j] = one(R)
+      elseif j <= m
+        L[i, j] = R()
       end
-   end
-   for i = 1:m
-      for j = n + 1:m
-         L[i, j] = R()
-      end
-   end
-   return rank, p, L, U
+    end
+  end
+  for i = 1:m
+    for j = n + 1:m
+      L[i, j] = R()
+    end
+  end
+  return rank, p, L, U
 end
 
 function fflu!(P::Perm, A::MatrixElem{T}) where {T <: RingElement}
-   if !is_domain_type(T)
-      error("Not implemented")
-   end
-   m = nrows(A)
-   n = ncols(A)
-   rank = 0
-   r = 1
-   c = 1
-   R = base_ring(A)
-   d = one(R)
-   d2 = one(R)
-   if m == 0 || n == 0
-      return 0, d
-   end
-   t = R()
-   while r <= m && c <= n
-      if is_zero_entry(A, r, c)
-         i = r + 1
-         while i <= m
-            if !is_zero_entry(A, i, c)
-               for j = 1:n
-                  A[i, j], A[r, j] = A[r, j], A[i, j]
-               end
-               P[r], P[i] = P[i], P[r]
-               break
-            end
-            i += 1
-         end
-         if i > m
-            c += 1
-            continue
-         end
+  if !is_domain_type(T)
+    error("Not implemented")
+  end
+  m = nrows(A)
+  n = ncols(A)
+  rank = 0
+  r = 1
+  c = 1
+  R = base_ring(A)
+  d = one(R)
+  d2 = one(R)
+  if m == 0 || n == 0
+    return 0, d
+  end
+  t = R()
+  while r <= m && c <= n
+    if is_zero_entry(A, r, c)
+      i = r + 1
+      while i <= m
+        if !is_zero_entry(A, i, c)
+          for j = 1:n
+            A[i, j], A[r, j] = A[r, j], A[i, j]
+          end
+          P[r], P[i] = P[i], P[r]
+          break
+        end
+        i += 1
       end
-      rank += 1
-      q = -A[r, c]
-      for i = r + 1:m
-         for j = c + 1:n
-            A[i, j] = mul_red!(A[i, j], A[i, j], q, false)
-            t = mul_red!(t, A[i, c], A[r, j], false)
-            A[i, j] = addeq!(A[i, j], t)
-            A[i, j] = reduce!(A[i, j])
-            if r > 1
-               A[i, j] = divexact(A[i, j], d)
-            else
-               A[i, j] = -A[i, j]
-            end
-         end
+      if i > m
+        c += 1
+        continue
       end
-      d = -A[r, c]
-      d2 = A[r, c]
-      r += 1
-      c += 1
-   end
-   inv!(P)
-   return rank, d2
+    end
+    rank += 1
+    q = -A[r, c]
+    for i = r + 1:m
+      for j = c + 1:n
+        A[i, j] = mul_red!(A[i, j], A[i, j], q, false)
+        t = mul_red!(t, A[i, c], A[r, j], false)
+        A[i, j] = addeq!(A[i, j], t)
+        A[i, j] = reduce!(A[i, j])
+        if r > 1
+          A[i, j] = divexact(A[i, j], d)
+        else
+          A[i, j] = -A[i, j]
+        end
+      end
+    end
+    d = -A[r, c]
+    d2 = A[r, c]
+    r += 1
+    c += 1
+  end
+  inv!(P)
+  return rank, d2
 end
 
 function fflu!(P::Perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResElem}}
-   m = nrows(A)
-   n = ncols(A)
-   rank = 0
-   r = 1
-   c = 1
-   R = base_ring(A)
-   d = one(R)
-   d2 = one(R)
-   if m == 0 || n == 0
-      return 0, d
-   end
-   t = R()
-   while r <= m && c <= n
-      if is_zero_entry(A, r, c)
-         i = r + 1
-         while i <= m
-            if !is_zero_entry(A, i, c)
-               for j = 1:n
-                  A[i, j], A[r, j] = A[r, j], A[i, j]
-               end
-               P[r], P[i] = P[i], P[r]
-               break
-            end
-            i += 1
-         end
-         if i > m
-            c += 1
-            continue
-         end
+  m = nrows(A)
+  n = ncols(A)
+  rank = 0
+  r = 1
+  c = 1
+  R = base_ring(A)
+  d = one(R)
+  d2 = one(R)
+  if m == 0 || n == 0
+    return 0, d
+  end
+  t = R()
+  while r <= m && c <= n
+    if is_zero_entry(A, r, c)
+      i = r + 1
+      while i <= m
+        if !is_zero_entry(A, i, c)
+          for j = 1:n
+            A[i, j], A[r, j] = A[r, j], A[i, j]
+          end
+          P[r], P[i] = P[i], P[r]
+          break
+        end
+        i += 1
       end
-      rank += 1
-      q = -A[r, c]
-      for i = r + 1:m
-         for j = c + 1:n
-            A[i, j] = mul_red!(A[i, j], A[i, j], q, false)
-            t = mul_red!(t, A[i, c], A[r, j], false)
-            A[i, j] = addeq!(A[i, j], t)
-            A[i, j] = reduce!(A[i, j])
-            if r > 1
-               A[i, j] = mul!(A[i, j], A[i, j], d)
-            else
-               A[i, j] = -A[i, j]
-            end
-         end
+      if i > m
+        c += 1
+        continue
       end
-      d = -inv(A[r, c])
-      d2 = A[r, c]
-      r += 1
-      c += 1
-   end
-   inv!(P)
-   return rank, d2
+    end
+    rank += 1
+    q = -A[r, c]
+    for i = r + 1:m
+      for j = c + 1:n
+        A[i, j] = mul_red!(A[i, j], A[i, j], q, false)
+        t = mul_red!(t, A[i, c], A[r, j], false)
+        A[i, j] = addeq!(A[i, j], t)
+        A[i, j] = reduce!(A[i, j])
+        if r > 1
+          A[i, j] = mul!(A[i, j], A[i, j], d)
+        else
+          A[i, j] = -A[i, j]
+        end
+      end
+    end
+    d = -inv(A[r, c])
+    d2 = A[r, c]
+    r += 1
+    c += 1
+  end
+  inv!(P)
+  return rank, d2
 end
 
 @doc raw"""
@@ -1855,45 +1855,45 @@ $A$ is square and nonsingular) and the sign is decided by the parity of the
 permutation.
 """
 function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
-   m = nrows(A)
-   n = ncols(A)
-   P.n != m && error("Permutation does not match matrix")
-   p = one(P)
-   R = base_ring(A)
-   U = deepcopy(A)
-   L = similar(A, m, m)
-   rank, d = fflu!(p, U)
-   i = 1
-   j = 1
-   k = 1
-   while i <= m && j <= n
-      if !is_zero_entry(U, i, j)
-         L[i, k] = U[i, j]
-         for l = 1:i - 1
-            L[l, k] = 0
-         end
-         for l = i + 1:m
-            L[l, k] = U[l, j]
-            U[l, j] = 0
-         end
-         i += 1
-         k += 1
+  m = nrows(A)
+  n = ncols(A)
+  P.n != m && error("Permutation does not match matrix")
+  p = one(P)
+  R = base_ring(A)
+  U = deepcopy(A)
+  L = similar(A, m, m)
+  rank, d = fflu!(p, U)
+  i = 1
+  j = 1
+  k = 1
+  while i <= m && j <= n
+    if !is_zero_entry(U, i, j)
+      L[i, k] = U[i, j]
+      for l = 1:i - 1
+        L[l, k] = 0
       end
-      j += 1
-   end
-
-   while k <= m
-      for l = 1:k - 1
-         L[l, k] = 0
+      for l = i + 1:m
+        L[l, k] = U[l, j]
+        U[l, j] = 0
       end
-      L[k, k] = 1
-      for l = k + 1: m
-         L[l, k] = 0
-      end
+      i += 1
       k += 1
-   end
+    end
+    j += 1
+  end
 
-   return rank, d, p, L, U
+  while k <= m
+    for l = 1:k - 1
+      L[l, k] = 0
+    end
+    L[k, k] = 1
+    for l = k + 1: m
+      L[l, k] = 0
+    end
+    k += 1
+  end
+
+  return rank, d, p, L, U
 end
 
 ###############################################################################
@@ -1903,59 +1903,59 @@ end
 ###############################################################################
 
 function rref_rational!(A::MatrixElem{T}) where {T <: RingElement}
-   m = nrows(A)
-   n = ncols(A)
-   R = base_ring(A)
-   P = one(SymmetricGroup(m))
-   rank, d = fflu!(P, A)
-   for i = rank + 1:m
-      for j = 1:n
-         A[i, j] = R()
+  m = nrows(A)
+  n = ncols(A)
+  R = base_ring(A)
+  P = one(SymmetricGroup(m))
+  rank, d = fflu!(P, A)
+  for i = rank + 1:m
+    for j = 1:n
+      A[i, j] = R()
+    end
+  end
+  if rank > 1
+    t = R()
+    q = R()
+    d = -d
+    pivots = zeros(Int, n)
+    np = rank
+    j = k = 1
+    for i = 1:rank
+      while is_zero_entry(A, i, j)
+        pivots[np + k] = j
+        j += 1
+        k += 1
       end
-   end
-   if rank > 1
-      t = R()
-      q = R()
-      d = -d
-      pivots = zeros(Int, n)
-      np = rank
-      j = k = 1
-      for i = 1:rank
-         while is_zero_entry(A, i, j)
-            pivots[np + k] = j
-            j += 1
-            k += 1
-         end
-         pivots[i] = j
-         j += 1
+      pivots[i] = j
+      j += 1
+    end
+    while k <= n - rank
+      pivots[np + k] = j
+      j += 1
+      k += 1
+    end
+    for k = 1:n - rank
+      for i = rank - 1:-1:1
+        t = mul_red!(t, A[i, pivots[np + k]], d, false)
+        for j = i + 1:rank
+          t = addmul_delayed_reduction!(t, A[i, pivots[j]], A[j, pivots[np + k]], q)
+        end
+        t = reduce!(t)
+        A[i, pivots[np + k]] = divexact(-t, A[i, pivots[i]])
       end
-      while k <= n - rank
-         pivots[np + k] = j
-         j += 1
-         k += 1
+    end
+    d = -d
+    for i = 1:rank
+      for j = 1:rank
+        if i == j
+          A[j, pivots[i]] = d
+        else
+          A[j, pivots[i]] = R()
+        end
       end
-      for k = 1:n - rank
-         for i = rank - 1:-1:1
-            t = mul_red!(t, A[i, pivots[np + k]], d, false)
-            for j = i + 1:rank
-               t = addmul_delayed_reduction!(t, A[i, pivots[j]], A[j, pivots[np + k]], q)
-            end
-            t = reduce!(t)
-            A[i, pivots[np + k]] = divexact(-t, A[i, pivots[i]])
-         end
-      end
-      d = -d
-      for i = 1:rank
-         for j = 1:rank
-            if i == j
-               A[j, pivots[i]] = d
-            else
-               A[j, pivots[i]] = R()
-            end
-         end
-      end
-   end
-   return rank, d
+    end
+  end
+  return rank, d
 end
 
 @doc raw"""
@@ -1967,69 +1967,69 @@ the reduced row echelon form of $M$. Note that the denominator is not usually
 minimal.
 """
 function rref_rational(M::MatrixElem{T}) where {T <: RingElement}
-   A = deepcopy(M)
-   r, d = rref_rational!(A)
-   return r, A, d
+  A = deepcopy(M)
+  r, d = rref_rational!(A)
+  return r, A, d
 end
 
 function rref!(A::MatrixElem{T}) where {T <: FieldElement}
-   m = nrows(A)::Int
-   n = ncols(A)::Int
-   R = base_ring(A)
-   P = one(SymmetricGroup(m))
-   rnk = lu!(P, A)
-   if rnk == 0
-      return 0
-   end
-   for i = 1:m
-      for j = 1:min(rnk, i - 1)
-         A[i, j] = R()
-      end
-   end
-   U = zero_matrix(R, rnk, rnk)
-   V = zero_matrix(R, rnk, n - rnk)
-   pivots = zeros(Int, n)
-   np = rnk
-   j = k = 1
-   for i = 1:rnk
-      while is_zero_entry(A, i, j)
-         pivots[np + k] = j
-         j += 1
-         k += 1
-      end
-      pivots[i] = j
-      j += 1
-   end
-   while k <= n - rnk
+  m = nrows(A)::Int
+  n = ncols(A)::Int
+  R = base_ring(A)
+  P = one(SymmetricGroup(m))
+  rnk = lu!(P, A)
+  if rnk == 0
+    return 0
+  end
+  for i = 1:m
+    for j = 1:min(rnk, i - 1)
+      A[i, j] = R()
+    end
+  end
+  U = zero_matrix(R, rnk, rnk)
+  V = zero_matrix(R, rnk, n - rnk)
+  pivots = zeros(Int, n)
+  np = rnk
+  j = k = 1
+  for i = 1:rnk
+    while is_zero_entry(A, i, j)
       pivots[np + k] = j
       j += 1
       k += 1
-   end
-   for i = 1:rnk
-      for j = 1:i
-         U[j, i] = A[j, pivots[i]]
-      end
-      for j = i + 1:rnk
-         U[j, i] = R()
-      end
-   end
-   for i = 1:n - rnk
-      for j = 1:rnk
-         V[j, i] = A[j, pivots[np + i]]
-      end
-   end
-   V = _solve_triu(U, V, false)
-   for i = 1:rnk
-      for j = 1:i
-         A[j, pivots[i]] = i == j ? one(R) : R()
-      end
-   end
-   for i = 1:n - rnk
-      for j = 1:rnk
-         A[j, pivots[np + i]] = V[j, i]
-      end
-   end
-   return rnk
+    end
+    pivots[i] = j
+    j += 1
+  end
+  while k <= n - rnk
+    pivots[np + k] = j
+    j += 1
+    k += 1
+  end
+  for i = 1:rnk
+    for j = 1:i
+      U[j, i] = A[j, pivots[i]]
+    end
+    for j = i + 1:rnk
+      U[j, i] = R()
+    end
+  end
+  for i = 1:n - rnk
+    for j = 1:rnk
+      V[j, i] = A[j, pivots[np + i]]
+    end
+  end
+  V = _solve_triu(U, V, false)
+  for i = 1:rnk
+    for j = 1:i
+      A[j, pivots[i]] = i == j ? one(R) : R()
+    end
+  end
+  for i = 1:n - rnk
+    for j = 1:rnk
+      A[j, pivots[np + i]] = V[j, i]
+    end
+  end
+  return rnk
 end
 
 @doc raw"""
@@ -2039,9 +2039,9 @@ Return a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a reduced row
 echelon form $A$ of $M$.
 """
 function rref(M::MatrixElem{T}) where {T <: FieldElement}
-   A = deepcopy(M)
-   r = rref!(A)
-   return r, A
+  A = deepcopy(M)
+  r = rref!(A)
+  return r, A
 end
 
 @doc raw"""
@@ -2051,27 +2051,27 @@ Return `true` if $M$ is in reduced row echelon form, otherwise return
 `false`.
 """
 function is_rref(M::MatrixElem{T}) where {T <: RingElement}
-   m = nrows(M)
-   n = ncols(M)
-   c = 1
-   for r = 1:m
-      for i = 1:c - 1
-         if !is_zero_entry(M, r, i)
-            return false
-         end
+  m = nrows(M)
+  n = ncols(M)
+  c = 1
+  for r = 1:m
+    for i = 1:c - 1
+      if !is_zero_entry(M, r, i)
+        return false
       end
-      while c <= n && is_zero_entry(M, r, c)
-         c += 1
+    end
+    while c <= n && is_zero_entry(M, r, c)
+      c += 1
+    end
+    if c <= n
+      for i = 1:r - 1
+        if !is_zero_entry(M, i, c)
+          return false
+        end
       end
-      if c <= n
-         for i = 1:r - 1
-            if !is_zero_entry(M, i, c)
-               return false
-            end
-         end
-      end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 @doc raw"""
@@ -2081,30 +2081,30 @@ Return `true` if $M$ is in reduced row echelon form, otherwise return
 `false`.
 """
 function is_rref(M::MatrixElem{T}) where {T <: FieldElement}
-   m = nrows(M)
-   n = ncols(M)
-   c = 1
-   for r = 1:m
-      for i = 1:c - 1
-         if !is_zero_entry(M, r, i)
-            return false
-         end
+  m = nrows(M)
+  n = ncols(M)
+  c = 1
+  for r = 1:m
+    for i = 1:c - 1
+      if !is_zero_entry(M, r, i)
+        return false
       end
-      while c <= n && is_zero_entry(M, r, c)
-         c += 1
+    end
+    while c <= n && is_zero_entry(M, r, c)
+      c += 1
+    end
+    if c <= n
+      if !isone(M[r, c])
+        return false
       end
-      if c <= n
-         if !isone(M[r, c])
-            return false
-         end
-         for i = 1:r - 1
-            if !is_zero_entry(M, i, c)
-               return false
-            end
-         end
+      for i = 1:r - 1
+        if !is_zero_entry(M, i, c)
+          return false
+        end
       end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 # Reduce row m of the matrix A, assuming the first m - 1 rows are in Gauss
@@ -2119,84 +2119,84 @@ end
 # the number of columns of A. The entries of L must be monotonic increasing.
 
 function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) where {T <: FieldElement}
-   R = base_ring(A)
-   n = ncols(A)
-   t = R()
-   for i = 1:n
-      # reduction of row was delayed, reduce next element now
-      if i != 1
-         A[m, i] = reduce!(A[m, i])
+  R = base_ring(A)
+  n = ncols(A)
+  t = R()
+  for i = 1:n
+    # reduction of row was delayed, reduce next element now
+    if i != 1
+      A[m, i] = reduce!(A[m, i])
+    end
+    if !is_zero_entry(A, m, i)
+      h = -A[m, i]
+      r = P[i]
+      if r != 0
+        A[m, i] = R()
+        for j = i + 1:L[r]
+          t = mul_red!(t, A[r, j], h, false)
+          A[m, j] = addeq!(A[m, j], t)
+        end
+      else
+        # reduce remainder of row for return
+        for j = i + 1:L[m]
+          A[m, j] = reduce!(A[m, j])
+        end
+        h = inv(A[m, i])
+        A[m, i] = one(R)
+        for j = i + 1:L[m]
+          A[m, j] = mul!(A[m, j], A[m, j], h)
+        end
+        P[i] = m
+        return i
       end
-      if !is_zero_entry(A, m, i)
-         h = -A[m, i]
-         r = P[i]
-         if r != 0
-            A[m, i] = R()
-            for j = i + 1:L[r]
-               t = mul_red!(t, A[r, j], h, false)
-               A[m, j] = addeq!(A[m, j], t)
-            end
-         else
-            # reduce remainder of row for return
-            for j = i + 1:L[m]
-               A[m, j] = reduce!(A[m, j])
-            end
-            h = inv(A[m, i])
-            A[m, i] = one(R)
-            for j = i + 1:L[m]
-               A[m, j] = mul!(A[m, j], A[m, j], h)
-            end
-            P[i] = m
-            return i
-         end
-      end
-   end
-   return 0
+    end
+  end
+  return 0
 end
 
 function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) where {T <: RingElement}
-   R = base_ring(A)
-   n = ncols(A)
-   t = R()
-   c = one(R)
-   c1 = 0
-   for i = 1:n
-      if !is_zero_entry(A, m, i)
-         h = -A[m, i]
-         r = P[i]
-         if r != 0
-            d = A[r, i]
-            A[m, i] = R()
-            for j = i + 1:L[r]
-               t = mul_red!(t, A[r, j], h, false)
-               A[m, j] = mul_red!(A[m, j], A[m, j], d, false)
-               A[m, j] = addeq!(A[m, j], t)
-               A[m, j] = reduce!(A[m, j])
-            end
-            for j = L[r] + 1:L[m]
-               A[m, j] = mul!(A[m, j], A[m, j], d)
-            end
-            if c1 > 0 && P[c1] < P[i]
-               for j = i + 1:L[m]
-                  A[m, j] = divexact(A[m, j], c)
-               end
-            end
-            c1 = i
-            c = d
-         else
-            P[i] = m
-            return i
-         end
+  R = base_ring(A)
+  n = ncols(A)
+  t = R()
+  c = one(R)
+  c1 = 0
+  for i = 1:n
+    if !is_zero_entry(A, m, i)
+      h = -A[m, i]
+      r = P[i]
+      if r != 0
+        d = A[r, i]
+        A[m, i] = R()
+        for j = i + 1:L[r]
+          t = mul_red!(t, A[r, j], h, false)
+          A[m, j] = mul_red!(A[m, j], A[m, j], d, false)
+          A[m, j] = addeq!(A[m, j], t)
+          A[m, j] = reduce!(A[m, j])
+        end
+        for j = L[r] + 1:L[m]
+          A[m, j] = mul!(A[m, j], A[m, j], d)
+        end
+        if c1 > 0 && P[c1] < P[i]
+          for j = i + 1:L[m]
+            A[m, j] = divexact(A[m, j], c)
+          end
+        end
+        c1 = i
+        c = d
       else
-         r = P[i]
-         if r != 0
-            for j = i + 1:L[m]
-               A[m, j] = mul!(A[m, j], A[m, j], A[r, i])
-            end
-         end
+        P[i] = m
+        return i
       end
-   end
-   return 0
+    else
+      r = P[i]
+      if r != 0
+        for j = i + 1:L[m]
+          A[m, j] = mul!(A[m, j], A[m, j], A[r, i])
+        end
+      end
+    end
+  end
+  return 0
 end
 
 ###############################################################################
@@ -2206,83 +2206,83 @@ end
 ###############################################################################
 
 function det_clow(M::MatrixElem{T}) where {T <: RingElement}
-   R = base_ring(M)
-   n = nrows(M)
-   if n == 0
-      return one(R)
-   end
-   A = Matrix{T}(undef, n, n)
-   B = Matrix{T}(undef, n, n)
-   C = R()
-   for i = 1:n
-      for j = 1:n
-         A[i, j] = i == j ? one(R) : zero(R)
-         B[i, j] = R()
-      end
-   end
-   for k = 1:n - 1
-      for i = 1:n
-         for j = 1:i
-            if !iszero(A[i, j])
-               for m = j + 1:n
-                  C = mul!(C, A[i, j], M[i, m])
-                  B[m, j] = addeq!(B[m, j], C)
-               end
-               for m = j + 1:n
-                  C = mul!(C, A[i, j], M[i, j])
-                  B[m, m] = addeq!(B[m, m], -C)
-               end
-            end
-         end
-      end
-      Temp = A
-      A = B
-      B = Temp
-      if k != n - 1
-         for i = 1:n
-            for j = 1:i
-               B[i, j] = R()
-            end
-         end
-      end
-   end
-   D = R()
-   for i = 1:n
+  R = base_ring(M)
+  n = nrows(M)
+  if n == 0
+    return one(R)
+  end
+  A = Matrix{T}(undef, n, n)
+  B = Matrix{T}(undef, n, n)
+  C = R()
+  for i = 1:n
+    for j = 1:n
+      A[i, j] = i == j ? one(R) : zero(R)
+      B[i, j] = R()
+    end
+  end
+  for k = 1:n - 1
+    for i = 1:n
       for j = 1:i
-         if !iszero(A[i, j])
-            D -= A[i, j]*M[i, j]
-         end
+        if !iszero(A[i, j])
+          for m = j + 1:n
+            C = mul!(C, A[i, j], M[i, m])
+            B[m, j] = addeq!(B[m, j], C)
+          end
+          for m = j + 1:n
+            C = mul!(C, A[i, j], M[i, j])
+            B[m, m] = addeq!(B[m, m], -C)
+          end
+        end
       end
-   end
-   return isodd(n) ? -D : D
+    end
+    Temp = A
+    A = B
+    B = Temp
+    if k != n - 1
+      for i = 1:n
+        for j = 1:i
+          B[i, j] = R()
+        end
+      end
+    end
+  end
+  D = R()
+  for i = 1:n
+    for j = 1:i
+      if !iszero(A[i, j])
+        D -= A[i, j]*M[i, j]
+      end
+    end
+  end
+  return isodd(n) ? -D : D
 end
 
 function det_df(M::MatrixElem{T}) where {T <: RingElement}
-   R = base_ring(M)
-   S = PolyRing(R)
-   n = nrows(M)
-   p = charpoly(S, M)
-   d = coeff(p, 0)
-   return isodd(n) ? -d : d
+  R = base_ring(M)
+  S = PolyRing(R)
+  n = nrows(M)
+  p = charpoly(S, M)
+  d = coeff(p, 0)
+  return isodd(n) ? -d : d
 end
 
 function det_fflu(M::MatrixElem{T}) where {T <: RingElement}
-   n = nrows(M)
-   if n == 0
-      return base_ring(M)()
-   end
-   A = deepcopy(M)
-   P = one(SymmetricGroup(n))
-   r, d = fflu!(P, A)
-   return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
+  n = nrows(M)
+  if n == 0
+    return base_ring(M)()
+  end
+  A = deepcopy(M)
+  P = one(SymmetricGroup(n))
+  r, d = fflu!(P, A)
+  return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
 
 function det(M::MatrixElem{T}) where {T <: FieldElement}
-   !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
-   return det_fflu(M)
+  !is_square(M) && error("Not a square matrix in det")
+  if nrows(M) == 0
+    return one(base_ring(M))
+  end
+  return det_fflu(M)
 end
 
 @doc raw"""
@@ -2303,73 +2303,73 @@ x^3 - 1
 ```
 """
 function det(M::MatrixElem{T}) where {T <: RingElement}
-   !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
-   try
-      return det_fflu(M)
-   catch
-      return det_df(M)
-   end
+  !is_square(M) && error("Not a square matrix in det")
+  if nrows(M) == 0
+    return one(base_ring(M))
+  end
+  try
+    return det_fflu(M)
+  catch
+    return det_df(M)
+  end
 end
 
 function det_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
-   n = nrows(M)
-   !is_domain_type(elem_type(base_ring(base_ring(M)))) &&
-          error("Generic interpolation requires a domain type")
-   R = base_ring(M)
-   if n == 0
-      return R()
-   end
-   maxlen = 0
-   for i = 1:n
-      for j = 1:n
-         maxlen = max(maxlen, length(M[i, j]))
+  n = nrows(M)
+  !is_domain_type(elem_type(base_ring(base_ring(M)))) &&
+  error("Generic interpolation requires a domain type")
+  R = base_ring(M)
+  if n == 0
+    return R()
+  end
+  maxlen = 0
+  for i = 1:n
+    for j = 1:n
+      maxlen = max(maxlen, length(M[i, j]))
+    end
+  end
+  if maxlen == 0
+    return R()
+  end
+  bound = n*(maxlen - 1) + 1
+  x = Vector{elem_type(base_ring(R))}(undef, bound)
+  d = Vector{elem_type(base_ring(R))}(undef, bound)
+  X = zero_matrix(base_ring(R), n, n)
+  b2 = div(bound, 2)
+  pt1 = base_ring(R)(1 - b2)
+  for i = 1:bound
+    x[i] = base_ring(R)(i - b2)
+    (x[i] == pt1 && i != 1) && error("Not enough interpolation points in ring")
+    for j = 1:n
+      for k = 1:n
+        X[j, k] = evaluate(M[j, k], x[i])
       end
-   end
-   if maxlen == 0
-      return R()
-   end
-   bound = n*(maxlen - 1) + 1
-   x = Vector{elem_type(base_ring(R))}(undef, bound)
-   d = Vector{elem_type(base_ring(R))}(undef, bound)
-   X = zero_matrix(base_ring(R), n, n)
-   b2 = div(bound, 2)
-   pt1 = base_ring(R)(1 - b2)
-   for i = 1:bound
-      x[i] = base_ring(R)(i - b2)
-      (x[i] == pt1 && i != 1) && error("Not enough interpolation points in ring")
-      for j = 1:n
-         for k = 1:n
-            X[j, k] = evaluate(M[j, k], x[i])
-         end
-      end
-      d[i] = det(X)
-   end
-   return interpolate(R, x, d)
+    end
+    d[i] = det(X)
+  end
+  return interpolate(R, x, d)
 end
 
 function det(M::MatrixElem{T}) where {S <: FinFieldElem, T <: PolyRingElem{S}}
-   !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
-   return det_popov(M)
+  !is_square(M) && error("Not a square matrix in det")
+  if nrows(M) == 0
+    return one(base_ring(M))
+  end
+  return det_popov(M)
 end
 
 function det(M::MatrixElem{T}) where {T <: PolyRingElem}
-   !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
-   try
-      return det_interpolation(M)
-   catch
-      # no point trying fflu, since it probably fails
-      # for same reason as det_interpolation
-      return det_df(M)
-   end
+  !is_square(M) && error("Not a square matrix in det")
+  if nrows(M) == 0
+    return one(base_ring(M))
+  end
+  try
+    return det_interpolation(M)
+  catch
+    # no point trying fflu, since it probably fails
+    # for same reason as det_interpolation
+    return det_df(M)
+  end
 end
 
 ###############################################################################
@@ -2391,18 +2391,18 @@ combinations(n::Int, k::Int) = combinations(1:n, k)
 Return an array consisting of k-combinations of a given vector v as arrays.
 """
 function combinations(v::AbstractVector{T}, k::Int) where T
-   n = length(v)
-   ans = Vector{T}[]
-   k > n && return ans
-   _combinations_dfs!(ans, Vector{T}(undef, k), v, n, k)
-   return ans
+  n = length(v)
+  ans = Vector{T}[]
+  k > n && return ans
+  _combinations_dfs!(ans, Vector{T}(undef, k), v, n, k)
+  return ans
 end
 function _combinations_dfs!(ans::Vector{Vector{T}}, comb::Vector{T}, v::AbstractVector{T}, n::Int, k::Int) where T
-   k < 1 && (pushfirst!(ans, comb[:]); return)
-   for m in n:-1:k
-      comb[k] = v[m]
-      _combinations_dfs!(ans, comb, v, m - 1, k - 1)
-   end
+  k < 1 && (pushfirst!(ans, comb[:]); return)
+  for m in n:-1:k
+    comb[k] = v[m]
+    _combinations_dfs!(ans, comb, v, m - 1, k - 1)
+  end
 end
 
 @doc raw"""
@@ -2426,15 +2426,15 @@ julia> minors(A, 2)
 ```
 """
 function minors(A::MatElem, k::Int)
-   row_indices = combinations(nrows(A), k)
-   col_indices = combinations(ncols(A), k)
-   mins = Vector{elem_type(base_ring(A))}(undef, 0)
-   for ri in row_indices
-      for ci in col_indices
-         push!(mins, det(A[ri, ci]))
-      end
-   end
-   return(mins)
+  row_indices = combinations(nrows(A), k)
+  col_indices = combinations(ncols(A), k)
+  mins = Vector{elem_type(base_ring(A))}(undef, 0)
+  for ri in row_indices
+    for ci in col_indices
+      push!(mins, det(A[ri, ci]))
+    end
+  end
+  return(mins)
 end
 
 @doc raw"""
@@ -2457,12 +2457,12 @@ function exterior_power(A::MatElem, k::Int)
   ri = combinations(nrows(A), k)
   n = length(ri)
   res = similar(A, n, n)
-   for i in 1:n
-     for j in 1:n
-       res[i, j] = det(A[ri[i], ri[j]])
-     end
-   end
-   return res 
+  for i in 1:n
+    for j in 1:n
+      res[i, j] = det(A[ri[i], ri[j]])
+    end
+  end
+  return res 
 end
 
 ###############################################################################
@@ -2490,17 +2490,17 @@ true
 ```
 """
 function is_skew_symmetric(M::MatrixElem)
-   n = nrows(M)
-   n == ncols(M) || return false
-   for i in 1:n, j in 1:i
-      M[i, j] == -M[j, i] || return false
-   end
-   return true
+  n = nrows(M)
+  n == ncols(M) || return false
+  for i in 1:n, j in 1:i
+    M[i, j] == -M[j, i] || return false
+  end
+  return true
 end
 
 function check_skew_symmetric(M::MatElem)
-   is_skew_symmetric(M) || throw(DomainError(M, "matrix must be skew-symmetric"))
-   return M
+  is_skew_symmetric(M) || throw(DomainError(M, "matrix must be skew-symmetric"))
+  return M
 end
 
 @doc raw"""
@@ -2509,16 +2509,16 @@ end
 Return the Pfaffian of a skew-symmetric matrix `M`.
 """
 function pfaffian(M::MatElem)
-   check_skew_symmetric(M)
-   # when the matrix is big, try use the BFL algorithm
-   if ncols(M) > 10
-      try
-         return pfaffian_bfl_bsgs(M)
-      catch
-      end
-   end
-   # fallback to using recursion
-   return pfaffian_r(M)
+  check_skew_symmetric(M)
+  # when the matrix is big, try use the BFL algorithm
+  if ncols(M) > 10
+    try
+      return pfaffian_bfl_bsgs(M)
+    catch
+    end
+  end
+  # fallback to using recursion
+  return pfaffian_r(M)
 end
 
 @doc raw"""
@@ -2527,121 +2527,121 @@ end
 Return a vector consisting of the `k`-Pfaffians of a skew-symmetric matrix `M`.
 """
 function pfaffians(M::MatElem, k::Int)
-   check_skew_symmetric(M)
-   indices = combinations(ncols(M), k)
-   pfs = elem_type(base_ring(M))[]
-   for i in indices
-      push!(pfs, pfaffian(M[i, i]))
-   end
-   return pfs
+  check_skew_symmetric(M)
+  indices = combinations(ncols(M), k)
+  pfs = elem_type(base_ring(M))[]
+  for i in indices
+    push!(pfs, pfaffian(M[i, i]))
+  end
+  return pfs
 end
 
 # using recursion
 pfaffian_r(M::MatElem) = _pfaffian(M, collect(1:ncols(M)), ncols(M))
 
 function _pfaffian(M::MatElem, idx::Vector{Int}, k::Int)
-   R = base_ring(M)
-   k == 0 && return one(R)
-   isodd(k) && return R()
-   k == 2 && return M[idx[1], idx[2]]
-   ans = R()
-   sig = false
-   for i in k - 1:-1:1
-      idx[i], idx[k - 1] = idx[k - 1], idx[i]
-      sig = !sig
-      g = M[idx[k - 1], idx[k]]
-      if !iszero(g)
-         ans = (sig ? (+) : (-))(ans, g * _pfaffian(M, idx, k - 2))
-      end
-   end
-   x = idx[k - 1]
-   deleteat!(idx, k - 1)
-   pushfirst!(idx, x) # restore idx
-   return ans
+  R = base_ring(M)
+  k == 0 && return one(R)
+  isodd(k) && return R()
+  k == 2 && return M[idx[1], idx[2]]
+  ans = R()
+  sig = false
+  for i in k - 1:-1:1
+    idx[i], idx[k - 1] = idx[k - 1], idx[i]
+    sig = !sig
+    g = M[idx[k - 1], idx[k]]
+    if !iszero(g)
+      ans = (sig ? (+) : (-))(ans, g * _pfaffian(M, idx, k - 2))
+    end
+  end
+  x = idx[k - 1]
+  deleteat!(idx, k - 1)
+  pushfirst!(idx, x) # restore idx
+  return ans
 end
 
 # using the algorithm of Baer-Faddeev-LeVerrier
 # the base ring of M should allow divisions of small integers
 # (specifically, 2,4,6,...,n).
 function pfaffian_bfl(M::MatElem)
-   R = base_ring(M)
-   n = ncols(M)
-   characteristic(R) == 0 || characteristic(R) > n || throw(DomainError(M, "base ring must allow divisions of small integers"))
-   n == 0 && return one(R)
-   isodd(n) && return R()
-   n == 2 && return M[1, 2]
-   N = deepcopy(M)
-   for i in 1:2:n
-      for j in 1:n
-         N[j, i], N[j, i + 1] = N[j, i + 1], -N[j, i]
-      end
-   end
-   P = deepcopy(N)
-   half_n = div(n, 2)
-   for i in 1:half_n - 1
-      P -= inv(R(2i)) * tr(P)
-      P *= N
-   end
-   return (-1)^(half_n + 1) * inv(R(n)) * tr(P)
+  R = base_ring(M)
+  n = ncols(M)
+  characteristic(R) == 0 || characteristic(R) > n || throw(DomainError(M, "base ring must allow divisions of small integers"))
+  n == 0 && return one(R)
+  isodd(n) && return R()
+  n == 2 && return M[1, 2]
+  N = deepcopy(M)
+  for i in 1:2:n
+    for j in 1:n
+      N[j, i], N[j, i + 1] = N[j, i + 1], -N[j, i]
+    end
+  end
+  P = deepcopy(N)
+  half_n = div(n, 2)
+  for i in 1:half_n - 1
+    P -= inv(R(2i)) * tr(P)
+    P *= N
+  end
+  return (-1)^(half_n + 1) * inv(R(n)) * tr(P)
 end
 
 function trace_of_prod(M::MatElem, N::MatElem)
-   is_square(M) && is_square(N) || error("Not a square matrix in trace")
-   d = zero(base_ring(M))
-   for i = 1:nrows(M)
-      d += (M[i:i, :] * N[:, i:i])[1, 1]
-   end
-   return d
+  is_square(M) && is_square(N) || error("Not a square matrix in trace")
+  d = zero(base_ring(M))
+  for i = 1:nrows(M)
+    d += (M[i:i, :] * N[:, i:i])[1, 1]
+  end
+  return d
 end
 
 # use baby-step giant-step
 # see https://arxiv.org/abs/2011.12573
 function pfaffian_bfl_bsgs(M::MatElem)
-   R = base_ring(M)
-   n = ncols(M)
-   characteristic(R) == 0 || characteristic(R) > n || throw(DomainError(M, "base ring must allow divisions of small integers"))
-   n == 0 && return one(R)
-   isodd(n) && return zero(R)
-   n == 2 && return M[1, 2]
-   N = deepcopy(M)
-   for i in 1:2:n
-      for j in 1:n
-         N[j, i], N[j, i + 1] = N[j, i + 1], -N[j, i]
-      end
-   end
+  R = base_ring(M)
+  n = ncols(M)
+  characteristic(R) == 0 || characteristic(R) > n || throw(DomainError(M, "base ring must allow divisions of small integers"))
+  n == 0 && return one(R)
+  isodd(n) && return zero(R)
+  n == 2 && return M[1, 2]
+  N = deepcopy(M)
+  for i in 1:2:n
+    for j in 1:n
+      N[j, i], N[j, i + 1] = N[j, i + 1], -N[j, i]
+    end
+  end
 
-   # precompute the powers of N and their traces
-   m = isqrt(n)
-   N_power = [N]
-   for i in 1:m - 1
-      push!(N_power, N_power[end] * N)
-   end
-   t = tr.(N_power)
+  # precompute the powers of N and their traces
+  m = isqrt(n)
+  N_power = [N]
+  for i in 1:m - 1
+    push!(N_power, N_power[end] * N)
+  end
+  t = tr.(N_power)
 
-   P = identity_matrix(R, n)
-   c = Vector{elem_type(R)}(undef, m)
-   i = 1
-   half_n = div(n, 2)
-   while i <= half_n - 1
-      m = min(m, half_n - i)
-      # compute the coefficient c[m - j] before each N^j
-      for j in 1:m
-         # when i = 1, P = Id, so tr(N^j) is already known
-         c[j] = (i == 1) ? t[j] : trace_of_prod(N_power[j], P)
-         for k in 1:j - 1
-            c[j] += t[k] * c[j - k]
-         end
-         c[j] *= -inv(R(2(i + j - 1)))
+  P = identity_matrix(R, n)
+  c = Vector{elem_type(R)}(undef, m)
+  i = 1
+  half_n = div(n, 2)
+  while i <= half_n - 1
+    m = min(m, half_n - i)
+    # compute the coefficient c[m - j] before each N^j
+    for j in 1:m
+      # when i = 1, P = Id, so tr(N^j) is already known
+      c[j] = (i == 1) ? t[j] : trace_of_prod(N_power[j], P)
+      for k in 1:j - 1
+        c[j] += t[k] * c[j - k]
       end
-      P *= N_power[m]
-      for j in 1:m - 1
-         P += c[m - j] * N_power[j]
-      end
-      P += c[m]
-      i += m
-   end
+      c[j] *= -inv(R(2(i + j - 1)))
+    end
+    P *= N_power[m]
+    for j in 1:m - 1
+      P += c[m - j] * N_power[j]
+    end
+    P += c[m]
+    i += m
+  end
 
-   return (-1)^(half_n + 1) * inv(R(n)) * trace_of_prod(N, P)
+  return (-1)^(half_n + 1) * inv(R(n)) * trace_of_prod(N, P)
 end
 
 ###############################################################################
@@ -2665,24 +2665,24 @@ julia> d = rank(A)
 ```
 """
 function rank(M::MatrixElem{T}) where {T <: RingElement}
-   n = nrows(M)
-   if n == 0
-      return 0
-   end
-   A = deepcopy(M)
-   P = one(SymmetricGroup(n))
-   r, d = fflu!(P, A)
-   return r
+  n = nrows(M)
+  if n == 0
+    return 0
+  end
+  A = deepcopy(M)
+  P = one(SymmetricGroup(n))
+  r, d = fflu!(P, A)
+  return r
 end
 
 function rank(M::MatrixElem{T}) where {T <: FieldElement}
-   n = nrows(M)
-   if n == 0
-      return 0
-   end
-   A = deepcopy(M)
-   P = one(SymmetricGroup(n))
-   return lu!(P, A)
+  n = nrows(M)
+  if n == 0
+    return 0
+  end
+  A = deepcopy(M)
+  P = one(SymmetricGroup(n))
+  return lu!(P, A)
 end
 
 ###############################################################################
@@ -2702,20 +2702,20 @@ end
 # triangular matrix L instead of removing columns (and corresponding rows of
 # the upper triangular matrix U). We also set free variables to zero.
 function _can_solve_with_solution_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   base_ring(A) != base_ring(b) && error("Base rings don't match in _can_solve_with_solution_fflu")
-   nrows(A) != nrows(b) && error("Dimensions don't match in _can_solve_with_solution_fflu")
-   FFLU = deepcopy(A)
-   p = one(SymmetricGroup(nrows(A)))
-   rank, d = fflu!(p, FFLU)
-   flag, y = _solve_fflu_precomp(p, FFLU, b)
-   n = nrows(A)
-   if flag && rank < n
-      b2 = p*b
-      A2 = p*A
-      A3 = A2[rank + 1:n, :]
-      flag = A3*y == b2[rank + 1:n, :]*d
-   end
-   return flag, y, d
+  base_ring(A) != base_ring(b) && error("Base rings don't match in _can_solve_with_solution_fflu")
+  nrows(A) != nrows(b) && error("Dimensions don't match in _can_solve_with_solution_fflu")
+  FFLU = deepcopy(A)
+  p = one(SymmetricGroup(nrows(A)))
+  rank, d = fflu!(p, FFLU)
+  flag, y = _solve_fflu_precomp(p, FFLU, b)
+  n = nrows(A)
+  if flag && rank < n
+    b2 = p*b
+    A2 = p*A
+    A3 = A2[rank + 1:n, :]
+    flag = A3*y == b2[rank + 1:n, :]*d
+  end
+  return flag, y, d
 end
 
 # Given a fraction free LU decomposition `LdU` of `p(A)` over an integral
@@ -2725,88 +2725,88 @@ end
 # be. If `r` is the rank of `A` then the first `r` rows of `p(A)y = p(b)d` will
 # hold iff `flag` is `true`. The remaining rows must be checked by the caller.
 function _solve_fflu_precomp(p::Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   x = p * b
-   n = nrows(x)
-   m = ncols(x)
-   R = base_ring(FFLU)
-   c = ncols(FFLU)
-   t = base_ring(b)()
-   s = base_ring(b)()
-   minus_one = R(-1)
-   y = similar(x, c, m)
-   diag = Vector{elem_type(R)}(undef, n)
-   piv = Vector{Int}(undef, n)
+  x = p * b
+  n = nrows(x)
+  m = ncols(x)
+  R = base_ring(FFLU)
+  c = ncols(FFLU)
+  t = base_ring(b)()
+  s = base_ring(b)()
+  minus_one = R(-1)
+  y = similar(x, c, m)
+  diag = Vector{elem_type(R)}(undef, n)
+  piv = Vector{Int}(undef, n)
 
-   rnk = 0
-   l = 0
-   for i = 1:n
+  rnk = 0
+  l = 0
+  for i = 1:n
+    l += 1
+    while l <= c && is_zero_entry(FFLU, i, l)
       l += 1
-      while l <= c && is_zero_entry(FFLU, i, l)
-         l += 1
-      end
-      piv[i] = l
-      if l <= c
-         diag[i] = FFLU[i, l]
-         rnk += 1
-      end
-   end
+    end
+    piv[i] = l
+    if l <= c
+      diag[i] = FFLU[i, l]
+      rnk += 1
+    end
+  end
 
-   for k in 1:m
-      for i in 1:(n - 1)
-         t = mul!(t, x[i, k], minus_one)
-         for j in (i + 1):n
-            if i <= c && piv[i] <= c
-               if i == 1
-                  x[j, k] = mul_red!(R(), x[j, k], diag[i], false)
-               else
-                  x[j, k] = mul_red!(x[j, k], x[j, k], diag[i], false)
-               end
-            else
-               x[j, k] = deepcopy(x[j, k])
-            end
-            if i <= c && piv[i] <= c
-               s = mul_red!(s, FFLU[j, piv[i]], t, false)
-               x[j, k] = addeq!(x[j, k], s)
-            end
-            x[j, k] = reduce!(x[j, k])
-            if i > 1
-               if i <= c && piv[i - 1] <= c
-                  flag, x[j, k] = divides(x[j, k], diag[i - 1])
-                  if !flag
-                     return false, x
-                  end
-               end
-            end
-         end
-      end
-
-      l = rnk
-      for i in c:-1:1
-         if l > 0 && i == piv[l]
-            if rnk != 0
-               y[i, k] = x[l, k]*diag[rnk]
-            else
-               y[i, k] = deepcopy(x[l, k])
-            end
-            for j in (piv[l] + 1):c
-               t = mul!(t, y[j, k], FFLU[l, j])
-               t = mul!(t, t, minus_one)
-               y[i, k] = addeq!(y[i, k], t)
-            end
-
-            flag, y[i, k] = divides(y[i, k], diag[l])
+  for k in 1:m
+    for i in 1:(n - 1)
+      t = mul!(t, x[i, k], minus_one)
+      for j in (i + 1):n
+        if i <= c && piv[i] <= c
+          if i == 1
+            x[j, k] = mul_red!(R(), x[j, k], diag[i], false)
+          else
+            x[j, k] = mul_red!(x[j, k], x[j, k], diag[i], false)
+          end
+        else
+          x[j, k] = deepcopy(x[j, k])
+        end
+        if i <= c && piv[i] <= c
+          s = mul_red!(s, FFLU[j, piv[i]], t, false)
+          x[j, k] = addeq!(x[j, k], s)
+        end
+        x[j, k] = reduce!(x[j, k])
+        if i > 1
+          if i <= c && piv[i - 1] <= c
+            flag, x[j, k] = divides(x[j, k], diag[i - 1])
             if !flag
-               return false, x
+              return false, x
             end
-
-            l -= 1
-         else
-            y[i, k] = R()
-         end
+          end
+        end
       end
-   end
+    end
 
-   return true, y
+    l = rnk
+    for i in c:-1:1
+      if l > 0 && i == piv[l]
+        if rnk != 0
+          y[i, k] = x[l, k]*diag[rnk]
+        else
+          y[i, k] = deepcopy(x[l, k])
+        end
+        for j in (piv[l] + 1):c
+          t = mul!(t, y[j, k], FFLU[l, j])
+          t = mul!(t, t, minus_one)
+          y[i, k] = addeq!(y[i, k], t)
+        end
+
+        flag, y[i, k] = divides(y[i, k], diag[l])
+        if !flag
+          return false, x
+        end
+
+        l -= 1
+      else
+        y[i, k] = R()
+      end
+    end
+  end
+
+  return true, y
 end
 
 # Return `flag, y` where flag is set to `true` if `Ay = b` has a solution
@@ -2819,33 +2819,33 @@ end
 # triangular matrix L instead of removing columns (and corresponding rows of
 # the upper triangular matrix U). We also set free variables to zero.
 function _can_solve_with_solution_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
-   base_ring(A) != base_ring(b) && error("Base rings don't match in can_solve_with_solution_lu")
-   nrows(A) != nrows(b) && error("Dimensions don't match in can_solve_with_solution_lu")
+  base_ring(A) != base_ring(b) && error("Base rings don't match in can_solve_with_solution_lu")
+  nrows(A) != nrows(b) && error("Dimensions don't match in can_solve_with_solution_lu")
 
-   if nrows(A) == 0
-      return true, zero_matrix(base_ring(A), ncols(A), ncols(b))
-   end
+  if nrows(A) == 0
+    return true, zero_matrix(base_ring(A), ncols(A), ncols(b))
+  end
 
-   if ncols(A) == 0
-      return iszero(b), zero_matrix(base_ring(A), ncols(A), ncols(b))
-   end
+  if ncols(A) == 0
+    return iszero(b), zero_matrix(base_ring(A), ncols(A), ncols(b))
+  end
 
-   LU = deepcopy(A)
-   p = one(SymmetricGroup(nrows(A)))
-   rank = lu!(p, LU)
+  LU = deepcopy(A)
+  p = one(SymmetricGroup(nrows(A)))
+  rank = lu!(p, LU)
 
-   y = _solve_lu_precomp(p, LU, b)
+  y = _solve_lu_precomp(p, LU, b)
 
-   n = nrows(A)
-   flag = true
-   if rank < n
-      b2 = p*b
-      A2 = p*A
-      A3 = A2[rank + 1:n, :]
-      flag = A3*y == b2[rank + 1:n, :]
-   end
+  n = nrows(A)
+  flag = true
+  if rank < n
+    b2 = p*b
+    A2 = p*A
+    A3 = A2[rank + 1:n, :]
+    flag = A3*y == b2[rank + 1:n, :]
+  end
 
-   return flag, y
+  return flag, y
 end
 
 # Given an LU decomposition `LU` of `p(A)` over a field with `L` invertible,
@@ -2853,319 +2853,319 @@ end
 # hold, where `r` is the rank of `A`. The remaining rows must be checked by
 # the caller.
 function _solve_lu_precomp(p::Perm, LU::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
-   x = p * b
-   n = nrows(x)
-   m = ncols(x)
-   R = base_ring(LU)
-   c = ncols(LU)
-   t = base_ring(b)()
-   s = base_ring(b)()
-   y = similar(x, c, m)
+  x = p * b
+  n = nrows(x)
+  m = ncols(x)
+  R = base_ring(LU)
+  c = ncols(LU)
+  t = base_ring(b)()
+  s = base_ring(b)()
+  y = similar(x, c, m)
 
-   diag = Vector{elem_type(R)}(undef, n)
-   piv = Vector{Int}(undef, n)
+  diag = Vector{elem_type(R)}(undef, n)
+  piv = Vector{Int}(undef, n)
 
-   l = 0
-   rnk = 0
-   for i = 1:n
+  l = 0
+  rnk = 0
+  for i = 1:n
+    l += 1
+    while l <= c && is_zero_entry(LU, i, l)
       l += 1
-      while l <= c && is_zero_entry(LU, i, l)
-         l += 1
+    end
+    piv[i] = l
+    if l <= c
+      diag[i] = LU[i, l]
+      rnk += 1
+    end
+  end
+
+  for k in 1:m
+    x[1, k] = deepcopy(x[1, k])
+    for i in 2:n
+      for j in 1:(i - 1)
+        # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
+        if j <= c
+          t = mul_red!(t, -LU[i, j], x[j, k], false)
+          if j == 1
+            x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
+          else
+            x[i, k] = addeq!(x[i, k], t)
+          end
+        else
+          x[i, k] = deepcopy(x[i, k])
+        end
       end
-      piv[i] = l
-      if l <= c
-         diag[i] = LU[i, l]
-         rnk += 1
+      x[i, k] = reduce!(x[i, k])
+    end
+
+    # Now every entry of x is a proper copy, so we can change the entries
+    # as much as we want.
+
+    l = rnk
+    for i in c:-1:1
+      if l > 0 && i == piv[l]
+        y[i, k] = x[l, k]
+
+        for j in (piv[l] + 1):c
+          # x[i, k] = x[i, k] - x[j, k] * LU[l, j]
+          t = mul_red!(t, y[j, k], -LU[l, j], false)
+          y[i, k] = addeq!(y[i, k], t)
+        end
+
+        y[i, k] = reduce!(y[i, k])
+        y[i, k] = divexact(y[i, k], diag[l])
+
+        l -= 1
+      else
+        y[i, k] = R()
       end
-   end
+    end
+  end
 
-   for k in 1:m
-      x[1, k] = deepcopy(x[1, k])
-      for i in 2:n
-         for j in 1:(i - 1)
-            # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
-            if j <= c
-               t = mul_red!(t, -LU[i, j], x[j, k], false)
-               if j == 1
-                  x[i, k] = x[i, k] + t # LU[i, j] * x[j, k]
-               else
-                  x[i, k] = addeq!(x[i, k], t)
-               end
-            else
-               x[i, k] = deepcopy(x[i, k])
-            end
-         end
-         x[i, k] = reduce!(x[i, k])
-      end
-
-      # Now every entry of x is a proper copy, so we can change the entries
-      # as much as we want.
-
-      l = rnk
-      for i in c:-1:1
-         if l > 0 && i == piv[l]
-            y[i, k] = x[l, k]
-
-            for j in (piv[l] + 1):c
-               # x[i, k] = x[i, k] - x[j, k] * LU[l, j]
-               t = mul_red!(t, y[j, k], -LU[l, j], false)
-               y[i, k] = addeq!(y[i, k], t)
-            end
-
-            y[i, k] = reduce!(y[i, k])
-            y[i, k] = divexact(y[i, k], diag[l])
-
-            l -= 1
-         else
-            y[i, k] = R()
-         end
-      end
-   end
-
-   return y
+  return y
 end
 
 function _solve_ff(M::MatrixElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
-   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   nrows(M) != nrows(b) && error("Dimensions don't match in solve")
-   m = nrows(M)
-   flag, x, d = _can_solve_with_solution_fflu(M, b)
-   !flag && error("System not solvable in _solve_ff")
-   for i in 1:nrows(x)
-      for j in 1:ncols(x)
-         x[i, j] = divexact(x[i, j], d)
-      end
-   end
-   return x
+  base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
+  nrows(M) != nrows(b) && error("Dimensions don't match in solve")
+  m = nrows(M)
+  flag, x, d = _can_solve_with_solution_fflu(M, b)
+  !flag && error("System not solvable in _solve_ff")
+  for i in 1:nrows(x)
+    for j in 1:ncols(x)
+      x[i, j] = divexact(x[i, j], d)
+    end
+  end
+  return x
 end
 
 function _can_solve_with_solution_with_det(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   # We cannot use _solve_fflu directly, since it forgot about the (parity of
-   # the) permutation.
-   R = base_ring(M)
-   FFLU = deepcopy(M)
-   p = one(SymmetricGroup(nrows(M)))
-   rank, d = fflu!(p, FFLU)
-   pivots = zeros(Int, nrows(M))
-   c = 1
-   for r = 1:nrows(M)
-      while c <= ncols(M)
-         if !is_zero_entry(FFLU, r, c)
-            pivots[r] = c
-            c += 1
-            break
-         end
-         c += 1
+  # We cannot use _solve_fflu directly, since it forgot about the (parity of
+  # the) permutation.
+  R = base_ring(M)
+  FFLU = deepcopy(M)
+  p = one(SymmetricGroup(nrows(M)))
+  rank, d = fflu!(p, FFLU)
+  pivots = zeros(Int, nrows(M))
+  c = 1
+  for r = 1:nrows(M)
+    while c <= ncols(M)
+      if !is_zero_entry(FFLU, r, c)
+        pivots[r] = c
+        c += 1
+        break
       end
-   end
-   flag, x = _solve_fflu_precomp(p, FFLU, b)
-   n = nrows(M)
-   if flag && rank < n
-      b2 = p*b
-      A2 = p*M
-      A3 = A2[rank + 1:n, :]
-      flag = A3*x == b2[rank + 1:n, :]*d
-   end
-   if !flag
-      return false, rank, p, pivots, x, d
-   end
-   # Now M*x = d*b, but d is only sign(P) * det(M)
-   if parity(p) != 0
-      minus_one = R(-1)
-      for k in 1:ncols(x)
-         for i in 1:nrows(x)
-            # We are allowed to modify x in-place.
-            x[i, k] = mul!(x[i, k], x[i, k], minus_one)
-         end
+      c += 1
+    end
+  end
+  flag, x = _solve_fflu_precomp(p, FFLU, b)
+  n = nrows(M)
+  if flag && rank < n
+    b2 = p*b
+    A2 = p*M
+    A3 = A2[rank + 1:n, :]
+    flag = A3*x == b2[rank + 1:n, :]*d
+  end
+  if !flag
+    return false, rank, p, pivots, x, d
+  end
+  # Now M*x = d*b, but d is only sign(P) * det(M)
+  if parity(p) != 0
+    minus_one = R(-1)
+    for k in 1:ncols(x)
+      for i in 1:nrows(x)
+        # We are allowed to modify x in-place.
+        x[i, k] = mul!(x[i, k], x[i, k], minus_one)
       end
-      d = mul!(d, d, minus_one)
-   end
-   return true, rank, p, pivots, x, d
+    end
+    d = mul!(d, d, minus_one)
+  end
+  return true, rank, p, pivots, x, d
 end
 
 function _can_solve_with_solution_with_det(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
-   flag, r, p, pivots, x, d = can_solve_with_solution_interpolation_inner(M, b)
-   return flag, r, p, pivots, x, d
+  flag, r, p, pivots, x, d = can_solve_with_solution_interpolation_inner(M, b)
+  return flag, r, p, pivots, x, d
 end
 
 # This can be removed once Nemo implements _can_solve_with_solution_with_det
 # It's here now only because Nemo overloads it
 function _solve_with_det(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   flag, r, p, piv, x, d = _can_solve_with_solution_with_det(M, b)
-   !flag && error("System not solvable in _solve_with_det")
-   return x, d
+  flag, r, p, piv, x, d = _can_solve_with_solution_with_det(M, b)
+  !flag && error("System not solvable in _solve_with_det")
+  return x, d
 end
 
 function _solve_ff(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   m = nrows(M)
-   n = ncols(M)
-   if m == 0
-      return zero_matrix(base_ring(M), ncols(M), ncols(b)), base_ring(M)()
-   end
-   if n == 0
-      b != 0 && error("System not soluble in _solve_ff")
-      return zero_matrix(base_ring(M), ncols(M), ncols(b)), base_ring(M)()
-   end
-   flag, S, d = _can_solve_with_solution_fflu(M, b)
-   !flag && error("System not soluble in _solve_ff")
-   return S, d
+  m = nrows(M)
+  n = ncols(M)
+  if m == 0
+    return zero_matrix(base_ring(M), ncols(M), ncols(b)), base_ring(M)()
+  end
+  if n == 0
+    b != 0 && error("System not soluble in _solve_ff")
+    return zero_matrix(base_ring(M), ncols(M), ncols(b)), base_ring(M)()
+  end
+  flag, S, d = _can_solve_with_solution_fflu(M, b)
+  !flag && error("System not soluble in _solve_ff")
+  return S, d
 end
 
 function can_solve_with_solution_interpolation_inner(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
-   m = nrows(M)
-   h = ncols(b)
-   c = ncols(M)
-   R = base_ring(M)
-   prm = one(SymmetricGroup(nrows(M)))
-   pivots = zeros(Int, nrows(M))
-   if m == 0
-      return true, 0, prm, pivots, zero_matrix(R, c, h), one(R)
-   end
-   R = base_ring(M)
-   maxlen = 0
-   for i = 1:m
-      for j = 1:c
-         maxlen = max(maxlen, length(M[i, j]))
+  m = nrows(M)
+  h = ncols(b)
+  c = ncols(M)
+  R = base_ring(M)
+  prm = one(SymmetricGroup(nrows(M)))
+  pivots = zeros(Int, nrows(M))
+  if m == 0
+    return true, 0, prm, pivots, zero_matrix(R, c, h), one(R)
+  end
+  R = base_ring(M)
+  maxlen = 0
+  for i = 1:m
+    for j = 1:c
+      maxlen = max(maxlen, length(M[i, j]))
+    end
+  end
+  if maxlen == 0
+    return iszero(b), 0, prm, pivots, zero_matrix(R, c, h), one(R)
+  end
+  maxlenb = 0
+  for i = 1:m
+    for j = 1:h
+      maxlenb = max(maxlenb, length(b[i, j]))
+    end
+  end
+  # bound from xd = (M*)b where d is the det
+  bound = (maxlen - 1)*(max(m, c) - 1) + max(maxlenb, maxlen)
+  tmat = matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
+  V = Vector{typeof(tmat)}(undef, bound)
+  d = Vector{elem_type(base_ring(R))}(undef, bound)
+  y = Vector{elem_type(base_ring(R))}(undef, bound)
+  bj = Vector{elem_type(base_ring(R))}(undef, bound)
+  X = similar(tmat, m, c)
+  Y = similar(tmat, m, h)
+  x = similar(b, c, h)
+  b2 = div(bound, 2)
+  pt1 = base_ring(R)(1 - b2)
+  l = 1
+  i = 1
+  pt = 1
+  rnk = -1
+  firstprm = true
+  while l <= bound
+    y[l] = base_ring(R)(pt - b2)
+    # Running out of interpolation points doesn't imply there is no solution
+    (y[l] == pt1 && pt != 1) && error("Not enough interpolation points in ring")
+    bad_evaluation = false
+    for j = 1:m
+      for k = 1:c
+        X[j, k] = evaluate(M[j, k], y[l])
+        if is_zero_entry(X, j, k) && !is_zero_entry(M, j, k)
+          bad_evaluation = true
+          break
+        end
       end
-   end
-   if maxlen == 0
-      return iszero(b), 0, prm, pivots, zero_matrix(R, c, h), one(R)
-   end
-   maxlenb = 0
-   for i = 1:m
-      for j = 1:h
-         maxlenb = max(maxlenb, length(b[i, j]))
+      if bad_evaluation
+        break
       end
-   end
-   # bound from xd = (M*)b where d is the det
-   bound = (maxlen - 1)*(max(m, c) - 1) + max(maxlenb, maxlen)
-   tmat = matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
-   V = Vector{typeof(tmat)}(undef, bound)
-   d = Vector{elem_type(base_ring(R))}(undef, bound)
-   y = Vector{elem_type(base_ring(R))}(undef, bound)
-   bj = Vector{elem_type(base_ring(R))}(undef, bound)
-   X = similar(tmat, m, c)
-   Y = similar(tmat, m, h)
-   x = similar(b, c, h)
-   b2 = div(bound, 2)
-   pt1 = base_ring(R)(1 - b2)
-   l = 1
-   i = 1
-   pt = 1
-   rnk = -1
-   firstprm = true
-   while l <= bound
+      for k = 1:h
+        Y[j, k] = evaluate(b[j, k], y[l])
+        if is_zero_entry(Y, j, k) && !is_zero_entry(b, j, k)
+          bad_evaluation = true
+          break
+        end
+      end
+      if bad_evaluation
+        break
+      end
+    end
+    try
+      if bad_evaluation
+        error("Bad evaluation point")
+      end
+      flag, r, p, pv, Vl, dl = _can_solve_with_solution_with_det(X, Y)
+      if !flag
+        return flag, r, p, pv, zero(x), zero(R)
+      end
+      p = inv!(p)
+      # Check that new solution has the same pivots as previous ones
+      if r != rnk || p != prm || pv != pivots
+        if r < rnk # rank is too low: reject
+          pt += 1
+          continue
+        elseif r > rnk # rank has increased: restart
+          l = 1
+          rnk = r
+          prm = p
+          pivots = pv
+          firstprm = false
+        elseif p != prm || pv != pivots # pivot structure different
+          reset_prm = false
+          for j = 1:length(p.d)
+            # If earlier pivots or row swaps are encountered, restart
+            if firstprm || (p[j] < prm[j] && pv[j] <= pivots[j]) ||
+              (p[j] == prm[j] && pv[j] < pivots[j] && pv[j] != 0)
+              prm = p
+              pivots = pv
+              l = 1
+              firstprm = false
+              break
+            elseif p[j] > prm[j] || pv[j] > pivots[j] # worse pivots/row swaps: reject
+              reset_prm = true
+              break
+            end
+          end
+          if reset_prm
+            pt += 1
+            continue
+          end
+        end
+      end
+      V[l] = Vl
+      d[l] = dl
       y[l] = base_ring(R)(pt - b2)
-      # Running out of interpolation points doesn't imply there is no solution
-      (y[l] == pt1 && pt != 1) && error("Not enough interpolation points in ring")
-      bad_evaluation = false
-      for j = 1:m
-         for k = 1:c
-            X[j, k] = evaluate(M[j, k], y[l])
-            if is_zero_entry(X, j, k) && !is_zero_entry(M, j, k)
-               bad_evaluation = true
-               break
-            end
-         end
-         if bad_evaluation
-            break
-         end
-         for k = 1:h
-            Y[j, k] = evaluate(b[j, k], y[l])
-            if is_zero_entry(Y, j, k) && !is_zero_entry(b, j, k)
-               bad_evaluation = true
-               break
-            end
-         end
-         if bad_evaluation
-            break
-         end
+      l += 1
+    catch e
+      if !(e isa ErrorException)
+        rethrow(e)
+      end
+      i = i + 1
+    end
+
+    # We tested bound evaluation points and an impossible inverse was
+    # encountered for all the values.
+
+    if i > bound && l == 1
+      # impossible inverse doesn't imply no solution
+      error("Impossible inverse or too many failures in can_solve_with_solution_interpolation")
+    end
+
+    pt = pt + 1
+  end
+  # Interpolate
+  for k = 1:h
+    for i = 1:c
+      for j = 1:bound
+        bj[j] = V[j][i, k]
       end
       try
-         if bad_evaluation
-            error("Bad evaluation point")
-         end
-         flag, r, p, pv, Vl, dl = _can_solve_with_solution_with_det(X, Y)
-         if !flag
-            return flag, r, p, pv, zero(x), zero(R)
-         end
-         p = inv!(p)
-         # Check that new solution has the same pivots as previous ones
-         if r != rnk || p != prm || pv != pivots
-            if r < rnk # rank is too low: reject
-               pt += 1
-               continue
-            elseif r > rnk # rank has increased: restart
-               l = 1
-               rnk = r
-               prm = p
-               pivots = pv
-               firstprm = false
-            elseif p != prm || pv != pivots # pivot structure different
-               reset_prm = false
-               for j = 1:length(p.d)
-                  # If earlier pivots or row swaps are encountered, restart
-                  if firstprm || (p[j] < prm[j] && pv[j] <= pivots[j]) ||
-                                 (p[j] == prm[j] && pv[j] < pivots[j] && pv[j] != 0)
-                     prm = p
-                     pivots = pv
-                     l = 1
-                     firstprm = false
-                     break
-                  elseif p[j] > prm[j] || pv[j] > pivots[j] # worse pivots/row swaps: reject
-                     reset_prm = true
-                     break
-                  end
-               end
-               if reset_prm
-                  pt += 1
-                  continue
-               end
-            end
-         end
-         V[l] = Vl
-         d[l] = dl
-         y[l] = base_ring(R)(pt - b2)
-         l += 1
+        x[i, k] = interpolate(R, y, bj)
       catch e
-         if !(e isa ErrorException)
-            rethrow(e)
-         end
-         i = i + 1
+        if !(e isa ErrorException)
+          rethrow(e)
+        end
+        return false, rnk, prm, pivots, zero(x), zero(R)
       end
-
-      # We tested bound evaluation points and an impossible inverse was
-      # encountered for all the values.
-
-      if i > bound && l == 1
-         # impossible inverse doesn't imply no solution
-         error("Impossible inverse or too many failures in can_solve_with_solution_interpolation")
-      end
-
-      pt = pt + 1
-   end
-   # Interpolate
-   for k = 1:h
-      for i = 1:c
-         for j = 1:bound
-            bj[j] = V[j][i, k]
-         end
-         try
-            x[i, k] = interpolate(R, y, bj)
-         catch e
-            if !(e isa ErrorException)
-               rethrow(e)
-            end
-            return false, rnk, prm, pivots, zero(x), zero(R)
-         end
-      end
-   end
-   return true, rnk, prm, pivots, x, interpolate(R, y, d)
+    end
+  end
+  return true, rnk, prm, pivots, x, interpolate(R, y, d)
 end
 
 function _can_solve_with_solution_interpolation(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
-   flag, r, p, pv, x, d = can_solve_with_solution_interpolation_inner(M, b)
-   return flag, x, d
+  flag, r, p, pv, x, d = can_solve_with_solution_interpolation_inner(M, b)
+  return flag, x, d
 end
 
 @doc raw"""
@@ -3178,30 +3178,30 @@ denominator will be the determinant of $A$ up to sign. If $A$ is singular an
 exception is raised.
 """
 function _solve_rational(M::MatElem{T}, b::MatElem{T}) where T <: RingElement
-   return _solve_ringelem(M, b)
+  return _solve_ringelem(M, b)
 end
 
 function _solve_ringelem(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   nrows(M) != nrows(b) && error("Dimensions don't match in solve")
-   return _solve_ff(M, b)
+  base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
+  nrows(M) != nrows(b) && error("Dimensions don't match in solve")
+  return _solve_ff(M, b)
 end
 
 function _solve_rational(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
-   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   nrows(M) != nrows(b) && error("Dimensions don't match in solve")
-   flag = true
-   try
-      flag, x, d = _can_solve_with_solution_interpolation(M, b)
-      !flag && error("No solution in _solve_rational")
-      return x, d
-   catch e
-      if !isa(e, ErrorException)
-         rethrow(e)
-      end
-      !flag && error("No solution in _solve_rational")
-      return _solve_ff(M, b)
-   end
+  base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
+  nrows(M) != nrows(b) && error("Dimensions don't match in solve")
+  flag = true
+  try
+    flag, x, d = _can_solve_with_solution_interpolation(M, b)
+    !flag && error("No solution in _solve_rational")
+    return x, d
+  catch e
+    if !isa(e, ErrorException)
+      rethrow(e)
+    end
+    !flag && error("No solution in _solve_rational")
+    return _solve_ff(M, b)
+  end
 end
 
 # Find the pivot columns of an rref matrix
@@ -3255,15 +3255,15 @@ false
 ```
 """
 function is_upper_triangular(M::MatrixElem)
-    m = ncols(M)
-    for i = 2:nrows(M)
-        for j = 1:min(i - 1, m)
-            if !is_zero_entry(M, i, j)
-                return false
-            end
-        end
+  m = ncols(M)
+  for i = 2:nrows(M)
+    for j = 1:min(i - 1, m)
+      if !is_zero_entry(M, i, j)
+        return false
+      end
     end
-    return true
+  end
+  return true
 end
 
 @doc raw"""
@@ -3276,39 +3276,39 @@ is raised. If unit is true then $U$ is assumed to have ones on its
 diagonal, and the diagonal will not be read.
 """
 function _solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <: FieldElement}
-   n = nrows(U)
-   m = ncols(b)
-   R = base_ring(U)
-   X = zero(b)
-   Tinv = Vector{elem_type(R)}(undef, n)
-   tmp = Vector{elem_type(R)}(undef, n)
-   if unit == false
-      for i = 1:n
-         Tinv[i] = inv(U[i, i])
+  n = nrows(U)
+  m = ncols(b)
+  R = base_ring(U)
+  X = zero(b)
+  Tinv = Vector{elem_type(R)}(undef, n)
+  tmp = Vector{elem_type(R)}(undef, n)
+  if unit == false
+    for i = 1:n
+      Tinv[i] = inv(U[i, i])
+    end
+  end
+  t = R()
+  for i = 1:m
+    for j = 1:n
+      tmp[j] = X[j, i]
+    end
+    for j = n:-1:1
+      s = R()
+      for k = j + 1:n
+        s = addmul_delayed_reduction!(s, U[j, k], tmp[k], t)
       end
-   end
-   t = R()
-   for i = 1:m
-      for j = 1:n
-         tmp[j] = X[j, i]
+      s = reduce!(s)
+      s = b[j, i] - s
+      if unit == false
+        s = mul!(s, s, Tinv[j])
       end
-      for j = n:-1:1
-         s = R()
-         for k = j + 1:n
-            s = addmul_delayed_reduction!(s, U[j, k], tmp[k], t)
-         end
-         s = reduce!(s)
-         s = b[j, i] - s
-         if unit == false
-            s = mul!(s, s, Tinv[j])
-         end
-         tmp[j] = s
-      end
-      for j = 1:n
-         X[j, i] = tmp[j]
-      end
-   end
-   return X
+      tmp[j] = s
+    end
+    for j = 1:n
+      X[j, i] = tmp[j]
+    end
+  end
+  return X
 end
 
 #solves A x = B for A intended to be lower triangular
@@ -3371,14 +3371,14 @@ true
 ```
 """
 function is_lower_triangular(M::MatrixElem)
-    for i = 1:nrows(M)
-        for j = i+1:ncols(M)
-            if !is_zero_entry(M, i, j)
-                return false
-            end
-        end
+  for i = 1:nrows(M)
+    for j = i+1:ncols(M)
+      if !is_zero_entry(M, i, j)
+        return false
+      end
     end
-    return true
+  end
+  return true
 end
 
 @doc raw"""
@@ -3403,14 +3403,14 @@ true
 ```
 """
 function is_diagonal(A::MatrixElem)
-    for i = 1:ncols(A)
-        for j = 1:nrows(A)
-            if i != j && !is_zero_entry(A, j, i)
-                return false
-            end
-        end
+  for i = 1:ncols(A)
+    for j = 1:nrows(A)
+      if i != j && !is_zero_entry(A, j, i)
+        return false
+      end
     end
-    return true
+  end
+  return true
 end
 
 ###############################################################################
@@ -3429,17 +3429,17 @@ will be the determinant of $M$ up to sign. If $M$ is singular an exception
 is raised.
 """
 function pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
-   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
-   flag, X, d = _can_solve_with_solution_fflu(M, identity_matrix(M))
-   !flag && error("Singular matrix in pseudo_inv")
-   return X, d
+  is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+  flag, X, d = _can_solve_with_solution_fflu(M, identity_matrix(M))
+  !flag && error("Singular matrix in pseudo_inv")
+  return X, d
 end
 
 function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
-   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
-   flag, A = _can_solve_with_solution_lu(M, identity_matrix(M))
-   !flag && error("Singular matrix in inv")
-   return A
+  is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+  flag, A = _can_solve_with_solution_lu(M, identity_matrix(M))
+  !flag && error("Singular matrix in inv")
+  return A
 end
 
 @doc raw"""
@@ -3451,10 +3451,10 @@ identity matrix. If $M$ is not invertible over the base ring an exception is
 raised.
 """
 function Base.inv(M::MatrixElem{T}) where {T <: RingElement}
-   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
-   X, d = pseudo_inv(M)
-   is_unit(d) || throw(DomainError(M, "Matrix is not invertible."))
-   return divexact(X, d)
+  is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+  X, d = pseudo_inv(M)
+  is_unit(d) || throw(DomainError(M, "Matrix is not invertible."))
+  return divexact(X, d)
 end
 
 ###############################################################################
@@ -3473,14 +3473,14 @@ true, $B$ is the left inverse of $A$ i.e. $BA$ is the $m\times m$ unit matrix.
 If `flag` is false, no right or left inverse exists.
 """
 function is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
-   if (side == :left && nrows(A) < ncols(A)) || (side == :right && ncols(A) < nrows(A))
-      return (false, zero(A, 0, 0))
-   end
-   I = (side == :left) ? zero(A, ncols(A), ncols(A)) : zero(A, nrows(A), nrows(A))
-   for i = 1:ncols(I)
-      I[i, i] = one(base_ring(I))
-   end
-   return can_solve_with_solution(A, I; side = side)
+  if (side == :left && nrows(A) < ncols(A)) || (side == :right && ncols(A) < nrows(A))
+    return (false, zero(A, 0, 0))
+  end
+  I = (side == :left) ? zero(A, ncols(A), ncols(A)) : zero(A, nrows(A), nrows(A))
+  for i = 1:ncols(I)
+    I[i, i] = one(base_ring(I))
+  end
+  return can_solve_with_solution(A, I; side = side)
 end
 
 @doc raw"""
@@ -3534,42 +3534,42 @@ julia> n, N = nullspace(M)
 ```
 """
 function nullspace(M::MatElem{T}) where {T <: RingElement}
-   n = ncols(M)
-   rank, A, d = rref_rational(M)
-   nullity = n - rank
-   R = base_ring(M)
-   U = zero(M, n, nullity)
-   if rank == 0
-      for i = 1:nullity
-         U[i, i] = one(R)
+  n = ncols(M)
+  rank, A, d = rref_rational(M)
+  nullity = n - rank
+  R = base_ring(M)
+  U = zero(M, n, nullity)
+  if rank == 0
+    for i = 1:nullity
+      U[i, i] = one(R)
+    end
+  elseif nullity != 0
+    pivots = zeros(Int, rank)
+    nonpivots = zeros(Int, nullity)
+    j = k = 1
+    for i = 1:rank
+      while is_zero_entry(A, i, j)
+        nonpivots[k] = j
+        j += 1
+        k += 1
       end
-   elseif nullity != 0
-      pivots = zeros(Int, rank)
-      nonpivots = zeros(Int, nullity)
-      j = k = 1
-      for i = 1:rank
-         while is_zero_entry(A, i, j)
-            nonpivots[k] = j
-            j += 1
-            k += 1
-         end
-         pivots[i] = j
-         j += 1
+      pivots[i] = j
+      j += 1
+    end
+    while k <= nullity
+      nonpivots[k] = j
+      j += 1
+      k += 1
+    end
+    d = -A[1, pivots[1]]
+    for i = 1:nullity
+      for j = 1:rank
+        U[pivots[j], i] = A[j, nonpivots[i]]
       end
-      while k <= nullity
-         nonpivots[k] = j
-         j += 1
-         k += 1
-      end
-      d = -A[1, pivots[1]]
-      for i = 1:nullity
-         for j = 1:rank
-            U[pivots[j], i] = A[j, nonpivots[i]]
-         end
-         U[nonpivots[i], i] = d
-      end
-   end
-   return nullity, U
+      U[nonpivots[i], i] = d
+    end
+  end
+  return nullity, U
 end
 
 @doc raw"""
@@ -3581,42 +3581,42 @@ i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
 $N$ will be an $n\times \nu$ matrix.
 """
 function nullspace(M::MatElem{T}) where {T <: FieldElement}
-   m = nrows(M)
-   n = ncols(M)
-   rank, A = rref(M)
-   nullity = n - rank
-   R = base_ring(M)
-   X = zero(M, n, nullity)
-   if rank == 0
-      for i = 1:nullity
-         X[i, i] = one(R)
+  m = nrows(M)
+  n = ncols(M)
+  rank, A = rref(M)
+  nullity = n - rank
+  R = base_ring(M)
+  X = zero(M, n, nullity)
+  if rank == 0
+    for i = 1:nullity
+      X[i, i] = one(R)
+    end
+  elseif nullity != 0
+    pivots = zeros(Int, max(m, n))
+    np = rank
+    j = k = 1
+    for i = 1:rank
+      while is_zero_entry(A, i, j)
+        pivots[np + k] = j
+        j += 1
+        k += 1
       end
-   elseif nullity != 0
-      pivots = zeros(Int, max(m, n))
-      np = rank
-      j = k = 1
-      for i = 1:rank
-         while is_zero_entry(A, i, j)
-            pivots[np + k] = j
-            j += 1
-            k += 1
-         end
-         pivots[i] = j
-         j += 1
+      pivots[i] = j
+      j += 1
+    end
+    while k <= nullity
+      pivots[np + k] = j
+      j += 1
+      k += 1
+    end
+    for i = 1:nullity
+      for j = 1:rank
+        X[pivots[j], i] = -A[j, pivots[np + i]]
       end
-      while k <= nullity
-         pivots[np + k] = j
-         j += 1
-         k += 1
-      end
-      for i = 1:nullity
-         for j = 1:rank
-            X[pivots[j], i] = -A[j, pivots[np + i]]
-         end
-         X[pivots[np + i], i] = one(R)
-      end
-   end
-   return nullity, X
+      X[pivots[np + i], i] = one(R)
+    end
+  end
+  return nullity, X
 end
 
 ###############################################################################
@@ -3626,46 +3626,46 @@ end
 ###############################################################################
 
 function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in hessenberg")
-   R = base_ring(A)
-   n = nrows(A)
-   u = R()
-   t = R()
-   for m = 2:n - 1
-      i = m + 1
-      while i <= n && is_zero_entry(A, i, m - 1)
-         i += 1
+  !is_square(A) && error("Dimensions don't match in hessenberg")
+  R = base_ring(A)
+  n = nrows(A)
+  u = R()
+  t = R()
+  for m = 2:n - 1
+    i = m + 1
+    while i <= n && is_zero_entry(A, i, m - 1)
+      i += 1
+    end
+    if i != n + 1
+      if !is_zero_entry(A, m, m - 1)
+        i = m
       end
-      if i != n + 1
-         if !is_zero_entry(A, m, m - 1)
-            i = m
-         end
-         h = -inv(A[i, m - 1])
-         if i > m
-            for j = m - 1:n
-               A[i, j], A[m, j] = A[m, j], A[i, j]
-            end
-            for j = 1:n
-               A[j, i], A[j, m] = A[j, m], A[j, i]
-            end
-         end
-         for i = m + 1:n
-            if !is_zero_entry(A, i, m - 1)
-               u = mul!(u, A[i, m - 1], h)
-               for j = m:n
-                  t = mul!(t, u, A[m, j])
-                  A[i, j] = addeq!(A[i, j], t)
-               end
-               u = -u
-               for j = 1:n
-                  t = mul!(t, u, A[j, i])
-                  A[j, m] = addeq!(A[j, m], t)
-               end
-               A[i, m - 1] = R()
-            end
-         end
+      h = -inv(A[i, m - 1])
+      if i > m
+        for j = m - 1:n
+          A[i, j], A[m, j] = A[m, j], A[i, j]
+        end
+        for j = 1:n
+          A[j, i], A[j, m] = A[j, m], A[j, i]
+        end
       end
-   end
+      for i = m + 1:n
+        if !is_zero_entry(A, i, m - 1)
+          u = mul!(u, A[i, m - 1], h)
+          for j = m:n
+            t = mul!(t, u, A[m, j])
+            A[i, j] = addeq!(A[i, j], t)
+          end
+          u = -u
+          for j = 1:n
+            t = mul!(t, u, A[j, i])
+            A[j, m] = addeq!(A[j, m], t)
+          end
+          A[i, m - 1] = R()
+        end
+      end
+    end
+  end
 end
 
 @doc raw"""
@@ -3677,10 +3677,10 @@ above and on the diagonal and in the diagonal line immediately below the
 diagonal.
 """
 function hessenberg(A::MatrixElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in hessenberg")
-   M = deepcopy(A)
-   hessenberg!(M)
-   return M
+  !is_square(A) && error("Dimensions don't match in hessenberg")
+  M = deepcopy(A)
+  hessenberg!(M)
+  return M
 end
 
 @doc raw"""
@@ -3689,18 +3689,18 @@ end
 Return `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
 function is_hessenberg(A::MatrixElem{T}) where {T <: RingElement}
-   if !is_square(A)
-      return false
-   end
-   n = nrows(A)
-   for i = 3:n
-      for j = 1:i - 2
-         if !is_zero_entry(A, i, j)
-            return false
-         end
+  if !is_square(A)
+    return false
+  end
+  n = nrows(A)
+  for i = 3:n
+    for j = 1:i - 2
+      if !is_zero_entry(A, i, j)
+        return false
       end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 ###############################################################################
@@ -3710,245 +3710,245 @@ end
 ###############################################################################
 
 function charpoly_hessenberg!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in charpoly")
-   R = base_ring(A)
-   base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
-   n = nrows(A)
-   if n == 0
-      return one(S)
-   end
-   if n == 1
-      return gen(S) - A[1, 1]
-   end
-   hessenberg!(A)
-   P = Vector{elem_type(S)}(undef, n + 1)
-   P[1] = one(S)
-   x = gen(S)
-   for m = 1:n
-      P[m + 1] = (x - A[m, m])*P[m]
-      t = one(R)
-      for i = 1:m - 1
-         t = mul!(t, t, A[m - i + 1, m - i])
-         P[m + 1] -= t*A[m - i, m]*P[m - i]
-      end
-   end
-   return P[n + 1]
+  !is_square(A) && error("Dimensions don't match in charpoly")
+  R = base_ring(A)
+  base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
+  n = nrows(A)
+  if n == 0
+    return one(S)
+  end
+  if n == 1
+    return gen(S) - A[1, 1]
+  end
+  hessenberg!(A)
+  P = Vector{elem_type(S)}(undef, n + 1)
+  P[1] = one(S)
+  x = gen(S)
+  for m = 1:n
+    P[m + 1] = (x - A[m, m])*P[m]
+    t = one(R)
+    for i = 1:m - 1
+      t = mul!(t, t, A[m - i + 1, m - i])
+      P[m + 1] -= t*A[m - i, m]*P[m - i]
+    end
+  end
+  return P[n + 1]
 end
 
 function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in charpoly")
-   R = base_ring(A)
-   base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
-   n = nrows(A)
-   if n == 0
-      return one(S)
-   end
-   if n == 1
-      return gen(S) - A[1, 1]
-   end
-   d = one(R)
-   t = R()
-   V = Vector{T}(undef, n)
-   W = Vector{T}(undef, n)
-   pol = one(S)
-   i = 1
-   while i < n
+  !is_square(A) && error("Dimensions don't match in charpoly")
+  R = base_ring(A)
+  base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
+  n = nrows(A)
+  if n == 0
+    return one(S)
+  end
+  if n == 1
+    return gen(S) - A[1, 1]
+  end
+  d = one(R)
+  t = R()
+  V = Vector{T}(undef, n)
+  W = Vector{T}(undef, n)
+  pol = one(S)
+  i = 1
+  while i < n
+    h = A[n - i + 1, n - i]
+    while iszero(h)
+      k = 1
+      while k < n - i && is_zero_entry(A, n - i + 1, n - i - k)
+        k += 1
+      end
+      if k == n - i
+        b = S()
+        fit!(b, i + 1)
+        b = setcoeff!(b, i, one(R))
+        for kk = 1:i
+          b = setcoeff!(b, kk - 1, -A[n - i + 1, n - kk + 1]*d)
+        end
+        pol *= b
+        n -= i
+        i = 1
+        if n == 1
+          pol *= (gen(S) - A[1, 1]*d)
+          return pol
+        end
+      else
+        for j = 1:n
+          A[n - i - k, j], A[n - i, j] = A[n - i, j], A[n - i - k, j]
+        end
+        for j = 1:n - i + 1
+          A[j, n - i - k], A[j, n - i] = A[j, n - i], A[j, n - i - k]
+        end
+      end
       h = A[n - i + 1, n - i]
-      while iszero(h)
-         k = 1
-         while k < n - i && is_zero_entry(A, n - i + 1, n - i - k)
-            k += 1
-         end
-         if k == n - i
-            b = S()
-            fit!(b, i + 1)
-            b = setcoeff!(b, i, one(R))
-            for kk = 1:i
-               b = setcoeff!(b, kk - 1, -A[n - i + 1, n - kk + 1]*d)
-            end
-            pol *= b
-            n -= i
-            i = 1
-            if n == 1
-               pol *= (gen(S) - A[1, 1]*d)
-               return pol
-            end
-         else
-            for j = 1:n
-               A[n - i - k, j], A[n - i, j] = A[n - i, j], A[n - i - k, j]
-            end
-            for j = 1:n - i + 1
-               A[j, n - i - k], A[j, n - i] = A[j, n - i], A[j, n - i - k]
-            end
-         end
-         h = A[n - i + 1, n - i]
+    end
+    for j = 1:n
+      V[j] = -A[n - i + 1, j]
+      W[j] = deepcopy(A[n - i + 1, j])
+    end
+    for j = 1:n - i
+      for kk = 1:n - i - 1
+        t = mul_red!(t, A[j, n - i], V[kk], false)
+        A[j, kk] = mul_red!(A[j, kk], A[j, kk], h, false)
+        A[j, kk] = addeq!(A[j, kk], t)
+        A[j, kk] = reduce!(A[j, kk])
       end
-      for j = 1:n
-         V[j] = -A[n - i + 1, j]
-         W[j] = deepcopy(A[n - i + 1, j])
+      for kk = n - i + 1:n
+        t = mul_red!(t, A[j, n - i], V[kk], false)
+        A[j, kk] = mul_red!(A[j, kk], A[j, kk], h, false)
+        A[j, kk] = addeq!(A[j, kk], t)
+        A[j, kk] = reduce!(A[j, kk])
       end
-      for j = 1:n - i
-         for kk = 1:n - i - 1
-            t = mul_red!(t, A[j, n - i], V[kk], false)
-            A[j, kk] = mul_red!(A[j, kk], A[j, kk], h, false)
-            A[j, kk] = addeq!(A[j, kk], t)
-            A[j, kk] = reduce!(A[j, kk])
-         end
-         for kk = n - i + 1:n
-            t = mul_red!(t, A[j, n - i], V[kk], false)
-            A[j, kk] = mul_red!(A[j, kk], A[j, kk], h, false)
-            A[j, kk] = addeq!(A[j, kk], t)
-            A[j, kk] = reduce!(A[j, kk])
-         end
+    end
+    for kk = 1:n
+      A[n - i + 1, kk] = R()
+    end
+    for j = 1:n - i
+      for kk = 1:n - i - 1
+        A[j, kk] = mul!(A[j, kk], A[j, kk], d)
       end
-      for kk = 1:n
-         A[n - i + 1, kk] = R()
+      for kk = n - i + 1:n
+        A[j, kk] = mul!(A[j, kk], A[j, kk], d)
       end
-      for j = 1:n - i
-         for kk = 1:n - i - 1
-            A[j, kk] = mul!(A[j, kk], A[j, kk], d)
-         end
-         for kk = n - i + 1:n
-            A[j, kk] = mul!(A[j, kk], A[j, kk], d)
-         end
-      end
-      A[n - i + 1, n - i] = deepcopy(h)
-      for j = 1:n - i - 1
-         s = R()
-         for kk = 1:n - i
-            s = addmul_delayed_reduction!(s, A[kk, j], W[kk], t)
-         end
-         s = reduce!(s)
-         A[n - i, j] = s
-      end
-      for j = n - i:n - 1
-         s = R()
-         for kk = 1:n - i
-            s = addmul_delayed_reduction!(s, A[kk, j], W[kk], t)
-         end
-         s = addmul_delayed_reduction!(s, h, W[j + 1], t)
-         s = reduce!(s)
-         A[n - i, j] = s
-      end
+    end
+    A[n - i + 1, n - i] = deepcopy(h)
+    for j = 1:n - i - 1
       s = R()
       for kk = 1:n - i
-         s = addmul_delayed_reduction!(s, A[kk, n], W[kk], t)
+        s = addmul_delayed_reduction!(s, A[kk, j], W[kk], t)
       end
       s = reduce!(s)
-      A[n - i, n] = s
-      for kk = 1:n
-         A[n - i, kk] = mul!(A[n - i, kk], A[n - i, kk], d)
+      A[n - i, j] = s
+    end
+    for j = n - i:n - 1
+      s = R()
+      for kk = 1:n - i
+        s = addmul_delayed_reduction!(s, A[kk, j], W[kk], t)
       end
-      d = inv(h)
-      parent(d) # To work around a bug in julia
-      i += 1
-   end
-   b = S()
-   fit!(b, n + 1)
-   b = setcoeff!(b, n, one(R))
-   for i = 1:n
-      c = -A[1, n - i + 1]*d
-      b = setcoeff!(b, i - 1, c)
-   end
-   return pol*b
+      s = addmul_delayed_reduction!(s, h, W[j + 1], t)
+      s = reduce!(s)
+      A[n - i, j] = s
+    end
+    s = R()
+    for kk = 1:n - i
+      s = addmul_delayed_reduction!(s, A[kk, n], W[kk], t)
+    end
+    s = reduce!(s)
+    A[n - i, n] = s
+    for kk = 1:n
+      A[n - i, kk] = mul!(A[n - i, kk], A[n - i, kk], d)
+    end
+    d = inv(h)
+    parent(d) # To work around a bug in julia
+    i += 1
+  end
+  b = S()
+  fit!(b, n + 1)
+  b = setcoeff!(b, n, one(R))
+  for i = 1:n
+    c = -A[1, n - i + 1]*d
+    b = setcoeff!(b, i - 1, c)
+  end
+  return pol*b
 end
 
 function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in charpoly")
-   R = base_ring(A)
-   base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
-   n = nrows(A)
-   if n == 0
-      return one(S)
-   end
-   if n == 1
-      return gen(S) - A[1, 1]
-   end
-   t = R()
-   V = Vector{T}(undef, n)
-   W = Vector{T}(undef, n)
-   pol = one(S)
-   i = 1
-   while i < n
+  !is_square(A) && error("Dimensions don't match in charpoly")
+  R = base_ring(A)
+  base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
+  n = nrows(A)
+  if n == 0
+    return one(S)
+  end
+  if n == 1
+    return gen(S) - A[1, 1]
+  end
+  t = R()
+  V = Vector{T}(undef, n)
+  W = Vector{T}(undef, n)
+  pol = one(S)
+  i = 1
+  while i < n
+    h = A[n - i + 1, n - i]
+    while iszero(h)
+      k = 1
+      while k < n - i && is_zero_entry(A, n - i + 1, n - i - k)
+        k += 1
+      end
+      if k == n - i
+        b = S()
+        fit!(b, i + 1)
+        b = setcoeff!(b, i, one(R))
+        for kk = 1:i
+          b = setcoeff!(b, kk - 1, -A[n - i + 1, n - kk + 1])
+        end
+        pol *= b
+        n -= i
+        i = 1
+        if n == 1
+          pol *= (gen(S) - A[1, 1])
+          return pol
+        end
+      else
+        for j = 1:n
+          A[n - i - k, j], A[n - i, j] = A[n - i, j], A[n - i - k, j]
+        end
+        for j = 1:n - i + 1
+          A[j, n - i - k], A[j, n - i] = A[j, n - i], A[j, n - i - k]
+        end
+      end
       h = A[n - i + 1, n - i]
-      while iszero(h)
-         k = 1
-         while k < n - i && is_zero_entry(A, n - i + 1, n - i - k)
-            k += 1
-         end
-         if k == n - i
-            b = S()
-            fit!(b, i + 1)
-            b = setcoeff!(b, i, one(R))
-            for kk = 1:i
-               b = setcoeff!(b, kk - 1, -A[n - i + 1, n - kk + 1])
-            end
-            pol *= b
-            n -= i
-            i = 1
-            if n == 1
-               pol *= (gen(S) - A[1, 1])
-               return pol
-            end
-         else
-            for j = 1:n
-               A[n - i - k, j], A[n - i, j] = A[n - i, j], A[n - i - k, j]
-            end
-            for j = 1:n - i + 1
-               A[j, n - i - k], A[j, n - i] = A[j, n - i], A[j, n - i - k]
-            end
-         end
-         h = A[n - i + 1, n - i]
+    end
+    h = -inv(h)
+    for j = 1:n
+      V[j] = A[n - i + 1, j]*h
+      W[j] = deepcopy(A[n - i + 1, j])
+    end
+    h = -h
+    for j = 1:n - i
+      for k = 1:n - i - 1
+        t = mul!(t, A[j, n - i], V[k])
+        A[j, k] = addeq!(A[j, k], t)
       end
-      h = -inv(h)
-      for j = 1:n
-         V[j] = A[n - i + 1, j]*h
-         W[j] = deepcopy(A[n - i + 1, j])
+      for k = n - i + 1:n
+        t = mul!(t, A[j, n - i], V[k])
+        A[j, k] = addeq!(A[j, k], t)
       end
-      h = -h
-      for j = 1:n - i
-         for k = 1:n - i - 1
-            t = mul!(t, A[j, n - i], V[k])
-            A[j, k] = addeq!(A[j, k], t)
-         end
-         for k = n - i + 1:n
-            t = mul!(t, A[j, n - i], V[k])
-            A[j, k] = addeq!(A[j, k], t)
-         end
-         A[j, n - i] = mul!(A[j, n - i], A[j, n - i], h)
-      end
-      for j = 1:n - i - 1
-         s = R()
-         for k = 1:n - i
-            s = addmul_delayed_reduction!(s, A[k, j], W[k], t)
-         end
-         s = reduce!(s)
-         A[n - i, j] = s
-      end
-      for j = n - i:n - 1
-         s = R()
-         for k = 1:n - i
-            s = addmul_delayed_reduction!(s, A[k, j], W[k], t)
-         end
-         s = addeq!(s, W[j + 1])
-         s = reduce!(s)
-         A[n - i, j] = s
-      end
+      A[j, n - i] = mul!(A[j, n - i], A[j, n - i], h)
+    end
+    for j = 1:n - i - 1
       s = R()
       for k = 1:n - i
-         s = addmul_delayed_reduction!(s, A[k, n], W[k], t)
+        s = addmul_delayed_reduction!(s, A[k, j], W[k], t)
       end
       s = reduce!(s)
-      A[n - i, n] = s
-      i += 1
-   end
-   b = S()
-   fit!(b, n + 1)
-   b = setcoeff!(b, n, one(R))
-   for i = 1:n
-      b = setcoeff!(b, i - 1, -A[1, n - i + 1])
-   end
-   return pol*b
+      A[n - i, j] = s
+    end
+    for j = n - i:n - 1
+      s = R()
+      for k = 1:n - i
+        s = addmul_delayed_reduction!(s, A[k, j], W[k], t)
+      end
+      s = addeq!(s, W[j + 1])
+      s = reduce!(s)
+      A[n - i, j] = s
+    end
+    s = R()
+    for k = 1:n - i
+      s = addmul_delayed_reduction!(s, A[k, n], W[k], t)
+    end
+    s = reduce!(s)
+    A[n - i, n] = s
+    i += 1
+  end
+  b = S()
+  fit!(b, n + 1)
+  b = setcoeff!(b, n, one(R))
+  for i = 1:n
+    b = setcoeff!(b, i - 1, -A[1, n - i + 1])
+  end
+  return pol*b
 end
 
 @doc raw"""
@@ -3987,62 +3987,62 @@ x^4 + 2*x^2 + 6*x + 2
 ```
 """
 function charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
-   !is_square(Y) && error("Dimensions don't match in charpoly")
-   R = base_ring(Y)
-   base_ring(S) != base_ring(Y) && error("Cannot coerce into polynomial ring")
-   n = nrows(Y)
-   if n == 0
-      return one(S)
-   end
-   F = Vector{elem_type(R)}(undef, n)
-   A = Vector{elem_type(R)}(undef, n)
-   M = Matrix{elem_type(R)}(undef, n - 1, n)
-   F[1] = -Y[1, 1]
-   for i = 2:n
-      F[i] = R()
-      for j = 1:i
-         M[1, j] = Y[j, i]
+  !is_square(Y) && error("Dimensions don't match in charpoly")
+  R = base_ring(Y)
+  base_ring(S) != base_ring(Y) && error("Cannot coerce into polynomial ring")
+  n = nrows(Y)
+  if n == 0
+    return one(S)
+  end
+  F = Vector{elem_type(R)}(undef, n)
+  A = Vector{elem_type(R)}(undef, n)
+  M = Matrix{elem_type(R)}(undef, n - 1, n)
+  F[1] = -Y[1, 1]
+  for i = 2:n
+    F[i] = R()
+    for j = 1:i
+      M[1, j] = Y[j, i]
+    end
+    A[1] = Y[i, i]
+    p = R()
+    for j = 2:i - 1
+      for k = 1:i
+        s = R()
+        for l = 1:i
+          s = addmul_delayed_reduction!(s, Y[k, l], M[j - 1, l], p)
+        end
+        s = reduce!(s)
+        M[j, k] = s
       end
-      A[1] = Y[i, i]
-      p = R()
-      for j = 2:i - 1
-         for k = 1:i
-            s = R()
-            for l = 1:i
-               s = addmul_delayed_reduction!(s, Y[k, l], M[j - 1, l], p)
-            end
-            s = reduce!(s)
-            M[j, k] = s
-         end
-         A[j] = M[j, i]
-      end
-      s = R()
-      for j = 1:i
-         s = addmul_delayed_reduction!(s, Y[i, j], M[i - 1, j], p)
+      A[j] = M[j, i]
+    end
+    s = R()
+    for j = 1:i
+      s = addmul_delayed_reduction!(s, Y[i, j], M[i - 1, j], p)
+    end
+    s = reduce!(s)
+    A[i] = s
+    for j = 1:i
+      s = -F[j]
+      for k = 1:j - 1
+        s = addmul_delayed_reduction!(s, A[k], F[j - k], p)
       end
       s = reduce!(s)
-      A[i] = s
-      for j = 1:i
-         s = -F[j]
-         for k = 1:j - 1
-            s = addmul_delayed_reduction!(s, A[k], F[j - k], p)
-         end
-         s = reduce!(s)
-         F[j] = -s - A[j]
-     end
-   end
-   z = gen(S)
-   f = z^n
-   for i = 1:n
-      f = setcoeff!(f, n - i, F[i])
-   end
-   return f
+      F[j] = -s - A[j]
+    end
+  end
+  z = gen(S)
+  f = z^n
+  for i = 1:n
+    f = setcoeff!(f, n - i, F[i])
+  end
+  return f
 end
 
 function charpoly(Y::MatrixElem)
-   R = base_ring(Y)
-   Rx, x = polynomial_ring(R; cached=false)
-   return charpoly(Rx, Y)
+  R = base_ring(Y)
+  Rx, x = polynomial_ring(R; cached=false)
+  return charpoly(Rx, Y)
 end
 
 ###############################################################################
@@ -4068,93 +4068,93 @@ end
 # extremely fast to compute over some fields).
 
 function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
-   !is_square(M) && error("Not a square matrix in minpoly")
-   base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
-   n = nrows(M)
-   if n == 0
-      return one(S)
-   end
-   R = base_ring(M)
-   p = one(S)
-   A = similar(M, n + 1, 2n + 1)
-   B = similar(M, n, n)
-   L1 = Int[n + i for i in 1:n + 1]
-   L2 = Int[n for i in 1:n]
-   P2 = zeros(Int, n)
-   P2[1] = 1
-   c2 = 1
-   r2 = 1
-   first_poly = true
-   while r2 <= n
-      P1 = Int[0 for i in 1:2n + 1]
-      v = zero(M, n, 1)
+  !is_square(M) && error("Not a square matrix in minpoly")
+  base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
+  n = nrows(M)
+  if n == 0
+    return one(S)
+  end
+  R = base_ring(M)
+  p = one(S)
+  A = similar(M, n + 1, 2n + 1)
+  B = similar(M, n, n)
+  L1 = Int[n + i for i in 1:n + 1]
+  L2 = Int[n for i in 1:n]
+  P2 = zeros(Int, n)
+  P2[1] = 1
+  c2 = 1
+  r2 = 1
+  first_poly = true
+  while r2 <= n
+    P1 = Int[0 for i in 1:2n + 1]
+    v = zero(M, n, 1)
+    for j = 1:n
+      B[r2, j] = v[j, 1]
+      A[1, j] = R()
+    end
+    P1[c2] = 1
+    P2[c2] = r2
+    v[c2, 1] = one(R)
+    B[r2, c2] = v[c2, 1]
+    A[1, c2] = one(R)
+    A[1, n + 1] = one(R)
+    indep = true
+    r1 = 1
+    c1 = 0
+    while c1 <= n && r1 <= n
+      r1 += 1
+      r2 = indep ? r2 + 1 : r2
+      v = M*v
       for j = 1:n
-         B[r2, j] = v[j, 1]
-         A[1, j] = R()
+        A[r1, j] = deepcopy(v[j, 1])
       end
-      P1[c2] = 1
-      P2[c2] = r2
-      v[c2, 1] = one(R)
-      B[r2, c2] = v[c2, 1]
-      A[1, c2] = one(R)
-      A[1, n + 1] = one(R)
-      indep = true
-      r1 = 1
-      c1 = 0
-      while c1 <= n && r1 <= n
-         r1 += 1
-         r2 = indep ? r2 + 1 : r2
-         v = M*v
-         for j = 1:n
-            A[r1, j] = deepcopy(v[j, 1])
-         end
-         for j = n + 1:n + r1 - 1
-            A[r1, j] = zero(R)
-         end
-         A[r1, n + r1] = one(R)
-         c1 = reduce_row!(A, P1, L1, r1)
-         if indep && r2 <= n && !first_poly
-            for j = 1:n
-               B[r2, j] = deepcopy(v[j, 1])
-            end
-            c = reduce_row!(B, P2, L2, r2)
-            indep = c != 0
-         end
+      for j = n + 1:n + r1 - 1
+        A[r1, j] = zero(R)
       end
-      if first_poly
-         for j = 1:n
-            P2[j] = P1[j]
-         end
-         r2 = r1
+      A[r1, n + r1] = one(R)
+      c1 = reduce_row!(A, P1, L1, r1)
+      if indep && r2 <= n && !first_poly
+        for j = 1:n
+          B[r2, j] = deepcopy(v[j, 1])
+        end
+        c = reduce_row!(B, P2, L2, r2)
+        indep = c != 0
       end
-      c = 0
-      for j = c2 + 1:n
-         if P2[j] == 0
-            c = j
-            break
-         end
+    end
+    if first_poly
+      for j = 1:n
+        P2[j] = P1[j]
       end
-      c2 = c
-      b = S()
-      fit!(b, r1)
-      h = inv(A[r1, n + r1])
-      for i = 1:r1
-         b = setcoeff!(b, i - 1, A[r1, n + i]*h)
+      r2 = r1
+    end
+    c = 0
+    for j = c2 + 1:n
+      if P2[j] == 0
+        c = j
+        break
       end
-      p = lcm(p, b)
-      if charpoly_only == true
-         return p
+    end
+    c2 = c
+    b = S()
+    fit!(b, r1)
+    h = inv(A[r1, n + r1])
+    for i = 1:r1
+      b = setcoeff!(b, i - 1, A[r1, n + i]*h)
+    end
+    p = lcm(p, b)
+    if charpoly_only == true
+      return p
+    end
+    if first_poly && r2 <= n
+      for j = 1:r1 - 1
+        for k = 1:n
+          B[j, k] = A[j, k]
+        end
       end
-      if first_poly && r2 <= n
-         for j = 1:r1 - 1
-            for k = 1:n
-               B[j, k] = A[j, k]
-            end
-         end
-      end
-      first_poly = false
-   end
-   return p
+    end
+    first_poly = false
+  end
+  return p
 end
 
 @doc raw"""
@@ -4190,109 +4190,109 @@ x^2 + 10*x
 ```
 """
 function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   !is_square(M) && error("Not a square matrix in minpoly")
-   base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
-   n = nrows(M)
-   if n == 0
-      return one(S)
-   end
-   R = base_ring(M)
-   p = one(S)
-   A = similar(M, n + 1, 2n + 1)
-   B = similar(M, n, n)
-   L1 = zeros(Int, n + 1)
-   for i in 1:n + 1
-      L1[i] = i + n
-   end
-   L2 = fill(n, n)
-   P2 = zeros(Int, n)
-   P2[1] = 1
-   c2 = 1
-   r2 = 1
-   first_poly = true
-   while r2 <= n
-      P1 = [0 for i in 1:2n + 1]
-      v = zero(M, n, 1)
+  !is_square(M) && error("Not a square matrix in minpoly")
+  base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
+  n = nrows(M)
+  if n == 0
+    return one(S)
+  end
+  R = base_ring(M)
+  p = one(S)
+  A = similar(M, n + 1, 2n + 1)
+  B = similar(M, n, n)
+  L1 = zeros(Int, n + 1)
+  for i in 1:n + 1
+    L1[i] = i + n
+  end
+  L2 = fill(n, n)
+  P2 = zeros(Int, n)
+  P2[1] = 1
+  c2 = 1
+  r2 = 1
+  first_poly = true
+  while r2 <= n
+    P1 = [0 for i in 1:2n + 1]
+    v = zero(M, n, 1)
+    for j = 1:n
+      B[r2, j] = v[j, 1]
+      A[1, j] = R()
+    end
+    P1[c2] = 1
+    P2[c2] = r2
+    v[c2, 1] = one(R)
+    B[r2, c2] = v[c2, 1]
+    for s = 1:c2 - 1
+      if P2[s] != 0
+        B[r2, c2] *= B[P2[s], s]
+      end
+    end
+    A[1, c2] = one(R)
+    A[1, n + 1] = one(R)
+    indep = true
+    r1 = 1
+    c1 = 0
+    while c1 <= n && r1 <= n
+      r1 += 1
+      r2 = indep ? r2 + 1 : r2
+      v = M*v
       for j = 1:n
-         B[r2, j] = v[j, 1]
-         A[1, j] = R()
+        A[r1, j] = deepcopy(v[j, 1])
       end
-      P1[c2] = 1
-      P2[c2] = r2
-      v[c2, 1] = one(R)
-      B[r2, c2] = v[c2, 1]
-      for s = 1:c2 - 1
-         if P2[s] != 0
-            B[r2, c2] *= B[P2[s], s]
-         end
+      for j = n + 1:n + r1 - 1
+        A[r1, j] = zero(R)
       end
-      A[1, c2] = one(R)
-      A[1, n + 1] = one(R)
-      indep = true
-      r1 = 1
-      c1 = 0
-      while c1 <= n && r1 <= n
-         r1 += 1
-         r2 = indep ? r2 + 1 : r2
-         v = M*v
-         for j = 1:n
-            A[r1, j] = deepcopy(v[j, 1])
-         end
-         for j = n + 1:n + r1 - 1
-            A[r1, j] = zero(R)
-         end
-         A[r1, n + r1] = one(R)
-         c1 = reduce_row!(A, P1, L1, r1)
-         if indep && r2 <= n && !first_poly
-            for j = 1:n
-               B[r2, j] = deepcopy(v[j, 1])
-            end
-            c = reduce_row!(B, P2, L2, r2)
-            indep = c != 0
-         end
+      A[r1, n + r1] = one(R)
+      c1 = reduce_row!(A, P1, L1, r1)
+      if indep && r2 <= n && !first_poly
+        for j = 1:n
+          B[r2, j] = deepcopy(v[j, 1])
+        end
+        c = reduce_row!(B, P2, L2, r2)
+        indep = c != 0
       end
-      if first_poly
-         for j = 1:n
-            P2[j] = P1[j]
-         end
-         r2 = r1
+    end
+    if first_poly
+      for j = 1:n
+        P2[j] = P1[j]
       end
-      c = 0
-      for j = c2 + 1:n
-         if P2[j] == 0
-            c = j
-            break
-         end
+      r2 = r1
+    end
+    c = 0
+    for j = c2 + 1:n
+      if P2[j] == 0
+        c = j
+        break
       end
-      c2 = c
-      b = S()
-      fit!(b, r1)
-      for i = 1:r1
-         b = setcoeff!(b, i - 1, A[r1, n + i])
+    end
+    c2 = c
+    b = S()
+    fit!(b, r1)
+    for i = 1:r1
+      b = setcoeff!(b, i - 1, A[r1, n + i])
+    end
+    b = reverse(b, r1)
+    b = primpart(b)
+    b = reverse(b, r1)
+    p = lcm(p, b)
+    if charpoly_only == true
+      return divexact(p, canonical_unit(p))
+    end
+    if first_poly && r2 <= n
+      for j = 1:r1 - 1
+        for k = 1:n
+          B[j, k] = A[j, k]
+        end
       end
-      b = reverse(b, r1)
-      b = primpart(b)
-      b = reverse(b, r1)
-      p = lcm(p, b)
-      if charpoly_only == true
-         return divexact(p, canonical_unit(p))
-      end
-      if first_poly && r2 <= n
-         for j = 1:r1 - 1
-            for k = 1:n
-               B[j, k] = A[j, k]
-            end
-         end
-      end
-      first_poly = false
-   end
-   return divexact(p, canonical_unit(p))
+    end
+    first_poly = false
+  end
+  return divexact(p, canonical_unit(p))
 end
 
 function minpoly(M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   R = base_ring(M)
-   Rx, x = polynomial_ring(R; cached=false)
-   return minpoly(Rx, M, charpoly_only)
+  R = base_ring(M)
+  Rx, x = polynomial_ring(R; cached=false)
+  return minpoly(Rx, M, charpoly_only)
 end
 
 ###############################################################################
@@ -4302,83 +4302,83 @@ end
 ###############################################################################
 
 function hnf_cohen(A::MatrixElem{T}) where {T <: RingElement}
-   H, U = hnf_cohen_with_transform(A)
-   return H
+  H, U = hnf_cohen_with_transform(A)
+  return H
 end
 
 function hnf_cohen_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   H = deepcopy(A)
-   m = nrows(H)
-   U = identity_matrix(A, m)
-   hnf_cohen!(H, U)
-   return H, U
+  H = deepcopy(A)
+  m = nrows(H)
+  U = identity_matrix(A, m)
+  hnf_cohen!(H, U)
+  return H, U
 end
 
 function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
-   m = nrows(H)
-   n = ncols(H)
-   l = min(m, n)
-   k = 1
-   t = base_ring(H)()
-   t1 = base_ring(H)()
-   t2 = base_ring(H)()
-   for i = 1:l
-      for j = k + 1:m
-         if is_zero_entry(H, j, i)
-            continue
-         end
-         d, u, v = gcdx(H[k, i], H[j, i])
-         a = divexact(H[k, i], d)
-         b = -divexact(H[j, i], d)
-         for c = i:n
-            t = deepcopy(H[j, c])
-            t1 = mul_red!(t1, a, H[j, c], false)
-            t2 = mul_red!(t2, b, H[k, c], false)
-            H[j, c] = t1 + t2
-            H[j, c] = reduce!(H[j, c])
-            t1 = mul_red!(t1, u, H[k, c], false)
-            t2 = mul_red!(t2, v, t, false)
-            H[k, c] = t1 + t2
-            H[k, c] = reduce!(H[k, c])
-         end
-         for c = 1:m
-            t = deepcopy(U[j,c])
-            t1 = mul_red!(t1, a, U[j, c], false)
-            t2 = mul_red!(t2, b, U[k, c], false)
-            U[j, c] = t1 + t2
-            U[j, c] = reduce!(U[j, c])
-            t1 = mul_red!(t1, u, U[k, c], false)
-            t2 = mul_red!(t2, v, t, false)
-            U[k, c] = t1 + t2
-            U[k, c] = reduce!(U[k, c])
-         end
+  m = nrows(H)
+  n = ncols(H)
+  l = min(m, n)
+  k = 1
+  t = base_ring(H)()
+  t1 = base_ring(H)()
+  t2 = base_ring(H)()
+  for i = 1:l
+    for j = k + 1:m
+      if is_zero_entry(H, j, i)
+        continue
       end
-      if is_zero_entry(H, k, i)
-         continue
+      d, u, v = gcdx(H[k, i], H[j, i])
+      a = divexact(H[k, i], d)
+      b = -divexact(H[j, i], d)
+      for c = i:n
+        t = deepcopy(H[j, c])
+        t1 = mul_red!(t1, a, H[j, c], false)
+        t2 = mul_red!(t2, b, H[k, c], false)
+        H[j, c] = t1 + t2
+        H[j, c] = reduce!(H[j, c])
+        t1 = mul_red!(t1, u, H[k, c], false)
+        t2 = mul_red!(t2, v, t, false)
+        H[k, c] = t1 + t2
+        H[k, c] = reduce!(H[k, c])
       end
-      cu = canonical_unit(H[k, i])
-      if !isone(cu)
-         for c = i:n
-            H[k, c] = divexact(H[k, c], cu)
-        end
-         for c = 1:m
-            U[k, c] = divexact(U[k, c], cu)
-         end
+      for c = 1:m
+        t = deepcopy(U[j,c])
+        t1 = mul_red!(t1, a, U[j, c], false)
+        t2 = mul_red!(t2, b, U[k, c], false)
+        U[j, c] = t1 + t2
+        U[j, c] = reduce!(U[j, c])
+        t1 = mul_red!(t1, u, U[k, c], false)
+        t2 = mul_red!(t2, v, t, false)
+        U[k, c] = t1 + t2
+        U[k, c] = reduce!(U[k, c])
       end
-      for j = 1:k-1
-         q = -div(H[j,i], H[k, i])
-         for c = i:n
-            t = mul!(t, q, H[k, c])
-            H[j, c] = addeq!(H[j, c], t)
-         end
-         for c = 1:m
-            t = mul!(t, q, U[k, c])
-            U[j, c] = addeq!(U[j, c], t)
-         end
+    end
+    if is_zero_entry(H, k, i)
+      continue
+    end
+    cu = canonical_unit(H[k, i])
+    if !isone(cu)
+      for c = i:n
+        H[k, c] = divexact(H[k, c], cu)
       end
-      k += 1
-   end
-   return nothing
+      for c = 1:m
+        U[k, c] = divexact(U[k, c], cu)
+      end
+    end
+    for j = 1:k-1
+      q = -div(H[j,i], H[k, i])
+      for c = i:n
+        t = mul!(t, q, H[k, c])
+        H[j, c] = addeq!(H[j, c], t)
+      end
+      for c = 1:m
+        t = mul!(t, q, U[k, c])
+        U[j, c] = addeq!(U[j, c], t)
+      end
+    end
+    k += 1
+  end
+  return nothing
 end
 
 #  Hermite normal form via Kannan-Bachem for matrices of full column rank
@@ -4394,9 +4394,9 @@ Compute the upper right row Hermite normal form of $A$ using the algorithm of
 Kannan-Bachem. The input must have full column rank.
 """
 function hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
-   H = deepcopy(A)
-   _hnf_minors!(H, similar(A, 0, 0), Val(false))
-   return H
+  H = deepcopy(A)
+  _hnf_minors!(H, similar(A, 0, 0), Val(false))
+  return H
 end
 
 @doc raw"""
@@ -4407,245 +4407,245 @@ matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem. The input must
 have full column rank.
 """
 function hnf_minors_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   H = deepcopy(A)
-   U = similar(A, nrows(A), nrows(A))
-   _hnf_minors!(H, U, Val(true))
-   return H, U
+  H = deepcopy(A)
+  U = similar(A, nrows(A), nrows(A))
+  _hnf_minors!(H, U, Val(true))
+  return H, U
 end
 
 function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
-   m = nrows(H)
-   n = ncols(H)
+  m = nrows(H)
+  n = ncols(H)
 
-   l = m
-   k = 0
+  l = m
+  k = 0
 
-   R = base_ring(H)
+  R = base_ring(H)
 
-   if with_transform
-      for i in 1:m
-         for j in 1:m
-            if j == i
-               U[i, j] = one(R)
-            else
-               U[i, j] = zero(R)
-            end
-         end
+  if with_transform
+    for i in 1:m
+      for j in 1:m
+        if j == i
+          U[i, j] = one(R)
+        else
+          U[i, j] = zero(R)
+        end
       end
-   end
+    end
+  end
 
-   t = zero(R)
-   b = zero(R)
-   t2 = zero(R)
-   r1d = zero(R)
-   r2d = zero(R)
-   q = zero(R)
-   minus_one = base_ring(H)(-1)
+  t = zero(R)
+  b = zero(R)
+  t2 = zero(R)
+  r1d = zero(R)
+  r2d = zero(R)
+  q = zero(R)
+  minus_one = base_ring(H)(-1)
 
-   while k <= n - 1
-      k = k + 1
-      if k == 1 && !is_zero_entry(H, k, k)
-         for j2 in 1:n
-            H[k, j2] = deepcopy(H[k, j2])
-         end
+  while k <= n - 1
+    k = k + 1
+    if k == 1 && !is_zero_entry(H, k, k)
+      for j2 in 1:n
+        H[k, j2] = deepcopy(H[k, j2])
       end
+    end
 
-      # We have a matrix of form ( * * * * )
-      #                          ( 0 * * * )
-      #                          ( 0 0 * * ) <- k - 1
-      #                          ( * * * * ) <- k
-      # We want to produce zeroes in the first k entries
-      # of row k.
+    # We have a matrix of form ( * * * * )
+    #                          ( 0 * * * )
+    #                          ( 0 0 * * ) <- k - 1
+    #                          ( * * * * ) <- k
+    # We want to produce zeroes in the first k entries
+    # of row k.
 
-      for j in 1:k-1
-         # Since we want to mutate the k-th row, first make a copy
-         if j == 1
-            for j2 in j:n
-               H[k, j2] = deepcopy(H[k, j2])
-            end
-         end
-
-         # Shortcuts
-         if is_zero_entry(H, k, j)
-            continue
-         end
-
-         di, q = divides(H[k, j], H[j, j])
-         if di
-            q = mul!(q, q, minus_one)
-            for j2 in j:n
-               t = mul!(t, q, H[j, j2])
-               H[k, j2] = add!(H[k, j2], H[k, j2], t)
-            end
-            if with_transform
-               for j2 in 1:m
-                  t = mul!(t, q, U[j, j2])
-                  U[k, j2] = add!(U[k, j2], U[k, j2], t)
-               end
-            end
-            continue
-         end
-
-         # Generic case
-         d, u, v = gcdx(H[j, j], H[k, j])
-
-         r1d = divexact(H[j, j], d)
-         r2d = divexact(H[k, j], d)
-
-         mul!(r2d, r2d, minus_one)
-         for j2 in j:n
-            b = mul_red!(b, u, H[j, j2], false)
-            t2 = mul_red!(t2, v, H[k, j2], false)
-            H[k, j2] = mul_red!(H[k, j2], H[k, j2], r1d, false)
-            t = mul_red!(t, r2d, H[j, j2], false)
-            H[k, j2] = add!(H[k, j2], H[k, j2], t)
-            H[j, j2] = add!(H[j, j2], b, t2)
-            H[k, j2] = reduce!(H[k, j2])
-            H[j, j2] = reduce!(H[j, j2])
-         end
-         if with_transform
-            for j2 in 1:m
-               b = mul_red!(b, u, U[j, j2], false)
-               t2 = mul_red!(t2, v, U[k, j2], false)
-               U[k, j2] = mul_red!(U[k, j2], U[k, j2], r1d, false)
-               t = mul_red!(t, r2d, U[j, j2], false)
-               U[k, j2] = add!(U[k, j2], U[k, j2], t)
-               U[j, j2] = add!(U[j, j2], b, t2)
-               U[k, j2] = reduce!(U[k, j2])
-               U[j, j2] = reduce!(U[j, j2])
-            end
-         end
+    for j in 1:k-1
+      # Since we want to mutate the k-th row, first make a copy
+      if j == 1
+        for j2 in j:n
+          H[k, j2] = deepcopy(H[k, j2])
+        end
       end
 
-      if is_zero_entry(H, k, k)
-         swap_rows!(H, k, l)
-         if with_transform
-            swap_rows!(U, k, l)
-         end
-         l = l - 1
-         k = k - 1
-         continue
+      # Shortcuts
+      if is_zero_entry(H, k, j)
+        continue
       end
 
-      u = canonical_unit(H[k, k])
-      if !isone(u)
-         u = R(inv(u))
-         for j in k:n
-            H[k, j] = mul!(H[k, j], H[k, j], u)
-         end
-         if with_transform
-            for j in 1:m
-               U[k, j] = mul!(U[k, j], U[k, j], u)
-            end
-         end
+      di, q = divides(H[k, j], H[j, j])
+      if di
+        q = mul!(q, q, minus_one)
+        for j2 in j:n
+          t = mul!(t, q, H[j, j2])
+          H[k, j2] = add!(H[k, j2], H[k, j2], t)
+        end
+        if with_transform
+          for j2 in 1:m
+            t = mul!(t, q, U[j, j2])
+            U[k, j2] = add!(U[k, j2], U[k, j2], t)
+          end
+        end
+        continue
       end
 
-      for i in (k - 1):-1:1
-         for j in (i + 1):k
-            q = div(H[i, j], H[j, j])
-            if iszero(q)
-              continue
-            end
-            q = mul!(q, q, minus_one)
-            for j2 in j:n
-               t = mul!(t, q, H[j, j2])
-               H[i, j2] = add!(H[i, j2], H[i, j2], t)
-            end
-            if with_transform
-               for j2 in 1:m
-                  t = mul!(t, q, U[j, j2])
-                  U[i, j2] = add!(U[i, j2], U[i, j2], t)
-               end
-            end
-         end
+      # Generic case
+      d, u, v = gcdx(H[j, j], H[k, j])
+
+      r1d = divexact(H[j, j], d)
+      r2d = divexact(H[k, j], d)
+
+      mul!(r2d, r2d, minus_one)
+      for j2 in j:n
+        b = mul_red!(b, u, H[j, j2], false)
+        t2 = mul_red!(t2, v, H[k, j2], false)
+        H[k, j2] = mul_red!(H[k, j2], H[k, j2], r1d, false)
+        t = mul_red!(t, r2d, H[j, j2], false)
+        H[k, j2] = add!(H[k, j2], H[k, j2], t)
+        H[j, j2] = add!(H[j, j2], b, t2)
+        H[k, j2] = reduce!(H[k, j2])
+        H[j, j2] = reduce!(H[j, j2])
       end
-      l = m
-   end
-
-   # Now the matrix is of form
-   # ( * * * )
-   # ( 0 * * )
-   # ( 0 0 * )
-   # ( * * * ) <- n + 1
-   # ( * * * )
-
-   for k in (n + 1):m
-      for j in 1:n
-         if j == 1
-            for j2 in 1:n
-               H[k, j2] = deepcopy(H[k, j2])
-            end
-         end
-
-         # We do the same shortcuts as above
-         if is_zero_entry(H, k, j)
-            continue
-         end
-
-         di, q = divides(H[k, j], H[j, j])
-         if di
-            q = mul!(q, q, minus_one)
-            for j2 in j:n
-               t = mul!(t, q, H[j, j2])
-               H[k, j2] = add!(H[k, j2], H[k, j2], t)
-            end
-            if with_transform
-               for j2 in 1:m
-                  t = mul!(t, q, U[j, j2])
-                  U[k, j2] = add!(U[k, j2], U[k, j2], t)
-               end
-            end
-            continue
-         end
-
-         d, u, v = gcdx(H[j, j], H[k, j])
-         r1d = divexact(H[j, j], d)
-         r2d = divexact(H[k, j], d)
-         mul!(r2d, r2d, minus_one)
-         for j2 in j:n
-            b = mul_red!(b, u, H[j, j2], false)
-            t2 = mul_red!(t2, v, H[k, j2], false)
-            H[k, j2] = mul_red!(H[k, j2], H[k, j2], r1d, false)
-            t = mul_red!(t, r2d, H[j, j2], false)
-            H[k, j2] = add!(H[k, j2], H[k, j2], t)
-            H[j, j2] = add!(H[j, j2], b, t2)
-            H[k, j2] = reduce!(H[k, j2])
-            H[j, j2] = reduce!(H[j, j2])
-         end
-         if with_transform
-            for j2 in 1:m
-               b = mul_red!(b, u, U[j, j2], false)
-               t2 = mul_red!(t2, v, U[k, j2], false)
-               U[k, j2] = mul_red!(U[k, j2], U[k, j2], r1d, false)
-               t = mul_red!(t, r2d, U[j, j2], false)
-               U[k, j2] = add!(U[k, j2], U[k, j2], t)
-               U[j, j2] = add!(U[j, j2], b, t2)
-               U[k, j2] = reduce!(U[k, j2])
-               U[j, j2] = reduce!(U[j, j2])
-            end
-         end
+      if with_transform
+        for j2 in 1:m
+          b = mul_red!(b, u, U[j, j2], false)
+          t2 = mul_red!(t2, v, U[k, j2], false)
+          U[k, j2] = mul_red!(U[k, j2], U[k, j2], r1d, false)
+          t = mul_red!(t, r2d, U[j, j2], false)
+          U[k, j2] = add!(U[k, j2], U[k, j2], t)
+          U[j, j2] = add!(U[j, j2], b, t2)
+          U[k, j2] = reduce!(U[k, j2])
+          U[j, j2] = reduce!(U[j, j2])
+        end
       end
-      for i in n:-1:1
-         for j in (i + 1):n
-            q = div(H[i, j], H[j, j])
-            if iszero(q)
-              continue
-            end
-            q = mul!(q, q, minus_one)
-            for j2 in j:n
-               t = mul!(t, q, H[j, j2])
-               H[i, j2] = add!(H[i, j2], H[i, j2], t)
-            end
-            if with_transform
-               for j2 in 1:m
-                  t = mul!(t, q, U[j, j2])
-                  U[i, j2] = add!(U[i, j2], U[i, j2], t)
-               end
-            end
-         end
+    end
+
+    if is_zero_entry(H, k, k)
+      swap_rows!(H, k, l)
+      if with_transform
+        swap_rows!(U, k, l)
       end
-   end
-   return H
+      l = l - 1
+      k = k - 1
+      continue
+    end
+
+    u = canonical_unit(H[k, k])
+    if !isone(u)
+      u = R(inv(u))
+      for j in k:n
+        H[k, j] = mul!(H[k, j], H[k, j], u)
+      end
+      if with_transform
+        for j in 1:m
+          U[k, j] = mul!(U[k, j], U[k, j], u)
+        end
+      end
+    end
+
+    for i in (k - 1):-1:1
+      for j in (i + 1):k
+        q = div(H[i, j], H[j, j])
+        if iszero(q)
+          continue
+        end
+        q = mul!(q, q, minus_one)
+        for j2 in j:n
+          t = mul!(t, q, H[j, j2])
+          H[i, j2] = add!(H[i, j2], H[i, j2], t)
+        end
+        if with_transform
+          for j2 in 1:m
+            t = mul!(t, q, U[j, j2])
+            U[i, j2] = add!(U[i, j2], U[i, j2], t)
+          end
+        end
+      end
+    end
+    l = m
+  end
+
+  # Now the matrix is of form
+  # ( * * * )
+  # ( 0 * * )
+  # ( 0 0 * )
+  # ( * * * ) <- n + 1
+  # ( * * * )
+
+  for k in (n + 1):m
+    for j in 1:n
+      if j == 1
+        for j2 in 1:n
+          H[k, j2] = deepcopy(H[k, j2])
+        end
+      end
+
+      # We do the same shortcuts as above
+      if is_zero_entry(H, k, j)
+        continue
+      end
+
+      di, q = divides(H[k, j], H[j, j])
+      if di
+        q = mul!(q, q, minus_one)
+        for j2 in j:n
+          t = mul!(t, q, H[j, j2])
+          H[k, j2] = add!(H[k, j2], H[k, j2], t)
+        end
+        if with_transform
+          for j2 in 1:m
+            t = mul!(t, q, U[j, j2])
+            U[k, j2] = add!(U[k, j2], U[k, j2], t)
+          end
+        end
+        continue
+      end
+
+      d, u, v = gcdx(H[j, j], H[k, j])
+      r1d = divexact(H[j, j], d)
+      r2d = divexact(H[k, j], d)
+      mul!(r2d, r2d, minus_one)
+      for j2 in j:n
+        b = mul_red!(b, u, H[j, j2], false)
+        t2 = mul_red!(t2, v, H[k, j2], false)
+        H[k, j2] = mul_red!(H[k, j2], H[k, j2], r1d, false)
+        t = mul_red!(t, r2d, H[j, j2], false)
+        H[k, j2] = add!(H[k, j2], H[k, j2], t)
+        H[j, j2] = add!(H[j, j2], b, t2)
+        H[k, j2] = reduce!(H[k, j2])
+        H[j, j2] = reduce!(H[j, j2])
+      end
+      if with_transform
+        for j2 in 1:m
+          b = mul_red!(b, u, U[j, j2], false)
+          t2 = mul_red!(t2, v, U[k, j2], false)
+          U[k, j2] = mul_red!(U[k, j2], U[k, j2], r1d, false)
+          t = mul_red!(t, r2d, U[j, j2], false)
+          U[k, j2] = add!(U[k, j2], U[k, j2], t)
+          U[j, j2] = add!(U[j, j2], b, t2)
+          U[k, j2] = reduce!(U[k, j2])
+          U[j, j2] = reduce!(U[j, j2])
+        end
+      end
+    end
+    for i in n:-1:1
+      for j in (i + 1):n
+        q = div(H[i, j], H[j, j])
+        if iszero(q)
+          continue
+        end
+        q = mul!(q, q, minus_one)
+        for j2 in j:n
+          t = mul!(t, q, H[j, j2])
+          H[i, j2] = add!(H[i, j2], H[i, j2], t)
+        end
+        if with_transform
+          for j2 in 1:m
+            t = mul!(t, q, U[j, j2])
+            U[i, j2] = add!(U[i, j2], U[i, j2], t)
+          end
+        end
+      end
+    end
+  end
+  return H
 end
 
 #  Hermite normal form for arbitrary matrices via a modification of the
@@ -4658,7 +4658,7 @@ Compute the upper right row Hermite normal form of $A$ using a modification
 of the algorithm of Kannan-Bachem.
 """
 function hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
-   return _hnf_kb(A, Val(false))
+  return _hnf_kb(A, Val(false))
 end
 
 @doc raw"""
@@ -4669,204 +4669,204 @@ matrix $U$ with $UA = H$ using a modification of the algorithm of
 Kannan-Bachem.
 """
 function hnf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   return _hnf_kb(A, Val(true))
+  return _hnf_kb(A, Val(true))
 end
 
 function _hnf_kb(A, ::Val{with_transform} = Val(false)) where {with_transform}
-   H = deepcopy(A)
-   m = nrows(H)
-   if with_transform
-      U = identity_matrix(A, m)
-      hnf_kb!(H, U, true)
-      return H, U
-   else
-      U = similar(A, 0, 0)
-      hnf_kb!(H, U, false)
-      return H
-   end
+  H = deepcopy(A)
+  m = nrows(H)
+  if with_transform
+    U = identity_matrix(A, m)
+    hnf_kb!(H, U, true)
+    return H, U
+  else
+    U = similar(A, 0, 0)
+    hnf_kb!(H, U, false)
+    return H
+  end
 end
 
 function kb_search_first_pivot(H, start_element::Int = 1)
-   for r = start_element:nrows(H)
-      for c = start_element:ncols(H)
-         if !is_zero_entry(H, r, c)
-            return r, c
-         end
+  for r = start_element:nrows(H)
+    for c = start_element:ncols(H)
+      if !is_zero_entry(H, r, c)
+        return r, c
       end
-   end
-   return 0, 0
+    end
+  end
+  return 0, 0
 end
 
 # Reduces the entries above H[pivot[c], c]
 function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
 
-   # Let c = 4 and pivot[c] = 4. H could look like this:
-   # ( 0 . * # * )
-   # ( . * * # * )
-   # ( 0 0 0 0 . )
-   # ( 0 0 0 . * )
-   # ( * * * * * )
-   #
-   # (. are pivots, we want to reduce the entries marked with #)
-   # The #'s are in rows whose pivot is in a column left of column c.
+  # Let c = 4 and pivot[c] = 4. H could look like this:
+  # ( 0 . * # * )
+  # ( . * * # * )
+  # ( 0 0 0 0 . )
+  # ( 0 0 0 . * )
+  # ( * * * * * )
+  #
+  # (. are pivots, we want to reduce the entries marked with #)
+  # The #'s are in rows whose pivot is in a column left of column c.
 
-   r = pivot[c]
-   t = base_ring(H)()
-   for i = start_element:c - 1
-      p = pivot[i]
-      if p == 0
-         continue
+  r = pivot[c]
+  t = base_ring(H)()
+  for i = start_element:c - 1
+    p = pivot[i]
+    if p == 0
+      continue
+    end
+    # So, the pivot in row p is in a column left of c.
+    if is_zero_entry(H, p, c)
+      continue
+    end
+    q = -div(H[p, c], H[r, c])
+    for j = c:ncols(H)
+      t = mul!(t, q, H[r, j])
+      H[p, j] += t
+    end
+    if with_trafo
+      for j = 1:ncols(U)
+        t = mul!(t, q, U[r, j])
+        U[p, j] += t
       end
-      # So, the pivot in row p is in a column left of c.
-      if is_zero_entry(H, p, c)
-         continue
-      end
-      q = -div(H[p, c], H[r, c])
-      for j = c:ncols(H)
-         t = mul!(t, q, H[r, j])
-         H[p, j] += t
-      end
-      if with_trafo
-         for j = 1:ncols(U)
-            t = mul!(t, q, U[r, j])
-            U[p, j] += t
-         end
-      end
-   end
-   return nothing
+    end
+  end
+  return nothing
 end
 
 # Multiplies row r by a unit such that the entry H[r, c] is "canonical"
 function kb_canonical_row!(H, U, r::Int, c::Int, with_trafo::Bool)
-   cu = canonical_unit(H[r, c])
-   if !isone(cu)
-      for j = c:ncols(H)
-         H[r, j] = divexact(H[r, j], cu)
+  cu = canonical_unit(H[r, c])
+  if !isone(cu)
+    for j = c:ncols(H)
+      H[r, j] = divexact(H[r, j], cu)
+    end
+    if with_trafo
+      for j = 1:ncols(U)
+        U[r, j] = divexact(U[r, j], cu)
       end
-      if with_trafo
-         for j = 1:ncols(U)
-            U[r, j] = divexact(U[r, j], cu)
-         end
-      end
-   end
-   return nothing
+    end
+  end
+  return nothing
 end
 
 function kb_sort_rows!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
-   m = nrows(H)
-   n = ncols(H)
-   pivot2 = zeros(Int, m)
-   for i = 1:n
-      if pivot[i] == 0
-         continue
-      end
-      pivot2[pivot[i]] = i
-   end
+  m = nrows(H)
+  n = ncols(H)
+  pivot2 = zeros(Int, m)
+  for i = 1:n
+    if pivot[i] == 0
+      continue
+    end
+    pivot2[pivot[i]] = i
+  end
 
-   r1 = start_element
-   for i = start_element:n
-      r2 = pivot[i]
-      if r2 == 0
-         continue
+  r1 = start_element
+  for i = start_element:n
+    r2 = pivot[i]
+    if r2 == 0
+      continue
+    end
+    if r1 != r2
+      swap_rows!(H, r1, r2)
+      with_trafo ? swap_rows!(U, r1, r2) : nothing
+      p = pivot2[r1]
+      pivot[i] = r1
+      if p != 0
+        pivot[p] = r2
       end
-      if r1 != r2
-         swap_rows!(H, r1, r2)
-         with_trafo ? swap_rows!(U, r1, r2) : nothing
-         p = pivot2[r1]
-         pivot[i] = r1
-         if p != 0
-            pivot[p] = r2
-         end
-         pivot2[r1] = i
-         pivot2[r2] = p
-      end
-      r1 += 1
-      if r1 == m
-         break
-      end
-   end
-   return nothing
+      pivot2[r1] = i
+      pivot2[r2] = p
+    end
+    r1 += 1
+    if r1 == m
+      break
+    end
+  end
+  return nothing
 end
 
 function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
-   m = nrows(H)
-   n = ncols(H)
-   pivot = zeros(Int, n) # pivot[j] == i if the pivot of column j is in row i
+  m = nrows(H)
+  n = ncols(H)
+  pivot = zeros(Int, n) # pivot[j] == i if the pivot of column j is in row i
 
-   # Find the first non-zero entry of H
-   row1, col1 = kb_search_first_pivot(H, start_element)
-   if row1 == 0
-      return nothing
-   end
-   pivot[col1] = row1
-   kb_canonical_row!(H, U, row1, col1, with_trafo)
-   pivot_max = col1
-   t = base_ring(H)()
-   t1 = base_ring(H)()
-   t2 = base_ring(H)()
-   for i = row1 + 1:m
-      new_pivot = false
-      for j = start_element:n
-         if is_zero_entry(H, i, j)
-            continue
-         end
-         if pivot[j] == 0
-            # We found a non-zero entry in a column without a pivot: This is a
-            # new pivot
-            pivot[j] = i
-            pivot_max = max(pivot_max, j)
-            new_pivot = true
-         else
-            # We have a pivot for this column: Use it to write 0 in H[i, j]
-            p = pivot[j]
-            d, u, v = gcdx(H[p, j], H[i, j])
-            a = divexact(H[p, j], d)
-            b = -divexact(H[i, j], d)
-            for c = j:n
-               t = deepcopy(H[i, c])
-               t1 = mul_red!(t1, a, H[i, c], false)
-               t2 = mul_red!(t2, b, H[p, c], false)
-               H[i, c] = reduce!(t1 + t2)
-               t1 = mul_red!(t1, u, H[p, c], false)
-               t2 = mul_red!(t2, v, t, false)
-               H[p, c] = reduce!(t1 + t2)
-            end
-            if with_trafo
-               for c = 1:m
-                  t = deepcopy(U[i, c])
-                  t1 = mul_red!(t1, a, U[i, c], false)
-                  t2 = mul_red!(t2, b, U[p, c], false)
-                  U[i, c] = reduce!(t1 + t2)
-                  t1 = mul_red!(t1, u, U[p, c], false)
-                  t2 = mul_red!(t2, v, t, false)
-                  U[p, c] = reduce!(t1 + t2)
-               end
-            end
-         end
-
-         # We changed the pivot of column j (or found a new one).
-         # We have do reduce the entries marked with # in
-         # ( 0 0 0 . * )
-         # ( . # # * * )
-         # ( 0 0 . * * )
-         # ( 0 . # * * )
-         # ( * * * * * )
-         # where . are pivots and i = 4, j = 2. (This example is for the
-         # "new pivot" case.)
-         kb_canonical_row!(H, U, pivot[j], j, with_trafo)
-         for c = j:pivot_max
-            if pivot[c] == 0
-               continue
-            end
-            kb_reduce_column!(H, U, pivot, c, with_trafo, start_element)
-         end
-         if new_pivot
-            break
-         end
+  # Find the first non-zero entry of H
+  row1, col1 = kb_search_first_pivot(H, start_element)
+  if row1 == 0
+    return nothing
+  end
+  pivot[col1] = row1
+  kb_canonical_row!(H, U, row1, col1, with_trafo)
+  pivot_max = col1
+  t = base_ring(H)()
+  t1 = base_ring(H)()
+  t2 = base_ring(H)()
+  for i = row1 + 1:m
+    new_pivot = false
+    for j = start_element:n
+      if is_zero_entry(H, i, j)
+        continue
       end
-   end
-   kb_sort_rows!(H, U, pivot, with_trafo, start_element)
-   return nothing
+      if pivot[j] == 0
+        # We found a non-zero entry in a column without a pivot: This is a
+        # new pivot
+        pivot[j] = i
+        pivot_max = max(pivot_max, j)
+        new_pivot = true
+      else
+        # We have a pivot for this column: Use it to write 0 in H[i, j]
+        p = pivot[j]
+        d, u, v = gcdx(H[p, j], H[i, j])
+        a = divexact(H[p, j], d)
+        b = -divexact(H[i, j], d)
+        for c = j:n
+          t = deepcopy(H[i, c])
+          t1 = mul_red!(t1, a, H[i, c], false)
+          t2 = mul_red!(t2, b, H[p, c], false)
+          H[i, c] = reduce!(t1 + t2)
+          t1 = mul_red!(t1, u, H[p, c], false)
+          t2 = mul_red!(t2, v, t, false)
+          H[p, c] = reduce!(t1 + t2)
+        end
+        if with_trafo
+          for c = 1:m
+            t = deepcopy(U[i, c])
+            t1 = mul_red!(t1, a, U[i, c], false)
+            t2 = mul_red!(t2, b, U[p, c], false)
+            U[i, c] = reduce!(t1 + t2)
+            t1 = mul_red!(t1, u, U[p, c], false)
+            t2 = mul_red!(t2, v, t, false)
+            U[p, c] = reduce!(t1 + t2)
+          end
+        end
+      end
+
+      # We changed the pivot of column j (or found a new one).
+      # We have do reduce the entries marked with # in
+      # ( 0 0 0 . * )
+      # ( . # # * * )
+      # ( 0 0 . * * )
+      # ( 0 . # * * )
+      # ( * * * * * )
+      # where . are pivots and i = 4, j = 2. (This example is for the
+      # "new pivot" case.)
+      kb_canonical_row!(H, U, pivot[j], j, with_trafo)
+      for c = j:pivot_max
+        if pivot[c] == 0
+          continue
+        end
+        kb_reduce_column!(H, U, pivot, c, with_trafo, start_element)
+      end
+      if new_pivot
+        break
+      end
+    end
+  end
+  kb_sort_rows!(H, U, pivot, with_trafo, start_element)
+  return nothing
 end
 
 @doc raw"""
@@ -4894,46 +4894,46 @@ end
 Return `true` if the matrix is in Hermite normal form.
 """
 function is_hnf(M::MatrixElem{T}) where T <: RingElement
-   r = nrows(M)
-   c = ncols(M)
-   row = 1
-   col = 1
-   pivots = zeros(Int, r)
-   # first check the staircase, since it is cheap to do
-   while row <= r
-      while col <= c && M[row, col] == 0
-         for i = row + 1:r
-            if M[i, col] != 0
-               return false
-            end
-         end
-         col += 1
+  r = nrows(M)
+  c = ncols(M)
+  row = 1
+  col = 1
+  pivots = zeros(Int, r)
+  # first check the staircase, since it is cheap to do
+  while row <= r
+    while col <= c && M[row, col] == 0
+      for i = row + 1:r
+        if M[i, col] != 0
+          return false
+        end
       end
-      if col <= c # found pivot
-         pivots[row] = col
-         for i = row + 1:r
-            if M[i, col] != 0
-               return false
-            end
-         end
-      end
-      row += 1
       col += 1
-   end
-   # now check everything above pivots is reduced (expensive)
-   row = 1
-   while row <= r && pivots[row] != 0
-      col = pivots[row]
-      p = M[row, col]
-      for i = 1:row - 1
-         qq, rr = divrem(M[i, col], p)
-         if rr != M[i, col]
-            return false
-         end
+    end
+    if col <= c # found pivot
+      pivots[row] = col
+      for i = row + 1:r
+        if M[i, col] != 0
+          return false
+        end
       end
-      row += 1
-   end
-   return true
+    end
+    row += 1
+    col += 1
+  end
+  # now check everything above pivots is reduced (expensive)
+  row = 1
+  while row <= r && pivots[row] != 0
+    col = pivots[row]
+    p = M[row, col]
+    for i = 1:row - 1
+      qq, rr = divrem(M[i, col], p)
+      if rr != M[i, col]
+        return false
+      end
+    end
+    row += 1
+  end
+  return true
 end
 
 ###############################################################################
@@ -4948,148 +4948,148 @@ end
 Return `true` if $A$ is in Smith Normal Form.
 """
 function is_snf(A::MatrixElem{T}) where T <: RingElement
-   m = nrows(A)
-   n = ncols(A)
-   a = A[1, 1]
-   for i = 2:min(m, n)
-      q, r = divrem(A[i, i], a)
-      if !iszero(r)
-         return false
+  m = nrows(A)
+  n = ncols(A)
+  a = A[1, 1]
+  for i = 2:min(m, n)
+    q, r = divrem(A[i, i], a)
+    if !iszero(r)
+      return false
+    end
+    a = A[i,i]
+  end
+  for i = 1:n
+    for j = 1:m
+      if i == j
+        continue
       end
-      a = A[i,i]
-   end
-   for i = 1:n
-      for j = 1:m
-         if i == j
-            continue
-         end
-         if !is_zero_entry(A, j, i)
-            return false
-         end
+      if !is_zero_entry(A, j, i)
+        return false
       end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 function snf_kb(A::MatrixElem{T}) where {T <: RingElement}
-   return _snf_kb(A, Val(false))
+  return _snf_kb(A, Val(false))
 end
 
 function snf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   return _snf_kb(A, Val(true))
+  return _snf_kb(A, Val(true))
 end
 
 function _snf_kb(A::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
-   S = deepcopy(A)
-   m = nrows(S)
-   n = ncols(S)
-   if with_transform
-      U = identity_matrix(A, m)
-      K = identity_matrix(A, n)
-      snf_kb!(S, U, K, true)
-      return S, U, K
-   else
-      U = similar(A, 0, 0)
-      K = U
-      snf_kb!(S, U, K, false)
-      return S
-   end
+  S = deepcopy(A)
+  m = nrows(S)
+  n = ncols(S)
+  if with_transform
+    U = identity_matrix(A, m)
+    K = identity_matrix(A, n)
+    snf_kb!(S, U, K, true)
+    return S, U, K
+  else
+    U = similar(A, 0, 0)
+    K = U
+    snf_kb!(S, U, K, false)
+    return S
+  end
 end
 
 function kb_clear_row!(S::MatrixElem{T}, K::MatrixElem{T}, i::Int, with_trafo::Bool) where {T <: RingElement}
-   m = nrows(S)
-   n = ncols(S)
-   t = base_ring(S)()
-   t1 = base_ring(S)()
-   t2 = base_ring(S)()
-   for j = i+1:n
-      if is_zero_entry(S, i, j)
-         continue
+  m = nrows(S)
+  n = ncols(S)
+  t = base_ring(S)()
+  t1 = base_ring(S)()
+  t2 = base_ring(S)()
+  for j = i+1:n
+    if is_zero_entry(S, i, j)
+      continue
+    end
+    d, u, v = gcdx(S[i, i], S[i, j])
+    a = divexact(S[i ,i], d)
+    b = -divexact(S[i, j], d)
+    for r = i:m
+      t = deepcopy(S[r, j])
+      t1 = mul_red!(t1, a, S[r, j], false)
+      t2 = mul_red!(t2, b, S[r, i], false)
+      S[r, j] = reduce!(t1 + t2)
+      t1 = mul_red!(t1, u, S[r, i], false)
+      t2 = mul_red!(t2, v, t, false)
+      S[r, i] = reduce!(t1 + t2)
+    end
+    if with_trafo
+      for r = 1:n
+        t = deepcopy(K[r,j])
+        t1 = mul_red!(t1, a, K[r, j], false)
+        t2 = mul_red!(t2, b, K[r, i], false)
+        K[r, j] = reduce!(t1 + t2)
+        t1 = mul_red!(t1, u, K[r, i], false)
+        t2 = mul_red!(t2, v, t, false)
+        K[r, i] = reduce!(t1 + t2)
       end
-      d, u, v = gcdx(S[i, i], S[i, j])
-      a = divexact(S[i ,i], d)
-      b = -divexact(S[i, j], d)
-      for r = i:m
-         t = deepcopy(S[r, j])
-         t1 = mul_red!(t1, a, S[r, j], false)
-         t2 = mul_red!(t2, b, S[r, i], false)
-         S[r, j] = reduce!(t1 + t2)
-         t1 = mul_red!(t1, u, S[r, i], false)
-         t2 = mul_red!(t2, v, t, false)
-         S[r, i] = reduce!(t1 + t2)
-      end
-      if with_trafo
-         for r = 1:n
-            t = deepcopy(K[r,j])
-            t1 = mul_red!(t1, a, K[r, j], false)
-            t2 = mul_red!(t2, b, K[r, i], false)
-            K[r, j] = reduce!(t1 + t2)
-            t1 = mul_red!(t1, u, K[r, i], false)
-            t2 = mul_red!(t2, v, t, false)
-            K[r, i] = reduce!(t1 + t2)
-         end
-      end
-   end
-   return nothing
+    end
+  end
+  return nothing
 end
 
 function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_trafo::Bool = false) where {T <: RingElement}
-   m = nrows(S)
-   n = ncols(S)
-   l = min(m, n)
-   i = 1
-   t = base_ring(S)()
-   t1 = base_ring(S)()
-   t2 = base_ring(S)()
-   while i <= l
-      kb_clear_row!(S, K, i, with_trafo)
-      hnf_kb!(S, U, with_trafo, i)
-      c = i + 1
-      while c <= n && is_zero_entry(S, i, c)
-         c += 1
+  m = nrows(S)
+  n = ncols(S)
+  l = min(m, n)
+  i = 1
+  t = base_ring(S)()
+  t1 = base_ring(S)()
+  t2 = base_ring(S)()
+  while i <= l
+    kb_clear_row!(S, K, i, with_trafo)
+    hnf_kb!(S, U, with_trafo, i)
+    c = i + 1
+    while c <= n && is_zero_entry(S, i, c)
+      c += 1
+    end
+    if c != n + 1
+      continue
+    end
+    i+=1
+  end
+  for i = 1:l-1
+    for j = i + 1:l
+      if isone(S[i, i])
+        break
       end
-      if c != n + 1
-         continue
+      if is_zero_entry(S, i, i) && is_zero_entry(S, j, j)
+        continue
       end
-      i+=1
-   end
-   for i = 1:l-1
-      for j = i + 1:l
-         if isone(S[i, i])
-           break
-         end
-         if is_zero_entry(S, i, i) && is_zero_entry(S, j, j)
-            continue
-         end
-         d, u, v = gcdx(S[i, i], S[j, j])
-         if with_trafo
-            q = -divexact(S[j, j], d)
-            t1 = mul!(t1, q, v)
-            for c = 1:m
-               t = deepcopy(U[i, c])
-               U[i, c] += U[j, c]
-               t2 = mul_red!(t2, t1, U[j, c], false)
-               U[j, c] += t2
-               t2 = mul_red!(t2, t1, t, false)
-               U[j, c] = reduce!(U[j, c] + t2)
-            end
-            q1 = -divexact(S[j, j], d)
-            q2 = divexact(S[i, i], d)
-            for r = 1:n
-               t = deepcopy(K[r, i])
-               t1 = mul_red!(t1, K[r, i], u, false)
-               t2 = mul_red!(t2, K[r, j], v, false)
-               K[r, i] = reduce!(t1 + t2)
-               t1 = mul_red!(t1, t, q1, false)
-               t2 = mul_red!(t2, K[r, j], q2, false)
-               K[r, j] = reduce!(t1 + t2)
-            end
-         end
-         S[j, j] = divexact(S[i, i]*S[j, j], d)
-         S[i, i] = d
+      d, u, v = gcdx(S[i, i], S[j, j])
+      if with_trafo
+        q = -divexact(S[j, j], d)
+        t1 = mul!(t1, q, v)
+        for c = 1:m
+          t = deepcopy(U[i, c])
+          U[i, c] += U[j, c]
+          t2 = mul_red!(t2, t1, U[j, c], false)
+          U[j, c] += t2
+          t2 = mul_red!(t2, t1, t, false)
+          U[j, c] = reduce!(U[j, c] + t2)
+        end
+        q1 = -divexact(S[j, j], d)
+        q2 = divexact(S[i, i], d)
+        for r = 1:n
+          t = deepcopy(K[r, i])
+          t1 = mul_red!(t1, K[r, i], u, false)
+          t2 = mul_red!(t2, K[r, j], v, false)
+          K[r, i] = reduce!(t1 + t2)
+          t1 = mul_red!(t1, t, q1, false)
+          t2 = mul_red!(t2, K[r, j], q2, false)
+          K[r, j] = reduce!(t1 + t2)
+        end
       end
-   end
-   return nothing
+      S[j, j] = divexact(S[i, i]*S[j, j], d)
+      S[i, i] = d
+    end
+  end
+  return nothing
 end
 
 @doc raw"""
@@ -5123,24 +5123,24 @@ end
 Return `true` if $P$ is a matrix in weak Popov form of the given rank.
 """
 function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
-   zero_rows = 0
-   pivots = zeros(ncols(P))
-   for r = 1:nrows(P)
-      p = find_pivot_popov(P, r)
-      if P[r, p] == 0
-         zero_rows += 1
-         continue
-      end
-      # There is already a pivot in this column
-      if pivots[p] != 0
-         return false
-      end
-      pivots[p] = r
-   end
-   if zero_rows != nrows(P) - rank
+  zero_rows = 0
+  pivots = zeros(ncols(P))
+  for r = 1:nrows(P)
+    p = find_pivot_popov(P, r)
+    if P[r, p] == 0
+      zero_rows += 1
+      continue
+    end
+    # There is already a pivot in this column
+    if pivots[p] != 0
       return false
-   end
-   return true
+    end
+    pivots[p] = r
+  end
+  if zero_rows != nrows(P) - rank
+    return false
+  end
+  return true
 end
 
 @doc raw"""
@@ -5149,55 +5149,55 @@ end
 Return `true` if $P$ is a matrix in Popov form with the given rank.
 """
 function is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
-   zero_rows = 0
-   for r = 1:nrows(P)
-      p = find_pivot_popov(P, r)
-      if P[r, p] != 0
-         break
-      end
-      zero_rows += 1
-   end
-   # The zero rows must all be on top.
-   if zero_rows != nrows(P) - rank
+  zero_rows = 0
+  for r = 1:nrows(P)
+    p = find_pivot_popov(P, r)
+    if P[r, p] != 0
+      break
+    end
+    zero_rows += 1
+  end
+  # The zero rows must all be on top.
+  if zero_rows != nrows(P) - rank
+    return false
+  end
+  pivotscr = zeros(Int, ncols(P)) # pivotscr[i] == j means the pivot of column i is in row j
+  pivots = zeros(Int, nrows(P)) # the other way round
+  for r = zero_rows + 1:nrows(P)
+    p = find_pivot_popov(P, r)
+    if P[r, p] == 0
       return false
-   end
-   pivotscr = zeros(Int, ncols(P)) # pivotscr[i] == j means the pivot of column i is in row j
-   pivots = zeros(Int, nrows(P)) # the other way round
-   for r = zero_rows + 1:nrows(P)
-      p = find_pivot_popov(P, r)
-      if P[r, p] == 0
-         return false
+    end
+    if pivotscr[p] != 0
+      # There is already a pivot in this column
+      return false
+    end
+    pivotscr[p] = r
+    pivots[r] = p
+  end
+  for r = zero_rows + 1:nrows(P)
+    p = pivots[r]
+    f = P[r, p]
+    if !isone(leading_coefficient(f))
+      return false
+    end
+    for i = 1:nrows(P)
+      i == r ? continue : nothing
+      if degree(P[i, p]) >= degree(f)
+        return false
       end
-      if pivotscr[p] != 0
-         # There is already a pivot in this column
-         return false
+    end
+    if r == nrows(P)
+      break
+    end
+    g = P[r + 1, pivots[r + 1]]
+    if degree(f) >= degree(g)
+      if pivots[r] >= pivots[r + 1]
+        return false
       end
-      pivotscr[p] = r
-      pivots[r] = p
-   end
-   for r = zero_rows + 1:nrows(P)
-      p = pivots[r]
-      f = P[r, p]
-      if !isone(leading_coefficient(f))
-         return false
-      end
-      for i = 1:nrows(P)
-         i == r ? continue : nothing
-         if degree(P[i, p]) >= degree(f)
-            return false
-         end
-      end
-      if r == nrows(P)
-         break
-      end
-      g = P[r + 1, pivots[r + 1]]
-      if degree(f) >= degree(g)
-         if pivots[r] >= pivots[r + 1]
-            return false
-         end
-      end
-   end
-   return true
+    end
+  end
+  return true
 end
 
 @doc raw"""
@@ -5206,7 +5206,7 @@ end
 Return the weak Popov form of $A$.
 """
 function weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _weak_popov(A, Val(false))
+  return _weak_popov(A, Val(false))
 end
 
 @doc raw"""
@@ -5216,22 +5216,22 @@ Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
 is a transformation matrix so that $P = UA$.
 """
 function weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _weak_popov(A, Val(true))
+  return _weak_popov(A, Val(true))
 end
 
 function _weak_popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
-   P = deepcopy(A)
-   m = nrows(P)
-   W = similar(A, 0, 0)
-   if with_transform
-      U = identity_matrix(A, m)
-      weak_popov!(P, W, U, false, true)
-      return P, U
-   else
-      U = similar(A, 0, 0)
-      weak_popov!(P, W, U, false, false)
-      return P
-   end
+  P = deepcopy(A)
+  m = nrows(P)
+  W = similar(A, 0, 0)
+  if with_transform
+    U = identity_matrix(A, m)
+    weak_popov!(P, W, U, false, true)
+    return P, U
+  else
+    U = similar(A, 0, 0)
+    weak_popov!(P, W, U, false, false)
+    return P
+  end
 end
 
 @doc raw"""
@@ -5242,7 +5242,7 @@ on $A$ and a vector $W$ by applying the same transformations on the vector $V$.
 Return the tuple $(P, W)$.
 """
 function extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
-   return _extended_weak_popov(A, V, Val(false))
+  return _extended_weak_popov(A, V, Val(false))
 end
 
 @doc raw"""
@@ -5254,56 +5254,56 @@ and a transformation matrix $U$ so that $P = UA$.
 Return the tuple $(P, W, U)$.
 """
 function extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
-   return _extended_weak_popov(A, V, Val(true))
+  return _extended_weak_popov(A, V, Val(true))
 end
 
 function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
-   @assert nrows(V) == nrows(A) && ncols(V) == 1
-   P = deepcopy(A)
-   W = deepcopy(V)
-   m = nrows(P)
-   if with_transform
-      U = identity_matrix(A)
-      weak_popov!(P, W, U, true, true)
-      return P, W, U
-   else
-      U = similar(A, 0, 0)
-      weak_popov!(P, W, U, true, false)
-      return P, W
-   end
+  @assert nrows(V) == nrows(A) && ncols(V) == 1
+  P = deepcopy(A)
+  W = deepcopy(V)
+  m = nrows(P)
+  if with_transform
+    U = identity_matrix(A)
+    weak_popov!(P, W, U, true, true)
+    return P, W, U
+  else
+    U = similar(A, 0, 0)
+    weak_popov!(P, W, U, true, false)
+    return P, W
+  end
 end
 
 function find_pivot_popov(P::MatElem{T}, r::Int, last_col::Int = 0) where {T <: PolyRingElem}
-   last_col == 0 ? n = ncols(P) : n = last_col
-   pivot = n
-   for c = n-1:-1:1
-      if degree(P[r,c]) > degree(P[r,pivot])
-         pivot = c
-      end
-   end
-   return pivot
+  last_col == 0 ? n = ncols(P) : n = last_col
+  pivot = n
+  for c = n-1:-1:1
+    if degree(P[r,c]) > degree(P[r,pivot])
+      pivot = c
+    end
+  end
+  return pivot
 end
 
 function init_pivots_popov(P::MatElem{T}, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
-   last_row == 0 ? m = nrows(P) : m = last_row
-   last_col == 0 ? n = ncols(P) : n = last_col
-   pivots = Vector{Vector{Int}}(undef, n)
-   for i = 1:n
-      pivots[i] = zeros(Int, 0)
-   end
-   # pivots[i] contains the indices of the rows in which the pivot element is in the ith column.
-   for r = 1:m
-      pivot = find_pivot_popov(P, r, last_col)
-      !is_zero_entry(P, r, pivot) ? push!(pivots[pivot], r) : nothing
-   end
-   return pivots
+  last_row == 0 ? m = nrows(P) : m = last_row
+  last_col == 0 ? n = ncols(P) : n = last_col
+  pivots = Vector{Vector{Int}}(undef, n)
+  for i = 1:n
+    pivots[i] = zeros(Int, 0)
+  end
+  # pivots[i] contains the indices of the rows in which the pivot element is in the ith column.
+  for r = 1:m
+    pivot = find_pivot_popov(P, r, last_col)
+    !is_zero_entry(P, r, pivot) ? push!(pivots[pivot], r) : nothing
+  end
+  return pivots
 end
 
 function weak_popov!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, extended::Bool = false,
-                                       with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
-   pivots = init_pivots_popov(P, last_row, last_col)
-   weak_popov_with_pivots!(P, W, U, pivots, extended, with_trafo, last_row, last_col)
-   return nothing
+    with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
+  pivots = init_pivots_popov(P, last_row, last_col)
+  weak_popov_with_pivots!(P, W, U, pivots, extended, with_trafo, last_row, last_col)
+  return nothing
 end
 
 #=
@@ -5311,59 +5311,59 @@ The weak Popov form is defined by T. Mulders and A. Storjohann in
 "On lattice reduction for polynomial matrices"
 =#
 function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pivots::Vector{Vector{Int}},
-                                                   extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
-   last_row == 0 ? m = nrows(P) : m = last_row
-   last_col == 0 ? n = ncols(P) : n = last_col
-   @assert length(pivots) >= n
+    extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0) where {T <: PolyRingElem}
+  last_row == 0 ? m = nrows(P) : m = last_row
+  last_col == 0 ? n = ncols(P) : n = last_col
+  @assert length(pivots) >= n
 
-   t = base_ring(P)()
-   change = true
-   while change
-      change = false
-      for i = 1:n
-         if length(pivots[i]) <= 1
-            continue
-         end
-         change = true
-         # Reduce with the pivot of minimal degree.
-         # TODO: Remove the list comprehension as soon as indmin(f, A) works
-         #pivotInd = indmin(degree(P[j, i]) for j in pivots[i])
-         pivotInd = argmin([degree(P[j, i]) for j in pivots[i]])
-         pivot = pivots[i][pivotInd]
-         for j = 1:length(pivots[i])
-            if j == pivotInd
-               continue
-            end
-            q = -div(P[pivots[i][j], i], P[pivot, i])
-            for c = 1:n
-               t = mul!(t, q, P[pivot, c])
-               P[pivots[i][j], c] = addeq!(P[pivots[i][j], c], t)
-            end
-            if with_trafo
-               for c = 1:ncols(U)
-                  t = mul!(t, q, U[pivot, c])
-                  U[pivots[i][j], c] = addeq!(U[pivots[i][j], c], t)
-               end
-            end
-            if extended
-               t = mul!(t, q, W[pivot,1])
-               W[pivots[i][j], 1] = addeq!(W[pivots[i][j], 1], t)
-            end
-         end
-         old_pivots = pivots[i]
-         pivots[i] = [pivot]
-         for j = 1:length(old_pivots)
-            if j == pivotInd
-               continue
-            end
-            p = find_pivot_popov(P, old_pivots[j], last_col)
-            if !is_zero_entry(P, old_pivots[j], p)
-               push!(pivots[p], old_pivots[j])
-            end
-         end
+  t = base_ring(P)()
+  change = true
+  while change
+    change = false
+    for i = 1:n
+      if length(pivots[i]) <= 1
+        continue
       end
-   end
-   return nothing
+      change = true
+      # Reduce with the pivot of minimal degree.
+      # TODO: Remove the list comprehension as soon as indmin(f, A) works
+      #pivotInd = indmin(degree(P[j, i]) for j in pivots[i])
+      pivotInd = argmin([degree(P[j, i]) for j in pivots[i]])
+      pivot = pivots[i][pivotInd]
+      for j = 1:length(pivots[i])
+        if j == pivotInd
+          continue
+        end
+        q = -div(P[pivots[i][j], i], P[pivot, i])
+        for c = 1:n
+          t = mul!(t, q, P[pivot, c])
+          P[pivots[i][j], c] = addeq!(P[pivots[i][j], c], t)
+        end
+        if with_trafo
+          for c = 1:ncols(U)
+            t = mul!(t, q, U[pivot, c])
+            U[pivots[i][j], c] = addeq!(U[pivots[i][j], c], t)
+          end
+        end
+        if extended
+          t = mul!(t, q, W[pivot,1])
+          W[pivots[i][j], 1] = addeq!(W[pivots[i][j], 1], t)
+        end
+      end
+      old_pivots = pivots[i]
+      pivots[i] = [pivot]
+      for j = 1:length(old_pivots)
+        if j == pivotInd
+          continue
+        end
+        p = find_pivot_popov(P, old_pivots[j], last_col)
+        if !is_zero_entry(P, old_pivots[j], p)
+          push!(pivots[p], old_pivots[j])
+        end
+      end
+    end
+  end
+  return nothing
 end
 
 @doc raw"""
@@ -5373,103 +5373,103 @@ Return an array of $r$ row indices such that these rows of $A$ are linearly
 independent, where $r$ is the rank of $A$.
 """
 function rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   B = deepcopy(A)
-   m = nrows(A)
-   n = ncols(A)
-   U = similar(A, 0, 0)
-   V = U
-   r = 0
-   rank_profile = Vector{Int}(undef, 0)
-   pivots = Vector{Vector{Int}}(undef, n)
-   for i = 1:n
-      pivots[i] = zeros(Int, 0)
-   end
-   p = find_pivot_popov(B, 1)
-   if !is_zero_entry(B, 1, p)
-      push!(pivots[p], 1)
-      r = 1
-      push!(rank_profile, 1)
-   end
-   for i = 2:m
-      p = find_pivot_popov(B, i)
-      !is_zero_entry(B, i, p) ? push!(pivots[p], i) : nothing
-      weak_popov_with_pivots!(B, V, U, pivots, false, false, i)
-      s = 0
-      for j = 1:n
-         # length(pivots[j]) is either 1 or 0, since B is in weak
-         # Popov form.
-         s += length(pivots[j])
-      end
-      if s != r
-         push!(rank_profile, i)
-         r = s
-      end
-   end
-   return rank_profile
+  B = deepcopy(A)
+  m = nrows(A)
+  n = ncols(A)
+  U = similar(A, 0, 0)
+  V = U
+  r = 0
+  rank_profile = Vector{Int}(undef, 0)
+  pivots = Vector{Vector{Int}}(undef, n)
+  for i = 1:n
+    pivots[i] = zeros(Int, 0)
+  end
+  p = find_pivot_popov(B, 1)
+  if !is_zero_entry(B, 1, p)
+    push!(pivots[p], 1)
+    r = 1
+    push!(rank_profile, 1)
+  end
+  for i = 2:m
+    p = find_pivot_popov(B, i)
+    !is_zero_entry(B, i, p) ? push!(pivots[p], i) : nothing
+    weak_popov_with_pivots!(B, V, U, pivots, false, false, i)
+    s = 0
+    for j = 1:n
+      # length(pivots[j]) is either 1 or 0, since B is in weak
+      # Popov form.
+      s += length(pivots[j])
+    end
+    if s != r
+      push!(rank_profile, i)
+      r = s
+    end
+  end
+  return rank_profile
 end
 
 function det_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   nrows(A) != ncols(A) && error("Not a square matrix in det_popov.")
-   B = deepcopy(A)
-   n = ncols(B)
-   R = base_ring(B)
-   det = one(R)
-   U = similar(A, 0, 0)
-   V = U
-   t = R()
-   pivots1 = init_pivots_popov(B)
-   weak_popov_with_pivots!(B, V, U, pivots1, false, false)
-   pivots = zeros(Int, n)
-   diag_elems = zeros(Int, n)
-   for i = 1:n
-      if isassigned(pivots1, i) && length(pivots1[i]) > 0
-         pivots[i] = pivots1[i][1]
-      else
-         # If there is no pivot in the ith column, A has not full rank.
-         return zero(R)
+  nrows(A) != ncols(A) && error("Not a square matrix in det_popov.")
+  B = deepcopy(A)
+  n = ncols(B)
+  R = base_ring(B)
+  det = one(R)
+  U = similar(A, 0, 0)
+  V = U
+  t = R()
+  pivots1 = init_pivots_popov(B)
+  weak_popov_with_pivots!(B, V, U, pivots1, false, false)
+  pivots = zeros(Int, n)
+  diag_elems = zeros(Int, n)
+  for i = 1:n
+    if isassigned(pivots1, i) && length(pivots1[i]) > 0
+      pivots[i] = pivots1[i][1]
+    else
+      # If there is no pivot in the ith column, A has not full rank.
+      return zero(R)
+    end
+  end
+  for i = n-1:-1:1
+    # "Remove" the column i+1 and compute a weak Popov Form of the
+    # remaining matrix.
+    r1 = pivots[i+1]
+    c = find_pivot_popov(B, r1, i)
+    # If the pivot B[r1, c] is zero then the row is zero.
+    while !is_zero_entry(B, r1, c)
+      r2 = pivots[c]
+      if degree(B[r2, c]) > degree(B[r1,c])
+        r1, r2 = r2, r1
+        pivots[c] = r2
       end
-   end
-   for i = n-1:-1:1
-      # "Remove" the column i+1 and compute a weak Popov Form of the
-      # remaining matrix.
-      r1 = pivots[i+1]
+      q = -div(B[r1, c], B[r2, c])
+      for j = 1:i + 1
+        t = mul!(t, q, B[r2, j])
+        B[r1, j] = addeq!(B[r1, j], t)
+      end
       c = find_pivot_popov(B, r1, i)
-      # If the pivot B[r1, c] is zero then the row is zero.
-      while !is_zero_entry(B, r1, c)
-         r2 = pivots[c]
-         if degree(B[r2, c]) > degree(B[r1,c])
-            r1, r2 = r2, r1
-            pivots[c] = r2
-         end
-         q = -div(B[r1, c], B[r2, c])
-         for j = 1:i + 1
-            t = mul!(t, q, B[r2, j])
-            B[r1, j] = addeq!(B[r1, j], t)
-         end
-         c = find_pivot_popov(B, r1, i)
-      end
-      if is_zero_entry(B, r1, i+1)
-         return zero(R)
-      end
-      diag_elems[i+1] = r1
-      det = mul!(det, det, B[r1,i+1])
-   end
-   det = mul!(det, det, B[pivots[1],1])
-   diag_elems[1] = pivots[1]
-   number_of_swaps = 0
-   # Adjust the sign of det by sorting the diagonal elements.
-   for i = 1:n
-      while diag_elems[i] != i
-         r = diag_elems[i]
-         diag_elems[i] = diag_elems[r]
-         diag_elems[r] = r
-         number_of_swaps += 1
-      end
-   end
-   if number_of_swaps%2 == 1
-      det = mul!(det, det, R(-1))
-   end
-   return det
+    end
+    if is_zero_entry(B, r1, i+1)
+      return zero(R)
+    end
+    diag_elems[i+1] = r1
+    det = mul!(det, det, B[r1,i+1])
+  end
+  det = mul!(det, det, B[pivots[1],1])
+  diag_elems[1] = pivots[1]
+  number_of_swaps = 0
+  # Adjust the sign of det by sorting the diagonal elements.
+  for i = 1:n
+    while diag_elems[i] != i
+      r = diag_elems[i]
+      diag_elems[i] = diag_elems[r]
+      diag_elems[r] = r
+      number_of_swaps += 1
+    end
+  end
+  if number_of_swaps%2 == 1
+    det = mul!(det, det, R(-1))
+  end
+  return det
 end
 
 @doc raw"""
@@ -5478,7 +5478,7 @@ end
 Return the Popov form of $A$.
 """
 function popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _popov(A, Val(false))
+  return _popov(A, Val(false))
 end
 
 @doc raw"""
@@ -5488,264 +5488,264 @@ Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
 is a transformation matrix so that $P = UA$.
 """
 function popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _popov(A, Val(true))
+  return _popov(A, Val(true))
 end
 
 function _popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
-   P = deepcopy(A)
-   m = nrows(P)
-   if with_transform
-      U = identity_matrix(A, m)
-      popov!(P, U, true)
-      return P, U
-   else
-      U = similar(A, 0, 0)
-      popov!(P, U, false)
-      return P
-   end
+  P = deepcopy(A)
+  m = nrows(P)
+  if with_transform
+    U = identity_matrix(A, m)
+    popov!(P, U, true)
+    return P, U
+  else
+    U = similar(A, 0, 0)
+    popov!(P, U, false)
+    return P
+  end
 end
 
 function asc_order_popov!(P::MatElem{T}, U::MatElem{T}, pivots::Vector{Vector{Int}}, with_trafo::Bool) where {T <: PolyRingElem}
-   m = nrows(P)
-   n = ncols(P)
-   pivots2 = Vector{NTuple{3,Int}}(undef, m)
-   for r = 1:m
-      pivots2[r] = (r,n,-1)
-   end
-   for c = 1:n
-      if length(pivots[c]) == 0
-         continue
-      end
-      r = pivots[c][1]
-      pivots2[r] = (r, c, degree(P[r,c]))
-   end
-   sort!(pivots2, lt = (x,y) -> ( x[3] < y[3] || ( x[3] == y[3] && x[2] <= y[2] ) ))
-   row_nums = [ i for i = 1:m ]
-   for r = 1:m
-      if pivots2[r][3] != -1
-         c = pivots2[r][2]
-         pivots[c] = [r]
-      end
-      i = pivots2[r][1]
-      r2 = row_nums[i]
-      if r == r2
-         continue
-      end
-      swap_rows!(P, r, r2)
-      with_trafo ? swap_rows!(U, r, r2) : nothing
-      j = findfirst(isequal(r), row_nums)
-      row_nums[i] = r
-      row_nums[j] = r2
-   end
-   return nothing
+  m = nrows(P)
+  n = ncols(P)
+  pivots2 = Vector{NTuple{3,Int}}(undef, m)
+  for r = 1:m
+    pivots2[r] = (r,n,-1)
+  end
+  for c = 1:n
+    if length(pivots[c]) == 0
+      continue
+    end
+    r = pivots[c][1]
+    pivots2[r] = (r, c, degree(P[r,c]))
+  end
+  sort!(pivots2, lt = (x,y) -> ( x[3] < y[3] || ( x[3] == y[3] && x[2] <= y[2] ) ))
+  row_nums = [ i for i = 1:m ]
+  for r = 1:m
+    if pivots2[r][3] != -1
+      c = pivots2[r][2]
+      pivots[c] = [r]
+    end
+    i = pivots2[r][1]
+    r2 = row_nums[i]
+    if r == r2
+      continue
+    end
+    swap_rows!(P, r, r2)
+    with_trafo ? swap_rows!(U, r, r2) : nothing
+    j = findfirst(isequal(r), row_nums)
+    row_nums[i] = r
+    row_nums[j] = r2
+  end
+  return nothing
 end
 
 # Mulders, Storjohann: "On lattice reduction for polynomial matrices", Section 7
 function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T <: PolyRingElem}
-   m = nrows(P)
-   n = ncols(P)
-   W = similar(U, 0, 0)
-   pivots = init_pivots_popov(P)
-   weak_popov_with_pivots!(P, W, U, pivots, false, with_trafo)
-   asc_order_popov!(P, U, pivots, with_trafo)
-   pivotColumns = zeros(Int, m)
-   for c = 1:n
-      if length(pivots[c]) == 0
-         continue
-      end
-      # P is in weak Popov form, so any non-zero row contains exactly one pivot
-      pivotColumns[pivots[c][1]] = c
-   end
+  m = nrows(P)
+  n = ncols(P)
+  W = similar(U, 0, 0)
+  pivots = init_pivots_popov(P)
+  weak_popov_with_pivots!(P, W, U, pivots, false, with_trafo)
+  asc_order_popov!(P, U, pivots, with_trafo)
+  pivotColumns = zeros(Int, m)
+  for c = 1:n
+    if length(pivots[c]) == 0
+      continue
+    end
+    # P is in weak Popov form, so any non-zero row contains exactly one pivot
+    pivotColumns[pivots[c][1]] = c
+  end
 
-   t = base_ring(P)()
-   for r = 1:m
-      # Reduce row r assuming that rows 1, ..., r - 1 are reduced
-      if iszero(pivotColumns[r])
-         continue
+  t = base_ring(P)()
+  for r = 1:m
+    # Reduce row r assuming that rows 1, ..., r - 1 are reduced
+    if iszero(pivotColumns[r])
+      continue
+    end
+    r2 = 1
+    while !iszero(r2)
+      r2 = 0
+      maxDegreeDiff = -1
+      # Find the column c2 for which the difference
+      # degree(P[r, c2]) - degree(P[r2, c2]) is maximal, where r2 is the row
+      # in which the pivot is in column c2.
+      for i = 1:r - 1
+        ci = pivotColumns[i]
+        if iszero(ci)
+          continue
+        end
+        d = degree(P[r, ci]) - degree(P[i, ci])
+        if d <= maxDegreeDiff
+          continue
+        end
+        maxDegreeDiff = d
+        r2 = i
       end
-      r2 = 1
-      while !iszero(r2)
-         r2 = 0
-         maxDegreeDiff = -1
-         # Find the column c2 for which the difference
-         # degree(P[r, c2]) - degree(P[r2, c2]) is maximal, where r2 is the row
-         # in which the pivot is in column c2.
-         for i = 1:r - 1
-            ci = pivotColumns[i]
-            if iszero(ci)
-               continue
-            end
-            d = degree(P[r, ci]) - degree(P[i, ci])
-            if d <= maxDegreeDiff
-               continue
-            end
-            maxDegreeDiff = d
-            r2 = i
-         end
-         iszero(r2) ? break : nothing
-         c2 = pivotColumns[r2]
-         q = -div(P[r, c2], P[r2, c2])
-         for c = 1:n
-            t = mul!(t, q, P[r2, c])
-            P[r, c] = addeq!(P[r, c], t)
-         end
-         if with_trafo
-            for c = 1:ncols(U)
-               t = mul!(t, q, U[r2, c])
-               U[r, c] = addeq!(U[r, c], t)
-            end
-         end
+      iszero(r2) ? break : nothing
+      c2 = pivotColumns[r2]
+      q = -div(P[r, c2], P[r2, c2])
+      for c = 1:n
+        t = mul!(t, q, P[r2, c])
+        P[r, c] = addeq!(P[r, c], t)
       end
-   end
-   # Make the pivots monic
-   for i = 1:n
-      if length(pivots[i]) == 0
-         continue
+      if with_trafo
+        for c = 1:ncols(U)
+          t = mul!(t, q, U[r2, c])
+          U[r, c] = addeq!(U[r, c], t)
+        end
       end
-      r = pivots[i][1]
-      cu = canonical_unit(P[r, i])
-      if !isone(cu)
-         for j = 1:n
-            P[r, j] = divexact(P[r, j], cu)
-         end
-         if with_trafo
-            for j = 1:ncols(U)
-               U[r, j] = divexact(U[r, j], cu)
-            end
-         end
+    end
+  end
+  # Make the pivots monic
+  for i = 1:n
+    if length(pivots[i]) == 0
+      continue
+    end
+    r = pivots[i][1]
+    cu = canonical_unit(P[r, i])
+    if !isone(cu)
+      for j = 1:n
+        P[r, j] = divexact(P[r, j], cu)
       end
-   end
-   return nothing
+      if with_trafo
+        for j = 1:ncols(U)
+          U[r, j] = divexact(U[r, j], cu)
+        end
+      end
+    end
+  end
+  return nothing
 end
 
 function hnf_via_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _hnf_via_popov(A, Val(false))
+  return _hnf_via_popov(A, Val(false))
 end
 
 function hnf_via_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _hnf_via_popov(A, Val(true))
+  return _hnf_via_popov(A, Val(true))
 end
 
 function _hnf_via_popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
-   H = deepcopy(A)
-   m = nrows(H)
-   if with_transform
-      U = identity_matrix(A, m)
-      hnf_via_popov!(H, U, true)
-      return H, U
-   else
-      U = similar(A, 0, 0)
-      hnf_via_popov!(H, U, false)
-      return H
-   end
+  H = deepcopy(A)
+  m = nrows(H)
+  if with_transform
+    U = identity_matrix(A, m)
+    hnf_via_popov!(H, U, true)
+    return H, U
+  else
+    U = similar(A, 0, 0)
+    hnf_via_popov!(H, U, false)
+    return H
+  end
 end
 
 function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Vector{Int}, r::Int, with_trafo::Bool) where {T <: PolyRingElem}
-   n = ncols(H)
-   t = base_ring(H)()
-   for c = 1:n
-      if pivots_hermite[c] == 0
-         continue
+  n = ncols(H)
+  t = base_ring(H)()
+  for c = 1:n
+    if pivots_hermite[c] == 0
+      continue
+    end
+    pivot = pivots_hermite[c]
+    q = -div(H[r, c], H[pivot, c])
+    for j = c:n
+      t = mul!(t, q, H[pivot, j])
+      H[r, j] = addeq!(H[r, j], t)
+    end
+    if with_trafo
+      for j = 1:ncols(U)
+        t = mul!(t, q, U[pivot, j])
+        U[r, j] = addeq!(U[r, j], t)
       end
-      pivot = pivots_hermite[c]
-      q = -div(H[r, c], H[pivot, c])
-      for j = c:n
-         t = mul!(t, q, H[pivot, j])
-         H[r, j] = addeq!(H[r, j], t)
-      end
-      if with_trafo
-         for j = 1:ncols(U)
-            t = mul!(t, q, U[pivot, j])
-            U[r, j] = addeq!(U[r, j], t)
-         end
-      end
-   end
-   return nothing
+    end
+  end
+  return nothing
 end
 
 function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermite::Vector{Int}, c::Int, with_trafo::Bool) where {T <: PolyRingElem}
-   m = nrows(H)
-   n = ncols(H)
-   t = base_ring(H)()
-   r = pivots_hermite[c]
-   for i = 1:m
-      if i == r
-         continue
+  m = nrows(H)
+  n = ncols(H)
+  t = base_ring(H)()
+  r = pivots_hermite[c]
+  for i = 1:m
+    if i == r
+      continue
+    end
+    if degree(H[i, c]) < degree(H[r, c])
+      continue
+    end
+    q = -div(H[i, c], H[r, c])
+    for j = 1:n
+      t = mul!(t, q, H[r, j])
+      H[i, j] = addeq!(H[i, j], t)
+    end
+    if with_trafo
+      for j = 1:ncols(U)
+        t = mul!(t, q, U[r, j])
+        U[i, j] = addeq!(U[i, j], t)
       end
-      if degree(H[i, c]) < degree(H[r, c])
-         continue
-      end
-      q = -div(H[i, c], H[r, c])
-      for j = 1:n
-         t = mul!(t, q, H[r, j])
-         H[i, j] = addeq!(H[i, j], t)
-      end
-      if with_trafo
-         for j = 1:ncols(U)
-            t = mul!(t, q, U[r, j])
-            U[i, j] = addeq!(U[i, j], t)
-         end
-      end
-   end
-   return nothing
+    end
+  end
+  return nothing
 end
 
 function hnf_via_popov!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T <: PolyRingElem}
-   m = nrows(H)
-   n = ncols(H)
-   R = base_ring(H)
-   W = similar(H, 0, 0)
-   t = R()
-   pivots = init_pivots_popov(H)
-   weak_popov_with_pivots!(H, W, U, pivots, false, with_trafo)
-   pivots_popov = zeros(Int, n)
-   for j = 1:n
-      if isassigned(pivots, j) && length(pivots[j]) > 0
-         pivots_popov[j] = pivots[j][1]
-      else
-         error("The rank must be equal to the number of columns.")
+  m = nrows(H)
+  n = ncols(H)
+  R = base_ring(H)
+  W = similar(H, 0, 0)
+  t = R()
+  pivots = init_pivots_popov(H)
+  weak_popov_with_pivots!(H, W, U, pivots, false, with_trafo)
+  pivots_popov = zeros(Int, n)
+  for j = 1:n
+    if isassigned(pivots, j) && length(pivots[j]) > 0
+      pivots_popov[j] = pivots[j][1]
+    else
+      error("The rank must be equal to the number of columns.")
+    end
+  end
+  pivots_hermite = zeros(Int, n)
+  for i = n-1:-1:1
+    # "Remove" the column i+1 and compute a weak Popov Form of the
+    # remaining matrix.
+    r1 = pivots_popov[i + 1]
+    c = find_pivot_popov(H, r1, i)
+    new_pivot = true
+    # If the pivot H[r1, c] is zero then the row is zero.
+    while !is_zero_entry(H, r1, c)
+      r2 = pivots_popov[c]
+      if degree(H[r2, c]) > degree(H[r1,c])
+        r1, r2 = r2, r1
+        pivots_popov[c] = r2
       end
-   end
-   pivots_hermite = zeros(Int, n)
-   for i = n-1:-1:1
-      # "Remove" the column i+1 and compute a weak Popov Form of the
-      # remaining matrix.
-      r1 = pivots_popov[i + 1]
+      q = -div(H[r1, c], H[r2, c])
+      for j = 1:n
+        t = mul!(t, q, H[r2, j])
+        H[r1, j] = addeq!(H[r1, j], t)
+      end
+      if with_trafo
+        for j = 1:ncols(U)
+          t = mul!(t, q, U[r2, j])
+          U[r1, j] = addeq!(U[r1, j], t)
+        end
+      end
+      hnf_via_popov_reduce_row!(H, U, pivots_hermite, r1, with_trafo)
       c = find_pivot_popov(H, r1, i)
-      new_pivot = true
-      # If the pivot H[r1, c] is zero then the row is zero.
-      while !is_zero_entry(H, r1, c)
-         r2 = pivots_popov[c]
-         if degree(H[r2, c]) > degree(H[r1,c])
-            r1, r2 = r2, r1
-            pivots_popov[c] = r2
-         end
-         q = -div(H[r1, c], H[r2, c])
-         for j = 1:n
-            t = mul!(t, q, H[r2, j])
-            H[r1, j] = addeq!(H[r1, j], t)
-         end
-         if with_trafo
-            for j = 1:ncols(U)
-               t = mul!(t, q, U[r2, j])
-               U[r1, j] = addeq!(U[r1, j], t)
-            end
-         end
-         hnf_via_popov_reduce_row!(H, U, pivots_hermite, r1, with_trafo)
-         c = find_pivot_popov(H, r1, i)
-      end
-      new_pivot ? nothing : continue
-      pivots_hermite[i+1] = r1
-      hnf_via_popov_reduce_column!(H, U, pivots_hermite, i+1, with_trafo)
-      l = pivots_popov[i]
-      hnf_via_popov_reduce_row!(H, U, pivots_hermite, l, with_trafo)
-   end
-   pivots_hermite[1] = pivots_popov[1]
-   kb_sort_rows!(H, U, pivots_hermite, with_trafo)
-   for c = 1:n
-      kb_canonical_row!(H, U, pivots_hermite[c], c, with_trafo)
-   end
-   return nothing
+    end
+    new_pivot ? nothing : continue
+    pivots_hermite[i+1] = r1
+    hnf_via_popov_reduce_column!(H, U, pivots_hermite, i+1, with_trafo)
+    l = pivots_popov[i]
+    hnf_via_popov_reduce_row!(H, U, pivots_hermite, l, with_trafo)
+  end
+  pivots_hermite[1] = pivots_popov[1]
+  kb_sort_rows!(H, U, pivots_hermite, with_trafo)
+  for c = 1:n
+    kb_canonical_row!(H, U, pivots_hermite[c], c, with_trafo)
+  end
+  return nothing
 end
 
 ###############################################################################
@@ -5784,28 +5784,28 @@ julia> similarity!(M, 1, R(3))
 ```
 """
 function similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
-   n = nrows(A)
-   t = base_ring(A)()
-   for i = 1:n
-      for j = 1:r - 1
-         t = mul!(t, A[i, r], d)
-         A[i, j] = addeq!(A[i, j], t)
-      end
-      for j = r + 1:n
-         t = mul!(t, A[i, r], d)
-         A[i, j] = addeq!(A[i, j], t)
-      end
-   end
-   d = -d
-   for i = 1:n
-      for j = 1:r - 1
-         A[r, i] = addmul_delayed_reduction!(A[r, i], A[j, i], d, t)
-      end
-      for j = r + 1:n
-         A[r, i] = addmul_delayed_reduction!(A[r, i], A[j, i], d, t)
-      end
-      A[r, i] = reduce!(A[r, i])
-   end
+  n = nrows(A)
+  t = base_ring(A)()
+  for i = 1:n
+    for j = 1:r - 1
+      t = mul!(t, A[i, r], d)
+      A[i, j] = addeq!(A[i, j], t)
+    end
+    for j = r + 1:n
+      t = mul!(t, A[i, r], d)
+      A[i, j] = addeq!(A[i, j], t)
+    end
+  end
+  d = -d
+  for i = 1:n
+    for j = 1:r - 1
+      A[r, i] = addmul_delayed_reduction!(A[r, i], A[j, i], d, t)
+    end
+    for j = r + 1:n
+      A[r, i] = addmul_delayed_reduction!(A[r, i], A[j, i], d, t)
+    end
+    A[r, i] = reduce!(A[r, i])
+  end
 end
 
 ###############################################################################
@@ -5839,10 +5839,10 @@ julia> M  # was not modified
 ```
 """
 function swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
-   (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
-   b = deepcopy(a)
-   swap_rows!(b, i, j)
-   return b
+  (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
+  b = deepcopy(a)
+  swap_rows!(b, i, j)
+  return b
 end
 
 @doc raw"""
@@ -5870,15 +5870,15 @@ julia> M  # was modified
 ```
 """
 function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
-   (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
-   if i != j
-      for k = 1:ncols(a)
-         x = a[i, k]
-         a[i, k] = a[j, k]
-         a[j, k] = x
-      end
-   end
-   return a
+  (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
+  if i != j
+    for k = 1:ncols(a)
+      x = a[i, k]
+      a[i, k] = a[j, k]
+      a[j, k] = x
+    end
+  end
+  return a
 end
 
 @doc raw"""
@@ -5888,10 +5888,10 @@ Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 row are swapped.
 """
 function swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
-   (1 <= i <= ncols(a) && 1 <= j <= ncols(a)) || throw(BoundsError())
-   b = deepcopy(a)
-   swap_cols!(b, i, j)
-   return b
+  (1 <= i <= ncols(a) && 1 <= j <= ncols(a)) || throw(BoundsError())
+  b = deepcopy(a)
+  swap_cols!(b, i, j)
+  return b
 end
 
 @doc raw"""
@@ -5901,14 +5901,14 @@ Swap the $i$th and $j$th column of $a$ in place. The function returns the mutate
 matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 """
 function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
-   if i != j
-      for k = 1:nrows(a)
-         x = a[k, i]
-         a[k, i] = a[k, j]
-         a[k, j] = x
-      end
-   end
-   return a
+  if i != j
+    for k = 1:nrows(a)
+      x = a[k, i]
+      a[k, i] = a[k, j]
+      a[k, j] = x
+    end
+  end
+  return a
 end
 
 @doc raw"""
@@ -5918,11 +5918,11 @@ Swap the $i$th and $r - i$th row of $a$ for $1 \leq i \leq r/2$,
 where $r$ is the number of rows of $a$.
 """
 function reverse_rows!(a::MatrixElem{T}) where T <: NCRingElement
-   k = div(nrows(a), 2)
-   for i in 1:k
-      swap_rows!(a, i, nrows(a) - i + 1)
-   end
-   return a
+  k = div(nrows(a), 2)
+  for i in 1:k
+    swap_rows!(a, i, nrows(a) - i + 1)
+  end
+  return a
 end
 
 @doc raw"""
@@ -5933,8 +5933,8 @@ row is swapped for $1 \leq i \leq r/2$. Here $r$ is the number of rows of
 $a$.
 """
 function reverse_rows(a::MatrixElem{T}) where T <: NCRingElement
-   b = deepcopy(a)
-   return reverse_rows!(b)
+  b = deepcopy(a)
+  return reverse_rows!(b)
 end
 
 @doc raw"""
@@ -5944,11 +5944,11 @@ Swap the $i$th and $r - i$th column of $a$ for $1 \leq i \leq c/2$,
 where $c$ is the number of columns of $a$.
 """
 function reverse_cols!(a::MatrixElem{T}) where T <: NCRingElement
-   k = div(ncols(a), 2)
-   for i in 1:k
-      swap_cols!(a, i, ncols(a) - i + 1)
-   end
-   return a
+  k = div(ncols(a), 2)
+  for i in 1:k
+    swap_cols!(a, i, ncols(a) - i + 1)
+  end
+  return a
 end
 
 @doc raw"""
@@ -5959,8 +5959,8 @@ column is swapped for $1 \leq i \leq c/2$. Here $c$ is the number of columns
 of$a$.
 """
 function reverse_cols(a::MatrixElem{T}) where T <: NCRingElement
-   b = deepcopy(a)
-   return reverse_cols!(b)
+  b = deepcopy(a)
+  return reverse_cols!(b)
 end
 
 ################################################################################
@@ -5978,16 +5978,16 @@ By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
 """
 function add_column!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
-   v = base_ring(a)(s)
-   nc = ncols(a)
-   !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
-   !_checkbounds(nc, j) && error("Column index ($j) must be between 1 and $nc")
-   temp = base_ring(a)()
-   for r in rows
-      temp = mul!(temp, v, a[r, i])
-      a[r, j] += temp # cannot mutate matrix entries
-   end
-   return a
+  v = base_ring(a)(s)
+  nc = ncols(a)
+  !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
+  !_checkbounds(nc, j) && error("Column index ($j) must be between 1 and $nc")
+  temp = base_ring(a)()
+  for r in rows
+    temp = mul!(temp, v, a[r, i])
+    a[r, j] += temp # cannot mutate matrix entries
+  end
+  return a
 end
 
 @doc raw"""
@@ -6000,8 +6000,8 @@ changed using the optional `rows` argument.
 
 """
 function add_column(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
-   b = deepcopy(a)
-   return add_column!(b, s, i, j, rows)
+  b = deepcopy(a)
+  return add_column!(b, s, i, j, rows)
 end
 
 @doc raw"""
@@ -6013,16 +6013,16 @@ By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
 """
 function add_row!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
-   v = base_ring(a)(s)
-   nr = nrows(a)
-   !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
-   !_checkbounds(nr, j) && error("Row index ($j) must be between 1 and $nr")
-   temp = base_ring(a)()
-   for c in cols
-      temp = mul!(temp, v, a[i, c])
-      a[j, c] += temp # cannot mutate matrix entries
-   end
-   return a
+  v = base_ring(a)(s)
+  nr = nrows(a)
+  !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
+  !_checkbounds(nr, j) && error("Row index ($j) must be between 1 and $nr")
+  temp = base_ring(a)()
+  for c in cols
+    temp = mul!(temp, v, a[i, c])
+    a[j, c] += temp # cannot mutate matrix entries
+  end
+  return a
 end
 
 @doc raw"""
@@ -6034,8 +6034,8 @@ By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
 """
 function add_row(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
-   b = deepcopy(a)
-   return add_row!(b, s, i, j, cols)
+  b = deepcopy(a)
+  return add_row!(b, s, i, j, cols)
 end
 
 # Multiply column
@@ -6049,14 +6049,14 @@ By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
 """
 function multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
-   c = base_ring(a)(s)
-   nc = ncols(a)
-   !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
-   temp = base_ring(a)()
-   for r in rows
-      a[r, i] = c*a[r, i] # cannot mutate matrix entries
-   end
-   return a
+  c = base_ring(a)(s)
+  nc = ncols(a)
+  !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
+  temp = base_ring(a)()
+  for r in rows
+    a[r, i] = c*a[r, i] # cannot mutate matrix entries
+  end
+  return a
 end
 
 @doc raw"""
@@ -6068,8 +6068,8 @@ By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
 """
 function multiply_column(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
-   b = deepcopy(a)
-   return multiply_column!(b, s, i, rows)
+  b = deepcopy(a)
+  return multiply_column!(b, s, i, rows)
 end
 
 # Multiply row
@@ -6083,14 +6083,14 @@ By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
 """
 function multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
-   c = base_ring(a)(s)
-   nr = nrows(a)
-   !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
-   temp = base_ring(a)()
-   for r in cols
-      a[i, r] = c*a[i, r] # cannot mutate matrix entries
-   end
-   return a
+  c = base_ring(a)(s)
+  nr = nrows(a)
+  !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
+  temp = base_ring(a)()
+  for r in cols
+    a[i, r] = c*a[i, r] # cannot mutate matrix entries
+  end
+  return a
 end
 
 @doc raw"""
@@ -6102,8 +6102,8 @@ By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
 """
 function multiply_row(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
-   b = deepcopy(a)
-   return multiply_row!(b, s, i, cols)
+  b = deepcopy(a)
+  return multiply_row!(b, s, i, cols)
 end
 
 ###############################################################################
@@ -6256,11 +6256,11 @@ _change_base_ring(R::NCRing, a::MatRingElem) = matrix_ring(R, nrows(a))()
 Return the matrix obtained by coercing each entry into `R`.
 """
 function change_base_ring(R::NCRing, M::MatrixElem{T}) where T <: NCRingElement
-   N = _change_base_ring(R, M)
-   for i = 1:nrows(M), j = 1:ncols(M)
-      N[i,j] = R(M[i,j])
-   end
-   return N
+  N = _change_base_ring(R, M)
+  for i = 1:nrows(M), j = 1:ncols(M)
+    N[i,j] = R(M[i,j])
+  end
+  return N
 end
 
 ###############################################################################
@@ -6275,10 +6275,10 @@ end
 Like `map_entries`, but stores the result in `dst` rather than a new matrix.
 """
 function map_entries!(f::S, dst::MatrixElem{T}, src::MatrixElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
-   for i = 1:nrows(src), j = 1:ncols(src)
-      dst[i, j] = f(src[i, j])
-   end
-   dst
+  for i = 1:nrows(src), j = 1:ncols(src)
+    dst[i, j] = f(src[i, j])
+  end
+  dst
 end
 
 @doc raw"""
@@ -6295,15 +6295,15 @@ Base.map!(f::S, dst::MatrixElem{T}, src::MatrixElem{U}) where {S, T <: NCRingEle
 Transform matrix `a` by applying `f` on each element.
 """
 function map_entries(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement}
-   isempty(a) && return _change_base_ring(parent(f(zero(base_ring(a)))), a)
-   b11 = f(a[1, 1])
-   b = _change_base_ring(parent(b11), a)
-   b[1, 1] = b11
-   for i = 1:nrows(a), j = 1:ncols(a)
-      i == j == 1 && continue
-      b[i, j] = f(a[i, j])
-   end
-   b
+  isempty(a) && return _change_base_ring(parent(f(zero(base_ring(a)))), a)
+  b11 = f(a[1, 1])
+  b = _change_base_ring(parent(b11), a)
+  b[1, 1] = b11
+  for i = 1:nrows(a), j = 1:ncols(a)
+    i == j == 1 && continue
+    b[i, j] = f(a[i, j])
+  end
+  b
 end
 
 @doc raw"""
@@ -6323,33 +6323,33 @@ Base.map(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement} = map_entries(f, 
 RandomExtensions.maketype(S::MatSpace, _) = elem_type(S)
 
 function RandomExtensions.make(S::MatSpace, vs...)
-   R = base_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, vs[1]) # forward to default Make constructor
-   else
-      Make(S, make(R, vs...))
-   end
+  R = base_ring(S)
+  if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+    Make(S, vs[1]) # forward to default Make constructor
+  else
+    Make(S, make(R, vs...))
+  end
 end
 
 # Sampler for a MatSpace not needing arguments (passed via make)
 # this allows to obtain the Sampler in simple cases without having to know about make
 # (when one can do `rand(M)`, one can expect to be able to do `rand(Sampler(rng, M))`)
 Random.Sampler(::Type{RNG}, S::MatSpace, n::Random.Repetition
-               ) where {RNG<:AbstractRNG} =
-   Random.Sampler(RNG, make(S), n)
+              ) where {RNG<:AbstractRNG} =
+Random.Sampler(RNG, make(S), n)
 
 function rand(rng::AbstractRNG,
-              sp::SamplerTrivial{<:Make2{<:MatElem,
-                                         <:MatSpace}})
-   S, v = sp[][1:end]
-   M = S()
-   R = base_ring(S)
-   for i = 1:nrows(M)
-      for j = 1:ncols(M)
-         M[i, j] = rand(rng, v)
-      end
-   end
-   return M
+    sp::SamplerTrivial{<:Make2{<:MatElem,
+                               <:MatSpace}})
+  S, v = sp[][1:end]
+  M = S()
+  R = base_ring(S)
+  for i = 1:nrows(M)
+    for j = 1:ncols(M)
+      M[i, j] = rand(rng, v)
+    end
+  end
+  return M
 end
 
 rand(rng::AbstractRNG, S::MatSpace, v...) = rand(rng, make(S, v...))
@@ -6358,69 +6358,69 @@ rand(S::MatSpace, v...) = rand(Random.GLOBAL_RNG, S, v...)
 
 # resolve ambiguities
 rand(rng::AbstractRNG, S::MatSpace, dims::Integer...) =
-   rand(rng, make(S), dims...)
+rand(rng, make(S), dims...)
 
 rand(S::MatSpace, dims::Integer...) = rand(Random.GLOBAL_RNG, S, dims...)
 
 function randmat_triu(rng::AbstractRNG, S::MatSpace, v...)
-   M = S()
-   R = base_ring(S)
-   for i = 1:nrows(M)
-      for j = 1:i - 1
-         M[i, j] = R()
-      end
-      for j = i:ncols(M)
-         M[i, j] = rand(rng, R, v...)
-      end
-      while is_zero_entry(M, i, i)
-         M[i, i] = rand(rng, R, v...)
-      end
-   end
-   return M
+  M = S()
+  R = base_ring(S)
+  for i = 1:nrows(M)
+    for j = 1:i - 1
+      M[i, j] = R()
+    end
+    for j = i:ncols(M)
+      M[i, j] = rand(rng, R, v...)
+    end
+    while is_zero_entry(M, i, i)
+      M[i, i] = rand(rng, R, v...)
+    end
+  end
+  return M
 end
 
 randmat_triu(S::MatSpace, v...) = randmat_triu(Random.GLOBAL_RNG, S, v...)
 
 function randmat_with_rank(rng::AbstractRNG, S::MatSpace{T}, rank::Int, v...) where {T <: RingElement}
-   if !is_domain_type(T) && !(T <: ResElem)
-      error("Not implemented")
-   end
-   M = S()
-   R = base_ring(S)
-   for i = 1:rank
-      for j = 1:i - 1
-         M[i, j] = R()
-      end
+  if !is_domain_type(T) && !(T <: ResElem)
+    error("Not implemented")
+  end
+  M = S()
+  R = base_ring(S)
+  for i = 1:rank
+    for j = 1:i - 1
+      M[i, j] = R()
+    end
+    M[i, i] = rand(rng, R, v...)
+    while is_zero_entry(M, i, i)
       M[i, i] = rand(rng, R, v...)
-      while is_zero_entry(M, i, i)
-         M[i, i] = rand(rng, R, v...)
-      end
-      for j = i + 1:ncols(M)
-         M[i, j] = rand(rng, R, v...)
-      end
-   end
-   for i = rank + 1:nrows(M)
+    end
+    for j = i + 1:ncols(M)
+      M[i, j] = rand(rng, R, v...)
+    end
+  end
+  for i = rank + 1:nrows(M)
+    for j = 1:ncols(M)
+      M[i, j] = R()
+    end
+  end
+  m = nrows(M)
+  if m > 1
+    for i = 1:4*m
+      r1 = rand(rng, 1:m)
+      r2 = rand(rng, 1:m - 1)
+      r2 = r2 >= r1 ? r2 + 1 : r2
+      d = rand(rng, -5:5)
       for j = 1:ncols(M)
-         M[i, j] = R()
+        M[r1, j] = M[r1, j] + d*M[r2, j]
       end
-   end
-   m = nrows(M)
-   if m > 1
-      for i = 1:4*m
-         r1 = rand(rng, 1:m)
-         r2 = rand(rng, 1:m - 1)
-         r2 = r2 >= r1 ? r2 + 1 : r2
-         d = rand(rng, -5:5)
-         for j = 1:ncols(M)
-            M[r1, j] = M[r1, j] + d*M[r2, j]
-         end
-      end
-   end
-   return M
+    end
+  end
+  return M
 end
 
 randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
-   randmat_with_rank(Random.GLOBAL_RNG, S, rank, v...)
+randmat_with_rank(Random.GLOBAL_RNG, S, rank, v...)
 
 ################################################################################
 #
@@ -6434,33 +6434,33 @@ randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
 Constructs the matrix over $R$ with entries as in `arr`.
 """
 function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
-   if elem_type(R) === T && all(e -> parent(e) === R, arr)
-      z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
-      return z
-   else
-      arr_coerce = convert(Matrix{elem_type(R)}, map(R, arr))::Matrix{elem_type(R)}
-      return matrix(R, arr_coerce)
-   end
+  if elem_type(R) === T && all(e -> parent(e) === R, arr)
+    z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
+    return z
+  else
+    arr_coerce = convert(Matrix{elem_type(R)}, map(R, arr))::Matrix{elem_type(R)}
+    return matrix(R, arr_coerce)
+  end
 end
 
 function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElem}
-   r, c = size(arr)
-   (r < 0 || c < 0) && error("Array must be non-empty")
-   R = parent(arr[1, 1])
-   all(e -> parent(e) === R, arr) || error("Non-compatible elements")
-   return matrix(R, arr)
+  r, c = size(arr)
+  (r < 0 || c < 0) && error("Array must be non-empty")
+  R = parent(arr[1, 1])
+  all(e -> parent(e) === R, arr) || error("Non-compatible elements")
+  return matrix(R, arr)
 end
 
 function matrix(arr::AbstractVector{T}) where {T<:NCRingElem}
-   return matrix(reshape(arr, length(arr), 1))
+  return matrix(reshape(arr, length(arr), 1))
 end
 
 function matrix(arr::Vector{Vector{T}}) where {T<:NCRingElem}
-    return matrix(permutedims(reduce(hcat, arr), (2, 1)))
+  return matrix(permutedims(reduce(hcat, arr), (2, 1)))
 end
 
 function matrix(R::NCRing, arr::Vector{<:Vector})
-   return matrix(R, permutedims(reduce(hcat, arr), (2, 1)))
+  return matrix(R, permutedims(reduce(hcat, arr), (2, 1)))
 end
 
 @doc raw"""
@@ -6470,15 +6470,15 @@ Constructs the $r \times c$ matrix over $R$, where the entries are taken
 row-wise from `arr`.
 """
 function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
-   _check_dim(r, c, arr)
-   ndims(arr) == 2 && return matrix(R, arr)
-   if elem_type(R) === T && all(e -> parent(e) === R, arr)
-     z = Generic.MatSpaceElem{elem_type(R)}(R, r, c, arr)
-     return z
-   else
-     arr_coerce = convert(Vector{elem_type(R)}, map(R, arr))::Vector{elem_type(R)}
-     return matrix(R, r, c, arr_coerce)
-   end
+  _check_dim(r, c, arr)
+  ndims(arr) == 2 && return matrix(R, arr)
+  if elem_type(R) === T && all(e -> parent(e) === R, arr)
+    z = Generic.MatSpaceElem{elem_type(R)}(R, r, c, arr)
+    return z
+  else
+    arr_coerce = convert(Vector{elem_type(R)}, map(R, arr))::Vector{elem_type(R)}
+    return matrix(R, r, c, arr_coerce)
+  end
 end
 
 ################################################################################
@@ -6493,14 +6493,14 @@ end
 Return the $r \times c$ zero matrix over $R$.
 """
 function zero_matrix(R::NCRing, r::Int, c::Int)
-   arr = Matrix{elem_type(R)}(undef, r, c)
-   for i in 1:r
-      for j in 1:c
-         arr[i, j] = zero(R)
-      end
-   end
-   z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
-   return z
+  arr = Matrix{elem_type(R)}(undef, r, c)
+  for i in 1:r
+    for j in 1:c
+      arr[i, j] = zero(R)
+    end
+  end
+  z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
+  return z
 end
 
 ################################################################################
@@ -6524,16 +6524,16 @@ with ones down the diagonal and zeroes elsewhere. `M` must be square.
 This is an alias for `one(M)`.
 """
 function identity_matrix(M::MatElem{T}) where T <: NCRingElement
-   identity_matrix(check_square(M), nrows(M))
+  identity_matrix(check_square(M), nrows(M))
 end
 
 function identity_matrix(M::MatElem{T}, n::Int) where T <: NCRingElement
-   z = zero(M, n, n)
-   R = base_ring(M)
-   for i = 1:n
-      z[i, i] = one(R)
-   end
-   z
+  z = zero(M, n, n)
+  R = base_ring(M)
+  for i = 1:n
+    z[i, i] = one(R)
+  end
+  z
 end
 
 ################################################################################
@@ -6550,11 +6550,11 @@ Return the $n \times n$ matrix over `R` with `a` along the main diagonal and
 zeroes elsewhere. If `R` is not specified, it defaults to `parent(a)`.
 """
 function scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
-   return diagonal_matrix(R(a), n)
+  return diagonal_matrix(R(a), n)
 end
 
 function scalar_matrix(n::Int, a::NCRingElement)
-   return diagonal_matrix(a, n)
+  return diagonal_matrix(a, n)
 end
 
 ################################################################################
@@ -6582,11 +6582,11 @@ julia> diagonal_matrix(QQ(-1), 3)
 ```
 """
 function diagonal_matrix(x::NCRingElement, m::Int, n::Int)
-   z = zero_matrix(parent(x), m, n)
-   for i in 1:min(m, n)
-      z[i, i] = x
-   end
-   return z
+  z = zero_matrix(parent(x), m, n)
+  for i in 1:min(m, n)
+    z[i, i] = x
+  end
+  return z
 end
 
 diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
@@ -6617,16 +6617,16 @@ julia> diagonal_matrix(ZZ, [5, 6])
 ```
 """
 function diagonal_matrix(R::NCRing, x::Vector{<:NCRingElement})
-    x = R.(x)
-    M = zero_matrix(R, length(x), length(x))
-    for i = 1:length(x)
-        M[i, i] = x[i]
-    end
-    return M
+  x = R.(x)
+  M = zero_matrix(R, length(x), length(x))
+  for i = 1:length(x)
+    M[i, i] = x[i]
+  end
+  return M
 end
 
 function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
-    return diagonal_matrix([x, xs...])
+  return diagonal_matrix([x, xs...])
 end
 
 diagonal_matrix(x::Vector{<:NCRingElement}) = diagonal_matrix(parent(x[1]), x)
@@ -6637,19 +6637,19 @@ diagonal_matrix(x::Vector{<:NCRingElement}) = diagonal_matrix(parent(x[1]), x)
 Returns a block diagonal matrix whose diagonal blocks are the matrices in $x$.
 """
 function diagonal_matrix(V::Vector{T}) where {T<:MatElem}
-    return block_diagonal_matrix(V)
+  return block_diagonal_matrix(V)
 end
 
 function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
-    return block_diagonal_matrix([x, xs...])
+  return block_diagonal_matrix([x, xs...])
 end
 
 function diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
-    if length(V) == 0
-        return zero_matrix(R, 0, 0)
-    else
-        return block_diagonal_matrix(map(x -> change_base_ring(R, x), V))
-    end
+  if length(V) == 0
+    return zero_matrix(R, 0, 0)
+  else
+    return block_diagonal_matrix(map(x -> change_base_ring(R, x), V))
+  end
 end
 
 
@@ -6677,19 +6677,19 @@ julia> lower_triangular_matrix([1, 2, 3])
 ```
 """
 function lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
-   l = length(L)
-   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
-   (flag, m) = is_square_with_sqrt(8*l+1)
-   flag || throw(ArgumentError("Input vector of invalid length"))
-   n = div(m-1, 2)
-   R = parent(L[1])
-   M = zero_matrix(R, n, n)
-   pos = 1
-   for i in 1:n, j in 1:i
-      M[i,j] = L[pos]
-      pos += 1
-   end
-   return M
+  l = length(L)
+  l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+  (flag, m) = is_square_with_sqrt(8*l+1)
+  flag || throw(ArgumentError("Input vector of invalid length"))
+  n = div(m-1, 2)
+  R = parent(L[1])
+  M = zero_matrix(R, n, n)
+  pos = 1
+  for i in 1:n, j in 1:i
+    M[i,j] = L[pos]
+    pos += 1
+  end
+  return M
 end
 
 ###############################################################################
@@ -6716,19 +6716,19 @@ julia> upper_triangular_matrix([1, 2, 3])
 ```
 """
 function upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
-   l = length(L)
-   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
-   (flag, m) = is_square_with_sqrt(8*l+1)
-   flag || throw(ArgumentError("Input vector of invalid length"))
-   n = div(m-1, 2)
-   R = parent(L[1])
-   M = zero_matrix(R, n, n)
-   pos = 1
-   for i in 1:n, j in i:n
-      M[i,j] = L[pos]
-      pos += 1
-   end
-   return M
+  l = length(L)
+  l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+  (flag, m) = is_square_with_sqrt(8*l+1)
+  flag || throw(ArgumentError("Input vector of invalid length"))
+  n = div(m-1, 2)
+  R = parent(L[1])
+  M = zero_matrix(R, n, n)
+  pos = 1
+  for i in 1:n, j in i:n
+    M[i,j] = L[pos]
+    pos += 1
+  end
+  return M
 end
 
 ###############################################################################
@@ -6756,19 +6756,19 @@ julia> strictly_lower_triangular_matrix([1, 2, 3])
 ```
 """
 function strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
-   l = length(L)
-   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
-   (flag, m) = is_square_with_sqrt(8*l+1)
-   flag || throw(ArgumentError("Input vector of invalid length"))
-   n = div(m+1, 2)
-   R = parent(L[1])
-   M = zero_matrix(R, n, n)
-   pos = 1
-   for i in 2:n, j in 1:(i-1)
-      M[i,j] = L[pos]
-      pos += 1
-   end
-   return M
+  l = length(L)
+  l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+  (flag, m) = is_square_with_sqrt(8*l+1)
+  flag || throw(ArgumentError("Input vector of invalid length"))
+  n = div(m+1, 2)
+  R = parent(L[1])
+  M = zero_matrix(R, n, n)
+  pos = 1
+  for i in 2:n, j in 1:(i-1)
+    M[i,j] = L[pos]
+    pos += 1
+  end
+  return M
 end
 
 ###############################################################################
@@ -6796,19 +6796,19 @@ julia> strictly_upper_triangular_matrix([1, 2, 3])
 ```
 """
 function strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
-   l = length(L)
-   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
-   (flag, m) = is_square_with_sqrt(8*l+1)
-   flag || throw(ArgumentError("Input vector of invalid length"))
-   n = div(m+1, 2)
-   R = parent(L[1])
-   M = zero_matrix(R, n, n)
-   pos = 1
-   for i in 1:(n-1), j in (i+1):n
-      M[i,j] = L[pos]
-      pos += 1
-   end
-   return M
+  l = length(L)
+  l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+  (flag, m) = is_square_with_sqrt(8*l+1)
+  flag || throw(ArgumentError("Input vector of invalid length"))
+  n = div(m+1, 2)
+  R = parent(L[1])
+  M = zero_matrix(R, n, n)
+  pos = 1
+  for i in 1:(n-1), j in (i+1):n
+    M[i,j] = L[pos]
+    pos += 1
+  end
+  return M
 end
 
 ###############################################################################
@@ -6824,7 +6824,7 @@ Return parent object corresponding to the space of $r\times c$ matrices over
 the ring $R$.
 """
 function matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
-   return Generic.matrix_space(R, r, c; cached)
+  return Generic.matrix_space(R, r, c; cached)
 end
 
 ###############################################################################

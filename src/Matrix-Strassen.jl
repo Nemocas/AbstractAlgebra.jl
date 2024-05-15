@@ -49,8 +49,8 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   @assert a == sC[1] && b == sB[1] && c == sC[2]
 
   if (a <= cutoff || b <= cutoff || c <= cutoff)
-      AbstractAlgebra.mul!(C, A, B)
-      return
+    AbstractAlgebra.mul!(C, A, B)
+    return
   end
 
   anr = div(a, 2)
@@ -91,10 +91,10 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   #X1->c = anc;
 
   #=
-      See Jean-Guillaume Dumas, Clement Pernet, Wei Zhou; "Memory
-      efficient scheduling of Strassen-Winograd's matrix multiplication
-      algorithm"; http://arxiv.org/pdf/0707.2347v3 for reference on the
-      used operation scheduling.
+  See Jean-Guillaume Dumas, Clement Pernet, Wei Zhou; "Memory
+  efficient scheduling of Strassen-Winograd's matrix multiplication
+  algorithm"; http://arxiv.org/pdf/0707.2347v3 for reference on the
+  used operation scheduling.
   =#
 
   X1 = A11 - A21
@@ -137,32 +137,32 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   add!(C11, X1, C11);
 
   if c > 2*bnc #A by last col of B -> last col of C
-      #nmod_mat_window_init(Bc, B, 0, 2*bnc, b, c);
-      Bc = view(B, 1:b, 2*bnc+1:c)
-      #nmod_mat_window_init(Cc, C, 0, 2*bnc, a, c);
-      Cc = view(C, 1:a, 2*bnc+1:c)
-      #nmod_mat_mul(Cc, A, Bc);
-      AbstractAlgebra.mul!(Cc, A, Bc)
+    #nmod_mat_window_init(Bc, B, 0, 2*bnc, b, c);
+    Bc = view(B, 1:b, 2*bnc+1:c)
+    #nmod_mat_window_init(Cc, C, 0, 2*bnc, a, c);
+    Cc = view(C, 1:a, 2*bnc+1:c)
+    #nmod_mat_mul(Cc, A, Bc);
+    AbstractAlgebra.mul!(Cc, A, Bc)
   end
 
   if a > 2*anr #last row of A by B -> last row of C
-      #nmod_mat_window_init(Ar, A, 2*anr, 0, a, b);
-      Ar = view(A, 2*anr+1:a, 1:b)
-      #nmod_mat_window_init(Cr, C, 2*anr, 0, a, c);
-      Cr = view(C, 2*anr+1:a, 1:c)
-      #nmod_mat_mul(Cr, Ar, B);
-      AbstractAlgebra.mul!(Cr, Ar, B)
+    #nmod_mat_window_init(Ar, A, 2*anr, 0, a, b);
+    Ar = view(A, 2*anr+1:a, 1:b)
+    #nmod_mat_window_init(Cr, C, 2*anr, 0, a, c);
+    Cr = view(C, 2*anr+1:a, 1:c)
+    #nmod_mat_mul(Cr, Ar, B);
+    AbstractAlgebra.mul!(Cr, Ar, B)
   end
 
   if b > 2*anc # last col of A by last row of B -> C
-      #nmod_mat_window_init(Ac, A, 0, 2*anc, 2*anr, b);
-      Ac = view(A, 1:2*anr, 2*anc+1:b)
-      #nmod_mat_window_init(Br, B, 2*bnr, 0, b, 2*bnc);
-      Br = view(B, 2*bnr+1:b, 1:2*bnc)
-      #nmod_mat_window_init(Cb, C, 0, 0, 2*anr, 2*bnc);
-      Cb = view(C, 1:2*anr, 1:2*bnc)
-      #nmod_mat_addmul(Cb, Cb, Ac, Br);
-      AbstractAlgebra.mul!(Cb, Ac, Br, true)
+    #nmod_mat_window_init(Ac, A, 0, 2*anc, 2*anr, b);
+    Ac = view(A, 1:2*anr, 2*anc+1:b)
+    #nmod_mat_window_init(Br, B, 2*bnr, 0, b, 2*bnc);
+    Br = view(B, 2*bnr+1:b, 1:2*bnc)
+    #nmod_mat_window_init(Cb, C, 0, 0, 2*anr, 2*bnc);
+    Cb = view(C, 1:2*anr, 1:2*bnc)
+    #nmod_mat_addmul(Cb, Cb, Ac, Br);
+    AbstractAlgebra.mul!(Cb, Ac, Br, true)
   end
 end
 

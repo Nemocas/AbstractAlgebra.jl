@@ -5,7 +5,7 @@
 ###############################################################################
 
 function isequal(a::RingElem, b::RingElem)
-   return parent(a) == parent(b) && a == b
+  return parent(a) == parent(b) && a == b
 end
 
 """
@@ -43,10 +43,10 @@ Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 Check if `x` is divisible by `y`, i.e. if $x = zy$ for some $z$.
 """
 function is_divisible_by(x::T, y::T) where T <: RingElem
-   if iszero(y)
-      return iszero(x)
-   end
-   return divides(x, y)[1]
+  if iszero(y)
+    return iszero(x)
+  end
+  return divides(x, y)[1]
 end
 
 @doc raw"""
@@ -55,7 +55,7 @@ end
 Check if `x` and `y` are associated, i.e. if `x` is a unit times `y`.
 """
 function is_associated(x::T, y::T) where T <: RingElem
-   return is_divisible_by(x, y) && is_divisible_by(y, x)
+  return is_divisible_by(x, y) && is_divisible_by(y, x)
 end
 
 ###############################################################################
@@ -65,11 +65,11 @@ end
 ###############################################################################
 
 function evaluate(x::PolyRingElem{T}, y::Integer) where T <: RingElem
-   return evaluate(x, base_ring(x)(y))
+  return evaluate(x, base_ring(x)(y))
 end
 
 function evaluate(x::MPolyRingElem{T}, y::Integer) where T <: RingElem
-   return evaluate(x, base_ring(x)(y))
+  return evaluate(x, base_ring(x)(y))
 end
 
 ###############################################################################
@@ -93,8 +93,8 @@ is_domain_type(R::Type{T}) where T <: RingElem = false
 ###############################################################################
 
 function Base.exp(a::RingElem)
-   a != 0 && error("Exponential of nonzero element")
-   return one(parent(a))
+  a != 0 && error("Exponential of nonzero element")
+  return one(parent(a))
 end
 
 ################################################################################
@@ -117,18 +117,18 @@ transpose(x::T) where {T <: RingElem} = deepcopy(x)
 # This is used in various Euclidean domains for Chinese remaindering.
 
 function ppio(a::E, b::E) where E <: RingElem
-   if iszero(a)
-     return one(parent(a)), a
-   end
-   c = gcd(a, b)
-   n = div(a, c)
-   g = gcd(c, n)
-   while !isone(g)
-      c *= g
-      n = div(n, g)
-      g = gcd(c, n)
-   end
-   return c, n
+  if iszero(a)
+    return one(parent(a)), a
+  end
+  c = gcd(a, b)
+  n = div(a, c)
+  g = gcd(c, n)
+  while !isone(g)
+    c *= g
+    n = div(n, g)
+    g = gcd(c, n)
+  end
+  return c, n
 end
 
 ################################################################################
@@ -168,9 +168,9 @@ end
 # assumes the existence of is_square and sqrt for input  
 function is_square_with_sqrt(a::RingElem)
   if is_square(a)
-     return true, sqrt(a)
+    return true, sqrt(a)
   else
-     return false, parent(a)()
+    return false, parent(a)()
   end
 end
 
@@ -181,7 +181,7 @@ end
 ###############################################################################
 
 is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
-                                                 throw(NotImplementedError(:is_perfect, F))
+throw(NotImplementedError(:is_perfect, F))
 
 is_finite(F::FinField) = true
 

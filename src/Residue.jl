@@ -19,22 +19,22 @@ parent(a::ResElem) = a.parent
 is_domain_type(a::Type{T}) where T <: ResElem = false
 
 function is_exact_type(a::Type{T}) where {S <: RingElement, T <: ResElem{S}}
-   return is_exact_type(S)
+  return is_exact_type(S)
 end
 
 function check_parent_type(a::ResidueRing{T}, b::ResidueRing{T}) where {T <: RingElement}
-   # exists only to check types of parents agree
+  # exists only to check types of parents agree
 end
 
 function check_parent(a::ResElem, b::ResElem, throw::Bool = true)
-   if parent(a) != parent(b)
-      check_parent_type(parent(a), parent(b))
-      fl = modulus(parent(a)) != modulus(parent(b))
-      fl && throw && error("Incompatible moduli in residue operation")
-      return !fl
-      #CF: maybe extend to divisibility?
-   end
-   return true
+  if parent(a) != parent(b)
+    check_parent_type(parent(a), parent(b))
+    fl = modulus(parent(a)) != modulus(parent(b))
+    fl && throw && error("Incompatible moduli in residue operation")
+    return !fl
+    #CF: maybe extend to divisibility?
+  end
+  return true
 end
 
 ###############################################################################
@@ -44,8 +44,8 @@ end
 ###############################################################################
 
 function Base.hash(a::ResElem, h::UInt)
-   b = 0x539c1c8715c1adc2%UInt
-   return xor(b, xor(hash(data(a), h), h))
+  b = 0x539c1c8715c1adc2%UInt
+  return xor(b, xor(hash(data(a), h), h))
 end
 
 @doc raw"""
@@ -54,7 +54,7 @@ end
 Return the modulus $a$ of the given residue ring $S = R/(a)$.
 """
 function modulus(S::ResidueRing)
-   return S.modulus
+  return S.modulus
 end
 
 @doc raw"""
@@ -64,7 +64,7 @@ Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 residue $r$ belongs to.
 """
 function modulus(r::ResElem)
-   return modulus(parent(r))
+  return modulus(parent(r))
 end
 
 data(a::ResElem) = a.data
@@ -82,8 +82,8 @@ iszero(a::ResElem) = iszero(data(a))
 isone(a::ResElem) = isone(data(a)) || a == one(parent(a))
 
 function is_unit(a::ResElem)
-   g = gcd(data(a), modulus(a))
-   return isone(g)
+  g = gcd(data(a), modulus(a))
+  return isone(g)
 end
 
 # currently residue rings are only allowed over domains
@@ -91,16 +91,16 @@ end
 is_zero_divisor(a::ResElem) = !is_unit(a)
 
 function is_zero_divisor_with_annihilator(a::ResElem)
-   g = gcd(data(a), modulus(a))
-   b = divexact(modulus(a), g)  # Modulus must be nonzero, so g is nonzero
-   return !is_unit(g), parent(a)(b)
+  g = gcd(data(a), modulus(a))
+  b = divexact(modulus(a), g)  # Modulus must be nonzero, so g is nonzero
+  return !is_unit(g), parent(a)(b)
 end
 
 deepcopy_internal(a::ResElem, dict::IdDict) =
-   parent(a)(deepcopy_internal(data(a), dict))
+parent(a)(deepcopy_internal(data(a), dict))
 
 function characteristic(a::ResidueRing{T}) where T <: Integer
-   return modulus(a)
+  return modulus(a)
 end
 
 ###############################################################################
@@ -110,7 +110,7 @@ end
 ###############################################################################
 
 function canonical_unit(x::ResElem{<:Union{Integer, RingElem}})
- #the simple return x does not work
+  #the simple return x does not work
   # - if x == 0, this is not a unit
   # - if R is not a field....
   if iszero(x)
@@ -136,22 +136,22 @@ end
 ###############################################################################
 
 function expressify(a::ResElem; context = nothing)
-   return expressify(data(a), context = context)
+  return expressify(data(a), context = context)
 end
 
 @enable_all_show_via_expressify ResElem
 
 function show(io::IO, a::ResidueRing)
-   @show_name(io, a)
-   @show_special(io, a)
-   if is_terse(io)
-     print(io, "Residue ring")
-   else
-     io = pretty(io)
-     print(io, "Residue ring of ",)
-     print(terse(io), Lowercase(), base_ring(a))
-     print(io, " modulo ", modulus(a))
-   end
+  @show_name(io, a)
+  @show_special(io, a)
+  if is_terse(io)
+    print(io, "Residue ring")
+  else
+    io = pretty(io)
+    print(io, "Residue ring of ",)
+    print(terse(io), Lowercase(), base_ring(a))
+    print(io, " modulo ", modulus(a))
+  end
 end
 
 ###############################################################################
@@ -161,7 +161,7 @@ end
 ###############################################################################
 
 function -(a::ResElem)
-   parent(a)(-data(a))
+  parent(a)(-data(a))
 end
 
 ###############################################################################
@@ -171,18 +171,18 @@ end
 ###############################################################################
 
 function +(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   return parent(a)(data(a) + data(b))
+  check_parent(a, b)
+  return parent(a)(data(a) + data(b))
 end
 
 function -(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   return parent(a)(data(a) - data(b))
+  check_parent(a, b)
+  return parent(a)(data(a) - data(b))
 end
 
 function *(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   return parent(a)(data(a) * data(b))
+  check_parent(a, b)
+  return parent(a)(data(a) * data(b))
 end
 
 ###############################################################################
@@ -222,12 +222,12 @@ end
 ###############################################################################
 
 function ^(a::ResElem, b::Int)
-   if b < 0
-      # powermod throws a DivideError when it should throw an NotInvertibleError
-      parent(a)(powermod(data(inv(a)), -b, modulus(a)))
-   else
-      parent(a)(powermod(data(a), b, modulus(a)))
-   end
+  if b < 0
+    # powermod throws a DivideError when it should throw an NotInvertibleError
+    parent(a)(powermod(data(inv(a)), -b, modulus(a)))
+  else
+    parent(a)(powermod(data(a), b, modulus(a)))
+  end
 end
 
 ###############################################################################
@@ -244,9 +244,9 @@ that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
 function ==(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   fl = check_parent(a, b, false)
-   !fl && return false
-   return data(a) == data(b)
+  fl = check_parent(a, b, false)
+  !fl && return false
+  return data(a) == data(b)
 end
 
 @doc raw"""
@@ -258,9 +258,9 @@ Only if the power series are precisely the same, to the same precision, are
 they declared equal by this function.
 """
 function isequal(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   fl = check_parent(a, b, false)
-   !fl && return false
-   return isequal(data(a), data(b))
+  fl = check_parent(a, b, false)
+  !fl && return false
+  return isequal(data(a), data(b))
 end
 
 ###############################################################################
@@ -275,8 +275,8 @@ end
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::ResElem, b::Union{Integer, Rational, AbstractFloat})
-   z = base_ring(a)(b)
-   return data(a) == mod(z, modulus(a))
+  z = base_ring(a)(b)
+  return data(a) == mod(z, modulus(a))
 end
 
 @doc raw"""
@@ -285,8 +285,8 @@ end
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::Union{Integer, Rational, AbstractFloat}, b::ResElem)
-   z = base_ring(b)(a)
-   return data(b) == mod(z, modulus(b))
+  z = base_ring(b)(a)
+  return data(b) == mod(z, modulus(b))
 end
 
 @doc raw"""
@@ -295,8 +295,8 @@ end
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::ResElem{T}, b::T) where {T <: RingElem}
-   z = base_ring(a)(b)
-   return data(a) == mod(z, modulus(a))
+  z = base_ring(a)(b)
+  return data(a) == mod(z, modulus(a))
 end
 
 @doc raw"""
@@ -305,8 +305,8 @@ end
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::T, b::ResElem{T}) where {T <: RingElem}
-   z = base_ring(b)(a)
-   return data(b) == mod(z, modulus(b))
+  z = base_ring(b)(a)
+  return data(b) == mod(z, modulus(b))
 end
 
 ###############################################################################
@@ -322,9 +322,9 @@ Return the inverse of the element $a$ in the residue ring. If an impossible
 inverse is encountered, an exception is raised.
 """
 function Base.inv(a::ResElem)
-   g, ainv = gcdinv(data(a), modulus(a))
-   isone(g) || throw(NotInvertibleError(a))
-   return parent(a)(ainv)
+  g, ainv = gcdinv(data(a), modulus(a))
+  isone(g) || throw(NotInvertibleError(a))
+  return parent(a)(ainv)
 end
 
 ###############################################################################
@@ -334,31 +334,31 @@ end
 ###############################################################################
 
 function divexact(a::ResElem{T}, b::ResElem{T}; check::Bool=true) where {T <: RingElement}
-   check_parent(a, b)
-   fl, q = divides(a, b)
-   check && !fl && error("Impossible inverse in divexact")
-   return q
+  check_parent(a, b)
+  fl, q = divides(a, b)
+  check && !fl && error("Impossible inverse in divexact")
+  return q
 end
 
 function divides(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   if iszero(a)
-      return true, a
-   end
-   A = data(a)
-   B = data(b)
-   R = parent(a)
-   m = modulus(R)
-   gb = gcd(B, m)
-   ub = divexact(B, gb)
-   q, r = divrem(A, gb)
-   if !iszero(r)
-     return false, b
-   end
-   ub = divexact(B, gb)
-   b1 = invmod(ub, divexact(m, gb))
-   rs = R(q)*b1
-   return true, rs
+  check_parent(a, b)
+  if iszero(a)
+    return true, a
+  end
+  A = data(a)
+  B = data(b)
+  R = parent(a)
+  m = modulus(R)
+  gb = gcd(B, m)
+  ub = divexact(B, gb)
+  q, r = divrem(A, gb)
+  if !iszero(r)
+    return false, b
+  end
+  ub = divexact(B, gb)
+  b1 = invmod(ub, divexact(m, gb))
+  rs = R(q)*b1
+  return true, rs
 end
 
 ###############################################################################
@@ -375,8 +375,8 @@ by taking the greatest common divisor of the data associated with the
 supplied residues and taking its greatest common divisor with the modulus.
 """
 function gcd(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   return parent(a)(gcd(gcd(data(a), modulus(a)), data(b)))
+  check_parent(a, b)
+  return parent(a)(gcd(gcd(data(a), modulus(a)), data(b)))
 end
 
 ###############################################################################
@@ -386,23 +386,23 @@ end
 ###############################################################################
 
 function zero!(a::ResElem{T}) where {T <: RingElement}
-   a.data = zero!(a.data)
-   return a
+  a.data = zero!(a.data)
+  return a
 end
 
 function mul!(c::ResElem{T}, a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   c.data = mod(data(a)*data(b), modulus(a))
-   return c
+  c.data = mod(data(a)*data(b), modulus(a))
+  return c
 end
 
 function addeq!(c::ResElem{T}, a::ResElem{T}) where {T <: RingElement}
-   c.data = mod(data(c) + data(a), modulus(a))
-   return c
+  c.data = mod(data(c) + data(a), modulus(a))
+  return c
 end
 
 function add!(c::ResElem{T}, a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   c.data = mod(data(a) + data(b), modulus(a))
-   return c
+  c.data = mod(data(a) + data(b), modulus(a))
+  return c
 end
 
 ###############################################################################
@@ -415,20 +415,20 @@ RandomExtensions.maketype(R::ResidueRing, _) = elem_type(R)
 
 # define rand(make(S, v))
 function rand(rng::AbstractRNG,
-              sp::SamplerTrivial{<:Make2{<:ResElem{T},
-                                         <:ResidueRing{T}}}
-              ) where {T}
-   S, v = sp[][1:end]
-   S(rand(rng, v))
+    sp::SamplerTrivial{<:Make2{<:ResElem{T},
+                               <:ResidueRing{T}}}
+  ) where {T}
+  S, v = sp[][1:end]
+  S(rand(rng, v))
 end
 
 function RandomExtensions.make(S::ResidueRing, vs...)
-   R = base_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, vs[1])
-   else
-      Make(S, make(base_ring(S), vs...))
-   end
+  R = base_ring(S)
+  if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
+    Make(S, vs[1])
+  else
+    Make(S, make(base_ring(S), vs...))
+  end
 end
 
 rand(rng::AbstractRNG, S::ResidueRing, v...) = rand(rng, make(S, v...))
@@ -451,20 +451,20 @@ to the constructor with the same base ring $R$ and element $a$. A modulus
 of zero is not supported and throws an exception.
 """
 function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
-   # Modulus of zero cannot be supported. E.g. A C library could not be expected to
-   # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
-   iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
-   T = elem_type(R)
-   S = EuclideanRingResidueRing{T}(R(a), cached)
-   return S, Generic.EuclideanRingResidueMap(R, S)
+  # Modulus of zero cannot be supported. E.g. A C library could not be expected to
+  # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
+  iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
+  T = elem_type(R)
+  S = EuclideanRingResidueRing{T}(R(a), cached)
+  return S, Generic.EuclideanRingResidueMap(R, S)
 end
 
 function residue_ring(R::PolyRing, a::RingElement; cached::Bool = true)
-   iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
-   !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
-   T = elem_type(R)
-   S = EuclideanRingResidueRing{T}(R(a), cached)
-   return S, Generic.EuclideanRingResidueMap(R, S)
+  iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
+  !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
+  T = elem_type(R)
+  S = EuclideanRingResidueRing{T}(R(a), cached)
+  return S, Generic.EuclideanRingResidueMap(R, S)
 end
 
 @doc raw"""
@@ -476,7 +476,7 @@ where the section is the lift of an element of the residue field back
 to the ring `R`.
 """
 function quo(R::Ring, a::RingElement; cached::Bool = true)
-   S, f = residue_ring(R, a; cached = cached)
-   return S, f
+  S, f = residue_ring(R, a; cached = cached)
+  return S, f
 end
 

@@ -1,115 +1,115 @@
 @testset "Generic.FreeModule.constructors" begin
-   R, x = polynomial_ring(ZZ, "x")
-   M = free_module(R, 5)
+  R, x = polynomial_ring(ZZ, "x")
+  M = free_module(R, 5)
 
-   @test free_module(R, 5, cached = true) === free_module(R, 5, cached = true)
-   @test free_module(R, 5, cached = true) !== free_module(R, 5, cached = false)
+  @test free_module(R, 5, cached = true) === free_module(R, 5, cached = true)
+  @test free_module(R, 5, cached = true) !== free_module(R, 5, cached = false)
 
-   @test isa(M, Generic.FreeModule)
+  @test isa(M, Generic.FreeModule)
 
-   @test elem_type(M) == Generic.FreeModuleElem{elem_type(R)}
-   @test elem_type(Generic.FreeModule{elem_type(R)}) == Generic.FreeModuleElem{elem_type(R)}
-   @test parent_type(Generic.FreeModuleElem{elem_type(R)}) == Generic.FreeModule{elem_type(R)}
+  @test elem_type(M) == Generic.FreeModuleElem{elem_type(R)}
+  @test elem_type(Generic.FreeModule{elem_type(R)}) == Generic.FreeModuleElem{elem_type(R)}
+  @test parent_type(Generic.FreeModuleElem{elem_type(R)}) == Generic.FreeModule{elem_type(R)}
 
-   @test isa(M, Generic.FreeModule)
+  @test isa(M, Generic.FreeModule)
 
-   @test isa(M([x, x, x, x, x]), Generic.FreeModuleElem)
+  @test isa(M([x, x, x, x, x]), Generic.FreeModuleElem)
 
-   F = free_module(ZZ, 0)
+  F = free_module(ZZ, 0)
 
-   @test isa(F([]), Generic.FreeModuleElem)
+  @test isa(F([]), Generic.FreeModuleElem)
 end
 
 @testset "Generic.FreeModule.manipulation" begin
-   R, x = polynomial_ring(ZZ, "x")
-   M = free_module(R, 5)
+  R, x = polynomial_ring(ZZ, "x")
+  M = free_module(R, 5)
 
-   @test rank(M) == 5
+  @test rank(M) == 5
 end
 
 @testset "Generic.FreeModule.unary_ops" begin
-   R, x = polynomial_ring(ZZ, "x")
+  R, x = polynomial_ring(ZZ, "x")
 
-   for iter = 1:10
-      M = free_module(R, 3)
+  for iter = 1:10
+    M = free_module(R, 3)
 
-      v = [rand(R, -1:2, -10:10) for i in 1:3]
-      w = [-c for c in v]
+    v = [rand(R, -1:2, -10:10) for i in 1:3]
+    w = [-c for c in v]
 
-      @test -M(v) == M(w)
-   end
+    @test -M(v) == M(w)
+  end
 
-   R = QQ
+  R = QQ
 
-   for iter = 1:10
-      M = free_module(R, 3)
+  for iter = 1:10
+    M = free_module(R, 3)
 
-      v = [rand(R, -10:10) for i in 1:3]
-      w = [-c for c in v]
+    v = [rand(R, -10:10) for i in 1:3]
+    w = [-c for c in v]
 
-      @test -M(v) == M(w)
-   end
+    @test -M(v) == M(w)
+  end
 end
 
 @testset "Generic.FreeModule.binary_ops" begin
-   R, x = polynomial_ring(ZZ, "x")
+  R, x = polynomial_ring(ZZ, "x")
 
-   for iter = 1:10
-      M = free_module(R, 3)
+  for iter = 1:10
+    M = free_module(R, 3)
 
-      m = rand(M, -1:2, -10:10)
-      n = rand(M, -1:2, -10:10)
+    m = rand(M, -1:2, -10:10)
+    n = rand(M, -1:2, -10:10)
 
-      @test m + n - n == m
-   end
+    @test m + n - n == m
+  end
 
-   R = QQ
+  R = QQ
 
-   for iter = 1:10
-      M = free_module(R, 3)
+  for iter = 1:10
+    M = free_module(R, 3)
 
-      m = rand(M, -10:10)
-      n = rand(M, -10:10)
+    m = rand(M, -10:10)
+    n = rand(M, -10:10)
 
-      @test m + n - n == m
-   end
+    @test m + n - n == m
+  end
 end
 
 @testset "Generic.FreeModule.adhoc_binary" begin
-   R, x = polynomial_ring(ZZ, "x")
+  R, x = polynomial_ring(ZZ, "x")
 
-   for iter = 1:10
-      M = free_module(R, 3)
-      c = rand(1:10)
+  for iter = 1:10
+    M = free_module(R, 3)
+    c = rand(1:10)
 
-      m = rand(M, -1:2, -10:10)
+    m = rand(M, -1:2, -10:10)
 
-      v = [rand(R, -1:2, -10:10) for i in 1:3]
-      w = [x*c for c in v]
+    v = [rand(R, -1:2, -10:10) for i in 1:3]
+    w = [x*c for c in v]
 
-      @test 2*m == m + m
-      @test m*c == c*m
-      @test x*M(v) == M(w)
-      @test m*x == x*m
-   end
+    @test 2*m == m + m
+    @test m*c == c*m
+    @test x*M(v) == M(w)
+    @test m*x == x*m
+  end
 
-   R = QQ
+  R = QQ
 
-   for iter = 1:10
-      M = free_module(R, 3)
-      c = rand(1:10)
+  for iter = 1:10
+    M = free_module(R, 3)
+    c = rand(1:10)
 
-      m = rand(M, -10:10)
+    m = rand(M, -10:10)
 
-      @test 2*m == m + m
-      @test m*c == c*m
-   end
+    @test 2*m == m + m
+    @test m*c == c*m
+  end
 end
 
 @testset "Generic.FreeModule.hash" begin
-   R, x = polynomial_ring(ZZ, "x")
-   M = free_module(R, 5)
+  R, x = polynomial_ring(ZZ, "x")
+  M = free_module(R, 5)
 
-   # ensure hash works
-   @test hash(zero(M)) isa UInt
+  # ensure hash works
+  @test hash(zero(M)) isa UInt
 end

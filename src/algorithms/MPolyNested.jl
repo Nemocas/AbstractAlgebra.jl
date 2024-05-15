@@ -16,8 +16,8 @@
 # from Q(t1, t2)[x1, x2] to S = Q[x1, x2, t1, t2]
 # the product of the two outputs should be equal to the input
 function _remove_denominators(
-  S::Union{MPolyRing, PolyRing},
-  f::Union{MPolyRingElem, PolyRingElem})
+    S::Union{MPolyRing, PolyRing},
+    f::Union{MPolyRingElem, PolyRingElem})
 
   R = parent(f)                   # Q(t1, t2)[x1, x2]
   R2 = base_ring(base_ring(R))    # Q[t1, t2]
@@ -43,8 +43,8 @@ end
 # from Q[x1, x2, t1, t2] to R = Q(t1, t2)[x1, x2]
 # the output is equal to the input
 function _restore_numerators(
-  R::Union{MPolyRing, PolyRing},
-  g::Union{MPolyRingElem, PolyRingElem})
+    R::Union{MPolyRing, PolyRing},
+    g::Union{MPolyRingElem, PolyRingElem})
 
   S = parent(g)                   # Q[x1, x2, t1, t2]
   R2 = base_ring(base_ring(R))    # Q[t1, t2]
@@ -80,9 +80,9 @@ end
 
 
 function gcd(
-  a::MPolyRingElem{Generic.FracFieldElem{T}},
-  b::MPolyRingElem{Generic.FracFieldElem{T}}
-) where T <: Union{PolyRingElem, MPolyRingElem}
+    a::MPolyRingElem{Generic.FracFieldElem{T}},
+    b::MPolyRingElem{Generic.FracFieldElem{T}}
+  ) where T <: Union{PolyRingElem, MPolyRingElem}
 
   R = parent(a)                   # Q(t1, t2)[x1, x2]
   R2 = base_ring(base_ring(R))    # Q[t1, t2]
@@ -94,9 +94,9 @@ function gcd(
 end
 
 function gcd(
-  a::PolyRingElem{Generic.FracFieldElem{T}},
-  b::PolyRingElem{Generic.FracFieldElem{T}}
-) where T <: Union{PolyRingElem, MPolyRingElem}
+    a::PolyRingElem{Generic.FracFieldElem{T}},
+    b::PolyRingElem{Generic.FracFieldElem{T}}
+  ) where T <: Union{PolyRingElem, MPolyRingElem}
 
   R = parent(a)                   # Q(t1, t2)[x1, x2]
   R2 = base_ring(base_ring(R))    # Q[t1, t2]
@@ -122,9 +122,9 @@ function _convert_frac_fac(R, u, fac)
 end
 
 function factor(
-  a::Union{MPolyRingElem{Generic.FracFieldElem{T}},
-           PolyRingElem{Generic.FracFieldElem{T}}}
-) where T <: Union{PolyRingElem, MPolyRingElem}
+    a::Union{MPolyRingElem{Generic.FracFieldElem{T}},
+             PolyRingElem{Generic.FracFieldElem{T}}}
+   ) where T <: Union{PolyRingElem, MPolyRingElem}
 
   R = parent(a)                   # Q(t1, t2)[x1, x2]
   R2 = base_ring(base_ring(R))    # Q[t1, t2]
@@ -134,9 +134,9 @@ function factor(
 end
 
 function factor_squarefree(
-  a::Union{MPolyRingElem{Generic.FracFieldElem{T}},
-           PolyRingElem{Generic.FracFieldElem{T}}}
-) where T <: Union{PolyRingElem, MPolyRingElem}
+    a::Union{MPolyRingElem{Generic.FracFieldElem{T}},
+             PolyRingElem{Generic.FracFieldElem{T}}}
+   ) where T <: Union{PolyRingElem, MPolyRingElem}
 
   R = parent(a)                   # Q(t1, t2)[x1, x2]
   R2 = base_ring(base_ring(R))    # Q[t1, t2]
@@ -154,7 +154,7 @@ end
 # denest for poly ring
 
 function _denest_recursive(BR::Union{MPolyRing, PolyRing},
-                           R::Union{MPolyRing, PolyRing}, n::Int)
+    R::Union{MPolyRing, PolyRing}, n::Int)
   return _denest_recursive(base_ring(BR), BR, n + nvars(R))
 end
 
@@ -176,7 +176,7 @@ end
 # denest for poly elem
 
 function _denest_recursive(r::MPolyBuildCtx, f::PolyRingElem{T},
-                           e0::Vector{Int}) where T <: Union{PolyRingElem, MPolyRingElem}
+    e0::Vector{Int}) where T <: Union{PolyRingElem, MPolyRingElem}
   for i in degree(f):-1:0
     _denest_recursive(r, coeff(f, i), vcat(e0, [i]))
   end
@@ -189,7 +189,7 @@ function _denest_recursive(r::MPolyBuildCtx, f::PolyRingElem, e0::Vector{Int})
 end
 
 function _denest_recursive(r::MPolyBuildCtx, f::MPolyRingElem{T},
-                           e0::Vector{Int}) where T <: Union{PolyRingElem, MPolyRingElem}
+    e0::Vector{Int}) where T <: Union{PolyRingElem, MPolyRingElem}
   for (c1, e1) in zip(coefficients(f), exponent_vectors(f))
     _denest_recursive(r, c1, vcat(e0, e1))
   end
@@ -217,13 +217,13 @@ end
 # renest for poly
 
 function _renest_recursive_coeff(R::Union{MPolyRing{T}, PolyRing{T}},
-                                 off::Int, idxs::Vector{Int},
-                                 gcoeffs, gexps) where T <: Union{PolyRingElem, MPolyRingElem}
+    off::Int, idxs::Vector{Int},
+    gcoeffs, gexps) where T <: Union{PolyRingElem, MPolyRingElem}
   return _renest_recursive(base_ring(R), off, idxs, gcoeffs, gexps)
 end
 
 function _renest_recursive_coeff(R::Union{MPolyRing, PolyRing}, off::Int,
-                                 idxs::Vector{Int}, gcoeffs, gexps)
+    idxs::Vector{Int}, gcoeffs, gexps)
   @assert length(idxs) == 1
   return gcoeffs[idxs[1]]
 end
@@ -284,17 +284,17 @@ function _nested_gcd(a, b)
 end
 
 function gcd(
-   a::Generic.Poly{T},
-   b::Generic.Poly{T}
-) where T <: Union{PolyRingElem, MPolyRingElem}
-   return _nested_gcd(a, b)
+    a::Generic.Poly{T},
+    b::Generic.Poly{T}
+  ) where T <: Union{PolyRingElem, MPolyRingElem}
+  return _nested_gcd(a, b)
 end
 
 function gcd(
-   a::Generic.MPoly{T},
-   b::Generic.MPoly{T}
-) where T <: Union{PolyRingElem, MPolyRingElem}
-   return _nested_gcd(a, b)
+    a::Generic.MPoly{T},
+    b::Generic.MPoly{T}
+  ) where T <: Union{PolyRingElem, MPolyRingElem}
+  return _nested_gcd(a, b)
 end
 
 function _convert_iter_fac(R, fac::Fac)
@@ -307,13 +307,13 @@ function _convert_iter_fac(R, fac::Fac)
 end
 
 function factor(a::Union{PolyRingElem{T}, MPolyRingElem{T}}) where
-                                                T <: Union{PolyRingElem, MPolyRingElem}
+  T <: Union{PolyRingElem, MPolyRingElem}
   A = denest(denest(parent(a)), a)
   return _convert_iter_fac(parent(a), factor(A))
 end
 
 function factor_squarefree(a::Union{PolyRingElem{T}, MPolyRingElem{T}}) where
-                                                T <: Union{PolyRingElem, MPolyRingElem}
+  T <: Union{PolyRingElem, MPolyRingElem}
   A = denest(denest(parent(a)), a)
   return _convert_iter_fac(parent(a), factor_squarefree(A))
 end

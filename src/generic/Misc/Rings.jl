@@ -5,27 +5,27 @@
 ###############################################################################
 
 function is_power(a::RingElem, n::Int)
-    if isone(a) || iszero(a)
-        return true, a
-    end
-    if isone(-a) && isodd(n)
-        return true, a
-    end
-    R = parent(a)
-    Rt = PolyRing(R)
-    x = gen(Rt)
-    r = roots(x^n - a)
-    if length(r) == 0
-        return false, a
-    else
-        return true, r[1]
-    end
+  if isone(a) || iszero(a)
+    return true, a
+  end
+  if isone(-a) && isodd(n)
+    return true, a
+  end
+  R = parent(a)
+  Rt = PolyRing(R)
+  x = gen(Rt)
+  r = roots(x^n - a)
+  if length(r) == 0
+    return false, a
+  else
+    return true, r[1]
+  end
 end
-  
+
 function root(a::RingElem, n::Int)
-    fl, b = is_power(a, n)
-    fl || error("element does not have a $n-th root")
-    return b
+  fl, b = is_power(a, n)
+  fl || error("element does not have a $n-th root")
+  return b
 end
 
 @doc raw"""
@@ -54,7 +54,7 @@ function rising_factorial(x::RingElement, n::Integer)
   n == 0 && return one(x)
   n == 1 && return x
   if x isa Integer
-      return reduce(Base.checked_mul, x+i-1 for i in 1:Int(n))
+    return reduce(Base.checked_mul, x+i-1 for i in 1:Int(n))
   end
   return prod(x+i-1 for i in 1:Int(n))
 end
@@ -88,7 +88,7 @@ function rising_factorial2(x::RingElement, n::Integer)
   f, F = rising_factorial2(x, Int(n)-1)
   # use product rule:  [(x+n-1)*f(x)]' = (x+n-1)'*f(x) + (x+n-1)*f'(x)
   if x isa Integer
-      return Base.checked_mul(x+n-1, f),  f + Base.checked_mul(x+n-1, F)
+    return Base.checked_mul(x+n-1, f),  f + Base.checked_mul(x+n-1, F)
   end
   return (x+n-1)*f,  f + (x+n-1)*F
 end

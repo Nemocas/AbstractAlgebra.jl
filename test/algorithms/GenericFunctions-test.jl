@@ -49,24 +49,24 @@ import ..test_EuclideanRing_interface
 import ..test_elem
 
 @attributes mutable struct ConstPolyRing{T <: RingElement} <: Ring
-   base_ring::Ring
+  base_ring::Ring
 
-   function ConstPolyRing{T}(R::Ring, cached::Bool) where T <: RingElement
-      return get_cached!(ConstPolyID, R, cached) do
-         new{T}(R)
-      end::ConstPolyRing{T}
-   end
+  function ConstPolyRing{T}(R::Ring, cached::Bool) where T <: RingElement
+    return get_cached!(ConstPolyID, R, cached) do
+      new{T}(R)
+    end::ConstPolyRing{T}
+  end
 end
 
 const ConstPolyID = AbstractAlgebra.CacheDictType{Ring, ConstPolyRing}()
-   
-mutable struct ConstPoly{T <: RingElement} <: RingElem
-   c::T
-   parent::ConstPolyRing{T}
 
-   function ConstPoly{T}(c::T) where T <: RingElement
-      return new(c)
-   end
+mutable struct ConstPoly{T <: RingElement} <: RingElem
+  c::T
+  parent::ConstPolyRing{T}
+
+  function ConstPoly{T}(c::T) where T <: RingElement
+    return new(c)
+  end
 end
 
 # Data type and parent object methods
@@ -86,14 +86,14 @@ is_domain_type(::Type{ConstPoly{T}}) where T <: RingElement = is_domain_type(T)
 is_exact_type(::Type{ConstPoly{T}}) where T <: RingElement = is_exact_type(T)
 
 function hash(f::ConstPoly, h::UInt)
-   r = 0x65125ab8e0cd44ca
-   return xor(r, hash(f.c, h))
+  r = 0x65125ab8e0cd44ca
+  return xor(r, hash(f.c, h))
 end
 
 function deepcopy_internal(f::ConstPoly{T}, dict::IdDict) where T <: RingElement
-   r = ConstPoly{T}(deepcopy_internal(f.c, dict))
-   r.parent = f.parent # parent should not be deepcopied
-   return r
+  r = ConstPoly{T}(deepcopy_internal(f.c, dict))
+  r.parent = f.parent # parent should not be deepcopied
+  return r
 end
 
 # Basic manipulation
@@ -117,62 +117,62 @@ canonical_unit(f::ConstPoly) = canonical_unit(f.c)
 # String I/O
 
 function show(io::IO, R::ConstPolyRing)
-   print(io, "Constant polynomials over ")
-   show(io, base_ring(R))
+  print(io, "Constant polynomials over ")
+  show(io, base_ring(R))
 end
 
 function show(io::IO, f::ConstPoly)
-   print(io, f.c)
+  print(io, f.c)
 end
 
 # Expressification (optional)
 
 function expressify(R::ConstPolyRing; context = nothing)
-   return Expr(:sequence, Expr(:text, "Constant polynomials over "),
-                          expressify(base_ring(R), context = context))
+  return Expr(:sequence, Expr(:text, "Constant polynomials over "),
+              expressify(base_ring(R), context = context))
 end
 
 function expressify(f::ConstPoly; context = nothing)
-   return expressify(f.c, context = context)
+  return expressify(f.c, context = context)
 end
 
 # Unary operations
 
 function -(f::ConstPoly)
-   R = parent(f)
-   return R(-f.c)
+  R = parent(f)
+  return R(-f.c)
 end
 
 # Binary operations
 
 function +(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
-   R = parent(f)
-   return R(f.c + g.c)
+  parent(f) != parent(g) && error("Incompatible rings")
+  R = parent(f)
+  return R(f.c + g.c)
 end
 
 function -(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
-   R = parent(f)
-   return R(f.c - g.c)
+  parent(f) != parent(g) && error("Incompatible rings")
+  R = parent(f)
+  return R(f.c - g.c)
 end
 
 function *(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
-   R = parent(f)
-   return R(f.c*g.c)
+  parent(f) != parent(g) && error("Incompatible rings")
+  R = parent(f)
+  return R(f.c*g.c)
 end
 
 # Comparison
 
 function ==(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
-   return f.c == g.c
+  parent(f) != parent(g) && error("Incompatible rings")
+  return f.c == g.c
 end
 
 function isequal(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
-   return isequal(f.c, g.c)
+  parent(f) != parent(g) && error("Incompatible rings")
+  return isequal(f.c, g.c)
 end
 
 # Powering need not be implemented if * is
@@ -180,38 +180,38 @@ end
 # Exact division
 
 function divexact(f::ConstPoly{T}, g::ConstPoly{T}; check::Bool = true) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
-   R = parent(f)
-   return R(divexact(f.c, g.c, check = check))
+  parent(f) != parent(g) && error("Incompatible rings")
+  R = parent(f)
+  return R(divexact(f.c, g.c, check = check))
 end
 
 # Inverse
 
 function inv(f::ConstPoly)
-   R = parent(f)
-   return R(AbstractAlgebra.inv(f.c))
+  R = parent(f)
+  return R(AbstractAlgebra.inv(f.c))
 end
 
 # Unsafe operators
 
 function zero!(f::ConstPoly)
-   f.c = zero(base_ring(parent(f)))
-   return f
+  f.c = zero(base_ring(parent(f)))
+  return f
 end
 
 function mul!(f::ConstPoly{T}, g::ConstPoly{T}, h::ConstPoly{T}) where T <: RingElement
-   f.c = g.c*h.c
-   return f
+  f.c = g.c*h.c
+  return f
 end
 
 function add!(f::ConstPoly{T}, g::ConstPoly{T}, h::ConstPoly{T}) where T <: RingElement
-   f.c = g.c + h.c
-   return f
+  f.c = g.c + h.c
+  return f
 end
 
 function addeq!(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   f.c += g.c
-   return f
+  f.c += g.c
+  return f
 end
 
 # Random generation
@@ -219,7 +219,7 @@ end
 RandomExtensions.maketype(R::ConstPolyRing, _) = elem_type(R)
 
 rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{ConstPoly,ConstPolyRing}}) =
-        sp[][1](rand(rng, sp[][2]))
+sp[][1](rand(rng, sp[][2]))
 
 rand(rng::AbstractRNG, R::ConstPolyRing, n::AbstractUnitRange{Int}) = R(rand(rng, n))
 
@@ -230,71 +230,71 @@ rand(R::ConstPolyRing, n::AbstractUnitRange{Int}) = rand(Random.GLOBAL_RNG, R, n
 promote_rule(::Type{ConstPoly{T}}, ::Type{ConstPoly{T}}) where T <: RingElement = ConstPoly{T}
 
 function promote_rule(::Type{ConstPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? ConstPoly{T} : Union{}
+  promote_rule(T, U) == T ? ConstPoly{T} : Union{}
 end
 
 # Constructors
 
 function (R::ConstPolyRing{T})() where T <: RingElement
-   r = ConstPoly{T}(base_ring(R)(0))
-   r.parent = R
-   return r
+  r = ConstPoly{T}(base_ring(R)(0))
+  r.parent = R
+  return r
 end
 
 function (R::ConstPolyRing{T})(c::Integer) where T <: RingElement
-   r = ConstPoly{T}(base_ring(R)(c))
-   r.parent = R
-   return r
+  r = ConstPoly{T}(base_ring(R)(c))
+  r.parent = R
+  return r
 end
 
 # Needed to prevent ambiguity
 function (R::ConstPolyRing{T})(c::T) where T <: Integer
-   r = ConstPoly{T}(base_ring(R)(c))
-   r.parent = R
-   return r
+  r = ConstPoly{T}(base_ring(R)(c))
+  r.parent = R
+  return r
 end
 
 function (R::ConstPolyRing{T})(c::T) where T <: RingElement
-   base_ring(R) != parent(c) && error("Unable to coerce element")
-   r = ConstPoly{T}(c)
-   r.parent = R
-   return r
+  base_ring(R) != parent(c) && error("Unable to coerce element")
+  r = ConstPoly{T}(c)
+  r.parent = R
+  return r
 end
 
 function (R::ConstPolyRing{T})(f::ConstPoly{T}) where T <: RingElement
-   R != parent(f) && error("Unable to coerce element")
-   return f
+  R != parent(f) && error("Unable to coerce element")
+  return f
 end
 
 # Parent constructor
 
 function ConstantPolynomialRing(R::Ring, cached::Bool=true)
-   T = elem_type(R)
-   return ConstPolyRing{T}(R, cached)
+  T = elem_type(R)
+  return ConstPolyRing{T}(R, cached)
 end
 
 # we need only divrem to satsify the
 # Euclidean interface
 
 function Base.divrem(a::ConstPoly{elem_type(ZZ)}, b::ConstPoly{elem_type(ZZ)})
-   parent(a) != parent(b) && error("Incompatible rings")
-   q, r = AbstractAlgebra.divrem(a.c, b.c)
-   return parent(a)(q), parent(a)(r)
+  parent(a) != parent(b) && error("Incompatible rings")
+  q, r = AbstractAlgebra.divrem(a.c, b.c)
+  return parent(a)(q), parent(a)(r)
 end
 
 ####
 
 function test_elem(R::ConstPolyRing{elem_type(ZZ)})
-   n = rand(1:999)
-   return R(rand(-n:n))
+  n = rand(1:999)
+  return R(rand(-n:n))
 end
 
 @testset "GenericFunctions.Ring_interface" begin
-   test_Ring_interface(ConstantPolynomialRing(ZZ))
+  test_Ring_interface(ConstantPolynomialRing(ZZ))
 end
 
 @testset "GenericFunctions.EuclideanRing_interface" begin
-   test_EuclideanRing_interface(ConstantPolynomialRing(ZZ))
+  test_EuclideanRing_interface(ConstantPolynomialRing(ZZ))
 end
 
 end

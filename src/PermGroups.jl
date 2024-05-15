@@ -11,7 +11,7 @@
 ###############################################################################
 
 function SymmetricGroup(n::T) where T
-   Generic.SymmetricGroup(n)
+  Generic.SymmetricGroup(n)
 end
 
 ###############################################################################
@@ -21,5 +21,5 @@ end
 ###############################################################################
 
 function AllPerms(n::T) where T
-   Generic.AllPerms(n)
+  Generic.AllPerms(n)
 end

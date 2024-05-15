@@ -2,9 +2,9 @@ import MacroTools as MT
 
 @assert Symbol <: VarName
 const VarNames = Union{
-    AbstractArray{<:VarName},
-    Pair{<:VarName},
-}
+                       AbstractArray{<:VarName},
+                       Pair{<:VarName},
+                      }
 
 req(cond, msg) = cond || throw(ArgumentError(msg))
 
@@ -71,7 +71,7 @@ julia> AbstractAlgebra.variable_names('a':'c', ['z'])
 variable_names(as::VarNames...) = variable_names(as)
 # brackets = Val(false) effectively replaces `:x` and `"x"` by `"x#"`, used by macro
 variable_names(as::Tuple{Vararg{VarNames}}, brackets::Val = Val(true)) =
-    Symbol[x for a in as for x in _variable_names(a, brackets)]
+Symbol[x for a in as for x in _variable_names(a, brackets)]
 
 _variable_names(s::VarName, ::Any) = [Symbol(s)]
 _variable_names(a::AbstractArray{<:VarName}, ::Any) = Symbol.(a)
@@ -84,11 +84,11 @@ _variable_names((s, axes)::Pair{<:Union{Char, Symbol}, <:Tuple}, ::Val{false}) =
 
 _variable_names((s, axe)::Pair{<:AbstractString}, val::Val) = _variable_names(s => (axe,), val)
 function _variable_names((s, axes)::Pair{<:AbstractString, <:Tuple}, val::Val)
-    c = count("#", s)
-    req(c <= 1, """Only a single '#' allowed, but "$s" contains $c of them.
-        Please communicate your use case to the Oscar community.""")
-    return c == 0 ? _variable_names(Symbol(s) => axes, val) :
-        _check_names([Symbol(replace(s, '#' => join(i))) for i in Iterators.product(axes...)], val)
+  c = count("#", s)
+  req(c <= 1, """Only a single '#' allowed, but "$s" contains $c of them.
+      Please communicate your use case to the Oscar community.""")
+  return c == 0 ? _variable_names(Symbol(s) => axes, val) :
+  _check_names([Symbol(replace(s, '#' => join(i))) for i in Iterators.product(axes...)], val)
 end
 
 """
@@ -97,21 +97,21 @@ end
 Warn, if any of the `names` is no valid Julia identifier. Return `names`.
 """
 function check_names(names)
-    badname = _first(!Meta.isidentifier, names)
-    if badname !== nothing
-        badname = first(x for x in names if !Meta.isidentifier(x))
-        badstring = repr(string(badname))
-        @warn "The variable name $badstring sadly is no Julia identifier. " *
-            "You can still access it as `var$badstring`."
-    end
-    return names
+  badname = _first(!Meta.isidentifier, names)
+  if badname !== nothing
+    badname = first(x for x in names if !Meta.isidentifier(x))
+    badstring = repr(string(badname))
+    @warn "The variable name $badstring sadly is no Julia identifier. " *
+    "You can still access it as `var$badstring`."
+  end
+  return names
 end
 _check_names(x, ::Val{true}) = x
 _check_names(x, ::Val{false}) = check_names(x)
 
 function _first(f, a)
-    i = iterate(Iterators.filter(f, a))
-    return i === nothing ? nothing : first(i)
+  i = iterate(Iterators.filter(f, a))
+  return i === nothing ? nothing : first(i)
 end
 
 @doc raw"""
@@ -139,27 +139,27 @@ julia> R, (a, b), x, y, z = polynomial_ring(ZZ, s...)
 ```
 """
 reshape_to_varnames(vec::Vector, varnames::VarNames...) =
-    reshape_to_varnames(vec, varnames)
+reshape_to_varnames(vec, varnames)
 function reshape_to_varnames(vec::Vector, varnames::Tuple{Vararg{VarNames}})
-    iter = Iterators.Stateful(vec)
-    result = _unpeel_reshape_to_varnames(iter, varnames)
-    @assert isempty(iter)
-    return result
+  iter = Iterators.Stateful(vec)
+  result = _unpeel_reshape_to_varnames(iter, varnames)
+  @assert isempty(iter)
+  return result
 end
 
 function _unpeel_reshape_to_varnames(iter, x::Tuple)
-    if length(x) === 1
-        return (_reshape_to_varnames(iter, x[1]), )
-    else
-        return tuple(_reshape_to_varnames(iter, x[1]), _unpeel_reshape_to_varnames(iter, Base.tail(x))...)
-    end
+  if length(x) === 1
+    return (_reshape_to_varnames(iter, x[1]), )
+  else
+    return tuple(_reshape_to_varnames(iter, x[1]), _unpeel_reshape_to_varnames(iter, Base.tail(x))...)
+  end
 end
 
 _reshape_to_varnames(iter::Iterators.Stateful, ::VarName) = popfirst!(iter)
 _reshape_to_varnames(iter::Iterators.Stateful, a::AbstractArray{<:VarName}) =
-    _reshape(iter, size(a))
+_reshape(iter, size(a))
 _reshape_to_varnames(iter::Iterators.Stateful, (_, shape)::Pair{<:VarName}) =
-    __reshape(iter, shape)
+__reshape(iter, shape)
 
 __reshape(iter, axes::Tuple) = _reshape(iter, ntuple(i -> size(axes[i])[1], length(axes)))
 __reshape(iter, axe) = _reshape(iter, size(axe))
@@ -189,20 +189,20 @@ Dict{Symbol, Any} with 3 entries:
 ```
 """
 function keyword_arguments(kvs::Tuple{Vararg{Expr}}, default::Dict{Symbol},
-        valid::Dict{Symbol, <:AbstractVector} = Dict{Symbol, Vector{Any}}()) ::
-        Dict{Symbol}
-    result = Dict{Symbol, Any}(default)
-    for o in kvs
-        req(MT.@capture(o, k_ = v_), "Only key value options allowed")
-        req(k in keys(result), "Invalid key value option key `$k`")
-        k in keys(valid) && req(v in valid[k], "Invalid option `$v` to key `$k`")
-        result[k] = v
-    end
-    return result
+    valid::Dict{Symbol, <:AbstractVector} = Dict{Symbol, Vector{Any}}()) ::
+  Dict{Symbol}
+  result = Dict{Symbol, Any}(default)
+  for o in kvs
+    req(MT.@capture(o, k_ = v_), "Only key value options allowed")
+    req(k in keys(result), "Invalid key value option key `$k`")
+    k in keys(valid) && req(v in valid[k], "Invalid option `$v` to key `$k`")
+    result[k] = v
+  end
+  return result
 end
 
 raw"""
-    normalise_keyword_arguments(args::Union{Tuple, Vector}) :: Vector
+normalise_keyword_arguments(args::Union{Tuple, Vector}) :: Vector
 
 Turn argument list like `(1, a=2; b=3).args` into `(1; a=2, b=3).args`.
 
@@ -223,133 +223,133 @@ julia> args = @nka_test(1+2, a=x; b=x^2, kw...); :($(args...),)
 ```
 """
 function normalise_keyword_arguments(args)
-    # Keyword arguments after `;`
-    if Meta.isexpr(first(args), :parameters)
-        kv = first(args)
-        args = args[2:end]
-    else
-        kv = Expr(:parameters)
-    end
-    # Keyword arguments without previous `;`
-    append!(kv.args, (Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))))
-    # normal arguments
-    args = (e for e in args if !Meta.isexpr(e, :(=)))
-    return [kv, args...]
+  # Keyword arguments after `;`
+  if Meta.isexpr(first(args), :parameters)
+    kv = first(args)
+    args = args[2:end]
+  else
+    kv = Expr(:parameters)
+  end
+  # Keyword arguments without previous `;`
+  append!(kv.args, (Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))))
+  # normal arguments
+  args = (e for e in args if !Meta.isexpr(e, :(=)))
+  return [kv, args...]
 end
 
 function _eval(m::Core.Module, e::Expr)
-    try
-        Base.eval(m, e)
-    catch err
-        if isa(err, UndefVarError)
-            @error "Inconveniently, you may only use literals and variables " *
-                "from the global scope of the current module (`$m`) " *
-                "when using variable name constructor macros"
-        end
-        rethrow()
+  try
+    Base.eval(m, e)
+  catch err
+    if isa(err, UndefVarError)
+      @error "Inconveniently, you may only use literals and variables " *
+      "from the global scope of the current module (`$m`) " *
+      "when using variable name constructor macros"
     end
+    rethrow()
+  end
 end
 
 # input is :([M.]f(args..., s) where {wheres} [ = ... ])
 function _splitdef(e::Expr)
-    Meta.isexpr(e, (:(=), :function)) || (e = Expr(:(=), e, :()))
-    d = MT.splitdef(e)
+  Meta.isexpr(e, (:(=), :function)) || (e = Expr(:(=), e, :()))
+  d = MT.splitdef(e)
 
-    req(isempty(d[:kwargs]), "Keyword arguments currently not supported")
+  req(isempty(d[:kwargs]), "Keyword arguments currently not supported")
 
-    args = d[:args][begin:end-1] # the last argument is just a placeholder
-    splitargs = MT.splitarg.(args)
-    req(all(((_, _, slurp, default),) -> (slurp, default) === (false, nothing), splitargs),
-        "Default and slurp arguments currently not supported")
+  args = d[:args][begin:end-1] # the last argument is just a placeholder
+  splitargs = MT.splitarg.(args)
+  req(all(((_, _, slurp, default),) -> (slurp, default) === (false, nothing), splitargs),
+      "Default and slurp arguments currently not supported")
 
-    argnames = first.(splitargs)
-    req(all(!isnothing, argnames), "Nameless arguments currently not supported")
+  argnames = first.(splitargs)
+  req(all(!isnothing, argnames), "Nameless arguments currently not supported")
 
-    base_f = d[:name]
-    return Dict{Symbol, Any}(
-        :base_f => esc(base_f),
-        :f => esc(unqualified_name(base_f)),
-        :wheres => esc.(d[:whereparams]),
-        :args => esc.(args),
-        :argnames => esc.(argnames),
-        :argtypes => (esc(a[2]) for a in splitargs),
-    )
+  base_f = d[:name]
+  return Dict{Symbol, Any}(
+                           :base_f => esc(base_f),
+                           :f => esc(unqualified_name(base_f)),
+                           :wheres => esc.(d[:whereparams]),
+                           :args => esc.(args),
+                           :argnames => esc.(argnames),
+                           :argtypes => (esc(a[2]) for a in splitargs),
+                          )
 end
 
 unqualified_name(name::Symbol) = name
 unqualified_name(name::QuoteNode) = name.value
 function unqualified_name(name::Expr)
-    req(Meta.isexpr(name, :., 2), "Expected a binding, but `$name` given")
-    unqualified_name(name.args[2])
+  req(Meta.isexpr(name, :., 2), "Expected a binding, but `$name` given")
+  unqualified_name(name.args[2])
 end
 
 function base_method(d::Dict{Symbol},
-        @nospecialize s_type::Union{Symbol, Expr})
-    f, base_f, wheres = d[:f], d[:base_f], d[:wheres]
-    if f == base_f
-        argtypes = :(Tuple{$(d[:argtypes]...), $s_type} where {$(wheres...)})
-        :(req(hasmethod($f, $argtypes),
-              "base method of `$($f)` for $($argtypes) missing"))
-    else
-        :($f($(d[:args]...), s::$s_type; kv...) where {$(wheres...)} =
-            $base_f($(d[:argnames]...), s; kv...))
-    end
+    @nospecialize s_type::Union{Symbol, Expr})
+  f, base_f, wheres = d[:f], d[:base_f], d[:wheres]
+  if f == base_f
+    argtypes = :(Tuple{$(d[:argtypes]...), $s_type} where {$(wheres...)})
+    :(req(hasmethod($f, $argtypes),
+          "base method of `$($f)` for $($argtypes) missing"))
+  else
+    :($f($(d[:args]...), s::$s_type; kv...) where {$(wheres...)} =
+      $base_f($(d[:argnames]...), s; kv...))
+  end
 end
 
 function varnames_method(d::Dict{Symbol})
-    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
-    quote
-        $f($(args...), s1::VarNames, s::VarNames...; kv...) where {$(wheres...)} =
-            $f($(argnames...), (s1, s...); kv...)
-        function $f($(args...), s::Tuple{Vararg{VarNames}}; kv...) where {$(wheres...)}
-            X, gens = $f($(argnames...), variable_names(s...); kv...)
-            return X, reshape_to_varnames(gens, s...)...
-        end
+  f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
+  quote
+    $f($(args...), s1::VarNames, s::VarNames...; kv...) where {$(wheres...)} =
+    $f($(argnames...), (s1, s...); kv...)
+    function $f($(args...), s::Tuple{Vararg{VarNames}}; kv...) where {$(wheres...)}
+      X, gens = $f($(argnames...), variable_names(s...); kv...)
+      return X, reshape_to_varnames(gens, s...)...
     end
+  end
 end
 
 function n_vars_method(d::Dict{Symbol}, n, range)
-    f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
-    n === :(:no) && return :()
-    req(n isa Symbol, "Value to option `n` must be `:no` or " *
-        "an alternative name like `m`, not `$n`")
-    quote
-        $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
-            $f($(argnames...), Symbol.(s, $range); kv...)
-    end
+  f, args, argnames, wheres = d[:f], d[:args], d[:argnames], d[:wheres]
+  n === :(:no) && return :()
+  req(n isa Symbol, "Value to option `n` must be `:no` or " *
+      "an alternative name like `m`, not `$n`")
+  quote
+    $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
+    $f($(argnames...), Symbol.(s, $range); kv...)
+  end
 end
 
 function varnames_macro(f, args_count, opt_in)
-    opt_in === :(:yes) || return :()
-    quote
-        macro $f(args...)
-            args = normalise_keyword_arguments(args)
-            req(length(args) >= $args_count+2, "Not enough arguments")
-            base_args = args[1:$args_count+1] # includes keyword arguments
+  opt_in === :(:yes) || return :()
+  quote
+    macro $f(args...)
+      args = normalise_keyword_arguments(args)
+      req(length(args) >= $args_count+2, "Not enough arguments")
+      base_args = args[1:$args_count+1] # includes keyword arguments
 
-            m = VERSION > v"9999" ? __module__ : $(esc(:__module__)) # julia issue #51602
-            s = _eval(m, :($$_varnames_macro($(args[$args_count+2:end]...))))
+      m = VERSION > v"9999" ? __module__ : $(esc(:__module__)) # julia issue #51602
+      s = _eval(m, :($$_varnames_macro($(args[$args_count+2:end]...))))
 
-            varnames_macro_code($f, esc.(base_args), s)
-        end
+      varnames_macro_code($f, esc.(base_args), s)
     end
+  end
 end
 
 _varnames_macro(arg::VarName) = Symbol(arg)
 _varnames_macro(args::VarNames...) = variable_names(args, Val(false))
 
 function varnames_macro_code(f, args, s::Symbol)
-    quote
-        X, $(esc(s)) = $f($(args...), $(QuoteNode(s)))
-        X
-    end
+  quote
+    X, $(esc(s)) = $f($(args...), $(QuoteNode(s)))
+    X
+  end
 end
 
 function varnames_macro_code(f, args, s::Vector{Symbol})
-    quote
-        X, ($(esc.(s)...),) = $f($(args...), $s)
-        X
-    end
+  quote
+    X, ($(esc.(s)...),) = $f($(args...), $s)
+    X
+  end
 end
 
 @doc raw"""
@@ -444,18 +444,18 @@ julia> @g("parameters", [:x, :y], a=1, b=2; c=3)
 ```
 """
 macro varnames_interface(e::Expr, options::Expr...)
-    d = _splitdef(e)
+  d = _splitdef(e)
 
-    opts = keyword_arguments(options,
-        Dict(:n => :n, :range => :(1:n), :macros => :(:yes)),
-        Dict(:macros => QuoteNode.([:no, :yes])))
+  opts = keyword_arguments(options,
+                           Dict(:n => :n, :range => :(1:n), :macros => :(:yes)),
+                           Dict(:macros => QuoteNode.([:no, :yes])))
 
-    quote
-        $(base_method(d, :(Vector{Symbol})))
-        $(varnames_method(d))
-        $(n_vars_method(d, opts[:n], opts[:range]))
-        $(varnames_macro(d[:f], length(d[:argnames]), opts[:macros]))
-    end
+  quote
+    $(base_method(d, :(Vector{Symbol})))
+    $(varnames_method(d))
+    $(n_vars_method(d, opts[:n], opts[:range]))
+    $(varnames_macro(d[:f], length(d[:argnames]), opts[:macros]))
+  end
 end
 
 @varnames_interface Generic.free_associative_algebra(R::Ring, s)

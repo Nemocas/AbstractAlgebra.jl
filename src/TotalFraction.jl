@@ -22,6 +22,6 @@ that it will always be returned by a call to the constructor when the same
 base ring $R$ is supplied.
 """
 function total_ring_of_fractions(R::Ring; cached::Bool=true)
-   return Generic.total_ring_of_fractions(R; cached=cached)
+  return Generic.total_ring_of_fractions(R; cached=cached)
 end
 

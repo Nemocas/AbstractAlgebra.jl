@@ -64,8 +64,8 @@ number_of_columns(a::Union{Mat,MatRingElem}) = size(a.entries, 2)
 Base.@propagate_inbounds getindex(a::Union{Mat, MatRingElem}, r::Int, c::Int) = a.entries[r, c]
 
 Base.@propagate_inbounds function setindex!(a::Union{Mat, MatRingElem}, d::NCRingElement,
-                                            r::Int, c::Int)
-    a.entries[r, c] = base_ring(a)(d)
+    r::Int, c::Int)
+  a.entries[r, c] = base_ring(a)(d)
 end
 
 Base.isassigned(a::Union{Mat,MatRingElem}, i, j) = isassigned(a.entries, i, j)
@@ -77,39 +77,39 @@ Base.isassigned(a::Union{Mat,MatRingElem}, i, j) = isassigned(a.entries, i, j)
 ################################################################################
 
 function copy(d::MatSpaceElem{T}) where T <: NCRingElement
-   z = similar(d)
-   for i = 1:nrows(d)
-      for j = 1:ncols(d)
-         z[i, j] = d[i, j]
-      end
-   end
-   return z
+  z = similar(d)
+  for i = 1:nrows(d)
+    for j = 1:ncols(d)
+      z[i, j] = d[i, j]
+    end
+  end
+  return z
 end
 
 function deepcopy_internal(d::MatSpaceElem{T}, dict::IdDict) where T <: NCRingElement
-   z = similar(d)
-   for i = 1:nrows(d)
-      for j = 1:ncols(d)
-         z[i, j] = deepcopy_internal(d[i, j], dict)
-      end
-   end
-   return z
+  z = similar(d)
+  for i = 1:nrows(d)
+    for j = 1:ncols(d)
+      z[i, j] = deepcopy_internal(d[i, j], dict)
+    end
+  end
+  return z
 end
 
 function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: NCRingElement
-   return MatSpaceView(deepcopy_internal(d.entries, dict), d.base_ring)
+  return MatSpaceView(deepcopy_internal(d.entries, dict), d.base_ring)
 end
 
 function Base.view(M::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
-   return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
+  return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
 end
 
 function Base.view(M::Mat{T}, rows::Int, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
-   return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
+  return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
 end
 
 function Base.view(M::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Int) where T <: NCRingElement
-   return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
+  return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
 end
 
 ################################################################################
@@ -127,7 +127,7 @@ is_square(a::MatElem) = (nrows(a) == ncols(a))
 ###############################################################################
 
 function transpose(x::Mat{T}) where T <: NCRingElement
-   MatSpaceElem{eltype(x)}(base_ring(x), permutedims(x.entries))
+  MatSpaceElem{eltype(x)}(base_ring(x), permutedims(x.entries))
 end
 
 ###############################################################################
@@ -139,7 +139,7 @@ end
 promote_rule(::Type{S}, ::Type{S}) where {T <: NCRingElement, S <: Mat{T}} = MatSpaceElem{T}
 
 function promote_rule(::Type{S}, ::Type{U}) where {T <: NCRingElement, S <: Mat{T}, U <: NCRingElement}
-   promote_rule(T, U) == T ? MatSpaceElem{T} : Union{}
+  promote_rule(T, U) == T ? MatSpaceElem{T} : Union{}
 end
 
 ###############################################################################
@@ -150,42 +150,42 @@ end
 
 # create a zero matrix
 function (a::MatSpace{T})() where {T <: NCRingElement}
-   return zero_matrix(base_ring(a), nrows(a), ncols(a))::dense_matrix_type(T)
+  return zero_matrix(base_ring(a), nrows(a), ncols(a))::dense_matrix_type(T)
 end
 
 # create a matrix with b on the diagonal
 function (a::AbstractAlgebra.Generic.MatSpace)(b::NCRingElement)
-   M = a()  # zero matrix
-   R = base_ring(a)
-   rb = R(b)
-   for i in 1:min(nrows(a), ncols(a))
-      M[i, i] = rb
-   end
-   return M
+  M = a()  # zero matrix
+  R = base_ring(a)
+  rb = R(b)
+  for i in 1:min(nrows(a), ncols(a))
+    M[i, i] = rb
+  end
+  return M
 end
 
 # convert a Julia matrix
 function (a::MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
-   _check_dim(nrows(a), ncols(a), b)
-   R = base_ring(a)
+  _check_dim(nrows(a), ncols(a), b)
+  R = base_ring(a)
 
-   # minor optimization for MatSpaceElem
-   if S === T && dense_matrix_type(T) === MatSpaceElem{T} && all(x -> R === parent(x), b)
-      return MatSpaceElem{T}(R, b)
-   end
+  # minor optimization for MatSpaceElem
+  if S === T && dense_matrix_type(T) === MatSpaceElem{T} && all(x -> R === parent(x), b)
+    return MatSpaceElem{T}(R, b)
+  end
 
-   # generic code
-   M = a()  # zero matrix
-   for i = 1:nrows(a), j = 1:ncols(a)
-      M[i, j] = R(b[i, j])
-   end
-   return M
+  # generic code
+  M = a()  # zero matrix
+  for i = 1:nrows(a), j = 1:ncols(a)
+    M[i, j] = R(b[i, j])
+  end
+  return M
 end
 
 # convert a Julia vector
 function (a::MatSpace{T})(b::AbstractVector) where T <: NCRingElement
-   _check_dim(nrows(a), ncols(a), b)
-   return a(transpose(reshape(b, a.ncols, a.nrows)))
+  _check_dim(nrows(a), ncols(a), b)
+  return a(transpose(reshape(b, a.ncols, a.nrows)))
 end
 
 ###############################################################################
@@ -195,11 +195,11 @@ end
 ###############################################################################
 
 function matrix_space(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
-   # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
-   # (and perhaps future compatibility, in case we need it again)
-   (r < 0 || c < 0) && error("Dimensions must be non-negative")
-   T = elem_type(R)
-   return MatSpace{T}(R, r, c)
+  # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
+  # (and perhaps future compatibility, in case we need it again)
+  (r < 0 || c < 0) && error("Dimensions must be non-negative")
+  T = elem_type(R)
+  return MatSpace{T}(R, r, c)
 end
 
 function AbstractAlgebra.sub!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T
@@ -235,14 +235,14 @@ Base.size(V::MatSpaceVecView) = (length(V.entries), )
 ###############################################################################
 
 function inj_proj_mat(R::NCRing, r::Int, c::Int, s::Int)
-   @assert r >= 0 && c >= 0 && s > 0
-   # Check whether there is space for a full identity matrix
-   if r <= c
-      @assert s + r - 1 <= c
-   else
-      @assert s + c - 1 <= r
-   end
-   return InjProjMat{elem_type(R)}(R, r, c, s)
+  @assert r >= 0 && c >= 0 && s > 0
+  # Check whether there is space for a full identity matrix
+  if r <= c
+    @assert s + r - 1 <= c
+  else
+    @assert s + c - 1 <= r
+  end
+  return InjProjMat{elem_type(R)}(R, r, c, s)
 end
 
 AbstractAlgebra.nrows(K::InjProjMat) = K.n
@@ -294,37 +294,37 @@ function *(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
 end
 
 function *(a::InjProjMat, b::InjProjMat)
-   @assert base_ring(a) === base_ring(b)
-   R = base_ring(a)
-   @assert ncols(a) == nrows(b)
-   m = nrows(a)
-   n = ncols(a)
-   k = ncols(b)
-   s = a.s
-   t = b.s
+  @assert base_ring(a) === base_ring(b)
+  R = base_ring(a)
+  @assert ncols(a) == nrows(b)
+  m = nrows(a)
+  n = ncols(a)
+  k = ncols(b)
+  s = a.s
+  t = b.s
 
-   # Easy cases
-   if m >= n
-      return reduce(vcat, [zero_matrix(R, s - 1, k), matrix(b), zero_matrix(R, m - n - s + 1, k)])
-   end
-   if m < n && n < k
-      return reduce(hcat, [zero_matrix(R, m, t - 1), matrix(a), zero_matrix(R, m, k - n - t + 1)])
-   end
+  # Easy cases
+  if m >= n
+    return reduce(vcat, [zero_matrix(R, s - 1, k), matrix(b), zero_matrix(R, m - n - s + 1, k)])
+  end
+  if m < n && n < k
+    return reduce(hcat, [zero_matrix(R, m, t - 1), matrix(a), zero_matrix(R, m, k - n - t + 1)])
+  end
 
-   # Annoying case: m < n && n >= k
-   c = zero_matrix(R, m, k)
-   if s <= t
-      offset = t - s
-      for i in 1:min(m - offset, k)
-         c[i + offset, i] = one(R)
-      end
-   else
-      offset = s - t
-      for i in 1:min(m, k - offset)
-         c[i, i + offset] = one(R)
-      end
-   end
-   return c
+  # Annoying case: m < n && n >= k
+  c = zero_matrix(R, m, k)
+  if s <= t
+    offset = t - s
+    for i in 1:min(m - offset, k)
+      c[i + offset, i] = one(R)
+    end
+  else
+    offset = s - t
+    for i in 1:min(m, k - offset)
+      c[i, i + offset] = one(R)
+    end
+  end
+  return c
 end
 
 function +(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}

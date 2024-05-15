@@ -23,30 +23,30 @@ section_map(f::MapWithSection) = f.section
 
 
 function Base.show(io::IO, M::MapWithSection)
-   if is_terse(io)
-      print(io, "Map with section")
-   else
-      io = pretty(io)
-      io = terse(io)
-      print(io, "Map: ")
-      print(io, Lowercase(), domain(M), " -> ")
-      print(io, Lowercase(), codomain(M))
-   end
+  if is_terse(io)
+    print(io, "Map with section")
+  else
+    io = pretty(io)
+    io = terse(io)
+    print(io, "Map: ")
+    print(io, Lowercase(), domain(M), " -> ")
+    print(io, Lowercase(), codomain(M))
+  end
 end
 
 function compose(f::MapWithSection{U, C}, g::MapWithSection{D, U}) where {D, U, C}
-   check_composable(f, g)
-   m = compose(f.map, g.map)
-   if isdefined(g, :section) && isdefined(f, :section)
-      p = compose(g.section, f.section)
-      return MapWithSection(m, p)
-   else
-      return MapWithSection(m)
-   end
+  check_composable(f, g)
+  m = compose(f.map, g.map)
+  if isdefined(g, :section) && isdefined(f, :section)
+    p = compose(g.section, f.section)
+    return MapWithSection(m, p)
+  else
+    return MapWithSection(m)
+  end
 end
 
 function Base.inv(f::MapWithSection)
-   return MapWithRetraction(f.section, f.map)
+  return MapWithRetraction(f.section, f.map)
 end
 
 ################################################################################
@@ -67,28 +67,28 @@ retraction_map(f::MapCache) = retraction_map(f.map)
 (f::MapWithRetraction{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
 
 function Base.show(io::IO, M::MapWithRetraction)
-   if is_terse(io)
-      print(io, "Map with retraction")
-   else
-      io = pretty(io)
-      io = terse(io)
-      print(io, "Map: ")
-      print(io, Lowercase(), domain(M), " -> ")
-      print(io, Lowercase(), codomain(M))
-   end
+  if is_terse(io)
+    print(io, "Map with retraction")
+  else
+    io = pretty(io)
+    io = terse(io)
+    print(io, "Map: ")
+    print(io, Lowercase(), domain(M), " -> ")
+    print(io, Lowercase(), codomain(M))
+  end
 end
 
 function compose(f::MapWithRetraction{U, C}, g::MapWithRetraction{D, U}) where {D, U, C}
-   check_composable(f, g)
-   m = compose(f.map, g.map)
-   if isdefined(g, :retraction) && isdefined(f, :retraction)
-      p = compose(g.retraction, f.retraction)
-      return MapWithRetraction(m, p)
-   else
-      return MapWithRetraction(m)
-   end
+  check_composable(f, g)
+  m = compose(f.map, g.map)
+  if isdefined(g, :retraction) && isdefined(f, :retraction)
+    p = compose(g.retraction, f.retraction)
+    return MapWithRetraction(m, p)
+  else
+    return MapWithRetraction(m)
+  end
 end
 
 function Base.inv(f::MapWithRetraction)
-   return MapWithSection(f.retraction, f.map)
+  return MapWithSection(f.retraction, f.map)
 end

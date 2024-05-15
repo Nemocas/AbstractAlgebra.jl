@@ -8,12 +8,12 @@ number_of_rows(A::Matrix{T}) where {T} = size(A)[1]
 number_of_columns(A::Matrix{T}) where {T} = size(A)[2]
 
 function is_zero_row(M::Matrix, i::Int)
-    for j = 1:ncols(M)
-        if !iszero(M[i, j])
-            return false
-        end
+  for j = 1:ncols(M)
+    if !iszero(M[i, j])
+      return false
     end
-    return true
+  end
+  return true
 end
 
 # TODO: add `is_zero_column(M::Matrix{T}, i::Int) where {T<:Integer}` and specialized functions in Nemo
@@ -83,10 +83,10 @@ Array(M::MatrixElem{T}) where {T<:NCRingElement} = Matrix(M)
 Array(R::NCRing, r::Int...) = Array{elem_type(R)}(undef, r)
 
 function zeros(R::NCRing, r::Int...)
-   T = elem_type(R)
-   A = Array{T}(undef, r)
-   for i in eachindex(A)
-      A[i] = R()
-   end
-   return A
+  T = elem_type(R)
+  A = Array{T}(undef, r)
+  for i in eachindex(A)
+    A[i] = R()
+  end
+  return A
 end

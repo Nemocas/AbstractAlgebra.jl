@@ -169,36 +169,36 @@ end
 ################# generic partial fractions ###################################
 
 #=
-  R is a multivariate ring. We will be dealing with polynomials in l + 1
-  variables, i.e. only the variables X, x_1, ..., x_l appear,
-  where X = gen(R, mainvar) and x_i = gen(R, minorvar[i]).
+R is a multivariate ring. We will be dealing with polynomials in l + 1
+variables, i.e. only the variables X, x_1, ..., x_l appear,
+where X = gen(R, mainvar) and x_i = gen(R, minorvar[i]).
 
-  For fixed B[1], ..., B[r], precompute info for solving
+For fixed B[1], ..., B[r], precompute info for solving
 
-    t/(B[1]*...*B[r]) = delta[1]/B[1] + ... + delta[r]/B[r] mod (x_i - alpha_i)^(deg_i + 1)
+t/(B[1]*...*B[r]) = delta[1]/B[1] + ... + delta[r]/B[r] mod (x_i - alpha_i)^(deg_i + 1)
 
-  for delta[1], ..., delta[r] given t in X, x_1, ..., x_l.
+for delta[1], ..., delta[r] given t in X, x_1, ..., x_l.
 
-  alpha is an array of evaluation points
-    x_1 = alpha[1]
-    ...
-    x_l = alpha[l]
+alpha is an array of evaluation points
+x_1 = alpha[1]
+...
+x_l = alpha[l]
 
-  If, after evaluation at all x_j = alpha[j], the B[i] did not drop degree
-  in X and are pairwise relatively prime in K[X], then the function returns
-  true and a suitable pfracinfo. Otherwise, it returns false and junk
+If, after evaluation at all x_j = alpha[j], the B[i] did not drop degree
+in X and are pairwise relatively prime in K[X], then the function returns
+true and a suitable pfracinfo. Otherwise, it returns false and junk
 
-  Upon success, we are ready to solve for the delta[i] using pfrac.
-  The only divisions that pfrac does in K are by the leading coefficients
-  of the inv_prod_betas1 member of pfracinfo
+Upon success, we are ready to solve for the delta[i] using pfrac.
+The only divisions that pfrac does in K are by the leading coefficients
+of the inv_prod_betas1 member of pfracinfo
 =#
 
 function pfracinit(
-  B::Vector{E},
-  mainvar,
-  minorvars::Vector{Int},
-  alphas::Vector
-) where E
+    B::Vector{E},
+    mainvar,
+    minorvars::Vector{Int},
+    alphas::Vector
+  ) where E
 
   r = length(B)       # number of factors
   l = length(minorvars)   # number of evaluated variables
@@ -228,7 +228,7 @@ function pfracinit(
   xalphas = E[gen(R, minorvars[j]) - R(alphas[j]) for j in 1:l]
 
   I = pfracinfo{E}(xalphas, betas, inv_prod_betas1, prod_betas_coeffs,
-                                                          deltas, delta_coeffs)
+                   deltas, delta_coeffs)
   for i in 1:r
     I.betas[1+l][i] = deepcopy(B[i])
   end
@@ -277,33 +277,33 @@ function pfracinit(
 end
 
 #=
-  Try to solve
+Try to solve
 
-    t/(B[1]*...*B[r]) = delta[1]/B[1] + ... + delta[r]/B[r] mod I
+t/(B[1]*...*B[r]) = delta[1]/B[1] + ... + delta[r]/B[r] mod I
 
-  where I = <(x_i - alpha_i)^(degs[i] + 1)>, and
-      the x_i and alpha_i are those parameters of pfracinit, and
-      the degs[i] are parameters of this function.
+where I = <(x_i - alpha_i)^(degs[i] + 1)>, and
+the x_i and alpha_i are those parameters of pfracinit, and
+the degs[i] are parameters of this function.
 
-  With check = false, a solution to the above problem is generated without fail.
-  With check = true, the solutions delta[j] are limited by
+With check = false, a solution to the above problem is generated without fail.
+With check = true, the solutions delta[j] are limited by
 
-    deg_{x_i} delta[j] <= degs[i] - deg_{x_i}(B[1]*...*B[r]/B[j])
+deg_{x_i} delta[j] <= degs[i] - deg_{x_i}(B[1]*...*B[r]/B[j])
 
-  The second return of pfrac (the array delta) is owned by I.
-  So, at least its length should not be mutated.
+The second return of pfrac (the array delta) is owned by I.
+So, at least its length should not be mutated.
 =#
 function pfrac(I::pfracinfo{E}, t::E, degs::Vector{Int}, check::Bool) where E
   return pfrac_recursive(I, t, degs, length(I.xalphas), check)
 end
 
 function pfrac_recursive(
-  I::pfracinfo{E},
-  t::E,
-  degs::Vector{Int},
-  lev::Int,
-  check::Bool
-) where E
+    I::pfracinfo{E},
+    t::E,
+    degs::Vector{Int},
+    lev::Int,
+    check::Bool
+  ) where E
 
   @assert 0 <= lev <= length(I.xalphas)
   @assert lev <= length(degs)
@@ -368,16 +368,16 @@ end
 ################# generic hensel lifting ######################################
 
 #=
-  Try to lift a factorization of A in 1 variable to 1 + n variables without
-  any leading coefficient information.
+Try to lift a factorization of A in 1 variable to 1 + n variables without
+any leading coefficient information.
 =#
 function hlift_without_lcc(
-  A::E,
-  Auf::Vector{E},       # univariate factorization in mainvar
-  mainvar::Int,
-  minorvars::Vector{Int},   # length n
-  alphas::Vector
-) where E
+    A::E,
+    Auf::Vector{E},       # univariate factorization in mainvar
+    mainvar::Int,
+    minorvars::Vector{Int},   # length n
+    alphas::Vector
+  ) where E
 
   R = parent(A)
   n = length(minorvars)
@@ -406,18 +406,18 @@ function hlift_without_lcc(
 end
 
 #=
-  Try to lift a factorization of A in 1 variable to 1 + n variables with the
-  assumption that divs[i] is a divisor of the leading coefficient of
-  the i^th liftedfactor.
+Try to lift a factorization of A in 1 variable to 1 + n variables with the
+assumption that divs[i] is a divisor of the leading coefficient of
+the i^th liftedfactor.
 =#
 function hlift_with_lcc(
-  A::E,
-  Auf::Vector{E},       # univariate factorization in mainvar
-  divs::Vector{E},      # lead coeff divisors
-  mainvar::Int,
-  minorvars::Vector{Int},   # length n
-  alphas::Vector,
-) where E
+    A::E,
+    Auf::Vector{E},       # univariate factorization in mainvar
+    divs::Vector{E},      # lead coeff divisors
+    mainvar::Int,
+    minorvars::Vector{Int},   # length n
+    alphas::Vector,
+  ) where E
 
   R = parent(A)
   K = base_ring(R)
@@ -451,17 +451,17 @@ end
 
 
 #=
-  Try to lift a factorization of A in 1 variable to 1 + n variables with
-  lcs[i] as the leading coefficient of the i^th lifted factor.
+Try to lift a factorization of A in 1 variable to 1 + n variables with
+lcs[i] as the leading coefficient of the i^th lifted factor.
 =#
 function hlift_have_lcs(
-  A::E,                 # lead coeff should equal prod(lcs)
-  Auf::Vector{E},       # univariate factorization in mainvar
-  lcs::Vector{E},       # lead coeffs of factors
-  mainvar::Int,
-  minorvars::Vector{Int},   # length n
-  alphas::Vector
-) where E
+    A::E,                 # lead coeff should equal prod(lcs)
+    Auf::Vector{E},       # univariate factorization in mainvar
+    lcs::Vector{E},       # lead coeffs of factors
+    mainvar::Int,
+    minorvars::Vector{Int},   # length n
+    alphas::Vector
+  ) where E
 
   R = parent(A)
   K = base_ring(R)
@@ -496,7 +496,7 @@ function hlift_have_lcs(
   for i in 2:n+1
     tfac = [set_lc(fac[j], mainvar, lc_evals[i, j]) for j in 1:r]
     ok, fac = hliftstep(tfac, mainvar, minorvars[1:i-1], liftdegs, alphas,
-                                                              A_evals[i], true)
+                        A_evals[i], true)
     if !ok
       return false, fac
     end
@@ -507,14 +507,14 @@ end
 
 
 function hliftstep(
-  fac::Vector{E},
-  mainvar::Int,
-  minorvars::Vector{Int},
-  liftdegs::Vector{Int},
-  alphas::Vector,
-  a::E,
-  check::Bool
-) where E
+    fac::Vector{E},
+    mainvar::Int,
+    minorvars::Vector{Int},
+    liftdegs::Vector{Int},
+    alphas::Vector,
+    a::E,
+    check::Bool
+  ) where E
 
   r = length(fac)
   @assert r >= 2
@@ -530,14 +530,14 @@ end
 
 
 function hliftstep_quartic2(
-  fac::Vector{E},
-  mainvar::Int,
-  minorvars::Vector{Int},
-  liftdegs::Vector{Int},
-  alphas::Vector,
-  a::E,
-  check::Bool
-) where E
+    fac::Vector{E},
+    mainvar::Int,
+    minorvars::Vector{Int},
+    liftdegs::Vector{Int},
+    alphas::Vector,
+    a::E,
+    check::Bool
+  ) where E
 
   R = parent(a)
   m = length(minorvars)
@@ -598,7 +598,7 @@ function hliftstep_quartic2(
     end
 
     if check && tdeg > liftdegs[m]
-#      println("high degree: ", tdeg, " > ", liftdegs[m])
+      #      println("high degree: ", tdeg, " > ", liftdegs[m])
       return false, newfac
     end
 
@@ -618,14 +618,14 @@ end
 
 
 function hliftstep_quartic(
-  fac::Vector{E},
-  mainvar::Int,
-  minorvars::Vector{Int},
-  liftdegs::Vector{Int},
-  alphas::Vector,
-  a::E,
-  check::Bool
-) where E
+    fac::Vector{E},
+    mainvar::Int,
+    minorvars::Vector{Int},
+    liftdegs::Vector{Int},
+    alphas::Vector,
+    a::E,
+    check::Bool
+  ) where E
 
   R = parent(a)
   r = length(fac)
@@ -735,14 +735,14 @@ end
 
 
 function hliftstep_quintic(
-  fac::Vector{E},
-  mainvar::Int,
-  minorvars::Vector{Int},
-  liftdegs::Vector{Int},
-  alphas::Vector,
-  a::E,
-  check::Bool
-) where E
+    fac::Vector{E},
+    mainvar::Int,
+    minorvars::Vector{Int},
+    liftdegs::Vector{Int},
+    alphas::Vector,
+    a::E,
+    check::Bool
+  ) where E
 
   R = parent(a)
   r = length(fac)
@@ -784,9 +784,9 @@ end
 ###################### generic factoring ######################################
 
 #=
-  Factor a into irreducibles assuming a depends only on variable var
-  Return (true, monic factors of a) if a is squarefree
-         (false, junk)              if a is not squarefree
+Factor a into irreducibles assuming a depends only on variable var
+Return (true, monic factors of a) if a is squarefree
+(false, junk)              if a is not squarefree
 =#
 function mfactor_irred_univar(a::E, var::Int) where E
   R = parent(a)
@@ -803,10 +803,10 @@ function mfactor_irred_univar(a::E, var::Int) where E
 end
 
 #=
-  Factor a into irreducibles assuming
-    a depends only on variables xvar and yvar, and
-    a is squarefree and primitive wrt xvar
-  Return monic squarefree factors of a
+Factor a into irreducibles assuming
+a depends only on variables xvar and yvar, and
+a is squarefree and primitive wrt xvar
+Return monic squarefree factors of a
 =#
 function mfactor_irred_bivar_char_zero(a::E, xvar::Int, yvar::Int) where E
 
@@ -815,7 +815,7 @@ function mfactor_irred_bivar_char_zero(a::E, xvar::Int, yvar::Int) where E
   alpha = 0
   @goto got_alpha
 
-@label next_alpha
+  @label next_alpha
 
   if alpha > 0
     alpha = -alpha
@@ -823,7 +823,7 @@ function mfactor_irred_bivar_char_zero(a::E, xvar::Int, yvar::Int) where E
     alpha = 1 - alpha
   end
 
-@label got_alpha
+  @label got_alpha
 
   u = eval_one(a, yvar, alpha)
   if degree(u, xvar) != xdeg
@@ -846,19 +846,19 @@ function mfactor_irred_bivar_char_zero(a::E, xvar::Int, yvar::Int) where E
 end
 
 #=
-  return (true, cont(a, x), array of factors) or
-         (false, junk, junk) if the ufacs don't lift straight to bivariate ones
+return (true, cont(a, x), array of factors) or
+(false, junk, junk) if the ufacs don't lift straight to bivariate ones
 
-  TODO: allow this function to do a bit of zassenhaus and add a parameter to
-        limit the size of the subsets. 
+TODO: allow this function to do a bit of zassenhaus and add a parameter to
+limit the size of the subsets. 
 =#
 function hlift_bivar_combine(
-  a::E,
-  xvar::Int,
-  yvar::Int,
-  alpha,
-  ufacs::Vector{E}  # factorization of a(x, y = alpha)
-) where E
+    a::E,
+    xvar::Int,
+    yvar::Int,
+    alpha,
+    ufacs::Vector{E}  # factorization of a(x, y = alpha)
+  ) where E
 
   R = parent(a)
   K = base_ring(R)
@@ -908,8 +908,8 @@ function hlift_bivar_combine(
 end
 
 #=
-  a and b are both factorizations. Make the bases coprime without changing
-  the values of factorizations. TODO this is probably done somewhere else.
+a and b are both factorizations. Make the bases coprime without changing
+the values of factorizations. TODO this is probably done somewhere else.
 =#
 function make_bases_coprime!(a::Vector{Pair{E, Int}}, b::Vector{Pair{E, Int}}) where E
   lena = length(a)
@@ -975,13 +975,13 @@ end
 
 
 function lcc_kaltofen_step!(
-  divs::Vector{E},  # modified
-  Af::Fac{E},       # unmodified, possibly new one is returned
-  Au::Vector{E},    # univariates in gen(v) from the lc's of bvar factors
-  v::Int,           # the main variable for this step
-  minorvars::Vector{Int},
-  alphas::Vector
-) where E
+    divs::Vector{E},  # modified
+    Af::Fac{E},       # unmodified, possibly new one is returned
+    Au::Vector{E},    # univariates in gen(v) from the lc's of bvar factors
+    v::Int,           # the main variable for this step
+    minorvars::Vector{Int},
+    alphas::Vector
+  ) where E
 
   R = parent(Af.unit)
   r = length(Au)
@@ -1049,24 +1049,24 @@ end
 
 
 #=
-  Try to determine divisors of the leading coefficients of the factors of A.
-  This is accomplished by looking at the bivariate factoration of A when
-  all but one of the minor variables are evaluated away. The resulting 
-  univariate leading coefficients are lifted against the supplied
-  factorization of lc(A). return is Tuple{::Boole, ::Vector{E}}
-  If the bool is true, then the method can be considered to have fully found
-  the leading coefficients, otherwise not. In any case, the second return
-  is a tentative guess at the leading coefficients.
+Try to determine divisors of the leading coefficients of the factors of A.
+This is accomplished by looking at the bivariate factoration of A when
+all but one of the minor variables are evaluated away. The resulting 
+univariate leading coefficients are lifted against the supplied
+factorization of lc(A). return is Tuple{::Boole, ::Vector{E}}
+If the bool is true, then the method can be considered to have fully found
+the leading coefficients, otherwise not. In any case, the second return
+is a tentative guess at the leading coefficients.
 =#
 function lcc_kaltofen(
-  lcAf::Fac{E},       # square free factorization of lc(A), not modified
-  A::E,
-  mainvar::Int,
-  maindeg::Int,
-  minorvars::Vector{Int},
-  alphas::Vector,
-  ufacs::Vector{E}    # univariate factors of (A evaluated at minor vars)
-) where E
+    lcAf::Fac{E},       # square free factorization of lc(A), not modified
+    A::E,
+    mainvar::Int,
+    maindeg::Int,
+    minorvars::Vector{Int},
+    alphas::Vector,
+    ufacs::Vector{E}    # univariate factors of (A evaluated at minor vars)
+  ) where E
 
   R = parent(A)
   r = length(ufacs)
@@ -1091,7 +1091,7 @@ function lcc_kaltofen(
     @assert degree(beval, mainvar) == maindeg
 
     ok, cont, bfac = hlift_bivar_combine(beval, mainvar, minorvars[vi],
-                                                             alphas[vi], ufacs)
+                                         alphas[vi], ufacs)
     if !ok
       # this means there are extraneous factors and so hlift will fail
       return false, divs
@@ -1113,7 +1113,7 @@ function lcc_kaltofen(
       continue
     end
     ok, lcAf = lcc_kaltofen_step!(divs, lcAf, ulcs, minorvars[vi],
-                                                 other_minorvars, other_alphas)
+                                  other_minorvars, other_alphas)
   end
 
   return isempty(lcAf.fac), divs
@@ -1123,11 +1123,11 @@ end
 # factor out the random choice so that it can be overridden
 # size increases every time this is called
 function mfactor_choose_eval_points!(
-  alphas::Vector,
-  A::E,
-  mainvar::Int,
-  minorvars::Vector{Int},
-  size::Int) where E
+    alphas::Vector,
+    A::E,
+    mainvar::Int,
+    minorvars::Vector{Int},
+    size::Int) where E
 
   n = length(minorvars)
   R = parent(A)
@@ -1140,10 +1140,10 @@ end
 
 # factor a truly multivariate A in at least three variables
 function mfactor_irred_mvar_char_zero(
-  A::E,             # squarefree, primitive wrt mainvar, monic
-  mainvar::Int,
-  minorvars::Vector{Int}
-) where E
+    A::E,             # squarefree, primitive wrt mainvar, monic
+    mainvar::Int,
+    minorvars::Vector{Int}
+  ) where E
 
   n = length(minorvars)
   R = parent(A)
@@ -1157,7 +1157,7 @@ function mfactor_irred_mvar_char_zero(
 
   maindeg = degree(A, mainvar)
 
-@label next_alpha
+  @label next_alpha
 
   alpha_modulus += 1
   mfactor_choose_eval_points!(alphas, A, mainvar, minorvars, alpha_modulus)

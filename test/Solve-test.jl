@@ -10,8 +10,8 @@
     @test_throws ArgumentError AbstractAlgebra.Solve.solve(M, matrix(R, 3, 1, [ R(1), R(2), R(3) ]), side = :test)
 
     for b in [ [ R(1), R(2), R(3) ],
-               matrix(R, 3, 1, [ R(1), R(2), R(3) ]),
-               matrix(R, 3, 2, [ R(1), R(2), R(3), R(4), R(5), R(6) ]) ]
+              matrix(R, 3, 1, [ R(1), R(2), R(3) ]),
+              matrix(R, 3, 2, [ R(1), R(2), R(3), R(4), R(5), R(6) ]) ]
       @test @inferred AbstractAlgebra.Solve.can_solve(M, b, side = :right)
       x = @inferred AbstractAlgebra.Solve.solve(M, b, side = :right)
       @test M*x == b
@@ -29,9 +29,9 @@
     end
 
     for b in [ [ R(1), R(1), R(1), R(1), R(1) ],
-               matrix(R, 1, 5, [ R(1), R(1), R(1), R(1), R(1) ]),
-               matrix(R, 2, 5, [ R(1), R(1), R(1), R(1), R(1),
-                                 R(1), R(1), R(1), R(1), R(1) ]) ]
+              matrix(R, 1, 5, [ R(1), R(1), R(1), R(1), R(1) ]),
+              matrix(R, 2, 5, [ R(1), R(1), R(1), R(1), R(1),
+                               R(1), R(1), R(1), R(1), R(1) ]) ]
       @test_throws ArgumentError AbstractAlgebra.Solve.solve(M, b)
       @test @inferred !AbstractAlgebra.Solve.can_solve(M, b)
       fl, x = @inferred AbstractAlgebra.Solve.can_solve_with_solution(M, b)
@@ -41,9 +41,9 @@
     end
 
     for b in [ [ R(1), R(2), R(3), R(4), R(5) ],
-               matrix(R, 1, 5, [ R(1), R(2), R(3), R(4), R(5)]),
-               matrix(R, 2, 5, [ R(1), R(2), R(3), R(4), R(5),
-                                 R(0), R(0), R(8), R(9), R(10) ]) ]
+              matrix(R, 1, 5, [ R(1), R(2), R(3), R(4), R(5)]),
+              matrix(R, 2, 5, [ R(1), R(2), R(3), R(4), R(5),
+                               R(0), R(0), R(8), R(9), R(10) ]) ]
       @test @inferred AbstractAlgebra.Solve.can_solve(M, b)
       x = @inferred AbstractAlgebra.Solve.solve(M, b)
       @test x*M == b
@@ -94,8 +94,8 @@ end
     @test_throws ArgumentError AbstractAlgebra.Solve.solve(C, matrix(R, 3, 1, [ R(1), R(2), R(3) ]), side = :test)
 
     for b in [ [ R(1), R(2), R(3) ],
-               matrix(R, 3, 1, [ R(1), R(2), R(3) ]),
-               matrix(R, 3, 2, [ R(1), R(2), R(3), R(4), R(5), R(6) ]) ]
+              matrix(R, 3, 1, [ R(1), R(2), R(3) ]),
+              matrix(R, 3, 2, [ R(1), R(2), R(3), R(4), R(5), R(6) ]) ]
       @test @inferred AbstractAlgebra.Solve.can_solve(C, b, side = :right)
       x = @inferred AbstractAlgebra.Solve.solve(C, b, side = :right)
       @test M*x == b
@@ -113,9 +113,9 @@ end
     end
 
     for b in [ [ R(1), R(1), R(1), R(1), R(1) ],
-               matrix(R, 1, 5, [ R(1), R(1), R(1), R(1), R(1) ]),
-               matrix(R, 2, 5, [ R(1), R(1), R(1), R(1), R(1),
-                                 R(1), R(1), R(1), R(1), R(1) ]) ]
+              matrix(R, 1, 5, [ R(1), R(1), R(1), R(1), R(1) ]),
+              matrix(R, 2, 5, [ R(1), R(1), R(1), R(1), R(1),
+                               R(1), R(1), R(1), R(1), R(1) ]) ]
       @test_throws ArgumentError AbstractAlgebra.Solve.solve(C, b)
       @test @inferred !AbstractAlgebra.Solve.can_solve(C, b)
       fl, x = @inferred AbstractAlgebra.Solve.can_solve_with_solution(C, b)
@@ -125,9 +125,9 @@ end
     end
 
     for b in [ [ R(1), R(2), R(3), R(4), R(5) ],
-               matrix(R, 1, 5, [ R(1), R(2), R(3), R(4), R(5)]),
-               matrix(R, 2, 5, [ R(1), R(2), R(3), R(4), R(5),
-                                 R(0), R(0), R(8), R(9), R(10) ]) ]
+              matrix(R, 1, 5, [ R(1), R(2), R(3), R(4), R(5)]),
+              matrix(R, 2, 5, [ R(1), R(2), R(3), R(4), R(5),
+                               R(0), R(0), R(8), R(9), R(10) ]) ]
       @test @inferred AbstractAlgebra.Solve.can_solve(C, b)
       x = @inferred AbstractAlgebra.Solve.solve(C, b)
       @test x*M == b
