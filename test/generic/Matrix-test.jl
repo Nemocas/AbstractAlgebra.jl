@@ -122,6 +122,9 @@ end
    @test elem_type(S) == Generic.MatSpaceElem{elem_type(R)}
    @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
    @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
+   @test base_ring_type(Generic.MatSpace{elem_type(R)}) == typeof(R)
+   @test base_ring_type(Generic.MatSpaceElem{elem_type(R)}) == typeof(R)
+   @test base_ring_type(S) == typeof(R)
    @test base_ring(S) == R
    @test nrows(S) == 3
    @test ncols(S) == 3
@@ -132,6 +135,7 @@ end
 
    @test isa(f, MatElem)
    @test parent_type(f) == typeof(S)
+   @test base_ring_type(f) == typeof(R)
 
    g = S(2)
 
@@ -347,6 +351,8 @@ end
    @test dense_matrix_type(R(1)) == elem_type(S)
    @test dense_matrix_type(typeof(R)) == elem_type(S)
    @test dense_matrix_type(typeof(R(1))) == elem_type(S)
+
+   @test base_ring_type(dense_matrix_type(R)) == typeof(R)
 
    @test isa(S(), MatElem)
    @test isa(S(ZZ(1)), MatElem)
