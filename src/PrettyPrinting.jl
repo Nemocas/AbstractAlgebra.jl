@@ -148,7 +148,7 @@ function show_obj(io::IO, mi::MIME, obj)
    finish(S)
 end
 
-global _html_as_latex = Ref(false)
+global _html_as_latex = Ref{Bool}(false)
 
 @doc raw"""
     get_html_as_latex()
@@ -552,8 +552,8 @@ end
 #
 ################################################################################
 
-mutable struct printer
-   io::IO
+mutable struct printer{IOT <: IO}
+   io::IOT
    array::Vector{String}
 
    # if terse_level is positive we print a+b instead of a + b
@@ -565,7 +565,7 @@ end
 function printer(io::IO)
    terse_level = get(io, :terse_level, 0)
    size_limit = get(io, :size_limit, -1)
-   return printer(io, String[], terse_level, Int[size_limit])
+   return printer{typeof(io)}(io, String[], terse_level, Int[size_limit])
 end
 
 # TODO since the subexpressions are not changing much, cache the leaf_count

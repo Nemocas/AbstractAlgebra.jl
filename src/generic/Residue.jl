@@ -49,14 +49,14 @@ function (a::EuclideanRingResidueRing{T})(b::Integer) where {T <: RingElement}
 end
 
 function (a::EuclideanRingResidueRing{T})(b::T) where {T <: RingElem}
-   base_ring(a) != parent(b) && error("Operation on incompatible objects")
+   base_ring(a) !== parent(b) && error("Operation on incompatible objects")
    z = EuclideanRingResidueRingElem{T}(mod(b, modulus(a)))
    z.parent = a
    return z
 end
 
 function (a::EuclideanRingResidueRing{T})(b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-   a != parent(b) && error("Operation on incompatible objects")
+   a !== parent(b) && error("Operation on incompatible objects")
    return b
 end
 

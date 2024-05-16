@@ -38,22 +38,22 @@ number_of_generators(a::MPolyRing) = a.num_vars
 function gen(a::MPolyRing{T}, i::Int, ::Val{:lex}) where {T <: RingElement}
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
-    return a([one(base_ring(a))], reshape([UInt(j == n - i + 1)
+    return a([one(base_ring(a))], reshape(UInt[UInt(j == n - i + 1)
             for j = 1:n], n, 1))
 end
 
 function gen(a::MPolyRing{T}, i::Int, ::Val{:deglex}) where {T <: RingElement}
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
-    return a([one(base_ring(a))], reshape([[UInt(j == n - i + 1)
-            for j in 1:n]..., UInt(1)], n + 1, 1))
+    return a([one(base_ring(a))], reshape(UInt[(UInt(j == n - i + 1)
+            for j in 1:n)..., UInt(1)], n + 1, 1))
 end
 
 function gen(a::MPolyRing{T}, i::Int, ::Val{:degrevlex}) where {T <: RingElement}
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
-    return a([one(base_ring(a))], reshape([[UInt(j == i)
-            for j in 1:n]..., UInt(1)], n + 1, 1))
+    return a([one(base_ring(a))], reshape(UInt[(UInt(j == i)
+            for j in 1:n)..., UInt(1)], n + 1, 1))
 end
 
 @doc raw"""
