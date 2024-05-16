@@ -18,8 +18,9 @@ function O(a::AbsMSeriesElem{T}) where T <: RingElement
   R = parent(a)
   p = poly(a)
   v = vars(p)
-  (length(v) != 1 || length(p) != 1 || !isone(leading_coefficient(p))) &&
-  error("Not a pure power in O()")
+  if length(v) != 1 || length(p) != 1 || !isone(leading_coefficient(p))
+    error("Not a pure power in O()")
+  end
   ind = var_index(v[1])
   exps = first(exponent_vectors(p))
   prec = [i == ind ? exps[i] : R.prec_max[i] for i in 1:length(exps)]
