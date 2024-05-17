@@ -232,6 +232,12 @@ end
 
    @test c == S(3, 7)
 
+   # Issue #1710
+   a = S(5, 7)
+   b = S(7, 5)
+   c = mul!(c, a, b)
+   @test is_one(c)
+
    a = S(5, 7)
    b = S(1, 7)
 

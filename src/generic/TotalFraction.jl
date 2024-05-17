@@ -410,7 +410,6 @@ function zero!(c::TotFrac)
 end
 
 function mul!(c::TotFrac{T}, a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
-   R = parent(a)
    n1 = numerator(a, false)
    d2 = denominator(b, false)
    n2 = numerator(b, false)
@@ -426,6 +425,7 @@ function mul!(c::TotFrac{T}, a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
       d = d1*d2
    end
    if n == d
+      R = base_ring(parent(a))
       c.num = one(R)
       c.den = one(R)
    else
