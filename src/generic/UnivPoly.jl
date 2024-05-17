@@ -24,7 +24,7 @@ function is_exact_type(::Type{T}) where {S <: RingElement, U <: MPolyRingElem{S}
    return is_exact_type(S)
 end
 
-parent(p::UnivPoly) = p.parent
+parent(p::UnivPoly) = p.parent::parent_type(p)
 
 elem_type(::Type{UniversalPolyRing{T, U}}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}} =
    UnivPoly{T, U}
@@ -252,7 +252,7 @@ function gen(S::UniversalPolyRing{T, U}, s::VarName) where {T <: RingElement, U 
    i = findfirst(==(Symbol(s)), S.S)
    if i === nothing
       push!(S.S, Symbol(s))
-      S.mpoly_ring = MPolyRing{T}(S.base_ring, S.S, S.ord, false)
+      S.mpoly_ring = MPolyRing{T}(base_ring(S), S.S, S.ord, false)
       i = length(S.S)
    end
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
@@ -297,7 +297,7 @@ function Base.hash(p::UnivPoly, h::UInt)
 end
 
 function deepcopy_internal(p::UnivPoly{T, U}, dict::IdDict) where {T, U}
-   return UnivPoly{T, U}(deepcopy_internal(p.p, dict), p.parent)
+   return UnivPoly{T, U}(deepcopy_internal(p.p, dict), parent(p))
 end
 
 ###############################################################################
@@ -355,7 +355,7 @@ end
 ###############################################################################
    
 function -(p::UnivPoly{T, U}) where {T, U}
-   return UnivPoly{T, U}(-p.p, p.parent)
+   return UnivPoly{T, U}(-p.p, parent(p))
 end
 
 ###############################################################################
@@ -377,19 +377,19 @@ end
 function +(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
    a, b = univ_promote(a, b)
-   return UnivPoly{T, U}(a.p + b.p, a.parent)
+   return UnivPoly{T, U}(a.p + b.p, parent(a))
 end
 
 function -(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
    a, b = univ_promote(a, b)
-   return UnivPoly{T, U}(a.p - b.p, a.parent)
+   return UnivPoly{T, U}(a.p - b.p, parent(a))
 end
 
 function *(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
    a, b = univ_promote(a, b)
-   return UnivPoly{T, U}(a.p*b.p, a.parent)
+   return UnivPoly{T, U}(a.p*b.p, parent(a))
 end
 
 ###############################################################################
@@ -680,14 +680,14 @@ end
 function divexact(a::UnivPoly{T, U}, b::UnivPoly{T, U}; check::Bool=true) where {T, U}
    check_parent(a, b)
    a, b = univ_promote(a, b)
-   return UnivPoly{T, U}(divexact(a.p, b.p; check=check), a.parent)
+   return UnivPoly{T, U}(divexact(a.p, b.p; check=check), parent(a))
 end
 
 function divides(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
    a, b = univ_promote(a, b)
    flag, q = divides(a.p, b.p)
-   return flag, UnivPoly{T, U}(q, a.parent)
+   return flag, UnivPoly{T, U}(q, parent(a))
 end
 
 ###############################################################################
@@ -699,14 +699,14 @@ end
 function Base.div(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
    a, b = univ_promote(a, b)
-   return UnivPoly{T, U}(div(a.p, b.p), a.parent)
+   return UnivPoly{T, U}(div(a.p, b.p), parent(a))
 end
 
 function Base.divrem(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T, U}
    check_parent(a, b)
    a, b = univ_promote(a, b)
    q, r = divrem(a.p, b.p)
-   return UnivPoly{T, U}(q, a.parent), UnivPoly{T, U}(r, a.parent)
+   return UnivPoly{T, U}(q, parent(a)), UnivPoly{T, U}(r, parent(a))
 end
 
 ###############################################################################
@@ -720,7 +720,7 @@ function derivative(p::UnivPoly{T, U}, j::Int) where {T, U}
    if j > nvars(parent(p.p))
       return zero(parent(p))
    end
-   return UnivPoly{T, U}(derivative(p.p, j), p.parent)
+   return UnivPoly{T, U}(derivative(p.p, j), parent(p))
 end
 
 function derivative(p::UnivPoly{T, U}, x::UnivPoly{T, U}) where {T, U}
@@ -872,13 +872,13 @@ end
 function gcd(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T <: RingElement, U}
    check_parent(a, b)
    a, b = univ_promote(a, b)
-   return UnivPoly{T, U}(gcd(a.p, b.p), a.parent)
+   return UnivPoly{T, U}(gcd(a.p, b.p), parent(a))
 end
 
 function lcm(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T <: RingElement, U}
    check_parent(a, b)
    a, b = univ_promote(a, b)
-   return UnivPoly{T, U}(lcm(a.p, b.p), a.parent)
+   return UnivPoly{T, U}(lcm(a.p, b.p), parent(a))
 end
 
 ###############################################################################
