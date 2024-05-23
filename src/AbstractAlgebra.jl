@@ -326,7 +326,7 @@ function canonical_injections(D)
 end
 
 function canonical_projections(D)
-  return [canonical_projections(D, i) for i=1:_number_of_direct_product_factors(D)]
+  return [canonical_projection(D, i) for i=1:_number_of_direct_product_factors(D)]
 end
 
 ###############################################################################
