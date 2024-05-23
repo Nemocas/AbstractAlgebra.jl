@@ -304,3 +304,11 @@ function comm!(out::T, g::T, h::T) where {T<:GroupElem}
     tmp = (out === g) ? conj(g, h) : conj!(out, g, h)
     return div_left!(out, tmp, g)
 end
+
+###############################################################################
+#
+#   Scalar for broadcasting
+#
+###############################################################################
+
+Base.broadcastable(x::GroupElem) = Ref(x)
