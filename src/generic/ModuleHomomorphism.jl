@@ -171,7 +171,7 @@ function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T},
       end
       for i = 1:q
          for j = 1:n
-            mat[m + i, j] = trels[i].v[1, j]
+            mat[m + i, j] = trels[i][1, j]
          end
       end
       # Find left inverse of mat

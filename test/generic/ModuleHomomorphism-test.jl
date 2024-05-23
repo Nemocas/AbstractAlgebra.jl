@@ -160,8 +160,8 @@ end
 end
 
 @testset "Generic.ModuleIsomorphism" begin
-   R = AbstractAlgebra.JuliaQQ
-   for iter = 1:100
+  let R = QQ
+    for iter in 1:100
       # test image of composition of canonical injection and projection
       M = rand_module(R, -10:10)::AbstractAlgebra.FPModule{elem_type(R)}
 
@@ -182,7 +182,21 @@ end
 
       @test isa(image_fn(f), Function)
       @test isa(inverse_image_fn(f), Function)
-   end
+    end
+  end
+  let R = ZZ # for ZZ not every random matrix gives an isomorphism, thus only calculate some fixed example
+    F = free_module(R, 1)
+    M = quo(F, sub(F, [F([R(304)])])[1])[1]
+
+    n = ngens(M)
+    S = matrix_space(R, n, n)
+    for iter in 1:10
+      N = matrix(R, 1, 1, [rand(R, -20:20)])
+      gcd(N[1,1], 304) == 1 || continue
+      f = ModuleIsomorphism(M, M, N)
+      @test mod(matrix(f)[1,1]*matrix(inv(f))[1,1], 304) == 1
+    end
+  end
 end
 
 @testset "Generic.ModuleIsomorphism.printing" begin
