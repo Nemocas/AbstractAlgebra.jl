@@ -16,6 +16,7 @@ import Base: show
 
 export solve
 export solve_init
+export solve_context_type
 export can_solve
 export can_solve_with_solution
 export can_solve_with_solution_and_kernel
@@ -153,19 +154,26 @@ julia> solve(C, [QQ(1), QQ(1), QQ(1)], side = :right)
  2//45
 ```
 """
-function solve_init(A::MatElem)
-  return SolveCtx(A)
+function solve_init(A::MatElem{T}) where T
+  return solve_context_type(T)(A)
 end
 
-function solve_init(A::MatElem{T}) where {T<:FracElem}
-  # A lives over a fraction field, we have to get the type of "integral"
-  # matrices, that is, matrices over the base ring of this field
-  IntMatT = dense_matrix_type(base_ring(base_ring(A)))
-  return SolveCtx{T, typeof(A), IntMatT, IntMatT}(A)
+function solve_context_type(::Type{T}) where {T <: NCRingElement}
+  MatType = dense_matrix_type(T)
+  return SolveCtx{T, MatType, MatType, LazyTransposeMatElem{T, MatType}}
 end
 
-function solve_init(A::MatElem{<:Rational{BigInt}})
-  return SolveCtx{Rational{BigInt}, typeof(A), dense_matrix_type(BigInt), dense_matrix_type(BigInt)}(A)
+solve_context_type(::T) where {T <: NCRingElement} = solve_context_type(T)
+solve_context_type(::Type{T}) where {T <: NCRing} = solve_context_type(elem_type(T))
+solve_context_type(::T) where {T <: NCRing} = solve_context_type(elem_type(T))
+solve_context_type(::Type{<: MatElem{T}}) where T = solve_context_type(T)
+solve_context_type(::MatElem{T}) where T = solve_context_type(T)
+
+function solve_context_type(::Type{T}) where {T <: Union{Rational{BigInt}, FracElem}}
+  # We have to get the type of "integral" matrices, that is, matrices over the
+  # base ring of the fraction field
+  IntMatT = dense_matrix_type(base_ring_type(T))
+  return SolveCtx{T, dense_matrix_type(T), IntMatT, IntMatT}
 end
 
 matrix(C::SolveCtx) = C.A

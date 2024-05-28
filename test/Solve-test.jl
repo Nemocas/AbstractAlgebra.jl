@@ -86,6 +86,13 @@ end
     M = matrix(R, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
     C = AbstractAlgebra.Solve.solve_init(M)
 
+    @test C isa AbstractAlgebra.solve_context_type(elem_type(R))
+    @test C isa AbstractAlgebra.solve_context_type(zero(R))
+    @test C isa AbstractAlgebra.solve_context_type(typeof(R))
+    @test C isa AbstractAlgebra.solve_context_type(R)
+    @test C isa AbstractAlgebra.solve_context_type(typeof(M))
+    @test C isa AbstractAlgebra.solve_context_type(M)
+
     @test_throws ErrorException AbstractAlgebra.Solve.solve(C, [ R(1) ])
     @test_throws ErrorException AbstractAlgebra.Solve.solve(C, [ R(1) ], side = :right)
     @test_throws ErrorException AbstractAlgebra.Solve.solve(C, matrix(R, 1, 1, [ R(1) ]))
