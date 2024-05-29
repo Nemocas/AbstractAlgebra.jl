@@ -177,6 +177,13 @@ end
   @test nrows(MT) == 5
   @test ncols(MT) == 3
 
+  V = @inferred view(MT, 1, 1:3)
+  @test V == [QQ(1), QQ(0), QQ(0)]
+  V = @inferred view(MT, 1:5, 1)
+  @test V == [QQ(1), QQ(2), QQ(3), QQ(4), QQ(5)]
+  V = @inferred view(MT, 3:4, 1:2)
+  @test V == QQ[3 8; 4 9]
+
   @test MT[2, 1] == QQ(2)
   MT[2, 1] = QQ(100)
   @test MT[2, 1] == QQ(100)
