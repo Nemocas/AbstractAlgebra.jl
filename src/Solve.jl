@@ -49,6 +49,20 @@ function Base.setindex!(M::LazyTransposeMatElem{T}, d::T, r::Int, c::Int) where 
   return M
 end
 
+function AbstractAlgebra.view(M::LazyTransposeMatElem, r::Union{Colon, AbstractVector{Int}}, c::Union{Colon, AbstractVector{Int}})
+  return lazy_transpose(view(data(M), c, r))
+end
+
+# If one of the arguments is an Int, then the result is 1-dimensional so wrapping
+# it in a lazy_transpose does not make sense (and does not work, if we don't add
+# something like lazy_transpose(::AbstractVector))
+function AbstractAlgebra.view(M::LazyTransposeMatElem, r::Int, c::Union{Colon, AbstractVector{Int}})
+  return view(data(M), c, r)
+end
+function AbstractAlgebra.view(M::LazyTransposeMatElem, r::Union{Colon, AbstractVector{Int}}, c::Int)
+  return view(data(M), c, r)
+end
+
 AbstractAlgebra.base_ring(M::LazyTransposeMatElem) = base_ring(data(M))
 
 Base.zero(M::LazyTransposeMatElem) = lazy_transpose(zero(data(M)))
