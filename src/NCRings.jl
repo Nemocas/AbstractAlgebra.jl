@@ -130,12 +130,6 @@ Base.:\(y::Union{Integer, Rational, AbstractFloat}, x::NCRingElem) = divexact_le
 
 Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 
-function check_parent(a::NCRingElement, b::NCRingElement, throw::Bool=true)
-   c = parent(a) !== parent(b)
-   c && throw && error("Incompatible polynomial rings in polynomial operation")
-   return !c
-end
-
 function zero!(z::NCRingElem)
    return zero(parent(z))
 end

@@ -38,12 +38,6 @@ function characteristic(R::RationalFunctionField)
    return characteristic(base_ring(R))
 end
 
-function check_parent(a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}, throw::Bool = true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   fl = parent(a) != parent(b)
-   fl && throw && error("Incompatible rings in rational function field operation")
-   return !fl
-end
-
 ###############################################################################
 #
 #   Constructors

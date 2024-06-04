@@ -25,13 +25,6 @@ function elem_type(::Type{AbsMSeriesRing{T, S}}) where {T <: RingElement, S}
     return AbsMSeries{T, S}
 end
 
-function check_parent(a::AbsMSeries, b::AbsMSeries, throw::Bool = true)
-    c = parent(a) != parent(b)
-    c && throw &&
-            error("Incompatible multivariate series rings in series operation")
-    return !c
- end
-
 ###############################################################################
 #
 #   Basic manipulation

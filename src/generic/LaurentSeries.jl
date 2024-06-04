@@ -63,12 +63,6 @@ this is returned as a `Symbol` not a `String`.
 """
 var(a::LaurentSeriesField) = a.S
 
-function check_parent(a::LaurentSeriesElem, b::LaurentSeriesElem, throw::Bool = true)
-   b = parent(a) != parent(b)
-   b && throw && error("Incompatible power series rings in Laurent series operation")
-   return !b
-end
-
 ###############################################################################
 #
 #   Basic manipulation

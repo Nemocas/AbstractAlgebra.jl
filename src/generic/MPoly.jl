@@ -111,12 +111,6 @@ function internal_ordering(a::MPolyRing{T}) where {T <: RingElement}
    return a.ord
 end
 
-function check_parent(a::MPoly{T}, b::MPoly{T}, throw::Bool = true) where T <: RingElement
-   b = parent(a) != parent(b)
-   b & throw && error("Incompatible polynomial rings in polynomial operation")
-   return !b
-end
-
 ###############################################################################
 #
 #   Manipulating terms and monomials

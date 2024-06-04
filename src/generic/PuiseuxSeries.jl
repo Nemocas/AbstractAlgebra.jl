@@ -91,12 +91,6 @@ end
 
 is_exact_type(a::Type{T}) where T <: PuiseuxSeriesElem = false
 
-function check_parent(a::PuiseuxSeriesElem, b::PuiseuxSeriesElem, throw::Bool = true)
-   fl = parent(a) != parent(b)
-   fl && throw && error("Incompatible Puiseux series rings in Puiseux series operation")
-   return !fl
-end
-
 ###############################################################################
 #
 #   Basic manipulation

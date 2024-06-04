@@ -24,10 +24,6 @@ is_exact_type(::Type{GFElem{T}}) where T <: Integer = true
 
 is_domain_type(::Type{GFElem{T}}) where T <: Integer = true
 
-function check_parent(a::GFElem, b::GFElem)
-   a.parent != b.parent && error("Operations on distinct finite fields not supported")
-end
-
 ###############################################################################
 #
 #   Basic manipulation

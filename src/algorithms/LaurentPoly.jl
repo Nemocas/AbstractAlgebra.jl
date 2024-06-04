@@ -17,13 +17,6 @@ is_domain_type(::Type{<:LaurentPolyRingElem{T}}) where {T} = is_domain_type(T)
 
 is_exact_type(::Type{<:LaurentPolyRingElem{T}}) where {T} = is_exact_type(T)
 
-function check_parent(a::LaurentPolyRingElem, b::LaurentPolyRingElem, throw::Bool = true)
-   c = parent(a) == parent(b)
-   c || !throw || error("incompatible Laurent polynomial rings")
-   return c
-end
-
-
 ###############################################################################
 #
 #   Basic manipulation
