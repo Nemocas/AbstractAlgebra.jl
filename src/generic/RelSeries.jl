@@ -399,7 +399,7 @@ end
 #
 ###############################################################################
 
-function power_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::VarName; cached::Bool=true, model=:capped_relative)
+function power_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::VarName; cached::Bool=true, model::Symbol=:capped_relative)
    T = elem_type(R)
 
    if model == :capped_relative

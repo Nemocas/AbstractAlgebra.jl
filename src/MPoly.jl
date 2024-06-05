@@ -1264,7 +1264,7 @@ If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
 """
-function map_coefficients(f::T, p::MPolyRingElem; cached = true, parent::MPolyRing = _change_mpoly_ring(parent(f(zero(base_ring(p)))), parent(p), cached)) where {T}
+function map_coefficients(f::T, p::MPolyRingElem; cached::Bool = true, parent::MPolyRing = _change_mpoly_ring(parent(f(zero(base_ring(p)))), parent(p), cached)) where {T}
    return _map(f, p, parent)
 end
 
