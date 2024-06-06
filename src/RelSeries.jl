@@ -1442,7 +1442,7 @@ rand(S::SeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val_range, v..
 ###############################################################################
 
 @doc raw"""
-    power_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true, model=:capped_relative)
+    power_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true, model::Symbol=:capped_relative)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a power series
 ring over the given base ring and a generator `x` for the power series ring.
@@ -1455,7 +1455,7 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-power_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true, model=:capped_relative) =
+power_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true, model::Symbol=:capped_relative) =
    Generic.power_series_ring(R, prec, Symbol(s); cached, model)
 
 function AbsPowerSeriesRing(R::Ring, prec::Int)
