@@ -18,7 +18,7 @@ base_ring_type(::Type{<:MatrixElem{T}}) where T <: NCRingElement = parent_type(T
 
 base_ring(a::MatrixElem{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T)
 
-function check_parent(a::MatElem, b::MatElem, throw::Bool = true)
+function check_parent(a::MatrixElem, b::MatrixElem, throw::Bool = true)
   fl = (base_ring(a) != base_ring(b) || nrows(a) != nrows(b) || ncols(a) != ncols(b))
   fl && throw && error("Incompatible matrix spaces in matrix operation")
   return !fl
