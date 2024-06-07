@@ -49,12 +49,6 @@ number_of_variables(a::PolyRing) = 1
 
 characteristic(a::PolyRing) = characteristic(base_ring(a))
 
-function check_parent(a::PolyRingElem{T}, b::PolyRingElem{T}, throw::Bool = true) where T<:RingElement
-   c = parent(a) != parent(b)
-   c && throw && error("Incompatible polynomial rings in polynomial operation")
-   return !c
-end
-
 ###############################################################################
 #
 #   Basic manipulation

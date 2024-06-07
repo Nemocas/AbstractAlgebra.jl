@@ -25,10 +25,6 @@ function rels(M::FreeModule{T}) where T <: RingElement
    return Vector{dense_matrix_type(T)}(undef, 0)
 end
 
-function check_parent(m1::FreeModuleElem{T}, m2::FreeModuleElem{T}) where T <: Union{RingElement, NCRingElem}
-    parent(m1) !== parent(m2) && error("Incompatible free modules")
-end
-
 is_free(M::FreeModule) = true
 
 @doc raw"""

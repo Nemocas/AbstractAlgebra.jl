@@ -203,6 +203,12 @@ import .PrettyPrinting: expressify
 #
 ###############################################################################
 
+function check_parent(a, b, throw::Bool = true)
+   flag = parent(a) === parent(b)
+   flag || !throw || error("parents do not match")
+   return flag
+end
+
 include("algorithms/LaurentPoly.jl")
 include("algorithms/FinField.jl")
 include("algorithms/GenericFunctions.jl")

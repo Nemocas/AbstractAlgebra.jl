@@ -48,12 +48,6 @@ end
 
 internal_ordering(p::UniversalPolyRing) = internal_ordering(mpoly_ring(p))
 
-function check_parent(a::UnivPoly{T, U}, b::UnivPoly{T, U}, throw::Bool = true) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
-   flag = parent(a) != parent(b)
-   flag & throw && error("Incompatible polynomial rings in polynomial operation")
-   return !flag
-end
-
 ###############################################################################
 #
 #   Manipulating terms and monomials

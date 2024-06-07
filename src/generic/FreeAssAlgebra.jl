@@ -38,16 +38,6 @@ function length(a::FreeAssAlgElem)
     return a.length
 end
 
-function check_parent(
-    a::FreeAssAlgElem{T},
-    b::FreeAssAlgElem{T},
-    throw::Bool = true,
-) where T <: RingElement
-    b = parent(a) != parent(b)
-    b & throw && error("Incompatible rings in operation")
-    return !b
-end
-
 ###############################################################################
 #
 # Basic manipulation

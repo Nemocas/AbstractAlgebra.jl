@@ -102,12 +102,6 @@ number_of_variables(a::NCPolyRing) = 1
 
 characteristic(a::NCPolyRing) = characteristic(base_ring(a))
 
-function check_parent(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, throw::Bool = true) where T<:RingElement
-   c = parent(a) != parent(b)
-   c && throw && error("Incompatible polynomial rings in polynomial operation")
-   return !c
-end
-
 ###############################################################################
 #
 #   Basic manipulation

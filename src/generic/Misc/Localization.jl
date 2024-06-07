@@ -124,11 +124,6 @@ base_ring(L::LocalizedEuclideanRing) = L.base_ring::base_ring_type(L)
 
 parent(a::LocalizedEuclideanRingElem) = a.parent
 
-function check_parent(a::LocalizedEuclideanRingElem{T}, b::LocalizedEuclideanRingElem{T})  where {T <: RingElem}
-    parent(a) !== parent(b) && error("Parent objects do not match")
-end
-
-
 ###############################################################################
 #
 #   Basic manipulation

@@ -555,12 +555,6 @@ symbol.
 """
 var(R::FunctionField) = R.S
 
-function check_parent(a::FunctionFieldElem{T}, b::FunctionFieldElem{T}, throw::Bool = true) where T <: FieldElement
-   fl = parent(a) != parent(b)
-   fl && throw && error("Incompatible function fields in function field operation")
-   return !fl
-end
-
 @doc raw"""
     characteristic(R::FunctionField)
 

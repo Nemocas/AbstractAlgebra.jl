@@ -38,12 +38,6 @@ function characteristic(R::TotFracRing{T}) where T <: RingElem
    return characteristic(base_ring(R))
 end
 
-function check_parent(a::TotFrac, b::TotFrac, throw::Bool = true)
-   fl = parent(a) != parent(b)
-   fl && throw && error("Incompatible rings in total ring of fractions operation")
-   return !fl
-end
-
 ###############################################################################
 #
 #   Constructors

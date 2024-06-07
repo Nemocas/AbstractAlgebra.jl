@@ -29,12 +29,6 @@ function characteristic(R::FracField{T}) where T <: RingElem
    return characteristic(base_ring(R))
 end
 
-function check_parent(a::FracElem, b::FracElem, throw::Bool = true)
-   fl = parent(a) != parent(b)
-   fl && throw && error("Incompatible rings in fraction field operation")
-   return !fl
-end
-
 @doc raw"""
     vars(a::FracElem{S}) where {S <: MPolyRingElem{<: RingElement}}
 

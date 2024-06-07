@@ -43,12 +43,6 @@ this is returned as a `Symbol` not a `String`.
 """
 var(a::SeriesRing) = a.S
 
-function check_parent(a::SeriesElem, b::SeriesElem, throw::Bool = true)
-   b = parent(a) != parent(b)
-   b && throw && error("Incompatible power series rings in power series operation")
-   return !b
-end
-
 ###############################################################################
 #
 #   Basic manipulation
