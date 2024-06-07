@@ -12,12 +12,6 @@
 
 base_ring_type(::Type{<:MatRing{T}}) where T <: NCRingElement = parent_type(T)
 
-function check_parent(a::MatRingElem{T}, b::MatRingElem{T}, throw::Bool = true) where T <: NCRingElement
-  fl = (base_ring(a) != base_ring(b) || degree(a) != degree(b))
-  fl && throw && error("Incompatible matrix spaces in matrix operation")
-  return !fl
-end
-
 ###############################################################################
 #
 #   Basic manipulation
