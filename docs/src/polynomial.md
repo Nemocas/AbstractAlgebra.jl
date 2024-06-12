@@ -59,19 +59,6 @@ the constructor as follows.
 R[:x]
 ```
 
-It is also possible to create a polynomial ring with default symbol as follows.
-This is a lightweight constructor and should be used in generic algorithms
-wherever possible when creating polynomial rings where the symbol does not
-matter.
-
-```julia
-PolyRing(R::Ring)
-```
-
-Given a base ring `R` return the polynomial ring $S = R[x]$. Note that unlike
-the constructors above, the return type is not a tuple. Only the ring is
-returned and not the generator. The polynomial ring is not cached.
-
 Here are some examples of creating polynomial rings and their associated
 generators.
 
@@ -81,8 +68,8 @@ generators.
 julia> T, z = QQ["z"]
 (Univariate polynomial ring in z over rationals, z)
 
-julia> U = PolyRing(ZZ)
-Univariate polynomial ring in x over integers
+julia> U, x = polynomial_ring(ZZ)
+(Univariate polynomial ring in x over integers, x)
 ```
 
 All of the examples here are generic polynomial rings, but specialised implementations
