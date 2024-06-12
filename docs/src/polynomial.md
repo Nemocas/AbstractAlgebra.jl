@@ -69,7 +69,7 @@ julia> T, z = QQ["z"]
 (Univariate polynomial ring in z over rationals, z)
 
 julia> U, x = polynomial_ring(ZZ)
-Univariate polynomial ring in x over integers
+(Univariate polynomial ring in x over integers, x)
 ```
 
 All of the examples here are generic polynomial rings, but specialised implementations
