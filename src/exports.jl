@@ -407,6 +407,7 @@ export number_of_rows
 export number_of_variables
 export one
 export one!
+export ones_matrix
 export order
 export ordinal_number_string
 export parent_type

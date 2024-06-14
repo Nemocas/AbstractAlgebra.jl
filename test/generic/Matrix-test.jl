@@ -259,6 +259,12 @@ end
 
    @test_throws DomainError identity_matrix(M3) # must be square
 
+   M5 = ones_matrix(R, 2, 3)
+
+   @test isa(M5, Generic.MatSpaceElem{elem_type(R)})
+   @test base_ring(M5) == R
+   @test all(isone, M5)
+
    # identity_matrix should preserve the type of the input
    M9 = matrix(F2(), F2Elem[1 0; 0 1])
    @test typeof(identity_matrix(M9))      == typeof(M9)
