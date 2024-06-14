@@ -421,6 +421,10 @@ identity_matrix(::MatElem{T}) where T <: RingElement
 ```
 
 ```@docs
+ones_matrix(::Ring, ::Int, ::Int)
+```
+
+```@docs
 scalar_matrix(R::Ring, n::Int, a::RingElement)
 ```
 
