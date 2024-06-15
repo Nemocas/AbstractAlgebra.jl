@@ -6443,6 +6443,10 @@ function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
    end
 end
 
+function matrix(R::NCRing, arr::MatElem)
+    return map_entries(R,arr)
+end
+
 function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElem}
    r, c = size(arr)
    (r < 0 || c < 0) && error("Array must be non-empty")

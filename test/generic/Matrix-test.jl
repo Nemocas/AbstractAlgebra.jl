@@ -325,7 +325,9 @@ end
 
    M = matrix(ZZ, M1)
    N = matrix(ZZ, N1)
-   K = matrix(ZZ, K1)
+
+   @test matrix(ZZ,M1) == M1
+   @test matrix(ZZ,N1) == N1
 
    @test block_diagonal_matrix([M, N, K]) == matrix(ZZ, [1 2 0 0 0; 3 4 0 0 0; 0 0 5 6 7; 0 0 8 9 10; 0 0 0 0 0; 0 0 0 0 0])
    @test block_diagonal_matrix([K]) == matrix(ZZ, 2, 0, [])
