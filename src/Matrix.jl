@@ -6444,7 +6444,7 @@ function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
 end
 
 function matrix(R::NCRing, arr::MatElem)
-    return map_entries(R,arr)
+    return map_entries(R, arr)
 end
 
 function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElem}
