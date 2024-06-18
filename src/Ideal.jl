@@ -10,14 +10,6 @@
 # are implemented by anyone implementing ideals for AbstractAlgebra rings.
 # The functions in this file extend the interface for `ideal`.
 
-function *(x::RingElement, R::Ring)
-  return ideal(R, x)
-end
-
-function *(R::Ring, x::RingElement)
-  return ideal(R, x)
-end
-
 function *(R::Ring, x::Any)
   return ideal(R, R(x))
 end
