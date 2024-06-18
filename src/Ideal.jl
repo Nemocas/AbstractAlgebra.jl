@@ -7,7 +7,7 @@
 # We assume that the functions
 #   ideal(R::Ring, x::RingElement)
 #   ideal(R::Ring, xs::AbstractVector)
-# are implemented in the package that uses AbstractAlgebra.
+# are implemented by anyone implementing ideals for AbstractAlgebra rings.
 # The functions in this file extend the interface for `ideal`.
 
 function *(x::RingElement, R::Ring)
