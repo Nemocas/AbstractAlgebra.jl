@@ -11,11 +11,11 @@
 # The functions in this file extend the interface for `ideal`.
 
 function *(R::Ring, x::Any)
-  return ideal(R, R(x))
+  return ideal(R, x)
 end
 
 function *(x::Any, R::Ring)
-  return ideal(R, R(x))
+  return ideal(R, x)
 end
 
 function ideal(R::Ring, x::Any)
