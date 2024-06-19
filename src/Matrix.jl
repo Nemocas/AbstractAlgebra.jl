@@ -672,8 +672,7 @@ function Base.show(io::IO, a::MatrixElem{T}) where T <: NCRingElement
 end
 
 function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem{T}) where T <: NCRingElement
-   if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-         !AbstractAlgebra.get_html_as_latex()
+   if isdefined(Main, :IJulia) && Main.IJulia.inited && !get_html_as_latex()
       error("Dummy error for jupyter")
    end
    show_via_expressify(io, mi, a)

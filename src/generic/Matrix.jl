@@ -154,7 +154,7 @@ function (a::MatSpace{T})() where {T <: NCRingElement}
 end
 
 # create a matrix with b on the diagonal
-function (a::AbstractAlgebra.Generic.MatSpace)(b::NCRingElement)
+function (a::MatSpace)(b::NCRingElement)
    M = a()  # zero matrix
    R = base_ring(a)
    rb = R(b)
