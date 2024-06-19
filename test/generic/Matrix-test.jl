@@ -325,6 +325,7 @@ end
 
    M = matrix(ZZ, M1)
    N = matrix(ZZ, N1)
+   K = matrix(ZZ, K1)
 
    @test matrix(ZZ, M) == M
    @test matrix(ZZ, N) == N
