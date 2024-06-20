@@ -560,7 +560,7 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(R::AbstractAlgebra.Integers{T}, _) where {T} = T
+RandomExtensions.maketype(R::Integers{T}, _) where {T} = T
 
 # define rand(make(ZZ, n:m))
 rand(rng::AbstractRNG,

@@ -25,7 +25,7 @@ function check_composable(a::Map, b::Map)
    codomain(a) !== domain(b) && error("Incompatible maps")
 end
 
-function Base.show(io::IO, mime::MIME"text/plain", M::AbstractAlgebra.Map)
+function Base.show(io::IO, mime::MIME"text/plain", M::Map)
    # the "header" printed for most map types is identical: the terse output
    # followed by "from DOMAIN" and "to CODOMAIN" lines.. We implement this
    # generically here. If desired, map types can provide a custom
@@ -37,11 +37,11 @@ function Base.show(io::IO, mime::MIME"text/plain", M::AbstractAlgebra.Map)
    show_map_data(io, M)
 end
 
-function show_map_data(io::IO, M::AbstractAlgebra.Map)
+function show_map_data(io::IO, M::Map)
    # no extra data by default; Map subtypes may overload this
 end
 
-function Base.show(io::IO, M::AbstractAlgebra.Map)
+function Base.show(io::IO, M::Map)
    if is_terse(io)
       print(io, "Map")
    else
@@ -53,7 +53,7 @@ function Base.show(io::IO, M::AbstractAlgebra.Map)
    end
 end
 
-Base.broadcastable(M::AbstractAlgebra.Map) = Ref(M)
+Base.broadcastable(M::Map) = Ref(M)
 
 ###############################################################################
 #
@@ -112,7 +112,7 @@ julia> f(t)
 t
 ```
 """
-identity_map(R::D) where D <: AbstractAlgebra.Set = Generic.IdentityMap{D}(R)
+identity_map(R::D) where D <: Set = Generic.IdentityMap{D}(R)
 
 ################################################################################
 #
