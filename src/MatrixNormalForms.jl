@@ -223,9 +223,17 @@ function strong_echelon_form_naive!(A::MatElem{<:RingElement})
   triangularize!(A)
 
   T = zero_matrix(base_ring(A), 1, ncols(A))
-  # We do not normalize!
   for j in 1:m
     if !iszero(A[j, j])
+      # Normalize/canonicalize the pivot
+      u = canonical_unit(A[j, j])
+      if !is_one(u)
+        uinv = inv(u)
+        for i in j:ncols(A)
+          A[j, i] = uinv*A[j, i]
+        end
+      end
+
       # This is the reduction
       for i in 1:j - 1
         if iszero(A[i, j])
@@ -284,10 +292,9 @@ function howell_form!(A::MatElem{<:RingElement})
 
   strong_echelon_form_naive!(A)
 
-  k = 1
+  # Move the zero rows to the bottom
   for i in 1:nrows(A)
     if !is_zero_row(A, i)
-      k += 1
       continue
     end
 
@@ -297,7 +304,7 @@ function howell_form!(A::MatElem{<:RingElement})
     end
     swap_rows!(A, i, i + j)
   end
-  return k
+  return A
 end
 
 @doc raw"""
