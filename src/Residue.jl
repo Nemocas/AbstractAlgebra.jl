@@ -96,6 +96,8 @@ function is_zero_divisor_with_annihilator(a::ResElem)
    return !is_unit(g), parent(a)(b)
 end
 
+annihilator(a::ResElem) = is_zero_divisor_with_annihilator(a)[2]
+
 deepcopy_internal(a::ResElem, dict::IdDict) =
    parent(a)(deepcopy_internal(data(a), dict))
 
@@ -377,6 +379,27 @@ supplied residues and taking its greatest common divisor with the modulus.
 function gcd(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(gcd(gcd(data(a), modulus(a)), data(b)))
+end
+
+# Return g, s, t, u, v in R with sv - tu a unit and
+#   [s t] [a] = [g]
+#   [u v] [b]   [0]
+# Generic implementation which uses HNF over the base ring.
+# g might not coincide with gcd(a, b) because gcd(a, b) is
+# gcd(gcd(data(a), modulus(a)), data(b)) and g is just
+# gcd(data(a), data(b)).
+function gcdex(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
+  check_parent(a, b)
+  R = parent(a)
+  M = matrix(base_ring(R), 2, 1, [data(a), data(b)])
+  H, U = hermite_form_with_transformation(M)
+  @assert is_zero(H[2, 1])
+  return R(H[1, 1]), R(U[1, 1]), R(U[1, 2]), R(U[2, 1]), R(U[2, 2])
+end
+
+function _div(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
+  check_parent(a, b)
+  return parent(a)(div(data(a), data(b)))
 end
 
 ###############################################################################
