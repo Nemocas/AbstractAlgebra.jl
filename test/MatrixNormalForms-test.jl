@@ -63,10 +63,8 @@ end
   @test Hl == R[0 0 0 0; 0 15 0 0; 16 9 2 0; 0 0 0 5]
   H = howell_form(M, trim = true)
   @test H == R[2 3 4 0; 0 15 0 0; 0 0 0 5]
-  @test nrows(H) == 3
   Hl = howell_form(M, shape = :lower, trim = true)
   @test Hl == R[0 15 0 0; 16 9 2 0; 0 0 0 5]
-  @test nrows(Hl) == 3
 
   H, U = howell_form_with_transformation(M)
   @test H == R[2 3 4 0; 0 15 0 0; 0 0 0 5; 0 0 0 0]
@@ -84,4 +82,22 @@ end
   c = R[4 1 0; 0 3 0; 0 0 1]
   @test howell_form(a) == c
   @test howell_form(b) == c
+
+  Qt, t = QQ["t"]
+  R, _ = residue_ring(Qt, t^5)
+  M = R[t^2 t^2 - 1 1; t t - 1 0]
+  H = howell_form(M)
+  @test H == R[t 0 -1; 0 1 -t^3 - t^2 - t - 1; 0 0 t^4]
+  H = howell_form(M, shape = :lower)
+  @test H == R[0 0 0; -t^4 - t^3 - t^2 - t 1 0; -t 0 1]
+  H = howell_form(M, trim = true)
+  @test H == R[t 0 -1; 0 1 -t^3 - t^2 - t - 1; 0 0 t^4]
+  H = howell_form(M, shape = :lower, trim = true)
+  @test H == R[-t^4 - t^3 - t^2 - t 1 0; -t 0 1]
+  H, U = howell_form_with_transformation(M)
+  @test H == R[t 0 -1; 0 1 -t^3 - t^2 - t - 1; 0 0 t^4]
+  @test U*M == H
+  H, U = howell_form_with_transformation(M, shape = :lower)
+  @test H == R[0 0 0; -t^4 - t^3 - t^2 - t 1 0; -t 0 1]
+  @test U*M == H
 end
