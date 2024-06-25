@@ -157,12 +157,12 @@ end
 # Return 0 if this is not possible, 1 if no swapping was necessary and -1
 # if rows were swapped.
 function _pivot(A::MatElem, start_row::Int, col::Int)
-  if !iszero(A[start_row, col])
+  if !is_zero_entry(A, start_row, col)
     return 1
   end
 
   for j in start_row + 1:nrows(A)
-    if !iszero(A[j, col])
+    if !is_zero_entry(A, j, col)
       swap_rows!(A, j, start_row)
       return -1
     end
@@ -185,7 +185,7 @@ function triangularize!(A::MatElem{<:RingElement})
     end
     d = d*t
     for i in (row + 1):nrows(A)
-      if iszero(A[i, col])
+      if is_zero_entry(A, i, col)
         continue
       end
 
@@ -224,7 +224,7 @@ function strong_echelon_form_naive!(A::MatElem{<:RingElement})
 
   T = zero_matrix(base_ring(A), 1, ncols(A))
   for j in 1:m
-    if !iszero(A[j, j])
+    if !is_zero_entry(A, j, j)
       # Normalize/canonicalize the pivot
       u = canonical_unit(A[j, j])
       if !is_one(u)
@@ -236,7 +236,7 @@ function strong_echelon_form_naive!(A::MatElem{<:RingElement})
 
       # This is the reduction
       for i in 1:j - 1
-        if iszero(A[i, j])
+        if is_zero_entry(A, i, j)
           continue
         end
         q = _div(A[i, j], A[j, j])
@@ -258,11 +258,11 @@ function strong_echelon_form_naive!(A::MatElem{<:RingElement})
 
     for i in j+1:m
 
-      if iszero(T[1, i])
+      if is_zero_entry(T, 1, i)
         continue
       end
 
-      if iszero(A[i, i])
+      if is_zero_entry(A, i, i)
         for k in i:m
           T[1, k], A[i, k] = A[i, k], T[1, k]
         end
