@@ -388,7 +388,7 @@ end
 # g might not coincide with gcd(a, b) because gcd(a, b) is
 # gcd(gcd(data(a), modulus(a)), data(b)) and g is just
 # gcd(data(a), data(b)).
-function gcdex(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
+function gcdxx(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
   check_parent(a, b)
   R = parent(a)
   M = matrix(base_ring(R), 2, 1, [data(a), data(b)])
@@ -397,10 +397,15 @@ function gcdex(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
   return R(H[1, 1]), R(U[1, 1]), R(U[1, 2]), R(U[2, 1]), R(U[2, 2])
 end
 
-function _div(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
+# The operation "Quo" on p. 13 of Storjohann "Algorithms for matrix canonical forms"
+function _div_for_howell_form(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
   check_parent(a, b)
   return parent(a)(div(data(a), data(b)))
 end
+
+# Fallback for euclidean rings (that is, rings implementing the euclidean ring
+# interface)
+_div_for_howell_form(a::T, b::T) where {T <: RingElement} = div(a, b)
 
 ###############################################################################
 #

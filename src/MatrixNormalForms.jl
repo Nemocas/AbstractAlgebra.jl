@@ -151,7 +151,7 @@ end
 ################################################################################
 
 # Works in theory over any principal ideal ring; internally we require functions
-# annihilator, gcdex and _div
+# annihilator, gcdxx and _div_for_howell_form
 
 # Swap rows so that there is a non-zero entry in A[start_row, col].
 # Return 0 if this is not possible, 1 if no swapping was necessary and -1
@@ -196,7 +196,7 @@ function triangularize!(A::MatElem{<:RingElement})
           A[i, k] = A[i, k] - q*A[row, k]
         end
       else
-        g, s, t, u, v = gcdex(A[row, col], A[i, col])
+        g, s, t, u, v = gcdxx(A[row, col], A[i, col])
 
         for k in col:m
           t1 = s*A[row, k] + t*A[i, k]
@@ -239,7 +239,7 @@ function strong_echelon_form_naive!(A::MatElem{<:RingElement})
         if is_zero_entry(A, i, j)
           continue
         end
-        q = _div(A[i, j], A[j, j])
+        q = _div_for_howell_form(A[i, j], A[j, j])
         for l in i:m
           A[i, l] = A[i, l] - q*A[j, l]
         end
@@ -273,7 +273,7 @@ function strong_echelon_form_naive!(A::MatElem{<:RingElement})
             T[1, k] = T[1, k] - q*A[i, k]
           end
         else
-          g, s, t, u, v = gcdex(A[i, i], T[1, i])
+          g, s, t, u, v = gcdxx(A[i, i], T[1, i])
           for k in i:m
             t1 = s*A[i, k] + t*T[1, k]
             t2 = u*A[i, k] + v*T[1, k]
