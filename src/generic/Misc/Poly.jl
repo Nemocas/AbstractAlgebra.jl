@@ -23,7 +23,7 @@ end
 ################################################################################
 
 function factor(R::Field, f::PolyRingElem)
-    Rt = AbstractAlgebra.PolyRing(R)
+    Rt = AbstractAlgebra.polynomial_ring_only(R, :x; cached=false)
     f1 = change_base_ring(R, f; parent = Rt)
     return factor(f1)
 end
@@ -70,7 +70,7 @@ end
 Returns the roots of the polynomial `f` in the field `R` as an array.
 """
 function roots(R::Field, f::PolyRingElem)
-    Rt = AbstractAlgebra.PolyRing(R)
+    Rt = AbstractAlgebra.polynomial_ring_only(R, :x; cached=false)
     f1 = change_base_ring(R, f, parent = Rt)
     return roots(f1)
 end

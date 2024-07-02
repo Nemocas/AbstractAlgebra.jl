@@ -22,8 +22,8 @@
 end
 
 @testset "Generic.Poly.constructors" begin
-   S1 = PolyRing(ZZ)
-   S2 = PolyRing(ZZ)
+   S1 = AbstractAlgebra.polynomial_ring_only(ZZ, :x; cached=false)
+   S2 = AbstractAlgebra.polynomial_ring_only(ZZ, :x; cached=false)
 
    @test S1 !== S2
    @test isa(S1, Generic.PolyRing)
