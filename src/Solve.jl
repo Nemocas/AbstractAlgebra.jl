@@ -9,6 +9,7 @@ using AbstractAlgebra.PrettyPrinting: pretty
 using AbstractAlgebra: _can_solve_with_solution_fflu
 using AbstractAlgebra: _can_solve_with_solution_interpolation
 using AbstractAlgebra: _solve_fflu_precomp
+using AbstractAlgebra: howell_form!
 import AbstractAlgebra: kernel
 import AbstractAlgebra: matrix
 
@@ -282,6 +283,27 @@ function _init_reduce(::HermiteFormTrait, C::SolveCtx)
   return nothing
 end
 
+# For this type, we store the Howell form of
+#   ( A | I_n)
+#   ( 0 |  0 )
+# in C.red. From this one can recover the Howell form of A with transformation,
+# but also additional information for the kernel.
+function _init_reduce(::HowellFormTrait, C::SolveCtx)
+  if isdefined(C, :red)
+    return nothing
+  end
+  A = matrix(C)
+
+  B = hcat(A, identity_matrix(A, nrows(A)))
+  if nrows(B) < ncols(B)
+    B = vcat(B, zero(A, ncols(B) - nrows(B), ncols(B)))
+  end
+
+  howell_form!(B)
+  C.red = B
+  return nothing
+end
+
 function _init_reduce_transpose(::LUTrait, C::SolveCtx)
   if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
     return nothing
@@ -331,6 +353,23 @@ function _init_reduce_transpose(::HermiteFormTrait, C::SolveCtx)
   R, U = hnf_with_transform(lazy_transpose(matrix(C)))
   C.red_transp = R
   C.trafo_transp = U
+  return nothing
+end
+
+function _init_reduce_transpose(::HowellFormTrait, C::SolveCtx)
+  if isdefined(C, :red_transp)
+    return nothing
+  end
+  A = matrix(C)
+
+  AT = lazy_transpose(A)
+  B = hcat(AT, identity_matrix(AT, nrows(AT)))
+  if nrows(B) < ncols(B)
+    B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
+  end
+
+  howell_form!(B)
+  C.red_transp = B
   return nothing
 end
 
@@ -589,6 +628,24 @@ function kernel(::HermiteFormTrait, A::MatElem; side::Symbol = :left)
   end
 end
 
+function kernel(::HowellFormTrait, A::MatElem; side::Symbol = :left)
+  check_option(side, [:right, :left], "side")
+
+  if side === :left
+    KK = kernel(HowellFormTrait(), lazy_transpose(A), side = :right)
+    return data(KK)
+  end
+
+  AT = lazy_transpose(A)
+  B = hcat(AT, identity_matrix(AT, nrows(AT)))
+  if nrows(B) < ncols(B)
+    B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
+  end
+
+  howell_form!(B)
+  return _kernel_of_howell_form(A, B)
+end
+
 function kernel(NF::RREFTrait, C::SolveCtx{<:FieldElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
@@ -618,6 +675,25 @@ function kernel(::HermiteFormTrait, C::SolveCtx; side::Symbol = :left)
   else
     if !isdefined(C, :kernel_left)
       nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
+      C.kernel_left = data(X)
+    end
+    return C.kernel_left
+  end
+end
+
+function kernel(::HowellFormTrait, C::SolveCtx; side::Symbol = :left)
+  check_option(side, [:right, :left], "side")
+
+  if side === :right
+    if !isdefined(C, :kernel_right)
+      B = reduced_matrix_of_transpose(C)
+      C.kernel_right = _kernel_of_howell_form(matrix(C), B)
+    end
+    return C.kernel_right
+  else
+    if !isdefined(C, :kernel_left)
+      B = reduced_matrix(C)
+      X = _kernel_of_howell_form(lazy_transpose(matrix(C)), B)
       C.kernel_left = data(X)
     end
     return C.kernel_left
@@ -778,6 +854,38 @@ function _can_solve_internal_no_check(::HermiteFormTrait, A::MatElem{T}, b::MatE
   return true, sol, N
 end
 
+# _can_solve_internal_no_check with Howell form
+function Solve._can_solve_internal_no_check(::HowellFormTrait, A::MatElem{T}, b::MatElem{T},
+           task::Symbol; side::Symbol = :left) where T
+  R = base_ring(A)
+
+  if side === :left
+    # For side == :left, we pretend that A and b are transposed
+    fl, _sol, _K = _can_solve_internal_no_check(HowellFormTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    return fl, data(_sol), data(_K)
+  end
+
+  AT = lazy_transpose(A)
+  B = hcat(AT, identity_matrix(AT, nrows(AT)))
+  if nrows(B) < ncols(B)
+    B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
+  end
+
+  howell_form!(B)
+
+  m = max(nrows(AT), ncols(AT))
+  H = view(B, 1:m, 1:ncols(AT))
+  U = view(B, 1:m, ncols(AT) + 1:ncols(B))
+
+  fl, sol = _can_solve_with_hnf(b, H, U, task)
+  if !fl || task !== :with_kernel
+    return fl, sol, zero(A, 0, 0)
+  end
+
+  N = _kernel_of_howell_form(A, B)
+  return true, sol, N
+end
+
 # _can_solve_internal_no_check with LU factoring for SOLVE CONTEXT
 function _can_solve_internal_no_check(::LUTrait, C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
   if side === :right
@@ -806,6 +914,38 @@ function _can_solve_internal_no_check(::HermiteFormTrait, C::SolveCtx{T}, b::Mat
   end
 
   return true, sol, kernel(C, side = side)
+end
+
+# _can_solve_internal_no_check with Howell form for SOLVE CONTEXT
+function _can_solve_internal_no_check(::HowellFormTrait, C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
+  if side === :right
+    A = matrix(C)
+    B = reduced_matrix_of_transpose(C)
+    m = max(ncols(A), nrows(A))
+    H = view(B, 1:m, 1:nrows(A))
+    U = view(B, 1:m, nrows(A) + 1:ncols(B))
+
+    fl, sol = _can_solve_with_hnf(b, H, U, task)
+    if !fl || task !== :with_kernel
+      return fl, sol, zero(b, 0, 0)
+    end
+
+    return fl, sol, kernel(C, side = :right)
+  else# side === :left
+    A = matrix(C)
+    B = reduced_matrix(C)
+    m = max(ncols(A), nrows(A))
+    H = view(B, 1:m, 1:ncols(A))
+    U = view(B, 1:m, ncols(A) + 1:ncols(B))
+
+    fl, sol_transp = _can_solve_with_hnf(lazy_transpose(b), H, U, task)
+    sol = data(sol_transp)
+    if !fl || task !== :with_kernel
+      return fl, sol, zero(b, 0, 0)
+    end
+
+    return fl, sol, kernel(C, side = :left)
+  end
 end
 
 ################################################################################
@@ -1016,7 +1156,7 @@ function _kernel_of_rref(R::MatElem{T}, r::Int, pivots::Vector{Int}) where T <: 
   return nullity, X
 end
 
-# Solve Ax = b where H = U*transpose(A) is in HNF.
+# Solve Ax = b where H = U*transpose(A) is in Hermite form/Howell form.
 # Takes same options for `task` as _can_solve_internal but only returns (flag, solution)
 # and no kernel.
 function _can_solve_with_hnf(b::MatElem{T}, H::MatElem{T}, U::MatElem{T}, task::Symbol) where T <: RingElement
@@ -1032,8 +1172,8 @@ function _can_solve_with_hnf(b::MatElem{T}, H::MatElem{T}, U::MatElem{T}, task::
       if k > ncols(H)
         continue
       end
-      q, r = divrem(b[k, i], H[j, k])
-      if !iszero(r)
+      fl, q = divides(b[k, i], H[j, k])
+      if !fl
         return false, zero(b, 0, 0)
       end
       for h = k:ncols(H)
@@ -1067,6 +1207,33 @@ function _kernel_of_hnf(A::MatElem{T}, H::MatElem{T}, U::MatElem{T}) where T <: 
     end
   end
   return nullity, N
+end
+
+# Compute a matrix N with AN == 0 where the columns of N generate the kernel
+# and H is the Howell form of
+# (A^t | I_n)
+# ( 0  |  0 ).
+# The matrix A is only used to get the return type right.
+function _kernel_of_howell_form(A::MatElem{T}, H::MatElem{T}) where T <: RingElement
+  r = 1
+  while r <= nrows(H) && !is_zero_row(H, r)
+    r += 1
+  end
+  r -= 1
+  h = view(H, 1:r, 1:nrows(A))
+  s = findfirst(i -> is_zero_row(h, i), 1:nrows(h))
+  if isnothing(s)
+    s = nrows(h)
+  else
+    s -= 1
+  end
+  N = zero(A, ncols(A), nrows(h) - s)
+  for i in 1:nrows(N)
+    for j in 1:ncols(N)
+      N[i, j] = H[s + j, nrows(A) + i]
+    end
+  end
+  return N
 end
 
 # Copied from Hecke, to be replaced with echelon_form_with_transformation eventually
