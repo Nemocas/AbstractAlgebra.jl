@@ -243,6 +243,8 @@ export hnf_with_transform
 export hom
 export hom_direct_sum
 export hooklength
+export howell_form
+export howell_form_with_transformation
 export ideal
 export identity_map
 export identity_matrix
