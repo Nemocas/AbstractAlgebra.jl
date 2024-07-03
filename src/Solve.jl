@@ -97,6 +97,7 @@ end
 
 matrix_normal_form_type(::Field) = RREFTrait()
 
+# The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
 matrix_normal_form_type(::FracField) = FFLUTrait()
 matrix_normal_form_type(::AbstractAlgebra.Rationals{BigInt}) = FFLUTrait()
 matrix_normal_form_type(::FracField{T}) where {T <: PolyRingElem} = MatrixInterpolateTrait()
@@ -592,46 +593,13 @@ function kernel(A::Union{MatElem, SolveCtx}; side::Symbol = :left)
   return kernel(matrix_normal_form_type(A), A; side)
 end
 
-# We can't compute a kernel using a LU/FFLU factoring, so we have to fall back to rref
-function kernel(::LUTrait, A::Union{MatElem, SolveCtx}; side::Symbol = :left)
-  return kernel(RREFTrait(), A; side)
-end
-function kernel(::FFLUTrait, A::Union{MatElem, SolveCtx}; side::Symbol = :left)
-  return kernel(RREFTrait(), A; side)
-end
-function kernel(::MatrixInterpolateTrait, A::Union{MatElem, SolveCtx}; side::Symbol = :left)
-  return kernel(RREFTrait(), A; side)
-end
+################################################################################
+#
+#  Kernel methods
+#
+################################################################################
 
-function kernel(NF::RREFTrait, A::MatElem; side::Symbol = :left)
-  check_option(side, [:right, :left], "side")
-
-  if side === :left
-    KK = kernel(NF, lazy_transpose(A), side = :right)
-    return lazy_transpose(KK)::typeof(A)
-  end
-
-  n, K = AbstractAlgebra.nullspace(A)
-  if ncols(K) > n
-    # For compatibility with `nullspace` methods in Nemo which add zero columns
-    K = sub(K, 1:nrows(K), 1:n)
-  end
-  return K
-end
-
-function kernel(::HermiteFormTrait, A::MatElem; side::Symbol = :left)
-  check_option(side, [:right, :left], "side")
-
-  if side === :right
-    HH, UU = hnf_with_transform(lazy_transpose(A))
-    return _kernel_of_hnf(A, HH, UU)[2]
-  else
-    H, U = hnf_with_transform(A)
-    _, X = _kernel_of_hnf(lazy_transpose(A), H, U)
-    # X is of type LazyTransposeMatElem
-    return data(X)
-  end
-end
+### HowellFormTrait
 
 function kernel(::HowellFormTrait, A::MatElem; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
@@ -649,41 +617,6 @@ function kernel(::HowellFormTrait, A::MatElem; side::Symbol = :left)
 
   howell_form!(B)
   return _kernel_of_howell_form(A, B)
-end
-
-function kernel(NF::RREFTrait, C::SolveCtx{<:FieldElement}; side::Symbol = :left)
-  check_option(side, [:right, :left], "side")
-
-  # I don't know how to compute the kernel using a LU factoring, so we call the
-  # "usual" method
-  if side === :right
-    if !isdefined(C, :kernel_right)
-      C.kernel_right = kernel(NF, matrix(C), side = :right)
-    end
-    return C.kernel_right
-  else
-    if !isdefined(C, :kernel_left)
-      C.kernel_left = kernel(NF, matrix(C), side = :left)
-    end
-    return C.kernel_left
-  end
-end
-
-function kernel(::HermiteFormTrait, C::SolveCtx; side::Symbol = :left)
-  check_option(side, [:right, :left], "side")
-
-  if side === :right
-    if !isdefined(C, :kernel_right)
-      C.kernel_right = _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))[2]
-    end
-    return C.kernel_right
-  else
-    if !isdefined(C, :kernel_left)
-      nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
-      C.kernel_left = data(X)
-    end
-    return C.kernel_left
-  end
 end
 
 function kernel(::HowellFormTrait, C::SolveCtx; side::Symbol = :left)
@@ -705,9 +638,92 @@ function kernel(::HowellFormTrait, C::SolveCtx; side::Symbol = :left)
   end
 end
 
+### HermiteFormTrait
+
+function kernel(::HermiteFormTrait, A::MatElem; side::Symbol = :left)
+  check_option(side, [:right, :left], "side")
+
+  if side === :right
+    HH, UU = hnf_with_transform(lazy_transpose(A))
+    return _kernel_of_hnf(A, HH, UU)[2]
+  else
+    H, U = hnf_with_transform(A)
+    _, X = _kernel_of_hnf(lazy_transpose(A), H, U)
+    # X is of type LazyTransposeMatElem
+    return data(X)
+  end
+end
+
+function kernel(::HermiteFormTrait, C::SolveCtx; side::Symbol = :left)
+  check_option(side, [:right, :left], "side")
+
+  if side === :right
+    if !isdefined(C, :kernel_right)
+      C.kernel_right = _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))[2]
+    end
+    return C.kernel_right
+  else
+    if !isdefined(C, :kernel_left)
+      nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
+      C.kernel_left = data(X)
+    end
+    return C.kernel_left
+  end
+end
+
+### RREFTrait
+
+function kernel(::RREFTrait, A::MatElem; side::Symbol = :left)
+  check_option(side, [:right, :left], "side")
+
+  if side === :left
+    KK = kernel(RREFTrait(), lazy_transpose(A), side = :right)
+    return lazy_transpose(KK)::typeof(A)
+  end
+
+  n, K = AbstractAlgebra.nullspace(A)
+  if ncols(K) > n
+    # For compatibility with `nullspace` methods in Nemo which add zero columns
+    K = sub(K, 1:nrows(K), 1:n)
+  end
+  return K
+end
+
+function kernel(::RREFTrait, C::SolveCtx; side::Symbol = :left)
+  check_option(side, [:right, :left], "side")
+
+  # I don't know how to compute the kernel using a LU factoring, so we call the
+  # "usual" method
+  if side === :right
+    if !isdefined(C, :kernel_right)
+      C.kernel_right = kernel(RREFTrait(), matrix(C), side = :right)
+    end
+    return C.kernel_right
+  else
+    if !isdefined(C, :kernel_left)
+      C.kernel_left = kernel(RREFTrait(), matrix(C), side = :left)
+    end
+    return C.kernel_left
+  end
+end
+
+### LUTrait / FFLUTrait / MatrixNormalFormTrait
+
+# We can't compute a kernel using a LU/FFLU factoring, so we have to fall back to RREF
+
+function kernel(::LUTrait, A::Union{MatElem, SolveCtx}; side::Symbol = :left)
+  return kernel(RREFTrait(), A; side)
+end
+function kernel(::FFLUTrait, A::Union{MatElem, SolveCtx}; side::Symbol = :left)
+  return kernel(RREFTrait(), A; side)
+end
+function kernel(::MatrixInterpolateTrait, A::Union{MatElem, SolveCtx}; side::Symbol = :left)
+  return kernel(RREFTrait(), A; side)
+end
+
 ################################################################################
 #
-#  Generic internal functionality
+#  Solving methods (internal)
 #
 ################################################################################
 
@@ -731,31 +747,6 @@ end
 #   for type stability
 # * :with_kernel -> A solution and the kernel is computed
 ###
-
-# A is supposed to be in rref of rank r
-# Return a Vector of length ncols(A) with the first r entries the pivot columns
-# of A and the following entries the non-pivot columns (in ascending order).
-function pivot_and_non_pivot_cols(A::MatElem, r::Int)
-  p = zeros(Int, ncols(A))
-  j = 1
-  k = 1
-  for i = 1:r
-    while is_zero_entry(A, i, j)
-      p[r + k] = j
-      j += 1
-      k += 1
-    end
-    p[i] = j
-    j += 1
-  end
-  while k <= ncols(A) - r
-    p[r + k] = j
-    j += 1
-    k += 1
-  end
-
-  return p
-end
 
 # Transform a right hand side of type Vector into a MatElem and do sanity checks
 function _can_solve_internal(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Vector{T}, task::Symbol; side::Symbol = :left) where T
@@ -792,7 +783,107 @@ function _can_solve_internal(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, Sol
   return _can_solve_internal_no_check(NF, A, b, task, side = side)
 end
 
-# _can_solve_internal_no_check with rref
+### HowellFormTrait
+
+function _can_solve_internal_no_check(::HowellFormTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
+  R = base_ring(A)
+
+  if side === :left
+    # For side == :left, we pretend that A and b are transposed
+    fl, _sol, _K = _can_solve_internal_no_check(HowellFormTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    return fl, data(_sol), data(_K)
+  end
+
+  AT = lazy_transpose(A)
+  B = hcat(AT, identity_matrix(AT, nrows(AT)))
+  if nrows(B) < ncols(B)
+    B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
+  end
+
+  howell_form!(B)
+
+  m = max(nrows(AT), ncols(AT))
+  H = view(B, 1:m, 1:ncols(AT))
+  U = view(B, 1:m, ncols(AT) + 1:ncols(B))
+
+  fl, sol = _can_solve_with_hnf(b, H, U, task)
+  if !fl || task !== :with_kernel
+    return fl, sol, zero(A, 0, 0)
+  end
+
+  N = _kernel_of_howell_form(A, B)
+  return true, sol, N
+end
+
+function _can_solve_internal_no_check(::HowellFormTrait, C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
+  if side === :right
+    A = matrix(C)
+    B = reduced_matrix_of_transpose(C)
+    m = max(ncols(A), nrows(A))
+    H = view(B, 1:m, 1:nrows(A))
+    U = view(B, 1:m, nrows(A) + 1:ncols(B))
+
+    fl, sol = _can_solve_with_hnf(b, H, U, task)
+    if !fl || task !== :with_kernel
+      return fl, sol, zero(b, 0, 0)
+    end
+
+    return fl, sol, kernel(C, side = :right)
+  else# side === :left
+    A = matrix(C)
+    B = reduced_matrix(C)
+    m = max(ncols(A), nrows(A))
+    H = view(B, 1:m, 1:ncols(A))
+    U = view(B, 1:m, ncols(A) + 1:ncols(B))
+
+    fl, sol_transp = _can_solve_with_hnf(lazy_transpose(b), H, U, task)
+    sol = data(sol_transp)
+    if !fl || task !== :with_kernel
+      return fl, sol, zero(b, 0, 0)
+    end
+
+    return fl, sol, kernel(C, side = :left)
+  end
+end
+
+### HermiteFormTrait
+
+function _can_solve_internal_no_check(::HermiteFormTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
+
+  R = base_ring(A)
+
+  if side === :left
+    # For side == :left, we pretend that A and b are transposed
+    fl, _sol, _K = _can_solve_internal_no_check(HermiteFormTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    return fl, data(_sol), data(_K)
+  end
+
+  H, S = hnf_with_transform(lazy_transpose(A))
+  fl, sol = _can_solve_with_hnf(b, H, S, task)
+  if !fl || task !== :with_kernel
+    return fl, sol, zero(A, 0, 0)
+  end
+
+  n, N = _kernel_of_hnf(A, H, S)
+  return true, sol, N
+end
+
+function _can_solve_internal_no_check(::HermiteFormTrait, C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
+  if side === :right
+    fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
+  else
+    fl, _sol = _can_solve_with_hnf(lazy_transpose(b), reduced_matrix(C), transformation_matrix(C), task)
+    sol = data(_sol)
+  end
+  if !fl || task !== :with_kernel
+    return fl, sol, zero(b, 0, 0)
+  end
+
+  return true, sol, kernel(C, side = side)
+end
+
+### RREFTrait
+
 function _can_solve_internal_no_check(::RREFTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
 
   R = base_ring(A)
@@ -838,60 +929,12 @@ function _can_solve_internal_no_check(::RREFTrait, A::MatElem{T}, b::MatElem{T},
   return true, sol, X
 end
 
-# _can_solve_internal_no_check with Hermite form
-function _can_solve_internal_no_check(::HermiteFormTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
+# RREFTrait with SolveCtx is not implemented
 
-  R = base_ring(A)
+### LUTrait
 
-  if side === :left
-    # For side == :left, we pretend that A and b are transposed
-    fl, _sol, _K = _can_solve_internal_no_check(HermiteFormTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
-    return fl, data(_sol), data(_K)
-  end
+# LUTrait with MatElem is not implemented
 
-  H, S = hnf_with_transform(lazy_transpose(A))
-  fl, sol = _can_solve_with_hnf(b, H, S, task)
-  if !fl || task !== :with_kernel
-    return fl, sol, zero(A, 0, 0)
-  end
-
-  n, N = _kernel_of_hnf(A, H, S)
-  return true, sol, N
-end
-
-# _can_solve_internal_no_check with Howell form
-function Solve._can_solve_internal_no_check(::HowellFormTrait, A::MatElem{T}, b::MatElem{T},
-           task::Symbol; side::Symbol = :left) where T
-  R = base_ring(A)
-
-  if side === :left
-    # For side == :left, we pretend that A and b are transposed
-    fl, _sol, _K = _can_solve_internal_no_check(HowellFormTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
-    return fl, data(_sol), data(_K)
-  end
-
-  AT = lazy_transpose(A)
-  B = hcat(AT, identity_matrix(AT, nrows(AT)))
-  if nrows(B) < ncols(B)
-    B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
-  end
-
-  howell_form!(B)
-
-  m = max(nrows(AT), ncols(AT))
-  H = view(B, 1:m, 1:ncols(AT))
-  U = view(B, 1:m, ncols(AT) + 1:ncols(B))
-
-  fl, sol = _can_solve_with_hnf(b, H, U, task)
-  if !fl || task !== :with_kernel
-    return fl, sol, zero(A, 0, 0)
-  end
-
-  N = _kernel_of_howell_form(A, B)
-  return true, sol, N
-end
-
-# _can_solve_internal_no_check with LU factoring for SOLVE CONTEXT
 function _can_solve_internal_no_check(::LUTrait, C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
   if side === :right
     fl, sol = _can_solve_with_lu(matrix(C), b, reduced_matrix(C), lu_permutation(C), rank(C))
@@ -906,61 +949,7 @@ function _can_solve_internal_no_check(::LUTrait, C::SolveCtx{T}, b::MatElem{T}, 
   return true, sol, kernel(C, side = side)
 end
 
-# _can_solve_internal_no_check with Hermite form for SOLVE CONTEXT
-function _can_solve_internal_no_check(::HermiteFormTrait, C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
-  if side === :right
-    fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
-  else
-    fl, _sol = _can_solve_with_hnf(lazy_transpose(b), reduced_matrix(C), transformation_matrix(C), task)
-    sol = data(_sol)
-  end
-  if !fl || task !== :with_kernel
-    return fl, sol, zero(b, 0, 0)
-  end
-
-  return true, sol, kernel(C, side = side)
-end
-
-# _can_solve_internal_no_check with Howell form for SOLVE CONTEXT
-function _can_solve_internal_no_check(::HowellFormTrait, C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
-  if side === :right
-    A = matrix(C)
-    B = reduced_matrix_of_transpose(C)
-    m = max(ncols(A), nrows(A))
-    H = view(B, 1:m, 1:nrows(A))
-    U = view(B, 1:m, nrows(A) + 1:ncols(B))
-
-    fl, sol = _can_solve_with_hnf(b, H, U, task)
-    if !fl || task !== :with_kernel
-      return fl, sol, zero(b, 0, 0)
-    end
-
-    return fl, sol, kernel(C, side = :right)
-  else# side === :left
-    A = matrix(C)
-    B = reduced_matrix(C)
-    m = max(ncols(A), nrows(A))
-    H = view(B, 1:m, 1:ncols(A))
-    U = view(B, 1:m, ncols(A) + 1:ncols(B))
-
-    fl, sol_transp = _can_solve_with_hnf(lazy_transpose(b), H, U, task)
-    sol = data(sol_transp)
-    if !fl || task !== :with_kernel
-      return fl, sol, zero(b, 0, 0)
-    end
-
-    return fl, sol, kernel(C, side = :left)
-  end
-end
-
-################################################################################
-#
-#  Special internal functonality
-#
-################################################################################
-
-# _can_solve_internal_no_check methods which only work or are efficient for
-# certain types
+### FFLUTrait
 
 function _common_denominator(A::MatElem{T}) where T <: Union{FracElem, Rational{BigInt}}
   d = numerator(one(base_ring(A)))
@@ -972,7 +961,6 @@ function _common_denominator(A::MatElem{T}) where T <: Union{FracElem, Rational{
   return d
 end
 
-# The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
 function _can_solve_internal_no_check(::FFLUTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
 
   if side === :left
@@ -1062,6 +1050,8 @@ function _can_solve_internal_no_check_left(::FFLUTrait, C::SolveCtx{T}, b::MatEl
   end
 end
 
+### MatrixInterpolateTrait
+
 function _can_solve_internal_no_check(::MatrixInterpolateTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
 
   if side === :left
@@ -1099,6 +1089,8 @@ function _can_solve_internal_no_check(::MatrixInterpolateTrait, A::MatElem{T}, b
   end
 end
 
+# MatrixInterpolateTrait with SolveCtx is not implemented
+
 ################################################################################
 #
 #  Internals for solving of row reduced matrices
@@ -1127,6 +1119,31 @@ function _can_solve_with_rref(b::MatElem{T}, U::MatElem{T}, r::Int, pivots::Vect
     end
   end
   return true, sol
+end
+
+# A is supposed to be in rref of rank r
+# Return a Vector of length ncols(A) with the first r entries the pivot columns
+# of A and the following entries the non-pivot columns (in ascending order).
+function pivot_and_non_pivot_cols(A::MatElem, r::Int)
+  p = zeros(Int, ncols(A))
+  j = 1
+  k = 1
+  for i = 1:r
+    while is_zero_entry(A, i, j)
+      p[r + k] = j
+      j += 1
+      k += 1
+    end
+    p[i] = j
+    j += 1
+  end
+  while k <= ncols(A) - r
+    p[r + k] = j
+    j += 1
+    k += 1
+  end
+
+  return p
 end
 
 # Solve Ax = b with LU and p a LU decomposition of A of rank r.

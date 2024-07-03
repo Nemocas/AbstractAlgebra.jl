@@ -85,7 +85,7 @@
   @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
 end
 
-@testset "Linear solving over $R" for R in [ QQ, ZZ, GF(101), fraction_field(QQ["x"][1]), residue_ring(ZZ, 16)[1] ]
+@testset "Linear solving context over $R" for R in [ QQ, ZZ, GF(101), fraction_field(QQ["x"][1]), residue_ring(ZZ, 16)[1] ]
   M = matrix(R, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = AbstractAlgebra.Solve.solve_init(M)
 
