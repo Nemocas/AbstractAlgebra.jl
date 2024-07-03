@@ -692,8 +692,6 @@ end
 function kernel(::RREFTrait, C::SolveCtx; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
-  # I don't know how to compute the kernel using a LU factoring, so we call the
-  # "usual" method
   if side === :right
     if !isdefined(C, :kernel_right)
       C.kernel_right = kernel(RREFTrait(), matrix(C), side = :right)
