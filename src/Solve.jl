@@ -949,7 +949,7 @@ function _can_solve_internal_no_check(::LUTrait, C::SolveCtx{T}, b::MatElem{T}, 
   return true, sol, kernel(C, side = side)
 end
 
-### FFLUTrait
+### FFLUTrait / MatrixInterpolateTrait
 
 function _common_denominator(A::MatElem{T}) where T <: Union{FracElem, Rational{BigInt}}
   d = numerator(one(base_ring(A)))
@@ -961,10 +961,10 @@ function _common_denominator(A::MatElem{T}) where T <: Union{FracElem, Rational{
   return d
 end
 
-function _can_solve_internal_no_check(::FFLUTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
+function _can_solve_internal_no_check(NF::Union{FFLUTrait, MatrixInterpolateTrait}, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
 
   if side === :left
-    fl, _sol, _K = _can_solve_internal_no_check(FFLUTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check(NF, lazy_transpose(A), lazy_transpose(b), task, side = :right)
     # This does not return LazyTransposedMat for sol because the matrices are made integral
     return fl, transpose(_sol), data(_K)
   end
@@ -973,7 +973,24 @@ function _can_solve_internal_no_check(::FFLUTrait, A::MatElem{T}, b::MatElem{T},
 
   Aint = matrix(parent(d), nrows(A), ncols(A), [numerator(A[i, j]*d) for i in 1:nrows(A) for j in 1:ncols(A)])
   bint = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
-  flag, sol_int, den = _can_solve_with_solution_fflu(Aint, bint)
+
+  flag = false
+  sol_int = similar(Aint, ncols(Aint), nrows(bint))
+  den = one(base_ring(A))
+  if NF isa MatrixInterpolateTrait
+    try
+      flag, sol_int, den = _can_solve_with_solution_interpolation(Aint, bint)
+    catch
+      flag, sol_int, den = _can_solve_with_solution_fflu(Aint, bint)
+    end
+  else
+    flag, sol_int, den = _can_solve_with_solution_fflu(Aint, bint)
+  end
+
+  if !flag
+    return flag, zero_matrix(base_ring(A), 0, 0), zero(b, 0, 0)
+  end
+
   sol = change_base_ring(base_ring(A), sol_int)
   sol = divexact(sol, base_ring(A)(den))
 
@@ -1047,45 +1064,6 @@ function _can_solve_internal_no_check_left(::FFLUTrait, C::SolveCtx{T}, b::MatEl
     return fl, y, kernel(RREFTrait(), C, side = :left)
   else
     return fl, y, zero(b, 0, 0)
-  end
-end
-
-### MatrixInterpolateTrait
-
-function _can_solve_internal_no_check(::MatrixInterpolateTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
-
-  if side === :left
-    fl, _sol, _K = _can_solve_internal_no_check(MatrixInterpolateTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
-    # This does not return a LazyTransposedMat for sol because the matrices are made integral
-    return fl, transpose(_sol), data(_K)
-  end
-
-  d = lcm(_common_denominator(A), _common_denominator(b))
-
-  Aint = matrix(parent(d), nrows(A), ncols(A), [numerator(A[i, j]*d) for i in 1:nrows(A) for j in 1:ncols(A)])
-  bint = matrix(parent(d), nrows(b), ncols(b), [numerator(b[i, j]*d) for i in 1:nrows(b) for j in 1:ncols(b)])
-
-  flag = false
-  sol_int = similar(Aint, ncols(Aint), nrows(bint))
-  den = one(base_ring(A))
-  try
-    flag, sol_int, den = _can_solve_with_solution_interpolation(Aint, bint)
-  catch
-    flag, sol_int, den = _can_solve_with_solution_fflu(Aint, bint)
-  end
-
-  if !flag
-    return flag, zero_matrix(base_ring(A), 0, 0), zero(b, 0, 0)
-  end
-
-  sol = change_base_ring(base_ring(A), sol_int)
-  sol = divexact(sol, base_ring(A)(den))
-
-  if task === :with_kernel
-    # I don't know how to compute the kernel using an (ff)lu factoring
-    return flag, sol, kernel(A, side = :right)
-  else
-    return flag, sol, zero(A, 0, 0)
   end
 end
 
