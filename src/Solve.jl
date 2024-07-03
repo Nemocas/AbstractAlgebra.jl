@@ -599,6 +599,9 @@ end
 function kernel(::FFLUTrait, A::Union{MatElem, SolveCtx}; side::Symbol = :left)
   return kernel(RREFTrait(), A; side)
 end
+function kernel(::MatrixInterpolateTrait, A::Union{MatElem, SolveCtx}; side::Symbol = :left)
+  return kernel(RREFTrait(), A; side)
+end
 
 function kernel(NF::RREFTrait, A::MatElem; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
@@ -1079,6 +1082,10 @@ function _can_solve_internal_no_check(::MatrixInterpolateTrait, A::MatElem{T}, b
     flag, sol_int, den = _can_solve_with_solution_interpolation(Aint, bint)
   catch
     flag, sol_int, den = _can_solve_with_solution_fflu(Aint, bint)
+  end
+
+  if !flag
+    return flag, zero_matrix(base_ring(A), 0, 0), zero(b, 0, 0)
   end
 
   sol = change_base_ring(base_ring(A), sol_int)
