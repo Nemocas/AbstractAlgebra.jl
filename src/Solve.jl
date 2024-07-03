@@ -81,7 +81,7 @@ abstract type MatrixNormalFormTrait end
 
 struct HowellFormTrait <: MatrixNormalFormTrait end # Howell form for PIR
 struct HermiteFormTrait <: MatrixNormalFormTrait end # Hermite form for PID
-struct RrefTrait <: MatrixNormalFormTrait end # Row-reduced echelon form for fields
+struct RREFTrait <: MatrixNormalFormTrait end # Row-reduced echelon form for fields
 struct LUTrait <: MatrixNormalFormTrait end # LU factoring for fields
 struct FFLUTrait <: MatrixNormalFormTrait end # "fraction free" LU factoring for fraction fields
 struct MatrixInterpolateTrait <: MatrixNormalFormTrait end # interpolate in fraction fields of polynomial rings
@@ -94,11 +94,12 @@ function matrix_normal_form_type(R::Ring)
   end
 end
 
-matrix_normal_form_type(::Field) = RrefTrait()
+matrix_normal_form_type(::Field) = RREFTrait()
 
 matrix_normal_form_type(::FracField) = FFLUTrait()
 matrix_normal_form_type(::AbstractAlgebra.Rationals{BigInt}) = FFLUTrait()
 matrix_normal_form_type(::FracField{T}) where {T <: PolyRingElem} = MatrixInterpolateTrait()
+
 matrix_normal_form_type(A::MatElem) = matrix_normal_form_type(base_ring(A))
 
 ################################################################################
@@ -222,11 +223,8 @@ end
 
 matrix_normal_form_type(C::SolveCtx) = matrix_normal_form_type(base_ring(C))
 
-# Overwrite RrefTrait for fields
+# Overwrite RREFTrait for fields
 matrix_normal_form_type(C::SolveCtx{<:FieldElement}) = LUTrait()
-function matrix_normal_form_type(C::SolveCtx{T}) where {T <: Union{Rational{BigInt}, FracElem}}
-  return FFLUTrait()
-end
 
 matrix(C::SolveCtx) = C.A
 
@@ -555,13 +553,13 @@ end
 
 # We can't compute a kernel using a LU/FFLU factoring, so we have to fall back to rref
 function kernel(::LUTrait, A::Union{MatElem, SolveCtx}; side::Symbol = :left)
-  return kernel(RrefTrait(), A; side)
+  return kernel(RREFTrait(), A; side)
 end
 function kernel(::FFLUTrait, A::Union{MatElem, SolveCtx}; side::Symbol = :left)
-  return kernel(RrefTrait(), A; side)
+  return kernel(RREFTrait(), A; side)
 end
 
-function kernel(NF::RrefTrait, A::MatElem; side::Symbol = :left)
+function kernel(NF::RREFTrait, A::MatElem; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   if side === :left
@@ -591,7 +589,7 @@ function kernel(::HermiteFormTrait, A::MatElem; side::Symbol = :left)
   end
 end
 
-function kernel(NF::RrefTrait, C::SolveCtx{<:FieldElement}; side::Symbol = :left)
+function kernel(NF::RREFTrait, C::SolveCtx{<:FieldElement}; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   # I don't know how to compute the kernel using a LU factoring, so we call the
@@ -714,13 +712,13 @@ function _can_solve_internal(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, Sol
 end
 
 # _can_solve_internal_no_check with rref
-function _can_solve_internal_no_check(::RrefTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
+function _can_solve_internal_no_check(::RREFTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
 
   R = base_ring(A)
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, _sol, _K = _can_solve_internal_no_check(RrefTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check(RREFTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
     return fl, data(_sol), data(_K)
   end
 
@@ -884,7 +882,7 @@ function _can_solve_internal_no_check_right(::FFLUTrait, C::SolveCtx{T}, b::MatE
   end
   if task === :with_kernel
     # I don't know how to compute the kernel using an (ff)lu factoring
-    return fl, y, kernel(RrefTrait(), C, side = :right)
+    return fl, y, kernel(RREFTrait(), C, side = :right)
   else
     return fl, y, zero(b, 0, 0)
   end
@@ -913,7 +911,7 @@ function _can_solve_internal_no_check_left(::FFLUTrait, C::SolveCtx{T}, b::MatEl
   end
   if task === :with_kernel
     # I don't know how to compute the kernel using an (ff)lu factoring
-    return fl, y, kernel(RrefTrait(), C, side = :left)
+    return fl, y, kernel(RREFTrait(), C, side = :left)
   else
     return fl, y, zero(b, 0, 0)
   end
