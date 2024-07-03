@@ -225,7 +225,9 @@ end
 matrix_normal_form_type(C::SolveCtx) = matrix_normal_form_type(base_ring(C))
 
 # Overwrite RREFTrait for fields
-matrix_normal_form_type(C::SolveCtx{<:FieldElement}) = LUTrait()
+matrix_normal_form_type(::SolveCtx{<:FieldElement}) = LUTrait()
+# Set it back for fraction fields
+matrix_normal_form_type(::SolveCtx{<:Union{FracElem, Rational{BigInt}}}) = FFLUTrait()
 
 matrix(C::SolveCtx) = C.A
 
