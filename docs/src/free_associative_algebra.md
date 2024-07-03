@@ -237,6 +237,11 @@ to the function, to only compute a partial Groebner basis.
     interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
 ```
 
+The implementation uses a non-commutative version of the Buchberger algorithm as described in
+> Xingqiang Xiu,
+> Non-commutative Gröbner Bases and Applications,
+> PhD thesis, 2012.
+
 **Examples**
 
 ```jldoctest; setup = :(using AbstractAlgebra)
