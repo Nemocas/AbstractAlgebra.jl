@@ -606,7 +606,7 @@ function kernel(::HowellFormTrait, A::MatElem; side::Symbol = :left)
 
   if side === :left
     KK = kernel(HowellFormTrait(), lazy_transpose(A), side = :right)
-    return data(KK)
+    return lazy_transpose(KK)
   end
 
   AT = lazy_transpose(A)
@@ -632,7 +632,7 @@ function kernel(::HowellFormTrait, C::SolveCtx; side::Symbol = :left)
     if !isdefined(C, :kernel_left)
       B = reduced_matrix(C)
       X = _kernel_of_howell_form(lazy_transpose(matrix(C)), B)
-      C.kernel_left = data(X)
+      C.kernel_left = lazy_transpose(X)
     end
     return C.kernel_left
   end
@@ -649,8 +649,8 @@ function kernel(::HermiteFormTrait, A::MatElem; side::Symbol = :left)
   else
     H, U = hnf_with_transform(A)
     _, X = _kernel_of_hnf(lazy_transpose(A), H, U)
-    # X is of type LazyTransposeMatElem
-    return data(X)
+    # X is lazy transposed
+    return lazy_transpose(X)
   end
 end
 
@@ -665,7 +665,7 @@ function kernel(::HermiteFormTrait, C::SolveCtx; side::Symbol = :left)
   else
     if !isdefined(C, :kernel_left)
       nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
-      C.kernel_left = data(X)
+      C.kernel_left = lazy_transpose(X)
     end
     return C.kernel_left
   end
@@ -789,7 +789,7 @@ function _can_solve_internal_no_check(::HowellFormTrait, A::MatElem{T}, b::MatEl
   if side === :left
     # For side == :left, we pretend that A and b are transposed
     fl, _sol, _K = _can_solve_internal_no_check(HowellFormTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
-    return fl, data(_sol), data(_K)
+    return fl, lazy_transpose(_sol), lazy_transpose(_K)
   end
 
   AT = lazy_transpose(A)
@@ -835,7 +835,7 @@ function _can_solve_internal_no_check(::HowellFormTrait, C::SolveCtx{T}, b::MatE
     U = view(B, 1:m, ncols(A) + 1:ncols(B))
 
     fl, sol_transp = _can_solve_with_hnf(lazy_transpose(b), H, U, task)
-    sol = data(sol_transp)
+    sol = lazy_transpose(sol_transp)
     if !fl || task !== :with_kernel
       return fl, sol, zero(b, 0, 0)
     end
@@ -853,7 +853,7 @@ function _can_solve_internal_no_check(::HermiteFormTrait, A::MatElem{T}, b::MatE
   if side === :left
     # For side == :left, we pretend that A and b are transposed
     fl, _sol, _K = _can_solve_internal_no_check(HermiteFormTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
-    return fl, data(_sol), data(_K)
+    return fl, lazy_transpose(_sol), lazy_transpose(_K)
   end
 
   H, S = hnf_with_transform(lazy_transpose(A))
@@ -871,7 +871,7 @@ function _can_solve_internal_no_check(::HermiteFormTrait, C::SolveCtx{T}, b::Mat
     fl, sol = _can_solve_with_hnf(b, reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C), task)
   else
     fl, _sol = _can_solve_with_hnf(lazy_transpose(b), reduced_matrix(C), transformation_matrix(C), task)
-    sol = data(_sol)
+    sol = lazy_transpose(_sol)
   end
   if !fl || task !== :with_kernel
     return fl, sol, zero(b, 0, 0)
@@ -889,7 +889,7 @@ function _can_solve_internal_no_check(::RREFTrait, A::MatElem{T}, b::MatElem{T},
   if side === :left
     # For side == :left, we pretend that A and b are transposed
     fl, _sol, _K = _can_solve_internal_no_check(RREFTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
-    return fl, data(_sol), data(_K)
+    return fl, lazy_transpose(_sol), lazy_transpose(_K)
   end
 
   mu = hcat(deepcopy(A), deepcopy(b))
@@ -938,7 +938,7 @@ function _can_solve_internal_no_check(::LUTrait, C::SolveCtx{T}, b::MatElem{T}, 
     fl, sol = _can_solve_with_lu(matrix(C), b, reduced_matrix(C), lu_permutation(C), rank(C))
   else
     fl, _sol = _can_solve_with_lu(lazy_transpose(matrix(C)), lazy_transpose(b), reduced_matrix_of_transpose(C), lu_permutation_of_transpose(C), rank(C))
-    sol = data(_sol)
+    sol = lazy_transpose(_sol)
   end
   if !fl || task !== :with_kernel
     return fl, sol, zero(b, 0, 0)
@@ -964,7 +964,7 @@ function _can_solve_internal_no_check(NF::Union{FFLUTrait, MatrixInterpolateTrai
   if side === :left
     fl, _sol, _K = _can_solve_internal_no_check(NF, lazy_transpose(A), lazy_transpose(b), task, side = :right)
     # This does not return LazyTransposedMat for sol because the matrices are made integral
-    return fl, transpose(_sol), data(_K)
+    return fl, transpose(_sol), lazy_transpose(_K)
   end
 
   d = lcm(_common_denominator(A), _common_denominator(b))
