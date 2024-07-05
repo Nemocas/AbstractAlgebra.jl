@@ -604,19 +604,24 @@ end
 function kernel(::HowellFormTrait, A::MatElem; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
-  if side === :left
-    KK = kernel(HowellFormTrait(), lazy_transpose(A), side = :right)
-    return lazy_transpose(KK)
-  end
+  if side === :right
+    AT = lazy_transpose(A)
+    B = hcat(AT, identity_matrix(AT, nrows(AT)))
+    if nrows(B) < ncols(B)
+      B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
+    end
 
-  AT = lazy_transpose(A)
-  B = hcat(AT, identity_matrix(AT, nrows(AT)))
-  if nrows(B) < ncols(B)
-    B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
-  end
+    howell_form!(B)
+    return lazy_transpose(_kernel_of_howell_form(B, nrows(A), ncols(A)))
+  else
+    B = hcat(A, identity_matrix(A, nrows(A)))
+    if nrows(B) < ncols(B)
+      B = vcat(B, zero(A, ncols(B) - nrows(B), ncols(B)))
+    end
 
-  howell_form!(B)
-  return _kernel_of_howell_form(A, B)
+    howell_form!(B)
+    return _kernel_of_howell_form(B, ncols(A), nrows(A))
+  end
 end
 
 function kernel(::HowellFormTrait, C::SolveCtx; side::Symbol = :left)
@@ -625,14 +630,13 @@ function kernel(::HowellFormTrait, C::SolveCtx; side::Symbol = :left)
   if side === :right
     if !isdefined(C, :kernel_right)
       B = reduced_matrix_of_transpose(C)
-      C.kernel_right = _kernel_of_howell_form(matrix(C), B)
+      C.kernel_right = lazy_transpose(_kernel_of_howell_form(B, nrows(C), ncols(C)))
     end
     return C.kernel_right
   else
     if !isdefined(C, :kernel_left)
       B = reduced_matrix(C)
-      X = _kernel_of_howell_form(lazy_transpose(matrix(C)), B)
-      C.kernel_left = lazy_transpose(X)
+      C.kernel_left = _kernel_of_howell_form(B, ncols(C), nrows(C))
     end
     return C.kernel_left
   end
@@ -644,13 +648,13 @@ function kernel(::HermiteFormTrait, A::MatElem; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   if side === :right
+    A = hnf(A)
     HH, UU = hnf_with_transform(lazy_transpose(A))
-    return _kernel_of_hnf(A, HH, UU)[2]
+    return lazy_transpose(_kernel_of_hnf(HH, UU))
   else
+    A = lazy_transpose(hnf(lazy_transpose(A)))
     H, U = hnf_with_transform(A)
-    _, X = _kernel_of_hnf(lazy_transpose(A), H, U)
-    # X is lazy transposed
-    return lazy_transpose(X)
+    return _kernel_of_hnf(H, U)
   end
 end
 
@@ -659,13 +663,12 @@ function kernel(::HermiteFormTrait, C::SolveCtx; side::Symbol = :left)
 
   if side === :right
     if !isdefined(C, :kernel_right)
-      C.kernel_right = _kernel_of_hnf(matrix(C), reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C))[2]
+      C.kernel_right = lazy_transpose(_kernel_of_hnf(reduced_matrix_of_transpose(C), transformation_matrix_of_transpose(C)))
     end
     return C.kernel_right
   else
     if !isdefined(C, :kernel_left)
-      nullity, X = _kernel_of_hnf(lazy_transpose(matrix(C)), reduced_matrix(C), transformation_matrix(C))
-      C.kernel_left = lazy_transpose(X)
+      C.kernel_left = _kernel_of_hnf(reduced_matrix(C), transformation_matrix(C))
     end
     return C.kernel_left
   end
@@ -809,8 +812,8 @@ function _can_solve_internal_no_check(::HowellFormTrait, A::MatElem{T}, b::MatEl
     return fl, sol, zero(A, 0, 0)
   end
 
-  N = _kernel_of_howell_form(A, B)
-  return true, sol, N
+  N = _kernel_of_howell_form(B, nrows(A), ncols(A))
+  return true, sol, lazy_transpose(N)
 end
 
 function _can_solve_internal_no_check(::HowellFormTrait, C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
@@ -862,8 +865,8 @@ function _can_solve_internal_no_check(::HermiteFormTrait, A::MatElem{T}, b::MatE
     return fl, sol, zero(A, 0, 0)
   end
 
-  n, N = _kernel_of_hnf(A, H, S)
-  return true, sol, N
+  N = _kernel_of_hnf(H, S)
+  return true, sol, lazy_transpose(N)
 end
 
 function _can_solve_internal_no_check(::HermiteFormTrait, C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
@@ -1193,49 +1196,36 @@ function _can_solve_with_hnf(b::MatElem{T}, H::MatElem{T}, U::MatElem{T}, task::
   return true, lazy_transpose(U)*lazy_transpose(sol)
 end
 
-# Compute a matrix N with AN == 0 where the columns of N give a basis for the kernel
+# Compute a matrix N with A*transpose(N) == 0 where the rows of N give a basis for the kernel
 # and H = U*transpose(A) is in HNF.
-# The matrix A is only needed to get the return type right (MatElem vs LazyTransposeMatElem)
-function _kernel_of_hnf(A::MatElem{T}, H::MatElem{T}, U::MatElem{T}) where T <: RingElement
+function _kernel_of_hnf(H::MatElem{T}, U::MatElem{T}) where T <: RingElement
   r = nrows(H)
   while r > 0 && is_zero_row(H, r)
     r -= 1
   end
   nullity = nrows(H) - r
-  N = zero(A, nrows(H), nullity)
-  for i = 1:nrows(N)
-    for j = 1:ncols(N)
-      N[i, j] = U[r + j, i]
-    end
-  end
-  return nullity, N
+  return U[r + 1:r + nullity, 1:nrows(H)]
 end
 
-# Compute a matrix N with AN == 0 where the columns of N generate the kernel
+# Compute a matrix N with A*transpose(N) == 0 where the rows of N generate the kernel
 # and H is the Howell form of
 # (A^t | I_n)
 # ( 0  |  0 ).
-# The matrix A is only used to get the return type right.
-function _kernel_of_howell_form(A::MatElem{T}, H::MatElem{T}) where T <: RingElement
+# nrowsA and ncolsA are supposed to be the number of rows and columns of A.
+function _kernel_of_howell_form(H::MatElem{T}, nrowsA::Int, ncolsA::Int) where T <: RingElement
   r = 1
   while r <= nrows(H) && !is_zero_row(H, r)
     r += 1
   end
   r -= 1
-  h = view(H, 1:r, 1:nrows(A))
+  h = view(H, 1:r, 1:nrowsA)
   s = findfirst(i -> is_zero_row(h, i), 1:nrows(h))
   if isnothing(s)
     s = nrows(h)
   else
     s -= 1
   end
-  N = zero(A, ncols(A), nrows(h) - s)
-  for i in 1:nrows(N)
-    for j in 1:ncols(N)
-      N[i, j] = H[s + j, nrows(A) + i]
-    end
-  end
-  return N
+  return H[s + 1:nrows(h), nrowsA + 1:nrowsA + ncolsA]
 end
 
 ################################################################################
