@@ -241,11 +241,17 @@ function _init_reduce(::LUTrait, C::SolveCtx)
   end
 
   B = deepcopy(matrix(C))
-  p = one(SymmetricGroup(nrows(matrix(C))))
+  p = Perm(1:nrows(B))
   r = lu!(p, B)
   set_rank!(C, r)
   C.red = B
   C.lu_perm = p
+  if r < nrows(C)
+    pA = p*matrix(C)
+    C.permuted_matrix = pA[r + 1:nrows(C), :]
+  else
+    C.permuted_matrix = zero(matrix(C), 0, ncols(C))
+  end
   return nothing
 end
 
@@ -313,11 +319,17 @@ function _init_reduce_transpose(::LUTrait, C::SolveCtx)
   end
 
   B = lazy_transpose(deepcopy(matrix(C)))
-  p = one(SymmetricGroup(ncols(matrix(C))))
+  p = Perm(1:nrows(B))
   r = lu!(p, B)
   set_rank!(C, r)
   C.red_transp = B
   C.lu_perm_transp = p
+  if r < ncols(C)
+    Ap = matrix(C)*p
+    C.permuted_matrix_transp = Ap[:, r + 1:ncols(C)]
+  else
+    C.permuted_matrix_transp = zero(matrix(C), nrows(C), 0)
+  end
   return nothing
 end
 
@@ -938,10 +950,33 @@ end
 
 function _can_solve_internal_no_check(::LUTrait, C::SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
   if side === :right
-    fl, sol = _can_solve_with_lu(matrix(C), b, reduced_matrix(C), lu_permutation(C), rank(C))
+    p = lu_permutation(C)
+    LU = reduced_matrix(C)
+    r = rank(C)
+    sol = AbstractAlgebra._solve_lu_precomp(p, LU, b)
+
+    # _solve_lu_precomp only takes care of the first r rows
+    # We now need to check whether the remaining rows are fine as well
+    n = nrows(C)
+    fl = true
+    if r < n
+      b2 = p*b
+      fl = permuted_matrix(C)*sol == view(b2, r + 1:n, :)
+    end
   else
-    fl, _sol = _can_solve_with_lu(lazy_transpose(matrix(C)), lazy_transpose(b), reduced_matrix_of_transpose(C), lu_permutation_of_transpose(C), rank(C))
-    sol = lazy_transpose(_sol)
+    p = lu_permutation_of_transpose(C)
+    LU = reduced_matrix_of_transpose(C)
+    r = rank(C)
+    sol = lazy_transpose(AbstractAlgebra._solve_lu_precomp(p, LU, lazy_transpose(b)))
+
+    # _solve_lu_precomp only takes care of the first r rows
+    # We now need to check whether the remaining rows are fine as well
+    n = ncols(C)
+    fl = true
+    if r < n
+      b2 = b*p
+      fl = sol*permuted_matrix_of_transpose(C) == view(b2, :, r + 1:n)
+    end
   end
   if !fl || task !== :with_kernel
     return fl, sol, zero(b, 0, 0)
@@ -1123,25 +1158,6 @@ function pivot_and_non_pivot_cols(A::MatElem, r::Int)
   end
 
   return p
-end
-
-# Solve Ax = b with LU and p a LU decomposition of A of rank r.
-# Takes same options for `task` as _can_solve_internal but only returns (flag, solution)
-# and no kernel.
-function _can_solve_with_lu(A::MatElem{T}, b::MatElem{T}, LU::MatElem{T}, p::Generic.Perm, r::Int) where T <: FieldElement
-  y = AbstractAlgebra._solve_lu_precomp(p, LU, b)
-
-  # _solve_lu_precomp only takes care of the first r rows
-  # We now need to check whether the remaining rows are fine as well
-  n = nrows(A)
-  fl = true
-  if r < n
-    b2 = p*b
-    A2 = p*A
-    A3 = A2[r + 1:n, :]
-    fl = A3*y == b2[r + 1:n, :]
-  end
-  return fl, y
 end
 
 # Compute a matrix N with RN == 0 where the columns of N give a basis for the kernel.
