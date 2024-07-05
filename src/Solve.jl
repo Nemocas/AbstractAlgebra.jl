@@ -1238,18 +1238,6 @@ function _kernel_of_howell_form(A::MatElem{T}, H::MatElem{T}) where T <: RingEle
   return N
 end
 
-# Copied from Hecke, to be replaced with echelon_form_with_transformation eventually
-# Only used by Nemo
-function _rref_with_transformation(M::MatElem{T}) where T <: FieldElement
-  n = hcat(deepcopy(M), identity_matrix(base_ring(M), nrows(M)))
-  rref!(n)
-  s = nrows(n)
-  while s > 0 && iszero(sub(n, s:s, 1:ncols(M)))
-    s -= 1
-  end
-  return s, sub(n, 1:nrows(M), 1:ncols(M)), sub(n, 1:nrows(M), ncols(M)+1:ncols(n))
-end
-
 ################################################################################
 #
 #  Checks
