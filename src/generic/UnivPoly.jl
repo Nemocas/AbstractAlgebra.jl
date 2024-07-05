@@ -1016,11 +1016,6 @@ function mul!(a::UnivPoly{T, U}, b::UnivPoly{T, U}, c::UnivPoly{T, U}) where {T 
    return a
 end
 
-function addeq!(a::UnivPoly{T, U}, b::UnivPoly{T, U}) where {T <: RingElement, U}
-   a.p = (a + b).p
-   return a
-end
-
 function addmul!(a::UnivPoly{T, U}, b::UnivPoly{T, U}, c::UnivPoly{T, U}) where {T <: RingElement, U}
    a.p = (a + b*c).p
    return a
