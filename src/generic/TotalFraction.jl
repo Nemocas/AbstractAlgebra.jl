@@ -200,10 +200,10 @@ end
 
 function *(a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
    check_parent(a, b)
-   n1 = numerator(a, false)
-   d2 = denominator(b, false)
-   n2 = numerator(b, false)
    d1 = denominator(a, false)
+   d2 = denominator(b, false)
+   n1 = numerator(a, false)
+   n2 = numerator(b, false)
    if n1 == d2
       n = deepcopy(n2)
       d = deepcopy(d1)
@@ -404,10 +404,10 @@ function zero!(c::TotFrac)
 end
 
 function mul!(c::TotFrac{T}, a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
-   n1 = numerator(a, false)
-   d2 = denominator(b, false)
-   n2 = numerator(b, false)
    d1 = denominator(a, false)
+   d2 = denominator(b, false)
+   n1 = numerator(a, false)
+   n2 = numerator(b, false)
    if n1 == d2
       n = deepcopy(n2)
       d = deepcopy(d1)

@@ -832,7 +832,6 @@ function addeq!(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
    d2 = denominator(b, false)
    n1 = numerator(a, false)
    n2 = numerator(b, false)
-   gd = gcd(d1, d2)
    if d1 == d2
       a.num = addeq!(a.num, b.num)
       if !isone(d1)
@@ -854,6 +853,7 @@ function addeq!(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
       a.num = addeq!(a.num, n2*d1)
       a.den = deepcopy(d1)
    else
+      gd = gcd(d1, d2)
       if isone(gd)
          if n1 !== n2
             a.num = mul!(a.num, a.num, d2)
@@ -884,7 +884,6 @@ function add!(c::FracElem{T}, a::FracElem{T}, b::FracElem{T}) where {T <: RingEl
    d2 = denominator(b, false)
    n1 = numerator(a, false)
    n2 = numerator(b, false)
-   gd = gcd(d1, d2)
    if d1 == d2
       c.num = n1 + n2
       if isone(d1)
@@ -905,6 +904,7 @@ function add!(c::FracElem{T}, a::FracElem{T}, b::FracElem{T}) where {T <: RingEl
       c.num = n1 + n2*d1
       c.den = deepcopy(d1)
    else
+      gd = gcd(d1, d2)
       if isone(gd)
          c.num = n1*d2 + n2*d1
          c.den = d1*d2
