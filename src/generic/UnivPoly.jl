@@ -900,7 +900,7 @@ end
 ################################################################################
 
 function _change_univ_poly_ring(R, Rx, cached::Bool)
-   P, _ = polynomial_ring(R, map(string, symbols(Rx)), internal_ordering=internal_ordering(Rx), cached=cached)
+   P = MPolyRing{elem_type(R)}(R, symbols(Rx), internal_ordering(Rx), cached)
    S = universal_polynomial_ring(R; internal_ordering=internal_ordering(Rx), cached=cached)
    S.S = deepcopy(symbols(Rx))
    S.mpoly_ring = P
