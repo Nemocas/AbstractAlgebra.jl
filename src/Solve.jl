@@ -765,6 +765,7 @@ end
 function _can_solve_internal(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Vector{T}, task::Symbol; side::Symbol = :left) where T
   check_option(task, [:only_check, :with_solution, :with_kernel], "task")
   check_option(side, [:right, :left], "side")
+  @assert all(x -> parent(x) === base_ring(A), b) "Base rings do not match"
 
   isright = side === :right
 
@@ -788,6 +789,8 @@ end
 function _can_solve_internal(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
   check_option(task, [:only_check, :with_solution, :with_kernel], "task")
   check_option(side, [:right, :left], "side")
+  @assert base_ring(A) === base_ring(b) "Base rings do not match"
+
   if side === :right
     check_linear_system_dim_right(A, b)
   else

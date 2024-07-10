@@ -15,6 +15,12 @@
   @test_throws ArgumentError AbstractAlgebra.Solve.solve(M, [ R(1), R(2), R(3) ], side = :test)
   @test_throws ArgumentError AbstractAlgebra.Solve.solve(M, matrix(R, 3, 1, [ R(1), R(2), R(3) ]), side = :test)
 
+  if R isa AbstractAlgebra.GFField
+    RR = GF(2)
+    @test_throws AssertionError solve(M, [ RR(1), RR(2), RR(3) ])
+    @test_throws AssertionError solve(M, matrix(RR, 3, 1, [1, 2, 3]))
+  end
+
   for b in [ [ R(1), R(2), R(3) ],
              matrix(R, 3, 1, [ R(1), R(2), R(3) ]),
              matrix(R, 3, 2, [ R(1), R(2), R(3), R(4), R(5), R(6) ]) ]
@@ -102,6 +108,12 @@ end
   @test_throws ErrorException AbstractAlgebra.Solve.solve(C, matrix(R, 1, 1, [ R(1) ]), side = :right)
   @test_throws ArgumentError AbstractAlgebra.Solve.solve(C, [ R(1), R(2), R(3) ], side = :test)
   @test_throws ArgumentError AbstractAlgebra.Solve.solve(C, matrix(R, 3, 1, [ R(1), R(2), R(3) ]), side = :test)
+
+  if R isa AbstractAlgebra.GFField
+    RR = GF(2)
+    @test_throws AssertionError solve(C, [ RR(1), RR(2), RR(3) ])
+    @test_throws AssertionError solve(C, matrix(RR, 3, 1, [1, 2, 3]))
+  end
 
   for b in [ [ R(1), R(2), R(3) ],
              matrix(R, 3, 1, [ R(1), R(2), R(3) ]),
