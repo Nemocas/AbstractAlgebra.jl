@@ -187,6 +187,14 @@ end
   @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
 end
 
+@testset "Linear solving context with non-default normal form" begin
+  R = GF(101)
+  M = matrix(R, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
+  C = solve_init(M)
+  @test_throws AssertionError solve(AbstractAlgebra.Solve.RREFTrait(), C, [R(1), R(2), R(3)])
+  @test_throws AssertionError solve(AbstractAlgebra.Solve.RREFTrait(), C, matrix(R, 1, 3, [1, 2, 3]))
+end
+
 @testset "Lazy transpose" begin
   M = matrix(QQ, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   MT = AbstractAlgebra.Solve.lazy_transpose(M)

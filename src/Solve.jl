@@ -151,10 +151,6 @@ matrix_normal_form_type(A::MatElem) = matrix_normal_form_type(base_ring(A))
     z.rank = -1 # not known yet
     return z
   end
-
-  function SolveCtx(A::MatElem{T}) where T
-    return SolveCtx{T, typeof(A), typeof(A), LazyTransposeMatElem{T, typeof(A)}}(A)
-  end
 end
 
 function Base.show(io::IO, ::MIME"text/plain", C::SolveCtx)
@@ -767,6 +763,13 @@ function _can_solve_internal(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, Sol
   check_option(side, [:right, :left], "side")
   @assert all(x -> parent(x) === base_ring(A), b) "Base rings do not match"
 
+  if A isa SolveCtx
+    # We could support this, but then matrix_normal_form_type(::SolveCtx) and
+    # solve_context_type(...) would be non-trivially entangled which seems not
+    # worth the effort
+    @assert NF === matrix_normal_form_type(A) "Non-default matrix normal form $NF is not supported"
+  end
+
   isright = side === :right
 
   if isright
@@ -791,6 +794,10 @@ function _can_solve_internal(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, Sol
   check_option(side, [:right, :left], "side")
   @assert base_ring(A) === base_ring(b) "Base rings do not match"
 
+  if A isa SolveCtx
+    @assert NF === matrix_normal_form_type(A) "Non-default matrix normal form $NF is not supported"
+  end
+
   if side === :right
     check_linear_system_dim_right(A, b)
   else
@@ -802,7 +809,6 @@ end
 ### HowellFormTrait
 
 function _can_solve_internal_no_check(::HowellFormTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
-  R = base_ring(A)
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
@@ -865,9 +871,6 @@ end
 ### HermiteFormTrait
 
 function _can_solve_internal_no_check(::HermiteFormTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
-
-  R = base_ring(A)
-
   if side === :left
     # For side == :left, we pretend that A and b are transposed
     fl, _sol, _K = _can_solve_internal_no_check(HermiteFormTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
@@ -901,9 +904,6 @@ end
 ### RREFTrait
 
 function _can_solve_internal_no_check(::RREFTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
-
-  R = base_ring(A)
-
   if side === :left
     # For side == :left, we pretend that A and b are transposed
     fl, _sol, _K = _can_solve_internal_no_check(RREFTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
@@ -939,13 +939,13 @@ function _can_solve_internal_no_check(::RREFTrait, A::MatElem{T}, b::MatElem{T},
     for j = 1:rk
       X[p[j], i] = -mu[j, p[rk + i]]
     end
-    X[p[rk + i], i] = one(R)
+    X[p[rk + i], i] = one(base_ring(A))
   end
 
   return true, sol, X
 end
 
-# RREFTrait with SolveCtx is not implemented
+# RREFTrait with SolveCtx is not implemented (it is in Nemo)
 
 ### LUTrait
 
