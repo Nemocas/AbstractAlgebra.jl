@@ -113,6 +113,7 @@ export addeq!
 export addmul!
 export addmul_delayed_reduction!
 export allow_unicode
+export annihilator
 export base_field
 export base_ring
 export base_ring_type
