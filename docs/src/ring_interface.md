@@ -812,7 +812,7 @@ using AbstractAlgebra
 using Random: Random, SamplerTrivial, GLOBAL_RNG
 using RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
-import AbstractAlgebra: parent_type, elem_type, base_ring, parent, is_domain_type,
+import AbstractAlgebra: parent_type, elem_type, base_ring, base_ring_type, parent, is_domain_type,
        is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
        get_cached!, is_unit, characteristic, Ring, RingElem, expressify
 
@@ -846,7 +846,7 @@ parent_type(::Type{ConstPoly{T}}) where T <: RingElement = ConstPolyRing{T}
 
 elem_type(::Type{ConstPolyRing{T}}) where T <: RingElement = ConstPoly{T}
 
-base_ring_type(::Type{ConstPoly{T}}) where T <: RingElement = parent_type(T)
+base_ring_type(::Type{ConstPolyRing{T}}) where T <: RingElement = parent_type(T)
 
 base_ring(R::ConstPolyRing) = R.base_ring::base_ring_type(R)
 
