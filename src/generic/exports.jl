@@ -49,7 +49,6 @@ export invmod
 export is_compatible
 export is_divisible_by
 export is_free
-export is_homogeneous
 export is_power
 export is_rimhook
 export is_submodule

@@ -635,31 +635,6 @@ function is_gen(x::MPoly{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    is_homogeneous(x::MPoly{T}) where {T <: RingElement}
-
-Return `true` if the given polynomial is homogeneous with respect to the standard grading and `false` otherwise.
-"""
-function is_homogeneous(x::MPoly{T}) where {T <: RingElement}
-   last_deg = 0
-   is_first = true
-
-   for e in exponent_vectors(x)
-      d = sum(e)
-      if !is_first
-         if d != last_deg
-            return false
-         else
-            last_deg = d
-         end
-      else
-         is_first = false
-         last_deg = d
-      end
-   end
-   return true
-end
-
-@doc raw"""
     coeff(x::MPoly, i::Int)
 
 Return the coefficient of the $i$-th term of the polynomial.

@@ -19,9 +19,9 @@
          y, z = gens(S, ["y", "z"])
          @test y == S[2]
 
-         @test elem_type(S) == Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}
-         @test elem_type(Generic.UniversalPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}
-         @test parent_type(Generic.UnivPoly{elem_type(R), Generic.MPoly{elem_type(R)}}) == Generic.UniversalPolyRing{elem_type(R), Generic.MPoly{elem_type(R)}}
+         @test elem_type(S) == Generic.UnivPoly{elem_type(R), mpoly_type(R)}
+         @test elem_type(Generic.UniversalPolyRing{elem_type(R), mpoly_type(R)}) == Generic.UnivPoly{elem_type(R), mpoly_type(R)}
+         @test parent_type(Generic.UnivPoly{elem_type(R), mpoly_type(R)}) == Generic.UniversalPolyRing{elem_type(R), mpoly_type(R)}
 
          @test base_ring(S) === R
          @test coefficient_ring(S) === R
@@ -998,14 +998,14 @@ end
          ug = canonical_unit(g)
          uh = canonical_unit(h)
 
-         @test gcd(f, f) == divexact(f, uf)
-         @test gcd(f*g, f) == divexact(f, uf)
-         @test gcd(f*h, f) == divexact(f, uf)
+         @test iszero(uf) || gcd(f, f) == divexact(f, uf)
+         @test iszero(uf) || gcd(f*g, f) == divexact(f, uf)
+         @test iszero(uf) || gcd(f*h, f) == divexact(f, uf)
 
-         @test gcd(g, g) == divexact(g, ug)
-         @test gcd(g*h, g) == divexact(g, ug)
+         @test iszero(ug) || gcd(g, g) == divexact(g, ug)
+         @test iszero(ug) || gcd(g*h, g) == divexact(g, ug)
 
-         @test gcd(h, h) == divexact(h, uh)
+         @test iszero(uh) || gcd(h, h) == divexact(h, uh)
 
          @test lcm(f, f) == f*uf
          @test lcm(f*g, f) == f*g*uf
