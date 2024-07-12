@@ -19,9 +19,9 @@
          y, z = gens(S, ["y", "z"])
          @test y == S[2]
 
-         @test elem_type(S) == Generic.UnivPoly{elem_type(R), mpoly_type(R)}
-         @test elem_type(Generic.UniversalPolyRing{elem_type(R), mpoly_type(R)}) == Generic.UnivPoly{elem_type(R), mpoly_type(R)}
-         @test parent_type(Generic.UnivPoly{elem_type(R), mpoly_type(R)}) == Generic.UniversalPolyRing{elem_type(R), mpoly_type(R)}
+         @test elem_type(S) == Generic.UnivPoly{elem_type(R)}
+         @test elem_type(Generic.UniversalPolyRing{elem_type(R)}) == Generic.UnivPoly{elem_type(R)}
+         @test parent_type(Generic.UnivPoly{elem_type(R)}) == Generic.UniversalPolyRing{elem_type(R)}
 
          @test base_ring(S) === R
          @test coefficient_ring(S) === R
