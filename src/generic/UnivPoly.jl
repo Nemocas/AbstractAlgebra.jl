@@ -33,7 +33,7 @@ parent_type(::Type{UnivPoly{T, U}}) where {T <: RingElement, U <: AbstractAlgebr
    UniversalPolyRing{T, U}
 
 function mpoly_ring(S::UniversalPolyRing{T, U}) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
-   return S.mpoly_ring::Generic.MPolyRing{T}
+   return S.mpoly_ring::mpoly_ring_type(T)
 end
 
 number_of_variables(S::UniversalPolyRing) = length(S.S)
@@ -246,7 +246,7 @@ function gen(S::UniversalPolyRing{T, U}, s::VarName) where {T <: RingElement, U 
    i = findfirst(==(Symbol(s)), S.S)
    if i === nothing
       push!(S.S, Symbol(s))
-      S.mpoly_ring = MPolyRing{T}(base_ring(S), S.S, S.ord, false)
+      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), S.S; internal_ordering=S.ord, cached=false)
       i = length(S.S)
    end
    return UnivPoly{T, U}(gen(mpoly_ring(S), i), S)
@@ -900,8 +900,8 @@ end
 ################################################################################
 
 function _change_univ_poly_ring(R, Rx, cached::Bool)
-   P = MPolyRing{elem_type(R)}(R, symbols(Rx), internal_ordering(Rx), cached)
-   S = universal_polynomial_ring(R; internal_ordering=internal_ordering(Rx), cached=cached)
+   P = AbstractAlgebra.polynomial_ring_only(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)
+   S = universal_polynomial_ring(R; internal_ordering=internal_ordering(Rx), cached)
    S.S = deepcopy(symbols(Rx))
    S.mpoly_ring = P
    return S
@@ -1113,7 +1113,7 @@ end
 
 function universal_polynomial_ring(R::Ring; internal_ordering=:lex, cached::Bool=true)
    T = elem_type(R)
-   U = Generic.MPoly{T}
+   U = mpoly_type(R)
 
    return UniversalPolyRing{T, U}(R, internal_ordering, cached)
 end

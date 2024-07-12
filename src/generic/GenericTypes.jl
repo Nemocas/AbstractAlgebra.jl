@@ -419,12 +419,21 @@ end
    ord::Symbol
    mpoly_ring::AbstractAlgebra.MPolyRing{T}
 
-   function UniversalPolyRing{T, U}(R::Ring, ord::Symbol, cached::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
-      return get_cached!(UnivPolyID, (R, ord, U), cached) do
-         new{T, U}(R, Vector{Symbol}(undef, 0), ord,
-                   MPolyRing{T}(R, Vector{Symbol}(), ord, cached)
-                      )
-      end::UniversalPolyRing{T, U}
+   function UniversalPolyRing{T,U}(
+      R::Ring, internal_ordering::Symbol, cached::Bool=true
+   ) where {T<:RingElement,U<:AbstractAlgebra.MPolyRingElem{T}}
+      @assert mpoly_type(R) == U
+      @assert elem_type(R) == T
+      return get_cached!(
+         UnivPolyID, (R, internal_ordering, U), cached
+      ) do
+         new{T,U}(
+            R,
+            Symbol[],
+            internal_ordering,
+            AbstractAlgebra.polynomial_ring_only(R, Symbol[]; internal_ordering, cached),
+         )
+      end::UniversalPolyRing{T,U}
    end
 end
 
