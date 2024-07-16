@@ -95,12 +95,14 @@ end
   M = matrix(R, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = AbstractAlgebra.Solve.solve_init(M)
 
-  @test C isa AbstractAlgebra.solve_context_type(elem_type(R))
-  @test C isa AbstractAlgebra.solve_context_type(zero(R))
-  @test C isa AbstractAlgebra.solve_context_type(typeof(R))
   @test C isa AbstractAlgebra.solve_context_type(R)
-  @test C isa AbstractAlgebra.solve_context_type(typeof(M))
   @test C isa AbstractAlgebra.solve_context_type(M)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), elem_type(R))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), R(1))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), typeof(R))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), R)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), typeof(M))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), M)
 
   @test_throws ErrorException AbstractAlgebra.Solve.solve(C, [ R(1) ])
   @test_throws ErrorException AbstractAlgebra.Solve.solve(C, [ R(1) ], side = :right)
@@ -191,8 +193,8 @@ end
   R = GF(101)
   M = matrix(R, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(M)
-  @test_throws AssertionError solve(AbstractAlgebra.Solve.RREFTrait(), C, [R(1), R(2), R(3)])
-  @test_throws AssertionError solve(AbstractAlgebra.Solve.RREFTrait(), C, matrix(R, 1, 3, [1, 2, 3]))
+  @test_throws ErrorException solve(AbstractAlgebra.Solve.RREFTrait(), C, [R(1), R(2), R(3), R(4), R(5)])
+  @test_throws ErrorException solve(AbstractAlgebra.Solve.RREFTrait(), C, matrix(R, 1, 5, [1, 2, 3, 4, 5]))
 end
 
 @testset "Lazy transpose" begin
