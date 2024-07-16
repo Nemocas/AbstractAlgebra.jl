@@ -249,6 +249,22 @@ matrix_normal_form_type(C::SolveCtx{T, NF}) where {T, NF} = NF()
 
 matrix(C::SolveCtx) = C.A
 
+function _init_reduce(C::SolveCtx{T, RREFTrait}) where T
+  if isdefined(C, :red) && isdefined(C, :trafo)
+    return nothing
+  end
+
+  B, U = echelon_form_with_transformation(matrix(C))
+  r = nrows(B)
+  while r > 0 && is_zero_row(B, r)
+    r -= 1
+  end
+  set_rank!(C, r)
+  C.red = B
+  C.trafo = U
+  return nothing
+end
+
 function _init_reduce(C::SolveCtx{T, LUTrait}) where T
   if isdefined(C, :red) && isdefined(C, :lu_perm)
     return nothing
@@ -324,6 +340,22 @@ function _init_reduce(C::SolveCtx{T, HowellFormTrait}) where T
 
   howell_form!(B)
   C.red = B
+  return nothing
+end
+
+function _init_reduce_transpose(C::SolveCtx{T, RREFTrait}) where T
+  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
+    return nothing
+  end
+
+  B, U = echelon_form_with_transformation(lazy_transpose(matrix(C)))
+  r = nrows(B)
+  while r > 0 && is_zero_row(B, r)
+    r -= 1
+  end
+  set_rank!(C, r)
+  C.red_transp = B
+  C.trafo_transp = U
   return nothing
 end
 
@@ -968,7 +1000,26 @@ function _can_solve_internal_no_check(::RREFTrait, A::MatElem{T}, b::MatElem{T},
   return true, sol, X
 end
 
-# RREFTrait with SolveCtx is not implemented (it is in Nemo)
+function _can_solve_internal_no_check(::RREFTrait, C::SolveCtx{T, RREFTrait}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
+  if side === :right
+    fl, sol = _can_solve_with_rref(b, transformation_matrix(C), rank(C), pivot_and_non_pivot_cols(C), task)
+    if !fl || task !== :with_kernel
+      return fl, sol, zero(b, 0, 0)
+    end
+
+    _, K = _kernel_of_rref(reduced_matrix(C), rank(C), pivot_and_non_pivot_cols(C))
+    return fl, sol, K
+  else# side === :left
+    fl, sol_transp = _can_solve_with_rref(lazy_transpose(b), transformation_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C), task)
+    sol = lazy_transpose(sol_transp)
+    if !fl || task !== :with_kernel
+      return fl, sol, zero(b, 0, 0)
+    end
+
+    _, K = _kernel_of_rref(reduced_matrix_of_transpose(C), rank(C), pivot_and_non_pivot_cols_of_transpose(C))
+    return fl, sol, lazy_transpose(K)
+  end
+end
 
 ### LUTrait
 

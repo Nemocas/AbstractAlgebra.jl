@@ -91,18 +91,32 @@
   @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
 end
 
-@testset "Linear solving context over $R" for R in [ QQ, ZZ, GF(101), fraction_field(QQ["x"][1]), residue_ring(ZZ, 16)[1] ]
+@testset "Linear solving context over $R with $NFTrait" for (R, NFTrait, is_default) in [
+    (QQ, AbstractAlgebra.Solve.FFLUTrait, true),
+    (ZZ, AbstractAlgebra.Solve.HermiteFormTrait, true),
+    (GF(101), AbstractAlgebra.Solve.LUTrait, true),
+    (GF(101), AbstractAlgebra.Solve.RREFTrait, false),
+    (fraction_field(QQ["x"][1]), AbstractAlgebra.Solve.FFLUTrait, true),
+    (residue_ring(ZZ, 16)[1], AbstractAlgebra.Solve.HowellFormTrait, true)
+   ]
   M = matrix(R, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
-  C = AbstractAlgebra.Solve.solve_init(M)
 
-  @test C isa AbstractAlgebra.solve_context_type(R)
-  @test C isa AbstractAlgebra.solve_context_type(M)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), elem_type(R))
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), R(1))
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), typeof(R))
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), R)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), typeof(M))
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.matrix_normal_form_type(C), M)
+  if is_default
+    C = solve_init(M)
+    @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === NFTrait()
+    @test C isa AbstractAlgebra.solve_context_type(R)
+    @test C isa AbstractAlgebra.solve_context_type(M)
+  end
+
+  C = solve_init(NFTrait(), M)
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === NFTrait()
+  @test C isa AbstractAlgebra.solve_context_type(NFTrait(), elem_type(R))
+  @test C isa AbstractAlgebra.solve_context_type(NFTrait(), R(1))
+  @test C isa AbstractAlgebra.solve_context_type(NFTrait(), typeof(R))
+  @test C isa AbstractAlgebra.solve_context_type(NFTrait(), R)
+  @test C isa AbstractAlgebra.solve_context_type(NFTrait(), typeof(M))
+  @test C isa AbstractAlgebra.solve_context_type(NFTrait(), M)
 
   @test_throws ErrorException AbstractAlgebra.Solve.solve(C, [ R(1) ])
   @test_throws ErrorException AbstractAlgebra.Solve.solve(C, [ R(1) ], side = :right)
