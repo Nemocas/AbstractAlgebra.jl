@@ -10,9 +10,9 @@
 #
 ###############################################################################
 
-JuliaRealField = Floats{BigFloat}()
+const JuliaRealField = Floats{BigFloat}()
 
-RDF = Floats{Float64}()
+const RDF = Floats{Float64}()
 
 parent(a::T) where T <: AbstractFloat = Floats{T}()
 
