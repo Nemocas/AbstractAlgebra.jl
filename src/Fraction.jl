@@ -635,7 +635,11 @@ end
 function evaluate(f::FracElem{T}, v::U) where {T <: PolyRingElem, U <: Integer}
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
- 
+
+function evaluate(f::FracElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+     return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+end
+
 ###############################################################################
 #
 #   Powering

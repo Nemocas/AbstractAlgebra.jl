@@ -294,6 +294,20 @@ end
 
    @test evaluate(f, [1, 2]) == ZZ(3)//ZZ(4)
    @test evaluate(f, [ZZ(1), ZZ(2)]) == ZZ(3)//ZZ(4)
+   @test evaluate(f, [1, 2], [ZZ(1), ZZ(2)]) == ZZ(3)//ZZ(4)
+   @test evaluate(f, [2, 1], [ZZ(2), ZZ(1)]) == ZZ(3)//ZZ(4)
+   @test evaluate(f, [1], [ZZ(2)]) == (y + 4)//(y + 2)
+
+   R = universal_polynomial_ring(ZZ)
+   x, y = gens(R, [:x, :y])
+
+   f = (x^2 + y)//(y + 2)
+
+   @test evaluate(f, [1, 2]) == ZZ(3)//ZZ(4)
+   @test evaluate(f, [ZZ(1), ZZ(2)]) == ZZ(3)//ZZ(4)
+   @test evaluate(f, [1, 2], [ZZ(1), ZZ(2)]) == ZZ(3)//ZZ(4)
+   @test evaluate(f, [2, 1], [ZZ(2), ZZ(1)]) == ZZ(3)//ZZ(4)
+   @test evaluate(f, [1], [ZZ(2)]) == (y + 4)//(y + 2)
 end
 
 @testset "Generic.FracFieldElem.derivative" begin
