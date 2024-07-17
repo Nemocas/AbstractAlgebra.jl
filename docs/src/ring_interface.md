@@ -1039,13 +1039,13 @@ end
 
 # Parent constructor
 
-function ConstantPolynomialRing(R::Ring, cached::Bool=true)
+function constant_polynomial_ring(R::Ring, cached::Bool=true)
    T = elem_type(R)
    return ConstPolyRing{T}(R, cached)
 end
 ```
 
-The above implementation of `ConstantPolynomialRing` may be tested as follows.
+The above implementation of `constant_polynomial_ring` may be tested as follows.
 
 ```julia
 using Test
@@ -1057,5 +1057,5 @@ function test_elem(R::ConstPolyRing{elem_type(S)})
    return R(rand(base_ring(R), 1:6, -999:999))
 end
 
-test_Ring_interface(ConstantPolynomialRing(S))
+test_Ring_interface(constant_polynomial_ring(S))
 ```
