@@ -210,11 +210,12 @@ end
   @test_throws ErrorException solve(AbstractAlgebra.Solve.RREFTrait(), C, [R(1), R(2), R(3), R(4), R(5)])
   @test_throws ErrorException solve(AbstractAlgebra.Solve.RREFTrait(), C, matrix(R, 1, 5, [1, 2, 3, 4, 5]))
 
-  # This should work
+  # This should work because we use RREFTrait for the kernel if C uses LUTrait
+  # for solving
   K = kernel(AbstractAlgebra.Solve.RREFTrait(), C)
   @test nrows(K) == 0
 
-  # This should not
+  # This should not work if C uses LUTrait
   @test_throws ErrorException kernel(AbstractAlgebra.Solve.HermiteFormTrait(), C)
 end
 

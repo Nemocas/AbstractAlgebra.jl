@@ -206,6 +206,12 @@ function solve_init(NF::MatrixNormalFormTrait, A::MatElem)
   return solve_context_type(NF, base_ring(A))(A)
 end
 
+# For a ring R, the following signatures of `solve_context_type` need to be
+# implemented:
+# 1) solve_context_type(R)
+# 2) solve_context_type(::MatrixNormalFormTrait, elem_type(R))
+# Version 1 should pick a matrix_normal_form_type and call 2
+
 function solve_context_type(R::NCRing)
   return solve_context_type(matrix_normal_form_type(R), elem_type(R))
 end
