@@ -783,13 +783,13 @@ end
 
 # We can't compute a kernel using a LU/FFLU factoring, so we have to fall back to RREF
 
-function kernel(::LUTrait, A::Union{MatElem, SolveCtx{T, LUTrait}}; side::Symbol = :left) where T
+function kernel(::LUTrait, A::Union{MatElem, SolveCtx{<: NCRingElement, LUTrait}}; side::Symbol = :left)
   return kernel(RREFTrait(), A; side)
 end
-function kernel(::FFLUTrait, A::Union{MatElem, SolveCtx{T, FFLUTrait}}; side::Symbol = :left) where T
+function kernel(::FFLUTrait, A::Union{MatElem, SolveCtx{<: NCRingElement, FFLUTrait}}; side::Symbol = :left)
   return kernel(RREFTrait(), A; side)
 end
-function kernel(::MatrixInterpolateTrait, A::Union{MatElem, SolveCtx{T, MatrixInterpolateTrait}}; side::Symbol = :left) where T
+function kernel(::MatrixInterpolateTrait, A::Union{MatElem, SolveCtx{<: NCRingElement, MatrixInterpolateTrait}}; side::Symbol = :left)
   return kernel(RREFTrait(), A; side)
 end
 
