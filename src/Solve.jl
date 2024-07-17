@@ -859,10 +859,6 @@ function _can_solve_internal(::NFTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Ma
 end
 
 # Catch non-matching normal forms in solve context
-function _can_solve_internal_no_check(::NFTrait, C::SolveCtx{T, NFTrait2}, b::Vector{T}, task::Symbol; side::Symbol = :left) where {T, NFTrait <: MatrixNormalFormTrait, NFTrait2 <: MatrixNormalFormTrait}
-  error("Cannot use normal form of type $NFTrait with solve context of type $NFTrait2")
-end
-
 function _can_solve_internal_no_check(::NFTrait, C::SolveCtx{T, NFTrait2}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where {T, NFTrait <: MatrixNormalFormTrait, NFTrait2 <: MatrixNormalFormTrait}
   error("Cannot use normal form of type $NFTrait with solve context of type $NFTrait2")
 end
