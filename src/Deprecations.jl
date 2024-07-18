@@ -9,13 +9,7 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
-# added during 0.40.*
-@alias FreeModule free_module
-@alias VectorSpace vector_space
-@alias UniversalPolynomialRing universal_polynomial_ring
-
-@alias is_finiteorder is_finite_order
-
+#= currently none =#
 
 ###############################################################################
 #
@@ -27,7 +21,11 @@
 # By calling this macro from the respective packages, we can ensure that the deprecated bindings are available there.
 macro include_deprecated_bindings()
     return esc(quote
-        #= currently none =#
+        # deprecated in 0.42
+        Base.@deprecate_binding FreeModule free_module
+        Base.@deprecate_binding VectorSpace vector_space
+        Base.@deprecate_binding UniversalPolynomialRing universal_polynomial_ring
+        Base.@deprecate_binding is_finiteorder is_finite_order
 
     end)
 end
