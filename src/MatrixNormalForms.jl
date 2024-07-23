@@ -103,7 +103,7 @@ function hermite_form(A::MatElem{<:RingElement}; reduced::Bool = true, shape::Sy
   if shape === :lower
     A = reverse_cols(A)
   end
-  H = hnf_kb(A)
+  H = hnf(A)
   r = nrows(H)
   # Compute the rank (if necessary)
   if trim
@@ -135,7 +135,7 @@ function hermite_form_with_transformation(A::MatElem{<:RingElement}; reduced::Bo
   if shape === :lower
     A = reverse_cols(A)
   end
-  H, U = hnf_kb_with_transform(A)
+  H, U = hnf_with_transform(A)
   if shape === :lower
     reverse_cols!(H)
     reverse_rows!(H)
