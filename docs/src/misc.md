@@ -184,6 +184,9 @@ AbstractAlgebra has a generic interface for linear solving and we describe here
 how one may extend this interface. For the user-facing functionality of linear
 solving, see [Linear Solving](@ref solving_chapter).
 
+Notice that the functionality is implemented in the module
+`AbstractAlgebra.Solve` and the internal functions are not exported from there.
+
 ### Matrix normal forms
 
 To distinguish between different algorithms, we use type traits of abstract type
@@ -200,12 +203,12 @@ The available algorithms/normal forms are
     fields of polynomial rings.
 
 To select a normal form type for rings of type `NewRing`, implement the function
-```
+```julia
 Solve.matrix_normal_form_type(::NewRing) = Bla()
 ```
 where `Bla <: MatrixNormalFormTrait`.
 A new type trait can be added via
-```
+```julia
 struct NewTrait <: Solve.MatrixNormalFormTrait end
 ```
 
@@ -219,9 +222,10 @@ described above to use the generic solving functionality. (However, for example
 
 For a new trait `NewTrait <: MatrixNormalFormTrait`, one needs to implement the
 function
-```
-Solve._can_solve_internal_no_check(::NewTrait, A::MatElem{T}, b::MatElem{T},
-task::Symbol, side::Symbol) where T
+```julia
+Solve._can_solve_internal_no_check(
+  ::NewTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol, side::Symbol
+  ) where T
 ```
 Inside this function, one can assume that `A` and `b` have the same base ring
 and have compatible dimensions. Further, `task` and `side` are set to "legal"
@@ -235,14 +239,14 @@ consisting of:
 * the kernel
 
 The input `task` may be:
-* `:only_check` -> Only test whether there is a solution, the second
+* `:only_check`: Only test whether there is a solution, the second
   and third return value are only for type stability;
-* `:with_solution` -> Compute a solution, if it exists, the last return value is
+* `:with_solution`: Compute a solution, if it exists, the last return value is
   only for type stability;
-* `:with_kernel` -> Compute a solution and a kernel.
+* `:with_kernel`: Compute a solution and a kernel.
 
 One should further implement the function
-```
+```julia
 kernel(::NewTrait, A::MatElem, side::Symbol = :left)
 ```
 which computes a left (or right) kernel of `A`.
@@ -259,9 +263,10 @@ For a new ring type, one may have to define the type parameters of a `SolveCtx`
 object.
 First of all, one needs to implement the function
 
-```
-Solve.solve_context_type(::NewRing) =
-Solve.solve_context_type(::NormalFormTrait, elem_type(NewRing))
+```julia
+function Solve.solve_context_type(::NewRing)
+  return Solve.solve_context_type(::NormalFormTrait, elem_type(NewRing))
+end
 ```
 
 to pick a `MatrixNormalFormTrait`.
@@ -270,9 +275,10 @@ Usually, nothing else should be necessary. However, if for example the normal
 form of a matrix does not live over the same ring as the matrix itself, one
 might also need to implement
 
-```
-Solve.solve_context_type(NF::NormalFormTrait, T::Type{NewRingElem})
- = Solve.SolveCtx{T, typeof(NF), MatType, RedMatType, TranspMatType}
+```julia
+function Solve.solve_context_type(NF::NormalFormTrait, T::Type{NewRingElem})
+  return Solve.SolveCtx{T, typeof(NF), MatType, RedMatType, TranspMatType}
+end
 ```
 
 where `MatType` is the dense matrix type over `NewRing`, `RedMatType` the type
@@ -284,7 +290,7 @@ reduced/normal form of the transposed matrix.
 To initialize the solve context functionality for a new normal form `NewTrait`,
 one needs to implement the functions
 
-```
+```julia
 Solve._init_reduce(C::SolveCtx{T, NewTrait}) where T
 Solve._init_reduce_transpose(C::SolveCtx{T, NewTrait}) where T
 ```
@@ -299,13 +305,14 @@ etc. New fields may also be added via attributes.
 
 As above, one finally needs to implement the functions
 
-```
-Solve._can_solve_internal_no_check(::NewTrait, C::SolveCtx{T, NewTrait}, b::MatElem{T},
-task::Symbol, side::Symbol) where T
+```julia
+Solve._can_solve_internal_no_check(
+  ::NewTrait, C::SolveCtx{T, NewTrait}, b::MatElem{T}, task::Symbol, side::Symbol
+  ) where T
 ```
 
 and
 
-```
+```julia
 kernel(::NewTrait, C::SolveCtx{T, NewTrait}, side::Symbol = :left)
 ```
