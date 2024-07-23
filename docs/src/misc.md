@@ -177,3 +177,135 @@ AbstractAlgebra.LowercaseOff
 AbstractAlgebra.terse
 AbstractAlgebra.is_terse
 ```
+
+## Linear solving interface for developers
+
+AbstractAlgebra has a generic interface for linear solving and we describe here
+how one may extend this interface. For the user-facing functionality of linear
+solving, see [Linear Solving](@ref solving_chapter).
+
+### Matrix normal forms
+
+To distinguish between different algorithms, we use type traits of abstract type
+`MatrixNormalFormTrait` which usually correspond to a certain matrix normal
+form.
+The available algorithms/normal forms are
+* `HowellFormTrait`: uses a Howell form;
+* `HermiteFormTrait`: uses a Hermite normal form;
+* `RREFTrait`: uses a row-reduced echelon form over fields;
+* `LUTrait`: uses a LU factoring of the matrix;
+* `FFLUTrait`: uses a "fraction-free" LU factoring of the matrix over fraction
+    fields;
+* `MatrixInterpolateTrait`: uses interpolation of polynomials for fraction
+    fields of polynomial rings.
+
+To select a normal form type for rings of type `NewRing`, implement the function
+```
+Solve.matrix_normal_form_type(::NewRing) = Bla()
+```
+where `Bla <: MatrixNormalFormTrait`.
+A new type trait can be added via
+```
+struct NewTrait <: Solve.MatrixNormalFormTrait end
+```
+
+### Internal solving functionality
+
+If a new ring type `NewRing` can make use of one of the available
+`MatrixNormalFormTrait`s, then it suffices to specify this normal form as
+described above to use the generic solving functionality. (However, for example
+`HermiteFormTrait` requires that the function
+`hermite_form_with_transformation` is implemented.)
+
+For a new trait `NewTrait <: MatrixNormalFormTrait`, one needs to implement the
+function
+```
+Solve._can_solve_internal_no_check(::NewTrait, A::MatElem{T}, b::MatElem{T},
+task::Symbol, side::Symbol) where T
+```
+Inside this function, one can assume that `A` and `b` have the same base ring
+and have compatible dimensions. Further, `task` and `side` are set to "legal"
+options. (All this is checked in `Solve._can_solve_internal`.)
+This function should then (try to) solve `Ax = b` (`side == :right`) or `xA = b`
+(`side == :left`) possibly with kernel.
+The function must always return a tuple `(::Bool, ::MatElem{T}, ::MatElem{T})`
+consisting of:
+* `true`/`false` whether a solution exists or not
+* the solution
+* the kernel
+
+The input `task` may be:
+* `:only_check` -> Only test whether there is a solution, the second
+  and third return value are only for type stability;
+* `:with_solution` -> Compute a solution, if it exists, the last return value is
+  only for type stability;
+* `:with_kernel` -> Compute a solution and a kernel.
+
+One should further implement the function
+```
+kernel(::NewTrait, A::MatElem, side::Symbol = :left)
+```
+which computes a left (or right) kernel of `A`.
+
+### Internal solve context functionality
+
+To efficiently solve several linear systems with the same matrix `A`, we provide
+the "solve contexts objects" of type `Solve.SolveCtx`.
+These can be extended for a ring of type `NewRing` as follows.
+
+#### Solve context type
+
+For a new ring type, one may have to define the type parameters of a `SolveCtx`
+object.
+First of all, one needs to implement the function
+
+```
+Solve.solve_context_type(::NewRing) =
+Solve.solve_context_type(::NormalFormTrait, elem_type(NewRing))
+```
+
+to pick a `MatrixNormalFormTrait`.
+
+Usually, nothing else should be necessary. However, if for example the normal
+form of a matrix does not live over the same ring as the matrix itself, one
+might also need to implement
+
+```
+Solve.solve_context_type(NF::NormalFormTrait, T::Type{NewRingElem})
+ = Solve.SolveCtx{T, typeof(NF), MatType, RedMatType, TranspMatType}
+```
+
+where `MatType` is the dense matrix type over `NewRing`, `RedMatType` the type
+of a matrix in reduced/normal form and `TranspMatType` the type of the
+reduced/normal form of the transposed matrix.
+
+#### Initialization
+
+To initialize the solve context functionality for a new normal form `NewTrait`,
+one needs to implement the functions
+
+```
+Solve._init_reduce(C::SolveCtx{T, NewTrait}) where T
+Solve._init_reduce_transpose(C::SolveCtx{T, NewTrait}) where T
+```
+
+These should fill the corresponding fields of the solve context `C` with a
+"reduced matrix" (that is, a matrix in normal form) of `matrix(C)` (respectively
+`transpose(matrix(C))` and other information necessary to solve a linear system.
+The fields can be accessed via `reduced_matrix`, `reduced_matrix_of_transpose`,
+etc. New fields may also be added via attributes.
+
+#### Internal solving functionality
+
+As above, one finally needs to implement the functions
+
+```
+Solve._can_solve_internal_no_check(::NewTrait, C::SolveCtx{T, NewTrait}, b::MatElem{T},
+task::Symbol, side::Symbol) where T
+```
+
+and
+
+```
+kernel(::NewTrait, C::SolveCtx{T, NewTrait}, side::Symbol = :left)
+```
