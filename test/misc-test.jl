@@ -15,7 +15,44 @@
 end
 
 @testset "rising_factorial" begin
-
   @test_throws OverflowError rising_factorial(10,30)
   @test_throws OverflowError rising_factorial2(10,30)
+end
+
+### Test options to @varnames_interface ###
+# For tests under default options, see doctests and test/generic/MPoly-test.jl
+
+# note: macro definition not allowed inside a local scope
+# hence using a module instead:
+module VarNamesTest
+  using AbstractAlgebra
+  using Test
+
+  f(a, s::Vector{Symbol}) = a, string.((a,), s)
+  projective(a, s::Vector{Symbol}) = f(a, s)
+  uses_n(n, s::Vector{Symbol}) = f(n, s)
+  no_n_variant(a, s::Vector{Symbol}) = f(a, s)
+  no_macros(a, s::Vector{Symbol}) = f(a, s)
+  AbstractAlgebra.@varnames_interface f(a, s)
+  AbstractAlgebra.@varnames_interface projective(a, s) range=0:n
+  AbstractAlgebra.@varnames_interface uses_n(n, s) n=m range=1:m
+  AbstractAlgebra.@varnames_interface no_n_variant(a, s) n=:no
+  AbstractAlgebra.@varnames_interface no_macros(a, s) macros=:no
+
+  @testset "VarNames" begin
+    @test f("A", 3) == ("A", ["Ax1", "Ax2", "Ax3"])
+
+    @f("A", :y => 1:3)
+    @test [y1, y2, y3] == ["Ay1", "Ay2", "Ay3"]
+    @test ! @isdefined x1
+    @test ! @isdefined y4
+
+    @testset "VarNames.options" begin
+      @test uses_n("A", 3) == ("A", ["Ax1", "Ax2", "Ax3"])
+      @test projective("A", 3) == ("A", ["Ax0", "Ax1", "Ax2", "Ax3"])
+
+      @test ! @isdefined var"@no_macros"
+      @test_throws MethodError no_n_variant("A", 3)
+    end
+  end
 end
