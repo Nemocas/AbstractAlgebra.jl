@@ -5,9 +5,15 @@
 ###############################################################################
 
 # We assume that the function
-#   ideal(R::Ring, xs::AbstractVector{T}) where T<:RingElement
-# is implemented by anyone implementing ideals for AbstractAlgebra rings.
+#   ideal(R::T, xs::Vector{U})
+# with U === elem_type(T) is implemented by anyone implementing ideals
+# for AbstractAlgebra rings.
 # The functions in this file extend the interface for `ideal`.
+
+function ideal(R::Ring, xs::AbstractVector{T}) where T<:RingElement
+  xs isa Vector{elem_type(R)} && error("ideals unsupported for ring $R")
+  return ideal(R, elem_type(R)[R(x) for x in xs])
+end
 
 function ideal(R::Ring, x::RingElement)
   return ideal(R, elem_type(R)[R(x)])
