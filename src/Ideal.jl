@@ -4,22 +4,21 @@
 #
 ###############################################################################
 
-# We assume that the functions
-#   ideal(R::Ring, x::RingElement)
-#   ideal(R::Ring, xs::AbstractVector)
-# are implemented by anyone implementing ideals for AbstractAlgebra rings.
+# We assume that the function
+#   ideal(R::Ring, xs::AbstractVector{T}) where T<:RingElement
+# is implemented by anyone implementing ideals for AbstractAlgebra rings.
 # The functions in this file extend the interface for `ideal`.
 
-function *(R::Ring, x::Any)
+function ideal(R::Ring, x::RingElement)
+  return ideal(R, elem_type(R)[R(x)])
+end
+
+function *(R::Ring, x::RingElement)
   return ideal(R, x)
 end
 
-function *(x::Any, R::Ring)
+function *(x::RingElement, R::Ring)
   return ideal(R, x)
-end
-
-function ideal(R::Ring, x::Any)
-  return ideal(R, R(x))
 end
 
 function ideal(x::RingElement)
@@ -27,7 +26,7 @@ function ideal(x::RingElement)
 end
 
 function ideal(xs::AbstractVector{T}) where T<:RingElement
-  !is_empty(xs) || throw(ArgumentError("Empty collection, cannot determine parent ring, try ideal(ring, xs) instead of ideal(xs)"))
+  !is_empty(xs) || throw(ArgumentError("Empty collection, cannot determine parent ring. Try ideal(ring, xs) instead of ideal(xs)"))
   return ideal(parent(xs[1]), xs)
 end
 
