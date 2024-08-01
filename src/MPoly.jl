@@ -1466,8 +1466,3 @@ multivariate polynomial ring.
 """
 polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
    mpoly_ring_type(T)(R, s, internal_ordering, cached)
-
-# Alternative constructors
-
-MPolyRing(R::Ring, n::Int) =
-   polynomial_ring_only(R, Symbol.(:x, 1:n); cached=false)

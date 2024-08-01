@@ -22,16 +22,14 @@ function is_exact_type(a::Type{T}) where {S <: RingElement, T <: ResFieldElem{S}
    return is_exact_type(S)
 end
 
-function check_parent_type(a::ResidueField{T}, b::ResidueField{T}) where {T <: RingElement}
-   # exists only to check types of parents agree
-end
-
 function check_parent(a::ResFieldElem, b::ResFieldElem, throw::Bool = true)
-   if parent(a) != parent(b)
-      check_parent_type(parent(a), parent(b))
-      fl = modulus(parent(a)) != modulus(parent(b))
-      fl && throw && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
-      return !fl
+   Ra = parent(a)
+   Rb = parent(b)
+   if Ra != Rb
+      fl = typeof(Ra) == typeof(Rb) && modulus(Ra) == modulus(Rb)
+      !fl && throw && error("Incompatible moduli in residue operation")
+      #CF: maybe extend to divisibility?
+      return fl
    end
    return true
 end

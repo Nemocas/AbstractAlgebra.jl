@@ -250,8 +250,8 @@ end
 #
 ###############################################################################
 
-sqrt_moduli = [3, 5, 7, 8]
-sqrt_residues = [[0, 1], [0, 1, 4], [0, 1, 2, 4], [0, 1, 4]]
+const sqrt_moduli = [3, 5, 7, 8]
+const sqrt_residues = [[0, 1], [0, 1, 4], [0, 1, 2, 4], [0, 1, 4]]
 
 @doc raw"""
     sqrt(a::T; check::Bool=true) where T <: Integer
@@ -366,14 +366,14 @@ function root(a::T, n::Int; check::Bool=true) where T <: Integer
    end
 end
 
-moduli3 = [7, 8, 13]
-residues3 = [[0, 1, 6], [0, 1, 3, 5, 7], [0, 1, 5, 8, 12]]
+const moduli3 = [7, 8, 13]
+const residues3 = [[0, 1, 6], [0, 1, 3, 5, 7], [0, 1, 5, 8, 12]]
 
-moduli5 = [8, 11, 31]
-residues5 = [[0, 1, 3, 5, 7], [0, 1, 10], [0, 1, 5, 6, 25, 26, 30]]
+const moduli5 = [8, 11, 31]
+const residues5 = [[0, 1, 3, 5, 7], [0, 1, 10], [0, 1, 5, 6, 25, 26, 30]]
 
-moduli7 = [8, 29, 43]
-residues7 = [[0, 1, 3, 5, 7], [0, 1, 12, 17, 28], [0, 1, 6, 7, 36, 37, 42]]
+const moduli7 = [8, 29, 43]
+const residues7 = [[0, 1, 3, 5, 7], [0, 1, 12, 17, 28], [0, 1, 6, 7, 36, 37, 42]]
 
 function ispower_moduli(a::Integer, n::Int)
    if mod(n, 3) == 0
@@ -542,10 +542,6 @@ function add!(a::T, b::T, c::T) where T <: Integer
    return b + c
 end
 
-function addeq!(a::T, b::T) where T <: Integer
-   return a + b
-end
-
 function addmul!(a::T, b::T, c::T, d::T) where T <: Integer
    return a + b*c
 end
@@ -560,7 +556,7 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(R::AbstractAlgebra.Integers{T}, _) where {T} = T
+RandomExtensions.maketype(R::Integers{T}, _) where {T} = T
 
 # define rand(make(ZZ, n:m))
 rand(rng::AbstractRNG,

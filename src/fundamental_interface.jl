@@ -318,7 +318,7 @@ function add! end
 
 Return `a + b`, possibly modifying the object `a` in the process.
 """
-function addeq! end
+addeq!(a, b) = add!(a, a, b)
 
 @doc raw"""
     sub!(a, b, c)

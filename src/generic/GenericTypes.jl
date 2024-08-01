@@ -413,25 +413,33 @@ end
 #
 ###############################################################################
 
-@attributes mutable struct UniversalPolyRing{T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}} <: AbstractAlgebra.UniversalPolyRing{T}
+@attributes mutable struct UniversalPolyRing{T <: RingElement} <: AbstractAlgebra.UniversalPolyRing{T}
    base_ring::Ring
    S::Vector{Symbol}
    ord::Symbol
    mpoly_ring::AbstractAlgebra.MPolyRing{T}
 
-   function UniversalPolyRing{T, U}(R::Ring, ord::Symbol, cached::Bool=true) where {T <: RingElement, U <: AbstractAlgebra.MPolyRingElem{T}}
-      return get_cached!(UnivPolyID, (R, ord, U), cached) do
-         new{T, U}(R, Vector{Symbol}(undef, 0), ord,
-                   MPolyRing{T}(R, Vector{Symbol}(), ord, cached)
-                      )
-      end::UniversalPolyRing{T, U}
+   function UniversalPolyRing{T}(
+      R::Ring, internal_ordering::Symbol, cached::Bool=true
+   ) where {T<:RingElement}
+      @assert elem_type(R) == T
+      return get_cached!(
+         UnivPolyID, (R, internal_ordering), cached
+      ) do
+         new{T}(
+            R,
+            Symbol[],
+            internal_ordering,
+            AbstractAlgebra.polynomial_ring_only(R, Symbol[]; internal_ordering, cached),
+         )
+      end::UniversalPolyRing{T}
    end
 end
 
-const UnivPolyID = CacheDictType{Tuple{Ring, Symbol, DataType}, Ring}()
+const UnivPolyID = CacheDictType{Tuple{Ring, Symbol}, Ring}()
 
-mutable struct UnivPoly{T <: RingElement, U <: MPolyRingElem{T}} <: AbstractAlgebra.UniversalPolyRingElem{T}
-   p::U
+mutable struct UnivPoly{T <: RingElement} <: AbstractAlgebra.UniversalPolyRingElem{T}
+   p::MPolyRingElem{T}
    parent::UniversalPolyRing{T}
 end
 

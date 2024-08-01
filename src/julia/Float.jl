@@ -10,9 +10,9 @@
 #
 ###############################################################################
 
-JuliaRealField = Floats{BigFloat}()
+const JuliaRealField = Floats{BigFloat}()
 
-RDF = Floats{Float64}()
+const RDF = Floats{Float64}()
 
 parent(a::T) where T <: AbstractFloat = Floats{T}()
 
@@ -167,10 +167,6 @@ end
 
 function add!(a::T, b::T, c::T) where T <: AbstractFloat
    return b + c
-end
-
-function addeq!(a::T, b::T) where T <: AbstractFloat
-   return a + b
 end
 
 function addmul!(a::T, b::T, c::T, d::T) where T <: AbstractFloat

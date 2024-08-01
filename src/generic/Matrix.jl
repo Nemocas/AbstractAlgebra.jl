@@ -48,14 +48,14 @@ dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 
 Return the number of rows of the given matrix space.
 """
-number_of_rows(a::MatSpace) = a.nrows
+number_of_rows(a::Generic.MatSpace) = a.nrows
 
 @doc raw"""
     number_of_columns(a::MatSpace)
 
 Return the number of columns of the given matrix space.
 """
-number_of_columns(a::MatSpace) = a.ncols
+number_of_columns(a::Generic.MatSpace) = a.ncols
 
 number_of_rows(a::Union{Mat, MatRingElem}) = size(a.entries, 1)
 
@@ -149,12 +149,12 @@ end
 ###############################################################################
 
 # create a zero matrix
-function (a::MatSpace{T})() where {T <: NCRingElement}
+function (a::Generic.MatSpace{T})() where {T <: NCRingElement}
    return zero_matrix(base_ring(a), nrows(a), ncols(a))::dense_matrix_type(T)
 end
 
 # create a matrix with b on the diagonal
-function (a::AbstractAlgebra.Generic.MatSpace)(b::NCRingElement)
+function (a::Generic.MatSpace)(b::NCRingElement)
    M = a()  # zero matrix
    R = base_ring(a)
    rb = R(b)
@@ -165,7 +165,7 @@ function (a::AbstractAlgebra.Generic.MatSpace)(b::NCRingElement)
 end
 
 # convert a Julia matrix
-function (a::MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
+function (a::Generic.MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
    _check_dim(nrows(a), ncols(a), b)
    R = base_ring(a)
 
@@ -183,7 +183,7 @@ function (a::MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
 end
 
 # convert a Julia vector
-function (a::MatSpace{T})(b::AbstractVector) where T <: NCRingElement
+function (a::Generic.MatSpace{T})(b::AbstractVector) where T <: NCRingElement
    _check_dim(nrows(a), ncols(a), b)
    return a(transpose(reshape(b, a.ncols, a.nrows)))
 end
@@ -199,7 +199,7 @@ function matrix_space(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = 
    # (and perhaps future compatibility, in case we need it again)
    (r < 0 || c < 0) && error("Dimensions must be non-negative")
    T = elem_type(R)
-   return MatSpace{T}(R, r, c)
+   return Generic.MatSpace{T}(R, r, c)
 end
 
 function AbstractAlgebra.sub!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T

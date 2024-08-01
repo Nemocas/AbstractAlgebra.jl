@@ -67,7 +67,7 @@ function kernel(f::Map(FPModuleHomomorphism))
       N = vcat(N, NN)
    end
    # compute the kernel
-   K = AbstractAlgebra.kernel(N)
+   K = kernel(N)
    V = [D(K[j:j, 1:nrows(M)]) for j in 1:nrows(K)]
    return sub(D, V)
 end

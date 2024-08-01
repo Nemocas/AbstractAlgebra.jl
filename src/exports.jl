@@ -113,6 +113,7 @@ export addeq!
 export addmul!
 export addmul_delayed_reduction!
 export allow_unicode
+export annihilator
 export base_field
 export base_ring
 export base_ring_type
@@ -243,6 +244,8 @@ export hnf_with_transform
 export hom
 export hom_direct_sum
 export hooklength
+export howell_form
+export howell_form_with_transformation
 export ideal
 export identity_map
 export identity_matrix

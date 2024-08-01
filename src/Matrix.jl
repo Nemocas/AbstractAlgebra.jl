@@ -672,8 +672,7 @@ function Base.show(io::IO, a::MatrixElem{T}) where T <: NCRingElement
 end
 
 function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem{T}) where T <: NCRingElement
-   if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-         !AbstractAlgebra.get_html_as_latex()
+   if isdefined(Main, :IJulia) && Main.IJulia.inited && !get_html_as_latex()
       error("Dummy error for jupyter")
    end
    show_via_expressify(io, mi, a)
@@ -6441,6 +6440,10 @@ function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
       arr_coerce = convert(Matrix{elem_type(R)}, map(R, arr))::Matrix{elem_type(R)}
       return matrix(R, arr_coerce)
    end
+end
+
+function matrix(R::NCRing, arr::MatElem)
+    return map_entries(R, arr)
 end
 
 function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElem}
