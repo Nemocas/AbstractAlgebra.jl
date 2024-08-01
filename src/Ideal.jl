@@ -10,6 +10,8 @@
 # for AbstractAlgebra rings.
 # The functions in this file extend the interface for `ideal`.
 
+# the following helper enables things like `ideal(R, [])` or `ideal(R, [1])`
+# the type check ensures we don't run into an infinite recursion
 function ideal(R::Ring, xs::AbstractVector{T}) where T<:RingElement
   xs isa Vector{elem_type(R)} && error("ideals unsupported for ring $R")
   return ideal(R, elem_type(R)[R(x) for x in xs])
