@@ -17,8 +17,8 @@ function ideal(R::Ring, xs::AbstractVector{T}) where T<:RingElement
   return ideal(R, elem_type(R)[R(x) for x in xs])
 end
 
-function ideal(R::Ring, x...)
-  return ideal(R, elem_type(R)[R(y) for y in [x...]])
+function ideal(R::Ring, x, y...)
+  return ideal(R, elem_type(R)[R(z) for z in [x, y...]])
 end
 
 function *(R::Ring, x::RingElement)
