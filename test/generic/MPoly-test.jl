@@ -132,9 +132,17 @@
    @test ZZxxx_ == ZZxxx0_
 
    QQxxx_ = @inferred polynomial_ring(QQ, "x#" => 1:3)
-   QQxxx2 = @polynomial_ring(QQ, "x#" => 1:3)
+   QQxxx00_ = @inferred polynomial_ring(QQ, 3)
+   QQxxx0 = @polynomial_ring(QQ, 3)
 
    @test QQxxx_[1] isa Generic.MPolyRing
+   @test QQxxx_ == QQxxx00_
+   @test QQxxx_ == (QQxxx0, [x1, x2, x3])
+
+   QQxxx1 = @polynomial_ring(QQ, 3, "x")
+   @test QQxxx_ == (QQxxx1, [x1, x2, x3])
+
+   QQxxx2 = @polynomial_ring(QQ, "x#" => 1:3)
    @test QQxxx_ == (QQxxx2, [x1, x2, x3])
 
    QQxxx3 = @polynomial_ring(QQ, :x=>1:3)

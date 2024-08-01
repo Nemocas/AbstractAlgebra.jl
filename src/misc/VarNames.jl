@@ -319,7 +319,7 @@ function n_vars_method(d::Dict{Symbol}, n, range)
     end
 end
 
-function varnames_macro(f, args_count, opt_in)
+function varnames_macro(f, args_count, opt_in, n, range)
     opt_in === :(:yes) || return :()
     quote
         macro $f(args...)
@@ -329,6 +329,7 @@ function varnames_macro(f, args_count, opt_in)
 
             m = VERSION > v"9999" ? __module__ : $(esc(:__module__)) # julia issue #51602
             s = _eval(m, :($$_varnames_macro($(args[$args_count+2:end]...))))
+            $(_n_vars_macro_support(n, range))
 
             varnames_macro_code($f, esc.(base_args), s)
         end
@@ -337,6 +338,20 @@ end
 
 _varnames_macro(arg::VarName) = Symbol(arg)
 _varnames_macro(args::VarNames...) = variable_names(args, Val(false))
+_varnames_macro(n::Int, s::VarName=:x) = (n, Symbol(s)) # defer work to `_n_vars_macro_support` outside `eval`
+
+function _n_vars_macro_support(n, range)
+    if n == :(:no)
+        return :(s isa Tuple{Int, Symbol} && throw(ArgumentError("`Int` argument variant not supported")))
+    else
+        return quote
+            if s isa Tuple{Int, Symbol}
+                $n = s[1]
+                s = Symbol.(s[2], $range)
+            end
+        end
+    end
+end
 
 function varnames_macro_code(f, args, s::Symbol)
     quote
@@ -391,11 +406,12 @@ Setting `n=:no` disables creation of this method.
 
     X = @f(args..., varnames...; kv...)
     X = @f(args..., varnames::Tuple; kv...)
+    X = @f(args..., n::Int, s::VarName = :x; kv...)
     X = @f(args..., varname::VarName; kv...)
 
 These macros behave like their `f(args..., varnames; kv...)` counterparts but also introduce the indexed `varnames` into the current scope.
-The first version needs at least one `varnames` argument.
-The third version calls the univariate base method if it exists (e.g. `polynomial_ring(R, varname)`).
+The first version needs at least one `varnames` argument to avoid confusion.
+The last version calls the univariate base method if it exists (e.g. `polynomial_ring(R, varname)`).
 
 Setting `macros=:no` disables macro creation.
 
@@ -417,6 +433,9 @@ f (generic function with 5 methods)
 
 julia> f("hello", [:x, :y, :z])
 ("hello", ["x", "y", "z"])
+
+julia> f("numbered", 3)
+("numbered", ["x1", "x2", "x3"])
 
 julia> f("hello", :x => (1:1, 1:2), :y => 1:2, [:z])
 ("hello", ["x[1, 1]" "x[1, 2]"], ["y[1]", "y[2]"], ["z"])
@@ -454,7 +473,7 @@ macro varnames_interface(e::Expr, options::Expr...)
         $(base_method(d, :(Vector{Symbol})))
         $(varnames_method(d))
         $(n_vars_method(d, opts[:n], opts[:range]))
-        $(varnames_macro(d[:f], length(d[:argnames]), opts[:macros]))
+        $(varnames_macro(d[:f], length(d[:argnames]), opts[:macros], opts[:n], opts[:range]))
     end
 end
 
