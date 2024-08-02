@@ -43,16 +43,28 @@ module VarNamesTest
     @test f("A", 3) == ("A", ["Ax1", "Ax2", "Ax3"])
 
     @f("A", :y => 1:3)
+    @f("B", 3, "z")
+
     @test [y1, y2, y3] == ["Ay1", "Ay2", "Ay3"]
+    @test [z1, z2, z3] == ["Bz1", "Bz2", "Bz3"]
     @test ! @isdefined x1
     @test ! @isdefined y4
+    @test ! @isdefined z4
 
     @testset "VarNames.options" begin
       @test uses_n("A", 3) == ("A", ["Ax1", "Ax2", "Ax3"])
       @test projective("A", 3) == ("A", ["Ax0", "Ax1", "Ax2", "Ax3"])
 
+      @projective("A", 3)
+      @test [x0, x1, x2, x3] == ["Ax0", "Ax1", "Ax2", "Ax3"]
+
+      @uses_n("B", 3, 'y')
+      @test [y1, y2, y3] == ["By1", "By2", "By3"]
+
       @test ! @isdefined var"@no_macros"
       @test_throws MethodError no_n_variant("A", 3)
+      @test_throws ArgumentError @macroexpand @no_n_variant("A", 3, :q)
+      @test ! @isdefined q1
     end
   end
 end
