@@ -235,8 +235,8 @@ This function should then (try to) solve `Ax = b` (`side == :right`) or `xA = b`
 The function must always return a tuple `(::Bool, ::MatElem{T}, ::MatElem{T})`
 consisting of:
 * `true`/`false` whether a solution exists or not
-* the solution
-* the kernel
+* the solution (or a placeholder if no solution exists or a solution is not requested)
+* the kernel (or a placeholder if the kernel is not requested)
 
 The input `task` may be:
 * `:only_check`: Only test whether there is a solution, the second
@@ -296,8 +296,8 @@ Solve._init_reduce_transpose(C::SolveCtx{T, NewTrait}) where T
 ```
 
 These should fill the corresponding fields of the solve context `C` with a
-"reduced matrix" (that is, a matrix in normal form) of `matrix(C)` (respectively
-`transpose(matrix(C))` and other information necessary to solve a linear system.
+"reduced matrix" (that is, a matrix in normal form) of `matrix(C)`, respectively
+`transpose(matrix(C))`, and other information necessary to solve a linear system.
 The fields can be accessed via `reduced_matrix`, `reduced_matrix_of_transpose`,
 etc. New fields may also be added via attributes.
 
