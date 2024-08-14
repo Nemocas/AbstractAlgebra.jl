@@ -27,6 +27,11 @@ caching of the parent object is not required, `cached` can be set to `false`.
 laurent_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true) =
    Generic.laurent_series_ring(R, prec, Symbol(s); cached)
 
+@doc raw"""
+    laurent_series_field(R::Field, prec::Int, s::VarName; cached::Bool=true)
+
+See [`laurent_series_ring`](@ref).
+"""
 laurent_series_field(R::Field, prec::Int, s::VarName; cached::Bool=true) =
    Generic.laurent_series_field(R, prec, Symbol(s); cached)
 
