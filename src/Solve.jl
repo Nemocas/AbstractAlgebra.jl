@@ -805,8 +805,8 @@ end
 # `_can_solve_internal_no_check` . Only the latter function needs to be
 # implemented for a given MatrixNormalFormTrait(). Specifically one needs to implement
 # the signature(s)
-#   _can_solve_internal_no_check(::NormalFormTrait, A::MatrixType, b::MatrixType, task::Symbol, side::Symbol)
-#   _can_solve_internal_no_check(::NormalFormTrait, C::SolveCtx, b::MatrixType, task::Symbol, side::Symbol)
+#   _can_solve_internal_no_check(::NormalFormTrait, A::MatrixType, b::MatrixType, task::Symbol; side::Symbol)
+#   _can_solve_internal_no_check(::NormalFormTrait, C::SolveCtx, b::MatrixType, task::Symbol; side::Symbol)
 # Inside these functions one can assume that A (resp. C) and b have compatible
 # dimensions and that `task` and `side` are set to a "legal" option.
 # These functions should then (try to) solve Ax = b (side == :right) or xA = b
