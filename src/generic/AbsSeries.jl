@@ -305,10 +305,11 @@ function (a::AbsPowerSeriesRing{T})() where T <: RingElement
 end
 
 function (a::AbsPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
-   if b == 0
+   bb = base_ring(a)(b)
+   if is_zero(bb)
       z = AbsSeries{T}(Vector{T}(undef, 0), 0, a.prec_max)
    else
-      z = AbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
+      z = AbsSeries{T}([bb], 1, a.prec_max)
    end
    z.parent = a
    return z

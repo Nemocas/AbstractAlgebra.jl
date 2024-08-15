@@ -578,8 +578,9 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
-                                       || (length(x) == 1 && coeff(x, 0) == y))
+==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
+                     ((length(x) == 0 && iszero(base_ring(x)(y))) ||
+                      (length(x) == 1 && coeff(x, 0) == y))
 
 @doc raw"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::AbsPowerSeriesRingElem)

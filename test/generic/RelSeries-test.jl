@@ -107,6 +107,14 @@ end
    @test_throws DomainError O(0+O(x^0))
 
    @test !occursin("\n", sprint(show, T))
+
+   # Test whether "things that get zero in the coefficient ring" are handled
+   # correctly
+   R5, x = power_series_ring(GF(5), 30, "x")
+   f = R5(5)
+   @test isa(f, Generic.RelSeries)
+   @test is_zero(f)
+   @test valuation(f) == max_precision(R5)
 end
 
 @testset "Generic.RelSeries.rand" begin
