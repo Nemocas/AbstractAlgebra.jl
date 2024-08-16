@@ -54,3 +54,8 @@ import .Generic: exponent; @deprecate exponent(a::Generic.MPoly{T}, i::Int, j::I
 import .Generic: set_exponent_vector!; @deprecate set_exponent_vector!(a::Generic.MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{ord}}) where {T <: RingElement, ord} set_exponent_vector!(a, i, exps, Val(ord))
 import .Generic: is_gen; @deprecate is_gen(x::Generic.MPoly{T}, ::Type{Val{ord}}) where {T <: RingElement, ord} is_gen(x, Val(ord))
 import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} degree(f, i, Val(ord))
+
+# deprecated during 0.42.*
+@deprecate zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) zero_matrix(R, n, m)
+@deprecate identity_matrix(::Type{MatElem}, R::Ring, n::Int) zero_matrix(R, n)
+@deprecate change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} map_coefficients(g, p, parent = new_polynomial_ring)

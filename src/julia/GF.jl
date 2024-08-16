@@ -411,13 +411,25 @@ end
 #
 ###############################################################################
 
-Random.Sampler(RNG::Type{<:AbstractRNG}, R::GFField, n::Random.Repetition) =
-   Random.SamplerSimple(R, Random.Sampler(RNG, 0:R.p - 1, n))
+Random.Sampler(RNG::Type{<:AbstractRNG}, R::FinField, n::Random.Repetition) =
+  Random.SamplerSimple(R, Random.Sampler(RNG, BigInt(0):BigInt(characteristic(R) - 1), n))
 
 rand(rng::AbstractRNG, R::Random.SamplerSimple{GFField{T}}) where T =
    GFElem{T}(rand(rng, R.data), R[])
 
-Random.gentype(T::Type{<:GFField}) = elem_type(T)
+function rand(rng::AbstractRNG, Ksp::Random.SamplerSimple{<:FinField})
+   K = Ksp[]
+   r = degree(K)
+   alpha = gen(K)
+   res = zero(K)
+   for i = 0:(r-1)
+      c = rand(rng, Ksp.data)
+      res += c * alpha^i
+   end
+   return res
+end
+
+Random.gentype(T::Type{<:FinField}) = elem_type(T)
 
 ###############################################################################
 #

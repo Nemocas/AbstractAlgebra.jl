@@ -73,6 +73,8 @@ function deepcopy_internal(a::Poly{T}, dict::IdDict) where T <: RingElement
    return parent(a)(coeffs)
 end
 
+Base.copy(f::Generic.Poly) = deepcopy(f)
+
 ###############################################################################
 #
 #   Karatsuba multiplication

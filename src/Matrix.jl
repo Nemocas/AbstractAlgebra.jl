@@ -426,6 +426,8 @@ function _to_indices(x, rows, cols)
    (rows, cols)
 end
 
+sub(M::MatElem, r::AbstractVector{<:Integer}, c::AbstractVector{<:Integer}) = M[r, c]
+
 function Base.view(M::MatElem,
          rows::Union{Int,Colon,AbstractVector{Int}},
          cols::Union{Int,Colon,AbstractVector{Int}})
@@ -790,6 +792,51 @@ function *(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    return A
 end
 
+function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
+   check_parent(a, b)
+   check_parent(a, c)
+   for i = 1:nrows(c)
+      for j = 1:ncols(c)
+         c[i, j] = add!(c[i, j], a[i, j], b[i, j])
+      end
+   end
+   return c
+end
+
+function mul!(c::MatElem{T}, a::MatElem{T}, b::MatElem{T}) where T <: NCRingElement
+   ncols(a) != nrows(b) && error("Incompatible matrix dimensions")
+   nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
+   ncols(c) != ncols(b) && error("Incompatible matrix dimensions")
+
+   if c === a || c === b
+      d = parent(a)()
+      return mul!(d, a, b)
+   end
+
+   t = base_ring(a)()
+   for i = 1:nrows(a)
+      for j = 1:ncols(b)
+         c[i, j] = zero!(c[i, j])
+         for k = 1:ncols(a)
+            c[i, j] = addmul_delayed_reduction!(c[i, j], a[i, k], b[k, j], t)
+         end
+         c[i, j] = reduce!(c[i, j])
+      end
+   end
+   return c
+end
+
+function sub!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
+   check_parent(a, b)
+   check_parent(a, c)
+   for i = 1:nrows(c)
+      for j = 1:ncols(c)
+         c[i, j] = sub!(c[i, j], a[i, j], b[i, j])
+      end
+   end
+   return c
+end
+
 ###############################################################################
 #
 #   Ad hoc binary operators
@@ -1011,6 +1058,24 @@ end
 function *(x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
    length(x) == nrows(y) || error("Incompatible dimensions")
    return mul!(T[base_ring(y)() for j in 1:ncols(y)], x, y)
+end
+
+function mul!(c::MatrixElem{T}, a::MatrixElem{T}, b::T) where T <: NCRingElement
+   nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
+   ncols(c) != ncols(a) && error("Incompatible matrix dimensions")
+
+   if c === a
+      d = parent(a)()
+      return mul!(d, a, b)
+   end
+
+   t = base_ring(a)()
+   for i = 1:nrows(a)
+      for j = 1:ncols(a)
+         c[i, j] = mul!(c[i, j], a[i, j], b)
+      end
+   end
+   return c
 end
 
 ################################################################################
@@ -1373,6 +1438,7 @@ julia> B = transpose(A)
 """
 transpose(x::MatrixElem{T}) where T <: NCRingElement
 
+transpose!(A::MatrixElem) = transpose(A)
 
 ###############################################################################
 #

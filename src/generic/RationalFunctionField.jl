@@ -91,6 +91,21 @@ function Base.denominator(a::RationalFunctionFieldElem, canonicalise::Bool=true)
    return denominator(data(a), canonicalise)
 end
 
+function (R::AbstractAlgebra.PolyRing{T})(x::RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
+   @assert isone(denominator(x))
+   y = numerator(x)
+   @assert parent(y) === R
+   return y
+end
+
+# Avoid ambiguity with (::Generic.PolyRing{T})(::RingElement)
+function (R::PolyRing{T})(x::RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
+   @assert isone(denominator(x))
+   y = numerator(x)
+   @assert parent(y) === R
+   return y
+end
+
 zero(R::RationalFunctionField) = R()
 
 one(R::RationalFunctionField) = R(1)

@@ -55,6 +55,8 @@ end
 
 Base.broadcastable(M::Map) = Ref(M)
 
+Base.:\(f::Map, x) = preimage(f, x)
+
 ###############################################################################
 #
 #   CompositeMap

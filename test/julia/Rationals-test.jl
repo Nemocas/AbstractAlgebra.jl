@@ -207,3 +207,24 @@ end
       @test AbstractAlgebra.divrem(r,s) == (r/s,0)
    end
 end
+
+@testset "Julia.Rationals.valuation" begin
+   z = QQ(1//6)
+   p = ZZ(3)
+   v, x = remove(z, p)
+   @test v == -1
+   @test v == valuation(z, p)
+   @test x == QQ(1//2)
+
+   p = ZZ(5)
+   v, x = remove(z, p)
+   @test v == 0
+   @test v == valuation(z, p)
+   @test x == z
+
+   z = QQ(0)
+   v, x = remove(z, p)
+   @test v == 0
+   @test x == z
+   @test_throws ErrorException valuation(z, p)
+end

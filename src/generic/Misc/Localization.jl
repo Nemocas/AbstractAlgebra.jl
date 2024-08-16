@@ -354,6 +354,7 @@ end
 
 promote_rule(::Type{LocalizedEuclideanRingElem{T}}, ::Type{LocalizedEuclideanRingElem{T}}) where {T <: RingElement} = LocalizedEuclideanRingElem{T}
 
+promote_rule(::Type{LocalizedEuclideanRingElem{T}}, ::Type{T}) where {T} = LocalizedEuclideanRingElem{T}
 
 ###############################################################################
 #

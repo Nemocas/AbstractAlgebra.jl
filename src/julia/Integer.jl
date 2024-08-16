@@ -28,6 +28,8 @@ is_exact_type(::Type{T}) where T <: Integer = true
 
 is_domain_type(::Type{T}) where T <: Integer = true
 
+base_ring(::Vector{T}) where T <: Integer = T
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -555,6 +557,10 @@ end
 
 function addmul!(a::T, b::T, c::T) where T <: Integer # special case, no temporary required
    return a + b*c
+end
+
+function neg!(w::Vector{<:Integer})
+    return w .*= -1
 end
 
 ###############################################################################

@@ -49,6 +49,8 @@ number_of_variables(a::PolyRing) = 1
 
 characteristic(a::PolyRing) = characteristic(base_ring(a))
 
+Base.copy(a::PolyRingElem) = deepcopy(a)
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -1960,6 +1962,10 @@ function content(a::PolyRingElem)
       z = gcd(z, coeff(a, i - 1))
    end
    return z
+end
+
+function content(a::PolyRingElem{<:FieldElem})
+   return one(base_ring(a))
 end
 
 @doc raw"""

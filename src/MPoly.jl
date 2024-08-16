@@ -1209,6 +1209,55 @@ function coefficients_of_univariate(p::MPolyRingElem,
    return coeffs
 end
 
+###############################################################################
+#
+#   As univariate polynomials
+#
+###############################################################################
+
+@doc raw"""
+    coefficients(f::MPolyRingElem, i::Int)
+
+Return the coefficients of `f` when viewed as a univariate polynomial in the `i`-th
+variable.
+"""
+function coefficients(f::MPolyRingElem, i::Int)
+   d = degree(f, i)
+   cf = [MPolyBuildCtx(parent(f)) for j = 0:d]
+   for (c, e) = zip(coefficients(f), exponent_vectors(f))
+      a = e[i]
+      e[i] = 0
+      push_term!(cf[a+1], c, e)
+   end
+   return map(finish, cf)
+end
+
+#check with Nemo/ Dan if there are better solutions
+#the block is also not used here I think
+#functionality to view mpoly as upoly in variable `i`, so the
+#coefficients are mpoly's without variable `i`.
+function leading_coefficient(f::MPolyRingElem, i::Int)
+   g = MPolyBuildCtx(parent(f))
+   d = degree(f, i)
+   for (c, e) = zip(coefficients(f), exponent_vectors(f))
+      if e[i] == d
+         e[i] = 0
+         push_term!(g, c, e)
+      end
+   end
+   return finish(g)
+end
+
+@doc raw"""
+    content(f::MPolyRingElem, i::Int)
+
+Return the content of `f` as a polynomial in the variable `i`, i.e. the gcd of
+all the coefficients when viewed as univariate polynomial in `i`.
+"""
+function content(f::MPolyRingElem, i::Int)
+   return reduce(gcd, coefficients(f, i))
+end
+
 ################################################################################
 #
 #  Change base ring
