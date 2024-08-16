@@ -1315,3 +1315,12 @@ end
    @test isequal(set_precision(b, 1), O(x))
    @test is_zero(set_precision(b, 1))
 end
+
+@testset "Generic.AbsSeries.lift" begin
+   R, x = power_series_ring(QQ, 20, "x", model = :capped_absolute)
+   f = x^2 + 2*x^5 + x^6
+
+   S, y = polynomial_ring(QQ, "y")
+   g = lift(S, f)
+   @test g == y^2 + 2*y^5 + y^6
+end

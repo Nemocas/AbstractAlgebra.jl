@@ -228,3 +228,17 @@ end
    @test x == z
    @test_throws ErrorException valuation(z, p)
 end
+
+@testset "Julia.Rationals.unsafe_operations" begin
+   a = QQ(2//3)
+   b = QQ(3//4)
+   c = QQ()
+   @test neg!(c, a) == -a
+   @test add!(c, a, b) == a + b
+   @test mul!(c, a, b) == a * b
+
+   b = ZZ(3)
+   @test sub!(c, a, b) == a - b
+   @test add!(c, a, b) == a + b
+   @test mul!(c, a, b) == a * b
+end

@@ -83,6 +83,12 @@
       end
       @test f1 == f4
 
+      f4 = zero(S)
+      for t in zip(coefficients(f1), monomials(f1))
+         f4 = addmul!(f4, S(t[1]), t[2])
+      end
+      @test f1 == f4
+
       if !iszero(f1)
          @test leading_term(f1) == leading_coefficient(f1)*leading_monomial(f1)
          @test total_degree(f1) >= total_degree(f1 - leading_term(f1))

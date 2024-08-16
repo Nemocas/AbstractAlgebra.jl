@@ -804,6 +804,7 @@ function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: N
 end
 
 function mul!(c::MatElem{T}, a::MatElem{T}, b::MatElem{T}) where T <: NCRingElement
+   @assert base_ring(a) === base_ring(b) && base_ring(a) === base_ring(c)
    ncols(a) != nrows(b) && error("Incompatible matrix dimensions")
    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
    ncols(c) != ncols(b) && error("Incompatible matrix dimensions")
@@ -1061,6 +1062,7 @@ function *(x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
 end
 
 function mul!(c::MatrixElem{T}, a::MatrixElem{T}, b::T) where T <: NCRingElement
+   @assert base_ring(a) === parent(b) && base_ring(a) === base_ring(c)
    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
    ncols(c) != ncols(a) && error("Incompatible matrix dimensions")
 

@@ -326,6 +326,7 @@ end
       f = rand(S, 0:5, 0:100, 0:0, -100:100)
 
       @test f == deepcopy(f)
+      @test f == copy(f)
 
       @test hash(f) == hash(deepcopy(f))
 
@@ -1694,4 +1695,12 @@ end
    @test_throws MethodError polynomial_ring(Char, [:x])
    @test_throws Exception mpoly_ring_type(Char)
    @test_throws ArgumentError mpoly_type(Char)
+end
+
+@testset "Generic.MPoly.as_univariate" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+   f = x * y + 2 * x^2 * y + x * y^2
+   @test coefficients(f, 1) == typeof(f)[R(), y + y^2, 2 * y]
+   @test leading_coefficient(f, 1) == coefficients(f, 1)[end]
+   @test content(f, 1) == y
 end

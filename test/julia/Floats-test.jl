@@ -32,6 +32,11 @@ end
 
    @test is_unit(R(3))
    @test is_unit(S(3))
+
+   @test is_negative(R(-3))
+   @test !is_negative(R(0))
+   @test !is_positive(R(-3))
+   @test !is_positive(R(0))
 end
 
 @testset "Julia.Floats.exact_division" begin

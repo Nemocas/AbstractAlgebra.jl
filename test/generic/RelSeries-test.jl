@@ -151,6 +151,8 @@ end
 
    @test isequal(deepcopy(a), a)
    @test isequal(deepcopy(b), b)
+   @test isequal(copy(a), a)
+   @test isequal(copy(b), b)
 
    @test normalise(a, 3) == 3
 
@@ -1350,4 +1352,13 @@ end
    @test isequal(set_precision(a, 0), O(x^0))
    @test isequal(set_precision(b, 1), O(x))
    @test is_zero(set_precision(b, 1))
+end
+
+@testset "Generic.RelSeries.lift" begin
+   R, x = power_series_ring(QQ, 20, "x")
+   f = x^2 + 2*x^5 + x^6
+
+   S, y = polynomial_ring(QQ, "y")
+   g = lift(S, f)
+   @test g == y^2 + 2*y^5 + y^6
 end

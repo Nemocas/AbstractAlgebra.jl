@@ -193,11 +193,10 @@ function canonical_unit(a::SeriesElem)
    iszero(a) && return one(parent(a))
    v = valuation(a)
    v == 0 && return a
-   v > 0 && return shift_right(a, v)
-   return shift_left(a, -v)
+   return shift_right(a, v)
 end
 
-function lift(R::PolyRing{T}, s::SeriesElem{T}) where {T}
+function lift(R::PolyRing{T}, s::RelPowerSeriesRingElem{T}) where {T}
    t = R()
    for x = 0:pol_length(s)
       setcoeff!(t, x, polcoeff(s, x))
