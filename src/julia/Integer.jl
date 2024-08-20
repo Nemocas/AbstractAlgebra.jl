@@ -377,15 +377,12 @@ end
 #
 #  [ a for a in 0:q-1 if a == 0 || powermod(a, divexact(q-1,p), q) == 1]
 
-# p = 3, q = 7 or q = 13
-const moduli3 = [7, 13]
-const residues3 = [[0, 1, 6], [0, 1, 5, 8, 12]]
-
-const moduli5 = [11, 31]
-const residues5 = [[0, 1, 10], [0, 1, 5, 6, 25, 26, 30]]
-
-const moduli7 = [29, 43]
-const residues7 = [[0, 1, 12, 17, 28], [0, 1, 6, 7, 36, 37, 42]]
+const _p_q_residues = (
+    #p => [q1 => residues,  q2 => residues, .... ]
+    3 => ( 7 => [0, 1, 6], 13 => [0, 1, 5, 8, 12] ),
+    5 => ( 11 => [0, 1, 10], 31 => [0, 1, 5, 6, 25, 26, 30] ),
+    7 => ( 29 => [0, 1, 12, 17, 28], 43 => [0, 1, 6, 7, 36, 37, 42] ),
+  )
 
 # helper which returns false if a definitely is not an n-th power,
 # otherwise return true (indicating we don't know)
@@ -399,25 +396,16 @@ function ispower_moduli(a::Integer, n::Int)
       return false
    end
 
-   if (n % 3) == 0
-      for i = 1:length(moduli3)
-         if !(mod(a, moduli3[i]) in residues3[i])
-            return false
-         end
-      end
-   elseif (n % 5) == 0
-      for i = 1:length(moduli5)
-         if !(mod(a, moduli5[i]) in residues5[i])
-            return false
-         end
-      end
-   elseif (n % 7) == 0
-      for i = 1:length(moduli7)
-         if !(mod(a, moduli7[i]) in residues7[i])
-            return false
-         end
-      end
+   for (p, q_residues) in _p_q_residues
+     if (n % p) == 0
+        for (q, residues) in q_residues
+           if !(mod(a, q) in residues)
+              return false
+           end
+        end
+     end
    end
+
    return true
 end
 
