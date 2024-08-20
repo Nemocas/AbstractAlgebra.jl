@@ -6574,6 +6574,8 @@ function zero_matrix(R::NCRing, r::Int, c::Int)
    return z
 end
 
+zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
+
 ################################################################################
 #
 #   Ones matrix
@@ -6627,6 +6629,8 @@ function identity_matrix(M::MatElem{T}, n::Int) where T <: NCRingElement
    end
    z
 end
+
+identity_matrix(::Type{MatElem}, R::Ring, n::Int) = identity_matrix(R, n)
 
 ################################################################################
 #
