@@ -1425,7 +1425,9 @@ function mod(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
    if length(f) >= length(g)
       f = deepcopy(f)
       b = leading_coefficient(g)
-      g = inv(b)*g
+      if !is_one(b)
+        g = inv(b)*g
+      end
       c = base_ring(f)()
       while length(f) >= length(g)
          l = -leading_coefficient(f)

@@ -9,6 +9,7 @@ using AbstractAlgebra.PrettyPrinting: pretty
 using AbstractAlgebra: _can_solve_with_solution_fflu
 using AbstractAlgebra: _can_solve_with_solution_interpolation
 using AbstractAlgebra: _solve_fflu_precomp
+using AbstractAlgebra: echelon_form!
 using AbstractAlgebra: howell_form!
 import AbstractAlgebra: kernel
 import AbstractAlgebra: matrix
@@ -322,7 +323,7 @@ function _init_reduce(C::SolveCtx{T, HermiteFormTrait}) where T
     return nothing
   end
 
-  R, U = hnf_with_transform(matrix(C))
+  R, U = hermite_form_with_transformation(matrix(C))
   C.red = R
   C.trafo = U
   return nothing
@@ -417,7 +418,7 @@ function _init_reduce_transpose(C::SolveCtx{T, HermiteFormTrait}) where T
     return nothing
   end
 
-  R, U = hnf_with_transform(lazy_transpose(matrix(C)))
+  R, U = hermite_form_with_transformation(lazy_transpose(matrix(C)))
   C.red_transp = R
   C.trafo_transp = U
   return nothing
@@ -718,11 +719,11 @@ function kernel(::HermiteFormTrait, A::MatElem; side::Symbol = :left)
 
   if side === :right
     A = hnf(A)
-    HH, UU = hnf_with_transform(lazy_transpose(A))
+    HH, UU = hermite_form_with_transformation(lazy_transpose(A))
     return lazy_transpose(_kernel_of_hnf(HH, UU))
   else
     A = lazy_transpose(hnf(lazy_transpose(A)))
-    H, U = hnf_with_transform(A)
+    H, U = hermite_form_with_transformation(A)
     return _kernel_of_hnf(H, U)
   end
 end
@@ -805,8 +806,8 @@ end
 # `_can_solve_internal_no_check` . Only the latter function needs to be
 # implemented for a given MatrixNormalFormTrait(). Specifically one needs to implement
 # the signature(s)
-#   _can_solve_internal_no_check(::NormalFormTrait, A::MatrixType, b::MatrixType, task::Symbol, side::Symbol)
-#   _can_solve_internal_no_check(::NormalFormTrait, C::SolveCtx, b::MatrixType, task::Symbol, side::Symbol)
+#   _can_solve_internal_no_check(::NormalFormTrait, A::MatrixType, b::MatrixType, task::Symbol; side::Symbol)
+#   _can_solve_internal_no_check(::NormalFormTrait, C::SolveCtx, b::MatrixType, task::Symbol; side::Symbol)
 # Inside these functions one can assume that A (resp. C) and b have compatible
 # dimensions and that `task` and `side` are set to a "legal" option.
 # These functions should then (try to) solve Ax = b (side == :right) or xA = b
@@ -934,7 +935,7 @@ function _can_solve_internal_no_check(::HermiteFormTrait, A::MatElem{T}, b::MatE
     return fl, lazy_transpose(_sol), lazy_transpose(_K)
   end
 
-  H, S = hnf_with_transform(lazy_transpose(A))
+  H, S = hermite_form_with_transformation(lazy_transpose(A))
   fl, sol = _can_solve_with_hnf(b, H, S, task)
   if !fl || task !== :with_kernel
     return fl, sol, zero(A, 0, 0)
@@ -969,7 +970,7 @@ function _can_solve_internal_no_check(::RREFTrait, A::MatElem{T}, b::MatElem{T},
 
   mu = hcat(deepcopy(A), deepcopy(b))
 
-  rk = rref!(mu)
+  rk = echelon_form!(mu)
   p = pivot_and_non_pivot_cols(mu, rk)
   if any(i -> i > ncols(A), p[1:rk])
     return false, zero(A, 0, 0), zero(A, 0, 0)

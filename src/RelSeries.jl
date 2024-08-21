@@ -781,8 +781,8 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::RelPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
-                  ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
-                    valuation(x) == 0 && polcoeff(x, 0) == y))
+                    ((pol_length(x) == 0 && iszero(base_ring(x)(y))) ||
+                     (pol_length(x) == 1 && valuation(x) == 0 && polcoeff(x, 0) == y))
 
 @doc raw"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::RelPowerSeriesRingElem)

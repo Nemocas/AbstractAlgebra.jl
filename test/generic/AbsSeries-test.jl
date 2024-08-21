@@ -106,6 +106,14 @@ end
    @test R === S
    S, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute, cached = false)
    @test R !== S
+
+   # Test whether "things that get zero in the coefficient ring" are handled
+   # correctly
+   R5, x = power_series_ring(GF(5), 30, "x", model = :capped_absolute)
+   f = R5(5)
+   @test isa(f, Generic.AbsSeries)
+   @test is_zero(f)
+   @test valuation(f) == max_precision(R5)
 end
 
 @testset "Generic.AbsSeries.manipulation" begin
