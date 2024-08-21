@@ -1301,4 +1301,17 @@ end
       @test is_unit(det(U))
       @test is_unit(det(V))
    end
- end
+end
+
+@testset "Generic.AbsSeries.set_precision" begin
+   R, x = power_series_ring(QQ, 20, "x", model = :capped_absolute)
+   a = 1 + x + x^3 + O(x^5)
+   b = x^2 + O(x^3)
+
+   @test isequal(set_precision(a, 7), 1 + x + x^3 + O(x^7))
+   @test isequal(set_precision(a, 5), 1 + x + x^3 + O(x^5))
+   @test isequal(set_precision(a, 3), 1 + x + O(x^3))
+   @test isequal(set_precision(a, 0), O(x^0))
+   @test isequal(set_precision(b, 1), O(x))
+   @test is_zero(set_precision(b, 1))
+end

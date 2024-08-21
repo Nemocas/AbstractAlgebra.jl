@@ -95,6 +95,11 @@ function set_length!(a::SeriesElem, len::Int)
    return a
 end
 
+# TODO: set_precision! for the generic types RelSeries and AbsSeries
+# truncates the underlying polynomial since #1773. In a breaking release,
+# this should possibly also happen for the abstract types. Alternatively,
+# this set_precision! should be renamed (and only be kept as a purely internal
+# setter function).
 function set_precision!(a::SeriesElem, prec::Int)
    a.prec = prec
    return a

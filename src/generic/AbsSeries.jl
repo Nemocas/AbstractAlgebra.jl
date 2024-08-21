@@ -72,6 +72,13 @@ function characteristic(a::AbsPowerSeriesRing{T}) where T <: RingElement
    return characteristic(base_ring(a))
 end
 
+function set_precision!(a::AbsSeries, prec::Int)
+   prec < 0 && throw(DomainError(prec, "Precision must be non-negative"))
+   a = truncate!(a, prec)
+   a.prec = prec
+   return a
+end
+
 ###############################################################################
 #
 #   Binary operations
@@ -163,6 +170,19 @@ end
 #   Unsafe functions
 #
 ###############################################################################
+
+function truncate!(a::AbsSeries{T}, n::Int) where T <: RingElement
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
+   if precision(a) <= n
+      return a
+   end
+   a.length = min(n, length(a))
+   while length(a) != 0 && is_zero(coeff(a, length(a) - 1))
+      a.length -= 1
+   end
+   a.prec = n
+   return a
+end
 
 function zero!(c::AbsSeries{T}) where T <: RingElement
    c.length = 0

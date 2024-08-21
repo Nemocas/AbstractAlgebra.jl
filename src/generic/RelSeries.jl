@@ -62,6 +62,16 @@ function characteristic(a::RelPowerSeriesRing{T}) where T <: RingElement
    return characteristic(base_ring(a))
 end
 
+function set_precision!(a::RelSeries, prec::Int)
+   prec < 0 && throw(DomainError(prec, "Precision must be non-negative"))
+   a = truncate!(a, prec)
+   a.prec = prec
+   if is_zero(a)
+      a.val = prec
+   end
+   return a
+end
+
 ###############################################################################
 #
 #   Binary operators
@@ -151,6 +161,24 @@ end
 #   Unsafe functions
 #
 ###############################################################################
+
+function truncate!(a::RelSeries{T}, n::Int) where T <: RingElement
+   n < 0 && throw(DomainError(n, "n must be >= 0"))
+   if precision(a) <= n
+      return a
+   end
+   if n <= valuation(a)
+      a = zero!(a)
+      a.val = n
+   else
+      a.length = min(n - valuation(a), pol_length(a))
+      while is_zero(polcoeff(a, pol_length(a) - 1))
+         a.length -= 1
+      end
+   end
+   a.prec = n
+   return a
+end
 
 function zero!(a::RelSeries)
    a.length = 0
