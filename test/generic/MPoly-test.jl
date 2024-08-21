@@ -183,7 +183,7 @@
    @test_logs (:warn, """The variable name "x-1" sadly is no Julia identifier. You can still access it as `var"x-1"`."""
       ) @macroexpand @polynomial_ring(QQ, :x => -1:1)
    @test_logs (:error, "Inconveniently, you may only use literals and variables from the global scope of the current module (`Main`) when using variable name constructor macros"
-      ) @test_throws (VERSION <= v"1.7" ? LoadError : UndefVarError) let local_name = 3
+      ) @test_throws (VERSION < v"1.7" ? LoadError : UndefVarError) let local_name = 3
          @macroexpand @polynomial_ring(QQ, :x => 1:local_name)
       end
 end
