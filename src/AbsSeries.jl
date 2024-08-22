@@ -81,6 +81,13 @@ function Base.hash(a::AbsPowerSeriesRingElem, h::UInt)
    return b
 end
 
+function set_precision!(a::AbsPowerSeriesRingElem, prec::Int)
+   prec < 0 && throw(DomainError(prec, "Precision must be non-negative"))
+   a = truncate!(a, prec)
+   _set_precision_raw!(a, prec)
+   return a
+end
+
 function lift(R::PolyRing{T}, s::AbsPowerSeriesRingElem{T}) where {T}
    t = R()
    for x = 0:pol_length(s)
@@ -413,22 +420,7 @@ end
 Return $a$ truncated to $n$ terms.
 """
 function truncate(a::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
-   n < 0 && throw(DomainError(n, "n must be >= 0"))
-   len = length(a)
-   if precision(a) <= n
-      return a
-   end
-   z = parent(a)()
-   fit!(z, n)
-   z = _set_precision_raw!(z, n)
-   for i = 1:min(n, len)
-      z = setcoeff!(z, i - 1, coeff(a, i - 1))
-   end
-   for i = len + 1:n
-      z = setcoeff!(z, i - 1, zero(base_ring(a)))
-   end
-   z = set_length!(z, normalise(z, n))
-   return z
+   return truncate!(deepcopy(a), n)
 end
 
 ###############################################################################

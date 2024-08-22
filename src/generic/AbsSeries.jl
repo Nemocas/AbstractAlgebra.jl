@@ -72,13 +72,6 @@ function characteristic(a::AbsPowerSeriesRing{T}) where T <: RingElement
    return characteristic(base_ring(a))
 end
 
-function set_precision!(a::AbsSeries, prec::Int)
-   prec < 0 && throw(DomainError(prec, "Precision must be non-negative"))
-   a = truncate!(a, prec)
-   a.prec = prec
-   return a
-end
-
 ###############################################################################
 #
 #   Binary operations

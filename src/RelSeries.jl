@@ -97,15 +97,14 @@ function set_length!(a::SeriesElem, len::Int)
    return a
 end
 
-# TODO: set_precision! for the generic types RelSeries and AbsSeries
-# truncates the underlying polynomial since #1773. In a breaking release,
-# this should possibly also happen for the abstract types. Alternatively,
-# this set_precision! should be renamed (and only be kept as a purely internal
-# setter function).
-function set_precision!(a::SeriesElem, prec::Int)
-  # TODO
-  _set_precision_raw!(a, prec)
-  return a
+function set_precision!(a::RelPowerSeriesRingElem, prec::Int)
+   prec < 0 && throw(DomainError(prec, "Precision must be non-negative"))
+   a = truncate!(a, prec)
+   _set_precision_raw!(a, prec)
+   if is_zero(a)
+      set_valuation!(a, prec)
+   end
+   return a
 end
 
 function _set_precision_raw!(a::SeriesElem, prec::Int)
@@ -615,27 +614,7 @@ end
 Return $a$ truncated to (absolute) precision $n$.
 """
 function truncate(a::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
-   n < 0 && throw(DomainError(n, "n must be >= 0"))
-   alen = pol_length(a)
-   aprec = precision(a)
-   aval = valuation(a)
-   if aprec <= n
-      return a
-   end
-   z = parent(a)()
-   z = _set_precision_raw!(z, n)
-   if n <= aval
-      z = set_length!(z, 0)
-      z = set_valuation!(z, n)
-   else
-      fit!(z, n - aval)
-      z = set_valuation!(z, aval)
-      for i = 1:min(n - aval, alen)
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
-      end
-      z = set_length!(z, normalise(z, n - aval))
-   end
-   return z
+   return truncate!(deepcopy(a), n)
 end
 
 # Intended only for internal use, does not renormalize, assumes n >= 0
