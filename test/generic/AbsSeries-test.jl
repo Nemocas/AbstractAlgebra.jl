@@ -575,6 +575,10 @@ end
    # Exact ring
    R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
 
+   # Special case: length 1
+   f = R(2)
+   @test isequal(f^3, R(8))
+
    for iter = 1:100
       f = rand(R, 0:12, -10:10)
       r2 = R(1)

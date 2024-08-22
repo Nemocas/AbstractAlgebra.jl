@@ -894,6 +894,10 @@ end
 @testset "Generic.RelSeries.square_root" begin
     # Exact ring
     R, x = power_series_ring(ZZ, 10, "x")
+
+    # Special case: precision 0
+    @test is_zero(sqrt(O(x^0)))
+
     for iter = 1:300
        f = rand(R, 0:10, -10:10)
        g = f^2
