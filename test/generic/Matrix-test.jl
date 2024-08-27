@@ -4382,3 +4382,25 @@ end
       @test M + X == N + matrix(X)
    end
 end
+
+@testset "Generic.Mat.unsafe" begin
+  a = QQ[1 2 3; 4 5 6]
+  b = QQ[1 1 1; 1 1 1]
+  c = zero_matrix(QQ, 2, 3)
+  c = add!(c, a, b)
+  @test c == a + b
+  c = sub!(c, a, b)
+  @test c == a - b
+
+  b = transpose(b)
+  c = zero_matrix(QQ, 2, 2)
+  c = mul!(c, a, b)
+  @test c == a * b
+
+  c = zero_matrix(QQ, 2, 3)
+  c = mul!(c, a, QQ(2))
+  @test c == a * QQ(2)
+
+  b = transpose(a)
+  @test AbstractAlgebra.transpose!(a) == b
+end

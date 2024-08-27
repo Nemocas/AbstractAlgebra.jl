@@ -152,6 +152,8 @@ function addmul!(z::T, x::T, y::T, c::T) where T <: NCRingElem
    return z
 end
 
+addmul!(z::T, x::T, y::T) where T <: NCRingElem = addmul!(z, x, y, parent(z)())
+
 ###############################################################################
 #
 #   Basic manipulation

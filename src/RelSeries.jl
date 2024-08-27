@@ -43,6 +43,8 @@ this is returned as a `Symbol` not a `String`.
 """
 var(a::SeriesRing) = a.S
 
+Base.copy(a::SeriesElem) = deepcopy(a)
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -103,6 +105,23 @@ end
 function set_precision!(a::SeriesElem, prec::Int)
    a.prec = prec
    return a
+end
+
+set_precision(a::SeriesElem, i::Int) = set_precision!(deepcopy(a), i)
+
+function set_precision(f::PolyRingElem{T}, n::Int) where {T<:SeriesElem}
+   g = parent(f)()
+   for i = 0:length(f)
+      setcoeff!(g, i, set_precision(coeff(f, i), n))
+   end
+   return g
+end
+
+function set_precision!(f::PolyRingElem{T}, n::Int) where {T<:SeriesElem}
+   for i = 0:length(f)
+      setcoeff!(f, i, set_precision!(coeff(f, i), n))
+   end
+   return f
 end
 
 function set_valuation!(a::RelPowerSeriesRingElem, val::Int)
@@ -168,6 +187,21 @@ function renormalize!(z::RelPowerSeriesRingElem)
       z = set_length!(z, zlen - i)
    end
    return nothing
+end
+
+function canonical_unit(a::SeriesElem)
+   iszero(a) && return one(parent(a))
+   v = valuation(a)
+   v == 0 && return a
+   return shift_right(a, v)
+end
+
+function lift(R::PolyRing{T}, s::RelPowerSeriesRingElem{T}) where {T}
+   t = R()
+   for x = 0:pol_length(s)
+      setcoeff!(t, x, polcoeff(s, x))
+   end
+   return shift_left(t, valuation(s))
 end
 
 ###############################################################################

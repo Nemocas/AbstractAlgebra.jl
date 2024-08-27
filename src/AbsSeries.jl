@@ -81,6 +81,14 @@ function Base.hash(a::AbsPowerSeriesRingElem, h::UInt)
    return b
 end
 
+function lift(R::PolyRing{T}, s::AbsPowerSeriesRingElem{T}) where {T}
+   t = R()
+   for x = 0:pol_length(s)
+      setcoeff!(t, x, polcoeff(s, x))
+   end
+   return t
+end
+
 ###############################################################################
 #
 #   Similar and zero

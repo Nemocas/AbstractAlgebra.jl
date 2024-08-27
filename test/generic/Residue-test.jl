@@ -462,3 +462,11 @@ end
       end
    end
 end
+
+@testset "EuclideanRingResidueRingElem.polynomials" begin
+   R, x = polynomial_ring(GF(5), "x")
+   S, _ = residue_ring(R, x^3)
+
+   @test gen(S) == S(x)
+   @test gens(S) == elem_type(S)[one(S), gen(S), gen(S)^2]
+end

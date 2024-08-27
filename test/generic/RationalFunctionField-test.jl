@@ -138,6 +138,12 @@ end
 
    @test numerator((x + 1)//(-x^2 + 1)) == -1
 
+   S = parent(numerator(x))
+   @test S(x) == gen(S)
+   @test_throws AssertionError S(1//x)
+   T, _ = polynomial_ring(QQ, "x", cached = false)
+   @test_throws AssertionError T(x)
+
    @test iszero(zero(R))
 
    @test isone(one(R))

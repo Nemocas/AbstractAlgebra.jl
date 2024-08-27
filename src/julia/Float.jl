@@ -44,6 +44,10 @@ canonical_unit(a::AbstractFloat) = a
 
 characteristic(a::Floats{T}) where T <: AbstractFloat = 0
 
+is_negative(n::T) where T<:Real = n < zero(T)
+
+is_positive(n::T) where T<:Real = n > zero(T)
+
 ###############################################################################
 #
 #   String I/O

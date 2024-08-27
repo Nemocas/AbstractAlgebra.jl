@@ -285,6 +285,14 @@ function addmul!(a::Rational{T}, b::Rational{T}, c::Rational{T}, d::Rational{T})
    return a
 end
 
+sub!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x - y
+
+neg!(z::Rational{T}, x::Rational{T}) where T <: Integer = -x
+
+add!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x + y
+
+mul!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x * y
+
 ###############################################################################
 #
 #   Random generation
@@ -309,6 +317,32 @@ end
 rand(rng::AbstractRNG, R::Rationals, n) = rand(rng, make(R, n))
 
 rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
+
+###############################################################################
+#
+#   valutaion / remove
+#
+###############################################################################
+
+# TODO (CF):
+# should be Bernstein'ed: this is slow for large valuations
+# returns the maximal v s.th. z mod p^v == 0 and z div p^v
+#   also useful if p is not prime....
+#
+# TODO: what happens to z = 0???
+function remove(z::Rational{T}, p::T) where {T<:Integer}
+    z == 0 && return (0, z)
+    v, d = remove(denominator(z), p)
+    w, n = remove(numerator(z), p)
+    return w - v, n // d
+end
+
+function valuation(z::Rational{T}, p::T) where {T<:Integer}
+    z == 0 && error("Not yet implemented")
+    v = valuation(denominator(z), p)
+    w = valuation(numerator(z), p)
+    return w - v
+end
 
 ###############################################################################
 #

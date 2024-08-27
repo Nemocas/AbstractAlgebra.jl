@@ -81,3 +81,47 @@ function preimage(f::EuclideanRingResidueMap, a)
   parent(a) != codomain(f) && error("Not an element of the codomain")
   return lift(a)
 end
+
+###############################################################################
+#
+#   Some functions for residue rings of polynomial rings
+#
+###############################################################################
+
+function gen(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
+   return R(gen(base_ring(R)))
+end
+
+# TODO: the names `gen` (algebra generator) and `gens` (module generators) are
+# very unfortunate
+function gens(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem} ## probably needs more cases
+   ## as the other residue functions
+   g = gen(R)
+   r = Vector{typeof(g)}()
+   push!(r, one(R))
+   if degree(modulus(R)) == 1
+      return r
+   end
+   push!(r, g)
+   for i = 2:degree(modulus(R))-1
+      push!(r, r[end] * g)
+   end
+   return r
+end
+
+function characteristic(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
+   return characteristic(base_ring(base_ring(R)))
+end
+
+function size(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
+   return size(base_ring(base_ring(R)))^degree(modulus(R))
+end
+
+function rand(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
+   r = rand(base_ring(base_ring(R)))
+   g = gen(R)
+   for i = 1:degree(modulus(R))
+      r = r * g + rand(base_ring(base_ring(R)))
+   end
+   return r
+end

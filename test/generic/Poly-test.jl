@@ -363,6 +363,7 @@ end
    @test canonical_unit(-x*y + x + 1) == -1
 
    @test deepcopy(h) == h
+   @test copy(h) == h
 
    @test is_term_recursive(2*x*y^2)
    @test !is_term_recursive(2*(x + 1)*y^2)
