@@ -1,4 +1,4 @@
-@testset "Generic.FreeAssAlgebra.constructors" begin
+@testset "Generic.FreeAssociativeAlgebra.constructors" begin
    R, x = ZZ["y"]
 
    for num_vars = 1:5
@@ -11,37 +11,37 @@
       @test free_associative_algebra(R, num_vars, "x", cached = true)[1] === free_associative_algebra(R, var_names, cached = true)[1]
       @test free_associative_algebra(R, num_vars, cached = true)[1] === free_associative_algebra(R, var_names, cached = true)[1]
 
-      @test elem_type(S) == Generic.FreeAssAlgElem{elem_type(R)}
-      @test elem_type(Generic.FreeAssAlgebra{elem_type(R)}) == Generic.FreeAssAlgElem{elem_type(R)}
-      @test parent_type(Generic.FreeAssAlgElem{elem_type(R)}) == Generic.FreeAssAlgebra{elem_type(R)}
+      @test elem_type(S) == Generic.FreeAssociativeAlgebraElem{elem_type(R)}
+      @test elem_type(Generic.FreeAssociativeAlgebra{elem_type(R)}) == Generic.FreeAssociativeAlgebraElem{elem_type(R)}
+      @test parent_type(Generic.FreeAssociativeAlgebraElem{elem_type(R)}) == Generic.FreeAssociativeAlgebra{elem_type(R)}
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
       @test ngens(S) == length(gens(S))
 
-      @test typeof(S) <: Generic.FreeAssAlgebra
+      @test typeof(S) <: Generic.FreeAssociativeAlgebra
 
       isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
          @test coefficient_ring(varlist[j]) === R
-         @test isa(varlist[j], FreeAssAlgElem)
-         @test isa(gens(S)[j], FreeAssAlgElem)
+         @test isa(varlist[j], FreeAssociativeAlgebraElem)
+         @test isa(gens(S)[j], FreeAssociativeAlgebraElem)
       end
 
       f = rand(S, 0:5, 0:10, 0:0, -100:100)
 
-      @test isa(f, FreeAssAlgElem)
+      @test isa(f, FreeAssociativeAlgebraElem)
 
-      @test isa(S(2), FreeAssAlgElem)
+      @test isa(S(2), FreeAssociativeAlgebraElem)
 
-      @test isa(S(R(2)), FreeAssAlgElem)
+      @test isa(S(R(2)), FreeAssociativeAlgebraElem)
 
-      @test isa(S(f), FreeAssAlgElem)
+      @test isa(S(f), FreeAssociativeAlgebraElem)
 
       V = [R(rand(-100:100)) for i in 1:5]
       W = [[rand(1:num_vars) for i in 1:rand(0:9)] for j in 1:5]
       f1 = S(V, W)
-      @test isa(f1, FreeAssAlgElem)
+      @test isa(f1, FreeAssociativeAlgebraElem)
 
       f2 = S()
       fit!(f2, 5)
@@ -130,17 +130,17 @@
    end
 end
 
-@testset "Generic.FreeAssAlgebra.printing" begin
+@testset "Generic.FreeAssociativeAlgebra.printing" begin
    R, x = ZZ["y"]
    S = free_associative_algebra(R, 5)
    @test !occursin("\n", sprint(show, R))
 end
 
-function test_elem(R::Generic.FreeAssAlgebra{elem_type(ZZ)})
+function test_elem(R::Generic.FreeAssociativeAlgebra{elem_type(ZZ)})
    return rand(R, 0:4, 0:5, -10:10)
 end
 
-@testset "Generic.FreeAssAlgebra.change_base_ring" begin
+@testset "Generic.FreeAssociativeAlgebra.change_base_ring" begin
    F5, = residue_ring(ZZ, 5)
    R, varsR = polynomial_ring(F5, ["x"])
    S, varsS = free_associative_algebra(R, ["y"])
@@ -188,7 +188,7 @@ end
    end
 end
 
-@testset "Generic.FreeAssAlgebra.divexact" begin
+@testset "Generic.FreeAssociativeAlgebra.divexact" begin
    R, (x, y, z) = free_associative_algebra(ZZ, [:x, :x, :x])
    a = x + y + z
    @test divexact(2*a, 2) == a
@@ -203,7 +203,7 @@ end
    @test_throws ArgumentError divexact_right(1 - x*a, x)
 end
 
-@testset "Generic.FreeAssAlgebra.is_unit" begin
+@testset "Generic.FreeAssociativeAlgebra.is_unit" begin
    R, (x,) = free_associative_algebra(residue_ring(ZZ, 4)[1], ["x"])
 
    @test !is_unit(x)
@@ -216,7 +216,7 @@ end
    end
 end
 
-@testset "Generic.FreeAssAlgebra.NCRing_interface" begin
+@testset "Generic.FreeAssociativeAlgebra.NCRing_interface" begin
    test_NCRing_interface(free_associative_algebra(ZZ, 3)[1])
 end
 

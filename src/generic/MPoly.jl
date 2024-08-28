@@ -3860,7 +3860,7 @@ function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
       return M
    end
    len = length(M.poly) + 1
-   if T <: AbstractAlgebra.FreeAssAlgElem
+   if T <: AbstractAlgebra.FreeAssociativeAlgebraElem
       set_exponent_word!(M.poly, len, expv)
    else
       set_exponent_vector!(M.poly, len, expv)
