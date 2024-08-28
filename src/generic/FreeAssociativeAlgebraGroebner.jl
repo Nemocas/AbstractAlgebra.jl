@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   FreeAssAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groebner basis
+#   FreeAssociativeAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groebner basis
 #
 ###############################################################################
 

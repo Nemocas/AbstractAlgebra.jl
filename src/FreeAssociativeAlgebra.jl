@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   FreeAssAlgebra.jl : free associative algebra R<x1,...,xn>
+#   FreeAssociativeAlgebra.jl : free associative algebra R<x1,...,xn>
 #
 ###############################################################################
 

@@ -7,7 +7,7 @@ end
 
 # Free algebras
 
-AbstractAlgebra.jl provides a module, implemented in `src/FreeAssAlgebra.jl` for
+AbstractAlgebra.jl provides a module, implemented in `src/FreeAssociativeAlgebra.jl` for
 free associative algebras over any commutative ring belonging to the
 AbstractAlgebra abstract type hierarchy.
 

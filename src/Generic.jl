@@ -54,7 +54,7 @@ include("generic/Matrix.jl")
 
 include("generic/MatRing.jl")
 
-include("generic/FreeAssAlgebra.jl")
+include("generic/FreeAssociativeAlgebra.jl")
 
 include("generic/Fraction.jl")
 
@@ -90,7 +90,7 @@ include("generic/Ideal.jl")
 
 include("generic/AhoCorasick.jl")
 
-include("generic/FreeAssAlgebraGroebner.jl")
+include("generic/FreeAssociativeAlgebraGroebner.jl")
 
 include("generic/PolyRingHom.jl")
 
