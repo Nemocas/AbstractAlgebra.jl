@@ -9,7 +9,9 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
-#= currently none =#
+# renamed in 0.42.3
+@alias FreeAssAlgebra FreeAssociativeAlgebra
+@alias FreeAssAlgElem FreeAssociativeAlgebraElem
 
 ###############################################################################
 #
