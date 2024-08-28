@@ -40,7 +40,7 @@ function ObstructionTriple{T}(first_poly::FreeAssAlgElem{T},
                                 pre_and_suffixes[4], first_index, second_index)
 end
 
-function FreeAssAlgElem{T}(R::FreeAssAlgebra{T}, mon::Monomial) where T
+function FreeAssAlgElem{T}(R::FreeAssociativeAlgebra{T}, mon::Monomial) where T
     return FreeAssAlgElem{T}(R, [one(base_ring(R))], [mon], 1)
 end
 

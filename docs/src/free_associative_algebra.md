@@ -17,17 +17,17 @@ AbstractAlgebra provides a generic type `Generic.FreeAssAlgElem{T}`
 where `T` is the type of elements of the coefficient ring. The elements are
 implemented using a Julia array of coefficients and a vector of
 vectors of `Int`s for the monomial words. Parent objects of such elements have
-type `Generic.FreeAssAlgebra{T}`.
+type `Generic.FreeAssociativeAlgebra{T}`.
 
 The element types belong to the abstract type `NCRingElem`,
 and the algebra types belong to the abstract type `NCRing`.
 
 The following basic functions are implemented.
 ```julia
-base_ring(R::FreeAssAlgebra)
+base_ring(R::FreeAssociativeAlgebra)
 base_ring(a::FreeAssAlgElem)
 parent(a::FreeAssAlgElem)
-characteristic(R::FreeAssAlgebra)
+characteristic(R::FreeAssociativeAlgebra)
 ```
 
 ## Free algebra constructors
@@ -99,10 +99,10 @@ The standard ring functions are available. The following functions from the
 multivariate polynomial interface are provided.
 
 ```julia
-symbols(S::FreeAssAlgebra)
-number_of_variables(f::FreeAssAlgebra)
-gens(S::FreeAssAlgebra)
-gen(S::FreeAssAlgebra, i::Int)
+symbols(S::FreeAssociativeAlgebra)
+number_of_variables(f::FreeAssociativeAlgebra)
+gens(S::FreeAssociativeAlgebra)
+gen(S::FreeAssociativeAlgebra, i::Int)
 is_gen(x::FreeAssAlgElem)
 total_degree(a::FreeAssAlgElem)
 length(f::FreeAssAlgElem)

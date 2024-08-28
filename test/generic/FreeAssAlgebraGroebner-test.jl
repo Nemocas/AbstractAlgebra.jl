@@ -1,6 +1,6 @@
 include("AhoCorasick-test.jl")
 
-@testset "Generic.FreeAssAlgebra.groebner" begin
+@testset "Generic.FreeAssociativeAlgebra.groebner" begin
  
     R, (x, y, u, v, t, s) = free_associative_algebra(GF(2), ["x", "y", "u", "v", "t", "s"])
     g = AbstractAlgebra.groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v,

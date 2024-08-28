@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-coefficient_ring(R::FreeAssAlgebra{T}) where T <: RingElement = base_ring(R)
+coefficient_ring(R::FreeAssociativeAlgebra{T}) where T <: RingElement = base_ring(R)
 
 function is_domain_type(::Type{S}) where {T <: RingElement, S <: FreeAssAlgElem{T}}
    return is_domain_type(T)
@@ -59,7 +59,7 @@ end
 
 @enable_all_show_via_expressify FreeAssAlgElem
 
-function show(io::IO, mime::MIME"text/plain", a::FreeAssAlgebra)
+function show(io::IO, mime::MIME"text/plain", a::FreeAssociativeAlgebra)
   @show_name(io, a)
   @show_special(io, mime, a)
 
@@ -79,7 +79,7 @@ function show(io::IO, mime::MIME"text/plain", a::FreeAssAlgebra)
   print(io, Dedent())
 end
 
-function show(io::IO, a::FreeAssAlgebra)
+function show(io::IO, a::FreeAssociativeAlgebra)
   @show_name(io, a)
   @show_special(io, a)
   if is_terse(io)
@@ -214,9 +214,9 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(S::FreeAssAlgebra, _, _, _) = elem_type(S)
+RandomExtensions.maketype(S::FreeAssociativeAlgebra, _, _, _) = elem_type(S)
 
-function RandomExtensions.make(S::FreeAssAlgebra,
+function RandomExtensions.make(S::FreeAssociativeAlgebra,
                                term_range::AbstractUnitRange{Int},
                                exp_bound::AbstractUnitRange{Int}, vs...)
    R = base_ring(S)
@@ -228,7 +228,7 @@ function RandomExtensions.make(S::FreeAssAlgebra,
 end
 
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
-                 <:NCRingElement, <:FreeAssAlgebra, <:AbstractUnitRange{Int}, <:AbstractUnitRange{Int}}})
+                 <:NCRingElement, <:FreeAssociativeAlgebra, <:AbstractUnitRange{Int}, <:AbstractUnitRange{Int}}})
    S, term_range, exp_bound, v = sp[][1:end]
    f = S()
    g = gens(S)
@@ -245,12 +245,12 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
    return f
 end
 
-function rand(rng::AbstractRNG, S::FreeAssAlgebra,
+function rand(rng::AbstractRNG, S::FreeAssociativeAlgebra,
               term_range::AbstractUnitRange{Int}, exp_bound::AbstractUnitRange{Int}, v...)
    m = make(S, term_range, exp_bound, v...)
    rand(rng, m)
 end
 
-function rand(S::FreeAssAlgebra, term_range, exp_bound, v...)
+function rand(S::FreeAssociativeAlgebra, term_range, exp_bound, v...)
    rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
 end

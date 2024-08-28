@@ -1148,18 +1148,18 @@ end
 
 ###############################################################################
 #
-#   FreeAssAlgebra / FreeAssAlgElem
+#   FreeAssociativeAlgebra / FreeAssAlgElem
 #
 ###############################################################################
 
-@attributes mutable struct FreeAssAlgebra{T <: RingElement} <: AbstractAlgebra.FreeAssAlgebra{T}
+@attributes mutable struct FreeAssociativeAlgebra{T <: RingElement} <: AbstractAlgebra.FreeAssociativeAlgebra{T}
    base_ring::Ring
    S::Vector{Symbol}
 
-   function FreeAssAlgebra{T}(R::Ring, s::Vector{Symbol}, cached::Bool = true) where T <: RingElement
+   function FreeAssociativeAlgebra{T}(R::Ring, s::Vector{Symbol}, cached::Bool = true) where T <: RingElement
       return get_cached!(FreeAssAlgID, (R, s), cached) do
          new{T}(R, s)
-      end::FreeAssAlgebra{T}
+      end::FreeAssociativeAlgebra{T}
    end
 end
 
@@ -1172,7 +1172,7 @@ const FreeAssAlgID = CacheDictType{Tuple{Ring, Vector{Symbol}}, NCRing}()
 # However, the object does not necessarily own the entries in the .exps vector
 # and should only mutate them when sole ownership is known.
 mutable struct FreeAssAlgElem{T <: RingElement} <: AbstractAlgebra.FreeAssAlgElem{T}
-   parent::FreeAssAlgebra{T}
+   parent::FreeAssociativeAlgebra{T}
    coeffs::Vector{T}
    exps::Vector{Vector{Int}}  # TODO: Int -> UInt8 for nvars < 256, etc
    length::Int

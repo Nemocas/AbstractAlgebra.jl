@@ -11,10 +11,10 @@
 ###############################################################################
 
 function parent_type(::Type{FreeAssAlgElem{T}}) where T <: RingElement
-    return FreeAssAlgebra{T}
+    return FreeAssociativeAlgebra{T}
 end
 
-function elem_type(::Type{FreeAssAlgebra{T}}) where T <: RingElement
+function elem_type(::Type{FreeAssociativeAlgebra{T}}) where T <: RingElement
     return FreeAssAlgElem{T}
 end
 
@@ -22,15 +22,15 @@ function parent(a::FreeAssAlgElem)
     return a.parent
 end
 
-base_ring_type(::Type{FreeAssAlgebra{T}}) where T <: RingElement = parent_type(T)
+base_ring_type(::Type{FreeAssociativeAlgebra{T}}) where T <: RingElement = parent_type(T)
 
-base_ring(a::FreeAssAlgebra{T}) where T <: RingElement = a.base_ring::parent_type(T)
+base_ring(a::FreeAssociativeAlgebra{T}) where T <: RingElement = a.base_ring::parent_type(T)
 
-function symbols(a::FreeAssAlgebra)
+function symbols(a::FreeAssociativeAlgebra)
     return a.S
 end
 
-function number_of_variables(a::FreeAssAlgebra)
+function number_of_variables(a::FreeAssociativeAlgebra)
     return length(a.S)
 end
 
@@ -53,11 +53,11 @@ function Base.deepcopy_internal(a::FreeAssAlgElem{T}, dict::IdDict) where T <: R
     )
 end
 
-function zero(a::FreeAssAlgebra{T}) where T
+function zero(a::FreeAssociativeAlgebra{T}) where T
     return FreeAssAlgElem{T}(a, T[], Vector{Int}[], 0)
 end
 
-function one(a::FreeAssAlgebra{T}) where T
+function one(a::FreeAssociativeAlgebra{T}) where T
     c = one(base_ring(a))
     !iszero(c) || return zero(a)
     return FreeAssAlgElem{T}(a, [c], [Int[]], 1)
@@ -75,18 +75,18 @@ function isone(a::FreeAssAlgElem{T}) where T
     end
 end
 
-function number_of_generators(a::FreeAssAlgebra{T}) where T
+function number_of_generators(a::FreeAssociativeAlgebra{T}) where T
     return number_of_variables(a)
 end
 
-function gen(a::FreeAssAlgebra{T}, i::Int) where T
+function gen(a::FreeAssociativeAlgebra{T}, i::Int) where T
     @boundscheck 1 <= i <= ngens(a) || throw(ArgumentError("variable index out of range"))
     c = one(base_ring(a))
     iszero(c) && return zero(a)
     return FreeAssAlgElem{T}(a, T[c], [Int[i]], 1)
 end
 
-function gens(a::FreeAssAlgebra{T}) where T <: RingElement
+function gens(a::FreeAssociativeAlgebra{T}) where T <: RingElement
     return [gen(a, i) for i in 1:ngens(a)]
 end
 
@@ -124,27 +124,27 @@ end
 #
 ###############################################################################
 
-function (a::FreeAssAlgebra{T})() where T
+function (a::FreeAssociativeAlgebra{T})() where T
     return zero(a)
 end
 
-function (a::FreeAssAlgebra{T})(b::T) where T
+function (a::FreeAssociativeAlgebra{T})(b::T) where T
     iszero(b) && return zero(a)
     return FreeAssAlgElem{T}(a, T[b], [Int[]], 1)
 end
 
-function (a::FreeAssAlgebra{T})(b::Integer) where T
+function (a::FreeAssociativeAlgebra{T})(b::Integer) where T
     iszero(b) && return zero(a)
     R = base_ring(a)
     return FreeAssAlgElem{T}(a, T[R(b)], [Int[]], 1)
 end
 
-function (a::FreeAssAlgebra{T})(b::FreeAssAlgElem{T}) where T <: RingElement
+function (a::FreeAssociativeAlgebra{T})(b::FreeAssAlgElem{T}) where T <: RingElement
     parent(b) != a && error("Unable to coerce element")
     return b
 end
 
-function (a::FreeAssAlgebra{T})(c::Vector{T}, e::Vector{Vector{Int}}) where T
+function (a::FreeAssociativeAlgebra{T})(c::Vector{T}, e::Vector{Vector{Int}}) where T
     for ei in e
         @boundscheck all(i -> (1 <= i <= nvars(a)), ei) ||
                      throw(ArgumentError("variable index out of range"))
@@ -668,7 +668,7 @@ function change_base_ring(
     R::Ring,
     a::FreeAssAlgElem{T};
     cached::Bool = true,
-    parent::AbstractAlgebra.FreeAssAlgebra = _change_freeassalg_ring(R, parent(a), cached),
+    parent::AbstractAlgebra.FreeAssociativeAlgebra = _change_freeassalg_ring(R, parent(a), cached),
 ) where T <: RingElement
     base_ring(parent) != R && error("Base rings do not match.")
     return _map(R, a, parent)
@@ -678,7 +678,7 @@ function map_coefficients(
     f::S,
     a::FreeAssAlgElem{T};
     cached::Bool = true,
-    parent::AbstractAlgebra.FreeAssAlgebra = _change_freeassalg_ring(
+    parent::AbstractAlgebra.FreeAssociativeAlgebra = _change_freeassalg_ring(
         parent(f(zero(base_ring(a)))),
         parent(a),
         cached,
@@ -709,6 +709,6 @@ function free_associative_algebra(
     s::Vector{Symbol};
     cached::Bool = true,
 )
-    parent_obj = FreeAssAlgebra{elem_type(R)}(R, s, cached)
+    parent_obj = FreeAssociativeAlgebra{elem_type(R)}(R, s, cached)
     return (parent_obj, gens(parent_obj))
 end
