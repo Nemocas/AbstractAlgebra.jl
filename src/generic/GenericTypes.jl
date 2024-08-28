@@ -1148,7 +1148,7 @@ end
 
 ###############################################################################
 #
-#   FreeAssociativeAlgebra / FreeAssAlgElem
+#   FreeAssociativeAlgebra / FreeAssociativeAlgebraElem
 #
 ###############################################################################
 
@@ -1171,7 +1171,7 @@ const FreeAssAlgID = CacheDictType{Tuple{Ring, Vector{Symbol}}, NCRing}()
 # the object of course owns the vector .exps and can mutate its length.
 # However, the object does not necessarily own the entries in the .exps vector
 # and should only mutate them when sole ownership is known.
-mutable struct FreeAssAlgElem{T <: RingElement} <: AbstractAlgebra.FreeAssAlgElem{T}
+mutable struct FreeAssociativeAlgebraElem{T <: RingElement} <: AbstractAlgebra.FreeAssociativeAlgebraElem{T}
    parent::FreeAssociativeAlgebra{T}
    coeffs::Vector{T}
    exps::Vector{Vector{Int}}  # TODO: Int -> UInt8 for nvars < 256, etc

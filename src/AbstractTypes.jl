@@ -144,7 +144,7 @@ abstract type MatElem{T} <: ModuleElem{T} end
 
 abstract type MatRingElem{T} <: NCRingElem end
 
-abstract type FreeAssAlgElem{T} <: NCRingElem end
+abstract type FreeAssociativeAlgebraElem{T} <: NCRingElem end
 
 abstract type NumFieldElem{T} <: FieldElem end
 

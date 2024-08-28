@@ -11,9 +11,9 @@
       @test free_associative_algebra(R, num_vars, "x", cached = true)[1] === free_associative_algebra(R, var_names, cached = true)[1]
       @test free_associative_algebra(R, num_vars, cached = true)[1] === free_associative_algebra(R, var_names, cached = true)[1]
 
-      @test elem_type(S) == Generic.FreeAssAlgElem{elem_type(R)}
-      @test elem_type(Generic.FreeAssociativeAlgebra{elem_type(R)}) == Generic.FreeAssAlgElem{elem_type(R)}
-      @test parent_type(Generic.FreeAssAlgElem{elem_type(R)}) == Generic.FreeAssociativeAlgebra{elem_type(R)}
+      @test elem_type(S) == Generic.FreeAssociativeAlgebraElem{elem_type(R)}
+      @test elem_type(Generic.FreeAssociativeAlgebra{elem_type(R)}) == Generic.FreeAssociativeAlgebraElem{elem_type(R)}
+      @test parent_type(Generic.FreeAssociativeAlgebraElem{elem_type(R)}) == Generic.FreeAssociativeAlgebra{elem_type(R)}
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
       @test ngens(S) == length(gens(S))
@@ -24,24 +24,24 @@
 
       for j = 1:num_vars
          @test coefficient_ring(varlist[j]) === R
-         @test isa(varlist[j], FreeAssAlgElem)
-         @test isa(gens(S)[j], FreeAssAlgElem)
+         @test isa(varlist[j], FreeAssociativeAlgebraElem)
+         @test isa(gens(S)[j], FreeAssociativeAlgebraElem)
       end
 
       f = rand(S, 0:5, 0:10, 0:0, -100:100)
 
-      @test isa(f, FreeAssAlgElem)
+      @test isa(f, FreeAssociativeAlgebraElem)
 
-      @test isa(S(2), FreeAssAlgElem)
+      @test isa(S(2), FreeAssociativeAlgebraElem)
 
-      @test isa(S(R(2)), FreeAssAlgElem)
+      @test isa(S(R(2)), FreeAssociativeAlgebraElem)
 
-      @test isa(S(f), FreeAssAlgElem)
+      @test isa(S(f), FreeAssociativeAlgebraElem)
 
       V = [R(rand(-100:100)) for i in 1:5]
       W = [[rand(1:num_vars) for i in 1:rand(0:9)] for j in 1:5]
       f1 = S(V, W)
-      @test isa(f1, FreeAssAlgElem)
+      @test isa(f1, FreeAssociativeAlgebraElem)
 
       f2 = S()
       fit!(f2, 5)

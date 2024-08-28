@@ -31,7 +31,7 @@ export FinField
 export FinFieldElem
 export FracElem
 export FracField
-export FreeAssAlgElem
+export FreeAssociativeAlgebraElem
 export FreeAssociativeAlgebra
 export FunctionalMap
 export GF

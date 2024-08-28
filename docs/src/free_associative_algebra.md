@@ -13,7 +13,7 @@ AbstractAlgebra abstract type hierarchy.
 
 ## Generic free algebra types
 
-AbstractAlgebra provides a generic type `Generic.FreeAssAlgElem{T}`
+AbstractAlgebra provides a generic type `Generic.FreeAssociativeAlgebraElem{T}`
 where `T` is the type of elements of the coefficient ring. The elements are
 implemented using a Julia array of coefficients and a vector of
 vectors of `Int`s for the monomial words. Parent objects of such elements have
@@ -25,8 +25,8 @@ and the algebra types belong to the abstract type `NCRing`.
 The following basic functions are implemented.
 ```julia
 base_ring(R::FreeAssociativeAlgebra)
-base_ring(a::FreeAssAlgElem)
-parent(a::FreeAssAlgElem)
+base_ring(a::FreeAssociativeAlgebraElem)
+parent(a::FreeAssociativeAlgebraElem)
 characteristic(R::FreeAssociativeAlgebra)
 ```
 
@@ -53,7 +53,7 @@ the parent object `S` from being cached.
 
 ```jldoctest
 julia> R, (x, y) = free_associative_algebra(ZZ, ["x", "y"])
-(Free associative algebra on 2 indeterminates over integers, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y])
+(Free associative algebra on 2 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y])
 
 julia> (x + y + 1)^2
 x^2 + x*y + y*x + y^2 + 2*x + 2*y + 1
@@ -74,7 +74,7 @@ with coefficients and monomial words and not exponent vectors.
 
 ```jldoctest
 julia> R, (x, y, z) = free_associative_algebra(ZZ, ["x", "y", "z"])
-(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y, z])
+(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y, z])
 
 julia> B = MPolyBuildCtx(R)
 Builder for an element of free associative algebra
@@ -86,7 +86,7 @@ julia> push_term!(B, ZZ(3), [3,3,3]); push_term!(B, ZZ(4), Int[]); finish(B)
 3*z^3 + 4
 
 julia> [gen(R, 2), R(9)]
-2-element Vector{AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}}:
+2-element Vector{AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}}:
  y
  9
 ```
@@ -103,9 +103,9 @@ symbols(S::FreeAssociativeAlgebra)
 number_of_variables(f::FreeAssociativeAlgebra)
 gens(S::FreeAssociativeAlgebra)
 gen(S::FreeAssociativeAlgebra, i::Int)
-is_gen(x::FreeAssAlgElem)
-total_degree(a::FreeAssAlgElem)
-length(f::FreeAssAlgElem)
+is_gen(x::FreeAssociativeAlgebraElem)
+total_degree(a::FreeAssociativeAlgebraElem)
+length(f::FreeAssociativeAlgebraElem)
 ```
 
 As with multivariate polynomials, an implementation must provide access to
@@ -115,10 +115,10 @@ provide the first such term.
 
 
 ```julia
-leading_coefficient(a::FreeAssAlgElem)
-leading_monomial(a::FreeAssAlgElem)
-leading_term(a::FreeAssAlgElem)
-leading_exponent_word(a::FreeAssAlgElem)
+leading_coefficient(a::FreeAssociativeAlgebraElem)
+leading_monomial(a::FreeAssociativeAlgebraElem)
+leading_term(a::FreeAssociativeAlgebraElem)
+leading_exponent_word(a::FreeAssociativeAlgebraElem)
 ```
 
 For types that allow constant time access to coefficients, the following are
@@ -126,23 +126,23 @@ also available, allowing access to the given coefficient, monomial or term.
 Terms are numbered from the most significant first.
 
 ```julia
-coeff(f::FreeAssAlgElem, n::Int)
-monomial(f::FreeAssAlgElem, n::Int)
-term(f::FreeAssAlgElem, n::Int)
+coeff(f::FreeAssociativeAlgebraElem, n::Int)
+monomial(f::FreeAssociativeAlgebraElem, n::Int)
+term(f::FreeAssociativeAlgebraElem, n::Int)
 ```
 
 In contrast with the interface for multivariable polynomials, the function
 `exponent_vector` is replaced by `exponent_word`
 
 ```@docs
-exponent_word(a::Generic.FreeAssAlgElem{T}, i::Int) where T <: RingElement
+exponent_word(a::Generic.FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
 ```
 
 **Examples**
 
 ```jldoctest
 julia> R, (x, y, z) = free_associative_algebra(ZZ, ["x", "y", "z"])
-(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[x, y, z])
+(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y, z])
 
 julia> map(total_degree, (R(0), R(1), -x^2*y^2*z^2*x + z*y))
 (-1, 0, 7)
@@ -168,7 +168,7 @@ julia> exponent_word(-x^2*y^2*z^2*x + z*y, 1)
 ```
 
 ```@docs
-evaluate(a::AbstractAlgebra.FreeAssAlgElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+evaluate(a::AbstractAlgebra.FreeAssociativeAlgebraElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
 ```
 
 ### Iterators
@@ -178,20 +178,20 @@ with `exponent_words` providing the analogous functionality that `exponent_vecto
 provides for multivariate polynomials.
 
 ```julia
-terms(p::FreeAssAlgElem)
-coefficients(p::FreeAssAlgElem)
-monomials(p::FreeAssAlgElem)
+terms(p::FreeAssociativeAlgebraElem)
+coefficients(p::FreeAssociativeAlgebraElem)
+monomials(p::FreeAssociativeAlgebraElem)
 ```
 
 ```@docs
-exponent_words(a::FreeAssAlgElem{T}) where T <: RingElement
+exponent_words(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
 ```
 
 **Examples**
 
 ```jldoctest
 julia> R, (a, b, c) = free_associative_algebra(ZZ, ["a", "b", "c"])
-(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssAlgElem{BigInt}[a, b, c])
+(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[a, b, c])
 
 julia> collect(terms(3*b*a*c - b + c + 2))
 4-element Vector{Any}:
@@ -230,11 +230,11 @@ Since such a Groebner basis is not necessarily finite, one can additionally pass
 to the function, to only compute a partial Groebner basis.
 
 ```@docs
-groebner_basis(g::Vector{FreeAssAlgElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false) where T <: FieldElement
+groebner_basis(g::Vector{FreeAssociativeAlgebraElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false) where T <: FieldElement
 
-normal_form(f::FreeAssAlgElem{T}, g::Vector{FreeAssAlgElem{T}}, aut::AhoCorasickAutomaton) where T
+normal_form(f::FreeAssociativeAlgebraElem{T}, g::Vector{FreeAssociativeAlgebraElem{T}}, aut::AhoCorasickAutomaton) where T
 
-interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
+interreduce!(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
 ```
 
 The implementation uses a non-commutative version of the Buchberger algorithm as described in
@@ -246,10 +246,10 @@ The implementation uses a non-commutative version of the Buchberger algorithm as
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R, (x, y, u, v, t, s) = free_associative_algebra(GF(2), ["x", "y", "u", "v", "t", "s"])
-(Free associative algebra on 6 indeterminates over finite field F_2, AbstractAlgebra.Generic.FreeAssAlgElem{AbstractAlgebra.GFElem{Int64}}[x, y, u, v, t, s])
+(Free associative algebra on 6 indeterminates over finite field F_2, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{AbstractAlgebra.GFElem{Int64}}[x, y, u, v, t, s])
 
 julia> g = Generic.groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v, (y*x)^3*t + (y*x)^2*t + t + s])
-5-element Vector{AbstractAlgebra.Generic.FreeAssAlgElem{AbstractAlgebra.GFElem{Int64}}}:
+5-element Vector{AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{AbstractAlgebra.GFElem{Int64}}}:
  u*x*y*x*y*x*y + u*x*y*x*y + u + v
  y*x*y*x*y*x*t + y*x*y*x*t + t + s
  u*x*s + v*x*t
