@@ -58,5 +58,5 @@ import .Generic: is_gen; @deprecate is_gen(x::Generic.MPoly{T}, ::Type{Val{ord}}
 import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} degree(f, i, Val(ord))
 
 # deprecated during 0.42.*
-@deprecate change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} map_coefficients(g, p, parent = new_polynomial_ring)
-@deprecate mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} Base.divrem(a * b, mod)[2]
+change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} = map_coefficients(g, p, parent = new_polynomial_ring)
+mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} = Base.divrem(a * b, mod)[2]
