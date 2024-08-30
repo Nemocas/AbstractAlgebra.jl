@@ -99,6 +99,8 @@ abstract type MatRing{T} <: NCRing end
 
 abstract type FreeAssociativeAlgebra{T} <: NCRing end
 
+abstract type PermGroupRing{T} <: NCRing end
+
 # Abstract types for number fields, parmeterised by the element type of
 # the base field.
 abstract type NumField{T} <: Field end
@@ -149,6 +151,8 @@ abstract type FreeAssociativeAlgebraElem{T} <: NCRingElem end
 abstract type NumFieldElem{T} <: FieldElem end
 
 abstract type SimpleNumFieldElem{T} <: NumFieldElem{T} end
+
+abstract type PermGroupRingElem{T} <: NCRingElem end
 
 # additional abstract types for parents, added ad hoc to form
 # collections of types as needed by applications

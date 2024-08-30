@@ -72,6 +72,8 @@ export NumFieldElem
 export O
 export Partition
 export Perm
+export PermGroupRing
+export PermGroupRingElem
 export PolyCoeffs
 export PolyRing
 export PolyRingElem
@@ -418,6 +420,7 @@ export parity
 export partitionseq
 export perm
 export permtype
+export perm_group_ring
 export pfaffian
 export pfaffians
 export pluralize

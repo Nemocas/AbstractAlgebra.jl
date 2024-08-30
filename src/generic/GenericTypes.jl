@@ -880,7 +880,7 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
       end::AbsMSeriesRing{T, S}
    end
 end
- 
+
 const AbsMSeriesID = CacheDictType{Tuple{Ring,
                                        Vector{Int}, Vector{Symbol}, Int}, Ring}()
 
@@ -1566,4 +1566,85 @@ end
 
 function PolyRingAnyMap(d::D, c::C, cm::U, ig::V) where {D, C, U, V}
   return PolyRingAnyMap{D, C, U, V}(d, c, cm, ig)
+end
+
+################################################################################
+#
+#   Permutation group ring
+#
+################################################################################
+
+@doc raw"""
+Permutation [group ring](https://en.wikipedia.org/wiki/Group_ring) over a base ring, also known as group algebra.
+
+- `base_ring`: The base ring, whose elements are used as coefficients of permutations.
+- `l`: The length of permutations.
+
+Basic usage:
+
+- To construct a permutation group ring.
+- To construct an element of a permutation group ring, use the call syntax of the parent object.
+- To perform arithmetic operations, use the standard arithmetic operators.
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = perm_group_ring(GF(2), 3)
+Permutation group ring over Prime field of characteristic 2
+
+julia> f0 = R(0)
+Dict{Perm, Nemo.FqFieldElem}()
+
+julia> f1 = R(1)
+Dict{Perm{Int64}, Nemo.FqFieldElem}(() => 1)
+
+julia> f2 = R(Perm([1,3,2]))
+Dict{Perm{Int64}, Nemo.FqFieldElem}((2,3) => 1)
+
+julia> f3 = R(Dict(Perm(3) => 1, Perm([3,1,2]) => 1))
+Dict{Perm{Int64}, Nemo.FqFieldElem}(() => 1, (1,3,2) => 1)
+
+julia> f1 + f2
+Dict{Perm, Nemo.FqFieldElem}(() => 1, (2,3) => 1)
+
+julia> f2 * f3
+Dict{Perm, Nemo.FqFieldElem}((1,3) => 1, (2,3) => 1)
+
+julia> f3 * 1 + 1
+Dict{Perm, Nemo.FqFieldElem}((1,3,2) => 1)
+```
+
+See also: [`PermGroupRingElem`](@ref).
+"""
+@attributes mutable struct PermGroupRing{T<:RingElement} <: NCRing
+    base_ring::Ring
+    l::Int
+
+    function PermGroupRing{T}(R::Ring, l::Int, cached::Bool) where {T<:RingElement}
+        return get_cached!(PermGroupRingElemID, (R, l), cached) do
+            new{T}(R, l)
+        end::PermGroupRing{T}
+    end
+end
+
+const PermGroupRingElemID = CacheDictType{Tuple{Ring, Int}, NCRing}()
+
+@doc raw"""
+Element of a [`PermGroupRing`](@ref).
+
+- `coeffs`: A dictionary of permutations and their coefficients. Empty dictionary represents zero.
+- `parent`: The parent group ring in type `PermGroupRing`.
+
+See also: [`PermGroupRing`](@ref).
+"""
+mutable struct PermGroupRingElem{T<:RingElement} <: NCRingElem
+    coeffs::Dict{<:Perm,T}
+    parent::PermGroupRing{T}
+
+    function PermGroupRingElem{T}(coeffs::Dict{<:Perm,T}) where {T<:RingElement}
+        filter!(x -> !iszero(x[2]) , coeffs) # remove zeros
+        return new{T}(coeffs)
+    end
+
+    function PermGroupRingElem{T}() where {T<:RingElement}
+        return new{T}(Dict{Perm,T}())
+    end
 end

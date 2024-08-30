@@ -249,6 +249,7 @@ include("UnivPoly.jl")
 include("FreeAssociativeAlgebra.jl")
 include("LaurentMPoly.jl")
 include("MatrixNormalForms.jl")
+include("GroupRing.jl")
 
 
 include("Groups.jl")
