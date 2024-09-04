@@ -57,6 +57,7 @@ import .Generic: set_exponent_vector!; @deprecate set_exponent_vector!(a::Generi
 import .Generic: is_gen; @deprecate is_gen(x::Generic.MPoly{T}, ::Type{Val{ord}}) where {T <: RingElement, ord} is_gen(x, Val(ord))
 import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} degree(f, i, Val(ord))
 
-# deprecated during 0.42.*
+# will become deprecated in 0.43.0
 change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} = map_coefficients(g, p, parent = new_polynomial_ring)
 mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} = Base.divrem(a * b, mod)[2]
+var"@attr"(__source__::LineNumberNode, __module__::Base.Module, expr::Expr) = var"@attr"(__source__, __module__, :Any, expr) # delegate `@attr functionexpression` to `@attr Any functionexpression` (macros are just functions with this weird extra syntax)

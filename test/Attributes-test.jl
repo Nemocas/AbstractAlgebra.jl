@@ -178,8 +178,8 @@ A cached attribute.
 """
 @attr Tuple{T,DataType,Vector{Any}} cached_attr(obj::T) where T = (obj,T,[])
 
-# cached attribute without return type specification
-@attr cached_attr2(obj::T) where T = (obj,T,[])
+# cached attribute with bad return type specification
+@attr Any cached_attr2(obj::T) where T = (obj,T,[])
 
 # cached attribute with return type specification depending on the input type
 my_derived_type(::Type{Tmp.Container{T}}) where T = T
@@ -201,7 +201,7 @@ my_derived_type(::Type{Tmp.Container{T}}) where T = T
     @test cached_attr(x) == y
     @test cached_attr(x) === y
 
-    # check cached without type specification is not inferring return types correctly
+    # check cached with bad type specification is not inferring return types correctly
     @test_throws ErrorException @inferred cached_attr2(x)
 
     # check when return type is derived via a function from input type
@@ -225,7 +225,7 @@ my_derived_type(::Type{Tmp.Container{T}}) where T = T
     @test functionloc(uncached_attr)[2] < functionloc(cached_attr)[2]
 end
 
-if VERSION >= v"1.7"
+@static if VERSION >= v"1.7"
     # the following tests need the improved `@macroexpand` from Julia 1.7
     @testset "@attr error handling" begin
         # wrong number of arguments
@@ -233,8 +233,8 @@ if VERSION >= v"1.7"
         @test_throws ArgumentError @macroexpand @attr foo(x::Int, y::Int) = 1
         @test_throws ArgumentError @macroexpand @attr Int foo() = 1
         @test_throws ArgumentError @macroexpand @attr Int foo(x::Int, y::Int) = 1
-        @test_throws ArgumentError @macroexpand @attr Int foo(x::Int) = 1 Any
-        @test_throws ArgumentError @macroexpand @attr Int Int Int
+        @test_throws MethodError @macroexpand @attr Int foo(x::Int) = 1 Any
+        @test_throws MethodError @macroexpand @attr Int Int Int
 
         # wrong kind of arguments
         #@test_throws ArgumentError @macroexpand @attr Int Int
