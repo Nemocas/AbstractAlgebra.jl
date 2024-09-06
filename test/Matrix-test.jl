@@ -66,8 +66,9 @@ end
 
 @testset "Matrix.is_nilpotent" begin
   @test is_nilpotent(zero_matrix(QQ, 3, 3))
-  @test !is_nilpotent(identity_matrix(QQ, 3))
   @test is_nilpotent(upper_triangular_matrix(QQ.([0,1,1,0,1,0])))
+  @test !is_nilpotent(identity_matrix(QQ, 3))
+  @test !is_nilpotent(diagonal_matrix(QQ, [1,-1,0]))
 end
 
 @testset "Matrix.concat" begin

@@ -3700,8 +3700,9 @@ such that $A^k = 0$. If `A` is not square an exception is raised.
 """
 function is_nilpotent(A::MatrixElem{T}) where {T <: RingElement}
   !is_square(A) && error("Dimensions don't match in is_nilpotent")
-  A = deepcopy(A)
+  is_zero(tr(A)) || return false
   n = nrows(A)
+  A = deepcopy(A)
   i = 1
   is_zero(A) && return true
   while i < n
