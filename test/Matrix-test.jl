@@ -64,6 +64,13 @@ end
     @test is_upper_triangular(matrix(ZZ, A))
 end
 
+@testset "Matrix.is_nilpotent" begin
+  @test is_nilpotent(zero_matrix(QQ, 3, 3))
+  @test is_nilpotent(upper_triangular_matrix(QQ.([0,1,1,0,1,0])))
+  @test !is_nilpotent(identity_matrix(QQ, 3))
+  @test !is_nilpotent(diagonal_matrix(QQ, [1,-1,0]))
+end
+
 @testset "Matrix.concat" begin
     for R in [ZZ, QQ, polynomial_ring(QQ, [:x, :y])[1]]
         S = matrix_space(R, 3, 3)
