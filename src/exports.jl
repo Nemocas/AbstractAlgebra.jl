@@ -173,6 +173,7 @@ export dim
 export direct_sum
 export disable_cache!
 export discriminant
+export div!
 export div_left
 export div_left!
 export div_right
@@ -372,6 +373,7 @@ export max_precision
 export minors
 export minpoly
 export mod
+export mod!
 export module_homomorphism
 export module_isomorphism
 export modulus
@@ -458,6 +460,7 @@ export reduce!
 export rel_series
 export rel_series_type
 export rels
+export rem!
 export remove
 export renest
 export renormalize!
