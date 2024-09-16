@@ -3395,7 +3395,7 @@ function _solve_tril!(A::MatElem{T}, B::MatElem{T}, C::MatElem{T}, f::Int = 0) w
       t = C[j, i]
       for k = 1:j-1
         mul_red!(s, A[k, i], B[j, k], false)
-        sub!(t, t, s)
+        t = sub!(t, s)
       end
       reduce!(t)
       if f == 1
