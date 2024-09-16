@@ -1753,7 +1753,7 @@ function lu!(P::Perm, A::MatrixElem{T}) where {T <: FieldElement}
       r += 1
       c += 1
    end
-   inv!(P)
+   P = inv!(P)
    return rank
 end
 
@@ -1848,7 +1848,7 @@ function fflu!(P::Perm, A::MatrixElem{T}) where {T <: RingElement}
       r += 1
       c += 1
    end
-   inv!(P)
+   P = inv!(P)
    return rank, d2
 end
 
@@ -1903,7 +1903,7 @@ function fflu!(P::Perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResEle
       r += 1
       c += 1
    end
-   inv!(P)
+   P = inv!(P)
    return rank, d2
 end
 

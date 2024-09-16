@@ -238,6 +238,7 @@ end
 
 # further mutable functions in fundamental_interface.jl:
 # mul!(out::T, g::T, h::T) where {T<:GroupElem} = g * h
+# inv!(out::T, g::T) where {T<:GroupElem} = inv(g)
 
 """
     one!(g::GroupElem)
@@ -245,14 +246,6 @@ end
 Return `one(g)`, possibly modifying `g`.
 """
 one!(g::GroupElem) = one(parent(g))
-
-"""
-    inv!(out::T, g::T) where {GEl <: GroupElem}
-
-Return `inv(g)`, possibly modifying `out`. Aliasing of `g` with `out` is
-allowed.
-"""
-inv!(out::T, g::T) where {T<:GroupElem} = inv(g)
 
 """
     div_right!(out::T, g::T, h::T) where {GEl <: GroupElem}
