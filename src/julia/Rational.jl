@@ -285,8 +285,6 @@ function addmul!(a::Rational{T}, b::Rational{T}, c::Rational{T}, d::Rational{T})
    return a
 end
 
-neg!(z::Rational{T}, x::Rational{T}) where T <: Integer = -x
-
 mul!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x * y
 
 ###############################################################################
