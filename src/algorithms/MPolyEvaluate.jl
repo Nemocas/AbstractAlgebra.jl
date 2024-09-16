@@ -88,7 +88,7 @@ function _horner_lex_rec(
   end
 
   (ta, tc) = _horner_lex_rec(res, ctxA, Bcoeffs, Bexps, Bstart, i-1, var+1, C, ctxC, ta, tc)
-  res[var] = addeq!(res[var], res[var+1])
+  res[var] = add!(res[var], res[var+1])
   res[var], ta, tc = mulpow!(res[var], C[var], e - nexte, ta, tc)
 
   if i > Bstop
@@ -551,13 +551,13 @@ function evaluate_log(f::MPolyRingElem, p::Vector{T}; power_cache = PowerCache{T
     j = i = i + 1
     while iseven(j) && length(r) > 1
       top = pop!(r)
-      r[end] = addeq!(r[end], top)
+      r[end] = add!(r[end], top)
       j >>= 1
     end
   end
   while length(r) > 1
     top = pop!(r)
-    r[end] = addeq!(r[end], top)
+    r[end] = add!(r[end], top)
   end
   return isempty(r) ? zero(S) : r[1]
 end

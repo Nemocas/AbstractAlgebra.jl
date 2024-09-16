@@ -619,10 +619,10 @@ end
 #
 ###############################################################################
 
-function addeq!(a::AbsMSeries{T}, b::AbsMSeries{T}) where T <: RingElement
+function add!(a::AbsMSeries{T}, b::AbsMSeries{T}) where T <: RingElement
     R = parent(a)
     prec = min.(precision(a), precision(b))
-    a.poly = addeq!(a.poly, b.poly)
+    a.poly = add!(a.poly, b.poly)
     if R.weighted_prec == -1
         a.poly = truncate_poly(a.poly, prec)
         a.prec = prec

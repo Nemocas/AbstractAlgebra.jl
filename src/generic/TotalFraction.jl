@@ -429,24 +429,24 @@ function mul!(c::TotFrac{T}, a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
    return c
 end
 
-function addeq!(a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
+function add!(a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
    R = base_ring(b)
    d1 = denominator(a, false)
    d2 = denominator(b, false)
    n1 = numerator(a, false)
    n2 = numerator(b, false)
    if d1 == d2
-      a.num = addeq!(a.num, b.num)
+      a.num = add!(a.num, b.num)
    elseif isone(d1)
       if n1 !== n2
          a.num = mul!(a.num, a.num, d2)
-         a.num = addeq!(a.num, n2)
+         a.num = add!(a.num, n2)
       else
          a.num = n1*d2 + n2
       end
       a.den = deepcopy(d2)
    elseif isone(d2)
-      a.num = addeq!(a.num, n2*d1)
+      a.num = add!(a.num, n2*d1)
       a.den = deepcopy(d1)
    else
       a.num = d1*n2 + d2*n1

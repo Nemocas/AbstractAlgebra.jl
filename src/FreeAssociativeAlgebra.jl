@@ -199,7 +199,7 @@ function evaluate(a::FreeAssociativeAlgebraElem{T}, vals::Vector{U}) where {T <:
    r = zero(S)
    o = one(S)
    for (c, v) in zip(coefficients(a), exponent_words(a))
-      r = addeq!(r, c*prod((vals[i] for i in v), init = o))
+      r = add!(r, c*prod((vals[i] for i in v), init = o))
    end
    return r
 end

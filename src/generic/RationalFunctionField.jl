@@ -484,11 +484,6 @@ function mul!(c::RationalFunctionFieldElem{T, U}, a::RationalFunctionFieldElem{T
    return c
 end
 
-function addeq!(a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   a.d = addeq!(data(a), data(b))
-   return a
-end
-
 function add!(c::RationalFunctionFieldElem{T}, a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    c.d = add!(data(c), data(a), data(b))
    return c

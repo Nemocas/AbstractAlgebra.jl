@@ -186,7 +186,7 @@ function *(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
          A[i, j] = base_ring(x)()
          for k = 1:ncols(x)
             C = mul!(C, x[i, k], y[k, j])
-            A[i, j] = addeq!(A[i, j], C)
+            A[i, j] = add!(A[i, j], C)
          end
       end
    end

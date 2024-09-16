@@ -116,7 +116,7 @@ function mul!(c::NCPoly{T}, a::NCPoly{T}, b::NCPoly{T}) where T <: NCRingElem
       for i = 1:lena - 1
          for j = 2:lenb
             t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
-            c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
+            c.coeffs[i + j - 1] = add!(c.coeffs[i + j - 1], t)
          end
       end
 
@@ -125,13 +125,13 @@ function mul!(c::NCPoly{T}, a::NCPoly{T}, b::NCPoly{T}) where T <: NCRingElem
    return c
 end
 
-function addeq!(c::NCPoly{T}, a::NCPoly{T}) where T <: NCRingElem
+function add!(c::NCPoly{T}, a::NCPoly{T}) where T <: NCRingElem
    lenc = length(c)
    lena = length(a)
    len = max(lenc, lena)
    fit!(c, len)
    for i = 1:lena
-      c.coeffs[i] = addeq!(c.coeffs[i], coeff(a, i - 1))
+      c.coeffs[i] = add!(c.coeffs[i], coeff(a, i - 1))
    end
    c = set_length!(c, normalise(c, len))
    return c

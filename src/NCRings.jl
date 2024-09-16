@@ -132,7 +132,7 @@ Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 
 function addmul!(z::T, x::T, y::T, c::T) where T <: NCRingElem
    c = mul!(c, x, y)
-   z = addeq!(z, c)
+   z = add!(z, c)
    return z
 end
 
@@ -197,7 +197,7 @@ end
 # Define addmul_delayed_reduction! for all ring elem types
 function addmul_delayed_reduction!(a::T, b::T, c::T, d::T) where T <: NCRingElement
    d = mul_red!(d, b, c, false)
-   return addeq!(a, d)
+   return add!(a, d)
 end
 
 # Fall back to nop

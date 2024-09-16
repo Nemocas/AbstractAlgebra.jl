@@ -318,13 +318,11 @@ function add!(a, b, c)
 end
 
 @doc raw"""
-    addeq!(a, b)
     add!(a, b)
 
 Return `a + b`, possibly modifying the object `a` in the process.
 This is a shorthand for `add!(a, a, b)`.
 """
-addeq!(a, b) = add!(a, a, b)
 add!(a, b) = add!(a, a, b)
 
 @doc raw"""

@@ -397,7 +397,7 @@ end
    b = 83 + 43*x^10 + O(x^20)
    c = a + b
    ccp = deepcopy(c)
-   addeq!(a, b)
+   a = add!(a, b)
    @test c - a == 0
    @test c - ccp == 0
 end

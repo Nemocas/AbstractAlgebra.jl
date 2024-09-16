@@ -420,11 +420,6 @@ function mul!(c::ResElem{T}, a::ResElem{T}, b::ResElem{T}) where {T <: RingEleme
    return c
 end
 
-function addeq!(c::ResElem{T}, a::ResElem{T}) where {T <: RingElement}
-   c.data = mod(data(c) + data(a), modulus(a))
-   return c
-end
-
 function add!(c::ResElem{T}, a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
    c.data = mod(data(a) + data(b), modulus(a))
    return c

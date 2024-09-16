@@ -768,7 +768,7 @@ function *(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
          if ai != 0
             for j = 2:min(lenb, lenz - i + 1)
                t = mul!(t, ai, polcoeff(b, j - 1))
-               d[i + j - 1] = addeq!(d[i + j - 1], t)
+               d[i + j - 1] = add!(d[i + j - 1], t)
             end
          end
       end
@@ -924,7 +924,7 @@ function mullow(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}, n::Int) where 
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
             t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
-            d[i + j - 1] = addeq!(d[i + j - 1], t)
+            d[i + j - 1] = add!(d[i + j - 1], t)
          end
       end
    end
@@ -1370,13 +1370,13 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
       for i = 1:div(n - 1, 2)
          j = n - i
          p = mul!(p, polcoeff(asqrt, i), polcoeff(asqrt, j))
-         c = addeq!(c, p)
+         c = add!(c, p)
       end
       c *= 2
       if (n % 2) == 0
          i = div(n, 2)
          p = mul!(p, polcoeff(asqrt, i), polcoeff(asqrt, i))
-         c = addeq!(c, p)
+         c = add!(c, p)
       end
       c = polcoeff(a, n) - c
       if check
@@ -1563,8 +1563,8 @@ function Base.exp(a::LaurentSeriesElem{T}) where T <: FieldElement
       z = set_precision!(z, la[n])
       one1 = set_precision!(one1, la[n])
       t = -log(z)
-      t = addeq!(t, one1)
-      t = addeq!(t, a)
+      t = add!(t, one1)
+      t = add!(t, a)
       z = mul!(z, z, t)
       n -= 1
    end
@@ -1662,7 +1662,7 @@ function mul!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
          if ai != 0
             for j = 2:min(lenb, lenc - i + 1)
                t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
-               c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
+               c.coeffs[i + j - 1] = add!(c.coeffs[i + j - 1], t)
             end
          end
       end
@@ -1676,7 +1676,7 @@ function mul!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
    return c
 end
 
-function addeq!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}) where {T <: RingElement}
+function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}) where {T <: RingElement}
    # TODO: write a version which doesn't make a copy
    b = deepcopy(c)
    return add!(c, b, a)
@@ -1684,9 +1684,9 @@ end
 
 function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingElement}
    if c === a
-      return addeq!(c, b)
+      return add!(c, b)
    elseif c === b
-      return addeq!(c, a)
+      return add!(c, a)
    end
    lena = pol_length(a)
    lenb = pol_length(b)

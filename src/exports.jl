@@ -109,7 +109,6 @@ export add_column
 export add_column!
 export add_row
 export add_row!
-export addeq!
 export addmul!
 export addmul_delayed_reduction!
 export allow_unicode

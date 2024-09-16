@@ -481,10 +481,6 @@ function mul!(c::FactoredFracFieldElem{T}, a::FactoredFracFieldElem{T}, b::Facto
   return a*b
 end
 
-function addeq!(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement
-    return a + b
-end
-
 ###############################################################################
 #
 #   Internal helpers
