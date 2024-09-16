@@ -304,8 +304,8 @@ const VarName = Union{Symbol, AbstractString, Char}
 
 Return the zero of `parent(a)`, possibly modifying the object `a` in the process.
 """
-function zero!(a::T) where {T}
-  return zero(a)
+function zero!(a)
+  return zero(parent(a))
 end
 
 @doc raw"""
@@ -313,7 +313,7 @@ end
 
 Return `b + c`, possibly modifying the object `a` in the process.
 """
-function add!(a::T, b::T, c::T) where {T}
+function add!(a, b, c)
   return b + c
 end
 
@@ -332,7 +332,7 @@ add!(a, b) = add!(a, a, b)
 
 Return `b - c`, possibly modifying the object `a` in the process.
 """
-function sub!(a::T, b::T, c::T) where {T}
+function sub!(a, b, c)
   return b - c
 end
 
@@ -349,7 +349,7 @@ sub!(a, b) = sub!(a, a, b)
 
 Return `-b`, possibly modifying the object `a` in the process.
 """
-function neg!(a::T, b::T) where {T}
+function neg!(a, b)
   return -b
 end
 
@@ -366,7 +366,7 @@ neg!(a) = neg!(a, a)
 
 Return `b * c`, possibly modifying the object `a` in the process.
 """
-function mul!(a::T, b::T, c::T) where {T}
+function mul!(a, b, c)
   return b * c
 end
 
@@ -383,7 +383,7 @@ mul!(a, b) = mul!(a, a, b)
 
 Return `div(b, c)`, possibly modifying the object `a` in the process.
 """
-function div!(a::T, b::T, c::T) where {T}
+function div!(a, b, c)
   return div(b, c)
 end
 
@@ -400,7 +400,7 @@ div!(a, b) = div!(a, a, b)
 
 Return `rem(b, c)`, possibly modifying the object `a` in the process.
 """
-function rem!(a::T, b::T, c::T) where {T}
+function rem!(a, b, c)
   return rem(b, c)
 end
 
@@ -417,7 +417,7 @@ rem!(a, b) = rem!(a, a, b)
 
 Return `mod(b, c)`, possibly modifying the object `a` in the process.
 """
-function mod!(a::T, b::T, c::T) where {T}
+function mod!(a, b, c)
   return mod(b, c)
 end
 
