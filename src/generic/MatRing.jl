@@ -99,17 +99,6 @@ function mul!(A::MatRingElem{T}, B::MatRingElem{T},
    return B*C
 end
 
-function add!(A::MatRingElem{T}, B::MatRingElem{T},
-                                C::MatRingElem{T}) where T <: NCRingElement
-   n = degree(A)
-   for i = 1:n
-      for j = 1:n
-         A.entries[i, j] = B.entries[i, j] + C.entries[i, j]
-      end
-   end
-   return A
-end
-
 function addeq!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
    n = degree(A)
    for i = 1:n

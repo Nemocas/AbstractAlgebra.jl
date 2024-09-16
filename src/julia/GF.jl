@@ -390,10 +390,6 @@ function addeq!(z::GFElem{BigInt}, x::GFElem{BigInt})
    end
 end
 
-function add!(z::GFElem{T}, x::GFElem{T}, y::GFElem{T}) where T <: Integer
-   return x + y
-end
-
 function add!(z::GFElem{BigInt}, x::GFElem{BigInt}, y::GFElem{BigInt})
    R = parent(x)
    p = R.p::BigInt

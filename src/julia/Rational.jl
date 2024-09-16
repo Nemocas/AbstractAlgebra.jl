@@ -289,8 +289,6 @@ sub!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x - y
 
 neg!(z::Rational{T}, x::Rational{T}) where T <: Integer = -x
 
-add!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x + y
-
 mul!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x * y
 
 ###############################################################################

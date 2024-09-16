@@ -484,10 +484,6 @@ function addeq!(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where 
     return a + b
 end
 
-function add!(c::FactoredFracFieldElem{T}, a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement
-    return a + b
-end
-
 ###############################################################################
 #
 #   Internal helpers

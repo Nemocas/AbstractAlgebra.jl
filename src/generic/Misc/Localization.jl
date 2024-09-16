@@ -102,8 +102,6 @@ Poly: deg(N(a/b)), rest the same
 #
 ###############################################################################
 
-add!(c::LocalizedEuclideanRingElem, a::LocalizedEuclideanRingElem, b::LocalizedEuclideanRingElem) = a + b
-
 mul!(c::LocalizedEuclideanRingElem, a::LocalizedEuclideanRingElem, b::LocalizedEuclideanRingElem) = a * b
 
 addeq!(a::LocalizedEuclideanRingElem, b::LocalizedEuclideanRingElem) = a + b
