@@ -212,14 +212,8 @@ function AbstractAlgebra.sub!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T
   return A
 end
 
-#since type(view(MatElem{T})) != MatElem{T} which breaks
-# sub!(A::T, B::T, C::T) where T  in AA 
-function AbstractAlgebra.mul!(A::Mat{T}, B::Mat{T}, C::Mat{T}, f::Bool = false) where T
-  if f
-    A.entries .+= (B * C).entries
-  else
-    A.entries .= (B * C).entries
-  end
+function AbstractAlgebra.mul!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T
+  A.entries .= (B * C).entries
   return A
 end
 

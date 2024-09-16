@@ -285,8 +285,6 @@ function addmul!(a::Rational{T}, b::Rational{T}, c::Rational{T}, d::Rational{T})
    return a
 end
 
-mul!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x * y
-
 ###############################################################################
 #
 #   Random generation

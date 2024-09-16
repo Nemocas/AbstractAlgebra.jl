@@ -1012,7 +1012,7 @@ function add!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingEl
 end
 
 function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
-   a.p = (b*c).p
+   a.p = mul!(a.p, b.p, c.p)
    return a
 end
 

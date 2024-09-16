@@ -130,10 +130,6 @@ Base.:\(y::Union{Integer, Rational, AbstractFloat}, x::NCRingElem) = divexact_le
 
 Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 
-function mul!(z::T, x::T, y::T) where T <: NCRingElem
-   return x*y
-end
-
 function addmul!(z::T, x::T, y::T, c::T) where T <: NCRingElem
    c = mul!(c, x, y)
    z = addeq!(z, c)

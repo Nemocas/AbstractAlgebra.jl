@@ -540,10 +540,6 @@ end
 # See #1077
 
 
-function mul!(a::T, b::T, c::T) where T <: Integer
-   return b*c
-end
-
 function addmul!(a::T, b::T, c::T, d::T) where T <: Integer
    return a + b*c
 end

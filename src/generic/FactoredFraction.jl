@@ -476,8 +476,9 @@ function zero!(c::FactoredFracFieldElem)
     return c
 end
 
+# needed as mul!(c::FracElem{T}, a::FracElem{T}, b::FracElem{T}) is incompatible
 function mul!(c::FactoredFracFieldElem{T}, a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement
-    return a*b
+  return a*b
 end
 
 function addeq!(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement

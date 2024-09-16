@@ -4,10 +4,6 @@
 #
 ###############################################################################
 
-function mul!(z::T, a, b)::T where T
-  return a*b
-end
-
 function pow!(z::T, a, b)::T where T
   return a^b
 end

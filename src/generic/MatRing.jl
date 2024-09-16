@@ -94,11 +94,6 @@ end
 #
 ###############################################################################
 
-function mul!(A::MatRingElem{T}, B::MatRingElem{T},
-                                C::MatRingElem{T}) where T <: NCRingElement
-   return B*C
-end
-
 function addeq!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
    n = degree(A)
    for i = 1:n
