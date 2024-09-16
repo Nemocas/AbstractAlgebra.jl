@@ -212,6 +212,7 @@ export free_associative_algebra
 export free_module
 export function_field
 export gcd
+export gcd!
 export gcd_with_cofactors
 export gcdinv
 export gcdx

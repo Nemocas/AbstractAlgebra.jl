@@ -445,6 +445,15 @@ This is a shorthand for `inv!(a, a)`.
 inv!(a) = inv!(a, a)
 
 @doc raw"""
+    gcd!(a, b, c)
+
+Return `gcd(b, c)`, possibly modifying the object `a` in the process.
+"""
+function gcd!(a, b, c)
+  return gcd(b, c)
+end
+
+@doc raw"""
     canonical_injection(D, i)
 
 Return the i-th canonical injection into the direct sum or product objects `D`.
