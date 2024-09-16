@@ -13,6 +13,9 @@
 @alias FreeAssAlgebra FreeAssociativeAlgebra
 @alias FreeAssAlgElem FreeAssociativeAlgebraElem
 
+# renamed in 0.42.6
+@alias addeq! add!
+
 ###############################################################################
 #
 #   Deprecated bindings

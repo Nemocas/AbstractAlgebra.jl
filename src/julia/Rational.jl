@@ -231,9 +231,9 @@ end
 
 function add!(a::Rational{T}, b::Rational{T}, c::Rational{T}) where T <: Integer
    if a === b
-      return addeq!(a, c)
+      return add!(a, c)
    elseif a == c
-      return addeq!(a, b)
+      return add!(a, b)
    else # no aliasing
       n = a.num
       d = a.den
@@ -253,7 +253,7 @@ function add!(a::Rational{T}, b::Rational{T}, c::Rational{T}) where T <: Integer
    end
 end
 
-function addeq!(a::Rational{T}, b::Rational{T}) where T <: Integer
+function add!(a::Rational{T}, b::Rational{T}) where T <: Integer
    if a === b
       if iseven(a.den)
          return Rational{T}(a.num, div(b.den, 2))
@@ -281,17 +281,9 @@ end
 
 function addmul!(a::Rational{T}, b::Rational{T}, c::Rational{T}, d::Rational{T}) where T <: Integer
    d = mul!(d, b, c)
-   a = addeq!(a, d)
+   a = add!(a, d)
    return a
 end
-
-sub!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x - y
-
-neg!(z::Rational{T}, x::Rational{T}) where T <: Integer = -x
-
-add!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x + y
-
-mul!(z::Rational{T}, x::Rational{T}, y::T) where T <: Integer = x * y
 
 ###############################################################################
 #

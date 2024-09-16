@@ -441,11 +441,6 @@ function mul!(c::ResFieldElem{T}, a::ResFieldElem{T}, b::ResFieldElem{T}) where 
    return c
 end
 
-function addeq!(c::ResFieldElem{T}, a::ResFieldElem{T}) where {T <: RingElement}
-   c.data = mod(data(c) + data(a), modulus(a))
-   return c
-end
-
 function add!(c::ResFieldElem{T}, a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
    c.data = mod(data(a) + data(b), modulus(a))
    return c

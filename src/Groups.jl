@@ -236,28 +236,16 @@ end
 # Mutable API where modifications are recommended for performance reasons
 ################################################################################
 
+# further mutable functions in fundamental_interface.jl:
+# mul!(out::T, g::T, h::T) where {T<:GroupElem} = g * h
+# inv!(out::T, g::T) where {T<:GroupElem} = inv(g)
+
 """
     one!(g::GroupElem)
 
 Return `one(g)`, possibly modifying `g`.
 """
 one!(g::GroupElem) = one(parent(g))
-
-"""
-    inv!(out::T, g::T) where {GEl <: GroupElem}
-
-Return `inv(g)`, possibly modifying `out`. Aliasing of `g` with `out` is
-allowed.
-"""
-inv!(out::T, g::T) where {T<:GroupElem} = inv(g)
-
-"""
-    mul!(out::T, g::T, h::T) where {GEl <: GroupElem}
-
-Return `g*h`, possibly modifying `out`. Aliasing of `g` or `h` with `out` is
-allowed.
-"""
-mul!(out::T, g::T, h::T) where {T<:GroupElem} = g * h
 
 """
     div_right!(out::T, g::T, h::T) where {GEl <: GroupElem}

@@ -11,7 +11,6 @@ using ..RandomExtensions: RandomExtensions, Make2, AbstractRNG
 import AbstractAlgebra: Ring
 import AbstractAlgebra: RingElem
 import AbstractAlgebra: add!
-import AbstractAlgebra: addeq!
 import AbstractAlgebra: base_ring
 import AbstractAlgebra: base_ring_type
 import AbstractAlgebra: canonical_unit
@@ -206,11 +205,6 @@ end
 
 function add!(f::ConstPoly{T}, g::ConstPoly{T}, h::ConstPoly{T}) where T <: RingElement
    f.c = g.c + h.c
-   return f
-end
-
-function addeq!(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   f.c += g.c
    return f
 end
 

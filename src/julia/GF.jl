@@ -360,10 +360,6 @@ function zero!(z::GFElem{T}) where T <: Integer
    return GFElem{T}(d, R)
 end
 
-function mul!(z::GFElem{T}, x::GFElem{T}, y::GFElem{T}) where T <: Integer
-   return x*y
-end
-
 function mul!(z::GFElem{BigInt}, x::GFElem{BigInt}, y::GFElem{BigInt})
    R = parent(x)
    p = R.p::BigInt
@@ -375,23 +371,15 @@ function mul!(z::GFElem{BigInt}, x::GFElem{BigInt}, y::GFElem{BigInt})
    end
 end
 
-function addeq!(z::GFElem{T}, x::GFElem{T}) where T <: Integer
-   return z + x
-end
-
-function addeq!(z::GFElem{BigInt}, x::GFElem{BigInt})
+function add!(z::GFElem{BigInt}, x::GFElem{BigInt})
    R = parent(x)
    p = R.p::BigInt
-   d = addeq!(z.d, x.d)
+   d = add!(z.d, x.d)
    if d < p
       return GFElem{BigInt}(d, R)
    else
       return GFElem{BigInt}(d - p, R)
    end
-end
-
-function add!(z::GFElem{T}, x::GFElem{T}, y::GFElem{T}) where T <: Integer
-   return x + y
 end
 
 function add!(z::GFElem{BigInt}, x::GFElem{BigInt}, y::GFElem{BigInt})

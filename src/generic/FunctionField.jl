@@ -191,7 +191,7 @@ function _rat_poly_add(poly1::Poly{S}, den1::S,
    if isone(d)
       rpoly = poly1*den2
       t = poly2*den1
-      rpoly = addeq!(rpoly, t)
+      rpoly = add!(rpoly, t)
       rden = den1*den2
    else
       den11 = divexact(den1, d)
@@ -199,7 +199,7 @@ function _rat_poly_add(poly1::Poly{S}, den1::S,
 
       rpoly = poly1*den22
       t = poly2*den11
-      rpoly = addeq!(rpoly, t)
+      rpoly = add!(rpoly, t)
 
       if iszero(rpoly)
          rden = one(R)
@@ -1180,7 +1180,7 @@ function add!(c::FunctionFieldElem{T},
    return c
 end
 
-function addeq!(c::FunctionFieldElem{T}, a::FunctionFieldElem{T}) where
+function add!(c::FunctionFieldElem{T}, a::FunctionFieldElem{T}) where
                                                               T <: FieldElement
    n1, d1 = _rat_poly(c)
    n2, d2 = _rat_poly(a)

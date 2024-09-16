@@ -124,7 +124,7 @@ function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:Abstract
       q = -q
       for j = i + 1:ncols(rel)
          t1 = mul!(t1, q, rel[1, j])
-         v[1, start + j - 1] = addeq!(v[1, start + j - 1], t1)
+         v[1, start + j - 1] = add!(v[1, start + j - 1], t1)
       end
       i += 1
    end

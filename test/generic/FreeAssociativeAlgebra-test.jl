@@ -73,7 +73,7 @@
 
       f4 = zero(S)
       for t in terms(f1)
-         f4 = addeq!(f4, t)
+         f4 = add!(f4, t)
       end
       @test f1 == f4
 

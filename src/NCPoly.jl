@@ -222,7 +222,7 @@ function *(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
    for i = 1:lena - 1
       for j = 2:lenb
          t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
-         d[i + j - 1] = addeq!(d[i + j - 1], t)
+         d[i + j - 1] = add!(d[i + j - 1], t)
       end
    end
    z = parent(a)(d)
@@ -441,7 +441,7 @@ function mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: N
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
             t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
-            d[i + j - 1] = addeq!(d[i + j - 1], t)
+            d[i + j - 1] = add!(d[i + j - 1], t)
          end
       end
    end
@@ -684,7 +684,7 @@ end
 
 function addmul!(z::NCPolyRingElem{T}, x::NCPolyRingElem{T}, y::NCPolyRingElem{T}, c::NCPolyRingElem{T}) where T <: NCRingElem
    c = mul!(c, x, y)
-   z = addeq!(z, c)
+   z = add!(z, c)
    return z
 end
 

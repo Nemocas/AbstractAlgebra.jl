@@ -562,12 +562,6 @@ add!(c::MyElem, a::MyElem, b::MyElem)
 
 Set $c$ to the value $a + b$ in place. Return the mutated value. Aliasing is permitted.
 
-```julia
-addeq!(a::MyElem, b::MyElem)
-```
-
-Set $a$ to $a + b$ in place. Return the mutated value. Aliasing is permitted.
-
 ### Random generation
 
 The random functions are only used for test code to generate test data. They therefore
@@ -813,7 +807,7 @@ using Random: Random, SamplerTrivial, GLOBAL_RNG
 using RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
 import AbstractAlgebra: parent_type, elem_type, base_ring, base_ring_type, parent, is_domain_type,
-       is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!, addeq!,
+       is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!,
        get_cached!, is_unit, characteristic, Ring, RingElem, expressify
 
 import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
@@ -977,11 +971,6 @@ end
 
 function add!(f::ConstPoly{T}, g::ConstPoly{T}, h::ConstPoly{T}) where T <: RingElement
    f.c = g.c + h.c
-   return f
-end
-
-function addeq!(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   f.c += g.c
    return f
 end
 

@@ -237,7 +237,7 @@ function mul!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where T <: Ring
    return c
 end
 
-function addeq!(c::RelSeries{T}, a::RelSeries{T}) where T <: RingElement
+function add!(c::RelSeries{T}, a::RelSeries{T}) where T <: RingElement
    lenc = pol_length(c)
    lena = pol_length(a)
    valc = valuation(c)
@@ -274,7 +274,7 @@ function addeq!(c::RelSeries{T}, a::RelSeries{T}) where T <: RingElement
          c.coeffs[i] = R()
       end
       for i = vala - valc + 1:min(lenc, lenr, lena + vala - valc)
-         c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i - vala + valc])
+         c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i - vala + valc])
       end
       for i = max(lenc, vala - valc) + 1:min(lena + vala - valc, lenr)
          c.coeffs[i] = deepcopy(a.coeffs[i - vala + valc])
@@ -289,9 +289,9 @@ end
 
 function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where T <: RingElement
    if c === a
-      return addeq!(c, b)
+      return add!(c, b)
    elseif c === b
-      return addeq!(c, a)
+      return add!(c, a)
    end
    lena = pol_length(a)
    lenb = pol_length(b)

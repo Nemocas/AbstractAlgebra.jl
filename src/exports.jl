@@ -109,7 +109,6 @@ export add_column
 export add_column!
 export add_row
 export add_row!
-export addeq!
 export addmul!
 export addmul_delayed_reduction!
 export allow_unicode
@@ -174,6 +173,7 @@ export dim
 export direct_sum
 export disable_cache!
 export discriminant
+export div!
 export div_left
 export div_left!
 export div_right
@@ -212,6 +212,7 @@ export free_associative_algebra
 export free_module
 export function_field
 export gcd
+export gcd!
 export gcd_with_cofactors
 export gcdinv
 export gcdx
@@ -373,6 +374,7 @@ export max_precision
 export minors
 export minpoly
 export mod
+export mod!
 export module_homomorphism
 export module_isomorphism
 export modulus
@@ -459,6 +461,7 @@ export reduce!
 export rel_series
 export rel_series_type
 export rels
+export rem!
 export remove
 export renest
 export renormalize!

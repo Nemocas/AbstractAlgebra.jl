@@ -764,18 +764,6 @@ function add!(c::PuiseuxSeriesElem{T}, a::PuiseuxSeriesElem{T}, b::PuiseuxSeries
     return c
 end
 
-function addeq!(c::PuiseuxSeriesElem{T}, a::PuiseuxSeriesElem{T}) where T <: RingElement
-    s = gcd(c.scale, a.scale)
-    zscale = div(c.scale*a.scale, s)
-    ainf = div(a.scale, s)
-    cinf = div(c.scale, s)
-    cnew = inflate(c.data, ainf)
-    c.data = addeq!(cnew, inflate(a.data, cinf))
-    c.scale = zscale
-    c = rescale!(c)
-    return c
-end
-
 ###############################################################################
 #
 #   Promotion rules

@@ -738,14 +738,6 @@ function mul!(a::SparsePoly{T}, b::SparsePoly{T}, c::SparsePoly{T}) where {T <: 
    return a
 end
 
-function addeq!(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
-   t = a + b
-   a.coeffs = t.coeffs
-   a.exps = t.exps
-   a.length = t.length
-   return a
-end
-
 function add!(a::SparsePoly{T}, b::SparsePoly{T}, c::SparsePoly{T}) where {T <: RingElement}
    t = b + c
    a.coeffs = t.coeffs

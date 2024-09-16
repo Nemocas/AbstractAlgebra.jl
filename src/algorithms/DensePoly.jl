@@ -11,7 +11,7 @@ import AbstractAlgebra: Ring
 import AbstractAlgebra: elem_type
 import AbstractAlgebra: mul_red!
 import AbstractAlgebra: reduce!
-import AbstractAlgebra: addeq!
+import AbstractAlgebra: add!
 
 # usual polynomial mullow with the "fast" techniques depending on cutoffs
 # write the lower Alen coefficients of
@@ -72,13 +72,13 @@ function macc_classical(
       if dr > 0
          for j in jstart : jstop
             t = mul_red!(t, B[Boff + j], C[Coff + i - j], false)
-            A[Aoff + i] = addeq!(A[Aoff + i], t)
+            A[Aoff + i] = add!(A[Aoff + i], t)
          end
       elseif dr < 0
          z = zero(R)
          for j in jstart : jstop
             t = mul_red!(t, B[Boff + j], C[Coff + i - j], false)
-            z = addeq!(z, t)
+            z = add!(z, t)
          end
          A[Aoff + i] -= z
       else
@@ -89,7 +89,7 @@ function macc_classical(
          end
          while (j = j + 1) <= jstop
             t = mul_red!(t, B[Boff + j], C[Coff + i - j], false)
-            A[Aoff + i] = addeq!(A[Aoff + i], t)
+            A[Aoff + i] = add!(A[Aoff + i], t)
          end
       end
       reduce!(A[Aoff + i])
@@ -206,7 +206,7 @@ function acc(
       end
    else
       for i in 0 : Blen - 1
-         A[Aoff + i] = addeq!(A[Aoff + i], B[Boff + i])
+         A[Aoff + i] = add!(A[Aoff + i], B[Boff + i])
       end
    end
 end
