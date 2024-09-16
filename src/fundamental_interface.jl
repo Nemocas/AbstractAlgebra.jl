@@ -50,7 +50,7 @@ julia> elem_type(S) == typeof(x)
 true
 ```
 """
-elem_type(x)  = elem_type(typeof(x))
+elem_type(x) = elem_type(typeof(x))
 elem_type(T::DataType) = throw(MethodError(elem_type, (T,)))
 
 @doc raw"""
@@ -304,35 +304,147 @@ const VarName = Union{Symbol, AbstractString, Char}
 
 Return the zero of `parent(a)`, possibly modifying the object `a` in the process.
 """
-function zero! end
+function zero!(a::T) where {T}
+  return zero(a)
+end
 
 @doc raw"""
     add!(a, b, c)
 
 Return `b + c`, possibly modifying the object `a` in the process.
 """
-function add! end
+function add!(a::T, b::T, c::T) where {T}
+  return b + c
+end
 
 @doc raw"""
     addeq!(a, b)
+    add!(a, b)
 
 Return `a + b`, possibly modifying the object `a` in the process.
+This is a shorthand for `add!(a, a, b)`.
 """
 addeq!(a, b) = add!(a, a, b)
+add!(a, b) = add!(a, a, b)
 
 @doc raw"""
     sub!(a, b, c)
 
 Return `b - c`, possibly modifying the object `a` in the process.
 """
-function sub! end
+function sub!(a::T, b::T, c::T) where {T}
+  return b - c
+end
+
+@doc raw"""
+    sub!(a, b)
+
+Return `a - b`, possibly modifying the object `a` in the process.
+This is a shorthand for `sub!(a, a, b)`.
+"""
+sub!(a, b) = sub!(a, a, b)
+
+@doc raw"""
+    neg!(a, b)
+
+Return `-b`, possibly modifying the object `a` in the process.
+"""
+function neg!(a::T, b::T) where {T}
+  return -b
+end
+
+@doc raw"""
+    neg!(a)
+
+Return `-a`, possibly modifying the object `a` in the process.
+This is a shorthand for `neg!(a, a)`.
+"""
+neg!(a) = neg!(a, a)
 
 @doc raw"""
     mul!(a, b, c)
 
-Return `b*c`, possibly modifying the object `a` in the process.
+Return `b * c`, possibly modifying the object `a` in the process.
 """
-function mul! end
+function mul!(a::T, b::T, c::T) where {T}
+  return b * c
+end
+
+@doc raw"""
+    mul!(a, b)
+
+Return `a * b`, possibly modifying the object `a` in the process.
+This is a shorthand for `mul!(a, a, b)`.
+"""
+mul!(a, b) = mul!(a, a, b)
+
+@doc raw"""
+    div!(a, b, c)
+
+Return `div(b, c)`, possibly modifying the object `a` in the process.
+"""
+function div!(a::T, b::T, c::T) where {T}
+  return div(b, c)
+end
+
+@doc raw"""
+    div!(a, b)
+
+Return `div(a, b)`, possibly modifying the object `a` in the process.
+This is a shorthand for `div!(a, a, b)`.
+"""
+div!(a, b) = div!(a, a, b)
+
+@doc raw"""
+    rem!(a, b, c)
+
+Return `rem(b, c)`, possibly modifying the object `a` in the process.
+"""
+function rem!(a::T, b::T, c::T) where {T}
+  return rem(b, c)
+end
+
+@doc raw"""
+    rem!(a, b)
+
+Return `rem(a, b)`, possibly modifying the object `a` in the process.
+This is a shorthand for `rem!(a, a, b)`.
+"""
+rem!(a, b) = rem!(a, a, b)
+
+@doc raw"""
+    mod!(a, b, c)
+
+Return `mod(b, c)`, possibly modifying the object `a` in the process.
+"""
+function mod!(a::T, b::T, c::T) where {T}
+  return mod(b, c)
+end
+
+@doc raw"""
+    mod!(a, b)
+
+Return `mod(a, b)`, possibly modifying the object `a` in the process.
+This is a shorthand for `mod!(a, a, b)`.
+"""
+mod!(a, b) = mod!(a, a, b)
+
+@doc raw"""
+    inv!(a, b)
+
+Return `inv(b)`, possibly modifying the object `a` in the process.
+"""
+function inv!(a::T, b::T) where {T}
+  return -b
+end
+
+@doc raw"""
+    inv!(a)
+
+Return `inv(a)`, possibly modifying the object `a` in the process.
+This is a shorthand for `inv!(a, a)`.
+"""
+inv!(a) = inv!(a, a)
 
 @doc raw"""
     canonical_injection(D, i)
@@ -361,4 +473,3 @@ function _number_of_direct_product_factors end
 Return the homomorphism from the domain `D` into the codomain `C` defined by the data.
 """
 function hom end
-
