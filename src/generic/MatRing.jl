@@ -95,7 +95,7 @@ end
 ###############################################################################
 
 function add!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
-   A.entries += B.entries
+   A.entries .+= B.entries
    return A
 end
 
