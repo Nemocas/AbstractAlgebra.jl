@@ -10,7 +10,7 @@ argument "cutoff" to indicate when the base case should be used.
 
 The speedup depends on the ring and the entry sizes.
 
-#Examples:
+# Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> m = matrix(ZZ, rand(-10:10, 1000, 1000));
@@ -22,7 +22,6 @@ julia> n = mul!(n, m, m);
 julia> n = Strassen.mul!(n, m, m);
 
 julia> n = Strassen.mul!(n, m, m; cutoff = 100);
-
 ```
 """
 module Strassen
@@ -49,8 +48,7 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   @assert a == sC[1] && b == sB[1] && c == sC[2]
 
   if (a <= cutoff || b <= cutoff || c <= cutoff)
-      AbstractAlgebra.mul!(C, A, B)
-      return
+      return AbstractAlgebra.mul!(C, A, B)
   end
 
   anr = div(a, 2)
@@ -164,6 +162,8 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
       #nmod_mat_addmul(Cb, Cb, Ac, Br);
       Cb = AbstractAlgebra.mul!(Cb, Ac, Br)
   end
+
+  return C
 end
 
 #solve_tril fast, recursive
