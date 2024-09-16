@@ -1037,7 +1037,7 @@ function __evaluate(a, vars, vals, powers)
         end
         M = Generic.MPolyBuildCtx(S)
         push_term!(M, c, v)
-        add!(r, t*finish(M))
+        r = add!(r, t*finish(M))
      end
      return r
    end

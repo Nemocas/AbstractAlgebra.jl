@@ -100,7 +100,7 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   #nmod_mat_mul(C21, X1, X2);
   mul!(C21, X1, X2; cutoff)
 
-  add!(X1, A21, A22);
+  X1 = add!(X1, A21, A22);
   sub!(X2, B12, B11);
   #nmod_mat_mul(C22, X1, X2);
   mul!(C22, X1, X2; cutoff)
@@ -118,11 +118,11 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   #nmod_mat_mul(X1, A11, B11);
   mul!(X1, A11, B11; cutoff)
 
-  add!(C12, X1, C12);
-  add!(C21, C12, C21);
-  add!(C12, C12, C22);
-  add!(C22, C21, C22);
-  add!(C12, C12, C11);
+  C12 = add!(C12, X1, C12);
+  C21 = add!(C21, C12, C21);
+  C12 = add!(C12, C12, C22);
+  C22 = add!(C22, C21, C22);
+  C12 = add!(C12, C12, C11);
   sub!(X2, X2, B21);
   #nmod_mat_mul(C11, A22, X2);
   mul!(C11, A22, X2; cutoff)
@@ -132,7 +132,7 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   #nmod_mat_mul(C11, A12, B21);
   mul!(C11, A12, B21; cutoff)
 
-  add!(C11, X1, C11);
+  C11 = add!(C11, X1, C11);
 
   if c > 2*bnc #A by last col of B -> last col of C
       #nmod_mat_window_init(Bc, B, 0, 2*bnc, b, c);
