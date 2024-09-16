@@ -167,7 +167,7 @@ right, respectively, of `a`.
 
 ## Unsafe ring operators
 
-To speed up polynomial arithmetic, various unsafe operators are provided, which
+To speed up polynomial arithmetic, various unsafe operators are provided, which may
 mutate the output rather than create a new object.
 
 ```julia
