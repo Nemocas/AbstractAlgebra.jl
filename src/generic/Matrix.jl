@@ -208,7 +208,7 @@ function AbstractAlgebra.add!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T
 end
 
 function AbstractAlgebra.sub!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T
-  A.entries.= B.entries .- C.entries
+  A.entries .= B.entries .- C.entries
   return A
 end
 
