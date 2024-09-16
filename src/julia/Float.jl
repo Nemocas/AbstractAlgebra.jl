@@ -161,9 +161,6 @@ end
 # No actual mutation is permitted for Julia types
 # See #1077
 
-function zero!(a::T) where T <: AbstractFloat
-   return T(0)
-end
 
 function mul!(a::T, b::T, c::T) where T <: AbstractFloat
    return b*c
