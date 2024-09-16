@@ -434,8 +434,8 @@ mod!(a, b) = mod!(a, a, b)
 
 Return `inv(b)`, possibly modifying the object `a` in the process.
 """
-function inv!(a::T, b::T) where {T}
-  return -b
+function inv!(a, b)
+  return inv(b)
 end
 
 @doc raw"""
