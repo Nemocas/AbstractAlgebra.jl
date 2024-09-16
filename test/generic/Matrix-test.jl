@@ -624,7 +624,7 @@ end
    @test iszero(zero(M, QQ, 3, 3))
    @test iszero(zero(M, QQ))
    
-   zero!(M)
+   M = zero!(M)
    @test iszero(M)
 
    @test isone(one(R))
