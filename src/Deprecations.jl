@@ -13,6 +13,9 @@
 @alias FreeAssAlgebra FreeAssociativeAlgebra
 @alias FreeAssAlgElem FreeAssociativeAlgebraElem
 
+# renamed in 0.42.6
+@alias addeq! add!
+
 ###############################################################################
 #
 #   Deprecated bindings
@@ -61,4 +64,3 @@ import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{V
 change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} = map_coefficients(g, p, parent = new_polynomial_ring)
 mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} = Base.divrem(a * b, mod)[2]
 var"@attr"(__source__::LineNumberNode, __module__::Base.Module, expr::Expr) = var"@attr"(__source__, __module__, :Any, expr) # delegate `@attr functionexpression` to `@attr Any functionexpression` (macros are just functions with this weird extra syntax)
-addeq!(a, b) = add!(a, b); export addeq!
