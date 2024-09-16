@@ -152,6 +152,8 @@ export compose
 export conj!
 export constant_coefficient
 export content
+export coprime_base
+export coprime_base_push!
 export crt
 export crt_with_lcm
 export cycles
