@@ -32,7 +32,7 @@ const cutoff = 1500
 
 function mul(A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff) where {T}
   C = zero_matrix(base_ring(A), nrows(A), ncols(B))
-  mul!(C, A, B; cutoff)
+  C = mul!(C, A, B; cutoff)
   return C
 end
 
@@ -98,25 +98,25 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   X1 = A11 - A21
   X2 = B22 - B12
   #nmod_mat_mul(C21, X1, X2);
-  mul!(C21, X1, X2; cutoff)
+  C21 = mul!(C21, X1, X2; cutoff)
 
   X1 = add!(X1, A21, A22);
   X2 = sub!(X2, B12, B11);
   #nmod_mat_mul(C22, X1, X2);
-  mul!(C22, X1, X2; cutoff)
+  C22 = mul!(C22, X1, X2; cutoff)
 
   X1 = sub!(X1, X1, A11);
   X2 = sub!(X2, B22, X2);
   #nmod_mat_mul(C12, X1, X2);
-  mul!(C12, X1, X2; cutoff)
+  C12 = mul!(C12, X1, X2; cutoff)
 
   X1 = sub!(X1, A12, X1);
   #nmod_mat_mul(C11, X1, B22);
-  mul!(C11, X1, B22; cutoff)
+  C11 = mul!(C11, X1, B22; cutoff)
 
   #X1->c = bnc;
   #nmod_mat_mul(X1, A11, B11);
-  mul!(X1, A11, B11; cutoff)
+  X1 = mul!(X1, A11, B11; cutoff)
 
   C12 = add!(C12, X1, C12);
   C21 = add!(C21, C12, C21);
@@ -125,12 +125,12 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   C12 = add!(C12, C12, C11);
   X2 = sub!(X2, X2, B21);
   #nmod_mat_mul(C11, A22, X2);
-  mul!(C11, A22, X2; cutoff)
+  C11 = mul!(C11, A22, X2; cutoff)
 
   C21 = sub!(C21, C21, C11);
 
   #nmod_mat_mul(C11, A12, B21);
-  mul!(C11, A12, B21; cutoff)
+  C11 = mul!(C11, A12, B21; cutoff)
 
   C11 = add!(C11, X1, C11);
 

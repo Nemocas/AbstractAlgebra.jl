@@ -425,7 +425,7 @@ end
       r = R()
       r = add!(r, f, g)
       @test isapprox(r, f + g)
-      mul!(r, f, g)
+      r = mul!(r, f, g)
       @test isapprox(r, f*g)
    end
 
@@ -439,7 +439,7 @@ end
       r = R()
       r = add!(r, f, g)
       @test isequal(r, f + g)
-      mul!(r, f, g)
+      r = mul!(r, f, g)
       @test isequal(r, f*g)
    end
 end
