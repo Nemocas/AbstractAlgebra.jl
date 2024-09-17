@@ -7,11 +7,17 @@ export @attr
 export @attributes
 export @enable_all_show_via_expressify
 export @free_associative_algebra
+export @hassert
 export @laurent_polynomial_ring
 export @perm_str
 export @polynomial_ring
 export @power_series_ring
 export @rational_function_field
+export @req
+export @v_do
+export @vprint
+export @vprintln
+export @vtime
 export AbsPowerSeriesRing
 export AbsPowerSeriesRingElem
 export AdditiveGroupElem
