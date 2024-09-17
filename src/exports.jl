@@ -18,6 +18,8 @@ export @v_do
 export @vprint
 export @vprintln
 export @vtime
+export @vtime_add
+export @vtime_add_elapsed
 export AbsPowerSeriesRing
 export AbsPowerSeriesRingElem
 export AdditiveGroupElem
