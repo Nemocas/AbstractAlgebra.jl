@@ -548,7 +548,7 @@ macro hassert(s, l::Int, cond)
 end
 
 function assertions(flag::Bool)
-  for s in Hecke.ASSERT_SCOPE
+  for s in ASSERT_SCOPE
     flag ? set_assertion_level(s, 8999) : set_assertion_level(s, 0)
   end
 end
