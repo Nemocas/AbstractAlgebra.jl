@@ -23,14 +23,14 @@ global const VERBOSE_LOOKUP = Dict{Symbol, Int}()
 global const VERBOSE_PRINT_INDENT = Int[ 0 ]
 
 @doc raw"""
-    add_verbosity_scope(s::Symbol) -> Nothing
+    AbstractAlgebra.add_verbosity_scope(s::Symbol) -> Nothing
 
 Add the symbol `s` to the list of (global) verbosity scopes.
 
 # Examples
 
 ```jldoctest
-julia> add_verbosity_scope(:MyScope)
+julia> AbstractAlgebra.add_verbosity_scope(:MyScope)
 
 ```
 """
@@ -93,15 +93,15 @@ We will set up different verbosity scopes with different verbosity levels in a
 custom function to show how to use this macro.
 
 ```jldoctest
-julia> add_verbosity_scope(:Test1);
+julia> AbstractAlgebra.add_verbosity_scope(:Test1);
 
-julia> add_verbosity_scope(:Test2);
+julia> AbstractAlgebra.add_verbosity_scope(:Test2);
 
-julia> add_verbosity_scope(:Test3);
+julia> AbstractAlgebra.add_verbosity_scope(:Test3);
 
-julia> set_verbosity_level(:Test1, 1);
+julia> AbstractAlgebra.set_verbosity_level(:Test1, 1);
 
-julia> set_verbosity_level(:Test2, 3);
+julia> AbstractAlgebra.set_verbosity_level(:Test2, 3);
 
 julia> function vprint_example()
        @vprintln :Test1 "Triggered"
@@ -199,15 +199,15 @@ We will set up different verbosity scopes with different verbosity levels in a
 custom function to show how to use this macro.
 
 ```jldoctest
-julia> add_verbosity_scope(:Test1);
+julia> AbstractAlgebra.add_verbosity_scope(:Test1);
 
-julia> add_verbosity_scope(:Test2);
+julia> AbstractAlgebra.add_verbosity_scope(:Test2);
 
-julia> add_verbosity_scope(:Test3);
+julia> AbstractAlgebra.add_verbosity_scope(:Test3);
 
-julia> set_verbosity_level(:Test1, 1);
+julia> AbstractAlgebra.set_verbosity_level(:Test1, 1);
 
-julia> set_verbosity_level(:Test2, 3);
+julia> AbstractAlgebra.set_verbosity_level(:Test2, 3);
 
 julia> function v_do_example(a::Int, b::Int, c::Int, d::Int)
        @v_do :Test1 a = 2*a
@@ -301,7 +301,7 @@ macro vtime_add_elapsed(flag, level, var, key, stmt)
 end
 
 @doc raw"""
-    set_verbosity_level(s::Symbol, l::Int) -> Int
+    AbstractAlgebra.set_verbosity_level(s::Symbol, l::Int) -> Int
 
 If `s` represents a known verbosity scope, set the current verbosity level of
 `s` to `l`.
@@ -316,12 +316,12 @@ verbosity scopes by calling the function [`add_verbosity_scope`](@ref).
 # Examples
 
 ```jldoctest
-julia> add_verbosity_scope(:MyScope)
+julia> AbstractAlgebra.add_verbosity_scope(:MyScope)
 
-julia> set_verbosity_level(:MyScope, 4)
+julia> AbstractAlgebra.set_verbosity_level(:MyScope, 4)
 4
 
-julia> set_verbosity_level(:MyScope, 0)
+julia> AbstractAlgebra.set_verbosity_level(:MyScope, 0)
 0
 ```
 """
@@ -331,7 +331,7 @@ function set_verbosity_level(s::Symbol, l::Int)
 end
 
 @doc raw"""
-    get_verbosity_level(s::Symbol) -> Int
+    AbstractAlgebra.get_verbosity_level(s::Symbol) -> Int
 
 If `s` represents a known verbosity scope, return the current verbosity level
 of `s`.
@@ -346,21 +346,21 @@ verbosity scopes by calling the function [`add_verbosity_scope`](@ref).
 # Examples
 
 ```jldoctest
-julia> add_verbosity_scope(:MyScope)
+julia> AbstractAlgebra.add_verbosity_scope(:MyScope)
 
-julia> get_verbosity_level(:MyScope)
+julia> AbstractAlgebra.get_verbosity_level(:MyScope)
 0
 
-julia> set_verbosity_level(:MyScope, 4)
+julia> AbstractAlgebra.set_verbosity_level(:MyScope, 4)
 4
 
-julia> get_verbosity_level(:MyScope)
+julia> AbstractAlgebra.get_verbosity_level(:MyScope)
 4
 
-julia> set_verbosity_level(:MyScope, 0)
+julia> AbstractAlgebra.set_verbosity_level(:MyScope, 0)
 0
 
-julia> get_verbosity_level(:MyScope)
+julia> AbstractAlgebra.get_verbosity_level(:MyScope)
 0
 ```
 """
@@ -380,14 +380,14 @@ global const ASSERT_SCOPE = Symbol[]
 global const ASSERT_LOOKUP = Dict{Symbol, Int}()
 
 @doc raw"""
-    add_assertion_scope(s::Symbol) -> Nothing
+    AbstractAlgebra.add_assertion_scope(s::Symbol) -> Nothing
 
 Add the symbol `s` to the list of (global) assertion scopes.
 
 # Examples
 
 ```jldoctest
-julia> add_assertion_scope(:MyScope)
+julia> AbstractAlgebra.add_assertion_scope(:MyScope)
 
 ```
 """
@@ -397,7 +397,7 @@ function add_assertion_scope(s::Symbol)
 end
 
 @doc raw"""
-    set_assertion_level(s::Symbol, l::Int) -> Int
+    AbstractAlgebra.set_assertion_level(s::Symbol, l::Int) -> Int
 
 If `s` represents a known assertion scope, set the current assertion level
 of `s` to `l`.
@@ -412,12 +412,12 @@ assertion scopes by calling the function [`add_assertion_scope`](@ref).
 # Examples
 
 ```jldoctest
-julia> add_assertion_scope(:MyScope)
+julia> AbstractAlgebra.add_assertion_scope(:MyScope)
 
-julia> set_assertion_level(:MyScope, 4)
+julia> AbstractAlgebra.set_assertion_level(:MyScope, 4)
 4
 
-julia> set_assertion_level(:MyScope, 0)
+julia> AbstractAlgebra.set_assertion_level(:MyScope, 0)
 0
 ```
 """
@@ -430,7 +430,7 @@ function set_assertion_level(s::Symbol, l::Int)
 end
 
 @doc raw"""
-    get_assertion_level(s::Symbol) -> Int
+    AbstractAlgebra.get_assertion_level(s::Symbol) -> Int
 
 If `s` represents a symbol of a known assertion scope, return the current
 assertion level of `s`.
@@ -445,21 +445,21 @@ assertion scopes by calling the function [`add_assertion_scope`](@ref).
 # Examples
 
 ```jldoctest
-julia> add_assertion_scope(:MyScope)
+julia> AbstractAlgebra.add_assertion_scope(:MyScope)
 
-julia> get_assertion_level(:MyScope)
+julia> AbstractAlgebra.get_assertion_level(:MyScope)
 0
 
-julia> set_assertion_level(:MyScope, 1)
+julia> AbstractAlgebra.set_assertion_level(:MyScope, 1)
 1
 
-julia> get_assertion_level(:MyScope)
+julia> AbstractAlgebra.get_assertion_level(:MyScope)
 1
 
-julia> set_assertion_level(:MyScope, 0)
+julia> AbstractAlgebra.set_assertion_level(:MyScope, 0)
 0
 
-julia> get_assertion_level(:MyScope)
+julia> AbstractAlgebra.get_assertion_level(:MyScope)
 0
 ```
 """
@@ -500,9 +500,9 @@ We will set up different assertion scopes with different assertion levels in a
 custom function to show how to use this macro.
 
 ```jldoctest
-julia> add_assertion_scope(:MyScope)
+julia> AbstractAlgebra.add_assertion_scope(:MyScope)
 
-julia> get_assertion_level(:MyScope)
+julia> AbstractAlgebra.get_assertion_level(:MyScope)
 0
 
 julia> function hassert_test(x::Int)
@@ -514,7 +514,7 @@ hassert_test (generic function with 1 method)
 julia> hassert_test(2)
 0
 
-julia> set_assertion_level(:MyScope, 701);
+julia> AbstractAlgebra.set_assertion_level(:MyScope, 701);
 
 julia> try hassert_test(2)
        catch e e
@@ -524,7 +524,7 @@ AssertionError("\$(Expr(:escape, :(mod(x, 3) == 0)))")
 julia> hassert_test(3)
 1
 
-julia> set_assertion_level(:MyScope, 0)
+julia> AbstractAlgebra.set_assertion_level(:MyScope, 0)
 0
 ```
 
