@@ -229,8 +229,8 @@ end
     # the following tests need the improved `@macroexpand` from Julia 1.7
     @testset "@attr error handling" begin
         # wrong number of arguments
-        @test_throws ArgumentError @macroexpand @attr foo() = 1
-        @test_throws ArgumentError @macroexpand @attr foo(x::Int, y::Int) = 1
+        @test_throws ArgumentError @macroexpand @attr Any foo() = 1
+        @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int) = 1
         @test_throws ArgumentError @macroexpand @attr Int foo() = 1
         @test_throws ArgumentError @macroexpand @attr Int foo(x::Int, y::Int) = 1
         @test_throws MethodError @macroexpand @attr Int foo(x::Int) = 1 Any
