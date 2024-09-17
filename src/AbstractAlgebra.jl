@@ -409,6 +409,7 @@ include("algorithms/MPolyEvaluate.jl")
 include("algorithms/MPolyFactor.jl")
 include("algorithms/MPolyNested.jl")
 include("algorithms/DensePoly.jl")
+include("algorithms/coprime_base.jl")
 
 ###############################################################################
 #
