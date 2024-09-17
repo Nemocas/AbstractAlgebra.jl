@@ -97,12 +97,17 @@ function set_length!(a::SeriesElem, len::Int)
    return a
 end
 
-# TODO: set_precision! for the generic types RelSeries and AbsSeries
-# truncates the underlying polynomial since #1773. In a breaking release,
-# this should possibly also happen for the abstract types. Alternatively,
-# this set_precision! should be renamed (and only be kept as a purely internal
-# setter function).
-function set_precision!(a::SeriesElem, prec::Int)
+function set_precision!(a::RelPowerSeriesRingElem, prec::Int)
+   prec < 0 && throw(DomainError(prec, "Precision must be non-negative"))
+   a = truncate!(a, prec)
+   _set_precision_raw!(a, prec)
+   if is_zero(a)
+      set_valuation!(a, prec)
+   end
+   return a
+end
+
+function _set_precision_raw!(a::SeriesElem, prec::Int)
    a.prec = prec
    return a
 end
@@ -175,7 +180,7 @@ function renormalize!(z::RelPowerSeriesRingElem)
    while i < zlen && iszero(polcoeff(z, i))
       i += 1
    end
-   z = set_precision!(z, zprec)
+   z = _set_precision_raw!(z, zprec)
    if i == zlen
       z = set_length!(z, 0)
       z = set_valuation!(z, zprec)
@@ -339,7 +344,7 @@ end
 function -(a::RelPowerSeriesRingElem)
    len = pol_length(a)
    z = parent(a)()
-   z = set_precision!(z, precision(a))
+   z = _set_precision_raw!(z, precision(a))
    z = set_valuation!(z, valuation(a))
    fit!(z, len)
    for i = 1:len
@@ -368,7 +373,7 @@ function +(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}) where T <
    R = base_ring(a)
    z = parent(a)()
    fit!(z, lenz)
-   z = set_precision!(z, prec)
+   z = _set_precision_raw!(z, prec)
    z = set_valuation!(z, valz)
    if vala >= valb
       for i = 1:min(lenb, vala - valb)
@@ -422,7 +427,7 @@ function -(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}) where T <
    R = base_ring(a)
    z = parent(a)()
    fit!(z, lenz)
-   z = set_precision!(z, prec)
+   z = _set_precision_raw!(z, prec)
    z = set_valuation!(z, valz)
    if vala >= valb
       for i = 1:min(lenb, vala - valb)
@@ -510,7 +515,7 @@ function *(a::T, b::RelPowerSeriesRingElem{T}) where {T <: RingElem}
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
-   z = set_precision!(z, precision(b))
+   z = _set_precision_raw!(z, precision(b))
    z = set_valuation!(z, valuation(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
@@ -524,7 +529,7 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::RelPowerSeriesRingElem
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
-   z = set_precision!(z, precision(b))
+   z = _set_precision_raw!(z, precision(b))
    z = set_valuation!(z, valuation(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
@@ -555,13 +560,13 @@ function shift_left(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    xlen = pol_length(x)
    if xlen == 0
       z = zero(parent(x))
-      z = set_precision!(z, precision(x) + n)
+      z = _set_precision_raw!(z, precision(x) + n)
       z = set_valuation!(z, valuation(x) + n)
       return z
    end
    z = parent(x)()
    fit!(z, xlen)
-   z = set_precision!(z, precision(x) + n)
+   z = _set_precision_raw!(z, precision(x) + n)
    z = set_valuation!(z, valuation(x) + n)
    for i = 1:xlen
       z = setcoeff!(z, i - 1, polcoeff(x, i - 1))
@@ -582,12 +587,12 @@ function shift_right(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElemen
    xprec = precision(x)
    z = parent(x)()
    if n >= xlen + xval
-      z = set_precision!(z, max(0, xprec - n))
+      z = _set_precision_raw!(z, max(0, xprec - n))
       z = set_valuation!(z, max(0, xprec - n))
    else
       zlen = min(xlen + xval - n, xlen)
       fit!(z, zlen)
-      z = set_precision!(z, max(0, xprec - n))
+      z = _set_precision_raw!(z, max(0, xprec - n))
       z = set_valuation!(z, max(0, xval - n))
       for i = 1:zlen
          z = setcoeff!(z, i - 1, polcoeff(x, i + xlen  - zlen - 1))
@@ -609,27 +614,7 @@ end
 Return $a$ truncated to (absolute) precision $n$.
 """
 function truncate(a::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
-   n < 0 && throw(DomainError(n, "n must be >= 0"))
-   alen = pol_length(a)
-   aprec = precision(a)
-   aval = valuation(a)
-   if aprec <= n
-      return a
-   end
-   z = parent(a)()
-   z = set_precision!(z, n)
-   if n <= aval
-      z = set_length!(z, 0)
-      z = set_valuation!(z, n)
-   else
-      fit!(z, n - aval)
-      z = set_valuation!(z, aval)
-      for i = 1:min(n - aval, alen)
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
-      end
-      z = set_length!(z, normalise(z, n - aval))
-   end
-   return z
+   return truncate!(deepcopy(a), n)
 end
 
 # Intended only for internal use, does not renormalize, assumes n >= 0
@@ -685,13 +670,13 @@ function ^(a::RelPowerSeriesRingElem{T}, b::Int) where T <: RingElement
       return z
    elseif pol_length(a) == 0
       z = parent(a)()
-      z = set_precision!(z, b*valuation(a))
+      z = _set_precision_raw!(z, b*valuation(a))
       z = set_valuation!(z, b*valuation(a))
       return z
    elseif is_gen(a)
       z = parent(a)()
       fit!(z, 1)
-      z = set_precision!(z, b + precision(a) - 1)
+      z = _set_precision_raw!(z, b + precision(a) - 1)
       z = set_valuation!(z, b)
       z = setcoeff!(z, 0, deepcopy(polcoeff(a, 0)))
       z = set_length!(z, 1)
@@ -699,7 +684,7 @@ function ^(a::RelPowerSeriesRingElem{T}, b::Int) where T <: RingElement
    elseif pol_length(a) == 1
       c = polcoeff(a, 0)^b
       z = parent(a)(c)
-      z = set_precision!(z, (b - 1)*valuation(a) + precision(a))
+      z = _set_precision_raw!(z, (b - 1)*valuation(a) + precision(a))
       z = set_valuation!(z, iszero(c) ? precision(z) : b*valuation(a))
       return z
    elseif b == 1
@@ -722,7 +707,7 @@ function ^(a::RelPowerSeriesRingElem{T}, b::Int) where T <: RingElement
          bit >>= 1
       end
       z = set_valuation!(z, b*val)
-      z = set_precision!(z, b*val + prec)
+      z = _set_precision_raw!(z, b*val + prec)
       renormalize!(z)
       return z
    end
@@ -871,7 +856,7 @@ function divexact(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}; ch
    end
    y = truncate(y, precision(x))
    res = parent(x)()
-   res = set_precision!(res, min(precision(x), valuation(x) + precision(y)))
+   res = _set_precision_raw!(res, min(precision(x), valuation(x) + precision(y)))
    res = set_valuation!(res, valuation(x))
    lc = coeff(y, 0)
    check && lc == 0 && error("Not an exact division")
@@ -916,7 +901,7 @@ function divexact(x::RelPowerSeriesRingElem, y::Union{Integer, Rational, Abstrac
    lenx = pol_length(x)
    z = parent(x)()
    fit!(z, lenx)
-   z = set_precision!(z, precision(x))
+   z = _set_precision_raw!(z, precision(x))
    z = set_valuation!(z, valuation(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
@@ -929,7 +914,7 @@ function divexact(x::RelPowerSeriesRingElem{T}, y::T; check::Bool=true) where {T
    lenx = pol_length(x)
    z = parent(x)()
    fit!(z, lenx)
-   z = set_precision!(z, precision(x))
+   z = _set_precision_raw!(z, precision(x))
    z = set_valuation!(z, valuation(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
@@ -955,7 +940,7 @@ function Base.inv(a::RelPowerSeriesRingElem)
    a1 = polcoeff(a, 0)
    ainv = parent(a)()
    fit!(ainv, precision(a))
-   ainv = set_precision!(ainv, precision(a))
+   ainv = _set_precision_raw!(ainv, precision(a))
    ainv = set_valuation!(ainv, 0)
    if precision(a) != 0
       ainv = setcoeff!(ainv, 0, divexact(one(R), a1))
@@ -981,20 +966,20 @@ function Base.inv(a::RelPowerSeriesRingElem{T}) where T <: FieldElement
     @assert prec != 0
     R = parent(a)
     x = R(inv(coeff(a, 0)))
-    x = set_precision!(x, 1)
+    x = _set_precision_raw!(x, 1)
     la = [prec]
     while la[end] > 1
         push!(la, div(la[end] + 1, 2))
     end 
     two = R(2)
-    two = set_precision!(two, prec)
+    two = _set_precision_raw!(two, prec)
     n = length(la) - 1
     y = R()
     minus_a = -a
     while n > 0
         # x -> x*(2 - xa) is the lifting recursion
-        x = set_precision!(x, la[n])
-        y = set_precision!(y, la[n])
+        x = _set_precision_raw!(x, la[n])
+        y = _set_precision_raw!(y, la[n])
         y = mul!(y, minus_a, x)
         y = add!(y, two)
         x = mul!(x, x, y)
@@ -1065,13 +1050,13 @@ function _compose_right(a::RelPowerSeriesRingElem, b::RelPowerSeriesRingElem)
       c = S(polcoeff(a, i - 1))
       z = z*b
       if !iszero(c)
-         c = set_precision!(c, precision(z))
+         c = _set_precision_raw!(c, precision(z))
          z += c
       end
    end
    z *= b^valuation(a)
    zprec = min(precision(z), valuation(b)*precision(a))
-   z = set_precision!(z, zprec)
+   z = _set_precision_raw!(z, zprec)
    z = set_valuation!(z, min(valuation(z), zprec))
    zlen = max(0, precision(z) - valuation(z))
    z = set_length!(z, min(zlen, pol_length(z)))
@@ -1095,7 +1080,7 @@ function sqrt_classical_char2(a::RelPowerSeriesRingElem; check::Bool=true)
    prec = div(precision(a) + 1, 2)
    if iszero(a)
       asqrt = parent(a)()
-      asqrt = set_precision!(asqrt, prec)
+      asqrt = _set_precision_raw!(asqrt, prec)
       asqrt = set_valuation!(asqrt, prec)
       return true, asqrt
    end
@@ -1106,7 +1091,7 @@ function sqrt_classical_char2(a::RelPowerSeriesRingElem; check::Bool=true)
    aval2 = div(aval, 2)
    asqrt = parent(a)()
    fit!(asqrt, prec)
-   asqrt = set_precision!(asqrt, prec)
+   asqrt = _set_precision_raw!(asqrt, prec)
    asqrt = set_valuation!(asqrt, aval2)
    if check
       for i = 1:2:precision(a) - aval - 1 # series must have even exponents
@@ -1141,13 +1126,13 @@ function sqrt_classical(a::RelPowerSeriesRingElem; check::Bool=true)
    prec = precision(a) - aval
    if prec == 0
       asqrt = parent(a)()
-      asqrt = set_precision!(asqrt, aval2)
+      asqrt = _set_precision_raw!(asqrt, aval2)
       asqrt = set_valuation!(asqrt, aval2)
       return true, asqrt
    end
    asqrt = parent(a)()
    fit!(asqrt, prec)
-   asqrt = set_precision!(asqrt, prec + aval2)
+   asqrt = _set_precision_raw!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
    if prec > 0
       c = polcoeff(a, 0)
@@ -1235,7 +1220,7 @@ julia> derivative(f)
 """
 function derivative(f::RelPowerSeriesRingElem{T}) where T <: RingElement
    g = parent(f)()
-   g = set_precision!(g, precision(f) - 1)
+   g = _set_precision_raw!(g, precision(f) - 1)
    fit!(g, pol_length(f))
    v = valuation(f)
    g = set_valuation!(g, 0)
@@ -1273,7 +1258,7 @@ julia> integral(f)
 function integral(f::RelPowerSeriesRingElem{T}) where T <: RingElement
    g = parent(f)()
    fit!(g, pol_length(f))
-   g = set_precision!(g, precision(f) + 1)
+   g = _set_precision_raw!(g, precision(f) + 1)
    v = valuation(f)
    g = set_valuation!(g, v + 1)
    for i = 1:pol_length(f)
@@ -1319,7 +1304,7 @@ Return the exponential of the power series $a$.
 function Base.exp(a::RelPowerSeriesRingElem{T}) where T <: RingElement
    if iszero(a)
       z = one(parent(a))
-      z = set_precision!(z, precision(a))
+      z = _set_precision_raw!(z, precision(a))
       return z
    end
    vala = valuation(a)
@@ -1327,7 +1312,7 @@ function Base.exp(a::RelPowerSeriesRingElem{T}) where T <: RingElement
    z = parent(a)()
    R = base_ring(a)
    fit!(z, preca)
-   z = set_precision!(z, preca)
+   z = _set_precision_raw!(z, preca)
    z = set_valuation!(z, 0)
    c = vala == 0 ? polcoeff(a, 0) : R()
    z = setcoeff!(z, 0, exp(c))
@@ -1352,7 +1337,7 @@ end
 function Base.exp(a::RelPowerSeriesRingElem{T}) where T <: FieldElement
    if iszero(a)
       b = one(parent(a))
-      b = set_precision!(b, precision(a))
+      b = _set_precision_raw!(b, precision(a))
       return b
    end
    R = base_ring(a)
@@ -1372,8 +1357,8 @@ function Base.exp(a::RelPowerSeriesRingElem{T}) where T <: FieldElement
    n = length(la) - 1
    # x -> x*(1 - log(a) + a) is the recursion
    while n > 0
-      x = set_precision!(x, la[n])
-      one1 = set_precision!(one1, la[n])
+      x = _set_precision_raw!(x, la[n])
+      one1 = _set_precision_raw!(one1, la[n])
       t = -log(x)
       t = add!(t, one1)
       t = add!(t, a)

@@ -124,6 +124,7 @@ export to_univariate
 export total_degree
 export trailing_coefficient
 export truncate
+export truncate!
 export unit
 export universal_polynomial_ring
 export upscale

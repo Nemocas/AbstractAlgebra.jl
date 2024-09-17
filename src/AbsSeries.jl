@@ -81,6 +81,13 @@ function Base.hash(a::AbsPowerSeriesRingElem, h::UInt)
    return b
 end
 
+function set_precision!(a::AbsPowerSeriesRingElem, prec::Int)
+   prec < 0 && throw(DomainError(prec, "Precision must be non-negative"))
+   a = truncate!(a, prec)
+   _set_precision_raw!(a, prec)
+   return a
+end
+
 function lift(R::PolyRing{T}, s::AbsPowerSeriesRingElem{T}) where {T}
    t = R()
    for x = 0:pol_length(s)
@@ -196,7 +203,7 @@ end
 function -(a::AbsPowerSeriesRingElem)
    len = length(a)
    z = parent(a)()
-   z = set_precision!(z, precision(a))
+   z = _set_precision_raw!(z, precision(a))
    fit!(z, len)
    for i = 1:len
       z = setcoeff!(z, i - 1, -coeff(a, i - 1))
@@ -220,7 +227,7 @@ function +(a::AbsPowerSeriesRingElem{T}, b::AbsPowerSeriesRingElem{T}) where T <
    lenz = max(lena, lenb)
    z = parent(a)()
    fit!(z, lenz)
-   z = set_precision!(z, prec)
+   z = _set_precision_raw!(z, prec)
    i = 1
    while i <= min(lena, lenb)
       z = setcoeff!(z, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
@@ -248,7 +255,7 @@ function -(a::AbsPowerSeriesRingElem{T}, b::AbsPowerSeriesRingElem{T}) where T <
    lenz = max(lena, lenb)
    z = parent(a)()
    fit!(z, lenz)
-   z = set_precision!(z, prec)
+   z = _set_precision_raw!(z, prec)
    i = 1
    while i <= min(lena, lenb)
       z = setcoeff!(z, i - 1, coeff(a, i - 1) - coeff(b, i - 1))
@@ -318,7 +325,7 @@ function *(a::T, b::AbsPowerSeriesRingElem{T}) where {T <: RingElem}
    len = length(b)
    z = parent(b)()
    fit!(z, len)
-   z = set_precision!(z, precision(b))
+   z = _set_precision_raw!(z, precision(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
@@ -330,7 +337,7 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbsPowerSeriesRingElem
    len = length(b)
    z = parent(b)()
    fit!(z, len)
-   z = set_precision!(z, precision(b))
+   z = _set_precision_raw!(z, precision(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
@@ -361,13 +368,13 @@ function shift_left(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    prec = min(prec, max_precision(parent(x)))
    if xlen == 0
       z = zero(parent(x))
-      z = set_precision!(z, prec)
+      z = _set_precision_raw!(z, prec)
       return z
    end
    zlen = min(prec, xlen + n)
    z = parent(x)()
    fit!(z, zlen)
-   z = set_precision!(z, prec)
+   z = _set_precision_raw!(z, prec)
    for i = 1:n
       z = setcoeff!(z, i - 1, zero(base_ring(x)))
    end
@@ -389,12 +396,12 @@ function shift_right(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElemen
    xlen = length(x)
    if n >= xlen
       z = zero(parent(x))
-      z = set_precision!(z, max(0, precision(x) - n))
+      z = _set_precision_raw!(z, max(0, precision(x) - n))
       return z
    end
    z = parent(x)()
    fit!(z, xlen - n)
-   z = set_precision!(z, precision(x) - n)
+   z = _set_precision_raw!(z, precision(x) - n)
    for i = 1:xlen - n
       z = setcoeff!(z, i - 1, coeff(x, i + n - 1))
    end
@@ -413,22 +420,7 @@ end
 Return $a$ truncated to $n$ terms.
 """
 function truncate(a::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
-   n < 0 && throw(DomainError(n, "n must be >= 0"))
-   len = length(a)
-   if precision(a) <= n
-      return a
-   end
-   z = parent(a)()
-   fit!(z, n)
-   z = set_precision!(z, n)
-   for i = 1:min(n, len)
-      z = setcoeff!(z, i - 1, coeff(a, i - 1))
-   end
-   for i = len + 1:n
-      z = setcoeff!(z, i - 1, zero(base_ring(a)))
-   end
-   z = set_length!(z, normalise(z, n))
-   return z
+   return truncate!(deepcopy(a), n)
 end
 
 ###############################################################################
@@ -447,14 +439,14 @@ function ^(a::AbsPowerSeriesRingElem{T}, b::Int) where T <: RingElement
    # special case powers of x for constructing power series efficiently
    if b == 0
       z = one(parent(a))
-      z = set_precision!(z, precision(a))
+      z = _set_precision_raw!(z, precision(a))
       return z
    elseif precision(a) > 0 && is_gen(a) && b > 0
       # arithmetic operators must not introduce new aliasing
       return deepcopy(shift_left(a, b - 1))
    elseif length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
-      z = set_precision!(z, precision(a))
+      z = _set_precision_raw!(z, precision(a))
       return z
    elseif b == 1
       return deepcopy(a)
@@ -619,7 +611,7 @@ function divexact(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}; ch
    end
    y = truncate(y, precision(x))
    res = parent(x)()
-   res = set_precision!(res, min(precision(x), precision(y) + valuation(x)))
+   res = _set_precision_raw!(res, min(precision(x), precision(y) + valuation(x)))
    lc = coeff(y, 0)
    check && iszero(lc) && error("Not an exact division")
    lenr = precision(x)
@@ -663,7 +655,7 @@ function divexact(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, Abstrac
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
-   z = set_precision!(z, precision(x))
+   z = _set_precision_raw!(z, precision(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y; check=check))
    end
@@ -675,7 +667,7 @@ function divexact(x::AbsPowerSeriesRingElem{T}, y::T; check::Bool=true) where {T
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
-   z = set_precision!(z, precision(x))
+   z = _set_precision_raw!(z, precision(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y; check=check))
    end
@@ -700,7 +692,7 @@ function Base.inv(a::AbsPowerSeriesRingElem)
    a1 = coeff(a, 0)
    ainv = parent(a)()
    fit!(ainv, precision(a))
-   ainv = set_precision!(ainv, precision(a))
+   ainv = _set_precision_raw!(ainv, precision(a))
    if precision(a) != 0
       ainv = setcoeff!(ainv, 0, divexact(one(R), a1))
    end
@@ -725,20 +717,20 @@ function Base.inv(a::AbsPowerSeriesRingElem{T}) where T <: FieldElement
     @assert prec != 0
     R = parent(a)
     x = R(inv(coeff(a, 0)))
-    x = set_precision!(x, 1)
+    x = _set_precision_raw!(x, 1)
     la = [prec]
     while la[end] > 1
         push!(la, div(la[end] + 1, 2))
     end 
     two = R(2)
-    two = set_precision!(two, prec)
+    two = _set_precision_raw!(two, prec)
     n = length(la) - 1
     y = R()
     minus_a = -a
     while n > 0
         # x -> x*(2 - xa) is the lifting recursion
-        x = set_precision!(x, la[n])
-        y = set_precision!(y, la[n])
+        x = _set_precision_raw!(x, la[n])
+        y = _set_precision_raw!(y, la[n])
         y = mul!(y, minus_a, x)
         y = add!(y, two)
         x = mul!(x, x, y)
@@ -808,7 +800,7 @@ function _compose_right(a::AbsPowerSeriesRingElem, b::AbsPowerSeriesRingElem)
       i -= 1
       z = z*b + coeff(a, i - 1)
    end
-   z = set_precision!(z, min(precision(z), valuation(b)*precision(a)))
+   z = _set_precision_raw!(z, min(precision(z), valuation(b)*precision(a)))
    z = set_length!(z, min(pol_length(z), precision(z)))
    return z
 end
@@ -825,7 +817,7 @@ function sqrt_classical_char2(a::AbsPowerSeriesRingElem; check::Bool=true)
    prec = div(precision(a) + 1, 2)
    asqrt = parent(a)()
    fit!(asqrt, prec)
-   asqrt = set_precision!(asqrt, prec)
+   asqrt = _set_precision_raw!(asqrt, prec)
    if check
       for i = 1:2:precision(a) - 1 # series must have even exponents
          if !iszero(coeff(a, i))
@@ -867,7 +859,7 @@ function sqrt_classical(a::AbsPowerSeriesRingElem; check::Bool=true)
    prec = precision(a) - aval2
    asqrt = parent(a)()
    fit!(asqrt, prec)
-   asqrt = set_precision!(asqrt, prec)
+   asqrt = _set_precision_raw!(asqrt, prec)
    for n = 1:aval2
       asqrt = setcoeff!(asqrt, n - 1, R())
    end
@@ -946,7 +938,7 @@ Return the derivative of the power series $f$.
 """
 function derivative(f::AbsPowerSeriesRingElem{T}) where T <: RingElement
    g = parent(f)()
-   g = set_precision!(g, precision(f) - 1)
+   g = _set_precision_raw!(g, precision(f) - 1)
    len = length(f) - 1
    fit!(g, len)
    for i = 1:len
@@ -965,7 +957,7 @@ function integral(f::AbsPowerSeriesRingElem{T}) where T <: RingElement
    g = parent(f)()
    len = length(f) + 1
    fit!(g, len)
-   g = set_precision!(g, precision(f) + 1)
+   g = _set_precision_raw!(g, precision(f) + 1)
    for i = 1:len - 1
       c = coeff(f, i - 1)
       if !iszero(c)
@@ -990,12 +982,12 @@ Return the exponential of the power series $a$.
 function Base.exp(a::AbsPowerSeriesRingElem{T}) where T <: RingElement
    if iszero(a)
       z = one(parent(a))
-      z = set_precision!(z, precision(a))
+      z = _set_precision_raw!(z, precision(a))
       return z
    end
    z = parent(a)()
    fit!(z, precision(a))
-   z = set_precision!(z, precision(a))
+   z = _set_precision_raw!(z, precision(a))
    z = setcoeff!(z, 0, exp(coeff(a, 0)))
    len = length(a)
    C = base_ring(a)()
@@ -1016,7 +1008,7 @@ end
 function Base.exp(a::AbsPowerSeriesRingElem{T}) where T <: FieldElement
    if iszero(a)
       b = parent(a)(1)
-      b = set_precision!(b, precision(a))
+      b = _set_precision_raw!(b, precision(a))
       return b
    end
    R = base_ring(a)
@@ -1036,8 +1028,8 @@ function Base.exp(a::AbsPowerSeriesRingElem{T}) where T <: FieldElement
    n = length(la) - 1
    # x -> x*(1 - log(a) + a) is the recursion
    while n > 0
-      x = set_precision!(x, la[n])
-      one1 = set_precision!(one1, la[n])
+      x = _set_precision_raw!(x, la[n])
+      one1 = _set_precision_raw!(one1, la[n])
       t = -log(x)
       t = add!(t, one1)
       t = add!(t, a)
