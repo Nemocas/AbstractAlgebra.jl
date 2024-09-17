@@ -49,7 +49,7 @@ end
 
 Returns a coprime base for $S$, i.e. the resulting array contains pairwise coprime objects that multiplicatively generate the same set as the input array.
 """
-function coprime_base(S::Vector{E}) where E
+function coprime_base(S::Vector{E}) where {E <: RingElement}
   @assert !isempty(S)
   T = Array{E}(undef, 1)
   T[1] = S[1]
