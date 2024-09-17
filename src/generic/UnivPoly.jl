@@ -36,6 +36,8 @@ end
 
 number_of_variables(S::UniversalPolyRing) = length(S.S)
 
+number_of_generators(S::UniversalPolyRing) = length(S.S)
+
 symbols(S::UniversalPolyRing) = S.S
 
 function vars(p::UnivPoly{T}) where {T}
