@@ -905,13 +905,13 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
       j = i = i + 1
       while iseven(j) && length(r) > 1
           top = pop!(r)
-          r[end] = addeq!(r[end], top)
+          r[end] = add!(r[end], top)
           j >>= 1
       end
    end
    while length(r) > 1
       top = pop!(r)
-      r[end] = addeq!(r[end], top)
+      r[end] = add!(r[end], top)
    end
    return r[1]
 end
@@ -1037,7 +1037,7 @@ function __evaluate(a, vars, vals, powers)
         end
         M = Generic.MPolyBuildCtx(S)
         push_term!(M, c, v)
-        addeq!(r, t*finish(M))
+        r = add!(r, t*finish(M))
      end
      return r
    end

@@ -1007,12 +1007,12 @@ function fit!(a::UnivPoly, n::Int)
 end
 
 function add!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
-   a.p = (b + c).p
+   a.p = add!(a.p, b.p, c.p)
    return a
 end
 
 function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
-   a.p = (b*c).p
+   a.p = mul!(a.p, b.p, c.p)
    return a
 end
 

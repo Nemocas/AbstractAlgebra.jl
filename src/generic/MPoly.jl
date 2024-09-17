@@ -972,10 +972,10 @@ function Base.push!(G::geobucket{T}, p::T) where T
        G.buckets[j] = zero(R)
      end
    end
-   G.buckets[i] = addeq!(G.buckets[i], p)
+   G.buckets[i] = add!(G.buckets[i], p)
    while i <= G.len
       if length(G.buckets[i]) >= 4^i
-         G.buckets[i + 1] = addeq!(G.buckets[i + 1], G.buckets[i])
+         G.buckets[i + 1] = add!(G.buckets[i + 1], G.buckets[i])
          G.buckets[i] = R()
          i += 1
       end
@@ -990,7 +990,7 @@ end
 function finish(G::geobucket{T}) where T
    p = G.buckets[1]
    for i = 2:length(G.buckets)
-      p = addeq!(p, G.buckets[i])
+      p = add!(p, G.buckets[i])
    end
    return p::T
 end
@@ -1132,7 +1132,7 @@ function do_merge(Ac::Vector{T}, Bc::Vector{T},
          monomial_set!(Be, r + k, Ae, s1 + i, N)
          i += 1
       elseif cmpexp == 0
-         Ac[s1 + i] = addeq!(Ac[s1 + i], Ac[s2 + j])
+         Ac[s1 + i] = add!(Ac[s1 + i], Ac[s2 + j])
          if !iszero(Ac[s1 + i])
             Bc[r + k] = Ac[s1 + i]
             monomial_set!(Be, r + k, Ae, s1 + i, N)
@@ -1775,8 +1775,8 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
                qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
             else
                c = mul_red!(c, Qc[v.i], Qc[v.j], false) # qc += 2*Q[i]*Q[j]
-               qc = addeq!(qc, c)
-               qc = addeq!(qc, c)
+               qc = add!(qc, c)
+               qc = add!(qc, c)
             end
          end
          # decide whether node needs processing or reusing
@@ -1795,8 +1795,8 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
                   qc = addmul_delayed_reduction!(qc, Qc[v.i], Qc[v.j], c)
                else
                   c = mul_red!(c, Qc[v.i], Qc[v.j], false) # qc += 2*Q[i]*Q[j]
-                  qc = addeq!(qc, c)
-                  qc = addeq!(qc, c)
+                  qc = add!(qc, c)
+                  qc = add!(qc, c)
                end
             end
             # decide whether node needs processing or reusing
@@ -2194,7 +2194,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
          v = I[x.n]
          largest[v.i] |= topbit
          t1 = mul!(t1, f.coeffs[v.i], gc[v.j])
-         SS = addeq!(SS, t1)
+         SS = add!(SS, t1)
          if !monomial_isless(Exps, exp, final_exp, 1, N, par, drmask)
             temp2 = add!(temp2, fik[v.i], gi[v.j])
             C = addmul_delayed_reduction!(C, temp2, t1, temp)
@@ -2208,7 +2208,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
             v = I[xn]
             largest[v.i] |= topbit
             t1 = mul!(t1, f.coeffs[v.i], gc[v.j])
-            SS = addeq!(SS, t1)
+            SS = add!(SS, t1)
             if !monomial_isless(Exps, exp, final_exp, 1, N, par, drmask)
                temp2 = add!(temp2, fik[v.i], gi[v.j])
                C = addmul_delayed_reduction!(C, temp2, t1, temp)
@@ -2254,7 +2254,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
       end
       if !iszero(C)
          temp = divexact(C, from_exp(R, exp_copy, 1, N) - kp1f1)
-         SS = addeq!(SS, temp)
+         SS = add!(SS, temp)
          gc[gnext] = divexact(temp, f.coeffs[1])
          push!(gi, -from_exp(R, ge, gnext, N))
          if (largest[2] & topbit) != 0
@@ -3860,7 +3860,7 @@ function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where {T, S}
       return M
    end
    len = length(M.poly) + 1
-   if T <: AbstractAlgebra.FreeAssAlgElem
+   if T <: AbstractAlgebra.FreeAssociativeAlgebraElem
       set_exponent_word!(M.poly, len, expv)
    else
       set_exponent_vector!(M.poly, len, expv)
@@ -3902,7 +3902,7 @@ function mul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
    return a
 end
 
-function addeq!(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+function add!(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    t = a + b
    a.coeffs = t.coeffs
    a.exps = t.exps

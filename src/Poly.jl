@@ -592,7 +592,7 @@ function mul_karatsuba(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingEl
    end
    for i = 1:length(z1)
       u = coeff(r, i + m - 1)
-      u = addeq!(u, coeff(z1, i - 1))
+      u = add!(u, coeff(z1, i - 1))
       setcoeff!(r, i + m - 1, u)
    end
    # necessary for finite characteristic
@@ -691,7 +691,7 @@ function mul_classical(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingEl
    for i = 1:lena - 1
       for j = 2:lenb
          t = mul_red!(t, coeff(a, i - 1), coeff(b, j - 1), false)
-         d[i + j - 1] = addeq!(d[i + j - 1], t)
+         d[i + j - 1] = add!(d[i + j - 1], t)
       end
    end
    for i = 1:lenz
@@ -770,9 +770,9 @@ function pow_multinomial(a::PolyRingElem{T}, e::Int) where T <: RingElement
       for i = 1 : min(k, lena - 1)
          t = coeff(a, i) * res[(k - i) + 1]
          u += e + 1
-         res[k + 1] = addeq!(res[k + 1], t * u)
+         res[k + 1] = add!(res[k + 1], t * u)
       end
-      d = addeq!(d, first)
+      d = add!(d, first)
       res[k + 1] = divexact(res[k + 1], d)
    end
    z = parent(a)(res)
@@ -1016,7 +1016,7 @@ function mullow(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where T <: RingE
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
             t = mul_red!(t, coeff(a, i - 1), coeff(b, j - 1), false)
-            d[i + j - 1] = addeq!(d[i + j - 1], t)
+            d[i + j - 1] = add!(d[i + j - 1], t)
          end
       end
    end
@@ -1087,7 +1087,7 @@ function divhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n0::Int) where T <: Rin
         if da < degree(b)
             break
         end
-        # negate quotient so we can use addeq! below
+        # negate quotient so we can use add! below
         q = -divexact(coeff(a, da), leading_coefficient(b))
         r = setcoeff!(r, da - degree(b), q)
         da -= 1
@@ -1096,7 +1096,7 @@ function divhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n0::Int) where T <: Rin
             for j = 0:min(degree(b) - 1, i)
                 t = mul!(t, coeff(r, da - degree(b) + j + 1),
                          coeff(b, degree(b) - j - 1))
-                c = addeq!(c, t)
+                c = add!(c, t)
             end
             a = setcoeff!(a, da, c)
         end
@@ -1436,7 +1436,7 @@ function mod(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
          for i = 1:length(g) - 1
             c = mul!(c, coeff(g, i - 1), l)
             u = coeff(f, i + length(f) - length(g) - 1)
-            u = addeq!(u, c)
+            u = add!(u, c)
             f = setcoeff!(f, i + length(f) - length(g) - 1, u)
          end
          f = set_length!(f, normalise(f, length(f) - 1))
@@ -1471,7 +1471,7 @@ function Base.divrem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElem
       for i = 1:length(g) - 1
          c = mul!(c, coeff(g, i - 1), l)
          u = coeff(f, i + length(f) - length(g) - 1)
-         u = addeq!(u, c)
+         u = add!(u, c)
          f = setcoeff!(f, i + length(f) - length(g) - 1, u)
       end
       f = set_length!(f, normalise(f, length(f) - 1))
@@ -1631,7 +1631,7 @@ function divides(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
      for i = 1:length(g)
         c = mul!(c, coeff(g, i - 1), d)
         u = coeff(f, i + length(f) - length(g) - 1)
-        u = addeq!(u, c)
+        u = add!(u, c)
         f = setcoeff!(f, i + length(f) - length(g) - 1, u)
      end
      f = set_length!(f, normalise(f, length(f)))
@@ -1720,9 +1720,9 @@ function sqrt_classical(f::PolyRingElem{T}; check::Bool=true) where T <: RingEle
       for j = lenq - k + 1:lenq
          if i - j + 2 >= j && j > 0
             c = mul_red!(c, d[j], d[i - j + 2], false)
-            qc = addeq!(qc, c)
+            qc = add!(qc, c)
             if (j != i - j + 2)
-               qc = addeq!(qc, c)
+               qc = add!(qc, c)
             end
          end
       end
@@ -2028,9 +2028,9 @@ function mat22_mul(a11, a12, a21, a22, b11, b12, b21, b22)
       C1 = add!(C1, C1, C3)
       C3 = add!(C3, C2, C3)
       C1 = add!(C1, C1, C0)
-      T1 = sub!(T1, T1, b21)
+      T1 = sub!(T1, b21)
       C0 = mul!(C0, a22, T1)
-      C2 = sub!(C2, C2, C0)
+      C2 = sub!(C2, C0)
       C0 = mul!(C0, a12, b21)
       C0 = add!(C0, C0, T0)
       return C0, C1, C2, C3
@@ -3012,7 +3012,7 @@ function monomial_to_newton!(P::Vector{T}, roots::Vector{T}) where T <: RingElem
       for i = 1:n - 1
          for j = n - 1:-1:i
             t = mul!(t, P[j + 1], roots[i])
-            P[j] = addeq!(P[j], t)
+            P[j] = add!(P[j], t)
          end
       end
    end
@@ -3038,7 +3038,7 @@ function newton_to_monomial!(P::Vector{T}, roots::Vector{T}) where T <: RingElem
          d = -roots[i]
          for j = i:n - 1
             t = mul!(t, P[j + 1], d)
-            P[j] = addeq!(P[j], t)
+            P[j] = add!(P[j], t)
          end
       end
    end
@@ -3285,7 +3285,7 @@ end
 
 function addmul!(z::PolyRingElem{T}, x::PolyRingElem{T}, y::PolyRingElem{T}, c::PolyRingElem{T}) where T <: RingElement
    c = mul!(c, x, y)
-   z = addeq!(z, c)
+   z = add!(z, c)
    return z
 end
 

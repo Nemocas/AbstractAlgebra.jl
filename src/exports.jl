@@ -31,8 +31,8 @@ export FinField
 export FinFieldElem
 export FracElem
 export FracField
-export FreeAssAlgElem
-export FreeAssAlgebra
+export FreeAssociativeAlgebraElem
+export FreeAssociativeAlgebra
 export FunctionalMap
 export GF
 export Generic
@@ -109,7 +109,6 @@ export add_column
 export add_column!
 export add_row
 export add_row!
-export addeq!
 export addmul!
 export addmul_delayed_reduction!
 export allow_unicode
@@ -153,6 +152,8 @@ export compose
 export conj!
 export constant_coefficient
 export content
+export coprime_base
+export coprime_base_push!
 export crt
 export crt_with_lcm
 export cycles
@@ -174,6 +175,7 @@ export dim
 export direct_sum
 export disable_cache!
 export discriminant
+export div!
 export div_left
 export div_left!
 export div_right
@@ -212,6 +214,7 @@ export free_associative_algebra
 export free_module
 export function_field
 export gcd
+export gcd!
 export gcd_with_cofactors
 export gcdinv
 export gcdx
@@ -294,6 +297,7 @@ export is_monic
 export is_monomial
 export is_monomial_recursive
 export is_negative
+export is_nilpotent
 export is_odd
 export is_one
 export is_perfect
@@ -372,6 +376,7 @@ export max_precision
 export minors
 export minpoly
 export mod
+export mod!
 export module_homomorphism
 export module_isomorphism
 export modulus
@@ -458,6 +463,7 @@ export reduce!
 export rel_series
 export rel_series_type
 export rels
+export rem!
 export remove
 export renest
 export renormalize!

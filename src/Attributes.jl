@@ -274,7 +274,7 @@ end
 
 
 """
-    @attr [RetType] funcdef
+    @attr RetType funcdef
 
 This macro is applied to the definition of a unary function, and enables
 caching ("memoization") of its return values based on the argument. This
@@ -323,21 +323,10 @@ julia> myattr(obj) # second time uses the cached result
 
 ```
 """
-macro attr(ex1, exs...)
-   if length(exs) == 0
-      rettype = Any
-      expr = ex1
-   elseif length(exs) == 1
-      rettype = ex1
-      expr = exs[1]
-   else
-      throw(ArgumentError("too many macro arguments"))
-   end
+macro attr(rettype, expr::Expr)
    d = MacroTools.splitdef(expr)
    length(d[:args]) == 1 || throw(ArgumentError("Only unary functions are supported"))
    length(d[:kwargs]) == 0 || throw(ArgumentError("Keyword arguments are not supported"))
-
-# TODO: handle optional ::RetType
 
    # store the original function name
    name = d[:name]

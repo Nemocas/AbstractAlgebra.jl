@@ -97,7 +97,7 @@ abstract type MatSpace{T} <: Module{T} end
 
 abstract type MatRing{T} <: NCRing end
 
-abstract type FreeAssAlgebra{T} <: NCRing end
+abstract type FreeAssociativeAlgebra{T} <: NCRing end
 
 # Abstract types for number fields, parmeterised by the element type of
 # the base field.
@@ -144,7 +144,7 @@ abstract type MatElem{T} <: ModuleElem{T} end
 
 abstract type MatRingElem{T} <: NCRingElem end
 
-abstract type FreeAssAlgElem{T} <: NCRingElem end
+abstract type FreeAssociativeAlgebraElem{T} <: NCRingElem end
 
 abstract type NumFieldElem{T} <: FieldElem end
 

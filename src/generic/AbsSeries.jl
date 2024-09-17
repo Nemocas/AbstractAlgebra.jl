@@ -239,7 +239,7 @@ function mul!(c::AbsSeries{T}, a::AbsSeries{T}, b::AbsSeries{T}) where T <: Ring
    return c
 end
 
-function addeq!(c::AbsSeries{T}, a::AbsSeries{T}) where T <: RingElement
+function add!(c::AbsSeries{T}, a::AbsSeries{T}) where T <: RingElement
    lenc = length(c)
    lena = length(a)
 
@@ -251,7 +251,7 @@ function addeq!(c::AbsSeries{T}, a::AbsSeries{T}) where T <: RingElement
    len = max(lenc, lena)
    fit!(c, len)
    for i = 1:lena
-      c.coeffs[i] = addeq!(c.coeffs[i], coeff(a, i - 1))
+      c.coeffs[i] = add!(c.coeffs[i], coeff(a, i - 1))
    end
    c.length = normalise(c, len)
    c.prec = prec
@@ -260,9 +260,9 @@ end
 
 function add!(c::AbsSeries{T}, a::AbsSeries{T}, b::AbsSeries{T}) where T <: RingElement
    if c === a
-      return addeq!(c, b)
+      return add!(c, b)
    elseif c === b
-      return addeq!(c, a)
+      return add!(c, a)
    end
    lena = length(a)
    lenb = length(b)

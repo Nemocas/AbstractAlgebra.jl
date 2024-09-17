@@ -35,4 +35,6 @@ crt(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
 crt(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
 crt_with_lcm(r1::T, m1::T, r2::T, m2::T; check::Bool=true) where T <: RingElement
 crt_with_lcm(r::Vector{T}, m::Vector{T}; check::Bool=true) where T <: RingElement
+coprime_base
+coprime_base_push!
 ```

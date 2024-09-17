@@ -1106,7 +1106,7 @@ end
       @test f1 == g + h
 
       f2 = deepcopy(f)
-      f2 = addeq!(f2, g)
+      f2 = add!(f2, g)
 
       @test f2 == f + g
 

@@ -198,7 +198,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
             x = deepcopy(b)
             @test add!(x, a, x) == ab
             x = deepcopy(a)
-            @test addeq!(x, b) == ab
+            @test add!(x, b) == ab
 
             # isapprox as BigFloat may fuse
             # matrices don't implement addmul!

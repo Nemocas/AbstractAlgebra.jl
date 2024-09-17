@@ -96,7 +96,6 @@ import ..AbstractAlgebra: RingElement
 import ..AbstractAlgebra: _can_solve_with_solution_fflu
 import ..AbstractAlgebra: _can_solve_with_solution_lu
 import ..AbstractAlgebra: add!
-import ..AbstractAlgebra: addeq!
 import ..AbstractAlgebra: addmul!
 import ..AbstractAlgebra: base_ring
 import ..AbstractAlgebra: base_ring_type

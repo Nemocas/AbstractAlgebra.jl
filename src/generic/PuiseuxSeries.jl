@@ -737,7 +737,7 @@ rand(S::PuiseuxSeriesRingOrField, val_range, scale_range, v...) =
 ###############################################################################
 
 function zero!(a::PuiseuxSeriesElem{T}) where T <: RingElement
-   zero!(a.data)
+   a.data = zero!(a.data)
    a.scale = 1
    return a
 end
@@ -759,18 +759,6 @@ function add!(c::PuiseuxSeriesElem{T}, a::PuiseuxSeriesElem{T}, b::PuiseuxSeries
     ainf = div(a.scale, s)
     binf = div(b.scale, s)
     c.data = add!(c.data, inflate(a.data, binf), inflate(b.data, ainf))
-    c.scale = zscale
-    c = rescale!(c)
-    return c
-end
-
-function addeq!(c::PuiseuxSeriesElem{T}, a::PuiseuxSeriesElem{T}) where T <: RingElement
-    s = gcd(c.scale, a.scale)
-    zscale = div(c.scale*a.scale, s)
-    ainf = div(a.scale, s)
-    cinf = div(c.scale, s)
-    cnew = inflate(c.data, ainf)
-    c.data = addeq!(cnew, inflate(a.data, cinf))
     c.scale = zscale
     c = rescale!(c)
     return c

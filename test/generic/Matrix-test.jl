@@ -59,7 +59,7 @@ AbstractAlgebra.parent_type(::Type{F2Elem}) = F2
 AbstractAlgebra.elem_type(::Type{F2}) = F2Elem
 AbstractAlgebra.parent(x::F2Elem) = F2()
 AbstractAlgebra.mul!(x::F2Elem, y::F2Elem, z::F2Elem) = y * z
-AbstractAlgebra.addeq!(x::F2Elem, y::F2Elem) = x + y
+AbstractAlgebra.add!(x::F2Elem, y::F2Elem) = x + y
 AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 
 Random.rand(rng::AbstractRNG, sp::Random.SamplerTrivial{F2}) = F2Elem(rand(rng, Bool))
@@ -624,7 +624,7 @@ end
    @test iszero(zero(M, QQ, 3, 3))
    @test iszero(zero(M, QQ))
    
-   zero!(M)
+   M = zero!(M)
    @test iszero(M)
 
    @test isone(one(R))

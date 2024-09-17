@@ -495,7 +495,7 @@ function *(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}) where T <
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
             t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
-            d[i + j - 1] = addeq!(d[i + j - 1], t)
+            d[i + j - 1] = add!(d[i + j - 1], t)
          end
       end
    end
@@ -641,7 +641,7 @@ function mullow(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}, n::I
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
             t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
-            d[i + j - 1] = addeq!(d[i + j - 1], t)
+            d[i + j - 1] = add!(d[i + j - 1], t)
          end
       end
    end
@@ -981,7 +981,7 @@ function Base.inv(a::RelPowerSeriesRingElem{T}) where T <: FieldElement
         x = _set_precision_raw!(x, la[n])
         y = _set_precision_raw!(y, la[n])
         y = mul!(y, minus_a, x)
-        y = addeq!(y, two)
+        y = add!(y, two)
         x = mul!(x, x, y)
         n -= 1 
     end
@@ -1149,13 +1149,13 @@ function sqrt_classical(a::RelPowerSeriesRingElem; check::Bool=true)
       for i = 1:div(n - 1, 2)
          j = n - i
          p = mul!(p, polcoeff(asqrt, i), polcoeff(asqrt, j))
-         c = addeq!(c, p)
+         c = add!(c, p)
       end
       c *= 2
       if (n % 2) == 0
          i = div(n, 2)
          p = mul!(p, polcoeff(asqrt, i), polcoeff(asqrt, i))
-         c = addeq!(c, p)
+         c = add!(c, p)
       end
       c = polcoeff(a, n) - c
       if check
@@ -1360,8 +1360,8 @@ function Base.exp(a::RelPowerSeriesRingElem{T}) where T <: FieldElement
       x = _set_precision_raw!(x, la[n])
       one1 = _set_precision_raw!(one1, la[n])
       t = -log(x)
-      t = addeq!(t, one1)
-      t = addeq!(t, a)
+      t = add!(t, one1)
+      t = add!(t, a)
       x = mul!(x, x, t)
       n -= 1 
    end

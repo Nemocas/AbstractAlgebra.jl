@@ -246,7 +246,7 @@ include("Fraction.jl")
 include("TotalFraction.jl")
 include("MPoly.jl")
 include("UnivPoly.jl")
-include("FreeAssAlgebra.jl")
+include("FreeAssociativeAlgebra.jl")
 include("LaurentMPoly.jl")
 include("MatrixNormalForms.jl")
 
@@ -409,6 +409,7 @@ include("algorithms/MPolyEvaluate.jl")
 include("algorithms/MPolyFactor.jl")
 include("algorithms/MPolyNested.jl")
 include("algorithms/DensePoly.jl")
+include("algorithms/coprime_base.jl")
 
 ###############################################################################
 #

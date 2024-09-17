@@ -94,40 +94,8 @@ end
 #
 ###############################################################################
 
-function zero!(M::MatRingElem{T}) where T <: NCRingElement
-   n = degree(M)
-   R = base_ring(M)
-   for i = 1:n
-      for j = 1:n
-         M[i, j] = zero(R)
-      end
-   end
-   return M
-end
-
-function mul!(A::MatRingElem{T}, B::MatRingElem{T},
-                                C::MatRingElem{T}) where T <: NCRingElement
-   return B*C
-end
-
-function add!(A::MatRingElem{T}, B::MatRingElem{T},
-                                C::MatRingElem{T}) where T <: NCRingElement
-   n = degree(A)
-   for i = 1:n
-      for j = 1:n
-         A.entries[i, j] = B.entries[i, j] + C.entries[i, j]
-      end
-   end
-   return A
-end
-
-function addeq!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
-   n = degree(A)
-   for i = 1:n
-      for j = 1:n
-         A.entries[i, j] += B.entries[i, j]
-      end
-   end
+function add!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
+   A.entries .+= B.entries
    return A
 end
 

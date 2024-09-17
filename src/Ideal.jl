@@ -12,13 +12,13 @@
 
 # the following helper enables things like `ideal(R, [])` or `ideal(R, [1])`
 # the type check ensures we don't run into an infinite recursion
-function ideal(R::Ring, xs::AbstractVector{T}) where T<:RingElement
+function ideal(R::NCRing, xs::AbstractVector{T}; kw...) where T<:NCRingElement
   xs isa Vector{elem_type(R)} && error("ideals unsupported for ring $R")
-  return ideal(R, elem_type(R)[R(x) for x in xs])
+  return ideal(R, elem_type(R)[R(x) for x in xs]; kw...)
 end
 
-function ideal(R::Ring, x, y...)
-  return ideal(R, elem_type(R)[R(z) for z in [x, y...]])
+function ideal(R::NCRing, x, y...; kw...)
+  return ideal(R, elem_type(R)[R(z) for z in [x, y...]]; kw...)
 end
 
 function *(R::Ring, x::RingElement)
@@ -29,13 +29,13 @@ function *(x::RingElement, R::Ring)
   return ideal(R, x)
 end
 
-function ideal(x::RingElement)
-  return ideal(parent(x), x)
+function ideal(x::NCRingElement; kw...)
+  return ideal(parent(x), x; kw...)
 end
 
-function ideal(xs::AbstractVector{T}) where T<:RingElement
+function ideal(xs::AbstractVector{T}; kw...) where T<:NCRingElement
   !is_empty(xs) || throw(ArgumentError("Empty collection, cannot determine parent ring. Try ideal(ring, xs) instead of ideal(xs)"))
-  return ideal(parent(xs[1]), xs)
+  return ideal(parent(xs[1]), xs; kw...)
 end
 
 iszero(I::Ideal) = all(iszero, gens(I))

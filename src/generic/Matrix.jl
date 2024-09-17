@@ -202,19 +202,18 @@ function matrix_space(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = 
    return Generic.MatSpace{T}(R, r, c)
 end
 
-function AbstractAlgebra.sub!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T
-  A.entries.= B.entries .- C.entries
+function AbstractAlgebra.add!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T
+  A.entries .= B.entries .+ C.entries
   return A
 end
 
-#since type(view(MatElem{T})) != MatElem{T} which breaks
-# sub!(A::T, B::T, C::T) where T  in AA 
-function AbstractAlgebra.mul!(A::Mat{T}, B::Mat{T}, C::Mat{T}, f::Bool = false) where T
-  if f
-    A.entries .+= (B * C).entries
-  else
-    A.entries .= (B * C).entries
-  end
+function AbstractAlgebra.sub!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T
+  A.entries .= B.entries .- C.entries
+  return A
+end
+
+function AbstractAlgebra.mul!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T
+  A.entries .= (B * C).entries
   return A
 end
 

@@ -417,15 +417,15 @@ end
       p = rand(L, -10:10, -10:10)
       q = rand(L, -10:10, -10:10)
       t = p*q
-      mul!(s, p, q)
+      s = mul!(s, p, q)
       @test t == s
       # TODO: add a test for when s.poly is immutable
 
-      # addeq!
+      # add!
       p = rand(L, -10:10, -10:10)
       q = rand(L, -10:10, -10:10)
       t = p + q
-      s = addeq!(p, q)
+      s = add!(p, q)
       @test s === p == t
       # TODO: add a test for when p.poly is immutable
 

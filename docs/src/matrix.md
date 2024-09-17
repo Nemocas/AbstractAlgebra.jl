@@ -916,6 +916,12 @@ det{T <: RingElem}(::MatElem{T})
 rank{T <: RingElem}(::MatElem{T})
 ```
 
+### Nilpotency
+
+```@docs
+is_nilpotent(::MatrixElem{T}) where {T <: RingElement}
+```
+
 ### Minors
 
 ```@docs

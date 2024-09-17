@@ -376,20 +376,20 @@ end
 # pull out a monomial common factor g, leaving mpolys
 function _gcdhelper(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
     amin, aiszero = _mindegs(a.mpoly)
-    add!(amin, amin, a.mindegs)
+    amin = add!(amin, amin, a.mindegs)
     if aiszero
         bp, bd = _normalize(b)
         return (bd, a.mpoly, bp)
     end
     bmin, biszero = _mindegs(b.mpoly)
-    add!(bmin, bmin, b.mindegs)
+    bmin = add!(bmin, bmin, b.mindegs)
     if biszero
         ap, ad = _normalize(a)
         return (ad, ap, b.mpoly)
     end
     g = min.(amin, bmin)
-    sub!(amin, g, a.mindegs)
-    sub!(bmin, g, b.mindegs)
+    amin = sub!(amin, g, a.mindegs)
+    bmin = sub!(bmin, g, b.mindegs)
     return (g, _divexact_by_exponent_vector(a.mpoly, amin),
                _divexact_by_exponent_vector(b.mpoly, bmin))
 end

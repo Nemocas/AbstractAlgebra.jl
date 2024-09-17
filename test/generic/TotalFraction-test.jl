@@ -241,34 +241,34 @@ end
    a = S(5, 7)
    b = S(1, 7)
 
-   a = addeq!(a, b)
+   a = add!(a, b)
 
    @test a == S(6, 7)
 
    a = S(3, 1)
 
-   a = addeq!(a, a)
+   a = add!(a, a)
 
    @test a == S(6, 1)
 
    a = S(3, 1)
    b = S(5, 7)
 
-   a = addeq!(a, b)
+   a = add!(a, b)
 
    @test a == S(2, 7)
 
    a = S(5, 7)
    b = S(3, 1)
 
-   a = addeq!(a, b)
+   a = add!(a, b)
 
    @test a == S(2, 7)
 
    a = S(3, 5)
    b = S(1, 7)
 
-   a = addeq!(a, b)
+   a = add!(a, b)
 
    @test a == S(2, 11)
 

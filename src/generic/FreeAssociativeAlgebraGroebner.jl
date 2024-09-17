@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   FreeAssAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groebner basis
+#   FreeAssociativeAlgebraGroebner.jl : free associative algebra R<x1,...,xn> Groebner basis
 #
 ###############################################################################
 
@@ -19,8 +19,8 @@ first_prefix g_i first_suffix = second_prefix g_j second_suffix
 where `g_i` is `first_poly` and `g_j` is `second_poly`.
 """
 struct ObstructionTriple{T} <: Obstruction{T}
-    first_poly::FreeAssAlgElem{T}
-    second_poly::FreeAssAlgElem{T}
+    first_poly::FreeAssociativeAlgebraElem{T}
+    second_poly::FreeAssociativeAlgebraElem{T}
     first_prefix::Monomial
     first_suffix::Monomial
     second_prefix::Monomial
@@ -29,8 +29,8 @@ struct ObstructionTriple{T} <: Obstruction{T}
     second_index::Int
 end
 
-function ObstructionTriple{T}(first_poly::FreeAssAlgElem{T},
-                              second_poly::FreeAssAlgElem{T},
+function ObstructionTriple{T}(first_poly::FreeAssociativeAlgebraElem{T},
+                              second_poly::FreeAssociativeAlgebraElem{T},
                               pre_and_suffixes::NTuple{4, Monomial},
                               first_index::Int,
                               second_index::Int
@@ -40,8 +40,8 @@ function ObstructionTriple{T}(first_poly::FreeAssAlgElem{T},
                                 pre_and_suffixes[4], first_index, second_index)
 end
 
-function FreeAssAlgElem{T}(R::FreeAssAlgebra{T}, mon::Monomial) where T
-    return FreeAssAlgElem{T}(R, [one(base_ring(R))], [mon], 1)
+function FreeAssociativeAlgebraElem{T}(R::FreeAssociativeAlgebra{T}, mon::Monomial) where T
+    return FreeAssociativeAlgebraElem{T}(R, [one(base_ring(R))], [mon], 1)
 end
 
 """
@@ -50,26 +50,26 @@ of the leading terms of p and q defined by o
 TODO documentation
 """
 function common_multiple_leading_term(ot::ObstructionTriple{T}) where T
-    return FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_prefix) *
-           FreeAssAlgElem{T}(parent(ot.first_poly), _leading_word(ot.first_poly)) *
-           FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_suffix)
+    return FreeAssociativeAlgebraElem{T}(parent(ot.first_poly), ot.first_prefix) *
+           FreeAssociativeAlgebraElem{T}(parent(ot.first_poly), _leading_word(ot.first_poly)) *
+           FreeAssociativeAlgebraElem{T}(parent(ot.first_poly), ot.first_suffix)
 end
 
 function s_polynomial(ot::ObstructionTriple{T}) where T
     first_term =
-        FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_prefix) *
+        FreeAssociativeAlgebraElem{T}(parent(ot.first_poly), ot.first_prefix) *
         ot.first_poly *
-        FreeAssAlgElem{T}(parent(ot.first_poly), ot.first_suffix)
+        FreeAssociativeAlgebraElem{T}(parent(ot.first_poly), ot.first_suffix)
     second_term =
-        FreeAssAlgElem{T}(parent(ot.first_poly), ot.second_prefix) *
+        FreeAssociativeAlgebraElem{T}(parent(ot.first_poly), ot.second_prefix) *
         ot.second_poly *
-        FreeAssAlgElem{T}(parent(ot.first_poly), ot.second_suffix)
+        FreeAssociativeAlgebraElem{T}(parent(ot.first_poly), ot.second_suffix)
     return inv(leading_coefficient(ot.first_poly)) * first_term -
            inv(leading_coefficient(ot.second_poly)) * second_term
 end
 
 # skip all of the extra length-checking
-function _leading_word(a::FreeAssAlgElem{T}) where T
+function _leading_word(a::FreeAssociativeAlgebraElem{T}) where T
     return a.exps[1]
 end
 
@@ -95,14 +95,14 @@ end
 
 # implementation of the normal form function using aho corasick to check for all Groebner basis elements in parallel
 @doc """
-    normal_form(f::FreeAssAlgElem{T}, g::Vector{FreeAssAlgElem{T}}, aut::AhoCorasickAutomaton)
+    normal_form(f::FreeAssociativeAlgebraElem{T}, g::Vector{FreeAssociativeAlgebraElem{T}}, aut::AhoCorasickAutomaton)
 
 Assuming `g` is a Groebner basis and `aut` an Aho-Corasick automaton for the elements of `g`,
 compute the normal form of `f` with respect to `g`
 """ 
 function normal_form(
-    f::FreeAssAlgElem{T},
-    g::Vector{FreeAssAlgElem{T}},
+    f::FreeAssociativeAlgebraElem{T},
+    g::Vector{FreeAssociativeAlgebraElem{T}},
     aut::AhoCorasickAutomaton,
 ) where T
     R = parent(f)
@@ -116,16 +116,16 @@ function normal_form(
         else
             push!(rcoeffs, f.coeffs[1])
             push!(rexps, f.exps[1])
-            f = FreeAssAlgElem{T}(R, f.coeffs[2:end], f.exps[2:end], length(f) - 1)
+            f = FreeAssociativeAlgebraElem{T}(R, f.coeffs[2:end], f.exps[2:end], length(f) - 1)
         end
     end
-    return FreeAssAlgElem{T}(R, rcoeffs, rexps, length(rcoeffs))
+    return FreeAssociativeAlgebraElem{T}(R, rcoeffs, rexps, length(rcoeffs))
 end
 
 # normal form with leftmost word divisions
 function normal_form(
-    f::FreeAssAlgElem{T},
-    g::Vector{FreeAssAlgElem{T}},
+    f::FreeAssociativeAlgebraElem{T},
+    g::Vector{FreeAssociativeAlgebraElem{T}},
 ) where T<:FieldElement
     R = parent(f)
     s = length(g)
@@ -145,17 +145,17 @@ function normal_form(
         else
             push!(rcoeffs, f.coeffs[1])
             push!(rexps, f.exps[1])
-            f = FreeAssAlgElem{T}(R, f.coeffs[2:end], f.exps[2:end], length(f) - 1)
+            f = FreeAssociativeAlgebraElem{T}(R, f.coeffs[2:end], f.exps[2:end], length(f) - 1)
         end
     end
-    r = FreeAssAlgElem{T}(R, rcoeffs, rexps, length(rcoeffs))
+    r = FreeAssociativeAlgebraElem{T}(R, rcoeffs, rexps, length(rcoeffs))
     return r
 end
 
 # weak normal form with leftmost word divisions
 function normal_form_weak(
-    f::FreeAssAlgElem{T},
-    g::Vector{FreeAssAlgElem{T}},
+    f::FreeAssociativeAlgebraElem{T},
+    g::Vector{FreeAssociativeAlgebraElem{T}},
 ) where T<:FieldElement
     R = parent(f)
     s = length(g)
@@ -178,13 +178,13 @@ function normal_form_weak(
 end
 
 @doc raw"""
-    interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
+    interreduce!(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
 
 Interreduce a given Groebner basis with itself, i.e. compute the normal form of each
 element of `g` with respect to the rest of the elements and discard elements with
 normal form $0$ and duplicates.
 """ 
-function interreduce!(g::Vector{FreeAssAlgElem{T}}) where T
+function interreduce!(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
     i = 1
     while length(g) > 1 && length(g) >= i
         aut = AhoCorasickAutomaton([g_j.exps[1] for g_j in g[1:end .!= i]])
@@ -396,7 +396,7 @@ end
 
 function is_redundant(
     obs::ObstructionTriple{T},
-    new_obstructions::PriorityQueue{Obstruction{T},FreeAssAlgElem{T}},
+    new_obstructions::PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}},
 ) where T
     # case 4b from Thm. 4.2.22 in Non-Commutative Groebner Bases and Applications by Xingqiang Xiu
     for obstruction_pair in new_obstructions
@@ -456,7 +456,7 @@ check, whether obs is a proper multiple of any of the obstructions in the priori
 """
 function is_proper_multiple(
     obs::ObstructionTriple{T},
-    obstructions::PriorityQueue{Obstruction{T},FreeAssAlgElem{T}},
+    obstructions::PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}},
 ) where T
     for obspair in obstructions
         obs2 = obspair[1]
@@ -469,8 +469,8 @@ end
 
 function is_redundant(
     obs::ObstructionTriple{T},
-    new_obstructions::PriorityQueue{Obstruction{T},FreeAssAlgElem{T}},
-    newest_element::FreeAssAlgElem{T},
+    new_obstructions::PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}},
+    newest_element::FreeAssociativeAlgebraElem{T},
     newest_index::Int,
 ) where T
     w1 = []
@@ -508,13 +508,13 @@ end
 
 
 function remove_redundancies!(
-    all_obstructions::PriorityQueue{Obstruction{T},FreeAssAlgElem{T}},
+    all_obstructions::PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}},
     newest_index::Int,
-    newest_element::FreeAssAlgElem{T},
+    newest_element::FreeAssociativeAlgebraElem{T},
 ) where T
     del_counter = 0
-    new_obstructions = PriorityQueue{Obstruction{T},FreeAssAlgElem{T}}()
-    old_obstructions = PriorityQueue{Obstruction{T},FreeAssAlgElem{T}}()
+    new_obstructions = PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
+    old_obstructions = PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
     for obstr_pair in all_obstructions
         if obstr_pair[1].second_index == newest_index
             new_obstructions[obstr_pair[1]] = obstr_pair[2]
@@ -542,9 +542,9 @@ function remove_redundancies!(
     # TODO case 4e from Thm 4.1 in Kreuzer Xiu
 end
 
-function get_obstructions(g::Vector{FreeAssAlgElem{T}}) where T
+function get_obstructions(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
     s = length(g)
-    result = PriorityQueue{Obstruction{T},FreeAssAlgElem{T}}()
+    result = PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
     for i in 1:s, j in 1:i
         if i == j
             obs = obstructions(_leading_word(g[i]))
@@ -562,8 +562,8 @@ end
 
 
 function add_obstructions!(
-    obstruction_queue::PriorityQueue{Obstruction{T},FreeAssAlgElem{T}},
-    g::Vector{FreeAssAlgElem{T}},
+    obstruction_queue::PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}},
+    g::Vector{FreeAssociativeAlgebraElem{T}},
 ) where T
     s = length(g)
     for i in 1:s
@@ -582,7 +582,7 @@ end
 
 
 function groebner_basis_buchberger(
-    g::Vector{FreeAssAlgElem{T}},
+    g::Vector{FreeAssociativeAlgebraElem{T}},
     reduction_bound::Int = typemax(Int),
     remove_redundancies::Bool = false
 ) where T<:FieldElement
@@ -618,7 +618,7 @@ function groebner_basis_buchberger(
 end
 
 @doc """
-    groebner_basis(g::Vector{FreeAssAlgElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false)
+    groebner_basis(g::Vector{FreeAssociativeAlgebraElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false)
 
 Compute a Groebner basis for the ideal generated by `g`. Stop when `reduction_bound` many
 non-zero entries have been added to the Groebner basis. If the computation stops due to the bound being exceeded, 
@@ -629,7 +629,7 @@ If `remove_redundancies` is set to true, some redundant obstructions will be rem
 time, however in practice it seems to inflate the running time regularly.
 """ 
 function groebner_basis(
-    g::Vector{FreeAssAlgElem{T}},
+    g::Vector{FreeAssociativeAlgebraElem{T}},
     reduction_bound::Int = typemax(Int),
     remove_redundancies::Bool = false
 ) where T<:FieldElement
