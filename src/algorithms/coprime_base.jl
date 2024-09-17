@@ -45,7 +45,7 @@ function augment_coprime_base(S::Vector{E}, a::E, start::Int = 1) where E
 end
 
 @doc raw"""
-    coprime_base(S::Vector{RingElem}) -> Vector{RingElem}
+    coprime_base(S::Vector{RingElement}) -> Vector{RingElement}
 
 Returns a coprime base for $S$, i.e. the resulting array contains pairwise coprime objects that multiplicatively generate the same set as the input array.
 """
