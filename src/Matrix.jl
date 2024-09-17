@@ -3395,7 +3395,7 @@ function _solve_tril!(A::MatElem{T}, B::MatElem{T}, C::MatElem{T}, f::Int = 0) w
       t = C[j, i]
       for k = 1:j-1
         mul_red!(s, A[k, i], B[j, k], false)
-        sub!(t, t, s)
+        t = sub!(t, s)
       end
       reduce!(t)
       if f == 1
@@ -4587,7 +4587,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, ::Val{with_transform} 
          r1d = divexact(H[j, j], d)
          r2d = divexact(H[k, j], d)
 
-         mul!(r2d, r2d, minus_one)
+         r2d = mul!(r2d, r2d, minus_one)
          for j2 in j:n
             b = mul_red!(b, u, H[j, j2], false)
             t2 = mul_red!(t2, v, H[k, j2], false)
@@ -4696,7 +4696,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, ::Val{with_transform} 
          d, u, v = gcdx(H[j, j], H[k, j])
          r1d = divexact(H[j, j], d)
          r2d = divexact(H[k, j], d)
-         mul!(r2d, r2d, minus_one)
+         r2d = mul!(r2d, r2d, minus_one)
          for j2 in j:n
             b = mul_red!(b, u, H[j, j2], false)
             t2 = mul_red!(t2, v, H[k, j2], false)

@@ -410,9 +410,9 @@ end
       g = rand(R, -12:12, -10:10)
       h = rand(R, -12:12, -10:10)
       r = R()
-      add!(r, f, g)
+      r = add!(r, f, g)
       @test isequal(r, f + g)
-      mul!(r, f, g)
+      r = mul!(r, f, g)
       @test isequal(r, f*g)
    end
 
@@ -423,9 +423,9 @@ end
       g = rand(R, -12:12, -1:1)
       h = rand(R, -12:12, -1:1)
       r = R()
-      add!(r, f, g)
+      r = add!(r, f, g)
       @test isapprox(r, f + g)
-      mul!(r, f, g)
+      r = mul!(r, f, g)
       @test isapprox(r, f*g)
    end
 
@@ -437,9 +437,9 @@ end
       g = rand(R, -12:12, 0:5)
       h = rand(R, -12:12, 0:5)
       r = R()
-      add!(r, f, g)
+      r = add!(r, f, g)
       @test isequal(r, f + g)
-      mul!(r, f, g)
+      r = mul!(r, f, g)
       @test isequal(r, f*g)
    end
 end
