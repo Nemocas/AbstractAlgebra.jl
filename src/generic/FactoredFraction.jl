@@ -481,11 +481,6 @@ function add!(c::FactoredFracFieldElem{T}, a::FactoredFracFieldElem{T}, b::Facto
   return a + b
 end
 
-# needed as add!(a::FracElem{T}, b::FracElem{T}) is incompatible
-function add!(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement
-  return a + b
-end
-
 # needed as mul!(c::FracElem{T}, a::FracElem{T}, b::FracElem{T}) is incompatible
 function mul!(c::FactoredFracFieldElem{T}, a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement
   return a*b
