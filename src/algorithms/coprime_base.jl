@@ -53,7 +53,7 @@ function coprime_base(S::Vector{E}) where {E <: RingElement}
   return coprime_base_steel(S)
 end
 
-function coprime_base_steel(S::Vector)
+function coprime_base_steel(S::Vector{E}) where {E}
   @assert !isempty(S)
   T = Array{E}(undef, 1)
   T[1] = S[1]
