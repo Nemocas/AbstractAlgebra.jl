@@ -831,58 +831,6 @@ function mul!(c::FracElem{T}, a::FracElem{T}, b::FracElem{T}) where {T <: RingEl
    return c
 end
 
-function add!(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
-   d1 = denominator(a, false)
-   d2 = denominator(b, false)
-   n1 = numerator(a, false)
-   n2 = numerator(b, false)
-   if d1 == d2
-      a.num = add!(a.num, b.num)
-      if !isone(d1)
-         gd = gcd(a.num, d1)
-         if !isone(gd)
-            a.num = divexact(a.num, gd)
-            a.den = divexact(d1, gd)
-         end
-      end
-   elseif isone(d1)
-      if n1 !== n2
-         a.num = mul!(a.num, a.num, d2)
-         a.num = add!(a.num, n2)
-      else
-         a.num = n1*d2 + n2
-      end
-      a.den = deepcopy(d2)
-   elseif isone(d2)
-      a.num = add!(a.num, n2*d1)
-      a.den = deepcopy(d1)
-   else
-      gd = gcd(d1, d2)
-      if isone(gd)
-         if n1 !== n2
-            a.num = mul!(a.num, a.num, d2)
-            a.num = add!(a.num, n2*d1)
-         else
-            a.num = n1*d2 + n2*d1
-         end
-         a.den = d1*d2
-      else
-         q1 = divexact(d1, gd)
-         q2 = divexact(d2, gd)
-         a.num = q1*n2 + q2*n1
-         t = gcd(a.num, gd)
-         if isone(t)
-            a.den = mul!(a.den, a.den, q2)
-         else
-            gd = divexact(d1, t)
-            a.num = divexact(a.num, t)
-            a.den = gd*q2
-         end
-      end
-   end
-   return a
-end
-
 function add!(c::FracElem{T}, a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
    d1 = denominator(a, false)
    d2 = denominator(b, false)
