@@ -79,6 +79,7 @@ makedocs(
              ],
              "Miscellaneous" => [
                  "misc.md",
+                 "assertions.md"
              ],
              "Interfaces" => [
                  "interface_introduction.md",
