@@ -9,12 +9,7 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
-# renamed in 0.42.3
-@alias FreeAssAlgebra FreeAssociativeAlgebra
-@alias FreeAssAlgElem FreeAssociativeAlgebraElem
-
-# renamed in 0.42.6
-@alias addeq! add!
+#= currently nothing here =#
 
 ###############################################################################
 #
@@ -26,12 +21,16 @@
 # By calling this macro from the respective packages, we can ensure that the deprecated bindings are available there.
 macro include_deprecated_bindings()
     return esc(quote
-        # deprecated in 0.42
+        # deprecated in 0.42.0
         Base.@deprecate_binding FreeModule free_module
         Base.@deprecate_binding VectorSpace vector_space
         Base.@deprecate_binding UniversalPolynomialRing universal_polynomial_ring
         Base.@deprecate_binding is_finiteorder is_finite_order
 
+        # renamed in 0.43.0
+        Base.@deprecate_binding FreeAssAlgebra FreeAssociativeAlgebra
+        Base.@deprecate_binding FreeAssAlgElem FreeAssociativeAlgebraElem
+        Base.@deprecate_binding addeq! add!
     end)
 end
 
@@ -60,7 +59,7 @@ import .Generic: set_exponent_vector!; @deprecate set_exponent_vector!(a::Generi
 import .Generic: is_gen; @deprecate is_gen(x::Generic.MPoly{T}, ::Type{Val{ord}}) where {T <: RingElement, ord} is_gen(x, Val(ord))
 import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} degree(f, i, Val(ord))
 
-# will become deprecated in 0.43.0
-change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} = map_coefficients(g, p, parent = new_polynomial_ring)
-mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} = Base.divrem(a * b, mod)[2]
-var"@attr"(__source__::LineNumberNode, __module__::Base.Module, expr::Expr) = var"@attr"(__source__, __module__, :Any, expr) # delegate `@attr functionexpression` to `@attr Any functionexpression` (macros are just functions with this weird extra syntax)
+# deprecated in 0.43.0
+@deprecate change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} map_coefficients(g, p, parent = new_polynomial_ring)
+@deprecate mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} Base.divrem(a * b, mod)[2]
+@deprecate var"@attr"(__source__::LineNumberNode, __module__::Base.Module, expr::Expr) var"@attr"(__source__, __module__, :Any, expr) # delegate `@attr functionexpression` to `@attr Any functionexpression` (macros are just functions with this weird extra syntax)
