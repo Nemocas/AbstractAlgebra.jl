@@ -1509,3 +1509,14 @@ multivariate polynomial ring.
 """
 polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
    mpoly_ring_type(T)(R, s, internal_ordering, cached)
+
+###############################################################################
+#
+#   Comparisons
+#
+###############################################################################
+
+function ==(x::MPolyRingElem, y::MPolyRingElem)
+   check_parent(x, y, true)
+   error("Polynomials cannot be compared")
+end
