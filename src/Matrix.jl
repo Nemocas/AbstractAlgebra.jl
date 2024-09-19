@@ -233,20 +233,21 @@ function isone(a::MatrixElem{T}) where T <: NCRingElement
 end
 
 @doc raw"""
-    is_zero_entry(M::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+    is_zero_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
 
 Return `true` if $M_{i,j}$ is zero.
 """
-@inline is_zero_entry(M::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement = iszero(M[i,j])
+@inline is_zero_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = iszero(M[i,j])
 
 @doc raw"""
-    is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
+    is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
 
 Return `true` if the $i$-th row of the matrix $M$ is zero.
 """
-function is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
+function is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
+  @boundscheck 1 <= i <= nrows(M) || Base.throw_boundserror(M, (i, 1:ncols(M)))
   for j in 1:ncols(M)
-    if !is_zero_entry(M, i, j)
+    @inbounds if !is_zero_entry(M, i, j)
       return false
     end
   end
@@ -254,13 +255,14 @@ function is_zero_row(M::MatrixElem{T}, i::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    is_zero_column(M::MatrixElem{T}, j::Int) where T <: NCRingElement
+    is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
 
 Return `true` if the $j$-th column of the matrix $M$ is zero.
 """
-function is_zero_column(M::MatrixElem{T}, j::Int) where T <: NCRingElement
+function is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
+  @boundscheck 1 <= j <= ncols(M) || Base.throw_boundserror(M, (1:nrows(M), j))
   for i in 1:nrows(M)
-    if !is_zero_entry(M, i, j)
+    @inbounds if !is_zero_entry(M, i, j)
       return false
     end
   end
