@@ -1011,13 +1011,13 @@ function add!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingEl
    return a
 end
 
-function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
-   a.p = mul!(a.p, b.p, c.p)
+function sub!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
+   a.p = sub!(a.p, b.p, c.p)
    return a
 end
 
-function addmul!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
-   a.p = (a + b*c).p
+function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
+   a.p = mul!(a.p, b.p, c.p)
    return a
 end
 
