@@ -125,6 +125,11 @@ end
    @test is_zero_column(C, 2)
    @test !is_zero_column(C, 1)
 
+   @test_throws BoundsError is_zero_row(C, 0)
+   @test_throws BoundsError is_zero_row(C, 4)
+   @test_throws BoundsError is_zero_column(C, 0)
+   @test_throws BoundsError is_zero_column(C, 4)
+
    S = matrix_ring(QQ, 3)
    A = S([1 2 3; 4 5 6; 7 8 9])
 

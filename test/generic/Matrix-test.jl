@@ -542,6 +542,11 @@ end
    @test is_zero_column(C, 2)
    @test !is_zero_column(C, 1)
 
+   @test_throws BoundsError is_zero_row(C, 0)
+   @test_throws BoundsError is_zero_row(C, 4)
+   @test_throws BoundsError is_zero_column(C, 0)
+   @test_throws BoundsError is_zero_column(C, 4)
+
    @test length(A) == length(B) == length(C) == 9
    @test !any(isempty, (A, B, C))
 
