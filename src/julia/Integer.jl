@@ -539,11 +539,6 @@ end
 # No actual mutation is permitted for Julia types
 # See #1077
 
-
-function addmul!(a::T, b::T, c::T, d::T) where T <: Integer
-   return a + b*c
-end
-
 function addmul!(a::T, b::T, c::T) where T <: Integer # special case, no temporary required
    return a + b*c
 end

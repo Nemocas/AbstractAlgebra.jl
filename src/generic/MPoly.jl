@@ -3894,6 +3894,14 @@ function add!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
    return a
 end
 
+function sub!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
+   t = b - c
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return a
+end
+
 function mul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
    t = b*c
    a.coeffs = t.coeffs
@@ -3902,20 +3910,9 @@ function mul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
    return a
 end
 
-function add!(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   t = a + b
-   a.coeffs = t.coeffs
-   a.exps = t.exps
-   a.length = t.length
-   return a
-end
-
 function addmul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
-   t = a + (b * c)
-   a.coeffs = t.coeffs
-   a.exps = t.exps
-   a.length = t.length
-   return a
+   t = b * c
+   return add!(a, t)
 end
 
 function resize_exps!(a::Matrix{UInt}, n::Int)
