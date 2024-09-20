@@ -143,7 +143,7 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
       #nmod_mat_window_init(Cc, C, 0, 2*bnc, a, c);
       Cc = view(C, 1:a, 2*bnc+1:c)
       #nmod_mat_mul(Cc, A, Bc);
-      Cc = AbstractAlgebra.mul!(Cc, A, Bc)
+      AbstractAlgebra.mul!(Cc, A, Bc) # needs to mutate Cc
   end
 
   if a > 2*anr #last row of A by B -> last row of C
@@ -152,7 +152,7 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
       #nmod_mat_window_init(Cr, C, 2*anr, 0, a, c);
       Cr = view(C, 2*anr+1:a, 1:c)
       #nmod_mat_mul(Cr, Ar, B);
-      Cr = AbstractAlgebra.mul!(Cr, Ar, B)
+      AbstractAlgebra.mul!(Cr, Ar, B) # needs to mutate Cr
   end
 
   if b > 2*anc # last col of A by last row of B -> C
@@ -163,7 +163,7 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
       #nmod_mat_window_init(Cb, C, 0, 0, 2*anr, 2*bnc);
       Cb = view(C, 1:2*anr, 1:2*bnc)
       #nmod_mat_addmul(Cb, Cb, Ac, Br);
-      Cb = AbstractAlgebra.mul!(Cb, Ac, Br)
+      AbstractAlgebra.addmul!(Cb, Ac, Br) # needs to mutate Cb
   end
 
   return C
