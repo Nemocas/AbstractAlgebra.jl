@@ -15,13 +15,16 @@ The speedup depends on the ring and the entry sizes.
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> m = matrix(ZZ, rand(-10:10, 1000, 1000));
 
-julia> n = similar(m);
+julia> n1 = similar(m); n2 = similar(m); n3 = similar(m);
 
-julia> n = mul!(n, m, m);
+julia> n1 = mul!(n1, m, m);
 
-julia> n = Strassen.mul!(n, m, m);
+julia> n2 = Strassen.mul!(n2, m, m);
 
-julia> n = Strassen.mul!(n, m, m; cutoff = 100);
+julia> n3 = Strassen.mul!(n3, m, m; cutoff = 100);
+
+julia> n1 == n2 == n3
+true
 ```
 """
 module Strassen
