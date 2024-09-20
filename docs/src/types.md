@@ -83,7 +83,7 @@ various relations between the objects and types.
 ```jldoctest
 julia> using AbstractAlgebra
 
-julia> R, x = ZZ["x"]
+julia> R, x = ZZ[:x]
 (Univariate polynomial ring in x over integers, x)
 
 julia> f = x^2 + 3x + 1

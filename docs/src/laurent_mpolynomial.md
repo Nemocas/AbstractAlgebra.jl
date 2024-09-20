@@ -104,7 +104,7 @@ $\prod_i x_i^{n_i}$ from the normalized representation. In particular,
 this means that the output of `gcd` will not have any negative exponents.
 
 ```jldoctest
-julia> R, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"]);
+julia> R, (x, y) = laurent_polynomial_ring(ZZ, [:x, :y]);
 
 julia> canonical_unit(2*x^-5 - 3*x + 4*y^-4 + 5*y^2)
 -x^-5*y^-4

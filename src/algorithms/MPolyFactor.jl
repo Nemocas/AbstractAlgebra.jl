@@ -246,7 +246,7 @@ function pfracinit(
   end
 
   # univariate ring for gcdx
-  S, x = polynomial_ring(K, "x")
+  S, x = polynomial_ring(K, :x)
   sub = [k == mainvar ? x : S(1) for k in 1:nvars(R)]
 
   for j in 0:l
@@ -791,7 +791,7 @@ end
 function mfactor_irred_univar(a::E, var::Int) where E
   R = parent(a)
   K = base_ring(R)
-  Kx, _ = polynomial_ring(K, "x")
+  Kx, _ = polynomial_ring(K, :x)
   F = factor(to_univar(a, var, Kx))
   res = E[]
   ok = true
@@ -873,7 +873,7 @@ function hlift_bivar_combine(
   xdeg = degree(a, xvar)
   ydeg = degree(a, yvar)
 
-  Ky, y = polynomial_ring(K, "x")
+  Ky, y = polynomial_ring(K, :x)
 
   yalpha = gen(R, yvar) - R(alpha)
   yalphapow = yalpha^(ydeg + 1)

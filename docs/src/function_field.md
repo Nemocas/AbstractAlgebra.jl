@@ -50,7 +50,7 @@ resulting parent objects to coerce various elements into the function field.
 **Examples**
 
 ```jldoctest
-julia> S, x = rational_function_field(QQ, "x")
+julia> S, x = rational_function_field(QQ, :x)
 (Rational function field over rationals, x)
 
 julia> f = S()
@@ -68,7 +68,7 @@ x + 1
 julia> m = S(numerator(x + 1, false), numerator(x + 2, false))
 (x + 1)//(x + 2)
 
-julia> R, (x, y) = rational_function_field(QQ, ["x", "y"])
+julia> R, (x, y) = rational_function_field(QQ, [:x, :y])
 (Rational function field over rationals, AbstractAlgebra.Generic.RationalFunctionFieldElem{Rational{BigInt}, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[x, y])
 
 julia> (x + y)//y^2
@@ -85,7 +85,7 @@ We give some examples of such functionality.
 **Examples**
 
 ```jldoctest
-julia> S, x = rational_function_field(QQ, "x")
+julia> S, x = rational_function_field(QQ, :x)
 (Rational function field over rationals, x)
 
 julia> f = S(x + 1)
@@ -147,7 +147,7 @@ gcd(::Generic.RationalFunctionFieldElem{T, U}, ::Generic.RationalFunctionFieldEl
 **Examples**
 
 ```jldoctest
-julia> R, x = rational_function_field(QQ, "x")
+julia> R, x = rational_function_field(QQ, :x)
 (Rational function field over rationals, x)
 
 julia> f = (x + 1)//(x^3 + 3x + 1)
@@ -174,7 +174,7 @@ Base.sqrt(::Generic.RationalFunctionFieldElem{T, U}) where {T <: FieldElem, U <:
 **Examples**
 
 ```jldoctest
-julia> R, x = rational_function_field(QQ, "x")
+julia> R, x = rational_function_field(QQ, :x)
 (Rational function field over rationals, x)
 
 julia> a = (21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
@@ -281,16 +281,16 @@ examples of such functionality.
 **Examples**
 
 ```jldoctest
-julia> R, x = rational_function_field(GF(23), "x") # characteristic p
+julia> R, x = rational_function_field(GF(23), :x) # characteristic p
 (Rational function field over finite field F_23, x)
 
-julia> U, z = R["z"]
+julia> U, z = R[:z]
 (Univariate polynomial ring in z over rational function field, z)
 
 julia> g = z^2 + 3z + 1
 z^2 + 3*z + 1
 
-julia> S, y = function_field(g, "y")
+julia> S, y = function_field(g, :y)
 (Function Field over finite field F_23 with defining polynomial y^2 + 3*y + 1, y)
 
 julia> f = (x + 1)*y + 1
@@ -357,16 +357,16 @@ num_coeff(::Generic.FunctionFieldElem, ::Int)
 **Examples**
 
 ```jldoctest
-julia> R, x = rational_function_field(QQ, "x")
+julia> R, x = rational_function_field(QQ, :x)
 (Rational function field over rationals, x)
 
-julia> U, z = R["z"]
+julia> U, z = R[:z]
 (Univariate polynomial ring in z over rational function field, z)
 
 julia> g = z^2 + 3*(x + 1)//(x + 2)*z + 1
 z^2 + (3*x + 3)//(x + 2)*z + 1
 
-julia> S, y = function_field(g, "y")
+julia> S, y = function_field(g, :y)
 (Function Field over rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
 
 julia> base_field(S)
@@ -420,16 +420,16 @@ norm(::Generic.FunctionFieldElem)
 ```
 
 ```jldoctest
-julia> R, x = rational_function_field(QQ, "x")
+julia> R, x = rational_function_field(QQ, :x)
 (Rational function field over rationals, x)
 
-julia> U, z = R["z"]
+julia> U, z = R[:z]
 (Univariate polynomial ring in z over rational function field, z)
 
 julia> g = z^2 + 3*(x + 1)//(x + 2)*z + 1
 z^2 + (3*x + 3)//(x + 2)*z + 1
 
-julia> S, y = function_field(g, "y")
+julia> S, y = function_field(g, :y)
 (Function Field over rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
 
 julia> f = (-3*x - 5//3)//(x - 2)*y + (x^3 + 1//9*x^2 + 5)//(x - 2)

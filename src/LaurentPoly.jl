@@ -19,7 +19,7 @@ ring $S = R[x, 1/x]$ and the generator $x$ of the ring.
 
 # Examples
 ```julia
-julia> R, x = laurent_polynomial_ring(ZZ, "x")
+julia> R, x = laurent_polynomial_ring(ZZ, :x)
 (Univariate Laurent Polynomial Ring in x over Integers, x)
 
 julia> 2x^-3 + x^2

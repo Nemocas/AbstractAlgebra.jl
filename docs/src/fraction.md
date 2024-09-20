@@ -62,7 +62,7 @@ resulting parent objects to coerce various elements into the fraction field.
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S = fraction_field(R)
@@ -93,7 +93,7 @@ FactoredFractionField(R::Ring; cached::Bool = true)
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
 (Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> S = FactoredFractionField(R)
@@ -137,7 +137,7 @@ fraction field without constructing the fraction field parent first.
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S = fraction_field(R)
@@ -185,7 +185,7 @@ characteristic is not known an exception is raised.
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S = fraction_field(R)
@@ -242,7 +242,7 @@ denominator(a::FracElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S = fraction_field(R)
@@ -286,7 +286,7 @@ gcd{T <: RingElem}(::FracElem{T}, ::FracElem{T})
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> f = (x + 1)//(x^3 + 3x + 1)
@@ -313,7 +313,7 @@ Base.sqrt(::FracElem{T}) where {T <: RingElem}
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S = fraction_field(R)
@@ -346,7 +346,7 @@ valuation{T <: RingElem}(::FracElem{T}, ::T)
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> f = (x + 1)//(x^3 + 3x + 1)
@@ -381,7 +381,7 @@ Rationals
 julia> f = rand(K, -10:10)
 -1//3
 
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S = fraction_field(R)

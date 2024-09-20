@@ -1040,7 +1040,7 @@ The above implementation of `constant_polynomial_ring` may be tested as follows.
 using Test
 include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
 
-S, _ = polynomial_ring(QQ, "x")
+S, _ = polynomial_ring(QQ, :x)
 
 function test_elem(R::ConstPolyRing{elem_type(S)})
    return R(rand(base_ring(R), 1:6, -999:999))

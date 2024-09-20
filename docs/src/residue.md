@@ -69,7 +69,7 @@ resulting parent objects to coerce various elements into the residue ring.
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S, = residue_ring(R, x^3 + 3x + 1);
@@ -171,7 +171,7 @@ modulus(::ResElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S, = residue_ring(R, x^3 + 3x + 1);
@@ -212,7 +212,7 @@ Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
 julia> f == deepcopy(f)
 true
 
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 ```
 
@@ -225,7 +225,7 @@ Base.inv(::ResElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S, = residue_ring(R, x^3 + 3x + 1);
@@ -247,7 +247,7 @@ gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S, = residue_ring(R, x^3 + 3x + 1);
@@ -306,7 +306,7 @@ julia> R, = residue_ring(ZZ, 7);
 julia> f = rand(R, 0:6)
 4
 
-julia> S, x = polynomial_ring(QQ, "x")
+julia> S, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> g = rand(S, 2:2, -10:10)

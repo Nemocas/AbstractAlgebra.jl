@@ -75,7 +75,7 @@ the resulting parent objects to coerce various elements into the ring.
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S = total_ring_of_fractions(R)
@@ -115,7 +115,7 @@ total ring of fractions in question.
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S = total_ring_of_fractions(R)
@@ -164,7 +164,7 @@ the characteristic is not known an exception is raised.
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S = total_ring_of_fractions(R)
@@ -218,7 +218,7 @@ denominator(a::TotFrac)
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> S = total_ring_of_fractions(R)
@@ -273,7 +273,7 @@ Total ring of fractions of residue ring
 julia> f = rand(K, 0:11)
 7//5
 
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S = total_ring_of_fractions(R)

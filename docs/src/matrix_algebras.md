@@ -72,7 +72,7 @@ resulting parent objects to coerce various elements into the matrix algebra.
 **Examples**
 
 ```jldoctest
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_ring(R, 3)
@@ -140,7 +140,7 @@ degree(::Generic.MatRingElem)
 **Examples**
 
 ```jldoctest
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_ring(R, 3)

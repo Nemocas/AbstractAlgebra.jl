@@ -57,7 +57,7 @@ This example makes use of multivariate polynomials.
 ```julia
 using AbstractAlgebra
 
-R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
+R, (x, y, z) = polynomial_ring(ZZ, [:x, :y, :z])
 
 f = x + y + z + 1
 
@@ -73,11 +73,11 @@ using AbstractAlgebra
 
 R = GF(7)
 
-S, y = polynomial_ring(R, "y")
+S, y = polynomial_ring(R, :y)
 
 T, = residue_ring(S, y^3 + 3y + 1)
 
-U, z = polynomial_ring(T, "z")
+U, z = polynomial_ring(T, :z)
 
 f = (3y^2 + y + 2)*z^2 + (2*y^2 + 1)*z + 4y + 3;
 
@@ -95,7 +95,7 @@ Here is an example using matrices.
 ```julia
 using AbstractAlgebra
 
-R, x = polynomial_ring(ZZ, "x")
+R, x = polynomial_ring(ZZ, :x)
 
 S = matrix_space(R, 10, 10)
 
@@ -109,9 +109,9 @@ And here is an example with power series.
 ```julia
 using AbstractAlgebra
 
-R, x = QQ["x"]
+R, x = QQ[:x]
 
-S, t = power_series_ring(R, 30, "t")
+S, t = power_series_ring(R, 30, :t)
 
 u = t + O(t^100)
 

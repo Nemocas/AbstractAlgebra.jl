@@ -78,7 +78,7 @@ resulting parent objects to coerce various elements into the matrix space.
 **Examples**
 
 ```jldoctest
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
@@ -176,7 +176,7 @@ julia> N3 = T(BigInt[2, 3, 1, 1])
 [2//1   3//1]
 [1//1   1//1]
 
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
@@ -485,7 +485,7 @@ Base.map!(f, ::MatrixElem{S}, ::MatrixElem{T}) where {S <: RingElement, T <: Rin
 **Examples**
 
 ```jldoctest
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
@@ -828,7 +828,7 @@ fflu{T <: RingElem}(::MatElem{T}, ::SymmetricGroup)
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
@@ -865,7 +865,7 @@ is_rref{T <: FieldElem}(::MatElem{T})
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
@@ -885,7 +885,7 @@ julia> r, A = rref(M)
 julia> is_rref(A)
 true
 
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S = matrix_space(R, 3, 3)
@@ -988,7 +988,7 @@ is_invertible{T <: RingElement}(::MatrixElem{T})
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
@@ -1013,7 +1013,7 @@ true
 julia> is_invertible_with_inverse(A)
 (true, [-343//7817*x^2+717//7817*x-2072//7817 -4964//23451*x^2+2195//23451*x-11162//23451 -232//23451*x^2-4187//23451*x-1561//23451; 128//7817*x^2-655//7817*x+2209//7817 599//23451*x^2-2027//23451*x-1327//23451 -1805//23451*x^2+2702//23451*x-7394//23451; 545//7817*x^2+570//7817*x+2016//7817 -1297//23451*x^2-5516//23451*x-337//23451 8254//23451*x^2-2053//23451*x+16519//23451])
 
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S = matrix_space(R, 3, 3)
@@ -1179,7 +1179,7 @@ popov_with_transform{T <: PolyRingElem}(::MatElem{T})
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(QQ, "x");
+julia> R, x = polynomial_ring(QQ, :x);
 
 julia> A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
 [1         2           3               x]

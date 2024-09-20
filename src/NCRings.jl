@@ -151,7 +151,7 @@ Return true if $a$ is invertible, else return false.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S, x = polynomial_ring(QQ, "x")
+julia> S, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> is_unit(x), is_unit(S(1)), is_unit(S(4))
