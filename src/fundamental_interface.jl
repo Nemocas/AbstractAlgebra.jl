@@ -377,6 +377,28 @@ This is a shorthand for `mul!(a, a, b)`.
 mul!(a, b) = mul!(a, a, b)
 
 @doc raw"""
+    addmul!(a, b, c, t)
+
+Return `a + b * c`, possibly modifying the objects `a` and `t` in the process.
+"""
+function addmul!(a, b, c, t)
+   t = mul!(t, b, c)
+   return add!(a, t)
+end
+
+@doc raw"""
+    addmul!(a, b, c)
+
+Return `a + b * c`, possibly modifying the object `a` in the process.
+
+This is usually a shorthand for `addmul!(a, b, c, parent(a)())`, but
+in some cases may be more efficient. For multiple operations in a row
+that use temporary storage, it is still best to use the four argument
+version.
+"""
+addmul!(a, b, c) = addmul!(a, b, c, parent(a)())
+
+@doc raw"""
     div!(a, b, c)
 
 Return `div(b, c)`, possibly modifying the object `a` in the process.

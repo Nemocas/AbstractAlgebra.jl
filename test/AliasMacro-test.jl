@@ -30,12 +30,23 @@ end
     @test !(:isbar in names(Bla))
 
     # verify docstring is correctly attached
-    @test string(@doc Bla.isfoo) ==
-        """
-        ```
-        isfoo
-        ```
+    if VERSION >= v"1.12.0-DEV.1223"
+      @test string(@doc Bla.isfoo) ==
+          """
+          ```julia
+          isfoo
+          ```
 
-        Alias for `is_foo`.
-        """
+          Alias for `is_foo`.
+          """
+    else
+      @test string(@doc Bla.isfoo) ==
+          """
+          ```
+          isfoo
+          ```
+
+          Alias for `is_foo`.
+          """
+    end
 end

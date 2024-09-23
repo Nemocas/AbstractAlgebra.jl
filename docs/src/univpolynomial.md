@@ -73,8 +73,14 @@ Universal Polynomial Ring over Integers
 julia> x = gen(S, :x)
 x
 
+julia> number_of_generators(S)
+1
+
 julia> y, z = gens(S, [:y, :z])
 (y, z)
+
+julia> number_of_generators(S)
+3
 ```
 
 ## Universal polynomial functionality

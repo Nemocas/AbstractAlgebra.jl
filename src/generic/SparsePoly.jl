@@ -721,15 +721,6 @@ function fit!(a::SparsePoly{T}, n::Int) where {T <: RingElement}
    return nothing
 end
 
-function addmul!(a::SparsePoly{T}, b::SparsePoly{T}, c::SparsePoly{T}, d::SparsePoly{T}) where {T <: RingElement}
-   t = b*c
-   t += a
-   a.coeffs = t.coeffs
-   a.exps = t.exps
-   a.length = t.length
-   return a
-end
-
 function mul!(a::SparsePoly{T}, b::SparsePoly{T}, c::SparsePoly{T}) where {T <: RingElement}
    t = b*c
    a.coeffs = t.coeffs
@@ -740,6 +731,14 @@ end
 
 function add!(a::SparsePoly{T}, b::SparsePoly{T}, c::SparsePoly{T}) where {T <: RingElement}
    t = b + c
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return a
+end
+
+function sub!(a::SparsePoly{T}, b::SparsePoly{T}, c::SparsePoly{T}) where {T <: RingElement}
+   t = b - c
    a.coeffs = t.coeffs
    a.exps = t.exps
    a.length = t.length
