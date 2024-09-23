@@ -1,3 +1,5 @@
+using REPL # needed due to https://github.com/JuliaLang/julia/issues/53349
+
 module Tmp
     using AbstractAlgebra
 
@@ -210,14 +212,25 @@ my_derived_type(::Type{Tmp.Container{T}}) where T = T
     @test y === x
 
     # verify docstring is correctly attached
-    @test string(@doc cached_attr) ==
-        """
-        ```
-        cached_attr(obj::T) where T
-        ```
+    if VERSION >= v"1.12.0-DEV.1223"
+        @test string(@doc cached_attr) ==
+            """
+            ```julia
+            cached_attr(obj::T) where T
+            ```
 
-        A cached attribute.
-        """
+            A cached attribute.
+            """
+    else
+        @test string(@doc cached_attr) ==
+            """
+            ```
+            cached_attr(obj::T) where T
+            ```
+
+            A cached attribute.
+            """
+    end
 
     # test function location is tracked accurately (this requires that the
     # definition of uncached_attr is before that of cached_attr)

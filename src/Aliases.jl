@@ -6,6 +6,7 @@
 @alias is_inf isinf
 @alias is_integer isinteger
 @alias is_less isless
+@alias is_nothing isnothing
 @alias is_odd isodd
 @alias is_one isone
 @alias is_real isreal

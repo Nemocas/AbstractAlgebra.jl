@@ -279,12 +279,6 @@ function add!(a::Rational{T}, b::Rational{T}) where T <: Integer
    end
 end
 
-function addmul!(a::Rational{T}, b::Rational{T}, c::Rational{T}, d::Rational{T}) where T <: Integer
-   d = mul!(d, b, c)
-   a = add!(a, d)
-   return a
-end
-
 ###############################################################################
 #
 #   Random generation
