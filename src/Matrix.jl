@@ -1421,7 +1421,7 @@ Return the transpose of the given matrix.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
@@ -1483,7 +1483,7 @@ $i$-th and $j$-th rows, respectively.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
@@ -1530,7 +1530,7 @@ require the matrix to be square.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
@@ -1571,7 +1571,7 @@ its entries, assuming it exists.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
@@ -1615,7 +1615,7 @@ Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
@@ -1660,7 +1660,7 @@ Apply the pemutation $P$ to the columns of the matrix $x$ and return the result.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, t = polynomial_ring(QQ, "t")
+julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S = matrix_space(R, 3, 3)
@@ -2362,7 +2362,7 @@ Return the determinant of the matrix $M$. We assume $M$ is square.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, x = polynomial_ring(QQ, "x")
+julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> A = R[x 1; 1 x^2];
@@ -3582,7 +3582,7 @@ function to compute an integral kernel.
 # Examples
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S = matrix_space(R, 4, 4)
@@ -4065,7 +4065,7 @@ julia> S = matrix_space(R, 4, 4)
 Matrix space of 4 rows and 4 columns
   over residue ring of integers modulo 7
 
-julia> T, y = polynomial_ring(R, "y")
+julia> T, y = polynomial_ring(R, :y)
 (Univariate polynomial ring in y over residue ring, y)
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
@@ -4268,7 +4268,7 @@ the resulting polynomial is an element of it.
 julia> R = GF(13)
 Finite field F_13
 
-julia> S, y = polynomial_ring(R, "y")
+julia> S, y = polynomial_ring(R, :y)
 (Univariate polynomial ring in y over finite field F_13, y)
 
 julia> M = R[7 6 1;

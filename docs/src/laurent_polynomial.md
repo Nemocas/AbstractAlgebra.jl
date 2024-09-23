@@ -41,7 +41,7 @@ Laurent polynomials implement the ring interface, and some methods
 from the polynomial interface, for example:
 
 ```jldoctest
-julia> R, x = laurent_polynomial_ring(ZZ, "x")
+julia> R, x = laurent_polynomial_ring(ZZ, :x)
 (Univariate Laurent polynomial ring in x over integers, x)
 
 julia> var(R)

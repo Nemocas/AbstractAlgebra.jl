@@ -113,7 +113,7 @@ precisions can be replaced by a single integer in the constructor.
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = power_series_ring(ZZ, [2, 3], ["x", "y"])
+julia> R, (x, y) = power_series_ring(ZZ, [2, 3], [:x, :y])
 (Multivariate power series ring in 2 variables over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^2), y + O(y^3) + O(x^2)])
 
 julia> f = R()
@@ -131,13 +131,13 @@ julia> k = R(x + 1)
 julia> m = x + y + O(y^2)
 y + x + O(y^2) + O(x^2)
 
-julia> R, (x, y) = power_series_ring(ZZ, 3, ["x", "y"])
+julia> R, (x, y) = power_series_ring(ZZ, 3, [:x, :y])
 (Multivariate power series ring in 2 variables over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^3), y + O(y^3) + O(x^3)])
 
 julia> n = x + y + O(R, 2)
 y + x + O(y^2) + O(x^2)
 
-julia> R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
+julia> R, (x, y) = power_series_ring(ZZ, [2, 3], 10, [:x, :y])
 (Multivariate power series ring in 2 variables over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(10), y + O(10)])
 
 julia> R()
@@ -168,7 +168,7 @@ We give some examples of such functionality.
 **Examples**
 
 ```jldoctest
-julia> R, (x,) = power_series_ring(ZZ, [5], ["x"])
+julia> R, (x,) = power_series_ring(ZZ, [5], [:x])
 (Multivariate power series ring in 1 variable over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(x^5)])
 
 julia> f = x^3 + 3x + 21
@@ -206,7 +206,7 @@ true
 julia> t = divexact(f*x, 1 + x)
 21*x - 18*x^2 + 18*x^3 - 17*x^4 + O(x^5)
 
-julia> R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
+julia> R, (x, y) = power_series_ring(ZZ, [2, 3], 10, [:x, :y])
 (Multivariate power series ring in 2 variables over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(10), y + O(10)])
 
 julia> f = 3x^2*y + 1

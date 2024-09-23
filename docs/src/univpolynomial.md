@@ -70,13 +70,13 @@ gens(S::UniversalPolyRing, vars::Vector{VarName})
 julia> S = universal_polynomial_ring(ZZ)
 Universal Polynomial Ring over Integers
 
-julia> x = gen(S, "x")
+julia> x = gen(S, :x)
 x
 
 julia> number_of_generators(S)
 1
 
-julia> y, z = gens(S, ["y", "z"])
+julia> y, z = gens(S, [:y, :z])
 (y, z)
 
 julia> number_of_generators(S)

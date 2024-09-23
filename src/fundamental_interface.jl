@@ -25,7 +25,7 @@ julia> G = SymmetricGroup(5); g = Perm([3,4,5,2,1])
 julia> parent(g) == G
 true
 
-julia> S, x = laurent_series_ring(ZZ, 3, "x")
+julia> S, x = laurent_series_ring(ZZ, 3, :x)
 (Laurent series ring in x over integers, x + O(x^4))
 
 julia> parent(x) == S
@@ -43,7 +43,7 @@ Given a parent object (or its type), return the type of its elements.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S, x = power_series_ring(QQ, 2, "x")
+julia> S, x = power_series_ring(QQ, 2, :x)
 (Univariate power series ring over rationals, x + O(x^3))
 
 julia> elem_type(S) == typeof(x)
@@ -61,7 +61,7 @@ Given an element (or its type), return the type of its parent object.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S = matrix_space(R, 2, 2)
@@ -84,7 +84,7 @@ Return base ring $R$ of given element or parent $a$.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> S, x = polynomial_ring(QQ, "x")
+julia> S, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
 julia> base_ring(S) == QQ
@@ -108,7 +108,7 @@ Return the type of the base ring of the given element, element type, parent or p
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> base_ring_type(R) == typeof(base_ring(R))
@@ -155,7 +155,7 @@ julia> one(S)
 [1   0]
 [0   1]
 
-julia> R, x = puiseux_series_field(QQ, 4, "x")
+julia> R, x = puiseux_series_field(QQ, 4, :x)
 (Puiseux series field in x over rationals, x + O(x^5))
 
 julia> one(x)
@@ -186,7 +186,7 @@ julia> zero(S)
 [0//1   0//1]
 [0//1   0//1]
 
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> zero(x^3 + 2)
@@ -219,7 +219,7 @@ false
 julia> isone(U([1 0; 0 1; 0 0]))
 false
 
-julia> T, x = puiseux_series_field(QQ, 10, "x")
+julia> T, x = puiseux_series_field(QQ, 10, :x)
 (Puiseux series field in x over rationals, x + O(x^11))
 
 julia> isone(x), isone(T(1))
@@ -235,7 +235,7 @@ Return true if $a$ is the additative identity, else return false.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> T, x = puiseux_series_field(QQ, 10, "x")
+julia> T, x = puiseux_series_field(QQ, 10, :x)
 (Puiseux series field in x over rationals, x + O(x^11))
 
 julia> a = T(0)
@@ -260,7 +260,7 @@ function iszero end
 
 # # Examples
 # ```jldoctest; setup = :(using AbstractAlgebra)
-# julia> S, x = laurent_polynomial_ring(QQ, "x")
+# julia> S, x = laurent_polynomial_ring(QQ, :x)
 # (Univariate Laurent Polynomial Ring in x over Rationals, x)
 
 # julia> gen(S)

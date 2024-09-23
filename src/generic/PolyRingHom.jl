@@ -189,14 +189,14 @@ to `S`, if such a homomorphism exists, and throw an error, otherwise.
 
 # Examples
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> Zx, x = ZZ["x"];
+julia> Zx, x = ZZ[:x];
 
 julia> F = hom(Zx, Zx, x + 1);
 
 julia> F(x^2)
 x^2 + 2*x + 1
 
-julia> Fp = GF(3); Fpy, y = Fp["y"];
+julia> Fp = GF(3); Fpy, y = Fp[:y];
 
 julia> G = hom(Zx, Fpy, c -> Fp(c), y^3);
 

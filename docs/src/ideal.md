@@ -60,7 +60,7 @@ contain duplicates, zero entries or be empty.
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y]; internal_ordering=:degrevlex)
 (Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
@@ -92,7 +92,7 @@ gens(::Generic.Ideal{T}) where T <: RingElement
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> V = [1 + 2x^2 + 3x^3, 5x^4 + 1, 2x - 1]
@@ -128,7 +128,7 @@ intersect(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
 **Examples**
 
 ```jldoctest
-julia> R, x = polynomial_ring(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> V = [1 + 2x^2 + 3x^3, 5x^4 + 1, 2x - 1]
@@ -170,7 +170,7 @@ normal_form(::U, ::Generic.Ideal{U}) where {T <: RingElement, U <: Union{PolyRin
 **Examples**
 
 ```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y]; internal_ordering=:degrevlex)
 (Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
