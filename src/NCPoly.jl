@@ -726,7 +726,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    polynomial_ring(R::NCRing, s::VarName = :x; cached::Bool = true)
+    polynomial_ring(R::NCRing, s::VarName = :x; cached::Bool=true)
 
 Given a base ring `R` and symbol/string `s` specifying how the generator
 (variable) should be printed, return a tuple `S, x` representing the new
@@ -745,21 +745,16 @@ julia> S, y = polynomial_ring(R, :y)
 (Univariate polynomial ring in y over R, y)
 ```
 """
-function polynomial_ring(R::NCRing, s::VarName =:x; kw...)
-   S = polynomial_ring_only(R, Symbol(s); kw...)
+function polynomial_ring(R::NCRing, s::VarName = :x; cached::Bool=true, kw...)
+   S = poly_ring(R, Symbol(s); cached, kw...)
    (S, gen(S))
 end
 
 @doc raw"""
-    polynomial_ring_only(R::NCRing, s::Symbol; cached::Bool=true)
+    poly_ring(R::NCRing, s::Symbol; cached::Bool=false)
 
 Like [`polynomial_ring(R::NCRing, s::Symbol)`](@ref) but return only the
 polynomial ring.
 """
-polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
+poly_ring(R::T, s::Symbol = :x; cached::Bool=false) where T<:NCRing =
    poly_ring_type(T)(R, s, cached)
-
-# Simplified constructor
-
-PolyRing(R::NCRing) = polynomial_ring_only(R, :x; cached=false)
-

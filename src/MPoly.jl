@@ -1576,8 +1576,8 @@ julia> S, generators = polynomial_ring(ZZ, [:x, :y, :z])
 (Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 ```
 """
-function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
-   S = polynomial_ring_only(R, s; kw...)
+function polynomial_ring(R::Ring, s::Vector{Symbol}; cached::Bool=true, kw...)
+   S = poly_ring(R, s; cached, kw...)
    (S, gens(S))
 end
 
@@ -1663,10 +1663,10 @@ true
 :(@polynomial_ring)
 
 """
-    polynomial_ring_only(R::Ring, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true)
+    poly_ring(R::Ring, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=false)
 
 Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the
 multivariate polynomial ring.
 """
-polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
+poly_ring(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=false) where T<:Ring =
    mpoly_ring_type(T)(R, s, internal_ordering, cached)

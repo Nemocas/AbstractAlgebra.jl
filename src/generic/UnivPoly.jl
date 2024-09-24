@@ -227,7 +227,7 @@ function _ensure_variables(S::UniversalPolyRing, v::Vector{<:VarName})
    end
    if !isempty(added_symbols)
       new_symbols = vcat(current_symbols, added_symbols)
-      S.base_ring = AbstractAlgebra.polynomial_ring_only(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+      S.base_ring = AbstractAlgebra.poly_ring(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S))
    end
    return idx
 end
@@ -238,7 +238,7 @@ function gen(S::UniversalPolyRing, s::VarName)
       new_symbols = copy(symbols(S))
       push!(new_symbols, Symbol(s))
       i = length(new_symbols)
-      S.base_ring = AbstractAlgebra.polynomial_ring_only(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+      S.base_ring = AbstractAlgebra.poly_ring(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S))
    end
    return @inbounds gen(S, i)
 end

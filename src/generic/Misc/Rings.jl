@@ -12,7 +12,7 @@ function is_power(a::RingElem, n::Int)
         return true, a
     end
     R = parent(a)
-    Rt = AbstractAlgebra.PolyRing(R)
+    Rt = AbstractAlgebra.poly_ring(R)
     x = gen(Rt)
     r = roots(x^n - a)
     if length(r) == 0

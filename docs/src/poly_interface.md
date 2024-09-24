@@ -146,7 +146,7 @@ This function is defined for generic polynomials and only needs to be defined fo
 custom polynomial rings, e.g. ones defined by a C implementation.
 
 ```@docs
-polynomial_ring_only(R::Ring, s::Symbol; cached::Bool=true)
+poly_ring(R::Ring, s::Symbol; cached::Bool=false)
 ```
 
 The default implementation figures out the appropriate polynomial ring type via
@@ -157,8 +157,8 @@ In our example, this would be
 MyPolyRing{T}(R, s, cached)
 ```
 
-Accordingly, `polynomial_ring_only` only needs to be defined, if such a
-constructor does not exist or other behaviour is wanted.
+Accordingly, a `poly_ring` method only needs to be defined if such a
+constructor does not exist for `dense_poly_type(T)` or if other behaviour is wanted.
 
 ### Basic manipulation of rings and elements
 
